@@ -1,17 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using De.Hochstaetter.Fronius.Contracts;
+using De.Hochstaetter.Fronius.Services;
 using System.Windows;
+using Unity;
 
 namespace FroniusMonitor
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
+
     public partial class App : Application
     {
+        public static readonly IUnityContainer Container = new UnityContainer();
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+
+            Container
+                .RegisterType<IWebClientService, WebClientService>()
+                ;
+        }
     }
 }

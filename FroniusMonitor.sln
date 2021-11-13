@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FroniusMonitor", "FroniusMonitor\FroniusMonitor.csproj", "{32C6AE9E-68BE-4BFA-BB96-A16EE9E823DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FroniusMonitor", "FroniusMonitor\FroniusMonitor.csproj", "{32C6AE9E-68BE-4BFA-BB96-A16EE9E823DC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fronius", "Fronius\Fronius.csproj", "{D650CFAC-72D1-4DDB-B563-3371985696BC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FroniusUnitTests", "FroniusUnitTests\FroniusUnitTests.csproj", "{DEBD9F67-72BD-4975-B584-FC9680F83B9F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{32C6AE9E-68BE-4BFA-BB96-A16EE9E823DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32C6AE9E-68BE-4BFA-BB96-A16EE9E823DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{32C6AE9E-68BE-4BFA-BB96-A16EE9E823DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D650CFAC-72D1-4DDB-B563-3371985696BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D650CFAC-72D1-4DDB-B563-3371985696BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D650CFAC-72D1-4DDB-B563-3371985696BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D650CFAC-72D1-4DDB-B563-3371985696BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEBD9F67-72BD-4975-B584-FC9680F83B9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEBD9F67-72BD-4975-B584-FC9680F83B9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEBD9F67-72BD-4975-B584-FC9680F83B9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEBD9F67-72BD-4975-B584-FC9680F83B9F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
