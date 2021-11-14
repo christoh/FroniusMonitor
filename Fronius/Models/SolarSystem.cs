@@ -20,6 +20,6 @@ namespace De.Hochstaetter.Fronius.Models
 
         IEnumerable IHierarchicalCollection.ChildrenEnumerable => DeviceGroups;
 
-        public override string ToString()=>DisplayName;
+        public override string ToString() => DisplayName;
     }
 }

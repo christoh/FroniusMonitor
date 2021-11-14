@@ -12,12 +12,25 @@
         >
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="500"/>
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <TreeView ItemsSource="{Binding SolarSystem, Converter={co:TreeViewConverter}}"/>
+        <TreeView BorderThickness="0" Grid.Column="0" ItemsSource="{Binding SolarSystem, Converter={co:TreeViewConverter}}" xmlns:models="clr-namespace:De.Hochstaetter.Fronius.Models;assembly=Fronius">
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate DataType="m:DeviceGroup" ItemsSource="{Binding Devices}">
+                    <TextBlock Text="{Binding DisplayName}"/>
+                    <HierarchicalDataTemplate.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding DisplayName}"/>
+                        </DataTemplate>
+                    </HierarchicalDataTemplate.ItemTemplate>
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+
+        <GridSplitter Grid.Column="1" ResizeBehavior="PreviousAndNext" BorderThickness="2" ResizeDirection="Columns" BorderBrush="LightGray" Margin="4,0" VerticalAlignment="Stretch"/>
 
     </Grid>
 </Window>

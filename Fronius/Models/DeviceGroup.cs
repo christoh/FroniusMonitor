@@ -19,7 +19,7 @@ namespace De.Hochstaetter.Fronius.Models
 
         IEnumerable IHierarchicalCollection.ItemsEnumerable => Devices;
 
-        IEnumerable IHierarchicalCollection.ChildrenEnumerable => Array.Empty<HierarchicalCollection>();
+        IEnumerable IHierarchicalCollection.ChildrenEnumerable => Array.Empty<object>();
 
         public override string ToString() => DisplayName;
     }
