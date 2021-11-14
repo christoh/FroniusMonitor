@@ -1,4 +1,5 @@
-﻿using System;
+﻿using De.Hochstaetter.Fronius.Contracts;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,27 +7,15 @@ using System.Threading.Tasks;
 
 namespace De.Hochstaetter.Fronius.Models
 {
-    public class DeviceInfo:BindableBase
+    public class DeviceInfo : IHaveDisplayName
     {
-        private DeviceClass deviceClass;
-        public DeviceClass DeviceClass
-        {
-            get=>deviceClass;
-            set=>Set(ref deviceClass,value);
-        }
+        public DeviceClass DeviceClass { get; init; }
+        public string? SerialNumber { get; init; }
+        public int Id { get; init; }
+        public int DeviceType { get; init; }
 
-        private string? serialNumber;
-        public string? SerialNumber
-        {
-            get=>serialNumber;
-            set=>Set(ref serialNumber,value);
-        }
-
-        private int id;
-        public int Id
-        {
-            get=>id;
-            set=>Set(ref id,value);
-        }
+        public string Model => DeviceType.ToDeviceString();
+        public virtual string DisplayName => $"{Model} #{Id}";
+        public override string ToString() => DisplayName;
     }
 }

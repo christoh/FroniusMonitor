@@ -4,9 +4,20 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FroniusMonitor"
+        xmlns:vm="clr-namespace:De.Hochstaetter.FroniusMonitor.ViewModels"
+        xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="800"
+        d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
+        >
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="500"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <TreeView ItemsSource="{Binding SolarSystem, Converter={co:TreeViewConverter}}"/>
 
     </Grid>
 </Window>

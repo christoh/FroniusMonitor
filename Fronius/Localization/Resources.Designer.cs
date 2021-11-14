@@ -61,11 +61,56 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Booting.
+        /// </summary>
+        public static string Booting {
+            get {
+                return ResourceManager.GetString("Booting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Devices.
+        /// </summary>
+        public static string Devices {
+            get {
+                return ResourceManager.GetString("Devices", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error.
+        /// </summary>
+        public static string Error {
+            get {
+                return ResourceManager.GetString("Error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Idle.
+        /// </summary>
+        public static string Idle {
+            get {
+                return ResourceManager.GetString("Idle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Incorrect response from data manager.
         /// </summary>
         public static string IncorrectData {
             get {
                 return ResourceManager.GetString("IncorrectData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid.
+        /// </summary>
+        public static string Invalid {
+            get {
+                return ResourceManager.GetString("Invalid", resourceCulture);
             }
         }
         
@@ -79,11 +124,56 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Inverters.
+        /// </summary>
+        public static string Inverters {
+            get {
+                return ResourceManager.GetString("Inverters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Smart meter.
         /// </summary>
         public static string Meter {
             get {
                 return ResourceManager.GetString("Meter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Smart Meters.
+        /// </summary>
+        public static string Meters {
+            get {
+                return ResourceManager.GetString("Meters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to My solar system.
+        /// </summary>
+        public static string MySolarSystem {
+            get {
+                return ResourceManager.GetString("MySolarSystem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to N/A.
+        /// </summary>
+        public static string NA {
+            get {
+                return ResourceManager.GetString("NA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You did not specify complete connection parameters.
+        /// </summary>
+        public static string NoSystemConnection {
+            get {
+                return ResourceManager.GetString("NoSystemConnection", resourceCulture);
             }
         }
         
@@ -97,11 +187,128 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ohm Pilots.
+        /// </summary>
+        public static string Ohmpilots {
+            get {
+                return ResourceManager.GetString("Ohmpilots", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ready.
+        /// </summary>
+        public static string Ready {
+            get {
+                return ResourceManager.GetString("Ready", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Running.
+        /// </summary>
+        public static string Running {
+            get {
+                return ResourceManager.GetString("Running", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sensor.
         /// </summary>
         public static string SensorCard {
             get {
                 return ResourceManager.GetString("SensorCard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sensors.
+        /// </summary>
+        public static string SensorCards {
+            get {
+                return ResourceManager.GetString("SensorCards", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sleeping.
+        /// </summary>
+        public static string Sleeping {
+            get {
+                return ResourceManager.GetString("Sleeping", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Standby.
+        /// </summary>
+        public static string Standby {
+            get {
+                return ResourceManager.GetString("Standby", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Starting (1/7).
+        /// </summary>
+        public static string StartUp0 {
+            get {
+                return ResourceManager.GetString("StartUp0", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Starting (2/7).
+        /// </summary>
+        public static string StartUp1 {
+            get {
+                return ResourceManager.GetString("StartUp1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Starting (3/7).
+        /// </summary>
+        public static string StartUp2 {
+            get {
+                return ResourceManager.GetString("StartUp2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Starting (4/7).
+        /// </summary>
+        public static string StartUp3 {
+            get {
+                return ResourceManager.GetString("StartUp3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Starting (5/7).
+        /// </summary>
+        public static string StartUp4 {
+            get {
+                return ResourceManager.GetString("StartUp4", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Starting (6/7).
+        /// </summary>
+        public static string StartUp5 {
+            get {
+                return ResourceManager.GetString("StartUp5", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Starting (7/7).
+        /// </summary>
+        public static string StartUp6 {
+            get {
+                return ResourceManager.GetString("StartUp6", resourceCulture);
             }
         }
         
@@ -115,11 +322,29 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Storages.
+        /// </summary>
+        public static string Storages {
+            get {
+                return ResourceManager.GetString("Storages", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to String control.
         /// </summary>
         public static string StringControl {
             get {
                 return ResourceManager.GetString("StringControl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to String Controls.
+        /// </summary>
+        public static string StringControls {
+            get {
+                return ResourceManager.GetString("StringControls", resourceCulture);
             }
         }
         

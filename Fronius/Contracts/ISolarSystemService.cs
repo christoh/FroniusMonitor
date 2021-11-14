@@ -7,10 +7,8 @@ using System.Threading.Tasks;
 
 namespace De.Hochstaetter.Fronius.Contracts
 {
-    public interface IWebClientService
+    public interface ISolarSystemService
     {
-        InverterConnection? InverterConnection{get;set;}
-        Task<SystemDevices> GetDevices();
-        Task<InverterDevices> GetInverters();
+        Task<SolarSystem> CreateSolarSystem(InverterConnection connection);
     }
 }

@@ -117,26 +117,101 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Booting" xml:space="preserve">
+    <value>Hochfahren</value>
+  </data>
+  <data name="Devices" xml:space="preserve">
+    <value>Geräte</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Fehler</value>
+  </data>
+  <data name="Idle" xml:space="preserve">
+    <value>Leerlauf</value>
+  </data>
   <data name="IncorrectData" xml:space="preserve">
     <value>Ungültige Antwort vom Datenmanager</value>
   </data>
+  <data name="Invalid" xml:space="preserve">
+    <value>Ungültig</value>
+  </data>
   <data name="Inverter" xml:space="preserve">
+    <value>Wechselrichter</value>
+  </data>
+  <data name="Inverters" xml:space="preserve">
     <value>Wechselrichter</value>
   </data>
   <data name="Meter" xml:space="preserve">
     <value>Smartmeter</value>
   </data>
+  <data name="Meters" xml:space="preserve">
+    <value>Smartmeter</value>
+  </data>
+  <data name="MySolarSystem" xml:space="preserve">
+    <value>Meine Solaranlage</value>
+  </data>
+  <data name="NA" xml:space="preserve">
+    <value>---</value>
+  </data>
+  <data name="NoSystemConnection" xml:space="preserve">
+    <value>Sie haben keine vollständigen Verbindungsparameter angegeben</value>
+  </data>
   <data name="Ohmpilot" xml:space="preserve">
     <value>Ohmpilot</value>
+  </data>
+  <data name="Ohmpilots" xml:space="preserve">
+    <value>Ohmpiloten</value>
+  </data>
+  <data name="Ready" xml:space="preserve">
+    <value>Bereit</value>
+  </data>
+  <data name="Running" xml:space="preserve">
+    <value>In Betrieb</value>
   </data>
   <data name="SensorCard" xml:space="preserve">
     <value>Sensor</value>
   </data>
+  <data name="Sensorcards" xml:space="preserve">
+    <value>Sensoren</value>
+  </data>
+  <data name="Sleeping" xml:space="preserve">
+    <value>Schlafmodus</value>
+  </data>
+  <data name="Standby" xml:space="preserve">
+    <value>Auf Abruf</value>
+  </data>
+  <data name="StartUp0" xml:space="preserve">
+    <value>Starten (1/7)</value>
+  </data>
+  <data name="StartUp1" xml:space="preserve">
+    <value>Starten (2/7)</value>
+  </data>
+  <data name="StartUp2" xml:space="preserve">
+    <value>Starten (3/7)</value>
+  </data>
+  <data name="StartUp3" xml:space="preserve">
+    <value>Starten (4/7)</value>
+  </data>
+  <data name="StartUp4" xml:space="preserve">
+    <value>Starten (5/7)</value>
+  </data>
+  <data name="StartUp5" xml:space="preserve">
+    <value>Starten (6/7)</value>
+  </data>
+  <data name="StartUp6" xml:space="preserve">
+    <value>Starten (7/7)</value>
+  </data>
   <data name="Storage" xml:space="preserve">
+    <value>Stromspeicher</value>
+  </data>
+  <data name="Storages" xml:space="preserve">
     <value>Stromspeicher</value>
   </data>
   <data name="StringControl" xml:space="preserve">
     <value>Leitungssteuerung</value>
+  </data>
+  <data name="StringControls" xml:space="preserve">
+    <value>Leitungssteuerungen</value>
   </data>
   <data name="Unknown" xml:space="preserve">
     <value>Unbekannt</value>
