@@ -12,5 +12,6 @@ namespace De.Hochstaetter.Fronius.Contracts
         InverterConnection? InverterConnection{get;set;}
         Task<SystemDevices> GetDevices();
         Task<InverterDevices> GetInverters();
+        Task<StorageDevices> GetStorages();
     }
 }

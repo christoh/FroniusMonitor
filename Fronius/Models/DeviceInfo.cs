@@ -14,7 +14,7 @@ namespace De.Hochstaetter.Fronius.Models
         public int Id { get; init; }
         public int DeviceType { get; init; }
 
-        public string Model => DeviceType.ToDeviceString();
+        public virtual string Model => DeviceType.ToDeviceString();
         public virtual string DisplayName => $"{Model} #{Id}";
         public override string ToString() => DisplayName;
     }

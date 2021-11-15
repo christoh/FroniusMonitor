@@ -71,6 +71,42 @@ namespace De.Hochstaetter.Fronius.Services
             }).ConfigureAwait(false);
         }
 
+        public async Task<StorageDevices> GetStorages()
+        {
+            var (result, dataToken) = await GetResponse<StorageDevices>("GetStorageRealtimeData.cgi?Scope=System").ConfigureAwait(false);
+
+            return await Task.Run(() =>
+            {
+                foreach (var device in dataToken.OfType<JProperty>())
+                {
+                    var storageToken = device.Value["Controller"] ?? throw new InvalidDataException(Resources.IncorrectData);
+                    var detailsToken = storageToken?["Details"] ?? throw new InvalidDataException(Resources.IncorrectData);
+
+                    var storage = new Storage
+                    {
+                        DeviceType = -1,
+                        Id = int.Parse(device.Name, NumberStyles.Integer, CultureInfo.InvariantCulture),
+                        StorageModel = detailsToken["Model"]?.Value<string>(),
+                        Manufacturer = detailsToken["Manufacturer"]?.Value<string>(),
+                        SerialNumber = detailsToken["Serial"]?.Value<string>()?.Trim(),
+                        MaximumCapacityWattHours = storageToken["Capacity_Maximum"]?.Value<double>() ?? double.NaN,
+                        Current = storageToken["Current_DC"]?.Value<double>() ?? double.NaN,
+                        DesignedCapacityWattHours = storageToken["DesignedCapacity"]?.Value<double>() ?? double.NaN,
+                        IsEnabled = storageToken["Enable"]?.Value<bool>() ?? true,
+                        StateOfCharge = (storageToken["StateOfCharge_Relative"]?.Value<double>() ?? double.NaN) / 100,
+                        StatusBatteryCell = (int)(storageToken["Status_BatteryCell"]?.Value<double>() ?? -1),
+                        TemperatureCelsius = storageToken["Temperature_Cell"]?.Value<double>() ?? double.NaN,
+                        StorageTimestamp = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(storageToken["TimeStamp"]?.Value<double>() ?? 0),
+                        Voltage = storageToken["Voltage_DC"]?.Value<double>() ?? double.NaN,
+                    };
+
+                    result.Storages.Add(storage);
+                }
+
+                return result;
+            }).ConfigureAwait(false);
+        }
+
         private static Inverter ParseInverter(JProperty device)
         {
             var deviceValues = device.Value;
@@ -83,7 +119,7 @@ namespace De.Hochstaetter.Fronius.Services
                 ErrorCode = deviceValues["ErrorCode"]?.Value<int>() ?? ~0,
                 MaxPvPowerWatts = deviceValues["PVPower"]?.Value<double>() ?? double.NaN,
                 Show = deviceValues["Show"]?.Value<bool>() ?? true,
-                Status = (InverterStatus)(deviceValues["StatusCode"]?.Value<int>() ?? 254),
+                Status = (InverterStatus)(deviceValues["StatusCode"]?.Value<int>() ?? -1),
                 SerialNumber = deviceValues["UniqueID"]?.Value<string>()
             };
         }

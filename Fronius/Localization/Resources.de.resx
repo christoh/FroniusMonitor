@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Active" xml:space="preserve">
+    <value>Aktiv</value>
+  </data>
   <data name="Booting" xml:space="preserve">
     <value>Hochfahren</value>
   </data>
@@ -128,6 +131,9 @@
   </data>
   <data name="Idle" xml:space="preserve">
     <value>Leerlauf</value>
+  </data>
+  <data name="Inactive" xml:space="preserve">
+    <value>Inaktiv</value>
   </data>
   <data name="IncorrectData" xml:space="preserve">
     <value>Ungültige Antwort vom Datenmanager</value>
@@ -180,6 +186,9 @@
   <data name="Standby" xml:space="preserve">
     <value>Auf Abruf</value>
   </data>
+  <data name="Starting" xml:space="preserve">
+    <value>Starten</value>
+  </data>
   <data name="StartUp0" xml:space="preserve">
     <value>Starten (1/7)</value>
   </data>
@@ -215,5 +224,8 @@
   </data>
   <data name="Unknown" xml:space="preserve">
     <value>Unbekannt</value>
+  </data>
+  <data name="Updating" xml:space="preserve">
+    <value>Aktualisieren</value>
   </data>
 </root>

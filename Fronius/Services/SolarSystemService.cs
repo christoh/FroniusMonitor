@@ -22,7 +22,8 @@ namespace De.Hochstaetter.Fronius.Services
         {
             var solarSystem = new SolarSystem();
             webClientService.InverterConnection = connection;
-            InverterDevices? inverters = null;
+            InverterDevices? inverterDevices = null;
+            StorageDevices? storageDevices = null;
 
 
             foreach (var deviceGroup in (await webClientService.GetDevices().ConfigureAwait(false)).Devices.AsParallel().GroupBy(d => d.DeviceClass))
@@ -30,7 +31,10 @@ namespace De.Hochstaetter.Fronius.Services
                 switch (deviceGroup.Key)
                 {
                     case DeviceClass.Inverter:
-                        inverters = await webClientService.GetInverters().ConfigureAwait(false);
+                        inverterDevices = await webClientService.GetInverters().ConfigureAwait(false);
+                        break;
+                    case DeviceClass.Storage:
+                        storageDevices = await webClientService.GetStorages().ConfigureAwait(false);
                         break;
                     default:
                         break;
@@ -43,7 +47,10 @@ namespace De.Hochstaetter.Fronius.Services
                     switch (deviceGroup.Key)
                     {
                         case DeviceClass.Inverter:
-                            group.Devices.Add(inverters?.Inverters.SingleOrDefault(i => i.Id == device.Id) ?? device);
+                            group.Devices.Add(inverterDevices?.Inverters.SingleOrDefault(i => i.Id == device.Id) ?? device);
+                            break;
+                        case DeviceClass.Storage:
+                            group.Devices.Add(storageDevices?.Storages.SingleOrDefault(s => s.Id == device.Id) ?? device);
                             break;
                         default:
                             group.Devices.Add(device);
