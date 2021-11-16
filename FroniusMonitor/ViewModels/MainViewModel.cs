@@ -1,10 +1,8 @@
-﻿using De.Hochstaetter.Fronius.Contracts;
+﻿using System.Windows.Input;
+using De.Hochstaetter.Fronius.Contracts;
 using De.Hochstaetter.Fronius.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using De.Hochstaetter.FroniusMonitor.Unity;
+using De.Hochstaetter.FroniusMonitor.Wpf.Commands;
 
 namespace De.Hochstaetter.FroniusMonitor.ViewModels
 {
@@ -12,21 +10,37 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
     {
         private readonly ISolarSystemService solarSystemService;
 
-        public MainViewModel(ISolarSystemService solarSystemServcice)
+        public MainViewModel(ISolarSystemService solarSystemService)
         {
-            this.solarSystemService = solarSystemServcice;
+            this.solarSystemService = solarSystemService;
         }
 
         private SolarSystem? solarSystem;
+
         public SolarSystem? SolarSystem
         {
             get => solarSystem;
             set => Set(ref solarSystem, value);
         }
 
+        public ICommand SelectDeviceCommand { get; set; } = null!;
+
         public async Task OnInitialize()
         {
-            SolarSystem = await solarSystemService.CreateSolarSystem(new InverterConnection{BaseUrl="http://192.168.44.10"}).ConfigureAwait(false);
+            SelectDeviceCommand = new Command<DeviceInfo>(SelectDevice);
+            SolarSystem = await solarSystemService.CreateSolarSystem(new InverterConnection {BaseUrl = "http://192.168.44.10"}).ConfigureAwait(false);
+        }
+
+        public void SelectDevice(DeviceInfo? device)
+        {
+            switch (device)
+            {
+                case Inverter inverter:
+                    //IoC.Get<InverterControl>();
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

@@ -34,7 +34,7 @@ namespace De.Hochstaetter.Fronius.Services
                         inverterDevices = await webClientService.GetInverters().ConfigureAwait(false);
                         break;
                     case DeviceClass.Storage:
-                        storageDevices = await webClientService.GetStorages().ConfigureAwait(false);
+                        storageDevices = await webClientService.GetStorageDevices().ConfigureAwait(false);
                         break;
                     default:
                         break;

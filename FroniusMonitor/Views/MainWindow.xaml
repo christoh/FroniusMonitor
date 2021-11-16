@@ -3,13 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:FroniusMonitor"
         xmlns:vm="clr-namespace:De.Hochstaetter.FroniusMonitor.ViewModels"
         xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
-        >
+        xmlns:m="clr-namespace:De.Hochstaetter.Fronius.Models;assembly=Fronius"
+        xmlns:local="clr-namespace:De.Hochstaetter.FroniusMonitor">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
@@ -17,13 +17,15 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <TreeView BorderThickness="0" Grid.Column="0" ItemsSource="{Binding SolarSystem, Converter={co:TreeViewConverter}}" xmlns:models="clr-namespace:De.Hochstaetter.Fronius.Models;assembly=Fronius">
+        <TreeView BorderThickness="0" Grid.Column="0" ItemsSource="{Binding SolarSystem, Converter={co:TreeViewConverter}}">
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate DataType="m:DeviceGroup" ItemsSource="{Binding Devices}">
                     <TextBlock Text="{Binding DisplayName}"/>
                     <HierarchicalDataTemplate.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding DisplayName}"/>
+                            <Button Command="{Binding Path=DataContext.SelectDeviceCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}}" CommandParameter="{Binding}" Style="{StaticResource TransparentButton}">
+                                <TextBlock Text="{Binding DisplayName}"/>
+                            </Button>
                         </DataTemplate>
                     </HierarchicalDataTemplate.ItemTemplate>
                 </HierarchicalDataTemplate>

@@ -1,16 +1,9 @@
-﻿using De.Hochstaetter.Fronius.Contracts;
-using De.Hochstaetter.Fronius.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net.Http;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using De.Hochstaetter.Fronius.Localization;
-using System.Globalization;
+﻿using System.Globalization;
+using De.Hochstaetter.Fronius.Contracts;
 using De.Hochstaetter.Fronius.Exceptions;
+using De.Hochstaetter.Fronius.Localization;
+using De.Hochstaetter.Fronius.Models;
+using Newtonsoft.Json.Linq;
 
 namespace De.Hochstaetter.Fronius.Services
 {
@@ -37,14 +30,14 @@ namespace De.Hochstaetter.Fronius.Services
                         deviceClass = DeviceClass.Unknown;
                     }
 
-                    foreach (var device in typeProperty.Children<JObject>().Select(d => d.Value<JObject>() ?? throw new InvalidDataException(Resources.IncorrectData)).Single())
+                    foreach (var (key, value) in typeProperty.Children<JObject>().Select(d => d.Value<JObject>() ?? throw new InvalidDataException(Resources.IncorrectData)).Single())
                     {
                         var deviceInfo = new DeviceInfo
                         {
                             DeviceClass = deviceClass,
-                            Id = int.Parse(device.Key, NumberStyles.Integer, CultureInfo.InvariantCulture),
-                            SerialNumber = device.Value?["Serial"]?.Value<string>()?.Trim(),
-                            DeviceType = device.Value?["DT"]?.Value<int>() ?? ~0
+                            Id = int.Parse(key, NumberStyles.Integer, CultureInfo.InvariantCulture),
+                            SerialNumber = value?["Serial"]?.Value<string>()?.Trim(),
+                            DeviceType = value?["DT"]?.Value<int>() ?? ~0
                         };
 
                         result.Devices.Add(deviceInfo);
@@ -71,7 +64,7 @@ namespace De.Hochstaetter.Fronius.Services
             }).ConfigureAwait(false);
         }
 
-        public async Task<StorageDevices> GetStorages()
+        public async Task<StorageDevices> GetStorageDevices()
         {
             var (result, dataToken) = await GetResponse<StorageDevices>("GetStorageRealtimeData.cgi?Scope=System").ConfigureAwait(false);
 
@@ -80,7 +73,7 @@ namespace De.Hochstaetter.Fronius.Services
                 foreach (var device in dataToken.OfType<JProperty>())
                 {
                     var storageToken = device.Value["Controller"] ?? throw new InvalidDataException(Resources.IncorrectData);
-                    var detailsToken = storageToken?["Details"] ?? throw new InvalidDataException(Resources.IncorrectData);
+                    var detailsToken = storageToken["Details"] ?? throw new InvalidDataException(Resources.IncorrectData);
 
                     var storage = new Storage
                     {
@@ -94,10 +87,9 @@ namespace De.Hochstaetter.Fronius.Services
                         DesignedCapacityWattHours = storageToken["DesignedCapacity"]?.Value<double>() ?? double.NaN,
                         IsEnabled = storageToken["Enable"]?.Value<bool>() ?? true,
                         StateOfCharge = (storageToken["StateOfCharge_Relative"]?.Value<double>() ?? double.NaN) / 100,
-                        StatusBatteryCell = (int)(storageToken["Status_BatteryCell"]?.Value<double>() ?? -1),
+                        StatusBatteryCell = (int) (storageToken["Status_BatteryCell"]?.Value<double>() ?? -1),
                         TemperatureCelsius = storageToken["Temperature_Cell"]?.Value<double>() ?? double.NaN,
-                        StorageTimestamp = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(storageToken["TimeStamp"]?.Value<double>() ?? 0),
-                        Voltage = storageToken["Voltage_DC"]?.Value<double>() ?? double.NaN,
+                        StorageTimestamp = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(storageToken["TimeStamp"]?.Value<double>() ?? 0), Voltage = storageToken["Voltage_DC"]?.Value<double>() ?? double.NaN,
                     };
 
                     result.Storages.Add(storage);
@@ -119,17 +111,14 @@ namespace De.Hochstaetter.Fronius.Services
                 ErrorCode = deviceValues["ErrorCode"]?.Value<int>() ?? ~0,
                 MaxPvPowerWatts = deviceValues["PVPower"]?.Value<double>() ?? double.NaN,
                 Show = deviceValues["Show"]?.Value<bool>() ?? true,
-                Status = (InverterStatus)(deviceValues["StatusCode"]?.Value<int>() ?? -1),
+                Status = (InverterStatus) (deviceValues["StatusCode"]?.Value<int>() ?? -1),
                 SerialNumber = deviceValues["UniqueID"]?.Value<string>()
             };
         }
 
         private async Task<(T, JToken)> GetResponse<T>(string request, string? debugString = null) where T : ResponseBase, new()
         {
-            if (inverterConnection == null)
-            {
-                throw new NullReferenceException(Resources.NoSystemConnection);
-            }
+            if (inverterConnection == null) throw new NullReferenceException(Resources.NoSystemConnection);
 
             string jsonString;
             var requestString = $"{inverterConnection.BaseUrl}/solar_api/v1/{request}";
@@ -143,7 +132,7 @@ namespace De.Hochstaetter.Fronius.Services
 
             return await Task.Run(() =>
             {
-                var headToken = JObject.Parse(jsonString)?["Head"] ?? throw new InvalidDataException(Resources.IncorrectData);
+                var headToken = JObject.Parse(jsonString)["Head"] ?? throw new InvalidDataException(Resources.IncorrectData);
                 var statusToken = headToken["Status"] ?? throw new InvalidDataException(Resources.IncorrectData);
 
                 var result = new T
@@ -159,7 +148,7 @@ namespace De.Hochstaetter.Fronius.Services
                     throw new SolarException(result.StatusCode, result.Reason, result.UserMessage, requestString);
                 }
 
-                var data = JObject.Parse(jsonString)?["Body"]?["Data"] ?? throw new InvalidDataException(Resources.IncorrectData);
+                var data = JObject.Parse(jsonString)["Body"]?["Data"] ?? throw new InvalidDataException(Resources.IncorrectData);
                 return (result, data);
             }).ConfigureAwait(false);
         }

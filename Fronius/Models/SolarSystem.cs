@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace De.Hochstaetter.Fronius.Models
 {
-    public class SolarSystem : IHierarchicalCollection, IHaveDisplayName
+    public class SolarSystem : IHierarchicalCollection
     {
         public string DisplayName => Resources.MySolarSystem;
 
