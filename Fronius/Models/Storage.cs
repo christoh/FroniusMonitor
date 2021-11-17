@@ -9,7 +9,7 @@ namespace De.Hochstaetter.Fronius.Models
 {
     public class Storage : DeviceInfo
     {
-        public override string DisplayName => StorageModel ?? Resources.Unknown;
+        public override string DisplayName => $"{StorageModel ?? Resources.Unknown} #{Id}";
         public string? Manufacturer { get; init; }
         public string? StorageModel { get; init; }
         public double MaximumCapacityWattHours { get; init; } = double.NaN;

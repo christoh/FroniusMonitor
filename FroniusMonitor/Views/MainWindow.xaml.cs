@@ -1,15 +1,14 @@
-﻿using De.Hochstaetter.Fronius.Contracts;
-using De.Hochstaetter.Fronius.Models;
+﻿using System.ComponentModel;
+using System.Windows;
+using System.Windows.Controls;
 using De.Hochstaetter.FroniusMonitor.Unity;
 using De.Hochstaetter.FroniusMonitor.ViewModels;
-using System.ComponentModel;
-using System.Windows;
 
-namespace De.Hochstaetter.FroniusMonitor
+namespace De.Hochstaetter.FroniusMonitor.Views
 {
     public partial class MainWindow : Window
     {
-        private MainViewModel Vm => (MainViewModel)DataContext;
+        public MainViewModel Vm => (MainViewModel)DataContext;
 
         public MainWindow()
         {
@@ -21,6 +20,11 @@ namespace De.Hochstaetter.FroniusMonitor
             {
                 await Vm.OnInitialize().ConfigureAwait(false);
             };
+        }
+
+        private void OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            Vm.SelectedItem=((TreeView) sender).SelectedItem;
         }
     }
 }

@@ -228,4 +228,7 @@
   <data name="Updating" xml:space="preserve">
     <value>Updating</value>
   </data>
+  <data name="AppName" xml:space="preserve">
+	  <value>Fronius Monitor</value>
+  </data>
 </root>

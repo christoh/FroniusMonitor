@@ -177,9 +177,6 @@
   <data name="SensorCard" xml:space="preserve">
     <value>Sensor</value>
   </data>
-  <data name="Sensorcards" xml:space="preserve">
-    <value>Sensoren</value>
-  </data>
   <data name="Sleeping" xml:space="preserve">
     <value>Schlafmodus</value>
   </data>
@@ -227,5 +224,11 @@
   </data>
   <data name="Updating" xml:space="preserve">
     <value>Aktualisieren</value>
+  </data>
+  <data name="SensorCards" xml:space="preserve">
+	  <value>Sensoren</value>
+  </data>
+  <data name="AppName" xml:space="preserve">
+	  <value>Fronius Monitor</value>
   </data>
 </root>

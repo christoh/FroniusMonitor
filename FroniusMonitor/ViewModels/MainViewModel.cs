@@ -2,7 +2,10 @@
 using De.Hochstaetter.Fronius.Contracts;
 using De.Hochstaetter.Fronius.Models;
 using De.Hochstaetter.FroniusMonitor.Unity;
+using De.Hochstaetter.FroniusMonitor.Views;
 using De.Hochstaetter.FroniusMonitor.Wpf.Commands;
+using FroniusMonitor;
+using Unity.Lifetime;
 
 namespace De.Hochstaetter.FroniusMonitor.ViewModels
 {
@@ -23,22 +26,58 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
             set => Set(ref solarSystem, value);
         }
 
-        public ICommand SelectDeviceCommand { get; set; } = null!;
+        private object? mainViewContent;
+
+        public object? MainViewContent
+        {
+            get => mainViewContent;
+            set => Set(ref mainViewContent, value);
+        }
+
+        private DeviceInfo? deviceInfo;
+
+        public DeviceInfo? DeviceInfo
+        {
+            get => deviceInfo;
+            set => Set(ref deviceInfo, value);
+        }
+
+        private object? selectedItem;
+
+        public object? SelectedItem
+        {
+            get => selectedItem;
+            set => Set(ref selectedItem, value, SelectDevice);
+        }
 
         public async Task OnInitialize()
         {
-            SelectDeviceCommand = new Command<DeviceInfo>(SelectDevice);
-            SolarSystem = await solarSystemService.CreateSolarSystem(new InverterConnection {BaseUrl = "http://192.168.44.10"}).ConfigureAwait(false);
+            SolarSystem = await solarSystemService.CreateSolarSystem(new InverterConnection { BaseUrl = "http://192.168.44.10" }).ConfigureAwait(false);
         }
 
-        public void SelectDevice(DeviceInfo? device)
+
+
+        public void SelectDevice()
         {
-            switch (device)
+            switch (SelectedItem)
             {
-                case Inverter inverter:
-                    //IoC.Get<InverterControl>();
+                case DeviceInfo device:
+                    DeviceInfo = device;
+
+                    switch (device)
+                    {
+                        case Inverter:
+                            MainViewContent = IoC.Get<InverterView>();
+                            break;
+                        default:
+                            MainViewContent = null;
+                            break;
+                    }
+
                     break;
+
                 default:
+                    MainViewContent = null;
                     break;
             }
         }
