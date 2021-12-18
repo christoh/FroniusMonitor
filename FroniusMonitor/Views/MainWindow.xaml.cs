@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using De.Hochstaetter.FroniusMonitor.Unity;
 using De.Hochstaetter.FroniusMonitor.ViewModels;
@@ -15,16 +14,12 @@ namespace De.Hochstaetter.FroniusMonitor.Views
             InitializeComponent();
 
             DataContext = IoC.Get<MainViewModel>();
-
-            Loaded += async (s, e) =>
-            {
-                await Vm.OnInitialize().ConfigureAwait(false);
-            };
+            Loaded += async (s, e) => { await Vm.OnInitialize().ConfigureAwait(false); };
         }
 
         private void OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            Vm.SelectedItem=((TreeView) sender).SelectedItem;
+            Vm.SelectedItem = ((TreeView)sender).SelectedItem;
         }
     }
 }

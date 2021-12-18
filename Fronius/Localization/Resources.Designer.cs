@@ -70,7 +70,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Fronius Monitor.
         /// </summary>
         public static string AppName {
             get {
@@ -88,11 +88,29 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Charging.
+        /// </summary>
+        public static string Charging {
+            get {
+                return ResourceManager.GetString("Charging", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Devices.
         /// </summary>
         public static string Devices {
             get {
                 return ResourceManager.GetString("Devices", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        public static string Discharging {
+            get {
+                return ResourceManager.GetString("Discharging", resourceCulture);
             }
         }
         
@@ -354,6 +372,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Storage {
             get {
                 return ResourceManager.GetString("Storage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} at {1:N0} W of power.
+        /// </summary>
+        public static string StoragePowerMessage {
+            get {
+                return ResourceManager.GetString("StoragePowerMessage", resourceCulture);
             }
         }
         

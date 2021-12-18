@@ -69,6 +69,9 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
                         case Inverter:
                             MainViewContent = IoC.Get<InverterView>();
                             break;
+                        case Storage:
+                            MainViewContent = IoC.Get<StorageView>();
+                            break;
                         default:
                             MainViewContent = null;
                             break;

@@ -5,20 +5,20 @@ using De.Hochstaetter.FroniusMonitor.ViewModels;
 
 namespace De.Hochstaetter.FroniusMonitor.Views
 {
-    public partial class InverterView
+    public partial class StorageView
     {
-        public InverterView()
+        public StorageView()
         {
             InitializeComponent();
-            DataContext = IoC.Get<InverterViewModel>();
+            DataContext = IoC.Get<StorageViewModel>();
 
             Loaded += async (_, _) =>
             {
-                Vm.Inverter = (Inverter)((MainWindow)Window.GetWindow(this)!).Vm.DeviceInfo!;
+                Vm.Storage = (Storage)((MainWindow)Window.GetWindow(this)!).Vm.DeviceInfo!;
                 await Vm.OnInitialize().ConfigureAwait(false);
             };
         }
 
-        private InverterViewModel Vm => (InverterViewModel)DataContext;
+        public StorageViewModel Vm => (StorageViewModel)DataContext;
     }
 }
