@@ -35,9 +35,10 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
 
         public string PowerString => string.Format(CultureInfo.CurrentCulture, Resources.StoragePowerMessage, Storage.Power < 0 ? Resources.Discharging : Resources.Charging, Math.Abs(Storage.Power));
 
-        public async Task OnInitialize()
+        public Task OnInitialize()
         {
-            await Task.Run(() => { timer = new Timer(TimerElapsed, null, 0, 1000); });
+            timer = new Timer(TimerElapsed, null, 0, 1000);
+            return Task.CompletedTask;
         }
 
         public async void TimerElapsed(object? _)
@@ -49,21 +50,17 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
 
             try
             {
-                try
-                {
-                    var device = (await webService.GetStorageDevices().ConfigureAwait(false)).Storages.FirstOrDefault(s => s.Id == Storage.Id);
-                    IsConnected = true;
+                var device = (await webService.GetStorageDevices().ConfigureAwait(false)).Storages.FirstOrDefault(s => s.Id == Storage.Id);
+                IsConnected = true;
 
-                    if (device != null && device.StorageTimestamp != Storage.StorageTimestamp)
-                    {
-                        Storage = device;
-                    }
-                }
-                catch
+                if (device != null && device.StorageTimestamp != Storage.StorageTimestamp)
                 {
-                    IsConnected = false;
-                    return;
+                    Storage = device;
                 }
+            }
+            catch
+            {
+                IsConnected = false;
             }
             finally
             {

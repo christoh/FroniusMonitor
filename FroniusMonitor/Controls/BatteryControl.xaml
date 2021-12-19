@@ -9,7 +9,7 @@
              d:DesignHeight="1000" d:DesignWidth="700">
     <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:BatteryControl}}">
         <Grid Height="1000" Width="700">
-            <Border CornerRadius="15" BorderBrush="DarkGreen" BorderThickness="30" Height="880" Width="660" VerticalAlignment="Top" Margin="0,100,0,0"/>
+            <Border x:Name="Enclosure" CornerRadius="15" BorderBrush="DarkGreen" BorderThickness="30" Height="880" Width="660" VerticalAlignment="Top" Margin="0,100,0,0"/>
 
             <Polygon Fill="LightGray" Points="60,940 60,140 640,140 640,940"/>
             <Polygon x:Name="SocPolygon" Fill="Transparent"/>
@@ -42,7 +42,7 @@
                 <Run Text="°C" />
             </TextBlock>
 
-            <Border VerticalAlignment="Top" CornerRadius="30,30,0,0" Background="DarkGreen" Width="200" Height="110" />
+            <Border x:Name="PlusPole" VerticalAlignment="Top" CornerRadius="30,30,0,0" Background="DarkGreen" Width="200" Height="110" />
         </Grid>
     </Viewbox>
 </UserControl>

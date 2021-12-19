@@ -1,6 +1,11 @@
-﻿using System.Windows;
+﻿using System.Drawing;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using De.Hochstaetter.Fronius.Models;
+using Color = System.Windows.Media.Color;
+using Point = System.Windows.Point;
 
 namespace De.Hochstaetter.FroniusMonitor.Controls
 {
@@ -23,28 +28,67 @@ namespace De.Hochstaetter.FroniusMonitor.Controls
             InitializeComponent();
         }
 
+        private bool isInChargingAnimation;
+
         private void OnStorageChanged()
         {
-            var color = Colors.LightGreen;
-
-            if (Storage.StateOfCharge < 50)
+            if (Storage.Power > 10)
             {
-                color=Colors.YellowGreen;
+                if (!isInChargingAnimation)
+                {
+                    isInChargingAnimation = true;
+                    PlusPole.Background = Enclosure.BorderBrush = new SolidColorBrush(Colors.DarkGreen);
+
+                    var animation = new ColorAnimation
+                    {
+                        To = Color.FromRgb(0, 136, 178),
+                        AutoReverse = true,
+                        RepeatBehavior = RepeatBehavior.Forever,
+                        Duration = TimeSpan.FromSeconds(1.5),
+                    };
+                    
+                    PlusPole.Background.BeginAnimation(SolidColorBrush.ColorProperty, animation);
+                }
+            }
+            else
+            {
+                var batteryBrush = Storage.TrafficLight switch
+                {
+                    TrafficLight.Red => Brushes.Red,
+                    TrafficLight.Green => Brushes.DarkGreen,
+                    _ => Brushes.DarkGray
+                };
+
+                isInChargingAnimation = false;
+                PlusPole.Background = Enclosure.BorderBrush = batteryBrush;
             }
 
-            if (Storage.StateOfCharge < 30)
+
+            var brush = Brushes.LightGreen;
+
+            if (Storage.StateOfCharge < 0.5)
             {
-                color = Colors.Yellow;
+                brush = Brushes.YellowGreen;
             }
 
-            if (Storage.StateOfCharge < 20)
+            if (Storage.StateOfCharge < 0.3)
             {
-                color = Colors.Orange;
+                brush = Brushes.Yellow;
             }
 
-            if (Storage.StateOfCharge < 10)
+            if (Storage.StateOfCharge < 0.2)
             {
-                color = Colors.OrangeRed;
+                brush = Brushes.Orange;
+            }
+
+            if (Storage.StateOfCharge < 0.12)
+            {
+                brush = Brushes.OrangeRed;
+            }
+
+            if (Storage.StateOfCharge < 0.08)
+            {
+                brush = Brushes.Red;
             }
 
             var height = Storage.StateOfCharge * 800;
@@ -53,7 +97,7 @@ namespace De.Hochstaetter.FroniusMonitor.Controls
             SocPolygon.Points.Add(new Point(60, 940 - height));
             SocPolygon.Points.Add(new Point(640, 940 - height));
             SocPolygon.Points.Add(new Point(640, 940));
-            SocPolygon.Fill = new SolidColorBrush(color);
+            SocPolygon.Fill = brush;
         }
     }
 }
