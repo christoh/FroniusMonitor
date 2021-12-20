@@ -20,5 +20,10 @@ namespace De.Hochstaetter.FroniusMonitor.Views
         }
 
         public StorageViewModel Vm => (StorageViewModel)DataContext;
+
+        private void BatteryControl_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

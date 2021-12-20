@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace De.Hochstaetter.Fronius.Models
 {
-    public class InverterDevices : ResponseBase, IHierarchicalCollection
+    public class InverterDevices : BaseResponse, IHierarchicalCollection
     {
         public ObservableCollection<Inverter> Inverters = new ObservableCollection<Inverter>();
         public override string DisplayName => Resources.Inverters;

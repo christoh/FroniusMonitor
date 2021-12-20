@@ -13,5 +13,6 @@ namespace De.Hochstaetter.Fronius.Contracts
         Task<SystemDevices> GetDevices();
         Task<InverterDevices> GetInverters();
         Task<StorageDevices> GetStorageDevices();
+        Task<SmartMeterDevices> GetMeterDevices();
     }
 }

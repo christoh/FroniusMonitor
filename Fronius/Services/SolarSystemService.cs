@@ -24,6 +24,7 @@ namespace De.Hochstaetter.Fronius.Services
             webClientService.InverterConnection = connection;
             InverterDevices? inverterDevices = null;
             StorageDevices? storageDevices = null;
+            SmartMeterDevices? smartMeterDevices = null;
 
 
             foreach (var deviceGroup in (await webClientService.GetDevices().ConfigureAwait(false)).Devices.AsParallel().GroupBy(d => d.DeviceClass))
@@ -35,6 +36,9 @@ namespace De.Hochstaetter.Fronius.Services
                         break;
                     case DeviceClass.Storage:
                         storageDevices = await webClientService.GetStorageDevices().ConfigureAwait(false);
+                        break;
+                    case DeviceClass.Meter:
+                        smartMeterDevices = await webClientService.GetMeterDevices().ConfigureAwait(false);
                         break;
                     default:
                         break;
@@ -52,8 +56,10 @@ namespace De.Hochstaetter.Fronius.Services
                         case DeviceClass.Storage:
                             group.Devices.Add(storageDevices?.Storages.SingleOrDefault(s => s.Id == device.Id) ?? device);
                             break;
+                        case DeviceClass.Meter:
+                            group.Devices.Add(smartMeterDevices?.SmartMeters.SingleOrDefault(s => s.Id == device.Id) ?? device);
+                            break;
                         default:
-                            group.Devices.Add(device);
                             break;
                     }
 

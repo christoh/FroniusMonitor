@@ -52,10 +52,8 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
 
         public async Task OnInitialize()
         {
-            SolarSystem = await solarSystemService.CreateSolarSystem(new InverterConnection { BaseUrl = "http://192.168.44.10" }).ConfigureAwait(false);
+            SolarSystem = await solarSystemService.CreateSolarSystem(new InverterConnection { BaseUrl = App.Settings.BaseUrl! }).ConfigureAwait(false);
         }
-
-
 
         public void SelectDevice()
         {

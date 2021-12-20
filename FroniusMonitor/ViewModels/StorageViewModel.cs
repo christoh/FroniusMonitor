@@ -2,6 +2,7 @@
 using De.Hochstaetter.Fronius.Contracts;
 using De.Hochstaetter.Fronius.Localization;
 using De.Hochstaetter.Fronius.Models;
+using FroniusMonitor;
 
 namespace De.Hochstaetter.FroniusMonitor.ViewModels
 {
@@ -14,7 +15,7 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
         public StorageViewModel(IWebClientService webService)
         {
             this.webService = webService;
-            webService.InverterConnection = new InverterConnection {BaseUrl = "http://192.168.44.10"};
+            webService.InverterConnection = new InverterConnection {BaseUrl = App.Settings.BaseUrl!};
         }
 
         private Storage storage = null!;
@@ -50,7 +51,9 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
 
             try
             {
-                var device = (await webService.GetStorageDevices().ConfigureAwait(false)).Storages.FirstOrDefault(s => s.Id == Storage.Id);
+                var result = await webService.GetStorageDevices().ConfigureAwait(false);
+                var device=result.Storages.FirstOrDefault(s => s.Id == Storage.Id);
+
                 IsConnected = true;
 
                 if (device != null && device.StorageTimestamp != Storage.StorageTimestamp)

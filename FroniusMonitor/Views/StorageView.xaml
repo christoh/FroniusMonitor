@@ -22,7 +22,7 @@
                 <Run Text="kWh"/>
                 <Run Text="("/><Run Text="{Binding Storage.StatusString,Mode=OneWay}"/><Run Text=")"/>
             </TextBlock>
-            <c:BatteryControl Grid.Row="1" Storage="{Binding Storage}"/>
+            <c:BatteryControl Grid.Row="1" Storage="{Binding Storage}" Loaded="BatteryControl_Loaded"/>
         </Grid>
     </Viewbox>
 </UserControl>

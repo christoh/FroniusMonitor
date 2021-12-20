@@ -20,6 +20,7 @@ public class Storage : DeviceInfo
     public double Power => Voltage * Current;
     public double RemainingCapacityWattHours => StateOfCharge * MaximumCapacityWattHours;
     public double RemainingCapacityKiloWattHours => RemainingCapacityWattHours / 1000;
+    public double Degradation => 1 - MaximumCapacityWattHours / DesignedCapacityWattHours;
 
     public TrafficLight TrafficLight => Manufacturer switch
     {

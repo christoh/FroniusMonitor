@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace De.Hochstaetter.Fronius.Models
 {
-    public abstract class ResponseBase : BindableBase
+    public class BaseResponse : BindableBase
     {
         private int statusCode;
         public int StatusCode
@@ -36,7 +36,7 @@ namespace De.Hochstaetter.Fronius.Models
             set => Set(ref timestamp, value);
         }
 
-        public abstract string DisplayName{get;}
+        public virtual string DisplayName => string.Empty;
         public override string ToString()=>DisplayName;
     }
 }

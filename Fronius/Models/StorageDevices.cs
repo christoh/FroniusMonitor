@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace De.Hochstaetter.Fronius.Models
 {
-    public class StorageDevices : ResponseBase, IHierarchicalCollection
+    public class StorageDevices : BaseResponse, IHierarchicalCollection
     {
         IEnumerable IHierarchicalCollection.ItemsEnumerable => Storages;
 

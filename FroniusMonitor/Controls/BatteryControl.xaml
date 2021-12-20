@@ -11,8 +11,8 @@
         <Grid Height="1000" Width="700">
             <Border x:Name="Enclosure" CornerRadius="15" BorderBrush="DarkGreen" BorderThickness="30" Height="880" Width="660" VerticalAlignment="Top" Margin="0,100,0,0"/>
 
-            <Polygon Fill="LightGray" Points="60,940 60,140 640,140 640,940"/>
-            <Polygon x:Name="SocPolygon" Fill="Transparent"/>
+            <Rectangle Width="580" Height="800" x:Name="BackgroundRectangle" Fill="LightGray" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,60"/>
+            <Rectangle Width="580" x:Name="SocRectangle" Fill="Transparent" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,60"/>
 
             <TextBlock Margin="0,200,0,0" FontWeight="Bold" HorizontalAlignment="Center" FontSize="150"
                        Text="{Binding Storage.StateOfCharge, StringFormat=P1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" />
