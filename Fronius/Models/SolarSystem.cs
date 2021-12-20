@@ -16,6 +16,12 @@ namespace De.Hochstaetter.Fronius.Models
 
         public ObservableCollection<DeviceGroup> DeviceGroups { get; } = new ObservableCollection<DeviceGroup>();
 
+        public IEnumerable<Storage> Storages => DeviceGroups.SingleOrDefault(g => g.DeviceClass == DeviceClass.Storage)?.Devices.OfType<Storage>() ?? Array.Empty<Storage>();
+
+        public IEnumerable<Inverter> Inverters => DeviceGroups.SingleOrDefault(g => g.DeviceClass == DeviceClass.Inverter)?.Devices.OfType<Inverter>() ?? Array.Empty<Inverter>();
+
+        public IEnumerable<SmartMeter> Meters => DeviceGroups.SingleOrDefault(g => g.DeviceClass == DeviceClass.Meter)?.Devices.OfType<SmartMeter>() ?? Array.Empty<SmartMeter>();
+
         IEnumerable IHierarchicalCollection.ItemsEnumerable { get; } = Array.Empty<object>();
 
         IEnumerable IHierarchicalCollection.ChildrenEnumerable => DeviceGroups;

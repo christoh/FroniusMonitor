@@ -2,11 +2,8 @@
 
 namespace De.Hochstaetter.Fronius.Models;
 
-public class Storage : DeviceInfo
+public class StorageData
 {
-    public override string DisplayName => $"{StorageModel ?? Resources.Unknown} #{Id}";
-    public string? Manufacturer { get; init; }
-    public string? StorageModel { get; init; }
     public double MaximumCapacityWattHours { get; init; } = double.NaN;
     public double Current { get; init; } = double.NaN;
     public double DesignedCapacityWattHours { get; init; }
@@ -21,6 +18,7 @@ public class Storage : DeviceInfo
     public double RemainingCapacityWattHours => StateOfCharge * MaximumCapacityWattHours;
     public double RemainingCapacityKiloWattHours => RemainingCapacityWattHours / 1000;
     public double Degradation => 1 - MaximumCapacityWattHours / DesignedCapacityWattHours;
+    public string Manufacturer { get; init; } = string.Empty;
 
     public TrafficLight TrafficLight => Manufacturer switch
     {
@@ -61,4 +59,25 @@ public class Storage : DeviceInfo
         },
         _ => Resources.Unknown
     };
+}
+
+public class Storage : DeviceInfo
+{
+    public override string DisplayName => $"{Model ?? Resources.Unknown} #{Id}";
+
+    private string model = string.Empty;
+
+    public override string Model
+    {
+        get => model;
+        set => Set(ref model, value, () => NotifyOfPropertyChange(nameof(DisplayName)));
+    }
+
+    private StorageData? data;
+
+    public StorageData? Data
+    {
+        get => data;
+        set => Set(ref data, value);
+    }
 }

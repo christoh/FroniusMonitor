@@ -1,26 +1,47 @@
 ﻿using De.Hochstaetter.Fronius.Contracts;
 using De.Hochstaetter.Fronius.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace De.Hochstaetter.Fronius.Services
 {
-    public class SolarSystemService : ISolarSystemService
+    public class SolarSystemService : BindableBase, ISolarSystemService
     {
         private readonly IWebClientService webClientService;
+        private Timer? timer;
+        private int updateSemaphore;
 
         public SolarSystemService(IWebClientService webClientService)
         {
             this.webClientService = webClientService;
         }
 
+        private SolarSystem? solarSystem;
 
-        public async Task<SolarSystem> CreateSolarSystem(InverterConnection connection)
+        public SolarSystem? SolarSystem
         {
-            var solarSystem = new SolarSystem();
+            get => solarSystem;
+            private set => Set(ref solarSystem, value);
+        }
+
+        public async Task Start(InverterConnection connection)
+        {
+            if (timer == null || SolarSystem == null)
+            {
+                Stop();
+            }
+
+            SolarSystem = await CreateSolarSystem(connection).ConfigureAwait(false);
+            timer = new Timer(TimerElapsed, null, 0, 1000);
+        }
+
+        public void Stop()
+        {
+            timer?.Dispose();
+            timer = null;
+        }
+
+        private async Task<SolarSystem> CreateSolarSystem(InverterConnection connection)
+        {
+            var result = new SolarSystem();
             webClientService.InverterConnection = connection;
             InverterDevices? inverterDevices = null;
             StorageDevices? storageDevices = null;
@@ -40,13 +61,11 @@ namespace De.Hochstaetter.Fronius.Services
                     case DeviceClass.Meter:
                         smartMeterDevices = await webClientService.GetMeterDevices().ConfigureAwait(false);
                         break;
-                    default:
-                        break;
                 }
 
                 foreach (var device in deviceGroup)
                 {
-                    var group = new DeviceGroup { DeviceClass = deviceGroup.Key };
+                    var group = new DeviceGroup {DeviceClass = deviceGroup.Key};
 
                     switch (deviceGroup.Key)
                     {
@@ -59,15 +78,67 @@ namespace De.Hochstaetter.Fronius.Services
                         case DeviceClass.Meter:
                             group.Devices.Add(smartMeterDevices?.SmartMeters.SingleOrDefault(s => s.Id == device.Id) ?? device);
                             break;
-                        default:
-                            break;
                     }
 
-                    solarSystem.DeviceGroups.Add(group);
+                    result.DeviceGroups.Add(group);
                 }
             }
 
-            return solarSystem;
+            return result;
+        }
+
+        public async void TimerElapsed(object? _)
+        {
+            if (SolarSystem == null || Interlocked.Exchange(ref updateSemaphore, 1) != 0)
+            {
+                return;
+            }
+
+            try
+            {
+                var storageDevices = await webClientService.GetStorageDevices().ConfigureAwait(false);
+
+                foreach (var storage in SolarSystem.Storages)
+                {
+                    var newStorage = storageDevices.Storages.SingleOrDefault(s => s.Id == storage.Id);
+
+                    if (newStorage != null)
+                    {
+                        storage.Data = newStorage.Data;
+                    }
+                }
+
+                var inverterDevices = await webClientService.GetInverters().ConfigureAwait(false);
+
+                foreach (var inverter in SolarSystem.Inverters)
+                {
+                    var newInverter = inverterDevices.Inverters.SingleOrDefault(i => i.Id == inverter.Id);
+
+                    if (newInverter == null)
+                    {
+                        continue;
+                    }
+
+                    inverter.Data = newInverter.Data;
+                    inverter.ThreePhasesData = newInverter.ThreePhasesData;
+                }
+
+                var meterDevices = await webClientService.GetMeterDevices().ConfigureAwait(false);
+
+                foreach (var smartMeter in SolarSystem.Meters)
+                {
+                    var newSmartMeter = meterDevices.SmartMeters.SingleOrDefault(m => m.Id == smartMeter.Id);
+
+                    if (newSmartMeter != null)
+                    {
+                        smartMeter.Data = newSmartMeter.Data;
+                    }
+                }
+            }
+            finally
+            {
+                Interlocked.Exchange(ref updateSemaphore, 0);
+            }
         }
     }
 }

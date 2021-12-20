@@ -9,6 +9,9 @@ namespace De.Hochstaetter.Fronius.Contracts
 {
     public interface ISolarSystemService
     {
-        Task<SolarSystem> CreateSolarSystem(InverterConnection connection);
+        SolarSystem? SolarSystem { get; }
+
+        Task Start(InverterConnection connection);
+        void Stop();
     }
 }

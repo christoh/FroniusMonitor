@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Reflection.Metadata;
 using De.Hochstaetter.Fronius.Contracts;
 using De.Hochstaetter.Fronius.Exceptions;
 using De.Hochstaetter.Fronius.Localization;
@@ -55,9 +56,9 @@ namespace De.Hochstaetter.Fronius.Services
             foreach (var device in dataToken.OfType<JProperty>())
             {
                 var id = int.Parse(device.Name, NumberStyles.Integer, CultureInfo.InvariantCulture);
-                var (_, common) = await GetResponse<BaseResponse>($"GetInverterRealtimeData.cgi?Scope=Device&DataCollection=CommonInverterData&DeviceId={id}").ConfigureAwait(false);
-                var (_, threePhases) = await GetResponse<BaseResponse>($"GetInverterRealtimeData.cgi?Scope=Device&DataCollection=3PInverterData&DeviceId={id}").ConfigureAwait(false);
-                var inverter = await ParseInverter(id, device, common, threePhases).ConfigureAwait(false);
+                var (data, common) = await GetResponse<BaseResponse>($"GetInverterRealtimeData.cgi?Scope=Device&DataCollection=CommonInverterData&DeviceId={id}").ConfigureAwait(false);
+                var (threePhasesData, threePhases) = await GetResponse<BaseResponse>($"GetInverterRealtimeData.cgi?Scope=Device&DataCollection=3PInverterData&DeviceId={id}").ConfigureAwait(false);
+                var inverter = await ParseInverter(id, device, common, threePhases,data,threePhasesData).ConfigureAwait(false);
                 result.Inverters.Add(inverter);
             }
 
@@ -75,31 +76,17 @@ namespace De.Hochstaetter.Fronius.Services
                 {
                     var meterToken = device.Value;
                     var detailsToken = device.Value["Details"] ?? throw new InvalidDataException(Resources.IncorrectData);
+                    var data = ParseSmartMeterData(meterToken);
 
                     var smartMeter = new SmartMeter
                     {
                         DeviceType = -1,
                         Id = int.Parse(device.Name, NumberStyles.Integer, CultureInfo.InvariantCulture),
-                        L1Current = meterToken["Current_AC_Phase_1"]?.Value<double>() ?? double.NaN,
-                        L2Current = meterToken["Current_AC_Phase_2"]?.Value<double>() ?? double.NaN,
-                        L3Current = meterToken["Current_AC_Phase_3"]?.Value<double>() ?? double.NaN,
-                        TotalCurrent = meterToken["Current_AC_Sum"]?.Value<double>() ?? double.NaN,
                         Manufacturer = detailsToken["Manufacturer"]?.Value<string>() ?? string.Empty,
-                        MeterModel = detailsToken["Model"]?.Value<string>() ?? string.Empty,
+                        Model = detailsToken["Model"]?.Value<string>() ?? string.Empty,
                         SerialNumber = detailsToken["Serial"]?.Value<string>() ?? string.Empty,
-                        IsEnabled = meterToken["Enable"]?.Value<bool>() ?? true,
-                        ReactiveEnergyConsumedWatts = meterToken["EnergyReactive_VArAC_Sum_Consumed"]?.Value<double>() ?? double.NaN,
-                        ReactiveEnergyProducedWatts = meterToken["EnergyReactive_VArAC_Sum_Produced"]?.Value<double>() ?? double.NaN,
-                        Frequency = meterToken["Frequency_Phase_Average"]?.Value<double>() ?? double.NaN,
                         MeterLocationCurrent = (int)Math.Round((meterToken["Meter_Location_Current"]?.Value<double>()) ?? -1, MidpointRounding.AwayFromZero),
-                        L1ApparentPowerWatts = meterToken["PowerApparent_S_Phase_1"]?.Value<double>() ?? double.NaN,
-                        L2ApparentPowerWatts = meterToken["PowerApparent_S_Phase_2"]?.Value<double>() ?? double.NaN,
-                        L3ApparentPowerWatts = meterToken["PowerApparent_S_Phase_3"]?.Value<double>() ?? double.NaN,
-                        TotalApparentPowerWatts = meterToken["PowerApparent_S_Sum"]?.Value<double>() ?? double.NaN,
-                        RealEnergyAbsoluteMinusWatts = meterToken["EnergyReal_WAC_Minus_Absolute"]?.Value<double>() ?? double.NaN,
-                        RealEnergyAbsolutePlusWatts = meterToken["EnergyReal_WAC_Plus_Absolute"]?.Value<double>() ?? double.NaN,
-                        RealEnergyConsumedWatts = meterToken["EnergyReal_WAC_Sum_Consumed"]?.Value<double>() ?? double.NaN,
-                        RealEnergyProducedWatts = meterToken["EnergyReal_WAC_Sum_Produced"]?.Value<double>() ?? double.NaN,
+                        Data = data,
                     };
 
                     result.SmartMeters.Add(smartMeter);
@@ -120,13 +107,9 @@ namespace De.Hochstaetter.Fronius.Services
                     var storageToken = device.Value["Controller"] ?? throw new InvalidDataException(Resources.IncorrectData);
                     var detailsToken = storageToken["Details"] ?? throw new InvalidDataException(Resources.IncorrectData);
 
-                    var storage = new Storage
+                    var data = new StorageData
                     {
-                        DeviceType = -1,
-                        Id = int.Parse(device.Name, NumberStyles.Integer, CultureInfo.InvariantCulture),
-                        StorageModel = detailsToken["Model"]?.Value<string>(),
-                        Manufacturer = detailsToken["Manufacturer"]?.Value<string>(),
-                        SerialNumber = detailsToken["Serial"]?.Value<string>()?.Trim(),
+                        Manufacturer = detailsToken["Manufacturer"]?.Value<string>() ?? string.Empty,
                         MaximumCapacityWattHours = storageToken["Capacity_Maximum"]?.Value<double>() ?? double.NaN,
                         Current = storageToken["Current_DC"]?.Value<double>() ?? double.NaN,
                         DesignedCapacityWattHours = storageToken["DesignedCapacity"]?.Value<double>() ?? double.NaN,
@@ -134,8 +117,17 @@ namespace De.Hochstaetter.Fronius.Services
                         StateOfCharge = (storageToken["StateOfCharge_Relative"]?.Value<double>() ?? double.NaN) / 100,
                         StatusBatteryCell = (int)(storageToken["Status_BatteryCell"]?.Value<double>() ?? -1),
                         TemperatureCelsius = storageToken["Temperature_Cell"]?.Value<double>() ?? double.NaN,
-                        StorageTimestamp = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(storageToken["TimeStamp"]?.Value<double>() ?? 0),
+                        StorageTimestamp = DateTime.UnixEpoch.AddSeconds(storageToken["TimeStamp"]?.Value<double>() ?? 0),
                         Voltage = storageToken["Voltage_DC"]?.Value<double>() ?? double.NaN,
+                    };
+
+                    var storage = new Storage
+                    {
+                        DeviceType = -1,
+                        Id = int.Parse(device.Name, NumberStyles.Integer, CultureInfo.InvariantCulture),
+                        SerialNumber = detailsToken["Serial"]?.Value<string>()?.Trim(),
+                        Model = detailsToken["Model"]?.Value<string>() ?? string.Empty,
+                        Data = data,
                     };
 
                     result.Storages.Add(storage);
@@ -145,35 +137,97 @@ namespace De.Hochstaetter.Fronius.Services
             }).ConfigureAwait(false);
         }
 
-        private static async Task<Inverter> ParseInverter(int id, JProperty device, JToken common, JToken threePhases) => await Task.Run(() =>
-        {
-            var deviceValues = device.Value;
 
-            return new Inverter
+        private static SmartMeterData ParseSmartMeterData(JToken meterToken)
+        {
+            return new SmartMeterData
             {
-                Id = id,
-                CustomName = deviceValues["CustomName"]?.Value<string>(),
-                DeviceType = deviceValues["DT"]?.Value<int>() ?? ~0,
-                ErrorCode = deviceValues["ErrorCode"]?.Value<int>() ?? ~0,
-                MaxPvPowerWatts = deviceValues["PVPower"]?.Value<double>() ?? double.NaN,
-                Show = deviceValues["Show"]?.Value<bool>() ?? true,
-                Status = (InverterStatus)(deviceValues["StatusCode"]?.Value<int>() ?? -1),
-                SerialNumber = deviceValues["UniqueID"]?.Value<string>(),
-                CurrentString1 = common["IDC"]?["Value"]?.Value<double?>(),
-                CurrentString2 = common["IDC_2"]?["Value"]?.Value<double?>(),
-                CurrentStorage = common["IDC_3"]?["Value"]?.Value<double?>(),
-                VoltageString1 = common["UDC"]?["Value"]?.Value<double?>(),
-                VoltageString2 = common["UDC_2"]?["Value"]?.Value<double?>(),
-                VoltageStorage = common["UDC_3"]?["Value"]?.Value<double?>(),
-                TotalEnergyWattHours = common["TOTAL_ENERGY"]?["Value"]?.Value<double?>(),
-                L1Current = threePhases["IAC_L1"]?["Value"]?.Value<double?>(),
-                L2Current = threePhases["IAC_L2"]?["Value"]?.Value<double?>(),
-                L3Current = threePhases["IAC_L3"]?["Value"]?.Value<double?>(),
-                L1Voltage = threePhases["UAC_L1"]?["Value"]?.Value<double?>(),
-                L2Voltage = threePhases["UAC_L2"]?["Value"]?.Value<double?>(),
-                L3Voltage = threePhases["UAC_L3"]?["Value"]?.Value<double?>(),
+                L1Current = meterToken["Current_AC_Phase_1"]?.Value<double>() ?? double.NaN,
+                L2Current = meterToken["Current_AC_Phase_2"]?.Value<double>() ?? double.NaN,
+                L3Current = meterToken["Current_AC_Phase_3"]?.Value<double>() ?? double.NaN,
+                TotalCurrent = meterToken["Current_AC_Sum"]?.Value<double>() ?? double.NaN,
+                IsEnabled = meterToken["Enable"]?.Value<bool>() ?? true,
+                ReactiveEnergyConsumedWattHours = meterToken["EnergyReactive_VArAC_Sum_Consumed"]?.Value<double>() ?? double.NaN,
+                ReactiveEnergyProducedWattHours = meterToken["EnergyReactive_VArAC_Sum_Produced"]?.Value<double>() ?? double.NaN,
+                Frequency = meterToken["Frequency_Phase_Average"]?.Value<double>() ?? double.NaN,
+                L1ApparentPower = meterToken["PowerApparent_S_Phase_1"]?.Value<double>() ?? double.NaN,
+                L2ApparentPower = meterToken["PowerApparent_S_Phase_2"]?.Value<double>() ?? double.NaN,
+                L3ApparentPower = meterToken["PowerApparent_S_Phase_3"]?.Value<double>() ?? double.NaN,
+                TotalApparentPower = meterToken["PowerApparent_S_Sum"]?.Value<double>() ?? double.NaN,
+                RealEnergyAbsoluteMinusWattHours = meterToken["EnergyReal_WAC_Minus_Absolute"]?.Value<double>() ?? double.NaN,
+                RealEnergyAbsolutePlusWattHours = meterToken["EnergyReal_WAC_Plus_Absolute"]?.Value<double>() ?? double.NaN,
+                RealEnergyConsumedWattHours = meterToken["EnergyReal_WAC_Sum_Consumed"]?.Value<double>() ?? double.NaN,
+                RealEnergyProducedWattHours = meterToken["EnergyReal_WAC_Sum_Produced"]?.Value<double>() ?? double.NaN,
+                L1PowerFactor = meterToken["PowerFactor_Phase_1"]?.Value<double>() ?? double.NaN,
+                L2PowerFactor = meterToken["PowerFactor_Phase_2"]?.Value<double>() ?? double.NaN,
+                L3PowerFactor = meterToken["PowerFactor_Phase_3"]?.Value<double>() ?? double.NaN,
+                TotalPowerFactor = meterToken["PowerFactor_Sum"]?.Value<double>() ?? double.NaN,
+                L1ReactivePower = meterToken["PowerReactive_Q_Phase_1"]?.Value<double>() ?? double.NaN,
+                L2ReactivePower = meterToken["PowerReactive_Q_Phase_2"]?.Value<double>() ?? double.NaN,
+                L3ReactivePower = meterToken["PowerReactive_Q_Phase_3"]?.Value<double>() ?? double.NaN,
+                TotalReactivePower = meterToken["PowerReactive_Q_Sum"]?.Value<double>() ?? double.NaN,
+                L1RealPower = meterToken["PowerReal_P_Phase_1"]?.Value<double>() ?? double.NaN,
+                L2RealPower = meterToken["PowerReal_P_Phase_2"]?.Value<double>() ?? double.NaN,
+                L3RealPower = meterToken["PowerReal_P_Phase_3"]?.Value<double>() ?? double.NaN,
+                TotalRealPower = meterToken["PowerReal_P_Sum"]?.Value<double>() ?? double.NaN,
+                MeterTimestamp = DateTime.UnixEpoch.AddSeconds(meterToken["TimeStamp"]?.Value<double>() ?? 0),
+                IsVisible = meterToken["Visible"]?.Value<bool>() ?? true,
+                L1L2Voltage = meterToken["Voltage_AC_PhaseToPhase_12"]?.Value<double>() ?? double.NaN,
+                L2L3Voltage = meterToken["Voltage_AC_PhaseToPhase_23"]?.Value<double>() ?? double.NaN,
+                L3L1Voltage = meterToken["Voltage_AC_PhaseToPhase_31"]?.Value<double>() ?? double.NaN,
+                L1Voltage = meterToken["Voltage_AC_Phase_1"]?.Value<double>() ?? double.NaN,
+                L2Voltage = meterToken["Voltage_AC_Phase_2"]?.Value<double>() ?? double.NaN,
+                L3Voltage = meterToken["Voltage_AC_Phase_3"]?.Value<double>() ?? double.NaN,
             };
-        }).ConfigureAwait(false);
+        }
+
+        private static async Task<Inverter> ParseInverter(int id, JProperty device, JToken common, JToken threePhases, BaseResponse data, BaseResponse threePhasesData) => await Task.Run(() =>
+         {
+             var deviceValues = device.Value;
+
+             var threePhasesDataNew = new ThreePhasesData
+             {
+                 L1Current = threePhases["IAC_L1"]?["Value"]?.Value<double?>(),
+                 L2Current = threePhases["IAC_L2"]?["Value"]?.Value<double?>(),
+                 L3Current = threePhases["IAC_L3"]?["Value"]?.Value<double?>(),
+                 L1Voltage = threePhases["UAC_L1"]?["Value"]?.Value<double?>(),
+                 L2Voltage = threePhases["UAC_L2"]?["Value"]?.Value<double?>(),
+                 L3Voltage = threePhases["UAC_L3"]?["Value"]?.Value<double?>(),
+                 Timestamp = threePhasesData.Timestamp,
+                 StatusCode = threePhasesData.StatusCode,
+                 Reason = threePhasesData.Reason,
+                 UserMessage = threePhasesData.Reason,
+             };
+
+             var dataNew = new InverterData
+             {
+                 ErrorCode = common["ErrorCode"]?.Value<int>() ?? ~0,
+                 TotalEnergyWattHours = common["TOTAL_ENERGY"]?["Value"]?.Value<double?>(),
+                 Status = (InverterStatus)(common["StatusCode"]?.Value<int>() ?? -1),
+                 CurrentString1 = common["IDC"]?["Value"]?.Value<double?>(),
+                 CurrentString2 = common["IDC_2"]?["Value"]?.Value<double?>(),
+                 CurrentStorage = common["IDC_3"]?["Value"]?.Value<double?>(),
+                 VoltageString1 = common["UDC"]?["Value"]?.Value<double?>(),
+                 VoltageString2 = common["UDC_2"]?["Value"]?.Value<double?>(),
+                 VoltageStorage = common["UDC_3"]?["Value"]?.Value<double?>(),
+                 Timestamp = data.Timestamp,
+                 StatusCode = data.StatusCode,
+                 Reason = data.Reason,
+                 UserMessage = data.Reason,
+             };
+
+             return new Inverter
+             {
+                 Id = id,
+                 CustomName = deviceValues["CustomName"]?.Value<string>(),
+                 DeviceType = deviceValues["DT"]?.Value<int>() ?? ~0,
+                 MaxPvPowerWatts = deviceValues["PVPower"]?.Value<double>() ?? double.NaN,
+                 Show = deviceValues["Show"]?.Value<bool>() ?? true,
+                 SerialNumber = deviceValues["UniqueID"]?.Value<string>(),
+                 Data = dataNew,
+                 ThreePhasesData = threePhasesDataNew,
+             };
+         }).ConfigureAwait(false);
 
         private async Task<(T, JToken)> GetResponse<T>(string request, string? debugString = null) where T : BaseResponse, new()
         {
@@ -197,7 +251,7 @@ namespace De.Hochstaetter.Fronius.Services
                 var result = new T
                 {
                     StatusCode = statusToken["Code"]?.Value<int>() ?? throw new InvalidDataException(Resources.IncorrectData),
-                    Timestamp = headToken["Timestamp"]?.Value<DateTime>() ?? DateTime.MinValue,
+                    Timestamp = (headToken["Timestamp"]?.Value<DateTime>() ?? DateTime.UnixEpoch).ToUniversalTime(),
                     Reason = statusToken["Reason"]?.Value<string>() ?? string.Empty,
                     UserMessage = statusToken["UserMessage"]?.Value<string>() ?? string.Empty
                 };

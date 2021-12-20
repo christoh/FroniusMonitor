@@ -33,7 +33,6 @@ namespace De.Hochstaetter.Fronius.Models
             return SetProperty(ref backingField, value, postAction, preFunc, propertyName);
         }
 
-
         protected void RaisePropertyChanged([CallerMemberName] string? propertyName = null) => OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
 
         // Same as RaisePropertyChanged (for compatibility with Caliburn.Micro)

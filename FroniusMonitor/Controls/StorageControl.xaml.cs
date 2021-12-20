@@ -9,7 +9,7 @@ using Point = System.Windows.Point;
 
 namespace De.Hochstaetter.FroniusMonitor.Controls
 {
-    public partial class BatteryControl
+    public partial class StorageControl
     {
         private bool isInChargingAnimation;
 
@@ -23,8 +23,8 @@ namespace De.Hochstaetter.FroniusMonitor.Controls
 
         public static readonly DependencyProperty StorageProperty = DependencyProperty.Register
         (
-            nameof(Storage), typeof(Storage), typeof(BatteryControl),
-            new PropertyMetadata((d, e) => ((BatteryControl)d).OnStorageChanged())
+            nameof(Storage), typeof(Storage), typeof(StorageControl),
+            new PropertyMetadata((d, e) => ((StorageControl)d).OnStorageChanged())
         );
 
         public Storage Storage
@@ -33,7 +33,7 @@ namespace De.Hochstaetter.FroniusMonitor.Controls
             set => SetValue(StorageProperty, value);
         }
 
-        public BatteryControl()
+        public StorageControl()
         {
             InitializeComponent();
         }
@@ -41,24 +41,30 @@ namespace De.Hochstaetter.FroniusMonitor.Controls
         private void OnStorageChanged()
         {
             Brush brush;
+            var data=Storage.Data;
 
-            if (Storage.StateOfCharge < 0.08)
+            if (data == null)
+            {
+                return;
+            }
+
+            if (data.StateOfCharge < 0.08)
             {
                 brush = Brushes.Red;
             }
-            else if (Storage.StateOfCharge < 0.12)
+            else if (data.StateOfCharge < 0.12)
             {
                 brush = Brushes.OrangeRed;
             }
-            else if (Storage.StateOfCharge < 0.2)
+            else if (data.StateOfCharge < 0.2)
             {
                 brush = Brushes.Orange;
             }
-            else if (Storage.StateOfCharge < 0.3)
+            else if (data.StateOfCharge < 0.3)
             {
                 brush = Brushes.Yellow;
             }
-            else if (Storage.StateOfCharge < 0.5)
+            else if (data.StateOfCharge < 0.5)
             {
                 brush = Brushes.YellowGreen;
             }
@@ -67,10 +73,10 @@ namespace De.Hochstaetter.FroniusMonitor.Controls
                 brush = Brushes.LightGreen;
             }
 
-            SocRectangle.Height = Storage.StateOfCharge * BackgroundRectangle.ActualHeight;
+            SocRectangle.Height = data.StateOfCharge * BackgroundRectangle.Height;
             SocRectangle.Fill = brush;
 
-            if (Storage.Power > 10)
+            if (data.Power > 10)
             {
                 if (!isInChargingAnimation)
                 {
@@ -87,7 +93,7 @@ namespace De.Hochstaetter.FroniusMonitor.Controls
                     PlusPole.Background.BeginAnimation(SolidColorBrush.ColorProperty, null);
                 }
 
-                brush = Storage.TrafficLight switch
+                brush = data.TrafficLight switch
                 {
                     TrafficLight.Red => Brushes.Red,
                     TrafficLight.Green => Brushes.DarkGreen,

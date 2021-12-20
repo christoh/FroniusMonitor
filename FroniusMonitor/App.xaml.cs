@@ -18,7 +18,7 @@ namespace FroniusMonitor
 
             Container
                 .RegisterType<IWebClientService, WebClientService>()
-                .RegisterType<ISolarSystemService, SolarSystemService>()
+                .RegisterSingleton<ISolarSystemService, SolarSystemService>()
                 ;
         }
     }

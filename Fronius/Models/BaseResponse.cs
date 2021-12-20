@@ -29,7 +29,7 @@ namespace De.Hochstaetter.Fronius.Models
             set => Set(ref userMessage, value);
         }
 
-        private DateTime timestamp=DateTime.MinValue;
+        private DateTime timestamp = DateTime.MinValue;
         public DateTime Timestamp
         {
             get => timestamp;
@@ -37,6 +37,6 @@ namespace De.Hochstaetter.Fronius.Models
         }
 
         public virtual string DisplayName => string.Empty;
-        public override string ToString()=>DisplayName;
+        public override string ToString() => DisplayName;
     }
 }

@@ -9,30 +9,34 @@
         Title="{x:Static p:Resources.AppName}" Height="450" Width="800"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
         xmlns:m="clr-namespace:De.Hochstaetter.Fronius.Models;assembly=Fronius"
-        xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius">
+        xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+        xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
-        <TreeView SelectedItemChanged="OnSelectedItemChanged" BorderThickness="0" Grid.Column="0"
-                  ItemsSource="{Binding SolarSystem, Converter={co:TreeViewConverter}}">
-            <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate DataType="m:DeviceGroup" ItemsSource="{Binding Devices}">
-                    <TextBlock Text="{Binding DisplayName}" />
-                </HierarchicalDataTemplate>
-            </TreeView.ItemTemplate>
-        </TreeView>
+        <Viewbox Grid.Column="0">
+            <Canvas Width="1024" Height="768">
+                <ItemsControl Canvas.Bottom="0" Canvas.Right="0" MaxWidth="340" Height="256" ItemsSource="{Binding SolarSystemService.SolarSystem.Storages, FallbackValue={x:Null}}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" IsItemsHost="True"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <c:StorageControl Margin="0,0" Storage="{Binding}"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Canvas>
+        </Viewbox>
 
         <GridSplitter Grid.Column="1" ResizeBehavior="PreviousAndNext" BorderThickness="2" ResizeDirection="Columns"
                       BorderBrush="LightGray" Margin="4,0" VerticalAlignment="Stretch" />
-
-        <Grid Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                              Content="{Binding MainViewContent}" />
-        </Grid>
 
     </Grid>
 </Window>
