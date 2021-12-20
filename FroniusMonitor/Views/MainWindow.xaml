@@ -32,6 +32,7 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
+                <c:PowerMeterClassic Height="256" MaxWidth="340" Canvas.Bottom="0" SmartMeter="{Binding SolarSystemService.SolarSystem.PrimaryMeter, FallbackValue={x:Null}}"/>
             </Canvas>
         </Viewbox>
 

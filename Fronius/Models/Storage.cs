@@ -28,12 +28,14 @@ public class StorageData
             4 => TrafficLight.Red,
             _ => TrafficLight.Yellow
         },
+
         "LG-Chem" => StatusBatteryCell switch
         {
             3 => TrafficLight.Green,
             5 => TrafficLight.Red,
             _ => TrafficLight.Yellow,
         },
+
         _ => TrafficLight.Yellow
     };
 

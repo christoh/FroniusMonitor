@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using De.Hochstaetter.Fronius.Contracts;
+﻿using De.Hochstaetter.Fronius.Contracts;
 
 namespace De.Hochstaetter.Fronius.Models
 {
     public class MeasurementRow : BindableBase, IHaveDisplayName
     {
-        private string displayName=string.Empty;
+        private string displayName = string.Empty;
 
         public string DisplayName
         {

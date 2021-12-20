@@ -22,6 +22,8 @@ namespace De.Hochstaetter.Fronius.Models
 
         public IEnumerable<SmartMeter> Meters => DeviceGroups.SingleOrDefault(g => g.DeviceClass == DeviceClass.Meter)?.Devices.OfType<SmartMeter>() ?? Array.Empty<SmartMeter>();
 
+        public SmartMeter? PrimaryMeter => Meters.FirstOrDefault(m => m.Usage == MeterUsage.Inverter);
+
         IEnumerable IHierarchicalCollection.ItemsEnumerable { get; } = Array.Empty<object>();
 
         IEnumerable IHierarchicalCollection.ChildrenEnumerable => DeviceGroups;
