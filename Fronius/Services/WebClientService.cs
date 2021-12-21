@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using System.Reflection.Metadata;
 using De.Hochstaetter.Fronius.Contracts;
 using De.Hochstaetter.Fronius.Exceptions;
 using De.Hochstaetter.Fronius.Localization;
@@ -58,12 +57,11 @@ namespace De.Hochstaetter.Fronius.Services
                 var id = int.Parse(device.Name, NumberStyles.Integer, CultureInfo.InvariantCulture);
                 var (data, common) = await GetResponse<BaseResponse>($"GetInverterRealtimeData.cgi?Scope=Device&DataCollection=CommonInverterData&DeviceId={id}").ConfigureAwait(false);
                 var (threePhasesData, threePhases) = await GetResponse<BaseResponse>($"GetInverterRealtimeData.cgi?Scope=Device&DataCollection=3PInverterData&DeviceId={id}").ConfigureAwait(false);
-                var inverter = await ParseInverter(id, device, common, threePhases,data,threePhasesData).ConfigureAwait(false);
+                var inverter = await ParseInverter(id, device, common, threePhases, data, threePhasesData).ConfigureAwait(false);
                 result.Inverters.Add(inverter);
             }
 
             return result;
-
         }
 
         public async Task<SmartMeterDevices> GetMeterDevices()
@@ -85,7 +83,7 @@ namespace De.Hochstaetter.Fronius.Services
                         Manufacturer = detailsToken["Manufacturer"]?.Value<string>() ?? string.Empty,
                         Model = detailsToken["Model"]?.Value<string>() ?? string.Empty,
                         SerialNumber = detailsToken["Serial"]?.Value<string>() ?? string.Empty,
-                        MeterLocationCurrent = (int)Math.Round((meterToken["Meter_Location_Current"]?.Value<double>()) ?? -1, MidpointRounding.AwayFromZero),
+                        MeterLocationCurrent = (int)Math.Round(meterToken["Meter_Location_Current"]?.Value<double>() ?? -1, MidpointRounding.AwayFromZero),
                         Data = data,
                     };
 
@@ -182,52 +180,52 @@ namespace De.Hochstaetter.Fronius.Services
         }
 
         private static async Task<Inverter> ParseInverter(int id, JProperty device, JToken common, JToken threePhases, BaseResponse data, BaseResponse threePhasesData) => await Task.Run(() =>
-         {
-             var deviceValues = device.Value;
+        {
+            var deviceValues = device.Value;
 
-             var threePhasesDataNew = new ThreePhasesData
-             {
-                 L1Current = threePhases["IAC_L1"]?["Value"]?.Value<double?>(),
-                 L2Current = threePhases["IAC_L2"]?["Value"]?.Value<double?>(),
-                 L3Current = threePhases["IAC_L3"]?["Value"]?.Value<double?>(),
-                 L1Voltage = threePhases["UAC_L1"]?["Value"]?.Value<double?>(),
-                 L2Voltage = threePhases["UAC_L2"]?["Value"]?.Value<double?>(),
-                 L3Voltage = threePhases["UAC_L3"]?["Value"]?.Value<double?>(),
-                 Timestamp = threePhasesData.Timestamp,
-                 StatusCode = threePhasesData.StatusCode,
-                 Reason = threePhasesData.Reason,
-                 UserMessage = threePhasesData.Reason,
-             };
+            var threePhasesDataNew = new ThreePhasesData
+            {
+                L1Current = threePhases["IAC_L1"]?["Value"]?.Value<double?>(),
+                L2Current = threePhases["IAC_L2"]?["Value"]?.Value<double?>(),
+                L3Current = threePhases["IAC_L3"]?["Value"]?.Value<double?>(),
+                L1Voltage = threePhases["UAC_L1"]?["Value"]?.Value<double?>(),
+                L2Voltage = threePhases["UAC_L2"]?["Value"]?.Value<double?>(),
+                L3Voltage = threePhases["UAC_L3"]?["Value"]?.Value<double?>(),
+                Timestamp = threePhasesData.Timestamp,
+                StatusCode = threePhasesData.StatusCode,
+                Reason = threePhasesData.Reason,
+                UserMessage = threePhasesData.Reason,
+            };
 
-             var dataNew = new InverterData
-             {
-                 ErrorCode = common["ErrorCode"]?.Value<int>() ?? ~0,
-                 TotalEnergyWattHours = common["TOTAL_ENERGY"]?["Value"]?.Value<double?>(),
-                 Status = (InverterStatus)(common["StatusCode"]?.Value<int>() ?? -1),
-                 CurrentString1 = common["IDC"]?["Value"]?.Value<double?>(),
-                 CurrentString2 = common["IDC_2"]?["Value"]?.Value<double?>(),
-                 CurrentStorage = common["IDC_3"]?["Value"]?.Value<double?>(),
-                 VoltageString1 = common["UDC"]?["Value"]?.Value<double?>(),
-                 VoltageString2 = common["UDC_2"]?["Value"]?.Value<double?>(),
-                 VoltageStorage = common["UDC_3"]?["Value"]?.Value<double?>(),
-                 Timestamp = data.Timestamp,
-                 StatusCode = data.StatusCode,
-                 Reason = data.Reason,
-                 UserMessage = data.Reason,
-             };
+            var dataNew = new InverterData
+            {
+                ErrorCode = common["ErrorCode"]?.Value<int>() ?? ~0,
+                TotalEnergyWattHours = common["TOTAL_ENERGY"]?["Value"]?.Value<double?>(),
+                Status = (InverterStatus)(common["StatusCode"]?.Value<int>() ?? -1),
+                CurrentString1 = common["IDC"]?["Value"]?.Value<double?>(),
+                CurrentString2 = common["IDC_2"]?["Value"]?.Value<double?>(),
+                CurrentStorage = common["IDC_3"]?["Value"]?.Value<double?>(),
+                VoltageString1 = common["UDC"]?["Value"]?.Value<double?>(),
+                VoltageString2 = common["UDC_2"]?["Value"]?.Value<double?>(),
+                VoltageStorage = common["UDC_3"]?["Value"]?.Value<double?>(),
+                Timestamp = data.Timestamp,
+                StatusCode = data.StatusCode,
+                Reason = data.Reason,
+                UserMessage = data.Reason,
+            };
 
-             return new Inverter
-             {
-                 Id = id,
-                 CustomName = deviceValues["CustomName"]?.Value<string>(),
-                 DeviceType = deviceValues["DT"]?.Value<int>() ?? ~0,
-                 MaxPvPowerWatts = deviceValues["PVPower"]?.Value<double>() ?? double.NaN,
-                 Show = deviceValues["Show"]?.Value<bool>() ?? true,
-                 SerialNumber = deviceValues["UniqueID"]?.Value<string>(),
-                 Data = dataNew,
-                 ThreePhasesData = threePhasesDataNew,
-             };
-         }).ConfigureAwait(false);
+            return new Inverter
+            {
+                Id = id,
+                CustomName = deviceValues["CustomName"]?.Value<string>(),
+                DeviceType = deviceValues["DT"]?.Value<int>() ?? ~0,
+                MaxPvPowerWatts = deviceValues["PVPower"]?.Value<double>() ?? double.NaN,
+                Show = deviceValues["Show"]?.Value<bool>() ?? true,
+                SerialNumber = deviceValues["UniqueID"]?.Value<string>(),
+                Data = dataNew,
+                ThreePhasesData = threePhasesDataNew,
+            };
+        }).ConfigureAwait(false);
 
         private async Task<(T, JToken)> GetResponse<T>(string request, string? debugString = null) where T : BaseResponse, new()
         {

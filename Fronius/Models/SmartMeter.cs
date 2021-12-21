@@ -63,6 +63,10 @@ public class SmartMeterData
     public double L2L3OutOfBalancePower => Math.Abs(L2RealPower - L3RealPower);
     public double L3L1OutOfBalancePower => Math.Abs(L3RealPower - L1RealPower);
     public double MaxOutOfBalancePower => new[] { L1L2OutOfBalancePower, L2L3OutOfBalancePower, L3L1OutOfBalancePower }.Max();
+    public double L1L2OutOfBalanceCurrent => Math.Abs(L1Current - L2Current);
+    public double L2L3OutOfBalanceCurrent => Math.Abs(L2Current - L3Current);
+    public double L3L1OutOfBalanceCurrent => Math.Abs(L3Current - L1Current);
+    public double MaxOutOfBalanceCurrent => new[] { L1L2OutOfBalanceCurrent, L2L3OutOfBalanceCurrent, L3L1OutOfBalanceCurrent }.Max();
 }
 
 public class SmartMeter : DeviceInfo

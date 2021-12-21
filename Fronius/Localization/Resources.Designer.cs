@@ -277,11 +277,11 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Out-of-balance Power.
+        ///   Looks up a localized string similar to Out of balance.
         /// </summary>
-        public static string OutOfBalancePower {
+        public static string OutOfBalance {
             get {
-                return ResourceManager.GetString("OutOfBalancePower", resourceCulture);
+                return ResourceManager.GetString("OutOfBalance", resourceCulture);
             }
         }
         

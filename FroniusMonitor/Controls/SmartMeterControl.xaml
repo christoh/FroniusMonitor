@@ -16,7 +16,7 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Viewbox Grid.Row="0" HorizontalAlignment="Stretch" Width="100" StretchDirection="DownOnly">
-                    <TextBlock Grid.Row="0" HorizontalAlignment="Stretch" FontSize="8" Text="{Binding SmartMeter, FallbackValue=---}" TextAlignment="Center"/>
+                    <TextBlock HorizontalAlignment="Stretch" FontSize="8" Text="{Binding SmartMeter, FallbackValue=---}" TextAlignment="Center"/>
                 </Viewbox>
 
                 <Grid Grid.Row="1" Background="#B3DBC6" Width="100" Height="94" Margin="4">

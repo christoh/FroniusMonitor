@@ -270,9 +270,6 @@
   <data name="PowerPercentage" xml:space="preserve">
     <value>Leistungsanteil</value>
   </data>
-  <data name="OutOfBalancePower" xml:space="preserve">
-    <value>Schieflast</value>
-  </data>
   <data name="PhaseVoltage" xml:space="preserve">
     <value>Phasenspannung</value>
   </data>
@@ -281,5 +278,8 @@
   </data>
   <data name="PowerFactor" xml:space="preserve">
     <value>Leistungsfaktor</value>
+  </data>
+  <data name="OutOfBalance" xml:space="preserve">
+    <value>Schieflast</value>
   </data>
 </root>

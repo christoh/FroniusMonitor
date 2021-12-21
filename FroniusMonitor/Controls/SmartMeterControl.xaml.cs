@@ -15,6 +15,7 @@ public enum MeterDisplayMode
     PhaseVoltage,
     LineVoltage,
     Current,
+    CurrentOutOfBalance,
     More
 }
 
@@ -32,7 +33,12 @@ public partial class SmartMeterControl
         MeterDisplayMode.PhaseVoltage, MeterDisplayMode.LineVoltage
     };
 
-    private int currentPowerModeIndex, currentVoltageModeIndex;
+    private static readonly IReadOnlyList<MeterDisplayMode> currentModes = new[]
+    {
+        MeterDisplayMode.Current, MeterDisplayMode.CurrentOutOfBalance
+    };
+
+    private int currentPowerModeIndex, currentVoltageModeIndex, currentCurrentIndex;
 
     #region Dependency Properties
 
@@ -169,7 +175,7 @@ public partial class SmartMeterControl
                     break;
 
                 case MeterDisplayMode.PowerOutOfBalance:
-                    Header.Text = Loc.OutOfBalancePower;
+                    Header.Text = Loc.OutOfBalance;
                     Value1.Text = $"{data.L1L2OutOfBalancePower:N1} W";
                     Value2.Text = $"{data.L2L3OutOfBalancePower:N1} W";
                     Value3.Text = $"{data.L3L1OutOfBalancePower:N1} W";
@@ -187,6 +193,15 @@ public partial class SmartMeterControl
                     Label3.Text = "Tim";
                     ValueSum.Text = $"{data.IsVisible}";
                     LabelSum.Text = "Val";
+                    break;
+
+                case MeterDisplayMode.CurrentOutOfBalance:
+                    Header.Text = Loc.OutOfBalance;
+                    Value1.Text = $"{data.L1L2OutOfBalanceCurrent:N3} A";
+                    Value2.Text = $"{data.L2L3OutOfBalanceCurrent:N3} A";
+                    Value3.Text = $"{data.L3L1OutOfBalanceCurrent:N3} A";
+                    ValueSum.Text = $"{data.MaxOutOfBalanceCurrent:N3} A";
+                    SetTwoPhases("Max");
                     break;
             }
         });
@@ -218,7 +233,7 @@ public partial class SmartMeterControl
 
     private void OnVoltageClick(object sender, RoutedEventArgs e) => SetMode(voltageModes, ref currentVoltageModeIndex);
 
-    private void OnCurrentClick(object sender, RoutedEventArgs e) => Mode = MeterDisplayMode.Current;
+    private void OnCurrentClick(object sender, RoutedEventArgs e) => SetMode(currentModes, ref currentCurrentIndex);
 
     private void OnMoreClick(object sender, RoutedEventArgs e) => Mode = MeterDisplayMode.More;
 }

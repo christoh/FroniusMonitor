@@ -2,7 +2,7 @@
 {
     public class Settings : BindableBase
     {
-        private string? baseUrl = "http://fronius1.hochstaetter.de";
+        private string? baseUrl = "http://neufahrn.hochstaetter.de:10";
 
         public string? BaseUrl
         {

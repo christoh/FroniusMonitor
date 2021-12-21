@@ -229,7 +229,7 @@
     <value>Updating</value>
   </data>
   <data name="AppName" xml:space="preserve">
-	  <value>Fronius Monitor</value>
+    <value>Fronius Monitor</value>
   </data>
   <data name="StoragePowerMessage" xml:space="preserve">
     <value>{0} at {1:N0} W of power</value>
@@ -270,9 +270,6 @@
   <data name="PowerPercentage" xml:space="preserve">
     <value>Power percentage</value>
   </data>
-  <data name="OutOfBalancePower" xml:space="preserve">
-    <value>Out-of-balance Power</value>
-  </data>
   <data name="PhaseVoltage" xml:space="preserve">
     <value>Phase voltage</value>
   </data>
@@ -281,5 +278,8 @@
   </data>
   <data name="PowerFactor" xml:space="preserve">
     <value>Power factor</value>
+  </data>
+  <data name="OutOfBalance" xml:space="preserve">
+    <value>Out of balance</value>
   </data>
 </root>
