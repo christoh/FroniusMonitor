@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.ComponentModel;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using De.Hochstaetter.Fronius.Models;
@@ -20,83 +21,109 @@ public partial class StorageControl
     public static readonly DependencyProperty StorageProperty = DependencyProperty.Register
     (
         nameof(Storage), typeof(Storage), typeof(StorageControl),
-        new PropertyMetadata((d, e) => ((StorageControl)d).OnStorageChanged())
+        new PropertyMetadata((d, e) => ((StorageControl)d).OnStorageChanged(e))
     );
 
-    public Storage Storage
+    public Storage? Storage
     {
-        get => (Storage)GetValue(StorageProperty);
+        get => (Storage?)GetValue(StorageProperty);
         set => SetValue(StorageProperty, value);
     }
 
     public StorageControl()
     {
         InitializeComponent();
+
+        Unloaded += (s, e) =>
+        {
+            if (Storage != null)
+            {
+                Storage.PropertyChanged -= OnDataChanged;
+            }
+        };
     }
 
-    private void OnStorageChanged()
+    private void OnStorageChanged(DependencyPropertyChangedEventArgs e)
     {
-        Brush brush;
-        var data = Storage.Data;
-
-        if (data == null)
+        if (e.OldValue is Storage oldStorage)
         {
-            return;
+            oldStorage.PropertyChanged -= OnDataChanged;
         }
 
-        if (data.StateOfCharge < 0.08)
+        if (Storage != null)
         {
-            brush = Brushes.Red;
-        }
-        else if (data.StateOfCharge < 0.12)
-        {
-            brush = Brushes.OrangeRed;
-        }
-        else if (data.StateOfCharge < 0.2)
-        {
-            brush = Brushes.Orange;
-        }
-        else if (data.StateOfCharge < 0.3)
-        {
-            brush = Brushes.Yellow;
-        }
-        else if (data.StateOfCharge < 0.5)
-        {
-            brush = Brushes.YellowGreen;
-        }
-        else
-        {
-            brush = Brushes.LightGreen;
+            Storage.PropertyChanged += OnDataChanged;
         }
 
-        SocRectangle.Height = data.StateOfCharge * BackgroundRectangle.Height;
-        SocRectangle.Fill = brush;
+        OnDataChanged();
+    }
 
-        if (data.Power > 10)
+    private void OnDataChanged(object? _ = null, PropertyChangedEventArgs? __ = null)
+    {
+        Dispatcher.InvokeAsync(() =>
         {
-            if (!isInChargingAnimation)
+            Brush brush;
+            var data = Storage?.Data;
+
+            if (data == null)
             {
-                isInChargingAnimation = true;
-                PlusPole.Background = Enclosure.BorderBrush = new SolidColorBrush(Colors.DarkGreen);
-                PlusPole.Background.BeginAnimation(SolidColorBrush.ColorProperty, chargingAnimation);
-            }
-        }
-        else
-        {
-            if (!PlusPole.Background.IsFrozen)
-            {
-                PlusPole.Background.BeginAnimation(SolidColorBrush.ColorProperty, null);
+                return;
             }
 
-            brush = data.TrafficLight switch
+            if (data.StateOfCharge < 0.08)
             {
-                TrafficLight.Red => Brushes.Red,
-                TrafficLight.Green => Brushes.DarkGreen,
-                _ => Brushes.DarkGray
-            };
+                brush = Brushes.Red;
+            }
+            else if (data.StateOfCharge < 0.12)
+            {
+                brush = Brushes.OrangeRed;
+            }
+            else if (data.StateOfCharge < 0.2)
+            {
+                brush = Brushes.Orange;
+            }
+            else if (data.StateOfCharge < 0.3)
+            {
+                brush = Brushes.Yellow;
+            }
+            else if (data.StateOfCharge < 0.5)
+            {
+                brush = Brushes.YellowGreen;
+            }
+            else
+            {
+                brush = Brushes.LightGreen;
+            }
 
-            isInChargingAnimation = false;
-            PlusPole.Background = Enclosure.BorderBrush = brush;
-        }
+            SocRectangle.Height = data.StateOfCharge * BackgroundRectangle.Height;
+            SocRectangle.Fill = brush;
+
+            if (data.Power > 10)
+            {
+                if (!isInChargingAnimation)
+                {
+                    isInChargingAnimation = true;
+                    PlusPole.Background = Enclosure.BorderBrush = new SolidColorBrush(Colors.DarkGreen);
+                    PlusPole.Background.BeginAnimation(SolidColorBrush.ColorProperty, chargingAnimation);
+                }
+            }
+            else
+            {
+                if (!PlusPole.Background.IsFrozen)
+                {
+                    PlusPole.Background.BeginAnimation(SolidColorBrush.ColorProperty, null);
+                }
+
+                brush = data.TrafficLight switch
+                {
+                    TrafficLight.Red => Brushes.Red,
+                    TrafficLight.Green => Brushes.DarkGreen,
+                    _ => Brushes.DarkGray
+                };
+
+                isInChargingAnimation = false;
+                PlusPole.Background = Enclosure.BorderBrush = brush;
+            }
+        });
     }
 }

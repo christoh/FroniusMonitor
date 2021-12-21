@@ -23,7 +23,7 @@
                     <Grid.Resources>
                         <Style TargetType="TextBlock">
                             <Setter Property="Foreground" Value="#082A18"/>
-                            <Setter Property="FontFamily" Value="pack://application:,,,/Assets/Fonts/#DS-Digital"/>
+                            <Setter Property="FontFamily" Value="pack://application:,,,/Assets/Fonts/#Digital-7 Mono"/>
                             <Setter Property="FontSize" Value="16"/>
                         </Style>
                     </Grid.Resources>
@@ -45,17 +45,18 @@
                     <TextBlock x:Name="Label1" Grid.Row="1" Grid.Column="0" Text="L1" Margin="0,4,0,0"/>
                     <TextBlock x:Name="Label2" Grid.Row="2" Grid.Column="0" Text="L2" Margin="0,2,0,0"/>
                     <TextBlock x:Name="Label3" Grid.Row="3" Grid.Column="0" Text="L3" Margin="0,2,0,0"/>
-                    <TextBlock x:Name="LabelSum" FontWeight="Bold" Grid.Row="4" Grid.Column="0" Text="Sum" Margin="0,2,0,0"/>
+                    <TextBlock x:Name="LabelSum" Grid.Row="4" Grid.Column="0" Text="Sum" Margin="0,2,0,0"/>
                     <TextBlock x:Name="Value1" TextAlignment="Right" Grid.Row="1" Grid.Column="1" Text="---" Margin="0,4,0,0"/>
                     <TextBlock x:Name="Value2" TextAlignment="Right" Grid.Row="2" Grid.Column="1" Text="---" Margin="0,2,0,0"/>
                     <TextBlock x:Name="Value3" TextAlignment="Right" Grid.Row="3" Grid.Column="1" Text="---" Margin="0,2,0,0"/>
-                    <TextBlock x:Name="ValueSum" FontWeight="Bold" TextAlignment="Right" Grid.Row="4" Grid.Column="1" Text="---" Margin="0,2,0,0"/>
+                    <TextBlock x:Name="ValueSum" TextAlignment="Right" Grid.Row="4" Grid.Column="1" Text="---" Margin="0,2,0,0"/>
 
                 </Grid>
 
                 <WrapPanel MaxWidth="110" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
                     <WrapPanel.Resources>
                         <Style TargetType="Button">
+                            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="ButtonBase">

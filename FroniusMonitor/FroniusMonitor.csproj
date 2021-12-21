@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Assets\Fonts\D7MONO.ttf" />
     <None Remove="Assets\Fonts\DS-DIGI.TTF" />
     <None Remove="Assets\Fonts\DS-DIGIB.TTF" />
     <None Remove="Assets\Fonts\DS-DIGII.TTF" />
@@ -34,6 +35,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Assets\Fonts\D7MONO.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Assets\Fonts\DS-DIGI.TTF">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
