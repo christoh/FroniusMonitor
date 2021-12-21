@@ -32,12 +32,16 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-                <c:PowerMeterClassic Height="256" MaxWidth="340" Canvas.Bottom="0" SmartMeter="{Binding SolarSystemService.SolarSystem.PrimaryMeter, FallbackValue={x:Null}}"/>
+                <Viewbox Height="256" MaxWidth="340" Canvas.Bottom="0" >
+                    <StackPanel Orientation="Horizontal">
+                        <c:PowerMeterClassic Height="256" SmartMeter="{Binding SolarSystemService.SolarSystem.PrimaryMeter, FallbackValue={x:Null}}"/>
+                        <c:SmartMeterControl Margin="20,0,0,0" Height="256" SmartMeter="{Binding SolarSystemService.SolarSystem.PrimaryMeter, FallbackValue={x:Null}}"/>
+                    </StackPanel>
+                </Viewbox>
             </Canvas>
         </Viewbox>
 
         <GridSplitter Grid.Column="1" ResizeBehavior="PreviousAndNext" BorderThickness="2" ResizeDirection="Columns"
                       BorderBrush="LightGray" Margin="4,0" VerticalAlignment="Stretch" />
-
     </Grid>
 </Window>

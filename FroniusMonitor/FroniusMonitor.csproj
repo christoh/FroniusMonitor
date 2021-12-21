@@ -19,11 +19,33 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Assets\Fonts\DS-DIGI.TTF" />
+    <None Remove="Assets\Fonts\DS-DIGIB.TTF" />
+    <None Remove="Assets\Fonts\DS-DIGII.TTF" />
+    <None Remove="Assets\Fonts\DS-DIGIT.TTF" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Unity.Container" Version="5.11.11" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Fronius\Fronius.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\Fonts\DS-DIGI.TTF">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Fonts\DS-DIGIB.TTF">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Fonts\DS-DIGII.TTF">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Fonts\DS-DIGIT.TTF">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
 </Project>

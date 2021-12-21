@@ -33,6 +33,22 @@ namespace De.Hochstaetter.Fronius.Services
             timer = new Timer(TimerElapsed, null, 0, 1000);
         }
 
+        private string lastConnectionError = string.Empty;
+
+        public string LastConnectionError
+        {
+            get => lastConnectionError;
+            set => Set(ref lastConnectionError, value);
+        }
+
+        private bool isConnected;
+
+        public bool IsConnected
+        {
+            get => isConnected;
+            set => Set(ref isConnected, value);
+        }
+
         public void Stop()
         {
             timer?.Dispose();
@@ -134,6 +150,13 @@ namespace De.Hochstaetter.Fronius.Services
                         smartMeter.Data = newSmartMeter.Data;
                     }
                 }
+
+                IsConnected = true;
+            }
+            catch(Exception ex)
+            {
+                IsConnected = false;
+                LastConnectionError = $"{ex.GetType().Name}: {ex.Message}";
             }
             finally
             {

@@ -240,4 +240,46 @@
   <data name="Discharging" xml:space="preserve">
     <value>Entladen</value>
   </data>
+  <data name="ProviderMeter" xml:space="preserve">
+    <value>Zähler Deines Netzbetreibers</value>
+  </data>
+  <data name="PleaseWait" xml:space="preserve">
+    <value>Warten ...</value>
+  </data>
+  <data name="Power" xml:space="preserve">
+    <value>Leistung</value>
+  </data>
+  <data name="Current" xml:space="preserve">
+    <value>Strom</value>
+  </data>
+  <data name="Voltage" xml:space="preserve">
+    <value>Spannung</value>
+  </data>
+  <data name="More" xml:space="preserve">
+    <value>Mehr</value>
+  </data>
+  <data name="ApparentPower" xml:space="preserve">
+    <value>Scheinleistung</value>
+  </data>
+  <data name="RealPower" xml:space="preserve">
+    <value>Wirkleistung</value>
+  </data>
+  <data name="ReactivePower" xml:space="preserve">
+    <value>Blindleistung</value>
+  </data>
+  <data name="PowerPercentage" xml:space="preserve">
+    <value>Leistungsanteil</value>
+  </data>
+  <data name="OutOfBalancePower" xml:space="preserve">
+    <value>Schieflast</value>
+  </data>
+  <data name="PhaseVoltage" xml:space="preserve">
+    <value>Phasenspannung</value>
+  </data>
+  <data name="LineVoltage" xml:space="preserve">
+    <value>Leiterspannung</value>
+  </data>
+  <data name="PowerFactor" xml:space="preserve">
+    <value>Leistungsfaktor</value>
+  </data>
 </root>

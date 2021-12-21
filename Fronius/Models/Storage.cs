@@ -65,7 +65,7 @@ public class StorageData
 
 public class Storage : DeviceInfo
 {
-    public override string DisplayName => $"{Model ?? Resources.Unknown} #{Id}";
+    public override string DisplayName => $"{Model} #{Id}";
 
     private string model = string.Empty;
 

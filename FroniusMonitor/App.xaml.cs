@@ -1,25 +1,26 @@
-﻿using De.Hochstaetter.Fronius.Contracts;
-using De.Hochstaetter.Fronius.Services;
+﻿//using System.Globalization;
 using System.Windows;
+using De.Hochstaetter.Fronius.Contracts;
 using De.Hochstaetter.Fronius.Models;
+using De.Hochstaetter.Fronius.Services;
 using Unity;
 
-namespace FroniusMonitor
+namespace De.Hochstaetter.FroniusMonitor;
+
+public partial class App
 {
+    public static readonly IUnityContainer Container = new UnityContainer();
 
-    public partial class App : Application
+    public static Settings Settings { get; set; } = new();
+
+    protected override void OnStartup(StartupEventArgs e)
     {
-        public static readonly IUnityContainer Container = new UnityContainer();
-        public static Settings Settings { get; set; } = new();
+        //Thread.CurrentThread.CurrentUICulture= new CultureInfo("de-CH");
+        base.OnStartup(e);
 
-        protected override void OnStartup(StartupEventArgs e)
-        {
-            base.OnStartup(e);
-
-            Container
-                .RegisterType<IWebClientService, WebClientService>()
-                .RegisterSingleton<ISolarSystemService, SolarSystemService>()
-                ;
-        }
+        Container
+            .RegisterType<IWebClientService, WebClientService>()
+            .RegisterSingleton<ISolarSystemService, SolarSystemService>()
+            ;
     }
 }

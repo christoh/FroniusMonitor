@@ -1,6 +1,5 @@
 ﻿using De.Hochstaetter.Fronius.Contracts;
 using De.Hochstaetter.Fronius.Models;
-using FroniusMonitor;
 
 namespace De.Hochstaetter.FroniusMonitor.ViewModels
 {

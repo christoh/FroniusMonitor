@@ -6,7 +6,7 @@ namespace De.Hochstaetter.FroniusMonitor.Controls
 {
     public partial class PowerMeterClassic : UserControl
     {
-        public static readonly DependencyProperty SmartMeterProperty = DependencyProperty.Register
+        public static readonly DependencyProperty SmartMeterControlProperty = DependencyProperty.Register
         (
             nameof(SmartMeter), typeof(SmartMeter), typeof(PowerMeterClassic),
             new PropertyMetadata((d, e) => ((PowerMeterClassic)d).OnSmartMeterChanged())
@@ -14,8 +14,8 @@ namespace De.Hochstaetter.FroniusMonitor.Controls
 
         public SmartMeter SmartMeter
         {
-            get => (SmartMeter)GetValue(SmartMeterProperty);
-            set => SetValue(SmartMeterProperty, value);
+            get => (SmartMeter)GetValue(SmartMeterControlProperty);
+            set => SetValue(SmartMeterControlProperty, value);
         }
 
         private void OnSmartMeterChanged()

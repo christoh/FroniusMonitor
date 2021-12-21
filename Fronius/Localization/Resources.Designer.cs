@@ -70,6 +70,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Apparent power.
+        /// </summary>
+        public static string ApparentPower {
+            get {
+                return ResourceManager.GetString("ApparentPower", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Fronius Monitor.
         /// </summary>
         public static string AppName {
@@ -97,6 +106,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Current.
+        /// </summary>
+        public static string Current {
+            get {
+                return ResourceManager.GetString("Current", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Devices.
         /// </summary>
         public static string Devices {
@@ -106,7 +124,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Discharging.
         /// </summary>
         public static string Discharging {
             get {
@@ -178,6 +196,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Line voltage.
+        /// </summary>
+        public static string LineVoltage {
+            get {
+                return ResourceManager.GetString("LineVoltage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Smart meter.
         /// </summary>
         public static string Meter {
@@ -192,6 +219,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Meters {
             get {
                 return ResourceManager.GetString("Meters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to More.
+        /// </summary>
+        public static string More {
+            get {
+                return ResourceManager.GetString("More", resourceCulture);
             }
         }
         
@@ -241,11 +277,92 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Out-of-balance Power.
+        /// </summary>
+        public static string OutOfBalancePower {
+            get {
+                return ResourceManager.GetString("OutOfBalancePower", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Phase voltage.
+        /// </summary>
+        public static string PhaseVoltage {
+            get {
+                return ResourceManager.GetString("PhaseVoltage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wait ....
+        /// </summary>
+        public static string PleaseWait {
+            get {
+                return ResourceManager.GetString("PleaseWait", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Power.
+        /// </summary>
+        public static string Power {
+            get {
+                return ResourceManager.GetString("Power", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Power factor.
+        /// </summary>
+        public static string PowerFactor {
+            get {
+                return ResourceManager.GetString("PowerFactor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Power percentage.
+        /// </summary>
+        public static string PowerPercentage {
+            get {
+                return ResourceManager.GetString("PowerPercentage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Meter supplied by your grid provider.
+        /// </summary>
+        public static string ProviderMeter {
+            get {
+                return ResourceManager.GetString("ProviderMeter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reactive Power.
+        /// </summary>
+        public static string ReactivePower {
+            get {
+                return ResourceManager.GetString("ReactivePower", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ready.
         /// </summary>
         public static string Ready {
             get {
                 return ResourceManager.GetString("Ready", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Real power.
+        /// </summary>
+        public static string RealPower {
+            get {
+                return ResourceManager.GetString("RealPower", resourceCulture);
             }
         }
         
@@ -426,6 +543,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Updating {
             get {
                 return ResourceManager.GetString("Updating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Voltage.
+        /// </summary>
+        public static string Voltage {
+            get {
+                return ResourceManager.GetString("Voltage", resourceCulture);
             }
         }
     }

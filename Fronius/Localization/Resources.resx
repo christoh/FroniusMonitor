@@ -240,4 +240,46 @@
   <data name="Discharging" xml:space="preserve">
     <value>Discharging</value>
   </data>
+  <data name="ProviderMeter" xml:space="preserve">
+    <value>Meter supplied by your grid provider</value>
+  </data>
+  <data name="PleaseWait" xml:space="preserve">
+    <value>Wait ...</value>
+  </data>
+  <data name="Power" xml:space="preserve">
+    <value>Power</value>
+  </data>
+  <data name="Current" xml:space="preserve">
+    <value>Current</value>
+  </data>
+  <data name="Voltage" xml:space="preserve">
+    <value>Voltage</value>
+  </data>
+  <data name="More" xml:space="preserve">
+    <value>More</value>
+  </data>
+  <data name="ApparentPower" xml:space="preserve">
+    <value>Apparent power</value>
+  </data>
+  <data name="RealPower" xml:space="preserve">
+    <value>Real power</value>
+  </data>
+  <data name="ReactivePower" xml:space="preserve">
+    <value>Reactive Power</value>
+  </data>
+  <data name="PowerPercentage" xml:space="preserve">
+    <value>Power percentage</value>
+  </data>
+  <data name="OutOfBalancePower" xml:space="preserve">
+    <value>Out-of-balance Power</value>
+  </data>
+  <data name="PhaseVoltage" xml:space="preserve">
+    <value>Phase voltage</value>
+  </data>
+  <data name="LineVoltage" xml:space="preserve">
+    <value>Line voltage</value>
+  </data>
+  <data name="PowerFactor" xml:space="preserve">
+    <value>Power factor</value>
+  </data>
 </root>

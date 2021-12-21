@@ -57,7 +57,12 @@ public class SmartMeterData
     public double L1Voltage { get; init; }
     public double L2Voltage { get; init; }
     public double L3Voltage { get; init; }
-
+    public double AverageTwoPhasesVoltage => new[] { L1L2Voltage, L2L3Voltage, L3L1Voltage }.Average();
+    public double AverageVoltage => new[] { L1Voltage, L2Voltage, L3Voltage }.Average();
+    public double L1L2OutOfBalancePower => Math.Abs(L1RealPower - L2RealPower);
+    public double L2L3OutOfBalancePower => Math.Abs(L2RealPower - L3RealPower);
+    public double L3L1OutOfBalancePower => Math.Abs(L3RealPower - L1RealPower);
+    public double MaxOutOfBalancePower => new[] { L1L2OutOfBalancePower, L2L3OutOfBalancePower, L3L1OutOfBalancePower }.Max();
 }
 
 public class SmartMeter : DeviceInfo
