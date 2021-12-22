@@ -34,7 +34,7 @@ public partial class StorageControl
     {
         InitializeComponent();
 
-        Unloaded += (s, e) =>
+        Unloaded += (_, _) =>
         {
             if (Storage != null)
             {

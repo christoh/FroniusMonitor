@@ -135,8 +135,8 @@ namespace De.Hochstaetter.Fronius.Services
                         continue;
                     }
 
-                    inverter.Data = newInverter.Data;
                     inverter.ThreePhasesData = newInverter.ThreePhasesData;
+                    inverter.Data = newInverter.Data;
                 }
 
                 var meterDevices = await webClientService.GetMeterDevices().ConfigureAwait(false);

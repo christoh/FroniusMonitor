@@ -267,9 +267,6 @@
   <data name="ReactivePower" xml:space="preserve">
     <value>Blindleistung</value>
   </data>
-  <data name="PowerPercentage" xml:space="preserve">
-    <value>Leistungsanteil</value>
-  </data>
   <data name="PhaseVoltage" xml:space="preserve">
     <value>Phasenspannung</value>
   </data>
@@ -281,5 +278,26 @@
   </data>
   <data name="OutOfBalance" xml:space="preserve">
     <value>Schieflast</value>
+  </data>
+  <data name="Energy" xml:space="preserve">
+    <value>Energie</value>
+  </data>
+  <data name="AcCurrent" xml:space="preserve">
+    <value>AC-Strom</value>
+  </data>
+  <data name="AcVoltage" xml:space="preserve">
+    <value>AC-Spannung</value>
+  </data>
+  <data name="DcPower" xml:space="preserve">
+    <value>DC-Leistung</value>
+  </data>
+  <data name="DcCurrent" xml:space="preserve">
+    <value>DC-Strom</value>
+  </data>
+  <data name="DcVoltage" xml:space="preserve">
+    <value>DC-Spannung</value>
+  </data>
+  <data name="AcPower" xml:space="preserve">
+    <value>AC-Leistung</value>
   </data>
 </root>

@@ -61,11 +61,38 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to AC current.
+        /// </summary>
+        public static string AcCurrent {
+            get {
+                return ResourceManager.GetString("AcCurrent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to AC power.
+        /// </summary>
+        public static string AcPower {
+            get {
+                return ResourceManager.GetString("AcPower", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Active.
         /// </summary>
         public static string Active {
             get {
                 return ResourceManager.GetString("Active", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to AC voltage.
+        /// </summary>
+        public static string AcVoltage {
+            get {
+                return ResourceManager.GetString("AcVoltage", resourceCulture);
             }
         }
         
@@ -115,6 +142,33 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to DC current.
+        /// </summary>
+        public static string DcCurrent {
+            get {
+                return ResourceManager.GetString("DcCurrent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DC power.
+        /// </summary>
+        public static string DcPower {
+            get {
+                return ResourceManager.GetString("DcPower", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DC voltage.
+        /// </summary>
+        public static string DcVoltage {
+            get {
+                return ResourceManager.GetString("DcVoltage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Devices.
         /// </summary>
         public static string Devices {
@@ -129,6 +183,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Discharging {
             get {
                 return ResourceManager.GetString("Discharging", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Energy.
+        /// </summary>
+        public static string Energy {
+            get {
+                return ResourceManager.GetString("Energy", resourceCulture);
             }
         }
         
@@ -318,15 +381,6 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string PowerFactor {
             get {
                 return ResourceManager.GetString("PowerFactor", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Power percentage.
-        /// </summary>
-        public static string PowerPercentage {
-            get {
-                return ResourceManager.GetString("PowerPercentage", resourceCulture);
             }
         }
         

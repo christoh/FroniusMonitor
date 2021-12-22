@@ -6,12 +6,12 @@
         xmlns:vm="clr-namespace:De.Hochstaetter.FroniusMonitor.ViewModels"
         xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
         mc:Ignorable="d"
-        Title="{x:Static p:Resources.AppName}" Height="450" Width="800"
+        Title="{x:Static p:Resources.AppName}" Height="600" Width="850"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
         xmlns:m="clr-namespace:De.Hochstaetter.Fronius.Models;assembly=Fronius"
         xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
         xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls">
-    <Grid>
+    <Grid Margin="16" >
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
@@ -19,26 +19,45 @@
         </Grid.ColumnDefinitions>
 
         <Viewbox Grid.Column="0">
-            <Canvas Width="1024" Height="768">
-                <ItemsControl Canvas.Bottom="0" Canvas.Right="0" MaxWidth="340" Height="256" ItemsSource="{Binding SolarSystemService.SolarSystem.Storages, FallbackValue={x:Null}}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel Orientation="Horizontal" IsItemsHost="True"/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <c:StorageControl Margin="0,0" Storage="{Binding}"/>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-                <Viewbox Height="256" MaxWidth="340" Canvas.Bottom="0" >
-                    <StackPanel Orientation="Horizontal">
-                        <c:PowerMeterClassic Height="256" SmartMeter="{Binding SolarSystemService.SolarSystem.PrimaryMeter, FallbackValue={x:Null}}"/>
-                        <c:SmartMeterControl Margin="20,0,0,0" Height="256" SmartMeter="{Binding SolarSystemService.SolarSystem.PrimaryMeter, FallbackValue={x:Null}}"/>
-                    </StackPanel>
-                </Viewbox>
-            </Canvas>
+            <Grid Height="500">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="250"/>
+                    <RowDefinition Height="250"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Margin="0,0,0,50">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <c:InverterControl Height="200" Grid.Column="1" Inverter="{Binding SolarSystemService.SolarSystem.PrimaryInverter, FallbackValue={x:Null}}"/>
+                </Grid>
+
+                <Grid Grid.Row="1" x:Name="LowerGrid" Margin="0,50,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <c:PowerMeterClassic Height="200" HorizontalAlignment="Left" Grid.Column="0" SmartMeter="{Binding SolarSystemService.SolarSystem.PrimaryMeter, FallbackValue={x:Null}}"/>
+                    <c:SmartMeterControl Height="200" HorizontalAlignment="Left" Grid.Column="1" Margin="10,0,0,0" SmartMeter="{Binding SolarSystemService.SolarSystem.PrimaryMeter, FallbackValue={x:Null}}"/>
+                    <ItemsControl Height="200" Grid.Column="2" DockPanel.Dock="Right" ItemsSource="{Binding SolarSystemService.SolarSystem.Storages, FallbackValue={x:Null}}" Margin="150,0,0,0">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" IsItemsHost="True" HorizontalAlignment="Right"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <c:StorageControl Margin="0,0" Storage="{Binding}"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
+            </Grid>
         </Viewbox>
 
         <GridSplitter Grid.Column="1" ResizeBehavior="PreviousAndNext" BorderThickness="2" ResizeDirection="Columns"

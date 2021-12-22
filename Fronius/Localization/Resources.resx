@@ -267,9 +267,6 @@
   <data name="ReactivePower" xml:space="preserve">
     <value>Reactive Power</value>
   </data>
-  <data name="PowerPercentage" xml:space="preserve">
-    <value>Power percentage</value>
-  </data>
   <data name="PhaseVoltage" xml:space="preserve">
     <value>Phase voltage</value>
   </data>
@@ -281,5 +278,26 @@
   </data>
   <data name="OutOfBalance" xml:space="preserve">
     <value>Out of balance</value>
+  </data>
+  <data name="Energy" xml:space="preserve">
+    <value>Energy</value>
+  </data>
+  <data name="AcCurrent" xml:space="preserve">
+    <value>AC current</value>
+  </data>
+  <data name="AcVoltage" xml:space="preserve">
+    <value>AC voltage</value>
+  </data>
+  <data name="DcPower" xml:space="preserve">
+    <value>DC power</value>
+  </data>
+  <data name="DcCurrent" xml:space="preserve">
+    <value>DC current</value>
+  </data>
+  <data name="DcVoltage" xml:space="preserve">
+    <value>DC voltage</value>
+  </data>
+  <data name="AcPower" xml:space="preserve">
+    <value>AC power</value>
   </data>
 </root>

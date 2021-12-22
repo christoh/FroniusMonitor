@@ -24,6 +24,8 @@ namespace De.Hochstaetter.Fronius.Models
 
         public SmartMeter? PrimaryMeter => Meters.FirstOrDefault(m => m.Usage == MeterUsage.Inverter);
 
+        public Inverter? PrimaryInverter => Inverters.FirstOrDefault();
+
         IEnumerable IHierarchicalCollection.ItemsEnumerable { get; } = Array.Empty<object>();
 
         IEnumerable IHierarchicalCollection.ChildrenEnumerable => DeviceGroups;

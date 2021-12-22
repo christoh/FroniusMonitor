@@ -20,10 +20,9 @@
 
   <ItemGroup>
     <None Remove="Assets\Fonts\D7MONO.ttf" />
-    <None Remove="Assets\Fonts\DS-DIGI.TTF" />
-    <None Remove="Assets\Fonts\DS-DIGIB.TTF" />
-    <None Remove="Assets\Fonts\DS-DIGII.TTF" />
-    <None Remove="Assets\Fonts\DS-DIGIT.TTF" />
+    <None Remove="Assets\Fonts\DOTMATRI.TTF" />
+    <None Remove="Assets\Fonts\DOTMBold.TTF" />
+    <None Remove="Assets\Fonts\EHSMB.TTF" />
   </ItemGroup>
 
   <ItemGroup>
@@ -38,16 +37,13 @@
     <Resource Include="Assets\Fonts\D7MONO.ttf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Assets\Fonts\DS-DIGI.TTF">
+    <Resource Include="Assets\Fonts\DOTMATRI.TTF">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Assets\Fonts\DS-DIGIB.TTF">
+    <Resource Include="Assets\Fonts\DOTMBold.TTF">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Assets\Fonts\DS-DIGII.TTF">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Assets\Fonts\DS-DIGIT.TTF">
+    <Resource Include="Assets\Fonts\EHSMB.TTF">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>

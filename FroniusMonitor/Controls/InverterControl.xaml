@@ -1,0 +1,52 @@
+﻿<UserControl x:Class="De.Hochstaetter.FroniusMonitor.Controls.InverterControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             mc:Ignorable="d" 
+             d:DesignHeight="127" d:DesignWidth="110">
+    <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:InverterControl}}">
+        <Border BorderBrush="DimGray" BorderThickness="1" Width="110">
+            <Grid x:Name="BackgroundProvider" Background="LightGray" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid.Resources>
+                    <Style TargetType="Viewbox">
+                        <Setter Property="StretchDirection" Value="DownOnly"/>
+                        <Setter Property="Margin" Value="4,0"/>
+                    </Style>
+                </Grid.Resources>
+                <Viewbox Grid.Row="0">
+                    <TextBlock FontSize="8" TextAlignment="Center" Text="{Binding Inverter.CustomName, FallbackValue=---}"/>
+                </Viewbox>
+                <Viewbox Grid.Row="1">
+                    <TextBlock FontSize="8" TextAlignment="Center">
+                        <Run Text="{Binding Inverter.Model, FallbackValue=---}"/>
+                        <Run Text="("/><Run Text="{Binding Inverter.Data.InverterStatusString, Mode=OneWay, FallbackValue={x:Static p:Resources.Unknown}}"/><Run Text=")"/>
+                    </TextBlock>
+                </Viewbox>
+
+                <c:LcdDisplay x:Name="Lcd" Grid.Row="2" Width="100" Height="85" Margin="4" FontSize="14" FontFamily="pack://application:,,,/Assets/Fonts/#Digital-7 Mono"/>
+
+                <WrapPanel MaxWidth="110" Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <WrapPanel.Resources>
+                        <Style TargetType="Button" BasedOn="{StaticResource DeviceButton}"/>
+                    </WrapPanel.Resources>
+                    <Button Content="AC" Click="OnAcClicked"/>
+                    <Button Content="DC" Click="OnDcClicked"/>
+                    <Button Content="{x:Static p:Resources.Energy}" Click="OnEnergyClicked"/>
+                    <Button Content="{x:Static p:Resources.More}" Click="OnMoreClicked"/>
+                </WrapPanel>
+
+
+            </Grid>
+        </Border>
+    </Viewbox>
+</UserControl>

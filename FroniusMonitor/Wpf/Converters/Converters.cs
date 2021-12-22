@@ -40,4 +40,14 @@ namespace De.Hochstaetter.FroniusMonitor.Wpf.Converters
             return result;
         }
     }
+
+    public class NullToString : ConverterBase
+    {
+        public string NullText { get; init; } = "---";
+
+        public override object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            return value ?? NullText;
+        }
+    }
 }

@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel;
 using System.Windows;
+using System.Windows.Media;
 using De.Hochstaetter.Fronius.Models;
+using De.Hochstaetter.FroniusMonitor.Contracts;
 using Loc = De.Hochstaetter.Fronius.Localization.Resources;
 
 namespace De.Hochstaetter.FroniusMonitor.Controls;
@@ -19,7 +21,7 @@ public enum MeterDisplayMode
     More
 }
 
-public partial class SmartMeterControl
+public partial class SmartMeterControl : IHaveLcdPanel
 {
     private static readonly IReadOnlyList<MeterDisplayMode> powerModes = new[]
     {
@@ -98,130 +100,117 @@ public partial class SmartMeterControl
 
     private void OnModeChanged() => SmartMeterDataChanged();
 
-    private void SmartMeterDataChanged(object? sender = null, PropertyChangedEventArgs? e = null)
+    private void SmartMeterDataChanged(object? sender = null, PropertyChangedEventArgs? e = null) => Dispatcher.InvokeAsync(() =>
     {
-        Dispatcher.InvokeAsync(() =>
+        var data = SmartMeter?.Data;
+
+        if (data is null)
         {
-            var data = SmartMeter?.Data;
+            BackgroundProvider.Background = Brushes.LightGray;
+            return;
+        }
 
-            if (data == null)
-            {
-                return;
-            }
+        BackgroundProvider.Background = !data.IsVisible ? Brushes.Red : data.IsEnabled ? Brushes.AntiqueWhite : Brushes.LightGray;
 
-            switch (Mode)
-            {
-                case MeterDisplayMode.PowerReal:
-                    Header.Text = Loc.RealPower;
-                    Value1.Text = $"{data.L1RealPower:N1} W";
-                    Value2.Text = $"{data.L2RealPower:N1} W";
-                    Value3.Text = $"{data.L3RealPower:N1} W";
-                    ValueSum.Text = $"{data.TotalRealPower:N1} W";
-                    SetL123("Sum");
-                    break;
+        switch (Mode)
+        {
+            case MeterDisplayMode.PowerReal:
+                Lcd.Header = Loc.RealPower;
+                Lcd.Value1 = $"{data.L1RealPower:N1} W";
+                Lcd.Value2 = $"{data.L2RealPower:N1} W";
+                Lcd.Value3 = $"{data.L3RealPower:N1} W";
+                Lcd.ValueSum = $"{data.TotalRealPower:N1} W";
+                SetL123("Sum");
+                break;
 
-                case MeterDisplayMode.PowerApparent:
-                    Header.Text = Loc.ApparentPower;
-                    Value1.Text = $"{data.L1ApparentPower:N1} W";
-                    Value2.Text = $"{data.L2ApparentPower:N1} W";
-                    Value3.Text = $"{data.L3ApparentPower:N1} W";
-                    ValueSum.Text = $"{data.TotalApparentPower:N1} W";
-                    SetL123("Sum");
-                    break;
+            case MeterDisplayMode.PowerApparent:
+                Lcd.Header = Loc.ApparentPower;
+                Lcd.Value1 = $"{data.L1ApparentPower:N1} W";
+                Lcd.Value2 = $"{data.L2ApparentPower:N1} W";
+                Lcd.Value3 = $"{data.L3ApparentPower:N1} W";
+                Lcd.ValueSum = $"{data.TotalApparentPower:N1} W";
+                SetL123("Sum");
+                break;
 
-                case MeterDisplayMode.PowerReactive:
-                    Header.Text = Loc.ReactivePower;
-                    Value1.Text = $"{data.L1ReactivePower:N1} W";
-                    Value2.Text = $"{data.L2ReactivePower:N1} W";
-                    Value3.Text = $"{data.L3ReactivePower:N1} W";
-                    ValueSum.Text = $"{data.TotalReactivePower:N1} W";
-                    SetL123("Sum");
-                    break;
+            case MeterDisplayMode.PowerReactive:
+                Lcd.Header = Loc.ReactivePower;
+                Lcd.Value1 = $"{data.L1ReactivePower:N1} W";
+                Lcd.Value2 = $"{data.L2ReactivePower:N1} W";
+                Lcd.Value3 = $"{data.L3ReactivePower:N1} W";
+                Lcd.ValueSum = $"{data.TotalReactivePower:N1} W";
+                SetL123("Sum");
+                break;
 
-                case MeterDisplayMode.PowerFactor:
-                    Header.Text = Loc.PowerFactor;
-                    Value1.Text = $"{data.L1PowerFactor:N3}";
-                    Value2.Text = $"{data.L2PowerFactor:N3}";
-                    Value3.Text = $"{data.L3PowerFactor:N3}";
-                    ValueSum.Text = $"{data.TotalPowerFactor:N3}";
-                    SetL123("Tot");
-                    break;
+            case MeterDisplayMode.PowerFactor:
+                Lcd.Header = Loc.PowerFactor;
+                Lcd.Value1 = $"{data.L1PowerFactor:N3}";
+                Lcd.Value2 = $"{data.L2PowerFactor:N3}";
+                Lcd.Value3 = $"{data.L3PowerFactor:N3}";
+                Lcd.ValueSum = $"{data.TotalPowerFactor:N3}";
+                SetL123("Tot");
+                break;
 
-                case MeterDisplayMode.PhaseVoltage:
-                    Header.Text = Loc.PhaseVoltage;
-                    Value1.Text = $"{data.L1Voltage:N1} V";
-                    Value2.Text = $"{data.L2Voltage:N1} V";
-                    Value3.Text = $"{data.L3Voltage:N1} V";
-                    ValueSum.Text = $"{data.AverageVoltage:N1} V";
-                    SetL123("Avg");
-                    break;
+            case MeterDisplayMode.PhaseVoltage:
+                Lcd.Header = Loc.PhaseVoltage;
+                Lcd.Value1 = $"{data.L1Voltage:N1} V";
+                Lcd.Value2 = $"{data.L2Voltage:N1} V";
+                Lcd.Value3 = $"{data.L3Voltage:N1} V";
+                Lcd.ValueSum = $"{data.AverageVoltage:N1} V";
+                SetL123("Avg");
+                break;
 
-                case MeterDisplayMode.LineVoltage:
-                    Header.Text = Loc.LineVoltage;
-                    Value1.Text = $"{data.L1L2Voltage:N1} V";
-                    Value2.Text = $"{data.L2L3Voltage:N1} V";
-                    Value3.Text = $"{data.L3L1Voltage:N1} V";
-                    ValueSum.Text = $"{data.AverageTwoPhasesVoltage:N1} V";
-                    SetTwoPhases("Avg");
-                    break;
+            case MeterDisplayMode.LineVoltage:
+                Lcd.Header = Loc.LineVoltage;
+                Lcd.Value1 = $"{data.L1L2Voltage:N1} V";
+                Lcd.Value2 = $"{data.L2L3Voltage:N1} V";
+                Lcd.Value3 = $"{data.L3L1Voltage:N1} V";
+                Lcd.ValueSum = $"{data.AverageTwoPhasesVoltage:N1} V";
+                SetTwoPhases("Avg");
+                break;
 
-                case MeterDisplayMode.Current:
-                    Header.Text = Loc.Current;
-                    Value1.Text = $"{data.L1Current:N3} A";
-                    Value2.Text = $"{data.L2Current:N3} A";
-                    Value3.Text = $"{data.L3Current:N3} A";
-                    ValueSum.Text = $"{data.TotalCurrent:N3} A";
-                    SetL123("Sum");
-                    break;
+            case MeterDisplayMode.Current:
+                Lcd.Header = Loc.Current;
+                Lcd.Value1 = $"{data.L1Current:N3} A";
+                Lcd.Value2 = $"{data.L2Current:N3} A";
+                Lcd.Value3 = $"{data.L3Current:N3} A";
+                Lcd.ValueSum = $"{data.TotalCurrent:N3} A";
+                SetL123("Sum");
+                break;
 
-                case MeterDisplayMode.PowerOutOfBalance:
-                    Header.Text = Loc.OutOfBalance;
-                    Value1.Text = $"{data.L1L2OutOfBalancePower:N1} W";
-                    Value2.Text = $"{data.L2L3OutOfBalancePower:N1} W";
-                    Value3.Text = $"{data.L3L1OutOfBalancePower:N1} W";
-                    ValueSum.Text = $"{data.MaxOutOfBalancePower:N1} W";
-                    SetTwoPhases("Max");
-                    break;
+            case MeterDisplayMode.PowerOutOfBalance:
+                Lcd.Header = Loc.OutOfBalance;
+                Lcd.Value1 = $"{data.L1L2OutOfBalancePower:N1} W";
+                Lcd.Value2 = $"{data.L2L3OutOfBalancePower:N1} W";
+                Lcd.Value3 = $"{data.L3L1OutOfBalancePower:N1} W";
+                Lcd.ValueSum = $"{data.MaxOutOfBalancePower:N1} W";
+                SetTwoPhases("Max");
+                break;
 
-                case MeterDisplayMode.More:
-                    Header.Text = SmartMeter?.SerialNumber;
-                    Value1.Text = $"{data.Frequency:N2} Hz";
-                    Label1.Text = "Frq";
-                    Value2.Text = $"{data.MeterTimestamp.ToLocalTime():d}";
-                    Label2.Text = "Dat";
-                    Value3.Text = $"{data.MeterTimestamp.ToLocalTime():T}";
-                    Label3.Text = "Tim";
-                    ValueSum.Text = $"{data.IsVisible}";
-                    LabelSum.Text = "Val";
-                    break;
+            case MeterDisplayMode.More:
+                Lcd.Header = SmartMeter?.SerialNumber;
+                Lcd.Value1 = $"{data.Frequency:N2} Hz";
+                Lcd.Label1 = "Frq";
+                Lcd.Value2 = $"{data.MeterTimestamp.ToLocalTime():d}";
+                Lcd.Label2 = "Dat";
+                Lcd.Value3 = $"{data.MeterTimestamp.ToLocalTime():T}";
+                Lcd.Label3 = "Tim";
+                Lcd.ValueSum = $"{data.IsVisible}";
+                Lcd.LabelSum = "Val";
+                break;
 
-                case MeterDisplayMode.CurrentOutOfBalance:
-                    Header.Text = Loc.OutOfBalance;
-                    Value1.Text = $"{data.L1L2OutOfBalanceCurrent:N3} A";
-                    Value2.Text = $"{data.L2L3OutOfBalanceCurrent:N3} A";
-                    Value3.Text = $"{data.L3L1OutOfBalanceCurrent:N3} A";
-                    ValueSum.Text = $"{data.MaxOutOfBalanceCurrent:N3} A";
-                    SetTwoPhases("Max");
-                    break;
-            }
-        });
-    }
+            case MeterDisplayMode.CurrentOutOfBalance:
+                Lcd.Header = Loc.OutOfBalance;
+                Lcd.Value1 = $"{data.L1L2OutOfBalanceCurrent:N3} A";
+                Lcd.Value2 = $"{data.L2L3OutOfBalanceCurrent:N3} A";
+                Lcd.Value3 = $"{data.L3L1OutOfBalanceCurrent:N3} A";
+                Lcd.ValueSum = $"{data.MaxOutOfBalanceCurrent:N3} A";
+                SetTwoPhases("Max");
+                break;
+        }
+    });
 
-    private void SetL123(string sumText)
-    {
-        Label1.Text = "L1";
-        Label2.Text = "L2";
-        Label3.Text = "L3";
-        LabelSum.Text = sumText;
-    }
-
-    private void SetTwoPhases(string sumText)
-    {
-        Label1.Text = "L12";
-        Label2.Text = "L23";
-        Label3.Text = "L31";
-        LabelSum.Text = sumText;
-    }
+    private void SetL123(string sumText) => IHaveLcdPanel.SetL123(Lcd, sumText);
+    private void SetTwoPhases(string sumText) => IHaveLcdPanel.SetTwoPhases(Lcd, sumText);
 
     private void SetMode(IReadOnlyList<MeterDisplayMode> modeList, ref int index)
     {
