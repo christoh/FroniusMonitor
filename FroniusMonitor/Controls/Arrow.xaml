@@ -1,0 +1,22 @@
+﻿<ContentControl x:Class="De.Hochstaetter.FroniusMonitor.Controls.Arrow"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:local="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
+                mc:Ignorable="d"
+                d:DesignHeight="100" d:DesignWidth="40">
+    <Viewbox x:Name="Viewbox" Stretch="Uniform" DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:Arrow}}">
+        <Viewbox.LayoutTransform>
+            <RotateTransform x:Name="RotateTransform"/>
+        </Viewbox.LayoutTransform>
+
+        <Canvas Width="40" Height="{Binding ArrowLength, FallbackValue=100}">
+            <Polygon x:Name="Polygon"
+                     Fill="{Binding Fill, FallbackValue=Red}" Stroke="{Binding Stroke, FallbackValue=Black}"
+                     StrokeThickness="{Binding StrokeThickness, FallbackValue=1}"
+                     >
+            </Polygon>
+        </Canvas>
+    </Viewbox>
+</ContentControl>

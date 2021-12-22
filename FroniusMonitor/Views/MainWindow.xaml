@@ -8,9 +8,11 @@
         mc:Ignorable="d"
         Title="{x:Static p:Resources.AppName}" Height="600" Width="850"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
+        xmlns:gl="clr-namespace:System.Globalization;assembly=System.Globalization"
         xmlns:m="clr-namespace:De.Hochstaetter.Fronius.Models;assembly=Fronius"
         xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
-        xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls">
+        xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
+        xmlns:images="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images">
     <Grid Margin="16" >
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -21,21 +23,73 @@
         <Viewbox Grid.Column="0">
             <Grid Height="500">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="250"/>
-                    <RowDefinition Height="250"/>
+                    <RowDefinition Height="200"/>
+                    <RowDefinition Height="100"/>
+                    <RowDefinition Height="200"/>
                 </Grid.RowDefinitions>
 
-                <Grid Grid.Row="0" Margin="0,0,0,50">
+                <Grid Grid.Row="0" >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <c:InverterControl Height="200" Grid.Column="1" Inverter="{Binding SolarSystemService.SolarSystem.PrimaryInverter, FallbackValue={x:Null}}"/>
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                        <images:SolarPanel Width="80" Foreground="#004000" VerticalAlignment="Top" Margin="0,10,0,0"/>
+
+                        <Grid VerticalAlignment="Top">
+                            <c:Arrow Angle="90" VerticalAlignment="Top" Height="120" Fill="#ffd000" ArrowLength="90" Margin="10,0"/>
+                            <TextBlock FontSize="14"  FontWeight="Bold" Margin="0,0,38,0" VerticalAlignment="Center" HorizontalAlignment="Right">
+                            <Run Text="{Binding SolarSystemService.SolarSystem.PowerFlow.SolarPower, Mode=OneWay, StringFormat=N1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---}"/>
+                            <Run Text="W"/>
+                            </TextBlock>
+                        </Grid>
+
+                        <c:InverterControl Height="200" Inverter="{Binding SolarSystemService.SolarSystem.PrimaryInverter, FallbackValue={x:Null}}"/>
+
+                        <Grid VerticalAlignment="Top">
+                            <c:Arrow Angle="{Binding SolarSystemService.SolarSystem.PowerFlow.LoadPower, Converter={co:PowerDirectionToDouble Incoming=-90, Outgoing=90, Null=90}, FallbackValue=90}" VerticalAlignment="Top" Height="120" Fill="#ffd000" ArrowLength="90" Margin="10,0"/>
+                            <TextBlock FontSize="14" FontWeight="Bold" Margin="0,0,38,0" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                <Run Text="{Binding SolarSystemService.SolarSystem.PowerFlow.LoadPower, Converter={co:ToAbsolute}, Mode=OneWay, StringFormat=N1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---}"/>
+                                <Run Text="W"/>
+                            </TextBlock>
+                        </Grid>
+
+                        <images:House Width="80" Foreground="Black" VerticalAlignment="Top" Margin="0,15,0,0"/>
+                    </StackPanel>
                 </Grid>
 
-                <Grid Grid.Row="1" x:Name="LowerGrid" Margin="0,50,0,0">
+                <Grid Grid.Row="1">
+                    <StackPanel Orientation="Horizontal" Margin="100,-40,0,0">
+
+                        <Grid Height="85" Width="120">
+                            <Grid.RenderTransform>
+                                <RotateTransform Angle="-30" CenterX="60" CenterY="60"></RotateTransform>
+                            </Grid.RenderTransform>
+                            <c:Arrow Angle="{Binding SolarSystemService.SolarSystem.PowerFlow.GridPower, Converter={co:PowerDirectionToDouble Incoming=90, Outgoing=-90, Null=90}, FallbackValue=90}" VerticalAlignment="Top" Height="120" Fill="LightGray" ArrowLength="90"/>
+                            <TextBlock FontSize="14" FontWeight="Bold" Margin="{Binding SolarSystemService.SolarSystem.PowerFlow.GridPower, Converter={co:PowerDirectionToThickness Incoming='0,38,30,0', Outgoing='0,38,12,0', Null='0,38,30,0'}, FallbackValue='0,38,30,0'}" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                <Run Text="{Binding SolarSystemService.SolarSystem.PowerFlow.GridPower, Converter={co:ToAbsolute}, Mode=OneWay, StringFormat=N1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---}"/>
+                                <Run Text="W"/>
+                            </TextBlock>
+                        </Grid>
+
+                        <Grid Height="85" Width="120" Margin="200,0,0,0">
+                            <Grid.RenderTransform>
+                                <RotateTransform Angle="30" CenterX="60" CenterY="60"></RotateTransform>
+                            </Grid.RenderTransform>
+                            <c:Arrow Angle="{Binding SolarSystemService.SolarSystem.PowerFlow.StoragePower, Converter={co:PowerDirectionToDouble Incoming=-90, Outgoing=90, Null=-90}, FallbackValue=-90}" VerticalAlignment="Top" Height="120" Fill="LightGreen" ArrowLength="90"/>
+                            <TextBlock FontSize="14" FontWeight="Bold" Margin="{Binding SolarSystemService.SolarSystem.PowerFlow.StoragePower, Converter={co:PowerDirectionToThickness Incoming='0,38,30,0', Outgoing='0,38,12,0', Null='0,38,30,0'}, FallbackValue='0,38,30,0'}" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                <Run Text="{Binding SolarSystemService.SolarSystem.PowerFlow.StoragePower, Converter={co:ToAbsolute}, Mode=OneWay, StringFormat=N1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---}"/>
+                                <Run Text="W"/>
+                            </TextBlock>
+                        </Grid>
+
+                    </StackPanel>
+                </Grid>
+
+                <Grid Grid.Row="2" x:Name="LowerGrid" >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>

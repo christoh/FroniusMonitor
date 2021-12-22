@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace De.Hochstaetter.Fronius.Models
 {
-    public class SolarSystem : IHierarchicalCollection
+    public class SolarSystem : BindableBase,IHierarchicalCollection
     {
         public string DisplayName => Resources.MySolarSystem;
 
@@ -26,7 +26,13 @@ namespace De.Hochstaetter.Fronius.Models
 
         public Inverter? PrimaryInverter => Inverters.FirstOrDefault();
 
-        public PowerFlow? PowerFlow { get; set; }
+        private PowerFlow? powerFlow;
+
+        public PowerFlow? PowerFlow
+        {
+            get => powerFlow;
+            set => Set(ref powerFlow, value);
+        }
 
         IEnumerable IHierarchicalCollection.ItemsEnumerable { get; } = Array.Empty<object>();
 
