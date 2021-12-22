@@ -11,6 +11,7 @@ public enum MeterLocation : sbyte
 {
     Grid,
     Load,
+    Unknown,
 }
 
 public class SmartMeterData

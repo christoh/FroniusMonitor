@@ -300,4 +300,7 @@
   <data name="AcPower" xml:space="preserve">
     <value>AC power</value>
   </data>
+  <data name="PowerFlow" xml:space="preserve">
+    <value>Power flow</value>
+  </data>
 </root>

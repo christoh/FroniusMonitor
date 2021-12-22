@@ -26,6 +26,8 @@ namespace De.Hochstaetter.Fronius.Models
 
         public Inverter? PrimaryInverter => Inverters.FirstOrDefault();
 
+        public PowerFlow? PowerFlow { get; set; }
+
         IEnumerable IHierarchicalCollection.ItemsEnumerable { get; } = Array.Empty<object>();
 
         IEnumerable IHierarchicalCollection.ChildrenEnumerable => DeviceGroups;

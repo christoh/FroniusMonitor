@@ -112,6 +112,8 @@ namespace De.Hochstaetter.Fronius.Services
 
             try
             {
+                SolarSystem.PowerFlow = await webClientService.GetPowerFlow().ConfigureAwait(false);
+
                 var storageDevices = await webClientService.GetStorageDevices().ConfigureAwait(false);
 
                 foreach (var storage in SolarSystem.Storages)

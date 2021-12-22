@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.Fronius.Models;
+﻿using De.Hochstaetter.Fronius.Contracts;
+
+namespace De.Hochstaetter.Fronius.Models;
 
 public class ThreePhasesData : BaseResponse
 {
@@ -13,7 +15,7 @@ public class ThreePhasesData : BaseResponse
     public double? L3PowerWatts => L3Voltage * L3Current;
 }
 
-public class InverterData : BaseResponse
+public class InverterData : EnergyCounterBase
 {
     public InverterStatus Status { get; init; }
     public string InverterStatusString => Status.ToDisplayName();
@@ -27,16 +29,9 @@ public class InverterData : BaseResponse
     public double? String2PowerWatts => CurrentString2 * VoltageString2;
     public double? String3PowerWatts => CurrentString3 * VoltageString3;
     public double? SolarPowerWatts => !String1PowerWatts.HasValue && !String2PowerWatts.HasValue && !String3PowerWatts.HasValue ? null : (String1PowerWatts ?? 0) + (String2PowerWatts ?? 0) + (String3PowerWatts ?? 0);
-    public double? TotalEnergyWattHours { get; init; }
-    public double? DayEnergyWattHours { get; init; }
-    public double? YearEnergyWattHours { get; init; }
+
     public double? TotalVoltage { get; init; }
     public double? TotalCurrent { get; init; }
-    public double? DayEnergyKiloWattHours => DayEnergyWattHours / 1000;
-    public double? YearEnergyKiloWattHours => YearEnergyWattHours / 1000;
-    public double? TotalEnergyKiloWattHours => TotalEnergyWattHours / 1000;
-    public double? YearEnergyMegaWattHours => YearEnergyWattHours / 1_000_000;
-    public double? TotalEnergyMegaWattHours => TotalEnergyWattHours / 1_000_000;
     public double? Frequency { get; init; }
     public double? AcPowerWatts { get; init; }
     public double? AbsolutePowerToLoad { get; init; }

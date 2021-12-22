@@ -300,4 +300,7 @@
   <data name="AcPower" xml:space="preserve">
     <value>AC-Leistung</value>
   </data>
+  <data name="PowerFlow" xml:space="preserve">
+    <value>Energiefluss</value>
+  </data>
 </root>

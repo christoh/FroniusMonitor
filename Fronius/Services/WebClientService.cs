@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using De.Hochstaetter.Fronius.Contracts;
 using De.Hochstaetter.Fronius.Exceptions;
 using De.Hochstaetter.Fronius.Localization;
@@ -135,6 +136,54 @@ namespace De.Hochstaetter.Fronius.Services
             }).ConfigureAwait(false);
         }
 
+        [SuppressMessage("ReSharper", "StringLiteralTypo")]
+        public async Task<PowerFlow> GetPowerFlow()
+        {
+            var (response, dataToken) = await GetResponse<BaseResponse>("GetPowerFlowRealtimeData.fcgi").ConfigureAwait(false);
+
+            var site = dataToken["Site"];
+
+            var result = new PowerFlow
+            {
+                Timestamp = response.Timestamp,
+                Reason = response.Reason,
+                UserMessage = response.UserMessage,
+                StatusCode = response.StatusCode,
+                Version = dataToken["Version"]?.Value<int>(),
+                BackupMode = site?["BackupMode"]?.Value<bool?>(),
+                StorageStandby = site?["BatteryStandby"]?.Value<bool?>(),
+                DayEnergyWattHours = site?["E_Day"]?.Value<double?>(),
+                TotalEnergyWattHours = site?["E_Total"]?.Value<double?>(),
+                YearEnergyWattHours = site?["E_Year"]?.Value<double?>(),
+                StoragePower = site?["P_Akku"]?.Value<double?>(),
+                GridPower = site?["P_Grid"]?.Value<double?>(),
+                LoadPower = site?["P_Load"]?.Value<double?>(),
+                SolarPower = site?["P_PV"]?.Value<double?>(),
+                Autonomy = site?["rel_Autonomy"]?.Value<double?>() / 100,
+                SelfConsumption = site?["rel_SelfConsumption"]?.Value<double?>() / 100,
+
+                MeterLocation = site?["Meter_Location"]?.Value<string?>() switch
+                {
+                    "grid" => MeterLocation.Grid,
+                    "load" => MeterLocation.Load,
+                    null => null,
+                    _ => MeterLocation.Unknown,
+                },
+
+                SiteType = site?["Mode"]?.Value<string?>() switch
+                {
+                    "produce-only" => SiteType.ProduceOnly,
+                    "meter" => SiteType.Meter,
+                    "vague-meter" => SiteType.VagueMeter,
+                    "bidirectional" => SiteType.BiDirectional,
+                    "ac-coupled" => SiteType.AcCoupled,
+                    null => null,
+                    _ => SiteType.Unknown,
+                },
+            };
+
+            return result;
+        }
 
         private static SmartMeterData ParseSmartMeterData(JToken meterToken)
         {

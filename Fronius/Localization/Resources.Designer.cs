@@ -385,6 +385,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Power flow.
+        /// </summary>
+        public static string PowerFlow {
+            get {
+                return ResourceManager.GetString("PowerFlow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Meter supplied by your grid provider.
         /// </summary>
         public static string ProviderMeter {
