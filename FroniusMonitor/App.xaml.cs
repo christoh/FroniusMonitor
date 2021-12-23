@@ -21,6 +21,7 @@ public partial class App
         Container
             .RegisterType<IWebClientService, WebClientService>()
             .RegisterSingleton<ISolarSystemService, SolarSystemService>()
+            .RegisterSingleton<Settings>()
             ;
     }
 }

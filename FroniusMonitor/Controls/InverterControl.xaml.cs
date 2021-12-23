@@ -194,6 +194,7 @@ public partial class InverterControl : IHaveLcdPanel
                     break;
 
                 case InverterDisplayMode.Energy:
+                    Lcd.Header = Loc.Energy;
                     Lcd.Label1 = "Day";
                     Lcd.Label2 = "Yr";
                     Lcd.Label3 = "Tot";

@@ -50,7 +50,7 @@
                         <c:InverterControl Height="200" Inverter="{Binding SolarSystemService.SolarSystem.PrimaryInverter, FallbackValue={x:Null}}"/>
 
                         <Grid VerticalAlignment="Top">
-                            <c:Arrow Angle="{Binding SolarSystemService.SolarSystem.PowerFlow.LoadPower, Converter={co:PowerDirectionToDouble Incoming=-90, Outgoing=90, Null=90}, FallbackValue=90}" VerticalAlignment="Top" Height="120" Fill="#ffd000" ArrowLength="90" Margin="10,0"/>
+                            <c:Arrow x:Name="LoadArrow" Angle="{Binding SolarSystemService.SolarSystem.PowerFlow.LoadPower, Converter={co:PowerDirectionToDouble Incoming=-90, Outgoing=90, Null=90}, FallbackValue=90}" VerticalAlignment="Top" Height="120" Fill="#ffd000" ArrowLength="90" Margin="10,0"/>
                             <TextBlock FontSize="14" FontWeight="Bold" Margin="0,0,38,0" VerticalAlignment="Center" HorizontalAlignment="Right">
                                 <Run Text="{Binding SolarSystemService.SolarSystem.PowerFlow.LoadPower, Converter={co:ToAbsolute}, Mode=OneWay, StringFormat=N1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---}"/>
                                 <Run Text="W"/>

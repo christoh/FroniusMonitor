@@ -18,7 +18,8 @@ public enum MeterDisplayMode
     LineVoltage,
     Current,
     CurrentOutOfBalance,
-    More
+    More,
+    MoreEnergy,
 }
 
 public partial class SmartMeterControl : IHaveLcdPanel
@@ -40,7 +41,12 @@ public partial class SmartMeterControl : IHaveLcdPanel
         MeterDisplayMode.Current, MeterDisplayMode.CurrentOutOfBalance
     };
 
-    private int currentPowerModeIndex, currentVoltageModeIndex, currentCurrentIndex;
+    private static readonly IReadOnlyList<MeterDisplayMode> moreModes = new[]
+    {
+        MeterDisplayMode.MoreEnergy, MeterDisplayMode.More
+    };
+
+    private int currentPowerModeIndex, currentVoltageModeIndex, currentCurrentIndex, currentMoreIndex;
 
     #region Dependency Properties
 
@@ -198,6 +204,18 @@ public partial class SmartMeterControl : IHaveLcdPanel
                 Lcd.LabelSum = "Val";
                 break;
 
+            case MeterDisplayMode.MoreEnergy:
+                Lcd.Header = $"{Loc.Energy} (kWh)";
+                Lcd.Value1 = $"{data.RealEnergyConsumedKiloWattHours:N1}";
+                Lcd.Label1 = "CRl";
+                Lcd.Value2 = $"{data.RealEnergyProducedKiloWattHours:N1}";
+                Lcd.Label2 = "PRl";
+                Lcd.Value3 = $"{data.ReactiveEnergyConsumedKiloWattHours:N1}";
+                Lcd.Label3 = "CRv";
+                Lcd.ValueSum = $"{data.ReactiveEnergyProducedKiloWattHours:N1}";
+                Lcd.LabelSum = "PRv";
+                break;
+
             case MeterDisplayMode.CurrentOutOfBalance:
                 Lcd.Header = Loc.OutOfBalance;
                 Lcd.Value1 = $"{data.L1L2OutOfBalanceCurrent:N3} A";
@@ -224,5 +242,5 @@ public partial class SmartMeterControl : IHaveLcdPanel
 
     private void OnCurrentClick(object sender, RoutedEventArgs e) => SetMode(currentModes, ref currentCurrentIndex);
 
-    private void OnMoreClick(object sender, RoutedEventArgs e) => Mode = MeterDisplayMode.More;
+    private void OnMoreClick(object sender, RoutedEventArgs e) => SetMode(moreModes, ref currentMoreIndex);
 }

@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
              mc:Ignorable="d"
              d:DesignHeight="100" d:DesignWidth="80">
     <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:PowerMeterClassic}}">
@@ -20,28 +21,18 @@
                 </Grid.RowDefinitions>
 
                 <local:PowerMeterClassicCounter
-                    Value="{Binding SmartMeter.Data.RealEnergyConsumedWattHours, FallbackValue=0}" Grid.Row="0"
+                    Value="{Binding SmartMeter.Data.RealEnergyConsumedWattHours, Converter={co:GridMeterConsumptionCorrector}, FallbackValue=0}" Grid.Row="0"
                     HorizontalAlignment="Center" Height="180" Width="750" Margin="0,150,0,0" />
 
                 <local:PowerMeterClassicCounter
-                    Value="{Binding SmartMeter.Data.RealEnergyProducedWattHours,FallbackValue=0}" Grid.Row="1"
+                    Value="{Binding SmartMeter.Data.RealEnergyProducedWattHours, Converter={co:GridMeterProductionCorrector}, FallbackValue=0}" Grid.Row="1"
                     HorizontalAlignment="Center" Height="180" Width="750" Margin="0,20,0,0" />
 
                 <Border Grid.Row="2" Background="Gray" CornerRadius="40,40,0,0" Width="550" Height="20" Margin="0,70,0,0"/>
 
                     <Grid Grid.Row="3" Width="550" ClipToBounds="True">
                         <Border Height="20" Background="DarkGray"/>
-                        <Rectangle x:Name="Wheel" Fill="DarkRed" Width="80" HorizontalAlignment="Left" Margin="-80,0,0,0">
-                            <Rectangle.Triggers>
-                                <EventTrigger RoutedEvent="Rectangle.Loaded">
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <ThicknessAnimation x:Name="Animation" Duration="0:0:5.0" To="1200,0,0,0" Storyboard.TargetName="Wheel" Storyboard.TargetProperty="Margin" RepeatBehavior="Forever"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger>
-                            </Rectangle.Triggers>
-                        </Rectangle>
+                        <Rectangle x:Name="Wheel" Fill="DarkRed" Width="80" HorizontalAlignment="Left" Margin="225,0,0,0"/>
                     </Grid>
                 <Border Grid.Row="4" Background="Gray" CornerRadius="0,0,40,40" Width="550" Height="20"/>
                 <TextBlock Grid.Row="5" FontSize="52" TextWrapping="Wrap" Margin="16,40,16,0" TextAlignment="Center" Text="{x:Static p:Resources.ProviderMeter}" Foreground="White"></TextBlock>
