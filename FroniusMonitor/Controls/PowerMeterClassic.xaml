@@ -18,24 +18,44 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
+                <TextBlock Grid.Row="0" Text="1.8.0" FontSize="40" Foreground="White" Margin="22,100,0,0"/>
                 <local:PowerMeterClassicCounter
-                    Value="{Binding SmartMeter.Data.RealEnergyConsumedWattHours, Converter={co:GridMeterConsumptionCorrector}, FallbackValue=0}" Grid.Row="0"
-                    HorizontalAlignment="Center" Height="180" Width="750" Margin="0,150,0,0" />
+                    Value="{Binding SmartMeter.Data.RealEnergyConsumedWattHours, Converter={co:GridMeterConsumptionCorrector}, FallbackValue=0}" Grid.Row="1"
+                    HorizontalAlignment="Center" Height="180" Width="750" />
 
+                <TextBlock Grid.Row="2" Text="2.8.0" FontSize="40" Foreground="White" Margin="22,20,0,0"/>
                 <local:PowerMeterClassicCounter
-                    Value="{Binding SmartMeter.Data.RealEnergyProducedWattHours, Converter={co:GridMeterProductionCorrector}, FallbackValue=0}" Grid.Row="1"
-                    HorizontalAlignment="Center" Height="180" Width="750" Margin="0,20,0,0" />
+                    Value="{Binding SmartMeter.Data.RealEnergyProducedWattHours, Converter={co:GridMeterProductionCorrector}, FallbackValue=0}" Grid.Row="3"
+                    HorizontalAlignment="Center" Height="180" Width="750"/>
 
-                <Border Grid.Row="2" Background="Gray" CornerRadius="40,40,0,0" Width="550" Height="20" Margin="0,70,0,0"/>
+                <Border Grid.Row="4" Background="Gray" CornerRadius="40,40,0,0" Width="550" Height="20" Margin="0,70,0,0"/>
 
-                    <Grid Grid.Row="3" Width="550" ClipToBounds="True">
+                <Grid Grid.Row="5">
+                    <Grid.Resources>
+                        <Style TargetType="Polyline">
+                            <Setter Property="Stroke" Value="Gray"/>
+                            <Setter Property="StrokeThickness" Value="4"/>
+                            <Setter Property="SnapsToDevicePixels" Value="True"/>
+                        </Style>
+                    </Grid.Resources>
+                    <Polyline Points="60,15 748,15"/>
+                    <Polyline Points="730,0 750,15 730,30"/>
+                    <Polyline Points="50,0 60,15 50,30"/>
+                    <Polyline Points="60,0 70,15 60,30"/>
+                    <Polyline Points="70,0 80,15 70,30"/>
+                    <Polyline Points="80,0 90,15 80,30"/>
+                    <Grid Width="550" ClipToBounds="True">
                         <Border Height="20" Background="DarkGray"/>
                         <Rectangle x:Name="Wheel" Fill="DarkRed" Width="80" HorizontalAlignment="Left" Margin="225,0,0,0"/>
                     </Grid>
-                <Border Grid.Row="4" Background="Gray" CornerRadius="0,0,40,40" Width="550" Height="20"/>
-                <TextBlock Grid.Row="5" FontSize="52" TextWrapping="Wrap" Margin="16,40,16,0" TextAlignment="Center" Text="{x:Static p:Resources.ProviderMeter}" Foreground="White"></TextBlock>
+                </Grid>
+                <Border Grid.Row="6" Background="Gray" CornerRadius="0,0,40,40" Width="550" Height="20"/>
+
+                <TextBlock Grid.Row="7" FontSize="52" TextWrapping="Wrap" Margin="16,40,16,0" TextAlignment="Center" Text="{x:Static p:Resources.ProviderMeter}" Foreground="White"></TextBlock>
 
             </Grid>
         </Border>
