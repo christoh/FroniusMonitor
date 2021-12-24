@@ -25,7 +25,7 @@ public enum InverterDisplayMode
 
 public partial class InverterControl : IHaveLcdPanel
 {
-    private readonly ISolarSystemService solarSystemService = IoC.Get<ISolarSystemService>();
+    private readonly ISolarSystemService solarSystemService = IoC.TryGet<ISolarSystemService>();
     private static readonly IReadOnlyList<InverterDisplayMode> acModes = new[] { InverterDisplayMode.AcPower, InverterDisplayMode.AcCurrent, InverterDisplayMode.AcVoltage };
     private static readonly IReadOnlyList<InverterDisplayMode> dcModes = new[] { InverterDisplayMode.DcPower, InverterDisplayMode.DcCurrent, InverterDisplayMode.DcVoltage };
     private static readonly IReadOnlyList<InverterDisplayMode> moreModes = new[] { InverterDisplayMode.MoreEfficiency, InverterDisplayMode.More };
@@ -223,13 +223,13 @@ public partial class InverterControl : IHaveLcdPanel
                 case InverterDisplayMode.MoreEfficiency:
                     Lcd.Header = Loc.Efficiency;
                     Lcd.Label1 = "Loss";
-                    Lcd.Value1 = ToLcd(solarSystemService.SolarSystem?.PowerFlow?.PowerLossWatts, "N1", "W");
+                    Lcd.Value1 = ToLcd(solarSystemService?.SolarSystem?.PowerFlow?.PowerLossWatts, "N1", "W");
                     Lcd.Label2 = "Eff";
-                    Lcd.Value2 = ToLcd(solarSystemService.SolarSystem?.PowerFlow?.Efficiency, "P2");
+                    Lcd.Value2 = ToLcd(solarSystemService?.SolarSystem?.PowerFlow?.Efficiency, "P2");
                     Lcd.Label3 = "Sc";
-                    Lcd.Value3 = ToLcd(solarSystemService.SolarSystem?.PowerFlow?.SelfConsumption, "P2");
+                    Lcd.Value3 = ToLcd(solarSystemService?.SolarSystem?.PowerFlow?.SelfConsumption, "P2");
                     Lcd.LabelSum = "Aut";
-                    Lcd.ValueSum = ToLcd(solarSystemService.SolarSystem?.PowerFlow?.Autonomy, "P2"); 
+                    Lcd.ValueSum = ToLcd(solarSystemService?.SolarSystem?.PowerFlow?.Autonomy, "P2"); 
                     break;
             }
         });
