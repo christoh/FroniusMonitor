@@ -15,7 +15,7 @@ namespace De.Hochstaetter.FroniusMonitor.Unity
             {
                 return App.Container.Resolve<T>();
             }
-            catch (Exception ex)
+            catch
             {
                 return default(T)!;
             }
