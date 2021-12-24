@@ -303,4 +303,7 @@
   <data name="PowerFlow" xml:space="preserve">
     <value>Power flow</value>
   </data>
+  <data name="Efficiency" xml:space="preserve">
+	  <value>Efficiency</value>
+  </data>
 </root>

@@ -22,7 +22,7 @@ namespace De.Hochstaetter.Fronius.Models
             set => Set(ref consumedEnergyOffSetWatts, value);
         }
 
-        private double producedEnergyOffsetWatts=3;
+        private double producedEnergyOffsetWatts=-310;
 
         [XmlElement("ConsumedEnergyOffSet")]
         public double ProducedEnergyOffsetWatts

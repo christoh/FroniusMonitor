@@ -187,6 +187,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Efficiency.
+        /// </summary>
+        public static string Efficiency {
+            get {
+                return ResourceManager.GetString("Efficiency", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Energy.
         /// </summary>
         public static string Energy {

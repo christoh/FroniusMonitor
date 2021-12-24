@@ -29,7 +29,6 @@ public class InverterData : EnergyCounterBase
     public double? String2PowerWatts => CurrentString2 * VoltageString2;
     public double? String3PowerWatts => CurrentString3 * VoltageString3;
     public double? SolarPowerWatts => !String1PowerWatts.HasValue && !String2PowerWatts.HasValue && !String3PowerWatts.HasValue ? null : (String1PowerWatts ?? 0) + (String2PowerWatts ?? 0) + (String3PowerWatts ?? 0);
-
     public double? TotalVoltage { get; init; }
     public double? TotalCurrent { get; init; }
     public double? Frequency { get; init; }

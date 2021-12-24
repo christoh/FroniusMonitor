@@ -2,8 +2,10 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Media;
+using De.Hochstaetter.Fronius.Contracts;
 using De.Hochstaetter.Fronius.Models;
 using De.Hochstaetter.FroniusMonitor.Contracts;
+using De.Hochstaetter.FroniusMonitor.Unity;
 using Loc = De.Hochstaetter.Fronius.Localization.Resources;
 
 namespace De.Hochstaetter.FroniusMonitor.Controls;
@@ -18,13 +20,16 @@ public enum InverterDisplayMode
     DcPower,
     Energy,
     More,
+    MoreEfficiency,
 }
 
 public partial class InverterControl : IHaveLcdPanel
 {
+    private readonly ISolarSystemService solarSystemService = IoC.Get<ISolarSystemService>();
     private static readonly IReadOnlyList<InverterDisplayMode> acModes = new[] { InverterDisplayMode.AcPower, InverterDisplayMode.AcCurrent, InverterDisplayMode.AcVoltage };
     private static readonly IReadOnlyList<InverterDisplayMode> dcModes = new[] { InverterDisplayMode.DcPower, InverterDisplayMode.DcCurrent, InverterDisplayMode.DcVoltage };
-    private int currentAcIndex, currentDcIndex;
+    private static readonly IReadOnlyList<InverterDisplayMode> moreModes = new[] { InverterDisplayMode.MoreEfficiency, InverterDisplayMode.More };
+    private int currentAcIndex, currentDcIndex, currentMoreIndex;
 
 
     #region Dependency Properties
@@ -206,13 +211,25 @@ public partial class InverterControl : IHaveLcdPanel
 
                 case InverterDisplayMode.More:
                     Lcd.Header = Inverter?.SerialNumber;
-                    Lcd.Value1 = ToLcd(Inverter?.Data?.Frequency,"N2","Hz");
+                    Lcd.Value1 = ToLcd(Inverter?.Data?.Frequency, "N2", "Hz");
                     Lcd.Label1 = "Frq";
                     Lcd.Value2 = $"{Inverter?.Data?.Timestamp.ToLocalTime():d}";
                     Lcd.Label2 = "Dat";
                     Lcd.Value3 = $"{Inverter?.Data?.Timestamp.ToLocalTime():T}";
                     Lcd.Label3 = "Tim";
                     Lcd.LabelSum = Lcd.ValueSum = string.Empty;
+                    break;
+
+                case InverterDisplayMode.MoreEfficiency:
+                    Lcd.Header = Loc.Efficiency;
+                    Lcd.Label1 = "Loss";
+                    Lcd.Value1 = ToLcd(solarSystemService.SolarSystem?.PowerFlow?.PowerLossWatts, "N1", "W");
+                    Lcd.Label2 = "Eff";
+                    Lcd.Value2 = ToLcd(solarSystemService.SolarSystem?.PowerFlow?.Efficiency, "P2");
+                    Lcd.Label3 = "Sc";
+                    Lcd.Value3 = ToLcd(solarSystemService.SolarSystem?.PowerFlow?.SelfConsumption, "P2");
+                    Lcd.LabelSum = "Aut";
+                    Lcd.ValueSum = ToLcd(solarSystemService.SolarSystem?.PowerFlow?.Autonomy, "P2"); 
                     break;
             }
         });
@@ -226,9 +243,9 @@ public partial class InverterControl : IHaveLcdPanel
         Lcd.ValueSum = ToLcd(aggregatedValue, format, unit, nullValue);
     }
 
-    private string ToLcd(double? value, string format, string unit, string nullValue = "---")
+    private string ToLcd(double? value, string format, string? unit = null, string nullValue = "---")
     {
-        return value.HasValue ? value.Value.ToString(format, CultureInfo.CurrentCulture) + ' ' + unit : nullValue;
+        return value.HasValue ? value.Value.ToString(format, CultureInfo.CurrentCulture) + (unit is not null ? ' ' + unit : string.Empty) : nullValue;
     }
 
     private void SetL123(string sumText) => IHaveLcdPanel.SetL123(Lcd, sumText);
@@ -253,5 +270,5 @@ public partial class InverterControl : IHaveLcdPanel
 
     private void OnEnergyClicked(object sender, RoutedEventArgs e) => Mode = InverterDisplayMode.Energy;
 
-    private void OnMoreClicked(object sender, RoutedEventArgs e) => Mode = InverterDisplayMode.More;
+    private void OnMoreClicked(object sender, RoutedEventArgs e) => SetMode(moreModes, ref currentMoreIndex);
 }

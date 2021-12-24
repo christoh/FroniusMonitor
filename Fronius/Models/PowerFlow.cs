@@ -37,7 +37,7 @@ namespace De.Hochstaetter.Fronius.Models
         public double? GridPower { get; init; }
         public double? SolarPower { get; init; }
         public double? LoadPower { get; init; }
-        public double? InverterPower => new[] { StoragePower, GridPower, SolarPower, LoadPower }.Where(ps => ps.HasValue).Sum(ps => ps!.Value);
+        public double? PowerLossWatts => new[] { StoragePower, GridPower, SolarPower, LoadPower }.Where(ps => ps.HasValue).Sum(ps => ps!.Value);
         public double? Autonomy { get; init; }
         public double? SelfConsumption { get; init; }
 
