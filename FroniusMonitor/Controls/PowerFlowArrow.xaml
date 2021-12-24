@@ -1,0 +1,19 @@
+﻿<ContentControl x:Class="De.Hochstaetter.FroniusMonitor.Controls.PowerFlowArrow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
+             xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
+             xmlns:gl="clr-namespace:System.Globalization;assembly=System.Globalization"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid x:Name="RootElement" Height="85" Width="120" DataContext="{Binding RelativeSource={RelativeSource AncestorType=c:PowerFlowArrow}}">
+        <Grid.RenderTransform>
+            <RotateTransform Angle="{Binding Angle}" CenterX="60" CenterY="60"></RotateTransform>
+        </Grid.RenderTransform>
+
+        <c:Arrow x:Name="Arrow" Angle="90" VerticalAlignment="Top" Height="120" Fill="{Binding Fill, FallbackValue=LightGray}" ArrowLength="90"/>
+        <TextBlock Text="--- W" x:Name="TextBlock" FontSize="14" FontWeight="Bold" Margin="0,35,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+    </Grid>
+</ContentControl>
