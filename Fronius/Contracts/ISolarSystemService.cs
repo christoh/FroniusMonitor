@@ -10,6 +10,7 @@ namespace De.Hochstaetter.Fronius.Contracts
     public interface ISolarSystemService
     {
         SolarSystem? SolarSystem { get; }
+        event EventHandler<SolarDataEventArgs>? NewDataReceived;
 
         Task Start(InverterConnection connection);
         void Stop();

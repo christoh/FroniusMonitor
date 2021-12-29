@@ -25,7 +25,7 @@ public enum InverterDisplayMode
 
 public partial class InverterControl : IHaveLcdPanel
 {
-    private readonly ISolarSystemService solarSystemService = IoC.TryGet<ISolarSystemService>();
+    private readonly ISolarSystemService? solarSystemService = IoC.TryGet<ISolarSystemService>();
     private static readonly IReadOnlyList<InverterDisplayMode> acModes = new[] { InverterDisplayMode.AcPower, InverterDisplayMode.AcCurrent, InverterDisplayMode.AcVoltage };
     private static readonly IReadOnlyList<InverterDisplayMode> dcModes = new[] { InverterDisplayMode.DcPower, InverterDisplayMode.DcCurrent, InverterDisplayMode.DcVoltage };
     private static readonly IReadOnlyList<InverterDisplayMode> moreModes = new[] { InverterDisplayMode.MoreEfficiency, InverterDisplayMode.More };
@@ -33,18 +33,6 @@ public partial class InverterControl : IHaveLcdPanel
 
 
     #region Dependency Properties
-
-    public static readonly DependencyProperty InverterProperty = DependencyProperty.Register
-    (
-        nameof(Inverter), typeof(Inverter), typeof(InverterControl),
-        new PropertyMetadata((d, e) => ((InverterControl)d).OnInverterChanged(e))
-    );
-
-    public Inverter? Inverter
-    {
-        get => (Inverter?)GetValue(InverterProperty);
-        set => SetValue(InverterProperty, value);
-    }
 
     public static readonly DependencyProperty ModeProperty = DependencyProperty.Register
     (
@@ -58,41 +46,45 @@ public partial class InverterControl : IHaveLcdPanel
         set => SetValue(ModeProperty, value);
     }
 
+    public static readonly DependencyProperty InverterProperty = DependencyProperty.Register
+    (
+        nameof(Inverter), typeof(Inverter), typeof(InverterControl)
+    );
+
+    public Inverter? Inverter
+    {
+        get => (Inverter?)GetValue(InverterProperty);
+        set => SetValue(InverterProperty, value);
+    }
+
     #endregion
 
     public InverterControl()
     {
         InitializeComponent();
 
+        Loaded += (_, _) =>
+        {
+            if (solarSystemService != null)
+            {
+                solarSystemService.NewDataReceived += SolarSystemService_NewDataReceived;
+            }
+        };
+
         Unloaded += (_, _) =>
         {
-            if (Inverter != null)
+            if (solarSystemService != null)
             {
-                Inverter.PropertyChanged -= OnInverterDataChanged;
+                solarSystemService.NewDataReceived -= SolarSystemService_NewDataReceived;
             }
         };
     }
 
-    private void OnModeChanged() => OnInverterDataChanged();
+    private void OnModeChanged() => SolarSystemService_NewDataReceived(this,new SolarDataEventArgs(solarSystemService?.SolarSystem));
 
-    private void OnInverterChanged(DependencyPropertyChangedEventArgs e)
+    private void SolarSystemService_NewDataReceived(object? sender, SolarDataEventArgs e)
     {
-        if (e.OldValue is Inverter oldInverter)
-        {
-            oldInverter.PropertyChanged -= OnInverterDataChanged;
-        }
-
-        if (Inverter != null)
-        {
-            Inverter.PropertyChanged += OnInverterDataChanged;
-        }
-
-
-    }
-
-    private void OnInverterDataChanged(object? _ = null, PropertyChangedEventArgs? e = null)
-    {
-        if (e != null && e.PropertyName != nameof(Inverter.Data))
+        if (e.SolarSystem==null)
         {
             return;
         }
@@ -199,13 +191,13 @@ public partial class InverterControl : IHaveLcdPanel
                     break;
 
                 case InverterDisplayMode.Energy:
-                    Lcd.Header = Loc.Energy;
+                    Lcd.Header = $"{Loc.Energy} (kWh)";
                     Lcd.Label1 = "Day";
                     Lcd.Label2 = "Yr";
                     Lcd.Label3 = "Tot";
-                    Lcd.Value1 = ToLcd(Inverter?.Data?.DayEnergyKiloWattHours, "N3", "kWh");
-                    Lcd.Value2 = ToLcd(Inverter?.Data?.YearEnergyMegaWattHours, "N3", "MWh");
-                    Lcd.Value3 = ToLcd(Inverter?.Data?.TotalEnergyMegaWattHours, "N3", "MWh");
+                    Lcd.Value1 = ToLcd(Inverter?.Data?.DayEnergyKiloWattHours, "N3");
+                    Lcd.Value2 = ToLcd(Inverter?.Data?.YearEnergyKiloWattHours, "N3");
+                    Lcd.Value3 = ToLcd(Inverter?.Data?.TotalEnergyKiloWattHours, "N3");
                     Lcd.LabelSum = Lcd.ValueSum = string.Empty;
                     break;
 
@@ -221,17 +213,17 @@ public partial class InverterControl : IHaveLcdPanel
                     break;
 
                 case InverterDisplayMode.MoreEfficiency:
-                    var acPower = Inverter?.Data?.AcPowerWatts;
-                    var dcPower = Inverter?.Data?.SolarPowerWatts - solarSystemService.SolarSystem?.Storages.Sum(s => s?.Data?.Power);
+                    //var acPower = Inverter?.Data?.AcPowerWatts;
+                    //var dcPower = Inverter?.Data?.SolarPowerWatts - solarSystemService.SolarSystem?.Storages.Sum(s => s?.Data?.Power);
                     Lcd.Header = Loc.Efficiency;
                     Lcd.Label1 = "Loss";
-                    Lcd.Value1 = ToLcd(dcPower-acPower, "N1", "W");
+                    Lcd.Value1 = ToLcd(e.SolarSystem?.PowerFlow?.PowerLossWatts, "N1", "W");
                     Lcd.Label2 = "Eff";
-                    Lcd.Value2 = ToLcd(acPower/dcPower, "P2");
+                    Lcd.Value2 = ToLcd(e.SolarSystem?.PowerFlow?.Efficiency, "P2");
                     Lcd.Label3 = "Sc";
-                    Lcd.Value3 = ToLcd(solarSystemService?.SolarSystem?.PowerFlow?.SelfConsumption, "P2");
+                    Lcd.Value3 = ToLcd(e.SolarSystem?.PowerFlow?.SelfConsumption, "P2");
                     Lcd.LabelSum = "Aut";
-                    Lcd.ValueSum = ToLcd(solarSystemService?.SolarSystem?.PowerFlow?.Autonomy, "P2"); 
+                    Lcd.ValueSum = ToLcd(e?.SolarSystem?.PowerFlow?.Autonomy, "P2"); 
                     break;
             }
         });

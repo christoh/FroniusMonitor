@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
              xmlns:gl="clr-namespace:System.Globalization;assembly=System.Globalization"
+             xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
              mc:Ignorable="d"
              d:DesignHeight="1000" d:DesignWidth="700">
     <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:StorageControl}}">
@@ -12,7 +13,7 @@
             <Border x:Name="Enclosure" CornerRadius="15" BorderBrush="DarkGreen" BorderThickness="30" Height="880" Width="660" VerticalAlignment="Top" Margin="0,100,0,0"/>
 
             <Rectangle Width="580" Height="800" x:Name="BackgroundRectangle" Fill="LightGray" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,60"/>
-            <Rectangle Width="580" x:Name="SocRectangle" Fill="Transparent" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,60"/>
+            <Rectangle Width="580" x:Name="SocRectangle" Fill="{Binding Storage.Data.StateOfCharge, Converter={co:SocToColor}, FallbackValue=White}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,60"/>
 
             <TextBlock Margin="0,200,0,0" FontWeight="Bold" HorizontalAlignment="Center" FontSize="150"
                        Text="{Binding Storage.Data.StateOfCharge, StringFormat=P1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=--- %}" />

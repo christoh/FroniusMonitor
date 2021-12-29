@@ -9,6 +9,8 @@ namespace De.Hochstaetter.Fronius.Services
         private Timer? timer;
         private int updateSemaphore;
 
+        public event EventHandler<SolarDataEventArgs>? NewDataReceived; 
+
         public SolarSystemService(IWebClientService webClientService)
         {
             this.webClientService = webClientService;
@@ -100,6 +102,7 @@ namespace De.Hochstaetter.Fronius.Services
                 }
             }
 
+            await Task.Run(() => NewDataReceived?.Invoke(this, new SolarDataEventArgs(result))).ConfigureAwait(false);
             return result;
         }
 
@@ -154,8 +157,9 @@ namespace De.Hochstaetter.Fronius.Services
                 }
 
                 IsConnected = true;
+                await Task.Run(() => NewDataReceived?.Invoke(this, new SolarDataEventArgs(SolarSystem))).ConfigureAwait(false);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 IsConnected = false;
                 LastConnectionError = $"{ex.GetType().Name}: {ex.Message}";

@@ -4,20 +4,20 @@ namespace De.Hochstaetter.Fronius.Models;
 
 public class StorageData
 {
-    public double MaximumCapacityWattHours { get; init; } = double.NaN;
-    public double Current { get; init; } = double.NaN;
-    public double DesignedCapacityWattHours { get; init; }
-    public double DesignedCapacityKiloWattHours => DesignedCapacityWattHours / 1000;
+    public double? MaximumCapacityWattHours { get; init; }
+    public double? Current { get; init; }
+    public double? DesignedCapacityWattHours { get; init; }
+    public double? DesignedCapacityKiloWattHours => DesignedCapacityWattHours / 1000;
     public bool IsEnabled { get; init; }
-    public double StateOfCharge { get; init; } = double.NaN;
-    public int StatusBatteryCell { get; init; }
-    public double TemperatureCelsius { get; init; }
-    public DateTime StorageTimestamp { get; init; }
-    public double Voltage { get; init; }
-    public double Power => Voltage * Current;
-    public double RemainingCapacityWattHours => StateOfCharge * MaximumCapacityWattHours;
-    public double RemainingCapacityKiloWattHours => RemainingCapacityWattHours / 1000;
-    public double Degradation => 1 - MaximumCapacityWattHours / DesignedCapacityWattHours;
+    public double? StateOfCharge { get; init; } = double.NaN;
+    public int? StatusBatteryCell { get; init; }
+    public double? TemperatureCelsius { get; init; }
+    public DateTime? StorageTimestamp { get; init; }
+    public double? Voltage { get; init; }
+    public double? Power => Voltage * Current;
+    public double? RemainingCapacityWattHours => StateOfCharge * MaximumCapacityWattHours;
+    public double? RemainingCapacityKiloWattHours => RemainingCapacityWattHours / 1000;
+    public double? Degradation => 1 - MaximumCapacityWattHours / DesignedCapacityWattHours;
     public string Manufacturer { get; init; } = string.Empty;
 
     public TrafficLight TrafficLight => Manufacturer switch

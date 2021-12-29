@@ -58,11 +58,12 @@ public partial class StorageControl
         OnDataChanged();
     }
 
+
+
     private void OnDataChanged(object? _ = null, PropertyChangedEventArgs? __ = null)
     {
         Dispatcher.InvokeAsync(() =>
         {
-            Brush brush;
             var data = Storage?.Data;
 
             if (data == null)
@@ -70,33 +71,7 @@ public partial class StorageControl
                 return;
             }
 
-            if (data.StateOfCharge < 0.08)
-            {
-                brush = Brushes.Red;
-            }
-            else if (data.StateOfCharge < 0.12)
-            {
-                brush = Brushes.OrangeRed;
-            }
-            else if (data.StateOfCharge < 0.2)
-            {
-                brush = Brushes.Orange;
-            }
-            else if (data.StateOfCharge < 0.3)
-            {
-                brush = Brushes.Yellow;
-            }
-            else if (data.StateOfCharge < 0.5)
-            {
-                brush = Brushes.YellowGreen;
-            }
-            else
-            {
-                brush = Brushes.LightGreen;
-            }
-
-            SocRectangle.Height = data.StateOfCharge * BackgroundRectangle.Height;
-            SocRectangle.Fill = brush;
+            SocRectangle.Height = (data.StateOfCharge ?? 0) * BackgroundRectangle.Height;
 
             if (data.Power > 10)
             {
@@ -114,7 +89,7 @@ public partial class StorageControl
                     PlusPole.Background.BeginAnimation(SolidColorBrush.ColorProperty, null);
                 }
 
-                brush = data.TrafficLight switch
+                var brush = data.TrafficLight switch
                 {
                     TrafficLight.Red => Brushes.Red,
                     TrafficLight.Green => Brushes.DarkGreen,
