@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Windows;
 using System.Windows.Media;
 using De.Hochstaetter.Fronius.Contracts;
@@ -26,9 +25,9 @@ public enum InverterDisplayMode
 public partial class InverterControl : IHaveLcdPanel
 {
     private readonly ISolarSystemService? solarSystemService = IoC.TryGet<ISolarSystemService>();
-    private static readonly IReadOnlyList<InverterDisplayMode> acModes = new[] { InverterDisplayMode.AcPower, InverterDisplayMode.AcCurrent, InverterDisplayMode.AcVoltage };
-    private static readonly IReadOnlyList<InverterDisplayMode> dcModes = new[] { InverterDisplayMode.DcPower, InverterDisplayMode.DcCurrent, InverterDisplayMode.DcVoltage };
-    private static readonly IReadOnlyList<InverterDisplayMode> moreModes = new[] { InverterDisplayMode.MoreEfficiency, InverterDisplayMode.More };
+    private static readonly IReadOnlyList<InverterDisplayMode> acModes = new[] {InverterDisplayMode.AcPower, InverterDisplayMode.AcCurrent, InverterDisplayMode.AcVoltage};
+    private static readonly IReadOnlyList<InverterDisplayMode> dcModes = new[] {InverterDisplayMode.DcPower, InverterDisplayMode.DcCurrent, InverterDisplayMode.DcVoltage};
+    private static readonly IReadOnlyList<InverterDisplayMode> moreModes = new[] {InverterDisplayMode.MoreEfficiency, InverterDisplayMode.More};
     private int currentAcIndex, currentDcIndex, currentMoreIndex;
 
 
@@ -80,11 +79,11 @@ public partial class InverterControl : IHaveLcdPanel
         };
     }
 
-    private void OnModeChanged() => SolarSystemService_NewDataReceived(this,new SolarDataEventArgs(solarSystemService?.SolarSystem));
+    private void OnModeChanged() => SolarSystemService_NewDataReceived(this, new SolarDataEventArgs(solarSystemService?.SolarSystem));
 
     private void SolarSystemService_NewDataReceived(object? sender, SolarDataEventArgs e)
     {
-        if (e.SolarSystem==null)
+        if (e.SolarSystem == null)
         {
             return;
         }
@@ -223,7 +222,7 @@ public partial class InverterControl : IHaveLcdPanel
                     Lcd.Label3 = "Sc";
                     Lcd.Value3 = ToLcd(e.SolarSystem?.PowerFlow?.SelfConsumption, "P2");
                     Lcd.LabelSum = "Aut";
-                    Lcd.ValueSum = ToLcd(e?.SolarSystem?.PowerFlow?.Autonomy, "P2"); 
+                    Lcd.ValueSum = ToLcd(e.SolarSystem?.PowerFlow?.Autonomy, "P2");
                     break;
             }
         });

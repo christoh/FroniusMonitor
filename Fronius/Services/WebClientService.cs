@@ -285,7 +285,10 @@ namespace De.Hochstaetter.Fronius.Services
 
         private async Task<(T, JToken)> GetResponse<T>(string request, string? debugString = null) where T : BaseResponse, new()
         {
-            if (InverterConnection == null) throw new NullReferenceException(Resources.NoSystemConnection);
+            if (InverterConnection == null)
+            {
+                throw new NullReferenceException(Resources.NoSystemConnection);
+            }
 
             string jsonString;
             var requestString = $"{InverterConnection.BaseUrl}/solar_api/v1/{request}";
