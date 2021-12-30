@@ -92,7 +92,7 @@ public class SocToColor : ConverterBase
                         break;
 
                     default:
-                        var lower = batteryColors.First(bc => soc >= bc.Soc);
+                        var lower = batteryColors.Last(bc => soc >= bc.Soc);
                         var upper = batteryColors.First(bc => bc.Soc > lower.Soc);
                         var percentage = (soc - lower.Soc) / (upper.Soc - lower.Soc);
                         color.R = Round(lower.Color.R, upper.Color.R);
