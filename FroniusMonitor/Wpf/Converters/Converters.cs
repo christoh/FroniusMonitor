@@ -30,34 +30,25 @@ public class NullToString : ConverterBase
     }
 }
 
-public class GridMeterConsumptionCorrector : ConverterBase
+public abstract class PowerCorrector : ConverterBase
 {
-    private readonly Settings settings = IoC.Get<Settings>();
+    protected abstract double OffsetWatts { get; }
+    protected static readonly Settings Settings = IoC.Get<Settings>();
 
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is not IConvertible convertible)
-        {
-            return null;
-        }
-
-        return convertible.ToDouble(culture) + settings.ConsumedEnergyOffSetWatts;
+        return value is not IConvertible convertible ? null : convertible.ToDouble(culture) + OffsetWatts;
     }
 }
 
-public class GridMeterProductionCorrector : ConverterBase
+public class GridMeterConsumptionCorrector : PowerCorrector
 {
-    private readonly Settings settings = IoC.Get<Settings>();
+    protected override double OffsetWatts { get; } = Settings.ConsumedEnergyOffsetWatts;
+}
 
-    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-    {
-        if (value is not IConvertible convertible)
-        {
-            return null;
-        }
-
-        return convertible.ToDouble(culture) + settings.ProducedEnergyOffsetWatts;
-    }
+public class GridMeterProductionCorrector : PowerCorrector
+{
+    protected override double OffsetWatts { get; } = Settings.ProducedEnergyOffsetWatts;
 }
 
 public class SocToColor : ConverterBase
@@ -66,9 +57,9 @@ public class SocToColor : ConverterBase
     {
         new (0, Colors.DarkRed),
         new (0.05, Colors.Red),
-        new (0.3, Colors.Yellow),
-        new (0.5, Colors.YellowGreen),
-        new (0.7, Colors.LightGreen),
+        new (0.25, Colors.Yellow),
+        new (0.40, Colors.YellowGreen),
+        new (0.5, Colors.LightGreen),
         new (1, Colors.LawnGreen),
     };
 
@@ -84,7 +75,7 @@ public class SocToColor : ConverterBase
                 switch (soc)
                 {
                     case <= 0:
-                        color = batteryColors.First().Color;
+                        color = batteryColors[0].Color;
                         break;
 
                     case >= 1:

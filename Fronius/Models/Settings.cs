@@ -13,13 +13,13 @@ namespace De.Hochstaetter.Fronius.Models
             set => Set(ref baseUrl, value);
         }
 
-        private double consumedEnergyOffSetWatts = 457000 - 2977910;
+        private double consumedEnergyOffsetWatts = 457000 - 2977910;
 
         [XmlElement("ConsumedEnergyOffSet")]
-        public double ConsumedEnergyOffSetWatts
+        public double ConsumedEnergyOffsetWatts
         {
-            get => consumedEnergyOffSetWatts;
-            set => Set(ref consumedEnergyOffSetWatts, value);
+            get => consumedEnergyOffsetWatts;
+            set => Set(ref consumedEnergyOffsetWatts, value);
         }
 
         private double producedEnergyOffsetWatts=-310;

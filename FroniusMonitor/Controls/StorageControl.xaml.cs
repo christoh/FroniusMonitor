@@ -59,7 +59,6 @@ public partial class StorageControl
     }
 
 
-
     private void OnDataChanged(object? _ = null, PropertyChangedEventArgs? __ = null)
     {
         Dispatcher.InvokeAsync(() =>
@@ -75,12 +74,10 @@ public partial class StorageControl
 
             if (data.Power > 10)
             {
-                if (!isInChargingAnimation)
-                {
-                    isInChargingAnimation = true;
-                    PlusPole.Background = Enclosure.BorderBrush = new SolidColorBrush(Colors.DarkGreen);
-                    PlusPole.Background.BeginAnimation(SolidColorBrush.ColorProperty, chargingAnimation);
-                }
+                if (isInChargingAnimation) return;
+                isInChargingAnimation = true;
+                PlusPole.Background = Enclosure.BorderBrush = new SolidColorBrush(Colors.DarkGreen);
+                PlusPole.Background.BeginAnimation(SolidColorBrush.ColorProperty, chargingAnimation);
             }
             else
             {
