@@ -1,0 +1,83 @@
+﻿<ContentControl x:Class="De.Hochstaetter.FroniusMonitor.Controls.PowerConsumer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
+             xmlns:gl="clr-namespace:System.Globalization;assembly=System.Runtime"
+             mc:Ignorable="d" 
+             d:DesignHeight="75" d:DesignWidth="210">
+    <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:PowerConsumer}}">
+            <Border Grid.Column="1" BorderBrush="DimGray" BorderThickness="1" Width="110">
+                <Grid x:Name="BackgroundProvider" Background="LightGray" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid.Resources>
+                        <Style TargetType="Viewbox">
+                            <Setter Property="StretchDirection" Value="DownOnly"/>
+                            <Setter Property="Margin" Value="4,0"/>
+                        </Style>
+                    </Grid.Resources>
+                    <Viewbox Grid.Row="0">
+                        <TextBlock FontSize="8" TextAlignment="Center" Text="{Binding FritzBoxDevice.Model, FallbackValue=---}"/>
+                    </Viewbox>
+                    <Viewbox Grid.Row="1">
+                        <TextBlock FontSize="8" TextAlignment="Center" Text="{Binding FritzBoxDevice.DisplayName, FallbackValue=---}"/>
+                    </Viewbox>
+
+                    <Grid  Grid.Row="2" Background="#B3DBC6" Margin="4">
+                        <Grid.Resources>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="Black"/>
+                                <Setter Property="FontSize" Value="8"/>
+                            </Style>
+                        </Grid.Resources>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.Power}"/>
+                        <TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right">
+                            <Run Text="{Binding FritzBoxDevice.PowerMeter.PowerWatts, StringFormat=N1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, Converter={co:NullToString}, Mode=OneWay, FallbackValue=---}"/>
+                        </TextBlock>
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text=" W"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.Voltage}"/>
+                        <TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right">
+                            <Run Text="{Binding FritzBoxDevice.PowerMeter.Voltage, StringFormat=N1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, Converter={co:NullToString}, Mode=OneWay, FallbackValue=---}"/>
+                        </TextBlock>
+                        <TextBlock Grid.Row="1" Grid.Column="2" Text=" V"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static p:Resources.Energy}"/>
+                        <TextBlock Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right">
+                            <Run Text="{Binding FritzBoxDevice.PowerMeter.EnergyKiloWattHours, StringFormat=N1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, Converter={co:NullToString}, Mode=OneWay, FallbackValue=---}"/>
+                        </TextBlock>
+                        <TextBlock Grid.Row="2" Grid.Column="2" Text=" kWh"/>
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Temperature"/>
+                        <TextBlock Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right">
+                            <Run Text="{Binding FritzBoxDevice.TemperatureSensor.Temperature, StringFormat=N1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, Converter={co:NullToString}, Mode=OneWay, FallbackValue=---}"/>
+                        </TextBlock>
+                        <TextBlock Grid.Row="3" Grid.Column="2" Text=" °C"/>
+
+                    </Grid>
+                </Grid>
+            </Border>
+    </Viewbox>
+</ContentControl>

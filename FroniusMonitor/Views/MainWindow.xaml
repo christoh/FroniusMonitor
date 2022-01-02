@@ -12,10 +12,12 @@
         xmlns:m="clr-namespace:De.Hochstaetter.Fronius.Models;assembly=Fronius"
         xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
         xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
-        xmlns:images="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images">
+        xmlns:images="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
+        xmlns:sys="clr-namespace:System;assembly=System.Runtime">
     <Grid Margin="16" >
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
@@ -27,11 +29,16 @@
                     <RowDefinition Height="100"/>
                     <RowDefinition Height="200"/>
                 </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-                <Grid Grid.Row="0" >
+                <Grid Grid.Row="0" Grid.Column="0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
@@ -51,7 +58,7 @@
                     </StackPanel>
                 </Grid>
 
-                <Grid Grid.Row="1">
+                <Grid Grid.Row="1" Grid.Column="0">
                     <StackPanel Orientation="Horizontal" Margin="100,-40,0,0">
 
                         <c:PowerFlowArrow Angle="-30" Fill="LightGray"
@@ -63,7 +70,7 @@
                     </StackPanel>
                 </Grid>
 
-                <Grid Grid.Row="2" x:Name="LowerGrid" >
+                <Grid Grid.Column="0" Grid.Row="2" x:Name="LowerGrid" >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
@@ -85,10 +92,21 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </Grid>
+
+                <Viewbox Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" Width="119" Margin="20,0,0,0">
+                    <ItemsControl Margin="0,0,1,0" ItemsSource="{Binding SolarSystemService.SolarSystem.FritzBox.DevicesWithPowerMeter, FallbackValue={x:Null}}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <c:PowerConsumer FritzBoxDevice="{Binding}" Margin="0,0,0,4"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                </Viewbox>
+
             </Grid>
         </Viewbox>
 
-        <GridSplitter Grid.Column="1" ResizeBehavior="PreviousAndNext" BorderThickness="2" ResizeDirection="Columns"
+        <GridSplitter Grid.Column="2" ResizeBehavior="PreviousAndNext" BorderThickness="2" ResizeDirection="Columns"
                       BorderBrush="LightGray" Margin="4,0" VerticalAlignment="Stretch" />
     </Grid>
 </Window>

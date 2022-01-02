@@ -1,5 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Security.Cryptography;
+using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
 using De.Hochstaetter.Fronius.Contracts;
 using De.Hochstaetter.Fronius.Exceptions;
 using De.Hochstaetter.Fronius.Localization;
@@ -10,17 +14,27 @@ namespace De.Hochstaetter.Fronius.Services
 {
     public class WebClientService : BindableBase, IWebClientService
     {
-        private InverterConnection? inverterConnection;
+        private string? fritzBoxSid;
 
-        public InverterConnection? InverterConnection
+        private WebConnection? inverterConnection;
+
+        public WebConnection? InverterConnection
         {
             get => inverterConnection;
             set => Set(ref inverterConnection, value);
         }
 
+        private WebConnection? fritzBoxConnection;
+
+        public WebConnection? FritzBoxConnection
+        {
+            get => fritzBoxConnection;
+            set => Set(ref fritzBoxConnection, value);
+        }
+
         public async Task<SystemDevices> GetDevices()
         {
-            var (result, dataToken) = await GetResponse<SystemDevices>("GetActiveDeviceInfo.cgi?DeviceClass=System").ConfigureAwait(false);
+            var (result, dataToken) = await GetJsonResponse<SystemDevices>("GetActiveDeviceInfo.cgi?DeviceClass=System").ConfigureAwait(false);
 
             return await Task.Run(() =>
             {
@@ -51,13 +65,13 @@ namespace De.Hochstaetter.Fronius.Services
 
         public async Task<InverterDevices> GetInverters()
         {
-            var (result, dataToken) = await GetResponse<InverterDevices>("GetInverterInfo.cgi").ConfigureAwait(false);
+            var (result, dataToken) = await GetJsonResponse<InverterDevices>("GetInverterInfo.cgi").ConfigureAwait(false);
 
             foreach (var device in dataToken.OfType<JProperty>())
             {
                 var id = int.Parse(device.Name, NumberStyles.Integer, CultureInfo.InvariantCulture);
-                var (data, common) = await GetResponse<BaseResponse>($"GetInverterRealtimeData.cgi?Scope=Device&DataCollection=CommonInverterData&DeviceId={id}").ConfigureAwait(false);
-                var (threePhasesData, threePhases) = await GetResponse<BaseResponse>($"GetInverterRealtimeData.cgi?Scope=Device&DataCollection=3PInverterData&DeviceId={id}").ConfigureAwait(false);
+                var (data, common) = await GetJsonResponse<BaseResponse>($"GetInverterRealtimeData.cgi?Scope=Device&DataCollection=CommonInverterData&DeviceId={id}").ConfigureAwait(false);
+                var (threePhasesData, threePhases) = await GetJsonResponse<BaseResponse>($"GetInverterRealtimeData.cgi?Scope=Device&DataCollection=3PInverterData&DeviceId={id}").ConfigureAwait(false);
                 var inverter = await ParseInverter(id, device, common, threePhases, data, threePhasesData).ConfigureAwait(false);
                 result.Inverters.Add(inverter);
             }
@@ -67,7 +81,7 @@ namespace De.Hochstaetter.Fronius.Services
 
         public async Task<SmartMeterDevices> GetMeterDevices()
         {
-            var (result, dataToken) = await GetResponse<SmartMeterDevices>("GetMeterRealtimeData.cgi").ConfigureAwait(false);
+            var (result, dataToken) = await GetJsonResponse<SmartMeterDevices>("GetMeterRealtimeData.cgi").ConfigureAwait(false);
 
             return await Task.Run(() =>
             {
@@ -97,7 +111,7 @@ namespace De.Hochstaetter.Fronius.Services
 
         public async Task<StorageDevices> GetStorageDevices()
         {
-            var (result, dataToken) = await GetResponse<StorageDevices>("GetStorageRealtimeData.cgi?Scope=System").ConfigureAwait(false);
+            var (result, dataToken) = await GetJsonResponse<StorageDevices>("GetStorageRealtimeData.cgi?Scope=System").ConfigureAwait(false);
 
             return await Task.Run(() =>
             {
@@ -139,7 +153,7 @@ namespace De.Hochstaetter.Fronius.Services
         [SuppressMessage("ReSharper", "StringLiteralTypo")]
         public async Task<PowerFlow> GetPowerFlow()
         {
-            var (response, dataToken) = await GetResponse<BaseResponse>("GetPowerFlowRealtimeData.fcgi").ConfigureAwait(false);
+            var (response, dataToken) = await GetJsonResponse<BaseResponse>("GetPowerFlowRealtimeData.fcgi").ConfigureAwait(false);
 
             var site = dataToken["Site"];
 
@@ -283,7 +297,78 @@ namespace De.Hochstaetter.Fronius.Services
             };
         }).ConfigureAwait(false);
 
-        private async Task<(T, JToken)> GetResponse<T>(string request, string? debugString = null) where T : BaseResponse, new()
+        public async Task FritzBoxLogin()
+        {
+            if (FritzBoxConnection == null)
+            {
+                throw new NullReferenceException(Resources.NoSystemConnection);
+            }
+
+            var document = await GetXmlResponse("login_sid.lua");
+            var challenge = document.SelectSingleNode("/SessionInfo/Challenge")?.InnerText;
+
+            if (challenge == null)
+            {
+                throw new InvalidDataException("FritzBox did not supply challenge");
+            }
+
+            var md5 = MD5.Create();
+            var text = challenge + "-" + FritzBoxConnection.Password;
+            var response = challenge + "-" + md5.ComputeHash(Encoding.Unicode.GetBytes(text)).Aggregate("", (current, next) => $"{current}{next:x2}");
+
+            var dict = new Dictionary<string, string>
+            {
+                { "username", FritzBoxConnection.UserName },
+                { "response", response }
+            };
+
+            document = await GetXmlResponse($"login_sid.lua", dict);
+            fritzBoxSid = document.SelectSingleNode("/SessionInfo/SID")?.InnerText;
+            //var x=await GetStringResponse($"webservices/homeautoswitch.lua?sid={fritzBoxSid}&switchcmd=getdevicelistinfos").ConfigureAwait(false)??throw new InvalidDataException();
+        }
+
+        public async Task<FritzBoxDeviceList> GetFritzBoxDevices()
+        {
+            await using var stream = await GetStreamResponse($"webservices/homeautoswitch.lua?sid={fritzBoxSid}&switchcmd=getdevicelistinfos").ConfigureAwait(false)??throw new InvalidDataException();
+            var serializer = new XmlSerializer(typeof(FritzBoxDeviceList));
+            return serializer.Deserialize(stream) as FritzBoxDeviceList??throw new InvalidDataException();
+        }
+
+        private async Task<HttpResponseMessage> GetFritzBoxResponse(string request, IEnumerable<KeyValuePair<string, string>>? postVariables = null)
+        {
+            if (FritzBoxConnection == null)
+            {
+                throw new NullReferenceException(Resources.NoSystemConnection);
+            }
+            var requestString = $"{FritzBoxConnection.BaseUrl}/{request}";
+
+            using var client = new HttpClient();
+            var response = postVariables == null ? await client.GetAsync(requestString).ConfigureAwait(false) : await client.PostAsync(requestString, new FormUrlEncodedContent(postVariables)).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
+            return response??throw new InvalidDataException();
+        }
+
+        private async Task<Stream> GetStreamResponse(string request, IEnumerable<KeyValuePair<string, string>>? postVariables = null)
+        {
+            var response = await GetFritzBoxResponse(request, postVariables).ConfigureAwait(false);
+            return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+        }
+
+        private async Task<string> GetStringResponse(string request)
+        {
+            var response = await GetFritzBoxResponse(request).ConfigureAwait(false);
+            return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        }
+
+        private async Task<XmlDocument> GetXmlResponse(string request, IEnumerable<KeyValuePair<string, string>>? postVariables = null)
+        {
+            await using var stream = await GetStreamResponse(request,postVariables);
+            var result = new XmlDocument();
+            result.Load(stream);
+            return result;
+        }
+
+        private async Task<(T, JToken)> GetJsonResponse<T>(string request, string? debugString = null) where T : BaseResponse, new()
         {
             if (InverterConnection == null)
             {

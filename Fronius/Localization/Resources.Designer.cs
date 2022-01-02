@@ -376,7 +376,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Power.
+        ///   Looks up a localized string similar to PowerString.
         /// </summary>
         public static string Power {
             get {
@@ -385,7 +385,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Power factor.
+        ///   Looks up a localized string similar to PowerString factor.
         /// </summary>
         public static string PowerFactor {
             get {
@@ -394,7 +394,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Power flow.
+        ///   Looks up a localized string similar to PowerString flow.
         /// </summary>
         public static string PowerFlow {
             get {
@@ -412,7 +412,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Reactive Power.
+        ///   Looks up a localized string similar to Reactive PowerString.
         /// </summary>
         public static string ReactivePower {
             get {

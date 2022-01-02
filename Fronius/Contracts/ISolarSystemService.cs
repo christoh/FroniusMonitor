@@ -12,7 +12,7 @@ namespace De.Hochstaetter.Fronius.Contracts
         SolarSystem? SolarSystem { get; }
         event EventHandler<SolarDataEventArgs>? NewDataReceived;
 
-        Task Start(InverterConnection connection);
+        Task Start(WebConnection inverterConnection, WebConnection fritzBoxConnection);
         void Stop();
     }
 }

@@ -74,7 +74,7 @@ public partial class PowerFlowArrow
     {
         TextBlock.Text = !Power.HasValue || Power.Value == 0d ? "--- W" : $"{Math.Abs(Power.Value):N1} W";
         var sign = HasRightPlacement ? 1 : -1;
-        //Angle="{Binding Power, Converter={co:PowerDirectionToDouble Incoming=-90, Outgoing=90, Null=-90}, FallbackValue=90}" 
+        //Angle="{Binding PowerString, Converter={co:PowerDirectionToDouble Incoming=-90, Outgoing=90, Null=-90}, FallbackValue=90}" 
         Arrow.Angle = Power < 0 ? 90 * sign : Power > 0 ? -90 * sign : DefaultsToOutgoing ? 90 * sign : -90 * sign;
     }
 }

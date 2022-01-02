@@ -15,7 +15,7 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
 
         public async Task OnInitialize()
         {
-            await SolarSystemService.Start(new InverterConnection {BaseUrl = App.Settings.BaseUrl!}).ConfigureAwait(false);
+            await SolarSystemService.Start(new WebConnection {BaseUrl = App.Settings.BaseUrlFronius!}, new WebConnection {BaseUrl = App.Settings.BaseUrlFritzBox!}).ConfigureAwait(false);
         }
     }
 }

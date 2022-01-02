@@ -1,0 +1,313 @@
+﻿<devicelist version="1" fwversion="7.29">
+  <device identifier="08761 0004279" id="16" functionbitmask="33664" fwversion="04.16" manufacturer="AVM" productname="FRITZ!DECT 200">
+    <present>0</present>
+    <txbusy>0</txbusy>
+    <name>Lampe Küchenschrank</name>
+    <switch>
+      <state></state>
+      <mode></mode>
+      <lock></lock>
+      <devicelock></devicelock>
+    </switch>
+    <simpleonoff>
+      <state></state>
+    </simpleonoff>
+    <powermeter>
+      <voltage></voltage>
+      <power></power>
+      <energy></energy>
+    </powermeter>
+    <temperature>
+      <celsius></celsius>
+      <offset></offset>
+    </temperature>
+  </device>
+  <device identifier="08761 0004275" id="17" functionbitmask="33664" fwversion="04.16" manufacturer="AVM" productname="FRITZ!DECT 200">
+    <present>1</present>
+    <txbusy>0</txbusy>
+    <name>Lampe Sofa Wohnzimmer</name>
+    <switch>
+      <state>0</state>
+      <mode>auto</mode>
+      <lock>0</lock>
+      <devicelock>0</devicelock>
+    </switch>
+    <simpleonoff>
+      <state>0</state>
+    </simpleonoff>
+    <powermeter>
+      <voltage>234193</voltage>
+      <power>0</power>
+      <energy>208449</energy>
+    </powermeter>
+    <temperature>
+      <celsius>240</celsius>
+      <offset>0</offset>
+    </temperature>
+  </device>
+  <device identifier="08761 0004280" id="18" functionbitmask="33664" fwversion="04.16" manufacturer="AVM" productname="FRITZ!DECT 200">
+    <present>1</present>
+    <txbusy>0</txbusy>
+    <name>Computer Furzi</name>
+    <switch>
+      <state>1</state>
+      <mode>manuell</mode>
+      <lock>0</lock>
+      <devicelock>0</devicelock>
+    </switch>
+    <simpleonoff>
+      <state>1</state>
+    </simpleonoff>
+    <powermeter>
+      <voltage>233809</voltage>
+      <power>3860</power>
+      <energy>3</energy>
+    </powermeter>
+    <temperature>
+      <celsius>180</celsius>
+      <offset>0</offset>
+    </temperature>
+  </device>
+  <device identifier="11630 0301014" id="19" functionbitmask="35712" fwversion="04.16" manufacturer="AVM" productname="FRITZ!DECT 200">
+    <present>1</present>
+    <txbusy>0</txbusy>
+    <name>Fernseher Wohnzimmer</name>
+    <switch>
+      <state>0</state>
+      <mode>manuell</mode>
+      <lock>0</lock>
+      <devicelock>0</devicelock>
+    </switch>
+    <simpleonoff>
+      <state>0</state>
+    </simpleonoff>
+    <powermeter>
+      <voltage>232635</voltage>
+      <power>0</power>
+      <energy>170</energy>
+    </powermeter>
+    <temperature>
+      <celsius>250</celsius>
+      <offset>-10</offset>
+    </temperature>
+  </device>
+  <device identifier="11630 0301015" id="20" functionbitmask="35712" fwversion="04.16" manufacturer="AVM" productname="FRITZ!DECT 200">
+    <present>1</present>
+    <txbusy>0</txbusy>
+    <name>Computer Supi</name>
+    <switch>
+      <state>1</state>
+      <mode>auto</mode>
+      <lock>0</lock>
+      <devicelock>0</devicelock>
+    </switch>
+    <simpleonoff>
+      <state>1</state>
+    </simpleonoff>
+    <powermeter>
+      <voltage>232328</voltage>
+      <power>242180</power>
+      <energy>8601</energy>
+    </powermeter>
+    <temperature>
+      <celsius>240</celsius>
+      <offset>-20</offset>
+    </temperature>
+  </device>
+  <device identifier="11630 0301009" id="21" functionbitmask="35712" fwversion="04.16" manufacturer="AVM" productname="FRITZ!DECT 200">
+    <present>1</present>
+    <txbusy>0</txbusy>
+    <name>Küche</name>
+    <switch>
+      <state>1</state>
+      <mode>manuell</mode>
+      <lock>0</lock>
+      <devicelock>0</devicelock>
+    </switch>
+    <simpleonoff>
+      <state>1</state>
+    </simpleonoff>
+    <powermeter>
+      <voltage>232967</voltage>
+      <power>3000</power>
+      <energy>214</energy>
+    </powermeter>
+    <temperature>
+      <celsius>280</celsius>
+      <offset>0</offset>
+    </temperature>
+  </device>
+  <device identifier="13077 0050820" id="406" functionbitmask="1" fwversion="34.10.16.16.015" manufacturer="AVM" productname="FRITZ!DECT 500">
+    <present>1</present>
+    <txbusy>0</txbusy>
+    <name>Lampe Büro Supi</name>
+  </device>
+  <device identifier="13077 0050820-1" id="2000" functionbitmask="237572" fwversion="0.0" manufacturer="AVM" productname="FRITZ!DECT 500">
+    <present>1</present>
+    <txbusy>0</txbusy>
+    <name>Lampe Büro Supi</name>
+    <simpleonoff>
+      <state>1</state>
+    </simpleonoff>
+    <levelcontrol>
+      <level>111</level>
+      <levelpercentage>44</levelpercentage>
+    </levelcontrol>
+    <colorcontrol supported_modes="5" current_mode="4" fullcolorsupport="1" mapped="0">
+      <hue></hue>
+      <saturation></saturation>
+      <unmapped_hue></unmapped_hue>
+      <unmapped_saturation></unmapped_saturation>
+      <temperature>3000</temperature>
+    </colorcontrol>
+    <etsiunitinfo>
+      <etsideviceid>406</etsideviceid>
+      <unittype>278</unittype>
+      <interfaces>512,514,513</interfaces>
+    </etsiunitinfo>
+  </device>
+  <device identifier="13077 0053217" id="407" functionbitmask="1" fwversion="34.10.16.16.015" manufacturer="AVM" productname="FRITZ!DECT 500">
+    <present>0</present>
+    <txbusy>0</txbusy>
+    <name>Lampe Büro Furzi</name>
+  </device>
+  <device identifier="13077 0053217-1" id="2001" functionbitmask="237572" fwversion="0.0" manufacturer="AVM" productname="FRITZ!DECT 500">
+    <present>0</present>
+    <txbusy>0</txbusy>
+    <name>Lampe Büro Furzi</name>
+    <simpleonoff>
+      <state></state>
+    </simpleonoff>
+    <levelcontrol>
+      <level></level>
+      <levelpercentage></levelpercentage>
+    </levelcontrol>
+    <colorcontrol supported_modes="0" current_mode="" fullcolorsupport="0" mapped="0">
+      <hue></hue>
+      <saturation></saturation>
+      <unmapped_hue></unmapped_hue>
+      <unmapped_saturation></unmapped_saturation>
+      <temperature></temperature>
+    </colorcontrol>
+    <etsiunitinfo>
+      <etsideviceid>407</etsideviceid>
+      <unittype>278</unittype>
+      <interfaces>512,514,513</interfaces>
+    </etsiunitinfo>
+  </device>
+  <device identifier="13077 0065163" id="408" functionbitmask="1" fwversion="34.10.16.16.015" manufacturer="AVM" productname="FRITZ!DECT 500">
+    <present>1</present>
+    <txbusy>0</txbusy>
+    <name>Lampe Schlafzimmer Südwest</name>
+  </device>
+  <device identifier="13077 0065163-1" id="2002" functionbitmask="237572" fwversion="0.0" manufacturer="AVM" productname="FRITZ!DECT 500">
+    <present>1</present>
+    <txbusy>0</txbusy>
+    <name>Lampe Schlafzimmer Südwest</name>
+    <simpleonoff>
+      <state>0</state>
+    </simpleonoff>
+    <levelcontrol>
+      <level>20</level>
+      <levelpercentage>8</levelpercentage>
+    </levelcontrol>
+    <colorcontrol supported_modes="5" current_mode="1" fullcolorsupport="1" mapped="0">
+      <hue>7</hue>
+      <saturation>254</saturation>
+      <unmapped_hue>7</unmapped_hue>
+      <unmapped_saturation>254</unmapped_saturation>
+      <temperature></temperature>
+    </colorcontrol>
+    <etsiunitinfo>
+      <etsideviceid>408</etsideviceid>
+      <unittype>278</unittype>
+      <interfaces>512,514,513</interfaces>
+    </etsiunitinfo>
+  </device>
+  <device identifier="13077 0028126" id="409" functionbitmask="1" fwversion="34.10.16.16.015" manufacturer="AVM" productname="FRITZ!DECT 500">
+    <present>1</present>
+    <txbusy>0</txbusy>
+    <name>Lampe Schlafzimmer Südost</name>
+  </device>
+  <device identifier="13077 0028126-1" id="2003" functionbitmask="237572" fwversion="0.0" manufacturer="AVM" productname="FRITZ!DECT 500">
+    <present>1</present>
+    <txbusy>0</txbusy>
+    <name>Lampe Schlafzimmer Südost</name>
+    <simpleonoff>
+      <state>0</state>
+    </simpleonoff>
+    <levelcontrol>
+      <level>20</level>
+      <levelpercentage>8</levelpercentage>
+    </levelcontrol>
+    <colorcontrol supported_modes="5" current_mode="1" fullcolorsupport="1" mapped="0">
+      <hue>7</hue>
+      <saturation>254</saturation>
+      <unmapped_hue>7</unmapped_hue>
+      <unmapped_saturation>254</unmapped_saturation>
+      <temperature></temperature>
+    </colorcontrol>
+    <etsiunitinfo>
+      <etsideviceid>409</etsideviceid>
+      <unittype>278</unittype>
+      <interfaces>512,514,513</interfaces>
+    </etsiunitinfo>
+  </device>
+  <group synchronized="0" identifier="grpB988C5-3AFF2F98C" id="900" functionbitmask="234116" fwversion="1.0" manufacturer="AVM" productname="">
+    <present>1</present>
+    <txbusy>0</txbusy>
+    <name>Lampen</name>
+    <switch>
+      <state>0</state>
+      <mode>auto</mode>
+      <lock>0</lock>
+      <devicelock>0</devicelock>
+    </switch>
+    <simpleonoff>
+      <state>0</state>
+    </simpleonoff>
+    <levelcontrol>
+      <level>111</level>
+      <levelpercentage>44</levelpercentage>
+    </levelcontrol>
+    <colorcontrol supported_modes="5" current_mode="4" fullcolorsupport="0" mapped="0">
+      <hue></hue>
+      <saturation></saturation>
+      <unmapped_hue></unmapped_hue>
+      <unmapped_saturation></unmapped_saturation>
+      <temperature>3000</temperature>
+    </colorcontrol>
+    <powermeter>
+      <voltage>234193</voltage>
+      <power>0</power>
+      <energy>208449</energy>
+    </powermeter>
+    <groupinfo>
+      <masterdeviceid>0</masterdeviceid>
+      <members>16,17,2000,2001</members>
+    </groupinfo>
+  </group>
+  <group synchronized="0" identifier="grpB988C5-3D217E95E" id="901" functionbitmask="233476" fwversion="1.0" manufacturer="AVM" productname="">
+    <present>1</present>
+    <txbusy>0</txbusy>
+    <name>Lampen Schlafzimmer</name>
+    <simpleonoff>
+      <state>0</state>
+    </simpleonoff>
+    <levelcontrol>
+      <level>255</level>
+      <levelpercentage>100</levelpercentage>
+    </levelcontrol>
+    <colorcontrol supported_modes="5" current_mode="4" fullcolorsupport="27" mapped="0">
+      <hue></hue>
+      <saturation></saturation>
+      <unmapped_hue></unmapped_hue>
+      <unmapped_saturation></unmapped_saturation>
+      <temperature>3000</temperature>
+    </colorcontrol>
+    <groupinfo>
+      <masterdeviceid>0</masterdeviceid>
+      <members>2002,2003</members>
+    </groupinfo>
+  </group>
+</devicelist>

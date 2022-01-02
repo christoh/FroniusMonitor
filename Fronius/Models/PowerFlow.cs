@@ -21,6 +21,7 @@ namespace De.Hochstaetter.Fronius.Models
 
     public class PowerFlow : EnergyCounterBase
     {
+        private IEnumerable<double> AllPowers => new[] {StoragePower, GridPower, SolarPower, LoadPower}.Where(ps => ps.HasValue).Select(ps => ps!.Value);
         public override string DisplayName => Resources.PowerFlow;
         public int? Version { get; init; }
         public bool? BackupMode { get; init; }
@@ -31,26 +32,12 @@ namespace De.Hochstaetter.Fronius.Models
         public double? GridPower { get; init; }
         public double? SolarPower { get; init; }
         public double? LoadPower { get; init; }
-        public double? PowerLossWatts => new[] { StoragePower, GridPower, SolarPower, LoadPower }.Where(ps => ps.HasValue).Sum(ps => ps!.Value);
+        public double? PowerLossWatts => AllPowers.Sum();
+        public double? Input => AllPowers.Any()?AllPowers.Where(ps => ps > 0).Sum():null;
+        public double? Output => AllPowers.Any()?AllPowers.Where(ps => ps < 0).Sum():null;
         public double? Autonomy { get; init; }
         public double? SelfConsumption { get; init; }
 
-        public double? Efficiency
-        {
-            get
-            {
-                IReadOnlyList<double> allPowers = new[] { StoragePower, GridPower, SolarPower, LoadPower }.Where(ps => ps.HasValue).Select(ps => ps!.Value).ToArray();
-
-                if (allPowers.Count == 0)
-                {
-                    return null;
-                }
-
-                var output = allPowers.Where(ps => ps < 0).Sum();
-                var input = allPowers.Where(ps => ps > 0).Sum();
-
-                return input < .000000001 ? null : -output / input;
-            }
-        }
+        public double? Efficiency => Input < .000000001 ? null : -Output / Input;
     }
 }

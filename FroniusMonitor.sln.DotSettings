@@ -107,6 +107,7 @@ private void On$propertyName$Changed()&#xD;
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=A04C8A03320DCE4A93632CFDF72357C5/@KeyIndexDefined">False</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Bindable/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Caliburn/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Dect/@EntryIndexedValue">True</s:Boolean>
 	
 
 
@@ -117,7 +118,8 @@ private void On$propertyName$Changed()&#xD;
 	
 	
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Fronius/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=Hochstaetter/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Hochstaetter/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Storages/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>
 	
 	
 	

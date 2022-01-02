@@ -160,7 +160,7 @@
     <value>N/A</value>
   </data>
   <data name="NoSystemConnection" xml:space="preserve">
-    <value>You did not specify complete connection parameters</value>
+    <value>You did not specify complete inverterConnection parameters</value>
   </data>
   <data name="Ohmpilot" xml:space="preserve">
     <value>Ohm pilot</value>
@@ -265,7 +265,7 @@
     <value>Real power</value>
   </data>
   <data name="ReactivePower" xml:space="preserve">
-    <value>Reactive Power</value>
+    <value>Reactive PowerString</value>
   </data>
   <data name="PhaseVoltage" xml:space="preserve">
     <value>Phase voltage</value>
@@ -274,7 +274,7 @@
     <value>Line voltage</value>
   </data>
   <data name="PowerFactor" xml:space="preserve">
-    <value>Power factor</value>
+    <value>PowerString factor</value>
   </data>
   <data name="OutOfBalance" xml:space="preserve">
     <value>Out of balance</value>
@@ -301,7 +301,7 @@
     <value>AC power</value>
   </data>
   <data name="PowerFlow" xml:space="preserve">
-    <value>Power flow</value>
+    <value>PowerString flow</value>
   </data>
   <data name="Efficiency" xml:space="preserve">
 	  <value>Efficiency</value>

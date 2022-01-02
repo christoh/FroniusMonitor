@@ -29,6 +29,7 @@ public partial class InverterControl : IHaveLcdPanel
     private static readonly IReadOnlyList<InverterDisplayMode> dcModes = new[] {InverterDisplayMode.DcPower, InverterDisplayMode.DcCurrent, InverterDisplayMode.DcVoltage};
     private static readonly IReadOnlyList<InverterDisplayMode> moreModes = new[] {InverterDisplayMode.MoreEfficiency, InverterDisplayMode.More};
     private int currentAcIndex, currentDcIndex, currentMoreIndex;
+    private readonly Queue<PowerFlow> powerFlowQueue = new(31);
 
 
     #region Dependency Properties
@@ -66,7 +67,7 @@ public partial class InverterControl : IHaveLcdPanel
         {
             if (solarSystemService != null)
             {
-                solarSystemService.NewDataReceived += SolarSystemService_NewDataReceived;
+                solarSystemService.NewDataReceived += NewDataReceived;
             }
         };
 
@@ -74,18 +75,28 @@ public partial class InverterControl : IHaveLcdPanel
         {
             if (solarSystemService != null)
             {
-                solarSystemService.NewDataReceived -= SolarSystemService_NewDataReceived;
+                solarSystemService.NewDataReceived -= NewDataReceived;
             }
         };
     }
 
-    private void OnModeChanged() => SolarSystemService_NewDataReceived(this, new SolarDataEventArgs(solarSystemService?.SolarSystem));
+    private void OnModeChanged() => NewDataReceived(this, new SolarDataEventArgs(solarSystemService?.SolarSystem));
 
-    private void SolarSystemService_NewDataReceived(object? sender, SolarDataEventArgs e)
+    private void NewDataReceived(object? sender, SolarDataEventArgs e)
     {
         if (e.SolarSystem == null)
         {
             return;
+        }
+
+        if (e.SolarSystem.PowerFlow != null && ReferenceEquals(sender,solarSystemService))
+        {
+            powerFlowQueue.Enqueue(e.SolarSystem.PowerFlow);
+
+            while (powerFlowQueue.Count > 30)
+            {
+                powerFlowQueue.Dequeue();
+            }
         }
 
         Dispatcher.InvokeAsync(() =>
@@ -213,12 +224,14 @@ public partial class InverterControl : IHaveLcdPanel
 
                 case InverterDisplayMode.MoreEfficiency:
                     //var acPower = Inverter?.Data?.AcPowerWatts;
-                    //var dcPower = Inverter?.Data?.SolarPowerWatts - solarSystemService.SolarSystem?.Storages.Sum(s => s?.Data?.Power);
+                    //var dcPower = Inverter?.Data?.SolarPowerWatts - solarSystemService.SolarSystem?.Storages.Sum(s => s?.Data?.PowerString);
+                    var powerLoss = powerFlowQueue.Average(pf => pf.PowerLossWatts);
+                    var incoming = powerFlowQueue.Average(pf => pf.Input);
                     Lcd.Header = Loc.Efficiency;
                     Lcd.Label1 = "Loss";
-                    Lcd.Value1 = ToLcd(e.SolarSystem?.PowerFlow?.PowerLossWatts, "N1", "W");
+                    Lcd.Value1 = ToLcd(powerLoss, "N1", "W");
                     Lcd.Label2 = "Eff";
-                    Lcd.Value2 = ToLcd(e.SolarSystem?.PowerFlow?.Efficiency, "P2");
+                    Lcd.Value2 = ToLcd(1-(powerLoss/incoming), "P2");
                     Lcd.Label3 = "Sc";
                     Lcd.Value3 = ToLcd(e.SolarSystem?.PowerFlow?.SelfConsumption, "P2");
                     Lcd.LabelSum = "Aut";
@@ -236,7 +249,7 @@ public partial class InverterControl : IHaveLcdPanel
         Lcd.ValueSum = ToLcd(aggregatedValue, format, unit, nullValue);
     }
 
-    private string ToLcd(double? value, string format, string? unit = null, string nullValue = "---")
+    private static string ToLcd(double? value, string format, string? unit = null, string nullValue = "---")
     {
         return value.HasValue ? value.Value.ToString(format, CultureInfo.CurrentCulture) + (unit is not null ? ' ' + unit : string.Empty) : nullValue;
     }
@@ -251,17 +264,17 @@ public partial class InverterControl : IHaveLcdPanel
         Lcd.LabelSum = sumText;
     }
 
-    private void SetMode(IReadOnlyList<InverterDisplayMode> modeList, ref int index)
+    private void CycleMode(IReadOnlyList<InverterDisplayMode> modeList, ref int index)
     {
         index = modeList.Contains(Mode) ? ++index % modeList.Count : 0;
         Mode = modeList[index];
     }
 
-    private void OnAcClicked(object sender, RoutedEventArgs e) => SetMode(acModes, ref currentAcIndex);
+    private void OnAcClicked(object sender, RoutedEventArgs e) => CycleMode(acModes, ref currentAcIndex);
 
-    private void OnDcClicked(object sender, RoutedEventArgs e) => SetMode(dcModes, ref currentDcIndex);
+    private void OnDcClicked(object sender, RoutedEventArgs e) => CycleMode(dcModes, ref currentDcIndex);
 
     private void OnEnergyClicked(object sender, RoutedEventArgs e) => Mode = InverterDisplayMode.Energy;
 
-    private void OnMoreClicked(object sender, RoutedEventArgs e) => SetMode(moreModes, ref currentMoreIndex);
+    private void OnMoreClicked(object sender, RoutedEventArgs e) => CycleMode(moreModes, ref currentMoreIndex);
 }
