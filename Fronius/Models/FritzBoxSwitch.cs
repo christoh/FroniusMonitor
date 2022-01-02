@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace De.Hochstaetter.Fronius.Models;
 
@@ -60,7 +59,7 @@ public class FritzBoxSwitch : BindableBase
     public string? IsDeviceLockedString
     {
         get => isDeviceLockedString;
-        set => Set(ref isDeviceLockedString, value);
+        set => Set(ref isDeviceLockedString, value, () => NotifyOfPropertyChange(nameof(IsDeviceLocked)));
     }
 
     [XmlIgnore]
@@ -71,6 +70,7 @@ public class FritzBoxSwitch : BindableBase
     }
 }
 
+// ReSharper disable once StringLiteralTypo
 [XmlType("simpleonoff")]
 public class FritzBoxSimpleSwitch : BindableBase
 {

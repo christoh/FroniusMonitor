@@ -38,11 +38,12 @@ public class FritzBoxDevice : BindableBase, IHaveDisplayName
 
     private uint functionMask;
 
+    // ReSharper disable once StringLiteralTypo
     [XmlAttribute("functionbitmask")]
     public uint FunctionMask
     {
         get => functionMask;
-        set => Set(ref functionMask, value,()=>NotifyOfPropertyChange(nameof(FritzBoxFeatures)));
+        set => Set(ref functionMask, value,()=>NotifyOfPropertyChange(nameof(Features)));
     }
 
     [XmlIgnore]
@@ -63,6 +64,7 @@ public class FritzBoxDevice : BindableBase, IHaveDisplayName
 
     private string? firmwareVersionString;
 
+    // ReSharper disable once StringLiteralTypo
     [XmlAttribute("fwversion")]
     public string? FirmwareVersionString
     {
@@ -81,6 +83,7 @@ public class FritzBoxDevice : BindableBase, IHaveDisplayName
 
     private string? model;
 
+    // ReSharper disable once StringLiteralTypo
     [XmlAttribute("productname")]
     public string? Model
     {

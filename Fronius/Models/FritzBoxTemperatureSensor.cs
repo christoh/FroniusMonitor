@@ -15,8 +15,8 @@ public class FritzBoxTemperatureSensor : BindableBase
     [XmlElement("offset")]
     public string? OffsetString
     {
-        get => FritzBoxDevice.GetStringValue(CorrectionOffset, 10);
-        set => CorrectionOffset = FritzBoxDevice.GetDoubleValue(value, 10);
+        get => FritzBoxDevice.GetStringValue(Offset, 10);
+        set => Offset = FritzBoxDevice.GetDoubleValue(value, 10);
     }
 
     private double? temperature;
@@ -25,17 +25,25 @@ public class FritzBoxTemperatureSensor : BindableBase
     public double? Temperature
     {
         get => temperature;
-        set => Set(ref temperature, value);
+        set => Set(ref temperature, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(TemperatureString));
+            NotifyOfPropertyChange(nameof(RawTemperature));
+        });
     }
 
-    private double? correctionOffset;
+    private double? offset;
 
     [XmlIgnore]
-    public double? CorrectionOffset
+    public double? Offset
     {
-        get => correctionOffset;
-        set => Set(ref correctionOffset, value);
+        get => offset;
+        set => Set(ref offset, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(OffsetString));
+            NotifyOfPropertyChange(nameof(RawTemperature));
+        });
     }
 
-    [XmlIgnore] public double? RawTemperature => Temperature - CorrectionOffset;
+    [XmlIgnore] public double? RawTemperature => Temperature - Offset;
 }
