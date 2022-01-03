@@ -9,6 +9,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <RootNamespace>De.Hochstaetter.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+    <ApplicationIcon>Assets\Images\sun.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,6 +24,10 @@
     <None Remove="Assets\Fonts\DOTMATRI.TTF" />
     <None Remove="Assets\Fonts\DOTMBold.TTF" />
     <None Remove="Assets\Fonts\EHSMB.TTF" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\Images\sun.ico" />
   </ItemGroup>
 
   <ItemGroup>
