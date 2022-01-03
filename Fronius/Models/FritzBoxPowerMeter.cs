@@ -1,4 +1,5 @@
 ﻿using System.Xml.Serialization;
+using De.Hochstaetter.Fronius.Contracts;
 
 namespace De.Hochstaetter.Fronius.Models
 {

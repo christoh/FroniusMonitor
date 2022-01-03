@@ -97,7 +97,7 @@
                     <ItemsControl Margin="0,0,1,0" ItemsSource="{Binding SolarSystemService.SolarSystem.FritzBox.DevicesWithPowerMeter, FallbackValue={x:Null}}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <c:PowerConsumer FritzBoxDevice="{Binding}" Margin="0,0,0,4"/>
+                            <c:PowerConsumer PowerMeter="{Binding}" Margin="0,0,0,4"/>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

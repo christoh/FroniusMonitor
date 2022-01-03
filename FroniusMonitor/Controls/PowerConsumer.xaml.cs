@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Media;
+using De.Hochstaetter.Fronius.Contracts;
 using De.Hochstaetter.Fronius.Models;
 
 namespace De.Hochstaetter.FroniusMonitor.Controls;
@@ -8,16 +9,16 @@ public partial class PowerConsumer
 {
     #region Dependency Properties
 
-    public static readonly DependencyProperty FritzBoxDeviceProperty = DependencyProperty.Register
+    public static readonly DependencyProperty PowerMeterProperty = DependencyProperty.Register
     (
-        nameof(FritzBoxDevice), typeof(FritzBoxDevice), typeof(PowerConsumer),
+        nameof(PowerMeter), typeof(IPowerMeter1P), typeof(PowerConsumer),
         new PropertyMetadata((d, e) => ((PowerConsumer)d).OnFritzBoxDeviceChanged())
     );
 
-    public FritzBoxDevice? FritzBoxDevice
+    public IPowerMeter1P? PowerMeter
     {
-        get => (FritzBoxDevice?)GetValue(FritzBoxDeviceProperty);
-        set => SetValue(FritzBoxDeviceProperty, value);
+        get => (IPowerMeter1P?)GetValue(PowerMeterProperty);
+        set => SetValue(PowerMeterProperty, value);
     }
 
     #endregion
@@ -29,9 +30,9 @@ public partial class PowerConsumer
 
     private void OnFritzBoxDeviceChanged()
     {
-        BackgroundProvider.Background = FritzBoxDevice is not {IsPresent: true}
+        BackgroundProvider.Background = PowerMeter is not {IsPresent: true}
             ? Brushes.OrangeRed 
-            : FritzBoxDevice.SimpleSwitch?.IsTurnedOn == null || FritzBoxDevice.SimpleSwitch.IsTurnedOn.Value
+            : PowerMeter?.IsTurnedOn == null || PowerMeter.IsTurnedOn.Value
                 ? Brushes.AntiqueWhite
                 : Brushes.LightGray;
     }

@@ -25,7 +25,7 @@ public enum FritzBoxFeatures : uint
 }
 
 [XmlType("device")]
-public class FritzBoxDevice : BindableBase, IHaveDisplayName
+public class FritzBoxDevice : BindableBase, IPowerMeter1P
 {
     private uint id;
 
@@ -43,7 +43,7 @@ public class FritzBoxDevice : BindableBase, IHaveDisplayName
     public uint FunctionMask
     {
         get => functionMask;
-        set => Set(ref functionMask, value,()=>NotifyOfPropertyChange(nameof(Features)));
+        set => Set(ref functionMask, value, () => NotifyOfPropertyChange(nameof(Features)));
     }
 
     [XmlIgnore]
@@ -160,4 +160,12 @@ public class FritzBoxDevice : BindableBase, IHaveDisplayName
     public static double? GetDoubleValue(string? value, double factor = 1000d) => string.IsNullOrWhiteSpace(value) ? null : int.Parse(value, NumberStyles.Integer, CultureInfo.InvariantCulture) / factor;
 
     public override string ToString() => $"{Manufacturer} {Model}: {DisplayName}";
+    double? IPowerMeter1P.Temperature => TemperatureSensor?.Temperature;
+    double? IPowerMeter1P.Frequency => null;
+    double? IPowerMeter1P.EnergyKiloWattHours => PowerMeter?.EnergyKiloWattHours;
+    double? IPowerMeter1P.Voltage => PowerMeter?.Voltage;
+    double? IPowerMeter1P.PowerWatts => PowerMeter?.PowerWatts;
+    bool? IPowerMeter1P.IsTurnedOn => SimpleSwitch?.IsTurnedOn ?? Switch?.IsTurnedOn;
+    string? IPowerMeter1P.Model => string.IsNullOrWhiteSpace(Manufacturer) ? Model : $"{Manufacturer} {Model}".Trim();
+
 }
