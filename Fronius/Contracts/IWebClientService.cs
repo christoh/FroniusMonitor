@@ -19,5 +19,7 @@ namespace De.Hochstaetter.Fronius.Contracts
         Task<PowerFlow> GetPowerFlow();
         Task FritzBoxLogin();
         Task<FritzBoxDeviceList> GetFritzBoxDevices();
+        Task TurnOnFritzBoxDevice(string ain);
+        Task TurnOffFritzBoxDevice(string ain);
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Media;
 using De.Hochstaetter.Fronius.Contracts;
-using De.Hochstaetter.Fronius.Models;
+using De.Hochstaetter.FroniusMonitor.Unity;
 
 namespace De.Hochstaetter.FroniusMonitor.Controls;
 
@@ -30,10 +30,16 @@ public partial class PowerConsumer
 
     private void OnFritzBoxDeviceChanged()
     {
-        BackgroundProvider.Background = PowerMeter is not {IsPresent: true}
-            ? Brushes.OrangeRed 
+        BackgroundProvider.Background = PowerMeter is not { IsPresent: true }
+            ? Brushes.OrangeRed
             : PowerMeter?.IsTurnedOn == null || PowerMeter.IsTurnedOn.Value
                 ? Brushes.AntiqueWhite
                 : Brushes.LightGray;
+    }
+
+    private async void OnPowerButtonClick(object sender, RoutedEventArgs e)
+    {
+        if (PowerMeter is not { IsPresent: true, CanTurnOnOff: true }) return;
+        await PowerMeter.TurnOnOff(!PowerMeter.IsTurnedOn.HasValue || !PowerMeter.IsTurnedOn.Value).ConfigureAwait(false);
     }
 }

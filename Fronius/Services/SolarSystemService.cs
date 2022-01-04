@@ -67,7 +67,7 @@ namespace De.Hochstaetter.Fronius.Services
             StorageDevices? storageDevices = null;
             SmartMeterDevices? smartMeterDevices = null;
 
-            await webClientService.FritzBoxLogin().ConfigureAwait(false);
+            //await webClientService.FritzBoxLogin().ConfigureAwait(false);
 
             try
             {

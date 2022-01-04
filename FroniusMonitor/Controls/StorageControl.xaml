@@ -23,6 +23,11 @@
                 <Run Text="kWh" />
             </TextBlock>
 
+            <TextBlock Margin="0,455,0,0" HorizontalAlignment="Center" FontSize="80" FontWeight="Bold">
+                <Run Text="{Binding Storage.Data.TemperatureCelsius, StringFormat=N1, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---}" />
+                <Run Text="°C" />
+            </TextBlock>
+
             <TextBlock Margin="0,570,0,0" HorizontalAlignment="Center" FontSize="80">
                 <Run Text="{Binding Storage.Data.Voltage, StringFormat=N1, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---}" />
                 <Run Text="V" />
@@ -38,9 +43,9 @@
                 <Run Text="A" />
             </TextBlock>
 
-            <TextBlock Margin="0,455,0,0" HorizontalAlignment="Center" FontSize="80" FontWeight="Bold">
-                <Run Text="{Binding Storage.Data.TemperatureCelsius, StringFormat=N1, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---}" />
-                <Run Text="°C" />
+            <TextBlock Margin="0,825,0,0" HorizontalAlignment="Center" FontSize="80">
+                <Run Text="{Binding Storage.Data.Degradation, StringFormat=P2, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---}" />
+                <Run Text="Deg" />
             </TextBlock>
 
             <Border x:Name="PlusPole" VerticalAlignment="Top" CornerRadius="30,30,0,0" Background="DarkGreen" Width="200" Height="110" />

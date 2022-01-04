@@ -27,8 +27,12 @@ public enum FritzBoxFeatures : uint
 [XmlType("device")]
 public class FritzBoxDevice : BindableBase, IPowerMeter1P
 {
-    private uint id;
+    private bool wasSwitched;
 
+    [XmlIgnore]
+    public IWebClientService? WebClientService { private get; set; }
+
+    private uint id;
     [XmlAttribute("id")]
     public uint Id
     {
@@ -89,6 +93,28 @@ public class FritzBoxDevice : BindableBase, IPowerMeter1P
     {
         get => model;
         set => Set(ref model, value);
+    }
+
+    public bool CanTurnOnOff => SimpleSwitch != null || Switch != null;
+
+    public async Task TurnOnOff(bool turnOn)
+    {
+        if (WebClientService == null)
+        {
+            throw new InvalidOperationException("No WebClientService");
+        }
+
+        wasSwitched = true;
+        NotifyOfPropertyChange(nameof(ISwitchable.IsEnabled));
+
+        if (turnOn)
+        {
+            await WebClientService.TurnOnFritzBoxDevice(Ain).ConfigureAwait(false);
+        }
+        else
+        {
+            await WebClientService.TurnOffFritzBoxDevice(Ain).ConfigureAwait(false);
+        }
     }
 
     private string displayName = string.Empty;
@@ -165,7 +191,8 @@ public class FritzBoxDevice : BindableBase, IPowerMeter1P
     double? IPowerMeter1P.EnergyKiloWattHours => PowerMeter?.EnergyKiloWattHours;
     double? IPowerMeter1P.Voltage => PowerMeter?.Voltage;
     double? IPowerMeter1P.PowerWatts => PowerMeter?.PowerWatts;
-    bool? IPowerMeter1P.IsTurnedOn => SimpleSwitch?.IsTurnedOn ?? Switch?.IsTurnedOn;
-    string? IPowerMeter1P.Model => string.IsNullOrWhiteSpace(Manufacturer) ? Model : $"{Manufacturer} {Model}".Trim();
-
+    bool IPowerMeter1P.CanReadPower => PowerMeter != null;
+    bool? ISwitchable.IsTurnedOn => SimpleSwitch?.IsTurnedOn ?? Switch?.IsTurnedOn;
+    string? ISwitchable.Model => string.IsNullOrWhiteSpace(Manufacturer) ? Model : $"{Manufacturer} {Model}".Trim();
+    bool ISwitchable.IsEnabled => !wasSwitched && IsPresent && (Switch is not { IsUiLocked: { } } || !Switch.IsUiLocked.Value);
 }

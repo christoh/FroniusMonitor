@@ -61,6 +61,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        public static string AccessDenied {
+            get {
+                return ResourceManager.GetString("AccessDenied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to AC current.
         /// </summary>
         public static string AcCurrent {
@@ -322,11 +331,20 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You did not specify complete connection parameters.
+        ///   Looks up a localized string similar to You did not specify complete inverterConnection parameters.
         /// </summary>
         public static string NoSystemConnection {
             get {
                 return ResourceManager.GetString("NoSystemConnection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Off.
+        /// </summary>
+        public static string Off {
+            get {
+                return ResourceManager.GetString("Off", resourceCulture);
             }
         }
         
@@ -345,6 +363,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Ohmpilots {
             get {
                 return ResourceManager.GetString("Ohmpilots", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to On.
+        /// </summary>
+        public static string On {
+            get {
+                return ResourceManager.GetString("On", resourceCulture);
             }
         }
         
@@ -376,7 +403,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to PowerString.
+        ///   Looks up a localized string similar to Power.
         /// </summary>
         public static string Power {
             get {
@@ -385,7 +412,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to PowerString factor.
+        ///   Looks up a localized string similar to Power factor.
         /// </summary>
         public static string PowerFactor {
             get {
@@ -394,7 +421,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to PowerString flow.
+        ///   Looks up a localized string similar to Power flow.
         /// </summary>
         public static string PowerFlow {
             get {
@@ -412,7 +439,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Reactive PowerString.
+        ///   Looks up a localized string similar to Reactive Power.
         /// </summary>
         public static string ReactivePower {
             get {

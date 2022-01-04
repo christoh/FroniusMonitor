@@ -93,11 +93,16 @@
                     </ItemsControl>
                 </Grid>
 
-                <Viewbox Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" Width="119" Margin="20,0,0,0">
-                    <ItemsControl Margin="0,0,1,0" ItemsSource="{Binding SolarSystemService.SolarSystem.FritzBox.DevicesWithPowerMeter, FallbackValue={x:Null}}">
-                    <ItemsControl.ItemTemplate>
+                <Viewbox Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" Width="246" Margin="20,0,0,0" VerticalAlignment="Top">
+                    <ItemsControl Margin="0,0,1,0" ItemsSource="{Binding SolarSystemService.SolarSystem.FritzBox.SwitchableDevices, FallbackValue={x:Null}}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Vertical" IsItemsHost="True" Height="500"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <c:PowerConsumer PowerMeter="{Binding}" Margin="0,0,0,4"/>
+                            <c:PowerConsumer Width="119" PowerMeter="{Binding}" Margin="4,0,0,4"/>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

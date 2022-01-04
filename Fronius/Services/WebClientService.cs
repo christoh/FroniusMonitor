@@ -1,17 +1,20 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 using De.Hochstaetter.Fronius.Contracts;
 using De.Hochstaetter.Fronius.Exceptions;
+using De.Hochstaetter.Fronius.Extensions;
 using De.Hochstaetter.Fronius.Localization;
 using De.Hochstaetter.Fronius.Models;
 using Newtonsoft.Json.Linq;
 
 namespace De.Hochstaetter.Fronius.Services
 {
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public class WebClientService : BindableBase, IWebClientService
     {
         private string? fritzBoxSid;
@@ -322,30 +325,68 @@ namespace De.Hochstaetter.Fronius.Services
                 { "response", response }
             };
 
-            document = await GetXmlResponse($"login_sid.lua", dict);
-            fritzBoxSid = document.SelectSingleNode("/SessionInfo/SID")?.InnerText;
-            //var x=await GetStringResponse($"webservices/homeautoswitch.lua?sid={fritzBoxSid}&switchcmd=getdevicelistinfos").ConfigureAwait(false)??throw new InvalidDataException();
+            document = await GetXmlResponse("login_sid.lua", dict);
+            fritzBoxSid = document.SelectSingleNode("/SessionInfo/SID")?.InnerText ?? throw new UnauthorizedAccessException(Resources.AccessDenied);
+
+            if (fritzBoxSid.All(c => c == '0'))
+            {
+                fritzBoxSid = null;
+                throw new UnauthorizedAccessException(Resources.AccessDenied);
+            }
         }
 
         public async Task<FritzBoxDeviceList> GetFritzBoxDevices()
         {
-            await using var stream = await GetStreamResponse($"webservices/homeautoswitch.lua?sid={fritzBoxSid}&switchcmd=getdevicelistinfos").ConfigureAwait(false)??throw new InvalidDataException();
+            await using var stream = await GetStreamResponse($"webservices/homeautoswitch.lua?switchcmd=getdevicelistinfos").ConfigureAwait(false) ?? throw new InvalidDataException();
             var serializer = new XmlSerializer(typeof(FritzBoxDeviceList));
-            return serializer.Deserialize(stream) as FritzBoxDeviceList??throw new InvalidDataException();
+            var result = serializer.Deserialize(stream) as FritzBoxDeviceList ?? throw new InvalidDataException();
+            result.Devices.Apply(d => d.WebClientService = this);
+            return result;
+        }
+
+        public async Task TurnOnFritzBoxDevice(string ain)
+        {
+            ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
+            await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setswitchon").ConfigureAwait(false);
+        }
+
+        public async Task TurnOffFritzBoxDevice(string ain)
+        {
+            ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
+            await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setswitchoff").ConfigureAwait(false);
         }
 
         private async Task<HttpResponseMessage> GetFritzBoxResponse(string request, IEnumerable<KeyValuePair<string, string>>? postVariables = null)
         {
-            if (FritzBoxConnection == null)
-            {
-                throw new NullReferenceException(Resources.NoSystemConnection);
-            }
-            var requestString = $"{FritzBoxConnection.BaseUrl}/{request}";
+            HttpResponseMessage response;
 
-            using var client = new HttpClient();
-            var response = postVariables == null ? await client.GetAsync(requestString).ConfigureAwait(false) : await client.PostAsync(requestString, new FormUrlEncodedContent(postVariables)).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
-            return response??throw new InvalidDataException();
+            if (fritzBoxSid == null && !request.StartsWith("login_sid.lua"))
+            {
+                await FritzBoxLogin().ConfigureAwait(false);
+            }
+
+            while (true)
+            {
+                if (FritzBoxConnection == null)
+                {
+                    throw new NullReferenceException(Resources.NoSystemConnection);
+                }
+                var requestString = $"{FritzBoxConnection.BaseUrl}/{request}{(fritzBoxSid == null ? string.Empty : $"&sid={fritzBoxSid}")}";
+
+                using var client = new HttpClient();
+                // ReSharper disable once PossibleMultipleEnumeration
+                response = postVariables == null ? await client.GetAsync(requestString).ConfigureAwait(false) : await client.PostAsync(requestString, new FormUrlEncodedContent(postVariables)).ConfigureAwait(false);
+
+                if (response.StatusCode == HttpStatusCode.Forbidden)
+                {
+                    await FritzBoxLogin().ConfigureAwait(false);
+                    continue;
+                }
+
+                response.EnsureSuccessStatusCode();
+                break;
+            }
+            return response;
         }
 
         private async Task<Stream> GetStreamResponse(string request, IEnumerable<KeyValuePair<string, string>>? postVariables = null)
@@ -362,7 +403,7 @@ namespace De.Hochstaetter.Fronius.Services
 
         private async Task<XmlDocument> GetXmlResponse(string request, IEnumerable<KeyValuePair<string, string>>? postVariables = null)
         {
-            await using var stream = await GetStreamResponse(request,postVariables);
+            await using var stream = await GetStreamResponse(request, postVariables);
             var result = new XmlDocument();
             result.Load(stream);
             return result;

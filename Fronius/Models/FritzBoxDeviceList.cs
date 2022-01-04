@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml.Serialization;
 using De.Hochstaetter.Fronius.Contracts;
 
@@ -28,5 +29,6 @@ public class FritzBoxDeviceList : BindableBase
 
     [XmlElement("device")] public List<FritzBoxDevice> Devices { get; } = new();
 
-    [XmlIgnore] public IEnumerable<IPowerMeter1P> DevicesWithPowerMeter => Devices.Where(d => d.PowerMeter != null);
+    [XmlIgnore] public List<IPowerMeter1P> DevicesWithPowerMeter => Devices.Where(d => d.PowerMeter != null).Cast<IPowerMeter1P>().ToList();
+    [XmlIgnore] public IEnumerable<ISwitchable> SwitchableDevices => Devices.Where(d => d.CanTurnOnOff).Cast<ISwitchable>().ToList();
 }

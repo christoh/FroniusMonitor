@@ -265,7 +265,7 @@
     <value>Real power</value>
   </data>
   <data name="ReactivePower" xml:space="preserve">
-    <value>Reactive PowerString</value>
+    <value>Reactive Power</value>
   </data>
   <data name="PhaseVoltage" xml:space="preserve">
     <value>Phase voltage</value>
@@ -274,7 +274,7 @@
     <value>Line voltage</value>
   </data>
   <data name="PowerFactor" xml:space="preserve">
-    <value>PowerString factor</value>
+    <value>Power factor</value>
   </data>
   <data name="OutOfBalance" xml:space="preserve">
     <value>Out of balance</value>
@@ -301,9 +301,18 @@
     <value>AC power</value>
   </data>
   <data name="PowerFlow" xml:space="preserve">
-    <value>PowerString flow</value>
+    <value>Power flow</value>
   </data>
   <data name="Efficiency" xml:space="preserve">
 	  <value>Efficiency</value>
+  </data>
+  <data name="On" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="Off" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="AccessDenied" xml:space="preserve">
+    <value>Access denied</value>
   </data>
 </root>

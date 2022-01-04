@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Markup;
 using System.Windows.Media;
@@ -109,3 +110,25 @@ public class SocToColor : ConverterBase
         return targetType.IsAssignableFrom(typeof(Color)) ? color : targetType.IsAssignableFrom(typeof(Brush)) ? new SolidColorBrush(color) : null;
     }
 }
+
+public abstract class BoolToAnything<T> : ConverterBase
+{
+    public T? True { get; set; }
+    public T? False { get; set; }
+    public T? Null { get; set; }
+
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is not bool boolValue ? Null : boolValue ? True : False;
+    }
+}
+
+public class Bool2Visibility : BoolToAnything<Visibility>
+{
+    public Bool2Visibility()
+    {
+        True = Visibility.Visible;
+        False=Null=Visibility.Collapsed;
+    }
+}
+

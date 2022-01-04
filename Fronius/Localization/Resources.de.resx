@@ -214,10 +214,10 @@
     <value>Stromspeicher</value>
   </data>
   <data name="StringControl" xml:space="preserve">
-    <value>Leitungssteuerung</value>
+    <value>Strangsteuerung</value>
   </data>
   <data name="StringControls" xml:space="preserve">
-    <value>Leitungssteuerungen</value>
+    <value>Strangsteuerungen</value>
   </data>
   <data name="Unknown" xml:space="preserve">
     <value>Unbekannt</value>
@@ -305,5 +305,14 @@
   </data>
   <data name="Efficiency" xml:space="preserve">
 	  <value>Effizienz</value>
+  </data>
+  <data name="On" xml:space="preserve">
+    <value>Ein</value>
+  </data>
+  <data name="Off" xml:space="preserve">
+    <value>Aus</value>
+  </data>
+  <data name="AccessDenied" xml:space="preserve">
+    <value>Zugriff verweigert</value>
   </data>
 </root>
