@@ -102,7 +102,7 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <c:PowerConsumer Width="119" PowerMeter="{Binding}" Margin="4,0,0,4"/>
+                            <c:PowerConsumer Width="119" Device="{Binding}" Margin="4,0,0,4"/>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

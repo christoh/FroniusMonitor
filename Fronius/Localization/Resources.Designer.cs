@@ -61,7 +61,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Access denied.
         /// </summary>
         public static string AccessDenied {
             get {
@@ -624,6 +624,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string StringControls {
             get {
                 return ResourceManager.GetString("StringControls", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        public static string Temperature {
+            get {
+                return ResourceManager.GetString("Temperature", resourceCulture);
             }
         }
         

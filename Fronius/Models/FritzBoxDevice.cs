@@ -7,6 +7,7 @@ namespace De.Hochstaetter.Fronius.Models;
 [Flags]
 public enum FritzBoxFeatures : uint
 {
+    None = 0,
     HanFunDevice = 1 << 0,
     Light = 1 << 2,
     AlarmSensor = 1 << 4,
@@ -25,7 +26,7 @@ public enum FritzBoxFeatures : uint
 }
 
 [XmlType("device")]
-public class FritzBoxDevice : BindableBase, IPowerMeter1P
+public class FritzBoxDevice : BindableBase, IPowerConsumer1P
 {
     private bool wasSwitched;
 
@@ -95,27 +96,7 @@ public class FritzBoxDevice : BindableBase, IPowerMeter1P
         set => Set(ref model, value);
     }
 
-    public bool CanTurnOnOff => SimpleSwitch != null || Switch != null;
-
-    public async Task TurnOnOff(bool turnOn)
-    {
-        if (WebClientService == null)
-        {
-            throw new InvalidOperationException("No WebClientService");
-        }
-
-        wasSwitched = true;
-        NotifyOfPropertyChange(nameof(ISwitchable.IsEnabled));
-
-        if (turnOn)
-        {
-            await WebClientService.TurnOnFritzBoxDevice(Ain).ConfigureAwait(false);
-        }
-        else
-        {
-            await WebClientService.TurnOffFritzBoxDevice(Ain).ConfigureAwait(false);
-        }
-    }
+    public bool CanSwitch => SimpleSwitch != null || Switch != null;
 
     private string displayName = string.Empty;
 
@@ -153,6 +134,14 @@ public class FritzBoxDevice : BindableBase, IPowerMeter1P
         set => Set(ref @switch, value);
     }
 
+    private FritzBoxLevel? levelControl;
+    [XmlElement("levelcontrol")]
+    public FritzBoxLevel? LevelControl
+    {
+        get => levelControl;
+        set => Set(ref levelControl, value);
+    }
+
     private FritzBoxSimpleSwitch? simpleSwitch;
 
     [XmlElement("simpleonoff")]
@@ -186,13 +175,47 @@ public class FritzBoxDevice : BindableBase, IPowerMeter1P
     public static double? GetDoubleValue(string? value, double factor = 1000d) => string.IsNullOrWhiteSpace(value) ? null : int.Parse(value, NumberStyles.Integer, CultureInfo.InvariantCulture) / factor;
 
     public override string ToString() => $"{Manufacturer} {Model}: {DisplayName}";
-    double? IPowerMeter1P.Temperature => TemperatureSensor?.Temperature;
+
+    double? ITemperatureSensor.TemperatureCelsius => TemperatureSensor?.Temperature;
     double? IPowerMeter1P.Frequency => null;
     double? IPowerMeter1P.EnergyKiloWattHours => PowerMeter?.EnergyKiloWattHours;
     double? IPowerMeter1P.Voltage => PowerMeter?.Voltage;
     double? IPowerMeter1P.PowerWatts => PowerMeter?.PowerWatts;
     bool IPowerMeter1P.CanReadPower => PowerMeter != null;
     bool? ISwitchable.IsTurnedOn => SimpleSwitch?.IsTurnedOn ?? Switch?.IsTurnedOn;
-    string? ISwitchable.Model => string.IsNullOrWhiteSpace(Manufacturer) ? Model : $"{Manufacturer} {Model}".Trim();
+    string? IPowerConsumer1P.Model => string.IsNullOrWhiteSpace(Manufacturer) ? Model : $"{Manufacturer} {Model}".Trim();
     bool ISwitchable.IsEnabled => !wasSwitched && IsPresent && (Switch is not { IsUiLocked: { } } || !Switch.IsUiLocked.Value);
+    bool IDimmable.IsEnabled => IsPresent && (Switch is not { IsUiLocked: { } } || !Switch.IsUiLocked.Value);
+    bool IDimmable.CanDim => (Features & FritzBoxFeatures.HasLevels) != FritzBoxFeatures.None;
+    double? IDimmable.Level => LevelControl?.Level;
+
+    public async Task TurnOnOff(bool turnOn)
+    {
+        if (WebClientService == null)
+        {
+            throw new InvalidOperationException("No WebClientService");
+        }
+
+        wasSwitched = true;
+        NotifyOfPropertyChange(nameof(ISwitchable.IsEnabled));
+
+        if (turnOn)
+        {
+            await WebClientService.TurnOnFritzBoxDevice(Ain).ConfigureAwait(false);
+        }
+        else
+        {
+            await WebClientService.TurnOffFritzBoxDevice(Ain).ConfigureAwait(false);
+        }
+    }
+
+    public async Task SetLevel(double level)
+    {
+        if (WebClientService == null)
+        {
+            throw new InvalidOperationException("No WebClientService");
+        }
+
+        await WebClientService.SetFritzBoxLevel(Ain, level).ConfigureAwait(false);
+    }
 }

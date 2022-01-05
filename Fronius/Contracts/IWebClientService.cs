@@ -21,5 +21,6 @@ namespace De.Hochstaetter.Fronius.Contracts
         Task<FritzBoxDeviceList> GetFritzBoxDevices();
         Task TurnOnFritzBoxDevice(string ain);
         Task TurnOffFritzBoxDevice(string ain);
+        Task SetFritzBoxLevel(string ain, double level);
     }
 }

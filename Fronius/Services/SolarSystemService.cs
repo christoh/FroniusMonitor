@@ -9,6 +9,7 @@ namespace De.Hochstaetter.Fronius.Services
         private Timer? timer;
         private int updateSemaphore;
         private int fritzBoxCounter;
+        private int suspendFritzBoxCounter;
 
         public event EventHandler<SolarDataEventArgs>? NewDataReceived;
 
@@ -23,17 +24,6 @@ namespace De.Hochstaetter.Fronius.Services
         {
             get => solarSystem;
             private set => Set(ref solarSystem, value);
-        }
-
-        public async Task Start(WebConnection inverterConnection, WebConnection fritzBoxConnection)
-        {
-            if (timer == null || SolarSystem == null)
-            {
-                Stop();
-            }
-
-            SolarSystem = await CreateSolarSystem(inverterConnection, fritzBoxConnection).ConfigureAwait(false);
-            timer = new Timer(TimerElapsed, null, 0, 1000);
         }
 
         private string lastConnectionError = string.Empty;
@@ -52,10 +42,36 @@ namespace De.Hochstaetter.Fronius.Services
             set => Set(ref isConnected, value);
         }
 
+        public async Task Start(WebConnection inverterConnection, WebConnection fritzBoxConnection)
+        {
+            if (timer == null || SolarSystem == null)
+            {
+                Stop();
+            }
+
+            SolarSystem = await CreateSolarSystem(inverterConnection, fritzBoxConnection).ConfigureAwait(false);
+            timer = new Timer(TimerElapsed, null, 0, 1000);
+        }
+
         public void Stop()
         {
             timer?.Dispose();
             timer = null;
+        }
+
+        public void SuspendPowerConsumers()
+        {
+            Interlocked.Increment(ref suspendFritzBoxCounter);
+        }
+
+        public void ResumePowerConsumers()
+        {
+            Interlocked.Decrement(ref suspendFritzBoxCounter);
+
+            if (suspendFritzBoxCounter < 0)
+            {
+                Interlocked.Exchange(ref suspendFritzBoxCounter, 0);
+            }
         }
 
         private async Task<SolarSystem> CreateSolarSystem(WebConnection inverterConnection, WebConnection fritzBoxConnection)
@@ -86,9 +102,11 @@ namespace De.Hochstaetter.Fronius.Services
                     case DeviceClass.Inverter:
                         inverterDevices = await webClientService.GetInverters().ConfigureAwait(false);
                         break;
+
                     case DeviceClass.Storage:
                         storageDevices = await webClientService.GetStorageDevices().ConfigureAwait(false);
                         break;
+
                     case DeviceClass.Meter:
                         smartMeterDevices = await webClientService.GetMeterDevices().ConfigureAwait(false);
                         break;
@@ -96,16 +114,18 @@ namespace De.Hochstaetter.Fronius.Services
 
                 foreach (var device in deviceGroup)
                 {
-                    var group = new DeviceGroup { DeviceClass = deviceGroup.Key };
+                    var group = new DeviceGroup {DeviceClass = deviceGroup.Key};
 
                     switch (deviceGroup.Key)
                     {
                         case DeviceClass.Inverter:
                             group.Devices.Add(inverterDevices?.Inverters.SingleOrDefault(i => i.Id == device.Id) ?? device);
                             break;
+
                         case DeviceClass.Storage:
                             group.Devices.Add(storageDevices?.Storages.SingleOrDefault(s => s.Id == device.Id) ?? device);
                             break;
+
                         case DeviceClass.Meter:
                             group.Devices.Add(smartMeterDevices?.SmartMeters.SingleOrDefault(s => s.Id == device.Id) ?? device);
                             break;
@@ -173,7 +193,7 @@ namespace De.Hochstaetter.Fronius.Services
 
                 try
                 {
-                    if (webClientService.FritzBoxConnection != null && (SolarSystem.FritzBox == null || fritzBoxCounter++ % 3 == 0))
+                    if (suspendFritzBoxCounter <= 0 && webClientService.FritzBoxConnection != null && (SolarSystem.FritzBox == null || fritzBoxCounter++ % 3 == 0))
                     {
                         SolarSystem.FritzBox = await webClientService.GetFritzBoxDevices().ConfigureAwait(false);
                     }

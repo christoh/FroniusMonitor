@@ -6,12 +6,10 @@ using System.Threading.Tasks;
 
 namespace De.Hochstaetter.Fronius.Contracts;
 
-public interface ISwitchable:IHaveDisplayName
+public interface ISwitchable
 {
-    bool IsPresent { get; }
     bool IsEnabled { get; }
     bool? IsTurnedOn { get; }
-    string? Model { get; }
-    bool CanTurnOnOff { get; }
+    bool CanSwitch { get; }
     Task TurnOnOff(bool turnOn);
 }

@@ -10,10 +10,17 @@
                 xmlns:contracts="clr-namespace:De.Hochstaetter.Fronius.Contracts;assembly=Fronius"
                 mc:Ignorable="d"
                 d:DesignHeight="75" d:DesignWidth="210">
+
+
+    <ContentControl.Resources>
+    </ContentControl.Resources>
+
+
     <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:PowerConsumer}}">
         <Border BorderBrush="DimGray" BorderThickness="1" Width="110">
             <Grid x:Name="BackgroundProvider" Background="LightGray">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
@@ -27,20 +34,33 @@
                     </Style>
                 </Grid.Resources>
                 <Viewbox Grid.Row="0">
-                    <TextBlock FontSize="8" TextAlignment="Center" Text="{Binding Path=PowerMeter.(contracts:ISwitchable.Model), FallbackValue='---'}" />
+                    <TextBlock FontSize="8" TextAlignment="Center" Text="{Binding Path=Device.(contracts:IPowerConsumer1P.Model), FallbackValue='---'}" />
                 </Viewbox>
                 <Viewbox Grid.Row="1">
-                    <TextBlock FontSize="8" TextAlignment="Center" Text="{Binding Path=PowerMeter.(contracts:IHaveDisplayName.DisplayName), FallbackValue=---}"/>
+                    <TextBlock FontSize="8" TextAlignment="Center" Text="{Binding Path=Device.(contracts:IHaveDisplayName.DisplayName), FallbackValue=---}"/>
                 </Viewbox>
 
-                <ToggleButton IsEnabled="{Binding Path=PowerMeter.(contracts:ISwitchable.IsEnabled), FallbackValue=False}"
-                              Visibility="{Binding Path=PowerMeter.(contracts:ISwitchable.CanTurnOnOff), Converter={co:Bool2Visibility}, FallbackValue=Visible}"
+                <ToggleButton IsEnabled="{Binding Path=Device.(contracts:ISwitchable.IsEnabled), FallbackValue=False}"
+                              Visibility="{Binding Path=Device.(contracts:ISwitchable.CanSwitch), Converter={co:Bool2Visibility}, FallbackValue=Visible}"
                               Click="OnPowerButtonClick"
                               Grid.Row="2" Height="7"
-                              IsChecked="{Binding Path=PowerMeter.(contracts:ISwitchable.IsTurnedOn), Mode=OneWay, FallbackValue={x:Null}}">
+                              IsChecked="{Binding Path=Device.(contracts:ISwitchable.IsTurnedOn), Mode=OneWay, FallbackValue={x:Null}}">
                 </ToggleButton>
 
-                <Grid Visibility="{Binding Path=PowerMeter.(contracts:IPowerMeter1P.CanReadPower), Converter={co:Bool2Visibility}, FallbackValue=Visible}" Grid.Row="3" Background="#B3DBC6" Margin="4">
+                <local:NonUpdatingSlider Grid.Row="3" Margin="0,4,0,0"
+                        Visibility="{Binding Path=Device.(contracts:IDimmable.CanDim), Converter={co:Bool2Visibility}, FallbackValue=Visible}"
+                        Minimum="0" Maximum="1" Value="{Binding Path=Device.(contracts:IDimmable.Level), Mode=OneWay, FallbackValue=0, TargetNullValue=0}"
+                        TickPlacement="TopLeft" TickFrequency=".1" Foreground="Black" IsSnapToTickEnabled="False"
+                        IsEnabled="{Binding Path=Device.(contracts:IDimmable.IsEnabled), FallbackValue=False}"
+                        ThumbDragCompleted="OnDimLevelChanged"
+                        Style="{StaticResource PowerConsumerSliderStyle}"
+                        >
+                    <Slider.LayoutTransform>
+                        <ScaleTransform ScaleX=".6" ScaleY="{Binding ScaleX, RelativeSource={RelativeSource Self}}"></ScaleTransform>
+                    </Slider.LayoutTransform>
+                </local:NonUpdatingSlider>
+
+                <Grid Visibility="{Binding Path=Device.(contracts:IPowerMeter1P.CanReadPower), Converter={co:Bool2Visibility}, FallbackValue=Visible}" Grid.Row="4" Background="#B3DBC6" Margin="4">
                     <Grid.Resources>
                         <Style TargetType="TextBlock">
                             <Setter Property="Foreground" Value="Black" />
@@ -62,25 +82,25 @@
 
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.Power}" />
                     <TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right">
-                        <Run Text="{Binding Path=PowerMeter.(contracts:IPowerMeter1P.PowerWatts), StringFormat=N1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, TargetNullValue=---, Mode=OneWay, FallbackValue=---}" />
+                        <Run Text="{Binding Path=Device.(contracts:IPowerMeter1P.PowerWatts), StringFormat=N1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, TargetNullValue=---, Mode=OneWay, FallbackValue=---}" />
                     </TextBlock>
                     <TextBlock Grid.Row="0" Grid.Column="2" Text=" W" />
 
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.Voltage}" />
                     <TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right">
-                        <Run Text="{Binding Path=PowerMeter.(contracts:IPowerMeter1P.Voltage), StringFormat=N1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, TargetNullValue=---, Mode=OneWay, FallbackValue=---}" />
+                        <Run Text="{Binding Path=Device.(contracts:IPowerMeter1P.Voltage), StringFormat=N1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, TargetNullValue=---, Mode=OneWay, FallbackValue=---}" />
                     </TextBlock>
                     <TextBlock Grid.Row="1" Grid.Column="2" Text=" V" />
 
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static p:Resources.Energy}" />
                     <TextBlock Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right">
-                        <Run Text="{Binding Path=PowerMeter.(contracts:IPowerMeter1P.EnergyKiloWattHours), StringFormat=N1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, Mode=OneWay,TargetNullValue=---, FallbackValue=---}" />
+                        <Run Text="{Binding Path=Device.(contracts:IPowerMeter1P.EnergyKiloWattHours), StringFormat=N1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, Mode=OneWay,TargetNullValue=---, FallbackValue=---}" />
                     </TextBlock>
                     <TextBlock Grid.Row="2" Grid.Column="2" Text=" kWh" />
 
-                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Temperature" />
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="{x:Static p:Resources.Temperature}" />
                     <TextBlock Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right">
-                        <Run Text="{Binding Path=PowerMeter.(contracts:IPowerMeter1P.Temperature), StringFormat=N1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, Mode=OneWay,TargetNullValue=---, FallbackValue=---}" />
+                        <Run Text="{Binding Path=Device.(contracts:ITemperatureSensor.TemperatureCelsius), StringFormat=N1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, Mode=OneWay,TargetNullValue=---, FallbackValue=---}" />
                     </TextBlock>
                     <TextBlock Grid.Row="3" Grid.Column="2" Text=" °C" />
 

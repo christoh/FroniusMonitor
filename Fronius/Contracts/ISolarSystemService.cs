@@ -14,5 +14,7 @@ namespace De.Hochstaetter.Fronius.Contracts
 
         Task Start(WebConnection inverterConnection, WebConnection fritzBoxConnection);
         void Stop();
+        void SuspendPowerConsumers();
+        void ResumePowerConsumers();
     }
 }

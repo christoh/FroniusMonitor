@@ -315,4 +315,7 @@
   <data name="AccessDenied" xml:space="preserve">
     <value>Access denied</value>
   </data>
+  <data name="Temperature" xml:space="preserve">
+    <value>Temperature</value>
+  </data>
 </root>

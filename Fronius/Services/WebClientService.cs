@@ -321,8 +321,8 @@ namespace De.Hochstaetter.Fronius.Services
 
             var dict = new Dictionary<string, string>
             {
-                { "username", FritzBoxConnection.UserName },
-                { "response", response }
+                {"username", FritzBoxConnection.UserName},
+                {"response", response}
             };
 
             document = await GetXmlResponse("login_sid.lua", dict);
@@ -347,13 +347,20 @@ namespace De.Hochstaetter.Fronius.Services
         public async Task TurnOnFritzBoxDevice(string ain)
         {
             ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
-            await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setswitchon").ConfigureAwait(false);
+            using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setswitchon").ConfigureAwait(false);
         }
 
         public async Task TurnOffFritzBoxDevice(string ain)
         {
             ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
-            await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setswitchoff").ConfigureAwait(false);
+            using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setswitchoff").ConfigureAwait(false);
+        }
+
+        public async Task SetFritzBoxLevel(string ain, double level)
+        {
+            var byteLevel = Math.Max((int)Math.Round(level * 255, MidpointRounding.AwayFromZero), 2);
+            ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
+            using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setlevel&level={byteLevel}").ConfigureAwait(false);
         }
 
         private async Task<HttpResponseMessage> GetFritzBoxResponse(string request, IEnumerable<KeyValuePair<string, string>>? postVariables = null)
@@ -371,6 +378,7 @@ namespace De.Hochstaetter.Fronius.Services
                 {
                     throw new NullReferenceException(Resources.NoSystemConnection);
                 }
+
                 var requestString = $"{FritzBoxConnection.BaseUrl}/{request}{(fritzBoxSid == null ? string.Empty : $"&sid={fritzBoxSid}")}";
 
                 using var client = new HttpClient();
@@ -386,6 +394,7 @@ namespace De.Hochstaetter.Fronius.Services
                 response.EnsureSuccessStatusCode();
                 break;
             }
+
             return response;
         }
 
@@ -403,7 +412,7 @@ namespace De.Hochstaetter.Fronius.Services
 
         private async Task<XmlDocument> GetXmlResponse(string request, IEnumerable<KeyValuePair<string, string>>? postVariables = null)
         {
-            await using var stream = await GetStreamResponse(request, postVariables);
+            await using var stream = await GetStreamResponse(request, postVariables).ConfigureAwait(false);
             var result = new XmlDocument();
             result.Load(stream);
             return result;
