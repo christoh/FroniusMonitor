@@ -379,7 +379,7 @@ namespace De.Hochstaetter.Fronius.Services
         {
             { 358, new [] { 180,112,54 } },
             {  35, new [] { 214,140,72 } },
-            {  52, new [] { 153,102,51}},
+            {  52, new [] { 153,102,51 } },
             {  92, new [] { 123, 79,38 } },
             { 120, new [] { 160, 82,38 } },
             { 160, new [] { 145, 84,41 } },
@@ -398,22 +398,6 @@ namespace De.Hochstaetter.Fronius.Services
             ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
             using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setcolor&hue={intHue}&saturation={intSaturation}&duration=0").ConfigureAwait(false);
         }
-
-        /*
-colors = {
-    "red"       : {"hue" : 358, "sat" : [180,112,54], "val" : [255,255,255] },
-    "orange"    : {"hue" : 35,  "sat" : [214,140,72], "val" : [252,252,255] },
-    "yellow"    : {"hue" : 52,  "sat" : [153,102,51], "val" : [255,255,255] },
-    "lime"      : {"hue" : 92,  "sat" : [123, 79,38], "val" : [248,250,252] },
-    "green"     : {"hue" : 120, "sat" : [160, 82,38], "val" : [220,232,242] },
-    "turquoise" : {"hue" : 160, "sat" : [145, 84,41], "val" : [235,242,248] },
-    "cyan"      : {"hue" : 195, "sat" : [179,118,59], "val" : [255,255,255] },
-    "lightblue" : {"hue" : 212, "sat" : [169,110,56], "val" : [252,252,255] },
-    "blue"      : {"hue" : 225, "sat" : [204,135,67], "val" : [255,255,255] },
-    "purple"    : {"hue" : 266, "sat" : [169,110,54], "val" : [250,250,252] },
-    "magenta"   : {"hue" : 296, "sat" : [140, 92,46], "val" : [250,252,255] },
-    "pink"      : {"hue" : 335, "sat" : [180,107,51], "val" : [255,248,250] }
-}         */
 
         private async Task<HttpResponseMessage> GetFritzBoxResponse(string request, IEnumerable<KeyValuePair<string, string>>? postVariables = null)
         {
