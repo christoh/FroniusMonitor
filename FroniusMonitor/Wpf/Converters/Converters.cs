@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Markup;
 using System.Windows.Media;
@@ -128,7 +129,39 @@ public class Bool2Visibility : BoolToAnything<Visibility>
     public Bool2Visibility()
     {
         True = Visibility.Visible;
-        False=Null=Visibility.Collapsed;
+        False = Null = Visibility.Collapsed;
+    }
+}
+
+public class GetTemperatureTicks : ConverterBase
+{
+    private readonly double tickDistance;
+
+    public GetTemperatureTicks(double tickDistance)
+    {
+        this.tickDistance = tickDistance;
+    }
+
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+
+        if (value is not Slider slider)
+        {
+            return null;
+        }
+
+        var list = new DoubleCollection { slider.Minimum };
+
+        for (var current = Round(slider.Minimum); current < slider.Maximum; current += tickDistance)
+        {
+            list.Add(current);
+        }
+
+        list.Add(slider.Maximum);
+        return list;
+
+
+        double Round(double i) => Math.Ceiling(i / tickDistance) * tickDistance;
     }
 }
 

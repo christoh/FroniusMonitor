@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Net;
 using System.Security.Cryptography;
@@ -338,6 +339,9 @@ namespace De.Hochstaetter.Fronius.Services
         public async Task<FritzBoxDeviceList> GetFritzBoxDevices()
         {
             await using var stream = await GetStreamResponse($"webservices/homeautoswitch.lua?switchcmd=getdevicelistinfos").ConfigureAwait(false) ?? throw new InvalidDataException();
+            //var m = (MemoryStream)stream;
+            //var x = Encoding.UTF8.GetString(m.ToArray());
+            //Debugger.Break();
             var serializer = new XmlSerializer(typeof(FritzBoxDeviceList));
             var result = serializer.Deserialize(stream) as FritzBoxDeviceList ?? throw new InvalidDataException();
             result.Devices.Apply(d => d.WebClientService = this);
@@ -358,10 +362,58 @@ namespace De.Hochstaetter.Fronius.Services
 
         public async Task SetFritzBoxLevel(string ain, double level)
         {
-            var byteLevel = Math.Max((int)Math.Round(level * 255, MidpointRounding.AwayFromZero), 2);
+            var byteLevel = Math.Max((byte)Math.Round(level * 255, MidpointRounding.AwayFromZero), (byte)2);
             ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
             using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setlevel&level={byteLevel}").ConfigureAwait(false);
         }
+
+        public async Task SetFritzBoxColorTemperature(string ain, double temperatureKelvin)
+        {
+            var intTemperature = (int)Math.Round(temperatureKelvin, MidpointRounding.AwayFromZero);
+            ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
+            using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setcolortemperature&temperature={intTemperature}&duration=0").ConfigureAwait(false);
+        }
+
+
+        private static readonly Dictionary<int, IEnumerable<int>> allowedFritzBoxColors = new()
+        {
+            { 358, new [] { 180,112,54 } },
+            {  35, new [] { 214,140,72 } },
+            {  52, new [] { 153,102,51}},
+            {  92, new [] { 123, 79,38 } },
+            { 120, new [] { 160, 82,38 } },
+            { 160, new [] { 145, 84,41 } },
+            { 195, new [] { 179,118,59 } },
+            { 212, new [] { 169,110,56 } },
+            { 225, new [] { 204,135,67 } },
+            { 266, new [] { 169,110,54 } },
+            { 296, new [] { 140, 92,46 } },
+            { 335, new [] { 180,107,51 } },
+        };
+
+        public async Task SetFritzBoxColor(string ain, double hueDegrees, double saturation)
+        {
+            var intHue = allowedFritzBoxColors.Keys.OrderBy(k=>Math.Min(Math.Abs(hueDegrees-k),Math.Abs(hueDegrees+360-k))).First();
+            var intSaturation = allowedFritzBoxColors[intHue].OrderBy(s=>Math.Abs(s-saturation*255)).First();
+            ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
+            using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setcolor&hue={intHue}&saturation={intSaturation}&duration=0").ConfigureAwait(false);
+        }
+
+        /*
+colors = {
+    "red"       : {"hue" : 358, "sat" : [180,112,54], "val" : [255,255,255] },
+    "orange"    : {"hue" : 35,  "sat" : [214,140,72], "val" : [252,252,255] },
+    "yellow"    : {"hue" : 52,  "sat" : [153,102,51], "val" : [255,255,255] },
+    "lime"      : {"hue" : 92,  "sat" : [123, 79,38], "val" : [248,250,252] },
+    "green"     : {"hue" : 120, "sat" : [160, 82,38], "val" : [220,232,242] },
+    "turquoise" : {"hue" : 160, "sat" : [145, 84,41], "val" : [235,242,248] },
+    "cyan"      : {"hue" : 195, "sat" : [179,118,59], "val" : [255,255,255] },
+    "lightblue" : {"hue" : 212, "sat" : [169,110,56], "val" : [252,252,255] },
+    "blue"      : {"hue" : 225, "sat" : [204,135,67], "val" : [255,255,255] },
+    "purple"    : {"hue" : 266, "sat" : [169,110,54], "val" : [250,250,252] },
+    "magenta"   : {"hue" : 296, "sat" : [140, 92,46], "val" : [250,252,255] },
+    "pink"      : {"hue" : 335, "sat" : [180,107,51], "val" : [255,248,250] }
+}         */
 
         private async Task<HttpResponseMessage> GetFritzBoxResponse(string request, IEnumerable<KeyValuePair<string, string>>? postVariables = null)
         {

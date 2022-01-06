@@ -22,5 +22,7 @@ namespace De.Hochstaetter.Fronius.Contracts
         Task TurnOnFritzBoxDevice(string ain);
         Task TurnOffFritzBoxDevice(string ain);
         Task SetFritzBoxLevel(string ain, double level);
+        Task SetFritzBoxColorTemperature(string ain, double temperatureKelvin);
+        Task SetFritzBoxColor(string ain, double hueDegrees, double saturation);
     }
 }

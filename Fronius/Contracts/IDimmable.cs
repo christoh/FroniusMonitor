@@ -11,6 +11,6 @@ namespace De.Hochstaetter.Fronius.Contracts
         bool CanDim { get; }
         double? Level { get; }
         Task SetLevel(double level);
-        bool IsEnabled { get; }
+        bool IsDimmingEnabled { get; }
     }
 }

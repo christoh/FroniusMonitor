@@ -169,13 +169,15 @@ public class FritzBoxDevice : BindableBase, IPowerConsumer1P
         set => Set(ref temperatureSensor, value);
     }
 
-    public static bool? GetBoolState(string? state) => state switch { "1" => true, "0" => false, _ => null };
-    public static string GetStringState(bool? state) => state switch { true => "1", false => "0", null => string.Empty };
-    public static string GetStringValue(double? value, double factor = 1000d) => !value.HasValue ? string.Empty : ((int)Math.Round(value.Value * factor, MidpointRounding.AwayFromZero)).ToString(CultureInfo.InvariantCulture);
-    public static double? GetDoubleValue(string? value, double factor = 1000d) => string.IsNullOrWhiteSpace(value) ? null : int.Parse(value, NumberStyles.Integer, CultureInfo.InvariantCulture) / factor;
+    private FritzBoxColorControl? color;
+    [XmlElement("colorcontrol")]
+    public FritzBoxColorControl? Color
+    {
+        get => color;
+        set => Set(ref color, value);
+    }
 
-    public override string ToString() => $"{Manufacturer} {Model}: {DisplayName}";
-
+    private bool IsPresentAndUnlocked => IsPresent && (Switch is not { IsUiLocked: { } } || !Switch.IsUiLocked.Value);
     double? ITemperatureSensor.TemperatureCelsius => TemperatureSensor?.Temperature;
     double? IPowerMeter1P.Frequency => null;
     double? IPowerMeter1P.EnergyKiloWattHours => PowerMeter?.EnergyKiloWattHours;
@@ -184,10 +186,37 @@ public class FritzBoxDevice : BindableBase, IPowerConsumer1P
     bool IPowerMeter1P.CanReadPower => PowerMeter != null;
     bool? ISwitchable.IsTurnedOn => SimpleSwitch?.IsTurnedOn ?? Switch?.IsTurnedOn;
     string? IPowerConsumer1P.Model => string.IsNullOrWhiteSpace(Manufacturer) ? Model : $"{Manufacturer} {Model}".Trim();
-    bool ISwitchable.IsEnabled => !wasSwitched && IsPresent && (Switch is not { IsUiLocked: { } } || !Switch.IsUiLocked.Value);
-    bool IDimmable.IsEnabled => IsPresent && (Switch is not { IsUiLocked: { } } || !Switch.IsUiLocked.Value);
+    bool ISwitchable.IsSwitchingEnabled => !wasSwitched && IsPresentAndUnlocked && ((ISwitchable)this).CanSwitch;
+    bool IDimmable.IsDimmingEnabled => IsPresentAndUnlocked && ((IDimmable)this).CanDim;
     bool IDimmable.CanDim => (Features & FritzBoxFeatures.HasLevels) != FritzBoxFeatures.None;
     double? IDimmable.Level => LevelControl?.Level;
+
+    bool IHsvColorControl.HasHsvColorControl => (Features & FritzBoxFeatures.ColoredLight) != FritzBoxFeatures.None
+                                                && Color is {SupportedModes: { }}
+                                                && (Color.SupportedModes.Value & FritzBoxColorMode.Hsv) != FritzBoxColorMode.None;
+
+    bool IHsvColorControl.IsHsvEnabled => IsPresentAndUnlocked && ((IHsvColorControl)this).HasHsvColorControl;
+    double? IHsvColorControl.HueDegrees => Color?.HueDegrees;
+    double? IHsvColorControl.Saturation => Color?.SaturationAbsolute / 255;
+    double? IHsvColorControl.Value => LevelControl?.Level;
+
+    bool IColorTemperatureControl.HasColorTemperatureControl => (Features & FritzBoxFeatures.ColoredLight) != FritzBoxFeatures.None
+                                                                && Color is {SupportedModes: { }}
+                                                                && (Color.SupportedModes.Value & FritzBoxColorMode.Temperature) != FritzBoxColorMode.None;
+
+    bool IColorTemperatureControl.IsColorTemperatureEnabled => IsPresentAndUnlocked && ((IColorTemperatureControl)this).HasColorTemperatureControl;
+
+    double? IColorTemperatureControl.ColorTemperatureKelvin => Color?.TemperatureKelvin;
+    double IColorTemperatureControl.MinTemperatureKelvin => 2700;
+    double IColorTemperatureControl.MaxTemperatureKelvin => 6500;
+
+    public static bool? GetBoolState(string? state) => state switch { "1" => true, "0" => false, _ => null };
+    public static string GetStringState(bool? state) => state switch { true => "1", false => "0", null => string.Empty };
+    public static string GetStringValue(double? value, double factor = 1000d) => !value.HasValue ? string.Empty : ((int)Math.Round(value.Value * factor, MidpointRounding.AwayFromZero)).ToString(CultureInfo.InvariantCulture);
+    public static double? GetDoubleValue(string? value, double factor = 1000d) => string.IsNullOrWhiteSpace(value) ? null : int.Parse(value, NumberStyles.Integer, CultureInfo.InvariantCulture) / factor;
+    public static uint? GetUintValue(string? value) => string.IsNullOrWhiteSpace(value) ? null : uint.Parse(value, NumberStyles.Integer, CultureInfo.InvariantCulture);
+
+    public override string ToString() => $"{Manufacturer} {Model}: {DisplayName}";
 
     public async Task TurnOnOff(bool turnOn)
     {
@@ -197,7 +226,7 @@ public class FritzBoxDevice : BindableBase, IPowerConsumer1P
         }
 
         wasSwitched = true;
-        NotifyOfPropertyChange(nameof(ISwitchable.IsEnabled));
+        NotifyOfPropertyChange(nameof(ISwitchable.IsSwitchingEnabled));
 
         if (turnOn)
         {
@@ -217,5 +246,26 @@ public class FritzBoxDevice : BindableBase, IPowerConsumer1P
         }
 
         await WebClientService.SetFritzBoxLevel(Ain, level).ConfigureAwait(false);
+    }
+
+    public async Task SetHsv(double hueDegrees, double saturation, double value)
+    {
+        if (WebClientService == null)
+        {
+            throw new InvalidOperationException("No WebClientService");
+        }
+
+        await WebClientService.SetFritzBoxColor(Ain, hueDegrees, saturation).ConfigureAwait(false);
+        await WebClientService.SetFritzBoxLevel(Ain, value).ConfigureAwait(false);
+    }
+
+    public async Task SetColorTemperature(double colorTemperatureKelvin)
+    {
+        if (WebClientService == null)
+        {
+            throw new InvalidOperationException("No WebClientService");
+        }
+
+        await WebClientService.SetFritzBoxColorTemperature(Ain, colorTemperatureKelvin).ConfigureAwait(false);
     }
 }

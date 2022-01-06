@@ -1,8 +1,10 @@
-﻿using System.Xml.Serialization;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Xml.Serialization;
 
 namespace De.Hochstaetter.Fronius.Models
 {
     [XmlType("levelcontrol")]
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public class FritzBoxLevel : BindableBase
     {
         [XmlElement("level")]
@@ -24,7 +26,7 @@ namespace De.Hochstaetter.Fronius.Models
         public double? Level
         {
             get => level;
-            set => Set(ref level, value);
+            set => Set(ref level, value,()=>NotifyOfPropertyChange(nameof(LevelString)));
         }
 
         private double? levelAbsolute;
@@ -32,7 +34,7 @@ namespace De.Hochstaetter.Fronius.Models
         public double? LevelAbsolute
         {
             get => levelAbsolute;
-            set => Set(ref levelAbsolute, value);
+            set => Set(ref levelAbsolute, value,()=>NotifyOfPropertyChange(nameof(LevelAbsoluteString)));
         }
     }
 }

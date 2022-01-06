@@ -8,6 +8,7 @@
                 xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
                 xmlns:gl="clr-namespace:System.Globalization;assembly=System.Runtime"
                 xmlns:contracts="clr-namespace:De.Hochstaetter.Fronius.Contracts;assembly=Fronius"
+                xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
                 mc:Ignorable="d"
                 d:DesignHeight="75" d:DesignWidth="210">
 
@@ -20,6 +21,9 @@
         <Border BorderBrush="DimGray" BorderThickness="1" Width="110">
             <Grid x:Name="BackgroundProvider" Background="LightGray">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
@@ -40,7 +44,7 @@
                     <TextBlock FontSize="8" TextAlignment="Center" Text="{Binding Path=Device.(contracts:IHaveDisplayName.DisplayName), FallbackValue=---}"/>
                 </Viewbox>
 
-                <ToggleButton IsEnabled="{Binding Path=Device.(contracts:ISwitchable.IsEnabled), FallbackValue=False}"
+                <ToggleButton IsEnabled="{Binding Path=Device.(contracts:ISwitchable.IsSwitchingEnabled), FallbackValue=False}"
                               Visibility="{Binding Path=Device.(contracts:ISwitchable.CanSwitch), Converter={co:Bool2Visibility}, FallbackValue=Visible}"
                               Click="OnPowerButtonClick"
                               Grid.Row="2" Height="7"
@@ -48,19 +52,57 @@
                 </ToggleButton>
 
                 <local:NonUpdatingSlider Grid.Row="3" Margin="0,4,0,0"
-                        Visibility="{Binding Path=Device.(contracts:IDimmable.CanDim), Converter={co:Bool2Visibility}, FallbackValue=Visible}"
-                        Minimum="0" Maximum="1" Value="{Binding Path=Device.(contracts:IDimmable.Level), Mode=OneWay, FallbackValue=0, TargetNullValue=0}"
-                        TickPlacement="TopLeft" TickFrequency=".1" Foreground="Black" IsSnapToTickEnabled="False"
-                        IsEnabled="{Binding Path=Device.(contracts:IDimmable.IsEnabled), FallbackValue=False}"
-                        ThumbDragCompleted="OnDimLevelChanged"
-                        Style="{StaticResource PowerConsumerSliderStyle}"
-                        >
-                    <Slider.LayoutTransform>
-                        <ScaleTransform ScaleX=".6" ScaleY="{Binding ScaleX, RelativeSource={RelativeSource Self}}"></ScaleTransform>
-                    </Slider.LayoutTransform>
+                                         Visibility="{Binding Path=Device.(contracts:IDimmable.CanDim), Converter={co:Bool2Visibility}, FallbackValue=Visible}"
+                                         Minimum="0" Maximum="1" Value="{Binding Path=Device.(contracts:IDimmable.Level), Mode=OneWay, FallbackValue=0, TargetNullValue=0}"
+                                         TickPlacement="TopLeft" TickFrequency=".1" Foreground="Black" IsSnapToTickEnabled="False"
+                                         IsEnabled="{Binding Path=Device.(contracts:IDimmable.IsDimmingEnabled), FallbackValue=False}"
+                                         ThumbDragCompleted="OnDimLevelChanged"
+                                         Style="{StaticResource PowerConsumerSliderStyle}"
+                />
+
+                <local:NonUpdatingSlider Grid.Row="4" Margin="0,4,0,0"
+                                         Visibility="{Binding Path=Device.(contracts:IColorTemperatureControl.HasColorTemperatureControl), Converter={co:Bool2Visibility}, FallbackValue=Visible}"
+                                         Minimum="{Binding Path=Device.(contracts:IColorTemperatureControl.MinTemperatureKelvin), Mode=OneWay, FallbackValue=2700}"
+                                         Maximum="{Binding Path=Device.(contracts:IColorTemperatureControl.MaxTemperatureKelvin), Mode=OneWay, FallbackValue=6500}"
+                                         Value="{Binding Path=Device.(contracts:IColorTemperatureControl.ColorTemperatureKelvin), Mode=OneWay, FallbackValue=0, TargetNullValue=0}"
+                                         TickPlacement="TopLeft"
+                                         Ticks="{Binding RelativeSource={RelativeSource Self}, Converter={co:GetTemperatureTicks 500}}"
+                                         Foreground="Black" IsSnapToTickEnabled="False"
+                                         IsEnabled="{Binding Path=Device.(contracts:IColorTemperatureControl.IsColorTemperatureEnabled), FallbackValue=False}"
+                                         Style="{StaticResource PowerConsumerSliderStyle}"
+                                         ThumbDragCompleted="OnColorTemperatureChanged"/>
+
+                <local:NonUpdatingSlider Grid.Row="5" Margin="0,4,0,0"
+                                         Visibility="{Binding Path=Device.(contracts:IHsvColorControl.HasHsvColorControl), Converter={co:Bool2Visibility}, FallbackValue=Visible}"
+                                         Minimum="0" Maximum="360" TickPlacement="TopLeft" TickFrequency="30" Foreground="Black" IsSnapToTickEnabled="False"
+                                         Value="{Binding Path=Device.(contracts:IHsvColorControl.HueDegrees), Mode=OneWay, FallbackValue=0, TargetNullValue=0}"
+                                         IsEnabled="{Binding Path=Device.(contracts:IHsvColorControl.IsHsvEnabled), FallbackValue=False}"
+                                         Style="{StaticResource PowerConsumerSliderStyle}"
+                                         ThumbDragCompleted="OnHueChanged">
+                    <local:NonUpdatingSlider.Resources>
+                        <LinearGradientBrush x:Key="TrackBackground" StartPoint="0,0" EndPoint="1,0" MappingMode="RelativeToBoundingBox">
+                            <GradientStop Color="Red" Offset="0"></GradientStop>
+                            <GradientStop Color="Yellow" Offset=".16667"></GradientStop>
+                            <GradientStop Color="#00ff00" Offset="0.3333"></GradientStop>
+                            <GradientStop Color="#00ffff" Offset="0.5"></GradientStop>
+                            <GradientStop Color="Blue" Offset=".666667"></GradientStop>
+                            <GradientStop Color="#ff00ff" Offset=".83333333333"></GradientStop>
+                            <GradientStop Color="Red" Offset="1"></GradientStop>
+                        </LinearGradientBrush>
+                    </local:NonUpdatingSlider.Resources>
                 </local:NonUpdatingSlider>
 
-                <Grid Visibility="{Binding Path=Device.(contracts:IPowerMeter1P.CanReadPower), Converter={co:Bool2Visibility}, FallbackValue=Visible}" Grid.Row="4" Background="#B3DBC6" Margin="4">
+                <local:NonUpdatingSlider Grid.Row="6" Margin="0,4,0,0"
+                                         Visibility="{Binding Path=Device.(contracts:IHsvColorControl.HasHsvColorControl), Converter={co:Bool2Visibility}, FallbackValue=Visible}"
+                                         Minimum="0" Maximum="1" TickPlacement="TopLeft" TickFrequency=".1" Foreground="Black" IsSnapToTickEnabled="False"
+                                         Value="{Binding Path=Device.(contracts:IHsvColorControl.Saturation), Mode=OneWay, FallbackValue=0, TargetNullValue=0}"
+                                         IsEnabled="{Binding Path=Device.(contracts:IHsvColorControl.IsHsvEnabled), FallbackValue=False}"
+                                         Style="{StaticResource PowerConsumerSliderStyle}"
+                                         ThumbDragCompleted="OnSaturationChanged"
+                                         
+                />
+
+                <Grid Visibility="{Binding Path=Device.(contracts:IPowerMeter1P.CanReadPower), Converter={co:Bool2Visibility}, FallbackValue=Visible}" Grid.Row="7" Background="#B3DBC6" Margin="4">
                     <Grid.Resources>
                         <Style TargetType="TextBlock">
                             <Setter Property="Foreground" Value="Black" />
