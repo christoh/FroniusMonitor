@@ -183,7 +183,7 @@ public class FritzBoxDevice : BindableBase, IPowerConsumer1P
     double? IPowerMeter1P.EnergyKiloWattHours => PowerMeter?.EnergyKiloWattHours;
     double? IPowerMeter1P.Voltage => PowerMeter?.Voltage;
     double? IPowerMeter1P.PowerWatts => PowerMeter?.PowerWatts;
-    bool IPowerMeter1P.CanReadPower => PowerMeter != null;
+    bool IPowerMeter1P.CanMeasurePower => (Features & FritzBoxFeatures.PowerMeter) != FritzBoxFeatures.None;
     bool? ISwitchable.IsTurnedOn => SimpleSwitch?.IsTurnedOn ?? Switch?.IsTurnedOn;
     string? IPowerConsumer1P.Model => string.IsNullOrWhiteSpace(Manufacturer) ? Model : $"{Manufacturer} {Model}".Trim();
     bool ISwitchable.IsSwitchingEnabled => !wasSwitched && IsPresentAndUnlocked && ((ISwitchable)this).CanSwitch;

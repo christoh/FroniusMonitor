@@ -9,6 +9,8 @@ namespace De.Hochstaetter.FroniusMonitor;
 
 public partial class App
 {
+    public const double ZoomFactor = 1.025;
+
     public static readonly IUnityContainer Container = new UnityContainer();
 
     public static Settings Settings { get; set; } = new();

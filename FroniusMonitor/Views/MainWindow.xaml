@@ -4,20 +4,15 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:De.Hochstaetter.FroniusMonitor.ViewModels"
-        xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
         mc:Ignorable="d"
-        Title="{x:Static p:Resources.AppName}" Height="600" Width="850"
+        Title="{x:Static p:Resources.AppName}" Height="810" Width="1440"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
-        xmlns:gl="clr-namespace:System.Globalization;assembly=System.Globalization"
-        xmlns:m="clr-namespace:De.Hochstaetter.Fronius.Models;assembly=Fronius"
         xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
         xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
-        xmlns:images="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
-        xmlns:sys="clr-namespace:System;assembly=System.Runtime">
-    <Grid Margin="16" >
+        xmlns:images="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images">
+    <Grid Margin="16">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
@@ -25,36 +20,36 @@
         <Viewbox Grid.Column="0">
             <Grid Height="500">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="200"/>
-                    <RowDefinition Height="100"/>
-                    <RowDefinition Height="200"/>
+                    <RowDefinition Height="200" />
+                    <RowDefinition Height="100" />
+                    <RowDefinition Height="200" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <Grid Grid.Row="0" Grid.Column="0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
 
                     <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
-                        <images:SolarPanel Width="80" Foreground="#004000" VerticalAlignment="Top" Margin="0,10,0,0"/>
+                        <images:SolarPanel Width="80" Foreground="#004000" VerticalAlignment="Top" Margin="0,10,0,0" />
 
                         <c:PowerFlowArrow VerticalAlignment="Top" Fill="#ffd000" Margin="15,0"
-                                          Power="{Binding SolarSystemService.SolarSystem.PowerFlow.SolarPower, FallbackValue={x:Null}}"/>
+                                          Power="{Binding SolarSystemService.SolarSystem.PowerFlow.SolarPower, FallbackValue={x:Null}}" />
 
-                        <c:InverterControl Height="200" Inverter="{Binding SolarSystemService.SolarSystem.PrimaryInverter, FallbackValue={x:Null}}"/>
+                        <c:InverterControl Height="200" Inverter="{Binding SolarSystemService.SolarSystem.PrimaryInverter, FallbackValue={x:Null}}" />
 
-                        <c:PowerFlowArrow x:Name="LoadArrow" VerticalAlignment="Top" Fill="#ffd000" HasRightPlacement="True" DefaultsToOutgoing="True"
-                                          Margin="25,0,10,0" Power="{Binding SolarSystemService.SolarSystem.PowerFlow.LoadPower, FallbackValue={x:Null}}"/>
+                        <c:PowerFlowArrow x:Name="LoadArrow" VerticalAlignment="Top" Fill="Transparent" HasRightPlacement="True" DefaultsToOutgoing="True"
+                                          Margin="25,0,10,0" Power="{Binding SolarSystemService.SolarSystem.PowerFlow.LoadPower, FallbackValue={x:Null}}" />
 
-                        <images:House Width="80" Foreground="Black" VerticalAlignment="Top" Margin="0,15,0,0"/>
+                        <images:House Width="80" Foreground="Black" VerticalAlignment="Top" Margin="0,15,0,0" />
                     </StackPanel>
                 </Grid>
 
@@ -62,56 +57,58 @@
                     <StackPanel Orientation="Horizontal" Margin="100,-40,0,0">
 
                         <c:PowerFlowArrow Angle="-30" Fill="LightGray"
-                                          Power="{Binding SolarSystemService.SolarSystem.PowerFlow.GridPower, FallbackValue={x:Null}}"/>
+                                          Power="{Binding SolarSystemService.SolarSystem.PowerFlow.GridPower, FallbackValue={x:Null}}" />
 
                         <c:PowerFlowArrow Angle="30" Margin="200,0,0,0" Fill="LightGreen" HasRightPlacement="True"
-                                          Power="{Binding SolarSystemService.SolarSystem.PowerFlow.StoragePower, FallbackValue={x:Null}}"/>
+                                          Power="{Binding SolarSystemService.SolarSystem.PowerFlow.StoragePower, FallbackValue={x:Null}}" />
 
                     </StackPanel>
                 </Grid>
 
-                <Grid Grid.Column="0" Grid.Row="2" x:Name="LowerGrid" >
+                <Grid Grid.Column="0" Grid.Row="2" x:Name="LowerGrid">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <c:PowerMeterClassic Height="200" HorizontalAlignment="Left" Grid.Column="0" SmartMeter="{Binding SolarSystemService.SolarSystem.PrimaryMeter, FallbackValue={x:Null}}"/>
-                    <c:SmartMeterControl Height="200" HorizontalAlignment="Left" Grid.Column="1" Margin="10,0,0,0" SmartMeter="{Binding SolarSystemService.SolarSystem.PrimaryMeter, FallbackValue={x:Null}}"/>
+                    <c:PowerMeterClassic Height="200" HorizontalAlignment="Left" Grid.Column="0" SmartMeter="{Binding SolarSystemService.SolarSystem.PrimaryMeter, FallbackValue={x:Null}}" />
+                    <c:SmartMeterControl Height="200" HorizontalAlignment="Left" Grid.Column="1" Margin="10,0,0,0" SmartMeter="{Binding SolarSystemService.SolarSystem.PrimaryMeter, FallbackValue={x:Null}}" />
                     <ItemsControl Height="200" Grid.Column="2" DockPanel.Dock="Right" ItemsSource="{Binding SolarSystemService.SolarSystem.Storages, FallbackValue={x:Null}}" Margin="150,0,0,0">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal" IsItemsHost="True" HorizontalAlignment="Right"/>
+                                <StackPanel Orientation="Horizontal" IsItemsHost="True" HorizontalAlignment="Right" />
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <c:StorageControl Margin="0,0" Storage="{Binding}"/>
+                                <c:StorageControl Margin="0,0" Storage="{Binding}" />
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </Grid>
-
-                <Viewbox Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" Width="246" Margin="20,0,0,0" VerticalAlignment="Top">
-                    <ItemsControl Margin="0,0,1,0" ItemsSource="{Binding SolarSystemService.SolarSystem.FritzBox.SwitchableDevices, FallbackValue={x:Null}}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel Orientation="Vertical" IsItemsHost="True" Height="500"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <c:PowerConsumer Width="119" Device="{Binding}" Margin="4,0,0,4"/>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-                </Viewbox>
-
             </Grid>
         </Viewbox>
 
-        <GridSplitter Grid.Column="2" ResizeBehavior="PreviousAndNext" BorderThickness="2" ResizeDirection="Columns"
-                      BorderBrush="LightGray" Margin="4,0" VerticalAlignment="Stretch" />
+        <GridSplitter Grid.Column="1" ResizeBehavior="PreviousAndNext" BorderThickness="2" ResizeDirection="Columns"
+                      BorderBrush="LightGray" Margin="10,0" VerticalAlignment="Stretch" />
+
+        <ScrollViewer VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto" VerticalContentAlignment="Top" HorizontalContentAlignment="Stretch"  Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Stretch" >
+        <ItemsControl ItemsSource="{Binding SolarSystemService.SolarSystem.FritzBox.PowerConsumers, FallbackValue={x:Null}}">
+            <ItemsControl.LayoutTransform>
+                <ScaleTransform x:Name="ConsumerScaler" ScaleX="1" ScaleY="1"/>
+            </ItemsControl.LayoutTransform>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Vertical" IsItemsHost="True" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <c:PowerConsumer Width="200" Device="{Binding}" Margin="0,0,8,8" />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        </ScrollViewer>
     </Grid>
 </Window>

@@ -164,4 +164,3 @@ public class GetTemperatureTicks : ConverterBase
         double Round(double i) => Math.Ceiling(i / tickDistance) * tickDistance;
     }
 }
-

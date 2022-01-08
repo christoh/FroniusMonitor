@@ -7,5 +7,5 @@ public interface IPowerMeter1P
     double? Current => PowerWatts / Voltage;
     double? Frequency { get; }
     double? EnergyKiloWattHours { get; }
-    bool CanReadPower { get; }
+    bool CanMeasurePower { get; }
 }

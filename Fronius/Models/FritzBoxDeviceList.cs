@@ -30,5 +30,5 @@ public class FritzBoxDeviceList : BindableBase
     [XmlElement("device")] public List<FritzBoxDevice> Devices { get; } = new();
 
     [XmlIgnore] public List<IPowerMeter1P> DevicesWithPowerMeter => Devices.Where(d => d.PowerMeter != null).Cast<IPowerMeter1P>().ToList();
-    [XmlIgnore] public IEnumerable<ISwitchable> SwitchableDevices => Devices.Where(d => d.CanSwitch).Cast<ISwitchable>().ToList();
+    [XmlIgnore] public IEnumerable<ISwitchable> PowerConsumers => Devices.Where(d => d.CanSwitch).Cast<ISwitchable>().ToList();
 }
