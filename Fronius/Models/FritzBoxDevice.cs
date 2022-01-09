@@ -96,7 +96,7 @@ public class FritzBoxDevice : BindableBase, IPowerConsumer1P
         set => Set(ref model, value);
     }
 
-    public bool CanSwitch => SimpleSwitch != null || Switch != null;
+    public bool CanSwitch => (Features & FritzBoxFeatures.TurnOnOff) != FritzBoxFeatures.None;
 
     private string displayName = string.Empty;
 
@@ -187,28 +187,29 @@ public class FritzBoxDevice : BindableBase, IPowerConsumer1P
     bool? ISwitchable.IsTurnedOn => SimpleSwitch?.IsTurnedOn ?? Switch?.IsTurnedOn;
     string? IPowerConsumer1P.Model => string.IsNullOrWhiteSpace(Manufacturer) ? Model : $"{Manufacturer} {Model}".Trim();
     bool ISwitchable.IsSwitchingEnabled => !wasSwitched && IsPresentAndUnlocked && ((ISwitchable)this).CanSwitch;
-    bool IDimmable.IsDimmingEnabled => IsPresentAndUnlocked && ((IDimmable)this).CanDim;
+    bool IDimmable.IsDimmingEnabled => !wasSwitched && IsPresentAndUnlocked && ((IDimmable)this).CanDim;
     bool IDimmable.CanDim => (Features & FritzBoxFeatures.HasLevels) != FritzBoxFeatures.None;
     double? IDimmable.Level => LevelControl?.Level;
 
     bool IHsvColorControl.HasHsvColorControl => (Features & FritzBoxFeatures.ColoredLight) != FritzBoxFeatures.None
-                                                && Color is {SupportedModes: { }}
+                                                && Color is { SupportedModes: { } }
                                                 && (Color.SupportedModes.Value & FritzBoxColorMode.Hsv) != FritzBoxColorMode.None;
 
-    bool IHsvColorControl.IsHsvEnabled => IsPresentAndUnlocked && ((IHsvColorControl)this).HasHsvColorControl;
+    bool IHsvColorControl.IsHsvEnabled => !wasSwitched && IsPresentAndUnlocked && ((IHsvColorControl)this).HasHsvColorControl;
     double? IHsvColorControl.HueDegrees => Color?.HueDegrees;
     double? IHsvColorControl.Saturation => Color?.SaturationAbsolute / 255;
     double? IHsvColorControl.Value => LevelControl?.Level;
 
     bool IColorTemperatureControl.HasColorTemperatureControl => (Features & FritzBoxFeatures.ColoredLight) != FritzBoxFeatures.None
-                                                                && Color is {SupportedModes: { }}
+                                                                && Color is { SupportedModes: { } }
                                                                 && (Color.SupportedModes.Value & FritzBoxColorMode.Temperature) != FritzBoxColorMode.None;
 
-    bool IColorTemperatureControl.IsColorTemperatureEnabled => IsPresentAndUnlocked && ((IColorTemperatureControl)this).HasColorTemperatureControl;
-
+    bool IColorTemperatureControl.IsColorTemperatureEnabled => !wasSwitched && IsPresentAndUnlocked && ((IColorTemperatureControl)this).HasColorTemperatureControl;
     double? IColorTemperatureControl.ColorTemperatureKelvin => Color?.TemperatureKelvin;
     double IColorTemperatureControl.MinTemperatureKelvin => 2700;
     double IColorTemperatureControl.MaxTemperatureKelvin => 6500;
+    bool IHsvColorControl.IsHsvActive => Color is { CurrentMode: { } } && (Color.CurrentMode.Value & FritzBoxColorMode.Hsv) != FritzBoxColorMode.None;
+    bool IColorTemperatureControl.IsColorTemperatureActive => Color is { CurrentMode: { } } && (Color.CurrentMode.Value & FritzBoxColorMode.Temperature) != FritzBoxColorMode.None;
 
     public static bool? GetBoolState(string? state) => state switch { "1" => true, "0" => false, _ => null };
     public static string GetStringState(bool? state) => state switch { true => "1", false => "0", null => string.Empty };
@@ -220,6 +221,39 @@ public class FritzBoxDevice : BindableBase, IPowerConsumer1P
 
     public async Task TurnOnOff(bool turnOn)
     {
+        InitiateSwitching();
+
+        if (turnOn)
+        {
+            await WebClientService!.TurnOnFritzBoxDevice(Ain).ConfigureAwait(false);
+        }
+        else
+        {
+            await WebClientService!.TurnOffFritzBoxDevice(Ain).ConfigureAwait(false);
+        }
+    }
+
+    public async Task SetLevel(double level)
+    {
+        InitiateSwitching();
+        await WebClientService!.SetFritzBoxLevel(Ain, level).ConfigureAwait(false);
+    }
+
+    public async Task SetHsv(double hueDegrees, double saturation, double value)
+    {
+        InitiateSwitching();
+        await WebClientService!.SetFritzBoxColor(Ain, hueDegrees, saturation).ConfigureAwait(false);
+        await WebClientService!.SetFritzBoxLevel(Ain, value).ConfigureAwait(false);
+    }
+
+    public async Task SetColorTemperature(double colorTemperatureKelvin)
+    {
+        InitiateSwitching();
+        await WebClientService!.SetFritzBoxColorTemperature(Ain, colorTemperatureKelvin).ConfigureAwait(false);
+    }
+
+    private void InitiateSwitching()
+    {
         if (WebClientService == null)
         {
             throw new InvalidOperationException("No WebClientService");
@@ -227,45 +261,8 @@ public class FritzBoxDevice : BindableBase, IPowerConsumer1P
 
         wasSwitched = true;
         NotifyOfPropertyChange(nameof(ISwitchable.IsSwitchingEnabled));
-
-        if (turnOn)
-        {
-            await WebClientService.TurnOnFritzBoxDevice(Ain).ConfigureAwait(false);
-        }
-        else
-        {
-            await WebClientService.TurnOffFritzBoxDevice(Ain).ConfigureAwait(false);
-        }
-    }
-
-    public async Task SetLevel(double level)
-    {
-        if (WebClientService == null)
-        {
-            throw new InvalidOperationException("No WebClientService");
-        }
-
-        await WebClientService.SetFritzBoxLevel(Ain, level).ConfigureAwait(false);
-    }
-
-    public async Task SetHsv(double hueDegrees, double saturation, double value)
-    {
-        if (WebClientService == null)
-        {
-            throw new InvalidOperationException("No WebClientService");
-        }
-
-        await WebClientService.SetFritzBoxColor(Ain, hueDegrees, saturation).ConfigureAwait(false);
-        await WebClientService.SetFritzBoxLevel(Ain, value).ConfigureAwait(false);
-    }
-
-    public async Task SetColorTemperature(double colorTemperatureKelvin)
-    {
-        if (WebClientService == null)
-        {
-            throw new InvalidOperationException("No WebClientService");
-        }
-
-        await WebClientService.SetFritzBoxColorTemperature(Ain, colorTemperatureKelvin).ConfigureAwait(false);
+        NotifyOfPropertyChange(nameof(IDimmable.IsDimmingEnabled));
+        NotifyOfPropertyChange(nameof(IHsvColorControl.IsHsvEnabled));
+        NotifyOfPropertyChange(nameof(IColorTemperatureControl.IsColorTemperatureEnabled));
     }
 }

@@ -8,6 +8,7 @@
                 xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
                 xmlns:gl="clr-namespace:System.Globalization;assembly=System.Runtime"
                 xmlns:contracts="clr-namespace:De.Hochstaetter.Fronius.Contracts;assembly=Fronius"
+                xmlns:system="clr-namespace:System;assembly=System.Runtime"
                 mc:Ignorable="d"
                 d:DesignHeight="75" d:DesignWidth="210">
 
@@ -88,7 +89,7 @@
                                              IsEnabled="{Binding Path=Device.(contracts:IDimmable.IsDimmingEnabled), FallbackValue=False}"
                                              ThumbDragCompleted="OnDimLevelChanged" />
 
-                    <TextBlock Grid.Row="1" Grid.Column="1"
+                    <TextBlock Grid.Row="1" Grid.Column="1" Opacity="{Binding Path=Device.(contracts:IColorTemperatureControl.IsColorTemperatureActive), Converter={co:Bool2Double False=.5, True=1}, FallbackValue=.5}"
                                Visibility="{Binding Path=Device.(contracts:IColorTemperatureControl.HasColorTemperatureControl), Converter={co:Bool2Visibility}, FallbackValue=Visible}">
                         <Run Text="{Binding Value, ElementName=TemperatureSlider, Mode=OneWay, StringFormat=N0, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---, TargetNullValue=---}" />
                         <Run Text="K" />
@@ -103,7 +104,7 @@
                                              IsEnabled="{Binding Path=Device.(contracts:IColorTemperatureControl.IsColorTemperatureEnabled), FallbackValue=False}"
                                              ThumbDragCompleted="OnColorTemperatureChanged" />
 
-                    <TextBlock Grid.Row="2" Grid.Column="1"
+                    <TextBlock Grid.Row="2" Grid.Column="1" Opacity="{Binding Path=Device.(contracts:IHsvColorControl.IsHsvActive), Converter={co:Bool2Double False=.5, True=1}, FallbackValue=.5}"
                                Visibility="{Binding Path=Device.(contracts:IHsvColorControl.HasHsvColorControl), Converter={co:Bool2Visibility}, FallbackValue=Visible}">
                         <Run Text="H:" />
                         <Run Text="{Binding Value, ElementName=HueSlider, Mode=OneWay, StringFormat=N0, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---, TargetNullValue=---}" /><Run Text="°" />
@@ -127,7 +128,7 @@
                         </local:NonUpdatingSlider.Resources>
                     </local:NonUpdatingSlider>
 
-                    <TextBlock Grid.Row="3" Grid.Column="1"
+                    <TextBlock Grid.Row="3" Grid.Column="1" Opacity="{Binding Path=Device.(contracts:IHsvColorControl.IsHsvActive), Converter={co:Bool2Double False=.5, True=1}, FallbackValue=.5}"
                                Visibility="{Binding Path=Device.(contracts:IHsvColorControl.HasHsvColorControl), Converter={co:Bool2Visibility}, FallbackValue=Visible}">
                         <Run Text="S:" />
                         <Run Text="{Binding Value, ElementName=SaturationSlider, Mode=OneWay, StringFormat=P0, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---, TargetNullValue=---}" />

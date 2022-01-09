@@ -133,6 +133,8 @@ public class Bool2Visibility : BoolToAnything<Visibility>
     }
 }
 
+public class Bool2Double:BoolToAnything<double>{}
+
 public class GetTemperatureTicks : ConverterBase
 {
     private readonly double tickDistance;
