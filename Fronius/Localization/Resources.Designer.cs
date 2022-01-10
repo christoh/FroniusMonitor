@@ -241,6 +241,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        public static string IncludeInverterPower {
+            get {
+                return ResourceManager.GetString("IncludeInverterPower", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Incorrect response from data manager.
         /// </summary>
         public static string IncorrectData {
@@ -628,7 +637,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Temperature.
         /// </summary>
         public static string Temperature {
             get {

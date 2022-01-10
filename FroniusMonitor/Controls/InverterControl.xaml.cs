@@ -223,15 +223,11 @@ public partial class InverterControl : IHaveLcdPanel
                     break;
 
                 case InverterDisplayMode.MoreEfficiency:
-                    //var acPower = Inverter?.Data?.AcPowerWatts;
-                    //var dcPower = Inverter?.Data?.SolarPowerWatts - solarSystemService.SolarSystem?.Storages.Sum(s => s?.Data?.PowerString);
-                    var powerLoss = powerFlowQueue.Average(pf => pf.PowerLossWatts);
-                    var incoming = powerFlowQueue.Average(pf => pf.Input);
                     Lcd.Header = Loc.Efficiency;
                     Lcd.Label1 = "Loss";
-                    Lcd.Value1 = ToLcd(powerLoss, "N1", "W");
+                    Lcd.Value1 = ToLcd(e.SolarSystem.PowerFlow?.PowerLoss, "N1", "W");
                     Lcd.Label2 = "Eff";
-                    Lcd.Value2 = ToLcd(1-(powerLoss/incoming), "P2");
+                    Lcd.Value2 = ToLcd(e.SolarSystem.PowerFlow?.Efficiency, "P2");
                     Lcd.Label3 = "Sc";
                     Lcd.Value3 = ToLcd(e.SolarSystem?.PowerFlow?.SelfConsumption, "P2");
                     Lcd.LabelSum = "Aut";

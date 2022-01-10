@@ -12,6 +12,14 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
 
         public ISolarSystemService SolarSystemService { get; }
 
+        private bool includeInverterPower;
+
+        public bool IncludeInverterPower
+        {
+            get => includeInverterPower;
+            set => Set(ref includeInverterPower, value);
+        }
+
 
         public async Task OnInitialize()
         {

@@ -10,11 +10,10 @@ namespace De.Hochstaetter.FroniusMonitor.Views;
 
 public partial class MainWindow
 {
-
     public static readonly DependencyProperty PowerFlowProperty = DependencyProperty.Register
     (
         nameof(PowerFlow), typeof(PowerFlow), typeof(MainWindow),
-        new PropertyMetadata((d, e) => ((MainWindow)d).OnPowerFlowChanged())
+        new PropertyMetadata((d, _) => ((MainWindow)d).OnPowerFlowChanged())
     );
 
     public PowerFlow? PowerFlow
@@ -22,13 +21,14 @@ public partial class MainWindow
         get => (PowerFlow?)GetValue(PowerFlowProperty);
         set => SetValue(PowerFlowProperty, value);
     }
+
     public MainWindow()
     {
         InitializeComponent();
 
         DataContext = IoC.Get<MainViewModel>();
 
-        Loaded += async (s, e) =>
+        Loaded += async (_, _) =>
         {
             var binding = new Binding($"{nameof(ViewModel.SolarSystemService)}.{nameof(ViewModel.SolarSystemService.SolarSystem)}.{nameof(ViewModel.SolarSystemService.SolarSystem.PowerFlow)}");
             SetBinding(PowerFlowProperty, binding);
@@ -87,14 +87,17 @@ public partial class MainWindow
             case Key.OemPlus:
                 ZoomIn();
                 break;
+
             case Key.Subtract:
             case Key.OemMinus:
                 ZoomOut();
                 break;
+
             case Key.NumPad0:
             case Key.D0:
                 Zoom0();
                 break;
+
             default:
                 e.Handled = false;
                 break;
@@ -115,7 +118,9 @@ public partial class MainWindow
             return;
         }
 
-        IReadOnlyList<double> allIncomingPowers = new[] { PowerFlow.StoragePower, PowerFlow.GridPower, PowerFlow.SolarPower }.Where(ps => ps.HasValue && ps.Value > 0).Select(ps => ps!.Value).ToArray();
+        LoadArrow.Power = PowerFlow.LoadPower - (ViewModel.IncludeInverterPower ? PowerFlow.PowerLoss : 0);
+
+        IReadOnlyList<double> allIncomingPowers = new[] {PowerFlow.StoragePower, PowerFlow.GridPower, PowerFlow.SolarPower}.Where(ps => ps is > 0).Select(ps => ps!.Value).ToArray();
         var totalIncomingPower = allIncomingPowers.Sum();
 
         double r = 0, g = 0, b = 0;
@@ -149,4 +154,3 @@ public partial class MainWindow
         byte Round(double value) => (byte)Math.Round(value, MidpointRounding.AwayFromZero);
     }
 }
-

@@ -318,4 +318,7 @@
   <data name="Temperature" xml:space="preserve">
     <value>Temperature</value>
   </data>
+  <data name="IncludeInverterPower" xml:space="preserve">
+    <value>Include inverter power (Solar web mode)</value>
+  </data>
 </root>

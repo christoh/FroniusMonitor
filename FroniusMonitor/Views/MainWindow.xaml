@@ -46,8 +46,14 @@
 
                         <c:InverterControl Height="200" Inverter="{Binding SolarSystemService.SolarSystem.PrimaryInverter, FallbackValue={x:Null}}" />
 
-                        <c:PowerFlowArrow x:Name="LoadArrow" VerticalAlignment="Top" Fill="Transparent" HasRightPlacement="True" DefaultsToOutgoing="True"
-                                          Margin="25,0,10,0" Power="{Binding SolarSystemService.SolarSystem.PowerFlow.LoadPower, FallbackValue={x:Null}}" />
+                        <c:PowerFlowArrow x:Name="LoadArrow" VerticalAlignment="Top" Fill="LightGray" HasRightPlacement="True" DefaultsToOutgoing="True"
+                                          Margin="25,0,10,0">
+                            <c:PowerFlowArrow.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Include inverter power (Solar web mode)" IsChecked="{Binding IncludeInverterPower}" IsCheckable="True"/>
+                                </ContextMenu>
+                            </c:PowerFlowArrow.ContextMenu>
+                        </c:PowerFlowArrow>
 
                         <images:House Width="80" Foreground="Black" VerticalAlignment="Top" Margin="0,15,0,0" />
                     </StackPanel>
@@ -57,7 +63,8 @@
                     <StackPanel Orientation="Horizontal" Margin="100,-40,0,0">
 
                         <c:PowerFlowArrow Angle="-30" Fill="LightGray"
-                                          Power="{Binding SolarSystemService.SolarSystem.PowerFlow.GridPower, FallbackValue={x:Null}}" />
+                                          Power="{Binding SolarSystemService.SolarSystem.PowerFlow.GridPower, FallbackValue={x:Null}}">
+                        </c:PowerFlowArrow>
 
                         <c:PowerFlowArrow Angle="30" Margin="200,0,0,0" Fill="LightGreen" HasRightPlacement="True"
                                           Power="{Binding SolarSystemService.SolarSystem.PowerFlow.StoragePower, FallbackValue={x:Null}}" />
@@ -93,22 +100,22 @@
         <GridSplitter Grid.Column="1" ResizeBehavior="PreviousAndNext" BorderThickness="2" ResizeDirection="Columns"
                       BorderBrush="LightGray" Margin="10,0" VerticalAlignment="Stretch" />
 
-        <ScrollViewer VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto" VerticalContentAlignment="Top" HorizontalContentAlignment="Stretch"  Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Stretch" >
-        <ItemsControl ItemsSource="{Binding SolarSystemService.SolarSystem.FritzBox.PowerConsumers, FallbackValue={x:Null}}">
-            <ItemsControl.LayoutTransform>
-                <ScaleTransform x:Name="ConsumerScaler" ScaleX="1" ScaleY="1"/>
-            </ItemsControl.LayoutTransform>
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel Orientation="Vertical" IsItemsHost="True" />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <c:PowerConsumer Width="200" Device="{Binding}" Margin="0,0,8,8" />
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+        <ScrollViewer VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto" VerticalContentAlignment="Top" HorizontalContentAlignment="Stretch" Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+            <ItemsControl ItemsSource="{Binding SolarSystemService.SolarSystem.FritzBox.PowerConsumers, FallbackValue={x:Null}}">
+                <ItemsControl.LayoutTransform>
+                    <ScaleTransform x:Name="ConsumerScaler" ScaleX="1" ScaleY="1" />
+                </ItemsControl.LayoutTransform>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Vertical" IsItemsHost="True" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <c:PowerConsumer Width="200" Device="{Binding}" Margin="0,0,8,8" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </ScrollViewer>
     </Grid>
 </Window>

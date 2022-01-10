@@ -318,4 +318,7 @@
   <data name="Temperature" xml:space="preserve">
     <value>Temperatur</value>
   </data>
+  <data name="IncludeInverterPower" xml:space="preserve">
+    <value>Leistung des Wechselrichters hinzufügen (Solar-Web-Modus)</value>
+  </data>
 </root>
