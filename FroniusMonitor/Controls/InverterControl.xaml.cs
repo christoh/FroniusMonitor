@@ -89,7 +89,7 @@ public partial class InverterControl : IHaveLcdPanel
             return;
         }
 
-        if (e.SolarSystem.PowerFlow != null && ReferenceEquals(sender,solarSystemService))
+        if (e.SolarSystem.PowerFlow != null && ReferenceEquals(sender, solarSystemService))
         {
             powerFlowQueue.Enqueue(e.SolarSystem.PowerFlow);
 
@@ -223,11 +223,15 @@ public partial class InverterControl : IHaveLcdPanel
                     break;
 
                 case InverterDisplayMode.MoreEfficiency:
+                    //public double? Efficiency => 1 - PowerLoss / (DcPower == 0 ? null : DcPower);
+                    var losses = powerFlowQueue.Any() ? powerFlowQueue.Select(p => p.PowerLoss).Sum() : (double?)null;
+                    var dcPower=powerFlowQueue.Any()?powerFlowQueue.Select(p=>p.DcPower).Sum():(double?)null;
+                    var eff = 1 - (losses / dcPower);
                     Lcd.Header = Loc.Efficiency;
                     Lcd.Label1 = "Loss";
-                    Lcd.Value1 = ToLcd(e.SolarSystem.PowerFlow?.PowerLoss, "N1", "W");
+                    Lcd.Value1 = ToLcd(powerFlowQueue.Any() ? powerFlowQueue.Select(p => p.PowerLoss).Average() : null, "N1", "W");
                     Lcd.Label2 = "Eff";
-                    Lcd.Value2 = ToLcd(e.SolarSystem.PowerFlow?.Efficiency, "P2");
+                    Lcd.Value2 = ToLcd(eff, "P2");
                     Lcd.Label3 = "Sc";
                     Lcd.Value3 = ToLcd(e.SolarSystem?.PowerFlow?.SelfConsumption, "P2");
                     Lcd.LabelSum = "Aut";

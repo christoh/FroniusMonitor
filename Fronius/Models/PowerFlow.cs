@@ -34,12 +34,12 @@ namespace De.Hochstaetter.Fronius.Models
         public double? GridPower { get; init; }
         public double? SolarPower { get; init; }
         public double? LoadPower { get; init; }
-        public double PowerLoss => DcPower+AcPower;
-        public double? Input => AllPowers.Any()?AllPowers.Where(ps => ps > 0).Sum():null;
-        public double? Output => AllPowers.Any()?AllPowers.Where(ps => ps < 0).Sum():null;
+        public double PowerLoss => DcPower + AcPower;
+        public double? Input => AllPowers.Any() ? AllPowers.Where(ps => ps > 0).Sum() : null;
+        public double? Output => AllPowers.Any() ? AllPowers.Where(ps => ps < 0).Sum() : null;
         public double? Autonomy { get; init; }
         public double? SelfConsumption { get; init; }
 
-        public double? Efficiency => 1-(PowerLoss/(DcPower==0?double.Epsilon:DcPower));
+        public double? Efficiency => 1 - PowerLoss / (DcPower == 0 ? null : DcPower);
     }
 }
