@@ -10,6 +10,7 @@ namespace De.Hochstaetter.Fronius.Services
         private int updateSemaphore;
         private int fritzBoxCounter;
         private int suspendFritzBoxCounter;
+        private const int QueueSize = 10;
 
         public event EventHandler<SolarDataEventArgs>? NewDataReceived;
 
@@ -42,6 +43,39 @@ namespace De.Hochstaetter.Fronius.Services
             set => Set(ref isConnected, value);
         }
 
+        public Queue<PowerFlow> PowerFlowQueue { get; } = new(QueueSize + 1);
+        private int? Count => PowerFlowQueue.Count == 0 ? null : PowerFlowQueue.Count;
+
+        public double GridPowerSum => PowerFlowQueue.Sum(p => p.GridPower ?? 0);
+        public double LoadPowerSum => PowerFlowQueue.Sum(p => p.LoadPower ?? 0);
+        public double SolarPowerSum => PowerFlowQueue.Sum(p => p.SolarPower ?? 0);
+        public double StoragePowerSum => PowerFlowQueue.Sum(p => p.StoragePower ?? 0);
+        public double AcPowerSum => GridPowerSum + LoadPowerSum;
+        public double DcPowerSum => SolarPowerSum + StoragePowerSum;
+        public double PowerLossSum => AcPowerSum + DcPowerSum;
+        public double? PowerLossAvg => PowerLossSum / Count;
+        public double? Efficiency => 1 - PowerLossSum / Math.Max(new[] { GridPowerSum, LoadPowerSum, SolarPowerSum, StoragePowerSum }.Sum(ps => ps > 0 ? ps : 0), double.Epsilon);
+        public double? GridPowerAvg => GridPowerSum / Count;
+        public double? LoadPowerAvg => LoadPowerSum / Count;
+        public double? StoragePowerAvg => StoragePowerSum / Count;
+        public double? SolarPowerAvg => SolarPowerSum / Count;
+
+        private void NotifyPowerQueueChanged()
+        {
+            NotifyOfPropertyChange(nameof(GridPowerSum));
+            NotifyOfPropertyChange(nameof(LoadPowerSum));
+            NotifyOfPropertyChange(nameof(SolarPowerSum));
+            NotifyOfPropertyChange(nameof(StoragePowerSum));
+            NotifyOfPropertyChange(nameof(GridPowerAvg));
+            NotifyOfPropertyChange(nameof(LoadPowerAvg));
+            NotifyOfPropertyChange(nameof(SolarPowerAvg));
+            NotifyOfPropertyChange(nameof(StoragePowerAvg));
+            NotifyOfPropertyChange(nameof(DcPowerSum));
+            NotifyOfPropertyChange(nameof(AcPowerSum));
+            NotifyOfPropertyChange(nameof(PowerLossSum));
+            NotifyOfPropertyChange(nameof(Efficiency));
+        }
+
         public async Task Start(WebConnection inverterConnection, WebConnection fritzBoxConnection)
         {
             if (timer == null || SolarSystem == null)
@@ -49,6 +83,8 @@ namespace De.Hochstaetter.Fronius.Services
                 Stop();
             }
 
+            PowerFlowQueue.Clear();
+            NotifyPowerQueueChanged();
             SolarSystem = await CreateSolarSystem(inverterConnection, fritzBoxConnection).ConfigureAwait(false);
             timer = new Timer(TimerElapsed, null, 0, 1000);
         }
@@ -114,7 +150,7 @@ namespace De.Hochstaetter.Fronius.Services
 
                 foreach (var device in deviceGroup)
                 {
-                    var group = new DeviceGroup {DeviceClass = deviceGroup.Key};
+                    var group = new DeviceGroup { DeviceClass = deviceGroup.Key };
 
                     switch (deviceGroup.Key)
                     {
@@ -149,6 +185,14 @@ namespace De.Hochstaetter.Fronius.Services
             try
             {
                 SolarSystem.PowerFlow = await webClientService.GetPowerFlow().ConfigureAwait(false);
+                PowerFlowQueue.Enqueue(SolarSystem.PowerFlow);
+
+                if (PowerFlowQueue.Count > QueueSize)
+                {
+                    PowerFlowQueue.Dequeue();
+                }
+
+                NotifyPowerQueueChanged();
 
                 var storageDevices = await webClientService.GetStorageDevices().ConfigureAwait(false);
 

@@ -1,7 +1,5 @@
 ﻿using System.Windows;
 using System.Windows.Media;
-using De.Hochstaetter.Fronius.Contracts;
-using De.Hochstaetter.FroniusMonitor.Unity;
 
 namespace De.Hochstaetter.FroniusMonitor.Controls;
 
@@ -10,7 +8,7 @@ public partial class PowerFlowArrow
     public static readonly DependencyProperty PowerProperty = DependencyProperty.Register
     (
         nameof(Power), typeof(double?), typeof(PowerFlowArrow),
-        new PropertyMetadata((d, e) => ((PowerFlowArrow)d).OnPowerChanged())
+        new PropertyMetadata((d, _) => ((PowerFlowArrow)d).OnPowerChanged())
     );
 
     public double? Power
@@ -33,7 +31,7 @@ public partial class PowerFlowArrow
     public static readonly DependencyProperty HasRightPlacementProperty = DependencyProperty.Register
     (
         nameof(HasRightPlacement), typeof(bool), typeof(PowerFlowArrow),
-        new PropertyMetadata((d, e) => ((PowerFlowArrow)d).OnPowerChanged())
+        new PropertyMetadata((d, _) => ((PowerFlowArrow)d).OnPowerChanged())
     );
 
     public bool HasRightPlacement
@@ -45,7 +43,7 @@ public partial class PowerFlowArrow
     public static readonly DependencyProperty DefaultsToOutgoingProperty = DependencyProperty.Register
     (
         nameof(DefaultsToOutgoing), typeof(bool), typeof(PowerFlowArrow),
-        new PropertyMetadata((d, e) => ((PowerFlowArrow)d).OnPowerChanged())
+        new PropertyMetadata((d, _) => ((PowerFlowArrow)d).OnPowerChanged())
     );
 
     public bool DefaultsToOutgoing

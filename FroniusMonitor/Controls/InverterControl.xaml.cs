@@ -25,12 +25,10 @@ public enum InverterDisplayMode
 public partial class InverterControl : IHaveLcdPanel
 {
     private readonly ISolarSystemService? solarSystemService = IoC.TryGet<ISolarSystemService>();
-    private static readonly IReadOnlyList<InverterDisplayMode> acModes = new[] {InverterDisplayMode.AcPower, InverterDisplayMode.AcCurrent, InverterDisplayMode.AcVoltage};
-    private static readonly IReadOnlyList<InverterDisplayMode> dcModes = new[] {InverterDisplayMode.DcPower, InverterDisplayMode.DcCurrent, InverterDisplayMode.DcVoltage};
-    private static readonly IReadOnlyList<InverterDisplayMode> moreModes = new[] {InverterDisplayMode.MoreEfficiency, InverterDisplayMode.More};
+    private static readonly IReadOnlyList<InverterDisplayMode> acModes = new[] { InverterDisplayMode.AcPower, InverterDisplayMode.AcCurrent, InverterDisplayMode.AcVoltage };
+    private static readonly IReadOnlyList<InverterDisplayMode> dcModes = new[] { InverterDisplayMode.DcPower, InverterDisplayMode.DcCurrent, InverterDisplayMode.DcVoltage };
+    private static readonly IReadOnlyList<InverterDisplayMode> moreModes = new[] { InverterDisplayMode.MoreEfficiency, InverterDisplayMode.More };
     private int currentAcIndex, currentDcIndex, currentMoreIndex;
-    private readonly Queue<PowerFlow> powerFlowQueue = new(31);
-
 
     #region Dependency Properties
 
@@ -87,16 +85,6 @@ public partial class InverterControl : IHaveLcdPanel
         if (e.SolarSystem == null)
         {
             return;
-        }
-
-        if (e.SolarSystem.PowerFlow != null && ReferenceEquals(sender, solarSystemService))
-        {
-            powerFlowQueue.Enqueue(e.SolarSystem.PowerFlow);
-
-            while (powerFlowQueue.Count > 30)
-            {
-                powerFlowQueue.Dequeue();
-            }
         }
 
         Dispatcher.InvokeAsync(() =>
@@ -223,15 +211,11 @@ public partial class InverterControl : IHaveLcdPanel
                     break;
 
                 case InverterDisplayMode.MoreEfficiency:
-                    //public double? Efficiency => 1 - PowerLoss / (DcPower == 0 ? null : DcPower);
-                    var losses = powerFlowQueue.Any() ? powerFlowQueue.Select(p => p.PowerLoss).Sum() : (double?)null;
-                    var dcPower=powerFlowQueue.Any()?powerFlowQueue.Select(p=>p.DcPower).Sum():(double?)null;
-                    var eff = 1 - (losses / dcPower);
                     Lcd.Header = Loc.Efficiency;
                     Lcd.Label1 = "Loss";
-                    Lcd.Value1 = ToLcd(powerFlowQueue.Any() ? powerFlowQueue.Select(p => p.PowerLoss).Average() : null, "N1", "W");
+                    Lcd.Value1 = ToLcd(solarSystemService?.PowerLossAvg, "N1", "W");
                     Lcd.Label2 = "Eff";
-                    Lcd.Value2 = ToLcd(eff, "P2");
+                    Lcd.Value2 = ToLcd(solarSystemService?.Efficiency, "P2");
                     Lcd.Label3 = "Sc";
                     Lcd.Value3 = ToLcd(e.SolarSystem?.PowerFlow?.SelfConsumption, "P2");
                     Lcd.LabelSum = "Aut";

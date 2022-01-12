@@ -21,7 +21,7 @@ namespace De.Hochstaetter.Fronius.Models
 
     public class PowerFlow : EnergyCounterBase
     {
-        private IEnumerable<double> AllPowers => new[] {StoragePower, GridPower, SolarPower, LoadPower}.Where(ps => ps.HasValue).Select(ps => ps!.Value);
+        private IEnumerable<double> AllPowers => new[] { StoragePower, GridPower, SolarPower, LoadPower }.Where(ps => ps.HasValue).Select(ps => ps!.Value);
         public double DcPower => (StoragePower ?? 0) + (SolarPower ?? 0);
         public double AcPower => (LoadPower ?? 0) + (GridPower ?? 0);
         public override string DisplayName => Resources.PowerFlow;
@@ -40,6 +40,6 @@ namespace De.Hochstaetter.Fronius.Models
         public double? Autonomy { get; init; }
         public double? SelfConsumption { get; init; }
 
-        public double? Efficiency => 1 - PowerLoss / (DcPower == 0 ? null : DcPower);
+        public double? Efficiency => 1 - PowerLoss / Input;
     }
 }
