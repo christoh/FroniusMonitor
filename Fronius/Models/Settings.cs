@@ -21,22 +21,22 @@ namespace De.Hochstaetter.Fronius.Models
             set => Set(ref baseUrlFritzBox, value);
         }
 
-        private double consumedEnergyOffsetWatts = 457000 - 2977910;
+        private double consumedEnergyOffsetWattHours = 457000 - 2977910;
 
         [XmlElement("ConsumedEnergyOffSet")]
-        public double ConsumedEnergyOffsetWatts
+        public double ConsumedEnergyOffsetWattHours
         {
-            get => consumedEnergyOffsetWatts;
-            set => Set(ref consumedEnergyOffsetWatts, value);
+            get => consumedEnergyOffsetWattHours;
+            set => Set(ref consumedEnergyOffsetWattHours, value);
         }
 
-        private double producedEnergyOffsetWatts=-310;
+        private double producedEnergyOffsetWattHours=-360;
 
         [XmlElement("ConsumedEnergyOffSet")]
-        public double ProducedEnergyOffsetWatts
+        public double ProducedEnergyOffsetWattHours
         {
-            get => producedEnergyOffsetWatts;
-            set => Set(ref producedEnergyOffsetWatts, value);
+            get => producedEnergyOffsetWattHours;
+            set => Set(ref producedEnergyOffsetWattHours, value);
         }
     }
 }

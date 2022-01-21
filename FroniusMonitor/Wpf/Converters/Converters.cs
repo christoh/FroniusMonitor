@@ -45,12 +45,12 @@ public abstract class PowerCorrector : ConverterBase
 
 public class GridMeterConsumptionCorrector : PowerCorrector
 {
-    protected override double OffsetWatts { get; } = Settings.ConsumedEnergyOffsetWatts;
+    protected override double OffsetWatts { get; } = Settings.ConsumedEnergyOffsetWattHours;
 }
 
 public class GridMeterProductionCorrector : PowerCorrector
 {
-    protected override double OffsetWatts { get; } = Settings.ProducedEnergyOffsetWatts;
+    protected override double OffsetWatts { get; } = Settings.ProducedEnergyOffsetWattHours;
 }
 
 public class SocToColor : ConverterBase
