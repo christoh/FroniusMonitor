@@ -4,8 +4,6 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Markup;
 using System.Windows.Media;
-using De.Hochstaetter.Fronius.Models;
-using De.Hochstaetter.FroniusMonitor.Unity;
 using De.Hochstaetter.FroniusMonitor.Models;
 
 namespace De.Hochstaetter.FroniusMonitor.Wpf.Converters;
@@ -35,7 +33,6 @@ public class NullToString : ConverterBase
 public abstract class PowerCorrector : ConverterBase
 {
     protected abstract double OffsetWatts { get; }
-    protected static readonly Settings Settings = IoC.Get<Settings>();
 
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
@@ -45,24 +42,24 @@ public abstract class PowerCorrector : ConverterBase
 
 public class GridMeterConsumptionCorrector : PowerCorrector
 {
-    protected override double OffsetWatts { get; } = Settings.ConsumedEnergyOffsetWattHours;
+    protected override double OffsetWatts => App.Settings.ConsumedEnergyOffsetWattHours;
 }
 
 public class GridMeterProductionCorrector : PowerCorrector
 {
-    protected override double OffsetWatts { get; } = Settings.ProducedEnergyOffsetWattHours;
+    protected override double OffsetWatts => App.Settings.ProducedEnergyOffsetWattHours;
 }
 
 public class SocToColor : ConverterBase
 {
     private static readonly IReadOnlyList<BatteryColor> batteryColors = new BatteryColor[]
     {
-        new (0, Colors.DarkRed),
-        new (0.05, Colors.Red),
-        new (0.25, Colors.Yellow),
-        new (0.40, Colors.YellowGreen),
-        new (0.5, Colors.LightGreen),
-        new (1, Colors.LawnGreen),
+        new(0, Colors.DarkRed),
+        new(0.05, Colors.Red),
+        new(0.25, Colors.Yellow),
+        new(0.40, Colors.YellowGreen),
+        new(0.5, Colors.LightGreen),
+        new(1, Colors.LawnGreen),
     };
 
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -133,7 +130,7 @@ public class Bool2Visibility : BoolToAnything<Visibility>
     }
 }
 
-public class Bool2Double:BoolToAnything<double>{}
+public class Bool2Double : BoolToAnything<double> { }
 
 public class GetTemperatureTicks : ConverterBase
 {
@@ -146,13 +143,12 @@ public class GetTemperatureTicks : ConverterBase
 
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-
         if (value is not Slider slider)
         {
             return null;
         }
 
-        var list = new DoubleCollection { slider.Minimum };
+        var list = new DoubleCollection {slider.Minimum};
 
         for (var current = Round(slider.Minimum); current < slider.Maximum; current += tickDistance)
         {

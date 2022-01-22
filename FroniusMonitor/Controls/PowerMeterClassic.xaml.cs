@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using De.Hochstaetter.Fronius.Models;
+using De.Hochstaetter.FroniusMonitor.Models;
 
 namespace De.Hochstaetter.FroniusMonitor.Controls
 {
@@ -79,6 +80,26 @@ namespace De.Hochstaetter.FroniusMonitor.Controls
                 animation.Duration = timeSpan;
                 Wheel.BeginAnimation(MarginProperty, animation);
             });
+        }
+
+        private async void OnConsumedPowerCalibrated(object _, double value)
+        {
+            if (SmartMeter?.Data != null)
+            {
+                App.Settings.ConsumedEnergyOffsetWattHours = value - SmartMeter.Data.RealEnergyConsumedWattHours;
+                SmartMeter.NotifySettingsChanged();
+                await Settings.Save().ConfigureAwait(false);
+            }
+        }
+
+        private async void OnProducedPowerCalibrated(object _, double value)
+        {
+            if (SmartMeter?.Data != null)
+            {
+                App.Settings.ProducedEnergyOffsetWattHours = value - SmartMeter.Data.RealEnergyProducedWattHours;
+                SmartMeter.NotifySettingsChanged();
+                await Settings.Save().ConfigureAwait(false);
+            }
         }
     }
 }

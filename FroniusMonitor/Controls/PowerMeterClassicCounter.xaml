@@ -75,7 +75,10 @@
                 </Style>
             </Grid.Resources>
 
-            <Canvas Grid.Column="0" x:Name="PlusCanvas" Grid.Row="0" Height="80" Visibility="Collapsed">
+            <Canvas Grid.Column="0" Grid.Row="0" Height="80">
+                <FrameworkElement.LayoutTransform>
+                    <ScaleTransform x:Name="PlusScaler" ScaleX="0" ScaleY="{Binding ScaleX, RelativeSource={RelativeSource Self}}" />
+                </FrameworkElement.LayoutTransform>
                 <Canvas.Resources>
                     <Style TargetType="Button" BasedOn="{StaticResource PlusButton}"/>
                 </Canvas.Resources>
@@ -138,7 +141,10 @@
                 </Border>
             </Canvas>
 
-            <Canvas Grid.Column="0" x:Name="MinusCanvas" Grid.Row="2" Height="80" Visibility="Collapsed">
+            <Canvas Grid.Column="0" Grid.Row="2" Height="80">
+                <FrameworkElement.LayoutTransform>
+                    <ScaleTransform x:Name="MinusScaler" ScaleX="0" ScaleY="{Binding ScaleX, RelativeSource={RelativeSource Self}}" />
+                </FrameworkElement.LayoutTransform>
                 <Canvas.Resources>
                     <Style TargetType="Button" BasedOn="{StaticResource MinusButton}"/>
                 </Canvas.Resources>
@@ -153,7 +159,10 @@
                 <Button Tag="{StaticResource P0}" Canvas.Top="10" Canvas.Left="660" Click="OnMinusPressed"/>
             </Canvas>
 
-            <StackPanel x:Name="ButtonPanel" Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="20,0,0,0" Visibility="Collapsed">
+            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="20,0,0,0">
+                <FrameworkElement.LayoutTransform>
+                    <ScaleTransform x:Name="ButtonScaler" ScaleX="0" ScaleY="{Binding ScaleX, RelativeSource={RelativeSource Self}}" />
+                </FrameworkElement.LayoutTransform>
                 <StackPanel.Resources>
                     <Style TargetType="Button" BasedOn="{StaticResource TransparentButton}">
                         <Setter Property="Background" Value="LightGray"/>

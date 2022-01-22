@@ -1,6 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 
 namespace De.Hochstaetter.FroniusMonitor.Controls;
 
@@ -9,6 +11,7 @@ public partial class PowerMeterClassicCounter
     private readonly IReadOnlyList<TextBlock> textBlocks;
     private double calibratedValue;
     private bool isInCalibration;
+    private readonly DoubleAnimation animation = new(1, TimeSpan.FromMilliseconds(200));
 
     public event EventHandler<double>? CalibrationCompleted;
 
@@ -40,8 +43,16 @@ public partial class PowerMeterClassicCounter
             switch (value)
             {
                 case true:
+                    animation.To = 1;
+                    MinusScaler.BeginAnimation(ScaleTransform.ScaleXProperty, animation);
+                    PlusScaler.BeginAnimation(ScaleTransform.ScaleXProperty, animation);
+                    ButtonScaler.BeginAnimation(ScaleTransform.ScaleXProperty, animation);
                     break;
                 case false:
+                    animation.To = 0;
+                    MinusScaler.BeginAnimation(ScaleTransform.ScaleXProperty, animation);
+                    PlusScaler.BeginAnimation(ScaleTransform.ScaleXProperty, animation);
+                    ButtonScaler.BeginAnimation(ScaleTransform.ScaleXProperty, animation);
                     break;
             }
         }
@@ -71,7 +82,6 @@ public partial class PowerMeterClassicCounter
         {
             calibratedValue = Value;
             IsInCalibration = true;
-            MinusCanvas.Visibility = PlusCanvas.Visibility = ButtonPanel.Visibility = Visibility.Visible;
         }
     }
 
@@ -83,7 +93,6 @@ public partial class PowerMeterClassicCounter
 
     private void OnCancelPressed(object sender, RoutedEventArgs e)
     {
-        MinusCanvas.Visibility = PlusCanvas.Visibility = ButtonPanel.Visibility = Visibility.Collapsed;
         IsInCalibration = false;
         OnValueChanged();
     }
