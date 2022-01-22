@@ -160,7 +160,7 @@
     <value>---</value>
   </data>
   <data name="NoSystemConnection" xml:space="preserve">
-    <value>Sie haben keine vollständigen Verbindungsparameter angegeben</value>
+    <value>Sie haben keine vollständigen Wechselrichter-Verbindungsparameter angegeben</value>
   </data>
   <data name="Ohmpilot" xml:space="preserve">
     <value>Ohmpilot</value>
@@ -320,5 +320,20 @@
   </data>
   <data name="IncludeInverterPower" xml:space="preserve">
     <value>Leistung des Wechselrichters hinzufügen (Solar-Web-Modus)</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>_Einstellungen</value>
+  </data>
+  <data name="View" xml:space="preserve">
+    <value>_Ansicht</value>
+  </data>
+  <data name="NoFritzBoxConnection" xml:space="preserve">
+    <value>Sie haben keine vollständigen Fritz!Box-Verbindungsparameter angegeben</value>
+  </data>
+  <data name="Ok" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Abbrechen</value>
   </data>
 </root>

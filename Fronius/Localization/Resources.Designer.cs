@@ -133,6 +133,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        public static string Cancel {
+            get {
+                return ResourceManager.GetString("Cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Charging.
         /// </summary>
         public static string Charging {
@@ -241,7 +250,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Include inverter power (Solar web mode).
         /// </summary>
         public static string IncludeInverterPower {
             get {
@@ -340,7 +349,16 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You did not specify complete inverterConnection parameters.
+        ///   Looks up a localized string similar to You did not specify complete Fritz!Box connection parameters.
+        /// </summary>
+        public static string NoFritzBoxConnection {
+            get {
+                return ResourceManager.GetString("NoFritzBoxConnection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You did not specify complete inverter connection parameters.
         /// </summary>
         public static string NoSystemConnection {
             get {
@@ -372,6 +390,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Ohmpilots {
             get {
                 return ResourceManager.GetString("Ohmpilots", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ok.
+        /// </summary>
+        public static string Ok {
+            get {
+                return ResourceManager.GetString("Ok", resourceCulture);
             }
         }
         
@@ -498,6 +525,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string SensorCards {
             get {
                 return ResourceManager.GetString("SensorCards", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Settings.
+        /// </summary>
+        public static string Settings {
+            get {
+                return ResourceManager.GetString("Settings", resourceCulture);
             }
         }
         
@@ -660,6 +696,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Updating {
             get {
                 return ResourceManager.GetString("Updating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _View.
+        /// </summary>
+        public static string View {
+            get {
+                return ResourceManager.GetString("View", resourceCulture);
             }
         }
         

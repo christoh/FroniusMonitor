@@ -153,4 +153,9 @@ public partial class MainWindow
 
         byte Round(double value) => (byte)Math.Round(value, MidpointRounding.AwayFromZero);
     }
+
+    private void OnAutoSizeChecked(object sender, RoutedEventArgs e)
+    {
+        PowerConsumerColumn.Width = new GridLength(0, GridUnitType.Auto);
+    }
 }

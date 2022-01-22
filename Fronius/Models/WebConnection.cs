@@ -1,9 +1,12 @@
-﻿namespace De.Hochstaetter.Fronius.Models
+﻿using System.ComponentModel;
+using System.Xml.Serialization;
+
+namespace De.Hochstaetter.Fronius.Models
 {
     public class WebConnection : BindableBase
     {
-        public string BaseUrl { get; init; } = string.Empty;
-        public string UserName { get; init; } = "FroniusMonitor";
-        public string Password { get; init; } = "Password";
+        [DefaultValue(null), XmlAttribute] public string? BaseUrl { get; init; }
+        [DefaultValue(null), XmlAttribute] public string? UserName { get; init; }
+        [DefaultValue(null), XmlAttribute] public string? Password { get; init; }
     }
 }

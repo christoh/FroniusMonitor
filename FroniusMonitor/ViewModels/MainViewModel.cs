@@ -23,11 +23,7 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
 
         public async Task OnInitialize()
         {
-            await SolarSystemService.Start
-            (
-                new WebConnection {BaseUrl = App.Settings.BaseUrlFronius!},
-                new WebConnection {BaseUrl = App.Settings.BaseUrlFritzBox!}
-            ).ConfigureAwait(false);
+            await SolarSystemService.Start(App.Settings.FroniusConnection, App.Settings.FritzBoxConnection).ConfigureAwait(false);
         }
     }
 }

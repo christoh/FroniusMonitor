@@ -3,56 +3,179 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
              mc:Ignorable="d"
              d:DesignHeight="180" d:DesignWidth="750">
+    <UserControl.Resources>
+        <sys:Int32 x:Key="P8">8</sys:Int32>
+        <sys:Int32 x:Key="P7">7</sys:Int32>
+        <sys:Int32 x:Key="P6">6</sys:Int32>
+        <sys:Int32 x:Key="P5">5</sys:Int32>
+        <sys:Int32 x:Key="P4">4</sys:Int32>
+        <sys:Int32 x:Key="P3">3</sys:Int32>
+        <sys:Int32 x:Key="P2">2</sys:Int32>
+        <sys:Int32 x:Key="P1">1</sys:Int32>
+        <sys:Int32 x:Key="P0">0</sys:Int32>
+    </UserControl.Resources>
     <Viewbox>
-        <Canvas x:Name="Canvas" HorizontalAlignment="Center" Height="180" Width="750" Background="LightGray">
-            <Canvas.Resources>
-                <Style TargetType="TextBlock">
-                    <Setter Property="Margin" Value="0,-10,0,0" />
-                    <Setter Property="Foreground" Value="White" />
-                    <Setter Property="Text" Value=" " />
-                    <Setter Property="FontSize" Value="120" />
-                    <Setter Property="VerticalAlignment" Value="Center" />
-                    <Setter Property="HorizontalAlignment" Value="Center" />
-                    <Setter Property="FontWeight" Value="SemiBold" />
-                </Style>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-                <Style TargetType="Border">
-                    <Setter Property="Background" Value="#303030" />
-                    <Setter Property="Height" Value="130" />
-                    <Setter Property="Width" Value="70" />
-                    <Setter Property="Canvas.Top" Value="25" />
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.Resources>
+                <Style TargetType="ButtonBase" x:Key="PlusMinusButton">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ButtonBase">
+                                <Viewbox>
+                                    <Grid Height="12" Width="12">
+                                        <Ellipse x:Name="Ellipse" Fill="Green"/>
+                                        <ContentPresenter/>
+                                    </Grid>
+                                </Viewbox>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Ellipse" Property="Fill" Value="LightGreen"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Height" Value="70"/>
+                    <Setter Property="Width" Value="70"/>
                 </Style>
-            </Canvas.Resources>
-            <Border Canvas.Left="660">
-                <TextBlock Foreground="Red" />
-            </Border>
-            <Border Canvas.Left="580">
-                <TextBlock Foreground="Red" />
-            </Border>
-            <Border Canvas.Left="500">
-                <TextBlock Foreground="Red" />
-            </Border>
-            <Border Canvas.Left="420">
-                <TextBlock />
-            </Border>
-            <Border Canvas.Left="340">
-                <TextBlock />
-            </Border>
-            <Border Canvas.Left="260">
-                <TextBlock />
-            </Border>
-            <Border Canvas.Left="180">
-                <TextBlock />
-            </Border>
-            <Border Canvas.Left="100">
-                <TextBlock />
-            </Border>
-            <Border Canvas.Left="20">
-                <TextBlock />
-            </Border>
-        </Canvas>
+                <Style x:Key="MinusButton" TargetType="ButtonBase" BasedOn="{StaticResource PlusMinusButton}">
+                    <Setter Property="ContentTemplate">
+                        <Setter.Value>
+                            <ItemContainerTemplate>
+                                <Line Stroke="White" X1="0" X2="9" StrokeThickness="2" Y1="1" Y2="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </ItemContainerTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+                <Style x:Key="PlusButton" TargetType="ButtonBase" BasedOn="{StaticResource PlusMinusButton}">
+                    <Setter Property="ContentTemplate">
+                        <Setter.Value>
+                            <ItemContainerTemplate>
+                                <Grid>
+                                    <Line Stroke="White" X1="0" X2="9" StrokeThickness="2" Y1="1" Y2="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <Line Stroke="White" X1="1" X2="1" StrokeThickness="2" Y1="0" Y2="9" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                            </ItemContainerTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Grid.Resources>
 
+            <Canvas Grid.Column="0" x:Name="PlusCanvas" Grid.Row="0" Height="80" Visibility="Collapsed">
+                <Canvas.Resources>
+                    <Style TargetType="Button" BasedOn="{StaticResource PlusButton}"/>
+                </Canvas.Resources>
+                <Button Tag="{StaticResource P8}" Canvas.Left="20" Click="OnPlusPressed"/>
+                <Button Tag="{StaticResource P7}" Canvas.Left="100" Click="OnPlusPressed"/>
+                <Button Tag="{StaticResource P6}" Canvas.Left="180" Click="OnPlusPressed"/>
+                <Button Tag="{StaticResource P5}" Canvas.Left="260" Click="OnPlusPressed"/>
+                <Button Tag="{StaticResource P4}" Canvas.Left="340" Click="OnPlusPressed"/>
+                <Button Tag="{StaticResource P3}" Canvas.Left="420" Click="OnPlusPressed"/>
+                <Button Tag="{StaticResource P2}" Canvas.Left="500" Click="OnPlusPressed"/>
+                <Button Tag="{StaticResource P1}" Canvas.Left="580" Click="OnPlusPressed"/>
+                <Button Tag="{StaticResource P0}" Canvas.Left="660" Click="OnPlusPressed"/>
+            </Canvas>
+
+            <Canvas Grid.Column="0" Grid.Row="1" x:Name="Canvas" HorizontalAlignment="Center" Height="180" Width="750" Background="LightGray" PreviewMouseDown="OnPreviewMouseDown">
+                <Canvas.Resources>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Margin" Value="0,-10,0,0" />
+                        <Setter Property="Foreground" Value="White" />
+                        <Setter Property="Text" Value=" " />
+                        <Setter Property="FontSize" Value="120" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                        <Setter Property="HorizontalAlignment" Value="Center" />
+                        <Setter Property="FontWeight" Value="SemiBold" />
+                    </Style>
+
+                    <Style TargetType="Border">
+                        <Setter Property="Background" Value="#303030" />
+                        <Setter Property="Height" Value="130" />
+                        <Setter Property="Width" Value="70" />
+                        <Setter Property="Canvas.Top" Value="25" />
+                    </Style>
+                </Canvas.Resources>
+                <Border Canvas.Left="660">
+                    <TextBlock Foreground="Red" />
+                </Border>
+                <Border Canvas.Left="580">
+                    <TextBlock Foreground="Red" />
+                </Border>
+                <Border Canvas.Left="500">
+                    <TextBlock Foreground="Red" />
+                </Border>
+                <Border Canvas.Left="420">
+                    <TextBlock />
+                </Border>
+                <Border Canvas.Left="340">
+                    <TextBlock />
+                </Border>
+                <Border Canvas.Left="260">
+                    <TextBlock />
+                </Border>
+                <Border Canvas.Left="180">
+                    <TextBlock />
+                </Border>
+                <Border Canvas.Left="100">
+                    <TextBlock />
+                </Border>
+                <Border Canvas.Left="20">
+                    <TextBlock />
+                </Border>
+            </Canvas>
+
+            <Canvas Grid.Column="0" x:Name="MinusCanvas" Grid.Row="2" Height="80" Visibility="Collapsed">
+                <Canvas.Resources>
+                    <Style TargetType="Button" BasedOn="{StaticResource MinusButton}"/>
+                </Canvas.Resources>
+                <Button Tag="{StaticResource P8}" Canvas.Top="10" Canvas.Left="20" Click="OnMinusPressed"/>
+                <Button Tag="{StaticResource P7}" Canvas.Top="10" Canvas.Left="100" Click="OnMinusPressed"/>
+                <Button Tag="{StaticResource P6}" Canvas.Top="10" Canvas.Left="180" Click="OnMinusPressed"/>
+                <Button Tag="{StaticResource P5}" Canvas.Top="10" Canvas.Left="260" Click="OnMinusPressed"/>
+                <Button Tag="{StaticResource P4}" Canvas.Top="10" Canvas.Left="340" Click="OnMinusPressed"/>
+                <Button Tag="{StaticResource P3}" Canvas.Top="10" Canvas.Left="420" Click="OnMinusPressed"/>
+                <Button Tag="{StaticResource P2}" Canvas.Top="10" Canvas.Left="500" Click="OnMinusPressed"/>
+                <Button Tag="{StaticResource P1}" Canvas.Top="10" Canvas.Left="580" Click="OnMinusPressed"/>
+                <Button Tag="{StaticResource P0}" Canvas.Top="10" Canvas.Left="660" Click="OnMinusPressed"/>
+            </Canvas>
+
+            <StackPanel x:Name="ButtonPanel" Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="20,0,0,0" Visibility="Collapsed">
+                <StackPanel.Resources>
+                    <Style TargetType="Button" BasedOn="{StaticResource TransparentButton}">
+                        <Setter Property="Background" Value="LightGray"/>
+                        <Setter Property="MinWidth" Value="200"/>
+                        <Setter Property="ContentTemplate">
+                            <Setter.Value>
+                                <DataTemplate>
+                                    <ContentControl Margin="40,0" Content="{TemplateBinding Content}"/>
+                                </DataTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="Gray"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Resources>
+                <Button FontSize="70" Height="100" Content="{x:Static p:Resources.Ok}" Click="OnOkPressed"/>
+                <Button FontSize="70" Height="100" Margin="20,0,0,0" Content="{x:Static p:Resources.Cancel}" Click="OnCancelPressed"/>
+            </StackPanel>
+
+        </Grid>
     </Viewbox>
 </UserControl>

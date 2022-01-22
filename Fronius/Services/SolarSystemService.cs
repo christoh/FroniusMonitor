@@ -76,7 +76,7 @@ namespace De.Hochstaetter.Fronius.Services
             NotifyOfPropertyChange(nameof(Efficiency));
         }
 
-        public async Task Start(WebConnection inverterConnection, WebConnection fritzBoxConnection)
+        public async Task Start(WebConnection? inverterConnection, WebConnection? fritzBoxConnection)
         {
             if (timer == null || SolarSystem == null)
             {
@@ -110,7 +110,7 @@ namespace De.Hochstaetter.Fronius.Services
             }
         }
 
-        private async Task<SolarSystem> CreateSolarSystem(WebConnection inverterConnection, WebConnection fritzBoxConnection)
+        private async Task<SolarSystem> CreateSolarSystem(WebConnection? inverterConnection, WebConnection? fritzBoxConnection)
         {
             var result = new SolarSystem();
             webClientService.InverterConnection = inverterConnection;

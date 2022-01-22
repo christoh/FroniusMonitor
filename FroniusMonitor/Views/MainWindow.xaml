@@ -10,14 +10,26 @@
         xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
         xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
         xmlns:images="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images">
-    <Grid Margin="16">
+    <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" x:Name="PowerConsumerColumn"/>
         </Grid.ColumnDefinitions>
 
-        <Viewbox Grid.Column="0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Menu Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
+            <MenuItem Header="{x:Static p:Resources.Settings}"/>
+            <MenuItem Header="{x:Static p:Resources.View}">
+                <MenuItem Header="_Auto-fit" Click="OnAutoSizeChecked"/>
+            </MenuItem>
+        </Menu>
+
+        <Viewbox Grid.Row="1" Grid.Column="0" Margin="16,16,0,16">
             <Grid Height="500">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="200" />
@@ -97,10 +109,13 @@
             </Grid>
         </Viewbox>
 
-        <GridSplitter Grid.Column="1" ResizeBehavior="PreviousAndNext" BorderThickness="2" ResizeDirection="Columns"
+        <GridSplitter Grid.Row="1" Grid.Column="1" ResizeBehavior="PreviousAndNext" BorderThickness="2" ResizeDirection="Columns"
                       BorderBrush="LightGray" Margin="10,0" VerticalAlignment="Stretch" />
 
-        <ScrollViewer VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto" VerticalContentAlignment="Top" HorizontalContentAlignment="Stretch" Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+        <ScrollViewer Grid.Row="1" Grid.Column="2"
+                      VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto"
+                      VerticalContentAlignment="Top" HorizontalContentAlignment="Stretch"
+                      Margin="10,16,0,0" VerticalAlignment="Center" HorizontalAlignment="Stretch">
             <ItemsControl ItemsSource="{Binding SolarSystemService.SolarSystem.FritzBox.PowerConsumers, FallbackValue={x:Null}}">
                 <ItemsControl.LayoutTransform>
                     <ScaleTransform x:Name="ConsumerScaler" ScaleX="1" ScaleY="1" />

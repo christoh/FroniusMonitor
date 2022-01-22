@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Net;
 using System.Security.Cryptography;
@@ -305,7 +304,7 @@ namespace De.Hochstaetter.Fronius.Services
         {
             if (FritzBoxConnection == null)
             {
-                throw new NullReferenceException(Resources.NoSystemConnection);
+                throw new NullReferenceException(Resources.NoFritzBoxConnection);
             }
 
             var document = await GetXmlResponse("login_sid.lua");
@@ -322,7 +321,7 @@ namespace De.Hochstaetter.Fronius.Services
 
             var dict = new Dictionary<string, string>
             {
-                {"username", FritzBoxConnection.UserName},
+                {"username", FritzBoxConnection.UserName??string.Empty},
                 {"response", response}
             };
 
