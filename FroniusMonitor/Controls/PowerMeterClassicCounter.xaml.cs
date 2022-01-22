@@ -7,8 +7,8 @@ namespace De.Hochstaetter.FroniusMonitor.Controls;
 public partial class PowerMeterClassicCounter
 {
     private readonly IReadOnlyList<TextBlock> textBlocks;
-    private bool isInCalibration;
     private double calibratedValue;
+    private bool isInCalibration;
 
     public event EventHandler<double>? CalibrationCompleted;
 
@@ -30,9 +30,26 @@ public partial class PowerMeterClassicCounter
         textBlocks = Canvas.Children.OfType<Border>().Select(b => (TextBlock)b.Child).ToArray();
     }
 
+    private bool IsInCalibration
+    {
+        get => isInCalibration;
+        set
+        {
+            isInCalibration = value;
+
+            switch (value)
+            {
+                case true:
+                    break;
+                case false:
+                    break;
+            }
+        }
+    }
+
     private void OnValueChanged()
     {
-        var value = (int)Math.Round(isInCalibration ? calibratedValue : Value, MidpointRounding.AwayFromZero);
+        var value = (int)Math.Round(IsInCalibration ? calibratedValue : Value, MidpointRounding.AwayFromZero);
 
         foreach (var textBlock in textBlocks)
         {
@@ -53,7 +70,7 @@ public partial class PowerMeterClassicCounter
         if (e.ClickCount > 1 && e.ChangedButton == MouseButton.Left)
         {
             calibratedValue = Value;
-            isInCalibration = true;
+            IsInCalibration = true;
             MinusCanvas.Visibility = PlusCanvas.Visibility = ButtonPanel.Visibility = Visibility.Visible;
         }
     }
@@ -67,7 +84,7 @@ public partial class PowerMeterClassicCounter
     private void OnCancelPressed(object sender, RoutedEventArgs e)
     {
         MinusCanvas.Visibility = PlusCanvas.Visibility = ButtonPanel.Visibility = Visibility.Collapsed;
-        isInCalibration = false;
+        IsInCalibration = false;
         OnValueChanged();
     }
 
