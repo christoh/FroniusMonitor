@@ -376,24 +376,24 @@ namespace De.Hochstaetter.Fronius.Services
 
         private static readonly Dictionary<int, IEnumerable<int>> allowedFritzBoxColors = new()
         {
-            { 358, new [] { 180,112,54 } },
-            {  35, new [] { 214,140,72 } },
-            {  52, new [] { 153,102,51 } },
-            {  92, new [] { 123, 79,38 } },
-            { 120, new [] { 160, 82,38 } },
-            { 160, new [] { 145, 84,41 } },
-            { 195, new [] { 179,118,59 } },
-            { 212, new [] { 169,110,56 } },
-            { 225, new [] { 204,135,67 } },
-            { 266, new [] { 169,110,54 } },
-            { 296, new [] { 140, 92,46 } },
-            { 335, new [] { 180,107,51 } },
+            { 358, new[] { 180, 112, 54 } },
+            { 35, new[] { 214, 140, 72 } },
+            { 52, new[] { 153, 102, 51 } },
+            { 92, new[] { 123, 79, 38 } },
+            { 120, new[] { 160, 82, 38 } },
+            { 160, new[] { 145, 84, 41 } },
+            { 195, new[] { 179, 118, 59 } },
+            { 212, new[] { 169, 110, 56 } },
+            { 225, new[] { 204, 135, 67 } },
+            { 266, new[] { 169, 110, 54 } },
+            { 296, new[] { 140, 92, 46 } },
+            { 335, new[] { 180, 107, 51 } },
         };
 
         public async Task SetFritzBoxColor(string ain, double hueDegrees, double saturation)
         {
-            var intHue = allowedFritzBoxColors.Keys.OrderBy(k=>Math.Min(Math.Abs(hueDegrees-k),Math.Abs(hueDegrees+360-k))).First();
-            var intSaturation = allowedFritzBoxColors[intHue].OrderBy(s=>Math.Abs(s-saturation*255)).First();
+            var intHue = allowedFritzBoxColors.Keys.OrderBy(k => Math.Min(Math.Abs(hueDegrees - k), Math.Abs(hueDegrees + 360 - k))).First();
+            var intSaturation = allowedFritzBoxColors[intHue].OrderBy(s => Math.Abs(s - saturation * 255)).First();
             ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
             using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setcolor&hue={intHue}&saturation={intSaturation}&duration=0").ConfigureAwait(false);
         }
@@ -414,7 +414,7 @@ namespace De.Hochstaetter.Fronius.Services
                     throw new NullReferenceException(Resources.NoSystemConnection);
                 }
 
-                var requestString = $"{FritzBoxConnection.BaseUrl}/{request}{(fritzBoxSid == null ? string.Empty : $"&sid={fritzBoxSid}")}";
+                var requestString = $"{FritzBoxConnection.BaseUrl}/{request}{(fritzBoxSid == null || request.StartsWith("login_sid.lua") ? string.Empty : $"&sid={fritzBoxSid}")}";
 
                 using var client = new HttpClient();
                 // ReSharper disable once PossibleMultipleEnumeration

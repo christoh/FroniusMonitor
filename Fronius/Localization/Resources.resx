@@ -336,4 +336,19 @@
   <data name="Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
+  <data name="Export" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="SettingsFilter" xml:space="preserve">
+    <value>{0} Settings Files (*.fms)|*.fms</value>
+  </data>
+  <data name="ExportSettings" xml:space="preserve">
+    <value>Export Settings</value>
+  </data>
+  <data name="Load" xml:space="preserve">
+    <value>Load</value>
+  </data>
+  <data name="LoadSettings" xml:space="preserve">
+    <value>Load Settings</value>
+  </data>
 </root>

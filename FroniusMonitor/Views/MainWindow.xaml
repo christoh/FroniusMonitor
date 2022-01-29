@@ -23,7 +23,10 @@
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
-            <MenuItem Header="{x:Static p:Resources.Settings}"/>
+            <MenuItem Header="{x:Static p:Resources.Settings}">
+                <MenuItem Header="{x:Static p:Resources.Export}" Command="{Binding ExportSettingsCommand}"/>
+                <MenuItem Header="{x:Static p:Resources.Load}" Command="{Binding LoadSettingsCommand}"/>
+            </MenuItem>
             <MenuItem Header="{x:Static p:Resources.View}">
                 <MenuItem Header="_Auto-fit" Click="OnAutoSizeChecked"/>
             </MenuItem>

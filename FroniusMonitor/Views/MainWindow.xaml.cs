@@ -30,6 +30,7 @@ public partial class MainWindow
 
         Loaded += async (_, _) =>
         {
+            ViewModel.Dispatcher = Dispatcher;
             var binding = new Binding($"{nameof(ViewModel.SolarSystemService)}.{nameof(ViewModel.SolarSystemService.SolarSystem)}.{nameof(ViewModel.SolarSystemService.SolarSystem.PowerFlow)}");
             SetBinding(PowerFlowProperty, binding);
             await ViewModel.OnInitialize().ConfigureAwait(false);

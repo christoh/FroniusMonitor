@@ -15,7 +15,7 @@ public partial class App
     public const double ZoomFactor = 1.025;
     public static string AppName => "FroniusMonitor";
     public static string PerUserDataDir => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Hochstätter", AppName);
-    public static string SettingsFileName => Path.Combine(PerUserDataDir, "Settings.xml");
+    public static string SettingsFileName => Path.Combine(PerUserDataDir, "Settings.fms");
 
     public static readonly IUnityContainer Container = new UnityContainer();
 

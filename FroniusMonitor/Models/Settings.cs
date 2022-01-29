@@ -44,13 +44,16 @@ namespace De.Hochstaetter.FroniusMonitor.Models
             set => Set(ref producedEnergyOffsetWattHours, value);
         }
 
-        public static async Task Save() => await Task.Run(() =>
+        public static async Task Save() => await Save(App.SettingsFileName).ConfigureAwait(false);
+
+
+        public static async Task Save(string fileName) => await Task.Run(() =>
         {
             lock (settingsLockObject)
             {
                 var serializer = new XmlSerializer(typeof(Settings));
                 Directory.CreateDirectory(App.PerUserDataDir);
-                using var stream = new FileStream(App.SettingsFileName, FileMode.Create, FileAccess.Write, FileShare.None);
+                using var stream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None);
 
                 using var writer = XmlWriter.Create(stream, new XmlWriterSettings
                 {
@@ -64,11 +67,16 @@ namespace De.Hochstaetter.FroniusMonitor.Models
             }
         }).ConfigureAwait(false);
 
-        public static async Task Load() => await Task.Run(() =>
+        public static async Task Load(string fileName) => await Task.Run(() =>
         {
-            var serializer = new XmlSerializer(typeof(Settings));
-            using var stream = new FileStream(App.SettingsFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-            App.Settings = (serializer.Deserialize(stream) as Settings) ?? new Settings();
+            lock (settingsLockObject)
+            {
+                var serializer = new XmlSerializer(typeof(Settings));
+                using var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                App.Settings = (serializer.Deserialize(stream) as Settings) ?? new Settings();
+            }
         }).ConfigureAwait(false);
+
+        public static async Task Load() => await Load(App.SettingsFileName).ConfigureAwait(false);
     }
 }
