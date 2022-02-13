@@ -201,7 +201,7 @@ public partial class InverterControl : IHaveLcdPanel
 
                 case InverterDisplayMode.More:
                     Lcd.Header = Inverter?.SerialNumber;
-                    Lcd.Value1 = ToLcd(Inverter?.Data?.Frequency, "N2", "Hz");
+                    Lcd.Value1 = ToLcd(Inverter?.Data?.Frequency, "N3", "Hz");
                     Lcd.Label1 = "Frq";
                     Lcd.Value2 = $"{Inverter?.Data?.Timestamp.ToLocalTime():d}";
                     Lcd.Label2 = "Dat";

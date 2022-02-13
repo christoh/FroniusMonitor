@@ -194,7 +194,7 @@ public partial class SmartMeterControl : IHaveLcdPanel
 
             case MeterDisplayMode.More:
                 Lcd.Header = SmartMeter?.SerialNumber;
-                Lcd.Value1 = $"{data.Frequency:N2} Hz";
+                Lcd.Value1 = $"{data.Frequency:N1} Hz";
                 Lcd.Label1 = "Frq";
                 Lcd.Value2 = $"{data.MeterTimestamp.ToLocalTime():d}";
                 Lcd.Label2 = "Dat";

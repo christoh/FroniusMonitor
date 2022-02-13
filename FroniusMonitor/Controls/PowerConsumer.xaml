@@ -8,7 +8,6 @@
                 xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
                 xmlns:gl="clr-namespace:System.Globalization;assembly=System.Runtime"
                 xmlns:contracts="clr-namespace:De.Hochstaetter.Fronius.Contracts;assembly=Fronius"
-                xmlns:system="clr-namespace:System;assembly=System.Runtime"
                 mc:Ignorable="d"
                 d:DesignHeight="75" d:DesignWidth="210">
 
