@@ -9,7 +9,8 @@
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
         xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
         xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
-        xmlns:images="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images">
+        xmlns:images="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
+        xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -82,7 +83,8 @@
                         </c:PowerFlowArrow>
 
                         <c:PowerFlowArrow Angle="30" Margin="200,0,0,0" Fill="LightGreen" HasRightPlacement="True"
-                                          Power="{Binding SolarSystemService.StoragePowerAvg, FallbackValue={x:Null}}" />
+                                          Power="{Binding SolarSystemService.StoragePowerAvg, FallbackValue={x:Null}}"
+                                          Visibility="{Binding SolarSystemService.SolarSystem.Storages, Converter={co:CountToVisibility}, FallbackValue=Collapsed}"/>
 
                     </StackPanel>
                 </Grid>

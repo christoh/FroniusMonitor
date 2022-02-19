@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Markup;
 using System.Windows.Media;
+using De.Hochstaetter.Fronius.Models;
 using De.Hochstaetter.FroniusMonitor.Models;
 
 namespace De.Hochstaetter.FroniusMonitor.Wpf.Converters;
@@ -160,5 +161,13 @@ public class GetTemperatureTicks : ConverterBase
 
 
         double Round(double i) => Math.Ceiling(i / tickDistance) * tickDistance;
+    }
+}
+
+public class CountToVisibility:ConverterBase
+{
+    public override object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is not IEnumerable<Storage> storages ? Visibility.Collapsed : storages.Any() ? Visibility.Visible : Visibility.Collapsed;
     }
 }
