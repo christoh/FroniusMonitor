@@ -140,7 +140,7 @@ namespace De.Hochstaetter.Fronius.Services
             }
 
 
-            foreach (var deviceGroup in (await webClientService.GetDevices().ConfigureAwait(false)).Devices.AsParallel().GroupBy(d => d.DeviceClass))
+            foreach (var deviceGroup in (await webClientService.GetDevices().ConfigureAwait(false)).Devices.GroupBy(d => d.DeviceClass))
             {
                 switch (deviceGroup.Key)
                 {
@@ -180,7 +180,6 @@ namespace De.Hochstaetter.Fronius.Services
                 }
             }
 
-            await Task.Run(() => NewDataReceived?.Invoke(this, new SolarDataEventArgs(result))).ConfigureAwait(false);
             return result;
         }
 
