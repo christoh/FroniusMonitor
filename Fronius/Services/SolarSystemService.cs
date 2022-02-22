@@ -113,8 +113,17 @@ namespace De.Hochstaetter.Fronius.Services
         private async Task<SolarSystem> CreateSolarSystem(WebConnection? inverterConnection, WebConnection? fritzBoxConnection)
         {
             var result = new SolarSystem();
-            webClientService.InverterConnection = inverterConnection;
-            webClientService.FritzBoxConnection = fritzBoxConnection;
+
+            if (inverterConnection != null)
+            {
+                webClientService.InverterConnection = inverterConnection;
+            }
+
+            if (fritzBoxConnection != null)
+            {
+                webClientService.FritzBoxConnection = fritzBoxConnection;
+            }
+
             InverterDevices? inverterDevices = null;
             StorageDevices? storageDevices = null;
             SmartMeterDevices? smartMeterDevices = null;
@@ -177,63 +186,72 @@ namespace De.Hochstaetter.Fronius.Services
 
         public async void TimerElapsed(object? _)
         {
-            if (SolarSystem == null || Interlocked.Exchange(ref updateSemaphore, 1) != 0)
+            if (Interlocked.Exchange(ref updateSemaphore, 1) != 0)
             {
                 return;
             }
 
             try
             {
-                SolarSystem.PowerFlow = await webClientService.GetPowerFlow().ConfigureAwait(false);
-                PowerFlowQueue.Enqueue(SolarSystem.PowerFlow);
+                var newSolarSystem = await CreateSolarSystem(null, null).ConfigureAwait(false);
 
-                if (PowerFlowQueue.Count > QueueSize)
+                if
+                (
+                    SolarSystem == null ||
+                    !SolarSystem.Storages.Select(s => s.Id).SequenceEqual(newSolarSystem.Storages.Select(n => n.Id)) ||
+                    !SolarSystem.Inverters.Select(s => s.Id).SequenceEqual(newSolarSystem.Inverters.Select(n => n.Id)) ||
+                    !SolarSystem.Meters.Select(s => s.Id).SequenceEqual(newSolarSystem.Meters.Select(n => n.Id))
+                )
                 {
-                    PowerFlowQueue.Dequeue();
+                    SolarSystem = newSolarSystem;
                 }
-
-                NotifyPowerQueueChanged();
-
-                var storageDevices = await webClientService.GetStorageDevices().ConfigureAwait(false);
-
-                foreach (var storage in SolarSystem.Storages)
+                else
                 {
-                    var newStorage = storageDevices.Storages.SingleOrDefault(s => s.Id == storage.Id);
+                    SolarSystem.PowerFlow = await webClientService.GetPowerFlow().ConfigureAwait(false);
+                    PowerFlowQueue.Enqueue(SolarSystem.PowerFlow);
 
-                    if (newStorage != null)
+                    if (PowerFlowQueue.Count > QueueSize)
                     {
-                        storage.Data = newStorage.Data;
-                    }
-                }
-
-                var inverterDevices = await webClientService.GetInverters().ConfigureAwait(false);
-
-                foreach (var inverter in SolarSystem.Inverters)
-                {
-                    var newInverter = inverterDevices.Inverters.SingleOrDefault(i => i.Id == inverter.Id);
-
-                    if (newInverter == null)
-                    {
-                        continue;
+                        PowerFlowQueue.Dequeue();
                     }
 
-                    inverter.ThreePhasesData = newInverter.ThreePhasesData;
-                    inverter.Data = newInverter.Data;
-                }
+                    NotifyPowerQueueChanged();
 
-                var meterDevices = await webClientService.GetMeterDevices().ConfigureAwait(false);
-
-                foreach (var smartMeter in SolarSystem.Meters)
-                {
-                    var newSmartMeter = meterDevices.SmartMeters.SingleOrDefault(m => m.Id == smartMeter.Id);
-
-                    if (newSmartMeter != null)
+                    foreach (var storage in SolarSystem.Storages.ToArray())
                     {
-                        smartMeter.Data = newSmartMeter.Data;
-                    }
-                }
+                        var newStorage = newSolarSystem.Storages.SingleOrDefault(s => s.Id == storage.Id);
 
-                IsConnected = true;
+                        if (newStorage != null)
+                        {
+                            storage.Data = newStorage.Data;
+                        }
+                    }
+
+                    foreach (var inverter in SolarSystem.Inverters)
+                    {
+                        var newInverter = newSolarSystem.Inverters.SingleOrDefault(i => i.Id == inverter.Id);
+
+                        if (newInverter == null)
+                        {
+                            continue;
+                        }
+
+                        inverter.ThreePhasesData = newInverter.ThreePhasesData;
+                        inverter.Data = newInverter.Data;
+                    }
+
+                    foreach (var smartMeter in SolarSystem.Meters)
+                    {
+                        var newSmartMeter = newSolarSystem.Meters.SingleOrDefault(m => m.Id == smartMeter.Id);
+
+                        if (newSmartMeter != null)
+                        {
+                            smartMeter.Data = newSmartMeter.Data;
+                        }
+                    }
+
+                    IsConnected = true;
+                }
 
                 try
                 {
