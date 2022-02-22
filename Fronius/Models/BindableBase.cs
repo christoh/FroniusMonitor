@@ -39,4 +39,18 @@ public abstract class BindableBase : INotifyPropertyChanged
     protected void Refresh() => NotifyOfPropertyChange(string.Empty);
 
     protected virtual void OnPropertyChanged(PropertyChangedEventArgs args) => PropertyChanged?.Invoke(this, args);
+
+    public void CopyFrom<T>(T other) where T : BindableBase
+    {
+        if (!GetType().IsAssignableFrom(typeof(T)))
+        {
+            throw new InvalidOperationException("Incompatible type");
+        }
+
+        foreach (var propertyInfo in GetType().GetProperties().Where(p => p.CanRead && p.CanWrite))
+        {
+            var otherValue = propertyInfo.GetValue(other);
+            propertyInfo.SetValue(this, otherValue);
+        }
+    }
 }

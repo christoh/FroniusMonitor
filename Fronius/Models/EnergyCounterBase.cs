@@ -2,9 +2,44 @@
 {
     public abstract class EnergyCounterBase : BaseResponse
     {
-        public double? TotalEnergyWattHours { get; init; }
-        public double? DayEnergyWattHours { get; init; }
-        public double? YearEnergyWattHours { get; init; }
+        private double? totalEnergyWattHours;
+
+        public double? TotalEnergyWattHours
+        {
+            get => totalEnergyWattHours;
+            set => Set(ref totalEnergyWattHours, value, () =>
+            {
+                NotifyOfPropertyChange(nameof(TotalEnergyKiloWattHours));
+                NotifyOfPropertyChange(nameof(TotalEnergyMegaWattHours));
+            });
+        }
+
+        private double? dayEnergyWattHours;
+
+        public double? DayEnergyWattHours
+        {
+            get => dayEnergyWattHours;
+
+            set => Set(ref dayEnergyWattHours, value, () =>
+            {
+                NotifyOfPropertyChange(nameof(DayEnergyKiloWattHours));
+                NotifyOfPropertyChange(nameof(DayEnergyMegaWattHours));
+            });
+        }
+
+        private double? yearEnergyWattHours;
+
+        public double? YearEnergyWattHours
+        {
+            get => yearEnergyWattHours;
+
+            set => Set(ref yearEnergyWattHours, value, () =>
+            {
+                NotifyOfPropertyChange(nameof(YearEnergyKiloWattHours));
+                NotifyOfPropertyChange(nameof(YearEnergyMegaWattHours));
+            });
+        }
+
         public double? DayEnergyKiloWattHours => DayEnergyWattHours / 1000;
         public double? YearEnergyKiloWattHours => YearEnergyWattHours / 1000;
         public double? TotalEnergyKiloWattHours => TotalEnergyWattHours / 1000;

@@ -217,6 +217,12 @@ public partial class InverterControl : IHaveLcdPanel
                     Lcd.Label2 = "Eff";
                     Lcd.Value2 = ToLcd(solarSystemService?.Efficiency, "P2");
                     Lcd.Label3 = "Sc";
+
+                    if (e.SolarSystem?.PowerFlow?.SelfConsumption == null)
+                    {
+
+                    }
+
                     Lcd.Value3 = ToLcd(e.SolarSystem?.PowerFlow?.SelfConsumption, "P2");
                     Lcd.LabelSum = "Aut";
                     Lcd.ValueSum = ToLcd(e.SolarSystem?.PowerFlow?.Autonomy, "P2");

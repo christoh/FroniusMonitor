@@ -180,7 +180,6 @@ namespace De.Hochstaetter.Fronius.Services
                 }
             }
 
-            await Task.Run(() => NewDataReceived?.Invoke(this, new SolarDataEventArgs(result))).ConfigureAwait(false);
             return result;
         }
 
@@ -207,7 +206,17 @@ namespace De.Hochstaetter.Fronius.Services
                 }
                 else
                 {
-                    SolarSystem.PowerFlow = await webClientService.GetPowerFlow().ConfigureAwait(false);
+                    var newPowerFlow=await webClientService.GetPowerFlow().ConfigureAwait(false);
+
+                    if (SolarSystem.PowerFlow != null)
+                    {
+                        SolarSystem.PowerFlow.CopyFrom(newPowerFlow);
+                    }
+                    else
+                    {
+                        SolarSystem.PowerFlow = newPowerFlow;
+                    }
+
                     PowerFlowQueue.Enqueue(SolarSystem.PowerFlow);
 
                     if (PowerFlowQueue.Count > QueueSize)
@@ -236,8 +245,23 @@ namespace De.Hochstaetter.Fronius.Services
                             continue;
                         }
 
-                        inverter.ThreePhasesData = newInverter.ThreePhasesData;
-                        inverter.Data = newInverter.Data;
+                        if (newInverter.ThreePhasesData != null && inverter.ThreePhasesData != null)
+                        {
+                            inverter.ThreePhasesData.CopyFrom(newInverter.ThreePhasesData);
+                        }
+                        else
+                        {
+                            inverter.ThreePhasesData=newInverter.ThreePhasesData;
+                        }
+
+                        if (newInverter.Data != null && inverter.Data != null)
+                        {
+                            inverter.Data.CopyFrom(newInverter.Data);
+                        }
+                        else
+                        {
+                            inverter.Data = newInverter.Data;
+                        }
                     }
 
                     foreach (var smartMeter in SolarSystem.Meters)
