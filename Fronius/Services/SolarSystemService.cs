@@ -8,9 +8,11 @@ namespace De.Hochstaetter.Fronius.Services
         private readonly IWebClientService webClientService;
         private Timer? timer;
         private int updateSemaphore;
-        private int fritzBoxCounter;
+        private int fritzBoxCounter, froniusCounter;
         private int suspendFritzBoxCounter;
         private const int QueueSize = 10;
+        private const int FritzBoxUpdateRate = 3;
+        private const int FroniusUpdateRate = 3;
 
         public event EventHandler<SolarDataEventArgs>? NewDataReceived;
 
@@ -192,69 +194,72 @@ namespace De.Hochstaetter.Fronius.Services
 
             try
             {
-                var newSolarSystem = await CreateSolarSystem(null, null).ConfigureAwait(false);
-
-                if
-                (
-                    SolarSystem == null ||
-                    !SolarSystem.Storages.Select(s => s.Id).SequenceEqual(newSolarSystem.Storages.Select(n => n.Id)) ||
-                    !SolarSystem.Inverters.Select(s => s.Id).SequenceEqual(newSolarSystem.Inverters.Select(n => n.Id)) ||
-                    !SolarSystem.Meters.Select(s => s.Id).SequenceEqual(newSolarSystem.Meters.Select(n => n.Id))
-                )
+                if (froniusCounter++ % FroniusUpdateRate == 0)
                 {
-                    SolarSystem = newSolarSystem;
-                }
-                else
-                {
-                    SolarSystem.PowerFlow = await webClientService.GetPowerFlow().ConfigureAwait(false);
-                    PowerFlowQueue.Enqueue(SolarSystem.PowerFlow);
+                    var newSolarSystem = await CreateSolarSystem(null, null).ConfigureAwait(false);
 
-                    if (PowerFlowQueue.Count > QueueSize)
+                    if
+                    (
+                        SolarSystem == null ||
+                        !SolarSystem.Storages.Select(s => s.Id).SequenceEqual(newSolarSystem.Storages.Select(n => n.Id)) ||
+                        !SolarSystem.Inverters.Select(s => s.Id).SequenceEqual(newSolarSystem.Inverters.Select(n => n.Id)) ||
+                        !SolarSystem.Meters.Select(s => s.Id).SequenceEqual(newSolarSystem.Meters.Select(n => n.Id))
+                    )
                     {
-                        PowerFlowQueue.Dequeue();
+                        SolarSystem = newSolarSystem;
                     }
-
-                    NotifyPowerQueueChanged();
-
-                    foreach (var storage in SolarSystem.Storages.ToArray())
+                    else
                     {
-                        var newStorage = newSolarSystem.Storages.SingleOrDefault(s => s.Id == storage.Id);
+                        SolarSystem.PowerFlow = await webClientService.GetPowerFlow().ConfigureAwait(false);
+                        PowerFlowQueue.Enqueue(SolarSystem.PowerFlow);
 
-                        if (newStorage != null)
+                        if (PowerFlowQueue.Count > QueueSize)
                         {
-                            storage.Data = newStorage.Data;
-                        }
-                    }
-
-                    foreach (var inverter in SolarSystem.Inverters)
-                    {
-                        var newInverter = newSolarSystem.Inverters.SingleOrDefault(i => i.Id == inverter.Id);
-
-                        if (newInverter == null)
-                        {
-                            continue;
+                            PowerFlowQueue.Dequeue();
                         }
 
-                        inverter.ThreePhasesData = newInverter.ThreePhasesData;
-                        inverter.Data = newInverter.Data;
-                    }
+                        NotifyPowerQueueChanged();
 
-                    foreach (var smartMeter in SolarSystem.Meters)
-                    {
-                        var newSmartMeter = newSolarSystem.Meters.SingleOrDefault(m => m.Id == smartMeter.Id);
-
-                        if (newSmartMeter != null)
+                        foreach (var storage in SolarSystem.Storages.ToArray())
                         {
-                            smartMeter.Data = newSmartMeter.Data;
-                        }
-                    }
+                            var newStorage = newSolarSystem.Storages.SingleOrDefault(s => s.Id == storage.Id);
 
-                    IsConnected = true;
+                            if (newStorage != null)
+                            {
+                                storage.Data = newStorage.Data;
+                            }
+                        }
+
+                        foreach (var inverter in SolarSystem.Inverters)
+                        {
+                            var newInverter = newSolarSystem.Inverters.SingleOrDefault(i => i.Id == inverter.Id);
+
+                            if (newInverter == null)
+                            {
+                                continue;
+                            }
+
+                            inverter.ThreePhasesData = newInverter.ThreePhasesData;
+                            inverter.Data = newInverter.Data;
+                        }
+
+                        foreach (var smartMeter in SolarSystem.Meters)
+                        {
+                            var newSmartMeter = newSolarSystem.Meters.SingleOrDefault(m => m.Id == smartMeter.Id);
+
+                            if (newSmartMeter != null)
+                            {
+                                smartMeter.Data = newSmartMeter.Data;
+                            }
+                        }
+
+                        IsConnected = true;
+                    }
                 }
 
                 try
                 {
-                    if (suspendFritzBoxCounter <= 0 && webClientService.FritzBoxConnection != null && (SolarSystem.FritzBox == null || fritzBoxCounter++ % 3 == 0))
+                    if (suspendFritzBoxCounter <= 0 && webClientService.FritzBoxConnection != null && SolarSystem != null && (SolarSystem.FritzBox == null || fritzBoxCounter++ % FritzBoxUpdateRate == 0))
                     {
                         SolarSystem.FritzBox = await webClientService.GetFritzBoxDevices().ConfigureAwait(false);
                     }
@@ -262,7 +267,11 @@ namespace De.Hochstaetter.Fronius.Services
                 catch
                 {
                     fritzBoxCounter = 0;
-                    SolarSystem.FritzBox = null;
+
+                    if (SolarSystem != null)
+                    {
+                        SolarSystem.FritzBox = null;
+                    }
                 }
 
                 await Task.Run(() => NewDataReceived?.Invoke(this, new SolarDataEventArgs(SolarSystem))).ConfigureAwait(false);
