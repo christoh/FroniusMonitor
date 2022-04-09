@@ -10,9 +10,9 @@ namespace De.Hochstaetter.Fronius.Services
         private int updateSemaphore;
         private int fritzBoxCounter, froniusCounter;
         private int suspendFritzBoxCounter;
-        private const int QueueSize = 10;
+        private const int QueueSize = 1;
         private const int FritzBoxUpdateRate = 3;
-        private const int FroniusUpdateRate = 3;
+        private const int FroniusUpdateRate = 2;
 
         public event EventHandler<SolarDataEventArgs>? NewDataReceived;
 
@@ -210,16 +210,6 @@ namespace De.Hochstaetter.Fronius.Services
                     }
                     else
                     {
-                        SolarSystem.PowerFlow = await webClientService.GetPowerFlow().ConfigureAwait(false);
-                        PowerFlowQueue.Enqueue(SolarSystem.PowerFlow);
-
-                        if (PowerFlowQueue.Count > QueueSize)
-                        {
-                            PowerFlowQueue.Dequeue();
-                        }
-
-                        NotifyPowerQueueChanged();
-
                         foreach (var storage in SolarSystem.Storages.ToArray())
                         {
                             var newStorage = newSolarSystem.Storages.SingleOrDefault(s => s.Id == storage.Id);
@@ -252,6 +242,42 @@ namespace De.Hochstaetter.Fronius.Services
                                 smartMeter.Data = newSmartMeter.Data;
                             }
                         }
+
+                        var solarPower = SolarSystem.Inverters.Sum(i => i.Data?.SolarPowerWatts);
+                        var storagePower = -SolarSystem.Storages.Sum(s => s.Data?.Power);
+                        var acPower = SolarSystem.Inverters.Sum(i => i.Data?.AcPowerWatts);
+                        var meterPower = SolarSystem.PrimaryMeter?.Data?.TotalRealPower;
+                        var gridPower = SolarSystem.PrimaryMeter?.Location == MeterLocation.Grid ? meterPower : -meterPower - acPower;
+                        var loadPower = SolarSystem.PrimaryMeter?.Location == MeterLocation.Load ? meterPower : -meterPower - acPower;
+
+                        var powerFlow = await webClientService.GetPowerFlow().ConfigureAwait(false);
+
+                        SolarSystem.PowerFlow = new PowerFlow
+                        {
+                            SolarPower = solarPower,
+                            StoragePower = storagePower,
+                            LoadPower = loadPower,
+                            GridPower = gridPower,
+                            MeterLocation = powerFlow.MeterLocation,
+                            SelfConsumption = Math.Min(-loadPower / solarPower ?? 0, 1),
+                            Autonomy = Math.Min(1d, (solarPower + storagePower) / -loadPower ?? 0),
+                            DayEnergyWattHours = powerFlow.DayEnergyWattHours,
+                            YearEnergyWattHours = powerFlow.YearEnergyWattHours,
+                            TotalEnergyWattHours = powerFlow.TotalEnergyWattHours,
+                            Version = powerFlow.Version,
+                            StorageStandby = powerFlow.StorageStandby,
+                            BackupMode = powerFlow.BackupMode,
+                            SiteType = powerFlow.SiteType,
+                        };
+
+                        PowerFlowQueue.Enqueue(SolarSystem.PowerFlow);
+
+                        if (PowerFlowQueue.Count > QueueSize)
+                        {
+                            PowerFlowQueue.Dequeue();
+                        }
+
+                        NotifyPowerQueueChanged();
 
                         IsConnected = true;
                     }
