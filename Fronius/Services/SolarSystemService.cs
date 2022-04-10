@@ -10,7 +10,7 @@ namespace De.Hochstaetter.Fronius.Services
         private int updateSemaphore;
         private int fritzBoxCounter, froniusCounter;
         private int suspendFritzBoxCounter;
-        private const int QueueSize = 1;
+        private const int QueueSize = 5;
         private const int FritzBoxUpdateRate = 3;
         private const int FroniusUpdateRate = 2;
 
@@ -268,6 +268,7 @@ namespace De.Hochstaetter.Fronius.Services
                             StorageStandby = powerFlow.StorageStandby,
                             BackupMode = powerFlow.BackupMode,
                             SiteType = powerFlow.SiteType,
+                            Timestamp = powerFlow.Timestamp,
                         };
 
                         PowerFlowQueue.Enqueue(SolarSystem.PowerFlow);
