@@ -56,7 +56,7 @@ namespace De.Hochstaetter.Fronius.Services
         public double DcPowerSum => SolarPowerSum + StoragePowerSum;
         public double PowerLossSum => AcPowerSum + DcPowerSum;
         public double? PowerLossAvg => PowerLossSum / Count;
-        public double? Efficiency => 1 - PowerLossSum / Math.Max(new[] { GridPowerSum, LoadPowerSum, SolarPowerSum, StoragePowerSum }.Sum(ps => ps > 0 ? ps : 0), double.Epsilon);
+        public double? Efficiency => -AcPowerSum / DcPowerSum;
         public double? GridPowerAvg => GridPowerSum / Count;
         public double? LoadPowerAvg => LoadPowerSum / Count;
         public double? StoragePowerAvg => StoragePowerSum / Count;
@@ -259,7 +259,7 @@ namespace De.Hochstaetter.Fronius.Services
                             LoadPower = loadPower,
                             GridPower = gridPower,
                             MeterLocation = powerFlow.MeterLocation,
-                            SelfConsumption = Math.Min(-loadPower / solarPower ?? 0, 1),
+                            SelfConsumption = Math.Min(-loadPower / acPower ?? 0, 1),
                             Autonomy = Math.Min(1d, (solarPower + storagePower) / -loadPower ?? 0),
                             DayEnergyWattHours = powerFlow.DayEnergyWattHours,
                             YearEnergyWattHours = powerFlow.YearEnergyWattHours,
