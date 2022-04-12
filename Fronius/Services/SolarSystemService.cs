@@ -10,7 +10,7 @@ namespace De.Hochstaetter.Fronius.Services
         private int updateSemaphore;
         private int fritzBoxCounter, froniusCounter;
         private int suspendFritzBoxCounter;
-        private const int QueueSize = 5;
+        private const int QueueSize = 30;
         private const int FritzBoxUpdateRate = 3;
         private const int FroniusUpdateRate = 2;
 

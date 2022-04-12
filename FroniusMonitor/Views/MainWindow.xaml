@@ -58,7 +58,7 @@
                         <images:SolarPanel Width="80" Foreground="#004000" VerticalAlignment="Top" Margin="0,10,0,0" />
 
                         <c:PowerFlowArrow VerticalAlignment="Top" Fill="#ffd000" Margin="15,0"
-                                          Power="{Binding SolarSystemService.SolarPowerAvg, FallbackValue={x:Null}}" />
+                                          Power="{Binding SolarSystemService.SolarSystem.PowerFlow.SolarPower, FallbackValue={x:Null}}" />
 
                         <c:InverterControl Height="200" Inverter="{Binding SolarSystemService.SolarSystem.PrimaryInverter, FallbackValue={x:Null}}" />
 
@@ -79,11 +79,11 @@
                     <StackPanel Orientation="Horizontal" Margin="100,-40,0,0">
 
                         <c:PowerFlowArrow Angle="-30" Fill="LightGray"
-                                          Power="{Binding SolarSystemService.GridPowerAvg, FallbackValue={x:Null}}">
+                                          Power="{Binding SolarSystemService.SolarSystem.PowerFlow.GridPower, FallbackValue={x:Null}}">
                         </c:PowerFlowArrow>
 
                         <c:PowerFlowArrow Angle="30" Margin="200,0,0,0" Fill="LightGreen" HasRightPlacement="True"
-                                          Power="{Binding SolarSystemService.StoragePowerAvg, FallbackValue={x:Null}}"
+                                          Power="{Binding SolarSystemService.SolarSystem.PowerFlow.StoragePower, FallbackValue={x:Null}}"
                                           Visibility="{Binding SolarSystemService.SolarSystem.Storages, Converter={co:CountToVisibility}, FallbackValue=Collapsed}"/>
 
                     </StackPanel>

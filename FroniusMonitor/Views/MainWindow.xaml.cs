@@ -119,31 +119,30 @@ public partial class MainWindow
             return;
         }
 
-        LoadArrow.Power = ViewModel.SolarSystemService.LoadPowerAvg - (ViewModel.IncludeInverterPower ? ViewModel.SolarSystemService.PowerLossAvg : 0);
+        LoadArrow.Power = PowerFlow.LoadPower - (ViewModel.IncludeInverterPower ? ViewModel.SolarSystemService.PowerLossAvg : 0);
 
-        IReadOnlyList<double> allIncomingPowers = new[] { ViewModel.SolarSystemService.SolarPowerAvg, ViewModel.SolarSystemService.StoragePowerAvg, ViewModel.SolarSystemService.GridPowerAvg }.Where(ps => ps is > 0).Select(ps => ps!.Value).ToArray();
-        var totalIncomingPower = allIncomingPowers.Sum();
+        var totalIncomingPower = new[] {PowerFlow.SolarPower, PowerFlow.StoragePower, PowerFlow.GridPower}.Where(ps => ps is > 0).Select(ps => ps!.Value).Sum();
 
         double r = 0, g = 0, b = 0;
 
-        if (ViewModel.SolarSystemService.SolarPowerAvg > 0)
+        if (PowerFlow.SolarPower > 0)
         {
-            r = 0xff * ViewModel.SolarSystemService.SolarPowerAvg.Value;
-            g = 0xd0 * ViewModel.SolarSystemService.SolarPowerAvg.Value;
+            r = 0xff * PowerFlow.SolarPower.Value;
+            g = 0xd0 * PowerFlow.SolarPower.Value;
         }
 
-        if (ViewModel.SolarSystemService.StoragePowerAvg > 0)
+        if (PowerFlow.StoragePower > 0)
         {
-            r += Colors.LightGreen.R * ViewModel.SolarSystemService.StoragePowerAvg.Value;
-            g += Colors.LightGreen.G * ViewModel.SolarSystemService.StoragePowerAvg.Value;
-            b += Colors.LightGreen.B * ViewModel.SolarSystemService.StoragePowerAvg.Value;
+            r += Colors.LightGreen.R * PowerFlow.StoragePower.Value;
+            g += Colors.LightGreen.G * PowerFlow.StoragePower.Value;
+            b += Colors.LightGreen.B * PowerFlow.StoragePower.Value;
         }
 
-        if (ViewModel.SolarSystemService.GridPowerAvg > 0)
+        if (PowerFlow.GridPower > 0)
         {
-            r += Colors.LightGray.R * ViewModel.SolarSystemService.GridPowerAvg.Value;
-            g += Colors.LightGray.G * ViewModel.SolarSystemService.GridPowerAvg.Value;
-            b += Colors.LightGray.B * ViewModel.SolarSystemService.GridPowerAvg.Value;
+            r += Colors.LightGray.R * PowerFlow.GridPower.Value;
+            g += Colors.LightGray.G * PowerFlow.GridPower.Value;
+            b += Colors.LightGray.B * PowerFlow.GridPower.Value;
         }
 
         r /= totalIncomingPower;
