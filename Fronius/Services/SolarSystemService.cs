@@ -10,9 +10,9 @@ namespace De.Hochstaetter.Fronius.Services
         private int updateSemaphore;
         private int fritzBoxCounter, froniusCounter;
         private int suspendFritzBoxCounter;
-        private const int QueueSize = 30;
+        private const int QueueSize = 60;
         private const int FritzBoxUpdateRate = 3;
-        private const int FroniusUpdateRate = 2;
+        private const int FroniusUpdateRate = 1;
 
         public event EventHandler<SolarDataEventArgs>? NewDataReceived;
 
@@ -243,14 +243,13 @@ namespace De.Hochstaetter.Fronius.Services
                             }
                         }
 
+                        var powerFlow = await webClientService.GetPowerFlow().ConfigureAwait(false);
                         var solarPower = SolarSystem.Inverters.Sum(i => i.Data?.SolarPowerWatts);
-                        var storagePower = -SolarSystem.Storages.Sum(s => s.Data?.Power);
+                        var storagePower = powerFlow.StoragePower;//-SolarSystem.Storages.Sum(s => s.Data?.Power);
                         var acPower = SolarSystem.Inverters.Sum(i => i.Data?.AcPowerWatts);
                         var meterPower = SolarSystem.PrimaryMeter?.Data?.TotalRealPower;
                         var gridPower = SolarSystem.PrimaryMeter?.Location == MeterLocation.Grid ? meterPower : -meterPower - acPower;
                         var loadPower = SolarSystem.PrimaryMeter?.Location == MeterLocation.Load ? meterPower : -meterPower - acPower;
-
-                        var powerFlow = await webClientService.GetPowerFlow().ConfigureAwait(false);
 
                         SolarSystem.PowerFlow = new PowerFlow
                         {
