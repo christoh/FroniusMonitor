@@ -245,7 +245,7 @@ namespace De.Hochstaetter.Fronius.Services
 
                         var powerFlow = await webClientService.GetPowerFlow().ConfigureAwait(false);
                         var solarPower = SolarSystem.Inverters.Sum(i => i.Data?.SolarPowerWatts);
-                        var storagePower = powerFlow.StoragePower;//-SolarSystem.Storages.Sum(s => s.Data?.Power);
+                        var storagePower = -SolarSystem.Storages.Sum(s => s.Data?.Power);
                         var acPower = SolarSystem.Inverters.Sum(i => i.Data?.AcPowerWatts);
                         var meterPower = SolarSystem.PrimaryMeter?.Data?.TotalRealPower;
                         var gridPower = SolarSystem.PrimaryMeter?.Location == MeterLocation.Grid ? meterPower : -meterPower - acPower;
