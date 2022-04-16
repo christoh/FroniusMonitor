@@ -113,13 +113,13 @@ public partial class MainWindow
             return;
         }
 
+        LoadArrow.Power = PowerFlow.LoadPower - (ViewModel.IncludeInverterPower ? ViewModel.SolarSystemService.PowerLossAvg : 0);
+
         if (PowerFlow.LoadPower > 0)
         {
             LoadArrow.Fill = Brushes.LightGray;
             return;
         }
-
-        LoadArrow.Power = PowerFlow.LoadPower - (ViewModel.IncludeInverterPower ? ViewModel.SolarSystemService.PowerLossAvg : 0);
 
         var totalIncomingPower = new[] {PowerFlow.SolarPower, PowerFlow.StoragePower, PowerFlow.GridPower}.Where(ps => ps is > 0).Select(ps => ps!.Value).Sum();
 
