@@ -243,32 +243,32 @@ namespace De.Hochstaetter.Fronius.Services
                             }
                         }
 
-                        var powerFlow = await webClientService.GetPowerFlow().ConfigureAwait(false);
-                        var solarPower = SolarSystem.Inverters.Sum(i => i.Data?.SolarPowerWatts);
-                        var storagePower = -SolarSystem.Storages.Sum(s => s.Data?.Power);
-                        var acPower = SolarSystem.Inverters.Sum(i => i.Data?.AcPowerWatts);
-                        var meterPower = SolarSystem.PrimaryMeter?.Data?.TotalRealPower;
-                        var gridPower = SolarSystem.PrimaryMeter?.Location == MeterLocation.Grid ? meterPower : -meterPower - acPower;
-                        var loadPower = SolarSystem.PrimaryMeter?.Location == MeterLocation.Load ? meterPower : -meterPower - acPower;
+                        SolarSystem.PowerFlow = await webClientService.GetPowerFlow().ConfigureAwait(false);
+                        //var solarPower = SolarSystem.Inverters.Sum(i => i.Data?.SolarPowerWatts);
+                        //var storagePower = -SolarSystem.Storages.Sum(s => s.Data?.Power);
+                        //var acPower = SolarSystem.Inverters.Sum(i => i.Data?.AcPowerWatts);
+                        //var meterPower = SolarSystem.PrimaryMeter?.Data?.TotalRealPower;
+                        //var gridPower = SolarSystem.PrimaryMeter?.Location == MeterLocation.Grid ? meterPower : -meterPower - acPower;
+                        //var loadPower = SolarSystem.PrimaryMeter?.Location == MeterLocation.Load ? meterPower : -meterPower - acPower;
 
-                        SolarSystem.PowerFlow = new PowerFlow
-                        {
-                            SolarPower = solarPower,
-                            StoragePower = storagePower,
-                            LoadPower = loadPower,
-                            GridPower = gridPower,
-                            MeterLocation = powerFlow.MeterLocation,
-                            SelfConsumption = Math.Min(-loadPower / acPower ?? 0, 1),
-                            Autonomy = Math.Min(1d, (solarPower + storagePower) / -loadPower ?? 0),
-                            DayEnergyWattHours = powerFlow.DayEnergyWattHours,
-                            YearEnergyWattHours = powerFlow.YearEnergyWattHours,
-                            TotalEnergyWattHours = powerFlow.TotalEnergyWattHours,
-                            Version = powerFlow.Version,
-                            StorageStandby = powerFlow.StorageStandby,
-                            BackupMode = powerFlow.BackupMode,
-                            SiteType = powerFlow.SiteType,
-                            Timestamp = powerFlow.Timestamp,
-                        };
+                        //SolarSystem.PowerFlow = new PowerFlow
+                        //{
+                        //    SolarPower = solarPower,
+                        //    StoragePower = storagePower,
+                        //    LoadPower = loadPower,
+                        //    GridPower = gridPower,
+                        //    MeterLocation = powerFlow.MeterLocation,
+                        //    SelfConsumption = Math.Min(-loadPower / acPower ?? 0, 1),
+                        //    Autonomy = Math.Min(1d, (solarPower + storagePower) / -loadPower ?? 0),
+                        //    DayEnergyWattHours = powerFlow.DayEnergyWattHours,
+                        //    YearEnergyWattHours = powerFlow.YearEnergyWattHours,
+                        //    TotalEnergyWattHours = powerFlow.TotalEnergyWattHours,
+                        //    Version = powerFlow.Version,
+                        //    StorageStandby = powerFlow.StorageStandby,
+                        //    BackupMode = powerFlow.BackupMode,
+                        //    SiteType = powerFlow.SiteType,
+                        //    Timestamp = powerFlow.Timestamp,
+                        //};
 
                         PowerFlowQueue.Enqueue(SolarSystem.PowerFlow);
 
