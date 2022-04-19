@@ -19,6 +19,8 @@ namespace De.Hochstaetter.Fronius.Services
     {
         private string? fritzBoxSid;
 
+        private DateTime lastSolarApiCall = DateTime.UtcNow.AddSeconds(-4);
+
         private WebConnection? inverterConnection;
 
         public WebConnection? InverterConnection
@@ -465,8 +467,16 @@ namespace De.Hochstaetter.Fronius.Services
 
             using (var client = new HttpClient())
             {
+                var nextAllowedCall = lastSolarApiCall.AddSeconds(4) - DateTime.UtcNow;
+
+                if (nextAllowedCall.Ticks > 0)
+                {
+                    await Task.Delay(nextAllowedCall).ConfigureAwait(false);
+                }
+
                 var response = await client.GetAsync(requestString).ConfigureAwait(false);
                 response.EnsureSuccessStatusCode();
+                lastSolarApiCall = DateTime.UtcNow;
                 jsonString = debugString ?? await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             }
 
