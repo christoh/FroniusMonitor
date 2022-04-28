@@ -12,7 +12,7 @@ namespace De.Hochstaetter.Fronius.Services
         private int suspendFritzBoxCounter;
         private const int QueueSize = 60;
         private const int FritzBoxUpdateRate = 3;
-        private const int FroniusUpdateRate = 1;
+        private const int FroniusUpdateRate = 4;
 
         public event EventHandler<SolarDataEventArgs>? NewDataReceived;
 

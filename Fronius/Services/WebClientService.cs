@@ -467,7 +467,7 @@ namespace De.Hochstaetter.Fronius.Services
 
             using (var client = new HttpClient())
             {
-                var nextAllowedCall = lastSolarApiCall.AddSeconds(4) - DateTime.UtcNow;
+                var nextAllowedCall = lastSolarApiCall.AddSeconds(.2) - DateTime.UtcNow;
 
                 if (nextAllowedCall.Ticks > 0)
                 {
