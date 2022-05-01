@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
+using De.Hochstaetter.Fronius.Attributes;
 using De.Hochstaetter.Fronius.Contracts;
 using De.Hochstaetter.Fronius.Exceptions;
 using De.Hochstaetter.Fronius.Extensions;
@@ -35,6 +36,116 @@ namespace De.Hochstaetter.Fronius.Services
         {
             get => fritzBoxConnection;
             set => Set(ref fritzBoxConnection, value);
+        }
+
+        public async Task<Gen24System> GetFroniusData()
+        {
+            var gen24System = new Gen24System();
+
+            var (result, dataToken) = await GetJsonResponse<BaseResponse>("components/readable", true).ConfigureAwait(false);
+            var inverter = dataToken["1"];
+
+            gen24System.Inverter = ReadFroniusData<Gen24Inverter>(inverter);
+
+            var storage = dataToken.Values().Where(t =>
+            {
+                var attributes = t["attributes"];
+
+                return
+                    attributes?["storage_interface_id"] != null ||
+                    (attributes?["id"]?.Value<string>() ?? string.Empty).StartsWith("rtu-generic-storage");
+            })?.FirstOrDefault();
+
+            gen24System.Storage = ReadFroniusData<Gen24Storage>(storage);
+            var restrictions = dataToken.Values().FirstOrDefault(t => t["attributes"]?["PowerRestrictionControllerVersion"] != null);
+            gen24System.Restrictions = ReadFroniusData<Gen24Restrictions>(restrictions);
+
+            var meters = dataToken.Values()
+                .Where(t => t["attributes"]?["meter-location"] != null)
+                .GroupBy(t => t["attributes"]?["id"]?.Value<string>())
+                .Select(g=>g.Values().First())
+                ;
+
+            foreach (var meter in meters)
+            {
+                var gen24PowerMeter = ReadFroniusData<Gen24PowerMeter>(meter.Parent);
+
+                if (gen24PowerMeter == null)
+                {
+                    continue;
+                }
+
+                gen24System.Meters.Add(gen24PowerMeter);
+            }
+
+            return gen24System;
+        }
+
+        private T? ReadFroniusData<T>(JToken? device) where T : new()
+        {
+            var channels = device?["channels"];
+            var attributes = device?["attributes"];
+
+            if (channels == null || attributes == null)
+            {
+                return default;
+            }
+
+            var result = new T();
+
+            foreach (var propertyInfo in typeof(T).GetProperties().Where(p => p.CustomAttributes.Any(a => a.AttributeType == typeof(FroniusAttribute))))
+            {
+                var attribute = (FroniusAttribute)propertyInfo.GetCustomAttributes(typeof(FroniusAttribute), true).Single();
+                var stringValue = (attribute.DataType == FroniusDataType.Channel ? channels[attribute.Name] : attributes[attribute.Name])?.Value<string>()?.Trim();
+                dynamic? value = null;
+
+                if (stringValue != null)
+                {
+                    if (propertyInfo.PropertyType.IsAssignableFrom(typeof(TimeSpan)))
+                    {
+                        var doubleValue = (double)Convert.ChangeType(stringValue, typeof(double), CultureInfo.InvariantCulture);
+                        value = TimeSpan.FromSeconds(doubleValue);
+                    }
+                    else if (propertyInfo.PropertyType.IsAssignableFrom(typeof(DateTime)))
+                    {
+                        var doubleValue = (double)Convert.ChangeType(stringValue, typeof(double), CultureInfo.InvariantCulture);
+                        value = DateTime.UnixEpoch.AddSeconds(doubleValue);
+                    }
+                    else if (attribute.DataType == FroniusDataType.Channel && propertyInfo.PropertyType.IsAssignableFrom(typeof(bool)))
+                    {
+                        value = (double)Convert.ChangeType(stringValue, typeof(double), CultureInfo.InvariantCulture) != 0d;
+                    }
+                    else if (propertyInfo.PropertyType.IsAssignableFrom(typeof(Version)))
+                    {
+                        try
+                        {
+                            value = new Version(stringValue);
+                        }
+                        catch
+                        {
+                            value = null;
+                        }
+                    }
+                    else
+                    {
+                        value = Convert.ChangeType(stringValue, Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? propertyInfo.PropertyType, CultureInfo.InvariantCulture);
+                    }
+
+                    if (propertyInfo.PropertyType.IsAssignableFrom(typeof(double)) || propertyInfo.PropertyType.IsAssignableFrom(typeof(float)))
+                    {
+                        value = attribute.Unit switch
+                        {
+                            Unit.Joule => value / 3600,
+                            Unit.Percent => value / 100,
+                            _ => value,
+                        };
+                    }
+                }
+
+                propertyInfo.SetValue(result, value);
+            }
+
+            return result;
         }
 
         public async Task<SystemDevices> GetDevices()
@@ -237,7 +348,7 @@ namespace De.Hochstaetter.Fronius.Services
                 L3RealPower = meterToken["PowerReal_P_Phase_3"]?.Value<double>() ?? double.NaN,
                 TotalRealPower = meterToken["PowerReal_P_Sum"]?.Value<double>() ?? double.NaN,
                 MeterTimestamp = DateTime.UnixEpoch.AddSeconds(meterToken["TimeStamp"]?.Value<double>() ?? 0),
-                IsVisible = meterToken["Visible"]?.Value<bool>() ?? true,
+                IsVisible = meterToken["IsVisible"]?.Value<bool>() ?? true,
                 L1L2Voltage = meterToken["Voltage_AC_PhaseToPhase_12"]?.Value<double>() ?? double.NaN,
                 L2L3Voltage = meterToken["Voltage_AC_PhaseToPhase_23"]?.Value<double>() ?? double.NaN,
                 L3L1Voltage = meterToken["Voltage_AC_PhaseToPhase_31"]?.Value<double>() ?? double.NaN,
@@ -323,7 +434,7 @@ namespace De.Hochstaetter.Fronius.Services
 
             var dict = new Dictionary<string, string>
             {
-                {"username", FritzBoxConnection.UserName??string.Empty},
+                {"username", FritzBoxConnection.UserName ?? string.Empty},
                 {"response", response}
             };
 
@@ -378,18 +489,18 @@ namespace De.Hochstaetter.Fronius.Services
 
         private static readonly Dictionary<int, IEnumerable<int>> allowedFritzBoxColors = new()
         {
-            { 358, new[] { 180, 112, 54 } },
-            { 35, new[] { 214, 140, 72 } },
-            { 52, new[] { 153, 102, 51 } },
-            { 92, new[] { 123, 79, 38 } },
-            { 120, new[] { 160, 82, 38 } },
-            { 160, new[] { 145, 84, 41 } },
-            { 195, new[] { 179, 118, 59 } },
-            { 212, new[] { 169, 110, 56 } },
-            { 225, new[] { 204, 135, 67 } },
-            { 266, new[] { 169, 110, 54 } },
-            { 296, new[] { 140, 92, 46 } },
-            { 335, new[] { 180, 107, 51 } },
+            {358, new[] {180, 112, 54}},
+            {35, new[] {214, 140, 72}},
+            {52, new[] {153, 102, 51}},
+            {92, new[] {123, 79, 38}},
+            {120, new[] {160, 82, 38}},
+            {160, new[] {145, 84, 41}},
+            {195, new[] {179, 118, 59}},
+            {212, new[] {169, 110, 56}},
+            {225, new[] {204, 135, 67}},
+            {266, new[] {169, 110, 54}},
+            {296, new[] {140, 92, 46}},
+            {335, new[] {180, 107, 51}},
         };
 
         public async Task SetFritzBoxColor(string ain, double hueDegrees, double saturation)
@@ -455,7 +566,7 @@ namespace De.Hochstaetter.Fronius.Services
             return result;
         }
 
-        private async Task<(T, JToken)> GetJsonResponse<T>(string request, string? debugString = null) where T : BaseResponse, new()
+        private async Task<(T, JToken)> GetJsonResponse<T>(string request, bool useUnofficialApi = false, string? debugString = null) where T : BaseResponse, new()
         {
             if (InverterConnection == null)
             {
@@ -463,7 +574,7 @@ namespace De.Hochstaetter.Fronius.Services
             }
 
             string jsonString;
-            var requestString = $"{InverterConnection.BaseUrl}/solar_api/v1/{request}";
+            var requestString = $"{InverterConnection.BaseUrl}/{(useUnofficialApi ? string.Empty : "solar_api/v1/")}{request}";
 
             using (var client = new HttpClient())
             {

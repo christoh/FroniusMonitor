@@ -12,7 +12,7 @@ namespace De.Hochstaetter.Fronius.Services
         private int suspendFritzBoxCounter;
         private const int QueueSize = 60;
         private const int FritzBoxUpdateRate = 3;
-        private const int FroniusUpdateRate = 4;
+        private const int FroniusUpdateRate = 1;
 
         public event EventHandler<SolarDataEventArgs>? NewDataReceived;
 
@@ -141,6 +141,7 @@ namespace De.Hochstaetter.Fronius.Services
                 result.FritzBox = null;
             }
 
+            result.Gen24System = await webClientService.GetFroniusData().ConfigureAwait(false);
 
             foreach (var deviceGroup in (await webClientService.GetDevices().ConfigureAwait(false)).Devices.GroupBy(d => d.DeviceClass))
             {

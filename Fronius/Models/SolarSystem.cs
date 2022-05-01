@@ -21,6 +21,14 @@ public class SolarSystem : BindableBase, IHierarchicalCollection
 
     public Inverter? PrimaryInverter => Inverters.FirstOrDefault();
 
+    private Gen24System? gen24System;
+
+    public Gen24System? Gen24System
+    {
+        get => gen24System;
+        set => Set(ref gen24System, value);
+    }
+
     private FritzBoxDeviceList? fritzBox;
 
     public FritzBoxDeviceList? FritzBox

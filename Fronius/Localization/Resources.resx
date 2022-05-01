@@ -253,7 +253,7 @@
     <value>Current</value>
   </data>
   <data name="Voltage" xml:space="preserve">
-    <value>Voltage</value>
+    <value>VoltageInternal</value>
   </data>
   <data name="More" xml:space="preserve">
     <value>More</value>

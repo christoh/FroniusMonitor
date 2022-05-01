@@ -12,6 +12,7 @@ namespace De.Hochstaetter.Fronius.Contracts
     {
         WebConnection? InverterConnection { get; set; }
         WebConnection? FritzBoxConnection { get; set; }
+        Task<Gen24System> GetFroniusData();
         Task<SystemDevices> GetDevices();
         Task<InverterDevices> GetInverters();
         Task<StorageDevices> GetStorageDevices();

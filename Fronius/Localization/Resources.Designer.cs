@@ -754,7 +754,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Voltage.
+        ///   Looks up a localized string similar to VoltageInternal.
         /// </summary>
         public static string Voltage {
             get {
