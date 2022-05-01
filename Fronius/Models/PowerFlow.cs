@@ -1,4 +1,5 @@
-﻿using De.Hochstaetter.Fronius.Localization;
+﻿using De.Hochstaetter.Fronius.Attributes;
+using De.Hochstaetter.Fronius.Localization;
 
 namespace De.Hochstaetter.Fronius.Models
 {
@@ -11,12 +12,12 @@ namespace De.Hochstaetter.Fronius.Models
      */
     public enum SiteType : sbyte
     {
-        ProduceOnly,
-        Meter,
-        VagueMeter,
-        BiDirectional,
-        AcCoupled,
-        Unknown,
+        [EnumParse(ParseAs = "produce-only")] ProduceOnly,
+        [EnumParse(ParseAs = "meter")] Meter,
+        [EnumParse(ParseAs = "vague-meter")] VagueMeter,
+        [EnumParse(ParseAs = "bidirectional")] BiDirectional,
+        [EnumParse(ParseAs = "ac-coupled")] AcCoupled,
+        [EnumParse(IsDefault = true)] Unknown,
     }
 
     public class PowerFlow : EnergyCounterBase

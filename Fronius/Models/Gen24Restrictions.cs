@@ -12,7 +12,7 @@ namespace De.Hochstaetter.Fronius.Models
     public class Gen24Restrictions:Gen24DeviceBase
     {
         private double? maxStorageChargeFromGridPower;
-        [Fronius("BAT_MODE_POWERRESTRICTION_CHARGE_FROM_AC_U16")]
+        [FroniusProprietaryImport("BAT_MODE_POWERRESTRICTION_CHARGE_FROM_AC_U16")]
         public double? MaxStorageChargeFromGridPower
         {
             get => maxStorageChargeFromGridPower;
@@ -20,7 +20,7 @@ namespace De.Hochstaetter.Fronius.Models
         }
 
         private double maxStateOfCharge;
-        [Fronius("BAT_PERCENT_POWERRESTRICTION_SOC_MAX_F64", Unit.Percent)]
+        [FroniusProprietaryImport("BAT_PERCENT_POWERRESTRICTION_SOC_MAX_F64", Unit.Percent)]
         public double MaxStateOfCharge
         {
             get => maxStateOfCharge;
@@ -28,7 +28,7 @@ namespace De.Hochstaetter.Fronius.Models
         }
 
         private double minStateOfCharge;
-        [Fronius("BAT_PERCENT_POWERRESTRICTION_SOC_MIN_F64", Unit.Percent)]
+        [FroniusProprietaryImport("BAT_PERCENT_POWERRESTRICTION_SOC_MIN_F64", Unit.Percent)]
         public double MinStateOfCharge
         {
             get => minStateOfCharge;
@@ -36,7 +36,7 @@ namespace De.Hochstaetter.Fronius.Models
         }
 
         private double? storageLimitDischarge;
-        [Fronius("DCLINK_POWERACTIVE_LIMIT_DISCHARGE_F64")]
+        [FroniusProprietaryImport("DCLINK_POWERACTIVE_LIMIT_DISCHARGE_F64")]
         public double? StorageLimitDischarge
         {
             get => storageLimitDischarge;
@@ -44,7 +44,7 @@ namespace De.Hochstaetter.Fronius.Models
         }
 
         private double? storageLimitCharge;
-        [Fronius("DCLINK_POWERACTIVE_MAX_F32")]
+        [FroniusProprietaryImport("DCLINK_POWERACTIVE_MAX_F32")]
         public double? StorageLimitCharge
         {
             get => storageLimitCharge;
