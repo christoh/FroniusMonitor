@@ -24,12 +24,12 @@
 
                 <TextBlock Grid.Row="0" Text="1.8.0" FontSize="40" Foreground="White" Margin="22,100,0,0"/>
                 <local:PowerMeterClassicCounter
-                    Value="{Binding SmartMeter.Data.RealEnergyConsumedWattHours, Converter={co:GridMeterConsumptionCorrector}, FallbackValue=0}" Grid.Row="1"
+                    Value="{Binding SmartMeter.EnergyRealConsumed, Converter={co:GridMeterConsumptionCorrector}, FallbackValue=0}" Grid.Row="1"
                     HorizontalAlignment="Center" Height="180" Width="750" CalibrationCompleted="OnConsumedPowerCalibrated" />
 
                 <TextBlock Grid.Row="2" Text="2.8.0" FontSize="40" Foreground="White" Margin="22,20,0,0"/>
                 <local:PowerMeterClassicCounter
-                    Value="{Binding SmartMeter.Data.RealEnergyProducedWattHours, Converter={co:GridMeterProductionCorrector}, FallbackValue=0}" Grid.Row="3"
+                    Value="{Binding SmartMeter.EnergyRealProduced, Converter={co:GridMeterProductionCorrector}, FallbackValue=0}" Grid.Row="3"
                     HorizontalAlignment="Center" Height="180" Width="750" CalibrationCompleted="OnProducedPowerCalibrated"/>
 
                 <Border Grid.Row="4" Background="Gray" CornerRadius="40,40,0,0" Width="550" Height="20" Margin="0,70,0,0"/>

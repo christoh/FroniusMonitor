@@ -383,7 +383,7 @@ public class Gen24Cache : Gen24DeviceBase
 
     private double? fan1RelativeRpm;
 
-    [FroniusProprietaryImport("FANCONTROL_PERCENT_01_F32")]
+    [FroniusProprietaryImport("FANCONTROL_PERCENT_01_F32", Unit.Percent)]
     public double? Fan1RelativeRpm
     {
         get => fan1RelativeRpm;
@@ -392,7 +392,7 @@ public class Gen24Cache : Gen24DeviceBase
 
     private double? fan2RelativeRpm;
 
-    [FroniusProprietaryImport("FANCONTROL_PERCENT_02_F32")]
+    [FroniusProprietaryImport("FANCONTROL_PERCENT_02_F32", Unit.Percent)]
     public double? Fan2RelativeRpm
     {
         get => fan2RelativeRpm;

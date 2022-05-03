@@ -18,16 +18,16 @@ public partial class StorageControl
         Duration = TimeSpan.FromSeconds(1.5),
     };
 
-    public static readonly DependencyProperty StorageProperty = DependencyProperty.Register
+    public static readonly DependencyProperty Gen24Property = DependencyProperty.Register
     (
-        nameof(Storage), typeof(Storage), typeof(StorageControl),
+        nameof(Gen24), typeof(Gen24System), typeof(StorageControl),
         new PropertyMetadata((d, e) => ((StorageControl)d).OnStorageChanged(e))
     );
 
-    public Storage? Storage
+    public Gen24System? Gen24
     {
-        get => (Storage?)GetValue(StorageProperty);
-        set => SetValue(StorageProperty, value);
+        get => (Gen24System?)GetValue(Gen24Property);
+        set => SetValue(Gen24Property, value);
     }
 
     public StorageControl()
@@ -36,9 +36,9 @@ public partial class StorageControl
 
         Unloaded += (_, _) =>
         {
-            if (Storage != null)
+            if (Gen24 != null)
             {
-                Storage.PropertyChanged -= OnDataChanged;
+                Gen24.PropertyChanged -= OnDataChanged;
             }
         };
     }
@@ -50,9 +50,9 @@ public partial class StorageControl
             oldStorage.PropertyChanged -= OnDataChanged;
         }
 
-        if (Storage != null)
+        if (Gen24 != null)
         {
-            Storage.PropertyChanged += OnDataChanged;
+            Gen24.PropertyChanged += OnDataChanged;
         }
 
         OnDataChanged();
@@ -63,16 +63,18 @@ public partial class StorageControl
     {
         Dispatcher.InvokeAsync(() =>
         {
-            var data = Storage?.Data;
+            var storage = Gen24?.Storage;
+            var cache = Gen24?.Cache;
+            var limits = Gen24?.Restrictions;
 
-            if (data == null)
+            if (storage == null)
             {
                 return;
             }
 
-            SocRectangle.Height = (data.StateOfCharge ?? 0) * BackgroundRectangle.Height;
+            SocRectangle.Height = (storage.StateOfCharge ?? 0) * BackgroundRectangle.Height;
 
-            if (data.Power > 10)
+            if (storage.Power > 10)
             {
                 if (isInChargingAnimation) return;
                 isInChargingAnimation = true;
@@ -86,7 +88,7 @@ public partial class StorageControl
                     PlusPole.Background.BeginAnimation(SolidColorBrush.ColorProperty, null);
                 }
 
-                var brush = data.TrafficLight switch
+                var brush = storage.TrafficLight switch
                 {
                     TrafficLight.Red => Brushes.Red,
                     TrafficLight.Green => Brushes.DarkGreen,

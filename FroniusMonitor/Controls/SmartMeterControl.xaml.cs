@@ -52,13 +52,13 @@ public partial class SmartMeterControl : IHaveLcdPanel
 
     public static readonly DependencyProperty SmartMeterProperty = DependencyProperty.Register
     (
-        nameof(SmartMeter), typeof(SmartMeter), typeof(SmartMeterControl),
-        new PropertyMetadata((d, e) => ((SmartMeterControl)d).OnSmartMeterChanged(e))
+        nameof(SmartMeter), typeof(Gen24PowerMeter), typeof(SmartMeterControl),
+        new PropertyMetadata((d, e) => ((SmartMeterControl)d).SmartMeterDataChanged())
     );
 
-    public SmartMeter? SmartMeter
+    public Gen24PowerMeter? SmartMeter
     {
-        get => (SmartMeter?)GetValue(SmartMeterProperty);
+        get => (Gen24PowerMeter?)GetValue(SmartMeterProperty);
         set => SetValue(SmartMeterProperty, value);
     }
 
@@ -79,149 +79,124 @@ public partial class SmartMeterControl : IHaveLcdPanel
     public SmartMeterControl()
     {
         InitializeComponent();
-
-        Unloaded += (_, _) =>
-        {
-            if (SmartMeter != null)
-            {
-                SmartMeter.PropertyChanged -= SmartMeterDataChanged;
-            }
-        };
-    }
-
-    private void OnSmartMeterChanged(DependencyPropertyChangedEventArgs e)
-    {
-        if (e.OldValue is SmartMeter oldSmartMeter)
-        {
-            oldSmartMeter.PropertyChanged -= SmartMeterDataChanged;
-        }
-
-        if (e.NewValue is SmartMeter newSmartMeter)
-        {
-            newSmartMeter.PropertyChanged += SmartMeterDataChanged;
-        }
-
-        SmartMeterDataChanged();
     }
 
     private void OnModeChanged() => SmartMeterDataChanged();
 
     private void SmartMeterDataChanged(object? sender = null, PropertyChangedEventArgs? e = null) => Dispatcher.InvokeAsync(() =>
     {
-        var data = SmartMeter?.Data;
-
-        if (data is null)
+        if (SmartMeter is null)
         {
             BackgroundProvider.Background = Brushes.LightGray;
             return;
         }
 
-        BackgroundProvider.Background = !data.IsVisible ? Brushes.Red : data.IsEnabled ? Brushes.AntiqueWhite : Brushes.LightGray;
+        BackgroundProvider.Background = !SmartMeter.IsVisible.HasValue||!SmartMeter.IsVisible.Value ? Brushes.Red : SmartMeter.IsEnabled.HasValue&&SmartMeter.IsEnabled.Value ? Brushes.AntiqueWhite : Brushes.LightGray;
 
         switch (Mode)
         {
             case MeterDisplayMode.PowerReal:
                 Lcd.Header = Loc.RealPower;
-                Lcd.Value1 = $"{data.L1RealPower:N1} W";
-                Lcd.Value2 = $"{data.L2RealPower:N1} W";
-                Lcd.Value3 = $"{data.L3RealPower:N1} W";
-                Lcd.ValueSum = $"{data.TotalRealPower:N1} W";
+                Lcd.Value1 = $"{SmartMeter.RealPowerL1:N1} W";
+                Lcd.Value2 = $"{SmartMeter.RealPowerL2:N1} W";
+                Lcd.Value3 = $"{SmartMeter.RealPowerL3:N1} W";
+                Lcd.ValueSum = $"{SmartMeter.RealPowerSum:N1} W";
                 SetL123("Sum");
                 break;
 
             case MeterDisplayMode.PowerApparent:
                 Lcd.Header = Loc.ApparentPower;
-                Lcd.Value1 = $"{data.L1ApparentPower:N1} W";
-                Lcd.Value2 = $"{data.L2ApparentPower:N1} W";
-                Lcd.Value3 = $"{data.L3ApparentPower:N1} W";
-                Lcd.ValueSum = $"{data.TotalApparentPower:N1} W";
+                Lcd.Value1 = $"{SmartMeter.ApparentPowerL1:N1} W";
+                Lcd.Value2 = $"{SmartMeter.ApparentPowerL2:N1} W";
+                Lcd.Value3 = $"{SmartMeter.ApparentPowerL3:N1} W";
+                Lcd.ValueSum = $"{SmartMeter.ApparentPowerSum:N1} W";
                 SetL123("Sum");
                 break;
 
             case MeterDisplayMode.PowerReactive:
                 Lcd.Header = Loc.ReactivePower;
-                Lcd.Value1 = $"{data.L1ReactivePower:N1} W";
-                Lcd.Value2 = $"{data.L2ReactivePower:N1} W";
-                Lcd.Value3 = $"{data.L3ReactivePower:N1} W";
-                Lcd.ValueSum = $"{data.TotalReactivePower:N1} W";
+                Lcd.Value1 = $"{SmartMeter.ReactivePowerL1:N1} W";
+                Lcd.Value2 = $"{SmartMeter.ReactivePowerL2:N1} W";
+                Lcd.Value3 = $"{SmartMeter.ReactivePowerL3:N1} W";
+                Lcd.ValueSum = $"{SmartMeter.ReactivePowerSum:N1} W";
                 SetL123("Sum");
                 break;
 
             case MeterDisplayMode.PowerFactor:
                 Lcd.Header = Loc.PowerFactor;
-                Lcd.Value1 = $"{data.L1PowerFactor:N3}";
-                Lcd.Value2 = $"{data.L2PowerFactor:N3}";
-                Lcd.Value3 = $"{data.L3PowerFactor:N3}";
-                Lcd.ValueSum = $"{data.TotalPowerFactor:N3}";
+                Lcd.Value1 = $"{SmartMeter.PowerFactorL1:N3}";
+                Lcd.Value2 = $"{SmartMeter.PowerFactorL2:N3}";
+                Lcd.Value3 = $"{SmartMeter.PowerFactorL3:N3}";
+                Lcd.ValueSum = $"{SmartMeter.PowerFactorTotal:N3}";
                 SetL123("Tot");
                 break;
 
             case MeterDisplayMode.PhaseVoltage:
                 Lcd.Header = Loc.PhaseVoltage;
-                Lcd.Value1 = $"{data.L1Voltage:N1} V";
-                Lcd.Value2 = $"{data.L2Voltage:N1} V";
-                Lcd.Value3 = $"{data.L3Voltage:N1} V";
-                Lcd.ValueSum = $"{data.AverageVoltage:N1} V";
+                Lcd.Value1 = $"{SmartMeter.PhaseVoltageL1:N1} V";
+                Lcd.Value2 = $"{SmartMeter.PhaseVoltageL2:N1} V";
+                Lcd.Value3 = $"{SmartMeter.PhaseVoltageL3:N1} V";
+                Lcd.ValueSum = $"{SmartMeter.PhaseVoltageAverage:N1} V";
                 SetL123("Avg");
                 break;
 
             case MeterDisplayMode.LineVoltage:
                 Lcd.Header = Loc.LineVoltage;
-                Lcd.Value1 = $"{data.L1L2Voltage:N1} V";
-                Lcd.Value2 = $"{data.L2L3Voltage:N1} V";
-                Lcd.Value3 = $"{data.L3L1Voltage:N1} V";
-                Lcd.ValueSum = $"{data.AverageTwoPhasesVoltage:N1} V";
+                Lcd.Value1 = $"{SmartMeter.LineVoltageL12:N1} V";
+                Lcd.Value2 = $"{SmartMeter.LineVoltageL23:N1} V";
+                Lcd.Value3 = $"{SmartMeter.LineVoltageL31:N1} V";
+                Lcd.ValueSum = $"{SmartMeter.LineVoltageAverage:N1} V";
                 SetTwoPhases("Avg");
                 break;
 
             case MeterDisplayMode.Current:
                 Lcd.Header = Loc.Current;
-                Lcd.Value1 = $"{data.L1Current:N3} A";
-                Lcd.Value2 = $"{data.L2Current:N3} A";
-                Lcd.Value3 = $"{data.L3Current:N3} A";
-                Lcd.ValueSum = $"{data.TotalCurrent:N3} A";
+                Lcd.Value1 = $"{SmartMeter.CurrentL1:N3} A";
+                Lcd.Value2 = $"{SmartMeter.CurrentL2:N3} A";
+                Lcd.Value3 = $"{SmartMeter.CurrentL3:N3} A";
+                Lcd.ValueSum = $"{SmartMeter.TotalCurrent:N3} A";
                 SetL123("Sum");
                 break;
 
             case MeterDisplayMode.PowerOutOfBalance:
                 Lcd.Header = Loc.OutOfBalance;
-                Lcd.Value1 = $"{data.L1L2OutOfBalancePower:N1} W";
-                Lcd.Value2 = $"{data.L2L3OutOfBalancePower:N1} W";
-                Lcd.Value3 = $"{data.L3L1OutOfBalancePower:N1} W";
-                Lcd.ValueSum = $"{data.MaxOutOfBalancePower:N1} W";
+                Lcd.Value1 = $"{SmartMeter.OutOfBalancePowerL12:N1} W";
+                Lcd.Value2 = $"{SmartMeter.OutOfBalancePowerL23:N1} W";
+                Lcd.Value3 = $"{SmartMeter.OutOfBalancePowerL31:N1} W";
+                Lcd.ValueSum = $"{SmartMeter.OutOfBalancePowerMax:N1} W";
                 SetTwoPhases("Max");
                 break;
 
             case MeterDisplayMode.More:
-                Lcd.Header = SmartMeter?.SerialNumber;
-                Lcd.Value1 = $"{data.Frequency:N1} Hz";
+                Lcd.Header = SmartMeter.SerialNumber;
+                Lcd.Value1 = $"{SmartMeter.Frequency:N1} Hz";
                 Lcd.Label1 = "Frq";
-                Lcd.Value2 = $"{data.MeterTimestamp.ToLocalTime():d}";
+                Lcd.Value2 = $"{SmartMeter.DataTime?.ToLocalTime():d}";
                 Lcd.Label2 = "Dat";
-                Lcd.Value3 = $"{data.MeterTimestamp.ToLocalTime():T}";
+                Lcd.Value3 = $"{SmartMeter.DataTime?.ToLocalTime():T}";
                 Lcd.Label3 = "Tim";
-                Lcd.ValueSum = $"{data.IsVisible}";
+                Lcd.ValueSum = $"{SmartMeter.IsVisible}";
                 Lcd.LabelSum = "Val";
                 break;
 
             case MeterDisplayMode.MoreEnergy:
                 Lcd.Header = $"{Loc.Energy} (kWh)";
-                Lcd.Value1 = $"{data.RealEnergyConsumedKiloWattHours:N1}";
+                Lcd.Value1 = $"{SmartMeter.EnergyRealConsumed/1000:N1}";
                 Lcd.Label1 = "CRl";
-                Lcd.Value2 = $"{data.RealEnergyProducedKiloWattHours:N1}";
+                Lcd.Value2 = $"{SmartMeter.EnergyRealProduced/1000:N1}";
                 Lcd.Label2 = "PRl";
-                Lcd.Value3 = $"{data.ReactiveEnergyConsumedKiloWattHours:N1}";
+                Lcd.Value3 = $"{SmartMeter.EnergyReactiveConsumed/1000:N1}";
                 Lcd.Label3 = "CRv";
-                Lcd.ValueSum = $"{data.ReactiveEnergyProducedKiloWattHours:N1}";
+                Lcd.ValueSum = $"{SmartMeter.EnergyReactiveProduced/1000:N1}";
                 Lcd.LabelSum = "PRv";
                 break;
 
             case MeterDisplayMode.CurrentOutOfBalance:
                 Lcd.Header = Loc.OutOfBalance;
-                Lcd.Value1 = $"{data.L1L2OutOfBalanceCurrent:N3} A";
-                Lcd.Value2 = $"{data.L2L3OutOfBalanceCurrent:N3} A";
-                Lcd.Value3 = $"{data.L3L1OutOfBalanceCurrent:N3} A";
-                Lcd.ValueSum = $"{data.MaxOutOfBalanceCurrent:N3} A";
+                Lcd.Value1 = $"{SmartMeter.OutOfBalanceCurrentL12:N3} A";
+                Lcd.Value2 = $"{SmartMeter.OutOfBalanceCurrentL23:N3} A";
+                Lcd.Value3 = $"{SmartMeter.OutOfBalanceCurrentL31:N3} A";
+                Lcd.ValueSum = $"{SmartMeter.OutOfBalanceCurrentMax:N3} A";
                 SetTwoPhases("Max");
                 break;
         }

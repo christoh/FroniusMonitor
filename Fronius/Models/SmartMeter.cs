@@ -116,9 +116,4 @@ public class SmartMeter : DeviceInfo
     public MeterLocation Location => MeterLocationCurrent == 0 ? MeterLocation.Grid : MeterLocation.Load;
     public MeterUsage Usage => MeterLocationCurrent < 2 ? MeterUsage.Inverter : MeterLocationCurrent > 255 ? MeterUsage.UniqueConsumer : MeterUsage.MultipleConsumers;
     public override string DisplayName => $"{Manufacturer} {Model} #{Id}";
-
-    public void NotifySettingsChanged()
-    {
-        NotifyOfPropertyChange(nameof(Data));
-    }
 }

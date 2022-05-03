@@ -29,7 +29,7 @@
                 <Viewbox Grid.Row="1">
                     <TextBlock FontSize="8" TextAlignment="Center">
                         <Run Text="{Binding Inverter.Model, FallbackValue=---}"/>
-                        <Run Text="("/><Run Text="{Binding Inverter.Data.InverterStatusString, Mode=OneWay, FallbackValue={x:Static p:Resources.Unknown}}"/><Run Text=")"/>
+                        <!--<Run Text="("/><Run Text="{Binding Inverter.Data.InverterStatusString, Mode=OneWay, FallbackValue={x:Static p:Resources.Unknown}}"/><Run Text=")"/>-->
                     </TextBlock>
                 </Viewbox>
 
@@ -44,8 +44,6 @@
                     <Button Content="{x:Static p:Resources.Energy}" Click="OnEnergyClicked"/>
                     <Button Content="{x:Static p:Resources.More}" Click="OnMoreClicked"/>
                 </WrapPanel>
-
-
             </Grid>
         </Border>
     </Viewbox>

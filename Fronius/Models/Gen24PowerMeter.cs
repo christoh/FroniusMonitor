@@ -33,6 +33,11 @@ public class Gen24PowerMeter : Gen24DeviceBase
         set => Set(ref currentL3, value);
     }
 
+    public double? OutOfBalanceCurrentL12 => Math.Abs((CurrentL1 - CurrentL2) ?? double.NaN);
+    public double? OutOfBalanceCurrentL23 => Math.Abs((CurrentL3 - CurrentL2) ?? double.NaN);
+    public double? OutOfBalanceCurrentL31 => Math.Abs((CurrentL1 - CurrentL3) ?? double.NaN);
+    public double? OutOfBalanceCurrentMax => new[] { OutOfBalanceCurrentL12, OutOfBalanceCurrentL23, OutOfBalanceCurrentL31 }.Max();
+
     private double? totalCurrent;
 
     [FroniusProprietaryImport("SMARTMETER_CURRENT_AC_SUM_NOW_F64")]
@@ -147,7 +152,12 @@ public class Gen24PowerMeter : Gen24DeviceBase
     public double? RealPowerL1
     {
         get => realPowerL1;
-        set => Set(ref realPowerL1, value);
+        set => Set(ref realPowerL1, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(OutOfBalancePowerL12));
+            NotifyOfPropertyChange(nameof(OutOfBalancePowerL31));
+            NotifyOfPropertyChange(nameof(OutOfBalancePowerMax));
+        });
     }
 
     private double? realPowerL2;
@@ -156,7 +166,12 @@ public class Gen24PowerMeter : Gen24DeviceBase
     public double? RealPowerL2
     {
         get => realPowerL2;
-        set => Set(ref realPowerL2, value);
+        set => Set(ref realPowerL2, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(OutOfBalancePowerL12));
+            NotifyOfPropertyChange(nameof(OutOfBalancePowerL23));
+            NotifyOfPropertyChange(nameof(OutOfBalancePowerMax));
+        });
     }
 
     private double? realPowerL3;
@@ -165,8 +180,18 @@ public class Gen24PowerMeter : Gen24DeviceBase
     public double? RealPowerL3
     {
         get => realPowerL3;
-        set => Set(ref realPowerL3, value);
+        set => Set(ref realPowerL3, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(OutOfBalancePowerL23));
+            NotifyOfPropertyChange(nameof(OutOfBalancePowerL31));
+            NotifyOfPropertyChange(nameof(OutOfBalancePowerMax));
+        });
     }
+
+    public double? OutOfBalancePowerL12 => Math.Abs((RealPowerL1 - RealPowerL2) ?? double.NaN);
+    public double? OutOfBalancePowerL23 => Math.Abs((RealPowerL3 - RealPowerL2) ?? double.NaN);
+    public double? OutOfBalancePowerL31 => Math.Abs((RealPowerL1 - RealPowerL3) ?? double.NaN);
+    public double? OutOfBalancePowerMax => new[] {OutOfBalancePowerL12, OutOfBalancePowerL23, OutOfBalancePowerL31}.Max();
 
     private double? realPowerL1Mean;
 

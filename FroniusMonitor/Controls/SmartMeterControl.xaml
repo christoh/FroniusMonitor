@@ -17,7 +17,7 @@
                 </Grid.RowDefinitions>
 
                 <Viewbox Grid.Row="0" HorizontalAlignment="Stretch" Width="100" StretchDirection="DownOnly">
-                    <TextBlock HorizontalAlignment="Stretch" FontSize="8" Text="{Binding SmartMeter, FallbackValue=---}" TextAlignment="Center"/>
+                    <TextBlock HorizontalAlignment="Stretch" FontSize="8" Text="{Binding SmartMeter.Model, FallbackValue=---}" TextAlignment="Center"/>
                 </Viewbox>
 
                 <local:LcdDisplay x:Name="Lcd" Grid.Row="1" Width="100" Height="94" Margin="4" FontSize="16" FontFamily="pack://application:,,,/Assets/Fonts/#Digital-7 Mono"/>

@@ -17,7 +17,7 @@ public class Gen24System : BindableBase
     public Gen24Storage? Storage
     {
         get => storage;
-        set => Set(ref storage, value);
+        set => Set(ref storage, value, () => NotifyOfPropertyChange(nameof(StorageNetCapacity)));
     }
 
     private Gen24Restrictions? restrictions;
@@ -25,7 +25,7 @@ public class Gen24System : BindableBase
     public Gen24Restrictions? Restrictions
     {
         get => restrictions;
-        set => Set(ref restrictions, value);
+        set => Set(ref restrictions, value, () => NotifyOfPropertyChange(nameof(StorageNetCapacity)));
     }
 
     private Gen24DataManager? dataManager;
@@ -51,6 +51,8 @@ public class Gen24System : BindableBase
         get => cache;
         set => Set(ref cache, value);
     }
+
+    public double? StorageNetCapacity => Storage?.MaxCapacity * (Storage?.StateOfCharge - Restrictions?.MinStateOfCharge);
 
     public ObservableCollection<Gen24PowerMeter> Meters { get; } = new ObservableCollection<Gen24PowerMeter>();
 

@@ -13,69 +13,40 @@ namespace De.Hochstaetter.FroniusMonitor.Controls
 
         public static readonly DependencyProperty SmartMeterControlProperty = DependencyProperty.Register
         (
-            nameof(SmartMeter), typeof(SmartMeter), typeof(PowerMeterClassic),
-            new PropertyMetadata((d, e) => ((PowerMeterClassic)d).OnSmartMeterChanged(e))
+            nameof(SmartMeter), typeof(Gen24PowerMeter), typeof(PowerMeterClassic),
+            new PropertyMetadata((d, e) => ((PowerMeterClassic)d).SmartMeterPropertyChanged())
         );
 
-        public SmartMeter? SmartMeter
+        public Gen24PowerMeter? SmartMeter
         {
-            get => (SmartMeter?)GetValue(SmartMeterControlProperty);
+            get => (Gen24PowerMeter?)GetValue(SmartMeterControlProperty);
             set => SetValue(SmartMeterControlProperty, value);
         }
 
         public PowerMeterClassic()
         {
             InitializeComponent();
-
-            Unloaded += (_, _) =>
-            {
-                if (SmartMeter is not null)
-                {
-                    SmartMeter.PropertyChanged -= SmartMeterPropertyChanged;
-                }
-            };
-        }
-
-        private void OnSmartMeterChanged(DependencyPropertyChangedEventArgs e)
-        {
-            if (e.OldValue is SmartMeter oldSmartMeter)
-            {
-                oldSmartMeter.PropertyChanged -= SmartMeterPropertyChanged;
-            }
-
-            if (SmartMeter != null)
-            {
-                SmartMeter.PropertyChanged += SmartMeterPropertyChanged;
-                SmartMeterPropertyChanged();
-            }
         }
 
         private void SmartMeterPropertyChanged(object? _ = null, PropertyChangedEventArgs? e = null)
         {
-            if (e != null && e.PropertyName != nameof(SmartMeter.Data))
-            {
-                return;
-            }
-
             Dispatcher.InvokeAsync(() =>
             {
-                var data = SmartMeter?.Data;
-
-                if (data is null)
+                if (SmartMeter == null)
                 {
                     return;
                 }
 
-                var power = SmartMeter?.Data?.TotalRealPower ?? 0;
+                var power = SmartMeter.RealPowerSum ?? 0;
                 var absolutePower = Math.Max(Math.Abs(power), .001);
-                var timeSpan= TimeSpan.FromMinutes(600 / absolutePower);
+                var timeSpan = TimeSpan.FromMinutes(600 / absolutePower);
                 var leftMargin = Wheel.Margin.Left;
-                Wheel.BeginAnimation(MarginProperty,null);
+                Wheel.BeginAnimation(MarginProperty, null);
 
                 Wheel.Margin = leftMargin is > 550 or < -80
                     ? new Thickness(power > 0 ? -80 : 550, 0, 0, 0)
                     : new Thickness(leftMargin, 0, 0, 0);
-                
+
                 animation.To = new Thickness(Wheel.Margin.Left + Math.Sign(power) * 630, 0, 0, 0);
                 animation.Duration = timeSpan;
                 Wheel.BeginAnimation(MarginProperty, animation);
@@ -84,20 +55,18 @@ namespace De.Hochstaetter.FroniusMonitor.Controls
 
         private async void OnConsumedPowerCalibrated(object _, double value)
         {
-            if (SmartMeter?.Data != null)
+            if (SmartMeter is {EnergyRealConsumed: { } energyRealConsumed })
             {
-                App.Settings.ConsumedEnergyOffsetWattHours = value - SmartMeter.Data.RealEnergyConsumedWattHours;
-                SmartMeter.NotifySettingsChanged();
+                App.Settings.ConsumedEnergyOffsetWattHours = value - energyRealConsumed;
                 await Settings.Save().ConfigureAwait(false);
             }
         }
 
         private async void OnProducedPowerCalibrated(object _, double value)
         {
-            if (SmartMeter?.Data != null)
+            if (SmartMeter is {EnergyRealProduced: { } energyRealProduced } )
             {
-                App.Settings.ProducedEnergyOffsetWattHours = value - SmartMeter.Data.RealEnergyProducedWattHours;
-                SmartMeter.NotifySettingsChanged();
+                App.Settings.ProducedEnergyOffsetWattHours = value - energyRealProduced;
                 await Settings.Save().ConfigureAwait(false);
             }
         }

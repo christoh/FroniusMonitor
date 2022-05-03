@@ -12,13 +12,13 @@ public partial class MainWindow
 {
     public static readonly DependencyProperty PowerFlowProperty = DependencyProperty.Register
     (
-        nameof(PowerFlow), typeof(PowerFlow), typeof(MainWindow),
+        nameof(PowerFlow), typeof(Gen24PowerFlow), typeof(MainWindow),
         new PropertyMetadata((d, _) => ((MainWindow)d).OnPowerFlowChanged())
     );
 
-    public PowerFlow? PowerFlow
+    public Gen24PowerFlow? PowerFlow
     {
-        get => (PowerFlow?)GetValue(PowerFlowProperty);
+        get => (Gen24PowerFlow?)GetValue(PowerFlowProperty);
         set => SetValue(PowerFlowProperty, value);
     }
 
@@ -31,7 +31,7 @@ public partial class MainWindow
         Loaded += async (_, _) =>
         {
             ViewModel.Dispatcher = Dispatcher;
-            var binding = new Binding($"{nameof(ViewModel.SolarSystemService)}.{nameof(ViewModel.SolarSystemService.SolarSystem)}.{nameof(ViewModel.SolarSystemService.SolarSystem.PowerFlow)}");
+            var binding = new Binding($"{nameof(ViewModel.SolarSystemService)}.{nameof(ViewModel.SolarSystemService.SolarSystem)}.{nameof(ViewModel.SolarSystemService.SolarSystem.Gen24System)}.{nameof(ViewModel.SolarSystemService.SolarSystem.Gen24System.PowerFlow)}");
             SetBinding(PowerFlowProperty, binding);
             await ViewModel.OnInitialize().ConfigureAwait(false);
         };

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using De.Hochstaetter.Fronius.Attributes;
+using De.Hochstaetter.Fronius.Localization;
 
 namespace De.Hochstaetter.Fronius.Models;
 
@@ -254,4 +255,47 @@ public class Gen24Storage:Gen24DeviceBase
     public double? PowerInternal => VoltageInternal * CurrentInternal;
 
     public double? Efficiency => LifeTimeDischarged / LifeTimeCharged;
+
+    public TrafficLight TrafficLight => Manufacturer switch
+    {
+        "BYD" => CellState switch
+        {
+            3 => TrafficLight.Green,
+            4 => TrafficLight.Red,
+            _ => TrafficLight.Yellow
+        },
+
+        "LG-Chem" => CellState switch
+        {
+            3 => TrafficLight.Green,
+            5 => TrafficLight.Red,
+            _ => TrafficLight.Yellow,
+        },
+
+        _ => TrafficLight.Yellow
+    };
+
+    public string StatusString => Manufacturer switch
+    {
+        "BYD" => CellState switch
+        {
+            0 => Resources.Standby,
+            1 => Resources.Inactive,
+            2 => Resources.Starting,
+            3 => Resources.Active,
+            4 => Resources.Error,
+            5 => Resources.Updating,
+            _ => Resources.Unknown
+        },
+        "LG-Chem" => CellState switch
+        {
+            1 => Resources.Standby,
+            3 => Resources.Active,
+            5 => Resources.Error,
+            10 => Resources.Sleeping,
+            _ => Resources.Unknown
+        },
+        _ => Resources.Unknown
+    };
+
 }

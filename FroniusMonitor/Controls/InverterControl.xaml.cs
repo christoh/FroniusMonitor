@@ -33,10 +33,10 @@ public enum InverterDisplayMode
 public partial class InverterControl : IHaveLcdPanel
 {
     private readonly ISolarSystemService? solarSystemService = IoC.TryGet<ISolarSystemService>();
-    private static readonly IReadOnlyList<InverterDisplayMode> acModes = new[] {InverterDisplayMode.AcPowerReal, InverterDisplayMode.AcPowerApparent, InverterDisplayMode.AcPowerReactive, InverterDisplayMode.AcPowerFactor, InverterDisplayMode.AcCurrent, InverterDisplayMode.AcPhaseVoltage, InverterDisplayMode.AcLineVoltage,};
-    private static readonly IReadOnlyList<InverterDisplayMode> dcModes = new[] {InverterDisplayMode.DcPower, InverterDisplayMode.DcCurrent, InverterDisplayMode.DcVoltage,};
-    private static readonly IReadOnlyList<InverterDisplayMode> moreModes = new[] {InverterDisplayMode.MoreEfficiency, InverterDisplayMode.More, InverterDisplayMode.MoreTemperatures, InverterDisplayMode.MoreFans,};
-    private static readonly IReadOnlyList<InverterDisplayMode> energyModes = new[] {InverterDisplayMode.EnergyInverter, InverterDisplayMode.EnergyStorage, InverterDisplayMode.EnergySolar,};
+    private static readonly IReadOnlyList<InverterDisplayMode> acModes = new[] { InverterDisplayMode.AcPowerReal, InverterDisplayMode.AcPowerApparent, InverterDisplayMode.AcPowerReactive, InverterDisplayMode.AcPowerFactor, InverterDisplayMode.AcCurrent, InverterDisplayMode.AcPhaseVoltage, InverterDisplayMode.AcLineVoltage, };
+    private static readonly IReadOnlyList<InverterDisplayMode> dcModes = new[] { InverterDisplayMode.DcPower, InverterDisplayMode.DcCurrent, InverterDisplayMode.DcVoltage, };
+    private static readonly IReadOnlyList<InverterDisplayMode> moreModes = new[] { InverterDisplayMode.MoreEfficiency, InverterDisplayMode.More, InverterDisplayMode.MoreTemperatures, InverterDisplayMode.MoreFans, };
+    private static readonly IReadOnlyList<InverterDisplayMode> energyModes = new[] { InverterDisplayMode.EnergyInverter, InverterDisplayMode.EnergyStorage, InverterDisplayMode.EnergySolar, };
     private int currentAcIndex, currentDcIndex, currentMoreIndex, energyIndex;
 
     #region Dependency Properties
@@ -95,6 +95,7 @@ public partial class InverterControl : IHaveLcdPanel
         var cache = gen24?.Cache;
         var inverter = gen24?.Inverter;
         var dataManager = gen24?.DataManager;
+        var powerFlow = gen24?.PowerFlow;
 
         if (cache == null && inverter == null && dataManager == null)
         {
@@ -103,12 +104,13 @@ public partial class InverterControl : IHaveLcdPanel
 
         Dispatcher.InvokeAsync(() =>
         {
-            BackgroundProvider.Background = Inverter?.Data?.Status switch
-            {
-                InverterStatus.Running => Brushes.AntiqueWhite,
-                InverterStatus.Error => Brushes.Red,
-                _ => Brushes.LightGray,
-            };
+            //BackgroundProvider.Background = Inverter?.Data?.Status switch
+            //{
+            //    InverterStatus.Running => Brushes.AntiqueWhite,
+            //    InverterStatus.Error => Brushes.Red,
+            //    _ => Brushes.LightGray,
+            //};
+            BackgroundProvider.Background = Brushes.AntiqueWhite;
 
             switch (Mode)
             {
@@ -128,7 +130,7 @@ public partial class InverterControl : IHaveLcdPanel
                     break;
 
                 case InverterDisplayMode.AcLineVoltage:
-                    SetL123("Avg");
+                    SetTwoPhases("Avg");
                     Lcd.Header = Loc.LineVoltage;
 
                     SetLcdValues
@@ -317,13 +319,13 @@ public partial class InverterControl : IHaveLcdPanel
                 case InverterDisplayMode.MoreEfficiency:
                     Lcd.Header = Loc.Efficiency;
                     Lcd.Label1 = "Loss";
-                    Lcd.Value1 = ToLcd(solarSystemService?.PowerLossAvg, "N1", "W");
+                    Lcd.Value1 = ToLcd(cache?.SolarPowerSum + cache?.StoragePower - cache?.InverterRealPowerSum, "N1", "W");
                     Lcd.Label2 = "Eff";
-                    Lcd.Value2 = ToLcd(solarSystemService?.Efficiency, "P2");
+                    Lcd.Value2 = ToLcd(cache?.InverterRealPowerSum / (cache?.SolarPowerSum + cache?.StoragePower), "P2");
                     Lcd.Label3 = "Sc";
-                    Lcd.Value3 = ToLcd(e.SolarSystem?.PowerFlow?.SelfConsumption, "P2");
+                    Lcd.Value3 = ToLcd(Math.Min(-powerFlow?.LoadPower / powerFlow?.InverterAcPower ?? 0, 1), "P2");
                     Lcd.LabelSum = "Aut";
-                    Lcd.ValueSum = ToLcd(e.SolarSystem?.PowerFlow?.Autonomy, "P2");
+                    Lcd.ValueSum = ToLcd(Math.Min(-powerFlow?.InverterAcPower/powerFlow?.LoadPower??0,1d), "P2");
                     break;
 
                 case InverterDisplayMode.MoreTemperatures:
@@ -364,6 +366,7 @@ public partial class InverterControl : IHaveLcdPanel
     }
 
     private void SetL123(string sumText) => IHaveLcdPanel.SetL123(Lcd, sumText);
+    private void SetTwoPhases(string sumText) => IHaveLcdPanel.SetTwoPhases(Lcd, sumText);
 
     private void SetDc123(string sumText)
     {
