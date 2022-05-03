@@ -51,7 +51,7 @@ public class Gen24Inverter : Gen24DeviceBase
     public double? PowerRealSum
     {
         get => powerRealSum;
-        set => Set(ref powerRealSum, value);
+        set => Set(ref powerRealSum, value, () => NotifyOfPropertyChange(nameof(PowerFactorAverage)));
     }
 
     private double? powerReactiveSum;
@@ -69,7 +69,7 @@ public class Gen24Inverter : Gen24DeviceBase
     public double? PowerApparentSum
     {
         get => powerApparentSum;
-        set => Set(ref powerApparentSum, value);
+        set => Set(ref powerApparentSum, value, () => NotifyOfPropertyChange(nameof(PowerFactorAverage)));
     }
 
     private TimeSpan? backupModeUpTime;
@@ -174,58 +174,58 @@ public class Gen24Inverter : Gen24DeviceBase
         set => Set(ref storageVoltage, value);
     }
 
-    private double? pv1Current;
+    private double? solar1Current;
 
     [FroniusProprietaryImport("PV_CURRENT_MEAN_01_F32")]
-    public double? Pv1Current
+    public double? Solar1Current
     {
-        get => pv1Current;
-        set => Set(ref pv1Current, value, () => NotifyOfPropertyChange(nameof(PvCurrentSum)));
+        get => solar1Current;
+        set => Set(ref solar1Current, value, () => NotifyOfPropertyChange(nameof(SolarCurrentSum)));
     }
 
-    private double? pv2Current;
+    private double? solar2Current;
 
     [FroniusProprietaryImport("PV_CURRENT_MEAN_02_F32")]
-    public double? Pv2Current
+    public double? Solar2Current
     {
-        get => pv2Current;
-        set => Set(ref pv2Current, value, () => NotifyOfPropertyChange(nameof(PvCurrentSum)));
+        get => solar2Current;
+        set => Set(ref solar2Current, value, () => NotifyOfPropertyChange(nameof(SolarCurrentSum)));
     }
 
-    private double? pv1Power;
+    private double? solar1Power;
 
     [FroniusProprietaryImport("PV_POWERACTIVE_MEAN_01_F32")]
-    public double? Pv1Power
+    public double? Solar1Power
     {
-        get => pv1Power;
-        set => Set(ref pv1Power, value, () => NotifyOfPropertyChange(nameof(PvPowerSum)));
+        get => solar1Power;
+        set => Set(ref solar1Power, value, () => NotifyOfPropertyChange(nameof(SolarPowerSum)));
     }
 
-    private double? pv2Power;
+    private double? solar2Power;
 
     [FroniusProprietaryImport("PV_POWERACTIVE_MEAN_02_F32")]
-    public double? Pv2Power
+    public double? Solar2Power
     {
-        get => pv2Power;
-        set => Set(ref pv2Power, value, () => NotifyOfPropertyChange(nameof(PvPowerSum)));
+        get => solar2Power;
+        set => Set(ref solar2Power, value, () => NotifyOfPropertyChange(nameof(SolarPowerSum)));
     }
 
-    private double? pv1Voltage;
+    private double? solar1Voltage;
 
     [FroniusProprietaryImport("PV_VOLTAGE_MEAN_01_F32")]
-    public double? Pv1Voltage
+    public double? Solar1Voltage
     {
-        get => pv1Voltage;
-        set => Set(ref pv1Voltage, value);
+        get => solar1Voltage;
+        set => Set(ref solar1Voltage, value);
     }
 
-    private double? pv2Voltage;
+    private double? solar2Voltage;
 
     [FroniusProprietaryImport("PV_VOLTAGE_MEAN_02_F32")]
-    public double? Pv2Voltage
+    public double? Solar2Voltage
     {
-        get => pv2Voltage;
-        set => Set(ref pv2Voltage, value);
+        get => solar2Voltage;
+        set => Set(ref solar2Voltage, value);
     }
 
     private TimeSpan? deviceUpTime;
@@ -240,12 +240,14 @@ public class Gen24Inverter : Gen24DeviceBase
     public double? AcPhaseVoltageAverage => (AcVoltageL1 + AcVoltageL2 + AcVoltageL3) / 3d;
     public double? AcLineVoltageAverage => (AcVoltageL12 + AcVoltageL23 + AcVoltageL31) / 3d;
     public double? AcCurrentSum => AcCurrentL1 + AcCurrentL2 + AcCurrentL3;
+    public double? PowerFactorAverage => PowerRealSum / PowerApparentSum;
+
 
     public double? AcPowerL1 => AcVoltageL1 * AcCurrentL1;
     public double? AcPowerL2 => AcVoltageL2 * AcCurrentL2;
     public double? AcPowerL3 => AcVoltageL3 * AcCurrentL3;
 
-    public double? PvPowerSum => Pv1Power + Pv2Power;
-    public double? PvCurrentSum => Pv1Current + Pv2Current;
+    public double? SolarPowerSum => Solar1Power + Solar2Power;
+    public double? SolarCurrentSum => Solar1Current + Solar2Current;
 
 }

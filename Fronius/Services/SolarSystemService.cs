@@ -130,8 +130,6 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         StorageDevices? storageDevices = null;
         SmartMeterDevices? smartMeterDevices = null;
 
-        //await webClientService.FritzBoxLogin().ConfigureAwait(false);
-
         try
         {
             result.FritzBox = await webClientService.GetFritzBoxDevices().ConfigureAwait(false);
@@ -211,6 +209,9 @@ public class SolarSystemService : BindableBase, ISolarSystemService
                 }
                 else
                 {
+
+                    SolarSystem.Gen24System = newSolarSystem.Gen24System;
+
                     foreach (var storage in SolarSystem.Storages.ToArray())
                     {
                         var newStorage = newSolarSystem.Storages.SingleOrDefault(s => s.Id == storage.Id);
@@ -283,6 +284,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
                     IsConnected = true;
                 }
             }
+
 
             try
             {

@@ -79,6 +79,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to AC line voltage.
+        /// </summary>
+        public static string ACLineVoltage {
+            get {
+                return ResourceManager.GetString("ACLineVoltage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to AC phase voltage.
+        /// </summary>
+        public static string AcPhaseVoltage {
+            get {
+                return ResourceManager.GetString("AcPhaseVoltage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to AC power.
         /// </summary>
         public static string AcPower {
@@ -250,6 +268,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Fans.
+        /// </summary>
+        public static string Fans {
+            get {
+                return ResourceManager.GetString("Fans", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Idle.
         /// </summary>
         public static string Idle {
@@ -331,7 +358,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Load Settings.
         /// </summary>
         public static string LoadSettings {
             get {
@@ -592,6 +619,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Solar panels.
+        /// </summary>
+        public static string SolarPanels {
+            get {
+                return ResourceManager.GetString("SolarPanels", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Standby.
         /// </summary>
         public static string Standby {
@@ -727,6 +763,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Temperatures.
+        /// </summary>
+        public static string Temperatures {
+            get {
+                return ResourceManager.GetString("Temperatures", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unknown.
         /// </summary>
         public static string Unknown {
@@ -754,7 +799,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to VoltageInternal.
+        ///   Looks up a localized string similar to Voltage.
         /// </summary>
         public static string Voltage {
             get {

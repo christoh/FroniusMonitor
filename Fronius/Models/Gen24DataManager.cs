@@ -39,12 +39,12 @@ public class Gen24DataManager : Gen24DeviceBase
         set => Set(ref powerInfluencingDevices, value);
     }
 
-    private double? pvPower;
+    private double? solarPower;
     [FroniusProprietaryImport("PV_POWERACTIVE_SUM_F64")]
-    public double? PvPower
+    public double? SolarPower
     {
-        get => pvPower;
-        set => Set(ref pvPower, value);
+        get => solarPower;
+        set => Set(ref solarPower, value);
     }
 
     private double? inverterLifeTimeEnergyProduced;

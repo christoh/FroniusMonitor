@@ -145,12 +145,12 @@ public class Gen24Storage:Gen24DeviceBase
         set => Set(ref maxPower, value);
     }
 
-    private double? voltage;
+    private double? voltageOuter;
     [FroniusProprietaryImport("DCLINK_VOLTAGE_MEAN_F32")]
-    public double? Voltage
+    public double? VoltageOuter
     {
-        get => voltage;
-        set => Set(ref voltage, value, () => NotifyOfPropertyChange(nameof(Power)));
+        get => voltageOuter;
+        set => Set(ref voltageOuter, value, () => NotifyOfPropertyChange(nameof(Power)));
     }
 
     private double ambientTemperature;
@@ -249,7 +249,7 @@ public class Gen24Storage:Gen24DeviceBase
         set => Set(ref minVoltage, value);
     }
 
-    public double? Power => Voltage * Current;
+    public double? Power => VoltageOuter * Current;
 
     public double? PowerInternal => VoltageInternal * CurrentInternal;
 

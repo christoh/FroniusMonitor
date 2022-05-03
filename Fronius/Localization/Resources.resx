@@ -253,7 +253,7 @@
     <value>Current</value>
   </data>
   <data name="Voltage" xml:space="preserve">
-    <value>VoltageInternal</value>
+	  <value>Voltage</value>
   </data>
   <data name="More" xml:space="preserve">
     <value>More</value>
@@ -350,5 +350,20 @@
   </data>
   <data name="LoadSettings" xml:space="preserve">
     <value>Load Settings</value>
+  </data>
+  <data name="AcPhaseVoltage" xml:space="preserve">
+	  <value>AC phase voltage</value>
+  </data>
+  <data name="ACLineVoltage" xml:space="preserve">
+	  <value>AC line voltage</value>
+  </data>
+  <data name="SolarPanels" xml:space="preserve">
+	  <value>Solar panels</value>
+  </data>
+  <data name="Temperatures" xml:space="preserve">
+	  <value>Temperatures</value>
+  </data>
+  <data name="Fans" xml:space="preserve">
+	  <value>Fans</value>
   </data>
 </root>

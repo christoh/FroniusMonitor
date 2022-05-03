@@ -351,4 +351,19 @@
   <data name="LoadSettings" xml:space="preserve">
     <value>Konfiguration laden</value>
   </data>
+  <data name="AcPhaseVoltage" xml:space="preserve">
+	  <value>AC-Phasenspannung</value>
+  </data>
+  <data name="ACLineVoltage" xml:space="preserve">
+	  <value>AC-Leitungsspannung</value>
+  </data>
+  <data name="SolarPanels" xml:space="preserve">
+	  <value>Solarmodule</value>
+  </data>
+  <data name="Temperatures" xml:space="preserve">
+	  <value>Temperaturen</value>
+  </data>
+  <data name="Fans" xml:space="preserve">
+	  <value>Ventilatoren</value>
+  </data>
 </root>
