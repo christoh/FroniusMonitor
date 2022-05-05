@@ -385,7 +385,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Miscellaneous.
         /// </summary>
         public static string Misc {
             get {
