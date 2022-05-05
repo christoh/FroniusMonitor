@@ -37,12 +37,12 @@
 
                 <WrapPanel MaxWidth="110" Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
                     <WrapPanel.Resources>
-                        <Style TargetType="Button" BasedOn="{StaticResource DeviceButton}"/>
+                        <Style TargetType="RadioButton" BasedOn="{StaticResource DeviceButton}"/>
                     </WrapPanel.Resources>
-                    <Button Content="AC" Click="OnAcClicked"/>
-                    <Button Content="DC" Click="OnDcClicked"/>
-                    <Button Content="{x:Static p:Resources.Energy}" Click="OnEnergyClicked"/>
-                    <Button Content="{x:Static p:Resources.More}" Click="OnMoreClicked"/>
+                    <RadioButton IsChecked="True" Content="AC" Click="OnAcClicked"/>
+                    <RadioButton Content="DC" Click="OnDcClicked"/>
+                    <RadioButton Content="{x:Static p:Resources.Energy}" Click="OnEnergyClicked"/>
+                    <RadioButton Content="{x:Static p:Resources.More}" Click="OnMoreClicked"/>
                 </WrapPanel>
             </Grid>
         </Border>

@@ -22,11 +22,11 @@ public partial class MainWindow
         set => SetValue(PowerFlowProperty, value);
     }
 
-    public MainWindow()
+    public MainWindow(MainViewModel vm)
     {
         InitializeComponent();
 
-        DataContext = IoC.Get<MainViewModel>();
+        DataContext = vm;
 
         Loaded += async (_, _) =>
         {

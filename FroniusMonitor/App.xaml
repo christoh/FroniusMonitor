@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
              xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
-             StartupUri="Views/MainWindow.xaml">
+             >
     <Application.Resources>
 
         <Style TargetType="Button">
@@ -29,18 +29,33 @@
             </Setter>
         </Style>
 
-        <Style TargetType="Button" x:Key="DeviceButton">
+        <Style TargetType="ToggleButton" x:Key="DeviceButton">
             <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="ButtonBase">
-                        <Border x:Name="Border" Background="BurlyWood"  Margin="2,1" Padding="1">
-                            <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border SnapsToDevicePixels="True" x:Name="Border" Background="BurlyWood"  Margin="2,1" Padding="1">
+                            <ContentControl x:Name="Content" FontSize="6" Content="{TemplateBinding Content}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                         </Border>
                         <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="LightSalmon"/>
+                            </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Border" Property="Background" Value="Coral"/>
                             </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <!--<Setter TargetName="Border" Property="BorderThickness" Value="1"/>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="CadetBlue"/>-->
+                                <Setter TargetName="Border" Property="Margin" Value="2,0,2,2"/>
+                            </Trigger>
+                            <!--<MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="True"/>
+                                    <Condition Property="IsChecked" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter Property="Background" TargetName="Border" Value="Coral"></Setter>
+                            </MultiTrigger>-->
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>

@@ -3,9 +3,11 @@
 using System.IO;
 using System.Windows;
 using De.Hochstaetter.Fronius.Contracts;
-using De.Hochstaetter.Fronius.Models;
 using De.Hochstaetter.Fronius.Services;
 using De.Hochstaetter.FroniusMonitor.Models;
+using De.Hochstaetter.FroniusMonitor.Unity;
+using De.Hochstaetter.FroniusMonitor.ViewModels;
+using De.Hochstaetter.FroniusMonitor.Views;
 using Unity;
 
 namespace De.Hochstaetter.FroniusMonitor;
@@ -29,6 +31,8 @@ public partial class App
         Container
             .RegisterType<IWebClientService, WebClientService>()
             .RegisterSingleton<ISolarSystemService, SolarSystemService>()
+            .RegisterSingleton<MainWindow>()
+            .RegisterSingleton<MainViewModel>()
             ;
 
         Directory.CreateDirectory(PerUserDataDir);
@@ -42,5 +46,7 @@ public partial class App
             Settings = new();
             Settings.Save().Wait();
         }
+
+        IoC.Get<MainWindow>().Show();
     }
 }

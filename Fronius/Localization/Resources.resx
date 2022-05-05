@@ -366,4 +366,7 @@
   <data name="Fans" xml:space="preserve">
 	  <value>Fans</value>
   </data>
+  <data name="Misc" xml:space="preserve">
+	  <value />
+  </data>
 </root>

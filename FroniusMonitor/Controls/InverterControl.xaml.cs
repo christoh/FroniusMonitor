@@ -36,7 +36,7 @@ public partial class InverterControl : IHaveLcdPanel
     private static readonly IReadOnlyList<InverterDisplayMode> acModes = new[] { InverterDisplayMode.AcPowerReal, InverterDisplayMode.AcPowerApparent, InverterDisplayMode.AcPowerReactive, InverterDisplayMode.AcPowerFactor, InverterDisplayMode.AcCurrent, InverterDisplayMode.AcPhaseVoltage, InverterDisplayMode.AcLineVoltage, };
     private static readonly IReadOnlyList<InverterDisplayMode> dcModes = new[] { InverterDisplayMode.DcPower, InverterDisplayMode.DcCurrent, InverterDisplayMode.DcVoltage, };
     private static readonly IReadOnlyList<InverterDisplayMode> moreModes = new[] { InverterDisplayMode.MoreEfficiency, InverterDisplayMode.More, InverterDisplayMode.MoreTemperatures, InverterDisplayMode.MoreFans, };
-    private static readonly IReadOnlyList<InverterDisplayMode> energyModes = new[] { InverterDisplayMode.EnergyInverter, InverterDisplayMode.EnergyStorage, InverterDisplayMode.EnergySolar, };
+    private static readonly IReadOnlyList<InverterDisplayMode> energyModes = new[] { InverterDisplayMode.EnergySolar, InverterDisplayMode.EnergyInverter, InverterDisplayMode.EnergyStorage, };
     private int currentAcIndex, currentDcIndex, currentMoreIndex, energyIndex;
 
     #region Dependency Properties
@@ -243,7 +243,7 @@ public partial class InverterControl : IHaveLcdPanel
                         cache?.Solar1Current ?? inverter?.Solar1Current,
                         cache?.Solar2Current ?? inverter?.Solar2Current,
                         null,
-                        cache?.StorageCurrent ?? inverter?.StorageCurrent ?? e?.SolarSystem?.Gen24System?.Storage?.Current,
+                        cache?.StorageCurrent ?? inverter?.StorageCurrent ?? e.SolarSystem?.Gen24System?.Storage?.Current,
                         "N3", "A", string.Empty
                     );
 
@@ -274,7 +274,7 @@ public partial class InverterControl : IHaveLcdPanel
                         cache?.InverterEnergyProducedL2 / 1000,
                         cache?.InverterEnergyProducedL3 / 1000,
                         (cache?.InverterEnergyProducedSum ?? dataManager?.InverterLifeTimeEnergyProduced) / 1000,
-                        "N3", string.Empty, string.Empty
+                        "N3", null, string.Empty
                     );
 
                     break;
@@ -288,7 +288,6 @@ public partial class InverterControl : IHaveLcdPanel
                     Lcd.Value1 = ToLcd(cache?.StorageLifeTimeEnergyCharged / 1000, "N3");
                     Lcd.Value2 = ToLcd(cache?.StorageLifeTimeEnergyDischarged / 1000, "N3");
                     Lcd.ValueSum = ToLcd(cache?.StorageEfficiency, "P2");
-
                     break;
 
                 case InverterDisplayMode.EnergySolar:
@@ -301,7 +300,6 @@ public partial class InverterControl : IHaveLcdPanel
                     Lcd.Value2 = ToLcd(cache?.Solar2EnergyLifeTime / 1000, "N3");
                     Lcd.Value3 = ToLcd(cache?.SolarEnergyLifeTimeSum / 1000, "N3");
                     Lcd.ValueSum = ToLcd((cache?.InverterEnergyProducedSum ?? dataManager?.InverterLifeTimeEnergyProduced) / cache?.SolarEnergyLifeTimeSum, "P2");
-
                     break;
 
                 case InverterDisplayMode.More:
@@ -341,18 +339,20 @@ public partial class InverterControl : IHaveLcdPanel
                     break;
 
                 case InverterDisplayMode.MoreFans:
-                    Lcd.Header = Loc.Fans;
+                    Lcd.Header = Loc.Misc;
                     Lcd.Label1 = "Fan 1";
                     Lcd.Label2 = "Fan 2";
-                    Lcd.Label3 = Lcd.LabelSum = Lcd.Value3 = Lcd.ValueSum = string.Empty;
+                    Lcd.LabelSum = "Iso";
+                    Lcd.Label3 = Lcd.Value3 = string.Empty;
                     Lcd.Value1 = ToLcd(cache?.Fan1RelativeRpm, "P2");
                     Lcd.Value2 = ToLcd(cache?.Fan2RelativeRpm, "P2");
+                    Lcd.ValueSum = ToLcd(cache?.IsolatorResistance / 1000, "N0", "kΩ");
                     break;
             }
         });
     }
 
-    private void SetLcdValues(double? value1, double? value2, double? value3, double? aggregatedValue, string format, string unit, string nullValue = "---")
+    private void SetLcdValues(double? value1, double? value2, double? value3, double? aggregatedValue, string format, string? unit, string nullValue = "---")
     {
         Lcd.Value1 = ToLcd(value1, format, unit);
         Lcd.Value2 = ToLcd(value2, format, unit);
