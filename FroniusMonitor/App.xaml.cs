@@ -26,6 +26,7 @@ public partial class App
     protected override void OnStartup(StartupEventArgs e)
     {
         //Thread.CurrentThread.CurrentUICulture= new CultureInfo("de-CH");
+        AppContext.SetSwitch("System.Net.Http.UseSocketsHttpHandler", false);
         base.OnStartup(e);
 
         Container

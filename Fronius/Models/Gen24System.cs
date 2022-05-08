@@ -52,6 +52,22 @@ public class Gen24System : BindableBase
         set => Set(ref cache, value);
     }
 
+    private Gen24Status? inverterStatus;
+
+    public Gen24Status? InverterStatus
+    {
+        get => inverterStatus;
+        set => Set(ref inverterStatus, value);
+    }
+
+    private Gen24Status? meterStatus;
+
+    public Gen24Status? MeterStatus
+    {
+        get => meterStatus;
+        set => Set(ref meterStatus, value);
+    }
+
     public double? StorageNetCapacity => Storage?.MaxCapacity * (Storage?.StateOfCharge - Restrictions?.MinStateOfCharge);
 
     public ObservableCollection<Gen24PowerMeter> Meters { get; } = new ObservableCollection<Gen24PowerMeter>();

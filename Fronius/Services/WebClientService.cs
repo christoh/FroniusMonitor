@@ -43,7 +43,23 @@ public class WebClientService : BindableBase, IWebClientService
     {
         var gen24System = new Gen24System();
 
-        var (result, dataToken) = await GetJsonResponse<BaseResponse>("components/readable", true).ConfigureAwait(false);
+        foreach (var statusToken in JArray.Parse(await GetFroniusJsonResponse("status/devices").ConfigureAwait(false)))
+        {
+            var x = ReadFroniusData<Gen24Status>(statusToken);
+
+            switch (x.DeviceType)
+            {
+                case DeviceType.Inverter:
+                    gen24System.InverterStatus = x;
+                    break;
+
+                case DeviceType.PowerMeter:
+                    gen24System.MeterStatus = x;
+                    break;
+            }
+        }
+
+        var (_, dataToken) = await GetJsonResponse<BaseResponse>("components/readable", true).ConfigureAwait(false);
         gen24System.Inverter = ReadFroniusData<Gen24Inverter>(dataToken["1"]);
 
         var storage = dataToken.Values().Where(t =>
@@ -53,7 +69,7 @@ public class WebClientService : BindableBase, IWebClientService
             return
                 attributes?["storage_interface_id"] != null ||
                 (attributes?["id"]?.Value<string>() ?? string.Empty).StartsWith("rtu-generic-storage");
-        })?.FirstOrDefault();
+        }).FirstOrDefault();
 
         gen24System.Storage = ReadFroniusData<Gen24Storage>(storage);
         var restrictions = dataToken.Values().FirstOrDefault(t => t["attributes"]?["PowerRestrictionControllerVersion"] != null);
@@ -68,12 +84,6 @@ public class WebClientService : BindableBase, IWebClientService
         foreach (var meter in meters)
         {
             var gen24PowerMeter = ReadFroniusData<Gen24PowerMeter>(meter.Parent);
-
-            if (gen24PowerMeter == null)
-            {
-                continue;
-            }
-
             gen24System.Meters.Add(gen24PowerMeter);
         }
 
@@ -84,15 +94,10 @@ public class WebClientService : BindableBase, IWebClientService
         return gen24System;
     }
 
-    private T? ReadFroniusData<T>(JToken? device) where T : new()
+    private T ReadFroniusData<T>(JToken? device) where T : new()
     {
         var channels = device?["channels"];
         var attributes = device?["attributes"];
-
-        if (channels == null || attributes == null)
-        {
-            return default;
-        }
 
         var result = new T();
 
@@ -100,7 +105,15 @@ public class WebClientService : BindableBase, IWebClientService
         {
             var nonNullablePropertyType = Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? propertyInfo.PropertyType;
             var attribute = (FroniusProprietaryImportAttribute)propertyInfo.GetCustomAttributes(typeof(FroniusProprietaryImportAttribute), true).Single();
-            var stringValue = (attribute.DataType == FroniusDataType.Channel ? channels[attribute.Name] : attributes[attribute.Name])?.Value<string>()?.Trim();
+
+            var token = attribute.DataType switch
+            {
+                FroniusDataType.Attribute => attributes?[attribute.Name],
+                FroniusDataType.Root => device?[attribute.Name],
+                _ => channels?[attribute.Name],
+            };
+
+            var stringValue = token?.Value<string>()?.Trim();
             dynamic? value = null;
 
             if (stringValue != null)
@@ -130,9 +143,9 @@ public class WebClientService : BindableBase, IWebClientService
                         value = null;
                     }
                 }
-                else if(nonNullablePropertyType.IsEnum)
+                else if (nonNullablePropertyType.IsEnum)
                 {
-                    value = ReadEnum(nonNullablePropertyType,stringValue);
+                    value = ReadEnum(nonNullablePropertyType, stringValue);
                 }
                 else
                 {
@@ -156,26 +169,25 @@ public class WebClientService : BindableBase, IWebClientService
         return result;
     }
 
-    private object? ReadEnum(Type type,string? stringValue)
+    private object? ReadEnum(Type type, string? stringValue)
     {
         if (stringValue == null)
         {
             return null;
         }
 
-        var values = Enum.GetValues(type);
         var fields = type.GetFields();
 
         if (int.TryParse(stringValue, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var numeric))
         {
             return Convert.ChangeType(numeric, type, CultureInfo.InvariantCulture);
         }
-            
+
         var fieldInfo =
             fields.SingleOrDefault(f => f.GetCustomAttributes().Any(a => a is EnumParseAttribute attribute && attribute.ParseAs?.ToUpperInvariant() == stringValue.ToUpperInvariant())) ??
             fields.SingleOrDefault(f => f.GetCustomAttributes().Any(a => a is EnumParseAttribute {IsDefault: true}));
 
-        return fieldInfo==null?null:Enum.Parse(type,fieldInfo.Name);
+        return fieldInfo == null ? null : Enum.Parse(type, fieldInfo.Name);
     }
 
     public async Task<SystemDevices> GetDevices()
@@ -330,7 +342,7 @@ public class WebClientService : BindableBase, IWebClientService
                 _ => MeterLocation.Unknown,
             },
 
-            SiteType = (SiteType?)ReadEnum(typeof(SiteType),site?["Mode"]?.Value<string?>()),
+            SiteType = (SiteType?)ReadEnum(typeof(SiteType), site?["Mode"]?.Value<string?>()),
         };
 
         return result;
@@ -510,18 +522,18 @@ public class WebClientService : BindableBase, IWebClientService
 
     private static readonly Dictionary<int, IEnumerable<int>> allowedFritzBoxColors = new()
     {
-        { 358, new[] { 180, 112, 54 } },
-        { 35, new[] { 214, 140, 72 } },
-        { 52, new[] { 153, 102, 51 } },
-        { 92, new[] { 123, 79, 38 } },
-        { 120, new[] { 160, 82, 38 } },
-        { 160, new[] { 145, 84, 41 } },
-        { 195, new[] { 179, 118, 59 } },
-        { 212, new[] { 169, 110, 56 } },
-        { 225, new[] { 204, 135, 67 } },
-        { 266, new[] { 169, 110, 54 } },
-        { 296, new[] { 140, 92, 46 } },
-        { 335, new[] { 180, 107, 51 } },
+        {358, new[] {180, 112, 54}},
+        {35, new[] {214, 140, 72}},
+        {52, new[] {153, 102, 51}},
+        {92, new[] {123, 79, 38}},
+        {120, new[] {160, 82, 38}},
+        {160, new[] {145, 84, 41}},
+        {195, new[] {179, 118, 59}},
+        {212, new[] {169, 110, 56}},
+        {225, new[] {204, 135, 67}},
+        {266, new[] {169, 110, 54}},
+        {296, new[] {140, 92, 46}},
+        {335, new[] {180, 107, 51}},
     };
 
     public async Task SetFritzBoxColor(string ain, double hueDegrees, double saturation)
@@ -573,6 +585,7 @@ public class WebClientService : BindableBase, IWebClientService
         return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
     }
 
+    [SuppressMessage("ReSharper", "UnusedMember.Local")]
     private async Task<string> GetStringResponse(string request)
     {
         var response = await GetFritzBoxResponse(request).ConfigureAwait(false);
@@ -587,30 +600,45 @@ public class WebClientService : BindableBase, IWebClientService
         return result;
     }
 
-    private async Task<(T, JToken)> GetJsonResponse<T>(string request, bool useUnofficialApi = false, string? debugString = null) where T : BaseResponse, new()
+    private HttpClient? froniusHttpClient;
+
+    private async Task<string> GetFroniusJsonResponse(string request)
     {
-        if (InverterConnection == null)
+        if (InverterConnection?.BaseUrl == null)
         {
             throw new NullReferenceException(Resources.NoSystemConnection);
         }
 
-        string jsonString;
-        var requestString = $"{InverterConnection.BaseUrl}/{(useUnofficialApi ? string.Empty : "solar_api/v1/")}{request}";
+        var requestString = $"{InverterConnection.BaseUrl}/{request}";
 
-        using (var client = new HttpClient())
+        if (froniusHttpClient == null)
         {
-            var nextAllowedCall = lastSolarApiCall.AddSeconds(.2) - DateTime.UtcNow;
-
-            if (nextAllowedCall.Ticks > 0)
+            var credCache = new CredentialCache
             {
-                await Task.Delay(nextAllowedCall).ConfigureAwait(false);
-            }
+                {new Uri(InverterConnection.BaseUrl + "/"), "Digest", new NetworkCredential(InverterConnection.UserName, InverterConnection.Password)}
+            };
 
-            var response = await client.GetAsync(requestString).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
-            lastSolarApiCall = DateTime.UtcNow;
-            jsonString = debugString ?? await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            froniusHttpClient = new HttpClient(new HttpClientHandler {Credentials = credCache});
         }
+
+        var nextAllowedCall = lastSolarApiCall.AddSeconds(.2) - DateTime.UtcNow;
+
+        if (nextAllowedCall.Ticks > 0)
+        {
+            await Task.Delay(nextAllowedCall).ConfigureAwait(false);
+        }
+
+        var response = await froniusHttpClient.GetAsync(requestString).ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+        var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        lastSolarApiCall = DateTime.UtcNow;
+        return result;
+    }
+
+    private async Task<(T, JToken)> GetJsonResponse<T>(string request, bool useUnofficialApi = false) where T : BaseResponse, new()
+    {
+        var requestString = $"{(useUnofficialApi ? string.Empty : "solar_api/v1/")}{request}";
+        var jsonString = await GetFroniusJsonResponse(requestString);
 
         return await Task.Run(() =>
         {

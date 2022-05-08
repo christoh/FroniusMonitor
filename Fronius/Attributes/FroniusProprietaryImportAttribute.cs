@@ -4,6 +4,7 @@ public enum FroniusDataType : byte
 {
     Attribute,
     Channel,
+    Root,
 }
 
 public enum Unit : byte

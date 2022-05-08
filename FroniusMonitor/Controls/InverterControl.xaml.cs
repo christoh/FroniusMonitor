@@ -4,6 +4,7 @@ using System.Windows.Media;
 using De.Hochstaetter.Fronius.Contracts;
 using De.Hochstaetter.Fronius.Models;
 using De.Hochstaetter.FroniusMonitor.Contracts;
+using De.Hochstaetter.FroniusMonitor.Models;
 using De.Hochstaetter.FroniusMonitor.Unity;
 using Loc = De.Hochstaetter.Fronius.Localization.Resources;
 
@@ -104,13 +105,8 @@ public partial class InverterControl : IHaveLcdPanel
 
         Dispatcher.InvokeAsync(() =>
         {
-            //BackgroundProvider.Background = Inverter?.Data?.Status switch
-            //{
-            //    InverterStatus.Running => Brushes.AntiqueWhite,
-            //    InverterStatus.Error => Brushes.Red,
-            //    _ => Brushes.LightGray,
-            //};
-            BackgroundProvider.Background = Brushes.AntiqueWhite;
+            BackgroundProvider.Background = e.SolarSystem?.Gen24System?.InverterStatus?.ToBrush() ?? Brushes.LightGray;
+            InverterName.Text = $"{Inverter?.Model} ({gen24?.InverterStatus?.StatusMessage})";
 
             switch (Mode)
             {
@@ -323,7 +319,7 @@ public partial class InverterControl : IHaveLcdPanel
                     Lcd.Label3 = "Sc";
                     Lcd.Value3 = ToLcd(Math.Min(-powerFlow?.LoadPower / powerFlow?.InverterAcPower ?? 0, 1), "P2");
                     Lcd.LabelSum = "Aut";
-                    Lcd.ValueSum = ToLcd(Math.Min(-powerFlow?.InverterAcPower/powerFlow?.LoadPower??0,1d), "P2");
+                    Lcd.ValueSum = ToLcd(Math.Min(-powerFlow?.InverterAcPower / powerFlow?.LoadPower ?? 0, 1d), "P2");
                     break;
 
                 case InverterDisplayMode.MoreTemperatures:

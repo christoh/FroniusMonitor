@@ -369,4 +369,28 @@
   <data name="Misc" xml:space="preserve">
 	  <value>Miscellaneous</value>
   </data>
+  <data name="STATE_DISCONNECTED" xml:space="preserve">
+	  <value>Disconnected</value>
+  </data>
+  <data name="STATE_ERROR" xml:space="preserve">
+	  <value>Error</value>
+  </data>
+  <data name="STATE_READY" xml:space="preserve">
+	  <value>Ready</value>
+  </data>
+  <data name="STATE_RUNNING" xml:space="preserve">
+	  <value>Running</value>
+  </data>
+  <data name="STATE_STARTUP" xml:space="preserve">
+	  <value>Starting</value>
+  </data>
+  <data name="STATE_STOPPED" xml:space="preserve">
+	  <value>Stopped</value>
+  </data>
+  <data name="STATE_UNKNOWN" xml:space="preserve">
+	  <value>Unknown</value>
+  </data>
+  <data name="STATE_WARNING" xml:space="preserve">
+	  <value>Warning</value>
+  </data>
 </root>

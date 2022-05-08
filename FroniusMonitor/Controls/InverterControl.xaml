@@ -27,10 +27,7 @@
                     <TextBlock FontSize="8" TextAlignment="Center" Text="{Binding Inverter.CustomName, FallbackValue=---}"/>
                 </Viewbox>
                 <Viewbox Grid.Row="1">
-                    <TextBlock FontSize="8" TextAlignment="Center">
-                        <Run Text="{Binding Inverter.Model, FallbackValue=---}"/>
-                        <!--<Run Text="("/><Run Text="{Binding Inverter.Data.InverterStatusString, Mode=OneWay, FallbackValue={x:Static p:Resources.Unknown}}"/><Run Text=")"/>-->
-                    </TextBlock>
+                    <TextBlock FontSize="8" x:Name="InverterName" TextAlignment="Center"/>
                 </Viewbox>
 
                 <c:LcdDisplay x:Name="Lcd" Grid.Row="2" Width="100" Height="85" Margin="4" FontSize="14" FontFamily="pack://application:,,,/Assets/Fonts/#Digital-7 Mono"/>

@@ -718,6 +718,78 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Disconnected.
+        /// </summary>
+        public static string STATE_DISCONNECTED {
+            get {
+                return ResourceManager.GetString("STATE_DISCONNECTED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error.
+        /// </summary>
+        public static string STATE_ERROR {
+            get {
+                return ResourceManager.GetString("STATE_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ready.
+        /// </summary>
+        public static string STATE_READY {
+            get {
+                return ResourceManager.GetString("STATE_READY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Running.
+        /// </summary>
+        public static string STATE_RUNNING {
+            get {
+                return ResourceManager.GetString("STATE_RUNNING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Starting.
+        /// </summary>
+        public static string STATE_STARTUP {
+            get {
+                return ResourceManager.GetString("STATE_STARTUP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stopped.
+        /// </summary>
+        public static string STATE_STOPPED {
+            get {
+                return ResourceManager.GetString("STATE_STOPPED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown.
+        /// </summary>
+        public static string STATE_UNKNOWN {
+            get {
+                return ResourceManager.GetString("STATE_UNKNOWN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Warning.
+        /// </summary>
+        public static string STATE_WARNING {
+            get {
+                return ResourceManager.GetString("STATE_WARNING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Storage.
         /// </summary>
         public static string Storage {
