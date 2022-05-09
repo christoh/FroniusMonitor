@@ -40,6 +40,22 @@ public partial class MainWindow
 
     public MainViewModel ViewModel => (MainViewModel)DataContext;
 
+    private EventLogView? eventLogView;
+    public EventLogView EventLogView
+    {
+        get
+        {
+            if (eventLogView == null)
+            {
+                eventLogView = IoC.Get<EventLogView>();
+                eventLogView.Closed += (s, e) => { eventLogView = null; };
+            }
+
+            return eventLogView!;
+        }
+    }
+
+
     private void ZoomIn()
     {
         ConsumerScaler.ScaleX *= App.ZoomFactor;
@@ -122,7 +138,7 @@ public partial class MainWindow
             return;
         }
 
-        var totalIncomingPower = new[] {PowerFlow.SolarPower, PowerFlow.StoragePower, PowerFlow.GridPower}.Where(ps => ps is > 0).Select(ps => ps!.Value).Sum();
+        var totalIncomingPower = new[] { PowerFlow.SolarPower, PowerFlow.StoragePower, PowerFlow.GridPower }.Where(ps => ps is > 0).Select(ps => ps!.Value).Sum();
 
         double r = 0, g = 0, b = 0;
 
@@ -162,6 +178,11 @@ public partial class MainWindow
 
     private void ShowEventLog(object sender, RoutedEventArgs e)
     {
-        IoC.Get<EventLogView>().Show();
+        if (eventLogView != null)
+        {
+            EventLogView.Activate();
+        }
+
+        EventLogView.Show();
     }
 }

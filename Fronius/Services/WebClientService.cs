@@ -42,7 +42,7 @@ public class WebClientService : BindableBase, IWebClientService
 
     public async Task<IOrderedEnumerable<Gen24Event>> GetFroniusEvents()
     {
-        var eventList = new List<Gen24Event>(1024);
+        var eventList = new List<Gen24Event>(256);
 
         Parallel.ForEach(JArray.Parse(await GetFroniusJsonResponse("status/events").ConfigureAwait(false)), eventToken =>
         {
@@ -497,9 +497,6 @@ public class WebClientService : BindableBase, IWebClientService
     public async Task<FritzBoxDeviceList> GetFritzBoxDevices()
     {
         await using var stream = await GetStreamResponse($"webservices/homeautoswitch.lua?switchcmd=getdevicelistinfos").ConfigureAwait(false) ?? throw new InvalidDataException();
-        //var m = (MemoryStream)stream;
-        //var x = Encoding.UTF8.GetString(m.ToArray());
-        //Debugger.Break();
         var serializer = new XmlSerializer(typeof(FritzBoxDeviceList));
         var result = serializer.Deserialize(stream) as FritzBoxDeviceList ?? throw new InvalidDataException();
         result.Devices.Apply(d => d.WebClientService = this);

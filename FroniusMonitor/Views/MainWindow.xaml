@@ -84,7 +84,7 @@
 
                         <c:PowerFlowArrow Angle="30" Margin="200,0,0,0" Fill="LightGreen" HasRightPlacement="True"
                                           Power="{Binding SolarSystemService.SolarSystem.Gen24System.PowerFlow.StoragePower, FallbackValue={x:Null}}"
-                                          Visibility="{Binding SolarSystemService.SolarSystem.Storages, Converter={co:CountToVisibility}, FallbackValue=Collapsed}" />
+                                          Visibility="{Binding SolarSystemService.SolarSystem.Gen24System.Storage, Converter={co:NullToVisibility}, FallbackValue=Collapsed}" />
 
                     </StackPanel>
                 </Grid>
@@ -103,7 +103,8 @@
                                          SmartMeter="{Binding SolarSystemService.SolarSystem.Gen24System.PrimaryPowerMeter, FallbackValue={x:Null}}" />
 
                     <c:StorageControl Height="200" Grid.Column="2" DockPanel.Dock="Right" Margin="150,0,0,0"
-                                      Gen24="{Binding SolarSystemService.SolarSystem.Gen24System, FallbackValue={x:Null}}" />
+                                      Gen24="{Binding SolarSystemService.SolarSystem.Gen24System, FallbackValue={x:Null}}"
+                                      Visibility="{Binding SolarSystemService.SolarSystem.Gen24System.Storage, Converter={co:NullToVisibility}, FallbackValue=Collapsed}"/>
                 </Grid>
             </Grid>
         </Viewbox>

@@ -24,5 +24,10 @@ namespace De.Hochstaetter.FroniusMonitor.Unity
         {
             return App.Container.Resolve<T>();
         }
+
+        public static object Get(Type type)
+        {
+            return App.Container.Resolve(type);
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using De.Hochstaetter.Fronius.Attributes;
+﻿using System.Globalization;
+using De.Hochstaetter.Fronius.Attributes;
 
 namespace De.Hochstaetter.Fronius.Models.Gen24;
 
@@ -43,7 +44,7 @@ public class Gen24Event : BindableBase
     public string? Prefix
     {
         get => prefix;
-        set => Set(ref prefix, value);
+        set => Set(ref prefix, value, () => NotifyOfPropertyChange(nameof(Code)));
     }
 
     private int? eventId;
@@ -51,8 +52,10 @@ public class Gen24Event : BindableBase
     public int? EventId
     {
         get => eventId;
-        set => Set(ref eventId, value);
+        set => Set(ref eventId, value, () => NotifyOfPropertyChange(nameof(Code)));
     }
+
+    public string Code => (string.IsNullOrEmpty(Prefix) ? string.Empty : $"{Prefix}-") + (EventId.HasValue ? EventId.Value.ToString(CultureInfo.InvariantCulture) : string.Empty);
 
     private Severity severity;
     [FroniusProprietaryImport("severity", FroniusDataType.Root)]

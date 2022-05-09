@@ -37,6 +37,20 @@ public class DateConverter : ConverterBase
     }
 }
 
+public class NullToAnything<T> : ConverterBase
+{
+    public virtual T? Null { get; set; }
+    public virtual T? NotNull { get; set; }
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)=>value is null? Null: NotNull;
+}
+
+public class NullToVisibility : NullToAnything<Visibility>
+{
+    public override Visibility Null { get; set; }= Visibility.Collapsed;
+    public override Visibility NotNull { get; set; }=Visibility.Visible;
+}
+
+
 public class NullToString : ConverterBase
 {
     public string NullText { get; init; } = "---";

@@ -1,17 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using De.Hochstaetter.FroniusMonitor.ViewModels;
+﻿using De.Hochstaetter.FroniusMonitor.ViewModels;
 
 namespace De.Hochstaetter.FroniusMonitor.Views
 {
@@ -23,10 +10,10 @@ namespace De.Hochstaetter.FroniusMonitor.Views
             DataContext = viewModel;
 
             Loaded += async (s, e) =>
-             {
-                 ViewModel.Dispatcher = Dispatcher;
-                 await ViewModel.OnInitialize().ConfigureAwait(false);
-             };
+            {
+                ViewModel.Dispatcher = Dispatcher;
+                await ViewModel.OnInitialize().ConfigureAwait(false);
+            };
         }
 
         public EventLogViewModel ViewModel => (EventLogViewModel)DataContext;
