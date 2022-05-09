@@ -12,6 +12,7 @@ using De.Hochstaetter.Fronius.Exceptions;
 using De.Hochstaetter.Fronius.Extensions;
 using De.Hochstaetter.Fronius.Localization;
 using De.Hochstaetter.Fronius.Models;
+using De.Hochstaetter.Fronius.Models.Gen24;
 using Newtonsoft.Json.Linq;
 
 namespace De.Hochstaetter.Fronius.Services;
@@ -39,22 +40,34 @@ public class WebClientService : BindableBase, IWebClientService
         set => Set(ref fritzBoxConnection, value);
     }
 
+    public async Task<IOrderedEnumerable<Gen24Event>> GetFroniusEvents()
+    {
+        var eventList = new List<Gen24Event>(1024);
+
+        Parallel.ForEach(JArray.Parse(await GetFroniusJsonResponse("status/events").ConfigureAwait(false)), eventToken =>
+        {
+            eventList.Add(ReadFroniusData<Gen24Event>(eventToken));
+        });
+
+        return eventList.OrderByDescending(e => e.EventTime);
+    }
+
     public async Task<Gen24System> GetFroniusData()
     {
         var gen24System = new Gen24System();
 
         foreach (var statusToken in JArray.Parse(await GetFroniusJsonResponse("status/devices").ConfigureAwait(false)))
         {
-            var x = ReadFroniusData<Gen24Status>(statusToken);
+            var status = ReadFroniusData<Gen24Status>(statusToken);
 
-            switch (x.DeviceType)
+            switch (status.DeviceType)
             {
                 case DeviceType.Inverter:
-                    gen24System.InverterStatus = x;
+                    gen24System.InverterStatus = status;
                     break;
 
                 case DeviceType.PowerMeter:
-                    gen24System.MeterStatus = x;
+                    gen24System.MeterStatus = status;
                     break;
             }
         }
@@ -180,7 +193,7 @@ public class WebClientService : BindableBase, IWebClientService
 
         if (int.TryParse(stringValue, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var numeric))
         {
-            return Convert.ChangeType(numeric, type, CultureInfo.InvariantCulture);
+            return Enum.Parse(type,stringValue,true);
         }
 
         var fieldInfo =

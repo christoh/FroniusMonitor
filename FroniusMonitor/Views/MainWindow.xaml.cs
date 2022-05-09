@@ -3,6 +3,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using De.Hochstaetter.Fronius.Models;
+using De.Hochstaetter.Fronius.Models.Gen24;
 using De.Hochstaetter.FroniusMonitor.Unity;
 using De.Hochstaetter.FroniusMonitor.ViewModels;
 
@@ -157,5 +158,10 @@ public partial class MainWindow
     private void OnAutoSizeChecked(object sender, RoutedEventArgs e)
     {
         PowerConsumerColumn.Width = new GridLength(0, GridUnitType.Auto);
+    }
+
+    private void ShowEventLog(object sender, RoutedEventArgs e)
+    {
+        IoC.Get<EventLogView>().Show();
     }
 }

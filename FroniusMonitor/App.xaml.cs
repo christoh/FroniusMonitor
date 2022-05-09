@@ -30,10 +30,12 @@ public partial class App
         base.OnStartup(e);
 
         Container
-            .RegisterType<IWebClientService, WebClientService>()
+            .RegisterSingleton<IWebClientService, WebClientService>()
             .RegisterSingleton<ISolarSystemService, SolarSystemService>()
             .RegisterSingleton<MainWindow>()
             .RegisterSingleton<MainViewModel>()
+            .RegisterType<EventLogView>()
+            .RegisterType<EventLogViewModel>()
             ;
 
         Directory.CreateDirectory(PerUserDataDir);

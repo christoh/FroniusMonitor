@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Resources;
-using System.Text;
-using System.Threading.Tasks;
-using De.Hochstaetter.Fronius.Attributes;
+﻿using De.Hochstaetter.Fronius.Attributes;
 using De.Hochstaetter.Fronius.Localization;
 
-namespace De.Hochstaetter.Fronius.Models
+namespace De.Hochstaetter.Fronius.Models.Gen24
 {
     public class Gen24Status : BindableBase
     {

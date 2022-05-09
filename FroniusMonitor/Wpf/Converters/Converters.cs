@@ -5,6 +5,7 @@ using System.Windows.Data;
 using System.Windows.Markup;
 using System.Windows.Media;
 using De.Hochstaetter.Fronius.Models;
+using De.Hochstaetter.Fronius.Models.Gen24;
 using De.Hochstaetter.FroniusMonitor.Models;
 
 namespace De.Hochstaetter.FroniusMonitor.Wpf.Converters;
@@ -18,6 +19,21 @@ public abstract class ConverterBase : MarkupExtension, IValueConverter
     public virtual object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         throw new NotSupportedException();
+    }
+}
+
+public class DateConverter : ConverterBase
+{
+    public string StringFormat { get; set; } = "G";
+    public bool UseCurrentCulture { get; set; } = true;
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not DateTime date)
+        {
+            return null;
+        }
+
+        return date.ToString(StringFormat, UseCurrentCulture ? CultureInfo.CurrentCulture : culture);
     }
 }
 
@@ -128,6 +144,29 @@ public class Bool2Visibility : BoolToAnything<Visibility>
     {
         True = Visibility.Visible;
         False = Null = Visibility.Collapsed;
+    }
+}
+
+public class SeverityToVisibility : ConverterBase
+{
+    public Visibility Error { get; set; } = Visibility.Collapsed;
+    public Visibility Warning { get; set; } = Visibility.Collapsed;
+    public Visibility Information { get; set; } = Visibility.Collapsed;
+    public Visibility Other { get; set; } = Visibility.Collapsed;
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not Severity severity)
+        {
+            return null;
+        }
+
+        return severity switch
+        {
+            Severity.Error => Error,
+            Severity.Information => Information,
+            Severity.Warning => Warning,
+            _ => Other,
+        };
     }
 }
 

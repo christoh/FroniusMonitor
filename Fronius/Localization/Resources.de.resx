@@ -393,4 +393,25 @@
   <data name="STATE_WARNING" xml:space="preserve">
 	  <value>Warnung</value>
   </data>
+  <data name="EventLog" xml:space="preserve">
+	  <value>Ereignisprotokoll</value>
+  </data>
+  <data name="Start" xml:space="preserve">
+	  <value>Beginn</value>
+  </data>
+  <data name="End" xml:space="preserve">
+	  <value>Ende</value>
+  </data>
+  <data name="Device" xml:space="preserve">
+	  <value>Gerät</value>
+  </data>
+  <data name="Id" xml:space="preserve">
+	  <value>Code</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+	  <value>Name</value>
+  </data>
+  <data name="Severity" xml:space="preserve">
+	  <value>Schwere</value>
+  </data>
 </root>

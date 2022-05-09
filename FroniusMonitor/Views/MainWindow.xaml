@@ -30,6 +30,7 @@
             </MenuItem>
             <MenuItem Header="{x:Static p:Resources.View}">
                 <MenuItem Header="_Auto-fit" Click="OnAutoSizeChecked" />
+                <MenuItem Header="_Show Event Log" Click="ShowEventLog" />
             </MenuItem>
         </Menu>
 

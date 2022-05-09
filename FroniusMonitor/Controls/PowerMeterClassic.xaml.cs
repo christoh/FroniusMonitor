@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using De.Hochstaetter.Fronius.Models;
+using De.Hochstaetter.Fronius.Models.Gen24;
 using De.Hochstaetter.FroniusMonitor.Models;
 
 namespace De.Hochstaetter.FroniusMonitor.Controls

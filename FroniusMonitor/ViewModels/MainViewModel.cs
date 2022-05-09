@@ -11,7 +11,7 @@ using Microsoft.Win32;
 
 namespace De.Hochstaetter.FroniusMonitor.ViewModels
 {
-    public class MainViewModel : BindableBase
+    public class MainViewModel : ViewModelBase
     {
         public MainViewModel(ISolarSystemService solarSystemService)
         {
@@ -23,8 +23,6 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
         public ICommand ExportSettingsCommand { get; }
         public ICommand LoadSettingsCommand { get; }
 
-        internal Dispatcher Dispatcher { get; set; } = null!;
-
         public ISolarSystemService SolarSystemService { get; }
 
         private bool includeInverterPower;
@@ -35,8 +33,9 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
             set => Set(ref includeInverterPower, value);
         }
 
-        public async Task OnInitialize()
+        internal override async Task OnInitialize()
         {
+            await base.OnInitialize().ConfigureAwait(false);
             await SolarSystemService.Start(App.Settings.FroniusConnection, App.Settings.FritzBoxConnection).ConfigureAwait(false);
         }
 

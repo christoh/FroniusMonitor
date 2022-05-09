@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Media;
 using De.Hochstaetter.Fronius.Models;
+using De.Hochstaetter.Fronius.Models.Gen24;
 using De.Hochstaetter.FroniusMonitor.Contracts;
 using Loc = De.Hochstaetter.Fronius.Localization.Resources;
 

@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics.CodeAnalysis;
 using De.Hochstaetter.Fronius.Attributes;
 using De.Hochstaetter.Fronius.Localization;
 
-namespace De.Hochstaetter.Fronius.Models;
+namespace De.Hochstaetter.Fronius.Models.Gen24;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public class Gen24Storage:Gen24DeviceBase

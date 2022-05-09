@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics.CodeAnalysis;
 using De.Hochstaetter.Fronius.Attributes;
 
-namespace De.Hochstaetter.Fronius.Models
+namespace De.Hochstaetter.Fronius.Models.Gen24
 {
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public class Gen24Restrictions:Gen24DeviceBase

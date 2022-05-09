@@ -5,6 +5,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using De.Hochstaetter.Fronius.Models.Gen24;
 
 namespace De.Hochstaetter.Fronius.Contracts
 {
@@ -25,5 +26,6 @@ namespace De.Hochstaetter.Fronius.Contracts
         Task SetFritzBoxLevel(string ain, double level);
         Task SetFritzBoxColorTemperature(string ain, double temperatureKelvin);
         Task SetFritzBoxColor(string ain, double hueDegrees, double saturation);
+        Task<IOrderedEnumerable<Gen24Event>> GetFroniusEvents();
     }
 }
