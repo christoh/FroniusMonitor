@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:De.Hochstaetter.FroniusMonitor.ViewModels"
         mc:Ignorable="d"
-        Title="{x:Static p:Resources.AppName}" Height="810" Width="1440"
+        Title="{x:Static p:Resources.AppName}" Height="1025" Width="1676"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
         xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
         xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"

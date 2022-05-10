@@ -40,6 +40,12 @@ public class WebClientService : BindableBase, IWebClientService
         set => Set(ref fritzBoxConnection, value);
     }
 
+    public async Task SetGridPowerTarget(double watts)
+    {
+        var token = JToken.Parse(await GetFroniusJsonResponse("config/batteries").ConfigureAwait(false));
+        var response = JToken.Parse(await GetFroniusJsonResponse("config/batteries", JToken.Parse("{\"HYB_EVU_CHARGEFROMGRID\": true}")).ConfigureAwait(false));
+    }
+
     public async Task<IOrderedEnumerable<Gen24Event>> GetFroniusEvents()
     {
         var eventList = new List<Gen24Event>(256);
@@ -54,6 +60,7 @@ public class WebClientService : BindableBase, IWebClientService
 
     public async Task<Gen24System> GetFroniusData()
     {
+        //await SetGridPowerTarget(50).ConfigureAwait(false);
         var gen24System = new Gen24System();
 
         foreach (var statusToken in JArray.Parse(await GetFroniusJsonResponse("status/devices").ConfigureAwait(false)))
@@ -191,14 +198,14 @@ public class WebClientService : BindableBase, IWebClientService
 
         var fields = type.GetFields();
 
-        if (int.TryParse(stringValue, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var numeric))
+        if (int.TryParse(stringValue, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out _))
         {
-            return Enum.Parse(type,stringValue,true);
+            return Enum.Parse(type, stringValue, true);
         }
 
         var fieldInfo =
             fields.SingleOrDefault(f => f.GetCustomAttributes().Any(a => a is EnumParseAttribute attribute && attribute.ParseAs?.ToUpperInvariant() == stringValue.ToUpperInvariant())) ??
-            fields.SingleOrDefault(f => f.GetCustomAttributes().Any(a => a is EnumParseAttribute {IsDefault: true}));
+            fields.SingleOrDefault(f => f.GetCustomAttributes().Any(a => a is EnumParseAttribute { IsDefault: true }));
 
         return fieldInfo == null ? null : Enum.Parse(type, fieldInfo.Name);
     }
@@ -532,18 +539,18 @@ public class WebClientService : BindableBase, IWebClientService
 
     private static readonly Dictionary<int, IEnumerable<int>> allowedFritzBoxColors = new()
     {
-        {358, new[] {180, 112, 54}},
-        {35, new[] {214, 140, 72}},
-        {52, new[] {153, 102, 51}},
-        {92, new[] {123, 79, 38}},
-        {120, new[] {160, 82, 38}},
-        {160, new[] {145, 84, 41}},
-        {195, new[] {179, 118, 59}},
-        {212, new[] {169, 110, 56}},
-        {225, new[] {204, 135, 67}},
-        {266, new[] {169, 110, 54}},
-        {296, new[] {140, 92, 46}},
-        {335, new[] {180, 107, 51}},
+        { 358, new[] { 180, 112, 54 } },
+        { 35, new[] { 214, 140, 72 } },
+        { 52, new[] { 153, 102, 51 } },
+        { 92, new[] { 123, 79, 38 } },
+        { 120, new[] { 160, 82, 38 } },
+        { 160, new[] { 145, 84, 41 } },
+        { 195, new[] { 179, 118, 59 } },
+        { 212, new[] { 169, 110, 56 } },
+        { 225, new[] { 204, 135, 67 } },
+        { 266, new[] { 169, 110, 54 } },
+        { 296, new[] { 140, 92, 46 } },
+        { 335, new[] { 180, 107, 51 } },
     };
 
     public async Task SetFritzBoxColor(string ain, double hueDegrees, double saturation)
@@ -610,27 +617,16 @@ public class WebClientService : BindableBase, IWebClientService
         return result;
     }
 
-    private HttpClient? froniusHttpClient;
+    private DigestAuthHttp? froniusHttpClient;
 
-    private async Task<string> GetFroniusJsonResponse(string request)
+    private async Task<string> GetFroniusJsonResponse(string request, JToken? token = null)
     {
         if (InverterConnection?.BaseUrl == null)
         {
             throw new NullReferenceException(Resources.NoSystemConnection);
         }
 
-        var requestString = $"{InverterConnection.BaseUrl}/{request}";
-
-        if (froniusHttpClient == null)
-        {
-            var credCache = new CredentialCache
-            {
-                {new Uri(InverterConnection.BaseUrl + "/"), "Digest", new NetworkCredential(InverterConnection.UserName, InverterConnection.Password)}
-            };
-
-            froniusHttpClient = new HttpClient(new HttpClientHandler {Credentials = credCache});
-        }
-
+        froniusHttpClient ??= new DigestAuthHttp(InverterConnection ?? throw new ArgumentNullException());
         var nextAllowedCall = lastSolarApiCall.AddSeconds(.2) - DateTime.UtcNow;
 
         if (nextAllowedCall.Ticks > 0)
@@ -638,9 +634,7 @@ public class WebClientService : BindableBase, IWebClientService
             await Task.Delay(nextAllowedCall).ConfigureAwait(false);
         }
 
-        var response = await froniusHttpClient.GetAsync(requestString).ConfigureAwait(false);
-        response.EnsureSuccessStatusCode();
-        var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var result = await froniusHttpClient.GetString(request, token).ConfigureAwait(false);
         lastSolarApiCall = DateTime.UtcNow;
         return result;
     }
