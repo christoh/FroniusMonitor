@@ -55,6 +55,21 @@ public partial class MainWindow
         }
     }
 
+    private SelfConsumptionOptimizationView? selfConsumptionOptimizationView;
+    public SelfConsumptionOptimizationView SelfConsumptionOptimizationView
+    {
+        get
+        {
+            if (selfConsumptionOptimizationView == null)
+            {
+                selfConsumptionOptimizationView = IoC.Get<SelfConsumptionOptimizationView>();
+                selfConsumptionOptimizationView.Closed += (s, e) => { selfConsumptionOptimizationView = null; };
+            }
+
+            return selfConsumptionOptimizationView!;
+        }
+    }
+
 
     private void ZoomIn()
     {
@@ -184,5 +199,15 @@ public partial class MainWindow
         }
 
         EventLogView.Show();
+    }
+
+    private void ShowSelfConsumptionOptimization(object sender, RoutedEventArgs e)
+    {
+        if (selfConsumptionOptimizationView != null)
+        {
+            SelfConsumptionOptimizationView.Activate();
+        }
+
+        SelfConsumptionOptimizationView.Show();
     }
 }

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using De.Hochstaetter.Fronius.Models.Gen24;
+using Newtonsoft.Json.Linq;
 
 namespace De.Hochstaetter.Fronius.Contracts
 {
@@ -27,5 +28,7 @@ namespace De.Hochstaetter.Fronius.Contracts
         Task SetFritzBoxColorTemperature(string ain, double temperatureKelvin);
         Task SetFritzBoxColor(string ain, double hueDegrees, double saturation);
         Task<IOrderedEnumerable<Gen24Event>> GetFroniusEvents();
+        Task<T> ReadGen24Entity<T>(string request) where T : new();
+        JToken GetUpdateToken<T>(T newEntity, T? oldEntity = default) where T : BindableBase;
     }
 }

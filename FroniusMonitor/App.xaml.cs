@@ -35,6 +35,8 @@ public partial class App
             .RegisterSingleton<MainViewModel>()
             .RegisterType<EventLogView>()
             .RegisterType<EventLogViewModel>()
+            .RegisterType<SelfConsumptionOptimizationViewModel>()
+            .RegisterType<SelfConsumptionOptimizationView>()
             ;
 
         Directory.CreateDirectory(PerUserDataDir);

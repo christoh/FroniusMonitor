@@ -13,6 +13,7 @@ using De.Hochstaetter.Fronius.Extensions;
 using De.Hochstaetter.Fronius.Localization;
 using De.Hochstaetter.Fronius.Models;
 using De.Hochstaetter.Fronius.Models.Gen24;
+using De.Hochstaetter.Fronius.Models.Gen24.Settings;
 using Newtonsoft.Json.Linq;
 
 namespace De.Hochstaetter.Fronius.Services;
@@ -40,10 +41,40 @@ public class WebClientService : BindableBase, IWebClientService
         set => Set(ref fritzBoxConnection, value);
     }
 
-    public async Task SetGridPowerTarget(double watts)
+    public async Task<T> ReadGen24Entity<T>(string request) where T : new()
     {
-        var token = JToken.Parse(await GetFroniusJsonResponse("config/batteries").ConfigureAwait(false));
-        var response = JToken.Parse(await GetFroniusJsonResponse("config/batteries", JToken.Parse("{\"HYB_EVU_CHARGEFROMGRID\": true}")).ConfigureAwait(false));
+        var token = JToken.Parse(await GetFroniusJsonResponse(request).ConfigureAwait(false));
+        return ReadFroniusData<T>(token);
+    }
+
+    public JToken GetUpdateToken<T>(T newEntity, T? oldEntity = default) where T : BindableBase
+    {
+        var jObject = new JObject();
+
+        foreach (var propertyInfo in typeof(T).GetProperties())
+        {
+            var jsonValueNew = GetFroniusJsonValue(propertyInfo, newEntity);
+
+            if (jsonValueNew == null)
+            {
+                continue;
+            }
+
+            if (oldEntity != default)
+            {
+                var jsonValueOld = GetFroniusJsonValue(propertyInfo, oldEntity);
+
+                if (jsonValueNew.Equals(jsonValueOld))
+                {
+                    continue;
+                }
+            }
+
+            var attribute = propertyInfo.GetCustomAttributes<FroniusProprietaryImportAttribute>().Single();
+            jObject.Add(attribute.Name, new JValue(jsonValueNew));
+        }
+
+        return jObject;
     }
 
     public async Task<IOrderedEnumerable<Gen24Event>> GetFroniusEvents()
@@ -60,7 +91,10 @@ public class WebClientService : BindableBase, IWebClientService
 
     public async Task<Gen24System> GetFroniusData()
     {
-        //await SetGridPowerTarget(50).ConfigureAwait(false);
+        //var gen24BatterySetting = await ReadGen24Entity<Gen24BatterySettings>("config/batteries").ConfigureAwait(false);
+        //var newSetting = (Gen24BatterySettings)gen24BatterySetting.Clone();
+        //newSetting.ChargeFromAc = true;
+        //var updateToken = GetUpdateToken(newSetting, gen24BatterySetting);
         var gen24System = new Gen24System();
 
         foreach (var statusToken in JArray.Parse(await GetFroniusJsonResponse("status/devices").ConfigureAwait(false)))
@@ -208,6 +242,37 @@ public class WebClientService : BindableBase, IWebClientService
             fields.SingleOrDefault(f => f.GetCustomAttributes().Any(a => a is EnumParseAttribute { IsDefault: true }));
 
         return fieldInfo == null ? null : Enum.Parse(type, fieldInfo.Name);
+    }
+
+    private object? GetFroniusJsonValue(PropertyInfo propertyInfo, object instance)
+    {
+        var value = propertyInfo.GetValue(instance);
+
+        if (value == null)
+        {
+            return null;
+        }
+
+        var result = value switch
+        {
+            Enum enumValue => GetFroniusEnumString(propertyInfo, enumValue),
+            DateTime date => (long)Math.Round((date.ToUniversalTime() - DateTime.UnixEpoch).TotalSeconds, MidpointRounding.AwayFromZero),
+            _ => value
+        };
+
+        return result;
+    }
+
+    private object? GetFroniusEnumString(PropertyInfo propertyInfo, Enum enumValue)
+    {
+        var fieldInfo = enumValue.GetType().GetFields().Single(f => f.Name == enumValue.ToString());
+
+        if (fieldInfo.GetCustomAttributes().SingleOrDefault(a => a is EnumParseAttribute) is not EnumParseAttribute attribute || attribute.ParseNumeric)
+        {
+            return Convert.ToInt32(enumValue);
+        }
+
+        return attribute.ParseAs;
     }
 
     public async Task<SystemDevices> GetDevices()
@@ -619,7 +684,8 @@ public class WebClientService : BindableBase, IWebClientService
 
     private DigestAuthHttp? froniusHttpClient;
 
-    private async Task<string> GetFroniusJsonResponse(string request, JToken? token = null)
+    //TODO:Make private
+    public async Task<string> GetFroniusJsonResponse(string request, JToken? token = null)
     {
         if (InverterConnection?.BaseUrl == null)
         {

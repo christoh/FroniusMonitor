@@ -1,0 +1,97 @@
+﻿<Window x:Class="De.Hochstaetter.FroniusMonitor.Views.SelfConsumptionOptimizationView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+        xmlns:vm="clr-namespace:De.Hochstaetter.FroniusMonitor.ViewModels"
+        xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
+        mc:Ignorable="d"
+        Title="{x:Static p:Resources.SelfConsumptionOptimization}" Width="560" SizeToContent="Height" ResizeMode="CanMinimize"
+        d:DataContext="{d:DesignInstance Type=vm:SelfConsumptionOptimizationViewModel}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <GroupBox Header="Grid Power Management" Grid.Row="0" Margin="8,8,8,4">
+            <Grid Margin="8,16">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,4">
+                    <RadioButton IsChecked="{Binding Settings.Mode, Mode=TwoWay, Converter={co:OptimizationMode2Bool Automatic=True, Manual=False}}" Margin="8,0" Content="{x:Static p:Resources.Automatic}"/>
+                    <RadioButton IsChecked="{Binding Settings.Mode, Mode=TwoWay, Converter={co:OptimizationMode2Bool Automatic=False, Manual=True}}" Margin="8,0" Content="{x:Static p:Resources.Manual}"/>
+                </StackPanel>
+                <Grid Grid.Row="1" Margin="16,16,8,16" Visibility="{Binding Settings.Mode, Converter={co:OptimizationMode2Visibility}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox TextAlignment="Center" IsReadOnly="True" Margin="0,0,0,-2" Width="40" Grid.Row="0" Grid.Column="0" Text="{Binding Settings.RequestedGridPower, Converter={co:ToAbsolute}}" HorizontalAlignment="Center"></TextBox>
+                    <Slider Grid.Column="0" Value="{Binding LogGridPower, Mode=TwoWay}" Grid.Row="1" Width="250" HorizontalAlignment="Left" Minimum="-1" Maximum="4.6989700043360188047862611052755"/>
+                    <StackPanel Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <RadioButton Content="{x:Static p:Resources.FeedIn}" IsChecked="{Binding IsFeedIn, Mode=TwoWay}" Margin="8,0"/>
+                        <RadioButton Content="{x:Static p:Resources.Consumption}" IsChecked="{Binding IsFeedIn, Mode=TwoWay, Converter={co:BoolInverter}}" Margin="8,0"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Grid.Row="1" Header="Battery Charging Options" Margin="8,4">
+            <WrapPanel Margin="16,16,8,16">
+                <CheckBox Content="{x:Static p:Resources.AllowGridCharge}" Width="220" IsChecked="{Binding Settings.ChargeFromGrid}"/>
+                <CheckBox Content="{x:Static p:Resources.ChargeFromAc}" Width="220" IsChecked="{Binding Settings.ChargeFromAc}"/>
+            </WrapPanel>
+        </GroupBox>
+
+        <GroupBox Grid.Row="2" Header="SoC Limits" Margin="8,4">
+            <Grid Margin="8,16">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,4">
+                    <RadioButton IsChecked="{Binding Settings.Limits, Mode=TwoWay, Converter={co:SocLimits2Bool UseDefault=True, Override=False}}" Margin="8,0" Content="{x:Static p:Resources.UseManufacturerDefaults}"/>
+                    <RadioButton IsChecked="{Binding Settings.Limits, Mode=TwoWay, Converter={co:SocLimits2Bool UseDefault=False, Override=True}}" Margin="8,0" Content="{x:Static p:Resources.Manual}"/>
+                </StackPanel>
+                <Grid Grid.Row="1" Visibility="{Binding Settings.Limits, Converter={co:SocLimits2Visibility}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,-2" HorizontalAlignment="Center" Grid.Row="0">
+                        <TextBlock Margin="0,0,4,0">
+                            <Run Text="Minimum SoC"></Run><Run Text=":"/>
+                        </TextBlock>
+                        <TextBox TextAlignment="Center" IsReadOnly="True"  Width="40" Grid.Row="0" Text="{Binding Settings.SocMin, Converter={co:ToAbsolute}}"/>
+                    </StackPanel>
+                    <Slider Value="{Binding SocMin, Mode=TwoWay}" Grid.Row="1" HorizontalAlignment="Stretch" Minimum="5" Maximum="100"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,-2" HorizontalAlignment="Center" Grid.Row="2">
+                        <TextBlock Margin="0,0,4,0">
+                            <Run Text="Maximum SoC"></Run><Run Text=":"/>
+                        </TextBlock>
+                        <TextBox TextAlignment="Center" IsReadOnly="True"  Width="40" Text="{Binding Settings.SocMax, Converter={co:ToAbsolute}}"></TextBox>
+                    </StackPanel>
+                    <Slider Value="{Binding SocMax, Mode=TwoWay}" Grid.Row="3" HorizontalAlignment="Stretch" Minimum="5" Maximum="100"/>
+                </Grid>
+            </Grid>
+        </GroupBox>
+
+        <StackPanel Grid.Row="3" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="16">
+            <Button Content="Undo" Margin="0,0,8,0" MinHeight="24" MinWidth="70" Command="{Binding UndoCommand}"/>
+            <Button Content="Apply" Margin="0,0,8,0" MinHeight="24" MinWidth="70" Command="{Binding ApplyCommand}"/>
+        </StackPanel>
+
+    </Grid>
+</Window>

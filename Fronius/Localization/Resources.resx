@@ -414,4 +414,28 @@
   <data name="Severity" xml:space="preserve">
 	  <value>Severity</value>
   </data>
+  <data name="SelfConsumptionOptimization" xml:space="preserve">
+	  <value>Self-Consumption Optimization</value>
+  </data>
+  <data name="Automatic" xml:space="preserve">
+	  <value>Automatic</value>
+  </data>
+  <data name="Manual" xml:space="preserve">
+	  <value>Manual</value>
+  </data>
+  <data name="FeedIn" xml:space="preserve">
+	  <value>Feed-In</value>
+  </data>
+  <data name="Consumption" xml:space="preserve">
+	  <value>Consumption</value>
+  </data>
+  <data name="AllowGridCharge" xml:space="preserve">
+	  <value>Allow charge battery from grid</value>
+  </data>
+  <data name="ChargeFromAc" xml:space="preserve">
+	  <value>Charge battery from load</value>
+  </data>
+  <data name="UseManufacturerDefaults" xml:space="preserve">
+	  <value>Use Manufacturer defaults</value>
+  </data>
 </root>

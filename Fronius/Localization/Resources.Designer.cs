@@ -124,6 +124,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Allow charge battery from grid.
+        /// </summary>
+        public static string AllowGridCharge {
+            get {
+                return ResourceManager.GetString("AllowGridCharge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Apparent power.
         /// </summary>
         public static string ApparentPower {
@@ -138,6 +147,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string AppName {
             get {
                 return ResourceManager.GetString("AppName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Automatic.
+        /// </summary>
+        public static string Automatic {
+            get {
+                return ResourceManager.GetString("Automatic", resourceCulture);
             }
         }
         
@@ -160,11 +178,29 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Charge battery from load.
+        /// </summary>
+        public static string ChargeFromAc {
+            get {
+                return ResourceManager.GetString("ChargeFromAc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Charging.
         /// </summary>
         public static string Charging {
             get {
                 return ResourceManager.GetString("Charging", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Consumption.
+        /// </summary>
+        public static string Consumption {
+            get {
+                return ResourceManager.GetString("Consumption", resourceCulture);
             }
         }
         
@@ -304,6 +340,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Feed-In.
+        /// </summary>
+        public static string FeedIn {
+            get {
+                return ResourceManager.GetString("FeedIn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Id.
         /// </summary>
         public static string Id {
@@ -399,6 +444,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string LoadSettings {
             get {
                 return ResourceManager.GetString("LoadSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manual.
+        /// </summary>
+        public static string Manual {
+            get {
+                return ResourceManager.GetString("Manual", resourceCulture);
             }
         }
         
@@ -624,6 +678,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Running {
             get {
                 return ResourceManager.GetString("Running", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Self-Consumption Optimization.
+        /// </summary>
+        public static string SelfConsumptionOptimization {
+            get {
+                return ResourceManager.GetString("SelfConsumptionOptimization", resourceCulture);
             }
         }
         
@@ -930,6 +993,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Updating {
             get {
                 return ResourceManager.GetString("Updating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use Manufacturer defaults.
+        /// </summary>
+        public static string UseManufacturerDefaults {
+            get {
+                return ResourceManager.GetString("UseManufacturerDefaults", resourceCulture);
             }
         }
         

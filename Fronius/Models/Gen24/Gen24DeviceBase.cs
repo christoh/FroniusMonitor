@@ -4,7 +4,7 @@ using De.Hochstaetter.Fronius.Attributes;
 namespace De.Hochstaetter.Fronius.Models.Gen24;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
-public abstract class Gen24DeviceBase : BindableBase
+public abstract class Gen24DeviceBase : BindableBase, ICloneable
 {
     private DateTime? dataTime;
 
@@ -92,4 +92,6 @@ public abstract class Gen24DeviceBase : BindableBase
         get => creationTime;
         set => Set(ref creationTime, value);
     }
+
+    public object Clone() => MemberwiseClone();
 }

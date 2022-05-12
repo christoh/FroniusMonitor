@@ -6,6 +6,7 @@ using System.Windows.Markup;
 using System.Windows.Media;
 using De.Hochstaetter.Fronius.Models;
 using De.Hochstaetter.Fronius.Models.Gen24;
+using De.Hochstaetter.Fronius.Models.Gen24.Settings;
 using De.Hochstaetter.FroniusMonitor.Models;
 
 namespace De.Hochstaetter.FroniusMonitor.Wpf.Converters;
@@ -238,5 +239,98 @@ public class CountToVisibility : ConverterBase
     public override object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         return value is not IEnumerable<Storage> storages ? Visibility.Collapsed : storages.Any() ? Visibility.Visible : Visibility.Collapsed;
+    }
+}
+
+public class OptimizationMode2Anything<T> : ConverterBase
+{
+    public virtual T? Automatic { get; set; }
+    public virtual T? Manual { get; set; }
+    public virtual T? Null { get; set; }
+
+
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return
+            value is not OptimizationMode mode
+                ? Null
+                : mode == OptimizationMode.Automatic
+                    ? Automatic
+                    : Manual;
+    }
+
+    public override object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not T tValue)
+        {
+            return null;
+        }
+
+        return tValue.Equals(Automatic) ? OptimizationMode.Automatic : tValue.Equals(Manual) ? OptimizationMode.Manual : null;
+    }
+}
+
+public class OptimizationMode2Bool : OptimizationMode2Anything<bool> { }
+
+public class OptimizationMode2Visibility : OptimizationMode2Anything<Visibility>
+{
+    public override Visibility Manual { get; set; } = Visibility.Visible;
+    public override Visibility Automatic { get; set; } = Visibility.Collapsed;
+}
+
+public class SocLimits2Anything<T> : ConverterBase
+{
+    public virtual T? Override { get; set; }
+    public virtual T? UseDefault { get; set; }
+    public virtual T? Null { get; set; }
+
+
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return
+            value is not SocLimits limits
+                ? Null
+                : limits == SocLimits.Override
+                    ? Override
+                    : UseDefault;
+    }
+
+    public override object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not T tValue)
+        {
+            return null;
+        }
+
+        return tValue.Equals(Override) ? SocLimits.Override : tValue.Equals(UseDefault) ? SocLimits.UseManufacturerDefault : null;
+    }
+}
+
+public class SocLimits2Bool : SocLimits2Anything<bool> { }
+
+public class SocLimits2Visibility : SocLimits2Anything<Visibility>
+{
+    public override Visibility Override { get; set; } = Visibility.Visible;
+    public override Visibility UseDefault { get; set; } = Visibility.Collapsed;
+}
+
+public class ToAbsolute : ConverterBase
+{
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is IConvertible convertible ? Math.Abs(convertible.ToDouble(CultureInfo.CurrentCulture)) : null;
+    }
+}
+
+public class BoolInverter : ConverterBase
+{
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is bool boolValue ? !boolValue : null;
+    }
+
+    public override object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is bool boolValue ? !boolValue : null;
     }
 }
