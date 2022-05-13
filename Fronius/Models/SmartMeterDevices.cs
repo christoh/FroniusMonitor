@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using De.Hochstaetter.Fronius.Contracts;
-using De.Hochstaetter.Fronius.Localization;
-
-namespace De.Hochstaetter.Fronius.Models
+﻿namespace De.Hochstaetter.Fronius.Models
 {
     public class SmartMeterDevices : BaseResponse, IHierarchicalCollection
     {

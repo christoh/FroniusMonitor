@@ -1,16 +1,4 @@
-﻿//using System.Globalization;
-
-using System.IO;
-using System.Windows;
-using De.Hochstaetter.Fronius.Contracts;
-using De.Hochstaetter.Fronius.Services;
-using De.Hochstaetter.FroniusMonitor.Models;
-using De.Hochstaetter.FroniusMonitor.Unity;
-using De.Hochstaetter.FroniusMonitor.ViewModels;
-using De.Hochstaetter.FroniusMonitor.Views;
-using Unity;
-
-namespace De.Hochstaetter.FroniusMonitor;
+﻿namespace De.Hochstaetter.FroniusMonitor;
 
 public partial class App
 {
@@ -25,7 +13,7 @@ public partial class App
 
     protected override void OnStartup(StartupEventArgs e)
     {
-        //Thread.CurrentThread.CurrentUICulture= new CultureInfo("de-CH");
+        Thread.CurrentThread.CurrentUICulture= new CultureInfo("de-CH");
         base.OnStartup(e);
 
         Container

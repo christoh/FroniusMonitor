@@ -1,22 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.Net;
-using System.Reflection;
-using System.Security.Cryptography;
-using System.Text;
-using System.Xml;
-using System.Xml.Serialization;
-using De.Hochstaetter.Fronius.Attributes;
-using De.Hochstaetter.Fronius.Contracts;
-using De.Hochstaetter.Fronius.Exceptions;
-using De.Hochstaetter.Fronius.Extensions;
-using De.Hochstaetter.Fronius.Localization;
-using De.Hochstaetter.Fronius.Models;
-using De.Hochstaetter.Fronius.Models.Gen24;
-using De.Hochstaetter.Fronius.Models.Gen24.Settings;
-using Newtonsoft.Json.Linq;
-
-namespace De.Hochstaetter.Fronius.Services;
+﻿namespace De.Hochstaetter.Fronius.Services;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public class WebClientService : BindableBase, IWebClientService
@@ -81,21 +63,24 @@ public class WebClientService : BindableBase, IWebClientService
     {
         var eventList = new List<Gen24Event>(256);
 
-        Parallel.ForEach(JArray.Parse(await GetFroniusJsonResponse("status/events").ConfigureAwait(false)), eventToken =>
-        {
-            eventList.Add(ReadFroniusData<Gen24Event>(eventToken));
-        });
+        Parallel.ForEach(JArray.Parse(await GetFroniusJsonResponse("status/events").ConfigureAwait(false)), eventToken => { eventList.Add(ReadFroniusData<Gen24Event>(eventToken)); });
 
         return eventList.OrderByDescending(e => e.EventTime);
     }
 
     public async Task<Gen24System> GetFroniusData()
     {
-        //var gen24BatterySetting = await ReadGen24Entity<Gen24BatterySettings>("config/batteries").ConfigureAwait(false);
-        //var newSetting = (Gen24BatterySettings)gen24BatterySetting.Clone();
-        //newSetting.ChargeFromAc = true;
-        //var updateToken = GetUpdateToken(newSetting, gen24BatterySetting);
         var gen24System = new Gen24System();
+
+        //try
+        //{
+        //    var test1 = await GetFroniusJsonResponse("config/powerlimits").ConfigureAwait(false);
+        //    var test2 = await GetFroniusJsonResponse("config/modbus").ConfigureAwait(false);
+        //}
+        //catch (Exception ex)
+        //{
+        //    //
+        //}
 
         foreach (var statusToken in JArray.Parse(await GetFroniusJsonResponse("status/devices").ConfigureAwait(false)))
         {
@@ -239,7 +224,7 @@ public class WebClientService : BindableBase, IWebClientService
 
         var fieldInfo =
             fields.SingleOrDefault(f => f.GetCustomAttributes().Any(a => a is EnumParseAttribute attribute && attribute.ParseAs?.ToUpperInvariant() == stringValue.ToUpperInvariant())) ??
-            fields.SingleOrDefault(f => f.GetCustomAttributes().Any(a => a is EnumParseAttribute { IsDefault: true }));
+            fields.SingleOrDefault(f => f.GetCustomAttributes().Any(a => a is EnumParseAttribute {IsDefault: true}));
 
         return fieldInfo == null ? null : Enum.Parse(type, fieldInfo.Name);
     }
@@ -604,18 +589,18 @@ public class WebClientService : BindableBase, IWebClientService
 
     private static readonly Dictionary<int, IEnumerable<int>> allowedFritzBoxColors = new()
     {
-        { 358, new[] { 180, 112, 54 } },
-        { 35, new[] { 214, 140, 72 } },
-        { 52, new[] { 153, 102, 51 } },
-        { 92, new[] { 123, 79, 38 } },
-        { 120, new[] { 160, 82, 38 } },
-        { 160, new[] { 145, 84, 41 } },
-        { 195, new[] { 179, 118, 59 } },
-        { 212, new[] { 169, 110, 56 } },
-        { 225, new[] { 204, 135, 67 } },
-        { 266, new[] { 169, 110, 54 } },
-        { 296, new[] { 140, 92, 46 } },
-        { 335, new[] { 180, 107, 51 } },
+        {358, new[] {180, 112, 54}},
+        {35, new[] {214, 140, 72}},
+        {52, new[] {153, 102, 51}},
+        {92, new[] {123, 79, 38}},
+        {120, new[] {160, 82, 38}},
+        {160, new[] {145, 84, 41}},
+        {195, new[] {179, 118, 59}},
+        {212, new[] {169, 110, 56}},
+        {225, new[] {204, 135, 67}},
+        {266, new[] {169, 110, 54}},
+        {296, new[] {140, 92, 46}},
+        {335, new[] {180, 107, 51}},
     };
 
     public async Task SetFritzBoxColor(string ain, double hueDegrees, double saturation)

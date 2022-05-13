@@ -1,6 +1,4 @@
-﻿using System.Xml.Serialization;
-
-namespace De.Hochstaetter.Fronius.Models
+﻿namespace De.Hochstaetter.Fronius.Models
 {
     [XmlType("powermeter")]
     public class FritzBoxPowerMeter : BindableBase

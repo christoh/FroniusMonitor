@@ -1,33 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Unity;
+﻿namespace De.Hochstaetter.FroniusMonitor.Unity;
 
-namespace De.Hochstaetter.FroniusMonitor.Unity
+public static class IoC
 {
-    public static class IoC
+    public static T TryGet<T>()
     {
-        public static T TryGet<T>()
-        {
-            try
-            {
-                return App.Container.Resolve<T>();
-            }
-            catch
-            {
-                return default(T)!;
-            }
-        }
-        public static T Get<T>()
+        try
         {
             return App.Container.Resolve<T>();
         }
-
-        public static object Get(Type type)
+        catch
         {
-            return App.Container.Resolve(type);
+            return default(T)!;
         }
+    }
+    public static T Get<T>()
+    {
+        return App.Container.Resolve<T>();
+    }
+
+    public static object Get(Type type)
+    {
+        return App.Container.Resolve(type);
     }
 }

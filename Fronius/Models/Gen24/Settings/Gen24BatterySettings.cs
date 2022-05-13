@@ -1,7 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using De.Hochstaetter.Fronius.Attributes;
-
-namespace De.Hochstaetter.Fronius.Models.Gen24.Settings;
+﻿namespace De.Hochstaetter.Fronius.Models.Gen24.Settings;
 
 public enum SocLimits : byte
 {
@@ -19,6 +16,7 @@ public enum OptimizationMode
 public class Gen24BatterySettings : BindableBase, ICloneable
 {
     private bool? isEnabled;
+
     [FroniusProprietaryImport("BAT_ENABLED", FroniusDataType.Root)]
     public bool? IsEnabled
     {
@@ -27,6 +25,7 @@ public class Gen24BatterySettings : BindableBase, ICloneable
     }
 
     private bool? isInCalibration;
+
     [FroniusProprietaryImport("BAT_CALIBRATION", FroniusDataType.Root)]
     public bool? IsInCalibration
     {
@@ -35,6 +34,7 @@ public class Gen24BatterySettings : BindableBase, ICloneable
     }
 
     private SocLimits limits;
+
     [FroniusProprietaryImport("BAT_M0_SOC_MODE", FroniusDataType.Root)]
     public SocLimits Limits
     {
@@ -43,6 +43,7 @@ public class Gen24BatterySettings : BindableBase, ICloneable
     }
 
     private byte? socMax;
+
     [FroniusProprietaryImport("BAT_M0_SOC_MAX", FroniusDataType.Root)]
     public byte? SocMax
     {
@@ -51,6 +52,7 @@ public class Gen24BatterySettings : BindableBase, ICloneable
     }
 
     private byte? socMin;
+
     [FroniusProprietaryImport("BAT_M0_SOC_MIN", FroniusDataType.Root)]
     public byte? SocMin
     {
@@ -59,6 +61,7 @@ public class Gen24BatterySettings : BindableBase, ICloneable
     }
 
     private string? model;
+
     [FroniusProprietaryImport("BAT_TYPE", FroniusDataType.Root)]
     public string? Model
     {
@@ -67,6 +70,7 @@ public class Gen24BatterySettings : BindableBase, ICloneable
     }
 
     private byte? backupCriticalSoc;
+
     [FroniusProprietaryImport("HYB_BACKUP_CRITICALSOC", FroniusDataType.Root)]
     public byte? BackupCriticalSoc
     {
@@ -75,6 +79,7 @@ public class Gen24BatterySettings : BindableBase, ICloneable
     }
 
     private byte? backupReserve;
+
     [FroniusProprietaryImport("HYB_BACKUP_RESERVED", FroniusDataType.Root)]
     public byte? BackupReserve
     {
@@ -83,6 +88,7 @@ public class Gen24BatterySettings : BindableBase, ICloneable
     }
 
     private bool? chargeFromAc;
+
     [FroniusProprietaryImport("HYB_BM_CHARGEFROMAC", FroniusDataType.Root)]
     public bool? ChargeFromAc
     {
@@ -91,6 +97,7 @@ public class Gen24BatterySettings : BindableBase, ICloneable
     }
 
     private bool? chargeFromGrid;
+
     [FroniusProprietaryImport("HYB_EVU_CHARGEFROMGRID", FroniusDataType.Root)]
     public bool? ChargeFromGrid
     {
@@ -99,6 +106,7 @@ public class Gen24BatterySettings : BindableBase, ICloneable
     }
 
     private int? acPowerMinimum;
+
     [FroniusProprietaryImport("HYB_BM_PACMIN", FroniusDataType.Root)]
     public int? AcPowerMinimum
     {
@@ -107,6 +115,7 @@ public class Gen24BatterySettings : BindableBase, ICloneable
     }
 
     private OptimizationMode? mode;
+
     [FroniusProprietaryImport("HYB_EM_MODE", FroniusDataType.Root)]
     public OptimizationMode? Mode
     {
@@ -115,6 +124,7 @@ public class Gen24BatterySettings : BindableBase, ICloneable
     }
 
     private int? requestedGridPower;
+
     [FroniusProprietaryImport("HYB_EM_POWER", FroniusDataType.Root)]
     public int? RequestedGridPower
     {
@@ -123,6 +133,7 @@ public class Gen24BatterySettings : BindableBase, ICloneable
     }
 
     private bool? isAcCoupled;
+
     [FroniusProprietaryImport("HYB_EVU_ACCOUPLED", FroniusDataType.Root)]
     public bool? IsAcCoupled
     {
@@ -131,6 +142,7 @@ public class Gen24BatterySettings : BindableBase, ICloneable
     }
 
     private int? solarPeakPower;
+
     [FroniusProprietaryImport("PV_PEAK_POWER", FroniusDataType.Root)]
     public int? SolarPeakPower
     {

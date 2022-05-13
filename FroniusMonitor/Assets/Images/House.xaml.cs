@@ -1,10 +1,9 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Assets.Images
+﻿namespace De.Hochstaetter.FroniusMonitor.Assets.Images;
+
+public partial class House
 {
-    public partial class House
+    public House()
     {
-        public House()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

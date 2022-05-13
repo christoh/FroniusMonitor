@@ -1,13 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Data;
-using System.Windows.Input;
-using System.Windows.Media;
-using De.Hochstaetter.Fronius.Models;
-using De.Hochstaetter.Fronius.Models.Gen24;
-using De.Hochstaetter.FroniusMonitor.Unity;
-using De.Hochstaetter.FroniusMonitor.ViewModels;
-
-namespace De.Hochstaetter.FroniusMonitor.Views;
+﻿namespace De.Hochstaetter.FroniusMonitor.Views;
 
 public partial class MainWindow
 {
@@ -198,6 +189,7 @@ public partial class MainWindow
             EventLogView.Activate();
         }
 
+        EventLogView.Owner = this;
         EventLogView.Show();
     }
 
@@ -208,6 +200,7 @@ public partial class MainWindow
             SelfConsumptionOptimizationView.Activate();
         }
 
+        SelfConsumptionOptimizationView.Owner = this;
         SelfConsumptionOptimizationView.Show();
     }
 }

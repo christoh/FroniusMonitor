@@ -1,6 +1,4 @@
-﻿using System.Windows;
-
-namespace De.Hochstaetter.FroniusMonitor.Controls;
+﻿namespace De.Hochstaetter.FroniusMonitor.Controls;
 
 public partial class LcdDisplay
 {

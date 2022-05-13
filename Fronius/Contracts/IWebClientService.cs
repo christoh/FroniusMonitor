@@ -1,14 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Models;
-using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using De.Hochstaetter.Fronius.Models.Gen24;
-using Newtonsoft.Json.Linq;
-
-namespace De.Hochstaetter.Fronius.Contracts
+﻿namespace De.Hochstaetter.Fronius.Contracts
 {
     public interface IWebClientService
     {

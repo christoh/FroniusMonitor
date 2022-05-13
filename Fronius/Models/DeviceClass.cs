@@ -1,6 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Localization;
-
-namespace De.Hochstaetter.Fronius.Models
+﻿namespace De.Hochstaetter.Fronius.Models
 {
     public enum DeviceClass : byte
     {

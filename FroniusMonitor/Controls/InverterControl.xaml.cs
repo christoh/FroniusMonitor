@@ -1,12 +1,4 @@
-﻿using System.Globalization;
-using System.Windows;
-using System.Windows.Media;
-using De.Hochstaetter.Fronius.Contracts;
-using De.Hochstaetter.Fronius.Models;
-using De.Hochstaetter.FroniusMonitor.Contracts;
-using De.Hochstaetter.FroniusMonitor.Models;
-using De.Hochstaetter.FroniusMonitor.Unity;
-using Loc = De.Hochstaetter.Fronius.Localization.Resources;
+﻿using Loc = De.Hochstaetter.Fronius.Localization.Resources;
 
 namespace De.Hochstaetter.FroniusMonitor.Controls;
 

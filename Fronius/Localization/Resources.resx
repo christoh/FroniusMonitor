@@ -438,4 +438,40 @@
   <data name="UseManufacturerDefaults" xml:space="preserve">
 	  <value>Use Manufacturer defaults</value>
   </data>
+  <data name="GridPowerManagement" xml:space="preserve">
+	  <value>Grid Power Management</value>
+  </data>
+  <data name="BatteryChargingOptions" xml:space="preserve">
+	  <value>Battery Options</value>
+  </data>
+  <data name="MinimumSoc" xml:space="preserve">
+	  <value>Minimum SoC</value>
+  </data>
+  <data name="MaximumSoc" xml:space="preserve">
+	  <value>Maximum SoC</value>
+  </data>
+  <data name="Undo" xml:space="preserve">
+	  <value>Undo</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+	  <value>Apply</value>
+  </data>
+  <data name="InverterCommError" xml:space="preserve">
+	  <value>The inverter did not accept the settings: {0}</value>
+  </data>
+  <data name="InverterCommReadError" xml:space="preserve">
+	  <value>Could not read data from the inverter: {0}</value>
+  </data>
+  <data name="Warning" xml:space="preserve">
+	  <value>Warning</value>
+  </data>
+  <data name="Success" xml:space="preserve">
+	  <value>Success</value>
+  </data>
+  <data name="NoSettingsChanged" xml:space="preserve">
+	  <value>No settings were changed</value>
+  </data>
+  <data name="SettingsWritten" xml:space="preserve">
+	  <value>Settings successfully written</value>
+  </data>
 </root>

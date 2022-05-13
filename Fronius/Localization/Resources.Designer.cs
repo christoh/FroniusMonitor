@@ -142,6 +142,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Apply.
+        /// </summary>
+        public static string Apply {
+            get {
+                return ResourceManager.GetString("Apply", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Fronius Monitor.
         /// </summary>
         public static string AppName {
@@ -156,6 +165,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Automatic {
             get {
                 return ResourceManager.GetString("Automatic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Battery Options.
+        /// </summary>
+        public static string BatteryChargingOptions {
+            get {
+                return ResourceManager.GetString("BatteryChargingOptions", resourceCulture);
             }
         }
         
@@ -349,6 +367,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Grid Power Management.
+        /// </summary>
+        public static string GridPowerManagement {
+            get {
+                return ResourceManager.GetString("GridPowerManagement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Id.
         /// </summary>
         public static string Id {
@@ -412,6 +439,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The inverter did not accept the settings: {0}.
+        /// </summary>
+        public static string InverterCommError {
+            get {
+                return ResourceManager.GetString("InverterCommError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not read data from the inverter: {0}.
+        /// </summary>
+        public static string InverterCommReadError {
+            get {
+                return ResourceManager.GetString("InverterCommReadError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Inverters.
         /// </summary>
         public static string Inverters {
@@ -457,6 +502,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Maximum SoC.
+        /// </summary>
+        public static string MaximumSoc {
+            get {
+                return ResourceManager.GetString("MaximumSoc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Smart meter.
         /// </summary>
         public static string Meter {
@@ -471,6 +525,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Meters {
             get {
                 return ResourceManager.GetString("Meters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Minimum SoC.
+        /// </summary>
+        public static string MinimumSoc {
+            get {
+                return ResourceManager.GetString("MinimumSoc", resourceCulture);
             }
         }
         
@@ -525,6 +588,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string NoFritzBoxConnection {
             get {
                 return ResourceManager.GetString("NoFritzBoxConnection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No settings were changed.
+        /// </summary>
+        public static string NoSettingsChanged {
+            get {
+                return ResourceManager.GetString("NoSettingsChanged", resourceCulture);
             }
         }
         
@@ -723,6 +795,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string SettingsFilter {
             get {
                 return ResourceManager.GetString("SettingsFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings successfully written.
+        /// </summary>
+        public static string SettingsWritten {
+            get {
+                return ResourceManager.GetString("SettingsWritten", resourceCulture);
             }
         }
         
@@ -961,6 +1042,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Success.
+        /// </summary>
+        public static string Success {
+            get {
+                return ResourceManager.GetString("Success", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Temperature.
         /// </summary>
         public static string Temperature {
@@ -975,6 +1065,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Temperatures {
             get {
                 return ResourceManager.GetString("Temperatures", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Undo.
+        /// </summary>
+        public static string Undo {
+            get {
+                return ResourceManager.GetString("Undo", resourceCulture);
             }
         }
         
@@ -1020,6 +1119,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Voltage {
             get {
                 return ResourceManager.GetString("Voltage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Warning.
+        /// </summary>
+        public static string Warning {
+            get {
+                return ResourceManager.GetString("Warning", resourceCulture);
             }
         }
     }

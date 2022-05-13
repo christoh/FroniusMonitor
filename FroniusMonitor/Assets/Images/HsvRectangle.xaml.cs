@@ -1,10 +1,9 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Assets.Images
+﻿namespace De.Hochstaetter.FroniusMonitor.Assets.Images;
+
+public partial class HsvRectangle
 {
-    public partial class HsvRectangle
+    public HsvRectangle()
     {
-        public HsvRectangle()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

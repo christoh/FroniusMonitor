@@ -1,9 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Contracts;
-using De.Hochstaetter.Fronius.Localization;
-using System.Collections;
-using System.Collections.ObjectModel;
-
-namespace De.Hochstaetter.Fronius.Models
+﻿namespace De.Hochstaetter.Fronius.Models
 {
     public class InverterDevices : BaseResponse, IHierarchicalCollection
     {

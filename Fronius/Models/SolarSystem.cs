@@ -1,10 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Contracts;
-using De.Hochstaetter.Fronius.Localization;
-using System.Collections;
-using System.Collections.ObjectModel;
-using De.Hochstaetter.Fronius.Models.Gen24;
-
-namespace De.Hochstaetter.Fronius.Models;
+﻿namespace De.Hochstaetter.Fronius.Models;
 
 public class SolarSystem : BindableBase, IHierarchicalCollection
 {

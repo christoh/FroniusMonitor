@@ -1,8 +1,4 @@
-﻿using System.Globalization;
-using System.Xml.Serialization;
-using De.Hochstaetter.Fronius.Contracts;
-
-namespace De.Hochstaetter.Fronius.Models;
+﻿namespace De.Hochstaetter.Fronius.Models;
 
 [Flags]
 public enum FritzBoxFeatures : uint

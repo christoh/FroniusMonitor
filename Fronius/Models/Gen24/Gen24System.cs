@@ -1,6 +1,4 @@
-﻿using System.Collections.ObjectModel;
-
-namespace De.Hochstaetter.Fronius.Models.Gen24;
+﻿namespace De.Hochstaetter.Fronius.Models.Gen24;
 
 public class Gen24System : BindableBase
 {

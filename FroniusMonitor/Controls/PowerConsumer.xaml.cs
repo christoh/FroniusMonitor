@@ -1,9 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Media;
-using De.Hochstaetter.Fronius.Contracts;
-using De.Hochstaetter.FroniusMonitor.Unity;
-
-namespace De.Hochstaetter.FroniusMonitor.Controls;
+﻿namespace De.Hochstaetter.FroniusMonitor.Controls;
 
 public partial class PowerConsumer
 {

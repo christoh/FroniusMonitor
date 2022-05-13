@@ -1,10 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using De.Hochstaetter.Fronius.Contracts;
-using De.Hochstaetter.FroniusMonitor.Unity;
-
-namespace De.Hochstaetter.FroniusMonitor.Controls;
+﻿namespace De.Hochstaetter.FroniusMonitor.Controls;
 
 public class NonUpdatingSlider : Slider
 {

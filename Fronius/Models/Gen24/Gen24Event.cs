@@ -1,7 +1,4 @@
-﻿using System.Globalization;
-using De.Hochstaetter.Fronius.Attributes;
-
-namespace De.Hochstaetter.Fronius.Models.Gen24;
+﻿namespace De.Hochstaetter.Fronius.Models.Gen24;
 
 public enum Severity : byte
 {

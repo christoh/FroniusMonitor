@@ -1,8 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using De.Hochstaetter.Fronius.Attributes;
-using De.Hochstaetter.Fronius.Localization;
-
-namespace De.Hochstaetter.Fronius.Models;
+﻿namespace De.Hochstaetter.Fronius.Models;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public enum DeviceType

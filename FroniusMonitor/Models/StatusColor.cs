@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media;
-using De.Hochstaetter.Fronius.Models;
-using De.Hochstaetter.Fronius.Models.Gen24;
-
-namespace De.Hochstaetter.FroniusMonitor.Models;
+﻿namespace De.Hochstaetter.FroniusMonitor.Models;
 
 public static class StatusColor
 {

@@ -1,8 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Xml.Serialization;
-using De.Hochstaetter.Fronius.Contracts;
-
-namespace De.Hochstaetter.Fronius.Models;
+﻿namespace De.Hochstaetter.Fronius.Models;
 
 [XmlRoot("devicelist")]
 [SuppressMessage("ReSharper", "StringLiteralTypo")]

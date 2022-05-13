@@ -1,7 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Contracts;
-using System.Collections;
-
-namespace De.Hochstaetter.Fronius.Models
+﻿namespace De.Hochstaetter.Fronius.Models
 {
     public class DeviceGroup : IHaveDisplayName, IHierarchicalCollection
     {

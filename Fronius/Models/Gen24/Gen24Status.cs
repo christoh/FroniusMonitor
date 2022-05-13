@@ -1,7 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Attributes;
-using De.Hochstaetter.Fronius.Localization;
-
-namespace De.Hochstaetter.Fronius.Models.Gen24
+﻿namespace De.Hochstaetter.Fronius.Models.Gen24
 {
     public class Gen24Status : BindableBase
     {

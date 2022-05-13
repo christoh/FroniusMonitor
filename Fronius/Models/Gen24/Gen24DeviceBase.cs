@@ -1,7 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using De.Hochstaetter.Fronius.Attributes;
-
-namespace De.Hochstaetter.Fronius.Models.Gen24;
+﻿namespace De.Hochstaetter.Fronius.Models.Gen24;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public abstract class Gen24DeviceBase : BindableBase, ICloneable

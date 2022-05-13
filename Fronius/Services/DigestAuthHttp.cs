@@ -1,10 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Net;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.RegularExpressions;
-using De.Hochstaetter.Fronius.Models;
-using Newtonsoft.Json.Linq;
+﻿using System.Text.RegularExpressions;
 
 namespace De.Hochstaetter.Fronius.Services
 {

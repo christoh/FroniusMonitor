@@ -1,10 +1,4 @@
-﻿using System.ComponentModel;
-using System.Windows;
-using System.Windows.Media;
-using De.Hochstaetter.Fronius.Models;
-using De.Hochstaetter.Fronius.Models.Gen24;
-using De.Hochstaetter.FroniusMonitor.Contracts;
-using Loc = De.Hochstaetter.Fronius.Localization.Resources;
+﻿using Loc = De.Hochstaetter.Fronius.Localization.Resources;
 
 namespace De.Hochstaetter.FroniusMonitor.Controls;
 
@@ -92,7 +86,7 @@ public partial class SmartMeterControl : IHaveLcdPanel
             return;
         }
 
-        BackgroundProvider.Background = !SmartMeter.IsVisible.HasValue||!SmartMeter.IsVisible.Value ? Brushes.Red : SmartMeter.IsEnabled.HasValue&&SmartMeter.IsEnabled.Value ? Brushes.AntiqueWhite : Brushes.LightGray;
+        BackgroundProvider.Background = !SmartMeter.IsVisible.HasValue || !SmartMeter.IsVisible.Value ? Brushes.Red : SmartMeter.IsEnabled.HasValue && SmartMeter.IsEnabled.Value ? Brushes.AntiqueWhite : Brushes.LightGray;
 
         switch (Mode)
         {
@@ -182,13 +176,13 @@ public partial class SmartMeterControl : IHaveLcdPanel
 
             case MeterDisplayMode.MoreEnergy:
                 Lcd.Header = $"{Loc.Energy} (kWh)";
-                Lcd.Value1 = $"{SmartMeter.EnergyRealConsumed/1000:N1}";
+                Lcd.Value1 = $"{SmartMeter.EnergyRealConsumed / 1000:N1}";
                 Lcd.Label1 = "CRl";
-                Lcd.Value2 = $"{SmartMeter.EnergyRealProduced/1000:N1}";
+                Lcd.Value2 = $"{SmartMeter.EnergyRealProduced / 1000:N1}";
                 Lcd.Label2 = "PRl";
-                Lcd.Value3 = $"{SmartMeter.EnergyReactiveConsumed/1000:N1}";
+                Lcd.Value3 = $"{SmartMeter.EnergyReactiveConsumed / 1000:N1}";
                 Lcd.Label3 = "CRv";
-                Lcd.ValueSum = $"{SmartMeter.EnergyReactiveProduced/1000:N1}";
+                Lcd.ValueSum = $"{SmartMeter.EnergyReactiveProduced / 1000:N1}";
                 Lcd.LabelSum = "PRv";
                 break;
 

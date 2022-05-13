@@ -1,113 +1,150 @@
-﻿using System.Windows.Input;
-using De.Hochstaetter.Fronius.Contracts;
-using De.Hochstaetter.Fronius.Models.Gen24.Settings;
-using De.Hochstaetter.Fronius.Services;
-using De.Hochstaetter.FroniusMonitor.Wpf.Commands;
+﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
-namespace De.Hochstaetter.FroniusMonitor.ViewModels
+public class SelfConsumptionOptimizationViewModel : ViewModelBase
 {
-    public class SelfConsumptionOptimizationViewModel : ViewModelBase
+    private readonly IWebClientService webClientService;
+    private SelfConsumptionOptimizationView view=null!;
+    private Gen24BatterySettings oldSettings = null!;
+
+    public SelfConsumptionOptimizationViewModel(IWebClientService webClientService)
     {
-        private readonly IWebClientService webClientService;
-        private Gen24BatterySettings oldSettings = null!;
+        this.webClientService = webClientService;
+    }
 
-        public SelfConsumptionOptimizationViewModel(IWebClientService webClientService)
+    private Gen24BatterySettings settings = null!;
+
+    public Gen24BatterySettings Settings
+    {
+        get => settings;
+        set => Set(ref settings, value);
+    }
+
+    private double logGridPower;
+
+    public double LogGridPower
+    {
+        get => logGridPower;
+        set => Set(ref logGridPower, value, UpdateGridPower);
+    }
+
+    private bool isFeedIn;
+
+    public bool IsFeedIn
+    {
+        get => isFeedIn;
+        set => Set(ref isFeedIn, value, UpdateGridPower);
+    }
+
+    private byte socMin;
+
+    public byte SocMin
+    {
+        get => socMin;
+        set => Set(ref socMin, value, () =>
         {
-            this.webClientService = webClientService;
-        }
+            Settings.SocMin = value;
 
-        private Gen24BatterySettings settings = null!;
-
-        public Gen24BatterySettings Settings
-        {
-            get => settings;
-            set => Set(ref settings, value);
-        }
-
-        private double logGridPower;
-
-        public double LogGridPower
-        {
-            get => logGridPower;
-            set => Set(ref logGridPower, value, UpdateGridPower);
-        }
-
-        private bool isFeedIn;
-
-        public bool IsFeedIn
-        {
-            get => isFeedIn;
-            set => Set(ref isFeedIn, value, UpdateGridPower);
-        }
-
-        private byte socMin;
-
-        public byte SocMin
-        {
-            get => socMin;
-            set => Set(ref socMin, value, () =>
+            if (SocMax < value)
             {
-                Settings.SocMin = value;
+                Settings.SocMax = SocMax = value;
+            }
+        });
+    }
 
-                if (SocMax < value)
-                {
-                    Settings.SocMax = SocMax = value;
-                }
-            });
-        }
+    private byte socMax;
 
-        private byte socMax;
-
-        public byte SocMax
+    public byte SocMax
+    {
+        get => socMax;
+        set => Set(ref socMax, value, () =>
         {
-            get => socMax;
-            set => Set(ref socMax, value, () =>
+            Settings.SocMax = value;
+
+            if (SocMin > value)
             {
-                Settings.SocMax = value;
+                Settings.SocMin = SocMin = value;
+            }
+        });
+    }
 
-                if (SocMin > value)
-                {
-                    Settings.SocMin = SocMin = value;
-                }
-            });
-        }
+    private ICommand? undoCommand;
+    public ICommand UndoCommand => undoCommand ??= new NoParameterCommand(Revert);
 
-        private ICommand? undoCommand;
-        public ICommand UndoCommand => undoCommand ??= new NoParameterCommand(Revert);
+    private ICommand? applyCommand;
+    public ICommand ApplyCommand => applyCommand ??= new NoParameterCommand(Apply);
 
-        private ICommand? applyCommand;
-        public ICommand ApplyCommand => applyCommand ??= new NoParameterCommand(Apply);
+    internal override async Task OnInitialize()
+    {
+        await base.OnInitialize().ConfigureAwait(false);
+        view = IoC.Get<MainWindow>().SelfConsumptionOptimizationView;
 
-        internal override async Task OnInitialize()
+        try
         {
-            await base.OnInitialize().ConfigureAwait(false);
             oldSettings = await webClientService.ReadGen24Entity<Gen24BatterySettings>("config/batteries").ConfigureAwait(false);
-            Revert();
+        }
+        catch (Exception ex)
+        {
+            await Dispatcher.InvokeAsync(() =>
+            {
+                MessageBox.Show
+                (
+                    view, string.Format(Resources.InverterCommReadError, ex.Message),
+                    ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error
+                );
+
+                view.Close();
+            });
+
+            return;
         }
 
-        private void UpdateGridPower()
+        Revert();
+    }
+
+    private void UpdateGridPower()
+    {
+        Settings.RequestedGridPower = (int)Math.Round(Math.Pow(10, LogGridPower) * (IsFeedIn ? -1 : 1), MidpointRounding.AwayFromZero);
+    }
+
+    private void Revert()
+    {
+        Settings = (Gen24BatterySettings)oldSettings.Clone();
+        socMin = Settings.SocMin ?? 5;
+        socMax = Settings.SocMax ?? 100;
+        isFeedIn = Settings.RequestedGridPower < 0;
+        NotifyOfPropertyChange(nameof(IsFeedIn));
+        NotifyOfPropertyChange(nameof(SocMin));
+        NotifyOfPropertyChange(nameof(SocMax));
+        LogGridPower = Math.Log10(Math.Abs(Settings.RequestedGridPower ?? .0000001));
+    }
+
+    private async void Apply()
+    {
+        var updateToken = webClientService.GetUpdateToken(Settings, oldSettings);
+
+        if (!updateToken.Children().Any())
         {
-            Settings.RequestedGridPower = (int)Math.Round(Math.Pow(10, LogGridPower) * (IsFeedIn ? -1 : 1), MidpointRounding.AwayFromZero);
+            await Dispatcher.InvokeAsync(() => MessageBox.Show(view, Resources.NoSettingsChanged, Resources.Warning, MessageBoxButton.OK, MessageBoxImage.Warning));
+            return;
         }
 
-        private void Revert()
+        try
         {
-            Settings = (Gen24BatterySettings)oldSettings.Clone();
-            socMin = Settings.SocMin ?? 5;
-            socMax = Settings.SocMax ?? 100;
-            isFeedIn = Settings.RequestedGridPower < 0;
-            NotifyOfPropertyChange(nameof(IsFeedIn));
-            NotifyOfPropertyChange(nameof(SocMin));
-            NotifyOfPropertyChange(nameof(SocMax));
-            LogGridPower = Math.Log10(Math.Abs(Settings.RequestedGridPower ?? .0000001));
+            var _ = await ((WebClientService)webClientService).GetFroniusJsonResponse("config/batteries", updateToken).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            await Dispatcher.InvokeAsync(() => MessageBox.Show
+            (
+                view, string.Format(Resources.InverterCommError, ex.Message),
+                ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error
+            ));
+
+            return;
         }
 
-        private async void Apply()
-        {
-            var updateToken = webClientService.GetUpdateToken(Settings, oldSettings);
-            var result = await ((WebClientService)webClientService).GetFroniusJsonResponse("config/batteries", updateToken).ConfigureAwait(false);
-            oldSettings = Settings;
-            Revert();
-        }
+        oldSettings = Settings;
+        Revert();
+        await Dispatcher.InvokeAsync(() => MessageBox.Show(view, Resources.SettingsWritten, Resources.Success, MessageBoxButton.OK, MessageBoxImage.Information));
     }
 }

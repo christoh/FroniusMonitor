@@ -1,6 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Contracts;
-
-namespace De.Hochstaetter.Fronius.Models
+﻿namespace De.Hochstaetter.Fronius.Models
 {
     public class DeviceInfo : BindableBase,IHaveDisplayName
     {
