@@ -13,7 +13,7 @@ public partial class App
 
     protected override void OnStartup(StartupEventArgs e)
     {
-        Thread.CurrentThread.CurrentUICulture= new CultureInfo("de-CH");
+        // Thread.CurrentThread.CurrentUICulture= new CultureInfo("de-CH");
         base.OnStartup(e);
 
         Container
