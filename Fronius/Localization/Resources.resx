@@ -483,4 +483,7 @@
   <data name="SocLimits" xml:space="preserve">
 	  <value>SoC Limits</value>
   </data>
+  <data name="MaxHomeChargingPower" xml:space="preserve">
+	  <value>Maximum power from home producers to battery</value>
+  </data>
 </root>

@@ -27,6 +27,14 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
         set => Set(ref logGridPower, value, UpdateGridPower);
     }
 
+    private double logHomePower;
+
+    public double LogHomePower
+    {
+        get => logHomePower;
+        set => Set(ref logHomePower, value, UpdateHomePower);
+    }
+
     private bool isFeedIn;
 
     public bool IsFeedIn
@@ -106,6 +114,11 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
         Settings.RequestedGridPower = (int)Math.Round(Math.Pow(10, LogGridPower) * (IsFeedIn ? -1 : 1), MidpointRounding.AwayFromZero);
     }
 
+    private void UpdateHomePower()
+    {
+        Settings.AcPowerMinimum = -(int)Math.Round(Math.Pow(10, LogHomePower), MidpointRounding.AwayFromZero);
+    }
+
     private void Revert()
     {
         Settings = (Gen24BatterySettings)oldSettings.Clone();
@@ -116,6 +129,7 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
         NotifyOfPropertyChange(nameof(SocMin));
         NotifyOfPropertyChange(nameof(SocMax));
         LogGridPower = Math.Log10(Math.Abs(Settings.RequestedGridPower ?? .0000001));
+        LogHomePower = Math.Log10(Math.Abs(-Settings.AcPowerMinimum ?? .0000001));
     }
 
     private async void Apply()

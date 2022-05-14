@@ -520,6 +520,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Maximum power from home producers to battery.
+        /// </summary>
+        public static string MaxHomeChargingPower {
+            get {
+                return ResourceManager.GetString("MaxHomeChargingPower", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Maximum SoC.
         /// </summary>
         public static string MaximumSoc {
