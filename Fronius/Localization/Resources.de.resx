@@ -430,10 +430,10 @@
 	  <value>Bezug</value>
   </data>
   <data name="AllowGridCharge" xml:space="preserve">
-	  <value>Erlaube, die Batterie aus dem Netz zu laden</value>
+	  <value>Batterieladung aus dem öffentlichen Netz zulassen</value>
   </data>
   <data name="ChargeFromAc" xml:space="preserve">
-	  <value>Batterie aus Last aufladen</value>
+	  <value>Batterieladung von weiteren Erzeugern im Hausnetz zulassen</value>
   </data>
   <data name="UseManufacturerDefaults" xml:space="preserve">
 	  <value>Herstellervorgaben verwenden</value>
@@ -473,5 +473,14 @@
   </data>
   <data name="SettingsWritten" xml:space="preserve">
 	  <value>Einstellungen erfolgreich geschrieben</value>
+  </data>
+  <data name="EnableBattery" xml:space="preserve">
+	  <value>Batterie aktivieren</value>
+  </data>
+  <data name="CalibrateBattery" xml:space="preserve">
+	  <value>Batterie kalibrieren</value>
+  </data>
+  <data name="SocLimits" xml:space="preserve">
+	  <value>Ladebegrenzungen</value>
   </data>
 </root>

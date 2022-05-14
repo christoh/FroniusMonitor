@@ -433,7 +433,7 @@
 	  <value>Allow charge battery from grid</value>
   </data>
   <data name="ChargeFromAc" xml:space="preserve">
-	  <value>Charge battery from load</value>
+	  <value>Allow charge battery from other producers in your home</value>
   </data>
   <data name="UseManufacturerDefaults" xml:space="preserve">
 	  <value>Use Manufacturer defaults</value>
@@ -473,5 +473,14 @@
   </data>
   <data name="SettingsWritten" xml:space="preserve">
 	  <value>Settings successfully written</value>
+  </data>
+  <data name="EnableBattery" xml:space="preserve">
+	  <value>Enable Battery</value>
+  </data>
+  <data name="CalibrateBattery" xml:space="preserve">
+	  <value>Calibrate Battery</value>
+  </data>
+  <data name="SocLimits" xml:space="preserve">
+	  <value>SoC Limits</value>
   </data>
 </root>

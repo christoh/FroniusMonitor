@@ -187,6 +187,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Calibrate Battery.
+        /// </summary>
+        public static string CalibrateBattery {
+            get {
+                return ResourceManager.GetString("CalibrateBattery", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>
         public static string Cancel {
@@ -196,7 +205,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Charge battery from load.
+        ///   Looks up a localized string similar to Allow charge battery from other producers in your home.
         /// </summary>
         public static string ChargeFromAc {
             get {
@@ -291,6 +300,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Efficiency {
             get {
                 return ResourceManager.GetString("Efficiency", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable Battery.
+        /// </summary>
+        public static string EnableBattery {
+            get {
+                return ResourceManager.GetString("EnableBattery", resourceCulture);
             }
         }
         
@@ -822,6 +840,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Sleeping {
             get {
                 return ResourceManager.GetString("Sleeping", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SoC Limits.
+        /// </summary>
+        public static string SocLimits {
+            get {
+                return ResourceManager.GetString("SocLimits", resourceCulture);
             }
         }
         

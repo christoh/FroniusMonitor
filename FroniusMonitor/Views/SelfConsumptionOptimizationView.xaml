@@ -46,10 +46,16 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <TextBox TextAlignment="Center" IsReadOnly="True" Margin="0,8,0,-1" Width="40" Grid.Row="2"
-                             Text="{Binding Settings.RequestedGridPower, Converter={co:ToAbsolute}}" HorizontalAlignment="Center" />
-                    <Slider Value="{Binding LogGridPower, Mode=TwoWay}"
-                            Grid.Row="3" HorizontalAlignment="Stretch"
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,8,0,-2" HorizontalAlignment="Center">
+                        <TextBlock Margin="0,0,4,0">
+                            <Run Text="{x:Static p:Resources.Power}" /><Run Text=":" />
+                        </TextBlock>
+                    <TextBox TextAlignment="Center" IsReadOnly="True" Width="40" Grid.Row="2"
+                                 Text="{Binding Settings.RequestedGridPower, Converter={co:ToAbsolute}}"  />
+                    <TextBlock Text="W" Margin="4,0,0,0"/>
+                    </StackPanel>
+                    <Slider Grid.Row="3" Value="{Binding LogGridPower, Mode=TwoWay}"
+                            HorizontalAlignment="Stretch"
                             Minimum="-1" Maximum="4.6989700043360188047862611052755" />
                     <StackPanel Grid.Row="0" Grid.RowSpan="2" Orientation="Horizontal" VerticalAlignment="Center">
                         <RadioButton Content="{x:Static p:Resources.FeedIn}" IsChecked="{Binding IsFeedIn, Mode=TwoWay}" Margin="8,0" />
@@ -80,10 +86,24 @@
                     <CheckBox Content="{x:Static p:Resources.ChargeFromAc}"
                               IsChecked="{Binding Settings.ChargeFromAc}" />
                 </Grid>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="S1"/>
+                    </Grid.ColumnDefinitions>
+                    <CheckBox Content="{x:Static p:Resources.EnableBattery}"
+                              IsChecked="{Binding Settings.IsEnabled}" />
+                </Grid>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="S1"/>
+                    </Grid.ColumnDefinitions>
+                    <CheckBox Content="{x:Static p:Resources.CalibrateBattery}"
+                              IsChecked="{Binding Settings.IsInCalibration}" />
+                </Grid>
             </WrapPanel>
         </GroupBox>
 
-        <GroupBox Grid.Row="2" Header="SoC Limits" Margin="8,4">
+        <GroupBox Grid.Row="2" Header="{x:Static p:Resources.SocLimits}" Margin="8,4">
             <Grid Margin="8,16">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -105,18 +125,18 @@
                     </Grid.RowDefinitions>
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,-2" HorizontalAlignment="Center" Grid.Row="0">
                         <TextBlock Margin="0,0,4,0">
-                            <Run Text="{x:Static p:Resources.MinimumSoc}" />
-                            <Run Text=":" />
+                            <Run Text="{x:Static p:Resources.MinimumSoc}" /><Run Text=":" />
                         </TextBlock>
                         <TextBox TextAlignment="Center" IsReadOnly="True" Width="40" Text="{Binding Settings.SocMin, Converter={co:ToAbsolute}}" />
+                        <TextBlock Margin="4,0,0,0" Text="%"/>
                     </StackPanel>
                     <Slider Value="{Binding SocMin, Mode=TwoWay}" Grid.Row="1" HorizontalAlignment="Stretch" Minimum="5" Maximum="100" />
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,-2" HorizontalAlignment="Center" Grid.Row="2">
                         <TextBlock Margin="0,0,4,0">
-                            <Run Text="{x:Static p:Resources.MaximumSoc}" />
-                            <Run Text=":" />
+                            <Run Text="{x:Static p:Resources.MaximumSoc}" /><Run Text=":" />
                         </TextBlock>
                         <TextBox TextAlignment="Center" IsReadOnly="True" Width="40" Text="{Binding Settings.SocMax, Converter={co:ToAbsolute}}" />
+                        <TextBlock Margin="4,0,0,0" Text="%"/>
                     </StackPanel>
                     <Slider Value="{Binding SocMax, Mode=TwoWay}" Grid.Row="3" HorizontalAlignment="Stretch" Minimum="5" Maximum="100" />
                 </Grid>

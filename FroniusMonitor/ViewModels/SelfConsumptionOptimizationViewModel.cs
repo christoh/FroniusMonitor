@@ -145,6 +145,6 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
 
         oldSettings = Settings;
         Revert();
-        await Dispatcher.InvokeAsync(() => MessageBox.Show(view, Resources.SettingsWritten, Resources.Success, MessageBoxButton.OK, MessageBoxImage.Information));
+        //await Dispatcher.InvokeAsync(() => MessageBox.Show(view, Resources.SettingsWritten, Resources.Success, MessageBoxButton.OK, MessageBoxImage.Information));
     }
 }
