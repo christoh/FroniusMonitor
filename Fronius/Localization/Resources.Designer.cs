@@ -547,6 +547,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Meter address.
+        /// </summary>
+        public static string MeterAddress {
+            get {
+                return ResourceManager.GetString("MeterAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Meter address must be between 1 and 247.
+        /// </summary>
+        public static string MeterAddressError {
+            get {
+                return ResourceManager.GetString("MeterAddressError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Smart Meters.
         /// </summary>
         public static string Meters {
@@ -1083,6 +1101,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Success {
             get {
                 return ResourceManager.GetString("Success", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sunspec address.
+        /// </summary>
+        public static string SunspecAddress {
+            get {
+                return ResourceManager.GetString("SunspecAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sunspec address must be between 1 and 255.
+        /// </summary>
+        public static string SunspecAddressError {
+            get {
+                return ResourceManager.GetString("SunspecAddressError", resourceCulture);
             }
         }
         

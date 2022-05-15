@@ -21,6 +21,7 @@ public partial class App
             .RegisterSingleton<ISolarSystemService, SolarSystemService>()
             .RegisterSingleton<MainWindow>()
             .RegisterSingleton<MainViewModel>()
+            .RegisterSingleton<IGen24JsonService, Gen24JsonService>()
             .RegisterType<EventLogView>()
             .RegisterType<EventLogViewModel>()
             .RegisterType<SelfConsumptionOptimizationViewModel>()

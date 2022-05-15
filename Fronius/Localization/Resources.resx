@@ -486,4 +486,16 @@
   <data name="MaxHomeChargingPower" xml:space="preserve">
 	  <value>Maximum power from home producers to battery</value>
   </data>
+  <data name="MeterAddress" xml:space="preserve">
+	  <value>Meter address</value>
+  </data>
+  <data name="MeterAddressError" xml:space="preserve">
+	  <value>Meter address must be between 1 and 247</value>
+  </data>
+  <data name="SunspecAddress" xml:space="preserve">
+	  <value>Sunspec address</value>
+  </data>
+  <data name="SunspecAddressError" xml:space="preserve">
+	  <value>Sunspec address must be between 1 and 255</value>
+  </data>
 </root>

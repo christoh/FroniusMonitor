@@ -1,11 +1,18 @@
-﻿namespace De.Hochstaetter.Fronius.Services;
+﻿using De.Hochstaetter.Fronius.Models.Gen24.Settings;
+
+namespace De.Hochstaetter.Fronius.Services;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public class WebClientService : BindableBase, IWebClientService
 {
+    private readonly IGen24JsonService gen24JsonService;
     private string? fritzBoxSid;
-
     private DateTime lastSolarApiCall = DateTime.UtcNow.AddSeconds(-4);
+
+    public WebClientService(IGen24JsonService gen24JsonService)
+    {
+        this.gen24JsonService = gen24JsonService;
+    }
 
     private WebConnection? inverterConnection;
 
@@ -26,7 +33,7 @@ public class WebClientService : BindableBase, IWebClientService
     public async Task<T> ReadGen24Entity<T>(string request) where T : new()
     {
         var token = JToken.Parse(await GetFroniusJsonResponse(request).ConfigureAwait(false));
-        return ReadFroniusData<T>(token);
+        return gen24JsonService.ReadFroniusData<T>(token);
     }
 
     public JToken GetUpdateToken<T>(T newEntity, T? oldEntity = default) where T : BindableBase
@@ -63,7 +70,7 @@ public class WebClientService : BindableBase, IWebClientService
     {
         var eventList = new List<Gen24Event>(256);
 
-        Parallel.ForEach(JArray.Parse(await GetFroniusJsonResponse("status/events").ConfigureAwait(false)), eventToken => { eventList.Add(ReadFroniusData<Gen24Event>(eventToken)); });
+        Parallel.ForEach(JArray.Parse(await GetFroniusJsonResponse("status/events").ConfigureAwait(false)), eventToken => { eventList.Add(gen24JsonService.ReadFroniusData<Gen24Event>(eventToken)); });
 
         return eventList.OrderByDescending(e => e.EventTime);
     }
@@ -74,8 +81,9 @@ public class WebClientService : BindableBase, IWebClientService
 
         //try
         //{
-        //    var test1 = await GetFroniusJsonResponse("config/powerlimits").ConfigureAwait(false);
+        //    //var test1 = await GetFroniusJsonResponse("config/powerlimits").ConfigureAwait(false);
         //    var test2 = await GetFroniusJsonResponse("config/modbus").ConfigureAwait(false);
+        //    var token = Gen24ModbusSettings.Parse(gen24JsonService,test2);
         //}
         //catch (Exception ex)
         //{
@@ -84,7 +92,7 @@ public class WebClientService : BindableBase, IWebClientService
 
         foreach (var statusToken in JArray.Parse(await GetFroniusJsonResponse("status/devices").ConfigureAwait(false)))
         {
-            var status = ReadFroniusData<Gen24Status>(statusToken);
+            var status = gen24JsonService.ReadFroniusData<Gen24Status>(statusToken);
 
             switch (status.DeviceType)
             {
@@ -99,7 +107,7 @@ public class WebClientService : BindableBase, IWebClientService
         }
 
         var (_, dataToken) = await GetJsonResponse<BaseResponse>("components/readable", true).ConfigureAwait(false);
-        gen24System.Inverter = ReadFroniusData<Gen24Inverter>(dataToken["1"]);
+        gen24System.Inverter = gen24JsonService.ReadFroniusData<Gen24Inverter>(dataToken["1"]);
 
         var storage = dataToken.Values().Where(t =>
         {
@@ -110,9 +118,9 @@ public class WebClientService : BindableBase, IWebClientService
                 (attributes?["id"]?.Value<string>() ?? string.Empty).StartsWith("rtu-generic-storage");
         }).FirstOrDefault();
 
-        gen24System.Storage = ReadFroniusData<Gen24Storage>(storage);
+        gen24System.Storage = gen24JsonService.ReadFroniusData<Gen24Storage>(storage);
         var restrictions = dataToken.Values().FirstOrDefault(t => t["attributes"]?["PowerRestrictionControllerVersion"] != null);
-        gen24System.Restrictions = ReadFroniusData<Gen24Restrictions>(restrictions);
+        gen24System.Restrictions = gen24JsonService.ReadFroniusData<Gen24Restrictions>(restrictions);
 
         var meters = dataToken.Values()
                 .Where(t => t["attributes"]?["meter-location"] != null)
@@ -122,111 +130,15 @@ public class WebClientService : BindableBase, IWebClientService
 
         foreach (var meter in meters)
         {
-            var gen24PowerMeter = ReadFroniusData<Gen24PowerMeter>(meter.Parent);
+            var gen24PowerMeter = gen24JsonService.ReadFroniusData<Gen24PowerMeter>(meter.Parent);
             gen24System.Meters.Add(gen24PowerMeter);
         }
 
-        gen24System.DataManager = ReadFroniusData<Gen24DataManager>(dataToken["262144"]);
-        gen24System.PowerFlow = ReadFroniusData<Gen24PowerFlow>(dataToken["327680"]);
-        gen24System.Cache = ReadFroniusData<Gen24Cache>(dataToken["393216"]);
+        gen24System.DataManager = gen24JsonService.ReadFroniusData<Gen24DataManager>(dataToken["262144"]);
+        gen24System.PowerFlow = gen24JsonService.ReadFroniusData<Gen24PowerFlow>(dataToken["327680"]);
+        gen24System.Cache = gen24JsonService.ReadFroniusData<Gen24Cache>(dataToken["393216"]);
 
         return gen24System;
-    }
-
-    private T ReadFroniusData<T>(JToken? device) where T : new()
-    {
-        var channels = device?["channels"];
-        var attributes = device?["attributes"];
-
-        var result = new T();
-
-        foreach (var propertyInfo in typeof(T).GetProperties().Where(p => p.CustomAttributes.Any(a => a.AttributeType == typeof(FroniusProprietaryImportAttribute))))
-        {
-            var nonNullablePropertyType = Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? propertyInfo.PropertyType;
-            var attribute = (FroniusProprietaryImportAttribute)propertyInfo.GetCustomAttributes(typeof(FroniusProprietaryImportAttribute), true).Single();
-
-            var token = attribute.DataType switch
-            {
-                FroniusDataType.Attribute => attributes?[attribute.Name],
-                FroniusDataType.Root => device?[attribute.Name],
-                _ => channels?[attribute.Name],
-            };
-
-            var stringValue = token?.Value<string>()?.Trim();
-            dynamic? value = null;
-
-            if (stringValue != null)
-            {
-                if (propertyInfo.PropertyType.IsAssignableFrom(typeof(TimeSpan)))
-                {
-                    var doubleValue = (double)Convert.ChangeType(stringValue, typeof(double), CultureInfo.InvariantCulture);
-                    value = TimeSpan.FromSeconds(doubleValue);
-                }
-                else if (propertyInfo.PropertyType.IsAssignableFrom(typeof(DateTime)))
-                {
-                    var doubleValue = (double)Convert.ChangeType(stringValue, typeof(double), CultureInfo.InvariantCulture);
-                    value = DateTime.UnixEpoch.AddSeconds(doubleValue);
-                }
-                else if (attribute.DataType == FroniusDataType.Channel && propertyInfo.PropertyType.IsAssignableFrom(typeof(bool)))
-                {
-                    value = string.IsNullOrEmpty(stringValue) ? null : (double)Convert.ChangeType(stringValue, typeof(double), CultureInfo.InvariantCulture) != 0d;
-                }
-                else if (propertyInfo.PropertyType.IsAssignableFrom(typeof(Version)))
-                {
-                    try
-                    {
-                        value = new Version(stringValue);
-                    }
-                    catch
-                    {
-                        value = null;
-                    }
-                }
-                else if (nonNullablePropertyType.IsEnum)
-                {
-                    value = ReadEnum(nonNullablePropertyType, stringValue);
-                }
-                else
-                {
-                    value = string.IsNullOrEmpty(stringValue) ? null : Convert.ChangeType(stringValue, nonNullablePropertyType, CultureInfo.InvariantCulture);
-                }
-
-                if (propertyInfo.PropertyType.IsAssignableFrom(typeof(double)) || propertyInfo.PropertyType.IsAssignableFrom(typeof(float)))
-                {
-                    value = attribute.Unit switch
-                    {
-                        Unit.Joule => value / 3600,
-                        Unit.Percent => value / 100,
-                        _ => value,
-                    };
-                }
-            }
-
-            propertyInfo.SetValue(result, value);
-        }
-
-        return result;
-    }
-
-    private object? ReadEnum(Type type, string? stringValue)
-    {
-        if (stringValue == null)
-        {
-            return null;
-        }
-
-        var fields = type.GetFields();
-
-        if (int.TryParse(stringValue, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out _))
-        {
-            return Enum.Parse(type, stringValue, true);
-        }
-
-        var fieldInfo =
-            fields.SingleOrDefault(f => f.GetCustomAttributes().Any(a => a is EnumParseAttribute attribute && attribute.ParseAs?.ToUpperInvariant() == stringValue.ToUpperInvariant())) ??
-            fields.SingleOrDefault(f => f.GetCustomAttributes().Any(a => a is EnumParseAttribute {IsDefault: true}));
-
-        return fieldInfo == null ? null : Enum.Parse(type, fieldInfo.Name);
     }
 
     private object? GetFroniusJsonValue(PropertyInfo propertyInfo, object instance)
@@ -240,7 +152,7 @@ public class WebClientService : BindableBase, IWebClientService
 
         var result = value switch
         {
-            Enum enumValue => GetFroniusEnumString(propertyInfo, enumValue),
+            Enum enumValue => GetFroniusEnumString(enumValue),
             DateTime date => (long)Math.Round((date.ToUniversalTime() - DateTime.UnixEpoch).TotalSeconds, MidpointRounding.AwayFromZero),
             _ => value
         };
@@ -248,7 +160,7 @@ public class WebClientService : BindableBase, IWebClientService
         return result;
     }
 
-    private object? GetFroniusEnumString(PropertyInfo propertyInfo, Enum enumValue)
+    private object? GetFroniusEnumString(Enum enumValue)
     {
         var fieldInfo = enumValue.GetType().GetFields().Single(f => f.Name == enumValue.ToString());
 
@@ -412,7 +324,7 @@ public class WebClientService : BindableBase, IWebClientService
                 _ => MeterLocation.Unknown,
             },
 
-            SiteType = (SiteType?)ReadEnum(typeof(SiteType), site?["Mode"]?.Value<string?>()),
+            SiteType = (SiteType?)gen24JsonService.ReadEnum(typeof(SiteType), site?["Mode"]?.Value<string?>()),
         };
 
         return result;
