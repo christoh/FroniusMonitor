@@ -19,6 +19,6 @@
         Task SetFritzBoxColor(string ain, double hueDegrees, double saturation);
         Task<IOrderedEnumerable<Gen24Event>> GetFroniusEvents();
         Task<T> ReadGen24Entity<T>(string request) where T : new();
-        JToken GetUpdateToken<T>(T newEntity, T? oldEntity = default) where T : BindableBase;
+        Task<string> GetFroniusJsonResponse(string request, JToken? token = null);
     }
 }

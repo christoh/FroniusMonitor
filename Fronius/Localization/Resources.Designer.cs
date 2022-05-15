@@ -592,6 +592,69 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Disabled.
+        /// </summary>
+        public static string ModbusInterfaceRole_Disabled {
+            get {
+                return ResourceManager.GetString("ModbusInterfaceRole_Disabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Master.
+        /// </summary>
+        public static string ModbusInterfaceRole_Master {
+            get {
+                return ResourceManager.GetString("ModbusInterfaceRole_Master", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Slave.
+        /// </summary>
+        public static string ModbusInterfaceRole_Slave {
+            get {
+                return ResourceManager.GetString("ModbusInterfaceRole_Slave", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Even.
+        /// </summary>
+        public static string ModbusParity_Even {
+            get {
+                return ResourceManager.GetString("ModbusParity_Even", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to None.
+        /// </summary>
+        public static string ModbusParity_None {
+            get {
+                return ResourceManager.GetString("ModbusParity_None", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Odd.
+        /// </summary>
+        public static string ModbusParity_Odd {
+            get {
+                return ResourceManager.GetString("ModbusParity_Odd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Modbus Settings.
+        /// </summary>
+        public static string ModbusSettings {
+            get {
+                return ResourceManager.GetString("ModbusSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to More.
         /// </summary>
         public static string More {

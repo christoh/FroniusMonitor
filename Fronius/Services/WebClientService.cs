@@ -6,6 +6,7 @@ namespace De.Hochstaetter.Fronius.Services;
 public class WebClientService : BindableBase, IWebClientService
 {
     private readonly IGen24JsonService gen24JsonService;
+    private DigestAuthHttp? froniusHttpClient;
     private string? fritzBoxSid;
     private DateTime lastSolarApiCall = DateTime.UtcNow.AddSeconds(-4);
 
@@ -36,36 +37,6 @@ public class WebClientService : BindableBase, IWebClientService
         return gen24JsonService.ReadFroniusData<T>(token);
     }
 
-    public JToken GetUpdateToken<T>(T newEntity, T? oldEntity = default) where T : BindableBase
-    {
-        var jObject = new JObject();
-
-        foreach (var propertyInfo in typeof(T).GetProperties())
-        {
-            var jsonValueNew = GetFroniusJsonValue(propertyInfo, newEntity);
-
-            if (jsonValueNew == null)
-            {
-                continue;
-            }
-
-            if (oldEntity != default)
-            {
-                var jsonValueOld = GetFroniusJsonValue(propertyInfo, oldEntity);
-
-                if (jsonValueNew.Equals(jsonValueOld))
-                {
-                    continue;
-                }
-            }
-
-            var attribute = propertyInfo.GetCustomAttributes<FroniusProprietaryImportAttribute>().Single();
-            jObject.Add(attribute.Name, new JValue(jsonValueNew));
-        }
-
-        return jObject;
-    }
-
     public async Task<IOrderedEnumerable<Gen24Event>> GetFroniusEvents()
     {
         var eventList = new List<Gen24Event>(256);
@@ -82,8 +53,12 @@ public class WebClientService : BindableBase, IWebClientService
         //try
         //{
         //    //var test1 = await GetFroniusJsonResponse("config/powerlimits").ConfigureAwait(false);
-        //    var test2 = await GetFroniusJsonResponse("config/modbus").ConfigureAwait(false);
-        //    var token = Gen24ModbusSettings.Parse(gen24JsonService,test2);
+        //    var json = await GetFroniusJsonResponse("config/modbus").ConfigureAwait(false);
+        //    var test2 = Gen24ModbusSettings.Parse(gen24JsonService, json);
+
+        //    var oldModbusSettings = (Gen24ModbusSettings)test2.Clone();
+        //    var updateToken = test2.GetToken(gen24JsonService,oldModbusSettings);
+        //    var response = await GetFroniusJsonResponse("config/modbus", updateToken).ConfigureAwait(false);
         //}
         //catch (Exception ex)
         //{
@@ -139,37 +114,6 @@ public class WebClientService : BindableBase, IWebClientService
         gen24System.Cache = gen24JsonService.ReadFroniusData<Gen24Cache>(dataToken["393216"]);
 
         return gen24System;
-    }
-
-    private object? GetFroniusJsonValue(PropertyInfo propertyInfo, object instance)
-    {
-        var value = propertyInfo.GetValue(instance);
-
-        if (value == null)
-        {
-            return null;
-        }
-
-        var result = value switch
-        {
-            Enum enumValue => GetFroniusEnumString(enumValue),
-            DateTime date => (long)Math.Round((date.ToUniversalTime() - DateTime.UnixEpoch).TotalSeconds, MidpointRounding.AwayFromZero),
-            _ => value
-        };
-
-        return result;
-    }
-
-    private object? GetFroniusEnumString(Enum enumValue)
-    {
-        var fieldInfo = enumValue.GetType().GetFields().Single(f => f.Name == enumValue.ToString());
-
-        if (fieldInfo.GetCustomAttributes().SingleOrDefault(a => a is EnumParseAttribute) is not EnumParseAttribute attribute || attribute.ParseNumeric)
-        {
-            return Convert.ToInt32(enumValue);
-        }
-
-        return attribute.ParseAs;
     }
 
     public async Task<SystemDevices> GetDevices()
@@ -517,8 +461,8 @@ public class WebClientService : BindableBase, IWebClientService
 
     public async Task SetFritzBoxColor(string ain, double hueDegrees, double saturation)
     {
-        var intHue = allowedFritzBoxColors.Keys.OrderBy(k => Math.Min(Math.Abs(hueDegrees - k), Math.Abs(hueDegrees + 360 - k))).First();
-        var intSaturation = allowedFritzBoxColors[intHue].OrderBy(s => Math.Abs(s - saturation * 255)).First();
+        var intHue = allowedFritzBoxColors.Keys.MinBy(k => Math.Min(Math.Abs(hueDegrees - k), Math.Abs(hueDegrees + 360 - k)));
+        var intSaturation = allowedFritzBoxColors[intHue].MinBy(s => Math.Abs(s - saturation * 255));
         ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
         using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setcolor&hue={intHue}&saturation={intSaturation}&duration=0").ConfigureAwait(false);
     }
@@ -579,9 +523,6 @@ public class WebClientService : BindableBase, IWebClientService
         return result;
     }
 
-    private DigestAuthHttp? froniusHttpClient;
-
-    //TODO:Make private
     public async Task<string> GetFroniusJsonResponse(string request, JToken? token = null)
     {
         if (InverterConnection?.BaseUrl == null)

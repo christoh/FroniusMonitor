@@ -32,6 +32,7 @@
                 <MenuItem Header="_Auto-fit" Click="OnAutoSizeChecked" />
                 <MenuItem Header="_Show Event Log" Click="ShowEventLog" />
                 <MenuItem Header="{x:Static p:Resources.SelfConsumptionOptimization}" Click="ShowSelfConsumptionOptimization" />
+                <MenuItem Header="{x:Static p:Resources.ModbusSettings}" Click="ShowModbusSettings" />
             </MenuItem>
         </Menu>
 

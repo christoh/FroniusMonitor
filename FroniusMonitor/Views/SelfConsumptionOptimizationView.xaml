@@ -106,13 +106,13 @@
                               IsChecked="{Binding Settings.IsInCalibration}" />
                     </Grid>
                 </WrapPanel>
-                <Grid Grid.Row="1">
+                <Grid Grid.Row="1" 
+                      Visibility="{Binding Settings.ChargeFromAc, Converter={co:Bool2Visibility}}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                <StackPanel Orientation="Horizontal" Margin="0,8,0,-2" HorizontalAlignment="Center" Grid.Row="0"
-                            Visibility="{Binding Settings.ChargeFromAc, Converter={co:Bool2Visibility}}">
+                <StackPanel Orientation="Horizontal" Margin="0,8,0,-2" HorizontalAlignment="Center" Grid.Row="0">
                     <TextBlock Margin="0,0,4,0">
                         <Run Text="{x:Static p:Resources.MaxHomeChargingPower}" /><Run Text=":" />
                     </TextBlock>

@@ -253,7 +253,7 @@
     <value>Current</value>
   </data>
   <data name="Voltage" xml:space="preserve">
-	  <value>Voltage</value>
+    <value>Voltage</value>
   </data>
   <data name="More" xml:space="preserve">
     <value>More</value>
@@ -304,7 +304,7 @@
     <value>Power flow</value>
   </data>
   <data name="Efficiency" xml:space="preserve">
-	  <value>Efficiency</value>
+    <value>Efficiency</value>
   </data>
   <data name="On" xml:space="preserve">
     <value>On</value>
@@ -352,150 +352,171 @@
     <value>Load Settings</value>
   </data>
   <data name="AcPhaseVoltage" xml:space="preserve">
-	  <value>AC phase voltage</value>
+    <value>AC phase voltage</value>
   </data>
   <data name="ACLineVoltage" xml:space="preserve">
-	  <value>AC line voltage</value>
+    <value>AC line voltage</value>
   </data>
   <data name="SolarPanels" xml:space="preserve">
-	  <value>Solar panels</value>
+    <value>Solar panels</value>
   </data>
   <data name="Temperatures" xml:space="preserve">
-	  <value>Temperatures</value>
+    <value>Temperatures</value>
   </data>
   <data name="Fans" xml:space="preserve">
-	  <value>Fans</value>
+    <value>Fans</value>
   </data>
   <data name="Misc" xml:space="preserve">
-	  <value>Miscellaneous</value>
+    <value>Miscellaneous</value>
   </data>
   <data name="STATE_DISCONNECTED" xml:space="preserve">
-	  <value>Disconnected</value>
+    <value>Disconnected</value>
   </data>
   <data name="STATE_ERROR" xml:space="preserve">
-	  <value>Error</value>
+    <value>Error</value>
   </data>
   <data name="STATE_READY" xml:space="preserve">
-	  <value>Ready</value>
+    <value>Ready</value>
   </data>
   <data name="STATE_RUNNING" xml:space="preserve">
-	  <value>Running</value>
+    <value>Running</value>
   </data>
   <data name="STATE_STARTUP" xml:space="preserve">
-	  <value>Starting</value>
+    <value>Starting</value>
   </data>
   <data name="STATE_STOPPED" xml:space="preserve">
-	  <value>Stopped</value>
+    <value>Stopped</value>
   </data>
   <data name="STATE_UNKNOWN" xml:space="preserve">
-	  <value>Unknown</value>
+    <value>Unknown</value>
   </data>
   <data name="STATE_WARNING" xml:space="preserve">
-	  <value>Warning</value>
+    <value>Warning</value>
   </data>
   <data name="EventLog" xml:space="preserve">
-	  <value>Event Log</value>
+    <value>Event Log</value>
   </data>
   <data name="Start" xml:space="preserve">
-	  <value>Start</value>
+    <value>Start</value>
   </data>
   <data name="End" xml:space="preserve">
-	  <value>End</value>
+    <value>End</value>
   </data>
   <data name="Device" xml:space="preserve">
-	  <value>Device</value>
+    <value>Device</value>
   </data>
   <data name="Id" xml:space="preserve">
-	  <value>Id</value>
+    <value>Id</value>
   </data>
   <data name="Name" xml:space="preserve">
-	  <value>Name</value>
+    <value>Name</value>
   </data>
   <data name="Severity" xml:space="preserve">
-	  <value>Severity</value>
+    <value>Severity</value>
   </data>
   <data name="SelfConsumptionOptimization" xml:space="preserve">
-	  <value>Self-Consumption Optimization</value>
+    <value>Self-Consumption Optimization</value>
   </data>
   <data name="Automatic" xml:space="preserve">
-	  <value>Automatic</value>
+    <value>Automatic</value>
   </data>
   <data name="Manual" xml:space="preserve">
-	  <value>Manual</value>
+    <value>Manual</value>
   </data>
   <data name="FeedIn" xml:space="preserve">
-	  <value>Feed-In</value>
+    <value>Feed-In</value>
   </data>
   <data name="Consumption" xml:space="preserve">
-	  <value>Consumption</value>
+    <value>Consumption</value>
   </data>
   <data name="AllowGridCharge" xml:space="preserve">
-	  <value>Allow charge battery from grid</value>
+    <value>Allow charge battery from grid</value>
   </data>
   <data name="ChargeFromAc" xml:space="preserve">
-	  <value>Allow charge battery from other producers in your home</value>
+    <value>Allow charge battery from other producers in your home</value>
   </data>
   <data name="UseManufacturerDefaults" xml:space="preserve">
-	  <value>Use Manufacturer defaults</value>
+    <value>Use Manufacturer defaults</value>
   </data>
   <data name="GridPowerManagement" xml:space="preserve">
-	  <value>Grid Power Management</value>
+    <value>Grid Power Management</value>
   </data>
   <data name="BatteryChargingOptions" xml:space="preserve">
-	  <value>Battery Options</value>
+    <value>Battery Options</value>
   </data>
   <data name="MinimumSoc" xml:space="preserve">
-	  <value>Minimum SoC</value>
+    <value>Minimum SoC</value>
   </data>
   <data name="MaximumSoc" xml:space="preserve">
-	  <value>Maximum SoC</value>
+    <value>Maximum SoC</value>
   </data>
   <data name="Undo" xml:space="preserve">
-	  <value>Undo</value>
+    <value>Undo</value>
   </data>
   <data name="Apply" xml:space="preserve">
-	  <value>Apply</value>
+    <value>Apply</value>
   </data>
   <data name="InverterCommError" xml:space="preserve">
-	  <value>The inverter did not accept the settings: {0}</value>
+    <value>The inverter did not accept the settings: {0}</value>
   </data>
   <data name="InverterCommReadError" xml:space="preserve">
-	  <value>Could not read data from the inverter: {0}</value>
+    <value>Could not read data from the inverter: {0}</value>
   </data>
   <data name="Warning" xml:space="preserve">
-	  <value>Warning</value>
+    <value>Warning</value>
   </data>
   <data name="Success" xml:space="preserve">
-	  <value>Success</value>
+    <value>Success</value>
   </data>
   <data name="NoSettingsChanged" xml:space="preserve">
-	  <value>No settings were changed</value>
+    <value>No settings were changed</value>
   </data>
   <data name="SettingsWritten" xml:space="preserve">
-	  <value>Settings successfully written</value>
+    <value>Settings successfully written</value>
   </data>
   <data name="EnableBattery" xml:space="preserve">
-	  <value>Enable Battery</value>
+    <value>Enable Battery</value>
   </data>
   <data name="CalibrateBattery" xml:space="preserve">
-	  <value>Calibrate Battery</value>
+    <value>Calibrate Battery</value>
   </data>
   <data name="SocLimits" xml:space="preserve">
-	  <value>SoC Limits</value>
+    <value>SoC Limits</value>
   </data>
   <data name="MaxHomeChargingPower" xml:space="preserve">
-	  <value>Maximum power from home producers to battery</value>
+    <value>Maximum power from home producers to battery</value>
   </data>
   <data name="MeterAddress" xml:space="preserve">
-	  <value>Meter address</value>
+    <value>Meter address</value>
   </data>
   <data name="MeterAddressError" xml:space="preserve">
-	  <value>Meter address must be between 1 and 247</value>
+    <value>Meter address must be between 1 and 247</value>
   </data>
   <data name="SunspecAddress" xml:space="preserve">
-	  <value>Sunspec address</value>
+    <value>Sunspec address</value>
   </data>
   <data name="SunspecAddressError" xml:space="preserve">
-	  <value>Sunspec address must be between 1 and 255</value>
+    <value>Sunspec address must be between 1 and 255</value>
+  </data>
+  <data name="ModbusSettings" xml:space="preserve">
+    <value>Modbus Settings</value>
+  </data>
+  <data name="ModbusInterfaceRole_Disabled" xml:space="preserve">
+	  <value>Disabled</value>
+  </data>
+  <data name="ModbusInterfaceRole_Master" xml:space="preserve">
+	  <value>Master</value>
+  </data>
+  <data name="ModbusInterfaceRole_Slave" xml:space="preserve">
+	  <value>Slave</value>
+  </data>
+  <data name="ModbusParity_Even" xml:space="preserve">
+	  <value>Even</value>
+  </data>
+  <data name="ModbusParity_Odd" xml:space="preserve">
+	  <value>Odd</value>
+  </data>
+  <data name="ModbusParity_None" xml:space="preserve">
+	  <value>None</value>
   </data>
 </root>

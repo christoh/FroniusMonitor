@@ -13,7 +13,7 @@ public partial class App
 
     protected override void OnStartup(StartupEventArgs e)
     {
-        // Thread.CurrentThread.CurrentUICulture= new CultureInfo("de-CH");
+        Thread.CurrentThread.CurrentUICulture= new CultureInfo("de-CH");
         base.OnStartup(e);
 
         Container
@@ -26,6 +26,8 @@ public partial class App
             .RegisterType<EventLogViewModel>()
             .RegisterType<SelfConsumptionOptimizationViewModel>()
             .RegisterType<SelfConsumptionOptimizationView>()
+            .RegisterType<ModbusView>()
+            .RegisterType<ModbusViewModel>()
             ;
 
         Directory.CreateDirectory(PerUserDataDir);

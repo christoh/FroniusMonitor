@@ -46,6 +46,23 @@ public partial class MainWindow
         }
     }
 
+    public ModbusView ModbusView
+    {
+        get
+        {
+            var modbusView= OwnedWindows.OfType<ModbusView>().SingleOrDefault();
+
+            if (modbusView == null)
+            {
+                modbusView=IoC.Get<ModbusView>();
+                modbusView.Owner = this;
+                modbusView.Show();
+            }
+
+            return modbusView;
+        }
+    }
+
     private SelfConsumptionOptimizationView? selfConsumptionOptimizationView;
     public SelfConsumptionOptimizationView SelfConsumptionOptimizationView
     {
@@ -202,5 +219,10 @@ public partial class MainWindow
 
         SelfConsumptionOptimizationView.Owner = this;
         SelfConsumptionOptimizationView.Show();
+    }
+
+    private void ShowModbusSettings(object sender, RoutedEventArgs e)
+    {
+        ModbusView.Activate();
     }
 }

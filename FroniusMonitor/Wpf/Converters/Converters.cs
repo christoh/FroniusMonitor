@@ -1,4 +1,5 @@
 ﻿using System.Windows.Markup;
+using De.Hochstaetter.Fronius.Extensions;
 
 namespace De.Hochstaetter.FroniusMonitor.Wpf.Converters;
 
@@ -9,6 +10,18 @@ public abstract class ConverterBase : MarkupExtension, IValueConverter
     public abstract object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture);
 
     public virtual object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotSupportedException();
+    }
+}
+
+public abstract class MultiConverterBase : MarkupExtension, IMultiValueConverter
+{
+    public override object ProvideValue(IServiceProvider serviceProvider) => this;
+
+    public abstract object? Convert(object?[] value, Type targetType, object? parameter, CultureInfo culture);
+
+    public virtual object?[] ConvertBack(object? value, Type[] targetTypes, object? parameter, CultureInfo culture)
     {
         throw new NotSupportedException();
     }
@@ -169,6 +182,58 @@ public class Bool2Visibility : BoolToAnything<Visibility>
     }
 }
 
+public class MultiBool2Anything<T> : MultiConverterBase
+{
+    public virtual T? All { get; set; }
+    public virtual T? Any { get; set; }
+    public virtual T? None { get; set; }
+    public virtual T? Invalid { get; set; }
+    public override object? Convert(object?[] value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        var boolValues = value?.OfType<bool>().ToArray();
+
+        if (value==null||boolValues==null ||value.Length != boolValues.Length)
+        {
+            return Invalid;
+        }
+
+        if (boolValues.All(b => b))
+        {
+            return All;
+        }
+
+        if (boolValues.Any(b => b))
+        {
+            return Any;
+        }
+
+        return None;
+    }
+}
+
+public class MultiBool2Visibility : MultiBool2Anything<Visibility>
+{
+    public override Visibility Any { get; set; } = Visibility.Collapsed;
+    public override Visibility All { get; set; }=Visibility.Visible;
+    public override Visibility None { get; set; } = Visibility.Collapsed;
+    public override Visibility Invalid { get; set; } = Visibility.Collapsed;
+}
+
+public class ModbusInterfaceRole2Visibility : MultiConverterBase
+{
+    public override object? Convert(object?[] value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        var roles = value?.OfType<ModbusInterfaceRole>().ToArray();
+
+        if (value == null || roles == null || value.Length != roles.Length)
+        {
+            return Visibility.Collapsed;
+        }
+
+        return roles.Any(r => r == ModbusInterfaceRole.Slave) ? Visibility.Visible : Visibility.Collapsed;
+    }
+}
+
 public class SeverityToVisibility : ConverterBase
 {
     public Visibility Error { get; set; } = Visibility.Collapsed;
@@ -323,5 +388,19 @@ public class BoolInverter : ConverterBase
     public override object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         return value is bool boolValue ? !boolValue : null;
+    }
+}
+
+public class Enum2DisplayName:ConverterBase
+{
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is Enum enumValue)
+        {
+            var result=enumValue.ToDisplayName();
+            return result;
+        }
+
+        return value;
     }
 }

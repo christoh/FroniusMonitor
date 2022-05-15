@@ -498,4 +498,25 @@
   <data name="SunspecAddressError" xml:space="preserve">
 	  <value>Sunspec-Addresse muss zwischen 1 und 255 liegen</value>
   </data>
+  <data name="ModbusSettings" xml:space="preserve">
+	  <value>Modbus-Einstellungen</value>
+  </data>
+  <data name="ModbusParity_Even" xml:space="preserve">
+	  <value>Gerade</value>
+  </data>
+  <data name="ModbusParity_Odd" xml:space="preserve">
+	  <value>Ungerade</value>
+  </data>
+  <data name="ModbusParity_None" xml:space="preserve">
+	  <value>Keine</value>
+  </data>
+  <data name="ModbusInterfaceRole_Disabled" xml:space="preserve">
+	  <value>Deaktiviert</value>
+  </data>
+  <data name="ModbusInterfaceRole_Master" xml:space="preserve">
+	  <value>Master</value>
+  </data>
+  <data name="ModbusInterfaceRole_Slave" xml:space="preserve">
+	  <value>Slave</value>
+  </data>
 </root>

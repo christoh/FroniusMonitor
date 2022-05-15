@@ -3,12 +3,14 @@
 public class SelfConsumptionOptimizationViewModel : ViewModelBase
 {
     private readonly IWebClientService webClientService;
+    private readonly IGen24JsonService gen24Service;
     private SelfConsumptionOptimizationView view=null!;
     private Gen24BatterySettings oldSettings = null!;
 
-    public SelfConsumptionOptimizationViewModel(IWebClientService webClientService)
+    public SelfConsumptionOptimizationViewModel(IWebClientService webClientService, IGen24JsonService gen24Service)
     {
         this.webClientService = webClientService;
+        this.gen24Service = gen24Service;
     }
 
     private Gen24BatterySettings settings = null!;
@@ -134,7 +136,7 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
 
     private async void Apply()
     {
-        var updateToken = webClientService.GetUpdateToken(Settings, oldSettings);
+        var updateToken = gen24Service.GetUpdateToken(Settings, oldSettings);
 
         if (!updateToken.Children().Any())
         {
@@ -144,7 +146,7 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
 
         try
         {
-            var _ = await ((WebClientService)webClientService).GetFroniusJsonResponse("config/batteries", updateToken).ConfigureAwait(false);
+            var _ = await webClientService.GetFroniusJsonResponse("config/batteries", updateToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

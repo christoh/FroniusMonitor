@@ -97,4 +97,65 @@ public class Gen24JsonService : IGen24JsonService
 
         return fieldInfo == null ? null : Enum.Parse(type, fieldInfo.Name);
     }
+
+    public JObject GetUpdateToken<T>(T newEntity, T? oldEntity = default) where T : BindableBase
+    {
+        var jObject = new JObject();
+
+        foreach (var propertyInfo in typeof(T).GetProperties().Where(p=>p.GetCustomAttribute<FroniusProprietaryImportAttribute>()!=null))
+        {
+            var jsonValueNew = GetFroniusJsonValue(propertyInfo, newEntity);
+
+            if (jsonValueNew == null)
+            {
+                continue;
+            }
+
+            if (oldEntity != default)
+            {
+                var jsonValueOld = GetFroniusJsonValue(propertyInfo, oldEntity);
+
+                if (jsonValueNew.Equals(jsonValueOld))
+                {
+                    continue;
+                }
+            }
+
+            var attribute = propertyInfo.GetCustomAttributes<FroniusProprietaryImportAttribute>().Single();
+            jObject.Add(attribute.Name, new JValue(jsonValueNew));
+        }
+
+        return jObject;
+    }
+
+    private object? GetFroniusJsonValue(PropertyInfo propertyInfo, object instance)
+    {
+        var value = propertyInfo.GetValue(instance);
+
+        if (value == null)
+        {
+            return null;
+        }
+
+        var result = value switch
+        {
+            Enum enumValue => GetFroniusEnumString(enumValue),
+            DateTime date => (long)Math.Round((date.ToUniversalTime() - DateTime.UnixEpoch).TotalSeconds, MidpointRounding.AwayFromZero),
+            _ => value
+        };
+
+        return result;
+    }
+
+    private object? GetFroniusEnumString(Enum enumValue)
+    {
+        var fieldInfo = enumValue.GetType().GetFields().Single(f => f.Name == enumValue.ToString());
+
+        if (fieldInfo.GetCustomAttributes().SingleOrDefault(a => a is EnumParseAttribute) is not EnumParseAttribute attribute || attribute.ParseNumeric)
+        {
+            return Convert.ToInt32(enumValue);
+        }
+
+        return attribute.ParseAs;
+    }
 }
