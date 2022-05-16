@@ -19,7 +19,7 @@ public abstract class MultiConverterBase : MarkupExtension, IMultiValueConverter
 {
     public override object ProvideValue(IServiceProvider serviceProvider) => this;
 
-    public abstract object? Convert(object?[] value, Type targetType, object? parameter, CultureInfo culture);
+    public abstract object? Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture);
 
     public virtual object?[] ConvertBack(object? value, Type[] targetTypes, object? parameter, CultureInfo culture)
     {
@@ -188,11 +188,11 @@ public class MultiBool2Anything<T> : MultiConverterBase
     public virtual T? Any { get; set; }
     public virtual T? None { get; set; }
     public virtual T? Invalid { get; set; }
-    public override object? Convert(object?[] value, Type targetType, object? parameter, CultureInfo culture)
+    public override object? Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
     {
-        var boolValues = value?.OfType<bool>().ToArray();
+        var boolValues = values?.OfType<bool>().ToArray();
 
-        if (value==null||boolValues==null ||value.Length != boolValues.Length)
+        if (values==null||boolValues==null ||values.Length != boolValues.Length)
         {
             return Invalid;
         }
@@ -221,16 +221,28 @@ public class MultiBool2Visibility : MultiBool2Anything<Visibility>
 
 public class ModbusInterfaceRole2Visibility : MultiConverterBase
 {
-    public override object? Convert(object?[] value, Type targetType, object? parameter, CultureInfo culture)
+    public override object? Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
     {
-        var roles = value?.OfType<ModbusInterfaceRole>().ToArray();
+        var roles = values?.OfType<ModbusInterfaceRole>().ToArray();
 
-        if (value == null || roles == null || value.Length != roles.Length)
+        if (values == null || roles == null || values.Length != roles.Length)
         {
             return Visibility.Collapsed;
         }
 
         return roles.Any(r => r == ModbusInterfaceRole.Slave) ? Visibility.Visible : Visibility.Collapsed;
+    }
+}
+
+public class CommonModbusSettingsVisibility : MultiConverterBase
+{
+    public override object? Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
+    {
+        var roles = values.OfType<ModbusInterfaceRole>();
+        var flags = values.OfType<bool>();
+
+        var result= roles.Any(r => r == ModbusInterfaceRole.Slave) || flags.Any(b=>b) ? Visibility.Visible : Visibility.Collapsed;
+        return result;
     }
 }
 

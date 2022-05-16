@@ -152,7 +152,7 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
         {
             await Dispatcher.InvokeAsync(() => MessageBox.Show
             (
-                view, string.Format(Resources.InverterCommError, ex.Message),
+                view, string.Format(Resources.InverterCommError, ex.Message)+Environment.NewLine+Environment.NewLine+updateToken,
                 ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error
             ));
 

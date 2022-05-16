@@ -493,10 +493,10 @@
 	  <value>Die Smartmeter-Adresse muss zwischen 1 und 247 liegen</value>
   </data>
   <data name="SunspecAddress" xml:space="preserve">
-	  <value>Sunspec-Adresse</value>
+	  <value>SunSpec-Adresse</value>
   </data>
   <data name="SunspecAddressError" xml:space="preserve">
-	  <value>Sunspec-Addresse muss zwischen 1 und 255 liegen</value>
+	  <value>SunSpec-Addresse muss zwischen 1 und 255 liegen</value>
   </data>
   <data name="ModbusSettings" xml:space="preserve">
 	  <value>Modbus-Einstellungen</value>
@@ -518,5 +518,53 @@
   </data>
   <data name="ModbusInterfaceRole_Slave" xml:space="preserve">
 	  <value>Slave</value>
+  </data>
+  <data name="SunspecMode_Float" xml:space="preserve">
+	  <value>Fließkomma</value>
+  </data>
+  <data name="SunspecMode_Int" xml:space="preserve">
+	  <value>Ganzahl + Skalierfaktor</value>
+  </data>
+  <data name="RtuModes" xml:space="preserve">
+	  <value>RTU-Schnittstellen-Betriebsarten</value>
+  </data>
+  <data name="Rtu0Mode" xml:space="preserve">
+	  <value>RTU-0-Betriebsart</value>
+  </data>
+  <data name="Rtu1Mode" xml:space="preserve">
+	  <value>RTU-1-Betriebsart</value>
+  </data>
+  <data name="RtuSlaveSettings" xml:space="preserve">
+	  <value>Modbus-RTU-Slave-Einstellungen</value>
+  </data>
+  <data name="BaudRate" xml:space="preserve">
+	  <value>Baudrate</value>
+  </data>
+  <data name="Parity" xml:space="preserve">
+	  <value>Parität</value>
+  </data>
+  <data name="ModbusTcpSettings" xml:space="preserve">
+	  <value>Modbus-Slave-TCP-Einstellungen</value>
+  </data>
+  <data name="EnableModbusTcp" xml:space="preserve">
+	  <value>Modbus-Slave über TCP aktivieren</value>
+  </data>
+  <data name="AllowInverterControlOverModbusTcp" xml:space="preserve">
+	  <value>Wechselrichtersteuerung über Modbus-TCP zulassen</value>
+  </data>
+  <data name="RestrictInverterControlOverModbusTcp" xml:space="preserve">
+	  <value>Steuerung über Modbus-TCP beschränken</value>
+  </data>
+  <data name="AllowIp" xml:space="preserve">
+	  <value>Erlaube Steuerung nur von IP-Adresse</value>
+  </data>
+  <data name="TcpPort" xml:space="preserve">
+	  <value>TCP-Port</value>
+  </data>
+  <data name="CommonModbusSlaveSettings" xml:space="preserve">
+	  <value>Allgemeine Modbus-Slave-Einstellungen</value>
+  </data>
+  <data name="SunspecMode" xml:space="preserve">
+	  <value>SunSpec-Betriebsart</value>
   </data>
 </root>

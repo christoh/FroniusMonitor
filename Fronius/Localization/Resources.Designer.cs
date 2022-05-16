@@ -133,6 +133,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Allow inverter control over TCP.
+        /// </summary>
+        public static string AllowInverterControlOverModbusTcp {
+            get {
+                return ResourceManager.GetString("AllowInverterControlOverModbusTcp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only allow control from IP address.
+        /// </summary>
+        public static string AllowIp {
+            get {
+                return ResourceManager.GetString("AllowIp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Apparent power.
         /// </summary>
         public static string ApparentPower {
@@ -178,6 +196,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Baud rate.
+        /// </summary>
+        public static string BaudRate {
+            get {
+                return ResourceManager.GetString("BaudRate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Booting.
         /// </summary>
         public static string Booting {
@@ -219,6 +246,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Charging {
             get {
                 return ResourceManager.GetString("Charging", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Common Modbus slave settings.
+        /// </summary>
+        public static string CommonModbusSlaveSettings {
+            get {
+                return ResourceManager.GetString("CommonModbusSlaveSettings", resourceCulture);
             }
         }
         
@@ -309,6 +345,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string EnableBattery {
             get {
                 return ResourceManager.GetString("EnableBattery", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable Modbus slave over TCP.
+        /// </summary>
+        public static string EnableModbusTcp {
+            get {
+                return ResourceManager.GetString("EnableModbusTcp", resourceCulture);
             }
         }
         
@@ -655,6 +700,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Modbus slave TCP settings.
+        /// </summary>
+        public static string ModbusTcpSettings {
+            get {
+                return ResourceManager.GetString("ModbusTcpSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to More.
         /// </summary>
         public static string More {
@@ -772,6 +826,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Parity.
+        /// </summary>
+        public static string Parity {
+            get {
+                return ResourceManager.GetString("Parity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Phase voltage.
         /// </summary>
         public static string PhaseVoltage {
@@ -849,6 +912,51 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string RealPower {
             get {
                 return ResourceManager.GetString("RealPower", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Restrict inverter control over TCP.
+        /// </summary>
+        public static string RestrictInverterControlOverModbusTcp {
+            get {
+                return ResourceManager.GetString("RestrictInverterControlOverModbusTcp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to RTU 0 Mode.
+        /// </summary>
+        public static string Rtu0Mode {
+            get {
+                return ResourceManager.GetString("Rtu0Mode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to RTU 1 Mode.
+        /// </summary>
+        public static string Rtu1Mode {
+            get {
+                return ResourceManager.GetString("Rtu1Mode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to RTU interface modes.
+        /// </summary>
+        public static string RtuModes {
+            get {
+                return ResourceManager.GetString("RtuModes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Modbus slave RTU settings.
+        /// </summary>
+        public static string RtuSlaveSettings {
+            get {
+                return ResourceManager.GetString("RtuSlaveSettings", resourceCulture);
             }
         }
         
@@ -1168,7 +1276,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sunspec address.
+        ///   Looks up a localized string similar to SunSpec address.
         /// </summary>
         public static string SunspecAddress {
             get {
@@ -1177,11 +1285,47 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sunspec address must be between 1 and 255.
+        ///   Looks up a localized string similar to SunSpec address must be between 1 and 255.
         /// </summary>
         public static string SunspecAddressError {
             get {
                 return ResourceManager.GetString("SunspecAddressError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SunSpec mode.
+        /// </summary>
+        public static string SunspecMode {
+            get {
+                return ResourceManager.GetString("SunspecMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Float point.
+        /// </summary>
+        public static string SunspecMode_Float {
+            get {
+                return ResourceManager.GetString("SunspecMode_Float", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Integer + scale factor.
+        /// </summary>
+        public static string SunspecMode_Int {
+            get {
+                return ResourceManager.GetString("SunspecMode_Int", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TCP port.
+        /// </summary>
+        public static string TcpPort {
+            get {
+                return ResourceManager.GetString("TcpPort", resourceCulture);
             }
         }
         

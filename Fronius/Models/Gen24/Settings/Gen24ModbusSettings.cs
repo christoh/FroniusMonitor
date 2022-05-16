@@ -17,6 +17,7 @@ public enum ModbusSlaveMode
     [EnumParse(ParseAs = "tcp")] Tcp,
 }
 
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
 public enum ModbusParity
 {
     [EnumParse(ParseAs = "n")] None,
@@ -24,6 +25,7 @@ public enum ModbusParity
     [EnumParse(ParseAs = "o")] Odd,
 }
 
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
 public enum SunspecMode
 {
     [EnumParse(ParseAs = "float")] Float,
@@ -35,7 +37,11 @@ public class Gen24ModbusSettings : BindableBase, ICloneable
 {
     private static readonly IReadOnlyList<int> baudRates = new[] { 9600, 19200 };
 
+    private static readonly IReadOnlyList<ushort> tcpPorts = new[] { (ushort)502, (ushort)1502 };
+
     public IReadOnlyList<int> BaudRates => baudRates;
+
+    public IReadOnlyList<ushort> TcpPorts => tcpPorts;
 
     private ModbusInterfaceRole rtu0 = ModbusInterfaceRole.Disabled;
 
@@ -203,7 +209,7 @@ public class Gen24ModbusSettings : BindableBase, ICloneable
 
         IEnumerable<string> GetInterfaces(string prefix)
         {
-            return token.SelectTokens($"{prefix}.rtuif[*].if")?.Select(t => t.Value<string>() ?? string.Empty) ?? Array.Empty<string>();
+            return token.SelectTokens($"{prefix}.rtuif[*].if").Select(t => t.Value<string>() ?? string.Empty);
         }
 
         void SetInterfaces(IEnumerable<string> interfaces, ModbusInterfaceRole role)
@@ -227,7 +233,7 @@ public class Gen24ModbusSettings : BindableBase, ICloneable
             slaveToken.Add("rtuif", ifToken);
 
             Add(Rtu0, ModbusInterfaceRole.Slave, "rtu0");
-            Add(Rtu0, ModbusInterfaceRole.Slave, "rtu1");
+            Add(Rtu1, ModbusInterfaceRole.Slave, "rtu1");
 
             ifToken = new JArray();
             var masterToken = new JObject { { "rtuif", ifToken } };
@@ -252,21 +258,21 @@ public class Gen24ModbusSettings : BindableBase, ICloneable
             if ((oldModbusSettings == null || oldModbusSettings.AllowControl != AllowControl) && AllowControl.HasValue)
             {
                 ctrToken.Add("on", AllowControl.Value);
+            }
 
-                if (oldModbusSettings == null || oldModbusSettings.RestrictControl != RestrictControl || oldModbusSettings.IpAddress != IpAddress)
+            if (oldModbusSettings == null || oldModbusSettings.RestrictControl != RestrictControl || oldModbusSettings.IpAddress != IpAddress)
+            {
+                var restrictionToken = new JObject();
+                ctrToken.Add("restriction", restrictionToken);
+
+                if (RestrictControl.HasValue && (oldModbusSettings == null || oldModbusSettings.RestrictControl != RestrictControl))
                 {
-                    var restrictionToken = new JObject();
-                    ctrToken.Add("restriction", restrictionToken);
+                    restrictionToken.Add("on", RestrictControl);
+                }
 
-                    if (RestrictControl.HasValue && (oldModbusSettings == null || oldModbusSettings.RestrictControl != RestrictControl))
-                    {
-                        restrictionToken.Add("on", RestrictControl);
-                    }
-
-                    if (IpAddress != null && (oldModbusSettings == null || oldModbusSettings.IpAddress != IpAddress))
-                    {
-                        restrictionToken.Add("ip", IpAddress);
-                    }
+                if (IpAddress != null && (oldModbusSettings == null || oldModbusSettings.IpAddress != IpAddress))
+                {
+                    restrictionToken.Add("ip", IpAddress);
                 }
             }
 

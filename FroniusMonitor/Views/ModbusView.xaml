@@ -8,41 +8,54 @@
         xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
         xmlns:m="clr-namespace:De.Hochstaetter.Fronius.Models.Gen24.Settings;assembly=Fronius"
         mc:Ignorable="d"
-        Title="{x:Static p:Resources.ModbusSettings}" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize"
+        Title="{x:Static p:Resources.ModbusSettings}" SizeToContent="Height" Width="430"  ResizeMode="CanMinimize"
         d:DataContext="{d:DesignInstance Type=vm:ModbusViewModel}">
     <Grid Margin="16">
         <Grid.Resources>
+            <Style TargetType="Button">
+                <Setter Property="Margin" Value="0,0,8,0"/>
+                <Setter Property="MinHeight" Value="30"/>
+                <Setter Property="MinWidth" Value="70"/>
+                <Setter Property="Padding" Value="8,0"/>
+            </Style>
+
             <Style TargetType="TextBlock">
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="HorizontalAlignment" Value="Right" />
-                <Setter Property="Margin" Value="0,4,0,4"/>
+                <Setter Property="Margin" Value="0,4,0,4" />
             </Style>
             <Style TargetType="ComboBox" x:Key="StandardComboBox">
                 <Setter Property="Margin" Value="8,4,0,4" />
                 <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
             </Style>
-            <Style TargetType="ComboBox" BasedOn="{StaticResource StandardComboBox}"/>
+            <Style TargetType="ComboBox" BasedOn="{StaticResource StandardComboBox}" />
             <Style TargetType="TextBox">
-                <Setter Property="Width" Value="100"/>
-                <Setter Property="Margin" Value="8,4,0,4"/>
+                <Setter Property="Width" Value="100" />
+                <Setter Property="Margin" Value="8,4,0,4" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
             </Style>
             <Style TargetType="CheckBox">
-                <Setter Property="Margin" Value="0,0,0,4"/>
+                <Setter Property="Margin" Value="0,0,0,4" />
             </Style>
         </Grid.Resources>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <GroupBox Grid.Row="0" Header="RTU interface modes">
+
+        <GroupBox Grid.Row="0" Header="{x:Static p:Resources.RtuModes}">
             <Grid Margin="16">
                 <Grid.Resources>
                     <DataTemplate x:Key="InterfaceRoleTemplate" DataType="m:ModbusInterfaceRole">
-                        <TextBlock Height="20" Text="{Binding Converter={co:Enum2DisplayName}}"/>
+                        <TextBlock Height="20" Text="{Binding Converter={co:Enum2DisplayName}}" />
                     </DataTemplate>
                     <Style TargetType="ComboBox" BasedOn="{StaticResource StandardComboBox}">
-                        <Setter Property="ItemTemplate" Value="{StaticResource InterfaceRoleTemplate}"/>
+                        <Setter Property="ItemTemplate" Value="{StaticResource InterfaceRoleTemplate}" />
                     </Style>
                 </Grid.Resources>
                 <Grid.RowDefinitions>
@@ -54,93 +67,92 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Row="0" Grid.Column="0">
-                    <Run Text="RTU 0 Mode" /><Run Text=":" />
+                    <Run Text="{x:Static p:Resources.Rtu0Mode}" /><Run Text=":" />
                 </TextBlock>
                 <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding ModBusInterfaceRoles}" SelectedItem="{Binding Settings.Rtu0}" />
                 <TextBlock Grid.Row="1" Grid.Column="0">
-                    <Run Text="RTU 1 Mode" /><Run Text=":" />
+                    <Run Text="{x:Static p:Resources.Rtu1Mode}" /><Run Text=":" />
                 </TextBlock>
                 <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding ModBusInterfaceRoles}" SelectedItem="{Binding Settings.Rtu1}" />
             </Grid>
         </GroupBox>
 
-        <GroupBox Grid.Row="1" Header="Modbus slave RTU settings" Margin="0,8,0,0">
+        <GroupBox Grid.Row="1" Header="{x:Static p:Resources.RtuSlaveSettings}" Margin="0,8,0,0">
             <GroupBox.Visibility>
                 <MultiBinding Converter="{co:ModbusInterfaceRole2Visibility}">
-                    <Binding Path="Settings.Rtu0"/>
-                    <Binding Path="Settings.Rtu1"/>
+                    <Binding Path="Settings.Rtu0" />
+                    <Binding Path="Settings.Rtu1" />
                 </MultiBinding>
             </GroupBox.Visibility>
             <GroupBox.Resources>
                 <DataTemplate x:Key="ParityTemplate" DataType="m:ModbusParity">
-                    <TextBlock Height="20" Text="{Binding Converter={co:Enum2DisplayName}}"/>
+                    <TextBlock Height="20" Text="{Binding Converter={co:Enum2DisplayName}}" />
                 </DataTemplate>
                 <Style TargetType="ComboBox" x:Key="ParityComboBox" BasedOn="{StaticResource StandardComboBox}">
-                    <Setter Property="ItemTemplate" Value="{StaticResource ParityTemplate}"/>
+                    <Setter Property="ItemTemplate" Value="{StaticResource ParityTemplate}" />
                 </Style>
             </GroupBox.Resources>
             <Grid Margin="16">
 
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Baud rate">
-                    <Run Text=":"/>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.BaudRate}">
+                    <Run Text=":" />
                 </TextBlock>
-                <ComboBox Grid.Row="0" Grid.Column="1" SelectedItem="{Binding Settings.BaudRate}" ItemsSource="{Binding Settings.BaudRates}"/>
+                <ComboBox Grid.Row="0" Grid.Column="1" SelectedItem="{Binding Settings.BaudRate}" ItemsSource="{Binding Settings.BaudRates}" />
 
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Parity">
-                    <Run Text=":"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.Parity}">
+                    <Run Text=":" />
                 </TextBlock>
-                <ComboBox Grid.Row="1" Grid.Column="1" SelectedItem="{Binding Settings.Parity}" ItemsSource="{Binding ModBusParities}" Style="{StaticResource ParityComboBox}"/>
+                <ComboBox Grid.Row="1" Grid.Column="1" SelectedItem="{Binding Settings.Parity}" ItemsSource="{Binding ModBusParities}" Style="{StaticResource ParityComboBox}" />
             </Grid>
         </GroupBox>
 
-        <GroupBox Grid.Row="2" Header="Modbus slave TCP settings" Margin="0,8,0,0">
+        <GroupBox Grid.Row="2" Header="{x:Static p:Resources.ModbusTcpSettings}" Margin="0,8,0,0">
             <Grid Margin="16">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <CheckBox Grid.Row="0" Content="Enable Modbus slave over TCP" IsChecked="{Binding EnableTcp}"/>
-                <CheckBox Grid.Row="1" Content="Allow inverter control over TCP" IsChecked="{Binding Settings.AllowControl}" 
-                          Visibility="{Binding EnableTcp, Converter={co:Bool2Visibility}}"/>
+                <CheckBox Grid.Row="0" Content="{x:Static p:Resources.EnableModbusTcp}" IsChecked="{Binding EnableTcp}" />
+                <CheckBox Grid.Row="1" Content="{x:Static p:Resources.AllowInverterControlOverModbusTcp}" IsChecked="{Binding Settings.AllowControl}"
+                          Visibility="{Binding EnableTcp, Converter={co:Bool2Visibility}}" />
                 <CheckBox Grid.Row="2" Margin="0,0,0,8"
-                          Content="Restrict inverter control over TCP" IsChecked="{Binding Settings.RestrictControl}">
+                          Content="{x:Static p:Resources.RestrictInverterControlOverModbusTcp}" IsChecked="{Binding Settings.RestrictControl}">
                     <CheckBox.Visibility>
                         <MultiBinding Converter="{co:MultiBool2Visibility}">
-                            <Binding Path="EnableTcp"/>
-                            <Binding Path="Settings.AllowControl"/>
+                            <Binding Path="EnableTcp" />
+                            <Binding Path="Settings.AllowControl" />
                         </MultiBinding>
                     </CheckBox.Visibility>
                 </CheckBox>
-                <Grid Grid.Row="3" >
-
+                <Grid Grid.Row="3">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Only allow control from IP">
-                        <Run Text=":"/>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.AllowIp}">
+                        <Run Text=":" />
                         <TextBlock.Visibility>
                             <MultiBinding Converter="{co:MultiBool2Visibility}">
-                                <Binding Path="EnableTcp"/>
-                                <Binding Path="Settings.AllowControl"/>
-                                <Binding Path="Settings.RestrictControl"/>
+                                <Binding Path="EnableTcp" />
+                                <Binding Path="Settings.AllowControl" />
+                                <Binding Path="Settings.RestrictControl" />
                             </MultiBinding>
                         </TextBlock.Visibility>
                     </TextBlock>
@@ -148,21 +160,79 @@
                     <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Settings.IpAddress, ValidatesOnExceptions=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                         <TextBox.Visibility>
                             <MultiBinding Converter="{co:MultiBool2Visibility}">
-                                <Binding Path="EnableTcp"/>
-                                <Binding Path="Settings.AllowControl"/>
-                                <Binding Path="Settings.RestrictControl"/>
+                                <Binding Path="EnableTcp" />
+                                <Binding Path="Settings.AllowControl" />
+                                <Binding Path="Settings.RestrictControl" />
                             </MultiBinding>
                         </TextBox.Visibility>
                     </TextBox>
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="TCP port" Visibility="{Binding EnableTcp, Converter={co:Bool2Visibility}}">
-                        <Run Text=":"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.TcpPort}" Visibility="{Binding EnableTcp, Converter={co:Bool2Visibility}}">
+                        <Run Text=":" />
                     </TextBlock>
 
-                    <TextBox Grid.Row="1" Visibility="{Binding EnableTcp, Converter={co:Bool2Visibility}}" Grid.Column="1" Text="{Binding Settings.TcpPort, ValidatesOnExceptions=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <ComboBox Grid.Row="1" Grid.Column="1"
+                              Visibility="{Binding EnableTcp, Converter={co:Bool2Visibility}}"
+                              SelectedItem="{Binding Settings.TcpPort}"
+                              ItemsSource="{Binding Settings.TcpPorts}"/>
 
                 </Grid>
             </Grid>
         </GroupBox>
+
+        <GroupBox Grid.Row="3" Header="{x:Static p:Resources.CommonModbusSlaveSettings}" Margin="0,8,0,0">
+            <GroupBox.Visibility>
+                <MultiBinding Converter="{co:CommonModbusSettingsVisibility}">
+                    <Binding Path="Settings.Rtu0"/>
+                    <Binding Path="Settings.Rtu1"/>
+                    <Binding Path="EnableTcp"/>
+                </MultiBinding>
+            </GroupBox.Visibility>
+            <Grid Margin="16">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.MeterAddress}">
+                    <Run Text=":" />
+                </TextBlock>
+
+                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Settings.MeterAddress, ValidatesOnExceptions=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.SunspecAddress}">
+                    <Run Text=":" />
+                </TextBlock>
+
+                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Settings.SunSpecAddress, ValidatesOnExceptions=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static p:Resources.SunspecMode}">
+                    <Run Text=":" />
+                </TextBlock>
+
+                <ComboBox Grid.Row="2" Grid.Column="1" SelectedItem="{Binding Settings.SunspecMode}" ItemsSource="{Binding SunspecModes}">
+                    <ComboBox.Resources>
+                        <DataTemplate x:Key="SunspecTemplate" DataType="m:SunspecMode">
+                            <TextBlock Height="20" Text="{Binding Converter={co:Enum2DisplayName}}" />
+                        </DataTemplate>
+                    </ComboBox.Resources>
+                    <ComboBox.Style>
+                        <Style TargetType="ComboBox" BasedOn="{StaticResource StandardComboBox}">
+                            <Setter Property="ItemTemplate" Value="{StaticResource SunspecTemplate}" />
+                        </Style>
+                    </ComboBox.Style>
+                </ComboBox>
+            </Grid>
+        </GroupBox>
+
+        <StackPanel Grid.Row="4" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="16">
+            <Button Content="{x:Static p:Resources.Undo}" Command="{Binding UndoCommand}" />
+            <Button Content="{x:Static p:Resources.Apply}" Command="{Binding ApplyCommand}" />
+        </StackPanel>
     </Grid>
 </Window>

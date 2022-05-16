@@ -1,6 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Models.Gen24.Settings;
-
-namespace De.Hochstaetter.Fronius.Services;
+﻿namespace De.Hochstaetter.Fronius.Services;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public class WebClientService : BindableBase, IWebClientService
@@ -53,12 +51,9 @@ public class WebClientService : BindableBase, IWebClientService
         //try
         //{
         //    //var test1 = await GetFroniusJsonResponse("config/powerlimits").ConfigureAwait(false);
-        //    var json = await GetFroniusJsonResponse("config/modbus").ConfigureAwait(false);
-        //    var test2 = Gen24ModbusSettings.Parse(gen24JsonService, json);
-
-        //    var oldModbusSettings = (Gen24ModbusSettings)test2.Clone();
-        //    var updateToken = test2.GetToken(gen24JsonService,oldModbusSettings);
-        //    var response = await GetFroniusJsonResponse("config/modbus", updateToken).ConfigureAwait(false);
+        //    //var test2 = await GetFroniusJsonResponse("config/ics").ConfigureAwait(false);
+        //    //var test3 = await GetFroniusJsonResponse("config/solarweb").ConfigureAwait(false);
+        //    //var test4 = await GetFroniusJsonResponse("config/emrs").ConfigureAwait(false);
         //}
         //catch (Exception ex)
         //{

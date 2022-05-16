@@ -493,10 +493,10 @@
     <value>Meter address must be between 1 and 247</value>
   </data>
   <data name="SunspecAddress" xml:space="preserve">
-    <value>Sunspec address</value>
+	  <value>SunSpec address</value>
   </data>
   <data name="SunspecAddressError" xml:space="preserve">
-    <value>Sunspec address must be between 1 and 255</value>
+	  <value>SunSpec address must be between 1 and 255</value>
   </data>
   <data name="ModbusSettings" xml:space="preserve">
     <value>Modbus Settings</value>
@@ -518,5 +518,53 @@
   </data>
   <data name="ModbusParity_None" xml:space="preserve">
 	  <value>None</value>
+  </data>
+  <data name="SunspecMode_Float" xml:space="preserve">
+	  <value>Float point</value>
+  </data>
+  <data name="SunspecMode_Int" xml:space="preserve">
+	  <value>Integer + scale factor</value>
+  </data>
+  <data name="RtuModes" xml:space="preserve">
+	  <value>RTU interface modes</value>
+  </data>
+  <data name="Rtu0Mode" xml:space="preserve">
+	  <value>RTU 0 Mode</value>
+  </data>
+  <data name="Rtu1Mode" xml:space="preserve">
+	  <value>RTU 1 Mode</value>
+  </data>
+  <data name="RtuSlaveSettings" xml:space="preserve">
+	  <value>Modbus slave RTU settings</value>
+  </data>
+  <data name="BaudRate" xml:space="preserve">
+	  <value>Baud rate</value>
+  </data>
+  <data name="Parity" xml:space="preserve">
+	  <value>Parity</value>
+  </data>
+  <data name="ModbusTcpSettings" xml:space="preserve">
+	  <value>Modbus slave TCP settings</value>
+  </data>
+  <data name="EnableModbusTcp" xml:space="preserve">
+	  <value>Enable Modbus slave over TCP</value>
+  </data>
+  <data name="AllowInverterControlOverModbusTcp" xml:space="preserve">
+	  <value>Allow inverter control over TCP</value>
+  </data>
+  <data name="RestrictInverterControlOverModbusTcp" xml:space="preserve">
+	  <value>Restrict inverter control over TCP</value>
+  </data>
+  <data name="AllowIp" xml:space="preserve">
+	  <value>Only allow control from IP address</value>
+  </data>
+  <data name="TcpPort" xml:space="preserve">
+	  <value>TCP port</value>
+  </data>
+  <data name="CommonModbusSlaveSettings" xml:space="preserve">
+	  <value>Common Modbus slave settings</value>
+  </data>
+  <data name="SunspecMode" xml:space="preserve">
+	  <value>SunSpec mode</value>
   </data>
 </root>
