@@ -567,4 +567,19 @@
   <data name="SunspecMode" xml:space="preserve">
 	  <value>SunSpec-Betriebsart</value>
   </data>
+  <data name="PleaseCorrectErrors" xml:space="preserve">
+	  <value>Bitte korrigiere die folgenden Fehler</value>
+  </data>
+  <data name="MustBeIpv4Address" xml:space="preserve">
+	  <value>Die IP-Adresse muss eine gültige IPv4-Adresse sein.</value>
+  </data>
+  <data name="Danger" xml:space="preserve">
+	  <value>Gefahr</value>
+  </data>
+  <data name="MustBePercent" xml:space="preserve">
+	  <value>Der eingegebene Wert muss ein ganzzahliger Prozentwert von 0 bis 100 sein.</value>
+  </data>
+  <data name="MustBeBetween" xml:space="preserve">
+	  <value>Der Wert muss zwischen {0} und {1} liegen</value>
+  </data>
 </root>

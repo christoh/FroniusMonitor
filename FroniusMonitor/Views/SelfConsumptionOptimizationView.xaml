@@ -6,6 +6,7 @@
         xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
         xmlns:vm="clr-namespace:De.Hochstaetter.FroniusMonitor.ViewModels"
         xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
+        xmlns:v="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Validation"
         mc:Ignorable="d"
         Title="{x:Static p:Resources.SelfConsumptionOptimization}" Width="560" SizeToContent="Height" ResizeMode="CanMinimize"
         d:DataContext="{d:DesignInstance Type=vm:SelfConsumptionOptimizationViewModel}"
@@ -46,21 +47,21 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,8,0,-2" HorizontalAlignment="Center">
-                        <TextBlock Margin="0,0,4,0">
-                            <Run Text="{x:Static p:Resources.Power}" /><Run Text=":" />
-                        </TextBlock>
-                        <TextBox TextAlignment="Center" IsReadOnly="True" Width="40" Grid.Row="2"
-                                 Text="{Binding Settings.RequestedGridPower, Converter={co:ToAbsolute}}"  />
-                        <TextBlock Text="W" Margin="4,0,0,0"/>
-                    </StackPanel>
-                    <Slider Grid.Row="3" Value="{Binding LogGridPower, Mode=TwoWay}"
-                            HorizontalAlignment="Stretch"
-                            Minimum="-1" Maximum="4.6989700043360188047862611052755" />
                     <StackPanel Grid.Row="0" Grid.RowSpan="2" Orientation="Horizontal" VerticalAlignment="Center">
                         <RadioButton Content="{x:Static p:Resources.FeedIn}" IsChecked="{Binding IsFeedIn, Mode=TwoWay}" Margin="8,0" />
                         <RadioButton Content="{x:Static p:Resources.Consumption}" IsChecked="{Binding IsFeedIn, Mode=TwoWay, Converter={co:BoolInverter}}" Margin="8,0" />
                     </StackPanel>
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,8,0,-2" HorizontalAlignment="Center">
+                        <TextBlock Margin="0,0,4,0">
+                            <Run Text="{x:Static p:Resources.Power}" /><Run Text=":" />
+                        </TextBlock>
+                        <TextBox TextAlignment="Center" Width="40"
+                                 Text="{co:ValidationBinding Path=RequestedGridPower, Rule={v:MinMaxIntRule Minimum=0, Maximum=50000}}"  />
+                        <TextBlock Text="W" Margin="4,0,0,0"/>
+                    </StackPanel>
+                    <Slider Grid.Row="3" Value="{Binding LogGridPower, Mode=TwoWay}"
+                            HorizontalAlignment="Stretch"
+                            Minimum="-.305" Maximum="4.6989700043360188047862611052755" />
                 </Grid>
             </Grid>
         </GroupBox>
@@ -95,33 +96,31 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" SharedSizeGroup="S1"/>
                         </Grid.ColumnDefinitions>
-                        <CheckBox Content="{x:Static p:Resources.EnableBattery}"
-                              IsChecked="{Binding Settings.IsEnabled}" />
+                        <CheckBox IsEnabled="{Binding EnableDanger}" Content="{x:Static p:Resources.EnableBattery}" IsChecked="{Binding Settings.IsEnabled}" />
                     </Grid>
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" SharedSizeGroup="S1"/>
                         </Grid.ColumnDefinitions>
-                        <CheckBox Content="{x:Static p:Resources.CalibrateBattery}"
-                              IsChecked="{Binding Settings.IsInCalibration}" />
+                        <CheckBox IsEnabled="{Binding EnableDanger}" Content="{x:Static p:Resources.CalibrateBattery}" IsChecked="{Binding Settings.IsInCalibration}" />
                     </Grid>
                 </WrapPanel>
                 <Grid Grid.Row="1" 
-                      Visibility="{Binding Settings.ChargeFromAc, Converter={co:Bool2Visibility}}">
+                      Visibility="{Binding Settings.ChargeFromAc, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                <StackPanel Orientation="Horizontal" Margin="0,8,0,-2" HorizontalAlignment="Center" Grid.Row="0">
-                    <TextBlock Margin="0,0,4,0">
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,-2" HorizontalAlignment="Center" Grid.Row="0">
+                        <TextBlock Margin="0,0,4,0">
                         <Run Text="{x:Static p:Resources.MaxHomeChargingPower}" /><Run Text=":" />
-                    </TextBlock>
-                    <TextBox TextAlignment="Center" IsReadOnly="True" Width="40" Text="{Binding Settings.AcPowerMinimum, Converter={co:ToAbsolute}}" />
-                    <TextBlock Margin="4,0,0,0" Text="W"/>
-                </StackPanel>
+                        </TextBlock>
+                        <TextBox TextAlignment="Center" Width="40" Text="{co:ValidationBinding Path= AcPowerMinimum, Converter={co:ToAbsolute}, Rule={v:MinMaxIntRule}}"/>
+                        <TextBlock Margin="4,0,0,0" Text="W"/>
+                    </StackPanel>
                     <Slider Grid.Row="1" Value="{Binding LogHomePower, Mode=TwoWay}"
                             HorizontalAlignment="Stretch"
-                            Minimum="-1" Maximum="4.6989700043360188047862611052755" />
+                            Minimum="-.305" Maximum="4.6989700043360188047862611052755" />
                 </Grid>
             </Grid>
         </GroupBox>
@@ -150,7 +149,8 @@
                         <TextBlock Margin="0,0,4,0">
                             <Run Text="{x:Static p:Resources.MinimumSoc}" /><Run Text=":" />
                         </TextBlock>
-                        <TextBox TextAlignment="Center" IsReadOnly="True" Width="40" Text="{Binding Settings.SocMin, Converter={co:ToAbsolute}}" />
+                        <TextBox TextAlignment="Center" Width="40"
+                                 Text="{co:ValidationBinding SocMin, Rule={v:RegExRule Pattern='^100$|^0*([0-9]{1,2})$', Message={x:Static p:Resources.MustBePercent}}}" />
                         <TextBlock Margin="4,0,0,0" Text="%"/>
                     </StackPanel>
                     <Slider Value="{Binding SocMin, Mode=TwoWay}" Grid.Row="1" HorizontalAlignment="Stretch" Minimum="5" Maximum="100" />
@@ -158,7 +158,8 @@
                         <TextBlock Margin="0,0,4,0">
                             <Run Text="{x:Static p:Resources.MaximumSoc}" /><Run Text=":" />
                         </TextBlock>
-                        <TextBox TextAlignment="Center" IsReadOnly="True" Width="40" Text="{Binding Settings.SocMax, Converter={co:ToAbsolute}}" />
+                        <TextBox TextAlignment="Center" Width="40"
+                                 Text="{co:ValidationBinding SocMax, Rule={v:RegExRule Pattern='^100$|^0*([0-9]{1,2})$', Message={x:Static p:Resources.MustBePercent}}}" />
                         <TextBlock Margin="4,0,0,0" Text="%"/>
                     </StackPanel>
                     <Slider Value="{Binding SocMax, Mode=TwoWay}" Grid.Row="3" HorizontalAlignment="Stretch" Minimum="5" Maximum="100" />
@@ -166,10 +167,21 @@
             </Grid>
         </GroupBox>
 
-        <StackPanel Grid.Row="3" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="16">
-            <Button Content="{x:Static p:Resources.Undo}" Command="{Binding UndoCommand}" />
-            <Button Content="{x:Static p:Resources.Apply}" Command="{Binding ApplyCommand}" />
-        </StackPanel>
+        <Grid Grid.Row="3" VerticalAlignment="Bottom" Margin="8,16,0,16" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="{x:Static p:Resources.Danger}" Margin="0,0,4,0" VerticalAlignment="Center">
+                <Run Text=":"/>
+            </TextBlock>
+            <ToggleButton Grid.Column="1" Height="18" VerticalAlignment="Center" IsChecked="{Binding EnableDanger}"/>
+            <Button Grid.Column="3"  VerticalAlignment="Center" Content="{x:Static p:Resources.Undo}" Command="{Binding UndoCommand}" />
+            <Button Grid.Column="4"  VerticalAlignment="Center" Content="{x:Static p:Resources.Apply}" Command="{Binding ApplyCommand}" />
+        </Grid>
 
     </Grid>
 </Window>

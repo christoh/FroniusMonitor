@@ -277,6 +277,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Danger.
+        /// </summary>
+        public static string Danger {
+            get {
+                return ResourceManager.GetString("Danger", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to DC current.
         /// </summary>
         public static string DcCurrent {
@@ -718,6 +727,33 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Value must be between {0} and {1}.
+        /// </summary>
+        public static string MustBeBetween {
+            get {
+                return ResourceManager.GetString("MustBeBetween", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IP address must be a valid IPv4 address.
+        /// </summary>
+        public static string MustBeIpv4Address {
+            get {
+                return ResourceManager.GetString("MustBeIpv4Address", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Entered value must be an integer percentage from 0 to 100.
+        /// </summary>
+        public static string MustBePercent {
+            get {
+                return ResourceManager.GetString("MustBePercent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to My solar system.
         /// </summary>
         public static string MySolarSystem {
@@ -840,6 +876,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string PhaseVoltage {
             get {
                 return ResourceManager.GetString("PhaseVoltage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please correct the following errors.
+        /// </summary>
+        public static string PleaseCorrectErrors {
+            get {
+                return ResourceManager.GetString("PleaseCorrectErrors", resourceCulture);
             }
         }
         

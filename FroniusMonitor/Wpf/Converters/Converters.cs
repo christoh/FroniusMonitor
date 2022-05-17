@@ -388,6 +388,11 @@ public class ToAbsolute : ConverterBase
     {
         return value is IConvertible convertible ? Math.Abs(convertible.ToDouble(CultureInfo.CurrentCulture)) : null;
     }
+
+    public override object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is IConvertible convertible ? (int)Math.Round(-convertible.ToDouble(CultureInfo.CurrentCulture),MidpointRounding.AwayFromZero) : null;
+    }
 }
 
 public class BoolInverter : ConverterBase

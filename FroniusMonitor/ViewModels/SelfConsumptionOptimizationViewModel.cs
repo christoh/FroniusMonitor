@@ -21,6 +21,21 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
         set => Set(ref settings, value);
     }
 
+    private bool enableDanger;
+
+    public bool EnableDanger
+    {
+        get => enableDanger;
+        set => Set(ref enableDanger, value, () =>
+        {
+            if (!value)
+            {
+                Settings.IsEnabled = oldSettings.IsEnabled;
+                Settings.IsInCalibration=oldSettings.IsInCalibration;
+            }
+        });
+    }
+
     private double logGridPower;
 
     public double LogGridPower
@@ -35,6 +50,22 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
     {
         get => logHomePower;
         set => Set(ref logHomePower, value, UpdateHomePower);
+    }
+
+    private int? acPowerMinimum;
+
+    public int? AcPowerMinimum
+    {
+        get => acPowerMinimum;
+        set => Set(ref acPowerMinimum, value,UpdateLogHomePower);
+    }
+
+    private int? requestedGridPower;
+
+    public int? RequestedGridPower
+    {
+        get => requestedGridPower;
+        set => Set(ref requestedGridPower, value,UpdateLogGridPower);
     }
 
     private bool isFeedIn;
@@ -113,12 +144,25 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
 
     private void UpdateGridPower()
     {
-        Settings.RequestedGridPower = (int)Math.Round(Math.Pow(10, LogGridPower) * (IsFeedIn ? -1 : 1), MidpointRounding.AwayFromZero);
+        RequestedGridPower= (int)Math.Round(Math.Pow(10, LogGridPower), MidpointRounding.AwayFromZero);
+        Settings.RequestedGridPower = RequestedGridPower * (IsFeedIn ? -1 : 1);
     }
 
     private void UpdateHomePower()
     {
-        Settings.AcPowerMinimum = -(int)Math.Round(Math.Pow(10, LogHomePower), MidpointRounding.AwayFromZero);
+        AcPowerMinimum=Settings.AcPowerMinimum = -(int)Math.Round(Math.Pow(10, LogHomePower), MidpointRounding.AwayFromZero);
+    }
+
+    private void UpdateLogHomePower()
+    {
+        Settings.AcPowerMinimum=AcPowerMinimum;
+        LogHomePower = Math.Log10(-AcPowerMinimum??double.NegativeInfinity);
+    }
+
+    private void UpdateLogGridPower()
+    {
+        Settings.RequestedGridPower = RequestedGridPower*(IsFeedIn ? -1 : 1);
+        LogGridPower = Math.Log10(RequestedGridPower ?? double.NegativeInfinity);
     }
 
     private void Revert()
@@ -136,6 +180,38 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
 
     private async void Apply()
     {
+        var errors = view.FindVisualChildren<TextBox>().SelectMany(Validation.GetErrors).ToArray();
+
+        foreach (var error in errors)
+        {
+            if (error.BindingInError is BindingExpression {Target: FrameworkElement {IsVisible: false}} expression)
+            {
+                var property = oldSettings.GetType().GetProperty(expression.ResolvedSourcePropertyName);
+
+                if (property != null)
+                {
+                    var value = property.GetValue(oldSettings);
+                    property.SetValue(Settings, value);
+                }
+            }
+        }
+
+        var errorList = errors
+            .Where(e => e.BindingInError is BindingExpression {Target: FrameworkElement {IsVisible: true}})
+            .Select(e => e.ErrorContent.ToString()).ToArray();
+
+        if (errorList.Length > 0)
+        {
+            MessageBox.Show
+            (
+                view,
+                $"{Resources.PleaseCorrectErrors}:{Environment.NewLine}{errorList.Aggregate(string.Empty, (c, n) => c + Environment.NewLine + "• " + n)}",
+                Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error
+            );
+
+            return;
+        }
+
         var updateToken = gen24Service.GetUpdateToken(Settings, oldSettings);
 
         if (!updateToken.Children().Any())
