@@ -1,6 +1,4 @@
-﻿using System.Windows.Markup;
-
-namespace De.Hochstaetter.FroniusMonitor.Wpf.Validation
+﻿namespace De.Hochstaetter.FroniusMonitor.Wpf.Validation
 {
     internal class RegexRule : ValidationRule
     {

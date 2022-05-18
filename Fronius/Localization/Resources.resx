@@ -582,4 +582,13 @@
   <data name="MustBeBetween" xml:space="preserve">
 	  <value>Value must be between {0} and {1}</value>
   </data>
+  <data name="BatteryIsAcCoupled" xml:space="preserve">
+	  <value>Battery is AC coupled</value>
+  </data>
+  <data name="Message" xml:space="preserve">
+	  <value>Message</value>
+  </data>
+  <data name="BackupConfiguration" xml:space="preserve">
+	  <value>Backup configuration</value>
+  </data>
 </root>

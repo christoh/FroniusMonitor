@@ -7,6 +7,10 @@ public class WebClientService : BindableBase, IWebClientService
     private DigestAuthHttp? froniusHttpClient;
     private string? fritzBoxSid;
     private DateTime lastSolarApiCall = DateTime.UtcNow.AddSeconds(-4);
+    private JObject? invariantConfigToken;
+    private JObject? localConfigToken;
+    private JObject? localEventToken;
+    private JObject? invariantEventToken;
 
     public WebClientService(IGen24JsonService gen24JsonService)
     {
@@ -54,6 +58,7 @@ public class WebClientService : BindableBase, IWebClientService
         //    //var test2 = await GetFroniusJsonResponse("config/ics").ConfigureAwait(false);
         //    //var test3 = await GetFroniusJsonResponse("config/solarweb").ConfigureAwait(false);
         //    //var test4 = await GetFroniusJsonResponse("config/emrs").ConfigureAwait(false);
+        //    //var test5 = await GetFroniusJsonResponse("config/timeofuse").ConfigureAwait(false);
         //}
         //catch (Exception ex)
         //{
@@ -267,6 +272,45 @@ public class WebClientService : BindableBase, IWebClientService
         };
 
         return result;
+    }
+
+    public async Task<string> GetConfigString(string category, string key)
+    {
+        (localConfigToken, invariantConfigToken) = await EnsureText("app/assets/i18n/WeblateTranslations/config", localConfigToken, invariantConfigToken).ConfigureAwait(false);
+        return localConfigToken?[category]?[key]?.Value<string>() ?? invariantConfigToken?[category]?[key]?.Value<string>() ?? $"{category}.{key}";
+    }
+
+    public async Task<string> GetEventDescription(string code)
+    {
+        (localEventToken, invariantEventToken) = await EnsureText("app/assets/i18n/StateCodeTranslations", localEventToken, invariantEventToken).ConfigureAwait(false);
+        return localEventToken?["StateCodes"]?[code]?.Value<string>()??invariantEventToken?["StateCodes"]?[code]?.Value<string>()??code;
+    }
+
+    private async Task<(JObject?, JObject?)> EnsureText(string baseUrl, JObject? l, JObject? i)
+    {
+        try
+        {
+            i ??= JObject.Parse(await GetFroniusJsonResponse($"{baseUrl}/en.json").ConfigureAwait(false));
+        }
+        catch
+        {
+            i ??= new JObject();
+        }
+
+
+        if (CultureInfo.CurrentUICulture.ThreeLetterWindowsLanguageName != "en")
+        {
+            try
+            {
+                l ??= JObject.Parse(await GetFroniusJsonResponse($"{baseUrl}/{CultureInfo.CurrentUICulture.TwoLetterISOLanguageName}.json").ConfigureAwait(false));
+            }
+            catch
+            {
+                l = new JObject();
+            }
+        }
+
+        return (l, i);
     }
 
     private static SmartMeterData ParseSmartMeterData(JToken meterToken)

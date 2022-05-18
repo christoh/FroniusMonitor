@@ -4,7 +4,7 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
 {
     private readonly IWebClientService webClientService;
     private readonly IGen24JsonService gen24Service;
-    private SelfConsumptionOptimizationView view=null!;
+    private SelfConsumptionOptimizationView view = null!;
     private Gen24BatterySettings oldSettings = null!;
 
     public SelfConsumptionOptimizationViewModel(IWebClientService webClientService, IGen24JsonService gen24Service)
@@ -31,7 +31,8 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
             if (!value)
             {
                 Settings.IsEnabled = oldSettings.IsEnabled;
-                Settings.IsInCalibration=oldSettings.IsInCalibration;
+                Settings.IsInCalibration = oldSettings.IsInCalibration;
+                Settings.IsAcCoupled = oldSettings.IsAcCoupled;
             }
         });
     }
@@ -57,7 +58,7 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
     public int? AcPowerMinimum
     {
         get => acPowerMinimum;
-        set => Set(ref acPowerMinimum, value,UpdateLogHomePower);
+        set => Set(ref acPowerMinimum, value, UpdateLogHomePower);
     }
 
     private int? requestedGridPower;
@@ -65,7 +66,7 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
     public int? RequestedGridPower
     {
         get => requestedGridPower;
-        set => Set(ref requestedGridPower, value,UpdateLogGridPower);
+        set => Set(ref requestedGridPower, value, UpdateLogGridPower);
     }
 
     private bool isFeedIn;
@@ -144,24 +145,24 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
 
     private void UpdateGridPower()
     {
-        RequestedGridPower= (int)Math.Round(Math.Pow(10, LogGridPower), MidpointRounding.AwayFromZero);
+        RequestedGridPower = (int)Math.Round(Math.Pow(10, LogGridPower), MidpointRounding.AwayFromZero);
         Settings.RequestedGridPower = RequestedGridPower * (IsFeedIn ? -1 : 1);
     }
 
     private void UpdateHomePower()
     {
-        AcPowerMinimum=Settings.AcPowerMinimum = -(int)Math.Round(Math.Pow(10, LogHomePower), MidpointRounding.AwayFromZero);
+        AcPowerMinimum = Settings.AcPowerMinimum = -(int)Math.Round(Math.Pow(10, LogHomePower), MidpointRounding.AwayFromZero);
     }
 
     private void UpdateLogHomePower()
     {
-        Settings.AcPowerMinimum=AcPowerMinimum;
-        LogHomePower = Math.Log10(-AcPowerMinimum??double.NegativeInfinity);
+        Settings.AcPowerMinimum = AcPowerMinimum;
+        LogHomePower = Math.Log10(-AcPowerMinimum ?? double.NegativeInfinity);
     }
 
     private void UpdateLogGridPower()
     {
-        Settings.RequestedGridPower = RequestedGridPower*(IsFeedIn ? -1 : 1);
+        Settings.RequestedGridPower = RequestedGridPower * (IsFeedIn ? -1 : 1);
         LogGridPower = Math.Log10(RequestedGridPower ?? double.NegativeInfinity);
     }
 
@@ -184,7 +185,7 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
 
         foreach (var error in errors)
         {
-            if (error.BindingInError is BindingExpression {Target: FrameworkElement {IsVisible: false}} expression)
+            if (error.BindingInError is BindingExpression { Target: FrameworkElement { IsVisible: false } } expression)
             {
                 var property = oldSettings.GetType().GetProperty(expression.ResolvedSourcePropertyName);
 
@@ -197,7 +198,7 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
         }
 
         var errorList = errors
-            .Where(e => e.BindingInError is BindingExpression {Target: FrameworkElement {IsVisible: true}})
+            .Where(e => e.BindingInError is BindingExpression { Target: FrameworkElement { IsVisible: true } })
             .Select(e => e.ErrorContent.ToString()).ToArray();
 
         if (errorList.Length > 0)
@@ -228,7 +229,7 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
         {
             await Dispatcher.InvokeAsync(() => MessageBox.Show
             (
-                view, string.Format(Resources.InverterCommError, ex.Message)+Environment.NewLine+Environment.NewLine+updateToken,
+                view, string.Format(Resources.InverterCommError, ex.Message) + Environment.NewLine + Environment.NewLine + updateToken,
                 ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error
             ));
 

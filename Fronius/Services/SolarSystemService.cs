@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.Fronius.Services;
+﻿using System.Runtime.InteropServices.ComTypes;
+
+namespace De.Hochstaetter.Fronius.Services;
 
 public class SolarSystemService : BindableBase, ISolarSystemService
 {
@@ -77,14 +79,12 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
     public async Task Start(WebConnection? inverterConnection, WebConnection? fritzBoxConnection)
     {
-        if (timer == null || SolarSystem == null)
-        {
-            Stop();
-        }
-
+        Stop();
         PowerFlowQueue.Clear();
         NotifyPowerQueueChanged();
         SolarSystem = await CreateSolarSystem(inverterConnection, fritzBoxConnection).ConfigureAwait(false);
+        _ = await webClientService.GetEventDescription("BYD2-46").ConfigureAwait(false);
+        _ = await webClientService.GetConfigString("BATTERIES", "BAT_M0_SOC_MIN");
         timer = new Timer(TimerElapsed, null, 0, 1000);
     }
 

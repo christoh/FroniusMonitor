@@ -1,5 +1,4 @@
-﻿using System.Windows.Markup;
-using De.Hochstaetter.Fronius.Extensions;
+﻿using De.Hochstaetter.Fronius.Extensions;
 
 namespace De.Hochstaetter.FroniusMonitor.Wpf.Converters;
 

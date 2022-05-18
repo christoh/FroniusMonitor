@@ -187,11 +187,29 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Backup configuration.
+        /// </summary>
+        public static string BackupConfiguration {
+            get {
+                return ResourceManager.GetString("BackupConfiguration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Battery Options.
         /// </summary>
         public static string BatteryChargingOptions {
             get {
                 return ResourceManager.GetString("BatteryChargingOptions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Battery is AC coupled.
+        /// </summary>
+        public static string BatteryIsAcCoupled {
+            get {
+                return ResourceManager.GetString("BatteryIsAcCoupled", resourceCulture);
             }
         }
         
@@ -588,6 +606,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string MaximumSoc {
             get {
                 return ResourceManager.GetString("MaximumSoc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Message.
+        /// </summary>
+        public static string Message {
+            get {
+                return ResourceManager.GetString("Message", resourceCulture);
             }
         }
         

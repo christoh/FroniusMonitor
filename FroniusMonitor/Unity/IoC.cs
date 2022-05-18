@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.FroniusMonitor.Unity;
 
-public static class IoC
+public class IoC:IServiceProvider
 {
     public static T TryGet<T>()
     {
@@ -22,4 +22,6 @@ public static class IoC
     {
         return App.Container.Resolve(type);
     }
+
+    public object? GetService(Type serviceType) => Get(serviceType);
 }

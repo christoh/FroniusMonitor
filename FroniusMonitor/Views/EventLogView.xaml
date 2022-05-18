@@ -37,6 +37,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+                <DataGridTextColumn ElementStyle="{StaticResource Es}" Header="{x:Static p:Resources.Message}" Binding="{Binding Message}" CanUserSort="True" CanUserResize="True" CanUserReorder="True"/>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

@@ -7,6 +7,7 @@
         xmlns:vm="clr-namespace:De.Hochstaetter.FroniusMonitor.ViewModels"
         xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
         xmlns:v="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Validation"
+        xmlns:l="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Localization"
         mc:Ignorable="d"
         Title="{x:Static p:Resources.SelfConsumptionOptimization}" Width="560" SizeToContent="Height" ResizeMode="CanMinimize"
         d:DataContext="{d:DesignInstance Type=vm:SelfConsumptionOptimizationViewModel}"
@@ -21,6 +22,7 @@
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -72,39 +74,26 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <WrapPanel Grid.IsSharedSizeScope="True" Margin="16,16,8,16" Grid.Row="0">
-                    <WrapPanel.Resources>
+                <StackPanel Margin="16,16,8,16" Grid.Row="0">
+                    <StackPanel.Resources>
                         <Style TargetType="CheckBox">
                             <Setter Property="Margin" Value="0,0,8,0"></Setter>
                         </Style>
-                    </WrapPanel.Resources>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" SharedSizeGroup="S1"/>
-                        </Grid.ColumnDefinitions>
-                        <CheckBox Content="{x:Static p:Resources.AllowGridCharge}"
-                              IsChecked="{Binding Settings.ChargeFromGrid}" />
-                    </Grid>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" SharedSizeGroup="S1"/>
-                        </Grid.ColumnDefinitions>
-                        <CheckBox Content="{x:Static p:Resources.ChargeFromAc}"
-                              IsChecked="{Binding Settings.ChargeFromAc}" />
-                    </Grid>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" SharedSizeGroup="S1"/>
-                        </Grid.ColumnDefinitions>
-                        <CheckBox IsEnabled="{Binding EnableDanger}" Content="{x:Static p:Resources.EnableBattery}" IsChecked="{Binding Settings.IsEnabled}" />
-                    </Grid>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" SharedSizeGroup="S1"/>
-                        </Grid.ColumnDefinitions>
-                        <CheckBox IsEnabled="{Binding EnableDanger}" Content="{x:Static p:Resources.CalibrateBattery}" IsChecked="{Binding Settings.IsInCalibration}" />
-                    </Grid>
-                </WrapPanel>
+                    </StackPanel.Resources>
+                    <CheckBox Content="{l:Loc 'BATTERIES', 'HYB_EVU_CHARGEFROMGRID'}"
+                                  IsChecked="{Binding Settings.ChargeFromGrid}" />
+                    <CheckBox Content="{l:Loc 'BATTERIES', 'HYB_BM_CHARGEFROMAC'}"
+                                  IsChecked="{Binding Settings.ChargeFromAc}" />
+                    <CheckBox IsEnabled="{Binding EnableDanger}"
+                                  Content="{x:Static p:Resources.EnableBattery}"
+                                  IsChecked="{Binding Settings.IsEnabled}" />
+                    <CheckBox IsEnabled="{Binding EnableDanger}"
+                                  Content="{x:Static p:Resources.CalibrateBattery}"
+                                  IsChecked="{Binding Settings.IsInCalibration}" />
+                    <CheckBox IsEnabled="{Binding EnableDanger}"
+                                  Content="{x:Static p:Resources.BatteryIsAcCoupled}"
+                                  IsChecked="{Binding Settings.IsAcCoupled}" />
+                </StackPanel>
                 <Grid Grid.Row="1" 
                       Visibility="{Binding Settings.ChargeFromAc, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}">
                     <Grid.RowDefinitions>
@@ -167,7 +156,36 @@
             </Grid>
         </GroupBox>
 
-        <Grid Grid.Row="3" VerticalAlignment="Bottom" Margin="8,16,0,16" >
+        <GroupBox Grid.Row="3" Header="{x:Static p:Resources.BackupConfiguration}" Margin="8,4">
+            <Grid Margin="8,16">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <StackPanel Orientation="Horizontal" Margin="0,8,0,-2" HorizontalAlignment="Center" Grid.Row="0">
+                    <TextBlock Margin="0,0,4,0">
+                        <Run Text="{l:Loc 'BATTERIES', 'HYB_BACKUP_CRITICALSOC'}" /><Run Text=":" />
+                    </TextBlock>
+                    <TextBox TextAlignment="Center" Width="40"
+                             Text="{co:ValidationBinding Settings.BackupCriticalSoc, Rule={v:RegExRule Pattern='^100$|^0*([0-9]{1,2})$', Message={x:Static p:Resources.MustBePercent}}}" />
+                    <TextBlock Margin="4,0,0,0" Text="%"/>
+                </StackPanel>
+                <Slider Value="{Binding Settings.BackupCriticalSoc, Mode=TwoWay}" Grid.Row="1" HorizontalAlignment="Stretch" Minimum="0" Maximum="100" />
+                <StackPanel Orientation="Horizontal" Margin="0,8,0,-2" HorizontalAlignment="Center" Grid.Row="2">
+                    <TextBlock Margin="0,0,4,0">
+                        <Run Text="{l:Loc 'BATTERIES', 'HYB_BACKUP_RESERVED'}" /><Run Text=":" />
+                    </TextBlock>
+                    <TextBox TextAlignment="Center" Width="40"
+                             Text="{co:ValidationBinding Settings.BackupReserve, Rule={v:MinMaxIntRule Minimum=5, Maximum=95}}" />
+                    <TextBlock Margin="4,0,0,0" Text="%"/>
+                </StackPanel>
+                <Slider Value="{Binding Settings.BackupReserve, Mode=TwoWay}" Grid.Row="3" HorizontalAlignment="Stretch" Minimum="5" Maximum="95" />
+            </Grid>
+        </GroupBox>
+
+        <Grid Grid.Row="4" VerticalAlignment="Bottom" Margin="8,16,0,16" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
