@@ -591,4 +591,43 @@
   <data name="BackupConfiguration" xml:space="preserve">
 	  <value>Notstrom-Konfiguration</value>
   </data>
+  <data name="Sunday_One" xml:space="preserve">
+	  <value>S</value>
+  </data>
+  <data name="Monday_One" xml:space="preserve">
+	  <value>M</value>
+  </data>
+  <data name="Tuesday_One" xml:space="preserve">
+	  <value>D</value>
+  </data>
+  <data name="Wednesday_One" xml:space="preserve">
+	  <value>M</value>
+  </data>
+  <data name="Thursday_One" xml:space="preserve">
+	  <value>D</value>
+  </data>
+  <data name="Friday_One" xml:space="preserve">
+	  <value>F</value>
+  </data>
+  <data name="Sunday" xml:space="preserve">
+	  <value>Sonntag</value>
+  </data>
+  <data name="Monday" xml:space="preserve">
+	  <value>Montag</value>
+  </data>
+  <data name="Tuesday" xml:space="preserve">
+	  <value>Dienstag</value>
+  </data>
+  <data name="Wednesday" xml:space="preserve">
+	  <value>Mittwoch</value>
+  </data>
+  <data name="Thursday" xml:space="preserve">
+	  <value>Donnerstag</value>
+  </data>
+  <data name="Friday" xml:space="preserve">
+	  <value>Freitag</value>
+  </data>
+  <data name="Saturday" xml:space="preserve">
+	  <value>Samstag</value>
+  </data>
 </root>

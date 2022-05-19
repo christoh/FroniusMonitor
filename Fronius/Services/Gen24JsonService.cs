@@ -18,6 +18,12 @@ public class Gen24JsonService : IGen24JsonService
             {
                 FroniusDataType.Attribute => attributes?[attribute.Name],
                 FroniusDataType.Root => device?[attribute.Name],
+
+                FroniusDataType.Custom => device?
+                [
+                    attribute?.PropertyName ?? throw new ApplicationException($"PropertyName not set for {propertyInfo.Name} in {typeof(T).Name}")
+                ]?[attribute.Name],
+
                 _ => channels?[attribute.Name],
             };
 
@@ -33,8 +39,22 @@ public class Gen24JsonService : IGen24JsonService
                 }
                 else if (propertyInfo.PropertyType.IsAssignableFrom(typeof(DateTime)))
                 {
-                    var doubleValue = (double)Convert.ChangeType(stringValue, typeof(double), CultureInfo.InvariantCulture);
-                    value = DateTime.UnixEpoch.AddSeconds(doubleValue);
+                    if (attribute.Unit != Unit.Time)
+                    {
+                        var doubleValue = (double)Convert.ChangeType(stringValue, typeof(double), CultureInfo.InvariantCulture);
+                        value = DateTime.UnixEpoch.AddSeconds(doubleValue);
+                    }
+                    else
+                    {
+                        if (!DateTime.TryParse(stringValue,CultureInfo.InvariantCulture,DateTimeStyles.AssumeLocal,out var dateTime))
+                        {
+                            value = null;
+                        }
+                        else
+                        {
+                            value = dateTime;
+                        }
+                    }
                 }
                 else if (attribute.DataType == FroniusDataType.Channel && propertyInfo.PropertyType.IsAssignableFrom(typeof(bool)))
                 {
@@ -102,9 +122,10 @@ public class Gen24JsonService : IGen24JsonService
     {
         var jObject = new JObject();
 
-        foreach (var propertyInfo in typeof(T).GetProperties().Where(p=>p.GetCustomAttribute<FroniusProprietaryImportAttribute>()!=null))
+        foreach (var propertyInfo in typeof(T).GetProperties().Where(p => p.GetCustomAttribute<FroniusProprietaryImportAttribute>() != null))
         {
-            var jsonValueNew = GetFroniusJsonValue(propertyInfo, newEntity);
+            var attribute = propertyInfo.GetCustomAttributes<FroniusProprietaryImportAttribute>().Single();
+            var jsonValueNew = GetFroniusJsonValue(propertyInfo, newEntity, attribute);
 
             if (jsonValueNew == null)
             {
@@ -113,7 +134,7 @@ public class Gen24JsonService : IGen24JsonService
 
             if (oldEntity != default)
             {
-                var jsonValueOld = GetFroniusJsonValue(propertyInfo, oldEntity);
+                var jsonValueOld = GetFroniusJsonValue(propertyInfo, oldEntity, attribute);
 
                 if (jsonValueNew.Equals(jsonValueOld))
                 {
@@ -121,14 +142,27 @@ public class Gen24JsonService : IGen24JsonService
                 }
             }
 
-            var attribute = propertyInfo.GetCustomAttributes<FroniusProprietaryImportAttribute>().Single();
-            jObject.Add(attribute.Name, new JValue(jsonValueNew));
+            if (attribute.DataType != FroniusDataType.Custom || attribute.PropertyName == null)
+            {
+                jObject.Add(attribute.Name, new JValue(jsonValueNew));
+            }
+            else
+            {
+                if (!jObject.ContainsKey(attribute.PropertyName))
+                {
+                    jObject.Add(attribute.PropertyName, new JObject {{attribute.Name, new JValue(jsonValueNew)}});
+                }
+                else
+                {
+                    jObject[attribute.PropertyName]![attribute.Name] = new JValue(jsonValueNew);
+                }
+            }
         }
 
         return jObject;
     }
 
-    private object? GetFroniusJsonValue(PropertyInfo propertyInfo, object instance)
+    private object? GetFroniusJsonValue(PropertyInfo propertyInfo, object instance, FroniusProprietaryImportAttribute attribute)
     {
         var value = propertyInfo.GetValue(instance);
 
@@ -140,7 +174,11 @@ public class Gen24JsonService : IGen24JsonService
         var result = value switch
         {
             Enum enumValue => GetFroniusEnumString(enumValue),
-            DateTime date => (long)Math.Round((date.ToUniversalTime() - DateTime.UnixEpoch).TotalSeconds, MidpointRounding.AwayFromZero),
+
+            DateTime date => attribute.Unit != Unit.Time
+                ? (long)Math.Round((date.ToUniversalTime() - DateTime.UnixEpoch).TotalSeconds, MidpointRounding.AwayFromZero)
+                : date.ToString("HH:mm", CultureInfo.InvariantCulture),
+
             _ => value
         };
 

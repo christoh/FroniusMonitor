@@ -591,4 +591,46 @@
   <data name="BackupConfiguration" xml:space="preserve">
 	  <value>Backup configuration</value>
   </data>
+  <data name="Sunday_One" xml:space="preserve">
+	  <value>S</value>
+  </data>
+  <data name="Monday_One" xml:space="preserve">
+	  <value>M</value>
+  </data>
+  <data name="Tuesday_One" xml:space="preserve">
+	  <value>T</value>
+  </data>
+  <data name="Wednesday_One" xml:space="preserve">
+	  <value>W</value>
+  </data>
+  <data name="Thursday_One" xml:space="preserve">
+	  <value>T</value>
+  </data>
+  <data name="Friday_One" xml:space="preserve">
+	  <value>F</value>
+  </data>
+  <data name="Saturday_One" xml:space="preserve">
+	  <value>S</value>
+  </data>
+  <data name="Sunday" xml:space="preserve">
+	  <value>Sunday</value>
+  </data>
+  <data name="Monday" xml:space="preserve">
+	  <value>Monday</value>
+  </data>
+  <data name="Tuesday" xml:space="preserve">
+	  <value>Tuesday</value>
+  </data>
+  <data name="Wednesday" xml:space="preserve">
+	  <value>Wednesday</value>
+  </data>
+  <data name="Thursday" xml:space="preserve">
+	  <value>Thursday</value>
+  </data>
+  <data name="Friday" xml:space="preserve">
+	  <value>Friday</value>
+  </data>
+  <data name="Saturday" xml:space="preserve">
+	  <value>Saturday</value>
+  </data>
 </root>

@@ -28,6 +28,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Localization\Resources.de-ch.resx">
+      <DependentUpon>Resources.resx</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Update="Localization\Resources.de.resx">
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>

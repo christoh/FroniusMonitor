@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.Fronius.Services;
+﻿using De.Hochstaetter.Fronius.Models.Gen24.Settings;
+
+namespace De.Hochstaetter.Fronius.Services;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public class WebClientService : BindableBase, IWebClientService
@@ -58,7 +60,44 @@ public class WebClientService : BindableBase, IWebClientService
         //    //var test2 = await GetFroniusJsonResponse("config/ics").ConfigureAwait(false);
         //    //var test3 = await GetFroniusJsonResponse("config/solarweb").ConfigureAwait(false);
         //    //var test4 = await GetFroniusJsonResponse("config/emrs").ConfigureAwait(false);
-        //    //var test5 = await GetFroniusJsonResponse("config/timeofuse").ConfigureAwait(false);
+        //    var test5 = await GetFroniusJsonResponse("config/timeofuse").ConfigureAwait(false);
+
+        //    var list = Gen24ChargingRule.Parse(test5);
+
+        //    var test6 = new[]
+        //    {
+        //        new Gen24ChargingRule
+        //        {
+        //            StartTime = new DateTime(1, 1, 1, 5, 0, 0, DateTimeKind.Local),
+        //            EndTime = new DateTime(1, 1, 1, 9, 0, 0, DateTimeKind.Local),
+        //            IsActive = true,
+        //            Power = 200,
+        //            RuleType = ChargingRuleType.MaximumCharge,
+        //            Monday = true, Tuesday = true, Wednesday = true, Thursday = true, Friday = true, Saturday = true, Sunday = true,
+        //        },
+        //        new Gen24ChargingRule
+        //        {
+        //            StartTime = new DateTime(1, 1, 1, 9, 0, 0, DateTimeKind.Local),
+        //            EndTime = new DateTime(1, 1, 1, 10, 0, 0, DateTimeKind.Local),
+        //            IsActive = true,
+        //            Power = 2000,
+        //            RuleType = ChargingRuleType.MaximumCharge,
+        //            Monday = true, Tuesday = true, Wednesday = true, Thursday = true, Friday = true, Saturday = true, Sunday = true,
+        //        },
+        //        new Gen24ChargingRule
+        //        {
+        //            StartTime = new DateTime(1, 1, 1, 11, 0, 0, DateTimeKind.Local),
+        //            EndTime = new DateTime(1, 1, 1, 16, 0, 0, DateTimeKind.Local),
+        //            IsActive = true,
+        //            Power = 3000,
+        //            RuleType = ChargingRuleType.MaximumCharge,
+        //            Monday = true, Tuesday = true, Wednesday = true, Thursday = true, Friday = true, Saturday = true, Sunday = true,
+        //        },
+        //    };
+
+        //    var token = Gen24ChargingRule.GetToken( new Gen24ChargingRule[]{}/*test6*/);
+        //    var tokenString = token.ToString();
+        //    //var result=await GetFroniusJsonResponse("config/timeofuse",token).ConfigureAwait(false);
         //}
         //catch (Exception ex)
         //{
@@ -283,7 +322,7 @@ public class WebClientService : BindableBase, IWebClientService
     public async Task<string> GetEventDescription(string code)
     {
         (localEventToken, invariantEventToken) = await EnsureText("app/assets/i18n/StateCodeTranslations", localEventToken, invariantEventToken).ConfigureAwait(false);
-        return localEventToken?["StateCodes"]?[code]?.Value<string>()??invariantEventToken?["StateCodes"]?[code]?.Value<string>()??code;
+        return localEventToken?["StateCodes"]?[code]?.Value<string>() ?? invariantEventToken?["StateCodes"]?[code]?.Value<string>() ?? code;
     }
 
     private async Task<(JObject?, JObject?)> EnsureText(string baseUrl, JObject? l, JObject? i)

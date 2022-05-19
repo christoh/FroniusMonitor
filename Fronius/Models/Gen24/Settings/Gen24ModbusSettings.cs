@@ -182,7 +182,7 @@ public class Gen24ModbusSettings : BindableBase, ICloneable
         });
     }
 
-    public static Gen24ModbusSettings Parse(IGen24JsonService gen24JsonService, string json)
+    public static Gen24ModbusSettings Parse(string json)
     {
         var token = JToken.Parse(json);
 
@@ -191,6 +191,7 @@ public class Gen24ModbusSettings : BindableBase, ICloneable
             throw new NullReferenceException("No Modbus config present");
         }
 
+        var gen24JsonService = IoC.Get<IGen24JsonService>();
         var result = gen24JsonService.ReadFroniusData<Gen24ModbusSettings>(token["slave"]);
         var masterInterfaces = GetInterfaces("master");
         var slaveInterfaces = GetInterfaces("slave");
@@ -222,8 +223,9 @@ public class Gen24ModbusSettings : BindableBase, ICloneable
         }
     }
 
-    public JToken GetToken(IGen24JsonService gen24Service, Gen24ModbusSettings? oldModbusSettings = null)
+    public JToken GetToken(Gen24ModbusSettings? oldModbusSettings = null)
     {
+        var gen24Service = IoC.Get<IGen24JsonService>();
         var slaveToken = gen24Service.GetUpdateToken(this, oldModbusSettings);
         var token = new JObject();
 

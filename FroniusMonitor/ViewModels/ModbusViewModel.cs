@@ -3,14 +3,12 @@
 public class ModbusViewModel : ViewModelBase
 {
     private readonly IWebClientService webClientService;
-    private readonly IGen24JsonService gen24Service;
     private Gen24ModbusSettings oldSettings = null!;
     private ModbusView view = null!;
 
-    public ModbusViewModel(IGen24JsonService gen24Service, IWebClientService webClientService)
+    public ModbusViewModel(IWebClientService webClientService)
     {
         this.webClientService = webClientService;
-        this.gen24Service = gen24Service;
     }
 
     private Gen24ModbusSettings settings = null!;
@@ -62,7 +60,7 @@ public class ModbusViewModel : ViewModelBase
     {
         await base.OnInitialize().ConfigureAwait(false);
         view = IoC.Get<MainWindow>().ModbusView;
-        oldSettings = Gen24ModbusSettings.Parse(gen24Service, await webClientService.GetFroniusJsonResponse("config/modbus").ConfigureAwait(false));
+        oldSettings = Gen24ModbusSettings.Parse(await webClientService.GetFroniusJsonResponse("config/modbus").ConfigureAwait(false));
         Undo();
     }
 
@@ -129,7 +127,7 @@ public class ModbusViewModel : ViewModelBase
             Settings.Mode = ModbusSlaveMode.Off;
         }
 
-        var updateToken = Settings.GetToken(gen24Service, oldSettings);
+        var updateToken = Settings.GetToken(oldSettings);
 
         if (!updateToken.Children().Any())
         {
