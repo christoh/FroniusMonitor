@@ -601,6 +601,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} does not match a time between 00:00 to 24:00.
+        /// </summary>
+        public static string InvalidChargingRuleTime {
+            get {
+                return ResourceManager.GetString("InvalidChargingRuleTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid time.
         /// </summary>
         public static string InvalidTime {

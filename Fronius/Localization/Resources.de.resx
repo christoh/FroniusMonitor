@@ -451,7 +451,7 @@
 	  <value>Maximaler Ladezustand</value>
   </data>
   <data name="Undo" xml:space="preserve">
-	  <value>Wiederherstellen</value>
+	  <value>Rückgängig</value>
   </data>
   <data name="Apply" xml:space="preserve">
 	  <value>Anwenden</value>
@@ -659,5 +659,8 @@
   </data>
   <data name="InvalidTime" xml:space="preserve">
 	  <value>Ungültige Zeitangabe</value>
+  </data>
+  <data name="InvalidChargingRuleTime" xml:space="preserve">
+	  <value>{0} entspricht nicht einer Zeit von 00:00 bis 24:00</value>
   </data>
 </root>

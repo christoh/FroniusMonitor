@@ -11,6 +11,7 @@ global using System.Reflection;
 global using System.Runtime.CompilerServices;
 global using System.Security.Cryptography;
 global using System.Text;
+global using System.Text.RegularExpressions;
 global using System.Xml;
 global using System.Xml.Serialization;
 global using De.Hochstaetter.Fronius.Attributes;

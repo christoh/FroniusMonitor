@@ -28,12 +28,12 @@ public abstract class BindableBase : INotifyPropertyChanged
         return SetProperty(ref backingField, value, postAction, preFunc, propertyName);
     }
 
-    public void RaisePropertyChanged([CallerMemberName] string? propertyName = null) => OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+    public virtual void RaisePropertyChanged([CallerMemberName] string? propertyName = null) => OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
 
     // Same as RaisePropertyChanged (for compatibility with Caliburn.Micro)
-    public void NotifyOfPropertyChange([CallerMemberName] string? propertyName = null) => RaisePropertyChanged(propertyName);
+    public virtual void NotifyOfPropertyChange([CallerMemberName] string? propertyName = null) => RaisePropertyChanged(propertyName);
 
-    protected void Refresh() => NotifyOfPropertyChange(string.Empty);
+    public virtual void Refresh() => NotifyOfPropertyChange(string.Empty);
 
     protected virtual void OnPropertyChanged(PropertyChangedEventArgs args) => PropertyChanged?.Invoke(this, args);
 }

@@ -663,4 +663,7 @@
   <data name="InvalidTime" xml:space="preserve">
 	  <value>Invalid time</value>
   </data>
+  <data name="InvalidChargingRuleTime" xml:space="preserve">
+	  <value>{0} does not match a time between 00:00 to 24:00</value>
+  </data>
 </root>

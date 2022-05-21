@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Reflection;
+using De.Hochstaetter.Fronius.Extensions;
 
 namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
@@ -11,7 +12,7 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
 
     private SelfConsumptionOptimizationView view = null!;
     private Gen24BatterySettings oldSettings = null!;
-    private BindableCollection<Gen24ChargingRule> oldChargingRules;
+    private BindableCollection<Gen24ChargingRule> oldChargingRules = null!;
 
     public SelfConsumptionOptimizationViewModel(IWebClientService webClientService, IGen24JsonService gen24Service)
     {
@@ -117,7 +118,7 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
         });
     }
 
-    private BindableCollection<Gen24ChargingRule> chargingRules;
+    private BindableCollection<Gen24ChargingRule> chargingRules = null!;
 
     public BindableCollection<Gen24ChargingRule> ChargingRules
     {
@@ -131,6 +132,12 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
     private ICommand? applyCommand;
     public ICommand ApplyCommand => applyCommand ??= new NoParameterCommand(Apply);
 
+    private ICommand? deleteChargingRuleCommand;
+    public ICommand DeleteChargingRuleCommand => deleteChargingRuleCommand ??= new Command<Gen24ChargingRule>(DeleteChargingRule!);
+
+    private ICommand? addChargingRuleCommand;
+    public ICommand AddChargingRuleCommand => addChargingRuleCommand ??= new NoParameterCommand(AddChargingRule);
+
     internal override async Task OnInitialize()
     {
         await base.OnInitialize().ConfigureAwait(false);
@@ -141,7 +148,7 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
         {
             jsonString = await webClientService.GetFroniusJsonResponse("config/timeofuse").ConfigureAwait(false);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             await Dispatcher.InvokeAsync(() =>
             {
@@ -205,6 +212,30 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
         LogGridPower = Math.Log10(RequestedGridPower ?? double.NegativeInfinity);
     }
 
+    private void DeleteChargingRule(Gen24ChargingRule rule)
+    {
+        ChargingRules.Remove(rule);
+    }
+
+    private void AddChargingRule()
+    {
+        ChargingRules.Add(new Gen24ChargingRule
+        {
+            IsActive = false,
+            RuleType = ChargingRuleType.MaximumCharge,
+            Power = 50000,
+            StartTime = "00:00",
+            EndTime = "00:00",
+            Monday = true,
+            Tuesday = true,
+            Wednesday = true,
+            Thursday = true,
+            Friday = true,
+            Saturday = true,
+            Sunday = true,
+        });
+    }
+
     private void Revert()
     {
         ChargingRules = (BindableCollection<Gen24ChargingRule>)oldChargingRules.Clone();
@@ -225,15 +256,14 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
 
         foreach (var error in errors)
         {
-            if (error.BindingInError is BindingExpression { Target: FrameworkElement { IsVisible: false } } expression)
+            if
+            (
+                error.BindingInError is BindingExpression { Target: FrameworkElement { IsVisible: false } } expression &&
+                oldSettings.GetType().GetProperty(expression.ResolvedSourcePropertyName) is { } property
+            )
             {
-                var property = oldSettings.GetType().GetProperty(expression.ResolvedSourcePropertyName);
-
-                if (property != null)
-                {
-                    var value = property.GetValue(oldSettings);
-                    property.SetValue(Settings, value);
-                }
+                var value = property.GetValue(oldSettings);
+                property.SetValue(Settings, value);
             }
         }
 
@@ -253,30 +283,56 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
             return;
         }
 
-        var updateToken = gen24Service.GetUpdateToken(Settings, oldSettings);
+        var rulesChanged = !ChargingRules.SequenceEqual(oldChargingRules);
 
-        if (!updateToken.Children().Any())
+        var updateToken = gen24Service.GetUpdateToken(Settings, oldSettings);
+        var nonRulesChanged = updateToken.Children().Any();
+        var rulesToken = Gen24ChargingRule.GetToken(ChargingRules);
+
+        if (!updateToken.Children().Any() && !rulesChanged)
         {
             await Dispatcher.InvokeAsync(() => MessageBox.Show(view, Resources.NoSettingsChanged, Resources.Warning, MessageBoxButton.OK, MessageBoxImage.Warning));
             return;
         }
 
-        try
+        if (nonRulesChanged)
         {
-            var _ = await webClientService.GetFroniusJsonResponse("config/batteries", updateToken).ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            await Dispatcher.InvokeAsync(() => MessageBox.Show
-            (
-                view, string.Format(Resources.InverterCommError, ex.Message) + Environment.NewLine + Environment.NewLine + updateToken,
-                ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error
-            ));
+            try
+            {
+                var _ = await webClientService.GetFroniusJsonResponse("config/batteries", updateToken).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                await Dispatcher.InvokeAsync(() => MessageBox.Show
+                (
+                    view, string.Format(Resources.InverterCommError, ex.Message) + Environment.NewLine + Environment.NewLine + updateToken,
+                    ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error
+                ));
 
-            return;
+                return;
+            }
+        }
+
+        if (rulesChanged)
+        {
+            try
+            {
+                var _ = await webClientService.GetFroniusJsonResponse("config/timeofuse", rulesToken).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                await Dispatcher.InvokeAsync(() => MessageBox.Show
+                (
+                    view, string.Format(Resources.InverterCommError, ex.Message) + Environment.NewLine + Environment.NewLine + updateToken,
+                    ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error
+                ));
+
+                return;
+            }
         }
 
         oldSettings = Settings;
+        oldChargingRules = ChargingRules;
         Revert();
         //await Dispatcher.InvokeAsync(() => MessageBox.Show(view, Resources.SettingsWritten, Resources.Success, MessageBoxButton.OK, MessageBoxImage.Information));
     }

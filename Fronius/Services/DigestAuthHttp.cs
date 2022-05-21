@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-namespace De.Hochstaetter.Fronius.Services
+﻿namespace De.Hochstaetter.Fronius.Services
 {
     public class DigestAuthHttp
     {

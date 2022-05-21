@@ -10,17 +10,19 @@ public enum ChargingRuleType
 
 public class Gen24ChargingRule : BindableBase, ICloneable
 {
-    private DateTime? startTime;
+    public static Regex TimeRegex { get; } = new(@"^([0-9]{1,2}):([0-9]{1,2})$", RegexOptions.Compiled);
+
+    private string? startTime;
     [FroniusProprietaryImport("TimeTable", "Start", Unit.Time)]
-    public DateTime? StartTime
+    public string? StartTime
     {
         get => startTime;
         set => Set(ref startTime, value);
     }
 
-    private DateTime? endTime;
+    private string? endTime;
     [FroniusProprietaryImport("TimeTable", "End", Unit.Time)]
-    public DateTime? EndTime
+    public string? EndTime
     {
         get => endTime;
         set => Set(ref endTime, value);
@@ -107,28 +109,28 @@ public class Gen24ChargingRule : BindableBase, ICloneable
         set => Set(ref power, value);
     }
 
-    private ChargingRuleType ruleType;
+    private ChargingRuleType? ruleType;
     [FroniusProprietaryImport("ScheduleType", FroniusDataType.Root)]
-    public ChargingRuleType RuleType
+    public ChargingRuleType? RuleType
     {
         get => ruleType;
         set => Set(ref ruleType, value);
     }
 
-    public object Clone() => MemberwiseClone();
-
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public static BindableCollection<Gen24ChargingRule> Parse(string json)
     {
         var token = JToken.Parse(json);
+        var result = new BindableCollection<Gen24ChargingRule>();
 
         if (token["timeofuse"] is not JArray array)
         {
-            throw new NullReferenceException("No ChargingRule config present");
+            return result;
         }
 
         var gen24Service = IoC.Get<IGen24JsonService>();
-        return new BindableCollection<Gen24ChargingRule>(array.Select(timeOfUseToken => gen24Service.ReadFroniusData<Gen24ChargingRule>(timeOfUseToken)));
+        result.AddRange(array.Select(timeOfUseToken => gen24Service.ReadFroniusData<Gen24ChargingRule>(timeOfUseToken)));
+        return result;
     }
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
@@ -139,4 +141,43 @@ public class Gen24ChargingRule : BindableBase, ICloneable
         rules.Apply(rule => array.Add(gen24Service.GetUpdateToken(rule)));
         return new JObject { { "timeofuse", array } };
     }
+
+    public override bool Equals(object? obj)
+    {
+        if (ReferenceEquals(this, obj))
+        {
+            return true;
+        }
+
+        if (obj is Gen24ChargingRule other)
+        {
+            var type = GetType();
+
+            if (type != other.GetType())
+            {
+                return false;
+            }
+
+            var fields = type.GetFields(BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance);
+
+            return fields.All(f =>
+            {
+                var thisValue = f.GetValue(this);
+                var otherValue = f.GetValue(other);
+                return ReferenceEquals(thisValue, other) || (thisValue?.Equals(otherValue) ?? false);
+            });
+        }
+
+        return false;
+    }
+
+    public override int GetHashCode()
+    {
+        return StartTime?.GetHashCode() ?? 0 ^ EndTime?.GetHashCode() ?? 0 ^ Power?.GetHashCode() ?? 0 ^ RuleType?.GetHashCode() ?? 0;
+    }
+
+    public static bool operator ==(Gen24ChargingRule? left, Gen24ChargingRule? right) => ReferenceEquals(left, right) || (left?.Equals(right) ?? false);
+    public static bool operator !=(Gen24ChargingRule? left, Gen24ChargingRule? right) => !(left == right);
+
+    public object Clone() => MemberwiseClone();
 }
