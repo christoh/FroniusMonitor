@@ -118,7 +118,7 @@ public class Gen24ChargingRule : BindableBase, ICloneable
     public object Clone() => MemberwiseClone();
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    public static IList<Gen24ChargingRule> Parse(string json)
+    public static BindableCollection<Gen24ChargingRule> Parse(string json)
     {
         var token = JToken.Parse(json);
 
@@ -128,25 +128,15 @@ public class Gen24ChargingRule : BindableBase, ICloneable
         }
 
         var gen24Service = IoC.Get<IGen24JsonService>();
-        var result= new List<Gen24ChargingRule>(array.Count);
-        result.AddRange(array.Select(timeOfUseToken => gen24Service.ReadFroniusData<Gen24ChargingRule>(timeOfUseToken)));
-
-        return result;
+        return new BindableCollection<Gen24ChargingRule>(array.Select(timeOfUseToken => gen24Service.ReadFroniusData<Gen24ChargingRule>(timeOfUseToken)));
     }
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public static JObject GetToken(IEnumerable<Gen24ChargingRule> rules)
     {
         var gen24Service = IoC.Get<IGen24JsonService>();
-        var token = new JObject();
         var array = new JArray();
-        token.Add("timeofuse", array);
-
-        foreach (var rule in rules)
-        {
-            array.Add(gen24Service.GetUpdateToken(rule));
-        }
-
-        return token;
+        rules.Apply(rule => array.Add(gen24Service.GetUpdateToken(rule)));
+        return new JObject { { "timeofuse", array } };
     }
 }

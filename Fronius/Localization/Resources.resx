@@ -633,4 +633,34 @@
   <data name="Saturday" xml:space="preserve">
 	  <value>Saturday</value>
   </data>
+  <data name="BatteryChargingRules" xml:space="preserve">
+	  <value>Battery Charging Rules</value>
+  </data>
+  <data name="ChargingRuleType_MinimumCharge" xml:space="preserve">
+	  <value>Min. charging power</value>
+  </data>
+  <data name="ChargingRuleType_MaximumCharge" xml:space="preserve">
+	  <value>Max. charging power</value>
+  </data>
+  <data name="ChargingRuleType_MaximumDischarge" xml:space="preserve">
+	  <value>Max. discharging power</value>
+  </data>
+  <data name="ChargingRuleType_MinimumDischarge" xml:space="preserve">
+	  <value>Min. discharging power</value>
+  </data>
+  <data name="DeleteRule" xml:space="preserve">
+	  <value>Delete rule</value>
+  </data>
+  <data name="AddRule" xml:space="preserve">
+	  <value>Add rule</value>
+  </data>
+  <data name="RuleTooltip" xml:space="preserve">
+	  <value>Use the right mouse button to add or delete rules.</value>
+  </data>
+  <data name="RuleType" xml:space="preserve">
+	  <value>Rule Type</value>
+  </data>
+  <data name="InvalidTime" xml:space="preserve">
+	  <value>Invalid time</value>
+  </data>
 </root>

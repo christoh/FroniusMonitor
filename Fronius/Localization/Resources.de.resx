@@ -630,4 +630,34 @@
   <data name="Saturday" xml:space="preserve">
 	  <value>Samstag</value>
   </data>
+  <data name="BatteryChargingRules" xml:space="preserve">
+	  <value>Batterieladeregeln</value>
+  </data>
+  <data name="ChargingRuleType_MinimumCharge" xml:space="preserve">
+	  <value>Min. Ladeleistung</value>
+  </data>
+  <data name="ChargingRuleType_MaximumCharge" xml:space="preserve">
+	  <value>Max. Ladeleistung</value>
+  </data>
+  <data name="ChargingRuleType_MaximumDischarge" xml:space="preserve">
+	  <value>Max. Entladeleistung</value>
+  </data>
+  <data name="ChargingRuleType_MinimumDischarge" xml:space="preserve">
+	  <value>Min. Entladeleistung</value>
+  </data>
+  <data name="DeleteRule" xml:space="preserve">
+	  <value>Regel löschen</value>
+  </data>
+  <data name="AddRule" xml:space="preserve">
+	  <value>Regel hinzufügen</value>
+  </data>
+  <data name="RuleTooltip" xml:space="preserve">
+	  <value>Benutze die rechte Maustaste, um Regeln hinzuzufügen oder zu löschen.</value>
+  </data>
+  <data name="RuleType" xml:space="preserve">
+	  <value>Art der Regel</value>
+  </data>
+  <data name="InvalidTime" xml:space="preserve">
+	  <value>Ungültige Zeitangabe</value>
+  </data>
 </root>

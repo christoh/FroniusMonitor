@@ -1,17 +1,25 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
+﻿using System.Collections.ObjectModel;
+
+namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
 public class SelfConsumptionOptimizationViewModel : ViewModelBase
 {
+    private static readonly IEnumerable<ChargingRuleType> ruleTypes = Enum.GetValues<ChargingRuleType>();
+
     private readonly IWebClientService webClientService;
     private readonly IGen24JsonService gen24Service;
+
     private SelfConsumptionOptimizationView view = null!;
     private Gen24BatterySettings oldSettings = null!;
+    private BindableCollection<Gen24ChargingRule> oldChargingRules;
 
     public SelfConsumptionOptimizationViewModel(IWebClientService webClientService, IGen24JsonService gen24Service)
     {
         this.webClientService = webClientService;
         this.gen24Service = gen24Service;
     }
+
+    public IEnumerable<ChargingRuleType> RuleTypes => ruleTypes;
 
     private Gen24BatterySettings settings = null!;
 
@@ -109,6 +117,14 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
         });
     }
 
+    private BindableCollection<Gen24ChargingRule> chargingRules;
+
+    public BindableCollection<Gen24ChargingRule> ChargingRules
+    {
+        get => chargingRules;
+        set => Set(ref chargingRules, value);
+    }
+
     private ICommand? undoCommand;
     public ICommand UndoCommand => undoCommand ??= new NoParameterCommand(Revert);
 
@@ -119,6 +135,29 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
     {
         await base.OnInitialize().ConfigureAwait(false);
         view = IoC.Get<MainWindow>().SelfConsumptionOptimizationView;
+        string jsonString;
+
+        try
+        {
+            jsonString = await webClientService.GetFroniusJsonResponse("config/timeofuse").ConfigureAwait(false);
+        }
+        catch(Exception ex)
+        {
+            await Dispatcher.InvokeAsync(() =>
+            {
+                MessageBox.Show
+                (
+                    view, string.Format(Resources.InverterCommReadError, ex.Message),
+                    ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error
+                );
+
+                view.Close();
+            });
+
+            return;
+        }
+
+        await Dispatcher.InvokeAsync(() => oldChargingRules = Gen24ChargingRule.Parse(jsonString));
 
         try
         {
@@ -168,6 +207,7 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
 
     private void Revert()
     {
+        ChargingRules = (BindableCollection<Gen24ChargingRule>)oldChargingRules.Clone();
         Settings = (Gen24BatterySettings)oldSettings.Clone();
         socMin = Settings.SocMin ?? 5;
         socMax = Settings.SocMax ?? 100;

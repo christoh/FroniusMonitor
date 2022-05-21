@@ -70,7 +70,7 @@ public class WebClientService : BindableBase, IWebClientService
         //        {
         //            StartTime = new DateTime(1, 1, 1, 5, 0, 0, DateTimeKind.Local),
         //            EndTime = new DateTime(1, 1, 1, 9, 0, 0, DateTimeKind.Local),
-        //            IsActive = true,
+        //            IsActive = false,
         //            Power = 200,
         //            RuleType = ChargingRuleType.MaximumCharge,
         //            Monday = true, Tuesday = true, Wednesday = true, Thursday = true, Friday = true, Saturday = true, Sunday = true,
@@ -79,7 +79,7 @@ public class WebClientService : BindableBase, IWebClientService
         //        {
         //            StartTime = new DateTime(1, 1, 1, 9, 0, 0, DateTimeKind.Local),
         //            EndTime = new DateTime(1, 1, 1, 10, 0, 0, DateTimeKind.Local),
-        //            IsActive = true,
+        //            IsActive = false,
         //            Power = 2000,
         //            RuleType = ChargingRuleType.MaximumCharge,
         //            Monday = true, Tuesday = true, Wednesday = true, Thursday = true, Friday = true, Saturday = true, Sunday = true,
@@ -88,14 +88,14 @@ public class WebClientService : BindableBase, IWebClientService
         //        {
         //            StartTime = new DateTime(1, 1, 1, 11, 0, 0, DateTimeKind.Local),
         //            EndTime = new DateTime(1, 1, 1, 16, 0, 0, DateTimeKind.Local),
-        //            IsActive = true,
+        //            IsActive = false,
         //            Power = 3000,
         //            RuleType = ChargingRuleType.MaximumCharge,
         //            Monday = true, Tuesday = true, Wednesday = true, Thursday = true, Friday = true, Saturday = true, Sunday = true,
         //        },
         //    };
 
-        //    var token = Gen24ChargingRule.GetToken( new Gen24ChargingRule[]{}/*test6*/);
+        //    var token = Gen24ChargingRule.GetToken(/*new Gen24ChargingRule[] { }*/test6);
         //    var tokenString = token.ToString();
         //    //var result=await GetFroniusJsonResponse("config/timeofuse",token).ConfigureAwait(false);
         //}

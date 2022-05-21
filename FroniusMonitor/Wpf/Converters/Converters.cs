@@ -45,15 +45,14 @@ public class DateConverter : ConverterBase
     public override object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         var effectiveCulture = UseCurrentCulture ? CultureInfo.CurrentCulture : culture;
+
         return DateTime.TryParse
         (
             value is IConvertible convertible ? convertible.ToString(effectiveCulture) : value?.ToString(),
             effectiveCulture,
             UseUtc ? DateTimeStyles.AssumeUniversal : DateTimeStyles.AssumeLocal,
             out var date
-        )
-            ? date
-            : null;
+        ) ? date : value;
     }
 }
 

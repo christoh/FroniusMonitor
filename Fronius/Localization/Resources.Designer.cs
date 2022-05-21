@@ -124,6 +124,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add rule.
+        /// </summary>
+        public static string AddRule {
+            get {
+                return ResourceManager.GetString("AddRule", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Allow charge battery from grid.
         /// </summary>
         public static string AllowGridCharge {
@@ -205,6 +214,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Battery Charging Rules.
+        /// </summary>
+        public static string BatteryChargingRules {
+            get {
+                return ResourceManager.GetString("BatteryChargingRules", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Battery is AC coupled.
         /// </summary>
         public static string BatteryIsAcCoupled {
@@ -268,6 +286,42 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Max. charging power.
+        /// </summary>
+        public static string ChargingRuleType_MaximumCharge {
+            get {
+                return ResourceManager.GetString("ChargingRuleType_MaximumCharge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Max. discharging power.
+        /// </summary>
+        public static string ChargingRuleType_MaximumDischarge {
+            get {
+                return ResourceManager.GetString("ChargingRuleType_MaximumDischarge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Min. charging power.
+        /// </summary>
+        public static string ChargingRuleType_MinimumCharge {
+            get {
+                return ResourceManager.GetString("ChargingRuleType_MinimumCharge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Min. discharging power.
+        /// </summary>
+        public static string ChargingRuleType_MinimumDischarge {
+            get {
+                return ResourceManager.GetString("ChargingRuleType_MinimumDischarge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Common Modbus slave settings.
         /// </summary>
         public static string CommonModbusSlaveSettings {
@@ -327,6 +381,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string DcVoltage {
             get {
                 return ResourceManager.GetString("DcVoltage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete rule.
+        /// </summary>
+        public static string DeleteRule {
+            get {
+                return ResourceManager.GetString("DeleteRule", resourceCulture);
             }
         }
         
@@ -534,6 +597,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Invalid {
             get {
                 return ResourceManager.GetString("Invalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid time.
+        /// </summary>
+        public static string InvalidTime {
+            get {
+                return ResourceManager.GetString("InvalidTime", resourceCulture);
             }
         }
         
@@ -1065,6 +1137,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string RtuSlaveSettings {
             get {
                 return ResourceManager.GetString("RtuSlaveSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use the right mouse button to add or delete rules..
+        /// </summary>
+        public static string RuleTooltip {
+            get {
+                return ResourceManager.GetString("RuleTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rule Type.
+        /// </summary>
+        public static string RuleType {
+            get {
+                return ResourceManager.GetString("RuleType", resourceCulture);
             }
         }
         
