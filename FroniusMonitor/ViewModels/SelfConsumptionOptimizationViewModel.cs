@@ -1,7 +1,4 @@
-﻿using System.Reflection;
-using De.Hochstaetter.Fronius.Extensions;
-
-namespace De.Hochstaetter.FroniusMonitor.ViewModels;
+﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
 public class SelfConsumptionOptimizationViewModel : ViewModelBase
 {
@@ -269,9 +266,28 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
 
         var errorList = errors
             .Where(e => e.BindingInError is BindingExpression { Target: FrameworkElement { IsVisible: true } })
-            .Select(e => e.ErrorContent.ToString()).ToArray();
+            .Select(e => e.ErrorContent.ToString()).ToList();
 
-        if (errorList.Length > 0)
+        for (var i = 0; i < ChargingRules.Count; i++)
+        {
+            if (ChargingRules[i].StartTimeDate > ChargingRules[i].EndTimeDate)
+            {
+                errorList.Add(string.Format(Resources.EndBeforeStart, ChargingRules[i]));
+            }
+
+            if (i < ChargingRules.Count - 1)
+            {
+                for (var j = i + 1; j < ChargingRules.Count; j++)
+                {
+                    if (ChargingRules[i].ConflictsWith(ChargingRules[j]))
+                    {
+                        errorList.Add(string.Format(Resources.ChargingRuleConflict, ChargingRules[i], ChargingRules[j]));
+                    }
+                }
+            }
+        }
+
+        if (errorList.Count > 0)
         {
             MessageBox.Show
             (
@@ -284,7 +300,6 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
         }
 
         var rulesChanged = !ChargingRules.SequenceEqual(oldChargingRules);
-
         var updateToken = gen24Service.GetUpdateToken(Settings, oldSettings);
         var nonRulesChanged = updateToken.Children().Any();
         var rulesToken = Gen24ChargingRule.GetToken(ChargingRules);

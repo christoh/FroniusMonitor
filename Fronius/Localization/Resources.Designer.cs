@@ -286,6 +286,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Charging rule &apos;{0}&apos; conflicts with &apos;{1}&apos;.
+        /// </summary>
+        public static string ChargingRuleConflict {
+            get {
+                return ResourceManager.GetString("ChargingRuleConflict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Max. charging power.
         /// </summary>
         public static string ChargingRuleType_MaximumCharge {
@@ -453,6 +462,33 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string End {
             get {
                 return ResourceManager.GetString("End", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos;: Start time is after end time.
+        /// </summary>
+        public static string EndBeforeStart {
+            get {
+                return ResourceManager.GetString("EndBeforeStart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to End (local).
+        /// </summary>
+        public static string EndLocal {
+            get {
+                return ResourceManager.GetString("EndLocal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to End (UTC).
+        /// </summary>
+        public static string EndUtc {
+            get {
+                return ResourceManager.GetString("EndUtc", resourceCulture);
             }
         }
         
@@ -1312,6 +1348,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Start (local).
+        /// </summary>
+        public static string StartLocal {
+            get {
+                return ResourceManager.GetString("StartLocal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Starting (1/7).
         /// </summary>
         public static string StartUp0 {
@@ -1371,6 +1416,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string StartUp6 {
             get {
                 return ResourceManager.GetString("StartUp6", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start (UTC).
+        /// </summary>
+        public static string StartUtc {
+            get {
+                return ResourceManager.GetString("StartUtc", resourceCulture);
             }
         }
         

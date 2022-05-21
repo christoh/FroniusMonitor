@@ -666,4 +666,22 @@
   <data name="InvalidChargingRuleTime" xml:space="preserve">
 	  <value>{0} does not match a time between 00:00 to 24:00</value>
   </data>
+  <data name="StartUtc" xml:space="preserve">
+	  <value>Start (UTC)</value>
+  </data>
+  <data name="StartLocal" xml:space="preserve">
+	  <value>Start (local)</value>
+  </data>
+  <data name="EndUtc" xml:space="preserve">
+	  <value>End (UTC)</value>
+  </data>
+  <data name="EndLocal" xml:space="preserve">
+	  <value>End (local)</value>
+  </data>
+  <data name="EndBeforeStart" xml:space="preserve">
+	  <value>'{0}': Start time is after end time</value>
+  </data>
+  <data name="ChargingRuleConflict" xml:space="preserve">
+	  <value>Charging rule '{0}' conflicts with '{1}'</value>
+  </data>
 </root>

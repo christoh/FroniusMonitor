@@ -17,7 +17,7 @@ public class Gen24ChargingRule : BindableBase, ICloneable
     public string? StartTime
     {
         get => startTime;
-        set => Set(ref startTime, value);
+        set => Set(ref startTime, value, () => NotifyOfPropertyChange(nameof(StartTimeDate)));
     }
 
     private string? endTime;
@@ -25,8 +25,13 @@ public class Gen24ChargingRule : BindableBase, ICloneable
     public string? EndTime
     {
         get => endTime;
-        set => Set(ref endTime, value);
+        set => Set(ref endTime, value, () => NotifyOfPropertyChange(nameof(EndTimeDate)));
     }
+
+    public DateTime? StartTimeDate => GetDate(StartTime);
+
+    public DateTime? EndTimeDate => GetDate(EndTime);
+
 
     private bool? monday;
 
@@ -141,6 +146,69 @@ public class Gen24ChargingRule : BindableBase, ICloneable
         rules.Apply(rule => array.Add(gen24Service.GetUpdateToken(rule)));
         return new JObject { { "timeofuse", array } };
     }
+
+    public bool ConflictsWith(Gen24ChargingRule other)
+    {
+        return
+            // Both rules are active
+            IsActive.HasValue && IsActive.Value && other.IsActive.HasValue && other.IsActive.Value &&
+
+            // Rules Overlap in time
+            StartTimeDate < other.EndTimeDate && EndTimeDate > other.StartTimeDate &&
+
+            RuleType.HasValue && other.RuleType.HasValue &&
+            (
+                // Same rule type
+                RuleType.Value == other.RuleType.Value ||
+
+                // Maximum is below Minimum
+                RuleType.Value==ChargingRuleType.MaximumCharge && other.RuleType==ChargingRuleType.MinimumCharge && Power<other.Power ||
+                // Minimum is above Maximum
+                RuleType.Value==ChargingRuleType.MinimumCharge && other.RuleType==ChargingRuleType.MaximumCharge && Power>other.Power ||
+                // Maximum is below Minimum
+                RuleType.Value==ChargingRuleType.MaximumDischarge && other.RuleType==ChargingRuleType.MinimumDischarge && Power<other.Power ||
+                // Minimum is above Maximum
+                RuleType.Value==ChargingRuleType.MinimumDischarge && other.RuleType==ChargingRuleType.MaximumDischarge && Power>other.Power
+            ) &&
+
+            // Weekdays overlap
+            (
+                Monday.HasValue && Monday.Value && other.Monday.HasValue && other.Monday.Value ||
+                Tuesday.HasValue && Tuesday.Value && other.Tuesday.HasValue && other.Tuesday.Value ||
+                Wednesday.HasValue && Wednesday.Value && other.Wednesday.HasValue && other.Wednesday.Value ||
+                Thursday.HasValue && Thursday.Value && other.Thursday.HasValue && other.Thursday.Value ||
+                Friday.HasValue && Friday.Value && other.Friday.HasValue && other.Friday.Value ||
+                Saturday.HasValue && Saturday.Value && other.Saturday.HasValue && other.Saturday.Value ||
+                Sunday.HasValue && Sunday.Value && other.Sunday.HasValue && other.Sunday.Value
+            );
+    }
+
+    public static DateTime? GetDate(string? timeString)
+    {
+        if (timeString == null)
+        {
+            return null;
+        }
+
+        var match = TimeRegex.Match(timeString);
+
+        if (!match.Success)
+        {
+            return null;
+        }
+
+        var hours = byte.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
+        var minutes = byte.Parse(match.Groups[2].Value, CultureInfo.InvariantCulture);
+
+        if (hours > 24 || minutes > 59 || hours == 24 && minutes != 0)
+        {
+            return null;
+        }
+
+        return DateTime.UtcNow.Date.AddHours(hours).AddMinutes(minutes);
+    }
+
+    public override string ToString() => $"{StartTimeDate:HH:mm}-{EndTimeDate:HH:mm}: {RuleType?.ToDisplayName()??"---"}: {Power??0} W";
 
     public override bool Equals(object? obj)
     {

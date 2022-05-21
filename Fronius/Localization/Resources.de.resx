@@ -663,4 +663,22 @@
   <data name="InvalidChargingRuleTime" xml:space="preserve">
 	  <value>{0} entspricht nicht einer Zeit von 00:00 bis 24:00</value>
   </data>
+  <data name="StartUtc" xml:space="preserve">
+	  <value>Beginn (UTC)</value>
+  </data>
+  <data name="StartLocal" xml:space="preserve">
+	  <value>Beginn (Ortszeit)</value>
+  </data>
+  <data name="EndUtc" xml:space="preserve">
+	  <value>Ende (UTC)</value>
+  </data>
+  <data name="EndLocal" xml:space="preserve">
+	  <value>Ende (Ortszeit)</value>
+  </data>
+  <data name="EndBeforeStart" xml:space="preserve">
+	  <value>'{0}': Anfangszeit liegt vor der Endzeit</value>
+  </data>
+  <data name="ChargingRuleConflict" xml:space="preserve">
+	  <value>Batterieladeregel '{0}' steht in Konflikt zu '{1}'</value>
+  </data>
 </root>

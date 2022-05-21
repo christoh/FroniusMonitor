@@ -11,15 +11,14 @@
         xmlns:l="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Localization"
         xmlns:m="clr-namespace:De.Hochstaetter.Fronius.Models.Gen24.Settings;assembly=Fronius"
         mc:Ignorable="d"
-        Title="{x:Static p:Resources.SelfConsumptionOptimization}" Width="750" SizeToContent="Height" ResizeMode="CanMinimize"
-        d:DataContext="{d:DesignInstance Type=vm:SelfConsumptionOptimizationViewModel}"
->
+        Title="{x:Static p:Resources.SelfConsumptionOptimization}" SizeToContent="WidthAndHeight"  ResizeMode="CanMinimize"
+        d:DataContext="{d:DesignInstance Type=vm:SelfConsumptionOptimizationViewModel}">
     <Window.Resources>
         <Style TargetType="Button">
-            <Setter Property="Margin" Value="0,0,8,0"/>
-            <Setter Property="MinHeight" Value="30"/>
-            <Setter Property="MinWidth" Value="70"/>
-            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="Margin" Value="0,0,8,0" />
+            <Setter Property="MinHeight" Value="30" />
+            <Setter Property="MinWidth" Value="70" />
+            <Setter Property="Padding" Value="8,0" />
         </Style>
     </Window.Resources>
     <Grid>
@@ -62,8 +61,8 @@
                             <Run Text="{x:Static p:Resources.Power}" /><Run Text=":" />
                         </TextBlock>
                         <TextBox TextAlignment="Center" Width="40"
-                                 Text="{co:ValidationBinding Path=RequestedGridPower, Rule={v:MinMaxIntRule Minimum=0, Maximum=50000}}"  />
-                        <TextBlock Text="W" Margin="4,0,0,0"/>
+                                 Text="{co:ValidationBinding Path=RequestedGridPower, Rule={v:MinMaxIntRule Minimum=0, Maximum=50000}}" />
+                        <TextBlock Text="W" Margin="4,0,0,0" />
                     </StackPanel>
                     <Slider Grid.Row="3" Value="{Binding LogGridPower, Mode=TwoWay}"
                             HorizontalAlignment="Stretch"
@@ -75,13 +74,13 @@
         <GroupBox Grid.Row="1" Header="{x:Static p:Resources.BatteryChargingOptions}" Margin="8,4">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <StackPanel Margin="16,16,8,16" Grid.Row="0">
                     <StackPanel.Resources>
                         <Style TargetType="CheckBox">
-                            <Setter Property="Margin" Value="0,0,8,0"/>
+                            <Setter Property="Margin" Value="0,0,8,0" />
                         </Style>
                     </StackPanel.Resources>
                     <CheckBox Content="{l:Loc 'BATTERIES', 'HYB_EVU_CHARGEFROMGRID'}"
@@ -92,24 +91,24 @@
                               Content="{x:Static p:Resources.EnableBattery}"
                               IsChecked="{Binding Settings.IsEnabled}" />
                     <CheckBox IsEnabled="{Binding EnableDanger}"
-                                  Content="{x:Static p:Resources.CalibrateBattery}"
-                                  IsChecked="{Binding Settings.IsInCalibration}" />
+                              Content="{x:Static p:Resources.CalibrateBattery}"
+                              IsChecked="{Binding Settings.IsInCalibration}" />
                     <CheckBox IsEnabled="{Binding EnableDanger}"
-                                  Content="{x:Static p:Resources.BatteryIsAcCoupled}"
-                                  IsChecked="{Binding Settings.IsAcCoupled}" />
+                              Content="{x:Static p:Resources.BatteryIsAcCoupled}"
+                              IsChecked="{Binding Settings.IsAcCoupled}" />
                 </StackPanel>
-                <Grid Grid.Row="1" 
+                <Grid Grid.Row="1"
                       Visibility="{Binding Settings.ChargeFromAc, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,-2" HorizontalAlignment="Center" Grid.Row="0">
                         <TextBlock Margin="0,0,4,0">
-                        <Run Text="{x:Static p:Resources.MaxHomeChargingPower}" /><Run Text=":" />
+                            <Run Text="{x:Static p:Resources.MaxHomeChargingPower}" /><Run Text=":" />
                         </TextBlock>
-                        <TextBox TextAlignment="Center" Width="40" Text="{co:ValidationBinding Path= AcPowerMinimum, Converter={co:ToAbsolute}, Rule={v:MinMaxIntRule}}"/>
-                        <TextBlock Margin="4,0,0,0" Text="W"/>
+                        <TextBox TextAlignment="Center" Width="40" Text="{co:ValidationBinding Path= AcPowerMinimum, Converter={co:ToAbsolute}, Rule={v:MinMaxIntRule}}" />
+                        <TextBlock Margin="4,0,0,0" Text="W" />
                     </StackPanel>
                     <Slider Grid.Row="1" Value="{Binding LogHomePower, Mode=TwoWay}"
                             HorizontalAlignment="Stretch"
@@ -144,7 +143,7 @@
                         </TextBlock>
                         <TextBox TextAlignment="Center" Width="40"
                                  Text="{co:ValidationBinding Path=SocMin, Rule={v:RegExRule Pattern='^100$|^0*([0-9]{1,2})$', Message={x:Static p:Resources.MustBePercent}}}" />
-                        <TextBlock Margin="4,0,0,0" Text="%"/>
+                        <TextBlock Margin="4,0,0,0" Text="%" />
                     </StackPanel>
                     <Slider Value="{Binding SocMin, Mode=TwoWay}" Grid.Row="1" HorizontalAlignment="Stretch" Minimum="5" Maximum="100" />
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,-2" HorizontalAlignment="Center" Grid.Row="2">
@@ -153,7 +152,7 @@
                         </TextBlock>
                         <TextBox TextAlignment="Center" Width="40"
                                  Text="{co:ValidationBinding Path=SocMax, Rule={v:RegExRule Pattern='^100$|^0*([0-9]{1,2})$', Message={x:Static p:Resources.MustBePercent}}}" />
-                        <TextBlock Margin="4,0,0,0" Text="%"/>
+                        <TextBlock Margin="4,0,0,0" Text="%" />
                     </StackPanel>
                     <Slider Value="{Binding SocMax, Mode=TwoWay}" Grid.Row="3" HorizontalAlignment="Stretch" Minimum="5" Maximum="100" />
                 </Grid>
@@ -174,7 +173,7 @@
                     </TextBlock>
                     <TextBox TextAlignment="Center" Width="40"
                              Text="{co:ValidationBinding Path=Settings.BackupCriticalSoc, Rule={v:RegExRule Pattern='^100$|^0*([0-9]{1,2})$', Message={x:Static p:Resources.MustBePercent}}}" />
-                    <TextBlock Margin="4,0,0,0" Text="%"/>
+                    <TextBlock Margin="4,0,0,0" Text="%" />
                 </StackPanel>
                 <Slider Value="{Binding Settings.BackupCriticalSoc, Mode=TwoWay}" Grid.Row="1" HorizontalAlignment="Stretch" Minimum="0" Maximum="100" />
                 <StackPanel Orientation="Horizontal" Margin="0,8,0,-2" HorizontalAlignment="Center" Grid.Row="2">
@@ -183,50 +182,50 @@
                     </TextBlock>
                     <TextBox TextAlignment="Center" Width="40"
                              Text="{co:ValidationBinding Path=Settings.BackupReserve, Rule={v:MinMaxIntRule Minimum=5, Maximum=95}}" />
-                    <TextBlock Margin="4,0,0,0" Text="%"/>
+                    <TextBlock Margin="4,0,0,0" Text="%" />
                 </StackPanel>
                 <Slider Value="{Binding Settings.BackupReserve, Mode=TwoWay}" Grid.Row="3" HorizontalAlignment="Stretch" Minimum="5" Maximum="95" />
             </Grid>
         </GroupBox>
 
         <GroupBox Grid.Row="3" Margin="8,4" Header="{x:Static p:Resources.BatteryChargingRules}">
-            <Grid  Margin="8">
+            <Grid Margin="8">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <DataGrid Grid.Row="0" CanUserAddRows="False" RowHeaderWidth="20" SelectionUnit="FullRow"  SelectionMode="Single"  ItemsSource="{Binding ChargingRules}" AutoGenerateColumns="False" GridLinesVisibility="Vertical" AlternatingRowBackground="AntiqueWhite" BorderThickness="1">
+                <DataGrid Grid.Row="0" CanUserAddRows="False" RowHeaderWidth="20" SelectionUnit="FullRow" SelectionMode="Single" ItemsSource="{Binding ChargingRules}" AutoGenerateColumns="False" GridLinesVisibility="Vertical" AlternatingRowBackground="AntiqueWhite" BorderThickness="1">
                     <DataGrid.RowStyle>
                         <Style TargetType="DataGridRow">
-                            <Setter Property="ToolTip" Value="{x:Static p:Resources.RuleTooltip}"/>
-                            <Setter Property="Tag" Value="{Binding Path=DataContext, RelativeSource={RelativeSource FindAncestor, AncestorType=DataGrid}}"/>
+                            <Setter Property="ToolTip" Value="{x:Static p:Resources.RuleTooltip}" />
+                            <Setter Property="Tag" Value="{Binding Path=DataContext, RelativeSource={RelativeSource FindAncestor, AncestorType=DataGrid}}" />
                             <Setter Property="ContextMenu">
                                 <Setter.Value>
                                     <ContextMenu Placement="Center">
                                         <MenuItem Header="{x:Static p:Resources.AddRule}"
-                                              Command="{Binding Path=PlacementTarget.(FrameworkElement.Tag).(vm:SelfConsumptionOptimizationViewModel.AddChargingRuleCommand), RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}"/>
+                                                  Command="{Binding Path=PlacementTarget.(FrameworkElement.Tag).(vm:SelfConsumptionOptimizationViewModel.AddChargingRuleCommand), RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
                                         <MenuItem Header="{x:Static p:Resources.DeleteRule}"
-                                              Command="{Binding Path=PlacementTarget.(FrameworkElement.Tag).(vm:SelfConsumptionOptimizationViewModel.DeleteChargingRuleCommand), RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}"
-                                              CommandParameter="{Binding Path=PlacementTarget.(FrameworkElement.DataContext),RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}"/>
+                                                  Command="{Binding Path=PlacementTarget.(FrameworkElement.Tag).(vm:SelfConsumptionOptimizationViewModel.DeleteChargingRuleCommand), RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}"
+                                                  CommandParameter="{Binding Path=PlacementTarget.(FrameworkElement.DataContext),RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
                                     </ContextMenu>
                                 </Setter.Value>
                             </Setter>
                         </Style>
                     </DataGrid.RowStyle>
                     <DataGrid.Resources>
-                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightSkyBlue"/>
-                        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="LightSkyBlue"/>
-                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightSkyBlue" />
+                        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="LightSkyBlue" />
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black" />
 
                         <Style TargetType="DataGridColumnHeader" x:Key="Es">
-                            <Setter Property="Padding"  Value="10,8"/>
+                            <Setter Property="Padding" Value="10,8" />
                         </Style>
 
                         <Style TargetType="DataGridCell">
-                            <Setter Property="MinHeight" Value="32"/>
-                            <Setter Property="VerticalContentAlignment" Value="Bottom"></Setter>
-                            <Setter Property="VerticalAlignment" Value="Bottom"></Setter>
+                            <Setter Property="MinHeight" Value="32" />
+                            <Setter Property="VerticalContentAlignment" Value="Bottom" />
+                            <Setter Property="VerticalAlignment" Value="Bottom" />
                         </Style>
 
                         <Style TargetType="ComboBox">
@@ -249,9 +248,9 @@
 
                         <Style TargetType="TextBox" x:Key="TextBoxStyle">
                             <Setter Property="Margin" Value="0,0" />
-                            <Setter Property="Background" Value="White"></Setter>
+                            <Setter Property="Background" Value="White" />
                             <Setter Property="Padding" Value="6,7,0,0" />
-                            <Setter Property="MaxWidth" Value="80"/>
+                            <Setter Property="MaxWidth" Value="80" />
                             <Setter Property="BorderThickness" Value="0" />
                             <Setter Property="VerticalAlignment" Value="Stretch" />
                             <Setter Property="HorizontalAlignment" Value="Stretch" />
@@ -259,7 +258,7 @@
 
                         <Style TargetType="TextBlock" x:Key="TextBlockStyle">
                             <Setter Property="Margin" Value="8,0" />
-                            <Setter Property="MaxWidth" Value="80"/>
+                            <Setter Property="MaxWidth" Value="80" />
                             <Setter Property="VerticalAlignment" Value="Center" />
                             <Setter Property="HorizontalAlignment" Value="Stretch" />
                         </Style>
@@ -269,72 +268,80 @@
                     <DataGrid.Columns>
 
                         <DataGridCheckBoxColumn Header="{x:Static p:Resources.Active}" Binding="{Binding IsActive, UpdateSourceTrigger=PropertyChanged}" CanUserReorder="False" CanUserResize="True" CanUserSort="True" SortMemberPath="IsActive"
-                                            HeaderStyle="{StaticResource Es}" ElementStyle="{StaticResource CheckBoxStyle}"/>
+                                                HeaderStyle="{StaticResource Es}" ElementStyle="{StaticResource CheckBoxStyle}" />
 
-                        <DataGridTextColumn Header="{x:Static p:Resources.Start}" Binding="{co:ValidationBinding StartTime, Rule={v:ChargingRuleDate}}" SortMemberPath="StartTime"
-                                        HeaderStyle="{StaticResource Es}" CanUserReorder="False" CanUserResize="True" CanUserSort="True" SortDirection="Ascending"
-                                        ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}"/>
+                        <DataGridTextColumn Header="{x:Static p:Resources.StartUtc}" Binding="{co:ValidationBinding StartTime, Rule={v:ChargingRuleDate}}" SortMemberPath="StartTime"
+                                            HeaderStyle="{StaticResource Es}" CanUserReorder="False" CanUserResize="True" CanUserSort="True" SortDirection="Ascending"
+                                            ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
 
-                        <DataGridTextColumn Header="{x:Static p:Resources.End}" Binding="{co:ValidationBinding EndTime, Rule={v:ChargingRuleDate}}" SortMemberPath="EndTime"
-                                        HeaderStyle="{StaticResource Es}" CanUserReorder="False" CanUserResize="True" CanUserSort="True"
-                                        ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}"/>
+                        <DataGridTextColumn Header="{x:Static p:Resources.EndUtc}" Binding="{co:ValidationBinding EndTime, Rule={v:ChargingRuleDate}}" SortMemberPath="EndTime"
+                                            HeaderStyle="{StaticResource Es}" CanUserReorder="False" CanUserResize="True" CanUserSort="True"
+                                            ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
+
+                        <DataGridTextColumn Header="{x:Static p:Resources.StartLocal}" IsReadOnly="True" Binding="{Binding StartTimeDate, Mode=OneWay, Converter={co:DateConverter StringFormat=HH:mm}}" SortMemberPath="StartTimeDate"
+                                            HeaderStyle="{StaticResource Es}" CanUserReorder="False" CanUserResize="True" CanUserSort="True" SortDirection="Ascending"
+                                            ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
+
+                        <DataGridTextColumn Header="{x:Static p:Resources.EndLocal}" IsReadOnly="True"  Binding="{Binding EndTimeDate, Converter={co:DateConverter StringFormat=HH:mm}}" SortMemberPath="EndTimeDate"
+                                            HeaderStyle="{StaticResource Es}" CanUserReorder="False" CanUserResize="True" CanUserSort="True"
+                                            ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
 
                         <DataGridTemplateColumn Header="{x:Static p:Resources.RuleType}" HeaderStyle="{StaticResource Es}" CanUserReorder="False" CanUserResize="True" CanUserSort="True" SortMemberPath="RuleType">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate DataType="{x:Type m:Gen24ChargingRule}">
-                                    <ComboBox SelectedItem="{Binding RuleType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ItemsSource="{Binding Path=DataContext.(vm:SelfConsumptionOptimizationViewModel.RuleTypes), RelativeSource={RelativeSource FindAncestor, AncestorType=DataGrid}}"/>
+                                    <ComboBox SelectedItem="{Binding RuleType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ItemsSource="{Binding Path=DataContext.(vm:SelfConsumptionOptimizationViewModel.RuleTypes), RelativeSource={RelativeSource FindAncestor, AncestorType=DataGrid}}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
                         <DataGridTextColumn Header="{x:Static p:Resources.Power}" SortMemberPath="Power" Binding="{Binding Power, UpdateSourceTrigger=PropertyChanged}"
-                                        HeaderStyle="{StaticResource Es}" CanUserReorder="False" CanUserResize="True" CanUserSort="True"
-                                        ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
+                                            HeaderStyle="{StaticResource Es}" CanUserReorder="False" CanUserResize="True" CanUserSort="True"
+                                            ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
 
                         <DataGridCheckBoxColumn Header="{x:Static p:Resources.Monday_One}" SortMemberPath="Monday" Binding="{Binding Monday, UpdateSourceTrigger=PropertyChanged}" CanUserReorder="False" CanUserResize="False" CanUserSort="True"
-                                            HeaderStyle="{StaticResource Es}" ElementStyle="{StaticResource CheckBoxStyle}"/>
+                                                HeaderStyle="{StaticResource Es}" ElementStyle="{StaticResource CheckBoxStyle}" />
 
                         <DataGridCheckBoxColumn Header="{x:Static p:Resources.Tuesday_One}" SortMemberPath="Tuesday" Binding="{Binding Tuesday, UpdateSourceTrigger=PropertyChanged}" CanUserReorder="False" CanUserResize="False" CanUserSort="True"
-                                            HeaderStyle="{StaticResource Es}" ElementStyle="{StaticResource CheckBoxStyle}"/>
+                                                HeaderStyle="{StaticResource Es}" ElementStyle="{StaticResource CheckBoxStyle}" />
 
                         <DataGridCheckBoxColumn Header="{x:Static p:Resources.Wednesday_One}" SortMemberPath="Wednesday" Binding="{Binding Wednesday, UpdateSourceTrigger=PropertyChanged}" CanUserReorder="False" CanUserResize="False" CanUserSort="True"
-                                            HeaderStyle="{StaticResource Es}" ElementStyle="{StaticResource CheckBoxStyle}"/>
+                                                HeaderStyle="{StaticResource Es}" ElementStyle="{StaticResource CheckBoxStyle}" />
 
                         <DataGridCheckBoxColumn Header="{x:Static p:Resources.Thursday_One}" SortMemberPath="Thursday" Binding="{Binding Thursday, UpdateSourceTrigger=PropertyChanged}" CanUserReorder="False" CanUserResize="False" CanUserSort="True"
-                                            HeaderStyle="{StaticResource Es}" ElementStyle="{StaticResource CheckBoxStyle}"/>
+                                                HeaderStyle="{StaticResource Es}" ElementStyle="{StaticResource CheckBoxStyle}" />
 
                         <DataGridCheckBoxColumn Header="{x:Static p:Resources.Friday_One}" SortMemberPath="Friday" Binding="{Binding Friday, UpdateSourceTrigger=PropertyChanged}" CanUserReorder="False" CanUserResize="False" CanUserSort="True"
-                                            HeaderStyle="{StaticResource Es}" ElementStyle="{StaticResource CheckBoxStyle}"/>
+                                                HeaderStyle="{StaticResource Es}" ElementStyle="{StaticResource CheckBoxStyle}" />
 
                         <DataGridCheckBoxColumn Header="{x:Static p:Resources.Saturday_One}" SortMemberPath="Saturday" Binding="{Binding Saturday, UpdateSourceTrigger=PropertyChanged}" CanUserReorder="False" CanUserResize="False" CanUserSort="True"
-                                            HeaderStyle="{StaticResource Es}" ElementStyle="{StaticResource CheckBoxStyle}"/>
+                                                HeaderStyle="{StaticResource Es}" ElementStyle="{StaticResource CheckBoxStyle}" />
 
                         <DataGridCheckBoxColumn Header="{x:Static p:Resources.Sunday_One}" SortMemberPath="Sunday" Binding="{Binding Sunday, UpdateSourceTrigger=PropertyChanged}" CanUserReorder="False" CanUserResize="False" CanUserSort="True"
-                                            HeaderStyle="{StaticResource Es}" ElementStyle="{StaticResource CheckBoxStyle}"/>
+                                                HeaderStyle="{StaticResource Es}" ElementStyle="{StaticResource CheckBoxStyle}" />
 
                     </DataGrid.Columns>
                 </DataGrid>
 
                 <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,8,0,0">
-                    <Button Content="{x:Static p:Resources.AddRule}" Width="Auto" Command="{Binding AddChargingRuleCommand}"/>
+                    <Button Content="{x:Static p:Resources.AddRule}" Width="Auto" Command="{Binding AddChargingRuleCommand}" />
                 </StackPanel>
             </Grid>
         </GroupBox>
 
-        <Grid Grid.Row="5" VerticalAlignment="Bottom" Margin="8,16,0,16" >
+        <Grid Grid.Row="5" VerticalAlignment="Bottom" Margin="8,16,0,16">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Text="{x:Static p:Resources.Danger}" Margin="0,0,4,0" VerticalAlignment="Center">
-                <Run Text=":"/>
+                <Run Text=":" />
             </TextBlock>
-            <ToggleButton Grid.Column="1" Height="18" VerticalAlignment="Center" IsChecked="{Binding EnableDanger}"/>
-            <Button Grid.Column="3"  VerticalAlignment="Center" Content="{x:Static p:Resources.Undo}" Command="{Binding UndoCommand}" />
-            <Button Grid.Column="4"  VerticalAlignment="Center" Content="{x:Static p:Resources.Apply}" Command="{Binding ApplyCommand}" />
+            <ToggleButton Grid.Column="1" Height="18" VerticalAlignment="Center" IsChecked="{Binding EnableDanger}" />
+            <Button Grid.Column="3" VerticalAlignment="Center" Content="{x:Static p:Resources.Undo}" Command="{Binding UndoCommand}" />
+            <Button Grid.Column="4" VerticalAlignment="Center" Content="{x:Static p:Resources.Apply}" Command="{Binding ApplyCommand}" />
         </Grid>
 
     </Grid>
