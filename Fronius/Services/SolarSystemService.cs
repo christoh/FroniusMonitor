@@ -136,6 +136,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
             result.FritzBox = null;
         }
 
+        result.Versions = Gen24Versions.Parse(await webClientService.GetFroniusJsonResponse("status/version").ConfigureAwait(false));
         result.Gen24System = await webClientService.GetFroniusData().ConfigureAwait(false);
 
         foreach (var deviceGroup in (await webClientService.GetDevices().ConfigureAwait(false)).Devices.GroupBy(d => d.DeviceClass))

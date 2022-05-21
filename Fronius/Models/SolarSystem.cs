@@ -24,6 +24,14 @@ public class SolarSystem : BindableBase, IHierarchicalCollection
         set => Set(ref gen24System, value);
     }
 
+    private Gen24Versions? versions;
+
+    public Gen24Versions? Versions
+    {
+        get => versions;
+        set => Set(ref versions, value);
+    }
+
     private FritzBoxDeviceList? fritzBox;
 
     public FritzBoxDeviceList? FritzBox
