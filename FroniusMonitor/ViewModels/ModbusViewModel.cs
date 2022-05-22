@@ -1,14 +1,12 @@
 ﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
-public class ModbusViewModel : ViewModelBase
+public class ModbusViewModel : SettingsViewModelBase
 {
-    private readonly IWebClientService webClientService;
     private Gen24ModbusSettings oldSettings = null!;
     private ModbusView view = null!;
 
-    public ModbusViewModel(IWebClientService webClientService)
+    public ModbusViewModel(IWebClientService webClientService, IGen24JsonService gen24JsonService):base(webClientService,gen24JsonService)
     {
-        this.webClientService = webClientService;
     }
 
     private Gen24ModbusSettings settings = null!;
@@ -60,7 +58,7 @@ public class ModbusViewModel : ViewModelBase
     {
         await base.OnInitialize().ConfigureAwait(false);
         view = IoC.Get<MainWindow>().ModbusView;
-        oldSettings = Gen24ModbusSettings.Parse(await webClientService.GetFroniusJsonResponse("config/modbus").ConfigureAwait(false));
+        oldSettings = Gen24ModbusSettings.Parse(await WebClientService.GetFroniusJsonResponse("config/modbus").ConfigureAwait(false));
         Undo();
     }
 
@@ -72,85 +70,85 @@ public class ModbusViewModel : ViewModelBase
 
     public async void Apply()
     {
-        var errors = view.FindVisualChildren<TextBox>().SelectMany(Validation.GetErrors).ToArray();
-
-        foreach (var error in errors)
-        {
-            if (error.BindingInError is BindingExpression {Target: FrameworkElement {IsVisible: false}} expression)
-            {
-                var type = oldSettings.GetType();
-                var property = type.GetProperty(expression.ResolvedSourcePropertyName);
-
-                if (property != null)
-                {
-                    var value = property.GetValue(oldSettings);
-                    property.SetValue(Settings, value);
-                }
-            }
-        }
-
-        var errorList = errors
-            .Where(e => e.BindingInError is BindingExpression {Target: FrameworkElement {IsVisible: true}})
-            .Select(e => e.ErrorContent.ToString()).ToArray();
-
-        if (errorList.Length > 0)
-        {
-            MessageBox.Show
-            (
-                view,
-                $"{Resources.PleaseCorrectErrors}:{Environment.NewLine}{errorList.Aggregate(string.Empty, (c, n) => c + Environment.NewLine + "• " + n)}",
-                Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error
-            );
-
-            return;
-        }
-
-        var isModbusRtu = Settings.Rtu0 == ModbusInterfaceRole.Slave || Settings.Rtu1 == ModbusInterfaceRole.Slave;
-        var isAnyModbus = isModbusRtu || EnableTcp;
-
-        Settings.InverterAddress = !isAnyModbus ? (byte)0 : (byte)1;
-
-        if (EnableTcp && isModbusRtu)
-        {
-            Settings.Mode = ModbusSlaveMode.Both;
-        }
-        else if (EnableTcp)
-        {
-            Settings.Mode = ModbusSlaveMode.Tcp;
-        }
-        else if (isModbusRtu)
-        {
-            Settings.Mode = ModbusSlaveMode.Rtu;
-        }
-        else
-        {
-            Settings.Mode = ModbusSlaveMode.Off;
-        }
-
-        var updateToken = Settings.GetToken(oldSettings);
-
-        if (!updateToken.Children().Any())
-        {
-            await Dispatcher.InvokeAsync(() => MessageBox.Show(view, Resources.NoSettingsChanged, Resources.Warning, MessageBoxButton.OK, MessageBoxImage.Warning));
-            return;
-        }
+        IsInUpdate = true;
 
         try
         {
-            var _ = await webClientService.GetFroniusJsonResponse("config/modbus", updateToken).ConfigureAwait(false);
+            var errors = view.FindVisualChildren<TextBox>().SelectMany(Validation.GetErrors).ToArray();
+
+            foreach (var error in errors)
+            {
+                if (error.BindingInError is BindingExpression { Target: FrameworkElement { IsVisible: false } } expression)
+                {
+                    var type = oldSettings.GetType();
+                    var property = type.GetProperty(expression.ResolvedSourcePropertyName);
+
+                    if (property != null)
+                    {
+                        var value = property.GetValue(oldSettings);
+                        property.SetValue(Settings, value);
+                    }
+                }
+            }
+
+            var errorList = errors
+                .Where(e => e.BindingInError is BindingExpression { Target: FrameworkElement { IsVisible: true } })
+                .Select(e => e.ErrorContent.ToString()).ToArray();
+
+            if (errorList.Length > 0)
+            {
+                MessageBox.Show
+                (
+                    view,
+                    $"{Resources.PleaseCorrectErrors}:{Environment.NewLine}{errorList.Aggregate(string.Empty, (c, n) => c + Environment.NewLine + "• " + n)}",
+                    Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error
+                );
+
+                return;
+            }
+
+            var isModbusRtu = Settings.Rtu0 == ModbusInterfaceRole.Slave || Settings.Rtu1 == ModbusInterfaceRole.Slave;
+            var isAnyModbus = isModbusRtu || EnableTcp;
+
+            Settings.InverterAddress = !isAnyModbus ? (byte)0 : (byte)1;
+
+            if (EnableTcp && isModbusRtu)
+            {
+                Settings.Mode = ModbusSlaveMode.Both;
+            }
+            else if (EnableTcp)
+            {
+                Settings.Mode = ModbusSlaveMode.Tcp;
+            }
+            else if (isModbusRtu)
+            {
+                Settings.Mode = ModbusSlaveMode.Rtu;
+            }
+            else
+            {
+                Settings.Mode = ModbusSlaveMode.Off;
+            }
+
+            var updateToken = Settings.GetToken(oldSettings);
+
+            if (!updateToken.Children().Any())
+            {
+                ShowNoSettingsChanged();
+                return;
+            }
+
+            if (!await UpdateInverter("config/modbus", updateToken))
+            {
+                return;
+            }
+
+            oldSettings = Settings;
+            Undo();
+            ToastText = Resources.SettingsSavedToInverter;
         }
-        catch (Exception ex)
+        finally
         {
-            await Dispatcher.InvokeAsync(() => MessageBox.Show
-            (
-                view, string.Format(Resources.InverterCommError, ex.Message) + Environment.NewLine + Environment.NewLine + updateToken,
-                ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error
-            ));
-
-            return;
+            IsInUpdate = false;
         }
-
-        oldSettings = Settings;
-        Undo();
     }
 }

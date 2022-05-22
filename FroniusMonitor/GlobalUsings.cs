@@ -34,4 +34,5 @@ global using De.Hochstaetter.FroniusMonitor.Views;
 global using De.Hochstaetter.FroniusMonitor.Wpf.Commands;
 global using De.Hochstaetter.FroniusMonitor.Wpf.Localization;
 global using Microsoft.Win32;
+global using Newtonsoft.Json.Linq;
 global using Unity;

@@ -1,20 +1,15 @@
 ﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
-public class SelfConsumptionOptimizationViewModel : ViewModelBase
+public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
 {
     private static readonly IEnumerable<ChargingRuleType> ruleTypes = Enum.GetValues<ChargingRuleType>();
-
-    private readonly IWebClientService webClientService;
-    private readonly IGen24JsonService gen24Service;
 
     private SelfConsumptionOptimizationView view = null!;
     private Gen24BatterySettings oldSettings = null!;
     private BindableCollection<Gen24ChargingRule> oldChargingRules = null!;
 
-    public SelfConsumptionOptimizationViewModel(IWebClientService webClientService, IGen24JsonService gen24Service)
+    public SelfConsumptionOptimizationViewModel(IWebClientService webClientService, IGen24JsonService gen24Service):base(webClientService,gen24Service)
     {
-        this.webClientService = webClientService;
-        this.gen24Service = gen24Service;
     }
 
     public IEnumerable<ChargingRuleType> RuleTypes => ruleTypes;
@@ -124,7 +119,7 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
     }
 
     private ICommand? undoCommand;
-    public ICommand UndoCommand => undoCommand ??= new NoParameterCommand(Revert);
+    public ICommand UndoCommand => undoCommand ??= new NoParameterCommand(Undo);
 
     private ICommand? applyCommand;
     public ICommand ApplyCommand => applyCommand ??= new NoParameterCommand(Apply);
@@ -143,7 +138,7 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
 
         try
         {
-            jsonString = await webClientService.GetFroniusJsonResponse("config/timeofuse").ConfigureAwait(false);
+            jsonString = await WebClientService.GetFroniusJsonResponse("config/timeofuse").ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -165,7 +160,7 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
 
         try
         {
-            oldSettings = await webClientService.ReadGen24Entity<Gen24BatterySettings>("config/batteries").ConfigureAwait(false);
+            oldSettings = await WebClientService.ReadGen24Entity<Gen24BatterySettings>("config/batteries").ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -183,7 +178,7 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
             return;
         }
 
-        Revert();
+        Undo();
     }
 
     private void UpdateGridPower()
@@ -233,7 +228,7 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
         });
     }
 
-    private void Revert()
+    private void Undo()
     {
         ChargingRules = (BindableCollection<Gen24ChargingRule>)oldChargingRules.Clone();
         Settings = (Gen24BatterySettings)oldSettings.Clone();
@@ -249,106 +244,95 @@ public class SelfConsumptionOptimizationViewModel : ViewModelBase
 
     private async void Apply()
     {
-        var errors = view.FindVisualChildren<TextBox>().SelectMany(Validation.GetErrors).ToArray();
+        IsInUpdate = true;
 
-        foreach (var error in errors)
+        try
         {
-            if
-            (
-                error.BindingInError is BindingExpression { Target: FrameworkElement { IsVisible: false } } expression &&
-                oldSettings.GetType().GetProperty(expression.ResolvedSourcePropertyName) is { } property
-            )
-            {
-                var value = property.GetValue(oldSettings);
-                property.SetValue(Settings, value);
-            }
-        }
+            var errors = view.FindVisualChildren<TextBox>().SelectMany(Validation.GetErrors).ToArray();
 
-        var errorList = errors
-            .Where(e => e.BindingInError is BindingExpression { Target: FrameworkElement { IsVisible: true } })
-            .Select(e => e.ErrorContent.ToString()).ToList();
-
-        for (var i = 0; i < ChargingRules.Count; i++)
-        {
-            if (ChargingRules[i].StartTimeDate > ChargingRules[i].EndTimeDate)
+            foreach (var error in errors)
             {
-                errorList.Add(string.Format(Resources.EndBeforeStart, ChargingRules[i]));
-            }
-
-            if (i < ChargingRules.Count - 1)
-            {
-                for (var j = i + 1; j < ChargingRules.Count; j++)
+                if
+                (
+                    error.BindingInError is BindingExpression { Target: FrameworkElement { IsVisible: false } } expression &&
+                    oldSettings.GetType().GetProperty(expression.ResolvedSourcePropertyName) is { } property
+                )
                 {
-                    if (ChargingRules[i].ConflictsWith(ChargingRules[j]))
+                    var value = property.GetValue(oldSettings);
+                    property.SetValue(Settings, value);
+                }
+            }
+
+            var errorList = errors
+                .Where(e => e.BindingInError is BindingExpression { Target: FrameworkElement { IsVisible: true } })
+                .Select(e => e.ErrorContent.ToString()).ToList();
+
+            for (var i = 0; i < ChargingRules.Count; i++)
+            {
+                if (ChargingRules[i].StartTimeDate > ChargingRules[i].EndTimeDate)
+                {
+                    errorList.Add(string.Format(Resources.EndBeforeStart, ChargingRules[i]));
+                }
+
+                if (i < ChargingRules.Count - 1)
+                {
+                    for (var j = i + 1; j < ChargingRules.Count; j++)
                     {
-                        errorList.Add(string.Format(Resources.ChargingRuleConflict, ChargingRules[i], ChargingRules[j]));
+                        if (ChargingRules[i].ConflictsWith(ChargingRules[j]))
+                        {
+                            errorList.Add(string.Format(Resources.ChargingRuleConflict, ChargingRules[i], ChargingRules[j]));
+                        }
                     }
                 }
             }
-        }
 
-        if (errorList.Count > 0)
-        {
-            MessageBox.Show
-            (
-                view,
-                $"{Resources.PleaseCorrectErrors}:{Environment.NewLine}{errorList.Aggregate(string.Empty, (c, n) => c + Environment.NewLine + "• " + n)}",
-                Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error
-            );
-
-            return;
-        }
-
-        var rulesChanged = !ChargingRules.SequenceEqual(oldChargingRules);
-        var updateToken = gen24Service.GetUpdateToken(Settings, oldSettings);
-        var nonRulesChanged = updateToken.Children().Any();
-        var rulesToken = Gen24ChargingRule.GetToken(ChargingRules);
-
-        if (!updateToken.Children().Any() && !rulesChanged)
-        {
-            await Dispatcher.InvokeAsync(() => MessageBox.Show(view, Resources.NoSettingsChanged, Resources.Warning, MessageBoxButton.OK, MessageBoxImage.Warning));
-            return;
-        }
-
-        if (nonRulesChanged)
-        {
-            try
+            if (errorList.Count > 0)
             {
-                var _ = await webClientService.GetFroniusJsonResponse("config/batteries", updateToken).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                await Dispatcher.InvokeAsync(() => MessageBox.Show
+                MessageBox.Show
                 (
-                    view, string.Format(Resources.InverterCommError, ex.Message) + Environment.NewLine + Environment.NewLine + updateToken,
-                    ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error
-                ));
+                    view,
+                    $"{Resources.PleaseCorrectErrors}:{Environment.NewLine}{errorList.Aggregate(string.Empty, (c, n) => c + Environment.NewLine + "• " + n)}",
+                    Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error
+                );
 
                 return;
             }
-        }
 
-        if (rulesChanged)
-        {
-            try
-            {
-                var _ = await webClientService.GetFroniusJsonResponse("config/timeofuse", rulesToken).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                await Dispatcher.InvokeAsync(() => MessageBox.Show
-                (
-                    view, string.Format(Resources.InverterCommError, ex.Message) + Environment.NewLine + Environment.NewLine + updateToken,
-                    ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error
-                ));
+            var rulesChanged = !ChargingRules.SequenceEqual(oldChargingRules);
+            var updateToken = Gen24Service.GetUpdateToken(Settings, oldSettings);
+            var nonRulesChanged = updateToken.Children().Any();
+            var rulesToken = Gen24ChargingRule.GetToken(ChargingRules);
 
+            if (!updateToken.Children().Any() && !rulesChanged)
+            {
+                ShowNoSettingsChanged();
                 return;
             }
-        }
 
-        oldSettings = Settings;
-        oldChargingRules = ChargingRules;
-        Revert();
-        //await Dispatcher.InvokeAsync(() => MessageBox.Show(view, Resources.SettingsWritten, Resources.Success, MessageBoxButton.OK, MessageBoxImage.Information));
+            if (nonRulesChanged)
+            {
+                if (!await UpdateInverter("config/batteries",updateToken).ConfigureAwait(false))
+                {
+                    return;
+                }
+            }
+
+            if (rulesChanged)
+            {
+                if (!await UpdateInverter("config/timeofuse",rulesToken).ConfigureAwait(false))
+                {
+                    return;
+                }
+            }
+
+            oldSettings = Settings;
+            oldChargingRules = ChargingRules;
+            Undo();
+            ToastText = Resources.SettingsSavedToInverter;
+        }
+        finally
+        {
+            IsInUpdate = false;
+        }
     }
 }

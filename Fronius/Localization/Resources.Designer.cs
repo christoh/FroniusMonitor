@@ -1276,11 +1276,11 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Settings successfully written.
+        ///   Looks up a localized string similar to The settings have been sent to the inverter..
         /// </summary>
-        public static string SettingsWritten {
+        public static string SettingsSavedToInverter {
             get {
-                return ResourceManager.GetString("SettingsWritten", resourceCulture);
+                return ResourceManager.GetString("SettingsSavedToInverter", resourceCulture);
             }
         }
         

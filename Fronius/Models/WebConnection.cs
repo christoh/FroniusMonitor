@@ -1,9 +1,28 @@
-﻿namespace De.Hochstaetter.Fronius.Models
+﻿namespace De.Hochstaetter.Fronius.Models;
+
+public class WebConnection : BindableBase
 {
-    public class WebConnection : BindableBase
+    private string? baseUrl;
+    [DefaultValue(null), XmlAttribute]
+    public string? BaseUrl
     {
-        [DefaultValue(null), XmlAttribute] public string? BaseUrl { get; init; }
-        [DefaultValue(null), XmlAttribute] public string? UserName { get; init; }
-        [DefaultValue(null), XmlAttribute] public string? Password { get; init; }
+        get => baseUrl;
+        set => Set(ref baseUrl, value);
+    }
+
+    private string? userName;
+    [DefaultValue(null), XmlAttribute]
+    public string? UserName
+    {
+        get => userName;
+        set => Set(ref userName, value);
+    }
+
+    private string? password;
+    [DefaultValue(null), XmlAttribute]
+    public string? Password
+    {
+        get => password;
+        set => Set(ref password, value);
     }
 }

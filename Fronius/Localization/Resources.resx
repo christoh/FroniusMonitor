@@ -471,9 +471,6 @@
   <data name="NoSettingsChanged" xml:space="preserve">
     <value>No settings were changed</value>
   </data>
-  <data name="SettingsWritten" xml:space="preserve">
-    <value>Settings successfully written</value>
-  </data>
   <data name="EnableBattery" xml:space="preserve">
     <value>Enable Battery</value>
   </data>
@@ -683,5 +680,8 @@
   </data>
   <data name="ChargingRuleConflict" xml:space="preserve">
 	  <value>Charging rule '{0}' conflicts with '{1}'</value>
+  </data>
+  <data name="SettingsSavedToInverter" xml:space="preserve">
+	  <value>The settings have been sent to the inverter.</value>
   </data>
 </root>

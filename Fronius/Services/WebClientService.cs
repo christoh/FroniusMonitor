@@ -1,6 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Models.Gen24.Settings;
-
-namespace De.Hochstaetter.Fronius.Services;
+﻿namespace De.Hochstaetter.Fronius.Services;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public class WebClientService : BindableBase, IWebClientService
@@ -56,11 +54,11 @@ public class WebClientService : BindableBase, IWebClientService
 
         //try
         //{
-        //    //var test1 = await GetFroniusJsonResponse("config/powerlimits").ConfigureAwait(false);
-        //    //var test2 = await GetFroniusJsonResponse("config/ics").ConfigureAwait(false);
-        //    //var test3 = await GetFroniusJsonResponse("config/solarweb").ConfigureAwait(false);
-        //    //var test4 = await GetFroniusJsonResponse("config/emrs").ConfigureAwait(false);
-        //    //var result=await GetFroniusJsonResponse("config/timeofuse",token).ConfigureAwait(false);
+        //    //var test1 = await GetFroniusJsonResponse("config/powerlimits").ConfigureAwait(false); // None
+        //    //var test2 = await GetFroniusJsonResponse("config/ics").ConfigureAwait(false); // None
+        //    //var test3 = await GetFroniusJsonResponse("config/solarweb").ConfigureAwait(false); // Read
+        //    //var test4 = await GetFroniusJsonResponse("config/emrs").ConfigureAwait(false); // Read/Write
+        //    //var test5 = await GetFroniusJsonResponse("config/meter").ConfigureAwait(false); // Read
         //}
         //catch (Exception ex)
         //{
