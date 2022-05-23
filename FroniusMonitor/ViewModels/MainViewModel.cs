@@ -14,12 +14,18 @@ public class MainViewModel : ViewModelBase
 
     public ISolarSystemService SolarSystemService { get; }
 
-    private bool includeInverterPower;
-
     public bool IncludeInverterPower
     {
-        get => includeInverterPower;
-        set => Set(ref includeInverterPower, value);
+        get => App.Settings.AddInverterPowerToConsumption;
+        set
+        {
+            if (value != App.Settings.AddInverterPowerToConsumption)
+            {
+                App.Settings.AddInverterPowerToConsumption = value;
+                NotifyOfPropertyChange();
+                Settings.Save().ConfigureAwait(false);
+            }
+        }
     }
 
     internal override async Task OnInitialize()

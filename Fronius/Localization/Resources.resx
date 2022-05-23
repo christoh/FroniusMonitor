@@ -684,4 +684,22 @@
   <data name="SettingsSavedToInverter" xml:space="preserve">
 	  <value>The settings have been sent to the inverter.</value>
   </data>
+  <data name="Credentials" xml:space="preserve">
+	  <value>Credentials</value>
+  </data>
+  <data name="Gen24InverterHeader" xml:space="preserve">
+	  <value>Fronius Gen24 inverter</value>
+  </data>
+  <data name="FritzBoxHeader" xml:space="preserve">
+	  <value>AVM Fritz!Box</value>
+  </data>
+  <data name="Username" xml:space="preserve">
+	  <value>User name</value>
+  </data>
+  <data name="Url" xml:space="preserve">
+	  <value>Url</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+	  <value>Password</value>
+  </data>
 </root>

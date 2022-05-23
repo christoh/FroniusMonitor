@@ -39,7 +39,7 @@ public partial class MainWindow
             if (eventLogView == null)
             {
                 eventLogView = IoC.Get<EventLogView>();
-                eventLogView.Closed += (s, e) => { eventLogView = null; };
+                eventLogView.Closed += (_, _) => { eventLogView = null; };
             }
 
             return eventLogView!;
@@ -63,6 +63,23 @@ public partial class MainWindow
         }
     }
 
+    public SettingsView SettingsView
+    {
+        get
+        {
+            var settingsView= OwnedWindows.OfType<SettingsView>().SingleOrDefault();
+
+            if (settingsView == null)
+            {
+                settingsView=IoC.Get<SettingsView>();
+                settingsView.Owner = this;
+                settingsView.Show();
+            }
+
+            return settingsView;
+        }
+    }
+
     private SelfConsumptionOptimizationView? selfConsumptionOptimizationView;
     public SelfConsumptionOptimizationView SelfConsumptionOptimizationView
     {
@@ -71,7 +88,7 @@ public partial class MainWindow
             if (selfConsumptionOptimizationView == null)
             {
                 selfConsumptionOptimizationView = IoC.Get<SelfConsumptionOptimizationView>();
-                selfConsumptionOptimizationView.Closed += (s, e) => { selfConsumptionOptimizationView = null; };
+                selfConsumptionOptimizationView.Closed += (_, _) => { selfConsumptionOptimizationView = null; };
             }
 
             return selfConsumptionOptimizationView!;
@@ -204,6 +221,7 @@ public partial class MainWindow
         if (eventLogView != null)
         {
             EventLogView.Activate();
+            EventLogView.WindowState=WindowState.Normal;
         }
 
         EventLogView.Owner = this;
@@ -215,6 +233,7 @@ public partial class MainWindow
         if (selfConsumptionOptimizationView != null)
         {
             SelfConsumptionOptimizationView.Activate();
+            SelfConsumptionOptimizationView.WindowState = WindowState.Normal;
         }
 
         SelfConsumptionOptimizationView.Owner = this;
@@ -224,5 +243,12 @@ public partial class MainWindow
     private void ShowModbusSettings(object sender, RoutedEventArgs e)
     {
         ModbusView.Activate();
+        ModbusView.WindowState = WindowState.Normal;
+    }
+
+    private void ShowSettings(object sender, RoutedEventArgs e)
+    {
+        SettingsView.Activate();
+        SettingsView.WindowState = WindowState.Normal;
     }
 }

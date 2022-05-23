@@ -349,6 +349,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Credentials.
+        /// </summary>
+        public static string Credentials {
+            get {
+                return ResourceManager.GetString("Credentials", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Current.
         /// </summary>
         public static string Current {
@@ -570,6 +579,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Friday_One {
             get {
                 return ResourceManager.GetString("Friday_One", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to AVM Fritz!Box.
+        /// </summary>
+        public static string FritzBoxHeader {
+            get {
+                return ResourceManager.GetString("FritzBoxHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fronius Gen24 inverter.
+        /// </summary>
+        public static string Gen24InverterHeader {
+            get {
+                return ResourceManager.GetString("Gen24InverterHeader", resourceCulture);
             }
         }
         
@@ -1047,6 +1074,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Parity {
             get {
                 return ResourceManager.GetString("Parity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password.
+        /// </summary>
+        public static string Password {
+            get {
+                return ResourceManager.GetString("Password", resourceCulture);
             }
         }
         
@@ -1708,11 +1744,29 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Url.
+        /// </summary>
+        public static string Url {
+            get {
+                return ResourceManager.GetString("Url", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Use Manufacturer defaults.
         /// </summary>
         public static string UseManufacturerDefaults {
             get {
                 return ResourceManager.GetString("UseManufacturerDefaults", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User name.
+        /// </summary>
+        public static string Username {
+            get {
+                return ResourceManager.GetString("Username", resourceCulture);
             }
         }
         

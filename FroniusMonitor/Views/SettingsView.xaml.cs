@@ -1,0 +1,17 @@
+﻿namespace De.Hochstaetter.FroniusMonitor.Views
+{
+    public partial class SettingsView
+    {
+        public SettingsView(SettingsViewModel viewModel)
+        {
+            InitializeComponent();
+            DataContext = viewModel;
+
+            Loaded += async (s, e) =>
+            {
+                viewModel.Dispatcher = Dispatcher;
+                await viewModel.OnInitialize().ConfigureAwait(false);
+            };
+        }
+    }
+}

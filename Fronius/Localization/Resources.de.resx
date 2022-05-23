@@ -681,4 +681,16 @@
   <data name="SettingsSavedToInverter" xml:space="preserve">
 	  <value>Die Einstellungen wurden an den Wechselrichter geschickt.</value>
   </data>
+  <data name="Credentials" xml:space="preserve">
+	  <value>Zugangsdaten</value>
+  </data>
+  <data name="Gen24InverterHeader" xml:space="preserve">
+	  <value>Fronius Gen24 Wechselrichter</value>
+  </data>
+  <data name="Username" xml:space="preserve">
+	  <value>Benutzername</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+	  <value>Kennwort</value>
+  </data>
 </root>

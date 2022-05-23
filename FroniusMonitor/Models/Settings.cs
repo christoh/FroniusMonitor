@@ -1,9 +1,9 @@
 ﻿namespace De.Hochstaetter.FroniusMonitor.Models;
 
-public class Settings : BindableBase
+public class Settings : BindableBase, ICloneable
 {
-    private static readonly object settingsLockObject = new object();
-    private WebConnection? fritzBoxConnection = new() { BaseUrl = "http://192.168.44.11", UserName = "FroniusMonitor", Password = "Password" };
+    private static readonly object settingsLockObject = new();
+    private WebConnection? fritzBoxConnection = new() { BaseUrl = "http://192.168.178.1", UserName = string.Empty, Password = string.Empty };
     [XmlElement, DefaultValue(null)]
     public WebConnection? FritzBoxConnection
     {
@@ -11,7 +11,7 @@ public class Settings : BindableBase
         set => Set(ref fritzBoxConnection, value);
     }
 
-    private WebConnection? froniusConnection = new() { BaseUrl = "http://192.168.44.10" };//"http://neufahrn.hochstaetter.de:10";
+    private WebConnection? froniusConnection = new() { BaseUrl = "http://192.168.178.XXX", UserName = string.Empty, Password = string.Empty};
     [XmlElement, DefaultValue(null)]
     public WebConnection? FroniusConnection
     {
@@ -19,7 +19,15 @@ public class Settings : BindableBase
         set => Set(ref froniusConnection, value);
     }
 
-    private double consumedEnergyOffsetWattHours = 457000 - 2977910;
+    private bool addInverterPowerToConsumption;
+    [XmlElement, DefaultValue(false)]
+    public bool AddInverterPowerToConsumption
+    {
+        get => addInverterPowerToConsumption;
+        set => Set(ref addInverterPowerToConsumption, value);
+    }
+
+    private double consumedEnergyOffsetWattHours;
 
     [XmlElement]
     public double ConsumedEnergyOffsetWattHours
@@ -28,7 +36,7 @@ public class Settings : BindableBase
         set => Set(ref consumedEnergyOffsetWattHours, value);
     }
 
-    private double producedEnergyOffsetWattHours = -360;
+    private double producedEnergyOffsetWattHours;
 
     [XmlElement]
     public double ProducedEnergyOffsetWattHours
@@ -38,7 +46,6 @@ public class Settings : BindableBase
     }
 
     public static async Task Save() => await Save(App.SettingsFileName).ConfigureAwait(false);
-
 
     public static async Task Save(string fileName) => await Task.Run(() =>
     {
@@ -52,7 +59,7 @@ public class Settings : BindableBase
             {
                 Encoding = Encoding.UTF8,
                 Indent = true,
-                IndentChars = "    ",
+                IndentChars = new string(' ', 3),
                 NewLineChars = Environment.NewLine,
             });
 
@@ -71,4 +78,12 @@ public class Settings : BindableBase
     }).ConfigureAwait(false);
 
     public static async Task Load() => await Load(App.SettingsFileName).ConfigureAwait(false);
+
+    public object Clone()
+    {
+        var clone=(Settings)MemberwiseClone();
+        clone.FritzBoxConnection = (WebConnection)clone.FritzBoxConnection?.Clone()!;
+        clone.FroniusConnection= (WebConnection)clone.FroniusConnection?.Clone()!;
+        return clone;
+    }
 }

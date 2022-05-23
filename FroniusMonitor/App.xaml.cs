@@ -30,6 +30,8 @@ public partial class App
             .RegisterType<SelfConsumptionOptimizationView>()
             .RegisterType<ModbusView>()
             .RegisterType<ModbusViewModel>()
+            .RegisterType<SettingsView>()
+            .RegisterType<SettingsViewModel>()
             ;
 
         Directory.CreateDirectory(PerUserDataDir);
