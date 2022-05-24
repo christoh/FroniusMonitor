@@ -2,7 +2,19 @@
 
 public class WebConnection : BindableBase, ICloneable
 {
+    private static readonly Aes aes;
+
+    static WebConnection()
+    {
+        aes = Aes.Create();
+        aes.KeySize = 128;
+        aes.Mode = CipherMode.ECB;
+        aes.Padding = PaddingMode.PKCS7;
+        aes.Key = SensorData.GetAesKey();
+    }
+
     private string? baseUrl;
+
     [DefaultValue(null), XmlAttribute]
     public string? BaseUrl
     {
@@ -11,6 +23,7 @@ public class WebConnection : BindableBase, ICloneable
     }
 
     private string? userName;
+
     [DefaultValue(null), XmlAttribute]
     public string? UserName
     {
@@ -18,26 +31,43 @@ public class WebConnection : BindableBase, ICloneable
         set => Set(ref userName, value);
     }
 
-    private string? password;
-    [DefaultValue(null), XmlAttribute]
-    public string? Password
+    private string password = string.Empty;
+
+    [XmlIgnore]
+    public string Password
     {
         get => password;
         set => Set(ref password, value);
     }
 
+    [DefaultValue(""), XmlAttribute("Password")]
     public string EncryptedPassword
     {
         get
         {
-            var aes = Aes.Create();
-            aes.KeySize = 128;
-            aes.Mode = CipherMode.ECB;
-            aes.Padding = PaddingMode.PKCS7;
-            aes.Key = Encoding.ASCII.GetBytes("Fronius GEN24 10"); // Replace by UUID
-            var encryptor = aes.CreateEncryptor();
-            var bytes = Encoding.UTF8.GetBytes(Password ?? new string((char)0x7280,1));
-            return Convert.ToBase64String(encryptor.TransformFinalBlock(bytes, 0, bytes.Length));
+            try
+            {
+                using var encrypt = aes.CreateEncryptor();
+                var bytes = Encoding.UTF8.GetBytes(Password);
+                return Convert.ToBase64String(encrypt.TransformFinalBlock(bytes, 0, bytes.Length));
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
+        set
+        {
+            try
+            {
+                using var decrypt = aes.CreateDecryptor();
+                var bytes = Convert.FromBase64String(value);
+                Password = Encoding.UTF8.GetString(decrypt.TransformFinalBlock(bytes, 0, bytes.Length));
+            }
+            catch
+            {
+                Password = string.Empty;
+            }
         }
     }
 
