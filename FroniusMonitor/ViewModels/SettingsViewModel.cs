@@ -1,24 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace De.Hochstaetter.FroniusMonitor.ViewModels
+﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels
 {
     public class SettingsViewModel : SettingsViewModelBase
     {
         public SettingsViewModel(IWebClientService webClientService, IGen24JsonService gen24Service) : base(webClientService, gen24Service) { }
 
+        private ICommand? okCommand;
+        public ICommand OkCommand => okCommand ??= new NoParameterCommand(Ok);
+
         internal override async Task OnInitialize()
         {
             await base.OnInitialize().ConfigureAwait(false);
             Settings = (Settings)App.Settings.Clone();
-
-            if (Settings.FroniusConnection == null)
-            {
-                Settings.FroniusConnection = new Settings().FroniusConnection;
-            }
+            Settings.FroniusConnection ??= new Settings().FroniusConnection;
         }
 
         private Settings settings = null!;
@@ -32,5 +25,32 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
         private static readonly IEnumerable<string> gen24UserNames = new[] { "customer", "technician", "support" };
 
         public IEnumerable<string> Gen24UserNames => gen24UserNames;
+
+        private async void Ok()
+        {
+            IoC.Get<MainWindow>().SettingsView.Close();
+            Settings.FroniusConnection!.BaseUrl = FixUrl(Settings.FroniusConnection!.BaseUrl!);
+            Settings.FritzBoxConnection!.BaseUrl = FixUrl(Settings.FritzBoxConnection!.BaseUrl!);
+            App.Settings = Settings;
+            IoC.Get<MainViewModel>().NotifyOfPropertyChange(nameof(Settings));
+            IoC.Get<IWebClientService>().FritzBoxConnection = Settings.HaveFritzBox ? Settings.FritzBoxConnection : null;
+            IoC.Get<IWebClientService>().InverterConnection = Settings.FroniusConnection;
+            await Settings.Save().ConfigureAwait(false);
+
+            static string FixUrl(string url)
+            {
+                if (!url.StartsWith("http://") && !url.StartsWith("https://"))
+                {
+                    url = "http://" + url;
+                }
+
+                while (url[^1..] == "/")
+                {
+                    url = url[..^1];
+                }
+
+                return url;
+            }
+        }
     }
 }

@@ -133,7 +133,8 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
     internal override async Task OnInitialize()
     {
         await base.OnInitialize().ConfigureAwait(false);
-        view = IoC.Get<MainWindow>().SelfConsumptionOptimizationView;
+        var mainWindow = IoC.Get<MainWindow>();
+        view = mainWindow.SelfConsumptionOptimizationView;
         string jsonString;
 
         try
@@ -151,6 +152,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
                 );
 
                 view.Close();
+                mainWindow.Activate();
             });
 
             return;

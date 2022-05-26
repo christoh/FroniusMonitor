@@ -19,6 +19,20 @@ public class Settings : BindableBase, ICloneable
         set => Set(ref froniusConnection, value);
     }
 
+    private bool haveFritzBox;
+    [XmlElement]
+    public bool HaveFritzBox
+    {
+        get => haveFritzBox;
+        set => Set(ref haveFritzBox, value, () =>
+        {
+            if (value)
+            {
+                FritzBoxConnection ??= new WebConnection { BaseUrl = "http://192.168.178.1", UserName = string.Empty, Password = string.Empty };
+            }
+        });
+    }
+
     private bool addInverterPowerToConsumption;
     [XmlElement, DefaultValue(false)]
     public bool AddInverterPowerToConsumption

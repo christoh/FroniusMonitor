@@ -1,53 +1,146 @@
 ﻿<Window x:Class="De.Hochstaetter.FroniusMonitor.Views.SettingsView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:De.Hochstaetter.FroniusMonitor.Views"
-             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
-             xmlns:vm="clr-namespace:De.Hochstaetter.FroniusMonitor.ViewModels"
-             xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize"
-             d:DataContext="{d:DesignInstance Type={x:Type vm:SettingsViewModel}}"
-             Title="{x:Static p:Resources.Credentials}"
-             >
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+        xmlns:vm="clr-namespace:De.Hochstaetter.FroniusMonitor.ViewModels"
+        xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
+        xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
+        mc:Ignorable="d"
+        d:DesignHeight="450" d:DesignWidth="800" MinWidth="480" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize"
+        d:DataContext="{d:DesignInstance Type={x:Type vm:SettingsViewModel}}"
+        Title="{x:Static p:Resources.Credentials}">
     <Grid Margin="16">
+        <Grid.Resources>
+            <Style TargetType="Button">
+                <Setter Property="Margin" Value="0,0,8,0" />
+                <Setter Property="MinHeight" Value="30" />
+                <Setter Property="MinWidth" Value="70" />
+                <Setter Property="Padding" Value="8,0" />
+            </Style>
+
+            <Style TargetType="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+            <Style TargetType="c:PasswordBox">
+                <Setter Property="MinHeight" Value="22" />
+                <Setter Property="Margin" Value="0,8,0,0" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+            </Style>
+            <Style TargetType="ComboBox">
+                <Setter Property="Margin" Value="0,8,0,0" />
+                <Setter Property="MinHeight" Value="22" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+            </Style>
+            <Style TargetType="TextBox">
+                <Setter Property="Margin" Value="0,8,0,0" />
+                <Setter Property="MinHeight" Value="22" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+            </Style>
+        </Grid.Resources>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <GroupBox Grid.Row="0" Header="{x:Static p:Resources.Gen24InverterHeader}">
             <Grid Margin="8">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.Url}"/>
-                <TextBlock Grid.Row="0" Grid.Column="1" Text=":" Margin="4,0"/>
-                <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding Settings.FroniusConnection.BaseUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.Url}" Margin="0,8,0,0" />
+                <TextBlock Grid.Row="0" Grid.Column="1" Text=":" Margin="4,8,4,0" />
 
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.Username}" Margin="0,4"/>
-                <TextBlock Grid.Row="1" Grid.Column="1" Text=":" Margin="4,4"/>
-                <ComboBox Grid.Row="1" Grid.Column="2" SelectedItem="{Binding Settings.FroniusConnection.UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ItemsSource="{Binding Gen24UserNames}" Margin="0,4"/>
+                <TextBox Grid.Row="0" Grid.Column="2"
+                         Text="{Binding Settings.FroniusConnection.BaseUrl, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static p:Resources.Password}" Margin="0,4"/>
-                <TextBlock Grid.Row="2" Grid.Column="1" Text=":" Margin="4,4"/>
-                <c:PasswordBox Grid.Row="2" Grid.Column="2" Template="{StaticResource PasswordBoxTemplate}" Password="{Binding Settings.FroniusConnection.Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.Username}" Margin="0,7,0,0" />
+                <TextBlock Grid.Row="1" Grid.Column="1" Text=":" Margin="4,7,4,0" />
+
+                <ComboBox Grid.Row="1" Grid.Column="2"
+                          SelectedItem="{Binding Settings.FroniusConnection.UserName, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          ItemsSource="{Binding Gen24UserNames}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}" MinHeight="20" Margin="0,2,0,0" VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static p:Resources.Password}" Margin="0,8,0,0" />
+                <TextBlock Grid.Row="2" Grid.Column="1" Text=":" Margin="4,8,4,0" />
+
+                <c:PasswordBox Grid.Row="2" Grid.Column="2" Template="{StaticResource PasswordBoxTemplate}"
+                               Password="{Binding Settings.FroniusConnection.Password, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             </Grid>
 
         </GroupBox>
 
         <GroupBox Grid.Row="1" Margin="0,8,0,0" Header="{x:Static p:Resources.FritzBoxHeader}">
+            <Grid Margin="8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
+                <CheckBox IsChecked="{Binding Settings.HaveFritzBox}" Grid.Row="0" Content="{x:Static p:Resources.EnableFritzBox}" Margin="0,4,0,8" />
+
+                <Grid Grid.Row="1" Visibility="{Binding Settings.HaveFritzBox, Converter={co:Bool2Visibility}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.Url}" Margin="0,8,0,0" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text=":" Margin="4,8,4,0" />
+
+                    <TextBox Grid.Row="0" Grid.Column="2"
+                             Text="{Binding Settings.FritzBoxConnection.BaseUrl, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.Username}" Margin="0,8,0,0" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text=":" Margin="4,8,4,0" />
+
+                    <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Settings.FritzBoxConnection.UserName, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static p:Resources.Password}" Margin="0,8,0,0" />
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text=":" Margin="4,8,4,0" />
+
+                    <c:PasswordBox Grid.Row="2" Grid.Column="2" Template="{StaticResource PasswordBoxTemplate}"
+                                   Password="{Binding Settings.FritzBoxConnection.Password, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </Grid>
+            </Grid>
         </GroupBox>
+
+        <Grid Grid.Row="2" Margin="0,32,-8,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="1" Content="{x:Static p:Resources.Cancel}" Click="OnCancelClick" IsCancel="True"/>
+            <Button Grid.Column="2" Content="{x:Static p:Resources.Ok}" Command="{Binding OkCommand}" IsDefault="True"/>
+
+        </Grid>
     </Grid>
 </Window>

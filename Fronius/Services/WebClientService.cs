@@ -22,7 +22,13 @@ public class WebClientService : BindableBase, IWebClientService
     public WebConnection? InverterConnection
     {
         get => inverterConnection;
-        set => Set(ref inverterConnection, value);
+        set => Set(ref inverterConnection, value, () =>
+        {
+            lock (froniusHttpClientLockObject)
+            {
+                froniusHttpClient = null;
+            }
+        });
     }
 
     private WebConnection? fritzBoxConnection;
@@ -562,6 +568,8 @@ public class WebClientService : BindableBase, IWebClientService
         return result;
     }
 
+    private readonly object froniusHttpClientLockObject=new();
+
     public async Task<string> GetFroniusJsonResponse(string request, JToken? token = null)
     {
         if (InverterConnection?.BaseUrl == null)
@@ -569,7 +577,15 @@ public class WebClientService : BindableBase, IWebClientService
             throw new NullReferenceException(Resources.NoSystemConnection);
         }
 
+        DigestAuthHttp client;
         froniusHttpClient ??= new DigestAuthHttp(InverterConnection ?? throw new ArgumentNullException());
+
+        lock (froniusHttpClientLockObject)
+        {
+            froniusHttpClient ??= new DigestAuthHttp(InverterConnection ?? throw new ArgumentNullException());
+            client = froniusHttpClient;
+        }
+
         var nextAllowedCall = lastSolarApiCall.AddSeconds(.2) - DateTime.UtcNow;
 
         if (nextAllowedCall.Ticks > 0)
@@ -577,7 +593,7 @@ public class WebClientService : BindableBase, IWebClientService
             await Task.Delay(nextAllowedCall).ConfigureAwait(false);
         }
 
-        var result = await froniusHttpClient.GetString(request, token).ConfigureAwait(false);
+        var result = await client.GetString(request, token).ConfigureAwait(false);
         lastSolarApiCall = DateTime.UtcNow;
         return result;
     }

@@ -28,6 +28,8 @@ public class MainViewModel : ViewModelBase
         }
     }
 
+    public Settings Settings => App.Settings;
+
     internal override async Task OnInitialize()
     {
         await base.OnInitialize().ConfigureAwait(false);
@@ -39,8 +41,13 @@ public class MainViewModel : ViewModelBase
         var dialog = new OpenFileDialog
         {
             Filter = string.Format(Resources.SettingsFilter, Resources.AppName),
-            AddExtension = false, CheckFileExists = true, CheckPathExists = true,
-            DereferenceLinks = true, Multiselect = false, ValidateNames = true, Title = Resources.LoadSettings
+            AddExtension = false,
+            CheckFileExists = true,
+            CheckPathExists = true,
+            DereferenceLinks = true,
+            Multiselect = false,
+            ValidateNames = true,
+            Title = Resources.LoadSettings
         };
 
         var result = dialog.ShowDialog();
@@ -68,7 +75,7 @@ public class MainViewModel : ViewModelBase
         }
         finally
         {
-            await SolarSystemService.Start(App.Settings.FroniusConnection, App.Settings.FritzBoxConnection).ConfigureAwait(false);
+            await SolarSystemService.Start(App.Settings.FroniusConnection, App.Settings.HaveFritzBox?App.Settings.FritzBoxConnection:null).ConfigureAwait(false);
         }
     }
 

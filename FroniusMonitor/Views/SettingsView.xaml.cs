@@ -13,5 +13,10 @@
                 await viewModel.OnInitialize().ConfigureAwait(false);
             };
         }
+
+        private void OnCancelClick(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
     }
 }

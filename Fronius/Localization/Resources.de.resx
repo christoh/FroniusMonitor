@@ -693,4 +693,7 @@
   <data name="Password" xml:space="preserve">
 	  <value>Kennwort</value>
   </data>
+  <data name="EnableFritzBox" xml:space="preserve">
+	  <value>AVM Fritz!Box Home-Automation-Geräte steuern</value>
+  </data>
 </root>

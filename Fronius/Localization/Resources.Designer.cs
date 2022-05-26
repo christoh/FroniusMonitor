@@ -457,6 +457,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Control AVM Fritz!Box Home Automation Devices.
+        /// </summary>
+        public static string EnableFritzBox {
+            get {
+                return ResourceManager.GetString("EnableFritzBox", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Enable Modbus slave over TCP.
         /// </summary>
         public static string EnableModbusTcp {
@@ -1263,6 +1272,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Saturday_One {
             get {
                 return ResourceManager.GetString("Saturday_One", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save.
+        /// </summary>
+        public static string Save {
+            get {
+                return ResourceManager.GetString("Save", resourceCulture);
             }
         }
         

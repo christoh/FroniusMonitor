@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
+﻿using System.Net;
+
+namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
 public class ModbusViewModel : SettingsViewModelBase
 {
@@ -57,8 +59,30 @@ public class ModbusViewModel : SettingsViewModelBase
     internal override async Task OnInitialize()
     {
         await base.OnInitialize().ConfigureAwait(false);
-        view = IoC.Get<MainWindow>().ModbusView;
-        oldSettings = Gen24ModbusSettings.Parse(await WebClientService.GetFroniusJsonResponse("config/modbus").ConfigureAwait(false));
+        var mainWindow = IoC.Get<MainWindow>();
+        view = mainWindow.ModbusView;
+
+        try
+        {
+            oldSettings = Gen24ModbusSettings.Parse(await WebClientService.GetFroniusJsonResponse("config/modbus").ConfigureAwait(false));
+        }
+        catch (Exception ex)
+        {
+            await Dispatcher.InvokeAsync(() =>
+            {
+                MessageBox.Show
+                (
+                    view, string.Format(Resources.InverterCommReadError, ex.Message),
+                    ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error
+                );
+
+                view.Close();
+                mainWindow.Activate();
+            });
+
+            return;
+        }
+
         Undo();
     }
 

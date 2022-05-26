@@ -702,4 +702,10 @@
   <data name="Password" xml:space="preserve">
 	  <value>Password</value>
   </data>
+  <data name="EnableFritzBox" xml:space="preserve">
+	  <value>Control AVM Fritz!Box Home Automation Devices</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+	  <value>Save</value>
+  </data>
 </root>

@@ -113,9 +113,9 @@
         </Viewbox>
 
         <GridSplitter Grid.Row="1" Grid.Column="1" ResizeBehavior="PreviousAndNext" BorderThickness="2" ResizeDirection="Columns"
-                      BorderBrush="LightGray" Margin="10,0" VerticalAlignment="Stretch" />
+                      BorderBrush="LightGray" Margin="10,0" VerticalAlignment="Stretch" Visibility="{Binding Settings.HaveFritzBox, Converter={co:Bool2Visibility}}"/>
 
-        <ScrollViewer Grid.Row="1" Grid.Column="2"
+        <ScrollViewer Grid.Row="1" Grid.Column="2" Visibility="{Binding Settings.HaveFritzBox, Converter={co:Bool2Visibility}}"
                       VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto"
                       VerticalContentAlignment="Top" HorizontalContentAlignment="Stretch"
                       Margin="10,16,0,0" VerticalAlignment="Center" HorizontalAlignment="Stretch">
