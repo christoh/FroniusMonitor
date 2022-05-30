@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.FroniusMonitor;
+﻿using De.Hochstaetter.FroniusMonitor.Models.CarCharging;
+
+namespace De.Hochstaetter.FroniusMonitor;
 
 public partial class App
 {
@@ -13,7 +15,7 @@ public partial class App
 
     protected override void OnStartup(StartupEventArgs e)
     {
-        Thread.CurrentThread.CurrentUICulture= new CultureInfo("de-CH");
+        Thread.CurrentThread.CurrentUICulture = new CultureInfo("de-CH");
         base.OnStartup(e);
 
         Fronius.IoC.Injector = new IoC();
@@ -24,6 +26,7 @@ public partial class App
             .RegisterSingleton<MainWindow>()
             .RegisterSingleton<MainViewModel>()
             .RegisterSingleton<IGen24JsonService, Gen24JsonService>()
+            .RegisterSingleton<IAesKeyProvider, AesKeyProvider>()
             .RegisterType<EventLogView>()
             .RegisterType<EventLogViewModel>()
             .RegisterType<SelfConsumptionOptimizationViewModel>()

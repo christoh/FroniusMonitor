@@ -21,6 +21,5 @@ global using De.Hochstaetter.Fronius.Exceptions;
 global using De.Hochstaetter.Fronius.Extensions;
 global using De.Hochstaetter.Fronius.Localization;
 global using De.Hochstaetter.Fronius.Models;
-global using De.Hochstaetter.Fronius.Models.CarCharging;
 global using De.Hochstaetter.Fronius.Models.Gen24;
 global using Newtonsoft.Json.Linq;

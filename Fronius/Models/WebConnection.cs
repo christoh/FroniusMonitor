@@ -10,7 +10,7 @@ public class WebConnection : BindableBase, ICloneable
         aes.KeySize = 128;
         aes.Mode = CipherMode.ECB;
         aes.Padding = PaddingMode.PKCS7;
-        aes.Key = SensorData.GetAesKey();
+        aes.Key = IoC.Get<IAesKeyProvider>().GetAesKey();
     }
 
     private string? baseUrl;

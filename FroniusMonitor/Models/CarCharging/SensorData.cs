@@ -1,4 +1,12 @@
-﻿namespace De.Hochstaetter.Fronius.Models.CarCharging;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
+
+namespace De.Hochstaetter.FroniusMonitor.Models.CarCharging;
+
+public class AesKeyProvider : IAesKeyProvider
+{
+    public byte[] GetAesKey() => SensorData.GetAesKey();
+}
 
 [StructLayout(LayoutKind.Sequential)]
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
