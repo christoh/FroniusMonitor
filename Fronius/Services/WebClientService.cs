@@ -65,6 +65,11 @@ public class WebClientService : BindableBase, IWebClientService
         //    //var test3 = await GetFroniusJsonResponse("config/solarweb").ConfigureAwait(false); // Read
         //    //var test4 = await GetFroniusJsonResponse("config/emrs").ConfigureAwait(false); // Read/Write
         //    //var test5 = await GetFroniusJsonResponse("config/meter").ConfigureAwait(false); // Read
+        //    //var token = JObject.Parse(test3);
+        //    //token["enableRemoteControl"] = true;
+        //    //token.Remove("_connectionKeepAlive_meta");
+        //    //token.Remove("_enableRemoteControl_meta");
+        //    //var response = await GetFroniusJsonResponse("config/solarweb", token).ConfigureAwait(false);
         //}
         //catch (Exception ex)
         //{
@@ -304,7 +309,7 @@ public class WebClientService : BindableBase, IWebClientService
         }
 
 
-        if (CultureInfo.CurrentUICulture.ThreeLetterWindowsLanguageName != "en")
+        if (CultureInfo.CurrentUICulture.TwoLetterISOLanguageName != "en")
         {
             try
             {
