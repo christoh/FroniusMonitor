@@ -38,4 +38,7 @@
 	<data name="Saturday" xml:space="preserve">
 		<value>Samschtig</value>
 	</data>
+	<data name="SunspecMode_Float" xml:space="preserve">
+		<value>Fliesskomma</value>
+	</data>
 </root>

@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
+﻿using System.Net;
+
+namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
 public abstract class SettingsViewModelBase : ViewModelBase
 {
@@ -29,9 +31,11 @@ public abstract class SettingsViewModelBase : ViewModelBase
 
     protected async Task<bool> UpdateInverter(string uri, JToken token)
     {
+        (JToken Token, HttpStatusCode Status) result;
+
         try
         {
-            var _ = await WebClientService.GetFroniusStringResponse(uri, token).ConfigureAwait(false);
+            result = await WebClientService.GetFroniusJsonResponse(uri, token, new[] { HttpStatusCode.OK, HttpStatusCode.BadRequest }).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -46,7 +50,20 @@ public abstract class SettingsViewModelBase : ViewModelBase
             return false;
         }
 
-        return true;
+        if (result.Status == HttpStatusCode.OK)
+        {
+            return true;
+        }
+
+        IsInUpdate = false;
+
+        await Dispatcher.InvokeAsync(() => MessageBox.Show
+        (
+            string.Format(Resources.InverterCommError, Resources.InvalidParameters) + Environment.NewLine + Environment.NewLine + token + Environment.NewLine + Environment.NewLine + result.Token,
+            Resources.InvalidParameters, MessageBoxButton.OK, MessageBoxImage.Error
+        ));
+
+        return false;
     }
 
     protected void ShowNoSettingsChanged()

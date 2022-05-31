@@ -81,6 +81,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         PowerFlowQueue.Clear();
         NotifyPowerQueueChanged();
         SolarSystem = await CreateSolarSystem(inverterConnection, fritzBoxConnection).ConfigureAwait(false);
+        await Task.Run(() => NewDataReceived?.Invoke(this, new SolarDataEventArgs(SolarSystem))).ConfigureAwait(false);
         _ = await webClientService.GetEventDescription("BYD2-46").ConfigureAwait(false);
         _ = await webClientService.GetConfigString("BATTERIES", "BAT_M0_SOC_MIN");
         timer = new Timer(TimerElapsed, null, 0, 1000);
@@ -136,8 +137,9 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
         try
         {
-            result.Versions = Gen24Versions.Parse((await webClientService.GetFroniusStringResponse("status/version").ConfigureAwait(false)).JsonString ?? string.Empty);
-            result.Gen24System = await webClientService.GetFroniusData().ConfigureAwait(false);
+            result.Versions = Gen24Versions.Parse((await webClientService.GetFroniusStringResponse("status/version").ConfigureAwait(false)).JsonString);
+            result.Components = Gen24Components.Parse((JObject)(await webClientService.GetFroniusJsonResponse("components/")).Token);
+            result.Gen24System = await webClientService.GetFroniusData(result.Components).ConfigureAwait(false);
 
             foreach (var deviceGroup in (await webClientService.GetDevices().ConfigureAwait(false)).Devices.GroupBy(d => d.DeviceClass))
             {
@@ -158,7 +160,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
                 foreach (var device in deviceGroup)
                 {
-                    var group = new DeviceGroup {DeviceClass = deviceGroup.Key};
+                    var group = new DeviceGroup { DeviceClass = deviceGroup.Key };
 
                     switch (deviceGroup.Key)
                     {
@@ -202,15 +204,17 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         {
             if (froniusCounter++ % FroniusUpdateRate == 0)
             {
-                if (SolarSystem?.PrimaryInverter == null || SolarSystem.Versions == null || SolarSystem.PrimaryMeter == null)
+                if (SolarSystem?.PrimaryInverter == null || SolarSystem.Versions == null || SolarSystem.PrimaryMeter == null || SolarSystem.Components == null)
                 {
                     SolarSystem = await CreateSolarSystem(null, null).ConfigureAwait(false);
                 }
+                else
+                {
+                    SolarSystem.Gen24System = await webClientService.GetFroniusData(SolarSystem.Components).ConfigureAwait(false);
+                }
 
-                SolarSystem.Gen24System = await webClientService.GetFroniusData().ConfigureAwait(false);
 
-
-                if (SolarSystem.Gen24System.PowerFlow != null)
+                if (SolarSystem.Gen24System?.PowerFlow != null)
                 {
                     PowerFlowQueue.Enqueue(SolarSystem.Gen24System.PowerFlow);
 

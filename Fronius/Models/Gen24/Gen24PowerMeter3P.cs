@@ -1,7 +1,7 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Gen24;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
-public class Gen24PowerMeter : Gen24DeviceBase
+public class Gen24PowerMeter3P : Gen24DeviceBase
 {
     private double? currentL1;
 

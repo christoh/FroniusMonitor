@@ -60,7 +60,7 @@ public class WebClientService : BindableBase, IWebClientService
     }
 
     [SuppressMessage("ReSharper", "CommentTypo")]
-    public async Task<Gen24System> GetFroniusData()
+    public async Task<Gen24System> GetFroniusData(Gen24Components components)
     {
         var gen24System = new Gen24System();
 
@@ -68,7 +68,7 @@ public class WebClientService : BindableBase, IWebClientService
         //{
         //    //var test1 = await GetFroniusStringResponse("config/powerlimits").ConfigureAwait(false); // None
         //    //var test2 = await GetFroniusStringResponse("config/ics").ConfigureAwait(false); // None
-        //    //var test3 = (await GetFroniusStringResponse("config/solarweb").ConfigureAwait(false)).JsonString??string.Empty; // Read
+        //    //var test3 = (await GetFroniusJsonResponse("config/solarweb").ConfigureAwait(false)); // Read
         //    //var test4 = await GetFroniusStringResponse("config/emrs").ConfigureAwait(false); // Read/Write
         //    //var test5 = await GetFroniusStringResponse("config/meter").ConfigureAwait(false); // Read
         //    //var token = JObject.Parse(test3);
@@ -82,7 +82,9 @@ public class WebClientService : BindableBase, IWebClientService
         //    //
         //}
 
-        foreach (var statusToken in JArray.Parse((await GetFroniusStringResponse("status/devices").ConfigureAwait(false)).JsonString))
+        var (token, _) = await GetFroniusJsonResponse("status/devices").ConfigureAwait(false);
+
+        foreach (var statusToken in (JArray)token)
         {
             var status = gen24JsonService.ReadFroniusData<Gen24Status>(statusToken);
 
@@ -99,36 +101,20 @@ public class WebClientService : BindableBase, IWebClientService
         }
 
         var (_, dataToken) = await GetJsonResponse<BaseResponse>("components/readable", true).ConfigureAwait(false);
-        gen24System.Inverter = gen24JsonService.ReadFroniusData<Gen24Inverter>(dataToken["1"]);
-
-        var storage = dataToken.Values().Where(t =>
-        {
-            var attributes = t["attributes"];
-
-            return
-                attributes?["storage_interface_id"] != null ||
-                (attributes?["id"]?.Value<string>() ?? string.Empty).StartsWith("rtu-generic-storage");
-        }).FirstOrDefault();
-
-        gen24System.Storage = gen24JsonService.ReadFroniusData<Gen24Storage>(storage);
-        var restrictions = dataToken.Values().FirstOrDefault(t => t["attributes"]?["PowerRestrictionControllerVersion"] != null);
+        gen24System.Inverter = gen24JsonService.ReadFroniusData<Gen24Inverter>(dataToken[components.Groups["Inverter"].FirstOrDefault() ?? "1"]);
+        gen24System.Storage = gen24JsonService.ReadFroniusData<Gen24Storage>(dataToken[components.Groups["BatteryManagementSystem"].FirstOrDefault() ?? "16580608"]);
+        var restrictions = components.Groups["Application"].Select(key => dataToken[key]).FirstOrDefault(t => t?["attributes"]?["PowerRestrictionControllerVersion"] != null);
         gen24System.Restrictions = gen24JsonService.ReadFroniusData<Gen24Restrictions>(restrictions);
 
-        var meters = dataToken.Values()
-                .Where(t => t["attributes"]?["meter-location"] != null)
-                .GroupBy(t => t["attributes"]?["id"]?.Value<string>())
-                .Select(g => g.Values().First())
-            ;
-
-        foreach (var meter in meters)
+        foreach (var meter in  components.Groups["PowerMeter"].Select(key => dataToken[key]).Where(m=>m!=null))
         {
-            var gen24PowerMeter = gen24JsonService.ReadFroniusData<Gen24PowerMeter>(meter.Parent);
+            var gen24PowerMeter = gen24JsonService.ReadFroniusData<Gen24PowerMeter3P>(meter);
             gen24System.Meters.Add(gen24PowerMeter);
         }
 
-        gen24System.DataManager = gen24JsonService.ReadFroniusData<Gen24DataManager>(dataToken["262144"]);
-        gen24System.PowerFlow = gen24JsonService.ReadFroniusData<Gen24PowerFlow>(dataToken["327680"]);
-        gen24System.Cache = gen24JsonService.ReadFroniusData<Gen24Cache>(dataToken["393216"]);
+        gen24System.DataManager = gen24JsonService.ReadFroniusData<Gen24DataManager>(dataToken[components.Groups["DataManager"].Single()]);
+        gen24System.PowerFlow = gen24JsonService.ReadFroniusData<Gen24PowerFlow>(dataToken[components.Groups["Site"].Single()]);
+        gen24System.Cache = gen24JsonService.ReadFroniusData<Gen24Cache>(dataToken[components.Groups["CACHE"].Single()]);
 
         return gen24System;
     }
@@ -581,7 +567,23 @@ public class WebClientService : BindableBase, IWebClientService
 
     private readonly object froniusHttpClientLockObject = new();
 
-    public async Task<(string JsonString, HttpStatusCode StatusCode)> GetFroniusStringResponse(string request, JToken? token = null)
+    public async Task<(string JsonString, HttpStatusCode StatusCode)> GetFroniusStringResponse(string request, JToken? token = null, IEnumerable<HttpStatusCode>? allowedStatusCodes = null)
+    {
+        var client = await GetFroniusHttpClient();
+        var result = await client.GetString(request, token?.ToString(), allowedStatusCodes).ConfigureAwait(false);
+        lastSolarApiCall = DateTime.UtcNow;
+        return result;
+    }
+
+    public async Task<(JToken Token, HttpStatusCode StatusCode)> GetFroniusJsonResponse(string request, JToken? token = null, IEnumerable<HttpStatusCode>? allowedStatusCodes = null)
+    {
+        var client = await GetFroniusHttpClient();
+        var result = await client.GetJsonToken(request, token, allowedStatusCodes).ConfigureAwait(false);
+        lastSolarApiCall = DateTime.UtcNow;
+        return result;
+    }
+
+    private async Task<DigestAuthHttp> GetFroniusHttpClient()
     {
         if (InverterConnection?.BaseUrl == null)
         {
@@ -603,9 +605,7 @@ public class WebClientService : BindableBase, IWebClientService
             await Task.Delay(nextAllowedCall).ConfigureAwait(false);
         }
 
-        var result = await client.GetString(request, token?.ToString()).ConfigureAwait(false);
-        lastSolarApiCall = DateTime.UtcNow;
-        return result;
+        return client;
     }
 
     private async Task<(T, JToken)> GetJsonResponse<T>(string request, bool useUnofficialApi = false) where T : BaseResponse, new()

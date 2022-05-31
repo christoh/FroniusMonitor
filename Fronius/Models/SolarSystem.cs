@@ -24,6 +24,14 @@ public class SolarSystem : BindableBase, IHierarchicalCollection
         set => Set(ref gen24System, value);
     }
 
+    private Gen24Components? components;
+
+    public Gen24Components? Components
+    {
+        get => components;
+        set => Set(ref components, value);
+    }
+
     private Gen24Versions? versions;
 
     public Gen24Versions? Versions

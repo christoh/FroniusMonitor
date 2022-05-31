@@ -160,7 +160,7 @@
     <value>---</value>
   </data>
   <data name="NoSystemConnection" xml:space="preserve">
-    <value>Sie haben keine vollständigen Wechselrichter-Verbindungsparameter angegeben</value>
+	  <value>Du hast keine vollständigen Wechselrichter-Verbindungsparameter angegeben</value>
   </data>
   <data name="Ohmpilot" xml:space="preserve">
     <value>Ohmpilot</value>
@@ -328,7 +328,7 @@
     <value>_Ansicht</value>
   </data>
   <data name="NoFritzBoxConnection" xml:space="preserve">
-    <value>Sie haben keine vollständigen Fritz!Box-Verbindungsparameter angegeben</value>
+	  <value>Du hast keine vollständigen Fritz!Box-Verbindungsparameter angegeben</value>
   </data>
   <data name="Ok" xml:space="preserve">
     <value>Ok</value>
@@ -695,5 +695,8 @@
   </data>
   <data name="EnableFritzBox" xml:space="preserve">
 	  <value>AVM Fritz!Box Home-Automation-Geräte steuern</value>
+  </data>
+  <data name="InvalidParameters" xml:space="preserve">
+	  <value>Ungültige Parameter</value>
   </data>
 </root>

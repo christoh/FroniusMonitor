@@ -6,13 +6,13 @@ public partial class PowerMeterClassic
 
     public static readonly DependencyProperty SmartMeterControlProperty = DependencyProperty.Register
     (
-        nameof(SmartMeter), typeof(Gen24PowerMeter), typeof(PowerMeterClassic),
+        nameof(SmartMeter), typeof(Gen24PowerMeter3P), typeof(PowerMeterClassic),
         new PropertyMetadata((d, _) => ((PowerMeterClassic)d).SmartMeterPropertyChanged())
     );
 
-    public Gen24PowerMeter? SmartMeter
+    public Gen24PowerMeter3P? SmartMeter
     {
-        get => (Gen24PowerMeter?)GetValue(SmartMeterControlProperty);
+        get => (Gen24PowerMeter3P?)GetValue(SmartMeterControlProperty);
         set => SetValue(SmartMeterControlProperty, value);
     }
 

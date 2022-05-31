@@ -35,7 +35,7 @@ public class DigestAuthHttp : IDisposable, IAsyncDisposable
 
     public async ValueTask DisposeAsync() => await Task.Run(Dispose).ConfigureAwait(false);
 
-    public async Task<(JToken?, HttpStatusCode)> GetJsonToken(string url, JToken? token)
+    public async Task<(JToken, HttpStatusCode)> GetJsonToken(string url, JToken? token, IEnumerable<HttpStatusCode>? allowedStatusCodes = null)
     {
         string? stringContent = null;
 
@@ -44,8 +44,8 @@ public class DigestAuthHttp : IDisposable, IAsyncDisposable
             await Task.Run(() => stringContent = token.ToString()).ConfigureAwait(false);
         }
 
-        var (stringResult, httpStatusCode) = await GetString(url, stringContent).ConfigureAwait(false);
-        JToken? resultToken = null;
+        var (stringResult, httpStatusCode) = await GetString(url, stringContent, allowedStatusCodes).ConfigureAwait(false);
+        var resultToken = JToken.Parse("{}");
 
         await Task.Run(() =>
         {
@@ -55,9 +55,9 @@ public class DigestAuthHttp : IDisposable, IAsyncDisposable
         return (resultToken, httpStatusCode);
     }
 
-    public async Task<(string, HttpStatusCode)> GetString(string url, string? stringContent = null)
+    public async Task<(string, HttpStatusCode)> GetString(string url, string? stringContent = null, IEnumerable<HttpStatusCode>? allowedStatusCodes = null)
     {
-        var response = await GetResponse(url, stringContent).ConfigureAwait(false);
+        var response = await GetResponse(url, stringContent, allowedStatusCodes).ConfigureAwait(false);
 
         try
         {
@@ -69,8 +69,11 @@ public class DigestAuthHttp : IDisposable, IAsyncDisposable
         }
     }
 
-    public async Task<HttpResponseMessage> GetResponse(string url, string? stringContent)
+    public async Task<HttpResponseMessage> GetResponse(string url, string? stringContent, IEnumerable<HttpStatusCode>? allowedStatusCodesEnumerable = null)
     {
+        allowedStatusCodesEnumerable ??= new[] { HttpStatusCode.OK };
+        var allowedStatusCodes = allowedStatusCodesEnumerable as IList<HttpStatusCode> ?? allowedStatusCodesEnumerable.ToArray();
+
         if (url.Length == 0 || url[0] != '/')
         {
             url = '/' + url;
@@ -84,6 +87,7 @@ public class DigestAuthHttp : IDisposable, IAsyncDisposable
 
             if (response.StatusCode != HttpStatusCode.Unauthorized)
             {
+                ThrowOnWrongStatusCode();
                 return response;
             }
 
@@ -110,7 +114,17 @@ public class DigestAuthHttp : IDisposable, IAsyncDisposable
             cnonce = unchecked((uint)random.Next(int.MinValue, int.MaxValue)).ToString("x8");
             cnonceDate = DateTime.UtcNow;
             request = await CreateRequest(url, stringContent).ConfigureAwait(false);
-            return await httpClient.SendAsync(request).ConfigureAwait(false);
+            response = await httpClient.SendAsync(request).ConfigureAwait(false);
+            ThrowOnWrongStatusCode();
+            return response;
+
+            void ThrowOnWrongStatusCode()
+            {
+                if (!allowedStatusCodes.Contains(response.StatusCode))
+                {
+                    throw new HttpRequestException(response.ReasonPhrase, null, response.StatusCode);
+                }
+            }
 
             Task<string?> GetAuthHeaderToken(string varName) => Task.Run(() =>
             {

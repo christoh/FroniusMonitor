@@ -47,13 +47,13 @@ public partial class SmartMeterControl : IHaveLcdPanel
 
     public static readonly DependencyProperty SmartMeterProperty = DependencyProperty.Register
     (
-        nameof(SmartMeter), typeof(Gen24PowerMeter), typeof(SmartMeterControl),
+        nameof(SmartMeter), typeof(Gen24PowerMeter3P), typeof(SmartMeterControl),
         new PropertyMetadata((d, _) => ((SmartMeterControl)d).SmartMeterDataChanged())
     );
 
-    public Gen24PowerMeter? SmartMeter
+    public Gen24PowerMeter3P? SmartMeter
     {
-        get => (Gen24PowerMeter?)GetValue(SmartMeterProperty);
+        get => (Gen24PowerMeter3P?)GetValue(SmartMeterProperty);
         set => SetValue(SmartMeterProperty, value);
     }
 
