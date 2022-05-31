@@ -31,7 +31,7 @@ public abstract class SettingsViewModelBase : ViewModelBase
     {
         try
         {
-            var _ = await WebClientService.GetFroniusJsonResponse(uri, token).ConfigureAwait(false);
+            var _ = await WebClientService.GetFroniusStringResponse(uri, token).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

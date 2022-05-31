@@ -1,15 +1,11 @@
-﻿using System.Net;
-
-namespace De.Hochstaetter.FroniusMonitor.ViewModels;
+﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
 public class ModbusViewModel : SettingsViewModelBase
 {
     private Gen24ModbusSettings oldSettings = null!;
     private ModbusView view = null!;
 
-    public ModbusViewModel(IWebClientService webClientService, IGen24JsonService gen24JsonService):base(webClientService,gen24JsonService)
-    {
-    }
+    public ModbusViewModel(IWebClientService webClientService, IGen24JsonService gen24JsonService) : base(webClientService, gen24JsonService) { }
 
     private Gen24ModbusSettings settings = null!;
 
@@ -64,7 +60,7 @@ public class ModbusViewModel : SettingsViewModelBase
 
         try
         {
-            oldSettings = Gen24ModbusSettings.Parse(await WebClientService.GetFroniusJsonResponse("config/modbus").ConfigureAwait(false));
+            oldSettings = Gen24ModbusSettings.Parse((await WebClientService.GetFroniusStringResponse("config/modbus").ConfigureAwait(false)).JsonString);
         }
         catch (Exception ex)
         {
@@ -102,7 +98,7 @@ public class ModbusViewModel : SettingsViewModelBase
 
             foreach (var error in errors)
             {
-                if (error.BindingInError is BindingExpression { Target: FrameworkElement { IsVisible: false } } expression)
+                if (error.BindingInError is BindingExpression {Target: FrameworkElement {IsVisible: false}} expression)
                 {
                     var type = oldSettings.GetType();
                     var property = type.GetProperty(expression.ResolvedSourcePropertyName);
@@ -116,7 +112,7 @@ public class ModbusViewModel : SettingsViewModelBase
             }
 
             var errorList = errors
-                .Where(e => e.BindingInError is BindingExpression { Target: FrameworkElement { IsVisible: true } })
+                .Where(e => e.BindingInError is BindingExpression {Target: FrameworkElement {IsVisible: true}})
                 .Select(e => e.ErrorContent.ToString()).ToArray();
 
             if (errorList.Length > 0)

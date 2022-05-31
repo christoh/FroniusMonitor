@@ -8,7 +8,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
     private Gen24BatterySettings oldSettings = null!;
     private BindableCollection<Gen24ChargingRule> oldChargingRules = null!;
 
-    public SelfConsumptionOptimizationViewModel(IWebClientService webClientService, IGen24JsonService gen24Service):base(webClientService,gen24Service)
+    public SelfConsumptionOptimizationViewModel(IWebClientService webClientService, IGen24JsonService gen24Service) : base(webClientService, gen24Service)
     {
     }
 
@@ -139,7 +139,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
 
         try
         {
-            jsonString = await WebClientService.GetFroniusJsonResponse("config/timeofuse").ConfigureAwait(false);
+            jsonString = (await WebClientService.GetFroniusStringResponse("config/timeofuse").ConfigureAwait(false)).JsonString;
         }
         catch (Exception ex)
         {
@@ -313,7 +313,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
 
             if (nonRulesChanged)
             {
-                if (!await UpdateInverter("config/batteries",updateToken).ConfigureAwait(false))
+                if (!await UpdateInverter("config/batteries", updateToken).ConfigureAwait(false))
                 {
                     return;
                 }
@@ -321,7 +321,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
 
             if (rulesChanged)
             {
-                if (!await UpdateInverter("config/timeofuse",rulesToken).ConfigureAwait(false))
+                if (!await UpdateInverter("config/timeofuse", rulesToken).ConfigureAwait(false))
                 {
                     return;
                 }

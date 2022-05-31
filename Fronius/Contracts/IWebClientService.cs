@@ -19,7 +19,7 @@
         Task SetFritzBoxColor(string ain, double hueDegrees, double saturation);
         Task<IOrderedEnumerable<Gen24Event>> GetFroniusEvents();
         Task<T> ReadGen24Entity<T>(string request) where T : new();
-        Task<string> GetFroniusJsonResponse(string request, JToken? token = null);
+        Task<(string JsonString,HttpStatusCode StatusCode)> GetFroniusStringResponse(string request, JToken? token = null);
         Task<string> GetConfigString(string category, string key);
         Task<string> GetEventDescription(string code);
 

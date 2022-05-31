@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices.ComTypes;
-
-namespace De.Hochstaetter.Fronius.Services;
+﻿namespace De.Hochstaetter.Fronius.Services;
 
 public class SolarSystemService : BindableBase, ISolarSystemService
 {
@@ -138,7 +136,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
         try
         {
-            result.Versions = Gen24Versions.Parse(await webClientService.GetFroniusJsonResponse("status/version").ConfigureAwait(false));
+            result.Versions = Gen24Versions.Parse((await webClientService.GetFroniusStringResponse("status/version").ConfigureAwait(false)).JsonString ?? string.Empty);
             result.Gen24System = await webClientService.GetFroniusData().ConfigureAwait(false);
 
             foreach (var deviceGroup in (await webClientService.GetDevices().ConfigureAwait(false)).Devices.GroupBy(d => d.DeviceClass))
@@ -160,7 +158,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
                 foreach (var device in deviceGroup)
                 {
-                    var group = new DeviceGroup { DeviceClass = deviceGroup.Key };
+                    var group = new DeviceGroup {DeviceClass = deviceGroup.Key};
 
                     switch (deviceGroup.Key)
                     {

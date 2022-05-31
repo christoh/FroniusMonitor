@@ -42,7 +42,7 @@ public class WebClientService : BindableBase, IWebClientService
 
     public async Task<T> ReadGen24Entity<T>(string request) where T : new()
     {
-        var token = JToken.Parse(await GetFroniusJsonResponse(request).ConfigureAwait(false));
+        var token = JToken.Parse((await GetFroniusStringResponse(request).ConfigureAwait(false)).JsonString);
         return gen24JsonService.ReadFroniusData<T>(token);
     }
 
@@ -50,34 +50,39 @@ public class WebClientService : BindableBase, IWebClientService
     {
         var eventList = new List<Gen24Event>(256);
 
-        Parallel.ForEach(JArray.Parse(await GetFroniusJsonResponse("status/events").ConfigureAwait(false)), eventToken => { eventList.Add(gen24JsonService.ReadFroniusData<Gen24Event>(eventToken)); });
+        Parallel.ForEach
+        (
+            JArray.Parse((await GetFroniusStringResponse("status/events").ConfigureAwait(false)).JsonString),
+            eventToken => { eventList.Add(gen24JsonService.ReadFroniusData<Gen24Event>(eventToken)); }
+        );
 
         return eventList.OrderByDescending(e => e.EventTime);
     }
 
+    [SuppressMessage("ReSharper", "CommentTypo")]
     public async Task<Gen24System> GetFroniusData()
     {
         var gen24System = new Gen24System();
 
         //try
         //{
-        //    //var test1 = await GetFroniusJsonResponse("config/powerlimits").ConfigureAwait(false); // None
-        //    //var test2 = await GetFroniusJsonResponse("config/ics").ConfigureAwait(false); // None
-        //    //var test3 = await GetFroniusJsonResponse("config/solarweb").ConfigureAwait(false); // Read
-        //    //var test4 = await GetFroniusJsonResponse("config/emrs").ConfigureAwait(false); // Read/Write
-        //    //var test5 = await GetFroniusJsonResponse("config/meter").ConfigureAwait(false); // Read
+        //    //var test1 = await GetFroniusStringResponse("config/powerlimits").ConfigureAwait(false); // None
+        //    //var test2 = await GetFroniusStringResponse("config/ics").ConfigureAwait(false); // None
+        //    //var test3 = (await GetFroniusStringResponse("config/solarweb").ConfigureAwait(false)).JsonString??string.Empty; // Read
+        //    //var test4 = await GetFroniusStringResponse("config/emrs").ConfigureAwait(false); // Read/Write
+        //    //var test5 = await GetFroniusStringResponse("config/meter").ConfigureAwait(false); // Read
         //    //var token = JObject.Parse(test3);
         //    //token["enableRemoteControl"] = true;
         //    //token.Remove("_connectionKeepAlive_meta");
         //    //token.Remove("_enableRemoteControl_meta");
-        //    //var response = await GetFroniusJsonResponse("config/solarweb", token).ConfigureAwait(false);
+        //    //var response = await GetFroniusStringResponse("config/solarweb", token).ConfigureAwait(false);
         //}
         //catch (Exception ex)
         //{
         //    //
         //}
 
-        foreach (var statusToken in JArray.Parse(await GetFroniusJsonResponse("status/devices").ConfigureAwait(false)))
+        foreach (var statusToken in JArray.Parse((await GetFroniusStringResponse("status/devices").ConfigureAwait(false)).JsonString))
         {
             var status = gen24JsonService.ReadFroniusData<Gen24Status>(statusToken);
 
@@ -302,7 +307,7 @@ public class WebClientService : BindableBase, IWebClientService
     {
         try
         {
-            i ??= JObject.Parse(await GetFroniusJsonResponse($"{baseUrl}/en.json").ConfigureAwait(false));
+            i ??= JObject.Parse((await GetFroniusStringResponse($"{baseUrl}/en.json").ConfigureAwait(false)).JsonString);
         }
         catch
         {
@@ -314,7 +319,7 @@ public class WebClientService : BindableBase, IWebClientService
         {
             try
             {
-                l ??= JObject.Parse(await GetFroniusJsonResponse($"{baseUrl}/{CultureInfo.CurrentUICulture.TwoLetterISOLanguageName}.json").ConfigureAwait(false));
+                l ??= JObject.Parse((await GetFroniusStringResponse($"{baseUrl}/{CultureInfo.CurrentUICulture.TwoLetterISOLanguageName}.json").ConfigureAwait(false)).JsonString);
             }
             catch
             {
@@ -444,7 +449,7 @@ public class WebClientService : BindableBase, IWebClientService
 
         var dict = new Dictionary<string, string>
         {
-            {"username", FritzBoxConnection.UserName ?? string.Empty},
+            {"username", FritzBoxConnection.UserName},
             {"response", response}
         };
 
@@ -460,7 +465,7 @@ public class WebClientService : BindableBase, IWebClientService
 
     public async Task<FritzBoxDeviceList> GetFritzBoxDevices()
     {
-        await using var stream = await GetStreamResponse($"webservices/homeautoswitch.lua?switchcmd=getdevicelistinfos").ConfigureAwait(false) ?? throw new InvalidDataException();
+        await using var stream = await GetStreamResponse("webservices/homeautoswitch.lua?switchcmd=getdevicelistinfos").ConfigureAwait(false) ?? throw new InvalidDataException();
         var serializer = new XmlSerializer(typeof(FritzBoxDeviceList));
         var result = serializer.Deserialize(stream) as FritzBoxDeviceList ?? throw new InvalidDataException();
         result.Devices.Apply(d => d.WebClientService = this);
@@ -574,9 +579,9 @@ public class WebClientService : BindableBase, IWebClientService
         return result;
     }
 
-    private readonly object froniusHttpClientLockObject=new();
+    private readonly object froniusHttpClientLockObject = new();
 
-    public async Task<string> GetFroniusJsonResponse(string request, JToken? token = null)
+    public async Task<(string JsonString, HttpStatusCode StatusCode)> GetFroniusStringResponse(string request, JToken? token = null)
     {
         if (InverterConnection?.BaseUrl == null)
         {
@@ -598,7 +603,7 @@ public class WebClientService : BindableBase, IWebClientService
             await Task.Delay(nextAllowedCall).ConfigureAwait(false);
         }
 
-        var result = await client.GetString(request, token).ConfigureAwait(false);
+        var result = await client.GetString(request, token?.ToString()).ConfigureAwait(false);
         lastSolarApiCall = DateTime.UtcNow;
         return result;
     }
@@ -606,7 +611,12 @@ public class WebClientService : BindableBase, IWebClientService
     private async Task<(T, JToken)> GetJsonResponse<T>(string request, bool useUnofficialApi = false) where T : BaseResponse, new()
     {
         var requestString = $"{(useUnofficialApi ? string.Empty : "solar_api/v1/")}{request}";
-        var jsonString = await GetFroniusJsonResponse(requestString);
+        var (jsonString, status) = await GetFroniusStringResponse(requestString);
+
+        if (status != HttpStatusCode.OK)
+        {
+            throw new HttpRequestException(string.Format(Resources.InverterCommReadError, status), null, status);
+        }
 
         return await Task.Run(() =>
         {
