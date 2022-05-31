@@ -7,7 +7,7 @@ public partial class Arrow
     public static readonly DependencyProperty ArrowLengthProperty = DependencyProperty.Register
     (
         nameof(ArrowLength), typeof(double), typeof(Arrow),
-        new PropertyMetadata(100d,(d, e) => ((Arrow)d).OnArrowChanged())
+        new PropertyMetadata(100d,(d, _) => ((Arrow)d).OnArrowChanged())
     );
 
     public double ArrowLength
@@ -52,7 +52,7 @@ public partial class Arrow
     public static readonly DependencyProperty AngleProperty = DependencyProperty.Register
     (
         nameof(Angle), typeof(double), typeof(Arrow),
-        new PropertyMetadata((d, e) => ((Arrow)d).OnArrowChanged())
+        new PropertyMetadata((d, _) => ((Arrow)d).OnArrowChanged())
     );
 
     public double Angle
@@ -82,7 +82,7 @@ public partial class Arrow
         };
 
         RotateTransform.Angle = Angle;
-        RotateTransform.CenterX = Viewbox.ActualWidth/2;
-        RotateTransform.CenterY = Viewbox.ActualHeight/2;
+        RotateTransform.CenterX = ViewBox.ActualWidth/2;
+        RotateTransform.CenterY = ViewBox.ActualHeight/2;
     }
 }

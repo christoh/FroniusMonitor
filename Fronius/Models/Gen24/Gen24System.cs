@@ -68,7 +68,7 @@ public class Gen24System : BindableBase
 
     public double? StorageNetCapacity => Storage?.MaxCapacity * (Storage?.StateOfCharge - Restrictions?.MinStateOfCharge);
 
-    public ObservableCollection<Gen24PowerMeter> Meters { get; } = new ObservableCollection<Gen24PowerMeter>();
+    public ObservableCollection<Gen24PowerMeter> Meters { get; } = new();
 
     public Gen24PowerMeter? PrimaryPowerMeter => Meters.SingleOrDefault(m => m.Usage == MeterUsage.Inverter);
 }

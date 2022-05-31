@@ -7,7 +7,7 @@ public partial class EventLogView
         InitializeComponent();
         DataContext = viewModel;
 
-        Loaded += async (s, e) =>
+        Loaded += async (_, _) =>
         {
             ViewModel.Dispatcher = Dispatcher;
             await ViewModel.OnInitialize().ConfigureAwait(false);

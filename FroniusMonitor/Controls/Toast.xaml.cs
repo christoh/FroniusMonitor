@@ -10,13 +10,13 @@ public partial class Toast
         (
             string.Empty,
             FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
-            (d, e) => ((Toast)d).OnTextChanged(e)
+            (d, _) => ((Toast)d).OnTextChanged()
         )
     );
 
     public static DependencyProperty CornerRadiusProperty = Border.CornerRadiusProperty.AddOwner(typeof(Toast), new PropertyMetadata(new CornerRadius(10)));
 
-    private static readonly DoubleAnimation animation = new DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(1000)) { AutoReverse = false };
+    private static readonly DoubleAnimation animation = new(1, 0, TimeSpan.FromMilliseconds(1000)) { AutoReverse = false };
 
     public string Text
     {
@@ -39,13 +39,13 @@ public partial class Toast
     {
         InitializeComponent();
 
-        animation.Completed+=(s, f) =>
+        animation.Completed+=(_, _) =>
         {
             Text = string.Empty;
         };
     }
 
-    private async void OnTextChanged(DependencyPropertyChangedEventArgs e)
+    private async void OnTextChanged()
     {
         if (string.IsNullOrWhiteSpace(Text))
         {

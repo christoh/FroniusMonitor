@@ -48,7 +48,7 @@ public partial class SmartMeterControl : IHaveLcdPanel
     public static readonly DependencyProperty SmartMeterProperty = DependencyProperty.Register
     (
         nameof(SmartMeter), typeof(Gen24PowerMeter), typeof(SmartMeterControl),
-        new PropertyMetadata((d, e) => ((SmartMeterControl)d).SmartMeterDataChanged())
+        new PropertyMetadata((d, _) => ((SmartMeterControl)d).SmartMeterDataChanged())
     );
 
     public Gen24PowerMeter? SmartMeter
@@ -78,7 +78,7 @@ public partial class SmartMeterControl : IHaveLcdPanel
 
     private void OnModeChanged() => SmartMeterDataChanged();
 
-    private void SmartMeterDataChanged(object? sender = null, PropertyChangedEventArgs? e = null) => Dispatcher.InvokeAsync(() =>
+    private void SmartMeterDataChanged() => Dispatcher.InvokeAsync(() =>
     {
         if (SmartMeter is null)
         {

@@ -58,8 +58,6 @@ public partial class StorageControl
         Dispatcher.InvokeAsync(() =>
         {
             var storage = Gen24?.Storage;
-            var cache = Gen24?.Cache;
-            var limits = Gen24?.Restrictions;
 
             if (storage == null)
             {

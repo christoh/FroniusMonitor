@@ -4,8 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
-             xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
-             xmlns:gl="clr-namespace:System.Globalization;assembly=System.Globalization"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid x:Name="RootElement" Height="85" Width="120" DataContext="{Binding RelativeSource={RelativeSource AncestorType=c:PowerFlowArrow}}">

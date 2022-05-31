@@ -7,7 +7,7 @@
             InitializeComponent();
             DataContext = viewModel;
 
-            Loaded += async (s, e) =>
+            Loaded += async (_, _) =>
             {
                 viewModel.Dispatcher = Dispatcher;
                 await viewModel.OnInitialize().ConfigureAwait(false);

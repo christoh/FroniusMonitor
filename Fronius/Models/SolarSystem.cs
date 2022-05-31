@@ -4,7 +4,7 @@ public class SolarSystem : BindableBase, IHierarchicalCollection
 {
     public string DisplayName => Resources.MySolarSystem;
 
-    public ObservableCollection<DeviceGroup> DeviceGroups { get; } = new ObservableCollection<DeviceGroup>();
+    public ObservableCollection<DeviceGroup> DeviceGroups { get; } = new();
 
     public IEnumerable<Storage> Storages => DeviceGroups.SingleOrDefault(g => g.DeviceClass == DeviceClass.Storage)?.Devices.OfType<Storage>() ?? Array.Empty<Storage>();
 

@@ -16,7 +16,7 @@ public enum Unit : byte
     Time
 }
 
-[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+[AttributeUsage(AttributeTargets.Property)]
 internal class FroniusProprietaryImportAttribute : Attribute
 {
     public FroniusProprietaryImportAttribute(string name, FroniusDataType dataType, Unit unit, string? propertyName)

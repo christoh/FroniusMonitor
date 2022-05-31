@@ -1,13 +1,13 @@
 ﻿namespace De.Hochstaetter.FroniusMonitor.Views
 {
-    public partial class ModbusView : Window
+    public partial class ModbusView
     {
         public ModbusView(ModbusViewModel viewModel)
         {
             InitializeComponent();
             DataContext = viewModel;
 
-            Loaded += async (s, e) =>
+            Loaded += async (_, _) =>
             {
                 viewModel.Dispatcher = Dispatcher;
                 await viewModel.OnInitialize().ConfigureAwait(false);

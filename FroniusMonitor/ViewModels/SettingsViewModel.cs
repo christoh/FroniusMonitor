@@ -29,8 +29,8 @@
         private async void Ok()
         {
             IoC.Get<MainWindow>().SettingsView.Close();
-            Settings.FroniusConnection!.BaseUrl = FixUrl(Settings.FroniusConnection!.BaseUrl!);
-            Settings.FritzBoxConnection!.BaseUrl = FixUrl(Settings.FritzBoxConnection!.BaseUrl!);
+            Settings.FroniusConnection!.BaseUrl = FixUrl(Settings.FroniusConnection!.BaseUrl);
+            Settings.FritzBoxConnection!.BaseUrl = FixUrl(Settings.FritzBoxConnection!.BaseUrl);
             App.Settings = Settings;
             IoC.Get<MainViewModel>().NotifyOfPropertyChange(nameof(Settings));
             IoC.Get<IWebClientService>().FritzBoxConnection = Settings.HaveFritzBox ? Settings.FritzBoxConnection : null;

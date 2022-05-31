@@ -6,7 +6,7 @@
                 xmlns:local="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
                 mc:Ignorable="d"
                 d:DesignHeight="100" d:DesignWidth="40">
-    <Viewbox x:Name="Viewbox" Stretch="Uniform" DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:Arrow}}">
+    <Viewbox x:Name="ViewBox" Stretch="Uniform" DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:Arrow}}">
         <Viewbox.LayoutTransform>
             <RotateTransform x:Name="RotateTransform"/>
         </Viewbox.LayoutTransform>

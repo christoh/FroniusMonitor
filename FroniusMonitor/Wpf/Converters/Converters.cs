@@ -188,9 +188,9 @@ public class MultiBool2Anything<T> : MultiConverterBase
     public virtual T? Invalid { get; set; }
     public override object? Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
     {
-        var boolValues = values?.OfType<bool>().ToArray();
+        var boolValues = values.OfType<bool>().ToArray();
 
-        if (values==null||boolValues==null ||values.Length != boolValues.Length)
+        if (values.Length != boolValues.Length)
         {
             return Invalid;
         }
@@ -219,11 +219,11 @@ public class MultiBool2Visibility : MultiBool2Anything<Visibility>
 
 public class ModbusInterfaceRole2Visibility : MultiConverterBase
 {
-    public override object? Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
+    public override object Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
     {
-        var roles = values?.OfType<ModbusInterfaceRole>().ToArray();
+        var roles = values.OfType<ModbusInterfaceRole>().ToArray();
 
-        if (values == null || roles == null || values.Length != roles.Length)
+        if (values.Length != roles.Length)
         {
             return Visibility.Collapsed;
         }
@@ -234,7 +234,7 @@ public class ModbusInterfaceRole2Visibility : MultiConverterBase
 
 public class CommonModbusSettingsVisibility : MultiConverterBase
 {
-    public override object? Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
+    public override object Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
     {
         var roles = values.OfType<ModbusInterfaceRole>();
         var flags = values.OfType<bool>();
@@ -297,14 +297,6 @@ public class GetTemperatureTicks : ConverterBase
 
 
         double Round(double i) => Math.Ceiling(i / tickDistance) * tickDistance;
-    }
-}
-
-public class CountToVisibility : ConverterBase
-{
-    public override object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-    {
-        return value is not IEnumerable<Storage> storages ? Visibility.Collapsed : storages.Any() ? Visibility.Visible : Visibility.Collapsed;
     }
 }
 

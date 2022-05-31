@@ -7,7 +7,7 @@ public partial class PowerMeterClassic
     public static readonly DependencyProperty SmartMeterControlProperty = DependencyProperty.Register
     (
         nameof(SmartMeter), typeof(Gen24PowerMeter), typeof(PowerMeterClassic),
-        new PropertyMetadata((d, e) => ((PowerMeterClassic)d).SmartMeterPropertyChanged())
+        new PropertyMetadata((d, _) => ((PowerMeterClassic)d).SmartMeterPropertyChanged())
     );
 
     public Gen24PowerMeter? SmartMeter
@@ -21,7 +21,7 @@ public partial class PowerMeterClassic
         InitializeComponent();
     }
 
-    private void SmartMeterPropertyChanged(object? _ = null, PropertyChangedEventArgs? e = null)
+    private void SmartMeterPropertyChanged()
     {
         Dispatcher.InvokeAsync(() =>
         {

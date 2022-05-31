@@ -23,5 +23,5 @@ public class IoC:IServiceProvider
         return App.Container.Resolve(type);
     }
 
-    public object? GetService(Type serviceType) => Get(serviceType);
+    public object GetService(Type serviceType) => Get(serviceType);
 }
