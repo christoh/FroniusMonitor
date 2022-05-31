@@ -13,19 +13,19 @@ public class WebConnection : BindableBase, ICloneable
         aes.Key = IoC.Get<IAesKeyProvider>().GetAesKey();
     }
 
-    private string? baseUrl;
+    private string baseUrl = "";
 
-    [DefaultValue(null), XmlAttribute]
-    public string? BaseUrl
+    [DefaultValue(""), XmlAttribute]
+    public string BaseUrl
     {
         get => baseUrl;
         set => Set(ref baseUrl, value);
     }
 
-    private string? userName;
+    private string userName = "";
 
-    [DefaultValue(null), XmlAttribute]
-    public string? UserName
+    [DefaultValue(""), XmlAttribute]
+    public string UserName
     {
         get => userName;
         set => Set(ref userName, value);

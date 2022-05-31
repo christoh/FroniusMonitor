@@ -26,6 +26,7 @@ public class WebClientService : BindableBase, IWebClientService
         {
             lock (froniusHttpClientLockObject)
             {
+                froniusHttpClient?.Dispose();
                 froniusHttpClient = null;
             }
         });
@@ -583,7 +584,6 @@ public class WebClientService : BindableBase, IWebClientService
         }
 
         DigestAuthHttp client;
-        froniusHttpClient ??= new DigestAuthHttp(InverterConnection ?? throw new ArgumentNullException());
 
         lock (froniusHttpClientLockObject)
         {
