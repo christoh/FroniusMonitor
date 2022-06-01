@@ -42,13 +42,13 @@ public partial class SmartMeterControl : IHaveLcdPanel
     };
 
     private int currentPowerModeIndex, currentVoltageModeIndex, currentCurrentIndex, currentMoreIndex;
+    private readonly ISolarSystemService? solarSystemService = IoC.TryGet<ISolarSystemService>();
 
     #region Dependency Properties
 
     public static readonly DependencyProperty SmartMeterProperty = DependencyProperty.Register
     (
-        nameof(SmartMeter), typeof(Gen24PowerMeter3P), typeof(SmartMeterControl),
-        new PropertyMetadata((d, _) => ((SmartMeterControl)d).SmartMeterDataChanged())
+        nameof(SmartMeter), typeof(Gen24PowerMeter3P), typeof(SmartMeterControl)
     );
 
     public Gen24PowerMeter3P? SmartMeter
@@ -60,7 +60,7 @@ public partial class SmartMeterControl : IHaveLcdPanel
     public static readonly DependencyProperty ModeProperty = DependencyProperty.Register
     (
         nameof(Mode), typeof(MeterDisplayMode), typeof(SmartMeterControl),
-        new PropertyMetadata(MeterDisplayMode.PowerReal, (d, _) => ((SmartMeterControl)d).OnModeChanged())
+        new PropertyMetadata(MeterDisplayMode.PowerReal, (d, _) => ((SmartMeterControl)d).SmartMeterDataChanged())
     );
 
     public MeterDisplayMode Mode
@@ -74,19 +74,41 @@ public partial class SmartMeterControl : IHaveLcdPanel
     public SmartMeterControl()
     {
         InitializeComponent();
+
+        Loaded += (_, _) =>
+        {
+            if (solarSystemService != null)
+            {
+                solarSystemService.NewDataReceived += NewDataReceived; ;
+            }
+        };
+
+        Unloaded += (_, _) =>
+        {
+            if (solarSystemService != null)
+            {
+                solarSystemService.NewDataReceived -= NewDataReceived;
+            }
+        };
+
     }
 
-    private void OnModeChanged() => SmartMeterDataChanged();
+    private void NewDataReceived(object? sender, SolarDataEventArgs e)
+    {
+        SmartMeterDataChanged();
+    }
 
     private void SmartMeterDataChanged() => Dispatcher.InvokeAsync(() =>
     {
         if (SmartMeter is null)
         {
             BackgroundProvider.Background = Brushes.LightGray;
+            Title.Text = "---";
             return;
         }
 
-        BackgroundProvider.Background = !SmartMeter.IsVisible.HasValue || !SmartMeter.IsVisible.Value ? Brushes.Red : SmartMeter.IsEnabled.HasValue && SmartMeter.IsEnabled.Value ? Brushes.AntiqueWhite : Brushes.LightGray;
+        Title.Text = $"{SmartMeter.Model} ({solarSystemService?.SolarSystem?.Gen24System?.MeterStatus?.StatusMessage??Loc.Unknown})";
+        BackgroundProvider.Background = solarSystemService?.SolarSystem?.Gen24System?.MeterStatus?.ToBrush() ?? Brushes.LightGray;
 
         switch (Mode)
         {

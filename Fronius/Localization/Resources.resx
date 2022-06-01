@@ -322,7 +322,7 @@
     <value>Include inverter power (Solar web mode)</value>
   </data>
   <data name="Settings" xml:space="preserve">
-    <value>_Settings</value>
+	  <value>Settings</value>
   </data>
   <data name="View" xml:space="preserve">
     <value>_View</value>
@@ -710,5 +710,11 @@
   </data>
   <data name="InvalidParameters" xml:space="preserve">
 	  <value>Invalid parameters</value>
+  </data>
+  <data name="MatchWindowsLanguage" xml:space="preserve">
+	  <value>Match Windows language if available or English otherwise</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+	  <value>Language</value>
   </data>
 </root>

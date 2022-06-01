@@ -322,7 +322,7 @@
     <value>Leistung des Wechselrichters hinzufügen (Solar-Web-Modus)</value>
   </data>
   <data name="Settings" xml:space="preserve">
-    <value>_Einstellungen</value>
+	  <value>Einstellungen</value>
   </data>
   <data name="View" xml:space="preserve">
     <value>_Ansicht</value>
@@ -698,5 +698,11 @@
   </data>
   <data name="InvalidParameters" xml:space="preserve">
 	  <value>Ungültige Parameter</value>
+  </data>
+  <data name="MatchWindowsLanguage" xml:space="preserve">
+	  <value>Windows-Anzeigesprache verwenden, wenn verfügbar, ansonsten Englisch</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+	  <value>Sprache</value>
   </data>
 </root>

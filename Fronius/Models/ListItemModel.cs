@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace De.Hochstaetter.Fronius.Models
 {
-    public class ListItemModel<T>:BindableBase
+    public class ListItemModel<T> : BindableBase
     {
-        private string displayName=string.Empty;
+        private string displayName = string.Empty;
 
         public string DisplayName
         {
@@ -23,5 +23,7 @@ namespace De.Hochstaetter.Fronius.Models
             get => valueField;
             set => Set(ref valueField, value);
         }
+
+        public override string ToString() => DisplayName;
     }
 }

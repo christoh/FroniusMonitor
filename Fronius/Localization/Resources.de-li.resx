@@ -1,0 +1,41 @@
+﻿<root>
+	<resheader name="resmimetype">
+		<value>text/microsoft-resx</value>
+	</resheader>
+	<resheader name="version">
+		<value>1.3</value>
+	</resheader>
+	<resheader name="reader">
+		<value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<resheader name="writer">
+		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<data name="Friday" xml:space="preserve">
+		<value>Friitig</value>
+	</data>
+	<data name="Monday" xml:space="preserve">
+		<value>Määntig</value>
+	</data>
+	<data name="Saturday" xml:space="preserve">
+		<value>Samschtig</value>
+	</data>
+	<data name="Sunday" xml:space="preserve">
+		<value>Sunntig</value>
+	</data>
+	<data name="SunspecMode_Float" xml:space="preserve">
+		<value>Fliesskomma</value>
+	</data>
+	<data name="Thursday" xml:space="preserve">
+		<value>Dunschtig</value>
+	</data>
+	<data name="Tuesday" xml:space="preserve">
+		<value>Ziischtig</value>
+	</data>
+	<data name="Tuesday_One" xml:space="preserve">
+		<value>Z</value>
+	</data>
+	<data name="Wednesday" xml:space="preserve">
+		<value>Mittwuch</value>
+	</data>
+</root>

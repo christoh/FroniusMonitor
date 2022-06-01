@@ -19,6 +19,14 @@ public class Settings : BindableBase, ICloneable
         set => Set(ref froniusConnection, value);
     }
 
+    private string? language;
+    [XmlElement, DefaultValue(null)]
+    public string? Language
+    {
+        get => language;
+        set => Set(ref language, value);
+    }
+
     private bool haveFritzBox;
     [XmlElement]
     public bool HaveFritzBox

@@ -10,7 +10,7 @@
         mc:Ignorable="d"
         d:DesignHeight="450" d:DesignWidth="800" MinWidth="480" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize"
         d:DataContext="{d:DesignInstance Type={x:Type vm:SettingsViewModel}}"
-        Title="{x:Static p:Resources.Credentials}">
+        Title="{x:Static p:Resources.Settings}">
     <Grid Margin="16">
         <Grid.Resources>
             <Style TargetType="Button">
@@ -46,8 +46,21 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <GroupBox Grid.Row="0" Header="{x:Static p:Resources.Gen24InverterHeader}">
+
+        <GroupBox Grid.Row="0" Header="{x:Static p:Resources.Language}">
+            <ComboBox Margin="8" ItemsSource="{Binding Cultures}" SelectedItem="{Binding SelectedCulture}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" MinHeight="20" Margin="0,2,0,0" VerticalAlignment="Center" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </GroupBox>
+
+
+        <GroupBox Grid.Row="1" Margin="0,8,0,0" Header="{x:Static p:Resources.Gen24InverterHeader}">
             <Grid Margin="8">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -89,7 +102,7 @@
 
         </GroupBox>
 
-        <GroupBox Grid.Row="1" Margin="0,8,0,0" Header="{x:Static p:Resources.FritzBoxHeader}">
+        <GroupBox Grid.Row="2" Margin="0,8,0,0" Header="{x:Static p:Resources.FritzBoxHeader}">
             <Grid Margin="8">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -131,7 +144,7 @@
             </Grid>
         </GroupBox>
 
-        <Grid Grid.Row="2" Margin="0,32,-8,0">
+        <Grid Grid.Row="3" Margin="0,32,-8,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>

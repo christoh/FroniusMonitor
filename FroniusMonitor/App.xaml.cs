@@ -15,10 +15,10 @@ public partial class App
 
     protected override void OnStartup(StartupEventArgs e)
     {
-        Thread.CurrentThread.CurrentUICulture = new CultureInfo("de-CH");
         base.OnStartup(e);
-
         Fronius.IoC.Injector = new IoC();
+
+        DispatcherUnhandledException += OnUnhandledException;
 
         Container
             .RegisterSingleton<IWebClientService, WebClientService>()
@@ -49,6 +49,24 @@ public partial class App
             Settings.Save().Wait();
         }
 
+        if (!string.IsNullOrWhiteSpace(Settings.Language))
+        {
+            try
+            {
+                Thread.CurrentThread.CurrentUICulture = new CultureInfo(Settings.Language);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, Fronius.Localization.Resources.Warning, MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
         IoC.Get<MainWindow>().Show();
+    }
+
+    private static void OnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+    {
+        e.Handled = true;
+        e.Dispatcher.InvokeAsync(() => MessageBox.Show(e.Exception.ToString(), Fronius.Localization.Resources.Warning, MessageBoxButton.OK, MessageBoxImage.Error));
     }
 }

@@ -736,6 +736,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Language.
+        /// </summary>
+        public static string Language {
+            get {
+                return ResourceManager.GetString("Language", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Line voltage.
         /// </summary>
         public static string LineVoltage {
@@ -768,6 +777,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Manual {
             get {
                 return ResourceManager.GetString("Manual", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Match Windows language if available or English otherwise.
+        /// </summary>
+        public static string MatchWindowsLanguage {
+            get {
+                return ResourceManager.GetString("MatchWindowsLanguage", resourceCulture);
             }
         }
         
@@ -1321,7 +1339,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to _Settings.
+        ///   Looks up a localized string similar to Settings.
         /// </summary>
         public static string Settings {
             get {
