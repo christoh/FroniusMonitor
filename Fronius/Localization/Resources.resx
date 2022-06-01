@@ -343,13 +343,13 @@
     <value>{0} Settings Files (*.fms)|*.fms</value>
   </data>
   <data name="ExportSettings" xml:space="preserve">
-    <value>Export Settings</value>
+	  <value>Export settings</value>
   </data>
   <data name="Load" xml:space="preserve">
     <value>Load</value>
   </data>
   <data name="LoadSettings" xml:space="preserve">
-    <value>Load Settings</value>
+	  <value>Load settings</value>
   </data>
   <data name="AcPhaseVoltage" xml:space="preserve">
     <value>AC phase voltage</value>
@@ -394,7 +394,7 @@
     <value>Warning</value>
   </data>
   <data name="EventLog" xml:space="preserve">
-    <value>Event Log</value>
+	  <value>Event log</value>
   </data>
   <data name="Start" xml:space="preserve">
     <value>Start</value>
@@ -439,10 +439,10 @@
     <value>Use Manufacturer defaults</value>
   </data>
   <data name="GridPowerManagement" xml:space="preserve">
-    <value>Grid Power Management</value>
+	  <value>Grid power management</value>
   </data>
   <data name="BatteryChargingOptions" xml:space="preserve">
-    <value>Battery Options</value>
+	  <value>Battery options</value>
   </data>
   <data name="MinimumSoc" xml:space="preserve">
     <value>Minimum SoC</value>
@@ -472,10 +472,10 @@
     <value>No settings were changed</value>
   </data>
   <data name="EnableBattery" xml:space="preserve">
-    <value>Enable Battery</value>
+	  <value>Enable battery</value>
   </data>
   <data name="CalibrateBattery" xml:space="preserve">
-    <value>Calibrate Battery</value>
+	  <value>Calibrate battery</value>
   </data>
   <data name="SocLimits" xml:space="preserve">
     <value>SoC Limits</value>
@@ -496,7 +496,7 @@
 	  <value>SunSpec address must be between 1 and 255</value>
   </data>
   <data name="ModbusSettings" xml:space="preserve">
-    <value>Modbus Settings</value>
+	  <value>Modbus settings</value>
   </data>
   <data name="ModbusInterfaceRole_Disabled" xml:space="preserve">
 	  <value>Disabled</value>
@@ -517,7 +517,7 @@
 	  <value>None</value>
   </data>
   <data name="SunspecMode_Float" xml:space="preserve">
-	  <value>Float point</value>
+	  <value>Floating point</value>
   </data>
   <data name="SunspecMode_Int" xml:space="preserve">
 	  <value>Integer + scale factor</value>
@@ -631,7 +631,7 @@
 	  <value>Saturday</value>
   </data>
   <data name="BatteryChargingRules" xml:space="preserve">
-	  <value>Battery Charging Rules</value>
+	  <value>Battery charging rules</value>
   </data>
   <data name="ChargingRuleType_MinimumCharge" xml:space="preserve">
 	  <value>Min. charging power</value>
@@ -703,7 +703,7 @@
 	  <value>Password</value>
   </data>
   <data name="EnableFritzBox" xml:space="preserve">
-	  <value>Control AVM Fritz!Box Home Automation Devices</value>
+	  <value>Control AVM Fritz!Box home automation devices</value>
   </data>
   <data name="Save" xml:space="preserve">
 	  <value>Save</value>
@@ -712,9 +712,12 @@
 	  <value>Invalid parameters</value>
   </data>
   <data name="MatchWindowsLanguage" xml:space="preserve">
-	  <value>Match Windows language if available or English otherwise</value>
+	  <value>Match Windows language if possible</value>
   </data>
   <data name="Language" xml:space="preserve">
 	  <value>Language</value>
+  </data>
+  <data name="AppSettings" xml:space="preserve">
+	  <value>Application settings</value>
   </data>
 </root>

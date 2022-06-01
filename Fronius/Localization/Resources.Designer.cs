@@ -187,6 +187,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Application settings.
+        /// </summary>
+        public static string AppSettings {
+            get {
+                return ResourceManager.GetString("AppSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Automatic.
         /// </summary>
         public static string Automatic {
@@ -205,7 +214,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Battery Options.
+        ///   Looks up a localized string similar to Battery options.
         /// </summary>
         public static string BatteryChargingOptions {
             get {
@@ -214,7 +223,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Battery Charging Rules.
+        ///   Looks up a localized string similar to Battery charging rules.
         /// </summary>
         public static string BatteryChargingRules {
             get {
@@ -250,7 +259,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Calibrate Battery.
+        ///   Looks up a localized string similar to Calibrate battery.
         /// </summary>
         public static string CalibrateBattery {
             get {
@@ -448,7 +457,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enable Battery.
+        ///   Looks up a localized string similar to Enable battery.
         /// </summary>
         public static string EnableBattery {
             get {
@@ -457,7 +466,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Control AVM Fritz!Box Home Automation Devices.
+        ///   Looks up a localized string similar to Control AVM Fritz!Box home automation devices.
         /// </summary>
         public static string EnableFritzBox {
             get {
@@ -529,7 +538,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Event Log.
+        ///   Looks up a localized string similar to Event log.
         /// </summary>
         public static string EventLog {
             get {
@@ -547,7 +556,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Export Settings.
+        ///   Looks up a localized string similar to Export settings.
         /// </summary>
         public static string ExportSettings {
             get {
@@ -610,7 +619,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Grid Power Management.
+        ///   Looks up a localized string similar to Grid power management.
         /// </summary>
         public static string GridPowerManagement {
             get {
@@ -763,7 +772,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Load Settings.
+        ///   Looks up a localized string similar to Load settings.
         /// </summary>
         public static string LoadSettings {
             get {
@@ -781,7 +790,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Match Windows language if available or English otherwise.
+        ///   Looks up a localized string similar to Match Windows language if possible.
         /// </summary>
         public static string MatchWindowsLanguage {
             get {
@@ -925,7 +934,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Modbus Settings.
+        ///   Looks up a localized string similar to Modbus settings.
         /// </summary>
         public static string ModbusSettings {
             get {
@@ -1681,7 +1690,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Float point.
+        ///   Looks up a localized string similar to Floating point.
         /// </summary>
         public static string SunspecMode_Float {
             get {

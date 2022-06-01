@@ -9,7 +9,7 @@
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
         xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
         xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
-        xmlns:images="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
+        xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
         xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -25,15 +25,16 @@
 
         <Menu Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
             <MenuItem Header="{x:Static p:Resources.Settings}">
-                <MenuItem Header="{x:Static p:Resources.Credentials}" Click="ShowSettings"/>
-                <MenuItem Header="{x:Static p:Resources.Export}" Command="{Binding ExportSettingsCommand}" />
-                <MenuItem Header="{x:Static p:Resources.Load}" Command="{Binding LoadSettingsCommand}" />
+                <MenuItem Header="{x:Static p:Resources.AppSettings}" Click="ShowSettings" Icon="{vi:SettingsIcon}"/>
+                <MenuItem Header="{x:Static p:Resources.Export}" Command="{Binding ExportSettingsCommand}" Icon="{vi:SettingsExportIcon}" />
+                <MenuItem Header="{x:Static p:Resources.Load}" Command="{Binding LoadSettingsCommand}" Icon="{vi:SettingsImportIcon}" />
+                <Separator/>
+                <MenuItem Header="{x:Static p:Resources.ModbusSettings}" Click="ShowModbusSettings" Icon="{vi:ModbusLogo}" />
+                <MenuItem Header="{x:Static p:Resources.SelfConsumptionOptimization}" Icon="{vi:HomeWithBatteryIcon}" Click="ShowSelfConsumptionOptimization" />
             </MenuItem>
             <MenuItem Header="{x:Static p:Resources.View}">
                 <MenuItem Header="_Auto-fit" Click="OnAutoSizeChecked" />
                 <MenuItem Header="_Show Event Log" Click="ShowEventLog" />
-                <MenuItem Header="{x:Static p:Resources.SelfConsumptionOptimization}" Click="ShowSelfConsumptionOptimization" />
-                <MenuItem Header="{x:Static p:Resources.ModbusSettings}" Click="ShowModbusSettings" />
             </MenuItem>
         </Menu>
 
@@ -59,7 +60,7 @@
 
 
                     <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
-                        <images:SolarPanel Width="80" Foreground="#004000" VerticalAlignment="Top" Margin="0,10,0,0" />
+                        <vi:SolarPanel Width="80" Foreground="#004000" VerticalAlignment="Top" Margin="0,10,0,0" />
 
                         <c:PowerFlowArrow VerticalAlignment="Top" Fill="#ffd000" Margin="15,0"
                                           Power="{Binding SolarSystemService.SolarSystem.Gen24System.PowerFlow.SolarPower, FallbackValue={x:Null}}" />
@@ -75,7 +76,7 @@
                             </c:PowerFlowArrow.ContextMenu>
                         </c:PowerFlowArrow>
 
-                        <images:House Width="80" Foreground="Black" VerticalAlignment="Top" Margin="0,15,0,0" />
+                        <vi:House Width="80" Foreground="Black" VerticalAlignment="Top" Margin="0,15,0,0" />
                     </StackPanel>
                 </Grid>
 

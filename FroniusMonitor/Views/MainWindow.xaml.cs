@@ -172,9 +172,9 @@ public partial class MainWindow
 
         LoadArrow.Power = PowerFlow.LoadPower - (ViewModel.IncludeInverterPower ? ViewModel.SolarSystemService.PowerLossAvg : 0);
 
-        if (PowerFlow.LoadPower > 0)
+        if (LoadArrow.Power > 0)
         {
-            LoadArrow.Fill = Brushes.LightGray;
+            LoadArrow.Fill = Brushes.Salmon;
             return;
         }
 

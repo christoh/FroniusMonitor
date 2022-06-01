@@ -71,6 +71,8 @@ public class WebClientService : BindableBase, IWebClientService
         //    //var test3 = (await GetFroniusJsonResponse("config/solarweb").ConfigureAwait(false)); // Read
         //    //var test4 = await GetFroniusStringResponse("config/emrs").ConfigureAwait(false); // Read/Write
         //    //var test5 = await GetFroniusStringResponse("config/meter").ConfigureAwait(false); // Read
+        //    var test6 = (await GetFroniusJsonResponse("config/").ConfigureAwait(false)).Token;
+        //    var test6String = test6.ToString();
         //    //var token = JObject.Parse(test3);
         //    //token["enableRemoteControl"] = true;
         //    //token.Remove("_connectionKeepAlive_meta");

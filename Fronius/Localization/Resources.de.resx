@@ -700,9 +700,12 @@
 	  <value>Ungültige Parameter</value>
   </data>
   <data name="MatchWindowsLanguage" xml:space="preserve">
-	  <value>Windows-Anzeigesprache verwenden, wenn verfügbar, ansonsten Englisch</value>
+	  <value>Möglichst Windows-Anzeigesprache verwenden</value>
   </data>
   <data name="Language" xml:space="preserve">
 	  <value>Sprache</value>
+  </data>
+  <data name="AppSettings" xml:space="preserve">
+	  <value>Anwendungseinstellungen</value>
   </data>
 </root>
