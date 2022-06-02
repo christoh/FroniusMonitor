@@ -42,7 +42,7 @@ public class WebClientService : BindableBase, IWebClientService
 
     public async Task<T> ReadGen24Entity<T>(string request) where T : new()
     {
-        var token = JToken.Parse((await GetFroniusStringResponse(request).ConfigureAwait(false)).JsonString);
+        var token = (await GetFroniusJsonResponse(request).ConfigureAwait(false)).Token;
         return gen24JsonService.ReadFroniusData<T>(token);
     }
 
@@ -52,7 +52,7 @@ public class WebClientService : BindableBase, IWebClientService
 
         Parallel.ForEach
         (
-            JArray.Parse((await GetFroniusStringResponse("status/events").ConfigureAwait(false)).JsonString),
+            (await GetFroniusJsonResponse("status/events").ConfigureAwait(false)).Token,
             eventToken => { eventList.Add(gen24JsonService.ReadFroniusData<Gen24Event>(eventToken)); }
         );
 
@@ -108,7 +108,7 @@ public class WebClientService : BindableBase, IWebClientService
         var restrictions = components.Groups["Application"].Select(key => dataToken[key]).FirstOrDefault(t => t?["attributes"]?["PowerRestrictionControllerVersion"] != null);
         gen24System.Restrictions = gen24JsonService.ReadFroniusData<Gen24Restrictions>(restrictions);
 
-        foreach (var meter in  components.Groups["PowerMeter"].Select(key => dataToken[key]).Where(m=>m!=null))
+        foreach (var meter in components.Groups["PowerMeter"].Select(key => dataToken[key]))
         {
             var gen24PowerMeter = gen24JsonService.ReadFroniusData<Gen24PowerMeter3P>(meter);
             gen24System.Meters.Add(gen24PowerMeter);
@@ -116,7 +116,7 @@ public class WebClientService : BindableBase, IWebClientService
 
         gen24System.DataManager = gen24JsonService.ReadFroniusData<Gen24DataManager>(dataToken[components.Groups["DataManager"].Single()]);
         gen24System.PowerFlow = gen24JsonService.ReadFroniusData<Gen24PowerFlow>(dataToken[components.Groups["Site"].Single()]);
-        gen24System.Cache = gen24JsonService.ReadFroniusData<Gen24Cache>(dataToken[components.Groups["CACHE"].Single()]);
+        gen24System.Cache = gen24JsonService.ReadFroniusData<Gen24Cache>(dataToken[components.Groups["CACHE"].FirstOrDefault() ?? "393216"]);
 
         return gen24System;
     }
