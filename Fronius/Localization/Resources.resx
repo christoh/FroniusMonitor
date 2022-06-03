@@ -414,9 +414,6 @@
   <data name="Severity" xml:space="preserve">
     <value>Severity</value>
   </data>
-  <data name="SelfConsumptionOptimization" xml:space="preserve">
-    <value>Self-Consumption Optimization</value>
-  </data>
   <data name="Automatic" xml:space="preserve">
     <value>Automatic</value>
   </data>
@@ -609,26 +606,11 @@
   <data name="Saturday_One" xml:space="preserve">
 	  <value>S</value>
   </data>
-  <data name="Sunday" xml:space="preserve">
-	  <value>Sunday</value>
-  </data>
-  <data name="Monday" xml:space="preserve">
-	  <value>Monday</value>
-  </data>
-  <data name="Tuesday" xml:space="preserve">
-	  <value>Tuesday</value>
-  </data>
   <data name="Wednesday" xml:space="preserve">
 	  <value>Wednesday</value>
   </data>
   <data name="Thursday" xml:space="preserve">
 	  <value>Thursday</value>
-  </data>
-  <data name="Friday" xml:space="preserve">
-	  <value>Friday</value>
-  </data>
-  <data name="Saturday" xml:space="preserve">
-	  <value>Saturday</value>
   </data>
   <data name="BatteryChargingRules" xml:space="preserve">
 	  <value>Battery charging rules</value>
@@ -705,9 +687,6 @@
   <data name="EnableFritzBox" xml:space="preserve">
 	  <value>Control AVM Fritz!Box home automation devices</value>
   </data>
-  <data name="Save" xml:space="preserve">
-	  <value>Save</value>
-  </data>
   <data name="InvalidParameters" xml:space="preserve">
 	  <value>Invalid parameters</value>
   </data>
@@ -719,5 +698,14 @@
   </data>
   <data name="AppSettings" xml:space="preserve">
 	  <value>Application settings</value>
+  </data>
+  <data name="Modbus" xml:space="preserve">
+	  <value>Modbus</value>
+  </data>
+  <data name="EnergyFlow" xml:space="preserve">
+	  <value>Energy flow</value>
+  </data>
+  <data name="ShowAvm" xml:space="preserve">
+	  <value>Fritz!Home</value>
   </data>
 </root>

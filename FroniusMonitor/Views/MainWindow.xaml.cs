@@ -2,6 +2,9 @@
 
 public partial class MainWindow
 {
+    private static readonly DoubleAnimation scaleAnimation = new() { Duration = TimeSpan.FromMilliseconds(200) };
+    private static readonly DoubleAnimation rotateAnimation = new() { Duration = TimeSpan.FromMilliseconds(200) };
+
     public static readonly DependencyProperty PowerFlowProperty = DependencyProperty.Register
     (
         nameof(PowerFlow), typeof(Gen24PowerFlow), typeof(MainWindow),
@@ -50,11 +53,11 @@ public partial class MainWindow
     {
         get
         {
-            var modbusView= OwnedWindows.OfType<ModbusView>().SingleOrDefault();
+            var modbusView = OwnedWindows.OfType<ModbusView>().SingleOrDefault();
 
             if (modbusView == null)
             {
-                modbusView=IoC.Get<ModbusView>();
+                modbusView = IoC.Get<ModbusView>();
                 modbusView.Owner = this;
                 modbusView.Show();
             }
@@ -67,11 +70,11 @@ public partial class MainWindow
     {
         get
         {
-            var settingsView= OwnedWindows.OfType<SettingsView>().SingleOrDefault();
+            var settingsView = OwnedWindows.OfType<SettingsView>().SingleOrDefault();
 
             if (settingsView == null)
             {
-                settingsView=IoC.Get<SettingsView>();
+                settingsView = IoC.Get<SettingsView>();
                 settingsView.Owner = this;
                 settingsView.Show();
             }
@@ -221,7 +224,7 @@ public partial class MainWindow
         if (eventLogView != null)
         {
             EventLogView.Activate();
-            EventLogView.WindowState=WindowState.Normal;
+            EventLogView.WindowState = WindowState.Normal;
         }
 
         EventLogView.Owner = this;
@@ -250,5 +253,38 @@ public partial class MainWindow
     {
         SettingsView.Activate();
         SettingsView.WindowState = WindowState.Normal;
+    }
+
+    private void OnRibbonExpanderChanged(object sender, RoutedEventArgs e)
+    {
+        if (RibbonExpander.IsChecked.HasValue && RibbonExpander.IsChecked.Value)
+        {
+            rotateAnimation.From = 180;
+            rotateAnimation.To = 360;
+            scaleAnimation.From = 0;
+            scaleAnimation.To = 1;
+        }
+        else
+        {
+            rotateAnimation.From = 360;
+            rotateAnimation.To = 180;
+            scaleAnimation.From = 1;
+            scaleAnimation.To = 0;
+        }
+
+        Chevron?.BeginAnimation(Chevron.AngleProperty, rotateAnimation);
+        RibbonTransform?.BeginAnimation(ScaleTransform.ScaleYProperty, scaleAnimation);
+    }
+
+    private void OnShowAvmChanged(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuItem showAvm)
+        {
+            return;
+        }
+
+        App.Settings.HaveFritzBox = showAvm.IsChecked;
+        IoC.Get<IWebClientService>().FritzBoxConnection = App.Settings.HaveFritzBox ? App.Settings.FritzBoxConnection : null;
+        _ = Settings.Save();
     }
 }

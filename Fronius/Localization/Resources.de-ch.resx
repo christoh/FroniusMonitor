@@ -17,26 +17,11 @@
 	<data name="Thursday_One" xml:space="preserve">
 		<value>D</value>
 	</data>
-	<data name="Sunday" xml:space="preserve">
-		<value>Sunntig</value>
-	</data>
-	<data name="Monday" xml:space="preserve">
-		<value>Määntig</value>
-	</data>
-	<data name="Tuesday" xml:space="preserve">
-		<value>Ziischtig</value>
-	</data>
 	<data name="Wednesday" xml:space="preserve">
 		<value>Mittwuch</value>
 	</data>
 	<data name="Thursday" xml:space="preserve">
 		<value>Dunschtig</value>
-	</data>
-	<data name="Friday" xml:space="preserve">
-		<value>Friitig</value>
-	</data>
-	<data name="Saturday" xml:space="preserve">
-		<value>Samschtig</value>
 	</data>
 	<data name="SunspecMode_Float" xml:space="preserve">
 		<value>Fliesskomma</value>

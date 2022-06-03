@@ -414,9 +414,6 @@
   <data name="Severity" xml:space="preserve">
 	  <value>Schwere</value>
   </data>
-  <data name="SelfConsumptionOptimization" xml:space="preserve">
-	  <value>Eigenverbrauchsoptimierung</value>
-  </data>
   <data name="Automatic" xml:space="preserve">
 	  <value>Automatisch</value>
   </data>
@@ -606,26 +603,11 @@
   <data name="Friday_One" xml:space="preserve">
 	  <value>F</value>
   </data>
-  <data name="Sunday" xml:space="preserve">
-	  <value>Sonntag</value>
-  </data>
-  <data name="Monday" xml:space="preserve">
-	  <value>Montag</value>
-  </data>
-  <data name="Tuesday" xml:space="preserve">
-	  <value>Dienstag</value>
-  </data>
   <data name="Wednesday" xml:space="preserve">
 	  <value>Mittwoch</value>
   </data>
   <data name="Thursday" xml:space="preserve">
 	  <value>Donnerstag</value>
-  </data>
-  <data name="Friday" xml:space="preserve">
-	  <value>Freitag</value>
-  </data>
-  <data name="Saturday" xml:space="preserve">
-	  <value>Samstag</value>
   </data>
   <data name="BatteryChargingRules" xml:space="preserve">
 	  <value>Batterieladeregeln</value>
@@ -707,5 +689,8 @@
   </data>
   <data name="AppSettings" xml:space="preserve">
 	  <value>Anwendungseinstellungen</value>
+  </data>
+  <data name="EnergyFlow" xml:space="preserve">
+	  <value>Energiefluss</value>
   </data>
 </root>

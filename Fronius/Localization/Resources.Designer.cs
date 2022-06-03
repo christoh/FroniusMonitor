@@ -529,6 +529,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Energy flow.
+        /// </summary>
+        public static string EnergyFlow {
+            get {
+                return ResourceManager.GetString("EnergyFlow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error.
         /// </summary>
         public static string Error {
@@ -579,15 +588,6 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string FeedIn {
             get {
                 return ResourceManager.GetString("FeedIn", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Friday.
-        /// </summary>
-        public static string Friday {
-            get {
-                return ResourceManager.GetString("Friday", resourceCulture);
             }
         }
         
@@ -880,6 +880,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Modbus.
+        /// </summary>
+        public static string Modbus {
+            get {
+                return ResourceManager.GetString("Modbus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Disabled.
         /// </summary>
         public static string ModbusInterfaceRole_Disabled {
@@ -948,15 +957,6 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string ModbusTcpSettings {
             get {
                 return ResourceManager.GetString("ModbusTcpSettings", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Monday.
-        /// </summary>
-        public static string Monday {
-            get {
-                return ResourceManager.GetString("Monday", resourceCulture);
             }
         }
         
@@ -1294,38 +1294,11 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Saturday.
-        /// </summary>
-        public static string Saturday {
-            get {
-                return ResourceManager.GetString("Saturday", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to S.
         /// </summary>
         public static string Saturday_One {
             get {
                 return ResourceManager.GetString("Saturday_One", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Save.
-        /// </summary>
-        public static string Save {
-            get {
-                return ResourceManager.GetString("Save", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Self-Consumption Optimization.
-        /// </summary>
-        public static string SelfConsumptionOptimization {
-            get {
-                return ResourceManager.GetString("SelfConsumptionOptimization", resourceCulture);
             }
         }
         
@@ -1380,6 +1353,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Severity {
             get {
                 return ResourceManager.GetString("Severity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fritz!Home.
+        /// </summary>
+        public static string ShowAvm {
+            get {
+                return ResourceManager.GetString("ShowAvm", resourceCulture);
             }
         }
         
@@ -1645,15 +1627,6 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sunday.
-        /// </summary>
-        public static string Sunday {
-            get {
-                return ResourceManager.GetString("Sunday", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to S.
         /// </summary>
         public static string Sunday_One {
@@ -1749,15 +1722,6 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Thursday_One {
             get {
                 return ResourceManager.GetString("Thursday_One", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Tuesday.
-        /// </summary>
-        public static string Tuesday {
-            get {
-                return ResourceManager.GetString("Tuesday", resourceCulture);
             }
         }
         

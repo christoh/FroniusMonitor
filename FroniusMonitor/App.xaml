@@ -128,6 +128,33 @@
             </Setter>
         </Style>
 
+        <Style TargetType="MenuItem" x:Key="RibbonButton">
+            <Setter Property="Padding" Value="4"/>
+            <Setter Property="Background" Value="{x:Static SystemColors.MenuBarBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="MenuItem">
+                        <Border x:Name="Border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding Background}" BorderThickness="1">
+                        <Grid Width="72" Height="52" Margin="{TemplateBinding Padding}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="32"/>
+                                <RowDefinition Height="20"/>
+                            </Grid.RowDefinitions>
+                                <ContentPresenter Grid.Row="0" MaxHeight="32" MaxWidth="32" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Icon}"/>
+                            <TextBlock Margin="0,4,0,0" Grid.Row="1" Text="{TemplateBinding Header}" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Top" TextAlignment="Center" TextWrapping="Wrap" TextTrimming="CharacterEllipsis"/>
+                        </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" TargetName="Border" Value="#4000c0ff"/>
+                                <Setter Property="BorderBrush" TargetName="Border" Value="#ff00c0ff"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style TargetType="Button">
             <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
         </Style>

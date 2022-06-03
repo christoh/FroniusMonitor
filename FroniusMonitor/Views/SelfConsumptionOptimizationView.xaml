@@ -12,7 +12,7 @@
         xmlns:m="clr-namespace:De.Hochstaetter.Fronius.Models.Gen24.Settings;assembly=Fronius"
         xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
         mc:Ignorable="d"
-        Title="{x:Static p:Resources.SelfConsumptionOptimization}" SizeToContent="WidthAndHeight"  ResizeMode="CanMinimize"
+        Title="{x:Static p:Resources.EnergyFlow}" SizeToContent="WidthAndHeight"  ResizeMode="CanMinimize"
         d:DataContext="{d:DesignInstance Type=vm:SelfConsumptionOptimizationViewModel}">
     <Window.Resources>
         <Style TargetType="Button">
