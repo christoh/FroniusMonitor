@@ -259,16 +259,13 @@ public partial class MainWindow
     {
         if (RibbonExpander.IsChecked.HasValue && RibbonExpander.IsChecked.Value)
         {
-            rotateAnimation.From = 180;
             rotateAnimation.To = 360;
-            scaleAnimation.From = 0;
             scaleAnimation.To = 1;
         }
         else
         {
             rotateAnimation.From = 360;
             rotateAnimation.To = 180;
-            scaleAnimation.From = 1;
             scaleAnimation.To = 0;
         }
 
@@ -278,13 +275,9 @@ public partial class MainWindow
 
     private void OnShowAvmChanged(object sender, RoutedEventArgs e)
     {
-        if (sender is not MenuItem showAvm)
+        if (sender is MenuItem showAvm)
         {
-            return;
+            ViewModel.FritzBoxVisibilityChanged(showAvm.IsChecked);
         }
-
-        App.Settings.HaveFritzBox = showAvm.IsChecked;
-        IoC.Get<IWebClientService>().FritzBoxConnection = App.Settings.HaveFritzBox ? App.Settings.FritzBoxConnection : null;
-        _ = Settings.Save();
     }
 }

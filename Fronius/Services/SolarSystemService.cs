@@ -93,6 +93,12 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         timer = null;
     }
 
+    public void InvalidateFritzBox()
+    {
+        fritzBoxCounter = 0;
+        timer?.Change(0, 1000);
+    }
+
     public void SuspendPowerConsumers()
     {
         Interlocked.Increment(ref suspendFritzBoxCounter);

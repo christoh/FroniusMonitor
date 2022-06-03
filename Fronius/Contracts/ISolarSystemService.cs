@@ -23,5 +23,6 @@
         void Stop();
         void SuspendPowerConsumers();
         void ResumePowerConsumers();
+        void InvalidateFritzBox();
     }
 }

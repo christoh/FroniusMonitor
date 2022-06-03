@@ -140,7 +140,7 @@
                                 <RowDefinition Height="32"/>
                                 <RowDefinition Height="20"/>
                             </Grid.RowDefinitions>
-                                <ContentPresenter Grid.Row="0" MaxHeight="32" MaxWidth="32" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Icon}"/>
+                                <ContentPresenter Grid.Row="0" MaxHeight="32" MaxWidth="64" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Icon}"/>
                             <TextBlock Margin="0,4,0,0" Grid.Row="1" Text="{TemplateBinding Header}" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Top" TextAlignment="Center" TextWrapping="Wrap" TextTrimming="CharacterEllipsis"/>
                         </Grid>
                         </Border>

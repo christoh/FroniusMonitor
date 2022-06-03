@@ -212,7 +212,7 @@ public class MultiBool2Anything<T> : MultiConverterBase
 public class MultiBool2Visibility : MultiBool2Anything<Visibility>
 {
     public override Visibility Any { get; set; } = Visibility.Collapsed;
-    public override Visibility All { get; set; }=Visibility.Visible;
+    public override Visibility All { get; set; } = Visibility.Visible;
     public override Visibility None { get; set; } = Visibility.Collapsed;
     public override Visibility Invalid { get; set; } = Visibility.Collapsed;
 }
@@ -239,7 +239,7 @@ public class CommonModbusSettingsVisibility : MultiConverterBase
         var roles = values.OfType<ModbusInterfaceRole>();
         var flags = values.OfType<bool>();
 
-        var result= roles.Any(r => r == ModbusInterfaceRole.Slave) || flags.Any(b=>b) ? Visibility.Visible : Visibility.Collapsed;
+        var result = roles.Any(r => r == ModbusInterfaceRole.Slave) || flags.Any(b => b) ? Visibility.Visible : Visibility.Collapsed;
         return result;
     }
 }
@@ -381,7 +381,7 @@ public class ToAbsolute : ConverterBase
 
     public override object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        return value is IConvertible convertible ? (int)Math.Round(-convertible.ToDouble(CultureInfo.CurrentCulture),MidpointRounding.AwayFromZero) : null;
+        return value is IConvertible convertible ? (int)Math.Round(-convertible.ToDouble(CultureInfo.CurrentCulture), MidpointRounding.AwayFromZero) : null;
     }
 }
 
@@ -398,16 +398,46 @@ public class BoolInverter : ConverterBase
     }
 }
 
-public class Enum2DisplayName:ConverterBase
+public class Enum2DisplayName : ConverterBase
 {
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is Enum enumValue)
         {
-            var result=enumValue.ToDisplayName();
+            var result = enumValue.ToDisplayName();
             return result;
         }
 
         return value;
+    }
+}
+
+public class ShowFritzBoxIcon : ConverterBase,IMultiValueConverter
+{
+    public override object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return
+            value is not WebConnection connection ||
+            string.IsNullOrWhiteSpace(connection.BaseUrl) ||
+            "http://".StartsWith(connection.BaseUrl)
+                ? Visibility.Collapsed 
+                : Visibility.Visible;
+    }
+
+    public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (values.Length != 2)
+        {
+            return Visibility.Collapsed;
+        }
+
+        var visibility = (Visibility)Convert(values[0], targetType, parameter, culture);
+
+        return values[1] is true ? visibility : Visibility.Collapsed;
+    }
+
+    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+    {
+        throw new NotSupportedException();
     }
 }

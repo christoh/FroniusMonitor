@@ -2,8 +2,11 @@
 
 public class MainViewModel : ViewModelBase
 {
-    public MainViewModel(ISolarSystemService solarSystemService)
+    private readonly IWebClientService webClientService;
+
+    public MainViewModel(ISolarSystemService solarSystemService, IWebClientService webClientService)
     {
+        this.webClientService = webClientService;
         SolarSystemService = solarSystemService;
         ExportSettingsCommand = new NoParameterCommand(ExportSettings);
         LoadSettingsCommand = new NoParameterCommand(LoadSettings);
@@ -33,7 +36,19 @@ public class MainViewModel : ViewModelBase
     internal override async Task OnInitialize()
     {
         await base.OnInitialize().ConfigureAwait(false);
-        await SolarSystemService.Start(App.Settings.FroniusConnection, App.Settings.FritzBoxConnection).ConfigureAwait(false);
+        await SolarSystemService.Start(App.Settings.FroniusConnection, App.Settings.HaveFritzBox ? App.Settings.FritzBoxConnection : null).ConfigureAwait(false);
+    }
+
+    internal void FritzBoxVisibilityChanged(bool isVisible)
+    {
+        webClientService.FritzBoxConnection = isVisible ? App.Settings.FritzBoxConnection : null;
+
+        if (isVisible)
+        {
+            SolarSystemService.InvalidateFritzBox();
+        }
+
+        _ = Settings.Save();
     }
 
     private async void LoadSettings()
@@ -75,7 +90,7 @@ public class MainViewModel : ViewModelBase
         }
         finally
         {
-            await SolarSystemService.Start(App.Settings.FroniusConnection, App.Settings.HaveFritzBox?App.Settings.FritzBoxConnection:null).ConfigureAwait(false);
+            await SolarSystemService.Start(App.Settings.FroniusConnection, App.Settings.HaveFritzBox ? App.Settings.FritzBoxConnection : null).ConfigureAwait(false);
         }
     }
 

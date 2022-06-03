@@ -42,7 +42,7 @@ public class SettingsViewModel : SettingsViewModelBase
         set => Set(ref selectedCulture, value);
     }
 
-    private static readonly IEnumerable<string> gen24UserNames = new[] {"customer", "technician", "support"};
+    private static readonly IEnumerable<string> gen24UserNames = new[] { "customer", "technician", "support" };
 
     public IEnumerable<string> Gen24UserNames => gen24UserNames;
 
@@ -81,10 +81,16 @@ public class SettingsViewModel : SettingsViewModelBase
             );
         }
 
+        if (!Settings.HaveFritzBox)
+        {
+            Settings.FritzBoxConnection.BaseUrl = "http://";
+        }
+
         App.Settings = Settings;
         IoC.Get<MainViewModel>().NotifyOfPropertyChange(nameof(Settings));
         IoC.Get<IWebClientService>().FritzBoxConnection = Settings.HaveFritzBox ? Settings.FritzBoxConnection : null;
         IoC.Get<IWebClientService>().InverterConnection = Settings.FroniusConnection;
+
         await Settings.Save().ConfigureAwait(false);
 
         static string FixUrl(string url)
@@ -94,7 +100,7 @@ public class SettingsViewModel : SettingsViewModelBase
                 url = "http://" + url;
             }
 
-            while (url[^1..] == "/")
+            while (url[^1..] == "/" && url != "http://")
             {
                 url = url[..^1];
             }

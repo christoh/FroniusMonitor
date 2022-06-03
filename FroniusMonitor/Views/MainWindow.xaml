@@ -30,19 +30,20 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Menu >
-            <MenuItem Header="{x:Static p:Resources.Settings}">
-                <MenuItem Header="{x:Static p:Resources.AppSettings}" Click="ShowSettings" Icon="{vi:SettingsIcon}"/>
-                <MenuItem Header="{x:Static p:Resources.Export}" Command="{Binding ExportSettingsCommand}" Icon="{vi:SettingsExportIcon}" />
-                <MenuItem Header="{x:Static p:Resources.Load}" Command="{Binding LoadSettingsCommand}" Icon="{vi:SettingsImportIcon}" />
-                <Separator/>
-                <MenuItem Header="{x:Static p:Resources.ModbusSettings}" Click="ShowModbusSettings" Icon="{vi:ModbusLogo}" />
-                <MenuItem Header="{x:Static p:Resources.EnergyFlow}" Icon="{vi:HomeWithBatteryIcon}" Click="ShowSelfConsumptionOptimization" />
-            </MenuItem>
-            <MenuItem Header="{x:Static p:Resources.View}">
-                <MenuItem Header="_Auto-fit" Click="OnAutoSizeChecked" />
-                <MenuItem Header="_Show Event Log" Click="ShowEventLog" />
-            </MenuItem>
-        </Menu>
+                <MenuItem Header="{x:Static p:Resources.Settings}">
+                    <MenuItem Header="{x:Static p:Resources.AppSettings}" Click="ShowSettings" Icon="{vi:SettingsIcon}"/>
+                    <MenuItem Header="{x:Static p:Resources.Export}" Command="{Binding ExportSettingsCommand}" Icon="{vi:SettingsExportIcon}" />
+                    <MenuItem Header="{x:Static p:Resources.Load}" Command="{Binding LoadSettingsCommand}" Icon="{vi:SettingsImportIcon}" />
+                    <Separator/>
+                    <MenuItem Header="{x:Static p:Resources.ModbusSettings}" Click="ShowModbusSettings" Icon="{vi:ModbusLogo}" />
+                    <MenuItem Header="{x:Static p:Resources.EnergyFlow}" Icon="{vi:HomeWithBatteryIcon}" Click="ShowSelfConsumptionOptimization" />
+                </MenuItem>
+                <MenuItem Header="{x:Static p:Resources.View}">
+                    <MenuItem Header="_Auto-fit" Click="OnAutoSizeChecked" />
+                    <MenuItem Header="_Show Event Log" Click="ShowEventLog" Icon="{vi:EventLogIcon}" />
+                    <MenuItem Visibility="{Binding Settings.FritzBoxConnection, Converter={co:ShowFritzBoxIcon}}" Header="{x:Static p:Resources.ShowAvm}" IsChecked="{Binding Settings.HaveFritzBox, Mode=TwoWay}" IsCheckable="True" Icon="{vi:FritzLogo}" Checked="OnShowAvmChanged" Unchecked="OnShowAvmChanged"/>
+                </MenuItem>
+            </Menu>
             <ToggleButton IsChecked="True" x:Name="RibbonExpander" Grid.Column="1" Style="{StaticResource TransparentButton}" Background="{x:Static SystemColors.MenuBarBrush}" Checked="OnRibbonExpanderChanged" Unchecked="OnRibbonExpanderChanged">
                 <vi:Chevron x:Name="Chevron" Angle="0" Width="8" Height="8" Margin="0,3,18,0" />
             </ToggleButton>
@@ -50,7 +51,7 @@
 
         <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" Background="{x:Static SystemColors.MenuBarBrush}">
             <StackPanel.LayoutTransform>
-                <ScaleTransform x:Name="RibbonTransform" ScaleY="1"></ScaleTransform>
+                <ScaleTransform x:Name="RibbonTransform" ScaleY="1"/>
             </StackPanel.LayoutTransform>
             <StackPanel.Resources>
                 <Style TargetType="MenuItem" BasedOn="{StaticResource RibbonButton}"/>
@@ -58,7 +59,8 @@
             <MenuItem Header="{x:Static p:Resources.Settings}" Click="ShowSettings" Icon="{vi:SettingsIcon}"/>
             <MenuItem Header="{x:Static p:Resources.Modbus}" Click="ShowModbusSettings" Icon="{vi:ModbusLogo}" />
             <MenuItem Header="{x:Static p:Resources.EnergyFlow}" Icon="{vi:HomeWithBatteryIcon}" Click="ShowSelfConsumptionOptimization" />
-            <MenuItem Header="{x:Static p:Resources.ShowAvm}" IsCheckable="True" Icon="{vi:FritzLogo}" Checked="OnShowAvmChanged" Unchecked="OnShowAvmChanged"/>
+            <MenuItem Visibility="{Binding Settings.FritzBoxConnection, Converter={co:ShowFritzBoxIcon}}" Header="{x:Static p:Resources.ShowAvm}" IsChecked="{Binding Settings.HaveFritzBox, Mode=TwoWay}" IsCheckable="True" Icon="{vi:FritzLogo}" Checked="OnShowAvmChanged" Unchecked="OnShowAvmChanged"/>
+            <MenuItem Header="{x:Static p:Resources.EventLog}" Click="ShowEventLog" Icon="{vi:EventLogIcon}" />
         </StackPanel>
 
         <Viewbox Grid.Row="2" Grid.Column="0" Margin="16,16,0,16">
@@ -137,12 +139,45 @@
         </Viewbox>
 
         <GridSplitter Grid.Row="2" Grid.Column="1" ResizeBehavior="PreviousAndNext" BorderThickness="2" ResizeDirection="Columns"
-                      BorderBrush="LightGray" Margin="10,0" VerticalAlignment="Stretch" Visibility="{Binding Settings.HaveFritzBox, Converter={co:Bool2Visibility}}"/>
+                      BorderBrush="LightGray" Margin="10,0" VerticalAlignment="Stretch">
+            <GridSplitter.Visibility>
+                <MultiBinding Converter="{co:ShowFritzBoxIcon}">
+                    <Binding Path="Settings.FritzBoxConnection"/>
+                    <Binding Path="Settings.HaveFritzBox"/>
+                </MultiBinding>
+            </GridSplitter.Visibility>
+        </GridSplitter>
 
-        <ScrollViewer Grid.Row="2" Grid.Column="2" Visibility="{Binding Settings.HaveFritzBox, Converter={co:Bool2Visibility}}"
+        <ScrollViewer Grid.Row="2" Grid.Column="2"
                       VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto"
                       VerticalContentAlignment="Top" HorizontalContentAlignment="Stretch"
-                      Margin="10,16,0,0" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                      Margin="10,16,0,0" VerticalAlignment="Center" HorizontalAlignment="Stretch"
+                      Visibility="{Binding Settings.FritzBoxConnection, Converter={co:ShowFritzBoxIcon}}">
+            <ScrollViewer.LayoutTransform>
+                <ScaleTransform x:Name="Transform"/>
+            </ScrollViewer.LayoutTransform>
+            <ScrollViewer.Style>
+                <Style TargetType="ScrollViewer">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Settings.HaveFritzBox}" Value="True">
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation From="0" To="1" Storyboard.Target="{Binding Source={x:Reference Transform}}" Storyboard.TargetProperty="ScaleX" Duration="0:0:0.200"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                            <DataTrigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation From="1" To="0" Storyboard.Target="{Binding Source={x:Reference Transform}}" Storyboard.TargetProperty="ScaleX" Duration="0:0:0.200"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.ExitActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ScrollViewer.Style>
             <ItemsControl ItemsSource="{Binding SolarSystemService.SolarSystem.FritzBox.PowerConsumers, FallbackValue={x:Null}}">
                 <ItemsControl.LayoutTransform>
                     <ScaleTransform x:Name="ConsumerScaler" ScaleX="1" ScaleY="1" />

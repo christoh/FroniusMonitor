@@ -1,0 +1,17 @@
+﻿<Viewbox x:Class="De.Hochstaetter.FroniusMonitor.Assets.Images.EventLogIcon"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
+             mc:Ignorable="d" 
+             SnapsToDevicePixels="True">
+    <Canvas Width="790" Height="920">
+        <Canvas.RenderTransform>
+            <TranslateTransform X="-120" Y="-50"></TranslateTransform>
+        </Canvas.RenderTransform>
+        <Path Data="M864 56H216c-17.6 0-32 14.4-32 32v104h112c17.6 0 32 14.4 32 32v32c0 17.6-14.4 32-32 32H184v88h112c17.6 0 32 14.4 32 32v32c0 17.6-14.4 32-32 32H184v88h112c17.6 0 32 14.4 32 32v32c0 17.6-14.4 32-32 32H184v64.8c2.4-0.8 5.6-0.8 8-0.8h112c17.6 0 32 14.4 32 32v32c0 17.6-14.4 32-32 32H192c-2.4 0-5.6-0.8-8-0.8V928c0 17.6 14.4 32 32 32h648c17.6 0 32-14.4 32-32V88c0-17.6-14.4-32-32-32z m-104 744H528c-17.6 0-32-14.4-32-32s14.4-32 32-32h232c17.6 0 32 14.4 32 32s-14.4 32-32 32z m0-160H528c-17.6 0-32-14.4-32-32s14.4-32 32-32h232c17.6 0 32 14.4 32 32s-14.4 32-32 32z m0-192H528c-17.6 0-32-14.4-32-32s14.4-32 32-32h232c17.6 0 32 14.4 32 32s-14.4 32-32 32z m0-168H528c-17.6 0-32-14.4-32-32s14.4-32 32-32h232c17.6 0 32 14.4 32 32s-14.4 32-32 32z" Fill="#3FA7F7" />
+        <Path Data="M160 280h112c17.6 0 32-14.4 32-32v-16c0-17.6-14.4-32-32-32H160c-17.6 0-32 14.4-32 32v16c0 17.6 14.4 32 32 32zM160 464h112c17.6 0 32-14.4 32-32v-16c0-17.6-14.4-32-32-32H160c-17.6 0-32 14.4-32 32v16c0 17.6 14.4 32 32 32zM160 648h112c17.6 0 32-14.4 32-32v-16c0-17.6-14.4-32-32-32H160c-17.6 0-32 14.4-32 32v16c0 17.6 14.4 32 32 32zM304 776v-16c0-17.6-14.4-32-32-32H160c-17.6 0-32 14.4-32 32v16c0 17.6 14.4 32 32 32h112c17.6 0 32-14.4 32-32z" Fill="#3FA7F7" />
+        <Path Data="M760 216H528c-17.6 0-32 14.4-32 32s14.4 32 32 32h232c17.6 0 32-14.4 32-32s-14.4-32-32-32zM760 384H528c-17.6 0-32 14.4-32 32s14.4 32 32 32h232c17.6 0 32-14.4 32-32s-14.4-32-32-32zM760 576H528c-17.6 0-32 14.4-32 32s14.4 32 32 32h232c17.6 0 32-14.4 32-32s-14.4-32-32-32zM760 736H528c-17.6 0-32 14.4-32 32s14.4 32 32 32h232c17.6 0 32-14.4 32-32s-14.4-32-32-32z" Fill="#F4D576" />
+    </Canvas>
+</Viewbox>
