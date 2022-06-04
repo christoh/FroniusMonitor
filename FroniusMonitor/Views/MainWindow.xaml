@@ -36,11 +36,11 @@
                     <MenuItem Header="{x:Static p:Resources.Load}" Command="{Binding LoadSettingsCommand}" Icon="{vi:SettingsImportIcon}" />
                     <Separator/>
                     <MenuItem Header="{x:Static p:Resources.ModbusSettings}" Click="ShowModbusSettings" Icon="{vi:ModbusLogo}" />
-                    <MenuItem Header="{x:Static p:Resources.EnergyFlow}" Icon="{vi:HomeWithBatteryIcon}" Click="ShowSelfConsumptionOptimization" />
+                    <MenuItem Header="{x:Static p:Resources.EnergyFlow}" Icon="{vi:EnergyFLow}" Click="ShowSelfConsumptionOptimization" />
                 </MenuItem>
                 <MenuItem Header="{x:Static p:Resources.View}">
                     <MenuItem Header="_Auto-fit" Click="OnAutoSizeChecked" />
-                    <MenuItem Header="_Show Event Log" Click="ShowEventLog" Icon="{vi:EventLogIcon}" />
+                    <MenuItem Header="{x:Static p:Resources.Events}" Click="ShowEventLog" Icon="{vi:EventLogIcon}" />
                     <MenuItem Visibility="{Binding Settings.FritzBoxConnection, Converter={co:ShowFritzBoxIcon}}" Header="{x:Static p:Resources.ShowAvm}" IsChecked="{Binding Settings.HaveFritzBox, Mode=TwoWay}" IsCheckable="True" Icon="{vi:FritzLogo}" Checked="OnShowAvmChanged" Unchecked="OnShowAvmChanged"/>
                 </MenuItem>
             </Menu>
@@ -58,9 +58,9 @@
             </StackPanel.Resources>
             <MenuItem Header="{x:Static p:Resources.Settings}" Click="ShowSettings" Icon="{vi:SettingsIcon}"/>
             <MenuItem Header="{x:Static p:Resources.Modbus}" Click="ShowModbusSettings" Icon="{vi:ModbusLogo}" />
-            <MenuItem Header="{x:Static p:Resources.EnergyFlow}" Icon="{vi:HomeWithBatteryIcon}" Click="ShowSelfConsumptionOptimization" />
+            <MenuItem Header="{x:Static p:Resources.EnergyFlow}" Icon="{vi:EnergyFLow}" Click="ShowSelfConsumptionOptimization" />
             <MenuItem Visibility="{Binding Settings.FritzBoxConnection, Converter={co:ShowFritzBoxIcon}}" Header="{x:Static p:Resources.ShowAvm}" IsChecked="{Binding Settings.HaveFritzBox, Mode=TwoWay}" IsCheckable="True" Icon="{vi:FritzLogo}" Checked="OnShowAvmChanged" Unchecked="OnShowAvmChanged"/>
-            <MenuItem Header="{x:Static p:Resources.EventLog}" Click="ShowEventLog" Icon="{vi:EventLogIcon}" />
+            <MenuItem Header="{x:Static p:Resources.Events}" Click="ShowEventLog" Icon="{vi:EventLogIcon}" />
         </StackPanel>
 
         <Viewbox Grid.Row="2" Grid.Column="0" Margin="16,16,0,16">

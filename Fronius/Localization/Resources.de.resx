@@ -693,4 +693,7 @@
   <data name="EnergyFlow" xml:space="preserve">
 	  <value>Energiefluss</value>
   </data>
+  <data name="Events" xml:space="preserve">
+	  <value>Ereignisse</value>
+  </data>
 </root>

@@ -1,0 +1,82 @@
+﻿<Viewbox x:Class="De.Hochstaetter.FroniusMonitor.Assets.Images.EnergyFLow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
+             mc:Ignorable="d" 
+             SnapsToDevicePixels="True">
+    <Canvas Width="393.18" Height="393.18" DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Viewbox}}}">
+        <Canvas.RenderTransform>
+            <TranslateTransform X="-87.75" Y="-100"></TranslateTransform>
+        </Canvas.RenderTransform>
+
+        <Canvas.Resources>
+            <LinearGradientBrush x:Key="Gradient" MappingMode="Absolute" StartPoint="114.1082,198.3327" EndPoint="454.6612,394.951" >
+                <GradientStop Offset="0" Color="#95C11F"/>
+                <GradientStop Offset="0.1254" Color="#8DBE20"/>
+                <GradientStop Offset="0.3178" Color="#78B724"/>
+                <GradientStop Offset="0.5533" Color="#55AB29"/>
+                <GradientStop Offset="0.8204" Color="#259A30"/>
+                <GradientStop Offset="1" Color="#008D36"/>
+            </LinearGradientBrush>
+
+			<Style x:Key="st3" TargetType="Line">
+                <Setter Property="Stroke" Value="White"/>
+                <Setter Property="StrokeThickness" Value="4.8511"/>
+                <Setter Property="StrokeEndLineCap"  Value="Round"/>
+                <Setter Property="StrokeStartLineCap"  Value="Round"/>
+                <Setter Property="StrokeLineJoin"  Value="Round"/>
+                <Setter Property="StrokeMiterLimit"  Value="10"/>
+            </Style>
+
+            <Style x:Key="st1" TargetType="Path">
+                <Setter Property="Stroke" Value="White"/>
+                <Setter Property="StrokeThickness" Value="16.5377"/>
+                <Setter Property="StrokeEndLineCap"  Value="Round"/>
+                <Setter Property="StrokeStartLineCap"  Value="Round"/>
+                <Setter Property="StrokeMiterLimit"  Value="10"/>
+            </Style>
+        </Canvas.Resources>
+
+	<Ellipse Fill="{StaticResource Gradient}" Width="393.18" Height="393.18" Canvas.Top="100.05" Canvas.Left="87.79"/>
+	<Path Style="{StaticResource st1}" Data="M286.28,351.32"/>
+	<Path Fill="White" Data="M314.69,303.67c0.01-2.73-2.16-6.98-4.85-6.99l-10.49-0.02l0.03-14.92c0-1.93-2.38-3.51-5.33-3.51
+		c-2.95-0.01-5.34,1.56-5.34,3.49l-0.03,14.92l-10.58-0.02l0.03-14.92c0-1.93-2.28-3.51-5.11-3.51c-2.82-0.01-5.12,1.56-5.12,3.49
+		l-0.03,14.92l-8.94-0.02c-2.68-0.01-4.86,4.23-4.87,6.97c0,0.95-4.26,35,29.75,35.06C317.83,338.68,314.69,304.83,314.69,303.67z"
+		/>
+		<Line Style="{StaticResource st3}" X1="269.71" Y1="134.42" X2="276.59" Y2="156.32"/>
+		<Line Style="{StaticResource st3}" X1="295.8" Y1="156.65" X2="304.83" Y2="140.36"/>
+		<Line Style="{StaticResource st3}" X1="310.08" Y1="170.56" X2="329.4" Y2="164.48"/>
+		<Line Style="{StaticResource st3}" X1="308.22" Y1="191.66" X2="324.3" Y2="200.05"/>
+		<Line Style="{StaticResource st3}" X1="292.62" Y1="205.05" X2="298.49" Y2="223.73"/>
+		<Line Style="{StaticResource st3}" X1="271.76" Y1="201.71" X2="264.42" Y2="218.87"/>
+		<Line Style="{StaticResource st3}" X1="258.76" Y1="187.39" X2="239.65" Y2="194.11"/>
+		<Line Style="{StaticResource st3}" X1="260.82" Y1="166.93" X2="244.95" Y2="159.19"/>
+    <Path Fill="White" Data="M278.19,160.77c-10.41,3.27-16.2,14.37-12.93,24.78c3.27,10.41,14.37,16.2,24.78,12.93
+			c10.41-3.27,16.2-14.37,12.93-24.78C299.7,163.28,288.6,157.5,278.19,160.77z M271.13,184.49c-5.04-12.52,6.74-17.59,6.74-17.59
+			C269.71,172.65,271.13,184.49,271.13,184.49z"/>
+    <Line Style="{StaticResource st3}" StrokeThickness="4.3273" X1="152.14" Y1="295.37" X2="152.64" Y2="337.83"/>
+    <Path Fill="White" Data="M152.08,294.25c0.27,0.57,17.89-21.91-0.88-50.9c0,0-7.57,17.47-3.38,44.48
+			C147.82,287.84,151.28,292.55,152.08,294.25z"/>
+    <Path Fill="White" Data="M153.84,294.5c-0.63,0.04,12.19,24.71,48.09,18.8c0,0-13.94-14.11-40.55-20.35
+			C161.38,292.95,155.72,294.4,153.84,294.5z"/>
+    <Ellipse Fill="White" Canvas.Left="146.06" Canvas.Top="289.6" Width="12.12" Height="12.12"/>
+    <Path Fill="White" Data="M150.53,294.78c-1.88-0.1-7.54-1.55-7.54-1.55c-29.6,0.85-40.94,21.65-40.94,21.65
+			C135.12,316.16,151.16,294.81,150.53,294.78z M112.03,312.99c0,0,15.12-5.04,30.67-13.65
+			C142.69,299.34,129.25,310.68,112.03,312.99z"/>
+
+    <Path Style="{StaticResource st1}" StrokeThickness="8.2342" Data="M400.5,262.17"/>
+    <Path Style="{StaticResource st1}" StrokeThickness="7.7473" Data="M165.06,237.05c13.61-25.06,35.12-45.21,61.18-57.11"/>
+    <Path Style="{StaticResource st1}" StrokeThickness="7.7473" Data="M282.98,313.31c0,0,1.88,75.85,1.33,85.02s0.79,34.98-20.67,32.77l-6.77-1.02
+		c-42.97-7.89-78.54-37.19-96.05-75.94"/>
+    <Path Style="{StaticResource st1}" StrokeThickness="7.7473" Data="M405.94,341.68c-15.29,45.72-54.95,80.27-103.55,88.22"/>
+    <Path Style="{StaticResource st1}" StrokeThickness="7.7473" Data="M341.08,182.57c23.79,12.23,43.39,31.48,56.03,55.02"/>
+    <Path Style="{StaticResource st1}" StrokeThickness="8.6597" Data="M400.31,261.9"/>
+    <Path Fill="White" StrokeThickness="7.7473" Data="M417.28,258.77h-2.35v-0.01c0-1.48-1.21-2.69-2.69-2.69h-12.72c-1.48,0-2.69,1.21-2.69,2.69v0.01h-2.36
+		c-2.9,0-5.27,2.37-5.27,5.27v56.42c0,2.9,2.37,5.27,5.27,5.27h22.82c2.9,0,5.27-2.37,5.27-5.27v-56.42
+		C422.74,258.11,420.18,258.77,417.28,258.77z M404.05,313.38l4.07-19.64l-10.55,1.33l11.73-24.58l-5,20.15l10-1.46L404.05,313.38z
+		 M396.96,260.71c8.55,3.02,17.45,0.61,17.45,0.61C404.71,266.93,396.96,260.71,396.96,260.71z"/>
+
+    </Canvas>
+</Viewbox>

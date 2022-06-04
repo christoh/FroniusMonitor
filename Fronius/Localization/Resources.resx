@@ -708,4 +708,7 @@
   <data name="ShowAvm" xml:space="preserve">
 	  <value>Fritz!Home</value>
   </data>
+  <data name="Events" xml:space="preserve">
+	  <value>Events</value>
+  </data>
 </root>

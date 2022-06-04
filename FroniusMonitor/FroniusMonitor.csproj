@@ -65,6 +65,9 @@
     <Compile Update="Assets\Images\FritzLogo.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Assets\Images\EnergyFlow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Assets\Images\HomeWithBatteryIcon.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -87,6 +90,10 @@
 
   <ItemGroup>
     <Page Update="Assets\Images\FritzLogo.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Assets\Images\EnergyFlow.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
