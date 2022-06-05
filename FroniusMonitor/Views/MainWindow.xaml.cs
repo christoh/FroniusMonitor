@@ -259,6 +259,7 @@ public partial class MainWindow
     {
         if (RibbonExpander.IsChecked.HasValue && RibbonExpander.IsChecked.Value)
         {
+            rotateAnimation.From = 180;
             rotateAnimation.To = 360;
             scaleAnimation.To = 1;
         }
