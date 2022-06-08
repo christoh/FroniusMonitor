@@ -28,3 +28,13 @@ public enum ModelStatus
     NotChargingBecausePhaseSwitch = 23,
     NotChargingBecauseMinPauseDuration = 24
 }
+
+public enum CarStatus
+{
+    Unknown = 0,
+    Idle = 1,
+    Charging = 2,
+    WaitCar = 3,
+    Complete = 4,
+    Error = 5
+}

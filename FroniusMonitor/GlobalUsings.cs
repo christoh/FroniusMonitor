@@ -20,6 +20,7 @@ global using System.Xml.Serialization;
 global using De.Hochstaetter.Fronius.Contracts;
 global using De.Hochstaetter.Fronius.Localization;
 global using De.Hochstaetter.Fronius.Models;
+global using De.Hochstaetter.Fronius.Models.Charging;
 global using De.Hochstaetter.Fronius.Models.Gen24;
 global using De.Hochstaetter.Fronius.Models.Gen24.Settings;
 global using De.Hochstaetter.Fronius.Services;

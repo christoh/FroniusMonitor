@@ -1,0 +1,92 @@
+﻿<UserControl x:Class="De.Hochstaetter.FroniusMonitor.Controls.WattPilotControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
+             xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             xmlns:gl="clr-namespace:System.Globalization;assembly=System.Runtime"
+             mc:Ignorable="d" 
+             d:DesignHeight="127" d:DesignWidth="110">
+    <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:WattPilotControl}}">
+        <Border BorderBrush="DimGray" BorderThickness="1" Width="110">
+            <Grid x:Name="BackgroundProvider" Background="{Binding WattPilotService.WattPilot, Converter={co:NullToBrush}}" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid.Resources>
+                    <Style TargetType="Viewbox">
+                        <Setter Property="StretchDirection" Value="DownOnly"/>
+                        <Setter Property="Margin" Value="4,0"/>
+                    </Style>
+                    <Style TargetType="c:LcdDisplay">
+                        <Setter Property="Grid.Row" Value="2"/>
+                        <Setter Property="Width" Value="100"/>
+                        <Setter Property="Height" Value="85"/>
+                        <Setter Property="Margin" Value="4"/>
+                        <Setter Property="FontSize" Value="14"/>
+                        <Setter Property="FontFamily" Value="pack://application:,,,/Assets/Fonts/#Digital-7 Mono"/>
+                    </Style>
+                </Grid.Resources>
+                <Viewbox Grid.Row="0">
+                    <TextBlock FontSize="8" TextAlignment="Center" Text="{Binding WattPilotService.WattPilot.DeviceName, FallbackValue=---, TargetNullValue=???}"/>
+                </Viewbox>
+                <Viewbox Grid.Row="1">
+                    <TextBlock FontSize="8" TextAlignment="Center" Text="{Binding WattPilotService.WattPilot.StatusDisplayName, FallbackValue=---, TargetNullValue=???}"/>
+                </Viewbox>
+
+                <!-- ReSharper disable Xaml.MissingGridIndex -->
+                <c:LcdDisplay x:Name="LcdVoltage" Visibility="Collapsed"
+                              Header="{x:Static p:Resources.PhaseVoltage}"
+                              Label1="L1" Label2="L2" Label3="L3" LabelSum="Avg"
+                              Value1="{Binding WattPilotService.WattPilot.VoltageL1, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0 V'}"
+                              Value2="{Binding WattPilotService.WattPilot.VoltageL2, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0 V'}"
+                              Value3="{Binding WattPilotService.WattPilot.VoltageL3, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0 V'}"
+                              ValueSum="{Binding WattPilotService.WattPilot.VoltageAverage, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0.0 V'}"
+                />
+
+                <c:LcdDisplay x:Name="LcdCurrent" Visibility="Collapsed"
+                              Header="{x:Static p:Resources.Current}"
+                              Label1="L1" Label2="L2" Label3="L3" LabelSum="Sum"
+                              Value1="{Binding WattPilotService.WattPilot.CurrentL1, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0.000 A'}"
+                              Value2="{Binding WattPilotService.WattPilot.CurrentL2, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0.000 A'}"
+                              Value3="{Binding WattPilotService.WattPilot.CurrentL3, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0.000 A'}"
+                              ValueSum="{Binding WattPilotService.WattPilot.CurrentSum, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0.000 A'}"
+                />
+
+                <c:LcdDisplay x:Name="LcdPower"
+                              Header="{x:Static p:Resources.RealPower}"
+                              Label1="L1" Label2="L2" Label3="L3" LabelSum="Sum"
+                              Value1="{Binding WattPilotService.WattPilot.PowerL1, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0.0 W'}"
+                              Value2="{Binding WattPilotService.WattPilot.PowerL2, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0.0 W'}"
+                              Value3="{Binding WattPilotService.WattPilot.PowerL3, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0.0 W'}"
+                              ValueSum="{Binding WattPilotService.WattPilot.PowerTotal, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0.0 W'}"
+                />
+
+                <c:LcdDisplay x:Name="LcdPowerFactor" Visibility="Collapsed"
+                              Header="{x:Static p:Resources.PowerFactor}"
+                              Label1="L1" Label2="L2" Label3="L3" LabelSum="Tot"
+                              Value1="{Binding WattPilotService.WattPilot.PowerFactorL1, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='N2'}"
+                              Value2="{Binding WattPilotService.WattPilot.PowerFactorL2, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='N2'}"
+                              Value3="{Binding WattPilotService.WattPilot.PowerFactorL3, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='N2'}"
+                              ValueSum="{Binding WattPilotService.WattPilot.PowerFactorN, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='N2'}"
+                />
+                <!-- ReSharper restore Xaml.MissingGridIndex -->
+
+                <WrapPanel MaxWidth="110" Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <WrapPanel.Resources>
+                        <Style TargetType="RadioButton" BasedOn="{StaticResource DeviceButton}"/>
+                    </WrapPanel.Resources>
+                    <RadioButton IsChecked="True" Content="AC" Click="OnAcClicked"/>
+                    <RadioButton Content="{x:Static p:Resources.Energy}" />
+                    <RadioButton Content="{x:Static p:Resources.More}"/>
+                </WrapPanel>
+            </Grid>
+        </Border>
+    </Viewbox>
+</UserControl>

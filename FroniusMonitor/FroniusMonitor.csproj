@@ -32,6 +32,7 @@
     <None Remove="Assets\Fonts\DOTMATRI.TTF" />
     <None Remove="Assets\Fonts\DOTMBold.TTF" />
     <None Remove="Assets\Fonts\EHSMB.TTF" />
+    <None Remove="Assets\Images\EQC.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -57,6 +58,9 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Assets\Fonts\EHSMB.TTF">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Images\EQC.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>

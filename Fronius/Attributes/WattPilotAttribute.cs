@@ -3,10 +3,12 @@
 [AttributeUsage(AttributeTargets.Property)]
 public class WattPilotAttribute : Attribute
 {
-    public WattPilotAttribute(string tokenName)
+    public WattPilotAttribute(string tokenName, int index = -1)
     {
-        TokenName=tokenName;
+        TokenName = tokenName;
+        Index = index;
     }
 
     public string TokenName { get; init; }
+    public int Index { get; init; }
 }

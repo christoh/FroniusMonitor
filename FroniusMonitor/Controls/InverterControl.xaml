@@ -22,6 +22,14 @@
                         <Setter Property="StretchDirection" Value="DownOnly"/>
                         <Setter Property="Margin" Value="4,0"/>
                     </Style>
+                    <Style TargetType="c:LcdDisplay">
+                        <Setter Property="Grid.Row" Value="2"/>
+                        <Setter Property="Width" Value="100"/>
+                        <Setter Property="Height" Value="85"/>
+                        <Setter Property="Margin" Value="4"/>
+                        <Setter Property="FontSize" Value="14"/>
+                        <Setter Property="FontFamily" Value="pack://application:,,,/Assets/Fonts/#Digital-7 Mono"/>
+                    </Style>
                 </Grid.Resources>
                 <Viewbox Grid.Row="0">
                     <TextBlock FontSize="8" TextAlignment="Center" Text="{Binding Inverter.CustomName, FallbackValue=---}"/>
@@ -30,7 +38,8 @@
                     <TextBlock FontSize="8" x:Name="InverterName" TextAlignment="Center"/>
                 </Viewbox>
 
-                <c:LcdDisplay x:Name="Lcd" Grid.Row="2" Width="100" Height="85" Margin="4" FontSize="14" FontFamily="pack://application:,,,/Assets/Fonts/#Digital-7 Mono"/>
+                <!-- ReSharper disable once Xaml.MissingGridIndex -->
+                <c:LcdDisplay x:Name="Lcd"/>
 
                 <WrapPanel MaxWidth="110" Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
                     <WrapPanel.Resources>

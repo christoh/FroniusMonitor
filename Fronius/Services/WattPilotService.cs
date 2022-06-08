@@ -1,5 +1,5 @@
-﻿using System.Net.WebSockets;
-using De.Hochstaetter.Fronius.Models.Charging;
+﻿using System.Diagnostics;
+using System.Net.WebSockets;
 
 namespace De.Hochstaetter.Fronius.Services;
 
@@ -107,7 +107,6 @@ public class WattPilotService : BindableBase, IWattPilotService
                 {
                     UpdateWattPilot(dataToken["status"] as JObject);
                 }
-
             } while (dataType == "fullStatus" && dataToken["partial"]?.Value<bool>() is true);
 
             tokenSource?.Dispose();
@@ -133,67 +132,101 @@ public class WattPilotService : BindableBase, IWattPilotService
 
         while (Connection != null)
         {
-            await Task.Delay(200).ConfigureAwait(false);
+            await Task.Delay(200, CancellationToken.None).ConfigureAwait(false);
         }
     }
 
     private void UpdateWattPilot(JObject? jObject)
     {
-        if (jObject == null)
+        if (jObject == null || WattPilot == null)
         {
             return;
         }
 
         foreach (var token in jObject)
         {
-            if (WattPilot == null)
+            IReadOnlyList<PropertyInfo> propertyInfos = typeof(WattPilot).GetProperties().Where(p => p.GetCustomAttribute<WattPilotAttribute>() is { } attribute && attribute.TokenName == token.Key).ToArray();
+
+            if (!propertyInfos.Any())
             {
                 continue;
             }
 
-            switch (token.Key)
+            if (propertyInfos.Count == 1)
             {
-                case "nrg":
-                    if (token.Value is JArray array)
-                    {
-                        WattPilot.VoltageL1 = array[0].Value<double>();
-                        WattPilot.VoltageL2 = array[1].Value<double>();
-                        WattPilot.VoltageL3 = array[2].Value<double>();
-                        WattPilot.VoltageN = array[3].Value<double>();
-                        WattPilot.CurrentL1 = array[4].Value<double>();
-                        WattPilot.CurrentL2 = array[5].Value<double>();
-                        WattPilot.CurrentL3 = array[6].Value<double>();
-                        WattPilot.PowerL1 = array[7].Value<double>();
-                        WattPilot.PowerL2 = array[8].Value<double>();
-                        WattPilot.PowerL3 = array[9].Value<double>();
-                        WattPilot.PowerN = array[10].Value<double>();
-                        WattPilot.PowerTotal = array[11].Value<double>();
-                        WattPilot.PowerFactorL1 = array[12].Value<double>();
-                        WattPilot.PowerFactorL2 = array[13].Value<double>();
-                        WattPilot.PowerFactorL3 = array[14].Value<double>();
-                        WattPilot.PowerFactorN = array[15].Value<double>();
-                    }
-                    break;
-
-                case "modelStatus":
-                    WattPilot.Status = (ModelStatus?)token.Value?.Value<byte>();
-                    break;
-                case "msi":
-                    WattPilot.StatusInternal = (ModelStatus?)token.Value?.Value<byte>();
-                    break;
-                case "mca":
-                    WattPilot.MinimumChargingCurrent = token.Value?.Value<double>();
-                    break;
-                case "amp":
-                    WattPilot.ChargingCurrent = token.Value?.Value<double>();
-                    break;
-                case "ama":
-                    WattPilot.MaximumChargingCurrent = token.Value?.Value<double>();
-                    break;
-                case "dll":
-                    WattPilot.DownloadLink = token.Value?.Value<string>();
-                    break;
+                SetWattPilotValue(propertyInfos[0], token.Value);
+                return;
             }
+
+            if (token.Value is JArray array)
+            {
+                foreach (var propertyInfo in propertyInfos)
+                {
+                    var attribute = propertyInfo.GetCustomAttribute<WattPilotAttribute>();
+
+                    if (attribute?.Index >= 0 && attribute.Index < array.Count)
+                    {
+                        SetWattPilotValue(propertyInfo,array[attribute.Index]);
+                    }
+                }
+            }
+        }
+    }
+
+    private void SetWattPilotValue(PropertyInfo propertyInfo, JToken? token)
+    {
+        var nonNullableType = Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? propertyInfo.PropertyType;
+
+        if
+        (
+            SetValue<bool>() ||
+            SetValue<double>() ||
+            SetValue<int>() ||
+            SetValue<byte>() ||
+            SetValue<string>() ||
+            SetValue<DateTime>()
+        )
+        {
+            return;
+        }
+
+        var stringValue = token?.Value<string>();
+
+        if (stringValue == null)
+        {
+            propertyInfo.SetValue(WattPilot, null);
+            return;
+        }
+
+        if (nonNullableType.IsEnum)
+        {
+            propertyInfo.SetValue(WattPilot, Enum.Parse(nonNullableType, stringValue));
+            return;
+        }
+
+        if (propertyInfo.PropertyType.IsAssignableFrom(typeof(Version)))
+        {
+            propertyInfo.SetValue(WattPilot, new Version(stringValue));
+            return;
+        }
+
+        Debugger.Break();
+
+        bool SetValue<T>()
+        {
+            if (!propertyInfo.PropertyType.IsAssignableFrom(typeof(T)))
+            {
+                return false;
+            }
+
+            if (token != null)
+            {
+                propertyInfo.SetValue(WattPilot, token.Value<T>());
+                return true;
+            }
+
+            propertyInfo.SetValue(WattPilot, null);
+            return true;
         }
     }
 
@@ -216,7 +249,10 @@ public class WattPilotService : BindableBase, IWattPilotService
                 }
             }
         }
-        catch (OperationCanceledException) { }
+        catch
+        {
+            // Just re-establish connection
+        }
         finally
         {
             tokenSource?.Dispose();

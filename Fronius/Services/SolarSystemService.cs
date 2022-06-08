@@ -204,19 +204,18 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
     private async ValueTask TryStartWattPilot(SolarSystem result)
     {
-        return;
-        //if (wattPilotService.Connection == null)
-        //{
-        //    try
-        //    {
-        //        await wattPilotService.Start(new WebConnection {BaseUrl = "ws://192.168.44.114", EncryptedPassword = "zx1z6fLYI3BYi+s2ZWPjow=="}).ConfigureAwait(false);
-        //        result.WattPilot = wattPilotService.WattPilot;
-        //    }
-        //    catch
-        //    {
-        //        // WattPilot failed
-        //    }
-        //}
+        if (wattPilotService.Connection == null)
+        {
+            try
+            {
+                await wattPilotService.Start(new WebConnection { BaseUrl = "ws://192.168.44.114", EncryptedPassword = "zx1z6fLYI3BYi+s2ZWPjow==" }).ConfigureAwait(false);
+                result.WattPilot = wattPilotService.WattPilot;
+            }
+            catch
+            {
+                // WattPilot failed
+            }
+        }
     }
 
     public async void TimerElapsed(object? _)

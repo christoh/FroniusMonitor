@@ -1,251 +1,320 @@
-﻿namespace De.Hochstaetter.Fronius.Models.Charging
+﻿namespace De.Hochstaetter.Fronius.Models.Charging;
+
+[SuppressMessage("ReSharper", "StringLiteralTypo")]
+public class WattPilot : BindableBase
 {
-    [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    public class WattPilot : BindableBase
+    private string? serialNumber;
+
+    [FroniusProprietaryImport("serial", FroniusDataType.Root)]
+    [WattPilot("sse")]
+    public string? SerialNumber
     {
-        private string? serialNumber;
-        [FroniusProprietaryImport("serial", FroniusDataType.Root)]
-        public string? SerialNumber
-        {
-            get => serialNumber;
-            set => Set(ref serialNumber, value);
-        }
+        get => serialNumber;
+        set => Set(ref serialNumber, value);
+    }
 
-        private string? hostName;
-        [FroniusProprietaryImport("hostname", FroniusDataType.Root)]
-        public string? HostName
-        {
-            get => hostName;
-            set => Set(ref hostName, value);
-        }
+    private string? hostName;
 
-        private string? deviceName;
-        [FroniusProprietaryImport("friendly_name", FroniusDataType.Root)]
-        public string? DeviceName
-        {
-            get => deviceName;
-            set => Set(ref deviceName, value);
-        }
+    [FroniusProprietaryImport("hostname", FroniusDataType.Root)]
+    [WattPilot("ffna")]
+    public string? HostName
+    {
+        get => hostName;
+        set => Set(ref hostName, value);
+    }
 
-        private string? manufacturer;
-        [FroniusProprietaryImport("manufacturer", FroniusDataType.Root)]
-        public string? Manufacturer
-        {
-            get => manufacturer;
-            set => Set(ref manufacturer, value);
-        }
+    private string? deviceName;
 
-        private string? model;
-        [FroniusProprietaryImport("devicetype", FroniusDataType.Root)]
-        public string? Model
-        {
-            get => model;
-            set => Set(ref model, value);
-        }
+    [WattPilot("fna")]
+    [FroniusProprietaryImport("friendly_name", FroniusDataType.Root)]
+    public string? DeviceName
+    {
+        get => deviceName;
+        set => Set(ref deviceName, value);
+    }
 
-        private Version? version;
-        [FroniusProprietaryImport("version", FroniusDataType.Root)]
-        public Version? Version
-        {
-            get => version;
-            set => Set(ref version, value);
-        }
+    private string? manufacturer;
 
-        private int? protocol;
-        [FroniusProprietaryImport("protocol", FroniusDataType.Root)]
-        public int? Protocol
-        {
-            get => protocol;
-            set => Set(ref protocol, value);
-        }
+    [WattPilot("oem")]
+    [FroniusProprietaryImport("manufacturer", FroniusDataType.Root)]
+    public string? Manufacturer
+    {
+        get => manufacturer;
+        set => Set(ref manufacturer, value);
+    }
 
-        private bool? isSecured;
-        [FroniusProprietaryImport("secured", FroniusDataType.Root)]
-        public bool? IsSecured
-        {
-            get => isSecured;
-            set => Set(ref isSecured, value);
-        }
+    private string? model;
 
-        private double? voltageL1;
+    [WattPilot("typ")]
+    [FroniusProprietaryImport("devicetype", FroniusDataType.Root)]
+    public string? Model
+    {
+        get => model;
+        set => Set(ref model, value);
+    }
 
-        public double? VoltageL1
-        {
-            get => voltageL1;
-            set => Set(ref voltageL1, value);
-        }
+    private Version? version;
 
-        private double? voltageL2;
+    [FroniusProprietaryImport("version", FroniusDataType.Root)]
+    [WattPilot("fwv")]
+    public Version? Version
+    {
+        get => version;
+        set => Set(ref version, value);
+    }
 
-        public double? VoltageL2
-        {
-            get => voltageL2;
-            set => Set(ref voltageL2, value);
-        }
+    private int? protocol;
 
-        private double voltageL3;
+    [FroniusProprietaryImport("protocol", FroniusDataType.Root)]
+    public int? Protocol
+    {
+        get => protocol;
+        set => Set(ref protocol, value);
+    }
 
-        public double VoltageL3
-        {
-            get => voltageL3;
-            set => Set(ref voltageL3, value);
-        }
+    private bool? isSecured;
 
-        private double voltageN;
+    [FroniusProprietaryImport("secured", FroniusDataType.Root)]
+    public bool? IsSecured
+    {
+        get => isSecured;
+        set => Set(ref isSecured, value);
+    }
 
-        public double VoltageN
-        {
-            get => voltageN;
-            set => Set(ref voltageN, value);
-        }
+    private double? voltageL1;
 
-        private double? currentL1;
+    [WattPilot("nrg", 0)]
+    public double? VoltageL1
+    {
+        get => voltageL1;
+        set => Set(ref voltageL1, value, () => NotifyOfPropertyChange(nameof(VoltageAverage)));
+    }
 
-        public double? CurrentL1
-        {
-            get => currentL1;
-            set => Set(ref currentL1, value);
-        }
+    private double? voltageL2;
 
-        private double? currentL2;
+    [WattPilot("nrg", 1)]
+    public double? VoltageL2
+    {
+        get => voltageL2;
+        set => Set(ref voltageL2, value, () => NotifyOfPropertyChange(nameof(VoltageAverage)));
+    }
 
-        public double? CurrentL2
-        {
-            get => currentL2;
-            set => Set(ref currentL2, value);
-        }
+    private double voltageL3;
 
-        private double? currentL3;
+    [WattPilot("nrg", 2)]
+    public double VoltageL3
+    {
+        get => voltageL3;
+        set => Set(ref voltageL3, value, () => NotifyOfPropertyChange(nameof(VoltageAverage)));
+    }
 
-        public double? CurrentL3
-        {
-            get => currentL3;
-            set => Set(ref currentL3, value);
-        }
+    private double voltageN;
 
-        private double? powerL1;
+    [WattPilot("nrg", 3)]
+    public double VoltageN
+    {
+        get => voltageN;
+        set => Set(ref voltageN, value);
+    }
 
-        public double? PowerL1
-        {
-            get => powerL1;
-            set => Set(ref powerL1, value);
-        }
+    private double? currentL1;
 
-        private double? powerL2;
+    [WattPilot("nrg", 4)]
+    public double? CurrentL1
+    {
+        get => currentL1;
+        set => Set(ref currentL1, value, () => NotifyOfPropertyChange(nameof(CurrentSum)));
+    }
 
-        public double? PowerL2
-        {
-            get => powerL2;
-            set => Set(ref powerL2, value);
-        }
+    private double? currentL2;
 
-        private double? powerL3;
+    [WattPilot("nrg", 5)]
+    public double? CurrentL2
+    {
+        get => currentL2;
+        set => Set(ref currentL2, value, () => NotifyOfPropertyChange(nameof(CurrentSum)));
+    }
 
-        public double? PowerL3
-        {
-            get => powerL3;
-            set => Set(ref powerL3, value);
-        }
+    private double? currentL3;
 
-        private double? powerN;
+    [WattPilot("nrg", 6)]
+    public double? CurrentL3
+    {
+        get => currentL3;
+        set => Set(ref currentL3, value, () => NotifyOfPropertyChange(nameof(CurrentSum)));
+    }
 
-        public double? PowerN
-        {
-            get => powerN;
-            set => Set(ref powerN, value);
-        }
+    public double? CurrentSum => CurrentL1 + CurrentL2 + CurrentL3;
 
-        private double? powerTotal;
+    private double? powerL1;
 
-        public double? PowerTotal
-        {
-            get => powerTotal;
-            set => Set(ref powerTotal, value);
-        }
+    [WattPilot("nrg", 7)]
+    public double? PowerL1
+    {
+        get => powerL1;
+        set => Set(ref powerL1, value);
+    }
 
-        private double? powerFactorL1;
+    private double? powerL2;
 
-        public double? PowerFactorL1
-        {
-            get => powerFactorL1;
-            set => Set(ref powerFactorL1, value);
-        }
+    [WattPilot("nrg", 8)]
+    public double? PowerL2
+    {
+        get => powerL2;
+        set => Set(ref powerL2, value);
+    }
 
-        private double? powerFactorL2;
+    private double? powerL3;
 
-        public double? PowerFactorL2
-        {
-            get => powerFactorL2;
-            set => Set(ref powerFactorL2, value);
-        }
+    [WattPilot("nrg", 9)]
+    public double? PowerL3
+    {
+        get => powerL3;
+        set => Set(ref powerL3, value);
+    }
 
-        private double? powerFactorL3;
+    private double? powerN;
 
-        public double? PowerFactorL3
-        {
-            get => powerFactorL3;
-            set => Set(ref powerFactorL3, value);
-        }
+    [WattPilot("nrg", 10)]
+    public double? PowerN
+    {
+        get => powerN;
+        set => Set(ref powerN, value);
+    }
 
-        private double? powerFactorN;
+    public double? VoltageAverage => (VoltageL1 + VoltageL2 + VoltageL3) / 3;
 
-        public double? PowerFactorN
-        {
-            get => powerFactorN;
-            set => Set(ref powerFactorN, value);
-        }
+    private double? powerTotal;
 
-        private ModelStatus? status;
+    [WattPilot("nrg", 11)]
+    public double? PowerTotal
+    {
+        get => powerTotal;
+        set => Set(ref powerTotal, value);
+    }
 
-        public ModelStatus? Status
-        {
-            get => status;
-            set => Set(ref status, value);
-        }
+    private double? powerFactorL1;
 
-        private ModelStatus? statusInternal;
+    [WattPilot("nrg", 12)]
+    public double? PowerFactorL1
+    {
+        get => powerFactorL1;
+        set => Set(ref powerFactorL1, value);
+    }
 
-        public ModelStatus? StatusInternal
-        {
-            get => statusInternal;
-            set => Set(ref statusInternal, value);
-        }
+    private double? powerFactorL2;
 
-        private double? minimumChargingCurrent;
+    [WattPilot("nrg", 13)]
+    public double? PowerFactorL2
+    {
+        get => powerFactorL2;
+        set => Set(ref powerFactorL2, value);
+    }
 
-        public double? MinimumChargingCurrent
-        {
-            get => minimumChargingCurrent;
-            set => Set(ref minimumChargingCurrent, value);
-        }
+    private double? powerFactorL3;
 
-        private double? maximumChargingCurrent;
+    [WattPilot("nrg", 14)]
+    public double? PowerFactorL3
+    {
+        get => powerFactorL3;
+        set => Set(ref powerFactorL3, value);
+    }
 
-        public double? MaximumChargingCurrent
-        {
-            get => maximumChargingCurrent;
-            set => Set(ref maximumChargingCurrent, value);
-        }
+    private double? powerFactorN;
 
-        private double? chargingCurrent;
+    [WattPilot("nrg", 15)]
+    public double? PowerFactorN
+    {
+        get => powerFactorN;
+        set => Set(ref powerFactorN, value);
+    }
 
-        public double? ChargingCurrent
-        {
-            get => chargingCurrent;
-            set => Set(ref chargingCurrent, value);
-        }
+    private ModelStatus? status;
 
-        private string? downloadLink;
+    [WattPilot("modelStatus")]
+    public ModelStatus? Status
+    {
+        get => status;
+        set => Set(ref status, value, () => NotifyOfPropertyChange(nameof(StatusDisplayName)));
+    }
 
-        public string? DownloadLink
-        {
-            get => downloadLink;
-            set => Set(ref downloadLink, value);
-        }
+    public string? StatusDisplayName => Status?.ToDisplayName();
 
-        public static WattPilot Parse(JToken token)
-        {
-            return IoC.Get<IGen24JsonService>().ReadFroniusData<WattPilot>(token);
-        }
+    private ModelStatus? statusInternal;
+
+    [WattPilot("msi")]
+    public ModelStatus? StatusInternal
+    {
+        get => statusInternal;
+        set => Set(ref statusInternal, value, () => NotifyOfPropertyChange(nameof(StatusInternalDisplayName)));
+    }
+
+    public string? StatusInternalDisplayName => StatusInternal?.ToDisplayName();
+
+    private double? minimumChargingCurrent;
+
+    [WattPilot("mca")]
+    public double? MinimumChargingCurrent
+    {
+        get => minimumChargingCurrent;
+        set => Set(ref minimumChargingCurrent, value);
+    }
+
+    private double? maximumChargingCurrent;
+
+    [WattPilot("ama")]
+    public double? MaximumChargingCurrent
+    {
+        get => maximumChargingCurrent;
+        set => Set(ref maximumChargingCurrent, value);
+    }
+
+    private double? chargingCurrent;
+
+    [WattPilot("amp")]
+    public double? ChargingCurrent
+    {
+        get => chargingCurrent;
+        set => Set(ref chargingCurrent, value);
+    }
+
+    private string? downloadLink;
+
+    [WattPilot("dll")]
+    public string? DownloadLink
+    {
+        get => downloadLink;
+        set => Set(ref downloadLink, value);
+    }
+
+    private string? cloudAccessKey;
+
+    [WattPilot("cak")]
+    public string? CloudAccessKey
+    {
+        get => cloudAccessKey;
+        set => Set(ref cloudAccessKey, value);
+    }
+
+    private bool? cloudAccessEnabled;
+
+    [WattPilot("cae")]
+    public bool? CloudAccessEnabled
+    {
+        get => cloudAccessEnabled;
+        set => Set(ref cloudAccessEnabled, value);
+    }
+
+    private CarStatus carStatus;
+    [WattPilot("car")]
+    public CarStatus CarStatus
+    {
+        get => carStatus;
+        set => Set(ref carStatus, value);
+    }
+
+    public static WattPilot Parse(JToken token)
+    {
+        return IoC.Get<IGen24JsonService>().ReadFroniusData<WattPilot>(token);
     }
 }

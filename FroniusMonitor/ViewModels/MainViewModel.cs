@@ -4,10 +4,11 @@ public class MainViewModel : ViewModelBase
 {
     private readonly IWebClientService webClientService;
 
-    public MainViewModel(ISolarSystemService solarSystemService, IWebClientService webClientService)
+    public MainViewModel(ISolarSystemService solarSystemService, IWebClientService webClientService, IWattPilotService wattPilotService)
     {
         this.webClientService = webClientService;
         SolarSystemService = solarSystemService;
+        WattPilotService = wattPilotService;
         ExportSettingsCommand = new NoParameterCommand(ExportSettings);
         LoadSettingsCommand = new NoParameterCommand(LoadSettings);
     }
@@ -16,6 +17,8 @@ public class MainViewModel : ViewModelBase
     public ICommand LoadSettingsCommand { get; }
 
     public ISolarSystemService SolarSystemService { get; }
+
+    public IWattPilotService WattPilotService { get; }
 
     public bool IncludeInverterPower
     {

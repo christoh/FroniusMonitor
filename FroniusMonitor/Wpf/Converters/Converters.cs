@@ -80,6 +80,12 @@ public class NullToString : ConverterBase
     }
 }
 
+public class NullToBrush : NullToAnything<Brush>
+{
+    public override Brush? NotNull { get; set; } = Brushes.AntiqueWhite;
+    public override Brush? Null { get; set; } = Brushes.LightGray;
+}
+
 public abstract class PowerCorrector : ConverterBase
 {
     protected abstract double OffsetWatts { get; }
