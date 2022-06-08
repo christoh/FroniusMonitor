@@ -970,6 +970,222 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Charging (next trip).
+        /// </summary>
+        public static string ModelStatus_ChargingBecauseAutomaticStop {
+            get {
+                return ResourceManager.GetString("ModelStatus_ChargingBecauseAutomaticStop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Charging (next trip, no clock).
+        /// </summary>
+        public static string ModelStatus_ChargingBecauseAutomaticStopNoClock {
+            get {
+                return ResourceManager.GetString("ModelStatus_ChargingBecauseAutomaticStopNoClock", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Charging (not enough time for next trip).
+        /// </summary>
+        public static string ModelStatus_ChargingBecauseAutomaticStopNotEnoughTime {
+            get {
+                return ResourceManager.GetString("ModelStatus_ChargingBecauseAutomaticStopNotEnoughTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Charging (testing car capabilities).
+        /// </summary>
+        public static string ModelStatus_ChargingBecauseAutomaticStopTestCharging {
+            get {
+                return ResourceManager.GetString("ModelStatus_ChargingBecauseAutomaticStopTestCharging", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Charging (energy price low).
+        /// </summary>
+        public static string ModelStatus_ChargingBecauseAwattarPriceLow {
+            get {
+                return ResourceManager.GetString("ModelStatus_ChargingBecauseAwattarPriceLow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Charging (car compatibility keep-alive).
+        /// </summary>
+        public static string ModelStatus_ChargingBecauseCarCompatibilityKeepAlive {
+            get {
+                return ResourceManager.GetString("ModelStatus_ChargingBecauseCarCompatibilityKeepAlive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Charging (pause not allowed).
+        /// </summary>
+        public static string ModelStatus_ChargingBecauseChargePauseNotAllowed {
+            get {
+                return ResourceManager.GetString("ModelStatus_ChargingBecauseChargePauseNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Charging (fallback default).
+        /// </summary>
+        public static string ModelStatus_ChargingBecauseFallbackDefault {
+            get {
+                return ResourceManager.GetString("ModelStatus_ChargingBecauseFallbackDefault", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Charging (Go-E default).
+        /// </summary>
+        public static string ModelStatus_ChargingBecauseFallbackGoEDefault {
+            get {
+                return ResourceManager.GetString("ModelStatus_ChargingBecauseFallbackGoEDefault", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Charging (Go-E scheduler).
+        /// </summary>
+        public static string ModelStatus_ChargingBecauseFallbackGoEScheduler {
+            get {
+                return ResourceManager.GetString("ModelStatus_ChargingBecauseFallbackGoEScheduler", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Charging (forced).
+        /// </summary>
+        public static string ModelStatus_ChargingBecauseForceStateOn {
+            get {
+                return ResourceManager.GetString("ModelStatus_ChargingBecauseForceStateOn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Charging (PV surplus).
+        /// </summary>
+        public static string ModelStatus_ChargingBecausePvSurplus {
+            get {
+                return ResourceManager.GetString("ModelStatus_ChargingBecausePvSurplus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pause (unauthorized).
+        /// </summary>
+        public static string ModelStatus_NotChargingBecauseAccessControlWait {
+            get {
+                return ResourceManager.GetString("ModelStatus_NotChargingBecauseAccessControlWait", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pause (energy limit).
+        /// </summary>
+        public static string ModelStatus_NotChargingBecauseEnergyLimit {
+            get {
+                return ResourceManager.GetString("ModelStatus_NotChargingBecauseEnergyLimit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pause (fallback next trip).
+        /// </summary>
+        public static string ModelStatus_NotChargingBecauseFallbackAutomaticStop {
+            get {
+                return ResourceManager.GetString("ModelStatus_NotChargingBecauseFallbackAutomaticStop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pause (energy price).
+        /// </summary>
+        public static string ModelStatus_NotChargingBecauseFallbackAwattar {
+            get {
+                return ResourceManager.GetString("ModelStatus_NotChargingBecauseFallbackAwattar", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pause (Go-E energy price).
+        /// </summary>
+        public static string ModelStatus_NotChargingBecauseFallbackGoEAwattar {
+            get {
+                return ResourceManager.GetString("ModelStatus_NotChargingBecauseFallbackGoEAwattar", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pause (forced).
+        /// </summary>
+        public static string ModelStatus_NotChargingBecauseForceStateOff {
+            get {
+                return ResourceManager.GetString("ModelStatus_NotChargingBecauseForceStateOff", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pause (minimum pause duration).
+        /// </summary>
+        public static string ModelStatus_NotChargingBecauseMinPauseDuration {
+            get {
+                return ResourceManager.GetString("ModelStatus_NotChargingBecauseMinPauseDuration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pause (insufficient data).
+        /// </summary>
+        public static string ModelStatus_NotChargingBecauseNoChargeCtrlData {
+            get {
+                return ResourceManager.GetString("ModelStatus_NotChargingBecauseNoChargeCtrlData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pause (phase switch).
+        /// </summary>
+        public static string ModelStatus_NotChargingBecausePhaseSwitch {
+            get {
+                return ResourceManager.GetString("ModelStatus_NotChargingBecausePhaseSwitch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pause (scheduled).
+        /// </summary>
+        public static string ModelStatus_NotChargingBecauseScheduler {
+            get {
+                return ResourceManager.GetString("ModelStatus_NotChargingBecauseScheduler", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pause (simulated unplugging).
+        /// </summary>
+        public static string ModelStatus_NotChargingBecauseSimulateUnplugging {
+            get {
+                return ResourceManager.GetString("ModelStatus_NotChargingBecauseSimulateUnplugging", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pause (over temperature limit).
+        /// </summary>
+        public static string ModelStatus_NotChargingBecauseTemperatureLimit {
+            get {
+                return ResourceManager.GetString("ModelStatus_NotChargingBecauseTemperatureLimit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to M.
         /// </summary>
         public static string Monday_One {

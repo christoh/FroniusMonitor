@@ -110,6 +110,7 @@ private void On$propertyName$Changed()&#xD;
 }</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/StructuralSearch/Pattern/=A04C8A03320DCE4A93632CFDF72357C5/@KeyIndexDefined">False</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Agilo/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Awattar/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Bindable/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Caliburn/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=chademo/@EntryIndexedValue">True</s:Boolean>

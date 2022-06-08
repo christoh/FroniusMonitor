@@ -27,6 +27,7 @@ public partial class App
             .RegisterSingleton<MainViewModel>()
             .RegisterSingleton<IGen24JsonService, Gen24JsonService>()
             .RegisterSingleton<IAesKeyProvider, AesKeyProvider>()
+            .RegisterSingleton<IWattPilotService, WattPilotService>()
             .RegisterType<EventLogView>()
             .RegisterType<EventLogViewModel>()
             .RegisterType<SelfConsumptionOptimizationViewModel>()

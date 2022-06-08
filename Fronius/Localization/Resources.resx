@@ -711,4 +711,76 @@
   <data name="Events" xml:space="preserve">
 	  <value>Events</value>
   </data>
+  <data name="ModelStatus_NotChargingBecauseNoChargeCtrlData" xml:space="preserve">
+	  <value>Pause (insufficient data)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseTemperatureLimit" xml:space="preserve">
+	  <value>Pause (over temperature limit)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseAccessControlWait" xml:space="preserve">
+	  <value>Pause (unauthorized)</value>
+  </data>
+  <data name="ModelStatus_ChargingBecauseForceStateOn" xml:space="preserve">
+	  <value>Charging (forced)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseForceStateOff" xml:space="preserve">
+	  <value>Pause (forced)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseScheduler" xml:space="preserve">
+	  <value>Pause (scheduled)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseEnergyLimit" xml:space="preserve">
+	  <value>Pause (energy limit)</value>
+  </data>
+  <data name="ModelStatus_ChargingBecauseAwattarPriceLow" xml:space="preserve">
+	  <value>Charging (energy price low)</value>
+  </data>
+  <data name="ModelStatus_ChargingBecauseAutomaticStopTestCharging" xml:space="preserve">
+	  <value>Charging (testing car capabilities)</value>
+  </data>
+  <data name="ModelStatus_ChargingBecauseAutomaticStopNotEnoughTime" xml:space="preserve">
+	  <value>Charging (not enough time for next trip)</value>
+  </data>
+  <data name="ModelStatus_ChargingBecauseAutomaticStop" xml:space="preserve">
+	  <value>Charging (next trip)</value>
+  </data>
+  <data name="ModelStatus_ChargingBecauseAutomaticStopNoClock" xml:space="preserve">
+	  <value>Charging (next trip, no clock)</value>
+  </data>
+  <data name="ModelStatus_ChargingBecausePvSurplus" xml:space="preserve">
+	  <value>Charging (PV surplus)</value>
+  </data>
+  <data name="ModelStatus_ChargingBecauseFallbackGoEDefault" xml:space="preserve">
+	  <value>Charging (Go-E default)</value>
+  </data>
+  <data name="ModelStatus_ChargingBecauseFallbackGoEScheduler" xml:space="preserve">
+	  <value>Charging (Go-E scheduler)</value>
+  </data>
+  <data name="ModelStatus_ChargingBecauseFallbackDefault" xml:space="preserve">
+	  <value>Charging (fallback default)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseFallbackGoEAwattar" xml:space="preserve">
+	  <value>Pause (Go-E energy price)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseFallbackAwattar" xml:space="preserve">
+	  <value>Pause (energy price)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseFallbackAutomaticStop" xml:space="preserve">
+	  <value>Pause (fallback next trip)</value>
+  </data>
+  <data name="ModelStatus_ChargingBecauseCarCompatibilityKeepAlive" xml:space="preserve">
+	  <value>Charging (car compatibility keep-alive)</value>
+  </data>
+  <data name="ModelStatus_ChargingBecauseChargePauseNotAllowed" xml:space="preserve">
+	  <value>Charging (pause not allowed)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseSimulateUnplugging" xml:space="preserve">
+	  <value>Pause (simulated unplugging)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecausePhaseSwitch" xml:space="preserve">
+	  <value>Pause (phase switch)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseMinPauseDuration" xml:space="preserve">
+	  <value>Pause (minimum pause duration)</value>
+  </data>
 </root>

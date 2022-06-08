@@ -56,6 +56,14 @@ public class SolarSystem : BindableBase, IHierarchicalCollection
         set => Set(ref powerFlow, value);
     }
 
+    private WattPilot? wattPilot;
+
+    public WattPilot? WattPilot
+    {
+        get => wattPilot;
+        set => Set(ref wattPilot, value);
+    }
+
     IEnumerable IHierarchicalCollection.ItemsEnumerable { get; } = Array.Empty<object>();
 
     IEnumerable IHierarchicalCollection.ChildrenEnumerable => DeviceGroups;
