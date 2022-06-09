@@ -11,7 +11,7 @@
              d:DesignHeight="127" d:DesignWidth="110">
     <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:WattPilotControl}}">
         <Border BorderBrush="DimGray" BorderThickness="1" Width="110">
-            <Grid x:Name="BackgroundProvider" Background="{Binding WattPilotService.WattPilot, Converter={co:NullToBrush}}" >
+            <Grid x:Name="BackgroundProvider" Background="{Binding WattPilotService.WattPilot, Converter={co:NullToBrush}, FallbackValue=LightGray}" >
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -24,11 +24,13 @@
                         <Setter Property="StretchDirection" Value="DownOnly"/>
                         <Setter Property="Margin" Value="4,0"/>
                     </Style>
-                    <Style TargetType="c:LcdDisplay">
+                    <Style TargetType="FrameworkElement" x:Key="LcdStyle">
                         <Setter Property="Grid.Row" Value="2"/>
                         <Setter Property="Width" Value="100"/>
                         <Setter Property="Height" Value="85"/>
                         <Setter Property="Margin" Value="4"/>
+                    </Style>
+                    <Style TargetType="c:LcdDisplay" BasedOn="{StaticResource LcdStyle}">
                         <Setter Property="FontSize" Value="14"/>
                         <Setter Property="FontFamily" Value="pack://application:,,,/Assets/Fonts/#Digital-7 Mono"/>
                     </Style>
@@ -39,6 +41,7 @@
                 <Viewbox Grid.Row="1">
                     <TextBlock FontSize="8" TextAlignment="Center" Text="{Binding WattPilotService.WattPilot.StatusDisplayName, FallbackValue=---, TargetNullValue=???}"/>
                 </Viewbox>
+
 
                 <!-- ReSharper disable Xaml.MissingGridIndex -->
                 <c:LcdDisplay x:Name="LcdVoltage" Visibility="Collapsed"
@@ -76,6 +79,45 @@
                               Value3="{Binding WattPilotService.WattPilot.PowerFactorL3, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='N2'}"
                               ValueSum="{Binding WattPilotService.WattPilot.PowerFactorN, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='N2'}"
                 />
+                <c:LcdDisplay x:Name="LcdMoreFrequency" Visibility="Collapsed"
+                              Header="{Binding WattPilotService.WattPilot.SerialNumber, FallbackValue='---'}"
+                              Label1="Frq" Label2="Dat" Label3="Tim" LabelSum=""
+                              Value1="{Binding WattPilotService.WattPilot.Frequency, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0.000 Hz'}"
+                              Value2="{Binding WattPilotService.WattPilot.TimeStampUtc, FallbackValue='---', Converter={co:DateConverter StringFormat=d}}"
+                              Value3="{Binding WattPilotService.WattPilot.TimeStampUtc, FallbackValue='---', Converter={co:DateConverter StringFormat=T}}"
+                              ValueSum=""
+                />
+                <ItemsControl x:Name="LcdEnergyCards" Visibility="Collapsed" Style="{StaticResource LcdStyle}" Background="#B3DBC6"
+                              ItemsSource="{Binding WattPilotService.WattPilot.Cards, FallbackValue={x:Null}}"
+                              Grid.IsSharedSizeScope="True">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel IsItemsHost="True" VerticalAlignment="Center"></StackPanel>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Viewbox StretchDirection="DownOnly">
+                            <Grid>
+                                <Grid.Resources>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="FontSize" Value="6.3"/>
+                                        <Setter Property="Margin" Value="2,0"/>
+                                    </Style>
+                                </Grid.Resources>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="G1"/>
+                                    <ColumnDefinition Width="*" SharedSizeGroup="G2"/>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="G3"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Margin="0,0,2,0" Text="{Binding HaveCardId, Converter={co:Bool2String False='', True='•'}}"/>
+                                <TextBlock Grid.Column="1" Margin="0,0,2,0" Text="{Binding Name}"/>
+                                <TextBlock Grid.Column="2" Margin="8,0,0,0" Text="{Binding Energy, Converter={co:SensorData Factor=.001, StringFormat=N2, Unit=kWh}}" TextAlignment="Right"/>
+                            </Grid>
+                            </Viewbox>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
                 <!-- ReSharper restore Xaml.MissingGridIndex -->
 
                 <WrapPanel MaxWidth="110" Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
@@ -83,8 +125,8 @@
                         <Style TargetType="RadioButton" BasedOn="{StaticResource DeviceButton}"/>
                     </WrapPanel.Resources>
                     <RadioButton IsChecked="True" Content="AC" Click="OnAcClicked"/>
-                    <RadioButton Content="{x:Static p:Resources.Energy}" />
-                    <RadioButton Content="{x:Static p:Resources.More}"/>
+                    <RadioButton Content="{x:Static p:Resources.Energy}" Click="OnEnergyClicked"/>
+                    <RadioButton Content="{x:Static p:Resources.More}" Click="OnMoreClicked"/>
                 </WrapPanel>
             </Grid>
         </Border>

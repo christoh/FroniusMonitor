@@ -43,6 +43,9 @@
                     <MenuItem Header="{x:Static p:Resources.Events}" Click="ShowEventLog" Icon="{vi:EventLogIcon}" />
                     <MenuItem Visibility="{Binding Settings.FritzBoxConnection, Converter={co:ShowFritzBoxIcon}}" Header="{x:Static p:Resources.ShowAvm}" IsChecked="{Binding Settings.HaveFritzBox, Mode=TwoWay}" IsCheckable="True" Icon="{vi:FritzLogo}" Checked="OnShowAvmChanged" Unchecked="OnShowAvmChanged"/>
                 </MenuItem>
+                <MenuItem Header="WattPilot" Visibility="{Binding SolarSystemService.SolarSystem.WattPilot, Converter={co:NullToVisibility}, FallbackValue=Collapsed}">
+                    <MenuItem Header="{x:Static p:Resources.DownloadChargeLog}" Command="{Binding DownloadChargeLogCommand}" Visibility="{Binding SolarSystemService.SolarSystem.WattPilot.DownloadLink, FallbackValue=Collapsed, Converter={co:NullToVisibility}}"/>
+                </MenuItem>
             </Menu>
             <ToggleButton IsChecked="True" x:Name="RibbonExpander" Grid.Column="1" Style="{StaticResource TransparentButton}" Background="{x:Static SystemColors.MenuBarBrush}" Checked="OnRibbonExpanderChanged" Unchecked="OnRibbonExpanderChanged">
                 <vi:Chevron x:Name="Chevron" Angle="0" Width="8" Height="8" Margin="0,3,18,0" />

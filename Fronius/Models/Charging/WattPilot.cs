@@ -1,7 +1,7 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Charging;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
-public class WattPilot : BindableBase
+public class WattPilot : BindableBase, IHaveDisplayName
 {
     private string? serialNumber;
 
@@ -305,13 +305,73 @@ public class WattPilot : BindableBase
         set => Set(ref cloudAccessEnabled, value);
     }
 
-    private CarStatus carStatus;
+    private CarStatus? carStatus;
     [WattPilot("car")]
-    public CarStatus CarStatus
+    public CarStatus? CarStatus
     {
         get => carStatus;
         set => Set(ref carStatus, value);
     }
+
+    private double? allowedCurrent;
+    [WattPilot("acu")]
+    public double? AllowedCurrent
+    {
+        get => allowedCurrent;
+        set => Set(ref allowedCurrent, value);
+    }
+
+    private double? allowedCurrentInternal;
+    [WattPilot("acui")]
+    public double? AllowedCurrentInternal
+    {
+        get => allowedCurrentInternal;
+        set => Set(ref allowedCurrentInternal, value);
+    }
+
+    private bool? allowCharging;
+    [WattPilot("alw")]
+    public bool? AllowCharging
+    {
+        get => allowCharging;
+        set => Set(ref allowCharging, value);
+    }
+
+    private double? cableCurrentMaximum;
+    [WattPilot("cbl")]
+    public double? CableCurrentMaximum
+    {
+        get => cableCurrentMaximum;
+        set => Set(ref cableCurrentMaximum, value);
+    }
+
+    private IReadOnlyList<WattPilotCard>? cards;
+    [WattPilot("cards")]
+    public IReadOnlyList<WattPilotCard>? Cards
+    {
+        get => cards;
+        set => Set(ref cards, value);
+    }
+
+    private double? frequency;
+    [WattPilot("fhz")]
+    public double? Frequency
+    {
+        get => frequency;
+        set => Set(ref frequency, value);
+    }
+
+    private DateTime? timeStampUtc;
+    [WattPilot("utc")]
+    public DateTime? TimeStampUtc
+    {
+        get => timeStampUtc;
+        set => Set(ref timeStampUtc, value);
+    }
+
+    public string DisplayName => $"{DeviceName ?? HostName ?? SerialNumber ?? Resources.Unknown}";
+
+    public override string ToString() => DisplayName;
 
     public static WattPilot Parse(JToken token)
     {

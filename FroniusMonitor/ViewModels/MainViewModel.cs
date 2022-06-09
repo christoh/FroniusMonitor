@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
+﻿using System.Diagnostics;
+
+namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
 public class MainViewModel : ViewModelBase
 {
@@ -11,10 +13,12 @@ public class MainViewModel : ViewModelBase
         WattPilotService = wattPilotService;
         ExportSettingsCommand = new NoParameterCommand(ExportSettings);
         LoadSettingsCommand = new NoParameterCommand(LoadSettings);
+        DownloadChargeLogCommand = new NoParameterCommand(DownloadChargeLog);
     }
 
     public ICommand ExportSettingsCommand { get; }
     public ICommand LoadSettingsCommand { get; }
+    public ICommand DownloadChargeLogCommand { get; }
 
     public ISolarSystemService SolarSystemService { get; }
 
@@ -52,6 +56,13 @@ public class MainViewModel : ViewModelBase
         }
 
         _ = Settings.Save();
+    }
+
+    private void DownloadChargeLog()
+    {
+        var link = SolarSystemService.SolarSystem?.WattPilot?.DownloadLink;
+        if (link == null) return;
+        Process.Start(new ProcessStartInfo { FileName = link, UseShellExecute = true });
     }
 
     private async void LoadSettings()

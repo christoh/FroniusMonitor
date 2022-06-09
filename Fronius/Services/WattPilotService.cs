@@ -105,7 +105,7 @@ public class WattPilotService : BindableBase, IWattPilotService
 
                 if (dataType == "fullStatus")
                 {
-                    UpdateWattPilot(dataToken["status"] as JObject);
+                    UpdateWattPilot(WattPilot!, dataToken["status"] as JObject);
                 }
             } while (dataType == "fullStatus" && dataToken["partial"]?.Value<bool>() is true);
 
@@ -136,16 +136,17 @@ public class WattPilotService : BindableBase, IWattPilotService
         }
     }
 
-    private void UpdateWattPilot(JObject? jObject)
+    private void UpdateWattPilot(object instance, JObject? jObject)
     {
-        if (jObject == null || WattPilot == null)
+        if (jObject == null)
         {
             return;
         }
 
         foreach (var token in jObject)
         {
-            IReadOnlyList<PropertyInfo> propertyInfos = typeof(WattPilot).GetProperties().Where(p => p.GetCustomAttribute<WattPilotAttribute>() is { } attribute && attribute.TokenName == token.Key).ToArray();
+            Debug.Print($"{token.Key}: {token.Value}");
+            IReadOnlyList<PropertyInfo> propertyInfos = instance.GetType().GetProperties().Where(p => p.GetCustomAttribute<WattPilotAttribute>() is { } attribute && attribute.TokenName == token.Key).ToArray();
 
             if (!propertyInfos.Any())
             {
@@ -154,8 +155,8 @@ public class WattPilotService : BindableBase, IWattPilotService
 
             if (propertyInfos.Count == 1)
             {
-                SetWattPilotValue(propertyInfos[0], token.Value);
-                return;
+                SetWattPilotValue(instance, propertyInfos[0], token.Value);
+                continue;
             }
 
             if (token.Value is JArray array)
@@ -166,14 +167,14 @@ public class WattPilotService : BindableBase, IWattPilotService
 
                     if (attribute?.Index >= 0 && attribute.Index < array.Count)
                     {
-                        SetWattPilotValue(propertyInfo,array[attribute.Index]);
+                        SetWattPilotValue(instance, propertyInfo, array[attribute.Index]);
                     }
                 }
             }
         }
     }
 
-    private void SetWattPilotValue(PropertyInfo propertyInfo, JToken? token)
+    private void SetWattPilotValue(object instance, PropertyInfo propertyInfo, JToken? token)
     {
         var nonNullableType = Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? propertyInfo.PropertyType;
 
@@ -183,10 +184,30 @@ public class WattPilotService : BindableBase, IWattPilotService
             SetValue<double>() ||
             SetValue<int>() ||
             SetValue<byte>() ||
-            SetValue<string>() ||
-            SetValue<DateTime>()
+            SetValue<string>()
         )
         {
+            return;
+        }
+
+        if (propertyInfo.Name == nameof(WattPilot.Cards))
+        {
+            if (token is JArray jArray)
+            {
+                var cards = new WattPilotCard[jArray.Count];
+
+                for (var i = 0; i < jArray.Count; i++)
+                {
+                    if (jArray[i] is not JObject jObject) continue;
+                    cards[i] = new WattPilotCard();
+                    UpdateWattPilot(cards[i], jObject);
+                }
+
+                propertyInfo.SetValue(instance, cards);
+                return;
+            }
+
+            propertyInfo.SetValue(instance, null);
             return;
         }
 
@@ -194,19 +215,39 @@ public class WattPilotService : BindableBase, IWattPilotService
 
         if (stringValue == null)
         {
-            propertyInfo.SetValue(WattPilot, null);
+            propertyInfo.SetValue(instance, null);
+            return;
+        }
+
+        if (propertyInfo.PropertyType.IsAssignableFrom(typeof(DateTime)))
+        {
+            if (DateTime.TryParse(stringValue+"Z", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind, out var dateTime))
+            {
+                propertyInfo.SetValue(instance,dateTime);
+            }
+
+            if (stringValue.LastIndexOf('.') >= 0)
+            {
+                var dateString=stringValue[..stringValue.LastIndexOf('.')]+'Z';
+
+                if (DateTime.TryParse(dateString, CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind, out dateTime))
+                {
+                    propertyInfo.SetValue(instance,dateTime);
+                }
+            }
+
             return;
         }
 
         if (nonNullableType.IsEnum)
         {
-            propertyInfo.SetValue(WattPilot, Enum.Parse(nonNullableType, stringValue));
+            propertyInfo.SetValue(instance, Enum.Parse(nonNullableType, stringValue));
             return;
         }
 
         if (propertyInfo.PropertyType.IsAssignableFrom(typeof(Version)))
         {
-            propertyInfo.SetValue(WattPilot, new Version(stringValue));
+            propertyInfo.SetValue(instance, new Version(stringValue));
             return;
         }
 
@@ -214,18 +255,22 @@ public class WattPilotService : BindableBase, IWattPilotService
 
         bool SetValue<T>()
         {
+            if (typeof(T) == typeof(DateTime))
+            {
+
+            }
             if (!propertyInfo.PropertyType.IsAssignableFrom(typeof(T)))
             {
                 return false;
             }
 
-            if (token != null)
+            if (token?.Value<string>() != null)
             {
-                propertyInfo.SetValue(WattPilot, token.Value<T>());
+                propertyInfo.SetValue(instance, token.Value<T>());
                 return true;
             }
 
-            propertyInfo.SetValue(WattPilot, null);
+            propertyInfo.SetValue(instance, null);
             return true;
         }
     }
@@ -245,7 +290,7 @@ public class WattPilotService : BindableBase, IWattPilotService
 
                 if (dataToken["type"]?.Value<string>() == "deltaStatus")
                 {
-                    UpdateWattPilot(dataToken["status"] as JObject);
+                    UpdateWattPilot(WattPilot!, dataToken["status"] as JObject);
                 }
             }
         }

@@ -448,6 +448,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Download car charging log.
+        /// </summary>
+        public static string DownloadChargeLog {
+            get {
+                return ResourceManager.GetString("DownloadChargeLog", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Efficiency.
         /// </summary>
         public static string Efficiency {

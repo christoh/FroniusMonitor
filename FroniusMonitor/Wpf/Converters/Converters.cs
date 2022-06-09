@@ -186,6 +186,8 @@ public class Bool2Visibility : BoolToAnything<Visibility>
     }
 }
 
+public class Bool2String:BoolToAnything<string>{}
+
 public class MultiBool2Anything<T> : MultiConverterBase
 {
     public virtual T? All { get; set; }
@@ -445,5 +447,33 @@ public class ShowFritzBoxIcon : ConverterBase,IMultiValueConverter
     public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
     {
         throw new NotSupportedException();
+    }
+}
+
+public class SensorData:ConverterBase
+{
+    public string StringFormat { get; set; } = "G";
+    public string Unit { get; set; } = string.Empty;
+    public bool ForceCurrentCulture { get; set; } = true;
+    public double Factor { get; set; } = 1;
+
+    public override object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        var unitString=$"{(Unit==string.Empty?string.Empty:" ")}{Unit}";
+
+        if (value is null)
+        {
+            return $"---{unitString}";
+        }
+
+        var effectiveCulture=ForceCurrentCulture ? CultureInfo.CurrentCulture : culture;
+
+        if (value is IConvertible convertible)
+        {
+            var doubleValue = convertible.ToDouble(effectiveCulture)*Factor;
+            return $"{doubleValue.ToString(StringFormat, effectiveCulture)}{unitString}";
+        }
+
+        return $"{value}{unitString}";
     }
 }

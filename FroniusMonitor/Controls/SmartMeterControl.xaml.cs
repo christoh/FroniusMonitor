@@ -79,7 +79,7 @@ public partial class SmartMeterControl : IHaveLcdPanel
         {
             if (solarSystemService != null)
             {
-                solarSystemService.NewDataReceived += NewDataReceived; ;
+                solarSystemService.NewDataReceived += NewDataReceived; 
             }
         };
 

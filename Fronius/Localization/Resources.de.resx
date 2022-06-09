@@ -768,4 +768,7 @@
   <data name="ModelStatus_NotChargingBecauseMinPauseDuration" xml:space="preserve">
 	  <value>Pause (Minimum-Pausendauer)</value>
   </data>
+  <data name="DownloadChargeLog" xml:space="preserve">
+	  <value>Autolade-Logdatei herunterladen</value>
+  </data>
 </root>

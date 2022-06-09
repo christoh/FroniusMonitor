@@ -6,6 +6,8 @@ public enum WattPilotDisplayMode : byte
     Current,
     Power,
     PowerFactor,
+    EnergyCards,
+    MoreFrequency
 }
 
 public partial class WattPilotControl
@@ -18,12 +20,22 @@ public partial class WattPilotControl
         WattPilotDisplayMode.PowerFactor,
     };
 
-    private int currentAcIndex;
+    private static readonly IReadOnlyList<WattPilotDisplayMode> energyModes = new[]
+    {
+        WattPilotDisplayMode.EnergyCards,
+    };
+
+    private static readonly IReadOnlyList<WattPilotDisplayMode> moreModes = new[]
+    {
+        WattPilotDisplayMode.MoreFrequency,
+    };
+
+    private int currentAcIndex, currentEnergyIndex, currentMoreIndex;
 
     public static readonly DependencyProperty ModeProperty = DependencyProperty.Register
     (
         nameof(Mode), typeof(WattPilotDisplayMode), typeof(WattPilotControl),
-        new PropertyMetadata(WattPilotDisplayMode.Current, (d, _) => ((WattPilotControl)d).OnModeChanged())
+        new PropertyMetadata(WattPilotDisplayMode.Power, (d, _) => ((WattPilotControl)d).OnModeChanged())
     );
 
     public WattPilotDisplayMode Mode
@@ -57,24 +69,25 @@ public partial class WattPilotControl
         Mode = modeList[index];
     }
 
+    private void OnEnergyClicked(object sender, RoutedEventArgs e) => CycleMode(energyModes, ref currentEnergyIndex);
     private void OnAcClicked(object sender, RoutedEventArgs e) => CycleMode(acModes, ref currentAcIndex);
+    private void OnMoreClicked(object sender, RoutedEventArgs e) => CycleMode(moreModes, ref currentMoreIndex);
 
     private void OnModeChanged()
     {
-        LcdCurrent.Visibility = LcdVoltage.Visibility = LcdPowerFactor.Visibility = LcdPower.Visibility = Visibility.Collapsed;
+        LcdMoreFrequency.Visibility = LcdEnergyCards.Visibility = LcdCurrent.Visibility = LcdVoltage.Visibility = LcdPowerFactor.Visibility = LcdPower.Visibility = Visibility.Collapsed;
 
-        var lcd = Mode switch
+        FrameworkElement lcd = Mode switch
         {
             WattPilotDisplayMode.Current => LcdCurrent,
             WattPilotDisplayMode.Voltage => LcdVoltage,
             WattPilotDisplayMode.Power => LcdPower,
             WattPilotDisplayMode.PowerFactor => LcdPowerFactor,
+            WattPilotDisplayMode.EnergyCards => LcdEnergyCards,
+            WattPilotDisplayMode.MoreFrequency=>LcdMoreFrequency,
             _ => throw new NotSupportedException("Unsupported DisplayMode")
         };
 
         lcd.Visibility = Visibility.Visible;
     }
-
-
-
 }
