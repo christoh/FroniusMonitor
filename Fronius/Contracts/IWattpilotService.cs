@@ -10,7 +10,10 @@ namespace De.Hochstaetter.Fronius.Contracts
     {
         WebConnection? Connection { get; }
         WattPilot? WattPilot { get; }
-        Task Start(WebConnection connection);
-        Task Stop();
+        ValueTask Start(WebConnection connection);
+        ValueTask Stop();
+        Task WaitSendValues(int timeout = 5000);
+        void BeginSendValues();
+        ValueTask SendValue(WattPilot instance, string propertyName);
     }
 }

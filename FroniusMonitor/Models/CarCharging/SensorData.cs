@@ -41,7 +41,7 @@ public ref struct SqlDatabaseEnumerator
 [SuppressMessage("ReSharper", "ConvertToAutoPropertyWhenPossible")]
 public unsafe ref struct SensorData
 {
-    private static readonly byte[] InverterCode = Encoding.ASCII.GetBytes("ChangeJudgeGEN24");
+    private static readonly byte[] InverterCode = { 0x43, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x4a, 0x75, 0x64, 0x67, 0x65, 0x47, 0x45, 0x4e, 0x32, 0x34 };
 
     private readonly byte modBusTcpPort;
     private readonly byte majorVersion;

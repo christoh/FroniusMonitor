@@ -1,15 +1,22 @@
-﻿using System.Diagnostics;
-using System.Net.WebSockets;
-
-namespace De.Hochstaetter.Fronius.Services;
+﻿namespace De.Hochstaetter.Fronius.Services;
 
 public class WattPilotService : BindableBase, IWattPilotService
 {
+    private class WattPilotAcknowledge
+    {
+        public ManualResetEventSlim Event { get; } = new();
+        public uint RequestId { get; init; }
+    }
+
+    private uint requestId;
     private CancellationTokenSource? tokenSource;
-    private CancellationToken Token => tokenSource!.Token;
     private ClientWebSocket? clientWebSocket;
-    private static readonly Random random = new Random(unchecked((int)DateTime.UtcNow.Ticks));
+    private static readonly Random random = new(unchecked((int)DateTime.UtcNow.Ticks));
     private Thread? readThread;
+    private readonly List<WattPilotAcknowledge> outstandingAcknowledges = new();
+    private readonly byte[] buffer = new byte[8192];
+
+    private CancellationToken Token => tokenSource?.Token ?? throw new WebSocketException(WebSocketError.ConnectionClosedPrematurely);
 
     private WebConnection? connection;
 
@@ -28,7 +35,7 @@ public class WattPilotService : BindableBase, IWattPilotService
     }
 
     [SuppressMessage("ReSharper", "ParameterHidesMember")]
-    public async Task Start(WebConnection connection)
+    public async ValueTask Start(WebConnection connection)
     {
         try
         {
@@ -38,7 +45,6 @@ public class WattPilotService : BindableBase, IWattPilotService
             clientWebSocket = new ClientWebSocket();
             await clientWebSocket.ConnectAsync(new Uri(connection.BaseUrl + "/ws"), Token).ConfigureAwait(false);
             Token.ThrowIfCancellationRequested();
-            var buffer = new byte[8192];
 
             var result = await clientWebSocket.ReceiveAsync(buffer, Token).ConfigureAwait(false);
             Token.ThrowIfCancellationRequested();
@@ -57,48 +63,21 @@ public class WattPilotService : BindableBase, IWattPilotService
             Token.ThrowIfCancellationRequested();
             var auth = Encoding.UTF8.GetString(buffer, 0, result.Count);
             token = JObject.Parse(auth);
-            var token1 = token["token1"]?.Value<string>();
-            var token2 = token["token2"]?.Value<string>();
             type = token["type"]?.Value<string>();
+            var haveData = true;
 
-            if (type != "authRequired" || token1?.Length != 32 || token2?.Length != 32)
+            if (type == "authRequired")
             {
-                throw new InvalidDataException("WattPilot did not supply proper auth tokens");
+                await Authenticate(token).ConfigureAwait(false);
+                haveData = false;
             }
-
-            var token3Bytes = new byte[16];
-            random.NextBytes(token3Bytes);
-            var token3 = string.Join(string.Empty, token3Bytes.Select(b => b.ToString("x2")));
-
-            using var deriveBytes = new Rfc2898DeriveBytes(Encoding.UTF8.GetBytes(Connection.Password), Encoding.UTF8.GetBytes(WattPilot.SerialNumber ?? string.Empty), 100000, HashAlgorithmName.SHA512);
-            var hash0 = deriveBytes.GetBytes(256);
-            var hashedPassword = Convert.ToBase64String(hash0)[..32];
-            using var sha256 = SHA256.Create();
-            var hash1Input = Encoding.UTF8.GetBytes(token1 + hashedPassword);
-            var hash1 = string.Join(string.Empty, sha256.ComputeHash(hash1Input, 0, hash1Input.Length).Select(b => b.ToString("x2")));
-            var hashInput = Encoding.UTF8.GetBytes(token3 + token2 + hash1);
-            var hash = string.Join(string.Empty, sha256.ComputeHash(hashInput, 0, hashInput.Length).Select(b => b.ToString("x2")));
-
-            var authMessage = new JObject
-            {
-                {"type", "auth"},
-                {"token3", token3},
-                {"hash", hash},
-            }.ToString();
-
-            await clientWebSocket.SendAsync(Encoding.UTF8.GetBytes(authMessage), WebSocketMessageType.Text, true, Token).ConfigureAwait(false);
-            Token.ThrowIfCancellationRequested();
-            result = await clientWebSocket.ReceiveAsync(buffer, Token).ConfigureAwait(false);
-            Token.ThrowIfCancellationRequested();
-            var authResponse = Encoding.UTF8.GetString(buffer, 0, result.Count);
-
 
             JObject? dataToken;
             string? dataType;
 
             do
             {
-                result = await clientWebSocket.ReceiveAsync(buffer, Token).ConfigureAwait(false);
+                if (!haveData) result = await clientWebSocket.ReceiveAsync(buffer, Token).ConfigureAwait(false);
                 Token.ThrowIfCancellationRequested();
                 dataToken = JObject.Parse(Encoding.UTF8.GetString(buffer, 0, result.Count));
                 dataType = dataToken["type"]?.Value<string>();
@@ -107,6 +86,8 @@ public class WattPilotService : BindableBase, IWattPilotService
                 {
                     UpdateWattPilot(WattPilot!, dataToken["status"] as JObject);
                 }
+
+                haveData = false;
             } while (dataType == "fullStatus" && dataToken["partial"]?.Value<bool>() is true);
 
             tokenSource?.Dispose();
@@ -126,13 +107,177 @@ public class WattPilotService : BindableBase, IWattPilotService
         }
     }
 
-    public async Task Stop()
+    private async Task Authenticate(JObject token)
+    {
+        var token1 = token["token1"]?.Value<string>();
+        var token2 = token["token2"]?.Value<string>();
+        var token3Bytes = new byte[16];
+
+        random.NextBytes(token3Bytes);
+        var token3 = string.Join(string.Empty, token3Bytes.Select(b => b.ToString("x2")));
+
+        var hashedPassword = await GetHashedPassword().ConfigureAwait(false);
+        Token.ThrowIfCancellationRequested();
+
+        var hash = await Task.Run(() =>
+        {
+            using var sha256 = SHA256.Create();
+            var hash1Input = Encoding.UTF8.GetBytes(token1 + hashedPassword);
+            var hash1 = string.Join(string.Empty, sha256.ComputeHash(hash1Input, 0, hash1Input.Length).Select(b => b.ToString("x2")));
+            var hashInput = Encoding.UTF8.GetBytes(token3 + token2 + hash1);
+            return string.Join(string.Empty, sha256.ComputeHash(hashInput, 0, hashInput.Length).Select(b => b.ToString("x2")));
+        }, Token).ConfigureAwait(false);
+
+        Token.ThrowIfCancellationRequested();
+
+        var authMessage = new JObject
+        {
+            {"type", "auth"},
+            {"token3", token3},
+            {"hash", hash},
+        }.ToString();
+
+        if (clientWebSocket == null) throw new WebSocketException(WebSocketError.ConnectionClosedPrematurely);
+
+        await clientWebSocket.SendAsync(Encoding.UTF8.GetBytes(authMessage), WebSocketMessageType.Text, true, Token).ConfigureAwait(false);
+        Token.ThrowIfCancellationRequested();
+        var result = await clientWebSocket.ReceiveAsync(buffer, Token).ConfigureAwait(false);
+
+        Token.ThrowIfCancellationRequested();
+        var authResponse = JObject.Parse(Encoding.UTF8.GetString(buffer, 0, result.Count));
+
+        if (authResponse["type"]?.Value<string>() == "authError")
+        {
+            throw new UnauthorizedAccessException(authResponse["message"]?.Value<string>());
+        }
+
+        if (authResponse["type"]?.Value<string>() != "authSuccess")
+        {
+            throw new InvalidDataException("The WattPilot did not respond properly on authentication");
+        }
+    }
+
+    private Task<string> GetHashedPassword() => Task.Run(() =>
+    {
+        using var deriveBytes = new Rfc2898DeriveBytes(Encoding.UTF8.GetBytes(Connection?.Password ?? string.Empty), Encoding.UTF8.GetBytes(WattPilot?.SerialNumber ?? string.Empty), 100000, HashAlgorithmName.SHA512);
+        var hash0 = deriveBytes.GetBytes(256);
+        var hashedPassword = Convert.ToBase64String(hash0)[..32];
+        return hashedPassword;
+    }, Token);
+
+    public async ValueTask Stop()
     {
         tokenSource?.Cancel();
 
         while (Connection != null)
         {
             await Task.Delay(200, CancellationToken.None).ConfigureAwait(false);
+        }
+    }
+
+    public void BeginSendValues()
+    {
+        ClearOutstandingAcknowledges();
+    }
+
+    private void ClearOutstandingAcknowledges()
+    {
+        lock (outstandingAcknowledges)
+        {
+            outstandingAcknowledges.Apply(a => a.Event.Dispose());
+            outstandingAcknowledges.Clear();
+        }
+    }
+
+    public Task WaitSendValues(int timeout = 5000) => Task.Run(() =>
+    {
+        WaitHandle[] events;
+
+        lock (outstandingAcknowledges)
+        {
+            events = outstandingAcknowledges.Select(a => a.Event.WaitHandle).ToArray();
+        }
+
+        try
+        {
+            if (!WaitHandle.WaitAll(events, timeout, true))
+            {
+                throw new TimeoutException($"The WattPilot did not answer within {timeout / 1e3d} seconds");
+            }
+        }
+        finally
+        {
+            lock (outstandingAcknowledges)
+            {
+                outstandingAcknowledges.Apply(a => a.Event.Dispose());
+            }
+        }
+    }, CancellationToken.None);
+
+    public async ValueTask SendValue(WattPilot instance, string propertyName)
+    {
+        var instanceType = instance.GetType();
+        var propertyInfo = instanceType.GetProperty(propertyName);
+
+        if (propertyInfo == null)
+        {
+            throw new ArgumentException($"Not a member of {instanceType.Name}", propertyName);
+        }
+
+        var key = propertyInfo.GetCustomAttribute<WattPilotAttribute>()?.TokenName;
+
+        if (key == null)
+        {
+            throw new ArgumentException("Not a WattPilot property", propertyName);
+        }
+
+        var value = propertyInfo.GetValue(instance);
+
+        var id = Interlocked.Increment(ref requestId);
+
+        var data = new JObject
+        {
+            {"type", "setValue"},
+            {"requestId", id},
+            {"key", key},
+            {
+                "value",
+                value == null ? null
+                : value is bool boolValue ? boolValue
+                : value is string stringValue ? stringValue
+                : value is double doubleValue ? doubleValue
+                : value is float floatValue ? floatValue
+                : value is int intValue ? intValue
+                : value is Enum enumValue ? (int)Convert.ChangeType(enumValue, TypeCode.Int32)
+                : throw new NotSupportedException("Unsupported Type")
+            },
+        }.ToString();
+
+        await Task.Run(() =>
+        {
+            if (instance.IsSecured.HasValue && instance.IsSecured.Value)
+            {
+                using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(GetHashedPassword().Result));
+                var hash = string.Join(string.Empty, hmac.ComputeHash(Encoding.UTF8.GetBytes(data)).Select(b => b.ToString("x2", CultureInfo.InvariantCulture)));
+
+                var message = new JObject
+                {
+                    {"type", "securedMsg"},
+                    {"data", data},
+                    {"requestId", FormattableString.Invariant($"{id}sm")},
+                    {"hmac", hash},
+                };
+
+                data = message.ToString();
+            }
+        }, CancellationToken.None).ConfigureAwait(false);
+
+        if (clientWebSocket == null) throw new WebSocketException(WebSocketError.ConnectionClosedPrematurely);
+        await clientWebSocket.SendAsync(Encoding.UTF8.GetBytes(data), WebSocketMessageType.Text, true, Token).ConfigureAwait(false);
+
+        lock (outstandingAcknowledges)
+        {
+            outstandingAcknowledges.Add(new WattPilotAcknowledge { RequestId = id });
         }
     }
 
@@ -221,18 +366,18 @@ public class WattPilotService : BindableBase, IWattPilotService
 
         if (propertyInfo.PropertyType.IsAssignableFrom(typeof(DateTime)))
         {
-            if (DateTime.TryParse(stringValue+"Z", CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind, out var dateTime))
+            if (DateTime.TryParse(stringValue + "Z", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dateTime))
             {
-                propertyInfo.SetValue(instance,dateTime);
+                propertyInfo.SetValue(instance, dateTime);
             }
 
             if (stringValue.LastIndexOf('.') >= 0)
             {
-                var dateString=stringValue[..stringValue.LastIndexOf('.')]+'Z';
+                var dateString = stringValue[..stringValue.LastIndexOf('.')] + 'Z';
 
-                if (DateTime.TryParse(dateString, CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind, out dateTime))
+                if (DateTime.TryParse(dateString, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out dateTime))
                 {
-                    propertyInfo.SetValue(instance,dateTime);
+                    propertyInfo.SetValue(instance, dateTime);
                 }
             }
 
@@ -255,10 +400,6 @@ public class WattPilotService : BindableBase, IWattPilotService
 
         bool SetValue<T>()
         {
-            if (typeof(T) == typeof(DateTime))
-            {
-
-            }
             if (!propertyInfo.PropertyType.IsAssignableFrom(typeof(T)))
             {
                 return false;
@@ -277,8 +418,6 @@ public class WattPilotService : BindableBase, IWattPilotService
 
     private async void Reader()
     {
-        var buffer = new byte[8192];
-
         try
         {
             while (tokenSource != null && !Token.IsCancellationRequested && clientWebSocket != null)
@@ -291,6 +430,38 @@ public class WattPilotService : BindableBase, IWattPilotService
                 if (dataToken["type"]?.Value<string>() == "deltaStatus")
                 {
                     UpdateWattPilot(WattPilot!, dataToken["status"] as JObject);
+                }
+
+                else if (dataToken["type"]?.Value<string>() == "response")
+                {
+                    WattPilotAcknowledge? ack;
+
+                    lock (outstandingAcknowledges)
+                    {
+                        ack = outstandingAcknowledges.SingleOrDefault(a => a.RequestId == dataToken["requestId"]?.Value<uint>());
+                    }
+
+                    if (ack == null) continue;
+
+                    try
+                    {
+                        if (dataToken["success"]?.Value<bool>() is not true)
+                        {
+                            ack.Event.Dispose();
+                        }
+                        else
+                        {
+                            ack.Event.Set();
+                            UpdateWattPilot(WattPilot!, dataToken["status"] as JObject);
+                        }
+                    }
+                    finally
+                    {
+                        lock (outstandingAcknowledges)
+                        {
+                            outstandingAcknowledges.Remove(ack);
+                        }
+                    }
                 }
             }
         }

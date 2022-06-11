@@ -23,6 +23,14 @@ public class WattPilot : BindableBase, IHaveDisplayName
         set => Set(ref hostName, value);
     }
 
+    private AccessMode? accessMode;
+    [WattPilot("acs")]
+    public AccessMode? AccessMode
+    {
+        get => accessMode;
+        set => Set(ref accessMode, value);
+    }
+
     private string? deviceName;
 
     [WattPilot("fna")]
@@ -99,19 +107,19 @@ public class WattPilot : BindableBase, IHaveDisplayName
         set => Set(ref voltageL2, value, () => NotifyOfPropertyChange(nameof(VoltageAverage)));
     }
 
-    private double voltageL3;
+    private double? voltageL3;
 
     [WattPilot("nrg", 2)]
-    public double VoltageL3
+    public double? VoltageL3
     {
         get => voltageL3;
         set => Set(ref voltageL3, value, () => NotifyOfPropertyChange(nameof(VoltageAverage)));
     }
 
-    private double voltageN;
+    private double? voltageN;
 
     [WattPilot("nrg", 3)]
-    public double VoltageN
+    public double? VoltageN
     {
         get => voltageN;
         set => Set(ref voltageN, value);
@@ -260,22 +268,22 @@ public class WattPilot : BindableBase, IHaveDisplayName
         set => Set(ref minimumChargingCurrent, value);
     }
 
-    private double? maximumChargingCurrent;
+    private double? absoluteMaximumChargingCurrent;
 
     [WattPilot("ama")]
+    public double? AbsoluteMaximumChargingCurrent
+    {
+        get => absoluteMaximumChargingCurrent;
+        set => Set(ref absoluteMaximumChargingCurrent, value);
+    }
+
+    private double? maximumChargingCurrent;
+
+    [WattPilot("amp")]
     public double? MaximumChargingCurrent
     {
         get => maximumChargingCurrent;
         set => Set(ref maximumChargingCurrent, value);
-    }
-
-    private double? chargingCurrent;
-
-    [WattPilot("amp")]
-    public double? ChargingCurrent
-    {
-        get => chargingCurrent;
-        set => Set(ref chargingCurrent, value);
     }
 
     private string? downloadLink;
@@ -329,12 +337,20 @@ public class WattPilot : BindableBase, IHaveDisplayName
         set => Set(ref allowedCurrentInternal, value);
     }
 
-    private bool? allowCharging;
+    private bool? isChargingAllowed;
     [WattPilot("alw")]
-    public bool? AllowCharging
+    public bool? IsChargingAllowed // Read-only: All prerequisites met (RFID auth, EnableCharging, etc.)
     {
-        get => allowCharging;
-        set => Set(ref allowCharging, value);
+        get => isChargingAllowed;
+        set => Set(ref isChargingAllowed, value);
+    }
+
+    private bool? enableCharging;
+    [WattPilot("bac")]
+    public bool? EnableCharging // Read-write: Allow/Disallow charging
+    {
+        get => enableCharging;
+        set => Set(ref enableCharging, value);
     }
 
     private double? cableCurrentMaximum;
@@ -343,6 +359,14 @@ public class WattPilot : BindableBase, IHaveDisplayName
     {
         get => cableCurrentMaximum;
         set => Set(ref cableCurrentMaximum, value);
+    }
+
+    private PhaseSwitchMode? phaseSwitchMode;
+    [WattPilot("psm")]
+    public PhaseSwitchMode? PhaseSwitchMode
+    {
+        get => phaseSwitchMode;
+        set => Set(ref phaseSwitchMode, value);
     }
 
     private IReadOnlyList<WattPilotCard>? cards;

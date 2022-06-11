@@ -116,7 +116,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         }
     }
 
-    private async Task<SolarSystem> CreateSolarSystem(WebConnection? inverterConnection, WebConnection? fritzBoxConnection)
+    private async ValueTask<SolarSystem> CreateSolarSystem(WebConnection? inverterConnection, WebConnection? fritzBoxConnection)
     {
         var result = new SolarSystem();
 
@@ -134,75 +134,86 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         StorageDevices? storageDevices = null;
         SmartMeterDevices? smartMeterDevices = null;
 
-        try
-        {
-            result.FritzBox = await webClientService.GetFritzBoxDevices().ConfigureAwait(false);
-        }
-        catch
-        {
-            result.FritzBox = null;
-        }
+        var fritzBoxTask = GetFritzBoxData();
+        var wattPilotTask = TryStartWattPilot(result);
+        var inverterTask = GetInverterDataFromSolarApi();
 
-        try
-        {
-            result.Versions = Gen24Versions.Parse((await webClientService.GetFroniusStringResponse("status/version").ConfigureAwait(false)).JsonString);
-            result.Components = Gen24Components.Parse((JObject)(await webClientService.GetFroniusJsonResponse("components/")).Token);
-            result.Gen24System = await webClientService.GetFroniusData(result.Components).ConfigureAwait(false);
+        await Task.Run(() => Task.WaitAll(fritzBoxTask, wattPilotTask, inverterTask)).ConfigureAwait(false);
 
-            foreach (var deviceGroup in (await webClientService.GetDevices().ConfigureAwait(false)).Devices.GroupBy(d => d.DeviceClass))
+        return result;
+
+        async Task GetFritzBoxData()
+        {
+            try
             {
-                switch (deviceGroup.Key)
+                result.FritzBox = await webClientService.GetFritzBoxDevices().ConfigureAwait(false);
+            }
+            catch
+            {
+                result.FritzBox = null;
+            }
+        }
+
+        async Task GetInverterDataFromSolarApi()
+        {
+            try
+            {
+                result.Versions = Gen24Versions.Parse((await webClientService.GetFroniusStringResponse("status/version").ConfigureAwait(false)).JsonString);
+                result.Components = Gen24Components.Parse((JObject)(await webClientService.GetFroniusJsonResponse("components/").ConfigureAwait(false)).Token);
+                result.Gen24System = await webClientService.GetFroniusData(result.Components).ConfigureAwait(false);
+
+                foreach (var deviceGroup in (await webClientService.GetDevices().ConfigureAwait(false)).Devices.GroupBy(d => d.DeviceClass))
                 {
-                    case DeviceClass.Inverter:
-                        inverterDevices = await webClientService.GetInverters().ConfigureAwait(false);
-                        break;
-
-                    case DeviceClass.Storage:
-                        storageDevices = await webClientService.GetStorageDevices().ConfigureAwait(false);
-                        break;
-
-                    case DeviceClass.Meter:
-                        smartMeterDevices = await webClientService.GetMeterDevices().ConfigureAwait(false);
-                        break;
-                }
-
-                foreach (var device in deviceGroup)
-                {
-                    var group = new DeviceGroup { DeviceClass = deviceGroup.Key };
-
                     switch (deviceGroup.Key)
                     {
                         case DeviceClass.Inverter:
-                            group.Devices.Add(inverterDevices?.Inverters.SingleOrDefault(i => i.Id == device.Id) ?? device);
+                            inverterDevices = await webClientService.GetInverters().ConfigureAwait(false);
                             break;
 
                         case DeviceClass.Storage:
-                            group.Devices.Add(storageDevices?.Storages.SingleOrDefault(s => s.Id == device.Id) ?? device);
+                            storageDevices = await webClientService.GetStorageDevices().ConfigureAwait(false);
                             break;
 
                         case DeviceClass.Meter:
-                            group.Devices.Add(smartMeterDevices?.SmartMeters.SingleOrDefault(s => s.Id == device.Id) ?? device);
+                            smartMeterDevices = await webClientService.GetMeterDevices().ConfigureAwait(false);
                             break;
                     }
 
-                    result.DeviceGroups.Add(group);
+                    foreach (var device in deviceGroup)
+                    {
+                        var group = new DeviceGroup { DeviceClass = deviceGroup.Key };
+
+                        switch (deviceGroup.Key)
+                        {
+                            case DeviceClass.Inverter:
+                                group.Devices.Add(inverterDevices?.Inverters.SingleOrDefault(i => i.Id == device.Id) ?? device);
+                                break;
+
+                            case DeviceClass.Storage:
+                                group.Devices.Add(storageDevices?.Storages.SingleOrDefault(s => s.Id == device.Id) ?? device);
+                                break;
+
+                            case DeviceClass.Meter:
+                                group.Devices.Add(smartMeterDevices?.SmartMeters.SingleOrDefault(s => s.Id == device.Id) ?? device);
+                                break;
+                        }
+
+                        result.DeviceGroups.Add(group);
+                    }
                 }
+
+                IsConnected = true;
             }
-
-            await TryStartWattPilot(result).ConfigureAwait(false);
-            IsConnected = true;
+            catch
+            {
+                IsConnected = false;
+                result.Gen24System = null;
+                result.Versions = null;
+            }
         }
-        catch
-        {
-            IsConnected = false;
-            result.Gen24System = null;
-            result.Versions = null;
-        }
-
-        return result;
     }
 
-    private async ValueTask TryStartWattPilot(SolarSystem result)
+    private async Task TryStartWattPilot(SolarSystem result)
     {
         if (wattPilotService.Connection == null)
         {
@@ -225,6 +236,22 @@ public class SolarSystemService : BindableBase, ISolarSystemService
             return;
         }
 
+        //if (wattPilotService.WattPilot != null)
+        //{
+
+        //    wattPilotService.BeginSendValues();
+        //    await wattPilotService.SendValue(wattPilotService.WattPilot, nameof(WattPilot.CloudAccessEnabled));
+
+        //    try
+        //    {
+        //        await wattPilotService.WaitSendValues().ConfigureAwait(false);
+        //    }
+        //    catch
+        //    {
+        //        //
+        //    }
+        //}
+
         try
         {
             if (froniusCounter++ % FroniusUpdateRate == 0)
@@ -236,10 +263,8 @@ public class SolarSystemService : BindableBase, ISolarSystemService
                 else
                 {
                     SolarSystem.Gen24System = await webClientService.GetFroniusData(SolarSystem.Components).ConfigureAwait(false);
+                    await TryStartWattPilot(SolarSystem).ConfigureAwait(false);
                 }
-
-                await TryStartWattPilot(SolarSystem).ConfigureAwait(false);
-
 
                 if (SolarSystem.Gen24System?.PowerFlow != null)
                 {
@@ -255,7 +280,6 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
                 IsConnected = true;
             }
-
 
             try
             {

@@ -29,7 +29,7 @@ public enum ModelStatus
     NotChargingBecauseMinPauseDuration = 24
 }
 
-public enum CarStatus
+public enum CarStatus : byte
 {
     Unknown = 0,
     Idle = 1,
@@ -37,4 +37,17 @@ public enum CarStatus
     WaitCar = 3,
     Complete = 4,
     Error = 5
+}
+
+public enum PhaseSwitchMode : byte
+{
+    Auto = 0,
+    Phase1 = 1,
+    Phases3 = 2,
+}
+
+public enum AccessMode : byte
+{
+    EveryOne = 0,
+    RequireAuth = 1,
 }
