@@ -134,25 +134,14 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         StorageDevices? storageDevices = null;
         SmartMeterDevices? smartMeterDevices = null;
 
-        var fritzBoxTask = GetFritzBoxData();
-        var wattPilotTask = TryStartWattPilot(result);
+        var fritzBoxTask = TryGetFritzBoxData();
+        var wattPilotTask = TryStartWattPilot();
         var inverterTask = GetInverterDataFromSolarApi();
 
         await Task.Run(() => Task.WaitAll(fritzBoxTask, wattPilotTask, inverterTask)).ConfigureAwait(false);
-
+        result.WattPilot = wattPilotTask.Result;
+        result.FritzBox = fritzBoxTask.Result;
         return result;
-
-        async Task GetFritzBoxData()
-        {
-            try
-            {
-                result.FritzBox = await webClientService.GetFritzBoxDevices().ConfigureAwait(false);
-            }
-            catch
-            {
-                result.FritzBox = null;
-            }
-        }
 
         async Task GetInverterDataFromSolarApi()
         {
@@ -213,19 +202,40 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         }
     }
 
-    private async Task TryStartWattPilot(SolarSystem result)
+    private async Task<FritzBoxDeviceList?> TryGetFritzBoxData()
+    {
+        try
+        {
+            return await webClientService.GetFritzBoxDevices().ConfigureAwait(false);
+        }
+        catch
+        {
+            fritzBoxCounter = 0;
+            throw;
+        }
+    }
+
+    private async Task<WattPilot?> TryStartWattPilot()
     {
         if (wattPilotService.Connection == null)
         {
-            try
-            {
-                await wattPilotService.Start(new WebConnection { BaseUrl = "ws://192.168.44.114", EncryptedPassword = "zx1z6fLYI3BYi+s2ZWPjow==" }).ConfigureAwait(false);
-                result.WattPilot = wattPilotService.WattPilot;
-            }
-            catch
-            {
-                // WattPilot failed
-            }
+            await wattPilotService.Start(new WebConnection { BaseUrl = "ws://192.168.44.114", EncryptedPassword = "zx1z6fLYI3BYi+s2ZWPjow==" }).ConfigureAwait(false);
+        }
+
+        return wattPilotService.WattPilot;
+    }
+
+    private async Task<Gen24System?> TryGetGen24System(Gen24Components components)
+    {
+        try
+        {
+            if (SolarSystem?.Components == null) return null;
+            return await webClientService.GetFroniusData(SolarSystem.Components).ConfigureAwait(false);
+        }
+        catch
+        {
+            froniusCounter = 0;
+            throw;
         }
     }
 
@@ -254,51 +264,51 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
         try
         {
-            if (froniusCounter++ % FroniusUpdateRate == 0)
+            var newSolarData = false;
+            var newFritzBoxData = false;
+            if (SolarSystem?.PrimaryInverter == null || SolarSystem.Versions == null || SolarSystem.Components == null)
             {
-                if (SolarSystem?.PrimaryInverter == null || SolarSystem.Versions == null || SolarSystem.PrimaryMeter == null || SolarSystem.Components == null)
+                SolarSystem = await CreateSolarSystem(null, null).ConfigureAwait(false);
+                newSolarData = true;
+                newFritzBoxData = true;
+            }
+            else
+            {
+                var gen24Task = froniusCounter++ % FroniusUpdateRate == 0 ? TryGetGen24System(SolarSystem.Components) : Task.FromResult<Gen24System?>(null);
+                var fritzBoxTask = suspendFritzBoxCounter <= 0 && webClientService.FritzBoxConnection != null && fritzBoxCounter++ % FritzBoxUpdateRate == 0 ? TryGetFritzBoxData() : Task.FromResult<FritzBoxDeviceList?>(null);
+                var wattPilotTask = TryStartWattPilot();
+
+                try
                 {
-                    SolarSystem = await CreateSolarSystem(null, null).ConfigureAwait(false);
+                    Task.WaitAll(gen24Task, fritzBoxTask, wattPilotTask);
                 }
-                else
+                catch (AggregateException)
                 {
-                    SolarSystem.Gen24System = await webClientService.GetFroniusData(SolarSystem.Components).ConfigureAwait(false);
-                    await TryStartWattPilot(SolarSystem).ConfigureAwait(false);
-                }
 
-                if (SolarSystem.Gen24System?.PowerFlow != null)
-                {
-                    PowerFlowQueue.Enqueue(SolarSystem.Gen24System.PowerFlow);
-
-                    if (PowerFlowQueue.Count > QueueSize)
-                    {
-                        PowerFlowQueue.Dequeue();
-                    }
-
-                    NotifyPowerQueueChanged();
                 }
 
-                IsConnected = true;
+                SolarSystem.WattPilot = wattPilotTask.IsCompletedSuccessfully ? wattPilotTask.Result ?? SolarSystem.WattPilot : null;
+                SolarSystem.FritzBox = fritzBoxTask.IsCompletedSuccessfully ? fritzBoxTask.Result ?? SolarSystem.FritzBox : null;
+                SolarSystem.Gen24System = gen24Task.IsCompletedSuccessfully ? gen24Task.Result ?? SolarSystem.Gen24System : null;
+                newFritzBoxData = fritzBoxTask.IsCompletedSuccessfully && fritzBoxTask.Result != null;
+                newSolarData = gen24Task.IsCompletedSuccessfully && gen24Task.Result != null;
             }
 
-            try
-            {
-                if (suspendFritzBoxCounter <= 0 && webClientService.FritzBoxConnection != null && SolarSystem != null && (SolarSystem.FritzBox == null || fritzBoxCounter++ % FritzBoxUpdateRate == 0))
-                {
-                    SolarSystem.FritzBox = await webClientService.GetFritzBoxDevices().ConfigureAwait(false);
-                }
-            }
-            catch
-            {
-                fritzBoxCounter = 0;
 
-                if (SolarSystem != null)
+            if (newSolarData && SolarSystem.Gen24System?.PowerFlow != null)
+            {
+                PowerFlowQueue.Enqueue(SolarSystem.Gen24System.PowerFlow);
+
+                if (PowerFlowQueue.Count > QueueSize)
                 {
-                    SolarSystem.FritzBox = null;
+                    PowerFlowQueue.Dequeue();
                 }
+
+                NotifyPowerQueueChanged();
             }
 
-            await Task.Run(() => NewDataReceived?.Invoke(this, new SolarDataEventArgs(SolarSystem))).ConfigureAwait(false);
+            IsConnected = true;
+            if (newFritzBoxData || newSolarData) await Task.Run(() => NewDataReceived?.Invoke(this, new SolarDataEventArgs(SolarSystem))).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

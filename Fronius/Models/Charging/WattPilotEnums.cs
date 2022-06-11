@@ -51,3 +51,35 @@ public enum AccessMode : byte
     EveryOne = 0,
     RequireAuth = 1,
 }
+
+public enum ChargingLogic : byte
+{
+    /// <summary>
+    /// Immediately charge the car until the car stops charging
+    /// </summary>
+    None = 3,
+
+    /// <summary>
+    /// Use enabled eco settings (PV surplus, awattar, etc.)
+    /// </summary>
+    Eco = 4,
+
+    /// <summary>
+    /// Ensure the car receives a certain amount of energy at a specific time.
+    /// Make use of eco settings
+    /// </summary>
+    NextTrip = 5,
+}
+
+public enum AwattarCountry : byte
+{
+    Austria = 0,
+    Germany = 1,
+}
+
+public enum EcoRoundingMode:byte
+{
+    PreferFromGrid=0,
+    NoPreference=1,
+    PreferToGrid=2,
+}
