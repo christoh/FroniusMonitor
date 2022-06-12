@@ -26,4 +26,7 @@
 	<data name="SunspecMode_Float" xml:space="preserve">
 		<value>Fliesskomma</value>
 	</data>
+	<data name="CableLockBehavior_AutoUnlock" xml:space="preserve">
+		<value>Immer entriegeln, wenn kein Strom fliesst</value>
+	</data>
 </root>

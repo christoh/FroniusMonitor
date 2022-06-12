@@ -44,6 +44,7 @@
                     <MenuItem Visibility="{Binding Settings.FritzBoxConnection, Converter={co:ShowFritzBoxIcon}}" Header="{x:Static p:Resources.ShowAvm}" IsChecked="{Binding Settings.HaveFritzBox, Mode=TwoWay}" IsCheckable="True" Icon="{vi:FritzLogo}" Checked="OnShowAvmChanged" Unchecked="OnShowAvmChanged"/>
                 </MenuItem>
                 <MenuItem Header="WattPilot" Visibility="{Binding SolarSystemService.SolarSystem.WattPilot, Converter={co:NullToVisibility}, FallbackValue=Collapsed}">
+                    <MenuItem Header="{x:Static p:Resources.Settings}" Click="ShowWattPilotSettings" Icon="{vi:ChargingTrafficSign}"/>
                     <MenuItem Header="{x:Static p:Resources.DownloadChargeLog}" Command="{Binding DownloadChargeLogCommand}" Visibility="{Binding SolarSystemService.SolarSystem.WattPilot.DownloadLink, FallbackValue=Collapsed, Converter={co:NullToVisibility}}"/>
                 </MenuItem>
             </Menu>
@@ -60,10 +61,11 @@
                 <Style TargetType="MenuItem" BasedOn="{StaticResource RibbonButton}"/>
             </StackPanel.Resources>
             <MenuItem Header="{x:Static p:Resources.Settings}" Click="ShowSettings" Icon="{vi:SettingsIcon}"/>
-            <MenuItem Header="{x:Static p:Resources.Modbus}" Click="ShowModbusSettings" Icon="{vi:ModbusLogo}" />
-            <MenuItem Header="{x:Static p:Resources.EnergyFlow}" Icon="{vi:EnergyFLow}" Click="ShowSelfConsumptionOptimization" />
+            <MenuItem Header="{x:Static p:Resources.Modbus}" Click="ShowModbusSettings" Icon="{vi:ModbusLogo}" Visibility="{Binding SolarSystemService.SolarSystem.Gen24System, FallbackValue=Collapsed, Converter={co:NullToVisibility}}" />
+            <MenuItem Header="{x:Static p:Resources.EnergyFlow}" Icon="{vi:EnergyFLow}" Click="ShowSelfConsumptionOptimization" Visibility="{Binding SolarSystemService.SolarSystem.Gen24System, FallbackValue=Collapsed, Converter={co:NullToVisibility}}" />
             <MenuItem Visibility="{Binding Settings.FritzBoxConnection, Converter={co:ShowFritzBoxIcon}}" Header="{x:Static p:Resources.ShowAvm}" IsChecked="{Binding Settings.HaveFritzBox, Mode=TwoWay}" IsCheckable="True" Icon="{vi:FritzLogo}" Checked="OnShowAvmChanged" Unchecked="OnShowAvmChanged"/>
-            <MenuItem Header="{x:Static p:Resources.Events}" Click="ShowEventLog" Icon="{vi:EventLogIcon}" />
+            <MenuItem Header="{x:Static p:Resources.Events}" Click="ShowEventLog" Icon="{vi:EventLogIcon}"  Visibility="{Binding SolarSystemService.SolarSystem.Gen24System, FallbackValue=Collapsed, Converter={co:NullToVisibility}}" />
+            <MenuItem Header="WattPilot" Click="ShowWattPilotSettings" Icon="{vi:ChargingTrafficSign}" Visibility="{Binding SolarSystemService.SolarSystem.WattPilot, Converter={co:NullToVisibility}, FallbackValue=Collapsed}"/>
         </StackPanel>
 
         <Viewbox Grid.Row="2" Grid.Column="0" Margin="16,16,0,16">
@@ -78,12 +80,12 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <Grid Grid.Row="0" Grid.Column="1">
+                <Grid Grid.Row="0" Grid.Column="1" Visibility="{Binding SolarSystemService.SolarSystem.WattPilot, Converter={co:NullToVisibility}, FallbackValue=Collapsed}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <c:PowerFlowArrow Grid.Column="0" x:Name="WattPilotArrow" VerticalAlignment="Top" Fill="LightGray" HasRightPlacement="False" DefaultsToOutgoing="False" 
+                    <c:PowerFlowArrow Grid.Column="0" x:Name="WattPilotArrow" VerticalAlignment="Top" Fill="{Binding ElementName=LoadArrow, Path=Fill}" HasRightPlacement="False" DefaultsToOutgoing="False" 
                                       Margin="25,0,10,0" Power="{Binding SolarSystemService.SolarSystem.WattPilot.PowerTotal, FallbackValue={x:Null}}"/>
                     <c:WattPilotControl Grid.Column="1" Height="200" WattPilotService="{Binding WattPilotService}"/>
                 </Grid>

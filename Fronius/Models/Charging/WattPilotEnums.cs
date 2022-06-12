@@ -29,6 +29,13 @@ public enum ModelStatus
     NotChargingBecauseMinPauseDuration = 24
 }
 
+public enum CableLockBehavior
+{
+    Normal = 0,
+    AutoUnlock = 1,
+    AlwaysLock = 2,
+}
+
 public enum CarStatus : byte
 {
     Unknown = 0,
@@ -48,7 +55,7 @@ public enum PhaseSwitchMode : byte
 
 public enum AccessMode : byte
 {
-    EveryOne = 0,
+    Everyone = 0,
     RequireAuth = 1,
 }
 
@@ -82,4 +89,19 @@ public enum EcoRoundingMode:byte
     PreferFromGrid=0,
     NoPreference=1,
     PreferToGrid=2,
+}
+
+[SuppressMessage("ReSharper", "InconsistentNaming")]
+[SuppressMessage("ReSharper", "IdentifierTypo")]
+public enum CarType : byte
+{
+    @default,
+    kiaSoul,
+    ecorsa,
+    renaultZoe,
+    MitsubishiImiev,
+    citroenCZero,
+    peugeotIon,
+    vwID3_4,
+    Eqc2019,
 }

@@ -81,6 +81,9 @@
     <Compile Update="Assets\Images\EventLogIcon.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Assets\Images\ChargingTrafficSign.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Assets\Images\SettingsImportIcon.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -110,6 +113,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Assets\Images\EventLogIcon.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Assets\Images\ChargingTrafficSign.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>

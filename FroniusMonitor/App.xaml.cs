@@ -36,6 +36,8 @@ public partial class App
             .RegisterType<ModbusViewModel>()
             .RegisterType<SettingsView>()
             .RegisterType<SettingsViewModel>()
+            .RegisterType<WattPilotSettingsView>()
+            .RegisterType<WattPilotSettingsViewModel>()
             ;
 
         Directory.CreateDirectory(PerUserDataDir);

@@ -769,6 +769,81 @@
 	  <value>Pause (Minimum-Pausendauer)</value>
   </data>
   <data name="DownloadChargeLog" xml:space="preserve">
-	  <value>Autolade-Logdatei herunterladen</value>
+	  <value>Ladelog herunterladen</value>
+  </data>
+  <data name="NoWattPilot" xml:space="preserve">
+	  <value>Kein Wattpilot gefunden</value>
+  </data>
+  <data name="BaseSettings" xml:space="preserve">
+	  <value>Allgemein</value>
+  </data>
+  <data name="WattPilotName" xml:space="preserve">
+	  <value>Name des Wattpiloten</value>
+  </data>
+  <data name="MaximumChargingCurrent" xml:space="preserve">
+	  <value>Maximale Ladeleistung</value>
+  </data>
+  <data name="RequireRfidAuth" xml:space="preserve">
+	  <value>RFID-Karte erforderlich zum Laden</value>
+  </data>
+  <data name="CableLockBehavior_Normal" xml:space="preserve">
+	  <value>Standard</value>
+  </data>
+  <data name="CableLockBehavior_AutoUnlock" xml:space="preserve">
+	  <value>Immer entriegeln, wenn kein Strom fließt</value>
+  </data>
+  <data name="CableLockBehavior_AlwaysLock" xml:space="preserve">
+	  <value>Niemals entriegeln</value>
+  </data>
+  <data name="CableLockBehavior" xml:space="preserve">
+	  <value>Kabelentrieglung</value>
+  </data>
+  <data name="UnlockCableOnPowerFailure" xml:space="preserve">
+	  <value>Kabel bei Stromausfall entriegeln</value>
+  </data>
+  <data name="EnableApiLink" xml:space="preserve">
+	  <value>API via {0} aktivieren</value>
+  </data>
+  <data name="ApiKey" xml:space="preserve">
+	  <value>API-Key</value>
+  </data>
+  <data name="DisableProtectiveEarth" xml:space="preserve">
+	  <value>Erdungsprüfung deaktivieren</value>
+  </data>
+  <data name="ChargingLogic_None" xml:space="preserve">
+	  <value>Volle Leistung</value>
+  </data>
+  <data name="ChargingLogic_NextTrip" xml:space="preserve">
+	  <value>Nächste Fahrt</value>
+  </data>
+  <data name="ChargingLogic" xml:space="preserve">
+	  <value>Ladelogik</value>
+  </data>
+  <data name="EcoSettings" xml:space="preserve">
+	  <value>Eco-Einstellungen</value>
+  </data>
+  <data name="PvSurplusEnabled" xml:space="preserve">
+	  <value>PV-Überschuss verwenden</value>
+  </data>
+  <data name="AwattarEnabled" xml:space="preserve">
+	  <value>Awattar/Lumina-Strompreis verwenden</value>
+  </data>
+  <data name="AwattarCountry_Austria" xml:space="preserve">
+	  <value>Österreich</value>
+  </data>
+  <data name="AwattarCountry" xml:space="preserve">
+	  <value>Awattar/Lumina-Land</value>
+  </data>
+  <data name="AwattarCountry_Germany" xml:space="preserve">
+	  <value>Deutschland</value>
+  </data>
+  <data name="MaxEnergyPrice" xml:space="preserve">
+	  <value>Maximaler Awattar/Lumina-Strompreis</value>
+  </data>
+  <data name="PvSurplusBatteryLevel" xml:space="preserve">
+	  <value>Minimaler SoC PV-Batterie</value>
+  </data>
+  <data name="OhmPilotTemperatureLimit" xml:space="preserve">
+	  <value>Minimale Ohmpilot-Temperatur</value>
   </data>
 </root>

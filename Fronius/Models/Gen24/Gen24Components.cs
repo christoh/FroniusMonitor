@@ -16,7 +16,7 @@ namespace De.Hochstaetter.Fronius.Models.Gen24
             set => Set(ref groups, value);
         }
 
-        public static Gen24Components Parse(JObject token)
+        public static Gen24Components Parse(JToken token)
         {
             var result = new Gen24Components();
 

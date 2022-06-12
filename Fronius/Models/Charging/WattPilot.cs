@@ -1,7 +1,7 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Charging;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
-public class WattPilot : BindableBase, IHaveDisplayName
+public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
 {
     private string? serialNumber;
 
@@ -25,16 +25,24 @@ public class WattPilot : BindableBase, IHaveDisplayName
 
     private AccessMode? accessMode;
 
-    [WattPilot("acs")]
+    [WattPilot("acs", false)]
     public AccessMode? AccessMode
     {
         get => accessMode;
         set => Set(ref accessMode, value);
     }
 
+    private ChargingLogic? chargingLogic;
+    [WattPilot("lmo", false)]
+    public ChargingLogic? ChargingLogic
+    {
+        get => chargingLogic;
+        set => Set(ref chargingLogic, value);
+    }
+
     private string? deviceName;
 
-    [WattPilot("fna")]
+    [WattPilot("fna", false)]
     [FroniusProprietaryImport("friendly_name", FroniusDataType.Root)]
     public string? DeviceName
     {
@@ -265,7 +273,7 @@ public class WattPilot : BindableBase, IHaveDisplayName
     /// <summary>
     ///     Normally 6A. Can be changed to a higher value if your car can not handle 6A
     /// </summary>
-    [WattPilot("mca")]
+    [WattPilot("mca", false)]
     public byte? MinimumChargingCurrent
     {
         get => minimumChargingCurrent;
@@ -278,7 +286,7 @@ public class WattPilot : BindableBase, IHaveDisplayName
     ///     Charge the car at least every amount of milliseconds. Use this if you car disconnects after it has not been charged
     ///     for a while. Set to 0 to disable
     /// </summary>
-    [WattPilot("mci")]
+    [WattPilot("mci", false)]
     public int? MinimumChargingInterval
     {
         get => minimumChargingInterval;
@@ -289,7 +297,7 @@ public class WattPilot : BindableBase, IHaveDisplayName
     /// <summary>
     ///     Charging pause duration in milliseconds. Some cars need a minimum pause duration before charging can continue. Set to 0 to disable.
     /// </summary>
-    [WattPilot("mcpd")]
+    [WattPilot("mcpd", false)]
     public int? MinimumPauseDuration
     {
         get => minimumPauseDuration;
@@ -301,20 +309,20 @@ public class WattPilot : BindableBase, IHaveDisplayName
     /// <summary>
     ///     Used to get the correct market price for energy
     /// </summary>
-    [WattPilot("awc")]
+    [WattPilot("awc", false)]
     public AwattarCountry EnergyPriceCountry
     {
         get => energyPriceCountry;
         set => Set(ref energyPriceCountry, value);
     }
 
-    private double? maxEnergyPrice;
+    private float? maxEnergyPrice;
 
     /// <summary>
     ///     Maximum energy price to allow charging in ct/kWh
     /// </summary>
-    [WattPilot("awp")]
-    public double? MaxEnergyPrice
+    [WattPilot("awp", false)]
+    public float? MaxEnergyPrice
     {
         get => maxEnergyPrice;
         set => Set(ref maxEnergyPrice, value);
@@ -324,7 +332,7 @@ public class WattPilot : BindableBase, IHaveDisplayName
     /// <summary>
     /// Some cars need this. If yours does not, leave it to false
     /// </summary>
-    [WattPilot("su")]
+    [WattPilot("su", false)]
     public bool? SimulateUnplugging
     {
         get => simulateUnplugging;
@@ -335,7 +343,7 @@ public class WattPilot : BindableBase, IHaveDisplayName
     /// <summary>
     /// Unclear, what this is good for. The app only uses <see cref="SimulateUnplugging"/>
     /// </summary>
-    [WattPilot("sua")]
+    [WattPilot("sua", false)]
     public bool? SimulateUnpluggingAlways
     {
         get => simulateUnpluggingAlways;
@@ -347,7 +355,7 @@ public class WattPilot : BindableBase, IHaveDisplayName
     /// <summary>
     ///     Minimum time before a phase switch occurs in milliseconds
     /// </summary>
-    [WattPilot("mptwt")]
+    [WattPilot("mptwt", false)]
     public int? MinimumTimeBetweenPhaseSwitches
     {
         get => minimumTimeBetweenPhaseSwitches;
@@ -360,7 +368,7 @@ public class WattPilot : BindableBase, IHaveDisplayName
     ///     Minimum time in milliseconds the PV surplus must be above or below <see cref="PhaseSwitchPower" /> before the phase
     ///     switch is requested
     /// </summary>
-    [WattPilot("mpwst")]
+    [WattPilot("mpwst", false)]
     public int? PhaseSwitchTriggerTime
     {
         get => phaseSwitchTriggerTime;
@@ -373,7 +381,7 @@ public class WattPilot : BindableBase, IHaveDisplayName
     ///     If PV surplus is above that power, switch to 3 phases. If PV surplus is below, switch to 1 phase.
     ///     Use <see cref="PhaseSwitchTriggerTime" /> to control the minimum time before the phase switch occurs.
     /// </summary>
-    [WattPilot("spl3")]
+    [WattPilot("spl3", false)]
     public double? PhaseSwitchPower
     {
         get => phaseSwitchPower;
@@ -385,7 +393,7 @@ public class WattPilot : BindableBase, IHaveDisplayName
     /// <summary>
     ///     Set this accordingly to comply with your DNO, e.g. don´t use 32 A if your house only supports 35A
     /// </summary>
-    [WattPilot("ama")]
+    [WattPilot("ama", false)]
     public byte? AbsoluteMaximumChargingCurrent
     {
         get => absoluteMaximumChargingCurrent;
@@ -397,7 +405,7 @@ public class WattPilot : BindableBase, IHaveDisplayName
     /// <summary>
     ///     Gets or sets whether you want the cable to unlock if the WattPilot is not powered.
     /// </summary>
-    [WattPilot("upo")]
+    [WattPilot("upo", false)]
     public bool? UnlockCableOnPowerFailure
     {
         get => unlockCableOnPowerFailure;
@@ -408,7 +416,7 @@ public class WattPilot : BindableBase, IHaveDisplayName
     /// <summary>
     /// If you don´t have a house battery, you can specify whether you prefer power from/to grid. If you have a battery, this setting does not make a big difference
     /// </summary>
-    [WattPilot("frm")]
+    [WattPilot("frm", false)]
     public EcoRoundingMode RoundingMode
     {
         get => roundingMode;
@@ -419,7 +427,7 @@ public class WattPilot : BindableBase, IHaveDisplayName
     /// <summary>
     /// Minimum power in Watts to start PV surplus charging
     /// </summary>
-    [WattPilot("fst")]
+    [WattPilot("fst", false)]
     public double? PvSurplusPowerThreshold
     {
         get => pvSurplusPowerThreshold;
@@ -430,7 +438,7 @@ public class WattPilot : BindableBase, IHaveDisplayName
     /// <summary>
     /// Once charging has started, it continues for at least <see cref="MinimumChargingTime"/> milliseconds.
     /// </summary>
-    [WattPilot("fmt")]
+    [WattPilot("fmt", false)]
     public int? MinimumChargingTime
     {
         get => minimumChargingTime;
@@ -443,7 +451,7 @@ public class WattPilot : BindableBase, IHaveDisplayName
     ///     The current active charging limit. Must be between <see cref="MinimumChargingCurrent" /> and
     ///     <see cref="AbsoluteMaximumChargingCurrent" />
     /// </summary>
-    [WattPilot("amp")]
+    [WattPilot("amp", false)]
     public byte? MaximumChargingCurrent
     {
         get => maximumChargingCurrent;
@@ -465,7 +473,7 @@ public class WattPilot : BindableBase, IHaveDisplayName
     ///     Token to be used at https://&lt;serial number&gt;.api.v3.go-e.io/
     ///     Requires that <see cref="CloudAccessEnabled" /> is true
     /// </summary>
-    [WattPilot("cak")]
+    [WattPilot("cak", false)]
     public string? CloudAccessKey
     {
         get => cloudAccessKey;
@@ -477,7 +485,7 @@ public class WattPilot : BindableBase, IHaveDisplayName
     /// <summary>
     ///     True: Can use go-E charger Cloud Api
     /// </summary>
-    [WattPilot("cae")]
+    [WattPilot("cae", false)]
     public bool? CloudAccessEnabled
     {
         get => cloudAccessEnabled;
@@ -531,7 +539,7 @@ public class WattPilot : BindableBase, IHaveDisplayName
     /// <summary>
     ///     Read-write: Allow/Disallow charging
     /// </summary>
-    [WattPilot("bac")]
+    [WattPilot("bac", false)]
     public bool? EnableCharging
     {
         get => enableCharging;
@@ -588,17 +596,17 @@ public class WattPilot : BindableBase, IHaveDisplayName
 
     private PhaseSwitchMode? phaseSwitchMode;
 
-    [WattPilot("psm")]
+    [WattPilot("psm", false)]
     public PhaseSwitchMode? PhaseSwitchMode
     {
         get => phaseSwitchMode;
         set => Set(ref phaseSwitchMode, value);
     }
 
-    private IReadOnlyList<WattPilotCard>? cards;
+    private IList<WattPilotCard>? cards;
 
     [WattPilot("cards")]
-    public IReadOnlyList<WattPilotCard>? Cards
+    public IList<WattPilotCard>? Cards
     {
         get => cards;
         set => Set(ref cards, value);
@@ -644,7 +652,7 @@ public class WattPilot : BindableBase, IHaveDisplayName
     /// <summary>
     ///     Used to tune PV surplus charging. See also <see cref="OhmPilotTemperatureLimitCelsius" />
     /// </summary>
-    [WattPilot("fam")]
+    [WattPilot("fam", false)]
     public int? PvSurplusBatteryLevel
     {
         get => pvSurplusBatteryLevel;
@@ -656,7 +664,7 @@ public class WattPilot : BindableBase, IHaveDisplayName
     /// <summary>
     ///     Used to tune PV surplus charging. See also <see cref="PvSurplusBatteryLevel" />
     /// </summary>
-    [WattPilot("fot")]
+    [WattPilot("fot", false)]
     public int? OhmPilotTemperatureLimitCelsius
     {
         get => ohmPilotTemperatureLimitCelsius;
@@ -671,16 +679,61 @@ public class WattPilot : BindableBase, IHaveDisplayName
 
     private bool? pvSurplusEnabled;
 
-    [WattPilot("fup")]
+    [WattPilot("fup", false)]
     public bool? PvSurplusEnabled
     {
         get => pvSurplusEnabled;
         set => Set(ref pvSurplusEnabled, value);
     }
 
+    private bool? awattarEnabled;
+    [WattPilot("ful", false)]
+    public bool? AwattarEnabled
+    {
+        get => awattarEnabled;
+        set => Set(ref awattarEnabled, value);
+    }
+
+    private CableLockBehavior? cableLockBehavior;
+    [WattPilot("ust", false)]
+    public CableLockBehavior? CableLockBehavior
+    {
+        get => cableLockBehavior;
+        set => Set(ref cableLockBehavior, value, () => NotifyOfPropertyChange(nameof(CableLockBehaviorDisplayName)));
+    }
+
+    private bool? disableProtectiveEarth;
+    [WattPilot("nmo", false)]
+    public bool? DisableProtectiveEarth
+    {
+        get => disableProtectiveEarth;
+        set => Set(ref disableProtectiveEarth, value);
+    }
+
+    public string? CableLockBehaviorDisplayName => CableLockBehavior?.ToDisplayName();
+
     public string DisplayName => $"{DeviceName ?? HostName ?? SerialNumber ?? Resources.Unknown}";
 
     public override string ToString() => DisplayName;
+
+    public object Clone()
+    {
+        var result = (WattPilot)MemberwiseClone();
+
+        if (Cards != null)
+        {
+            IList<WattPilotCard> newCards = new WattPilotCard[Cards.Count];
+
+            for (var i = 0; i < Cards.Count; i++)
+            {
+                newCards[i] = new WattPilotCard { Energy = Cards[i].Energy, HaveCardId = Cards[i].HaveCardId, Name = Cards[i].Name, };
+            }
+
+            result.Cards = newCards;
+        }
+
+        return result;
+    }
 
     public static WattPilot Parse(JToken token)
     {

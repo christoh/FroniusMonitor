@@ -186,7 +186,7 @@ public class Bool2Visibility : BoolToAnything<Visibility>
     }
 }
 
-public class Bool2String:BoolToAnything<string>{}
+public class Bool2String : BoolToAnything<string> { }
 
 public class MultiBool2Anything<T> : MultiConverterBase
 {
@@ -420,7 +420,7 @@ public class Enum2DisplayName : ConverterBase
     }
 }
 
-public class ShowFritzBoxIcon : ConverterBase,IMultiValueConverter
+public class ShowFritzBoxIcon : ConverterBase, IMultiValueConverter
 {
     public override object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
@@ -428,7 +428,7 @@ public class ShowFritzBoxIcon : ConverterBase,IMultiValueConverter
             value is not WebConnection connection ||
             string.IsNullOrWhiteSpace(connection.BaseUrl) ||
             "http://".StartsWith(connection.BaseUrl)
-                ? Visibility.Collapsed 
+                ? Visibility.Collapsed
                 : Visibility.Visible;
     }
 
@@ -450,7 +450,7 @@ public class ShowFritzBoxIcon : ConverterBase,IMultiValueConverter
     }
 }
 
-public class SensorData:ConverterBase
+public class SensorData : ConverterBase
 {
     public string StringFormat { get; set; } = "G";
     public string Unit { get; set; } = string.Empty;
@@ -459,21 +459,34 @@ public class SensorData:ConverterBase
 
     public override object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        var unitString=$"{(Unit==string.Empty?string.Empty:" ")}{Unit}";
+        var unitString = $"{(Unit == string.Empty ? string.Empty : " ")}{Unit}";
 
         if (value is null)
         {
             return $"---{unitString}";
         }
 
-        var effectiveCulture=ForceCurrentCulture ? CultureInfo.CurrentCulture : culture;
+        var effectiveCulture = ForceCurrentCulture ? CultureInfo.CurrentCulture : culture;
 
         if (value is IConvertible convertible)
         {
-            var doubleValue = convertible.ToDouble(effectiveCulture)*Factor;
+            var doubleValue = convertible.ToDouble(effectiveCulture) * Factor;
             return $"{doubleValue.ToString(StringFormat, effectiveCulture)}{unitString}";
         }
 
         return $"{value}{unitString}";
+    }
+}
+
+public class AccessMode2Bool : ConverterBase
+{
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is not AccessMode accessMode ? null : accessMode == AccessMode.RequireAuth;
+    }
+
+    public override object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is not bool boolValue ? null : boolValue ? AccessMode.RequireAuth : AccessMode.Everyone;
     }
 }

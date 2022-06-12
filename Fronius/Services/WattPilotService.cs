@@ -2,12 +2,6 @@
 
 public class WattPilotService : BindableBase, IWattPilotService
 {
-    private class WattPilotAcknowledge
-    {
-        public ManualResetEventSlim Event { get; } = new();
-        public uint RequestId { get; init; }
-    }
-
     private uint requestId;
     private CancellationTokenSource? tokenSource;
     private ClientWebSocket? clientWebSocket;
@@ -24,6 +18,21 @@ public class WattPilotService : BindableBase, IWattPilotService
     {
         get => connection;
         private set => Set(ref connection, value);
+    }
+
+    public IReadOnlyList<WattPilotAcknowledge> UnsuccessfulWrites
+    {
+        get
+        {
+            WattPilotAcknowledge[] result;
+
+            lock (outstandingAcknowledges)
+            {
+                result= outstandingAcknowledges.ToArray();
+            }
+
+            return result;
+        }
     }
 
     private WattPilot? wattPilot;
@@ -200,7 +209,7 @@ public class WattPilotService : BindableBase, IWattPilotService
 
         try
         {
-            if (!WaitHandle.WaitAll(events, timeout, true))
+            if (events.Length > 0 && !WaitHandle.WaitAll(events, timeout, true))
             {
                 throw new TimeoutException($"The WattPilot did not answer within {timeout / 1e3d} seconds");
             }
@@ -244,11 +253,13 @@ public class WattPilotService : BindableBase, IWattPilotService
                 "value",
                 value == null ? null
                 : value is bool boolValue ? boolValue
+                : value is byte byteValue ? byteValue
+                : value is uint uintValue ? uintValue
+                : value is Enum enumValue ? (int)Convert.ChangeType(enumValue, TypeCode.Int32)
+                : value is int intValue ? intValue
                 : value is string stringValue ? stringValue
                 : value is double doubleValue ? doubleValue
                 : value is float floatValue ? floatValue
-                : value is int intValue ? intValue
-                : value is Enum enumValue ? (int)Convert.ChangeType(enumValue, TypeCode.Int32)
                 : throw new NotSupportedException("Unsupported Type")
             },
         }.ToString();
@@ -277,7 +288,7 @@ public class WattPilotService : BindableBase, IWattPilotService
 
         lock (outstandingAcknowledges)
         {
-            outstandingAcknowledges.Add(new WattPilotAcknowledge { RequestId = id });
+            outstandingAcknowledges.Add(new WattPilotAcknowledge { RequestId = id, PropertyInfo = propertyInfo, Value = value});
         }
     }
 
@@ -326,6 +337,7 @@ public class WattPilotService : BindableBase, IWattPilotService
         if
         (
             SetValue<bool>() ||
+            SetValue<float>() ||
             SetValue<double>() ||
             SetValue<int>() ||
             SetValue<byte>() ||

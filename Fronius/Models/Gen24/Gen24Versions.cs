@@ -92,13 +92,12 @@ public class Gen24Versions : BindableBase
         set => Set(ref swVersions, value);
     }
 
-    public static Gen24Versions Parse(string jsonText)
+    public static Gen24Versions Parse(JToken token)
     {
-        var token = JObject.Parse(jsonText);
         var gen24Service = IoC.Get<IGen24JsonService>();
         var result = gen24Service.ReadFroniusData<Gen24Versions>(token);
 
-        var swRevisions = token?["swrevisions"];
+        var swRevisions = token["swrevisions"];
 
         if (swRevisions != null)
         {
@@ -108,7 +107,7 @@ public class Gen24Versions : BindableBase
 
                 try
                 {
-                    version = new Version(swToken.Value.ToString()!.Replace("-", "."));
+                    version = new Version(swToken.Value.ToString().Replace("-", "."));
                 }
                 catch
                 {

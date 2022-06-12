@@ -160,6 +160,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to API key.
+        /// </summary>
+        public static string ApiKey {
+            get {
+                return ResourceManager.GetString("ApiKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Apparent power.
         /// </summary>
         public static string ApparentPower {
@@ -205,11 +214,56 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Awattar/Lumina country.
+        /// </summary>
+        public static string AwattarCountry {
+            get {
+                return ResourceManager.GetString("AwattarCountry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Austria.
+        /// </summary>
+        public static string AwattarCountry_Austria {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Austria", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Germany.
+        /// </summary>
+        public static string AwattarCountry_Germany {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Germany", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use Awattar/Lumina energy price.
+        /// </summary>
+        public static string AwattarEnabled {
+            get {
+                return ResourceManager.GetString("AwattarEnabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Backup configuration.
         /// </summary>
         public static string BackupConfiguration {
             get {
                 return ResourceManager.GetString("BackupConfiguration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Base Settings.
+        /// </summary>
+        public static string BaseSettings {
+            get {
+                return ResourceManager.GetString("BaseSettings", resourceCulture);
             }
         }
         
@@ -259,6 +313,42 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cable unlock behavior.
+        /// </summary>
+        public static string CableLockBehavior {
+            get {
+                return ResourceManager.GetString("CableLockBehavior", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Never unlock.
+        /// </summary>
+        public static string CableLockBehavior_AlwaysLock {
+            get {
+                return ResourceManager.GetString("CableLockBehavior_AlwaysLock", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Always unlock, wenn not charging.
+        /// </summary>
+        public static string CableLockBehavior_AutoUnlock {
+            get {
+                return ResourceManager.GetString("CableLockBehavior_AutoUnlock", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default.
+        /// </summary>
+        public static string CableLockBehavior_Normal {
+            get {
+                return ResourceManager.GetString("CableLockBehavior_Normal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Calibrate battery.
         /// </summary>
         public static string CalibrateBattery {
@@ -291,6 +381,42 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Charging {
             get {
                 return ResourceManager.GetString("Charging", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Charging logic.
+        /// </summary>
+        public static string ChargingLogic {
+            get {
+                return ResourceManager.GetString("ChargingLogic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Eco.
+        /// </summary>
+        public static string ChargingLogic_Eco {
+            get {
+                return ResourceManager.GetString("ChargingLogic_Eco", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Next Trip.
+        /// </summary>
+        public static string ChargingLogic_NextTrip {
+            get {
+                return ResourceManager.GetString("ChargingLogic_NextTrip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Full Power.
+        /// </summary>
+        public static string ChargingLogic_None {
+            get {
+                return ResourceManager.GetString("ChargingLogic_None", resourceCulture);
             }
         }
         
@@ -439,6 +565,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Disable protective earth checking.
+        /// </summary>
+        public static string DisableProtectiveEarth {
+            get {
+                return ResourceManager.GetString("DisableProtectiveEarth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Discharging.
         /// </summary>
         public static string Discharging {
@@ -448,11 +583,20 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Download car charging log.
+        ///   Looks up a localized string similar to Download charging log.
         /// </summary>
         public static string DownloadChargeLog {
             get {
                 return ResourceManager.GetString("DownloadChargeLog", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Eco settings.
+        /// </summary>
+        public static string EcoSettings {
+            get {
+                return ResourceManager.GetString("EcoSettings", resourceCulture);
             }
         }
         
@@ -462,6 +606,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Efficiency {
             get {
                 return ResourceManager.GetString("Efficiency", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable API at {0}.
+        /// </summary>
+        public static string EnableApiLink {
+            get {
+                return ResourceManager.GetString("EnableApiLink", resourceCulture);
             }
         }
         
@@ -817,11 +970,29 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Maximum Awattar/Lumina energy price.
+        /// </summary>
+        public static string MaxEnergyPrice {
+            get {
+                return ResourceManager.GetString("MaxEnergyPrice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Maximum power from home producers to battery.
         /// </summary>
         public static string MaxHomeChargingPower {
             get {
                 return ResourceManager.GetString("MaxHomeChargingPower", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Maximum charging current.
+        /// </summary>
+        public static string MaximumChargingCurrent {
+            get {
+                return ResourceManager.GetString("MaximumChargingCurrent", resourceCulture);
             }
         }
         
@@ -1294,6 +1465,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No Wattpilot found.
+        /// </summary>
+        public static string NoWattPilot {
+            get {
+                return ResourceManager.GetString("NoWattPilot", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Off.
         /// </summary>
         public static string Off {
@@ -1317,6 +1497,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Ohmpilots {
             get {
                 return ResourceManager.GetString("Ohmpilots", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Minimum Ohmpilot temperature.
+        /// </summary>
+        public static string OhmPilotTemperatureLimit {
+            get {
+                return ResourceManager.GetString("OhmPilotTemperatureLimit", resourceCulture);
             }
         }
         
@@ -1429,6 +1618,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Minimum SoC PV battery.
+        /// </summary>
+        public static string PvSurplusBatteryLevel {
+            get {
+                return ResourceManager.GetString("PvSurplusBatteryLevel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use PV surplus.
+        /// </summary>
+        public static string PvSurplusEnabled {
+            get {
+                return ResourceManager.GetString("PvSurplusEnabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Reactive Power.
         /// </summary>
         public static string ReactivePower {
@@ -1452,6 +1659,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string RealPower {
             get {
                 return ResourceManager.GetString("RealPower", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Require RFID card to charge.
+        /// </summary>
+        public static string RequireRfidAuth {
+            get {
+                return ResourceManager.GetString("RequireRfidAuth", resourceCulture);
             }
         }
         
@@ -1987,6 +2203,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unlock cable on power failure.
+        /// </summary>
+        public static string UnlockCableOnPowerFailure {
+            get {
+                return ResourceManager.GetString("UnlockCableOnPowerFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Updating.
         /// </summary>
         public static string Updating {
@@ -2046,6 +2271,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Warning {
             get {
                 return ResourceManager.GetString("Warning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wattpilot name.
+        /// </summary>
+        public static string WattPilotName {
+            get {
+                return ResourceManager.GetString("WattPilotName", resourceCulture);
             }
         }
         

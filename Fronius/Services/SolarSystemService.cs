@@ -138,17 +138,24 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         var wattPilotTask = TryStartWattPilot();
         var inverterTask = GetInverterDataFromSolarApi();
 
-        await Task.Run(() => Task.WaitAll(fritzBoxTask, wattPilotTask, inverterTask)).ConfigureAwait(false);
-        result.WattPilot = wattPilotTask.Result;
-        result.FritzBox = fritzBoxTask.Result;
+        try
+        {
+            await Task.Run(() => Task.WaitAll(fritzBoxTask, wattPilotTask, inverterTask)).ConfigureAwait(false);
+        }
+        catch (AggregateException)
+        {
+        }
+
+        result.WattPilot = wattPilotTask.IsCompletedSuccessfully ? wattPilotTask.Result : null;
+        result.FritzBox = fritzBoxTask.IsCompletedSuccessfully ? fritzBoxTask.Result : null;
         return result;
 
         async Task GetInverterDataFromSolarApi()
         {
             try
             {
-                result.Versions = Gen24Versions.Parse((await webClientService.GetFroniusStringResponse("status/version").ConfigureAwait(false)).JsonString);
-                result.Components = Gen24Components.Parse((JObject)(await webClientService.GetFroniusJsonResponse("components/").ConfigureAwait(false)).Token);
+                result.Versions = Gen24Versions.Parse((await webClientService.GetFroniusJsonResponse("status/version").ConfigureAwait(false)).Token);
+                result.Components = Gen24Components.Parse((await webClientService.GetFroniusJsonResponse("components/").ConfigureAwait(false)).Token);
                 result.Gen24System = await webClientService.GetFroniusData(result.Components).ConfigureAwait(false);
 
                 foreach (var deviceGroup in (await webClientService.GetDevices().ConfigureAwait(false)).Devices.GroupBy(d => d.DeviceClass))
@@ -287,7 +294,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
                 }
 
-                SolarSystem.WattPilot = wattPilotTask.IsCompletedSuccessfully ? wattPilotTask.Result ?? SolarSystem.WattPilot : null;
+                SolarSystem.WattPilot = wattPilotTask.IsCompletedSuccessfully ? wattPilotTask.Result ?? SolarSystem.WattPilot : SolarSystem.WattPilot;
                 SolarSystem.FritzBox = fritzBoxTask.IsCompletedSuccessfully ? fritzBoxTask.Result ?? SolarSystem.FritzBox : null;
                 SolarSystem.Gen24System = gen24Task.IsCompletedSuccessfully ? gen24Task.Result ?? SolarSystem.Gen24System : null;
                 newFritzBoxData = fritzBoxTask.IsCompletedSuccessfully && fritzBoxTask.Result != null;

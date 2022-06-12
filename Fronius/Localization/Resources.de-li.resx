@@ -23,4 +23,7 @@
 	<data name="Wednesday" xml:space="preserve">
 		<value>Mittwuch</value>
 	</data>
+	<data name="CableLockBehavior_AutoUnlock" xml:space="preserve">
+		<value>Immer entriegeln, wenn kein Strom fliesst</value>
+	</data>
 </root>

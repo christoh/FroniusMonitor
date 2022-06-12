@@ -49,38 +49,24 @@ public partial class MainWindow
         }
     }
 
-    public ModbusView ModbusView
+    public ModbusView ModbusView => GetView<ModbusView>();
+
+    public SettingsView SettingsView => GetView<SettingsView>();
+
+    public WattPilotSettingsView WattPilotSettingsView => GetView<WattPilotSettingsView>();
+
+    public T GetView<T>() where T : Window
     {
-        get
+        var view = OwnedWindows.OfType<T>().SingleOrDefault();
+
+        if (view == null)
         {
-            var modbusView = OwnedWindows.OfType<ModbusView>().SingleOrDefault();
-
-            if (modbusView == null)
-            {
-                modbusView = IoC.Get<ModbusView>();
-                modbusView.Owner = this;
-                modbusView.Show();
-            }
-
-            return modbusView;
+            view = IoC.Get<T>();
+            view.Owner = this;
+            view.Show();
         }
-    }
 
-    public SettingsView SettingsView
-    {
-        get
-        {
-            var settingsView = OwnedWindows.OfType<SettingsView>().SingleOrDefault();
-
-            if (settingsView == null)
-            {
-                settingsView = IoC.Get<SettingsView>();
-                settingsView.Owner = this;
-                settingsView.Show();
-            }
-
-            return settingsView;
-        }
+        return view;
     }
 
     private SelfConsumptionOptimizationView? selfConsumptionOptimizationView;
@@ -255,6 +241,12 @@ public partial class MainWindow
         SettingsView.WindowState = WindowState.Normal;
     }
 
+    private void ShowWattPilotSettings(object sender, RoutedEventArgs e)
+    {
+        WattPilotSettingsView.Activate();
+        WattPilotSettingsView.WindowState = WindowState.Normal;
+    }
+
     private void OnRibbonExpanderChanged(object sender, RoutedEventArgs e)
     {
         if (RibbonExpander.IsChecked.HasValue && RibbonExpander.IsChecked.Value)
@@ -281,4 +273,5 @@ public partial class MainWindow
             ViewModel.FritzBoxVisibilityChanged(showAvm.IsChecked);
         }
     }
+
 }
