@@ -86,7 +86,7 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <c:PowerFlowArrow Grid.Column="0" x:Name="WattPilotArrow" VerticalAlignment="Top" Fill="{Binding ElementName=LoadArrow, Path=Fill}" HasRightPlacement="False" DefaultsToOutgoing="False" 
-                                      Margin="25,0,10,0" Power="{Binding SolarSystemService.SolarSystem.WattPilot.PowerTotal, FallbackValue={x:Null}}"/>
+                                      Margin="25,0,10,0" Power="{Binding SolarSystemService.SolarSystem.WattPilot.PowerTotal, FallbackValue=0}"/>
                     <c:WattPilotControl Grid.Column="1" Height="200" WattPilotService="{Binding WattPilotService}"/>
                 </Grid>
 

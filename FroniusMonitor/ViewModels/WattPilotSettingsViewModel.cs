@@ -6,10 +6,6 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
 {
     public class WattPilotSettingsViewModel : ViewModelBase
     {
-        private static readonly CableLockBehavior[] cableLockBehaviors = Enum.GetValues<CableLockBehavior>();
-        private static readonly ChargingLogic[] chargingLogicList = Enum.GetValues<ChargingLogic>();
-        private static readonly AwattarCountry[] energyPriceCountries = Enum.GetValues<AwattarCountry>().OrderBy(c=>c.ToDisplayName()).ToArray();
-
         private readonly ISolarSystemService solarSystemService;
         private readonly IWattPilotService wattPilotService;
         private WattPilot oldWattPilot = null!;
@@ -22,9 +18,10 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
             this.mainWindow = mainWindow;
         }
 
-        public static IReadOnlyList<CableLockBehavior> CableLockBehaviors => cableLockBehaviors;
-        public static IReadOnlyList<ChargingLogic> ChargingLogicList => chargingLogicList;
-        public static IReadOnlyList<AwattarCountry> EnergyPriceCountries => energyPriceCountries;
+        public static IReadOnlyList<CableLockBehavior> CableLockBehaviors { get; } = Enum.GetValues<CableLockBehavior>();
+        public static IReadOnlyList<ChargingLogic> ChargingLogicList { get; } = Enum.GetValues<ChargingLogic>();
+        public static IReadOnlyList<EcoRoundingMode> EcoRoundingModes { get; } = Enum.GetValues<EcoRoundingMode>();
+        public static IReadOnlyList<AwattarCountry> EnergyPriceCountries { get; } = Enum.GetValues<AwattarCountry>().OrderBy(c => c.ToDisplayName()).ToArray();
 
 
         private WattPilot wattPilot = null!;
@@ -49,6 +46,20 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
         {
             get => isInUpdate;
             set => Set(ref isInUpdate, value);
+        }
+
+        private bool requiresChargingInterval;
+
+        public bool RequiresChargingInterval
+        {
+            get => requiresChargingInterval;
+            set => Set(ref requiresChargingInterval, value, () =>
+            {
+                if (value && WattPilot.MinimumChargingInterval < 300000)
+                {
+                    WattPilot.MinimumChargingInterval = 300000;
+                }
+            });
         }
 
         public string ApiLink => string.Format(Resources.EnableApiLink, "https://" + (WattPilot.SerialNumber ?? "<Serial>") + ".api.v3.go-e.io");
@@ -78,7 +89,12 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
             }
 
             oldWattPilot = (WattPilot)localWattPilot.Clone();
+
+            ////Reboot WattPilot
+            //oldWattPilot.Reboot = true;
+            //await wattPilotService.SendValue(oldWattPilot, nameof(Fronius.Models.Charging.WattPilot.Reboot));
             Undo();
+            RequiresChargingInterval = (WattPilot.MinimumChargingInterval ?? 0) != 0;
         }
 
         public void Undo()
@@ -92,6 +108,12 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
             try
             {
                 IsInUpdate = true;
+
+                if (!RequiresChargingInterval)
+                {
+                    WattPilot.MinimumChargingInterval = 0;
+                }
+
                 wattPilotService.BeginSendValues();
 
                 try

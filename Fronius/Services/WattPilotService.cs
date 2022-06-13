@@ -169,8 +169,8 @@ public class WattPilotService : BindableBase, IWattPilotService
     private Task<string> GetHashedPassword() => Task.Run(() =>
     {
         using var deriveBytes = new Rfc2898DeriveBytes(Encoding.UTF8.GetBytes(Connection?.Password ?? string.Empty), Encoding.UTF8.GetBytes(WattPilot?.SerialNumber ?? string.Empty), 100000, HashAlgorithmName.SHA512);
-        var hash0 = deriveBytes.GetBytes(256);
-        var hashedPassword = Convert.ToBase64String(hash0)[..32];
+        var hash0 = deriveBytes.GetBytes(24);
+        var hashedPassword = Convert.ToBase64String(hash0);
         return hashedPassword;
     }, Token);
 

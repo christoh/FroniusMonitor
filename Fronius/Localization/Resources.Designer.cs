@@ -133,6 +133,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Allow charging pause.
+        /// </summary>
+        public static string AllowChargingPause {
+            get {
+                return ResourceManager.GetString("AllowChargingPause", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Allow charge battery from grid.
         /// </summary>
         public static string AllowGridCharge {
@@ -367,6 +376,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Car Settings.
+        /// </summary>
+        public static string CarSettings {
+            get {
+                return ResourceManager.GetString("CarSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Allow charge battery from other producers in your home.
         /// </summary>
         public static string ChargeFromAc {
@@ -588,6 +606,42 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string DownloadChargeLog {
             get {
                 return ResourceManager.GetString("DownloadChargeLog", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PV surplus rounding.
+        /// </summary>
+        public static string EcoRoundingMode {
+            get {
+                return ResourceManager.GetString("EcoRoundingMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No Preference.
+        /// </summary>
+        public static string EcoRoundingMode_NoPreference {
+            get {
+                return ResourceManager.GetString("EcoRoundingMode_NoPreference", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Prefer consumption.
+        /// </summary>
+        public static string EcoRoundingMode_PreferFromGrid {
+            get {
+                return ResourceManager.GetString("EcoRoundingMode_PreferFromGrid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Prefer feed-in.
+        /// </summary>
+        public static string EcoRoundingMode_PreferToGrid {
+            get {
+                return ResourceManager.GetString("EcoRoundingMode_PreferToGrid", resourceCulture);
             }
         }
         
@@ -1051,11 +1105,47 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Minimum charging current.
+        /// </summary>
+        public static string MinimumChargingCurrent {
+            get {
+                return ResourceManager.GetString("MinimumChargingCurrent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Most cars can handle of 6 A. However, some need more. Set in accordance with your car&apos;s technical specifications..
+        /// </summary>
+        public static string MinimumChargingCurrent_ToolTip {
+            get {
+                return ResourceManager.GetString("MinimumChargingCurrent_ToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Forced charging interval.
+        /// </summary>
+        public static string MinimumChargingInterval {
+            get {
+                return ResourceManager.GetString("MinimumChargingInterval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Minimum SoC.
         /// </summary>
         public static string MinimumSoc {
             get {
                 return ResourceManager.GetString("MinimumSoc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to minutes.
+        /// </summary>
+        public static string Minutes {
+            get {
+                return ResourceManager.GetString("Minutes", resourceCulture);
             }
         }
         
@@ -1438,6 +1528,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to PV does not feed the grid.
+        /// </summary>
+        public static string NoFeedIn {
+            get {
+                return ResourceManager.GetString("NoFeedIn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If your PV system does not feed the grid, enable this setting..
+        /// </summary>
+        public static string NoFeedIn_ToolTip {
+            get {
+                return ResourceManager.GetString("NoFeedIn_ToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You did not specify complete Fritz!Box connection parameters.
         /// </summary>
         public static string NoFritzBoxConnection {
@@ -1636,6 +1744,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to PV surplus starting power.
+        /// </summary>
+        public static string PvSurplusPowerThreshold {
+            get {
+                return ResourceManager.GetString("PvSurplusPowerThreshold", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Reactive Power.
         /// </summary>
         public static string ReactivePower {
@@ -1668,6 +1785,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string RequireRfidAuth {
             get {
                 return ResourceManager.GetString("RequireRfidAuth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Car requires a charging interval.
+        /// </summary>
+        public static string RequiresChargingInterval {
+            get {
+                return ResourceManager.GetString("RequiresChargingInterval", resourceCulture);
             }
         }
         
@@ -1812,6 +1938,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string ShowAvm {
             get {
                 return ResourceManager.GetString("ShowAvm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Simulate unplugging.
+        /// </summary>
+        public static string SimulateUnplugging {
+            get {
+                return ResourceManager.GetString("SimulateUnplugging", resourceCulture);
             }
         }
         

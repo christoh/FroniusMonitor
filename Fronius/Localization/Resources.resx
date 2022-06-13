@@ -864,4 +864,49 @@
   <data name="OhmPilotTemperatureLimit" xml:space="preserve">
 	  <value>Minimum Ohmpilot temperature</value>
   </data>
+  <data name="PvSurplusPowerThreshold" xml:space="preserve">
+	  <value>PV surplus starting power</value>
+  </data>
+  <data name="NoFeedIn" xml:space="preserve">
+	  <value>PV does not feed the grid</value>
+  </data>
+  <data name="NoFeedIn_ToolTip" xml:space="preserve">
+	  <value>If your PV system does not feed the grid, enable this setting.</value>
+  </data>
+  <data name="EcoRoundingMode" xml:space="preserve">
+	  <value>PV surplus rounding</value>
+  </data>
+  <data name="EcoRoundingMode_PreferFromGrid" xml:space="preserve">
+	  <value>Prefer consumption</value>
+  </data>
+  <data name="EcoRoundingMode_NoPreference" xml:space="preserve">
+	  <value>No Preference</value>
+  </data>
+  <data name="EcoRoundingMode_PreferToGrid" xml:space="preserve">
+	  <value>Prefer feed-in</value>
+  </data>
+  <data name="CarSettings" xml:space="preserve">
+	  <value>Car Settings</value>
+  </data>
+  <data name="MinimumChargingCurrent" xml:space="preserve">
+	  <value>Minimum charging current</value>
+  </data>
+  <data name="MinimumChargingCurrent_ToolTip" xml:space="preserve">
+	  <value>Most cars can handle of 6 A. However, some need more. Set in accordance with your car's technical specifications.</value>
+  </data>
+  <data name="MinimumChargingInterval" xml:space="preserve">
+	  <value>Forced charging interval</value>
+  </data>
+  <data name="Minutes" xml:space="preserve">
+	  <value>minutes</value>
+  </data>
+  <data name="RequiresChargingInterval" xml:space="preserve">
+	  <value>Car requires a charging interval</value>
+  </data>
+  <data name="AllowChargingPause" xml:space="preserve">
+	  <value>Allow charging pause</value>
+  </data>
+  <data name="SimulateUnplugging" xml:space="preserve">
+	  <value>Simulate unplugging</value>
+  </data>
 </root>

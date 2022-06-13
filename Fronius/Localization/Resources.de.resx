@@ -846,4 +846,49 @@
   <data name="OhmPilotTemperatureLimit" xml:space="preserve">
 	  <value>Minimale Ohmpilot-Temperatur</value>
   </data>
+  <data name="PvSurplusPowerThreshold" xml:space="preserve">
+	  <value>PV-Überschuss-Startleistung</value>
+  </data>
+  <data name="NoFeedIn" xml:space="preserve">
+	  <value>PV-Anlage speist nicht ein</value>
+  </data>
+  <data name="NoFeedIn_ToolTip" xml:space="preserve">
+	  <value>Wenn Deine PV-Anlage nicht ins Netz einspeist, dann musst Du das hier anklicken</value>
+  </data>
+  <data name="EcoRoundingMode" xml:space="preserve">
+	  <value>PV-Überschuss-Rundung</value>
+  </data>
+  <data name="EcoRoundingMode_PreferFromGrid" xml:space="preserve">
+	  <value>Netzbezug bevorzugen</value>
+  </data>
+  <data name="EcoRoundingMode_NoPreference" xml:space="preserve">
+	  <value>Keine Präferenz</value>
+  </data>
+  <data name="EcoRoundingMode_PreferToGrid" xml:space="preserve">
+	  <value>Einspeisung bevorzugen</value>
+  </data>
+  <data name="CarSettings" xml:space="preserve">
+	  <value>Fahrzeugeinstellungen</value>
+  </data>
+  <data name="MinimumChargingCurrent" xml:space="preserve">
+	  <value>Mindestladestrom</value>
+  </data>
+  <data name="MinimumChargingCurrent_ToolTip" xml:space="preserve">
+	  <value>Die meisten E-Autos vertragen 6 A. Einige jedoch benötigen mehr. Setze das entsprechend den technischen Spezifikationen Deines Autos.</value>
+  </data>
+  <data name="MinimumChargingInterval" xml:space="preserve">
+	  <value>Erzwungenes Ladeintervall</value>
+  </data>
+  <data name="Minutes" xml:space="preserve">
+	  <value>Minuten</value>
+  </data>
+  <data name="RequiresChargingInterval" xml:space="preserve">
+	  <value>Das Auto benötigt ein Ladeinterval</value>
+  </data>
+  <data name="AllowChargingPause" xml:space="preserve">
+	  <value>Ladepause erlauben</value>
+  </data>
+  <data name="SimulateUnplugging" xml:space="preserve">
+	  <value>Ausstecken simulieren</value>
+  </data>
 </root>

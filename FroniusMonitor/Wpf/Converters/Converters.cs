@@ -490,3 +490,26 @@ public class AccessMode2Bool : ConverterBase
         return value is not bool boolValue ? null : boolValue ? AccessMode.RequireAuth : AccessMode.Everyone;
     }
 }
+
+public class Milliseconds2Minutes:ConverterBase
+{
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not int intValue)
+        {
+            return value;
+        }
+
+        return intValue / 60000;
+    }
+
+    public override object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not string stringValue||!int.TryParse(stringValue,NumberStyles.AllowLeadingSign,CultureInfo.CurrentCulture,out var intValue))
+        {
+            return value;
+        }
+
+        return intValue * 60000;
+    }
+}

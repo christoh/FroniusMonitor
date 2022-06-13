@@ -304,6 +304,14 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref minimumPauseDuration, value);
     }
 
+    private bool? allowChargingPause;
+    [WattPilot("fap", false)] //go-eCharger uses "acp" for this
+    public bool? AllowChargingPause
+    {
+        get => allowChargingPause;
+        set => Set(ref allowChargingPause, value);
+    }
+
     private AwattarCountry energyPriceCountry;
 
     /// <summary>
@@ -423,12 +431,12 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref roundingMode, value);
     }
 
-    private double? pvSurplusPowerThreshold;
+    private float? pvSurplusPowerThreshold;
     /// <summary>
     /// Minimum power in Watts to start PV surplus charging
     /// </summary>
     [WattPilot("fst", false)]
-    public double? PvSurplusPowerThreshold
+    public float? PvSurplusPowerThreshold
     {
         get => pvSurplusPowerThreshold;
         set => Set(ref pvSurplusPowerThreshold, value);
@@ -582,17 +590,19 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref cableCurrentMaximum, value);
     }
 
-    private double? maximumWattPilotPower;
+    private byte? maximumWattPilotPowerKiloWatts;
 
     /// <summary>
     ///     Maximum Power that the WattPilot is able to deliver (11 or 22 kW)
     /// </summary>
     [WattPilot("var")]
-    public double? MaximumWattPilotPower
+    public byte? MaximumWattPilotPowerKiloWatts
     {
-        get => maximumWattPilotPower;
-        set => Set(ref maximumWattPilotPower, value);
+        get => maximumWattPilotPowerKiloWatts;
+        set => Set(ref maximumWattPilotPowerKiloWatts, value,()=>NotifyOfPropertyChange(nameof(MaximumWattPilotPower)));
     }
+
+    public double? MaximumWattPilotPower => MaximumWattPilotPowerKiloWatts * 1000d;
 
     private PhaseSwitchMode? phaseSwitchMode;
 
@@ -601,6 +611,17 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     {
         get => phaseSwitchMode;
         set => Set(ref phaseSwitchMode, value);
+    }
+
+    private bool? noFeedIn;
+    /// <summary>
+    /// If your inverter does not feed the grid, enable this
+    /// </summary>
+    [WattPilot("fzf", false)]
+    public bool? NoFeedIn
+    {
+        get => noFeedIn;
+        set => Set(ref noFeedIn, value);
     }
 
     private IList<WattPilotCard>? cards;
@@ -657,6 +678,14 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     {
         get => pvSurplusBatteryLevel;
         set => Set(ref pvSurplusBatteryLevel, value);
+    }
+
+    private bool? reboot;
+    [WattPilot("rst", false)]
+    public bool? Reboot
+    {
+        get => reboot;
+        set => Set(ref reboot, value);
     }
 
     private int? ohmPilotTemperatureLimitCelsius;
