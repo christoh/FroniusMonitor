@@ -232,7 +232,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         return wattPilotService.WattPilot;
     }
 
-    private async Task<Gen24System?> TryGetGen24System(Gen24Components components)
+    private async Task<Gen24System?> TryGetGen24System()
     {
         try
         {
@@ -265,7 +265,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
             }
             else
             {
-                var gen24Task = froniusCounter++ % FroniusUpdateRate == 0 ? TryGetGen24System(SolarSystem.Components) : Task.FromResult<Gen24System?>(null);
+                var gen24Task = froniusCounter++ % FroniusUpdateRate == 0 ? TryGetGen24System() : Task.FromResult<Gen24System?>(null);
                 var fritzBoxTask = suspendFritzBoxCounter <= 0 && webClientService.FritzBoxConnection != null && fritzBoxCounter++ % FritzBoxUpdateRate == 0 ? TryGetFritzBoxData() : Task.FromResult<FritzBoxDeviceList?>(null);
                 var wattPilotTask = TryStartWattPilot();
 
