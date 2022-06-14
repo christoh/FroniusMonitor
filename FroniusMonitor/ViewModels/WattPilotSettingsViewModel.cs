@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Security;
 using De.Hochstaetter.Fronius.Attributes;
 using De.Hochstaetter.Fronius.Extensions;
 
@@ -21,6 +22,7 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
         public static IReadOnlyList<CableLockBehavior> CableLockBehaviors { get; } = Enum.GetValues<CableLockBehavior>();
         public static IReadOnlyList<ChargingLogic> ChargingLogicList { get; } = Enum.GetValues<ChargingLogic>();
         public static IReadOnlyList<EcoRoundingMode> EcoRoundingModes { get; } = Enum.GetValues<EcoRoundingMode>();
+        public static IReadOnlyList<PhaseSwitchMode> PhaseSwitchModes { get; } = Enum.GetValues<PhaseSwitchMode>();
         public static IReadOnlyList<AwattarCountry> EnergyPriceCountries { get; } = Enum.GetValues<AwattarCountry>().OrderBy(c => c.ToDisplayName()).ToArray();
 
 
@@ -94,13 +96,18 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
             //oldWattPilot.Reboot = true;
             //await wattPilotService.SendValue(oldWattPilot, nameof(Fronius.Models.Charging.WattPilot.Reboot));
             Undo();
-            RequiresChargingInterval = (WattPilot.MinimumChargingInterval ?? 0) != 0;
         }
 
         public void Undo()
         {
             WattPilot = (WattPilot)oldWattPilot.Clone();
             Title = $"{WattPilot.DeviceName} {WattPilot.SerialNumber}";
+            RequiresChargingInterval = (WattPilot.MinimumChargingInterval ?? 0) != 0;
+
+            if (WattPilot.AllowChargingPause.HasValue && !WattPilot.AllowChargingPause.Value)
+            {
+                WattPilot.PhaseSwitchMode = PhaseSwitchMode.Phases3;
+            }
         }
 
         public async void Apply()
@@ -112,6 +119,11 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
                 if (!RequiresChargingInterval)
                 {
                     WattPilot.MinimumChargingInterval = 0;
+                }
+
+                if (WattPilot.AllowChargingPause.HasValue && !WattPilot.AllowChargingPause.Value)
+                {
+                    WattPilot.PhaseSwitchMode = PhaseSwitchMode.Phases3;
                 }
 
                 wattPilotService.BeginSendValues();

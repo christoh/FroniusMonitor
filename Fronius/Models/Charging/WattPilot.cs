@@ -33,6 +33,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private ChargingLogic? chargingLogic;
+
     [WattPilot("lmo", false)]
     public ChargingLogic? ChargingLogic
     {
@@ -294,8 +295,10 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private int? minimumPauseDuration;
+
     /// <summary>
-    ///     Charging pause duration in milliseconds. Some cars need a minimum pause duration before charging can continue. Set to 0 to disable.
+    ///     Charging pause duration in milliseconds. Some cars need a minimum pause duration before charging can continue. Set
+    ///     to 0 to disable.
     /// </summary>
     [WattPilot("mcpd", false)]
     public int? MinimumPauseDuration
@@ -305,11 +308,12 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private bool? allowChargingPause;
+
     [WattPilot("fap", false)] //go-eCharger uses "acp" for this
     public bool? AllowChargingPause
     {
         get => allowChargingPause;
-        set => Set(ref allowChargingPause, value);
+        set => Set(ref allowChargingPause, value, () => NotifyOfPropertyChange(nameof(AllowPauseAndHasPhaseSwitch)));
     }
 
     private AwattarCountry energyPriceCountry;
@@ -337,8 +341,9 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private bool? simulateUnplugging;
+
     /// <summary>
-    /// Some cars need this. If yours does not, leave it to false
+    ///     Some cars need this. If yours does not, leave it to false
     /// </summary>
     [WattPilot("su", false)]
     public bool? SimulateUnplugging
@@ -348,8 +353,9 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private bool? simulateUnpluggingAlways;
+
     /// <summary>
-    /// Unclear, what this is good for. The app only uses <see cref="SimulateUnplugging"/>
+    ///     Unclear, what this is good for. The app only uses <see cref="SimulateUnplugging" />
     /// </summary>
     [WattPilot("sua", false)]
     public bool? SimulateUnpluggingAlways
@@ -383,17 +389,43 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref phaseSwitchTriggerTime, value);
     }
 
-    private double? phaseSwitchPower;
+    private float? phaseSwitchPower;
 
     /// <summary>
     ///     If PV surplus is above that power, switch to 3 phases. If PV surplus is below, switch to 1 phase.
     ///     Use <see cref="PhaseSwitchTriggerTime" /> to control the minimum time before the phase switch occurs.
     /// </summary>
     [WattPilot("spl3", false)]
-    public double? PhaseSwitchPower
+    public float? PhaseSwitchPower
     {
         get => phaseSwitchPower;
         set => Set(ref phaseSwitchPower, value);
+    }
+
+    public bool? AllowPauseAndHasPhaseSwitch => PhaseSwitchMode == Charging.PhaseSwitchMode.Auto && AllowChargingPause.HasValue && AllowChargingPause.Value;
+
+    private int? nextTripTime;
+
+    /// <summary>
+    ///     Next trip departure time in seconds from day start (local-time)
+    /// </summary>
+    [WattPilot("ftt")]
+    public int? NextTripTime
+    {
+        get => nextTripTime;
+        set => Set(ref nextTripTime, value);
+    }
+
+    private int? nextTripEnergyToCharge;
+
+    /// <summary>
+    ///     Next trip minimum energy to charge
+    /// </summary>
+    [WattPilot("fte")]
+    public int? NextTripEnergyToCharge
+    {
+        get => nextTripEnergyToCharge;
+        set => Set(ref nextTripEnergyToCharge, value);
     }
 
     private byte? absoluteMaximumChargingCurrent;
@@ -421,8 +453,10 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private EcoRoundingMode roundingMode;
+
     /// <summary>
-    /// If you don´t have a house battery, you can specify whether you prefer power from/to grid. If you have a battery, this setting does not make a big difference
+    ///     If you don´t have a house battery, you can specify whether you prefer power from/to grid. If you have a battery,
+    ///     this setting does not make a big difference
     /// </summary>
     [WattPilot("frm", false)]
     public EcoRoundingMode RoundingMode
@@ -432,8 +466,9 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private float? pvSurplusPowerThreshold;
+
     /// <summary>
-    /// Minimum power in Watts to start PV surplus charging
+    ///     Minimum power in Watts to start PV surplus charging
     /// </summary>
     [WattPilot("fst", false)]
     public float? PvSurplusPowerThreshold
@@ -443,8 +478,9 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private int? minimumChargingTime;
+
     /// <summary>
-    /// Once charging has started, it continues for at least <see cref="MinimumChargingTime"/> milliseconds.
+    ///     Once charging has started, it continues for at least <see cref="MinimumChargingTime" /> milliseconds.
     /// </summary>
     [WattPilot("fmt", false)]
     public int? MinimumChargingTime
@@ -599,7 +635,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     public byte? MaximumWattPilotPowerKiloWatts
     {
         get => maximumWattPilotPowerKiloWatts;
-        set => Set(ref maximumWattPilotPowerKiloWatts, value,()=>NotifyOfPropertyChange(nameof(MaximumWattPilotPower)));
+        set => Set(ref maximumWattPilotPowerKiloWatts, value, () => NotifyOfPropertyChange(nameof(MaximumWattPilotPower)));
     }
 
     public double? MaximumWattPilotPower => MaximumWattPilotPowerKiloWatts * 1000d;
@@ -610,12 +646,13 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     public PhaseSwitchMode? PhaseSwitchMode
     {
         get => phaseSwitchMode;
-        set => Set(ref phaseSwitchMode, value);
+        set => Set(ref phaseSwitchMode, value, () => NotifyOfPropertyChange(nameof(AllowPauseAndHasPhaseSwitch)));
     }
 
     private bool? noFeedIn;
+
     /// <summary>
-    /// If your inverter does not feed the grid, enable this
+    ///     If your inverter does not feed the grid, enable this
     /// </summary>
     [WattPilot("fzf", false)]
     public bool? NoFeedIn
@@ -681,6 +718,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private bool? reboot;
+
     [WattPilot("rst", false)]
     public bool? Reboot
     {
@@ -716,6 +754,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private bool? awattarEnabled;
+
     [WattPilot("ful", false)]
     public bool? AwattarEnabled
     {
@@ -724,6 +763,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private CableLockBehavior? cableLockBehavior;
+
     [WattPilot("ust", false)]
     public CableLockBehavior? CableLockBehavior
     {
@@ -732,6 +772,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private bool? disableProtectiveEarth;
+
     [WattPilot("nmo", false)]
     public bool? DisableProtectiveEarth
     {
@@ -755,7 +796,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
 
             for (var i = 0; i < Cards.Count; i++)
             {
-                newCards[i] = new WattPilotCard { Energy = Cards[i].Energy, HaveCardId = Cards[i].HaveCardId, Name = Cards[i].Name, };
+                newCards[i] = new WattPilotCard {Energy = Cards[i].Energy, HaveCardId = Cards[i].HaveCardId, Name = Cards[i].Name,};
             }
 
             result.Cards = newCards;

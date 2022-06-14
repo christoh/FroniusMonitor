@@ -28,7 +28,7 @@ public class WattPilotService : BindableBase, IWattPilotService
 
             lock (outstandingAcknowledges)
             {
-                result= outstandingAcknowledges.ToArray();
+                result = outstandingAcknowledges.ToArray();
             }
 
             return result;
@@ -288,7 +288,7 @@ public class WattPilotService : BindableBase, IWattPilotService
 
         lock (outstandingAcknowledges)
         {
-            outstandingAcknowledges.Add(new WattPilotAcknowledge { RequestId = id, PropertyInfo = propertyInfo, Value = value});
+            outstandingAcknowledges.Add(new WattPilotAcknowledge {RequestId = id, PropertyInfo = propertyInfo, Value = value});
         }
     }
 

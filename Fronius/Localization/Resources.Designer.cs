@@ -1132,11 +1132,38 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Minimum charging time.
+        /// </summary>
+        public static string MinimumChargingTime {
+            get {
+                return ResourceManager.GetString("MinimumChargingTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Minimum pause duration.
+        /// </summary>
+        public static string MinimumPauseDuration {
+            get {
+                return ResourceManager.GetString("MinimumPauseDuration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Minimum SoC.
         /// </summary>
         public static string MinimumSoc {
             get {
                 return ResourceManager.GetString("MinimumSoc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Minimum time between phase switches.
+        /// </summary>
+        public static string MinimumTimeBetweenPhaseSwitches {
+            get {
+                return ResourceManager.GetString("MinimumTimeBetweenPhaseSwitches", resourceCulture);
             }
         }
         
@@ -1659,6 +1686,60 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Password {
             get {
                 return ResourceManager.GetString("Password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Phase switch mode.
+        /// </summary>
+        public static string PhaseSwitchMode {
+            get {
+                return ResourceManager.GetString("PhaseSwitchMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Automatic.
+        /// </summary>
+        public static string PhaseSwitchMode_Auto {
+            get {
+                return ResourceManager.GetString("PhaseSwitchMode_Auto", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only one phase.
+        /// </summary>
+        public static string PhaseSwitchMode_Phase1 {
+            get {
+                return ResourceManager.GetString("PhaseSwitchMode_Phase1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only three phases.
+        /// </summary>
+        public static string PhaseSwitchMode_Phases3 {
+            get {
+                return ResourceManager.GetString("PhaseSwitchMode_Phases3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Phase switch power.
+        /// </summary>
+        public static string PhaseSwitchPower {
+            get {
+                return ResourceManager.GetString("PhaseSwitchPower", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Phase switch latency.
+        /// </summary>
+        public static string PhaseSwitchTriggerTime {
+            get {
+                return ResourceManager.GetString("PhaseSwitchTriggerTime", resourceCulture);
             }
         }
         

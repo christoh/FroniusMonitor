@@ -909,4 +909,31 @@
   <data name="SimulateUnplugging" xml:space="preserve">
 	  <value>Simulate unplugging</value>
   </data>
+  <data name="MinimumPauseDuration" xml:space="preserve">
+	  <value>Minimum pause duration</value>
+  </data>
+  <data name="MinimumChargingTime" xml:space="preserve">
+	  <value>Minimum charging time</value>
+  </data>
+  <data name="PhaseSwitchMode" xml:space="preserve">
+	  <value>Phase switch mode</value>
+  </data>
+  <data name="PhaseSwitchMode_Auto" xml:space="preserve">
+	  <value>Automatic</value>
+  </data>
+  <data name="PhaseSwitchMode_Phase1" xml:space="preserve">
+	  <value>Only one phase</value>
+  </data>
+  <data name="PhaseSwitchMode_Phases3" xml:space="preserve">
+	  <value>Only three phases</value>
+  </data>
+  <data name="PhaseSwitchPower" xml:space="preserve">
+	  <value>Phase switch power</value>
+  </data>
+  <data name="MinimumTimeBetweenPhaseSwitches" xml:space="preserve">
+	  <value>Minimum time between phase switches</value>
+  </data>
+  <data name="PhaseSwitchTriggerTime" xml:space="preserve">
+	  <value>Phase switch latency</value>
+  </data>
 </root>

@@ -253,22 +253,6 @@ public class SolarSystemService : BindableBase, ISolarSystemService
             return;
         }
 
-        //if (wattPilotService.WattPilot != null)
-        //{
-
-        //    wattPilotService.BeginSendValues();
-        //    await wattPilotService.SendValue(wattPilotService.WattPilot, nameof(WattPilot.CloudAccessEnabled));
-
-        //    try
-        //    {
-        //        await wattPilotService.WaitSendValues().ConfigureAwait(false);
-        //    }
-        //    catch
-        //    {
-        //        //
-        //    }
-        //}
-
         try
         {
             var newSolarData = false;

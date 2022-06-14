@@ -891,4 +891,31 @@
   <data name="SimulateUnplugging" xml:space="preserve">
 	  <value>Ausstecken simulieren</value>
   </data>
+  <data name="MinimumPauseDuration" xml:space="preserve">
+	  <value>Mindestladepause</value>
+  </data>
+  <data name="MinimumChargingTime" xml:space="preserve">
+	  <value>Mindestladezeit</value>
+  </data>
+  <data name="PhaseSwitchMode" xml:space="preserve">
+	  <value>Phasenumschaltung</value>
+  </data>
+  <data name="PhaseSwitchMode_Auto" xml:space="preserve">
+	  <value>Automatisch</value>
+  </data>
+  <data name="PhaseSwitchMode_Phase1" xml:space="preserve">
+	  <value>Nur einphasig</value>
+  </data>
+  <data name="PhaseSwitchMode_Phases3" xml:space="preserve">
+	  <value>Nur dreiphasig</value>
+  </data>
+  <data name="PhaseSwitchPower" xml:space="preserve">
+	  <value>Phasenumschaltleistung</value>
+  </data>
+  <data name="MinimumTimeBetweenPhaseSwitches" xml:space="preserve">
+	  <value>Mindestzeit zwischen Phasenumschaltungen</value>
+  </data>
+  <data name="PhaseSwitchTriggerTime" xml:space="preserve">
+	  <value>Phasenumschaltlatenz</value>
+  </data>
 </root>

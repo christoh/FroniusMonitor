@@ -85,6 +85,7 @@
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
+
                         <TextBlock Grid.Column="0" Grid.Row="2" Text="{x:Static p:Resources.ChargingLogic}"/>
                         <TextBlock Grid.Column="1" Grid.Row="2" Text=":"/>
                         <ComboBox Grid.Column="2" Grid.Row="2" MinWidth="250" ItemsSource="{Binding ChargingLogicList}" SelectedItem="{Binding WattPilot.ChargingLogic}">
@@ -94,6 +95,7 @@
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
+
                         <TextBlock Grid.Column="0" Grid.Row="3" Text="{x:Static p:Resources.ApiKey}"/>
                         <TextBlock Grid.Column="1" Grid.Row="3" Text=":"/>
                         <c:PasswordBox Grid.Column="2" Grid.Row="3" MinWidth="250" Password="{Binding WattPilot.CloudAccessKey}"/>
@@ -118,14 +120,38 @@
             </GroupBox>
 
             <GroupBox Margin="8,0,8,4" Header="{x:Static p:Resources.CarSettings}">
-                <StackPanel Margin="8" Grid.IsSharedSizeScope="True" ToolTip="{x:Static p:Resources.MinimumChargingCurrent_ToolTip}">
+                <StackPanel Margin="8" Grid.IsSharedSizeScope="True">
 
                     <CheckBox IsChecked="{Binding RequiresChargingInterval}" Content="{x:Static p:Resources.RequiresChargingInterval}"/>
                     <CheckBox IsChecked="{Binding WattPilot.AllowChargingPause}" Content="{x:Static p:Resources.AllowChargingPause}"/>
                     <CheckBox IsChecked="{Binding WattPilot.SimulateUnplugging}" Content="{x:Static p:Resources.SimulateUnplugging}"
                               Visibility="{Binding WattPilot.AllowChargingPause, Converter={co:Bool2Visibility}}"/>
 
-                    <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center">
+                    <Grid Margin="0,8,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="G1"/>
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="G2"/>
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="G3"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Column="0" Grid.Row="0" Text="{x:Static p:Resources.PhaseSwitchMode}" Visibility="{Binding WattPilot.AllowChargingPause, Converter={co:Bool2Visibility}}"/>
+                        <TextBlock Grid.Column="1" Grid.Row="0" Text=":" Visibility="{Binding WattPilot.AllowChargingPause, Converter={co:Bool2Visibility}}"/>
+                        <ComboBox Grid.Column="2" Grid.Row="0" MinWidth="250" ItemsSource="{Binding PhaseSwitchModes}" SelectedItem="{Binding WattPilot.PhaseSwitchMode}"
+                                  Visibility="{Binding WattPilot.AllowChargingPause, Converter={co:Bool2Visibility}}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Margin="0,2,0,0" Height="20" Text="{Binding Converter={co:Enum2DisplayName}}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                    </Grid>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center" ToolTip="{x:Static p:Resources.MinimumChargingCurrent_ToolTip}">
                         <TextBlock Margin="0,0,4,0">
                             <Run Text="{x:Static p:Resources.MinimumChargingCurrent}" /><Run Text=":" />
                         </TextBlock>
@@ -145,6 +171,61 @@
                     </StackPanel>
                     <Slider Value="{Binding WattPilot.MinimumChargingInterval, Mode=TwoWay}" TickFrequency="60000" IsSnapToTickEnabled="True" HorizontalAlignment="Stretch" Minimum="300000" Maximum="14400000"
                             Visibility="{Binding RequiresChargingInterval, Converter={co:Bool2Visibility}}"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center" Visibility="{Binding WattPilot.AllowChargingPause, Converter={co:Bool2Visibility}}">
+                        <TextBlock Margin="0,0,4,0">
+                            <Run Text="{x:Static p:Resources.MinimumPauseDuration}" /><Run Text=":" />
+                        </TextBlock>
+                        <TextBox MinHeight="0" TextAlignment="Center" Width="40"
+                                 Text="{co:ValidationBinding Path=WattPilot.MinimumPauseDuration, Converter={co:Milliseconds2Minutes}, Rule={v:MinMaxIntRule Minimum=0, Maximum=35791}}" />
+                        <TextBlock Margin="4,0,0,0" Text="{x:Static p:Resources.Minutes}" />
+                    </StackPanel>
+                    <Slider Value="{Binding WattPilot.MinimumPauseDuration, Mode=TwoWay}" TickFrequency="60000" IsSnapToTickEnabled="True" HorizontalAlignment="Stretch" Minimum="0" Maximum="1200000"
+                            Visibility="{Binding WattPilot.AllowChargingPause, Converter={co:Bool2Visibility}}"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center" Visibility="{Binding WattPilot.AllowChargingPause, Converter={co:Bool2Visibility}}">
+                        <TextBlock Margin="0,0,4,0">
+                            <Run Text="{x:Static p:Resources.MinimumChargingTime}" /><Run Text=":" />
+                        </TextBlock>
+                        <TextBox MinHeight="0" TextAlignment="Center" Width="40"
+                                 Text="{co:ValidationBinding Path=WattPilot.MinimumChargingTime, Converter={co:Milliseconds2Minutes}, Rule={v:MinMaxIntRule Minimum=0, Maximum=35791}}" />
+                        <TextBlock Margin="4,0,0,0" Text="{x:Static p:Resources.Minutes}" />
+                    </StackPanel>
+                    <Slider Value="{Binding WattPilot.MinimumChargingTime, Mode=TwoWay}" TickFrequency="60000" IsSnapToTickEnabled="True" HorizontalAlignment="Stretch" Minimum="0" Maximum="1200000"
+                            Visibility="{Binding WattPilot.AllowChargingPause, Converter={co:Bool2Visibility}}"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center" Visibility="{Binding WattPilot.AllowPauseAndHasPhaseSwitch, Converter={co:Bool2Visibility}}">
+                        <TextBlock Margin="0,0,4,0">
+                            <Run Text="{x:Static p:Resources.PhaseSwitchPower}" /><Run Text=":" />
+                        </TextBlock>
+                        <TextBox MinHeight="0" TextAlignment="Center" Width="40"
+                                 Text="{co:ValidationBinding Path=WattPilot.PhaseSwitchPower, Rule={v:MinMaxIntRule Minimum=1400, Maximum=7200}}" />
+                        <TextBlock Margin="4,0,0,0" Text="W" />
+                    </StackPanel>
+                    <Slider Value="{Binding WattPilot.PhaseSwitchPower, Mode=TwoWay}" TickFrequency="1" IsSnapToTickEnabled="True" HorizontalAlignment="Stretch" Minimum="1400" Maximum="7200"
+                            Visibility="{Binding WattPilot.AllowPauseAndHasPhaseSwitch, Converter={co:Bool2Visibility}}"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center" Visibility="{Binding WattPilot.AllowPauseAndHasPhaseSwitch, Converter={co:Bool2Visibility}}">
+                        <TextBlock Margin="0,0,4,0">
+                            <Run Text="{x:Static p:Resources.PhaseSwitchTriggerTime}" /><Run Text=":" />
+                        </TextBlock>
+                        <TextBox MinHeight="0" TextAlignment="Center" Width="40"
+                                 Text="{co:ValidationBinding Path=WattPilot.PhaseSwitchTriggerTime, Converter={co:Milliseconds2Minutes}, Rule={v:MinMaxIntRule Minimum=0, Maximum=35791}}" />
+                        <TextBlock Margin="4,0,0,0" Text="{x:Static p:Resources.Minutes}" />
+                    </StackPanel>
+                    <Slider Value="{Binding WattPilot.PhaseSwitchTriggerTime, Mode=TwoWay}" TickFrequency="60000" IsSnapToTickEnabled="True" HorizontalAlignment="Stretch" Minimum="0" Maximum="1200000"
+                            Visibility="{Binding WattPilot.AllowPauseAndHasPhaseSwitch, Converter={co:Bool2Visibility}}"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center" Visibility="{Binding WattPilot.AllowPauseAndHasPhaseSwitch, Converter={co:Bool2Visibility}}">
+                        <TextBlock Margin="0,0,4,0">
+                            <Run Text="{x:Static p:Resources.MinimumTimeBetweenPhaseSwitches}" /><Run Text=":" />
+                        </TextBlock>
+                        <TextBox MinHeight="0" TextAlignment="Center" Width="40"
+                                 Text="{co:ValidationBinding Path=WattPilot.MinimumTimeBetweenPhaseSwitches, Converter={co:Milliseconds2Minutes}, Rule={v:MinMaxIntRule Minimum=0, Maximum=35791}}" />
+                        <TextBlock Margin="4,0,0,0" Text="{x:Static p:Resources.Minutes}" />
+                    </StackPanel>
+                    <Slider Value="{Binding WattPilot.MinimumTimeBetweenPhaseSwitches, Mode=TwoWay}" TickFrequency="60000" IsSnapToTickEnabled="True" HorizontalAlignment="Stretch" Minimum="0" Maximum="1200000"
+                            Visibility="{Binding WattPilot.AllowPauseAndHasPhaseSwitch, Converter={co:Bool2Visibility}}"/>
 
                 </StackPanel>
             </GroupBox>
