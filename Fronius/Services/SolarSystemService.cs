@@ -255,8 +255,8 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
         try
         {
-            var newSolarData = false;
-            var newFritzBoxData = false;
+            bool newSolarData;
+            bool newFritzBoxData;
             if (SolarSystem?.PrimaryInverter == null || SolarSystem.Versions == null || SolarSystem.Components == null)
             {
                 SolarSystem = await CreateSolarSystem(null, null).ConfigureAwait(false);
