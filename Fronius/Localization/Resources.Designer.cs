@@ -817,6 +817,42 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Forced charge.
+        /// </summary>
+        public static string ForcedCharge {
+            get {
+                return ResourceManager.GetString("ForcedCharge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Don&apos;t force.
+        /// </summary>
+        public static string ForcedCharge_Default {
+            get {
+                return ResourceManager.GetString("ForcedCharge_Default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Force pause.
+        /// </summary>
+        public static string ForcedCharge_ForcedOff {
+            get {
+                return ResourceManager.GetString("ForcedCharge_ForcedOff", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Force charge.
+        /// </summary>
+        public static string ForcedCharge_ForcedOn {
+            get {
+                return ResourceManager.GetString("ForcedCharge_ForcedOn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to F.
         /// </summary>
         public static string Friday_One {
@@ -1402,7 +1438,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Pause (energy price).
+        ///   Looks up a localized string similar to Pause (Eco).
         /// </summary>
         public static string ModelStatus_NotChargingBecauseFallbackAwattar {
             get {

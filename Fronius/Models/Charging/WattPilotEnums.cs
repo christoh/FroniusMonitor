@@ -78,17 +78,24 @@ public enum ChargingLogic : byte
     NextTrip = 5,
 }
 
+public enum ForcedCharge
+{
+    Default = 0,
+    ForcedOff = 1,
+    ForcedOn = 2,
+}
+
 public enum AwattarCountry : byte
 {
     Austria = 0,
     Germany = 1,
 }
 
-public enum EcoRoundingMode:byte
+public enum EcoRoundingMode : byte
 {
-    PreferFromGrid=0,
-    NoPreference=1,
-    PreferToGrid=2,
+    PreferFromGrid = 0,
+    NoPreference = 1,
+    PreferToGrid = 2,
 }
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]

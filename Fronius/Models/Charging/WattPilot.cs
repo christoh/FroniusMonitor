@@ -569,7 +569,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     private bool? isChargingAllowed;
 
     /// <summary>
-    ///     Read-only: All prerequisites met (RFID auth, <see cref="EnableCharging" />, etc.)
+    ///     Read-only: All prerequisites met (RFID auth, <see cref="ButtonEnableCharging" />, etc.)
     /// </summary>
     [WattPilot("alw")]
     public bool? IsChargingAllowed
@@ -578,16 +578,24 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref isChargingAllowed, value);
     }
 
-    private bool? enableCharging;
+    private bool? buttonEnableCharging;
 
     /// <summary>
     ///     Read-write: Allow/Disallow charging
     /// </summary>
     [WattPilot("bac", false)]
-    public bool? EnableCharging
+    public bool? ButtonEnableCharging
     {
-        get => enableCharging;
-        set => Set(ref enableCharging, value);
+        get => buttonEnableCharging;
+        set => Set(ref buttonEnableCharging, value);
+    }
+
+    private ForcedCharge forcedCharge;
+    [WattPilot("frc", false)]
+    public ForcedCharge ForcedCharge
+    {
+        get => forcedCharge;
+        set => Set(ref forcedCharge, value);
     }
 
     private double? totalEnergy;

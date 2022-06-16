@@ -748,7 +748,7 @@
 	  <value>Pause (Go-E-Strompreis)</value>
   </data>
   <data name="ModelStatus_NotChargingBecauseFallbackAwattar" xml:space="preserve">
-	  <value>Pause (Strompreis)</value>
+	  <value>Pause (Eco)</value>
   </data>
   <data name="ModelStatus_NotChargingBecauseFallbackAutomaticStop" xml:space="preserve">
 	  <value>Pause (Fallback nächste Reise)</value>
@@ -917,5 +917,17 @@
   </data>
   <data name="PhaseSwitchTriggerTime" xml:space="preserve">
 	  <value>Phasenumschaltlatenz</value>
+  </data>
+  <data name="ForcedCharge" xml:space="preserve">
+	  <value>Erzwungenes Laden</value>
+  </data>
+  <data name="ForcedCharge_Default" xml:space="preserve">
+	  <value>Nichts erzwingen</value>
+  </data>
+  <data name="ForcedCharge_ForcedOn" xml:space="preserve">
+	  <value>Laden erwzingen</value>
+  </data>
+  <data name="ForcedCharge_ForcedOff" xml:space="preserve">
+	  <value>Pause erzwingen</value>
   </data>
 </root>

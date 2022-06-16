@@ -763,7 +763,7 @@
 	  <value>Pause (Go-E energy price)</value>
   </data>
   <data name="ModelStatus_NotChargingBecauseFallbackAwattar" xml:space="preserve">
-	  <value>Pause (energy price)</value>
+	  <value>Pause (Eco)</value>
   </data>
   <data name="ModelStatus_NotChargingBecauseFallbackAutomaticStop" xml:space="preserve">
 	  <value>Pause (fallback next trip)</value>
@@ -935,5 +935,17 @@
   </data>
   <data name="PhaseSwitchTriggerTime" xml:space="preserve">
 	  <value>Phase switch latency</value>
+  </data>
+  <data name="ForcedCharge" xml:space="preserve">
+	  <value>Forced charge</value>
+  </data>
+  <data name="ForcedCharge_Default" xml:space="preserve">
+	  <value>Don't force</value>
+  </data>
+  <data name="ForcedCharge_ForcedOn" xml:space="preserve">
+	  <value>Force charge</value>
+  </data>
+  <data name="ForcedCharge_ForcedOff" xml:space="preserve">
+	  <value>Force pause</value>
   </data>
 </root>
