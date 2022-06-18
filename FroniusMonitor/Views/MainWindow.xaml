@@ -41,9 +41,9 @@
                 <MenuItem Header="{x:Static p:Resources.View}">
                     <MenuItem Header="_Auto-fit" Click="OnAutoSizeChecked" />
                     <MenuItem Header="{x:Static p:Resources.Events}" Click="ShowEventLog" Icon="{vi:EventLogIcon}" />
-                    <MenuItem Visibility="{Binding Settings.FritzBoxConnection, Converter={co:ShowFritzBoxIcon}}" Header="{x:Static p:Resources.ShowAvm}" IsChecked="{Binding Settings.HaveFritzBox, Mode=TwoWay}" IsCheckable="True" Icon="{vi:FritzLogo}" Checked="OnShowAvmChanged" Unchecked="OnShowAvmChanged"/>
+                    <MenuItem Visibility="{Binding Settings.FritzBoxConnection, Converter={co:ShowFritzBoxIcon}}" Header="{x:Static p:Resources.ShowAvm}" IsChecked="{Binding Settings.ShowFritzBox, Mode=TwoWay}" IsCheckable="True" Icon="{vi:FritzLogo}" Checked="OnShowAvmChanged" Unchecked="OnShowAvmChanged"/>
                 </MenuItem>
-                <MenuItem Header="WattPilot" Visibility="{Binding SolarSystemService.SolarSystem.WattPilot, Converter={co:NullToVisibility}, FallbackValue=Collapsed}">
+                <MenuItem Header="Wattpilot" Visibility="{Binding SolarSystemService.SolarSystem.WattPilot, Converter={co:NullToVisibility}, FallbackValue=Collapsed}">
                     <MenuItem Header="{x:Static p:Resources.Settings}" Click="ShowWattPilotSettings" Icon="{vi:ChargingTrafficSign}"/>
                     <MenuItem Header="{x:Static p:Resources.DownloadChargeLog}" Command="{Binding DownloadChargeLogCommand}" Visibility="{Binding SolarSystemService.SolarSystem.WattPilot.DownloadLink, FallbackValue=Collapsed, Converter={co:NullToVisibility}}"/>
                 </MenuItem>
@@ -63,9 +63,10 @@
             <MenuItem Header="{x:Static p:Resources.Settings}" Click="ShowSettings" Icon="{vi:SettingsIcon}"/>
             <MenuItem Header="{x:Static p:Resources.Modbus}" Click="ShowModbusSettings" Icon="{vi:ModbusLogo}" Visibility="{Binding SolarSystemService.SolarSystem.Gen24System, FallbackValue=Collapsed, Converter={co:NullToVisibility}}" />
             <MenuItem Header="{x:Static p:Resources.EnergyFlow}" Icon="{vi:EnergyFLow}" Click="ShowSelfConsumptionOptimization" Visibility="{Binding SolarSystemService.SolarSystem.Gen24System, FallbackValue=Collapsed, Converter={co:NullToVisibility}}" />
-            <MenuItem Visibility="{Binding Settings.FritzBoxConnection, Converter={co:ShowFritzBoxIcon}}" Header="{x:Static p:Resources.ShowAvm}" IsChecked="{Binding Settings.HaveFritzBox, Mode=TwoWay}" IsCheckable="True" Icon="{vi:FritzLogo}" Checked="OnShowAvmChanged" Unchecked="OnShowAvmChanged"/>
+            <MenuItem Visibility="{Binding Settings.FritzBoxConnection, Converter={co:ShowFritzBoxIcon}}" Header="{x:Static p:Resources.ShowAvm}" IsChecked="{Binding Settings.ShowFritzBox, Mode=TwoWay}" IsCheckable="True" Icon="{vi:FritzLogo}" Checked="OnShowAvmChanged" Unchecked="OnShowAvmChanged"/>
+            <MenuItem Header="WattPilot" Click="ShowWattPilot"  Icon="{vi:ChargingTrafficSign}" Visibility="{Binding Settings.HaveWattPilot, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}" IsCheckable="True" IsChecked="{Binding Settings.ShowWattPilot}"/>
             <MenuItem Header="{x:Static p:Resources.Events}" Click="ShowEventLog" Icon="{vi:EventLogIcon}"  Visibility="{Binding SolarSystemService.SolarSystem.Gen24System, FallbackValue=Collapsed, Converter={co:NullToVisibility}}" />
-            <MenuItem Header="WattPilot" Click="ShowWattPilotSettings" Icon="{vi:ChargingTrafficSign}" Visibility="{Binding SolarSystemService.SolarSystem.WattPilot, Converter={co:NullToVisibility}, FallbackValue=Collapsed}"/>
+            <MenuItem Header="{x:Static p:Resources.Settings}" Click="ShowWattPilotSettings" Icon="{vi:ChargingTrafficSignSettings}" Visibility="{Binding WattPilotService.WattPilot, Converter={co:NullToVisibility}, FallbackValue=Collapsed}" />
         </StackPanel>
 
         <Viewbox Grid.Row="2" Grid.Column="0" Margin="16,16,0,16">
@@ -80,7 +81,32 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <Grid Grid.Row="0" Grid.Column="1" Visibility="{Binding SolarSystemService.SolarSystem.WattPilot, Converter={co:NullToVisibility}, FallbackValue=Collapsed}">
+                <Grid Grid.Row="0" Grid.Column="1">
+                    <Grid.LayoutTransform>
+                        <ScaleTransform x:Name="WattPilotTransform" ScaleX="0" ScaleY="{Binding ElementName=WattPilotTransform, Path=ScaleX}"></ScaleTransform>
+                    </Grid.LayoutTransform>
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Settings.ShowWattPilot}" Value="True">
+                                    <DataTrigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation From="0" To="1" Duration="00:00:00.2" Storyboard.Target="{Binding Source={x:Reference WattPilotTransform}}" Storyboard.TargetProperty="ScaleX"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </DataTrigger.EnterActions>
+                                    <DataTrigger.ExitActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation From="1" To="0" Duration="00:00:00.2" Storyboard.Target="{Binding Source={x:Reference WattPilotTransform}}" Storyboard.TargetProperty="ScaleX"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </DataTrigger.ExitActions>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
@@ -156,6 +182,7 @@
                 <MultiBinding Converter="{co:ShowFritzBoxIcon}">
                     <Binding Path="Settings.FritzBoxConnection"/>
                     <Binding Path="Settings.HaveFritzBox"/>
+                    <Binding Path="Settings.ShowFritzBox"/>
                 </MultiBinding>
             </GridSplitter.Visibility>
         </GridSplitter>
@@ -171,7 +198,7 @@
             <ScrollViewer.Style>
                 <Style TargetType="ScrollViewer">
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Settings.HaveFritzBox}" Value="True">
+                        <DataTrigger Binding="{Binding Settings.ShowFritzBox}" Value="True">
                             <DataTrigger.EnterActions>
                                 <BeginStoryboard>
                                     <Storyboard>

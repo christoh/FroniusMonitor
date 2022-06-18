@@ -6,11 +6,13 @@ public abstract class SettingsViewModelBase : ViewModelBase
 {
     protected readonly IWebClientService WebClientService;
     protected readonly IGen24JsonService Gen24Service;
+    protected readonly IWattPilotService WattPilotService;
 
-    protected SettingsViewModelBase(IWebClientService webClientService, IGen24JsonService gen24Service)
+    protected SettingsViewModelBase(IWebClientService webClientService, IGen24JsonService gen24Service, IWattPilotService wattPilotService)
     {
         WebClientService = webClientService;
         Gen24Service = gen24Service;
+        WattPilotService = wattPilotService;
     }
 
     private string toastText = string.Empty;

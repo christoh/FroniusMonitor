@@ -930,4 +930,7 @@
   <data name="ForcedCharge_ForcedOff" xml:space="preserve">
 	  <value>Pause erzwingen</value>
   </data>
+  <data name="ControlWattPilot" xml:space="preserve">
+	  <value>Einen mit dem Wechselrichter verbundenen Wattpiloten steuern</value>
+  </data>
 </root>

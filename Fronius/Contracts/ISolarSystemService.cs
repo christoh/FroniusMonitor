@@ -3,6 +3,7 @@
     public interface ISolarSystemService
     {
         SolarSystem? SolarSystem { get; }
+        WebConnection? WattPilotConnection { get; set; }
         public double GridPowerSum { get; }
         public double LoadPowerSum { get; }
         public double SolarPowerSum { get; }
@@ -19,7 +20,7 @@
 
         event EventHandler<SolarDataEventArgs>? NewDataReceived;
 
-        Task Start(WebConnection? inverterConnection, WebConnection? fritzBoxConnection);
+        Task Start(WebConnection? inverterConnection, WebConnection? fritzBoxConnection, WebConnection? wattPilotConnection);
         void Stop();
         void SuspendPowerConsumers();
         void ResumePowerConsumers();

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Accessibility;
 
 namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
@@ -43,7 +44,13 @@ public class MainViewModel : ViewModelBase
     internal override async Task OnInitialize()
     {
         await base.OnInitialize().ConfigureAwait(false);
-        await SolarSystemService.Start(App.Settings.FroniusConnection, App.Settings.HaveFritzBox ? App.Settings.FritzBoxConnection : null).ConfigureAwait(false);
+
+        await SolarSystemService.Start
+        (
+            App.Settings.FroniusConnection,
+            App.Settings.HaveFritzBox && App.Settings.ShowFritzBox ? App.Settings.FritzBoxConnection : null,
+            App.Settings.HaveWattPilot && App.Settings.ShowWattPilot ? App.Settings.WattPilotConnection : null
+        ).ConfigureAwait(false);
     }
 
     internal void FritzBoxVisibilityChanged(bool isVisible)
@@ -55,6 +62,12 @@ public class MainViewModel : ViewModelBase
             SolarSystemService.InvalidateFritzBox();
         }
 
+        _ = Settings.Save();
+    }
+
+    internal void WattPilotVisibilityChanged(bool isVisible)
+    {
+        SolarSystemService.WattPilotConnection = isVisible ? App.Settings.WattPilotConnection : null;
         _ = Settings.Save();
     }
 
@@ -104,7 +117,12 @@ public class MainViewModel : ViewModelBase
         }
         finally
         {
-            await SolarSystemService.Start(App.Settings.FroniusConnection, App.Settings.HaveFritzBox ? App.Settings.FritzBoxConnection : null).ConfigureAwait(false);
+            await SolarSystemService.Start
+            (
+                App.Settings.FroniusConnection,
+                App.Settings.HaveFritzBox && App.Settings.ShowFritzBox ? App.Settings.FritzBoxConnection : null,
+                App.Settings.HaveWattPilot && App.Settings.ShowWattPilot ? App.Settings.WattPilotConnection : null
+            ).ConfigureAwait(false);
         }
     }
 

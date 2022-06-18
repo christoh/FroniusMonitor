@@ -37,7 +37,16 @@ public class WebConnection : BindableBase, ICloneable
     public string Password
     {
         get => password;
-        set => Set(ref password, value);
+        set => Set(ref password, value, () => calculatedChecksum = null);
+    }
+
+    private string? passwordChecksum;
+
+    [XmlAttribute, DefaultValue(null)]
+    public string? PasswordChecksum
+    {
+        get => passwordChecksum;
+        set => Set(ref passwordChecksum, value);
     }
 
     [DefaultValue(""), XmlAttribute("Password")]
@@ -67,6 +76,24 @@ public class WebConnection : BindableBase, ICloneable
             catch
             {
                 Password = string.Empty;
+            }
+        }
+    }
+
+
+    private string? calculatedChecksum;
+
+    [XmlIgnore]
+    public string CalculatedChecksum
+    {
+        get
+        {
+            return calculatedChecksum ??= CalculateChecksum();
+
+            string CalculateChecksum()
+            {
+                using var deriveBytes = new Rfc2898DeriveBytes(Encoding.UTF8.GetBytes(Password), aes.Key, 131072, HashAlgorithmName.SHA256);
+                return Convert.ToBase64String(deriveBytes.GetBytes(8));
             }
         }
     }

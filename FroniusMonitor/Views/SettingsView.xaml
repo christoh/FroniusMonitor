@@ -8,11 +8,11 @@
         xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
         xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
         mc:Ignorable="d"
-        d:DesignHeight="450" d:DesignWidth="800" MinWidth="480" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize"
+        MinWidth="480" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize"
         d:DataContext="{d:DesignInstance Type={x:Type vm:SettingsViewModel}}"
         Title="{x:Static p:Resources.Settings}">
-    <Grid Margin="16">
-        <Grid.Resources>
+    <StackPanel Margin="16">
+        <StackPanel.Resources>
             <Style TargetType="Button">
                 <Setter Property="Margin" Value="0,0,8,0" />
                 <Setter Property="MinHeight" Value="30" />
@@ -41,15 +41,9 @@
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="VerticalContentAlignment" Value="Center" />
             </Style>
-        </Grid.Resources>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+        </StackPanel.Resources>
 
-        <GroupBox Grid.Row="0" Header="{x:Static p:Resources.Language}">
+        <GroupBox Header="{x:Static p:Resources.Language}">
             <ComboBox Margin="8" ItemsSource="{Binding Cultures}" SelectedItem="{Binding SelectedCulture}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
@@ -60,7 +54,7 @@
         </GroupBox>
 
 
-        <GroupBox Grid.Row="1" Margin="0,8,0,0" Header="{x:Static p:Resources.Gen24InverterHeader}">
+        <GroupBox Margin="0,8,0,0" Header="{x:Static p:Resources.Gen24InverterHeader}">
             <Grid Margin="8">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -102,7 +96,43 @@
 
         </GroupBox>
 
-        <GroupBox Grid.Row="2" Margin="0,8,0,0" Header="{x:Static p:Resources.FritzBoxHeader}">
+        <GroupBox Margin="0,8,0,0" Header="{x:Static p:Resources.WattPilotHeader}">
+            <Grid Margin="8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <CheckBox IsChecked="{Binding Settings.HaveWattPilot}" Grid.Row="0" Content="{x:Static p:Resources.ControlWattPilot}" Margin="0,4,0,8" />
+
+                <Grid Grid.Row="1" Visibility="{Binding Settings.HaveWattPilot, Converter={co:Bool2Visibility}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.Url}" Margin="0,8,0,0" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text=":" Margin="4,8,4,0" />
+
+                    <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding Settings.WattPilotConnection.BaseUrl, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.Password}" Margin="0,8,0,0" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text=":" Margin="4,8,4,0" />
+
+                    <c:PasswordBox Grid.Row="1" Grid.Column="2" Template="{StaticResource PasswordBoxTemplate}"
+                                   Password="{Binding Settings.WattPilotConnection.Password, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </Grid>
+            </Grid>
+        </GroupBox>
+
+
+        <GroupBox Margin="0,8,0,0" Header="{x:Static p:Resources.FritzBoxHeader}">
             <Grid Margin="8">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -144,7 +174,7 @@
             </Grid>
         </GroupBox>
 
-        <Grid Grid.Row="3" Margin="0,32,-8,0">
+        <Grid Margin="0,32,-8,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -155,5 +185,5 @@
             <Button Grid.Column="2" Content="{x:Static p:Resources.Ok}" Command="{Binding OkCommand}" IsDefault="True"/>
 
         </Grid>
-    </Grid>
+    </StackPanel>
 </Window>

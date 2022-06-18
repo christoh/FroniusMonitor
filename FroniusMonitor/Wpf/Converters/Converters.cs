@@ -434,14 +434,14 @@ public class ShowFritzBoxIcon : ConverterBase, IMultiValueConverter
 
     public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
     {
-        if (values.Length != 2)
+        if (values.Length != 3)
         {
             return Visibility.Collapsed;
         }
 
         var visibility = (Visibility)Convert(values[0], targetType, parameter, culture);
 
-        return values[1] is true ? visibility : Visibility.Collapsed;
+        return values[1] is true && values[2] is true ? visibility : Visibility.Collapsed;
     }
 
     public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

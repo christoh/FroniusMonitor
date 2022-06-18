@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Models;
+﻿using De.Hochstaetter.Fronius.Extensions;
+
+namespace De.Hochstaetter.FroniusMonitor.Models;
 
 public class Settings : BindableBase, ICloneable
 {
@@ -11,7 +13,7 @@ public class Settings : BindableBase, ICloneable
         set => Set(ref fritzBoxConnection, value);
     }
 
-    private WebConnection? froniusConnection = new() { BaseUrl = "http://192.168.178.XXX", UserName = string.Empty, Password = string.Empty};
+    private WebConnection? froniusConnection = new() { BaseUrl = "http://192.168.178.XXX", UserName = string.Empty, Password = string.Empty };
     [XmlElement, DefaultValue(null)]
     public WebConnection? FroniusConnection
     {
@@ -19,16 +21,48 @@ public class Settings : BindableBase, ICloneable
         set => Set(ref froniusConnection, value);
     }
 
-    private string? language;
+    private WebConnection? wattPilotConnection = new() { BaseUrl = "ws://192.168.178.YYY", Password = string.Empty };
     [XmlElement, DefaultValue(null)]
+    public WebConnection? WattPilotConnection
+    {
+        get => wattPilotConnection;
+        set => Set(ref wattPilotConnection, value);
+    }
+
+    private string? language;
+    [XmlAttribute, DefaultValue(null)]
     public string? Language
     {
         get => language;
         set => Set(ref language, value);
     }
 
+    private bool showFritzBox;
+    [XmlAttribute]
+    public bool ShowFritzBox
+    {
+        get => showFritzBox;
+        set => Set(ref showFritzBox, value);
+    }
+
+    private bool haveWattPilot;
+    [XmlAttribute]
+    public bool HaveWattPilot
+    {
+        get => haveWattPilot;
+        set => Set(ref haveWattPilot, value);
+    }
+
+    private bool showWattPilot;
+    [XmlAttribute]
+    public bool ShowWattPilot
+    {
+        get => showWattPilot;
+        set => Set(ref showWattPilot, value);
+    }
+
     private bool haveFritzBox;
-    [XmlElement]
+    [XmlAttribute]
     public bool HaveFritzBox
     {
         get => haveFritzBox;
@@ -73,6 +107,7 @@ public class Settings : BindableBase, ICloneable
     {
         lock (settingsLockObject)
         {
+            UpdateChecksum(App.Settings.WattPilotConnection, App.Settings.FritzBoxConnection, App.Settings.FroniusConnection);
             var serializer = new XmlSerializer(typeof(Settings));
             Directory.CreateDirectory(App.PerUserDataDir);
             using var stream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None);
@@ -96,6 +131,7 @@ public class Settings : BindableBase, ICloneable
             var serializer = new XmlSerializer(typeof(Settings));
             using var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
             App.Settings = (serializer.Deserialize(stream) as Settings) ?? new Settings();
+            ClearIncorrectPasswords(App.Settings.WattPilotConnection, App.Settings.FritzBoxConnection, App.Settings.FroniusConnection);
         }
     }).ConfigureAwait(false);
 
@@ -103,9 +139,22 @@ public class Settings : BindableBase, ICloneable
 
     public object Clone()
     {
-        var clone=(Settings)MemberwiseClone();
+        var clone = (Settings)MemberwiseClone();
         clone.FritzBoxConnection = (WebConnection)clone.FritzBoxConnection?.Clone()!;
-        clone.FroniusConnection= (WebConnection)clone.FroniusConnection?.Clone()!;
+        clone.FroniusConnection = (WebConnection)clone.FroniusConnection?.Clone()!;
         return clone;
+    }
+
+    private static void UpdateChecksum(params WebConnection?[] connections)
+    {
+        connections.Where(connection => connection != null).Apply(connection =>
+        {
+            connection!.PasswordChecksum = connection.CalculatedChecksum;
+        });
+    }
+
+    private static void ClearIncorrectPasswords(params WebConnection?[] connections)
+    {
+        connections.Where(connection => connection != null && connection.PasswordChecksum != connection.CalculatedChecksum).Apply(connection => connection!.Password = string.Empty);
     }
 }

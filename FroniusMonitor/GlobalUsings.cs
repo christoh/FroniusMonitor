@@ -2,8 +2,11 @@
 
 global using System;
 global using System.ComponentModel;
+global using System.ComponentModel.Design;
+global using System.Diagnostics.CodeAnalysis;
 global using System.Globalization;
 global using System.IO;
+global using System.Runtime.InteropServices;
 global using System.Text;
 global using System.Text.RegularExpressions;
 global using System.Windows;
@@ -36,3 +39,4 @@ global using De.Hochstaetter.FroniusMonitor.Wpf.Commands;
 global using Microsoft.Win32;
 global using Newtonsoft.Json.Linq;
 global using Unity;
+global using SingleThreadedApartment = System.Diagnostics.DebuggerNonUserCodeAttribute;

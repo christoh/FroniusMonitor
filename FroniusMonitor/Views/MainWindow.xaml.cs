@@ -274,4 +274,11 @@ public partial class MainWindow
         }
     }
 
+    private void ShowWattPilot(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem showAvm)
+        {
+            ViewModel.WattPilotVisibilityChanged(showAvm.IsChecked);
+        }
+    }
 }

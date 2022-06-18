@@ -28,6 +28,14 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         private set => Set(ref solarSystem, value);
     }
 
+    private WebConnection? wattPilotConnection;
+
+    public WebConnection? WattPilotConnection
+    {
+        get => wattPilotConnection;
+        set => Set(ref wattPilotConnection, value);
+    }
+
     private string lastConnectionError = string.Empty;
 
     public string LastConnectionError
@@ -77,9 +85,11 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         NotifyOfPropertyChange(nameof(Efficiency));
     }
 
-    public async Task Start(WebConnection? inverterConnection, WebConnection? fritzBoxConnection)
+    [SuppressMessage("ReSharper", "ParameterHidesMember")]
+    public async Task Start(WebConnection? inverterConnection, WebConnection? fritzBoxConnection, WebConnection? wattPilotConnection)
     {
         Stop();
+        WattPilotConnection = wattPilotConnection;
         PowerFlowQueue.Clear();
         NotifyPowerQueueChanged();
         SolarSystem = await CreateSolarSystem(inverterConnection, fritzBoxConnection).ConfigureAwait(false);
@@ -93,6 +103,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
     {
         timer?.Dispose();
         timer = null;
+        WattPilotConnection = null;
     }
 
     public void InvalidateFritzBox()
@@ -224,9 +235,13 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
     private async Task<WattPilot?> TryStartWattPilot()
     {
-        if (wattPilotService.Connection == null)
+        if (wattPilotService.Connection == null && WattPilotConnection != null)
         {
-            await wattPilotService.Start(new WebConnection { BaseUrl = "ws://192.168.44.114", EncryptedPassword = "zx1z6fLYI3BYi+s2ZWPjow==" }).ConfigureAwait(false);
+            await wattPilotService.Start(WattPilotConnection).ConfigureAwait(false);
+        }
+        else if (WattPilotConnection == null)
+        {
+            await wattPilotService.Stop();
         }
 
         return wattPilotService.WattPilot;
@@ -266,7 +281,9 @@ public class SolarSystemService : BindableBase, ISolarSystemService
             else
             {
                 var gen24Task = froniusCounter++ % FroniusUpdateRate == 0 ? TryGetGen24System() : Task.FromResult<Gen24System?>(null);
-                var fritzBoxTask = suspendFritzBoxCounter <= 0 && webClientService.FritzBoxConnection != null && fritzBoxCounter++ % FritzBoxUpdateRate == 0 ? TryGetFritzBoxData() : Task.FromResult<FritzBoxDeviceList?>(null);
+
+                var fritzBoxTask = suspendFritzBoxCounter <= 0 && webClientService.FritzBoxConnection != null &&
+                                   fritzBoxCounter++ % FritzBoxUpdateRate == 0 ? TryGetFritzBoxData() : Task.FromResult<FritzBoxDeviceList?>(null);
                 var wattPilotTask = TryStartWattPilot();
 
                 try

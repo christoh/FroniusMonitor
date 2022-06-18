@@ -502,6 +502,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Control Wattpilot connected to inverter.
+        /// </summary>
+        public static string ControlWattPilot {
+            get {
+                return ResourceManager.GetString("ControlWattPilot", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Credentials.
         /// </summary>
         public static string Credentials {
@@ -2523,6 +2532,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Warning {
             get {
                 return ResourceManager.GetString("Warning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fronius Wattpilot.
+        /// </summary>
+        public static string WattPilotHeader {
+            get {
+                return ResourceManager.GetString("WattPilotHeader", resourceCulture);
             }
         }
         

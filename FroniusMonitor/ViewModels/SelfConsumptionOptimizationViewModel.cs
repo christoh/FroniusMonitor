@@ -8,9 +8,12 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
     private Gen24BatterySettings oldSettings = null!;
     private BindableCollection<Gen24ChargingRule> oldChargingRules = null!;
 
-    public SelfConsumptionOptimizationViewModel(IWebClientService webClientService, IGen24JsonService gen24Service) : base(webClientService, gen24Service)
-    {
-    }
+    public SelfConsumptionOptimizationViewModel
+    (
+        IWebClientService webClientService,
+        IGen24JsonService gen24Service,
+        IWattPilotService wattPilotService
+    ) : base(webClientService, gen24Service, wattPilotService) { }
 
     public IEnumerable<ChargingRuleType> RuleTypes => ruleTypes;
 
@@ -256,7 +259,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
             {
                 if
                 (
-                    error.BindingInError is BindingExpression { Target: FrameworkElement { IsVisible: false } } expression &&
+                    error.BindingInError is BindingExpression {Target: FrameworkElement {IsVisible: false}} expression &&
                     oldSettings.GetType().GetProperty(expression.ResolvedSourcePropertyName) is { } property
                 )
                 {
@@ -266,7 +269,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
             }
 
             var errorList = errors
-                .Where(e => e.BindingInError is BindingExpression { Target: FrameworkElement { IsVisible: true } })
+                .Where(e => e.BindingInError is BindingExpression {Target: FrameworkElement {IsVisible: true}})
                 .Select(e => e.ErrorContent.ToString()).ToList();
 
             for (var i = 0; i < ChargingRules.Count; i++)

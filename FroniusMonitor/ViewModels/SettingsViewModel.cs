@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
+﻿using System.Runtime.CompilerServices;
+
+namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
 public class SettingsViewModel : SettingsViewModelBase
 {
@@ -11,7 +13,18 @@ public class SettingsViewModel : SettingsViewModelBase
         new ListItemModel<string?> {DisplayName = GetCultureName("de-LI"), Value = "de-LI"},
     };
 
-    public SettingsViewModel(IWebClientService webClientService, IGen24JsonService gen24Service) : base(webClientService, gen24Service) { }
+    private readonly ISolarSystemService solarSystemService;
+
+    public SettingsViewModel
+    (
+        IWebClientService webClientService,
+        IGen24JsonService gen24Service,
+        IWattPilotService wattPilotService,
+        ISolarSystemService solarSystemService
+    ) : base(webClientService, gen24Service, wattPilotService)
+    {
+        this.solarSystemService = solarSystemService;
+    }
 
     private ICommand? okCommand;
     public ICommand OkCommand => okCommand ??= new NoParameterCommand(Ok);
@@ -65,6 +78,7 @@ public class SettingsViewModel : SettingsViewModelBase
         IoC.Get<MainWindow>().SettingsView.Close();
         Settings.FroniusConnection!.BaseUrl = FixUrl(Settings.FroniusConnection!.BaseUrl);
         Settings.FritzBoxConnection!.BaseUrl = FixUrl(Settings.FritzBoxConnection!.BaseUrl);
+        Settings.WattPilotConnection!.BaseUrl = FixUrl(Settings.WattPilotConnection!.BaseUrl, true);
 
         if (Settings.Language?.ToUpperInvariant() != SelectedCulture.Value?.ToUpperInvariant())
         {
@@ -81,26 +95,31 @@ public class SettingsViewModel : SettingsViewModelBase
             );
         }
 
-        if (!Settings.HaveFritzBox)
-        {
-            Settings.FritzBoxConnection.BaseUrl = "http://";
-        }
-
         App.Settings = Settings;
         IoC.Get<MainViewModel>().NotifyOfPropertyChange(nameof(Settings));
-        IoC.Get<IWebClientService>().FritzBoxConnection = Settings.HaveFritzBox ? Settings.FritzBoxConnection : null;
-        IoC.Get<IWebClientService>().InverterConnection = Settings.FroniusConnection;
+        WebClientService.FritzBoxConnection = Settings.HaveFritzBox && Settings.ShowFritzBox ? Settings.FritzBoxConnection : null;
+        WebClientService.InverterConnection = Settings.FroniusConnection;
+
+        if (!Settings.HaveWattPilot || !Settings.ShowWattPilot)
+        {
+            Settings.ShowWattPilot = false;
+            solarSystemService.WattPilotConnection = null;
+        }
+        else
+        {
+            solarSystemService.WattPilotConnection=Settings.WattPilotConnection;
+        }
 
         await Settings.Save().ConfigureAwait(false);
 
-        static string FixUrl(string url)
+        static string FixUrl(string url, bool isWebSocket = false)
         {
-            if (!url.StartsWith("http://") && !url.StartsWith("https://"))
+            if (!url.StartsWith(isWebSocket ? "ws://" : "http://") && !url.StartsWith(isWebSocket ? "wss://" : "https://"))
             {
-                url = "http://" + url;
+                url = (isWebSocket ? "ws://" : "http://") + url;
             }
 
-            while (url[^1..] == "/" && url != "http://")
+            while (url[^1..] == "/" && url[^3..] != ":")
             {
                 url = url[..^1];
             }

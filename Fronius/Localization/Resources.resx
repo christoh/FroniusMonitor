@@ -948,4 +948,10 @@
   <data name="ForcedCharge_ForcedOff" xml:space="preserve">
 	  <value>Force pause</value>
   </data>
+  <data name="WattPilotHeader" xml:space="preserve">
+	  <value>Fronius Wattpilot</value>
+  </data>
+  <data name="ControlWattPilot" xml:space="preserve">
+	  <value>Control Wattpilot connected to inverter</value>
+  </data>
 </root>

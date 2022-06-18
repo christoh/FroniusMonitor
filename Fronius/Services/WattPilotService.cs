@@ -9,6 +9,9 @@ public class WattPilotService : BindableBase, IWattPilotService
     private Thread? readThread;
     private readonly List<WattPilotAcknowledge> outstandingAcknowledges = new();
     private readonly byte[] buffer = new byte[8192];
+    private string? hashedPassword;
+    private string? oldEncryptedPassword;
+
 
     private CancellationToken Token => tokenSource?.Token ?? throw new WebSocketException(WebSocketError.ConnectionClosedPrematurely);
 
@@ -17,7 +20,17 @@ public class WattPilotService : BindableBase, IWattPilotService
     public WebConnection? Connection
     {
         get => connection;
-        private set => Set(ref connection, value);
+
+        private set => Set(ref connection, value, null, () =>
+        {
+            if (value?.Password != null && value.EncryptedPassword != oldEncryptedPassword)
+            {
+                oldEncryptedPassword = value.EncryptedPassword;
+                hashedPassword = null;
+            }
+
+            return value;
+        });
     }
 
     public IReadOnlyList<WattPilotAcknowledge> UnsuccessfulWrites
@@ -168,9 +181,13 @@ public class WattPilotService : BindableBase, IWattPilotService
 
     private Task<string> GetHashedPassword() => Task.Run(() =>
     {
-        using var deriveBytes = new Rfc2898DeriveBytes(Encoding.UTF8.GetBytes(Connection?.Password ?? string.Empty), Encoding.UTF8.GetBytes(WattPilot?.SerialNumber ?? string.Empty), 100000, HashAlgorithmName.SHA512);
-        var hash0 = deriveBytes.GetBytes(24);
-        var hashedPassword = Convert.ToBase64String(hash0);
+        if (hashedPassword == null)
+        {
+            using var deriveBytes = new Rfc2898DeriveBytes(Encoding.UTF8.GetBytes(Connection?.Password ?? string.Empty), Encoding.UTF8.GetBytes(WattPilot?.SerialNumber ?? string.Empty), 100000, HashAlgorithmName.SHA512);
+            var hash0 = deriveBytes.GetBytes(24);
+            hashedPassword = Convert.ToBase64String(hash0);
+        }
+
         return hashedPassword;
     }, Token);
 
@@ -288,7 +305,7 @@ public class WattPilotService : BindableBase, IWattPilotService
 
         lock (outstandingAcknowledges)
         {
-            outstandingAcknowledges.Add(new WattPilotAcknowledge {RequestId = id, PropertyInfo = propertyInfo, Value = value});
+            outstandingAcknowledges.Add(new WattPilotAcknowledge { RequestId = id, PropertyInfo = propertyInfo, Value = value });
         }
     }
 
