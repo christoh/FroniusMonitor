@@ -1,6 +1,4 @@
-﻿using System.Net;
-
-namespace De.Hochstaetter.FroniusMonitor.ViewModels;
+﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
 public abstract class SettingsViewModelBase : ViewModelBase
 {
