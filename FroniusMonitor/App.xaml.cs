@@ -1,4 +1,5 @@
-﻿using De.Hochstaetter.FroniusMonitor.Models.CarCharging;
+﻿using System.Diagnostics;
+using De.Hochstaetter.FroniusMonitor.Models.CarCharging;
 
 namespace De.Hochstaetter.FroniusMonitor;
 
@@ -6,8 +7,9 @@ public partial class App
 {
     public const double ZoomFactor = 1.025;
     public static string AppName => "FroniusMonitor";
-    public static string PerUserDataDir => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Hochstätter", AppName);
+    public static string PerUserDataDir => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Hochstätter", AppName);
     public static string SettingsFileName => Path.Combine(PerUserDataDir, "Settings.fms");
+    public static Timer? SolarSystemQueryTimer;
 
     public static readonly IUnityContainer Container = new UnityContainer();
 

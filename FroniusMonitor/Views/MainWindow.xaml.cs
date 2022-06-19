@@ -19,6 +19,15 @@ public partial class MainWindow
 
     public MainWindow(MainViewModel vm)
     {
+        Initialized += (_, _) =>
+        {
+            if (App.Settings.MainWindowSize is {IsEmpty: false})
+            {
+                Width = App.Settings.MainWindowSize.Value.Width;
+                Height = App.Settings.MainWindowSize.Value.Height;
+            }
+        };
+
         InitializeComponent();
 
         DataContext = vm;
@@ -29,6 +38,15 @@ public partial class MainWindow
             var binding = new Binding($"{nameof(ViewModel.SolarSystemService)}.{nameof(ViewModel.SolarSystemService.SolarSystem)}.{nameof(ViewModel.SolarSystemService.SolarSystem.Gen24System)}.{nameof(ViewModel.SolarSystemService.SolarSystem.Gen24System.PowerFlow)}");
             SetBinding(PowerFlowProperty, binding);
             await ViewModel.OnInitialize().ConfigureAwait(false);
+        };
+
+        SizeChanged += async (_, e) =>
+        {
+            if (IsLoaded)
+            {
+                App.Settings.MainWindowSize = e.NewSize;
+                await Settings.Save().ConfigureAwait(false);
+            }
         };
     }
 

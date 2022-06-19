@@ -65,6 +65,8 @@ public class WattPilotService : BindableBase, IWattPilotService
             tokenSource = new CancellationTokenSource(10000);
             Connection = connection;
             clientWebSocket = new ClientWebSocket();
+            clientWebSocket.Options.KeepAliveInterval = TimeSpan.FromMinutes(2);
+            clientWebSocket.Options.DangerousDeflateOptions = new WebSocketDeflateOptions();
             await clientWebSocket.ConnectAsync(new Uri(connection.BaseUrl + "/ws"), Token).ConfigureAwait(false);
             Token.ThrowIfCancellationRequested();
 
@@ -161,7 +163,7 @@ public class WattPilotService : BindableBase, IWattPilotService
 
         if (clientWebSocket == null) throw new WebSocketException(WebSocketError.ConnectionClosedPrematurely);
 
-        await clientWebSocket.SendAsync(Encoding.UTF8.GetBytes(authMessage), WebSocketMessageType.Text, true, Token).ConfigureAwait(false);
+        await clientWebSocket.SendAsync(Encoding.UTF8.GetBytes(authMessage), WebSocketMessageType.Text,WebSocketMessageFlags.DisableCompression|WebSocketMessageFlags.EndOfMessage, Token).ConfigureAwait(false);
         Token.ThrowIfCancellationRequested();
         var result = await clientWebSocket.ReceiveAsync(buffer, Token).ConfigureAwait(false);
 

@@ -13,6 +13,14 @@ public class Settings : BindableBase, ICloneable
         set => Set(ref fritzBoxConnection, value);
     }
 
+    private Size? mainWindowSize;
+    [DefaultValue(null),XmlElement("WindowSize")]
+    public Size? MainWindowSize
+    {
+        get => mainWindowSize;
+        set => Set(ref mainWindowSize, value);
+    }
+
     private WebConnection? froniusConnection = new() { BaseUrl = "http://192.168.178.XXX", UserName = string.Empty, Password = string.Empty };
     [XmlElement, DefaultValue(null)]
     public WebConnection? FroniusConnection
@@ -128,9 +136,11 @@ public class Settings : BindableBase, ICloneable
     {
         lock (settingsLockObject)
         {
+            App.SolarSystemQueryTimer = new(_ => { Environment.Exit(0); }, null, 2000, -1);
             var serializer = new XmlSerializer(typeof(Settings));
             using var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-            App.Settings = (serializer.Deserialize(stream) as Settings) ?? new Settings();
+            App.Settings = serializer.Deserialize(stream) as Settings ?? new Settings();
+            App.SolarSystemQueryTimer?.Dispose();
             ClearIncorrectPasswords(App.Settings.WattPilotConnection, App.Settings.FritzBoxConnection, App.Settings.FroniusConnection);
         }
     }).ConfigureAwait(false);

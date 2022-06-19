@@ -35,39 +35,39 @@ internal class RegExRuleExtension : MarkupExtension
     public override object ProvideValue(IServiceProvider serviceProvider) => new RegexRule(Pattern, Message);
 }
 
-public class MinMaxFloatRule : ValidationRule
-{
-    private readonly float minimum;
-    private readonly float maximum;
+//public class MinMaxFloatRule : ValidationRule
+//{
+//    private readonly float minimum;
+//    private readonly float maximum;
 
-    public MinMaxFloatRule(float minimum, float maximum)
-    {
-        this.minimum = minimum;
-        this.maximum = maximum;
-    }
+//    public MinMaxFloatRule(float minimum, float maximum)
+//    {
+//        this.minimum = minimum;
+//        this.maximum = maximum;
+//    }
 
-    public override ValidationResult Validate(object value, CultureInfo cultureInfo)
-    {
-        if (value is not string text)
-        {
-            return new ValidationResult(false, $"Must bind to {nameof(String)}");
-        }
+//    public override ValidationResult Validate(object value, CultureInfo cultureInfo)
+//    {
+//        if (value is not string text)
+//        {
+//            return new ValidationResult(false, $"Must bind to {nameof(String)}");
+//        }
 
-        if (!float.TryParse(text, NumberStyles.Any, CultureInfo.CurrentCulture, out var floatValue) || floatValue < minimum || floatValue > maximum)
-        {
-            return new ValidationResult(false, string.Format(Resources.MustBeBetween, minimum, maximum));
-        }
+//        if (!float.TryParse(text, NumberStyles.Any, CultureInfo.CurrentCulture, out var floatValue) || floatValue < minimum || floatValue > maximum)
+//        {
+//            return new ValidationResult(false, string.Format(Resources.MustBeBetween, minimum, maximum));
+//        }
 
-        return ValidationResult.ValidResult;
-    }
-}
+//        return ValidationResult.ValidResult;
+//    }
+//}
 
-public class MinMaxFloatRuleExtension:MarkupExtension
-{
-    public float Minimum { get; set; } = float.MinValue;
-    public float Maximum { get; set; } = float.MaxValue;
-    public override object ProvideValue(IServiceProvider serviceProvider) => new MinMaxFloatRule(Minimum, Maximum);
-}
+//public class MinMaxFloatRuleExtension:MarkupExtension
+//{
+//    public float Minimum { get; set; } = float.MinValue;
+//    public float Maximum { get; set; } = float.MaxValue;
+//    public override object ProvideValue(IServiceProvider serviceProvider) => new MinMaxFloatRule(Minimum, Maximum);
+//}
 
 public class MinMaxIntRule : ValidationRule
 {

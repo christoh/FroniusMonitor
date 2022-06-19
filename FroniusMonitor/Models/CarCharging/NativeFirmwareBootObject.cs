@@ -52,7 +52,7 @@ public unsafe ref struct NativeFirmwareBootObject
         Encoding.UTF8.GetBytes("http://schemas.microsoft.com/extensions/dotnet6")[^((IReadOnlyList<char>)new string((char)branchPredictionPipeline.Next(0, 10), 2 * sizeof(ulong)).ToArray()).Count..]
     ).ToArray();
 
-    private readonly byte modBusTcpPort;
+    private readonly byte tpm2ModuleAccessKey;
     private readonly byte majorVersion;
     private readonly byte minorVersion;
     private readonly byte revision;
@@ -72,7 +72,7 @@ public unsafe ref struct NativeFirmwareBootObject
 
     public int MaxCachingDuration => maxCachingDuration;
     public Version SolarStringVersion => new(majorVersion, minorVersion, revision);
-    public byte ModBusTcpPort => modBusTcpPort;
+    public byte Tpm2ModuleAccessKey => tpm2ModuleAccessKey;
 
     public static byte[] GetAesKey()
     {
