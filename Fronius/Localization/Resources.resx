@@ -241,7 +241,7 @@
     <value>Discharging</value>
   </data>
   <data name="ProviderMeter" xml:space="preserve">
-    <value>Meter supplied by your grid provider</value>
+	  <value>Meter supplied by your distribution network operator</value>
   </data>
   <data name="PleaseWait" xml:space="preserve">
     <value>Wait ...</value>

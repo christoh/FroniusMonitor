@@ -1,7 +1,4 @@
-﻿using System.Diagnostics;
-using Accessibility;
-
-namespace De.Hochstaetter.FroniusMonitor.ViewModels;
+﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
 public class MainViewModel : ViewModelBase
 {
@@ -75,7 +72,7 @@ public class MainViewModel : ViewModelBase
     {
         var link = SolarSystemService.SolarSystem?.WattPilot?.DownloadLink;
         if (link == null) return;
-        Process.Start(new ProcessStartInfo { FileName = link, UseShellExecute = true });
+        Process.Start(new ProcessStartInfo {FileName = link, UseShellExecute = true});
     }
 
     private async void LoadSettings()

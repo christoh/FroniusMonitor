@@ -1843,7 +1843,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Meter supplied by your grid provider.
+        ///   Looks up a localized string similar to Meter supplied by your distribution network operator.
         /// </summary>
         public static string ProviderMeter {
             get {

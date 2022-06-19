@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using De.Hochstaetter.FroniusMonitor.Models.CarCharging;
+﻿using De.Hochstaetter.FroniusMonitor.Models.CarCharging;
 
 namespace De.Hochstaetter.FroniusMonitor;
 

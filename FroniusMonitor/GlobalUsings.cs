@@ -1,8 +1,10 @@
+// ReSharper disable IdentifierTypo
 // Global using directives
 
 global using System;
 global using System.ComponentModel;
 global using System.ComponentModel.Design;
+global using System.Diagnostics;
 global using System.Diagnostics.CodeAnalysis;
 global using System.Globalization;
 global using System.IO;
@@ -16,6 +18,7 @@ global using System.Windows.Controls;
 global using System.Windows.Controls.Primitives;
 global using System.Windows.Data;
 global using System.Windows.Input;
+global using System.Windows.Interop;
 global using System.Windows.Markup;
 global using System.Windows.Media;
 global using System.Windows.Media.Animation;
@@ -42,3 +45,4 @@ global using Microsoft.Win32;
 global using Newtonsoft.Json.Linq;
 global using Unity;
 global using SafeHeapMarshalling = System.Diagnostics.DebuggerNonUserCodeAttribute;
+global using BigEndianMarshalling = System.Diagnostics.DebuggerHiddenAttribute;
