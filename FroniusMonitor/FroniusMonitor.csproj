@@ -32,7 +32,6 @@
     <None Remove="Assets\Fonts\DOTMATRI.TTF" />
     <None Remove="Assets\Fonts\DOTMBold.TTF" />
     <None Remove="Assets\Fonts\EHSMB.TTF" />
-    <None Remove="Assets\Images\EQC.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -60,13 +59,13 @@
     <Resource Include="Assets\Fonts\EHSMB.TTF">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Assets\Images\EQC.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
   </ItemGroup>
 
   <ItemGroup>
     <Compile Update="Assets\Images\ChargingTrafficSignSettings.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Assets\Images\Car.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Assets\Images\FritzLogo.xaml.cs">
@@ -99,7 +98,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Assets\Images\EQC.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <Page Update="Assets\Images\ChargingTrafficSignSettings.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Assets\Images\Car.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>

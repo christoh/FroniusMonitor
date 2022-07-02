@@ -21,5 +21,5 @@ public partial class Chevron
 
 public class ChevronExtension : MarkupExtension
 {
-    public override object ProvideValue(IServiceProvider serviceProvider) => new SettingsIcon();
+    public override object ProvideValue(IServiceProvider serviceProvider) => new Chevron();
 }
