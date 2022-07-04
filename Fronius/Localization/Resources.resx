@@ -954,4 +954,13 @@
   <data name="ControlWattPilot" xml:space="preserve">
 	  <value>Control Wattpilot connected to inverter</value>
   </data>
+  <data name="Guest" xml:space="preserve">
+	  <value>Guest</value>
+  </data>
+  <data name="NoRfidCard" xml:space="preserve">
+	  <value>No RFID card</value>
+  </data>
+  <data name="AuthCurrentUser" xml:space="preserve">
+	  <value>Authenticate car</value>
+  </data>
 </root>

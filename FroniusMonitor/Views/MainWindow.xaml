@@ -122,6 +122,15 @@
                     </vi:Car.LayoutTransform>
                 </vi:Car>
 
+                <TextBlock Grid.Row="2" Grid.Column="1" Margin="152,30,0,0" Width="113" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" Text="{Binding SolarSystemService.SolarSystem.WattPilot.CurrentUser,FallbackValue=''}">
+                    <TextBlock.LayoutTransform>
+                        <TransformGroup>
+                            <RotateTransform Angle="-1.2"/>
+                            <ScaleTransform ScaleX="{Binding ScaleX, ElementName=WattPilotTransform}" ScaleY="{Binding ScaleY, ElementName=WattPilotTransform}"/>
+                        </TransformGroup>
+                    </TextBlock.LayoutTransform>
+                </TextBlock>
+
                 <Grid Grid.Row="0" Grid.Column="0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />

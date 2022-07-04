@@ -65,6 +65,14 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
             });
         }
 
+        private bool isUserAuthenticated;
+
+        public bool IsUserAuthenticated
+        {
+            get => isUserAuthenticated;
+            set => Set(ref isUserAuthenticated, value);
+        }
+
         public string ApiLink => string.Format(Resources.EnableApiLink, "https://" + (WattPilot.SerialNumber ?? "<Serial>") + ".api.v3.go-e.io");
 
         private ICommand? applyCommand;
@@ -91,6 +99,7 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
                 return;
             }
 
+            IsUserAuthenticated = localWattPilot.AuthenticatedCardIndex.HasValue;
             oldWattPilot = (WattPilot)localWattPilot.Clone();
 
             ////Reboot WattPilot
@@ -116,6 +125,15 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
             try
             {
                 IsInUpdate = true;
+
+                if (IsUserAuthenticated)
+                {
+                    WattPilot.AuthenticatedCardIndex ??= 0;
+                }
+                else
+                {
+                    WattPilot.AuthenticatedCardIndex = null;
+                }
 
                 if (!RequiresChargingInterval)
                 {

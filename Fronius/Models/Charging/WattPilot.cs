@@ -591,6 +591,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private ForcedCharge forcedCharge;
+
     [WattPilot("frc", false)]
     public ForcedCharge ForcedCharge
     {
@@ -621,6 +622,8 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         get => totalEnergyWithoutCurrentSession;
         set => Set(ref totalEnergyWithoutCurrentSession, value);
     }
+
+    public double? EnergyCurrentSession => TotalEnergy - TotalEnergyWithoutCurrentSession;
 
     private double? cableCurrentMaximum;
 
@@ -677,6 +680,25 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         get => cards;
         set => Set(ref cards, value);
     }
+
+    private byte? authenticatedCardIndex;
+
+    /// <summary>
+    /// null = Unauthenticated, 0=guest charging, 1=card index 0, 2= card index 1, ...
+    /// </summary>
+    [WattPilot("trx", false)]
+    public byte? AuthenticatedCardIndex
+    {
+        get => authenticatedCardIndex;
+        set => Set(ref authenticatedCardIndex, value, () => NotifyOfPropertyChange(nameof(CurrentUser)));
+    }
+
+    public string CurrentUser => AuthenticatedCardIndex switch
+    {
+        0 => Resources.Guest,
+        null => Resources.NoRfidCard,
+        _ => Cards?[AuthenticatedCardIndex.Value - 1].Name ?? "---",
+    };
 
     private bool? is16AmpereVariant;
 
@@ -804,7 +826,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
 
             for (var i = 0; i < Cards.Count; i++)
             {
-                newCards[i] = new WattPilotCard {Energy = Cards[i].Energy, HaveCardId = Cards[i].HaveCardId, Name = Cards[i].Name,};
+                newCards[i] = new WattPilotCard { Energy = Cards[i].Energy, HaveCardId = Cards[i].HaveCardId, Name = Cards[i].Name, };
             }
 
             result.Cards = newCards;

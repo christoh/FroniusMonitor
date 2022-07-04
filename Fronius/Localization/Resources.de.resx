@@ -933,4 +933,13 @@
   <data name="ControlWattPilot" xml:space="preserve">
 	  <value>Einen mit dem Wechselrichter verbundenen Wattpiloten steuern</value>
   </data>
+  <data name="Guest" xml:space="preserve">
+	  <value>Gast</value>
+  </data>
+  <data name="NoRfidCard" xml:space="preserve">
+	  <value>Keine RFID-Karte</value>
+  </data>
+  <data name="AuthCurrentUser" xml:space="preserve">
+	  <value>Fahrzeug authentifizeren</value>
+  </data>
 </root>

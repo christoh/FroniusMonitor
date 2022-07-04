@@ -114,6 +114,7 @@
 
                     <CheckBox Content="{x:Static p:Resources.UnlockCableOnPowerFailure}" IsChecked="{Binding WattPilot.UnlockCableOnPowerFailure}"/>
                     <CheckBox Content="{x:Static p:Resources.RequireRfidAuth}" IsChecked="{Binding WattPilot.AccessMode, Converter={co:AccessMode2Bool}}"/>
+                    <CheckBox Content="{x:Static p:Resources.AuthCurrentUser}" IsChecked="{Binding IsUserAuthenticated}"/>
                     <CheckBox Content="{Binding ApiLink}" IsChecked="{Binding WattPilot.CloudAccessEnabled}"/>
                     <CheckBox IsChecked="{Binding WattPilot.DisableProtectiveEarth}" Content="{x:Static p:Resources.DisableProtectiveEarth}"/>
 

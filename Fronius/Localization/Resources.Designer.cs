@@ -214,6 +214,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Authenticate car.
+        /// </summary>
+        public static string AuthCurrentUser {
+            get {
+                return ResourceManager.GetString("AuthCurrentUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Automatic.
         /// </summary>
         public static string Automatic {
@@ -894,6 +903,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string GridPowerManagement {
             get {
                 return ResourceManager.GetString("GridPowerManagement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Guest.
+        /// </summary>
+        public static string Guest {
+            get {
+                return ResourceManager.GetString("Guest", resourceCulture);
             }
         }
         
@@ -1623,6 +1641,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string NoFritzBoxConnection {
             get {
                 return ResourceManager.GetString("NoFritzBoxConnection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No RFID card.
+        /// </summary>
+        public static string NoRfidCard {
+            get {
+                return ResourceManager.GetString("NoRfidCard", resourceCulture);
             }
         }
         
