@@ -4,11 +4,19 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
+             xmlns:converters="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
+             xmlns:charging="clr-namespace:De.Hochstaetter.Fronius.Models.Charging;assembly=Fronius"
              mc:Ignorable="d" 
              d:DesignHeight="32" d:DesignWidth="79"
              SnapsToDevicePixels="True">
-    <Canvas Width="79" Height="32" DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Viewbox}}}">
-        <Path Fill="{Binding Path=(TextElement.Foreground)}" Data="M66.1,24.7c0,1-0.8,1.9-1.9,1.9c-1,0-1.9-0.8-1.9-1.9c0-1,0.8-1.9,1.9-1.9C65.3,22.8,66.1,23.7,66.1,24.7z
+    <Canvas Width="79" Height="32" DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:Car}}}">
+		<Canvas.Resources>
+			<Style TargetType="Line">
+                <Setter Property="Stroke" Value="#ff800000"/>
+                <Setter Property="StrokeThickness" Value="3"/>
+            </Style>
+        </Canvas.Resources>
+        <Path x:Name="CarShape" Fill="LightGray" Data="M66.1,24.7c0,1-0.8,1.9-1.9,1.9c-1,0-1.9-0.8-1.9-1.9c0-1,0.8-1.9,1.9-1.9C65.3,22.8,66.1,23.7,66.1,24.7z
 	 M27,11.2c0.2,0,0.4-0.1,0.6-0.3s0.2-0.4,0.2-0.6c0-0.7-0.3-1.2-0.8-1.7l0,0c-0.2-0.2-0.6-0.3-0.9-0.2c-0.9,0.3-1.5,0.9-1.8,1.5
 	c-0.2,0.3-0.2,0.6,0,0.8c0.1,0.3,0.4,0.4,0.7,0.4c-0.2,0.3-0.1,0.6,0.1,0.8c0.1,0.1,0.2,0.1,0.3,0.1c0.2,0,0.4-0.1,0.5-0.2l0.5-0.6
 	C26.4,11.2,27,11.2,27,11.2z M14.7,22.8c-1,0-1.9,0.8-1.9,1.9c0,1,0.8,1.9,1.9,1.9c1,0,1.9-0.8,1.9-1.9
@@ -28,5 +36,7 @@
 	c1.5-1.5,3.6-2.4,5.9-2.4l0,0c2.3,0,4.4,0.9,5.9,2.4S23,21,23,23.3V25h32.9v-1.7c0-2.3,0.9-4.4,2.4-5.9l0,0c1.5-1.5,3.6-2.4,5.9-2.4
 	l0,0c2.3,0,4.4,0.9,5.9,2.4s2.4,3.6,2.4,5.9v1.6c2.3-0.1,3.8-1.3,4.3-1.8C76.8,23.1,76.8,19.1,76.8,19.1z M56.7,13.2h4v-1.1h-4V13.2
 	z" />
+        <Line Visibility="{Binding Status, Converter={converters:CarStatus2Visibility}}" X1="35" X2="44" Y1="12" Y2="20" />
+        <Line Visibility="{Binding Status, Converter={converters:CarStatus2Visibility}}" X1="35" X2="44" Y1="20" Y2="12" />
     </Canvas>
 </Viewbox>

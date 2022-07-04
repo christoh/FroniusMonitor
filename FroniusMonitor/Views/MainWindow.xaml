@@ -116,6 +116,12 @@
                     <c:WattPilotControl Grid.Column="1" Height="200" WattPilotService="{Binding WattPilotService}"/>
                 </Grid>
 
+                <vi:Car Grid.Column="1" Width="280" HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Row="2" Status="{Binding SolarSystemService.SolarSystem.WattPilot.CarStatus, FallbackValue={x:Null}}">
+                    <vi:Car.LayoutTransform>
+                        <ScaleTransform ScaleX="{Binding ScaleX, ElementName=WattPilotTransform}" ScaleY="{Binding ScaleY, ElementName=WattPilotTransform}"/>
+                    </vi:Car.LayoutTransform>
+                </vi:Car>
+
                 <Grid Grid.Row="0" Grid.Column="0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
