@@ -116,21 +116,35 @@
                     <c:WattPilotControl Grid.Column="1" Height="200" WattPilotService="{Binding WattPilotService}"/>
                 </Grid>
 
-                <vi:Car Grid.Column="1" Width="280" HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Row="2" Status="{Binding SolarSystemService.SolarSystem.WattPilot.CarStatus, FallbackValue={x:Null}}">
-                    <vi:Car.LayoutTransform>
+                <Grid Grid.Row="1" Grid.Column="1" Grid.RowSpan="2">
+                    <Grid.LayoutTransform>
                         <ScaleTransform ScaleX="{Binding ScaleX, ElementName=WattPilotTransform}" ScaleY="{Binding ScaleY, ElementName=WattPilotTransform}"/>
-                    </vi:Car.LayoutTransform>
-                </vi:Car>
+                    </Grid.LayoutTransform>
 
-                <TextBlock Grid.Row="2" Grid.Column="1" Margin="152,30,0,0" Width="113" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" Text="{Binding SolarSystemService.SolarSystem.WattPilot.CurrentUser,FallbackValue=''}">
-                    <TextBlock.LayoutTransform>
-                        <TransformGroup>
-                            <RotateTransform Angle="-1.2"/>
-                            <ScaleTransform ScaleX="{Binding ScaleX, ElementName=WattPilotTransform}" ScaleY="{Binding ScaleY, ElementName=WattPilotTransform}"/>
-                        </TransformGroup>
-                    </TextBlock.LayoutTransform>
-                </TextBlock>
+                    <vi:Car Width="280" HorizontalAlignment="Right" VerticalAlignment="Bottom" Status="{Binding SolarSystemService.SolarSystem.WattPilot.CarStatus, FallbackValue={x:Null}}"
+                            Visibility="{Binding SolarSystemService.SolarSystem.WattPilot.CableCurrentMaximum, FallbackValue=Collapsed, Converter={co:NullToVisibility}}"/>
 
+                    <vi:Typ2 Width="100" Margin="150,55,0,0" VerticalAlignment="Top" WattPilot="{Binding SolarSystemService.SolarSystem.WattPilot, FallbackValue={x:Null}}"
+                             Visibility="{Binding SolarSystemService.SolarSystem.WattPilot.CableCurrentMaximum, FallbackValue=Collapsed, Converter={co:NullToVisibility}}"/>
+
+                    <TextBlock FontSize="20" FontWeight="Medium" TextAlignment="Center" Margin="150,28,0,0" Visibility="{Binding SolarSystemService.SolarSystem.WattPilot.CableCurrentMaximum, FallbackValue=Collapsed, Converter={co:NullToVisibility}}">
+                        <Run Text="{Binding SolarSystemService.SolarSystem.WattPilot.CableCurrentMaximum, FallbackValue='-',Mode=OneWay, StringFormat=N0}"/>
+                        <Run Text="A"></Run>
+                    </TextBlock>
+
+                    <TextBlock Opacity="{Binding SolarSystemService.SolarSystem.WattPilot.CarStatus, Converter={co:CarStatus2Opacity}, FallbackValue=.5}"
+                               FontSize="20" FontWeight="Medium" TextAlignment="Center" Margin="150,160,0,0"
+                               Visibility="{Binding SolarSystemService.SolarSystem.WattPilot.EnergyCurrentSession, FallbackValue=Collapsed, Converter={co:NullToVisibility}}">
+                        <Run Text="{Binding SolarSystemService.SolarSystem.WattPilot.EnergyCurrentSession, FallbackValue='-',Mode=OneWay, StringFormat=N0}"/>
+                        <Run Text="Wh"/>
+                    </TextBlock>
+
+                    <TextBlock Margin="152,131,0,0" Width="113" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" Text="{Binding SolarSystemService.SolarSystem.WattPilot.CurrentUser,FallbackValue=''}">
+                        <TextBlock.LayoutTransform>
+                                <RotateTransform Angle="-1.2"/>
+                        </TextBlock.LayoutTransform>
+                    </TextBlock>
+                </Grid>
                 <Grid Grid.Row="0" Grid.Column="0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />

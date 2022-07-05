@@ -112,3 +112,13 @@ public enum CarType : byte
     vwID3_4,
     Eqc2019,
 }
+
+[Flags]
+public enum Phases : byte
+{
+    None = 0,
+    L1 = 1 << 0,
+    L2 = 1 << 1,
+    L3 = 1 << 2,
+    All = L1 | L2 | L3,
+}

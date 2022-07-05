@@ -521,3 +521,85 @@ public class CarStatus2Visibility : ConverterBase
         return value is CarStatus.Idle or null ? Visibility.Visible : Visibility.Collapsed;
     }
 }
+
+public class CarStatus2Opacity : ConverterBase
+{
+    public override object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is CarStatus.Idle or null ? .5 : 1;
+    }
+}
+
+public class WattPilotPhase2Brush : ConverterBase
+{
+    public Phases Phase { get; set; }
+    public override object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        Color result;
+
+        switch (value)
+        {
+            case WattPilot wattPilot:
+
+                var resultL1 = GetPhaseColor(Phases.L1, wattPilot.L1CableEnabled, wattPilot.L1CarEnabled);
+                var resultL2 = GetPhaseColor(Phases.L2, wattPilot.L2CableEnabled, wattPilot.L2CarEnabled);
+                var resultL3 = GetPhaseColor(Phases.L3, wattPilot.L3CableEnabled, wattPilot.L3CarEnabled);
+
+                var colors = new[] { resultL1, resultL2, resultL3 };
+
+                if (colors.Any(c => c == Colors.LightGreen))
+                {
+                    result = Colors.LightGreen;
+                }
+                else if (colors.Any(c => c == Color.FromRgb(248, 232, 19)))
+                {
+                    result = Color.FromRgb(248, 232, 19);
+                }
+                else if (colors.Any(c => c == Colors.White))
+                {
+                    result = Colors.White;
+                }
+                else if (colors.Any(c => c == Colors.OrangeRed))
+                {
+                    result = Colors.OrangeRed;
+                }
+                else
+                {
+                    result = Colors.Transparent;
+                }
+
+                Color GetPhaseColor(Phases phases, bool? cableEnabled, bool? carEnabled)
+                {
+                    if ((Phase & phases) != 0)
+                    {
+                        if (carEnabled is true && cableEnabled is true)
+                        {
+                            return Colors.LightGreen;
+                        }
+                        if (cableEnabled is true)
+                        {
+                            return Color.FromRgb(248, 232, 19);
+                        }
+
+                        if (carEnabled is true)
+                        {
+                            return Colors.White;
+                        }
+
+                        return Colors.OrangeRed;
+                    }
+
+                    return Colors.Transparent;
+                }
+
+                break;
+
+            default:
+                result = Colors.Transparent;
+                break;
+        }
+
+        return targetType.IsAssignableFrom(typeof(Color)) ? result : new SolidColorBrush(result);
+
+    }
+}

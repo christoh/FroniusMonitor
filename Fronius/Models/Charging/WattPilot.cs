@@ -247,6 +247,54 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref powerFactorN, value);
     }
 
+    private bool? l1CarEnabled;
+    [WattPilot("pha", 0)]
+    public bool? L1CarEnabled
+    {
+        get => l1CarEnabled;
+        set => Set(ref l1CarEnabled, value);
+    }
+
+    private bool? l2CarEnabled;
+    [WattPilot("pha", 1)]
+    public bool? L2CarEnabled
+    {
+        get => l2CarEnabled;
+        set => Set(ref l2CarEnabled, value);
+    }
+
+    private bool? l3CarEnabled;
+    [WattPilot("pha", 2)]
+    public bool? L3CarEnabled
+    {
+        get => l3CarEnabled;
+        set => Set(ref l3CarEnabled, value);
+    }
+
+    private bool? l1CableEnabled;
+    [WattPilot("pha", 3)]
+    public bool? L1CableEnabled
+    {
+        get => l1CableEnabled;
+        set => Set(ref l1CableEnabled, value);
+    }
+
+    private bool? l2CableEnabled;
+    [WattPilot("pha", 4)]
+    public bool? L2CableEnabled
+    {
+        get => l2CableEnabled;
+        set => Set(ref l2CableEnabled, value);
+    }
+
+    private bool? l3CableEnabled;
+    [WattPilot("pha", 5)]
+    public bool? L3CableEnabled
+    {
+        get => l3CableEnabled;
+        set => Set(ref l3CableEnabled, value);
+    }
+
     private ModelStatus? status;
 
     [WattPilot("modelStatus")]
@@ -623,7 +671,13 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref totalEnergyWithoutCurrentSession, value);
     }
 
-    public double? EnergyCurrentSession => TotalEnergy - TotalEnergyWithoutCurrentSession;
+    private double? energyCurrentSession;
+    [WattPilot("wh")]
+    public double? EnergyCurrentSession
+    {
+        get => energyCurrentSession;
+        set => Set(ref energyCurrentSession, value);
+    }
 
     private double? cableCurrentMaximum;
 
