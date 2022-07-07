@@ -17,5 +17,6 @@ namespace De.Hochstaetter.Fronius.Contracts
         Task WaitSendValues(int timeout = 5000);
         void BeginSendValues();
         ValueTask SendValue(WattPilot instance, string propertyName);
+        ValueTask<List<string>> Send(WattPilot? localWattPilot = null, WattPilot? oldWattPilot = null);
     }
 }

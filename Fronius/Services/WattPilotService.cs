@@ -131,6 +131,45 @@ public class WattPilotService : BindableBase, IWattPilotService
         }
     }
 
+    public async ValueTask<List<string>> Send(WattPilot? localWattPilot = null, WattPilot? oldWattPilot = null)
+    {
+        localWattPilot ??= WattPilot ?? throw new WebException("Not connected to Wattpilot", WebExceptionStatus.ConnectionClosed);
+
+        var errors = new List<string>();
+
+        foreach (var propertyInfo in typeof(WattPilot).GetProperties().Where(p => p.GetCustomAttribute<WattPilotAttribute>() != null))
+        {
+            var oldValue = oldWattPilot == null ? null : propertyInfo.GetValue(oldWattPilot);
+            var newValue = propertyInfo.GetValue(localWattPilot);
+
+            if
+            (
+                oldWattPilot != null &&
+                (
+                    ReferenceEquals(oldValue, newValue) ||
+                    oldValue is not null && oldValue.Equals(newValue) ||
+                    newValue is not null && newValue.Equals(oldValue) ||
+                    propertyInfo.GetCustomAttribute<WattPilotAttribute>()!.IsReadOnly
+                )
+
+            )
+            {
+                continue;
+            }
+
+            try
+            {
+                await SendValue(localWattPilot, propertyInfo.Name).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                errors.Add($"{ex.GetType().Name}: {propertyInfo.Name} = '{propertyInfo.GetValue(localWattPilot)}' ({ex.Message})");
+            }
+        }
+
+        return errors;
+    }
+
     private async Task Authenticate(JObject token)
     {
         var token1 = token["token1"]?.Value<string>();
@@ -140,13 +179,13 @@ public class WattPilotService : BindableBase, IWattPilotService
         random.NextBytes(token3Bytes);
         var token3 = string.Join(string.Empty, token3Bytes.Select(b => b.ToString("x2")));
 
-        var hashedPassword = await GetHashedPassword().ConfigureAwait(false);
+        var localHashedPassword = await GetHashedPassword().ConfigureAwait(false);
         Token.ThrowIfCancellationRequested();
 
         var hash = await Task.Run(() =>
         {
             using var sha256 = SHA256.Create();
-            var hash1Input = Encoding.UTF8.GetBytes(token1 + hashedPassword);
+            var hash1Input = Encoding.UTF8.GetBytes(token1 + localHashedPassword);
             var hash1 = string.Join(string.Empty, sha256.ComputeHash(hash1Input, 0, hash1Input.Length).Select(b => b.ToString("x2")));
             var hashInput = Encoding.UTF8.GetBytes(token3 + token2 + hash1);
             return string.Join(string.Empty, sha256.ComputeHash(hashInput, 0, hashInput.Length).Select(b => b.ToString("x2")));
@@ -163,7 +202,7 @@ public class WattPilotService : BindableBase, IWattPilotService
 
         if (clientWebSocket == null) throw new WebSocketException(WebSocketError.ConnectionClosedPrematurely);
 
-        await clientWebSocket.SendAsync(Encoding.UTF8.GetBytes(authMessage), WebSocketMessageType.Text,WebSocketMessageFlags.DisableCompression|WebSocketMessageFlags.EndOfMessage, Token).ConfigureAwait(false);
+        await clientWebSocket.SendAsync(Encoding.UTF8.GetBytes(authMessage), WebSocketMessageType.Text, WebSocketMessageFlags.DisableCompression | WebSocketMessageFlags.EndOfMessage, Token).ConfigureAwait(false);
         Token.ThrowIfCancellationRequested();
         var result = await clientWebSocket.ReceiveAsync(buffer, Token).ConfigureAwait(false);
 
