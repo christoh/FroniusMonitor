@@ -56,19 +56,19 @@
                 <c:LcdDisplay x:Name="LcdCurrent" Visibility="Collapsed"
                               Header="{x:Static p:Resources.Current}"
                               Label1="L1" Label2="L2" Label3="L3" LabelSum="Sum"
-                              Value1="{Binding WattPilotService.WattPilot.CurrentL1, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0.000 A'}"
-                              Value2="{Binding WattPilotService.WattPilot.CurrentL2, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0.000 A'}"
-                              Value3="{Binding WattPilotService.WattPilot.CurrentL3, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0.000 A'}"
-                              ValueSum="{Binding WattPilotService.WattPilot.CurrentSum, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0.000 A'}"
+                              Value1="{Binding WattPilotService.WattPilot.CurrentL1, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='#,0.0 A'}"
+                              Value2="{Binding WattPilotService.WattPilot.CurrentL2, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='#,0.0 A'}"
+                              Value3="{Binding WattPilotService.WattPilot.CurrentL3, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='#,0.0 A'}"
+                              ValueSum="{Binding WattPilotService.WattPilot.CurrentSum, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='#,0.0 A'}"
                 />
 
                 <c:LcdDisplay x:Name="LcdPower"
                               Header="{x:Static p:Resources.RealPower}"
                               Label1="L1" Label2="L2" Label3="L3" LabelSum="Sum"
-                              Value1="{Binding WattPilotService.WattPilot.PowerL1, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0.0 W'}"
-                              Value2="{Binding WattPilotService.WattPilot.PowerL2, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0.0 W'}"
-                              Value3="{Binding WattPilotService.WattPilot.PowerL3, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0.0 W'}"
-                              ValueSum="{Binding WattPilotService.WattPilot.PowerTotal, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0.0 W'}"
+                              Value1="{Binding WattPilotService.WattPilot.PowerL1, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='#,0 W'}"
+                              Value2="{Binding WattPilotService.WattPilot.PowerL2, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='#,0 W'}"
+                              Value3="{Binding WattPilotService.WattPilot.PowerL3, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='#,0 W'}"
+                              ValueSum="{Binding WattPilotService.WattPilot.PowerTotal, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='#,0 W'}"
                 />
 
                 <c:LcdDisplay x:Name="LcdPowerFactor" Visibility="Collapsed"

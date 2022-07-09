@@ -28,9 +28,9 @@ public partial class Car
         switch (Status)
         {
             case CarStatus.Charging:
-                animation.From = Colors.Blue;
+                animation.From = Colors.DarkTurquoise;
                 animation.To = Colors.DodgerBlue;
-                animation.Duration = TimeSpan.FromSeconds(1.5);
+                animation.Duration = TimeSpan.FromSeconds(2);
                 break;
 
             case CarStatus.Error:
@@ -40,15 +40,15 @@ public partial class Car
                 break;
 
             case CarStatus.Complete:
-                animation.From = Colors.Green;
-                animation.To = Colors.Green;
+                animation.From = Colors.LightGreen;
+                animation.To = Colors.YellowGreen;
                 animation.Duration = TimeSpan.FromSeconds(20);
                 break;
 
             case CarStatus.WaitCar:
-                animation.From = Colors.Yellow;
-                animation.To = Colors.DarkOrange;
-                animation.Duration = TimeSpan.FromSeconds(1.5);
+                animation.From = Color.FromRgb(255, 224, 0);
+                animation.To = Color.FromRgb(255, 128, 0);
+                animation.Duration = TimeSpan.FromSeconds(5);
                 break;
 
             default:

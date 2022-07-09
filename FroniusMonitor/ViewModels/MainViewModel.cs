@@ -12,11 +12,13 @@ public class MainViewModel : ViewModelBase
         ExportSettingsCommand = new NoParameterCommand(ExportSettings);
         LoadSettingsCommand = new NoParameterCommand(LoadSettings);
         DownloadChargeLogCommand = new NoParameterCommand(DownloadChargeLog);
+        RebootWattPilotCommand = new NoParameterCommand(RebootWattPilot);
     }
 
     public ICommand ExportSettingsCommand { get; }
     public ICommand LoadSettingsCommand { get; }
     public ICommand DownloadChargeLogCommand { get; }
+    public ICommand RebootWattPilotCommand { get; }
 
     public ISolarSystemService SolarSystemService { get; }
 
@@ -66,6 +68,39 @@ public class MainViewModel : ViewModelBase
     {
         SolarSystemService.WattPilotConnection = isVisible ? App.Settings.WattPilotConnection : null;
         _ = Settings.Save();
+    }
+
+    private async void RebootWattPilot()
+    {
+        WattPilotService.BeginSendValues();
+
+        if (WattPilotService.WattPilot?.Clone() is not WattPilot newWattPilot)
+        {
+            await Dispatcher.InvokeAsync(() => MessageBox.Show(IoC.Get<MainWindow>(), Resources.NoWattPilot, Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error));
+            return;
+        }
+
+        newWattPilot.Reboot = true;
+        var errors = await WattPilotService.Send(newWattPilot, WattPilotService.WattPilot).ConfigureAwait(false);
+
+        if (errors.Count > 0)
+        {
+            var notWritten = "• " + string.Join(Environment.NewLine + "• ", errors);
+
+            await Dispatcher.InvokeAsync(() =>
+            {
+                MessageBox.Show
+                (
+                    IoC.Get<MainWindow>(),
+                    "The following settings were not written to the Wattpilot:" + Environment.NewLine + Environment.NewLine + notWritten,
+                    Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error
+                );
+            });
+
+            return;
+        }
+
+        await WattPilotService.Stop().ConfigureAwait(false);
     }
 
     private void DownloadChargeLog()

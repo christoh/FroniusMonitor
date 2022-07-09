@@ -331,6 +331,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enable start/stop charging via hardware button.
+        /// </summary>
+        public static string ButtonEnableCharging {
+            get {
+                return ResourceManager.GetString("ButtonEnableCharging", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable mode switch via hardware button.
+        /// </summary>
+        public static string ButtonEnableModeSwitch {
+            get {
+                return ResourceManager.GetString("ButtonEnableModeSwitch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cable unlock behavior.
         /// </summary>
         public static string CableLockBehavior {
@@ -682,7 +700,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enable API at {0}.
+        ///   Looks up a localized string similar to Enable API at.
         /// </summary>
         public static string EnableApiLink {
             get {
@@ -1929,6 +1947,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string RealPower {
             get {
                 return ResourceManager.GetString("RealPower", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reboot.
+        /// </summary>
+        public static string Reboot {
+            get {
+                return ResourceManager.GetString("Reboot", resourceCulture);
             }
         }
         

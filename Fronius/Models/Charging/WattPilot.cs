@@ -629,13 +629,21 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     private bool? buttonEnableCharging;
 
     /// <summary>
-    ///     Read-write: Allow/Disallow charging
+    ///     Read-write: Allow/Disallow charging via hardware button
     /// </summary>
     [WattPilot("bac", false)]
     public bool? ButtonEnableCharging
     {
         get => buttonEnableCharging;
         set => Set(ref buttonEnableCharging, value);
+    }
+
+    private bool buttonEnableModeSwitch;
+    [WattPilot("bam", false)]
+    public bool ButtonEnableModeSwitch
+    {
+        get => buttonEnableModeSwitch;
+        set => Set(ref buttonEnableModeSwitch, value);
     }
 
     private ForcedCharge forcedCharge;

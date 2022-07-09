@@ -802,7 +802,7 @@
 	  <value>Kabel bei Stromausfall entriegeln</value>
   </data>
   <data name="EnableApiLink" xml:space="preserve">
-	  <value>API via {0} aktivieren</value>
+	  <value>Aktiviere API via</value>
   </data>
   <data name="ApiKey" xml:space="preserve">
 	  <value>API-Key</value>
@@ -941,5 +941,14 @@
   </data>
   <data name="AuthCurrentUser" xml:space="preserve">
 	  <value>Fahrzeug authentifizeren</value>
+  </data>
+  <data name="Reboot" xml:space="preserve">
+	  <value>Neustart</value>
+  </data>
+  <data name="ButtonEnableCharging" xml:space="preserve">
+	  <value>Ladung starten/stoppen über den Hardware-Button erlauben</value>
+  </data>
+  <data name="ButtonEnableModeSwitch" xml:space="preserve">
+	  <value>Lademodus über den Hardware-Button umschalten erlauben</value>
   </data>
 </root>

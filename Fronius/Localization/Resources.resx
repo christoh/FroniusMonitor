@@ -817,7 +817,7 @@
 	  <value>Unlock cable on power failure</value>
   </data>
   <data name="EnableApiLink" xml:space="preserve">
-	  <value>Enable API at {0}</value>
+	  <value>Enable API at</value>
   </data>
   <data name="ApiKey" xml:space="preserve">
 	  <value>API key</value>
@@ -962,5 +962,14 @@
   </data>
   <data name="AuthCurrentUser" xml:space="preserve">
 	  <value>Authenticate car</value>
+  </data>
+  <data name="Reboot" xml:space="preserve">
+	  <value>Reboot</value>
+  </data>
+  <data name="ButtonEnableCharging" xml:space="preserve">
+	  <value>Enable start/stop charging via hardware button</value>
+  </data>
+  <data name="ButtonEnableModeSwitch" xml:space="preserve">
+	  <value>Enable mode switch via hardware button</value>
   </data>
 </root>

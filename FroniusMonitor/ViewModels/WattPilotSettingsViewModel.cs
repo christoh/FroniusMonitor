@@ -29,7 +29,11 @@ public class WattPilotSettingsViewModel : ViewModelBase
     public WattPilot WattPilot
     {
         get => wattPilot;
-        set => Set(ref wattPilot, value, () => NotifyOfPropertyChange(nameof(ApiLink)));
+        set => Set(ref wattPilot, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(ApiLink));
+            NotifyOfPropertyChange(nameof(ApiUri));
+        });
     }
 
     private string title = "Wattpilot";
@@ -70,13 +74,22 @@ public class WattPilotSettingsViewModel : ViewModelBase
         set => Set(ref isUserAuthenticated, value);
     }
 
-    public string ApiLink => string.Format(Resources.EnableApiLink, "https://" + (WattPilot.SerialNumber ?? "<Serial>") + ".api.v3.go-e.io");
+    public string ApiLink => "https://" + (WattPilot.SerialNumber ?? "<Serial>") + ".api.v3.go-e.io";
+    public string ApiUri => ApiLink + $"/api/status?token={WattPilot.CloudAccessKey ?? "<Token>"}";
 
     private ICommand? applyCommand;
     public ICommand ApplyCommand => applyCommand ??= new NoParameterCommand(Apply);
 
     private ICommand? undoCommand;
     public ICommand UndoCommand => undoCommand ??= new NoParameterCommand(Undo);
+
+    private ICommand? navigateToApiCommand;
+    public ICommand NavigateToApiCommand => navigateToApiCommand ??= new NoParameterCommand(NavigateToApi);
+
+    private void NavigateToApi()
+    {
+        Process.Start(new ProcessStartInfo(ApiUri) {UseShellExecute = true});
+    }
 
 
     internal override async Task OnInitialize()
@@ -146,7 +159,7 @@ public class WattPilotSettingsViewModel : ViewModelBase
 
             try
             {
-                var errors = await wattPilotService.Send(WattPilot, oldWattPilot);
+                var errors = await wattPilotService.Send(WattPilot, oldWattPilot).ConfigureAwait(false);
 
                 if (errors.Count > 0)
                 {

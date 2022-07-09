@@ -115,8 +115,17 @@
                     <CheckBox Content="{x:Static p:Resources.UnlockCableOnPowerFailure}" IsChecked="{Binding WattPilot.UnlockCableOnPowerFailure}"/>
                     <CheckBox Content="{x:Static p:Resources.RequireRfidAuth}" IsChecked="{Binding WattPilot.AccessMode, Converter={co:AccessMode2Bool}}"/>
                     <CheckBox Content="{x:Static p:Resources.AuthCurrentUser}" IsChecked="{Binding IsUserAuthenticated}"/>
-                    <CheckBox Content="{Binding ApiLink}" IsChecked="{Binding WattPilot.CloudAccessEnabled}"/>
+                    <CheckBox IsChecked="{Binding WattPilot.CloudAccessEnabled}">
+                        <TextBlock Margin="0">
+                            <Run Text="{x:Static p:Resources.EnableApiLink}"/>
+                            <Hyperlink Command="{Binding NavigateToApiCommand}">
+                                <TextBlock Margin="0" Text="{Binding ApiLink}"></TextBlock>
+                            </Hyperlink>
+                        </TextBlock>
+                    </CheckBox>
                     <CheckBox IsChecked="{Binding WattPilot.DisableProtectiveEarth}" Content="{x:Static p:Resources.DisableProtectiveEarth}"/>
+                    <CheckBox IsChecked="{Binding WattPilot.ButtonEnableCharging}" Content="{x:Static p:Resources.ButtonEnableCharging}"/>
+                    <CheckBox IsChecked="{Binding WattPilot.ButtonEnableModeSwitch}" Content="{x:Static p:Resources.ButtonEnableModeSwitch}"/>
 
                     <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center">
                         <TextBlock Margin="0,0,4,0">

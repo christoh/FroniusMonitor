@@ -31,7 +31,7 @@
           <Canvas.RenderTransform>
             <TranslateTransform X="1262.4405" Y="-231.32143"/>
           </Canvas.RenderTransform>
-          <Path Fill="{Binding WattPilot, Converter={co:WattPilotPhase2Brush Phase=L2}}" x:Name="L2" StrokeThickness="4.60754" StrokeMiterLimit="10">
+          <Path Fill="Transparent" x:Name="L2" StrokeThickness="4.60754" StrokeMiterLimit="10">
             <Path.Data>
               <PathGeometry Figures="m -492.57422 -520.44516 c -23.47388 0 -42.52879 18.92909 -42.52879 42.40297 0 23.47388 19.05491 42.5288 42.52879 42.5288 23.46382 0 42.40298 -19.05492 42.40298 -42.5288 0 -23.47388 -18.93916 -42.40297 -42.40298 -42.40297 z" FillRule="NonZero"/>
             </Path.Data>
@@ -41,7 +41,7 @@
               <PathGeometry Figures="m -492.57422 -522.74805 c -24.71234 0 -44.83203 19.9845 -44.83203 44.70508 0 24.72058 20.11145 44.83399 44.83203 44.83399 24.71105 0 44.70703 -20.12098 44.70703 -44.83399 0 -24.713 -20.00421 -44.70508 -44.70703 -44.70508 z m 0 4.60743 c 22.22478 0 40.09961 17.86294 40.09961 40.09765 0 22.23471 -17.88307 40.22656 -40.09961 40.22656 -22.22713 0 -40.22461 -17.99942 -40.22461 -40.22656 0 -22.22713 17.98924 -40.09765 40.22461 -40.09765 z" FillRule="NonZero"/>
             </Path.Data>
           </Path>
-          <Path Fill="{Binding WattPilot, Converter={co:WattPilotPhase2Brush Phase=L3}}" x:Name="L3" StrokeThickness="4.60754" StrokeMiterLimit="10">
+          <Path Fill="Transparent" x:Name="L3" StrokeThickness="4.60754" StrokeMiterLimit="10">
             <Path.Data>
               <PathGeometry Figures="m -609.71715 -520.44516 c -23.46885 0 -42.52879 18.92909 -42.52879 42.40297 0 23.47388 19.05994 42.5288 42.52879 42.5288 23.47389 0 42.40298 -19.05492 42.40298 -42.5288 0 -23.47388 -18.92909 -42.40297 -42.40298 -42.40297 z" FillRule="NonZero"/>
             </Path.Data>
@@ -51,7 +51,7 @@
               <PathGeometry Figures="m -609.7168 -522.74805 c -24.70758 0 -44.83203 19.98417 -44.83203 44.70508 0 24.72091 20.11622 44.83399 44.83203 44.83399 24.72059 0 44.70703 -20.12164 44.70703 -44.83399 0 -24.71234 -19.99467 -44.70508 -44.70703 -44.70508 z m 0 4.60743 c 22.23538 0 40.09961 17.86228 40.09961 40.09765 0 22.23537 -17.87246 40.22656 -40.09961 40.22656 -22.22183 0 -40.22461 -17.99975 -40.22461 -40.22656 0 -22.2268 17.99454 -40.09765 40.22461 -40.09765 z" FillRule="NonZero"/>
             </Path.Data>
           </Path>
-          <Path Fill="{Binding WattPilot, Converter={co:WattPilotPhase2Brush Phase=L1}}" x:Name="L1" StrokeThickness="4.60754" StrokeMiterLimit="10">
+          <Path Fill="Transparent" x:Name="L1" StrokeThickness="4.60754" StrokeMiterLimit="10">
             <Path.Data>
               <PathGeometry Figures="m -439.98692 -615.06545 c -23.47388 0 -42.52879 19.05492 -42.52879 42.5288 0 23.47388 19.05491 42.5288 42.52879 42.5288 23.47389 0 42.5288 -19.05492 42.5288 -42.5288 0 -23.47388 -19.05491 -42.5288 -42.5288 -42.5288 z" FillRule="NonZero"/>
             </Path.Data>
@@ -61,7 +61,7 @@
               <PathGeometry Figures="m -439.98633 -617.36914 c -24.72058 0 -44.83398 20.11145 -44.83398 44.83203 0 24.72058 20.1134 44.83399 44.83398 44.83399 24.72059 0 44.83203 -20.11341 44.83203 -44.83399 0 -24.72058 -20.11144 -44.83203 -44.83203 -44.83203 z m 0 4.60742 c 22.22715 0 40.22461 17.99748 40.22461 40.22461 0 22.22714 -17.99746 40.22461 -40.22461 40.22461 -22.22713 0 -40.22656 -17.99747 -40.22656 -40.22461 0 -22.22713 17.99943 -40.22461 40.22656 -40.22461 z" FillRule="NonZero"/>
             </Path.Data>
           </Path>
-          <Path Fill="{Binding WattPilot, Converter={co:WattPilotPhase2Brush Phase=All}}" StrokeThickness="4.60754" StrokeMiterLimit="10">
+          <Path Fill="Transparent" x:Name="Pe" StrokeThickness="4.60754" StrokeMiterLimit="10">
             <Path.Data>
               <PathGeometry Figures="m -553.60675 -615.06545 c -23.47388 0 -42.5288 19.05492 -42.5288 42.5288 0 23.47388 19.05492 42.5288 42.5288 42.5288 23.47388 0 42.5288 -19.05492 42.5288 -42.5288 0 -23.47388 -19.05492 -42.5288 -42.5288 -42.5288 z" FillRule="NonZero"/>
             </Path.Data>
@@ -71,7 +71,7 @@
               <PathGeometry Figures="m -553.60742 -617.36914 c -24.72058 0 -44.83203 20.11145 -44.83203 44.83203 0 24.72058 20.11145 44.83399 44.83203 44.83399 24.72058 0 44.83398 -20.11341 44.83398 -44.83399 0 -24.72058 -20.1134 -44.83203 -44.83398 -44.83203 z m 0 4.60742 c 22.22713 0 40.22656 17.99748 40.22656 40.22461 0 22.22713 -17.99943 40.22461 -40.22656 40.22461 -22.22714 0 -40.22461 -17.99748 -40.22461 -40.22461 0 -22.22713 17.99747 -40.22461 40.22461 -40.22461 z" FillRule="NonZero"/>
             </Path.Data>
           </Path>
-          <Path Fill="{Binding WattPilot, Converter={co:WattPilotPhase2Brush Phase=All}}" StrokeThickness="4.60754" StrokeMiterLimit="10">
+          <Path Fill="Transparent" StrokeThickness="4.60754" x:Name="N" StrokeMiterLimit="10">
             <Path.Data>
               <PathGeometry Figures="m -663.82931 -615.06545 c -23.46885 0 -42.40298 19.05492 -42.40298 42.5288 0 23.47388 18.93413 42.5288 42.40298 42.5288 23.46885 0 42.52879 -19.05492 42.52879 -42.5288 0 -23.47388 -19.05994 -42.5288 -42.52879 -42.5288 z" FillRule="NonZero"/>
             </Path.Data>
