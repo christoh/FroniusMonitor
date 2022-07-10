@@ -1690,6 +1690,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Not a member of {0}.
+        /// </summary>
+        public static string NotAMemberOf {
+            get {
+                return ResourceManager.GetString("NotAMemberOf", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No Wattpilot found.
         /// </summary>
         public static string NoWattPilot {
@@ -2604,6 +2613,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string WattPilotName {
             get {
                 return ResourceManager.GetString("WattPilotName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Wattpilot did not answer within {0} seconds.
+        /// </summary>
+        public static string WattPilotTimeout {
+            get {
+                return ResourceManager.GetString("WattPilotTimeout", resourceCulture);
             }
         }
         

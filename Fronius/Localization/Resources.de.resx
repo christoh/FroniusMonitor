@@ -951,4 +951,10 @@
   <data name="ButtonEnableModeSwitch" xml:space="preserve">
 	  <value>Lademodus über den Hardware-Button umschalten erlauben</value>
   </data>
+  <data name="WattPilotTimeout" xml:space="preserve">
+	  <value>Der Wattpilot hat nicht innerhalb von {0} Sekunden geantwortet</value>
+  </data>
+  <data name="NotAMemberOf" xml:space="preserve">
+	  <value>Kein Member von {0}</value>
+  </data>
 </root>

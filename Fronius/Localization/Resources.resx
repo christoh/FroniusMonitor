@@ -972,4 +972,10 @@
   <data name="ButtonEnableModeSwitch" xml:space="preserve">
 	  <value>Enable mode switch via hardware button</value>
   </data>
+  <data name="WattPilotTimeout" xml:space="preserve">
+	  <value>The Wattpilot did not answer within {0} seconds</value>
+  </data>
+  <data name="NotAMemberOf" xml:space="preserve">
+	  <value>Not a member of {0}</value>
+  </data>
 </root>

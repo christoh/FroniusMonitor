@@ -220,17 +220,20 @@ public class WattPilotService : BindableBase, IWattPilotService
         }
     }
 
-    private Task<string> GetHashedPassword() => Task.Run(() =>
+    private async Task<string> GetHashedPassword()
     {
         if (hashedPassword == null)
         {
-            using var deriveBytes = new Rfc2898DeriveBytes(Encoding.UTF8.GetBytes(Connection?.Password ?? string.Empty), Encoding.UTF8.GetBytes(WattPilot?.SerialNumber ?? string.Empty), 100000, HashAlgorithmName.SHA512);
-            var hash0 = deriveBytes.GetBytes(24);
-            hashedPassword = Convert.ToBase64String(hash0);
+            await Task.Run(() =>
+            {
+                using var deriveBytes = new Rfc2898DeriveBytes(Encoding.UTF8.GetBytes(Connection?.Password ?? string.Empty), Encoding.UTF8.GetBytes(WattPilot?.SerialNumber ?? string.Empty), 100000, HashAlgorithmName.SHA512);
+                var hash0 = deriveBytes.GetBytes(24);
+                hashedPassword = Convert.ToBase64String(hash0);
+            }, Token).ConfigureAwait(false);
         }
 
-        return hashedPassword;
-    }, Token);
+        return hashedPassword!;
+    }
 
     public async ValueTask Stop()
     {
@@ -269,7 +272,7 @@ public class WattPilotService : BindableBase, IWattPilotService
         {
             if (events.Length > 0 && !WaitHandle.WaitAll(events, timeout, true))
             {
-                throw new TimeoutException($"The WattPilot did not answer within {timeout / 1e3d} seconds");
+                throw new TimeoutException(string.Format(Resources.WattPilotTimeout, timeout / 1e3d));
             }
         }
         finally
@@ -288,14 +291,14 @@ public class WattPilotService : BindableBase, IWattPilotService
 
         if (propertyInfo == null)
         {
-            throw new ArgumentException($"Not a member of {instanceType.Name}", propertyName);
+            throw new ArgumentException(string.Format(Resources.NotAMemberOf, instanceType.Name), propertyName);
         }
 
         var key = propertyInfo.GetCustomAttribute<WattPilotAttribute>()?.TokenName;
 
         if (key == null)
         {
-            throw new ArgumentException("Not a WattPilot property", propertyName);
+            throw new ArgumentException("Not a Wattpilot property", propertyName);
         }
 
         var value = propertyInfo.GetValue(instance);
