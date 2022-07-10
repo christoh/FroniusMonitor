@@ -781,7 +781,7 @@
 	  <value>Name des Wattpiloten</value>
   </data>
   <data name="MaximumChargingCurrent" xml:space="preserve">
-	  <value>Maximale Ladeleistung</value>
+	  <value>Gewünschter Ladestrom</value>
   </data>
   <data name="RequireRfidAuth" xml:space="preserve">
 	  <value>RFID-Karte erforderlich zum Laden</value>
@@ -956,5 +956,11 @@
   </data>
   <data name="NotAMemberOf" xml:space="preserve">
 	  <value>Kein Member von {0}</value>
+  </data>
+  <data name="SentToWattPilot" xml:space="preserve">
+	  <value>Die Einstellungen wurden an den Wattpiloten geschickt.</value>
+  </data>
+  <data name="AbsoluteMaximumChargingCurrent" xml:space="preserve">
+	  <value>Ladestrombegrenzung</value>
   </data>
 </root>

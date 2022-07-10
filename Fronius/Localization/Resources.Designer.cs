@@ -61,6 +61,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Charging current limit.
+        /// </summary>
+        public static string AbsoluteMaximumChargingCurrent {
+            get {
+                return ResourceManager.GetString("AbsoluteMaximumChargingCurrent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Access denied.
         /// </summary>
         public static string AccessDenied {
@@ -2082,6 +2091,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string SensorCards {
             get {
                 return ResourceManager.GetString("SensorCards", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The settings have been sent to the Wattpilot..
+        /// </summary>
+        public static string SentToWattPilot {
+            get {
+                return ResourceManager.GetString("SentToWattPilot", resourceCulture);
             }
         }
         

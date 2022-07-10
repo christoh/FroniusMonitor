@@ -134,7 +134,7 @@ public class WattPilotService : BindableBase, IWattPilotService
     public async ValueTask<List<string>> Send(WattPilot? localWattPilot = null, WattPilot? oldWattPilot = null)
     {
         localWattPilot ??= WattPilot ?? throw new WebException("Not connected to Wattpilot", WebExceptionStatus.ConnectionClosed);
-
+        var sentSomething = false;
         var errors = new List<string>();
 
         foreach (var propertyInfo in typeof(WattPilot).GetProperties().Where(p => p.GetCustomAttribute<WattPilotAttribute>() != null))
@@ -147,11 +147,10 @@ public class WattPilotService : BindableBase, IWattPilotService
                 oldWattPilot != null &&
                 (
                     ReferenceEquals(oldValue, newValue) ||
-                    oldValue is not null && oldValue.Equals(newValue) ||
-                    newValue is not null && newValue.Equals(oldValue) ||
+                    (oldValue is not null && oldValue.Equals(newValue)) ||
+                    (newValue is not null && newValue.Equals(oldValue)) ||
                     propertyInfo.GetCustomAttribute<WattPilotAttribute>()!.IsReadOnly
                 )
-
             )
             {
                 continue;
@@ -159,12 +158,18 @@ public class WattPilotService : BindableBase, IWattPilotService
 
             try
             {
+                sentSomething = true;
                 await SendValue(localWattPilot, propertyInfo.Name).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 errors.Add($"{ex.GetType().Name}: {propertyInfo.Name} = '{propertyInfo.GetValue(localWattPilot)}' ({ex.Message})");
             }
+        }
+
+        if (!sentSomething)
+        {
+            throw new ArgumentException(Resources.NoSettingsChanged);
         }
 
         return errors;
@@ -298,7 +303,7 @@ public class WattPilotService : BindableBase, IWattPilotService
 
         if (key == null)
         {
-            throw new ArgumentException("Not a Wattpilot property", propertyName);
+            throw new ArgumentException(string.Format(Resources.NotAMemberOf, instanceType.Name), propertyName);
         }
 
         var value = propertyInfo.GetValue(instance);
@@ -349,7 +354,7 @@ public class WattPilotService : BindableBase, IWattPilotService
 
         lock (outstandingAcknowledges)
         {
-            outstandingAcknowledges.Add(new WattPilotAcknowledge { RequestId = id, PropertyInfo = propertyInfo, Value = value });
+            outstandingAcknowledges.Add(new WattPilotAcknowledge {RequestId = id, PropertyInfo = propertyInfo, Value = value});
         }
     }
 

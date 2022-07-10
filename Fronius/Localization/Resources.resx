@@ -978,4 +978,10 @@
   <data name="NotAMemberOf" xml:space="preserve">
 	  <value>Not a member of {0}</value>
   </data>
+  <data name="SentToWattPilot" xml:space="preserve">
+	  <value>The settings have been sent to the Wattpilot.</value>
+  </data>
+  <data name="AbsoluteMaximumChargingCurrent" xml:space="preserve">
+	  <value>Charging current limit</value>
+  </data>
 </root>

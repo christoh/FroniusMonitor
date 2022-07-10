@@ -177,6 +177,8 @@ public abstract class BoolToAnything<T> : ConverterBase
     }
 }
 
+public class Bool2Brush : BoolToAnything<Brush> { }
+
 public class Bool2Visibility : BoolToAnything<Visibility>
 {
     public Bool2Visibility()

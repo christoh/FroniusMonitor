@@ -36,6 +36,22 @@ public class WattPilotSettingsViewModel : ViewModelBase
         });
     }
 
+    private bool enableDanger;
+
+    public bool EnableDanger
+    {
+        get => enableDanger;
+        set => Set(ref enableDanger, value);
+    }
+
+    private string toastText=string.Empty;
+
+    public string ToastText
+    {
+        get => toastText;
+        set => Set(ref toastText, value);
+    }
+
     private string title = "Wattpilot";
 
     public string Title
@@ -156,10 +172,11 @@ public class WattPilotSettingsViewModel : ViewModelBase
             }
 
             wattPilotService.BeginSendValues();
-
+            var sentSomething = false;
             try
             {
                 var errors = await wattPilotService.Send(WattPilot, oldWattPilot).ConfigureAwait(false);
+                sentSomething = true;
 
                 if (errors.Count > 0)
                 {
@@ -176,15 +193,30 @@ public class WattPilotSettingsViewModel : ViewModelBase
                     });
                 }
             }
+            catch (ArgumentException ex)
+            {
+                sentSomething=false;
+                IsInUpdate = false;
+                Dispatcher.Invoke(() => MessageBox.Show(ex.Message, Resources.Warning, MessageBoxButton.OK, MessageBoxImage.Warning));
+            }
             finally
             {
                 try
                 {
                     await wattPilotService.WaitSendValues().ConfigureAwait(false);
+
+                    if (sentSomething)
+                    {
+                        ToastText = Resources.SentToWattPilot;
+                    }
+
+                    oldWattPilot = WattPilot;
+                    Undo();
                 }
                 catch (TimeoutException) when (wattPilotService.UnsuccessfulWrites.Count > 0)
                 {
                     var notWritten = "• " + string.Join(Environment.NewLine + "• ", wattPilotService.UnsuccessfulWrites.Select(a => a.ToString()));
+                    IsInUpdate = false;
 
                     await Dispatcher.InvokeAsync(() =>
                     {
@@ -200,8 +232,6 @@ public class WattPilotSettingsViewModel : ViewModelBase
         }
         finally
         {
-            oldWattPilot = WattPilot;
-            Undo();
             IsInUpdate = false;
         }
     }

@@ -36,7 +36,7 @@
             </TextBlock>
 
             <TextBlock Margin="0,570,0,0" HorizontalAlignment="Center" FontSize="80">
-                <Run Text="{Binding Gen24.Storage.AvailableCapacity, StringFormat=N1, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---}" />
+                <Run Text="{Binding Gen24.Storage.AvailableCapacity, StringFormat=N0, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---}" />
                 <Run Text="Wh g" />
             </TextBlock>
 

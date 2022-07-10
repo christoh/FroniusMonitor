@@ -32,6 +32,7 @@
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="HorizontalAlignment" Value="Right" />
                 <Setter Property="Margin" Value="0,4,0,4" />
+                <Setter Property="Opacity" Value="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={co:Bool2Double True=1, False=.5}}" />
             </Style>
             <Style TargetType="ComboBox" x:Key="StandardComboBox">
                 <Setter Property="Margin" Value="8,4,0,4" />
@@ -107,9 +108,9 @@
                             </ComboBox.ItemTemplate>
                         </ComboBox>
 
-                        <TextBlock Grid.Column="0" Grid.Row="4" Text="{x:Static p:Resources.ApiKey}"/>
-                        <TextBlock Grid.Column="1" Grid.Row="4" Text=":"/>
-                        <c:PasswordBox Grid.Column="2" Grid.Row="4" MinWidth="250" Password="{Binding WattPilot.CloudAccessKey}"/>
+                        <TextBlock IsEnabled="{Binding EnableDanger}" Grid.Column="0" Grid.Row="4" Text="{x:Static p:Resources.ApiKey}"/>
+                        <TextBlock IsEnabled="{Binding EnableDanger}" Grid.Column="1" Grid.Row="4" Text=":"/>
+                        <c:PasswordBox IsReadOnly="{Binding EnableDanger, Converter={co:BoolInverter}}" Grid.Column="2" Grid.Row="4" MinWidth="250" Password="{Binding WattPilot.CloudAccessKey}"/>
                     </Grid>
 
                     <CheckBox Content="{x:Static p:Resources.UnlockCableOnPowerFailure}" IsChecked="{Binding WattPilot.UnlockCableOnPowerFailure}"/>
@@ -119,23 +120,35 @@
                         <TextBlock Margin="0">
                             <Run Text="{x:Static p:Resources.EnableApiLink}"/>
                             <Hyperlink Command="{Binding NavigateToApiCommand}">
-                                <TextBlock Margin="0" Text="{Binding ApiLink}"></TextBlock>
+                                <TextBlock Margin="0" Text="{Binding ApiLink}"/>
                             </Hyperlink>
                         </TextBlock>
                     </CheckBox>
-                    <CheckBox IsChecked="{Binding WattPilot.DisableProtectiveEarth}" Content="{x:Static p:Resources.DisableProtectiveEarth}"/>
+                    <CheckBox IsEnabled="{Binding EnableDanger}" IsChecked="{Binding WattPilot.DisableProtectiveEarth}">
+                        <TextBlock Margin="0" Text="{x:Static p:Resources.DisableProtectiveEarth}"></TextBlock>
+                    </CheckBox>
                     <CheckBox IsChecked="{Binding WattPilot.ButtonEnableCharging}" Content="{x:Static p:Resources.ButtonEnableCharging}"/>
                     <CheckBox IsChecked="{Binding WattPilot.ButtonEnableModeSwitch}" Content="{x:Static p:Resources.ButtonEnableModeSwitch}"/>
 
                     <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center">
                         <TextBlock Margin="0,0,4,0">
-                        <Run Text="{x:Static p:Resources.MaximumChargingCurrent}" /><Run Text=":" />
+                            <Run Text="{x:Static p:Resources.MaximumChargingCurrent}" /><Run Text=":" />
                         </TextBlock>
                         <TextBox MinHeight="0" TextAlignment="Center" Width="40"
-                             Text="{co:ValidationBinding Path=WattPilot.MaximumChargingCurrent, Rule={v:MinMaxIntRule Minimum=0, Maximum=32}}" />
+                                 Text="{co:ValidationBinding Path=WattPilot.MaximumChargingCurrent, Rule={v:MinMaxIntRule Minimum=0, Maximum=32}}" />
                         <TextBlock Margin="4,0,0,0" Text="A" />
                     </StackPanel>
                     <Slider Value="{Binding WattPilot.MaximumChargingCurrent, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="{Binding WattPilot.MinimumChargingCurrent}" Maximum="{Binding WattPilot.AbsoluteMaximumChargingCurrent}" />
+
+                    <StackPanel IsEnabled="{Binding EnableDanger}" Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center">
+                        <TextBlock Margin="0,0,4,0">
+                            <Run Text="{x:Static p:Resources.AbsoluteMaximumChargingCurrent}" /><Run Text=":" />
+                        </TextBlock>
+                        <TextBox MinHeight="0" TextAlignment="Center" Width="40"
+                                 Text="{co:ValidationBinding Path=WattPilot.AbsoluteMaximumChargingCurrent, Rule={v:MinMaxIntRule Minimum=0, Maximum=32}}" />
+                        <TextBlock Margin="4,0,0,0" Text="A" />
+                    </StackPanel>
+                    <Slider IsEnabled="{Binding EnableDanger}" Value="{Binding WattPilot.AbsoluteMaximumChargingCurrent, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="6" Maximum="{Binding WattPilot.Is16AmpereVariant, Converter={co:Bool2Double Null=32, False=32, True=16}}" />
 
                 </StackPanel>
             </GroupBox>
@@ -344,7 +357,7 @@
                         <TextBlock Margin="4,0,0,0" Text="W" />
                     </StackPanel>
                     <Slider Value="{Binding WattPilot.PvSurplusPowerThreshold, Mode=TwoWay}" TickFrequency="1" IsSnapToTickEnabled="True" HorizontalAlignment="Stretch" Minimum="0" Maximum="{Binding WattPilot.MaximumWattPilotPower}"
-                        Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}"/>
+                            Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}"/>
 
                 </StackPanel>
             </GroupBox>
@@ -359,6 +372,14 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="{x:Static p:Resources.Danger}" Margin="0,0,4,0" VerticalAlignment="Center">
+                <Run Text=":" />
+            </TextBlock>
+            <ToggleButton Grid.Column="1" Height="18" VerticalAlignment="Center" IsChecked="{Binding EnableDanger}" />
+            <Viewbox Grid.Column="3" Height="32" Margin="0,4,-180,0" Visibility="{Binding IsInUpdate, Converter={co:Bool2Visibility False=Hidden}}">
+                <Control Style="{StaticResource BusyAnimationStyle}" Background="Transparent" />
+            </Viewbox>
+            <c:Toast Height="40" Background="Green" CornerRadius="10" Grid.Column="3" Padding="10,6" Foreground="White" MinWidth="200" Margin="0,0,16,0" Text="{Binding ToastText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             <Button Grid.Column="4" VerticalAlignment="Center" Content="{x:Static p:Resources.Undo}" Command="{Binding UndoCommand}" IsEnabled="{Binding IsInUpdate, Converter={co:BoolInverter}}" />
             <Button Grid.Column="5" VerticalAlignment="Center" Content="{x:Static p:Resources.Apply}" Command="{Binding ApplyCommand}" IsEnabled="{Binding IsInUpdate, Converter={co:BoolInverter}}"/>
 
