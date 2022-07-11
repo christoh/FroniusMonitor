@@ -23,6 +23,7 @@ public class WattPilotSettingsViewModel : ViewModelBase
     public static IReadOnlyList<AwattarCountry> EnergyPriceCountries { get; } = Enum.GetValues<AwattarCountry>().OrderBy(c => c.ToDisplayName()).ToArray();
     public static IReadOnlyList<ForcedCharge> ForcedChargeList { get; } = Enum.GetValues<ForcedCharge>().OrderBy(c => c.ToDisplayName()).ToArray();
 
+    public WattPilotSettingsView View => mainWindow.WattPilotSettingsView;
 
     private WattPilot wattPilot = null!;
 
@@ -44,12 +45,20 @@ public class WattPilotSettingsViewModel : ViewModelBase
         set => Set(ref enableDanger, value);
     }
 
-    private string toastText=string.Empty;
+    private string toastText = string.Empty;
 
     public string ToastText
     {
         get => toastText;
         set => Set(ref toastText, value);
+    }
+
+    private string nextTripTimeString = string.Empty;
+
+    public string NextTripTimeString
+    {
+        get => nextTripTimeString;
+        set => Set(ref nextTripTimeString, value);
     }
 
     private string title = "Wattpilot";
@@ -58,6 +67,21 @@ public class WattPilotSettingsViewModel : ViewModelBase
     {
         get => title;
         set => Set(ref title, value);
+    }
+
+    private float nextTripEnergyToCharge;
+
+    public float NextTripEnergyToCharge
+    {
+        get => nextTripEnergyToCharge;
+
+        set => Set(ref nextTripEnergyToCharge, value, () =>
+        {
+            if (WattPilot != null!)
+            {
+                WattPilot.NextTripEnergyToCharge = (int)Math.Round(value * 1000, MidpointRounding.AwayFromZero);
+            }
+        });
     }
 
     private bool isInUpdate;
@@ -104,7 +128,7 @@ public class WattPilotSettingsViewModel : ViewModelBase
 
     private void NavigateToApi()
     {
-        Process.Start(new ProcessStartInfo(ApiUri) {UseShellExecute = true});
+        Process.Start(new ProcessStartInfo(ApiUri) { UseShellExecute = true });
     }
 
 
@@ -128,9 +152,17 @@ public class WattPilotSettingsViewModel : ViewModelBase
         IsUserAuthenticated = localWattPilot.AuthenticatedCardIndex.HasValue;
         oldWattPilot = (WattPilot)localWattPilot.Clone();
 
-        ////Reboot WattPilot
-        //oldWattPilot.Reboot = true;
-        //await wattPilotService.SendValue(oldWattPilot, nameof(Fronius.Models.Charging.WattPilot.Reboot));
+        if (oldWattPilot.NextTripTime.HasValue)
+        {
+            var timeSpan = TimeSpan.FromSeconds(oldWattPilot.NextTripTime.Value);
+            NextTripTimeString = $"{timeSpan.Hours:00}:{timeSpan.Minutes:00}";
+        }
+
+        if (oldWattPilot.NextTripEnergyToCharge.HasValue)
+        {
+            NextTripEnergyToCharge = oldWattPilot.NextTripEnergyToCharge.Value / 1000f;
+        }
+
         Undo();
     }
 
@@ -150,7 +182,45 @@ public class WattPilotSettingsViewModel : ViewModelBase
     {
         try
         {
+            var validationErrors = View.FindVisualChildren<TextBox>().SelectMany(Validation.GetErrors).ToArray();
+
+            foreach (var error in validationErrors)
+            {
+                if
+                (
+                    error.BindingInError is BindingExpression { Target: FrameworkElement { IsVisible: false } } expression &&
+                    oldWattPilot.GetType().GetProperty(expression.ResolvedSourcePropertyName) is { } property
+                )
+                {
+                    var value = property.GetValue(oldWattPilot);
+                    property.SetValue(WattPilot, value);
+                }
+            }
+
+            IList<string> errors = validationErrors
+                .Where(e => e.BindingInError is BindingExpression { Target: FrameworkElement { IsVisible: true } })
+                .Select(e => e.ErrorContent.ToString() ?? string.Empty).ToList();
+
+            if (errors.Count > 0)
+            {
+                MessageBox.Show
+                (
+                    View,
+                    $"{Resources.PleaseCorrectErrors}:{Environment.NewLine}{errors.Aggregate(string.Empty, (c, n) => c + Environment.NewLine + "• " + n)}",
+                    Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error
+                );
+
+                return;
+            }
+
             IsInUpdate = true;
+
+            var nextTripTime = Gen24ChargingRule.GetDate(NextTripTimeString);
+
+            if (nextTripTime.HasValue)
+            {
+                WattPilot.NextTripTime = Math.Min(nextTripTime.Value.Hour * 3600 + nextTripTime.Value.Minute * 60, 86399);
+            }
 
             if (IsUserAuthenticated)
             {
@@ -175,7 +245,7 @@ public class WattPilotSettingsViewModel : ViewModelBase
             var sentSomething = false;
             try
             {
-                var errors = await wattPilotService.Send(WattPilot, oldWattPilot).ConfigureAwait(false);
+                errors = await wattPilotService.Send(WattPilot, oldWattPilot).ConfigureAwait(false);
                 sentSomething = true;
 
                 if (errors.Count > 0)
@@ -195,7 +265,7 @@ public class WattPilotSettingsViewModel : ViewModelBase
             }
             catch (ArgumentException ex)
             {
-                sentSomething=false;
+                sentSomething = false;
                 IsInUpdate = false;
                 Dispatcher.Invoke(() => MessageBox.Show(ex.Message, Resources.Warning, MessageBoxButton.OK, MessageBoxImage.Warning));
             }

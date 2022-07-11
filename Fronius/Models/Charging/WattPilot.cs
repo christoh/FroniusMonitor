@@ -457,7 +457,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     /// <summary>
     ///     Next trip departure time in seconds from day start (local-time)
     /// </summary>
-    [WattPilot("ftt")]
+    [WattPilot("ftt", false)]
     public int? NextTripTime
     {
         get => nextTripTime;
@@ -469,17 +469,25 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     /// <summary>
     ///     Next trip minimum energy to charge
     /// </summary>
-    [WattPilot("fte")]
+    [WattPilot("fte", false)]
     public int? NextTripEnergyToCharge
     {
         get => nextTripEnergyToCharge;
         set => Set(ref nextTripEnergyToCharge, value);
     }
 
+    private bool? nextTripRemainInEcoMode;
+    [WattPilot("fre", false)]
+    public bool? NextTripRemainInEcoMode
+    {
+        get => nextTripRemainInEcoMode;
+        set => Set(ref nextTripRemainInEcoMode, value);
+    }
+
     private byte? absoluteMaximumChargingCurrent;
 
     /// <summary>
-    ///     Set this accordingly to comply with your DNO, e.g. don´t use 32 A if your house only supports 35A
+    ///     Set this in accordance with your DNO, e.g. don´t use 32 A if your house only supports 35A
     /// </summary>
     [WattPilot("ama", false)]
     public byte? AbsoluteMaximumChargingCurrent
@@ -617,7 +625,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     private bool? isChargingAllowed;
 
     /// <summary>
-    ///     Read-only: All prerequisites met (RFID auth, <see cref="ButtonEnableCharging" />, etc.)
+    ///     Read-only: All prerequisites met (RFID auth, <see cref="ButtonEnableCurrentSelection" />, etc.)
     /// </summary>
     [WattPilot("alw")]
     public bool? IsChargingAllowed
@@ -626,16 +634,16 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref isChargingAllowed, value);
     }
 
-    private bool? buttonEnableCharging;
+    private bool? buttonEnableCurrentSelection;
 
     /// <summary>
-    ///     Read-write: Allow/Disallow charging via hardware button
+    ///     Read-write: Allow/Disallow changing the current levels via button
     /// </summary>
     [WattPilot("bac", false)]
-    public bool? ButtonEnableCharging
+    public bool? ButtonEnableCurrentSelection
     {
-        get => buttonEnableCharging;
-        set => Set(ref buttonEnableCharging, value);
+        get => buttonEnableCurrentSelection;
+        set => Set(ref buttonEnableCurrentSelection, value);
     }
 
     private bool buttonEnableModeSwitch;

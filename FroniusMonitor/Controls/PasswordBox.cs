@@ -150,14 +150,24 @@
         private void DoCut(object sender, ExecutedRoutedEventArgs e)
         {
             DoCopy(sender, e);
+
+            if (IsReadOnly)
+            {
+                return;
+            }
+
             var savedCaretIndex = CaretIndex;
             Password = Password[..SelectionStart] + Password[(SelectionStart + SelectionLength)..];
             CaretIndex = savedCaretIndex;
-            e.Handled = true;
         }
 
         private void DoPaste(object sender, ExecutedRoutedEventArgs e)
         {
+            if (IsReadOnly)
+            {
+                return;
+            }
+
             var savedCaretIndex = CaretIndex;
             var clipboardText = Clipboard.GetText();
             Password = Password[..SelectionStart] + clipboardText + Password[(SelectionStart + SelectionLength)..];

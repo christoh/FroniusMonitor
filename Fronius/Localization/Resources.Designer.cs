@@ -340,7 +340,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enable start/stop charging via hardware button.
+        ///   Looks up a localized string similar to Allow current level selection via hardware button.
         /// </summary>
         public static string ButtonEnableCharging {
             get {
@@ -439,7 +439,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Charging logic.
+        ///   Looks up a localized string similar to Charging mode.
         /// </summary>
         public static string ChargingLogic {
             get {
@@ -1483,7 +1483,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Pause (fallback next trip).
+        ///   Looks up a localized string similar to Pause (next trip).
         /// </summary>
         public static string ModelStatus_NotChargingBecauseFallbackAutomaticStop {
             get {
@@ -1641,6 +1641,42 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Name {
             get {
                 return ResourceManager.GetString("Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Minimum energy for next trip.
+        /// </summary>
+        public static string NextTripEnergyToCharge {
+            get {
+                return ResourceManager.GetString("NextTripEnergyToCharge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stay in eco mode.
+        /// </summary>
+        public static string NextTripRemainInEcoMode {
+            get {
+                return ResourceManager.GetString("NextTripRemainInEcoMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Next Trip Settings.
+        /// </summary>
+        public static string NextTripSettings {
+            get {
+                return ResourceManager.GetString("NextTripSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Next trip time.
+        /// </summary>
+        public static string NextTripTime {
+            get {
+                return ResourceManager.GetString("NextTripTime", resourceCulture);
             }
         }
         

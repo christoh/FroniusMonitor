@@ -766,7 +766,7 @@
 	  <value>Pause (Eco)</value>
   </data>
   <data name="ModelStatus_NotChargingBecauseFallbackAutomaticStop" xml:space="preserve">
-	  <value>Pause (fallback next trip)</value>
+	  <value>Pause (next trip)</value>
   </data>
   <data name="ModelStatus_ChargingBecauseCarCompatibilityKeepAlive" xml:space="preserve">
 	  <value>Charging (car compatibility keep-alive)</value>
@@ -835,7 +835,7 @@
 	  <value>Next Trip</value>
   </data>
   <data name="ChargingLogic" xml:space="preserve">
-	  <value>Charging logic</value>
+	  <value>Charging mode</value>
   </data>
   <data name="EcoSettings" xml:space="preserve">
 	  <value>Eco settings</value>
@@ -967,7 +967,7 @@
 	  <value>Reboot</value>
   </data>
   <data name="ButtonEnableCharging" xml:space="preserve">
-	  <value>Enable start/stop charging via hardware button</value>
+	  <value>Allow current level selection via hardware button</value>
   </data>
   <data name="ButtonEnableModeSwitch" xml:space="preserve">
 	  <value>Enable mode switch via hardware button</value>
@@ -983,5 +983,17 @@
   </data>
   <data name="AbsoluteMaximumChargingCurrent" xml:space="preserve">
 	  <value>Charging current limit</value>
+  </data>
+  <data name="NextTripSettings" xml:space="preserve">
+	  <value>Next Trip Settings</value>
+  </data>
+  <data name="NextTripTime" xml:space="preserve">
+	  <value>Next trip time</value>
+  </data>
+  <data name="NextTripEnergyToCharge" xml:space="preserve">
+	  <value>Minimum energy for next trip</value>
+  </data>
+  <data name="NextTripRemainInEcoMode" xml:space="preserve">
+	  <value>Stay in eco mode</value>
   </data>
 </root>

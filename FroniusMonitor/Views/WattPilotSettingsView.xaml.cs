@@ -13,4 +13,17 @@ public partial class WattPilotSettingsView
             await viewModel.OnInitialize().ConfigureAwait(false);
         };
     }
+
+    private void OnChargingLogicChanged(object sender, SelectionChangedEventArgs e)
+    {
+        EcoSettings.Visibility =
+            ChargingLogicBox.SelectedItem is ChargingLogic.NextTrip or ChargingLogic.Eco
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+
+        NextTripSettings.Visibility =
+            ChargingLogicBox.SelectedItem is ChargingLogic.NextTrip
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+    }
 }

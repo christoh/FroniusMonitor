@@ -724,13 +724,13 @@
 	  <value>Laden (Ladeleistung des Autos testen)</value>
   </data>
   <data name="ModelStatus_ChargingBecauseAutomaticStopNotEnoughTime" xml:space="preserve">
-	  <value>Laden (nicht genug Zeit bis nächste Reise)</value>
+	  <value>Laden (nicht genug Zeit bis nächste Fahrt)</value>
   </data>
   <data name="ModelStatus_ChargingBecauseAutomaticStop" xml:space="preserve">
-	  <value>Laden (nächste Reise)</value>
+	  <value>Laden (nächste Fahrt)</value>
   </data>
   <data name="ModelStatus_ChargingBecauseAutomaticStopNoClock" xml:space="preserve">
-	  <value>Laden (nächste Reise, keine Uhrzeit)</value>
+	  <value>Laden (nächste Fahrt, keine Uhrzeit)</value>
   </data>
   <data name="ModelStatus_ChargingBecausePvSurplus" xml:space="preserve">
 	  <value>Laden (PV-Überschuss)</value>
@@ -751,7 +751,7 @@
 	  <value>Pause (Eco)</value>
   </data>
   <data name="ModelStatus_NotChargingBecauseFallbackAutomaticStop" xml:space="preserve">
-	  <value>Pause (Fallback nächste Reise)</value>
+	  <value>Pause (nächste Fahrt)</value>
   </data>
   <data name="ModelStatus_ChargingBecauseCarCompatibilityKeepAlive" xml:space="preserve">
 	  <value>Laden (Fahrzeug-Kompatibilität keep-alive)</value>
@@ -817,7 +817,7 @@
 	  <value>Nächste Fahrt</value>
   </data>
   <data name="ChargingLogic" xml:space="preserve">
-	  <value>Ladelogik</value>
+	  <value>Lademodus</value>
   </data>
   <data name="EcoSettings" xml:space="preserve">
 	  <value>Eco-Einstellungen</value>
@@ -946,7 +946,7 @@
 	  <value>Neustart</value>
   </data>
   <data name="ButtonEnableCharging" xml:space="preserve">
-	  <value>Ladung starten/stoppen über den Hardware-Button erlauben</value>
+	  <value>Erlaube die Auswahl der Stromstufe über den Hardware-Button</value>
   </data>
   <data name="ButtonEnableModeSwitch" xml:space="preserve">
 	  <value>Lademodus über den Hardware-Button umschalten erlauben</value>
@@ -962,5 +962,17 @@
   </data>
   <data name="AbsoluteMaximumChargingCurrent" xml:space="preserve">
 	  <value>Ladestrombegrenzung</value>
+  </data>
+  <data name="NextTripSettings" xml:space="preserve">
+	  <value>Einstellungen für nächste Fahrt</value>
+  </data>
+  <data name="NextTripTime" xml:space="preserve">
+	  <value>Uhrzeit nächste Fahrt</value>
+  </data>
+  <data name="NextTripEnergyToCharge" xml:space="preserve">
+	  <value>Mindestenergie für nächste Fahrt</value>
+  </data>
+  <data name="NextTripRemainInEcoMode" xml:space="preserve">
+	  <value>Im Eco-Modus bleiben</value>
   </data>
 </root>
