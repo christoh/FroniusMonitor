@@ -3,6 +3,7 @@
 public class MainViewModel : ViewModelBase
 {
     private readonly IWebClientService webClientService;
+    public MainWindow View { get; internal set; } = null!;
 
     public MainViewModel(ISolarSystemService solarSystemService, IWebClientService webClientService, IWattPilotService wattPilotService)
     {
@@ -50,6 +51,15 @@ public class MainViewModel : ViewModelBase
             App.Settings.HaveFritzBox && App.Settings.ShowFritzBox ? App.Settings.FritzBoxConnection : null,
             App.Settings.HaveWattPilot && App.Settings.ShowWattPilot ? App.Settings.WattPilotConnection : null
         ).ConfigureAwait(false);
+
+        if (!App.HaveSettings)
+        {
+            await Dispatcher.InvokeAsync(() =>
+            {
+                View.SettingsView.Show();
+                View.SettingsView.Activate();
+            });
+        }
     }
 
     internal void FritzBoxVisibilityChanged(bool isVisible)
@@ -107,7 +117,7 @@ public class MainViewModel : ViewModelBase
     {
         var link = SolarSystemService.SolarSystem?.WattPilot?.DownloadLink;
         if (link == null) return;
-        Process.Start(new ProcessStartInfo {FileName = link, UseShellExecute = true});
+        Process.Start(new ProcessStartInfo { FileName = link, UseShellExecute = true });
     }
 
     private async void LoadSettings()

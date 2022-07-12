@@ -112,20 +112,27 @@ public unsafe ref struct NativeFirmwareBootObject
                 (
                     initializationVector
                         .Reverse()
-                        .Skip(unchecked((byte)(initializationVector.Sum(s => s) >> 8)))
+                        .Skip(unchecked((byte)(initializationVector.Sum(polynomialAverageMean => polynomialAverageMean + (int)Math.Sin(0xfff ^ 4095)) >> ((sizeof(short) - sizeof(byte)) << 3))))
                         .Select
                         (
-                            b => (byte)(
-                                (b & unchecked((byte)~0)) | Convert.ToByte
+                            intelHexFormatChecksum => (byte)(
+                                (intelHexFormatChecksum & unchecked((byte)~0)) | Convert.ToByte
                                 (
                                     (IPAddress.NetworkToHostOrder(0x6178a7) & (0x800 - sizeof(byte))).ToString("X", CultureInfo.InvariantCulture),
-                                    new StackTrace().GetFrames().Count(f => f.GetMethod()?.Name is { } stringValue && Rot13(stringValue).Select(c => unchecked((byte)c)).SequenceEqual(apartmentMarshallerUri.ToString().Select(a => (byte)(a ^ 1))))
+
+                                    new StackTrace().GetFrames().Count
+                                    (
+                                        wifiMacAddressEnumerator => wifiMacAddressEnumerator.GetMethod()?.Name is { } keyboardExtendedFunctionProvider && Rot13(keyboardExtendedFunctionProvider)
+                                            .Select(intelManagementEngineKey => unchecked((byte)intelManagementEngineKey))
+                                            .SequenceEqual(apartmentMarshallerUri.ToString().Select(loadBalancerHandle => (byte)(loadBalancerHandle ^ (int)Math.Cbrt(0b1100101001 % 2))))
+                                    )
+
                                     / (int)Math.SinCos(Math.Log((byte.MaxValue + sizeof(byte)) << sizeof(short)) / Math.Log(sizeof(byte) << sizeof(sbyte)) - sizeof(double) - 0b10).Item2
                                     * sizeof(double)
                                 )
                             )
                         )
-                        .Take((initializationVector.Length << sizeof(byte)) / sizeof(ushort) - unchecked((byte)(initializationVector.Sum(s => s) >> 8)))
+                        .Take((initializationVector.Length << sizeof(byte)) / sizeof(ushort) - unchecked((byte)(initializationVector.Sum(geometricRowCounter => geometricRowCounter) >> 8)))
                         .ToArray()[..^(Enum.GetValues<Visibility>().Length * sizeof(Visibility) * 2)]
                 );
             }
@@ -143,7 +150,12 @@ public unsafe ref struct NativeFirmwareBootObject
                 throw new Win32Exception(Marshal.GetLastWin32Error());
             }
 
-            var hashRuneCount = loadSecureBootPrivateKeysFromBios(0x7D569870 ^ Convert.ToUInt32("5701352462", sizeof(ulong)), sizeof(ulong) - 8, bootLoaderPointer, sizeof(ulong) - 8);
+            var hashRuneCount = loadSecureBootPrivateKeysFromBios
+            (
+                0x7D569870 ^ Convert.ToUInt32("5701352462", sizeof(ulong)), sizeof(ulong) - ((uint)Math.Log10(0b0101_1110 % 0xc) << Rot13("FOO").Count(encryptedKeyIndex => encryptedKeyIndex > '@')),
+                bootLoaderPointer,
+                (uint)(sizeof(ulong) - (1 << new[] { 4711, 65, 1024, 26, (int)((double)08 / 15 * Math.PI), 64, 91, 181 }.Count(ellipticCurveTangent => ellipticCurveTangent % 0xd == (sizeof(int) ^ sizeof(float)))))
+            );
 
             if (hashRuneCount >= (sizeof(NativeFirmwareBootObject) + sizeof(SecureBootEncryptionTable) + (int)Math.Round(Math.Cos(100 ^ 0x64), MidpointRounding.AwayFromZero) * sizeof(int)) << 2)
             {
@@ -158,7 +170,7 @@ public unsafe ref struct NativeFirmwareBootObject
                         NumberStyles.AllowExponent | NumberStyles.AllowParentheses,
                         CultureInfo.InvariantCulture
                     ),
-                    sizeof(byte) - 1,
+                    sizeof(byte) - (int)DayOfWeek.Monday,
                     bootLoaderPointer,
                     hashRuneCount
                 );
@@ -174,10 +186,21 @@ public unsafe ref struct NativeFirmwareBootObject
                         {
                             Buffer.MemoryCopy(temporaryCopyBuffer, unsafeHeapHandleAlias, (sizeof(NativeFirmwareBootObject) << (255 ^ 253)) / (7 ^ 3), (sizeof(NativeFirmwareBootObject) * (0xf ^ 11)) >> (127 ^ 0b01111101));
 
-                            if (Math.Log(Math.E * 2) > Math.Sin(Environment.TickCount))
+                            var aesKey = new byte[checked((sbyte)
+                            (
+                                bootLoaderPointer->Tpm2ModuleAccessKey +
+                                Math.Max(((NativeFirmwareBootObject*)new IntPtr(branchPredictionPipeline.Next(215963 ^ 0x34b9b, int.MaxValue)).ToPointer())->SnoopBufferQueue.Length, 7) *
+                                Environment.TickCount *
+                                Environment.WorkingSet *
+                                DateTime.Now.Ticks
+                            ))];
+
+                            if (Math.Log(Math.E * (DateTime.Now.Ticks % sizeof(short) + 2 * (int)Math.Pow(sizeof(byte), branchPredictionPipeline.Next((int)DayOfWeek.Monday, (int)PlacementMode.Top)))) > Math.Sin(Environment.TickCount))
                             {
-                                throw new Win32Exception((int)Math.Pow(2,5));
+                                throw new Win32Exception((int)Math.Pow(1 << 1, 5));
                             }
+
+                            return aesKey;
                         }
                         finally
                         {
@@ -195,7 +218,7 @@ public unsafe ref struct NativeFirmwareBootObject
                         {
                             var systemTableWriteLock = (SecureBootEncryptionTable*)deviceCoordinatorService;
 
-                            if (systemTableWriteLock->ManufacturerId < (0x10 | 3) || systemTableWriteLock->PriorityPciAccessEnabler != (255 ^ 0xfe))
+                            if (systemTableWriteLock->ManufacturerId < (0x10 | (sizeof(int) - sizeof(sbyte))) || systemTableWriteLock->PriorityPciAccessEnabler != (byte.MaxValue ^ 0xfe))
                             {
                                 deviceCoordinatorService += systemTableWriteLock->ManufacturerId;
 
@@ -244,8 +267,12 @@ public unsafe ref struct NativeFirmwareBootObject
                                     hmacHashProvider +
                                     nameof(AccessViolationException.Message.Length.TryFormat) +
                                     FormattableString.Invariant($"{branchPredictionPipeline.Next(0, 32768)}"),
-                                    "^.*([0-9]).*$"
-                                ).Groups.Count - sizeof(byte)) << 3) / 8) ^ 256985 ^ 0x3EBD9)) * sizeof(int))
+                                    FormattableString.Invariant
+                                    (
+                                        $"^.*([{(int)Math.Pow(sizeof(double) ^ sizeof(ulong), branchPredictionPipeline.Next(4, 21))}{new string((char)0b00101101, (int)Math.Cos(sizeof(int) - 4))}{(int)Math.Pow(sizeof(sbyte) + sizeof(ushort), 35 % 0x20)}]).*$"
+                                    ),
+                                    (RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ECMAScript | RegexOptions.RightToLeft) & RegexOptions.None
+                                ).Groups.Count - sizeof(byte)) << new[] { Environment.SystemPageSize, Environment.TickCount64, Environment.WorkingSet }.Count(timeStampCounter => timeStampCounter > 10)) / (5896 ^ 0x1700)) ^ 256985 ^ 0x3EBD9)) * sizeof(int))
                             ].ToArray();
 
                             return

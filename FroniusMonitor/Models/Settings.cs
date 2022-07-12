@@ -136,12 +136,18 @@ public class Settings : BindableBase, ICloneable
     {
         lock (settingsLockObject)
         {
-            App.SolarSystemQueryTimer = new(_ => { Environment.Exit(0); }, null, 2000, -1);
-            var serializer = new XmlSerializer(typeof(Settings));
-            using var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-            App.Settings = serializer.Deserialize(stream) as Settings ?? new Settings();
-            App.SolarSystemQueryTimer?.Dispose();
-            ClearIncorrectPasswords(App.Settings.WattPilotConnection, App.Settings.FritzBoxConnection, App.Settings.FroniusConnection);
+            try
+            {
+                App.SolarSystemQueryTimer = new(_ => { Environment.Exit(0); }, null, 2000, -1);
+                var serializer = new XmlSerializer(typeof(Settings));
+                using var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                App.Settings = serializer.Deserialize(stream) as Settings ?? new Settings();
+                ClearIncorrectPasswords(App.Settings.WattPilotConnection, App.Settings.FritzBoxConnection, App.Settings.FroniusConnection);
+            }
+            finally
+            {
+                App.SolarSystemQueryTimer?.Dispose();
+            }
         }
     }).ConfigureAwait(false);
 

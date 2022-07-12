@@ -37,6 +37,7 @@ public partial class MainWindow
             ViewModel.Dispatcher = Dispatcher;
             var binding = new Binding($"{nameof(ViewModel.SolarSystemService)}.{nameof(ViewModel.SolarSystemService.SolarSystem)}.{nameof(ViewModel.SolarSystemService.SolarSystem.Gen24System)}.{nameof(ViewModel.SolarSystemService.SolarSystem.Gen24System.PowerFlow)}");
             SetBinding(PowerFlowProperty, binding);
+            ViewModel.View = this;
             await ViewModel.OnInitialize().ConfigureAwait(false);
         };
 

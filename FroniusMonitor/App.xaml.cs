@@ -9,6 +9,7 @@ public partial class App
     public static string PerUserDataDir => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Hochstätter", AppName);
     public static string SettingsFileName => Path.Combine(PerUserDataDir, "Settings.fms");
     public static Timer? SolarSystemQueryTimer;
+    public static bool HaveSettings = true;
 
     public static readonly IUnityContainer Container = new UnityContainer();
 
@@ -49,6 +50,7 @@ public partial class App
         }
         catch
         {
+            HaveSettings = false;
             Settings = new();
             Settings.Save().Wait();
         }
