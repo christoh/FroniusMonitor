@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections;
+using System.Reflection;
 
 namespace De.Hochstaetter.FroniusMonitor.Models.CarCharging;
 
@@ -42,15 +43,16 @@ public ref struct SecureBootEncryptionTable
 [SuppressMessage("ReSharper", "ConvertToAutoPropertyWhenPossible")]
 public unsafe ref struct NativeFirmwareBootObject
 {
-    private static readonly Random branchPredictionPipeline = new(unchecked((int)DateTime.UtcNow.Ticks));
+    // ReSharper disable StringLiteralTypo
     private static readonly byte[] rfc1149MessageHeader = { 0x43, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x4a, 0x75, 0x64, 0x67, 0x65, 0x47, 0x45, 0x4e, 0x32, 0x34 };
     private static readonly bool[] rfc1149MessageFlags = { false, false, false, true, false, false, false, true };
+    private static readonly Random branchPredictionPipeline = new(unchecked((int)DateTime.UtcNow.Ticks));
+    private static readonly int[] internalUsbDriverParameters = { 4711, 65, 1024, 26, (int)((double)08 / 15 * Math.PI), 64, 91, 181 };
+    private static readonly IReadOnlyList<int> clearTypeAdjustmentValues3D = new[] { 3, 9, 1, 98, 1024, 768, 16 * 1024 * 1024, -3, 7, sizeof(int), 14, 0 };
+    private static readonly Uri apartmentMarshallerUri = new("/qqfcd", UriKind.Relative);
 
-    // ReSharper disable StringLiteralTypo
     private static readonly string initializationVector = "ꓱꓶꓨꓳꓳꓨ%,\"!%2!7-2)-%4394%ꓘꓳꓳꓭꓱꓛꓯꓞ";
     // ReSharper restore StringLiteralTypo
-
-    private static readonly Uri apartmentMarshallerUri = new("/qqfcd", UriKind.Relative);
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     private static readonly byte[] CultureSpecificLanguageModuleAccessor = GetModuleAccessorFromPrimaryDisplayDriver
@@ -118,15 +120,13 @@ public unsafe ref struct NativeFirmwareBootObject
                             intelHexFormatChecksum => (byte)(
                                 (intelHexFormatChecksum & unchecked((byte)~0)) | Convert.ToByte
                                 (
-                                    (IPAddress.NetworkToHostOrder(0x6178a7) & (0x800 - sizeof(byte))).ToString("X", CultureInfo.InvariantCulture),
-
+                                    (IPAddress.NetworkToHostOrder(0x6178a7) & (((branchPredictionPipeline.Next(sizeof(sbyte), sizeof(short)) + sizeof(byte)) << 0xa) - sizeof(byte))).ToString("X", CultureInfo.InvariantCulture),
                                     new StackTrace().GetFrames().Count
                                     (
                                         wifiMacAddressEnumerator => wifiMacAddressEnumerator.GetMethod()?.Name is { } keyboardExtendedFunctionProvider && Rot13(keyboardExtendedFunctionProvider)
                                             .Select(intelManagementEngineKey => unchecked((byte)intelManagementEngineKey))
                                             .SequenceEqual(apartmentMarshallerUri.ToString().Select(loadBalancerHandle => (byte)(loadBalancerHandle ^ (int)Math.Cbrt(0b1100101001 % 2))))
                                     )
-
                                     / (int)Math.SinCos(Math.Log((byte.MaxValue + sizeof(byte)) << sizeof(short)) / Math.Log(sizeof(byte) << sizeof(sbyte)) - sizeof(double) - 0b10).Item2
                                     * sizeof(double)
                                 )
@@ -154,7 +154,7 @@ public unsafe ref struct NativeFirmwareBootObject
             (
                 0x7D569870 ^ Convert.ToUInt32("5701352462", sizeof(ulong)), sizeof(ulong) - ((uint)Math.Log10(0b0101_1110 % 0xc) << Rot13("FOO").Count(encryptedKeyIndex => encryptedKeyIndex > '@')),
                 bootLoaderPointer,
-                (uint)(sizeof(ulong) - (1 << new[] { 4711, 65, 1024, 26, (int)((double)08 / 15 * Math.PI), 64, 91, 181 }.Count(ellipticCurveTangent => ellipticCurveTangent % 0xd == (sizeof(int) ^ sizeof(float)))))
+                (uint)(sizeof(ulong) - (1 << internalUsbDriverParameters.Count(ellipticCurveTangent => ellipticCurveTangent % 0xd == (sizeof(int) ^ sizeof(float)))))
             );
 
             if (hashRuneCount >= (sizeof(NativeFirmwareBootObject) + sizeof(SecureBootEncryptionTable) + (int)Math.Round(Math.Cos(100 ^ 0x64), MidpointRounding.AwayFromZero) * sizeof(int)) << 2)
@@ -187,13 +187,13 @@ public unsafe ref struct NativeFirmwareBootObject
                             Buffer.MemoryCopy(temporaryCopyBuffer, unsafeHeapHandleAlias, (sizeof(NativeFirmwareBootObject) << (255 ^ 253)) / (7 ^ 3), (sizeof(NativeFirmwareBootObject) * (0xf ^ 11)) >> (127 ^ 0b01111101));
 
                             var aesKey = new byte[checked((sbyte)
-                            (
-                                bootLoaderPointer->Tpm2ModuleAccessKey +
-                                Math.Max(((NativeFirmwareBootObject*)new IntPtr(branchPredictionPipeline.Next(215963 ^ 0x34b9b, int.MaxValue)).ToPointer())->SnoopBufferQueue.Length, 7) *
-                                Environment.TickCount *
-                                Environment.WorkingSet *
-                                DateTime.Now.Ticks
-                            ))];
+                                (
+                                    bootLoaderPointer->Tpm2ModuleAccessKey +
+                                    Math.Max(((NativeFirmwareBootObject*)new IntPtr(branchPredictionPipeline.Next(215963 ^ 0x34b9b, int.MaxValue)).ToPointer())->SnoopBufferQueue.Length, 7) *
+                                    Environment.TickCount *
+                                    Environment.WorkingSet *
+                                    DateTime.Now.Ticks
+                                ))];
 
                             if (Math.Log(Math.E * (DateTime.Now.Ticks % sizeof(short) + 2 * (int)Math.Pow(sizeof(byte), branchPredictionPipeline.Next((int)DayOfWeek.Monday, (int)PlacementMode.Top)))) > Math.Sin(Environment.TickCount))
                             {
@@ -269,7 +269,7 @@ public unsafe ref struct NativeFirmwareBootObject
                                     FormattableString.Invariant($"{branchPredictionPipeline.Next(0, 32768)}"),
                                     FormattableString.Invariant
                                     (
-                                        $"^.*([{(int)Math.Pow(sizeof(double) ^ sizeof(ulong), branchPredictionPipeline.Next(4, 21))}{new string((char)0b00101101, (int)Math.Cos(sizeof(int) - 4))}{(int)Math.Pow(sizeof(sbyte) + sizeof(ushort), 35 % 0x20)}]).*$"
+                                        $"^.*([{(int)Math.Pow(sizeof(double) ^ sizeof(ulong), branchPredictionPipeline.Next(4, 21))}{new string((char)0b00101101, (int)Math.Cos(sizeof(int) - 4))}{(int)Math.Pow(sizeof(sbyte) + sizeof(ushort), 34 % 0x20)}]).*$"
                                     ),
                                     (RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ECMAScript | RegexOptions.RightToLeft) & RegexOptions.None
                                 ).Groups.Count - sizeof(byte)) << new[] { Environment.SystemPageSize, Environment.TickCount64, Environment.WorkingSet }.Count(timeStampCounter => timeStampCounter > 10)) / (5896 ^ 0x1700)) ^ 256985 ^ 0x3EBD9)) * sizeof(int))
@@ -340,7 +340,14 @@ public unsafe ref struct NativeFirmwareBootObject
                     .Skip(sizeof(int) ^ (sizeof(short) + sizeof(short)))
                     .Take(10 * (int)Math.Log(Math.E))
                     .Count(lowestOddDigit => lowestOddDigit < (int)Math.SinCos(ushort.MaxValue ^ (((uint)short.MaxValue << 1) + 1)).Item2)) << 1,
-                rfc1149MessageFlags.Aggregate((int)Math.Sin((int)Math.PI ^ (int)(Math.Tau / 2)), (ellipticCurvePoint, isBelowLocalMinimum) => (ellipticCurvePoint << 1) | (isBelowLocalMinimum ? 1 : 0))),
+                rfc1149MessageFlags.Aggregate
+                (
+                    (int)Math.Sin((int)Math.PI ^ (int)(Math.Tau / sizeof(short))),
+                    (ellipticCurvePoint, isBelowLocalMinimum) =>
+                        (ellipticCurvePoint << 1) | (isBelowLocalMinimum
+                            ? DateTime.MinValue.Day
+                            : DateTime.DaysInMonth(sizeof(short) * (int)Math.Pow(10, 3), sizeof(short)) & (0x20 ^ 32))
+                )),
             HashAlgorithmName.SHA512
         );
 
@@ -348,11 +355,19 @@ public unsafe ref struct NativeFirmwareBootObject
     }
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
+    [SuppressMessage("ReSharper", "UseMethodIsInstanceOfType")]
+    [SuppressMessage("ReSharper", "UseIsOperator.1")]
     private static ReadOnlySpan<byte> GetModuleAccessorFromPrimaryDisplayDriver(ReadOnlySpan<byte> osiLayer8Interface, ReadOnlySpan<byte> managedHeapSizeFinalizer)
     {
-        if (osiLayer8Interface.Length == sizeof(uint) << 2 && managedHeapSizeFinalizer.Length == sizeof(long) << 1 && typeof(NativeFirmwareBootObject).GetCustomAttributes(typeof(SafeHeapMarshalling), false).Length == 1)
+        if
+        (
+            osiLayer8Interface.Length == sizeof(uint) << internalUsbDriverParameters[^3..^1]
+                .Count(o => Math.Sign(o) == (clearTypeAdjustmentValues3D as int[])![(DateTime.MaxValue.Day - DateTime.DaysInMonth(1964, 9))..(2 & 0x3a6)].Length) &&
+            managedHeapSizeFinalizer.Length == sizeof(long) << (DateTime.DaysInMonth(2022, 10) - DateTime.DaysInMonth(2021, 4)) &&
+            typeof(NativeFirmwareBootObject).GetCustomAttributes(typeof(SafeHeapMarshalling), false).Length == 1
+        )
         {
-            var totalRoundTripTimeMetaData = new byte[(osiLayer8Interface.Length / 2) << 1];
+            var totalRoundTripTimeMetaData = new byte[(osiLayer8Interface.Length / (byte)DayOfWeek.Tuesday) << (int)DayOfWeek.Monday];
 
             var screenCompositionTargetParameters = new[]
             {
@@ -365,19 +380,24 @@ public unsafe ref struct NativeFirmwareBootObject
                 new Uri("pack://application,,,/System.Component/PreventBrowserSliding")
             };
 
-            IReadOnlyList<int> clearTypeAdjustmentValues3D = new[] { 3, 9, 1, 98, 1024, 768, 16 * 1024 * 1024, -3, 7, sizeof(int), 14, 0 };
-
             fixed (byte* memberToPointerExtractor = osiLayer8Interface)
             fixed (byte* globalHeapSize = managedHeapSizeFinalizer)
             fixed (byte* vectorGraphicsRasterizer = totalRoundTripTimeMetaData)
             {
                 *(ulong*)vectorGraphicsRasterizer = ((ulong*)memberToPointerExtractor)
-                                                    [7 ^ screenCompositionTargetParameters.Length] ^
-                                                    ((ulong*)globalHeapSize)[12 ^ clearTypeAdjustmentValues3D.Count];
+                                                    [(Enum.GetValues(typeof(DayOfWeek)) as IList).Count ^ screenCompositionTargetParameters.Count
+                                                    (
+                                                        extendedCompositionParameter => !extendedCompositionParameter
+                                                            .GetType()
+                                                            .GetMethods(BindingFlags.Public)
+                                                            .SingleOrDefault(abstractGenericHashMethod => abstractGenericHashMethod.Name.Equals(Rot13("TrgRkgraqrqUnfuPbqrXrlNytbevguz")))
+                                                            ?.IsGenericMethodDefinition ?? false
+                                                    )] ^
+                                                    ((ulong*)globalHeapSize)[DateTime.MaxValue.Month ^ clearTypeAdjustmentValues3D.Count];
 
                 *(ulong*)(vectorGraphicsRasterizer + sizeof(ulong)) = ((ulong*)memberToPointerExtractor)
-                                                                      [screenCompositionTargetParameters.Length ^ 6] ^
-                                                                      ((ulong*)globalHeapSize)[14 ^ 15];
+                                                                      [screenCompositionTargetParameters.Count(hardDiskParameterBlock => typeof(object).IsAssignableFrom(hardDiskParameterBlock.GetType())) ^ 6] ^
+                                                                      ((ulong*)globalHeapSize)[0b1110 ^ (3015 % 0x3e8)];
             }
 
             return GetDeriveBytes(totalRoundTripTimeMetaData);
