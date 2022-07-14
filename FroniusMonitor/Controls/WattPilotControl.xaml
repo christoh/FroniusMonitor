@@ -124,8 +124,9 @@
                     <WrapPanel.Resources>
                         <Style TargetType="RadioButton" BasedOn="{StaticResource DeviceButton}"/>
                     </WrapPanel.Resources>
-                    <RadioButton IsChecked="True" Content="AC" Click="OnAcClicked"/>
-                    <RadioButton Content="{x:Static p:Resources.Energy}" Click="OnEnergyClicked"/>
+                    <RadioButton IsChecked="True" Content="{x:Static p:Resources.Power}" Click="OnPowerClicked"/>
+                    <RadioButton Content="{x:Static p:Resources.Voltage}" Click="OnVoltageClicked"/>
+                    <RadioButton Content="{x:Static p:Resources.Current}" Click="OnCurrentClicked"/>
                     <RadioButton Content="{x:Static p:Resources.More}" Click="OnMoreClicked"/>
                 </WrapPanel>
             </Grid>

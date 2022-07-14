@@ -75,8 +75,6 @@ public partial class Typ2
 
     private void UpdatePeAndN(SolidColorBrush l1, SolidColorBrush l2, SolidColorBrush l3)
     {
-        Color allColors;
-
         if (IsAny(Colors.LightGreen, l1, l2, l3))
         {
             N.Fill = Pe.Fill = Brushes.LightGreen;
@@ -102,7 +100,6 @@ public partial class Typ2
         bool IsAny(Color color, params SolidColorBrush[] brushes)
         {
             return brushes.Any(b => b.Color == color);
-
         }
     }
 

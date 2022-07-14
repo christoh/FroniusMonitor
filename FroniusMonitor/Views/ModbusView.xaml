@@ -24,6 +24,7 @@
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="HorizontalAlignment" Value="Right" />
                 <Setter Property="Margin" Value="0,4,0,4" />
+                <Setter Property="Opacity" Value="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={co:Bool2Double False=.5, True=1}}"></Setter>
             </Style>
             <Style TargetType="ComboBox" x:Key="StandardComboBox">
                 <Setter Property="Margin" Value="8,4,0,4" />

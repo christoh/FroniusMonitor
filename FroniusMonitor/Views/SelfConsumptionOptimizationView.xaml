@@ -21,6 +21,9 @@
             <Setter Property="MinWidth" Value="70" />
             <Setter Property="Padding" Value="8,0" />
         </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="Opacity" Value="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={co:Bool2Double True=1, False=.5}}"/>
+        </Style>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -143,14 +146,23 @@
                         <CheckBox Content="{l:Loc 'BATTERIES', 'HYB_BM_CHARGEFROMAC'}"
                               IsChecked="{Binding Settings.ChargeFromAc}" />
                         <CheckBox IsEnabled="{Binding EnableDanger}"
-                              Content="{x:Static p:Resources.EnableBattery}"
-                              IsChecked="{Binding Settings.IsEnabled}" />
+                              IsChecked="{Binding Settings.IsEnabled}">
+                            <CheckBox.Content>
+                                <TextBlock Text="{x:Static p:Resources.EnableBattery}"></TextBlock>
+                            </CheckBox.Content>
+                        </CheckBox>
                         <CheckBox IsEnabled="{Binding EnableDanger}"
-                              Content="{x:Static p:Resources.CalibrateBattery}"
-                              IsChecked="{Binding Settings.IsInCalibration}" />
+                              IsChecked="{Binding Settings.IsInCalibration}">
+                        <CheckBox.Content>
+                            <TextBlock Text="{x:Static p:Resources.CalibrateBattery}"></TextBlock>
+                        </CheckBox.Content>
+                            </CheckBox>
                         <CheckBox IsEnabled="{Binding EnableDanger}"
-                              Content="{x:Static p:Resources.BatteryIsAcCoupled}"
-                              IsChecked="{Binding Settings.IsAcCoupled}" />
+                                  IsChecked="{Binding Settings.IsAcCoupled}">
+                            <CheckBox.Content>
+                                <TextBlock Text="{x:Static p:Resources.BatteryIsAcCoupled}"></TextBlock>
+                            </CheckBox.Content>
+                        </CheckBox>
                     </StackPanel>
                     <Grid Margin="0,0,0,8" Grid.Row="1" Visibility="{Binding Settings.ChargeFromAc, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}">
                         <Grid.RowDefinitions>

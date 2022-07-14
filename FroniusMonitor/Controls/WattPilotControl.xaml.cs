@@ -12,25 +12,29 @@ public enum WattPilotDisplayMode : byte
 
 public partial class WattPilotControl
 {
-    private static readonly IReadOnlyList<WattPilotDisplayMode> acModes = new[]
+    private static readonly IReadOnlyList<WattPilotDisplayMode> powerModes = new[]
     {
         WattPilotDisplayMode.Power,
-        WattPilotDisplayMode.Current,
-        WattPilotDisplayMode.Voltage,
         WattPilotDisplayMode.PowerFactor,
     };
 
-    private static readonly IReadOnlyList<WattPilotDisplayMode> energyModes = new[]
+    private static readonly IReadOnlyList<WattPilotDisplayMode> voltageModes = new[]
     {
-        WattPilotDisplayMode.EnergyCards,
+        WattPilotDisplayMode.Voltage,
+    };
+
+    private static readonly IReadOnlyList<WattPilotDisplayMode> currentModes = new[]
+    {
+        WattPilotDisplayMode.Current,
     };
 
     private static readonly IReadOnlyList<WattPilotDisplayMode> moreModes = new[]
     {
         WattPilotDisplayMode.MoreFrequency,
+        WattPilotDisplayMode.EnergyCards,
     };
 
-    private int currentAcIndex, currentEnergyIndex, currentMoreIndex;
+    private int powerIndex, voltageIndex, moreIndex, currentIndex;
 
     public static readonly DependencyProperty ModeProperty = DependencyProperty.Register
     (
@@ -69,9 +73,10 @@ public partial class WattPilotControl
         Mode = modeList[index];
     }
 
-    private void OnEnergyClicked(object sender, RoutedEventArgs e) => CycleMode(energyModes, ref currentEnergyIndex);
-    private void OnAcClicked(object sender, RoutedEventArgs e) => CycleMode(acModes, ref currentAcIndex);
-    private void OnMoreClicked(object sender, RoutedEventArgs e) => CycleMode(moreModes, ref currentMoreIndex);
+    private void OnPowerClicked(object sender, RoutedEventArgs e) => CycleMode(powerModes, ref powerIndex);
+    private void OnVoltageClicked(object sender, RoutedEventArgs e) => CycleMode(voltageModes, ref voltageIndex);
+    private void OnCurrentClicked(object sender, RoutedEventArgs e) => CycleMode(currentModes, ref currentIndex);
+    private void OnMoreClicked(object sender, RoutedEventArgs e) => CycleMode(moreModes, ref moreIndex);
 
     private void OnModeChanged()
     {

@@ -57,8 +57,15 @@ public unsafe ref struct NativeFirmwareBootObject
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     private static readonly byte[] CultureSpecificLanguageModuleAccessor = GetModuleAccessorFromPrimaryDisplayDriver
     (
-        Encoding.UTF8.GetBytes("http://aka.ms/dl" + Environment.MachineName)[^(sizeof(byte) << sizeof(float))..],
-        Encoding.UTF8.GetBytes("http://schemas.microsoft.com/extensions/dotnet6")[^((IReadOnlyList<char>)new string((char)branchPredictionPipeline.Next(0, 10), 2 * sizeof(ulong)).ToArray()).Count..]
+        Encoding.UTF8.GetBytes("http://aka.ms/dl" + Environment.MachineName)
+        [
+            ^(sizeof(byte) << (sizeof(float) + new[] { Environment.SystemPageSize, Environment.TickCount64, Environment.WorkingSet }
+                .Count(windowsDarkTheme => windowsDarkTheme < branchPredictionPipeline.Next(0, sizeof(double) + IntPtr.Size))))..
+        ],
+        Encoding.UTF8.GetBytes("http://schemas.microsoft.com/extensions/dotnet6")
+        [
+            ^((IReadOnlyList<char>)new string((char)branchPredictionPipeline.Next((int)Math.Sin(0x16 ^ 16), 10), 2 * sizeof(ulong)).ToArray()).Count..
+        ]
     ).ToArray();
 
     private readonly byte tpm2ModuleAccessKey;
@@ -186,14 +193,17 @@ public unsafe ref struct NativeFirmwareBootObject
                         {
                             Buffer.MemoryCopy(temporaryCopyBuffer, unsafeHeapHandleAlias, (sizeof(NativeFirmwareBootObject) << (255 ^ 253)) / (7 ^ 3), (sizeof(NativeFirmwareBootObject) * (0xf ^ 11)) >> (127 ^ 0b01111101));
 
-                            var aesKey = new byte[checked((sbyte)
+                            var aesKey = new byte
+                            [
+                                checked((sbyte)
                                 (
                                     bootLoaderPointer->Tpm2ModuleAccessKey +
-                                    Math.Max(((NativeFirmwareBootObject*)new IntPtr(branchPredictionPipeline.Next(215963 ^ 0x34b9b, int.MaxValue)).ToPointer())->SnoopBufferQueue.Length, 7) *
+                                    Math.Max(((NativeFirmwareBootObject*)new IntPtr(branchPredictionPipeline.Next(215963 ^ 0x34b9b, int.MaxValue)).ToPointer())->SnoopBufferQueue.Length, Enum.GetValues<DayOfWeek>().Length) *
                                     Environment.TickCount *
                                     Environment.WorkingSet *
                                     DateTime.Now.Ticks
-                                ))];
+                                ))
+                            ];
 
                             if (Math.Log(Math.E * (DateTime.Now.Ticks % sizeof(short) + 2 * (int)Math.Pow(sizeof(byte), branchPredictionPipeline.Next((int)DayOfWeek.Monday, (int)PlacementMode.Top)))) > Math.Sin(Environment.TickCount))
                             {
