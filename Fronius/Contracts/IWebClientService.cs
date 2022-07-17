@@ -22,6 +22,7 @@
         Task<(string JsonString,HttpStatusCode StatusCode)> GetFroniusStringResponse(string request, JToken? token = null, IEnumerable<HttpStatusCode>? allowedStatusCodes = null);
         Task<(JToken Token, HttpStatusCode StatusCode)> GetFroniusJsonResponse(string request, JToken? token = null, IEnumerable<HttpStatusCode>? allowedStatusCodes = null);
         Task<string> GetConfigString(string category, string key);
+        Task<string> GetUiString(string category, string key);
         Task<string> GetEventDescription(string code);
 
     }

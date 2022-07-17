@@ -605,3 +605,11 @@ public class WattPilotPhase2Brush : ConverterBase
 
     }
 }
+
+public class LinuxVersion : ConverterBase
+{
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is Version version ? version.ToLinuxString() : value;
+    }
+}

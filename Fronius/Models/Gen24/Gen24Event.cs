@@ -46,9 +46,9 @@ public class Gen24Event : BindableBase
         set => Set(ref prefix, value, () => NotifyOfPropertyChange(nameof(Code)));
     }
 
-    private int? eventId;
+    private uint? eventId;
     [FroniusProprietaryImport("eventID", FroniusDataType.Root)]
-    public int? EventId
+    public uint? EventId
     {
         get => eventId;
         set => Set(ref eventId, value, () => NotifyOfPropertyChange(nameof(Code)));

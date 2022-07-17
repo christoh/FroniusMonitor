@@ -159,7 +159,7 @@
                         <c:PowerFlowArrow VerticalAlignment="Top" Fill="#ffd000" Margin="15,0"
                                           Power="{Binding SolarSystemService.SolarSystem.Gen24System.PowerFlow.SolarPower, FallbackValue={x:Null}}" />
 
-                        <c:InverterControl Height="200" Inverter="{Binding SolarSystemService.SolarSystem.PrimaryInverter, FallbackValue={x:Null}}" />
+                        <c:InverterControl Height="200" Inverter="{Binding SolarSystemService.SolarSystem.PrimaryInverter, FallbackValue={x:Null}}" Versions="{Binding SolarSystemService.SolarSystem.Versions, FallbackValue={x:Null}}"/>
 
                         <c:PowerFlowArrow x:Name="LoadArrow" VerticalAlignment="Top" Fill="LightGray" HasRightPlacement="True" DefaultsToOutgoing="True"
                                           Margin="25,0,10,0">

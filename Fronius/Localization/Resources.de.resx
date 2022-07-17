@@ -975,4 +975,10 @@
   <data name="NextTripRemainInEcoMode" xml:space="preserve">
 	  <value>Im Eco-Modus bleiben</value>
   </data>
+  <data name="NoGen24Symo" xml:space="preserve">
+	  <value>Kann nicht verifizieren, dass es sich um einen GEN24 Symo handelt.</value>
+  </data>
+  <data name="UtcBug" xml:space="preserve">
+	  <value>Aufgrund eines Bugs in Firmversion 1.19.7-1 sind alle Zeiten in den Batterieladeregeln in UTC. Du solltest auf 1.21.6-1 oder höher upgraden.</value>
+  </data>
 </root>

@@ -48,13 +48,13 @@
                     </Grid.RowDefinitions>
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,4" HorizontalAlignment="Left">
                         <RadioButton IsChecked="{Binding Settings.Mode, Mode=TwoWay, Converter={co:OptimizationMode2Bool Automatic=True, Manual=False}}"
-                                 Margin="8,0" Content="{x:Static p:Resources.Automatic}" />
+                                 Margin="8,0" Content="{l:LocConfig 'BATTERIES','AUTO'}" />
                         <RadioButton IsChecked="{Binding Settings.Mode, Mode=TwoWay, Converter={co:OptimizationMode2Bool Automatic=False, Manual=True}}"
-                                 Margin="8,0" Content="{x:Static p:Resources.Manual}" />
+                                 Margin="8,0" Content="{l:LocConfig 'BATTERIES','MANUAL'}" />
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left"
                                 Visibility="{Binding Settings.Mode, Converter={co:OptimizationMode2Visibility}, FallbackValue=Collapsed}">
-                            <RadioButton Content="{x:Static p:Resources.FeedIn}" IsChecked="{Binding IsFeedIn, Mode=TwoWay}" Margin="8,0" />
-                            <RadioButton Content="{x:Static p:Resources.Consumption}" IsChecked="{Binding IsFeedIn, Mode=TwoWay, Converter={co:BoolInverter}}" Margin="8,0" />
+                            <RadioButton Content="{l:LocUi 'BATTERIES', 'FEED_IN'}" IsChecked="{Binding IsFeedIn, Mode=TwoWay}" Margin="8,0" />
+                            <RadioButton Content="{l:LocUi 'BATTERIES', 'CONSUMPTION'}" IsChecked="{Binding IsFeedIn, Mode=TwoWay, Converter={co:BoolInverter}}" Margin="8,0" />
                         </StackPanel>
                     </StackPanel>
                     <Grid Grid.Row="1" Margin="0,8,0,4"
@@ -67,7 +67,7 @@
                         </Grid.RowDefinitions>
                         <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,8,0,-2" HorizontalAlignment="Center">
                             <TextBlock Margin="0,0,4,0">
-                            <Run Text="{x:Static p:Resources.Power}" /><Run Text=":" />
+                            <Run Text="{l:LocConfig 'BATTERIES', 'HYB_EM_POWER'}" /><Run Text=":" />
                             </TextBlock>
                             <TextBox TextAlignment="Center" Width="40"
                                  Text="{co:ValidationBinding Path=RequestedGridPower, Rule={v:MinMaxIntRule Minimum=0, Maximum=50000}}" />
@@ -88,9 +88,9 @@
                     </Grid.RowDefinitions>
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,4">
                         <RadioButton IsChecked="{Binding Settings.Limits, Mode=TwoWay, Converter={co:SocLimits2Bool UseDefault=True, Override=False}}"
-                                 Margin="8,0" Content="{x:Static p:Resources.UseManufacturerDefaults}" />
+                                 Margin="8,0" Content="{l:LocConfig 'BATTERIES', 'SOC_MODE_AUTO'}" />
                         <RadioButton IsChecked="{Binding Settings.Limits, Mode=TwoWay, Converter={co:SocLimits2Bool UseDefault=False, Override=True}}"
-                                 Margin="8,0" Content="{x:Static p:Resources.Manual}" />
+                                 Margin="8,0" Content="{l:LocConfig 'BATTERIES', 'SOC_MODE_MANUAL'}" />
                     </StackPanel>
                     <Grid Grid.Row="1"
                       Visibility="{Binding Settings.Limits, Converter={co:SocLimits2Visibility}, FallbackValue=Collapsed}">
@@ -102,7 +102,7 @@
                         </Grid.RowDefinitions>
                         <StackPanel Orientation="Horizontal" Margin="0,8,0,-2" HorizontalAlignment="Center" Grid.Row="0">
                             <TextBlock Margin="0,0,4,0">
-                            <Run Text="{x:Static p:Resources.MinimumSoc}" /><Run Text=":" />
+                            <Run Text="{l:LocConfig 'BATTERIES', 'BAT_M0_SOC_MIN'}" /><Run Text=":" />
                             </TextBlock>
                             <TextBox TextAlignment="Center" Width="40"
                                  Text="{co:ValidationBinding Path=SocMin, Rule={v:RegExRule Pattern='^100$|^0*([0-9]{1,2})$', Message={x:Static p:Resources.MustBePercent}}}" />
@@ -111,7 +111,7 @@
                         <Slider Value="{Binding SocMin, Mode=TwoWay}" Grid.Row="1" HorizontalAlignment="Stretch" Minimum="5" Maximum="100" />
                         <StackPanel Orientation="Horizontal" Margin="0,8,0,-2" HorizontalAlignment="Center" Grid.Row="2">
                             <TextBlock Margin="0,0,4,0">
-                            <Run Text="{x:Static p:Resources.MaximumSoc}" /><Run Text=":" />
+                            <Run Text="{l:LocConfig 'BATTERIES', 'BAT_M0_SOC_MAX'}" /><Run Text=":" />
                             </TextBlock>
                             <TextBox TextAlignment="Center" Width="40"
                                  Text="{co:ValidationBinding Path=SocMax, Rule={v:RegExRule Pattern='^100$|^0*([0-9]{1,2})$', Message={x:Static p:Resources.MustBePercent}}}" />
@@ -141,9 +141,9 @@
                                 <Setter Property="Margin" Value="0,0,8,0" />
                             </Style>
                         </StackPanel.Resources>
-                        <CheckBox Content="{l:Loc 'BATTERIES', 'HYB_EVU_CHARGEFROMGRID'}"
+                        <CheckBox Content="{l:LocConfig 'BATTERIES', 'HYB_EVU_CHARGEFROMGRID'}"
                               IsChecked="{Binding Settings.ChargeFromGrid}" />
-                        <CheckBox Content="{l:Loc 'BATTERIES', 'HYB_BM_CHARGEFROMAC'}"
+                        <CheckBox Content="{l:LocConfig 'BATTERIES', 'HYB_BM_CHARGEFROMAC'}"
                               IsChecked="{Binding Settings.ChargeFromAc}" />
                         <CheckBox IsEnabled="{Binding EnableDanger}"
                               IsChecked="{Binding Settings.IsEnabled}">
@@ -171,9 +171,9 @@
                         </Grid.RowDefinitions>
                         <StackPanel Orientation="Horizontal" Margin="0,8,0,-2" HorizontalAlignment="Center" Grid.Row="0">
                             <TextBlock Margin="0,0,4,0">
-                            <Run Text="{x:Static p:Resources.MaxHomeChargingPower}" /><Run Text=":" />
+                            <Run Text="{l:LocConfig 'BATTERIES', 'HYB_BM_PACMIN'}" /><Run Text=":" />
                             </TextBlock>
-                            <TextBox TextAlignment="Center" Width="40" Text="{co:ValidationBinding Path= AcPowerMinimum, Converter={co:ToAbsolute}, Rule={v:MinMaxIntRule}}" />
+                            <TextBox TextAlignment="Center" Width="40" Text="{co:ValidationBinding Path= BatteryAcChargingMaxPower, Converter={co:ToAbsolute}, Rule={v:MinMaxIntRule}}" />
                             <TextBlock Margin="4,0,0,0" Text="W" />
                         </StackPanel>
                         <Slider Grid.Row="1" Value="{Binding LogHomePower, Mode=TwoWay}"
@@ -193,7 +193,7 @@
                     </Grid.RowDefinitions>
                     <StackPanel Orientation="Horizontal" Margin="0,-4,0,-2" HorizontalAlignment="Center" Grid.Row="0">
                         <TextBlock Margin="0,0,4,0">
-                        <Run Text="{l:Loc 'BATTERIES', 'HYB_BACKUP_CRITICALSOC'}" /><Run Text=":" />
+                        <Run Text="{l:LocConfig 'BATTERIES', 'HYB_BACKUP_CRITICALSOC'}" /><Run Text=":" />
                         </TextBlock>
                         <TextBox TextAlignment="Center" Width="40"
                              Text="{co:ValidationBinding Path=Settings.BackupCriticalSoc, Rule={v:RegExRule Pattern='^100$|^0*([0-9]{1,2})$', Message={x:Static p:Resources.MustBePercent}}}" />
@@ -202,7 +202,7 @@
                     <Slider Value="{Binding Settings.BackupCriticalSoc, Mode=TwoWay}" Grid.Row="1" HorizontalAlignment="Stretch" Minimum="0" Maximum="100" />
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,-2" HorizontalAlignment="Center" Grid.Row="2">
                         <TextBlock Margin="0,0,4,0">
-                        <Run Text="{l:Loc 'BATTERIES', 'HYB_BACKUP_RESERVED'}" /><Run Text=":" />
+                        <Run Text="{l:LocConfig 'BATTERIES', 'HYB_BACKUP_RESERVED'}" /><Run Text=":" />
                         </TextBlock>
                         <TextBox TextAlignment="Center" Width="40"
                              Text="{co:ValidationBinding Path=Settings.BackupReserve, Rule={v:MinMaxIntRule Minimum=5, Maximum=95}}" />
@@ -296,21 +296,21 @@
                         <DataGridCheckBoxColumn Header="{x:Static p:Resources.Active}" Binding="{Binding IsActive, UpdateSourceTrigger=PropertyChanged}" CanUserReorder="False" CanUserResize="True" CanUserSort="True" SortMemberPath="IsActive"
                                                 HeaderStyle="{StaticResource Es}" ElementStyle="{StaticResource CheckBoxStyle}" />
 
-                        <DataGridTextColumn Header="{x:Static p:Resources.StartUtc}" Binding="{co:ValidationBinding StartTime, Rule={v:ChargingRuleDate}}" SortMemberPath="StartTime"
+                        <DataGridTextColumn Header="{x:Static p:Resources.Start}" Binding="{co:ValidationBinding StartTime, Rule={v:ChargingRuleDate}}" SortMemberPath="StartTime"
                                             HeaderStyle="{StaticResource Es}" CanUserReorder="False" CanUserResize="True" CanUserSort="True" SortDirection="Ascending"
                                             ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
 
-                        <DataGridTextColumn Header="{x:Static p:Resources.EndUtc}" Binding="{co:ValidationBinding EndTime, Rule={v:ChargingRuleDate}}" SortMemberPath="EndTime"
+                        <DataGridTextColumn Header="{x:Static p:Resources.End}" Binding="{co:ValidationBinding EndTime, Rule={v:ChargingRuleDate}}" SortMemberPath="EndTime"
                                             HeaderStyle="{StaticResource Es}" CanUserReorder="False" CanUserResize="True" CanUserSort="True"
                                             ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
 
-                        <DataGridTextColumn Header="{x:Static p:Resources.StartLocal}" IsReadOnly="True" Binding="{Binding StartTimeDate, Mode=OneWay, Converter={co:DateConverter StringFormat=HH:mm}}" SortMemberPath="StartTimeDate"
+                        <!--<DataGridTextColumn Header="{x:Static p:Resources.StartLocal}" IsReadOnly="True" Binding="{Binding StartTimeDate, Mode=OneWay, Converter={co:DateConverter StringFormat=HH:mm}}" SortMemberPath="StartTimeDate"
                                             HeaderStyle="{StaticResource Es}" CanUserReorder="False" CanUserResize="True" CanUserSort="True" SortDirection="Ascending"
                                             ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
 
                         <DataGridTextColumn Header="{x:Static p:Resources.EndLocal}" IsReadOnly="True"  Binding="{Binding EndTimeDate, Converter={co:DateConverter StringFormat=HH:mm}}" SortMemberPath="EndTimeDate"
                                             HeaderStyle="{StaticResource Es}" CanUserReorder="False" CanUserResize="True" CanUserSort="True"
-                                            ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
+                                            ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />-->
 
                         <DataGridTemplateColumn Header="{x:Static p:Resources.RuleType}" HeaderStyle="{StaticResource Es}" CanUserReorder="False" CanUserResize="True" CanUserSort="True" SortMemberPath="RuleType">
                             <DataGridTemplateColumn.CellTemplate>

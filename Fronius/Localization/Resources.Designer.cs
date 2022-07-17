@@ -1708,6 +1708,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot verify that the inverter is a GEN24 Symo.
+        /// </summary>
+        public static string NoGen24Symo {
+            get {
+                return ResourceManager.GetString("NoGen24Symo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No RFID card.
         /// </summary>
         public static string NoRfidCard {
@@ -2622,6 +2631,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Username {
             get {
                 return ResourceManager.GetString("Username", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Due to a bug in firmware 1.19.7-1 time in battery charging rules is UTC. Consider upgrading to 1.21.6-1 or higher..
+        /// </summary>
+        public static string UtcBug {
+            get {
+                return ResourceManager.GetString("UtcBug", resourceCulture);
             }
         }
         

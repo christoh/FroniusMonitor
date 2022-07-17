@@ -9,6 +9,8 @@ public class WebClientService : BindableBase, IWebClientService
     private DateTime lastSolarApiCall = DateTime.UtcNow.AddSeconds(-4);
     private JObject? invariantConfigToken;
     private JObject? localConfigToken;
+    private JObject? localUiToken;
+    private JObject? invariantUiToken;
     private JObject? localEventToken;
     private JObject? invariantEventToken;
 
@@ -279,16 +281,27 @@ public class WebClientService : BindableBase, IWebClientService
         return result;
     }
 
+    public async Task<string> GetUiString(string category, string key)
+    {
+        (localUiToken, invariantUiToken) = await EnsureText("app/assets/i18n/WeblateTranslations/ui", localUiToken, invariantUiToken).ConfigureAwait(false);
+        return GetCategoryKeyString(localUiToken, invariantUiToken, category, key);
+    }
+
     public async Task<string> GetConfigString(string category, string key)
     {
         (localConfigToken, invariantConfigToken) = await EnsureText("app/assets/i18n/WeblateTranslations/config", localConfigToken, invariantConfigToken).ConfigureAwait(false);
-        return localConfigToken?[category]?[key]?.Value<string>() ?? invariantConfigToken?[category]?[key]?.Value<string>() ?? $"{category}.{key}";
+        return GetCategoryKeyString(localConfigToken, invariantConfigToken, category, key);
     }
 
     public async Task<string> GetEventDescription(string code)
     {
         (localEventToken, invariantEventToken) = await EnsureText("app/assets/i18n/StateCodeTranslations", localEventToken, invariantEventToken).ConfigureAwait(false);
-        return localEventToken?["StateCodes"]?[code]?.Value<string>() ?? invariantEventToken?["StateCodes"]?[code]?.Value<string>() ?? code;
+        return GetCategoryKeyString(localEventToken, invariantEventToken, "StateCodes", code);
+    }
+
+    private string GetCategoryKeyString(JObject? localToken, JObject? invariantToken, string category, string key)
+    {
+        return localToken?[category]?[key]?.Value<string>() ?? invariantToken?[category]?[key]?.Value<string>() ?? $"{(category != "StateCodes" ? $"{category}." : string.Empty)}{key}";
     }
 
     private async Task<(JObject?, JObject?)> EnsureText(string baseUrl, JObject? l, JObject? i)
@@ -299,7 +312,7 @@ public class WebClientService : BindableBase, IWebClientService
         }
         catch
         {
-            i ??= new JObject();
+            //i ??= new JObject();
         }
 
 
@@ -311,7 +324,7 @@ public class WebClientService : BindableBase, IWebClientService
             }
             catch
             {
-                l = new JObject();
+                //l = new JObject();
             }
         }
 

@@ -996,4 +996,10 @@
   <data name="NextTripRemainInEcoMode" xml:space="preserve">
 	  <value>Stay in eco mode</value>
   </data>
+  <data name="NoGen24Symo" xml:space="preserve">
+	  <value>Cannot verify that the inverter is a GEN24 Symo</value>
+  </data>
+  <data name="UtcBug" xml:space="preserve">
+	  <value>Due to a bug in firmware 1.19.7-1 time in battery charging rules is UTC. Consider upgrading to 1.21.6-1 or higher.</value>
+  </data>
 </root>

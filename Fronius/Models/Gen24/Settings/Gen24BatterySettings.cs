@@ -105,13 +105,13 @@ public class Gen24BatterySettings : BindableBase, ICloneable
         set => Set(ref chargeFromGrid, value);
     }
 
-    private int? acPowerMinimum;
+    private int? batteryAcChargingMaxPower;
 
     [FroniusProprietaryImport("HYB_BM_PACMIN", FroniusDataType.Root)]
-    public int? AcPowerMinimum
+    public int? BatteryAcChargingMaxPower
     {
-        get => acPowerMinimum;
-        set => Set(ref acPowerMinimum, value);
+        get => batteryAcChargingMaxPower;
+        set => Set(ref batteryAcChargingMaxPower, value);
     }
 
     private OptimizationMode? mode;

@@ -7,13 +7,18 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
     private SelfConsumptionOptimizationView view = null!;
     private Gen24BatterySettings oldSettings = null!;
     private BindableCollection<Gen24ChargingRule> oldChargingRules = null!;
+    private readonly ISolarSystemService solarSystemService;
 
     public SelfConsumptionOptimizationViewModel
     (
         IWebClientService webClientService,
         IGen24JsonService gen24Service,
-        IWattPilotService wattPilotService
-    ) : base(webClientService, gen24Service, wattPilotService) { }
+        IWattPilotService wattPilotService,
+        ISolarSystemService solarSystemService
+    ) : base(webClientService, gen24Service, wattPilotService)
+    {
+        this.solarSystemService = solarSystemService;
+    }
 
     public IEnumerable<ChargingRuleType> RuleTypes => ruleTypes;
 
@@ -57,12 +62,12 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
         set => Set(ref logHomePower, value, UpdateHomePower);
     }
 
-    private int? acPowerMinimum;
+    private int? batteryAcChargingMaxPower;
 
-    public int? AcPowerMinimum
+    public int? BatteryAcChargingMaxPower
     {
-        get => acPowerMinimum;
-        set => Set(ref acPowerMinimum, value, UpdateLogHomePower);
+        get => batteryAcChargingMaxPower;
+        set => Set(ref batteryAcChargingMaxPower, value, UpdateLogHomePower);
     }
 
     private int? requestedGridPower;
@@ -133,11 +138,34 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
     private ICommand? addChargingRuleCommand;
     public ICommand AddChargingRuleCommand => addChargingRuleCommand ??= new NoParameterCommand(AddChargingRule);
 
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     internal override async Task OnInitialize()
     {
         await base.OnInitialize().ConfigureAwait(false);
         var mainWindow = IoC.Get<MainWindow>();
         view = mainWindow.SelfConsumptionOptimizationView;
+
+        var softwareVersions = solarSystemService.SolarSystem?.Versions?.SwVersions;
+
+        if (softwareVersions == null || !softwareVersions.ContainsKey("DEVICEGROUP"))
+        {
+            await Dispatcher.InvokeAsync(() =>
+            {
+                MessageBox.Show(view, Resources.NoGen24Symo, Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error);
+                view.Close();
+            });
+
+            return;
+        }
+
+        if (softwareVersions["DEVICEGROUP"] == new Version(1, 19, 7, 1))
+        {
+            await Dispatcher.InvokeAsync(() =>
+            {
+                MessageBox.Show(view, Resources.UtcBug, Resources.Warning, MessageBoxButton.OK, MessageBoxImage.Warning);
+            });
+        }
+
         string jsonString;
 
         try
@@ -194,13 +222,13 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
 
     private void UpdateHomePower()
     {
-        AcPowerMinimum = Settings.AcPowerMinimum = -(int)Math.Round(Math.Pow(10, LogHomePower), MidpointRounding.AwayFromZero);
+        BatteryAcChargingMaxPower = Settings.BatteryAcChargingMaxPower = -(int)Math.Round(Math.Pow(10, LogHomePower), MidpointRounding.AwayFromZero);
     }
 
     private void UpdateLogHomePower()
     {
-        Settings.AcPowerMinimum = AcPowerMinimum;
-        LogHomePower = Math.Log10(-AcPowerMinimum ?? double.NegativeInfinity);
+        Settings.BatteryAcChargingMaxPower = BatteryAcChargingMaxPower;
+        LogHomePower = Math.Log10(-BatteryAcChargingMaxPower ?? double.NegativeInfinity);
     }
 
     private void UpdateLogGridPower()
@@ -235,7 +263,11 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
 
     private void Undo()
     {
-        ChargingRules = (BindableCollection<Gen24ChargingRule>)oldChargingRules.Clone();
+        Dispatcher.Invoke(() =>
+        {
+            ChargingRules = new BindableCollection<Gen24ChargingRule>(((BindableCollection<Gen24ChargingRule>)oldChargingRules.Clone()).OrderBy(r => r.StartTime).ThenBy(r => r.EndTime),SynchronizationContext.Current);
+        });
+
         Settings = (Gen24BatterySettings)oldSettings.Clone();
         socMin = Settings.SocMin ?? 5;
         socMax = Settings.SocMax ?? 100;
@@ -244,7 +276,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
         NotifyOfPropertyChange(nameof(SocMin));
         NotifyOfPropertyChange(nameof(SocMax));
         LogGridPower = Math.Log10(Math.Abs(Settings.RequestedGridPower ?? .0000001));
-        LogHomePower = Math.Log10(Math.Abs(-Settings.AcPowerMinimum ?? .0000001));
+        LogHomePower = Math.Log10(Math.Abs(-Settings.BatteryAcChargingMaxPower ?? .0000001));
     }
 
     private async void Apply()
@@ -259,7 +291,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
             {
                 if
                 (
-                    error.BindingInError is BindingExpression {Target: FrameworkElement {IsVisible: false}} expression &&
+                    error.BindingInError is BindingExpression { Target: FrameworkElement { IsVisible: false } } expression &&
                     oldSettings.GetType().GetProperty(expression.ResolvedSourcePropertyName) is { } property
                 )
                 {
@@ -269,7 +301,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
             }
 
             var errorList = errors
-                .Where(e => e.BindingInError is BindingExpression {Target: FrameworkElement {IsVisible: true}})
+                .Where(e => e.BindingInError is BindingExpression { Target: FrameworkElement { IsVisible: true } })
                 .Select(e => e.ErrorContent.ToString()).ToList();
 
             for (var i = 0; i < ChargingRules.Count; i++)

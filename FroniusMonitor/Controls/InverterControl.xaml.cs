@@ -21,6 +21,7 @@ public enum InverterDisplayMode
     MoreEfficiency,
     MoreTemperatures,
     MoreFans,
+    MoreVersions,
 }
 
 public partial class InverterControl : IHaveLcdPanel
@@ -28,7 +29,7 @@ public partial class InverterControl : IHaveLcdPanel
     private readonly ISolarSystemService? solarSystemService = IoC.TryGet<ISolarSystemService>();
     private static readonly IReadOnlyList<InverterDisplayMode> acModes = new[] { InverterDisplayMode.AcPowerReal, InverterDisplayMode.AcPowerApparent, InverterDisplayMode.AcPowerReactive, InverterDisplayMode.AcPowerFactor, InverterDisplayMode.AcCurrent, InverterDisplayMode.AcPhaseVoltage, InverterDisplayMode.AcLineVoltage, };
     private static readonly IReadOnlyList<InverterDisplayMode> dcModes = new[] { InverterDisplayMode.DcPower, InverterDisplayMode.DcCurrent, InverterDisplayMode.DcVoltage, };
-    private static readonly IReadOnlyList<InverterDisplayMode> moreModes = new[] { InverterDisplayMode.MoreEfficiency, InverterDisplayMode.More, InverterDisplayMode.MoreTemperatures, InverterDisplayMode.MoreFans, };
+    private static readonly IReadOnlyList<InverterDisplayMode> moreModes = new[] { InverterDisplayMode.MoreEfficiency, InverterDisplayMode.More, InverterDisplayMode.MoreTemperatures, InverterDisplayMode.MoreFans, InverterDisplayMode.MoreVersions };
     private static readonly IReadOnlyList<InverterDisplayMode> energyModes = new[] { InverterDisplayMode.EnergySolar, InverterDisplayMode.EnergyInverter, InverterDisplayMode.EnergyStorage, };
     private int currentAcIndex, currentDcIndex, currentMoreIndex, energyIndex;
 
@@ -55,6 +56,17 @@ public partial class InverterControl : IHaveLcdPanel
     {
         get => (Inverter?)GetValue(InverterProperty);
         set => SetValue(InverterProperty, value);
+    }
+
+    public static readonly DependencyProperty VersionsProperty = DependencyProperty.Register
+    (
+        nameof(Versions), typeof(Gen24Versions), typeof(InverterControl)
+    );
+
+    public Gen24Versions? Versions
+    {
+        get => (Gen24Versions?)GetValue(VersionsProperty);
+        set => SetValue(VersionsProperty, value);
     }
 
     #endregion
@@ -99,6 +111,8 @@ public partial class InverterControl : IHaveLcdPanel
         {
             BackgroundProvider.Background = e.SolarSystem?.Gen24System?.InverterStatus?.ToBrush() ?? Brushes.LightGray;
             InverterName.Text = $"{Inverter?.Model} ({gen24?.InverterStatus?.StatusMessage})";
+            VersionList.Visibility = Visibility.Collapsed;
+            Lcd.Visibility = Visibility.Visible;
 
             switch (Mode)
             {
@@ -335,6 +349,11 @@ public partial class InverterControl : IHaveLcdPanel
                     Lcd.Value1 = ToLcd(cache?.Fan1RelativeRpm, "P2");
                     Lcd.Value2 = ToLcd(cache?.Fan2RelativeRpm, "P2");
                     Lcd.ValueSum = ToLcd(cache?.IsolatorResistance / 1000, "N0", "kΩ");
+                    break;
+
+                case InverterDisplayMode.MoreVersions:
+                    VersionList.Visibility = Visibility.Visible;
+                    Lcd.Visibility = Visibility.Collapsed;
                     break;
             }
         });
