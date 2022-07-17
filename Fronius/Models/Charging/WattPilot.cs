@@ -170,7 +170,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     public double? PowerL1
     {
         get => powerL1;
-        set => Set(ref powerL1, value);
+        set => Set(ref powerL1, value, () => NotifyOfPropertyChange(nameof(PowerSum)));
     }
 
     private double? powerL2;
@@ -179,7 +179,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     public double? PowerL2
     {
         get => powerL2;
-        set => Set(ref powerL2, value);
+        set => Set(ref powerL2, value, () => NotifyOfPropertyChange(nameof(PowerSum)));
     }
 
     private double? powerL3;
@@ -188,7 +188,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     public double? PowerL3
     {
         get => powerL3;
-        set => Set(ref powerL3, value);
+        set => Set(ref powerL3, value, () => NotifyOfPropertyChange(nameof(PowerSum)));
     }
 
     private double? powerN;
@@ -199,6 +199,8 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         get => powerN;
         set => Set(ref powerN, value);
     }
+
+    public double? PowerSum => PowerL1 + PowerL2 + PowerL3;
 
     public double? VoltageAverage => (VoltageL1 + VoltageL2 + VoltageL3) / 3;
 
@@ -211,41 +213,46 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref powerTotal, value);
     }
 
-    private double? powerFactorL1;
+    private double? powerFactorPercentL1;
 
     [WattPilot("nrg", 12)]
-    public double? PowerFactorL1
+    public double? PowerFactorPercentL1
     {
-        get => powerFactorL1;
-        set => Set(ref powerFactorL1, value);
+        get => powerFactorPercentL1;
+        set => Set(ref powerFactorPercentL1, value, () => NotifyOfPropertyChange(nameof(PowerFactorL1)));
     }
 
-    private double? powerFactorL2;
+    private double? powerFactorPercentL2;
 
     [WattPilot("nrg", 13)]
-    public double? PowerFactorL2
+    public double? PowerFactorPercentL2
     {
-        get => powerFactorL2;
-        set => Set(ref powerFactorL2, value);
+        get => powerFactorPercentL2;
+        set => Set(ref powerFactorPercentL2, value, () => NotifyOfPropertyChange(nameof(PowerFactorL2)));
     }
 
-    private double? powerFactorL3;
+    private double? powerFactorPercentL3;
 
     [WattPilot("nrg", 14)]
-    public double? PowerFactorL3
+    public double? PowerFactorPercentL3
     {
-        get => powerFactorL3;
-        set => Set(ref powerFactorL3, value);
+        get => powerFactorPercentL3;
+        set => Set(ref powerFactorPercentL3, value, () => NotifyOfPropertyChange(nameof(PowerFactorL3)));
     }
 
-    private double? powerFactorN;
+    private double? powerFactorPercentN;
 
     [WattPilot("nrg", 15)]
-    public double? PowerFactorN
+    public double? PowerFactorPercentN
     {
-        get => powerFactorN;
-        set => Set(ref powerFactorN, value);
+        get => powerFactorPercentN;
+        set => Set(ref powerFactorPercentN, value, () => NotifyOfPropertyChange(nameof(PowerFactorN)));
     }
+
+    public double? PowerFactorL1 => PowerFactorPercentL1 / 100;
+    public double? PowerFactorL2 => PowerFactorPercentL2 / 100;
+    public double? PowerFactorL3 => PowerFactorPercentL3 / 100;
+    public double? PowerFactorN => PowerFactorPercentN / 100;
 
     private bool? l1CarEnabled;
     [WattPilot("pha", 0)]

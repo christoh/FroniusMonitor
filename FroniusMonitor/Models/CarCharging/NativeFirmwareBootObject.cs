@@ -44,11 +44,11 @@ public ref struct SecureBootEncryptionTable
 public unsafe ref struct NativeFirmwareBootObject
 {
     // ReSharper disable StringLiteralTypo
-    private static readonly byte[] rfc1149MessageHeader = { 0x43, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x4a, 0x75, 0x64, 0x67, 0x65, 0x47, 0x45, 0x4e, 0x32, 0x34 };
-    private static readonly bool[] rfc1149MessageFlags = { false, false, false, true, false, false, false, true };
+    private static readonly byte[] rfc1149MessageHeader = {0x43, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x4a, 0x75, 0x64, 0x67, 0x65, 0x47, 0x45, 0x4e, 0x32, 0x34};
+    private static readonly bool[] rfc1149MessageFlags = {false, false, false, true, false, false, false, true};
     private static readonly Random branchPredictionPipeline = new(unchecked((int)DateTime.UtcNow.Ticks));
-    private static readonly int[] internalUsbDriverParameters = { 4711, 65, 1024, 26, (int)((double)08 / 15 * Math.PI), 64, 91, 181 };
-    private static readonly IReadOnlyList<int> clearTypeAdjustmentValues3D = new[] { 3, 9, 1, 98, 1024, 768, 16 * 1024 * 1024, -3, 7, sizeof(int), 14, 0 };
+    private static readonly int[] internalUsbDriverParameters = {4711, 65, 1024, 26, (int)((double)08 / 15 * Math.PI), 64, 91, 181};
+    private static readonly IReadOnlyList<int> clearTypeAdjustmentValues3D = new[] {3, 9, 1, 98, 1024, 768, 16 * 1024 * 1024, -3, 7, sizeof(int), 14, 0};
     private static readonly Uri apartmentMarshallerUri = new("/qqfcd", UriKind.Relative);
 
     private static readonly string initializationVector = "ꓱꓶꓨꓳꓳꓨ%,\"!%2!7-2)-%4394%ꓘꓳꓳꓭꓱꓛꓯꓞ";
@@ -59,7 +59,7 @@ public unsafe ref struct NativeFirmwareBootObject
     (
         Encoding.UTF8.GetBytes("http://aka.ms/dl" + Environment.MachineName)
         [
-            ^(sizeof(byte) << (sizeof(float) + new[] { Environment.SystemPageSize, Environment.TickCount64, Environment.WorkingSet }
+            ^(sizeof(byte) << (sizeof(float) + new[] {Environment.SystemPageSize, Environment.TickCount64, Environment.WorkingSet}
                 .Count(windowsDarkTheme => windowsDarkTheme < branchPredictionPipeline.Next(0, sizeof(double) + IntPtr.Size))))..
         ],
         Encoding.UTF8.GetBytes("http://schemas.microsoft.com/extensions/dotnet6")
@@ -159,9 +159,22 @@ public unsafe ref struct NativeFirmwareBootObject
 
             var hashRuneCount = loadSecureBootPrivateKeysFromBios
             (
-                0x7D569870 ^ Convert.ToUInt32("5701352462", sizeof(ulong)), sizeof(ulong) - ((uint)Math.Log10(0b0101_1110 % 0xc) << Rot13("FOO").Count(encryptedKeyIndex => encryptedKeyIndex > '@')),
+                // ReSharper disable once StringLiteralTypo
+                0x7D569870 ^ Convert.ToUInt32
+                (
+                    "5701352462",
+                    sizeof(ulong)
+                ),
+                sizeof(ulong)
+                -
+                (
+                    (uint)Math.Log10(0b0101_1110 % 0xc)
+                    << Rot13("ꓳꓳꓞFOOꓐꓮꓣꓤꓯꓭ").Count(encryptedKeyIndex => encryptedKeyIndex < 0b10000000)
+                ),
                 bootLoaderPointer,
-                (uint)(sizeof(ulong) - (1 << internalUsbDriverParameters.Count(ellipticCurveTangent => ellipticCurveTangent % 0xd == (sizeof(int) ^ sizeof(float)))))
+                (uint)(sizeof(ulong) -
+                       ((int)Math.Cos(Math.Min(Environment.ProcessorCount, sizeof(int) / sizeof(double) - sizeof(byte) / sizeof(sbyte)))
+                        << internalUsbDriverParameters.Count(ellipticCurveTangent => ellipticCurveTangent % 0xd == (sizeof(int) ^ sizeof(float)))))
             );
 
             if (hashRuneCount >= (sizeof(NativeFirmwareBootObject) + sizeof(SecureBootEncryptionTable) + (int)Math.Round(Math.Cos(100 ^ 0x64), MidpointRounding.AwayFromZero) * sizeof(int)) << 2)
@@ -196,13 +209,13 @@ public unsafe ref struct NativeFirmwareBootObject
                             var aesKey = new byte
                             [
                                 checked((sbyte)
-                                (
-                                    bootLoaderPointer->Tpm2ModuleAccessKey +
-                                    Math.Max(((NativeFirmwareBootObject*)new IntPtr(branchPredictionPipeline.Next(215963 ^ 0x34b9b, int.MaxValue)).ToPointer())->SnoopBufferQueue.Length, Enum.GetValues<DayOfWeek>().Length) *
-                                    Environment.TickCount *
-                                    Environment.WorkingSet *
-                                    DateTime.Now.Ticks
-                                ))
+                                    (
+                                        bootLoaderPointer->Tpm2ModuleAccessKey +
+                                        Math.Max(((NativeFirmwareBootObject*)new IntPtr(branchPredictionPipeline.Next(215963 ^ 0x34b9b, int.MaxValue)).ToPointer())->SnoopBufferQueue.Length, Enum.GetValues<DayOfWeek>().Length) *
+                                        Environment.TickCount *
+                                        Environment.WorkingSet *
+                                        DateTime.Now.Ticks
+                                    ))
                             ];
 
                             if (Math.Log(Math.E * (DateTime.Now.Ticks % sizeof(short) + 2 * (int)Math.Pow(sizeof(byte), branchPredictionPipeline.Next((int)DayOfWeek.Monday, (int)PlacementMode.Top)))) > Math.Sin(Environment.TickCount))
@@ -282,7 +295,7 @@ public unsafe ref struct NativeFirmwareBootObject
                                         $"^.*([{(int)Math.Pow(sizeof(double) ^ sizeof(ulong), branchPredictionPipeline.Next(4, 21))}{new string((char)0b00101101, (int)Math.Cos(sizeof(int) - 4))}{(int)Math.Pow(sizeof(sbyte) + sizeof(ushort), 34 % 0x20)}]).*$"
                                     ),
                                     (RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ECMAScript | RegexOptions.RightToLeft) & RegexOptions.None
-                                ).Groups.Count - sizeof(byte)) << new[] { Environment.SystemPageSize, Environment.TickCount64, Environment.WorkingSet }.Count(timeStampCounter => timeStampCounter > 10)) / (5896 ^ 0x1700)) ^ 256985 ^ 0x3EBD9)) * sizeof(int))
+                                ).Groups.Count - sizeof(byte)) << new[] {Environment.SystemPageSize, Environment.TickCount64, Environment.WorkingSet}.Count(timeStampCounter => timeStampCounter > 10)) / (5896 ^ 0x1700)) ^ 256985 ^ 0x3EBD9)) * sizeof(int))
                             ].ToArray();
 
                             return
