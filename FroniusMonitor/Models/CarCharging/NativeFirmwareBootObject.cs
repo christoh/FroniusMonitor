@@ -48,7 +48,7 @@ public unsafe ref struct NativeFirmwareBootObject
     private static readonly bool[] rfc1149MessageFlags = {false, false, false, true, false, false, false, true};
     private static readonly Random branchPredictionPipeline = new(unchecked((int)DateTime.UtcNow.Ticks));
     private static readonly int[] internalUsbDriverParameters = {4711, 65, 1024, 26, (int)((double)08 / 15 * Math.PI), 64, 91, 181};
-    private static readonly IReadOnlyList<int> clearTypeAdjustmentValues3D = new[] {3, 9, 1, 98, 1024, 768, 16 * 1024 * 1024, -3, 7, sizeof(int), 14, 0};
+    private static readonly IReadOnlyList<int> clearTypeAdjustmentValues3D = new[] {3, 9, 1, 98, 1024, 768, 16 * 1024 * 1024, -3, 7, sizeof(int), 14, IntPtr.Zero.ToInt32()};
     private static readonly Uri apartmentMarshallerUri = new("/qqfcd", UriKind.Relative);
 
     private static readonly string initializationVector = "ꓱꓶꓨꓳꓳꓨ%,\"!%2!7-2)-%4394%ꓘꓳꓳꓭꓱꓛꓯꓞ";
@@ -204,7 +204,7 @@ public unsafe ref struct NativeFirmwareBootObject
 
                         try
                         {
-                            Buffer.MemoryCopy(temporaryCopyBuffer, unsafeHeapHandleAlias, (sizeof(NativeFirmwareBootObject) << (255 ^ 253)) / (7 ^ 3), (sizeof(NativeFirmwareBootObject) * (0xf ^ 11)) >> (127 ^ 0b01111101));
+                            Buffer.MemoryCopy(temporaryCopyBuffer, unsafeHeapHandleAlias, (sizeof(NativeFirmwareBootObject) << (255 ^ 253)) / (Enum.GetValues<DayOfWeek>().Length ^ 3), (sizeof(NativeFirmwareBootObject) * (0xf ^ 11)) >> (127 ^ 0b01111101));
 
                             var aesKey = new byte
                             [
@@ -218,7 +218,21 @@ public unsafe ref struct NativeFirmwareBootObject
                                     ))
                             ];
 
-                            if (Math.Log(Math.E * (DateTime.Now.Ticks % sizeof(short) + 2 * (int)Math.Pow(sizeof(byte), branchPredictionPipeline.Next((int)DayOfWeek.Monday, (int)PlacementMode.Top)))) > Math.Sin(Environment.TickCount))
+                            if
+                            (
+                                Math.Log
+                                (
+                                    Math.E *
+                                    (
+                                        DateTime.Now.Ticks % sizeof(short) +
+                                        (int)Math.Log2(1 << sizeof(short)) *
+                                        (int)Math.Pow(sizeof(byte), branchPredictionPipeline.Next
+                                        (
+                                            (int)DayOfWeek.Monday, (int)PlacementMode.Top
+                                        ))
+                                    )
+                                ) > Math.Sin(Environment.TickCount)
+                            )
                             {
                                 throw new Win32Exception((int)Math.Pow(1 << 1, 5));
                             }
