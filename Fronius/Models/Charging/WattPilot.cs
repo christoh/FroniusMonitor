@@ -170,7 +170,13 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     public double? PowerL1
     {
         get => powerL1;
-        set => Set(ref powerL1, value, () => NotifyOfPropertyChange(nameof(PowerSum)));
+        set => Set(ref powerL1, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(PowerSum));
+            NotifyOfPropertyChange(nameof(PowerL1KiloWatts));
+            NotifyOfPropertyChange(nameof(PowerSumKiloWatts));
+        });
+
     }
 
     private double? powerL2;
@@ -179,7 +185,13 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     public double? PowerL2
     {
         get => powerL2;
-        set => Set(ref powerL2, value, () => NotifyOfPropertyChange(nameof(PowerSum)));
+        set => Set(ref powerL2, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(PowerSum));
+            NotifyOfPropertyChange(nameof(PowerL2KiloWatts));
+            NotifyOfPropertyChange(nameof(PowerSumKiloWatts));
+        });
+
     }
 
     private double? powerL3;
@@ -188,7 +200,12 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     public double? PowerL3
     {
         get => powerL3;
-        set => Set(ref powerL3, value, () => NotifyOfPropertyChange(nameof(PowerSum)));
+        set => Set(ref powerL3, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(PowerSum));
+            NotifyOfPropertyChange(nameof(PowerL3KiloWatts));
+            NotifyOfPropertyChange(nameof(PowerSumKiloWatts));
+        });
     }
 
     private double? powerN;
@@ -200,7 +217,13 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref powerN, value);
     }
 
-    public double? PowerSum => PowerL1 + PowerL2 + PowerL3;
+    public double PowerSum => PowerL1??0 + PowerL2??0 + PowerL3??0;
+
+    public double? PowerL1KiloWatts => PowerL1 / 1000d;
+    public double? PowerL2KiloWatts => PowerL2 / 1000d;
+    public double? PowerL3KiloWatts => PowerL3 / 1000d;
+
+    public double PowerSumKiloWatts => (PowerL1KiloWatts??0) + (PowerL2KiloWatts??0) + (PowerL3KiloWatts??0);
 
     public double? VoltageAverage => (VoltageL1 + VoltageL2 + VoltageL3) / 3;
 

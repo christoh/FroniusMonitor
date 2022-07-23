@@ -981,4 +981,7 @@
   <data name="UtcBug" xml:space="preserve">
 	  <value>Aufgrund eines Bugs in Firmversion 1.19.7-1 sind alle Zeiten in den Batterieladeregeln in UTC. Du solltest auf 1.21.6-1 oder höher upgraden.</value>
   </data>
+  <data name="NeutralWire" xml:space="preserve">
+	  <value>Nullleiter</value>
+  </data>
 </root>

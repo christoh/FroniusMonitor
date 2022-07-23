@@ -1645,6 +1645,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Neutral wire.
+        /// </summary>
+        public static string NeutralWire {
+            get {
+                return ResourceManager.GetString("NeutralWire", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Minimum energy for next trip.
         /// </summary>
         public static string NextTripEnergyToCharge {

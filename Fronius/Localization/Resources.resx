@@ -1002,4 +1002,7 @@
   <data name="UtcBug" xml:space="preserve">
 	  <value>Due to a bug in firmware 1.19.7-1 time in battery charging rules is UTC. Consider upgrading to 1.21.6-1 or higher.</value>
   </data>
+  <data name="NeutralWire" xml:space="preserve">
+	  <value>Neutral wire</value>
+  </data>
 </root>
