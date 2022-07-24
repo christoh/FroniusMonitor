@@ -757,7 +757,7 @@
 	  <value>Charging (Go-E scheduler)</value>
   </data>
   <data name="ModelStatus_ChargingBecauseFallbackDefault" xml:space="preserve">
-	  <value>Charging (fallback default)</value>
+	  <value>Charging (full power)</value>
   </data>
   <data name="ModelStatus_NotChargingBecauseFallbackGoEAwattar" xml:space="preserve">
 	  <value>Pause (Go-E energy price)</value>

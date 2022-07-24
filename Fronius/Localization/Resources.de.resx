@@ -742,7 +742,7 @@
 	  <value>Laden (Go-E Zeitplan)</value>
   </data>
   <data name="ModelStatus_ChargingBecauseFallbackDefault" xml:space="preserve">
-	  <value>Laden (Default-Fallback)</value>
+	  <value>Laden (Volle Leistung)</value>
   </data>
   <data name="ModelStatus_NotChargingBecauseFallbackGoEAwattar" xml:space="preserve">
 	  <value>Pause (Go-E-Strompreis)</value>
