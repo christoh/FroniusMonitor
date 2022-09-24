@@ -1060,6 +1060,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enable Wi-Fi client.
+        /// </summary>
+        public static string IsWifiClientEnabled {
+            get {
+                return ResourceManager.GetString("IsWifiClientEnabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Language.
         /// </summary>
         public static string Language {
@@ -1420,7 +1429,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Charging (fallback default).
+        ///   Looks up a localized string similar to Charging (full power).
         /// </summary>
         public static string ModelStatus_ChargingBecauseFallbackDefault {
             get {
@@ -2707,6 +2716,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Wi-Fi password.
+        /// </summary>
+        public static string WattPilotWifiPassword {
+            get {
+                return ResourceManager.GetString("WattPilotWifiPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Wednesday.
         /// </summary>
         public static string Wednesday {
@@ -2721,6 +2739,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Wednesday_One {
             get {
                 return ResourceManager.GetString("Wednesday_One", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wi-Fi name.
+        /// </summary>
+        public static string WifiSsid {
+            get {
+                return ResourceManager.GetString("WifiSsid", resourceCulture);
             }
         }
     }

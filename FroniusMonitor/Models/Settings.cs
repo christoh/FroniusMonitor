@@ -1,6 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Extensions;
-
-namespace De.Hochstaetter.FroniusMonitor.Models;
+﻿namespace De.Hochstaetter.FroniusMonitor.Models;
 
 public class Settings : BindableBase, ICloneable
 {

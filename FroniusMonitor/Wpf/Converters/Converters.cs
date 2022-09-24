@@ -1,6 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Extensions;
-
-namespace De.Hochstaetter.FroniusMonitor.Wpf.Converters;
+﻿namespace De.Hochstaetter.FroniusMonitor.Wpf.Converters;
 
 public abstract class ConverterBase : MarkupExtension, IValueConverter
 {

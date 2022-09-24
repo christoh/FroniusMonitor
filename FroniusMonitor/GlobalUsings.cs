@@ -26,6 +26,7 @@ global using System.Windows.Threading;
 global using System.Xml;
 global using System.Xml.Serialization;
 global using De.Hochstaetter.Fronius.Contracts;
+global using De.Hochstaetter.Fronius.Extensions;
 global using De.Hochstaetter.Fronius.Localization;
 global using De.Hochstaetter.Fronius.Models;
 global using De.Hochstaetter.Fronius.Models.Charging;

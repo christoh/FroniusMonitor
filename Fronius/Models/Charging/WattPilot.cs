@@ -51,6 +51,31 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref deviceName, value);
     }
 
+    private string? wattPilotSsid;
+
+    [WattPilot("wan", false)]
+    public string? WattPilotSsid
+    {
+        get => wattPilotSsid;
+        set => Set(ref wattPilotSsid, value);
+    }
+
+    private string? wifiPassword;
+    [WattPilot("wak", false)]
+    public string? WifiPassword
+    {
+        get => wifiPassword;
+        set => Set(ref wifiPassword, value);
+    }
+
+    private bool? isWifiClientEnabled;
+    [WattPilot("wen", false)]
+    public bool? IsWifiClientEnabled
+    {
+        get => isWifiClientEnabled;
+        set => Set(ref isWifiClientEnabled, value);
+    }
+
     private string? manufacturer;
 
     [WattPilot("oem")]

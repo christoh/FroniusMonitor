@@ -984,4 +984,13 @@
   <data name="NeutralWire" xml:space="preserve">
 	  <value>Nullleiter</value>
   </data>
+  <data name="WifiSsid" xml:space="preserve">
+	  <value>WLAN-Name</value>
+  </data>
+  <data name="WattPilotWifiPassword" xml:space="preserve">
+	  <value>WLAN-Kennwort</value>
+  </data>
+  <data name="IsWifiClientEnabled" xml:space="preserve">
+	  <value>WLAN-Client aktivieren</value>
+  </data>
 </root>

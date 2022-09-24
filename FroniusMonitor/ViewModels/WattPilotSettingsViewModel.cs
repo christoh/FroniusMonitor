@@ -1,6 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Extensions;
-
-namespace De.Hochstaetter.FroniusMonitor.ViewModels;
+﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
 public class WattPilotSettingsViewModel : ViewModelBase
 {
@@ -92,6 +90,14 @@ public class WattPilotSettingsViewModel : ViewModelBase
         set => Set(ref isInUpdate, value);
     }
 
+    private string wattPilotWifiPassword = string.Empty;
+
+    public string WattPilotWifiPassword
+    {
+        get => wattPilotWifiPassword;
+        set => Set(ref wattPilotWifiPassword, value);
+    }
+
     private bool requiresChargingInterval;
 
     public bool RequiresChargingInterval
@@ -121,7 +127,7 @@ public class WattPilotSettingsViewModel : ViewModelBase
     public ICommand ApplyCommand => applyCommand ??= new NoParameterCommand(Apply);
 
     private ICommand? undoCommand;
-    public ICommand UndoCommand => undoCommand ??= new NoParameterCommand(Undo);
+    public ICommand UndoCommand => undoCommand ??= new NoParameterCommand(()=>Undo());
 
     private ICommand? navigateToApiCommand;
     public ICommand NavigateToApiCommand => navigateToApiCommand ??= new NoParameterCommand(NavigateToApi);
@@ -166,8 +172,13 @@ public class WattPilotSettingsViewModel : ViewModelBase
         Undo();
     }
 
-    public void Undo()
+    private void Undo(bool resetWriteOnlyFields = true)
     {
+        if (resetWriteOnlyFields)
+        {
+            WattPilotWifiPassword = string.Empty;
+        }
+
         WattPilot = (WattPilot)oldWattPilot.Clone();
         Title = $"{WattPilot.DeviceName} {WattPilot.SerialNumber}";
         RequiresChargingInterval = (WattPilot.MinimumChargingInterval ?? 0) != 0;
@@ -178,7 +189,7 @@ public class WattPilotSettingsViewModel : ViewModelBase
         }
     }
 
-    public async void Apply()
+    private async void Apply()
     {
         try
         {
@@ -241,6 +252,11 @@ public class WattPilotSettingsViewModel : ViewModelBase
                 WattPilot.PhaseSwitchMode = PhaseSwitchMode.Phases3;
             }
 
+            if (!string.IsNullOrWhiteSpace(WattPilotWifiPassword))
+            {
+                WattPilot.WifiPassword = WattPilotWifiPassword;
+            }
+
             wattPilotService.BeginSendValues();
             var sentSomething = false;
             try
@@ -281,7 +297,7 @@ public class WattPilotSettingsViewModel : ViewModelBase
                     }
 
                     oldWattPilot = WattPilot;
-                    Undo();
+                    Undo(false);
                 }
                 catch (TimeoutException) when (wattPilotService.UnsuccessfulWrites.Count > 0)
                 {

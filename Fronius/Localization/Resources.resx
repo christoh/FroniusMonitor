@@ -1005,4 +1005,13 @@
   <data name="NeutralWire" xml:space="preserve">
 	  <value>Neutral wire</value>
   </data>
+  <data name="WifiSsid" xml:space="preserve">
+	  <value>Wi-Fi name</value>
+  </data>
+  <data name="WattPilotWifiPassword" xml:space="preserve">
+	  <value>Wi-Fi password</value>
+  </data>
+  <data name="IsWifiClientEnabled" xml:space="preserve">
+	  <value>Enable Wi-Fi client</value>
+  </data>
 </root>
