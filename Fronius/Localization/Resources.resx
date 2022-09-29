@@ -574,7 +574,7 @@
 	  <value>Entered value must be an integer percentage from 0 to 100</value>
   </data>
   <data name="MustBeBetween" xml:space="preserve">
-	  <value>Value must be between {0} and {1}</value>
+	  <value>{0} must be between {1} and {2}</value>
   </data>
   <data name="BatteryIsAcCoupled" xml:space="preserve">
 	  <value>Battery is AC coupled</value>
@@ -1013,5 +1013,8 @@
   </data>
   <data name="IsWifiClientEnabled" xml:space="preserve">
 	  <value>Enable Wi-Fi client</value>
+  </data>
+  <data name="DefaultPropertyDisplayName" xml:space="preserve">
+	  <value>Value</value>
   </data>
 </root>

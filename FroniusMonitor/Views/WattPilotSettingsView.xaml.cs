@@ -26,4 +26,17 @@ public partial class WattPilotSettingsView
                 ? Visibility.Visible
                 : Visibility.Collapsed;
     }
+
+    private void OnValidationChanged(object? sender, ValidationErrorEventArgs e)
+    {
+        if (sender is FrameworkElement {DataContext: ViewModelBase viewModelBase})
+        {
+            viewModelBase.HandleValidationErrorChange(e);
+        }
+    }
+
+    private void OnVisibilityChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        
+    }
 }

@@ -574,7 +574,7 @@
 	  <value>Der eingegebene Wert muss ein ganzzahliger Prozentwert von 0 bis 100 sein.</value>
   </data>
   <data name="MustBeBetween" xml:space="preserve">
-	  <value>Der Wert muss zwischen {0} und {1} liegen</value>
+	  <value>{0} muss zwischen {1} und {2} liegen</value>
   </data>
   <data name="BatteryIsAcCoupled" xml:space="preserve">
 	  <value>Batterieanbindung über Wechselstrom (AC)</value>
@@ -992,5 +992,8 @@
   </data>
   <data name="IsWifiClientEnabled" xml:space="preserve">
 	  <value>WLAN-Client aktivieren</value>
+  </data>
+  <data name="DefaultPropertyDisplayName" xml:space="preserve">
+	  <value>Der Wert</value>
   </data>
 </root>

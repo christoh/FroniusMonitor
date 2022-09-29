@@ -13,10 +13,6 @@
         Title="{Binding Title}" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize"
         d:DataContext="{d:DesignInstance Type=vm:WattPilotSettingsViewModel}">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -47,6 +43,7 @@
                 <Setter Property="Margin" Value="8,4,0,4" />
                 <Setter Property="HorizontalAlignment" Value="Left" />
                 <Setter Property="VerticalContentAlignment" Value="Center" />
+                <EventSetter Event="Validation.Error" Handler="OnValidationChanged"/>
             </Style>
             <Style TargetType="TextBox" BasedOn="{StaticResource StandardTextBox}" />
             <Style TargetType="c:PasswordBox" BasedOn="{StaticResource StandardTextBox}">
@@ -57,7 +54,7 @@
             </Style>
         </Grid.Resources>
 
-        <StackPanel Grid.Row="0" Grid.Column="0">
+        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
             <GroupBox Margin="8,8,8,0" Header="{x:Static p:Resources.BaseSettings}">
                 <StackPanel Margin="8" Grid.IsSharedSizeScope="True">
 
@@ -148,7 +145,7 @@
                             <Run Text="{x:Static p:Resources.MaximumChargingCurrent}" /><Run Text=":" />
                         </TextBlock>
                         <TextBox MinHeight="0" TextAlignment="Center" Width="40"
-                                 Text="{co:ValidationBinding Path=WattPilot.MaximumChargingCurrent, Rule={v:MinMaxIntRule Minimum=0, Maximum=32}}" />
+                                 Text="{co:ValidationBinding Path=WattPilot.MaximumChargingCurrent, Rule={v:MinMaxIntRule PropertyDisplayName={x:Static p:Resources.MaximumChargingCurrent}, Minimum=0, Maximum=32}}" />
                         <TextBlock Margin="4,0,0,0" Text="A" />
                     </StackPanel>
                     <Slider Value="{Binding WattPilot.MaximumChargingCurrent, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="{Binding WattPilot.MinimumChargingCurrent}" Maximum="{Binding WattPilot.AbsoluteMaximumChargingCurrent}" />
@@ -158,7 +155,7 @@
                             <Run Text="{x:Static p:Resources.AbsoluteMaximumChargingCurrent}" /><Run Text=":" />
                         </TextBlock>
                         <TextBox MinHeight="0" TextAlignment="Center" Width="40"
-                                 Text="{co:ValidationBinding Path=WattPilot.AbsoluteMaximumChargingCurrent, Rule={v:MinMaxIntRule Minimum=0, Maximum=32}}" />
+                                 Text="{co:ValidationBinding Path=WattPilot.AbsoluteMaximumChargingCurrent, Rule={v:MinMaxIntRule PropertyDisplayName={x:Static p:Resources.AbsoluteMaximumChargingCurrent}, Minimum=0, Maximum=32}}" />
                         <TextBlock Margin="4,0,0,0" Text="A" />
                     </StackPanel>
                     <Slider IsEnabled="{Binding EnableDanger}" Value="{Binding WattPilot.AbsoluteMaximumChargingCurrent, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="6" Maximum="{Binding WattPilot.Is16AmpereVariant, Converter={co:Bool2Double Null=32, False=32, True=16}}" />
@@ -219,7 +216,7 @@
                             <Run Text="{x:Static p:Resources.MaxEnergyPrice}" /><Run Text=":" />
                         </TextBlock>
                         <TextBox MinHeight="0" TextAlignment="Center" Width="40"
-                                 Text="{Binding Path=WattPilot.MaxEnergyPrice, StringFormat=N1}" />
+                                 Text="{co:ValidationBinding Path=WattPilot.MaxEnergyPrice, StringFormat=N1, Rule={v:MinMaxFloatRule Minimum=-200, Maximum=1000, PropertyDisplayName={x:Static p:Resources.MaxEnergyPrice}}}" />
                         <TextBlock Margin="4,0,0,0" Text="ct/kWh" />
                     </StackPanel>
                     <Slider Value="{Binding WattPilot.MaxEnergyPrice, Mode=TwoWay}" HorizontalAlignment="Stretch" TickFrequency=".1" IsSnapToTickEnabled="True" Minimum="-10" Maximum="100"
@@ -230,7 +227,7 @@
                             <Run Text="{x:Static p:Resources.PvSurplusBatteryLevel}" /><Run Text=":" />
                         </TextBlock>
                         <TextBox MinHeight="0" TextAlignment="Center" Width="40"
-                                 Text="{Binding Path=WattPilot.PvSurplusBatteryLevel}" />
+                                 Text="{co:ValidationBinding WattPilot.PvSurplusBatteryLevel, Rule={v:MinMaxIntRule Minimum=0, Maximum=100, PropertyDisplayName={x:Static p:Resources.PvSurplusBatteryLevel}}}" />
                         <TextBlock Margin="4,0,0,0" Text="%" />
                     </StackPanel>
                     <Slider Value="{Binding WattPilot.PvSurplusBatteryLevel, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="0" Maximum="100"
@@ -241,7 +238,7 @@
                             <Run Text="{x:Static p:Resources.OhmPilotTemperatureLimit}" /><Run Text=":" />
                         </TextBlock>
                         <TextBox MinHeight="0" TextAlignment="Center" Width="40"
-                                 Text="{co:ValidationBinding Path=WattPilot.OhmPilotTemperatureLimitCelsius, Rule={v:MinMaxIntRule Minimum=0, Maximum=100}}" />
+                                 Text="{co:ValidationBinding Path=WattPilot.OhmPilotTemperatureLimitCelsius, Rule={v:MinMaxIntRule Minimum=0, Maximum=100, PropertyDisplayName={x:Static p:Resources.OhmPilotTemperatureLimit}}}" />
                         <TextBlock Margin="4,0,0,0" Text="°C" />
                     </StackPanel>
                     <Slider Value="{Binding WattPilot.OhmPilotTemperatureLimitCelsius, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="0" Maximum="100"
@@ -252,18 +249,45 @@
                             <Run Text="{x:Static p:Resources.PvSurplusPowerThreshold}" /><Run Text=":" />
                         </TextBlock>
                         <TextBox MinHeight="0" TextAlignment="Center" Width="40"
-                                 Text="{co:ValidationBinding Path=WattPilot.PvSurplusPowerThreshold, Rule={v:MinMaxIntRule Minimum=0, Maximum=22000}}" />
+                                 Text="{co:ValidationBinding Path=WattPilot.PvSurplusPowerThreshold, Rule={v:MinMaxIntRule Minimum=0, Maximum=22000, PropertyDisplayName={x:Static p:Resources.PvSurplusPowerThreshold}}}" />
                         <TextBlock Margin="4,0,0,0" Text="W" />
                     </StackPanel>
                     <Slider Value="{Binding WattPilot.PvSurplusPowerThreshold, Mode=TwoWay}" TickFrequency="1" IsSnapToTickEnabled="True" HorizontalAlignment="Stretch" Minimum="0" Maximum="{Binding WattPilot.MaximumWattPilotPower}"
                             Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}" />
 
+                    <StackPanel Margin="0,24,0,0" x:Name="NextTripSettings">
+                    <Grid >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Column="0" Grid.Row="0" Text="{x:Static p:Resources.NextTripTime}" />
+                        <TextBlock Grid.Column="1" Grid.Row="0" Text=":" />
+                        <TextBox Grid.Column="2" Grid.Row="0" MinWidth="250" MaxLength="32" Text="{co:ValidationBinding NextTripTimeString, Rule={v:ChargingRuleDate}}" />
+                    </Grid>
+
+                    <CheckBox IsChecked="{Binding WattPilot.NextTripRemainInEcoMode}" Content="{x:Static p:Resources.NextTripRemainInEcoMode}" />
+
+                    <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center" Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}">
+                        <TextBlock Margin="0,0,4,0">
+                            <Run Text="{x:Static p:Resources.NextTripEnergyToCharge}" /><Run Text=":" />
+                        </TextBlock>
+                        <TextBox MinHeight="0" TextAlignment="Center" Width="40"
+                                 Text="{co:ValidationBinding Path=NextTripEnergyToCharge,ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, Rule={v:MinMaxFloatRule Minimum=0, Maximum=300, PropertyDisplayName={x:Static p:Resources.NextTripEnergyToCharge}}}" />
+                        <TextBlock Margin="4,0,0,0" Text="kWh" />
+                    </StackPanel>
+                    <Slider Value="{Binding NextTripEnergyToCharge, Mode=TwoWay}" TickFrequency="1" IsSnapToTickEnabled="True" HorizontalAlignment="Stretch" Minimum="0" Maximum="150"
+                            Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}" />
+                    </StackPanel>
                 </StackPanel>
             </GroupBox>
 
-        </StackPanel>
-
-        <StackPanel Grid.Row="0" Grid.Column="1">
             <GroupBox Margin="0,8,8,0" Header="{x:Static p:Resources.CarSettings}">
                 <StackPanel Margin="8" Grid.IsSharedSizeScope="True">
 
@@ -301,7 +325,7 @@
                             <Run Text="{x:Static p:Resources.MinimumChargingCurrent}" /><Run Text=":" />
                         </TextBlock>
                         <TextBox MinHeight="0" TextAlignment="Center" Width="40"
-                                 Text="{co:ValidationBinding Path=WattPilot.MinimumChargingCurrent, Rule={v:MinMaxIntRule Minimum=6, Maximum=32}}" />
+                                 Text="{co:ValidationBinding Path=WattPilot.MinimumChargingCurrent, Rule={v:MinMaxIntRule Minimum=6, Maximum=32, PropertyDisplayName={x:Static p:Resources.MinimumChargingCurrent}}}" />
                         <TextBlock Margin="4,0,0,0" Text="A" />
                     </StackPanel>
                     <Slider Value="{Binding WattPilot.MinimumChargingCurrent, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="6" Maximum="{Binding WattPilot.AbsoluteMaximumChargingCurrent}" />
@@ -311,7 +335,7 @@
                             <Run Text="{x:Static p:Resources.MinimumChargingInterval}" /><Run Text=":" />
                         </TextBlock>
                         <TextBox MinHeight="0" TextAlignment="Center" Width="40"
-                                 Text="{co:ValidationBinding Path=WattPilot.MinimumChargingInterval, Converter={co:Milliseconds2Minutes}, Rule={v:MinMaxIntRule Minimum=5, Maximum=35791}}" />
+                                 Text="{co:ValidationBinding Path=WattPilot.MinimumChargingInterval, Converter={co:Milliseconds2Minutes}, Rule={v:MinMaxIntRule Minimum=5, Maximum=35791, PropertyDisplayName={x:Static p:Resources.MinimumChargingInterval}}}" />
                         <TextBlock Margin="4,0,0,0" Text="{x:Static p:Resources.Minutes}" />
                     </StackPanel>
                     <Slider Value="{Binding WattPilot.MinimumChargingInterval, Mode=TwoWay}" TickFrequency="60000" IsSnapToTickEnabled="True" HorizontalAlignment="Stretch" Minimum="300000" Maximum="14400000"
@@ -322,7 +346,7 @@
                             <Run Text="{x:Static p:Resources.MinimumPauseDuration}" /><Run Text=":" />
                         </TextBlock>
                         <TextBox MinHeight="0" TextAlignment="Center" Width="40"
-                                 Text="{co:ValidationBinding Path=WattPilot.MinimumPauseDuration, Converter={co:Milliseconds2Minutes}, Rule={v:MinMaxIntRule Minimum=0, Maximum=35791}}" />
+                                 Text="{co:ValidationBinding Path=WattPilot.MinimumPauseDuration, Converter={co:Milliseconds2Minutes}, Rule={v:MinMaxIntRule Minimum=0, Maximum=35791, PropertyDisplayName={x:Static p:Resources.MinimumPauseDuration}}}" />
                         <TextBlock Margin="4,0,0,0" Text="{x:Static p:Resources.Minutes}" />
                     </StackPanel>
                     <Slider Value="{Binding WattPilot.MinimumPauseDuration, Mode=TwoWay}" TickFrequency="60000" IsSnapToTickEnabled="True" HorizontalAlignment="Stretch" Minimum="0" Maximum="1200000"
@@ -333,7 +357,7 @@
                             <Run Text="{x:Static p:Resources.MinimumChargingTime}" /><Run Text=":" />
                         </TextBlock>
                         <TextBox MinHeight="0" TextAlignment="Center" Width="40"
-                                 Text="{co:ValidationBinding Path=WattPilot.MinimumChargingTime, Converter={co:Milliseconds2Minutes}, Rule={v:MinMaxIntRule Minimum=0, Maximum=35791}}" />
+                                 Text="{co:ValidationBinding Path=WattPilot.MinimumChargingTime, Converter={co:Milliseconds2Minutes}, Rule={v:MinMaxIntRule Minimum=0, Maximum=35791, PropertyDisplayName={x:Static p:Resources.MinimumChargingTime}}}" />
                         <TextBlock Margin="4,0,0,0" Text="{x:Static p:Resources.Minutes}" />
                     </StackPanel>
                     <Slider Value="{Binding WattPilot.MinimumChargingTime, Mode=TwoWay}" TickFrequency="60000" IsSnapToTickEnabled="True" HorizontalAlignment="Stretch" Minimum="0" Maximum="1200000"
@@ -344,7 +368,7 @@
                             <Run Text="{x:Static p:Resources.PhaseSwitchPower}" /><Run Text=":" />
                         </TextBlock>
                         <TextBox MinHeight="0" TextAlignment="Center" Width="40"
-                                 Text="{co:ValidationBinding Path=WattPilot.PhaseSwitchPower, Rule={v:MinMaxIntRule Minimum=1400, Maximum=7200}}" />
+                                 Text="{co:ValidationBinding Path=WattPilot.PhaseSwitchPower, Rule={v:MinMaxIntRule Minimum=1400, Maximum=7200, PropertyDisplayName={x:Static p:Resources.PhaseSwitchPower}}}" />
                         <TextBlock Margin="4,0,0,0" Text="W" />
                     </StackPanel>
                     <Slider Value="{Binding WattPilot.PhaseSwitchPower, Mode=TwoWay}" TickFrequency="1" IsSnapToTickEnabled="True" HorizontalAlignment="Stretch" Minimum="1400" Maximum="7200"
@@ -355,7 +379,7 @@
                             <Run Text="{x:Static p:Resources.PhaseSwitchTriggerTime}" /><Run Text=":" />
                         </TextBlock>
                         <TextBox MinHeight="0" TextAlignment="Center" Width="40"
-                                 Text="{co:ValidationBinding Path=WattPilot.PhaseSwitchTriggerTime, Converter={co:Milliseconds2Minutes}, Rule={v:MinMaxIntRule Minimum=0, Maximum=35791}}" />
+                                 Text="{co:ValidationBinding Path=WattPilot.PhaseSwitchTriggerTime, Converter={co:Milliseconds2Minutes}, Rule={v:MinMaxIntRule Minimum=0, Maximum=35791, PropertyDisplayName={x:Static p:Resources.PhaseSwitchTriggerTime}}}" />
                         <TextBlock Margin="4,0,0,0" Text="{x:Static p:Resources.Minutes}" />
                     </StackPanel>
                     <Slider Value="{Binding WattPilot.PhaseSwitchTriggerTime, Mode=TwoWay}" TickFrequency="60000" IsSnapToTickEnabled="True" HorizontalAlignment="Stretch" Minimum="0" Maximum="1200000"
@@ -366,7 +390,7 @@
                             <Run Text="{x:Static p:Resources.MinimumTimeBetweenPhaseSwitches}" /><Run Text=":" />
                         </TextBlock>
                         <TextBox MinHeight="0" TextAlignment="Center" Width="40"
-                                 Text="{co:ValidationBinding Path=WattPilot.MinimumTimeBetweenPhaseSwitches, Converter={co:Milliseconds2Minutes}, Rule={v:MinMaxIntRule Minimum=0, Maximum=35791}}" />
+                                 Text="{co:ValidationBinding Path=WattPilot.MinimumTimeBetweenPhaseSwitches, Converter={co:Milliseconds2Minutes}, Rule={v:MinMaxIntRule Minimum=0, Maximum=35791, PropertyDisplayName={x:Static p:Resources.MinimumTimeBetweenPhaseSwitches}}}" />
                         <TextBlock Margin="4,0,0,0" Text="{x:Static p:Resources.Minutes}" />
                     </StackPanel>
                     <Slider Value="{Binding WattPilot.MinimumTimeBetweenPhaseSwitches, Mode=TwoWay}" TickFrequency="60000" IsSnapToTickEnabled="True" HorizontalAlignment="Stretch" Minimum="0" Maximum="1200000"
@@ -375,42 +399,11 @@
                 </StackPanel>
             </GroupBox>
 
-            <GroupBox Margin="0,4,8,4" Header="{x:Static p:Resources.NextTripSettings}" x:Name="NextTripSettings">
-                <StackPanel Margin="8" Grid.IsSharedSizeScope="True">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" SharedSizeGroup="G1" />
-                            <ColumnDefinition Width="Auto" SharedSizeGroup="G2" />
-                            <ColumnDefinition Width="Auto" SharedSizeGroup="G3" />
-                        </Grid.ColumnDefinitions>
-
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-
-                        <TextBlock Grid.Column="0" Grid.Row="0" Text="{x:Static p:Resources.NextTripTime}" />
-                        <TextBlock Grid.Column="1" Grid.Row="0" Text=":" />
-                        <TextBox Grid.Column="2" Grid.Row="0" MinWidth="250" MaxLength="32" Text="{co:ValidationBinding NextTripTimeString, Rule={v:ChargingRuleDate}}" />
-                    </Grid>
-
-                    <CheckBox IsChecked="{Binding WattPilot.NextTripRemainInEcoMode}" Content="{x:Static p:Resources.NextTripRemainInEcoMode}" />
-
-                    <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center" Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}">
-                        <TextBlock Margin="0,0,4,0">
-                            <Run Text="{x:Static p:Resources.NextTripEnergyToCharge}" /><Run Text=":" />
-                        </TextBlock>
-                        <TextBox MinHeight="0" TextAlignment="Center" Width="40"
-                                 Text="{co:ValidationBinding Path=NextTripEnergyToCharge,ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, Rule={v:MinMaxFloatRule Minimum=0, Maximum=300}}" />
-                        <TextBlock Margin="4,0,0,0" Text="kWh" />
-                    </StackPanel>
-                    <Slider Value="{Binding NextTripEnergyToCharge, Mode=TwoWay}" TickFrequency="1" IsSnapToTickEnabled="True" HorizontalAlignment="Stretch" Minimum="0" Maximum="150"
-                            Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}" />
-                </StackPanel>
-            </GroupBox>
+            <GroupBox Width="250" Style="{StaticResource ErrorGroupBox}" Margin="0,8,8,0"/>
 
         </StackPanel>
 
-        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Bottom" Margin="8,16">
+        <Grid Grid.Row="1" Grid.Column="0" VerticalAlignment="Bottom" Margin="8,16">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
@@ -428,7 +421,14 @@
             </Viewbox>
             <c:Toast Height="40" Background="Green" CornerRadius="10" Grid.Column="3" Padding="10,6" Foreground="White" MinWidth="200" Margin="0,0,16,0" Text="{Binding ToastText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <Button Grid.Column="4" VerticalAlignment="Center" Content="{x:Static p:Resources.Undo}" Command="{Binding UndoCommand}" IsEnabled="{Binding IsInUpdate, Converter={co:BoolInverter}}" />
-            <Button Grid.Column="5" VerticalAlignment="Center" Content="{x:Static p:Resources.Apply}" Command="{Binding ApplyCommand}" IsEnabled="{Binding IsInUpdate, Converter={co:BoolInverter}}" />
+            <Button Grid.Column="5" VerticalAlignment="Center" Content="{x:Static p:Resources.Apply}" Command="{Binding ApplyCommand}" >
+                <Button.IsEnabled>
+                    <MultiBinding Converter="{co:MultiBool2Bool None=True, Any=False, All=False, Invalid=False}">
+                        <Binding Path="IsInUpdate"/>
+                        <Binding Path="HasNotifiedValidationErrors"/>
+                    </MultiBinding>
+                </Button.IsEnabled>
+            </Button>
 
         </Grid>
     </Grid>

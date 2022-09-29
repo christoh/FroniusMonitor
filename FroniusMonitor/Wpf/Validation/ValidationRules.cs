@@ -39,11 +39,13 @@ public class MinMaxFloatRule : ValidationRule
 {
     private readonly float minimum;
     private readonly float maximum;
+    private readonly string propertyDisplayName;
 
-    public MinMaxFloatRule(float minimum, float maximum)
+    public MinMaxFloatRule(string propertyDisplayName, float minimum, float maximum)
     {
         this.minimum = minimum;
         this.maximum = maximum;
+        this.propertyDisplayName = propertyDisplayName;
     }
 
     public override ValidationResult Validate(object value, CultureInfo cultureInfo)
@@ -55,7 +57,7 @@ public class MinMaxFloatRule : ValidationRule
 
         if (!float.TryParse(text, NumberStyles.Any, CultureInfo.CurrentCulture, out var floatValue) || floatValue < minimum || floatValue > maximum)
         {
-            return new ValidationResult(false, string.Format(Resources.MustBeBetween, minimum, maximum));
+            return new ValidationResult(false, string.Format(Resources.MustBeBetween, propertyDisplayName, minimum, maximum));
         }
 
         return ValidationResult.ValidResult;
@@ -66,18 +68,21 @@ public class MinMaxFloatRuleExtension : MarkupExtension
 {
     public float Minimum { get; set; } = float.MinValue;
     public float Maximum { get; set; } = float.MaxValue;
-    public override object ProvideValue(IServiceProvider serviceProvider) => new MinMaxFloatRule(Minimum, Maximum);
+    public string PropertyDisplayName { get; set; } = Resources.DefaultPropertyDisplayName;
+    public override object ProvideValue(IServiceProvider serviceProvider) => new MinMaxFloatRule(PropertyDisplayName, Minimum, Maximum);
 }
 
 public class MinMaxIntRule : ValidationRule
 {
     private readonly int minimum;
     private readonly int maximum;
+    private readonly string propertyDisplayName;
 
-    public MinMaxIntRule(int minimum, int maximum)
+    public MinMaxIntRule(string propertyDisplayName, int minimum, int maximum)
     {
         this.minimum = minimum;
         this.maximum = maximum;
+        this.propertyDisplayName = propertyDisplayName;
     }
 
     public override ValidationResult Validate(object value, CultureInfo cultureInfo)
@@ -89,7 +94,7 @@ public class MinMaxIntRule : ValidationRule
 
         if (!int.TryParse(text, NumberStyles.AllowLeadingSign, CultureInfo.CurrentCulture, out var intValue) || intValue < minimum || intValue > maximum)
         {
-            return new ValidationResult(false, string.Format(Resources.MustBeBetween, minimum, maximum));
+            return new ValidationResult(false, string.Format(Resources.MustBeBetween, propertyDisplayName, minimum, maximum));
         }
 
         return ValidationResult.ValidResult;
@@ -100,7 +105,8 @@ public class MinMaxIntRuleExtension : MarkupExtension
 {
     public int Minimum { get; set; } = 0;
     public int Maximum { get; set; } = 50000;
-    public override object ProvideValue(IServiceProvider serviceProvider) => new MinMaxIntRule(Minimum, Maximum);
+    public string PropertyDisplayName { get; set; } = Resources.DefaultPropertyDisplayName;
+    public override object ProvideValue(IServiceProvider serviceProvider) => new MinMaxIntRule(PropertyDisplayName, Minimum, Maximum);
 }
 
 public class ChargingRuleDate : ValidationRule

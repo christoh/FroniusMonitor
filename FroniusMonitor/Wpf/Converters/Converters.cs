@@ -225,6 +225,8 @@ public class MultiBool2Visibility : MultiBool2Anything<Visibility>
     public override Visibility Invalid { get; set; } = Visibility.Collapsed;
 }
 
+public class MultiBool2Bool:MultiBool2Anything<bool>{}
+
 public class ModbusInterfaceRole2Visibility : MultiConverterBase
 {
     public override object Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)

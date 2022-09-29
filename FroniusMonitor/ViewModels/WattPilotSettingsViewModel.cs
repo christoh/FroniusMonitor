@@ -193,9 +193,7 @@ public class WattPilotSettingsViewModel : ViewModelBase
     {
         try
         {
-            var validationErrors = View.FindVisualChildren<TextBox>().SelectMany(Validation.GetErrors).ToArray();
-
-            foreach (var error in validationErrors)
+            foreach (var error in NotifiedValidationErrors)
             {
                 if
                 (
@@ -208,7 +206,7 @@ public class WattPilotSettingsViewModel : ViewModelBase
                 }
             }
 
-            IList<string> errors = validationErrors
+            IList<string> errors = NotifiedValidationErrors
                 .Where(e => e.BindingInError is BindingExpression { Target: FrameworkElement { IsVisible: true } })
                 .Select(e => e.ErrorContent.ToString() ?? string.Empty).ToList();
 

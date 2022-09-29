@@ -601,6 +601,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Value.
+        /// </summary>
+        public static string DefaultPropertyDisplayName {
+            get {
+                return ResourceManager.GetString("DefaultPropertyDisplayName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Delete rule.
         /// </summary>
         public static string DeleteRule {
@@ -1600,7 +1609,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Value must be between {0} and {1}.
+        ///   Looks up a localized string similar to {0} must be between {1} and {2}.
         /// </summary>
         public static string MustBeBetween {
             get {
