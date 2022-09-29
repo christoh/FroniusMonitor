@@ -24,6 +24,9 @@
         <Style TargetType="TextBlock">
             <Setter Property="Opacity" Value="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={co:Bool2Double True=1, False=.5}}"/>
         </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="ToolTip" Value="{Binding Path=(Validation.Errors)[0].ErrorContent, RelativeSource={RelativeSource Self}}"/>
+        </Style>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
