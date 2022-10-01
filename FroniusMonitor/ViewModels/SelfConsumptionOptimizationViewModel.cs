@@ -265,7 +265,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
     {
         Dispatcher.Invoke(() =>
         {
-            ChargingRules = new BindableCollection<Gen24ChargingRule>(((BindableCollection<Gen24ChargingRule>)oldChargingRules.Clone()).OrderBy(r => r.StartTime).ThenBy(r => r.EndTime),SynchronizationContext.Current);
+            ChargingRules = new BindableCollection<Gen24ChargingRule>(((BindableCollection<Gen24ChargingRule>)oldChargingRules.Clone()).OrderBy(r => r.StartTime).ThenBy(r => r.EndTime), SynchronizationContext.Current);
         });
 
         Settings = (Gen24BatterySettings)oldSettings.Clone();
@@ -277,6 +277,8 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
         NotifyOfPropertyChange(nameof(SocMax));
         LogGridPower = Math.Log10(Math.Abs(Settings.RequestedGridPower ?? .0000001));
         LogHomePower = Math.Log10(Math.Abs(-Settings.BatteryAcChargingMaxPower ?? .0000001));
+        NotifyOfPropertyChange(nameof(RequestedGridPower));
+        NotifyOfPropertyChange(nameof(BatteryAcChargingMaxPower));
     }
 
     private async void Apply()
@@ -285,9 +287,9 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
 
         try
         {
-            var errors = view.FindVisualChildren<TextBox>().SelectMany(Validation.GetErrors).ToArray();
+            //var errors = view.FindVisualChildren<TextBox>().SelectMany(Validation.GetErrors).ToArray();
 
-            foreach (var error in errors)
+            foreach (var error in NotifiedValidationErrors)
             {
                 if
                 (
@@ -300,9 +302,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
                 }
             }
 
-            var errorList = errors
-                .Where(e => e.BindingInError is BindingExpression { Target: FrameworkElement { IsVisible: true } })
-                .Select(e => e.ErrorContent.ToString()).ToList();
+            var errorList = new List<string>();
 
             for (var i = 0; i < ChargingRules.Count; i++)
             {

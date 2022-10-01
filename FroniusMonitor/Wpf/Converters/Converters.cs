@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Wpf.Converters;
+﻿using De.Hochstaetter.FroniusMonitor.Wpf.Localization;
+
+namespace De.Hochstaetter.FroniusMonitor.Wpf.Converters;
 
 public abstract class ConverterBase : MarkupExtension, IValueConverter
 {
@@ -24,6 +26,8 @@ public abstract class MultiConverterBase : MarkupExtension, IMultiValueConverter
     }
 }
 
+
+#if DEBUG
 public class DoNothing:ConverterBase
 {
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -36,6 +40,7 @@ public class DoNothing:ConverterBase
         return value;
     }
 }
+#endif
 
 public class DateConverter : ConverterBase
 {

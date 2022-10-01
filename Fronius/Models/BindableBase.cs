@@ -4,9 +4,9 @@ public abstract class BindableBase : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    protected virtual bool SetProperty<T>(ref T backingField, T value, Action? postAction = null, Func<T>? preFunc = null, [CallerMemberName] string? propertyName = null)
+    protected virtual bool SetProperty<T>(ref T backingField, T value, Action? postAction = null, Func<T>? preFunc = null, [CallerMemberName] string? propertyName = null, bool notifyAlways = false)
     {
-        if (EqualityComparer<T>.Default.Equals(backingField, value))
+        if (!notifyAlways && EqualityComparer<T>.Default.Equals(backingField, value))
         {
             return false;
         }
@@ -23,7 +23,7 @@ public abstract class BindableBase : INotifyPropertyChanged
     }
 
     // Same as SetProperty (for compatibility with Caliburn.Micro)
-    protected virtual bool Set<T>(ref T backingField, T value, Action? postAction = null, Func<T>? preFunc = null, [CallerMemberName] string? propertyName = null)
+    protected virtual bool Set<T>(ref T backingField, T value, Action? postAction = null, Func<T>? preFunc = null, [CallerMemberName] string? propertyName = null, bool notifyAlways = false)
     {
         return SetProperty(ref backingField, value, postAction, preFunc, propertyName);
     }

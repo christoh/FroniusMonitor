@@ -373,7 +373,14 @@
             </Viewbox>
             <c:Toast Height="32" Background="Green" CornerRadius="10" Grid.Column="3" Padding="10,6" Foreground="White" MinWidth="200" Margin="0,0,16,0" Text="{Binding ToastText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             <Button Grid.Column="4" VerticalAlignment="Center" Content="{x:Static p:Resources.Undo}" Command="{Binding UndoCommand}" IsEnabled="{Binding IsInUpdate, Converter={co:BoolInverter}}" />
-            <Button Grid.Column="5" VerticalAlignment="Center" Content="{x:Static p:Resources.Apply}" Command="{Binding ApplyCommand}" IsEnabled="{Binding IsInUpdate, Converter={co:BoolInverter}}"/>
+            <Button Grid.Column="5" VerticalAlignment="Center" Content="{x:Static p:Resources.Apply}" Command="{Binding ApplyCommand}">
+                <Button.IsEnabled>
+                    <MultiBinding Converter="{co:MultiBool2Bool Any=False, All=False, Invalid=False, None=True}">
+                        <Binding Path="IsInUpdate"/>
+                        <Binding Path="HasVisibleNotifiedValidationErrors"/>
+                    </MultiBinding>
+                </Button.IsEnabled>
+            </Button>
         </Grid>
     </Grid>
 </c:ValidationWindow>
