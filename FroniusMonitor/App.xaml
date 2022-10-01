@@ -146,7 +146,7 @@
                     <ItemsControl ItemsSource="{Binding Path=(vm:ViewModelBase.NotifiedValidationErrors)}" Margin="8">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="{x:Type ValidationError}">
-                                <Grid Margin="0,0,0,6">
+                                <Grid Margin="0,0,0,6" IsVisibleChanged="ValidationErrorVisibilityChanged" Visibility="{Binding Path=BindingInError.(BindingExpressionBase.Target).(UIElement.IsVisible), Converter={co:Bool2Visibility}}">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" />
@@ -163,7 +163,7 @@
             </Setter>
 
             <Style.Triggers>
-                <DataTrigger Binding="{Binding Path=(vm:ViewModelBase.HasNotifiedValidationErrors)}" Value="{x:Static sys:Boolean.TrueString}">
+                <DataTrigger Binding="{Binding Path=(vm:ViewModelBase.HasVisibleNotifiedValidationErrors)}" Value="{x:Static sys:Boolean.TrueString}">
                     <DataTrigger.EnterActions>
                         <BeginStoryboard>
                             <Storyboard>

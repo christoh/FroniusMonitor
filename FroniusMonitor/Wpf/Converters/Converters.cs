@@ -24,6 +24,19 @@ public abstract class MultiConverterBase : MarkupExtension, IMultiValueConverter
     }
 }
 
+public class DoNothing:ConverterBase
+{
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value;
+    }
+
+    public override object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value;
+    }
+}
+
 public class DateConverter : ConverterBase
 {
     public string StringFormat { get; set; } = "G";

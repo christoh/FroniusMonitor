@@ -1,4 +1,4 @@
-﻿<Window x:Class="De.Hochstaetter.FroniusMonitor.Views.WattPilotSettingsView"
+﻿<c:ValidationWindow x:Class="De.Hochstaetter.FroniusMonitor.Views.WattPilotSettingsView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -426,11 +426,11 @@
                 <Button.IsEnabled>
                     <MultiBinding Converter="{co:MultiBool2Bool None=True, Any=False, All=False, Invalid=False}">
                         <Binding Path="IsInUpdate"/>
-                        <Binding Path="HasNotifiedValidationErrors"/>
+                        <Binding Path="HasVisibleNotifiedValidationErrors"/>
                     </MultiBinding>
                 </Button.IsEnabled>
             </Button>
 
         </Grid>
     </Grid>
-</Window>
+</c:ValidationWindow>

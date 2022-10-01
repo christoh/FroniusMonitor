@@ -574,7 +574,7 @@
 	  <value>Entered value must be an integer percentage from 0 to 100</value>
   </data>
   <data name="MustBeBetween" xml:space="preserve">
-	  <value>{0} must be between {1} and {2}</value>
+	  <value>{0} must be between {1:N0} and {2:N0}</value>
   </data>
   <data name="BatteryIsAcCoupled" xml:space="preserve">
 	  <value>Battery is AC coupled</value>

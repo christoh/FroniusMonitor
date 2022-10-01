@@ -574,7 +574,7 @@
 	  <value>Der eingegebene Wert muss ein ganzzahliger Prozentwert von 0 bis 100 sein.</value>
   </data>
   <data name="MustBeBetween" xml:space="preserve">
-	  <value>{0} muss zwischen {1} und {2} liegen</value>
+	  <value>{0} muss zwischen {1:N0} und {2:N0} liegen</value>
   </data>
   <data name="BatteryIsAcCoupled" xml:space="preserve">
 	  <value>Batterieanbindung über Wechselstrom (AC)</value>

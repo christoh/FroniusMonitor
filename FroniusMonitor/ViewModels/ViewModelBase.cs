@@ -2,22 +2,24 @@
 
 namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
-public abstract class ViewModelBase:BindableBase
+public abstract class ViewModelBase : BindableBase
 {
     public Dispatcher Dispatcher { get; set; } = null!;
 
-    private readonly ObservableCollection<ValidationError> notifiedValidationErrors  = new();
+    private readonly ObservableCollection<ValidationError> notifiedValidationErrors = new();
     public ReadOnlyObservableCollection<ValidationError> NotifiedValidationErrors { get; }
 
     public bool HasNotifiedValidationErrors => NotifiedValidationErrors.Count > 0;
 
-    public IReadOnlyList<ValidationError> VisibleNotifiedValidationErrors=>NotifiedValidationErrors.Where(e=>((BindingExpression)e.BindingInError).Target is FrameworkElement{Visibility: Visibility.Visible}).ToArray();
+    public IEnumerable<ValidationError> VisibleNotifiedValidationErrors => NotifiedValidationErrors.Where(e => ((BindingExpressionBase)e.BindingInError).Target is FrameworkElement { IsVisible: true });
+
+    public bool HasVisibleNotifiedValidationErrors => VisibleNotifiedValidationErrors.Any();
 
     protected ViewModelBase()
     {
         NotifiedValidationErrors = new(notifiedValidationErrors);
     }
-    
+
     internal virtual Task OnInitialize() => Task.CompletedTask;
 
     public void HandleValidationErrorChange(ValidationErrorEventArgs e)
@@ -35,6 +37,7 @@ public abstract class ViewModelBase:BindableBase
         }
 
         NotifyOfPropertyChange(nameof(HasNotifiedValidationErrors));
+        NotifyOfPropertyChange(nameof(HasVisibleNotifiedValidationErrors));
         NotifyOfPropertyChange(nameof(VisibleNotifiedValidationErrors));
     }
 }

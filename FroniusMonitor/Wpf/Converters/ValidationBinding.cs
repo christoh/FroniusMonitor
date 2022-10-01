@@ -7,6 +7,7 @@ public class ValidationBinding : Binding
         UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
         ValidatesOnExceptions = true;
         NotifyOnValidationError = true;
+        ConverterCulture = CultureInfo.CurrentCulture;
     }
 
     public ValidationBinding() : this(null) { }

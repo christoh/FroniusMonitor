@@ -19,4 +19,22 @@ public static class DependencyObjectExtensions
             }
         }
     }
+
+    public static T? GetVisualParent<T>(this DependencyObject? element) where T : DependencyObject
+    {
+        while (true)
+        {
+            if (element is null)
+            {
+                return null;
+            }
+
+            element = VisualTreeHelper.GetParent(element);
+
+            if (element is T desiredElement)
+            {
+                return desiredElement;
+            }
+        }
+    }
 }

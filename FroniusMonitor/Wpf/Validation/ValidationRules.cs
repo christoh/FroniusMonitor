@@ -1,117 +1,90 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Wpf.Validation;
+﻿using System.Linq.Expressions;
 
-internal class RegexRule : ValidationRule
+namespace De.Hochstaetter.FroniusMonitor.Wpf.Validation;
+
+internal class StringResult : IHaveDisplayName
 {
-    private readonly string pattern;
-    private readonly string message;
+    private readonly Func<string> func;
 
-    public RegexRule(string pattern, string message)
+    public StringResult(Func<string> func)
     {
-        this.pattern = pattern;
-        this.message = message;
+        this.func = func;
     }
 
-    public override ValidationResult Validate(object value, CultureInfo cultureInfo)
-    {
-        if (value is not string text)
-        {
-            return new ValidationResult(false, $"Must bind to {nameof(String)}");
-        }
+    public override string ToString() => func();
+    public string DisplayName => func();
 
-        if (!Regex.IsMatch(text, pattern))
-        {
-            return new ValidationResult(false, message);
-        }
-
-        return ValidationResult.ValidResult;
-    }
+    public static ValidationResult Create(Func<string> localFunc) => new ValidationResult(false, new StringResult(localFunc));
 }
 
-internal class RegExRuleExtension : MarkupExtension
+public class MarkupRule : ValidationRule
+{
+    private readonly ValidationRuleExtension extension;
+
+    public MarkupRule(ValidationRuleExtension extension)
+    {
+        this.extension = extension;
+    }
+    public override ValidationResult Validate(object value, CultureInfo cultureInfo) => extension.Validate(value);
+}
+
+public abstract class ValidationRuleExtension : MarkupExtension
+{
+    private readonly MarkupRule rule;
+
+    protected ValidationRuleExtension()
+    {
+        rule = new MarkupRule(this);
+    }
+
+    public sealed override object ProvideValue(IServiceProvider serviceProvider) => rule;
+    public abstract ValidationResult Validate(object? value);
+}
+
+internal class RegExRuleExtension : ValidationRuleExtension
 {
     public string Message { get; set; } = string.Empty;
     public string Pattern { get; set; } = @"^.*$";
 
-    public override object ProvideValue(IServiceProvider serviceProvider) => new RegexRule(Pattern, Message);
-}
-
-public class MinMaxFloatRule : ValidationRule
-{
-    private readonly float minimum;
-    private readonly float maximum;
-    private readonly string propertyDisplayName;
-
-    public MinMaxFloatRule(string propertyDisplayName, float minimum, float maximum)
+    public override ValidationResult Validate(object? value)
     {
-        this.minimum = minimum;
-        this.maximum = maximum;
-        this.propertyDisplayName = propertyDisplayName;
-    }
-
-    public override ValidationResult Validate(object value, CultureInfo cultureInfo)
-    {
-        if (value is not string text)
-        {
-            return new ValidationResult(false, $"Must bind to {nameof(String)}");
-        }
-
-        if (!float.TryParse(text, NumberStyles.Any, CultureInfo.CurrentCulture, out var floatValue) || floatValue < minimum || floatValue > maximum)
-        {
-            return new ValidationResult(false, string.Format(Resources.MustBeBetween, propertyDisplayName, minimum, maximum));
-        }
-
-        return ValidationResult.ValidResult;
+        return !Regex.IsMatch(value?.ToString() ?? string.Empty, Pattern)
+            ? new ValidationResult(false, new StringResult(() => Message))
+            : ValidationResult.ValidResult;
     }
 }
 
-public class MinMaxFloatRuleExtension : MarkupExtension
+public class MinMaxFloatRuleExtension : ValidationRuleExtension
 {
     public float Minimum { get; set; } = float.MinValue;
     public float Maximum { get; set; } = float.MaxValue;
     public string PropertyDisplayName { get; set; } = Resources.DefaultPropertyDisplayName;
-    public override object ProvideValue(IServiceProvider serviceProvider) => new MinMaxFloatRule(PropertyDisplayName, Minimum, Maximum);
-}
 
-public class MinMaxIntRule : ValidationRule
-{
-    private readonly int minimum;
-    private readonly int maximum;
-    private readonly string propertyDisplayName;
-
-    public MinMaxIntRule(string propertyDisplayName, int minimum, int maximum)
+    public override ValidationResult Validate(object? value)
     {
-        this.minimum = minimum;
-        this.maximum = maximum;
-        this.propertyDisplayName = propertyDisplayName;
-    }
-
-    public override ValidationResult Validate(object value, CultureInfo cultureInfo)
-    {
-        if (value is not string text)
-        {
-            return new ValidationResult(false, $"Must bind to {nameof(String)}");
-        }
-
-        if (!int.TryParse(text, NumberStyles.AllowLeadingSign, CultureInfo.CurrentCulture, out var intValue) || intValue < minimum || intValue > maximum)
-        {
-            return new ValidationResult(false, string.Format(Resources.MustBeBetween, propertyDisplayName, minimum, maximum));
-        }
-
-        return ValidationResult.ValidResult;
+        return !float.TryParse(value?.ToString(), NumberStyles.Any, CultureInfo.CurrentCulture, out var floatValue) || floatValue < Minimum || floatValue > Maximum 
+            ? StringResult.Create(() => string.Format(Resources.MustBeBetween, PropertyDisplayName, Minimum, Maximum)) 
+            : ValidationResult.ValidResult;
     }
 }
 
-public class MinMaxIntRuleExtension : MarkupExtension
+public class MinMaxIntRuleExtension : ValidationRuleExtension
 {
     public int Minimum { get; set; } = 0;
     public int Maximum { get; set; } = 50000;
     public string PropertyDisplayName { get; set; } = Resources.DefaultPropertyDisplayName;
-    public override object ProvideValue(IServiceProvider serviceProvider) => new MinMaxIntRule(PropertyDisplayName, Minimum, Maximum);
+
+    public override ValidationResult Validate(object? value)
+    {
+        return int.TryParse(value?.ToString(), NumberStyles.AllowLeadingSign|NumberStyles.AllowThousands, CultureInfo.CurrentCulture, out var intValue) && intValue >= Minimum && intValue <= Maximum
+            ? ValidationResult.ValidResult
+            : StringResult.Create(() => string.Format(Resources.MustBeBetween, PropertyDisplayName, Minimum, Maximum));
+    }
 }
 
-public class ChargingRuleDate : ValidationRule
+public class ChargingRuleDateExtension : ValidationRuleExtension
 {
-    public override ValidationResult Validate(object value, CultureInfo cultureInfo)
+    public override ValidationResult Validate(object? value)
     {
         if (value is not string text)
         {
@@ -119,7 +92,7 @@ public class ChargingRuleDate : ValidationRule
         }
 
         var match = Gen24ChargingRule.TimeRegex.Match(text);
-        var invalidTime = new ValidationResult(false, string.Format(Resources.InvalidChargingRuleTime, text));
+        var invalidTime = StringResult.Create(() => string.Format(Resources.InvalidChargingRuleTime, text));
 
         if (!match.Success)
         {
@@ -136,9 +109,4 @@ public class ChargingRuleDate : ValidationRule
 
         return ValidationResult.ValidResult;
     }
-}
-
-public class ChargingRuleDateExtension : MarkupExtension
-{
-    public override object ProvideValue(IServiceProvider serviceProvider) => new ChargingRuleDate();
 }

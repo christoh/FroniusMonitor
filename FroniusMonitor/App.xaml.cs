@@ -75,4 +75,13 @@ public partial class App
         e.Handled = true;
         e.Dispatcher.InvokeAsync(() => MessageBox.Show(e.Exception.ToString(), Fronius.Localization.Resources.Warning, MessageBoxButton.OK, MessageBoxImage.Error));
     }
+
+    private void ValidationErrorVisibilityChanged(object sender, DependencyPropertyChangedEventArgs _)
+    {
+        if (sender is DependencyObject d && d.GetVisualParent<ItemsControl>()?.DataContext is ViewModelBase viewModelBase)
+        {
+            viewModelBase.NotifyOfPropertyChange(nameof(ViewModelBase.HasVisibleNotifiedValidationErrors));
+            viewModelBase.NotifyOfPropertyChange(nameof(ViewModelBase.VisibleNotifiedValidationErrors));
+        }
+    }
 }

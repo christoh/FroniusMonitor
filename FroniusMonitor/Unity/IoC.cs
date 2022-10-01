@@ -2,7 +2,7 @@
 
 public class IoC:IServiceProvider
 {
-    public static T TryGet<T>()
+    public static T? TryGet<T>()
     {
         try
         {
@@ -10,7 +10,7 @@ public class IoC:IServiceProvider
         }
         catch
         {
-            return default(T)!;
+            return default;
         }
     }
     public static T Get<T>()

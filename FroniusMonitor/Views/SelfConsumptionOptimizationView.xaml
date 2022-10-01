@@ -1,5 +1,5 @@
 ﻿<!-- ReSharper disable MarkupAttributeTypo -->
-<Window x:Class="De.Hochstaetter.FroniusMonitor.Views.SelfConsumptionOptimizationView"
+<c:ValidationWindow x:Class="De.Hochstaetter.FroniusMonitor.Views.SelfConsumptionOptimizationView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -14,24 +14,26 @@
         mc:Ignorable="d"
         Title="{x:Static p:Resources.EnergyFlow}" SizeToContent="WidthAndHeight"  ResizeMode="CanMinimize"
         d:DataContext="{d:DesignInstance Type=vm:SelfConsumptionOptimizationViewModel}">
-    <Window.Resources>
-        <Style TargetType="Button">
-            <Setter Property="Margin" Value="0,0,8,0" />
-            <Setter Property="MinHeight" Value="30" />
-            <Setter Property="MinWidth" Value="70" />
-            <Setter Property="Padding" Value="8,0" />
-        </Style>
-        <Style TargetType="TextBlock">
-            <Setter Property="Opacity" Value="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={co:Bool2Double True=1, False=.5}}"/>
-        </Style>
-        <Style TargetType="TextBox">
-            <Setter Property="ToolTip" Value="{Binding Path=(Validation.Errors)[0].ErrorContent, RelativeSource={RelativeSource Self}}"/>
-        </Style>
-    </Window.Resources>
     <Grid>
+        <Grid.Resources>
+            <Style TargetType="Button">
+                <Setter Property="Margin" Value="0,0,8,0" />
+                <Setter Property="MinHeight" Value="30" />
+                <Setter Property="MinWidth" Value="70" />
+                <Setter Property="Padding" Value="8,0" />
+            </Style>
+            <Style TargetType="TextBlock">
+                <Setter Property="Opacity" Value="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={co:Bool2Double True=1, False=.5}}"/>
+            </Style>
+            <Style TargetType="TextBox">
+                <Setter Property="ToolTip" Value="{Binding Path=(Validation.Errors)[0].ErrorContent, RelativeSource={RelativeSource Self}}"/>
+                <EventSetter Event="Validation.Error" Handler="OnValidationChanged"/>
+            </Style>
+        </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"/>
             <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -73,7 +75,7 @@
                             <Run Text="{l:LocConfig 'BATTERIES', 'HYB_EM_POWER'}" /><Run Text=":" />
                             </TextBlock>
                             <TextBox TextAlignment="Center" Width="40"
-                                 Text="{co:ValidationBinding Path=RequestedGridPower, Rule={v:MinMaxIntRule Minimum=0, Maximum=50000}}" />
+                                 Text="{co:ValidationBinding Path=RequestedGridPower, Rule={v:MinMaxIntRule Minimum=0, Maximum=50000, PropertyDisplayName={l:LocConfig 'BATTERIES', 'HYB_EM_POWER'}}}" />
                             <TextBlock Text="W" Margin="4,0,0,0" />
                         </StackPanel>
                         <Slider Grid.Row="3" Value="{Binding LogGridPower, Mode=TwoWay}"
@@ -108,7 +110,7 @@
                             <Run Text="{l:LocConfig 'BATTERIES', 'BAT_M0_SOC_MIN'}" /><Run Text=":" />
                             </TextBlock>
                             <TextBox TextAlignment="Center" Width="40"
-                                 Text="{co:ValidationBinding Path=SocMin, Rule={v:RegExRule Pattern='^100$|^0*([0-9]{1,2})$', Message={x:Static p:Resources.MustBePercent}}}" />
+                                 Text="{co:ValidationBinding Path=SocMin, Rule={v:MinMaxIntRule Minimum=0, Maximum=100, PropertyDisplayName={l:LocConfig 'BATTERIES', 'BAT_M0_SOC_MIN'}}}" />
                             <TextBlock Margin="4,0,0,0" Text="%" />
                         </StackPanel>
                         <Slider Value="{Binding SocMin, Mode=TwoWay}" Grid.Row="1" HorizontalAlignment="Stretch" Minimum="5" Maximum="100" />
@@ -117,7 +119,7 @@
                             <Run Text="{l:LocConfig 'BATTERIES', 'BAT_M0_SOC_MAX'}" /><Run Text=":" />
                             </TextBlock>
                             <TextBox TextAlignment="Center" Width="40"
-                                 Text="{co:ValidationBinding Path=SocMax, Rule={v:RegExRule Pattern='^100$|^0*([0-9]{1,2})$', Message={x:Static p:Resources.MustBePercent}}}" />
+                                 Text="{co:ValidationBinding Path=SocMax, Rule={v:MinMaxIntRule Minimum=0, Maximum=100, PropertyDisplayName={l:LocConfig 'BATTERIES', 'BAT_M0_SOC_MAX'}}}" />
                             <TextBlock Margin="4,0,0,0" Text="%" />
                         </StackPanel>
                         <Slider Value="{Binding SocMax, Mode=TwoWay}" Grid.Row="3" HorizontalAlignment="Stretch" Minimum="5" Maximum="100" />
@@ -283,6 +285,8 @@
                             <Setter Property="BorderThickness" Value="0" />
                             <Setter Property="VerticalAlignment" Value="Stretch" />
                             <Setter Property="HorizontalAlignment" Value="Stretch" />
+                            <EventSetter Event="Validation.Error" Handler="OnValidationChanged"/>
+                            <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}"/>
                         </Style>
 
                         <Style TargetType="TextBlock" x:Key="TextBlockStyle">
@@ -307,14 +311,6 @@
                                             HeaderStyle="{StaticResource Es}" CanUserReorder="False" CanUserResize="True" CanUserSort="True"
                                             ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
 
-                        <!--<DataGridTextColumn Header="{x:Static p:Resources.StartLocal}" IsReadOnly="True" Binding="{Binding StartTimeDate, Mode=OneWay, Converter={co:DateConverter StringFormat=HH:mm}}" SortMemberPath="StartTimeDate"
-                                            HeaderStyle="{StaticResource Es}" CanUserReorder="False" CanUserResize="True" CanUserSort="True" SortDirection="Ascending"
-                                            ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
-
-                        <DataGridTextColumn Header="{x:Static p:Resources.EndLocal}" IsReadOnly="True"  Binding="{Binding EndTimeDate, Converter={co:DateConverter StringFormat=HH:mm}}" SortMemberPath="EndTimeDate"
-                                            HeaderStyle="{StaticResource Es}" CanUserReorder="False" CanUserResize="True" CanUserSort="True"
-                                            ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />-->
-
                         <DataGridTemplateColumn Header="{x:Static p:Resources.RuleType}" HeaderStyle="{StaticResource Es}" CanUserReorder="False" CanUserResize="True" CanUserSort="True" SortMemberPath="RuleType">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate DataType="{x:Type m:Gen24ChargingRule}">
@@ -323,7 +319,7 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
-                        <DataGridTextColumn Header="{x:Static p:Resources.Power}" SortMemberPath="Power" Binding="{Binding Power, UpdateSourceTrigger=PropertyChanged}"
+                        <DataGridTextColumn Header="{x:Static p:Resources.Power}" SortMemberPath="Power" Binding="{co:ValidationBinding Power, Rule={v:MinMaxIntRule PropertyDisplayName={x:Static p:Resources.Power}, Minimum=0, Maximum=50000}}"
                                             HeaderStyle="{StaticResource Es}" CanUserReorder="False" CanUserResize="True" CanUserSort="True"
                                             ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
 
@@ -357,7 +353,9 @@
             </Grid>
         </GroupBox>
 
-        <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Bottom" Margin="8,16,0,16">
+        <GroupBox Style="{StaticResource ErrorGroupBox}" Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Margin="0,4,6,4"/>
+
+        <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" VerticalAlignment="Bottom" Margin="8,16,0,16">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
@@ -378,4 +376,4 @@
             <Button Grid.Column="5" VerticalAlignment="Center" Content="{x:Static p:Resources.Apply}" Command="{Binding ApplyCommand}" IsEnabled="{Binding IsInUpdate, Converter={co:BoolInverter}}"/>
         </Grid>
     </Grid>
-</Window>
+</c:ValidationWindow>

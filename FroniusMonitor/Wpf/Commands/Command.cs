@@ -20,7 +20,7 @@ public abstract class CommandBase : ICommand
             return;
         }
 
-        synchronizationContext.Post(d => Raise(), null);
+        synchronizationContext.Post(_ => Raise(), null);
     }
 
     private void Raise()
