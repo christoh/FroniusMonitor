@@ -551,6 +551,14 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref absoluteMaximumChargingCurrent, value);
     }
 
+    private byte? maximumChargingCurrentPhase1;
+    [WattPilot("la1", false)]
+    public byte? MaximumChargingCurrentPhase1
+    {
+        get => maximumChargingCurrentPhase1;
+        set => Set(ref maximumChargingCurrentPhase1, value);
+    }
+
     private bool? unlockCableOnPowerFailure;
 
     /// <summary>

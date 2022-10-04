@@ -996,4 +996,7 @@
   <data name="DefaultPropertyDisplayName" xml:space="preserve">
 	  <value>Der Wert</value>
   </data>
+  <data name="MaximumChargingCurrentPhase1" xml:space="preserve">
+	  <value>Ladestrombegrenzung bei einphasigem Laden</value>
+  </data>
 </root>

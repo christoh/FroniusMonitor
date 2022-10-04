@@ -161,6 +161,16 @@
                     </StackPanel>
                     <Slider IsEnabled="{Binding EnableDanger}" Value="{Binding WattPilot.AbsoluteMaximumChargingCurrent, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="6" Maximum="{Binding WattPilot.Is16AmpereVariant, Converter={co:Bool2Double Null=32, False=32, True=16}}" />
 
+                    <StackPanel IsEnabled="{Binding EnableDanger}" Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center">
+                        <TextBlock Margin="0,0,4,0">
+                            <Run Text="{x:Static p:Resources.MaximumChargingCurrentPhase1}" /><Run Text=":" />
+                        </TextBlock>
+                        <TextBox MinHeight="0" TextAlignment="Center" Width="40"
+                                 Text="{co:ValidationBinding Path=WattPilot.MaximumChargingCurrentPhase1, Rule={v:MinMaxIntRule PropertyDisplayName={x:Static p:Resources.MaximumChargingCurrentPhase1}, Minimum=0, Maximum=16}}" />
+                        <TextBlock Margin="4,0,0,0" Text="A" />
+                    </StackPanel>
+                    <Slider IsEnabled="{Binding EnableDanger}" Value="{Binding WattPilot.MaximumChargingCurrentPhase1, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="6" Maximum="16" />
+
                 </StackPanel>
             </GroupBox>
 

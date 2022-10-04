@@ -1159,6 +1159,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Charging current limit with 1 phase only.
+        /// </summary>
+        public static string MaximumChargingCurrentPhase1 {
+            get {
+                return ResourceManager.GetString("MaximumChargingCurrentPhase1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Maximum SoC.
         /// </summary>
         public static string MaximumSoc {

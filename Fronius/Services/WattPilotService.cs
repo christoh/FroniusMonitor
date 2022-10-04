@@ -112,7 +112,7 @@ public class WattPilotService : BindableBase, IWattPilotService
                 }
 
                 haveData = false;
-            } while (dataType == "fullStatus" && dataToken["partial"]?.Value<bool>() is true);
+            } while (dataType != "fullStatus" || dataToken["partial"]?.Value<bool>() is true);
 
             tokenSource?.Dispose();
             tokenSource = new CancellationTokenSource();
@@ -354,7 +354,7 @@ public class WattPilotService : BindableBase, IWattPilotService
 
         lock (outstandingAcknowledges)
         {
-            outstandingAcknowledges.Add(new WattPilotAcknowledge {RequestId = id, PropertyInfo = propertyInfo, Value = value});
+            outstandingAcknowledges.Add(new WattPilotAcknowledge { RequestId = id, PropertyInfo = propertyInfo, Value = value });
         }
     }
 

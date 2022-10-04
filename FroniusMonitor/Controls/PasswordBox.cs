@@ -218,7 +218,7 @@
 
             try
             {
-                Text = Visible ? Password : new string(PasswordChar, Password.Length);
+                Text = Visible ? Password : new string(PasswordChar, Password?.Length??0);
             }
             finally
             {
