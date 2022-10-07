@@ -28,7 +28,7 @@ public abstract class MultiConverterBase : MarkupExtension, IMultiValueConverter
 
 
 #if DEBUG
-public class DoNothing:ConverterBase
+public class DoNothing : ConverterBase
 {
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
@@ -41,6 +41,44 @@ public class DoNothing:ConverterBase
     }
 }
 #endif
+
+public class Sum : MultiConverterBase
+{
+    public override object? Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return values.OfType<IConvertible>().Select(v => v.ToDouble(CultureInfo.CurrentCulture)).Sum();
+    }
+}
+
+public abstract class PlacementModeToAnything<T> : ConverterBase
+{
+    public T? Top { get; set; }
+    public T? Bottom { get; set; }
+    public T? Right { get; set; }
+    public T? Left { get; set; }
+    public T? Center { get; set; }
+    public T? Null { get; set; }
+    public T? Relative { get; set; }
+
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is not PlacementMode placementMode ? Null : placementMode switch
+        {
+            PlacementMode.Top => Top,
+            PlacementMode.Bottom => Bottom,
+            PlacementMode.Right => Right,
+            PlacementMode.Left => Left,
+            PlacementMode.Center => Center,
+            PlacementMode.Relative => Relative,
+            _ => Null,
+        };
+    }
+}
+
+public class PlacementMode2Thickness : PlacementModeToAnything<Thickness> { }
+public class PlacementMode2Double : PlacementModeToAnything<double> { }
+public class PlacementMode2VerticalAlignment : PlacementModeToAnything<VerticalAlignment> { }
+public class PlacementMode2TextAlignment : PlacementModeToAnything<TextAlignment> { }
 
 public class DateConverter : ConverterBase
 {
@@ -100,6 +138,12 @@ public class NullToBrush : NullToAnything<Brush>
 {
     public override Brush? NotNull { get; set; } = Brushes.AntiqueWhite;
     public override Brush? Null { get; set; } = Brushes.LightGray;
+}
+
+public class NullToBool : NullToAnything<bool>
+{
+    public override bool NotNull { get; set; } = true;
+    public override bool Null { get; set; } = false;
 }
 
 public abstract class PowerCorrector : ConverterBase
@@ -243,7 +287,7 @@ public class MultiBool2Visibility : MultiBool2Anything<Visibility>
     public override Visibility Invalid { get; set; } = Visibility.Collapsed;
 }
 
-public class MultiBool2Bool:MultiBool2Anything<bool>{}
+public class MultiBool2Bool : MultiBool2Anything<bool> { }
 
 public class ModbusInterfaceRole2Visibility : MultiConverterBase
 {
@@ -561,9 +605,9 @@ public class WattPilotPhase2Brush : ConverterBase
         {
             case WattPilot wattPilot:
 
-                var resultL1 = GetPhaseColor(Phases.L1, wattPilot.L1CableEnabled, wattPilot.L1CarEnabled);
-                var resultL2 = GetPhaseColor(Phases.L2, wattPilot.L2CableEnabled, wattPilot.L2CarEnabled);
-                var resultL3 = GetPhaseColor(Phases.L3, wattPilot.L3CableEnabled, wattPilot.L3CarEnabled);
+                var resultL1 = GetPhaseColor(Phases.L1, wattPilot.L1CableEnabled, wattPilot.L1ChargerEnabled);
+                var resultL2 = GetPhaseColor(Phases.L2, wattPilot.L2CableEnabled, wattPilot.L2ChargerEnabled);
+                var resultL3 = GetPhaseColor(Phases.L3, wattPilot.L3CableEnabled, wattPilot.L3ChargerEnabled);
 
                 var colors = new[] { resultL1, resultL2, resultL3 };
 

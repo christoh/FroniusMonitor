@@ -106,6 +106,14 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref version, value);
     }
 
+    private int? wifiSignal;
+    [WattPilot("rssi")]
+    public int? WifiSignal
+    {
+        get => wifiSignal;
+        set => Set(ref wifiSignal, value);
+    }
+
     private int? protocol;
 
     [FroniusProprietaryImport("protocol", FroniusDataType.Root)]
@@ -302,28 +310,28 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     public double? PowerFactorL3 => PowerFactorPercentL3 / 100;
     public double? PowerFactorN => PowerFactorPercentN / 100;
 
-    private bool? l1CarEnabled;
+    private bool? l1ChargerEnabled;
     [WattPilot("pha", 0)]
-    public bool? L1CarEnabled
+    public bool? L1ChargerEnabled
     {
-        get => l1CarEnabled;
-        set => Set(ref l1CarEnabled, value);
+        get => l1ChargerEnabled;
+        set => Set(ref l1ChargerEnabled, value);
     }
 
-    private bool? l2CarEnabled;
+    private bool? l2ChargerEnabled;
     [WattPilot("pha", 1)]
-    public bool? L2CarEnabled
+    public bool? L2ChargerEnabled
     {
-        get => l2CarEnabled;
-        set => Set(ref l2CarEnabled, value);
+        get => l2ChargerEnabled;
+        set => Set(ref l2ChargerEnabled, value);
     }
 
-    private bool? l3CarEnabled;
+    private bool? l3ChargerEnabled;
     [WattPilot("pha", 2)]
-    public bool? L3CarEnabled
+    public bool? L3ChargerEnabled
     {
-        get => l3CarEnabled;
-        set => Set(ref l3CarEnabled, value);
+        get => l3ChargerEnabled;
+        set => Set(ref l3ChargerEnabled, value);
     }
 
     private bool? l1CableEnabled;
@@ -348,6 +356,14 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     {
         get => l3CableEnabled;
         set => Set(ref l3CableEnabled, value);
+    }
+
+    private byte? numberOfCarPhases;
+    [WattPilot("pnp")]
+    public byte? NumberOfCarPhases
+    {
+        get => numberOfCarPhases;
+        set => Set(ref numberOfCarPhases, value);
     }
 
     private ModelStatus? status;

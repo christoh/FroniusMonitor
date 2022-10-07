@@ -35,13 +35,24 @@
                         <Setter Property="FontFamily" Value="pack://application:,,,/Assets/Fonts/#Digital-7 Mono"/>
                     </Style>
                 </Grid.Resources>
-                <Viewbox Grid.Row="0">
+                <Grid Grid.Row="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Viewbox Grid.Row="0" Grid.Column="0">
                     <TextBlock FontSize="8" TextAlignment="Center" Text="{Binding WattPilotService.WattPilot.DeviceName, FallbackValue=---, TargetNullValue=???}"/>
                 </Viewbox>
-                <Viewbox Grid.Row="1">
+                <Viewbox Grid.Row="1" Grid.Column="0">
                     <TextBlock FontSize="8" TextAlignment="Center" Text="{Binding WattPilotService.WattPilot.StatusDisplayName, FallbackValue=---, TargetNullValue=???}"/>
                 </Viewbox>
-
+                    <c:WifiControl Grid.Row="0" Grid.Column="1" Fill="Black" SignalStrength="{Binding WattPilotService.WattPilot.WifiSignal, FallbackValue=-200}" Grid.RowSpan="2" Height="8" Margin="0,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                   IsConnected="{Binding WattPilotService.WattPilot.WifiSignal, Converter={co:NullToBool}, FallbackValue=False}" />
+                </Grid>
 
                 <!-- ReSharper disable Xaml.MissingGridIndex -->
                 <c:LcdDisplay x:Name="LcdVoltage" Visibility="Collapsed"

@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Controls;
+﻿using System.Windows.Shapes;
+
+namespace De.Hochstaetter.FroniusMonitor.Controls;
 
 public partial class PowerFlowArrow
 {
@@ -14,9 +16,9 @@ public partial class PowerFlowArrow
         set => SetValue(PowerProperty, value);
     }
 
-    public static readonly DependencyProperty FillProperty = DependencyProperty.Register
+    public static readonly DependencyProperty FillProperty = Shape.FillProperty.AddOwner
     (
-        nameof(Fill), typeof(Brush), typeof(PowerFlowArrow)
+        typeof(PowerFlowArrow)
     );
 
     public Brush Fill
@@ -49,9 +51,9 @@ public partial class PowerFlowArrow
         set => SetValue(DefaultsToOutgoingProperty, value);
     }
 
-    public static readonly DependencyProperty AngleProperty = DependencyProperty.Register
+    public static readonly DependencyProperty AngleProperty = RotateTransform.AngleProperty.AddOwner
     (
-        nameof(Angle), typeof(double), typeof(PowerFlowArrow)
+        typeof(PowerFlowArrow)
     );
 
     public double Angle
@@ -59,6 +61,20 @@ public partial class PowerFlowArrow
         get => (double)GetValue(AngleProperty);
         set => SetValue(AngleProperty, value);
     }
+
+    public static readonly DependencyProperty TextPlacementProperty = DependencyProperty.Register
+    (
+        nameof(TextPlacement), typeof(PlacementMode), typeof(PowerFlowArrow),
+        new PropertyMetadata(PlacementMode.Center /*,(d, _) => ((PowerFlowArrow)d).OnTextPlacementChanged()*/)
+    );
+
+    public PlacementMode TextPlacement
+    {
+        get => (PlacementMode)GetValue(TextPlacementProperty);
+        set => SetValue(TextPlacementProperty, value);
+    }
+
+    //private void OnTextPlacementChanged() { }
 
     public PowerFlowArrow()
     {

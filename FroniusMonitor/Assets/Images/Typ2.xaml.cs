@@ -31,15 +31,20 @@ public partial class Typ2
             if (e.NewValue is WattPilot newWattPilot)
             {
                 newWattPilot.PropertyChanged += WattPilot_PropertyChanged!;
-                var colorL1 = GetColor(newWattPilot.L1CableEnabled, newWattPilot.L1CarEnabled);
-                var colorL2 = GetColor(newWattPilot.L2CableEnabled, newWattPilot.L2CarEnabled);
-                var colorL3 = GetColor(newWattPilot.L3CableEnabled, newWattPilot.L3CarEnabled);
-                L1.Fill = colorL1;
-                L2.Fill = colorL2;
-                L3.Fill = colorL3;
-                UpdatePeAndN(colorL1, colorL2, colorL3);
+                UpdateAll(newWattPilot);
             }
         });
+    }
+
+    private void UpdateAll(WattPilot wattPilot)
+    {
+        var colorL1 = GetColor(wattPilot.L1CableEnabled, wattPilot.L1ChargerEnabled, wattPilot.NumberOfCarPhases >= 1);
+        var colorL2 = GetColor(wattPilot.L2CableEnabled, wattPilot.L2ChargerEnabled, wattPilot.NumberOfCarPhases >= 2);
+        var colorL3 = GetColor(wattPilot.L3CableEnabled, wattPilot.L3ChargerEnabled, wattPilot.NumberOfCarPhases >= 3);
+        L1.Fill = colorL1;
+        L2.Fill = colorL2;
+        L3.Fill = colorL3;
+        UpdatePeAndN(colorL1, colorL2, colorL3);
     }
 
     private void WattPilot_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -50,21 +55,25 @@ public partial class Typ2
 
             switch (e.PropertyName)
             {
-                case nameof(wattPilot.L1CarEnabled):
+                case nameof(wattPilot.NumberOfCarPhases):
+                    UpdateAll(wattPilot);
+                    break;
+
+                case nameof(wattPilot.L1ChargerEnabled):
                 case nameof(wattPilot.L1CableEnabled):
-                    var colorL1 = GetColor(wattPilot.L1CableEnabled, wattPilot.L1CarEnabled);
+                    var colorL1 = GetColor(wattPilot.L1CableEnabled, wattPilot.L1ChargerEnabled, wattPilot.NumberOfCarPhases >= 1);
                     L1.Fill = colorL1;
                     break;
 
-                case nameof(wattPilot.L2CarEnabled):
+                case nameof(wattPilot.L2ChargerEnabled):
                 case nameof(wattPilot.L2CableEnabled):
-                    var colorL2 = GetColor(wattPilot.L2CableEnabled, wattPilot.L2CarEnabled);
+                    var colorL2 = GetColor(wattPilot.L2CableEnabled, wattPilot.L2ChargerEnabled, wattPilot.NumberOfCarPhases >= 2);
                     L2.Fill = colorL2;
                     break;
 
-                case nameof(wattPilot.L3CarEnabled):
+                case nameof(wattPilot.L3ChargerEnabled):
                 case nameof(wattPilot.L3CableEnabled):
-                    var colorL3 = GetColor(wattPilot.L3CableEnabled, wattPilot.L3CarEnabled);
+                    var colorL3 = GetColor(wattPilot.L3CableEnabled, wattPilot.L3ChargerEnabled, wattPilot.NumberOfCarPhases >= 3);
                     L3.Fill = colorL3;
                     break;
             }
@@ -76,6 +85,12 @@ public partial class Typ2
     private void UpdatePeAndN(SolidColorBrush l1, SolidColorBrush l2, SolidColorBrush l3)
     {
         if (IsAny(Colors.LightGreen, l1, l2, l3))
+        {
+            N.Fill = Pe.Fill = Brushes.LightGreen;
+            return;
+        }
+
+        if (IsAny(Colors.LightSalmon, l1, l2, l3))
         {
             N.Fill = Pe.Fill = Brushes.LightGreen;
             return;
@@ -103,19 +118,19 @@ public partial class Typ2
         }
     }
 
-    private SolidColorBrush GetColor(bool? cableEnabled, bool? carEnabled)
+    private SolidColorBrush GetColor(bool? cableEnabled, bool? chargerEnabled, bool carEnabled)
     {
-        if (carEnabled is null || cableEnabled is null)
+        if (chargerEnabled is null || cableEnabled is null)
         {
             return Brushes.Transparent;
         }
 
-        if (carEnabled.Value && cableEnabled.Value)
+        if (chargerEnabled.Value && cableEnabled.Value)
         {
-            return Brushes.LightGreen;
+            return carEnabled ? Brushes.LightGreen : Brushes.LightSalmon;
         }
 
-        if (carEnabled.Value)
+        if (chargerEnabled.Value)
         {
             return Brushes.White;
         }

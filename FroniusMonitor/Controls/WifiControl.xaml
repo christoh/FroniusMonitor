@@ -1,0 +1,18 @@
+﻿<Viewbox x:Class="De.Hochstaetter.FroniusMonitor.Controls.WifiControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="452" d:DesignWidth="512">
+    <Canvas Height="452" Width="512" DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:WifiControl}}">
+        <Canvas.RenderTransform>
+            <TranslateTransform Y="-30"></TranslateTransform>
+        </Canvas.RenderTransform>
+        <Path Fill="{Binding Fill}" x:Name="Low" Data="M357.411,317.859c-27.086-27.088-63.102-42.006-101.41-42.006c-38.307,0-74.323,14.919-101.41,42.006 c-14.299,14.299-14.297,37.48,0,51.779s37.48,14.297,51.778,0c13.256-13.256,30.883-20.558,49.632-20.558 c18.748,0,36.375,7.301,49.632,20.558c7.149,7.151,16.519,10.725,25.889,10.724c9.369,0,18.741-3.576,25.889-10.724 C371.709,355.339,371.709,332.158,357.411,317.859z"/>
+    <Path Fill="{Binding Fill}" x:Name="Medium" Data="M424.57,223.835c-92.95-92.949-244.191-92.948-337.14,0c-14.297,14.299-14.297,37.481,0,51.78 c14.299,14.299,37.481,14.299,51.78,0c64.4-64.4,169.184-64.399,233.582,0c7.149,7.149,16.52,10.724,25.889,10.724 s18.74-3.575,25.889-10.724C438.869,261.316,438.869,238.134,424.57,223.835z"/>
+    <Path Fill="{Binding Fill}" x:Name="High" Data="M501.276,131.791C435.761,66.275,348.654,30.194,256,30.194S76.239,66.275,10.723,131.791 c-14.297,14.299-14.297,37.481,0,51.78c14.299,14.299,37.481,14.299,51.78,0c106.695-106.695,280.299-106.696,386.994,0 c7.149,7.149,16.52,10.724,25.889,10.724s18.74-3.575,25.889-10.724C515.575,169.272,515.575,146.09,501.276,131.791z"/>
+    <Ellipse Fill="{Binding Fill}" x:Name="Connection" Canvas.Left="210.233" Canvas.Top="390.273" Height="91.534" Width="91.534"/>
+    </Canvas>
+</Viewbox>

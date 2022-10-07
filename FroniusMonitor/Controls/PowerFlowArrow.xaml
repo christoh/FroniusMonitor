@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
+             xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid x:Name="RootElement" Height="85" Width="120" DataContext="{Binding RelativeSource={RelativeSource AncestorType=c:PowerFlowArrow}}">
@@ -11,7 +12,25 @@
             <RotateTransform Angle="{Binding Angle}" CenterX="60" CenterY="60"></RotateTransform>
         </Grid.RenderTransform>
 
-        <c:Arrow x:Name="Arrow" Angle="90" VerticalAlignment="Top" Height="120" Fill="{Binding Fill, FallbackValue=LightGray}" ArrowLength="90"/>
-        <TextBlock Text="--- W" x:Name="TextBlock" FontSize="14" FontWeight="Bold" Margin="0,35,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <Canvas>
+        <c:Arrow x:Name="Arrow" Angle="90" VerticalAlignment="Top" Height="120" Fill="{Binding Fill, FallbackValue=LightGray}" ArrowLength="90"
+                 Margin="{Binding TextPlacement, Converter={co:PlacementMode2Thickness Center='0', Left='20,0,0,0', Right='0', Relative='0'}}">
+            <c:Arrow.LayoutTransform>
+                <TransformGroup>
+                    <ScaleTransform ScaleX="{Binding TextPlacement, Converter={co:PlacementMode2Double Center=1, Left=.8, Right=.8, Relative=1}}"
+                                    ScaleY="1" CenterX="60" CenterY="42.5"/>
+                </TransformGroup>
+            </c:Arrow.LayoutTransform>
+        </c:Arrow>
+        <TextBlock Text="--- W" x:Name="TextBlock" FontSize="14" FontWeight="Bold" Canvas.Top="15" Canvas.Left="20" Width="85"
+                   TextAlignment="{Binding TextPlacement, Converter={co:PlacementMode2TextAlignment Center=Center, Left=Center, Right=Center, Relative=Center}}"
+                   Margin="{Binding TextPlacement, Converter={co:PlacementMode2Thickness Center='0,35,0,0', Left='-25,88,0,0', Right='80,88,0,0', Relative='0,35,0,0'}}"
+                   VerticalAlignment="{Binding TextPlacement, Converter={co:PlacementMode2VerticalAlignment Center=Center, Left=Center, Right=Center, Relative=Center}}"
+                   HorizontalAlignment="Center">
+            <TextBlock.RenderTransform>
+                <RotateTransform Angle="{Binding TextPlacement, Converter={co:PlacementMode2Double Center=0, Left=-90, Top=-90, Right=-90, Relative=0}}"/>
+            </TextBlock.RenderTransform>
+        </TextBlock>
+        </Canvas>
     </Grid>
 </ContentControl>
