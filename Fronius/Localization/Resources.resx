@@ -1020,4 +1020,7 @@
   <data name="MaximumChargingCurrentPhase1" xml:space="preserve">
 	  <value>Charging current limit with 1 phase only</value>
   </data>
+  <data name="HiddenWifi" xml:space="preserve">
+	  <value>(hidden Wifi)</value>
+  </data>
 </root>

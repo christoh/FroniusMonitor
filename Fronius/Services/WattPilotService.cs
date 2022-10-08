@@ -434,11 +434,29 @@ public class WattPilotService : BindableBase, IWattPilotService
             return;
         }
 
+        if (token is JObject subObject)
+        {
+            var subInstance = IoC.Get(propertyInfo.PropertyType);
+
+            if (subInstance != null)
+            {
+                propertyInfo.SetValue(instance, subInstance);
+                UpdateWattPilot(subInstance, subObject);
+                return;
+            }
+        }
+
         var stringValue = token?.Value<string>();
 
         if (stringValue == null)
         {
             propertyInfo.SetValue(instance, null);
+            return;
+        }
+
+        if (propertyInfo.PropertyType.IsAssignableFrom(typeof(IPAddress)))
+        {
+            propertyInfo.SetValue(instance,IPAddress.Parse(stringValue));
             return;
         }
 

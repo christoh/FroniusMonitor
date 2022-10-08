@@ -952,6 +952,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to (hidden Wifi).
+        /// </summary>
+        public static string HiddenWifi {
+            get {
+                return ResourceManager.GetString("HiddenWifi", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Id.
         /// </summary>
         public static string Id {

@@ -932,6 +932,14 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref pvSurplusEnabled, value);
     }
 
+    private WattPilotWifiInfo? currentWifi;
+    [WattPilot("ccw", typeof(WattPilotWifiInfo))]
+    public WattPilotWifiInfo? CurrentWifi
+    {
+        get => currentWifi;
+        set => Set(ref currentWifi, value);
+    }
+
     private bool? awattarEnabled;
 
     [WattPilot("ful", false)]

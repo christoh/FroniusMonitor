@@ -999,4 +999,7 @@
   <data name="MaximumChargingCurrentPhase1" xml:space="preserve">
 	  <value>Ladestrombegrenzung bei einphasigem Laden</value>
   </data>
+  <data name="HiddenWifi" xml:space="preserve">
+	  <value>(verstecktes WLAN)</value>
+  </data>
 </root>

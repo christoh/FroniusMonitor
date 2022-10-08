@@ -9,6 +9,7 @@ public enum WattPilotDisplayMode : byte
     EnergyCards,
     MoreFrequency,
     MoreOutOfBalance,
+    MoreWifi,
 }
 
 public partial class WattPilotControl
@@ -34,6 +35,7 @@ public partial class WattPilotControl
         WattPilotDisplayMode.MoreFrequency,
         WattPilotDisplayMode.MoreOutOfBalance,
         WattPilotDisplayMode.EnergyCards,
+        WattPilotDisplayMode.MoreWifi,
     };
 
     private int powerIndex, voltageIndex, moreIndex, currentIndex;
@@ -82,7 +84,15 @@ public partial class WattPilotControl
 
     private void OnModeChanged()
     {
-        LcdOutOfBalance.Visibility = LcdMoreFrequency.Visibility = LcdEnergyCards.Visibility = LcdCurrent.Visibility = LcdVoltage.Visibility = LcdPowerFactor.Visibility = LcdPower.Visibility = Visibility.Collapsed;
+        LcdMoreWifi.Visibility =
+            LcdOutOfBalance.Visibility =
+                LcdMoreFrequency.Visibility =
+                    LcdEnergyCards.Visibility =
+                        LcdCurrent.Visibility =
+                            LcdVoltage.Visibility =
+                                LcdPowerFactor.Visibility =
+                                    LcdPower.Visibility =
+                                        Visibility.Collapsed;
 
         FrameworkElement lcd = Mode switch
         {
@@ -93,6 +103,7 @@ public partial class WattPilotControl
             WattPilotDisplayMode.EnergyCards => LcdEnergyCards,
             WattPilotDisplayMode.MoreFrequency => LcdMoreFrequency,
             WattPilotDisplayMode.MoreOutOfBalance => LcdOutOfBalance,
+            WattPilotDisplayMode.MoreWifi => LcdMoreWifi,
             _ => throw new NotSupportedException("Unsupported DisplayMode")
         };
 

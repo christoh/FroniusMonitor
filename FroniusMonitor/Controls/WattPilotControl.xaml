@@ -1,56 +1,58 @@
 ﻿<UserControl x:Class="De.Hochstaetter.FroniusMonitor.Controls.WattPilotControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
              xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
              xmlns:gl="clr-namespace:System.Globalization;assembly=System.Runtime"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              d:DesignHeight="127" d:DesignWidth="110">
     <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:WattPilotControl}}">
         <Border BorderBrush="DimGray" BorderThickness="1" Width="110">
-            <Grid x:Name="BackgroundProvider" Background="{Binding WattPilotService.WattPilot, Converter={co:NullToBrush}, FallbackValue=LightGray}" >
+            <Grid x:Name="BackgroundProvider" Background="{Binding WattPilotService.WattPilot, Converter={co:NullToBrush}, FallbackValue=LightGray}">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <Grid.Resources>
                     <Style TargetType="Viewbox">
-                        <Setter Property="StretchDirection" Value="DownOnly"/>
-                        <Setter Property="Margin" Value="4,0"/>
+                        <Setter Property="StretchDirection" Value="DownOnly" />
+                        <Setter Property="Margin" Value="4,0" />
                     </Style>
                     <Style TargetType="FrameworkElement" x:Key="LcdStyle">
-                        <Setter Property="Grid.Row" Value="2"/>
-                        <Setter Property="Width" Value="100"/>
-                        <Setter Property="Height" Value="85"/>
-                        <Setter Property="Margin" Value="4"/>
+                        <Setter Property="Grid.Row" Value="2" />
+                        <Setter Property="Width" Value="100" />
+                        <Setter Property="Height" Value="85" />
+                        <Setter Property="Margin" Value="4" />
+                        <Setter Property="Control.Background" Value="#B3DBC6"/>
+                        <Setter Property="Panel.Background" Value="#B3DBC6"/>
                     </Style>
                     <Style TargetType="c:LcdDisplay" BasedOn="{StaticResource LcdStyle}">
-                        <Setter Property="FontSize" Value="14"/>
-                        <Setter Property="FontFamily" Value="pack://application:,,,/Assets/Fonts/#Digital-7 Mono"/>
+                        <Setter Property="FontSize" Value="14" />
+                        <Setter Property="FontFamily" Value="pack://application:,,,/Assets/Fonts/#Digital-7 Mono" />
                     </Style>
                 </Grid.Resources>
                 <Grid Grid.Row="0">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <Viewbox Grid.Row="0" Grid.Column="0">
-                    <TextBlock FontSize="8" TextAlignment="Center" Text="{Binding WattPilotService.WattPilot.DeviceName, FallbackValue=---, TargetNullValue=???}"/>
-                </Viewbox>
-                <Viewbox Grid.Row="1" Grid.Column="0">
-                    <TextBlock FontSize="8" TextAlignment="Center" Text="{Binding WattPilotService.WattPilot.StatusDisplayName, FallbackValue=---, TargetNullValue=???}"/>
-                </Viewbox>
-                    <c:WifiControl Grid.Row="0" Grid.Column="1" Fill="Black" SignalStrength="{Binding WattPilotService.WattPilot.WifiSignal, FallbackValue=-200}" Grid.RowSpan="2" Height="8" Margin="0,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"
+                    <Viewbox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+                        <TextBlock FontSize="8" TextAlignment="Center" Text="{Binding WattPilotService.WattPilot.DeviceName, FallbackValue=---, TargetNullValue=???}" />
+                    </Viewbox>
+                    <Viewbox Grid.Row="1" Grid.Column="1">
+                        <TextBlock FontSize="8" TextAlignment="Center" Text="{Binding WattPilotService.WattPilot.StatusDisplayName, FallbackValue=---, TargetNullValue=???}" />
+                    </Viewbox>
+                    <c:WifiControl Grid.Row="1" Grid.Column="0" Fill="Black" SignalStrength="{Binding WattPilotService.WattPilot.WifiSignal, FallbackValue=-200}" Grid.RowSpan="1" Height="5" Margin="4,1,-2,0" VerticalAlignment="Center" HorizontalAlignment="Center"
                                    IsConnected="{Binding WattPilotService.WattPilot.WifiSignal, Converter={co:NullToBool}, FallbackValue=False}" />
                 </Grid>
 
@@ -61,8 +63,7 @@
                               Value1="{Binding WattPilotService.WattPilot.VoltageL1, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0 V'}"
                               Value2="{Binding WattPilotService.WattPilot.VoltageL2, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0 V'}"
                               Value3="{Binding WattPilotService.WattPilot.VoltageL3, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0 V'}"
-                              ValueSum="{Binding WattPilotService.WattPilot.VoltageAverage, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0.0 V'}"
-                />
+                              ValueSum="{Binding WattPilotService.WattPilot.VoltageAverage, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0.0 V'}" />
 
                 <c:LcdDisplay x:Name="LcdCurrent" Visibility="Collapsed"
                               Header="{x:Static p:Resources.Current}"
@@ -70,8 +71,7 @@
                               Value1="{Binding WattPilotService.WattPilot.CurrentL1, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='#,0.0 A'}"
                               Value2="{Binding WattPilotService.WattPilot.CurrentL2, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='#,0.0 A'}"
                               Value3="{Binding WattPilotService.WattPilot.CurrentL3, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='#,0.0 A'}"
-                              ValueSum="{Binding WattPilotService.WattPilot.CurrentSum, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='#,0.0 A'}"
-                />
+                              ValueSum="{Binding WattPilotService.WattPilot.CurrentSum, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='#,0.0 A'}" />
 
                 <c:LcdDisplay x:Name="LcdPower"
                               Header="{x:Static p:Resources.RealPower}"
@@ -79,8 +79,7 @@
                               Value1="{Binding WattPilotService.WattPilot.PowerL1KiloWatts, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0.0 kW'}"
                               Value2="{Binding WattPilotService.WattPilot.PowerL2KiloWatts, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0.0 kW'}"
                               Value3="{Binding WattPilotService.WattPilot.PowerL3KiloWatts, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0.0 kW'}"
-                              ValueSum="{Binding WattPilotService.WattPilot.PowerSumKiloWatts, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0.0 kW'}"
-                />
+                              ValueSum="{Binding WattPilotService.WattPilot.PowerSumKiloWatts, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0.0 kW'}" />
 
                 <c:LcdDisplay x:Name="LcdPowerFactor" Visibility="Collapsed"
                               Header="{x:Static p:Resources.PowerFactor}"
@@ -88,8 +87,7 @@
                               Value1="{Binding WattPilotService.WattPilot.PowerFactorL1, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='N2'}"
                               Value2="{Binding WattPilotService.WattPilot.PowerFactorL2, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='N2'}"
                               Value3="{Binding WattPilotService.WattPilot.PowerFactorL3, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='N2'}"
-                              ValueSum="{Binding WattPilotService.WattPilot.PowerFactorN, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='N2'}"
-                />
+                              ValueSum="{Binding WattPilotService.WattPilot.PowerFactorN, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='N2'}" />
 
                 <c:LcdDisplay x:Name="LcdOutOfBalance" Visibility="Collapsed"
                               Header="{x:Static p:Resources.NeutralWire}"
@@ -97,8 +95,7 @@
                               Value1="{Binding WattPilotService.WattPilot.PowerN, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='#,0 W'}"
                               Value2="{Binding WattPilotService.WattPilot.VoltageN, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0 V'}"
                               Value3="{Binding WattPilotService.WattPilot.PowerFactorN, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='N2'}"
-                              ValueSum=""
-                />
+                              ValueSum="" />
 
                 <c:LcdDisplay x:Name="LcdMoreFrequency" Visibility="Collapsed"
                               Header="{Binding WattPilotService.WattPilot.SerialNumber, FallbackValue='---'}"
@@ -106,35 +103,105 @@
                               Value1="{Binding WattPilotService.WattPilot.Frequency, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0.000 Hz'}"
                               Value2="{Binding WattPilotService.WattPilot.TimeStampUtc, FallbackValue='---', Converter={co:DateConverter StringFormat=d}}"
                               Value3="{Binding WattPilotService.WattPilot.TimeStampUtc, FallbackValue='---', Converter={co:DateConverter StringFormat=T}}"
-                              ValueSum=""
-                />
-                <ItemsControl x:Name="LcdEnergyCards" Visibility="Collapsed" Style="{StaticResource LcdStyle}" Background="#B3DBC6"
-                              ItemsSource="{Binding WattPilotService.WattPilot.Cards, FallbackValue={x:Null}}"
+                              ValueSum="" />
+
+                <Border x:Name="LcdMoreWifi" Visibility="Collapsed" Style="{StaticResource LcdStyle}">
+                    <Grid Margin="2,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.Resources>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="FontSize" Value="7"/>
+                            </Style>
+                            <Style TargetType="Viewbox">
+                                <Setter Property="StretchDirection" Value="DownOnly"/>
+                                <Setter Property="HorizontalAlignment" Value="Right"/>
+                            </Style>
+                        </Grid.Resources>
+
+                        <Viewbox Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="0,0,0,2">
+                            <TextBlock FontSize="9" Text="{Binding WattPilotService.WattPilot.CurrentWifi.Ssid, FallbackValue='---'}" HorizontalAlignment="Center"/>
+                        </Viewbox>
+
+                        <TextBlock Grid.Column="0" Grid.Row="2" Text="Type"/>
+                        <Viewbox Grid.Column="1" Grid.Row="2" >
+                            <TextBlock HorizontalAlignment="Right">
+                                <Run Text="{Binding WattPilotService.WattPilot.CurrentWifi.Type, Mode=OneWay, FallbackValue='---'}"></Run>
+                            </TextBlock>
+                        </Viewbox>
+
+                        <TextBlock Grid.Column="0" Grid.Row="3" Text="Channel"/>
+                        <Viewbox Grid.Column="1" Grid.Row="3">
+                            <TextBlock Text="{Binding WattPilotService.WattPilot.CurrentWifi.Channel, FallbackValue='---'}" HorizontalAlignment="Right"/>
+                        </Viewbox>
+
+                        <TextBlock Grid.Column="0" Grid.Row="4" Text="Signal"/>
+                        <Viewbox Grid.Column="1" Grid.Row="4">
+                            <TextBlock HorizontalAlignment="Right">
+                                <Run Text="{Binding WattPilotService.WattPilot.WifiSignal, FallbackValue='---'}"/>
+                                <Run Text="dBm"></Run>
+                            </TextBlock>
+                        </Viewbox>
+
+                        <TextBlock Grid.Column="0" Grid.Row="5" Text="Auth"/>
+                        <Viewbox Grid.Column="1" Grid.Row="5">
+                            <TextBlock Text="{Binding WattPilotService.WattPilot.CurrentWifi.Encryption, FallbackValue='---'}" HorizontalAlignment="Right"/>
+                        </Viewbox>
+
+                        <TextBlock Grid.Column="0" Grid.Row="6" Text="P-Cipher"/>
+                        <Viewbox Grid.Column="1" Grid.Row="6">
+                            <TextBlock Text="{Binding WattPilotService.WattPilot.CurrentWifi.PairwiseCipher, FallbackValue='---'}" HorizontalAlignment="Right"/>
+                        </Viewbox>
+
+                        <TextBlock Grid.Column="0" Grid.Row="7" Text="G-Cipher"/>
+                        <Viewbox Grid.Column="1" Grid.Row="7">
+                            <TextBlock Text="{Binding WattPilotService.WattPilot.CurrentWifi.GroupCipher, FallbackValue='---'}" HorizontalAlignment="Right"/>
+                        </Viewbox>
+
+                    </Grid>
+                </Border>
+
+                <ItemsControl x:Name="LcdEnergyCards" Visibility="Collapsed" Style="{StaticResource LcdStyle}"
+                              ItemsSource="{Binding WattPilotService.WattPilot.Cards, FallbackValue='---'}"
                               Grid.IsSharedSizeScope="True">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <StackPanel IsItemsHost="True" VerticalAlignment="Center"></StackPanel>
+                            <StackPanel IsItemsHost="True" VerticalAlignment="Center" />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Viewbox StretchDirection="DownOnly">
-                            <Grid>
-                                <Grid.Resources>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="FontSize" Value="6.3"/>
-                                        <Setter Property="Margin" Value="2,0"/>
-                                    </Style>
-                                </Grid.Resources>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" SharedSizeGroup="G1"/>
-                                    <ColumnDefinition Width="*" SharedSizeGroup="G2"/>
-                                    <ColumnDefinition Width="Auto" SharedSizeGroup="G3"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Margin="0,0,2,0" Text="{Binding HaveCardId, Converter={co:Bool2String False='', True='•'}}"/>
-                                <TextBlock Grid.Column="1" Margin="0,0,2,0" Text="{Binding Name}"/>
-                                <TextBlock Grid.Column="2" Margin="8,0,0,0" Text="{Binding Energy, Converter={co:SensorData Factor=.001, StringFormat=N2, Unit=kWh}}" TextAlignment="Right"/>
-                            </Grid>
+                                <Grid>
+                                    <Grid.Resources>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="FontSize" Value="6.3" />
+                                            <Setter Property="Margin" Value="2,0" />
+                                        </Style>
+                                    </Grid.Resources>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" SharedSizeGroup="G1" />
+                                        <ColumnDefinition Width="*" SharedSizeGroup="G2" />
+                                        <ColumnDefinition Width="Auto" SharedSizeGroup="G3" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Margin="0,0,2,0" Text="{Binding HaveCardId, Converter={co:Bool2String False='', True='•'}}" />
+                                    <TextBlock Grid.Column="1" Margin="0,0,2,0" Text="{Binding Name}" />
+                                    <TextBlock Grid.Column="2" Margin="8,0,0,0" Text="{Binding Energy, Converter={co:SensorData Factor=.001, StringFormat=N2, Unit=kWh}}" TextAlignment="Right" />
+                                </Grid>
                             </Viewbox>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -143,12 +210,12 @@
 
                 <WrapPanel MaxWidth="110" Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
                     <WrapPanel.Resources>
-                        <Style TargetType="RadioButton" BasedOn="{StaticResource DeviceButton}"/>
+                        <Style TargetType="RadioButton" BasedOn="{StaticResource DeviceButton}" />
                     </WrapPanel.Resources>
-                    <RadioButton IsChecked="True" Content="{x:Static p:Resources.Power}" Click="OnPowerClicked"/>
-                    <RadioButton Content="{x:Static p:Resources.Voltage}" Click="OnVoltageClicked"/>
-                    <RadioButton Content="{x:Static p:Resources.Current}" Click="OnCurrentClicked"/>
-                    <RadioButton Content="{x:Static p:Resources.More}" Click="OnMoreClicked"/>
+                    <RadioButton IsChecked="True" Content="{x:Static p:Resources.Power}" Click="OnPowerClicked" />
+                    <RadioButton Content="{x:Static p:Resources.Voltage}" Click="OnVoltageClicked" />
+                    <RadioButton Content="{x:Static p:Resources.Current}" Click="OnCurrentClicked" />
+                    <RadioButton Content="{x:Static p:Resources.More}" Click="OnMoreClicked" />
                 </WrapPanel>
             </Grid>
         </Border>
