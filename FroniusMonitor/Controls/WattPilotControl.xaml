@@ -133,23 +133,23 @@
                             </Style>
                         </Grid.Resources>
 
-                        <Viewbox Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="0,0,0,2">
-                            <TextBlock FontSize="9" Text="{Binding WattPilotService.WattPilot.CurrentWifi.Ssid, FallbackValue='---'}" HorizontalAlignment="Center"/>
+                        <Viewbox Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="0,0,0,1">
+                            <TextBlock FontSize="8" Text="{Binding WattPilotService.WattPilot.CurrentWifi.Ssid, FallbackValue='---'}" HorizontalAlignment="Center"/>
                         </Viewbox>
 
-                        <TextBlock Grid.Column="0" Grid.Row="2" Text="Type"/>
+                        <TextBlock Grid.Column="0" Grid.Row="2" Text="{x:Static p:Resources.Mode}"/>
                         <Viewbox Grid.Column="1" Grid.Row="2" >
                             <TextBlock HorizontalAlignment="Right">
                                 <Run Text="{Binding WattPilotService.WattPilot.CurrentWifi.Type, Mode=OneWay, FallbackValue='---'}"></Run>
                             </TextBlock>
                         </Viewbox>
 
-                        <TextBlock Grid.Column="0" Grid.Row="3" Text="Channel"/>
+                        <TextBlock Grid.Column="0" Grid.Row="3" Text="{x:Static p:Resources.Channel}"/>
                         <Viewbox Grid.Column="1" Grid.Row="3">
                             <TextBlock Text="{Binding WattPilotService.WattPilot.CurrentWifi.Channel, FallbackValue='---'}" HorizontalAlignment="Right"/>
                         </Viewbox>
 
-                        <TextBlock Grid.Column="0" Grid.Row="4" Text="Signal"/>
+                        <TextBlock Grid.Column="0" Grid.Row="4" Text="{x:Static p:Resources.Signal}"/>
                         <Viewbox Grid.Column="1" Grid.Row="4">
                             <TextBlock HorizontalAlignment="Right">
                                 <Run Text="{Binding WattPilotService.WattPilot.WifiSignal, FallbackValue='---'}"/>
@@ -159,17 +159,17 @@
 
                         <TextBlock Grid.Column="0" Grid.Row="5" Text="Auth"/>
                         <Viewbox Grid.Column="1" Grid.Row="5">
-                            <TextBlock Text="{Binding WattPilotService.WattPilot.CurrentWifi.Encryption, FallbackValue='---'}" HorizontalAlignment="Right"/>
+                            <TextBlock Text="{Binding WattPilotService.WattPilot.CurrentWifi.Encryption, FallbackValue='---', Converter={co:ToUpper}}" HorizontalAlignment="Right"/>
                         </Viewbox>
 
-                        <TextBlock Grid.Column="0" Grid.Row="6" Text="P-Cipher"/>
+                        <TextBlock Grid.Column="0" Grid.Row="6" Text="{x:Static p:Resources.CipherP}"/>
                         <Viewbox Grid.Column="1" Grid.Row="6">
-                            <TextBlock Text="{Binding WattPilotService.WattPilot.CurrentWifi.PairwiseCipher, FallbackValue='---'}" HorizontalAlignment="Right"/>
+                            <TextBlock Text="{Binding WattPilotService.WattPilot.CurrentWifi.PairwiseCipher, FallbackValue='---', Converter={co:ToUpper}}" HorizontalAlignment="Right"/>
                         </Viewbox>
 
-                        <TextBlock Grid.Column="0" Grid.Row="7" Text="G-Cipher"/>
+                        <TextBlock Grid.Column="0" Grid.Row="7" Text="{x:Static p:Resources.CipherG}"/>
                         <Viewbox Grid.Column="1" Grid.Row="7">
-                            <TextBlock Text="{Binding WattPilotService.WattPilot.CurrentWifi.GroupCipher, FallbackValue='---'}" HorizontalAlignment="Right"/>
+                            <TextBlock Text="{Binding WattPilotService.WattPilot.CurrentWifi.GroupCipher, FallbackValue='---', Converter={co:ToUpper}}" HorizontalAlignment="Right"/>
                         </Viewbox>
 
                     </Grid>

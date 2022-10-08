@@ -434,14 +434,44 @@ public class WattPilotService : BindableBase, IWattPilotService
             return;
         }
 
-        if (token is JObject subObject)
         {
-            var subInstance = IoC.Get(propertyInfo.PropertyType);
-
-            if (subInstance != null)
+            if (token is JObject subObject)
             {
-                propertyInfo.SetValue(instance, subInstance);
-                UpdateWattPilot(subInstance, subObject);
+                var subInstance = IoC.Get(propertyInfo.PropertyType);
+
+                if (subInstance != null)
+                {
+                    propertyInfo.SetValue(instance, subInstance);
+                    UpdateWattPilot(subInstance, subObject);
+                    return;
+                }
+            }
+        }
+
+        {
+            if (token is JArray array)
+            {
+                var list = Activator.CreateInstance(propertyInfo.PropertyType) as IList;
+
+                if (list == null)
+                {
+                    return;
+                }
+
+                var subType = propertyInfo.PropertyType.GetGenericArguments()[0];
+
+                foreach (var arrayItem in array)
+                {
+                    if (arrayItem is not JObject subObject || IoC.Get(subType) is not { } subInstance)
+                    {
+                        continue;
+                    }
+
+                    UpdateWattPilot(subInstance, subObject);
+                    list.Add(subInstance);
+                }
+
+                propertyInfo.SetValue(instance, list);
                 return;
             }
         }
@@ -456,7 +486,7 @@ public class WattPilotService : BindableBase, IWattPilotService
 
         if (propertyInfo.PropertyType.IsAssignableFrom(typeof(IPAddress)))
         {
-            propertyInfo.SetValue(instance,IPAddress.Parse(stringValue));
+            propertyInfo.SetValue(instance, IPAddress.Parse(stringValue));
             return;
         }
 

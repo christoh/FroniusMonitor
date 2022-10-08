@@ -122,6 +122,14 @@ namespace De.Hochstaetter.Fronius.Models.Charging
             set => Set(ref macAddressString, value);
         }
 
+        private int? wifiSignal;
+        [WattPilot("rssi")]
+        public int? WifiSignal
+        {
+            get => wifiSignal;
+            set => Set(ref wifiSignal, value);
+        }
+
         private IPAddress? netMask;
         [WattPilot("netmask")]
         public IPAddress? NetMask

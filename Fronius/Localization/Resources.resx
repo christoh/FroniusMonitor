@@ -1023,4 +1023,22 @@
   <data name="HiddenWifi" xml:space="preserve">
 	  <value>(hidden Wifi)</value>
   </data>
+  <data name="Type" xml:space="preserve">
+	  <value>Type</value>
+  </data>
+  <data name="Mode" xml:space="preserve">
+	  <value>Mode</value>
+  </data>
+  <data name="Channel" xml:space="preserve">
+	  <value>Channel</value>
+  </data>
+  <data name="Signal" xml:space="preserve">
+	  <value>Signal</value>
+  </data>
+  <data name="CipherP" xml:space="preserve">
+	  <value>P Cipher</value>
+  </data>
+  <data name="CipherG" xml:space="preserve">
+	  <value>G Cipher</value>
+  </data>
 </root>

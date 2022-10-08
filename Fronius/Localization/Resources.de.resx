@@ -1002,4 +1002,19 @@
   <data name="HiddenWifi" xml:space="preserve">
 	  <value>(verstecktes WLAN)</value>
   </data>
+  <data name="Type" xml:space="preserve">
+	  <value>Typ</value>
+  </data>
+  <data name="Mode" xml:space="preserve">
+	  <value>Modus</value>
+  </data>
+  <data name="Channel" xml:space="preserve">
+	  <value>Kanal</value>
+  </data>
+  <data name="CipherP" xml:space="preserve">
+	  <value>P-Chiffre</value>
+  </data>
+  <data name="CipherG" xml:space="preserve">
+	  <value>G-Chiffre</value>
+  </data>
 </root>

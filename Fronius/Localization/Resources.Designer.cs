@@ -421,6 +421,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Channel.
+        /// </summary>
+        public static string Channel {
+            get {
+                return ResourceManager.GetString("Channel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Allow charge battery from other producers in your home.
         /// </summary>
         public static string ChargeFromAc {
@@ -516,6 +525,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string ChargingRuleType_MinimumDischarge {
             get {
                 return ResourceManager.GetString("ChargingRuleType_MinimumDischarge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to G Cipher.
+        /// </summary>
+        public static string CipherG {
+            get {
+                return ResourceManager.GetString("CipherG", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to P Cipher.
+        /// </summary>
+        public static string CipherP {
+            get {
+                return ResourceManager.GetString("CipherP", resourceCulture);
             }
         }
         
@@ -1393,6 +1420,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Mode.
+        /// </summary>
+        public static string Mode {
+            get {
+                return ResourceManager.GetString("Mode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Charging (next trip).
         /// </summary>
         public static string ModelStatus_ChargingBecauseAutomaticStop {
@@ -2239,6 +2275,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Signal.
+        /// </summary>
+        public static string Signal {
+            get {
+                return ResourceManager.GetString("Signal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Simulate unplugging.
         /// </summary>
         public static string SimulateUnplugging {
@@ -2613,6 +2658,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Tuesday_One {
             get {
                 return ResourceManager.GetString("Tuesday_One", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type.
+        /// </summary>
+        public static string Type {
+            get {
+                return ResourceManager.GetString("Type", resourceCulture);
             }
         }
         

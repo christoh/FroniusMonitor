@@ -156,6 +156,11 @@ public abstract class PowerCorrector : ConverterBase
     }
 }
 
+public class ToUpper:ConverterBase
+{
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value?.ToString()?.ToUpper(CultureInfo.CurrentCulture);
+}
+
 public class GridMeterConsumptionCorrector : PowerCorrector
 {
     protected override double OffsetWatts => App.Settings.ConsumedEnergyOffsetWattHours;

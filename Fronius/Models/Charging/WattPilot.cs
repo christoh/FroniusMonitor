@@ -111,7 +111,21 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     public int? WifiSignal
     {
         get => wifiSignal;
-        set => Set(ref wifiSignal, value);
+        set => Set(ref wifiSignal, value, () =>
+        {
+            if (CurrentWifi != null)
+            {
+                CurrentWifi.WifiSignal = value;
+            }
+        });
+    }
+
+    private List<WattPilotWifiInfo>? scannedWifis;
+    [WattPilot("scan")]
+    public List<WattPilotWifiInfo>? ScannedWifis
+    {
+        get => scannedWifis;
+        set => Set(ref scannedWifis, value);
     }
 
     private int? protocol;
