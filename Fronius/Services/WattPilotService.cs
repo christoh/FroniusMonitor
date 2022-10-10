@@ -137,7 +137,7 @@ public class WattPilotService : BindableBase, IWattPilotService
         var sentSomething = false;
         var errors = new List<string>();
 
-        foreach (var propertyInfo in typeof(WattPilot).GetProperties().Where(p => p.GetCustomAttribute<WattPilotAttribute>() != null))
+        foreach (var propertyInfo in typeof(WattPilot).GetProperties().Where(p => p.GetCustomAttributes<WattPilotAttribute>().Count() == 1))
         {
             var oldValue = oldWattPilot == null ? null : propertyInfo.GetValue(oldWattPilot);
             var newValue = propertyInfo.GetValue(localWattPilot);
@@ -368,7 +368,7 @@ public class WattPilotService : BindableBase, IWattPilotService
         foreach (var token in jObject)
         {
             Debug.Print($"{token.Key}: {token.Value}");
-            IReadOnlyList<PropertyInfo> propertyInfos = instance.GetType().GetProperties().Where(p => p.GetCustomAttribute<WattPilotAttribute>() is { } attribute && attribute.TokenName == token.Key).ToArray();
+            IReadOnlyList<PropertyInfo> propertyInfos = instance.GetType().GetProperties().Where(p => p.GetCustomAttributes<WattPilotAttribute>().Any(a => a.TokenName == token.Key)).ToArray();
 
             if (!propertyInfos.Any())
             {
@@ -385,7 +385,7 @@ public class WattPilotService : BindableBase, IWattPilotService
             {
                 foreach (var propertyInfo in propertyInfos)
                 {
-                    var attribute = propertyInfo.GetCustomAttribute<WattPilotAttribute>();
+                    var attribute = propertyInfo.GetCustomAttributes<WattPilotAttribute>().Single(a => a.TokenName == token.Key);
 
                     if (attribute?.Index >= 0 && attribute.Index < array.Count)
                     {

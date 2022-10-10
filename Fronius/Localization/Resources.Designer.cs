@@ -2203,6 +2203,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Wifi networks in range.
+        /// </summary>
+        public static string ScannedWifis {
+            get {
+                return ResourceManager.GetString("ScannedWifis", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sensor.
         /// </summary>
         public static string SensorCard {

@@ -1041,4 +1041,7 @@
   <data name="CipherG" xml:space="preserve">
 	  <value>G Cipher</value>
   </data>
+  <data name="ScannedWifis" xml:space="preserve">
+	  <value>Wifi networks in range</value>
+  </data>
 </root>

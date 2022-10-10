@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using De.Hochstaetter.Fronius.Models.Wifi;
-// ReSharper disable StringLiteralTypo
+﻿// ReSharper disable StringLiteralTypo
 
 namespace De.Hochstaetter.Fronius.Models.Charging
 {
     public class WattPilotWifiInfo : BindableBase, IHaveDisplayName
     {
         private string? ssid;
+
         [WattPilot("ssid")]
         public string? Ssid
         {
@@ -19,7 +14,9 @@ namespace De.Hochstaetter.Fronius.Models.Charging
         }
 
         private bool? isB;
+
         [WattPilot("b")]
+        [WattPilot("f", 2)]
         public bool? IsB
         {
             get => isB;
@@ -27,6 +24,8 @@ namespace De.Hochstaetter.Fronius.Models.Charging
         }
 
         private bool? isG;
+
+        [WattPilot("f", 3)]
         [WattPilot("g")]
         public bool? IsG
         {
@@ -35,6 +34,8 @@ namespace De.Hochstaetter.Fronius.Models.Charging
         }
 
         private bool? isN;
+
+        [WattPilot("f", 4)]
         [WattPilot("n")]
         public bool? IsN
         {
@@ -43,6 +44,7 @@ namespace De.Hochstaetter.Fronius.Models.Charging
         }
 
         private IPAddress? ipV4Address;
+
         [WattPilot("ip")]
         public IPAddress? IpV4Address
         {
@@ -50,7 +52,17 @@ namespace De.Hochstaetter.Fronius.Models.Charging
             set => Set(ref ipV4Address, value);
         }
 
+        private string? countryCode;
+
+        [WattPilot("f", 9)]
+        public string? CountryCode
+        {
+            get => countryCode;
+            set => Set(ref countryCode, value);
+        }
+
         private int? channel;
+
         [WattPilot("channel")]
         public int? Channel
         {
@@ -59,6 +71,7 @@ namespace De.Hochstaetter.Fronius.Models.Charging
         }
 
         private WifiEncryption? encryption;
+
         [WattPilot("encryptionType")]
         public WifiEncryption? Encryption
         {
@@ -67,7 +80,9 @@ namespace De.Hochstaetter.Fronius.Models.Charging
         }
 
         private WifiCipher? pairwiseCipher;
+
         [WattPilot("pairwiseCipher")]
+        [WattPilot("f", 0)]
         public WifiCipher? PairwiseCipher
         {
             get => pairwiseCipher;
@@ -75,7 +90,9 @@ namespace De.Hochstaetter.Fronius.Models.Charging
         }
 
         private WifiCipher? groupCipher;
+
         [WattPilot("groupCipher")]
+        [WattPilot("f", 1)]
         public WifiCipher? GroupCipher
         {
             get => groupCipher;
@@ -83,7 +100,9 @@ namespace De.Hochstaetter.Fronius.Models.Charging
         }
 
         private bool? supportsLowRate;
+
         [WattPilot("lr")]
+        [WattPilot("f", 5)]
         public bool? SupportsLowRate
         {
             get => supportsLowRate;
@@ -91,7 +110,9 @@ namespace De.Hochstaetter.Fronius.Models.Charging
         }
 
         private bool? allowWps;
+
         [WattPilot("wps")]
+        [WattPilot("f", 6)]
         public bool? AllowWps
         {
             get => allowWps;
@@ -99,7 +120,9 @@ namespace De.Hochstaetter.Fronius.Models.Charging
         }
 
         private bool? isFtmResponder;
+
         [WattPilot("ftmResponder")]
+        [WattPilot("f", 7)]
         public bool? IsFtmResponder
         {
             get => isFtmResponder;
@@ -107,7 +130,9 @@ namespace De.Hochstaetter.Fronius.Models.Charging
         }
 
         private bool? isFtmInitiator;
+
         [WattPilot("ftmInitiator")]
+        [WattPilot("f", 8)]
         public bool? IsFtmInitiator
         {
             get => isFtmInitiator;
@@ -115,6 +140,7 @@ namespace De.Hochstaetter.Fronius.Models.Charging
         }
 
         private string? macAddressString;
+
         [WattPilot("bssid")]
         public string? MacAddressString
         {
@@ -123,6 +149,7 @@ namespace De.Hochstaetter.Fronius.Models.Charging
         }
 
         private int? wifiSignal;
+
         [WattPilot("rssi")]
         public int? WifiSignal
         {
@@ -131,6 +158,7 @@ namespace De.Hochstaetter.Fronius.Models.Charging
         }
 
         private IPAddress? netMask;
+
         [WattPilot("netmask")]
         public IPAddress? NetMask
         {
