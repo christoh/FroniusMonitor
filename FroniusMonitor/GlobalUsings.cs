@@ -38,6 +38,7 @@ global using De.Hochstaetter.FroniusMonitor.Contracts;
 global using De.Hochstaetter.FroniusMonitor.Controls;
 global using De.Hochstaetter.FroniusMonitor.Extensions;
 global using De.Hochstaetter.FroniusMonitor.Models;
+global using De.Hochstaetter.FroniusMonitor.Models.CarCharging;
 global using De.Hochstaetter.FroniusMonitor.Unity;
 global using De.Hochstaetter.FroniusMonitor.ViewModels;
 global using De.Hochstaetter.FroniusMonitor.Views;

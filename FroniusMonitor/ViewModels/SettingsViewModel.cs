@@ -59,6 +59,10 @@ public class SettingsViewModel : SettingsViewModelBase
 
     public IEnumerable<string> Gen24UserNames => gen24UserNames;
 
+    private static readonly IReadOnlyList<byte> froniusUpdateRates = new byte[] { 1, 2, 3, 4, 5, 10, 20, 30, 60 };
+
+    public IReadOnlyList<byte> FroniusUpdateRates => froniusUpdateRates;
+
     private static string GetCultureName(string id)
     {
         var culture = new CultureInfo(id);
@@ -99,6 +103,7 @@ public class SettingsViewModel : SettingsViewModelBase
         IoC.Get<MainViewModel>().NotifyOfPropertyChange(nameof(Settings));
         WebClientService.FritzBoxConnection = Settings.HaveFritzBox && Settings.ShowFritzBox ? Settings.FritzBoxConnection : null;
         WebClientService.InverterConnection = Settings.FroniusConnection;
+        solarSystemService.FroniusUpdateRate = Settings.FroniusUpdateRate;
 
         if (!Settings.HaveWattPilot || !Settings.ShowWattPilot)
         {
@@ -107,7 +112,7 @@ public class SettingsViewModel : SettingsViewModelBase
         }
         else
         {
-            solarSystemService.WattPilotConnection=Settings.WattPilotConnection;
+            solarSystemService.WattPilotConnection = Settings.WattPilotConnection;
         }
 
         await Settings.Save().ConfigureAwait(false);

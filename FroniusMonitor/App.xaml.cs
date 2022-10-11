@@ -1,4 +1,4 @@
-﻿using De.Hochstaetter.FroniusMonitor.Models.CarCharging;
+﻿using Loc = De.Hochstaetter.Fronius.Localization.Resources;
 
 namespace De.Hochstaetter.FroniusMonitor;
 
@@ -55,6 +55,8 @@ public partial class App
             Settings.Save().Wait();
         }
 
+        IoC.Get<ISolarSystemService>().FroniusUpdateRate = Settings.FroniusUpdateRate;
+
         if (!string.IsNullOrWhiteSpace(Settings.Language))
         {
             try
@@ -63,7 +65,7 @@ public partial class App
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, Fronius.Localization.Resources.Warning, MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(ex.Message, Loc.Warning, MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -73,7 +75,7 @@ public partial class App
     private static void OnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
         e.Handled = true;
-        e.Dispatcher.InvokeAsync(() => MessageBox.Show(e.Exception.ToString(), Fronius.Localization.Resources.Warning, MessageBoxButton.OK, MessageBoxImage.Error));
+        e.Dispatcher.InvokeAsync(() => MessageBox.Show(e.Exception.ToString(), Loc.Warning, MessageBoxButton.OK, MessageBoxImage.Error));
     }
 
     private void ValidationErrorVisibilityChanged(object sender, DependencyPropertyChangedEventArgs _)

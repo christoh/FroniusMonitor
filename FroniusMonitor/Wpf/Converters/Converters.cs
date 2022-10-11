@@ -156,7 +156,7 @@ public abstract class PowerCorrector : ConverterBase
     }
 }
 
-public class ToUpper:ConverterBase
+public class ToUpper : ConverterBase
 {
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value?.ToString()?.ToUpper(CultureInfo.CurrentCulture);
 }
@@ -680,3 +680,17 @@ public class LinuxVersion : ConverterBase
         return value is Version version ? version.ToLinuxString() : value;
     }
 }
+
+public class EqualityToAnything<TFrom, TTo> : ConverterBase
+{
+    public TFrom? Value { get; set; }
+    public TTo? Equal { get; set; }
+    public TTo? NotEqual { get; set; }
+
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is null ? Value is null ? Equal : NotEqual : value.Equals(Value) ? Equal : NotEqual;
+    }
+}
+
+public class ByteEqualityToString:EqualityToAnything<byte,string>{}

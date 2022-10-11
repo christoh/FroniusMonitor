@@ -2212,6 +2212,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to second.
+        /// </summary>
+        public static string Second {
+            get {
+                return ResourceManager.GetString("Second", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to seconds.
+        /// </summary>
+        public static string Seconds {
+            get {
+                return ResourceManager.GetString("Seconds", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sensor.
         /// </summary>
         public static string SensorCard {
@@ -2703,6 +2721,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string UnlockCableOnPowerFailure {
             get {
                 return ResourceManager.GetString("UnlockCableOnPowerFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update rate.
+        /// </summary>
+        public static string UpdateRate {
+            get {
+                return ResourceManager.GetString("UpdateRate", resourceCulture);
             }
         }
         

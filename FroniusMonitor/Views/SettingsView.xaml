@@ -60,6 +60,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <Grid.ColumnDefinitions>
@@ -67,6 +68,12 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
+                <Grid.Resources>
+                    <DataTemplate x:Key="ComboBoxTemplate">
+                        <TextBlock Text="{Binding}" MinHeight="20" Margin="0,2,0,0" VerticalAlignment="Center" />
+                    </DataTemplate>
+
+                </Grid.Resources>
 
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.Url}" Margin="0,8,0,0" />
                 <TextBlock Grid.Row="0" Grid.Column="1" Text=":" Margin="4,8,4,0" />
@@ -79,19 +86,26 @@
 
                 <ComboBox Grid.Row="1" Grid.Column="2"
                           SelectedItem="{Binding Settings.FroniusConnection.UserName, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          ItemsSource="{Binding Gen24UserNames}">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding}" MinHeight="20" Margin="0,2,0,0" VerticalAlignment="Center" />
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
+                          ItemsSource="{Binding Gen24UserNames}" ItemTemplate="{StaticResource ComboBoxTemplate}"/>
 
                 <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static p:Resources.Password}" Margin="0,8,0,0" />
                 <TextBlock Grid.Row="2" Grid.Column="1" Text=":" Margin="4,8,4,0" />
 
                 <c:PasswordBox Grid.Row="2" Grid.Column="2" Template="{StaticResource PasswordBoxTemplate}"
                                Password="{Binding Settings.FroniusConnection.Password, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="{x:Static p:Resources.UpdateRate}" Margin="0,8,0,0"/>
+                <TextBlock Grid.Row="3" Grid.Column="1" Text=":" Margin="4,8,4,0"/>
+
+                <Grid  Grid.Row="3" Grid.Column="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <ComboBox Grid.Column="0" SelectedItem="{Binding Settings.FroniusUpdateRate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                              ItemsSource="{Binding FroniusUpdateRates}" ItemTemplate="{StaticResource ComboBoxTemplate}"/>
+                    <TextBlock Grid.Column="1" Text="{Binding Settings.FroniusUpdateRate, Converter={co:ByteEqualityToString Value=1, Equal={x:Static p:Resources.Second}, NotEqual={x:Static p:Resources.Seconds}}}" Margin="4,8,0,0"/>
+                </Grid>
             </Grid>
 
         </GroupBox>

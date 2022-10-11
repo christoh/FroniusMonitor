@@ -1044,4 +1044,13 @@
   <data name="ScannedWifis" xml:space="preserve">
 	  <value>Wifi networks in range</value>
   </data>
+  <data name="UpdateRate" xml:space="preserve">
+	  <value>Update rate</value>
+  </data>
+  <data name="Second" xml:space="preserve">
+	  <value>second</value>
+  </data>
+  <data name="Seconds" xml:space="preserve">
+	  <value>seconds</value>
+  </data>
 </root>

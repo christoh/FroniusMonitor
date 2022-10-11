@@ -10,7 +10,6 @@ public class SolarSystemService : BindableBase, ISolarSystemService
     private int suspendFritzBoxCounter;
     private const int QueueSize = 60;
     private const int FritzBoxUpdateRate = 3;
-    private const int FroniusUpdateRate = 5;
 
     public event EventHandler<SolarDataEventArgs>? NewDataReceived;
 
@@ -21,7 +20,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
     }
 
     private SolarSystem? solarSystem;
-
+    
     public SolarSystem? SolarSystem
     {
         get => solarSystem;
@@ -51,6 +50,8 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         get => isConnected;
         set => Set(ref isConnected, value);
     }
+
+    public int FroniusUpdateRate { get; set; }
 
     public Queue<Gen24PowerFlow> PowerFlowQueue { get; } = new(QueueSize + 1);
     private int? Count => PowerFlowQueue.Count == 0 ? null : PowerFlowQueue.Count;

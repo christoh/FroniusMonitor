@@ -4,6 +4,8 @@
     {
         SolarSystem? SolarSystem { get; }
         WebConnection? WattPilotConnection { get; set; }
+
+        public int FroniusUpdateRate { get; set; }
         public double GridPowerSum { get; }
         public double LoadPowerSum { get; }
         public double SolarPowerSum { get; }

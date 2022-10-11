@@ -19,6 +19,14 @@ public class Settings : BindableBase, ICloneable
         set => Set(ref mainWindowSize, value);
     }
 
+    private byte froniusUpdateRate = 5;
+    [DefaultValue((byte)5)]
+    public byte FroniusUpdateRate
+    {
+        get => froniusUpdateRate;
+        set => Set(ref froniusUpdateRate, value);
+    }
+
     private WebConnection? froniusConnection = new() { BaseUrl = "http://192.168.178.XXX", UserName = string.Empty, Password = string.Empty };
     [XmlElement, DefaultValue(null)]
     public WebConnection? FroniusConnection

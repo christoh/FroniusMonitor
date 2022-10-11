@@ -1020,4 +1020,13 @@
   <data name="ScannedWifis" xml:space="preserve">
 	  <value>WLAN-Netze in der Umgebung</value>
   </data>
+  <data name="UpdateRate" xml:space="preserve">
+	  <value>Aktualisierungsrate</value>
+  </data>
+  <data name="Second" xml:space="preserve">
+	  <value>Sekunde</value>
+  </data>
+  <data name="Seconds" xml:space="preserve">
+	  <value>Sekunden</value>
+  </data>
 </root>
