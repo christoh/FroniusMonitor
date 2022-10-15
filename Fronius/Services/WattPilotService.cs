@@ -385,7 +385,7 @@ public class WattPilotService : BindableBase, IWattPilotService
             {
                 foreach (var propertyInfo in propertyInfos)
                 {
-                    var attribute = propertyInfo.GetCustomAttributes<WattPilotAttribute>().Single(a => a.TokenName == token.Key);
+                    var attribute = propertyInfo.GetCustomAttributes<WattPilotAttribute>().SingleOrDefault(a => a.TokenName == token.Key);
 
                     if (attribute?.Index >= 0 && attribute.Index < array.Count)
                     {

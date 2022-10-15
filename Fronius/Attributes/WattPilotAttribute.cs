@@ -12,6 +12,7 @@ public class WattPilotAttribute : Attribute
     }
 
     public WattPilotAttribute(string tokenName, int index) : this(tokenName, true, index, null) { }
+    public WattPilotAttribute(string tokenName, int index, bool isReadOnly) : this(tokenName, isReadOnly, index, null) { }
     public WattPilotAttribute(string tokenName) : this(tokenName, true, -1, null) { }
     public WattPilotAttribute(string tokenName, bool isReadOnly) : this(tokenName, isReadOnly, -1, null) { }
     public WattPilotAttribute(string tokenName, Type type) : this(tokenName, true, -1, type) { }

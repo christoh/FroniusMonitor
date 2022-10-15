@@ -106,6 +106,49 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref version, value);
     }
 
+    private WattPilotInverter? inverter;
+    [WattPilot("cci")]
+    public WattPilotInverter? Inverter
+    {
+        get => inverter;
+        set => Set(ref inverter, value);
+    }
+
+    private byte? l1Map;
+    [WattPilot("map", 0)]
+    public byte? L1Map
+    {
+        get => l1Map;
+        set => Set(ref l1Map, value, () => NotifyOfPropertyChange(nameof(PhaseMap)));
+    }
+
+    private byte? l2Map;
+    [WattPilot("map", 1)]
+    public byte? L2Map
+    {
+        get => l2Map;
+        set => Set(ref l2Map, value, () => NotifyOfPropertyChange(nameof(PhaseMap)));
+    }
+
+    private byte? l3Map;
+    [WattPilot("map", 2)]
+    public byte? L3Map
+    {
+        get => l3Map;
+        set => Set(ref l3Map, value, () => NotifyOfPropertyChange(nameof(PhaseMap)));
+    }
+
+    public WattPilotPhaseMap PhaseMap
+    {
+        get => new WattPilotPhaseMap(L1Map ?? 0, L2Map ?? 0, L3Map ?? 0);
+        set
+        {
+            L1Map = value.L1Map;
+            L2Map = value.L2Map;
+            L3Map = value.L3Map;
+        }
+    }
+
     private int? wifiSignal;
     [WattPilot("rssi")]
     public int? WifiSignal
@@ -264,13 +307,13 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref powerN, value);
     }
 
-    public double PowerSum => PowerL1??0 + PowerL2??0 + PowerL3??0;
+    public double PowerSum => PowerL1 ?? 0 + PowerL2 ?? 0 + PowerL3 ?? 0;
 
     public double? PowerL1KiloWatts => PowerL1 / 1000d;
     public double? PowerL2KiloWatts => PowerL2 / 1000d;
     public double? PowerL3KiloWatts => PowerL3 / 1000d;
 
-    public double PowerSumKiloWatts => (PowerL1KiloWatts??0) + (PowerL2KiloWatts??0) + (PowerL3KiloWatts??0);
+    public double PowerSumKiloWatts => (PowerL1KiloWatts ?? 0) + (PowerL2KiloWatts ?? 0) + (PowerL3KiloWatts ?? 0);
 
     public double? VoltageAverage => (VoltageL1 + VoltageL2 + VoltageL3) / 3;
 

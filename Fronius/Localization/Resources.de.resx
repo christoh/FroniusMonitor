@@ -1029,4 +1029,7 @@
   <data name="Seconds" xml:space="preserve">
 	  <value>Sekunden</value>
   </data>
+  <data name="PhaseMap" xml:space="preserve">
+	  <value>Phasenzuordnung</value>
+  </data>
 </root>

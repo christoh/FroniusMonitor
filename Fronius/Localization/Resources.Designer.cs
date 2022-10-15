@@ -1924,6 +1924,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Phase mapping.
+        /// </summary>
+        public static string PhaseMap {
+            get {
+                return ResourceManager.GetString("PhaseMap", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Phase switch mode.
         /// </summary>
         public static string PhaseSwitchMode {
