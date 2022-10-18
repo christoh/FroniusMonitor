@@ -416,6 +416,9 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private byte? numberOfCarPhases;
+    /// <summary>
+    /// Only updated when in Eco mode
+    /// </summary>
     [WattPilot("pnp")]
     public byte? NumberOfCarPhases
     {
