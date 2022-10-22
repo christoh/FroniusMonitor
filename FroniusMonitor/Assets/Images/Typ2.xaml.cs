@@ -55,22 +55,21 @@ public partial class Typ2
 
             switch (e.PropertyName)
             {
-                case nameof(wattPilot.NumberOfCarPhases):
-                    UpdateAll(wattPilot);
-                    break;
-
+                case nameof(wattPilot.CurrentL1):
                 case nameof(wattPilot.L1ChargerEnabled):
                 case nameof(wattPilot.L1CableEnabled):
                     var colorL1 = GetColor(wattPilot.L1CableEnabled, wattPilot.L1ChargerEnabled, wattPilot.CurrentL1 > 1);
                     L1.Fill = colorL1;
                     break;
 
+                case nameof(wattPilot.CurrentL2):
                 case nameof(wattPilot.L2ChargerEnabled):
                 case nameof(wattPilot.L2CableEnabled):
                     var colorL2 = GetColor(wattPilot.L2CableEnabled, wattPilot.L2ChargerEnabled, wattPilot.CurrentL2 > 1);
                     L2.Fill = colorL2;
                     break;
 
+                case nameof(wattPilot.CurrentL3):
                 case nameof(wattPilot.L3ChargerEnabled):
                 case nameof(wattPilot.L3CableEnabled):
                     var colorL3 = GetColor(wattPilot.L3CableEnabled, wattPilot.L3ChargerEnabled, wattPilot.CurrentL3 > 1);
