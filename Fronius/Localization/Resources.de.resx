@@ -1032,4 +1032,7 @@
   <data name="PhaseMap" xml:space="preserve">
 	  <value>Phasenzuordnung</value>
   </data>
+  <data name="IsInServiceMode" xml:space="preserve">
+	  <value>Batteriewartungsmodus</value>
+  </data>
 </root>

@@ -150,5 +150,13 @@ public class Gen24BatterySettings : BindableBase, ICloneable
         set => Set(ref solarPeakPower, value);
     }
 
+    private bool isInServiceMode;
+    [FroniusProprietaryImport("BAT_SERVICE_ON", FroniusDataType.Root)]
+    public bool IsInServiceMode
+    {
+        get => isInServiceMode;
+        set => Set(ref isInServiceMode, value);
+    }
+
     public object Clone() => MemberwiseClone();
 }

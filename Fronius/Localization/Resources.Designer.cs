@@ -1105,6 +1105,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Battery service mode.
+        /// </summary>
+        public static string IsInServiceMode {
+            get {
+                return ResourceManager.GetString("IsInServiceMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Enable Wi-Fi client.
         /// </summary>
         public static string IsWifiClientEnabled {
