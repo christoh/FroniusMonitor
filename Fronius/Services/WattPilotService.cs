@@ -12,7 +12,6 @@ public class WattPilotService : BindableBase, IWattPilotService
     private string? hashedPassword;
     private string? oldEncryptedPassword;
 
-
     private CancellationToken Token => tokenSource?.Token ?? throw new WebSocketException(WebSocketError.ConnectionClosedPrematurely);
 
     private WebConnection? connection;

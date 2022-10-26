@@ -8,7 +8,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
     private int updateSemaphore;
     private int fritzBoxCounter, froniusCounter;
     private int suspendFritzBoxCounter;
-    private const int QueueSize = 60;
+    private int QueueSize => Math.Max(1, (int)Math.Round(5d / FroniusUpdateRate, MidpointRounding.AwayFromZero));
     private const int FritzBoxUpdateRate = 3;
 
     public event EventHandler<SolarDataEventArgs>? NewDataReceived;
@@ -17,10 +17,11 @@ public class SolarSystemService : BindableBase, ISolarSystemService
     {
         this.webClientService = webClientService;
         this.wattPilotService = wattPilotService;
+        PowerFlowQueue = new Queue<Gen24PowerFlow>(QueueSize + 1);
     }
 
     private SolarSystem? solarSystem;
-    
+
     public SolarSystem? SolarSystem
     {
         get => solarSystem;
@@ -53,7 +54,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
     public int FroniusUpdateRate { get; set; }
 
-    public Queue<Gen24PowerFlow> PowerFlowQueue { get; } = new(QueueSize + 1);
+    public Queue<Gen24PowerFlow> PowerFlowQueue { get; }
     private int? Count => PowerFlowQueue.Count == 0 ? null : PowerFlowQueue.Count;
 
     public double GridPowerSum => PowerFlowQueue.Sum(p => p.GridPower ?? 0);

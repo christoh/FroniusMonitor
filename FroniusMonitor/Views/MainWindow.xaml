@@ -41,6 +41,7 @@
                 </MenuItem>
                 <MenuItem Header="{x:Static p:Resources.View}">
                     <MenuItem Header="_Auto-fit" Click="OnAutoSizeChecked" />
+                    <MenuItem Header="{x:Static p:Resources.IncludeInverterPower}" Icon="{vi:Gen24}" IsChecked="{Binding IncludeInverterPower}" IsCheckable="True" />
                     <MenuItem Header="{x:Static p:Resources.Events}" Click="ShowEventLog" Icon="{vi:EventLogIcon}" />
                     <MenuItem Visibility="{Binding Settings.HaveFritzBox, Converter={co:Bool2Visibility}}" Header="{x:Static p:Resources.ShowAvm}" IsChecked="{Binding Settings.ShowFritzBox, Mode=TwoWay}" IsCheckable="True" Icon="{vi:FritzLogo}" Checked="OnShowAvmChanged" Unchecked="OnShowAvmChanged"/>
                 </MenuItem>
@@ -181,7 +182,7 @@
                                           Margin="25,0,10,0">
                             <c:PowerFlowArrow.ContextMenu>
                                 <ContextMenu>
-                                    <MenuItem Header="Include inverter power (Solar web mode)" IsChecked="{Binding IncludeInverterPower}" IsCheckable="True" />
+                                    <MenuItem Header="{x:Static p:Resources.IncludeInverterPower}" IsChecked="{Binding IncludeInverterPower}" IsCheckable="True" />
                                 </ContextMenu>
                             </c:PowerFlowArrow.ContextMenu>
                         </c:PowerFlowArrow>
