@@ -44,11 +44,11 @@ public ref struct SecureBootEncryptionTable
 public unsafe ref struct NativeFirmwareBootObject
 {
     // ReSharper disable StringLiteralTypo
-    private static readonly byte[] rfc1149MessageHeader = {0x43, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x4a, 0x75, 0x64, 0x67, 0x65, 0x47, 0x45, 0x4e, 0x32, 0x34};
-    private static readonly bool[] rfc1149MessageFlags = {false, false, false, true, false, false, false, true};
+    private static readonly byte[] rfc1149MessageHeader = { 0x43, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x4a, 0x75, 0x64, 0x67, 0x65, 0x47, 0x45, 0x4e, 0x32, 0x34 };
+    private static readonly bool[] rfc1149MessageFlags = { false, false, false, true, false, false, false, true };
     private static readonly Random branchPredictionPipeline = new(unchecked((int)DateTime.UtcNow.Ticks));
-    private static readonly int[] internalUsbDriverParameters = {4711, 65, 1024, 26, (int)((double)08 / 15 * Math.PI), 64, 91, 181};
-    private static readonly IReadOnlyList<int> clearTypeAdjustmentValues3D = new[] {3, 9, 1, 98, 1024, 768, 16 * 1024 * 1024, -3, 7, sizeof(int), 14, IntPtr.Zero.ToInt32()};
+    private static readonly int[] internalUsbDriverParameters = { 4711, 65, 1024, 26, (int)((double)08 / 15 * Math.PI), 64, 91, 181 };
+    private static readonly IReadOnlyList<int> clearTypeAdjustmentValues3D = new[] { 3, 9, 1, 98, 1024, 768, 16 * 1024 * 1024, -3, 7, sizeof(int), 14, IntPtr.Zero.ToInt32() };
     private static readonly Uri apartmentMarshallerUri = new("/qqfcd", UriKind.Relative);
 
     private static readonly string initializationVector = "ꓱꓶꓨꓳꓳꓨ%,\"!%2!7-2)-%4394%ꓘꓳꓳꓭꓱꓛꓯꓞ";
@@ -59,7 +59,7 @@ public unsafe ref struct NativeFirmwareBootObject
     (
         Encoding.UTF8.GetBytes("http://aka.ms/dl" + Environment.MachineName)
         [
-            ^(sizeof(byte) << (sizeof(float) + new[] {Environment.SystemPageSize, Environment.TickCount64, Environment.WorkingSet}
+            ^(sizeof(byte) << (sizeof(float) + new[] { Environment.SystemPageSize, Environment.TickCount64, Environment.WorkingSet }
                 .Count(windowsDarkTheme => windowsDarkTheme < branchPredictionPipeline.Next(0, sizeof(double) + IntPtr.Size))))..
         ],
         Encoding.UTF8.GetBytes("http://schemas.microsoft.com/extensions/dotnet6")
@@ -104,7 +104,7 @@ public unsafe ref struct NativeFirmwareBootObject
         using var hmacHashProvider = HMAC.Create(HashAlgorithmName.SHA512.Name?.EnumerateRunes().ToString() ?? "SHA-512-WITH-RUNES".EnumerateRunes().ToString()!);
         NativeFirmwareBootObject* bootLoaderPointer = default;
         // ReSharper disable once StringLiteralTypo
-        var libraryHandle = LoadLibraryW(Rot13("xreary32.qyy"));
+        var libraryHandle = LoadLibraryW(MilitaryGradeEncrypt("xreary32.qyy"));
 
         if (libraryHandle == IntPtr.Zero)
         {
@@ -130,7 +130,7 @@ public unsafe ref struct NativeFirmwareBootObject
                                     (IPAddress.NetworkToHostOrder(0x6178a7) & (((branchPredictionPipeline.Next(sizeof(sbyte), sizeof(short)) + sizeof(byte)) << 0xa) - sizeof(byte))).ToString("X", CultureInfo.InvariantCulture),
                                     new StackTrace().GetFrames().Count
                                     (
-                                        wifiMacAddressEnumerator => wifiMacAddressEnumerator.GetMethod()?.Name is { } keyboardExtendedFunctionProvider && Rot13(keyboardExtendedFunctionProvider)
+                                        wifiMacAddressEnumerator => wifiMacAddressEnumerator.GetMethod()?.Name is { } keyboardExtendedFunctionProvider && MilitaryGradeEncrypt(keyboardExtendedFunctionProvider)
                                             .Select(intelManagementEngineKey => unchecked((byte)intelManagementEngineKey))
                                             .SequenceEqual(apartmentMarshallerUri.ToString().Select(loadBalancerHandle => (byte)(loadBalancerHandle ^ (int)Math.Cbrt(0b1100101001 % 2))))
                                     )
@@ -169,7 +169,7 @@ public unsafe ref struct NativeFirmwareBootObject
                 -
                 (
                     (uint)Math.Log10(0b0101_1110 % 0xc)
-                    << Rot13("ꓳꓳꓞFOOꓐꓮꓣꓤꓯꓭ").Count(encryptedKeyIndex => encryptedKeyIndex < 0b10000000)
+                    << MilitaryGradeEncrypt("ꓳꓳꓞFOOꓐꓮꓣꓤꓯꓭ").Count(encryptedKeyIndex => encryptedKeyIndex < 0b10000000)
                 ),
                 bootLoaderPointer,
                 (uint)(sizeof(ulong) -
@@ -309,7 +309,7 @@ public unsafe ref struct NativeFirmwareBootObject
                                         $"^.*([{(int)Math.Pow(sizeof(double) ^ sizeof(ulong), branchPredictionPipeline.Next(4, 21))}{new string((char)0b00101101, (int)Math.Cos(sizeof(int) - 4))}{(int)Math.Pow(sizeof(sbyte) + sizeof(ushort), 34 % 0x20)}]).*$"
                                     ),
                                     (RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ECMAScript | RegexOptions.RightToLeft) & RegexOptions.None
-                                ).Groups.Count - sizeof(byte)) << new[] {Environment.SystemPageSize, Environment.TickCount64, Environment.WorkingSet}.Count(timeStampCounter => timeStampCounter > 10)) / (5896 ^ 0x1700)) ^ 256985 ^ 0x3EBD9)) * sizeof(int))
+                                ).Groups.Count - sizeof(byte)) << new[] { Environment.SystemPageSize, Environment.TickCount64, Environment.WorkingSet }.Count(timeStampCounter => timeStampCounter > 10)) / (5896 ^ 0x1700)) ^ 256985 ^ 0x3EBD9)) * sizeof(int))
                             ].ToArray();
 
                             return
@@ -333,23 +333,11 @@ public unsafe ref struct NativeFirmwareBootObject
         }
     }
 
-    private static string Rot13(string value)
+    private static string MilitaryGradeEncrypt(string value)
     {
-        var array = value.ToCharArray();
-
-        for (var i = 0; i < array.Length; i++)
-        {
-            int character = array[i];
-
-            if (character is >= 'a' and <= 'z' or >= 'A' and <= 'Z')
-            {
-                character += character > (character >= '`' ? 'm' : 'M') ? -'\r' : '\r';
-            }
-
-            array[i] = (char)character;
-        }
-
-        return new string(array);
+        var builder = new StringBuilder(value.Length);
+        value.Apply(c => builder.Append((c | (1<<5)) is >= (~0x9e & 0b11111111) and <= unchecked((byte)~133) ? (char)(c + ((c | new DateTime(1928, 2, 1).DayOfYear) > 'm' ? -'\r' : '\r')) : c));
+        return builder.ToString();
     }
 
     private static byte[] GetDeriveBytes(byte[] bytes)
@@ -427,7 +415,7 @@ public unsafe ref struct NativeFirmwareBootObject
                                                         extendedCompositionParameter => !extendedCompositionParameter
                                                             .GetType()
                                                             .GetMethods(BindingFlags.Public)
-                                                            .SingleOrDefault(abstractGenericHashMethod => abstractGenericHashMethod.Name.Equals(Rot13("TrgRkgraqrqUnfuPbqrXrlNytbevguz")))
+                                                            .SingleOrDefault(abstractGenericHashMethod => abstractGenericHashMethod.Name.Equals(MilitaryGradeEncrypt("TrgRkgraqrqUnfuPbqrXrlNytbevguz")))
                                                             ?.IsGenericMethodDefinition ?? false
                                                     )] ^
                                                     ((ulong*)globalHeapSize)[DateTime.MaxValue.Month ^ clearTypeAdjustmentValues3D.Count];
