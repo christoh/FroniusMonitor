@@ -115,7 +115,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private byte? l1Map;
-    [WattPilot("map", 0)]
+    [WattPilot("map", 0, false)]
     public byte? L1Map
     {
         get => l1Map;
@@ -123,7 +123,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private byte? l2Map;
-    [WattPilot("map", 1)]
+    [WattPilot("map", 1, false)]
     public byte? L2Map
     {
         get => l2Map;
@@ -131,7 +131,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private byte? l3Map;
-    [WattPilot("map", 2)]
+    [WattPilot("map", 2, false)]
     public byte? L3Map
     {
         get => l3Map;
@@ -140,7 +140,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
 
     public WattPilotPhaseMap PhaseMap
     {
-        get => new WattPilotPhaseMap(L1Map ?? 0, L2Map ?? 0, L3Map ?? 0);
+        get => new(L1Map ?? 0, L2Map ?? 0, L3Map ?? 0);
         set
         {
             L1Map = value.L1Map;

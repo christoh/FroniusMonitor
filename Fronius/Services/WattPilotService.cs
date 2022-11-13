@@ -298,7 +298,14 @@ public class WattPilotService : BindableBase, IWattPilotService
             throw new ArgumentException(string.Format(Resources.NotAMemberOf, instanceType.Name), propertyName);
         }
 
-        var key = propertyInfo.GetCustomAttribute<WattPilotAttribute>()?.TokenName;
+        var attribute = propertyInfo.GetCustomAttribute<WattPilotAttribute>();
+
+        if (attribute == null)
+        {
+            throw new ArgumentException(string.Format(Resources.NotAMemberOf, instanceType.Name), propertyName);
+        }
+
+        var key = attribute.TokenName;
 
         if (key == null)
         {
