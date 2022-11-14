@@ -443,7 +443,7 @@ public class WattPilotService : BindableBase, IWattPilotService
         {
             if (token is JObject subObject)
             {
-                var subInstance = IoC.Get(propertyInfo.PropertyType);
+                var subInstance = Activator.CreateInstance(propertyInfo.PropertyType);
 
                 if (subInstance != null)
                 {

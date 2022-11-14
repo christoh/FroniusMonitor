@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FroniusPhone.Pages.MainPage"
+             BindingContext="{Binding ViewModel, Source={RelativeSource Self}}"
+             >
+
+    <ScrollView HorizontalOptions="Center">
+        <Grid ColumnDefinitions="*,*,*,*,*" Margin="10,8,10,0" RowDefinitions="64,24" HorizontalOptions="Center" >
+            <Grid.Resources>
+                <Style TargetType="Image" ApplyToDerivedTypes="True">
+                    <Setter Property="HorizontalOptions" Value="Center"/>
+                    <Setter Property="VerticalOptions" Value="Start"/>
+                </Style>
+                <Style TargetType="Label" ApplyToDerivedTypes="True">
+                    <Setter Property="HorizontalOptions" Value="Center"/>
+                    <Setter Property="VerticalOptions" Value="Start"/>
+                    <Setter Property="TextColor" Value="{AppThemeBinding Dark=White, Light=Black}"/>
+                </Style>
+            </Grid.Resources>
+            <Image Grid.Row="0" Grid.Column="0"
+                   Source="sun.png"
+                   SemanticProperties.Description="Sun"/>
+
+
+            <Label Grid.Row="1" Grid.Column="0"
+                   Text="{Binding SolarSystemService.SolarSystem.Gen24System.PowerFlow.SolarPower, StringFormat='{0:N0} W', FallbackValue='---'}"/>
+
+            <Image Grid.Row="0" Grid.Column="1"
+                   Source="load.png"
+                   SemanticProperties.Description="Load"/>
+
+            <Label Grid.Row="1" Grid.Column="1"
+                   Text="{Binding SolarSystemService.SolarSystem.Gen24System.PowerFlow.LoadPower, StringFormat='{0:N0} W', FallbackValue='---'}"/>
+
+            <Image Grid.Row="0" Grid.Column="3"
+                   Source="battery.png"
+                   SemanticProperties.Description="Load"/>
+
+            <Label Grid.Row="0" Grid.Column="3" FontSize="8" HorizontalOptions="Center" VerticalOptions="Center"
+                   Text="{Binding SolarSystemService.SolarSystem.Gen24System.Storage.StateOfCharge, StringFormat='{0:P0}', FallbackValue='---'}"/>
+
+            <Label Grid.Row="1" Grid.Column="3"
+                   Text="{Binding SolarSystemService.SolarSystem.Gen24System.PowerFlow.StoragePower, StringFormat='{0:N0} W', FallbackValue='---'}"/>
+
+            <Image Grid.Row="0" Grid.Column="4"
+                   Source="grid.png"
+                   SemanticProperties.Description="Load"/>
+
+            <Label Grid.Row="1" Grid.Column="4"
+                   Text="{Binding SolarSystemService.SolarSystem.Gen24System.PowerFlow.GridPower, StringFormat='{0:N0} W', FallbackValue='---'}"/>
+
+            <Image Grid.Row="0" Grid.Column="2"
+                   Source="car.png"
+                   SemanticProperties.Description="Load"/>
+
+            <Label Grid.Row="1" Grid.Column="2"
+                   Text="{Binding SolarSystemService.SolarSystem.WattPilot.PowerTotal, StringFormat='{0:N0} W', FallbackValue='---'}"/>
+        </Grid>
+    </ScrollView>
+
+</ContentPage>

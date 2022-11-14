@@ -1,22 +1,42 @@
-﻿using De.Hochstaetter.FroniusPhone.Views;
+﻿namespace FroniusPhone;
 
-namespace De.Hochstaetter.FroniusPhone
+public static class MauiProgram
 {
-    public static class MauiProgram
+    public static MauiApp CreateMauiApp()
     {
-        public static MauiApp CreateMauiApp()
-        {
-            var builder = MauiApp.CreateBuilder();
-            builder
-                .UseMauiApp<App>()
-                .ConfigureFonts(fonts =>
-                {
-                    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                });
+        var builder = MauiApp.CreateBuilder();
 
-            builder.Services.AddSingleton<MainView>();
+        builder
+            .UseMauiApp<App>()
+            .RegisterServices()
+            .ConfigureFonts(fonts =>
+            {
+                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+            });
 
-            return builder.Build();
-        }
+        #if DEBUG
+        builder.Logging.AddDebug();
+        #endif
+        return builder.Build();
+    }
+
+    private static MauiAppBuilder RegisterServices(this MauiAppBuilder builder)
+    {
+        builder.Services
+            .AddSingleton<ISolarSystemService, SolarSystemService>()
+            .AddSingleton<IWebClientService, WebClientService>()
+            .AddSingleton<ISolarSystemService, SolarSystemService>()
+            .AddSingleton<IAesKeyProvider, AesKeyProvider>()
+            .AddSingleton<IWattPilotService, WattPilotService>()
+            .AddSingleton<SettingsBase, Settings>()
+            .AddSingleton<IGen24JsonService, Gen24JsonService>()
+            .AddSingleton<AppShell>()
+            .AddSingleton<ShellViewModel>()
+            .AddSingleton<MainPage>()
+            .AddSingleton<MainViewModel>()
+            ;
+
+        return builder;
     }
 }

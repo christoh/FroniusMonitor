@@ -2,15 +2,15 @@
 
 public class WebConnection : BindableBase, ICloneable
 {
-    private static readonly Aes aes;
+    public static Aes Aes;
 
     static WebConnection()
     {
-        aes = Aes.Create();
-        aes.KeySize = 128;
-        aes.Mode = CipherMode.ECB;
-        aes.Padding = PaddingMode.PKCS7;
-        aes.Key = IoC.Get<IAesKeyProvider>().GetAesKey();
+        Aes = Aes.Create();
+        Aes.KeySize = 128;
+        Aes.Mode = CipherMode.ECB;
+        Aes.Padding = PaddingMode.PKCS7;
+        Aes.Key = IoC.Injector == null ? new byte[16] : IoC.Get<IAesKeyProvider>().GetAesKey();
     }
 
     private string baseUrl = "";
@@ -56,7 +56,7 @@ public class WebConnection : BindableBase, ICloneable
         {
             try
             {
-                using var encrypt = aes.CreateEncryptor();
+                using var encrypt = Aes.CreateEncryptor();
                 var bytes = Encoding.UTF8.GetBytes(Password);
                 return Convert.ToBase64String(encrypt.TransformFinalBlock(bytes, 0, bytes.Length));
             }
@@ -69,7 +69,7 @@ public class WebConnection : BindableBase, ICloneable
         {
             try
             {
-                using var decrypt = aes.CreateDecryptor();
+                using var decrypt = Aes.CreateDecryptor();
                 var bytes = Convert.FromBase64String(value);
                 Password = Encoding.UTF8.GetString(decrypt.TransformFinalBlock(bytes, 0, bytes.Length));
             }
@@ -92,7 +92,7 @@ public class WebConnection : BindableBase, ICloneable
 
             string CalculateChecksum()
             {
-                using var deriveBytes = new Rfc2898DeriveBytes(Encoding.UTF8.GetBytes(Password), aes.Key, 131072, HashAlgorithmName.SHA256);
+                using var deriveBytes = new Rfc2898DeriveBytes(Encoding.UTF8.GetBytes(Password), Aes.Key, 131072, HashAlgorithmName.SHA256);
                 return Convert.ToBase64String(deriveBytes.GetBytes(8));
             }
         }

@@ -55,6 +55,7 @@ public partial class App
             Settings.Save().Wait();
         }
 
+        Container.RegisterInstance<SettingsBase>(Settings);
         IoC.Get<ISolarSystemService>().FroniusUpdateRate = Settings.FroniusUpdateRate;
 
         if (!string.IsNullOrWhiteSpace(Settings.Language))

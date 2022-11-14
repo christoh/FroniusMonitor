@@ -1059,4 +1059,7 @@
   <data name="IsInServiceMode" xml:space="preserve">
 	  <value>Battery service mode</value>
   </data>
+  <data name="FroniusManager" xml:space="preserve">
+	  <value>Fronius Gen24 Manager</value>
+  </data>
 </root>

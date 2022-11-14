@@ -2,7 +2,7 @@
 {
     public class IoC : IServiceProvider
     {
-        public static IServiceProvider? Injector { private get; set; }
+        public static IServiceProvider? Injector { get; set; }
 
         public static T Get<T>() => (T)(Get(typeof(T)) ?? default(T))!;
 

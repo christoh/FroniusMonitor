@@ -1,7 +1,7 @@
 ﻿using ObjCRuntime;
 using UIKit;
 
-namespace De.Hochstaetter.FroniusPhone
+namespace FroniusPhone
 {
     public class Program
     {

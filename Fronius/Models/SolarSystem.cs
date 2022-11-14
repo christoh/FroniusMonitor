@@ -2,6 +2,18 @@
 
 public class SolarSystem : BindableBase, IHierarchicalCollection
 {
+    public SolarSystem()
+    {
+        DeviceGroups.CollectionChanged += (s, e) =>
+        {
+            NotifyOfPropertyChange(nameof(Storages));
+            NotifyOfPropertyChange(nameof(Inverters));
+            NotifyOfPropertyChange(nameof(Meters));
+            NotifyOfPropertyChange(nameof(PrimaryInverter));
+            NotifyOfPropertyChange(nameof(PrimaryMeter));
+        };
+    }
+
     public string DisplayName => Resources.MySolarSystem;
 
     public ObservableCollection<DeviceGroup> DeviceGroups { get; } = new();

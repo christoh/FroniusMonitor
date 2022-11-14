@@ -1,12 +1,37 @@
-﻿using De.Hochstaetter.FroniusPhone.Views;
+﻿using De.Hochstaetter.Fronius;
 
-namespace De.Hochstaetter.FroniusPhone;
-
-public partial class App : Application
+namespace FroniusPhone
 {
-    public App(MainView mainPage)
+    public partial class App
     {
-        InitializeComponent();
-        MainPage = mainPage;
+        private readonly SettingsBase settings;
+        private readonly ISolarSystemService solarSystemService;
+        private readonly IAesKeyProvider aesKeyProvider;
+
+        public App(AppShell shell, SettingsBase settings, IAesKeyProvider aesKeyProvider, ISolarSystemService solarSystemService)
+        {
+            MainPage = shell;
+            this.settings = settings;
+            this.solarSystemService=solarSystemService;
+            this.aesKeyProvider= aesKeyProvider;
+            InitializeComponent();
+        }
+
+        protected override async void OnStart()
+        {
+            try
+            {
+                IoC.Injector = Handler.MauiContext?.Services;
+                WebConnection.Aes.Key = aesKeyProvider.GetAesKey();
+                settings.HaveWattPilot = true;
+                settings.FroniusUpdateRate = 5;
+                solarSystemService.FroniusUpdateRate = settings.FroniusUpdateRate;
+                await solarSystemService.Start(settings.FroniusConnection, settings.FritzBoxConnection, settings.WattPilotConnection);
+            }
+            finally
+            {
+                base.OnStart();
+            }
+        }
     }
 }

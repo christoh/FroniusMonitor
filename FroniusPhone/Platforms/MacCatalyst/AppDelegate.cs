@@ -1,6 +1,6 @@
 ﻿using Foundation;
 
-namespace De.Hochstaetter.FroniusPhone
+namespace FroniusPhone
 {
     [Register("AppDelegate")]
     public class AppDelegate : MauiUIApplicationDelegate

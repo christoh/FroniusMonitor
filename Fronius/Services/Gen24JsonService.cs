@@ -64,7 +64,7 @@ public class Gen24JsonService : IGen24JsonService
                 {
                     try
                     {
-                        if (stringValue.Contains("-"))
+                        if (stringValue.Contains('-'))
                         {
                             stringValue=stringValue.Replace("-", ".");
                         }

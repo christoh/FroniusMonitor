@@ -952,6 +952,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Fronius Gen24 Manager.
+        /// </summary>
+        public static string FroniusManager {
+            get {
+                return ResourceManager.GetString("FroniusManager", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Fronius Gen24 inverter.
         /// </summary>
         public static string Gen24InverterHeader {
