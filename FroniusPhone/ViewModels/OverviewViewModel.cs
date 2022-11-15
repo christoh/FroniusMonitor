@@ -1,8 +1,8 @@
 ﻿namespace FroniusPhone.ViewModels;
 
-public class MainViewModel : BindableBase
+public class OverviewViewModel : BindableBase
 {
-    public MainViewModel(ISolarSystemService solarSystemService)
+    public OverviewViewModel(ISolarSystemService solarSystemService)
     {
         this.solarSystemService = solarSystemService;
     }

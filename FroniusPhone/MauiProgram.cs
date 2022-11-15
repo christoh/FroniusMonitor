@@ -32,9 +32,9 @@ public static class MauiProgram
             .AddSingleton<SettingsBase, Settings>()
             .AddSingleton<IGen24JsonService, Gen24JsonService>()
             .AddSingleton<AppShell>()
-            .AddSingleton<ShellViewModel>()
-            .AddSingleton<MainPage>()
-            .AddSingleton<MainViewModel>()
+            .AddSingleton<Overview>()
+            .AddSingleton<OverviewViewModel>()
+            .AddSingleton<SettingsPage>()
             ;
 
         return builder;

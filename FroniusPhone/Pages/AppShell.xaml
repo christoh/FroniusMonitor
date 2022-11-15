@@ -3,12 +3,28 @@
 <Shell x:Class="FroniusPhone.Pages.AppShell"
        xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-       xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
-       Shell.FlyoutBehavior="Disabled"
-       BindingContext="{Binding ViewModel, Source={RelativeSource Self}}">
+       xmlns:pages="clr-namespace:FroniusPhone.Pages"
+       xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius">
 
-    <ShellContent x:Name="ShellContent"
-                  Title="{x:Static p:Resources.FroniusManager}"
-                  Route="MainPage" />
+    <Shell.ItemTemplate>
+        <DataTemplate x:DataType="FlyoutItem">
+            <Grid ColumnDefinitions="0.1*,0.9*">
+                <Image Source="{Binding FlyoutIcon}"
+                       Margin="5"
+                       HeightRequest="24" />
+                <Label Grid.Column="1"
+                       Text="{Binding Title}" FontSize="16"
+                       TextColor="Black" FontAttributes="Bold"
+                       VerticalTextAlignment="Center" />
+            </Grid>
+        </DataTemplate>
+    </Shell.ItemTemplate>
+
+    <ShellContent Title="{x:Static p:Resources.FroniusManager}"
+                  ContentTemplate="{DataTemplate pages:Overview}"
+                  Route="app" />
+    <ShellContent Title="Settings"
+                  ContentTemplate="{DataTemplate pages:SettingsPage}"
+                  Route="settings" />
 
 </Shell>

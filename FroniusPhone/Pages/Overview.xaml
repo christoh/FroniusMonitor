@@ -2,12 +2,12 @@
 
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="FroniusPhone.Pages.MainPage"
+             x:Class="FroniusPhone.Pages.Overview"
              BindingContext="{Binding ViewModel, Source={RelativeSource Self}}"
              >
 
     <ScrollView HorizontalOptions="Center">
-        <Grid ColumnDefinitions="*,*,*,*,*" Margin="10,8,10,0" RowDefinitions="64,24" HorizontalOptions="Center" >
+        <Grid ColumnDefinitions="72,72,72,72,72" Margin="0,8" RowDefinitions="64,24,64,24,64,24" HorizontalOptions="Center" >
             <Grid.Resources>
                 <Style TargetType="Image" ApplyToDerivedTypes="True">
                     <Setter Property="HorizontalOptions" Value="Center"/>

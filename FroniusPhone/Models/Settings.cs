@@ -1,4 +1,4 @@
 ﻿namespace FroniusPhone.Models
 {
-    internal class Settings : SettingsBase { }
+    public class Settings : SettingsBase { }
 }
