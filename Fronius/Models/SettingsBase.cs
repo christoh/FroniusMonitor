@@ -115,4 +115,18 @@ public abstract class SettingsBase : BindableBase
         get => producedEnergyOffsetWattHours;
         set => Set(ref producedEnergyOffsetWattHours, value);
     }
+
+    protected static void UpdateChecksum(params WebConnection?[] connections)
+    {
+        connections.Where(connection => connection != null).Apply(connection =>
+        {
+            connection!.PasswordChecksum = connection.CalculatedChecksum;
+        });
+    }
+
+    protected static void ClearIncorrectPasswords(params WebConnection?[] connections)
+    {
+        connections.Where(connection => connection != null && connection.PasswordChecksum != connection.CalculatedChecksum).Apply(connection => connection!.Password = string.Empty);
+    }
+
 }

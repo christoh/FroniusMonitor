@@ -2,8 +2,10 @@
 
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:FroniusPhone.ViewModels"
+             xmlns:co="clr-namespace:FroniusPhone.Converters"
              x:Class="FroniusPhone.Pages.Overview"
-             BindingContext="{Binding ViewModel, Source={RelativeSource Self}}"
+             x:DataType="viewModels:OverviewViewModel"
              >
 
     <ScrollView HorizontalOptions="Center">
@@ -31,8 +33,15 @@
                    Source="load.png"
                    SemanticProperties.Description="Load"/>
 
-            <Label Grid.Row="1" Grid.Column="1"
-                   Text="{Binding SolarSystemService.SolarSystem.Gen24System.PowerFlow.LoadPower, StringFormat='{0:N0} W', FallbackValue='---'}"/>
+            <Label Grid.Row="1" Grid.Column="1">
+                <Label.Text>
+                    <MultiBinding Converter="{co:LoadPowerConverter}" TargetNullValue="---" FallbackValue="---" StringFormat="{}{0:N0} W">
+                        <Binding Path="SolarSystemService.SolarSystem.Gen24System.PowerFlow.LoadPower" FallbackValue="---" TargetNullValue="---"/>
+                        <Binding Path="SolarSystemService.PowerLossAvg"/>
+                        <Binding Path="Settings.AddInverterPowerToConsumption"/>
+                    </MultiBinding>
+                </Label.Text>
+            </Label>
 
             <Image Grid.Row="0" Grid.Column="3"
                    Source="battery.png"

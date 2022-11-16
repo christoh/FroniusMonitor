@@ -319,7 +319,7 @@
     <value>Temperatur</value>
   </data>
   <data name="IncludeInverterPower" xml:space="preserve">
-    <value>Leistung des Wechselrichters hinzufügen (Solar-Web-Modus)</value>
+	  <value>Wechselrichterleistung zum Hausverbrauch hinzufügen (Solar-Web-Modus)</value>
   </data>
   <data name="Settings" xml:space="preserve">
 	  <value>Einstellungen</value>
@@ -1037,5 +1037,11 @@
   </data>
   <data name="FroniusManager" xml:space="preserve">
 	  <value>Fronius Gen24 Manager</value>
+  </data>
+  <data name="Options" xml:space="preserve">
+	  <value>Optionen</value>
+  </data>
+  <data name="User" xml:space="preserve">
+	  <value>Benutzer</value>
   </data>
 </root>

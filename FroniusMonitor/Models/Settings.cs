@@ -63,17 +63,4 @@ public class Settings : SettingsBase, ICloneable
         clone.FroniusConnection = (WebConnection)clone.FroniusConnection?.Clone()!;
         return clone;
     }
-
-    private static void UpdateChecksum(params WebConnection?[] connections)
-    {
-        connections.Where(connection => connection != null).Apply(connection =>
-        {
-            connection!.PasswordChecksum = connection.CalculatedChecksum;
-        });
-    }
-
-    private static void ClearIncorrectPasswords(params WebConnection?[] connections)
-    {
-        connections.Where(connection => connection != null && connection.PasswordChecksum != connection.CalculatedChecksum).Apply(connection => connection!.Password = string.Empty);
-    }
 }

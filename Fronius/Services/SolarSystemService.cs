@@ -84,6 +84,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         NotifyOfPropertyChange(nameof(DcPowerSum));
         NotifyOfPropertyChange(nameof(AcPowerSum));
         NotifyOfPropertyChange(nameof(PowerLossSum));
+        NotifyOfPropertyChange(nameof(PowerLossAvg));
         NotifyOfPropertyChange(nameof(Efficiency));
     }
 

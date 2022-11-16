@@ -1,12 +1,101 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             xmlns:viewModels="clr-namespace:FroniusPhone.ViewModels"
              x:Class="FroniusPhone.Pages.SettingsPage"
-             Title="Settings">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             Title="{x:Static p:Resources.Settings}"
+             x:DataType="viewModels:SettingsViewModel">
+    <ScrollView Margin="12">
+        <VerticalStackLayout>
+            <VerticalStackLayout.Resources>
+                <Style x:Key="All" TargetType="View">
+                    <Setter Property="Margin" Value="0,3"/>
+                    <Setter Property="VerticalOptions" Value="Center"/>
+                </Style>
+                <Style x:Key="LeftLabel" TargetType="Label" BasedOn="{StaticResource All}">
+                    <Setter Property="TextColor" Value="{AppThemeBinding Dark={StaticResource Gray200}, Light={StaticResource Gray600}}"/>
+                    <Setter Property="FontAttributes" Value="Italic"/>
+                    <Setter Property="Grid.Column" Value="0"/>
+                </Style>
+                <Style x:Key="Entry" TargetType="Entry" BasedOn="{StaticResource All}">
+                    <Setter Property="Grid.Column" Value="1"/>
+                    <Setter Property="IsSpellCheckEnabled" Value="False"/>
+                </Style>
+                <Style x:Key="Picker" TargetType="Entry" BasedOn="{StaticResource All}">
+                    <Setter Property="Grid.Column" Value="1"/>
+                </Style>
+                <Style TargetType="Label" x:Key="HeaderLabel">
+                    <Setter Property="FontSize" Value="16"/>
+                    <Setter Property="FontAttributes" Value="Bold"/>
+                    <Setter Property="Margin" Value="0,18,0,0"/>
+                </Style>
+                <Style TargetType="Rectangle" x:Key="Separator">
+                    <Setter Property="Margin" Value="0,4"/>
+                    <Setter Property="HorizontalOptions" Value="Fill"/>
+                    <Setter Property="HeightRequest" Value="2"/>
+                    <Setter Property="Fill" Value="{AppThemeBinding Dark=White, Light=Black}"/>
+                </Style>
+                <Style x:Key="SwitchLabel" TargetType="Label" BasedOn="{StaticResource All}">
+                    <Setter Property="Grid.Column" Value="0"/>
+                </Style>
+                <Style x:Key="Switch" TargetType="Switch" BasedOn="{StaticResource All}">
+                    <Setter Property="Grid.Column" Value="1"/>
+                </Style>
+            </VerticalStackLayout.Resources>
+
+            <Label Style="{StaticResource HeaderLabel}" Text="{x:Static p:Resources.Gen24InverterHeader}"/>
+            <Rectangle Style="{StaticResource Separator}"/>
+
+            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+                <Label Style="{StaticResource LeftLabel}" Grid.Row="0" Text="{x:Static p:Resources.Url}" />
+                <Entry Style="{StaticResource Entry}" Keyboard="Url" Grid.Row="0" Text="{Binding Settings.FroniusConnection.BaseUrl, FallbackValue='Error!'}" Placeholder="http://192.168.178.10"/>
+                <Label Style="{StaticResource LeftLabel}" Grid.Row="1" Text="{x:Static p:Resources.User}"/>
+                <Picker Style="{StaticResource Picker}" Grid.Row="1" ItemsSource="{Binding Gen24UserNames}" SelectedItem="{Binding Settings.FroniusConnection.UserName, FallbackValue='customer'}"/>
+                <Label Style="{StaticResource LeftLabel}" Grid.Row="2" Text="{x:Static p:Resources.Password}"/>
+                <Entry Style="{StaticResource Entry}" Grid.Row="2" Text="{Binding Settings.FroniusConnection.Password, FallbackValue='Error!'}" IsPassword="True"/>
+            </Grid>
+            <Grid ColumnDefinitions="Auto,*">
+                <Label Style="{StaticResource LeftLabel}" Text="{x:Static p:Resources.UpdateRate}"/>
+                <Picker Style="{StaticResource Picker}" ItemsSource="{Binding FroniusUpdateRates}" SelectedItem="{Binding Settings.FroniusUpdateRate}" HorizontalOptions="End"/>
+            </Grid>
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Style="{StaticResource SwitchLabel}" Text="{x:Static p:Resources.IncludeInverterPower}"/>
+                <Switch Style="{StaticResource Switch}" IsToggled="{Binding Settings.AddInverterPowerToConsumption}"/>
+            </Grid>
+
+            <Label Style="{StaticResource HeaderLabel}" Text="{x:Static p:Resources.WattPilotHeader}"/>
+            <Rectangle Style="{StaticResource Separator}"/>
+
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Style="{StaticResource SwitchLabel}" Text="{x:Static p:Resources.ControlWattPilot}"/>
+                <Switch Style="{StaticResource Switch}" IsToggled="{Binding Settings.HaveWattPilot}"/>
+            </Grid>
+
+            <Grid ColumnDefinitions="64,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" IsVisible="{Binding Settings.HaveWattPilot}">
+                <Label Style="{StaticResource LeftLabel}" Grid.Row="1" Text="{x:Static p:Resources.Url}" />
+                <Entry Style="{StaticResource Entry}" Grid.Row="1" Keyboard="Url" Text="{Binding Settings.WattPilotConnection.BaseUrl, FallbackValue='Error!'}" Placeholder="http://192.168.178.10"/>
+                <Label Style="{StaticResource LeftLabel}" Grid.Row="2" Text="{x:Static p:Resources.Password}"/>
+                <Entry Style="{StaticResource Entry}" Grid.Row="2" Text="{Binding Settings.WattPilotConnection.Password, FallbackValue='Error!'}" IsPassword="True"/>
+            </Grid>
+
+            <Label Style="{StaticResource HeaderLabel}" Text="{x:Static p:Resources.FritzBoxHeader}"/>
+            <Rectangle Style="{StaticResource Separator}"/>
+
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Style="{StaticResource SwitchLabel}" Text="{x:Static p:Resources.EnableFritzBox}"/>
+                <Switch Style="{StaticResource Switch}" IsToggled="{Binding Settings.HaveFritzBox}"/>
+            </Grid>
+
+            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" IsVisible="{Binding Settings.HaveFritzBox}">
+                <Label Style="{StaticResource LeftLabel}" Grid.Row="0" Text="{x:Static p:Resources.Url}"/>
+                <Entry Style="{StaticResource Entry}" Grid.Row="0" Keyboard="Url" Text="{Binding Settings.FritzBoxConnection.BaseUrl, FallbackValue='Error!'}" Placeholder="http://192.168.178.10"/>
+                <Label Style="{StaticResource LeftLabel}" Grid.Row="1" Text="{x:Static p:Resources.User}"/>
+                <Entry Style="{StaticResource Entry}" Grid.Row="1" Text="{Binding Settings.FritzBoxConnection.UserName, FallbackValue='Error!'}" Placeholder="FritzUser"/>
+                <Label Style="{StaticResource LeftLabel}" Grid.Row="2" Text="{x:Static p:Resources.Password}"/>
+                <Entry Style="{StaticResource Entry}" Grid.Row="2" Text="{Binding Settings.FritzBoxConnection.Password, FallbackValue='Error!'}" IsPassword="True"/>
+            </Grid>
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

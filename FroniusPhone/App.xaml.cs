@@ -5,17 +5,22 @@ namespace FroniusPhone
 {
     public partial class App
     {
-        private readonly SettingsBase settings;
+        private readonly Settings settings;
         private readonly ISolarSystemService solarSystemService;
         private readonly IAesKeyProvider aesKeyProvider;
+        private readonly AppShell shell;
 
-        public App(AppShell shell, SettingsBase settings, IAesKeyProvider aesKeyProvider, ISolarSystemService solarSystemService)
+        public static string PerUserDataDir => Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        public static string SettingsFileName => Path.Combine(PerUserDataDir, "Settings.fms");
+
+
+        public App(AppShell shell, Settings settings, IAesKeyProvider aesKeyProvider, ISolarSystemService solarSystemService)
         {
             this.settings = settings;
-            this.solarSystemService=solarSystemService;
-            this.aesKeyProvider= aesKeyProvider;
+            this.solarSystemService = solarSystemService;
+            this.aesKeyProvider = aesKeyProvider;
             InitializeComponent();
-            MainPage = shell;
+            MainPage = this.shell = shell;
         }
 
         protected override void OnHandlerChanged()
@@ -35,8 +40,16 @@ namespace FroniusPhone
             try
             {
                 WebConnection.Aes.Key = aesKeyProvider.GetAesKey();
-                settings.HaveWattPilot = true;
-                settings.FroniusUpdateRate = 1;
+
+                try
+                {
+                    await settings.LoadAsync().ConfigureAwait(false);
+                }
+                catch
+                {
+                    shell.NeedInitialSettings = true;
+                }
+
                 solarSystemService.FroniusUpdateRate = settings.FroniusUpdateRate;
                 await solarSystemService.Start(settings.FroniusConnection, settings.FritzBoxConnection, settings.WattPilotConnection);
             }
@@ -50,9 +63,9 @@ namespace FroniusPhone
         {
             try
             {
-                #if ANDROID || IOS
+#if ANDROID || IOS
                 solarSystemService.Stop();
-                #endif
+#endif
             }
             finally
             {
@@ -63,9 +76,9 @@ namespace FroniusPhone
         protected override async void OnResume()
         {
             base.OnResume();
-            #if ANDROID || IOS
+#if ANDROID || IOS
             await solarSystemService.Start(settings.FroniusConnection, settings.FritzBoxConnection, settings.WattPilotConnection);
-            #endif
+#endif
         }
     }
 }

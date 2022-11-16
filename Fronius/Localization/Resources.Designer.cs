@@ -1024,7 +1024,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Include inverter power (Solar web mode).
+        ///   Looks up a localized string similar to Include inverter power to load (Solar web mode).
         /// </summary>
         public static string IncludeInverterPower {
             get {
@@ -1915,6 +1915,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Options.
+        /// </summary>
+        public static string Options {
+            get {
+                return ResourceManager.GetString("Options", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Out of balance.
         /// </summary>
         public static string OutOfBalance {
@@ -2784,6 +2793,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string UseManufacturerDefaults {
             get {
                 return ResourceManager.GetString("UseManufacturerDefaults", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User.
+        /// </summary>
+        public static string User {
+            get {
+                return ResourceManager.GetString("User", resourceCulture);
             }
         }
         

@@ -15,7 +15,8 @@
                 <Label Grid.Column="1"
                        Text="{Binding Title}" FontSize="16"
                        TextColor="Black" FontAttributes="Bold"
-                       VerticalTextAlignment="Center" />
+                       HorizontalOptions="Start"
+                       />
             </Grid>
         </DataTemplate>
     </Shell.ItemTemplate>
@@ -23,7 +24,7 @@
     <ShellContent Title="{x:Static p:Resources.FroniusManager}"
                   ContentTemplate="{DataTemplate pages:Overview}"
                   Route="app" />
-    <ShellContent Title="Settings"
+    <ShellContent Title="{x:Static p:Resources.Settings}"
                   ContentTemplate="{DataTemplate pages:SettingsPage}"
                   Route="settings" />
 

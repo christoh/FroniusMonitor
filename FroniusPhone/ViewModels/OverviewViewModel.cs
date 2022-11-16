@@ -1,10 +1,11 @@
 ﻿namespace FroniusPhone.ViewModels;
 
-public class OverviewViewModel : BindableBase
+public class OverviewViewModel : ViewModelBase
 {
-    public OverviewViewModel(ISolarSystemService solarSystemService)
+    public OverviewViewModel(ISolarSystemService solarSystemService, Settings settings)
     {
         this.solarSystemService = solarSystemService;
+        this.settings = settings;
     }
 
     private ISolarSystemService solarSystemService;
@@ -13,5 +14,13 @@ public class OverviewViewModel : BindableBase
     {
         get => solarSystemService;
         set => Set(ref solarSystemService, value);
+    }
+
+    private Settings settings;
+
+    public Settings Settings
+    {
+        get => settings;
+        set => Set(ref settings, value);
     }
 }

@@ -29,12 +29,13 @@ public static class MauiProgram
             .AddSingleton<ISolarSystemService, SolarSystemService>()
             .AddSingleton<IAesKeyProvider, AesKeyProvider>()
             .AddSingleton<IWattPilotService, WattPilotService>()
-            .AddSingleton<SettingsBase, Settings>()
+            .AddSingleton<Settings>()
             .AddSingleton<IGen24JsonService, Gen24JsonService>()
             .AddSingleton<AppShell>()
             .AddSingleton<Overview>()
             .AddSingleton<OverviewViewModel>()
             .AddSingleton<SettingsPage>()
+            .AddSingleton<SettingsViewModel>()
             ;
 
         return builder;

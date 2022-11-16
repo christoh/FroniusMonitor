@@ -6,6 +6,7 @@ public partial class Overview
     {
         BindingContext = ViewModel = viewModel;
         InitializeComponent();
+        HandlerChanged += (_, _) => viewModel.Dispatcher = Dispatcher;
     }
 
     public OverviewViewModel ViewModel { get; set; }
