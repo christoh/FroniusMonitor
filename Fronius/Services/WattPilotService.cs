@@ -11,6 +11,7 @@ public class WattPilotService : BindableBase, IWattPilotService
     private readonly byte[] buffer = new byte[8192];
     private string? hashedPassword;
     private string? oldEncryptedPassword;
+    private WattPilot? savedWattPilot;
 
     private CancellationToken Token => tokenSource?.Token ?? throw new WebSocketException(WebSocketError.ConnectionClosedPrematurely);
 
@@ -63,6 +64,7 @@ public class WattPilotService : BindableBase, IWattPilotService
             tokenSource?.Dispose();
             tokenSource = new CancellationTokenSource(10000);
             Connection = connection;
+
             clientWebSocket = new ClientWebSocket();
             clientWebSocket.Options.KeepAliveInterval = TimeSpan.FromMinutes(2);
             clientWebSocket.Options.DangerousDeflateOptions = new WebSocketDeflateOptions();
@@ -75,43 +77,55 @@ public class WattPilotService : BindableBase, IWattPilotService
             var token = JObject.Parse(hello);
             var type = token["type"]?.Value<string>();
 
-            if (type != "hello")
+            if (type == "deltaStatus" && savedWattPilot != null)
             {
-                throw new InvalidDataException("WattPilot did not greet with 'hello'");
+                WattPilot = savedWattPilot;
+                UpdateWattPilot(WattPilot, token["status"] as JObject);
             }
-
-            WattPilot = WattPilot.Parse(token);
-
-            result = await clientWebSocket.ReceiveAsync(buffer, Token).ConfigureAwait(false);
-            Token.ThrowIfCancellationRequested();
-            var auth = Encoding.UTF8.GetString(buffer, 0, result.Count);
-            token = JObject.Parse(auth);
-            type = token["type"]?.Value<string>();
-            var haveData = true;
-
-            if (type == "authRequired")
+            else
             {
-                await Authenticate(token).ConfigureAwait(false);
-                haveData = false;
-            }
-
-            JObject? dataToken;
-            string? dataType;
-
-            do
-            {
-                if (!haveData) result = await clientWebSocket.ReceiveAsync(buffer, Token).ConfigureAwait(false);
-                Token.ThrowIfCancellationRequested();
-                dataToken = JObject.Parse(Encoding.UTF8.GetString(buffer, 0, result.Count));
-                dataType = dataToken["type"]?.Value<string>();
-
-                if (dataType == "fullStatus")
+                if (type != "hello")
                 {
-                    UpdateWattPilot(WattPilot!, dataToken["status"] as JObject);
+                    await Task.Delay(5000, Token).ConfigureAwait(false);
+                    throw new InvalidDataException("WattPilot did not greet with 'hello'");
                 }
 
-                haveData = false;
-            } while (dataType != "fullStatus" || dataToken["partial"]?.Value<bool>() is true);
+                WattPilot = WattPilot.Parse(token);
+                savedWattPilot = null;
+
+                result = await clientWebSocket.ReceiveAsync(buffer, Token).ConfigureAwait(false);
+                Token.ThrowIfCancellationRequested();
+                var auth = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                token = JObject.Parse(auth);
+                type = token["type"]?.Value<string>();
+                var haveData = true;
+
+                if (type == "authRequired")
+                {
+                    await Authenticate(token).ConfigureAwait(false);
+                    haveData = false;
+                }
+
+                while (true)
+                {
+                    if (!haveData) result = await clientWebSocket.ReceiveAsync(buffer, Token).ConfigureAwait(false);
+                    Token.ThrowIfCancellationRequested();
+                    var dataToken = JObject.Parse(Encoding.UTF8.GetString(buffer, 0, result.Count));
+                    var dataType = dataToken["type"]?.Value<string>();
+
+                    if (dataType is "fullStatus" or "deltaStatus")
+                    {
+                        UpdateWattPilot(WattPilot!, dataToken["status"] as JObject);
+                    }
+
+                    if (dataType == "fullStatus" && !dataToken["partial"]!.Value<bool>())
+                    {
+                        break;
+                    }
+
+                    haveData = false;
+                }
+            }
 
             tokenSource?.Dispose();
             tokenSource = new CancellationTokenSource();
@@ -122,6 +136,19 @@ public class WattPilotService : BindableBase, IWattPilotService
         {
             tokenSource?.Dispose();
             tokenSource = null;
+
+            if (clientWebSocket != null)
+            {
+                try
+                {
+                    await clientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Good bye", CancellationToken.None).ConfigureAwait(false);
+                }
+                catch
+                {
+                    //
+                }
+            }
+
             clientWebSocket?.Dispose();
             clientWebSocket = null;
             WattPilot = null;
@@ -188,11 +215,10 @@ public class WattPilotService : BindableBase, IWattPilotService
 
         var hash = await Task.Run(() =>
         {
-            using var sha256 = SHA256.Create();
             var hash1Input = Encoding.UTF8.GetBytes(token1 + localHashedPassword);
-            var hash1 = string.Join(string.Empty, sha256.ComputeHash(hash1Input, 0, hash1Input.Length).Select(b => b.ToString("x2")));
+            var hash1 = string.Join(string.Empty, SHA256.HashData(hash1Input).Select(b => b.ToString("x2")));
             var hashInput = Encoding.UTF8.GetBytes(token3 + token2 + hash1);
-            return string.Join(string.Empty, sha256.ComputeHash(hashInput, 0, hashInput.Length).Select(b => b.ToString("x2")));
+            return string.Join(string.Empty, SHA256.HashData(hashInput).Select(b => b.ToString("x2")));
         }, Token).ConfigureAwait(false);
 
         Token.ThrowIfCancellationRequested();
@@ -605,8 +631,22 @@ public class WattPilotService : BindableBase, IWattPilotService
         {
             tokenSource?.Dispose();
             tokenSource = null;
+
+            if (clientWebSocket != null)
+            {
+                try
+                {
+                    await clientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Good bye", CancellationToken.None).ConfigureAwait(false);
+                }
+                catch
+                {
+                    //
+                }
+            }
+
             clientWebSocket?.Dispose();
             clientWebSocket = null;
+            savedWattPilot = WattPilot;
             WattPilot = null;
             readThread = null;
             Connection = null;
