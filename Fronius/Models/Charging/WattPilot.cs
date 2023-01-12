@@ -163,6 +163,14 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         });
     }
 
+    private WifiScanStatus wifiScanStatus;
+    [WattPilot("scas")]
+    public WifiScanStatus WifiScanStatus
+    {
+        get => wifiScanStatus;
+        set => Set(ref wifiScanStatus, value);
+    }
+
     private List<WattPilotWifiInfo>? scannedWifis;
     [WattPilot("scan")]
     public List<WattPilotWifiInfo>? ScannedWifis

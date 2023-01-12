@@ -29,6 +29,14 @@ public enum ModelStatus
     NotChargingBecauseMinPauseDuration = 24
 }
 
+public enum WifiScanStatus
+{
+    None=0,
+    Scanning=1,
+    Finished=2,
+    Failed=3,
+}
+
 public enum CableLockBehavior
 {
     Normal = 0,
