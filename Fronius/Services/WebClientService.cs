@@ -542,13 +542,11 @@ public class WebClientService : BindableBase, IWebClientService
 
             var requestString = $"{FritzBoxConnection.BaseUrl}/{request}{(fritzBoxSid == null || request.StartsWith("login_sid.lua") ? string.Empty : $"&sid={fritzBoxSid}")}";
 
-            HttpClientHandler handler = new HttpClientHandler();
-            handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
-            {
-                return true;
-            };
-            
-            using var client = new HttpClient(handler);
+            using var client = new HttpClient
+            (
+                new HttpClientHandler { ServerCertificateCustomValidationCallback = (_, _, _, _) => true, }
+            );
+
             // ReSharper disable once PossibleMultipleEnumeration
             response = postVariables == null ? await client.GetAsync(requestString).ConfigureAwait(false) : await client.PostAsync(requestString, new FormUrlEncodedContent(postVariables)).ConfigureAwait(false);
 
