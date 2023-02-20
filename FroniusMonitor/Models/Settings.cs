@@ -41,7 +41,7 @@ public class Settings : SettingsBase, ICloneable
         {
             try
             {
-                App.SolarSystemQueryTimer = new(_ => { Environment.Exit(0); }, null, 2000, -1);
+                App.SolarSystemQueryTimer = new(_ => { Environment.Exit(0); }, null, 10000, -1);
                 var serializer = new XmlSerializer(typeof(Settings));
                 using var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
                 App.Settings = serializer.Deserialize(stream) as Settings ?? new Settings();
