@@ -299,7 +299,7 @@ public class WebClientService : BindableBase, IWebClientService
         return GetCategoryKeyString(localEventToken, invariantEventToken, "StateCodes", code);
     }
 
-    private string GetCategoryKeyString(JObject? localToken, JObject? invariantToken, string category, string key)
+    private static string GetCategoryKeyString(JObject? localToken, JObject? invariantToken, string category, string key)
     {
         return localToken?[category]?[key]?.Value<string>() ?? invariantToken?[category]?[key]?.Value<string>() ?? $"{(category != "StateCodes" ? $"{category}." : string.Empty)}{key}";
     }
@@ -437,16 +437,9 @@ public class WebClientService : BindableBase, IWebClientService
         }
 
         var document = await GetXmlResponse("login_sid.lua");
-        var challenge = document.SelectSingleNode("/SessionInfo/Challenge")?.InnerText;
-
-        if (challenge == null)
-        {
-            throw new InvalidDataException("FritzBox did not supply challenge");
-        }
-
-        var md5 = MD5.Create();
+        var challenge = document.SelectSingleNode("/SessionInfo/Challenge")?.InnerText ?? throw new InvalidDataException("FritzBox did not supply challenge");
         var text = challenge + "-" + FritzBoxConnection.Password;
-        var response = challenge + "-" + md5.ComputeHash(Encoding.Unicode.GetBytes(text)).Aggregate("", (current, next) => $"{current}{next:x2}");
+        var response = challenge + "-" + MD5.HashData(Encoding.Unicode.GetBytes(text)).Aggregate("", (current, next) => $"{current}{next:x2}");
 
         var dict = new Dictionary<string, string>
         {
@@ -570,11 +563,13 @@ public class WebClientService : BindableBase, IWebClientService
     }
 
     [SuppressMessage("ReSharper", "UnusedMember.Local")]
+#pragma warning disable IDE0051
     private async Task<string> GetStringResponse(string request)
     {
         var response = await GetFritzBoxResponse(request).ConfigureAwait(false);
         return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
     }
+#pragma warning restore IDE0051
 
     private async Task<XmlDocument> GetXmlResponse(string request, IEnumerable<KeyValuePair<string, string>>? postVariables = null)
     {

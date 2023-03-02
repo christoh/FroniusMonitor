@@ -2,7 +2,7 @@
 
 public partial class PowerConsumer
 {
-    private static readonly ISolarSystemService solarSystemService = IoC.TryGet<ISolarSystemService>();
+    private static readonly ISolarSystemService solarSystemService = IoC.TryGet<ISolarSystemService>()!;
 
     #region Dependency Properties
 

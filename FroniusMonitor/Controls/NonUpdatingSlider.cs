@@ -3,7 +3,7 @@
 public class NonUpdatingSlider : Slider
 {
     public event EventHandler<RoutedPropertyChangedEventArgs<double>>? ThumbDragCompleted;
-    private static readonly ISolarSystemService solarSystemService = IoC.TryGet<ISolarSystemService>();
+    private static readonly ISolarSystemService solarSystemService = IoC.TryGet<ISolarSystemService>()!;
 
     protected override void OnThumbDragStarted(DragStartedEventArgs e)
     {
