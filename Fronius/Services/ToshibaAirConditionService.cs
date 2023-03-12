@@ -1,10 +1,9 @@
-﻿// ReSharper disable once RedundantUsingDirective
-
-using System.Net.Http.Headers;
-using System.Text.Json;
+﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
 using De.Hochstaetter.Fronius.Models.JsonConverters;
 using De.Hochstaetter.Fronius.Models.ToshibaAc;
+using Microsoft.Azure.Devices.Client;
 
 namespace De.Hochstaetter.Fronius.Services;
 
@@ -13,7 +12,7 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
     private ToshibaAcSession? session;
     private static readonly JsonSerializerOptions jsonOptions = new(JsonSerializerDefaults.Web);
     private CancellationTokenSource? tokenSource;
-    private event EventHandler<ToshibaAcDataReceivedEventArgs>? NewDataReceived;
+    private DeviceClient? azureClient;
 
     static ToshibaAirConditionService()
     {
@@ -46,8 +45,12 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
     public void Stop()
     {
         tokenSource?.Cancel();
+        azureClient?.Dispose();
+        tokenSource = null;
+        azureClient = null;
     }
 
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public async ValueTask Start()
     {
         var settings = Settings;
@@ -59,44 +62,71 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
 
         Stop();
 
-        tokenSource = new CancellationTokenSource();
-
-        session = await GetJsonResult<ToshibaAcSession>("/api/Consumer/Login", new Dictionary<string, string>
+        try
         {
-            {"Username", settings.ToshibaAcConnection.UserName},
-            {"Password", settings.ToshibaAcConnection.Password},
-        }).ConfigureAwait(false);
+            tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
 
-        new Thread(UpdateThread).Start();
+            var postData = new Dictionary<string, string>
+            {
+                { "Username", settings.ToshibaAcConnection.UserName },
+                { "Password", settings.ToshibaAcConnection.Password },
+            };
+
+            session = await Deserialize<ToshibaAcSession>("/api/Consumer/Login", postData).ConfigureAwait(false)
+                      ?? throw new WebException("No session data received", WebExceptionStatus.ReceiveFailure);
+
+            postData = new Dictionary<string, string>
+            {
+                { "DeviceID", settings.ToshibaAcConnection.UserName + ":" + session.ConsumerId.ToString("D") },
+                { "DeviceType", "1" },
+                { "Username", settings.ToshibaAcConnection!.UserName },
+            };
+
+            var azureCredentials = await Deserialize<ToshibaAcAzureCredentials>("/api/Consumer/RegisterMobileDevice", postData).ConfigureAwait(false);
+            AllDevices = await Deserialize<ObservableCollection<ToshibaAcMapping>>($"/api/AC/GetConsumerACMapping?consumerId={session.ConsumerId}").ConfigureAwait(false);
+
+            var auth = AuthenticationMethodFactory.CreateAuthenticationWithToken(azureCredentials.DeviceId, azureCredentials.SasToken);
+            azureClient = DeviceClient.Create(azureCredentials.HostName, auth, TransportType.Amqp_WebSocket_Only);
+            await azureClient.OpenAsync(Token).ConfigureAwait(false);
+            await azureClient.SetMethodHandlerAsync("smmobile", HandleSmMobileMethod, null, Token).ConfigureAwait(false);
+        }
+        finally
+        {
+            tokenSource?.Dispose();
+            tokenSource = new CancellationTokenSource();
+        }
     }
 
-    private async void UpdateThread()
+    private Task<MethodResponse> HandleSmMobileMethod(MethodRequest request, object _) => Task.Run(() =>
     {
         try
         {
-            while (true)
+            var command = JsonSerializer.Deserialize<ToshibaAcAzureSmMobileCommand>(request.Data, jsonOptions);
+
+            switch (command?.CommandName)
             {
-                var settings = IoC.Get<SettingsBase>();
+                case "CMD_FCU_FROM_AC":
+                    var stateData = command.PayLoad.EnumerateObject().First(o => o.Name == "data").Value.Deserialize<ToshibaAcStateData>(jsonOptions);
 
-                if (!settings.HaveToshibaAc || !settings.ShowToshibaAc)
-                {
-                    tokenSource?.Cancel();
-                }
+                    if (stateData == null)
+                    {
+                        break;
+                    }
 
-                AllDevices = await GetJsonResult<ObservableCollection<ToshibaAcMapping>>($"/api/AC/GetConsumerACMapping?consumerId={session!.ConsumerId}").ConfigureAwait(false);
-                //var supi = await GetJsonResult<ToshibaAcStatusDevice>($"/api/AC/GetCurrentACState?ACId={AllDevices[0].Devices[0].AcId}").ConfigureAwait(false);
-                NewDataReceived?.Invoke(this, new ToshibaAcDataReceivedEventArgs(AllDevices));
-                await Task.Delay(TimeSpan.FromSeconds(settings.ToshibaAcUpdateRate), Token).ConfigureAwait(false);
+                    var device = AllDevices!.SelectMany(d => d.Devices).First(d => d.DeviceUniqueId == command.DeviceUniqueId);
+                    device.State.UpdateStateData(stateData);
+                    break;
             }
         }
         catch
         {
-            tokenSource?.Dispose();
-            tokenSource = null;
+            return new MethodResponse(1);
         }
-    }
 
-    private async ValueTask<T> GetJsonResult<T>(string uri, IEnumerable<KeyValuePair<string, string>>? postVariables = null) where T : new()
+        return new MethodResponse(0);
+    }, Token);
+
+    private async ValueTask<T> Deserialize<T>(string uri, IEnumerable<KeyValuePair<string, string>>? postVariables = null) where T : new()
     {
         var settings = IoC.Get<SettingsBase>();
 
@@ -121,14 +151,17 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
         }
 
         using var response = (await client.SendAsync(message, Token).ConfigureAwait(false)).EnsureSuccessStatusCode();
-        #if DEBUG
+
+        #if xDEBUG // This allows you to see the raw JSON string
+        
         var jsonText = await response.Content.ReadAsStringAsync(Token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
         var jDocument = JsonDocument.Parse(jsonText);
-        Token.ThrowIfCancellationRequested();
         var result = jDocument.Deserialize<ToshibaAcResponse<T>>(jsonOptions) ?? throw new InvalidDataException("No data");
-        Token.ThrowIfCancellationRequested();
+        
         #else
+        
         var result = await response.Content.ReadFromJsonAsync<ToshibaAcResponse<T>>(jsonOptions, Token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
+        
         #endif
 
         if (!result.IsSuccess)
