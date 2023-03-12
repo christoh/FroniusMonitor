@@ -98,7 +98,12 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
     private async ValueTask<T> GetJsonResult<T>(string uri, IEnumerable<KeyValuePair<string, string>>? postVariables = null) where T : new()
     {
         var settings = IoC.Get<SettingsBase>();
-        EnsureConnectionParameters(settings);
+
+        if (!settings.HaveToshibaAc || settings.ToshibaAcConnection == null)
+        {
+            throw new InvalidDataException("No active Toshiba connection");
+        }
+        
         using var client = new HttpClient();
         client.BaseAddress = new Uri(settings.ToshibaAcConnection!.BaseUrl);
 
@@ -131,13 +136,5 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
         }
 
         return result.Data;
-    }
-
-    private static void EnsureConnectionParameters(SettingsBase settings)
-    {
-        if (!settings.HaveToshibaAc || settings.ToshibaAcConnection == null)
-        {
-            throw new InvalidDataException("No active Toshiba connection");
-        }
     }
 }
