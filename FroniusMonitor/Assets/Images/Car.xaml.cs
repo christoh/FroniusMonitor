@@ -4,7 +4,7 @@ namespace De.Hochstaetter.FroniusMonitor.Assets.Images;
 
 public partial class Car
 {
-    private readonly ColorAnimation animation=new ColorAnimation(Colors.Transparent,Colors.Transparent,TimeSpan.FromSeconds(2)){AutoReverse = true, RepeatBehavior = RepeatBehavior.Forever, AccelerationRatio = .25, DecelerationRatio = .25};
+    private readonly ColorAnimation animation=new(Colors.Transparent,Colors.Transparent,TimeSpan.FromSeconds(2)){AutoReverse = true, RepeatBehavior = RepeatBehavior.Forever, AccelerationRatio = .25, DecelerationRatio = .25};
 
     public static readonly DependencyProperty StatusProperty = DependencyProperty.Register
     (

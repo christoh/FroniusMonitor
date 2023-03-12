@@ -43,17 +43,24 @@
             set => SetStateData(3, (byte)value);
         }
 
-        public ToshibaPowerLimit PowerLimit
+        public byte PowerLimit
         {
-            get => (ToshibaPowerLimit)StateData[5];
-            set => SetStateData(5, (byte)value);
+            get => StateData[5];
+            set => SetStateData(5, value);
         }
 
-        public sbyte CurrentIndoorTemperatureCelsius => unchecked((sbyte)StateData[8]);
+        public ToshibaAcPowerSetting PowerSetting
+        {
+            get => (ToshibaAcPowerSetting)StateData[6];
+            set => SetStateData(6, (byte)value);
+        }
 
-        public sbyte CurrentOutdoorTemperatureCelsius => unchecked((sbyte)StateData[9]);
+        public sbyte? CurrentIndoorTemperatureCelsius => unchecked(StateData[8] == 127 ? null : (sbyte)StateData[8]);
+
+        public sbyte? CurrentOutdoorTemperatureCelsius => unchecked(StateData[9] == 127 ? null : (sbyte)StateData[9]);
 
         public override string ToString() => StateData.Aggregate(new StringBuilder(), (c, n) => c.Append($"{n:x2}")).ToString();
+
 
         private void SetStateData(int index, byte value, [CallerMemberName] string? propertyName = null)
         {

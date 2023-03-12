@@ -10,7 +10,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
     private int updateSemaphore;
     private int fritzBoxCounter, froniusCounter;
     private int suspendFritzBoxCounter;
-    private int QueueSize => 1;
+    private static int QueueSize => 1;
     private const int FritzBoxUpdateRate = 3;
 
     public event EventHandler<SolarDataEventArgs>? NewDataReceived;

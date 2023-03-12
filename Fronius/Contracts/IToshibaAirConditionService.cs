@@ -8,6 +8,6 @@ namespace De.Hochstaetter.Fronius.Contracts
         public void Stop();
         public bool IsRunning { get; }
         public ObservableCollection<ToshibaAcMapping>? AllDevices { get; }
-        public SettingsBase Settings { get; set; }
+        public SettingsBase Settings { get; }
     }
 }

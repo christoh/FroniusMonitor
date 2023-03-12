@@ -1050,4 +1050,7 @@
   <data name="EnableToshibaAc" xml:space="preserve">
 	  <value>Toshiba-Klimaanlagen steuern</value>
   </data>
+  <data name="ToshibaAc" xml:space="preserve">
+	  <value>Toshiba Klima</value>
+  </data>
 </root>

@@ -2725,6 +2725,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Toshiba A/C.
+        /// </summary>
+        public static string ToshibaAc {
+            get {
+                return ResourceManager.GetString("ToshibaAc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Toshiba Air Condition.
         /// </summary>
         public static string ToshibaAcHeader {

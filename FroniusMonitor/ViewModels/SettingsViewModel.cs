@@ -14,16 +14,20 @@ public class SettingsViewModel : SettingsViewModelBase
     };
 
     private readonly ISolarSystemService solarSystemService;
+    private readonly IUnityContainer container;
+
 
     public SettingsViewModel
     (
         IWebClientService webClientService,
         IGen24JsonService gen24Service,
         IWattPilotService wattPilotService,
-        ISolarSystemService solarSystemService
+        ISolarSystemService solarSystemService,
+        IUnityContainer container
     ) : base(webClientService, gen24Service, wattPilotService)
     {
         this.solarSystemService = solarSystemService;
+        this.container = container;
     }
 
     private ICommand? okCommand;
@@ -104,7 +108,7 @@ public class SettingsViewModel : SettingsViewModelBase
         WebClientService.FritzBoxConnection = Settings is { HaveFritzBox: true, ShowFritzBox: true } ? Settings.FritzBoxConnection : null;
         WebClientService.InverterConnection = Settings.FroniusConnection;
         solarSystemService.FroniusUpdateRate = Settings.FroniusUpdateRate;
-        solarSystemService.AcService.Settings = Settings;
+        container.RegisterInstance<SettingsBase>(Settings);
 
         if (!Settings.HaveWattPilot || !Settings.ShowWattPilot)
         {
