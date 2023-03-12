@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.Fronius.Services;
+﻿using De.Hochstaetter.Fronius.Models.ToshibaAc;
+
+namespace De.Hochstaetter.Fronius.Services;
 
 public class SolarSystemService : BindableBase, ISolarSystemService
 {
@@ -13,12 +15,15 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
     public event EventHandler<SolarDataEventArgs>? NewDataReceived;
 
-    public SolarSystemService(IWebClientService webClientService, IWattPilotService wattPilotService)
+    public SolarSystemService(IWebClientService webClientService, IWattPilotService wattPilotService, IToshibaAirConditionService acService)
     {
         this.webClientService = webClientService;
         this.wattPilotService = wattPilotService;
+        AcService = acService;
         PowerFlowQueue = new Queue<Gen24PowerFlow>(QueueSize + 1);
     }
+
+    public IToshibaAirConditionService AcService { get; }
 
     private SolarSystem? solarSystem;
 
@@ -150,11 +155,12 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
         var fritzBoxTask = TryGetFritzBoxData();
         var wattPilotTask = TryStartWattPilot();
+        var toshibaAcTask = TryStartToshibaAc();
         var inverterTask = GetInverterDataFromSolarApi();
 
         try
         {
-            await Task.Run(() => Task.WaitAll(fritzBoxTask, wattPilotTask, inverterTask)).ConfigureAwait(false);
+            await Task.Run(() => Task.WaitAll(fritzBoxTask, wattPilotTask, inverterTask, toshibaAcTask)).ConfigureAwait(false);
         }
         catch (AggregateException)
         {
@@ -250,6 +256,14 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         return wattPilotService.WattPilot;
     }
 
+    private async Task TryStartToshibaAc()
+    {
+        if (!AcService.IsRunning)
+        {
+            await AcService.Start().ConfigureAwait(false);
+        }
+    }
+
     private async Task<Gen24System?> TryGetGen24System()
     {
         try
@@ -289,9 +303,11 @@ public class SolarSystemService : BindableBase, ISolarSystemService
                                    fritzBoxCounter++ % FritzBoxUpdateRate == 0 ? TryGetFritzBoxData() : Task.FromResult<FritzBoxDeviceList?>(null);
                 var wattPilotTask = TryStartWattPilot();
 
+                var toshibaAcTask = TryStartToshibaAc();
+
                 try
                 {
-                    Task.WaitAll(gen24Task, fritzBoxTask, wattPilotTask);
+                    Task.WaitAll(gen24Task, fritzBoxTask, wattPilotTask, toshibaAcTask);
                 }
                 catch (AggregateException)
                 {

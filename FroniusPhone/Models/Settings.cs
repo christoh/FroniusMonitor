@@ -29,7 +29,7 @@ namespace FroniusPhone.Models
             }
 
             fileName ??= App.SettingsFileName;
-            UpdateChecksum(WattPilotConnection, FritzBoxConnection, FroniusConnection);
+            UpdateChecksum(WattPilotConnection, FritzBoxConnection, FroniusConnection, ToshibaAcConnection);
             var serializer = new XmlSerializer(typeof(Settings));
             using var stream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None);
 

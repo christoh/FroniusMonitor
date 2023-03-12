@@ -1044,4 +1044,10 @@
   <data name="User" xml:space="preserve">
 	  <value>Benutzer</value>
   </data>
+  <data name="ToshibaAcHeader" xml:space="preserve">
+	  <value>Toshiba Klimaanlagen</value>
+  </data>
+  <data name="EnableToshibaAc" xml:space="preserve">
+	  <value>Toshiba-Klimaanlagen steuern</value>
+  </data>
 </root>

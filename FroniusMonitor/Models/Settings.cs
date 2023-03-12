@@ -18,7 +18,7 @@ public class Settings : SettingsBase, ICloneable
     {
         lock (settingsLockObject)
         {
-            UpdateChecksum(App.Settings.WattPilotConnection, App.Settings.FritzBoxConnection, App.Settings.FroniusConnection);
+            UpdateChecksum(App.Settings.WattPilotConnection, App.Settings.FritzBoxConnection, App.Settings.FroniusConnection, App.Settings.ToshibaAcConnection);
             var serializer = new XmlSerializer(typeof(Settings));
             Directory.CreateDirectory(App.PerUserDataDir);
             using var stream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None);
