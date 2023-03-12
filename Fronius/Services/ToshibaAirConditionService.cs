@@ -1,4 +1,5 @@
 ﻿// ReSharper disable once RedundantUsingDirective
+
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Net.Http.Json;
@@ -51,7 +52,7 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
     {
         var settings = Settings;
 
-        if (!settings.HaveToshibaAc||!settings.ShowToshibaAc || settings.ToshibaAcConnection == null)
+        if (!settings.HaveToshibaAc || !settings.ShowToshibaAc || settings.ToshibaAcConnection == null)
         {
             return;
         }
@@ -103,7 +104,7 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
         {
             throw new InvalidDataException("No active Toshiba connection");
         }
-        
+
         using var client = new HttpClient();
         client.BaseAddress = new Uri(settings.ToshibaAcConnection!.BaseUrl);
 

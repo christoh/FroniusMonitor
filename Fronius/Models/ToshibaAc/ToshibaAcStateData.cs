@@ -16,6 +16,7 @@
                 NotifyOfPropertyChange(nameof(PowerLimit));
                 NotifyOfPropertyChange(nameof(CurrentIndoorTemperatureCelsius));
                 NotifyOfPropertyChange(nameof(CurrentOutdoorTemperatureCelsius));
+                NotifyOfPropertyChange(nameof(PowerSetting));
             });
         }
 
@@ -60,7 +61,6 @@
         public sbyte? CurrentOutdoorTemperatureCelsius => unchecked(StateData[9] == 127 ? null : (sbyte)StateData[9]);
 
         public override string ToString() => StateData.Aggregate(new StringBuilder(), (c, n) => c.Append($"{n:x2}")).ToString();
-
 
         private void SetStateData(int index, byte value, [CallerMemberName] string? propertyName = null)
         {
