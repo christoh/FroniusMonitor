@@ -300,4 +300,9 @@ public partial class MainWindow
             ViewModel.WattPilotVisibilityChanged(showAvm.IsChecked);
         }
     }
+
+    private async void SaveSettings(object sender, RoutedEventArgs e)
+    {
+        await Settings.Save().ConfigureAwait(false);
+    }
 }

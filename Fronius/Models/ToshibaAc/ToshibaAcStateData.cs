@@ -7,17 +7,7 @@
         public IList<byte> StateData
         {
             get => stateData;
-            set => Set(ref stateData, value, () =>
-            {
-                NotifyOfPropertyChange(nameof(ToshibaAcOperatingMode));
-                NotifyOfPropertyChange(nameof(IsTurnedOn));
-                NotifyOfPropertyChange(nameof(TargetTemperatureCelsius));
-                NotifyOfPropertyChange(nameof(FanSpeed));
-                NotifyOfPropertyChange(nameof(PowerLimit));
-                NotifyOfPropertyChange(nameof(CurrentIndoorTemperatureCelsius));
-                NotifyOfPropertyChange(nameof(CurrentOutdoorTemperatureCelsius));
-                NotifyOfPropertyChange(nameof(PowerSetting));
-            });
+            set => Set(ref stateData, value, NotifyStateDataProperties);
         }
 
         public bool IsTurnedOn
@@ -61,6 +51,32 @@
         public sbyte? CurrentOutdoorTemperatureCelsius => unchecked(StateData[9] == 127 ? null : (sbyte)StateData[9]);
 
         public override string ToString() => StateData.Aggregate(new StringBuilder(), (c, n) => c.Append($"{n:x2}")).ToString();
+
+        internal void UpdateStateData(ToshibaAcStateData update)
+        {
+            for (var i = 0; i < Math.Min(update.StateData.Count, StateData.Count); i++)
+            {
+                if (update.StateData[i] != 255)
+                {
+                    StateData[i] = update.StateData[i];
+                }
+            }
+
+            NotifyStateDataProperties();
+        }
+
+        private void NotifyStateDataProperties()
+        {
+            NotifyOfPropertyChange(nameof(ToshibaAcOperatingMode));
+            NotifyOfPropertyChange(nameof(IsTurnedOn));
+            NotifyOfPropertyChange(nameof(TargetTemperatureCelsius));
+            NotifyOfPropertyChange(nameof(FanSpeed));
+            NotifyOfPropertyChange(nameof(Mode));
+            NotifyOfPropertyChange(nameof(PowerLimit));
+            NotifyOfPropertyChange(nameof(CurrentIndoorTemperatureCelsius));
+            NotifyOfPropertyChange(nameof(CurrentOutdoorTemperatureCelsius));
+            NotifyOfPropertyChange(nameof(PowerSetting));
+        }
 
         private void SetStateData(int index, byte value, [CallerMemberName] string? propertyName = null)
         {
