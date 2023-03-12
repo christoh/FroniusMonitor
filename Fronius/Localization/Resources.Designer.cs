@@ -781,6 +781,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Control Toshiba A/C systems.
+        /// </summary>
+        public static string EnableToshibaAc {
+            get {
+                return ResourceManager.GetString("EnableToshibaAc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to End.
         /// </summary>
         public static string End {
@@ -2712,6 +2721,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Thursday_One {
             get {
                 return ResourceManager.GetString("Thursday_One", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Toshiba Air Condition.
+        /// </summary>
+        public static string ToshibaAcHeader {
+            get {
+                return ResourceManager.GetString("ToshibaAcHeader", resourceCulture);
             }
         }
         

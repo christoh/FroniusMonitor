@@ -317,26 +317,9 @@ public class WattPilotService : BindableBase, IWattPilotService
     public async ValueTask SendValue(WattPilot instance, string propertyName)
     {
         var instanceType = instance.GetType();
-        var propertyInfo = instanceType.GetProperty(propertyName);
-
-        if (propertyInfo == null)
-        {
-            throw new ArgumentException(string.Format(Resources.NotAMemberOf, instanceType.Name), propertyName);
-        }
-
-        var attribute = propertyInfo.GetCustomAttribute<WattPilotAttribute>();
-
-        if (attribute == null)
-        {
-            throw new ArgumentException(string.Format(Resources.NotAMemberOf, instanceType.Name), propertyName);
-        }
-
-        var key = attribute.TokenName;
-
-        if (key == null)
-        {
-            throw new ArgumentException(string.Format(Resources.NotAMemberOf, instanceType.Name), propertyName);
-        }
+        var propertyInfo = instanceType.GetProperty(propertyName)??throw new ArgumentException(string.Format(Resources.NotAMemberOf, instanceType.Name), propertyName);;
+        var attribute = propertyInfo.GetCustomAttribute<WattPilotAttribute>()??throw new ArgumentException(string.Format(Resources.NotAMemberOf, instanceType.Name), propertyName);
+        var key = attribute.TokenName??throw new ArgumentException(string.Format(Resources.NotAMemberOf, instanceType.Name), propertyName);
 
         var value = propertyInfo.GetValue(instance);
 
@@ -483,9 +466,7 @@ public class WattPilotService : BindableBase, IWattPilotService
         {
             if (token is JArray array)
             {
-                var list = Activator.CreateInstance(propertyInfo.PropertyType) as IList;
-
-                if (list == null)
+                if (Activator.CreateInstance(propertyInfo.PropertyType) is not IList list)
                 {
                     return;
                 }

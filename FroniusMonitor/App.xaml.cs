@@ -30,6 +30,7 @@ public partial class App
             .RegisterSingleton<IGen24JsonService, Gen24JsonService>()
             .RegisterSingleton<IAesKeyProvider, AesKeyProvider>()
             .RegisterSingleton<IWattPilotService, WattPilotService>()
+            .RegisterSingleton<IToshibaAirConditionService, ToshibaAirConditionService>()
             .RegisterType<EventLogView>()
             .RegisterType<EventLogViewModel>()
             .RegisterType<SelfConsumptionOptimizationViewModel>()
@@ -46,13 +47,13 @@ public partial class App
 
         try
         {
-            Settings.Load().Wait();
+            Settings.Load().GetAwaiter().GetResult();
         }
         catch
         {
             HaveSettings = false;
             Settings = new();
-            Settings.Save().Wait();
+            Settings.Save().GetAwaiter().GetResult();
         }
 
         Container.RegisterInstance<SettingsBase>(Settings);

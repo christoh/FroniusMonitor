@@ -20,6 +20,10 @@
                 <Setter Property="Padding" Value="8,0" />
             </Style>
 
+            <DataTemplate x:Key="ComboBoxTemplate">
+                <TextBlock Text="{Binding}" MinHeight="20" Margin="0,2,0,0" VerticalAlignment="Center" />
+            </DataTemplate>
+
             <Style TargetType="TextBlock">
                 <Setter Property="VerticalAlignment" Value="Center" />
             </Style>
@@ -68,12 +72,6 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <Grid.Resources>
-                    <DataTemplate x:Key="ComboBoxTemplate">
-                        <TextBlock Text="{Binding}" MinHeight="20" Margin="0,2,0,0" VerticalAlignment="Center" />
-                    </DataTemplate>
-
-                </Grid.Resources>
 
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.Url}" Margin="0,8,0,0" />
                 <TextBlock Grid.Row="0" Grid.Column="1" Text=":" Margin="4,8,4,0" />
@@ -184,6 +182,60 @@
 
                     <c:PasswordBox Grid.Row="2" Grid.Column="2" Template="{StaticResource PasswordBoxTemplate}"
                                    Password="{Binding Settings.FritzBoxConnection.Password, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </Grid>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Margin="0,8,0,0" Header="{x:Static p:Resources.ToshibaAcHeader}">
+            <Grid Margin="8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <CheckBox IsChecked="{Binding Settings.HaveToshibaAc}" Grid.Row="0" Content="{x:Static p:Resources.EnableToshibaAc}" Margin="0,4,0,8" />
+
+                <Grid Grid.Row="1" Visibility="{Binding Settings.HaveToshibaAc, Converter={co:Bool2Visibility}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.Url}" Margin="0,8,0,0" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text=":" Margin="4,8,4,0" />
+
+                    <TextBox Grid.Row="0" Grid.Column="2"
+                             Text="{Binding Settings.ToshibaAcConnection.BaseUrl, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.Username}" Margin="0,8,0,0" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text=":" Margin="4,8,4,0" />
+
+                    <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Settings.ToshibaAcConnection.UserName, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static p:Resources.Password}" Margin="0,8,0,0" />
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text=":" Margin="4,8,4,0" />
+
+                    <c:PasswordBox Grid.Row="2" Grid.Column="2" Template="{StaticResource PasswordBoxTemplate}"
+                                   Password="{Binding Settings.ToshibaAcConnection.Password, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="{x:Static p:Resources.UpdateRate}" Margin="0,8,0,0" />
+                    <TextBlock Grid.Row="3" Grid.Column="1" Text=":" Margin="4,8,4,0" />
+                    <Grid Grid.Row="3" Grid.Column="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <ComboBox Grid.Column="0" SelectedItem="{Binding Settings.ToshibaAcUpdateRate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                  ItemsSource="{Binding FroniusUpdateRates}" ItemTemplate="{StaticResource ComboBoxTemplate}"/>
+                        <TextBlock Grid.Column="1" Text="{Binding Settings.ToshibaAcUpdateRate, Converter={co:ByteEqualityToString Value=1, Equal={x:Static p:Resources.Second}, NotEqual={x:Static p:Resources.Seconds}}}" Margin="4,8,0,0"/>
+                    </Grid>
                 </Grid>
             </Grid>
         </GroupBox>

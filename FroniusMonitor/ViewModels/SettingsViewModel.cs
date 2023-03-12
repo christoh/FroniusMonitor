@@ -101,9 +101,10 @@ public class SettingsViewModel : SettingsViewModelBase
 
         App.Settings = Settings;
         IoC.Get<MainViewModel>().NotifyOfPropertyChange(nameof(Settings));
-        WebClientService.FritzBoxConnection = Settings.HaveFritzBox && Settings.ShowFritzBox ? Settings.FritzBoxConnection : null;
+        WebClientService.FritzBoxConnection = Settings is { HaveFritzBox: true, ShowFritzBox: true } ? Settings.FritzBoxConnection : null;
         WebClientService.InverterConnection = Settings.FroniusConnection;
         solarSystemService.FroniusUpdateRate = Settings.FroniusUpdateRate;
+        solarSystemService.AcService.Settings = Settings;
 
         if (!Settings.HaveWattPilot || !Settings.ShowWattPilot)
         {

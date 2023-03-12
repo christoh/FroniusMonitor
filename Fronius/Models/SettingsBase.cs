@@ -20,6 +20,15 @@ public abstract class SettingsBase : BindableBase
         set => Set(ref froniusUpdateRate, value);
     }
 
+    private byte toshibaAcUpdateRate = 5;
+
+    [DefaultValue((byte)5)]
+    public byte ToshibaAcUpdateRate
+    {
+        get => toshibaAcUpdateRate;
+        set => Set(ref toshibaAcUpdateRate, value);
+    }
+
     private WebConnection? froniusConnection = new() {BaseUrl = "http://192.168.178.XXX", UserName = string.Empty, Password = string.Empty};
 
     [XmlElement, DefaultValue(null)]
@@ -89,6 +98,39 @@ public abstract class SettingsBase : BindableBase
         });
     }
 
+    private bool haveToshibaAc;
+
+    [XmlAttribute]
+    public bool HaveToshibaAc
+    {
+        get => haveToshibaAc;
+        set => Set(ref haveToshibaAc, value, () =>
+        {
+            if (value)
+            {
+                ToshibaAcConnection ??= new WebConnection {BaseUrl = "https://mobileapi.toshibahomeaccontrols.com", UserName = string.Empty, Password = string.Empty};
+            }
+        });
+    }
+
+    private bool showToshibaAc;
+
+    [XmlAttribute]
+    public bool ShowToshibaAc
+    {
+        get => showToshibaAc;
+        set => Set(ref showToshibaAc, value);
+    }
+
+    private WebConnection? toshibaAcConnection;
+
+    [XmlElement, DefaultValue(null)]
+    public WebConnection? ToshibaAcConnection
+    {
+        get => toshibaAcConnection;
+        set => Set(ref toshibaAcConnection, value);
+    }
+
     private bool addInverterPowerToConsumption;
 
     [XmlElement, DefaultValue(false)]
@@ -118,15 +160,11 @@ public abstract class SettingsBase : BindableBase
 
     protected static void UpdateChecksum(params WebConnection?[] connections)
     {
-        connections.Where(connection => connection != null).Apply(connection =>
-        {
-            connection!.PasswordChecksum = connection.CalculatedChecksum;
-        });
+        connections.Where(connection => connection != null).Apply(connection => { connection!.PasswordChecksum = connection.CalculatedChecksum; });
     }
 
     protected static void ClearIncorrectPasswords(params WebConnection?[] connections)
     {
         connections.Where(connection => connection != null && connection.PasswordChecksum != connection.CalculatedChecksum).Apply(connection => connection!.Password = string.Empty);
     }
-
 }
