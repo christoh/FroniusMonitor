@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace De.Hochstaetter.Fronius.Models.ToshibaAc
 {
-    public enum ToshibaAcOperatingMode : byte
+    public enum ToshibaAcPowerSetting : byte
     {
-        Auto = 0x41,
-        Cooling = 0x42,
-        Drying = 0x44,
-        Heating = 0x43,
-        FanOnly = 0x45,
+        Normal = 0x0,
+        Eco = 0x3,
+        HiPower = 0x1,
+        Quiet1 = 0xa,
+        Quiet2 = 0x2,
     }
 }

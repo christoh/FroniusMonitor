@@ -1074,4 +1074,7 @@
   <data name="EnableToshibaAc" xml:space="preserve">
 	  <value>Control Toshiba A/C systems</value>
   </data>
+  <data name="ToshibaAc" xml:space="preserve">
+	  <value>Toshiba A/C</value>
+  </data>
 </root>

@@ -216,7 +216,7 @@ public partial class MainWindow
 
         LoadArrow.Fill = new SolidColorBrush(Color.FromRgb(Round(r), Round(g), Round(b)));
 
-        byte Round(double value) => (byte)Math.Round(value, MidpointRounding.AwayFromZero);
+        static byte Round(double value) => (byte)Math.Round(value, MidpointRounding.AwayFromZero);
     }
 
     private void OnAutoSizeChecked(object sender, RoutedEventArgs e)

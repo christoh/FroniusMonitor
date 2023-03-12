@@ -1,7 +1,7 @@
-﻿using System.Net.Http.Headers;
-// ReSharper disable once RedundantUsingDirective
-using System.Net.Http.Json;
+﻿// ReSharper disable once RedundantUsingDirective
+using System.Net.Http.Headers;
 using System.Text.Json;
+using System.Net.Http.Json;
 using De.Hochstaetter.Fronius.Models.JsonConverters;
 using De.Hochstaetter.Fronius.Models.ToshibaAc;
 
@@ -11,7 +11,6 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
 {
     private ToshibaAcSession? session;
     private static readonly JsonSerializerOptions jsonOptions = new(JsonSerializerDefaults.Web);
-    private readonly Thread updateThread;
     private CancellationTokenSource? tokenSource;
     private event EventHandler<ToshibaAcDataReceivedEventArgs>? NewDataReceived;
 
@@ -29,19 +28,7 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
         jsonOptions.WriteIndented = true;
     }
 
-    public ToshibaAirConditionService(SettingsBase settings)
-    {
-        this.settings = settings;
-        updateThread = new Thread(UpdateThread);
-    }
-
-    private SettingsBase settings;
-
-    public SettingsBase Settings
-    {
-        get => settings;
-        set => Set(ref settings, value);
-    }
+    public SettingsBase Settings => IoC.Get<SettingsBase>();
 
     private CancellationToken Token => tokenSource?.Token ?? throw new WebException("Connection closed", WebExceptionStatus.ConnectionClosed);
 
@@ -62,7 +49,9 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
 
     public async ValueTask Start()
     {
-        if (!settings.HaveToshibaAc || settings.ToshibaAcConnection == null)
+        var settings = Settings;
+
+        if (!settings.HaveToshibaAc||!settings.ShowToshibaAc || settings.ToshibaAcConnection == null)
         {
             return;
         }
@@ -77,7 +66,7 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
             {"Password", settings.ToshibaAcConnection.Password},
         }).ConfigureAwait(false);
 
-        updateThread.Start();
+        new Thread(UpdateThread).Start();
     }
 
     private async void UpdateThread()
@@ -86,13 +75,15 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
         {
             while (true)
             {
+                var settings = IoC.Get<SettingsBase>();
+
                 if (!settings.HaveToshibaAc || !settings.ShowToshibaAc)
                 {
-                    continue;
+                    tokenSource?.Cancel();
                 }
 
                 AllDevices = await GetJsonResult<ObservableCollection<ToshibaAcMapping>>($"/api/AC/GetConsumerACMapping?consumerId={session!.ConsumerId}").ConfigureAwait(false);
-                var supi = await GetJsonResult<ToshibaAcStatusDevice>($"/api/AC/GetCurrentACState?ACId={AllDevices[0].Devices[0].AcId}").ConfigureAwait(false);
+                //var supi = await GetJsonResult<ToshibaAcStatusDevice>($"/api/AC/GetCurrentACState?ACId={AllDevices[0].Devices[0].AcId}").ConfigureAwait(false);
                 NewDataReceived?.Invoke(this, new ToshibaAcDataReceivedEventArgs(AllDevices));
                 await Task.Delay(TimeSpan.FromSeconds(settings.ToshibaAcUpdateRate), Token).ConfigureAwait(false);
             }
@@ -106,7 +97,8 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
 
     private async ValueTask<T> GetJsonResult<T>(string uri, IEnumerable<KeyValuePair<string, string>>? postVariables = null) where T : new()
     {
-        EnsureConnectionParameters();
+        var settings = IoC.Get<SettingsBase>();
+        EnsureConnectionParameters(settings);
         using var client = new HttpClient();
         client.BaseAddress = new Uri(settings.ToshibaAcConnection!.BaseUrl);
 
@@ -123,15 +115,15 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
         }
 
         using var response = (await client.SendAsync(message, Token).ConfigureAwait(false)).EnsureSuccessStatusCode();
-#if DEBUG
+        #if DEBUG
         var jsonText = await response.Content.ReadAsStringAsync(Token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
         var jDocument = JsonDocument.Parse(jsonText);
         Token.ThrowIfCancellationRequested();
         var result = jDocument.Deserialize<ToshibaAcResponse<T>>(jsonOptions) ?? throw new InvalidDataException("No data");
         Token.ThrowIfCancellationRequested();
-#else
+        #else
         var result = await response.Content.ReadFromJsonAsync<ToshibaAcResponse<T>>(jsonOptions, Token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
-#endif
+        #endif
 
         if (!result.IsSuccess)
         {
@@ -141,7 +133,7 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
         return result.Data;
     }
 
-    private void EnsureConnectionParameters()
+    private static void EnsureConnectionParameters(SettingsBase settings)
     {
         if (!settings.HaveToshibaAc || settings.ToshibaAcConnection == null)
         {

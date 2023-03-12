@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace De.Hochstaetter.Fronius.Models.ToshibaAc;
+﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc;
 
 public class ToshibaAcResponse<T> : BindableBase where T : new()
 {
@@ -29,6 +23,7 @@ public class ToshibaAcResponse<T> : BindableBase where T : new()
     }
 
     private string message = string.Empty;
+
     [JsonPropertyName("Message")]
     [JsonRequired]
     public string Message
