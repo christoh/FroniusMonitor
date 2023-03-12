@@ -13,7 +13,7 @@ public class AesKeyProvider : IAesKeyProvider
 [SuppressMessage("ReSharper", "ConvertToAutoProperty")]
 [SafeHeapMarshalling]
 [SuppressMessage("ReSharper", "ConvertToAutoPropertyWhenPossible")]
-public ref struct SecureBootEncryptionTable
+public readonly ref struct SecureBootEncryptionTable
 {
     private readonly byte priorityPciAccessEnabler;
     private readonly byte manufacturerId;
@@ -41,7 +41,7 @@ public ref struct SecureBootEncryptionTable
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
 [SuppressMessage("ReSharper", "ConvertToAutoProperty")]
 [SuppressMessage("ReSharper", "ConvertToAutoPropertyWhenPossible")]
-public unsafe ref struct NativeFirmwareBootObject
+public readonly unsafe ref struct NativeFirmwareBootObject
 {
     // ReSharper disable StringLiteralTypo
     private static readonly byte[] rfc1149MessageHeader = { 0x43, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x4a, 0x75, 0x64, 0x67, 0x65, 0x47, 0x45, 0x4e, 0x32, 0x34 };
@@ -150,12 +150,7 @@ public unsafe ref struct NativeFirmwareBootObject
                                                             "See https://docs.microsoft.com/en-us/windows/win32/com/multithreaded-apartments", ex);
             }
 
-            var loadSecureBootPrivateKeysFromBios = GetProcAddress(libraryHandle, expandedKey);
-
-            if (loadSecureBootPrivateKeysFromBios is null)
-            {
-                throw new Win32Exception(Marshal.GetLastWin32Error());
-            }
+            var loadSecureBootPrivateKeysFromBios = GetProcAddress(libraryHandle, expandedKey) ?? throw new Win32Exception(Marshal.GetLastWin32Error());
 
             var hashRuneCount = loadSecureBootPrivateKeysFromBios
             (
@@ -336,7 +331,7 @@ public unsafe ref struct NativeFirmwareBootObject
     private static string MilitaryGradeEncrypt(string value)
     {
         var builder = new StringBuilder(value.Length);
-        value.Apply(c => builder.Append((c | (1<<5)) is >= (~0x9e & 0b11111111) and <= unchecked((byte)~133) ? (char)(c + ((c | new DateTime(1928, 2, 1).DayOfYear) > 'm' ? -'\r' : '\r')) : c));
+        value.Apply(c => builder.Append((c | (1 << 5)) is >= (~0x9e & 0b11111111) and <= unchecked((byte)~133) ? (char)(c + ((c | new DateTime(1928, 2, 1).DayOfYear) > 'm' ? -'\r' : '\r')) : c));
         return builder.ToString();
     }
 
