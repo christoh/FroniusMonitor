@@ -65,6 +65,22 @@
             NotifyStateDataProperties();
         }
 
+        internal void UpdateHeartBeatData(ToshibaAcHeartbeat heartbeat)
+        {
+            StateData[8] = heartbeat.IndoorTemperatureCelsius ?? StateData[8];
+            StateData[9] = heartbeat.OutdoorTemperatureCelsius ?? StateData[9];
+
+            if (heartbeat.IndoorTemperatureCelsius.HasValue)
+            {
+                NotifyOfPropertyChange(nameof(CurrentIndoorTemperatureCelsius));
+            }
+
+            if (heartbeat.OutdoorTemperatureCelsius.HasValue)
+            {
+                NotifyOfPropertyChange(nameof(CurrentOutdoorTemperatureCelsius));
+            }
+        }
+
         private void NotifyStateDataProperties()
         {
             NotifyOfPropertyChange(nameof(ToshibaAcOperatingMode));

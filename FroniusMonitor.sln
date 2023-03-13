@@ -9,7 +9,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fronius", "Fronius\Fronius.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FroniusUnitTests", "FroniusUnitTests\FroniusUnitTests.csproj", "{DEBD9F67-72BD-4975-B584-FC9680F83B9F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FroniusPhone", "FroniusPhone\FroniusPhone.csproj", "{C091AA92-2848-47CA-B1C1-42303F08F5D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FroniusPhone", "FroniusPhone\FroniusPhone.csproj", "{C091AA92-2848-47CA-B1C1-42303F08F5D6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AD03EA76-5E1F-43DF-BC15-0C56C6C97725}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

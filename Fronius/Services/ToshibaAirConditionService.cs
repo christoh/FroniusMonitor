@@ -89,32 +89,42 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
             azureClient = DeviceClient.Create(azureCredentials.HostName, auth, TransportType.Amqp_WebSocket_Only);
             await azureClient.OpenAsync(Token).ConfigureAwait(false);
             await azureClient.SetMethodHandlerAsync("smmobile", HandleSmMobileMethod, null, Token).ConfigureAwait(false);
-        }
-        finally
-        {
+
+            #if DEBUG
+
+            await azureClient.SetMethodDefaultHandlerAsync(HandleOtherMethods, null, Token).ConfigureAwait(false);
+
+            #endif
+
             tokenSource?.Dispose();
             tokenSource = new CancellationTokenSource();
+        }
+        catch
+        {
+            Stop();
         }
     }
 
     private Task<MethodResponse> HandleSmMobileMethod(MethodRequest request, object _) => Task.Run(() =>
     {
+        Debug.Print(request.Name);
+        Debug.Print(request.DataAsJson);
+
         try
         {
-            var command = JsonSerializer.Deserialize<ToshibaAcAzureSmMobileCommand>(request.Data, jsonOptions);
+            var command = JsonSerializer.Deserialize<ToshibaAcAzureSmMobileCommand>(request.Data, jsonOptions)!;
+            var device = AllDevices!.SelectMany(d => d.Devices).First(d => d.DeviceUniqueId == command.DeviceUniqueId);
 
-            switch (command?.CommandName)
+            switch (command!.CommandName)
             {
                 case "CMD_FCU_FROM_AC":
-                    var stateData = command.PayLoad.EnumerateObject().First(o => o.Name == "data").Value.Deserialize<ToshibaAcStateData>(jsonOptions);
-
-                    if (stateData == null)
-                    {
-                        break;
-                    }
-
-                    var device = AllDevices!.SelectMany(d => d.Devices).First(d => d.DeviceUniqueId == command.DeviceUniqueId);
+                    var stateData = command.PayLoad.EnumerateObject().First(o => o.Name == "data").Value.Deserialize<ToshibaAcStateData>(jsonOptions)!;
                     device.State.UpdateStateData(stateData);
+                    break;
+
+                case "CMD_HEARTBEAT":
+                    var heartbeat = command.PayLoad.Deserialize<ToshibaAcHeartbeat>(jsonOptions)!;
+                    device.State.UpdateHeartBeatData(heartbeat);
                     break;
             }
         }
@@ -125,6 +135,17 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
 
         return new MethodResponse(0);
     }, Token);
+
+    #if DEBUG
+
+    private Task<MethodResponse> HandleOtherMethods(MethodRequest request, object _) => Task.Run(() =>
+    {
+        Debug.Print(request.Name);
+        Debug.Print(request.DataAsJson);
+        return new MethodResponse(0);
+    }, Token);
+
+    #endif
 
     private async ValueTask<T> Deserialize<T>(string uri, IEnumerable<KeyValuePair<string, string>>? postVariables = null) where T : new()
     {
@@ -153,15 +174,14 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
         using var response = (await client.SendAsync(message, Token).ConfigureAwait(false)).EnsureSuccessStatusCode();
 
         #if xDEBUG // This allows you to see the raw JSON string
-        
         var jsonText = await response.Content.ReadAsStringAsync(Token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
         var jDocument = JsonDocument.Parse(jsonText);
         var result = jDocument.Deserialize<ToshibaAcResponse<T>>(jsonOptions) ?? throw new InvalidDataException("No data");
-        
+
         #else
-        
+
         var result = await response.Content.ReadFromJsonAsync<ToshibaAcResponse<T>>(jsonOptions, Token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
-        
+
         #endif
 
         if (!result.IsSuccess)
