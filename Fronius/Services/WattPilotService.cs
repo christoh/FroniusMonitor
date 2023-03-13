@@ -382,7 +382,7 @@ public class WattPilotService : BindableBase, IWattPilotService
 
         foreach (var token in jObject)
         {
-            Debug.Print($"{token.Key}: {token.Value}");
+            //Debug.Print($"{token.Key}: {token.Value}");
             IReadOnlyList<PropertyInfo> propertyInfos = instance.GetType().GetProperties().Where(p => p.GetCustomAttributes<WattPilotAttribute>().Any(a => a.TokenName == token.Key)).ToArray();
 
             if (!propertyInfos.Any())

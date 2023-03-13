@@ -46,7 +46,7 @@ public class Gen24JsonService : IGen24JsonService
                     }
                     else
                     {
-                        if (!DateTime.TryParse(stringValue,CultureInfo.InvariantCulture,DateTimeStyles.AssumeLocal,out var dateTime))
+                        if (!DateTime.TryParse(stringValue, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var dateTime))
                         {
                             value = null;
                         }
@@ -62,19 +62,12 @@ public class Gen24JsonService : IGen24JsonService
                 }
                 else if (propertyInfo.PropertyType.IsAssignableFrom(typeof(Version)))
                 {
-                    try
+                    if (stringValue.Contains('-'))
                     {
-                        if (stringValue.Contains('-'))
-                        {
-                            stringValue=stringValue.Replace("-", ".");
-                        }
+                        stringValue = stringValue.Replace("-", ".");
+                    }
 
-                        value=new Version(stringValue);
-                    }
-                    catch
-                    {
-                        value = null;
-                    }
+                    value = Version.TryParse(stringValue, out var version) ? version : null;
                 }
                 else if (nonNullablePropertyType.IsEnum)
                 {
@@ -118,7 +111,7 @@ public class Gen24JsonService : IGen24JsonService
 
         var fieldInfo =
             fields.SingleOrDefault(f => f.GetCustomAttributes().Any(a => a is EnumParseAttribute attribute && attribute.ParseAs?.ToUpperInvariant() == stringValue.ToUpperInvariant())) ??
-            fields.SingleOrDefault(f => f.GetCustomAttributes().Any(a => a is EnumParseAttribute {IsDefault: true}));
+            fields.SingleOrDefault(f => f.GetCustomAttributes().Any(a => a is EnumParseAttribute { IsDefault: true }));
 
         return fieldInfo == null ? null : Enum.Parse(type, fieldInfo.Name);
     }
@@ -155,7 +148,7 @@ public class Gen24JsonService : IGen24JsonService
             {
                 if (!jObject.ContainsKey(attribute.PropertyName))
                 {
-                    jObject.Add(attribute.PropertyName, new JObject {{attribute.Name, new JValue(jsonValueNew)}});
+                    jObject.Add(attribute.PropertyName, new JObject { { attribute.Name, new JValue(jsonValueNew) } });
                 }
                 else
                 {
@@ -167,7 +160,7 @@ public class Gen24JsonService : IGen24JsonService
         return jObject;
     }
 
-    private object? GetFroniusJsonValue(PropertyInfo propertyInfo, object instance, FroniusProprietaryImportAttribute attribute)
+    private static object? GetFroniusJsonValue(PropertyInfo propertyInfo, object instance, FroniusProprietaryImportAttribute attribute)
     {
         var value = propertyInfo.GetValue(instance);
 
@@ -190,7 +183,7 @@ public class Gen24JsonService : IGen24JsonService
         return result;
     }
 
-    private object? GetFroniusEnumString(Enum enumValue)
+    private static object? GetFroniusEnumString(Enum enumValue)
     {
         var fieldInfo = enumValue.GetType().GetFields().Single(f => f.Name == enumValue.ToString());
 
