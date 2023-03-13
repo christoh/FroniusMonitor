@@ -4,11 +4,11 @@ namespace De.Hochstaetter.Fronius.Models.ToshibaAc
 {
     public class ToshibaAcAzureSmMobileCommand : BindableBase
     {
-        private Guid deviceUniqueId;
+        private string deviceUniqueId = string.Empty;
 
         [JsonPropertyName("sourceId")]
         [JsonRequired]
-        public Guid DeviceUniqueId
+        public string DeviceUniqueId
         {
             get => deviceUniqueId;
             set => Set(ref deviceUniqueId, value);

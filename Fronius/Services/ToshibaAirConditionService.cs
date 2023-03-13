@@ -4,6 +4,7 @@ using System.Text.Json;
 using De.Hochstaetter.Fronius.Models.JsonConverters;
 using De.Hochstaetter.Fronius.Models.ToshibaAc;
 using Microsoft.Azure.Devices.Client;
+using Microsoft.Azure.Devices.Client.Exceptions;
 
 namespace De.Hochstaetter.Fronius.Services;
 
@@ -13,6 +14,7 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
     private static readonly JsonSerializerOptions jsonOptions = new(JsonSerializerDefaults.Web);
     private CancellationTokenSource? tokenSource;
     private DeviceClient? azureClient;
+    private ulong messageId = BitConverter.ToUInt64(RandomNumberGenerator.GetBytes(8));
 
     static ToshibaAirConditionService()
     {
@@ -46,6 +48,7 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
     {
         tokenSource?.Cancel();
         azureClient?.Dispose();
+        session = null;
         tokenSource = null;
         azureClient = null;
     }
@@ -68,8 +71,8 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
 
             var postData = new Dictionary<string, string>
             {
-                { "Username", settings.ToshibaAcConnection.UserName },
-                { "Password", settings.ToshibaAcConnection.Password },
+                {"Username", settings.ToshibaAcConnection.UserName},
+                {"Password", settings.ToshibaAcConnection.Password},
             };
 
             session = await Deserialize<ToshibaAcSession>("/api/Consumer/Login", postData).ConfigureAwait(false)
@@ -77,9 +80,9 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
 
             postData = new Dictionary<string, string>
             {
-                { "DeviceID", settings.ToshibaAcConnection.UserName + ":" + session.ConsumerId.ToString("D") },
-                { "DeviceType", "1" },
-                { "Username", settings.ToshibaAcConnection!.UserName },
+                {"DeviceID", settings.ToshibaAcConnection.UserName + ":" + session.ConsumerId.ToString("D")},
+                {"DeviceType", "1"},
+                {"Username", settings.ToshibaAcConnection!.UserName},
             };
 
             var azureCredentials = await Deserialize<ToshibaAcAzureCredentials>("/api/Consumer/RegisterMobileDevice", postData).ConfigureAwait(false);
@@ -105,6 +108,33 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
         }
     }
 
+    public async ValueTask SendDeviceCommand(ToshibaAcStateData state, params string[] targetIdStrings)
+    {
+        var settings = Settings;
+
+        if (settings.ToshibaAcConnection == null || azureClient == null || session == null || !IsRunning)
+        {
+            throw new IotHubCommunicationException("Not connected");
+        }
+
+        var command = new ToshibaAcAzureSmMobileCommand
+        {
+            CommandName = "CMD_FCU_TO_AC",
+            DeviceUniqueId = settings.ToshibaAcConnection.UserName + ":" + session.ConsumerId.ToString("D"),
+            MessageId = $"{++messageId:x}",
+            TargetIds = targetIdStrings,
+            TimeStamp = $"{(DateTime.UtcNow - DateTime.UnixEpoch).Ticks:x}",
+            PayLoad = JsonDocument.Parse($"{{ \"data\":\"{state}\"}}").RootElement
+        };
+
+        var commandString = JsonSerializer.Serialize(command, jsonOptions);
+        await azureClient.SendEventAsync(new Message(Encoding.UTF8.GetBytes(commandString)), Token).ConfigureAwait(false);
+    }
+
+    public ValueTask SendDeviceCommand(ToshibaAcStateData state, params Guid[] deviceUniqueIds) => SendDeviceCommand(state, deviceUniqueIds.Select(id => id.ToString("D")).ToArray());
+
+    public ValueTask SendDeviceCommand(ToshibaAcStateData state, params ToshibaAcMappingDevice[] device) => SendDeviceCommand(state, device.Select(d => d.DeviceUniqueId.ToString("D")).ToArray());
+
     private Task<MethodResponse> HandleSmMobileMethod(MethodRequest request, object _) => Task.Run(() =>
     {
         Debug.Print(request.Name);
@@ -113,7 +143,7 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
         try
         {
             var command = JsonSerializer.Deserialize<ToshibaAcAzureSmMobileCommand>(request.Data, jsonOptions)!;
-            var device = AllDevices!.SelectMany(d => d.Devices).First(d => d.DeviceUniqueId == command.DeviceUniqueId);
+            var device = AllDevices!.SelectMany(d => d.Devices).First(d => d.DeviceUniqueId.ToString("D") == command.DeviceUniqueId.ToLowerInvariant());
 
             switch (command!.CommandName)
             {
