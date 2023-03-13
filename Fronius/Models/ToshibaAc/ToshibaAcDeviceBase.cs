@@ -8,7 +8,7 @@ namespace De.Hochstaetter.Fronius.Models.ToshibaAc
 {
     public abstract class ToshibaAcDeviceBase : BindableBase
     {
-        private ToshibaAcStateData state = default!;
+        private ToshibaAcStateData state = new();
         [JsonPropertyName("ACStateData")]
         public ToshibaAcStateData State
         {
