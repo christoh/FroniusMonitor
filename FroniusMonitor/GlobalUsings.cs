@@ -32,6 +32,7 @@ global using De.Hochstaetter.Fronius.Models;
 global using De.Hochstaetter.Fronius.Models.Charging;
 global using De.Hochstaetter.Fronius.Models.Gen24;
 global using De.Hochstaetter.Fronius.Models.Gen24.Settings;
+global using De.Hochstaetter.Fronius.Models.ToshibaAc;
 global using De.Hochstaetter.Fronius.Services;
 global using De.Hochstaetter.FroniusMonitor.Assets.Images;
 global using De.Hochstaetter.FroniusMonitor.Contracts;

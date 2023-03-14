@@ -213,6 +213,9 @@
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         </Style>
 
+        <SolidColorBrush x:Key="TextBox.MouseOver.Border" Color="#FF7EB4EA" />
+        <SolidColorBrush x:Key="TextBox.Focus.Border" Color="#FF569DE5" />
+
         <Style x:Key="TransparentButton" TargetType="{x:Type ButtonBase}">
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
             <Setter Property="Background" Value="Transparent" />
@@ -232,8 +235,29 @@
             </Setter>
         </Style>
 
-        <SolidColorBrush x:Key="TextBox.MouseOver.Border" Color="#FF7EB4EA" />
-        <SolidColorBrush x:Key="TextBox.Focus.Border" Color="#FF569DE5" />
+        <Style x:Key="StrictlyTransparentButton" TargetType="ButtonBase" BasedOn="{StaticResource TransparentButton}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ButtonBase">
+                        <Grid x:Name="Grid" Background="Transparent" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.5" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Grid" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <TranslateTransform Y="-3"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
         <ControlTemplate x:Key="PasswordBoxTemplate" TargetType="{x:Type TextBoxBase}">
             <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True">

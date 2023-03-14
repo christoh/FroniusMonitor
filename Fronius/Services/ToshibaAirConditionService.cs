@@ -131,10 +131,6 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
         await azureClient.SendEventAsync(new Message(Encoding.UTF8.GetBytes(commandString)), Token).ConfigureAwait(false);
     }
 
-    public ValueTask SendDeviceCommand(ToshibaAcStateData state, params Guid[] deviceUniqueIds) => SendDeviceCommand(state, deviceUniqueIds.Select(id => id.ToString("D")).ToArray());
-
-    public ValueTask SendDeviceCommand(ToshibaAcStateData state, params ToshibaAcMappingDevice[] device) => SendDeviceCommand(state, device.Select(d => d.DeviceUniqueId.ToString("D")).ToArray());
-
     private Task<MethodResponse> HandleSmMobileMethod(MethodRequest request, object _) => Task.Run(() =>
     {
         Debug.Print(request.Name);
@@ -145,7 +141,7 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
             var command = JsonSerializer.Deserialize<ToshibaAcAzureSmMobileCommand>(request.Data, jsonOptions)!;
             var device = AllDevices!.SelectMany(d => d.Devices).First(d => d.DeviceUniqueId.ToString("D") == command.DeviceUniqueId.ToLowerInvariant());
 
-            switch (command!.CommandName)
+            switch (command.CommandName)
             {
                 case "CMD_FCU_FROM_AC":
                     var stateData = command.PayLoad.EnumerateObject().First(o => o.Name == "data").Value.Deserialize<ToshibaAcStateData>(jsonOptions)!;

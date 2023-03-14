@@ -693,4 +693,7 @@ public class EqualityToAnything<TFrom, TTo> : ConverterBase
     }
 }
 
-public class ByteEqualityToString:EqualityToAnything<byte,string>{}
+public class ByteEqualityToString : EqualityToAnything<byte, string> { }
+
+public class ToshibaAcOperatingMode2Visibility : EqualityToAnything<ToshibaAcOperatingMode, Visibility> { }
+public class ToshibaAcOperatingMode2Brush : EqualityToAnything<ToshibaAcOperatingMode, Brush> { }

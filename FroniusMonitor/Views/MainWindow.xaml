@@ -291,6 +291,9 @@
                       Margin="10,16,0,0" VerticalAlignment="Center" HorizontalAlignment="Stretch"
                       Visibility="{Binding Settings.FritzBoxConnection, Converter={co:ShowFritzBoxIcon}}">
             <ItemsControl ItemsSource="{Binding SolarSystemService.AcService.AllDevices[0].Devices, FallbackValue={x:Null}}">
+                <ItemsControl.LayoutTransform>
+                    <ScaleTransform ScaleX="{Binding ElementName=ConsumerScaler, Path=ScaleX}" ScaleY="{Binding ElementName=ConsumerScaler, Path=ScaleX}" />
+                </ItemsControl.LayoutTransform>
                 <ItemsControl.Visibility>
                     <MultiBinding Converter="{co:MultiBool2Visibility All=Visible, Any=Collapsed, Invalid=Collapsed, None=Collapsed}">
                         <Binding Path="Settings.HaveToshibaAc" />
@@ -302,14 +305,11 @@
                         <WrapPanel Orientation="Vertical" IsItemsHost="True" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
-
-                <ItemsControl.Resources>
-                    <ResourceDictionary>
-                        <ResourceDictionary.MergedDictionaries>
-                            <ResourceDictionary Source="pack://application:,,,/FroniusMonitor;component/Wpf/ToshibaAcTemplate.xaml" />
-                        </ResourceDictionary.MergedDictionaries>
-                    </ResourceDictionary>
-                </ItemsControl.Resources>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <c:ToshibaAcControl Width="150" Device="{Binding}" Margin="0,0,8,8"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
 
