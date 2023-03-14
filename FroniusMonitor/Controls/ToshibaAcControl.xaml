@@ -6,12 +6,14 @@
              xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
              xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
+             xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
              mc:Ignorable="d"
              d:DesignHeight="150" d:DesignWidth="150">
     <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}">
         <Border BorderBrush="DimGray" BorderThickness="1" Width="150" Background="{Binding Device.State.IsTurnedOn, Converter={co:Bool2Brush False=LightGray, True=AntiqueWhite}}">
             <Grid Margin="2">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
@@ -27,47 +29,76 @@
                     <TextBlock FontSize="12" TextAlignment="Center" Text="{Binding Device.Name, FallbackValue='---'}" />
                 </Viewbox>
 
-                <Viewbox Grid.Row="2" Height="17" Margin="0,3,0,0">
-                <StackPanel  Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Click="OnPowerClicked" Style="{StaticResource StrictlyTransparentButton}" Width="20" Visibility="{Binding Device.State.IsTurnedOn, Converter={co:Bool2Visibility}}">
-                        <Canvas Height="20" Width="20">
-                            <Ellipse Width="20" Height="20" Stroke="Black" />
-                            <Ellipse Width="8" Height="10" Margin="6,5,0,0" Stroke="Black" />
-                        </Canvas>
-                    </Button>
-                    <Button Click="OnPowerClicked" Style="{StaticResource StrictlyTransparentButton}" Width="20" Visibility="{Binding Device.State.IsTurnedOn, Converter={co:Bool2Visibility True=Collapsed, False=Visible}}">
-                        <Canvas Height="20" Width="20">
-                            <Ellipse Width="20" Height="20" Stroke="Black" />
-                            <Line X1="10" X2="10" Y1="5" Y2="15" Stroke="Black" />
-                        </Canvas>
-                    </Button>
-                </StackPanel>
+                <Viewbox Grid.Row="2" Height="{Binding ElementName=HvacButton1, Path=ActualHeight}" Margin="0,3,0,0">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Click="OnPowerClicked" Style="{StaticResource StrictlyTransparentButton}" Width="20" Visibility="{Binding Device.State.IsTurnedOn, Converter={co:Bool2Visibility}}">
+                            <Canvas Height="20" Width="20">
+                                <Ellipse Width="20" Height="20" Stroke="Black" />
+                                <Ellipse Width="8" Height="10" Margin="6,5,0,0" Stroke="Black" />
+                            </Canvas>
+                        </Button>
+                        <Button Click="OnPowerClicked" Style="{StaticResource StrictlyTransparentButton}" Width="20" Visibility="{Binding Device.State.IsTurnedOn, Converter={co:Bool2Visibility True=Collapsed, False=Visible}}">
+                            <Canvas Height="20" Width="20">
+                                <Ellipse Width="20" Height="20" Stroke="Black" />
+                                <Line X1="10" X2="10" Y1="5" Y2="15" Stroke="Black" />
+                            </Canvas>
+                        </Button>
+                    </StackPanel>
                 </Viewbox>
 
                 <Grid Grid.Row="3" Margin="0,3,0,0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
                     <Grid.Resources>
-                        <Style TargetType="vi:HvacIcon" BasedOn="{StaticResource StrictlyTransparentButton}">
-                            <Setter Property="Margin" Value="2"/>
-                            <Setter Property="Foreground" Value="Black"/>
-                            <EventSetter Event="Click" Handler="OnModeClicked"/>
+                        <Style TargetType="c:HvacButton" BasedOn="{StaticResource HvacButtonStyle}">
+                            <Setter Property="Margin" Value="2" />
+                            <Setter Property="Foreground" Value="Black" />
+                            <EventSetter Event="Click" Handler="OnModeClicked" />
                         </Style>
 
-                        <Style TargetType="Button" BasedOn="{StaticResource TransparentButton}"/>
+                        <Style TargetType="Button" BasedOn="{StaticResource TransparentButton}" />
                     </Grid.Resources>
 
-                    <vi:HvacIcon Grid.Column="0" Mode="Auto" Background="{Binding Device.State.Mode, Converter={co:ToshibaAcOperatingMode2Brush Value=Auto, Equal=Aquamarine, NotEqual=Transparent}}"/>
-                    <vi:HvacIcon Grid.Column="1" Mode="Cooling" Background="{Binding Device.State.Mode, Converter={co:ToshibaAcOperatingMode2Brush Value=Cooling, Equal=Aquamarine, NotEqual=Transparent}}"/>
-                    <vi:HvacIcon Grid.Column="2" Mode="Drying" Background="{Binding Device.State.Mode, Converter={co:ToshibaAcOperatingMode2Brush Value=Drying, Equal=Aquamarine, NotEqual=Transparent}}"/>
-                    <vi:HvacIcon Grid.Column="3" Mode="Heating" Background="{Binding Device.State.Mode, Converter={co:ToshibaAcOperatingMode2Brush Value=Heating, Equal=Aquamarine, NotEqual=Transparent}}"/>
-                    <vi:HvacIcon Grid.Column="4" Mode="FanOnly" Background="{Binding Device.State.Mode, Converter={co:ToshibaAcOperatingMode2Brush Value=FanOnly, Equal=Aquamarine, NotEqual=Transparent}}"/>
+                    <c:HvacButton x:Name="HvacButton1" Grid.Column="0" Mode="Auto" Background="{Binding Device.State.Mode, Converter={co:ToshibaAcOperatingMode2Brush Value=Auto, Equal=Aquamarine, NotEqual=Transparent}}" />
+                    <c:HvacButton Grid.Column="1" Mode="Cooling" Background="{Binding Device.State.Mode, Converter={co:ToshibaAcOperatingMode2Brush Value=Cooling, Equal=Aquamarine, NotEqual=Transparent}}" />
+                    <c:HvacButton Grid.Column="2" Mode="Drying" Background="{Binding Device.State.Mode, Converter={co:ToshibaAcOperatingMode2Brush Value=Drying, Equal=Aquamarine, NotEqual=Transparent}}" />
+                    <c:HvacButton Grid.Column="3" Mode="Heating" Background="{Binding Device.State.Mode, Converter={co:ToshibaAcOperatingMode2Brush Value=Heating, Equal=Aquamarine, NotEqual=Transparent}}" />
+                    <c:HvacButton Grid.Column="4" Mode="FanOnly" Background="{Binding Device.State.Mode, Converter={co:ToshibaAcOperatingMode2Brush Value=FanOnly, Equal=Aquamarine, NotEqual=Transparent}}" />
+                </Grid>
+
+                <Grid Grid.Row="5" Margin="0,4,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <c:HvacFanSpeedButton Width="50" Grid.Row="0" Grid.Column="0" FanSpeed="{Binding Device.State.FanSpeed}" Click="OnFanSpeedClicked">
+                        <c:HvacFanSpeedButton.Style>
+                            <Style TargetType="c:HvacFanSpeedButton" BasedOn="{StaticResource TransparentButton}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="c:HvacFanSpeedButton">
+                                            <ContentPresenter/>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsEnabled" Value="False">
+                                                    <Setter Property="Opacity" Value=".5" />
+                                                </Trigger>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background"  Value="{StaticResource MouseOverFill}" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </c:HvacFanSpeedButton.Style>
+                    </c:HvacFanSpeedButton>
+
                 </Grid>
 
                 <Grid Grid.Row="4" Background="#B3DBC6" Margin="2">
@@ -96,9 +127,6 @@
                         </Style>
                     </Grid.Resources>
 
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Fan speed" />
-                    <TextBlock Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Device.State.FanSpeed}" HorizontalAlignment="Right" />
-
                     <TextBlock Grid.Row="3" Grid.Column="0" Text="Target" />
                     <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Device.State.TargetTemperatureCelsius}" HorizontalAlignment="Right" />
                     <TextBlock Grid.Row="3" Grid.Column="2" Text="°C" />
@@ -117,9 +145,6 @@
 
                     <TextBlock Grid.Row="7" Grid.Column="0" Text="Power Mode" />
                     <TextBlock Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Device.State.PowerSetting}" HorizontalAlignment="Right" />
-
-                    <TextBlock Grid.Row="8" Grid.Column="0" Text="Firmware" />
-                    <TextBlock Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Path=Device.FirmwareVersion}" HorizontalAlignment="Right" />
                 </Grid>
             </Grid>
         </Border>

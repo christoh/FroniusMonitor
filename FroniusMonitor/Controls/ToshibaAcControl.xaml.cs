@@ -1,7 +1,16 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Controls;
+﻿using De.Hochstaetter.Fronius.Models.ToshibaAc;
+
+namespace De.Hochstaetter.FroniusMonitor.Controls;
 
 public partial class ToshibaAcControl
 {
+    private static IList<ToshibaAcFanSpeed> fanSpeeds = new[]
+    {
+        ToshibaAcFanSpeed.Manual1, ToshibaAcFanSpeed.Manual2, ToshibaAcFanSpeed.Manual3,
+        ToshibaAcFanSpeed.Manual4, ToshibaAcFanSpeed.Manual5,
+        ToshibaAcFanSpeed.Auto, ToshibaAcFanSpeed.Quiet,
+    };
+
     private readonly ISolarSystemService solarSystemService = null!;
     private CancellationTokenSource? enablerTokenSource;
 
@@ -61,5 +70,19 @@ public partial class ToshibaAcControl
 
     private void OnPowerClicked(object sender, RoutedEventArgs e) => SendCommand(() => new ToshibaAcStateData { IsTurnedOn = !Device.State.IsTurnedOn });
 
-    private void OnModeClicked(object sender, RoutedEventArgs e) => SendCommand(() => new ToshibaAcStateData { Mode = ((HvacIcon)sender).Mode });
+    private void OnModeClicked(object sender, RoutedEventArgs e) => SendCommand(() => new ToshibaAcStateData { Mode = ((HvacButton)sender).Mode });
+
+    private void OnFanSpeedClicked(object sender, RoutedEventArgs e)
+    {
+        var index = fanSpeeds.IndexOf(Device.State.FanSpeed);
+
+        if (index < 0)
+        {
+            return;
+        }
+
+        index = ++index % fanSpeeds.Count;
+
+        SendCommand(() => new ToshibaAcStateData { FanSpeed = fanSpeeds[index] });
+    }
 }
