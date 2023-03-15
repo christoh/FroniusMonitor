@@ -27,7 +27,9 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
         jsonOptions.Converters.Add(new ToshibaHexConverter<ToshibaAcFanSpeed>());
         jsonOptions.Converters.Add(new ToshibaHexConverter<ToshibaAcPowerState>());
         jsonOptions.Converters.Add(new ToshibaStateDataConverter());
+        #if DEBUG
         jsonOptions.WriteIndented = true;
+        #endif
     }
 
     public SettingsBase Settings => IoC.Get<SettingsBase>();
@@ -80,7 +82,7 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
 
             postData = new Dictionary<string, string>
             {
-                {"DeviceID", settings.ToshibaAcConnection.UserName + ":" + session.ConsumerId.ToString("D")},
+                {"DeviceID", $"FroniusMonitor:{Guid.NewGuid():D}"},
                 {"DeviceType", "1"},
                 {"Username", settings.ToshibaAcConnection!.UserName},
             };
@@ -93,11 +95,11 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
             await azureClient.OpenAsync(Token).ConfigureAwait(false);
             await azureClient.SetMethodHandlerAsync("smmobile", HandleSmMobileMethod, null, Token).ConfigureAwait(false);
 
-            #if DEBUG
+#if DEBUG
 
             await azureClient.SetMethodDefaultHandlerAsync(HandleOtherMethods, null, Token).ConfigureAwait(false);
 
-            #endif
+#endif
 
             tokenSource?.Dispose();
             tokenSource = new CancellationTokenSource();
@@ -128,6 +130,7 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
         };
 
         var commandString = JsonSerializer.Serialize(command, jsonOptions);
+        Debug.Print(commandString);
         await azureClient.SendEventAsync(new Message(Encoding.UTF8.GetBytes(commandString)), Token).ConfigureAwait(false);
     }
 
@@ -162,7 +165,7 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
         return new MethodResponse(0);
     }, Token);
 
-    #if DEBUG
+#if DEBUG
 
     private Task<MethodResponse> HandleOtherMethods(MethodRequest request, object _) => Task.Run(() =>
     {
@@ -171,7 +174,7 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
         return new MethodResponse(0);
     }, Token);
 
-    #endif
+#endif
 
     private async ValueTask<T> Deserialize<T>(string uri, IEnumerable<KeyValuePair<string, string>>? postVariables = null) where T : new()
     {
@@ -199,16 +202,16 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
 
         using var response = (await client.SendAsync(message, Token).ConfigureAwait(false)).EnsureSuccessStatusCode();
 
-        #if xDEBUG // This allows you to see the raw JSON string
+#if xDEBUG // This allows you to see the raw JSON string
         var jsonText = await response.Content.ReadAsStringAsync(Token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
         var jDocument = JsonDocument.Parse(jsonText);
         var result = jDocument.Deserialize<ToshibaAcResponse<T>>(jsonOptions) ?? throw new InvalidDataException("No data");
 
-        #else
+#else
 
         var result = await response.Content.ReadFromJsonAsync<ToshibaAcResponse<T>>(jsonOptions, Token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
 
-        #endif
+#endif
 
         if (!result.IsSuccess)
         {

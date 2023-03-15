@@ -1,14 +1,18 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Controls
+﻿using System.Windows.Shapes;
+
+namespace De.Hochstaetter.FroniusMonitor.Controls
 {
     public partial class HvacFanSpeedButton
     {
-        private readonly IReadOnlyList<Border> manualElements;
+        private readonly IReadOnlyList<Shape> manualElements;
         private readonly IReadOnlyList<UIElement> allElements;
+
+        #region DependencyProperties
 
         public static readonly DependencyProperty FanSpeedProperty = DependencyProperty.Register
         (
             nameof(FanSpeed), typeof(ToshibaAcFanSpeed), typeof(HvacFanSpeedButton),
-            new PropertyMetadata((d, e) => ((HvacFanSpeedButton)d).OnFanSpeedChanged(e))
+            new PropertyMetadata((d, _) => ((HvacFanSpeedButton)d).OnFanSpeedChanged())
         );
 
         public ToshibaAcFanSpeed FanSpeed
@@ -16,6 +20,20 @@
             get => (ToshibaAcFanSpeed)GetValue(FanSpeedProperty);
             set => SetValue(FanSpeedProperty, value);
         }
+
+        public static readonly DependencyProperty FanBrushProperty = DependencyProperty.Register
+        (
+            nameof(FanBrush), typeof(Brush), typeof(HvacFanSpeedButton),
+            new PropertyMetadata((d, e) => ((HvacFanSpeedButton)d).OnFanSpeedChanged())
+        );
+
+        public Brush FanBrush
+        {
+            get => (Brush)GetValue(FanBrushProperty);
+            set => SetValue(FanBrushProperty, value);
+        }
+
+        #endregion
 
         public HvacFanSpeedButton()
         {
@@ -29,7 +47,7 @@
             allElements.Apply(element => element.Visibility = Visibility.Collapsed);
         }
 
-        private void OnFanSpeedChanged(DependencyPropertyChangedEventArgs e)
+        private void OnFanSpeedChanged()
         {
             DisableAll();
 
@@ -60,7 +78,7 @@
                     {
                         for (var i = 0; i < manualElements.Count; i++)
                         {
-                            manualElements[i].Background = i <= level ? Foreground : Brushes.Transparent;
+                            manualElements[i].Fill = i <= level ? FanBrush : Brushes.Transparent;
                         }
                     }
 

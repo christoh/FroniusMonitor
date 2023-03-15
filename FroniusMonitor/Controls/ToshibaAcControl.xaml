@@ -77,7 +77,7 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <c:HvacFanSpeedButton Width="50" Grid.Row="0" Grid.Column="0" FanSpeed="{Binding Device.State.FanSpeed}" Click="OnFanSpeedClicked">
+                    <c:HvacFanSpeedButton Width="50" Grid.Row="0" Grid.Column="0" FanSpeed="{Binding Device.State.FanSpeed}" FanBrush="LimeGreen" Click="OnFanSpeedClicked">
                         <c:HvacFanSpeedButton.Style>
                             <Style TargetType="c:HvacFanSpeedButton" BasedOn="{StaticResource TransparentButton}">
                                 <Setter Property="Template">
