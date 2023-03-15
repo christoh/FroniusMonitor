@@ -228,9 +228,6 @@
   <data name="SensorCards" xml:space="preserve">
 	  <value>Sensoren</value>
   </data>
-  <data name="AppName" xml:space="preserve">
-	  <value>Fronius Monitor</value>
-  </data>
   <data name="StoragePowerMessage" xml:space="preserve">
     <value>{0} mit {1:N0} W Leistung</value>
   </data>

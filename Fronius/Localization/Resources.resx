@@ -229,7 +229,7 @@
     <value>Updating</value>
   </data>
   <data name="AppName" xml:space="preserve">
-    <value>Fronius Monitor</value>
+	  <value>Home Automation Control Center</value>
   </data>
   <data name="StoragePowerMessage" xml:space="preserve">
     <value>{0} at {1:N0} W of power</value>
