@@ -205,7 +205,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Fronius Monitor.
+        ///   Looks up a localized string similar to Home Automation Control Center.
         /// </summary>
         public static string AppName {
             get {
