@@ -3,53 +3,38 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:local="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
         xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
         mc:Ignorable="d"
-        d:DesignHeight="100" d:DesignWidth="150"
-        >
+        d:DesignHeight="100" d:DesignWidth="150">
     <Viewbox>
         <Canvas Background="{Binding Background}" Width="150" Height="100" DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}">
+            <Canvas.Resources>
+                <Style TargetType="Polygon">
+                    <Setter Property="Stroke" Value="{Binding Foreground}" />
+                    <Setter Property="StrokeThickness" Value="2" />
+                </Style>
+            </Canvas.Resources>
+
             <Path Fill="{Binding Foreground}" Data="{StaticResource FanGeometry}">
                 <Path.RenderTransform>
                     <TransformGroup>
-                        <TranslateTransform X="-426" Y="-285.5"/>
-                        <ScaleTransform ScaleX=".9" ScaleY=".9"/>
+                        <TranslateTransform X="-426" Y="-285.5" />
+                        <ScaleTransform ScaleX=".9" ScaleY=".9" />
                     </TransformGroup>
                 </Path.RenderTransform>
             </Path>
 
-            <vi:QuietIcon x:Name="QuietIcon" BorderBrush="Red" Width="80" Canvas.Left="50" Canvas.Bottom="10"/>
+            <vi:QuietIcon x:Name="QuietIcon" BorderBrush="Red" Width="80" Canvas.Left="50" Canvas.Bottom="10" />
 
             <Grid Width="150" Height="100" x:Name="Auto">
-                <TextBlock Text="AUTO" FontSize="36" FontWeight="DemiBold" Margin="20,18,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <TextBlock Text="AUTO" FontSize="36" FontWeight="DemiBold" Margin="20,18,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" />
             </Grid>
 
-            <Grid Width="150" Height="100" Margin="0,0,-5,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-
-                <Grid.Resources>
-                    <Style TargetType="Border">
-                        <Setter Property="VerticalAlignment" Value="Bottom" />
-                        <Setter Property="Margin" Value="0,0,5,0" />
-                        <Setter Property="Background" Value="Transparent"/>
-                        <Setter Property="BorderThickness" Value="2"></Setter>
-                        <Setter Property="BorderBrush" Value="{Binding Foreground}"/>
-                    </Style>
-                </Grid.Resources>
-
-                <Border x:Name="Level1" Grid.Column="0" Height="20" />
-                <Border x:Name="Level2" Grid.Column="1" Height="40" />
-                <Border x:Name="Level3" Grid.Column="2" Height="60" />
-                <Border x:Name="Level4" Grid.Column="3" Height="80" />
-                <Border x:Name="Level5" Grid.Column="4" Height="100" />
-            </Grid>
+            <Polygon x:Name="Level1" Points="0,100 26,100 26,83 " />
+            <Polygon x:Name="Level2" Points="31,80 31,100 57,100 57,63 " />
+            <Polygon x:Name="Level3" Points="62,60 62,100 88,100 88,43 " />
+            <Polygon x:Name="Level4" Points="93,40 93,100 119,100 119,23 " />
+            <Polygon x:Name="Level5" Points="124,20 124,100 150,100 150,3 " />
         </Canvas>
     </Viewbox>
 </Button>

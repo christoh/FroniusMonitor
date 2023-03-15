@@ -4,7 +4,7 @@ namespace De.Hochstaetter.FroniusMonitor.Controls;
 
 public partial class ToshibaAcControl
 {
-    private static IList<ToshibaAcFanSpeed> fanSpeeds = new[]
+    private static readonly IList<ToshibaAcFanSpeed> fanSpeeds = new[]
     {
         ToshibaAcFanSpeed.Manual1, ToshibaAcFanSpeed.Manual2, ToshibaAcFanSpeed.Manual3,
         ToshibaAcFanSpeed.Manual4, ToshibaAcFanSpeed.Manual5,
