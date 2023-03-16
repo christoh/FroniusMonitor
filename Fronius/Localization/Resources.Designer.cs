@@ -2077,6 +2077,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Power limit.
+        /// </summary>
+        public static string PowerLimit {
+            get {
+                return ResourceManager.GetString("PowerLimit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Meter supplied by your distribution network operator.
         /// </summary>
         public static string ProviderMeter {

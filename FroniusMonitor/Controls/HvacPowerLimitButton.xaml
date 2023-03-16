@@ -1,0 +1,43 @@
+﻿<Button x:Class="De.Hochstaetter.FroniusMonitor.Controls.HvacPowerLimitButton"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
+        mc:Ignorable="d"
+        >
+    <Viewbox>
+        <Grid DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:HvacPowerLimitButton}}" Background="{Binding Background}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="10" Margin="1,-2,1,1" FontWeight="DemiBold">
+                <Run Text="LIMIT" />
+                <!--<Run Text="{Binding PowerLimit}"/><Run Text="%"/>-->
+            </TextBlock>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Grid.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="BorderThickness" Value=".7" />
+                        <Setter Property="BorderBrush" Value="{Binding PowerBorderBrush, FallbackValue=Black}" />
+                        <Setter Property="Height" Value="10" />
+                        <Setter Property="Width" Value="8" />
+                        <Setter Property="Background" Value="{Binding PowerBrush, FallbackValue=LimeGreen}" />
+                        <Setter Property="Margin" Value="1,8,1,0" />
+                    </Style>
+                </Grid.Resources>
+
+                <Border Grid.Column="0" Width="16" />
+                <Border x:Name="P75" Grid.Column="1" />
+                <Border x:Name="P100" Grid.Column="2" />
+            </Grid>
+        </Grid>
+    </Viewbox>
+</Button>
