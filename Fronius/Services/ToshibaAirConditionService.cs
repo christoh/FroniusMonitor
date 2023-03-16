@@ -27,9 +27,9 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
         jsonOptions.Converters.Add(new ToshibaHexConverter<ToshibaAcFanSpeed>());
         jsonOptions.Converters.Add(new ToshibaHexConverter<ToshibaAcPowerState>());
         jsonOptions.Converters.Add(new ToshibaStateDataConverter());
-        #if DEBUG
+#if DEBUG
         jsonOptions.WriteIndented = true;
-        #endif
+#endif
     }
 
     public SettingsBase Settings => IoC.Get<SettingsBase>();
@@ -37,6 +37,14 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
     private CancellationToken Token => tokenSource?.Token ?? throw new WebException("Connection closed", WebExceptionStatus.ConnectionClosed);
 
     public bool IsRunning => tokenSource != null;
+
+    private bool isConnected;
+
+    public bool IsConnected
+    {
+        get => isConnected;
+        private set => Set(ref isConnected, value);
+    }
 
     private ObservableCollection<ToshibaAcMapping>? allDevices;
 
@@ -88,10 +96,12 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
             };
 
             var azureCredentials = await Deserialize<ToshibaAcAzureCredentials>("/api/Consumer/RegisterMobileDevice", postData).ConfigureAwait(false);
+            var auth = AuthenticationMethodFactory.CreateAuthenticationWithToken(azureCredentials.DeviceId, azureCredentials.SasToken);
+            azureClient = DeviceClient.Create(azureCredentials.HostName, auth, TransportType.Amqp);
+
             AllDevices = await Deserialize<ObservableCollection<ToshibaAcMapping>>($"/api/AC/GetConsumerACMapping?consumerId={session.ConsumerId}").ConfigureAwait(false);
 
-            var auth = AuthenticationMethodFactory.CreateAuthenticationWithToken(azureCredentials.DeviceId, azureCredentials.SasToken);
-            azureClient = DeviceClient.Create(azureCredentials.HostName, auth, TransportType.Amqp_WebSocket_Only);
+            azureClient.SetConnectionStatusChangesHandler(OnAzureConnectionStatusChange);
             await azureClient.OpenAsync(Token).ConfigureAwait(false);
             await azureClient.SetMethodHandlerAsync("smmobile", HandleSmMobileMethod, null, Token).ConfigureAwait(false);
 
@@ -132,6 +142,11 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
         var commandString = JsonSerializer.Serialize(command, jsonOptions);
         Debug.Print(commandString);
         await azureClient.SendEventAsync(new Message(Encoding.UTF8.GetBytes(commandString)), Token).ConfigureAwait(false);
+    }
+
+    private void OnAzureConnectionStatusChange(ConnectionStatus status, ConnectionStatusChangeReason reason)
+    {
+        IsConnected = status == ConnectionStatus.Connected;
     }
 
     private Task<MethodResponse> HandleSmMobileMethod(MethodRequest request, object _) => Task.Run(() =>

@@ -681,6 +681,19 @@ public class LinuxVersion : ConverterBase
     }
 }
 
+public class ToshibaHvacStatus2Brush : MultiConverterBase
+{
+    public override object? Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (values?.OfType<bool>().ToList() is not List<bool> {Count:2} list)
+        {
+            return null;
+        }
+
+        return !list[0] ? Brushes.OrangeRed : list[1] ? Brushes.AntiqueWhite : Brushes.LightGray;
+    }
+}
+
 public class EqualityToAnything<TFrom, TTo> : ConverterBase
 {
     public TFrom? Value { get; set; }

@@ -11,7 +11,14 @@ public partial class ToshibaAcControl
         ToshibaAcFanSpeed.Auto, ToshibaAcFanSpeed.Quiet,
     };
 
-    private readonly ISolarSystemService solarSystemService = null!;
+    // ReSharper disable once UseUtf8StringLiteral
+    private static readonly IList<byte> powerLimits = new[] { (byte)50, (byte)75, (byte)100, };
+
+    private static IReadOnlyDictionary<byte, IReadOnlyList<ToshibaHvacMeritFeatureA>> meritFeatureADictionary = new Dictionary<byte, IReadOnlyList<ToshibaHvacMeritFeatureA>>
+    {
+        {0x3c, new[] {ToshibaHvacMeritFeatureA.None, ToshibaHvacMeritFeatureA.Eco, ToshibaHvacMeritFeatureA.HighPower, ToshibaHvacMeritFeatureA.Silent1, ToshibaHvacMeritFeatureA.Silent1}}
+    };
+
     private CancellationTokenSource? enablerTokenSource;
 
     public static readonly DependencyProperty DeviceProperty = DependencyProperty.Register
@@ -26,13 +33,15 @@ public partial class ToshibaAcControl
         set => SetValue(DeviceProperty, value);
     }
 
+    public ISolarSystemService SolarSystemService { get; } = null!;
+
     public ToshibaAcControl()
     {
         InitializeComponent();
 
         if (!DesignerProperties.GetIsInDesignMode(this))
         {
-            solarSystemService = IoC.Get<ISolarSystemService>();
+            SolarSystemService = IoC.Get<ISolarSystemService>();
         }
 
         Unloaded += (_, _) => Device.State.PropertyChanged -= OnStateChanged;
@@ -63,7 +72,7 @@ public partial class ToshibaAcControl
     private void SendCommand(ToshibaAcStateData stateData)
     {
         IsEnabled = false;
-        solarSystemService.AcService.SendDeviceCommand(stateData, Device);
+        SolarSystemService.AcService.SendDeviceCommand(stateData, Device);
         enablerTokenSource = new CancellationTokenSource();
         Task.Delay(TimeSpan.FromSeconds(10), enablerTokenSource.Token).ContinueWith(_ => OnStateChanged(), enablerTokenSource.Token);
     }
@@ -74,13 +83,7 @@ public partial class ToshibaAcControl
 
     private void OnFanSpeedClicked(object sender, RoutedEventArgs e)
     {
-        var index = fanSpeeds.IndexOf(Device.State.FanSpeed);
-
-        if (index < 0)
-        {
-            return;
-        }
-
+        var index = Math.Max(fanSpeeds.IndexOf(Device.State.FanSpeed), 0);
         index = ++index % fanSpeeds.Count;
         SendCommand(new ToshibaAcStateData { FanSpeed = fanSpeeds[index] });
     }
@@ -91,7 +94,7 @@ public partial class ToshibaAcControl
 
     private void ChangeTemperature(sbyte amount)
     {
-        var newTemperature = Math.Max(Math.Min((sbyte)30, (sbyte)(Device.State.TargetTemperatureCelsius + amount)), (sbyte)17);
+        var newTemperature = Math.Max(Math.Min((sbyte)30, (sbyte)(Device.State.TargetTemperatureCelsius! + amount)), (sbyte)17);
 
         if (newTemperature == Device.State.TargetTemperatureCelsius)
         {
@@ -99,5 +102,12 @@ public partial class ToshibaAcControl
         }
 
         SendCommand(new ToshibaAcStateData { TargetTemperatureCelsius = newTemperature });
+    }
+
+    private void OnPowerLimitClicked(object sender, RoutedEventArgs e)
+    {
+        var index = Math.Max(powerLimits.IndexOf(Device.State.PowerLimit), 0);
+        index = ++index % powerLimits.Count;
+        SendCommand(new ToshibaAcStateData { PowerLimit = powerLimits[index] });
     }
 }

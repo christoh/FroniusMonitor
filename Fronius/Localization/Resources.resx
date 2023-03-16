@@ -1077,4 +1077,7 @@
   <data name="ToshibaHvac" xml:space="preserve">
 	  <value>Toshiba HVAC</value>
   </data>
+  <data name="PowerLimit" xml:space="preserve">
+	  <value>Power limit</value>
+  </data>
 </root>

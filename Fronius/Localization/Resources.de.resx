@@ -1050,4 +1050,7 @@
   <data name="ToshibaHvac" xml:space="preserve">
 	  <value>Toshiba Klima</value>
   </data>
+  <data name="PowerLimit" xml:space="preserve">
+	  <value>Powerlimit</value>
+  </data>
 </root>
