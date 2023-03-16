@@ -94,6 +94,9 @@
     <Compile Update="Assets\Images\ModbusLogo.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Assets\Images\TemperatureInside.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>

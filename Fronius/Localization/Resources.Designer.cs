@@ -2725,20 +2725,20 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Toshiba A/C.
-        /// </summary>
-        public static string ToshibaAc {
-            get {
-                return ResourceManager.GetString("ToshibaAc", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Toshiba Air Condition.
+        ///   Looks up a localized string similar to Toshiba HVACs.
         /// </summary>
         public static string ToshibaAcHeader {
             get {
                 return ResourceManager.GetString("ToshibaAcHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Toshiba HVAC.
+        /// </summary>
+        public static string ToshibaHvac {
+            get {
+                return ResourceManager.GetString("ToshibaHvac", resourceCulture);
             }
         }
         

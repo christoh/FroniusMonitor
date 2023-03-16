@@ -1,6 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Models.ToshibaAc;
-
-namespace De.Hochstaetter.Fronius.Services;
+﻿namespace De.Hochstaetter.Fronius.Services;
 
 public class SolarSystemService : BindableBase, ISolarSystemService
 {
@@ -162,9 +160,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         {
             await Task.Run(() => Task.WaitAll(fritzBoxTask, wattPilotTask, inverterTask, toshibaAcTask)).ConfigureAwait(false);
         }
-        catch (AggregateException)
-        {
-        }
+        catch (AggregateException) { }
 
         result.WattPilot = wattPilotTask.IsCompletedSuccessfully ? wattPilotTask.Result : null;
         result.FritzBox = fritzBoxTask.IsCompletedSuccessfully ? fritzBoxTask.Result : null;
@@ -197,7 +193,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
                     foreach (var device in deviceGroup)
                     {
-                        var group = new DeviceGroup { DeviceClass = deviceGroup.Key };
+                        var group = new DeviceGroup {DeviceClass = deviceGroup.Key};
 
                         switch (deviceGroup.Key)
                         {
@@ -289,6 +285,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         {
             bool newSolarData;
             bool newFritzBoxData;
+
             if (SolarSystem?.PrimaryInverter == null || SolarSystem.Versions == null || SolarSystem.Components == null)
             {
                 SolarSystem = await CreateSolarSystem(null, null).ConfigureAwait(false);
@@ -300,7 +297,10 @@ public class SolarSystemService : BindableBase, ISolarSystemService
                 var gen24Task = froniusCounter++ % FroniusUpdateRate == 0 ? TryGetGen24System() : Task.FromResult<Gen24System?>(null);
 
                 var fritzBoxTask = suspendFritzBoxCounter <= 0 && webClientService.FritzBoxConnection != null &&
-                                   fritzBoxCounter++ % FritzBoxUpdateRate == 0 ? TryGetFritzBoxData() : Task.FromResult<FritzBoxDeviceList?>(null);
+                                   fritzBoxCounter++ % FritzBoxUpdateRate == 0
+                    ? TryGetFritzBoxData()
+                    : Task.FromResult<FritzBoxDeviceList?>(null);
+
                 var wattPilotTask = TryStartWattPilot();
 
                 var toshibaAcTask = TryStartToshibaAc();
@@ -309,16 +309,13 @@ public class SolarSystemService : BindableBase, ISolarSystemService
                 {
                     Task.WaitAll(gen24Task, fritzBoxTask, wattPilotTask, toshibaAcTask);
                 }
-                catch (AggregateException)
-                {
-
-                }
+                catch (AggregateException) { }
 
                 SolarSystem.WattPilot = wattPilotTask.IsCompletedSuccessfully ? wattPilotTask.Result ?? SolarSystem.WattPilot : SolarSystem.WattPilot;
                 SolarSystem.FritzBox = fritzBoxTask.IsCompletedSuccessfully ? fritzBoxTask.Result ?? SolarSystem.FritzBox : null;
                 SolarSystem.Gen24System = gen24Task.IsCompletedSuccessfully ? gen24Task.Result ?? SolarSystem.Gen24System : null;
-                newFritzBoxData = fritzBoxTask.IsCompletedSuccessfully && fritzBoxTask.Result != null;
-                newSolarData = gen24Task.IsCompletedSuccessfully && gen24Task.Result != null;
+                newFritzBoxData = fritzBoxTask is {IsCompletedSuccessfully: true, Result: { }};
+                newSolarData = gen24Task is {IsCompletedSuccessfully: true, Result: { }};
             }
 
 

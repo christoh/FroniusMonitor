@@ -2,17 +2,13 @@
 
 public class ToshibaAcStateData : BindableBase
 {
-
-
-    static ToshibaAcStateData()
+    public ToshibaAcStateData()
     {
-        Empty = new byte[19];
-        Array.Fill<byte>(Empty, 0xff);
+        stateData = new byte[19];
+        Array.Fill<byte>((byte[])stateData, 0xff);
     }
 
-    public static byte[] Empty { get; }
-
-    private IList<byte> stateData = Empty;
+    private IList<byte> stateData;
 
     public IList<byte> StateData
     {
@@ -32,10 +28,10 @@ public class ToshibaAcStateData : BindableBase
         set => SetStateData(1, (byte)value);
     }
 
-    public sbyte TargetTemperatureCelsius
+    public sbyte? TargetTemperatureCelsius
     {
-        get => unchecked((sbyte)StateData[2]);
-        set => SetStateData(2, unchecked((byte)value));
+        get => ToTemperature(StateData[2]);
+        set => SetStateData(2, ToByte(value));
     }
 
     public ToshibaAcFanSpeed FanSpeed
@@ -56,9 +52,9 @@ public class ToshibaAcStateData : BindableBase
         set => SetStateData(6, (byte)value);
     }
 
-    public sbyte? CurrentIndoorTemperatureCelsius => unchecked(StateData[8] == 127 ? null : (sbyte)StateData[8]);
+    public sbyte? CurrentIndoorTemperatureCelsius => ToTemperature(StateData[8]);
 
-    public sbyte? CurrentOutdoorTemperatureCelsius => unchecked(StateData[9] == 127 ? null : (sbyte)StateData[9]);
+    public sbyte? CurrentOutdoorTemperatureCelsius => ToTemperature(StateData[9]);
 
     public override string ToString() => StateData.Aggregate(new StringBuilder(StateData.Count << 1), (c, n) => c.Append($"{n:x2}")).ToString();
 
@@ -112,4 +108,8 @@ public class ToshibaAcStateData : BindableBase
             NotifyOfPropertyChange(propertyName);
         }
     }
+
+    private static sbyte? ToTemperature(byte value) => value > 0x7e ? null : value < 0x40 ? (sbyte)value : (sbyte)(value - 0x7f);
+
+    private static byte ToByte(sbyte? value) => value == null ? (byte)0x7f : value < 0 ? (byte)(value + 0x7f) : (byte)value;
 }

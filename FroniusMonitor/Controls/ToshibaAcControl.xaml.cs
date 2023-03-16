@@ -56,21 +56,21 @@ public partial class ToshibaAcControl
         enablerTokenSource?.Cancel();
         enablerTokenSource?.Dispose();
         enablerTokenSource = null;
+        PowerButton.IsChecked = Device.State.IsTurnedOn;
         return IsEnabled = true;
     });
 
-    private void SendCommand(Func<ToshibaAcStateData> func)
+    private void SendCommand(ToshibaAcStateData stateData)
     {
         IsEnabled = false;
-        var stateData = func();
         solarSystemService.AcService.SendDeviceCommand(stateData, Device);
         enablerTokenSource = new CancellationTokenSource();
         Task.Delay(TimeSpan.FromSeconds(10), enablerTokenSource.Token).ContinueWith(_ => OnStateChanged(), enablerTokenSource.Token);
     }
 
-    private void OnPowerClicked(object sender, RoutedEventArgs e) => SendCommand(() => new ToshibaAcStateData { IsTurnedOn = !Device.State.IsTurnedOn });
+    private void OnPowerClicked(object sender, RoutedEventArgs e) => SendCommand(new ToshibaAcStateData { IsTurnedOn = !Device.State.IsTurnedOn });
 
-    private void OnModeClicked(object sender, RoutedEventArgs e) => SendCommand(() => new ToshibaAcStateData { Mode = ((HvacButton)sender).Mode });
+    private void OnModeClicked(object sender, RoutedEventArgs e) => SendCommand(new ToshibaAcStateData { Mode = ((HvacButton)sender).Mode });
 
     private void OnFanSpeedClicked(object sender, RoutedEventArgs e)
     {
@@ -82,7 +82,22 @@ public partial class ToshibaAcControl
         }
 
         index = ++index % fanSpeeds.Count;
+        SendCommand(new ToshibaAcStateData { FanSpeed = fanSpeeds[index] });
+    }
 
-        SendCommand(() => new ToshibaAcStateData { FanSpeed = fanSpeeds[index] });
+    private void OnTemperatureUpClicked(object sender, RoutedEventArgs e) => ChangeTemperature(1);
+
+    private void OnTemperatureDownClicked(object sender, RoutedEventArgs e) => ChangeTemperature(-1);
+
+    private void ChangeTemperature(sbyte amount)
+    {
+        var newTemperature = Math.Max(Math.Min((sbyte)30, (sbyte)(Device.State.TargetTemperatureCelsius + amount)), (sbyte)17);
+
+        if (newTemperature == Device.State.TargetTemperatureCelsius)
+        {
+            return;
+        }
+
+        SendCommand(new ToshibaAcStateData { TargetTemperatureCelsius = newTemperature });
     }
 }
