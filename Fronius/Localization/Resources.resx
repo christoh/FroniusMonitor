@@ -1069,12 +1069,12 @@
 	  <value>User</value>
   </data>
   <data name="ToshibaAcHeader" xml:space="preserve">
-	  <value>Toshiba Air Condition</value>
+	  <value>Toshiba HVACs</value>
   </data>
   <data name="EnableToshibaAc" xml:space="preserve">
 	  <value>Control Toshiba A/C systems</value>
   </data>
-  <data name="ToshibaAc" xml:space="preserve">
-	  <value>Toshiba A/C</value>
+  <data name="ToshibaHvac" xml:space="preserve">
+	  <value>Toshiba HVAC</value>
   </data>
 </root>

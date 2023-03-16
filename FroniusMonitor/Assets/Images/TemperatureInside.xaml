@@ -1,0 +1,14 @@
+﻿<ContentControl x:Class="De.Hochstaetter.FroniusMonitor.Assets.Images.TemperatureInside"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
+             mc:Ignorable="d" 
+             d:DesignHeight="24" d:DesignWidth="24">
+    <Viewbox DataContext="{Binding RelativeSource={RelativeSource AncestorType=local:TemperatureOutside}}">
+        <Canvas Height="24" Width="24">
+        <Path Margin="-4,-4" Fill="Black" Data="M 16 3.96875 L 15.46875 4.3125 L 3.96875 11.53125 L 5 13.15625 L 5 27 L 5 28 L 6 28 L 26 28 L 27 28 L 27 27 L 27 13.15625 L 28.03125 11.53125 L 16.53125 4.3125 L 16 3.96875 z M 16 6.34375 L 25 12 L 25 26 L 7 26 L 7 12 L 16 6.34375 z M 15 10 L 15 20.28125 C 14.403151 20.629936 14 21.268327 14 22 C 14 23.092725 14.907275 24 16 24 C 17.092725 24 18 23.092725 18 22 C 18 21.268327 17.596849 20.629936 17 20.28125 L 17 19 L 19 19 L 19 17 L 17 17 L 17 16 L 19 16 L 19 14 L 17 14 L 17 13 L 19 13 L 19 11 L 17 11 L 17 10 L 15 10 z"/>
+        </Canvas>
+    </Viewbox>
+</ContentControl>

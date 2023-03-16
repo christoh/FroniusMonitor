@@ -155,6 +155,12 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
                     var heartbeat = command.PayLoad.Deserialize<ToshibaAcHeartbeat>(jsonOptions)!;
                     device.State.UpdateHeartBeatData(heartbeat);
                     break;
+
+                case "CMD_SET_SCHEDULE_FROM_AC":
+                    break;
+
+                default:
+                    break;
             }
         }
         catch
@@ -202,8 +208,9 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
 
         using var response = (await client.SendAsync(message, Token).ConfigureAwait(false)).EnsureSuccessStatusCode();
 
-#if xDEBUG // This allows you to see the raw JSON string
+#if DEBUG // This allows you to see the raw JSON string
         var jsonText = await response.Content.ReadAsStringAsync(Token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
+        Debug.Print(jsonText);
         var jDocument = JsonDocument.Parse(jsonText);
         var result = jDocument.Deserialize<ToshibaAcResponse<T>>(jsonOptions) ?? throw new InvalidDataException("No data");
 
