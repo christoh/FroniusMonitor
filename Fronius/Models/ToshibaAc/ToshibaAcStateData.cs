@@ -109,7 +109,17 @@ public class ToshibaAcStateData : BindableBase
         }
     }
 
-    private static sbyte? ToTemperature(byte value) => value > 0x7e ? null : value < 0x40 ? (sbyte)value : (sbyte)(value - 0x7f);
+    private static sbyte? ToTemperature(byte value) => value switch
+    {
+        0x7f => null,
+        0x7e => -1,
+        _ => unchecked((sbyte)value)
+    };
 
-    private static byte ToByte(sbyte? value) => value == null ? (byte)0x7f : value < 0 ? (byte)(value + 0x7f) : (byte)value;
+    private static byte ToByte(sbyte? value) => value switch
+    {
+        null => 0x7f,
+        -1 => 0x7e,
+        _ => unchecked((byte)value)
+    };
 }
