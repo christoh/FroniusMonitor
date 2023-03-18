@@ -48,6 +48,7 @@
         }
 
         private string createdDate = string.Empty;
+
         [JsonPropertyName("CreatedDate")]
         public string CreatedDate
         {

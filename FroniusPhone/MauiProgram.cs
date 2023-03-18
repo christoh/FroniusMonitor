@@ -15,9 +15,9 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
-        #if DEBUG
+#if DEBUG
         builder.Logging.AddDebug();
-        #endif
+#endif
         return builder.Build();
     }
 
@@ -36,7 +36,8 @@ public static class MauiProgram
             .AddSingleton<OverviewViewModel>()
             .AddSingleton<SettingsPage>()
             .AddSingleton<SettingsViewModel>()
-            ;
+            .AddSingleton(SynchronizationContext.Current ?? throw new InvalidOperationException("No Context"))
+        ;
 
         return builder;
     }

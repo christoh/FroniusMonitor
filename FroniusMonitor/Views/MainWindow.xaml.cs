@@ -221,7 +221,8 @@ public partial class MainWindow
 
     private void OnAutoSizeChecked(object sender, RoutedEventArgs e)
     {
-        PowerConsumerColumn.Width = new GridLength(0, GridUnitType.Auto);
+        PowerConsumerRow.Height = new GridLength(0, GridUnitType.Star);
+        SolarSystemRow.Height = new GridLength(1, GridUnitType.Auto);
     }
 
     private void ShowEventLog(object sender, RoutedEventArgs e)

@@ -685,7 +685,7 @@ public class ToshibaHvacStatus2Brush : MultiConverterBase
 {
     public override object? Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (values?.OfType<bool>().ToList() is not List<bool> {Count:2} list)
+        if (values?.OfType<bool>().ToList() is not List<bool> { Count: 2 } list)
         {
             return null;
         }
@@ -710,3 +710,43 @@ public class ByteEqualityToString : EqualityToAnything<byte, string> { }
 
 public class ToshibaAcOperatingMode2Visibility : EqualityToAnything<ToshibaAcOperatingMode, Visibility> { }
 public class ToshibaAcOperatingMode2Brush : EqualityToAnything<ToshibaAcOperatingMode, Brush> { }
+
+public class MeritFeatureA2Visibility : EqualityToAnything<ToshibaHvacMeritFeaturesA, Visibility>
+{
+    public MeritFeatureA2Visibility()
+    {
+        Equal = Visibility.Visible;
+        NotEqual = Visibility.Collapsed;
+    }
+}
+
+public class Range2Anything<TFrom, TTo> : ConverterBase where TFrom : IComparable
+{
+    public TFrom? Minimum { get; set; }
+    public TFrom? Maximum { get; set; }
+    public TTo? InRange { get; set; }
+    public TTo? OutOfRange { get; set; }
+
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is not TFrom fromValue ? OutOfRange : fromValue.CompareTo(Minimum) >= 0 && fromValue.CompareTo(Maximum) <= 0 ? InRange : OutOfRange;
+    }
+}
+
+public class ToshibaHvacMeritFeaturesARange2Visibility : Range2Anything<ToshibaHvacMeritFeaturesA, Visibility>
+{
+    public ToshibaHvacMeritFeaturesARange2Visibility()
+    {
+        InRange = Visibility.Visible;
+        OutOfRange = Visibility.Collapsed;
+    }
+}
+
+public class ToshibaHvacSilent2Visibility:ConverterBase
+{
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is ToshibaHvacMeritFeaturesA.Silent1 or ToshibaHvacMeritFeaturesA.Silent2 ? Visibility.Visible : Visibility.Collapsed;
+    }
+}
+

@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc
 {
-    public enum ToshibaHvacMeritFeatureA
+    public enum ToshibaHvacMeritFeaturesA
     {
         None = 0,
         HighPower = 1,

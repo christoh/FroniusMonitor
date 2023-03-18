@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.Fronius.Services;
+﻿using De.Hochstaetter.Fronius.Models.ToshibaAc;
+
+namespace De.Hochstaetter.Fronius.Services;
 
 public class SolarSystemService : BindableBase, ISolarSystemService
 {
@@ -13,13 +15,16 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
     public event EventHandler<SolarDataEventArgs>? NewDataReceived;
 
-    public SolarSystemService(IWebClientService webClientService, IWattPilotService wattPilotService, IToshibaAirConditionService acService)
+    public SolarSystemService(IWebClientService webClientService, IWattPilotService wattPilotService, IToshibaAirConditionService acService, SynchronizationContext context)
     {
         this.webClientService = webClientService;
         this.wattPilotService = wattPilotService;
         AcService = acService;
         PowerFlowQueue = new Queue<Gen24PowerFlow>(QueueSize + 1);
+        SwitchableDevices = new BindableCollection<ISwitchable>(context);
     }
+
+    public BindableCollection<ISwitchable> SwitchableDevices { get; }
 
     public IToshibaAirConditionService AcService { get; }
 
@@ -158,7 +163,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
         try
         {
-            await Task.Run(() => Task.WaitAll(fritzBoxTask, wattPilotTask, inverterTask, toshibaAcTask)).ConfigureAwait(false);
+            await Task.WhenAll(fritzBoxTask, wattPilotTask, inverterTask, toshibaAcTask).ConfigureAwait(false);
         }
         catch (AggregateException) { }
 
@@ -229,7 +234,35 @@ public class SolarSystemService : BindableBase, ISolarSystemService
     {
         try
         {
-            return await webClientService.GetFritzBoxDevices().ConfigureAwait(false);
+            var devices = await webClientService.GetFritzBoxDevices().ConfigureAwait(false);
+
+            await Task.Run(() =>
+            {
+                var powerConsumers = devices.PowerConsumers.Cast<FritzBoxDevice>().ToList();
+                var switchableDevices = SwitchableDevices.OfType<FritzBoxDevice>().ToList();
+                var devicesToRemove = switchableDevices.Where(s => !powerConsumers.Select(f => f.Id).Contains(s.Id)).ToList();
+                var devicesToAdd = powerConsumers.Where(p => !switchableDevices.Select(f => f.Id).Contains(p.Id)).ToList();
+                var devicesToUpdate = switchableDevices.Where(s => powerConsumers.Select(p => p.Id).Contains(s.Id)).ToList();
+
+                foreach (var oldDevice in devicesToUpdate)
+                {
+                    var newDevice = powerConsumers.Single(p => p.Id == oldDevice.Id);
+
+                    //foreach (var propertyInfo in typeof(FritzBoxDevice).GetProperties().Where(p => p is { CanWrite: true, CanRead: true }))
+                    //{
+                    //    var value = propertyInfo.GetValue(oldDevice);
+                    //    propertyInfo.SetValue(newDevice, value);
+                    //    oldDevice.Refresh();
+                    //}
+                    var index = SwitchableDevices.IndexOf(oldDevice);
+                    SwitchableDevices[index] = newDevice;
+                }
+
+                SwitchableDevices.RemoveRange(devicesToRemove);
+                SwitchableDevices.AddRange(devicesToAdd);
+            }).ConfigureAwait(false);
+
+            return devices;
         }
         catch
         {
@@ -257,6 +290,14 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         if (!AcService.IsRunning)
         {
             await AcService.Start().ConfigureAwait(false);
+
+            if (!AcService.IsRunning)
+            {
+                return;
+            }
+
+            SwitchableDevices.RemoveRange(SwitchableDevices.OfType<ToshibaAcMappingDevice>().ToList());
+            SwitchableDevices.AddRange(AcService.AllDevices!.SelectMany(d => d.Devices));
         }
     }
 
@@ -274,17 +315,25 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         }
     }
 
-    public async void TimerElapsed(object? _)
+    private async void TimerElapsed(object? _)
     {
         if (Interlocked.Exchange(ref updateSemaphore, 1) != 0)
         {
             return;
         }
 
+        var settings = IoC.Get<SettingsBase>();
+
         try
         {
             bool newSolarData;
             bool newFritzBoxData;
+
+            if (!settings.HaveToshibaAc)
+            {
+                await AcService.Stop().ConfigureAwait(false);
+                SwitchableDevices.RemoveRange(SwitchableDevices.OfType<ToshibaAcMappingDevice>().ToList());
+            }
 
             if (SolarSystem?.PrimaryInverter == null || SolarSystem.Versions == null || SolarSystem.Components == null)
             {
@@ -295,6 +344,11 @@ public class SolarSystemService : BindableBase, ISolarSystemService
             else
             {
                 var gen24Task = froniusCounter++ % FroniusUpdateRate == 0 ? TryGetGen24System() : Task.FromResult<Gen24System?>(null);
+
+                if (webClientService.FritzBoxConnection == null && SwitchableDevices.Any(d => d is FritzBoxDevice))
+                {
+                    SwitchableDevices.RemoveRange(SwitchableDevices.OfType<FritzBoxDevice>().ToList());
+                }
 
                 var fritzBoxTask = suspendFritzBoxCounter <= 0 && webClientService.FritzBoxConnection != null &&
                                    fritzBoxCounter++ % FritzBoxUpdateRate == 0
@@ -307,7 +361,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
                 try
                 {
-                    Task.WaitAll(gen24Task, fritzBoxTask, wattPilotTask, toshibaAcTask);
+                    await Task.WhenAll(gen24Task, fritzBoxTask, wattPilotTask, toshibaAcTask).ConfigureAwait(false);
                 }
                 catch (AggregateException) { }
 

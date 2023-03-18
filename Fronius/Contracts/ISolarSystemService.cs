@@ -6,6 +6,8 @@
         WebConnection? WattPilotConnection { get; set; }
         public IToshibaAirConditionService AcService { get; }
 
+        public BindableCollection<ISwitchable>? SwitchableDevices { get; }
+
         public int FroniusUpdateRate { get; set; }
         public double GridPowerSum { get; }
         public double LoadPowerSum { get; }

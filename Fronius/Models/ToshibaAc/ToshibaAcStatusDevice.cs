@@ -29,12 +29,6 @@
             set => Set(ref powerState, value, () => NotifyOfPropertyChange(nameof(IsTurnedOn)));
         }
 
-        public bool IsTurnedOn
-        {
-            get => PowerState == ToshibaAcPowerState.On;
-            set => PowerState = value ? ToshibaAcPowerState.On : ToshibaAcPowerState.Off;
-        }
-
         private Guid deviceUniqueId;
 
         [JsonPropertyName("ACDeviceUniqueId")]

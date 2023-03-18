@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace De.Hochstaetter.Fronius.Models.ToshibaAc
+﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc
 {
-    public abstract class ToshibaAcDeviceBase : BindableBase
+    public abstract class ToshibaAcDeviceBase : BindableBase, ISwitchable
     {
         private ToshibaAcStateData state = new();
+
         [JsonPropertyName("ACStateData")]
         public ToshibaAcStateData State
         {
@@ -17,6 +12,7 @@ namespace De.Hochstaetter.Fronius.Models.ToshibaAc
         }
 
         private Version firmwareVersion = default!;
+
         [JsonPropertyName("FirmwareVersion")]
         public Version FirmwareVersion
         {
@@ -25,6 +21,7 @@ namespace De.Hochstaetter.Fronius.Models.ToshibaAc
         }
 
         private ushort meritFeature;
+
         [JsonPropertyName("MeritFeature")]
         public ushort MeritFeature
         {
@@ -33,11 +30,21 @@ namespace De.Hochstaetter.Fronius.Models.ToshibaAc
         }
 
         private ObservableCollection<ToshibaAcModeValue> modes = new();
+
         [JsonPropertyName("ModeValues")]
         public ObservableCollection<ToshibaAcModeValue> Modes
         {
             get => modes;
             set => Set(ref modes, value);
+        }
+
+        public bool IsSwitchingEnabled => false;
+        public bool? IsTurnedOn => State.IsTurnedOn;
+        public bool CanSwitch => true;
+
+        public Task TurnOnOff(bool turnOn)
+        {
+            throw new NotImplementedException();
         }
     }
 }

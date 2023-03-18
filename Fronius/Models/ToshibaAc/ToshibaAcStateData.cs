@@ -46,9 +46,9 @@ public class ToshibaAcStateData : BindableBase
         set => SetStateData(5, value);
     }
 
-    public ToshibaAcPowerSetting PowerSetting
+    public ToshibaHvacMeritFeaturesA MeritFeaturesA
     {
-        get => (ToshibaAcPowerSetting)StateData[6];
+        get => (ToshibaHvacMeritFeaturesA)StateData[6];
         set => SetStateData(6, (byte)value);
     }
 
@@ -97,7 +97,7 @@ public class ToshibaAcStateData : BindableBase
         NotifyOfPropertyChange(nameof(PowerLimit));
         NotifyOfPropertyChange(nameof(CurrentIndoorTemperatureCelsius));
         NotifyOfPropertyChange(nameof(CurrentOutdoorTemperatureCelsius));
-        NotifyOfPropertyChange(nameof(PowerSetting));
+        NotifyOfPropertyChange(nameof(MeritFeaturesA));
     }
 
     private void SetStateData(int index, byte value, [CallerMemberName] string? propertyName = null)

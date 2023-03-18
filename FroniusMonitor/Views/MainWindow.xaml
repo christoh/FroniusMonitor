@@ -11,22 +11,19 @@
         xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
         xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
         xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
-        xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters">
+        xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
+        xmlns:models="clr-namespace:De.Hochstaetter.Fronius.Models;assembly=Fronius"
+        xmlns:toshiba="clr-namespace:De.Hochstaetter.Fronius.Models.ToshibaAc;assembly=Fronius">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="Auto" x:Name="PowerConsumerColumn" />
-            <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
-
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" x:Name="SolarSystemRow" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" x:Name="PowerConsumerRow"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4">
+        <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
@@ -58,7 +55,7 @@
             </ToggleButton>
         </Grid>
 
-        <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Orientation="Horizontal" Background="{x:Static SystemColors.MenuBarBrush}">
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Background="{x:Static SystemColors.MenuBarBrush}">
             <StackPanel.LayoutTransform>
                 <ScaleTransform x:Name="RibbonTransform" ScaleY="1" />
             </StackPanel.LayoutTransform>
@@ -75,7 +72,7 @@
             <MenuItem Header="{x:Static p:Resources.Settings}" Click="ShowWattPilotSettings" Icon="{vi:ChargingTrafficSignSettings}" Visibility="{Binding WattPilotService.WattPilot, Converter={co:NullToVisibility}, FallbackValue=Collapsed}" />
         </StackPanel>
 
-        <Viewbox Grid.Row="2" Grid.Column="0" Margin="16,16,0,16">
+        <Viewbox Grid.Row="2" Margin="16">
             <Grid Height="500">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="200" />
@@ -227,48 +224,15 @@
             </Grid>
         </Viewbox>
 
-        <GridSplitter Grid.Row="2" Grid.Column="1" ResizeBehavior="PreviousAndNext" BorderThickness="2" ResizeDirection="Columns"
-                      BorderBrush="LightGray" Margin="10,0" VerticalAlignment="Stretch">
-            <GridSplitter.Visibility>
-                <MultiBinding Converter="{co:ShowFritzBoxIcon}">
-                    <Binding Path="Settings.FritzBoxConnection" />
-                    <Binding Path="Settings.HaveFritzBox" />
-                    <Binding Path="Settings.ShowFritzBox" />
-                </MultiBinding>
-            </GridSplitter.Visibility>
-        </GridSplitter>
+        <GridSplitter Grid.Row="3" Height="10" Grid.Column="0" ResizeBehavior="PreviousAndNext" BorderThickness="2" ResizeDirection="Rows"
+                      BorderBrush="LightGray" Margin="0" HorizontalAlignment="Stretch" MaxHeight="5" />
 
-        <ScrollViewer Grid.Row="2" Grid.Column="2"
+        <ScrollViewer x:Name="ScrollViewer" Grid.Row="4"
                       VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto"
                       VerticalContentAlignment="Top" HorizontalContentAlignment="Stretch"
-                      Margin="10,16,0,0" VerticalAlignment="Center" HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                       Visibility="{Binding Settings.FritzBoxConnection, Converter={co:ShowFritzBoxIcon}}">
-            <ScrollViewer.LayoutTransform>
-                <ScaleTransform x:Name="Transform" />
-            </ScrollViewer.LayoutTransform>
-            <ScrollViewer.Style>
-                <Style TargetType="ScrollViewer">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding Settings.ShowFritzBox}" Value="True">
-                            <DataTrigger.EnterActions>
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation From="0" To="1" Storyboard.Target="{Binding Source={x:Reference Transform}}" Storyboard.TargetProperty="ScaleX" Duration="0:0:0.200" />
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </DataTrigger.EnterActions>
-                            <DataTrigger.ExitActions>
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation From="1" To="0" Storyboard.Target="{Binding Source={x:Reference Transform}}" Storyboard.TargetProperty="ScaleX" Duration="0:0:0.200" />
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </DataTrigger.ExitActions>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </ScrollViewer.Style>
-            <ItemsControl ItemsSource="{Binding SolarSystemService.SolarSystem.FritzBox.PowerConsumers, FallbackValue={x:Null}}">
+            <ItemsControl Margin="10,10,0,0" ItemsSource="{Binding SolarSystemService.SwitchableDevices, FallbackValue={x:Null}}">
                 <ItemsControl.LayoutTransform>
                     <ScaleTransform x:Name="ConsumerScaler" ScaleX="1" ScaleY="1" />
                 </ItemsControl.LayoutTransform>
@@ -277,41 +241,17 @@
                         <WrapPanel Orientation="Vertical" IsItemsHost="True" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <c:PowerConsumer Width="150" Device="{Binding}" Margin="0,0,8,8" />
+                <ItemsControl.Resources>
+                    <DataTemplate DataType="{x:Type models:FritzBoxDevice}">
+                        <c:PowerConsumer Width="150" Device="{Binding}" Margin="0,0,8,8"
+                                         Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}, Path=DataContext.Settings.ShowFritzBox, Converter={co:Bool2Visibility}}" />
                     </DataTemplate>
-                </ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type toshiba:ToshibaAcMappingDevice}">
+                        <c:ToshibaHvacControl Width="150" Device="{Binding}" Margin="0,0,8,8"
+                                              Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}, Path=DataContext.Settings.ShowToshibaAc, Converter={co:Bool2Visibility}}" />
+                    </DataTemplate>
+                </ItemsControl.Resources>
             </ItemsControl>
         </ScrollViewer>
-
-        <ScrollViewer Grid.Row="2" Grid.Column="3"
-                      VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto"
-                      VerticalContentAlignment="Top" HorizontalContentAlignment="Stretch"
-                      Margin="10,16,0,0" VerticalAlignment="Center" HorizontalAlignment="Stretch"
-                      Visibility="{Binding Settings.FritzBoxConnection, Converter={co:ShowFritzBoxIcon}}">
-            <ItemsControl ItemsSource="{Binding SolarSystemService.AcService.AllDevices[0].Devices, FallbackValue={x:Null}}">
-                <ItemsControl.LayoutTransform>
-                    <ScaleTransform ScaleX="{Binding ElementName=ConsumerScaler, Path=ScaleX}" ScaleY="{Binding ElementName=ConsumerScaler, Path=ScaleX}" />
-                </ItemsControl.LayoutTransform>
-                <ItemsControl.Visibility>
-                    <MultiBinding Converter="{co:MultiBool2Visibility All=Visible, Any=Collapsed, Invalid=Collapsed, None=Collapsed}">
-                        <Binding Path="Settings.HaveToshibaAc" />
-                        <Binding Path="Settings.ShowToshibaAc" />
-                    </MultiBinding>
-                </ItemsControl.Visibility>
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Vertical" IsItemsHost="True" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <c:ToshibaAcControl Width="150" Device="{Binding}" Margin="0,0,8,8"/>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
-
     </Grid>
 </Window>
