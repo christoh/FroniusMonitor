@@ -5,11 +5,11 @@ namespace De.Hochstaetter.Fronius.Contracts
     public interface IToshibaAirConditionService
     {
         public ValueTask Start();
-        public void Stop();
+        public ValueTask Stop();
         public bool IsRunning { get; }
         public bool IsConnected { get; }
         public ValueTask SendDeviceCommand(ToshibaAcStateData state, params string[] targetIdStrings);
-        public ObservableCollection<ToshibaAcMapping>? AllDevices { get; }
+        public BindableCollection<ToshibaAcMapping>? AllDevices { get; }
         public SettingsBase Settings { get; }
 
         public ValueTask SendDeviceCommand(ToshibaAcStateData state, params Guid[] deviceUniqueIds) => SendDeviceCommand(state, deviceUniqueIds.Select(id => id.ToString("D")).ToArray());

@@ -1,8 +1,6 @@
-﻿using De.Hochstaetter.Fronius.Models.ToshibaAc;
+﻿namespace De.Hochstaetter.FroniusMonitor.Controls;
 
-namespace De.Hochstaetter.FroniusMonitor.Controls;
-
-public partial class ToshibaAcControl
+public partial class ToshibaHvacControl
 {
     private static readonly IList<ToshibaAcFanSpeed> fanSpeeds = new[]
     {
@@ -12,19 +10,21 @@ public partial class ToshibaAcControl
     };
 
     // ReSharper disable once UseUtf8StringLiteral
-    private static readonly IList<byte> powerLimits = new[] { (byte)50, (byte)75, (byte)100, };
+#pragma warning disable IDE0230 
+    private static readonly IList<byte> powerLimits = new[] {(byte)50, (byte)75, (byte)100,};
+#pragma warning restore IDE0230
 
-    private static IReadOnlyDictionary<byte, IReadOnlyList<ToshibaHvacMeritFeatureA>> meritFeatureADictionary = new Dictionary<byte, IReadOnlyList<ToshibaHvacMeritFeatureA>>
+    private static readonly IReadOnlyDictionary<byte, IList<ToshibaHvacMeritFeaturesA>> meritFeatureADictionary = new Dictionary<byte, IList<ToshibaHvacMeritFeaturesA>>
     {
-        {0x3c, new[] {ToshibaHvacMeritFeatureA.None, ToshibaHvacMeritFeatureA.Eco, ToshibaHvacMeritFeatureA.HighPower, ToshibaHvacMeritFeatureA.Silent1, ToshibaHvacMeritFeatureA.Silent1}}
+        {0x3c, new[] {ToshibaHvacMeritFeaturesA.None, ToshibaHvacMeritFeaturesA.Eco, ToshibaHvacMeritFeaturesA.HighPower, ToshibaHvacMeritFeaturesA.Silent2, ToshibaHvacMeritFeaturesA.Silent1}}
     };
 
     private CancellationTokenSource? enablerTokenSource;
 
     public static readonly DependencyProperty DeviceProperty = DependencyProperty.Register
     (
-        nameof(Device), typeof(ToshibaAcMappingDevice), typeof(ToshibaAcControl),
-        new PropertyMetadata((d, e) => ((ToshibaAcControl)d).OnDeviceChanged(e))
+        nameof(Device), typeof(ToshibaAcMappingDevice), typeof(ToshibaHvacControl),
+        new PropertyMetadata((d, e) => ((ToshibaHvacControl)d).OnDeviceChanged(e))
     );
 
     public ToshibaAcMappingDevice Device
@@ -35,7 +35,7 @@ public partial class ToshibaAcControl
 
     public ISolarSystemService SolarSystemService { get; } = null!;
 
-    public ToshibaAcControl()
+    public ToshibaHvacControl()
     {
         InitializeComponent();
 
@@ -66,7 +66,7 @@ public partial class ToshibaAcControl
         enablerTokenSource?.Dispose();
         enablerTokenSource = null;
         PowerButton.IsChecked = Device.State.IsTurnedOn;
-        return IsEnabled = true;
+        IsEnabled = true;
     });
 
     private void SendCommand(ToshibaAcStateData stateData)
@@ -77,15 +77,15 @@ public partial class ToshibaAcControl
         Task.Delay(TimeSpan.FromSeconds(10), enablerTokenSource.Token).ContinueWith(_ => OnStateChanged(), enablerTokenSource.Token);
     }
 
-    private void OnPowerClicked(object sender, RoutedEventArgs e) => SendCommand(new ToshibaAcStateData { IsTurnedOn = !Device.State.IsTurnedOn });
+    private void OnPowerClicked(object sender, RoutedEventArgs e) => SendCommand(new ToshibaAcStateData {IsTurnedOn = !Device.State.IsTurnedOn});
 
-    private void OnModeClicked(object sender, RoutedEventArgs e) => SendCommand(new ToshibaAcStateData { Mode = ((HvacButton)sender).Mode });
+    private void OnModeClicked(object sender, RoutedEventArgs e) => SendCommand(new ToshibaAcStateData {Mode = ((HvacButton)sender).Mode});
 
     private void OnFanSpeedClicked(object sender, RoutedEventArgs e)
     {
         var index = Math.Max(fanSpeeds.IndexOf(Device.State.FanSpeed), 0);
         index = ++index % fanSpeeds.Count;
-        SendCommand(new ToshibaAcStateData { FanSpeed = fanSpeeds[index] });
+        SendCommand(new ToshibaAcStateData {FanSpeed = fanSpeeds[index]});
     }
 
     private void OnTemperatureUpClicked(object sender, RoutedEventArgs e) => ChangeTemperature(1);
@@ -101,13 +101,26 @@ public partial class ToshibaAcControl
             return;
         }
 
-        SendCommand(new ToshibaAcStateData { TargetTemperatureCelsius = newTemperature });
+        SendCommand(new ToshibaAcStateData {TargetTemperatureCelsius = newTemperature});
     }
 
     private void OnPowerLimitClicked(object sender, RoutedEventArgs e)
     {
         var index = Math.Max(powerLimits.IndexOf(Device.State.PowerLimit), 0);
         index = ++index % powerLimits.Count;
-        SendCommand(new ToshibaAcStateData { PowerLimit = powerLimits[index] });
+        SendCommand(new ToshibaAcStateData {PowerLimit = powerLimits[index]});
+    }
+
+    private void OnMeritFeaturesAClicked(object sender, RoutedEventArgs e)
+    {
+        var key = (byte)(Device.MeritFeature >> 8);
+
+        if (meritFeatureADictionary.ContainsKey(key))
+        {
+            var features = meritFeatureADictionary[key];
+            var index = Math.Max(0, features.IndexOf(Device.State.MeritFeaturesA));
+            index = ++index % features.Count;
+            SendCommand(new ToshibaAcStateData {MeritFeaturesA = features[index]});
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="De.Hochstaetter.FroniusMonitor.Controls.ToshibaAcControl"
+﻿<UserControl x:Class="De.Hochstaetter.FroniusMonitor.Controls.ToshibaHvacControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -69,6 +69,8 @@
                         <Style TargetType="ButtonBase" BasedOn="{StaticResource TransparentButton}" x:Key="HoverButton">
                             <Setter Property="BorderThickness" Value="1" />
                             <Setter Property="BorderBrush" Value="Transparent" />
+                            <Setter Property="Height" Value="30" />
+                            <Setter Property="Margin" Value="4,0,0,0" />
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="ButtonBase">
@@ -82,7 +84,7 @@
                                             <Trigger Property="IsPressed" Value="True">
                                                 <Setter Property="RenderTransform">
                                                     <Setter.Value>
-                                                        <TranslateTransform Y="-2"/>
+                                                        <TranslateTransform Y="-2" />
                                                     </Setter.Value>
                                                 </Setter>
                                             </Trigger>
@@ -99,13 +101,16 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <c:HvacFanSpeedButton Style="{StaticResource HoverButton}" Height="30" Grid.Column="0"
+                    <c:HvacFanSpeedButton Style="{StaticResource HoverButton}" Grid.Column="0" Margin="0"
                                           FanSpeed="{Binding Device.State.FanSpeed}" FanBrush="LimeGreen" Click="OnFanSpeedClicked" />
 
-                    <c:HvacPowerLimitButton Style="{StaticResource HoverButton}" Grid.Column="1" Height="30" PowerBorderBrush="Black" Click="OnPowerLimitClicked"
-                                            Margin="4,0,0,0" PowerLimit="{Binding Device.State.PowerLimit}" PowerBrush="LimeGreen"/>
+                    <c:HvacPowerLimitButton Style="{StaticResource HoverButton}" Grid.Column="1" PowerBorderBrush="Black" Click="OnPowerLimitClicked"
+                                            PowerLimit="{Binding Device.State.PowerLimit}" PowerBrush="LimeGreen" />
+
+                    <c:HvacMeritFeatureAButton Grid.Column="2" Style="{StaticResource HoverButton}" MeritFeaturesA="{Binding Device.State.MeritFeaturesA}" Click="OnMeritFeaturesAClicked"/>
 
                 </Grid>
 

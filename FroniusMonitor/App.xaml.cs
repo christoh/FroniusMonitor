@@ -24,6 +24,7 @@ public partial class App
 
         Container
             .RegisterSingleton<IWebClientService, WebClientService>()
+            .RegisterInstance(SynchronizationContext.Current)
             .RegisterSingleton<ISolarSystemService, SolarSystemService>()
             .RegisterSingleton<MainWindow>()
             .RegisterSingleton<MainViewModel>()
