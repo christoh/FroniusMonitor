@@ -11,7 +11,6 @@ namespace De.Hochstaetter.Fronius.Contracts
         public bool IsConnected { get; }
         public ValueTask<string> SendDeviceCommand(ToshibaAcStateData state, params string[] targetIdStrings);
         public BindableCollection<ToshibaAcMapping>? AllDevices { get; }
-        public SettingsBase Settings { get; }
 
         public ValueTask<string> SendDeviceCommand(ToshibaAcStateData state, params Guid[] deviceUniqueIds) => SendDeviceCommand(state, deviceUniqueIds.Select(id => id.ToString("D")).ToArray());
 

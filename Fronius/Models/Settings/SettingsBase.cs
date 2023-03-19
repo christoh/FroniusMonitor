@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Settings;
 
-public abstract class SettingsBase : BindableBase
+public abstract class SettingsBase : BindableBase, ICloneable
 {
     private WebConnection? fritzBoxConnection = new() { BaseUrl = "http://192.168.178.1", UserName = string.Empty, Password = string.Empty };
 
@@ -102,8 +102,10 @@ public abstract class SettingsBase : BindableBase
                 ToshibaAcConnection ??= new AzureConnection
                 {
                     BaseUrl = "https://mobileapi.toshibahomeaccontrols.com",
-                    UserName = string.Empty, Password = string.Empty,
-                    Protocol = Protocol.Amqp, TunnelMode = TunnelMode.Auto
+                    UserName = string.Empty,
+                    Password = string.Empty,
+                    Protocol = Protocol.Amqp,
+                    TunnelMode = TunnelMode.Auto
                 };
             }
         });
@@ -162,5 +164,47 @@ public abstract class SettingsBase : BindableBase
     protected static void ClearIncorrectPasswords(params WebConnection?[] connections)
     {
         connections.Where(connection => connection != null && connection.PasswordChecksum != connection.CalculatedChecksum).Apply(connection => connection!.Password = string.Empty);
+    }
+
+    public object Clone()
+    {
+        var clone = (SettingsBase)MemberwiseClone();
+
+        foreach (var propertyInfo in GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy).Where(p => p is { CanRead: true, CanWrite: true } && p.PropertyType.GetInterface(nameof(ICloneable)) is not null))
+        {
+            var value = propertyInfo.GetValue(clone);
+
+            if (value != null)
+            {
+                var cloneMethod = propertyInfo.PropertyType.GetMethod(nameof(ICloneable.Clone));
+                propertyInfo.SetValue(clone, cloneMethod?.Invoke(value, null));
+            }
+        }
+
+        return clone;
+    }
+
+    public void CopyFrom(SettingsBase other)
+    {
+        var otherType = other.GetType();
+
+        if (!GetType().IsAssignableFrom(otherType))
+        {
+            throw new ArgumentException($"{GetType().Name} is not assignable from {otherType}");
+        }
+
+        foreach (var propertyInfo in other.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy).Where(p => p is { CanRead: true, CanWrite: true }))
+        {
+            var value = propertyInfo.GetValue(other);
+            if (propertyInfo.PropertyType.GetInterface(nameof(ICloneable)) == null)
+            {
+                propertyInfo.SetValue(this, value);
+            }
+            else if (value is not null)
+            {
+                var cloneMethod = propertyInfo.PropertyType.GetMethod(nameof(ICloneable.Clone));
+                propertyInfo.SetValue(this, cloneMethod?.Invoke(value, null));
+            }
+        }
     }
 }

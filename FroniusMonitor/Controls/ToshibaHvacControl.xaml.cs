@@ -59,7 +59,7 @@ public partial class ToshibaHvacControl
 
         SolarSystemService.AcService.LiveDataReceived -= OnAnswerReceived;
 
-        Dispatcher.InvokeAsync(() =>
+        Dispatcher.BeginInvoke(() =>
         {
             PowerButton.IsChecked = Device.State.IsTurnedOn;
             IsEnabled = true;
@@ -75,7 +75,7 @@ public partial class ToshibaHvacControl
         lock (tokenLock)
         {
             enablerTokenSource = new CancellationTokenSource();
-            _ = Task.Delay(TimeSpan.FromSeconds(10), enablerTokenSource.Token).ContinueWith(t => OnStateChanged(), enablerTokenSource.Token);
+            _ = Task.Delay(TimeSpan.FromSeconds(10), enablerTokenSource.Token).ContinueWith(_ => OnStateChanged(), enablerTokenSource.Token);
         }
     }
 

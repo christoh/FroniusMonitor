@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using De.Hochstaetter.Fronius.Models.Settings;
+﻿using De.Hochstaetter.Fronius.Models.Settings;
 
 namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
@@ -28,7 +27,6 @@ public class SettingsViewModel : SettingsViewModelBase
     };
 
     private readonly ISolarSystemService solarSystemService;
-    private readonly IUnityContainer container;
 
 
     public SettingsViewModel
@@ -36,12 +34,10 @@ public class SettingsViewModel : SettingsViewModelBase
         IWebClientService webClientService,
         IGen24JsonService gen24Service,
         IWattPilotService wattPilotService,
-        ISolarSystemService solarSystemService,
-        IUnityContainer container
+        ISolarSystemService solarSystemService
     ) : base(webClientService, gen24Service, wattPilotService)
     {
         this.solarSystemService = solarSystemService;
-        this.container = container;
     }
 
     private ICommand? okCommand;
@@ -92,11 +88,11 @@ public class SettingsViewModel : SettingsViewModelBase
         set => Set(ref selectedCulture, value);
     }
 
-    private static readonly IEnumerable<string> gen24UserNames = new[] { "customer", "technician", "support" };
+    private static readonly IEnumerable<string> gen24UserNames = new[] {"customer", "technician", "support"};
 
     public IEnumerable<string> Gen24UserNames => gen24UserNames;
 
-    private static readonly IReadOnlyList<byte> froniusUpdateRates = new byte[] { 1, 2, 3, 4, 5, 10, 20, 30, 60 };
+    private static readonly IReadOnlyList<byte> froniusUpdateRates = new byte[] {1, 2, 3, 4, 5, 10, 20, 30, 60};
 
     public IReadOnlyList<byte> FroniusUpdateRates => froniusUpdateRates;
 
@@ -146,12 +142,11 @@ public class SettingsViewModel : SettingsViewModelBase
             );
         }
 
-        App.Settings = Settings;
         IoC.Get<MainViewModel>().NotifyOfPropertyChange(nameof(Settings));
-        WebClientService.FritzBoxConnection = Settings is { HaveFritzBox: true, ShowFritzBox: true } ? Settings.FritzBoxConnection : null;
+        WebClientService.FritzBoxConnection = Settings is {HaveFritzBox: true, ShowFritzBox: true} ? Settings.FritzBoxConnection : null;
         WebClientService.InverterConnection = Settings.FroniusConnection;
         solarSystemService.FroniusUpdateRate = Settings.FroniusUpdateRate;
-        container.RegisterInstance<SettingsBase>(Settings);
+        App.Settings.CopyFrom(Settings);
 
         if (!Settings.HaveWattPilot || !Settings.ShowWattPilot)
         {
@@ -163,6 +158,7 @@ public class SettingsViewModel : SettingsViewModelBase
             solarSystemService.WattPilotConnection = Settings.WattPilotConnection;
         }
 
+        await solarSystemService.AcService.Stop().ConfigureAwait(false);
         await Settings.Save().ConfigureAwait(false);
 
         static string FixUrl(string url, bool isWebSocket = false)

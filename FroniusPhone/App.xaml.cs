@@ -28,7 +28,10 @@ namespace FroniusPhone
         {
             try
             {
-                IoC.Injector = Handler.MauiContext?.Services;
+                if (Handler.MauiContext?.Services != null)
+                {
+                    IoC.Update(Handler.MauiContext.Services);
+                }
             }
             finally
             {

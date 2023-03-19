@@ -2,7 +2,7 @@
 
 namespace De.Hochstaetter.FroniusMonitor.Models;
 
-public class Settings : SettingsBase, ICloneable
+public class Settings : SettingsBase
 {
     private static readonly object settingsLockObject = new();
 
@@ -14,7 +14,7 @@ public class Settings : SettingsBase, ICloneable
         set => Set(ref mainWindowSize, value);
     }
 
-    public static async Task Save() => await Save(App.SettingsFileName).ConfigureAwait(false);
+    public static Task Save() => Save(App.SettingsFileName);
 
     public static async Task Save(string fileName) => await Task.Run(() =>
     {
@@ -56,13 +56,5 @@ public class Settings : SettingsBase, ICloneable
         }
     }).ConfigureAwait(false);
 
-    public static async Task Load() => await Load(App.SettingsFileName).ConfigureAwait(false);
-
-    public object Clone()
-    {
-        var clone = (Settings)MemberwiseClone();
-        clone.FritzBoxConnection = (WebConnection)clone.FritzBoxConnection?.Clone()!;
-        clone.FroniusConnection = (WebConnection)clone.FroniusConnection?.Clone()!;
-        return clone;
-    }
+    public static Task Load() => Load(App.SettingsFileName);
 }

@@ -1,4 +1,5 @@
 ﻿using De.Hochstaetter.Fronius.Models.Settings;
+using Microsoft.Extensions.DependencyInjection;
 using Loc = De.Hochstaetter.Fronius.Localization.Resources;
 
 namespace De.Hochstaetter.FroniusMonitor;
@@ -12,39 +13,17 @@ public partial class App
     public static Timer? SolarSystemQueryTimer;
     public static bool HaveSettings = true;
 
-    public static readonly IUnityContainer Container = new UnityContainer();
+    public static readonly IServiceCollection ServiceCollection = new ServiceCollection();
 
     public static Settings Settings { get; set; } = null!;
 
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
-        Fronius.IoC.Injector = new IoC();
 
         DispatcherUnhandledException += OnUnhandledException;
 
-        Container
-            .RegisterSingleton<IWebClientService, WebClientService>()
-            .RegisterInstance(SynchronizationContext.Current)
-            .RegisterSingleton<ISolarSystemService, SolarSystemService>()
-            .RegisterSingleton<MainWindow>()
-            .RegisterSingleton<MainViewModel>()
-            .RegisterSingleton<IGen24JsonService, Gen24JsonService>()
-            .RegisterSingleton<IAesKeyProvider, AesKeyProvider>()
-            .RegisterSingleton<IWattPilotService, WattPilotService>()
-            .RegisterSingleton<IToshibaAirConditionService, ToshibaAirConditionService>()
-            .RegisterType<EventLogView>()
-            .RegisterType<EventLogViewModel>()
-            .RegisterType<SelfConsumptionOptimizationViewModel>()
-            .RegisterType<SelfConsumptionOptimizationView>()
-            .RegisterType<ModbusView>()
-            .RegisterType<ModbusViewModel>()
-            .RegisterType<SettingsView>()
-            .RegisterType<SettingsViewModel>()
-            .RegisterType<WattPilotSettingsView>()
-            .RegisterType<WattPilotSettingsViewModel>()
-            ;
-
+        IoC.Update(ServiceCollection.AddSingleton<IAesKeyProvider, AesKeyProvider>().BuildServiceProvider());
         Directory.CreateDirectory(PerUserDataDir);
 
         try
@@ -58,7 +37,30 @@ public partial class App
             Settings.Save().GetAwaiter().GetResult();
         }
 
-        Container.RegisterInstance<SettingsBase>(Settings);
+        var injector = ServiceCollection
+                .AddSingleton<IWebClientService, WebClientService>()
+                .AddSingleton(SynchronizationContext.Current!)
+                .AddSingleton<ISolarSystemService, SolarSystemService>()
+                .AddSingleton<MainWindow>()
+                .AddSingleton<MainViewModel>()
+                .AddSingleton<IGen24JsonService, Gen24JsonService>()
+                .AddSingleton<IWattPilotService, WattPilotService>()
+                .AddSingleton<IToshibaAirConditionService, ToshibaAirConditionService>()
+                .AddSingleton<SettingsBase>(Settings)
+                .AddTransient<EventLogView>()
+                .AddTransient<EventLogViewModel>()
+                .AddTransient<SelfConsumptionOptimizationViewModel>()
+                .AddTransient<SelfConsumptionOptimizationView>()
+                .AddTransient<ModbusView>()
+                .AddTransient<ModbusViewModel>()
+                .AddTransient<SettingsView>()
+                .AddTransient<SettingsViewModel>()
+                .AddTransient<WattPilotSettingsView>()
+                .AddTransient<WattPilotSettingsViewModel>()
+                .BuildServiceProvider()
+                ;
+
+        IoC.Update(injector);
         IoC.Get<ISolarSystemService>().FroniusUpdateRate = Settings.FroniusUpdateRate;
 
         if (!string.IsNullOrWhiteSpace(Settings.Language))

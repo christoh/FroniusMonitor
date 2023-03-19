@@ -7,6 +7,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 {
     private readonly IWebClientService webClientService;
     private readonly IWattPilotService wattPilotService;
+    private readonly SettingsBase settings;
     private Timer? timer;
     private int updateSemaphore;
     private int fritzBoxCounter, froniusCounter;
@@ -16,14 +17,14 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
     public event EventHandler<SolarDataEventArgs>? NewDataReceived;
 
-    public SolarSystemService(IWebClientService webClientService, IWattPilotService wattPilotService, IToshibaAirConditionService acService, SynchronizationContext context)
+    public SolarSystemService(SettingsBase settings, IWebClientService webClientService, IWattPilotService wattPilotService, IToshibaAirConditionService acService, SynchronizationContext context)
     {
         this.webClientService = webClientService;
         this.wattPilotService = wattPilotService;
+        this.settings = settings;
         AcService = acService;
         PowerFlowQueue = new Queue<Gen24PowerFlow>(QueueSize + 1);
         SwitchableDevices = new BindableCollection<ISwitchable>(context);
-        SwitchableDevices.CollectionChanged += (s, e) => { };
     }
 
     public BindableCollection<ISwitchable> SwitchableDevices { get; }
@@ -324,8 +325,6 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         {
             return;
         }
-
-        var settings = IoC.Get<SettingsBase>();
 
         try
         {

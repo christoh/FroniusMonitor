@@ -42,7 +42,7 @@ public partial class SmartMeterControl : IHaveLcdPanel
     };
 
     private int currentPowerModeIndex, currentVoltageModeIndex, currentCurrentIndex, currentMoreIndex;
-    private readonly ISolarSystemService? solarSystemService = IoC.TryGet<ISolarSystemService>();
+    private readonly ISolarSystemService? solarSystemService = IoC.TryGetRegistered<ISolarSystemService>();
 
     #region Dependency Properties
 

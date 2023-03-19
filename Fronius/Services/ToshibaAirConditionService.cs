@@ -11,6 +11,7 @@ namespace De.Hochstaetter.Fronius.Services;
 public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionService
 {
     private readonly SynchronizationContext context;
+    private readonly SettingsBase settings;
 
     private ToshibaAcSession? session;
     private static readonly JsonSerializerOptions jsonOptions = new(JsonSerializerDefaults.Web);
@@ -36,12 +37,11 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
         #endif
     }
 
-    public ToshibaAirConditionService(SynchronizationContext context)
+    public ToshibaAirConditionService(SynchronizationContext context, SettingsBase settings)
     {
         this.context = context;
+        this.settings= settings;
     }
-
-    public SettingsBase Settings => IoC.Get<SettingsBase>();
 
     private CancellationToken Token => tokenSource?.Token ?? throw new WebException("Connection closed", WebExceptionStatus.ConnectionClosed);
 
@@ -81,8 +81,6 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public async ValueTask Start()
     {
-        var settings = Settings;
-
         if (!settings.HaveToshibaAc || !settings.ShowToshibaAc || settings.ToshibaAcConnection == null)
         {
             return;
@@ -138,8 +136,6 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
 
     public async ValueTask<string> SendDeviceCommand(ToshibaAcStateData state, params string[] targetIdStrings)
     {
-        var settings = Settings;
-
         if (settings.ToshibaAcConnection == null || azureClient == null || session == null || !IsRunning)
         {
             throw new IotHubCommunicationException("Not connected");
@@ -218,8 +214,6 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
 
     private async ValueTask<T> Deserialize<T>(string uri, IEnumerable<KeyValuePair<string, string>>? postVariables = null) where T : new()
     {
-        var settings = IoC.Get<SettingsBase>();
-
         if (!settings.HaveToshibaAc || settings.ToshibaAcConnection == null)
         {
             throw new InvalidDataException("No active Toshiba connection");

@@ -33,10 +33,10 @@ public abstract class LocBase : UpdateableMarkupExtension
 
 public class LocUi : LocBase
 {
-    public LocUi(string category, string key) : base(category, key, IoC.TryGet<IWebClientService>()?.GetUiString(category, key)) { }
+    public LocUi(string category, string key) : base(category, key, IoC.TryGetRegistered<IWebClientService>()?.GetUiString(category, key)) { }
 }
 
 public class LocConfig : LocBase
 {
-    public LocConfig(string category, string key) : base(category, key, IoC.TryGet<IWebClientService>()?.GetConfigString(category, key)) { }
+    public LocConfig(string category, string key) : base(category, key, IoC.TryGetRegistered<IWebClientService>()?.GetConfigString(category, key)) { }
 }
