@@ -18,9 +18,9 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" x:Name="SolarSystemRow" />
+            <RowDefinition Height="*" x:Name="SolarSystemRow" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" x:Name="PowerConsumerRow"/>
+            <RowDefinition Height="{Binding Settings.ControllerGridRowHeight, Mode=OneWay}" x:Name="PowerConsumerRow"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
@@ -227,10 +227,10 @@
         <GridSplitter Grid.Row="3" Height="10" Grid.Column="0" ResizeBehavior="PreviousAndNext" BorderThickness="2" ResizeDirection="Rows"
                       BorderBrush="LightGray" Margin="0" HorizontalAlignment="Stretch" MaxHeight="5" />
 
-        <ScrollViewer x:Name="ScrollViewer" Grid.Row="4"
+        <ScrollViewer x:Name="ScrollViewer" Grid.Row="4" CanContentScroll="False"
                       VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto"
-                      VerticalContentAlignment="Top" HorizontalContentAlignment="Stretch"
-                      VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                      VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                      VerticalAlignment="Stretch" HorizontalAlignment="Stretch" SizeChanged="OnControllerGridRowHeightChanged"
                       Visibility="{Binding Settings.FritzBoxConnection, Converter={co:ShowFritzBoxIcon}}">
             <ItemsControl Margin="10,10,0,0" ItemsSource="{Binding SolarSystemService.SwitchableDevices, FallbackValue={x:Null}}">
                 <ItemsControl.LayoutTransform>
@@ -238,7 +238,7 @@
                 </ItemsControl.LayoutTransform>
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Vertical" IsItemsHost="True" />
+                        <WrapPanel Orientation="Vertical" IsItemsHost="True" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.Resources>

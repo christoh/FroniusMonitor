@@ -5,6 +5,9 @@ using De.Hochstaetter.Fronius.Models.Settings;
 using De.Hochstaetter.Fronius.Models.ToshibaAc;
 using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Client.Exceptions;
+// ReSharper disable RedundantUsingDirective
+using System.Net.Http.Json;
+// ReSharper restore RedundantUsingDirective
 
 namespace De.Hochstaetter.Fronius.Services;
 
@@ -40,7 +43,7 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
     public ToshibaAirConditionService(SynchronizationContext context, SettingsBase settings)
     {
         this.context = context;
-        this.settings= settings;
+        this.settings = settings;
     }
 
     private CancellationToken Token => tokenSource?.Token ?? throw new WebException("Connection closed", WebExceptionStatus.ConnectionClosed);
@@ -237,7 +240,6 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
         using var response = (await client.SendAsync(message, Token).ConfigureAwait(false)).EnsureSuccessStatusCode();
 
         #if DEBUG // This allows you to see the raw JSON string
-
         var jsonText = await response.Content.ReadAsStringAsync(Token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
         Debug.Print(jsonText);
         var jDocument = JsonDocument.Parse(jsonText);

@@ -14,6 +14,14 @@ public class Settings : SettingsBase
         set => Set(ref mainWindowSize, value);
     }
 
+    private double controllerGridRowHeight = 375;
+    [DefaultValue(375), XmlElement("ControllerGridRowHeight")]
+    public double ControllerGridRowHeight
+    {
+        get => controllerGridRowHeight;
+        set => Set(ref controllerGridRowHeight, value);
+    }
+
     public static Task Save() => Save(App.SettingsFileName);
 
     public static async Task Save(string fileName) => await Task.Run(() =>
