@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.Fronius.Contracts
+﻿using De.Hochstaetter.Fronius.Models.Settings;
+
+namespace De.Hochstaetter.Fronius.Contracts
 {
     public interface IWebClientService
     {

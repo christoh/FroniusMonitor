@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.Fronius.Services;
+﻿using De.Hochstaetter.Fronius.Models.Settings;
+
+namespace De.Hochstaetter.Fronius.Services;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public class WebClientService : BindableBase, IWebClientService

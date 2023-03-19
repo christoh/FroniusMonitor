@@ -9,7 +9,7 @@ public partial class PowerConsumer
     public static readonly DependencyProperty DeviceProperty = DependencyProperty.Register
     (
         nameof(Device), typeof(IPowerConsumer1P), typeof(PowerConsumer),
-        new PropertyMetadata((d, _) => ((PowerConsumer)d).OnFritzBoxDeviceChanged())
+        new PropertyMetadata(null, (d, e) => ((PowerConsumer)d).OnFritzBoxDeviceChanged(e))
     );
 
     public IPowerConsumer1P? Device
@@ -25,18 +25,35 @@ public partial class PowerConsumer
         InitializeComponent();
     }
 
-    private void OnFritzBoxDeviceChanged()
+    private void OnFritzBoxDeviceChanged(DependencyPropertyChangedEventArgs e)
     {
-        BackgroundProvider.Background = Device is not { IsPresent: true }
-            ? Brushes.OrangeRed
-            : Device?.IsTurnedOn == null || Device.IsTurnedOn.Value
-                ? Brushes.AntiqueWhite
-                : Brushes.LightGray;
+        if (e.OldValue is INotifyPropertyChanged oldDevice)
+        {
+            oldDevice.PropertyChanged -= OnDevicePropertyChanged;
+        }
+
+        if (e.NewValue is INotifyPropertyChanged newDevice)
+        {
+            newDevice.PropertyChanged += OnDevicePropertyChanged;
+            OnDevicePropertyChanged(Device, new PropertyChangedEventArgs(string.Empty));
+        }
     }
+
+    private void OnDevicePropertyChanged(object? sender, PropertyChangedEventArgs e) => Dispatcher.InvokeAsync(() =>
+    {
+        if (e.PropertyName == string.Empty)
+        {
+            BackgroundProvider.Background = Device is not { IsPresent: true }
+                ? Brushes.OrangeRed
+                : Device.IsTurnedOn == null || Device.IsTurnedOn.Value
+                    ? Brushes.AntiqueWhite
+                    : Brushes.LightGray;
+        }
+    });
 
     private async void OnPowerButtonClick(object sender, RoutedEventArgs e)
     {
-        if (Device is not { IsPresent: true, CanSwitch: true }) return;
+        if (Device is not {IsPresent: true, CanSwitch: true}) return;
         solarSystemService.SuspendPowerConsumers();
 
         try
@@ -87,6 +104,6 @@ public partial class PowerConsumer
             return;
         }
 
-        await Device.SetHsv(Device?.HueDegrees??0, e.NewValue, Device?.Value ?? 1).ConfigureAwait(false);
+        await Device.SetHsv(Device?.HueDegrees ?? 0, e.NewValue, Device?.Value ?? 1).ConfigureAwait(false);
     }
 }

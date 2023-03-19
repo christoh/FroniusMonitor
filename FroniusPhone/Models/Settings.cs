@@ -2,6 +2,7 @@
 using System.Xml;
 using System.Xml.Serialization;
 using De.Hochstaetter.Fronius.Extensions;
+using De.Hochstaetter.Fronius.Models.Settings;
 
 namespace FroniusPhone.Models
 {

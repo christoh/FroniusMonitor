@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Models;
+﻿namespace De.Hochstaetter.Fronius.Models.Settings;
 
 public class WebConnection : BindableBase, ICloneable
 {

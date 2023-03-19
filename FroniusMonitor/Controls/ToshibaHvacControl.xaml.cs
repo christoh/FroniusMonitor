@@ -10,7 +10,7 @@ public partial class ToshibaHvacControl
     };
 
     // ReSharper disable once UseUtf8StringLiteral
-#pragma warning disable IDE0230 
+#pragma warning disable IDE0230
     private static readonly IList<byte> powerLimits = new[] {(byte)50, (byte)75, (byte)100,};
 #pragma warning restore IDE0230
 
@@ -20,11 +20,12 @@ public partial class ToshibaHvacControl
     };
 
     private CancellationTokenSource? enablerTokenSource;
+    private readonly object tokenLock = new();
+    private string? awaitedMessage;
 
     public static readonly DependencyProperty DeviceProperty = DependencyProperty.Register
     (
-        nameof(Device), typeof(ToshibaAcMappingDevice), typeof(ToshibaHvacControl),
-        new PropertyMetadata((d, e) => ((ToshibaHvacControl)d).OnDeviceChanged(e))
+        nameof(Device), typeof(ToshibaAcMappingDevice), typeof(ToshibaHvacControl)
     );
 
     public ToshibaAcMappingDevice Device
@@ -44,37 +45,46 @@ public partial class ToshibaHvacControl
             SolarSystemService = IoC.Get<ISolarSystemService>();
         }
 
-        Unloaded += (_, _) => Device.State.PropertyChanged -= OnStateChanged;
+        Unloaded += (_, _) => SolarSystemService.AcService.LiveDataReceived -= OnAnswerReceived;
     }
 
-    private void OnDeviceChanged(DependencyPropertyChangedEventArgs e)
+    private void OnStateChanged()
     {
-        if (e.OldValue is ToshibaAcMappingDevice oldDevice)
+        lock (tokenLock)
         {
-            oldDevice.State.PropertyChanged -= OnStateChanged;
+            enablerTokenSource?.Cancel();
+            enablerTokenSource?.Dispose();
+            enablerTokenSource = null;
         }
 
-        if (e.NewValue is ToshibaAcMappingDevice newDevice)
+        SolarSystemService.AcService.LiveDataReceived -= OnAnswerReceived;
+
+        Dispatcher.InvokeAsync(() =>
         {
-            newDevice.State.PropertyChanged += OnStateChanged;
-        }
+            PowerButton.IsChecked = Device.State.IsTurnedOn;
+            IsEnabled = true;
+        });
     }
 
-    private void OnStateChanged(object? sender = null, PropertyChangedEventArgs? e = null) => Dispatcher.InvokeAsync(() =>
-    {
-        enablerTokenSource?.Cancel();
-        enablerTokenSource?.Dispose();
-        enablerTokenSource = null;
-        PowerButton.IsChecked = Device.State.IsTurnedOn;
-        IsEnabled = true;
-    });
-
-    private void SendCommand(ToshibaAcStateData stateData)
+    private async void SendCommand(ToshibaAcStateData stateData)
     {
         IsEnabled = false;
-        SolarSystemService.AcService.SendDeviceCommand(stateData, Device);
-        enablerTokenSource = new CancellationTokenSource();
-        Task.Delay(TimeSpan.FromSeconds(10), enablerTokenSource.Token).ContinueWith(_ => OnStateChanged(), enablerTokenSource.Token);
+        SolarSystemService.AcService.LiveDataReceived += OnAnswerReceived;
+        awaitedMessage = await SolarSystemService.AcService.SendDeviceCommand(stateData, Device).ConfigureAwait(false);
+
+        lock (tokenLock)
+        {
+            enablerTokenSource = new CancellationTokenSource();
+            _ = Task.Delay(TimeSpan.FromSeconds(10), enablerTokenSource.Token).ContinueWith(t => OnStateChanged(), enablerTokenSource.Token);
+        }
+    }
+
+    private void OnAnswerReceived(object? sender, ToshibaHvacAzureSmMobileCommand command)
+    {
+        if (command.MessageId == awaitedMessage)
+        {
+            OnStateChanged();
+        }
     }
 
     private void OnPowerClicked(object sender, RoutedEventArgs e) => SendCommand(new ToshibaAcStateData {IsTurnedOn = !Device.State.IsTurnedOn});

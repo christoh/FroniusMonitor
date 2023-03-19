@@ -1053,4 +1053,55 @@
   <data name="PowerLimit" xml:space="preserve">
 	  <value>Powerlimit</value>
   </data>
+  <data name="ToshibaHvacUrlTooltip" xml:space="preserve">
+	  <value>Du solltest die URL nicht ändern, solange Toshiba sie nicht ändert.</value>
+  </data>
+  <data name="Protocol" xml:space="preserve">
+	  <value>Protokoll</value>
+  </data>
+  <data name="Protocol_Amqp_ToolTip" xml:space="preserve">
+	  <value>Im Allgemeinen die beste Wahl. Anders als MQTT unterstützt es Zurückweisung von Nachrichten.</value>
+  </data>
+  <data name="Protocol_Mqtt_ToolTip" xml:space="preserve">
+	  <value>MQTT ist einfacher als AMQP, es fehlen aber einige Features. Wenn die Internetverbindung instabil ist, gehen jedoch weniger Nachrichten verloren.</value>
+  </data>
+  <data name="Protocol_Http1_ToolTip" xml:space="preserve">
+	  <value>HTTP 1.1 ist weniger geeignet, kann jedoch nötig werden, wenn die Interverbindung eine paranoide Firewall hat.</value>
+  </data>
+  <data name="LiveUpdateProtocol" xml:space="preserve">
+	  <value>Liveupdate-Protokoll</value>
+  </data>
+  <data name="TunnelStrategy" xml:space="preserve">
+	  <value>Tunnelstrategie</value>
+  </data>
+  <data name="TunnelMode_Websocket" xml:space="preserve">
+	  <value>Websocket</value>
+  </data>
+  <data name="TunnelMode_NoTunnel" xml:space="preserve">
+	  <value>Keine Tunellung</value>
+  </data>
+  <data name="TunnelMode_Auto_ToolTip" xml:space="preserve">
+	  <value>Zunächst das native Protokoll versuchen. Wenn das fehlschlägt, versuchen, einen Tunnel über HTTP und Websocket aufzubauen. Wenn die Internetverbindung über eine Firewall läuft, kriegt man so wahrscheinlich eine Verbindung.</value>
+  </data>
+  <data name="TunnelMode_Websocket_ToolTip" xml:space="preserve">
+	  <value>Immer einen Tunnel über HTTP und Websocket verwenden. Wenn Du weißt, dass Deine Internetverbindung über eine Firewall läuft, die das native Protokoll blockt, kannst Du die Zeit sparen, es über das native Protkoll zu versuchen.</value>
+  </data>
+  <data name="TunnelMode_NoTunnel_ToolTip" xml:space="preserve">
+	  <value>Wenn die Firewall das native Protokoll blockt, bekommst Du keine Verbindung mit dieser Einstellung.</value>
+  </data>
+  <data name="HvacModeAuto" xml:space="preserve">
+	  <value>Automatisch Kühlen oder Heizen</value>
+  </data>
+  <data name="HvacModeCooling" xml:space="preserve">
+	  <value>Nur Kühlen</value>
+  </data>
+  <data name="HvacModeDrying" xml:space="preserve">
+	  <value>Entfeuchten</value>
+  </data>
+  <data name="HvacModeHeating" xml:space="preserve">
+	  <value>Nur Heizen</value>
+  </data>
+  <data name="HvacModeFanOnly" xml:space="preserve">
+	  <value>Nur Lüften</value>
+  </data>
 </root>

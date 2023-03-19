@@ -7,6 +7,7 @@
         xmlns:vm="clr-namespace:De.Hochstaetter.FroniusMonitor.ViewModels"
         xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
         xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
+        xmlns:contracts="clr-namespace:De.Hochstaetter.Fronius.Contracts;assembly=Fronius"
         mc:Ignorable="d"
         MinWidth="480" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize"
         d:DataContext="{d:DesignInstance Type={x:Type vm:SettingsViewModel}}"
@@ -22,6 +23,25 @@
 
             <DataTemplate x:Key="ComboBoxTemplate">
                 <TextBlock Text="{Binding}" MinHeight="20" Margin="0,2,0,0" VerticalAlignment="Center" />
+            </DataTemplate>
+
+            <DataTemplate x:Key="ComboBoxTemplateToolTip">
+                <Grid Background="Transparent" HorizontalAlignment="Stretch" ToolTip="{Binding Path=(contracts:IHaveToolTip.ToolTip), Mode=OneWay}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding}" MinHeight="20" Margin="0,2,0,0" VerticalAlignment="Center">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Visibility" Value="Hidden"/>
+                                </Trigger>
+                            </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
             </DataTemplate>
 
             <Style TargetType="TextBlock">
@@ -84,7 +104,7 @@
 
                 <ComboBox Grid.Row="1" Grid.Column="2"
                           SelectedItem="{Binding Settings.FroniusConnection.UserName, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          ItemsSource="{Binding Gen24UserNames}" ItemTemplate="{StaticResource ComboBoxTemplate}"/>
+                          ItemsSource="{Binding Gen24UserNames}" ItemTemplate="{StaticResource ComboBoxTemplate}" />
 
                 <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static p:Resources.Password}" Margin="0,8,0,0" />
                 <TextBlock Grid.Row="2" Grid.Column="1" Text=":" Margin="4,8,4,0" />
@@ -92,17 +112,17 @@
                 <c:PasswordBox Grid.Row="2" Grid.Column="2" Template="{StaticResource PasswordBoxTemplate}"
                                Password="{Binding Settings.FroniusConnection.Password, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                <TextBlock Grid.Row="3" Grid.Column="0" Text="{x:Static p:Resources.UpdateRate}" Margin="0,8,0,0"/>
-                <TextBlock Grid.Row="3" Grid.Column="1" Text=":" Margin="4,8,4,0"/>
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="{x:Static p:Resources.UpdateRate}" Margin="0,8,0,0" />
+                <TextBlock Grid.Row="3" Grid.Column="1" Text=":" Margin="4,8,4,0" />
 
-                <Grid  Grid.Row="3" Grid.Column="2">
+                <Grid Grid.Row="3" Grid.Column="2">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <ComboBox Grid.Column="0" SelectedItem="{Binding Settings.FroniusUpdateRate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                              ItemsSource="{Binding FroniusUpdateRates}" ItemTemplate="{StaticResource ComboBoxTemplate}"/>
-                    <TextBlock Grid.Column="1" Text="{Binding Settings.FroniusUpdateRate, Converter={co:ByteEqualityToString Value=1, Equal={x:Static p:Resources.Second}, NotEqual={x:Static p:Resources.Seconds}}}" Margin="4,8,0,0"/>
+                              ItemsSource="{Binding FroniusUpdateRates}" ItemTemplate="{StaticResource ComboBoxTemplate}" />
+                    <TextBlock Grid.Column="1" Text="{Binding Settings.FroniusUpdateRate, Converter={co:ByteEqualityToString Value=1, Equal={x:Static p:Resources.Second}, NotEqual={x:Static p:Resources.Seconds}}}" Margin="4,8,0,0" />
                 </Grid>
             </Grid>
 
@@ -201,6 +221,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <Grid.ColumnDefinitions>
@@ -209,10 +230,9 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.Url}" Margin="0,8,0,0" />
-                    <TextBlock Grid.Row="0" Grid.Column="1" Text=":" Margin="4,8,4,0" />
-
-                    <TextBox Grid.Row="0" Grid.Column="2"
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.Url}" Margin="0,8,0,0" ToolTip="{x:Static p:Resources.ToshibaHvacUrlTooltip}" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text=":" Margin="4,8,4,0" ToolTip="{x:Static p:Resources.ToshibaHvacUrlTooltip}" />
+                    <TextBox Grid.Row="0" Grid.Column="2" ToolTip="{x:Static p:Resources.ToshibaHvacUrlTooltip}"
                              Text="{Binding Settings.ToshibaAcConnection.BaseUrl, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.Username}" Margin="0,8,0,0" />
@@ -225,30 +245,33 @@
 
                     <c:PasswordBox Grid.Row="2" Grid.Column="2" Template="{StaticResource PasswordBoxTemplate}"
                                    Password="{Binding Settings.ToshibaAcConnection.Password, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <TextBlock Grid.Row="3" Grid.Column="0" Text="{x:Static p:Resources.UpdateRate}" Margin="0,8,0,0" />
+
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="{x:Static p:Resources.LiveUpdateProtocol}" Margin="0,8,0,0" />
                     <TextBlock Grid.Row="3" Grid.Column="1" Text=":" Margin="4,8,4,0" />
-                    <Grid Grid.Row="3" Grid.Column="2">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <ComboBox Grid.Column="0" SelectedItem="{Binding Settings.ToshibaAcUpdateRate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                  ItemsSource="{Binding FroniusUpdateRates}" ItemTemplate="{StaticResource ComboBoxTemplate}"/>
-                        <TextBlock Grid.Column="1" Text="{Binding Settings.ToshibaAcUpdateRate, Converter={co:ByteEqualityToString Value=1, Equal={x:Static p:Resources.Second}, NotEqual={x:Static p:Resources.Seconds}}}" Margin="4,8,0,0"/>
-                    </Grid>
+
+                    <ComboBox Grid.Row="3" Grid.Column="2" SelectedItem="{Binding SelectedProtocol, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                              ToolTip="{Binding SelectedProtocol.ToolTip}"
+                              ItemsSource="{Binding AzureProtocols}" ItemTemplate="{StaticResource ComboBoxTemplateToolTip}" />
+
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="{x:Static p:Resources.TunnelStrategy}" Margin="0,8,0,0" />
+                    <TextBlock Grid.Row="4" Grid.Column="1" Text=":" Margin="4,8,4,0" />
+
+                    <ComboBox Grid.Row="4" Grid.Column="2" SelectedItem="{Binding SelectedTunnelMode, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, FallbackValue='---'}"
+                              ToolTip="{Binding SelectedTunnelMode.ToolTip, FallbackValue='---'}" IsEnabled="{Binding CanUseTunnel}"
+                              ItemsSource="{Binding TunnelModes}" ItemTemplate="{StaticResource ComboBoxTemplateToolTip}" />
                 </Grid>
             </Grid>
         </GroupBox>
 
         <Grid Margin="0,32,-8,0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="1" Content="{x:Static p:Resources.Cancel}" Click="OnCancelClick" IsCancel="True"/>
-            <Button Grid.Column="2" Content="{x:Static p:Resources.Ok}" Command="{Binding OkCommand}" IsDefault="True"/>
+            <Button Grid.Column="1" Content="{x:Static p:Resources.Cancel}" Click="OnCancelClick" IsCancel="True" />
+            <Button Grid.Column="2" Content="{x:Static p:Resources.Ok}" Command="{Binding OkCommand}" IsDefault="True" />
 
         </Grid>
     </StackPanel>

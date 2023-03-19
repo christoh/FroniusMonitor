@@ -1,4 +1,5 @@
-﻿using De.Hochstaetter.FroniusMonitor.Wpf.Localization;
+﻿using De.Hochstaetter.Fronius.Models.Settings;
+using De.Hochstaetter.FroniusMonitor.Wpf.Localization;
 
 namespace De.Hochstaetter.FroniusMonitor.Wpf.Converters;
 
@@ -243,6 +244,8 @@ public abstract class BoolToAnything<T> : ConverterBase
 }
 
 public class Bool2Brush : BoolToAnything<Brush> { }
+
+public class Bool2DataTemplate : BoolToAnything<DataTemplate> { }
 
 public class Bool2Visibility : BoolToAnything<Visibility>
 {
@@ -681,7 +684,7 @@ public class LinuxVersion : ConverterBase
     }
 }
 
-public class ToshibaHvacStatus2Brush : MultiConverterBase
+public class PowerStatus2Brush : MultiConverterBase
 {
     public override object? Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
     {
@@ -742,7 +745,7 @@ public class ToshibaHvacMeritFeaturesARange2Visibility : Range2Anything<ToshibaH
     }
 }
 
-public class ToshibaHvacSilent2Visibility:ConverterBase
+public class ToshibaHvacSilent2Visibility : ConverterBase
 {
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {

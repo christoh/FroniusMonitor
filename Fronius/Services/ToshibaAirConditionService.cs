@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Text.Json;
 using De.Hochstaetter.Fronius.Models.JsonConverters;
+using De.Hochstaetter.Fronius.Models.Settings;
 using De.Hochstaetter.Fronius.Models.ToshibaAc;
 using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Client.Exceptions;
@@ -16,6 +17,8 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
     private CancellationTokenSource? tokenSource;
     private DeviceClient? azureClient;
     private ulong messageId = BitConverter.ToUInt64(RandomNumberGenerator.GetBytes(8));
+
+    public event EventHandler<ToshibaHvacAzureSmMobileCommand>? LiveDataReceived;
 
     static ToshibaAirConditionService()
     {
@@ -68,7 +71,6 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
         if (azureClient != null)
         {
             await azureClient.DisposeAsync().ConfigureAwait(false);
-
         }
 
         AllDevices?.Clear();
@@ -110,7 +112,7 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
 
             var azureCredentials = await Deserialize<ToshibaAcAzureCredentials>("/api/Consumer/RegisterMobileDevice", postData).ConfigureAwait(false);
             var auth = AuthenticationMethodFactory.CreateAuthenticationWithToken(azureCredentials.DeviceId, azureCredentials.SasToken);
-            azureClient = DeviceClient.Create(azureCredentials.HostName, auth, TransportType.Amqp);
+            azureClient = DeviceClient.Create(azureCredentials.HostName, auth, settings.ToshibaAcConnection.TransportType);
 
             var devices = await Deserialize<List<ToshibaAcMapping>>($"/api/AC/GetConsumerACMapping?consumerId={session.ConsumerId}").ConfigureAwait(false);
             AllDevices = new BindableCollection<ToshibaAcMapping>(devices, context);
@@ -134,7 +136,7 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
         }
     }
 
-    public async ValueTask SendDeviceCommand(ToshibaAcStateData state, params string[] targetIdStrings)
+    public async ValueTask<string> SendDeviceCommand(ToshibaAcStateData state, params string[] targetIdStrings)
     {
         var settings = Settings;
 
@@ -143,7 +145,7 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
             throw new IotHubCommunicationException("Not connected");
         }
 
-        var command = new ToshibaAcAzureSmMobileCommand
+        var command = new ToshibaHvacAzureSmMobileCommand
         {
             CommandName = "CMD_FCU_TO_AC",
             DeviceUniqueId = settings.ToshibaAcConnection.UserName + ":" + session.ConsumerId.ToString("D"),
@@ -156,6 +158,7 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
         var commandString = JsonSerializer.Serialize(command, jsonOptions);
         Debug.Print(commandString);
         await azureClient.SendEventAsync(new Message(Encoding.UTF8.GetBytes(commandString)), Token).ConfigureAwait(false);
+        return command.MessageId;
     }
 
     private void OnAzureConnectionStatusChange(ConnectionStatus status, ConnectionStatusChangeReason reason)
@@ -170,7 +173,7 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
 
         try
         {
-            var command = JsonSerializer.Deserialize<ToshibaAcAzureSmMobileCommand>(request.Data, jsonOptions)!;
+            var command = JsonSerializer.Deserialize<ToshibaHvacAzureSmMobileCommand>(request.Data, jsonOptions)!;
             var device = AllDevices!.SelectMany(d => d.Devices).First(d => d.DeviceUniqueId.ToString("D") == command.DeviceUniqueId.ToLowerInvariant());
 
             switch (command.CommandName)
@@ -191,6 +194,8 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
                 default:
                     break;
             }
+
+            LiveDataReceived?.Invoke(this, command);
         }
         catch
         {
@@ -238,6 +243,7 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
         using var response = (await client.SendAsync(message, Token).ConfigureAwait(false)).EnsureSuccessStatusCode();
 
         #if DEBUG // This allows you to see the raw JSON string
+
         var jsonText = await response.Content.ReadAsStringAsync(Token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
         Debug.Print(jsonText);
         var jDocument = JsonDocument.Parse(jsonText);

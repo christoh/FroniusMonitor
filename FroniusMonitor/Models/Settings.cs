@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Models;
+﻿using De.Hochstaetter.Fronius.Models.Settings;
+
+namespace De.Hochstaetter.FroniusMonitor.Models;
 
 public class Settings : SettingsBase, ICloneable
 {

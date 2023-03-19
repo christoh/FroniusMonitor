@@ -2,7 +2,7 @@
 
 namespace De.Hochstaetter.Fronius.Models.ToshibaAc
 {
-    public class ToshibaAcAzureSmMobileCommand : BindableBase
+    public class ToshibaHvacAzureSmMobileCommand : BindableBase
     {
         private string deviceUniqueId = string.Empty;
 

@@ -26,4 +26,7 @@
 	<data name="CableLockBehavior_AutoUnlock" xml:space="preserve">
 		<value>Immer entriegeln, wenn kein Strom fliesst</value>
 	</data>
+	<data name="TunnelMode_Websocket_ToolTip" xml:space="preserve">
+		<value>Immer einen Tunnel über HTTP und Websocket verwenden. Wenn Du weisst, dass Deine Internetverbindung über eine Firewall läuft, die das native Protokoll blockt, kannst Du die Zeit sparen, es über das native Protkoll zu versuchen.</value>
+	</data>
 </root>

@@ -1080,4 +1080,67 @@
   <data name="PowerLimit" xml:space="preserve">
 	  <value>Power limit</value>
   </data>
+  <data name="ToshibaHvacUrlTooltip" xml:space="preserve">
+	  <value>You should not change the URL unless Toshiba changes the host name</value>
+  </data>
+  <data name="Protocol" xml:space="preserve">
+	  <value>Protocol</value>
+  </data>
+  <data name="Protocol_Amqp" xml:space="preserve">
+	  <value>AMQP (Advanced Message Queuing Protocol)</value>
+  </data>
+  <data name="Protocol_Mqtt" xml:space="preserve">
+	  <value>MQTT (Message Queuing Telemetry Transport)</value>
+  </data>
+  <data name="Protocol_Http1" xml:space="preserve">
+	  <value>HTTP 1.1 (Hypertext Transfer Protocol)</value>
+  </data>
+  <data name="Protocol_Amqp_ToolTip" xml:space="preserve">
+	  <value>Best for general use. Unlike MQTT it supports message rejection and abondoning.</value>
+  </data>
+  <data name="Protocol_Mqtt_ToolTip" xml:space="preserve">
+	  <value>MQTT is more lightweight than AMQP but lacks some feature. However, if you have an unstable internet connection, you might loose less messages.</value>
+  </data>
+  <data name="Protocol_Http1_ToolTip" xml:space="preserve">
+	  <value>HTTP 1.1 is not very effective but may be necessary if the internet connection has paranoid firewall serrings.</value>
+  </data>
+  <data name="LiveUpdateProtocol" xml:space="preserve">
+	  <value>Live update protocol</value>
+  </data>
+  <data name="TunnelStrategy" xml:space="preserve">
+	  <value>Tunnel strategy</value>
+  </data>
+  <data name="TunnelMode_Auto" xml:space="preserve">
+	  <value>Auto</value>
+  </data>
+  <data name="TunnelMode_Websocket" xml:space="preserve">
+	  <value>Web socket</value>
+  </data>
+  <data name="TunnelMode_NoTunnel" xml:space="preserve">
+	  <value>No tunnelling</value>
+  </data>
+  <data name="TunnelMode_Auto_ToolTip" xml:space="preserve">
+	  <value>Try the native protocol first. If that fails, try tunnelling through HTTP and wen socket. If the internet connection is firewalled, you will likely get a connection.</value>
+  </data>
+  <data name="TunnelMode_Websocket_ToolTip" xml:space="preserve">
+	  <value>Always use a web tunnel via HTTP and web socket. If you know that your internet connection is firewalled, there is no waste of time by trying the native protocol.</value>
+  </data>
+  <data name="TunnelMode_NoTunnel_ToolTip" xml:space="preserve">
+	  <value>If the firewall blocks the native protocol, you do not get a connection with this setting.</value>
+  </data>
+  <data name="HvacModeAuto" xml:space="preserve">
+	  <value>Automatically Cool or Heat</value>
+  </data>
+  <data name="HvacModeCooling" xml:space="preserve">
+	  <value>Cooling only</value>
+  </data>
+  <data name="HvacModeDrying" xml:space="preserve">
+	  <value>Dehumidify</value>
+  </data>
+  <data name="HvacModeHeating" xml:space="preserve">
+	  <value>Heating only</value>
+  </data>
+  <data name="HvacModeFanOnly" xml:space="preserve">
+	  <value>Fan only</value>
+  </data>
 </root>

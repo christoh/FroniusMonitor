@@ -12,6 +12,17 @@
         <Color x:Key="FilledColor" A="255" B="155" R="155" G="155" />
         <Color x:Key="UnfilledColor" A="0" B="155" R="155" G="155" />
 
+        <Style TargetType="ToolTip">
+            <Setter Property="ContentTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <TextBox IsReadOnly="True" Background="Transparent" HorizontalAlignment="Stretch" TextWrapping="Wrap" BorderThickness="0" BorderBrush="Transparent" 
+                                 Text="{TemplateBinding Content}" MaxWidth="300" />
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style x:Key="BusyAnimationStyle" TargetType="Control">
             <Setter Property="Background" Value="#7F000000" />
 

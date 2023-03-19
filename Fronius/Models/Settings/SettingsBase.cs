@@ -1,8 +1,8 @@
-﻿namespace De.Hochstaetter.Fronius.Models;
+﻿namespace De.Hochstaetter.Fronius.Models.Settings;
 
 public abstract class SettingsBase : BindableBase
 {
-    private WebConnection? fritzBoxConnection = new() {BaseUrl = "http://192.168.178.1", UserName = string.Empty, Password = string.Empty};
+    private WebConnection? fritzBoxConnection = new() { BaseUrl = "http://192.168.178.1", UserName = string.Empty, Password = string.Empty };
 
     [XmlElement, DefaultValue(null)]
     public WebConnection? FritzBoxConnection
@@ -20,16 +20,7 @@ public abstract class SettingsBase : BindableBase
         set => Set(ref froniusUpdateRate, value);
     }
 
-    private byte toshibaAcUpdateRate = 5;
-
-    [DefaultValue((byte)5)]
-    public byte ToshibaAcUpdateRate
-    {
-        get => toshibaAcUpdateRate;
-        set => Set(ref toshibaAcUpdateRate, value);
-    }
-
-    private WebConnection? froniusConnection = new() {BaseUrl = "http://192.168.178.XXX", UserName = string.Empty, Password = string.Empty};
+    private WebConnection? froniusConnection = new() { BaseUrl = "http://192.168.178.XXX", UserName = string.Empty, Password = string.Empty };
 
     [XmlElement, DefaultValue(null)]
     public WebConnection? FroniusConnection
@@ -38,7 +29,7 @@ public abstract class SettingsBase : BindableBase
         set => Set(ref froniusConnection, value);
     }
 
-    private WebConnection? wattPilotConnection = new() {BaseUrl = "ws://192.168.178.YYY", Password = string.Empty};
+    private WebConnection? wattPilotConnection = new() { BaseUrl = "ws://192.168.178.YYY", Password = string.Empty };
 
     [XmlElement, DefaultValue(null)]
     public WebConnection? WattPilotConnection
@@ -93,7 +84,7 @@ public abstract class SettingsBase : BindableBase
         {
             if (value)
             {
-                FritzBoxConnection ??= new WebConnection {BaseUrl = "http://192.168.178.1", UserName = string.Empty, Password = string.Empty};
+                FritzBoxConnection ??= new WebConnection { BaseUrl = "http://192.168.178.1", UserName = string.Empty, Password = string.Empty };
             }
         });
     }
@@ -108,7 +99,12 @@ public abstract class SettingsBase : BindableBase
         {
             if (value)
             {
-                ToshibaAcConnection ??= new WebConnection {BaseUrl = "https://mobileapi.toshibahomeaccontrols.com", UserName = string.Empty, Password = string.Empty};
+                ToshibaAcConnection ??= new AzureConnection
+                {
+                    BaseUrl = "https://mobileapi.toshibahomeaccontrols.com",
+                    UserName = string.Empty, Password = string.Empty,
+                    Protocol = Protocol.Amqp, TunnelMode = TunnelMode.Auto
+                };
             }
         });
     }
@@ -122,10 +118,10 @@ public abstract class SettingsBase : BindableBase
         set => Set(ref showToshibaAc, value);
     }
 
-    private WebConnection? toshibaAcConnection;
+    private AzureConnection? toshibaAcConnection;
 
     [XmlElement, DefaultValue(null)]
-    public WebConnection? ToshibaAcConnection
+    public AzureConnection? ToshibaAcConnection
     {
         get => toshibaAcConnection;
         set => Set(ref toshibaAcConnection, value);

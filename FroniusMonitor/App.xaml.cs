@@ -1,4 +1,5 @@
-﻿using Loc = De.Hochstaetter.Fronius.Localization.Resources;
+﻿using De.Hochstaetter.Fronius.Models.Settings;
+using Loc = De.Hochstaetter.Fronius.Localization.Resources;
 
 namespace De.Hochstaetter.FroniusMonitor;
 

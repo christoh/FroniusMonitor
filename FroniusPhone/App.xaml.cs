@@ -1,4 +1,5 @@
 ﻿using De.Hochstaetter.Fronius;
+using De.Hochstaetter.Fronius.Models.Settings;
 using Microsoft.Maui.Controls;
 
 namespace FroniusPhone

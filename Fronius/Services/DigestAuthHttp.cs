@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.Fronius.Services;
+﻿using De.Hochstaetter.Fronius.Models.Settings;
+
+namespace De.Hochstaetter.Fronius.Services;
 
 // Algorithm must be MD5 (MD5-sess and SHA are not supported)
 // qop must be auth (auth-int and none is not supported)

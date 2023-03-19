@@ -1,4 +1,5 @@
-﻿using De.Hochstaetter.Fronius.Models.ToshibaAc;
+﻿using De.Hochstaetter.Fronius.Models.Settings;
+using De.Hochstaetter.Fronius.Models.ToshibaAc;
 
 namespace De.Hochstaetter.Fronius.Services;
 
@@ -22,6 +23,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         AcService = acService;
         PowerFlowQueue = new Queue<Gen24PowerFlow>(QueueSize + 1);
         SwitchableDevices = new BindableCollection<ISwitchable>(context);
+        SwitchableDevices.CollectionChanged += (s, e) => { };
     }
 
     public BindableCollection<ISwitchable> SwitchableDevices { get; }
@@ -165,7 +167,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         {
             await Task.WhenAll(fritzBoxTask, wattPilotTask, inverterTask, toshibaAcTask).ConfigureAwait(false);
         }
-        catch (AggregateException) { }
+        catch (TaskCanceledException) { }
 
         result.WattPilot = wattPilotTask.IsCompletedSuccessfully ? wattPilotTask.Result : null;
         result.FritzBox = fritzBoxTask.IsCompletedSuccessfully ? fritzBoxTask.Result : null;
@@ -198,7 +200,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
                     foreach (var device in deviceGroup)
                     {
-                        var group = new DeviceGroup {DeviceClass = deviceGroup.Key};
+                        var group = new DeviceGroup { DeviceClass = deviceGroup.Key };
 
                         switch (deviceGroup.Key)
                         {
@@ -240,26 +242,27 @@ public class SolarSystemService : BindableBase, ISolarSystemService
             {
                 var powerConsumers = devices.PowerConsumers.Cast<FritzBoxDevice>().ToList();
                 var switchableDevices = SwitchableDevices.OfType<FritzBoxDevice>().ToList();
-                var devicesToRemove = switchableDevices.Where(s => !powerConsumers.Select(f => f.Id).Contains(s.Id)).ToList();
-                var devicesToAdd = powerConsumers.Where(p => !switchableDevices.Select(f => f.Id).Contains(p.Id)).ToList();
-                var devicesToUpdate = switchableDevices.Where(s => powerConsumers.Select(p => p.Id).Contains(s.Id)).ToList();
+                var devicesToRemove = switchableDevices.ExceptBy(powerConsumers.Select(p => p.Id), p => p.Id).ToList();
+                var devicesToAdd = powerConsumers.ExceptBy(switchableDevices.Select(p => p.Id), p => p.Id).ToList();
+                var devicesToUpdate = switchableDevices.IntersectBy(powerConsumers.Select(p => p.Id), p => p.Id).ToList();
 
                 foreach (var oldDevice in devicesToUpdate)
                 {
                     var newDevice = powerConsumers.Single(p => p.Id == oldDevice.Id);
-
-                    //foreach (var propertyInfo in typeof(FritzBoxDevice).GetProperties().Where(p => p is { CanWrite: true, CanRead: true }))
-                    //{
-                    //    var value = propertyInfo.GetValue(oldDevice);
-                    //    propertyInfo.SetValue(newDevice, value);
-                    //    oldDevice.Refresh();
-                    //}
-                    var index = SwitchableDevices.IndexOf(oldDevice);
-                    SwitchableDevices[index] = newDevice;
+                    oldDevice.CopyFrom(newDevice);
                 }
 
-                SwitchableDevices.RemoveRange(devicesToRemove);
-                SwitchableDevices.AddRange(devicesToAdd);
+
+                if (devicesToRemove.Count > 0)
+                {
+                    SwitchableDevices.RemoveRange(devicesToRemove);
+                }
+
+                if (devicesToAdd.Count > 0)
+                {
+                    SwitchableDevices.AddRange(devicesToAdd);
+                }
+
             }).ConfigureAwait(false);
 
             return devices;
@@ -363,13 +366,13 @@ public class SolarSystemService : BindableBase, ISolarSystemService
                 {
                     await Task.WhenAll(gen24Task, fritzBoxTask, wattPilotTask, toshibaAcTask).ConfigureAwait(false);
                 }
-                catch (AggregateException) { }
+                catch (TaskCanceledException) { }
 
                 SolarSystem.WattPilot = wattPilotTask.IsCompletedSuccessfully ? wattPilotTask.Result ?? SolarSystem.WattPilot : SolarSystem.WattPilot;
                 SolarSystem.FritzBox = fritzBoxTask.IsCompletedSuccessfully ? fritzBoxTask.Result ?? SolarSystem.FritzBox : null;
                 SolarSystem.Gen24System = gen24Task.IsCompletedSuccessfully ? gen24Task.Result ?? SolarSystem.Gen24System : null;
-                newFritzBoxData = fritzBoxTask is {IsCompletedSuccessfully: true, Result: { }};
-                newSolarData = gen24Task is {IsCompletedSuccessfully: true, Result: { }};
+                newFritzBoxData = fritzBoxTask is { IsCompletedSuccessfully: true, Result: { } };
+                newSolarData = gen24Task is { IsCompletedSuccessfully: true, Result: { } };
             }
 
 

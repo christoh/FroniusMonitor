@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using De.Hochstaetter.Fronius.Models.Settings;
 
 namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
@@ -11,6 +12,19 @@ public class SettingsViewModel : SettingsViewModelBase
         new ListItemModel<string?> {DisplayName = GetCultureName("de"), Value = "de"},
         new ListItemModel<string?> {DisplayName = GetCultureName("de-CH"), Value = "de-CH"},
         new ListItemModel<string?> {DisplayName = GetCultureName("de-LI"), Value = "de-LI"},
+    };
+
+    private static readonly IEnumerable<ListItemModel<Protocol>> azureProtocols = new[]
+    {
+        new EnumListItemModel<Protocol> {Value = Protocol.Amqp},
+        new EnumListItemModel<Protocol> {Value = Protocol.Mqtt},
+    };
+
+    private static readonly IEnumerable<ListItemModel<TunnelMode>> tunnelModes = new[]
+    {
+        new EnumListItemModel<TunnelMode> {Value = TunnelMode.Auto},
+        new EnumListItemModel<TunnelMode> {Value = TunnelMode.Websocket},
+        new EnumListItemModel<TunnelMode> {Value = TunnelMode.NoTunnel},
     };
 
     private readonly ISolarSystemService solarSystemService;
@@ -33,13 +47,32 @@ public class SettingsViewModel : SettingsViewModelBase
     private ICommand? okCommand;
     public ICommand OkCommand => okCommand ??= new NoParameterCommand(Ok);
 
-    internal override async Task OnInitialize()
+    public IEnumerable<ListItemModel<Protocol>> AzureProtocols => azureProtocols;
+
+    public IEnumerable<ListItemModel<TunnelMode>> TunnelModes => tunnelModes;
+
+    public ListItemModel<Protocol> SelectedProtocol
     {
-        await base.OnInitialize().ConfigureAwait(false);
-        Settings = (Settings)App.Settings.Clone();
-        Settings.FroniusConnection ??= new Settings().FroniusConnection;
-        SelectedCulture = Cultures.SingleOrDefault(c => c.Value?.ToUpperInvariant() == Settings.Language?.ToUpperInvariant()) ?? Cultures.First();
+        get => AzureProtocols.First(p => p.Value == Settings.ToshibaAcConnection!.Protocol);
+        set
+        {
+            Settings.ToshibaAcConnection!.Protocol = value.Value;
+            NotifyOfPropertyChange();
+            NotifyOfPropertyChange(nameof(CanUseTunnel));
+        }
     }
+
+    public ListItemModel<TunnelMode> SelectedTunnelMode
+    {
+        get => TunnelModes.First(p => p.Value == Settings.ToshibaAcConnection!.TunnelMode);
+        set
+        {
+            Settings.ToshibaAcConnection!.TunnelMode = value.Value;
+            NotifyOfPropertyChange();
+        }
+    }
+
+    public bool CanUseTunnel => Settings.ToshibaAcConnection!.CanUseTunnel;
 
     private Settings settings = null!;
 
@@ -66,6 +99,16 @@ public class SettingsViewModel : SettingsViewModelBase
     private static readonly IReadOnlyList<byte> froniusUpdateRates = new byte[] { 1, 2, 3, 4, 5, 10, 20, 30, 60 };
 
     public IReadOnlyList<byte> FroniusUpdateRates => froniusUpdateRates;
+
+    internal override async Task OnInitialize()
+    {
+        await base.OnInitialize().ConfigureAwait(false);
+        Settings = (Settings)App.Settings.Clone();
+        Settings.FroniusConnection ??= new Settings().FroniusConnection;
+        Settings.ToshibaAcConnection ??= new Settings().ToshibaAcConnection;
+        SelectedCulture = Cultures.SingleOrDefault(c => c.Value?.ToUpperInvariant() == Settings.Language?.ToUpperInvariant()) ?? Cultures.First();
+        NotifyOfPropertyChange(nameof(SelectedProtocol));
+    }
 
     private static string GetCultureName(string id)
     {

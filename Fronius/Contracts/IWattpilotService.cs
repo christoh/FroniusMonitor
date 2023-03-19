@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using De.Hochstaetter.Fronius.Services;
+﻿using De.Hochstaetter.Fronius.Models.Settings;
 
 namespace De.Hochstaetter.Fronius.Contracts
 {
