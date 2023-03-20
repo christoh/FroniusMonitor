@@ -21,7 +21,7 @@ public partial class MainWindow
     {
         Initialized += (_, _) =>
         {
-            if (App.Settings.MainWindowSize is {IsEmpty: false})
+            if (App.Settings.MainWindowSize is { IsEmpty: false })
             {
                 Width = App.Settings.MainWindowSize.Value.Width;
                 Height = App.Settings.MainWindowSize.Value.Height;
@@ -32,31 +32,31 @@ public partial class MainWindow
 
         DataContext = vm;
 
-        Loaded += async (_, _) =>
+        Loaded += (_, _) =>
         {
             ViewModel.Dispatcher = Dispatcher;
             var binding = new Binding($"{nameof(ViewModel.SolarSystemService)}.{nameof(ViewModel.SolarSystemService.SolarSystem)}.{nameof(ViewModel.SolarSystemService.SolarSystem.Gen24System)}.{nameof(ViewModel.SolarSystemService.SolarSystem.Gen24System.PowerFlow)}");
             SetBinding(PowerFlowProperty, binding);
             ViewModel.View = this;
-            await ViewModel.OnInitialize().ConfigureAwait(false);
+            _ = ViewModel.OnInitialize();
         };
 
-        SizeChanged += async (_, e) =>
+        SizeChanged += (_, e) =>
         {
             if (IsLoaded)
             {
                 App.Settings.MainWindowSize = e.NewSize;
-                await Settings.Save().ConfigureAwait(false);
+                Settings.Save();
             }
         };
     }
 
-    private async void OnControllerGridRowHeightChanged(object sender, SizeChangedEventArgs e)
+    private void OnControllerGridRowHeightChanged(object sender, SizeChangedEventArgs e)
     {
-        if (IsLoaded && e.HeightChanged)
+        if (IsLoaded && e.HeightChanged && double.IsInfinity(PowerConsumerRow.MaxHeight))
         {
             App.Settings.ControllerGridRowHeight = PowerConsumerRow.ActualHeight;
-            await Settings.Save().ConfigureAwait(false);
+            Settings.Save();
         }
     }
 
@@ -73,7 +73,7 @@ public partial class MainWindow
                 eventLogView.Closed += (_, _) => { eventLogView = null; };
             }
 
-            return eventLogView!;
+            return eventLogView;
         }
     }
 
@@ -231,7 +231,6 @@ public partial class MainWindow
     private void OnAutoSizeChecked(object sender, RoutedEventArgs e)
     {
         SolarSystemRow.Height = new GridLength(1, GridUnitType.Star);
-        PowerConsumerRow.Height = new GridLength(375, GridUnitType.Pixel);
     }
 
     private void ShowEventLog(object sender, RoutedEventArgs e)
@@ -311,9 +310,8 @@ public partial class MainWindow
         }
     }
 
-    private async void SaveSettings(object sender, RoutedEventArgs e)
+    private void SaveSettings(object sender, RoutedEventArgs e)
     {
-        await Settings.Save().ConfigureAwait(false);
+        Settings.Save();
     }
-
 }
