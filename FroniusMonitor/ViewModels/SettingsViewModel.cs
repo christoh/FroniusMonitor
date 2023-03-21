@@ -158,7 +158,7 @@ public class SettingsViewModel : SettingsViewModelBase
             solarSystemService.WattPilotConnection = Settings.WattPilotConnection;
         }
 
-        await solarSystemService.AcService.Stop().ConfigureAwait(false);
+        await solarSystemService.HvacService.Stop().ConfigureAwait(false);
         await Settings.Save().ConfigureAwait(false);
 
         static string FixUrl(string url, bool isWebSocket = false)

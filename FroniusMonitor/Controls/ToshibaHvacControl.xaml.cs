@@ -45,7 +45,7 @@ public partial class ToshibaHvacControl
             SolarSystemService = IoC.Get<ISolarSystemService>();
         }
 
-        Unloaded += (_, _) => SolarSystemService.AcService.LiveDataReceived -= OnAnswerReceived;
+        Unloaded += (_, _) => SolarSystemService.HvacService.LiveDataReceived -= OnAnswerReceived;
     }
 
     private void OnStateChanged()
@@ -57,7 +57,7 @@ public partial class ToshibaHvacControl
             enablerTokenSource = null;
         }
 
-        SolarSystemService.AcService.LiveDataReceived -= OnAnswerReceived;
+        SolarSystemService.HvacService.LiveDataReceived -= OnAnswerReceived;
 
         Dispatcher.BeginInvoke(() =>
         {
@@ -69,8 +69,8 @@ public partial class ToshibaHvacControl
     private async void SendCommand(ToshibaHvacStateData stateData)
     {
         IsEnabled = false;
-        SolarSystemService.AcService.LiveDataReceived += OnAnswerReceived;
-        awaitedMessage = await SolarSystemService.AcService.SendDeviceCommand(stateData, Device).ConfigureAwait(false);
+        SolarSystemService.HvacService.LiveDataReceived += OnAnswerReceived;
+        awaitedMessage = await SolarSystemService.HvacService.SendDeviceCommand(stateData, Device).ConfigureAwait(false);
 
         lock (tokenLock)
         {

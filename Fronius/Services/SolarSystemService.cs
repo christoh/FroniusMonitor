@@ -22,14 +22,14 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         this.webClientService = webClientService;
         this.wattPilotService = wattPilotService;
         this.settings = settings;
-        AcService = acService;
+        HvacService = acService;
         PowerFlowQueue = new Queue<Gen24PowerFlow>(QueueSize + 1);
         SwitchableDevices = new BindableCollection<ISwitchable>(context);
     }
 
     public BindableCollection<ISwitchable> SwitchableDevices { get; }
 
-    public IToshibaHvacService AcService { get; }
+    public IToshibaHvacService HvacService { get; }
 
     private SolarSystem? solarSystem;
 
@@ -291,17 +291,17 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
     private async Task TryStartToshibaAc()
     {
-        if (!AcService.IsRunning)
+        if (!HvacService.IsRunning)
         {
-            await AcService.Start().ConfigureAwait(false);
+            await HvacService.Start().ConfigureAwait(false);
 
-            if (!AcService.IsRunning)
+            if (!HvacService.IsRunning)
             {
                 return;
             }
 
             SwitchableDevices.RemoveRange(SwitchableDevices.OfType<ToshibaHvacMappingDevice>().ToList());
-            SwitchableDevices.AddRange(AcService.AllDevices!.SelectMany(d => d.Devices));
+            SwitchableDevices.AddRange(HvacService.AllDevices!.SelectMany(d => d.Devices));
         }
     }
 
@@ -333,7 +333,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
             if (!settings.HaveToshibaAc)
             {
-                await AcService.Stop().ConfigureAwait(false);
+                await HvacService.Stop().ConfigureAwait(false);
                 SwitchableDevices.RemoveRange(SwitchableDevices.OfType<ToshibaHvacMappingDevice>().ToList());
             }
 
