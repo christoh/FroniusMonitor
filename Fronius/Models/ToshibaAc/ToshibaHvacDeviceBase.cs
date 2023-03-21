@@ -1,11 +1,11 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc
 {
-    public abstract class ToshibaAcDeviceBase : BindableBase, ISwitchable
+    public abstract class ToshibaHvacDeviceBase : BindableBase, ISwitchable
     {
-        private ToshibaAcStateData state = new();
+        private ToshibaHvacStateData state = new();
 
         [JsonPropertyName("ACStateData")]
-        public ToshibaAcStateData State
+        public ToshibaHvacStateData State
         {
             get => state;
             set => Set(ref state, value);
@@ -29,10 +29,10 @@
             set => Set(ref meritFeature, value);
         }
 
-        private ObservableCollection<ToshibaAcModeValue> modes = new();
+        private ObservableCollection<ToshibaHvacModeValue> modes = new();
 
         [JsonPropertyName("ModeValues")]
-        public ObservableCollection<ToshibaAcModeValue> Modes
+        public ObservableCollection<ToshibaHvacModeValue> Modes
         {
             get => modes;
             set => Set(ref modes, value);

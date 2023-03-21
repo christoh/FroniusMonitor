@@ -11,12 +11,12 @@ using System.Net.Http.Json;
 
 namespace De.Hochstaetter.Fronius.Services;
 
-public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionService
+public class ToshibaHvacService : BindableBase, IToshibaHvacService
 {
     private readonly SynchronizationContext context;
     private readonly SettingsBase settings;
 
-    private ToshibaAcSession? session;
+    private ToshibaHvacSession? session;
     private static readonly JsonSerializerOptions jsonOptions = new(JsonSerializerDefaults.Web);
     private CancellationTokenSource? tokenSource;
     private DeviceClient? azureClient;
@@ -24,23 +24,23 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
 
     public event EventHandler<ToshibaHvacAzureSmMobileCommand>? LiveDataReceived;
 
-    static ToshibaAirConditionService()
+    static ToshibaHvacService()
     {
         // jsonOptions.Converters.Add(new ToshibaDateTimeConverter());
         jsonOptions.Converters.Add(new ToshibaHexConverter<int>());
         jsonOptions.Converters.Add(new ToshibaHexConverter<byte>());
         jsonOptions.Converters.Add(new ToshibaHexConverter<sbyte>());
         jsonOptions.Converters.Add(new ToshibaHexConverter<ushort>());
-        jsonOptions.Converters.Add(new ToshibaHexConverter<ToshibaAcOperatingMode>());
-        jsonOptions.Converters.Add(new ToshibaHexConverter<ToshibaAcFanSpeed>());
-        jsonOptions.Converters.Add(new ToshibaHexConverter<ToshibaAcPowerState>());
+        jsonOptions.Converters.Add(new ToshibaHexConverter<ToshibaHvacOperatingMode>());
+        jsonOptions.Converters.Add(new ToshibaHexConverter<ToshibaHvacFanSpeed>());
+        jsonOptions.Converters.Add(new ToshibaHexConverter<ToshibaHvacPowerState>());
         jsonOptions.Converters.Add(new ToshibaStateDataConverter());
         #if DEBUG
         jsonOptions.WriteIndented = true;
         #endif
     }
 
-    public ToshibaAirConditionService(SynchronizationContext context, SettingsBase settings)
+    public ToshibaHvacService(SynchronizationContext context, SettingsBase settings)
     {
         this.context = context;
         this.settings = settings;
@@ -58,9 +58,9 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
         private set => Set(ref isConnected, value);
     }
 
-    private BindableCollection<ToshibaAcMapping>? allDevices;
+    private BindableCollection<ToshibaHvacMapping>? allDevices;
 
-    public BindableCollection<ToshibaAcMapping>? AllDevices
+    public BindableCollection<ToshibaHvacMapping>? AllDevices
     {
         get => allDevices;
         private set => Set(ref allDevices, value);
@@ -101,7 +101,7 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
                 {"Password", settings.ToshibaAcConnection.Password},
             };
 
-            session = await Deserialize<ToshibaAcSession>("/api/Consumer/Login", postData).ConfigureAwait(false)
+            session = await Deserialize<ToshibaHvacSession>("/api/Consumer/Login", postData).ConfigureAwait(false)
                       ?? throw new WebException("No session data received", WebExceptionStatus.ReceiveFailure);
 
             postData = new Dictionary<string, string>
@@ -111,12 +111,12 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
                 {"Username", settings.ToshibaAcConnection!.UserName},
             };
 
-            var azureCredentials = await Deserialize<ToshibaAcAzureCredentials>("/api/Consumer/RegisterMobileDevice", postData).ConfigureAwait(false);
+            var azureCredentials = await Deserialize<ToshibaHvacAzureCredentials>("/api/Consumer/RegisterMobileDevice", postData).ConfigureAwait(false);
             var auth = AuthenticationMethodFactory.CreateAuthenticationWithToken(azureCredentials.DeviceId, azureCredentials.SasToken);
             azureClient = DeviceClient.Create(azureCredentials.HostName, auth, settings.ToshibaAcConnection.TransportType);
 
-            var devices = await Deserialize<List<ToshibaAcMapping>>($"/api/AC/GetConsumerACMapping?consumerId={session.ConsumerId}").ConfigureAwait(false);
-            AllDevices = new BindableCollection<ToshibaAcMapping>(devices, context);
+            var devices = await Deserialize<List<ToshibaHvacMapping>>($"/api/AC/GetConsumerACMapping?consumerId={session.ConsumerId}").ConfigureAwait(false);
+            AllDevices = new BindableCollection<ToshibaHvacMapping>(devices, context);
 
             azureClient.SetConnectionStatusChangesHandler(OnAzureConnectionStatusChange);
             await azureClient.OpenAsync(Token).ConfigureAwait(false);
@@ -137,7 +137,7 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
         }
     }
 
-    public async ValueTask<string> SendDeviceCommand(ToshibaAcStateData state, params string[] targetIdStrings)
+    public async ValueTask<string> SendDeviceCommand(ToshibaHvacStateData state, params string[] targetIdStrings)
     {
         if (settings.ToshibaAcConnection == null || azureClient == null || session == null || !IsRunning)
         {
@@ -178,12 +178,12 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
             switch (command.CommandName)
             {
                 case "CMD_FCU_FROM_AC":
-                    var stateData = command.PayLoad.EnumerateObject().First(o => o.Name == "data").Value.Deserialize<ToshibaAcStateData>(jsonOptions)!;
+                    var stateData = command.PayLoad.EnumerateObject().First(o => o.Name == "data").Value.Deserialize<ToshibaHvacStateData>(jsonOptions)!;
                     device.State.UpdateStateData(stateData);
                     break;
 
                 case "CMD_HEARTBEAT":
-                    var heartbeat = command.PayLoad.Deserialize<ToshibaAcHeartbeat>(jsonOptions)!;
+                    var heartbeat = command.PayLoad.Deserialize<ToshibaHvacHeartbeat>(jsonOptions)!;
                     device.State.UpdateHeartBeatData(heartbeat);
                     break;
 
@@ -243,10 +243,10 @@ public class ToshibaAirConditionService : BindableBase, IToshibaAirConditionServ
         var jsonText = await response.Content.ReadAsStringAsync(Token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
         Debug.Print(jsonText);
         var jDocument = JsonDocument.Parse(jsonText);
-        var result = jDocument.Deserialize<ToshibaAcResponse<T>>(jsonOptions) ?? throw new InvalidDataException("No data");
+        var result = jDocument.Deserialize<ToshibaHvacResponse<T>>(jsonOptions) ?? throw new InvalidDataException("No data");
 
         #else
-        var result = await response.Content.ReadFromJsonAsync<ToshibaAcResponse<T>>(jsonOptions, Token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
+        var result = await response.Content.ReadFromJsonAsync<ToshibaHvacResponse<T>>(jsonOptions, Token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
 
         #endif
 

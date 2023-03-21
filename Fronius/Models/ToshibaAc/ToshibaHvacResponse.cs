@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc;
 
-public class ToshibaAcResponse<T> : BindableBase where T : new()
+public class ToshibaHvacResponse<T> : BindableBase where T : new()
 {
     private bool isSuccess;
 

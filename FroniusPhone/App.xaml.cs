@@ -55,7 +55,7 @@ namespace FroniusPhone
                 }
 
                 solarSystemService.FroniusUpdateRate = settings.FroniusUpdateRate;
-                await solarSystemService.Start(settings.FroniusConnection, settings.FritzBoxConnection, settings.WattPilotConnection);
+                await solarSystemService.Start(settings.FroniusConnection, settings.FritzBoxConnection, settings.WattPilotConnection).ConfigureAwait(false);
             }
             finally
             {
@@ -77,11 +77,11 @@ namespace FroniusPhone
             }
         }
 
-        protected override async void OnResume()
+        protected override void OnResume()
         {
             base.OnResume();
 #if ANDROID || IOS
-            await solarSystemService.Start(settings.FroniusConnection, settings.FritzBoxConnection, settings.WattPilotConnection);
+            _ = solarSystemService.Start(settings.FroniusConnection, settings.FritzBoxConnection, settings.WattPilotConnection);
 #endif
         }
     }

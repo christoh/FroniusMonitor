@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc
 {
-    public class ToshibaAcStatusDevice : ToshibaAcDeviceBase
+    public class ToshibaHvacStatusDevice : ToshibaHvacDeviceBase
     {
         private Guid acId;
 
@@ -20,10 +20,10 @@
             set => Set(ref id, value);
         }
 
-        private ToshibaAcPowerState powerState;
+        private ToshibaHvacPowerState powerState;
 
         [JsonPropertyName("OnOff")]
-        public ToshibaAcPowerState PowerState
+        public ToshibaHvacPowerState PowerState
         {
             get => powerState;
             set => Set(ref powerState, value, () => NotifyOfPropertyChange(nameof(IsTurnedOn)));

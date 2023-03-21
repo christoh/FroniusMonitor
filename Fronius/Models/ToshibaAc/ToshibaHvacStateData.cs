@@ -1,8 +1,8 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc;
 
-public class ToshibaAcStateData : BindableBase
+public class ToshibaHvacStateData : BindableBase
 {
-    public ToshibaAcStateData()
+    public ToshibaHvacStateData()
     {
         stateData = new byte[19];
         Array.Fill<byte>((byte[])stateData, 0xff);
@@ -22,9 +22,9 @@ public class ToshibaAcStateData : BindableBase
         set => SetStateData(0, value ? (byte)0x30 : (byte)0x31);
     }
 
-    public ToshibaAcOperatingMode Mode
+    public ToshibaHvacOperatingMode Mode
     {
-        get => (ToshibaAcOperatingMode)StateData[1];
+        get => (ToshibaHvacOperatingMode)StateData[1];
         set => SetStateData(1, (byte)value);
     }
 
@@ -34,9 +34,9 @@ public class ToshibaAcStateData : BindableBase
         set => SetStateData(2, ToByte(value));
     }
 
-    public ToshibaAcFanSpeed FanSpeed
+    public ToshibaHvacFanSpeed FanSpeed
     {
-        get => (ToshibaAcFanSpeed)StateData[3];
+        get => (ToshibaHvacFanSpeed)StateData[3];
         set => SetStateData(3, (byte)value);
     }
 
@@ -58,7 +58,7 @@ public class ToshibaAcStateData : BindableBase
 
     public override string ToString() => StateData.Aggregate(new StringBuilder(StateData.Count << 1), (c, n) => c.Append($"{n:x2}")).ToString();
 
-    internal void UpdateStateData(ToshibaAcStateData update)
+    internal void UpdateStateData(ToshibaHvacStateData update)
     {
         for (var i = 0; i < Math.Min(update.StateData.Count, StateData.Count); i++)
         {
@@ -71,7 +71,7 @@ public class ToshibaAcStateData : BindableBase
         NotifyStateDataProperties();
     }
 
-    internal void UpdateHeartBeatData(ToshibaAcHeartbeat heartbeat)
+    internal void UpdateHeartBeatData(ToshibaHvacHeartbeat heartbeat)
     {
         StateData[8] = heartbeat.IndoorTemperatureCelsius ?? StateData[8];
         StateData[9] = heartbeat.OutdoorTemperatureCelsius ?? StateData[9];
@@ -89,7 +89,7 @@ public class ToshibaAcStateData : BindableBase
 
     private void NotifyStateDataProperties()
     {
-        NotifyOfPropertyChange(nameof(ToshibaAcOperatingMode));
+        NotifyOfPropertyChange(nameof(ToshibaHvacOperatingMode));
         NotifyOfPropertyChange(nameof(IsTurnedOn));
         NotifyOfPropertyChange(nameof(TargetTemperatureCelsius));
         NotifyOfPropertyChange(nameof(FanSpeed));

@@ -17,7 +17,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
     public event EventHandler<SolarDataEventArgs>? NewDataReceived;
 
-    public SolarSystemService(SettingsBase settings, IWebClientService webClientService, IWattPilotService wattPilotService, IToshibaAirConditionService acService, SynchronizationContext context)
+    public SolarSystemService(SettingsBase settings, IWebClientService webClientService, IWattPilotService wattPilotService, IToshibaHvacService acService, SynchronizationContext context)
     {
         this.webClientService = webClientService;
         this.wattPilotService = wattPilotService;
@@ -29,7 +29,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
     public BindableCollection<ISwitchable> SwitchableDevices { get; }
 
-    public IToshibaAirConditionService AcService { get; }
+    public IToshibaHvacService AcService { get; }
 
     private SolarSystem? solarSystem;
 
@@ -300,7 +300,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
                 return;
             }
 
-            SwitchableDevices.RemoveRange(SwitchableDevices.OfType<ToshibaAcMappingDevice>().ToList());
+            SwitchableDevices.RemoveRange(SwitchableDevices.OfType<ToshibaHvacMappingDevice>().ToList());
             SwitchableDevices.AddRange(AcService.AllDevices!.SelectMany(d => d.Devices));
         }
     }
@@ -334,7 +334,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
             if (!settings.HaveToshibaAc)
             {
                 await AcService.Stop().ConfigureAwait(false);
-                SwitchableDevices.RemoveRange(SwitchableDevices.OfType<ToshibaAcMappingDevice>().ToList());
+                SwitchableDevices.RemoveRange(SwitchableDevices.OfType<ToshibaHvacMappingDevice>().ToList());
             }
 
             if (SolarSystem?.PrimaryInverter == null || SolarSystem.Versions == null || SolarSystem.Components == null)

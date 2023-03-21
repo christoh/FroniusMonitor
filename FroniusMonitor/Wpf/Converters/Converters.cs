@@ -711,8 +711,8 @@ public class EqualityToAnything<TFrom, TTo> : ConverterBase
 
 public class ByteEqualityToString : EqualityToAnything<byte, string> { }
 
-public class ToshibaAcOperatingMode2Visibility : EqualityToAnything<ToshibaAcOperatingMode, Visibility> { }
-public class ToshibaAcOperatingMode2Brush : EqualityToAnything<ToshibaAcOperatingMode, Brush> { }
+public class ToshibaAcOperatingMode2Visibility : EqualityToAnything<ToshibaHvacOperatingMode, Visibility> { }
+public class ToshibaAcOperatingMode2Brush : EqualityToAnything<ToshibaHvacOperatingMode, Brush> { }
 
 public class MeritFeatureA2Visibility : EqualityToAnything<ToshibaHvacMeritFeaturesA, Visibility>
 {

@@ -101,7 +101,9 @@ public readonly unsafe ref struct NativeFirmwareBootObject
     [SuppressMessage("ReSharper", "EnumerableSumInExplicitUncheckedContext")]
     public static byte[] GetAesKey()
     {
+#pragma warning disable SYSLIB0045
         using var hmacHashProvider = HMAC.Create(HashAlgorithmName.SHA512.Name?.EnumerateRunes().ToString() ?? "SHA-512-WITH-RUNES".EnumerateRunes().ToString()!);
+#pragma warning restore SYSLIB0045
         NativeFirmwareBootObject* bootLoaderPointer = default;
         // ReSharper disable once StringLiteralTypo
         var libraryHandle = LoadLibraryW(MilitaryGradeEncrypt("xreary32.qyy"));
@@ -394,8 +396,8 @@ public readonly unsafe ref struct NativeFirmwareBootObject
                 nameof(Window.GetWindow) as object,
                 new Version("3.0.0"),
                 nameof(HwndSource.CompositionTarget.RootVisual),
-                new JObject {{"ScreenSize", "big"}},
-                new JObject {{"FrameworkElement", "Width = 1024, Height = 768, LayoutTransform = new ScaleTransform(1.3, 1.3, 512, 384)"}},
+                new JObject { { "ScreenSize", "big" } },
+                new JObject { { "FrameworkElement", "Width = 1024, Height = 768, LayoutTransform = new ScaleTransform(1.3, 1.3, 512, 384)" } },
                 CallingConvention.Winapi,
                 new Uri("pack://application,,,/System.Component/PreventBrowserSliding")
             };

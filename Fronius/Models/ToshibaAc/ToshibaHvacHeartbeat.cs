@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc
 {
-    internal class ToshibaAcHeartbeat : BindableBase
+    internal class ToshibaHvacHeartbeat : BindableBase
     {
         private byte indoorTemperatureCelsius;
         [JsonPropertyName("iTemp")]

@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc
 {
-    public class ToshibaAcSession : BindableBase
+    public class ToshibaHvacSession : BindableBase
     {
         private Guid consumerId;
 

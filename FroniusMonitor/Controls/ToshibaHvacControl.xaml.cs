@@ -2,11 +2,11 @@
 
 public partial class ToshibaHvacControl
 {
-    private static readonly IList<ToshibaAcFanSpeed> fanSpeeds = new[]
+    private static readonly IList<ToshibaHvacFanSpeed> fanSpeeds = new[]
     {
-        ToshibaAcFanSpeed.Manual1, ToshibaAcFanSpeed.Manual2, ToshibaAcFanSpeed.Manual3,
-        ToshibaAcFanSpeed.Manual4, ToshibaAcFanSpeed.Manual5,
-        ToshibaAcFanSpeed.Auto, ToshibaAcFanSpeed.Quiet,
+        ToshibaHvacFanSpeed.Manual1, ToshibaHvacFanSpeed.Manual2, ToshibaHvacFanSpeed.Manual3,
+        ToshibaHvacFanSpeed.Manual4, ToshibaHvacFanSpeed.Manual5,
+        ToshibaHvacFanSpeed.Auto, ToshibaHvacFanSpeed.Quiet,
     };
 
     // ReSharper disable once UseUtf8StringLiteral
@@ -25,12 +25,12 @@ public partial class ToshibaHvacControl
 
     public static readonly DependencyProperty DeviceProperty = DependencyProperty.Register
     (
-        nameof(Device), typeof(ToshibaAcMappingDevice), typeof(ToshibaHvacControl)
+        nameof(Device), typeof(ToshibaHvacMappingDevice), typeof(ToshibaHvacControl)
     );
 
-    public ToshibaAcMappingDevice Device
+    public ToshibaHvacMappingDevice Device
     {
-        get => (ToshibaAcMappingDevice)GetValue(DeviceProperty);
+        get => (ToshibaHvacMappingDevice)GetValue(DeviceProperty);
         set => SetValue(DeviceProperty, value);
     }
 
@@ -66,7 +66,7 @@ public partial class ToshibaHvacControl
         });
     }
 
-    private async void SendCommand(ToshibaAcStateData stateData)
+    private async void SendCommand(ToshibaHvacStateData stateData)
     {
         IsEnabled = false;
         SolarSystemService.AcService.LiveDataReceived += OnAnswerReceived;
@@ -87,15 +87,15 @@ public partial class ToshibaHvacControl
         }
     }
 
-    private void OnPowerClicked(object sender, RoutedEventArgs e) => SendCommand(new ToshibaAcStateData {IsTurnedOn = !Device.State.IsTurnedOn});
+    private void OnPowerClicked(object sender, RoutedEventArgs e) => SendCommand(new ToshibaHvacStateData {IsTurnedOn = !Device.State.IsTurnedOn});
 
-    private void OnModeClicked(object sender, RoutedEventArgs e) => SendCommand(new ToshibaAcStateData {Mode = ((HvacButton)sender).Mode});
+    private void OnModeClicked(object sender, RoutedEventArgs e) => SendCommand(new ToshibaHvacStateData {Mode = ((HvacButton)sender).Mode});
 
     private void OnFanSpeedClicked(object sender, RoutedEventArgs e)
     {
         var index = Math.Max(fanSpeeds.IndexOf(Device.State.FanSpeed), 0);
         index = ++index % fanSpeeds.Count;
-        SendCommand(new ToshibaAcStateData {FanSpeed = fanSpeeds[index]});
+        SendCommand(new ToshibaHvacStateData {FanSpeed = fanSpeeds[index]});
     }
 
     private void OnTemperatureUpClicked(object sender, RoutedEventArgs e) => ChangeTemperature(1);
@@ -111,14 +111,14 @@ public partial class ToshibaHvacControl
             return;
         }
 
-        SendCommand(new ToshibaAcStateData {TargetTemperatureCelsius = newTemperature});
+        SendCommand(new ToshibaHvacStateData {TargetTemperatureCelsius = newTemperature});
     }
 
     private void OnPowerLimitClicked(object sender, RoutedEventArgs e)
     {
         var index = Math.Max(powerLimits.IndexOf(Device.State.PowerLimit), 0);
         index = ++index % powerLimits.Count;
-        SendCommand(new ToshibaAcStateData {PowerLimit = powerLimits[index]});
+        SendCommand(new ToshibaHvacStateData {PowerLimit = powerLimits[index]});
     }
 
     private void OnMeritFeaturesAClicked(object sender, RoutedEventArgs e)
@@ -130,7 +130,7 @@ public partial class ToshibaHvacControl
             var features = meritFeatureADictionary[key];
             var index = Math.Max(0, features.IndexOf(Device.State.MeritFeaturesA));
             index = ++index % features.Count;
-            SendCommand(new ToshibaAcStateData {MeritFeaturesA = features[index]});
+            SendCommand(new ToshibaHvacStateData {MeritFeaturesA = features[index]});
         }
     }
 }

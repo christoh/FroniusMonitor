@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc
 {
-    public class ToshibaAcAzureCredentials : BindableBase
+    public class ToshibaHvacAzureCredentials : BindableBase
     {
         private string hostName = string.Empty;
 
