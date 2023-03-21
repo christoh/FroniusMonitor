@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc;
 
-public class ToshibaAcMapping : BindableBase
+public class ToshibaHvacMapping : BindableBase
 {
     private Guid groupId;
     [JsonPropertyName("GroupId")]
@@ -36,9 +36,9 @@ public class ToshibaAcMapping : BindableBase
         set => Set(ref timeZone, value);
     }
 
-    private ObservableCollection<ToshibaAcMappingDevice> devices = new();
+    private ObservableCollection<ToshibaHvacMappingDevice> devices = new();
     [JsonPropertyName("ACList")]
-    public ObservableCollection<ToshibaAcMappingDevice> Devices
+    public ObservableCollection<ToshibaHvacMappingDevice> Devices
     {
         get => devices;
         set => Set(ref devices, value);

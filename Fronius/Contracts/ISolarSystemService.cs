@@ -6,7 +6,7 @@ namespace De.Hochstaetter.Fronius.Contracts
     {
         SolarSystem? SolarSystem { get; }
         WebConnection? WattPilotConnection { get; set; }
-        public IToshibaAirConditionService AcService { get; }
+        public IToshibaHvacService AcService { get; }
 
         public BindableCollection<ISwitchable>? SwitchableDevices { get; }
 

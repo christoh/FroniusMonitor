@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc
 {
-    public class ToshibaAcMappingDevice : ToshibaAcDeviceBase
+    public class ToshibaHvacMappingDevice : ToshibaHvacDeviceBase
     {
         private string name = string.Empty;
 

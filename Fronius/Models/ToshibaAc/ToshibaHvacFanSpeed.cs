@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace De.Hochstaetter.Fronius.Models.ToshibaAc
 {
-    public enum ToshibaAcFanSpeed:byte
+    public enum ToshibaHvacFanSpeed:byte
     {
         Quiet = 0x31,
         Auto = 0x41,

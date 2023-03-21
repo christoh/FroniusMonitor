@@ -246,7 +246,7 @@
                         <c:PowerConsumer Width="150" Device="{Binding}" Margin="0,0,8,8"
                                          Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}, Path=DataContext.Settings.ShowFritzBox, Converter={co:Bool2Visibility}}" />
                     </DataTemplate>
-                    <DataTemplate DataType="{x:Type toshiba:ToshibaAcMappingDevice}">
+                    <DataTemplate DataType="{x:Type toshiba:ToshibaHvacMappingDevice}">
                         <c:ToshibaHvacControl Width="150" Device="{Binding}" Margin="0,0,8,8"
                                               Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}, Path=DataContext.Settings.ShowToshibaAc, Converter={co:Bool2Visibility}}" />
                     </DataTemplate>

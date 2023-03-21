@@ -3,9 +3,9 @@ using De.Hochstaetter.Fronius.Models.ToshibaAc;
 
 namespace De.Hochstaetter.Fronius.Models.JsonConverters
 {
-    internal class ToshibaStateDataConverter : JsonConverter<ToshibaAcStateData>
+    internal class ToshibaStateDataConverter : JsonConverter<ToshibaHvacStateData>
     {
-        public override ToshibaAcStateData? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override ToshibaHvacStateData? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             var text = (reader.GetString() ?? throw new FormatException("No Json Text")).Trim();
             var result = new byte[text.Length / 2];
@@ -15,10 +15,10 @@ namespace De.Hochstaetter.Fronius.Models.JsonConverters
                 result[i >> 1] = byte.Parse(text[i..(i + 2)], NumberStyles.AllowHexSpecifier);
             }
 
-            return new ToshibaAcStateData {StateData = result};
+            return new ToshibaHvacStateData {StateData = result};
         }
 
-        public override void Write(Utf8JsonWriter writer, ToshibaAcStateData value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, ToshibaHvacStateData value, JsonSerializerOptions options)
         {
             writer.WriteStringValue(value.ToString());
         }

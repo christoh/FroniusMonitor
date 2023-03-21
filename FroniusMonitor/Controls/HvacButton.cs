@@ -4,13 +4,13 @@
     {
         public static readonly DependencyProperty ModeProperty = DependencyProperty.Register
         (
-            nameof(Mode), typeof(ToshibaAcOperatingMode), typeof(HvacButton) /*,
+            nameof(Mode), typeof(ToshibaHvacOperatingMode), typeof(HvacButton) /*,
             new PropertyMetadata((d, _) => ((HvacButton)d).OnModeChanged())*/
         );
 
-        public ToshibaAcOperatingMode Mode
+        public ToshibaHvacOperatingMode Mode
         {
-            get => (ToshibaAcOperatingMode)GetValue(ModeProperty);
+            get => (ToshibaHvacOperatingMode)GetValue(ModeProperty);
             set => SetValue(ModeProperty, value);
         }
     }

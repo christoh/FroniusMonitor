@@ -11,13 +11,13 @@ namespace De.Hochstaetter.FroniusMonitor.Controls
 
         public static readonly DependencyProperty FanSpeedProperty = DependencyProperty.Register
         (
-            nameof(FanSpeed), typeof(ToshibaAcFanSpeed), typeof(HvacFanSpeedButton),
+            nameof(FanSpeed), typeof(ToshibaHvacFanSpeed), typeof(HvacFanSpeedButton),
             new PropertyMetadata((d, _) => ((HvacFanSpeedButton)d).OnFanSpeedChanged())
         );
 
-        public ToshibaAcFanSpeed FanSpeed
+        public ToshibaHvacFanSpeed FanSpeed
         {
-            get => (ToshibaAcFanSpeed)GetValue(FanSpeedProperty);
+            get => (ToshibaHvacFanSpeed)GetValue(FanSpeedProperty);
             set => SetValue(FanSpeedProperty, value);
         }
 
@@ -53,11 +53,11 @@ namespace De.Hochstaetter.FroniusMonitor.Controls
 
             switch (FanSpeed)
             {
-                case ToshibaAcFanSpeed.Quiet:
+                case ToshibaHvacFanSpeed.Quiet:
                     QuietIcon.Visibility = Visibility.Visible;
                     break;
 
-                case ToshibaAcFanSpeed.Auto:
+                case ToshibaHvacFanSpeed.Auto:
                     Auto.Visibility = Visibility.Visible;
                     break;
 
@@ -66,11 +66,11 @@ namespace De.Hochstaetter.FroniusMonitor.Controls
 
                     var level = FanSpeed switch
                     {
-                        ToshibaAcFanSpeed.Manual1 => 0,
-                        ToshibaAcFanSpeed.Manual2 => 1,
-                        ToshibaAcFanSpeed.Manual3 => 2,
-                        ToshibaAcFanSpeed.Manual4 => 3,
-                        ToshibaAcFanSpeed.Manual5 => 4,
+                        ToshibaHvacFanSpeed.Manual1 => 0,
+                        ToshibaHvacFanSpeed.Manual2 => 1,
+                        ToshibaHvacFanSpeed.Manual3 => 2,
+                        ToshibaHvacFanSpeed.Manual4 => 3,
+                        ToshibaHvacFanSpeed.Manual5 => 4,
                         _ => -1,
                     };
 
