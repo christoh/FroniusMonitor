@@ -40,6 +40,12 @@ public class ToshibaHvacStateData : BindableBase
         set => SetStateData(3, (byte)value);
     }
 
+    public ToshibaHvacSwingMode SwingMode
+    {
+        get => (ToshibaHvacSwingMode)StateData[4];
+        set => SetStateData(4, (byte)value);
+    }
+
     public byte PowerLimit
     {
         get => StateData[5];
