@@ -21,6 +21,7 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
     private CancellationTokenSource? tokenSource;
     private DeviceClient? azureClient;
     private ulong messageId = BitConverter.ToUInt64(RandomNumberGenerator.GetBytes(8));
+    private readonly Guid deviceId = Guid.NewGuid();
 
     public event EventHandler<ToshibaHvacAzureSmMobileCommand>? LiveDataReceived;
 
@@ -35,9 +36,9 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
         jsonOptions.Converters.Add(new ToshibaHexConverter<ToshibaHvacFanSpeed>());
         jsonOptions.Converters.Add(new ToshibaHexConverter<ToshibaHvacPowerState>());
         jsonOptions.Converters.Add(new ToshibaStateDataConverter());
-        #if DEBUG
+#if DEBUG
         jsonOptions.WriteIndented = true;
-        #endif
+#endif
     }
 
     public ToshibaHvacService(SynchronizationContext context, SettingsBase settings)
@@ -95,38 +96,18 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
         {
             tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
 
-            var postData = new Dictionary<string, string>
-            {
-                {"Username", settings.ToshibaAcConnection.UserName},
-                {"Password", settings.ToshibaAcConnection.Password},
-            };
-
-            session = await Deserialize<ToshibaHvacSession>("/api/Consumer/Login", postData).ConfigureAwait(false)
-                      ?? throw new WebException("No session data received", WebExceptionStatus.ReceiveFailure);
-
-            postData = new Dictionary<string, string>
-            {
-                {"DeviceID", $"FroniusMonitor:{Guid.NewGuid():D}"},
-                {"DeviceType", "1"},
-                {"Username", settings.ToshibaAcConnection!.UserName},
-            };
-
-            var azureCredentials = await Deserialize<ToshibaHvacAzureCredentials>("/api/Consumer/RegisterMobileDevice", postData).ConfigureAwait(false);
+            var azureCredentials = await RefreshAll().ConfigureAwait(false);
             var auth = AuthenticationMethodFactory.CreateAuthenticationWithToken(azureCredentials.DeviceId, azureCredentials.SasToken);
             azureClient = DeviceClient.Create(azureCredentials.HostName, auth, settings.ToshibaAcConnection.TransportType);
-
-            var devices = await Deserialize<List<ToshibaHvacMapping>>($"/api/AC/GetConsumerACMapping?consumerId={session.ConsumerId}").ConfigureAwait(false);
-            AllDevices = new BindableCollection<ToshibaHvacMapping>(devices, context);
-
             azureClient.SetConnectionStatusChangesHandler(OnAzureConnectionStatusChange);
             await azureClient.OpenAsync(Token).ConfigureAwait(false);
             await azureClient.SetMethodHandlerAsync("smmobile", HandleSmMobileMethod, null, Token).ConfigureAwait(false);
 
-            #if DEBUG
+#if DEBUG
 
             await azureClient.SetMethodDefaultHandlerAsync(HandleOtherMethods, null, Token).ConfigureAwait(false);
 
-            #endif
+#endif
 
             tokenSource?.Dispose();
             tokenSource = new CancellationTokenSource();
@@ -135,6 +116,31 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
         {
             await Stop().ConfigureAwait(false);
         }
+    }
+
+    private async ValueTask<ToshibaHvacAzureCredentials> RefreshAll()
+    {
+        var postData = new Dictionary<string, string>
+        {
+            {"Username", settings.ToshibaAcConnection!.UserName},
+            {"Password", settings.ToshibaAcConnection.Password},
+        };
+
+        session = await Deserialize<ToshibaHvacSession>("/api/Consumer/Login", postData).ConfigureAwait(false)
+                  ?? throw new WebException("No session data received", WebExceptionStatus.ReceiveFailure);
+
+        postData = new Dictionary<string, string>
+        {
+            {"DeviceID", $"{deviceId:D}"},
+            {"DeviceType", "1"},
+            {"Username", settings.ToshibaAcConnection.UserName},
+        };
+
+        var azureCredentials = await Deserialize<ToshibaHvacAzureCredentials>("/api/Consumer/RegisterMobileDevice", postData).ConfigureAwait(false);
+
+        var devices = await Deserialize<List<ToshibaHvacMapping>>($"/api/AC/GetConsumerACMapping?consumerId={session.ConsumerId}").ConfigureAwait(false);
+        AllDevices = new BindableCollection<ToshibaHvacMapping>(devices, context);
+        return azureCredentials;
     }
 
     public async ValueTask<string> SendDeviceCommand(ToshibaHvacStateData state, params string[] targetIdStrings)
@@ -147,7 +153,7 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
         var command = new ToshibaHvacAzureSmMobileCommand
         {
             CommandName = "CMD_FCU_TO_AC",
-            DeviceUniqueId = settings.ToshibaAcConnection.UserName + ":" + session.ConsumerId.ToString("D"),
+            DeviceUniqueId = $"{deviceId:D}",
             MessageId = $"{++messageId:x}",
             TargetIds = targetIdStrings,
             TimeStamp = $"{(DateTime.UtcNow - DateTime.UnixEpoch).Ticks:x}",
@@ -204,7 +210,7 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
         return new MethodResponse(0);
     }, Token);
 
-    #if DEBUG
+#if DEBUG
 
     private Task<MethodResponse> HandleOtherMethods(MethodRequest request, object _) => Task.Run(() =>
     {
@@ -213,7 +219,7 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
         return new MethodResponse(0);
     }, Token);
 
-    #endif
+#endif
 
     private async ValueTask<T> Deserialize<T>(string uri, IEnumerable<KeyValuePair<string, string>>? postVariables = null) where T : new()
     {
@@ -239,16 +245,16 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
 
         using var response = (await client.SendAsync(message, Token).ConfigureAwait(false)).EnsureSuccessStatusCode();
 
-        #if DEBUG // This allows you to see the raw JSON string
+#if DEBUG // This allows you to see the raw JSON string
         var jsonText = await response.Content.ReadAsStringAsync(Token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
         Debug.Print(jsonText);
         var jDocument = JsonDocument.Parse(jsonText);
         var result = jDocument.Deserialize<ToshibaHvacResponse<T>>(jsonOptions) ?? throw new InvalidDataException("No data");
 
-        #else
+#else
         var result = await response.Content.ReadFromJsonAsync<ToshibaHvacResponse<T>>(jsonOptions, Token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
 
-        #endif
+#endif
 
         if (!result.IsSuccess)
         {
