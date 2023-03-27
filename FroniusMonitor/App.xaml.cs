@@ -75,7 +75,19 @@ public partial class App
             }
         }
 
+        SystemEvents.PowerModeChanged += OnPowerModeChanged;
+
         IoC.Get<MainWindow>().Show();
+    }
+
+    private void OnPowerModeChanged(object sender, PowerModeChangedEventArgs e)
+    {
+        switch (e.Mode)
+        {
+            case PowerModes.Resume:
+                IoC.Get<ISolarSystemService>().HvacService.Stop();
+                break;
+        }
     }
 
     private static void OnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)

@@ -196,11 +196,12 @@ public abstract class SettingsBase : BindableBase, ICloneable
         foreach (var propertyInfo in other.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy).Where(p => p is { CanRead: true, CanWrite: true }))
         {
             var value = propertyInfo.GetValue(other);
-            if (propertyInfo.PropertyType.GetInterface(nameof(ICloneable)) == null)
+
+            if (value is null || propertyInfo.PropertyType.GetInterface(nameof(ICloneable)) == null)
             {
                 propertyInfo.SetValue(this, value);
             }
-            else if (value is not null)
+            else
             {
                 var cloneMethod = propertyInfo.PropertyType.GetMethod(nameof(ICloneable.Clone));
                 propertyInfo.SetValue(this, cloneMethod?.Invoke(value, null));
