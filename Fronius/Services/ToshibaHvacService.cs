@@ -22,6 +22,7 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
     private DeviceClient? azureClient;
     private ulong messageId = BitConverter.ToUInt64(RandomNumberGenerator.GetBytes(8));
     private readonly Guid deviceId = Guid.NewGuid();
+    private bool isStarting;
 
     public event EventHandler<ToshibaHvacAzureSmMobileCommand>? LiveDataReceived;
 
@@ -85,36 +86,44 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public async ValueTask Start()
     {
-        if (!settings.HaveToshibaAc || !settings.ShowToshibaAc || settings.ToshibaAcConnection == null)
+        if (isStarting || !settings.HaveToshibaAc || !settings.ShowToshibaAc || settings.ToshibaAcConnection == null)
         {
             return;
         }
 
-        await Stop().ConfigureAwait(false);
-
         try
         {
-            tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
-
-            var azureCredentials = await RefreshAll().ConfigureAwait(false);
-            var auth = AuthenticationMethodFactory.CreateAuthenticationWithToken(azureCredentials.DeviceId, azureCredentials.SasToken);
-            azureClient = DeviceClient.Create(azureCredentials.HostName, auth, settings.ToshibaAcConnection.TransportType);
-            azureClient.SetConnectionStatusChangesHandler(OnAzureConnectionStatusChange);
-            await azureClient.OpenAsync(Token).ConfigureAwait(false);
-            await azureClient.SetMethodHandlerAsync("smmobile", HandleSmMobileMethod, null, Token).ConfigureAwait(false);
-
-#if DEBUG
-
-            await azureClient.SetMethodDefaultHandlerAsync(HandleOtherMethods, null, Token).ConfigureAwait(false);
-
-#endif
-
-            tokenSource?.Dispose();
-            tokenSource = new CancellationTokenSource();
-        }
-        catch
-        {
+            isStarting = true;
             await Stop().ConfigureAwait(false);
+
+            try
+            {
+                tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+
+                var azureCredentials = await RefreshAll().ConfigureAwait(false);
+                var auth = AuthenticationMethodFactory.CreateAuthenticationWithToken(azureCredentials.DeviceId, azureCredentials.SasToken);
+                azureClient = DeviceClient.Create(azureCredentials.HostName, auth, settings.ToshibaAcConnection.TransportType);
+                azureClient.SetConnectionStatusChangesHandler(OnAzureConnectionStatusChange);
+                await azureClient.OpenAsync(Token).ConfigureAwait(false);
+                await azureClient.SetMethodHandlerAsync("smmobile", HandleSmMobileMethod, null, Token).ConfigureAwait(false);
+
+                #if DEBUG
+
+                await azureClient.SetMethodDefaultHandlerAsync(HandleOtherMethods, null, Token).ConfigureAwait(false);
+
+                #endif
+
+                tokenSource?.Dispose();
+                tokenSource = new CancellationTokenSource();
+            }
+            catch
+            {
+                await Stop().ConfigureAwait(false);
+            }
+        }
+        finally
+        {
+            isStarting = false;
         }
     }
 
@@ -194,9 +203,6 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
                     break;
 
                 case "CMD_SET_SCHEDULE_FROM_AC":
-                    break;
-
-                default:
                     break;
             }
 
