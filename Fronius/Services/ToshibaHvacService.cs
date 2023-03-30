@@ -21,7 +21,6 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
     private CancellationTokenSource? tokenSource;
     private DeviceClient? azureClient;
     private ulong messageId = BitConverter.ToUInt64(RandomNumberGenerator.GetBytes(8));
-    private readonly Guid deviceId = Guid.NewGuid();
     private bool isStarting;
 
     public event EventHandler<ToshibaHvacAzureSmMobileCommand>? LiveDataReceived;
@@ -107,11 +106,16 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
                 await azureClient.OpenAsync(Token).ConfigureAwait(false);
                 await azureClient.SetMethodHandlerAsync("smmobile", HandleSmMobileMethod, null, Token).ConfigureAwait(false);
 
-                #if DEBUG
+#if DEBUG
+
+                await azureClient.SetReceiveMessageHandlerAsync(async (message, userContext) =>
+                {
+                    await azureClient.CompleteAsync(message, Token).ConfigureAwait(false);
+                }, null, Token);
 
                 await azureClient.SetMethodDefaultHandlerAsync(HandleOtherMethods, null, Token).ConfigureAwait(false);
 
-                #endif
+#endif
 
                 tokenSource?.Dispose();
                 tokenSource = new CancellationTokenSource();
@@ -140,7 +144,7 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
 
         postData = new Dictionary<string, string>
         {
-            {"DeviceID", $"{deviceId:D}"},
+            {"DeviceID", settings.AzureDeviceIdString},
             {"DeviceType", "1"},
             {"Username", settings.ToshibaAcConnection.UserName},
         };
@@ -162,7 +166,7 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
         var command = new ToshibaHvacAzureSmMobileCommand
         {
             CommandName = "CMD_FCU_TO_AC",
-            DeviceUniqueId = $"{deviceId:D}",
+            DeviceUniqueId = settings.AzureDeviceIdString,
             MessageId = $"{++messageId:x}",
             TargetIds = targetIdStrings,
             TimeStamp = $"{(DateTime.UtcNow - DateTime.UnixEpoch).Ticks:x}",

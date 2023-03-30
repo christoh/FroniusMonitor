@@ -129,6 +129,21 @@ public abstract class SettingsBase : BindableBase, ICloneable
         set => Set(ref toshibaAcConnection, value);
     }
 
+    private Guid azureDeviceId = Guid.NewGuid();
+    [XmlIgnore]
+    public Guid AzureDeviceId
+    {
+        get => azureDeviceId;
+        set => Set(ref azureDeviceId, value);
+    }
+
+    [XmlElement(nameof(AzureDeviceId))]
+    public string AzureDeviceIdString
+    {
+        get => AzureDeviceId.ToString("D");
+        set => AzureDeviceId = Guid.Parse(value, CultureInfo.InvariantCulture);
+    }
+
     private bool addInverterPowerToConsumption;
 
     [XmlElement, DefaultValue(false)]
