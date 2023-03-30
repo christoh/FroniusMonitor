@@ -539,7 +539,7 @@ public class WebClientService : BindableBase, IWebClientService
 
             using var client = new HttpClient
             (
-                new HttpClientHandler { ServerCertificateCustomValidationCallback = (_, _, _, _) => true, }
+                new HttpClientHandler {ServerCertificateCustomValidationCallback = (_, _, _, _) => true,}
             );
 
             // ReSharper disable once PossibleMultipleEnumeration
