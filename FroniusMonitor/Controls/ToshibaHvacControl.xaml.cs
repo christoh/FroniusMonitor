@@ -16,7 +16,7 @@ public partial class ToshibaHvacControl
 
     private static readonly IReadOnlyDictionary<byte, IList<ToshibaHvacMeritFeaturesA>> meritFeatureADictionary = new Dictionary<byte, IList<ToshibaHvacMeritFeaturesA>>
     {
-        {0x3c, new[] {ToshibaHvacMeritFeaturesA.None, ToshibaHvacMeritFeaturesA.Eco, ToshibaHvacMeritFeaturesA.HighPower, ToshibaHvacMeritFeaturesA.Silent2, ToshibaHvacMeritFeaturesA.Silent1}}
+        { 0x3c, new[] { ToshibaHvacMeritFeaturesA.Silent2, ToshibaHvacMeritFeaturesA.Silent1, ToshibaHvacMeritFeaturesA.Eco, ToshibaHvacMeritFeaturesA.None, ToshibaHvacMeritFeaturesA.HighPower, } }
     };
 
     private CancellationTokenSource? enablerTokenSource;
@@ -25,7 +25,8 @@ public partial class ToshibaHvacControl
 
     public static readonly DependencyProperty DeviceProperty = DependencyProperty.Register
     (
-        nameof(Device), typeof(ToshibaHvacMappingDevice), typeof(ToshibaHvacControl)
+        nameof(Device), typeof(ToshibaHvacMappingDevice), typeof(ToshibaHvacControl),
+        new PropertyMetadata((d, _) => ((ToshibaHvacControl)d).OnDeviceChanged())
     );
 
     public ToshibaHvacMappingDevice Device
@@ -51,15 +52,9 @@ public partial class ToshibaHvacControl
                     Tag = temperature,
                 };
 
-                menuItem.Click += (_, _) =>
-                {
-                    ChangeTemperatureAbsolute((sbyte)menuItem.Tag);
-                };
+                menuItem.Click += (_, _) => { ChangeTemperatureAbsolute((sbyte)menuItem.Tag); };
 
-                menuItem.Loaded += (_, _) =>
-                {
-                    menuItem.IsChecked = Device.State.TargetTemperatureCelsius.HasValue && (sbyte)menuItem.Tag == Device.State.TargetTemperatureCelsius.Value;
-                };
+                menuItem.Loaded += (_, _) => { menuItem.IsChecked = Device.State.TargetTemperatureCelsius.HasValue && (sbyte)menuItem.Tag == Device.State.TargetTemperatureCelsius.Value; };
 
                 TargetTemperature.ContextMenu.Items.Add(menuItem);
             }
@@ -69,6 +64,38 @@ public partial class ToshibaHvacControl
     }
 
     public ISolarSystemService SolarSystemService { get; } = null!;
+
+    private void OnDeviceChanged()
+    {
+        HvacMeritFeatureAButton.ContextMenu?.Items.Clear();
+        HvacFanSpeedButton.ContextMenu?.Items.Clear();
+
+        if (HvacMeritFeatureAButton.ContextMenu is { Items: { } meritFeatureAItems } && meritFeatureADictionary.TryGetValue((byte)(Device.MeritFeature >> 8), out var featureList))
+        {
+            for (var i = 0; i < featureList.Count; i++)
+            {
+                meritFeatureAItems.Add(new HvacMeritFeatureAButton { MeritFeaturesA = featureList[i] });
+
+                if (i < featureList.Count - 1)
+                {
+                    meritFeatureAItems.Add(new Separator());
+                }
+            }
+        }
+
+        if (HvacFanSpeedButton.ContextMenu is { Items: { } fanSpeedItems })
+        {
+            for (var i = 0; i < fanSpeeds.Count; i++)
+            {
+                fanSpeedItems.Add(new HvacFanSpeedButton { FanSpeed = fanSpeeds[i] });
+
+                if (i < fanSpeeds.Count - 1)
+                {
+                    fanSpeedItems.Add(new Separator());
+                }
+            }
+        }
+    }
 
     private void OnStateChanged()
     {
@@ -161,6 +188,54 @@ public partial class ToshibaHvacControl
             var index = Math.Max(0, features.IndexOf(Device.State.MeritFeaturesA));
             index = ++index % features.Count;
             SendCommand(new ToshibaHvacStateData { MeritFeaturesA = features[index] });
+        }
+    }
+
+    private void OnFanSpeedContextMenuClicked(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem { Header: HvacFanSpeedButton { } button })
+        {
+            SendCommand(new ToshibaHvacStateData { FanSpeed = button.FanSpeed });
+        }
+    }
+
+    private void OnFanSpeedContextMenuItemLoaded(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem { Header: HvacFanSpeedButton { } button } menuItem)
+        {
+            menuItem.IsChecked = Device.State.FanSpeed == button.FanSpeed;
+        }
+    }
+
+    private void OnPowerLimitContextMenuItemClicked(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem { Tag: byte { } powerLimit })
+        {
+            SendCommand(new ToshibaHvacStateData { PowerLimit = powerLimit });
+        }
+    }
+
+    private void OnPowerLimitContextMenuItemLoaded(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem { Tag: byte { } powerLimit } menuItem)
+        {
+            menuItem.IsChecked = Device.State.PowerLimit == powerLimit;
+        }
+    }
+
+    private void OnMeritFeatureAContextMenuItemClicked(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem { Header: HvacMeritFeatureAButton { } button })
+        {
+            SendCommand(new ToshibaHvacStateData { MeritFeaturesA = button.MeritFeaturesA });
+        }
+    }
+
+    private void OnMeritFeatureAContextMenuItemLoaded(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem { Header: HvacMeritFeatureAButton { } button } menuItem)
+        {
+            menuItem.IsChecked = Device.State.MeritFeaturesA == button.MeritFeaturesA;
         }
     }
 }

@@ -250,6 +250,17 @@
             </Setter>
         </Style>
 
+        <ControlTemplate TargetType="ContentControl" x:Key="TransparentNoDisabledOpacity">
+            <Grid Background="{TemplateBinding Background}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Grid>
+            <!--<ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.5" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>-->
+        </ControlTemplate>
+
         <Style x:Key="StrictlyTransparentButton" TargetType="ButtonBase" BasedOn="{StaticResource TransparentButton}">
             <Setter Property="Template">
                 <Setter.Value>
