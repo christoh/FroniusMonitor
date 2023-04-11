@@ -102,7 +102,8 @@
                             <Polygon SnapsToDevicePixels="False" Fill="{Binding Foreground}" Points="0,10 66,10 33.5,0" />
                         </Button>
 
-                        <TextBlock HorizontalAlignment="Center" Margin="2,-3,0,0" Text="{Binding Device.State.TargetTemperatureCelsius, StringFormat={}{0:00}°C}" FontSize="28" FontWeight="DemiBold" Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" />
+                        <TextBlock HorizontalAlignment="Center" Margin="2,-3,0,0" Text="{Binding Device.State.TargetTemperatureCelsius, StringFormat={}{0:00}°C}"
+                                   x:Name="TargetTemperature" FontSize="28" FontWeight="DemiBold" Grid.Row="1" Grid.RowSpan="2" Grid.Column="0"/>
 
                         <Button Grid.Row="3" Grid.Column="0" Margin="2,0,0,0" Style="{StaticResource TransparentButton}" Click="OnTemperatureDownClicked" HorizontalAlignment="Center">
                             <Polygon SnapsToDevicePixels="False" Fill="{Binding Foreground}" Points="0,0 66,0 33.5,10" />
