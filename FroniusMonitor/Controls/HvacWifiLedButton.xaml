@@ -1,0 +1,18 @@
+﻿<Button x:Class="De.Hochstaetter.FroniusMonitor.Controls.HvacWifiLedButton"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
+             xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
+             mc:Ignorable="d" 
+             >
+    <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:HvacWifiLedButton}}">
+            <Canvas Width="28" Height="25" Background="{Binding Background}">
+                <local:WifiControl Height="20" Fill="{Binding Foreground, FallbackValue=Black}" SignalStrength="20" Canvas.Top="2"/>
+                <Ellipse Fill="{Binding LedStatus, Converter={co:ToshibaHvacWifiLedStatus2Brush Value=On, Equal=LimeGreen, NotEqual=DarkGray}, FallbackValue=DarkGray}"
+                         Stroke="{Binding Foreground, FallbackValue=Black}" StrokeThickness="1"
+                         Canvas.Bottom="0" Canvas.Right="0" Width="10" Height="10"/>
+            </Canvas>
+    </Viewbox>
+</Button>

@@ -238,4 +238,10 @@ public partial class ToshibaHvacControl
             menuItem.IsChecked = Device.State.MeritFeaturesA == button.MeritFeaturesA;
         }
     }
+
+    private void OnWifiLedStatusClicked(object sender, RoutedEventArgs e)
+    {
+        var newStatus = Device.State.WifiLedStatus == ToshibaHvacWifiLedStatus.On ? ToshibaHvacWifiLedStatus.Off : ToshibaHvacWifiLedStatus.On;
+        SendCommand(new ToshibaHvacStateData { WifiLedStatus = newStatus});
+    }
 }

@@ -1120,10 +1120,10 @@
 	  <value>No tunnelling</value>
   </data>
   <data name="TunnelMode_Auto_ToolTip" xml:space="preserve">
-	  <value>Try the native protocol first. If that fails, try tunnelling through HTTP and wen socket. If the internet connection is firewalled, you will likely get a connection.</value>
+	  <value>Try the native protocol first. If that fails, try tunnelling through HTTP and web socket. If the internet connection is firewalled, you will likely get a connection.</value>
   </data>
   <data name="TunnelMode_Websocket_ToolTip" xml:space="preserve">
-	  <value>Always use a web tunnel via HTTP and web socket. If you know that your internet connection is firewalled, there is no waste of time by trying the native protocol.</value>
+	  <value>Always use a web tunnel via HTTP and web socket. If you know that your internet connection is firewalled and blocks the native protocol, there is no waste of time by trying the native protocol.</value>
   </data>
   <data name="TunnelMode_NoTunnel_ToolTip" xml:space="preserve">
 	  <value>If the firewall blocks the native protocol, you do not get a connection with this setting.</value>

@@ -1,12 +1,13 @@
-﻿using System.Net.Http.Headers;
+﻿// ReSharper disable RedundantUsingDirective
+using System.Net.Http.Headers;
 using System.Text.Json;
+using System.Net.Http.Json;
 using De.Hochstaetter.Fronius.Models.JsonConverters;
 using De.Hochstaetter.Fronius.Models.Settings;
 using De.Hochstaetter.Fronius.Models.ToshibaAc;
 using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Client.Exceptions;
-// ReSharper disable RedundantUsingDirective
-using System.Net.Http.Json;
+
 // ReSharper restore RedundantUsingDirective
 
 namespace De.Hochstaetter.Fronius.Services;
@@ -36,9 +37,9 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
         jsonOptions.Converters.Add(new ToshibaHexConverter<ToshibaHvacFanSpeed>());
         jsonOptions.Converters.Add(new ToshibaHexConverter<ToshibaHvacPowerState>());
         jsonOptions.Converters.Add(new ToshibaStateDataConverter());
-#if DEBUG
+        #if DEBUG
         jsonOptions.WriteIndented = true;
-#endif
+        #endif
     }
 
     public ToshibaHvacService(SynchronizationContext context, SettingsBase settings)
@@ -106,8 +107,9 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
                 await azureClient.OpenAsync(Token).ConfigureAwait(false);
                 await azureClient.SetMethodHandlerAsync("smmobile", HandleSmMobileMethod, null, Token).ConfigureAwait(false);
 
-#if DEBUG
+                #if DEBUG
 
+                // ReSharper disable once UnusedParameter.Local
                 await azureClient.SetReceiveMessageHandlerAsync(async (message, userContext) =>
                 {
                     await azureClient.CompleteAsync(message, Token).ConfigureAwait(false);
@@ -115,7 +117,7 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
 
                 await azureClient.SetMethodDefaultHandlerAsync(HandleOtherMethods, null, Token).ConfigureAwait(false);
 
-#endif
+                #endif
 
                 tokenSource?.Dispose();
                 tokenSource = new CancellationTokenSource();
@@ -135,8 +137,8 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
     {
         var postData = new Dictionary<string, string>
         {
-            {"Username", settings.ToshibaAcConnection!.UserName},
-            {"Password", settings.ToshibaAcConnection.Password},
+            { "Username", settings.ToshibaAcConnection!.UserName },
+            { "Password", settings.ToshibaAcConnection.Password },
         };
 
         session = await Deserialize<ToshibaHvacSession>("/api/Consumer/Login", postData).ConfigureAwait(false)
@@ -144,9 +146,9 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
 
         postData = new Dictionary<string, string>
         {
-            {"DeviceID", settings.AzureDeviceIdString},
-            {"DeviceType", "1"},
-            {"Username", settings.ToshibaAcConnection.UserName},
+            { "DeviceID", settings.AzureDeviceIdString },
+            { "DeviceType", "1" },
+            { "Username", settings.ToshibaAcConnection.UserName },
         };
 
         var azureCredentials = await Deserialize<ToshibaHvacAzureCredentials>("/api/Consumer/RegisterMobileDevice", postData).ConfigureAwait(false);
@@ -173,9 +175,12 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
             PayLoad = JsonDocument.Parse($"{{ \"data\":\"{state}\"}}").RootElement
         };
 
-        var commandString = JsonSerializer.Serialize(command, jsonOptions);
-        Debug.Print(commandString);
-        await azureClient.SendEventAsync(new Message(Encoding.UTF8.GetBytes(commandString)), Token).ConfigureAwait(false);
+        await using var memoryStream = new MemoryStream();
+        await JsonSerializer.SerializeAsync(memoryStream, command, jsonOptions, Token).ConfigureAwait(false);
+        memoryStream.Position = 0;
+        Debug.Print(Encoding.UTF8.GetString(memoryStream.ToArray()));
+        using var message = new Message(memoryStream);
+        await azureClient.SendEventAsync(message, Token).ConfigureAwait(false);
         return command.MessageId;
     }
 
@@ -220,7 +225,7 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
         return new MethodResponse(0);
     }, Token);
 
-#if DEBUG
+    #if DEBUG
 
     private Task<MethodResponse> HandleOtherMethods(MethodRequest request, object _) => Task.Run(() =>
     {
@@ -229,7 +234,7 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
         return new MethodResponse(0);
     }, Token);
 
-#endif
+    #endif
 
     private async ValueTask<T> Deserialize<T>(string uri, IEnumerable<KeyValuePair<string, string>>? postVariables = null) where T : new()
     {
@@ -255,16 +260,16 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
 
         using var response = (await client.SendAsync(message, Token).ConfigureAwait(false)).EnsureSuccessStatusCode();
 
-#if DEBUG // This allows you to see the raw JSON string
+        #if DEBUG // This allows you to see the raw JSON string
         var jsonText = await response.Content.ReadAsStringAsync(Token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
         Debug.Print(jsonText);
         var jDocument = JsonDocument.Parse(jsonText);
         var result = jDocument.Deserialize<ToshibaHvacResponse<T>>(jsonOptions) ?? throw new InvalidDataException("No data");
 
-#else
+        #else
         var result = await response.Content.ReadFromJsonAsync<ToshibaHvacResponse<T>>(jsonOptions, Token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
 
-#endif
+        #endif
 
         if (!result.IsSuccess)
         {

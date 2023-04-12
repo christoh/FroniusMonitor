@@ -2896,7 +2896,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Try the native protocol first. If that fails, try tunnelling through HTTP and wen socket. If the internet connection is firewalled, you will likely get a connection..
+        ///   Looks up a localized string similar to Try the native protocol first. If that fails, try tunnelling through HTTP and web socket. If the internet connection is firewalled, you will likely get a connection..
         /// </summary>
         public static string TunnelMode_Auto_ToolTip {
             get {
@@ -2932,7 +2932,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Always use a web tunnel via HTTP and web socket. If you know that your internet connection is firewalled, there is no waste of time by trying the native protocol..
+        ///   Looks up a localized string similar to Always use a web tunnel via HTTP and web socket. If you know that your internet connection is firewalled and blocks the native protocol, there is no waste of time by trying the native protocol..
         /// </summary>
         public static string TunnelMode_Websocket_ToolTip {
             get {

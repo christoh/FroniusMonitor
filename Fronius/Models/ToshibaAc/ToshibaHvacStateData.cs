@@ -58,6 +58,12 @@ public class ToshibaHvacStateData : BindableBase
         set => SetStateData(6, (byte)value);
     }
 
+    public ToshibaHvacWifiLedStatus WifiLedStatus
+    {
+        get => (ToshibaHvacWifiLedStatus)StateData[15];
+        set => SetStateData(15, (byte)value);
+    }
+
     public sbyte? CurrentIndoorTemperatureCelsius => ToTemperature(StateData[8]);
 
     public sbyte? CurrentOutdoorTemperatureCelsius => ToTemperature(StateData[9]);
@@ -104,6 +110,7 @@ public class ToshibaHvacStateData : BindableBase
         NotifyOfPropertyChange(nameof(CurrentIndoorTemperatureCelsius));
         NotifyOfPropertyChange(nameof(CurrentOutdoorTemperatureCelsius));
         NotifyOfPropertyChange(nameof(MeritFeaturesA));
+        NotifyOfPropertyChange(nameof(WifiLedStatus));
     }
 
     private void SetStateData(int index, byte value, [CallerMemberName] string? propertyName = null)

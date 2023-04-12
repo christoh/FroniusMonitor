@@ -120,6 +120,7 @@
                     </Grid>
                 </StackPanel>
 
+
                 <Grid Grid.Row="5" Margin="0,4,0,0">
                     <Grid.Resources>
 
@@ -155,79 +156,96 @@
                             </Setter>
                         </Style>
                     </Grid.Resources>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
 
-                    <c:HvacFanSpeedButton x:Name="HvacFanSpeedButton" Style="{StaticResource HoverButton}" Grid.Column="0" Margin="0"
-                                          FanSpeed="{Binding Device.State.FanSpeed}" FanBrush="LimeGreen" Click="OnFanSpeedClicked">
-                        <c:HvacFanSpeedButton.ContextMenu>
-                            <ContextMenu>
-                                <ContextMenu.Resources>
-                                    <Style TargetType="c:HvacFanSpeedButton">
-                                        <Setter Property="MaxHeight" Value="25" />
-                                        <Setter Property="Margin" Value="0,4" />
-                                        <Setter Property="IsEnabled" Value="False" />
-                                        <Setter Property="FanBrush" Value="LimeGreen" />
-                                        <Setter Property="Background" Value="Transparent" />
-                                        <Setter Property="Template" Value="{StaticResource TransparentNoDisabledOpacity}" />
-                                    </Style>
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
 
-                                    <Style TargetType="MenuItem">
-                                        <EventSetter Event="Click" Handler="OnFanSpeedContextMenuClicked" />
-                                        <EventSetter Event="Loaded" Handler="OnFanSpeedContextMenuItemLoaded" />
-                                    </Style>
-                                </ContextMenu.Resources>
-                            </ContextMenu>
-                        </c:HvacFanSpeedButton.ContextMenu>
-                    </c:HvacFanSpeedButton>
+                        <c:HvacFanSpeedButton x:Name="HvacFanSpeedButton" Style="{StaticResource HoverButton}" Grid.Column="0" Margin="0"
+                                              FanSpeed="{Binding Device.State.FanSpeed}" FanBrush="LimeGreen" Click="OnFanSpeedClicked">
+                            <c:HvacFanSpeedButton.ContextMenu>
+                                <ContextMenu>
+                                    <ContextMenu.Resources>
+                                        <Style TargetType="c:HvacFanSpeedButton">
+                                            <Setter Property="MaxHeight" Value="25" />
+                                            <Setter Property="Margin" Value="0,4" />
+                                            <Setter Property="IsEnabled" Value="False" />
+                                            <Setter Property="FanBrush" Value="LimeGreen" />
+                                            <Setter Property="Background" Value="Transparent" />
+                                            <Setter Property="Template" Value="{StaticResource TransparentNoDisabledOpacity}" />
+                                        </Style>
 
-                    <c:HvacPowerLimitButton Style="{StaticResource HoverButton}" Grid.Column="1" PowerBorderBrush="Black" Click="OnPowerLimitClicked"
-                                            PowerLimit="{Binding Device.State.PowerLimit}" PowerBrush="LimeGreen">
-                        <c:HvacPowerLimitButton.ContextMenu>
-                            <ContextMenu>
-                                <ContextMenu.Resources>
-                                    <system:Byte x:Key="P50">50</system:Byte>
-                                    <system:Byte x:Key="P75">75</system:Byte>
-                                    <system:Byte x:Key="P100">100</system:Byte>
+                                        <Style TargetType="MenuItem">
+                                            <EventSetter Event="Click" Handler="OnFanSpeedContextMenuClicked" />
+                                            <EventSetter Event="Loaded" Handler="OnFanSpeedContextMenuItemLoaded" />
+                                        </Style>
+                                    </ContextMenu.Resources>
+                                </ContextMenu>
+                            </c:HvacFanSpeedButton.ContextMenu>
+                        </c:HvacFanSpeedButton>
 
-                                    <Style TargetType="MenuItem">
-                                        <EventSetter Event="Click" Handler="OnPowerLimitContextMenuItemClicked" />
-                                        <EventSetter Event="Loaded" Handler="OnPowerLimitContextMenuItemLoaded" />
-                                    </Style>
-                                </ContextMenu.Resources>
+                        <c:HvacPowerLimitButton Style="{StaticResource HoverButton}" Grid.Column="1" PowerBorderBrush="Black" Click="OnPowerLimitClicked"
+                                                PowerLimit="{Binding Device.State.PowerLimit}" PowerBrush="LimeGreen">
+                            <c:HvacPowerLimitButton.ContextMenu>
+                                <ContextMenu>
+                                    <ContextMenu.Resources>
+                                        <system:Byte x:Key="P50">50</system:Byte>
+                                        <system:Byte x:Key="P75">75</system:Byte>
+                                        <system:Byte x:Key="P100">100</system:Byte>
 
-                                <MenuItem Header="50 %" Tag="{StaticResource P50}" />
-                                <MenuItem Header="75 %" Tag="{StaticResource P75}" />
-                                <MenuItem Header="100 %" Tag="{StaticResource P100}" />
+                                        <Style TargetType="MenuItem">
+                                            <EventSetter Event="Click" Handler="OnPowerLimitContextMenuItemClicked" />
+                                            <EventSetter Event="Loaded" Handler="OnPowerLimitContextMenuItemLoaded" />
+                                        </Style>
+                                    </ContextMenu.Resources>
 
-                            </ContextMenu>
-                        </c:HvacPowerLimitButton.ContextMenu>
-                    </c:HvacPowerLimitButton>
+                                    <MenuItem Header="50 %" Tag="{StaticResource P50}" />
+                                    <MenuItem Header="75 %" Tag="{StaticResource P75}" />
+                                    <MenuItem Header="100 %" Tag="{StaticResource P100}" />
 
-                    <c:HvacMeritFeatureAButton Grid.Column="2" Style="{StaticResource HoverButton}" MeritFeaturesA="{Binding Device.State.MeritFeaturesA}"
-                                               x:Name="HvacMeritFeatureAButton" Click="OnMeritFeaturesAClicked">
-                        <c:HvacMeritFeatureAButton.ContextMenu>
-                            <ContextMenu>
-                                <ContextMenu.Resources>
-                                    <Style TargetType="MenuItem">
-                                        <EventSetter Event="Click" Handler="OnMeritFeatureAContextMenuItemClicked"/>
-                                        <EventSetter Event="Loaded" Handler="OnMeritFeatureAContextMenuItemLoaded"/>
-                                    </Style>
+                                </ContextMenu>
+                            </c:HvacPowerLimitButton.ContextMenu>
+                        </c:HvacPowerLimitButton>
 
-                                    <Style TargetType="c:HvacMeritFeatureAButton">
-                                        <Setter Property="MaxHeight" Value="25" />
-                                        <Setter Property="Margin" Value="0,4" />
-                                        <Setter Property="IsEnabled" Value="False" />
-                                        <Setter Property="Background" Value="Transparent" />
-                                        <Setter Property="Template" Value="{StaticResource TransparentNoDisabledOpacity}" />
-                                    </Style>
-                                </ContextMenu.Resources>
-                            </ContextMenu>
-                        </c:HvacMeritFeatureAButton.ContextMenu>
-                    </c:HvacMeritFeatureAButton>
+                        <c:HvacMeritFeatureAButton Grid.Column="2" Style="{StaticResource HoverButton}" MeritFeaturesA="{Binding Device.State.MeritFeaturesA}"
+                                                   x:Name="HvacMeritFeatureAButton" Click="OnMeritFeaturesAClicked">
+                            <c:HvacMeritFeatureAButton.ContextMenu>
+                                <ContextMenu>
+                                    <ContextMenu.Resources>
+                                        <Style TargetType="MenuItem">
+                                            <EventSetter Event="Click" Handler="OnMeritFeatureAContextMenuItemClicked" />
+                                            <EventSetter Event="Loaded" Handler="OnMeritFeatureAContextMenuItemLoaded" />
+                                        </Style>
+
+                                        <Style TargetType="c:HvacMeritFeatureAButton">
+                                            <Setter Property="MaxHeight" Value="25" />
+                                            <Setter Property="Margin" Value="0,4" />
+                                            <Setter Property="IsEnabled" Value="False" />
+                                            <Setter Property="Background" Value="Transparent" />
+                                            <Setter Property="Template" Value="{StaticResource TransparentNoDisabledOpacity}" />
+                                        </Style>
+                                    </ContextMenu.Resources>
+                                </ContextMenu>
+                            </c:HvacMeritFeatureAButton.ContextMenu>
+                        </c:HvacMeritFeatureAButton>
+                    </Grid>
+
+                    <Grid Grid.Row="1" Margin="0,2,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <c:HvacWifiLedButton Style="{StaticResource HoverButton}" Grid.Column="0" LedStatus="{Binding Device.State.WifiLedStatus}" 
+                                             Click="OnWifiLedStatusClicked"/>
+                    </Grid>
+
                 </Grid>
             </Grid>
         </Border>

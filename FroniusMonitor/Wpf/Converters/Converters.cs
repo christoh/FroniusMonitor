@@ -713,6 +713,7 @@ public class ByteEqualityToString : EqualityToAnything<byte, string> { }
 
 public class ToshibaAcOperatingMode2Visibility : EqualityToAnything<ToshibaHvacOperatingMode, Visibility> { }
 public class ToshibaAcOperatingMode2Brush : EqualityToAnything<ToshibaHvacOperatingMode, Brush> { }
+public class ToshibaHvacWifiLedStatus2Brush : EqualityToAnything<ToshibaHvacWifiLedStatus, Brush> { }
 
 public class MeritFeatureA2Visibility : EqualityToAnything<ToshibaHvacMeritFeaturesA, Visibility>
 {
