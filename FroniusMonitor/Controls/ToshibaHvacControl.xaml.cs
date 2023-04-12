@@ -193,7 +193,7 @@ public partial class ToshibaHvacControl
 
     private void OnFanSpeedContextMenuClicked(object sender, RoutedEventArgs e)
     {
-        if (sender is MenuItem { Header: HvacFanSpeedButton { } button })
+        if (sender is MenuItem { Header: HvacFanSpeedButton button })
         {
             SendCommand(new ToshibaHvacStateData { FanSpeed = button.FanSpeed });
         }
@@ -201,7 +201,7 @@ public partial class ToshibaHvacControl
 
     private void OnFanSpeedContextMenuItemLoaded(object sender, RoutedEventArgs e)
     {
-        if (sender is MenuItem { Header: HvacFanSpeedButton { } button } menuItem)
+        if (sender is MenuItem { Header: HvacFanSpeedButton button } menuItem)
         {
             menuItem.IsChecked = Device.State.FanSpeed == button.FanSpeed;
         }
@@ -209,7 +209,7 @@ public partial class ToshibaHvacControl
 
     private void OnPowerLimitContextMenuItemClicked(object sender, RoutedEventArgs e)
     {
-        if (sender is MenuItem { Tag: byte { } powerLimit })
+        if (sender is MenuItem { Tag: byte powerLimit })
         {
             SendCommand(new ToshibaHvacStateData { PowerLimit = powerLimit });
         }
@@ -217,7 +217,7 @@ public partial class ToshibaHvacControl
 
     private void OnPowerLimitContextMenuItemLoaded(object sender, RoutedEventArgs e)
     {
-        if (sender is MenuItem { Tag: byte { } powerLimit } menuItem)
+        if (sender is MenuItem { Tag: byte powerLimit } menuItem)
         {
             menuItem.IsChecked = Device.State.PowerLimit == powerLimit;
         }
@@ -225,7 +225,7 @@ public partial class ToshibaHvacControl
 
     private void OnMeritFeatureAContextMenuItemClicked(object sender, RoutedEventArgs e)
     {
-        if (sender is MenuItem { Header: HvacMeritFeatureAButton { } button })
+        if (sender is MenuItem { Header: HvacMeritFeatureAButton button })
         {
             SendCommand(new ToshibaHvacStateData { MeritFeaturesA = button.MeritFeaturesA });
         }
@@ -233,7 +233,7 @@ public partial class ToshibaHvacControl
 
     private void OnMeritFeatureAContextMenuItemLoaded(object sender, RoutedEventArgs e)
     {
-        if (sender is MenuItem { Header: HvacMeritFeatureAButton { } button } menuItem)
+        if (sender is MenuItem { Header: HvacMeritFeatureAButton button } menuItem)
         {
             menuItem.IsChecked = Device.State.MeritFeaturesA == button.MeritFeaturesA;
         }

@@ -12,7 +12,7 @@ public partial class HvacFanSpeedButton
     public static readonly DependencyProperty FanSpeedProperty = DependencyProperty.Register
     (
         nameof(FanSpeed), typeof(ToshibaHvacFanSpeed), typeof(HvacFanSpeedButton),
-        new PropertyMetadata((d, e) => ((HvacFanSpeedButton)d).OnFanSpeedChanged())
+        new PropertyMetadata((d, _) => ((HvacFanSpeedButton)d).OnFanSpeedChanged())
     );
 
     public ToshibaHvacFanSpeed FanSpeed
