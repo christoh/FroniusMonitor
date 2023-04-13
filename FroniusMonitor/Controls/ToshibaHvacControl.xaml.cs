@@ -182,9 +182,8 @@ public partial class ToshibaHvacControl
     {
         var key = (byte)(Device.MeritFeature >> 8);
 
-        if (meritFeatureADictionary.ContainsKey(key))
+        if (meritFeatureADictionary.TryGetValue(key, out var features))
         {
-            var features = meritFeatureADictionary[key];
             var index = Math.Max(0, features.IndexOf(Device.State.MeritFeaturesA));
             index = ++index % features.Count;
             SendCommand(new ToshibaHvacStateData { MeritFeaturesA = features[index] });
