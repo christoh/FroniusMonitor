@@ -2,6 +2,20 @@
 
 public class ToshibaHvacStateData : BindableBase
 {
+    private static readonly IReadOnlyDictionary<byte, string> stateDataMap = new Dictionary<byte, string>
+    {
+        { 0, nameof(IsTurnedOn) },
+        { 1, nameof(Mode) },
+        { 2, nameof(TargetTemperatureCelsius) },
+        { 3, nameof(FanSpeed) },
+        { 4, nameof(SwingMode) },
+        { 5, nameof(PowerLimit) },
+        { 6, nameof(MeritFeaturesA) },
+        { 8, nameof(CurrentIndoorTemperatureCelsius) },
+        { 9, nameof(CurrentOutdoorTemperatureCelsius) },
+        { 15, nameof(WifiLedStatus) },
+    };
+
     public ToshibaHvacStateData()
     {
         stateData = new byte[19];
@@ -13,7 +27,7 @@ public class ToshibaHvacStateData : BindableBase
     public IList<byte> StateData
     {
         get => stateData;
-        set => Set(ref stateData, value, NotifyStateDataProperties);
+        set => Set(ref stateData, value, () => stateDataMap.Values.Apply(propertyList => propertyList.Split('|').Apply(NotifyOfPropertyChange)));
     }
 
     public bool IsTurnedOn
@@ -54,9 +68,21 @@ public class ToshibaHvacStateData : BindableBase
 
     public ToshibaHvacMeritFeaturesA MeritFeaturesA
     {
-        get => (ToshibaHvacMeritFeaturesA)StateData[6];
-        set => SetStateData(6, (byte)value);
+        get => (ToshibaHvacMeritFeaturesA)(StateData[6] & 0xf);
+
+        set
+        {
+            if (value != MeritFeaturesA)
+            {
+                StateData[6] = unchecked((byte)((StateData[6] & 0xf0) | ((byte)value & 0xf)));
+                NotifyOfPropertyChange();
+            }
+        }
     }
+
+    public sbyte? CurrentIndoorTemperatureCelsius => ToTemperature(StateData[8]);
+
+    public sbyte? CurrentOutdoorTemperatureCelsius => ToTemperature(StateData[9]);
 
     public ToshibaHvacWifiLedStatus WifiLedStatus
     {
@@ -64,23 +90,24 @@ public class ToshibaHvacStateData : BindableBase
         set => SetStateData(15, (byte)value);
     }
 
-    public sbyte? CurrentIndoorTemperatureCelsius => ToTemperature(StateData[8]);
-
-    public sbyte? CurrentOutdoorTemperatureCelsius => ToTemperature(StateData[9]);
-
     public override string ToString() => StateData.Aggregate(new StringBuilder(StateData.Count << 1), (c, n) => c.Append($"{n:x2}")).ToString();
 
     internal void UpdateStateData(ToshibaHvacStateData update)
     {
-        for (var i = 0; i < Math.Min(update.StateData.Count, StateData.Count); i++)
+        for (byte i = 0; i < new[] { update.StateData.Count, StateData.Count, 255 }.Min(); i++)
         {
-            if (update.StateData[i] != 255)
+            if (update.StateData[i] == 255)
             {
-                StateData[i] = update.StateData[i];
+                continue;
+            }
+
+            StateData[i] = update.StateData[i];
+
+            if (stateDataMap.TryGetValue(i, out var propertyName))
+            {
+                NotifyOfPropertyChange(propertyName);
             }
         }
-
-        NotifyStateDataProperties();
     }
 
     internal void UpdateHeartBeatData(ToshibaHvacHeartbeat heartbeat)
@@ -97,21 +124,6 @@ public class ToshibaHvacStateData : BindableBase
         {
             NotifyOfPropertyChange(nameof(CurrentOutdoorTemperatureCelsius));
         }
-    }
-
-    private void NotifyStateDataProperties()
-    {
-        NotifyOfPropertyChange(nameof(ToshibaHvacOperatingMode));
-        NotifyOfPropertyChange(nameof(IsTurnedOn));
-        NotifyOfPropertyChange(nameof(TargetTemperatureCelsius));
-        NotifyOfPropertyChange(nameof(FanSpeed));
-        NotifyOfPropertyChange(nameof(Mode));
-        NotifyOfPropertyChange(nameof(PowerLimit));
-        NotifyOfPropertyChange(nameof(CurrentIndoorTemperatureCelsius));
-        NotifyOfPropertyChange(nameof(CurrentOutdoorTemperatureCelsius));
-        NotifyOfPropertyChange(nameof(MeritFeaturesA));
-        NotifyOfPropertyChange(nameof(SwingMode));
-        NotifyOfPropertyChange(nameof(WifiLedStatus));
     }
 
     private void SetStateData(int index, byte value, [CallerMemberName] string? propertyName = null)
