@@ -110,6 +110,7 @@ public class ToshibaHvacStateData : BindableBase
         NotifyOfPropertyChange(nameof(CurrentIndoorTemperatureCelsius));
         NotifyOfPropertyChange(nameof(CurrentOutdoorTemperatureCelsius));
         NotifyOfPropertyChange(nameof(MeritFeaturesA));
+        NotifyOfPropertyChange(nameof(SwingMode));
         NotifyOfPropertyChange(nameof(WifiLedStatus));
     }
 

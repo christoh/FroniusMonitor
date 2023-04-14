@@ -1,0 +1,40 @@
+﻿<Button x:Class="De.Hochstaetter.FroniusMonitor.Controls.ToshibaHvacSwingModeButton"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
+             xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
+             mc:Ignorable="d">
+    <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:ToshibaHvacSwingModeButton}}">
+        <Canvas Height="25" Width="25" Background="{Binding Background}">
+            <Canvas.Resources>
+                <Style TargetType="Line">
+                    <Setter Property="Stroke" Value="{Binding Foreground, FallbackValue=Black}"/>
+                    <Setter Property="StrokeThickness" Value="1.7"></Setter>
+                </Style>
+            </Canvas.Resources>
+            <Border Width="8" Height="8" CornerRadius="0,0,3,0" Background="{Binding Foreground, FallbackValue=Black}"/>
+            <Line X1="3" X2="3" Y1="10" Y2="25"/>
+            <Line X1="6" X2="10" Y1="9.5" Y2="24"/>
+            <Line X1="9" X2="18" Y1="8" Y2="21"/>
+            <Line X1="11" X2="24" Y1="5" Y2="13"/>
+            <Line X1="11" X2="25" Y1="2" Y2="2"/>
+
+            <Ellipse Visibility="{Binding SwingMode, Converter={co:ToshibaHvacSwingMode2Visibility Value=Off, Equal=Visible, NotEqual=Collapsed}}"
+                     Canvas.Bottom="0" Canvas.Right="0" Width="18" Height="18" Fill="Transparent" Stroke="Red" StrokeThickness="2"/>
+
+            <Line Visibility="{Binding SwingMode, Converter={co:ToshibaHvacSwingMode2Visibility Value=Off, Equal=Visible, NotEqual=Collapsed}}"
+                  Stroke="Red" StrokeThickness="2" X1="10" X2="22" Y1="21" Y2="11"/>
+
+            <!--<Viewbox Width="11" Canvas.Top="3" Canvas.Left="4"  Visibility="{Binding SwingMode, Converter={co:ToshibaHvacSwingMode2Visibility Value=Vertical, Equal=Visible, NotEqual=Collapsed}}">
+                <Viewbox.LayoutTransform>
+                    <RotateTransform Angle="270"></RotateTransform>
+                </Viewbox.LayoutTransform>
+                <Canvas Height="490.423" Width="490.423">
+                    <Path Fill="{Binding Foreground, FallbackValue=Black}" Data="M483.248,366.926l-97.8-88.4c-8.3-8.3-21.8-7.3-29.1,1c-8.3,8.3-7.3,21.8,1,29.1l58,52h-32	c-139.4,0-252.8-113.4-252.8-252.8v-33l52,58c8.3,8.3,20.8,8.3,29.1,1c8.3-8.3,8.3-20.8,1-29.1l-88.4-97.8		c-7.3-8.3-22.9-8.3-30.2,0l-88.3,97.9c-8.3,8.3-7.3,21.8,1,29.1c10.9,8.8,25.1,5.3,30.2-1l52-58v33 c0,162.3,131.1,293.4,293.4,293.4h34.2l-59.1,53.1c-8.3,8.3-8.3,20.8-1,29.1c11,10.2,24.9,5.8,29.1,1l97.8-86.3 C492.748,390.626,492.848,376.326,483.248,366.926z"></Path>
+                </Canvas>
+            </Viewbox>-->
+        </Canvas>
+    </Viewbox>
+</Button>

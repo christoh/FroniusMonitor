@@ -19,6 +19,11 @@ public partial class ToshibaHvacControl
         { 0x3c, new[] { ToshibaHvacMeritFeaturesA.Silent2, ToshibaHvacMeritFeaturesA.Silent1, ToshibaHvacMeritFeaturesA.Eco, ToshibaHvacMeritFeaturesA.None, ToshibaHvacMeritFeaturesA.HighPower, } }
     };
 
+    private static readonly IReadOnlyDictionary<byte, IList<ToshibaHvacSwingMode>> swingModeDictionary = new Dictionary<byte, IList<ToshibaHvacSwingMode>>
+    {
+        { 0x3c, new[] { ToshibaHvacSwingMode.Off, ToshibaHvacSwingMode.Vertical, } },
+    };
+
     private CancellationTokenSource? enablerTokenSource;
     private readonly object tokenLock = new();
     private string? awaitedMessage;
@@ -52,13 +57,12 @@ public partial class ToshibaHvacControl
                     Tag = temperature,
                 };
 
-                menuItem.Click += (_, _) => { ChangeTemperatureAbsolute((sbyte)menuItem.Tag); };
-
-                menuItem.Loaded += (_, _) => { menuItem.IsChecked = Device.State.TargetTemperatureCelsius.HasValue && (sbyte)menuItem.Tag == Device.State.TargetTemperatureCelsius.Value; };
-
+                menuItem.Click += (_, _) => ChangeTemperatureAbsolute((sbyte)menuItem.Tag); 
+                menuItem.Loaded += (_, _) => menuItem.IsChecked = Device.State.TargetTemperatureCelsius.HasValue && (sbyte)menuItem.Tag == Device.State.TargetTemperatureCelsius.Value;
                 TargetTemperature.ContextMenu.Items.Add(menuItem);
             }
 
+            CreateContextMenuForButtonSelection(HvacFanSpeedButton, fanSpeeds, nameof(HvacFanSpeedButton.FanSpeed));
             Unloaded += (_, _) => SolarSystemService.HvacService.LiveDataReceived -= OnAnswerReceived;
         }
     }
@@ -67,32 +71,32 @@ public partial class ToshibaHvacControl
 
     private void OnDeviceChanged()
     {
-        HvacMeritFeatureAButton.ContextMenu?.Items.Clear();
-        HvacFanSpeedButton.ContextMenu?.Items.Clear();
-
-        if (HvacMeritFeatureAButton.ContextMenu is { Items: { } meritFeatureAItems } && meritFeatureADictionary.TryGetValue((byte)(Device.MeritFeature >> 8), out var featureList))
+        if (meritFeatureADictionary.TryGetValue((byte)(Device.MeritFeature >> 8), out var featureList))
         {
-            for (var i = 0; i < featureList.Count; i++)
-            {
-                meritFeatureAItems.Add(new HvacMeritFeatureAButton { MeritFeaturesA = featureList[i] });
+            CreateContextMenuForButtonSelection(HvacMeritFeatureAButton, featureList, nameof(HvacMeritFeatureAButton.MeritFeaturesA));
+        }
+    }
 
-                if (i < featureList.Count - 1)
-                {
-                    meritFeatureAItems.Add(new Separator());
-                }
-            }
+    private static void CreateContextMenuForButtonSelection<TElement, TData>(TElement element, IList<TData> list, string propertyName)
+        where TElement : FrameworkElement, new()
+        where TData : struct
+    {
+        if (element.ContextMenu is not { Items: { } items })
+        {
+            return;
         }
 
-        if (HvacFanSpeedButton.ContextMenu is { Items: { } fanSpeedItems })
-        {
-            for (var i = 0; i < fanSpeeds.Count; i++)
-            {
-                fanSpeedItems.Add(new HvacFanSpeedButton { FanSpeed = fanSpeeds[i] });
+        items.Clear();
 
-                if (i < fanSpeeds.Count - 1)
-                {
-                    fanSpeedItems.Add(new Separator());
-                }
+        for (var i = 0; i < list.Count; i++)
+        {
+            var newItem = new TElement();
+            typeof(TElement).GetProperty(propertyName)!.SetValue(newItem, list[i]);
+            items.Add(newItem);
+
+            if (i < items.Count - 1)
+            {
+                items.Add(new Separator());
             }
         }
     }
@@ -140,107 +144,113 @@ public partial class ToshibaHvacControl
 
     private void OnModeClicked(object sender, RoutedEventArgs e) => SendCommand(new ToshibaHvacStateData { Mode = ((HvacButton)sender).Mode });
 
-    private void OnFanSpeedClicked(object sender, RoutedEventArgs e)
-    {
-        var index = Math.Max(fanSpeeds.IndexOf(Device.State.FanSpeed), 0);
-        index = ++index % fanSpeeds.Count;
-        SendCommand(new ToshibaHvacStateData { FanSpeed = fanSpeeds[index] });
-    }
-
     private void OnTemperatureUpClicked(object sender, RoutedEventArgs e) => ChangeTemperatureRelative(1);
 
     private void OnTemperatureDownClicked(object sender, RoutedEventArgs e) => ChangeTemperatureRelative(-1);
 
     private void ChangeTemperatureRelative(sbyte amount)
     {
-        var newTemperature = Math.Max(Math.Min((sbyte)30, (sbyte)(Device.State.TargetTemperatureCelsius! + amount)), (sbyte)17);
-
-        if (newTemperature == Device.State.TargetTemperatureCelsius)
-        {
-            return;
-        }
-
-        SendCommand(new ToshibaHvacStateData { TargetTemperatureCelsius = newTemperature });
+        var newTemperature = (sbyte)(Device.State.TargetTemperatureCelsius + amount ?? 22);
+        ChangeTemperatureAbsolute(newTemperature);
     }
 
     private void ChangeTemperatureAbsolute(sbyte temperatureCelsius)
     {
-        if (Device.State.TargetTemperatureCelsius.HasValue)
+        temperatureCelsius = temperatureCelsius switch { > 30 => 30, < 17 => 17, _ => temperatureCelsius, };
+
+        if (Device.State.TargetTemperatureCelsius != temperatureCelsius)
         {
-            ChangeTemperatureRelative(unchecked((sbyte)(temperatureCelsius - Device.State.TargetTemperatureCelsius.Value)));
+            SendCommand(new ToshibaHvacStateData { TargetTemperatureCelsius = temperatureCelsius });
         }
     }
 
-    private void OnPowerLimitClicked(object sender, RoutedEventArgs e)
-    {
-        var index = Math.Max(powerLimits.IndexOf(Device.State.PowerLimit), 0);
-        index = ++index % powerLimits.Count;
-        SendCommand(new ToshibaHvacStateData { PowerLimit = powerLimits[index] });
-    }
+    private void OnPowerLimitClicked(object sender, RoutedEventArgs e) => OnIndexedValueClicked(powerLimits, nameof(ToshibaHvacStateData.PowerLimit));
 
-    private void OnMeritFeaturesAClicked(object sender, RoutedEventArgs e)
-    {
-        var key = (byte)(Device.MeritFeature >> 8);
+    private void OnFanSpeedClicked(object sender, RoutedEventArgs e) => OnIndexedValueClicked(fanSpeeds, nameof(ToshibaHvacStateData.FanSpeed));
 
-        if (meritFeatureADictionary.TryGetValue(key, out var features))
-        {
-            var index = Math.Max(0, features.IndexOf(Device.State.MeritFeaturesA));
-            index = ++index % features.Count;
-            SendCommand(new ToshibaHvacStateData { MeritFeaturesA = features[index] });
-        }
-    }
+    private void OnMeritFeaturesAClicked(object sender, RoutedEventArgs e) => OnFeatureDependentIndexedValueClicked(meritFeatureADictionary, nameof(ToshibaHvacStateData.MeritFeaturesA));
 
-    private void OnFanSpeedContextMenuClicked(object sender, RoutedEventArgs e)
+    private void OnFanSpeedContextMenuItemClicked(object sender, RoutedEventArgs e)
     {
-        if (sender is MenuItem { Header: HvacFanSpeedButton button })
-        {
-            SendCommand(new ToshibaHvacStateData { FanSpeed = button.FanSpeed });
-        }
+        OnButtonContextMenuItemClicked(sender, nameof(ToshibaHvacStateData.FanSpeed), nameof(HvacFanSpeedButton.FanSpeed));
     }
 
     private void OnFanSpeedContextMenuItemLoaded(object sender, RoutedEventArgs e)
     {
-        if (sender is MenuItem { Header: HvacFanSpeedButton button } menuItem)
-        {
-            menuItem.IsChecked = Device.State.FanSpeed == button.FanSpeed;
-        }
+        OnButtonContextMenuItemLoaded(sender, nameof(ToshibaHvacStateData.FanSpeed), nameof(HvacFanSpeedButton.FanSpeed));
     }
 
     private void OnPowerLimitContextMenuItemClicked(object sender, RoutedEventArgs e)
     {
-        if (sender is MenuItem { Tag: byte powerLimit })
-        {
-            SendCommand(new ToshibaHvacStateData { PowerLimit = powerLimit });
-        }
+        OnButtonContextMenuItemClicked(sender, nameof(ToshibaHvacStateData.PowerLimit));
     }
 
     private void OnPowerLimitContextMenuItemLoaded(object sender, RoutedEventArgs e)
     {
-        if (sender is MenuItem { Tag: byte powerLimit } menuItem)
-        {
-            menuItem.IsChecked = Device.State.PowerLimit == powerLimit;
-        }
+        OnButtonContextMenuItemLoaded(sender, nameof(ToshibaHvacStateData.PowerLimit));
     }
 
     private void OnMeritFeatureAContextMenuItemClicked(object sender, RoutedEventArgs e)
     {
-        if (sender is MenuItem { Header: HvacMeritFeatureAButton button })
-        {
-            SendCommand(new ToshibaHvacStateData { MeritFeaturesA = button.MeritFeaturesA });
-        }
+        OnButtonContextMenuItemClicked(sender, nameof(ToshibaHvacStateData.MeritFeaturesA), nameof(HvacMeritFeatureAButton.MeritFeaturesA));
     }
 
     private void OnMeritFeatureAContextMenuItemLoaded(object sender, RoutedEventArgs e)
     {
-        if (sender is MenuItem { Header: HvacMeritFeatureAButton button } menuItem)
-        {
-            menuItem.IsChecked = Device.State.MeritFeaturesA == button.MeritFeaturesA;
-        }
+        OnButtonContextMenuItemLoaded(sender, nameof(ToshibaHvacStateData.MeritFeaturesA), nameof(HvacMeritFeatureAButton.MeritFeaturesA));
     }
 
     private void OnWifiLedStatusClicked(object sender, RoutedEventArgs e)
     {
         var newStatus = Device.State.WifiLedStatus == ToshibaHvacWifiLedStatus.On ? ToshibaHvacWifiLedStatus.Off : ToshibaHvacWifiLedStatus.On;
-        SendCommand(new ToshibaHvacStateData { WifiLedStatus = newStatus});
+        SendCommand(new ToshibaHvacStateData { WifiLedStatus = newStatus });
+    }
+
+    private void OnSwingModeClicked(object sender, RoutedEventArgs e) => OnFeatureDependentIndexedValueClicked(swingModeDictionary, nameof(ToshibaHvacStateData.SwingMode));
+
+    private void OnButtonContextMenuItemClicked(object sender, string devicePropertyName, string buttonPropertyName = "")
+    {
+        var newState = new ToshibaHvacStateData();
+
+        typeof(ToshibaHvacStateData).GetProperty(devicePropertyName)?.SetValue(newState, sender switch
+        {
+            MenuItem { Header: DependencyObject header } => header.GetType().GetProperty(buttonPropertyName)!.GetValue(header),
+            MenuItem { Tag: { } tagValue } => tagValue,
+            _ => throw new InvalidOperationException(),
+        });
+
+        SendCommand(newState);
+    }
+
+    private void OnButtonContextMenuItemLoaded(object sender, string devicePropertyName, string buttonPropertyName = "")
+    {
+        var value = typeof(ToshibaHvacStateData).GetProperty(devicePropertyName)!.GetValue(Device.State);
+
+        ((MenuItem)sender).IsChecked = sender switch
+        {
+            MenuItem { Header: DependencyObject header } => header.GetType().GetProperty(buttonPropertyName)?.GetValue(header)?.Equals(value) ?? false,
+            MenuItem { Tag: { } tagValue } => tagValue.Equals(value),
+            _ => false,
+        };
+    }
+
+    private void OnFeatureDependentIndexedValueClicked<T>(IReadOnlyDictionary<byte, IList<T>> dictionary, string propertyName) where T : struct
+    {
+        var key = (byte)(Device.MeritFeature >> 8);
+
+        if (dictionary.TryGetValue(key, out var list))
+        {
+            OnIndexedValueClicked(list, propertyName);
+        }
+    }
+
+    private void OnIndexedValueClicked<T>(IList<T> list, string propertyName) where T : struct
+    {
+        var property = typeof(ToshibaHvacStateData).GetProperty(propertyName);
+        var index = Math.Max(list.IndexOf((T)property!.GetValue(Device.State)!), -1);
+        index = ++index % list.Count;
+        var newState = new ToshibaHvacStateData();
+        property.SetValue(newState, list[index]);
+        SendCommand(newState);
     }
 }

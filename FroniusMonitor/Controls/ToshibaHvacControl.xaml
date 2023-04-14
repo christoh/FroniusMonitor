@@ -183,7 +183,7 @@
                                         </Style>
 
                                         <Style TargetType="MenuItem">
-                                            <EventSetter Event="Click" Handler="OnFanSpeedContextMenuClicked" />
+                                            <EventSetter Event="Click" Handler="OnFanSpeedContextMenuItemClicked" />
                                             <EventSetter Event="Loaded" Handler="OnFanSpeedContextMenuItemLoaded" />
                                         </Style>
                                     </ContextMenu.Resources>
@@ -240,10 +240,14 @@
                     <Grid Grid.Row="1" Margin="0,2,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
                         <c:HvacWifiLedButton Style="{StaticResource HoverButton}" Grid.Column="0" LedStatus="{Binding Device.State.WifiLedStatus}" 
                                              Click="OnWifiLedStatusClicked"/>
+
+                        <c:ToshibaHvacSwingModeButton Grid.Column="1" Style="{StaticResource HoverButton}" SwingMode="{Binding Device.State.SwingMode}"
+                                                      Click="OnSwingModeClicked"/>
                     </Grid>
 
                 </Grid>
