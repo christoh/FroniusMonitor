@@ -1104,4 +1104,7 @@
   <data name="HvacModeFanOnly" xml:space="preserve">
 	  <value>Nur Lüften</value>
   </data>
+  <data name="IsAlreadyRunning" xml:space="preserve">
+	  <value>{0} ist bereits gestartet.</value>
+  </data>
 </root>

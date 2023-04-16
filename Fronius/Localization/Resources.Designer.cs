@@ -1168,6 +1168,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} is already running..
+        /// </summary>
+        public static string IsAlreadyRunning {
+            get {
+                return ResourceManager.GetString("IsAlreadyRunning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Battery service mode.
         /// </summary>
         public static string IsInServiceMode {

@@ -7,13 +7,23 @@ namespace De.Hochstaetter.FroniusMonitor;
 public partial class App
 {
     public const double ZoomFactor = 1.025;
+    private static readonly Mutex mutex= new(true, $"{Environment.UserName}_HomeAutomationControlCenter");
+    public static bool HaveSettings = true;
+    public static readonly IServiceCollection ServiceCollection = new ServiceCollection();
+    public static Timer? SolarSystemQueryTimer;
+
+    static App()
+    {
+        if (!mutex.WaitOne(0, false))
+        {
+            MessageBox.Show(string.Format(Loc.IsAlreadyRunning, Loc.AppName), Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error);
+            Environment.Exit(666);
+        }
+    }
+
     public static string AppName => "FroniusMonitor";
     public static string PerUserDataDir => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Hochstätter", AppName);
     public static string SettingsFileName => Path.Combine(PerUserDataDir, "Settings.fms");
-    public static Timer? SolarSystemQueryTimer;
-    public static bool HaveSettings = true;
-
-    public static readonly IServiceCollection ServiceCollection = new ServiceCollection();
 
     public static Settings Settings { get; set; } = null!;
 
@@ -58,7 +68,7 @@ public partial class App
                 .AddTransient<WattPilotSettingsView>()
                 .AddTransient<WattPilotSettingsViewModel>()
                 .BuildServiceProvider()
-                ;
+            ;
 
         IoC.Update(injector);
         IoC.Get<ISolarSystemService>().FroniusUpdateRate = Settings.FroniusUpdateRate;
@@ -76,7 +86,6 @@ public partial class App
         }
 
         SystemEvents.PowerModeChanged += OnPowerModeChanged;
-
         IoC.Get<MainWindow>().Show();
     }
 
