@@ -89,7 +89,7 @@ public partial class App
         IoC.Get<MainWindow>().Show();
     }
 
-    private void OnPowerModeChanged(object sender, PowerModeChangedEventArgs e)
+    private static void OnPowerModeChanged(object sender, PowerModeChangedEventArgs e)
     {
         switch (e.Mode)
         {

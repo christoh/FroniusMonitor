@@ -1,5 +1,4 @@
 ﻿using De.Hochstaetter.Fronius.Models.Settings;
-using De.Hochstaetter.FroniusMonitor.Wpf.Localization;
 
 namespace De.Hochstaetter.FroniusMonitor.Wpf.Converters;
 
@@ -45,7 +44,7 @@ public class DoNothing : ConverterBase
 
 public class Sum : MultiConverterBase
 {
-    public override object? Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
+    public override object Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
     {
         return values.OfType<IConvertible>().Select(v => v.ToDouble(CultureInfo.CurrentCulture)).Sum();
     }
@@ -63,7 +62,7 @@ public abstract class PlacementModeToAnything<T> : ConverterBase
 
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        return value is not PlacementMode placementMode ? Null : placementMode switch
+        return value switch
         {
             PlacementMode.Top => Top,
             PlacementMode.Bottom => Bottom,
@@ -77,8 +76,11 @@ public abstract class PlacementModeToAnything<T> : ConverterBase
 }
 
 public class PlacementMode2Thickness : PlacementModeToAnything<Thickness> { }
+
 public class PlacementMode2Double : PlacementModeToAnything<double> { }
+
 public class PlacementMode2VerticalAlignment : PlacementModeToAnything<VerticalAlignment> { }
+
 public class PlacementMode2TextAlignment : PlacementModeToAnything<TextAlignment> { }
 
 public class DateConverter : ConverterBase
@@ -107,7 +109,9 @@ public class DateConverter : ConverterBase
             effectiveCulture,
             UseUtc ? DateTimeStyles.AssumeUniversal : DateTimeStyles.AssumeLocal,
             out var date
-        ) ? date : value;
+        )
+            ? date
+            : value;
     }
 }
 
@@ -123,7 +127,6 @@ public class NullToVisibility : NullToAnything<Visibility>
     public override Visibility Null { get; set; } = Visibility.Collapsed;
     public override Visibility NotNull { get; set; } = Visibility.Visible;
 }
-
 
 public class NullToString : ConverterBase
 {
@@ -245,7 +248,7 @@ public abstract class BoolToAnything<T> : ConverterBase
 
 public class Bool2Brush : BoolToAnything<Brush> { }
 
-public class Bool2DataTemplate : BoolToAnything<DataTemplate> { }
+//public class Bool2DataTemplate : BoolToAnything<DataTemplate> { }
 
 public class Bool2Visibility : BoolToAnything<Visibility>
 {
@@ -264,6 +267,7 @@ public class MultiBool2Anything<T> : MultiConverterBase
     public virtual T? Any { get; set; }
     public virtual T? None { get; set; }
     public virtual T? Invalid { get; set; }
+
     public override object? Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
     {
         var boolValues = values.OfType<bool>().ToArray();
@@ -330,6 +334,7 @@ public class SeverityToVisibility : ConverterBase
     public Visibility Warning { get; set; } = Visibility.Collapsed;
     public Visibility Information { get; set; } = Visibility.Collapsed;
     public Visibility Other { get; set; } = Visibility.Collapsed;
+
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is not Severity severity)
@@ -602,79 +607,80 @@ public class CarStatus2Opacity : ConverterBase
     }
 }
 
-public class WattPilotPhase2Brush : ConverterBase
-{
-    public Phases Phase { get; set; }
-    public override object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-    {
-        Color result;
+//public class WattPilotPhase2Brush : ConverterBase
+//{
+//    public Phases Phase { get; set; }
 
-        switch (value)
-        {
-            case WattPilot wattPilot:
+//    public override object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+//    {
+//        Color result;
 
-                var resultL1 = GetPhaseColor(Phases.L1, wattPilot.L1CableEnabled, wattPilot.L1ChargerEnabled);
-                var resultL2 = GetPhaseColor(Phases.L2, wattPilot.L2CableEnabled, wattPilot.L2ChargerEnabled);
-                var resultL3 = GetPhaseColor(Phases.L3, wattPilot.L3CableEnabled, wattPilot.L3ChargerEnabled);
+//        switch (value)
+//        {
+//            case WattPilot wattPilot:
 
-                var colors = new[] { resultL1, resultL2, resultL3 };
+//                var resultL1 = GetPhaseColor(Phases.L1, wattPilot.L1CableEnabled, wattPilot.L1ChargerEnabled);
+//                var resultL2 = GetPhaseColor(Phases.L2, wattPilot.L2CableEnabled, wattPilot.L2ChargerEnabled);
+//                var resultL3 = GetPhaseColor(Phases.L3, wattPilot.L3CableEnabled, wattPilot.L3ChargerEnabled);
 
-                if (colors.Any(c => c == Colors.LightGreen))
-                {
-                    result = Colors.LightGreen;
-                }
-                else if (colors.Any(c => c == Color.FromRgb(248, 232, 19)))
-                {
-                    result = Color.FromRgb(248, 232, 19);
-                }
-                else if (colors.Any(c => c == Colors.White))
-                {
-                    result = Colors.White;
-                }
-                else if (colors.Any(c => c == Colors.OrangeRed))
-                {
-                    result = Colors.OrangeRed;
-                }
-                else
-                {
-                    result = Colors.Transparent;
-                }
+//                var colors = new[] { resultL1, resultL2, resultL3 };
 
-                Color GetPhaseColor(Phases phases, bool? cableEnabled, bool? carEnabled)
-                {
-                    if ((Phase & phases) != 0)
-                    {
-                        if (carEnabled is true && cableEnabled is true)
-                        {
-                            return Colors.LightGreen;
-                        }
-                        if (cableEnabled is true)
-                        {
-                            return Color.FromRgb(248, 232, 19);
-                        }
+//                if (colors.Any(c => c == Colors.LightGreen))
+//                {
+//                    result = Colors.LightGreen;
+//                }
+//                else if (colors.Any(c => c == Color.FromRgb(248, 232, 19)))
+//                {
+//                    result = Color.FromRgb(248, 232, 19);
+//                }
+//                else if (colors.Any(c => c == Colors.White))
+//                {
+//                    result = Colors.White;
+//                }
+//                else if (colors.Any(c => c == Colors.OrangeRed))
+//                {
+//                    result = Colors.OrangeRed;
+//                }
+//                else
+//                {
+//                    result = Colors.Transparent;
+//                }
 
-                        if (carEnabled is true)
-                        {
-                            return Colors.White;
-                        }
+//                Color GetPhaseColor(Phases phases, bool? cableEnabled, bool? carEnabled)
+//                {
+//                    if ((Phase & phases) != 0)
+//                    {
+//                        if (carEnabled is true && cableEnabled is true)
+//                        {
+//                            return Colors.LightGreen;
+//                        }
 
-                        return Colors.OrangeRed;
-                    }
+//                        if (cableEnabled is true)
+//                        {
+//                            return Color.FromRgb(248, 232, 19);
+//                        }
 
-                    return Colors.Transparent;
-                }
+//                        if (carEnabled is true)
+//                        {
+//                            return Colors.White;
+//                        }
 
-                break;
+//                        return Colors.OrangeRed;
+//                    }
 
-            default:
-                result = Colors.Transparent;
-                break;
-        }
+//                    return Colors.Transparent;
+//                }
 
-        return targetType.IsAssignableFrom(typeof(Color)) ? result : new SolidColorBrush(result);
+//                break;
 
-    }
-}
+//            default:
+//                result = Colors.Transparent;
+//                break;
+//        }
+
+//        return targetType.IsAssignableFrom(typeof(Color)) ? result : new SolidColorBrush(result);
+//    }
+//}
 
 public class LinuxVersion : ConverterBase
 {
@@ -688,7 +694,7 @@ public class PowerStatus2Brush : MultiConverterBase
 {
     public override object? Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (values?.OfType<bool>().ToList() is not List<bool> { Count: 2 } list)
+        if (values.OfType<bool>().ToList() is not { Count: 2 } list)
         {
             return null;
         }
@@ -712,9 +718,12 @@ public class EqualityToAnything<TFrom, TTo> : ConverterBase
 public class ByteEqualityToString : EqualityToAnything<byte, string> { }
 
 public class ToshibaAcOperatingMode2Visibility : EqualityToAnything<ToshibaHvacOperatingMode, Visibility> { }
+
 public class ToshibaAcOperatingMode2Brush : EqualityToAnything<ToshibaHvacOperatingMode, Brush> { }
+
 public class ToshibaHvacWifiLedStatus2Brush : EqualityToAnything<ToshibaHvacWifiLedStatus, Brush> { }
-public class ToshibaHvacSwingMode2Visibility: EqualityToAnything<ToshibaHvacSwingMode, Visibility>{}
+
+public class ToshibaHvacSwingMode2Visibility : EqualityToAnything<ToshibaHvacSwingMode, Visibility> { }
 
 public class MeritFeatureA2Visibility : EqualityToAnything<ToshibaHvacMeritFeaturesA, Visibility>
 {
@@ -749,9 +758,8 @@ public class ToshibaHvacMeritFeaturesARange2Visibility : Range2Anything<ToshibaH
 
 public class ToshibaHvacSilent2Visibility : ConverterBase
 {
-    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public override object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         return value is ToshibaHvacMeritFeaturesA.Silent1 or ToshibaHvacMeritFeaturesA.Silent2 ? Visibility.Visible : Visibility.Collapsed;
     }
 }
-
