@@ -1066,7 +1066,7 @@
 	  <value>MQTT ist einfacher als AMQP, es fehlen aber einige Features. Wenn die Internetverbindung instabil ist, gehen jedoch weniger Nachrichten verloren.</value>
   </data>
   <data name="Protocol_Http1_ToolTip" xml:space="preserve">
-	  <value>HTTP 1.1 ist weniger geeignet, kann jedoch nötig werden, wenn die Interverbindung eine paranoide Firewall hat.</value>
+	  <value>HTTP 1.1 ist weniger geeignet, kann jedoch nötig werden, wenn die Internetverbindung eine paranoide Firewall hat.</value>
   </data>
   <data name="LiveUpdateProtocol" xml:space="preserve">
 	  <value>Liveupdate-Protokoll</value>
