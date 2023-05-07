@@ -28,16 +28,16 @@
             <DataTemplate x:Key="ComboBoxTemplateToolTip">
                 <Grid Background="Transparent" HorizontalAlignment="Stretch" ToolTip="{Binding Path=(contracts:IHaveToolTip.ToolTip), Mode=OneWay}">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="{Binding}" MinHeight="20" Margin="0,2,0,0" VerticalAlignment="Center">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
-                            <Style.Triggers>
-                                <Trigger Property="IsEnabled" Value="False">
-                                    <Setter Property="Visibility" Value="Hidden"/>
-                                </Trigger>
-                            </Style.Triggers>
+                                <Style.Triggers>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter Property="Visibility" Value="Hidden" />
+                                    </Trigger>
+                                </Style.Triggers>
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
@@ -85,6 +85,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <Grid.ColumnDefinitions>
@@ -124,6 +125,11 @@
                               ItemsSource="{Binding FroniusUpdateRates}" ItemTemplate="{StaticResource ComboBoxTemplate}" />
                     <TextBlock Grid.Column="1" Text="{Binding Settings.FroniusUpdateRate, Converter={co:ByteEqualityToString Value=1, Equal={x:Static p:Resources.Second}, NotEqual={x:Static p:Resources.Seconds}}}" Margin="4,8,0,0" />
                 </Grid>
+
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="{x:Static p:Resources.DriftsFile}" Margin="0,8,0,0" />
+                <TextBlock Grid.Row="4" Grid.Column="1" Text=":" Margin="4,8,4,0" />
+                <Button HorizontalAlignment="Left" Padding="8,0" MinWidth="80" Style="{x:Null}" Grid.Row="4" Grid.Column="2"
+                        Height="24" Margin="0,8,0,0" Content="{x:Static p:Resources.Change}" Command="{Binding ChangeDriftsFileCommand}"/>
             </Grid>
 
         </GroupBox>

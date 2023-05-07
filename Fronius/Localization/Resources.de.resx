@@ -1107,4 +1107,13 @@
   <data name="IsAlreadyRunning" xml:space="preserve">
 	  <value>{0} ist bereits gestartet.</value>
   </data>
+  <data name="DriftsFile" xml:space="preserve">
+	  <value>Drift-Datei</value>
+  </data>
+  <data name="Change" xml:space="preserve">
+	  <value>Ändern</value>
+  </data>
+  <data name="SelectDriftsFile" xml:space="preserve">
+	  <value>Wähle den Ort und den Namen der Drifts-Datei</value>
+  </data>
 </root>

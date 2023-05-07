@@ -20,8 +20,9 @@ public abstract class SettingsBase : BindableBase, ICloneable
         set => Set(ref froniusUpdateRate, value);
     }
 
-    private string? driftFileName = @"D:\OneDrive\Home\OneDrive\Dokumente\FroniusMonitor\Drifts.xml";
+    private string? driftFileName;
 
+    [DefaultValue(null)]
     public string? DriftFileName
     {
         get => driftFileName;

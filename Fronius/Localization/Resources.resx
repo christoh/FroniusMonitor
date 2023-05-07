@@ -1146,4 +1146,13 @@
   <data name="IsAlreadyRunning" xml:space="preserve">
 	  <value>{0} is already running.</value>
   </data>
+  <data name="DriftsFile" xml:space="preserve">
+	  <value>Drifts file</value>
+  </data>
+  <data name="Change" xml:space="preserve">
+	  <value>Change</value>
+  </data>
+  <data name="SelectDriftsFile" xml:space="preserve">
+	  <value>Select Location and Name of the drifts file</value>
+  </data>
 </root>

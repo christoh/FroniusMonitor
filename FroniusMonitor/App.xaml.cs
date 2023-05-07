@@ -7,7 +7,7 @@ namespace De.Hochstaetter.FroniusMonitor;
 public partial class App
 {
     public const double ZoomFactor = 1.025;
-    private static readonly Mutex mutex= new(true, $"{Environment.UserName}_HomeAutomationControlCenter");
+    private static readonly Mutex mutex = new(true, $"{Environment.UserName}_HomeAutomationControlCenter");
     public static bool HaveSettings = true;
     public static readonly IServiceCollection ServiceCollection = new ServiceCollection();
     public static Timer? SolarSystemQueryTimer;
@@ -43,7 +43,12 @@ public partial class App
         catch
         {
             HaveSettings = false;
-            Settings = new();
+
+            Settings = new()
+            {
+                DriftFileName = Path.Combine(PerUserDataDir, "Drifts.xml")
+            };
+
             Settings.Save().GetAwaiter().GetResult();
         }
 

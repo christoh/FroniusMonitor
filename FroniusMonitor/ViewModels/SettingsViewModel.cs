@@ -43,6 +43,9 @@ public class SettingsViewModel : SettingsViewModelBase
     private ICommand? okCommand;
     public ICommand OkCommand => okCommand ??= new NoParameterCommand(Ok);
 
+    private ICommand? changeDriftsFileCommand;
+    public ICommand ChangeDriftsFileCommand => changeDriftsFileCommand ??= new NoParameterCommand(ChangeDriftsFile);
+
     public IEnumerable<ListItemModel<Protocol>> AzureProtocols => azureProtocols;
 
     public IEnumerable<ListItemModel<TunnelMode>> TunnelModes => tunnelModes;
@@ -104,6 +107,29 @@ public class SettingsViewModel : SettingsViewModelBase
         Settings.ToshibaAcConnection ??= new Settings().ToshibaAcConnection;
         SelectedCulture = Cultures.SingleOrDefault(c => c.Value?.ToUpperInvariant() == Settings.Language?.ToUpperInvariant()) ?? Cultures.First();
         NotifyOfPropertyChange(nameof(SelectedProtocol));
+    }
+
+    private void ChangeDriftsFile()
+    {
+        var dialog = new SaveFileDialog
+        {
+            CheckFileExists = false,
+            CheckPathExists = true,
+            DefaultExt = ".xml",
+            DereferenceLinks = true,
+            FileName = "Drifts.xml",
+            InitialDirectory = string.IsNullOrWhiteSpace(Settings.DriftFileName)?null:Path.GetDirectoryName(Settings.DriftFileName),
+            OverwritePrompt = false,
+            ValidateNames = true,
+            Title = Resources.SelectDriftsFile,
+        };
+
+        var result=dialog.ShowDialog();
+
+        if (result.HasValue && result.Value)
+        {
+            Settings.DriftFileName = dialog.FileName;
+        }
     }
 
     private static string GetCultureName(string id)

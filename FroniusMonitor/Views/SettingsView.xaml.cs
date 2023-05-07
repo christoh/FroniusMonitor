@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Views
+﻿using De.Hochstaetter.Fronius.Models.Settings;
+
+namespace De.Hochstaetter.FroniusMonitor.Views
 {
     public partial class SettingsView
     {
@@ -18,5 +20,6 @@
         {
             Close();
         }
+
     }
 }

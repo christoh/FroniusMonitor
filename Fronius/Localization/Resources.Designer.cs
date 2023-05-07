@@ -421,6 +421,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Change.
+        /// </summary>
+        public static string Change {
+            get {
+                return ResourceManager.GetString("Change", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Channel.
         /// </summary>
         public static string Channel {
@@ -687,6 +696,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string DownloadChargeLog {
             get {
                 return ResourceManager.GetString("DownloadChargeLog", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Drifts file.
+        /// </summary>
+        public static string DriftsFile {
+            get {
+                return ResourceManager.GetString("DriftsFile", resourceCulture);
             }
         }
         
@@ -2406,6 +2424,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Seconds {
             get {
                 return ResourceManager.GetString("Seconds", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select Location and Name of the drifts file.
+        /// </summary>
+        public static string SelectDriftsFile {
+            get {
+                return ResourceManager.GetString("SelectDriftsFile", resourceCulture);
             }
         }
         
