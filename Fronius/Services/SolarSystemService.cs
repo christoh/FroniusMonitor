@@ -82,6 +82,8 @@ public class SolarSystemService : BindableBase, ISolarSystemService
     public double? StoragePowerAvg => StoragePowerSum / Count;
     public double? SolarPowerAvg => SolarPowerSum / Count;
 
+    public IList<SmartMeterCalibrationHistoryItem> SmartMeterHistory { get; private set; } = new List<SmartMeterCalibrationHistoryItem>();
+
     private void NotifyPowerQueueChanged()
     {
         NotifyOfPropertyChange(nameof(GridPowerSum));
@@ -98,6 +100,71 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         NotifyOfPropertyChange(nameof(PowerLossAvg));
         NotifyOfPropertyChange(nameof(Efficiency));
     }
+
+    public Task<IList<SmartMeterCalibrationHistoryItem>> ReadCalibrationHistory() => Task.Run(() =>
+    {
+        if (string.IsNullOrWhiteSpace(settings.DriftFileName) || !File.Exists(settings.DriftFileName))
+        {
+            return new List<SmartMeterCalibrationHistoryItem>();
+        }
+
+        var serializer = new XmlSerializer(typeof(List<SmartMeterCalibrationHistoryItem>));
+        using var stream = new FileStream(settings.DriftFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+        return serializer.Deserialize(stream) as IList<SmartMeterCalibrationHistoryItem> ?? new List<SmartMeterCalibrationHistoryItem>();
+    });
+
+    public Task<IList<SmartMeterCalibrationHistoryItem>> AddCalibrationHistoryItem(double consumedEnergyOffset, double producedEnergyOffset) => Task.Run(() =>
+    {
+        if (string.IsNullOrWhiteSpace(settings.DriftFileName))
+        {
+            return SmartMeterHistory;
+        }
+
+        var directoryName = Path.GetDirectoryName(settings.DriftFileName);
+
+        if (!Directory.Exists(Path.GetDirectoryName(settings.DriftFileName)))
+        {
+            try
+            {
+                Directory.CreateDirectory(directoryName!);
+            }
+            catch
+            {
+                return SmartMeterHistory;
+            }
+        }
+
+        var newItem = new SmartMeterCalibrationHistoryItem
+        {
+            CalibrationDate = DateTime.UtcNow,
+            ConsumedOffset = consumedEnergyOffset,
+            ProducedOffset = producedEnergyOffset,
+            EnergyRealConsumed = SolarSystem?.Gen24System?.PrimaryPowerMeter?.EnergyRealConsumed ?? double.NaN,
+            EnergyRealProduced = SolarSystem?.Gen24System?.PrimaryPowerMeter?.EnergyRealProduced ?? double.NaN,
+        };
+
+        SmartMeterHistory.Add(newItem);
+
+        if (SmartMeterHistory.Count > 50)
+        {
+            SmartMeterHistory.RemoveAt(1);
+        }
+
+        var serializer = new XmlSerializer(typeof(List<SmartMeterCalibrationHistoryItem>));
+        using var stream = new FileStream(settings.DriftFileName, FileMode.Create, FileAccess.Write, FileShare.None);
+
+        using var writer = XmlWriter.Create(stream, new XmlWriterSettings
+        {
+            Encoding = Encoding.UTF8,
+            Indent = true,
+            IndentChars = new string(' ', 3),
+            NewLineChars = Environment.NewLine,
+        });
+
+        serializer.Serialize(writer, SmartMeterHistory as List<SmartMeterCalibrationHistoryItem> ?? SmartMeterHistory.ToList());
+
+        return SmartMeterHistory;
+    });
 
     [SuppressMessage("ReSharper", "ParameterHidesMember")]
     public async Task Start(WebConnection? inverterConnection, WebConnection? fritzBoxConnection, WebConnection? wattPilotConnection)
@@ -144,6 +211,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
     private async ValueTask<SolarSystem> CreateSolarSystem(WebConnection? inverterConnection, WebConnection? fritzBoxConnection)
     {
         var result = new SolarSystem();
+        SmartMeterHistory = await ReadCalibrationHistory().ConfigureAwait(false);
 
         if (inverterConnection != null)
         {
@@ -263,7 +331,6 @@ public class SolarSystemService : BindableBase, ISolarSystemService
                 {
                     SwitchableDevices.AddRange(devicesToAdd);
                 }
-
             }).ConfigureAwait(false);
 
             return devices;

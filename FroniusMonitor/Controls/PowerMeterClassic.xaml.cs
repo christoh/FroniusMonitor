@@ -48,19 +48,19 @@ public partial class PowerMeterClassic
 
     private async void OnConsumedPowerCalibrated(object _, double value)
     {
-        if (SmartMeter is {EnergyRealConsumed: { } energyRealConsumed})
+        if (SmartMeter is { EnergyRealConsumed: { } energyRealConsumed })
         {
-            App.Settings.ConsumedEnergyOffsetWattHours = value - energyRealConsumed;
-            await Settings.Save().ConfigureAwait(false);
+            await IoC.Get<ISolarSystemService>().AddCalibrationHistoryItem(value - energyRealConsumed, double.NaN).ConfigureAwait(false);
+            //await Settings.Save().ConfigureAwait(false);
         }
     }
 
     private async void OnProducedPowerCalibrated(object _, double value)
     {
-        if (SmartMeter is {EnergyRealProduced: { } energyRealProduced})
+        if (SmartMeter is { EnergyRealProduced: { } energyRealProduced })
         {
-            App.Settings.ProducedEnergyOffsetWattHours = value - energyRealProduced;
-            await Settings.Save().ConfigureAwait(false);
+            await IoC.Get<ISolarSystemService>().AddCalibrationHistoryItem(double.NaN, value - energyRealProduced).ConfigureAwait(false);
+            //await Settings.Save().ConfigureAwait(false);
         }
     }
 }

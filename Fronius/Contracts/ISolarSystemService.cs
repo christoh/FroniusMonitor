@@ -24,6 +24,7 @@ namespace De.Hochstaetter.Fronius.Contracts
         public double? StoragePowerAvg { get; }
         public double? SolarPowerAvg { get; }
         public double? PowerLossAvg { get; }
+        IList<SmartMeterCalibrationHistoryItem> SmartMeterHistory { get; }
 
         event EventHandler<SolarDataEventArgs>? NewDataReceived;
 
@@ -32,5 +33,7 @@ namespace De.Hochstaetter.Fronius.Contracts
         void SuspendPowerConsumers();
         void ResumePowerConsumers();
         void InvalidateFritzBox();
+        Task<IList<SmartMeterCalibrationHistoryItem>> ReadCalibrationHistory();
+        Task<IList<SmartMeterCalibrationHistoryItem>> AddCalibrationHistoryItem(double consumedEnergyOffsetWattHours, double producedEnergyOffsetWattHours);
     }
 }

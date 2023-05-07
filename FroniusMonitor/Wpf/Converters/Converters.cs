@@ -150,29 +150,73 @@ public class NullToBool : NullToAnything<bool>
     public override bool Null { get; set; } = false;
 }
 
-public abstract class PowerCorrector : ConverterBase
-{
-    protected abstract double OffsetWatts { get; }
-
-    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-    {
-        return value is not IConvertible convertible ? null : convertible.ToDouble(culture) + OffsetWatts;
-    }
-}
-
 public class ToUpper : ConverterBase
 {
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value?.ToString()?.ToUpper(CultureInfo.CurrentCulture);
 }
 
-public class GridMeterConsumptionCorrector : PowerCorrector
+public abstract class GridMeterCorrectorBase : ConverterBase
 {
-    protected override double OffsetWatts => App.Settings.ConsumedEnergyOffsetWattHours;
+    private readonly ISolarSystemService solarSystemService = IoC.GetRegistered<ISolarSystemService>();
+    protected SmartMeterCalibrationHistoryItem? First, Last;
+    private double lastOffsetCorrectedValue, factor;
+    private int count;
+    protected abstract EnergyDirection EnergyDirection { get; }
+
+    public double FirstEnergyReal => GetEnergy(First!, EnergyDirection);
+    public double FirstOffset => GetOffset(First!, EnergyDirection);
+    public double LastEnergyReal => GetEnergy(Last!, EnergyDirection);
+    public double LastOffset => GetOffset(Last!, EnergyDirection);
+
+    public override object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not double doubleValue || !double.IsFinite(doubleValue))
+        {
+            return 0;
+        }
+
+        if (count != solarSystemService.SmartMeterHistory.Count)
+        {
+            count = solarSystemService.SmartMeterHistory.Count;
+            First = solarSystemService.SmartMeterHistory.FirstOrDefault(item => double.IsFinite(GetOffset(item, EnergyDirection)));
+            Last = solarSystemService.SmartMeterHistory.LastOrDefault(item => double.IsFinite(GetOffset(item, EnergyDirection)));
+
+            if (First is not null && Last is not null)
+            {
+                lastOffsetCorrectedValue = LastEnergyReal + LastOffset;
+                factor = (lastOffsetCorrectedValue - FirstEnergyReal - FirstOffset) / (LastEnergyReal - FirstEnergyReal);
+                factor = double.IsFinite(factor) ? factor : 1;
+            }
+        }
+
+        return Last is null
+            ? doubleValue
+            : Math.Round(lastOffsetCorrectedValue + (doubleValue + LastOffset - lastOffsetCorrectedValue) * factor, MidpointRounding.AwayFromZero);
+    }
+
+    private double GetEnergy(SmartMeterCalibrationHistoryItem item, EnergyDirection energyDirection) => energyDirection switch
+    {
+        EnergyDirection.Consumption => item.EnergyRealConsumed,
+        EnergyDirection.Production => item.EnergyRealProduced,
+        _ => throw new NotSupportedException($"{nameof(EnergyDirection)} must be either {nameof(EnergyDirection.Consumption)} or {nameof(EnergyDirection.Production)}")
+    };
+
+    private double GetOffset(SmartMeterCalibrationHistoryItem item, EnergyDirection energyDirection) => energyDirection switch
+    {
+        EnergyDirection.Consumption => item.ConsumedOffset,
+        EnergyDirection.Production => item.ProducedOffset,
+        _ => throw new NotSupportedException($"{nameof(EnergyDirection)} must be either {nameof(EnergyDirection.Consumption)} or {nameof(EnergyDirection.Production)}")
+    };
 }
 
-public class GridMeterProductionCorrector : PowerCorrector
+public class GridMeterProductionCorrector : GridMeterCorrectorBase
 {
-    protected override double OffsetWatts => App.Settings.ProducedEnergyOffsetWattHours;
+    protected override EnergyDirection EnergyDirection => EnergyDirection.Production;
+}
+
+public class GridMeterConsumptionCorrector : GridMeterCorrectorBase
+{
+    protected override EnergyDirection EnergyDirection => EnergyDirection.Consumption;
 }
 
 public class SocToColor : ConverterBase

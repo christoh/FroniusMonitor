@@ -53,7 +53,11 @@ public partial class PowerConsumer
 
     private async void OnPowerButtonClick(object sender, RoutedEventArgs e)
     {
-        if (Device is not {IsPresent: true, CanSwitch: true}) return;
+        if (Device is not { IsPresent: true, CanSwitch: true })
+        {
+            return;
+        }
+
         solarSystemService.SuspendPowerConsumers();
 
         try

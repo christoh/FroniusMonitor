@@ -20,6 +20,14 @@ public abstract class SettingsBase : BindableBase, ICloneable
         set => Set(ref froniusUpdateRate, value);
     }
 
+    private string? driftFileName = @"D:\OneDrive\Home\OneDrive\Dokumente\FroniusMonitor\Drifts.xml";
+
+    public string? DriftFileName
+    {
+        get => driftFileName;
+        set => Set(ref driftFileName, value);
+    }
+
     private WebConnection? froniusConnection = new() { BaseUrl = "http://192.168.178.XXX", UserName = string.Empty, Password = string.Empty };
 
     [XmlElement, DefaultValue(null)]
@@ -130,6 +138,7 @@ public abstract class SettingsBase : BindableBase, ICloneable
     }
 
     private Guid azureDeviceId = Guid.NewGuid();
+
     [XmlIgnore]
     public Guid AzureDeviceId
     {
@@ -153,23 +162,23 @@ public abstract class SettingsBase : BindableBase, ICloneable
         set => Set(ref addInverterPowerToConsumption, value);
     }
 
-    private double consumedEnergyOffsetWattHours;
+    //private double consumedEnergyOffsetWattHours;
 
-    [XmlElement]
-    public double ConsumedEnergyOffsetWattHours
-    {
-        get => consumedEnergyOffsetWattHours;
-        set => Set(ref consumedEnergyOffsetWattHours, value);
-    }
+    //[XmlElement]
+    //public double ConsumedEnergyOffsetWattHours
+    //{
+    //    get => consumedEnergyOffsetWattHours;
+    //    set => Set(ref consumedEnergyOffsetWattHours, value);
+    //}
 
-    private double producedEnergyOffsetWattHours;
+    //private double producedEnergyOffsetWattHours;
 
-    [XmlElement]
-    public double ProducedEnergyOffsetWattHours
-    {
-        get => producedEnergyOffsetWattHours;
-        set => Set(ref producedEnergyOffsetWattHours, value);
-    }
+    //[XmlElement]
+    //public double ProducedEnergyOffsetWattHours
+    //{
+    //    get => producedEnergyOffsetWattHours;
+    //    set => Set(ref producedEnergyOffsetWattHours, value);
+    //}
 
     protected static void UpdateChecksum(params WebConnection?[] connections)
     {
