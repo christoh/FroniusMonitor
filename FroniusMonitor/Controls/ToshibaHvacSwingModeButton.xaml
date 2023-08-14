@@ -15,11 +15,11 @@
                 </Style>
             </Canvas.Resources>
             <Border Width="8" Height="8" CornerRadius="0,0,3,0" Background="{Binding Foreground, FallbackValue=Black}"/>
-            <Line X1="3" X2="3" Y1="10" Y2="25"/>
-            <Line X1="6" X2="10" Y1="9.5" Y2="24"/>
-            <Line X1="9" X2="18" Y1="8" Y2="21"/>
-            <Line X1="11" X2="24" Y1="5" Y2="13"/>
-            <Line X1="11" X2="25" Y1="2" Y2="2"/>
+            <Line X1="3" X2="3" Y1="10" Y2="25" Stroke="{Binding SwingMode, Converter={co:ToshibaHvacSwingMode2Brush Value=Fixed5, Equal=Black, NotEqual=DarkGray}}"/>
+            <Line X1="6" X2="10" Y1="9.5" Y2="24" Stroke="{Binding SwingMode, Converter={co:ToshibaHvacSwingMode2Brush Value=Fixed4, Equal=Black, NotEqual=DarkGray}}"/>
+            <Line X1="9" X2="18" Y1="8" Y2="21" Stroke="{Binding SwingMode, Converter={co:ToshibaHvacSwingMode2Brush Value=Fixed3, Equal=Black, NotEqual=DarkGray}}"/>
+            <Line X1="11" X2="24" Y1="5" Y2="13" Stroke="{Binding SwingMode, Converter={co:ToshibaHvacSwingMode2Brush Value=Fixed2, Equal=Black, NotEqual=DarkGray}}"/>
+            <Line X1="11" X2="25" Y1="2" Y2="2" Stroke="{Binding SwingMode, Converter={co:ToshibaHvacSwingMode2Brush Value=Fixed1, Equal=Black, NotEqual=DarkGray}}"/>
 
             <Ellipse Visibility="{Binding SwingMode, Converter={co:ToshibaHvacSwingMode2Visibility Value=Off, Equal=Visible, NotEqual=Collapsed}}"
                      Canvas.Bottom="0" Canvas.Right="0" Width="18" Height="18" Fill="Transparent" Stroke="Red" StrokeThickness="2"/>

@@ -246,8 +246,27 @@
                         <c:HvacWifiLedButton Style="{StaticResource HoverButton}" Grid.Column="0" LedStatus="{Binding Device.State.WifiLedStatus}" 
                                              Click="OnWifiLedStatusClicked"/>
 
-                        <c:ToshibaHvacSwingModeButton Grid.Column="1" Style="{StaticResource HoverButton}" SwingMode="{Binding Device.State.SwingMode}"
-                                                      Click="OnSwingModeClicked"/>
+                        <c:ToshibaHvacSwingModeButton Grid.Column="1" Style="{StaticResource HoverButton}" x:Name="HvacSwingModeButton"
+                                                      SwingMode="{Binding Device.State.SwingMode}" Click="OnSwingModeClicked">
+                            <c:ToshibaHvacSwingModeButton.ContextMenu>
+                                <ContextMenu>
+                                    <ContextMenu.Resources>
+                                        <Style TargetType="MenuItem">
+                                            <EventSetter Event="Click" Handler="OnSwingModeContextMenuItemClicked" />
+                                            <EventSetter Event="Loaded" Handler="OnSwingModeContextMenuItemLoaded"/>
+                                        </Style>
+
+                                        <Style TargetType="c:ToshibaHvacSwingModeButton">
+                                            <Setter Property="MaxHeight" Value="25" />
+                                            <Setter Property="Margin" Value="0,4" />
+                                            <Setter Property="IsEnabled" Value="False" />
+                                            <Setter Property="Background" Value="Transparent" />
+                                            <Setter Property="Template" Value="{StaticResource TransparentNoDisabledOpacity}" />
+                                        </Style>
+                                    </ContextMenu.Resources>
+                                </ContextMenu>
+                            </c:ToshibaHvacSwingModeButton.ContextMenu>
+                        </c:ToshibaHvacSwingModeButton>
                     </Grid>
 
                 </Grid>
