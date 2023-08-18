@@ -16,6 +16,7 @@
                 <MultiBinding Converter="{co:PowerStatus2Brush}">
                     <Binding Path="SolarSystemService.HvacService.IsConnected" />
                     <Binding Path="Device.State.IsTurnedOn" />
+                    <Binding Path="Device.State.IsSelfCleaning" />
                 </MultiBinding>
             </Border.Background>
             <Grid Margin="2">

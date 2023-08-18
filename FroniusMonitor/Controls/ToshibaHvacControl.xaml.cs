@@ -50,7 +50,7 @@ public partial class ToshibaHvacControl
     public static readonly DependencyProperty DeviceProperty = DependencyProperty.Register
     (
         nameof(Device), typeof(ToshibaHvacMappingDevice), typeof(ToshibaHvacControl),
-        new PropertyMetadata((d, _) => ((ToshibaHvacControl)d).OnDeviceChanged())
+        new PropertyMetadata((d, e) => ((ToshibaHvacControl)d).OnDeviceChanged(e))
     );
 
     public ToshibaHvacMappingDevice Device
@@ -88,7 +88,7 @@ public partial class ToshibaHvacControl
 
     public ISolarSystemService SolarSystemService { get; } = null!;
 
-    private void OnDeviceChanged()
+    private void OnDeviceChanged(DependencyPropertyChangedEventArgs e)
     {
         if (meritFeatureADictionary.TryGetValue((byte)(Device.MeritFeature >> 8), out var featureList))
         {
@@ -135,12 +135,7 @@ public partial class ToshibaHvacControl
         }
 
         SolarSystemService.HvacService.LiveDataReceived -= OnAnswerReceived;
-
-        Dispatcher.Invoke(() =>
-        {
-            PowerButton.IsChecked = Device.State.IsTurnedOn;
-            IsEnabled = true;
-        });
+        Dispatcher.BeginInvoke(() => IsEnabled = true);
     }
 
     private async void SendCommand(ToshibaHvacStateData stateData)

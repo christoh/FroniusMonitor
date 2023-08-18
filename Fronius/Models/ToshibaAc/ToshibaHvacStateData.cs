@@ -13,6 +13,7 @@ public class ToshibaHvacStateData : BindableBase
         { 6, nameof(MeritFeaturesA) },
         { 8, nameof(CurrentIndoorTemperatureCelsius) },
         { 9, nameof(CurrentOutdoorTemperatureCelsius) },
+        { 14, nameof(IsSelfCleaning)},
         { 15, nameof(WifiLedStatus) },
     };
 
@@ -34,6 +35,12 @@ public class ToshibaHvacStateData : BindableBase
     {
         get => StateData[0] == 0x30;
         set => SetStateData(0, value ? (byte)0x30 : (byte)0x31);
+    }
+
+    public bool IsSelfCleaning
+    {
+        get => StateData[14] == 0x18;
+        set => SetStateData(14, value ? (byte)0x18 : (byte)0x10);
     }
 
     public ToshibaHvacOperatingMode Mode
@@ -94,7 +101,7 @@ public class ToshibaHvacStateData : BindableBase
 
     internal void UpdateStateData(ToshibaHvacStateData update)
     {
-        for (byte i = 0; i < new[] { update.StateData.Count, StateData.Count, 255 }.Min(); i++)
+        for (byte i = 0; i < new[] { update.StateData.Count, StateData.Count, 19 }.Min(); i++)
         {
             if (update.StateData[i] == 255)
             {

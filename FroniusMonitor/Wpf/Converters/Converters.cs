@@ -738,12 +738,12 @@ public class PowerStatus2Brush : MultiConverterBase
 {
     public override object? Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (values.OfType<bool>().ToList() is not { Count: 2 } list)
+        if (values.OfType<bool>().ToList() is not { Count: 3 } list)
         {
             return null;
         }
 
-        return !list[0] ? Brushes.OrangeRed : list[1] ? Brushes.AntiqueWhite : Brushes.LightGray;
+        return !list[0] ? Brushes.OrangeRed : list[2] ? Brushes.Azure : list[1] ? Brushes.AntiqueWhite : Brushes.LightGray;
     }
 }
 
