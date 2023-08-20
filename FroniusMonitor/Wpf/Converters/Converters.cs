@@ -829,3 +829,21 @@ public class ToshibaHvacSilent2Visibility : ConverterBase
         return value is ToshibaHvacMeritFeaturesA.Silent1 or ToshibaHvacMeritFeaturesA.Silent2 ? Visibility.Visible : Visibility.Collapsed;
     }
 }
+
+public class ToshibaMeritFeatureTemperature : MultiConverterBase
+{
+    public override object? Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (values.Length < 1)
+        {
+            return null;
+        }
+
+        if (values.Length < 2 || values[0] is not sbyte temperature || values[1] is not ToshibaHvacMeritFeaturesA meritFeaturesA || meritFeaturesA != ToshibaHvacMeritFeaturesA.Heating8C)
+        {
+            return values[0];
+        }
+
+        return (sbyte)(temperature - 16);
+    }
+}

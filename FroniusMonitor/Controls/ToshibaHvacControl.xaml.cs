@@ -14,34 +14,8 @@ public partial class ToshibaHvacControl
     private static readonly IList<byte> powerLimits = new[] { (byte)50, (byte)75, (byte)100, };
 #pragma warning restore IDE0230
 
-    private static readonly IReadOnlyDictionary<byte, IList<ToshibaHvacMeritFeaturesA>> meritFeatureADictionary = new Dictionary<byte, IList<ToshibaHvacMeritFeaturesA>>
-    {
-        { 0x2c, new[] { ToshibaHvacMeritFeaturesA.Silent2, ToshibaHvacMeritFeaturesA.Silent1, ToshibaHvacMeritFeaturesA.Eco, ToshibaHvacMeritFeaturesA.None, ToshibaHvacMeritFeaturesA.HighPower, } },
-        { 0x3c, new[] { ToshibaHvacMeritFeaturesA.Silent2, ToshibaHvacMeritFeaturesA.Silent1, ToshibaHvacMeritFeaturesA.Eco, ToshibaHvacMeritFeaturesA.None, ToshibaHvacMeritFeaturesA.HighPower, } },
-    };
-
-    private static readonly IReadOnlyDictionary<byte, IList<ToshibaHvacSwingMode>> swingModeDictionary = new Dictionary<byte, IList<ToshibaHvacSwingMode>>
-    {
-        {
-            0x2c, new[]
-            {
-                ToshibaHvacSwingMode.Off,
-                ToshibaHvacSwingMode.Vertical,
-                ToshibaHvacSwingMode.Fixed1,
-                ToshibaHvacSwingMode.Fixed2,
-                ToshibaHvacSwingMode.Fixed3,
-                ToshibaHvacSwingMode.Fixed4,
-                ToshibaHvacSwingMode.Fixed5,
-            }
-        },
-        {
-            0x3c, new[]
-            {
-                ToshibaHvacSwingMode.Off,
-                ToshibaHvacSwingMode.Vertical,
-            }
-        },
-    };
+    private IList<ToshibaHvacMeritFeaturesA> meritFeaturesA = null!;
+    private IList<ToshibaHvacSwingMode> swingModes = null!;
 
     private CancellationTokenSource? enablerTokenSource;
     private readonly object tokenLock = new();
@@ -50,7 +24,7 @@ public partial class ToshibaHvacControl
     public static readonly DependencyProperty DeviceProperty = DependencyProperty.Register
     (
         nameof(Device), typeof(ToshibaHvacMappingDevice), typeof(ToshibaHvacControl),
-        new PropertyMetadata((d, e) => ((ToshibaHvacControl)d).OnDeviceChanged(e))
+        new PropertyMetadata((d, _) => ((ToshibaHvacControl)d).OnDeviceChanged())
     );
 
     public ToshibaHvacMappingDevice Device
@@ -88,17 +62,12 @@ public partial class ToshibaHvacControl
 
     public ISolarSystemService SolarSystemService { get; } = null!;
 
-    private void OnDeviceChanged(DependencyPropertyChangedEventArgs e)
+    private void OnDeviceChanged()
     {
-        if (meritFeatureADictionary.TryGetValue((byte)(Device.MeritFeature >> 8), out var featureList))
-        {
-            CreateContextMenuForButtonSelection(HvacMeritFeatureAButton, featureList, nameof(HvacMeritFeatureAButton.MeritFeaturesA));
-        }
-
-        if (swingModeDictionary.TryGetValue((byte)(Device.MeritFeature >> 8), out var swingModes))
-        {
-            CreateContextMenuForButtonSelection(HvacSwingModeButton, swingModes, nameof(HvacSwingModeButton.SwingMode));
-        }
+        meritFeaturesA = GetMeritAFeatures();
+        swingModes = GetSwingModes();
+        CreateContextMenuForButtonSelection(HvacMeritFeatureAButton, meritFeaturesA, nameof(HvacMeritFeatureAButton.MeritFeaturesA));
+        CreateContextMenuForButtonSelection(HvacSwingModeButton, swingModes, nameof(HvacSwingModeButton.SwingMode));
     }
 
     private static void CreateContextMenuForButtonSelection<TElement, TData>(TElement element, IList<TData> list, string propertyName)
@@ -187,7 +156,7 @@ public partial class ToshibaHvacControl
 
     private void OnFanSpeedClicked(object sender, RoutedEventArgs e) => OnIndexedValueClicked(fanSpeeds, nameof(ToshibaHvacStateData.FanSpeed));
 
-    private void OnMeritFeaturesAClicked(object sender, RoutedEventArgs e) => OnFeatureDependentIndexedValueClicked(meritFeatureADictionary, nameof(ToshibaHvacStateData.MeritFeaturesA));
+    private void OnMeritFeaturesAClicked(object sender, RoutedEventArgs e) => OnIndexedValueClicked(meritFeaturesA, nameof(ToshibaHvacStateData.MeritFeaturesA));
 
     private void OnFanSpeedContextMenuItemClicked(object sender, RoutedEventArgs e)
     {
@@ -225,7 +194,7 @@ public partial class ToshibaHvacControl
         SendCommand(new ToshibaHvacStateData { WifiLedStatus = newStatus });
     }
 
-    private void OnSwingModeClicked(object sender, RoutedEventArgs e) => OnFeatureDependentIndexedValueClicked(swingModeDictionary, nameof(ToshibaHvacStateData.SwingMode));
+    private void OnSwingModeClicked(object sender, RoutedEventArgs e) => OnIndexedValueClicked(swingModes, nameof(ToshibaHvacStateData.SwingMode));
 
     private void OnSwingModeContextMenuItemClicked(object sender, RoutedEventArgs e)
     {
@@ -251,6 +220,57 @@ public partial class ToshibaHvacControl
         SendCommand(newState);
     }
 
+    private IList<ToshibaHvacMeritFeaturesA> GetMeritAFeatures()
+    {
+        var result = new List<ToshibaHvacMeritFeaturesA>(10) { ToshibaHvacMeritFeaturesA.None, /* ToshibaHvacMeritFeaturesA.SleepCare, ToshibaHvacMeritFeaturesA.Comfort */ };
+
+        if (Device.AcModelId is 2 or 3)
+        {
+            result.AddRange(new[] { ToshibaHvacMeritFeaturesA.Eco, ToshibaHvacMeritFeaturesA.HighPower });
+
+            if ((Device.MeritFeature & 0x2000) != 0)
+            {
+                result.AddRange(new[] { ToshibaHvacMeritFeaturesA.Silent2, ToshibaHvacMeritFeaturesA.Silent1 });
+            }
+
+            if ((Device.MeritFeature & 0x0400) != 0)
+            {
+                result.Add(ToshibaHvacMeritFeaturesA.Heating8C);
+            }
+
+            if ((Device.MeritFeature & 0x8000) != 0)
+            {
+                result.Add(ToshibaHvacMeritFeaturesA.Floor);
+            }
+        }
+
+        return result;
+    }
+
+    private IList<ToshibaHvacSwingMode> GetSwingModes()
+    {
+        var result = new List<ToshibaHvacSwingMode>(10) { ToshibaHvacSwingMode.Off, ToshibaHvacSwingMode.Vertical, };
+
+        if ((Device.MeritFeature & 0x4000) != 0)
+        {
+            result.AddRange(new[] { ToshibaHvacSwingMode.Horizontal, ToshibaHvacSwingMode.Both });
+        }
+
+        if (Device.AcModelId == 3 && (Device.MeritFeature & 0x2) != 0)
+        {
+            result.AddRange(new[]
+            {
+                ToshibaHvacSwingMode.Fixed1,
+                ToshibaHvacSwingMode.Fixed2,
+                ToshibaHvacSwingMode.Fixed3,
+                ToshibaHvacSwingMode.Fixed4,
+                ToshibaHvacSwingMode.Fixed5,
+            });
+        }
+
+        return result;
+    }
+
     private void OnButtonContextMenuItemLoaded(object sender, string devicePropertyName, string buttonPropertyName = "")
     {
         var value = typeof(ToshibaHvacStateData).GetProperty(devicePropertyName)!.GetValue(Device.State);
@@ -261,16 +281,6 @@ public partial class ToshibaHvacControl
             MenuItem { Tag: { } tagValue } => tagValue.Equals(value),
             _ => false,
         };
-    }
-
-    private void OnFeatureDependentIndexedValueClicked<T>(IReadOnlyDictionary<byte, IList<T>> dictionary, string propertyName) where T : struct
-    {
-        var key = (byte)(Device.MeritFeature >> 8);
-
-        if (dictionary.TryGetValue(key, out var list))
-        {
-            OnIndexedValueClicked(list, propertyName);
-        }
     }
 
     private void OnIndexedValueClicked<T>(IList<T> list, string propertyName) where T : struct

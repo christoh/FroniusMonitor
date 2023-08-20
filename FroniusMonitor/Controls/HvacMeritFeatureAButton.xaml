@@ -23,6 +23,7 @@
                     </Style>
                 </Grid.Resources>
 
+                <TextBlock Text="8°C" Visibility="{Binding MeritFeaturesA, Converter={co:MeritFeatureA2Visibility Value=Heating8C}, FallbackValue=Collapsed}"/>
                 <TextBlock Text="ECO" Visibility="{Binding MeritFeaturesA, Converter={co:MeritFeatureA2Visibility Value=Eco}, FallbackValue=Collapsed}" />
                 <TextBlock Text="Normal" Visibility="{Binding MeritFeaturesA, Converter={co:MeritFeatureA2Visibility Value=None}, FallbackValue=Collapsed}">
                     <TextBlock.LayoutTransform>
