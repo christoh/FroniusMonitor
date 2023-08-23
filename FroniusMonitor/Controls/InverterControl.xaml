@@ -35,10 +35,10 @@
                     </Style>
                 </Grid.Resources>
                 <Viewbox Grid.Row="0">
-                    <TextBlock FontSize="8" TextAlignment="Center" Text="{Binding Inverter.CustomName, FallbackValue=---}"/>
+                    <TextBlock FontSize="8" TextAlignment="Center" x:Name="InverterName" Text="---"/>
                 </Viewbox>
                 <Viewbox Grid.Row="1">
-                    <TextBlock FontSize="8" x:Name="InverterName" TextAlignment="Center"/>
+                    <TextBlock FontSize="8" x:Name="InverterModelName" Text="---" TextAlignment="Center"/>
                 </Viewbox>
 
                 <!-- ReSharper disable once Xaml.MissingGridIndex -->

@@ -17,6 +17,18 @@ public partial class MainWindow
         set => SetValue(PowerFlowProperty, value);
     }
 
+    public static readonly DependencyProperty PowerFlow2Property = DependencyProperty.Register
+    (
+        nameof(PowerFlow2), typeof(Gen24PowerFlow), typeof(MainWindow),
+        new PropertyMetadata((d, _) => ((MainWindow)d).OnPowerFlowChanged())
+    );
+
+    public Gen24PowerFlow? PowerFlow2
+    {
+        get => (Gen24PowerFlow?)GetValue(PowerFlow2Property);
+        set => SetValue(PowerFlow2Property, value);
+    }
+
     public MainWindow(MainViewModel vm)
     {
         Initialized += (_, _) =>
@@ -37,6 +49,8 @@ public partial class MainWindow
             ViewModel.Dispatcher = Dispatcher;
             var binding = new Binding($"{nameof(ViewModel.SolarSystemService)}.{nameof(ViewModel.SolarSystemService.SolarSystem)}.{nameof(ViewModel.SolarSystemService.SolarSystem.Gen24System)}.{nameof(ViewModel.SolarSystemService.SolarSystem.Gen24System.PowerFlow)}");
             SetBinding(PowerFlowProperty, binding);
+            binding = new Binding($"{nameof(ViewModel.SolarSystemService)}.{nameof(ViewModel.SolarSystemService.SolarSystem)}.{nameof(ViewModel.SolarSystemService.SolarSystem.Gen24System2)}.{nameof(ViewModel.SolarSystemService.SolarSystem.Gen24System2.PowerFlow)}");
+            SetBinding(PowerFlow2Property, binding);
             ViewModel.View = this;
             _ = ViewModel.OnInitialize();
         };
@@ -182,12 +196,20 @@ public partial class MainWindow
 
     private void OnPowerFlowChanged()
     {
-        if (PowerFlow is null)
+        if (PowerFlow is null && PowerFlow2 is null)
         {
             return;
         }
 
-        LoadArrow.Power = PowerFlow.LoadPower - (ViewModel.IncludeInverterPower ? ViewModel.SolarSystemService.PowerLossAvg : 0);
+        var powerFlow = new Gen24PowerFlow
+        {
+            LoadPower = (PowerFlow?.LoadPower ?? -PowerFlow?.InverterAcPower ?? 0) + (PowerFlow2?.LoadPower ?? -PowerFlow2?.InverterAcPower ?? 0),
+            GridPower = (PowerFlow?.GridPower ?? 0) + (PowerFlow2?.GridPower ?? 0),
+            StoragePower = (PowerFlow?.StoragePower ?? 0) + (PowerFlow2?.StoragePower ?? 0),
+            SolarPower = (PowerFlow?.SolarPower ?? 0) + (PowerFlow2?.SolarPower ?? 0)
+        };
+
+        LoadArrow.Power = powerFlow.LoadPower - (ViewModel.IncludeInverterPower ? powerFlow.LoadPower + powerFlow.SolarPower + powerFlow.GridPower + powerFlow.StoragePower : 0);
 
         if (LoadArrow.Power > 0)
         {
@@ -195,28 +217,28 @@ public partial class MainWindow
             return;
         }
 
-        var totalIncomingPower = new[] { PowerFlow.SolarPower, PowerFlow.StoragePower, PowerFlow.GridPower }.Where(ps => ps is > 0).Select(ps => ps!.Value).Sum();
+        var totalIncomingPower = new[] { powerFlow.SolarPower, powerFlow.StoragePower, powerFlow.GridPower }.Where(ps => ps is > 0).Select(ps => ps!.Value).Sum();
 
         double r = 0, g = 0, b = 0;
 
-        if (PowerFlow.SolarPower > 0)
+        if (powerFlow.SolarPower > 0)
         {
-            r = 0xff * PowerFlow.SolarPower.Value;
-            g = 0xd0 * PowerFlow.SolarPower.Value;
+            r = 0xff * powerFlow.SolarPower.Value;
+            g = 0xd0 * powerFlow.SolarPower.Value;
         }
 
-        if (PowerFlow.StoragePower > 0)
+        if (powerFlow.StoragePower > 0)
         {
-            r += Colors.LightGreen.R * PowerFlow.StoragePower.Value;
-            g += Colors.LightGreen.G * PowerFlow.StoragePower.Value;
-            b += Colors.LightGreen.B * PowerFlow.StoragePower.Value;
+            r += Colors.LightGreen.R * powerFlow.StoragePower.Value;
+            g += Colors.LightGreen.G * powerFlow.StoragePower.Value;
+            b += Colors.LightGreen.B * powerFlow.StoragePower.Value;
         }
 
-        if (PowerFlow.GridPower > 0)
+        if (powerFlow.GridPower > 0)
         {
-            r += Colors.LightGray.R * PowerFlow.GridPower.Value;
-            g += Colors.LightGray.G * PowerFlow.GridPower.Value;
-            b += Colors.LightGray.B * PowerFlow.GridPower.Value;
+            r += Colors.LightGray.R * powerFlow.GridPower.Value;
+            g += Colors.LightGray.G * powerFlow.GridPower.Value;
+            b += Colors.LightGray.B * powerFlow.GridPower.Value;
         }
 
         r /= totalIncomingPower;
@@ -224,6 +246,7 @@ public partial class MainWindow
         b /= totalIncomingPower;
 
         LoadArrow.Fill = new SolidColorBrush(Color.FromRgb(Round(r), Round(g), Round(b)));
+        return;
 
         static byte Round(double value) => (byte)Math.Round(value, MidpointRounding.AwayFromZero);
     }

@@ -47,15 +47,15 @@ public partial class InverterControl : IHaveLcdPanel
         set => SetValue(ModeProperty, value);
     }
 
-    public static readonly DependencyProperty InverterProperty = DependencyProperty.Register
+    public static readonly DependencyProperty IsSecondaryProperty = DependencyProperty.Register
     (
-        nameof(Inverter), typeof(Inverter), typeof(InverterControl)
+        nameof(IsSecondary), typeof(bool), typeof(InverterControl)
     );
 
-    public Inverter? Inverter
+    public bool IsSecondary
     {
-        get => (Inverter?)GetValue(InverterProperty);
-        set => SetValue(InverterProperty, value);
+        get => (bool)GetValue(IsSecondaryProperty);
+        set => SetValue(IsSecondaryProperty, value);
     }
 
     public static readonly DependencyProperty VersionsProperty = DependencyProperty.Register
@@ -96,21 +96,24 @@ public partial class InverterControl : IHaveLcdPanel
 
     private void NewDataReceived(object? sender, SolarDataEventArgs e)
     {
-        var gen24 = e.SolarSystem?.Gen24System;
-        var cache = gen24?.Cache;
-        var inverter = gen24?.Inverter;
-        var dataManager = gen24?.DataManager;
-        var powerFlow = gen24?.PowerFlow;
-
-        if (cache == null && inverter == null && dataManager == null)
-        {
-            return;
-        }
 
         Dispatcher.InvokeAsync(() =>
         {
-            BackgroundProvider.Background = e.SolarSystem?.Gen24System?.InverterStatus?.ToBrush() ?? Brushes.LightGray;
-            InverterName.Text = $"{Inverter?.Model} ({gen24?.InverterStatus?.StatusMessage})";
+            var gen24 = IsSecondary ? e.SolarSystem?.Gen24System2 : e.SolarSystem?.Gen24System;
+            var cache = gen24?.Cache;
+            var inverter = gen24?.Inverter;
+            var dataManager = gen24?.DataManager;
+            var powerFlow = gen24?.PowerFlow;
+            var gen24Common = IsSecondary ? e.SolarSystem?.Gen24Common2 : e.SolarSystem?.Gen24Common;
+
+            if (cache == null && inverter == null && dataManager == null)
+            {
+                return;
+            }
+
+            BackgroundProvider.Background = gen24?.InverterStatus?.ToBrush() ?? Brushes.LightGray;
+            InverterModelName.Text = $"{gen24?.Inverter?.Model ?? "---"} ({gen24?.InverterStatus?.StatusMessage ?? Loc.Unknown})";
+            InverterName.Text = gen24Common?.DisplayName ?? "---";
             VersionList.Visibility = Visibility.Collapsed;
             Lcd.Visibility = Visibility.Visible;
 
@@ -245,7 +248,7 @@ public partial class InverterControl : IHaveLcdPanel
                         cache?.Solar1Current ?? inverter?.Solar1Current,
                         cache?.Solar2Current ?? inverter?.Solar2Current,
                         null,
-                        cache?.StorageCurrent ?? inverter?.StorageCurrent ?? e.SolarSystem?.Gen24System?.Storage?.Current,
+                        cache?.StorageCurrent ?? inverter?.StorageCurrent ?? gen24?.Storage?.Current,
                         "N3", "A", string.Empty
                     );
 

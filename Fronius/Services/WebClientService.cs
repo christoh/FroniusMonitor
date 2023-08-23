@@ -85,7 +85,6 @@ public class WebClientService : BindableBase, IWebClientService
         //}
         //catch (Exception ex)
         //{
-        //    //
         //}
 
         var (token, _) = await GetFroniusJsonResponse("status/devices").ConfigureAwait(false);
@@ -108,14 +107,22 @@ public class WebClientService : BindableBase, IWebClientService
 
         var (_, dataToken) = await GetJsonResponse<BaseResponse>("components/readable", true).ConfigureAwait(false);
         gen24System.Inverter = gen24JsonService.ReadFroniusData<Gen24Inverter>(dataToken[components.Groups["Inverter"].FirstOrDefault() ?? "1"]);
-        gen24System.Storage = gen24JsonService.ReadFroniusData<Gen24Storage>(dataToken[components.Groups["BatteryManagementSystem"].FirstOrDefault() ?? "16580608"]);
+
+        if (components.Groups.TryGetValue("BatteryManagementSystem", out var storages))
+        {
+            gen24System.Storage = gen24JsonService.ReadFroniusData<Gen24Storage>(dataToken[storages.FirstOrDefault() ?? "16580608"]);
+        }
+
         var restrictions = components.Groups["Application"].Select(key => dataToken[key]).FirstOrDefault(t => t?["attributes"]?["PowerRestrictionControllerVersion"] != null);
         gen24System.Restrictions = gen24JsonService.ReadFroniusData<Gen24Restrictions>(restrictions);
 
-        foreach (var meter in components.Groups["PowerMeter"].Select(key => dataToken[key]))
+        if (components.Groups.TryGetValue("PowerMeter", out var powerMeters))
         {
-            var gen24PowerMeter = gen24JsonService.ReadFroniusData<Gen24PowerMeter3P>(meter);
-            gen24System.Meters.Add(gen24PowerMeter);
+            foreach (var meter in powerMeters.Select(key => dataToken[key]))
+            {
+                var gen24PowerMeter = gen24JsonService.ReadFroniusData<Gen24PowerMeter3P>(meter);
+                gen24System.Meters.Add(gen24PowerMeter);
+            }
         }
 
         gen24System.DataManager = gen24JsonService.ReadFroniusData<Gen24DataManager>(dataToken[components.Groups["DataManager"].Single()]);

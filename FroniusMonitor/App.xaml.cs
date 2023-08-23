@@ -53,7 +53,7 @@ public partial class App
         }
 
         var injector = ServiceCollection
-                .AddSingleton<IWebClientService, WebClientService>()
+                .AddScoped<IWebClientService, WebClientService>()
                 .AddSingleton(SynchronizationContext.Current!)
                 .AddSingleton<ISolarSystemService, SolarSystemService>()
                 .AddSingleton<MainWindow>()
