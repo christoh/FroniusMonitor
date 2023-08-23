@@ -1,5 +1,24 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Gen24;
 
+/*
+ * mandatory field
+ * Mode: Contains:
+ * "produce-only",                      inverter only
+ * "meter", "vague-meter",              inverter and meter
+ * "bidirectional" or "ac-coupled"      inverter , meter and battery
+ */
+
+public enum SiteType : sbyte
+{
+    [EnumParse(ParseAs = "produce-only")] ProduceOnly,
+    [EnumParse(ParseAs = "meter")] Meter,
+    [EnumParse(ParseAs = "vague-meter")] VagueMeter,
+    [EnumParse(ParseAs = "bidirectional")] BiDirectional,
+    [EnumParse(ParseAs = "ac-coupled")] AcCoupled,
+    [EnumParse(IsDefault = true)] Unknown,
+}
+
+
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public class Gen24PowerFlow : Gen24DeviceBase
 {
@@ -12,13 +31,15 @@ public class Gen24PowerFlow : Gen24DeviceBase
         set => Set(ref siteType, value);
     }
 
-    private string? backupMode;
+    public string? SiteTypeDisplayName => SiteType?.ToDisplayName();
+
+    private string? backupModeDisplayName;
 
     [FroniusProprietaryImport("BackupMode", FroniusDataType.Attribute)]
-    public string? BackupMode
+    public string? BackupModeDisplayName
     {
-        get => backupMode;
-        set => Set(ref backupMode, value);
+        get => backupModeDisplayName;
+        set => Set(ref backupModeDisplayName, value);
     }
 
     private double? inverterLifeTimeEnergyProduced;
@@ -100,4 +121,25 @@ public class Gen24PowerFlow : Gen24DeviceBase
         get => mainInverterId;
         set => Set(ref mainInverterId, value);
     }
+
+    public IEnumerable<double> AllPowers => new[] { StoragePower, GridPower, SolarPower, LoadPower ?? -InverterAcPower }.Where(ps => ps.HasValue).Select(ps => ps!.Value);
+    public double DcPower => (StoragePower ?? 0) + (SolarPower ?? 0);
+    public double AcPower => (LoadPower ?? -InverterAcPower ?? 0) + (GridPower ?? 0);
+    public double PowerLoss => DcPower + AcPower;
+    public double? Input => AllPowers.Any() ? AllPowers.Where(ps => ps > 0).Sum() : null;
+    public double? Output => AllPowers.Any() ? AllPowers.Where(ps => ps < 0).Sum() : null;
+    public double? Efficiency => 1 - PowerLoss / Input;
+
+
+    private void NotifyPowers()
+    {
+        NotifyOfPropertyChange(nameof(AllPowers));
+        NotifyOfPropertyChange(nameof(DcPower));
+        NotifyOfPropertyChange(nameof(PowerLoss));
+        NotifyOfPropertyChange(nameof(PowerLoss));
+        NotifyOfPropertyChange(nameof(Input));
+        NotifyOfPropertyChange(nameof(Output));
+        NotifyOfPropertyChange(nameof(Efficiency));
+    }
+
 }

@@ -2,34 +2,8 @@
 
 namespace De.Hochstaetter.Fronius.Models;
 
-public class SolarSystem : BindableBase, IHierarchicalCollection
+public class SolarSystem : BindableBase
 {
-    public SolarSystem()
-    {
-        DeviceGroups.CollectionChanged += (s, e) =>
-        {
-            NotifyOfPropertyChange(nameof(Storages));
-            NotifyOfPropertyChange(nameof(Inverters));
-            NotifyOfPropertyChange(nameof(Meters));
-            NotifyOfPropertyChange(nameof(PrimaryInverter));
-            NotifyOfPropertyChange(nameof(PrimaryMeter));
-        };
-    }
-
-    public string DisplayName => Resources.MySolarSystem;
-
-    public ObservableCollection<DeviceGroup> DeviceGroups { get; } = new();
-
-    public IEnumerable<Storage> Storages => DeviceGroups.SingleOrDefault(g => g.DeviceClass == DeviceClass.Storage)?.Devices.OfType<Storage>() ?? Array.Empty<Storage>();
-
-    public IEnumerable<Inverter> Inverters => DeviceGroups.SingleOrDefault(g => g.DeviceClass == DeviceClass.Inverter)?.Devices.OfType<Inverter>() ?? Array.Empty<Inverter>();
-
-    public IEnumerable<SmartMeter> Meters => DeviceGroups.SingleOrDefault(g => g.DeviceClass == DeviceClass.Meter)?.Devices.OfType<SmartMeter>() ?? Array.Empty<SmartMeter>();
-
-    public SmartMeter? PrimaryMeter => Meters.FirstOrDefault(m => m.Usage == MeterUsage.Inverter);
-
-    public Inverter? PrimaryInverter => Inverters.FirstOrDefault();
-
     private Gen24System? gen24System;
 
     public Gen24System? Gen24System
@@ -102,12 +76,20 @@ public class SolarSystem : BindableBase, IHierarchicalCollection
         set => Set(ref fritzBox, value);
     }
 
-    private PowerFlow? powerFlow;
+    //private PowerFlow? powerFlow;
 
-    public PowerFlow? PowerFlow
+    //public PowerFlow? PowerFlow
+    //{
+    //    get => powerFlow;
+    //    set => Set(ref powerFlow, value);
+    //}
+
+    private Gen24PowerFlow? sitePowerFlow;
+
+    public Gen24PowerFlow? SitePowerFlow
     {
-        get => powerFlow;
-        set => Set(ref powerFlow, value);
+        get => sitePowerFlow;
+        set => Set(ref sitePowerFlow, value);
     }
 
     private WattPilot? wattPilot;
@@ -117,11 +99,5 @@ public class SolarSystem : BindableBase, IHierarchicalCollection
         get => wattPilot;
         set => Set(ref wattPilot, value);
     }
-
-    IEnumerable IHierarchicalCollection.ItemsEnumerable { get; } = Array.Empty<object>();
-
-    IEnumerable IHierarchicalCollection.ChildrenEnumerable => DeviceGroups;
-
-    public override string ToString() => DisplayName;
 }
 

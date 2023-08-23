@@ -1116,4 +1116,22 @@
   <data name="SelectDriftsFile" xml:space="preserve">
 	  <value>Wähle den Ort und den Namen der Drifts-Datei</value>
   </data>
+  <data name="OpTime" xml:space="preserve">
+	  <value>Betriebszeiten</value>
+  </data>
+  <data name="SiteType_ProduceOnly" xml:space="preserve">
+	  <value>Weder Batterie noch Smartmeter</value>
+  </data>
+  <data name="SiteType_Meter" xml:space="preserve">
+	  <value>Smartmeter am Netz</value>
+  </data>
+  <data name="SiteType_VagueMeter" xml:space="preserve">
+	  <value>Smartmeter an Last</value>
+  </data>
+  <data name="SiteType_BiDirectional" xml:space="preserve">
+	  <value>Mit DC-Batterie</value>
+  </data>
+  <data name="SiteType_AcCoupled" xml:space="preserve">
+	  <value>Mit AC-Batterie</value>
+  </data>
 </root>

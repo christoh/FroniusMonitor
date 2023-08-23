@@ -2005,6 +2005,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Op times.
+        /// </summary>
+        public static string OpTime {
+            get {
+                return ResourceManager.GetString("OpTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Options.
         /// </summary>
         public static string Options {
@@ -2523,6 +2532,51 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string SimulateUnplugging {
             get {
                 return ResourceManager.GetString("SimulateUnplugging", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to With AC battery.
+        /// </summary>
+        public static string SiteType_AcCoupled {
+            get {
+                return ResourceManager.GetString("SiteType_AcCoupled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to With DC battery.
+        /// </summary>
+        public static string SiteType_BiDirectional {
+            get {
+                return ResourceManager.GetString("SiteType_BiDirectional", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Meter at grid.
+        /// </summary>
+        public static string SiteType_Meter {
+            get {
+                return ResourceManager.GetString("SiteType_Meter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No battery or meter.
+        /// </summary>
+        public static string SiteType_ProduceOnly {
+            get {
+                return ResourceManager.GetString("SiteType_ProduceOnly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Meter at load.
+        /// </summary>
+        public static string SiteType_VagueMeter {
+            get {
+                return ResourceManager.GetString("SiteType_VagueMeter", resourceCulture);
             }
         }
         

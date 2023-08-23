@@ -1155,4 +1155,22 @@
   <data name="SelectDriftsFile" xml:space="preserve">
 	  <value>Select Location and Name of the drifts file</value>
   </data>
+  <data name="OpTime" xml:space="preserve">
+	  <value>Op times</value>
+  </data>
+  <data name="SiteType_ProduceOnly" xml:space="preserve">
+	  <value>No battery or meter</value>
+  </data>
+  <data name="SiteType_Meter" xml:space="preserve">
+	  <value>Meter at grid</value>
+  </data>
+  <data name="SiteType_VagueMeter" xml:space="preserve">
+	  <value>Meter at load</value>
+  </data>
+  <data name="SiteType_BiDirectional" xml:space="preserve">
+	  <value>With DC battery</value>
+  </data>
+  <data name="SiteType_AcCoupled" xml:space="preserve">
+	  <value>With AC battery</value>
+  </data>
 </root>
