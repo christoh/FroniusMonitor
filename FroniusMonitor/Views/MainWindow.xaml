@@ -243,7 +243,17 @@
                     <c:StorageControl Height="200" Grid.Column="2" Margin="80,0,0,0"
                                       Gen24="{Binding SolarSystemService.SolarSystem.Gen24System, FallbackValue={x:Null}}"
                                       Visibility="{Binding SolarSystemService.SolarSystem.Gen24System.Storage, Converter={co:NullToVisibility Null=Hidden}, FallbackValue=Hidden}" />
-                    <vi:House Grid.Column="3" Width="200" Foreground="Black" VerticalAlignment="Center" Margin="20,0,0,0" />
+                    <c:House Grid.Column="3" Width="240" Foreground="Black" VerticalAlignment="Bottom" Margin="10,0,0,3"
+                              PowerLossWatts="{Binding SolarSystemService.SolarSystem.SitePowerFlow.PowerLoss, FallbackValue={x:Null}}"
+                              Efficiency="{Binding SolarSystemService.SolarSystem.SitePowerFlow.Efficiency, FallbackValue={x:Null}}"
+                              ProductionWatts="{Binding SolarSystemService.SolarSystem.SitePowerFlow.SolarPower, FallbackValue={x:Null}}">
+                        <c:House.ConsumptionWatts>
+                            <MultiBinding Converter="{co:HouseConsumptionConverter}">
+                                <Binding Path="SolarSystemService.SolarSystem.SitePowerFlow.LoadPower" FallbackValue="{x:Null}"/>
+                                <Binding Path="SolarSystemService.SolarSystem.WattPilot.PowerTotal" FallbackValue="{x:Null}"/>
+                            </MultiBinding>
+                        </c:House.ConsumptionWatts>
+                    </c:House>
 
                 </Grid>
             </Grid>

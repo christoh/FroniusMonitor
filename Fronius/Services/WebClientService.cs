@@ -1,4 +1,5 @@
-﻿using De.Hochstaetter.Fronius.Models.Settings;
+﻿using De.Hochstaetter.Fronius.Models.Gen24.Commands;
+using De.Hochstaetter.Fronius.Models.Settings;
 
 namespace De.Hochstaetter.Fronius.Services;
 
@@ -196,8 +197,8 @@ public class WebClientService : BindableBase, IWebClientService
 
         var dict = new Dictionary<string, string>
         {
-            {"username", FritzBoxConnection.UserName},
-            {"response", response}
+            { "username", FritzBoxConnection.UserName },
+            { "response", response }
         };
 
         document = await GetXmlResponse("login_sid.lua", dict);
@@ -248,18 +249,18 @@ public class WebClientService : BindableBase, IWebClientService
 
     private static readonly Dictionary<int, IEnumerable<int>> allowedFritzBoxColors = new()
     {
-        {358, new[] {180, 112, 54}},
-        {35, new[] {214, 140, 72}},
-        {52, new[] {153, 102, 51}},
-        {92, new[] {123, 79, 38}},
-        {120, new[] {160, 82, 38}},
-        {160, new[] {145, 84, 41}},
-        {195, new[] {179, 118, 59}},
-        {212, new[] {169, 110, 56}},
-        {225, new[] {204, 135, 67}},
-        {266, new[] {169, 110, 54}},
-        {296, new[] {140, 92, 46}},
-        {335, new[] {180, 107, 51}},
+        { 358, new[] { 180, 112, 54 } },
+        { 35, new[] { 214, 140, 72 } },
+        { 52, new[] { 153, 102, 51 } },
+        { 92, new[] { 123, 79, 38 } },
+        { 120, new[] { 160, 82, 38 } },
+        { 160, new[] { 145, 84, 41 } },
+        { 195, new[] { 179, 118, 59 } },
+        { 212, new[] { 169, 110, 56 } },
+        { 225, new[] { 204, 135, 67 } },
+        { 266, new[] { 169, 110, 54 } },
+        { 296, new[] { 140, 92, 46 } },
+        { 335, new[] { 180, 107, 51 } },
     };
 
     public async Task SetFritzBoxColor(string ain, double hueDegrees, double saturation)
@@ -290,7 +291,7 @@ public class WebClientService : BindableBase, IWebClientService
 
             using var client = new HttpClient
             (
-                new HttpClientHandler {ServerCertificateCustomValidationCallback = (_, _, _, _) => true,}
+                new HttpClientHandler { ServerCertificateCustomValidationCallback = (_, _, _, _) => true, }
             );
 
             // ReSharper disable once PossibleMultipleEnumeration
@@ -350,6 +351,29 @@ public class WebClientService : BindableBase, IWebClientService
         return result;
     }
 
+    public async Task<T?> SendFroniusCommand<T>(string request, JToken? token = null) where T : Gen24NoResultCommand, new()
+    {
+        var client = await GetFroniusHttpClient();
+        var (result, statusCode) = await client.GetJsonToken(request, token, new[] { HttpStatusCode.OK, HttpStatusCode.BadRequest, }).ConfigureAwait(false);
+
+        if (statusCode == HttpStatusCode.BadRequest)
+        {
+            var message = result["failure"]?.Value<string>() ?? "Unknown bad request";
+            throw new HttpRequestException(message, null, statusCode);
+        }
+
+        var success = result["success"]?.Value<bool>() ?? false;
+
+        if (!success)
+        {
+            throw new InvalidDataException(result.ToString());
+        }
+
+        var resultData = result["resultData"];
+
+        return resultData is { HasValues: true } ? gen24JsonService.ReadFroniusData<T>(resultData) : null;
+    }
+
     private async Task<DigestAuthHttp> GetFroniusHttpClient()
     {
         if (InverterConnection?.BaseUrl == null)
@@ -407,4 +431,6 @@ public class WebClientService : BindableBase, IWebClientService
             return (result, data);
         }).ConfigureAwait(false);
     }
+
+    public override string ToString() => InverterConnection?.BaseUrl ?? "---";
 }

@@ -1159,7 +1159,7 @@
 	  <value>Op times</value>
   </data>
   <data name="SiteType_ProduceOnly" xml:space="preserve">
-	  <value>No battery or meter</value>
+	  <value>No meter</value>
   </data>
   <data name="SiteType_Meter" xml:space="preserve">
 	  <value>Meter at grid</value>
@@ -1172,5 +1172,11 @@
   </data>
   <data name="SiteType_AcCoupled" xml:space="preserve">
 	  <value>With AC battery</value>
+  </data>
+  <data name="CouldNotChangeStandBy" xml:space="preserve">
+	  <value>Could not change standby state: {0}</value>
+  </data>
+  <data name="StandbyWarning" xml:space="preserve">
+	  <value>Are you sure you want to set this inverter to standy?</value>
   </data>
 </root>

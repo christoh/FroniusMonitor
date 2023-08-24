@@ -1120,7 +1120,7 @@
 	  <value>Betriebszeiten</value>
   </data>
   <data name="SiteType_ProduceOnly" xml:space="preserve">
-	  <value>Weder Batterie noch Smartmeter</value>
+	  <value>Ohne Smartmeter</value>
   </data>
   <data name="SiteType_Meter" xml:space="preserve">
 	  <value>Smartmeter am Netz</value>
@@ -1133,5 +1133,11 @@
   </data>
   <data name="SiteType_AcCoupled" xml:space="preserve">
 	  <value>Mit AC-Batterie</value>
+  </data>
+  <data name="CouldNotChangeStandBy" xml:space="preserve">
+	  <value>Konnte den Stand-By-Zustand nicht ändern: {0}</value>
+  </data>
+  <data name="StandbyWarning" xml:space="preserve">
+	  <value>Bist Du sicher, dass Du den Wechselrichter in den Stand-By-Modus versetzen willst?</value>
   </data>
 </root>

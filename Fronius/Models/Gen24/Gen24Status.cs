@@ -34,6 +34,6 @@
             set => Set(ref status, value);
         }
 
-        public string? StatusMessage => Resources.ResourceManager.GetString(StatusCode ?? "STATE_UNKNOWN");
+        public string? StatusMessage => Resources.ResourceManager.GetString(StatusCode ?? "STATE_UNKNOWN") ?? StatusCode;
     }
 }

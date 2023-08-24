@@ -583,6 +583,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not change standby state: {0}.
+        /// </summary>
+        public static string CouldNotChangeStandBy {
+            get {
+                return ResourceManager.GetString("CouldNotChangeStandBy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Credentials.
         /// </summary>
         public static string Credentials {
@@ -2563,7 +2572,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No battery or meter.
+        ///   Looks up a localized string similar to No meter.
         /// </summary>
         public static string SiteType_ProduceOnly {
             get {
@@ -2613,6 +2622,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Standby {
             get {
                 return ResourceManager.GetString("Standby", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to set this inverter to standy?.
+        /// </summary>
+        public static string StandbyWarning {
+            get {
+                return ResourceManager.GetString("StandbyWarning", resourceCulture);
             }
         }
         

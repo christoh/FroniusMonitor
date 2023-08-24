@@ -6,11 +6,10 @@ namespace De.Hochstaetter.Fronius.Services;
 
 public class SolarSystemService : BindableBase, ISolarSystemService
 {
-    private readonly IWebClientService webClientService;
-    private readonly IWebClientService webClientService2;
     private readonly IWattPilotService wattPilotService;
     private readonly SettingsBase settings;
     private Timer? timer;
+    private DateTime lastConfigUpdate = DateTime.UnixEpoch;
     private int updateSemaphore;
     private int fritzBoxCounter, froniusCounter;
     private int suspendFritzBoxCounter;
@@ -20,13 +19,17 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
     public SolarSystemService(SettingsBase settings, IWebClientService webClientService, IWattPilotService wattPilotService, IToshibaHvacService acService, SynchronizationContext context)
     {
-        this.webClientService = webClientService;
+        WebClientService = webClientService;
         this.wattPilotService = wattPilotService;
         this.settings = settings;
         HvacService = acService;
         SwitchableDevices = new BindableCollection<ISwitchable>(context);
-        webClientService2 = IoC.Injector?.CreateScope().ServiceProvider.GetService(typeof(IWebClientService)) as IWebClientService ?? throw new NullReferenceException($"{nameof(IWebClientService)} not registered");
+        WebClientService2 = IoC.Injector?.CreateScope().ServiceProvider.GetService(typeof(IWebClientService)) as IWebClientService ?? throw new NullReferenceException($"{nameof(IWebClientService)} not registered");
     }
+
+    public IWebClientService WebClientService { get; }
+
+    public IWebClientService? WebClientService2 { get; }
 
     public BindableCollection<ISwitchable> SwitchableDevices { get; }
 
@@ -140,8 +143,8 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         WattPilotConnection = wattPilotConnection;
         SolarSystem = await CreateSolarSystem(inverterConnection, fritzBoxConnection).ConfigureAwait(false);
         await Task.Run(() => NewDataReceived?.Invoke(this, new SolarDataEventArgs(SolarSystem))).ConfigureAwait(false);
-        _ = await webClientService.GetEventDescription("BYD2-46").ConfigureAwait(false);
-        _ = await webClientService.GetConfigString("BATTERIES", "BAT_M0_SOC_MIN");
+        _ = await WebClientService.GetEventDescription("BYD2-46").ConfigureAwait(false);
+        _ = await WebClientService.GetConfigString("BATTERIES", "BAT_M0_SOC_MIN");
         timer = new Timer(TimerElapsed, null, 0, 1000);
     }
 
@@ -180,15 +183,15 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
         if (inverterConnection != null)
         {
-            webClientService.InverterConnection = inverterConnection;
+            WebClientService.InverterConnection = inverterConnection;
             var inverter2Connection = (WebConnection)inverterConnection.Clone();
             inverter2Connection.BaseUrl = "https://solar2.hochstaetter.de";
-            webClientService2.InverterConnection = inverter2Connection;
+            WebClientService2.InverterConnection = inverter2Connection;
         }
 
         if (fritzBoxConnection != null)
         {
-            webClientService.FritzBoxConnection = fritzBoxConnection;
+            WebClientService.FritzBoxConnection = fritzBoxConnection;
         }
 
         var fritzBoxTask = TryGetFritzBoxData();
@@ -210,14 +213,9 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         {
             try
             {
-                result.Versions = Gen24Versions.Parse((await webClientService.GetFroniusJsonResponse("status/version").ConfigureAwait(false)).Token);
-                result.Components = Gen24Components.Parse((await webClientService.GetFroniusJsonResponse("components/").ConfigureAwait(false)).Token);
-                result.Versions2 = Gen24Versions.Parse((await webClientService2.GetFroniusJsonResponse("status/version").ConfigureAwait(false)).Token);
-                result.Components2 = Gen24Components.Parse((await webClientService2.GetFroniusJsonResponse("components/").ConfigureAwait(false)).Token);
-                result.Gen24System = await webClientService.GetFroniusData(result.Components).ConfigureAwait(false);
-                result.Gen24System2 = await webClientService2.GetFroniusData(result.Components2).ConfigureAwait(false);
-                result.Gen24Common = Gen24Common.Parse((await webClientService.GetFroniusJsonResponse("config/common").ConfigureAwait(false)).Token);
-                result.Gen24Common2 = Gen24Common.Parse((await webClientService2.GetFroniusJsonResponse("config/common").ConfigureAwait(false)).Token);
+                await UpdateConfigData(result).ConfigureAwait(false);
+                result.Gen24System = await WebClientService.GetFroniusData(result.Components!).ConfigureAwait(false);
+                result.Gen24System2 = await WebClientService2.GetFroniusData(result.Components2!).ConfigureAwait(false);
                 IsConnected = true;
             }
             catch
@@ -229,11 +227,22 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         }
     }
 
+    private async ValueTask UpdateConfigData(SolarSystem result)
+    {
+        result.Versions = Gen24Versions.Parse((await WebClientService.GetFroniusJsonResponse("status/version").ConfigureAwait(false)).Token);
+        result.Components = Gen24Components.Parse((await WebClientService.GetFroniusJsonResponse("components/").ConfigureAwait(false)).Token);
+        result.Versions2 = Gen24Versions.Parse((await WebClientService2.GetFroniusJsonResponse("status/version").ConfigureAwait(false)).Token);
+        result.Components2 = Gen24Components.Parse((await WebClientService2.GetFroniusJsonResponse("components/").ConfigureAwait(false)).Token);
+        result.Gen24Common = Gen24Common.Parse((await WebClientService.GetFroniusJsonResponse("config/common").ConfigureAwait(false)).Token);
+        result.Gen24Common2 = Gen24Common.Parse((await WebClientService2.GetFroniusJsonResponse("config/common").ConfigureAwait(false)).Token);
+        lastConfigUpdate = DateTime.UtcNow;
+    }
+
     private async Task<FritzBoxDeviceList?> TryGetFritzBoxData()
     {
         try
         {
-            var devices = await webClientService.GetFritzBoxDevices().ConfigureAwait(false);
+            var devices = await WebClientService.GetFritzBoxDevices().ConfigureAwait(false);
 
             await Task.Run(() =>
             {
@@ -309,7 +318,6 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
         try
         {
-            if (SolarSystem?.Components == null) return null;
             return await localWebClientService.GetFroniusData(components).ConfigureAwait(false);
         }
         catch
@@ -345,15 +353,20 @@ public class SolarSystemService : BindableBase, ISolarSystemService
             }
             else
             {
-                var gen24Task = froniusCounter++ % FroniusUpdateRate == 0 ? TryGetGen24System(webClientService, SolarSystem.Components) : Task.FromResult<Gen24System?>(null);
-                var gen24Task2 = froniusCounter++ % FroniusUpdateRate == 0 ? TryGetGen24System(webClientService2, SolarSystem.Components2) : Task.FromResult<Gen24System?>(null);
+                if ((DateTime.UtcNow - lastConfigUpdate).TotalMinutes > 5)
+                {
+                    await UpdateConfigData(SolarSystem).ConfigureAwait(false);
+                }
 
-                if (webClientService.FritzBoxConnection == null && SwitchableDevices.Any(d => d is FritzBoxDevice))
+                var gen24Task = froniusCounter % FroniusUpdateRate == 0 ? TryGetGen24System(WebClientService, SolarSystem.Components) : Task.FromResult<Gen24System?>(null);
+                var gen24Task2 = froniusCounter++ % FroniusUpdateRate == 0 ? TryGetGen24System(WebClientService2, SolarSystem.Components2) : Task.FromResult<Gen24System?>(null);
+
+                if (WebClientService.FritzBoxConnection == null && SwitchableDevices.Any(d => d is FritzBoxDevice))
                 {
                     SwitchableDevices.RemoveRange(SwitchableDevices.OfType<FritzBoxDevice>().ToList());
                 }
 
-                var fritzBoxTask = suspendFritzBoxCounter <= 0 && webClientService.FritzBoxConnection != null &&
+                var fritzBoxTask = suspendFritzBoxCounter <= 0 && WebClientService.FritzBoxConnection != null &&
                                    fritzBoxCounter++ % FritzBoxUpdateRate == 0
                     ? TryGetFritzBoxData()
                     : Task.FromResult<FritzBoxDeviceList?>(null);

@@ -7,7 +7,8 @@ namespace De.Hochstaetter.Fronius.Contracts
         SolarSystem? SolarSystem { get; }
         WebConnection? WattPilotConnection { get; set; }
         public IToshibaHvacService HvacService { get; }
-
+        public IWebClientService WebClientService { get; }
+        public IWebClientService? WebClientService2 { get; }
         public BindableCollection<ISwitchable>? SwitchableDevices { get; }
 
         public int FroniusUpdateRate { get; set; }

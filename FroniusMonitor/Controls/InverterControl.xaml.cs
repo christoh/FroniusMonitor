@@ -1,4 +1,5 @@
-﻿using Loc = De.Hochstaetter.Fronius.Localization.Resources;
+﻿using De.Hochstaetter.Fronius.Models.Gen24.Commands;
+using Loc = De.Hochstaetter.Fronius.Localization.Resources;
 
 namespace De.Hochstaetter.FroniusMonitor.Controls;
 
@@ -28,11 +29,15 @@ public enum InverterDisplayMode
 public partial class InverterControl : IHaveLcdPanel
 {
     private readonly ISolarSystemService? solarSystemService = IoC.TryGetRegistered<ISolarSystemService>();
+    private IWebClientService? webClientService;
     private static readonly IReadOnlyList<InverterDisplayMode> acModes = new[] { InverterDisplayMode.AcPowerReal, InverterDisplayMode.AcPowerApparent, InverterDisplayMode.AcPowerReactive, InverterDisplayMode.AcPowerFactor, InverterDisplayMode.AcCurrent, InverterDisplayMode.AcPhaseVoltage, InverterDisplayMode.AcLineVoltage, };
     private static readonly IReadOnlyList<InverterDisplayMode> dcModes = new[] { InverterDisplayMode.DcPower, InverterDisplayMode.DcCurrent, InverterDisplayMode.DcVoltage, };
     private static readonly IReadOnlyList<InverterDisplayMode> moreModes = new[] { InverterDisplayMode.MoreEfficiency, InverterDisplayMode.More, InverterDisplayMode.MoreTemperatures, InverterDisplayMode.MoreFans, InverterDisplayMode.MoreOp, InverterDisplayMode.MoreVersions };
     private static readonly IReadOnlyList<InverterDisplayMode> energyModes = new[] { InverterDisplayMode.EnergySolar, InverterDisplayMode.EnergyInverter, InverterDisplayMode.EnergyStorage, };
     private int currentAcIndex, currentDcIndex, currentMoreIndex, energyIndex;
+    private bool isInStandByChange;
+    private string? lastStatusCode;
+    private DateTime lastStandbySwitchUpdate = DateTime.UnixEpoch;
 
     #region Dependency Properties
 
@@ -50,7 +55,8 @@ public partial class InverterControl : IHaveLcdPanel
 
     public static readonly DependencyProperty IsSecondaryProperty = DependencyProperty.Register
     (
-        nameof(IsSecondary), typeof(bool), typeof(InverterControl)
+        nameof(IsSecondary), typeof(bool), typeof(InverterControl),
+        new PropertyMetadata((d, _) => ((InverterControl)d).OnIsSecondaryChanged())
     );
 
     public bool IsSecondary
@@ -74,6 +80,7 @@ public partial class InverterControl : IHaveLcdPanel
 
     public InverterControl()
     {
+        webClientService = solarSystemService?.WebClientService;
         InitializeComponent();
 
         Loaded += (_, _) =>
@@ -95,16 +102,48 @@ public partial class InverterControl : IHaveLcdPanel
 
     private void OnModeChanged() => NewDataReceived(this, new SolarDataEventArgs(solarSystemService?.SolarSystem));
 
-    private void NewDataReceived(object? sender, SolarDataEventArgs e)
+    private void OnIsSecondaryChanged()
     {
+        webClientService = IsSecondary switch
+        {
+            false => solarSystemService?.WebClientService,
+            true => solarSystemService?.WebClientService2,
+        };
+    }
+
+    private async void NewDataReceived(object? sender, SolarDataEventArgs e)
+    {
+        Gen24System? gen24 = null!;
+        Dispatcher.Invoke(() => gen24 = IsSecondary ? e.SolarSystem?.Gen24System2 : e.SolarSystem?.Gen24System);
+        var inverter = gen24?.Inverter;
+        var dataManager = gen24?.DataManager;
+        var powerFlow = e.SolarSystem?.SitePowerFlow;
+
+        if
+        (
+            !isInStandByChange &&
+            (
+                (DateTime.UtcNow - lastStandbySwitchUpdate).TotalMinutes > 5 || lastStatusCode != gen24?.InverterStatus?.StatusCode
+            )
+        )
+        {
+            try
+            {
+                var standByStatus = await webClientService!.SendFroniusCommand<Gen24StandByStatus>("commands/StandbyState").ConfigureAwait(false);
+                Dispatcher.InvokeAsync(() => StandByButton.IsChecked = !standByStatus!.IsStandBy);
+                lastStandbySwitchUpdate = DateTime.UtcNow;
+            }
+            catch
+            {
+                // if it does not update, we don't care
+            }
+        }
+
+        lastStatusCode = gen24?.InverterStatus?.StatusCode;
 
         Dispatcher.InvokeAsync(() =>
         {
-            var gen24 = IsSecondary ? e.SolarSystem?.Gen24System2 : e.SolarSystem?.Gen24System;
             var cache = gen24?.Cache;
-            var inverter = gen24?.Inverter;
-            var dataManager = gen24?.DataManager;
-            var powerFlow = e.SolarSystem?.SitePowerFlow;
             var gen24Common = IsSecondary ? e.SolarSystem?.Gen24Common2 : e.SolarSystem?.Gen24Common;
 
             if (cache == null && inverter == null && dataManager == null)
@@ -113,7 +152,7 @@ public partial class InverterControl : IHaveLcdPanel
             }
 
             BackgroundProvider.Background = gen24?.InverterStatus?.ToBrush() ?? Brushes.LightGray;
-            InverterModelName.Text = $"{gen24?.Inverter?.Model ?? "---"} ({gen24?.InverterStatus?.StatusMessage ?? Loc.Unknown})";
+            InverterModelName.Text = $"{gen24?.PowerFlow?.SiteTypeDisplayName ?? "---"} ({gen24?.InverterStatus?.StatusMessage ?? Loc.Unknown})";
             InverterName.Text = gen24Common?.DisplayName ?? "---";
             VersionList.Visibility = Visibility.Collapsed;
             Lcd.Visibility = Visibility.Visible;
@@ -241,14 +280,14 @@ public partial class InverterControl : IHaveLcdPanel
                     break;
 
                 case InverterDisplayMode.DcCurrent:
-                    SetDc123(string.Empty);
+                    SetDc123("PvSum");
                     Lcd.Header = Loc.DcCurrent;
 
                     SetLcdValues
                     (
                         cache?.Solar1Current ?? inverter?.Solar1Current,
                         cache?.Solar2Current ?? inverter?.Solar2Current,
-                        null,
+                        (cache?.Solar1Current ?? inverter?.Solar1Current) + (cache?.Solar2Current ?? inverter?.Solar2Current),
                         cache?.StorageCurrent ?? inverter?.StorageCurrent ?? gen24?.Storage?.Current,
                         "N3", "A"
                     );
@@ -411,4 +450,41 @@ public partial class InverterControl : IHaveLcdPanel
     private void OnEnergyClicked(object sender, RoutedEventArgs e) => CycleMode(energyModes, ref energyIndex);
 
     private void OnMoreClicked(object sender, RoutedEventArgs e) => CycleMode(moreModes, ref currentMoreIndex);
+
+    private async void OnTestClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not ToggleButton toggleButton)
+        {
+            return;
+        }
+
+        try
+        {
+            isInStandByChange = true;
+
+            if (!toggleButton.IsChecked!.Value)
+            {
+                if (MessageBox.Show(Loc.StandbyWarning, Loc.Warning, MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
+                {
+                    return;
+                }
+            }
+
+            var token = JObject.Parse($"{{\"requestState\": {(toggleButton.IsChecked!.Value ? "1" : "0")}}}");
+
+            try
+            {
+                await webClientService!.SendFroniusCommand<Gen24NoResultCommand>("commands/StandbyRequestState", token).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(string.Format(Loc.CouldNotChangeStandBy, ex.Message), Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+        finally
+        {
+            lastStandbySwitchUpdate = DateTime.UnixEpoch;
+            isInStandByChange = false;
+        }
+    }
 }

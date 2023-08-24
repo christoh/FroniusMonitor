@@ -1,4 +1,5 @@
-﻿using De.Hochstaetter.Fronius.Models.Settings;
+﻿using De.Hochstaetter.Fronius.Models.Gen24.Commands;
+using De.Hochstaetter.Fronius.Models.Settings;
 
 namespace De.Hochstaetter.Fronius.Contracts
 {
@@ -7,6 +8,7 @@ namespace De.Hochstaetter.Fronius.Contracts
         WebConnection? InverterConnection { get; set; }
         WebConnection? FritzBoxConnection { get; set; }
         Task<Gen24System> GetFroniusData(Gen24Components components);
+        Task<T?> SendFroniusCommand<T>(string request, JToken? token = null) where T : Gen24NoResultCommand, new();
         Task FritzBoxLogin();
         Task<FritzBoxDeviceList> GetFritzBoxDevices();
         Task TurnOnFritzBoxDevice(string ain);

@@ -1,4 +1,5 @@
-﻿using De.Hochstaetter.Fronius.Models.Settings;
+﻿using System.Numerics;
+using De.Hochstaetter.Fronius.Models.Settings;
 
 namespace De.Hochstaetter.FroniusMonitor.Wpf.Converters;
 
@@ -845,5 +846,28 @@ public class ToshibaMeritFeatureTemperature : MultiConverterBase
         }
 
         return (sbyte)(temperature - 16);
+    }
+}
+
+public class HouseConsumptionConverter : MultiConverterBase
+{
+    public override object? Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (values.Length < 1 || values[0] is not double loadPower)
+        {
+            return null;
+        }
+
+        return values.Length < 2 || values[1] is not double wattPilotPower ? -loadPower : -loadPower - wattPilotPower;
+    }
+}
+
+public class Multiply : ConverterBase
+{
+    public bool UseConverterCulture { get; set; }
+    public double Factor { get; set; } = 100;
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is not IConvertible convertible ? value : convertible.ToDouble(UseConverterCulture ? culture : CultureInfo.CurrentCulture) * Factor;
     }
 }
