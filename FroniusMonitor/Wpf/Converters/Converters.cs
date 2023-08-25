@@ -1,5 +1,4 @@
-﻿using System.Numerics;
-using De.Hochstaetter.Fronius.Models.Settings;
+﻿using De.Hochstaetter.Fronius.Models.Settings;
 
 namespace De.Hochstaetter.FroniusMonitor.Wpf.Converters;
 
@@ -866,6 +865,7 @@ public class Multiply : ConverterBase
 {
     public bool UseConverterCulture { get; set; }
     public double Factor { get; set; } = 100;
+
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         return value is not IConvertible convertible ? value : convertible.ToDouble(UseConverterCulture ? culture : CultureInfo.CurrentCulture) * Factor;
