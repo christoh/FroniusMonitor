@@ -122,14 +122,13 @@ public partial class InverterControl : IHaveLcdPanel
         if
         (
             !isInStandByChange &&
-            (
-                (DateTime.UtcNow - lastStandbySwitchUpdate).TotalMinutes > 5 || lastStatusCode != gen24?.InverterStatus?.StatusCode
-            )
+            ((DateTime.UtcNow - lastStandbySwitchUpdate).TotalMinutes > 5 || lastStatusCode != gen24?.InverterStatus?.StatusCode) &&
+            webClientService != null
         )
         {
             try
             {
-                var standByStatus = await webClientService!.SendFroniusCommand<Gen24StandByStatus>("commands/StandbyState").ConfigureAwait(false);
+                var standByStatus = await webClientService.GetInverterStandByStatus().ConfigureAwait(false);
                 Dispatcher.InvokeAsync(() => StandByButton.IsChecked = !standByStatus!.IsStandBy);
                 lastStandbySwitchUpdate = DateTime.UtcNow;
             }
@@ -453,7 +452,7 @@ public partial class InverterControl : IHaveLcdPanel
 
     private async void OnTestClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not ToggleButton toggleButton)
+        if (sender is not ToggleButton { IsChecked: not null } toggleButton || webClientService is null)
         {
             return;
         }
@@ -462,19 +461,14 @@ public partial class InverterControl : IHaveLcdPanel
         {
             isInStandByChange = true;
 
-            if (!toggleButton.IsChecked!.Value)
+            if (!toggleButton.IsChecked.Value && MessageBox.Show(Loc.StandbyWarning, Loc.Warning, MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
             {
-                if (MessageBox.Show(Loc.StandbyWarning, Loc.Warning, MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
-                {
-                    return;
-                }
+                return;
             }
-
-            var token = JObject.Parse($"{{\"requestState\": {(toggleButton.IsChecked!.Value ? "1" : "0")}}}");
 
             try
             {
-                await webClientService!.SendFroniusCommand<Gen24NoResultCommand>("commands/StandbyRequestState", token).ConfigureAwait(false);
+                await webClientService.RequestInverterStandBy(!toggleButton.IsChecked.Value);
             }
             catch (Exception ex)
             {

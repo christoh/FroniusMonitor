@@ -1,4 +1,5 @@
-﻿using De.Hochstaetter.Fronius.Models.Gen24.Commands;
+﻿using De.Hochstaetter.Fronius.Contracts;
+using De.Hochstaetter.Fronius.Models.Gen24.Commands;
 using De.Hochstaetter.Fronius.Models.Settings;
 
 namespace De.Hochstaetter.Fronius.Services;
@@ -45,13 +46,13 @@ public class WebClientService : BindableBase, IWebClientService
         set => Set(ref fritzBoxConnection, value);
     }
 
-    public async Task<T> ReadGen24Entity<T>(string request) where T : new()
+    public async ValueTask<T> ReadGen24Entity<T>(string request) where T : new()
     {
         var token = (await GetFroniusJsonResponse(request).ConfigureAwait(false)).Token;
         return gen24JsonService.ReadFroniusData<T>(token);
     }
 
-    public async Task<IOrderedEnumerable<Gen24Event>> GetFroniusEvents()
+    public async ValueTask<IOrderedEnumerable<Gen24Event>> GetFroniusEvents()
     {
         var eventList = new List<Gen24Event>(256);
 
@@ -65,7 +66,7 @@ public class WebClientService : BindableBase, IWebClientService
     }
 
     [SuppressMessage("ReSharper", "CommentTypo")]
-    public async Task<Gen24System> GetFroniusData(Gen24Components components)
+    public async ValueTask<Gen24System> GetFroniusData(Gen24Components components)
     {
         var gen24System = new Gen24System();
 
@@ -145,7 +146,7 @@ public class WebClientService : BindableBase, IWebClientService
         return GetCategoryKeyString(localConfigToken, invariantConfigToken, category, key);
     }
 
-    public async Task<string> GetEventDescription(string code)
+    public async ValueTask<string> GetEventDescription(string code)
     {
         (localEventToken, invariantEventToken) = await EnsureText("app/assets/i18n/StateCodeTranslations", localEventToken, invariantEventToken).ConfigureAwait(false);
         return GetCategoryKeyString(localEventToken, invariantEventToken, "StateCodes", code);
@@ -156,7 +157,7 @@ public class WebClientService : BindableBase, IWebClientService
         return localToken?[category]?[key]?.Value<string>() ?? invariantToken?[category]?[key]?.Value<string>() ?? $"{(category != "StateCodes" ? $"{category}." : string.Empty)}{key}";
     }
 
-    private async Task<(JObject?, JObject?)> EnsureText(string baseUrl, JObject? l, JObject? i)
+    private async ValueTask<(JObject?, JObject?)> EnsureText(string baseUrl, JObject? l, JObject? i)
     {
         try
         {
@@ -183,7 +184,7 @@ public class WebClientService : BindableBase, IWebClientService
         return (l, i);
     }
 
-    public async Task FritzBoxLogin()
+    public async ValueTask FritzBoxLogin()
     {
         if (FritzBoxConnection == null)
         {
@@ -211,7 +212,7 @@ public class WebClientService : BindableBase, IWebClientService
         }
     }
 
-    public async Task<FritzBoxDeviceList> GetFritzBoxDevices()
+    public async ValueTask<FritzBoxDeviceList> GetFritzBoxDevices()
     {
         await using var stream = await GetStreamResponse("webservices/homeautoswitch.lua?switchcmd=getdevicelistinfos").ConfigureAwait(false) ?? throw new InvalidDataException();
         var serializer = new XmlSerializer(typeof(FritzBoxDeviceList));
@@ -220,26 +221,26 @@ public class WebClientService : BindableBase, IWebClientService
         return result;
     }
 
-    public async Task TurnOnFritzBoxDevice(string ain)
+    public async ValueTask TurnOnFritzBoxDevice(string ain)
     {
         ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
         using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setswitchon").ConfigureAwait(false);
     }
 
-    public async Task TurnOffFritzBoxDevice(string ain)
+    public async ValueTask TurnOffFritzBoxDevice(string ain)
     {
         ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
         using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setswitchoff").ConfigureAwait(false);
     }
 
-    public async Task SetFritzBoxLevel(string ain, double level)
+    public async ValueTask SetFritzBoxLevel(string ain, double level)
     {
         var byteLevel = Math.Max((byte)Math.Round(level * 255, MidpointRounding.AwayFromZero), (byte)2);
         ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
         using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setlevel&level={byteLevel}").ConfigureAwait(false);
     }
 
-    public async Task SetFritzBoxColorTemperature(string ain, double temperatureKelvin)
+    public async ValueTask SetFritzBoxColorTemperature(string ain, double temperatureKelvin)
     {
         var intTemperature = (int)Math.Round(temperatureKelvin, MidpointRounding.AwayFromZero);
         ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
@@ -263,7 +264,7 @@ public class WebClientService : BindableBase, IWebClientService
         { 335, new[] { 180, 107, 51 } },
     };
 
-    public async Task SetFritzBoxColor(string ain, double hueDegrees, double saturation)
+    public async ValueTask SetFritzBoxColor(string ain, double hueDegrees, double saturation)
     {
         var intHue = allowedFritzBoxColors.Keys.MinBy(k => Math.Min(Math.Abs(hueDegrees - k), Math.Abs(hueDegrees + 360 - k)));
         var intSaturation = allowedFritzBoxColors[intHue].MinBy(s => Math.Abs(s - saturation * 255));
@@ -271,7 +272,7 @@ public class WebClientService : BindableBase, IWebClientService
         using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setcolor&hue={intHue}&saturation={intSaturation}&duration=0").ConfigureAwait(false);
     }
 
-    private async Task<HttpResponseMessage> GetFritzBoxResponse(string request, IEnumerable<KeyValuePair<string, string>>? postVariables = null)
+    private async ValueTask<HttpResponseMessage> GetFritzBoxResponse(string request, IEnumerable<KeyValuePair<string, string>>? postVariables = null)
     {
         HttpResponseMessage response;
 
@@ -310,7 +311,7 @@ public class WebClientService : BindableBase, IWebClientService
         return response;
     }
 
-    private async Task<Stream> GetStreamResponse(string request, IEnumerable<KeyValuePair<string, string>>? postVariables = null)
+    private async ValueTask<Stream> GetStreamResponse(string request, IEnumerable<KeyValuePair<string, string>>? postVariables = null)
     {
         var response = await GetFritzBoxResponse(request, postVariables).ConfigureAwait(false);
         return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
@@ -318,14 +319,14 @@ public class WebClientService : BindableBase, IWebClientService
 
     [SuppressMessage("ReSharper", "UnusedMember.Local")]
 #pragma warning disable IDE0051
-    private async Task<string> GetStringResponse(string request)
+    private async ValueTask<string> GetStringResponse(string request)
     {
         var response = await GetFritzBoxResponse(request).ConfigureAwait(false);
         return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
     }
 #pragma warning restore IDE0051
 
-    private async Task<XmlDocument> GetXmlResponse(string request, IEnumerable<KeyValuePair<string, string>>? postVariables = null)
+    private async ValueTask<XmlDocument> GetXmlResponse(string request, IEnumerable<KeyValuePair<string, string>>? postVariables = null)
     {
         await using var stream = await GetStreamResponse(request, postVariables).ConfigureAwait(false);
         var result = new XmlDocument();
@@ -335,7 +336,7 @@ public class WebClientService : BindableBase, IWebClientService
 
     private readonly object froniusHttpClientLockObject = new();
 
-    public async Task<(string JsonString, HttpStatusCode StatusCode)> GetFroniusStringResponse(string request, JToken? token = null, IEnumerable<HttpStatusCode>? allowedStatusCodes = null)
+    public async ValueTask<(string JsonString, HttpStatusCode StatusCode)> GetFroniusStringResponse(string request, JToken? token = null, IEnumerable<HttpStatusCode>? allowedStatusCodes = null)
     {
         var client = await GetFroniusHttpClient();
         var result = await client.GetString(request, token?.ToString(), allowedStatusCodes).ConfigureAwait(false);
@@ -343,7 +344,7 @@ public class WebClientService : BindableBase, IWebClientService
         return result;
     }
 
-    public async Task<(JToken Token, HttpStatusCode StatusCode)> GetFroniusJsonResponse(string request, JToken? token = null, IEnumerable<HttpStatusCode>? allowedStatusCodes = null)
+    public async ValueTask<(JToken Token, HttpStatusCode StatusCode)> GetFroniusJsonResponse(string request, JToken? token = null, IEnumerable<HttpStatusCode>? allowedStatusCodes = null)
     {
         var client = await GetFroniusHttpClient();
         var result = await client.GetJsonToken(request, token, allowedStatusCodes).ConfigureAwait(false);
@@ -351,7 +352,7 @@ public class WebClientService : BindableBase, IWebClientService
         return result;
     }
 
-    public async Task<T?> SendFroniusCommand<T>(string request, JToken? token = null) where T : Gen24NoResultCommand, new()
+    public async ValueTask<T?> SendFroniusCommand<T>(string request, JToken? token = null) where T : Gen24NoResultCommand, new()
     {
         var client = await GetFroniusHttpClient();
         var (result, statusCode) = await client.GetJsonToken(request, token, new[] { HttpStatusCode.OK, HttpStatusCode.BadRequest, }).ConfigureAwait(false);
@@ -372,6 +373,14 @@ public class WebClientService : BindableBase, IWebClientService
         var resultData = result["resultData"];
 
         return resultData is { HasValues: true } ? gen24JsonService.ReadFroniusData<T>(resultData) : null;
+    }
+
+    public ValueTask<Gen24StandByStatus?> GetInverterStandByStatus() => SendFroniusCommand<Gen24StandByStatus>("commands/StandbyState");
+
+    public async ValueTask RequestInverterStandBy(bool isStandBy)
+    {
+        var token = JObject.Parse($"{{\"requestState\": {(isStandBy ? "0" : "1")}}}");
+        await SendFroniusCommand<Gen24NoResultCommand>("commands/StandbyRequestState", token).ConfigureAwait(false);
     }
 
     private async Task<DigestAuthHttp> GetFroniusHttpClient()
