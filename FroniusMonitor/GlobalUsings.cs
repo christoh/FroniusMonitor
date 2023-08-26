@@ -48,3 +48,4 @@ global using Microsoft.Win32;
 global using Newtonsoft.Json.Linq;
 global using SafeHeapMarshalling = System.Diagnostics.DebuggerNonUserCodeAttribute;
 global using BigEndianMarshalling = System.Diagnostics.DebuggerHiddenAttribute;
+global using Loc = De.Hochstaetter.Fronius.Localization.Resources;

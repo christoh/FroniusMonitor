@@ -1,6 +1,5 @@
 ﻿using De.Hochstaetter.Fronius.Models.Settings;
 using Microsoft.Extensions.DependencyInjection;
-using Loc = De.Hochstaetter.Fronius.Localization.Resources;
 
 namespace De.Hochstaetter.FroniusMonitor;
 

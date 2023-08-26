@@ -1,6 +1,4 @@
-﻿using Loc = De.Hochstaetter.Fronius.Localization.Resources;
-
-namespace De.Hochstaetter.FroniusMonitor.Controls;
+﻿namespace De.Hochstaetter.FroniusMonitor.Controls;
 
 public enum MeterDisplayMode
 {

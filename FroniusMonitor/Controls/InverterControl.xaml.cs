@@ -1,7 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Models.Gen24.Commands;
-using Loc = De.Hochstaetter.Fronius.Localization.Resources;
-
-namespace De.Hochstaetter.FroniusMonitor.Controls;
+﻿namespace De.Hochstaetter.FroniusMonitor.Controls;
 
 public enum InverterDisplayMode
 {
