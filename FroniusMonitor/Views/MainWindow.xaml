@@ -139,7 +139,7 @@
                                               Power="{Binding SolarSystemService.SolarSystem.Gen24System.Inverter.Solar2Power, FallbackValue={x:Null}}" />
                         </StackPanel>
                         <c:InverterControl Height="200" Versions="{Binding SolarSystemService.SolarSystem.Versions, FallbackValue={x:Null}}" />
-                        <c:InverterControl Height="200" Versions="{Binding SolarSystemService.SolarSystem.Versions, FallbackValue={x:Null}}" IsSecondary="True" Margin="8,0,0,0"/>
+                        <c:InverterControl Height="200" Versions="{Binding SolarSystemService.SolarSystem.Versions2, FallbackValue={x:Null}}" IsSecondary="True" Margin="8,0,0,0"/>
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <StackPanel Orientation="Vertical">
