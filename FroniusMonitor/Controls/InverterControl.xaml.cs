@@ -358,9 +358,9 @@ public partial class InverterControl : IHaveLcdPanel
                 case InverterDisplayMode.MoreEfficiency:
                     Lcd.Header = Loc.Efficiency;
                     Lcd.Label1 = "Loss";
-                    Lcd.Value1 = ToLcd(cache?.SolarPowerSum + (cache?.StoragePower ?? 0) - cache?.InverterRealPowerSum, "N1", "W");
+                    Lcd.Value1 = ToLcd((inverter?.SolarPowerSum ?? 0) + (inverter?.StoragePower ?? 0) - (inverter?.PowerApparentSum ?? 0), "N1", "W");
                     Lcd.Label2 = "Eff";
-                    Lcd.Value2 = ToLcd(cache?.InverterRealPowerSum / (cache?.SolarPowerSum + (cache?.StoragePower ?? 0)), "P2");
+                    Lcd.Value2 = ToLcd((inverter?.PowerApparentSum ?? 0) / ((inverter?.SolarPowerSum ?? 0) + (inverter?.StoragePower ?? 0)), "P2");
                     Lcd.Label3 = "Sc";
                     Lcd.Value3 = ToLcd(Math.Max(Math.Min(-powerFlow?.LoadPower / powerFlow?.InverterAcPower ?? 0, 1), 0), "P2");
                     Lcd.LabelSum = "Aut";
@@ -419,7 +419,7 @@ public partial class InverterControl : IHaveLcdPanel
 
     private static string ToLcd(double? value, string format, string? unit = null, string nullValue = "---")
     {
-        return value.HasValue ? value.Value.ToString(format, CultureInfo.CurrentCulture) + (unit is not null ? ' ' + unit : string.Empty) : nullValue;
+        return (value.HasValue && double.IsFinite(value.Value)) ? value.Value.ToString(format, CultureInfo.CurrentCulture) + (unit is not null ? ' ' + unit : string.Empty) : nullValue;
     }
 
     private void SetL123(string sumText) => IHaveLcdPanel.SetL123(Lcd, sumText);

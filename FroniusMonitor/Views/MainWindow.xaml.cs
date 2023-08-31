@@ -77,6 +77,7 @@ public partial class MainWindow
     public MainViewModel ViewModel => (MainViewModel)DataContext;
 
     private EventLogView? eventLogView;
+
     public EventLogView EventLogView
     {
         get
@@ -112,6 +113,7 @@ public partial class MainWindow
     }
 
     private SelfConsumptionOptimizationView? selfConsumptionOptimizationView;
+
     public SelfConsumptionOptimizationView SelfConsumptionOptimizationView
     {
         get
@@ -210,10 +212,22 @@ public partial class MainWindow
         };
 
         LoadArrow.Power = powerFlow.LoadPower - (ViewModel.IncludeInverterPower ? powerFlow.LoadPower + powerFlow.SolarPower + powerFlow.GridPower + powerFlow.StoragePower : 0);
+        LoadArrowPrimaryInverter.Power = PowerFlow?.LoadPower - (ViewModel.IncludeInverterPower ? PowerFlow?.LoadPower + PowerFlow?.SolarPower + PowerFlow?.GridPower + PowerFlow?.StoragePower : 0);
 
-        if (LoadArrow.Power > 0)
+        ColorLoadArrow(LoadArrow, powerFlow, Brushes.Salmon);
+        ColorLoadArrow(LoadArrowPrimaryInverter, PowerFlow, new SolidColorBrush(Color.FromRgb(0xff, 0xd0, 0)));
+    }
+
+    private static void ColorLoadArrow(PowerFlowArrow arrow, Gen24PowerFlow? powerFlow, Brush incomingPowerBrush)
+    {
+        if (powerFlow == null)
         {
-            LoadArrow.Fill = Brushes.Salmon;
+            return;
+        }
+
+        if (arrow.Power > 0)
+        {
+            arrow.Fill = incomingPowerBrush;
             return;
         }
 
@@ -245,7 +259,7 @@ public partial class MainWindow
         g /= totalIncomingPower;
         b /= totalIncomingPower;
 
-        LoadArrow.Fill = new SolidColorBrush(Color.FromRgb(Round(r), Round(g), Round(b)));
+        arrow.Fill = new SolidColorBrush(Color.FromRgb(Round(r), Round(g), Round(b)));
         return;
 
         static byte Round(double value) => (byte)Math.Round(value, MidpointRounding.AwayFromZero);

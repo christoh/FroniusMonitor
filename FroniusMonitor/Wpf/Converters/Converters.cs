@@ -122,6 +122,8 @@ public class NullToAnything<T> : ConverterBase
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value is null ? Null : NotNull;
 }
 
+public class NullToThickness : NullToAnything<Thickness> { }
+
 public class NullToVisibility : NullToAnything<Visibility>
 {
     public override Visibility Null { get; set; } = Visibility.Collapsed;
@@ -158,15 +160,15 @@ public class ToUpper : ConverterBase
 public abstract class GridMeterCorrectorBase : ConverterBase
 {
     private readonly ISolarSystemService solarSystemService = IoC.GetRegistered<ISolarSystemService>();
-    protected SmartMeterCalibrationHistoryItem? First, Last;
+    private SmartMeterCalibrationHistoryItem? first, last;
     private double lastOffsetCorrectedValue, factor;
     private int count;
     protected abstract EnergyDirection EnergyDirection { get; }
 
-    public double FirstEnergyReal => GetEnergy(First!, EnergyDirection);
-    public double FirstOffset => GetOffset(First!, EnergyDirection);
-    public double LastEnergyReal => GetEnergy(Last!, EnergyDirection);
-    public double LastOffset => GetOffset(Last!, EnergyDirection);
+    private double FirstEnergyReal => GetEnergy(first!, EnergyDirection);
+    private double FirstOffset => GetOffset(first!, EnergyDirection);
+    private double LastEnergyReal => GetEnergy(last!, EnergyDirection);
+    private double LastOffset => GetOffset(last!, EnergyDirection);
 
     public override object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
@@ -178,10 +180,10 @@ public abstract class GridMeterCorrectorBase : ConverterBase
         if (count != solarSystemService.SmartMeterHistory.Count)
         {
             count = solarSystemService.SmartMeterHistory.Count;
-            First = solarSystemService.SmartMeterHistory.FirstOrDefault(item => double.IsFinite(GetOffset(item, EnergyDirection)));
-            Last = solarSystemService.SmartMeterHistory.LastOrDefault(item => double.IsFinite(GetOffset(item, EnergyDirection)));
+            first = solarSystemService.SmartMeterHistory.FirstOrDefault(item => double.IsFinite(GetOffset(item, EnergyDirection)));
+            last = solarSystemService.SmartMeterHistory.LastOrDefault(item => double.IsFinite(GetOffset(item, EnergyDirection)));
 
-            if (First is not null && Last is not null)
+            if (first is not null && last is not null)
             {
                 lastOffsetCorrectedValue = LastEnergyReal + LastOffset;
                 factor = (lastOffsetCorrectedValue - FirstEnergyReal - FirstOffset) / (LastEnergyReal - FirstEnergyReal);
@@ -189,7 +191,7 @@ public abstract class GridMeterCorrectorBase : ConverterBase
             }
         }
 
-        return Last is null
+        return last is null
             ? doubleValue
             : Math.Round(lastOffsetCorrectedValue + (doubleValue + LastOffset - lastOffsetCorrectedValue) * factor, MidpointRounding.AwayFromZero);
     }

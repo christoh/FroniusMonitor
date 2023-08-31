@@ -20,7 +20,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" x:Name="SolarSystemRow" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="{Binding Settings.ControllerGridRowHeight, Mode=OneWay}" x:Name="PowerConsumerRow"/>
+            <RowDefinition Height="{Binding Settings.ControllerGridRowHeight, Mode=OneWay}" x:Name="PowerConsumerRow" />
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
@@ -84,42 +84,6 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <Grid Grid.Row="1" Grid.Column="0" Grid.RowSpan="2" Visibility="{Binding WattPilotService.WattPilot, FallbackValue=Collapsed, Converter={co:NullToVisibility}}">
-                    <Grid.LayoutTransform>
-                        <ScaleTransform ScaleX="{Binding ScaleX, ElementName=WattPilotTransform}" ScaleY="{Binding ScaleY, ElementName=WattPilotTransform}" />
-                    </Grid.LayoutTransform>
-
-                    <StackPanel VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,80,120,0">
-                        <TextBlock FontSize="14" FontWeight="Medium" TextAlignment="Center" Margin="0" Visibility="{Binding SolarSystemService.SolarSystem.WattPilot.CableCurrentMaximum, FallbackValue=Collapsed, Converter={co:NullToVisibility}}">
-                            <Run Text="{Binding SolarSystemService.SolarSystem.WattPilot.CableCurrentMaximum, FallbackValue='-',Mode=OneWay, StringFormat=N0, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" />
-                            <Run Text="A" />
-                        </TextBlock>
-                        <vi:Typ2 Width="80" Margin="0,0,0,0" WattPilot="{Binding SolarSystemService.SolarSystem.WattPilot, FallbackValue={x:Null}}"
-                                 Visibility="{Binding SolarSystemService.SolarSystem.WattPilot.CableCurrentMaximum, FallbackValue=Collapsed, Converter={co:NullToVisibility}}" />
-
-                    </StackPanel>
-
-
-                    <vi:Car Width="250" HorizontalAlignment="Right" Margin="0,0,0,0" VerticalAlignment="Bottom" Status="{Binding SolarSystemService.SolarSystem.WattPilot.CarStatus, FallbackValue={x:Null}}"
-                            Visibility="{Binding SolarSystemService.SolarSystem.WattPilot.CableCurrentMaximum, FallbackValue=Collapsed, Converter={co:NullToVisibility}}" />
-
-                    <TextBlock Opacity="{Binding SolarSystemService.SolarSystem.WattPilot.CarStatus, Converter={co:CarStatus2Opacity}, FallbackValue=.5}"
-                               FontSize="12" FontWeight="Medium" TextAlignment="Center" Margin="850,210,0,0"
-                               Visibility="{Binding SolarSystemService.SolarSystem.WattPilot.EnergyCurrentSession, FallbackValue=Collapsed, Converter={co:NullToVisibility}}">
-                        <TextBlock.LayoutTransform>
-                            <RotateTransform Angle="-1.2" />
-                        </TextBlock.LayoutTransform>
-                        <Run Text="{Binding SolarSystemService.SolarSystem.WattPilot.EnergyCurrentSession, FallbackValue='-',Mode=OneWay, StringFormat=N0, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" />
-                        <Run Text="Wh" />
-                    </TextBlock>
-
-                    <TextBlock Margin="863,194,0,0" Width="113" TextAlignment="Center" FontSize="11" FontWeight="Medium" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left"
-                               Text="{Binding SolarSystemService.SolarSystem.WattPilot.CurrentUser,FallbackValue=''}">
-                        <TextBlock.LayoutTransform>
-                            <RotateTransform Angle="-1.2" />
-                        </TextBlock.LayoutTransform>
-                    </TextBlock>
-                </Grid>
                 <Grid Grid.Row="0" Grid.Column="0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -139,7 +103,9 @@
                                               Power="{Binding SolarSystemService.SolarSystem.Gen24System.Inverter.Solar2Power, FallbackValue={x:Null}}" />
                         </StackPanel>
                         <c:InverterControl Height="200" Versions="{Binding SolarSystemService.SolarSystem.Versions, FallbackValue={x:Null}}" />
-                        <c:InverterControl Height="200" Versions="{Binding SolarSystemService.SolarSystem.Versions2, FallbackValue={x:Null}}" IsSecondary="True" Margin="8,0,0,0"/>
+                        <c:PowerFlowArrow VerticalAlignment="Top" Fill="#ffd000" HasRightPlacement="True" x:Name="LoadArrowPrimaryInverter" Margin="15,0"
+                                          Power="{Binding SolarSystemService.SolarSystem.Gen24System.PowerFlow.LoadPower, FallbackValue={x:Null}}" />
+                        <c:InverterControl Height="200" Versions="{Binding SolarSystemService.SolarSystem.Versions2, FallbackValue={x:Null}}" IsSecondary="True" />
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <StackPanel Orientation="Vertical">
@@ -154,35 +120,6 @@
                             </StackPanel>
 
                         </StackPanel>
-
-                        <Grid Margin="55,0,0,0" >
-                            <Grid.LayoutTransform>
-                                <ScaleTransform x:Name="WattPilotTransform" ScaleX="0" ScaleY="{Binding ElementName=WattPilotTransform, Path=ScaleX}" />
-                            </Grid.LayoutTransform>
-                            <Grid.Style>
-                                <Style TargetType="Grid">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Settings.ShowWattPilot}" Value="True">
-                                            <DataTrigger.EnterActions>
-                                                <BeginStoryboard>
-                                                    <Storyboard>
-                                                        <DoubleAnimation From="0" To="1" Duration="00:00:00.2" Storyboard.Target="{Binding Source={x:Reference WattPilotTransform}}" Storyboard.TargetProperty="ScaleX" />
-                                                    </Storyboard>
-                                                </BeginStoryboard>
-                                            </DataTrigger.EnterActions>
-                                            <DataTrigger.ExitActions>
-                                                <BeginStoryboard>
-                                                    <Storyboard>
-                                                        <DoubleAnimation From="1" To="0" Duration="00:00:00.2" Storyboard.Target="{Binding Source={x:Reference WattPilotTransform}}" Storyboard.TargetProperty="ScaleX" />
-                                                    </Storyboard>
-                                                </BeginStoryboard>
-                                            </DataTrigger.ExitActions>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Grid.Style>
-                            <c:WattPilotControl Height="200" WattPilotService="{Binding WattPilotService}" />
-                        </Grid>
                     </StackPanel>
                 </Grid>
 
@@ -192,12 +129,12 @@
                         <c:PowerFlowArrow Angle="-30" Fill="LightGray"
                                           Power="{Binding SolarSystemService.SolarSystem.Gen24System.PowerFlow.GridPower, FallbackValue={x:Null}}" />
 
-                        <c:PowerFlowArrow Angle="30" Margin="140,0,0,0" Fill="LightGreen" HasRightPlacement="True"
+                        <c:PowerFlowArrow Angle="30" Margin="60,0,0,0" Fill="LightGreen" HasRightPlacement="True"
                                           Power="{Binding SolarSystemService.SolarSystem.Gen24System.PowerFlow.StoragePower, FallbackValue={x:Null}}"
                                           Visibility="{Binding SolarSystemService.SolarSystem.Gen24System.Storage, Converter={co:NullToVisibility Null=Hidden}, FallbackValue=Hidden}" />
 
-                        <c:PowerFlowArrow x:Name="LoadArrow" Fill="LightGray" HasRightPlacement="True" DefaultsToOutgoing="True"
-                                          Margin="40,0,0,0" Angle="30">
+                        <c:PowerFlowArrow x:Name="LoadArrow" Fill="LightGray" HasRightPlacement="False" DefaultsToOutgoing="True"
+                                          Margin="{Binding SolarSystemService.SolarSystem.Gen24System2, Converter={co:NullToThickness NotNull='150,0,0,0', Null='15,0,0,0'}, FallbackValue='15,0,0,0'}" Angle="-30">
                             <c:PowerFlowArrow.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Header="{x:Static p:Resources.IncludeInverterPower}" IsChecked="{Binding IncludeInverterPower}" IsCheckable="True" />
@@ -205,14 +142,12 @@
                             </c:PowerFlowArrow.ContextMenu>
                         </c:PowerFlowArrow>
 
-                        <StackPanel Orientation="Horizontal" Visibility="{Binding WattPilotService.WattPilot, FallbackValue=Collapsed, Converter={co:NullToVisibility}}">
+                        <StackPanel Orientation="Horizontal" Visibility="{Binding WattPilotService.WattPilot, FallbackValue=Collapsed, Converter={co:NullToVisibility}}" Margin="0,0,0,0">
                             <StackPanel.LayoutTransform>
                                 <ScaleTransform ScaleX="{Binding ScaleX, ElementName=WattPilotTransform}" ScaleY="{Binding ScaleY, ElementName=WattPilotTransform}" />
                             </StackPanel.LayoutTransform>
-                            <c:PowerFlowArrow Angle="-30" x:Name="WattPilotArrow" Fill="{Binding ElementName=LoadArrow, Path=Fill}" HasRightPlacement="False" DefaultsToOutgoing="False"
-                                          Margin="105,0,0,0" Power="{Binding SolarSystemService.SolarSystem.WattPilot.PowerTotal, FallbackValue=0}" />
-                            <c:PowerFlowArrow x:Name="CarArrow" Angle="-30" Fill="{Binding ElementName=LoadArrow, Path=Fill}" HasRightPlacement="True" DefaultsToOutgoing="False"
-                                          Margin="58,0,0,0" HorizontalAlignment="Left"
+                            <!--<c:PowerFlowArrow x:Name="CarArrow" Angle="0" Fill="{Binding ElementName=LoadArrow, Path=Fill}" HasRightPlacement="True" DefaultsToOutgoing="False"
+                                          Margin="0,0,0,0" HorizontalAlignment="Right"
                                           Visibility="{Binding SolarSystemService.SolarSystem.WattPilot.PowerL1, FallbackValue=Collapsed, Converter={co:NullToVisibility}}">
                                 <c:PowerFlowArrow.Power>
                                     <MultiBinding Converter="{co:Sum}">
@@ -221,13 +156,52 @@
                                         <Binding Path="WattPilotService.WattPilot.PowerL3" FallbackValue="0" />
                                     </MultiBinding>
                                 </c:PowerFlowArrow.Power>
-                            </c:PowerFlowArrow>
+                            </c:PowerFlowArrow>-->
+                        </StackPanel>
+
+                        <Grid Visibility="{Binding WattPilotService.WattPilot, FallbackValue=Collapsed, Converter={co:NullToVisibility}}" Margin="152,0,0,0">
+                            <Grid.LayoutTransform>
+                                <ScaleTransform ScaleX="{Binding ScaleX, ElementName=WattPilotTransform}" ScaleY="{Binding ScaleY, ElementName=WattPilotTransform}" />
+                            </Grid.LayoutTransform>
+
+                            <vi:Car Width="150" HorizontalAlignment="Right" Margin="0,0,0,10" VerticalAlignment="Bottom" Status="{Binding SolarSystemService.SolarSystem.WattPilot.CarStatus, FallbackValue={x:Null}}"
+                                    Visibility="{Binding SolarSystemService.SolarSystem.WattPilot.CableCurrentMaximum, FallbackValue=Collapsed, Converter={co:NullToVisibility}}" />
+
+                            <TextBlock Opacity="{Binding SolarSystemService.SolarSystem.WattPilot.CarStatus, Converter={co:CarStatus2Opacity}, FallbackValue=.5}"
+                                       FontSize="9" FontWeight="Medium" TextAlignment="Center" Margin="30,74,0,0"
+                                       Visibility="{Binding SolarSystemService.SolarSystem.WattPilot.EnergyCurrentSession, FallbackValue=Collapsed, Converter={co:NullToVisibility}}">
+                                <TextBlock.LayoutTransform>
+                                    <RotateTransform Angle="-1.2" />
+                                </TextBlock.LayoutTransform>
+                                <Run Text="{Binding SolarSystemService.SolarSystem.WattPilot.EnergyCurrentSession, FallbackValue='-',Mode=OneWay, StringFormat=N0, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" />
+                                <Run Text="Wh" />
+                            </TextBlock>
+
+                            <TextBlock Margin="50,55,0,0" TextAlignment="Center" FontSize="10" FontWeight="Medium" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left"
+                                       Text="{Binding SolarSystemService.SolarSystem.WattPilot.CurrentUser,FallbackValue=''}">
+                                <TextBlock.LayoutTransform>
+                                    <RotateTransform Angle="-1.2" />
+                                </TextBlock.LayoutTransform>
+                            </TextBlock>
+                        </Grid>
+
+
+                        <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="10,0,0,10">
+                            <TextBlock FontSize="14" FontWeight="Medium" TextAlignment="Center" Margin="0" Visibility="{Binding SolarSystemService.SolarSystem.WattPilot.CableCurrentMaximum, FallbackValue=Collapsed, Converter={co:NullToVisibility}}">
+                                <Run Text="{Binding SolarSystemService.SolarSystem.WattPilot.CableCurrentMaximum, FallbackValue='-',Mode=OneWay, StringFormat=N0, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" />
+                                <Run Text="A" />
+                            </TextBlock>
+                            <vi:Typ2 Width="60" Margin="0,0,0,0" WattPilot="{Binding SolarSystemService.SolarSystem.WattPilot, FallbackValue={x:Null}}"
+                                     Visibility="{Binding SolarSystemService.SolarSystem.WattPilot.CableCurrentMaximum, FallbackValue=Collapsed, Converter={co:NullToVisibility}}" />
+
                         </StackPanel>
                     </StackPanel>
                 </Grid>
 
                 <Grid Grid.Column="0" Grid.Row="2" x:Name="LowerGrid">
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
@@ -240,20 +214,51 @@
                     <c:SmartMeterControl Height="200" HorizontalAlignment="Left" Grid.Column="1" Margin="10,0,0,0"
                                          SmartMeter="{Binding SolarSystemService.SolarSystem.Gen24System.PrimaryPowerMeter, FallbackValue={x:Null}}" />
 
-                    <c:StorageControl Height="200" Grid.Column="2" Margin="80,0,0,0"
+                    <c:StorageControl Height="200" Grid.Column="2" Margin="8,0,0,0"
                                       Gen24="{Binding SolarSystemService.SolarSystem.Gen24System, FallbackValue={x:Null}}"
                                       Visibility="{Binding SolarSystemService.SolarSystem.Gen24System.Storage, Converter={co:NullToVisibility Null=Hidden}, FallbackValue=Hidden}" />
                     <c:House Grid.Column="3" Width="240" Foreground="Black" VerticalAlignment="Bottom" Margin="10,0,0,3"
-                              PowerLossWatts="{Binding SolarSystemService.SolarSystem.SitePowerFlow.PowerLoss, FallbackValue={x:Null}}"
-                              Efficiency="{Binding SolarSystemService.SolarSystem.SitePowerFlow.Efficiency, FallbackValue={x:Null}}"
-                              ProductionWatts="{Binding SolarSystemService.SolarSystem.SitePowerFlow.SolarPower, FallbackValue={x:Null}}">
+                             PowerLossWatts="{Binding SolarSystemService.SolarSystem.SitePowerFlow.PowerLoss, FallbackValue={x:Null}}"
+                             Efficiency="{Binding SolarSystemService.SolarSystem.SitePowerFlow.Efficiency, FallbackValue={x:Null}}"
+                             ProductionWatts="{Binding SolarSystemService.SolarSystem.SitePowerFlow.SolarPower, FallbackValue={x:Null}}">
                         <c:House.ConsumptionWatts>
                             <MultiBinding Converter="{co:HouseConsumptionConverter}">
-                                <Binding Path="SolarSystemService.SolarSystem.SitePowerFlow.LoadPower" FallbackValue="{x:Null}"/>
-                                <Binding Path="SolarSystemService.SolarSystem.WattPilot.PowerTotal" FallbackValue="{x:Null}"/>
+                                <Binding Path="SolarSystemService.SolarSystem.SitePowerFlow.LoadPower" FallbackValue="{x:Null}" />
+                                <Binding Path="SolarSystemService.SolarSystem.WattPilot.PowerTotal" FallbackValue="{x:Null}" />
                             </MultiBinding>
                         </c:House.ConsumptionWatts>
                     </c:House>
+                    <c:PowerFlowArrow Grid.Column="4" x:Name="WattPilotArrow" Fill="{Binding ElementName=LoadArrow, Path=Fill}" HasRightPlacement="False" DefaultsToOutgoing="False"
+                                      Margin="-10,30,0,0" Power="{Binding SolarSystemService.SolarSystem.WattPilot.PowerTotal, FallbackValue=0}" />
+
+                    <Grid Margin="15,0,0,0" Grid.Column="5">
+                        <Grid.LayoutTransform>
+                            <ScaleTransform x:Name="WattPilotTransform" ScaleX="0" ScaleY="{Binding ElementName=WattPilotTransform, Path=ScaleX}" />
+                        </Grid.LayoutTransform>
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Settings.ShowWattPilot}" Value="True">
+                                        <DataTrigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation From="0" To="1" Duration="00:00:00.2" Storyboard.Target="{Binding Source={x:Reference WattPilotTransform}}" Storyboard.TargetProperty="ScaleX" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </DataTrigger.EnterActions>
+                                        <DataTrigger.ExitActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation From="1" To="0" Duration="00:00:00.2" Storyboard.Target="{Binding Source={x:Reference WattPilotTransform}}" Storyboard.TargetProperty="ScaleX" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </DataTrigger.ExitActions>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <c:WattPilotControl Height="200" WattPilotService="{Binding WattPilotService}" />
+                    </Grid>
 
                 </Grid>
             </Grid>
@@ -273,7 +278,7 @@
                 </ItemsControl.LayoutTransform>
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Vertical" IsItemsHost="True" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+                        <WrapPanel Orientation="Vertical" IsItemsHost="True" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.Resources>
