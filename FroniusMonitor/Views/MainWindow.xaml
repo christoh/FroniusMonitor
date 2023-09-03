@@ -229,6 +229,8 @@
                             <MultiBinding Converter="{co:HouseConsumptionConverter}">
                                 <Binding Path="SolarSystemService.SolarSystem.SitePowerFlow.LoadPower" FallbackValue="{x:Null}" />
                                 <Binding Path="SolarSystemService.SolarSystem.WattPilot.PowerTotal" FallbackValue="{x:Null}" />
+                                <Binding Path="SolarSystemService.SolarSystem.SitePowerFlow.PowerLoss" FallbackValue="{x:Null}"/>
+                                <Binding Path="Settings.AddInverterPowerToConsumption" FallbackValue="{x:Null}"/>
                             </MultiBinding>
                         </c:House.ConsumptionWatts>
                     </c:House>

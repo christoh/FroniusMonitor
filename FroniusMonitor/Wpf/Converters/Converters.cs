@@ -854,12 +854,16 @@ public class HouseConsumptionConverter : MultiConverterBase
 {
     public override object? Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (values.Length < 1 || values[0] is not double loadPower)
+        if (values.Length < 4 || values[0] is not double loadPower)
         {
             return null;
         }
 
-        return values.Length < 2 || values[1] is not double wattPilotPower ? -loadPower : -loadPower - wattPilotPower;
+        var wattPilotPower = values[1] as double? ?? 0;
+        var powerLoss = values[2] as double? ?? 0;
+        var includeInverterPower = values[3] as bool? ?? false;
+
+        return -loadPower - wattPilotPower + (includeInverterPower ? powerLoss : 0);
     }
 }
 
