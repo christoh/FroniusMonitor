@@ -183,7 +183,7 @@ public abstract class GridMeterCorrectorBase : ConverterBase
             first = solarSystemService.SmartMeterHistory.FirstOrDefault(item => double.IsFinite(GetOffset(item, EnergyDirection)));
             last = solarSystemService.SmartMeterHistory.LastOrDefault(item => double.IsFinite(GetOffset(item, EnergyDirection)));
 
-            if (first is not null && last is not null)
+            if (last is not null)
             {
                 lastOffsetCorrectedValue = LastEnergyReal + LastOffset;
                 factor = (lastOffsetCorrectedValue - FirstEnergyReal - FirstOffset) / (LastEnergyReal - FirstEnergyReal);

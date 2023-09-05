@@ -203,15 +203,8 @@ public partial class MainWindow
             return;
         }
 
-        var sitePowerFlow = new Gen24PowerFlow
-        {
-            LoadPower = (PowerFlow?.LoadPower ?? -PowerFlow?.InverterAcPower ?? 0) + (PowerFlow2?.LoadPower ?? -PowerFlow2?.InverterAcPower ?? 0),
-            GridPower = (PowerFlow?.GridPower ?? 0) + (PowerFlow2?.GridPower ?? 0),
-            StoragePower = (PowerFlow?.StoragePower ?? 0) + (PowerFlow2?.StoragePower ?? 0),
-            SolarPower = (PowerFlow?.SolarPower ?? 0) + (PowerFlow2?.SolarPower ?? 0)
-        };
-
-        LoadArrow.Power = sitePowerFlow.LoadPowerCorrected - (ViewModel.IncludeInverterPower ? sitePowerFlow.LoadPowerCorrected + sitePowerFlow.SolarPower + sitePowerFlow.GridPowerCorrected + sitePowerFlow.StoragePower : 0);
+        var sitePowerFlow = ViewModel.SolarSystemService.SolarSystem?.SitePowerFlow;
+        LoadArrow.Power = sitePowerFlow?.LoadPowerCorrected - (ViewModel.IncludeInverterPower ? sitePowerFlow?.LoadPowerCorrected + sitePowerFlow?.SolarPower + sitePowerFlow?.GridPowerCorrected + sitePowerFlow?.StoragePower : 0);
         LoadArrowPrimaryInverter.Power = PowerFlow?.LoadPowerCorrected - (ViewModel.IncludeInverterPower ? PowerFlow?.LoadPowerCorrected + PowerFlow?.SolarPower + PowerFlow?.GridPowerCorrected + PowerFlow?.StoragePower : 0);
 
         ColorLoadArrow(LoadArrow, sitePowerFlow, Brushes.Salmon);

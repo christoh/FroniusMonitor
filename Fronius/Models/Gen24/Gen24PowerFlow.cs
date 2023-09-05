@@ -89,20 +89,16 @@ public class Gen24PowerFlow : Gen24DeviceBase
         set => Set(ref loadPower, value, () => NotifyOfPropertyChange(nameof(LoadPowerCorrected)));
     }
 
-    private static double consumedFactor = double.NaN;
+    private static double consumedFactor = 1;
 
     public static double ConsumedFactor
     {
         get
         {
-            if (oldSmartMeterHistoryCountConsumed != history.Count || !double.IsFinite(consumedFactor))
+            if (oldSmartMeterHistoryCountConsumed != history.Count)
             {
                 var consumed = (IReadOnlyList<SmartMeterCalibrationHistoryItem>)history.Where(item => double.IsFinite(item.ConsumedOffset)).ToList();
-
-                consumedFactor = consumed.Count < 2
-                    ? 1
-                    : (consumed[^1].EnergyRealConsumed + consumed[^1].ConsumedOffset - consumed[0].EnergyRealConsumed - consumed[0].ConsumedOffset) / (consumed[^1].EnergyRealConsumed - consumed[0].EnergyRealConsumed);
-
+                consumedFactor = CalculateSmartMeterFactor(consumed, false);
                 oldSmartMeterHistoryCountConsumed = history.Count;
             }
 
@@ -110,20 +106,16 @@ public class Gen24PowerFlow : Gen24DeviceBase
         }
     }
 
-    private static double producedFactor = double.NaN;
+    private static double producedFactor = 1;
 
     public static double ProducedFactor
     {
         get
         {
-            if (oldSmartMeterHistoryCountProduced != history.Count || !double.IsFinite(producedFactor))
+            if (oldSmartMeterHistoryCountProduced != history.Count)
             {
                 var produced = (IReadOnlyList<SmartMeterCalibrationHistoryItem>)history.Where(item => double.IsFinite(item.ProducedOffset)).ToList();
-
-                producedFactor = produced.Count < 2
-                    ? 1
-                    : (produced[^1].EnergyRealProduced + produced[^1].ProducedOffset - produced[0].EnergyRealProduced - produced[0].ProducedOffset) / (produced[^1].EnergyRealProduced - produced[0].EnergyRealProduced);
-
+                producedFactor = CalculateSmartMeterFactor(produced, true);
                 oldSmartMeterHistoryCountProduced = history.Count;
             }
 
@@ -178,13 +170,27 @@ public class Gen24PowerFlow : Gen24DeviceBase
         set => Set(ref mainInverterId, value);
     }
 
-    public IEnumerable<double> AllPowers => new[] { StoragePower, GridPowerCorrected, SolarPower, LoadPowerCorrected ?? -InverterAcPower }.Where(ps => ps.HasValue).Select(ps => ps!.Value);
-    public double DcPower => (StoragePower ?? 0) + (SolarPower ?? 0);
-    public double AcPower => (LoadPowerCorrected ?? -InverterAcPower ?? 0) + (GridPowerCorrected ?? 0);
-    public double PowerLoss => DcPower + AcPower;
-    public double? Input => AllPowers.Any() ? AllPowers.Where(ps => ps > 0).Sum() : null;
-    public double? Output => AllPowers.Any() ? AllPowers.Where(ps => ps < 0).Sum() : null;
-    public double? Efficiency => 1 - PowerLoss / Input;
+    public IEnumerable<double> AllPowers => new[] { StoragePower, GridPower, SolarPower, LoadPower ?? -InverterAcPower }.Where(ps => ps.HasValue).Select(ps => ps!.Value);
+    public double DcInputPower => new[] { StoragePower ?? 0, SolarPower ?? 0 }.Where(ps => ps > 0).Sum();
+    //public double AcPower => (LoadPower ?? -InverterAcPower ?? 0) + (GridPower ?? 0);
+    public double PowerLoss => (StoragePower + SolarPower - InverterAcPower) ?? 0;
+    //public double? Input => AllPowers.Any() ? AllPowers.Where(ps => ps > 0).Sum() : null;
+    //public double? Output => AllPowers.Any() ? AllPowers.Where(ps => ps < 0).Sum() : null;
+    public double? Efficiency => 1 - PowerLoss / DcInputPower;
+
+    private static double CalculateSmartMeterFactor(IReadOnlyList<SmartMeterCalibrationHistoryItem> list, bool isProduced)
+    {
+        if (list.Count < 2)
+        {
+            return 1.0;
+        }
+
+        var first = list[0];
+        var last = list[^1];
+        var rawEnergy = (isProduced ? last.EnergyRealProduced : last.EnergyRealConsumed) - (isProduced ? first.EnergyRealProduced : first.EnergyRealConsumed);
+        var offsetEnergy = (isProduced ? last.ProducedOffset : last.ConsumedOffset) - (isProduced ? first.ProducedOffset : first.ConsumedOffset);
+        return (rawEnergy + offsetEnergy) / rawEnergy;
+    }
 
     //private void NotifyPowers()
     //{

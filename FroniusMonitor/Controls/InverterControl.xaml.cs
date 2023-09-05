@@ -358,9 +358,10 @@ public partial class InverterControl : IHaveLcdPanel
                 case InverterDisplayMode.MoreEfficiency:
                     Lcd.Header = Loc.Efficiency;
                     Lcd.Label1 = "Loss";
-                    Lcd.Value1 = ToLcd((inverter?.SolarPowerSum ?? 0) + (inverter?.StoragePower ?? 0) - (inverter?.PowerApparentSum ?? 0), "N1", "W");
+                    var loss = (inverter?.SolarPowerSum ?? 0) + (inverter?.StoragePower ?? 0) - (inverter?.PowerApparentSum ?? 0);
+                    Lcd.Value1 = ToLcd(loss, "N1", "W");
                     Lcd.Label2 = "Eff";
-                    Lcd.Value2 = ToLcd((inverter?.PowerApparentSum ?? 0) / ((inverter?.SolarPowerSum ?? 0) + (inverter?.StoragePower ?? 0)), "P2");
+                    Lcd.Value2 = ToLcd(1 - loss / new[] { inverter?.SolarPowerSum, inverter?.StoragePower }.Where(ps => ps is > 0.0).Sum(), "P2");
                     Lcd.Label3 = "Sc";
                     Lcd.Value3 = ToLcd(Math.Max(Math.Min(-powerFlow?.LoadPowerCorrected / powerFlow?.InverterAcPower ?? 0, 1), 0), "P2");
                     Lcd.LabelSum = "Aut";
