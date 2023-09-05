@@ -127,7 +127,7 @@
                     <StackPanel Orientation="Horizontal" Margin="100,-40,0,0">
 
                         <c:PowerFlowArrow Angle="-30" Fill="LightGray"
-                                          Power="{Binding SolarSystemService.SolarSystem.Gen24System.PowerFlow.GridPower, FallbackValue={x:Null}}" />
+                                          Power="{Binding SolarSystemService.SolarSystem.Gen24System.PowerFlow.GridPowerCorrected, FallbackValue={x:Null}}" />
 
                         <c:PowerFlowArrow Angle="30" Margin="60,0,0,0" Fill="LightGreen" HasRightPlacement="True"
                                           Power="{Binding SolarSystemService.SolarSystem.Gen24System.PowerFlow.StoragePower, FallbackValue={x:Null}}"
@@ -227,7 +227,7 @@
                              ProductionWatts="{Binding SolarSystemService.SolarSystem.SitePowerFlow.SolarPower, FallbackValue={x:Null}}">
                         <c:House.ConsumptionWatts>
                             <MultiBinding Converter="{co:HouseConsumptionConverter}">
-                                <Binding Path="SolarSystemService.SolarSystem.SitePowerFlow.LoadPower" FallbackValue="{x:Null}" />
+                                <Binding Path="SolarSystemService.SolarSystem.SitePowerFlow.LoadPowerCorrected" FallbackValue="{x:Null}" />
                                 <Binding Path="SolarSystemService.SolarSystem.WattPilot.PowerTotal" FallbackValue="{x:Null}" />
                                 <Binding Path="SolarSystemService.SolarSystem.SitePowerFlow.PowerLoss" FallbackValue="{x:Null}"/>
                                 <Binding Path="Settings.AddInverterPowerToConsumption" FallbackValue="{x:Null}"/>

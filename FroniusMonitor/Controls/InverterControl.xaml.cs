@@ -362,9 +362,9 @@ public partial class InverterControl : IHaveLcdPanel
                     Lcd.Label2 = "Eff";
                     Lcd.Value2 = ToLcd((inverter?.PowerApparentSum ?? 0) / ((inverter?.SolarPowerSum ?? 0) + (inverter?.StoragePower ?? 0)), "P2");
                     Lcd.Label3 = "Sc";
-                    Lcd.Value3 = ToLcd(Math.Max(Math.Min(-powerFlow?.LoadPower / powerFlow?.InverterAcPower ?? 0, 1), 0), "P2");
+                    Lcd.Value3 = ToLcd(Math.Max(Math.Min(-powerFlow?.LoadPowerCorrected / powerFlow?.InverterAcPower ?? 0, 1), 0), "P2");
                     Lcd.LabelSum = "Aut";
-                    Lcd.ValueSum = ToLcd(powerFlow?.LoadPower > 0 ? 1 : Math.Max(Math.Min(-powerFlow?.InverterAcPower / powerFlow?.LoadPower ?? 0, 1d), 0), "P2");
+                    Lcd.ValueSum = ToLcd(powerFlow?.LoadPowerCorrected > 0 ? 1 : Math.Max(Math.Min(-powerFlow?.InverterAcPower / powerFlow?.LoadPowerCorrected ?? 0, 1d), 0), "P2");
                     break;
 
                 case InverterDisplayMode.MoreTemperatures:

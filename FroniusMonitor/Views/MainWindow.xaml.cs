@@ -203,7 +203,7 @@ public partial class MainWindow
             return;
         }
 
-        var powerFlow = new Gen24PowerFlow
+        var sitePowerFlow = new Gen24PowerFlow
         {
             LoadPower = (PowerFlow?.LoadPower ?? -PowerFlow?.InverterAcPower ?? 0) + (PowerFlow2?.LoadPower ?? -PowerFlow2?.InverterAcPower ?? 0),
             GridPower = (PowerFlow?.GridPower ?? 0) + (PowerFlow2?.GridPower ?? 0),
@@ -211,10 +211,10 @@ public partial class MainWindow
             SolarPower = (PowerFlow?.SolarPower ?? 0) + (PowerFlow2?.SolarPower ?? 0)
         };
 
-        LoadArrow.Power = powerFlow.LoadPower - (ViewModel.IncludeInverterPower ? powerFlow.LoadPower + powerFlow.SolarPower + powerFlow.GridPower + powerFlow.StoragePower : 0);
-        LoadArrowPrimaryInverter.Power = PowerFlow?.LoadPower - (ViewModel.IncludeInverterPower ? PowerFlow?.LoadPower + PowerFlow?.SolarPower + PowerFlow?.GridPower + PowerFlow?.StoragePower : 0);
+        LoadArrow.Power = sitePowerFlow.LoadPowerCorrected - (ViewModel.IncludeInverterPower ? sitePowerFlow.LoadPowerCorrected + sitePowerFlow.SolarPower + sitePowerFlow.GridPowerCorrected + sitePowerFlow.StoragePower : 0);
+        LoadArrowPrimaryInverter.Power = PowerFlow?.LoadPowerCorrected - (ViewModel.IncludeInverterPower ? PowerFlow?.LoadPowerCorrected + PowerFlow?.SolarPower + PowerFlow?.GridPowerCorrected + PowerFlow?.StoragePower : 0);
 
-        ColorLoadArrow(LoadArrow, powerFlow, Brushes.Salmon);
+        ColorLoadArrow(LoadArrow, sitePowerFlow, Brushes.Salmon);
         ColorLoadArrow(LoadArrowPrimaryInverter, PowerFlow, new SolidColorBrush(Color.FromRgb(0xff, 0xd0, 0)));
     }
 
