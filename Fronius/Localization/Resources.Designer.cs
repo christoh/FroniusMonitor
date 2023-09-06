@@ -637,6 +637,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to DC power %.
+        /// </summary>
+        public static string DcRelativePower {
+            get {
+                return ResourceManager.GetString("DcRelativePower", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to DC voltage.
         /// </summary>
         public static string DcVoltage {

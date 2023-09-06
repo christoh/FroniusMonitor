@@ -138,6 +138,42 @@ public abstract class SettingsBase : BindableBase, ICloneable
         set => Set(ref toshibaAcConnection, value);
     }
 
+    private double inverter1Dc1WattPeak = double.NaN;
+
+    [XmlElement, DefaultValue(double.NaN)]
+    public double Inverter1Dc1WattPeak
+    {
+        get => inverter1Dc1WattPeak;
+        set => Set(ref inverter1Dc1WattPeak, value);
+    }
+
+    private double inverter1Dc2WattPeak = double.NaN;
+
+    [XmlElement, DefaultValue(double.NaN)] 
+    public double Inverter1Dc2WattPeak
+    {
+        get => inverter1Dc2WattPeak;
+        set => Set(ref inverter1Dc2WattPeak, value);
+    }
+
+    private double inverter2Dc1WattPeak = double.NaN;
+
+    [XmlElement, DefaultValue(double.NaN)]
+    public double Inverter2Dc1WattPeak
+    {
+        get => inverter2Dc1WattPeak;
+        set => Set(ref inverter2Dc1WattPeak, value);
+    }
+
+    private double inverter2Dc2WattPeak = double.NaN;
+
+    [XmlElement, DefaultValue(double.NaN)] 
+    public double Inverter2Dc2WattPeak
+    {
+        get => inverter2Dc2WattPeak;
+        set => Set(ref inverter2Dc2WattPeak, value);
+    }
+
     private Guid azureDeviceId = Guid.NewGuid();
 
     [XmlIgnore]
@@ -162,24 +198,6 @@ public abstract class SettingsBase : BindableBase, ICloneable
         get => addInverterPowerToConsumption;
         set => Set(ref addInverterPowerToConsumption, value);
     }
-
-    //private double consumedEnergyOffsetWattHours;
-
-    //[XmlElement]
-    //public double ConsumedEnergyOffsetWattHours
-    //{
-    //    get => consumedEnergyOffsetWattHours;
-    //    set => Set(ref consumedEnergyOffsetWattHours, value);
-    //}
-
-    //private double producedEnergyOffsetWattHours;
-
-    //[XmlElement]
-    //public double ProducedEnergyOffsetWattHours
-    //{
-    //    get => producedEnergyOffsetWattHours;
-    //    set => Set(ref producedEnergyOffsetWattHours, value);
-    //}
 
     protected static void UpdateChecksum(params WebConnection?[] connections)
     {

@@ -1140,4 +1140,7 @@
   <data name="StandbyWarning" xml:space="preserve">
 	  <value>Bist Du sicher, dass Du den Wechselrichter in den Stand-By-Modus versetzen willst?</value>
   </data>
+  <data name="DcRelativePower" xml:space="preserve">
+	  <value>DC-Leistung %</value>
+  </data>
 </root>

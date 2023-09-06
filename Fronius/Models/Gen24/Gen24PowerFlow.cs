@@ -172,10 +172,7 @@ public class Gen24PowerFlow : Gen24DeviceBase
 
     public IEnumerable<double> AllPowers => new[] { StoragePower, GridPower, SolarPower, LoadPower ?? -InverterAcPower }.Where(ps => ps.HasValue).Select(ps => ps!.Value);
     public double DcInputPower => new[] { StoragePower ?? 0, SolarPower ?? 0 }.Where(ps => ps > 0).Sum();
-    //public double AcPower => (LoadPower ?? -InverterAcPower ?? 0) + (GridPower ?? 0);
     public double PowerLoss => (StoragePower + SolarPower - InverterAcPower) ?? 0;
-    //public double? Input => AllPowers.Any() ? AllPowers.Where(ps => ps > 0).Sum() : null;
-    //public double? Output => AllPowers.Any() ? AllPowers.Where(ps => ps < 0).Sum() : null;
     public double? Efficiency => 1 - PowerLoss / DcInputPower;
 
     private static double CalculateSmartMeterFactor(IReadOnlyList<SmartMeterCalibrationHistoryItem> list, bool isProduced)
@@ -191,15 +188,4 @@ public class Gen24PowerFlow : Gen24DeviceBase
         var offsetEnergy = (isProduced ? last.ProducedOffset : last.ConsumedOffset) - (isProduced ? first.ProducedOffset : first.ConsumedOffset);
         return (rawEnergy + offsetEnergy) / rawEnergy;
     }
-
-    //private void NotifyPowers()
-    //{
-    //    NotifyOfPropertyChange(nameof(AllPowers));
-    //    NotifyOfPropertyChange(nameof(DcPower));
-    //    NotifyOfPropertyChange(nameof(PowerLoss));
-    //    NotifyOfPropertyChange(nameof(PowerLoss));
-    //    NotifyOfPropertyChange(nameof(Input));
-    //    NotifyOfPropertyChange(nameof(Output));
-    //    NotifyOfPropertyChange(nameof(Efficiency));
-    //}
 }

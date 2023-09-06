@@ -1179,4 +1179,7 @@
   <data name="StandbyWarning" xml:space="preserve">
 	  <value>Are you sure you want to set this inverter to standy?</value>
   </data>
+  <data name="DcRelativePower" xml:space="preserve">
+	  <value>DC power %</value>
+  </data>
 </root>

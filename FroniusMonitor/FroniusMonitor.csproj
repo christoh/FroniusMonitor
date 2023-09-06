@@ -27,17 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Assets\Fonts\D7MONO.ttf" />
-    <None Remove="Assets\Fonts\DOTMATRI.TTF" />
-    <None Remove="Assets\Fonts\DOTMBold.TTF" />
-    <None Remove="Assets\Fonts\EHSMB.TTF" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Assets\Images\sun.ico" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
   </ItemGroup>
 

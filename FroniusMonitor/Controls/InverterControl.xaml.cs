@@ -12,6 +12,7 @@ public enum InverterDisplayMode
     DcVoltage,
     DcCurrent,
     DcPower,
+    DcRelativePower,
     EnergyInverter,
     EnergyStorage,
     EnergySolar,
@@ -28,7 +29,7 @@ public partial class InverterControl : IHaveLcdPanel
     private readonly ISolarSystemService? solarSystemService = IoC.TryGetRegistered<ISolarSystemService>();
     private IWebClientService? webClientService;
     private static readonly IReadOnlyList<InverterDisplayMode> acModes = new[] { InverterDisplayMode.AcPowerReal, InverterDisplayMode.AcPowerApparent, InverterDisplayMode.AcPowerReactive, InverterDisplayMode.AcPowerFactor, InverterDisplayMode.AcCurrent, InverterDisplayMode.AcPhaseVoltage, InverterDisplayMode.AcLineVoltage, };
-    private static readonly IReadOnlyList<InverterDisplayMode> dcModes = new[] { InverterDisplayMode.DcPower, InverterDisplayMode.DcCurrent, InverterDisplayMode.DcVoltage, };
+    private static readonly IReadOnlyList<InverterDisplayMode> dcModes = new[] { InverterDisplayMode.DcPower, InverterDisplayMode.DcRelativePower, InverterDisplayMode.DcCurrent, InverterDisplayMode.DcVoltage, };
     private static readonly IReadOnlyList<InverterDisplayMode> moreModes = new[] { InverterDisplayMode.MoreEfficiency, InverterDisplayMode.More, InverterDisplayMode.MoreTemperatures, InverterDisplayMode.MoreFans, InverterDisplayMode.MoreOp, InverterDisplayMode.MoreVersions };
     private static readonly IReadOnlyList<InverterDisplayMode> energyModes = new[] { InverterDisplayMode.EnergySolar, InverterDisplayMode.EnergyInverter, InverterDisplayMode.EnergyStorage, };
     private int currentAcIndex, currentDcIndex, currentMoreIndex, energyIndex;
@@ -303,6 +304,22 @@ public partial class InverterControl : IHaveLcdPanel
                         "N1", "W"
                     );
 
+                    break;
+
+                case InverterDisplayMode.DcRelativePower:
+                    Lcd.Header = Loc.DcRelativePower;
+                    var wattPeak1 = IsSecondary ? App.Settings.Inverter2Dc1WattPeak : App.Settings.Inverter1Dc1WattPeak;
+                    var wattPeak2 = IsSecondary ? App.Settings.Inverter2Dc2WattPeak : App.Settings.Inverter1Dc2WattPeak;
+                    var power1 = cache?.Solar1Power ?? inverter?.Solar1Power;
+                    var power2 = cache?.Solar2Power ?? inverter?.Solar2Power;
+                    Lcd.Label1 = "PV1";
+                    Lcd.Label2 = "PV2";
+                    Lcd.Label3 = string.Empty;
+                    Lcd.LabelSum = "Total";
+                    Lcd.Value1 = ToLcd(power1 / wattPeak1, "P2");
+                    Lcd.Value2 = ToLcd(power2 / wattPeak2, "P2");
+                    Lcd.Value3 = string.Empty;
+                    Lcd.ValueSum = ToLcd((power1 + power2) / (wattPeak1 + wattPeak2), "P2");
                     break;
 
                 case InverterDisplayMode.EnergyInverter:
