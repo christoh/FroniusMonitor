@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Controls;
+﻿using De.Hochstaetter.Fronius.Models.Gen24;
+
+namespace De.Hochstaetter.FroniusMonitor.Controls;
 
 public enum InverterDisplayMode
 {
@@ -314,12 +316,12 @@ public partial class InverterControl : IHaveLcdPanel
                     var power2 = cache?.Solar2Power ?? inverter?.Solar2Power;
                     Lcd.Label1 = "PV1";
                     Lcd.Label2 = "PV2";
-                    Lcd.Label3 = string.Empty;
-                    Lcd.LabelSum = "Total";
+                    Lcd.Label3 = "Total";
+                    Lcd.LabelSum = "Site";
                     Lcd.Value1 = ToLcd(power1 / wattPeak1, "P2");
                     Lcd.Value2 = ToLcd(power2 / wattPeak2, "P2");
-                    Lcd.Value3 = string.Empty;
-                    Lcd.ValueSum = ToLcd((power1 + power2) / (wattPeak1 + wattPeak2), "P2");
+                    Lcd.Value3 = ToLcd((power1 + power2) / (wattPeak1 + wattPeak2), "P2");
+                    Lcd.ValueSum = ToLcd(powerFlow?.SolarPower / (App.Settings.Inverter1Dc1WattPeak + App.Settings.Inverter1Dc2WattPeak + App.Settings.Inverter2Dc1WattPeak + App.Settings.Inverter2Dc2WattPeak), "P2");
                     break;
 
                 case InverterDisplayMode.EnergyInverter:
