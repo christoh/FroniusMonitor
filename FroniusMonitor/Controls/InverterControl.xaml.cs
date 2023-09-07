@@ -467,7 +467,7 @@ public partial class InverterControl : IHaveLcdPanel
 
     private void OnMoreClicked(object sender, RoutedEventArgs e) => CycleMode(moreModes, ref currentMoreIndex);
 
-    private async void OnTestClick(object sender, RoutedEventArgs e)
+    private async void OnStandByClicked(object sender, RoutedEventArgs e)
     {
         if (sender is not ToggleButton { IsChecked: not null } toggleButton || webClientService is null)
         {

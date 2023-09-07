@@ -70,7 +70,7 @@
                     <RadioButton Content="DC" Click="OnDcClicked"/>
                     <RadioButton Content="{x:Static p:Resources.Energy}" Click="OnEnergyClicked"/>
                     <RadioButton Content="{x:Static p:Resources.More}" Click="OnMoreClicked"/>
-                    <ToggleButton Margin="3,0,0,0" x:Name="StandByButton" Content="Status" Height="6" Click="OnTestClick"/>
+                    <ToggleButton Margin="3,0,0,0" x:Name="StandByButton" Content="Status" Height="6" Click="OnStandByClicked"/>
                 </WrapPanel>
             </Grid>
         </Border>
