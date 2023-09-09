@@ -71,6 +71,8 @@ public partial class App
                 .AddTransient<SettingsViewModel>()
                 .AddTransient<WattPilotSettingsView>()
                 .AddTransient<WattPilotSettingsViewModel>()
+                .AddTransient<InverterSettingsView>()
+                .AddTransient<InverterSettingsViewModel>()
                 .BuildServiceProvider()
             ;
 

@@ -18,10 +18,12 @@ namespace De.Hochstaetter.Fronius.Contracts
         ValueTask SetFritzBoxColor(string ain, double hueDegrees, double saturation);
         ValueTask<IOrderedEnumerable<Gen24Event>> GetFroniusEvents();
         ValueTask<T> ReadGen24Entity<T>(string request) where T : new();
-        ValueTask<(string JsonString,HttpStatusCode StatusCode)> GetFroniusStringResponse(string request, JToken? token = null, IEnumerable<HttpStatusCode>? allowedStatusCodes = null);
+        ValueTask<(string JsonString, HttpStatusCode StatusCode)> GetFroniusStringResponse(string request, JToken? token = null, IEnumerable<HttpStatusCode>? allowedStatusCodes = null);
         ValueTask<(JToken Token, HttpStatusCode StatusCode)> GetFroniusJsonResponse(string request, JToken? token = null, IEnumerable<HttpStatusCode>? allowedStatusCodes = null);
         Task<string> GetConfigString(string category, string key);
         Task<string> GetUiString(string category, string key);
+        Task<string> GetFroniusName<T>(T enumValue) where T : Enum;
+        public Task<string> GetChannelString(string category);
         ValueTask<string> GetEventDescription(string code);
         ValueTask<Gen24StandByStatus?> GetInverterStandByStatus();
         ValueTask RequestInverterStandBy(bool isStandBy);

@@ -8,11 +8,17 @@
              xmlns:ddd="clr-namespace:System.Collections.Generic;assembly=System.Runtime"
              xmlns:gen24="clr-namespace:De.Hochstaetter.Fronius.Models.Gen24;assembly=Fronius"
              xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
+             xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
              mc:Ignorable="d" 
              d:DesignHeight="127" d:DesignWidth="110">
     <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:InverterControl}}">
         <Border BorderBrush="DimGray" BorderThickness="1" Width="110">
             <Grid x:Name="BackgroundProvider" Background="LightGray" >
+                <Grid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="{x:Static p:Resources.Settings}" Icon="{vi:SettingsIcon}" Click="OnSettingsClicked"/>
+                    </ContextMenu>
+                </Grid.ContextMenu>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>

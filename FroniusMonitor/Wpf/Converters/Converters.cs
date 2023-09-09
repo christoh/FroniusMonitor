@@ -763,6 +763,8 @@ public class EqualityToAnything<TFrom, TTo> : ConverterBase
 
 public class ByteEqualityToString : EqualityToAnything<byte, string> { }
 
+public class String2Bool : EqualityToAnything<string, bool> { }
+
 public class ToshibaAcOperatingMode2Visibility : EqualityToAnything<ToshibaHvacOperatingMode, Visibility> { }
 
 public class ToshibaAcOperatingMode2Brush : EqualityToAnything<ToshibaHvacOperatingMode, Brush> { }
@@ -770,6 +772,8 @@ public class ToshibaAcOperatingMode2Brush : EqualityToAnything<ToshibaHvacOperat
 public class ToshibaHvacWifiLedStatus2Brush : EqualityToAnything<ToshibaHvacWifiLedStatus, Brush> { }
 
 public class ToshibaHvacSwingMode2Visibility : EqualityToAnything<ToshibaHvacSwingMode, Visibility> { }
+
+public class MpptPowerMode2Visibility : EqualityToAnything<MpptPowerMode, Visibility> { }
 
 public class ToshibaHvacSwingMode2Brush : EqualityToAnything<ToshibaHvacSwingMode, Brush>
 {

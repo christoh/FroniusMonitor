@@ -628,7 +628,7 @@
 	  <value>Regel hinzufügen</value>
   </data>
   <data name="RuleTooltip" xml:space="preserve">
-	  <value>Benutze die rechte Maustaste, um Regeln hinzuzufügen oder zu löschen.</value>
+	  <value>Verwende die rechte Maustaste, um Regeln hinzuzufügen oder zu löschen.</value>
   </data>
   <data name="RuleType" xml:space="preserve">
 	  <value>Art der Regel</value>
@@ -1142,5 +1142,11 @@
   </data>
   <data name="DcRelativePower" xml:space="preserve">
 	  <value>DC-Leistung %</value>
+  </data>
+  <data name="InverterSettings" xml:space="preserve">
+	  <value>Wechselrichtereinstellungen</value>
+  </data>
+  <data name="SynchronizeTime" xml:space="preserve">
+	  <value>NTP-Zeitsynchronisierung benutzen</value>
   </data>
 </root>

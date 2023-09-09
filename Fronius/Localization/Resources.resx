@@ -1182,4 +1182,10 @@
   <data name="DcRelativePower" xml:space="preserve">
 	  <value>DC power %</value>
   </data>
+  <data name="InverterSettings" xml:space="preserve">
+	  <value>Inverter Settings</value>
+  </data>
+  <data name="SynchronizeTime" xml:space="preserve">
+	  <value>Use NTP time synchronization</value>
+  </data>
 </root>

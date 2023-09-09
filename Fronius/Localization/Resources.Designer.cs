@@ -1204,6 +1204,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Inverter Settings.
+        /// </summary>
+        public static string InverterSettings {
+            get {
+                return ResourceManager.GetString("InverterSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} is already running..
         /// </summary>
         public static string IsAlreadyRunning {
@@ -2919,6 +2928,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string SunspecMode_Int {
             get {
                 return ResourceManager.GetString("SunspecMode_Int", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use NTP time synchronization.
+        /// </summary>
+        public static string SynchronizeTime {
+            get {
+                return ResourceManager.GetString("SynchronizeTime", resourceCulture);
             }
         }
         

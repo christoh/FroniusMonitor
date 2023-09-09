@@ -1,8 +1,7 @@
 ﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
-public abstract class SettingsViewModelBase : ViewModelBase
+public abstract class SettingsViewModelBase : ViewModelBase, IHaveWebClientService
 {
-    protected readonly IWebClientService WebClientService;
     protected readonly IGen24JsonService Gen24Service;
     protected readonly IWattPilotService WattPilotService;
 
@@ -13,6 +12,14 @@ public abstract class SettingsViewModelBase : ViewModelBase
         WattPilotService = wattPilotService;
     }
 
+    private IWebClientService webClientService = null!;
+
+    public IWebClientService WebClientService
+    {
+        get => webClientService;
+        set => Set(ref webClientService, value);
+    }
+    
     private string toastText = string.Empty;
 
     public string ToastText

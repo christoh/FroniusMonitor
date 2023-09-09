@@ -98,13 +98,20 @@ public partial class MainWindow
 
     public WattPilotSettingsView WattPilotSettingsView => GetView<WattPilotSettingsView>();
 
-    public T GetView<T>() where T : Window
+    public T GetView<T>(IWebClientService? webClientService = null) where T : Window
     {
-        var view = OwnedWindows.OfType<T>().SingleOrDefault();
+        var views = OwnedWindows.OfType<T>();
+        var view = webClientService == null ? views.SingleOrDefault() : views.SingleOrDefault(v => v is IHaveWebClientService haveWebClientService && haveWebClientService.WebClientService == webClientService);
 
         if (view == null)
         {
             view = IoC.Get<T>();
+
+            if (view is IHaveWebClientService haveWebClientService)
+            {
+                haveWebClientService.WebClientService = webClientService!;
+            }
+
             view.Owner = this;
             view.Show();
         }

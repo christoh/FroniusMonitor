@@ -1,25 +1,21 @@
-﻿using De.Hochstaetter.Fronius.Models.Settings;
+﻿namespace De.Hochstaetter.FroniusMonitor.Views;
 
-namespace De.Hochstaetter.FroniusMonitor.Views
+public partial class SettingsView
 {
-    public partial class SettingsView
+    public SettingsView(SettingsViewModel viewModel)
     {
-        public SettingsView(SettingsViewModel viewModel)
+        InitializeComponent();
+        DataContext = viewModel;
+
+        Loaded += async (_, _) =>
         {
-            InitializeComponent();
-            DataContext = viewModel;
+            viewModel.Dispatcher = Dispatcher;
+            await viewModel.OnInitialize().ConfigureAwait(false);
+        };
+    }
 
-            Loaded += async (_, _) =>
-            {
-                viewModel.Dispatcher = Dispatcher;
-                await viewModel.OnInitialize().ConfigureAwait(false);
-            };
-        }
-
-        private void OnCancelClick(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
-
+    private void OnCancelClick(object sender, RoutedEventArgs e)
+    {
+        Close();
     }
 }

@@ -21,7 +21,7 @@ public class Gen24JsonService : IGen24JsonService
 
                 FroniusDataType.Custom => device?
                 [
-                    attribute?.PropertyName ?? throw new ApplicationException($"PropertyName not set for {propertyInfo.Name} in {typeof(T).Name}")
+                    attribute.PropertyName ?? throw new ApplicationException($"PropertyName not set for {propertyInfo.Name} in {typeof(T).Name}")
                 ]?[attribute.Name],
 
                 _ => channels?[attribute.Name],
@@ -116,11 +116,13 @@ public class Gen24JsonService : IGen24JsonService
         return fieldInfo == null ? null : Enum.Parse(type, fieldInfo.Name);
     }
 
-    public JObject GetUpdateToken<T>(T newEntity, T? oldEntity = default) where T : BindableBase
+    public JObject GetUpdateToken<T>(T newEntity, T? oldEntity = default) where T : BindableBase => GetUpdateToken(typeof(T), newEntity, oldEntity);
+    
+    public JObject GetUpdateToken(Type type, BindableBase newEntity, BindableBase? oldEntity = default)
     {
         var jObject = new JObject();
 
-        foreach (var propertyInfo in typeof(T).GetProperties().Where(p => p.GetCustomAttribute<FroniusProprietaryImportAttribute>() != null))
+        foreach (var propertyInfo in type.GetProperties().Where(p => p.GetCustomAttribute<FroniusProprietaryImportAttribute>() != null))
         {
             var attribute = propertyInfo.GetCustomAttributes<FroniusProprietaryImportAttribute>().Single();
             var jsonValueNew = GetFroniusJsonValue(propertyInfo, newEntity, attribute);

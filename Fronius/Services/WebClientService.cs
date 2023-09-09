@@ -10,12 +10,10 @@ public class WebClientService : BindableBase, IWebClientService
     private DigestAuthHttp? froniusHttpClient;
     private string? fritzBoxSid;
     private DateTime lastSolarApiCall = DateTime.UtcNow.AddSeconds(-4);
-    private JObject? invariantConfigToken;
-    private JObject? localConfigToken;
-    private JObject? localUiToken;
-    private JObject? invariantUiToken;
-    private JObject? localEventToken;
-    private JObject? invariantEventToken;
+    private JObject? invariantConfigToken, localConfigToken;
+    private JObject? localUiToken, invariantUiToken;
+    private JObject? localEventToken, invariantEventToken;
+    private JObject? localChannelToken, invariantChannelToken;
 
     public WebClientService(IGen24JsonService gen24JsonService)
     {
@@ -78,6 +76,8 @@ public class WebClientService : BindableBase, IWebClientService
         //    //var test5 = await GetFroniusStringResponse("config/meter").ConfigureAwait(false); // Read
         //    var test6 = (await GetFroniusJsonResponse("config/").ConfigureAwait(false)).Token;
         //    var test6String = test6.ToString();
+        //    //var test7 = (await GetFroniusJsonResponse("config/setup/powerunit/mppt").ConfigureAwait(false)).Token;
+        //    //var test8 = (await GetFroniusJsonResponse("config/common").ConfigureAwait(false)).Token;
         //    //var token = JObject.Parse(test3);
         //    //token["enableRemoteControl"] = true;
         //    //token.Remove("_connectionKeepAlive_meta");
@@ -86,6 +86,7 @@ public class WebClientService : BindableBase, IWebClientService
         //}
         //catch (Exception ex)
         //{
+
         //}
 
         var (token, _) = await GetFroniusJsonResponse("status/devices").ConfigureAwait(false);
@@ -133,6 +134,18 @@ public class WebClientService : BindableBase, IWebClientService
         return gen24System;
     }
 
+    public Task<string> GetFroniusName<T>(T enumValue) where T : Enum
+    {
+        var enumValueString = enumValue.ToString();
+
+        var attribute = typeof(T)
+            .GetMember(enumValueString).Single()
+            .GetCustomAttribute(typeof(EnumParseAttribute)) as EnumParseAttribute;
+        
+        var key = attribute?.ParseAs ?? enumValueString;
+        return GetChannelString(key);
+    }
+
     public async Task<string> GetUiString(string category, string key)
     {
         (localUiToken, invariantUiToken) = await EnsureText("app/assets/i18n/WeblateTranslations/ui", localUiToken, invariantUiToken).ConfigureAwait(false);
@@ -145,22 +158,34 @@ public class WebClientService : BindableBase, IWebClientService
         return GetCategoryKeyString(localConfigToken, invariantConfigToken, category, key);
     }
 
+    public async Task<string> GetChannelString(string key)
+    {
+        (localChannelToken, invariantChannelToken) = await EnsureText("app/assets/i18n/WeblateTranslations/channels", localChannelToken, invariantChannelToken).ConfigureAwait(false);
+        return GetCategoryKeyString(localChannelToken, invariantChannelToken, key, null);
+    }
+
     public async ValueTask<string> GetEventDescription(string code)
     {
         (localEventToken, invariantEventToken) = await EnsureText("app/assets/i18n/StateCodeTranslations", localEventToken, invariantEventToken).ConfigureAwait(false);
         return GetCategoryKeyString(localEventToken, invariantEventToken, "StateCodes", code);
     }
 
-    private static string GetCategoryKeyString(JObject? localToken, JObject? invariantToken, string category, string key)
+    private static string GetCategoryKeyString(JObject? localToken, JObject? invariantToken, string category, string? key)
     {
-        return localToken?[category]?[key]?.Value<string>() ?? invariantToken?[category]?[key]?.Value<string>() ?? $"{(category != "StateCodes" ? $"{category}." : string.Empty)}{key}";
+        return
+            key == null
+                ? localToken?[category]?.Value<string>() ?? invariantToken?[category]?.Value<string>() ?? category
+                : localToken?[category]?[key]?.Value<string>() ?? invariantToken?[category]?[key]?.Value<string>() ?? $"{(category != "StateCodes" ? $"{category}." : string.Empty)}{key}";
     }
 
     private async ValueTask<(JObject?, JObject?)> EnsureText(string baseUrl, JObject? l, JObject? i)
     {
         try
         {
-            i ??= JObject.Parse((await GetFroniusStringResponse($"{baseUrl}/en.json").ConfigureAwait(false)).JsonString);
+            await Task.Run(async () =>
+            {
+                i ??= JObject.Parse((await GetFroniusStringResponse($"{baseUrl}/en.json").ConfigureAwait(false)).JsonString);
+            }).ConfigureAwait(false);
         }
         catch
         {
@@ -172,7 +197,10 @@ public class WebClientService : BindableBase, IWebClientService
         {
             try
             {
-                l ??= JObject.Parse((await GetFroniusStringResponse($"{baseUrl}/{CultureInfo.CurrentUICulture.TwoLetterISOLanguageName}.json").ConfigureAwait(false)).JsonString);
+                await Task.Run(async () =>
+                {
+                    l ??= JObject.Parse((await GetFroniusStringResponse($"{baseUrl}/{CultureInfo.CurrentUICulture.TwoLetterISOLanguageName}.json").ConfigureAwait(false)).JsonString);
+                }).ConfigureAwait(false);
             }
             catch
             {

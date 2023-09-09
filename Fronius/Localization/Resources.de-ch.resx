@@ -32,4 +32,7 @@
 	<data name="TunnelMode_Websocket_ToolTip" xml:space="preserve">
 		<value>Immer einen Tunnel über HTTP und Websocket verwenden. Wenn Du weisst, dass Deine Internetverbindung über eine Firewall läuft, die das native Protokoll blockt, kannst Du die Zeit sparen, es über das native Protkoll zu versuchen.</value>
 	</data>
+	<data name="SynchronizeTime" xml:space="preserve">
+		<value>NTP-Zeitsynchronisierung benützen</value>
+	</data>
 </root>

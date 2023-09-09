@@ -1,0 +1,271 @@
+﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels
+{
+    public class InverterSettingsViewModel : SettingsViewModelBase
+    {
+        private Gen24InverterSettings oldSettings = null!;
+
+        public InverterSettingsViewModel(IWebClientService webClientService, IGen24JsonService gen24Service, IWattPilotService wattPilotService) : base(webClientService, gen24Service, wattPilotService) { }
+
+        private ICommand? undoCommand;
+        public ICommand UndoCommand => undoCommand ??= new NoParameterCommand(Undo);
+
+        private ICommand? applyCommand;
+        public ICommand ApplyCommand => applyCommand ??= new NoParameterCommand(Apply);
+
+        private IEnumerable<ListItemModel<MpptPowerMode>> powerModes = null!;
+
+        public IEnumerable<ListItemModel<MpptPowerMode>> PowerModes
+        {
+            get => powerModes;
+            set => Set(ref powerModes, value);
+        }
+
+        private ListItemModel<MpptPowerMode>? selectedPowerModeMppt1;
+
+        public ListItemModel<MpptPowerMode>? SelectedPowerModeMppt1
+        {
+            get => selectedPowerModeMppt1;
+            set => Set(ref selectedPowerModeMppt1, value, () =>
+            {
+                if (Settings.Mppt?.Mppt1 != null)
+                {
+                    Settings.Mppt.Mppt1.PowerMode = value?.Value;
+                }
+            });
+        }
+
+        private ListItemModel<MpptPowerMode>? selectedPowerModeMppt2;
+
+        public ListItemModel<MpptPowerMode>? SelectedPowerModeMppt2
+        {
+            get => selectedPowerModeMppt2;
+            set => Set(ref selectedPowerModeMppt2, value, () =>
+            {
+                if (Settings.Mppt?.Mppt2 != null)
+                {
+                    Settings.Mppt.Mppt2.PowerMode = value?.Value;
+                }
+            });
+        }
+
+        private IEnumerable<ListItemModel<MpptOnOff>> dynamicPeakManagerModes = null!;
+
+        public IEnumerable<ListItemModel<MpptOnOff>> DynamicPeakManagerModes
+        {
+            get => dynamicPeakManagerModes;
+            set => Set(ref dynamicPeakManagerModes, value);
+        }
+
+        private ListItemModel<MpptOnOff>? selectedDynamicPeakManagerModeMppt1;
+
+        public ListItemModel<MpptOnOff>? SelectedDynamicPeakManagerModeMppt1
+        {
+            get => selectedDynamicPeakManagerModeMppt1;
+            set => Set(ref selectedDynamicPeakManagerModeMppt1, value, () =>
+            {
+                if (Settings.Mppt?.Mppt1 != null)
+                {
+                    Settings.Mppt.Mppt1.DynamicPeakManager = value?.Value;
+                }
+            });
+        }
+
+        private ListItemModel<MpptOnOff>? selectedDynamicPeakManagerModeMppt2;
+
+        public ListItemModel<MpptOnOff>? SelectedDynamicPeakManagerModeMppt2
+        {
+            get => selectedDynamicPeakManagerModeMppt2;
+            set => Set(ref selectedDynamicPeakManagerModeMppt2, value, () =>
+            {
+                if (Settings.Mppt?.Mppt2 != null)
+                {
+                    Settings.Mppt.Mppt2.DynamicPeakManager = value?.Value;
+                }
+            });
+        }
+
+        private string title = Loc.InverterSettings;
+
+        public string Title
+        {
+            get => title;
+            set => Set(ref title, value);
+        }
+
+        private Gen24InverterSettings settings = null!;
+
+        public Gen24InverterSettings Settings
+        {
+            get => settings;
+            set => Set(ref settings, value);
+        }
+
+        private double logWattPeakMppt1;
+
+        public double LogWattPeakMppt1
+        {
+            get => logWattPeakMppt1;
+            set => Set(ref logWattPeakMppt1, value, UpdateWattPeakMppt1);
+        }
+
+        private uint wattPeakMppt1;
+
+        public uint WattPeakMppt1
+        {
+            get => wattPeakMppt1;
+            set => Set(ref wattPeakMppt1, value, UpdateLogWattPeakMppt1);
+        }
+
+        private double logWattPeakMppt2;
+
+        public double LogWattPeakMppt2
+        {
+            get => logWattPeakMppt2;
+            set => Set(ref logWattPeakMppt2, value, UpdateWattPeakMppt2);
+        }
+
+        private uint wattPeakMppt2;
+
+        public uint WattPeakMppt2
+        {
+            get => wattPeakMppt2;
+            set => Set(ref wattPeakMppt2, value, UpdateLogWattPeakMppt2);
+        }
+
+        private bool enableDanger;
+
+        public bool EnableDanger
+        {
+            get => enableDanger;
+            set => Set(ref enableDanger, value);
+        }
+
+        internal override async Task OnInitialize()
+        {
+            await base.OnInitialize().ConfigureAwait(false);
+            oldSettings = await ReadDataFromInverter().ConfigureAwait(false);
+
+            PowerModes = new[]
+            {
+                new ListItemModel<MpptPowerMode>{ Value = MpptPowerMode.Off, DisplayName = await WebClientService.GetFroniusName(MpptPowerMode.Off).ConfigureAwait(false) },
+                new ListItemModel<MpptPowerMode>{ Value = MpptPowerMode.Auto, DisplayName = await WebClientService.GetFroniusName(MpptPowerMode.Auto).ConfigureAwait(false) },
+                new ListItemModel<MpptPowerMode>{ Value = MpptPowerMode.Fix, DisplayName = await WebClientService.GetFroniusName(MpptPowerMode.Fix).ConfigureAwait(false) },
+            };
+
+            DynamicPeakManagerModes = new[]
+            {
+                new ListItemModel<MpptOnOff>{ Value = MpptOnOff.Off, DisplayName = await WebClientService.GetFroniusName(MpptOnOff.Off).ConfigureAwait(false)},
+                new ListItemModel<MpptOnOff>{ Value = MpptOnOff.On, DisplayName = await WebClientService.GetFroniusName(MpptOnOff.On).ConfigureAwait(false)},
+                new ListItemModel<MpptOnOff>{ Value = MpptOnOff.OnMlsd, DisplayName = await WebClientService.GetFroniusName(MpptOnOff.OnMlsd).ConfigureAwait(false)},
+            };
+
+            Undo();
+        }
+
+        [SuppressMessage("ReSharper", "StringLiteralTypo")]
+        private async void Apply()
+        {
+            IsInUpdate = true;
+
+            try
+            {
+                var updateTokenCommon = await UpdateIfRequired(Settings, oldSettings,"config/common").ConfigureAwait(false);
+
+                if (updateTokenCommon.HasValues)
+                {
+                    await UpdateInverter("config/common", updateTokenCommon);
+                }
+
+                var updateTokenMppt1 = await UpdateIfRequired(Settings.Mppt?.Mppt1, oldSettings.Mppt?.Mppt1, "config/setup/powerunit/mppt/mppt1").ConfigureAwait(false);
+                var updateTokenMppt2 = await UpdateIfRequired(Settings.Mppt?.Mppt2, oldSettings.Mppt?.Mppt2, "config/setup/powerunit/mppt/mppt2").ConfigureAwait(false);
+
+                if (new[] { updateTokenCommon, updateTokenMppt1, updateTokenMppt2 }.All(token => !token.HasValues))
+                {
+                    ShowNoSettingsChanged();
+                    return;
+                }
+
+                oldSettings = Settings;
+                Undo();
+                ToastText = Loc.SettingsSavedToInverter;
+            }
+            finally
+            {
+                IsInUpdate = false;
+            }
+        }
+
+        private async ValueTask<JObject> UpdateIfRequired<T>(T? newValues, T? oldValues, string uri) where T:BindableBase
+        {
+            if (newValues is not null && oldValues is not null)
+            {
+                var updateToken = Gen24Service.GetUpdateToken(newValues, oldValues);
+
+                if (updateToken.HasValues)
+                {
+                    await UpdateInverter(uri, updateToken);
+                }
+
+                return updateToken;
+            }
+
+            return new JObject();
+        }
+
+        [SuppressMessage("ReSharper", "StringLiteralTypo")]
+        private async ValueTask<Gen24InverterSettings> ReadDataFromInverter()
+        {
+            var mpptToken = (await WebClientService.GetFroniusJsonResponse("config/setup/powerunit/mppt").ConfigureAwait(false)).Token;
+            var commonToken = (await WebClientService.GetFroniusJsonResponse("config/common").ConfigureAwait(false)).Token;
+            return Gen24InverterSettings.Parse(commonToken, mpptToken);
+        }
+
+        private void Undo()
+        {
+            Settings = (Gen24InverterSettings)oldSettings.Clone();
+            Title = $"{Loc.InverterSettings} - {oldSettings.SystemName}";
+
+            SelectedPowerModeMppt1 = PowerModes.FirstOrDefault(pm => pm.Value == Settings.Mppt?.Mppt1?.PowerMode);
+            SelectedDynamicPeakManagerModeMppt1 = DynamicPeakManagerModes.FirstOrDefault(mode => mode.Value == Settings.Mppt?.Mppt1?.DynamicPeakManager);
+            WattPeakMppt1 = Settings.Mppt?.Mppt1?.WattPeak ?? 0;
+            UpdateLogWattPeakMppt1();
+
+            SelectedPowerModeMppt2 = PowerModes.FirstOrDefault(pm => pm.Value == Settings.Mppt?.Mppt2?.PowerMode);
+            SelectedDynamicPeakManagerModeMppt2 = DynamicPeakManagerModes.FirstOrDefault(mode => mode.Value == Settings.Mppt?.Mppt2?.DynamicPeakManager);
+            WattPeakMppt2 = Settings.Mppt?.Mppt2?.WattPeak ?? 0;
+            UpdateLogWattPeakMppt2();
+        }
+
+        private void UpdateWattPeakMppt1()
+        {
+            WattPeakMppt1 = (uint)Math.Round(Math.Pow(10, LogWattPeakMppt1), MidpointRounding.AwayFromZero);
+
+            if (Settings.Mppt?.Mppt1?.WattPeak is not null)
+            {
+                Settings.Mppt.Mppt1.WattPeak = WattPeakMppt1;
+            }
+        }
+
+        private void UpdateLogWattPeakMppt1()
+        {
+            LogWattPeakMppt1 = WattPeakMppt1 == 0 ? -0.30980391997148633857556748281473 : Math.Log10(WattPeakMppt1);
+            UpdateWattPeakMppt1();
+        }
+
+        private void UpdateWattPeakMppt2()
+        {
+            WattPeakMppt2 = (uint)Math.Round(Math.Pow(10, LogWattPeakMppt2), MidpointRounding.AwayFromZero);
+
+            if (Settings.Mppt?.Mppt2?.WattPeak is not null)
+            {
+                Settings.Mppt.Mppt2.WattPeak = WattPeakMppt2;
+            }
+        }
+
+        private void UpdateLogWattPeakMppt2()
+        {
+            LogWattPeakMppt2 = WattPeakMppt2 == 0 ? -0.30980391997148633857556748281473 : Math.Log10(WattPeakMppt2);
+            UpdateWattPeakMppt2();
+        }
+    }
+}

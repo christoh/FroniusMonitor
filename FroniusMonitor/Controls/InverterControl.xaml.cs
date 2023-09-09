@@ -498,4 +498,9 @@ public partial class InverterControl : IHaveLcdPanel
             isInStandByChange = false;
         }
     }
+
+    private void OnSettingsClicked(object sender, RoutedEventArgs e)
+    {
+        IoC.Get<MainWindow>().GetView<InverterSettingsView>(webClientService).Focus();
+    }
 }
