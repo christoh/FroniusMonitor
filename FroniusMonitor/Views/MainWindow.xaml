@@ -92,8 +92,10 @@
 
                     <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
                         <StackPanel Orientation="Vertical">
-                            <c:SolarPanels x:Name="FirstPanel" Tracker="Inverter1Mppt1" Width="105" VerticalAlignment="Center" WattPeak="{Binding Settings.Inverter1Dc1WattPeak}" Margin="0,0,0,0" />
-                            <c:SolarPanels Tracker="Inverter1Mppt2" Width="{Binding ElementName=FirstPanel, Path=Width}" WattPeak="{Binding Settings.Inverter1Dc2WattPeak}" VerticalAlignment="Center" Margin="0,0,0,0" />
+                            <c:SolarPanels x:Name="FirstPanel" Tracker="Inverter1Mppt1" Width="105" VerticalAlignment="Center"
+                                           WattPeak="{Binding SolarSystemService.SolarSystem.Gen24Config.InverterSettings.Mppt.Mppt1.WattPeak, FallbackValue=0, TargetNullValue=0}" Margin="0,0,0,0" />
+                            <c:SolarPanels Tracker="Inverter1Mppt2" Width="{Binding ElementName=FirstPanel, Path=Width}"
+                                           WattPeak="{Binding SolarSystemService.SolarSystem.Gen24Config.InverterSettings.Mppt.Mppt2.WattPeak, FallbackValue=0, TargetNullValue=0}" VerticalAlignment="Center" Margin="0,0,0,0" />
                         </StackPanel>
 
                         <StackPanel Orientation="Vertical">
@@ -102,10 +104,10 @@
                             <c:PowerFlowArrow VerticalAlignment="Top" Fill="#ffd000" Margin="15,0"
                                               Power="{Binding SolarSystemService.SolarSystem.Gen24System.Inverter.Solar2Power, FallbackValue={x:Null}}" />
                         </StackPanel>
-                        <c:InverterControl Height="200" Versions="{Binding SolarSystemService.SolarSystem.Versions, FallbackValue={x:Null}}" />
+                        <c:InverterControl Height="200" Versions="{Binding SolarSystemService.SolarSystem.Gen24Config.Versions, FallbackValue={x:Null}}" />
                         <c:PowerFlowArrow VerticalAlignment="Top" Fill="#ffd000" HasRightPlacement="True" x:Name="LoadArrowPrimaryInverter" Margin="15,0"
                                           Power="{Binding SolarSystemService.SolarSystem.Gen24System.PowerFlow.LoadPower, FallbackValue={x:Null}}" />
-                        <c:InverterControl Height="200" Versions="{Binding SolarSystemService.SolarSystem.Versions2, FallbackValue={x:Null}}" IsSecondary="True" />
+                        <c:InverterControl Height="200" Versions="{Binding SolarSystemService.SolarSystem.Gen24Config2.Versions, FallbackValue={x:Null}}" IsSecondary="True" />
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <StackPanel Orientation="Vertical">
@@ -115,8 +117,10 @@
                                                   Power="{Binding SolarSystemService.SolarSystem.Gen24System2.Inverter.Solar2Power, FallbackValue={x:Null}}" />
                             </StackPanel>
                             <StackPanel Orientation="Vertical">
-                                <c:SolarPanels WattPeak="{Binding Settings.Inverter2Dc1WattPeak}" Tracker="Inverter2Mppt1" Width="{Binding ElementName=FirstPanel, Path=Width}" VerticalAlignment="Center" Margin="0,0,0,0" />
-                                <c:SolarPanels WattPeak="{Binding Settings.Inverter2Dc2WattPeak}" Tracker="Inverter2Mppt2" Width="{Binding ElementName=FirstPanel, Path=Width}" VerticalAlignment="Center" Margin="0,0,0,0" />
+                                <c:SolarPanels WattPeak="{Binding SolarSystemService.SolarSystem.Gen24Config2.InverterSettings.Mppt.Mppt1.WattPeak, FallbackValue=0, TargetNullValue=0}"
+                                               Tracker="Inverter2Mppt1" Width="{Binding ElementName=FirstPanel, Path=Width}" VerticalAlignment="Center" Margin="0,0,0,0" />
+                                <c:SolarPanels WattPeak="{Binding SolarSystemService.SolarSystem.Gen24Config2.InverterSettings.Mppt.Mppt2.WattPeak, FallbackValue=0, TargetNullValue=0}"
+                                               Tracker="Inverter2Mppt2" Width="{Binding ElementName=FirstPanel, Path=Width}" VerticalAlignment="Center" Margin="0,0,0,0" />
                             </StackPanel>
 
                         </StackPanel>

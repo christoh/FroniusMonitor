@@ -1,6 +1,4 @@
-﻿using System.Linq.Expressions;
-
-namespace De.Hochstaetter.FroniusMonitor.Wpf.Validation;
+﻿namespace De.Hochstaetter.FroniusMonitor.Wpf.Validation;
 
 internal class StringResult : IHaveDisplayName
 {
@@ -14,7 +12,7 @@ internal class StringResult : IHaveDisplayName
     public override string ToString() => func();
     public string DisplayName => func();
 
-    public static ValidationResult Create(Func<string> localFunc) => new ValidationResult(false, new StringResult(localFunc));
+    public static ValidationResult Create(Func<string> localFunc) => new(false, new StringResult(localFunc));
 }
 
 public class MarkupRule : ValidationRule
@@ -25,7 +23,7 @@ public class MarkupRule : ValidationRule
     {
         this.extension = extension;
     }
-    public override ValidationResult Validate(object value, CultureInfo cultureInfo) => extension.Validate(value);
+    public override ValidationResult Validate(object? value, CultureInfo cultureInfo) => extension.Validate(value);
 }
 
 public abstract class ValidationRuleExtension : MarkupExtension

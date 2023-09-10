@@ -1,6 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Models.Gen24.Settings;
-
-namespace De.Hochstaetter.Fronius.Models;
+﻿namespace De.Hochstaetter.Fronius.Models;
 
 public class SolarSystem : BindableBase
 {
@@ -20,52 +18,20 @@ public class SolarSystem : BindableBase
         set => Set(ref gen24System2, value);
     }
 
-    private Gen24Components? components;
+    private Gen24Config? gen24Config;
 
-    public Gen24Components? Components
+    public Gen24Config? Gen24Config
     {
-        get => components;
-        set => Set(ref components, value);
+        get => gen24Config;
+        set => Set(ref gen24Config, value);
     }
 
-    private Gen24Components? components2;
+    private Gen24Config? gen24Config2;
 
-    public Gen24Components? Components2
+    public Gen24Config? Gen24Config2
     {
-        get => components2;
-        set => Set(ref components2, value);
-    }
-
-    private Gen24Versions? versions;
-
-    public Gen24Versions? Versions
-    {
-        get => versions;
-        set => Set(ref versions, value);
-    }
-
-    private Gen24Versions? versions2;
-
-    public Gen24Versions? Versions2
-    {
-        get => versions2;
-        set => Set(ref versions2, value);
-    }
-
-    private Gen24Common? gen24Common;
-
-    public Gen24Common? Gen24Common
-    {
-        get => gen24Common;
-        set => Set(ref gen24Common, value);
-    }
-
-    private Gen24Common? gen24Common2;
-
-    public Gen24Common? Gen24Common2
-    {
-        get => gen24Common2;
-        set => Set(ref gen24Common2, value);
+        get => gen24Config2;
+        set => Set(ref gen24Config2, value);
     }
 
     private FritzBoxDeviceList? fritzBox;
@@ -75,14 +41,6 @@ public class SolarSystem : BindableBase
         get => fritzBox;
         set => Set(ref fritzBox, value);
     }
-
-    //private PowerFlow? powerFlow;
-
-    //public PowerFlow? PowerFlow
-    //{
-    //    get => powerFlow;
-    //    set => Set(ref powerFlow, value);
-    //}
 
     private Gen24PowerFlow? sitePowerFlow;
 

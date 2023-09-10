@@ -63,32 +63,9 @@ public class WebClientService : BindableBase, IWebClientService
     }
 
     [SuppressMessage("ReSharper", "CommentTypo")]
-    public async ValueTask<Gen24System> GetFroniusData(Gen24Components components)
+    public async Task<Gen24System> GetFroniusData(Gen24Components components)
     {
         var gen24System = new Gen24System();
-
-        //try
-        //{
-        //    //var test1 = await GetFroniusStringResponse("config/powerlimits").ConfigureAwait(false); // None
-        //    //var test2 = await GetFroniusStringResponse("config/ics").ConfigureAwait(false); // None
-        //    //var test3 = (await GetFroniusJsonResponse("config/solarweb").ConfigureAwait(false)); // Read
-        //    //var test4 = await GetFroniusStringResponse("config/emrs").ConfigureAwait(false); // Read/Write
-        //    //var test5 = await GetFroniusStringResponse("config/meter").ConfigureAwait(false); // Read
-        //    var test6 = (await GetFroniusJsonResponse("config/").ConfigureAwait(false)).Token;
-        //    var test6String = test6.ToString();
-        //    //var test7 = (await GetFroniusJsonResponse("config/setup/powerunit/mppt").ConfigureAwait(false)).Token;
-        //    //var test8 = (await GetFroniusJsonResponse("config/common").ConfigureAwait(false)).Token;
-        //    //var token = JObject.Parse(test3);
-        //    //token["enableRemoteControl"] = true;
-        //    //token.Remove("_connectionKeepAlive_meta");
-        //    //token.Remove("_enableRemoteControl_meta");
-        //    //var response = await GetFroniusStringResponse("config/solarweb", token).ConfigureAwait(false);
-        //}
-        //catch (Exception ex)
-        //{
-
-        //}
-
         var (token, _) = await GetFroniusJsonResponse("status/devices").ConfigureAwait(false);
 
         foreach (var statusToken in (JArray)token)

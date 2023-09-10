@@ -1,5 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Models.Gen24.Settings;
-using De.Hochstaetter.Fronius.Models.Settings;
+﻿using De.Hochstaetter.Fronius.Models.Settings;
 using De.Hochstaetter.Fronius.Models.ToshibaAc;
 
 namespace De.Hochstaetter.Fronius.Services;
@@ -214,28 +213,62 @@ public class SolarSystemService : BindableBase, ISolarSystemService
             try
             {
                 await UpdateConfigData(result).ConfigureAwait(false);
-                result.Gen24System = await WebClientService.GetFroniusData(result.Components!).ConfigureAwait(false);
-                result.Gen24System2 = await WebClientService2.GetFroniusData(result.Components2!).ConfigureAwait(false);
+                var task1 = WebClientService.GetFroniusData(result.Gen24Config!.Components!);
+                var task2 = WebClientService2.GetFroniusData(result.Gen24Config2!.Components!);
+
+                await Task.WhenAll(task1, task2).ConfigureAwait(false);
+                
+                result.Gen24System = task1.Result;
+                result.Gen24System2 = task2.Result;
                 IsConnected = true;
             }
             catch
             {
                 IsConnected = false;
                 result.Gen24System = null;
-                result.Versions = null;
+                result.Gen24Config!.Versions = null;
             }
         }
     }
 
-    private async ValueTask UpdateConfigData(SolarSystem result)
+    private async Task UpdateConfigData(SolarSystem result)
     {
-        result.Versions = Gen24Versions.Parse((await WebClientService.GetFroniusJsonResponse("status/version").ConfigureAwait(false)).Token);
-        result.Components = Gen24Components.Parse((await WebClientService.GetFroniusJsonResponse("components/").ConfigureAwait(false)).Token);
-        result.Versions2 = Gen24Versions.Parse((await WebClientService2.GetFroniusJsonResponse("status/version").ConfigureAwait(false)).Token);
-        result.Components2 = Gen24Components.Parse((await WebClientService2.GetFroniusJsonResponse("components/").ConfigureAwait(false)).Token);
-        result.Gen24Common = Gen24Common.Parse((await WebClientService.GetFroniusJsonResponse("config/common").ConfigureAwait(false)).Token);
-        result.Gen24Common2 = Gen24Common.Parse((await WebClientService2.GetFroniusJsonResponse("config/common").ConfigureAwait(false)).Token);
+        var task1 = GetConfigToken(WebClientService);
+        var task2 = GetConfigToken(WebClientService2);
+
+        await Task.WhenAll(task1, task2).ConfigureAwait(false);
+
+        result.Gen24Config = task1.Result;
+        result.Gen24Config2 = task2.Result;
         lastConfigUpdate = DateTime.UtcNow;
+    }
+
+    private async Task<Gen24Config?> GetConfigToken(IWebClientService? webClientService)
+    {
+        if (webClientService is null)
+        {
+            return null;
+        }
+
+        var versionsToken = (await webClientService.GetFroniusJsonResponse("status/version").ConfigureAwait(false)).Token;
+        var componentsToken = (await webClientService.GetFroniusJsonResponse("components/").ConfigureAwait(false)).Token;
+        var configToken = (await webClientService.GetFroniusJsonResponse("config/").ConfigureAwait(false)).Token;
+        
+        #if DEBUG
+        // ReSharper disable UnusedVariable
+        var versionString = versionsToken.ToString();
+        var componentsString= componentsToken.ToString();
+        var configString = configToken.ToString();
+        // ReSharper restore UnusedVariable
+        #endif
+
+        return await Task.Run(() =>
+        {
+            var commonToken = configToken["common"]?["ui"]?.Value<JToken>() ?? new JObject();
+            var mpptToken = configToken["setup"]?["powerunit"]?["mppt"]?.Value<JToken>() ?? new JObject();
+            var gen24Config = Gen24Config.Parse(versionsToken, componentsToken, commonToken, mpptToken);
+            return gen24Config;
+        }).ConfigureAwait(false);
     }
 
     private async Task<FritzBoxDeviceList?> TryGetFritzBoxData()
@@ -345,7 +378,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
                 SwitchableDevices.RemoveRange(SwitchableDevices.OfType<ToshibaHvacMappingDevice>().ToList());
             }
 
-            if (SolarSystem?.Gen24System == null || SolarSystem.Versions == null || SolarSystem.Components == null)
+            if (SolarSystem?.Gen24Config == null)
             {
                 SolarSystem = await CreateSolarSystem(null, null).ConfigureAwait(false);
                 newSolarData = true;
@@ -358,8 +391,8 @@ public class SolarSystemService : BindableBase, ISolarSystemService
                     await UpdateConfigData(SolarSystem).ConfigureAwait(false);
                 }
 
-                var gen24Task = froniusCounter % FroniusUpdateRate == 0 ? TryGetGen24System(WebClientService, SolarSystem.Components) : Task.FromResult<Gen24System?>(null);
-                var gen24Task2 = froniusCounter++ % FroniusUpdateRate == 0 ? TryGetGen24System(WebClientService2, SolarSystem.Components2) : Task.FromResult<Gen24System?>(null);
+                var gen24Task = froniusCounter % FroniusUpdateRate == 0 ? TryGetGen24System(WebClientService, SolarSystem.Gen24Config!.Components) : Task.FromResult<Gen24System?>(null);
+                var gen24Task2 = froniusCounter++ % FroniusUpdateRate == 0 ? TryGetGen24System(WebClientService2, SolarSystem.Gen24Config2.Components) : Task.FromResult<Gen24System?>(null);
 
                 if (WebClientService.FritzBoxConnection == null && SwitchableDevices.Any(d => d is FritzBoxDevice))
                 {

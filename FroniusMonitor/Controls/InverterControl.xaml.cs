@@ -1,6 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Models.Gen24;
-
-namespace De.Hochstaetter.FroniusMonitor.Controls;
+﻿namespace De.Hochstaetter.FroniusMonitor.Controls;
 
 public enum InverterDisplayMode
 {
@@ -114,7 +112,14 @@ public partial class InverterControl : IHaveLcdPanel
     private async void NewDataReceived(object? sender, SolarDataEventArgs e)
     {
         Gen24System? gen24 = null!;
-        Dispatcher.Invoke(() => gen24 = IsSecondary ? e.SolarSystem?.Gen24System2 : e.SolarSystem?.Gen24System);
+        Gen24Config? config = null!;
+        
+        Dispatcher.Invoke(() =>
+        {
+            gen24 = IsSecondary ? e.SolarSystem?.Gen24System2 : e.SolarSystem?.Gen24System;
+            config = IsSecondary ? e.SolarSystem?.Gen24Config2:e.SolarSystem?.Gen24Config;
+        });
+        
         var inverter = gen24?.Inverter;
         var dataManager = gen24?.DataManager;
         var powerFlow = e.SolarSystem?.SitePowerFlow;
@@ -143,7 +148,7 @@ public partial class InverterControl : IHaveLcdPanel
         Dispatcher.InvokeAsync(() =>
         {
             var cache = gen24?.Cache;
-            var gen24Common = IsSecondary ? e.SolarSystem?.Gen24Common2 : e.SolarSystem?.Gen24Common;
+            var gen24Common = IsSecondary ? e.SolarSystem?.Gen24Config2?.InverterSettings : e.SolarSystem?.Gen24Config?.InverterSettings;
 
             if (cache == null && inverter == null && dataManager == null)
             {
@@ -152,7 +157,7 @@ public partial class InverterControl : IHaveLcdPanel
 
             BackgroundProvider.Background = gen24?.InverterStatus?.ToBrush() ?? Brushes.LightGray;
             InverterModelName.Text = $"{gen24?.PowerFlow?.SiteTypeDisplayName ?? "---"} ({gen24?.InverterStatus?.StatusMessage ?? Loc.Unknown})";
-            InverterName.Text = gen24Common?.DisplayName ?? "---";
+            InverterName.Text = gen24Common?.SystemName ?? "---";
             VersionList.Visibility = Visibility.Collapsed;
             Lcd.Visibility = Visibility.Visible;
 
@@ -310,8 +315,8 @@ public partial class InverterControl : IHaveLcdPanel
 
                 case InverterDisplayMode.DcRelativePower:
                     Lcd.Header = Loc.DcRelativePower;
-                    var wattPeak1 = IsSecondary ? App.Settings.Inverter2Dc1WattPeak : App.Settings.Inverter1Dc1WattPeak;
-                    var wattPeak2 = IsSecondary ? App.Settings.Inverter2Dc2WattPeak : App.Settings.Inverter1Dc2WattPeak;
+                    var wattPeak1 = config?.InverterSettings?.Mppt?.Mppt1?.WattPeak;
+                    var wattPeak2 = config?.InverterSettings?.Mppt?.Mppt2?.WattPeak;
                     var power1 = cache?.Solar1Power ?? inverter?.Solar1Power;
                     var power2 = cache?.Solar2Power ?? inverter?.Solar2Power;
                     Lcd.Label1 = "PV1";
@@ -321,7 +326,17 @@ public partial class InverterControl : IHaveLcdPanel
                     Lcd.Value1 = ToLcd(power1 / wattPeak1, "P2");
                     Lcd.Value2 = ToLcd(power2 / wattPeak2, "P2");
                     Lcd.Value3 = ToLcd((power1 + power2) / (wattPeak1 + wattPeak2), "P2");
-                    Lcd.ValueSum = ToLcd(powerFlow?.SolarPower / (App.Settings.Inverter1Dc1WattPeak + App.Settings.Inverter1Dc2WattPeak + App.Settings.Inverter2Dc1WattPeak + App.Settings.Inverter2Dc2WattPeak), "P2");
+                    
+                    Lcd.ValueSum = ToLcd
+                    (
+                        powerFlow?.SolarPower /
+                        (
+                                             e.SolarSystem?.Gen24Config?.InverterSettings?.Mppt?.Mppt1?.WattPeak+
+                                             e.SolarSystem?.Gen24Config?.InverterSettings?.Mppt?.Mppt2?.WattPeak+
+                                             e.SolarSystem?.Gen24Config2?.InverterSettings?.Mppt?.Mppt1?.WattPeak+
+                                             e.SolarSystem?.Gen24Config2?.InverterSettings?.Mppt?.Mppt2?.WattPeak
+                        ), "P2");
+                    
                     break;
 
                 case InverterDisplayMode.EnergyInverter:

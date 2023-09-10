@@ -145,7 +145,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
         var mainWindow = IoC.Get<MainWindow>();
         view = mainWindow.SelfConsumptionOptimizationView;
 
-        var softwareVersions = solarSystemService.SolarSystem?.Versions?.SwVersions;
+        var softwareVersions = solarSystemService.SolarSystem?.Gen24Config?.Versions?.SwVersions;
 
         if (softwareVersions == null || !softwareVersions.ContainsKey("DEVICEGROUP"))
         {
