@@ -47,7 +47,7 @@ public class DigestAuthHttp : IDisposable, IAsyncDisposable
         }
 
         var (stringResult, httpStatusCode) = await GetString(url, stringContent, allowedStatusCodes).ConfigureAwait(false);
-        var resultToken = JToken.Parse("{}");
+        JToken resultToken = new JObject();
 
         await Task.Run(() =>
         {

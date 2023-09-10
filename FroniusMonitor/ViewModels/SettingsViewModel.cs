@@ -26,7 +26,7 @@ public class SettingsViewModel : SettingsViewModelBase
         new EnumListItemModel<TunnelMode> {Value = TunnelMode.NoTunnel},
     };
 
-    private readonly ISolarSystemService solarSystemService;
+    private readonly IDataCollectionService dataCollectionService;
 
 
     public SettingsViewModel
@@ -34,10 +34,10 @@ public class SettingsViewModel : SettingsViewModelBase
         IWebClientService webClientService,
         IGen24JsonService gen24Service,
         IWattPilotService wattPilotService,
-        ISolarSystemService solarSystemService
+        IDataCollectionService dataCollectionService
     ) : base(webClientService, gen24Service, wattPilotService)
     {
-        this.solarSystemService = solarSystemService;
+        this.dataCollectionService = dataCollectionService;
     }
 
     private ICommand? okCommand;
@@ -171,20 +171,20 @@ public class SettingsViewModel : SettingsViewModelBase
         IoC.Get<MainViewModel>().NotifyOfPropertyChange(nameof(Settings));
         WebClientService.FritzBoxConnection = Settings is {HaveFritzBox: true, ShowFritzBox: true} ? Settings.FritzBoxConnection : null;
         WebClientService.InverterConnection = Settings.FroniusConnection;
-        solarSystemService.FroniusUpdateRate = Settings.FroniusUpdateRate;
+        dataCollectionService.FroniusUpdateRate = Settings.FroniusUpdateRate;
         App.Settings.CopyFrom(Settings);
 
         if (!Settings.HaveWattPilot || !Settings.ShowWattPilot)
         {
             Settings.ShowWattPilot = false;
-            solarSystemService.WattPilotConnection = null;
+            dataCollectionService.WattPilotConnection = null;
         }
         else
         {
-            solarSystemService.WattPilotConnection = Settings.WattPilotConnection;
+            dataCollectionService.WattPilotConnection = Settings.WattPilotConnection;
         }
 
-        await solarSystemService.HvacService.Stop().ConfigureAwait(false);
+        await dataCollectionService.HvacService.Stop().ConfigureAwait(false);
         await Settings.Save().ConfigureAwait(false);
 
         static string FixUrl(string url, bool isWebSocket = false)

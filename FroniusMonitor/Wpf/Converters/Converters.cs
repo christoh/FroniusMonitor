@@ -159,7 +159,7 @@ public class ToUpper : ConverterBase
 
 public abstract class GridMeterCorrectorBase : ConverterBase
 {
-    private readonly ISolarSystemService solarSystemService = IoC.GetRegistered<ISolarSystemService>();
+    private readonly IDataCollectionService dataCollectionService = IoC.GetRegistered<IDataCollectionService>();
     private SmartMeterCalibrationHistoryItem? first, last;
     private double lastOffsetCorrectedValue, factor;
     private int count;
@@ -177,11 +177,11 @@ public abstract class GridMeterCorrectorBase : ConverterBase
             return 0;
         }
 
-        if (count != solarSystemService.SmartMeterHistory.Count)
+        if (count != dataCollectionService.SmartMeterHistory.Count)
         {
-            count = solarSystemService.SmartMeterHistory.Count;
-            first = solarSystemService.SmartMeterHistory.FirstOrDefault(item => double.IsFinite(GetOffset(item, EnergyDirection)));
-            last = solarSystemService.SmartMeterHistory.LastOrDefault(item => double.IsFinite(GetOffset(item, EnergyDirection)));
+            count = dataCollectionService.SmartMeterHistory.Count;
+            first = dataCollectionService.SmartMeterHistory.FirstOrDefault(item => double.IsFinite(GetOffset(item, EnergyDirection)));
+            last = dataCollectionService.SmartMeterHistory.LastOrDefault(item => double.IsFinite(GetOffset(item, EnergyDirection)));
 
             if (last is not null)
             {
@@ -765,7 +765,11 @@ public class ByteEqualityToString : EqualityToAnything<byte, string> { }
 
 public class String2Bool : EqualityToAnything<string, bool> { }
 
+public class String2Visibility : EqualityToAnything<string, Visibility> { }
+
 public class ToshibaAcOperatingMode2Visibility : EqualityToAnything<ToshibaHvacOperatingMode, Visibility> { }
+
+public class PowerLimitMode2Visibility : EqualityToAnything<PowerLimitMode, Visibility> { }
 
 public class ToshibaAcOperatingMode2Brush : EqualityToAnything<ToshibaHvacOperatingMode, Brush> { }
 

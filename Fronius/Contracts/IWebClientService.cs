@@ -7,7 +7,7 @@ public interface IWebClientService
 {
     WebConnection? InverterConnection { get; set; }
     WebConnection? FritzBoxConnection { get; set; }
-    Task<Gen24System> GetFroniusData(Gen24Components components);
+    Task<Gen24Sensors> GetFroniusData(Gen24Components components);
     ValueTask<T?> SendFroniusCommand<T>(string request, JToken? token = null) where T : Gen24NoResultCommand, new();
     ValueTask FritzBoxLogin();
     ValueTask<FritzBoxDeviceList> GetFritzBoxDevices();

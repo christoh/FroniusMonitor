@@ -2,10 +2,10 @@
 
 public class SolarDataEventArgs : EventArgs
 {
-    public SolarDataEventArgs(SolarSystem? solarSystem)
+    public SolarDataEventArgs(HomeAutomationSystem? homeAutomationSystem)
     {
-        SolarSystem = solarSystem;
+        HomeAutomationSystem = homeAutomationSystem;
     }
 
-    public SolarSystem? SolarSystem { get; set; }
+    public HomeAutomationSystem? HomeAutomationSystem { get; set; }
 }

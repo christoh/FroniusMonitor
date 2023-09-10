@@ -63,9 +63,9 @@ public class WebClientService : BindableBase, IWebClientService
     }
 
     [SuppressMessage("ReSharper", "CommentTypo")]
-    public async Task<Gen24System> GetFroniusData(Gen24Components components)
+    public async Task<Gen24Sensors> GetFroniusData(Gen24Components components)
     {
-        var gen24System = new Gen24System();
+        var gen24Sensors = new Gen24Sensors();
         var (token, _) = await GetFroniusJsonResponse("status/devices").ConfigureAwait(false);
 
         foreach (var statusToken in (JArray)token)
@@ -75,40 +75,40 @@ public class WebClientService : BindableBase, IWebClientService
             switch (status.DeviceType)
             {
                 case DeviceType.Inverter:
-                    gen24System.InverterStatus = status;
+                    gen24Sensors.InverterStatus = status;
                     break;
 
                 case DeviceType.PowerMeter:
-                    gen24System.MeterStatus = status;
+                    gen24Sensors.MeterStatus = status;
                     break;
             }
         }
 
         var (_, dataToken) = await GetJsonResponse<BaseResponse>("components/readable", true).ConfigureAwait(false);
-        gen24System.Inverter = gen24JsonService.ReadFroniusData<Gen24Inverter>(dataToken[components.Groups["Inverter"].FirstOrDefault() ?? "1"]);
+        gen24Sensors.Inverter = gen24JsonService.ReadFroniusData<Gen24Inverter>(dataToken[components.Groups["Inverter"].FirstOrDefault() ?? "1"]);
 
         if (components.Groups.TryGetValue("BatteryManagementSystem", out var storages))
         {
-            gen24System.Storage = gen24JsonService.ReadFroniusData<Gen24Storage>(dataToken[storages.FirstOrDefault() ?? "16580608"]);
+            gen24Sensors.Storage = gen24JsonService.ReadFroniusData<Gen24Storage>(dataToken[storages.FirstOrDefault() ?? "16580608"]);
         }
 
         var restrictions = components.Groups["Application"].Select(key => dataToken[key]).FirstOrDefault(t => t?["attributes"]?["PowerRestrictionControllerVersion"] != null);
-        gen24System.Restrictions = gen24JsonService.ReadFroniusData<Gen24Restrictions>(restrictions);
+        gen24Sensors.Restrictions = gen24JsonService.ReadFroniusData<Gen24Restrictions>(restrictions);
 
         if (components.Groups.TryGetValue("PowerMeter", out var powerMeters))
         {
             foreach (var meter in powerMeters.Select(key => dataToken[key]))
             {
                 var gen24PowerMeter = gen24JsonService.ReadFroniusData<Gen24PowerMeter3P>(meter);
-                gen24System.Meters.Add(gen24PowerMeter);
+                gen24Sensors.Meters.Add(gen24PowerMeter);
             }
         }
 
-        gen24System.DataManager = gen24JsonService.ReadFroniusData<Gen24DataManager>(dataToken[components.Groups["DataManager"].Single()]);
-        gen24System.PowerFlow = gen24JsonService.ReadFroniusData<Gen24PowerFlow>(dataToken[components.Groups["Site"].Single()]);
-        gen24System.Cache = gen24JsonService.ReadFroniusData<Gen24Cache>(dataToken[components.Groups["CACHE"].FirstOrDefault() ?? "393216"]);
+        gen24Sensors.DataManager = gen24JsonService.ReadFroniusData<Gen24DataManager>(dataToken[components.Groups["DataManager"].Single()]);
+        gen24Sensors.PowerFlow = gen24JsonService.ReadFroniusData<Gen24PowerFlow>(dataToken[components.Groups["Site"].Single()]);
+        gen24Sensors.Cache = gen24JsonService.ReadFroniusData<Gen24Cache>(dataToken[components.Groups["CACHE"].FirstOrDefault() ?? "393216"]);
 
-        return gen24System;
+        return gen24Sensors;
     }
 
     public Task<string> GetFroniusName<T>(T enumValue) where T : Enum

@@ -39,7 +39,7 @@ public partial class ToshibaHvacControl
 
         if (!DesignerProperties.GetIsInDesignMode(this))
         {
-            SolarSystemService = IoC.Get<ISolarSystemService>();
+            DataCollectionService = IoC.Get<IDataCollectionService>();
             TargetTemperature.ContextMenu = new ContextMenu();
 
             for (sbyte temperature = 30; temperature > 16; temperature--)
@@ -56,11 +56,11 @@ public partial class ToshibaHvacControl
             }
 
             CreateContextMenuForButtonSelection(HvacFanSpeedButton, fanSpeeds, nameof(HvacFanSpeedButton.FanSpeed));
-            Unloaded += (_, _) => SolarSystemService.HvacService.LiveDataReceived -= OnAnswerReceived;
+            Unloaded += (_, _) => DataCollectionService.HvacService.LiveDataReceived -= OnAnswerReceived;
         }
     }
 
-    public ISolarSystemService SolarSystemService { get; } = null!;
+    public IDataCollectionService DataCollectionService { get; } = null!;
 
     private void OnDeviceChanged()
     {
@@ -103,15 +103,15 @@ public partial class ToshibaHvacControl
             enablerTokenSource = null;
         }
 
-        SolarSystemService.HvacService.LiveDataReceived -= OnAnswerReceived;
+        DataCollectionService.HvacService.LiveDataReceived -= OnAnswerReceived;
         Dispatcher.BeginInvoke(() => IsEnabled = true);
     }
 
     private async void SendCommand(ToshibaHvacStateData stateData)
     {
         IsEnabled = false;
-        SolarSystemService.HvacService.LiveDataReceived += OnAnswerReceived;
-        awaitedMessage = await SolarSystemService.HvacService.SendDeviceCommand(stateData, Device).ConfigureAwait(false);
+        DataCollectionService.HvacService.LiveDataReceived += OnAnswerReceived;
+        awaitedMessage = await DataCollectionService.HvacService.SendDeviceCommand(stateData, Device).ConfigureAwait(false);
 
         lock (tokenLock)
         {

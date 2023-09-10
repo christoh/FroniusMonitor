@@ -5,10 +5,10 @@ public class MainViewModel : ViewModelBase
     private readonly IWebClientService webClientService;
     public MainWindow View { get; internal set; } = null!;
 
-    public MainViewModel(ISolarSystemService solarSystemService, IWebClientService webClientService, IWattPilotService wattPilotService)
+    public MainViewModel(IDataCollectionService dataCollectionService, IWebClientService webClientService, IWattPilotService wattPilotService)
     {
         this.webClientService = webClientService;
-        SolarSystemService = solarSystemService;
+        DataCollectionService = dataCollectionService;
         WattPilotService = wattPilotService;
         ExportSettingsCommand = new NoParameterCommand(ExportSettings);
         LoadSettingsCommand = new NoParameterCommand(LoadSettings);
@@ -21,7 +21,7 @@ public class MainViewModel : ViewModelBase
     public ICommand DownloadChargeLogCommand { get; }
     public ICommand RebootWattPilotCommand { get; }
 
-    public ISolarSystemService SolarSystemService { get; }
+    public IDataCollectionService DataCollectionService { get; }
 
     public IWattPilotService WattPilotService { get; }
 
@@ -45,7 +45,7 @@ public class MainViewModel : ViewModelBase
     {
         await base.OnInitialize().ConfigureAwait(false);
 
-        await SolarSystemService.Start
+        await DataCollectionService.Start
         (
             App.Settings.FroniusConnection,
             App.Settings.HaveFritzBox && App.Settings.ShowFritzBox ? App.Settings.FritzBoxConnection : null,
@@ -68,7 +68,7 @@ public class MainViewModel : ViewModelBase
 
         if (isVisible)
         {
-            SolarSystemService.InvalidateFritzBox();
+            DataCollectionService.InvalidateFritzBox();
         }
 
         _ = Settings.Save();
@@ -76,7 +76,7 @@ public class MainViewModel : ViewModelBase
 
     internal void WattPilotVisibilityChanged(bool isVisible)
     {
-        SolarSystemService.WattPilotConnection = isVisible ? App.Settings.WattPilotConnection : null;
+        DataCollectionService.WattPilotConnection = isVisible ? App.Settings.WattPilotConnection : null;
         _ = Settings.Save();
     }
 
@@ -115,7 +115,7 @@ public class MainViewModel : ViewModelBase
 
     private void DownloadChargeLog()
     {
-        var link = SolarSystemService.SolarSystem?.WattPilot?.DownloadLink;
+        var link = DataCollectionService.HomeAutomationSystem?.WattPilot?.DownloadLink;
         if (link == null) return;
         Process.Start(new ProcessStartInfo { FileName = link, UseShellExecute = true });
     }
@@ -141,7 +141,7 @@ public class MainViewModel : ViewModelBase
             return;
         }
 
-        SolarSystemService.Stop();
+        DataCollectionService.Stop();
 
         try
         {
@@ -159,7 +159,7 @@ public class MainViewModel : ViewModelBase
         }
         finally
         {
-            await SolarSystemService.Start
+            await DataCollectionService.Start
             (
                 App.Settings.FroniusConnection,
                 App.Settings.HaveFritzBox && App.Settings.ShowFritzBox ? App.Settings.FritzBoxConnection : null,

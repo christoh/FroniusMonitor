@@ -54,7 +54,7 @@ public partial class App
         var injector = ServiceCollection
                 .AddScoped<IWebClientService, WebClientService>()
                 .AddSingleton(SynchronizationContext.Current!)
-                .AddSingleton<ISolarSystemService, SolarSystemService>()
+                .AddSingleton<IDataCollectionService, DataCollectionService>()
                 .AddSingleton<MainWindow>()
                 .AddSingleton<MainViewModel>()
                 .AddSingleton<IGen24JsonService, Gen24JsonService>()
@@ -77,7 +77,7 @@ public partial class App
             ;
 
         IoC.Update(injector);
-        IoC.Get<ISolarSystemService>().FroniusUpdateRate = Settings.FroniusUpdateRate;
+        IoC.Get<IDataCollectionService>().FroniusUpdateRate = Settings.FroniusUpdateRate;
 
         if (!string.IsNullOrWhiteSpace(Settings.Language))
         {
@@ -100,7 +100,7 @@ public partial class App
         switch (e.Mode)
         {
             case PowerModes.Resume:
-                IoC.Get<ISolarSystemService>().HvacService.Stop();
+                IoC.Get<IDataCollectionService>().HvacService.Stop();
                 break;
         }
     }

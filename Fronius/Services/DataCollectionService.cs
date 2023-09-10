@@ -1,9 +1,10 @@
-﻿using De.Hochstaetter.Fronius.Models.Settings;
+﻿using De.Hochstaetter.Fronius.Models.Gen24.Settings;
+using De.Hochstaetter.Fronius.Models.Settings;
 using De.Hochstaetter.Fronius.Models.ToshibaAc;
 
 namespace De.Hochstaetter.Fronius.Services;
 
-public class SolarSystemService : BindableBase, ISolarSystemService
+public class DataCollectionService : BindableBase, IDataCollectionService
 {
     private readonly IWattPilotService wattPilotService;
     private readonly SettingsBase settings;
@@ -16,7 +17,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
     public event EventHandler<SolarDataEventArgs>? NewDataReceived;
 
-    public SolarSystemService(SettingsBase settings, IWebClientService webClientService, IWattPilotService wattPilotService, IToshibaHvacService acService, SynchronizationContext context)
+    public DataCollectionService(SettingsBase settings, IWebClientService webClientService, IWattPilotService wattPilotService, IToshibaHvacService acService, SynchronizationContext context)
     {
         WebClientService = webClientService;
         this.wattPilotService = wattPilotService;
@@ -34,12 +35,12 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
     public IToshibaHvacService HvacService { get; }
 
-    private SolarSystem? solarSystem;
+    private HomeAutomationSystem? homeAutomationSystem;
 
-    public SolarSystem? SolarSystem
+    public HomeAutomationSystem? HomeAutomationSystem
     {
-        get => solarSystem;
-        private set => Set(ref solarSystem, value);
+        get => homeAutomationSystem;
+        private set => Set(ref homeAutomationSystem, value);
     }
 
     private WebConnection? wattPilotConnection;
@@ -108,8 +109,8 @@ public class SolarSystemService : BindableBase, ISolarSystemService
             CalibrationDate = DateTime.UtcNow,
             ConsumedOffset = consumedEnergyOffset,
             ProducedOffset = producedEnergyOffset,
-            EnergyRealConsumed = SolarSystem?.Gen24System?.PrimaryPowerMeter?.EnergyRealConsumed ?? double.NaN,
-            EnergyRealProduced = SolarSystem?.Gen24System?.PrimaryPowerMeter?.EnergyRealProduced ?? double.NaN,
+            EnergyRealConsumed = HomeAutomationSystem?.Gen24Sensors?.PrimaryPowerMeter?.EnergyRealConsumed ?? double.NaN,
+            EnergyRealProduced = HomeAutomationSystem?.Gen24Sensors?.PrimaryPowerMeter?.EnergyRealProduced ?? double.NaN,
         };
 
         SmartMeterHistory.Add(newItem);
@@ -140,8 +141,8 @@ public class SolarSystemService : BindableBase, ISolarSystemService
     {
         Stop();
         WattPilotConnection = wattPilotConnection;
-        SolarSystem = await CreateSolarSystem(inverterConnection, fritzBoxConnection).ConfigureAwait(false);
-        await Task.Run(() => NewDataReceived?.Invoke(this, new SolarDataEventArgs(SolarSystem))).ConfigureAwait(false);
+        HomeAutomationSystem = await CreateSolarSystem(inverterConnection, fritzBoxConnection).ConfigureAwait(false);
+        await Task.Run(() => NewDataReceived?.Invoke(this, new SolarDataEventArgs(HomeAutomationSystem))).ConfigureAwait(false);
         _ = await WebClientService.GetEventDescription("BYD2-46").ConfigureAwait(false);
         _ = await WebClientService.GetConfigString("BATTERIES", "BAT_M0_SOC_MIN");
         timer = new Timer(TimerElapsed, null, 0, 1000);
@@ -175,9 +176,9 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         }
     }
 
-    private async ValueTask<SolarSystem> CreateSolarSystem(WebConnection? inverterConnection, WebConnection? fritzBoxConnection)
+    private async ValueTask<HomeAutomationSystem> CreateSolarSystem(WebConnection? inverterConnection, WebConnection? fritzBoxConnection)
     {
-        var result = new SolarSystem();
+        var result = new HomeAutomationSystem();
         SmartMeterHistory = await ReadCalibrationHistory().ConfigureAwait(false);
 
         if (inverterConnection != null)
@@ -218,20 +219,20 @@ public class SolarSystemService : BindableBase, ISolarSystemService
 
                 await Task.WhenAll(task1, task2).ConfigureAwait(false);
                 
-                result.Gen24System = task1.Result;
-                result.Gen24System2 = task2.Result;
+                result.Gen24Sensors = task1.Result;
+                result.Gen24Sensors2 = task2.Result;
                 IsConnected = true;
             }
             catch
             {
                 IsConnected = false;
-                result.Gen24System = null;
+                result.Gen24Sensors = null;
                 result.Gen24Config!.Versions = null;
             }
         }
     }
 
-    private async Task UpdateConfigData(SolarSystem result)
+    private async Task UpdateConfigData(HomeAutomationSystem result)
     {
         var task1 = GetConfigToken(WebClientService);
         var task2 = GetConfigToken(WebClientService2);
@@ -256,9 +257,9 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         
         #if DEBUG
         // ReSharper disable UnusedVariable
+        var configString = configToken.ToString();
         var versionString = versionsToken.ToString();
         var componentsString= componentsToken.ToString();
-        var configString = configToken.ToString();
         // ReSharper restore UnusedVariable
         #endif
 
@@ -266,7 +267,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         {
             var commonToken = configToken["common"]?["ui"]?.Value<JToken>() ?? new JObject();
             var mpptToken = configToken["setup"]?["powerunit"]?["mppt"]?.Value<JToken>() ?? new JObject();
-            var gen24Config = Gen24Config.Parse(versionsToken, componentsToken, commonToken, mpptToken);
+            var gen24Config = Gen24Config.Parse(versionsToken, componentsToken, configToken);
             return gen24Config;
         }).ConfigureAwait(false);
     }
@@ -342,7 +343,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
         }
     }
 
-    private async Task<Gen24System?> TryGetGen24System(IWebClientService? localWebClientService, Gen24Components? components)
+    private async Task<Gen24Sensors?> TryGetGen24System(IWebClientService? localWebClientService, Gen24Components? components)
     {
         if (localWebClientService is null || components is null)
         {
@@ -378,9 +379,9 @@ public class SolarSystemService : BindableBase, ISolarSystemService
                 SwitchableDevices.RemoveRange(SwitchableDevices.OfType<ToshibaHvacMappingDevice>().ToList());
             }
 
-            if (SolarSystem?.Gen24Config == null)
+            if (HomeAutomationSystem?.Gen24Config == null)
             {
-                SolarSystem = await CreateSolarSystem(null, null).ConfigureAwait(false);
+                HomeAutomationSystem = await CreateSolarSystem(null, null).ConfigureAwait(false);
                 newSolarData = true;
                 newFritzBoxData = true;
             }
@@ -388,11 +389,11 @@ public class SolarSystemService : BindableBase, ISolarSystemService
             {
                 if ((DateTime.UtcNow - lastConfigUpdate).TotalMinutes > 5)
                 {
-                    await UpdateConfigData(SolarSystem).ConfigureAwait(false);
+                    await UpdateConfigData(HomeAutomationSystem).ConfigureAwait(false);
                 }
 
-                var gen24Task = froniusCounter % FroniusUpdateRate == 0 ? TryGetGen24System(WebClientService, SolarSystem.Gen24Config!.Components) : Task.FromResult<Gen24System?>(null);
-                var gen24Task2 = froniusCounter++ % FroniusUpdateRate == 0 ? TryGetGen24System(WebClientService2, SolarSystem.Gen24Config2.Components) : Task.FromResult<Gen24System?>(null);
+                var gen24Task = froniusCounter % FroniusUpdateRate == 0 ? TryGetGen24System(WebClientService, HomeAutomationSystem.Gen24Config!.Components) : Task.FromResult<Gen24Sensors?>(null);
+                var gen24Task2 = froniusCounter++ % FroniusUpdateRate == 0 ? TryGetGen24System(WebClientService2, HomeAutomationSystem.Gen24Config2.Components) : Task.FromResult<Gen24Sensors?>(null);
 
                 if (WebClientService.FritzBoxConnection == null && SwitchableDevices.Any(d => d is FritzBoxDevice))
                 {
@@ -414,15 +415,15 @@ public class SolarSystemService : BindableBase, ISolarSystemService
                 }
                 catch (TaskCanceledException) { }
 
-                SolarSystem.WattPilot = wattPilotTask.IsCompletedSuccessfully ? wattPilotTask.Result ?? SolarSystem.WattPilot : SolarSystem.WattPilot;
-                SolarSystem.FritzBox = fritzBoxTask.IsCompletedSuccessfully ? fritzBoxTask.Result ?? SolarSystem.FritzBox : null;
-                SolarSystem.Gen24System = gen24Task.IsCompletedSuccessfully ? gen24Task.Result ?? SolarSystem.Gen24System : null;
-                SolarSystem.Gen24System2 = gen24Task2.IsCompletedSuccessfully ? gen24Task2.Result ?? SolarSystem.Gen24System2 : null;
+                HomeAutomationSystem.WattPilot = wattPilotTask.IsCompletedSuccessfully ? wattPilotTask.Result ?? HomeAutomationSystem.WattPilot : HomeAutomationSystem.WattPilot;
+                HomeAutomationSystem.FritzBox = fritzBoxTask.IsCompletedSuccessfully ? fritzBoxTask.Result ?? HomeAutomationSystem.FritzBox : null;
+                HomeAutomationSystem.Gen24Sensors = gen24Task.IsCompletedSuccessfully ? gen24Task.Result ?? HomeAutomationSystem.Gen24Sensors : null;
+                HomeAutomationSystem.Gen24Sensors2 = gen24Task2.IsCompletedSuccessfully ? gen24Task2.Result ?? HomeAutomationSystem.Gen24Sensors2 : null;
 
-                var powerFlow = SolarSystem.Gen24System?.PowerFlow;
-                var powerFlow2 = SolarSystem.Gen24System2?.PowerFlow;
+                var powerFlow = HomeAutomationSystem.Gen24Sensors?.PowerFlow;
+                var powerFlow2 = HomeAutomationSystem.Gen24Sensors2?.PowerFlow;
 
-                SolarSystem.SitePowerFlow = new Gen24PowerFlow
+                HomeAutomationSystem.SitePowerFlow = new Gen24PowerFlow
                 {
                     LoadPower = (powerFlow?.LoadPower ?? -powerFlow?.InverterAcPower ?? 0) + (powerFlow2?.LoadPower ?? -powerFlow2?.InverterAcPower ?? 0),
                     GridPower = (powerFlow?.GridPower ?? 0) + (powerFlow2?.GridPower ?? 0),
@@ -440,7 +441,7 @@ public class SolarSystemService : BindableBase, ISolarSystemService
             }
 
             IsConnected = true;
-            if (newFritzBoxData || newSolarData) await Task.Run(() => NewDataReceived?.Invoke(this, new SolarDataEventArgs(SolarSystem))).ConfigureAwait(false);
+            if (newFritzBoxData || newSolarData) await Task.Run(() => NewDataReceived?.Invoke(this, new SolarDataEventArgs(HomeAutomationSystem))).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

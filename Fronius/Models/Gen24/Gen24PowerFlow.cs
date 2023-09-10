@@ -22,7 +22,7 @@ public enum SiteType : sbyte
 public class Gen24PowerFlow : Gen24DeviceBase
 {
     private SiteType? siteType;
-    private static readonly IList<SmartMeterCalibrationHistoryItem> history = IoC.TryGet<ISolarSystemService>()?.SmartMeterHistory!;
+    private static readonly IList<SmartMeterCalibrationHistoryItem> history = IoC.TryGet<IDataCollectionService>()?.SmartMeterHistory!;
     private static int oldSmartMeterHistoryCountProduced;
     private static int oldSmartMeterHistoryCountConsumed;
 

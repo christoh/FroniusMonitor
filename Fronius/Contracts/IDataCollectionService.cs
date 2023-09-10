@@ -2,9 +2,9 @@
 
 namespace De.Hochstaetter.Fronius.Contracts
 {
-    public interface ISolarSystemService
+    public interface IDataCollectionService
     {
-        SolarSystem? SolarSystem { get; }
+        HomeAutomationSystem? HomeAutomationSystem { get; }
         WebConnection? WattPilotConnection { get; set; }
         public IToshibaHvacService HvacService { get; }
         public IWebClientService WebClientService { get; }

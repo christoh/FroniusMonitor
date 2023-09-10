@@ -1,5 +1,6 @@
 ﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels
 {
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public class InverterSettingsViewModel : SettingsViewModelBase
     {
         private Gen24InverterSettings oldSettings = null!;
@@ -84,6 +85,28 @@
             });
         }
 
+        private IEnumerable<ListItemModel<PowerLimitMode>> powerLimitModes = null!;
+
+        public IEnumerable<ListItemModel<PowerLimitMode>> PowerLimitModes
+        {
+            get => powerLimitModes;
+            set => Set(ref powerLimitModes, value);
+        }
+
+        private ListItemModel<PowerLimitMode>? selectedPowerLimitMode;
+
+        public ListItemModel<PowerLimitMode>? SelectedPowerLimitMode
+        {
+            get => selectedPowerLimitMode;
+            set => Set(ref selectedPowerLimitMode, value, () =>
+            {
+                if (Settings?.ExportLimit?.Limit != null)
+                {
+                    Settings.ExportLimit.Limit.PowerLimitMode = value?.Value;
+                }
+            });
+        }
+
         private string title = Loc.InverterSettings;
 
         public string Title
@@ -142,24 +165,40 @@
 
         internal override async Task OnInitialize()
         {
-            await base.OnInitialize().ConfigureAwait(false);
-            oldSettings = await ReadDataFromInverter().ConfigureAwait(false);
+            IsInUpdate = true;
 
-            PowerModes = new[]
+            try
             {
-                new ListItemModel<MpptPowerMode>{ Value = MpptPowerMode.Off, DisplayName = await WebClientService.GetFroniusName(MpptPowerMode.Off).ConfigureAwait(false) },
-                new ListItemModel<MpptPowerMode>{ Value = MpptPowerMode.Auto, DisplayName = await WebClientService.GetFroniusName(MpptPowerMode.Auto).ConfigureAwait(false) },
-                new ListItemModel<MpptPowerMode>{ Value = MpptPowerMode.Fix, DisplayName = await WebClientService.GetFroniusName(MpptPowerMode.Fix).ConfigureAwait(false) },
-            };
+                await base.OnInitialize().ConfigureAwait(false);
+                oldSettings = await ReadDataFromInverter().ConfigureAwait(false);
 
-            DynamicPeakManagerModes = new[]
+                PowerModes = new[]
+                {
+                    new ListItemModel<MpptPowerMode> { Value = MpptPowerMode.Off, DisplayName = await WebClientService.GetFroniusName(MpptPowerMode.Off).ConfigureAwait(false) },
+                    new ListItemModel<MpptPowerMode> { Value = MpptPowerMode.Auto, DisplayName = await WebClientService.GetFroniusName(MpptPowerMode.Auto).ConfigureAwait(false) },
+                    new ListItemModel<MpptPowerMode> { Value = MpptPowerMode.Fix, DisplayName = await WebClientService.GetFroniusName(MpptPowerMode.Fix).ConfigureAwait(false) },
+                };
+
+                DynamicPeakManagerModes = new[]
+                {
+                    new ListItemModel<MpptOnOff> { Value = MpptOnOff.Off, DisplayName = await WebClientService.GetFroniusName(MpptOnOff.Off).ConfigureAwait(false) },
+                    new ListItemModel<MpptOnOff> { Value = MpptOnOff.On, DisplayName = await WebClientService.GetFroniusName(MpptOnOff.On).ConfigureAwait(false) },
+                    new ListItemModel<MpptOnOff> { Value = MpptOnOff.OnMlsd, DisplayName = await WebClientService.GetFroniusName(MpptOnOff.OnMlsd).ConfigureAwait(false) },
+                };
+
+                PowerLimitModes = new[]
+                {
+                    new ListItemModel<PowerLimitMode> { Value = PowerLimitMode.Off, DisplayName = await WebClientService.GetFroniusName(PowerLimitMode.Off).ConfigureAwait(false) },
+                    new ListItemModel<PowerLimitMode> { Value = PowerLimitMode.EntireSystem, DisplayName = await WebClientService.GetConfigString("EXPORTLIMIT", "WLIM_MAX_W").ConfigureAwait(false) },
+                    new ListItemModel<PowerLimitMode> { Value = PowerLimitMode.WeakestPhase, DisplayName = await WebClientService.GetConfigString("EXPORTLIMIT", "WLIM_MAX_FEEDIN_PER_PHASE").ConfigureAwait(false) },
+                };
+
+                Undo();
+            }
+            finally
             {
-                new ListItemModel<MpptOnOff>{ Value = MpptOnOff.Off, DisplayName = await WebClientService.GetFroniusName(MpptOnOff.Off).ConfigureAwait(false)},
-                new ListItemModel<MpptOnOff>{ Value = MpptOnOff.On, DisplayName = await WebClientService.GetFroniusName(MpptOnOff.On).ConfigureAwait(false)},
-                new ListItemModel<MpptOnOff>{ Value = MpptOnOff.OnMlsd, DisplayName = await WebClientService.GetFroniusName(MpptOnOff.OnMlsd).ConfigureAwait(false)},
-            };
-
-            Undo();
+                IsInUpdate=false;
+            }
         }
 
         [SuppressMessage("ReSharper", "StringLiteralTypo")]
@@ -169,7 +208,7 @@
 
             try
             {
-                var updateTokenCommon = await UpdateIfRequired(Settings, oldSettings,"config/common").ConfigureAwait(false);
+                var updateTokenCommon = await UpdateIfRequired(Settings, oldSettings, "config/common").ConfigureAwait(false);
 
                 if (updateTokenCommon.HasValues)
                 {
@@ -195,7 +234,7 @@
             }
         }
 
-        private async ValueTask<JObject> UpdateIfRequired<T>(T? newValues, T? oldValues, string uri) where T:BindableBase
+        private async ValueTask<JObject> UpdateIfRequired<T>(T? newValues, T? oldValues, string uri) where T : BindableBase
         {
             if (newValues is not null && oldValues is not null)
             {
@@ -217,7 +256,8 @@
         {
             var mpptToken = (await WebClientService.GetFroniusJsonResponse("config/setup/powerunit/mppt").ConfigureAwait(false)).Token;
             var commonToken = (await WebClientService.GetFroniusJsonResponse("config/common").ConfigureAwait(false)).Token;
-            return Gen24InverterSettings.Parse(commonToken, mpptToken);
+            var exportLimitToken = (await WebClientService.GetFroniusJsonResponse("config/powerlimits/exportLimits").ConfigureAwait(false)).Token;
+            return Gen24InverterSettings.Parse(commonToken, mpptToken, exportLimitToken);
         }
 
         private void Undo()
@@ -234,6 +274,8 @@
             SelectedDynamicPeakManagerModeMppt2 = DynamicPeakManagerModes.FirstOrDefault(mode => mode.Value == Settings.Mppt?.Mppt2?.DynamicPeakManager);
             WattPeakMppt2 = Settings.Mppt?.Mppt2?.WattPeak ?? 0;
             UpdateLogWattPeakMppt2();
+
+            SelectedPowerLimitMode = PowerLimitModes.FirstOrDefault(plm => plm.Value == Settings?.ExportLimit?.Limit?.PowerLimitMode);
         }
 
         private void UpdateWattPeakMppt1()

@@ -14,13 +14,13 @@ public partial class StorageControl
 
     public static readonly DependencyProperty Gen24Property = DependencyProperty.Register
     (
-        nameof(Gen24), typeof(Gen24System), typeof(StorageControl),
+        nameof(Gen24), typeof(Gen24Sensors), typeof(StorageControl),
         new PropertyMetadata((d, e) => ((StorageControl)d).OnStorageChanged(e))
     );
 
-    public Gen24System? Gen24
+    public Gen24Sensors? Gen24
     {
-        get => (Gen24System?)GetValue(Gen24Property);
+        get => (Gen24Sensors?)GetValue(Gen24Property);
         set => SetValue(Gen24Property, value);
     }
 

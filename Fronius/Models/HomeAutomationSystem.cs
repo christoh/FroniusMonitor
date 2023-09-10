@@ -1,21 +1,21 @@
 ﻿namespace De.Hochstaetter.Fronius.Models;
 
-public class SolarSystem : BindableBase
+public class HomeAutomationSystem : BindableBase
 {
-    private Gen24System? gen24System;
+    private Gen24Sensors? gen24Sensors;
 
-    public Gen24System? Gen24System
+    public Gen24Sensors? Gen24Sensors
     {
-        get => gen24System;
-        set => Set(ref gen24System, value);
+        get => gen24Sensors;
+        set => Set(ref gen24Sensors, value);
     }
 
-    private Gen24System? gen24System2;
+    private Gen24Sensors? gen24Sensors2;
 
-    public Gen24System? Gen24System2
+    public Gen24Sensors? Gen24Sensors2
     {
-        get => gen24System2;
-        set => Set(ref gen24System2, value);
+        get => gen24Sensors2;
+        set => Set(ref gen24Sensors2, value);
     }
 
     private Gen24Config? gen24Config;

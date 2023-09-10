@@ -50,7 +50,7 @@ public partial class PowerMeterClassic
     {
         if (SmartMeter is { EnergyRealConsumed: { } energyRealConsumed })
         {
-            await IoC.Get<ISolarSystemService>().AddCalibrationHistoryItem(value - energyRealConsumed, double.NaN).ConfigureAwait(false);
+            await IoC.Get<IDataCollectionService>().AddCalibrationHistoryItem(value - energyRealConsumed, double.NaN).ConfigureAwait(false);
             //await Settings.Save().ConfigureAwait(false);
         }
     }
@@ -59,7 +59,7 @@ public partial class PowerMeterClassic
     {
         if (SmartMeter is { EnergyRealProduced: { } energyRealProduced })
         {
-            await IoC.Get<ISolarSystemService>().AddCalibrationHistoryItem(double.NaN, value - energyRealProduced).ConfigureAwait(false);
+            await IoC.Get<IDataCollectionService>().AddCalibrationHistoryItem(double.NaN, value - energyRealProduced).ConfigureAwait(false);
             //await Settings.Save().ConfigureAwait(false);
         }
     }

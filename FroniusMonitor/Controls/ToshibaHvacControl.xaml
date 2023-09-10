@@ -14,7 +14,7 @@
         <Border BorderBrush="DimGray" BorderThickness="1" Width="150">
             <Border.Background>
                 <MultiBinding Converter="{co:PowerStatus2Brush}">
-                    <Binding Path="SolarSystemService.HvacService.IsConnected" />
+                    <Binding Path="DataCollectionService.HvacService.IsConnected" />
                     <Binding Path="Device.State.IsTurnedOn" />
                     <Binding Path="Device.State.IsSelfCleaning" />
                 </MultiBinding>

@@ -28,13 +28,13 @@ public class Gen24Config : BindableBase, ICloneable
         set => Set(ref inverterSettings, value);
     }
 
-    public static Gen24Config Parse(JToken versionsToken, JToken componentsToken, JToken commonToken, JToken mpptToken)
+    public static Gen24Config Parse(JToken versionsToken, JToken componentsToken, JToken configToken)
     {
         var gen24Config = new Gen24Config
         {
             Versions = Gen24Versions.Parse(versionsToken),
             Components = Gen24Components.Parse(componentsToken),
-            InverterSettings = Gen24InverterSettings.Parse(commonToken, mpptToken),
+            InverterSettings = Gen24InverterSettings.Parse(configToken),
         };
 
         return gen24Config;

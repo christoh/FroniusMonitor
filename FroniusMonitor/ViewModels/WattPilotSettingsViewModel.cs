@@ -2,14 +2,14 @@
 
 public class WattPilotSettingsViewModel : ViewModelBase
 {
-    private readonly ISolarSystemService solarSystemService;
+    private readonly IDataCollectionService dataCollectionService;
     private readonly IWattPilotService wattPilotService;
     private WattPilot oldWattPilot = null!;
     private readonly MainWindow mainWindow;
 
-    public WattPilotSettingsViewModel(ISolarSystemService solarSystemService, IWattPilotService wattPilotService, MainWindow mainWindow)
+    public WattPilotSettingsViewModel(IDataCollectionService dataCollectionService, IWattPilotService wattPilotService, MainWindow mainWindow)
     {
-        this.solarSystemService = solarSystemService;
+        this.dataCollectionService = dataCollectionService;
         this.wattPilotService = wattPilotService;
         this.mainWindow = mainWindow;
     }
@@ -141,7 +141,7 @@ public class WattPilotSettingsViewModel : ViewModelBase
     internal override async Task OnInitialize()
     {
         await base.OnInitialize().ConfigureAwait(false);
-        var localWattPilot = wattPilotService.WattPilot ?? solarSystemService.SolarSystem?.WattPilot;
+        var localWattPilot = wattPilotService.WattPilot ?? dataCollectionService.HomeAutomationSystem?.WattPilot;
 
         if (localWattPilot == null)
         {

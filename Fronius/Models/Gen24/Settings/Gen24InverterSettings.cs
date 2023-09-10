@@ -37,6 +37,14 @@ public class Gen24InverterSettings : BindableBase, ICloneable
         set => Set(ref mppt, value);
     }
 
+    private Gen24PowerLimitSettings? exportLimit;
+
+    public Gen24PowerLimitSettings? ExportLimit
+    {
+        get => exportLimit;
+        set => Set(ref exportLimit, value);
+    }
+
     public object Clone()
     {
         var clone = new Gen24InverterSettings
@@ -45,16 +53,28 @@ public class Gen24InverterSettings : BindableBase, ICloneable
             TimeZoneName = TimeZoneName,
             TimeSync = TimeSync,
             Mppt = Mppt?.Clone() as Gen24Mppt,
+            ExportLimit = ExportLimit?.Clone() as Gen24PowerLimitSettings,
         };
 
         return clone;
     }
 
-    public static Gen24InverterSettings Parse(JToken? uiToken, JToken? mpptToken)
+    public static Gen24InverterSettings Parse(JToken? uiToken, JToken? mpptToken, JToken? exportLimitToken)
     {
         var inverterSettings = gen24JsonService.ReadFroniusData<Gen24InverterSettings>(uiToken);
-        inverterSettings.Mppt=Gen24Mppt.Parse(mpptToken);
+        inverterSettings.Mppt = Gen24Mppt.Parse(mpptToken);
+        inverterSettings.ExportLimit = Gen24PowerLimitSettings.Parse(exportLimitToken);
         return inverterSettings;
+    }
+
+    public static Gen24InverterSettings Parse(JToken? configToken)
+    {
+        return Parse
+        (
+            configToken?["common"]?["ui"]?.Value<JToken>() ?? new JObject(),
+            configToken?["setup"]?["powerunit"]?["mppt"]?.Value<JToken>() ?? new JObject(),
+            configToken?["powerlimits"]?["powerLimits"]?["exportLimits"]?.Value<JToken>() ?? new JObject()
+        );
     }
 
     public override string ToString() => SystemName ?? string.Empty;

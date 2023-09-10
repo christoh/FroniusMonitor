@@ -13,7 +13,7 @@
         ResizeMode="NoResize"
         SizeToContent="WidthAndHeight"
         d:DataContext="{d:DesignInstance vm:InverterSettingsViewModel}"
-        Title="{Binding Title}" Height="450" Width="800">
+        Title="{Binding Title}">
     <!-- ReSharper disable MarkupAttributeTypo -->
     <Grid Margin="8">
         <Grid.Resources>
@@ -61,13 +61,17 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" IsEnabled="{Binding IsInUpdate, Converter={co:BoolInverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <GroupBox Grid.Column="0" Header="{l:LocUi 'COMMON', 'TITLE'}">
+            <GroupBox Grid.Row="0" Grid.Column="0" Header="{l:LocUi 'COMMON', 'TITLE'}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -91,7 +95,8 @@
                 </Grid>
             </GroupBox>
 
-            <GroupBox Grid.Column="1" Header="{l:LocChannel 'MPPT1'}" Margin="4,0,0,0" IsEnabled="{Binding WebClientService.InverterConnection.UserName, FallbackValue=customer, Converter={co:String2Bool Value=customer, Equal=False, NotEqual=True}}">
+            <GroupBox Grid.Row="0" Grid.Column="1" Header="{l:LocChannel 'MPPT1'}" Margin="4,0,0,0"
+                      IsEnabled="{Binding WebClientService.InverterConnection.UserName, FallbackValue=customer, Converter={co:String2Bool Value=customer, Equal=False, NotEqual=True}}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -153,7 +158,8 @@
                 </Grid>
             </GroupBox>
 
-            <GroupBox Grid.Column="2" Header="{l:LocChannel 'MPPT2'}" Margin="4,0,0,0">
+            <GroupBox Grid.Row="0" Grid.Column="2" Header="{l:LocChannel 'MPPT2'}" Margin="4,0,0,0"
+                      IsEnabled="{Binding WebClientService.InverterConnection.UserName, FallbackValue=customer, Converter={co:String2Bool Value=customer, Equal=False, NotEqual=True}}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -205,7 +211,7 @@
                             <TextBlock Margin="0,0,4,0">
                                 <Run Text="{l:LocChannel 'PV_VOLTAGE_FIX_02_F32'}" /><Run Text=":" />
                             </TextBlock>
-                            <TextBox MinHeight="0" TextAlignment="Center" Width="40"
+                            <TextBox MinHeight="0" TextAlignment="Center" MinWidth="40"
                                      Text="{co:ValidationBinding Path=Settings.Mppt.Mppt2.DcFixedVoltage, FallbackValue=600, StringFormat=F0, Rule={v:MinMaxFloatRule Minimum=80, Maximum=800, PropertyDisplayName={l:LocChannel 'PV_VOLTAGE_FIX_02_F32'}}}" />
                             <TextBlock Margin="4,0,0,0" Text="V" />
                         </StackPanel>
@@ -215,7 +221,73 @@
                 </Grid>
             </GroupBox>
 
-            <GroupBox Style="{StaticResource ErrorGroupBox}" Grid.Column="3" Grid.Row="0" Margin="4,0,0,0" />
+            <GroupBox Visibility="{Binding WebClientService.InverterConnection.UserName, FallbackValue='customer', Converter={co:String2Visibility Value=customer, Equal=Collapsed, NotEqual=Visible}}"
+                      Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Header="{l:LocConfig 'EXPORTLIMIT', 'TITEL'}" Margin="0,4,0,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.Mode}"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text=":"/>
+                    <ComboBox HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="2" ItemsSource="{Binding PowerLimitModes}" SelectedItem="{Binding SelectedPowerLimitMode}"/>
+
+                    <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" VerticalContentAlignment="Center" HorizontalAlignment="Left" IsChecked="{Binding Settings.ExportLimit.EnableFailSafeMode, FallbackValue={x:Null}}"
+                              Visibility="{Binding Settings.ExportLimit.Limit.PowerLimitMode, FallbackValue=Collapsed, Converter={co:PowerLimitMode2Visibility Value=Off, Equal=Collapsed, NotEqual=Visible}}">
+                        <TextBlock Text="{l:LocConfig 'EXPORTLIMIT', 'failSafeModeEnabled'}" TextWrapping="Wrap" />
+                    </CheckBox>
+
+                    <CheckBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" VerticalContentAlignment="Center" HorizontalAlignment="Left" IsChecked="{Binding Settings.ExportLimit.Limit.SoftLimit.IsEnabled, FallbackValue={x:Null}}"
+                              Visibility="{Binding Settings.ExportLimit.Limit.PowerLimitMode, FallbackValue=Collapsed, Converter={co:PowerLimitMode2Visibility Value=Off, Equal=Collapsed, NotEqual=Visible}}">
+                        <TextBlock Text="Soft limit" TextWrapping="Wrap" />
+                    </CheckBox>
+
+                    <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" VerticalContentAlignment="Center" HorizontalAlignment="Left" IsChecked="{Binding Settings.ExportLimit.Limit.HardLimit.IsEnabled, FallbackValue={x:Null}}"
+                              Visibility="{Binding Settings.ExportLimit.Limit.PowerLimitMode, FallbackValue=Collapsed, Converter={co:PowerLimitMode2Visibility Value=Off, Equal=Collapsed, NotEqual=Visible}}">
+                        <TextBlock Text="Hard limit" TextWrapping="Wrap" />
+                    </CheckBox>
+
+                    <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,4,0,0" >
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"
+                                    Visibility="{Binding Settings.ExportLimit.Limit.SoftLimit.IsEnabled, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}">
+                            <TextBlock Margin="0,0,4,0">
+                                <Run Text="Soft limit" /><Run Text=":" />
+                            </TextBlock>
+                            <TextBox MinHeight="0" TextAlignment="Center" MinWidth="40"
+                                     Text="{co:ValidationBinding Path=Settings.ExportLimit.Limit.SoftLimit.PowerLimit, FallbackValue=20000, StringFormat=F0, Rule={v:MinMaxFloatRule Minimum=0, Maximum=10000, PropertyDisplayName='Soft limit'}}" />
+                            <TextBlock Margin="4,0,0,0" Text="W" />
+                        </StackPanel>
+                        <Slider Value="{Binding Settings.ExportLimit.Limit.SoftLimit.PowerLimit, Mode=TwoWay, FallbackValue=10000}" HorizontalAlignment="Stretch" TickFrequency=".1" IsSnapToTickEnabled="True" Minimum="0" Maximum="20000"
+                                Visibility="{Binding Settings.ExportLimit.Limit.SoftLimit.IsEnabled, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,8,0,0" >
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"
+                                    Visibility="{Binding Settings.ExportLimit.Limit.HardLimit.IsEnabled, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}">
+                            <TextBlock Margin="0,0,4,0">
+                                <Run Text="Hard limit" /><Run Text=":" />
+                            </TextBlock>
+                            <TextBox MinHeight="0" TextAlignment="Center" MinWidth="40"
+                                     Text="{co:ValidationBinding Path=Settings.ExportLimit.Limit.HardLimit.PowerLimit, FallbackValue=20000, StringFormat=F0, Rule={v:MinMaxFloatRule Minimum=0, Maximum=10000, PropertyDisplayName='Hard limit'}}" />
+                            <TextBlock Margin="4,0,0,0" Text="W" />
+                        </StackPanel>
+                        <Slider Value="{Binding Settings.ExportLimit.Limit.HardLimit.PowerLimit, Mode=TwoWay, FallbackValue=10000}" HorizontalAlignment="Stretch" TickFrequency=".1" IsSnapToTickEnabled="True" Minimum="0" Maximum="20000"
+                                Visibility="{Binding Settings.ExportLimit.Limit.HardLimit.IsEnabled, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}" />
+                    </StackPanel>
+                </Grid>
+            </GroupBox>
+
+            <GroupBox Style="{StaticResource ErrorGroupBox}" Grid.Column="3" Grid.Row="0" Grid.RowSpan="2" Margin="4,0,0,0" />
         </Grid>
         <Grid Grid.Row="1" Margin="0,8,0,0">
             <Grid.ColumnDefinitions>

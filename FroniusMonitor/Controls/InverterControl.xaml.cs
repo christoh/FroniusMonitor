@@ -26,7 +26,7 @@ public enum InverterDisplayMode
 
 public partial class InverterControl : IHaveLcdPanel
 {
-    private readonly ISolarSystemService? solarSystemService = IoC.TryGetRegistered<ISolarSystemService>();
+    private readonly IDataCollectionService? solarSystemService = IoC.TryGetRegistered<IDataCollectionService>();
     private IWebClientService? webClientService;
     private static readonly IReadOnlyList<InverterDisplayMode> acModes = new[] { InverterDisplayMode.AcPowerReal, InverterDisplayMode.AcPowerApparent, InverterDisplayMode.AcPowerReactive, InverterDisplayMode.AcPowerFactor, InverterDisplayMode.AcCurrent, InverterDisplayMode.AcPhaseVoltage, InverterDisplayMode.AcLineVoltage, };
     private static readonly IReadOnlyList<InverterDisplayMode> dcModes = new[] { InverterDisplayMode.DcPower, InverterDisplayMode.DcRelativePower, InverterDisplayMode.DcCurrent, InverterDisplayMode.DcVoltage, };
@@ -98,7 +98,7 @@ public partial class InverterControl : IHaveLcdPanel
         };
     }
 
-    private void OnModeChanged() => NewDataReceived(this, new SolarDataEventArgs(solarSystemService?.SolarSystem));
+    private void OnModeChanged() => NewDataReceived(this, new SolarDataEventArgs(solarSystemService?.HomeAutomationSystem));
 
     private void OnIsSecondaryChanged()
     {
@@ -111,23 +111,23 @@ public partial class InverterControl : IHaveLcdPanel
 
     private async void NewDataReceived(object? sender, SolarDataEventArgs e)
     {
-        Gen24System? gen24 = null!;
-        Gen24Config? config = null!;
+        Gen24Sensors? gen24Sensors = null!;
+        Gen24Config? gen24Config = null!;
         
         Dispatcher.Invoke(() =>
         {
-            gen24 = IsSecondary ? e.SolarSystem?.Gen24System2 : e.SolarSystem?.Gen24System;
-            config = IsSecondary ? e.SolarSystem?.Gen24Config2:e.SolarSystem?.Gen24Config;
+            gen24Sensors = IsSecondary ? e.HomeAutomationSystem?.Gen24Sensors2 : e.HomeAutomationSystem?.Gen24Sensors;
+            gen24Config = IsSecondary ? e.HomeAutomationSystem?.Gen24Config2:e.HomeAutomationSystem?.Gen24Config;
         });
         
-        var inverter = gen24?.Inverter;
-        var dataManager = gen24?.DataManager;
-        var powerFlow = e.SolarSystem?.SitePowerFlow;
+        var inverter = gen24Sensors?.Inverter;
+        var dataManager = gen24Sensors?.DataManager;
+        var powerFlow = e.HomeAutomationSystem?.SitePowerFlow;
 
         if
         (
             !isInStandByChange &&
-            ((DateTime.UtcNow - lastStandbySwitchUpdate).TotalMinutes > 5 || lastStatusCode != gen24?.InverterStatus?.StatusCode) &&
+            ((DateTime.UtcNow - lastStandbySwitchUpdate).TotalMinutes > 5 || lastStatusCode != gen24Sensors?.InverterStatus?.StatusCode) &&
             webClientService != null
         )
         {
@@ -143,20 +143,20 @@ public partial class InverterControl : IHaveLcdPanel
             }
         }
 
-        lastStatusCode = gen24?.InverterStatus?.StatusCode;
+        lastStatusCode = gen24Sensors?.InverterStatus?.StatusCode;
 
         Dispatcher.InvokeAsync(() =>
         {
-            var cache = gen24?.Cache;
-            var gen24Common = IsSecondary ? e.SolarSystem?.Gen24Config2?.InverterSettings : e.SolarSystem?.Gen24Config?.InverterSettings;
+            var cache = gen24Sensors?.Cache;
+            var gen24Common = IsSecondary ? e.HomeAutomationSystem?.Gen24Config2?.InverterSettings : e.HomeAutomationSystem?.Gen24Config?.InverterSettings;
 
             if (cache == null && inverter == null && dataManager == null)
             {
                 return;
             }
 
-            BackgroundProvider.Background = gen24?.InverterStatus?.ToBrush() ?? Brushes.LightGray;
-            InverterModelName.Text = $"{gen24?.PowerFlow?.SiteTypeDisplayName ?? "---"} ({gen24?.InverterStatus?.StatusMessage ?? Loc.Unknown})";
+            BackgroundProvider.Background = gen24Sensors?.InverterStatus?.ToBrush() ?? Brushes.LightGray;
+            InverterModelName.Text = $"{gen24Config.Versions?.ModelName ?? "---"} ({gen24Sensors?.InverterStatus?.StatusMessage ?? Loc.Unknown})";
             InverterName.Text = gen24Common?.SystemName ?? "---";
             VersionList.Visibility = Visibility.Collapsed;
             Lcd.Visibility = Visibility.Visible;
@@ -292,7 +292,7 @@ public partial class InverterControl : IHaveLcdPanel
                         cache?.Solar1Current ?? inverter?.Solar1Current,
                         cache?.Solar2Current ?? inverter?.Solar2Current,
                         (cache?.Solar1Current ?? inverter?.Solar1Current) + (cache?.Solar2Current ?? inverter?.Solar2Current),
-                        cache?.StorageCurrent ?? inverter?.StorageCurrent ?? gen24?.Storage?.Current,
+                        cache?.StorageCurrent ?? inverter?.StorageCurrent ?? gen24Sensors?.Storage?.Current,
                         "N3", "A"
                     );
 
@@ -315,8 +315,8 @@ public partial class InverterControl : IHaveLcdPanel
 
                 case InverterDisplayMode.DcRelativePower:
                     Lcd.Header = Loc.DcRelativePower;
-                    var wattPeak1 = config?.InverterSettings?.Mppt?.Mppt1?.WattPeak;
-                    var wattPeak2 = config?.InverterSettings?.Mppt?.Mppt2?.WattPeak;
+                    var wattPeak1 = gen24Config?.InverterSettings?.Mppt?.Mppt1?.WattPeak;
+                    var wattPeak2 = gen24Config?.InverterSettings?.Mppt?.Mppt2?.WattPeak;
                     var power1 = cache?.Solar1Power ?? inverter?.Solar1Power;
                     var power2 = cache?.Solar2Power ?? inverter?.Solar2Power;
                     Lcd.Label1 = "PV1";
@@ -331,10 +331,10 @@ public partial class InverterControl : IHaveLcdPanel
                     (
                         powerFlow?.SolarPower /
                         (
-                                             e.SolarSystem?.Gen24Config?.InverterSettings?.Mppt?.Mppt1?.WattPeak+
-                                             e.SolarSystem?.Gen24Config?.InverterSettings?.Mppt?.Mppt2?.WattPeak+
-                                             e.SolarSystem?.Gen24Config2?.InverterSettings?.Mppt?.Mppt1?.WattPeak+
-                                             e.SolarSystem?.Gen24Config2?.InverterSettings?.Mppt?.Mppt2?.WattPeak
+                                             e.HomeAutomationSystem?.Gen24Config?.InverterSettings?.Mppt?.Mppt1?.WattPeak+
+                                             e.HomeAutomationSystem?.Gen24Config?.InverterSettings?.Mppt?.Mppt2?.WattPeak+
+                                             e.HomeAutomationSystem?.Gen24Config2?.InverterSettings?.Mppt?.Mppt1?.WattPeak+
+                                             e.HomeAutomationSystem?.Gen24Config2?.InverterSettings?.Mppt?.Mppt2?.WattPeak
                         ), "P2");
                     
                     break;

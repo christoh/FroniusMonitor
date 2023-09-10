@@ -40,7 +40,7 @@ public partial class SmartMeterControl : IHaveLcdPanel
     };
 
     private int currentPowerModeIndex, currentVoltageModeIndex, currentCurrentIndex, currentMoreIndex;
-    private readonly ISolarSystemService? solarSystemService = IoC.TryGetRegistered<ISolarSystemService>();
+    private readonly IDataCollectionService? solarSystemService = IoC.TryGetRegistered<IDataCollectionService>();
 
     #region Dependency Properties
 
@@ -105,8 +105,8 @@ public partial class SmartMeterControl : IHaveLcdPanel
             return;
         }
 
-        Title.Text = $"{SmartMeter.Model} ({solarSystemService?.SolarSystem?.Gen24System?.MeterStatus?.StatusMessage??Loc.Unknown})";
-        BackgroundProvider.Background = solarSystemService?.SolarSystem?.Gen24System?.MeterStatus?.ToBrush() ?? Brushes.LightGray;
+        Title.Text = $"{SmartMeter.Model} ({solarSystemService?.HomeAutomationSystem?.Gen24Sensors?.MeterStatus?.StatusMessage??Loc.Unknown})";
+        BackgroundProvider.Background = solarSystemService?.HomeAutomationSystem?.Gen24Sensors?.MeterStatus?.ToBrush() ?? Brushes.LightGray;
 
         switch (Mode)
         {

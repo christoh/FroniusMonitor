@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Gen24;
 
-public class Gen24System : BindableBase
+public class Gen24Sensors : BindableBase
 {
     private Gen24Inverter? inverter;
 

@@ -3,11 +3,11 @@
 public class NonUpdatingSlider : Slider
 {
     public event EventHandler<RoutedPropertyChangedEventArgs<double>>? ThumbDragCompleted;
-    private static readonly ISolarSystemService solarSystemService = IoC.TryGetRegistered<ISolarSystemService>()!;
+    private static readonly IDataCollectionService dataCollectionService = IoC.TryGetRegistered<IDataCollectionService>()!;
 
     protected override void OnThumbDragStarted(DragStartedEventArgs e)
     {
-        solarSystemService.SuspendPowerConsumers();
+        dataCollectionService.SuspendPowerConsumers();
         base.OnThumbDragStarted(e);
     }
 
@@ -21,7 +21,7 @@ public class NonUpdatingSlider : Slider
         }
         finally
         {
-            solarSystemService.ResumePowerConsumers();
+            dataCollectionService.ResumePowerConsumers();
         }
     }
 }

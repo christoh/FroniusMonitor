@@ -2,7 +2,7 @@
 
 public partial class PowerConsumer
 {
-    private static readonly ISolarSystemService solarSystemService = IoC.TryGetRegistered<ISolarSystemService>()!;
+    private static readonly IDataCollectionService dataCollectionService = IoC.TryGetRegistered<IDataCollectionService>()!;
 
     #region Dependency Properties
 
@@ -58,7 +58,7 @@ public partial class PowerConsumer
             return;
         }
 
-        solarSystemService.SuspendPowerConsumers();
+        dataCollectionService.SuspendPowerConsumers();
 
         try
         {
@@ -67,7 +67,7 @@ public partial class PowerConsumer
         }
         finally
         {
-            solarSystemService.ResumePowerConsumers();
+            dataCollectionService.ResumePowerConsumers();
         }
     }
 

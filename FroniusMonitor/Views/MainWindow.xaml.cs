@@ -47,9 +47,9 @@ public partial class MainWindow
         Loaded += (_, _) =>
         {
             ViewModel.Dispatcher = Dispatcher;
-            var binding = new Binding($"{nameof(ViewModel.SolarSystemService)}.{nameof(ViewModel.SolarSystemService.SolarSystem)}.{nameof(ViewModel.SolarSystemService.SolarSystem.Gen24System)}.{nameof(ViewModel.SolarSystemService.SolarSystem.Gen24System.PowerFlow)}");
+            var binding = new Binding($"{nameof(ViewModel.DataCollectionService)}.{nameof(ViewModel.DataCollectionService.HomeAutomationSystem)}.{nameof(ViewModel.DataCollectionService.HomeAutomationSystem.Gen24Sensors)}.{nameof(ViewModel.DataCollectionService.HomeAutomationSystem.Gen24Sensors.PowerFlow)}");
             SetBinding(PowerFlowProperty, binding);
-            binding = new Binding($"{nameof(ViewModel.SolarSystemService)}.{nameof(ViewModel.SolarSystemService.SolarSystem)}.{nameof(ViewModel.SolarSystemService.SolarSystem.Gen24System2)}.{nameof(ViewModel.SolarSystemService.SolarSystem.Gen24System2.PowerFlow)}");
+            binding = new Binding($"{nameof(ViewModel.DataCollectionService)}.{nameof(ViewModel.DataCollectionService.HomeAutomationSystem)}.{nameof(ViewModel.DataCollectionService.HomeAutomationSystem.Gen24Sensors2)}.{nameof(ViewModel.DataCollectionService.HomeAutomationSystem.Gen24Sensors2.PowerFlow)}");
             SetBinding(PowerFlow2Property, binding);
             ViewModel.View = this;
             _ = ViewModel.OnInitialize();
@@ -210,7 +210,7 @@ public partial class MainWindow
             return;
         }
 
-        var sitePowerFlow = ViewModel.SolarSystemService.SolarSystem?.SitePowerFlow;
+        var sitePowerFlow = ViewModel.DataCollectionService.HomeAutomationSystem?.SitePowerFlow;
         LoadArrow.Power = sitePowerFlow?.LoadPowerCorrected - (ViewModel.IncludeInverterPower ? sitePowerFlow?.LoadPowerCorrected + sitePowerFlow?.SolarPower + sitePowerFlow?.GridPowerCorrected + sitePowerFlow?.StoragePower : 0);
         LoadArrowPrimaryInverter.Power = PowerFlow?.LoadPowerCorrected - (ViewModel.IncludeInverterPower ? PowerFlow?.LoadPowerCorrected + PowerFlow?.SolarPower + PowerFlow?.GridPowerCorrected + PowerFlow?.StoragePower : 0);
 
