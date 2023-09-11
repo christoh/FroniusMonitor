@@ -197,7 +197,7 @@
             }
             finally
             {
-                IsInUpdate=false;
+                IsInUpdate = false;
             }
         }
 
@@ -208,17 +208,12 @@
 
             try
             {
-                var updateTokenCommon = await UpdateIfRequired(Settings, oldSettings, "config/common").ConfigureAwait(false);
+                var hasUpdates = false;
+                await UpdateIfRequired(Settings, oldSettings, "config/common").ConfigureAwait(false);
+                await UpdateIfRequired(Settings.Mppt?.Mppt1, oldSettings.Mppt?.Mppt1, "config/setup/powerunit/mppt/mppt1").ConfigureAwait(false);
+                await UpdateIfRequired(Settings.Mppt?.Mppt2, oldSettings.Mppt?.Mppt2, "config/setup/powerunit/mppt/mppt2").ConfigureAwait(false);
 
-                if (updateTokenCommon.HasValues)
-                {
-                    await UpdateInverter("config/common", updateTokenCommon);
-                }
-
-                var updateTokenMppt1 = await UpdateIfRequired(Settings.Mppt?.Mppt1, oldSettings.Mppt?.Mppt1, "config/setup/powerunit/mppt/mppt1").ConfigureAwait(false);
-                var updateTokenMppt2 = await UpdateIfRequired(Settings.Mppt?.Mppt2, oldSettings.Mppt?.Mppt2, "config/setup/powerunit/mppt/mppt2").ConfigureAwait(false);
-
-                if (new[] { updateTokenCommon, updateTokenMppt1, updateTokenMppt2 }.All(token => !token.HasValues))
+                if (!hasUpdates)
                 {
                     ShowNoSettingsChanged();
                     return;
@@ -227,6 +222,25 @@
                 oldSettings = Settings;
                 Undo();
                 ToastText = Loc.SettingsSavedToInverter;
+                return;
+
+                async ValueTask UpdateIfRequired<T>(T? newValues, T? oldValues, string uri) where T : BindableBase
+                {
+                    if (newValues is not null && oldValues is not null)
+                    {
+                        var updateToken = Gen24Service.GetUpdateToken(newValues, oldValues);
+
+                        if (updateToken.HasValues)
+                        {
+                            var success = await UpdateInverter(uri, updateToken).ConfigureAwait(false);
+
+                            if (success)
+                            {
+                                hasUpdates = true;
+                            }
+                        }
+                    }
+                }
             }
             finally
             {
@@ -234,22 +248,6 @@
             }
         }
 
-        private async ValueTask<JObject> UpdateIfRequired<T>(T? newValues, T? oldValues, string uri) where T : BindableBase
-        {
-            if (newValues is not null && oldValues is not null)
-            {
-                var updateToken = Gen24Service.GetUpdateToken(newValues, oldValues);
-
-                if (updateToken.HasValues)
-                {
-                    await UpdateInverter(uri, updateToken);
-                }
-
-                return updateToken;
-            }
-
-            return new JObject();
-        }
 
         [SuppressMessage("ReSharper", "StringLiteralTypo")]
         private async ValueTask<Gen24InverterSettings> ReadDataFromInverter()
