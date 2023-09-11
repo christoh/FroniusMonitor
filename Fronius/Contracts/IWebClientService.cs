@@ -19,8 +19,8 @@ public interface IWebClientService
     ValueTask<T> ReadGen24Entity<T>(string request) where T : new();
     ValueTask<(string JsonString, HttpStatusCode StatusCode)> GetFroniusStringResponse(string request, JToken? token = null, IEnumerable<HttpStatusCode>? allowedStatusCodes = null);
     ValueTask<(JToken Token, HttpStatusCode StatusCode)> GetFroniusJsonResponse(string request, JToken? token = null, IEnumerable<HttpStatusCode>? allowedStatusCodes = null);
-    Task<string> GetConfigString(string category, string key);
-    Task<string> GetUiString(string category, string key);
+    Task<string> GetConfigString(string path);
+    Task<string> GetUiString(string path);
     Task<string> GetFroniusName<T>(T enumValue) where T : Enum;
     public Task<string> GetChannelString(string category);
     ValueTask<string> GetEventDescription(string code);

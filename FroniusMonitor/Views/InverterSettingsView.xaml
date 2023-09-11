@@ -71,7 +71,7 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <GroupBox Grid.Row="0" Grid.Column="0" Header="{l:LocUi 'COMMON', 'TITLE'}">
+            <GroupBox Grid.Row="0" Grid.Column="0" Header="{l:Ui 'COMMON.TITLE'}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -83,7 +83,7 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="200" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{l:LocConfig 'COMMON', 'systemName'}" />
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{l:Config 'COMMON.systemName'}" />
                     <TextBlock Grid.Row="0" Grid.Column="1" Text=":" />
                     <TextBox Grid.Row="0" Grid.Column="2" MaxLength="30" Text="{Binding Settings.SystemName}" />
 
@@ -95,7 +95,7 @@
                 </Grid>
             </GroupBox>
 
-            <GroupBox Grid.Row="0" Grid.Column="1" Header="{l:LocChannel 'MPPT1'}" Margin="4,0,0,0"
+            <GroupBox Grid.Row="0" Grid.Column="1" Header="{l:Channel 'MPPT1'}" Margin="4,0,0,0"
                       IsEnabled="{Binding WebClientService.InverterConnection.UserName, FallbackValue=customer, Converter={co:String2Bool Value=customer, Equal=False, NotEqual=True}}">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -110,7 +110,7 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{l:LocChannel 'PV_MODE_MPP_01_U16'}" />
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{l:Channel 'PV_MODE_MPP_01_U16'}" />
                     <TextBlock Grid.Row="0" Grid.Column="1" Text=":" />
                     <ComboBox MinWidth="140" Grid.Row="0" Grid.Column="2" ItemsSource="{Binding PowerModes}" SelectedItem="{Binding SelectedPowerModeMppt1}">
                         <ComboBox.ItemTemplate>
@@ -120,7 +120,7 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{l:LocChannel 'PV_MODE_DYNAMICPEAK_01_U16'}" />
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{l:Channel 'PV_MODE_DYNAMICPEAK_01_U16'}" />
                     <TextBlock Grid.Row="1" Grid.Column="1" Text=":" />
                     <ComboBox MinWidth="140" Grid.Row="1" Grid.Column="2" ItemsSource="{Binding DynamicPeakManagerModes}" SelectedItem="{Binding SelectedDynamicPeakManagerModeMppt1}">
                         <ComboBox.ItemTemplate>
@@ -133,10 +133,10 @@
                     <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3">
                         <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center">
                             <TextBlock Margin="0,0,4,0">
-                                <Run Text="{l:LocChannel 'PV_POWERACTIVE_CONNECTED_PEAK_MAX_01_U32'}" /><Run Text=":" />
+                                <Run Text="{l:Channel 'PV_POWERACTIVE_CONNECTED_PEAK_MAX_01_U32'}" /><Run Text=":" />
                             </TextBlock>
                             <TextBox MinHeight="0" TextAlignment="Center" Width="40"
-                                     Text="{co:ValidationBinding Path=WattPeakMppt1, FallbackValue=5000, StringFormat=F0, Rule={v:MinMaxIntRule Minimum=0, Maximum=2000000, PropertyDisplayName={l:LocChannel 'PV_POWERACTIVE_CONNECTED_PEAK_MAX_01_U32'}}}" />
+                                     Text="{co:ValidationBinding Path=WattPeakMppt1, FallbackValue=5000, StringFormat=F0, Rule={v:MinMaxIntRule Minimum=0, Maximum=2000000, PropertyDisplayName={l:Channel 'PV_POWERACTIVE_CONNECTED_PEAK_MAX_01_U32'}}}" />
                             <TextBlock Margin="4,0,0,0" Text="W" />
                         </StackPanel>
                         <Slider Value="{Binding LogWattPeakMppt1, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="-0.30980391997148633857556748281473" Maximum="5.3010299956639811952137388947245"/>
@@ -146,10 +146,10 @@
                         <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center"
                                     Visibility="{Binding Settings.Mppt.Mppt1.PowerMode, Converter={co:MpptPowerMode2Visibility Value=Fix, Equal=Visible, NotEqual=Collapsed}, FallbackValue=Collapsed}">
                             <TextBlock Margin="0,0,4,0">
-                                <Run Text="{l:LocChannel 'PV_VOLTAGE_FIX_01_F32'}" /><Run Text=":" />
+                                <Run Text="{l:Channel 'PV_VOLTAGE_FIX_01_F32'}" /><Run Text=":" />
                             </TextBlock>
                             <TextBox MinHeight="0" TextAlignment="Center" Width="40"
-                                     Text="{co:ValidationBinding Path=Settings.Mppt.Mppt1.DcFixedVoltage, FallbackValue=600, StringFormat=F0, Rule={v:MinMaxFloatRule Minimum=80, Maximum=800, PropertyDisplayName={l:LocChannel 'PV_VOLTAGE_FIX_01_F32'}}}" />
+                                     Text="{co:ValidationBinding Path=Settings.Mppt.Mppt1.DcFixedVoltage, FallbackValue=600, StringFormat=F0, Rule={v:MinMaxFloatRule Minimum=80, Maximum=800, PropertyDisplayName={l:Channel 'PV_VOLTAGE_FIX_01_F32'}}}" />
                             <TextBlock Margin="4,0,0,0" Text="V" />
                         </StackPanel>
                         <Slider Value="{Binding Settings.Mppt.Mppt1.DcFixedVoltage, Mode=TwoWay, FallbackValue=600}" HorizontalAlignment="Stretch" TickFrequency=".1" IsSnapToTickEnabled="True" Minimum="80" Maximum="800"
@@ -158,7 +158,7 @@
                 </Grid>
             </GroupBox>
 
-            <GroupBox Grid.Row="0" Grid.Column="2" Header="{l:LocChannel 'MPPT2'}" Margin="4,0,0,0"
+            <GroupBox Grid.Row="0" Grid.Column="2" Header="{l:Channel 'MPPT2'}" Margin="4,0,0,0"
                       IsEnabled="{Binding WebClientService.InverterConnection.UserName, FallbackValue=customer, Converter={co:String2Bool Value=customer, Equal=False, NotEqual=True}}">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -173,7 +173,7 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{l:LocChannel 'PV_MODE_MPP_02_U16'}" />
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{l:Channel 'PV_MODE_MPP_02_U16'}" />
                     <TextBlock Grid.Row="0" Grid.Column="1" Text=":" />
                     <ComboBox MinWidth="140" Grid.Row="0" Grid.Column="2" ItemsSource="{Binding PowerModes}" SelectedItem="{Binding SelectedPowerModeMppt2}">
                         <ComboBox.ItemTemplate>
@@ -183,7 +183,7 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{l:LocChannel 'PV_MODE_DYNAMICPEAK_02_U16'}" />
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{l:Channel 'PV_MODE_DYNAMICPEAK_02_U16'}" />
                     <TextBlock Grid.Row="1" Grid.Column="1" Text=":" />
                     <ComboBox MinWidth="140" Grid.Row="1" Grid.Column="2" ItemsSource="{Binding DynamicPeakManagerModes}" SelectedItem="{Binding SelectedDynamicPeakManagerModeMppt2}">
                         <ComboBox.ItemTemplate>
@@ -196,10 +196,10 @@
                     <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3">
                         <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center">
                             <TextBlock Margin="0,0,4,0">
-                                <Run Text="{l:LocChannel 'PV_POWERACTIVE_CONNECTED_PEAK_MAX_02_U32'}" /><Run Text=":" />
+                                <Run Text="{l:Channel 'PV_POWERACTIVE_CONNECTED_PEAK_MAX_02_U32'}" /><Run Text=":" />
                             </TextBlock>
                             <TextBox MinHeight="0" TextAlignment="Center" Width="40"
-                                     Text="{co:ValidationBinding Path=WattPeakMppt2, FallbackValue=5000, StringFormat=F0, Rule={v:MinMaxIntRule Minimum=0, Maximum=2000000, PropertyDisplayName={l:LocChannel 'PV_POWERACTIVE_CONNECTED_PEAK_MAX_02_U32'}}}" />
+                                     Text="{co:ValidationBinding Path=WattPeakMppt2, FallbackValue=5000, StringFormat=F0, Rule={v:MinMaxIntRule Minimum=0, Maximum=2000000, PropertyDisplayName={l:Channel 'PV_POWERACTIVE_CONNECTED_PEAK_MAX_02_U32'}}}" />
                             <TextBlock Margin="4,0,0,0" Text="W" />
                         </StackPanel>
                         <Slider Value="{Binding LogWattPeakMppt2, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="-0.30980391997148633857556748281473" Maximum="5.3010299956639811952137388947245"/>
@@ -209,10 +209,10 @@
                         <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center"
                                     Visibility="{Binding Settings.Mppt.Mppt2.PowerMode, Converter={co:MpptPowerMode2Visibility Value=Fix, Equal=Visible, NotEqual=Collapsed}, FallbackValue=Collapsed}">
                             <TextBlock Margin="0,0,4,0">
-                                <Run Text="{l:LocChannel 'PV_VOLTAGE_FIX_02_F32'}" /><Run Text=":" />
+                                <Run Text="{l:Channel 'PV_VOLTAGE_FIX_02_F32'}" /><Run Text=":" />
                             </TextBlock>
                             <TextBox MinHeight="0" TextAlignment="Center" MinWidth="40"
-                                     Text="{co:ValidationBinding Path=Settings.Mppt.Mppt2.DcFixedVoltage, FallbackValue=600, StringFormat=F0, Rule={v:MinMaxFloatRule Minimum=80, Maximum=800, PropertyDisplayName={l:LocChannel 'PV_VOLTAGE_FIX_02_F32'}}}" />
+                                     Text="{co:ValidationBinding Path=Settings.Mppt.Mppt2.DcFixedVoltage, FallbackValue=600, StringFormat=F0, Rule={v:MinMaxFloatRule Minimum=80, Maximum=800, PropertyDisplayName={l:Channel 'PV_VOLTAGE_FIX_02_F32'}}}" />
                             <TextBlock Margin="4,0,0,0" Text="V" />
                         </StackPanel>
                         <Slider Value="{Binding Settings.Mppt.Mppt2.DcFixedVoltage, Mode=TwoWay, FallbackValue=600}" HorizontalAlignment="Stretch" TickFrequency=".1" IsSnapToTickEnabled="True" Minimum="80" Maximum="800"
@@ -222,7 +222,7 @@
             </GroupBox>
 
             <GroupBox Visibility="{Binding WebClientService.InverterConnection.UserName, FallbackValue='customer', Converter={co:String2Visibility Value=customer, Equal=Collapsed, NotEqual=Visible}}"
-                      Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Header="{l:LocConfig 'EXPORTLIMIT', 'TITEL'}" Margin="0,4,0,0">
+                      Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Header="{l:Config 'EXPORTLIMIT.TITEL'}" Margin="0,4,0,0">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -244,24 +244,24 @@
 
                     <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" VerticalContentAlignment="Center" HorizontalAlignment="Left" IsChecked="{Binding Settings.ExportLimit.EnableFailSafeMode, FallbackValue={x:Null}}"
                               Visibility="{Binding Settings.ExportLimit.Limit.PowerLimitMode, FallbackValue=Collapsed, Converter={co:PowerLimitMode2Visibility Value=Off, Equal=Collapsed, NotEqual=Visible}}">
-                        <TextBlock Text="{l:LocConfig 'EXPORTLIMIT', 'failSafeModeEnabled'}" TextWrapping="Wrap" />
+                        <TextBlock Text="{l:Config 'EXPORTLIMIT.failSafeModeEnabled'}" TextWrapping="Wrap" />
                     </CheckBox>
 
                     <CheckBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" VerticalContentAlignment="Center" HorizontalAlignment="Left" IsChecked="{Binding Settings.ExportLimit.Limit.SoftLimit.IsEnabled, FallbackValue={x:Null}}"
                               Visibility="{Binding Settings.ExportLimit.Limit.PowerLimitMode, FallbackValue=Collapsed, Converter={co:PowerLimitMode2Visibility Value=Off, Equal=Collapsed, NotEqual=Visible}}">
-                        <TextBlock Text="Soft limit" TextWrapping="Wrap" />
+                        <TextBlock Text="{l:Config 'EXPORTLIMIT.SOFTLIMIT.enabled'}" TextWrapping="Wrap" />
                     </CheckBox>
 
                     <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" VerticalContentAlignment="Center" HorizontalAlignment="Left" IsChecked="{Binding Settings.ExportLimit.Limit.HardLimit.IsEnabled, FallbackValue={x:Null}}"
                               Visibility="{Binding Settings.ExportLimit.Limit.PowerLimitMode, FallbackValue=Collapsed, Converter={co:PowerLimitMode2Visibility Value=Off, Equal=Collapsed, NotEqual=Visible}}">
-                        <TextBlock Text="Hard limit" TextWrapping="Wrap" />
+                        <TextBlock Text="{l:Config 'EXPORTLIMIT.HARDLIMIT.enabled'}" TextWrapping="Wrap" />
                     </CheckBox>
 
                     <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,4,0,0" >
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"
                                     Visibility="{Binding Settings.ExportLimit.Limit.SoftLimit.IsEnabled, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}">
                             <TextBlock Margin="0,0,4,0">
-                                <Run Text="Soft limit" /><Run Text=":" />
+                                <Run Text="{l:Config 'EXPORTLIMIT.SOFTLIMIT.enabled'}" /><Run Text=":" />
                             </TextBlock>
                             <TextBox MinHeight="0" TextAlignment="Center" MinWidth="40"
                                      Text="{co:ValidationBinding Path=Settings.ExportLimit.Limit.SoftLimit.PowerLimit, FallbackValue=20000, StringFormat=F0, Rule={v:MinMaxFloatRule Minimum=0, Maximum=10000, PropertyDisplayName='Soft limit'}}" />
@@ -275,7 +275,7 @@
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"
                                     Visibility="{Binding Settings.ExportLimit.Limit.HardLimit.IsEnabled, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}">
                             <TextBlock Margin="0,0,4,0">
-                                <Run Text="Hard limit" /><Run Text=":" />
+                                <Run Text="{l:Config 'EXPORTLIMIT.HARDLIMIT.enabled'}" /><Run Text=":" />
                             </TextBlock>
                             <TextBox MinHeight="0" TextAlignment="Center" MinWidth="40"
                                      Text="{co:ValidationBinding Path=Settings.ExportLimit.Limit.HardLimit.PowerLimit, FallbackValue=20000, StringFormat=F0, Rule={v:MinMaxFloatRule Minimum=0, Maximum=10000, PropertyDisplayName='Hard limit'}}" />

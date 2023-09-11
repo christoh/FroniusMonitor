@@ -189,8 +189,8 @@
                 PowerLimitModes = new[]
                 {
                     new ListItemModel<PowerLimitMode> { Value = PowerLimitMode.Off, DisplayName = await WebClientService.GetFroniusName(PowerLimitMode.Off).ConfigureAwait(false) },
-                    new ListItemModel<PowerLimitMode> { Value = PowerLimitMode.EntireSystem, DisplayName = await WebClientService.GetConfigString("EXPORTLIMIT", "WLIM_MAX_W").ConfigureAwait(false) },
-                    new ListItemModel<PowerLimitMode> { Value = PowerLimitMode.WeakestPhase, DisplayName = await WebClientService.GetConfigString("EXPORTLIMIT", "WLIM_MAX_FEEDIN_PER_PHASE").ConfigureAwait(false) },
+                    new ListItemModel<PowerLimitMode> { Value = PowerLimitMode.EntireSystem, DisplayName = await WebClientService.GetConfigString("EXPORTLIMIT.WLIM_MAX_W").ConfigureAwait(false) },
+                    new ListItemModel<PowerLimitMode> { Value = PowerLimitMode.WeakestPhase, DisplayName = await WebClientService.GetConfigString("EXPORTLIMIT.WLIM_MAX_FEEDIN_PER_PHASE").ConfigureAwait(false) },
                 };
 
                 Undo();

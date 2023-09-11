@@ -143,8 +143,8 @@ public class DataCollectionService : BindableBase, IDataCollectionService
         WattPilotConnection = wattPilotConnection;
         HomeAutomationSystem = await CreateSolarSystem(inverterConnection, inverter2Connection, fritzBoxConnection).ConfigureAwait(false);
         await Task.Run(() => NewDataReceived?.Invoke(this, new SolarDataEventArgs(HomeAutomationSystem))).ConfigureAwait(false);
-        _ = await WebClientService.GetEventDescription("BYD2-46").ConfigureAwait(false);
-        _ = await WebClientService.GetConfigString("BATTERIES", "BAT_M0_SOC_MIN");
+        //_ = await WebClientService.GetEventDescription("BYD2-46").ConfigureAwait(false);
+        //_ = await WebClientService.GetConfigString("BATTERIES", "BAT_M0_SOC_MIN");
         timer = new Timer(TimerElapsed, null, 0, 1000);
     }
 

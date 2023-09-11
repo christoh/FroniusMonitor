@@ -122,16 +122,10 @@ public class WebClientService : BindableBase, IWebClientService
         return GetChannelString(key);
     }
 
-    public async Task<string> GetUiString(string category, string key)
+    public async Task<string> GetUiString(string path)
     {
         (localUiToken, invariantUiToken) = await EnsureText("app/assets/i18n/WeblateTranslations/ui", localUiToken, invariantUiToken).ConfigureAwait(false);
-        return GetCategoryKeyString(localUiToken, invariantUiToken, category, key);
-    }
-
-    public async Task<string> GetConfigString(string category, string key)
-    {
-        (localConfigToken, invariantConfigToken) = await EnsureText("app/assets/i18n/WeblateTranslations/config", localConfigToken, invariantConfigToken).ConfigureAwait(false);
-        return GetCategoryKeyString(localConfigToken, invariantConfigToken, category, key);
+        return GetLocalizedString(localUiToken, invariantUiToken, path);
     }
 
     public async Task<string> GetConfigString(string path)
@@ -143,13 +137,13 @@ public class WebClientService : BindableBase, IWebClientService
     public async Task<string> GetChannelString(string key)
     {
         (localChannelToken, invariantChannelToken) = await EnsureText("app/assets/i18n/WeblateTranslations/channels", localChannelToken, invariantChannelToken).ConfigureAwait(false);
-        return GetCategoryKeyString(localChannelToken, invariantChannelToken, key, null);
+        return GetLocalizedString(localChannelToken, invariantChannelToken, key);
     }
 
     public async ValueTask<string> GetEventDescription(string code)
     {
         (localEventToken, invariantEventToken) = await EnsureText("app/assets/i18n/StateCodeTranslations", localEventToken, invariantEventToken).ConfigureAwait(false);
-        return GetCategoryKeyString(localEventToken, invariantEventToken, "StateCodes", code);
+        return GetLocalizedString(localEventToken, invariantEventToken, "StateCodes." + code);
     }
 
     private static string GetLocalizedString(JObject? localToken, JObject? invariantToken, string path)
@@ -186,14 +180,6 @@ public class WebClientService : BindableBase, IWebClientService
             token = token[keys[0]]?.Value<JObject>();
             keys = keys[1..];
         }
-    }
-
-    private static string GetCategoryKeyString(JObject? localToken, JObject? invariantToken, string category, string? key)
-    {
-        return
-            key == null
-                ? localToken?[category]?.Value<string>() ?? invariantToken?[category]?.Value<string>() ?? category
-                : localToken?[category]?[key]?.Value<string>() ?? invariantToken?[category]?[key]?.Value<string>() ?? $"{(category != "StateCodes" ? $"{category}." : string.Empty)}{key}";
     }
 
     private async ValueTask<(JObject?, JObject?)> EnsureText(string baseUrl, JObject? l, JObject? i)
