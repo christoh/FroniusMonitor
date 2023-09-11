@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using De.Hochstaetter.Fronius.Models.ToshibaAc;
 
 namespace De.Hochstaetter.Fronius.Models.JsonConverters
 {

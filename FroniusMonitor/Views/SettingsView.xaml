@@ -77,7 +77,6 @@
             </ComboBox>
         </GroupBox>
 
-
         <GroupBox Margin="0,8,0,0" Header="{x:Static p:Resources.Gen24InverterHeader}">
             <Grid Margin="8">
                 <Grid.RowDefinitions>
@@ -132,6 +131,48 @@
                         Height="24" Margin="0,8,0,0" Content="{x:Static p:Resources.Change}" Command="{Binding ChangeDriftsFileCommand}"/>
             </Grid>
 
+        </GroupBox>
+
+        <GroupBox Margin="0,8,0,0" Header="{x:Static p:Resources.Gen24InverterHeader}">
+            <Grid Margin="8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <CheckBox IsChecked="{Binding Settings.HaveTwoInverters}" Grid.Row="0" Content="{x:Static p:Resources.HaveTwoInverters}" Margin="0,4,0,8" />
+
+                <Grid Grid.Row="1" Visibility="{Binding Settings.HaveTwoInverters, Converter={co:Bool2Visibility}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.Url}" Margin="0,8,0,0" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text=":" Margin="4,8,4,0" />
+                    <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Settings.FroniusConnection2.BaseUrl, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static p:Resources.Username}" Margin="0,7,0,0" />
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text=":" Margin="4,7,4,0" />
+                    <ComboBox Grid.Row="2" Grid.Column="2"
+                          SelectedItem="{Binding Settings.FroniusConnection2.UserName, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          ItemsSource="{Binding Gen24UserNames}" ItemTemplate="{StaticResource ComboBoxTemplate}" />
+
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="{x:Static p:Resources.Password}" Margin="0,8,0,0" />
+                    <TextBlock Grid.Row="3" Grid.Column="1" Text=":" Margin="4,8,4,0" />
+                    <c:PasswordBox Grid.Row="3" Grid.Column="2" Template="{StaticResource PasswordBoxTemplate}"
+                               Password="{Binding Settings.FroniusConnection2.Password, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </Grid>
+            </Grid>
         </GroupBox>
 
         <GroupBox Margin="0,8,0,0" Header="{x:Static p:Resources.WattPilotHeader}">

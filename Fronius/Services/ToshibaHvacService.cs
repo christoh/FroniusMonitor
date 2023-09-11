@@ -3,8 +3,6 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Net.Http.Json;
 using De.Hochstaetter.Fronius.Models.JsonConverters;
-using De.Hochstaetter.Fronius.Models.Settings;
-using De.Hochstaetter.Fronius.Models.ToshibaAc;
 using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Client.Exceptions;
 

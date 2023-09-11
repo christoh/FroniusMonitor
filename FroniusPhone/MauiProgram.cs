@@ -24,9 +24,8 @@ public static class MauiProgram
     private static MauiAppBuilder RegisterServices(this MauiAppBuilder builder)
     {
         builder.Services
-            .AddSingleton<ISolarSystemService, SolarSystemService>()
+            .AddSingleton<IDataCollectionService, DataCollectionService>()
             .AddSingleton<IWebClientService, WebClientService>()
-            .AddSingleton<ISolarSystemService, SolarSystemService>()
             .AddSingleton<IAesKeyProvider, AesKeyProvider>()
             .AddSingleton<IWattPilotService, WattPilotService>()
             .AddSingleton<Settings>()

@@ -38,6 +38,15 @@ public abstract class SettingsBase : BindableBase, ICloneable
         set => Set(ref froniusConnection, value);
     }
 
+    private WebConnection? froniusConnection2 = new() { BaseUrl = "http://192.168.178.XXX", UserName = string.Empty, Password = string.Empty };
+
+    [XmlElement, DefaultValue(null)]
+    public WebConnection? FroniusConnection2
+    {
+        get => froniusConnection2;
+        set => Set(ref froniusConnection2, value);
+    }
+
     private WebConnection? wattPilotConnection = new() { BaseUrl = "ws://192.168.178.YYY", Password = string.Empty };
 
     [XmlElement, DefaultValue(null)]
@@ -72,6 +81,14 @@ public abstract class SettingsBase : BindableBase, ICloneable
     {
         get => haveWattPilot;
         set => Set(ref haveWattPilot, value);
+    }
+
+    private bool haveTwoInverters;
+    [XmlAttribute]
+    public bool HaveTwoInverters
+    {
+        get => haveTwoInverters;
+        set => Set(ref haveTwoInverters, value);
     }
 
     private bool showWattPilot;

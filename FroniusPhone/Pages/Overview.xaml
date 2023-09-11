@@ -27,7 +27,7 @@
 
 
             <Label Grid.Row="1" Grid.Column="0"
-                   Text="{Binding SolarSystemService.SolarSystem.Gen24System.PowerFlow.SolarPower, StringFormat='{0:N0} W', FallbackValue='---'}"/>
+                   Text="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors.PowerFlow.SolarPower, StringFormat='{0:N0} W', FallbackValue='---'}"/>
 
             <Image Grid.Row="0" Grid.Column="1"
                    Source="load.png"
@@ -36,8 +36,8 @@
             <Label Grid.Row="1" Grid.Column="1">
                 <Label.Text>
                     <MultiBinding Converter="{co:LoadPowerConverter}" TargetNullValue="---" FallbackValue="---" StringFormat="{}{0:N0} W">
-                        <Binding Path="SolarSystemService.SolarSystem.Gen24System.PowerFlow.LoadPower" FallbackValue="---" TargetNullValue="---"/>
-                        <Binding Path="SolarSystemService.PowerLossAvg"/>
+                        <Binding Path="DataCollectionService.HomeAutomationSystem.Gen24Sensors.PowerFlow.LoadPower" FallbackValue="---" TargetNullValue="---"/>
+                        <Binding Path="DataCollectionService.HomeAutomationSystem.Gen24Sensors.PowerFlow.PowerLoss" FallbackValue="---"/>
                         <Binding Path="Settings.AddInverterPowerToConsumption"/>
                     </MultiBinding>
                 </Label.Text>
@@ -48,24 +48,24 @@
                    SemanticProperties.Description="Load"/>
 
             <Label Grid.Row="0" Grid.Column="3" FontSize="8" HorizontalOptions="Center" VerticalOptions="Center"
-                   Text="{Binding SolarSystemService.SolarSystem.Gen24System.Storage.StateOfCharge, StringFormat='{0:P0}', FallbackValue='---'}"/>
+                   Text="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors.Storage.StateOfCharge, StringFormat='{0:P0}', FallbackValue='---'}"/>
 
             <Label Grid.Row="1" Grid.Column="3"
-                   Text="{Binding SolarSystemService.SolarSystem.Gen24System.PowerFlow.StoragePower, StringFormat='{0:N0} W', FallbackValue='---'}"/>
+                   Text="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors.PowerFlow.StoragePower, StringFormat='{0:N0} W', FallbackValue='---'}"/>
 
             <Image Grid.Row="0" Grid.Column="4"
                    Source="grid.png"
                    SemanticProperties.Description="Load"/>
 
             <Label Grid.Row="1" Grid.Column="4"
-                   Text="{Binding SolarSystemService.SolarSystem.Gen24System.PowerFlow.GridPower, StringFormat='{0:N0} W', FallbackValue='---'}"/>
+                   Text="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors.PowerFlow.GridPower, StringFormat='{0:N0} W', FallbackValue='---'}"/>
 
             <Image Grid.Row="0" Grid.Column="2"
                    Source="car.png"
                    SemanticProperties.Description="Load"/>
 
             <Label Grid.Row="1" Grid.Column="2"
-                   Text="{Binding SolarSystemService.SolarSystem.WattPilot.PowerTotal, StringFormat='{0:N0} W', FallbackValue='---'}"/>
+                   Text="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors.PowerFlow.InverterAcPower, StringFormat='{0:N0} W', FallbackValue='---'}"/>
         </Grid>
     </ScrollView>
 

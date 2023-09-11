@@ -1,7 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Models.Settings;
-using De.Hochstaetter.Fronius.Models.ToshibaAc;
-
-namespace De.Hochstaetter.Fronius.Contracts
+﻿namespace De.Hochstaetter.Fronius.Contracts
 {
     public interface IToshibaHvacService
     {

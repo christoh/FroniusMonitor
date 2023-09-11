@@ -2,18 +2,18 @@
 
 public class OverviewViewModel : ViewModelBase
 {
-    public OverviewViewModel(ISolarSystemService solarSystemService, Settings settings)
+    public OverviewViewModel(IDataCollectionService dataCollectionService, Settings settings)
     {
-        this.solarSystemService = solarSystemService;
+        this.dataCollectionService = dataCollectionService;
         this.settings = settings;
     }
 
-    private ISolarSystemService solarSystemService;
+    private IDataCollectionService dataCollectionService;
 
-    public ISolarSystemService SolarSystemService
+    public IDataCollectionService DataCollectionService
     {
-        get => solarSystemService;
-        set => Set(ref solarSystemService, value);
+        get => dataCollectionService;
+        set => Set(ref dataCollectionService, value);
     }
 
     private Settings settings;

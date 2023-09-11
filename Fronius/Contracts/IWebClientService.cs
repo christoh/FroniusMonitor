@@ -1,5 +1,4 @@
 ﻿using De.Hochstaetter.Fronius.Models.Gen24.Commands;
-using De.Hochstaetter.Fronius.Models.Settings;
 
 namespace De.Hochstaetter.Fronius.Contracts;
 

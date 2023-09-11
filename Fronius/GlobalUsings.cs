@@ -26,6 +26,8 @@ global using De.Hochstaetter.Fronius.Localization;
 global using De.Hochstaetter.Fronius.Models;
 global using De.Hochstaetter.Fronius.Models.Gen24;
 global using De.Hochstaetter.Fronius.Models.Charging;
+global using De.Hochstaetter.Fronius.Models.Settings;
+global using De.Hochstaetter.Fronius.Models.ToshibaAc;
 global using De.Hochstaetter.Fronius.Models.Wifi;
 global using Microsoft.Extensions.DependencyInjection;
 global using Newtonsoft.Json.Linq;

@@ -7,7 +7,7 @@ namespace FroniusPhone
     public partial class App
     {
         private readonly Settings settings;
-        private readonly ISolarSystemService solarSystemService;
+        private readonly IDataCollectionService dataCollectionService;
         private readonly IAesKeyProvider aesKeyProvider;
         private readonly AppShell shell;
 
@@ -15,10 +15,10 @@ namespace FroniusPhone
         public static string SettingsFileName => Path.Combine(PerUserDataDir, "Settings.fms");
 
 
-        public App(AppShell shell, Settings settings, IAesKeyProvider aesKeyProvider, ISolarSystemService solarSystemService)
+        public App(AppShell shell, Settings settings, IAesKeyProvider aesKeyProvider, IDataCollectionService dataCollectionService)
         {
             this.settings = settings;
-            this.solarSystemService = solarSystemService;
+            this.dataCollectionService = dataCollectionService;
             this.aesKeyProvider = aesKeyProvider;
             InitializeComponent();
             MainPage = this.shell = shell;
@@ -54,8 +54,8 @@ namespace FroniusPhone
                     shell.NeedInitialSettings = true;
                 }
 
-                solarSystemService.FroniusUpdateRate = settings.FroniusUpdateRate;
-                await solarSystemService.Start(settings.FroniusConnection, settings.FritzBoxConnection, settings.WattPilotConnection).ConfigureAwait(false);
+                dataCollectionService.FroniusUpdateRate = settings.FroniusUpdateRate;
+                await dataCollectionService.Start(settings.FroniusConnection, settings.FroniusConnection2, settings.FritzBoxConnection, settings.WattPilotConnection).ConfigureAwait(false);
             }
             finally
             {
@@ -68,7 +68,7 @@ namespace FroniusPhone
             try
             {
 #if ANDROID || IOS
-                solarSystemService.Stop();
+                dataCollectionService.Stop();
 #endif
             }
             finally
@@ -81,7 +81,7 @@ namespace FroniusPhone
         {
             base.OnResume();
 #if ANDROID || IOS
-            _ = solarSystemService.Start(settings.FroniusConnection, settings.FritzBoxConnection, settings.WattPilotConnection);
+            _ = dataCollectionService.Start(settings.FroniusConnection, settings.FroniusConnection2, settings.FritzBoxConnection, settings.WattPilotConnection);
 #endif
         }
     }

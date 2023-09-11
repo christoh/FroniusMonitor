@@ -1,6 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Models.Settings;
-
-namespace De.Hochstaetter.Fronius.Services;
+﻿namespace De.Hochstaetter.Fronius.Services;
 
 public class WattPilotService : BindableBase, IWattPilotService
 {

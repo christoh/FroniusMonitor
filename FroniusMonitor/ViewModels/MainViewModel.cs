@@ -48,6 +48,7 @@ public class MainViewModel : ViewModelBase
         await DataCollectionService.Start
         (
             App.Settings.FroniusConnection,
+            App.Settings.FroniusConnection2,
             App.Settings.HaveFritzBox && App.Settings.ShowFritzBox ? App.Settings.FritzBoxConnection : null,
             App.Settings.HaveWattPilot && App.Settings.ShowWattPilot ? App.Settings.WattPilotConnection : null
         ).ConfigureAwait(false);
@@ -162,6 +163,7 @@ public class MainViewModel : ViewModelBase
             await DataCollectionService.Start
             (
                 App.Settings.FroniusConnection,
+                App.Settings.HaveTwoInverters ? App.Settings.FroniusConnection2 : null,
                 App.Settings.HaveFritzBox && App.Settings.ShowFritzBox ? App.Settings.FritzBoxConnection : null,
                 App.Settings.HaveWattPilot && App.Settings.ShowWattPilot ? App.Settings.WattPilotConnection : null
             ).ConfigureAwait(false);

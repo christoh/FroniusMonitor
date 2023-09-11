@@ -1,6 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Models.Settings;
-
-namespace De.Hochstaetter.Fronius.Contracts
+﻿namespace De.Hochstaetter.Fronius.Contracts
 {
     public interface IDataCollectionService
     {
@@ -16,7 +14,7 @@ namespace De.Hochstaetter.Fronius.Contracts
 
         event EventHandler<SolarDataEventArgs>? NewDataReceived;
 
-        Task Start(WebConnection? inverterConnection, WebConnection? fritzBoxConnection, WebConnection? wattPilotConnection);
+        Task Start(WebConnection? inverterConnection, WebConnection? inverter2Connection, WebConnection? fritzBoxConnection, WebConnection? wattPilotConnection);
         void Stop();
         void SuspendPowerConsumers();
         void ResumePowerConsumers();

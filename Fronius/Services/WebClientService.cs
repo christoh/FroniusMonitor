@@ -1,5 +1,4 @@
 ﻿using De.Hochstaetter.Fronius.Models.Gen24.Commands;
-using De.Hochstaetter.Fronius.Models.Settings;
 
 namespace De.Hochstaetter.Fronius.Services;
 
@@ -118,7 +117,7 @@ public class WebClientService : BindableBase, IWebClientService
         var attribute = typeof(T)
             .GetMember(enumValueString).Single()
             .GetCustomAttribute(typeof(EnumParseAttribute)) as EnumParseAttribute;
-        
+
         var key = attribute?.ParseAs ?? enumValueString;
         return GetChannelString(key);
     }
@@ -135,6 +134,12 @@ public class WebClientService : BindableBase, IWebClientService
         return GetCategoryKeyString(localConfigToken, invariantConfigToken, category, key);
     }
 
+    public async Task<string> GetConfigString(string path)
+    {
+        (localConfigToken, invariantConfigToken) = await EnsureText("app/assets/i18n/WeblateTranslations/config", localConfigToken, invariantConfigToken).ConfigureAwait(false);
+        return GetLocalizedString(localConfigToken, invariantConfigToken, path);
+    }
+
     public async Task<string> GetChannelString(string key)
     {
         (localChannelToken, invariantChannelToken) = await EnsureText("app/assets/i18n/WeblateTranslations/channels", localChannelToken, invariantChannelToken).ConfigureAwait(false);
@@ -145,6 +150,42 @@ public class WebClientService : BindableBase, IWebClientService
     {
         (localEventToken, invariantEventToken) = await EnsureText("app/assets/i18n/StateCodeTranslations", localEventToken, invariantEventToken).ConfigureAwait(false);
         return GetCategoryKeyString(localEventToken, invariantEventToken, "StateCodes", code);
+    }
+
+    private static string GetLocalizedString(JObject? localToken, JObject? invariantToken, string path)
+    {
+        var keys = path.Split('.');
+
+        if (localToken != null)
+        {
+            var result = GetStringFromKeys(localToken, keys);
+
+            if (result != null)
+            {
+                return result;
+            }
+        }
+
+        return GetStringFromKeys(invariantToken, keys) ?? path;
+    }
+
+    private static string? GetStringFromKeys(JObject? token, string[] keys)
+    {
+        while (true)
+        {
+            if (token == null)
+            {
+                return null;
+            }
+
+            if (keys.Length == 1)
+            {
+                return token[keys[0]]?.Value<string>();
+            }
+
+            token = token[keys[0]]?.Value<JObject>();
+            keys = keys[1..];
+        }
     }
 
     private static string GetCategoryKeyString(JObject? localToken, JObject? invariantToken, string category, string? key)

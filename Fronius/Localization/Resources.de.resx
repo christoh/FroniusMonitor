@@ -1149,4 +1149,7 @@
   <data name="SynchronizeTime" xml:space="preserve">
 	  <value>NTP-Zeitsynchronisierung benutzen</value>
   </data>
+  <data name="HaveTwoInverters" xml:space="preserve">
+	  <value>Ich habe einen zweiten Fronius Gen24</value>
+  </data>
 </root>

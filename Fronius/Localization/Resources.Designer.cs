@@ -1033,6 +1033,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to I have a second Fronius Gen24.
+        /// </summary>
+        public static string HaveTwoInverters {
+            get {
+                return ResourceManager.GetString("HaveTwoInverters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to (hidden Wifi).
         /// </summary>
         public static string HiddenWifi {

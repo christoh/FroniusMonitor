@@ -1,8 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Models.Gen24.Settings;
-using De.Hochstaetter.Fronius.Models.Settings;
-using De.Hochstaetter.Fronius.Models.ToshibaAc;
-
-namespace De.Hochstaetter.Fronius.Services;
+﻿namespace De.Hochstaetter.Fronius.Services;
 
 public class DataCollectionService : BindableBase, IDataCollectionService
 {
@@ -24,7 +20,11 @@ public class DataCollectionService : BindableBase, IDataCollectionService
         this.settings = settings;
         HvacService = acService;
         SwitchableDevices = new BindableCollection<ISwitchable>(context);
-        WebClientService2 = IoC.Injector?.CreateScope().ServiceProvider.GetService(typeof(IWebClientService)) as IWebClientService ?? throw new NullReferenceException($"{nameof(IWebClientService)} not registered");
+
+        if (settings.HaveTwoInverters)
+        {
+            WebClientService2 = IoC.Injector?.CreateScope().ServiceProvider.GetRequiredService<IWebClientService>();
+        }
     }
 
     public IWebClientService WebClientService { get; }
@@ -137,11 +137,11 @@ public class DataCollectionService : BindableBase, IDataCollectionService
     });
 
     [SuppressMessage("ReSharper", "ParameterHidesMember")]
-    public async Task Start(WebConnection? inverterConnection, WebConnection? fritzBoxConnection, WebConnection? wattPilotConnection)
+    public async Task Start(WebConnection? inverterConnection, WebConnection? inverter2Connection, WebConnection? fritzBoxConnection, WebConnection? wattPilotConnection)
     {
         Stop();
         WattPilotConnection = wattPilotConnection;
-        HomeAutomationSystem = await CreateSolarSystem(inverterConnection, fritzBoxConnection).ConfigureAwait(false);
+        HomeAutomationSystem = await CreateSolarSystem(inverterConnection, inverter2Connection, fritzBoxConnection).ConfigureAwait(false);
         await Task.Run(() => NewDataReceived?.Invoke(this, new SolarDataEventArgs(HomeAutomationSystem))).ConfigureAwait(false);
         _ = await WebClientService.GetEventDescription("BYD2-46").ConfigureAwait(false);
         _ = await WebClientService.GetConfigString("BATTERIES", "BAT_M0_SOC_MIN");
@@ -176,7 +176,7 @@ public class DataCollectionService : BindableBase, IDataCollectionService
         }
     }
 
-    private async ValueTask<HomeAutomationSystem> CreateSolarSystem(WebConnection? inverterConnection, WebConnection? fritzBoxConnection)
+    private async ValueTask<HomeAutomationSystem> CreateSolarSystem(WebConnection? inverterConnection, WebConnection? inverter2Connection, WebConnection? fritzBoxConnection)
     {
         var result = new HomeAutomationSystem();
         SmartMeterHistory = await ReadCalibrationHistory().ConfigureAwait(false);
@@ -184,8 +184,10 @@ public class DataCollectionService : BindableBase, IDataCollectionService
         if (inverterConnection != null)
         {
             WebClientService.InverterConnection = inverterConnection;
-            var inverter2Connection = (WebConnection)inverterConnection.Clone();
-            inverter2Connection.BaseUrl = "https://solar2.hochstaetter.de";
+        }
+
+        if (WebClientService2 != null && inverter2Connection != null)
+        {
             WebClientService2.InverterConnection = inverter2Connection;
         }
 
@@ -215,10 +217,10 @@ public class DataCollectionService : BindableBase, IDataCollectionService
             {
                 await UpdateConfigData(result).ConfigureAwait(false);
                 var task1 = WebClientService.GetFroniusData(result.Gen24Config!.Components!);
-                var task2 = WebClientService2.GetFroniusData(result.Gen24Config2!.Components!);
+                var task2 = WebClientService2?.GetFroniusData(result.Gen24Config2!.Components!) ?? Task.FromResult<Gen24Sensors?>(null)!;
 
                 await Task.WhenAll(task1, task2).ConfigureAwait(false);
-                
+
                 result.Gen24Sensors = task1.Result;
                 result.Gen24Sensors2 = task2.Result;
                 IsConnected = true;
@@ -244,7 +246,7 @@ public class DataCollectionService : BindableBase, IDataCollectionService
         lastConfigUpdate = DateTime.UtcNow;
     }
 
-    private async Task<Gen24Config?> GetConfigToken(IWebClientService? webClientService)
+    private static async Task<Gen24Config?> GetConfigToken(IWebClientService? webClientService)
     {
         if (webClientService is null)
         {
@@ -254,22 +256,16 @@ public class DataCollectionService : BindableBase, IDataCollectionService
         var versionsToken = (await webClientService.GetFroniusJsonResponse("status/version").ConfigureAwait(false)).Token;
         var componentsToken = (await webClientService.GetFroniusJsonResponse("components/").ConfigureAwait(false)).Token;
         var configToken = (await webClientService.GetFroniusJsonResponse("config/").ConfigureAwait(false)).Token;
-        
-        #if DEBUG
+
+#if DEBUG
         // ReSharper disable UnusedVariable
         var configString = configToken.ToString();
         var versionString = versionsToken.ToString();
-        var componentsString= componentsToken.ToString();
+        var componentsString = componentsToken.ToString();
         // ReSharper restore UnusedVariable
-        #endif
+#endif
 
-        return await Task.Run(() =>
-        {
-            var commonToken = configToken["common"]?["ui"]?.Value<JToken>() ?? new JObject();
-            var mpptToken = configToken["setup"]?["powerunit"]?["mppt"]?.Value<JToken>() ?? new JObject();
-            var gen24Config = Gen24Config.Parse(versionsToken, componentsToken, configToken);
-            return gen24Config;
-        }).ConfigureAwait(false);
+        return await Task.Run(() => Gen24Config.Parse(versionsToken, componentsToken, configToken)).ConfigureAwait(false);
     }
 
     private async Task<FritzBoxDeviceList?> TryGetFritzBoxData()
@@ -345,7 +341,7 @@ public class DataCollectionService : BindableBase, IDataCollectionService
 
     private async Task<Gen24Sensors?> TryGetGen24System(IWebClientService? localWebClientService, Gen24Components? components)
     {
-        if (localWebClientService is null || components is null)
+        if (localWebClientService?.InverterConnection is null || components is null)
         {
             return null;
         }
@@ -381,7 +377,7 @@ public class DataCollectionService : BindableBase, IDataCollectionService
 
             if (HomeAutomationSystem?.Gen24Config == null)
             {
-                HomeAutomationSystem = await CreateSolarSystem(null, null).ConfigureAwait(false);
+                HomeAutomationSystem = await CreateSolarSystem(null, null, null).ConfigureAwait(false);
                 newSolarData = true;
                 newFritzBoxData = true;
             }
@@ -393,7 +389,7 @@ public class DataCollectionService : BindableBase, IDataCollectionService
                 }
 
                 var gen24Task = froniusCounter % FroniusUpdateRate == 0 ? TryGetGen24System(WebClientService, HomeAutomationSystem.Gen24Config!.Components) : Task.FromResult<Gen24Sensors?>(null);
-                var gen24Task2 = froniusCounter++ % FroniusUpdateRate == 0 ? TryGetGen24System(WebClientService2, HomeAutomationSystem.Gen24Config2.Components) : Task.FromResult<Gen24Sensors?>(null);
+                var gen24Task2 = froniusCounter++ % FroniusUpdateRate == 0 ? TryGetGen24System(WebClientService2, HomeAutomationSystem.Gen24Config2!.Components) : Task.FromResult<Gen24Sensors?>(null);
 
                 if (WebClientService.FritzBoxConnection == null && SwitchableDevices.Any(d => d is FritzBoxDevice))
                 {
@@ -431,9 +427,8 @@ public class DataCollectionService : BindableBase, IDataCollectionService
                     SolarPower = (powerFlow?.SolarPower ?? 0) + (powerFlow2?.SolarPower ?? 0),
                     InverterAcPower = (powerFlow?.InverterAcPower ?? 0) + (powerFlow2?.InverterAcPower ?? 0),
                     BackupModeDisplayName = powerFlow?.BackupModeDisplayName,
-                    InverterPowerNominal = (powerFlow?.InverterPowerNominal) + (powerFlow2?.InverterPowerNominal),
-                    StoragePowerConfigured = (powerFlow?.StoragePowerConfigured + powerFlow2?.StoragePowerConfigured) ?? 0,
-
+                    InverterPowerNominal = powerFlow?.InverterPowerNominal + powerFlow2?.InverterPowerNominal,
+                    StoragePowerConfigured = powerFlow?.StoragePowerConfigured + powerFlow2?.StoragePowerConfigured ?? 0,
                 };
 
                 newFritzBoxData = fritzBoxTask is { IsCompletedSuccessfully: true, Result: not null };
