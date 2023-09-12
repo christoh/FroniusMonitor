@@ -322,20 +322,21 @@ public partial class InverterControl : IHaveLcdPanel
                     Lcd.Label1 = "PV1";
                     Lcd.Label2 = "PV2";
                     Lcd.Label3 = "Total";
-                    Lcd.LabelSum = "Site";
+                    Lcd.LabelSum = "2/1";
                     Lcd.Value1 = ToLcd(power1 / wattPeak1, "P2");
                     Lcd.Value2 = ToLcd(power2 / wattPeak2, "P2");
                     Lcd.Value3 = ToLcd((power1 + power2) / (wattPeak1 + wattPeak2), "P2");
+                    Lcd.ValueSum = ToLcd(power2 / wattPeak2 / (power1 / wattPeak1), "P2");
                     
-                    Lcd.ValueSum = ToLcd
-                    (
-                        powerFlow?.SolarPower /
-                        (
-                                             e.HomeAutomationSystem?.Gen24Config?.InverterSettings?.Mppt?.Mppt1?.WattPeak+
-                                             e.HomeAutomationSystem?.Gen24Config?.InverterSettings?.Mppt?.Mppt2?.WattPeak+
-                                             e.HomeAutomationSystem?.Gen24Config2?.InverterSettings?.Mppt?.Mppt1?.WattPeak+
-                                             e.HomeAutomationSystem?.Gen24Config2?.InverterSettings?.Mppt?.Mppt2?.WattPeak
-                        ), "P2");
+                    //Lcd.ValueSum = ToLcd
+                    //(
+                    //    powerFlow?.SolarPower /
+                    //    (
+                    //                         e.HomeAutomationSystem?.Gen24Config?.InverterSettings?.Mppt?.Mppt1?.WattPeak+
+                    //                         e.HomeAutomationSystem?.Gen24Config?.InverterSettings?.Mppt?.Mppt2?.WattPeak+
+                    //                         e.HomeAutomationSystem?.Gen24Config2?.InverterSettings?.Mppt?.Mppt1?.WattPeak+
+                    //                         e.HomeAutomationSystem?.Gen24Config2?.InverterSettings?.Mppt?.Mppt2?.WattPeak
+                    //    ), "P2");
                     
                     break;
 
