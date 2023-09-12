@@ -85,7 +85,7 @@
                 </Grid>
             </GroupBox>
 
-            <GroupBox Grid.Row="1" Header="{x:Static p:Resources.SocLimits}" Margin="8,4">
+            <GroupBox Grid.Row="1" Header="{l:Config 'BATTERIES.BAT_M0_SOC_MODE'}" Margin="8,4">
                 <Grid Margin="8,16,8,12">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -225,7 +225,7 @@
 
         </Grid>
 
-        <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="8,4" Header="{x:Static p:Resources.BatteryChargingRules}">
+        <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="8,4" Header="{l:Ui 'BATTERY_CONTROL_SCHEDULE.ADD_CONTAINER_TITLE'}">
             <Grid Margin="8">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />

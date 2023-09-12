@@ -10,8 +10,9 @@
         xmlns:gl="clr-namespace:System.Globalization;assembly=System.Runtime"
         xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
         xmlns:gen24="clr-namespace:De.Hochstaetter.Fronius.Models.Gen24;assembly=Fronius"
+        xmlns:l="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Localization"
         mc:Ignorable="d"
-        Title="{x:Static p:Resources.EventLog}" Height="450" Width="800"
+        Title="{l:Ui 'EVENTLOG.TITLE'}" Height="450" Width="800"
         d:DataContext="{d:DesignInstance Type=vm:EventLogViewModel}">
     <Grid>
         <Grid.Resources>
@@ -28,7 +29,7 @@
             <DataGrid.Columns>
                 <DataGridTextColumn ElementStyle="{StaticResource Es}" Header="{x:Static p:Resources.Start}" Binding="{Binding EventTime, Converter={co:DateConverter}}" CanUserSort="True" CanUserResize="True" CanUserReorder="True"/>
                 <DataGridTextColumn ElementStyle="{StaticResource Es}" Header="{x:Static p:Resources.End}" Binding="{Binding ActiveUntil, Converter={co:DateConverter}}" CanUserSort="True" CanUserResize="True" CanUserReorder="True"/>
-                <DataGridTextColumn ElementStyle="{StaticResource Es}" Header="{x:Static p:Resources.Id}" Binding="{Binding Code, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" CanUserSort="True" CanUserResize="True" CanUserReorder="True"/>
+                <DataGridTextColumn ElementStyle="{StaticResource Es}" Header="{l:Ui 'EVENTLOG.CODE' }" Binding="{Binding Code, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" CanUserSort="True" CanUserResize="True" CanUserReorder="True"/>
                 <DataGridTextColumn ElementStyle="{StaticResource Es}" Header="{x:Static p:Resources.Name}" Binding="{Binding Label}" CanUserSort="True" CanUserResize="True" CanUserReorder="True"/>
                 <DataGridTemplateColumn Header="{x:Static p:Resources.Severity}" SortMemberPath="Severity" CanUserSort="True" CanUserReorder="True" CanUserResize="True">
                     <DataGridTemplateColumn.CellTemplate>
@@ -37,7 +38,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn ElementStyle="{StaticResource Es}" Header="{x:Static p:Resources.Message}" Binding="{Binding Message}" CanUserSort="True" CanUserResize="True" CanUserReorder="True"/>
+                <DataGridTextColumn ElementStyle="{StaticResource Es}" Header="{l:Ui 'EVENTLOG.DESCRIPTION' }" Binding="{Binding Message}" CanUserSort="True" CanUserResize="True" CanUserReorder="True"/>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>
