@@ -11,26 +11,26 @@ public class Gen24PowerLimit : BindableBase, ICloneable
 {
     private static readonly IGen24JsonService gen24JsonService = IoC.TryGet<IGen24JsonService>()!;
 
-    private Gen24PowerLimitDefinition? softLimit;
+    private Gen24PowerLimitDefinition softLimit = new();
 
-    public Gen24PowerLimitDefinition? SoftLimit
+    public Gen24PowerLimitDefinition SoftLimit
     {
         get => softLimit;
         set => Set(ref softLimit, value);
     }
 
-    private Gen24PowerLimitDefinition? hardLimit;
+    private Gen24PowerLimitDefinition hardLimit = new();
 
-    public Gen24PowerLimitDefinition? HardLimit
+    public Gen24PowerLimitDefinition HardLimit
     {
         get => hardLimit;
         set => Set(ref hardLimit, value);
     }
 
-    private PowerLimitMode? powerLimitMode;
+    private PowerLimitMode powerLimitMode = PowerLimitMode.Off;
 
     [FroniusProprietaryImport("mode", FroniusDataType.Root)]
-    public PowerLimitMode? PowerLimitMode
+    public PowerLimitMode PowerLimitMode
     {
         get => powerLimitMode;
         set => Set(ref powerLimitMode, value);
@@ -49,8 +49,8 @@ public class Gen24PowerLimit : BindableBase, ICloneable
         var gen24PowerLimit = new Gen24PowerLimit
         {
             PowerLimitMode = PowerLimitMode,
-            HardLimit = HardLimit?.Clone() as Gen24PowerLimitDefinition,
-            SoftLimit = SoftLimit?.Clone() as Gen24PowerLimitDefinition,
+            HardLimit = (Gen24PowerLimitDefinition)HardLimit.Clone(),
+            SoftLimit = (Gen24PowerLimitDefinition)SoftLimit.Clone(),
         };
 
         return gen24PowerLimit;

@@ -242,47 +242,47 @@
                     <TextBlock Grid.Row="0" Grid.Column="1" Text=":"/>
                     <ComboBox HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="2" ItemsSource="{Binding PowerLimitModes}" SelectedItem="{Binding SelectedPowerLimitMode}"/>
 
-                    <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" VerticalContentAlignment="Center" HorizontalAlignment="Left" IsChecked="{Binding Settings.ExportLimit.EnableFailSafeMode, FallbackValue={x:Null}}"
-                              Visibility="{Binding Settings.ExportLimit.Limit.PowerLimitMode, FallbackValue=Collapsed, Converter={co:PowerLimitMode2Visibility Value=Off, Equal=Collapsed, NotEqual=Visible}}">
+                    <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" VerticalContentAlignment="Center" HorizontalAlignment="Left" IsChecked="{Binding Settings.PowerLimitSettings.ExportLimits.EnableFailSafeMode, FallbackValue={x:Null}}"
+                              Visibility="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.PowerLimitMode, FallbackValue=Collapsed, Converter={co:PowerLimitMode2Visibility Value=Off, Equal=Collapsed, NotEqual=Visible}}">
                         <TextBlock Text="{l:Config 'EXPORTLIMIT.failSafeModeEnabled'}" TextWrapping="Wrap" />
                     </CheckBox>
 
-                    <CheckBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" VerticalContentAlignment="Center" HorizontalAlignment="Left" IsChecked="{Binding Settings.ExportLimit.Limit.SoftLimit.IsEnabled, FallbackValue={x:Null}}"
-                              Visibility="{Binding Settings.ExportLimit.Limit.PowerLimitMode, FallbackValue=Collapsed, Converter={co:PowerLimitMode2Visibility Value=Off, Equal=Collapsed, NotEqual=Visible}}">
+                    <CheckBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" VerticalContentAlignment="Center" HorizontalAlignment="Left" IsChecked="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit.IsEnabled, FallbackValue={x:Null}}"
+                              Visibility="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.PowerLimitMode, FallbackValue=Collapsed, Converter={co:PowerLimitMode2Visibility Value=Off, Equal=Collapsed, NotEqual=Visible}}">
                         <TextBlock Text="{l:Config 'EXPORTLIMIT.SOFTLIMIT.enabled'}" TextWrapping="Wrap" />
                     </CheckBox>
 
-                    <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" VerticalContentAlignment="Center" HorizontalAlignment="Left" IsChecked="{Binding Settings.ExportLimit.Limit.HardLimit.IsEnabled, FallbackValue={x:Null}}"
-                              Visibility="{Binding Settings.ExportLimit.Limit.PowerLimitMode, FallbackValue=Collapsed, Converter={co:PowerLimitMode2Visibility Value=Off, Equal=Collapsed, NotEqual=Visible}}">
+                    <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" VerticalContentAlignment="Center" HorizontalAlignment="Left" IsChecked="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.HardLimit.IsEnabled, FallbackValue={x:Null}}"
+                              Visibility="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.PowerLimitMode, FallbackValue=Collapsed, Converter={co:PowerLimitMode2Visibility Value=Off, Equal=Collapsed, NotEqual=Visible}}">
                         <TextBlock Text="{l:Config 'EXPORTLIMIT.HARDLIMIT.enabled'}" TextWrapping="Wrap" />
                     </CheckBox>
 
                     <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,4,0,0" >
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"
-                                    Visibility="{Binding Settings.ExportLimit.Limit.SoftLimit.IsEnabled, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}">
+                                    Visibility="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit.IsEnabled, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}">
                             <TextBlock Margin="0,0,4,0">
                                 <Run Text="{l:Config 'EXPORTLIMIT.SOFTLIMIT.enabled'}" /><Run Text=":" />
                             </TextBlock>
                             <TextBox MinHeight="0" TextAlignment="Center" MinWidth="40"
-                                     Text="{co:ValidationBinding Path=Settings.ExportLimit.Limit.SoftLimit.PowerLimit, FallbackValue=20000, StringFormat=F0, Rule={v:MinMaxFloatRule Minimum=0, Maximum=10000, PropertyDisplayName='Soft limit'}}" />
+                                     Text="{co:ValidationBinding Path=Settings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit.PowerLimit, FallbackValue=20000, StringFormat=F0, Rule={v:MinMaxFloatRule Minimum=0, Maximum=10000, PropertyDisplayName='Soft limit'}}" />
                             <TextBlock Margin="4,0,0,0" Text="W" />
                         </StackPanel>
-                        <Slider Value="{Binding Settings.ExportLimit.Limit.SoftLimit.PowerLimit, Mode=TwoWay, FallbackValue=10000}" HorizontalAlignment="Stretch" TickFrequency=".1" IsSnapToTickEnabled="True" Minimum="0" Maximum="20000"
-                                Visibility="{Binding Settings.ExportLimit.Limit.SoftLimit.IsEnabled, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}" />
+                        <Slider Value="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit.PowerLimit, Mode=TwoWay, FallbackValue=10000}" HorizontalAlignment="Stretch" TickFrequency=".1" IsSnapToTickEnabled="True" Minimum="0" Maximum="20000"
+                                Visibility="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit.IsEnabled, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}" />
                     </StackPanel>
 
                     <StackPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,8,0,0" >
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"
-                                    Visibility="{Binding Settings.ExportLimit.Limit.HardLimit.IsEnabled, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}">
+                                    Visibility="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.HardLimit.IsEnabled, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}">
                             <TextBlock Margin="0,0,4,0">
                                 <Run Text="{l:Config 'EXPORTLIMIT.HARDLIMIT.enabled'}" /><Run Text=":" />
                             </TextBlock>
                             <TextBox MinHeight="0" TextAlignment="Center" MinWidth="40"
-                                     Text="{co:ValidationBinding Path=Settings.ExportLimit.Limit.HardLimit.PowerLimit, FallbackValue=20000, StringFormat=F0, Rule={v:MinMaxFloatRule Minimum=0, Maximum=10000, PropertyDisplayName='Hard limit'}}" />
+                                     Text="{co:ValidationBinding Path=Settings.PowerLimitSettings.ExportLimits.ActivePower.HardLimit.PowerLimit, FallbackValue=20000, StringFormat=F0, Rule={v:MinMaxFloatRule Minimum=0, Maximum=10000, PropertyDisplayName='Hard limit'}}" />
                             <TextBlock Margin="4,0,0,0" Text="W" />
                         </StackPanel>
-                        <Slider Value="{Binding Settings.ExportLimit.Limit.HardLimit.PowerLimit, Mode=TwoWay, FallbackValue=10000}" HorizontalAlignment="Stretch" TickFrequency=".1" IsSnapToTickEnabled="True" Minimum="0" Maximum="20000"
-                                Visibility="{Binding Settings.ExportLimit.Limit.HardLimit.IsEnabled, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}" />
+                        <Slider Value="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.HardLimit.PowerLimit, Mode=TwoWay, FallbackValue=10000}" HorizontalAlignment="Stretch" TickFrequency=".1" IsSnapToTickEnabled="True" Minimum="0" Maximum="20000"
+                                Visibility="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.HardLimit.IsEnabled, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}" />
                     </StackPanel>
                 </Grid>
             </GroupBox>

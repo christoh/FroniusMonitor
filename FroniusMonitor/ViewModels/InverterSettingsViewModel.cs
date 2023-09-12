@@ -93,18 +93,12 @@
             set => Set(ref powerLimitModes, value);
         }
 
-        private ListItemModel<PowerLimitMode>? selectedPowerLimitMode;
+        private ListItemModel<PowerLimitMode> selectedPowerLimitMode = null!;
 
-        public ListItemModel<PowerLimitMode>? SelectedPowerLimitMode
+        public ListItemModel<PowerLimitMode> SelectedPowerLimitMode
         {
             get => selectedPowerLimitMode;
-            set => Set(ref selectedPowerLimitMode, value, () =>
-            {
-                if (Settings?.ExportLimit?.Limit != null)
-                {
-                    Settings.ExportLimit.Limit.PowerLimitMode = value?.Value;
-                }
-            });
+            set => Set(ref selectedPowerLimitMode, value, () => Settings.PowerLimitSettings.ExportLimits.ActivePower.PowerLimitMode = value.Value);
         }
 
         private string title = Loc.InverterSettings;
@@ -213,6 +207,46 @@
                 await UpdateIfRequired(Settings.Mppt?.Mppt1, oldSettings.Mppt?.Mppt1, "config/setup/powerunit/mppt/mppt1").ConfigureAwait(false);
                 await UpdateIfRequired(Settings.Mppt?.Mppt2, oldSettings.Mppt?.Mppt2, "config/setup/powerunit/mppt/mppt2").ConfigureAwait(false);
 
+                if (Settings.PowerLimitSettings.ExportLimits.ActivePower.PowerLimitMode == PowerLimitMode.Off)
+                {
+                    Settings.PowerLimitSettings = new();
+                }
+                else
+                {
+                    SetLimit(Settings.PowerLimitSettings.ExportLimits.ActivePower.HardLimit);
+                    SetLimit(Settings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit);
+
+                    if
+                    (
+                        !Settings.PowerLimitSettings.ExportLimits.ActivePower.HardLimit.IsEnabled &&
+                        !Settings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit.IsEnabled
+                    )
+                    {
+                        Settings.PowerLimitSettings = new();
+                    }
+                }
+
+                var visualizationToken = Gen24Service.GetUpdateToken(Settings.PowerLimitSettings.Visualization, oldSettings.PowerLimitSettings.Visualization);
+                visualizationToken.Add("exportLimits", new JObject { { "activePower", new JObject() }, });
+
+                var hardLimitToken = Gen24Service.GetUpdateToken(Settings.PowerLimitSettings.ExportLimits.ActivePower.HardLimit, oldSettings.PowerLimitSettings.ExportLimits.ActivePower.HardLimit);
+                var softLimitToken = Gen24Service.GetUpdateToken(Settings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit, oldSettings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit);
+
+                var activePowerToken = Gen24Service.GetUpdateToken(Settings.PowerLimitSettings.ExportLimits.ActivePower, oldSettings.PowerLimitSettings.ExportLimits.ActivePower);
+                activePowerToken.Add("hardLimit", hardLimitToken);
+                activePowerToken.Add("softLimit", softLimitToken);
+
+                var exportLimitsToken = Gen24Service.GetUpdateToken(Settings.PowerLimitSettings.ExportLimits, oldSettings.PowerLimitSettings.ExportLimits);
+                exportLimitsToken.Add("activePower", activePowerToken);
+
+                var updateToken = new JObject
+                {
+                    { "visualization", visualizationToken },
+                    { "exportLimits", exportLimitsToken },
+                };
+
+                var x = updateToken.ToString();
+
                 if (!hasUpdates)
                 {
                     ShowNoSettingsChanged();
@@ -223,6 +257,14 @@
                 Undo();
                 ToastText = Loc.SettingsSavedToInverter;
                 return;
+
+                static void SetLimit(Gen24PowerLimitDefinition limit)
+                {
+                    if (!limit.IsEnabled)
+                    {
+                        limit.PowerLimit = 0;
+                    }
+                }
 
                 async ValueTask UpdateIfRequired<T>(T? newValues, T? oldValues, string uri) where T : BindableBase
                 {
@@ -243,6 +285,7 @@
                 }
             }
             finally
+
             {
                 IsInUpdate = false;
             }
@@ -254,8 +297,8 @@
         {
             var mpptToken = (await WebClientService.GetFroniusJsonResponse("config/setup/powerunit/mppt").ConfigureAwait(false)).Token;
             var commonToken = (await WebClientService.GetFroniusJsonResponse("config/common").ConfigureAwait(false)).Token;
-            var exportLimitToken = (await WebClientService.GetFroniusJsonResponse("config/powerlimits/exportLimits").ConfigureAwait(false)).Token;
-            return Gen24InverterSettings.Parse(commonToken, mpptToken, exportLimitToken);
+            var powerLimitToken = (await WebClientService.GetFroniusJsonResponse("config/powerlimits").ConfigureAwait(false)).Token;
+            return Gen24InverterSettings.Parse(commonToken, mpptToken, powerLimitToken);
         }
 
         private void Undo()
@@ -273,7 +316,7 @@
             WattPeakMppt2 = Settings.Mppt?.Mppt2?.WattPeak ?? 0;
             UpdateLogWattPeakMppt2();
 
-            SelectedPowerLimitMode = PowerLimitModes.FirstOrDefault(plm => plm.Value == Settings?.ExportLimit?.Limit?.PowerLimitMode);
+            SelectedPowerLimitMode = PowerLimitModes.First(plm => plm.Value == Settings.PowerLimitSettings.ExportLimits.ActivePower.PowerLimitMode);
         }
 
         private void UpdateWattPeakMppt1()

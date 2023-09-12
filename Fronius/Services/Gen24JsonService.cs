@@ -2,33 +2,33 @@
 
 public class Gen24JsonService : IGen24JsonService
 {
-    public T ReadFroniusData<T>(JToken? device) where T : new()
+    public T ReadFroniusData<T>(JToken? token) where T : new()
     {
-        var channels = device?["channels"];
-        var attributes = device?["attributes"];
+        var channels = token?["channels"];
+        var attributes = token?["attributes"];
 
         var result = new T();
 
         foreach (var propertyInfo in typeof(T).GetProperties().Where(p => p.CustomAttributes.Any(a => a.AttributeType == typeof(FroniusProprietaryImportAttribute))))
         {
-            var value = ReadSingleProperty<T>(device, propertyInfo, attributes, channels);
+            var value = ReadSingleProperty<T>(token, propertyInfo, attributes, channels);
             propertyInfo.SetValue(result, value);
         }
 
         return result;
     }
 
-    private dynamic? ReadSingleProperty<T>(JToken? device, PropertyInfo propertyInfo, JToken? attributes = null, JToken? channels = null) where T : new()
+    private dynamic? ReadSingleProperty<T>(JToken? token, PropertyInfo propertyInfo, JToken? attributes = null, JToken? channels = null) where T : new()
     {
         var nonNullablePropertyType = Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? propertyInfo.PropertyType;
         var attribute = (FroniusProprietaryImportAttribute)propertyInfo.GetCustomAttributes(typeof(FroniusProprietaryImportAttribute), true).Single();
 
-        var token = attribute.DataType switch
+        var parsedToken = attribute.DataType switch
         {
             FroniusDataType.Attribute => attributes?[attribute.Name],
-            FroniusDataType.Root => device?[attribute.Name],
+            FroniusDataType.Root => token?[attribute.Name],
 
-            FroniusDataType.Custom => device?
+            FroniusDataType.Custom => token?
             [
                 attribute.PropertyName ?? throw new ApplicationException($"PropertyName not set for {propertyInfo.Name} in {typeof(T).Name}")
             ]?[attribute.Name],
@@ -36,7 +36,7 @@ public class Gen24JsonService : IGen24JsonService
             _ => channels?[attribute.Name],
         };
 
-        var stringValue = token?.Value<string>()?.Trim();
+        var stringValue = parsedToken?.Value<string>()?.Trim();
         dynamic? value = null;
 
         if (stringValue != null)

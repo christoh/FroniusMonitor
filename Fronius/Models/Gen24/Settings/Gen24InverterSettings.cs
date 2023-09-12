@@ -1,11 +1,10 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Gen24.Settings;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
-public class Gen24InverterSettings : BindableBase, ICloneable
+public class Gen24InverterSettings : Gen24ParsingBase
 {
-    private static readonly IGen24JsonService gen24JsonService = IoC.TryGet<IGen24JsonService>()!;
-
     private string? systemName = string.Empty;
+
     [FroniusProprietaryImport("systemName", FroniusDataType.Root)]
     public string? SystemName
     {
@@ -37,15 +36,15 @@ public class Gen24InverterSettings : BindableBase, ICloneable
         set => Set(ref mppt, value);
     }
 
-    private Gen24PowerLimitSettings? exportLimit;
+    private Gen24PowerLimitSettings powerLimitSettings = new();
 
-    public Gen24PowerLimitSettings? ExportLimit
+    public Gen24PowerLimitSettings PowerLimitSettings
     {
-        get => exportLimit;
-        set => Set(ref exportLimit, value);
+        get => powerLimitSettings;
+        set => Set(ref powerLimitSettings, value);
     }
 
-    public object Clone()
+    public override object Clone()
     {
         var clone = new Gen24InverterSettings
         {
@@ -53,17 +52,17 @@ public class Gen24InverterSettings : BindableBase, ICloneable
             TimeZoneName = TimeZoneName,
             TimeSync = TimeSync,
             Mppt = Mppt?.Clone() as Gen24Mppt,
-            ExportLimit = ExportLimit?.Clone() as Gen24PowerLimitSettings,
+            PowerLimitSettings = (Gen24PowerLimitSettings)PowerLimitSettings.Clone(),
         };
 
         return clone;
     }
 
-    public static Gen24InverterSettings Parse(JToken? uiToken, JToken? mpptToken, JToken? exportLimitToken)
+    public static Gen24InverterSettings Parse(JToken? uiToken, JToken? mpptToken, JToken? powerLimitToken)
     {
-        var inverterSettings = gen24JsonService.ReadFroniusData<Gen24InverterSettings>(uiToken);
+        var inverterSettings = Gen24JsonService.ReadFroniusData<Gen24InverterSettings>(uiToken);
         inverterSettings.Mppt = Gen24Mppt.Parse(mpptToken);
-        inverterSettings.ExportLimit = Gen24PowerLimitSettings.Parse(exportLimitToken);
+        inverterSettings.PowerLimitSettings = Gen24PowerLimitSettings.Parse(powerLimitToken);
         return inverterSettings;
     }
 

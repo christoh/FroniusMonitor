@@ -1,47 +1,47 @@
-﻿namespace De.Hochstaetter.Fronius.Models.Gen24.Settings;
-
-[SuppressMessage("ReSharper", "StringLiteralTypo")]
-public class Gen24PowerLimitSettings : BindableBase, ICloneable
+﻿namespace De.Hochstaetter.Fronius.Models.Gen24.Settings
 {
-    private static readonly IGen24JsonService gen24JsonService = IoC.TryGet<IGen24JsonService>()!;
-
-    private bool? enableFailSafeMode;
-    [FroniusProprietaryImport("failSafeModeEnabled", FroniusDataType.Root)]
-    public bool? EnableFailSafeMode
+    public class Gen24PowerLimitSettings : BindableBase, ICloneable
     {
-        get => enableFailSafeMode;
-        set => Set(ref enableFailSafeMode, value);
-    }
+        private Gen24PowerLimits exportLimits = new();
 
-    private Gen24PowerLimit? limit;
-
-    public Gen24PowerLimit? Limit
-    {
-        get => limit;
-        set => Set(ref limit, value);
-    }
-
-    public static Gen24PowerLimitSettings ParseFromConfig(JToken? configToken)
-    {
-        var token = configToken?["powerlimits"]?["powerLimits"]?["exportLimits"]?.Value<JToken>();
-        return Parse(token);
-    }
-    
-    public static Gen24PowerLimitSettings Parse(JToken? token)
-    {
-        var gen24PowerLimitSettings = gen24JsonService.ReadFroniusData<Gen24PowerLimitSettings>(token?.Value<JToken>());
-        gen24PowerLimitSettings.Limit = Gen24PowerLimit.Parse(token?["activePower"]?.Value<JToken>());
-        return gen24PowerLimitSettings;
-    }
-
-    public object Clone()
-    {
-        var gen24PowerLimitSettings = new Gen24PowerLimitSettings
+        public Gen24PowerLimits ExportLimits
         {
-            EnableFailSafeMode = EnableFailSafeMode,
-            Limit = Limit?.Clone() as Gen24PowerLimit,
-        };
-        
-        return gen24PowerLimitSettings;
+            get => exportLimits;
+            set => Set(ref exportLimits, value);
+        }
+
+        private Gen24PowerLimitsVisualization visualization = new();
+
+        public Gen24PowerLimitsVisualization Visualization
+        {
+            get => visualization;
+            set => Set(ref visualization, value);
+        }
+
+        public static Gen24PowerLimitSettings ParseFromConfig(JToken? configToken)
+        {
+            var token = configToken?["powerlimits"]?["powerLimits"]?.Value<JToken>();
+            return Parse(token);
+        }
+
+        public static Gen24PowerLimitSettings Parse(JToken? token)
+        {
+            var gen24PowerLimitSettings = new Gen24PowerLimitSettings
+            {
+                ExportLimits = Gen24PowerLimits.Parse(token?["exportLimits"]),
+                Visualization = Gen24PowerLimitsVisualization.Parse(token?["visualization"]),
+            };
+
+            return gen24PowerLimitSettings;
+        }
+
+        public object Clone()
+        {
+            return new Gen24PowerLimitSettings
+            {
+                ExportLimits = (Gen24PowerLimits)ExportLimits.Clone(),
+                Visualization = (Gen24PowerLimitsVisualization)Visualization.Clone(),
+            };
+        }
     }
 }
