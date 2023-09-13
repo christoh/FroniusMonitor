@@ -239,13 +239,13 @@
                 var exportLimitsToken = Gen24Service.GetUpdateToken(Settings.PowerLimitSettings.ExportLimits, oldSettings.PowerLimitSettings.ExportLimits);
                 exportLimitsToken.Add("activePower", activePowerToken);
 
-                var updateToken = new JObject
+                var limitsToken = new JObject
                 {
                     { "visualization", visualizationToken },
                     { "exportLimits", exportLimitsToken },
                 };
 
-                var x = updateToken.ToString();
+                var x = limitsToken.ToString();
 
                 if (!hasUpdates)
                 {
@@ -303,6 +303,17 @@
 
         private void Undo()
         {
+            if (oldSettings.PowerLimitSettings.Visualization.WattPeakReferenceValue == 0)
+            {
+                var system = IoC.Get<IDataCollectionService>().HomeAutomationSystem;
+                
+                oldSettings.PowerLimitSettings.Visualization.WattPeakReferenceValue =
+                    (system?.Gen24Config?.InverterSettings?.Mppt?.Mppt1?.WattPeak ?? 0) +
+                    (system?.Gen24Config?.InverterSettings?.Mppt?.Mppt2?.WattPeak ?? 0) +
+                    (system?.Gen24Config2?.InverterSettings?.Mppt?.Mppt1?.WattPeak ?? 0) +
+                    (system?.Gen24Config2?.InverterSettings?.Mppt?.Mppt2?.WattPeak ?? 0);
+            }
+            
             Settings = (Gen24InverterSettings)oldSettings.Clone();
             Title = $"{Loc.InverterSettings} - {oldSettings.SystemName}";
 
