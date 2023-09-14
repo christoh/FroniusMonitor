@@ -30,7 +30,7 @@ public partial class PowerMeterClassic
                 return;
             }
 
-            var power = SmartMeter.RealPowerSum ?? 0;
+            var power = SmartMeter.ActivePowerSum ?? 0;
             var absolutePower = Math.Max(Math.Abs(power), .001);
             var timeSpan = TimeSpan.FromMinutes(600 / absolutePower);
             var leftMargin = Wheel.Margin.Left;

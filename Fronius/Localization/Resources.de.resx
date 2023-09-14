@@ -258,7 +258,7 @@
   <data name="ApparentPower" xml:space="preserve">
     <value>Scheinleistung</value>
   </data>
-  <data name="RealPower" xml:space="preserve">
+  <data name="ActivePower" xml:space="preserve">
     <value>Wirkleistung</value>
   </data>
   <data name="ReactivePower" xml:space="preserve">

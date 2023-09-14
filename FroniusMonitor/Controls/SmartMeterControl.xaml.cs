@@ -2,7 +2,7 @@
 
 public enum MeterDisplayMode
 {
-    PowerReal,
+    PowerActive,
     PowerApparent,
     PowerReactive,
     PowerFactor,
@@ -19,7 +19,7 @@ public partial class SmartMeterControl : IHaveLcdPanel
 {
     private static readonly IReadOnlyList<MeterDisplayMode> powerModes = new[]
     {
-        MeterDisplayMode.PowerReal, MeterDisplayMode.PowerApparent,
+        MeterDisplayMode.PowerActive, MeterDisplayMode.PowerApparent,
         MeterDisplayMode.PowerReactive, MeterDisplayMode.PowerFactor,
         MeterDisplayMode.PowerOutOfBalance
     };
@@ -58,7 +58,7 @@ public partial class SmartMeterControl : IHaveLcdPanel
     public static readonly DependencyProperty ModeProperty = DependencyProperty.Register
     (
         nameof(Mode), typeof(MeterDisplayMode), typeof(SmartMeterControl),
-        new PropertyMetadata(MeterDisplayMode.PowerReal, (d, _) => ((SmartMeterControl)d).SmartMeterDataChanged())
+        new PropertyMetadata(MeterDisplayMode.PowerActive, (d, _) => ((SmartMeterControl)d).SmartMeterDataChanged())
     );
 
     public MeterDisplayMode Mode
@@ -110,30 +110,30 @@ public partial class SmartMeterControl : IHaveLcdPanel
 
         switch (Mode)
         {
-            case MeterDisplayMode.PowerReal:
-                Lcd.Header = Loc.RealPower;
-                Lcd.Value1 = $"{SmartMeter.RealPowerL1:N1} W";
-                Lcd.Value2 = $"{SmartMeter.RealPowerL2:N1} W";
-                Lcd.Value3 = $"{SmartMeter.RealPowerL3:N1} W";
-                Lcd.ValueSum = $"{SmartMeter.RealPowerSum:N1} W";
+            case MeterDisplayMode.PowerActive:
+                Lcd.Header = Loc.ActivePower;
+                Lcd.Value1 = $"{SmartMeter.ActivePowerL1:N1} W";
+                Lcd.Value2 = $"{SmartMeter.ActivePowerL2:N1} W";
+                Lcd.Value3 = $"{SmartMeter.ActivePowerL3:N1} W";
+                Lcd.ValueSum = $"{SmartMeter.ActivePowerSum:N1} W";
                 SetL123("Sum");
                 break;
 
             case MeterDisplayMode.PowerApparent:
                 Lcd.Header = Loc.ApparentPower;
-                Lcd.Value1 = $"{SmartMeter.ApparentPowerL1:N1} W";
-                Lcd.Value2 = $"{SmartMeter.ApparentPowerL2:N1} W";
-                Lcd.Value3 = $"{SmartMeter.ApparentPowerL3:N1} W";
-                Lcd.ValueSum = $"{SmartMeter.ApparentPowerSum:N1} W";
+                Lcd.Value1 = $"{SmartMeter.ApparentPowerL1:N1} VA";
+                Lcd.Value2 = $"{SmartMeter.ApparentPowerL2:N1} VA";
+                Lcd.Value3 = $"{SmartMeter.ApparentPowerL3:N1} VA";
+                Lcd.ValueSum = $"{SmartMeter.ApparentPowerSum:N1} VA";
                 SetL123("Sum");
                 break;
 
             case MeterDisplayMode.PowerReactive:
                 Lcd.Header = Loc.ReactivePower;
-                Lcd.Value1 = $"{SmartMeter.ReactivePowerL1:N1} W";
-                Lcd.Value2 = $"{SmartMeter.ReactivePowerL2:N1} W";
-                Lcd.Value3 = $"{SmartMeter.ReactivePowerL3:N1} W";
-                Lcd.ValueSum = $"{SmartMeter.ReactivePowerSum:N1} W";
+                Lcd.Value1 = $"{SmartMeter.ReactivePowerL1:N1} var";
+                Lcd.Value2 = $"{SmartMeter.ReactivePowerL2:N1} var";
+                Lcd.Value3 = $"{SmartMeter.ReactivePowerL3:N1} var";
+                Lcd.ValueSum = $"{SmartMeter.ReactivePowerSum:N1} var";
                 SetL123("Sum");
                 break;
 

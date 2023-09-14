@@ -42,13 +42,13 @@ public class Gen24Inverter : Gen24DeviceBase
         });
     }
 
-    private double? powerRealSum;
+    private double? powerActiveSum;
 
     [FroniusProprietaryImport("ACBRIDGE_POWERAPPARENT_SUM_MEAN_F32")]
-    public double? PowerRealSum
+    public double? PowerActiveSum
     {
-        get => powerRealSum;
-        set => Set(ref powerRealSum, value, () => NotifyOfPropertyChange(nameof(PowerFactorAverage)));
+        get => powerActiveSum;
+        set => Set(ref powerActiveSum, value, () => NotifyOfPropertyChange(nameof(PowerFactorAverage)));
     }
 
     private double? powerReactiveSum;
@@ -237,7 +237,7 @@ public class Gen24Inverter : Gen24DeviceBase
     public double? AcPhaseVoltageAverage => (AcVoltageL1 + AcVoltageL2 + AcVoltageL3) / 3d;
     public double? AcLineVoltageAverage => (AcVoltageL12 + AcVoltageL23 + AcVoltageL31) / 3d;
     public double? AcCurrentSum => AcCurrentL1 + AcCurrentL2 + AcCurrentL3;
-    public double? PowerFactorAverage => PowerRealSum / PowerApparentSum;
+    public double? PowerFactorAverage => PowerActiveSum / PowerApparentSum;
 
 
     public double? AcPowerL1 => AcVoltageL1 * AcCurrentL1;

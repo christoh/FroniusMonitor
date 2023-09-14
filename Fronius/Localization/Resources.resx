@@ -261,8 +261,8 @@
   <data name="ApparentPower" xml:space="preserve">
     <value>Apparent power</value>
   </data>
-  <data name="RealPower" xml:space="preserve">
-    <value>Real power</value>
+  <data name="ActivePower" xml:space="preserve">
+	  <value>Active Power</value>
   </data>
   <data name="ReactivePower" xml:space="preserve">
     <value>Reactive Power</value>

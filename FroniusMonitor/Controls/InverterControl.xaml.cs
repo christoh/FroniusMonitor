@@ -5,7 +5,7 @@ public enum InverterDisplayMode
     AcPhaseVoltage,
     AcLineVoltage,
     AcCurrent,
-    AcPowerReal,
+    AcPowerActive,
     AcPowerApparent,
     AcPowerReactive,
     AcPowerFactor,
@@ -28,7 +28,7 @@ public partial class InverterControl : IHaveLcdPanel
 {
     private readonly IDataCollectionService? solarSystemService = IoC.TryGetRegistered<IDataCollectionService>();
     private IWebClientService? webClientService;
-    private static readonly IReadOnlyList<InverterDisplayMode> acModes = new[] { InverterDisplayMode.AcPowerReal, InverterDisplayMode.AcPowerApparent, InverterDisplayMode.AcPowerReactive, InverterDisplayMode.AcPowerFactor, InverterDisplayMode.AcCurrent, InverterDisplayMode.AcPhaseVoltage, InverterDisplayMode.AcLineVoltage, };
+    private static readonly IReadOnlyList<InverterDisplayMode> acModes = new[] { InverterDisplayMode.AcPowerActive, InverterDisplayMode.AcPowerApparent, InverterDisplayMode.AcPowerReactive, InverterDisplayMode.AcPowerFactor, InverterDisplayMode.AcCurrent, InverterDisplayMode.AcPhaseVoltage, InverterDisplayMode.AcLineVoltage, };
     private static readonly IReadOnlyList<InverterDisplayMode> dcModes = new[] { InverterDisplayMode.DcPower, InverterDisplayMode.DcRelativePower, InverterDisplayMode.DcCurrent, InverterDisplayMode.DcVoltage, };
     private static readonly IReadOnlyList<InverterDisplayMode> moreModes = new[] { InverterDisplayMode.MoreEfficiency, InverterDisplayMode.More, InverterDisplayMode.MoreTemperatures, InverterDisplayMode.MoreFans, InverterDisplayMode.MoreOp, InverterDisplayMode.MoreVersions };
     private static readonly IReadOnlyList<InverterDisplayMode> energyModes = new[] { InverterDisplayMode.EnergySolar, InverterDisplayMode.EnergyInverter, InverterDisplayMode.EnergyStorage, };
@@ -42,7 +42,7 @@ public partial class InverterControl : IHaveLcdPanel
     public static readonly DependencyProperty ModeProperty = DependencyProperty.Register
     (
         nameof(Mode), typeof(InverterDisplayMode), typeof(InverterControl),
-        new PropertyMetadata(InverterDisplayMode.AcPowerReal, (d, _) => ((InverterControl)d).OnModeChanged())
+        new PropertyMetadata(InverterDisplayMode.AcPowerActive, (d, _) => ((InverterControl)d).OnModeChanged())
     );
 
     public InverterDisplayMode Mode
@@ -208,16 +208,16 @@ public partial class InverterControl : IHaveLcdPanel
 
                     break;
 
-                case InverterDisplayMode.AcPowerReal:
+                case InverterDisplayMode.AcPowerActive:
                     SetL123("Sum");
-                    Lcd.Header = Loc.RealPower;
+                    Lcd.Header = Loc.ActivePower;
 
                     SetLcdValues
                     (
-                        cache?.InverterRealPowerL1,
-                        cache?.InverterRealPowerL2,
-                        cache?.InverterRealPowerL3,
-                        cache?.InverterRealPowerSum ?? inverter?.PowerRealSum,
+                        cache?.InverterActivePowerL1,
+                        cache?.InverterActivePowerL2,
+                        cache?.InverterActivePowerL3,
+                        cache?.InverterActivePowerSum ?? inverter?.PowerActiveSum,
                         "N1", "W"
                     );
 
@@ -233,7 +233,7 @@ public partial class InverterControl : IHaveLcdPanel
                         cache?.InverterApparentPowerL2,
                         cache?.InverterApparentPowerL3,
                         cache?.InverterApparentPowerSum ?? inverter?.PowerApparentSum,
-                        "N1", "W"
+                        "N1", "VA"
                     );
 
                     break;
@@ -248,7 +248,7 @@ public partial class InverterControl : IHaveLcdPanel
                         cache?.InverterReactivePowerL2,
                         cache?.InverterReactivePowerL3,
                         cache?.InverterReactivePowerSum ?? inverter?.PowerReactiveSum,
-                        "N1", "W"
+                        "N1", "var"
                     );
 
                     break;
@@ -405,14 +405,14 @@ public partial class InverterControl : IHaveLcdPanel
 
                 case InverterDisplayMode.MoreTemperatures:
                     Lcd.Header = Loc.Temperature;
-                    Lcd.Label1 = "Ambient";
-                    Lcd.Label2 = "Module1";
-                    Lcd.Label3 = "Module3";
-                    Lcd.LabelSum = "Module4";
-                    Lcd.Value1 = ToLcd(cache?.InverterAmbientTemperature, "N1", "°C");
-                    Lcd.Value2 = ToLcd(cache?.TemperatureInverterModule1, "N1", "°C");
-                    Lcd.Value3 = ToLcd(cache?.TemperatureInverterModule3, "N1", "°C");
-                    Lcd.ValueSum = ToLcd(cache?.TemperatureInverterModule4, "N1", "°C");
+                    Lcd.Label1 = "Amb";
+                    Lcd.Label2 = "AC";
+                    Lcd.Label3 = "DC";
+                    Lcd.LabelSum = "BAT";
+                    Lcd.Value1 = ToLcd(cache?.InverterAmbientTemperature, "N2", "°C");
+                    Lcd.Value2 = ToLcd(cache?.TemperatureInverterModule1, "N2", "°C");
+                    Lcd.Value3 = ToLcd(cache?.TemperatureInverterModule3, "N2", "°C");
+                    Lcd.ValueSum = ToLcd(cache?.TemperatureInverterModule4, "N2", "°C");
                     break;
 
                 case InverterDisplayMode.MoreFans:

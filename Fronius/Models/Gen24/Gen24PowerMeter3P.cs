@@ -143,13 +143,13 @@ public class Gen24PowerMeter3P : Gen24DeviceBase
         set => Set(ref frequency, value);
     }
 
-    private double? realPowerL1;
+    private double? activePowerL1;
 
     [FroniusProprietaryImport("SMARTMETER_POWERACTIVE_01_F64")]
-    public double? RealPowerL1
+    public double? ActivePowerL1
     {
-        get => realPowerL1;
-        set => Set(ref realPowerL1, value, () =>
+        get => activePowerL1;
+        set => Set(ref activePowerL1, value, () =>
         {
             NotifyOfPropertyChange(nameof(OutOfBalancePowerL12));
             NotifyOfPropertyChange(nameof(OutOfBalancePowerL31));
@@ -157,13 +157,13 @@ public class Gen24PowerMeter3P : Gen24DeviceBase
         });
     }
 
-    private double? realPowerL2;
+    private double? activePowerL2;
 
     [FroniusProprietaryImport("SMARTMETER_POWERACTIVE_02_F64")]
-    public double? RealPowerL2
+    public double? ActivePowerL2
     {
-        get => realPowerL2;
-        set => Set(ref realPowerL2, value, () =>
+        get => activePowerL2;
+        set => Set(ref activePowerL2, value, () =>
         {
             NotifyOfPropertyChange(nameof(OutOfBalancePowerL12));
             NotifyOfPropertyChange(nameof(OutOfBalancePowerL23));
@@ -171,13 +171,13 @@ public class Gen24PowerMeter3P : Gen24DeviceBase
         });
     }
 
-    private double? realPowerL3;
+    private double? activePowerL3;
 
     [FroniusProprietaryImport("SMARTMETER_POWERACTIVE_03_F64")]
-    public double? RealPowerL3
+    public double? ActivePowerL3
     {
-        get => realPowerL3;
-        set => Set(ref realPowerL3, value, () =>
+        get => activePowerL3;
+        set => Set(ref activePowerL3, value, () =>
         {
             NotifyOfPropertyChange(nameof(OutOfBalancePowerL23));
             NotifyOfPropertyChange(nameof(OutOfBalancePowerL31));
@@ -185,9 +185,9 @@ public class Gen24PowerMeter3P : Gen24DeviceBase
         });
     }
 
-    public double? OutOfBalancePowerL12 => Math.Abs((RealPowerL1 - RealPowerL2) ?? double.NaN);
-    public double? OutOfBalancePowerL23 => Math.Abs((RealPowerL3 - RealPowerL2) ?? double.NaN);
-    public double? OutOfBalancePowerL31 => Math.Abs((RealPowerL1 - RealPowerL3) ?? double.NaN);
+    public double? OutOfBalancePowerL12 => Math.Abs((ActivePowerL1 - ActivePowerL2) ?? double.NaN);
+    public double? OutOfBalancePowerL23 => Math.Abs((ActivePowerL3 - ActivePowerL2) ?? double.NaN);
+    public double? OutOfBalancePowerL31 => Math.Abs((ActivePowerL1 - ActivePowerL3) ?? double.NaN);
     public double? OutOfBalancePowerMax => new[] {OutOfBalancePowerL12, OutOfBalancePowerL23, OutOfBalancePowerL31}.Max();
 
     private double? realPowerL1Mean;
@@ -217,13 +217,13 @@ public class Gen24PowerMeter3P : Gen24DeviceBase
         set => Set(ref realPowerL3Mean, value, () => NotifyOfPropertyChange(nameof(RealPowerSumMean)));
     }
 
-    private double? realPowerSum;
+    private double? activePowerSum;
 
     [FroniusProprietaryImport("SMARTMETER_POWERACTIVE_MEAN_SUM_F64")]
-    public double? RealPowerSum
+    public double? ActivePowerSum
     {
-        get => realPowerSum;
-        set => Set(ref realPowerSum, value, () => NotifyOfPropertyChange(nameof(RealPowerSumMean)));
+        get => activePowerSum;
+        set => Set(ref activePowerSum, value, () => NotifyOfPropertyChange(nameof(RealPowerSumMean)));
     }
 
     private double? apparentPowerL1;

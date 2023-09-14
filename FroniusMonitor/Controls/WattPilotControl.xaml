@@ -74,7 +74,7 @@
                               ValueSum="{Binding WattPilotService.WattPilot.CurrentSum, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='#,0.0 A'}" />
 
                 <c:LcdDisplay x:Name="LcdPower"
-                              Header="{x:Static p:Resources.RealPower}"
+                              Header="{x:Static p:Resources.ActivePower}"
                               Label1="L1" Label2="L2" Label3="L3" LabelSum="Sum"
                               Value1="{Binding WattPilotService.WattPilot.PowerL1KiloWatts, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0.0 kW'}"
                               Value2="{Binding WattPilotService.WattPilot.PowerL2KiloWatts, FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, StringFormat='0.0 kW'}"

@@ -124,6 +124,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Active Power.
+        /// </summary>
+        public static string ActivePower {
+            get {
+                return ResourceManager.GetString("ActivePower", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to AC voltage.
         /// </summary>
         public static string AcVoltage {
@@ -2325,15 +2334,6 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Ready {
             get {
                 return ResourceManager.GetString("Ready", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Real power.
-        /// </summary>
-        public static string RealPower {
-            get {
-                return ResourceManager.GetString("RealPower", resourceCulture);
             }
         }
         

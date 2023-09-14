@@ -99,40 +99,40 @@ public class Gen24Cache : Gen24DeviceBase
         set => Set(ref inverterFrequency, value);
     }
 
-    private double? inverterRealPowerL1;
+    private double? inverterActivePowerL1;
 
     [FroniusProprietaryImport("ACBRIDGE_POWERACTIVE_MEAN_01_F32")]
-    public double? InverterRealPowerL1
+    public double? InverterActivePowerL1
     {
-        get => inverterRealPowerL1;
-        set => Set(ref inverterRealPowerL1, value, () => NotifyOfPropertyChange(nameof(InverterPowerFactorL1)));
+        get => inverterActivePowerL1;
+        set => Set(ref inverterActivePowerL1, value, () => NotifyOfPropertyChange(nameof(InverterPowerFactorL1)));
     }
 
-    private double? inverterRealPowerL2;
+    private double? inverterActivePowerL2;
 
     [FroniusProprietaryImport("ACBRIDGE_POWERACTIVE_MEAN_02_F32")]
-    public double? InverterRealPowerL2
+    public double? InverterActivePowerL2
     {
-        get => inverterRealPowerL2;
-        set => Set(ref inverterRealPowerL2, value, () => NotifyOfPropertyChange(nameof(InverterPowerFactorL2)));
+        get => inverterActivePowerL2;
+        set => Set(ref inverterActivePowerL2, value, () => NotifyOfPropertyChange(nameof(InverterPowerFactorL2)));
     }
 
-    private double? inverterRealPowerL3;
+    private double? inverterActivePowerL3;
 
     [FroniusProprietaryImport("ACBRIDGE_POWERACTIVE_MEAN_03_F32")]
-    public double? InverterRealPowerL3
+    public double? InverterActivePowerL3
     {
-        get => inverterRealPowerL3;
-        set => Set(ref inverterRealPowerL3, value, () => NotifyOfPropertyChange(nameof(InverterPowerFactorL3)));
+        get => inverterActivePowerL3;
+        set => Set(ref inverterActivePowerL3, value, () => NotifyOfPropertyChange(nameof(InverterPowerFactorL3)));
     }
 
-    private double? inverterRealPowerSum;
+    private double? inverterActivePowerSum;
 
     [FroniusProprietaryImport("ACBRIDGE_POWERACTIVE_SUM_MEAN_F32")]
-    public double? InverterRealPowerSum
+    public double? InverterActivePowerSum
     {
-        get => inverterRealPowerSum;
-        set => Set(ref inverterRealPowerSum, value, () => NotifyOfPropertyChange(nameof(InverterPowerFactorAverage)));
+        get => inverterActivePowerSum;
+        set => Set(ref inverterActivePowerSum, value, () => NotifyOfPropertyChange(nameof(InverterPowerFactorAverage)));
     }
 
     private double? inverterApparentPowerL1;
@@ -207,10 +207,10 @@ public class Gen24Cache : Gen24DeviceBase
         set => Set(ref inverterReactivePowerSum, value);
     }
 
-    public double? InverterPowerFactorL1 => InverterRealPowerL1 / InverterApparentPowerL1;
-    public double? InverterPowerFactorL2 => InverterRealPowerL2 / InverterApparentPowerL2;
-    public double? InverterPowerFactorL3 => InverterRealPowerL3 / InverterApparentPowerL3;
-    public double? InverterPowerFactorAverage => InverterRealPowerSum / InverterApparentPowerSum;
+    public double? InverterPowerFactorL1 => InverterActivePowerL1 / InverterApparentPowerL1;
+    public double? InverterPowerFactorL2 => InverterActivePowerL2 / InverterApparentPowerL2;
+    public double? InverterPowerFactorL3 => InverterActivePowerL3 / InverterApparentPowerL3;
+    public double? InverterPowerFactorAverage => InverterActivePowerSum / InverterApparentPowerSum;
 
     private TimeSpan backupModeUpTime;
 
