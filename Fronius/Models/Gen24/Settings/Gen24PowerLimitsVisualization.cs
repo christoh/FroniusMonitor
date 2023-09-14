@@ -3,9 +3,9 @@
 public class Gen24PowerLimitsVisualization : Gen24ParsingBase
 {
 
-    private uint wattPeakReferenceValue;
+    private double wattPeakReferenceValue;
     [FroniusProprietaryImport("wattPeakReferenceValue", FroniusDataType.Root)]
-    public uint WattPeakReferenceValue
+    public double WattPeakReferenceValue
     {
         get => wattPeakReferenceValue;
         set => Set(ref wattPeakReferenceValue, value);

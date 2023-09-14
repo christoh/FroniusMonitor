@@ -5,13 +5,22 @@ public abstract class SettingsViewModelBase : ViewModelBase, IHaveWebClientServi
     protected readonly IGen24JsonService Gen24Service;
     protected readonly IWattPilotService WattPilotService;
 
-    protected SettingsViewModelBase(IWebClientService webClientService, IGen24JsonService gen24Service, IWattPilotService wattPilotService)
+    protected SettingsViewModelBase(IDataCollectionService dataCollectionService, IWebClientService webClientService, IGen24JsonService gen24Service, IWattPilotService wattPilotService)
     {
         WebClientService = webClientService;
         Gen24Service = gen24Service;
         WattPilotService = wattPilotService;
+        DataCollectionService = dataCollectionService;
     }
 
+    private IDataCollectionService dataCollectionService = null!;
+
+    public IDataCollectionService DataCollectionService
+    {
+        get => dataCollectionService;
+        set => Set(ref dataCollectionService, value);
+    }
+    
     private IWebClientService webClientService = null!;
 
     public IWebClientService WebClientService

@@ -5,7 +5,7 @@ public class ModbusViewModel : SettingsViewModelBase
     private Gen24ModbusSettings oldSettings = null!;
     private ModbusView view = null!;
 
-    public ModbusViewModel(IWebClientService webClientService, IGen24JsonService gen24JsonService, IWattPilotService wattPilotService) : base(webClientService, gen24JsonService, wattPilotService) { }
+    public ModbusViewModel(IDataCollectionService dataCollectionService, IWebClientService webClientService, IGen24JsonService gen24JsonService, IWattPilotService wattPilotService) : base(dataCollectionService, webClientService, gen24JsonService, wattPilotService) { }
 
     private Gen24ModbusSettings settings = null!;
 

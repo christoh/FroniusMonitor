@@ -7,7 +7,6 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
     private SelfConsumptionOptimizationView view = null!;
     private Gen24BatterySettings oldSettings = null!;
     private BindableCollection<Gen24ChargingRule> oldChargingRules = null!;
-    private readonly IDataCollectionService dataCollectionService;
 
     public SelfConsumptionOptimizationViewModel
     (
@@ -15,9 +14,8 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
         IGen24JsonService gen24Service,
         IWattPilotService wattPilotService,
         IDataCollectionService dataCollectionService
-    ) : base(webClientService, gen24Service, wattPilotService)
+    ) : base(dataCollectionService, webClientService, gen24Service, wattPilotService)
     {
-        this.dataCollectionService = dataCollectionService;
     }
 
     public IEnumerable<ChargingRuleType> RuleTypes => ruleTypes;
@@ -145,7 +143,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
         var mainWindow = IoC.Get<MainWindow>();
         view = mainWindow.SelfConsumptionOptimizationView;
 
-        var softwareVersions = dataCollectionService.HomeAutomationSystem?.Gen24Config?.Versions?.SwVersions;
+        var softwareVersions = DataCollectionService.HomeAutomationSystem?.Gen24Config?.Versions?.SwVersions;
 
         if (softwareVersions == null || !softwareVersions.ContainsKey("DEVICEGROUP"))
         {

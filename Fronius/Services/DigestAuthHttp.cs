@@ -3,7 +3,7 @@
 // Algorithm must be MD5 (MD5-sess and SHA are not supported)
 // qop must be auth (auth-int and none is not supported)
 
-public class DigestAuthHttp : IDisposable, IAsyncDisposable
+public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
 {
     private static readonly Random random = new(unchecked((int)DateTime.UtcNow.Ticks));
     private readonly MD5 md5 = MD5.Create();
@@ -33,7 +33,7 @@ public class DigestAuthHttp : IDisposable, IAsyncDisposable
         httpClient.Dispose();
     }
 
-    public async ValueTask DisposeAsync() => await Task.Run(Dispose).ConfigureAwait(false);
+    public ValueTask DisposeAsync() => new(Task.Run(Dispose));
 
     public async Task<(JToken, HttpStatusCode)> GetJsonToken(string url, JToken? token, IEnumerable<HttpStatusCode>? allowedStatusCodes = null)
     {

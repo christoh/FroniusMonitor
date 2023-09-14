@@ -1,4 +1,5 @@
 ﻿using De.Hochstaetter.Fronius.Models.Settings;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
@@ -26,18 +27,14 @@ public class SettingsViewModel : SettingsViewModelBase
         new EnumListItemModel<TunnelMode> {Value = TunnelMode.NoTunnel},
     };
 
-    private readonly IDataCollectionService dataCollectionService;
-
-
     public SettingsViewModel
     (
         IWebClientService webClientService,
         IGen24JsonService gen24Service,
         IWattPilotService wattPilotService,
         IDataCollectionService dataCollectionService
-    ) : base(webClientService, gen24Service, wattPilotService)
+    ) : base(dataCollectionService, webClientService, gen24Service, wattPilotService)
     {
-        this.dataCollectionService = dataCollectionService;
     }
 
     private ICommand? okCommand;
@@ -91,11 +88,11 @@ public class SettingsViewModel : SettingsViewModelBase
         set => Set(ref selectedCulture, value);
     }
 
-    private static readonly IEnumerable<string> gen24UserNames = new[] {"customer", "technician", "support"};
+    private static readonly IEnumerable<string> gen24UserNames = new[] { "customer", "technician", "support" };
 
     public IEnumerable<string> Gen24UserNames => gen24UserNames;
 
-    private static readonly IReadOnlyList<byte> froniusUpdateRates = new byte[] {1, 2, 3, 4, 5, 10, 20, 30, 60};
+    private static readonly IReadOnlyList<byte> froniusUpdateRates = new byte[] { 1, 2, 3, 4, 5, 10, 20, 30, 60 };
 
     public IReadOnlyList<byte> FroniusUpdateRates => froniusUpdateRates;
 
@@ -118,13 +115,13 @@ public class SettingsViewModel : SettingsViewModelBase
             DefaultExt = ".xml",
             DereferenceLinks = true,
             FileName = "Drifts.xml",
-            InitialDirectory = string.IsNullOrWhiteSpace(Settings.DriftFileName)?null:Path.GetDirectoryName(Settings.DriftFileName),
+            InitialDirectory = string.IsNullOrWhiteSpace(Settings.DriftFileName) ? null : Path.GetDirectoryName(Settings.DriftFileName),
             OverwritePrompt = false,
             ValidateNames = true,
             Title = Resources.SelectDriftsFile,
         };
 
-        var result=dialog.ShowDialog();
+        var result = dialog.ShowDialog();
 
         if (result.HasValue && result.Value)
         {
@@ -169,22 +166,30 @@ public class SettingsViewModel : SettingsViewModelBase
         }
 
         IoC.Get<MainViewModel>().NotifyOfPropertyChange(nameof(Settings));
-        WebClientService.FritzBoxConnection = Settings is {HaveFritzBox: true, ShowFritzBox: true} ? Settings.FritzBoxConnection : null;
+        WebClientService.FritzBoxConnection = Settings is { HaveFritzBox: true, ShowFritzBox: true } ? Settings.FritzBoxConnection : null;
         WebClientService.InverterConnection = Settings.FroniusConnection;
-        dataCollectionService.FroniusUpdateRate = Settings.FroniusUpdateRate;
+
+        if (Settings.HaveTwoInverters)
+        {
+            DataCollectionService.WebClientService2 ??= IoC.Injector!.CreateScope().ServiceProvider.GetRequiredService<IWebClientService>();
+            DataCollectionService.WebClientService2.FritzBoxConnection = WebClientService.FritzBoxConnection;
+            DataCollectionService.WebClientService2.InverterConnection = Settings.FroniusConnection2;
+        }
+
+        DataCollectionService.FroniusUpdateRate = Settings.FroniusUpdateRate;
         App.Settings.CopyFrom(Settings);
 
         if (!Settings.HaveWattPilot || !Settings.ShowWattPilot)
         {
             Settings.ShowWattPilot = false;
-            dataCollectionService.WattPilotConnection = null;
+            DataCollectionService.WattPilotConnection = null;
         }
         else
         {
-            dataCollectionService.WattPilotConnection = Settings.WattPilotConnection;
+            DataCollectionService.WattPilotConnection = Settings.WattPilotConnection;
         }
 
-        await dataCollectionService.HvacService.Stop().ConfigureAwait(false);
+        await DataCollectionService.HvacService.Stop().ConfigureAwait(false);
         await Settings.Save().ConfigureAwait(false);
 
         static string FixUrl(string url, bool isWebSocket = false)

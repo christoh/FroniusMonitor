@@ -29,7 +29,13 @@ public class DataCollectionService : BindableBase, IDataCollectionService
 
     public IWebClientService WebClientService { get; }
 
-    public IWebClientService? WebClientService2 { get; }
+    private IWebClientService? webClientService2;
+
+    public IWebClientService? WebClientService2
+    {
+        get => webClientService2;
+        set => Set(ref webClientService2, value);
+    }
 
     public BindableCollection<ISwitchable> SwitchableDevices { get; }
 

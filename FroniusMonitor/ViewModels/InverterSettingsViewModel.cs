@@ -5,7 +5,7 @@
     {
         private Gen24InverterSettings oldSettings = null!;
 
-        public InverterSettingsViewModel(IWebClientService webClientService, IGen24JsonService gen24Service, IWattPilotService wattPilotService) : base(webClientService, gen24Service, wattPilotService) { }
+        public InverterSettingsViewModel(IDataCollectionService dataCollectionService, IWebClientService webClientService, IGen24JsonService gen24Service, IWattPilotService wattPilotService) : base(dataCollectionService, webClientService, gen24Service, wattPilotService) { }
 
         private ICommand? undoCommand;
         public ICommand UndoCommand => undoCommand ??= new NoParameterCommand(Undo);
@@ -157,6 +157,45 @@
             set => Set(ref enableDanger, value);
         }
 
+        private double softLimit;
+
+        public double SoftLimit
+        {
+            get => softLimit;
+            set => Set(ref softLimit, value, () =>
+            {
+                Settings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit.PowerLimit = value;
+                HardLimit = Math.Max(HardLimit, value);
+                WattPeakReferenceValue = Math.Max(WattPeakReferenceValue, HardLimit);
+            });
+        }
+
+        private double hardLimit;
+
+        public double HardLimit
+        {
+            get => hardLimit;
+            set => Set(ref hardLimit, value, () =>
+            {
+                Settings.PowerLimitSettings.ExportLimits.ActivePower.HardLimit.PowerLimit = value;
+                SoftLimit = Math.Min(SoftLimit, value);
+                WattPeakReferenceValue = Math.Max(WattPeakReferenceValue, value);
+            });
+        }
+
+        private double wattPeakReferenceValue;
+
+        public double WattPeakReferenceValue
+        {
+            get => wattPeakReferenceValue;
+            set => Set(ref wattPeakReferenceValue, value, () =>
+            {
+                Settings.PowerLimitSettings.Visualization.WattPeakReferenceValue = value;
+                HardLimit = Math.Min(HardLimit, value);
+                SoftLimit = Math.Min(SoftLimit, HardLimit);
+            });
+        }
+
         internal override async Task OnInitialize()
         {
             IsInUpdate = true;
@@ -227,7 +266,7 @@
                 }
 
                 var visualizationToken = Gen24Service.GetUpdateToken(Settings.PowerLimitSettings.Visualization, oldSettings.PowerLimitSettings.Visualization);
-                visualizationToken.Add("exportLimits", new JObject { { "activePower", new JObject() }, });
+                visualizationToken.Add("exportLimits", new JObject { { "activePower", new JObject { { "displayModeSoftLimit", "absolute" } } }, });
 
                 var hardLimitToken = Gen24Service.GetUpdateToken(Settings.PowerLimitSettings.ExportLimits.ActivePower.HardLimit, oldSettings.PowerLimitSettings.ExportLimits.ActivePower.HardLimit);
                 var softLimitToken = Gen24Service.GetUpdateToken(Settings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit, oldSettings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit);
@@ -245,13 +284,19 @@
                     { "exportLimits", exportLimitsToken },
                 };
 
-                var x = limitsToken.ToString();
+                if (new[] { visualizationToken, hardLimitToken, softLimitToken, activePowerToken, exportLimitsToken, limitsToken }
+                    .Any(t => t.Children().Any(c => c is JProperty p && p.Value.Children().Any(v => v.Children().Any(child => child is JValue)))))
+                {
+                    hasUpdates = true;
+                }
 
                 if (!hasUpdates)
                 {
                     ShowNoSettingsChanged();
                     return;
                 }
+
+                var success = await UpdateInverter("config/powerlimits", limitsToken).ConfigureAwait(false);
 
                 oldSettings = Settings;
                 Undo();
@@ -303,18 +348,19 @@
 
         private void Undo()
         {
-            if (oldSettings.PowerLimitSettings.Visualization.WattPeakReferenceValue == 0)
+            Settings = (Gen24InverterSettings)oldSettings.Clone();
+
+            if (Settings.PowerLimitSettings.Visualization.WattPeakReferenceValue == 0)
             {
                 var system = IoC.Get<IDataCollectionService>().HomeAutomationSystem;
-                
-                oldSettings.PowerLimitSettings.Visualization.WattPeakReferenceValue =
+
+                Settings.PowerLimitSettings.Visualization.WattPeakReferenceValue =
                     (system?.Gen24Config?.InverterSettings?.Mppt?.Mppt1?.WattPeak ?? 0) +
                     (system?.Gen24Config?.InverterSettings?.Mppt?.Mppt2?.WattPeak ?? 0) +
                     (system?.Gen24Config2?.InverterSettings?.Mppt?.Mppt1?.WattPeak ?? 0) +
                     (system?.Gen24Config2?.InverterSettings?.Mppt?.Mppt2?.WattPeak ?? 0);
             }
-            
-            Settings = (Gen24InverterSettings)oldSettings.Clone();
+
             Title = $"{Loc.InverterSettings} - {oldSettings.SystemName}";
 
             SelectedPowerModeMppt1 = PowerModes.FirstOrDefault(pm => pm.Value == Settings.Mppt?.Mppt1?.PowerMode);
@@ -328,6 +374,12 @@
             UpdateLogWattPeakMppt2();
 
             SelectedPowerLimitMode = PowerLimitModes.First(plm => plm.Value == Settings.PowerLimitSettings.ExportLimits.ActivePower.PowerLimitMode);
+            wattPeakReferenceValue = Settings.PowerLimitSettings.Visualization.WattPeakReferenceValue;
+            softLimit = Settings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit.PowerLimit;
+            hardLimit = Settings.PowerLimitSettings.ExportLimits.ActivePower.HardLimit.PowerLimit;
+            NotifyOfPropertyChange(nameof(SoftLimit));
+            NotifyOfPropertyChange(nameof(HardLimit));
+            NotifyOfPropertyChange(nameof(WattPeakReferenceValue));
         }
 
         private void UpdateWattPeakMppt1()
