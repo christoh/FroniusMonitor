@@ -186,10 +186,10 @@ public class WebClientService : BindableBase, IWebClientService
     {
         try
         {
-            await Task.Run(async () =>
+            if (i == null)
             {
-                i ??= JObject.Parse((await GetFroniusStringResponse($"{baseUrl}/en.json").ConfigureAwait(false)).JsonString);
-            }).ConfigureAwait(false);
+                await Task.Run(async () => { i = JObject.Parse((await GetFroniusStringResponse($"{baseUrl}/en.json").ConfigureAwait(false)).JsonString); }).ConfigureAwait(false);
+            }
         }
         catch
         {
@@ -201,10 +201,10 @@ public class WebClientService : BindableBase, IWebClientService
         {
             try
             {
-                await Task.Run(async () =>
+                if (l == null)
                 {
-                    l ??= JObject.Parse((await GetFroniusStringResponse($"{baseUrl}/{CultureInfo.CurrentUICulture.TwoLetterISOLanguageName}.json").ConfigureAwait(false)).JsonString);
-                }).ConfigureAwait(false);
+                    await Task.Run(async () => { l = JObject.Parse((await GetFroniusStringResponse($"{baseUrl}/{CultureInfo.CurrentUICulture.TwoLetterISOLanguageName}.json").ConfigureAwait(false)).JsonString); }).ConfigureAwait(false);
+                }
             }
             catch
             {
