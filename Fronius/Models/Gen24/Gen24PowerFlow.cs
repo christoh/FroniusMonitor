@@ -172,7 +172,7 @@ public class Gen24PowerFlow : Gen24DeviceBase
 
     public IEnumerable<double> AllPowers => new[] { StoragePower, GridPower, SolarPower, LoadPower ?? -InverterAcPower }.Where(ps => ps.HasValue).Select(ps => ps!.Value);
     public double DcInputPower => new[] { StoragePower ?? 0, SolarPower ?? 0 }.Where(ps => ps > 0).Sum();
-    public double PowerLoss => (StoragePower + SolarPower - InverterAcPower) ?? 0;
+    public double PowerLoss => ((StoragePower??0) + SolarPower - InverterAcPower) ?? 0;
     public double? Efficiency => 1 - PowerLoss / DcInputPower;
 
     private static double CalculateSmartMeterFactor(IReadOnlyList<SmartMeterCalibrationHistoryItem> list, bool isProduced)

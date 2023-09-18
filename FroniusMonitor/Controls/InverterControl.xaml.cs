@@ -113,16 +113,16 @@ public partial class InverterControl : IHaveLcdPanel
     {
         Gen24Sensors? gen24Sensors = null!;
         Gen24Config? gen24Config = null!;
-        
+
         Dispatcher.Invoke(() =>
         {
             gen24Sensors = IsSecondary ? e.HomeAutomationSystem?.Gen24Sensors2 : e.HomeAutomationSystem?.Gen24Sensors;
-            gen24Config = IsSecondary ? e.HomeAutomationSystem?.Gen24Config2:e.HomeAutomationSystem?.Gen24Config;
+            gen24Config = IsSecondary ? e.HomeAutomationSystem?.Gen24Config2 : e.HomeAutomationSystem?.Gen24Config;
         });
-        
+
         var inverter = gen24Sensors?.Inverter;
         var dataManager = gen24Sensors?.DataManager;
-        var powerFlow = e.HomeAutomationSystem?.SitePowerFlow;
+        var sitePowerFlow = e.HomeAutomationSystem?.SitePowerFlow;
 
         if
         (
@@ -327,7 +327,7 @@ public partial class InverterControl : IHaveLcdPanel
                     Lcd.Value2 = ToLcd(power2 / wattPeak2, "P2");
                     Lcd.Value3 = ToLcd((power1 + power2) / (wattPeak1 + wattPeak2), "P2");
                     Lcd.ValueSum = ToLcd(power2 / wattPeak2 / (power1 / wattPeak1), "P2");
-                    
+
                     //Lcd.ValueSum = ToLcd
                     //(
                     //    powerFlow?.SolarPower /
@@ -337,7 +337,7 @@ public partial class InverterControl : IHaveLcdPanel
                     //                         e.HomeAutomationSystem?.Gen24Config2?.InverterSettings?.Mppt?.Mppt1?.WattPeak+
                     //                         e.HomeAutomationSystem?.Gen24Config2?.InverterSettings?.Mppt?.Mppt2?.WattPeak
                     //    ), "P2");
-                    
+
                     break;
 
                 case InverterDisplayMode.EnergyInverter:
@@ -393,14 +393,14 @@ public partial class InverterControl : IHaveLcdPanel
                 case InverterDisplayMode.MoreEfficiency:
                     Lcd.Header = Loc.Efficiency;
                     Lcd.Label1 = "Loss";
-                    var loss = (inverter?.SolarPowerSum ?? 0) + (inverter?.StoragePower ?? 0) - (inverter?.PowerApparentSum ?? 0);
+                    var loss = gen24Sensors?.PowerFlow?.PowerLoss ?? 0;
                     Lcd.Value1 = ToLcd(loss, "N1", "W");
                     Lcd.Label2 = "Eff";
-                    Lcd.Value2 = ToLcd(1 - loss / new[] { inverter?.SolarPowerSum, inverter?.StoragePower }.Where(ps => ps is > 0.0).Sum(), "P2");
+                    Lcd.Value2 = ToLcd(gen24Sensors?.PowerFlow?.Efficiency, "P2");
                     Lcd.Label3 = "Sc";
-                    Lcd.Value3 = ToLcd(Math.Max(Math.Min(-powerFlow?.LoadPowerCorrected / powerFlow?.InverterAcPower ?? 0, 1), 0), "P2");
+                    Lcd.Value3 = ToLcd(Math.Max(Math.Min(-sitePowerFlow?.LoadPowerCorrected / sitePowerFlow?.InverterAcPower ?? 0, 1), 0), "P2");
                     Lcd.LabelSum = "Aut";
-                    Lcd.ValueSum = ToLcd(powerFlow?.LoadPowerCorrected > 0 ? 1 : Math.Max(Math.Min(-powerFlow?.InverterAcPower / powerFlow?.LoadPowerCorrected ?? 0, 1d), 0), "P2");
+                    Lcd.ValueSum = ToLcd(sitePowerFlow?.LoadPowerCorrected > 0 ? 1 : Math.Max(Math.Min(-sitePowerFlow?.InverterAcPower / sitePowerFlow?.LoadPowerCorrected ?? 0, 1d), 0), "P2");
                     break;
 
                 case InverterDisplayMode.MoreTemperatures:
