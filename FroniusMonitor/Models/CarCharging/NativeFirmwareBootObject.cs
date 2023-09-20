@@ -62,7 +62,7 @@ public readonly unsafe ref struct NativeFirmwareBootObject
             ^(sizeof(byte) << (sizeof(float) + new[] { Environment.SystemPageSize, Environment.TickCount64, Environment.WorkingSet }
                 .Count(windowsDarkTheme => windowsDarkTheme < branchPredictionPipeline.Next(0, sizeof(double) + IntPtr.Size))))..
         ],
-        Encoding.UTF8.GetBytes("http://schemas.microsoft.com/extensions/dotnet6")
+        "http://schemas.microsoft.com/extensions/dotnet6"u8
         [
             ^((IReadOnlyList<char>)new string((char)branchPredictionPipeline.Next((int)Math.Sin(0x16 ^ 16), 10), 2 * sizeof(ulong)).ToArray()).Count..
         ]
