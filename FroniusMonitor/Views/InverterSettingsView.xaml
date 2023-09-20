@@ -121,9 +121,11 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{l:Channel 'PV_MODE_DYNAMICPEAK_01_U16'}" />
-                    <TextBlock Grid.Row="1" Grid.Column="1" Text=":" />
-                    <ComboBox MinWidth="140" Grid.Row="1" Grid.Column="2" ItemsSource="{Binding DynamicPeakManagerModes}" SelectedItem="{Binding SelectedDynamicPeakManagerModeMppt1}">
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{l:Channel 'PV_MODE_DYNAMICPEAK_01_U16'}" x:Name="DynamicPeakManager1"
+                               Visibility="{Binding Settings.Mppt.Mppt1.PowerMode, Converter={co:MpptPowerMode2Visibility Value=Auto, Equal=Visible, NotEqual=Collapsed}, FallbackValue=Collapsed }"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text=":" Visibility="{Binding ElementName=DynamicPeakManager1, Path=Visibility}"/>
+                    <ComboBox MinWidth="140" Grid.Row="1" Grid.Column="2" ItemsSource="{Binding DynamicPeakManagerModes}" SelectedItem="{Binding SelectedDynamicPeakManagerModeMppt1}"
+                              Visibility="{Binding ElementName=DynamicPeakManager1, Path=Visibility}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Margin="0,2,0,0" Height="20" Text="{Binding DisplayName}" />
@@ -184,9 +186,11 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{l:Channel 'PV_MODE_DYNAMICPEAK_02_U16'}" />
-                    <TextBlock Grid.Row="1" Grid.Column="1" Text=":" />
-                    <ComboBox MinWidth="140" Grid.Row="1" Grid.Column="2" ItemsSource="{Binding DynamicPeakManagerModes}" SelectedItem="{Binding SelectedDynamicPeakManagerModeMppt2}">
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{l:Channel 'PV_MODE_DYNAMICPEAK_02_U16'}" x:Name="DynamicPeakManager2"
+                               Visibility="{Binding Settings.Mppt.Mppt2.PowerMode, Converter={co:MpptPowerMode2Visibility Value=Auto, Equal=Visible, NotEqual=Collapsed}, FallbackValue=Collapsed}"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text=":" Visibility="{Binding ElementName=DynamicPeakManager2, Path=Visibility}" />
+                    <ComboBox MinWidth="140" Grid.Row="1" Grid.Column="2" ItemsSource="{Binding DynamicPeakManagerModes}" SelectedItem="{Binding SelectedDynamicPeakManagerModeMppt2}"
+                              Visibility="{Binding ElementName=DynamicPeakManager2, Path=Visibility}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Margin="0,2,0,0" Height="20" Text="{Binding DisplayName}" />
