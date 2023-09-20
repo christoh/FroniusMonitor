@@ -134,7 +134,7 @@ public partial class InverterControl : IHaveLcdPanel
             try
             {
                 var standByStatus = await webClientService.GetInverterStandByStatus().ConfigureAwait(false);
-                Dispatcher.InvokeAsync(() => StandByButton.IsChecked = !standByStatus!.IsStandBy);
+                _ = Dispatcher.InvokeAsync(() => StandByButton.IsChecked = !standByStatus!.IsStandBy);
                 lastStandbySwitchUpdate = DateTime.UtcNow;
             }
             catch
@@ -145,7 +145,7 @@ public partial class InverterControl : IHaveLcdPanel
 
         lastStatusCode = gen24Sensors?.InverterStatus?.StatusCode;
 
-        Dispatcher.InvokeAsync(() =>
+        _ = Dispatcher.InvokeAsync(() =>
         {
             var cache = gen24Sensors?.Cache;
             var gen24Common = IsSecondary ? e.HomeAutomationSystem?.Gen24Config2?.InverterSettings : e.HomeAutomationSystem?.Gen24Config?.InverterSettings;

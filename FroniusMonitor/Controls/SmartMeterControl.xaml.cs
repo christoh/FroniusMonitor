@@ -40,13 +40,14 @@ public partial class SmartMeterControl : IHaveLcdPanel
     };
 
     private int currentPowerModeIndex, currentVoltageModeIndex, currentCurrentIndex, currentMoreIndex;
-    private readonly IDataCollectionService? solarSystemService = IoC.TryGetRegistered<IDataCollectionService>();
+    private readonly IDataCollectionService? dataCollectionService = IoC.TryGetRegistered<IDataCollectionService>();
 
     #region Dependency Properties
 
     public static readonly DependencyProperty SmartMeterProperty = DependencyProperty.Register
     (
-        nameof(SmartMeter), typeof(Gen24PowerMeter3P), typeof(SmartMeterControl)
+        nameof(SmartMeter), typeof(Gen24PowerMeter3P), typeof(SmartMeterControl),
+        new PropertyMetadata((d, _) => ((SmartMeterControl)d).SmartMeterDataChanged())
     );
 
     public Gen24PowerMeter3P? SmartMeter
@@ -72,28 +73,6 @@ public partial class SmartMeterControl : IHaveLcdPanel
     public SmartMeterControl()
     {
         InitializeComponent();
-
-        Loaded += (_, _) =>
-        {
-            if (solarSystemService != null)
-            {
-                solarSystemService.NewDataReceived += NewDataReceived; 
-            }
-        };
-
-        Unloaded += (_, _) =>
-        {
-            if (solarSystemService != null)
-            {
-                solarSystemService.NewDataReceived -= NewDataReceived;
-            }
-        };
-
-    }
-
-    private void NewDataReceived(object? sender, SolarDataEventArgs e)
-    {
-        SmartMeterDataChanged();
     }
 
     private void SmartMeterDataChanged() => Dispatcher.InvokeAsync(() =>
@@ -105,8 +84,8 @@ public partial class SmartMeterControl : IHaveLcdPanel
             return;
         }
 
-        Title.Text = $"{SmartMeter.Model} ({solarSystemService?.HomeAutomationSystem?.Gen24Sensors?.MeterStatus?.StatusMessage??Loc.Unknown})";
-        BackgroundProvider.Background = solarSystemService?.HomeAutomationSystem?.Gen24Sensors?.MeterStatus?.ToBrush() ?? Brushes.LightGray;
+        Title.Text = $"{SmartMeter.Model} ({dataCollectionService?.HomeAutomationSystem?.Gen24Sensors?.MeterStatus?.StatusMessage ?? Loc.Unknown})";
+        BackgroundProvider.Background = dataCollectionService?.HomeAutomationSystem?.Gen24Sensors?.MeterStatus?.ToBrush() ?? Brushes.LightGray;
 
         switch (Mode)
         {

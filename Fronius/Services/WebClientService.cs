@@ -42,19 +42,19 @@ public class WebClientService : BindableBase, IWebClientService
         set => Set(ref fritzBoxConnection, value);
     }
 
-    public async ValueTask<T> ReadGen24Entity<T>(string request) where T : new()
+    public async ValueTask<T> ReadGen24Entity<T>(string request, CancellationToken token = default) where T : new()
     {
-        var token = (await GetFroniusJsonResponse(request).ConfigureAwait(false)).Token;
-        return gen24JsonService.ReadFroniusData<T>(token);
+        var jToken = (await GetFroniusJsonResponse(request, token: token).ConfigureAwait(false)).Token;
+        return gen24JsonService.ReadFroniusData<T>(jToken);
     }
 
-    public async ValueTask<IOrderedEnumerable<Gen24Event>> GetFroniusEvents()
+    public async ValueTask<IOrderedEnumerable<Gen24Event>> GetFroniusEvents(CancellationToken token = default)
     {
         var eventList = new List<Gen24Event>(256);
 
         Parallel.ForEach
         (
-            (await GetFroniusJsonResponse("status/events").ConfigureAwait(false)).Token,
+            (await GetFroniusJsonResponse("status/events", token: token).ConfigureAwait(false)).Token,
             eventToken => { eventList.Add(gen24JsonService.ReadFroniusData<Gen24Event>(eventToken)); }
         );
 
@@ -62,12 +62,12 @@ public class WebClientService : BindableBase, IWebClientService
     }
 
     [SuppressMessage("ReSharper", "CommentTypo")]
-    public async Task<Gen24Sensors> GetFroniusData(Gen24Components components)
+    public async Task<Gen24Sensors> GetFroniusData(Gen24Components components, CancellationToken token = default)
     {
         var gen24Sensors = new Gen24Sensors();
-        var (token, _) = await GetFroniusJsonResponse("status/devices").ConfigureAwait(false);
+        var (jToken, _) = await GetFroniusJsonResponse("status/devices", token: token).ConfigureAwait(false);
 
-        foreach (var statusToken in (JArray)token)
+        foreach (var statusToken in (JArray)jToken)
         {
             var status = gen24JsonService.ReadFroniusData<Gen24Status>(statusToken);
 
@@ -83,7 +83,7 @@ public class WebClientService : BindableBase, IWebClientService
             }
         }
 
-        var (_, dataToken) = await GetJsonResponse<BaseResponse>("components/readable", true).ConfigureAwait(false);
+        var (_, dataToken) = await GetJsonResponse<BaseResponse>("components/readable", true, token: token).ConfigureAwait(false);
         gen24Sensors.Inverter = gen24JsonService.ReadFroniusData<Gen24Inverter>(dataToken[components.Groups["Inverter"].FirstOrDefault() ?? "1"]);
 
         if (components.Groups.TryGetValue("BatteryManagementSystem", out var storages))
@@ -110,7 +110,7 @@ public class WebClientService : BindableBase, IWebClientService
         return gen24Sensors;
     }
 
-    public Task<string> GetFroniusName<T>(T enumValue) where T : Enum
+    public Task<string> GetFroniusName<T>(T enumValue, CancellationToken token = default) where T : Enum
     {
         var enumValueString = enumValue.ToString();
 
@@ -119,30 +119,30 @@ public class WebClientService : BindableBase, IWebClientService
             .GetCustomAttribute(typeof(EnumParseAttribute)) as EnumParseAttribute;
 
         var key = attribute?.ParseAs ?? enumValueString;
-        return GetChannelString(key);
+        return GetChannelString(key, token);
     }
 
-    public async Task<string> GetUiString(string path)
+    public async Task<string> GetUiString(string path, CancellationToken token = default)
     {
-        (localUiToken, invariantUiToken) = await EnsureText("app/assets/i18n/WeblateTranslations/ui", localUiToken, invariantUiToken).ConfigureAwait(false);
+        (localUiToken, invariantUiToken) = await EnsureText("app/assets/i18n/WeblateTranslations/ui", localUiToken, invariantUiToken, token).ConfigureAwait(false);
         return GetLocalizedString(localUiToken, invariantUiToken, path);
     }
 
-    public async Task<string> GetConfigString(string path)
+    public async Task<string> GetConfigString(string path, CancellationToken token = default)
     {
-        (localConfigToken, invariantConfigToken) = await EnsureText("app/assets/i18n/WeblateTranslations/config", localConfigToken, invariantConfigToken).ConfigureAwait(false);
+        (localConfigToken, invariantConfigToken) = await EnsureText("app/assets/i18n/WeblateTranslations/config", localConfigToken, invariantConfigToken, token).ConfigureAwait(false);
         return GetLocalizedString(localConfigToken, invariantConfigToken, path);
     }
 
-    public async Task<string> GetChannelString(string key)
+    public async Task<string> GetChannelString(string key, CancellationToken token = default)
     {
-        (localChannelToken, invariantChannelToken) = await EnsureText("app/assets/i18n/WeblateTranslations/channels", localChannelToken, invariantChannelToken).ConfigureAwait(false);
+        (localChannelToken, invariantChannelToken) = await EnsureText("app/assets/i18n/WeblateTranslations/channels", localChannelToken, invariantChannelToken, token).ConfigureAwait(false);
         return GetLocalizedString(localChannelToken, invariantChannelToken, key);
     }
 
-    public async ValueTask<string> GetEventDescription(string code)
+    public async ValueTask<string> GetEventDescription(string code, CancellationToken token = default)
     {
-        (localEventToken, invariantEventToken) = await EnsureText("app/assets/i18n/StateCodeTranslations", localEventToken, invariantEventToken).ConfigureAwait(false);
+        (localEventToken, invariantEventToken) = await EnsureText("app/assets/i18n/StateCodeTranslations", localEventToken, invariantEventToken, token).ConfigureAwait(false);
         return GetLocalizedString(localEventToken, invariantEventToken, "StateCodes." + code);
     }
 
@@ -182,13 +182,13 @@ public class WebClientService : BindableBase, IWebClientService
         }
     }
 
-    private async ValueTask<(JObject?, JObject?)> EnsureText(string baseUrl, JObject? l, JObject? i)
+    private async ValueTask<(JObject?, JObject?)> EnsureText(string baseUrl, JObject? l, JObject? i, CancellationToken token = default)
     {
         try
         {
             if (i == null)
             {
-                await Task.Run(async () => { i = JObject.Parse((await GetFroniusStringResponse($"{baseUrl}/en.json").ConfigureAwait(false)).JsonString); }).ConfigureAwait(false);
+                await Task.Run(async () => { i = JObject.Parse((await GetFroniusStringResponse($"{baseUrl}/en.json", token: token).ConfigureAwait(false)).JsonString); }, token).ConfigureAwait(false);
             }
         }
         catch
@@ -203,7 +203,7 @@ public class WebClientService : BindableBase, IWebClientService
             {
                 if (l == null)
                 {
-                    await Task.Run(async () => { l = JObject.Parse((await GetFroniusStringResponse($"{baseUrl}/{CultureInfo.CurrentUICulture.TwoLetterISOLanguageName}.json").ConfigureAwait(false)).JsonString); }).ConfigureAwait(false);
+                    await Task.Run(async () => { l = JObject.Parse((await GetFroniusStringResponse($"{baseUrl}/{CultureInfo.CurrentUICulture.TwoLetterISOLanguageName}.json", token: token).ConfigureAwait(false)).JsonString); }, token).ConfigureAwait(false);
                 }
             }
             catch
@@ -215,14 +215,14 @@ public class WebClientService : BindableBase, IWebClientService
         return (l, i);
     }
 
-    public async ValueTask FritzBoxLogin()
+    public async ValueTask FritzBoxLogin(CancellationToken token = default)
     {
         if (FritzBoxConnection == null)
         {
             throw new NullReferenceException(Resources.NoFritzBoxConnection);
         }
 
-        var document = await GetXmlResponse("login_sid.lua");
+        var document = await GetXmlResponse("login_sid.lua", token: token);
         var challenge = document.SelectSingleNode("/SessionInfo/Challenge")?.InnerText ?? throw new InvalidDataException("FritzBox did not supply challenge");
         var text = challenge + "-" + FritzBoxConnection.Password;
         var response = challenge + "-" + MD5.HashData(Encoding.Unicode.GetBytes(text)).Aggregate("", (current, next) => $"{current}{next:x2}");
@@ -233,7 +233,7 @@ public class WebClientService : BindableBase, IWebClientService
             { "response", response }
         };
 
-        document = await GetXmlResponse("login_sid.lua", dict);
+        document = await GetXmlResponse("login_sid.lua", dict, token);
         fritzBoxSid = document.SelectSingleNode("/SessionInfo/SID")?.InnerText ?? throw new UnauthorizedAccessException(Resources.AccessDenied);
 
         if (fritzBoxSid.All(c => c == '0'))
@@ -243,39 +243,39 @@ public class WebClientService : BindableBase, IWebClientService
         }
     }
 
-    public async ValueTask<FritzBoxDeviceList> GetFritzBoxDevices()
+    public async ValueTask<FritzBoxDeviceList> GetFritzBoxDevices(CancellationToken token = default)
     {
-        await using var stream = await GetStreamResponse("webservices/homeautoswitch.lua?switchcmd=getdevicelistinfos").ConfigureAwait(false) ?? throw new InvalidDataException();
+        await using var stream = await GetStreamResponse("webservices/homeautoswitch.lua?switchcmd=getdevicelistinfos", token: token).ConfigureAwait(false) ?? throw new InvalidDataException();
         var serializer = new XmlSerializer(typeof(FritzBoxDeviceList));
         var result = serializer.Deserialize(stream) as FritzBoxDeviceList ?? throw new InvalidDataException();
         result.Devices.Apply(d => d.WebClientService = this);
         return result;
     }
 
-    public async ValueTask TurnOnFritzBoxDevice(string ain)
+    public async ValueTask TurnOnFritzBoxDevice(string ain, CancellationToken token = default)
     {
         ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
-        using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setswitchon").ConfigureAwait(false);
+        using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setswitchon", token: token).ConfigureAwait(false);
     }
 
-    public async ValueTask TurnOffFritzBoxDevice(string ain)
+    public async ValueTask TurnOffFritzBoxDevice(string ain, CancellationToken token = default)
     {
         ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
-        using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setswitchoff").ConfigureAwait(false);
+        using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setswitchoff", token: token).ConfigureAwait(false);
     }
 
-    public async ValueTask SetFritzBoxLevel(string ain, double level)
+    public async ValueTask SetFritzBoxLevel(string ain, double level, CancellationToken token = default)
     {
         var byteLevel = Math.Max((byte)Math.Round(level * 255, MidpointRounding.AwayFromZero), (byte)2);
         ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
-        using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setlevel&level={byteLevel}").ConfigureAwait(false);
+        using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setlevel&level={byteLevel}", token: token).ConfigureAwait(false);
     }
 
-    public async ValueTask SetFritzBoxColorTemperature(string ain, double temperatureKelvin)
+    public async ValueTask SetFritzBoxColorTemperature(string ain, double temperatureKelvin, CancellationToken token = default)
     {
         var intTemperature = (int)Math.Round(temperatureKelvin, MidpointRounding.AwayFromZero);
         ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
-        using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setcolortemperature&temperature={intTemperature}&duration=0").ConfigureAwait(false);
+        using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setcolortemperature&temperature={intTemperature}&duration=0", token: token).ConfigureAwait(false);
     }
 
 
@@ -295,21 +295,21 @@ public class WebClientService : BindableBase, IWebClientService
         { 335, new[] { 180, 107, 51 } },
     };
 
-    public async ValueTask SetFritzBoxColor(string ain, double hueDegrees, double saturation)
+    public async ValueTask SetFritzBoxColor(string ain, double hueDegrees, double saturation, CancellationToken token = default)
     {
         var intHue = allowedFritzBoxColors.Keys.MinBy(k => Math.Min(Math.Abs(hueDegrees - k), Math.Abs(hueDegrees + 360 - k)));
         var intSaturation = allowedFritzBoxColors[intHue].MinBy(s => Math.Abs(s - saturation * 255));
         ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
-        using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setcolor&hue={intHue}&saturation={intSaturation}&duration=0").ConfigureAwait(false);
+        using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setcolor&hue={intHue}&saturation={intSaturation}&duration=0", token: token).ConfigureAwait(false);
     }
 
-    private async ValueTask<HttpResponseMessage> GetFritzBoxResponse(string request, IEnumerable<KeyValuePair<string, string>>? postVariables = null)
+    private async ValueTask<HttpResponseMessage> GetFritzBoxResponse(string request, IEnumerable<KeyValuePair<string, string>>? postVariables = null, CancellationToken token = default)
     {
         HttpResponseMessage response;
 
         if (fritzBoxSid == null && !request.StartsWith("login_sid.lua"))
         {
-            await FritzBoxLogin().ConfigureAwait(false);
+            await FritzBoxLogin(token).ConfigureAwait(false);
         }
 
         while (true)
@@ -327,11 +327,11 @@ public class WebClientService : BindableBase, IWebClientService
             );
 
             // ReSharper disable once PossibleMultipleEnumeration
-            response = postVariables == null ? await client.GetAsync(requestString).ConfigureAwait(false) : await client.PostAsync(requestString, new FormUrlEncodedContent(postVariables)).ConfigureAwait(false);
+            response = postVariables == null ? await client.GetAsync(requestString, token).ConfigureAwait(false) : await client.PostAsync(requestString, new FormUrlEncodedContent(postVariables), token).ConfigureAwait(false);
 
             if (response.StatusCode == HttpStatusCode.Forbidden)
             {
-                await FritzBoxLogin().ConfigureAwait(false);
+                await FritzBoxLogin(token).ConfigureAwait(false);
                 continue;
             }
 
@@ -342,10 +342,10 @@ public class WebClientService : BindableBase, IWebClientService
         return response;
     }
 
-    private async ValueTask<Stream> GetStreamResponse(string request, IEnumerable<KeyValuePair<string, string>>? postVariables = null)
+    private async ValueTask<Stream> GetStreamResponse(string request, IEnumerable<KeyValuePair<string, string>>? postVariables = null, CancellationToken token = default)
     {
-        var response = await GetFritzBoxResponse(request, postVariables).ConfigureAwait(false);
-        return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+        var response = await GetFritzBoxResponse(request, postVariables, token).ConfigureAwait(false);
+        return await response.Content.ReadAsStreamAsync(token).ConfigureAwait(false);
     }
 
     [SuppressMessage("ReSharper", "UnusedMember.Local")]
@@ -357,9 +357,9 @@ public class WebClientService : BindableBase, IWebClientService
     }
 #pragma warning restore IDE0051
 
-    private async ValueTask<XmlDocument> GetXmlResponse(string request, IEnumerable<KeyValuePair<string, string>>? postVariables = null)
+    private async ValueTask<XmlDocument> GetXmlResponse(string request, IEnumerable<KeyValuePair<string, string>>? postVariables = null, CancellationToken token = default)
     {
-        await using var stream = await GetStreamResponse(request, postVariables).ConfigureAwait(false);
+        await using var stream = await GetStreamResponse(request, postVariables, token).ConfigureAwait(false);
         var result = new XmlDocument();
         result.Load(stream);
         return result;
@@ -367,26 +367,26 @@ public class WebClientService : BindableBase, IWebClientService
 
     private readonly object froniusHttpClientLockObject = new();
 
-    public async ValueTask<(string JsonString, HttpStatusCode StatusCode)> GetFroniusStringResponse(string request, JToken? token = null, IEnumerable<HttpStatusCode>? allowedStatusCodes = null)
+    public async ValueTask<(string JsonString, HttpStatusCode StatusCode)> GetFroniusStringResponse(string request, JToken? jToken = null, IEnumerable<HttpStatusCode>? allowedStatusCodes = null, CancellationToken token = default)
     {
-        var client = await GetFroniusHttpClient();
-        var result = await client.GetString(request, token?.ToString(), allowedStatusCodes).ConfigureAwait(false);
+        var client = await GetFroniusHttpClient(token);
+        var result = await client.GetString(request, jToken?.ToString(), allowedStatusCodes, token).ConfigureAwait(false);
         lastSolarApiCall = DateTime.UtcNow;
         return result;
     }
 
-    public async ValueTask<(JToken Token, HttpStatusCode StatusCode)> GetFroniusJsonResponse(string request, JToken? token = null, IEnumerable<HttpStatusCode>? allowedStatusCodes = null)
+    public async ValueTask<(JToken Token, HttpStatusCode StatusCode)> GetFroniusJsonResponse(string request, JToken? jToken = null, IEnumerable<HttpStatusCode>? allowedStatusCodes = null, CancellationToken token = default)
     {
-        var client = await GetFroniusHttpClient();
-        var result = await client.GetJsonToken(request, token, allowedStatusCodes).ConfigureAwait(false);
+        var client = await GetFroniusHttpClient(token);
+        var result = await client.GetJsonToken(request, jToken, allowedStatusCodes, token).ConfigureAwait(false);
         lastSolarApiCall = DateTime.UtcNow;
         return result;
     }
 
-    public async ValueTask<T?> SendFroniusCommand<T>(string request, JToken? token = null) where T : Gen24NoResultCommand, new()
+    public async ValueTask<T?> SendFroniusCommand<T>(string request, JToken? jToken = null, CancellationToken token = default) where T : Gen24NoResultCommand, new()
     {
-        var client = await GetFroniusHttpClient();
-        var (result, statusCode) = await client.GetJsonToken(request, token, new[] { HttpStatusCode.OK, HttpStatusCode.BadRequest, }).ConfigureAwait(false);
+        var client = await GetFroniusHttpClient(token);
+        var (result, statusCode) = await client.GetJsonToken(request, jToken, new[] { HttpStatusCode.OK, HttpStatusCode.BadRequest, }, token).ConfigureAwait(false);
 
         if (statusCode == HttpStatusCode.BadRequest)
         {
@@ -406,15 +406,15 @@ public class WebClientService : BindableBase, IWebClientService
         return resultData is { HasValues: true } ? gen24JsonService.ReadFroniusData<T>(resultData) : null;
     }
 
-    public ValueTask<Gen24StandByStatus?> GetInverterStandByStatus() => SendFroniusCommand<Gen24StandByStatus>("commands/StandbyState");
+    public ValueTask<Gen24StandByStatus?> GetInverterStandByStatus(CancellationToken token = default) => SendFroniusCommand<Gen24StandByStatus>("commands/StandbyState", token: token);
 
-    public async ValueTask RequestInverterStandBy(bool isStandBy)
+    public async ValueTask RequestInverterStandBy(bool isStandBy, CancellationToken token = default)
     {
-        var token = JObject.Parse($"{{\"requestState\": {(isStandBy ? "0" : "1")}}}");
-        await SendFroniusCommand<Gen24NoResultCommand>("commands/StandbyRequestState", token).ConfigureAwait(false);
+        var jToken = JObject.Parse($"{{\"requestState\": {(isStandBy ? "0" : "1")}}}");
+        await SendFroniusCommand<Gen24NoResultCommand>("commands/StandbyRequestState", jToken, token).ConfigureAwait(false);
     }
 
-    private async Task<DigestAuthHttp> GetFroniusHttpClient()
+    private async Task<DigestAuthHttp> GetFroniusHttpClient(CancellationToken token = default)
     {
         if (InverterConnection?.BaseUrl == null)
         {
@@ -425,7 +425,7 @@ public class WebClientService : BindableBase, IWebClientService
 
         lock (froniusHttpClientLockObject)
         {
-            froniusHttpClient ??= new DigestAuthHttp(InverterConnection ?? throw new ArgumentNullException());
+            froniusHttpClient ??= new DigestAuthHttp(InverterConnection ?? throw new ArgumentNullException(null, @"No inverter connection"));
             client = froniusHttpClient;
         }
 
@@ -433,16 +433,16 @@ public class WebClientService : BindableBase, IWebClientService
 
         if (nextAllowedCall.Ticks > 0)
         {
-            await Task.Delay(nextAllowedCall).ConfigureAwait(false);
+            await Task.Delay(nextAllowedCall, token).ConfigureAwait(false);
         }
 
         return client;
     }
 
-    private async Task<(T, JToken)> GetJsonResponse<T>(string request, bool useUnofficialApi = false) where T : BaseResponse, new()
+    private async Task<(T, JToken)> GetJsonResponse<T>(string request, bool useUnofficialApi = false, CancellationToken token = default) where T : BaseResponse, new()
     {
         var requestString = $"{(useUnofficialApi ? string.Empty : "solar_api/v1/")}{request}";
-        var (jsonString, status) = await GetFroniusStringResponse(requestString);
+        var (jsonString, status) = await GetFroniusStringResponse(requestString, token: token);
 
         if (status != HttpStatusCode.OK)
         {
@@ -464,12 +464,12 @@ public class WebClientService : BindableBase, IWebClientService
 
             if (result.StatusCode != 0)
             {
-                throw new SolarException(result.StatusCode, result.Reason, result.UserMessage, requestString);
+                throw new Gen24Exception(result.StatusCode, result.Reason, result.UserMessage, requestString);
             }
 
             var data = JObject.Parse(jsonString)["Body"]?["Data"] ?? throw new InvalidDataException(Resources.IncorrectData);
             return (result, data);
-        }).ConfigureAwait(false);
+        }, token).ConfigureAwait(false);
     }
 
     public override string ToString() => InverterConnection?.BaseUrl ?? "---";

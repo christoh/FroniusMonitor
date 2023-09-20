@@ -1,5 +1,6 @@
 ﻿namespace De.Hochstaetter.Fronius.Services;
 
+// ReSharper disable once CommentTypo
 // Algorithm must be MD5 (MD5-sess and SHA are not supported)
 // qop must be auth (auth-int and none is not supported)
 
@@ -35,33 +36,33 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
 
     public ValueTask DisposeAsync() => new(Task.Run(Dispose));
 
-    public async Task<(JToken, HttpStatusCode)> GetJsonToken(string url, JToken? token, IEnumerable<HttpStatusCode>? allowedStatusCodes = null)
+    public async ValueTask<(JToken, HttpStatusCode)> GetJsonToken(string url, JToken? jToken, IEnumerable<HttpStatusCode>? allowedStatusCodes = null, CancellationToken token = default)
     {
         string? stringContent = null;
 
-        if (token != null)
+        if (jToken != null)
         {
-            await Task.Run(() => stringContent = token.ToString()).ConfigureAwait(false);
+            await Task.Run(() => stringContent = jToken.ToString(), token).ConfigureAwait(false);
         }
 
-        var (stringResult, httpStatusCode) = await GetString(url, stringContent, allowedStatusCodes).ConfigureAwait(false);
+        var (stringResult, httpStatusCode) = await GetString(url, stringContent, allowedStatusCodes, token).ConfigureAwait(false);
         JToken resultToken = new JObject();
 
         await Task.Run(() =>
         {
             resultToken = JToken.Parse(stringResult);
-        }).ConfigureAwait(false);
+        }, token).ConfigureAwait(false);
 
         return (resultToken, httpStatusCode);
     }
 
-    public async Task<(string, HttpStatusCode)> GetString(string url, string? stringContent = null, IEnumerable<HttpStatusCode>? allowedStatusCodes = null)
+    public async ValueTask<(string, HttpStatusCode)> GetString(string url, string? stringContent = null, IEnumerable<HttpStatusCode>? allowedStatusCodes = null, CancellationToken token = default)
     {
-        var response = await GetResponse(url, stringContent, allowedStatusCodes).ConfigureAwait(false);
+        var response = await GetResponse(url, stringContent, allowedStatusCodes, token).ConfigureAwait(false);
 
         try
         {
-            return (await response.Content.ReadAsStringAsync().ConfigureAwait(false), response.StatusCode);
+            return (await response.Content.ReadAsStringAsync(token).ConfigureAwait(false), response.StatusCode);
         }
         finally
         {
@@ -69,7 +70,7 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
         }
     }
 
-    public async Task<HttpResponseMessage> GetResponse(string url, string? stringContent, IEnumerable<HttpStatusCode>? allowedStatusCodesEnumerable = null)
+    public async ValueTask<HttpResponseMessage> GetResponse(string url, string? stringContent, IEnumerable<HttpStatusCode>? allowedStatusCodesEnumerable = null, CancellationToken token = default)
     {
         allowedStatusCodesEnumerable ??= new[] { HttpStatusCode.OK };
         var allowedStatusCodes = allowedStatusCodesEnumerable as IList<HttpStatusCode> ?? allowedStatusCodesEnumerable.ToArray();
@@ -79,11 +80,11 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
             url = '/' + url;
         }
 
-        var request = await CreateRequest(url, stringContent).ConfigureAwait(false);
+        var request = await CreateRequest(url, stringContent, token).ConfigureAwait(false);
 
         try
         {
-            var response = await httpClient.SendAsync(request).ConfigureAwait(false);
+            var response = await httpClient.SendAsync(request, token).ConfigureAwait(false);
 
             if (response.StatusCode != HttpStatusCode.Unauthorized)
             {
@@ -113,8 +114,8 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
             nc = 0;
             cnonce = unchecked((uint)random.Next(int.MinValue, int.MaxValue)).ToString("x8");
             cnonceDate = DateTime.UtcNow;
-            request = await CreateRequest(url, stringContent).ConfigureAwait(false);
-            response = await httpClient.SendAsync(request).ConfigureAwait(false);
+            request = await CreateRequest(url, stringContent, token).ConfigureAwait(false);
+            response = await httpClient.SendAsync(request, token).ConfigureAwait(false);
             ThrowOnWrongStatusCode();
             return response;
 
@@ -131,7 +132,7 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
                 var regex = new Regex($@"{varName}=(""([^""]*)""|([^,]*))");
                 var matchHeader = regex.Match(wwwAuthenticateHeader);
                 return !matchHeader.Success ? null : matchHeader.Groups.OfType<Group>().Last(group => group.Length > 0).Value;
-            });
+            }, token);
         }
         finally
         {
@@ -139,26 +140,26 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
         }
     }
 
-    private async Task<HttpRequestMessage> CreateRequest(string url, string? stringContent)
+    private async ValueTask<HttpRequestMessage> CreateRequest(string url, string? stringContent, CancellationToken token)
     {
         var request = new HttpRequestMessage(stringContent != null ? HttpMethod.Post : HttpMethod.Get, url);
 
 
         if (stringContent != null)
         {
-            await Task.Run(() => request.Content = new StringContent(stringContent, Encoding.UTF8, "application/json")).ConfigureAwait(false);
+            await Task.Run(() => request.Content = new StringContent(stringContent, Encoding.UTF8, "application/json"), token).ConfigureAwait(false);
         }
 
         if (!string.IsNullOrEmpty(cnonce) && DateTime.UtcNow - cnonceDate < cnonceDuration && nc < 99_999_999)
         {
-            request.Headers.Add("Authorization", await CreateDigestHeader(request).ConfigureAwait(false));
+            request.Headers.Add("Authorization", await CreateDigestHeader(request, token).ConfigureAwait(false));
         }
 
         return request;
     }
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    private async ValueTask<string> CreateDigestHeader(HttpRequestMessage request)
+    private async ValueTask<string> CreateDigestHeader(HttpRequestMessage request, CancellationToken token)
     {
         encoding ??= Encoding.UTF8;
         ha1 ??= await CalculateMd5Hash($"{connection.UserName}:{realm}:{connection.Password}").ConfigureAwait(false);
@@ -182,6 +183,6 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
                     (stringBuilder, hashByte) => stringBuilder.Append(hashByte.ToString("x2"))
                 )
                 .ToString();
-        });
+        }, token);
     }
 }
