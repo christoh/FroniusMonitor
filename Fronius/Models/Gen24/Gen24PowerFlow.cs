@@ -125,10 +125,7 @@ public class Gen24PowerFlow : Gen24DeviceBase
 
     public double? LoadPowerCorrected => LoadPower + GridPower - GridPowerCorrected;
 
-    public double? GridPowerCorrected
-    {
-        get { return GridPower * (GridPower < 0 ? ProducedFactor : ConsumedFactor); }
-    }
+    public double? GridPowerCorrected => GridPower * (GridPower < 0 ? ProducedFactor : ConsumedFactor);
 
     private double? inverterAcPower;
 

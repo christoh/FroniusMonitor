@@ -14,9 +14,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
         IGen24JsonService gen24Service,
         IWattPilotService wattPilotService,
         IDataCollectionService dataCollectionService
-    ) : base(dataCollectionService, webClientService, gen24Service, wattPilotService)
-    {
-    }
+    ) : base(dataCollectionService, webClientService, gen24Service, wattPilotService) { }
 
     public IEnumerable<ChargingRuleType> RuleTypes => ruleTypes;
 
@@ -158,10 +156,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
 
         if (softwareVersions["DEVICEGROUP"] == new Version(1, 19, 7, 1))
         {
-            await Dispatcher.InvokeAsync(() =>
-            {
-                MessageBox.Show(view, Resources.UtcBug, Resources.Warning, MessageBoxButton.OK, MessageBoxImage.Warning);
-            });
+            await Dispatcher.InvokeAsync(() => { MessageBox.Show(view, Resources.UtcBug, Resources.Warning, MessageBoxButton.OK, MessageBoxImage.Warning); });
         }
 
         string jsonString;
@@ -261,10 +256,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
 
     private void Undo()
     {
-        Dispatcher.Invoke(() =>
-        {
-            ChargingRules = new BindableCollection<Gen24ChargingRule>(((BindableCollection<Gen24ChargingRule>)oldChargingRules.Clone()).OrderBy(r => r.StartTime).ThenBy(r => r.EndTime), SynchronizationContext.Current);
-        });
+        Dispatcher.Invoke(() => { ChargingRules = new BindableCollection<Gen24ChargingRule>(((BindableCollection<Gen24ChargingRule>)oldChargingRules.Clone()).OrderBy(r => r.StartTime).ThenBy(r => r.EndTime), SynchronizationContext.Current); });
 
         Settings = (Gen24BatterySettings)oldSettings.Clone();
         socMin = Settings.SocMin ?? 5;

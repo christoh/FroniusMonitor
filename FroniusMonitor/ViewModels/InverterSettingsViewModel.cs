@@ -319,6 +319,7 @@
 
                         if (updateToken.HasValues)
                         {
+                            // ReSharper disable once VariableHidesOuterVariable
                             var success = await UpdateInverter(uri, updateToken).ConfigureAwait(false);
 
                             if (success)
