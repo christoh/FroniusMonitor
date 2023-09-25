@@ -109,4 +109,9 @@ public partial class WattPilotControl
 
         lcd.Visibility = Visibility.Visible;
     }
+
+    private void OnSettingsClicked(object sender, RoutedEventArgs e)
+    {
+        IoC.GetRegistered<MainWindow>().GetView<WattPilotSettingsView>().Focus();
+    }
 }
