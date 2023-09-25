@@ -16,8 +16,11 @@
             <Setter Property="ContentTemplate">
                 <Setter.Value>
                     <DataTemplate>
-                        <TextBox IsReadOnly="True" Background="Transparent" HorizontalAlignment="Stretch" TextWrapping="Wrap" BorderThickness="0" BorderBrush="Transparent" 
+                        <Grid>
+                            <TextBox Visibility="{TemplateBinding Content, Converter={co:TypeToVisibility Type={x:Type sys:String}, Equal=Visible, NotEqual=Collapsed}}" IsReadOnly="True" Background="Transparent" HorizontalAlignment="Stretch" TextWrapping="Wrap" BorderThickness="0" BorderBrush="Transparent" 
                                  Text="{TemplateBinding Content}" MaxWidth="300" />
+                            <ContentPresenter Content="{TemplateBinding Content}" Visibility="{TemplateBinding Content, Converter={co:TypeToVisibility Type={x:Type sys:String}, Equal=Collapsed, NotEqual=Visible}}"/>
+                        </Grid>
                     </DataTemplate>
                 </Setter.Value>
             </Setter>

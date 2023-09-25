@@ -5,7 +5,6 @@ public class WattPilotSettingsViewModel : ViewModelBase
     private readonly IDataCollectionService dataCollectionService;
     private readonly IWattPilotService wattPilotService;
     private WattPilot oldWattPilot = null!;
-    //private readonly MainWindow mainWindow;
 
     public WattPilotSettingsViewModel(IDataCollectionService dataCollectionService, IWattPilotService wattPilotService)
     {
@@ -142,7 +141,7 @@ public class WattPilotSettingsViewModel : ViewModelBase
 
         if (localWattPilot == null)
         {
-            Show(Resources.NoWattPilot, Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error);
+            ShowBox(Resources.NoWattPilot, Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error);
             Close();
             return;
         }
@@ -204,7 +203,7 @@ public class WattPilotSettingsViewModel : ViewModelBase
 
             if (errors.Count > 0)
             {
-                Show
+                ShowBox
                 (
                     $"{Resources.PleaseCorrectErrors}:{Environment.NewLine}{errors.Aggregate(string.Empty, (c, n) => c + Environment.NewLine + "• " + n)}",
                     Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error
@@ -258,7 +257,7 @@ public class WattPilotSettingsViewModel : ViewModelBase
                 {
                     var notWritten = "• " + string.Join(Environment.NewLine + "• ", errors);
 
-                    Show
+                    ShowBox
                     (
                         "The following settings were not written to the Wattpilot:" + Environment.NewLine + Environment.NewLine + notWritten,
                         Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error
@@ -269,7 +268,7 @@ public class WattPilotSettingsViewModel : ViewModelBase
             {
                 sentSomething = false;
                 IsInUpdate = false;
-                Show(ex.Message, Resources.Warning, MessageBoxButton.OK, MessageBoxImage.Warning);
+                ShowBox(ex.Message, Resources.Warning, MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             finally
             {
@@ -290,7 +289,7 @@ public class WattPilotSettingsViewModel : ViewModelBase
                     var notWritten = "• " + string.Join(Environment.NewLine + "• ", wattPilotService.UnsuccessfulWrites.Select(a => a.ToString()));
                     IsInUpdate = false;
 
-                    Show
+                    ShowBox
                     (
                         "The following settings were not confirmed by the Wattpilot:" + Environment.NewLine + Environment.NewLine + notWritten,
                         Resources.Warning, MessageBoxButton.OK, MessageBoxImage.Warning

@@ -18,11 +18,11 @@ public abstract class ViewModelBase : BindableBase
 
     public bool HasVisibleNotifiedValidationErrors => VisibleNotifiedValidationErrors.Any();
 
-    public Window View { protected get; set; } = null!;
+    internal Window View { private get; set; } = null!;
 
     internal virtual Task OnInitialize() => Task.CompletedTask;
 
-    public void HandleValidationErrorChange(ValidationErrorEventArgs e)
+    internal void HandleValidationErrorChange(ValidationErrorEventArgs e)
     {
         switch (e.Action)
         {
@@ -43,7 +43,7 @@ public abstract class ViewModelBase : BindableBase
 
     protected virtual void Close() => Dispatcher.InvokeAsync(View.Close);
 
-    public MessageBoxResult Show(string text, string caption = "", MessageBoxButton button = MessageBoxButton.OK, MessageBoxImage icon = MessageBoxImage.None, MessageBoxResult defaultResult = MessageBoxResult.None)
+    protected MessageBoxResult ShowBox(string text, string caption = "", MessageBoxButton button = MessageBoxButton.OK, MessageBoxImage icon = MessageBoxImage.None, MessageBoxResult defaultResult = MessageBoxResult.None)
     {
         MessageBoxResult result = defaultResult;
 
@@ -54,4 +54,6 @@ public abstract class ViewModelBase : BindableBase
 
         return result;
     }
+
+    protected IEnumerable<T> FindVisualChildren<T>() where T : DependencyObject => View.FindVisualChildren<T>();
 }

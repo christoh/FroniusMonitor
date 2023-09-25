@@ -144,7 +144,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
         {
             await Dispatcher.InvokeAsync(() =>
             {
-                Show(Loc.NoGen24Symo, Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowBox(Loc.NoGen24Symo, Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error);
                 Close();
             });
 
@@ -153,7 +153,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
 
         if (softwareVersions["DEVICEGROUP"] == new Version(1, 19, 7, 1))
         {
-            Show(Loc.UtcBug, Loc.Warning, MessageBoxButton.OK, MessageBoxImage.Warning);
+            ShowBox(Loc.UtcBug, Loc.Warning, MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
         string jsonString;
@@ -166,7 +166,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
         {
             await Dispatcher.InvokeAsync(() =>
             {
-                Show
+                ShowBox
                 (
                     string.Format(Loc.InverterCommReadError, ex.Message),
                     ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error
@@ -186,7 +186,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
         }
         catch (Exception ex)
         {
-            Show
+            ShowBox
             (
                 string.Format(Loc.InverterCommReadError, ex.Message),
                 ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error
@@ -302,7 +302,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
 
             if (errorList.Count > 0)
             {
-                Show
+                ShowBox
                 (
                     $"{Loc.PleaseCorrectErrors}:{Environment.NewLine}{errorList.Aggregate(string.Empty, (c, n) => c + Environment.NewLine + "• " + n)}",
                     Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error

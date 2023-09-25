@@ -51,7 +51,7 @@ public abstract class SettingsViewModelBase : ViewModelBase
         {
             IsInUpdate = false;
 
-            Show
+            ShowBox
             (
                 string.Format(Loc.InverterCommError, ex.Message) + Environment.NewLine + Environment.NewLine + token,
                 ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error
@@ -67,7 +67,7 @@ public abstract class SettingsViewModelBase : ViewModelBase
 
         IsInUpdate = false;
 
-        Show
+        ShowBox
         (
             string.Format(Loc.InverterCommError, Loc.InvalidParameters) + Environment.NewLine + Environment.NewLine + token + Environment.NewLine + Environment.NewLine + result.Token,
             Loc.InvalidParameters, MessageBoxButton.OK, MessageBoxImage.Error
@@ -79,6 +79,6 @@ public abstract class SettingsViewModelBase : ViewModelBase
     protected void ShowNoSettingsChanged()
     {
         IsInUpdate = false;
-        Show(Loc.NoSettingsChanged, Loc.Warning, MessageBoxButton.OK, MessageBoxImage.Warning);
+        ShowBox(Loc.NoSettingsChanged, Loc.Warning, MessageBoxButton.OK, MessageBoxImage.Warning);
     }
 }

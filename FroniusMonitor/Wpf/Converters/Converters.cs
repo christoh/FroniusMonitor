@@ -749,6 +749,20 @@ public class PowerStatus2Brush : MultiConverterBase
     }
 }
 
+public class TypeToAnything<TTo> : ConverterBase
+{
+    public Type? Type { get; set; }
+    public TTo? Equal { get; set; }
+    public TTo? NotEqual { get; set; }
+
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return Type is not null && value is not null && Type.IsInstanceOfType(value)? Equal : NotEqual;
+    }
+}
+
+public class TypeToVisibility : TypeToAnything<Visibility> { }
+
 public class EqualityToAnything<TFrom, TTo> : ConverterBase
 {
     public TFrom? Value { get; set; }

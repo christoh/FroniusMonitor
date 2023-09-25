@@ -145,7 +145,7 @@ public class SettingsViewModel : SettingsViewModelBase
 
     private async void Ok()
     {
-        View.Close();
+        Close();
         Settings.FroniusConnection!.BaseUrl = FixUrl(Settings.FroniusConnection!.BaseUrl);
         Settings.FritzBoxConnection!.BaseUrl = FixUrl(Settings.FritzBoxConnection!.BaseUrl);
         Settings.WattPilotConnection!.BaseUrl = FixUrl(Settings.WattPilotConnection!.BaseUrl, true);
@@ -154,7 +154,7 @@ public class SettingsViewModel : SettingsViewModelBase
         {
             Settings.Language = SelectedCulture.Value;
 
-            Show
+            ShowBox
             (
                 "The new language settings require that you restart the program." + Environment.NewLine +
                 // ReSharper disable StringLiteralTypo

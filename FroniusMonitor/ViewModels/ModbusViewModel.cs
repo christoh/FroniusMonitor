@@ -62,14 +62,13 @@ public class ModbusViewModel : SettingsViewModelBase
         }
         catch (Exception ex)
         {
-            Show
+            ShowBox
             (
                 string.Format(Resources.InverterCommReadError, ex.Message),
                 ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error
             );
 
             Close();
-
             return;
         }
 
@@ -88,7 +87,7 @@ public class ModbusViewModel : SettingsViewModelBase
 
         try
         {
-            var errors = View.FindVisualChildren<TextBox>().SelectMany(Validation.GetErrors).ToArray();
+            var errors = FindVisualChildren<TextBox>().SelectMany(Validation.GetErrors).ToList();
 
             foreach (var error in errors)
             {
@@ -107,11 +106,11 @@ public class ModbusViewModel : SettingsViewModelBase
 
             var errorList = errors
                 .Where(e => e.BindingInError is BindingExpression { Target: FrameworkElement { IsVisible: true } })
-                .Select(e => e.ErrorContent.ToString()).ToArray();
+                .Select(e => e.ErrorContent.ToString()).ToList();
 
-            if (errorList.Length > 0)
+            if (errorList.Count > 0)
             {
-                Show
+                ShowBox
                 (
                     $"{Resources.PleaseCorrectErrors}:{Environment.NewLine}{errorList.Aggregate(string.Empty, (c, n) => c + Environment.NewLine + "• " + n)}",
                     Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error
