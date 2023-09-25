@@ -6,6 +6,7 @@ public partial class WattPilotSettingsView
     {
         InitializeComponent();
         DataContext = viewModel;
+        viewModel.View = this;
 
         Loaded += async (_, _) =>
         {

@@ -17,6 +17,9 @@
                 <Grid.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="{x:Static p:Resources.Settings}" Icon="{vi:SettingsIcon}" Click="OnSettingsClicked"/>
+                        <MenuItem Header="{x:Static p:Resources.EnergyFlow}" Icon="{vi:EnergyFLow}" Click="OnEnergyFlowClicked"/>
+                        <MenuItem Header="{x:Static p:Resources.Modbus}" Icon="{vi:ModbusLogo}" Click="OnModbusClicked"/>
+                        <MenuItem Header="{x:Static p:Resources.EventLog}" Icon="{vi:EventLogIcon}" Click="OnEventLogClicked"/>
                     </ContextMenu>
                 </Grid.ContextMenu>
                 <Grid.RowDefinitions>

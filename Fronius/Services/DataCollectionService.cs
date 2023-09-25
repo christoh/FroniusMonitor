@@ -24,11 +24,16 @@ public class DataCollectionService : BindableBase, IDataCollectionService
 
         if (settings.HaveTwoInverters)
         {
-            WebClientService2 = IoC.Injector?.CreateScope().ServiceProvider.GetRequiredService<IWebClientService>();
+            Container2 = IoC.Injector!.CreateScope().ServiceProvider;
+            WebClientService2 = Container2?.GetRequiredService<IWebClientService>();
         }
     }
 
     public IWebClientService WebClientService { get; }
+
+    public IServiceProvider Container => IoC.Injector!;
+
+    public IServiceProvider? Container2 { get; }
 
     private IWebClientService? webClientService2;
 

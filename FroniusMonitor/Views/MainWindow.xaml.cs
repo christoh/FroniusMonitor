@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Views;
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace De.Hochstaetter.FroniusMonitor.Views;
 
 public partial class MainWindow
 {
@@ -43,6 +45,7 @@ public partial class MainWindow
         InitializeComponent();
 
         DataContext = vm;
+        vm.View = this;
 
         Loaded += (_, _) =>
         {
@@ -51,7 +54,6 @@ public partial class MainWindow
             SetBinding(PowerFlowProperty, binding);
             binding = new Binding($"{nameof(ViewModel.DataCollectionService)}.{nameof(ViewModel.DataCollectionService.HomeAutomationSystem)}.{nameof(ViewModel.DataCollectionService.HomeAutomationSystem.Gen24Sensors2)}.{nameof(ViewModel.DataCollectionService.HomeAutomationSystem.Gen24Sensors2.PowerFlow)}");
             SetBinding(PowerFlow2Property, binding);
-            ViewModel.View = this;
             _ = ViewModel.OnInitialize();
         };
 
@@ -76,65 +78,24 @@ public partial class MainWindow
 
     public MainViewModel ViewModel => (MainViewModel)DataContext;
 
-    private EventLogView? eventLogView;
-
-    public EventLogView EventLogView
+    public T GetView<T>(IServiceProvider? container = null) where T : Window
     {
-        get
-        {
-            if (eventLogView == null)
-            {
-                eventLogView = IoC.Get<EventLogView>();
-                eventLogView.Closed += (_, _) => { eventLogView = null; };
-            }
-
-            return eventLogView;
-        }
-    }
-
-    public ModbusView ModbusView => GetView<ModbusView>();
-
-    public SettingsView SettingsView => GetView<SettingsView>();
-
-    public WattPilotSettingsView WattPilotSettingsView => GetView<WattPilotSettingsView>();
-
-    public T GetView<T>(IWebClientService? webClientService = null) where T : Window
-    {
-        var views = OwnedWindows.OfType<T>();
-        var view = webClientService == null ? views.SingleOrDefault() : views.SingleOrDefault(v => v is IHaveWebClientService haveWebClientService && haveWebClientService.WebClientService == webClientService);
+        var view = OwnedWindows.OfType<T>().SingleOrDefault
+        (
+            w => container == null ||
+                 w is not IInverterScoped scoped ||
+                 scoped.WebClientService == container.GetRequiredService<IWebClientService>()
+        );
 
         if (view == null)
         {
-            view = IoC.Get<T>();
-
-            if (view is IHaveWebClientService haveWebClientService)
-            {
-                haveWebClientService.WebClientService = webClientService!;
-            }
-
+            view = (container ?? IoC.Injector!).GetRequiredService<T>();
             view.Owner = this;
-            view.Show();
         }
 
+        view.Show();
         return view;
     }
-
-    private SelfConsumptionOptimizationView? selfConsumptionOptimizationView;
-
-    public SelfConsumptionOptimizationView SelfConsumptionOptimizationView
-    {
-        get
-        {
-            if (selfConsumptionOptimizationView == null)
-            {
-                selfConsumptionOptimizationView = IoC.Get<SelfConsumptionOptimizationView>();
-                selfConsumptionOptimizationView.Closed += (_, _) => { selfConsumptionOptimizationView = null; };
-            }
-
-            return selfConsumptionOptimizationView!;
-        }
-    }
-
 
     private void ZoomIn()
     {
@@ -272,44 +233,27 @@ public partial class MainWindow
 
     private void ShowEventLog(object sender, RoutedEventArgs e)
     {
-        if (eventLogView != null)
-        {
-            EventLogView.Activate();
-            EventLogView.WindowState = WindowState.Normal;
-        }
-
-        EventLogView.Owner = this;
-        EventLogView.Show();
+        GetView<EventLogView>(IoC.Injector).Focus();
     }
 
     private void ShowSelfConsumptionOptimization(object sender, RoutedEventArgs e)
     {
-        if (selfConsumptionOptimizationView != null)
-        {
-            SelfConsumptionOptimizationView.Activate();
-            SelfConsumptionOptimizationView.WindowState = WindowState.Normal;
-        }
-
-        SelfConsumptionOptimizationView.Owner = this;
-        SelfConsumptionOptimizationView.Show();
+        GetView<SelfConsumptionOptimizationView>(IoC.Injector).Focus();
     }
 
     private void ShowModbusSettings(object sender, RoutedEventArgs e)
     {
-        ModbusView.Activate();
-        ModbusView.WindowState = WindowState.Normal;
+        GetView<ModbusView>(IoC.Injector).Focus();
     }
 
     private void ShowSettings(object sender, RoutedEventArgs e)
     {
-        SettingsView.Activate();
-        SettingsView.WindowState = WindowState.Normal;
+        GetView<SettingsView>().Focus();
     }
 
     private void ShowWattPilotSettings(object sender, RoutedEventArgs e)
     {
-        WattPilotSettingsView.Activate();
-        WattPilotSettingsView.WindowState = WindowState.Normal;
+        GetView<WattPilotSettingsView>().Focus();
     }
 
     private void OnRibbonExpanderChanged(object sender, RoutedEventArgs e)

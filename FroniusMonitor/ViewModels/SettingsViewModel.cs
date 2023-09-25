@@ -46,7 +46,7 @@ public class SettingsViewModel : SettingsViewModelBase
     public IEnumerable<ListItemModel<Protocol>> AzureProtocols => azureProtocols;
 
     public IEnumerable<ListItemModel<TunnelMode>> TunnelModes => tunnelModes;
-
+    
     public ListItemModel<Protocol> SelectedProtocol
     {
         get => AzureProtocols.First(p => p.Value == Settings.ToshibaAcConnection!.Protocol);
@@ -145,7 +145,7 @@ public class SettingsViewModel : SettingsViewModelBase
 
     private async void Ok()
     {
-        IoC.Get<MainWindow>().SettingsView.Close();
+        View.Close();
         Settings.FroniusConnection!.BaseUrl = FixUrl(Settings.FroniusConnection!.BaseUrl);
         Settings.FritzBoxConnection!.BaseUrl = FixUrl(Settings.FritzBoxConnection!.BaseUrl);
         Settings.WattPilotConnection!.BaseUrl = FixUrl(Settings.WattPilotConnection!.BaseUrl, true);
@@ -154,9 +154,8 @@ public class SettingsViewModel : SettingsViewModelBase
         {
             Settings.Language = SelectedCulture.Value;
 
-            MessageBox.Show
+            Show
             (
-                IoC.Get<MainWindow>(),
                 "The new language settings require that you restart the program." + Environment.NewLine +
                 // ReSharper disable StringLiteralTypo
                 "Die neuen Spracheinstellungen erfordern, dass Du das Programm neu startest.",

@@ -1,9 +1,12 @@
-﻿using System.Collections.ObjectModel;
-
-namespace De.Hochstaetter.FroniusMonitor.ViewModels;
+﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
 public abstract class ViewModelBase : BindableBase
 {
+    protected ViewModelBase()
+    {
+        NotifiedValidationErrors = new(notifiedValidationErrors);
+    }
+
     public Dispatcher Dispatcher { get; set; } = null!;
 
     private readonly ObservableCollection<ValidationError> notifiedValidationErrors = new();
@@ -15,10 +18,7 @@ public abstract class ViewModelBase : BindableBase
 
     public bool HasVisibleNotifiedValidationErrors => VisibleNotifiedValidationErrors.Any();
 
-    protected ViewModelBase()
-    {
-        NotifiedValidationErrors = new(notifiedValidationErrors);
-    }
+    public Window View { protected get; set; } = null!;
 
     internal virtual Task OnInitialize() => Task.CompletedTask;
 
@@ -39,5 +39,19 @@ public abstract class ViewModelBase : BindableBase
         NotifyOfPropertyChange(nameof(HasNotifiedValidationErrors));
         NotifyOfPropertyChange(nameof(HasVisibleNotifiedValidationErrors));
         NotifyOfPropertyChange(nameof(VisibleNotifiedValidationErrors));
+    }
+
+    protected virtual void Close() => Dispatcher.InvokeAsync(View.Close);
+
+    public MessageBoxResult Show(string text, string caption = "", MessageBoxButton button = MessageBoxButton.OK, MessageBoxImage icon = MessageBoxImage.None, MessageBoxResult defaultResult = MessageBoxResult.None)
+    {
+        MessageBoxResult result = defaultResult;
+
+        Dispatcher.Invoke(() =>
+        {
+            result = MessageBox.Show(View, text, caption, button, icon, defaultResult);
+        });
+
+        return result;
     }
 }

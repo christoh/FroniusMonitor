@@ -1,14 +1,13 @@
 ﻿namespace De.Hochstaetter.FroniusMonitor.Views;
 
-public partial class InverterSettingsView : IHaveWebClientService
+public partial class InverterSettingsView : IInverterScoped
 {
-    private readonly InverterSettingsViewModel viewModel;
-
-    public InverterSettingsView(InverterSettingsViewModel viewModel)
+    public InverterSettingsView(InverterSettingsViewModel viewModel, IWebClientService webClientService)
     {
         InitializeComponent();
-        this.viewModel = viewModel;
         DataContext = viewModel;
+        viewModel.View = this;
+        WebClientService = webClientService;
 
         Loaded += async (_, _) =>
         {
@@ -17,9 +16,5 @@ public partial class InverterSettingsView : IHaveWebClientService
         };
     }
 
-    public IWebClientService WebClientService
-    {
-        get => viewModel.WebClientService;
-        set => viewModel.WebClientService = value;
-    }
+    public IWebClientService WebClientService { get; }
 }

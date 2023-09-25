@@ -26,8 +26,9 @@ public enum InverterDisplayMode
 
 public partial class InverterControl : IHaveLcdPanel
 {
-    private readonly IDataCollectionService? solarSystemService = IoC.TryGetRegistered<IDataCollectionService>();
+    private readonly IDataCollectionService? dataCollectionService = IoC.TryGetRegistered<IDataCollectionService>();
     private IWebClientService? webClientService;
+    private IServiceProvider provider = IoC.Injector!;
     private static readonly IReadOnlyList<InverterDisplayMode> acModes = new[] { InverterDisplayMode.AcPowerActive, InverterDisplayMode.AcPowerApparent, InverterDisplayMode.AcPowerReactive, InverterDisplayMode.AcPowerFactor, InverterDisplayMode.AcCurrent, InverterDisplayMode.AcPhaseVoltage, InverterDisplayMode.AcLineVoltage, };
     private static readonly IReadOnlyList<InverterDisplayMode> dcModes = new[] { InverterDisplayMode.DcPower, InverterDisplayMode.DcRelativePower, InverterDisplayMode.DcCurrent, InverterDisplayMode.DcVoltage, };
     private static readonly IReadOnlyList<InverterDisplayMode> moreModes = new[] { InverterDisplayMode.MoreEfficiency, InverterDisplayMode.More, InverterDisplayMode.MoreTemperatures, InverterDisplayMode.MoreFans, InverterDisplayMode.MoreOp, InverterDisplayMode.MoreVersions };
@@ -78,34 +79,40 @@ public partial class InverterControl : IHaveLcdPanel
 
     public InverterControl()
     {
-        webClientService = solarSystemService?.WebClientService;
+        webClientService = dataCollectionService?.WebClientService;
         InitializeComponent();
 
         Loaded += (_, _) =>
         {
-            if (solarSystemService != null)
+            if (dataCollectionService != null)
             {
-                solarSystemService.NewDataReceived += NewDataReceived;
+                dataCollectionService.NewDataReceived += NewDataReceived;
             }
         };
 
         Unloaded += (_, _) =>
         {
-            if (solarSystemService != null)
+            if (dataCollectionService != null)
             {
-                solarSystemService.NewDataReceived -= NewDataReceived;
+                dataCollectionService.NewDataReceived -= NewDataReceived;
             }
         };
     }
 
-    private void OnModeChanged() => NewDataReceived(this, new SolarDataEventArgs(solarSystemService?.HomeAutomationSystem));
+    private void OnModeChanged() => NewDataReceived(this, new SolarDataEventArgs(dataCollectionService?.HomeAutomationSystem));
 
     private void OnIsSecondaryChanged()
     {
         webClientService = IsSecondary switch
         {
-            false => solarSystemService?.WebClientService,
-            true => solarSystemService?.WebClientService2,
+            false => dataCollectionService?.WebClientService,
+            true => dataCollectionService?.WebClientService2,
+        };
+
+        provider = IsSecondary switch
+        {
+            false => dataCollectionService!.Container,
+            true => dataCollectionService!.Container2!,
         };
     }
 
@@ -517,6 +524,21 @@ public partial class InverterControl : IHaveLcdPanel
 
     private void OnSettingsClicked(object sender, RoutedEventArgs e)
     {
-        IoC.Get<MainWindow>().GetView<InverterSettingsView>(webClientService).Focus();
+        IoC.Get<MainWindow>().GetView<InverterSettingsView>(provider).Focus();
+    }
+
+    private void OnEnergyFlowClicked(object sender, RoutedEventArgs e)
+    {
+        IoC.Get<MainWindow>().GetView<SelfConsumptionOptimizationView>(provider).Focus();
+    }
+
+    private void OnModbusClicked(object sender, RoutedEventArgs e)
+    {
+        IoC.Get<MainWindow>().GetView<ModbusView>(provider).Focus();
+    }
+
+    private void OnEventLogClicked(object sender, RoutedEventArgs e)
+    {
+        IoC.Get<MainWindow>().GetView<EventLogView>(provider).Focus();
     }
 }

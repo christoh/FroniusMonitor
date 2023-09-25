@@ -4,7 +4,6 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
 {
     private static readonly IEnumerable<ChargingRuleType> ruleTypes = Enum.GetValues<ChargingRuleType>();
 
-    private SelfConsumptionOptimizationView view = null!;
     private Gen24BatterySettings oldSettings = null!;
     private BindableCollection<Gen24ChargingRule> oldChargingRules = null!;
 
@@ -138,8 +137,6 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
     internal override async Task OnInitialize()
     {
         await base.OnInitialize().ConfigureAwait(false);
-        var mainWindow = IoC.Get<MainWindow>();
-        view = mainWindow.SelfConsumptionOptimizationView;
 
         var softwareVersions = DataCollectionService.HomeAutomationSystem?.Gen24Config?.Versions?.SwVersions;
 
@@ -147,8 +144,8 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
         {
             await Dispatcher.InvokeAsync(() =>
             {
-                MessageBox.Show(view, Resources.NoGen24Symo, Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error);
-                view.Close();
+                Show(Loc.NoGen24Symo, Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error);
+                Close();
             });
 
             return;
@@ -156,7 +153,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
 
         if (softwareVersions["DEVICEGROUP"] == new Version(1, 19, 7, 1))
         {
-            await Dispatcher.InvokeAsync(() => { MessageBox.Show(view, Resources.UtcBug, Resources.Warning, MessageBoxButton.OK, MessageBoxImage.Warning); });
+            Show(Loc.UtcBug, Loc.Warning, MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
         string jsonString;
@@ -169,14 +166,13 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
         {
             await Dispatcher.InvokeAsync(() =>
             {
-                MessageBox.Show
+                Show
                 (
-                    view, string.Format(Resources.InverterCommReadError, ex.Message),
+                    string.Format(Loc.InverterCommReadError, ex.Message),
                     ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error
                 );
 
-                view.Close();
-                mainWindow.Activate();
+                Close();
             });
 
             return;
@@ -190,18 +186,11 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
         }
         catch (Exception ex)
         {
-            await Dispatcher.InvokeAsync(() =>
-            {
-                MessageBox.Show
-                (
-                    view, string.Format(Resources.InverterCommReadError, ex.Message),
-                    ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error
-                );
-
-                view.Close();
-            });
-
-            return;
+            Show
+            (
+                string.Format(Loc.InverterCommReadError, ex.Message),
+                ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error
+            );
         }
 
         Undo();
@@ -277,8 +266,6 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
 
         try
         {
-            //var errors = view.FindVisualChildren<TextBox>().SelectMany(Validation.GetErrors).ToArray();
-
             foreach (var error in NotifiedValidationErrors)
             {
                 if
@@ -298,7 +285,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
             {
                 if (ChargingRules[i].StartTimeDate > ChargingRules[i].EndTimeDate)
                 {
-                    errorList.Add(string.Format(Resources.EndBeforeStart, ChargingRules[i]));
+                    errorList.Add(string.Format(Loc.EndBeforeStart, ChargingRules[i]));
                 }
 
                 if (i < ChargingRules.Count - 1)
@@ -307,7 +294,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
                     {
                         if (ChargingRules[i].ConflictsWith(ChargingRules[j]))
                         {
-                            errorList.Add(string.Format(Resources.ChargingRuleConflict, ChargingRules[i], ChargingRules[j]));
+                            errorList.Add(string.Format(Loc.ChargingRuleConflict, ChargingRules[i], ChargingRules[j]));
                         }
                     }
                 }
@@ -315,11 +302,10 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
 
             if (errorList.Count > 0)
             {
-                MessageBox.Show
+                Show
                 (
-                    view,
-                    $"{Resources.PleaseCorrectErrors}:{Environment.NewLine}{errorList.Aggregate(string.Empty, (c, n) => c + Environment.NewLine + "• " + n)}",
-                    Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error
+                    $"{Loc.PleaseCorrectErrors}:{Environment.NewLine}{errorList.Aggregate(string.Empty, (c, n) => c + Environment.NewLine + "• " + n)}",
+                    Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error
                 );
 
                 return;
@@ -355,7 +341,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
             oldSettings = Settings;
             oldChargingRules = ChargingRules;
             Undo();
-            ToastText = Resources.SettingsSavedToInverter;
+            ToastText = Loc.SettingsSavedToInverter;
         }
         finally
         {

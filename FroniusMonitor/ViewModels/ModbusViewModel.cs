@@ -3,9 +3,9 @@
 public class ModbusViewModel : SettingsViewModelBase
 {
     private Gen24ModbusSettings oldSettings = null!;
-    private ModbusView view = null!;
 
-    public ModbusViewModel(IDataCollectionService dataCollectionService, IWebClientService webClientService, IGen24JsonService gen24JsonService, IWattPilotService wattPilotService) : base(dataCollectionService, webClientService, gen24JsonService, wattPilotService) { }
+    public ModbusViewModel(IDataCollectionService dataCollectionService, IWebClientService webClientService, IGen24JsonService gen24JsonService, IWattPilotService wattPilotService)
+        : base(dataCollectionService, webClientService, gen24JsonService, wattPilotService) { }
 
     private Gen24ModbusSettings settings = null!;
 
@@ -55,8 +55,6 @@ public class ModbusViewModel : SettingsViewModelBase
     internal override async Task OnInitialize()
     {
         await base.OnInitialize().ConfigureAwait(false);
-        var mainWindow = IoC.Get<MainWindow>();
-        view = mainWindow.ModbusView;
 
         try
         {
@@ -64,17 +62,13 @@ public class ModbusViewModel : SettingsViewModelBase
         }
         catch (Exception ex)
         {
-            await Dispatcher.InvokeAsync(() =>
-            {
-                MessageBox.Show
-                (
-                    view, string.Format(Resources.InverterCommReadError, ex.Message),
-                    ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error
-                );
+            Show
+            (
+                string.Format(Resources.InverterCommReadError, ex.Message),
+                ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error
+            );
 
-                view.Close();
-                mainWindow.Activate();
-            });
+            Close();
 
             return;
         }
@@ -94,11 +88,11 @@ public class ModbusViewModel : SettingsViewModelBase
 
         try
         {
-            var errors = view.FindVisualChildren<TextBox>().SelectMany(Validation.GetErrors).ToArray();
+            var errors = View.FindVisualChildren<TextBox>().SelectMany(Validation.GetErrors).ToArray();
 
             foreach (var error in errors)
             {
-                if (error.BindingInError is BindingExpression {Target: FrameworkElement {IsVisible: false}} expression)
+                if (error.BindingInError is BindingExpression { Target: FrameworkElement { IsVisible: false } } expression)
                 {
                     var type = oldSettings.GetType();
                     var property = type.GetProperty(expression.ResolvedSourcePropertyName);
@@ -112,14 +106,13 @@ public class ModbusViewModel : SettingsViewModelBase
             }
 
             var errorList = errors
-                .Where(e => e.BindingInError is BindingExpression {Target: FrameworkElement {IsVisible: true}})
+                .Where(e => e.BindingInError is BindingExpression { Target: FrameworkElement { IsVisible: true } })
                 .Select(e => e.ErrorContent.ToString()).ToArray();
 
             if (errorList.Length > 0)
             {
-                MessageBox.Show
+                Show
                 (
-                    view,
                     $"{Resources.PleaseCorrectErrors}:{Environment.NewLine}{errorList.Aggregate(string.Empty, (c, n) => c + Environment.NewLine + "• " + n)}",
                     Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error
                 );

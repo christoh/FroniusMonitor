@@ -6,6 +6,7 @@ public partial class SettingsView
     {
         InitializeComponent();
         DataContext = viewModel;
+        viewModel.View = this;
 
         Loaded += async (_, _) =>
         {

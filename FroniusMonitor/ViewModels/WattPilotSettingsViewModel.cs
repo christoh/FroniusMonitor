@@ -5,13 +5,12 @@ public class WattPilotSettingsViewModel : ViewModelBase
     private readonly IDataCollectionService dataCollectionService;
     private readonly IWattPilotService wattPilotService;
     private WattPilot oldWattPilot = null!;
-    private readonly MainWindow mainWindow;
+    //private readonly MainWindow mainWindow;
 
-    public WattPilotSettingsViewModel(IDataCollectionService dataCollectionService, IWattPilotService wattPilotService, MainWindow mainWindow)
+    public WattPilotSettingsViewModel(IDataCollectionService dataCollectionService, IWattPilotService wattPilotService)
     {
         this.dataCollectionService = dataCollectionService;
         this.wattPilotService = wattPilotService;
-        this.mainWindow = mainWindow;
     }
 
     public static IReadOnlyList<CableLockBehavior> CableLockBehaviors { get; } = Enum.GetValues<CableLockBehavior>();
@@ -20,8 +19,6 @@ public class WattPilotSettingsViewModel : ViewModelBase
     public static IReadOnlyList<PhaseSwitchMode> PhaseSwitchModes { get; } = Enum.GetValues<PhaseSwitchMode>();
     public static IReadOnlyList<AwattarCountry> EnergyPriceCountries { get; } = Enum.GetValues<AwattarCountry>().OrderBy(c => c.ToDisplayName()).ToArray();
     public static IReadOnlyList<ForcedCharge> ForcedChargeList { get; } = Enum.GetValues<ForcedCharge>().OrderBy(c => c.ToDisplayName()).ToArray();
-
-    public WattPilotSettingsView View => mainWindow.WattPilotSettingsView;
 
     private WattPilot wattPilot = null!;
 
@@ -127,7 +124,7 @@ public class WattPilotSettingsViewModel : ViewModelBase
     public ICommand ApplyCommand => applyCommand ??= new NoParameterCommand(Apply);
 
     private ICommand? undoCommand;
-    public ICommand UndoCommand => undoCommand ??= new NoParameterCommand(()=>Undo());
+    public ICommand UndoCommand => undoCommand ??= new NoParameterCommand(() => Undo());
 
     private ICommand? navigateToApiCommand;
     public ICommand NavigateToApiCommand => navigateToApiCommand ??= new NoParameterCommand(NavigateToApi);
@@ -145,13 +142,8 @@ public class WattPilotSettingsViewModel : ViewModelBase
 
         if (localWattPilot == null)
         {
-            await Dispatcher.InvokeAsync(() =>
-            {
-                MessageBox.Show(Resources.NoWattPilot, Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error);
-                mainWindow.SettingsView.Close();
-                mainWindow.DataContext = null;
-            });
-
+            Show(Resources.NoWattPilot, Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error);
+            Close();
             return;
         }
 
@@ -212,9 +204,8 @@ public class WattPilotSettingsViewModel : ViewModelBase
 
             if (errors.Count > 0)
             {
-                MessageBox.Show
+                Show
                 (
-                    View,
                     $"{Resources.PleaseCorrectErrors}:{Environment.NewLine}{errors.Aggregate(string.Empty, (c, n) => c + Environment.NewLine + "• " + n)}",
                     Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error
                 );
@@ -257,6 +248,7 @@ public class WattPilotSettingsViewModel : ViewModelBase
 
             wattPilotService.BeginSendValues();
             var sentSomething = false;
+
             try
             {
                 errors = await wattPilotService.Send(WattPilot, oldWattPilot).ConfigureAwait(false);
@@ -266,22 +258,18 @@ public class WattPilotSettingsViewModel : ViewModelBase
                 {
                     var notWritten = "• " + string.Join(Environment.NewLine + "• ", errors);
 
-                    await Dispatcher.InvokeAsync(() =>
-                    {
-                        MessageBox.Show
-                        (
-                            mainWindow.WattPilotSettingsView,
-                            "The following settings were not written to the Wattpilot:" + Environment.NewLine + Environment.NewLine + notWritten,
-                            Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error
-                        );
-                    });
+                    Show
+                    (
+                        "The following settings were not written to the Wattpilot:" + Environment.NewLine + Environment.NewLine + notWritten,
+                        Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error
+                    );
                 }
             }
             catch (ArgumentException ex)
             {
                 sentSomething = false;
                 IsInUpdate = false;
-                Dispatcher.Invoke(() => MessageBox.Show(ex.Message, Resources.Warning, MessageBoxButton.OK, MessageBoxImage.Warning));
+                Show(ex.Message, Resources.Warning, MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             finally
             {
@@ -302,15 +290,11 @@ public class WattPilotSettingsViewModel : ViewModelBase
                     var notWritten = "• " + string.Join(Environment.NewLine + "• ", wattPilotService.UnsuccessfulWrites.Select(a => a.ToString()));
                     IsInUpdate = false;
 
-                    await Dispatcher.InvokeAsync(() =>
-                    {
-                        MessageBox.Show
-                        (
-                            mainWindow.WattPilotSettingsView,
-                            "The following settings were not confirmed by the Wattpilot:" + Environment.NewLine + Environment.NewLine + notWritten,
-                            Resources.Warning, MessageBoxButton.OK, MessageBoxImage.Warning
-                        );
-                    });
+                    Show
+                    (
+                        "The following settings were not confirmed by the Wattpilot:" + Environment.NewLine + Environment.NewLine + notWritten,
+                        Resources.Warning, MessageBoxButton.OK, MessageBoxImage.Warning
+                    );
                 }
             }
         }

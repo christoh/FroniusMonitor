@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
-public abstract class SettingsViewModelBase : ViewModelBase, IHaveWebClientService
+public abstract class SettingsViewModelBase : ViewModelBase
 {
     protected readonly IGen24JsonService Gen24Service;
     protected readonly IWattPilotService WattPilotService;
@@ -20,15 +20,9 @@ public abstract class SettingsViewModelBase : ViewModelBase, IHaveWebClientServi
         get => dataCollectionService;
         set => Set(ref dataCollectionService, value);
     }
-    
-    private IWebClientService webClientService = null!;
 
-    public IWebClientService WebClientService
-    {
-        get => webClientService;
-        set => Set(ref webClientService, value);
-    }
-    
+    public IWebClientService WebClientService { get; }
+
     private string toastText = string.Empty;
 
     public string ToastText
@@ -57,11 +51,11 @@ public abstract class SettingsViewModelBase : ViewModelBase, IHaveWebClientServi
         {
             IsInUpdate = false;
 
-            await Dispatcher.InvokeAsync(() => MessageBox.Show
+            Show
             (
-                string.Format(Resources.InverterCommError, ex.Message) + Environment.NewLine + Environment.NewLine + token,
+                string.Format(Loc.InverterCommError, ex.Message) + Environment.NewLine + Environment.NewLine + token,
                 ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error
-            ));
+            );
 
             return false;
         }
@@ -73,11 +67,11 @@ public abstract class SettingsViewModelBase : ViewModelBase, IHaveWebClientServi
 
         IsInUpdate = false;
 
-        await Dispatcher.InvokeAsync(() => MessageBox.Show
+        Show
         (
-            string.Format(Resources.InverterCommError, Resources.InvalidParameters) + Environment.NewLine + Environment.NewLine + token + Environment.NewLine + Environment.NewLine + result.Token,
-            Resources.InvalidParameters, MessageBoxButton.OK, MessageBoxImage.Error
-        ));
+            string.Format(Loc.InverterCommError, Loc.InvalidParameters) + Environment.NewLine + Environment.NewLine + token + Environment.NewLine + Environment.NewLine + result.Token,
+            Loc.InvalidParameters, MessageBoxButton.OK, MessageBoxImage.Error
+        );
 
         return false;
     }
@@ -85,6 +79,6 @@ public abstract class SettingsViewModelBase : ViewModelBase, IHaveWebClientServi
     protected void ShowNoSettingsChanged()
     {
         IsInUpdate = false;
-        Dispatcher.Invoke(() => MessageBox.Show(Resources.NoSettingsChanged, Resources.Warning, MessageBoxButton.OK, MessageBoxImage.Warning));
+        Show(Loc.NoSettingsChanged, Loc.Warning, MessageBoxButton.OK, MessageBoxImage.Warning);
     }
 }

@@ -3,7 +3,6 @@
 public class MainViewModel : ViewModelBase
 {
     private readonly IWebClientService webClientService;
-    public MainWindow View { get; internal set; } = null!;
 
     public MainViewModel(IDataCollectionService dataCollectionService, IWebClientService webClientService, IWattPilotService wattPilotService)
     {
@@ -24,7 +23,7 @@ public class MainViewModel : ViewModelBase
     public IDataCollectionService DataCollectionService { get; }
 
     public IWattPilotService WattPilotService { get; }
-
+    
     public bool IncludeInverterPower
     {
         get => App.Settings.AddInverterPowerToConsumption;
@@ -57,8 +56,7 @@ public class MainViewModel : ViewModelBase
         {
             await Dispatcher.InvokeAsync(() =>
             {
-                View.SettingsView.Show();
-                View.SettingsView.Activate();
+                IoC.Get<MainWindow>().GetView<SettingsView>().Focus();
             });
         }
     }

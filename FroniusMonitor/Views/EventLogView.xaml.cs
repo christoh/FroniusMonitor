@@ -1,11 +1,13 @@
 ﻿namespace De.Hochstaetter.FroniusMonitor.Views;
 
-public partial class EventLogView
+public partial class EventLogView : IInverterScoped
 {
-    public EventLogView(EventLogViewModel viewModel)
+    public EventLogView(EventLogViewModel viewModel, IWebClientService webClientService)
     {
         InitializeComponent();
         DataContext = viewModel;
+        viewModel.View = this;
+        WebClientService = webClientService;
 
         Loaded += async (_, _) =>
         {
@@ -15,4 +17,5 @@ public partial class EventLogView
     }
 
     public EventLogViewModel ViewModel => (EventLogViewModel)DataContext;
+    public IWebClientService WebClientService { get; }
 }
