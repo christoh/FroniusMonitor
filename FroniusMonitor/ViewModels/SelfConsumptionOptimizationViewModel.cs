@@ -41,6 +41,14 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
         });
     }
 
+    private string title = Loc.EnergyFlow;
+
+    public string Title
+    {
+        get => title;
+        set => Set(ref title, value);
+    }
+
     private double logGridPower;
 
     public double LogGridPower
@@ -136,64 +144,64 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     internal override async Task OnInitialize()
     {
-        await base.OnInitialize().ConfigureAwait(false);
-
-        var softwareVersions = DataCollectionService.HomeAutomationSystem?.Gen24Config?.Versions?.SwVersions;
-
-        if (softwareVersions == null || !softwareVersions.ContainsKey("DEVICEGROUP"))
-        {
-            await Dispatcher.InvokeAsync(() =>
-            {
-                ShowBox(Loc.NoGen24Symo, Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error);
-                Close();
-            });
-
-            return;
-        }
-
-        if (softwareVersions["DEVICEGROUP"] == new Version(1, 19, 7, 1))
-        {
-            ShowBox(Loc.UtcBug, Loc.Warning, MessageBoxButton.OK, MessageBoxImage.Warning);
-        }
-
-        string jsonString;
+        IsInUpdate = true;
 
         try
         {
-            jsonString = (await WebClientService.GetFroniusStringResponse("config/timeofuse").ConfigureAwait(false)).JsonString;
-        }
-        catch (Exception ex)
-        {
-            await Dispatcher.InvokeAsync(() =>
+            await base.OnInitialize().ConfigureAwait(false);
+            using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+
+            IDictionary<string, Version> softwareVersions;
+            JToken configToken;
+
+            try
             {
+                configToken = (await WebClientService.GetFroniusJsonResponse("config/", token: tokenSource.Token).ConfigureAwait(false)).Token;
+                softwareVersions = Gen24Versions.Parse((await WebClientService.GetFroniusJsonResponse("status/version", token: tokenSource.Token).ConfigureAwait(false)).Token).SwVersions;
+            }
+            catch (Exception ex)
+            {
+                IsInUpdate = false;
+
                 ShowBox
                 (
-                    string.Format(Loc.InverterCommReadError, ex.Message),
+                    string.Format(Loc.InverterCommReadError, ex is TaskCanceledException ? Loc.InverterTimeout : ex.Message),
                     ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error
                 );
 
                 Close();
-            });
+                return;
+            }
 
-            return;
+            var inverterSettings = Gen24InverterSettings.Parse(configToken);
+            oldSettings = Gen24Service.ReadFroniusData<Gen24BatterySettings>(configToken["batteries"]?["batteries"]);
+
+            if (!string.IsNullOrWhiteSpace(inverterSettings.SystemName))
+            {
+                Title = $"{Loc.EnergyFlow} - {inverterSettings.SystemName}";
+            }
+
+            if (!softwareVersions.ContainsKey("DEVICEGROUP"))
+            {
+                ShowBox(Loc.NoGen24Symo, Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error);
+                Close();
+                return;
+            }
+
+            if (softwareVersions["DEVICEGROUP"] == new Version(1, 19, 7, 1))
+            {
+                IsInUpdate = false;
+                ShowBox(Loc.UtcBug, Loc.Warning, MessageBoxButton.OK, MessageBoxImage.Warning);
+                IsInUpdate = true;
+            }
+
+            await Dispatcher.InvokeAsync(() => oldChargingRules = Gen24ChargingRule.Parse(configToken["timeofuse"]));
+            Undo();
         }
-
-        await Dispatcher.InvokeAsync(() => oldChargingRules = Gen24ChargingRule.Parse(jsonString));
-
-        try
+        finally
         {
-            oldSettings = await WebClientService.ReadGen24Entity<Gen24BatterySettings>("config/batteries").ConfigureAwait(false);
+            IsInUpdate = false;
         }
-        catch (Exception ex)
-        {
-            ShowBox
-            (
-                string.Format(Loc.InverterCommReadError, ex.Message),
-                ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error
-            );
-        }
-
-        Undo();
     }
 
     private void UpdateGridPower()

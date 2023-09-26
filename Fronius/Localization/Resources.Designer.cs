@@ -1231,6 +1231,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        public static string InverterTimeout {
+            get {
+                return ResourceManager.GetString("InverterTimeout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} is already running..
         /// </summary>
         public static string IsAlreadyRunning {

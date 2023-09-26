@@ -1191,4 +1191,7 @@
   <data name="HaveTwoInverters" xml:space="preserve">
 	  <value>I have a second Fronius Gen24</value>
   </data>
+  <data name="InverterTimeout" xml:space="preserve">
+	  <value>Reading from inverter timed out</value>
+  </data>
 </root>

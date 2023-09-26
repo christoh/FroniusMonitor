@@ -123,12 +123,11 @@ public class Gen24ChargingRule : BindableBase, ICloneable
     }
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    public static BindableCollection<Gen24ChargingRule> Parse(string json)
+    public static BindableCollection<Gen24ChargingRule> Parse(JToken? token)
     {
-        var token = JToken.Parse(json);
         var result = new BindableCollection<Gen24ChargingRule>();
 
-        if (token["timeofuse"] is not JArray array)
+        if (token?["timeofuse"] is not JArray array)
         {
             return result;
         }
