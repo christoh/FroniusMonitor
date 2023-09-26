@@ -1155,4 +1155,7 @@
   <data name="InverterTimeout" xml:space="preserve">
 	  <value>Zeitüberschreitung beim Lesen vom Wechselrichter</value>
   </data>
+  <data name="NetMask" xml:space="preserve">
+	  <value>Subnetzmaske</value>
+  </data>
 </root>

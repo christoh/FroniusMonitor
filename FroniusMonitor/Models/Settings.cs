@@ -22,13 +22,21 @@ public class Settings : SettingsBase
         set => Set(ref controllerGridRowHeight, value);
     }
 
+    private bool showRibbon;
+    [DefaultValue(false), XmlAttribute("ShowRibbon")]
+    public bool ShowRibbon
+    {
+        get => showRibbon;
+        set => Set(ref showRibbon, value);
+    }
+
     public static Task Save() => Save(App.SettingsFileName);
 
     public static async Task Save(string fileName) => await Task.Run(() =>
     {
         lock (settingsLockObject)
         {
-            UpdateChecksum(App.Settings.WattPilotConnection, App.Settings.FritzBoxConnection, App.Settings.FroniusConnection, App.Settings.ToshibaAcConnection);
+            UpdateChecksum(App.Settings.WattPilotConnection, App.Settings.FritzBoxConnection, App.Settings.FroniusConnection, App.Settings.FroniusConnection2, App.Settings.ToshibaAcConnection);
             var serializer = new XmlSerializer(typeof(Settings));
             Directory.CreateDirectory(App.PerUserDataDir);
             using var stream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None);

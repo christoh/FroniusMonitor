@@ -31,7 +31,7 @@ public enum SunspecMode
 }
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
-public class Gen24ModbusSettings : BindableBase, ICloneable
+public class Gen24ModbusSettings : Gen24ParsingBase, ICloneable
 {
     private static readonly IReadOnlyList<int> baudRates = new[] { 9600, 19200 };
 
@@ -180,10 +180,8 @@ public class Gen24ModbusSettings : BindableBase, ICloneable
         });
     }
 
-    public static Gen24ModbusSettings Parse(string json)
+    public static Gen24ModbusSettings Parse(JToken? token)
     {
-        var token = JToken.Parse(json);
-
         if (token == null)
         {
             throw new NullReferenceException("No Modbus config present");
@@ -288,5 +286,5 @@ public class Gen24ModbusSettings : BindableBase, ICloneable
 
     }
 
-    public object Clone() => MemberwiseClone();
+    public override object Clone() => MemberwiseClone();
 }

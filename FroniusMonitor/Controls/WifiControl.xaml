@@ -6,7 +6,7 @@
          xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
          mc:Ignorable="d"
          d:DesignHeight="452" d:DesignWidth="512">
-    <Canvas Height="452" Width="512" DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:WifiControl}}">
+    <Canvas Background="Transparent" Height="452" Width="512" DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:WifiControl}}">
         <Canvas.RenderTransform>
             <TranslateTransform Y="-30" />
         </Canvas.RenderTransform>

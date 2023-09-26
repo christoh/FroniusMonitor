@@ -166,6 +166,14 @@ namespace De.Hochstaetter.Fronius.Models.Charging
             set => Set(ref netMask, value);
         }
 
+        private IPAddress? gateway;
+        [WattPilot("gw")]
+        public IPAddress? Gateway
+        {
+            get => gateway;
+            set => Set(ref gateway, value);
+        }
+
         public string Type
         {
             get

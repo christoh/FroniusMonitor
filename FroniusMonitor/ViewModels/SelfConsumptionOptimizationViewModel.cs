@@ -194,8 +194,8 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
                 ShowBox(Loc.UtcBug, Loc.Warning, MessageBoxButton.OK, MessageBoxImage.Warning);
                 IsInUpdate = true;
             }
-
-            await Dispatcher.InvokeAsync(() => oldChargingRules = Gen24ChargingRule.Parse(configToken["timeofuse"]));
+            
+            oldChargingRules = Gen24ChargingRule.Parse(configToken["timeofuse"], Ctx);
             Undo();
         }
         finally

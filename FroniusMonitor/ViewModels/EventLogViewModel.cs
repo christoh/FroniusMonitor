@@ -17,9 +17,26 @@ public class EventLogViewModel : ViewModelBase
         set => Set(ref events, value);
     }
 
+    private string title = string.Empty;
+
+    public string Title
+    {
+        get => title;
+        set => Set(ref title, value);
+    }
+
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     internal override async Task OnInitialize()
     {
+        Title = await webClientService.GetUiString("EVENTLOG.TITLE").ConfigureAwait(false);
         await base.OnInitialize().ConfigureAwait(false);
+        var inverterBaseSettings = await webClientService.ReadGen24Entity<Gen24InverterSettings>("config/common").ConfigureAwait(false);
+
+        if (!string.IsNullOrWhiteSpace(inverterBaseSettings.SystemName))
+        {
+            Title += $" - {inverterBaseSettings.SystemName}";
+        }
+
         Events = await webClientService.GetFroniusEvents().ConfigureAwait(false);
     }
 }

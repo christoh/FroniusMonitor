@@ -147,6 +147,7 @@ public class SettingsViewModel : SettingsViewModelBase
     {
         Close();
         Settings.FroniusConnection!.BaseUrl = FixUrl(Settings.FroniusConnection!.BaseUrl);
+        Settings.FroniusConnection2!.BaseUrl = FixUrl(Settings.FroniusConnection2.BaseUrl);
         Settings.FritzBoxConnection!.BaseUrl = FixUrl(Settings.FritzBoxConnection!.BaseUrl);
         Settings.WattPilotConnection!.BaseUrl = FixUrl(Settings.WattPilotConnection!.BaseUrl, true);
 

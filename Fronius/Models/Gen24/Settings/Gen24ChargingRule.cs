@@ -123,9 +123,9 @@ public class Gen24ChargingRule : BindableBase, ICloneable
     }
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    public static BindableCollection<Gen24ChargingRule> Parse(JToken? token)
+    public static BindableCollection<Gen24ChargingRule> Parse(JToken? token, SynchronizationContext? ctx)
     {
-        var result = new BindableCollection<Gen24ChargingRule>();
+        var result = new BindableCollection<Gen24ChargingRule>(ctx);
 
         if (token?["timeofuse"] is not JArray array)
         {
@@ -133,7 +133,7 @@ public class Gen24ChargingRule : BindableBase, ICloneable
         }
 
         var gen24Service = IoC.Get<IGen24JsonService>();
-        result.AddRange(array.Select(timeOfUseToken => gen24Service.ReadFroniusData<Gen24ChargingRule>(timeOfUseToken)));
+        result.AddRange(array.Select(gen24Service.ReadFroniusData<Gen24ChargingRule>));
         return result;
     }
 

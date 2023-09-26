@@ -1194,4 +1194,7 @@
   <data name="InverterTimeout" xml:space="preserve">
 	  <value>Reading from inverter timed out</value>
   </data>
+  <data name="NetMask" xml:space="preserve">
+	  <value>Subnet mask</value>
+  </data>
 </root>

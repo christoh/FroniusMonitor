@@ -21,6 +21,14 @@ public class ModbusViewModel : SettingsViewModelBase
 
     public IReadOnlyList<SunspecMode> SunspecModes => Enum.GetValues<SunspecMode>();
 
+    private string title = Loc.Modbus;
+
+    public string Title
+    {
+        get => title;
+        set => Set(ref title, value);
+    }
+
     private bool enableTcp;
 
     public bool EnableTcp
@@ -54,25 +62,44 @@ public class ModbusViewModel : SettingsViewModelBase
 
     internal override async Task OnInitialize()
     {
-        await base.OnInitialize().ConfigureAwait(false);
-
         try
         {
-            oldSettings = Gen24ModbusSettings.Parse((await WebClientService.GetFroniusStringResponse("config/modbus").ConfigureAwait(false)).JsonString);
+            IsInUpdate = true;
+            await base.OnInitialize().ConfigureAwait(false);
+            using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            Gen24InverterSettings inverterSettings;
+
+            try
+            {
+                var configToken = (await WebClientService.GetFroniusJsonResponse("config/", token: tokenSource.Token).ConfigureAwait(false)).Token;
+                oldSettings = Gen24ModbusSettings.Parse(configToken["modbus"]);
+                inverterSettings = Gen24InverterSettings.Parse(configToken);
+            }
+            catch (Exception ex)
+            {
+                IsInUpdate = false;
+                
+                ShowBox
+                (
+                    string.Format(Resources.InverterCommReadError, ex is TaskCanceledException ? Loc.InverterTimeout : ex.Message),
+                    ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error
+                );
+
+                Close();
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(inverterSettings.SystemName))
+            {
+                Title += $" - {inverterSettings.SystemName}";
+            }
+
+            Undo();
         }
-        catch (Exception ex)
+        finally
         {
-            ShowBox
-            (
-                string.Format(Resources.InverterCommReadError, ex.Message),
-                ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error
-            );
-
-            Close();
-            return;
+            IsInUpdate=false;
         }
-
-        Undo();
     }
 
     private void Undo()

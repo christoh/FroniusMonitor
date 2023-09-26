@@ -54,6 +54,9 @@ public partial class MainWindow
             SetBinding(PowerFlowProperty, binding);
             binding = new Binding($"{nameof(ViewModel.DataCollectionService)}.{nameof(ViewModel.DataCollectionService.HomeAutomationSystem)}.{nameof(ViewModel.DataCollectionService.HomeAutomationSystem.Gen24Sensors2)}.{nameof(ViewModel.DataCollectionService.HomeAutomationSystem.Gen24Sensors2.PowerFlow)}");
             SetBinding(PowerFlow2Property, binding);
+            RibbonTransform.ScaleY = App.Settings.ShowRibbon ? 1 : 0;
+            RibbonExpander.IsChecked = App.Settings.ShowRibbon;
+            OnRibbonExpanderChanged();
             _ = ViewModel.OnInitialize();
         };
 
@@ -256,23 +259,24 @@ public partial class MainWindow
         GetView<WattPilotSettingsView>().Focus();
     }
 
-    private void OnRibbonExpanderChanged(object sender, RoutedEventArgs e)
+    private void OnRibbonExpanderChanged(object? sender = null, RoutedEventArgs? e = null)
     {
         if (RibbonExpander.IsChecked.HasValue && RibbonExpander.IsChecked.Value)
         {
-            rotateAnimation.From = 180;
-            rotateAnimation.To = 360;
+            rotateAnimation.To = 180;
             scaleAnimation.To = 1;
+            App.Settings.ShowRibbon = true;
         }
         else
         {
-            rotateAnimation.From = 360;
-            rotateAnimation.To = 180;
+            rotateAnimation.To = 0;
             scaleAnimation.To = 0;
+            App.Settings.ShowRibbon = false;
         }
 
         Chevron?.BeginAnimation(Chevron.AngleProperty, rotateAnimation);
         RibbonTransform?.BeginAnimation(ScaleTransform.ScaleYProperty, scaleAnimation);
+        Settings.Save();
     }
 
     private void OnShowAvmChanged(object sender, RoutedEventArgs e)

@@ -10,6 +10,7 @@ public abstract class ViewModelBase : BindableBase
     public Dispatcher Dispatcher { get; set; } = null!;
 
     private readonly ObservableCollection<ValidationError> notifiedValidationErrors = new();
+
     public ReadOnlyObservableCollection<ValidationError> NotifiedValidationErrors { get; }
 
     public bool HasNotifiedValidationErrors => NotifiedValidationErrors.Count > 0;
@@ -18,9 +19,23 @@ public abstract class ViewModelBase : BindableBase
 
     public bool HasVisibleNotifiedValidationErrors => VisibleNotifiedValidationErrors.Any();
 
+    protected SynchronizationContext Ctx { get; private set; } = null!;
+
     internal Window View { private get; set; } = null!;
 
-    internal virtual Task OnInitialize() => Task.CompletedTask;
+
+
+    internal virtual async Task OnInitialize()
+    {
+        if (SynchronizationContext.Current is null)
+        {
+            await Dispatcher.InvokeAsync(() => Ctx = SynchronizationContext.Current ?? throw new InvalidOperationException("No Ctx"));
+        }
+        else
+        {
+            Ctx = SynchronizationContext.Current;
+        }
+    }
 
     internal void HandleValidationErrorChange(ValidationErrorEventArgs e)
     {

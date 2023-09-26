@@ -1231,7 +1231,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Reading from inverter timed out.
         /// </summary>
         public static string InverterTimeout {
             get {
@@ -1875,6 +1875,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Name {
             get {
                 return ResourceManager.GetString("Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Subnet mask.
+        /// </summary>
+        public static string NetMask {
+            get {
+                return ResourceManager.GetString("NetMask", resourceCulture);
             }
         }
         

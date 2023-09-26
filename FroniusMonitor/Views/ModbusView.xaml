@@ -9,7 +9,7 @@
         xmlns:m="clr-namespace:De.Hochstaetter.Fronius.Models.Gen24.Settings;assembly=Fronius"
         xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
         mc:Ignorable="d"
-        Title="{x:Static p:Resources.ModbusSettings}" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize"
+        Title="{Binding Title}" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize"
         d:DataContext="{d:DesignInstance Type=vm:ModbusViewModel}">
     <Grid Margin="16">
         <Grid.Resources>
