@@ -138,7 +138,7 @@
                                         <TextBlock Text="{Binding NetMask, FallbackValue='---'}" HorizontalAlignment="Right" />
                                     </Viewbox>
 
-                                    <TextBlock Grid.Column="0" Grid.Row="10" Text="Gateway" />
+                                    <TextBlock Grid.Column="0" Grid.Row="10" Text="{x:Static p:Resources.Gateway}" />
                                     <Viewbox Grid.Column="1" Grid.Row="10">
                                         <TextBlock Text="{Binding Gateway, FallbackValue='---'}" HorizontalAlignment="Right" />
                                     </Viewbox>
@@ -215,10 +215,12 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <Grid.Resources>
                             <Style TargetType="TextBlock">
-                                <Setter Property="FontSize" Value="7"/>
+                                <Setter Property="FontSize" Value="6"/>
                             </Style>
                             <Style TargetType="Viewbox">
                                 <Setter Property="StretchDirection" Value="DownOnly"/>
@@ -245,7 +247,7 @@
                         <TextBlock Grid.Column="0" Grid.Row="4" Text="{x:Static p:Resources.Signal}"/>
                         <Viewbox Grid.Column="1" Grid.Row="4">
                             <TextBlock HorizontalAlignment="Right">
-                                <Run Text="{Binding WifiSignal, FallbackValue='---'}"/>
+                                <Run Text="{Binding CurrentWifi.WifiSignal, FallbackValue='---'}"/>
                                 <Run Text="dBm"></Run>
                             </TextBlock>
                         </Viewbox>
@@ -263,6 +265,21 @@
                         <TextBlock Grid.Column="0" Grid.Row="7" Text="{x:Static p:Resources.CipherG}"/>
                         <Viewbox Grid.Column="1" Grid.Row="7">
                             <TextBlock Text="{Binding CurrentWifi.GroupCipher, FallbackValue='---', Converter={co:ToUpper}}" HorizontalAlignment="Right"/>
+                        </Viewbox>
+
+                        <TextBlock Grid.Column="0" Grid.Row="8" Text="IPv4"/>
+                        <Viewbox Grid.Column="1" Grid.Row="8">
+                            <TextBlock Text="{Binding CurrentWifi.IpV4Address, FallbackValue='---'}" HorizontalAlignment="Right"/>
+                        </Viewbox>
+
+                        <TextBlock Grid.Column="0" Grid.Row="9" Text="{x:Static p:Resources.NetMask}"/>
+                        <Viewbox Grid.Column="1" Grid.Row="9">
+                            <TextBlock Text="{Binding CurrentWifi.NetMask, FallbackValue='---'}" HorizontalAlignment="Right"/>
+                        </Viewbox>
+
+                        <TextBlock Grid.Column="0" Grid.Row="10" Text="{x:Static p:Resources.Gateway}"/>
+                        <Viewbox Grid.Column="1" Grid.Row="10">
+                            <TextBlock Text="{Binding CurrentWifi.Gateway, FallbackValue='---'}" HorizontalAlignment="Right"/>
                         </Viewbox>
 
                     </Grid>

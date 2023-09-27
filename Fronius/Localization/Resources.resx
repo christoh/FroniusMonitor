@@ -1197,4 +1197,7 @@
   <data name="NetMask" xml:space="preserve">
 	  <value>Subnet mask</value>
   </data>
+  <data name="Gateway" xml:space="preserve">
+	  <value>Gateway</value>
+  </data>
 </root>

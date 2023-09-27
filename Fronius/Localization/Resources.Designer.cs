@@ -1015,6 +1015,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        public static string Gateway {
+            get {
+                return ResourceManager.GetString("Gateway", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Fronius Gen24 inverter.
         /// </summary>
         public static string Gen24InverterHeader {
