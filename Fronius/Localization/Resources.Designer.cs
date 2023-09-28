@@ -277,6 +277,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Average.
+        /// </summary>
+        public static string AverageShort {
+            get {
+                return ResourceManager.GetString("AverageShort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Awattar/Lumina country.
         /// </summary>
         public static string AwattarCountry {
@@ -3396,6 +3405,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string View {
             get {
                 return ResourceManager.GetString("View", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Visible.
+        /// </summary>
+        public static string Visible {
+            get {
+                return ResourceManager.GetString("Visible", resourceCulture);
             }
         }
         

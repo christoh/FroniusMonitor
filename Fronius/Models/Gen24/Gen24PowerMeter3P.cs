@@ -3,6 +3,9 @@
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public class Gen24PowerMeter3P : Gen24DeviceBase
 {
+    public DateTime ReceivedTime { get; set; } = DateTime.UtcNow;
+    public TimeSpan? Latency => ReceivedTime - DataTime;
+    
     private double? currentL1;
 
     [FroniusProprietaryImport("SMARTMETER_CURRENT_01_F64")]
@@ -62,22 +65,22 @@ public class Gen24PowerMeter3P : Gen24DeviceBase
         set => Set(ref energyRealAbsolutePlus, value);
     }
 
-    private double? energyRealConsumed;
+    private double? energyActiveConsumed;
 
     [FroniusProprietaryImport("SMARTMETER_ENERGYACTIVE_CONSUMED_SUM_F64")]
-    public double? EnergyRealConsumed
+    public double? EnergyActiveConsumed
     {
-        get => energyRealConsumed;
-        set => Set(ref energyRealConsumed, value);
+        get => energyActiveConsumed;
+        set => Set(ref energyActiveConsumed, value);
     }
 
-    private double? energyRealProduced;
+    private double? energyActiveProduced;
 
     [FroniusProprietaryImport("SMARTMETER_ENERGYACTIVE_PRODUCED_SUM_F64")]
-    public double? EnergyRealProduced
+    public double? EnergyActiveProduced
     {
-        get => energyRealProduced;
-        set => Set(ref energyRealProduced, value);
+        get => energyActiveProduced;
+        set => Set(ref energyActiveProduced, value);
     }
 
     private double? energyReactiveConsumed;

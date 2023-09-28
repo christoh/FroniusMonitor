@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Controls;
+﻿using System.Reflection;
+
+namespace De.Hochstaetter.FroniusMonitor.Controls;
 
 public enum MeterDisplayMode
 {
@@ -68,6 +70,17 @@ public partial class SmartMeterControl : IHaveLcdPanel
         set => SetValue(ModeProperty, value);
     }
 
+    public static readonly DependencyProperty MeterStatusProperty = DependencyProperty.Register
+    (
+        nameof(MeterStatus), typeof(Gen24Status), typeof(SmartMeterControl)
+    );
+
+    public Gen24Status? MeterStatus
+    {
+        get => (Gen24Status?)GetValue(MeterStatusProperty);
+        set => SetValue(MeterStatusProperty, value);
+    }
+
     #endregion
 
     public SmartMeterControl()
@@ -87,117 +100,14 @@ public partial class SmartMeterControl : IHaveLcdPanel
         Title.Text = $"{SmartMeter.Model} ({dataCollectionService?.HomeAutomationSystem?.Gen24Sensors?.MeterStatus?.StatusMessage ?? Loc.Unknown})";
         BackgroundProvider.Background = dataCollectionService?.HomeAutomationSystem?.Gen24Sensors?.MeterStatus?.ToBrush() ?? Brushes.LightGray;
 
-        switch (Mode)
+        Enum.GetNames<MeterDisplayMode>().Apply(enumName =>
         {
-            case MeterDisplayMode.PowerActive:
-                Lcd.Header = Loc.ActivePower;
-                Lcd.Value1 = $"{SmartMeter.ActivePowerL1:N1} W";
-                Lcd.Value2 = $"{SmartMeter.ActivePowerL2:N1} W";
-                Lcd.Value3 = $"{SmartMeter.ActivePowerL3:N1} W";
-                Lcd.ValueSum = $"{SmartMeter.ActivePowerSum:N1} W";
-                SetL123("Sum");
-                break;
-
-            case MeterDisplayMode.PowerApparent:
-                Lcd.Header = Loc.ApparentPower;
-                Lcd.Value1 = $"{SmartMeter.ApparentPowerL1:N1} VA";
-                Lcd.Value2 = $"{SmartMeter.ApparentPowerL2:N1} VA";
-                Lcd.Value3 = $"{SmartMeter.ApparentPowerL3:N1} VA";
-                Lcd.ValueSum = $"{SmartMeter.ApparentPowerSum:N1} VA";
-                SetL123("Sum");
-                break;
-
-            case MeterDisplayMode.PowerReactive:
-                Lcd.Header = Loc.ReactivePower;
-                Lcd.Value1 = $"{SmartMeter.ReactivePowerL1:N1} var";
-                Lcd.Value2 = $"{SmartMeter.ReactivePowerL2:N1} var";
-                Lcd.Value3 = $"{SmartMeter.ReactivePowerL3:N1} var";
-                Lcd.ValueSum = $"{SmartMeter.ReactivePowerSum:N1} var";
-                SetL123("Sum");
-                break;
-
-            case MeterDisplayMode.PowerFactor:
-                Lcd.Header = Loc.PowerFactor;
-                Lcd.Value1 = $"{SmartMeter.PowerFactorL1:N3}";
-                Lcd.Value2 = $"{SmartMeter.PowerFactorL2:N3}";
-                Lcd.Value3 = $"{SmartMeter.PowerFactorL3:N3}";
-                Lcd.ValueSum = $"{SmartMeter.PowerFactorTotal:N3}";
-                SetL123("Tot");
-                break;
-
-            case MeterDisplayMode.PhaseVoltage:
-                Lcd.Header = Loc.PhaseVoltage;
-                Lcd.Value1 = $"{SmartMeter.PhaseVoltageL1:N1} V";
-                Lcd.Value2 = $"{SmartMeter.PhaseVoltageL2:N1} V";
-                Lcd.Value3 = $"{SmartMeter.PhaseVoltageL3:N1} V";
-                Lcd.ValueSum = $"{SmartMeter.PhaseVoltageAverage:N1} V";
-                SetL123("Avg");
-                break;
-
-            case MeterDisplayMode.LineVoltage:
-                Lcd.Header = Loc.LineVoltage;
-                Lcd.Value1 = $"{SmartMeter.LineVoltageL12:N1} V";
-                Lcd.Value2 = $"{SmartMeter.LineVoltageL23:N1} V";
-                Lcd.Value3 = $"{SmartMeter.LineVoltageL31:N1} V";
-                Lcd.ValueSum = $"{SmartMeter.LineVoltageAverage:N1} V";
-                SetTwoPhases("Avg");
-                break;
-
-            case MeterDisplayMode.Current:
-                Lcd.Header = Loc.Current;
-                Lcd.Value1 = $"{SmartMeter.CurrentL1:N3} A";
-                Lcd.Value2 = $"{SmartMeter.CurrentL2:N3} A";
-                Lcd.Value3 = $"{SmartMeter.CurrentL3:N3} A";
-                Lcd.ValueSum = $"{SmartMeter.TotalCurrent:N3} A";
-                SetL123("Sum");
-                break;
-
-            case MeterDisplayMode.PowerOutOfBalance:
-                Lcd.Header = Loc.OutOfBalance;
-                Lcd.Value1 = $"{SmartMeter.OutOfBalancePowerL12:N1} W";
-                Lcd.Value2 = $"{SmartMeter.OutOfBalancePowerL23:N1} W";
-                Lcd.Value3 = $"{SmartMeter.OutOfBalancePowerL31:N1} W";
-                Lcd.ValueSum = $"{SmartMeter.OutOfBalancePowerMax:N1} W";
-                SetTwoPhases("Max");
-                break;
-
-            case MeterDisplayMode.More:
-                Lcd.Header = SmartMeter.SerialNumber;
-                Lcd.Value1 = $"{SmartMeter.Frequency:N1} Hz";
-                Lcd.Label1 = "Frq";
-                Lcd.Value2 = $"{SmartMeter.DataTime?.ToLocalTime():d}";
-                Lcd.Label2 = "Dat";
-                Lcd.Value3 = $"{SmartMeter.DataTime?.ToLocalTime():T}";
-                Lcd.Label3 = "Tim";
-                Lcd.ValueSum = $"{SmartMeter.IsVisible}";
-                Lcd.LabelSum = "Val";
-                break;
-
-            case MeterDisplayMode.MoreEnergy:
-                Lcd.Header = $"{Loc.Energy} (kWh)";
-                Lcd.Value1 = $"{SmartMeter.EnergyRealConsumed / 1000:N1}";
-                Lcd.Label1 = "CRl";
-                Lcd.Value2 = $"{SmartMeter.EnergyRealProduced / 1000:N1}";
-                Lcd.Label2 = "PRl";
-                Lcd.Value3 = $"{SmartMeter.EnergyReactiveConsumed / 1000:N1}";
-                Lcd.Label3 = "CRv";
-                Lcd.ValueSum = $"{SmartMeter.EnergyReactiveProduced / 1000:N1}";
-                Lcd.LabelSum = "PRv";
-                break;
-
-            case MeterDisplayMode.CurrentOutOfBalance:
-                Lcd.Header = Loc.OutOfBalance;
-                Lcd.Value1 = $"{SmartMeter.OutOfBalanceCurrentL12:N3} A";
-                Lcd.Value2 = $"{SmartMeter.OutOfBalanceCurrentL23:N3} A";
-                Lcd.Value3 = $"{SmartMeter.OutOfBalanceCurrentL31:N3} A";
-                Lcd.ValueSum = $"{SmartMeter.OutOfBalanceCurrentMax:N3} A";
-                SetTwoPhases("Max");
-                break;
-        }
+            if (GetType().GetField(enumName, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public)?.GetValue(this) is FrameworkElement element)
+            {
+                element.Visibility = Mode.ToString() == enumName ? Visibility.Visible : Visibility.Collapsed;
+            }
+        });
     });
-
-    private void SetL123(string sumText) => IHaveLcdPanel.SetL123(Lcd, sumText);
-    private void SetTwoPhases(string sumText) => IHaveLcdPanel.SetTwoPhases(Lcd, sumText);
 
     private void SetMode(IReadOnlyList<MeterDisplayMode> modeList, ref int index)
     {

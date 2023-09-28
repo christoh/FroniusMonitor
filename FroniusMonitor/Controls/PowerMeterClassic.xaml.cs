@@ -48,7 +48,7 @@ public partial class PowerMeterClassic
 
     private async void OnConsumedPowerCalibrated(object _, double value)
     {
-        if (SmartMeter is { EnergyRealConsumed: { } energyRealConsumed })
+        if (SmartMeter is { EnergyActiveConsumed: { } energyRealConsumed })
         {
             await IoC.Get<IDataCollectionService>().AddCalibrationHistoryItem(value - energyRealConsumed, double.NaN).ConfigureAwait(false);
             //await Settings.Save().ConfigureAwait(false);
@@ -57,7 +57,7 @@ public partial class PowerMeterClassic
 
     private async void OnProducedPowerCalibrated(object _, double value)
     {
-        if (SmartMeter is { EnergyRealProduced: { } energyRealProduced })
+        if (SmartMeter is { EnergyActiveProduced: { } energyRealProduced })
         {
             await IoC.Get<IDataCollectionService>().AddCalibrationHistoryItem(double.NaN, value - energyRealProduced).ConfigureAwait(false);
             //await Settings.Save().ConfigureAwait(false);
