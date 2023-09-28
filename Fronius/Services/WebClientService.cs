@@ -184,6 +184,11 @@ public class WebClientService : BindableBase, IWebClientService
 
     private async ValueTask<(JObject?, JObject?)> EnsureText(string baseUrl, JObject? l, JObject? i, CancellationToken token = default)
     {
+        while (InverterConnection?.BaseUrl == null)
+        {
+            await Task.Delay(TimeSpan.FromMilliseconds(100), token).ConfigureAwait(false);
+        }
+        
         try
         {
             if (i == null)

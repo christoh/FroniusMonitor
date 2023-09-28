@@ -749,6 +749,13 @@ public class PowerStatus2Brush : MultiConverterBase
     }
 }
 
+public class Gen24Status2PanelBrush:ConverterBase {
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is Gen24Status status ? status.ToPanelBrush() : Brushes.Gainsboro;
+    }
+}
+
 public class TypeToAnything<TTo> : ConverterBase
 {
     public Type? Type { get; set; }

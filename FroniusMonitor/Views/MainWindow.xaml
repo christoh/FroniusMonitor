@@ -104,10 +104,14 @@
                             <c:PowerFlowArrow VerticalAlignment="Top" Fill="#ffd000" Margin="15,0"
                                               Power="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors.Inverter.Solar2Power, FallbackValue={x:Null}}" />
                         </StackPanel>
-                        <c:InverterControl Height="200" Versions="{Binding DataCollectionService.HomeAutomationSystem.Gen24Config.Versions, FallbackValue={x:Null}}" />
+                        <c:InverterControl Height="200" Versions="{Binding DataCollectionService.HomeAutomationSystem.Gen24Config.Versions, FallbackValue={x:Null}}"
+                                           Sensors="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors, FallbackValue={x:Null}}"
+                                           Config="{Binding DataCollectionService.HomeAutomationSystem.Gen24Config, FallbackValue={x:Null}}"/>
                         <c:PowerFlowArrow VerticalAlignment="Top" Fill="#ffd000" HasRightPlacement="True" x:Name="LoadArrowPrimaryInverter" Margin="15,0"
                                           Power="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors.PowerFlow.LoadPower, FallbackValue={x:Null}}" />
-                        <c:InverterControl Height="200" Versions="{Binding DataCollectionService.HomeAutomationSystem.Gen24Config2.Versions, FallbackValue={x:Null}}" IsSecondary="True" />
+                        <c:InverterControl Height="200" Versions="{Binding DataCollectionService.HomeAutomationSystem.Gen24Config2.Versions, FallbackValue={x:Null}}" IsSecondary="True"
+                                           Sensors="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors2, FallbackValue={x:Null}}"
+                                           Config="{Binding DataCollectionService.HomeAutomationSystem.Gen24Config2, FallbackValue={x:Null}}"/>
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <StackPanel Orientation="Vertical">
@@ -169,26 +173,11 @@
                                 <ScaleTransform ScaleX="{Binding ScaleX, ElementName=WattPilotTransform}" ScaleY="{Binding ScaleY, ElementName=WattPilotTransform}" />
                             </Grid.LayoutTransform>
 
-                            <vi:Car Width="150" HorizontalAlignment="Right" Margin="0,0,0,10" VerticalAlignment="Bottom" Status="{Binding DataCollectionService.HomeAutomationSystem.WattPilot.CarStatus, FallbackValue={x:Null}}"/>
-
-                            <TextBlock Opacity="{Binding DataCollectionService.HomeAutomationSystem.WattPilot.CarStatus, Converter={co:CarStatus2Opacity}, FallbackValue=.5}"
-                                       FontSize="9" FontWeight="Medium" TextAlignment="Center" Margin="30,74,0,0"
-                                       Visibility="{Binding DataCollectionService.HomeAutomationSystem.WattPilot.EnergyCurrentSession, FallbackValue=Collapsed, Converter={co:NullToVisibility}}">
-                                <TextBlock.LayoutTransform>
-                                    <RotateTransform Angle="-1.2" />
-                                </TextBlock.LayoutTransform>
-                                <Run Text="{Binding DataCollectionService.HomeAutomationSystem.WattPilot.EnergyCurrentSession, FallbackValue='-',Mode=OneWay, StringFormat=N0, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" />
-                                <Run Text="Wh" />
-                            </TextBlock>
-
-                            <TextBlock Margin="50,55,0,0" TextAlignment="Center" FontSize="10" FontWeight="Medium" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left"
-                                       Text="{Binding DataCollectionService.HomeAutomationSystem.WattPilot.CurrentUser,FallbackValue=''}">
-                                <TextBlock.LayoutTransform>
-                                    <RotateTransform Angle="-1.2" />
-                                </TextBlock.LayoutTransform>
-                            </TextBlock>
+                            <vi:Car Width="150" HorizontalAlignment="Right" Margin="0,0,0,10" VerticalAlignment="Bottom"
+                                    Status="{Binding DataCollectionService.HomeAutomationSystem.WattPilot.CarStatus, FallbackValue={x:Null}}"
+                                    EnergyWatts="{Binding DataCollectionService.HomeAutomationSystem.WattPilot.EnergyCurrentSession, FallbackValue=0}"
+                                    CurrentUser="{Binding DataCollectionService.HomeAutomationSystem.WattPilot.CurrentUser, FallbackValue=''}"/>
                         </Grid>
-
 
                         <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="10,0,0,10">
                             <StackPanel.LayoutTransform>

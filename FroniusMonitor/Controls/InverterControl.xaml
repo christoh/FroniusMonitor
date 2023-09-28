@@ -1,85 +1,622 @@
 ﻿<UserControl x:Class="De.Hochstaetter.FroniusMonitor.Controls.InverterControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
-             xmlns:ddd="clr-namespace:System.Collections.Generic;assembly=System.Runtime"
-             xmlns:gen24="clr-namespace:De.Hochstaetter.Fronius.Models.Gen24;assembly=Fronius"
              xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
              xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
-             mc:Ignorable="d" 
+             xmlns:l="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Localization"
+             mc:Ignorable="d"
              d:DesignHeight="127" d:DesignWidth="110">
     <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:InverterControl}}">
         <Border BorderBrush="DimGray" BorderThickness="1" Width="110">
-            <Grid x:Name="BackgroundProvider" Background="LightGray" >
+            <Grid x:Name="BackgroundProvider" Background="LightGray">
                 <Grid.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="{x:Static p:Resources.Settings}" Icon="{vi:SettingsIcon}" Click="OnSettingsClicked"/>
-                        <MenuItem Header="{x:Static p:Resources.EnergyFlow}" Icon="{vi:EnergyFLow}" Click="OnEnergyFlowClicked"/>
-                        <MenuItem Header="{x:Static p:Resources.Modbus}" Icon="{vi:ModbusLogo}" Click="OnModbusClicked"/>
-                        <MenuItem Header="{x:Static p:Resources.EventLog}" Icon="{vi:EventLogIcon}" Click="OnEventLogClicked"/>
+                        <MenuItem Header="{x:Static p:Resources.Settings}" Icon="{vi:SettingsIcon}" Click="OnSettingsClicked" />
+                        <MenuItem Header="{x:Static p:Resources.EnergyFlow}" Icon="{vi:EnergyFLow}" Click="OnEnergyFlowClicked" />
+                        <MenuItem Header="{x:Static p:Resources.Modbus}" Icon="{vi:ModbusLogo}" Click="OnModbusClicked" />
+                        <MenuItem Header="{x:Static p:Resources.EventLog}" Icon="{vi:EventLogIcon}" Click="OnEventLogClicked" />
                     </ContextMenu>
                 </Grid.ContextMenu>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <Grid.Resources>
                     <Style TargetType="Viewbox">
-                        <Setter Property="StretchDirection" Value="DownOnly"/>
-                        <Setter Property="Margin" Value="4,0"/>
+                        <Setter Property="StretchDirection" Value="DownOnly" />
+                        <Setter Property="Margin" Value="4,0" />
                     </Style>
                     <Style TargetType="c:LcdDisplay">
-                        <Setter Property="Grid.Row" Value="2"/>
-                        <Setter Property="Width" Value="100"/>
-                        <Setter Property="Height" Value="85"/>
-                        <Setter Property="Margin" Value="4"/>
-                        <Setter Property="FontSize" Value="14"/>
-                        <Setter Property="FontFamily" Value="pack://application:,,,/Assets/Fonts/#Digital-7 Mono"/>
+                        <Setter Property="Grid.Row" Value="2" />
+                        <Setter Property="Width" Value="100" />
+                        <Setter Property="Height" Value="85" />
+                        <Setter Property="Margin" Value="4" />
+                        <Setter Property="FontSize" Value="14" />
+                        <Setter Property="FontFamily" Value="pack://application:,,,/Assets/Fonts/#Digital-7 Mono" />
                     </Style>
+
+                    <Style TargetType="c:LinearHorizontalGauge" x:Key="AcPowerGaugeStyle" BasedOn="{StaticResource InverterControlGaugeStyle}">
+                        <d:Style.DataContext>
+                            <x:Type Type="c:InverterControl" />
+                        </d:Style.DataContext>
+                        <Setter Property="Minimum" Value="0" />
+                        <Setter Property="Maximum" Value="{Binding Config.MaxAcPower, FallbackValue=3333.333333333, Converter={co:Multiply Factor=.33333333333333}}" />
+                        <Setter Property="VeryHigh" Value="{Binding Config.MaxAcPower, FallbackValue=3200, Converter={co:Multiply Factor=.32}}" />
+                        <Setter Property="High" Value="{Binding Config.MaxAcPower, FallbackValue=3000, Converter={co:Multiply Factor=.3}}" />
+                        <Setter Property="UnitSymbol" Value="W" />
+                        <Setter Property="StringFormat" Value="N0" />
+                    </Style>
+
+                    <Style TargetType="c:LinearHorizontalGauge" x:Key="AcEnergyGaugeStyle" BasedOn="{StaticResource InverterControlGaugeStyle}">
+                        <Setter Property="StringFormat" Value="N1" />
+                        <Setter Property="Minimum" Value="999999" />
+                        <Setter Property="Maximum" Value="1000000" />
+                    </Style>
+
                 </Grid.Resources>
                 <Viewbox Grid.Row="0">
-                    <TextBlock FontSize="8" TextAlignment="Center" x:Name="InverterName" Text="---"/>
+                    <TextBlock FontSize="8" TextAlignment="Center" x:Name="InverterName" Text="---" />
                 </Viewbox>
                 <Viewbox Grid.Row="1">
-                    <TextBlock FontSize="8" x:Name="InverterModelName" Text="---" TextAlignment="Center"/>
+                    <TextBlock FontSize="8" x:Name="InverterModelName" Text="---" TextAlignment="Center" />
                 </Viewbox>
 
-                <!-- ReSharper disable once Xaml.MissingGridIndex -->
-                <c:LcdDisplay Grid.Row="2" x:Name="Lcd"/>
-                <Border x:Name="VersionList" Grid.Row="2" Visibility="Collapsed" Width="100" Height="85" Margin="4" Background="#B3DBC6">
-                <Viewbox Grid.IsSharedSizeScope="True" StretchDirection="DownOnly">
-                <ItemsControl ItemsSource="{Binding Versions.SwVersions, FallbackValue={x:Null}}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" SharedSizeGroup="Key"/>
-                                    <ColumnDefinition Width="Auto" SharedSizeGroup="Value"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" HorizontalAlignment="Left" Margin="2,0,8,0" Text="{Binding Path=Key}" Foreground="#082A18"/>
-                                <TextBlock TextAlignment="Right" Grid.Column="1" Margin="8,0,2,0" Text="{Binding Path=Value, Converter={co:LinuxVersion}}" Foreground="#082A18"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-                </Viewbox>
+                <Border Grid.Row="2" Width="100" Height="85" Margin="4" Background="{Binding Sensors.InverterStatus, FallbackValue={x:Null}, Converter={co:Gen24Status2PanelBrush}}" BorderThickness=".2" BorderBrush="Black">
+                    <Grid>
+                        <Viewbox x:Name="MoreVersions" Visibility="Collapsed" Grid.IsSharedSizeScope="True" StretchDirection="DownOnly">
+                            <ItemsControl ItemsSource="{Binding Versions.SwVersions, FallbackValue={x:Null}}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" SharedSizeGroup="Key" />
+                                                <ColumnDefinition Width="Auto" SharedSizeGroup="Value" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" HorizontalAlignment="Left" Margin="2,0,8,0" Text="{Binding Path=Key}" Foreground="#082A18" />
+                                            <TextBlock TextAlignment="Right" Grid.Column="1" Margin="8,0,2,0" Text="{Binding Path=Value, Converter={co:LinuxVersion}}" Foreground="#082A18" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Viewbox>
+
+                        <Grid x:Name="AcPhaseVoltage" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource InverterControlGaugeStyle}">
+                                    <Setter Property="Minimum" Value="210" />
+                                    <Setter Property="Maximum" Value="250" />
+                                    <Setter Property="VeryHigh" Value="243" />
+                                    <Setter Property="VeryLow" Value="217" />
+                                    <Setter Property="High" Value="235" />
+                                    <Setter Property="Low" Value="225" />
+                                    <Setter Property="UnitSymbol" Value="V" />
+                                    <Setter Property="StringFormat" Value="N1" />
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.PhaseVoltage}" Margin="0,0,0,2" TextAlignment="Center" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge DisplayName="L1" Value="{Binding Sensors.Cache.InverterPhaseVoltageL1, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding Sensors.Cache.InverterPhaseVoltageL2, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding Sensors.Cache.InverterPhaseVoltageL3, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Average}" Value="{Binding Sensors.Cache.InverterPhaseVoltageAverage, FallbackValue={x:Null}}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="AcLineVoltage" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource InverterControlGaugeStyle}">
+                                    <Setter Property="Minimum" Value="380" />
+                                    <Setter Property="Maximum" Value="420" />
+                                    <Setter Property="VeryHigh" Value="415" />
+                                    <Setter Property="High" Value="407.5" />
+                                    <Setter Property="VeryLow" Value="375" />
+                                    <Setter Property="Low" Value="392.5" />
+                                    <Setter Property="UnitSymbol" Value="V" />
+                                    <Setter Property="StringFormat" Value="N1" />
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.LineVoltage}" Margin="0,0,0,2" TextAlignment="Center" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge DisplayName="L12" Value="{Binding Sensors.Cache.InverterLineVoltageL12, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L23" Value="{Binding Sensors.Cache.InverterLineVoltageL23, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L31" Value="{Binding Sensors.Cache.InverterLineVoltageL31, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Average}" Value="{Binding Sensors.Cache.InverterLineVoltageAverage, FallbackValue={x:Null}}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="AcPowerActive">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource AcPowerGaugeStyle}" />
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.ActivePower}" TextAlignment="Center" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge DisplayName="L1" Value="{Binding Sensors.Cache.InverterActivePowerL1, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding Sensors.Cache.InverterActivePowerL2, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding Sensors.Cache.InverterActivePowerL3, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Sum}" Value="{Binding Sensors.Cache.InverterActivePowerSum, FallbackValue={x:Null}}"
+                                                         Maximum="{Binding Config.MaxAcPower, FallbackValue=10000}"
+                                                         High="{Binding Config.MaxAcPower, FallbackValue=9000, Converter={co:Multiply Factor=.9}}"
+                                                         VeryHigh="{Binding Config.MaxAcPower, FallbackValue=9600, Converter={co:Multiply Factor=.96}}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="AcPowerApparent" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource AcPowerGaugeStyle}">
+                                    <Setter Property="UnitSymbol" Value="VA" />
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.ApparentPower}" TextAlignment="Center" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge DisplayName="L1" Value="{Binding Sensors.Cache.InverterApparentPowerL1, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding Sensors.Cache.InverterApparentPowerL2, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding Sensors.Cache.InverterApparentPowerL3, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Sum}" Value="{Binding Sensors.Cache.InverterApparentPowerSum, FallbackValue={x:Null}}"
+                                                         Maximum="{Binding Config.MaxAcPower, FallbackValue=10000}"
+                                                         High="{Binding Config.MaxAcPower, FallbackValue=9000, Converter={co:Multiply Factor=.9}}"
+                                                         VeryHigh="{Binding Config.MaxAcPower, FallbackValue=9600, Converter={co:Multiply Factor=.96}}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="AcPowerReactive" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource AcPowerGaugeStyle}">
+                                    <Setter Property="UnitSymbol" Value="var" />
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.ReactivePower}" TextAlignment="Center" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge DisplayName="L1" Value="{Binding Sensors.Cache.InverterReactivePowerL1, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding Sensors.Cache.InverterReactivePowerL2, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding Sensors.Cache.InverterReactivePowerL3, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Sum}" Value="{Binding Sensors.Cache.InverterReactivePowerSum, FallbackValue={x:Null}}"
+                                                         Maximum="{Binding Config.MaxAcPower, FallbackValue=10000}"
+                                                         High="{Binding Config.MaxAcPower, FallbackValue=9000, Converter={co:Multiply Factor=.9}}"
+                                                         VeryHigh="{Binding Config.MaxAcPower, FallbackValue=9600, Converter={co:Multiply Factor=.96}}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="AcPowerFactor" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource InverterControlGaugeStyle}">
+                                    <Setter Property="Minimum" Value="-1" />
+                                    <Setter Property="Maximum" Value="1" />
+                                    <Setter Property="VeryLow" Value=".95" />
+                                    <Setter Property="Low" Value=".98" />
+                                    <Setter Property="StringFormat" Value="N3" />
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Text="cos(φ)" Margin="0,0,0,2" TextAlignment="Center" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge DisplayName="L1" Value="{Binding Sensors.Cache.InverterPowerFactorL1, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding Sensors.Cache.InverterPowerFactorL2, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding Sensors.Cache.InverterPowerFactorL3, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Average}" Value="{Binding Sensors.Cache.InverterPowerFactorAverage, FallbackValue={x:Null}}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="AcCurrent" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource InverterControlGaugeStyle}">
+                                    <d:Style.DataContext>
+                                        <x:Type Type="c:InverterControl" />
+                                    </d:Style.DataContext>
+                                    <Setter Property="Minimum" Value="0" />
+                                    <Setter Property="Maximum" Value="{Binding Config.MaxAcPower, Converter={co:Multiply Factor=0.00144928}, FallbackValue=0}" />
+                                    <Setter Property="High" Value="{Binding Config.MaxAcPower, Converter={co:Multiply Factor=0.0012}, FallbackValue=0}" />
+                                    <Setter Property="VeryHigh" Value="{Binding Config.MaxAcPower, Converter={co:Multiply Factor=0.0014}, FallbackValue=0}" />
+                                    <Setter Property="StringFormat" Value="N3" />
+                                    <Setter Property="Low" Value="0.5" />
+                                    <Setter Property="UnitSymbol" Value="A" />
+                                    <Setter Property="VeryLow" Value="0.1" />
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.AcCurrent}" Margin="0,0,0,2" TextAlignment="Center" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge DisplayName="L1" Value="{Binding Sensors.Cache.InverterCurrentL1, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding Sensors.Cache.InverterCurrentL2, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding Sensors.Cache.InverterCurrentL3, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Sum}" Value="{Binding Sensors.Cache.InverterCurrentSum, FallbackValue={x:Null}}"
+                                                         Maximum="{Binding Config.MaxAcPower, Converter={co:Multiply Factor=0.00434783}, FallbackValue=0}"
+                                                         Low="1.5" VeryLow="0.3"
+                                                         High="{Binding Config.MaxAcPower, Converter={co:Multiply Factor=0.0036}, FallbackValue=0}"
+                                                         VeryHigh="{Binding Config.MaxAcPower, Converter={co:Multiply Factor=0.0042}, FallbackValue=0}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="DcPower" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource InverterControlGaugeStyle}">
+                                    <d:Style.DataContext>
+                                        <x:Type Type="c:InverterControl" />
+                                    </d:Style.DataContext>
+                                    <Setter Property="Minimum" Value="0" />
+                                    <Setter Property="UnitSymbol" Value="W" />
+                                    <Setter Property="StringFormat" Value="N0" />
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" x:Name="DcPowerHeadline" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+
+                                <c:LinearHorizontalGauge DisplayName="{l:Channel 'MPPT1'}" x:Name="DcPowerFirstGauge"
+                                                         Value="{Binding Sensors.Cache.Solar1Power, FallbackValue={x:Null}}"
+                                                         Maximum="{Binding Config.InverterSettings.Mppt.Mppt1.WattPeak, FallbackValue=5000}"
+                                                         VeryLow="{Binding Config.InverterSettings.Mppt.Mppt1.WattPeak, FallbackValue=250, Converter={co:Multiply Factor=.05}}"
+                                                         Low="{Binding Config.InverterSettings.Mppt.Mppt1.WattPeak, FallbackValue=500, Converter={co:Multiply Factor=.10}}"
+                                                         High="{Binding Config.InverterSettings.Mppt.Mppt1.WattPeak, FallbackValue=4500, Converter={co:Multiply Factor=.90}}"
+                                                         VeryHigh="{Binding Config.InverterSettings.Mppt.Mppt1.WattPeak, FallbackValue=4750, Converter={co:Multiply Factor=.95}}" />
+
+                                <c:LinearHorizontalGauge DisplayName="{l:Channel 'MPPT2'}" ShowPercent="{Binding ShowPercent, ElementName=DcPowerFirstGauge}"
+                                                         Value="{Binding Sensors.Cache.Solar2Power, FallbackValue={x:Null}}"
+                                                         Maximum="{Binding Config.InverterSettings.Mppt.Mppt2.WattPeak, FallbackValue=5000}"
+                                                         VeryLow="{Binding Config.InverterSettings.Mppt.Mppt2.WattPeak, FallbackValue=250, Converter={co:Multiply Factor=.05}}"
+                                                         Low="{Binding Config.InverterSettings.Mppt.Mppt2.WattPeak, FallbackValue=500, Converter={co:Multiply Factor=.10}}"
+                                                         High="{Binding Config.InverterSettings.Mppt.Mppt2.WattPeak, FallbackValue=4500, Converter={co:Multiply Factor=.90}}"
+                                                         VeryHigh="{Binding Config.InverterSettings.Mppt.Mppt2.WattPeak, FallbackValue=4750, Converter={co:Multiply Factor=.95}}" />
+
+                                <c:LinearHorizontalGauge x:Name="DcPowerAggregateGauge" ShowPercent="{Binding ShowPercent, ElementName=DcPowerFirstGauge}"
+                                                         Value="{Binding Sensors.Cache.SolarPowerSum, FallbackValue={x:Null}}"
+                                                         Maximum="{Binding Config.InverterSettings.Mppt.WattPeakTotal, FallbackValue=10000}"
+                                                         VeryLow="{Binding Config.InverterSettings.Mppt.WattPeakTotal, FallbackValue=500, Converter={co:Multiply Factor=.05}}"
+                                                         Low="{Binding Config.InverterSettings.Mppt.WattPeakTotal, FallbackValue=1000, Converter={co:Multiply Factor=.10}}"
+                                                         High="{Binding Config.InverterSettings.Mppt.WattPeakTotal, FallbackValue=9000, Converter={co:Multiply Factor=.90}}"
+                                                         VeryHigh="{Binding Config.InverterSettings.Mppt.WattPeakTotal, FallbackValue=9500, Converter={co:Multiply Factor=.95}}" />
+
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Battery}" ShowPercent="{Binding ShowPercent, ElementName=DcPowerFirstGauge}"
+                                                         Value="{Binding Sensors.Cache.StoragePower, FallbackValue={x:Null}}"
+                                                         Visibility="{Binding Sensors.Storage, FallbackValue=Collapsed, Converter={co:NullToVisibility}}"
+                                                         Minimum="0" Maximum="7000" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="DcVoltage" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource InverterControlGaugeStyle}">
+                                    <Setter Property="Minimum" Value="0" />
+                                    <Setter Property="Maximum" Value="800" />
+                                    <Setter Property="VeryHigh" Value="750" />
+                                    <Setter Property="High" Value="700" />
+                                    <Setter Property="VeryLow" Value="50" />
+                                    <Setter Property="Low" Value="100" />
+                                    <Setter Property="UnitSymbol" Value="V" />
+                                    <Setter Property="StringFormat" Value="N1" />
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.DcVoltage}" Margin="0,0,0,2" TextAlignment="Center" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge DisplayName="{l:Channel 'MPPT1'}" Value="{Binding Sensors.Cache.Solar1Voltage, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="{l:Channel 'MPPT2'}" Value="{Binding Sensors.Cache.Solar2Voltage, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="DC Link" Value="{Binding Sensors.Cache.DcLinkVoltage, FallbackValue={x:Null}}"
+                                                         Minimum="550" Maximum="660" Low="600" VeryLow="580" High="640" VeryHigh="650" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Battery}" Value="{Binding Sensors.Cache.StorageVoltageOuter, FallbackValue={x:Null}}"
+                                                         Minimum="230" Maximum="360" VeryLow="240" VeryHigh="350" High="340" Low="250" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="DcCurrent" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource InverterControlGaugeStyle}">
+                                    <Setter Property="Minimum" Value="0" />
+                                    <Setter Property="VeryLow" Value="0.25" />
+                                    <Setter Property="Low" Value="0.5" />
+                                    <Setter Property="UnitSymbol" Value="A" />
+                                    <Setter Property="StringFormat" Value="N3" />
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.DcCurrent}" Margin="0,0,0,2" TextAlignment="Center" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge DisplayName="{l:Channel 'MPPT1'}" Value="{Binding Sensors.Cache.Solar1Current, FallbackValue={x:Null}}"
+                                                         Maximum="25" High="20" VeryHigh="23" />
+                                <c:LinearHorizontalGauge DisplayName="{l:Channel 'MPPT2'}" Value="{Binding Sensors.Cache.Solar2Current, FallbackValue={x:Null}}"
+                                                         Maximum="12.5" High="10" VeryHigh="11.5" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Sum}" Value="{Binding Sensors.Cache.SolarCurrentSum, FallbackValue={x:Null}}"
+                                                         Maximum="37.5" High="30" VeryHigh="34.5" Low="1" VeryLow="0.5" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Battery}" Value="{Binding Sensors.Cache.StorageCurrent, FallbackValue={x:Null}}"
+                                                         Minimum="0" Maximum="22" VeryLow="-1" VeryHigh="21" High="19" Low="-1"
+                                                         Visibility="{Binding Sensors.Storage, FallbackValue=Collapsed, Converter={co:NullToVisibility}}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="MoreEfficiency" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource InverterControlGaugeStyle}">
+                                    <Setter Property="Minimum" Value="0" />
+                                    <Setter Property="UnitSymbol" Value="W" />
+                                    <Setter Property="ShowPercent" Value="True" />
+                                    <Setter Property="StringFormat" Value="N2" />
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.Efficiency}" Margin="0,0,0,2" TextAlignment="Center" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Loss}" x:Name="MoreEfficiencyLoss"
+                                                         Maximum="300" High="280" VeryHigh="290" ShowPercent="False" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Efficiency}" x:Name="MoreEfficiencyEfficiency"
+                                                         Maximum="1" Low=".9" VeryLow=".8" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.SelfConsumptionShort}" x:Name="MoreEfficiencySelfConsumption"
+                                                         Maximum="1" Low=".50" VeryLow=".25" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.SelfSufficiency}" x:Name="MoreEfficiencySelfSufficiency"
+                                                         Maximum="1" VeryLow=".5" Low=".75" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="More" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource InverterControlGaugeStyle}">
+                                    <Setter Property="Minimum" Value="45" />
+                                    <Setter Property="Maximum" Value="55" />
+                                    <Setter Property="UnitSymbol" Value="Hz" />
+                                    <Setter Property="StringFormat" Value="N3" />
+                                    <Setter Property="VeryLow" Value="49.7" />
+                                    <Setter Property="VeryHigh" Value="50.2" />
+                                    <Setter Property="Low" Value="49.98" />
+                                    <Setter Property="High" Value="50.02" />
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{Binding Sensors.DataManager.SerialNumber, FallbackValue={x:Null}}" Margin="0,0,0,2" TextAlignment="Center" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge DisplayName="Gen24" Value="{Binding Sensors.Cache.InverterFrequency, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Grid}" Value="{Binding Sensors.Cache.FeedInPointFrequency, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge Minimum="0" Maximum="5000" Low="0" VeryLow="0" High="2000" VeryHigh="4000"
+                                                         StringFormat="N0" UnitSymbol="ms" x:Name="MoreDelayGauge" DisplayName="{x:Static p:Resources.Latency}" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Time}" UnitSymbol="{x:Null}" Value="{Binding Sensors.Cache.DataTime, FallbackValue={x:Null}}" StringFormat="T" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="MoreTemperatures" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource InverterControlGaugeStyle}">
+                                    <Setter Property="Minimum" Value="15" />
+                                    <Setter Property="Maximum" Value="80" />
+                                    <Setter Property="UnitSymbol" Value="°C" />
+                                    <Setter Property="StringFormat" Value="N1" />
+                                    <Setter Property="VeryLow" Value="10" />
+                                    <Setter Property="VeryHigh" Value="60" />
+                                    <Setter Property="Low" Value="20" />
+                                    <Setter Property="High" Value="50" />
+                                    <Setter Property="UseAbsoluteValue" Value="False" />
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.Temperatures}" Margin="0,0,0,2" TextAlignment="Center" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Ambient}" High="65" VeryHigh="75" Value="{Binding Sensors.Cache.InverterAmbientTemperature, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.AcModule}" Value="{Binding Sensors.Cache.TemperatureInverterAcModule, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.DcModule}" Value="{Binding Sensors.Cache.TemperatureInverterDcModule, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.BatteryModule}" Value="{Binding Sensors.Cache.TemperatureInverterBatteryModule, FallbackValue={x:Null}}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="MoreFans" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource InverterControlGaugeStyle}">
+                                    <Setter Property="Minimum" Value="0" />
+                                    <Setter Property="Maximum" Value="1" />
+                                    <Setter Property="ShowPercent" Value="True" />
+                                    <Setter Property="DisplayName" Value="{x:Static p:Resources.Fan}" />
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.Misc}" Margin="0,0,0,2" TextAlignment="Center" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge SubDisplayName="1" Value="{Binding Sensors.Cache.Fan1RelativeRpm, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge SubDisplayName="2" Value="{Binding Sensors.Cache.Fan2RelativeRpm, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="Iso" Value="{Binding Sensors.Cache.IsolatorResistance, Converter={co:Multiply Factor=.000001}, FallbackValue=0}"
+                                                         Minimum="0" Maximum="100" StringFormat="N2" ShowPercent="False" VeryLow=".1" Low=".5" UnitSymbol="MΩ" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="MoreOp" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource InverterControlGaugeStyle}">
+                                    <Setter Property="StringFormat" Value="N3" />
+                                    <Setter Property="UnitSymbol" Value="D" />
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.OpTime}" Margin="0,0,0,2" TextAlignment="Center" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge DisplayName="Total" Value="{Binding Sensors.Cache.InverterUpTime.TotalDays, FallbackValue={x:Null}}" Maximum="1826.25" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.BackupOpTime}" Value="{Binding Sensors.Cache.BackupModeUpTime.TotalDays, FallbackValue={x:Null}}"
+                                                         Maximum="{Binding Sensors.Cache.InverterUpTime.TotalDays, FallbackValue=0}" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.BackupOpTime}" Value="{Binding Sensors.Cache.RelativeBackupModeUpTime, FallbackValue={x:Null}}"
+                                                         Minimum="0" Maximum="1" ShowPercent="True" High=".05" VeryHigh=".15" StringFormatForPercentage="N3" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="EnergySolar" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource AcEnergyGaugeStyle}" />
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Margin="0,0,0,2" TextAlignment="Center">
+                                <Run Text="{x:Static p:Resources.SolarPanels}" />
+                                <Run Text="(kWh)" />
+                            </TextBlock>
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge DisplayName="{l:Channel 'MPPT1'}" Value="{Binding Sensors.Cache.Solar1EnergyLifeTime, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
+                                <c:LinearHorizontalGauge DisplayName="{l:Channel 'MPPT2'}" Value="{Binding Sensors.Cache.Solar2EnergyLifeTime, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Sum}" Value="{Binding Sensors.Cache.SolarEnergyLifeTimeSum, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Efficiency}" Value="{Binding Sensors.Cache.InverterEfficiency, FallbackValue={x:Null}}"
+                                                         Minimum="0" Maximum="1" Low=".92" VeryLow=".90" ShowPercent="True" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="EnergyInverter" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource AcEnergyGaugeStyle}" />
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Margin="0,0,0,2" TextAlignment="Center">
+                                <Run Text="{x:Static p:Resources.Inverter}" />
+                                <Run Text="(kWh)" />
+                            </TextBlock>
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge DisplayName="L1" Value="{Binding Sensors.Cache.InverterEnergyProducedL1, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
+                                <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding Sensors.Cache.InverterEnergyProducedL2, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
+                                <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding Sensors.Cache.InverterEnergyProducedL3, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Sum}" Value="{Binding Sensors.Cache.InverterEnergyProducedSum, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="EnergyRectifier" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource AcEnergyGaugeStyle}" />
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Margin="0,0,0,2" TextAlignment="Center">
+                                <Run Text="{x:Static p:Resources.Rectifier}" />
+                                <Run Text="(kWh)" />
+                            </TextBlock>
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge DisplayName="L1" Value="{Binding Sensors.Cache.InverterEnergyConsumedL1, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
+                                <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding Sensors.Cache.InverterEnergyConsumedL2, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
+                                <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding Sensors.Cache.InverterEnergyConsumedL3, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Sum}" Value="{Binding Sensors.Cache.InverterEnergyConsumedSum, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="EnergyStorage" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource AcEnergyGaugeStyle}" />
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Margin="0,0,0,2" TextAlignment="Center">
+                                <Run Text="{x:Static p:Resources.Battery}" />
+                                <Run Text="(kWh)" />
+                            </TextBlock>
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge DisplayName="In" Value="{Binding Sensors.Cache.StorageLifeTimeEnergyCharged, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
+                                <c:LinearHorizontalGauge DisplayName="Out" Value="{Binding Sensors.Cache.StorageLifeTimeEnergyDischarged, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Efficiency}" Value="{Binding Sensors.Cache.StorageEfficiency, FallbackValue={x:Null}}"
+                                                         ShowPercent="True" Minimum="0" Maximum="1" Low=".92" VeryLow=".90" />
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
                 </Border>
 
                 <WrapPanel MaxWidth="110" Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
                     <WrapPanel.Resources>
-                        <Style TargetType="RadioButton" BasedOn="{StaticResource DeviceButton}"/>
+                        <Style TargetType="RadioButton" BasedOn="{StaticResource DeviceButton}" />
                     </WrapPanel.Resources>
-                    <RadioButton IsChecked="True" Content="AC" Click="OnAcClicked"/>
-                    <RadioButton Content="DC" Click="OnDcClicked"/>
-                    <RadioButton Content="{x:Static p:Resources.Energy}" Click="OnEnergyClicked"/>
-                    <RadioButton Content="{x:Static p:Resources.More}" Click="OnMoreClicked"/>
-                    <ToggleButton Margin="3,0,0,0" x:Name="StandByButton" Content="Status" Height="6" Click="OnStandByClicked"/>
+                    <RadioButton IsChecked="True" Content="AC" Click="OnAcClicked" />
+                    <RadioButton Content="DC" Click="OnDcClicked" />
+                    <RadioButton Content="{x:Static p:Resources.Energy}" Click="OnEnergyClicked" />
+                    <RadioButton Content="{x:Static p:Resources.More}" Click="OnMoreClicked" />
+                    <ToggleButton Margin="3,0,0,0" x:Name="StandByButton" Content="Status" Height="6" Click="OnStandByClicked" />
                 </WrapPanel>
             </Grid>
         </Border>

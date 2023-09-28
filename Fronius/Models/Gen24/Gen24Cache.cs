@@ -88,6 +88,8 @@ public class Gen24Cache : Gen24DeviceBase
         set => Set(ref inverterEnergyProducedL3, value, () => NotifyOfPropertyChange(nameof(InverterEnergyProducedSum)));
     }
 
+    public double? InverterEfficiency => (InverterEnergyProducedSum - InverterEnergyConsumedSum) / SolarEnergyLifeTimeSum;
+
     public double? InverterEnergyProducedSum => InverterEnergyProducedL1 + InverterEnergyProducedL2 + InverterEnergyProducedL3;
 
     private double? inverterFrequency;
@@ -218,8 +220,10 @@ public class Gen24Cache : Gen24DeviceBase
     public TimeSpan BackupModeUpTime
     {
         get => backupModeUpTime;
-        set => Set(ref backupModeUpTime, value);
+        set => Set(ref backupModeUpTime, value, () => NotifyOfPropertyChange(nameof(RelativeBackupModeUpTime)));
     }
+
+    public double? RelativeBackupModeUpTime => BackupModeUpTime / InverterUpTime;
 
     private double? inverterPhaseVoltageL1;
 
@@ -366,7 +370,7 @@ public class Gen24Cache : Gen24DeviceBase
     public TimeSpan? InverterUpTime
     {
         get => inverterUpTime;
-        set => Set(ref inverterUpTime, value);
+        set => Set(ref inverterUpTime, value, () => NotifyOfPropertyChange(nameof(RelativeBackupModeUpTime)));
     }
 
     private double? inverterSafetyExtraLowVoltage;
@@ -480,31 +484,31 @@ public class Gen24Cache : Gen24DeviceBase
         set => Set(ref isolatorResistance, value);
     }
 
-    private double? temperatureInverterModule1;
+    private double? temperatureInverterAcModule;
 
     [FroniusProprietaryImport("MODULE_TEMPERATURE_MEAN_01_F32")]
-    public double? TemperatureInverterModule1
+    public double? TemperatureInverterAcModule
     {
-        get => temperatureInverterModule1;
-        set => Set(ref temperatureInverterModule1, value);
+        get => temperatureInverterAcModule;
+        set => Set(ref temperatureInverterAcModule, value);
     }
 
-    private double? temperatureInverterModule3;
+    private double? temperatureInverterDcModule;
 
     [FroniusProprietaryImport("MODULE_TEMPERATURE_MEAN_03_F32")]
-    public double? TemperatureInverterModule3
+    public double? TemperatureInverterDcModule
     {
-        get => temperatureInverterModule3;
-        set => Set(ref temperatureInverterModule3, value);
+        get => temperatureInverterDcModule;
+        set => Set(ref temperatureInverterDcModule, value);
     }
 
-    private double? temperatureInverterModule4;
+    private double? temperatureInverterBatteryModule;
 
     [FroniusProprietaryImport("MODULE_TEMPERATURE_MEAN_04_F32")]
-    public double? TemperatureInverterModule4
+    public double? TemperatureInverterBatteryModule
     {
-        get => temperatureInverterModule4;
-        set => Set(ref temperatureInverterModule4, value);
+        get => temperatureInverterBatteryModule;
+        set => Set(ref temperatureInverterBatteryModule, value);
     }
 
     private double? solar1Current;

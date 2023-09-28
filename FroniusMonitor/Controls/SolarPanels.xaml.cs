@@ -11,7 +11,7 @@ public partial class SolarPanels
     public static readonly DependencyProperty TrackerProperty = DependencyProperty.Register
     (
         nameof(Tracker), typeof(Tracker), typeof(SolarPanels),
-        new PropertyMetadata((d, e) => ((SolarPanels)d).OnTrackerChanged())
+        new PropertyMetadata((d, _) => ((SolarPanels)d).OnTrackerChanged())
     );
 
     public Tracker Tracker

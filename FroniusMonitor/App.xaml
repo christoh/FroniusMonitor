@@ -17,9 +17,9 @@
                 <Setter.Value>
                     <DataTemplate>
                         <Grid>
-                            <TextBox Visibility="{TemplateBinding Content, Converter={co:TypeToVisibility Type={x:Type sys:String}, Equal=Visible, NotEqual=Collapsed}}" IsReadOnly="True" Background="Transparent" HorizontalAlignment="Stretch" TextWrapping="Wrap" BorderThickness="0" BorderBrush="Transparent" 
-                                 Text="{TemplateBinding Content}" MaxWidth="300" />
-                            <ContentPresenter Content="{TemplateBinding Content}" Visibility="{TemplateBinding Content, Converter={co:TypeToVisibility Type={x:Type sys:String}, Equal=Collapsed, NotEqual=Visible}}"/>
+                            <TextBox Visibility="{TemplateBinding Content, Converter={co:TypeToVisibility Type={x:Type sys:String}, Equal=Visible, NotEqual=Collapsed}}" IsReadOnly="True" Background="Transparent" HorizontalAlignment="Stretch" TextWrapping="Wrap" BorderThickness="0" BorderBrush="Transparent"
+                                     Text="{TemplateBinding Content}" MaxWidth="300" />
+                            <ContentPresenter Content="{TemplateBinding Content}" Visibility="{TemplateBinding Content, Converter={co:TypeToVisibility Type={x:Type sys:String}, Equal=Collapsed, NotEqual=Visible}}" />
                         </Grid>
                     </DataTemplate>
                 </Setter.Value>
@@ -561,6 +561,14 @@
                     <ScaleTransform ScaleX=".6" ScaleY="{Binding ScaleX, RelativeSource={RelativeSource Self}}" />
                 </Setter.Value>
             </Setter>
+        </Style>
+
+        <Style TargetType="c:LinearHorizontalGauge" x:Key="InverterControlGaugeStyle">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontFamily" Value="Calibri"/>
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="ProgressBarHeight" Value="14" />
+            <Setter Property="Margin" Value="3,1" />
         </Style>
 
     </Application.Resources>

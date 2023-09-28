@@ -48,6 +48,8 @@ public class Gen24Mppt : BindableBase, ICloneable
         set => Set(ref mppt2, value);
     }
 
+    public double? WattPeakTotal => Mppt1?.WattPeak + Mppt2?.WattPeak;
+
     public object Clone()
     {
         return new Gen24Mppt

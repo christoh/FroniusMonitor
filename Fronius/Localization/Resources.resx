@@ -289,7 +289,7 @@
     <value>AC voltage</value>
   </data>
   <data name="DcPower" xml:space="preserve">
-    <value>DC power</value>
+	  <value>DC Power</value>
   </data>
   <data name="DcCurrent" xml:space="preserve">
     <value>DC current</value>
@@ -1180,7 +1180,7 @@
 	  <value>Are you sure you want to set this inverter to standy?</value>
   </data>
   <data name="DcRelativePower" xml:space="preserve">
-	  <value>DC power %</value>
+	  <value>DC Power %</value>
   </data>
   <data name="InverterSettings" xml:space="preserve">
 	  <value>Inverter Settings</value>
@@ -1199,5 +1199,62 @@
   </data>
   <data name="Gateway" xml:space="preserve">
 	  <value>Gateway</value>
+  </data>
+  <data name="Average" xml:space="preserve">
+	  <value>Average</value>
+  </data>
+  <data name="Sum" xml:space="preserve">
+	  <value>Sum</value>
+  </data>
+  <data name="Battery" xml:space="preserve">
+	  <value>Battery</value>
+  </data>
+  <data name="Total" xml:space="preserve">
+	  <value>Total</value>
+  </data>
+  <data name="Site" xml:space="preserve">
+	  <value>Site</value>
+  </data>
+  <data name="Loss" xml:space="preserve">
+	  <value>Loss</value>
+  </data>
+  <data name="SelfSufficiency" xml:space="preserve">
+	  <value>Autarchy</value>
+  </data>
+  <data name="Grid" xml:space="preserve">
+	  <value>Grid</value>
+  </data>
+  <data name="Date" xml:space="preserve">
+	  <value>Date</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+	  <value>Time</value>
+  </data>
+  <data name="SelfConsumptionShort" xml:space="preserve">
+	  <value>Self use</value>
+  </data>
+  <data name="Latency" xml:space="preserve">
+	  <value>Latency</value>
+  </data>
+  <data name="Ambient" xml:space="preserve">
+	  <value>Ambient</value>
+  </data>
+  <data name="AcModule" xml:space="preserve">
+	  <value>AC module</value>
+  </data>
+  <data name="DcModule" xml:space="preserve">
+	  <value>DC module</value>
+  </data>
+  <data name="BatteryModule" xml:space="preserve">
+	  <value>Batt. mod.</value>
+  </data>
+  <data name="Fan" xml:space="preserve">
+	  <value>Fan</value>
+  </data>
+  <data name="BackupOpTime" xml:space="preserve">
+	  <value>Backup</value>
+  </data>
+  <data name="Rectifier" xml:space="preserve">
+	  <value>Rectifier</value>
   </data>
 </root>

@@ -23,4 +23,15 @@ public static class StatusColor
             _ => Brushes.LightGray,
         };
     }
+
+    public static SolidColorBrush ToPanelBrush(this Gen24Status status)
+    {
+        return status.StatusCode switch
+        {
+            "STATE_ERROR" => Brushes.OrangeRed,
+            "STATE_RUNNING" => Brushes.Cornsilk,
+            "STATE_WARNING" => Brushes.Yellow,
+            _ => Brushes.Gainsboro,
+        };
+    }
 }

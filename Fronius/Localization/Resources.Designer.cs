@@ -97,6 +97,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to AC module.
+        /// </summary>
+        public static string AcModule {
+            get {
+                return ResourceManager.GetString("AcModule", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to AC phase voltage.
         /// </summary>
         public static string AcPhaseVoltage {
@@ -187,6 +196,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ambient.
+        /// </summary>
+        public static string Ambient {
+            get {
+                return ResourceManager.GetString("Ambient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to API key.
         /// </summary>
         public static string ApiKey {
@@ -250,6 +268,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Average.
+        /// </summary>
+        public static string Average {
+            get {
+                return ResourceManager.GetString("Average", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Awattar/Lumina country.
         /// </summary>
         public static string AwattarCountry {
@@ -295,11 +322,29 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Backup.
+        /// </summary>
+        public static string BackupOpTime {
+            get {
+                return ResourceManager.GetString("BackupOpTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Base Settings.
         /// </summary>
         public static string BaseSettings {
             get {
                 return ResourceManager.GetString("BaseSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Battery.
+        /// </summary>
+        public static string Battery {
+            get {
+                return ResourceManager.GetString("Battery", resourceCulture);
             }
         }
         
@@ -327,6 +372,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string BatteryIsAcCoupled {
             get {
                 return ResourceManager.GetString("BatteryIsAcCoupled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Batt. mod..
+        /// </summary>
+        public static string BatteryModule {
+            get {
+                return ResourceManager.GetString("BatteryModule", resourceCulture);
             }
         }
         
@@ -628,6 +682,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Date.
+        /// </summary>
+        public static string Date {
+            get {
+                return ResourceManager.GetString("Date", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to DC current.
         /// </summary>
         public static string DcCurrent {
@@ -637,7 +700,16 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DC power.
+        ///   Looks up a localized string similar to DC module.
+        /// </summary>
+        public static string DcModule {
+            get {
+                return ResourceManager.GetString("DcModule", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DC Power.
         /// </summary>
         public static string DcPower {
             get {
@@ -646,7 +718,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DC power %.
+        ///   Looks up a localized string similar to DC Power %.
         /// </summary>
         public static string DcRelativePower {
             get {
@@ -934,6 +1006,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Fan.
+        /// </summary>
+        public static string Fan {
+            get {
+                return ResourceManager.GetString("Fan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Fans.
         /// </summary>
         public static string Fans {
@@ -1015,7 +1096,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Gateway.
         /// </summary>
         public static string Gateway {
             get {
@@ -1029,6 +1110,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Gen24InverterHeader {
             get {
                 return ResourceManager.GetString("Gen24InverterHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Grid.
+        /// </summary>
+        public static string Grid {
+            get {
+                return ResourceManager.GetString("Grid", resourceCulture);
             }
         }
         
@@ -1285,6 +1375,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Latency.
+        /// </summary>
+        public static string Latency {
+            get {
+                return ResourceManager.GetString("Latency", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Line voltage.
         /// </summary>
         public static string LineVoltage {
@@ -1317,6 +1416,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string LoadSettings {
             get {
                 return ResourceManager.GetString("LoadSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loss.
+        /// </summary>
+        public static string Loss {
+            get {
+                return ResourceManager.GetString("Loss", resourceCulture);
             }
         }
         
@@ -2374,6 +2482,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Rectifier.
+        /// </summary>
+        public static string Rectifier {
+            get {
+                return ResourceManager.GetString("Rectifier", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Require RFID card to charge.
         /// </summary>
         public static string RequireRfidAuth {
@@ -2509,6 +2626,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Self use.
+        /// </summary>
+        public static string SelfConsumptionShort {
+            get {
+                return ResourceManager.GetString("SelfConsumptionShort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Autarchy.
+        /// </summary>
+        public static string SelfSufficiency {
+            get {
+                return ResourceManager.GetString("SelfSufficiency", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sensor.
         /// </summary>
         public static string SensorCard {
@@ -2595,6 +2730,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string SimulateUnplugging {
             get {
                 return ResourceManager.GetString("SimulateUnplugging", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Site.
+        /// </summary>
+        public static string Site {
+            get {
+                return ResourceManager.GetString("Site", resourceCulture);
             }
         }
         
@@ -2914,6 +3058,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sum.
+        /// </summary>
+        public static string Sum {
+            get {
+                return ResourceManager.GetString("Sum", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to S.
         /// </summary>
         public static string Sunday_One {
@@ -3022,6 +3175,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Time.
+        /// </summary>
+        public static string Time {
+            get {
+                return ResourceManager.GetString("Time", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Toshiba HVACs.
         /// </summary>
         public static string ToshibaAcHeader {
@@ -3045,6 +3207,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string ToshibaHvacUrlTooltip {
             get {
                 return ResourceManager.GetString("ToshibaHvacUrlTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Total.
+        /// </summary>
+        public static string Total {
+            get {
+                return ResourceManager.GetString("Total", resourceCulture);
             }
         }
         

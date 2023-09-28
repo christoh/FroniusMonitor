@@ -1,10 +1,8 @@
-﻿using System.Windows.Shapes;
-
-namespace De.Hochstaetter.FroniusMonitor.Assets.Images;
+﻿namespace De.Hochstaetter.FroniusMonitor.Assets.Images;
 
 public partial class Car
 {
-    private readonly ColorAnimation animation=new(Colors.Transparent,Colors.Transparent,TimeSpan.FromSeconds(2)){AutoReverse = true, RepeatBehavior = RepeatBehavior.Forever, AccelerationRatio = .25, DecelerationRatio = .25};
+    private readonly ColorAnimation animation = new(Colors.Transparent, Colors.Transparent, TimeSpan.FromSeconds(2)) { AutoReverse = true, RepeatBehavior = RepeatBehavior.Forever, AccelerationRatio = .25, DecelerationRatio = .25 };
 
     public static readonly DependencyProperty StatusProperty = DependencyProperty.Register
     (
@@ -16,6 +14,30 @@ public partial class Car
     {
         get => (CarStatus?)GetValue(StatusProperty);
         set => SetValue(StatusProperty, value);
+    }
+
+    public static readonly DependencyProperty EnergyWattsProperty = DependencyProperty.Register
+    (
+        nameof(EnergyWatts), typeof(double), typeof(Car),
+        new PropertyMetadata(0d)
+    );
+
+    public double EnergyWatts
+    {
+        get => (double)GetValue(EnergyWattsProperty);
+        set => SetValue(EnergyWattsProperty, value);
+    }
+
+    public static readonly DependencyProperty CurrentUserProperty = DependencyProperty.Register
+    (
+        nameof(CurrentUser), typeof(string), typeof(Car),
+        new PropertyMetadata(string.Empty)
+    );
+
+    public string? CurrentUser
+    {
+        get => (string?)GetValue(CurrentUserProperty);
+        set => SetValue(CurrentUserProperty, value);
     }
 
     public Car()
@@ -58,10 +80,10 @@ public partial class Car
                 break;
         }
 
-        var brush = new SolidColorBrush(animation.From??Colors.Transparent);
+        var brush = new SolidColorBrush(animation.From ?? Colors.Transparent);
 
         CarShape.Fill = brush;
-        CarShape.Fill.BeginAnimation(SolidColorBrush.ColorProperty,animation);
+        CarShape.Fill.BeginAnimation(SolidColorBrush.ColorProperty, animation);
     }
 }
 

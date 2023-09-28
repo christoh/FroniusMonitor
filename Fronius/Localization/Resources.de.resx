@@ -1158,4 +1158,61 @@
   <data name="NetMask" xml:space="preserve">
 	  <value>Subnetzmaske</value>
   </data>
+  <data name="Average" xml:space="preserve">
+	  <value>Durchschnitt</value>
+  </data>
+  <data name="Sum" xml:space="preserve">
+	  <value>Summe</value>
+  </data>
+  <data name="Battery" xml:space="preserve">
+	  <value>Batterie</value>
+  </data>
+  <data name="Total" xml:space="preserve">
+	  <value>Gesamt</value>
+  </data>
+  <data name="Site" xml:space="preserve">
+	  <value>PV-System</value>
+  </data>
+  <data name="Loss" xml:space="preserve">
+	  <value>Verlust</value>
+  </data>
+  <data name="SelfSufficiency" xml:space="preserve">
+	  <value>Autarkie</value>
+  </data>
+  <data name="Grid" xml:space="preserve">
+	  <value>Netz</value>
+  </data>
+  <data name="Date" xml:space="preserve">
+	  <value>Datum</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+	  <value>Zeit</value>
+  </data>
+  <data name="SelfConsumptionShort" xml:space="preserve">
+	  <value>Eig.Vbr.</value>
+  </data>
+  <data name="Latency" xml:space="preserve">
+	  <value>Latenz</value>
+  </data>
+  <data name="Ambient" xml:space="preserve">
+	  <value>Umgebung</value>
+  </data>
+  <data name="AcModule" xml:space="preserve">
+	  <value>AC-Modul</value>
+  </data>
+  <data name="DcModule" xml:space="preserve">
+	  <value>DC-Modul</value>
+  </data>
+  <data name="BatteryModule" xml:space="preserve">
+	  <value>Batt.-Mod.</value>
+  </data>
+  <data name="Fan" xml:space="preserve">
+	  <value>Lüfter</value>
+  </data>
+  <data name="BackupOpTime" xml:space="preserve">
+	  <value>Notstrom</value>
+  </data>
+  <data name="Rectifier" xml:space="preserve">
+	  <value>Gleichrichter</value>
+  </data>
 </root>

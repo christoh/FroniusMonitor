@@ -1,0 +1,47 @@
+﻿<ContentControl x:Class="De.Hochstaetter.FroniusMonitor.Controls.LinearHorizontalGauge"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
+                xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
+                mc:Ignorable="d"
+                d:DesignHeight="50" d:DesignWidth="300">
+    <Grid DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type c:LinearHorizontalGauge}}}">
+        <Border BorderBrush="#80000000" BorderThickness=".2">
+            <ProgressBar x:Name="ProgressBar" Foreground="Green" Background="Transparent" Orientation="Horizontal" BorderThickness="0" Height="{Binding ProgressBarHeight}" VerticalAlignment="Bottom"
+                         Minimum="{Binding Minimum}" Maximum="{Binding Maximum}" />
+        </Border>
+        <Grid>
+            <Grid.Resources>
+                <Style TargetType="TextBlock">
+                    <Setter Property="SnapsToDevicePixels" Value="True" />
+                    <Setter Property="TextAlignment" Value="Right" />
+                </Style>
+            </Grid.Resources>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Margin="1,0,0,0" TextAlignment="Left">
+                <Run Text="{Binding DisplayName, Mode=OneWay}" />
+                <Run Text="{Binding SubDisplayName, Mode=OneWay}" />
+            </TextBlock>
+            <TextBlock Grid.Column="2" x:Name="ValueTextBlock" Visibility="{Binding ShowPercent, Converter={co:Bool2Visibility True=Collapsed, False=Visible}}"/>
+            <TextBlock Grid.Column="3" Text="{Binding UnitSymbol}" Foreground="#0000ff" Visibility="{Binding ShowPercent, Converter={co:Bool2Visibility True=Collapsed, False=Visible}}"
+                       Margin="{Binding UnitSymbol, Converter={co:NullToThickness NotNull='2,0,1,0', Null='0,0,1,0'}}" />
+
+            <TextBlock Grid.Column="4" Visibility="{Binding ShowPercent, Converter={co:Bool2Visibility}}" Margin="1,0,0,0">
+                <Run x:Name="PercentRun" />
+            </TextBlock>
+            
+            <TextBlock Grid.Column="5" Visibility="{Binding ShowPercent, Converter={co:Bool2Visibility}}" Margin="2,0,1,0">
+                <Run Text="%" Foreground="Blue"/>
+            </TextBlock>
+        </Grid>
+    </Grid>
+</ContentControl>
