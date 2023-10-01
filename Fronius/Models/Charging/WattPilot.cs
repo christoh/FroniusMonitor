@@ -224,13 +224,13 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref voltageL3, value, () => NotifyOfPropertyChange(nameof(VoltageAverage)));
     }
 
-    private double? voltageN;
+    private double? voltageL0;
 
     [WattPilot("nrg", 3)]
-    public double? VoltageN
+    public double? VoltageL0
     {
-        get => voltageN;
-        set => Set(ref voltageN, value);
+        get => voltageL0;
+        set => Set(ref voltageL0, value);
     }
 
     private double? currentL1;
@@ -306,13 +306,13 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         });
     }
 
-    private double? powerN;
+    private double? powerL0;
 
     [WattPilot("nrg", 10)]
-    public double? PowerN
+    public double? PowerL0
     {
-        get => powerN;
-        set => Set(ref powerN, value);
+        get => powerL0;
+        set => Set(ref powerL0, value);
     }
 
     public double PowerSum => PowerL1 ?? 0 + PowerL2 ?? 0 + PowerL3 ?? 0;
@@ -367,13 +367,13 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     public double? PowerFactorPercentN
     {
         get => powerFactorPercentN;
-        set => Set(ref powerFactorPercentN, value, () => NotifyOfPropertyChange(nameof(PowerFactorN)));
+        set => Set(ref powerFactorPercentN, value, () => NotifyOfPropertyChange(nameof(PowerFactorL0)));
     }
 
     public double? PowerFactorL1 => PowerFactorPercentL1 / 100;
     public double? PowerFactorL2 => PowerFactorPercentL2 / 100;
     public double? PowerFactorL3 => PowerFactorPercentL3 / 100;
-    public double? PowerFactorN => PowerFactorPercentN / 100;
+    public double? PowerFactorL0 => PowerFactorPercentN / 100;
 
     private bool? l1ChargerEnabled;
     [WattPilot("pha", 0)]
@@ -949,7 +949,15 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     public DateTime? TimeStampUtc
     {
         get => timeStampUtc;
-        set => Set(ref timeStampUtc, value);
+        set => Set(ref timeStampUtc, value, () => Latency = DateTime.UtcNow - TimeStampUtc);
+    }
+
+    private TimeSpan? latency;
+
+    public TimeSpan? Latency
+    {
+        get => latency;
+        private set => Set(ref latency, value);
     }
 
     private int? pvSurplusBatteryLevel;

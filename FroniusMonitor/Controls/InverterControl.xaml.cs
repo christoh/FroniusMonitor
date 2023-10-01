@@ -27,7 +27,7 @@ public enum InverterDisplayMode
     MoreOp,
 }
 
-public partial class InverterControl : IHaveLcdPanel
+public partial class InverterControl
 {
     private readonly IDataCollectionService? dataCollectionService = IoC.TryGetRegistered<IDataCollectionService>();
     private IWebClientService? webClientService;
@@ -143,7 +143,6 @@ public partial class InverterControl : IHaveLcdPanel
 
     private async void NewDataReceived(object? sender, SolarDataEventArgs e)
     {
-        var dataReceivedTime = DateTime.UtcNow;
         Gen24Sensors? gen24Sensors = null!;
         Gen24Config? gen24Config = null!;
 

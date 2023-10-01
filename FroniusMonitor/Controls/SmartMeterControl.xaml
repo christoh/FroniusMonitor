@@ -288,10 +288,11 @@
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                                 <c:LinearHorizontalGauge DisplayName="Frq." Value="{Binding SmartMeter.Frequency, FallbackValue={x:Null}}" StringFormat="N1"
-                                                         Minimum="45" Maximum="55" Low="49.8" High="50.2" VeryHigh="51" VeryLow="49"/>
-                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Time}" Value="{Binding SmartMeter.DataTime, FallbackValue={x:Null}}" StringFormat="T"/>
+                                                         Minimum="45" Maximum="55" Low="49.8" High="50.2" VeryHigh="51" VeryLow="49" UnitSymbol="Hz"/>
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Time}" Value="{Binding SmartMeter.DataTime, FallbackValue={x:Null}}" StringFormat="T"
+                                                         Minimum="0" Maximum="5000"/>
                                 <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Latency}" Value="{Binding SmartMeter.Latency.TotalMilliseconds, FallbackValue={x:Null}}"
-                                                         StringFormat="N0" Minimum="0" Maximum="5000" Low="0" VeryLow="0" High="2000" VeryHigh="4000"/>
+                                                         StringFormat="N0" Minimum="0" Maximum="5000" Low="0" VeryLow="0" High="2000" VeryHigh="4000" UnitSymbol="ms"/>
                             </StackPanel>
                         </Grid>
                     </Grid>

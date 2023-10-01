@@ -17,7 +17,7 @@ public enum MeterDisplayMode
     MoreEnergy,
 }
 
-public partial class SmartMeterControl : IHaveLcdPanel
+public partial class SmartMeterControl
 {
     private static readonly IReadOnlyList<MeterDisplayMode> powerModes = new[]
     {

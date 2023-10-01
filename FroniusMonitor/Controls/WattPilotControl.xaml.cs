@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Controls;
+﻿using System.Reflection;
+
+namespace De.Hochstaetter.FroniusMonitor.Controls;
 
 public enum WattPilotDisplayMode : byte
 {
@@ -8,7 +10,7 @@ public enum WattPilotDisplayMode : byte
     PowerFactor,
     EnergyCards,
     MoreFrequency,
-    MoreOutOfBalance,
+    NeutralWire,
     MoreWifi,
 }
 
@@ -33,7 +35,7 @@ public partial class WattPilotControl
     private static readonly IReadOnlyList<WattPilotDisplayMode> moreModes = new[]
     {
         WattPilotDisplayMode.MoreFrequency,
-        WattPilotDisplayMode.MoreOutOfBalance,
+        WattPilotDisplayMode.NeutralWire,
         WattPilotDisplayMode.EnergyCards,
         WattPilotDisplayMode.MoreWifi,
     };
@@ -84,30 +86,13 @@ public partial class WattPilotControl
 
     private void OnModeChanged()
     {
-        LcdMoreWifi.Visibility =
-            LcdOutOfBalance.Visibility =
-                LcdMoreFrequency.Visibility =
-                    LcdEnergyCards.Visibility =
-                        LcdCurrent.Visibility =
-                            LcdVoltage.Visibility =
-                                LcdPowerFactor.Visibility =
-                                    LcdPower.Visibility =
-                                        Visibility.Collapsed;
-
-        FrameworkElement lcd = Mode switch
+        Enum.GetNames<WattPilotDisplayMode>().Apply(enumName =>
         {
-            WattPilotDisplayMode.Current => LcdCurrent,
-            WattPilotDisplayMode.Voltage => LcdVoltage,
-            WattPilotDisplayMode.Power => LcdPower,
-            WattPilotDisplayMode.PowerFactor => LcdPowerFactor,
-            WattPilotDisplayMode.EnergyCards => LcdEnergyCards,
-            WattPilotDisplayMode.MoreFrequency => LcdMoreFrequency,
-            WattPilotDisplayMode.MoreOutOfBalance => LcdOutOfBalance,
-            WattPilotDisplayMode.MoreWifi => LcdMoreWifi,
-            _ => throw new NotSupportedException("Unsupported DisplayMode")
-        };
-
-        lcd.Visibility = Visibility.Visible;
+            if (GetType().GetField(enumName, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public)?.GetValue(this) is FrameworkElement element)
+            {
+                element.Visibility = Mode.ToString() == enumName ? Visibility.Visible : Visibility.Collapsed;
+            }
+        });
     }
 
     private void OnSettingsClicked(object sender, RoutedEventArgs e)
