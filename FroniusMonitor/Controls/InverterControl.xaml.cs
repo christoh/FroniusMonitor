@@ -39,7 +39,6 @@ public partial class InverterControl : IHaveLcdPanel
     private int currentAcIndex, currentDcIndex, currentMoreIndex, energyIndex;
     private bool isInStandByChange;
     private string? lastStatusCode;
-    private DateTime? lastCacheTime;
     private DateTime lastStandbySwitchUpdate = DateTime.UnixEpoch;
 
     #region Dependency Properties
@@ -209,15 +208,6 @@ public partial class InverterControl : IHaveLcdPanel
                     DcPowerHeadline.Text = Loc.DcPower + (Mode == InverterDisplayMode.DcRelativePower ? " %" : string.Empty);
                     DcPowerFirstGauge.ShowPercent = Mode == InverterDisplayMode.DcRelativePower;
                     DcPowerAggregateGauge.DisplayName = Mode == InverterDisplayMode.DcPower ? Loc.Sum : Loc.Total;
-                    break;
-
-                case InverterDisplayMode.More:
-                    if (cache?.DataTime != lastCacheTime)
-                    {
-                        MoreDelayGauge.Value = (dataReceivedTime - cache?.DataTime)?.TotalMilliseconds;
-                    }
-
-                    lastCacheTime = cache?.DataTime;
                     break;
 
                 case InverterDisplayMode.MoreEfficiency:

@@ -3,6 +3,9 @@
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public abstract class Gen24DeviceBase : BindableBase, ICloneable
 {
+    public DateTime ReceivedTime { get; set; } = DateTime.UtcNow;
+    public TimeSpan? Latency => ReceivedTime - DataTime;
+    
     private DateTime? dataTime;
 
     [FroniusProprietaryImport("COMPONENTS_TIME_STAMP_U64")]

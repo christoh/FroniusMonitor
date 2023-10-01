@@ -427,8 +427,8 @@
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                                 <c:LinearHorizontalGauge DisplayName="Gen24" Value="{Binding Sensors.Cache.InverterFrequency, FallbackValue={x:Null}}" />
                                 <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Grid}" Value="{Binding Sensors.Cache.FeedInPointFrequency, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge Minimum="0" Maximum="5000" Low="0" VeryLow="0" High="2000" VeryHigh="4000"
-                                                         StringFormat="N0" UnitSymbol="ms" x:Name="MoreDelayGauge" DisplayName="{x:Static p:Resources.Latency}" />
+                                <c:LinearHorizontalGauge Minimum="0" Maximum="5000" Low="0" VeryLow="0" High="2000" VeryHigh="4000" StringFormat="N0" UnitSymbol="ms"
+                                                         DisplayName="{x:Static p:Resources.Latency}" Value="{Binding Sensors.Cache.Latency.TotalMilliseconds, FallbackValue={x:Null}}"/>
                                 <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Time}" UnitSymbol="{x:Null}" Value="{Binding Sensors.Cache.DataTime, FallbackValue={x:Null}}" StringFormat="T" />
                             </StackPanel>
                         </Grid>

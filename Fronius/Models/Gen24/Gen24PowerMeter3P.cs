@@ -3,9 +3,6 @@
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public class Gen24PowerMeter3P : Gen24DeviceBase
 {
-    public DateTime ReceivedTime { get; set; } = DateTime.UtcNow;
-    public TimeSpan? Latency => ReceivedTime - DataTime;
-    
     private double? currentL1;
 
     [FroniusProprietaryImport("SMARTMETER_CURRENT_01_F64")]
