@@ -221,7 +221,7 @@
                         : Brushes.LightGreen;
 
                 var percentage = (ProgressBar.Value - Minimum) / (Maximum - Minimum) * 100;
-                PercentRun.Text = percentage.ToString(StringFormatForPercentage, CultureInfo.CurrentCulture);
+                PercentRun.Text = !isFinite ? "---" : percentage.ToString(StringFormatForPercentage, CultureInfo.CurrentCulture);
             }
             else
             {

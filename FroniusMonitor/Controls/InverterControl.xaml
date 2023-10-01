@@ -311,7 +311,6 @@
 
                                 <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Battery}" ShowPercent="{Binding ShowPercent, ElementName=DcPowerFirstGauge}"
                                                          Value="{Binding Sensors.Cache.StoragePower, FallbackValue={x:Null}}"
-                                                         Visibility="{Binding Sensors.Storage, FallbackValue=Collapsed, Converter={co:NullToVisibility}}"
                                                          Minimum="0" Maximum="7000" />
                             </StackPanel>
                         </Grid>
