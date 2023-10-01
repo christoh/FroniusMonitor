@@ -1,35 +1,308 @@
 ﻿<UserControl x:Class="De.Hochstaetter.FroniusMonitor.Controls.SmartMeterControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
-             mc:Ignorable="d" 
+             xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls" xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
+             mc:Ignorable="d"
              d:DesignHeight="127" d:DesignWidth="110">
     <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SmartMeterControl}}">
         <Border BorderBrush="DimGray" BorderThickness="1" Width="110">
             <Grid x:Name="BackgroundProvider" Background="LightGray">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
+                <Grid.Resources>
+                    <Style TargetType="c:LinearHorizontalGauge" x:Key="PowerGaugeStyle" BasedOn="{StaticResource InverterControlGaugeStyle}">
+                        <Setter Property="StringFormat" Value="N0" />
+                        <Setter Property="Maximum" Value="8050" />
+                        <Setter Property="High" Value="6000" />
+                        <Setter Property="UnitSymbol" Value="VA" />
+                        <Setter Property="VeryHigh" Value="7000" />
+                    </Style>
+                </Grid.Resources>
+
                 <Viewbox Grid.Row="0" HorizontalAlignment="Stretch" Width="100" StretchDirection="DownOnly">
-                    <TextBlock x:Name="Title" HorizontalAlignment="Stretch" FontSize="8" Text="---" TextAlignment="Center"/>
+                    <TextBlock x:Name="Title" HorizontalAlignment="Stretch" FontSize="8" Text="---" TextAlignment="Center" />
                 </Viewbox>
 
-                <local:LcdDisplay x:Name="Lcd" Grid.Row="1" Width="100" Height="94" Margin="4" FontSize="16" FontFamily="pack://application:,,,/Assets/Fonts/#Digital-7 Mono"/>
+                <Border Grid.Row="1" Width="100" Height="94" Margin="4" Background="{Binding MeterStatus, FallbackValue={x:Null}, Converter={co:Gen24Status2PanelBrush}}" BorderThickness=".2" BorderBrush="Black">
+                    <Grid>
+                        <Grid x:Name="PowerActive">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource PowerGaugeStyle}">
+                                    <Setter Property="UnitSymbol" Value="W" />
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Margin="0,0,0,2" TextAlignment="Center" Text="{x:Static p:Resources.ActivePower}" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge DisplayName="L1" Value="{Binding SmartMeter.ActivePowerL1, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding SmartMeter.ActivePowerL2, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding SmartMeter.ActivePowerL3, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Sum}" Value="{Binding SmartMeter.ActivePowerSum, FallbackValue={x:Null}}"
+                                                         Maximum="24150" High="18000" VeryHigh="21000" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="PowerApparent" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource PowerGaugeStyle}" />
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Margin="0,0,0,2" TextAlignment="Center" Text="{x:Static p:Resources.ApparentPower}" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge DisplayName="L1" Value="{Binding SmartMeter.ApparentPowerL1, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding SmartMeter.ApparentPowerL2, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding SmartMeter.ApparentPowerL3, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Sum}" Value="{Binding SmartMeter.ApparentPowerSum, FallbackValue={x:Null}}"
+                                                         Maximum="24150" High="18000" VeryHigh="21000" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="PowerReactive" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource PowerGaugeStyle}" />
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Margin="0,0,0,2" TextAlignment="Center" Text="{x:Static p:Resources.ReactivePower}" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge DisplayName="L1" Value="{Binding SmartMeter.ReactivePowerL1, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding SmartMeter.ReactivePowerL2, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding SmartMeter.ReactivePowerL3, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Sum}" Value="{Binding SmartMeter.ReactivePowerSum, FallbackValue={x:Null}}"
+                                                         Maximum="24150" High="18000" VeryHigh="21000" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="PowerOutOfBalance" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource PowerGaugeStyle}">
+                                    <Setter Property="UnitSymbol" Value="W" />
+                                    <Setter Property="High" Value="2990" />
+                                    <Setter Property="VeryHigh" Value="3680" />
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Margin="0,0,0,2" TextAlignment="Center" Text="{x:Static p:Resources.OutOfBalance}" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge DisplayName="L12" Value="{Binding SmartMeter.OutOfBalancePowerL12, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L23" Value="{Binding SmartMeter.OutOfBalancePowerL23, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L31" Value="{Binding SmartMeter.OutOfBalancePowerL31, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="Max." Value="{Binding SmartMeter.OutOfBalancePowerMax, FallbackValue={x:Null}}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="PowerFactor" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource InverterControlGaugeStyle}">
+                                    <Setter Property="Maximum" Value="1" />
+                                    <Setter Property="Low" Value=".5"/>
+                                    <Setter Property="VeryLow" Value=".2"/>
+                                    <Setter Property="StringFormat" Value="N3" />
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Margin="0,0,0,2" TextAlignment="Center" Text="cos(φ)" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge DisplayName="L1" Value="{Binding SmartMeter.PowerFactorL1, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding SmartMeter.PowerFactorL2, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding SmartMeter.PowerFactorL3, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Total}" Value="{Binding SmartMeter.PowerFactorTotal, FallbackValue={x:Null}}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="PhaseVoltage" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource InverterControlGaugeStyle}">
+                                    <Setter Property="Minimum" Value="210" />
+                                    <Setter Property="Maximum" Value="250" />
+                                    <Setter Property="VeryHigh" Value="243" />
+                                    <Setter Property="VeryLow" Value="217" />
+                                    <Setter Property="High" Value="235" />
+                                    <Setter Property="Low" Value="225" />
+                                    <Setter Property="UnitSymbol" Value="V" />
+                                    <Setter Property="StringFormat" Value="N1" />
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.PhaseVoltage}" Margin="0,0,0,2" TextAlignment="Center" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge DisplayName="L1" Value="{Binding SmartMeter.PhaseVoltageL1, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding SmartMeter.PhaseVoltageL2, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding SmartMeter.PhaseVoltageL3, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.AverageShort}" Value="{Binding SmartMeter.PhaseVoltageAverage, FallbackValue={x:Null}}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="LineVoltage" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource InverterControlGaugeStyle}">
+                                    <Setter Property="Minimum" Value="380" />
+                                    <Setter Property="Maximum" Value="420" />
+                                    <Setter Property="VeryHigh" Value="415" />
+                                    <Setter Property="High" Value="407.5" />
+                                    <Setter Property="VeryLow" Value="375" />
+                                    <Setter Property="Low" Value="392.5" />
+                                    <Setter Property="UnitSymbol" Value="V" />
+                                    <Setter Property="StringFormat" Value="N1" />
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.LineVoltage}" Margin="0,0,0,2" TextAlignment="Center" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge DisplayName="L12" Value="{Binding SmartMeter.LineVoltageL12, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L23" Value="{Binding SmartMeter.LineVoltageL23, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L31" Value="{Binding SmartMeter.LineVoltageL31, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.AverageShort}" Value="{Binding SmartMeter.LineVoltageAverage, FallbackValue={x:Null}}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="Current" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource InverterControlGaugeStyle}">
+                                    <Setter Property="Maximum" Value="35" />
+                                    <Setter Property="VeryHigh" Value="32" />
+                                    <Setter Property="High" Value="28" />
+                                    <Setter Property="UnitSymbol" Value="A" />
+                                    <Setter Property="StringFormat" Value="N3" />
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.Current}" Margin="0,0,0,2" TextAlignment="Center" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge DisplayName="L1" Value="{Binding SmartMeter.CurrentL1, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding SmartMeter.CurrentL2, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding SmartMeter.CurrentL3, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Sum}" Value="{Binding SmartMeter.TotalCurrent, FallbackValue={x:Null}}"
+                                                         Maximum="105" High="84" VeryHigh="96"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="CurrentOutOfBalance" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource InverterControlGaugeStyle}">
+                                    <Setter Property="UnitSymbol" Value="A" />
+                                    <Setter Property="High" Value="13" />
+                                    <Setter Property="VeryHigh" Value="16" />
+                                    <Setter Property="StringFormat" Value="N3" />
+                                    <Setter Property="Maximum" Value="35"></Setter>
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Margin="0,0,0,2" TextAlignment="Center" Text="{x:Static p:Resources.OutOfBalance}" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge DisplayName="L12" Value="{Binding SmartMeter.OutOfBalanceCurrentL12, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L23" Value="{Binding SmartMeter.OutOfBalanceCurrentL23, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="L31" Value="{Binding SmartMeter.OutOfBalanceCurrentL31, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="Max." Value="{Binding SmartMeter.OutOfBalanceCurrentMax, FallbackValue={x:Null}}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="MoreEnergy" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource InverterControlGaugeStyle}"/>
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Margin="0,0,0,2" TextAlignment="Center">
+                                <Run Text="{x:Static p:Resources.Energy}"/>
+                                <Run Text="(kWh)"/>
+                            </TextBlock>
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge DisplayName="1.8.0" Value="{Binding SmartMeter.EnergyActiveConsumed, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
+                                <c:LinearHorizontalGauge DisplayName="2.8.0" Value="{Binding SmartMeter.EnergyActiveProduced, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
+                                <c:LinearHorizontalGauge DisplayName="3.8.0" Value="{Binding SmartMeter.EnergyReactiveConsumed, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
+                                <c:LinearHorizontalGauge DisplayName="4.8.0" Value="{Binding SmartMeter.EnergyReactiveProduced, FallbackValue=0, Converter={co:Multiply Factor=.001}}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="More" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource InverterControlGaugeStyle}">
+                                    <Setter Property="StringFormat" Value="N1" />
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Margin="0,0,0,2" TextAlignment="Center" Text="{Binding SmartMeter.SerialNumber, FallbackValue='---'}"/>
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearHorizontalGauge DisplayName="Frq." Value="{Binding SmartMeter.Frequency, FallbackValue={x:Null}}" StringFormat="N1"
+                                                         Minimum="45" Maximum="55" Low="49.8" High="50.2" VeryHigh="51" VeryLow="49"/>
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Time}" Value="{Binding SmartMeter.DataTime, FallbackValue={x:Null}}" StringFormat="T"/>
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Latency}" Value="{Binding SmartMeter.Latency.TotalMilliseconds, FallbackValue={x:Null}}"
+                                                         StringFormat="N0" Minimum="0" Maximum="5000" Low="0" VeryLow="0" High="2000" VeryHigh="4000"/>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </Border>
 
                 <WrapPanel MaxWidth="110" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
                     <WrapPanel.Resources>
-                        <Style TargetType="RadioButton" BasedOn="{StaticResource DeviceButton}"/>
+                        <Style TargetType="RadioButton" BasedOn="{StaticResource DeviceButton}" />
                     </WrapPanel.Resources>
-                    <RadioButton IsChecked="True" Content="{x:Static p:Resources.Power}" Click="OnPowerClick"/>
-                    <RadioButton Content="{x:Static p:Resources.Voltage}" Click="OnVoltageClick"/>
-                    <RadioButton Content="{x:Static p:Resources.Current}" Click="OnCurrentClick"/>
-                    <RadioButton Content="{x:Static p:Resources.More}" Click="OnMoreClick"/>
+                    <RadioButton IsChecked="True" Content="{x:Static p:Resources.Power}" Click="OnPowerClick" />
+                    <RadioButton Content="{x:Static p:Resources.Voltage}" Click="OnVoltageClick" />
+                    <RadioButton Content="{x:Static p:Resources.Current}" Click="OnCurrentClick" />
+                    <RadioButton Content="{x:Static p:Resources.More}" Click="OnMoreClick" />
                 </WrapPanel>
             </Grid>
         </Border>

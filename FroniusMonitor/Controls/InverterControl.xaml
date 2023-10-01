@@ -33,14 +33,6 @@
                         <Setter Property="StretchDirection" Value="DownOnly" />
                         <Setter Property="Margin" Value="4,0" />
                     </Style>
-                    <Style TargetType="c:LcdDisplay">
-                        <Setter Property="Grid.Row" Value="2" />
-                        <Setter Property="Width" Value="100" />
-                        <Setter Property="Height" Value="85" />
-                        <Setter Property="Margin" Value="4" />
-                        <Setter Property="FontSize" Value="14" />
-                        <Setter Property="FontFamily" Value="pack://application:,,,/Assets/Fonts/#Digital-7 Mono" />
-                    </Style>
 
                     <Style TargetType="c:LinearHorizontalGauge" x:Key="AcPowerGaugeStyle" BasedOn="{StaticResource InverterControlGaugeStyle}">
                         <d:Style.DataContext>
@@ -111,7 +103,7 @@
                                 <c:LinearHorizontalGauge DisplayName="L1" Value="{Binding Sensors.Cache.InverterPhaseVoltageL1, FallbackValue={x:Null}}" />
                                 <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding Sensors.Cache.InverterPhaseVoltageL2, FallbackValue={x:Null}}" />
                                 <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding Sensors.Cache.InverterPhaseVoltageL3, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Average}" Value="{Binding Sensors.Cache.InverterPhaseVoltageAverage, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.AverageShort}" Value="{Binding Sensors.Cache.InverterPhaseVoltageAverage, FallbackValue={x:Null}}" />
                             </StackPanel>
                         </Grid>
 
@@ -139,7 +131,7 @@
                                 <c:LinearHorizontalGauge DisplayName="L12" Value="{Binding Sensors.Cache.InverterLineVoltageL12, FallbackValue={x:Null}}" />
                                 <c:LinearHorizontalGauge DisplayName="L23" Value="{Binding Sensors.Cache.InverterLineVoltageL23, FallbackValue={x:Null}}" />
                                 <c:LinearHorizontalGauge DisplayName="L31" Value="{Binding Sensors.Cache.InverterLineVoltageL31, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Average}" Value="{Binding Sensors.Cache.InverterLineVoltageAverage, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.AverageShort}" Value="{Binding Sensors.Cache.InverterLineVoltageAverage, FallbackValue={x:Null}}" />
                             </StackPanel>
                         </Grid>
 
@@ -419,10 +411,10 @@
                                     <Setter Property="Maximum" Value="55" />
                                     <Setter Property="UnitSymbol" Value="Hz" />
                                     <Setter Property="StringFormat" Value="N3" />
-                                    <Setter Property="VeryLow" Value="49.7" />
-                                    <Setter Property="VeryHigh" Value="50.2" />
-                                    <Setter Property="Low" Value="49.98" />
-                                    <Setter Property="High" Value="50.02" />
+                                    <Setter Property="VeryLow" Value="49" />
+                                    <Setter Property="VeryHigh" Value="51" />
+                                    <Setter Property="Low" Value="49.8" />
+                                    <Setter Property="High" Value="50.2" />
                                 </Style>
                             </Grid.Resources>
                             <Grid.RowDefinitions>

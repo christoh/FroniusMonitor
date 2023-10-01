@@ -121,8 +121,8 @@ public class DataCollectionService : BindableBase, IDataCollectionService
             CalibrationDate = DateTime.UtcNow,
             ConsumedOffset = consumedEnergyOffset,
             ProducedOffset = producedEnergyOffset,
-            EnergyRealConsumed = HomeAutomationSystem?.Gen24Sensors?.PrimaryPowerMeter?.EnergyRealConsumed ?? double.NaN,
-            EnergyRealProduced = HomeAutomationSystem?.Gen24Sensors?.PrimaryPowerMeter?.EnergyRealProduced ?? double.NaN,
+            EnergyRealConsumed = HomeAutomationSystem?.Gen24Sensors?.PrimaryPowerMeter?.EnergyActiveConsumed ?? double.NaN,
+            EnergyRealProduced = HomeAutomationSystem?.Gen24Sensors?.PrimaryPowerMeter?.EnergyActiveProduced ?? double.NaN,
         };
 
         SmartMeterHistory.Add(newItem);

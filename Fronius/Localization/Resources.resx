@@ -1257,4 +1257,10 @@
   <data name="Rectifier" xml:space="preserve">
 	  <value>Rectifier</value>
   </data>
+  <data name="AverageShort" xml:space="preserve">
+	  <value>Average</value>
+  </data>
+  <data name="Visible" xml:space="preserve">
+	  <value>Visible</value>
+  </data>
 </root>

@@ -202,7 +202,7 @@
                 double doubleVal => isFinite ? doubleVal.ToString(StringFormat ?? "N0", CultureInfo.CurrentCulture) : "---",
                 DateTime dateTimeVal => dateTimeVal.ToLocalTime().ToString(StringFormat ?? "g", CultureInfo.CurrentCulture),
                 TimeSpan timeSpanValue => timeSpanValue.ToString(StringFormat ?? "g", CultureInfo.CurrentCulture),
-                _ => Value?.ToString(StringFormat ?? "N0", CultureInfo.CurrentCulture) ?? "---",
+                _ => Value?.ToString(StringFormat, CultureInfo.CurrentCulture) ?? "---",
             };
 
             if (doubleValue.HasValue)
@@ -214,9 +214,9 @@
 
                 ProgressBar.Value = isFinite ? UseAbsoluteValue ? Math.Abs(doubleValue.Value) : doubleValue.Value : 0;
 
-                ProgressBar.Foreground = doubleValue.Value < VeryLow || doubleValue.Value > VeryHigh
+                ProgressBar.Foreground = ProgressBar.Value < VeryLow || ProgressBar.Value > VeryHigh
                     ? Brushes.Salmon
-                    : doubleValue.Value < Low || doubleValue.Value > High
+                    : ProgressBar.Value < Low || ProgressBar.Value > High
                         ? new SolidColorBrush(Color.FromRgb(255, 208, 0))
                         : Brushes.LightGreen;
 
