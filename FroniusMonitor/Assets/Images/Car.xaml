@@ -33,12 +33,12 @@
         <Line Visibility="{Binding Status, Converter={co:CarStatus2Visibility}}" X1="36" X2="45" Y1="13" Y2="21" />
         <Line Visibility="{Binding Status, Converter={co:CarStatus2Visibility}}" X1="36" X2="45" Y1="21" Y2="13" />
 
-        <TextBlock FontSize="6" Canvas.Top="1.6" FontWeight="Medium" Margin="8,0,0,0">
+        <TextBlock FontSize="5" Canvas.Top="1.6" FontWeight="Medium" Margin="8,0.5,0,0">
             <Run Text="{Binding EnergyWatts, Mode=OneWay, StringFormat=N0, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" />
             <Run Text="Wh" />
         </TextBlock>
 
-        <TextBlock FontSize="6" FontWeight="Medium" TextAlignment="Center" Canvas.Top="12"
+        <TextBlock FontSize="5" FontWeight="Medium" TextAlignment="Center" Canvas.Top="13"
                    Text="{Binding CurrentUser, Mode=OneWay, StringFormat=N0, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" />
 
     </Canvas>

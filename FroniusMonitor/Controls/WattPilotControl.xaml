@@ -204,7 +204,7 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.NeutralWire}" Margin="0,0,0,2" TextAlignment="Center" />
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{Binding SerialNumber}" Margin="0,0,0,2" TextAlignment="Center" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                                 <c:LinearHorizontalGauge DisplayName="Frq." Value="{Binding Frequency, FallbackValue={x:Null}}" UnitSymbol="Hz"
