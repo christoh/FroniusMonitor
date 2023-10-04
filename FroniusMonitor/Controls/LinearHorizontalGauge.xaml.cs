@@ -200,19 +200,16 @@
             ValueTextBlock.Text = Value switch
             {
                 double doubleVal => isFinite ? doubleVal.ToString(StringFormat ?? "N0", CultureInfo.CurrentCulture) : "---",
-                DateTime dateTimeVal => dateTimeVal.ToLocalTime().ToString(StringFormat ?? "g", CultureInfo.CurrentCulture),
+                DateTime dateTimeValue => dateTimeValue.ToLocalTime().ToString(StringFormat ?? "g", CultureInfo.CurrentCulture),
                 TimeSpan timeSpanValue => timeSpanValue.ToString(StringFormat ?? "g", CultureInfo.CurrentCulture),
                 _ => Value?.ToString(StringFormat, CultureInfo.CurrentCulture) ?? "---",
             };
 
-            if (doubleValue.HasValue)
+            if (isFinite)
             {
-                if (!isFinite)
-                {
-                    ValueTextBlock.Text = "---";
-                }
-
-                ProgressBar.Value = isFinite ? UseAbsoluteValue ? Math.Abs(doubleValue.Value) : doubleValue.Value : 0;
+                ProgressBar.Minimum = Minimum;
+                ProgressBar.Maximum = Maximum;
+                ProgressBar.Value = UseAbsoluteValue ? Math.Abs(doubleValue!.Value) : doubleValue!.Value;
 
                 ProgressBar.Foreground = ProgressBar.Value < VeryLow || ProgressBar.Value > VeryHigh
                     ? Brushes.Salmon
@@ -221,11 +218,14 @@
                         : Brushes.LightGreen;
 
                 var percentage = (ProgressBar.Value - Minimum) / (Maximum - Minimum) * 100;
-                PercentRun.Text = !isFinite ? "---" : percentage.ToString(StringFormatForPercentage, CultureInfo.CurrentCulture);
+                PercentRun.Text = percentage.ToString(StringFormatForPercentage, CultureInfo.CurrentCulture);
             }
             else
             {
-                ProgressBar.Value = Minimum;
+                ProgressBar.Value = 0;
+                ProgressBar.Minimum = 0;
+                ProgressBar.Maximum = 1;
+                PercentRun.Text = "---";
             }
         }
     }

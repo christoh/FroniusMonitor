@@ -10,7 +10,7 @@
     <Grid DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type c:LinearHorizontalGauge}}}">
         <Border BorderBrush="#80000000" BorderThickness=".2">
             <ProgressBar x:Name="ProgressBar" Foreground="Green" Background="Transparent" Orientation="Horizontal" BorderThickness="0" Height="{Binding ProgressBarHeight}" VerticalAlignment="Bottom"
-                         Minimum="{Binding Minimum}" Maximum="{Binding Maximum}" />
+                         />
         </Border>
         <Grid>
             <Grid.Resources>
