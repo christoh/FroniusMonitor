@@ -422,8 +422,8 @@ public class DataCollectionService : BindableBase, IDataCollectionService
                     await UpdateConfigData(HomeAutomationSystem, tokenSource.Token).ConfigureAwait(false);
                 }
 
-                var gen24Task = froniusCounter % FroniusUpdateRate == 0 ? TryGetGen24System(WebClientService, HomeAutomationSystem.Gen24Config!.Components, tokenSource.Token) : Task.FromResult<Gen24Sensors?>(null);
-                var gen24Task2 = froniusCounter++ % FroniusUpdateRate == 0 ? TryGetGen24System(WebClientService2, HomeAutomationSystem.Gen24Config2!.Components, tokenSource.Token) : Task.FromResult<Gen24Sensors?>(null);
+                var gen24Task = froniusCounter % FroniusUpdateRate == 0 ? TryGetGen24System(WebClientService, HomeAutomationSystem.Gen24Config?.Components, tokenSource.Token) : Task.FromResult<Gen24Sensors?>(null);
+                var gen24Task2 = froniusCounter++ % FroniusUpdateRate == 0 ? TryGetGen24System(WebClientService2, HomeAutomationSystem.Gen24Config2?.Components, tokenSource.Token) : Task.FromResult<Gen24Sensors?>(null);
 
                 if (WebClientService.FritzBoxConnection == null && SwitchableDevices.Any(d => d is FritzBoxDevice))
                 {
