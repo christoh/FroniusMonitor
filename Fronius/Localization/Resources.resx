@@ -805,7 +805,7 @@
 	  <value>Default</value>
   </data>
   <data name="CableLockBehavior_AutoUnlock" xml:space="preserve">
-	  <value>Always unlock, wenn not charging</value>
+	  <value>Always unlock if not charging</value>
   </data>
   <data name="CableLockBehavior_AlwaysLock" xml:space="preserve">
 	  <value>Never unlock</value>
@@ -1096,13 +1096,13 @@
 	  <value>HTTP 1.1 (Hypertext Transfer Protocol)</value>
   </data>
   <data name="Protocol_Amqp_ToolTip" xml:space="preserve">
-	  <value>Best for general use. Unlike MQTT it supports message rejection and abondoning.</value>
+	  <value>Best for general use. Unlike MQTT it supports message rejection and abandoning.</value>
   </data>
   <data name="Protocol_Mqtt_ToolTip" xml:space="preserve">
-	  <value>MQTT is more lightweight than AMQP but lacks some feature. However, if you have an unstable internet connection, you might loose less messages.</value>
+	  <value>MQTT is more lightweight than AMQP but lacks some features. However, if you have an unstable internet connection, you might loose less messages.</value>
   </data>
   <data name="Protocol_Http1_ToolTip" xml:space="preserve">
-	  <value>HTTP 1.1 is not very effective but may be necessary if the internet connection has paranoid firewall serrings.</value>
+	  <value>HTTP 1.1 may be necessary if the internet connection has very strict firewall settings.</value>
   </data>
   <data name="LiveUpdateProtocol" xml:space="preserve">
 	  <value>Live update protocol</value>
@@ -1117,13 +1117,13 @@
 	  <value>Web socket</value>
   </data>
   <data name="TunnelMode_NoTunnel" xml:space="preserve">
-	  <value>No tunnelling</value>
+	  <value>No tunneling</value>
   </data>
   <data name="TunnelMode_Auto_ToolTip" xml:space="preserve">
-	  <value>Try the native protocol first. If that fails, try tunnelling through HTTP and web socket. If the internet connection is firewalled, you will likely get a connection.</value>
+	  <value>Try the native protocol first. If that fails, try tunneling through HTTP and web sockets. If the internet connection is restricted, you may still be able to establish a connection.</value>
   </data>
   <data name="TunnelMode_Websocket_ToolTip" xml:space="preserve">
-	  <value>Always use a web tunnel via HTTP and web socket. If you know that your internet connection is firewalled and blocks the native protocol, there is no waste of time by trying the native protocol.</value>
+	  <value>Always use a web tunnel via HTTP and web socket. If you know that your internet connection is restricted and blocks the native protocol, there is no waste of time by trying the native protocol.</value>
   </data>
   <data name="TunnelMode_NoTunnel_ToolTip" xml:space="preserve">
 	  <value>If the firewall blocks the native protocol, you do not get a connection with this setting.</value>
@@ -1177,7 +1177,7 @@
 	  <value>Could not change standby state: {0}</value>
   </data>
   <data name="StandbyWarning" xml:space="preserve">
-	  <value>Are you sure you want to set this inverter to standy?</value>
+	  <value>Are you sure you want to set this inverter to standby?</value>
   </data>
   <data name="DcRelativePower" xml:space="preserve">
 	  <value>DC Power %</value>
@@ -1219,7 +1219,7 @@
 	  <value>Loss</value>
   </data>
   <data name="SelfSufficiency" xml:space="preserve">
-	  <value>Autarchy</value>
+	  <value>Self-sufficiency</value>
   </data>
   <data name="Grid" xml:space="preserve">
 	  <value>Grid</value>
