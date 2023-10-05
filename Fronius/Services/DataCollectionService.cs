@@ -23,11 +23,11 @@ public class DataCollectionService : BindableBase, IDataCollectionService
         this.settings = settings;
         HvacService = acService;
         SwitchableDevices = new BindableCollection<ISwitchable>(context);
+        Container2 = IoC.Injector!.CreateScope().ServiceProvider;
 
         if (settings.HaveTwoInverters)
         {
-            Container2 = IoC.Injector!.CreateScope().ServiceProvider;
-            Gen24Service2 = Container2?.GetRequiredService<IGen24Service>();
+            Gen24Service2 = Container2.GetRequiredService<IGen24Service>();
         }
     }
 
@@ -36,7 +36,7 @@ public class DataCollectionService : BindableBase, IDataCollectionService
 
     public IServiceProvider Container => IoC.Injector!;
 
-    public IServiceProvider? Container2 { get; }
+    public IServiceProvider Container2 { get; }
 
     private IGen24Service? gen24Service2;
 

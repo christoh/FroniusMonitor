@@ -23,6 +23,6 @@
         Task<IList<SmartMeterCalibrationHistoryItem>> ReadCalibrationHistory();
         Task<IList<SmartMeterCalibrationHistoryItem>> AddCalibrationHistoryItem(double consumedEnergyOffsetWattHours, double producedEnergyOffsetWattHours);
         IServiceProvider Container { get; }
-        IServiceProvider? Container2 { get; }
+        IServiceProvider Container2 { get; }
     }
 }

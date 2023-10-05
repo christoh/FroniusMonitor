@@ -47,7 +47,7 @@ public class SettingsViewModel : SettingsViewModelBase
     public IEnumerable<ListItemModel<Protocol>> AzureProtocols => azureProtocols;
 
     public IEnumerable<ListItemModel<TunnelMode>> TunnelModes => tunnelModes;
-    
+
     public ListItemModel<Protocol> SelectedProtocol
     {
         get => AzureProtocols.First(p => p.Value == Settings.ToshibaAcConnection!.Protocol);
@@ -166,31 +166,34 @@ public class SettingsViewModel : SettingsViewModelBase
             );
         }
 
-        IoC.Get<MainViewModel>().NotifyOfPropertyChange(nameof(Settings));
         FritzBoxService.Connection = Settings is { HaveFritzBox: true, ShowFritzBox: true } ? Settings.FritzBoxConnection : null;
         Gen24Service.Connection = Settings.FroniusConnection;
 
         if (Settings.HaveTwoInverters)
         {
-            DataCollectionService.Gen24Service2 ??= IoC.Injector!.CreateScope().ServiceProvider.GetRequiredService<IGen24Service>();
-            DataCollectionService.FritzBoxService.Connection = FritzBoxService.Connection;
-            DataCollectionService.Gen24Service2.Connection = Settings.FroniusConnection2;
+            DataCollectionService.Gen24Service2 ??= DataCollectionService.Container2.GetRequiredService<IGen24Service>();
+        }
+        else
+        {
+            DataCollectionService.Gen24Service2 = null;
         }
 
         DataCollectionService.FroniusUpdateRate = Settings.FroniusUpdateRate;
         App.Settings.CopyFrom(Settings);
+        IoC.Get<MainViewModel>().NotifyOfPropertyChange(nameof(Settings));
 
-        if (!Settings.HaveWattPilot || !Settings.ShowWattPilot)
-        {
-            Settings.ShowWattPilot = false;
-            DataCollectionService.WattPilotConnection = null;
-        }
-        else
-        {
-            DataCollectionService.WattPilotConnection = Settings.WattPilotConnection;
-        }
-
+        Settings.ShowWattPilot = false;
+        await WattPilotService.Stop().ConfigureAwait(false);
         await DataCollectionService.HvacService.Stop().ConfigureAwait(false);
+
+        await DataCollectionService.Start
+        (
+            Settings.FroniusConnection,
+            Settings.HaveTwoInverters ? Settings.FroniusConnection2 : null,
+            Settings.HaveFritzBox ? Settings.FritzBoxConnection : null,
+            Settings.HaveWattPilot ? Settings.WattPilotConnection : null
+        ).ConfigureAwait(false);
+
         await Settings.Save().ConfigureAwait(false);
 
         static string FixUrl(string url, bool isWebSocket = false)
