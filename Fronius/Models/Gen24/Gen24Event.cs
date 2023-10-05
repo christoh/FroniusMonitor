@@ -12,7 +12,7 @@ public enum Severity : byte
 
 public class Gen24Event : BindableBase
 {
-    private readonly IWebClientService webClientService = IoC.Get<IWebClientService>();
+    private readonly IGen24Service gen24Service = IoC.Get<IGen24Service>();
 
     private DateTime? activeUntil;
     [FroniusProprietaryImport("activeUntil", FroniusDataType.Root)]
@@ -56,7 +56,7 @@ public class Gen24Event : BindableBase
 
     public string Code => (string.IsNullOrEmpty(Prefix) ? string.Empty : $"{Prefix}-") + (EventId.HasValue ? EventId.Value.ToString(CultureInfo.InvariantCulture) : string.Empty);
 
-    public string Message => webClientService.GetEventDescription(Code).Result;
+    public string Message => gen24Service.GetEventDescription(Code).Result;
 
     private Severity severity;
     [FroniusProprietaryImport("severity", FroniusDataType.Root)]

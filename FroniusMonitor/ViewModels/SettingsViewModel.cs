@@ -29,11 +29,12 @@ public class SettingsViewModel : SettingsViewModelBase
 
     public SettingsViewModel
     (
-        IWebClientService webClientService,
-        IGen24JsonService gen24Service,
+        IGen24Service gen24Service,
+        IGen24JsonService gen24JsonService,
+        IFritzBoxService fritzBoxService,
         IWattPilotService wattPilotService,
         IDataCollectionService dataCollectionService
-    ) : base(dataCollectionService, webClientService, gen24Service, wattPilotService)
+    ) : base(dataCollectionService, gen24Service, gen24JsonService, fritzBoxService, wattPilotService)
     {
     }
 
@@ -166,14 +167,14 @@ public class SettingsViewModel : SettingsViewModelBase
         }
 
         IoC.Get<MainViewModel>().NotifyOfPropertyChange(nameof(Settings));
-        WebClientService.FritzBoxConnection = Settings is { HaveFritzBox: true, ShowFritzBox: true } ? Settings.FritzBoxConnection : null;
-        WebClientService.InverterConnection = Settings.FroniusConnection;
+        FritzBoxService.Connection = Settings is { HaveFritzBox: true, ShowFritzBox: true } ? Settings.FritzBoxConnection : null;
+        Gen24Service.Connection = Settings.FroniusConnection;
 
         if (Settings.HaveTwoInverters)
         {
-            DataCollectionService.WebClientService2 ??= IoC.Injector!.CreateScope().ServiceProvider.GetRequiredService<IWebClientService>();
-            DataCollectionService.WebClientService2.FritzBoxConnection = WebClientService.FritzBoxConnection;
-            DataCollectionService.WebClientService2.InverterConnection = Settings.FroniusConnection2;
+            DataCollectionService.Gen24Service2 ??= IoC.Injector!.CreateScope().ServiceProvider.GetRequiredService<IGen24Service>();
+            DataCollectionService.FritzBoxService.Connection = FritzBoxService.Connection;
+            DataCollectionService.Gen24Service2.Connection = Settings.FroniusConnection2;
         }
 
         DataCollectionService.FroniusUpdateRate = Settings.FroniusUpdateRate;

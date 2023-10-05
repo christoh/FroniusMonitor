@@ -2,12 +2,12 @@
 
 public partial class SelfConsumptionOptimizationView : IInverterScoped
 {
-    public SelfConsumptionOptimizationView(SelfConsumptionOptimizationViewModel viewModel, IWebClientService webClientService)
+    public SelfConsumptionOptimizationView(SelfConsumptionOptimizationViewModel viewModel, IGen24Service gen24Service)
     {
         InitializeComponent();
         DataContext = viewModel;
         viewModel.View = this;
-        WebClientService = webClientService;
+        Gen24Service = gen24Service;
 
         Loaded += async (_, _) =>
         {
@@ -16,5 +16,5 @@ public partial class SelfConsumptionOptimizationView : IInverterScoped
         };
     }
 
-    public IWebClientService WebClientService { get; }
+    public IGen24Service Gen24Service { get; }
 }

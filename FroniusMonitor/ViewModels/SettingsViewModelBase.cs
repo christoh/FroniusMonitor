@@ -2,13 +2,15 @@
 
 public abstract class SettingsViewModelBase : ViewModelBase
 {
-    protected readonly IGen24JsonService Gen24Service;
+    protected readonly IGen24JsonService Gen24JsonService;
     protected readonly IWattPilotService WattPilotService;
 
-    protected SettingsViewModelBase(IDataCollectionService dataCollectionService, IWebClientService webClientService, IGen24JsonService gen24Service, IWattPilotService wattPilotService)
+    protected SettingsViewModelBase(IDataCollectionService dataCollectionService, IGen24Service gen24Service,
+        IGen24JsonService gen24JsonService, IFritzBoxService fritzBoxService, IWattPilotService wattPilotService)
     {
-        WebClientService = webClientService;
         Gen24Service = gen24Service;
+        Gen24JsonService = gen24JsonService;
+        FritzBoxService = fritzBoxService;
         WattPilotService = wattPilotService;
         DataCollectionService = dataCollectionService;
     }
@@ -21,7 +23,8 @@ public abstract class SettingsViewModelBase : ViewModelBase
         set => Set(ref dataCollectionService, value);
     }
 
-    public IWebClientService WebClientService { get; }
+    public IGen24Service Gen24Service { get; }
+    public IFritzBoxService FritzBoxService { get; }
 
     private string toastText = string.Empty;
 
@@ -45,7 +48,7 @@ public abstract class SettingsViewModelBase : ViewModelBase
 
         try
         {
-            result = await WebClientService.GetFroniusJsonResponse(uri, token, new[] { HttpStatusCode.OK, HttpStatusCode.BadRequest }).ConfigureAwait(false);
+            result = await Gen24Service.GetFroniusJsonResponse(uri, token, new[] { HttpStatusCode.OK, HttpStatusCode.BadRequest }).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

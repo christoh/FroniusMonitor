@@ -52,7 +52,8 @@ public partial class App
         }
 
         var injector = ServiceCollection
-            .AddScoped<IWebClientService, WebClientService>()
+            .AddScoped<IGen24Service, Gen24Service>()
+            .AddScoped<IFritzBoxService, FritzBoxService>()
             .AddSingleton(SynchronizationContext.Current!)
             .AddSingleton<IDataCollectionService, DataCollectionService>()
             .AddSingleton<MainWindow>()

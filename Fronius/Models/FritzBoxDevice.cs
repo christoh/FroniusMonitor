@@ -48,7 +48,7 @@ public class FritzBoxDevice : BindableBase, IPowerConsumer1P
     private bool wasSwitched;
 
     [XmlIgnore]
-    public IWebClientService? WebClientService { private get; set; }
+    public IFritzBoxService? FritzBoxService { private get; set; }
 
     private uint id;
     [XmlAttribute("id")]
@@ -242,38 +242,38 @@ public class FritzBoxDevice : BindableBase, IPowerConsumer1P
 
         if (turnOn)
         {
-            await WebClientService!.TurnOnFritzBoxDevice(Ain).ConfigureAwait(false);
+            await FritzBoxService!.TurnOnFritzBoxDevice(Ain).ConfigureAwait(false);
         }
         else
         {
-            await WebClientService!.TurnOffFritzBoxDevice(Ain).ConfigureAwait(false);
+            await FritzBoxService!.TurnOffFritzBoxDevice(Ain).ConfigureAwait(false);
         }
     }
 
     public async Task SetLevel(double level)
     {
         InitiateSwitching();
-        await WebClientService!.SetFritzBoxLevel(Ain, level).ConfigureAwait(false);
+        await FritzBoxService!.SetFritzBoxLevel(Ain, level).ConfigureAwait(false);
     }
 
     public async Task SetHsv(double hueDegrees, double saturation, double value)
     {
         InitiateSwitching();
-        await WebClientService!.SetFritzBoxColor(Ain, hueDegrees, saturation).ConfigureAwait(false);
-        await WebClientService!.SetFritzBoxLevel(Ain, value).ConfigureAwait(false);
+        await FritzBoxService!.SetFritzBoxColor(Ain, hueDegrees, saturation).ConfigureAwait(false);
+        await FritzBoxService!.SetFritzBoxLevel(Ain, value).ConfigureAwait(false);
     }
 
     public async Task SetColorTemperature(double colorTemperatureKelvin)
     {
         InitiateSwitching();
-        await WebClientService!.SetFritzBoxColorTemperature(Ain, colorTemperatureKelvin).ConfigureAwait(false);
+        await FritzBoxService!.SetFritzBoxColorTemperature(Ain, colorTemperatureKelvin).ConfigureAwait(false);
     }
 
     private void InitiateSwitching()
     {
-        if (WebClientService == null)
+        if (FritzBoxService == null)
         {
-            throw new InvalidOperationException("No WebClientService");
+            throw new InvalidOperationException("No FritzBoxService");
         }
 
         wasSwitched = true;

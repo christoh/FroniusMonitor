@@ -2,12 +2,12 @@
 
 public partial class InverterSettingsView : IInverterScoped
 {
-    public InverterSettingsView(InverterSettingsViewModel viewModel, IWebClientService webClientService)
+    public InverterSettingsView(InverterSettingsViewModel viewModel, IGen24Service gen24Service)
     {
         InitializeComponent();
         DataContext = viewModel;
         viewModel.View = this;
-        WebClientService = webClientService;
+        Gen24Service = gen24Service;
 
         Loaded += async (_, _) =>
         {
@@ -16,5 +16,5 @@ public partial class InverterSettingsView : IInverterScoped
         };
     }
 
-    public IWebClientService WebClientService { get; }
+    public IGen24Service Gen24Service { get; }
 }

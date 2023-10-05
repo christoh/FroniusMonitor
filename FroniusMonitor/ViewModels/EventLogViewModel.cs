@@ -2,11 +2,11 @@
 
 public class EventLogViewModel : ViewModelBase
 {
-    private readonly IWebClientService webClientService;
+    private readonly IGen24Service gen24Service;
 
-    public EventLogViewModel(IWebClientService webClientService)
+    public EventLogViewModel(IGen24Service gen24Service)
     {
-        this.webClientService = webClientService;
+        this.gen24Service = gen24Service;
     }
 
     private IOrderedEnumerable<Gen24Event>? events;
@@ -28,15 +28,15 @@ public class EventLogViewModel : ViewModelBase
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     internal override async Task OnInitialize()
     {
-        Title = await webClientService.GetUiString("EVENTLOG.TITLE").ConfigureAwait(false);
+        Title = await gen24Service.GetUiString("EVENTLOG.TITLE").ConfigureAwait(false);
         await base.OnInitialize().ConfigureAwait(false);
-        var inverterBaseSettings = await webClientService.ReadGen24Entity<Gen24InverterSettings>("config/common").ConfigureAwait(false);
+        var inverterBaseSettings = await gen24Service.ReadGen24Entity<Gen24InverterSettings>("config/common").ConfigureAwait(false);
 
         if (!string.IsNullOrWhiteSpace(inverterBaseSettings.SystemName))
         {
             Title += $" - {inverterBaseSettings.SystemName}";
         }
 
-        Events = await webClientService.GetFroniusEvents().ConfigureAwait(false);
+        Events = await gen24Service.GetFroniusEvents().ConfigureAwait(false);
     }
 }

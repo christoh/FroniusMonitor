@@ -2,12 +2,12 @@
 {
     public partial class ModbusView : IInverterScoped
     {
-        public ModbusView(ModbusViewModel viewModel, IWebClientService webClientService)
+        public ModbusView(ModbusViewModel viewModel, IGen24Service gen24Service)
         {
             InitializeComponent();
             viewModel.View = this;
             DataContext = viewModel;
-            WebClientService = webClientService;
+            Gen24Service = gen24Service;
 
             Loaded += async (_, _) =>
             {
@@ -16,6 +16,6 @@
             };
         }
 
-        public IWebClientService WebClientService { get; }
+        public IGen24Service Gen24Service { get; }
     }
 }
