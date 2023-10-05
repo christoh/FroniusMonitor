@@ -31,15 +31,15 @@ public abstract class LocBase : UpdateableMarkupExtension
 
 public class Config : LocBase
 {
-    public Config(string path) : base(path, IoC.TryGetRegistered<IWebClientService>()?.GetConfigString(path)) { }
+    public Config(string path) : base(path, IoC.TryGetRegistered<IGen24Service>()?.GetConfigString(path)) { }
 }
 
 public class Ui : LocBase
 {
-    public Ui(string path) : base(path, IoC.TryGetRegistered<IWebClientService>()?.GetUiString(path)) { }
+    public Ui(string path) : base(path, IoC.TryGetRegistered<IGen24Service>()?.GetUiString(path)) { }
 }
 
 public class Channel : LocBase
 {
-    public Channel(string key) : base(key, IoC.TryGetRegistered<IWebClientService>()?.GetChannelString(key)) { }
+    public Channel(string key) : base(key, IoC.TryGetRegistered<IGen24Service>()?.GetChannelString(key)) { }
 }

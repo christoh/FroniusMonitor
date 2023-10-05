@@ -2,5 +2,5 @@
 
 public interface IInverterScoped
 {
-    IWebClientService WebClientService { get; }
+    IGen24Service Gen24Service { get; }
 }

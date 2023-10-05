@@ -30,7 +30,7 @@ public enum InverterDisplayMode
 public partial class InverterControl
 {
     private readonly IDataCollectionService? dataCollectionService = IoC.TryGetRegistered<IDataCollectionService>();
-    private IWebClientService? webClientService;
+    private IGen24Service? gen24Service;
     private IServiceProvider provider = IoC.Injector!;
     private static readonly IReadOnlyList<InverterDisplayMode> acModes = new[] { InverterDisplayMode.AcPowerActive, InverterDisplayMode.AcPowerApparent, InverterDisplayMode.AcPowerReactive, InverterDisplayMode.AcPowerFactor, InverterDisplayMode.AcCurrent, InverterDisplayMode.AcPhaseVoltage, InverterDisplayMode.AcLineVoltage, };
     private static readonly IReadOnlyList<InverterDisplayMode> dcModes = new[] { InverterDisplayMode.DcPower, InverterDisplayMode.DcRelativePower, InverterDisplayMode.DcCurrent, InverterDisplayMode.DcVoltage, };
@@ -104,7 +104,7 @@ public partial class InverterControl
 
     public InverterControl()
     {
-        webClientService = dataCollectionService?.WebClientService;
+        gen24Service = dataCollectionService?.Gen24Service;
         InitializeComponent();
 
         Loaded += (_, _) =>
@@ -128,10 +128,10 @@ public partial class InverterControl
 
     private void OnIsSecondaryChanged()
     {
-        webClientService = IsSecondary switch
+        gen24Service = IsSecondary switch
         {
-            false => dataCollectionService?.WebClientService,
-            true => dataCollectionService?.WebClientService2,
+            false => dataCollectionService?.Gen24Service,
+            true => dataCollectionService?.Gen24Service2,
         };
 
         provider = IsSecondary switch
@@ -160,12 +160,12 @@ public partial class InverterControl
         (
             !isInStandByChange &&
             ((DateTime.UtcNow - lastStandbySwitchUpdate).TotalMinutes > 5 || lastStatusCode != gen24Sensors?.InverterStatus?.StatusCode) &&
-            webClientService != null
+            gen24Service != null
         )
         {
             try
             {
-                var standByStatus = await webClientService.GetInverterStandByStatus().ConfigureAwait(false);
+                var standByStatus = await gen24Service.GetInverterStandByStatus().ConfigureAwait(false);
                 _ = Dispatcher.InvokeAsync(() => StandByButton.IsChecked = !standByStatus!.IsStandBy);
                 lastStandbySwitchUpdate = DateTime.UtcNow;
             }
@@ -235,7 +235,7 @@ public partial class InverterControl
 
     private async void OnStandByClicked(object sender, RoutedEventArgs e)
     {
-        if (sender is not ToggleButton { IsChecked: not null } toggleButton || webClientService is null)
+        if (sender is not ToggleButton { IsChecked: not null } toggleButton || gen24Service is null)
         {
             return;
         }
@@ -251,7 +251,7 @@ public partial class InverterControl
 
             try
             {
-                await webClientService.RequestInverterStandBy(!toggleButton.IsChecked.Value);
+                await gen24Service.RequestInverterStandBy(!toggleButton.IsChecked.Value);
             }
             catch (Exception ex)
             {

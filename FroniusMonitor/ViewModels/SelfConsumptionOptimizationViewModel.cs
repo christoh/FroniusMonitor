@@ -9,11 +9,12 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
 
     public SelfConsumptionOptimizationViewModel
     (
-        IWebClientService webClientService,
-        IGen24JsonService gen24Service,
+        IGen24Service gen24Service,
+        IGen24JsonService gen24JsonService,
+        IFritzBoxService fritzBoxService,
         IWattPilotService wattPilotService,
         IDataCollectionService dataCollectionService
-    ) : base(dataCollectionService, webClientService, gen24Service, wattPilotService) { }
+    ) : base(dataCollectionService, gen24Service, gen24JsonService, fritzBoxService, wattPilotService) { }
 
     public IEnumerable<ChargingRuleType> RuleTypes => ruleTypes;
 
@@ -156,8 +157,8 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
 
             try
             {
-                configToken = (await WebClientService.GetFroniusJsonResponse("config/", token: tokenSource.Token).ConfigureAwait(false)).Token;
-                softwareVersions = Gen24Versions.Parse((await WebClientService.GetFroniusJsonResponse("status/version", token: tokenSource.Token).ConfigureAwait(false)).Token).SwVersions;
+                configToken = (await Gen24Service.GetFroniusJsonResponse("config/", token: tokenSource.Token).ConfigureAwait(false)).Token;
+                softwareVersions = Gen24Versions.Parse((await Gen24Service.GetFroniusJsonResponse("status/version", token: tokenSource.Token).ConfigureAwait(false)).Token).SwVersions;
             }
             catch (Exception ex)
             {
@@ -174,7 +175,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
             }
 
             var inverterSettings = Gen24InverterSettings.Parse(configToken);
-            oldSettings = Gen24Service.ReadFroniusData<Gen24BatterySettings>(configToken["batteries"]?["batteries"]);
+            oldSettings = Gen24JsonService.ReadFroniusData<Gen24BatterySettings>(configToken["batteries"]?["batteries"]);
 
             if (!string.IsNullOrWhiteSpace(inverterSettings.SystemName))
             {
@@ -320,7 +321,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
             }
 
             var rulesChanged = !ChargingRules.SequenceEqual(oldChargingRules);
-            var updateToken = Gen24Service.GetUpdateToken(Settings, oldSettings);
+            var updateToken = Gen24JsonService.GetUpdateToken(Settings, oldSettings);
             var nonRulesChanged = updateToken.Children().Any();
             var rulesToken = Gen24ChargingRule.GetToken(ChargingRules);
 

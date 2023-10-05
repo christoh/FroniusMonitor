@@ -4,8 +4,10 @@ public class ModbusViewModel : SettingsViewModelBase
 {
     private Gen24ModbusSettings oldSettings = null!;
 
-    public ModbusViewModel(IDataCollectionService dataCollectionService, IWebClientService webClientService, IGen24JsonService gen24JsonService, IWattPilotService wattPilotService)
-        : base(dataCollectionService, webClientService, gen24JsonService, wattPilotService) { }
+    public ModbusViewModel(IDataCollectionService dataCollectionService, IGen24Service gen24Service,
+            IGen24JsonService gen24JsonService, IFritzBoxService fritzBoxService, IWattPilotService wattPilotService)
+        : base(dataCollectionService, gen24Service, gen24JsonService, fritzBoxService, wattPilotService)
+    { }
 
     private Gen24ModbusSettings settings = null!;
 
@@ -71,7 +73,7 @@ public class ModbusViewModel : SettingsViewModelBase
 
             try
             {
-                var configToken = (await WebClientService.GetFroniusJsonResponse("config/", token: tokenSource.Token).ConfigureAwait(false)).Token;
+                var configToken = (await Gen24Service.GetFroniusJsonResponse("config/", token: tokenSource.Token).ConfigureAwait(false)).Token;
                 oldSettings = Gen24ModbusSettings.Parse(configToken["modbus"]);
                 inverterSettings = Gen24InverterSettings.Parse(configToken);
             }

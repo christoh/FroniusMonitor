@@ -2,19 +2,11 @@
 
 namespace De.Hochstaetter.Fronius.Contracts;
 
-public interface IWebClientService
+public interface IGen24Service
 {
-    WebConnection? InverterConnection { get; set; }
-    WebConnection? FritzBoxConnection { get; set; }
+    WebConnection? Connection { get; set; }
     Task<Gen24Sensors> GetFroniusData(Gen24Components components, CancellationToken token = default);
     ValueTask<T?> SendFroniusCommand<T>(string request, JToken? jToken = null, CancellationToken token = default) where T : Gen24NoResultCommand, new();
-    ValueTask FritzBoxLogin(CancellationToken token = default);
-    ValueTask<FritzBoxDeviceList> GetFritzBoxDevices(CancellationToken token = default);
-    ValueTask TurnOnFritzBoxDevice(string ain, CancellationToken token = default);
-    ValueTask TurnOffFritzBoxDevice(string ain, CancellationToken token = default);
-    ValueTask SetFritzBoxLevel(string ain, double level, CancellationToken token = default);
-    ValueTask SetFritzBoxColorTemperature(string ain, double temperatureKelvin, CancellationToken token = default);
-    ValueTask SetFritzBoxColor(string ain, double hueDegrees, double saturation, CancellationToken token = default);
     ValueTask<IOrderedEnumerable<Gen24Event>> GetFroniusEvents(CancellationToken token = default);
     ValueTask<T> ReadGen24Entity<T>(string request, CancellationToken token = default) where T : new();
     ValueTask<(string JsonString, HttpStatusCode StatusCode)> GetFroniusStringResponse(string request, JToken? jToken = null, IEnumerable<HttpStatusCode>? allowedStatusCodes = null, CancellationToken token = default);

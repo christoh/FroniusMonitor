@@ -2,11 +2,11 @@
 
 public class MainViewModel : ViewModelBase
 {
-    private readonly IWebClientService webClientService;
+    private readonly IFritzBoxService fritzBoxService;
 
-    public MainViewModel(IDataCollectionService dataCollectionService, IWebClientService webClientService, IWattPilotService wattPilotService)
+    public MainViewModel(IDataCollectionService dataCollectionService, IFritzBoxService fritzBoxService, IWattPilotService wattPilotService)
     {
-        this.webClientService = webClientService;
+        this.fritzBoxService = fritzBoxService;
         DataCollectionService = dataCollectionService;
         WattPilotService = wattPilotService;
         ExportSettingsCommand = new NoParameterCommand(ExportSettings);
@@ -63,7 +63,7 @@ public class MainViewModel : ViewModelBase
 
     internal void FritzBoxVisibilityChanged(bool isVisible)
     {
-        webClientService.FritzBoxConnection = isVisible ? App.Settings.FritzBoxConnection : null;
+        fritzBoxService.Connection = isVisible ? App.Settings.FritzBoxConnection : null;
 
         if (isVisible)
         {

@@ -87,7 +87,7 @@ public partial class MainWindow
         (
             w => container == null ||
                  w is not IInverterScoped scoped ||
-                 scoped.WebClientService == container.GetRequiredService<IWebClientService>()
+                 scoped.Gen24Service == container.GetRequiredService<IGen24Service>()
         );
 
         if (view == null)

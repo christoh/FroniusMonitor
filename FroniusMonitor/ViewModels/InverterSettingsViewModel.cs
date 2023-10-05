@@ -5,7 +5,10 @@
     {
         private Gen24InverterSettings oldSettings = null!;
 
-        public InverterSettingsViewModel(IDataCollectionService dataCollectionService, IWebClientService webClientService, IGen24JsonService gen24Service, IWattPilotService wattPilotService) : base(dataCollectionService, webClientService, gen24Service, wattPilotService) { }
+        public InverterSettingsViewModel(IDataCollectionService dataCollectionService, IGen24Service gen24Service,
+                IGen24JsonService gen24JsonService, IFritzBoxService fritzBoxService, IWattPilotService wattPilotService)
+            : base(dataCollectionService, gen24Service, gen24JsonService, fritzBoxService, wattPilotService)
+        { }
 
         private ICommand? undoCommand;
         public ICommand UndoCommand => undoCommand ??= new NoParameterCommand(Undo);
@@ -207,23 +210,23 @@
 
                 PowerModes = new[]
                 {
-                    new ListItemModel<MpptPowerMode> { Value = MpptPowerMode.Off, DisplayName = await WebClientService.GetFroniusName(MpptPowerMode.Off).ConfigureAwait(false) },
-                    new ListItemModel<MpptPowerMode> { Value = MpptPowerMode.Auto, DisplayName = await WebClientService.GetFroniusName(MpptPowerMode.Auto).ConfigureAwait(false) },
-                    new ListItemModel<MpptPowerMode> { Value = MpptPowerMode.Fix, DisplayName = await WebClientService.GetFroniusName(MpptPowerMode.Fix).ConfigureAwait(false) },
+                    new ListItemModel<MpptPowerMode> { Value = MpptPowerMode.Off, DisplayName = await Gen24Service.GetFroniusName(MpptPowerMode.Off).ConfigureAwait(false) },
+                    new ListItemModel<MpptPowerMode> { Value = MpptPowerMode.Auto, DisplayName = await Gen24Service.GetFroniusName(MpptPowerMode.Auto).ConfigureAwait(false) },
+                    new ListItemModel<MpptPowerMode> { Value = MpptPowerMode.Fix, DisplayName = await Gen24Service.GetFroniusName(MpptPowerMode.Fix).ConfigureAwait(false) },
                 };
 
                 DynamicPeakManagerModes = new[]
                 {
-                    new ListItemModel<MpptOnOff> { Value = MpptOnOff.Off, DisplayName = await WebClientService.GetFroniusName(MpptOnOff.Off).ConfigureAwait(false) },
-                    new ListItemModel<MpptOnOff> { Value = MpptOnOff.On, DisplayName = await WebClientService.GetFroniusName(MpptOnOff.On).ConfigureAwait(false) },
-                    new ListItemModel<MpptOnOff> { Value = MpptOnOff.OnMlsd, DisplayName = await WebClientService.GetFroniusName(MpptOnOff.OnMlsd).ConfigureAwait(false) },
+                    new ListItemModel<MpptOnOff> { Value = MpptOnOff.Off, DisplayName = await Gen24Service.GetFroniusName(MpptOnOff.Off).ConfigureAwait(false) },
+                    new ListItemModel<MpptOnOff> { Value = MpptOnOff.On, DisplayName = await Gen24Service.GetFroniusName(MpptOnOff.On).ConfigureAwait(false) },
+                    new ListItemModel<MpptOnOff> { Value = MpptOnOff.OnMlsd, DisplayName = await Gen24Service.GetFroniusName(MpptOnOff.OnMlsd).ConfigureAwait(false) },
                 };
 
                 PowerLimitModes = new[]
                 {
-                    new ListItemModel<PowerLimitMode> { Value = PowerLimitMode.Off, DisplayName = await WebClientService.GetFroniusName(PowerLimitMode.Off).ConfigureAwait(false) },
-                    new ListItemModel<PowerLimitMode> { Value = PowerLimitMode.EntireSystem, DisplayName = await WebClientService.GetConfigString("EXPORTLIMIT.WLIM_MAX_W").ConfigureAwait(false) },
-                    new ListItemModel<PowerLimitMode> { Value = PowerLimitMode.WeakestPhase, DisplayName = await WebClientService.GetConfigString("EXPORTLIMIT.WLIM_MAX_FEEDIN_PER_PHASE").ConfigureAwait(false) },
+                    new ListItemModel<PowerLimitMode> { Value = PowerLimitMode.Off, DisplayName = await Gen24Service.GetFroniusName(PowerLimitMode.Off).ConfigureAwait(false) },
+                    new ListItemModel<PowerLimitMode> { Value = PowerLimitMode.EntireSystem, DisplayName = await Gen24Service.GetConfigString("EXPORTLIMIT.WLIM_MAX_W").ConfigureAwait(false) },
+                    new ListItemModel<PowerLimitMode> { Value = PowerLimitMode.WeakestPhase, DisplayName = await Gen24Service.GetConfigString("EXPORTLIMIT.WLIM_MAX_FEEDIN_PER_PHASE").ConfigureAwait(false) },
                 };
 
                 Undo();
@@ -265,17 +268,17 @@
                     }
                 }
 
-                var visualizationToken = Gen24Service.GetUpdateToken(Settings.PowerLimitSettings.Visualization, oldSettings.PowerLimitSettings.Visualization);
+                var visualizationToken = Gen24JsonService.GetUpdateToken(Settings.PowerLimitSettings.Visualization, oldSettings.PowerLimitSettings.Visualization);
                 visualizationToken.Add("exportLimits", new JObject { { "activePower", new JObject { { "displayModeSoftLimit", "absolute" } } }, });
 
-                var hardLimitToken = Gen24Service.GetUpdateToken(Settings.PowerLimitSettings.ExportLimits.ActivePower.HardLimit, oldSettings.PowerLimitSettings.ExportLimits.ActivePower.HardLimit);
-                var softLimitToken = Gen24Service.GetUpdateToken(Settings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit, oldSettings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit);
+                var hardLimitToken = Gen24JsonService.GetUpdateToken(Settings.PowerLimitSettings.ExportLimits.ActivePower.HardLimit, oldSettings.PowerLimitSettings.ExportLimits.ActivePower.HardLimit);
+                var softLimitToken = Gen24JsonService.GetUpdateToken(Settings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit, oldSettings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit);
 
-                var activePowerToken = Gen24Service.GetUpdateToken(Settings.PowerLimitSettings.ExportLimits.ActivePower, oldSettings.PowerLimitSettings.ExportLimits.ActivePower);
+                var activePowerToken = Gen24JsonService.GetUpdateToken(Settings.PowerLimitSettings.ExportLimits.ActivePower, oldSettings.PowerLimitSettings.ExportLimits.ActivePower);
                 activePowerToken.Add("hardLimit", hardLimitToken);
                 activePowerToken.Add("softLimit", softLimitToken);
 
-                var exportLimitsToken = Gen24Service.GetUpdateToken(Settings.PowerLimitSettings.ExportLimits, oldSettings.PowerLimitSettings.ExportLimits);
+                var exportLimitsToken = Gen24JsonService.GetUpdateToken(Settings.PowerLimitSettings.ExportLimits, oldSettings.PowerLimitSettings.ExportLimits);
                 exportLimitsToken.Add("activePower", activePowerToken);
 
                 var limitsToken = new JObject
@@ -315,7 +318,7 @@
                 {
                     if (newValues is not null && oldValues is not null)
                     {
-                        var updateToken = Gen24Service.GetUpdateToken(newValues, oldValues);
+                        var updateToken = Gen24JsonService.GetUpdateToken(newValues, oldValues);
 
                         if (updateToken.HasValues)
                         {
@@ -341,9 +344,9 @@
         [SuppressMessage("ReSharper", "StringLiteralTypo")]
         private async ValueTask<Gen24InverterSettings> ReadDataFromInverter()
         {
-            var mpptToken = (await WebClientService.GetFroniusJsonResponse("config/setup/powerunit/mppt").ConfigureAwait(false)).Token;
-            var commonToken = (await WebClientService.GetFroniusJsonResponse("config/common").ConfigureAwait(false)).Token;
-            var powerLimitToken = (await WebClientService.GetFroniusJsonResponse("config/powerlimits").ConfigureAwait(false)).Token;
+            var mpptToken = (await Gen24Service.GetFroniusJsonResponse("config/setup/powerunit/mppt").ConfigureAwait(false)).Token;
+            var commonToken = (await Gen24Service.GetFroniusJsonResponse("config/common").ConfigureAwait(false)).Token;
+            var powerLimitToken = (await Gen24Service.GetFroniusJsonResponse("config/powerlimits").ConfigureAwait(false)).Token;
             return Gen24InverterSettings.Parse(commonToken, mpptToken, powerLimitToken);
         }
 

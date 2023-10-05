@@ -97,7 +97,7 @@
             </GroupBox>
 
             <GroupBox Grid.Row="0" Grid.Column="1" Header="{l:Channel 'MPPT1'}" Margin="4,0,0,0"
-                      IsEnabled="{Binding WebClientService.InverterConnection.UserName, FallbackValue=customer, Converter={co:String2Bool Value=customer, Equal=False, NotEqual=True}}">
+                      IsEnabled="{Binding Gen24Service.Connection.UserName, FallbackValue=customer, Converter={co:String2Bool Value=customer, Equal=False, NotEqual=True}}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -162,7 +162,7 @@
             </GroupBox>
 
             <GroupBox Grid.Row="0" Grid.Column="2" Header="{l:Channel 'MPPT2'}" Margin="4,0,0,0"
-                      IsEnabled="{Binding WebClientService.InverterConnection.UserName, FallbackValue=customer, Converter={co:String2Bool Value=customer, Equal=False, NotEqual=True}}">
+                      IsEnabled="{Binding Gen24Service.Connection.UserName, FallbackValue=customer, Converter={co:String2Bool Value=customer, Equal=False, NotEqual=True}}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -226,7 +226,7 @@
                 </Grid>
             </GroupBox>
 
-            <GroupBox Visibility="{Binding WebClientService.InverterConnection.UserName, FallbackValue=Collapsed, Converter={co:String2Visibility Value=customer, Equal=Collapsed, NotEqual=Visible}}"
+            <GroupBox Visibility="{Binding Gen24Service.Connection.UserName, FallbackValue=Collapsed, Converter={co:String2Visibility Value=customer, Equal=Collapsed, NotEqual=Visible}}"
                       Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Header="{l:Config 'EXPORTLIMIT.TITEL'}" Margin="0,4,0,0">
                 <Grid>
                     <Grid.RowDefinitions>
