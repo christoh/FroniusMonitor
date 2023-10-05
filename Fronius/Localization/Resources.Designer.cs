@@ -448,7 +448,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Always unlock, wenn not charging.
+        ///   Looks up a localized string similar to Always unlock if not charging.
         /// </summary>
         public static string CableLockBehavior_AutoUnlock {
             get {
@@ -2383,7 +2383,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Best for general use. Unlike MQTT it supports message rejection and abondoning..
+        ///   Looks up a localized string similar to Best for general use. Unlike MQTT it supports message rejection and abandoning..
         /// </summary>
         public static string Protocol_Amqp_ToolTip {
             get {
@@ -2401,7 +2401,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to HTTP 1.1 is not very effective but may be necessary if the internet connection has paranoid firewall serrings..
+        ///   Looks up a localized string similar to HTTP 1.1 may be necessary if the internet connection has very strict firewall settings..
         /// </summary>
         public static string Protocol_Http1_ToolTip {
             get {
@@ -2419,7 +2419,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to MQTT is more lightweight than AMQP but lacks some feature. However, if you have an unstable internet connection, you might loose less messages..
+        ///   Looks up a localized string similar to MQTT is more lightweight than AMQP but lacks some features. However, if you have an unstable internet connection, you might loose less messages..
         /// </summary>
         public static string Protocol_Mqtt_ToolTip {
             get {
@@ -2644,7 +2644,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Autarchy.
+        ///   Looks up a localized string similar to Self-sufficiency.
         /// </summary>
         public static string SelfSufficiency {
             get {
@@ -2842,7 +2842,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Are you sure you want to set this inverter to standy?.
+        ///   Looks up a localized string similar to Are you sure you want to set this inverter to standby?.
         /// </summary>
         public static string StandbyWarning {
             get {
@@ -3256,7 +3256,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Try the native protocol first. If that fails, try tunnelling through HTTP and web socket. If the internet connection is firewalled, you will likely get a connection..
+        ///   Looks up a localized string similar to Try the native protocol first. If that fails, try tunneling through HTTP and web sockets. If the internet connection is restricted, you may still be able to establish a connection..
         /// </summary>
         public static string TunnelMode_Auto_ToolTip {
             get {
@@ -3265,7 +3265,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No tunnelling.
+        ///   Looks up a localized string similar to No tunneling.
         /// </summary>
         public static string TunnelMode_NoTunnel {
             get {
@@ -3292,7 +3292,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Always use a web tunnel via HTTP and web socket. If you know that your internet connection is firewalled and blocks the native protocol, there is no waste of time by trying the native protocol..
+        ///   Looks up a localized string similar to Always use a web tunnel via HTTP and web socket. If you know that your internet connection is restricted and blocks the native protocol, there is no waste of time by trying the native protocol..
         /// </summary>
         public static string TunnelMode_Websocket_ToolTip {
             get {
