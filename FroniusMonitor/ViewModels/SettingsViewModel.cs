@@ -50,7 +50,12 @@ public class SettingsViewModel : SettingsViewModelBase
 
     public ListItemModel<Protocol> SelectedProtocol
     {
-        get => AzureProtocols.First(p => p.Value == Settings.ToshibaAcConnection!.Protocol);
+        get => AzureProtocols.FirstOrDefault(p =>
+        {
+            if (Settings.ToshibaAcConnection == null)
+                return false;
+            return p.Value == Settings.ToshibaAcConnection.Protocol;
+        }, new ListItemModel<Protocol>());
         set
         {
             Settings.ToshibaAcConnection!.Protocol = value.Value;
@@ -61,7 +66,12 @@ public class SettingsViewModel : SettingsViewModelBase
 
     public ListItemModel<TunnelMode> SelectedTunnelMode
     {
-        get => TunnelModes.First(p => p.Value == Settings.ToshibaAcConnection!.TunnelMode);
+        get => TunnelModes.FirstOrDefault(p =>
+        {
+            if (Settings.ToshibaAcConnection == null)
+                return false;
+            return p.Value == Settings.ToshibaAcConnection.TunnelMode;
+        }, new ListItemModel<TunnelMode>());
         set
         {
             Settings.ToshibaAcConnection!.TunnelMode = value.Value;
@@ -69,7 +79,7 @@ public class SettingsViewModel : SettingsViewModelBase
         }
     }
 
-    public bool CanUseTunnel => Settings.ToshibaAcConnection!.CanUseTunnel;
+    public bool CanUseTunnel => Settings.ToshibaAcConnection?.CanUseTunnel ?? false;
 
     private Settings settings = null!;
 
