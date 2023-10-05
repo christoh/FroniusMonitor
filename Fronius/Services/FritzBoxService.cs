@@ -1,5 +1,6 @@
 ﻿namespace De.Hochstaetter.Fronius.Services;
 
+[SuppressMessage("ReSharper", "StringLiteralTypo")]
 public class FritzBoxService : BindableBase, IFritzBoxService
 {
     private string? fritzBoxSid;
@@ -74,8 +75,7 @@ public class FritzBoxService : BindableBase, IFritzBoxService
     {
         var intTemperature = (int)Math.Round(temperatureKelvin, MidpointRounding.AwayFromZero);
         ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
-        using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setcolortemperature&temperature={intTemperature}&duration=0",
-            token: token).ConfigureAwait(false);
+        using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setcolortemperature&temperature={intTemperature}&duration=0", token: token).ConfigureAwait(false);
     }
 
 
