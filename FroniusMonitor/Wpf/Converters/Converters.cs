@@ -152,6 +152,8 @@ public class NullToBool : NullToAnything<bool>
     public override bool Null { get; set; } = false;
 }
 
+public class NullToDouble : NullToAnything<double> { }
+
 public class ToUpper : ConverterBase
 {
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value?.ToString()?.ToUpper(CultureInfo.CurrentCulture);
@@ -749,7 +751,8 @@ public class PowerStatus2Brush : MultiConverterBase
     }
 }
 
-public class Gen24Status2PanelBrush:ConverterBase {
+public class Gen24Status2PanelBrush : ConverterBase
+{
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         return value is Gen24Status status ? status.ToPanelBrush() : Brushes.Gainsboro;
@@ -764,7 +767,7 @@ public class TypeToAnything<TTo> : ConverterBase
 
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        return Type is not null && value is not null && Type.IsInstanceOfType(value)? Equal : NotEqual;
+        return Type is not null && value is not null && Type.IsInstanceOfType(value) ? Equal : NotEqual;
     }
 }
 

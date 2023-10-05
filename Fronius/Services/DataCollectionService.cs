@@ -2,7 +2,7 @@
 
 public class DataCollectionService : BindableBase, IDataCollectionService
 {
-    private static readonly TimeSpan webRequestTimeOut = TimeSpan.FromSeconds(10);
+    private static readonly TimeSpan webRequestTimeOut = TimeSpan.FromSeconds(100000);
     private readonly IWattPilotService wattPilotService;
     private readonly SettingsBase settings;
     private Timer? timer;
@@ -426,7 +426,7 @@ public class DataCollectionService : BindableBase, IDataCollectionService
                 }
 
                 var gen24Task = froniusCounter % FroniusUpdateRate == 0 ? TryGetGen24System(Gen24Service, HomeAutomationSystem.Gen24Config!.Components, tokenSource.Token) : Task.FromResult<Gen24Sensors?>(null);
-                var gen24Task2 = froniusCounter++ % FroniusUpdateRate == 0 ? TryGetGen24System(Gen24Service2, HomeAutomationSystem.Gen24Config2!.Components, tokenSource.Token) : Task.FromResult<Gen24Sensors?>(null);
+                var gen24Task2 = froniusCounter++ % FroniusUpdateRate == 0 ? TryGetGen24System(Gen24Service2, HomeAutomationSystem.Gen24Config2?.Components, tokenSource.Token) : Task.FromResult<Gen24Sensors?>(null);
 
                 if (FritzBoxService.Connection == null && SwitchableDevices.Any(d => d is FritzBoxDevice))
                 {

@@ -108,12 +108,14 @@
                                            Sensors="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors, FallbackValue={x:Null}}"
                                            Config="{Binding DataCollectionService.HomeAutomationSystem.Gen24Config, FallbackValue={x:Null}}"/>
                         <c:PowerFlowArrow VerticalAlignment="Top" Fill="#ffd000" HasRightPlacement="True" x:Name="LoadArrowPrimaryInverter" Margin="15,0"
+                                          Visibility="{Binding DataCollectionService.HomeAutomationSystem.Gen24Config2, FallbackValue=Collapsed, Converter={co:NullToVisibility}}"
                                           Power="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors.PowerFlow.LoadPower, FallbackValue={x:Null}}" />
                         <c:InverterControl Height="200" Versions="{Binding DataCollectionService.HomeAutomationSystem.Gen24Config2.Versions, FallbackValue={x:Null}}" IsSecondary="True"
                                            Sensors="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors2, FallbackValue={x:Null}}"
-                                           Config="{Binding DataCollectionService.HomeAutomationSystem.Gen24Config2, FallbackValue={x:Null}}"/>
+                                           Config="{Binding DataCollectionService.HomeAutomationSystem.Gen24Config2, FallbackValue={x:Null}}"
+                                           Visibility="{Binding DataCollectionService.HomeAutomationSystem.Gen24Config2, FallbackValue=Collapsed, Converter={co:NullToVisibility}}"/>
 
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Visibility="{Binding DataCollectionService.HomeAutomationSystem.Gen24Config2, FallbackValue=Collapsed, Converter={co:NullToVisibility}}">
                             <StackPanel Orientation="Vertical">
                                 <c:PowerFlowArrow VerticalAlignment="Top" Fill="#ffd000" Margin="15,0" HasRightPlacement="True"
                                                   Power="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors2.Inverter.Solar1Power, FallbackValue={x:Null}}" />
@@ -141,8 +143,11 @@
                                           Power="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors.PowerFlow.StoragePower, FallbackValue={x:Null}}"
                                           Visibility="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors.Storage, Converter={co:NullToVisibility Null=Hidden}, FallbackValue=Hidden}" />
 
-                        <c:PowerFlowArrow x:Name="LoadArrow" Fill="LightGray" HasRightPlacement="False" DefaultsToOutgoing="True"
-                                          Margin="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors2, Converter={co:NullToThickness NotNull='110,0,0,0', Null='15,0,0,0'}, FallbackValue='15,0,0,0'}" Angle="-30">
+                        <c:PowerFlowArrow x:Name="LoadArrow" Fill="LightGray" DefaultsToOutgoing="True" 
+                                          HasRightPlacement="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors2, FallbackValue=True, Converter={co:NullToBool Null=True, NotNull=False}}" 
+                                          Margin="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors2, Converter={co:NullToThickness NotNull='110,0,0,0', Null='15,0,0,0'}, FallbackValue='15,0,0,0'}"
+                                          Angle="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors2, Converter={co:NullToDouble Null=30, NotNull=-30}, FallbackValue=30}"
+                                          >
                             <c:PowerFlowArrow.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Header="{x:Static p:Resources.IncludeInverterPower}" IsChecked="{Binding IncludeInverterPower}" IsCheckable="True" />
