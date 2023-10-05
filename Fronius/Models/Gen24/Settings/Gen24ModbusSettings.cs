@@ -173,11 +173,27 @@ public class Gen24ModbusSettings : Gen24ParsingBase, ICloneable
         get => ipAddress;
         set => Set(ref ipAddress, value, () =>
         {
-            if (value != null && !Regex.IsMatch(value, @"^$|^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))?((,(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))?)?)+$"))
+            if (!string.IsNullOrEmpty(value) && !value.Split(',').All(IsValidIpOrIpWithMask))
             {
                 throw new ArgumentException(Resources.MustBeIpv4Address);
             }
         });
+    }
+
+    private static bool IsValidIpOrIpWithMask(string value)
+    {
+        var parts = value.Split('/');
+        var isValidIp = parts[0].Split('.').Length == 4 // 4 octets
+            && parts[0].Split('.').All(octet => byte.TryParse(octet, out _)); // and each is valid
+
+        return parts.Length switch
+        {
+            // like 192.168.178.1
+            1 => isValidIp,
+            // with mask, like 192.168.178.1/16 (mask range needs to be within 0 and 32)
+            2 when int.TryParse(parts[1], out int mask) && mask is > 0 and <= 32 => isValidIp,
+            _ => false
+        };
     }
 
     public static Gen24ModbusSettings Parse(JToken? token)
