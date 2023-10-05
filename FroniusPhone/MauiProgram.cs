@@ -25,7 +25,8 @@ public static class MauiProgram
     {
         builder.Services
             .AddSingleton<IDataCollectionService, DataCollectionService>()
-            .AddSingleton<IWebClientService, WebClientService>()
+            .AddSingleton<IGen24Service, Gen24Service>()
+            .AddSingleton<IFritzBoxService, FritzBoxService>()
             .AddSingleton<IAesKeyProvider, AesKeyProvider>()
             .AddSingleton<IWattPilotService, WattPilotService>()
             .AddSingleton<Settings>()
