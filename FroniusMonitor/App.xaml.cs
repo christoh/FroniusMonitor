@@ -9,7 +9,6 @@ public partial class App
     private static readonly Mutex mutex = new(true, $"{Environment.UserName}_HomeAutomationControlCenter");
     public static bool HaveSettings = true;
     public static readonly IServiceCollection ServiceCollection = new ServiceCollection();
-    public static Timer? SolarSystemQueryTimer;
 
     static App()
     {

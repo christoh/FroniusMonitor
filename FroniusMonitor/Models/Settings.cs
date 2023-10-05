@@ -36,7 +36,8 @@ public class Settings : SettingsBase
     {
         lock (settingsLockObject)
         {
-            UpdateChecksum(App.Settings.WattPilotConnection, App.Settings.FritzBoxConnection, App.Settings.FroniusConnection, App.Settings.FroniusConnection2, App.Settings.ToshibaAcConnection);
+            UpdateChecksum(App.Settings.WattPilotConnection, App.Settings.FritzBoxConnection,
+                App.Settings.FroniusConnection, App.Settings.FroniusConnection2, App.Settings.ToshibaAcConnection);
             var serializer = new XmlSerializer(typeof(Settings));
             Directory.CreateDirectory(App.PerUserDataDir);
             using var stream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None);
@@ -57,18 +58,10 @@ public class Settings : SettingsBase
     {
         lock (settingsLockObject)
         {
-            try
-            {
-                App.SolarSystemQueryTimer = new(_ => { Environment.Exit(0); }, null, 10000, -1);
-                var serializer = new XmlSerializer(typeof(Settings));
-                using var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-                App.Settings = serializer.Deserialize(stream) as Settings ?? new Settings();
-                ClearIncorrectPasswords(App.Settings.WattPilotConnection, App.Settings.FritzBoxConnection, App.Settings.FroniusConnection);
-            }
-            finally
-            {
-                App.SolarSystemQueryTimer?.Dispose();
-            }
+            var serializer = new XmlSerializer(typeof(Settings));
+            using var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+            App.Settings = serializer.Deserialize(stream) as Settings ?? new Settings();
+            ClearIncorrectPasswords(App.Settings.WattPilotConnection, App.Settings.FritzBoxConnection, App.Settings.FroniusConnection);
         }
     }).ConfigureAwait(false);
 
