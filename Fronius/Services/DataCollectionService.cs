@@ -307,6 +307,9 @@ public class DataCollectionService : BindableBase, IDataCollectionService
     {
         try
         {
+            if (FritzBoxService.Connection == null)
+                return null;
+
             var devices = await FritzBoxService.GetFritzBoxDevices(token).ConfigureAwait(false);
 
             await Task.Run(() =>
