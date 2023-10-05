@@ -2635,7 +2635,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Self use.
+        ///   Looks up a localized string similar to Cons..
         /// </summary>
         public static string SelfConsumptionShort {
             get {
@@ -2649,6 +2649,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string SelfSufficiency {
             get {
                 return ResourceManager.GetString("SelfSufficiency", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Self-suf..
+        /// </summary>
+        public static string SelfSufficiencyShort {
+            get {
+                return ResourceManager.GetString("SelfSufficiencyShort", resourceCulture);
             }
         }
         

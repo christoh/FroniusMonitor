@@ -1221,4 +1221,7 @@
   <data name="Visible" xml:space="preserve">
 	  <value>SIchtbar</value>
   </data>
+  <data name="SelfSufficiencyShort" xml:space="preserve">
+	  <value>Autarkie</value>
+  </data>
 </root>

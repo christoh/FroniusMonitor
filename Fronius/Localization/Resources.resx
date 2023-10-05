@@ -1231,7 +1231,7 @@
 	  <value>Time</value>
   </data>
   <data name="SelfConsumptionShort" xml:space="preserve">
-	  <value>Self use</value>
+	  <value>Cons.</value>
   </data>
   <data name="Latency" xml:space="preserve">
 	  <value>Latency</value>
@@ -1262,5 +1262,8 @@
   </data>
   <data name="Visible" xml:space="preserve">
 	  <value>Visible</value>
+  </data>
+  <data name="SelfSufficiencyShort" xml:space="preserve">
+	  <value>Self-suf.</value>
   </data>
 </root>

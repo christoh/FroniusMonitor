@@ -398,7 +398,7 @@
                                                          Maximum="1" Low=".9" VeryLow=".8" />
                                 <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.SelfConsumptionShort}" x:Name="MoreEfficiencySelfConsumption"
                                                          Maximum="1" Low=".50" VeryLow=".25" />
-                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.SelfSufficiency}" x:Name="MoreEfficiencySelfSufficiency"
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.SelfSufficiencyShort}" x:Name="MoreEfficiencySelfSufficiency"
                                                          Maximum="1" VeryLow=".5" Low=".75" />
                             </StackPanel>
                         </Grid>
