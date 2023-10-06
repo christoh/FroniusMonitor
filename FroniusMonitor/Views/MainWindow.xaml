@@ -8,10 +8,10 @@
         mc:Ignorable="d"
         Title="{x:Static p:Resources.AppName}" Height="860" Width="1080"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel, IsDesignTimeCreatable=False}"
-        xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
         xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
         xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
         xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
+        xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
         xmlns:models="clr-namespace:De.Hochstaetter.Fronius.Models;assembly=Fronius"
         xmlns:toshiba="clr-namespace:De.Hochstaetter.Fronius.Models.ToshibaAc;assembly=Fronius">
     <Grid>

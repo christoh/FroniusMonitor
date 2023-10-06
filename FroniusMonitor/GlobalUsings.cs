@@ -37,6 +37,7 @@ global using De.Hochstaetter.Fronius.Models.Gen24.Settings;
 global using De.Hochstaetter.Fronius.Models.ToshibaAc;
 global using De.Hochstaetter.Fronius.Services;
 global using De.Hochstaetter.FroniusMonitor.Assets.Images;
+global using De.Hochstaetter.FroniusMonitor.AttachedProperties;
 global using De.Hochstaetter.FroniusMonitor.Controls;
 global using De.Hochstaetter.FroniusMonitor.Extensions;
 global using De.Hochstaetter.FroniusMonitor.Models;

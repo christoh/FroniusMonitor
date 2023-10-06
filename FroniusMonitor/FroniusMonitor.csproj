@@ -4,6 +4,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <UseWPF>true</UseWPF>
     <ImplicitUsings>enable</ImplicitUsings>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
@@ -24,6 +25,16 @@
     <EmbeddedResource Remove="Properties\**" />
     <None Remove="Properties\**" />
     <Page Remove="Properties\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Remove="SolarPanels\Sample solar panel layout.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="SolarPanels\Sample solar panel layout.xaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

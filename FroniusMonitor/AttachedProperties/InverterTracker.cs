@@ -27,4 +27,20 @@ public class InverterTracker
     {
         return (Tracker)element.GetValue(MpptProperty);
     }
+    
+    public static readonly DependencyProperty ColorShapesProperty = DependencyProperty.RegisterAttached
+    (
+        "ColorShapes", typeof(bool), typeof(InverterTracker),
+        new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.Inherits)
+    );
+
+    public static void SetColorShapes(UIElement element, bool value)
+    {
+        element.SetValue(ColorShapesProperty, value);
+    }
+
+    public static bool GetColorShapes(UIElement element)
+    {
+        return (bool)element.GetValue(ColorShapesProperty);
+    }
 }
