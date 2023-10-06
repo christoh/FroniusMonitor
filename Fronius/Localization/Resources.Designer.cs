@@ -709,6 +709,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to DC link.
+        /// </summary>
+        public static string DcLink {
+            get {
+                return ResourceManager.GetString("DcLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to DC module.
         /// </summary>
         public static string DcModule {

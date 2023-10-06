@@ -1224,4 +1224,7 @@
   <data name="SelfSufficiencyShort" xml:space="preserve">
 	  <value>Autarkie</value>
   </data>
+  <data name="DcLink" xml:space="preserve">
+	  <value>DC-Link</value>
+  </data>
 </root>

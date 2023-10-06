@@ -1266,4 +1266,7 @@
   <data name="SelfSufficiencyShort" xml:space="preserve">
 	  <value>Self-suf.</value>
   </data>
+  <data name="DcLink" xml:space="preserve">
+	  <value>DC link</value>
+  </data>
 </root>

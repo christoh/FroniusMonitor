@@ -338,8 +338,8 @@
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                                 <c:LinearHorizontalGauge DisplayName="{l:Channel 'MPPT1'}" Value="{Binding Sensors.Cache.Solar1Voltage, FallbackValue={x:Null}}" />
                                 <c:LinearHorizontalGauge DisplayName="{l:Channel 'MPPT2'}" Value="{Binding Sensors.Cache.Solar2Voltage, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="DC Link" Value="{Binding Sensors.Cache.DcLinkVoltage, FallbackValue={x:Null}}"
-                                                         Minimum="550" Maximum="660" Low="600" VeryLow="580" High="640" VeryHigh="650" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.DcLink}" Value="{Binding Sensors.Cache.DcLinkVoltage, FallbackValue={x:Null}}"
+                                                         Minimum="550" Maximum="800" Low="600" VeryLow="580" High="750" VeryHigh="800" />
                                 <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Battery}" Value="{Binding Sensors.Cache.StorageVoltageOuter, FallbackValue={x:Null}}"
                                                          Minimum="230" Maximum="360" VeryLow="240" VeryHigh="350" High="340" Low="250" />
                             </StackPanel>
