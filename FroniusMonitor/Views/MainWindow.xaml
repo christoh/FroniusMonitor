@@ -145,7 +145,7 @@
 
                         <c:PowerFlowArrow x:Name="LoadArrow" Fill="LightGray" DefaultsToOutgoing="True" 
                                           HasRightPlacement="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors2, FallbackValue=True, Converter={co:NullToBool Null=True, NotNull=False}}" 
-                                          Margin="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors2, Converter={co:NullToThickness NotNull='110,0,0,0', Null='15,0,0,0'}, FallbackValue='15,0,0,0'}"
+                                          Margin="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors2, Converter={co:NullToThickness NotNull='180,0,0,0', Null='15,0,0,0'}, FallbackValue='15,0,0,0'}"
                                           Angle="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors2, Converter={co:NullToDouble Null=30, NotNull=-30}, FallbackValue=30}"
                                           >
                             <c:PowerFlowArrow.ContextMenu>
@@ -172,7 +172,7 @@
                             </c:PowerFlowArrow>-->
                         </StackPanel>
 
-                        <Grid Margin="152,0,0,0"
+                        <Grid Margin="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors2, Converter={co:NullToThickness NotNull='72,0,0,0', Null='235,0,0,0'}, FallbackValue='235,0,0,0'}"
                               Visibility="{Binding DataCollectionService.HomeAutomationSystem.WattPilot.CableCurrentMaximum, FallbackValue=Hidden, Converter={co:NullToVisibility Null=Hidden}}">
                             <Grid.LayoutTransform>
                                 <ScaleTransform ScaleX="{Binding ScaleX, ElementName=WattPilotTransform}" ScaleY="{Binding ScaleY, ElementName=WattPilotTransform}" />
