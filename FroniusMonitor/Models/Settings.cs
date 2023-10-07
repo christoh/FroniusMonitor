@@ -30,6 +30,14 @@ public class Settings : SettingsBase
         set => Set(ref showRibbon, value);
     }
 
+    private string? customSolarPanelLayout;
+    [DefaultValue(null)]
+    public string? CustomSolarPanelLayout
+    {
+        get => customSolarPanelLayout;
+        set => Set(ref customSolarPanelLayout, value);
+    }
+
     public static Task Save() => Save(App.SettingsFileName);
 
     public static async Task Save(string fileName) => await Task.Run(() =>

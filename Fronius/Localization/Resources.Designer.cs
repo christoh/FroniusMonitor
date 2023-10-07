@@ -610,6 +610,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Choose.
+        /// </summary>
+        public static string Choose {
+            get {
+                return ResourceManager.GetString("Choose", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select a solar panel layout file.
+        /// </summary>
+        public static string ChoosePanelLayoutFile {
+            get {
+                return ResourceManager.GetString("ChoosePanelLayoutFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to G Cipher.
         /// </summary>
         public static string CipherG {
@@ -1047,6 +1065,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string FeedIn {
             get {
                 return ResourceManager.GetString("FeedIn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to |All files (*.*)|*.
+        /// </summary>
+        public static string FilterAllFiles {
+            get {
+                return ResourceManager.GetString("FilterAllFiles", resourceCulture);
             }
         }
         
@@ -2527,6 +2554,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reset.
+        /// </summary>
+        public static string Reset {
+            get {
+                return ResourceManager.GetString("Reset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Restrict inverter control over TCP.
         /// </summary>
         public static string RestrictInverterControlOverModbusTcp {
@@ -2829,6 +2865,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string SocLimits {
             get {
                 return ResourceManager.GetString("SocLimits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Solar panel layout.
+        /// </summary>
+        public static string SolarPanelLayout {
+            get {
+                return ResourceManager.GetString("SolarPanelLayout", resourceCulture);
             }
         }
         
@@ -3432,6 +3477,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Visible {
             get {
                 return ResourceManager.GetString("Visible", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Visualization.
+        /// </summary>
+        public static string Visualization {
+            get {
+                return ResourceManager.GetString("Visualization", resourceCulture);
             }
         }
         

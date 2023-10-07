@@ -1,0 +1,135 @@
+﻿<!--
+     Root doesn't need to be a canvas
+     Choose approximately same height and width for the root element.
+     Always include the namespaces -->
+<Canvas xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:a="clr-namespace:De.Hochstaetter.FroniusMonitor.AttachedProperties;assembly=FroniusMonitor"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:gl="clr-namespace:System.Globalization;assembly=System.Runtime"
+        xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls;assembly=FroniusMonitor"
+        xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images;assembly=FroniusMonitor"
+        xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters;assembly=FroniusMonitor"
+        xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+        mc:Ignorable="d"
+        d:DesignHeight="450" d:DesignWidth="450"
+        d:DataContext="{d:DesignInstance Type=c:SolarPanels}"
+        Height="450" Width="450">
+    <Canvas.LayoutTransform>
+        <RotateTransform Angle="-24" />
+    </Canvas.LayoutTransform>
+    <Canvas.Resources>
+        <!-- Always create these two brush resources in the root element -->
+        <SolidColorBrush x:Key="ActiveSolarPanelBrush">#ffd000</SolidColorBrush>
+        <SolidColorBrush x:Key="InactiveSolarPanelBrush">#000000</SolidColorBrush>
+
+        <Style TargetType="Rectangle" x:Key="LandscapeRect">
+            <Setter Property="Margin" Value="0,0,0,-2" />
+            <Setter Property="Height" Value="28.46" />
+            <Setter Property="Stroke" Value="Silver" />
+            <Setter Property="StrokeThickness" Value="2" />
+            <Setter Property="Width" Value="46" />
+        </Style>
+        <Style TargetType="Rectangle" BasedOn="{StaticResource LandscapeRect}" />
+    </Canvas.Resources>
+    <Border Height="100" Width="360" BorderThickness="3" BorderBrush="Black">
+        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="56" Foreground="Black" FontWeight="Bold">
+            <Run Text="{Binding WattPeak, StringFormat=N0, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, Mode=OneWay}" />
+            <Run Text="Wp" />
+        </TextBlock>
+    </Border>
+    <Border Canvas.Top="100" Height="100" Width="360" BorderThickness="3" BorderBrush="Black">
+        <Border.Resources>
+            <Style TargetType="Rectangle" BasedOn="{StaticResource LandscapeRect}" >
+                <Setter Property="Margin" Value="0,0,-2,0" />
+                <Setter Property="Width" Value="28.46" />
+                <Setter Property="Height" Value="46" />
+            </Style>
+        </Border.Resources>
+        <StackPanel a:InverterTracker.ColorShapes="True">
+            <StackPanel Margin="4,0,6,0" Orientation="Horizontal" VerticalAlignment="Top" a:InverterTracker.Mppt="Inverter1Mppt1">
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+            </StackPanel>
+            <StackPanel Margin="4,0,6,0" Orientation="Horizontal" VerticalAlignment="Top" a:InverterTracker.Mppt="Inverter1Mppt2">
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+            </StackPanel>
+        </StackPanel>
+    </Border>
+
+    <Border Canvas.Right="0" Canvas.Bottom="0" Height="250" Width="100" BorderThickness="3" BorderBrush="Black">
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" a:InverterTracker.ColorShapes="True" a:InverterTracker.Mppt="Inverter2Mppt1">
+            <StackPanel>
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+            </StackPanel>
+            <StackPanel>
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+            </StackPanel>
+        </StackPanel>
+    </Border>
+
+    <Border Canvas.Right="100" Canvas.Bottom="0" Height="250" Width="100" BorderThickness="3" BorderBrush="Black">
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,-30,0,0" a:InverterTracker.ColorShapes="True" a:InverterTracker.Mppt="Inverter2Mppt2">
+            <StackPanel>
+                <Rectangle Visibility="Hidden" a:InverterTracker.ColorShapes="False" />
+                <Rectangle Visibility="Hidden" a:InverterTracker.ColorShapes="False" />
+                <Rectangle a:InverterTracker.Mppt="Inverter1Mppt2" />
+                <Rectangle a:InverterTracker.Mppt="Inverter1Mppt2" />
+                <Rectangle Visibility="Hidden" a:InverterTracker.ColorShapes="False" Height="28" />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+            </StackPanel>
+            <StackPanel>
+                <Rectangle Visibility="Hidden" a:InverterTracker.ColorShapes="False" />
+                <Rectangle a:InverterTracker.Mppt="Inverter1Mppt2" />
+                <Rectangle a:InverterTracker.Mppt="Inverter1Mppt2" />
+                <Rectangle a:InverterTracker.Mppt="Inverter1Mppt2" />
+                <Rectangle Visibility="Hidden" a:InverterTracker.ColorShapes="False" Height="28" />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+                <Rectangle />
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Canvas>

@@ -1,12 +1,11 @@
 ﻿using System.Windows.Shapes;
-using De.Hochstaetter.FroniusMonitor.AttachedProperties;
 
 namespace De.Hochstaetter.FroniusMonitor.Controls;
 
-public partial class SolarPanels
+public sealed partial class SolarPanels
 {
-    private static readonly SolidColorBrush solarBrush = new(Color.FromRgb(0xff, 0xd0, 0));
-    private static readonly SolidColorBrush panelBrush = new(Color.FromRgb(64, 64, 64));
+    private Brush solarBrush = new SolidColorBrush(Color.FromRgb(0xff, 0xd0, 0));
+    private Brush panelBrush = new SolidColorBrush(Color.FromRgb(64, 64, 64));
 
     public static readonly DependencyProperty TrackerProperty = DependencyProperty.Register
     (
@@ -34,10 +33,49 @@ public partial class SolarPanels
     public SolarPanels()
     {
         InitializeComponent();
+        OnSettingsChanged(this);
+        Loaded += (_, _) => App.Settings.SettingsChanged += OnSettingsChanged;
+        Unloaded += (_, _) => App.Settings.SettingsChanged -= OnSettingsChanged;
     }
+
+    public void OnSettingsChanged(object? sender, EventArgs? __ = null) => Dispatcher.Invoke(() =>
+    {
+        FrameworkElement content;
+
+        try
+        {
+            using var stream = new FileStream(App.Settings.CustomSolarPanelLayout!, FileMode.Open, FileAccess.Read, FileShare.Read);
+            content = (FrameworkElement)XamlReader.Load(stream);
+        }
+        catch
+        {
+            content = new SolarPanel { Foreground = Brushes.DarkGreen };
+        }
+
+        content.DataContext = this;
+
+        if (content.TryFindResource("ActiveSolarPanelBrush") is Brush activeSolarPanelBrush)
+        {
+            solarBrush = activeSolarPanelBrush;
+        }
+
+        if (content.TryFindResource("InactiveSolarPanelBrush") is Brush inactiveSolarPanelBrush)
+        {
+            panelBrush = inactiveSolarPanelBrush;
+        }
+
+        Child = content;
+
+        if (!ReferenceEquals(sender, this))
+        {
+            OnTrackerChanged();
+        }
+    });
 
     private void OnTrackerChanged()
     {
-        this.FindVisualChildren<Rectangle>().Apply(solarPanel => solarPanel.Fill = InverterTracker.GetMppt(solarPanel) == Tracker ? solarBrush : panelBrush);
+        this.FindVisualChildren<Shape>()
+            .Where(InverterTracker.GetColorShapes)
+            .Apply(solarPanel => solarPanel.Fill = InverterTracker.GetMppt(solarPanel) == Tracker ? solarBrush : panelBrush);
     }
 }

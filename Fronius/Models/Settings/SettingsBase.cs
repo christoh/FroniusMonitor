@@ -2,10 +2,12 @@
 
 public abstract class SettingsBase : BindableBase, ICloneable
 {
-    private WebConnection? fritzBoxConnection = new() { BaseUrl = "http://192.168.178.1", UserName = string.Empty, Password = string.Empty };
+    public event EventHandler<EventArgs> SettingsChanged;
+
+    private WebConnection fritzBoxConnection = new() { BaseUrl = "http://192.168.178.1", UserName = string.Empty, Password = string.Empty };
 
     [XmlElement, DefaultValue(null)]
-    public WebConnection? FritzBoxConnection
+    public WebConnection FritzBoxConnection
     {
         get => fritzBoxConnection;
         set => Set(ref fritzBoxConnection, value);
@@ -29,28 +31,28 @@ public abstract class SettingsBase : BindableBase, ICloneable
         set => Set(ref driftFileName, value);
     }
 
-    private WebConnection? froniusConnection = new() { BaseUrl = "http://192.168.178.XXX", UserName = string.Empty, Password = string.Empty };
+    private WebConnection froniusConnection = new() { BaseUrl = "http://192.168.178.XXX", UserName = string.Empty, Password = string.Empty };
 
     [XmlElement, DefaultValue(null)]
-    public WebConnection? FroniusConnection
+    public WebConnection FroniusConnection
     {
         get => froniusConnection;
         set => Set(ref froniusConnection, value);
     }
 
-    private WebConnection? froniusConnection2 = new() { BaseUrl = "http://192.168.178.XXX", UserName = string.Empty, Password = string.Empty };
+    private WebConnection froniusConnection2 = new() { BaseUrl = "http://192.168.178.XXX", UserName = string.Empty, Password = string.Empty };
 
     [XmlElement, DefaultValue(null)]
-    public WebConnection? FroniusConnection2
+    public WebConnection FroniusConnection2
     {
         get => froniusConnection2;
         set => Set(ref froniusConnection2, value);
     }
 
-    private WebConnection? wattPilotConnection = new() { BaseUrl = "ws://192.168.178.YYY", Password = string.Empty };
+    private WebConnection wattPilotConnection = new() { BaseUrl = "ws://192.168.178.YYY", Password = string.Empty };
 
     [XmlElement, DefaultValue(null)]
-    public WebConnection? WattPilotConnection
+    public WebConnection WattPilotConnection
     {
         get => wattPilotConnection;
         set => Set(ref wattPilotConnection, value);
@@ -106,13 +108,7 @@ public abstract class SettingsBase : BindableBase, ICloneable
     public bool HaveFritzBox
     {
         get => haveFritzBox;
-        set => Set(ref haveFritzBox, value, () =>
-        {
-            if (value)
-            {
-                FritzBoxConnection ??= new WebConnection { BaseUrl = "http://192.168.178.1", UserName = string.Empty, Password = string.Empty };
-            }
-        });
+        set => Set(ref haveFritzBox, value);
     }
 
     private bool haveToshibaAc;
@@ -121,20 +117,7 @@ public abstract class SettingsBase : BindableBase, ICloneable
     public bool HaveToshibaAc
     {
         get => haveToshibaAc;
-        set => Set(ref haveToshibaAc, value, () =>
-        {
-            if (value)
-            {
-                ToshibaAcConnection ??= new AzureConnection
-                {
-                    BaseUrl = "https://mobileapi.toshibahomeaccontrols.com",
-                    UserName = string.Empty,
-                    Password = string.Empty,
-                    Protocol = Protocol.Amqp,
-                    TunnelMode = TunnelMode.Auto
-                };
-            }
-        });
+        set => Set(ref haveToshibaAc, value);
     }
 
     private bool showToshibaAc;
@@ -146,10 +129,17 @@ public abstract class SettingsBase : BindableBase, ICloneable
         set => Set(ref showToshibaAc, value);
     }
 
-    private AzureConnection? toshibaAcConnection;
+    private AzureConnection toshibaAcConnection = new AzureConnection
+    {
+        BaseUrl = "https://mobileapi.toshibahomeaccontrols.com",
+        UserName = string.Empty,
+        Password = string.Empty,
+        Protocol = Protocol.Amqp,
+        TunnelMode = TunnelMode.Auto
+    };
 
-    [XmlElement, DefaultValue(null)]
-    public AzureConnection? ToshibaAcConnection
+    [XmlElement]
+    public AzureConnection ToshibaAcConnection
     {
         get => toshibaAcConnection;
         set => Set(ref toshibaAcConnection, value);
@@ -232,4 +222,6 @@ public abstract class SettingsBase : BindableBase, ICloneable
             }
         }
     }
+
+    public void NotifySettingsChanged() => SettingsChanged?.Invoke(this, EventArgs.Empty);
 }
