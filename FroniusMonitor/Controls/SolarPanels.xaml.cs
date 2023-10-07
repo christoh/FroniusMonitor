@@ -33,6 +33,12 @@ public sealed partial class SolarPanels
     public SolarPanels()
     {
         InitializeComponent();
+
+        if (DesignerProperties.GetIsInDesignMode(this))
+        {
+            return;
+        }
+        
         OnSettingsChanged(this);
         Loaded += (_, _) => App.Settings.SettingsChanged += OnSettingsChanged;
         Unloaded += (_, _) => App.Settings.SettingsChanged -= OnSettingsChanged;
