@@ -1227,4 +1227,22 @@
   <data name="DcLink" xml:space="preserve">
 	  <value>DC-Link</value>
   </data>
+  <data name="Visualization" xml:space="preserve">
+	  <value>Visualisierung</value>
+  </data>
+  <data name="Reset" xml:space="preserve">
+	  <value>Zurücksetzen</value>
+  </data>
+  <data name="Choose" xml:space="preserve">
+	  <value>Auswählen</value>
+  </data>
+  <data name="SolarPanelLayout" xml:space="preserve">
+	  <value>Solarmodul-Layout</value>
+  </data>
+  <data name="ChoosePanelLayoutFile" xml:space="preserve">
+	  <value>Solarmodul-Layout-Datei auswählen</value>
+  </data>
+  <data name="FilterAllFiles" xml:space="preserve">
+	  <value>|Alle Dateien (*.*)|*</value>
+  </data>
 </root>

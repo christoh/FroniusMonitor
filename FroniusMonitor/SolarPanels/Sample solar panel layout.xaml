@@ -24,13 +24,14 @@
         <SolidColorBrush x:Key="ActiveSolarPanelBrush">#ffd000</SolidColorBrush>
         <SolidColorBrush x:Key="InactiveSolarPanelBrush">#000000</SolidColorBrush>
 
-        <Style TargetType="Rectangle">
+        <Style TargetType="Rectangle" x:Key="LandscapeRect">
             <Setter Property="Margin" Value="0,0,0,-2" />
             <Setter Property="Height" Value="28.46" />
             <Setter Property="Stroke" Value="Silver" />
             <Setter Property="StrokeThickness" Value="2" />
             <Setter Property="Width" Value="46" />
         </Style>
+        <Style TargetType="Rectangle" BasedOn="{StaticResource LandscapeRect}" />
     </Canvas.Resources>
     <Border Height="100" Width="360" BorderThickness="3" BorderBrush="Black">
         <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="56" Foreground="Black" FontWeight="Bold">
@@ -40,11 +41,9 @@
     </Border>
     <Border Canvas.Top="100" Height="100" Width="360" BorderThickness="3" BorderBrush="Black">
         <Border.Resources>
-            <Style TargetType="Rectangle">
+            <Style TargetType="Rectangle" BasedOn="{StaticResource LandscapeRect}" >
                 <Setter Property="Margin" Value="0,0,-2,0" />
                 <Setter Property="Width" Value="28.46" />
-                <Setter Property="Stroke" Value="Silver" />
-                <Setter Property="StrokeThickness" Value="2" />
                 <Setter Property="Height" Value="46" />
             </Style>
         </Border.Resources>
