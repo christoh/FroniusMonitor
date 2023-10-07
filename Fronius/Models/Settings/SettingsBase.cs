@@ -2,7 +2,7 @@
 
 public abstract class SettingsBase : BindableBase, ICloneable
 {
-    public event EventHandler<EventArgs> SettingsChanged;
+    public event EventHandler<EventArgs>? SettingsChanged;
 
     private WebConnection fritzBoxConnection = new() { BaseUrl = "http://192.168.178.1", UserName = string.Empty, Password = string.Empty };
 
