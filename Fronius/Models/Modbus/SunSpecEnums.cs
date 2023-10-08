@@ -9,6 +9,6 @@ public enum SunSpecMeterType : byte
 
 public enum SunSpecProtocol : byte
 {
-    IntAndScale = 0,
+    IntAndScaleFactor = 0,
     Float = 1,
 }
