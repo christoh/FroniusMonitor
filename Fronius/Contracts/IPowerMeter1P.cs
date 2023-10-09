@@ -8,4 +8,7 @@ public interface IPowerMeter1P
     double? Frequency { get; }
     double? EnergyKiloWattHours { get; }
     bool CanMeasurePower { get; }
+    string? Manufacturer { get; }
+    string? Model { get; }
+    string? SerialNumber { get; }
 }

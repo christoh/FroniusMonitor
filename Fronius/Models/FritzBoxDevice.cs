@@ -228,6 +228,8 @@ public class FritzBoxDevice : BindableBase, IPowerConsumer1P
     bool IHsvColorControl.IsHsvActive => Color is { CurrentMode: { } } && (Color.CurrentMode.Value & FritzBoxColorMode.Hsv) != FritzBoxColorMode.None;
     bool IColorTemperatureControl.IsColorTemperatureActive => Color is { CurrentMode: { } } && (Color.CurrentMode.Value & FritzBoxColorMode.Temperature) != FritzBoxColorMode.None;
 
+    string? IPowerMeter1P.SerialNumber => Ain.Replace(" ", string.Empty);
+
     public static bool? GetBoolState(string? state) => state switch { "1" => true, "0" => false, _ => null };
     public static string GetStringState(bool? state) => state switch { true => "1", false => "0", null => string.Empty };
     public static string GetStringValue(double? value, double factor = 1000d) => !value.HasValue ? string.Empty : ((int)Math.Round(value.Value * factor, MidpointRounding.AwayFromZero)).ToString(CultureInfo.InvariantCulture);
