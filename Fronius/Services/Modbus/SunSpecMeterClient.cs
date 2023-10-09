@@ -124,13 +124,13 @@ public class SunSpecMeterClient : SunSpecClientBase, ISunSpecMeterClient
 
     private static void ReadIntSfData(SunSpecMeter meter, ReadOnlyMemory<byte> data)
     {
-        var currentScaleFactor = Math.Pow(10, Read<short>(40076));
+        var currentScaleFactor = Math.Pow(10, Read<short>(40076));//-4
         meter.TotalCurrent = Read<short>(40072) * currentScaleFactor;
         meter.CurrentL1 = Read<short>(40073) * currentScaleFactor;
         meter.CurrentL2 = Read<short>(40074) * currentScaleFactor;
         meter.CurrentL3 = Read<short>(40075) * currentScaleFactor;
 
-        var voltageScaleFactor = Math.Pow(10, Read<short>(40085));
+        var voltageScaleFactor = Math.Pow(10, Read<short>(40085));//-1
         meter.PhaseVoltageAverage = Read<short>(40077) * voltageScaleFactor;
         meter.PhaseVoltageL1 = Read<short>(40078) * voltageScaleFactor;
         meter.PhaseVoltageL2 = Read<short>(40079) * voltageScaleFactor;
@@ -140,34 +140,34 @@ public class SunSpecMeterClient : SunSpecClientBase, ISunSpecMeterClient
         meter.LineVoltageL23 = Read<short>(40083) * voltageScaleFactor;
         meter.LineVoltageL31 = Read<short>(40084) * voltageScaleFactor;
 
-        var frequencyScaleFactor = Math.Pow(10, Read<short>(40087));
+        var frequencyScaleFactor = Math.Pow(10, Read<short>(40087));//-2
         meter.Frequency = Read<short>(40086) * frequencyScaleFactor;
 
-        var activePowerScaleFactor = Math.Pow(10, Read<short>(40092));
+        var activePowerScaleFactor = Math.Pow(10, Read<short>(40092));//-2
         meter.ActivePowerSum = Read<short>(40088) * activePowerScaleFactor;
         meter.ActivePowerL1 = Read<short>(40089) * activePowerScaleFactor;
         meter.ActivePowerL2 = Read<short>(40090) * activePowerScaleFactor;
         meter.ActivePowerL3 = Read<short>(40091) * activePowerScaleFactor;
 
-        var apparentPowerScaleFactor = Math.Pow(10, Read<short>(40097));
+        var apparentPowerScaleFactor = Math.Pow(10, Read<short>(40097));//-2
         meter.ApparentPowerSum = Read<short>(40093) * apparentPowerScaleFactor;
         meter.ApparentPowerL1 = Read<short>(40094) * apparentPowerScaleFactor;
         meter.ApparentPowerL2 = Read<short>(40095) * apparentPowerScaleFactor;
         meter.ApparentPowerL3 = Read<short>(40096) * apparentPowerScaleFactor;
 
-        var reactivePowerScaleFactor = Math.Pow(10, Read<short>(40102));
+        var reactivePowerScaleFactor = Math.Pow(10, Read<short>(40102));//-2
         meter.ReactivePowerSum = Read<short>(40098) * reactivePowerScaleFactor;
         meter.ReactivePowerL1 = Read<short>(40099) * reactivePowerScaleFactor;
         meter.ReactivePowerL2 = Read<short>(40100) * reactivePowerScaleFactor;
         meter.ReactivePowerL3 = Read<short>(40101) * reactivePowerScaleFactor;
 
-        var powerFactorScaleFactor = Math.Pow(10, Read<short>(40107)) / 100d;
+        var powerFactorScaleFactor = Math.Pow(10, Read<short>(40107)) / 100d;//-1
         meter.PowerFactorTotal = Read<short>(40103) * powerFactorScaleFactor;
         meter.PowerFactorL1 = Read<short>(40104) * powerFactorScaleFactor;
         meter.PowerFactorL2 = Read<short>(40105) * powerFactorScaleFactor;
         meter.PowerFactorL3 = Read<short>(40106) * powerFactorScaleFactor;
 
-        var energyActiveScaleFactor = Math.Pow(10, Read<short>(40124));
+        var energyActiveScaleFactor = Math.Pow(10, Read<short>(40124)); //-3
         meter.EnergyActiveProduced = Read<uint>(40108) * energyActiveScaleFactor;
         meter.EnergyActiveProducedL1 = Read<uint>(40110) * energyActiveScaleFactor;
         meter.EnergyActiveProducedL2 = Read<uint>(40112) * energyActiveScaleFactor;
@@ -176,8 +176,8 @@ public class SunSpecMeterClient : SunSpecClientBase, ISunSpecMeterClient
         meter.EnergyActiveConsumedL1 = Read<uint>(40118) * energyActiveScaleFactor;
         meter.EnergyActiveConsumedL2 = Read<uint>(40120) * energyActiveScaleFactor;
         meter.EnergyActiveConsumedL3 = Read<uint>(40122) * energyActiveScaleFactor;
-
-        var energyApparentScaleFactor = Math.Pow(10, Read<short>(40141));
+        
+        var energyApparentScaleFactor = Math.Pow(10, Read<short>(40141)); //-32768
         meter.EnergyApparentProduced = Read<uint>(40125) * energyApparentScaleFactor;
         meter.EnergyApparentProducedL1 = Read<uint>(40127) * energyApparentScaleFactor;
         meter.EnergyApparentProducedL2 = Read<uint>(40129) * energyApparentScaleFactor;
@@ -187,7 +187,7 @@ public class SunSpecMeterClient : SunSpecClientBase, ISunSpecMeterClient
         meter.EnergyApparentConsumedL2 = Read<uint>(40137) * energyApparentScaleFactor;
         meter.EnergyApparentConsumedL3 = Read<uint>(40139) * energyApparentScaleFactor;
 
-        var energyReactiveScaleFactor = Math.Pow(10, Read<short>(40174));
+        var energyReactiveScaleFactor = Math.Pow(10, Read<short>(40174)); //-32768
         meter.EnergyReactiveConsumedQ1 = Read<uint>(40142) * energyReactiveScaleFactor;
         meter.EnergyReactiveConsumedQ1L1 = Read<uint>(40144) * energyReactiveScaleFactor;
         meter.EnergyReactiveConsumedQ1L2 = Read<uint>(40146) * energyReactiveScaleFactor;

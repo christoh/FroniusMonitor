@@ -1,7 +1,14 @@
-﻿namespace De.Hochstaetter.HomeAutomationServer;
+﻿using De.Hochstaetter.Fronius.Models.Settings;
+using De.Hochstaetter.HomeAutomationServer.Crypto;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
+
+namespace De.Hochstaetter.HomeAutomationServer;
 
 internal class Program
 {
+    private static SunSpecMeterService? server;
+    private static ILogger? logger;
+
     private static void Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration()
@@ -16,6 +23,7 @@ internal class Program
         serviceCollection
             .AddScoped<IGen24Service, Gen24Service>()
             .AddSingleton<IFritzBoxService, FritzBoxService>()
+            .AddSingleton<IAesKeyProvider, AesKeyProvider>()
             .AddSingleton<IDataCollectionService, DataCollectionService>()
             .AddSingleton<IGen24JsonService, Gen24JsonService>()
             .AddSingleton<IWattPilotService, WattPilotService>()
@@ -29,44 +37,51 @@ internal class Program
         var serviceProvider = serviceCollection.BuildServiceProvider();
         IoC.Update(serviceProvider);
 
-        var logger = IoC.Get<ILogger<Program>>();
-
-        //var server = new ModbusTcpServer(logger, true) { EnableRaisingEvents = true, ConnectionTimeout = TimeSpan.FromSeconds(20) };
-        //server.AddUnit(2);
-        //server.Start();
-
-        //while (true)
-        //{
-        //    var registers = server.GetHoldingRegisters(2);
-
-        //    lock (server.Lock)
-        //    {
-        //        registers.SetBigEndian<int>(40000, 1400204883);
-        //    }
-
-        //    Thread.Sleep(1000);
-        //}
+        logger = IoC.Get<ILogger<Program>>();
 
         logger.LogInformation($"Arguments: {string.Join(" ", args)}");
-        var client = IoC.Get<ISunSpecMeterClient>();
-        
+
+        server = IoC.Get<SunSpecMeterService>();
         logger.LogInformation("Starting server");
-        var server = IoC.Get<SunSpecMeterService>();
         server.StartAsync().GetAwaiter().GetResult();
-        
-        logger.LogInformation("Connecting to Modbus/TCP of smart meter");
-        client.ConnectAsync("127.0.0.1", 1502, 2).GetAwaiter().GetResult();
-        
-        logger.LogInformation("Retrieving data");
-        var meter = client.GetDataAsync().GetAwaiter().GetResult();
-        
-        logger.LogInformation($"L1 Voltage: {meter.PhaseVoltageL1:N1} V");
-        logger.LogInformation($"L2 Voltage: {meter.PhaseVoltageL2:N1} V");
-        logger.LogInformation($"L3 Voltage: {meter.PhaseVoltageL3:N1} V");
+
+        var fritzBoxService = IoC.Get<IFritzBoxService>();
+        fritzBoxService.Connection = new WebConnection { BaseUrl = "http://192.168.44.11", UserName = "FroniusMonitor", Password = args[0] };
 
         while (true)
         {
-            Thread.Sleep(500);
+            Thread.Sleep(5000);
+            IReadOnlyList<IPowerMeter1P> powerMeters;
+
+            try
+            {
+                powerMeters = fritzBoxService.GetFritzBoxDevices().GetAwaiter().GetResult().DevicesWithPowerMeter;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                continue;
+            }
+
+            UpdateServer(powerMeters, 2, "087610004279"); // Lampe Küchenschrank
+            UpdateServer(powerMeters, 3, "087610004275"); // Lampe Sofa Wohnzimmer
+            UpdateServer(powerMeters, 4, "087610004280"); // Computer Bettina
+            UpdateServer(powerMeters, 5, "116300301014"); // Fernseher Wohnzimmer
+            UpdateServer(powerMeters, 6, "116300301015"); // Computer Christoph
+            UpdateServer(powerMeters, 7, "116300301009"); // Stehlampe Medienzimmer
         }
+    }
+
+    private static void UpdateServer(IReadOnlyList<IPowerMeter1P> powerMeters, byte modbusAddress, string serialNumber)
+    {
+        var powerMeter = powerMeters.SingleOrDefault(p => string.Equals(p.SerialNumber, serialNumber, StringComparison.Ordinal));
+
+        if (powerMeter == null)
+        {
+            logger?.LogWarning($"Power meter '{serialNumber}' not found");
+            return;
+        }
+
+        server?.UpdateMeter(powerMeter, modbusAddress);
     }
 }

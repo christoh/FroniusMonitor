@@ -18,11 +18,6 @@ public static class ModbusExtensions
             throw new ArgumentException($"{nameof(length)} must be an even number");
         }
 
-        if (text.Length > length)
-        {
-            throw new ArgumentException($"{nameof(text)} is too long");
-        }
-
         if (!omitLength)
         {
             registers.SetBigEndian<ushort>(register++, (ushort)(length >> 1));
