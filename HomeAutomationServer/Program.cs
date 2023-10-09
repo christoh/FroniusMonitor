@@ -2,7 +2,7 @@
 
 internal class Program
 {
-    private static void Main(string[] _)
+    private static void Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel
@@ -46,8 +46,14 @@ internal class Program
         //    Thread.Sleep(1000);
         //}
 
+	logger.LogInformation($"Arguments: {string.Join(" ", args)}");
         var client = IoC.Get<ISunSpecMeterClient>();
+	logger.LogInformation("Connecting to Modbus/TCP of smart meter");
         client.ConnectAsync("192.168.44.10", 502, 200).GetAwaiter().GetResult();
+	logger.LogInformation("Retrieving data");
         var meter = client.GetDataAsync().GetAwaiter().GetResult();
+	logger.LogInformation($"L1 Voltage: {meter.PhaseVoltageL1:N1} V");
+        logger.LogInformation($"L2 Voltage: {meter.PhaseVoltageL2:N1} V");
+	logger.LogInformation($"L3 Voltage: {meter.PhaseVoltageL3:N1} V");
     }
 }
