@@ -20,20 +20,20 @@ public class SunSpecMeterService
             MaxConnections = 0,
         };
 
-        //server.RequestValidator = (_, functionCode, address, numberOfRegisters) =>
-        //{
-        //    if (functionCode != ModbusFunctionCode.ReadHoldingRegisters)
-        //    {
-        //        return ModbusExceptionCode.IllegalFunction;
-        //    }
+        server.RequestValidator = (_, functionCode, address, numberOfRegisters) =>
+        {
+            if (functionCode != ModbusFunctionCode.ReadHoldingRegisters)
+            {
+                return ModbusExceptionCode.IllegalFunction;
+            }
 
-        //    if (address is < 40000 or >= 50000)
-        //    {
-        //        return ModbusExceptionCode.IllegalDataAddress;
-        //    }
+            if (address < 40000 || address + numberOfRegisters > 40178)
+            {
+                return ModbusExceptionCode.IllegalDataAddress;
+            }
 
-        //    return ModbusExceptionCode.OK;
-        //};
+            return ModbusExceptionCode.OK;
+        };
 
         server.Start(new IPEndPoint(IPAddress.Any, 502));
     });
@@ -57,7 +57,7 @@ public class SunSpecMeterService
             registers.SetBigEndian<ushort>(40002, 1); // Common Model Block identifier
             registers.SetBigEndian<ushort>(40003, 65); // Length of Common Model Block
             registers.WriteString(40004, 32, meter.Manufacturer ?? nameof(meter.Manufacturer)); // manufacturer
-            registers.WriteString(40020, 32, meter.DisplayName ?? meter.Model ?? nameof(meter.Model)); // model
+            registers.WriteString(40020, 32, meter.Model ?? nameof(meter.Model)); // model
             registers.WriteString(40036, 16, "<secondary>"); // data manager version
             registers.WriteString(40044, 16, meter.DeviceVersion ?? "1.0.0-1"); // device version
             registers.WriteString(40052, 32, meter.SerialNumber ?? "0"); // serial number
@@ -70,10 +70,11 @@ public class SunSpecMeterService
             SetValue<short>(40073, meter.Current ?? 0);
 
             scaleFactor = SetExponent(40085, -1);
-            SetValue<short>(40077, meter.Voltage ?? 0);
+            SetValue<short>(40077, meter.Voltage / 3 ?? 0);
             SetValue<short>(40078, meter.Voltage ?? 0);
-            SetValue<short>(40081, meter.Voltage ?? 0);
+            SetValue<short>(40081, meter.Voltage * .66666666666667 ?? 0);
             SetValue<short>(40082, meter.Voltage ?? 0);
+            SetValue<short>(40084, meter.Voltage ?? 0);
 
             scaleFactor = SetExponent(40087, -2);
             SetValue<short>(40086, meter.Frequency ?? 50);
@@ -103,7 +104,7 @@ public class SunSpecMeterService
             double SetExponent(ushort register, short exponent)
             {
                 var registers = server!.GetHoldingRegisters(modbusAddress);
-                registers.SetBigEndian<short>(register - 1, exponent);
+                registers.SetBigEndian(register - 1, exponent);
                 return Math.Pow(10, exponent);
             }
 
