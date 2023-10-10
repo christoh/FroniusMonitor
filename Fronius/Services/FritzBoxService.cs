@@ -118,7 +118,7 @@ public class FritzBoxService : BindableBase, IFritzBoxService
         {
             if (Connection == null)
             {
-                throw new NullReferenceException(Resources.NoSystemConnection);
+                throw new NullReferenceException(Resources.NoFritzBoxConnection);
             }
 
             var requestString = $"{Connection.BaseUrl}/{request}{(fritzBoxSid == null || request.StartsWith("login_sid.lua") ? string.Empty : $"&sid={fritzBoxSid}")}";
