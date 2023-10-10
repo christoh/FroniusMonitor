@@ -13,7 +13,7 @@ public class SunSpecMeterService
         this.logger = logger;
     }
 
-    public Task StartAsync() => Task.Run(() =>
+    public Task StartAsync(IPEndPoint endPoint) => Task.Run(() =>
     {
         server = new ModbusTcpServer(logger, true)
         {
@@ -35,7 +35,7 @@ public class SunSpecMeterService
             return ModbusExceptionCode.OK;
         };
 
-        server.Start(new IPEndPoint(IPAddress.Any, 502));
+        server.Start(endPoint);
     });
 
     public void UpdateMeter(IPowerMeter1P meter, byte modbusAddress)

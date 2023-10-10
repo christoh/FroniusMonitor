@@ -8,7 +8,6 @@
 		<Nullable>enable</Nullable>
 		<RootNamespace>De.Hochstaetter.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<ItemGroup>
