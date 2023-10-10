@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Modbus;
 
-public class SunSpecMeter : SunSpecDeviceBase
+public class SunSpecMeter : SunSpecDeviceBase, IPowerMeter3P
 {
     private SunSpecMeterType? meterType;
 
@@ -383,7 +383,7 @@ public class SunSpecMeter : SunSpecDeviceBase
     public double? EnergyReactiveConsumedQ1
     {
         get => energyReactiveConsumedQ1;
-        set => Set(ref energyReactiveConsumedQ1, value);
+        set => Set(ref energyReactiveConsumedQ1, value, () => NotifyOfPropertyChange(nameof(IPowerMeter3P.EnergyReactiveConsumed)));
     }
 
     private double? energyReactiveConsumedQ1L1;
@@ -391,7 +391,11 @@ public class SunSpecMeter : SunSpecDeviceBase
     public double? EnergyReactiveConsumedQ1L1
     {
         get => energyReactiveConsumedQ1L1;
-        set => Set(ref energyReactiveConsumedQ1L1, value);
+        set => Set(ref energyReactiveConsumedQ1L1, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(EnergyReactiveConsumedL1));
+            NotifyOfPropertyChange(nameof(IPowerMeter3P.EnergyReactiveConsumed));
+        });
     }
 
     private double? energyReactiveConsumedQ1L2;
@@ -399,7 +403,11 @@ public class SunSpecMeter : SunSpecDeviceBase
     public double? EnergyReactiveConsumedQ1L2
     {
         get => energyReactiveConsumedQ1L2;
-        set => Set(ref energyReactiveConsumedQ1L2, value);
+        set => Set(ref energyReactiveConsumedQ1L2, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(EnergyReactiveConsumedL2));
+            NotifyOfPropertyChange(nameof(IPowerMeter3P.EnergyReactiveConsumed));
+        });
     }
 
     private double? energyReactiveConsumedQ1L3;
@@ -407,7 +415,11 @@ public class SunSpecMeter : SunSpecDeviceBase
     public double? EnergyReactiveConsumedQ1L3
     {
         get => energyReactiveConsumedQ1L3;
-        set => Set(ref energyReactiveConsumedQ1L3, value);
+        set => Set(ref energyReactiveConsumedQ1L3, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(EnergyReactiveConsumedL3));
+            NotifyOfPropertyChange(nameof(IPowerMeter3P.EnergyReactiveConsumed));
+        });
     }
 
     private double? energyReactiveConsumedQ2;
@@ -415,7 +427,7 @@ public class SunSpecMeter : SunSpecDeviceBase
     public double? EnergyReactiveConsumedQ2
     {
         get => energyReactiveConsumedQ2;
-        set => Set(ref energyReactiveConsumedQ2, value);
+        set => Set(ref energyReactiveConsumedQ2, value, ()=>NotifyOfPropertyChange(nameof(IPowerMeter3P.EnergyReactiveConsumed)));
     }
 
     private double? energyReactiveConsumedQ2L1;
@@ -423,7 +435,11 @@ public class SunSpecMeter : SunSpecDeviceBase
     public double? EnergyReactiveConsumedQ2L1
     {
         get => energyReactiveConsumedQ2L1;
-        set => Set(ref energyReactiveConsumedQ2L1, value);
+        set => Set(ref energyReactiveConsumedQ2L1, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(EnergyReactiveConsumedL1));
+            NotifyOfPropertyChange(nameof(IPowerMeter3P.EnergyReactiveConsumed));
+        });
     }
 
     private double? energyReactiveConsumedQ2L2;
@@ -431,7 +447,11 @@ public class SunSpecMeter : SunSpecDeviceBase
     public double? EnergyReactiveConsumedQ2L2
     {
         get => energyReactiveConsumedQ2L2;
-        set => Set(ref energyReactiveConsumedQ2L2, value);
+        set => Set(ref energyReactiveConsumedQ2L2, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(EnergyReactiveConsumedL2));
+            NotifyOfPropertyChange(nameof(IPowerMeter3P.EnergyReactiveConsumed));
+        });
     }
 
     private double? energyReactiveConsumedQ2L3;
@@ -439,7 +459,11 @@ public class SunSpecMeter : SunSpecDeviceBase
     public double? EnergyReactiveConsumedQ2L3
     {
         get => energyReactiveConsumedQ2L3;
-        set => Set(ref energyReactiveConsumedQ2L3, value);
+        set => Set(ref energyReactiveConsumedQ2L3, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(EnergyReactiveConsumedL3));
+            NotifyOfPropertyChange(nameof(IPowerMeter3P.EnergyReactiveConsumed));
+        });
     }
 
     private double? energyReactiveProducedQ3;
@@ -447,7 +471,7 @@ public class SunSpecMeter : SunSpecDeviceBase
     public double? EnergyReactiveProducedQ3
     {
         get => energyReactiveProducedQ3;
-        set => Set(ref energyReactiveProducedQ3, value);
+        set => Set(ref energyReactiveProducedQ3, value, () => NotifyOfPropertyChange(nameof(IPowerMeter3P.EnergyReactiveProduced)));
     }
 
     private double? energyReactiveProducedQ3L1;
@@ -455,7 +479,11 @@ public class SunSpecMeter : SunSpecDeviceBase
     public double? EnergyReactiveProducedQ3L1
     {
         get => energyReactiveProducedQ3L1;
-        set => Set(ref energyReactiveProducedQ3L1, value);
+        set => Set(ref energyReactiveProducedQ3L1, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(EnergyReactiveProducedL1));
+            NotifyOfPropertyChange(nameof(IPowerMeter3P.EnergyReactiveProduced));
+        });
     }
 
     private double? energyReactiveProducedQ3L2;
@@ -463,7 +491,11 @@ public class SunSpecMeter : SunSpecDeviceBase
     public double? EnergyReactiveProducedQ3L2
     {
         get => energyReactiveProducedQ3L2;
-        set => Set(ref energyReactiveProducedQ3L2, value);
+        set => Set(ref energyReactiveProducedQ3L2, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(EnergyReactiveProducedL2));
+            NotifyOfPropertyChange(nameof(IPowerMeter3P.EnergyReactiveProduced));
+        });
     }
 
     private double? energyReactiveProducedQ3L3;
@@ -471,7 +503,11 @@ public class SunSpecMeter : SunSpecDeviceBase
     public double? EnergyReactiveProducedQ3L3
     {
         get => energyReactiveProducedQ3L3;
-        set => Set(ref energyReactiveProducedQ3L3, value);
+        set => Set(ref energyReactiveProducedQ3L3, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(EnergyReactiveProducedL3));
+            NotifyOfPropertyChange(nameof(IPowerMeter3P.EnergyReactiveProduced));
+        });
     }
 
     private double? energyReactiveProducedQ4;
@@ -479,7 +515,7 @@ public class SunSpecMeter : SunSpecDeviceBase
     public double? EnergyReactiveProducedQ4
     {
         get => energyReactiveProducedQ4;
-        set => Set(ref energyReactiveProducedQ4, value);
+        set => Set(ref energyReactiveProducedQ4, value, () => NotifyOfPropertyChange(nameof(IPowerMeter3P.EnergyReactiveProduced)));
     }
 
     private double? energyReactiveProducedQ4L1;
@@ -487,7 +523,11 @@ public class SunSpecMeter : SunSpecDeviceBase
     public double? EnergyReactiveProducedQ4L1
     {
         get => energyReactiveProducedQ4L1;
-        set => Set(ref energyReactiveProducedQ4L1, value);
+        set => Set(ref energyReactiveProducedQ4L1, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(EnergyReactiveProducedL1));
+            NotifyOfPropertyChange(nameof(IPowerMeter3P.EnergyReactiveProduced));
+        });
     }
 
     private double? energyReactiveProducedQ4L2;
@@ -495,7 +535,11 @@ public class SunSpecMeter : SunSpecDeviceBase
     public double? EnergyReactiveProducedQ4L2
     {
         get => energyReactiveProducedQ4L2;
-        set => Set(ref energyReactiveProducedQ4L2, value);
+        set => Set(ref energyReactiveProducedQ4L2, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(EnergyReactiveProducedL2));
+            NotifyOfPropertyChange(nameof(IPowerMeter3P.EnergyReactiveProduced));
+        });
     }
 
     private double? energyReactiveProducedQ4L3;
@@ -503,7 +547,11 @@ public class SunSpecMeter : SunSpecDeviceBase
     public double? EnergyReactiveProducedQ4L3
     {
         get => energyReactiveProducedQ4L3;
-        set => Set(ref energyReactiveProducedQ4L3, value);
+        set => Set(ref energyReactiveProducedQ4L3, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(EnergyReactiveProducedL3));
+            NotifyOfPropertyChange(nameof(IPowerMeter3P.EnergyReactiveProduced));
+        });
     }
 
     private uint eventBitField;
@@ -513,4 +561,11 @@ public class SunSpecMeter : SunSpecDeviceBase
         get => eventBitField;
         set => Set(ref eventBitField, value);
     }
+
+    public double? EnergyReactiveConsumedL1 => EnergyReactiveConsumedQ1L1 + EnergyReactiveConsumedQ2L1;
+    public double? EnergyReactiveConsumedL2 => EnergyReactiveConsumedQ1L2 + EnergyReactiveConsumedQ2L2;
+    public double? EnergyReactiveConsumedL3 => EnergyReactiveConsumedQ1L3 + EnergyReactiveConsumedQ2L3;
+    public double? EnergyReactiveProducedL1 => EnergyReactiveProducedQ3L1 + EnergyReactiveProducedQ4L1;
+    public double? EnergyReactiveProducedL2 => EnergyReactiveProducedQ3L2 + EnergyReactiveProducedQ4L2;
+    public double? EnergyReactiveProducedL3 => EnergyReactiveProducedQ3L3 + EnergyReactiveProducedQ4L3;
 }
