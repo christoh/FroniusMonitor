@@ -363,9 +363,9 @@ public class DataCollectionService : BindableBase, IDataCollectionService
 
     private async Task TryStartToshibaAc()
     {
-        if (!HvacService.IsRunning)
+        if (settings is { HaveToshibaAc: true, ShowToshibaAc: true } && !HvacService.IsRunning)
         {
-            await HvacService.Start().ConfigureAwait(false);
+            await HvacService.Start(settings.ToshibaAcConnection, settings.AzureDeviceIdString).ConfigureAwait(false);
 
             if (!HvacService.IsRunning)
             {
@@ -489,3 +489,4 @@ public class DataCollectionService : BindableBase, IDataCollectionService
         }
     }
 }
+//

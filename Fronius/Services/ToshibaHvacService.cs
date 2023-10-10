@@ -13,7 +13,9 @@ namespace De.Hochstaetter.Fronius.Services;
 public class ToshibaHvacService : BindableBase, IToshibaHvacService
 {
     private readonly SynchronizationContext context;
-    private readonly SettingsBase settings;
+
+    private string? azureDeviceId;
+    private AzureConnection? azureConnection;
 
     private ToshibaHvacSession? session;
     private static readonly JsonSerializerOptions jsonOptions = new(JsonSerializerDefaults.Web);
@@ -40,10 +42,9 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
         #endif
     }
 
-    public ToshibaHvacService(SynchronizationContext context, SettingsBase settings)
+    public ToshibaHvacService(SynchronizationContext context)
     {
         this.context = context;
-        this.settings = settings;
     }
 
     private CancellationToken Token => tokenSource?.Token ?? throw new WebException("Connection closed", WebExceptionStatus.ConnectionClosed);
@@ -82,12 +83,15 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
     }
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    public async ValueTask Start()
+    public async ValueTask Start(AzureConnection? connection, string deviceId)
     {
-        if (isStarting || !settings.HaveToshibaAc || !settings.ShowToshibaAc || settings.ToshibaAcConnection == null)
+        if (isStarting || connection == null)
         {
             return;
         }
+
+        azureDeviceId = deviceId;
+        azureConnection = connection;
 
         try
         {
@@ -100,7 +104,7 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
 
                 var azureCredentials = await RefreshAll().ConfigureAwait(false);
                 var auth = AuthenticationMethodFactory.CreateAuthenticationWithToken(azureCredentials.DeviceId, azureCredentials.SasToken);
-                azureClient = DeviceClient.Create(azureCredentials.HostName, auth, settings.ToshibaAcConnection.TransportType);
+                azureClient = DeviceClient.Create(azureCredentials.HostName, auth, azureConnection.TransportType);
                 azureClient.SetConnectionStatusChangesHandler(OnAzureConnectionStatusChange);
                 await azureClient.OpenAsync(Token).ConfigureAwait(false);
                 await azureClient.SetMethodHandlerAsync("smmobile", HandleSmMobileMethod, null, Token).ConfigureAwait(false);
@@ -135,8 +139,8 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
     {
         var postData = new Dictionary<string, string>
         {
-            { "Username", settings.ToshibaAcConnection!.UserName },
-            { "Password", settings.ToshibaAcConnection.Password },
+            { "Username", azureConnection!.UserName},
+            { "Password", azureConnection.Password}
         };
 
         session = await Deserialize<ToshibaHvacSession>("/api/Consumer/Login", postData).ConfigureAwait(false)
@@ -144,9 +148,9 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
 
         postData = new Dictionary<string, string>
         {
-            { "DeviceID", settings.AzureDeviceIdString },
+            { "DeviceID", azureDeviceId!},
             { "DeviceType", "1" },
-            { "Username", settings.ToshibaAcConnection.UserName },
+            { "Username", azureConnection.UserName},
         };
 
         var azureCredentials = await Deserialize<ToshibaHvacAzureCredentials>("/api/Consumer/RegisterMobileDevice", postData).ConfigureAwait(false);
@@ -159,7 +163,7 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
 
     public async ValueTask<string> SendDeviceCommand(ToshibaHvacStateData state, params string[] targetIdStrings)
     {
-        if (settings.ToshibaAcConnection == null || azureClient == null || session == null || !IsRunning)
+        if (azureConnection == null || azureClient == null || session == null || !IsRunning)
         {
             throw new IotHubCommunicationException("Not connected");
         }
@@ -167,7 +171,7 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
         var command = new ToshibaHvacAzureSmMobileCommand
         {
             CommandName = "CMD_FCU_TO_AC",
-            DeviceUniqueId = settings.AzureDeviceIdString,
+            DeviceUniqueId = azureDeviceId!,
             MessageId = $"{++messageId:x}",
             TargetIds = targetIdStrings,
             TimeStamp = $"{(DateTime.UtcNow - DateTime.UnixEpoch).Ticks:x}",
@@ -237,13 +241,13 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
 
     private async ValueTask<T> Deserialize<T>(string uri, IEnumerable<KeyValuePair<string, string>>? postVariables = null) where T : new()
     {
-        if (!settings.HaveToshibaAc || settings.ToshibaAcConnection == null)
+        if (azureConnection == null)
         {
             throw new InvalidDataException("No active Toshiba connection");
         }
 
         using var client = new HttpClient();
-        client.BaseAddress = new Uri(settings.ToshibaAcConnection!.BaseUrl);
+        client.BaseAddress = new Uri(azureConnection.BaseUrl);
 
         var message = new HttpRequestMessage(postVariables == null ? HttpMethod.Get : HttpMethod.Post, uri);
 
