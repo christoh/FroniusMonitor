@@ -20,7 +20,7 @@ public static class ModbusExtensions
 
         if (!omitLength)
         {
-            registers.SetBigEndian<ushort>(register++, (ushort)(length >> 1));
+            registers.SetBigEndian(register++, (ushort)(length >> 1));
         }
 
         var bytes = Encoding.ASCII.GetBytes(text);
@@ -30,11 +30,5 @@ public static class ModbusExtensions
         {
             Buffer.MemoryCopy(bytePointer, registerPointer, registers.Length - register, bytes.Length);
         }
-
-        //    for (var i = 0; i < bytes.Length >> 1; i++)
-        //    {
-        //        registers[register + i] = unchecked((short)((bytes[i << 1] << 8) | (bytes[(i << 1) + 1])));
-        //    }
-        //}
     }
 }

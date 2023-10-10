@@ -1,8 +1,27 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Gen24;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
-public class Gen24PowerMeter3P : Gen24DeviceBase
+public class Gen24PowerMeter3P : Gen24DeviceBase, IPowerMeter3P
 {
+    public double? EnergyActiveProducedL3 => null;
+    public double? EnergyActiveConsumedL1 => null;
+    public double? EnergyActiveConsumedL2 => null;
+    public double? EnergyActiveConsumedL3 => null;
+    public double? EnergyApparentProducedL1 => null;
+    public double? EnergyApparentProducedL2 => null;
+    public double? EnergyApparentProducedL3 => null;
+    public double? EnergyApparentConsumedL1 => null;
+    public double? EnergyApparentConsumedL2 => null;
+    public double? EnergyApparentConsumedL3 => null;
+    public double? EnergyActiveProducedL1 => null;
+    public double? EnergyActiveProducedL2 => null;
+    public double? EnergyReactiveConsumedL1 => null;
+    public double? EnergyReactiveConsumedL2 => null;
+    public double? EnergyReactiveConsumedL3 => null;
+    public double? EnergyReactiveProducedL1 => null;
+    public double? EnergyReactiveProducedL2 => null;
+    public double? EnergyReactiveProducedL3 => null;
+
     private double? currentL1;
 
     [FroniusProprietaryImport("SMARTMETER_CURRENT_01_F64")]
