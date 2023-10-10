@@ -2,7 +2,7 @@
 {
     public interface IToshibaHvacService
     {
-        public ValueTask Start();
+        public ValueTask Start(AzureConnection? azureConnection, string azureDeviceId);
         public ValueTask Stop();
         public bool IsRunning { get; }
         public bool IsConnected { get; }
