@@ -51,13 +51,13 @@ public class SunSpecMeterService
             {
                 server.AddUnit(modbusAddress);
             }
-            
+
             var registers = server.GetHoldingRegisters(modbusAddress);
             registers.WriteString(40000, 4, "SunS"); // magic
             registers.SetBigEndian<ushort>(40002, 1); // Common Model Block identifier
             registers.SetBigEndian<ushort>(40003, 65); // Length of Common Model Block
             registers.WriteString(40004, 32, meter.Manufacturer ?? nameof(meter.Manufacturer)); // manufacturer
-            registers.WriteString(40020, 32, meter.DisplayName?? meter.Model ?? nameof(meter.Model)); // model
+            registers.WriteString(40020, 32, meter.DisplayName ?? meter.Model ?? nameof(meter.Model)); // model
             registers.WriteString(40036, 16, "<secondary>"); // data manager version
             registers.WriteString(40044, 16, meter.DeviceVersion ?? "1.0.0-1"); // device version
             registers.WriteString(40052, 32, meter.SerialNumber ?? "0"); // serial number
@@ -92,13 +92,13 @@ public class SunSpecMeterService
             SetValue<short>(40104, 1);
 
             scaleFactor = SetExponent(40124, -3);
-            SetValue<uint>(40116,(meter.EnergyKiloWattHours??0)*100);
+            SetValue<uint>(40116, (meter.EnergyKiloWattHours ?? 0) * 1000);
 
             _ = SetExponent(40141, -32768);
             _ = SetExponent(40174, -32768);
-            
-            registers.SetBigEndian<short>(40176,-1);
-            registers.SetBigEndian<short>(40177,0);
+
+            registers.SetBigEndian<short>(40176, -1);
+            registers.SetBigEndian<short>(40177, 0);
 
             double SetExponent(ushort register, short exponent)
             {
