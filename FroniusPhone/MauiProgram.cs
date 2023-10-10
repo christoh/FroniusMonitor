@@ -1,4 +1,6 @@
-﻿namespace FroniusPhone;
+﻿using De.Hochstaetter.Fronius.Models.Settings;
+
+namespace FroniusPhone;
 
 public static class MauiProgram
 {
@@ -36,6 +38,8 @@ public static class MauiProgram
             .AddSingleton<OverviewViewModel>()
             .AddSingleton<SettingsPage>()
             .AddSingleton<SettingsViewModel>()
+            .AddSingleton<SettingsBase>(new Settings())
+            .AddSingleton<IToshibaHvacService, ToshibaHvacService>()
             .AddSingleton(SynchronizationContext.Current ?? throw new InvalidOperationException("No Context"))
         ;
 
