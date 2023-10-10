@@ -93,9 +93,16 @@ public class DataCollectionService : BindableBase, IDataCollectionService
             return new List<SmartMeterCalibrationHistoryItem>();
         }
 
-        var serializer = new XmlSerializer(typeof(List<SmartMeterCalibrationHistoryItem>));
-        using var stream = new FileStream(settings.DriftFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-        return serializer.Deserialize(stream) as IList<SmartMeterCalibrationHistoryItem> ?? new List<SmartMeterCalibrationHistoryItem>();
+        try
+        {
+            var serializer = new XmlSerializer(typeof(List<SmartMeterCalibrationHistoryItem>));
+            using var stream = new FileStream(settings.DriftFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+            return serializer.Deserialize(stream) as IList<SmartMeterCalibrationHistoryItem> ?? new List<SmartMeterCalibrationHistoryItem>();
+        }
+        catch (Exception)
+        {
+            return new List<SmartMeterCalibrationHistoryItem>();
+        }
     });
 
     public Task<IList<SmartMeterCalibrationHistoryItem>> AddCalibrationHistoryItem(double consumedEnergyOffset, double producedEnergyOffset) => Task.Run(() =>
