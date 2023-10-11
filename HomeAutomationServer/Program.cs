@@ -1,9 +1,9 @@
 ﻿using System.Net;
-using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
+using De.Hochstaetter.Fronius.Extensions;
 using De.Hochstaetter.Fronius.Models.Settings;
 using De.Hochstaetter.HomeAutomationServer.Crypto;
-using De.Hochstaetter.HomeAutomationServer.Models.Settings;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
+using De.Hochstaetter.HomeAutomationServer.DataCollectors;
 
 namespace De.Hochstaetter.HomeAutomationServer;
 
@@ -11,11 +11,11 @@ internal class Program
 {
     private static SunSpecMeterService? server;
     private static ILogger? logger;
-    private static IReadOnlyList<string> arguments = null!;
+    private static IReadOnlyList<string> Arguments { get; set; } = null!;
 
     private static void Main(string[] args)
     {
-        Program.arguments = args;
+        Arguments = args;
 
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel
@@ -34,7 +34,14 @@ internal class Program
         catch (FileNotFoundException ex)
         {
             settings = new();
-            settings.FritzBoxConnections.Add(new WebConnection { BaseUrl = "http://192.168.178.xxx", UserName = "SomeName", Password = "Swordfish"});
+            
+            settings.FritzBoxConnections.Add(new WebConnection
+            {
+                BaseUrl = "http://192.168.178.xxx",
+                UserName = string.Empty,
+                Password = string.Empty,
+            });
+            
             settings.ModbusMappings.Add(new ModbusMapping());
             settings.Save();
             settingsLoadException = ex;
@@ -50,6 +57,7 @@ internal class Program
             .AddTransient<IFritzBoxService, FritzBoxService>()
             .AddSingleton<IAesKeyProvider, AesKeyProvider>()
             .AddSingleton<SunSpecMeterService>()
+            .AddSingleton<FritzBoxDataCollector>()
             .AddTransient<ISunSpecMeterClient, SunSpecMeterClient>()
             .AddLogging(builder => builder.AddSerilog())
             ;
@@ -70,60 +78,46 @@ internal class Program
                 break;
 
             case not null:
-                logger.LogCritical($"{Settings.SettingsFileName} could not be loaded. Must exit");
+                logger.LogCritical($"{Settings.SettingsFileName} could not be loaded. Must exit.");
                 Environment.ExitCode = settingsLoadException.HResult;
                 return;
         }
 
-        MainAsync().GetAwaiter().GetResult();
-    }
-
-    private static async Task MainAsync()
-    {
-
-        server = IoC.Get<SunSpecMeterService>();
-        var settings = IoC.Get<Settings>();
-
-        logger.LogInformation("Starting server");
-        await server.StartAsync(new IPEndPoint(IPAddress.Parse(settings.ServerIpAddress), settings.ServerPort)).ConfigureAwait(false);
-
-        var fritzBoxService = IoC.Get<IFritzBoxService>();
-        fritzBoxService.Connection = new WebConnection { BaseUrl = "http://192.168.44.11", UserName = "FroniusMonitor", Password = arguments[0] };
+        RunServicesAsync().GetAwaiter().GetResult();
 
         while (true)
         {
             Thread.Sleep(5000);
-            IReadOnlyList<IPowerMeter1P> powerMeters;
-
-            try
-            {
-                powerMeters = fritzBoxService.GetFritzBoxDevices().GetAwaiter().GetResult().DevicesWithPowerMeter;
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, ex.Message);
-                continue;
-            }
-
-            UpdateServer(powerMeters, 2, "087610004279"); // Lampe Küchenschrank
-            UpdateServer(powerMeters, 3, "087610004275"); // Lampe Sofa Wohnzimmer
-            UpdateServer(powerMeters, 4, "087610004280"); // Computer Bettina
-            UpdateServer(powerMeters, 5, "116300301014"); // Fernseher Wohnzimmer
-            UpdateServer(powerMeters, 6, "116300301015"); // Computer Christoph
-            UpdateServer(powerMeters, 7, "116300301009"); // Stehlampe Medienzimmer
         }
     }
 
-    private static void UpdateServer(IReadOnlyList<IPowerMeter1P> powerMeters, byte modbusAddress, string serialNumber)
+    private static async Task RunServicesAsync()
     {
-        var powerMeter = powerMeters.SingleOrDefault(p => string.Equals(p.SerialNumber, serialNumber, StringComparison.Ordinal));
+        logger = IoC.Get<ILogger<Program>>();
+        server = IoC.Get<SunSpecMeterService>();
+        var settings = IoC.Get<Settings>();
 
-        if (powerMeter == null)
+        if (Arguments.Count > 0)
         {
-            logger?.LogWarning($"Power meter '{serialNumber}' not found");
-            return;
+            var regex = new Regex(@"^(?<UserName>(?!:).+):(?<Password>(?!:).+)$");
+            var match = regex.Match(Arguments[0]);
+
+            if (match.Success)
+            {
+                var userName = match.Groups["UserName"].Value;
+                var password = match.Groups["Password"].Value;
+
+                settings.FritzBoxConnections.Where(c => c.UserName == userName).Apply(c => { c.Password = password; });
+
+                await settings.SaveAsync().ConfigureAwait(false);
+                Environment.Exit(0);
+                return;
+            }
         }
 
-        server?.UpdateMeter(powerMeter, modbusAddress);
+        logger.LogInformation($"Starting server on {settings.ServerIpAddress}:{settings.ServerPort}");
+        await server.StartAsync(new IPEndPoint(IPAddress.Parse(settings.ServerIpAddress), settings.ServerPort)).ConfigureAwait(false);
+        var fritzBoxDataCollector = IoC.Get<FritzBoxDataCollector>();
+        await fritzBoxDataCollector.StartAsync();
     }
 }

@@ -3,8 +3,24 @@
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public class FritzBoxService : BindableBase, IFritzBoxService
 {
-    private string? fritzBoxSid;
+    private static readonly Dictionary<int, IEnumerable<int>> allowedFritzBoxColors = new()
+    {
+        { 358, new[] { 180, 112, 54 } },
+        { 35, new[] { 214, 140, 72 } },
+        { 52, new[] { 153, 102, 51 } },
+        { 92, new[] { 123, 79, 38 } },
+        { 120, new[] { 160, 82, 38 } },
+        { 160, new[] { 145, 84, 41 } },
+        { 195, new[] { 179, 118, 59 } },
+        { 212, new[] { 169, 110, 56 } },
+        { 225, new[] { 204, 135, 67 } },
+        { 266, new[] { 169, 110, 54 } },
+        { 296, new[] { 140, 92, 46 } },
+        { 335, new[] { 180, 107, 51 } },
+    };
 
+    private string? fritzBoxSid;
+    
     private WebConnection? connection;
 
     public WebConnection? Connection
@@ -42,10 +58,11 @@ public class FritzBoxService : BindableBase, IFritzBoxService
         }
     }
 
-    public async ValueTask<FritzBoxDeviceList> GetFritzBoxDevices(CancellationToken token = default)
+    public async Task<FritzBoxDeviceList> GetFritzBoxDevices(CancellationToken token = default)
     {
         await using var stream = await GetStreamResponse("webservices/homeautoswitch.lua?switchcmd=getdevicelistinfos", token: token)
             .ConfigureAwait(false) ?? throw new InvalidDataException();
+        
         var serializer = new XmlSerializer(typeof(FritzBoxDeviceList));
         var result = serializer.Deserialize(stream) as FritzBoxDeviceList ?? throw new InvalidDataException();
         result.Devices.Apply(d => d.FritzBoxService = this);
@@ -75,33 +92,25 @@ public class FritzBoxService : BindableBase, IFritzBoxService
     {
         var intTemperature = (int)Math.Round(temperatureKelvin, MidpointRounding.AwayFromZero);
         ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
-        using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setcolortemperature&temperature={intTemperature}&duration=0", token: token).ConfigureAwait(false);
+        
+        using var _ = await GetFritzBoxResponse
+        (
+            $"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setcolortemperature&temperature={intTemperature}&duration=0",
+            token: token
+        ).ConfigureAwait(false);
     }
-
-
-    private static readonly Dictionary<int, IEnumerable<int>> allowedFritzBoxColors = new()
-    {
-        { 358, new[] { 180, 112, 54 } },
-        { 35, new[] { 214, 140, 72 } },
-        { 52, new[] { 153, 102, 51 } },
-        { 92, new[] { 123, 79, 38 } },
-        { 120, new[] { 160, 82, 38 } },
-        { 160, new[] { 145, 84, 41 } },
-        { 195, new[] { 179, 118, 59 } },
-        { 212, new[] { 169, 110, 56 } },
-        { 225, new[] { 204, 135, 67 } },
-        { 266, new[] { 169, 110, 54 } },
-        { 296, new[] { 140, 92, 46 } },
-        { 335, new[] { 180, 107, 51 } },
-    };
 
     public async ValueTask SetFritzBoxColor(string ain, double hueDegrees, double saturation, CancellationToken token = default)
     {
         var intHue = allowedFritzBoxColors.Keys.MinBy(k => Math.Min(Math.Abs(hueDegrees - k), Math.Abs(hueDegrees + 360 - k)));
         var intSaturation = allowedFritzBoxColors[intHue].MinBy(s => Math.Abs(s - saturation * 255));
         ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
-        using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setcolor&hue={intHue}&saturation={intSaturation}&duration=0",
-            token: token).ConfigureAwait(false);
+        
+        using var _ = await GetFritzBoxResponse
+        (
+            $"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setcolor&hue={intHue}&saturation={intSaturation}&duration=0",
+            token: token
+        ).ConfigureAwait(false);
     }
 
     private async ValueTask<HttpResponseMessage> GetFritzBoxResponse(string request, IEnumerable<KeyValuePair<string, string>>? postVariables = null,
