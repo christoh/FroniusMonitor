@@ -80,12 +80,12 @@ public class SunSpecMeterService
             SetValue<short>(40086, meter.Frequency ?? 50);
 
             scaleFactor = SetExponent(40092, -2);
-            SetValue<short>(40088, meter.PowerWatts ?? 0);
-            SetValue<short>(40089, meter.PowerWatts ?? 0);
+            SetValue<short>(40088, meter.ActivePower ?? 0);
+            SetValue<short>(40089, meter.ActivePower ?? 0);
 
             scaleFactor = SetExponent(40097, -2);
-            SetValue<short>(40093, meter.PowerWatts ?? 0);
-            SetValue<short>(40094, meter.PowerWatts ?? 0);
+            SetValue<short>(40093, meter.ActivePower ?? 0);
+            SetValue<short>(40094, meter.ActivePower ?? 0);
 
             _ = SetExponent(40102, -2);
             scaleFactor = SetExponent(40107, -1);
@@ -93,7 +93,7 @@ public class SunSpecMeterService
             SetValue<short>(40104, 1);
 
             scaleFactor = SetExponent(40124, -3);
-            SetValue<uint>(40116, (meter.EnergyKiloWattHours ?? 0) * 1000);
+            SetValue<uint>(40116, meter.EnergyConsumed ?? 0);
 
             _ = SetExponent(40141, -32768);
             _ = SetExponent(40174, -32768);

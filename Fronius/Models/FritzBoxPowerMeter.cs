@@ -20,17 +20,17 @@
         [XmlElement("energy")]
         public string? EnergyString
         {
-            get => FritzBoxDevice.GetStringValue(EnergyKiloWattHours);
-            set => EnergyKiloWattHours = FritzBoxDevice.GetDoubleValue(value);
+            get => FritzBoxDevice.GetStringValue(EnergyConsumed, 1);
+            set => EnergyConsumed = FritzBoxDevice.GetDoubleValue(value, 1);
         }
 
-        private double? energyKiloWattHours;
+        private double? energyConsumed;
 
         [XmlIgnore]
-        public double? EnergyKiloWattHours
+        public double? EnergyConsumed
         {
-            get => energyKiloWattHours;
-            set => Set(ref energyKiloWattHours, value, () => NotifyOfPropertyChange(nameof(EnergyString)));
+            get => energyConsumed;
+            set => Set(ref energyConsumed, value, () => NotifyOfPropertyChange(nameof(EnergyString)));
         }
 
         private double? voltage;

@@ -163,7 +163,7 @@
 
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.Power}" />
                     <TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right">
-                        <Run Text="{Binding Path=Device.(contracts:IPowerMeter1P.PowerWatts), StringFormat=N1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, TargetNullValue=---, Mode=OneWay, FallbackValue=---}" />
+                        <Run Text="{Binding Path=Device.(contracts:IPowerMeter1P.ActivePower), StringFormat=N1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, TargetNullValue=---, Mode=OneWay, FallbackValue=---}" />
                     </TextBlock>
                     <TextBlock Grid.Row="0" Grid.Column="2" Text=" W" />
 
@@ -175,7 +175,7 @@
 
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static p:Resources.Energy}" />
                     <TextBlock Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right">
-                        <Run Text="{Binding Path=Device.(contracts:IPowerMeter1P.EnergyKiloWattHours), StringFormat=N1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, Mode=OneWay,TargetNullValue=---, FallbackValue=---}" />
+                        <Run Text="{Binding Path=Device.(contracts:IPowerMeter1P.EnergyConsumed), Converter={co:Multiply Factor=.001}, StringFormat=N1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, Mode=OneWay,TargetNullValue=---, FallbackValue=---}" />
                     </TextBlock>
                     <TextBlock Grid.Row="2" Grid.Column="2" Text=" kWh" />
 

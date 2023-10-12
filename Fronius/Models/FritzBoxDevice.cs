@@ -197,9 +197,9 @@ public class FritzBoxDevice : BindableBase, IPowerConsumer1P
     private bool IsPresentAndUnlocked => IsPresent && (Switch is not { IsUiLocked: { } } || !Switch.IsUiLocked.Value);
     double? ITemperatureSensor.TemperatureCelsius => TemperatureSensor?.Temperature;
     double? IPowerMeter1P.Frequency => null;
-    double? IPowerMeter1P.EnergyKiloWattHours => PowerMeter?.EnergyKiloWattHours;
+    double? IPowerMeter1P.EnergyConsumed => PowerMeter?.EnergyConsumed;
     double? IPowerMeter1P.Voltage => PowerMeter?.Voltage;
-    double? IPowerMeter1P.PowerWatts => PowerMeter?.PowerWatts;
+    double? IPowerMeter1P.ActivePower => PowerMeter?.PowerWatts;
     bool IPowerMeter1P.CanMeasurePower => (Features & FritzBoxFeatures.PowerMeter) != FritzBoxFeatures.None;
     bool? ISwitchable.IsTurnedOn => SimpleSwitch?.IsTurnedOn ?? Switch?.IsTurnedOn;
     string? IPowerConsumer1P.Model => string.IsNullOrWhiteSpace(Manufacturer) ? Model : $"{Manufacturer} {Model}".Trim();
