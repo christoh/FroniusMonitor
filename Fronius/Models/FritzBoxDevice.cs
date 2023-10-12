@@ -227,6 +227,8 @@ public class FritzBoxDevice : BindableBase, IPowerConsumer1P
     double IColorTemperatureControl.MaxTemperatureKelvin => 6500;
     bool IHsvColorControl.IsHsvActive => Color is { CurrentMode: { } } && (Color.CurrentMode.Value & FritzBoxColorMode.Hsv) != FritzBoxColorMode.None;
     bool IColorTemperatureControl.IsColorTemperatureActive => Color is { CurrentMode: { } } && (Color.CurrentMode.Value & FritzBoxColorMode.Temperature) != FritzBoxColorMode.None;
+    string? IPowerMeter1P.SerialNumber => Ain.Replace(" ", string.Empty);
+    string? IPowerMeter1P.DeviceVersion => FirmwareVersionString;
 
     public static bool? GetBoolState(string? state) => state switch { "1" => true, "0" => false, _ => null };
     public static string GetStringState(bool? state) => state switch { true => "1", false => "0", null => string.Empty };

@@ -1245,4 +1245,7 @@
   <data name="FilterAllFiles" xml:space="preserve">
 	  <value>|Alle Dateien (*.*)|*</value>
   </data>
+  <data name="IncorrectPhaseNumber" xml:space="preserve">
+	  <value>Phase muss von 1 bis 3 sein</value>
+  </data>
 </root>

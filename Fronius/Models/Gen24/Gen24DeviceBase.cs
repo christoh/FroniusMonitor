@@ -93,5 +93,13 @@ public abstract class Gen24DeviceBase : BindableBase, ICloneable
         set => Set(ref creationTime, value);
     }
 
+    private uint groupId;
+
+    public uint GroupId
+    {
+        get => groupId;
+        set => Set(ref groupId, value);
+    }
+
     public object Clone() => MemberwiseClone();
 }

@@ -56,6 +56,32 @@ public class Gen24Service : BindableBase, IGen24Service
     public async Task<Gen24Sensors> GetFroniusData(Gen24Components components, CancellationToken token = default)
     {
         var gen24Sensors = new Gen24Sensors();
+
+        var (_, dataToken) = await GetJsonResponse<BaseResponse>("components/readable", true, token: token).ConfigureAwait(false);
+        gen24Sensors.Inverter = gen24JsonService.ReadFroniusData<Gen24Inverter>(dataToken[components.Groups["Inverter"].FirstOrDefault() ?? "1"]);
+
+        if (components.Groups.TryGetValue("BatteryManagementSystem", out var storages))
+        {
+            gen24Sensors.Storage = gen24JsonService.ReadFroniusData<Gen24Storage>(dataToken[storages.FirstOrDefault() ?? "16580608"]);
+            gen24Sensors.Storage.GroupId = uint.Parse(storages.FirstOrDefault() ?? "16580608");
+        }
+
+        var restrictions = components.Groups["Application"]
+            .Select(key => dataToken[key])
+            .FirstOrDefault(t => t?["attributes"]?["PowerRestrictionControllerVersion"] != null);
+        gen24Sensors.Restrictions = gen24JsonService.ReadFroniusData<Gen24Restrictions>(restrictions);
+
+        if (components.Groups.TryGetValue("PowerMeter", out var powerMeters))
+        {
+            foreach (var powerMeter in powerMeters)
+            {
+                var meter = dataToken[powerMeter];
+                var gen24PowerMeter = gen24JsonService.ReadFroniusData<Gen24PowerMeter3P>(meter);
+                gen24PowerMeter.GroupId = uint.Parse(powerMeter);
+                gen24Sensors.Meters.Add(gen24PowerMeter);
+            }
+        }
+
         var (jToken, _) = await GetFroniusJsonResponse("status/devices", token: token).ConfigureAwait(false);
 
         foreach (var statusToken in (JArray)jToken)
@@ -66,33 +92,16 @@ public class Gen24Service : BindableBase, IGen24Service
             {
                 case DeviceType.Inverter:
                     gen24Sensors.InverterStatus = status;
+
                     break;
 
                 case DeviceType.PowerMeter:
-                    gen24Sensors.MeterStatus = status;
+                    if (gen24Sensors.PrimaryPowerMeter?.GroupId is not null && status.Id == gen24Sensors.PrimaryPowerMeter?.GroupId)
+                    {
+                        gen24Sensors.MeterStatus = status;
+                    }
+                    
                     break;
-            }
-        }
-
-        var (_, dataToken) = await GetJsonResponse<BaseResponse>("components/readable", true, token: token).ConfigureAwait(false);
-        gen24Sensors.Inverter = gen24JsonService.ReadFroniusData<Gen24Inverter>(dataToken[components.Groups["Inverter"].FirstOrDefault() ?? "1"]);
-
-        if (components.Groups.TryGetValue("BatteryManagementSystem", out var storages))
-        {
-            gen24Sensors.Storage = gen24JsonService.ReadFroniusData<Gen24Storage>(dataToken[storages.FirstOrDefault() ?? "16580608"]);
-        }
-
-        var restrictions = components.Groups["Application"]
-            .Select(key => dataToken[key])
-            .FirstOrDefault(t => t?["attributes"]?["PowerRestrictionControllerVersion"] != null);
-        gen24Sensors.Restrictions = gen24JsonService.ReadFroniusData<Gen24Restrictions>(restrictions);
-
-        if (components.Groups.TryGetValue("PowerMeter", out var powerMeters))
-        {
-            foreach (var meter in powerMeters.Select(key => dataToken[key]))
-            {
-                var gen24PowerMeter = gen24JsonService.ReadFroniusData<Gen24PowerMeter3P>(meter);
-                gen24Sensors.Meters.Add(gen24PowerMeter);
             }
         }
 
@@ -184,13 +193,16 @@ public class Gen24Service : BindableBase, IGen24Service
         {
             await Task.Delay(TimeSpan.FromMilliseconds(100), token).ConfigureAwait(false);
         }
-        
+
         try
         {
             if (i == null)
             {
-                await Task.Run(async () => { i = JObject.Parse((await GetFroniusStringResponse($"{baseUrl}/en.json", token: token)
-                    .ConfigureAwait(false)).JsonString); }, token).ConfigureAwait(false);
+                await Task.Run(async () =>
+                {
+                    i = JObject.Parse((await GetFroniusStringResponse($"{baseUrl}/en.json", token: token)
+                    .ConfigureAwait(false)).JsonString);
+                }, token).ConfigureAwait(false);
             }
         }
         catch

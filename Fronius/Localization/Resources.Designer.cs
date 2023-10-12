@@ -1294,6 +1294,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Phase must be from 1 to 3.
+        /// </summary>
+        public static string IncorrectPhaseNumber {
+            get {
+                return ResourceManager.GetString("IncorrectPhaseNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid.
         /// </summary>
         public static string Invalid {

@@ -1,8 +1,27 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Gen24;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
-public class Gen24PowerMeter3P : Gen24DeviceBase
+public class Gen24PowerMeter3P : Gen24DeviceBase, IPowerMeter3P
 {
+    public double? EnergyActiveProducedL3 => null;
+    public double? EnergyActiveConsumedL1 => null;
+    public double? EnergyActiveConsumedL2 => null;
+    public double? EnergyActiveConsumedL3 => null;
+    public double? EnergyApparentProducedL1 => null;
+    public double? EnergyApparentProducedL2 => null;
+    public double? EnergyApparentProducedL3 => null;
+    public double? EnergyApparentConsumedL1 => null;
+    public double? EnergyApparentConsumedL2 => null;
+    public double? EnergyApparentConsumedL3 => null;
+    public double? EnergyActiveProducedL1 => null;
+    public double? EnergyActiveProducedL2 => null;
+    public double? EnergyReactiveConsumedL1 => null;
+    public double? EnergyReactiveConsumedL2 => null;
+    public double? EnergyReactiveConsumedL3 => null;
+    public double? EnergyReactiveProducedL1 => null;
+    public double? EnergyReactiveProducedL2 => null;
+    public double? EnergyReactiveProducedL3 => null;
+
     private double? currentL1;
 
     [FroniusProprietaryImport("SMARTMETER_CURRENT_01_F64")]
@@ -190,31 +209,31 @@ public class Gen24PowerMeter3P : Gen24DeviceBase
     public double? OutOfBalancePowerL31 => Math.Abs((ActivePowerL1 - ActivePowerL3) ?? double.NaN);
     public double? OutOfBalancePowerMax => new[] {OutOfBalancePowerL12, OutOfBalancePowerL23, OutOfBalancePowerL31}.Max();
 
-    private double? realPowerL1Mean;
+    private double? activePowerL1Mean;
 
     [FroniusProprietaryImport("SMARTMETER_POWERACTIVE_MEAN_01_F64")]
-    public double? RealPowerL1Mean
+    public double? ActivePowerL1Mean
     {
-        get => realPowerL1Mean;
-        set => Set(ref realPowerL1Mean, value);
+        get => activePowerL1Mean;
+        set => Set(ref activePowerL1Mean, value);
     }
 
-    private double? realPowerL2Mean;
+    private double? activePowerL2Mean;
 
     [FroniusProprietaryImport("SMARTMETER_POWERACTIVE_MEAN_02_F64")]
-    public double? RealPowerL2Mean
+    public double? ActivePowerL2Mean
     {
-        get => realPowerL2Mean;
-        set => Set(ref realPowerL2Mean, value, () => NotifyOfPropertyChange(nameof(RealPowerSumMean)));
+        get => activePowerL2Mean;
+        set => Set(ref activePowerL2Mean, value, () => NotifyOfPropertyChange(nameof(ActivePowerSumMean)));
     }
 
-    private double? realPowerL3Mean;
+    private double? activePowerL3Mean;
 
     [FroniusProprietaryImport("SMARTMETER_POWERACTIVE_MEAN_03_F64")]
-    public double? RealPowerL3Mean
+    public double? ActivePowerL3Mean
     {
-        get => realPowerL3Mean;
-        set => Set(ref realPowerL3Mean, value, () => NotifyOfPropertyChange(nameof(RealPowerSumMean)));
+        get => activePowerL3Mean;
+        set => Set(ref activePowerL3Mean, value, () => NotifyOfPropertyChange(nameof(ActivePowerSumMean)));
     }
 
     private double? activePowerSum;
@@ -223,7 +242,7 @@ public class Gen24PowerMeter3P : Gen24DeviceBase
     public double? ActivePowerSum
     {
         get => activePowerSum;
-        set => Set(ref activePowerSum, value, () => NotifyOfPropertyChange(nameof(RealPowerSumMean)));
+        set => Set(ref activePowerSum, value, () => NotifyOfPropertyChange(nameof(ActivePowerSumMean)));
     }
 
     private double? apparentPowerL1;
@@ -464,7 +483,7 @@ public class Gen24PowerMeter3P : Gen24DeviceBase
     public MeterLocation Location => MeterLocationCurrent == 0 ? MeterLocation.Grid : MeterLocation.Load;
     public MeterUsage Usage => MeterLocationCurrent < 2 ? MeterUsage.Inverter : MeterLocationCurrent > 255 ? MeterUsage.UniqueConsumer : MeterUsage.MultipleConsumers;
 
-    public double? RealPowerSumMean => RealPowerL1Mean + RealPowerL2Mean + RealPowerL3Mean;
+    public double? ActivePowerSumMean => ActivePowerL1Mean + ActivePowerL2Mean + ActivePowerL3Mean;
     public double? ApparentPowerSumMean => ApparentPowerL1Mean + ApparentPowerL2Mean + ApparentPowerL3Mean;
 
     public double? PhaseVoltageAverage => (PhaseVoltageL1 + PhaseVoltageL2 + PhaseVoltageL3) / 3;

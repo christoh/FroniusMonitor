@@ -349,3 +349,4 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 /Setup/Output/Fronius Monitor-Setup-v.1.0.0.0.exe
+/HomeAutomationServer/Properties/launchSettings.json
