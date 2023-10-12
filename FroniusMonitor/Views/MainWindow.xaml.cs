@@ -174,9 +174,10 @@ public partial class MainWindow
             return;
         }
 
-        var sitePowerFlow = ViewModel.DataCollectionService.HomeAutomationSystem?.SitePowerFlow;
-        LoadArrow.Power = sitePowerFlow?.LoadPowerCorrected - (ViewModel.IncludeInverterPower ? sitePowerFlow?.LoadPowerCorrected + sitePowerFlow?.SolarPower + sitePowerFlow?.GridPowerCorrected + sitePowerFlow?.StoragePower : 0);
-        LoadArrowPrimaryInverter.Power = PowerFlow?.LoadPowerCorrected - (ViewModel.IncludeInverterPower ? PowerFlow?.LoadPowerCorrected + PowerFlow?.SolarPower + PowerFlow?.GridPowerCorrected + PowerFlow?.StoragePower : 0);
+        var homeAutomationSystem = ViewModel.DataCollectionService.HomeAutomationSystem;
+        var sitePowerFlow = homeAutomationSystem?.SitePowerFlow;
+        LoadArrow.Power = homeAutomationSystem?.LoadPowerCorrected - (ViewModel.IncludeInverterPower ? homeAutomationSystem?.LoadPowerCorrected + sitePowerFlow?.SolarPower + homeAutomationSystem?.GridPowerCorrected + sitePowerFlow?.StoragePower : 0);
+        LoadArrowPrimaryInverter.Power = homeAutomationSystem?.LoadPowerCorrected - (ViewModel.IncludeInverterPower ? homeAutomationSystem?.LoadPowerCorrected + PowerFlow?.SolarPower + homeAutomationSystem?.GridPowerCorrected + PowerFlow?.StoragePower : 0);
 
         ColorLoadArrow(LoadArrow, sitePowerFlow, Brushes.Salmon);
         ColorLoadArrow(LoadArrowPrimaryInverter, PowerFlow, new SolidColorBrush(Color.FromRgb(0xff, 0xd0, 0)));

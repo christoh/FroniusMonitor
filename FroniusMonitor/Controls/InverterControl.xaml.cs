@@ -212,8 +212,8 @@ public partial class InverterControl
                 case InverterDisplayMode.MoreEfficiency:
                     MoreEfficiencyLoss.Value = gen24Sensors?.PowerFlow?.PowerLoss ?? 0;
                     MoreEfficiencyEfficiency.Value = gen24Sensors?.PowerFlow?.Efficiency ?? 0;
-                    MoreEfficiencySelfConsumption.Value = Math.Max(Math.Min(-sitePowerFlow?.LoadPowerCorrected / sitePowerFlow?.InverterAcPower ?? 0, 1), 0);
-                    MoreEfficiencySelfSufficiency.Value = sitePowerFlow?.LoadPowerCorrected > 0 ? 1 : Math.Max(Math.Min(-sitePowerFlow?.InverterAcPower / sitePowerFlow?.LoadPowerCorrected ?? 0, 1d), 0);
+                    MoreEfficiencySelfConsumption.Value = Math.Max(Math.Min(-e.HomeAutomationSystem?.LoadPowerCorrected / sitePowerFlow?.InverterAcPower ?? 0, 1), 0);
+                    MoreEfficiencySelfSufficiency.Value = e.HomeAutomationSystem?.LoadPowerCorrected > 0 ? 1 : Math.Max(Math.Min(-sitePowerFlow?.InverterAcPower / e.HomeAutomationSystem?.LoadPowerCorrected ?? 0, 1d), 0);
                     break;
             }
         });

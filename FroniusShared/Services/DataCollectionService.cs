@@ -1,10 +1,10 @@
-﻿namespace De.Hochstaetter.Fronius.Services;
+﻿namespace De.Hochstaetter.FroniusShared.Services;
 
 public class DataCollectionService : BindableBase, IDataCollectionService
 {
     private static readonly TimeSpan webRequestTimeOut = TimeSpan.FromSeconds(100000);
     private readonly IWattPilotService wattPilotService;
-    private readonly SettingsBase settings;
+    private readonly SettingsShared settings;
     private Timer? timer;
     private DateTime lastConfigUpdate = DateTime.UnixEpoch;
     private int updateSemaphore;
@@ -14,7 +14,7 @@ public class DataCollectionService : BindableBase, IDataCollectionService
 
     public event EventHandler<SolarDataEventArgs>? NewDataReceived;
 
-    public DataCollectionService(SettingsBase settings, IGen24Service gen24Service, IFritzBoxService fritzBoxService,
+    public DataCollectionService(SettingsShared settings, IGen24Service gen24Service, IFritzBoxService fritzBoxService,
         IWattPilotService wattPilotService, IToshibaHvacService acService, SynchronizationContext context)
     {
         Gen24Service = gen24Service;
@@ -23,11 +23,15 @@ public class DataCollectionService : BindableBase, IDataCollectionService
         this.settings = settings;
         HvacService = acService;
         SwitchableDevices = new BindableCollection<ISwitchable>(context);
-        Container2 = IoC.Injector!.CreateScope().ServiceProvider;
+
+        if (IoC.Injector?.CreateScope().ServiceProvider is {} container)
+        {
+            Container2 = container;
+        }
 
         if (settings.HaveTwoInverters)
         {
-            Gen24Service2 = Container2.GetRequiredService<IGen24Service>();
+            Gen24Service2 = Container2?.GetRequiredService<IGen24Service>();
         }
     }
 
@@ -36,7 +40,7 @@ public class DataCollectionService : BindableBase, IDataCollectionService
 
     public IServiceProvider Container => IoC.Injector!;
 
-    public IServiceProvider Container2 { get; }
+    public IServiceProvider? Container2 { get; }
 
     private IGen24Service? gen24Service2;
 
@@ -363,9 +367,9 @@ public class DataCollectionService : BindableBase, IDataCollectionService
 
     private async Task TryStartToshibaAc()
     {
-        if (!HvacService.IsRunning)
+        if (settings is { HaveToshibaAc: true, ShowToshibaAc: true } && !HvacService.IsRunning)
         {
-            await HvacService.Start().ConfigureAwait(false);
+            await HvacService.Start(settings.ToshibaAcConnection, settings.AzureDeviceIdString).ConfigureAwait(false);
 
             if (!HvacService.IsRunning)
             {
@@ -489,3 +493,4 @@ public class DataCollectionService : BindableBase, IDataCollectionService
         }
     }
 }
+//

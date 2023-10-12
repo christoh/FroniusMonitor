@@ -2,7 +2,7 @@
 
 namespace De.Hochstaetter.FroniusMonitor.Models;
 
-public class Settings : SettingsBase
+public class Settings : SettingsShared
 {
     private static readonly object settingsLockObject = new();
 

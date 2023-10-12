@@ -137,7 +137,7 @@
                     <StackPanel Orientation="Horizontal" Margin="120,-40,0,0">
 
                         <c:PowerFlowArrow Angle="-30" Fill="LightGray"
-                                          Power="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors.PowerFlow.GridPowerCorrected, FallbackValue={x:Null}}" />
+                                          Power="{Binding DataCollectionService.HomeAutomationSystem.GridPowerCorrected, FallbackValue={x:Null}}" />
 
                         <c:PowerFlowArrow Angle="30" Margin="80,0,0,0" Fill="LightGreen" HasRightPlacement="True"
                                           Power="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors.PowerFlow.StoragePower, FallbackValue={x:Null}}"
@@ -226,7 +226,7 @@
                              ProductionWatts="{Binding DataCollectionService.HomeAutomationSystem.SitePowerFlow.SolarPower, FallbackValue={x:Null}}">
                         <c:House.ConsumptionWatts>
                             <MultiBinding Converter="{co:HouseConsumptionConverter}">
-                                <Binding Path="DataCollectionService.HomeAutomationSystem.SitePowerFlow.LoadPowerCorrected" FallbackValue="{x:Null}" />
+                                <Binding Path="DataCollectionService.HomeAutomationSystem.LoadPowerCorrected" FallbackValue="{x:Null}" />
                                 <Binding Path="DataCollectionService.HomeAutomationSystem.WattPilot.PowerTotal" FallbackValue="{x:Null}" />
                                 <Binding Path="DataCollectionService.HomeAutomationSystem.SitePowerFlow.PowerLoss" FallbackValue="{x:Null}"/>
                                 <Binding Path="Settings.AddInverterPowerToConsumption" FallbackValue="{x:Null}"/>

@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Models;
+﻿namespace De.Hochstaetter.FroniusShared.Models;
 
 public class SolarDataEventArgs : EventArgs
 {
