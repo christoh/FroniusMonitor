@@ -6,7 +6,7 @@ using De.Hochstaetter.Fronius.Models.Settings;
 
 namespace FroniusPhone.Models
 {
-    public class Settings : SettingsBase
+    public class Settings : SettingsShared
     {
         public void Load(string? fileName = null)
         {

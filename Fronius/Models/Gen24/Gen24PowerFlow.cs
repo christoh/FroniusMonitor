@@ -22,9 +22,6 @@ public enum SiteType : sbyte
 public class Gen24PowerFlow : Gen24DeviceBase
 {
     private SiteType? siteType;
-    private static readonly IList<SmartMeterCalibrationHistoryItem> history = IoC.TryGet<IDataCollectionService>()?.SmartMeterHistory!;
-    private static int oldSmartMeterHistoryCountProduced;
-    private static int oldSmartMeterHistoryCountConsumed;
 
     [FroniusProprietaryImport("state", FroniusDataType.Attribute)]
     public SiteType? SiteType
@@ -86,46 +83,8 @@ public class Gen24PowerFlow : Gen24DeviceBase
     public double? LoadPower
     {
         get => loadPower;
-        set => Set(ref loadPower, value, () => NotifyOfPropertyChange(nameof(LoadPowerCorrected)));
+        set => Set(ref loadPower, value);
     }
-
-    private static double consumedFactor = 1;
-
-    public static double ConsumedFactor
-    {
-        get
-        {
-            if (oldSmartMeterHistoryCountConsumed != history.Count)
-            {
-                var consumed = (IReadOnlyList<SmartMeterCalibrationHistoryItem>)history.Where(item => double.IsFinite(item.ConsumedOffset)).ToList();
-                consumedFactor = CalculateSmartMeterFactor(consumed, false);
-                oldSmartMeterHistoryCountConsumed = history.Count;
-            }
-
-            return consumedFactor;
-        }
-    }
-
-    private static double producedFactor = 1;
-
-    public static double ProducedFactor
-    {
-        get
-        {
-            if (oldSmartMeterHistoryCountProduced != history.Count)
-            {
-                var produced = (IReadOnlyList<SmartMeterCalibrationHistoryItem>)history.Where(item => double.IsFinite(item.ProducedOffset)).ToList();
-                producedFactor = CalculateSmartMeterFactor(produced, true);
-                oldSmartMeterHistoryCountProduced = history.Count;
-            }
-
-            return producedFactor;
-        }
-    }
-
-    public double? LoadPowerCorrected => LoadPower + GridPower - GridPowerCorrected;
-
-    public double? GridPowerCorrected => GridPower * (GridPower < 0 ? ProducedFactor : ConsumedFactor);
 
     private double? inverterAcPower;
 
@@ -142,11 +101,7 @@ public class Gen24PowerFlow : Gen24DeviceBase
     public double? GridPower
     {
         get => gridPower;
-        set => Set(ref gridPower, value, () =>
-        {
-            NotifyOfPropertyChange(nameof(GridPowerCorrected));
-            NotifyOfPropertyChange(nameof(LoadPowerCorrected));
-        });
+        set => Set(ref gridPower, value);
     }
 
     private double? solarPower;
@@ -171,18 +126,4 @@ public class Gen24PowerFlow : Gen24DeviceBase
     public double DcInputPower => new[] { StoragePower ?? 0, SolarPower ?? 0 }.Where(ps => ps > 0).Sum();
     public double PowerLoss => (StoragePower ?? 0) + (SolarPower ?? 0) - (InverterAcPower ?? 0);
     public double? Efficiency => 1 - PowerLoss / DcInputPower;
-
-    private static double CalculateSmartMeterFactor(IReadOnlyList<SmartMeterCalibrationHistoryItem> list, bool isProduced)
-    {
-        if (list.Count < 2)
-        {
-            return 1.0;
-        }
-
-        var first = list[0];
-        var last = list[^1];
-        var rawEnergy = (isProduced ? last.EnergyRealProduced : last.EnergyRealConsumed) - (isProduced ? first.EnergyRealProduced : first.EnergyRealConsumed);
-        var offsetEnergy = (isProduced ? last.ProducedOffset : last.ConsumedOffset) - (isProduced ? first.ProducedOffset : first.ConsumedOffset);
-        return (rawEnergy + offsetEnergy) / rawEnergy;
-    }
 }

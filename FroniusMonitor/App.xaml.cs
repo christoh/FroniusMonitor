@@ -61,7 +61,7 @@ public partial class App
             .AddSingleton<IGen24JsonService, Gen24JsonService>()
             .AddSingleton<IWattPilotService, WattPilotService>()
             .AddSingleton<IToshibaHvacService, ToshibaHvacService>()
-            .AddSingleton<SettingsBase>(Settings)
+            .AddSingleton<SettingsShared>(Settings)
             .AddTransient<EventLogView>()
             .AddTransient<SelfConsumptionOptimizationView>()
             .AddTransient<ModbusView>()

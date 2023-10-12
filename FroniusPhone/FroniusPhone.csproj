@@ -54,6 +54,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\FroniusShared\FroniusShared.csproj" />
 	  <ProjectReference Include="..\Fronius\Fronius.csproj" />
 	</ItemGroup>
 

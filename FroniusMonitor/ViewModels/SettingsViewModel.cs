@@ -215,7 +215,7 @@ public class SettingsViewModel : SettingsViewModelBase
 
             if (Settings.HaveTwoInverters)
             {
-                DataCollectionService.Gen24Service2 ??= DataCollectionService.Container2.GetRequiredService<IGen24Service>();
+                DataCollectionService.Gen24Service2 ??= DataCollectionService.Container2?.GetRequiredService<IGen24Service>();
             }
             else
             {

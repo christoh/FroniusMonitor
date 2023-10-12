@@ -38,7 +38,7 @@ public static class MauiProgram
             .AddSingleton<OverviewViewModel>()
             .AddSingleton<SettingsPage>()
             .AddSingleton<SettingsViewModel>()
-            .AddSingleton<SettingsBase>(new Settings())
+            .AddSingleton<SettingsShared>(new Settings())
             .AddSingleton<IToshibaHvacService, ToshibaHvacService>()
             .AddSingleton(SynchronizationContext.Current ?? throw new InvalidOperationException("No Context"))
         ;
