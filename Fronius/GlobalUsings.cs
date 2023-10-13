@@ -13,6 +13,7 @@ global using System.Net.Sockets;
 global using System.Net.WebSockets;
 global using System.Reflection;
 global using System.Runtime.CompilerServices;
+global using System.Runtime.Serialization;
 global using System.Runtime.InteropServices;
 global using System.Security.Cryptography;
 global using System.Text;

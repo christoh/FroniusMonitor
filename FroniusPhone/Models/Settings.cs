@@ -1,8 +1,4 @@
-﻿using System.Text;
-using System.Xml;
-using System.Xml.Serialization;
-using De.Hochstaetter.Fronius.Extensions;
-using De.Hochstaetter.Fronius.Models.Settings;
+﻿using De.Hochstaetter.Fronius.Extensions;
 
 namespace FroniusPhone.Models
 {
@@ -10,10 +6,7 @@ namespace FroniusPhone.Models
     {
         public void Load(string? fileName = null)
         {
-            fileName ??= App.SettingsFileName;
-            var serializer = new XmlSerializer(typeof(Settings));
-            var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-            var settings = serializer.Deserialize(stream) as Settings ?? new Settings();
+            var settings = Load<Settings>(fileName ?? App.SettingsFileName);
             typeof(Settings).GetProperties().Apply(propertyInfo => propertyInfo.SetValue(this, propertyInfo.GetValue(settings)));
         }
 
@@ -28,21 +21,7 @@ namespace FroniusPhone.Models
             {
                 Directory.CreateDirectory(App.PerUserDataDir);
             }
-
-            fileName ??= App.SettingsFileName;
-            UpdateChecksum(WattPilotConnection, FritzBoxConnection, FroniusConnection, FroniusConnection2, ToshibaAcConnection);
-            var serializer = new XmlSerializer(typeof(Settings));
-            using var stream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None);
-
-            using var writer = XmlWriter.Create(stream, new XmlWriterSettings
-            {
-                Encoding = Encoding.UTF8,
-                Indent = true,
-                IndentChars = new string(' ', 3),
-                NewLineChars = Environment.NewLine,
-            });
-
-            serializer.Serialize(writer, this);
+            Save<Settings>(this, fileName ?? App.SettingsFileName);
         }
 
         public async ValueTask SaveAsync(string? fileName = null)
