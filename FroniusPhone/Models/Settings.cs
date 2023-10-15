@@ -21,7 +21,7 @@ namespace FroniusPhone.Models
             {
                 Directory.CreateDirectory(App.PerUserDataDir);
             }
-            Save<Settings>(this, fileName ?? App.SettingsFileName);
+            Save(this, fileName ?? App.SettingsFileName);
         }
 
         public async ValueTask SaveAsync(string? fileName = null)

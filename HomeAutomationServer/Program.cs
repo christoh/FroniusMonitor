@@ -29,7 +29,7 @@ internal class Program
 
         try
         {
-            settings = Settings.Load();
+            settings = Settings.LoadAsync().GetAwaiter().GetResult();
         }
         catch (FileNotFoundException ex)
         {
@@ -43,7 +43,7 @@ internal class Program
             });
             
             settings.ModbusMappings.Add(new ModbusMapping());
-            settings.Save();
+            settings.SaveAsync().GetAwaiter().GetResult();
             settingsLoadException = ex;
         }
         catch (Exception ex)
