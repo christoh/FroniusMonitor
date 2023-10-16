@@ -19,5 +19,5 @@ public class Settings : SettingsBase
 
     public static async Task<Settings> LoadAsync(string? fileName = null) => await Task.Run(() => Load<Settings>(fileName ?? SettingsFileName));
 
-    public async Task SaveAsync(string? fileName = null) => await Task.Run(() => Save<Settings>(this, fileName ?? SettingsFileName));
+    public async Task SaveAsync(string? fileName = null) => await Task.Run(() => Save(this, fileName ?? SettingsFileName));
 }

@@ -36,12 +36,13 @@ public class Settings : SettingsShared
 
     public static Task Save() => Save(App.SettingsFileName);
 
-    public static async Task Save(string fileName) => await Task.Run(() => Save<Settings>(App.Settings, fileName)).ConfigureAwait(false);
+    public static async Task Save(string fileName) => await Task.Run(() => Save(App.Settings, fileName)).ConfigureAwait(false);
 
     public static async Task Load(string fileName) => await Task.Run(() =>
     {
         try
         {
+            App.SolarSystemQueryTimer = new(_ => { Environment.Exit(0); }, null, 10000, -1);
             App.Settings = Load<Settings>(fileName);
         }
         finally
