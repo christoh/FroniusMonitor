@@ -13,7 +13,7 @@ internal class Program
     private static ILogger? logger;
     private static IReadOnlyList<string> Arguments { get; set; } = null!;
 
-    private static void Main(string[] args)
+    private static async Task Main(string[] args)
     {
         Arguments = args;
 
@@ -29,7 +29,7 @@ internal class Program
 
         try
         {
-            settings = Settings.LoadAsync().GetAwaiter().GetResult();
+            settings = await Settings.LoadAsync().ConfigureAwait(true);
         }
         catch (FileNotFoundException ex)
         {
@@ -43,7 +43,7 @@ internal class Program
             });
             
             settings.ModbusMappings.Add(new ModbusMapping());
-            settings.SaveAsync().GetAwaiter().GetResult();
+            await settings.SaveAsync().ConfigureAwait(true);
             settingsLoadException = ex;
         }
         catch (Exception ex)
@@ -83,11 +83,11 @@ internal class Program
                 return;
         }
 
-        RunServicesAsync().GetAwaiter().GetResult();
+        await RunServicesAsync().ConfigureAwait(true);
 
         while (true)
         {
-            Thread.Sleep(5000);
+            await Task.Delay(5000).ConfigureAwait(true);
         }
     }
 
