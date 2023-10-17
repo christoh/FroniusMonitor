@@ -48,7 +48,11 @@ public class HomeAutomationSystem : BindableBase
     public Gen24PowerFlow? SitePowerFlow
     {
         get => sitePowerFlow;
-        set => Set(ref sitePowerFlow, value);
+        set => Set(ref sitePowerFlow, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(GridPowerCorrected));
+            NotifyOfPropertyChange(nameof(LoadPowerCorrected));
+        });
     }
 
     private WattPilot? wattPilot;
