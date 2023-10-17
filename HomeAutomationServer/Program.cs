@@ -7,16 +7,19 @@ using De.Hochstaetter.HomeAutomationServer.DataCollectors;
 
 namespace De.Hochstaetter.HomeAutomationServer;
 
-internal class Program
+internal partial class Program
 {
     private static SunSpecMeterService? server;
+
+    [GeneratedRegex("^(?<UserName>(?!:).+):(?<Password>(?!:).+)$", RegexOptions.Compiled)]
+    private static partial Regex PasswordRegex();
+
+    private static readonly Regex regex = PasswordRegex();
     private static ILogger? logger;
-    private static IReadOnlyList<string> Arguments { get; set; } = null!;
 
-    private static async Task Main(string[] args)
+
+    private static async Task<int> Main(string[] args)
     {
-        Arguments = args;
-
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel
             .Verbose()
@@ -34,14 +37,14 @@ internal class Program
         catch (FileNotFoundException ex)
         {
             settings = new();
-            
+
             settings.FritzBoxConnections.Add(new WebConnection
             {
                 BaseUrl = "http://192.168.178.xxx",
                 UserName = string.Empty,
                 Password = string.Empty,
             });
-            
+
             settings.ModbusMappings.Add(new ModbusMapping());
             await settings.SaveAsync().ConfigureAwait(true);
             settingsLoadException = ex;
@@ -70,6 +73,7 @@ internal class Program
         var serviceProvider = serviceCollection.BuildServiceProvider();
         IoC.Update(serviceProvider);
         logger = IoC.Get<ILogger<Program>>();
+        server = IoC.Get<SunSpecMeterService>();
 
         switch (settingsLoadException)
         {
@@ -80,44 +84,38 @@ internal class Program
             case not null:
                 logger.LogCritical($"{Settings.SettingsFileName} could not be loaded. Must exit.");
                 Environment.ExitCode = settingsLoadException.HResult;
-                return;
+                return settingsLoadException.HResult;
         }
 
-        await RunServicesAsync().ConfigureAwait(true);
-
-        while (true)
+        if (settings == null)
         {
-            await Task.Delay(5000).ConfigureAwait(true);
+            return 1;
         }
-    }
 
-    private static async Task RunServicesAsync()
-    {
-        logger = IoC.Get<ILogger<Program>>();
-        server = IoC.Get<SunSpecMeterService>();
-        var settings = IoC.Get<Settings>();
-
-        if (Arguments.Count > 0)
+        if (args is [var arg0, ..])
         {
-            var regex = new Regex(@"^(?<UserName>(?!:).+):(?<Password>(?!:).+)$");
-            var match = regex.Match(Arguments[0]);
+            var match = regex.Match(arg0);
 
             if (match.Success)
             {
                 var userName = match.Groups["UserName"].Value;
                 var password = match.Groups["Password"].Value;
-
                 settings.FritzBoxConnections.Where(c => c.UserName == userName).Apply(c => { c.Password = password; });
-
                 await settings.SaveAsync().ConfigureAwait(false);
-                Environment.Exit(0);
-                return;
+                return 0;
             }
+
+            return 2;
         }
 
         logger.LogInformation($"Starting server on {settings.ServerIpAddress}:{settings.ServerPort}");
-        await server.StartAsync(new IPEndPoint(IPAddress.Parse(settings.ServerIpAddress), settings.ServerPort)).ConfigureAwait(false);
+        await server.StartAsync(new IPEndPoint(IPAddress.Parse(settings.ServerIpAddress), settings.ServerPort)).ConfigureAwait(true);
         var fritzBoxDataCollector = IoC.Get<FritzBoxDataCollector>();
-        await fritzBoxDataCollector.StartAsync();
+        await fritzBoxDataCollector.StartAsync().ConfigureAwait(true);
+
+        while (true)
+        {
+            await Task.Delay(5000).ConfigureAwait(true);
+        }
     }
 }

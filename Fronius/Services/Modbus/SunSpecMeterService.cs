@@ -49,6 +49,7 @@ public class SunSpecMeterService
         {
             if (!server.UnitIdentifiers.Contains(modbusAddress))
             {
+                logger.LogInformation($"Adding power meter {meter.DisplayName} at modbus address {modbusAddress}");
                 server.AddUnit(modbusAddress);
             }
 
