@@ -33,7 +33,7 @@
             ? throw new NullReferenceException($"App must set an {nameof(Injector)} that implements {nameof(IServiceProvider)}")
             : Injector.GetRequiredService(type);
 
-        public static void Update(IServiceProvider newInjector)
+        public static async void Update(IServiceProvider newInjector)
         {
             var oldInjector = Injector;
             Injector = newInjector;
@@ -41,11 +41,11 @@
             switch (oldInjector)
             {
                 case IAsyncDisposable asyncDisposable:
-                    asyncDisposable.DisposeAsync();
+                    await asyncDisposable.DisposeAsync().ConfigureAwait(false);
                     break;
 
                 case IDisposable disposable:
-                    Task.Run(disposable.Dispose);
+                    await Task.Run(disposable.Dispose).ConfigureAwait(false);
                     break;
             }
         }

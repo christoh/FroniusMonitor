@@ -1,6 +1,7 @@
 // Global using directives
 
 global using System.Collections;
+global using System.Collections.Concurrent;
 global using System.Collections.ObjectModel;
 global using System.Collections.Specialized;
 global using System.ComponentModel;

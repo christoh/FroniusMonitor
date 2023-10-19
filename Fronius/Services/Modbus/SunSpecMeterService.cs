@@ -1,44 +1,68 @@
-﻿using FluentModbus;
+﻿using De.Hochstaetter.Fronius.Models.Events;
+using FluentModbus;
 
 namespace De.Hochstaetter.Fronius.Services.Modbus;
 
 [SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
 public class SunSpecMeterService
 {
-    private readonly ILogger logger;
+    private readonly ILogger<SunSpecMeterService> logger;
+    private readonly IDataControlService dataControlService;
+    private readonly IEnumerable<ModbusMapping> mappings;
     private ModbusTcpServer? server;
 
-    public SunSpecMeterService(ILogger<SunSpecMeterService> logger)
+    public SunSpecMeterService(IEnumerable<ModbusMapping> mappings, ILogger<SunSpecMeterService> logger, IDataControlService dataControlService)
     {
         this.logger = logger;
+        this.dataControlService = dataControlService;
+        this.mappings = mappings;
     }
 
     public Task StartAsync(IPEndPoint endPoint) => Task.Run(() =>
     {
+        dataControlService.DeviceUpdate += OnDeviceUpdate;
+
         server = new ModbusTcpServer(logger, true)
         {
             MaxConnections = 0,
-        };
-
-        server.RequestValidator = (_, functionCode, address, numberOfRegisters) =>
-        {
-            if (functionCode != ModbusFunctionCode.ReadHoldingRegisters)
+            RequestValidator = (_, functionCode, address, numberOfRegisters) =>
             {
-                return ModbusExceptionCode.IllegalFunction;
-            }
+                if (functionCode != ModbusFunctionCode.ReadHoldingRegisters)
+                {
+                    return ModbusExceptionCode.IllegalFunction;
+                }
 
-            if (address < 40000 || address + numberOfRegisters > 40178)
-            {
-                return ModbusExceptionCode.IllegalDataAddress;
-            }
+                if (address < 40000 || address + numberOfRegisters > 40178)
+                {
+                    return ModbusExceptionCode.IllegalDataAddress;
+                }
 
-            return ModbusExceptionCode.OK;
+                return ModbusExceptionCode.OK;
+            }
         };
 
         server.Start(endPoint);
     });
 
-    public void UpdateMeter(IPowerMeter1P meter, byte modbusAddress)
+    private void OnDeviceUpdate(object? s, DeviceUpdateEventArgs e)
+    {
+        if (e.Device is not IPowerMeter1P { CanMeasurePower: true } meter)
+        {
+            return;
+        }
+
+        var mapping = mappings.SingleOrDefault(m => string.Equals(m.SerialNumber, meter.SerialNumber, StringComparison.Ordinal));
+
+        if (mapping == null)
+        {
+            logger?.LogWarning("Power meter {DisplayName} ({SerialNumber}) has no Modbus mapping", meter.DisplayName, meter.SerialNumber);
+            return;
+        }
+
+        UpdateMeter(meter, mapping.ModbusAddress, e.DeviceAction);
+    }
+
+    public void UpdateMeter(IPowerMeter1P meter, byte modbusAddress, DeviceAction deviceAction)
     {
         if (server == null)
         {
@@ -47,9 +71,15 @@ public class SunSpecMeterService
 
         lock (server.Lock)
         {
-            if (!server.UnitIdentifiers.Contains(modbusAddress))
+            if (deviceAction == DeviceAction.Delete)
             {
-                logger.LogInformation($"Adding power meter {meter.DisplayName} at modbus address {modbusAddress}");
+                server.RemoveUnit(modbusAddress);
+                return;
+            }
+
+            if (deviceAction == DeviceAction.Add)
+            {
+                logger.LogInformation("Adding power meter {DisplayName} at modbus address {ModbusAddress}", meter.DisplayName, modbusAddress);
                 server.AddUnit(modbusAddress);
             }
 

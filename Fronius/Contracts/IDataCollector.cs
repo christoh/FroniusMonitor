@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.HomeAutomationServer.Contracts;
+﻿namespace De.Hochstaetter.Fronius.Contracts;
 
 internal interface IDataCollector : IAsyncDisposable
 {

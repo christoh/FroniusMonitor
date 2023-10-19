@@ -1,6 +1,4 @@
-﻿using System.Xml.Serialization;
-
-namespace De.Hochstaetter.HomeAutomationServer.Models.Settings;
+﻿namespace De.Hochstaetter.Fronius.Models;
 
 public class ModbusMapping
 {

@@ -1,6 +1,4 @@
-﻿using Microsoft.WindowsAzure.Storage.Blob.Protocol;
-
-namespace De.Hochstaetter.Fronius.Contracts;
+﻿namespace De.Hochstaetter.Fronius.Contracts;
 
 public interface IPowerMeter1P : IHaveDisplayName
 {

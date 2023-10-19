@@ -1,11 +1,4 @@
-﻿using System.Net;
-using System.Text.RegularExpressions;
-using De.Hochstaetter.Fronius.Extensions;
-using De.Hochstaetter.Fronius.Models.Settings;
-using De.Hochstaetter.HomeAutomationServer.Crypto;
-using De.Hochstaetter.HomeAutomationServer.DataCollectors;
-
-namespace De.Hochstaetter.HomeAutomationServer;
+﻿namespace De.Hochstaetter.HomeAutomationServer;
 
 internal partial class Program
 {
@@ -54,20 +47,29 @@ internal partial class Program
             settingsLoadException = ex;
         }
 
-        var serviceCollection = new ServiceCollection();
+        IServiceCollection serviceCollection = new ServiceCollection();
 
         serviceCollection
+            .AddOptions()
             .AddTransient<IFritzBoxService, FritzBoxService>()
             .AddSingleton<IAesKeyProvider, AesKeyProvider>()
-            .AddSingleton<SunSpecMeterService>()
             .AddSingleton<FritzBoxDataCollector>()
+            .AddSingleton<SunSpecMeterService>()
+            .AddSingleton<IDataControlService, DataControlService>()
             .AddTransient<ISunSpecMeterClient, SunSpecMeterClient>()
             .AddLogging(builder => builder.AddSerilog())
             ;
 
         if (settings != null)
         {
-            serviceCollection.AddSingleton(settings);
+            serviceCollection
+                .AddSingleton<IEnumerable<ModbusMapping>>(settings.ModbusMappings)
+                .Configure<FritzBoxParameters>(f =>
+                {
+                    f.Connections = settings.FritzBoxConnections;
+                    f.RefreshRate = TimeSpan.FromSeconds(60);
+                })
+                ;
         }
 
         var serviceProvider = serviceCollection.BuildServiceProvider();
@@ -78,11 +80,11 @@ internal partial class Program
         switch (settingsLoadException)
         {
             case FileNotFoundException:
-                logger.LogWarning($"{Settings.SettingsFileName} does not exist. Created a default file.");
+                logger.LogWarning("{FileName} does not exist. Created a default file.", Settings.SettingsFileName);
                 break;
 
             case not null:
-                logger.LogCritical($"{Settings.SettingsFileName} could not be loaded. Must exit.");
+                logger.LogCritical("{FileName} could not be loaded. Must exit.", Settings.SettingsFileName);
                 Environment.ExitCode = settingsLoadException.HResult;
                 return settingsLoadException.HResult;
         }
@@ -108,7 +110,7 @@ internal partial class Program
             return 2;
         }
 
-        logger.LogInformation($"Starting server on {settings.ServerIpAddress}:{settings.ServerPort}");
+        logger.LogInformation("Starting server on {IpAddress}:{Port}", settings.ServerIpAddress, settings.ServerPort);
         await server.StartAsync(new IPEndPoint(IPAddress.Parse(settings.ServerIpAddress), settings.ServerPort)).ConfigureAwait(true);
         var fritzBoxDataCollector = IoC.Get<FritzBoxDataCollector>();
         await fritzBoxDataCollector.StartAsync().ConfigureAwait(true);
