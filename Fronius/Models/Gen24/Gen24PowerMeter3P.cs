@@ -1,5 +1,19 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Gen24;
 
+public enum MeterUsage : sbyte
+{
+    MultipleConsumers,
+    UniqueConsumer,
+    Inverter,
+}
+
+public enum MeterLocation : sbyte
+{
+    Grid,
+    Load,
+    Unknown,
+}
+
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public class Gen24PowerMeter3P : Gen24DeviceBase, IPowerMeter3P
 {

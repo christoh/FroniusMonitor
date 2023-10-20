@@ -1248,4 +1248,7 @@
   <data name="IncorrectPhaseNumber" xml:space="preserve">
 	  <value>Phase muss von 1 bis 3 sein</value>
   </data>
+  <data name="ScAddress" xml:space="preserve">
+	  <value>Stringkontroll-Adresse (nur Tauro)</value>
+  </data>
 </root>

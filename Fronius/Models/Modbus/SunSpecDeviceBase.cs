@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Modbus;
 
-public abstract class SunSpecDeviceBase : BindableBase
+public class SunSpecDeviceBase : BindableBase
 {
     private string? manufacturer;
 

@@ -1,4 +1,4 @@
-namespace FroniusUnitTests;
+namespace FroniusUnitTests.UnitTests;
 
 [TestFixture]
 public class Gen24ModbusSettingsTests

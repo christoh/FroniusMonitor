@@ -38,6 +38,8 @@
             set => Set(ref modes, value);
         }
 
+        public abstract Guid DeviceUniqueId { get; set; }
+
         public bool IsSwitchingEnabled => false;
         public bool? IsTurnedOn => State.IsTurnedOn;
         public bool CanSwitch => true;
@@ -46,5 +48,17 @@
         {
             throw new NotImplementedException();
         }
+
+        [JsonIgnore]
+        public bool IsPresent => true;
+        
+        [JsonIgnore]
+        public string Manufacturer => "Toshiba";
+        
+        [JsonIgnore]
+        public string Model => "HVAC";
+
+        [JsonIgnore]
+        public string SerialNumber => DeviceUniqueId.ToString("N");
     }
 }

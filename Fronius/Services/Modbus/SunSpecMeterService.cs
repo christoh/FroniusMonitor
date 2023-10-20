@@ -74,6 +74,7 @@ public class SunSpecMeterService
             if (deviceAction == DeviceAction.Delete)
             {
                 server.RemoveUnit(modbusAddress);
+                logger.LogInformation("Removing power meter {DisplayName} at modbus address {ModbusAddress}", meter.DisplayName, modbusAddress);
                 return;
             }
 

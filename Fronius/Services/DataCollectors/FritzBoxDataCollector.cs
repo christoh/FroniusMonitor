@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-
-namespace De.Hochstaetter.Fronius.Services.DataCollectors;
+﻿namespace De.Hochstaetter.Fronius.Services.DataCollectors;
 
 public class FritzBoxDataCollector : IDataCollector
 {
@@ -8,6 +6,7 @@ public class FritzBoxDataCollector : IDataCollector
     private readonly IDataControlService dataControlService;
     private readonly IList<IFritzBoxService> fritzBoxServices = new List<IFritzBoxService>();
     private readonly IOptionsMonitor<FritzBoxParameters> options;
+    private IDictionary<string, IPowerConsumer1P>? currentDevices;
     private CancellationTokenSource? tokenSource;
     private Thread? runner;
 
@@ -62,7 +61,7 @@ public class FritzBoxDataCollector : IDataCollector
     {
         try
         {
-            await StopAsync();
+            await StopAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -114,6 +113,12 @@ public class FritzBoxDataCollector : IDataCollector
                     .Cast<IPowerConsumer1P>()
                     .Where(p => p is { IsPresent: true }).ToArray();
 
+                if (currentDevices != null)
+                {
+                    var devicesToDelete = currentDevices.Keys.Where(k => !fritzBoxDevices.Select(f => f.Id).Contains(k));
+                }
+
+                currentDevices = fritzBoxDevices.ToDictionary(f => f.Id);
                 await dataControlService.AddOrUpdateAsync(fritzBoxDevices, token).ConfigureAwait(true);
             }
             catch (OperationCanceledException)

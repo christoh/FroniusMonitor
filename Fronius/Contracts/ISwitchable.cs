@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.Fronius.Contracts;
 
-public interface ISwitchable
+public interface ISwitchable : IHaveUniqueId
 {
     bool IsSwitchingEnabled { get; }
     bool? IsTurnedOn { get; }
