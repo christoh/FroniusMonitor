@@ -17,7 +17,6 @@ public class SunSpecClient : ISunSpecClient
     protected int ModbusAddress { get; private set; } = ~0;
     public bool IsConnected => ModbusClient is { IsConnected: true };
 
-    [SuppressMessage("ReSharper", "ParameterHidesMember")]
     public async Task ConnectAsync(string hostname, int port, ushort modbusAddress, TimeSpan timeout = default)
     {
         if (timeout == default)
@@ -61,9 +60,9 @@ public class SunSpecClient : ISunSpecClient
                     baseRegister = register;
                     break;
                 }
-                catch (Exception e)
+                catch
                 {
-                    continue;
+                    // continue;
                 }
             }
 
@@ -102,8 +101,6 @@ public class SunSpecClient : ISunSpecClient
         }
 
         ushort register = baseRegister;
-        var header = await ModbusClient!.ReadHoldingRegistersAsync<byte>(ModbusAddress, register, 4, token).ConfigureAwait(false);
-        var magic = header.ReadString(0, 2);
         register += 2;
         Memory<byte> data;
         var result = new List<SunSpecModelBase>();
@@ -114,7 +111,8 @@ public class SunSpecClient : ISunSpecClient
 
             var sunSpecModelBase = sunSpecModel switch
             {
-                1 => new SunSpecCommonBlock(data, sunSpecModel, (ushort)(register + 2)),
+                1 => (SunSpecModelBase)new SunSpecCommonBlock(data, sunSpecModel, (ushort)(register + 2)),
+                >= 101 and <= 103 => new SunSpecInverterInt(data, sunSpecModel, (ushort)(register + 2)),
                 _ => null
             };
 

@@ -2,12 +2,17 @@
 
 internal static class SunSpecExtensions
 {
-    public static string ReadString(this Memory<byte> data, ushort register, ushort length)
+    public static string? ReadString(this Memory<byte> data, ushort register, ushort length)
     {
         var range = data.Span.Slice(register << 1, length << 1);
         var nullIndex = range.IndexOf((byte)0);
 
-        if (nullIndex >= 0)
+        if (nullIndex == 0)
+        {
+            return null;
+        }
+        
+        if (nullIndex > 0)
         {
             range = range[0..nullIndex];
         }
@@ -15,13 +20,17 @@ internal static class SunSpecExtensions
         return Encoding.UTF8.GetString(range);
     }
 
-    public static void WriteString(this Memory<byte> data, string value, ushort register, ushort length)
+    public static void WriteString(this Memory<byte> data, string? value, ushort register, ushort length)
     {
-        var bytes = Encoding.UTF8.GetBytes(value);
         var destination = data.Span[(register << 1)..(length << 1)];
-        bytes = bytes[..Math.Min(destination.Length, bytes.Length)];
         destination.Fill(0);
-        bytes.CopyTo(destination);
+
+        if (value is not null)
+        {
+            var bytes = Encoding.UTF8.GetBytes(value);
+            bytes = bytes[..Math.Min(destination.Length, bytes.Length)];
+            bytes.CopyTo(destination);
+        }
     }
 
     public static unsafe T Read<T>(this Memory<byte> data, ushort register) where T : unmanaged

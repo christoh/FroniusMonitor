@@ -22,6 +22,7 @@ public abstract class SunSpecModelBase : BindableBase
     public ushort ModelNumber { get; private set; }
     protected Memory<byte> Data { get; private set; }
     public ushort AbsoluteRegister { get; private set; }
+    public abstract IReadOnlyList<ushort> SupportedModels { get; }
 
     public void CopyFrom(SunSpecModelBase other)
     {
@@ -29,20 +30,20 @@ public abstract class SunSpecModelBase : BindableBase
         {
             throw new ArgumentException($"Cannot copy from {other.GetType().Name} to {GetType().Name}");
         }
-        
+
         Data = new Memory<byte>(new byte[other.Data.Length]);
         other.Data.CopyTo(Data);
         AbsoluteRegister = other.AbsoluteRegister;
         ModelNumber = other.ModelNumber;
     }
 
-    protected string GetString([CallerMemberName] string propertyName = null!)
+    protected string? GetString([CallerMemberName] string propertyName = null!)
     {
         var attribute = GetAttribute(propertyName);
         return Data.ReadString(attribute.Start, attribute.Length);
     }
 
-    protected void SetString(string value, [CallerMemberName] string propertyName = null!)
+    protected void SetString(string? value, [CallerMemberName] string propertyName = null!)
     {
         var attribute = GetAttribute(propertyName);
         var oldValue = Data.ReadString(attribute.Start, attribute.Length);
@@ -71,6 +72,36 @@ public abstract class SunSpecModelBase : BindableBase
             NotifyOfPropertyChange(propertyName);
         }
     }
+
+    protected static double? ToDouble<T>(T value, short sf) where T : IConvertible
+    {
+        var isNull =
+            value is (short)-32768 ||
+            value is (ushort)0xffff ||
+            value is unchecked((int)0x80000000) ||
+            value is 0xffffffff ||
+            sf == -32768;
+
+        return isNull ? null : value.ToDouble(CultureInfo.InvariantCulture) * Math.Pow(10, sf);
+    }
+
+    protected static T FromDouble<T>(double? value, short sf) where T : IConvertible
+    {
+        object nullValue =
+            typeof(T) == typeof(short) ? (short)-32768 :
+            typeof(T) == typeof(ushort) ? (ushort)0xffff :
+            typeof(T) == typeof(int) ? unchecked((int)0x80000000) :
+            typeof(T) == typeof(uint) ? 0xffffffff :
+            throw new NotSupportedException("Unsupported type");
+
+        return (T)Convert.ChangeType
+        (
+            value is null or double.NaN || sf == -32768 ? nullValue : Math.Round(value.Value / Math.Pow(10, sf), MidpointRounding.AwayFromZero),
+            typeof(T),
+            CultureInfo.InvariantCulture
+        );
+    }
+
 
     private ModbusAttribute GetAttribute(string propertyName)
     {

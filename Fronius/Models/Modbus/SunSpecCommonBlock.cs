@@ -9,35 +9,35 @@ public class SunSpecCommonBlock : SunSpecModelBase
     }
 
     [Modbus(0, 16)]
-    public string Manufacturer
+    public string? Manufacturer
     {
         get => GetString();
         set => SetString(value);
     }
 
     [Modbus(16, 16)]
-    public string ModelName
+    public string? ModelName
     {
         get => GetString();
         set => SetString(value);
     }
 
     [Modbus(32, 8)]
-    public string Options
+    public string? Options
     {
         get => GetString();
         set => SetString(value);
     }
 
     [Modbus(40, 8)]
-    public string Version
+    public string? Version
     {
         get => GetString();
         set => SetString(value);
     }
 
     [Modbus(48, 16)]
-    public string SerialNumber
+    public string? SerialNumber
     {
         get => GetString();
         set => SetString(value);
@@ -51,4 +51,6 @@ public class SunSpecCommonBlock : SunSpecModelBase
     }
 
     public override string ToString() => $"{Manufacturer ?? "---"} - {ModelName ?? "---"}";
+
+    public override IReadOnlyList<ushort> SupportedModels => new ushort[] { 1, };
 }
