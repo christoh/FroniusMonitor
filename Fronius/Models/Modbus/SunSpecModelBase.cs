@@ -1,0 +1,80 @@
+﻿namespace De.Hochstaetter.Fronius.Models.Modbus;
+
+public abstract class SunSpecModelBase : BindableBase
+{
+    protected SunSpecModelBase(ReadOnlyMemory<byte> data, ushort modelNumber, ushort absoluteRegister)
+    {
+        Data = new Memory<byte>(new byte[data.Length]);
+        data.CopyTo(Data);
+        AbsoluteRegister = absoluteRegister;
+        ModelNumber = modelNumber;
+    }
+
+    protected SunSpecModelBase(ushort modelNumber, ushort absoluteRegister, ushort dataLength)
+    {
+        Data = new Memory<byte>(new byte[dataLength << 1]);
+        AbsoluteRegister = absoluteRegister;
+        ModelNumber = modelNumber;
+    }
+
+    public ushort DataLength => (ushort)(Data.Length >> 1);
+    public ReadOnlyMemory<byte> RawData => Data;
+    public ushort ModelNumber { get; private set; }
+    protected Memory<byte> Data { get; private set; }
+    public ushort AbsoluteRegister { get; private set; }
+
+    public void CopyFrom(SunSpecModelBase other)
+    {
+        if (!GetType().IsInstanceOfType(other))
+        {
+            throw new ArgumentException($"Cannot copy from {other.GetType().Name} to {GetType().Name}");
+        }
+        
+        Data = new Memory<byte>(new byte[other.Data.Length]);
+        other.Data.CopyTo(Data);
+        AbsoluteRegister = other.AbsoluteRegister;
+        ModelNumber = other.ModelNumber;
+    }
+
+    protected string GetString([CallerMemberName] string propertyName = null!)
+    {
+        var attribute = GetAttribute(propertyName);
+        return Data.ReadString(attribute.Start, attribute.Length);
+    }
+
+    protected void SetString(string value, [CallerMemberName] string propertyName = null!)
+    {
+        var attribute = GetAttribute(propertyName);
+        var oldValue = Data.ReadString(attribute.Start, attribute.Length);
+        Data.WriteString(value, attribute.Start, attribute.Length);
+
+        if (!string.Equals(value, oldValue, StringComparison.Ordinal))
+        {
+            NotifyOfPropertyChange(propertyName);
+        }
+    }
+
+    protected T Get<T>([CallerMemberName] string propertyName = null!) where T : unmanaged
+    {
+        var attribute = GetAttribute(propertyName);
+        return Data.Read<T>(attribute.Start);
+    }
+
+    protected void Set<T>(T value, [CallerMemberName] string propertyName = null!) where T : unmanaged
+    {
+        var attribute = GetAttribute(propertyName);
+        var oldValue = Data.Read<T>(attribute.Start);
+        Data.Write(attribute.Start, value);
+
+        if (!oldValue.Equals(value))
+        {
+            NotifyOfPropertyChange(propertyName);
+        }
+    }
+
+    private ModbusAttribute GetAttribute(string propertyName)
+    {
+        var propertyInfo = GetType().GetProperty(propertyName) ?? throw new InvalidDataException("Property is not public instance");
+        return propertyInfo.GetCustomAttribute(typeof(ModbusAttribute)) as ModbusAttribute ?? throw new InvalidDataException($"{nameof(ModbusAttribute)} is missing");
+    }
+}

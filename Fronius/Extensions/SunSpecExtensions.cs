@@ -15,6 +15,15 @@ internal static class SunSpecExtensions
         return Encoding.UTF8.GetString(range);
     }
 
+    public static void WriteString(this Memory<byte> data, string value, ushort register, ushort length)
+    {
+        var bytes = Encoding.UTF8.GetBytes(value);
+        var destination = data.Span[(register << 1)..(length << 1)];
+        bytes = bytes[..Math.Min(destination.Length, bytes.Length)];
+        destination.Fill(0);
+        bytes.CopyTo(destination);
+    }
+
     public static unsafe T Read<T>(this Memory<byte> data, ushort register) where T : unmanaged
     {
         var span = data.Span[(register << 1)..];
@@ -35,6 +44,29 @@ internal static class SunSpecExtensions
         fixed (byte* dataPointer = span)
         {
             return *(T*)(dataPointer);
+        }
+    }
+
+    public static unsafe void Write<T>(this Memory<byte> data, ushort register, T value) where T : unmanaged
+    {
+        var span = data.Span[(register << 1)..];
+
+        if (BitConverter.IsLittleEndian)
+        {
+            byte* valuePointer = (byte*)&value;
+            var swappedValuePointer = stackalloc byte[sizeof(T)];
+
+            for (var i = 0; i < sizeof(T); i++)
+            {
+                swappedValuePointer[sizeof(T) - i - 1] = valuePointer[i];
+            }
+
+            value = *(T*)swappedValuePointer;
+        }
+
+        fixed (byte* dataPointer = span)
+        {
+            *(T*)(dataPointer) = value;
         }
     }
 }

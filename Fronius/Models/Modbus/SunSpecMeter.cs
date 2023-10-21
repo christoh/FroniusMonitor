@@ -427,7 +427,7 @@ public class SunSpecMeter : SunSpecDeviceBase, IPowerMeter3P
     public double? EnergyReactiveConsumedQ2
     {
         get => energyReactiveConsumedQ2;
-        set => Set(ref energyReactiveConsumedQ2, value, ()=>NotifyOfPropertyChange(nameof(IPowerMeter3P.EnergyReactiveConsumed)));
+        set => Set(ref energyReactiveConsumedQ2, value, () => NotifyOfPropertyChange(nameof(IPowerMeter3P.EnergyReactiveConsumed)));
     }
 
     private double? energyReactiveConsumedQ2L1;

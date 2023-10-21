@@ -18,13 +18,13 @@ public class SunSpecClientTests
     public async Task Inverter_Success()
     {
         await client.ConnectAsync("192.168.44.10", 502, 1).ConfigureAwait(false);
-        await client.GetDataAsync().ConfigureAwait(false);
+        var device = await client.GetDataAsync().ConfigureAwait(false);
     }
 
     [Test]
     public async Task Meter_Success()
     {
         await client.ConnectAsync("192.168.44.10", 502, 200).ConfigureAwait(false);
-        await client.GetDataAsync().ConfigureAwait(false);
+        var device = await client.GetDataAsync().ConfigureAwait(false);
     }
 }
