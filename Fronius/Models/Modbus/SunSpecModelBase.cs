@@ -2,8 +2,14 @@
 
 public abstract class SunSpecModelBase : BindableBase
 {
+    [SuppressMessage("ReSharper", "VirtualMemberCallInConstructor")]
     private SunSpecModelBase(ushort modelNumber, ushort absoluteRegister)
     {
+        if (!SupportedModels.Contains(modelNumber))
+        {
+            throw new ArgumentException($"{GetType().Name} does not support SunSPec model {modelNumber}");
+        }
+        
         AbsoluteRegister = absoluteRegister;
         ModelNumber = modelNumber;
     }

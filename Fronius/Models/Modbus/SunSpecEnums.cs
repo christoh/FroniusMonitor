@@ -57,6 +57,36 @@ public enum SunSpecInverterEvents1 : uint
 }
 
 [Flags]
+public enum SunSpecMpptEvent : uint
+{
+    None = 0,
+    GroundFault= 1 << 0,
+    InputOverVoltage= 1 << 1,
+    Reserved2= 1 << 2,
+    DcDisconnected= 1 << 3,
+    Reserved4= 1 << 4,
+    CabinetOpen= 1 << 5,
+    ManualShutDown= 1 << 6,
+    OverTemperature= 1 << 7,
+    Reserved8= 1 << 8,
+    Reserved9= 1 << 9,
+    Reserved10= 1 << 10,
+    Reserved11= 1 << 11,
+    BlownStringFuse= 1 << 12,
+    UnderTemperature= 1 << 13,
+    MemoryLoss= 1 << 14,
+    ArcDetected= 1 << 15,
+    Reserved16= 1 << 16,
+    Reserved17= 1 << 17,
+    Reserved18= 1 << 18,
+    Reserved19= 1 << 19,
+    TestFailed= 1 << 20,
+    InputUnderVoltage= 1 << 21,
+    InputOverCurrent= 1 << 22,
+    Null = 0xffffffff,
+}
+
+[Flags]
 public enum SunSpecInverterEvents2 : uint
 {
     None = 0,
@@ -89,4 +119,12 @@ public enum SunSpecInverterVendorEvents4 : uint
 {
     None = 0,
     Null = 0xffffffff,
+}
+
+public enum SunSpecDerType : ushort
+{
+    None = 0,
+    Inverter = 4,
+    Storage = 82,
+    Null = 0xffff,
 }
