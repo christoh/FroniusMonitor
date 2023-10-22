@@ -53,4 +53,6 @@ public class SunSpecCommonBlock : SunSpecModelBase
     public override string ToString() => $"{Manufacturer ?? "---"} - {ModelName ?? "---"}";
 
     public override IReadOnlyList<ushort> SupportedModels { get; } = new ushort[] { 1, };
+    
+    public override ushort MinimumDataLength => 65;
 }

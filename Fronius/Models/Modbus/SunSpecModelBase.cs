@@ -9,7 +9,7 @@ public abstract class SunSpecModelBase : BindableBase
         {
             throw new ArgumentException($"{GetType().Name} does not support SunSPec model {modelNumber}");
         }
-        
+
         AbsoluteRegister = absoluteRegister;
         ModelNumber = modelNumber;
     }
@@ -20,9 +20,10 @@ public abstract class SunSpecModelBase : BindableBase
         data.CopyTo(Data);
     }
 
+    [SuppressMessage("ReSharper", "VirtualMemberCallInConstructor")]
     protected SunSpecModelBase(ushort modelNumber, ushort absoluteRegister, ushort dataLength) : this(modelNumber, absoluteRegister)
     {
-        Data = new Memory<byte>(new byte[dataLength << 1]);
+        Data = new Memory<byte>(new byte[Math.Max(dataLength, MinimumDataLength) << 1]);
     }
 
     public ushort DataLength => (ushort)(Data.Length >> 1);
@@ -31,6 +32,7 @@ public abstract class SunSpecModelBase : BindableBase
     protected Memory<byte> Data { get; private set; }
     public ushort AbsoluteRegister { get; private set; }
     public abstract IReadOnlyList<ushort> SupportedModels { get; }
+    public abstract ushort MinimumDataLength { get; }
 
     public void CopyFrom(SunSpecModelBase other)
     {

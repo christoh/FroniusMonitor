@@ -15,7 +15,10 @@
                     Data.Slice(registerOffset << 1, 40),
                     0xffff,
                     (ushort)(absoluteRegister + registerOffset),
-                    DcVoltageSf, DcCurrentSf, DcEnergySf, DcPowerSf
+                    DcVoltageSf,
+                    DcCurrentSf,
+                    DcEnergySf,
+                    DcPowerSf
                 );
             }
 
@@ -23,6 +26,8 @@
         }
 
         public override IReadOnlyList<ushort> SupportedModels { get; } = new ushort[] { 160, };
+        
+        public override ushort MinimumDataLength => throw new NotSupportedException();
 
         public IReadOnlyList<SunSpecMppt> Mppts { get; }
 

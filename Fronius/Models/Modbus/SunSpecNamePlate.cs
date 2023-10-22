@@ -5,6 +5,8 @@ public class SunSpecNamePlate : SunSpecModelBase
     public SunSpecNamePlate(ReadOnlyMemory<byte> data, ushort modelNumber, ushort absoluteRegister) : base(data, modelNumber, absoluteRegister) { }
 
     public override IReadOnlyList<ushort> SupportedModels { get; } = new ushort[] { 120, };
+    
+    public override ushort MinimumDataLength => 25;
 
     [Modbus(0)]
     public SunSpecDerType DeviceType

@@ -5,6 +5,7 @@
         public SunSpecInverterInt(ReadOnlyMemory<byte> data, ushort modelNumber, ushort absoluteRegister) : base(data, modelNumber, absoluteRegister) { }
 
         public override IReadOnlyList<ushort> SupportedModels { get; } = new ushort[] { 101, 102, 103 };
+        public override ushort MinimumDataLength => 50;
 
         [Modbus(0)]
         public ushort AcCurrentSumI

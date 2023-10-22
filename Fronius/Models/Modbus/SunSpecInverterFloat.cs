@@ -5,6 +5,7 @@ public class SunSpecInverterFloat : SunSpecModelBase
     public SunSpecInverterFloat(ReadOnlyMemory<byte> data, ushort modelNumber, ushort absoluteRegister) : base(data, modelNumber, absoluteRegister) { }
     
     public override IReadOnlyList<ushort> SupportedModels { get; } = new ushort[] { 111, 112, 113 };
+    public override ushort MinimumDataLength => 60;
 
     [Modbus(0)]
     public float AcCurrentSumF

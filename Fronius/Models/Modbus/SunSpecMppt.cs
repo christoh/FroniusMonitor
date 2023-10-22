@@ -25,6 +25,8 @@
         public short DcCurrentSf { get; }
 
         public override IReadOnlyList<ushort> SupportedModels { get; } = new[] { (ushort)0xffff };
+        
+        public override ushort MinimumDataLength => 20;
 
         [Modbus(0)]
         public ushort Id
@@ -38,6 +40,62 @@
         {
             get => GetString() ?? string.Empty;
             set => SetString(value);
+        }
+
+        [Modbus(9)]
+        public ushort DcCurrentI
+        {
+            get => Get<ushort>();
+            set => Set(value);
+        }
+
+        [Modbus(10)]
+        public ushort DcVoltageI
+        {
+            get => Get<ushort>();
+            set => Set(value);
+        }
+
+        [Modbus(11)]
+        public ushort DcEnergyI
+        {
+            get => Get<ushort>();
+            set => Set(value);
+        }
+
+        [Modbus(12)]
+        public uint DcLifeTimeEnergyI
+        {
+            get => Get<uint>();
+            set => Set(value);
+        }
+
+        [Modbus(14)]
+        public uint TimeStamp
+        {
+            get => Get<uint>();
+            set => Set(value);
+        }
+
+        [Modbus(16)]
+        public short TemperatureI
+        {
+            get => Get<short>();
+            set => Set(value);
+        }
+
+        [Modbus(17)]
+        public SunSpecMpptState State
+        {
+            get => Get<SunSpecMpptState>();
+            set => Set(value);
+        }
+
+        [Modbus(18)]
+        public SunSpecMpptEvent Events
+        {
+            get => Get<SunSpecMpptEvent>();
+            set => Set(value);
         }
 
         public override string ToString() => DisplayName;
