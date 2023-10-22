@@ -113,6 +113,7 @@ public class SunSpecClient : ISunSpecClient
             {
                 1 => (SunSpecModelBase)new SunSpecCommonBlock(data, sunSpecModel, (ushort)(register + 2)),
                 >= 101 and <= 103 => new SunSpecInverterInt(data, sunSpecModel, (ushort)(register + 2)),
+                >= 111 and <= 113 => new SunSpecInverterFloat(data, sunSpecModel, (ushort)(register + 2)),
                 _ => null
             };
 

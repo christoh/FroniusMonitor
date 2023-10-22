@@ -3,31 +3,31 @@
     public class SunSpecInverterInt : SunSpecModelBase
     {
         public SunSpecInverterInt(ReadOnlyMemory<byte> data, ushort modelNumber, ushort absoluteRegister) : base(data, modelNumber, absoluteRegister) { }
-        public SunSpecInverterInt(ushort modelNumber, ushort absoluteRegister, ushort dataLength) : base(modelNumber, absoluteRegister, dataLength) { }
-        public override IReadOnlyList<ushort> SupportedModels => new ushort[] { 101, 102, 103 };
 
-        [Modbus(0, "A")]
+        public override IReadOnlyList<ushort> SupportedModels { get; } = new ushort[] { 101, 102, 103 };
+
+        [Modbus(0)]
         public ushort AcCurrentSumI
         {
             get => Get<ushort>();
             set => Set(value);
         }
 
-        [Modbus(1, "A")]
+        [Modbus(1)]
         public ushort AcCurrentL1I
         {
             get => Get<ushort>();
             set => Set(value);
         }
 
-        [Modbus(2, "A")]
+        [Modbus(2)]
         public ushort AcCurrentL2I
         {
             get => Get<ushort>();
             set => Set(value);
         }
 
-        [Modbus(3, "A")]
+        [Modbus(3)]
         public ushort AcCurrentL3I
         {
             get => Get<ushort>();
@@ -138,7 +138,7 @@
             get => Get<short>();
             set => Set(value);
         }
-        
+
         [Modbus(19)]
         public short PowerReactiveSf
         {
@@ -238,7 +238,7 @@
         }
 
         [Modbus(34)]
-        public short OtherTemperature
+        public short OtherTemperatureI
         {
             get => Get<short>();
             set => Set(value);
@@ -306,7 +306,7 @@
             get => Get<SunSpecInverterVendorEvents4>();
             set => Set(value);
         }
-        
+
         public double? AcCurrentSum
         {
             get => ToDouble(AcCurrentSumI, CurrentSf);

@@ -2,19 +2,21 @@
 
 public abstract class SunSpecModelBase : BindableBase
 {
-    protected SunSpecModelBase(ReadOnlyMemory<byte> data, ushort modelNumber, ushort absoluteRegister)
+    private SunSpecModelBase(ushort modelNumber, ushort absoluteRegister)
     {
-        Data = new Memory<byte>(new byte[data.Length]);
-        data.CopyTo(Data);
         AbsoluteRegister = absoluteRegister;
         ModelNumber = modelNumber;
     }
 
-    protected SunSpecModelBase(ushort modelNumber, ushort absoluteRegister, ushort dataLength)
+    protected SunSpecModelBase(ReadOnlyMemory<byte> data, ushort modelNumber, ushort absoluteRegister) : this(modelNumber, absoluteRegister)
+    {
+        Data = new Memory<byte>(new byte[data.Length]);
+        data.CopyTo(Data);
+    }
+
+    protected SunSpecModelBase(ushort modelNumber, ushort absoluteRegister, ushort dataLength) : this(modelNumber, absoluteRegister)
     {
         Data = new Memory<byte>(new byte[dataLength << 1]);
-        AbsoluteRegister = absoluteRegister;
-        ModelNumber = modelNumber;
     }
 
     public ushort DataLength => (ushort)(Data.Length >> 1);
