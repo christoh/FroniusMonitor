@@ -239,7 +239,6 @@ public class Gen24Inverter : Gen24DeviceBase
     public double? AcCurrentSum => AcCurrentL1 + AcCurrentL2 + AcCurrentL3;
     public double? PowerFactorTotal => PowerActiveSum / PowerApparentSum;
 
-
     public double? AcPowerL1 => AcVoltageL1 * AcCurrentL1;
     public double? AcPowerL2 => AcVoltageL2 * AcCurrentL2;
     public double? AcPowerL3 => AcVoltageL3 * AcCurrentL3;

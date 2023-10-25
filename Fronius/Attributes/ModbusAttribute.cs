@@ -15,4 +15,5 @@ public class ModbusAttribute : Attribute
     public ushort Start { get; init; }
     public ushort Length { get; init; }
     public bool IsReadOnly { get; init; }
+    public bool IsAccumulated { get; init; }
 }

@@ -102,6 +102,42 @@ public enum SunSpecMpptEvent : uint
 }
 
 [Flags]
+public enum SunSpecMeterEvents : uint
+{
+    None = 0,
+    PowerFailure = 1 << 2,
+    UnderVoltage = 1 << 3,
+    LowPowerFactor = 1 << 4,
+    OverCurrent = 1 << 5,
+    OverVoltage = 1 << 6,
+    MissingSensor = 1 << 7,
+    Reserved1 = 1 << 8,
+    Reserved2 = 1 << 9,
+    Reserved3 = 1 << 10,
+    Reserved4 = 1 << 11,
+    Reserved5 = 1 << 12,
+    Reserved6 = 1 << 13,
+    Reserved7 = 1 << 14,
+    Reserved8 = 1 << 15,
+    Oem1 = 1 << 16,
+    Oem2 = 1 << 17,
+    Oem3 = 1 << 18,
+    Oem4 = 1 << 19,
+    Oem5 = 1 << 20,
+    Oem6 = 1 << 21,
+    Oem7 = 1 << 22,
+    Oem8 = 1 << 23,
+    Oem9 = 1 << 24,
+    Oem10 = 1 << 25,
+    Oem11 = 1 << 26,
+    Oem12 = 1 << 27,
+    Oem13 = 1 << 28,
+    Oem14 = 1 << 29,
+    Oem15 = 1 << 30,
+    Null = 0xffffffff,
+}
+
+[Flags]
 public enum SunSpecInverterEvents2 : uint
 {
     None = 0,

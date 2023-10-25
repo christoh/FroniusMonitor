@@ -63,6 +63,7 @@
 	
 	
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2DDBAEC40DFD4D41834C1F82A6CC09DF/Field/=TYPE/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2DDBAEC40DFD4D41834C1F82A6CC09DF/Field/=TYPE/Expression/@EntryValue">typeName()</s:String>
 	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2DDBAEC40DFD4D41834C1F82A6CC09DF/Field/=TYPE/InitialRange/@EntryValue">1</s:Int64>
 	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2DDBAEC40DFD4D41834C1F82A6CC09DF/Field/=TYPE/Order/@EntryValue">0</s:Int64>
 	
@@ -118,6 +119,28 @@ public $propertyType$ $propertyName$&#xD;
 private void On$propertyName$Changed()&#xD;
 {&#xD;
 }</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=AF6210D4F9BBEA4585994473F8FC9C33/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=AF6210D4F9BBEA4585994473F8FC9C33/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=AF6210D4F9BBEA4585994473F8FC9C33/Applicability/=Surround/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=AF6210D4F9BBEA4585994473F8FC9C33/Field/=CurrentSf/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=AF6210D4F9BBEA4585994473F8FC9C33/Field/=CurrentSf/Expression/@EntryValue">capitalize()</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=AF6210D4F9BBEA4585994473F8FC9C33/Field/=CurrentSf/Order/@EntryValue">1</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=AF6210D4F9BBEA4585994473F8FC9C33/Field/=TotalCurrent/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=AF6210D4F9BBEA4585994473F8FC9C33/Field/=TotalCurrent/Order/@EntryValue">0</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=AF6210D4F9BBEA4585994473F8FC9C33/Field/=Type/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=AF6210D4F9BBEA4585994473F8FC9C33/Field/=Type/Expression/@EntryValue">fixedTypeName("")</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=AF6210D4F9BBEA4585994473F8FC9C33/Field/=Type/Order/@EntryValue">2</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=AF6210D4F9BBEA4585994473F8FC9C33/Reformat/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=AF6210D4F9BBEA4585994473F8FC9C33/Scope/=C3001E7C0DA78E4487072B7E050D86C5/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=AF6210D4F9BBEA4585994473F8FC9C33/Scope/=C3001E7C0DA78E4487072B7E050D86C5/CustomProperties/=minimumLanguageVersion/@EntryIndexedValue">2.0</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=AF6210D4F9BBEA4585994473F8FC9C33/Scope/=C3001E7C0DA78E4487072B7E050D86C5/Type/@EntryValue">InCSharpFile</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=AF6210D4F9BBEA4585994473F8FC9C33/Shortcut/@EntryValue">scalefactorproperty</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=AF6210D4F9BBEA4585994473F8FC9C33/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=AF6210D4F9BBEA4585994473F8FC9C33/Text/@EntryValue">    public double? $TotalCurrent$&#xD;
+    {&#xD;
+        get =&gt; ToDouble($TotalCurrent$I, $CurrentSf$);&#xD;
+        set =&gt; $TotalCurrent$I = FromDouble&lt;$Type$&gt;(value, $CurrentSf$);&#xD;
+    }</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F6E58673BC0F9E48A1347E49B1E800CF/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F6E58673BC0F9E48A1347E49B1E800CF/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F6E58673BC0F9E48A1347E49B1E800CF/Description/@EntryValue">Create a modbus property</s:String>

@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Modbus;
 
-public class SunSpecMeter : SunSpecDeviceBase, IPowerMeter3P
+public class SunSpecMeterOld : SunSpecDeviceBase, IPowerMeter3P
 {
     private SunSpecMeterType? meterType;
 

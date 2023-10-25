@@ -25,6 +25,7 @@ public class SunSpecClient : ISunSpecClient
         }
 
         var ipAddresses = await Dns.GetHostAddressesAsync(hostname).ConfigureAwait(false) ?? throw new SocketException((int)SocketError.HostNotFound);
+        logger.LogInformation("IP addresses found: {IpAddresses}", string.Join(", ", ipAddresses.Select(i => i.ToString())));
         var client = new ModbusTcpClient();
         Exception? exception = null;
 
@@ -35,10 +36,12 @@ public class SunSpecClient : ISunSpecClient
 
             try
             {
+                logger.LogInformation("Connecting to {IpAddress}:{port}", ipAddress, port);
                 await Task.Run(() => client.Connect(new IPEndPoint(ipAddress, port), ModbusEndianness.BigEndian)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
+                logger.LogError(ex, "Connection failed");
                 exception = ex;
                 continue;
             }
@@ -117,6 +120,8 @@ public class SunSpecClient : ISunSpecClient
                 120 => new SunSpecNamePlate(data, sunSpecModel, (ushort)(register + 2)),
                 121 => new SunSpecInverterSettings(data, sunSpecModel, (ushort)(register + 2)),
                 160 => new SunSpecMultipleMppt(data, sunSpecModel, (ushort)(register + 2)),
+                >= 201 and <= 204 => new SunSpecMeterInt(data, sunSpecModel, (ushort)(register + 2)),
+                >= 211 and <= 214 => new SunSpecMeterFloat(data, sunSpecModel, (ushort)(register + 2)),
                 _ => null
             };
 

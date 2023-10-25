@@ -137,7 +137,7 @@ public partial class InverterControl
         provider = IsSecondary switch
         {
             false => dataCollectionService!.Container,
-            true => dataCollectionService!.Container2!,
+            true => dataCollectionService!.Container2,
         };
     }
 

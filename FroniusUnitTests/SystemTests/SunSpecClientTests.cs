@@ -1,17 +1,29 @@
-﻿using De.Hochstaetter.Fronius.Services.Modbus;
-using Microsoft.Extensions.Logging;
+﻿using De.Hochstaetter.Fronius.Models.Modbus;
 
 namespace FroniusUnitTests.SystemTests;
 
 [TestFixture]
 public class SunSpecClientTests
 {
-    private readonly ILogger<SunSpecClient> logger = Substitute.For<ILogger<SunSpecClient>>();
+    //private readonly ILogger<SunSpecClient> logger;
     private readonly SunSpecClient client;
 
     public SunSpecClientTests()
     {
-        client = new(logger);
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel
+            .Verbose()
+            .WriteTo
+            .Debug(formatProvider: CultureInfo.InvariantCulture)
+            .CreateLogger();
+
+        var services = new ServiceCollection()
+                .AddSingleton<SunSpecClient>()
+                .AddLogging(builder => builder.AddSerilog())
+            ;
+
+        var provider = services.BuildServiceProvider();
+        client = provider.GetRequiredService<SunSpecClient>();
     }
 
     [Test]

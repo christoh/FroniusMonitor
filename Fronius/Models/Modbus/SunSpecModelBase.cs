@@ -83,25 +83,28 @@ public abstract class SunSpecModelBase : BindableBase
         }
     }
 
-    protected static double? ToDouble<T>(T value, short sf) where T : IConvertible
+    protected static double? ToDouble<T>(T value, short sf = 0, bool isAccumulated = false) where T : IConvertible
     {
         var isNull =
             value is (short)-32768 ||
             value is (ushort)0xffff ||
             value is unchecked((int)0x80000000) ||
-            value is 0xffffffff ||
+            value is 0xffffffff && !isAccumulated ||
+            value is 0U && isAccumulated ||
+            value is (float)float.NaN ||
             sf == -32768;
 
         return isNull ? null : value.ToDouble(CultureInfo.InvariantCulture) * Math.Pow(10, sf);
     }
 
-    protected static T FromDouble<T>(double? value, short sf) where T : IConvertible
+    protected static T FromDouble<T>(double? value, short sf = 0, bool isAccumulated = false) where T : IConvertible
     {
         object nullValue =
             typeof(T) == typeof(short) ? (short)-32768 :
             typeof(T) == typeof(ushort) ? (ushort)0xffff :
             typeof(T) == typeof(int) ? unchecked((int)0x80000000) :
-            typeof(T) == typeof(uint) ? 0xffffffff :
+            typeof(T) == typeof(uint) ? (isAccumulated ? 0 : 0xffffffff) :
+            typeof(T) == typeof(float) ? float.NaN :
             throw new NotSupportedException("Unsupported type");
 
         return (T)Convert.ChangeType

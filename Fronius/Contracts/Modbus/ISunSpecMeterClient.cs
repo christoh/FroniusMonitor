@@ -2,5 +2,5 @@
 
 public interface ISunSpecMeterClient : ISunSpecClient
 {
-    public Task<SunSpecMeter> GetDataAsync(CancellationToken token = default);
+    public Task<SunSpecMeterOld> GetDataAsync(CancellationToken token = default);
 }

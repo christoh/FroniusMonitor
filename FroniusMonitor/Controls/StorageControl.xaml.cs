@@ -12,84 +12,57 @@ public partial class StorageControl
         Duration = TimeSpan.FromSeconds(1.5),
     };
 
-    public static readonly DependencyProperty Gen24Property = DependencyProperty.Register
+    public static readonly DependencyProperty Gen24SensorsProperty = DependencyProperty.Register
     (
-        nameof(Gen24), typeof(Gen24Sensors), typeof(StorageControl),
-        new PropertyMetadata((d, e) => ((StorageControl)d).OnStorageChanged(e))
+        nameof(Gen24Sensors), typeof(Gen24Sensors), typeof(StorageControl),
+        new PropertyMetadata((d, e) => ((StorageControl)d).OnDataChanged())
     );
 
-    public Gen24Sensors? Gen24
+    public Gen24Sensors? Gen24Sensors
     {
-        get => (Gen24Sensors?)GetValue(Gen24Property);
-        set => SetValue(Gen24Property, value);
+        get => (Gen24Sensors?)GetValue(Gen24SensorsProperty);
+        set => SetValue(Gen24SensorsProperty, value);
     }
 
     public StorageControl()
     {
         InitializeComponent();
-
-        Unloaded += (_, _) =>
-        {
-            if (Gen24 != null)
-            {
-                Gen24.PropertyChanged -= OnDataChanged;
-            }
-        };
     }
 
-    private void OnStorageChanged(DependencyPropertyChangedEventArgs e)
+    private void OnDataChanged()
     {
-        if (e.OldValue is Storage oldStorage)
+        var storage = Gen24Sensors?.Storage;
+
+        if (storage == null)
         {
-            oldStorage.PropertyChanged -= OnDataChanged;
+            return;
         }
 
-        if (Gen24 != null)
+        SocRectangle.Height = (storage.StateOfCharge ?? 0) * BackgroundRectangle.Height;
+
+        if (storage.Power > 10)
         {
-            Gen24.PropertyChanged += OnDataChanged;
+            if (isInChargingAnimation) return;
+            isInChargingAnimation = true;
+            PlusPole.Background = Enclosure.BorderBrush = new SolidColorBrush(Colors.DarkGreen);
+            PlusPole.Background.BeginAnimation(SolidColorBrush.ColorProperty, chargingAnimation);
         }
-
-        OnDataChanged();
-    }
-
-
-    private void OnDataChanged(object? _ = null, PropertyChangedEventArgs? __ = null)
-    {
-        Dispatcher.InvokeAsync(() =>
+        else
         {
-            var storage = Gen24?.Storage;
-
-            if (storage == null)
+            if (!PlusPole.Background.IsFrozen)
             {
-                return;
+                PlusPole.Background.BeginAnimation(SolidColorBrush.ColorProperty, null);
             }
 
-            SocRectangle.Height = (storage.StateOfCharge ?? 0) * BackgroundRectangle.Height;
-
-            if (storage.Power > 10)
+            var brush = storage.TrafficLight switch
             {
-                if (isInChargingAnimation) return;
-                isInChargingAnimation = true;
-                PlusPole.Background = Enclosure.BorderBrush = new SolidColorBrush(Colors.DarkGreen);
-                PlusPole.Background.BeginAnimation(SolidColorBrush.ColorProperty, chargingAnimation);
-            }
-            else
-            {
-                if (!PlusPole.Background.IsFrozen)
-                {
-                    PlusPole.Background.BeginAnimation(SolidColorBrush.ColorProperty, null);
-                }
+                TrafficLight.Red => Brushes.Red,
+                TrafficLight.Green => Brushes.DarkGreen,
+                _ => Brushes.DarkGray
+            };
 
-                var brush = storage.TrafficLight switch
-                {
-                    TrafficLight.Red => Brushes.Red,
-                    TrafficLight.Green => Brushes.DarkGreen,
-                    _ => Brushes.DarkGray
-                };
-
-                isInChargingAnimation = false;
-                PlusPole.Background = Enclosure.BorderBrush = brush;
-            }
-        });
+            isInChargingAnimation = false;
+            PlusPole.Background = Enclosure.BorderBrush = brush;
+        }
     }
 }
