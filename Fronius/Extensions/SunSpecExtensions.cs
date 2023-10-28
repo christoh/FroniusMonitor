@@ -11,7 +11,7 @@ internal static class SunSpecExtensions
         {
             return null;
         }
-        
+
         if (nullIndex > 0)
         {
             range = range[0..nullIndex];
@@ -22,7 +22,7 @@ internal static class SunSpecExtensions
 
     public static void WriteString(this Memory<byte> data, string? value, ushort register, ushort length)
     {
-        var destination = data.Span[(register << 1)..(length << 1)];
+        var destination = data.Span.Slice(register << 1, length << 1);
         destination.Fill(0);
 
         if (value is not null)

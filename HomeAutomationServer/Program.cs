@@ -56,7 +56,7 @@ internal partial class Program
             .AddSingleton<FritzBoxDataCollector>()
             .AddSingleton<SunSpecMeterService>()
             .AddSingleton<IDataControlService, DataControlService>()
-            .AddTransient<ISunSpecMeterClient, SunSpecMeterClient>()
+            //.AddTransient<ISunSpecClient, SunSpecClient>()
             .AddLogging(builder => builder.AddSerilog())
             ;
 

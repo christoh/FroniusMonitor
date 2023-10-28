@@ -4,7 +4,7 @@ public class SunSpecMeterFloat : SunSpecModelBase, ISunSpecMeter
 {
     public SunSpecMeterFloat(ReadOnlyMemory<byte> data, ushort modelNumber, ushort absoluteRegister) : base(data, modelNumber, absoluteRegister) { }
 
-    public SunSpecMeterFloat(ushort modelNumber, ushort absoluteRegister, ushort dataLength) : base(modelNumber, absoluteRegister, dataLength)
+    public SunSpecMeterFloat(ushort modelNumber, ushort absoluteRegister, ushort dataLength = 0) : base(modelNumber, absoluteRegister, dataLength)
     {
         GetType().GetProperties().Where(p => p.PropertyType == typeof(float)).Apply(p => p.SetValue(this, float.NaN));
     }
@@ -62,9 +62,9 @@ public class SunSpecMeterFloat : SunSpecModelBase, ISunSpecMeter
     public double? CurrentL3
     {
         get => ToDouble(CurrentL3F);
-        set => CurrentL1F = FromDouble<float>(value);
+        set => CurrentL3F = FromDouble<float>(value);
     }
-    
+
     [Modbus(8)]
     public float PhaseVoltageAverageF
     {
@@ -181,7 +181,7 @@ public class SunSpecMeterFloat : SunSpecModelBase, ISunSpecMeter
         get => ToDouble(FrequencyF);
         set => FrequencyF = FromDouble<float>(value);
     }
-    
+
     [Modbus(26)]
     public float ActivePowerSumF
     {
@@ -389,7 +389,7 @@ public class SunSpecMeterFloat : SunSpecModelBase, ISunSpecMeter
         get => ToDouble(PowerFactorL3F);
         set => PowerFactorL3F = FromDouble<float>(value);
     }
-    
+
     [Modbus(58)]
     public float EnergyActiveProducedF
     {
@@ -493,7 +493,7 @@ public class SunSpecMeterFloat : SunSpecModelBase, ISunSpecMeter
         get => ToDouble(EnergyActiveConsumedL3F);
         set => EnergyActiveConsumedL3F = FromDouble<float>(value);
     }
-    
+
     [Modbus(74)]
     public float EnergyApparentProducedF
     {
@@ -597,7 +597,7 @@ public class SunSpecMeterFloat : SunSpecModelBase, ISunSpecMeter
         get => ToDouble(EnergyApparentConsumedL3F);
         set => EnergyApparentConsumedL3F = FromDouble<float>(value);
     }
-    
+
     [Modbus(90)]
     public float EnergyReactiveConsumedQ1F
     {

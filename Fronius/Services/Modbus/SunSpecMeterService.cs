@@ -32,7 +32,7 @@ public class SunSpecMeterService
                     return ModbusExceptionCode.IllegalFunction;
                 }
 
-                if (address < 40000 || address + numberOfRegisters > 40178)
+                if (address < 40000 || address + numberOfRegisters > 49999)
                 {
                     return ModbusExceptionCode.IllegalDataAddress;
                 }
@@ -55,96 +55,99 @@ public class SunSpecMeterService
 
         if (mapping == null)
         {
-            logger?.LogWarning("Power meter {DisplayName} ({SerialNumber}) has no Modbus mapping", meter.DisplayName, meter.SerialNumber);
+            logger.LogWarning("Power meter {DisplayName} ({SerialNumber}) has no Modbus mapping", meter.DisplayName, meter.SerialNumber);
             return;
         }
 
-        UpdateMeter(meter, mapping.ModbusAddress, e.DeviceAction);
+        UpdateMeter(meter, mapping, e.DeviceAction);
     }
 
-    public void UpdateMeter(IPowerMeter1P meter, byte modbusAddress, DeviceAction deviceAction)
+    public void UpdateMeter(IPowerMeter1P meter, ModbusMapping mapping, DeviceAction deviceAction)
     {
         if (server == null)
         {
             throw new InvalidOperationException("Server not started");
         }
 
+        var sunSpecCommonBlock = new SunSpecCommonBlock(0)
+        {
+            ModbusAddress = mapping.ModbusAddress,
+            SerialNumber = meter.SerialNumber,
+            Manufacturer = meter.Manufacturer,
+            ModelName = meter.Model,
+            Options = "<secondary>",
+            Version = meter.DeviceVersion
+        };
+
+        var sunSpecMeter = new SunSpecMeterFloat(213, 0)
+        {
+            TotalCurrent = meter.Current,
+            PhaseVoltageAverage = meter.Voltage,
+            Frequency = 50,
+            ActivePowerSum = meter.ActivePower,
+            EnergyActiveProduced = 0,
+            EnergyActiveConsumed = meter.EnergyConsumed
+        };
+
+        switch (mapping.Phase)
+        {
+            case 1:
+                sunSpecMeter.CurrentL1 = meter.Current;
+                sunSpecMeter.PhaseVoltageL1 = meter.Voltage;
+                sunSpecMeter.ActivePowerL1 = meter.ActivePower;
+                break;
+            case 2:
+                sunSpecMeter.CurrentL2 = meter.Current;
+                sunSpecMeter.PhaseVoltageL2 = meter.Voltage;
+                sunSpecMeter.ActivePowerL2 = meter.ActivePower;
+                break;
+            case 3:
+                sunSpecMeter.CurrentL3 = meter.Current;
+                sunSpecMeter.PhaseVoltageL3 = meter.Voltage;
+                sunSpecMeter.ActivePowerL3 = meter.ActivePower;
+                break;
+        }
+
         lock (server.Lock)
         {
             if (deviceAction == DeviceAction.Delete)
             {
-                server.RemoveUnit(modbusAddress);
-                logger.LogInformation("Removing power meter {DisplayName} at modbus address {ModbusAddress}", meter.DisplayName, modbusAddress);
+                server.RemoveUnit(mapping.ModbusAddress);
+                logger.LogInformation("Removing power meter {DisplayName} at modbus address {ModbusAddress}", meter.DisplayName, mapping.ModbusAddress);
                 return;
             }
 
             if (deviceAction == DeviceAction.Add)
             {
-                logger.LogInformation("Adding power meter {DisplayName} at modbus address {ModbusAddress}", meter.DisplayName, modbusAddress);
-                server.AddUnit(modbusAddress);
+                logger.LogInformation("Adding power meter {DisplayName} at modbus address {ModbusAddress}", meter.DisplayName, mapping.ModbusAddress);
+                server.AddUnit(mapping.ModbusAddress);
             }
 
-            var registers = server.GetHoldingRegisters(modbusAddress);
-            registers.WriteString(40000, 4, "SunS"); // magic
-            registers.SetBigEndian<ushort>(40002, 1); // Common Model Block identifier
-            registers.SetBigEndian<ushort>(40003, 65); // Length of Common Model Block
-            registers.WriteString(40004, 32, meter.Manufacturer ?? nameof(meter.Manufacturer)); // manufacturer
-            registers.WriteString(40020, 32, meter.Model ?? nameof(meter.Model)); // model
-            registers.WriteString(40036, 16, "<secondary>"); // data manager version
-            registers.WriteString(40044, 16, meter.DeviceVersion ?? "1.0.0-1"); // device version
-            registers.WriteString(40052, 32, meter.SerialNumber ?? "0"); // serial number
-            registers.SetBigEndian<ushort>(40068, modbusAddress); // Modbus address
-            registers.SetBigEndian<ushort>(40069, 203); // single-phase with int+sf
-            registers.SetBigEndian<ushort>(40070, 105); // length of data block (fixed)
+            WriteModbus(sunSpecCommonBlock, sunSpecMeter);
+            return;
 
-            var scaleFactor = SetExponent(40076, -4);
-            SetValue<short>(40072, meter.Current ?? 0);
-            SetValue<short>(40073, meter.Current ?? 0);
-
-            scaleFactor = SetExponent(40085, -1);
-            SetValue<short>(40077, meter.Voltage / 3 ?? 0);
-            SetValue<short>(40078, meter.Voltage ?? 0);
-            SetValue<short>(40081, meter.Voltage * .66666666666667 ?? 0);
-            SetValue<short>(40082, meter.Voltage ?? 0);
-            SetValue<short>(40084, meter.Voltage ?? 0);
-
-            scaleFactor = SetExponent(40087, -2);
-            SetValue<short>(40086, meter.Frequency ?? 50);
-
-            scaleFactor = SetExponent(40092, -2);
-            SetValue<short>(40088, meter.ActivePower ?? 0);
-            SetValue<short>(40089, meter.ActivePower ?? 0);
-
-            scaleFactor = SetExponent(40097, -2);
-            SetValue<short>(40093, meter.ActivePower ?? 0);
-            SetValue<short>(40094, meter.ActivePower ?? 0);
-
-            _ = SetExponent(40102, -2);
-            scaleFactor = SetExponent(40107, -1);
-            SetValue<short>(40103, 1);
-            SetValue<short>(40104, 1);
-
-            scaleFactor = SetExponent(40124, -3);
-            SetValue<uint>(40116, meter.EnergyConsumed ?? 0);
-
-            _ = SetExponent(40141, -32768);
-            _ = SetExponent(40174, -32768);
-
-            registers.SetBigEndian<short>(40176, -1);
-            registers.SetBigEndian<short>(40177, 0);
-
-            double SetExponent(ushort register, short exponent)
+            unsafe void WriteModbus(params SunSpecModelBase[] models)
             {
-                var registers = server!.GetHoldingRegisters(modbusAddress);
-                registers.SetBigEndian(register - 1, exponent);
-                return Math.Pow(10, exponent);
-            }
+                var registers = server.GetHoldingRegisters(mapping.ModbusAddress);
+                registers.WriteString(40000, 2, "SunS");
+                ushort absoluteRegister = 40002;
 
-            void SetValue<T>(ushort register, double value) where T : unmanaged, IConvertible
-            {
-                var intSfValue = (T)Convert.ChangeType(Math.Round(value / scaleFactor), typeof(T));
-                var registers = server!.GetHoldingRegisters(modbusAddress);
-                registers.SetBigEndian(register - 1, intSfValue);
+                foreach (var model in models)
+                {
+                    registers.SetBigEndian(absoluteRegister++, model.ModelNumber);
+                    registers.SetBigEndian(absoluteRegister++, model.DataLength);
+
+                    fixed (short* registerPointer = registers[absoluteRegister..])
+                    fixed (byte* dataPointer = model.RawData.Span)
+                    {
+                        Buffer.MemoryCopy(dataPointer, registerPointer, registers[absoluteRegister..].Length, model.RawData.Length);
+                    }
+
+                    absoluteRegister += model.DataLength;
+                }
+
+                registers.SetBigEndian<short>(absoluteRegister++, -1);
+                registers.SetBigEndian<short>(absoluteRegister, 0);
             }
         }
     }

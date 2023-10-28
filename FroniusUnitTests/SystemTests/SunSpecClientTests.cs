@@ -38,5 +38,6 @@ public class SunSpecClientTests
     {
         await client.ConnectAsync("192.168.44.10", 502, 200).ConfigureAwait(false);
         var device = await client.GetDataAsync().ConfigureAwait(false);
+        var sunSpecMeter = new SunSpecMeter(device);
     }
 }

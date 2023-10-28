@@ -109,7 +109,7 @@ public abstract class SunSpecModelBase : BindableBase
 
         return (T)Convert.ChangeType
         (
-            value is null or double.NaN || sf == -32768 ? nullValue : Math.Round(value.Value / Math.Pow(10, sf), MidpointRounding.AwayFromZero),
+            value is null or double.NaN || sf == -32768 ? nullValue : Math.Round(value.Value / Math.Pow(10, sf), typeof(T) != typeof(float) ? 0 : 8, MidpointRounding.AwayFromZero),
             typeof(T),
             CultureInfo.InvariantCulture
         );
