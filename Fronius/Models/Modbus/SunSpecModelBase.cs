@@ -2,6 +2,8 @@
 
 public abstract class SunSpecModelBase : BindableBase
 {
+    private static readonly DateTime SunSpecBigBangTime = new(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
     [SuppressMessage("ReSharper", "VirtualMemberCallInConstructor")]
     private SunSpecModelBase(ushort modelNumber, ushort absoluteRegister)
     {
@@ -90,6 +92,8 @@ public abstract class SunSpecModelBase : BindableBase
             value is (ushort)0xffff ||
             value is unchecked((int)0x80000000) ||
             value is 0xffffffff && !isAccumulated ||
+            value is 0xffffffffffffffff && !isAccumulated ||
+            value is 0UL && isAccumulated ||
             value is 0U && isAccumulated ||
             value is (float)float.NaN ||
             sf == -32768;
@@ -103,7 +107,8 @@ public abstract class SunSpecModelBase : BindableBase
             typeof(T) == typeof(short) ? (short)-32768 :
             typeof(T) == typeof(ushort) ? (ushort)0xffff :
             typeof(T) == typeof(int) ? unchecked((int)0x80000000) :
-            typeof(T) == typeof(uint) ? (isAccumulated ? 0 : 0xffffffff) :
+            typeof(T) == typeof(uint) ? (isAccumulated ? 0U : 0xffffffff) :
+            typeof(T) == typeof(ulong) ? (isAccumulated ? 0UL : 0xffffffffffffffff) :
             typeof(T) == typeof(float) ? float.NaN :
             throw new NotSupportedException("Unsupported type");
 
@@ -115,6 +120,9 @@ public abstract class SunSpecModelBase : BindableBase
         );
     }
 
+    protected static DateTime? ToDateTime(uint sunSpecTime) => sunSpecTime == ~0U ? null : SunSpecBigBangTime.AddSeconds(sunSpecTime);
+
+    protected static uint ToSunSpecTime(DateTime? time) => time.HasValue ? (uint)Math.Round((time.Value.ToUniversalTime() - SunSpecBigBangTime).TotalSeconds, MidpointRounding.AwayFromZero) : ~0U;
 
     private ModbusAttribute GetAttribute(string propertyName)
     {

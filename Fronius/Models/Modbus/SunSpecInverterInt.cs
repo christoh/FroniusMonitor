@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Modbus
 {
-    public class SunSpecInverterInt : SunSpecModelBase
+    public class SunSpecInverterInt : SunSpecModelBase, ISunSpecInverter
     {
         public SunSpecInverterInt(ReadOnlyMemory<byte> data, ushort modelNumber, ushort absoluteRegister) : base(data, modelNumber, absoluteRegister) { }
 
@@ -40,6 +40,30 @@
         {
             get => Get<short>();
             set => Set(value);
+        }
+
+        public double? AcCurrentSum
+        {
+            get => ToDouble(AcCurrentSumI, CurrentSf);
+            set => AcCurrentSumI = FromDouble<ushort>(value, CurrentSf);
+        }
+
+        public double? AcCurrentL1
+        {
+            get => ToDouble(AcCurrentL1I, CurrentSf);
+            set => AcCurrentL1I = FromDouble<ushort>(value, CurrentSf);
+        }
+
+        public double? AcCurrentL2
+        {
+            get => ToDouble(AcCurrentL2I, CurrentSf);
+            set => AcCurrentL2I = FromDouble<ushort>(value, CurrentSf);
+        }
+
+        public double? AcCurrentL3
+        {
+            get => ToDouble(AcCurrentL3I, CurrentSf);
+            set => AcCurrentL3I = FromDouble<ushort>(value, CurrentSf);
         }
 
         [Modbus(5)]
@@ -91,6 +115,42 @@
             set => Set(value);
         }
 
+        public double? AcVoltageL12
+        {
+            get => ToDouble(AcVoltageL12I, AcVoltageSf);
+            set => AcVoltageL12I = FromDouble<ushort>(value, AcVoltageSf);
+        }
+
+        public double? AcVoltageL23
+        {
+            get => ToDouble(AcVoltageL23I, AcVoltageSf);
+            set => AcVoltageL23I = FromDouble<ushort>(value, AcVoltageSf);
+        }
+
+        public double? AcVoltageL31
+        {
+            get => ToDouble(AcVoltageL31I, AcVoltageSf);
+            set => AcVoltageL31I = FromDouble<ushort>(value, AcVoltageSf);
+        }
+
+        public double? AcVoltageL1
+        {
+            get => ToDouble(AcVoltageL1I, AcVoltageSf);
+            set => AcVoltageL1I = FromDouble<ushort>(value, AcVoltageSf);
+        }
+
+        public double? AcVoltageL2
+        {
+            get => ToDouble(AcVoltageL2I, AcVoltageSf);
+            set => AcVoltageL2I = FromDouble<ushort>(value, AcVoltageSf);
+        }
+
+        public double? AcVoltageL3
+        {
+            get => ToDouble(AcVoltageL3I, AcVoltageSf);
+            set => AcVoltageL3I = FromDouble<ushort>(value, AcVoltageSf);
+        }
+
         [Modbus(12)]
         public short PowerActiveSumI
         {
@@ -103,6 +163,12 @@
         {
             get => Get<short>();
             set => Set(value);
+        }
+
+        public double? PowerActiveSum
+        {
+            get => ToDouble(PowerActiveSumI, PowerActiveSf);
+            set => PowerActiveSumI = FromDouble<short>(value, PowerActiveSf);
         }
 
         [Modbus(14)]
@@ -119,6 +185,12 @@
             set => Set(value);
         }
 
+        public double? Frequency
+        {
+            get => ToDouble(FrequencyI, FrequencySf);
+            set => FrequencyI = FromDouble<ushort>(value, FrequencySf);
+        }
+
         [Modbus(16)]
         public short PowerApparentSumI
         {
@@ -131,6 +203,12 @@
         {
             get => Get<short>();
             set => Set(value);
+        }
+
+        public double? PowerApparentSum
+        {
+            get => ToDouble(PowerApparentSumI, PowerApparentSf);
+            set => PowerApparentSumI = FromDouble<short>(value, PowerApparentSf);
         }
 
         [Modbus(18)]
@@ -147,6 +225,12 @@
             set => Set(value);
         }
 
+        public double? PowerReactiveSum
+        {
+            get => ToDouble(PowerReactiveSumI, PowerReactiveSf);
+            set => PowerReactiveSumI = FromDouble<short>(value, PowerReactiveSf);
+        }
+
         [Modbus(20)]
         public short PowerFactorTotalI
         {
@@ -159,6 +243,12 @@
         {
             get => Get<short>();
             set => Set(value);
+        }
+
+        public double? PowerFactorTotal
+        {
+            get => ToDouble(PowerFactorTotalI, PowerFactorSf) / 100;
+            set => PowerFactorTotalI = FromDouble<short>(value * 100, PowerFactorSf);
         }
 
         [Modbus(22)]
@@ -175,6 +265,12 @@
             set => Set(value);
         }
 
+        public double? EnergyTotal
+        {
+            get => ToDouble(EnergyTotalI, EnergySf, true);
+            set => EnergyTotalI = FromDouble<uint>(value, EnergySf);
+        }
+
         [Modbus(25)]
         public ushort DcCurrentI
         {
@@ -187,6 +283,12 @@
         {
             get => Get<short>();
             set => Set(value);
+        }
+
+        public double? DcCurrent
+        {
+            get => ToDouble(DcCurrentI, DcCurrentSf);
+            set => DcCurrentI = FromDouble<ushort>(value, DcCurrentSf);
         }
 
         [Modbus(27)]
@@ -203,6 +305,12 @@
             set => Set(value);
         }
 
+        public double? DcVoltage
+        {
+            get => ToDouble(DcVoltageI, DcVoltageSf);
+            set => DcVoltageI = FromDouble<ushort>(value, DcVoltageSf);
+        }
+
         [Modbus(29)]
         public short DcPowerI
         {
@@ -215,6 +323,12 @@
         {
             get => Get<short>();
             set => Set(value);
+        }
+
+        public double? DcPower
+        {
+            get => ToDouble(DcPowerI, DcPowerSf);
+            set => DcPowerI = FromDouble<short>(value, DcPowerSf);
         }
 
         [Modbus(31)]
@@ -250,6 +364,30 @@
         {
             get => Get<short>();
             set => Set(value);
+        }
+
+        public double? CabinetTemperature
+        {
+            get => ToDouble(CabinetTemperatureI, TemperatureSf);
+            set => CabinetTemperatureI = FromDouble<short>(value, TemperatureSf);
+        }
+
+        public double? HeatSinkTemperature
+        {
+            get => ToDouble(HeatSinkTemperatureI, TemperatureSf);
+            set => HeatSinkTemperatureI = FromDouble<short>(value, TemperatureSf);
+        }
+
+        public double? TransformerTemperature
+        {
+            get => ToDouble(TransformerTemperatureI, TemperatureSf);
+            set => TransformerTemperatureI = FromDouble<short>(value, TemperatureSf);
+        }
+
+        public double? OtherTemperature
+        {
+            get => ToDouble(OtherTemperatureI, TemperatureSf);
+            set => OtherTemperatureI = FromDouble<short>(value, TemperatureSf);
         }
 
         [Modbus(36)]
@@ -306,30 +444,6 @@
         {
             get => Get<SunSpecInverterVendorEvents4>();
             set => Set(value);
-        }
-
-        public double? AcCurrentSum
-        {
-            get => ToDouble(AcCurrentSumI, CurrentSf);
-            set => AcCurrentSumI = FromDouble<ushort>(value, CurrentSf);
-        }
-
-        public double? AcCurrentL1
-        {
-            get => ToDouble(AcCurrentL1I, CurrentSf);
-            set => AcCurrentL1I = FromDouble<ushort>(value, CurrentSf);
-        }
-
-        public double? AcCurrentL2
-        {
-            get => ToDouble(AcCurrentL2I, CurrentSf);
-            set => AcCurrentL2I = FromDouble<ushort>(value, CurrentSf);
-        }
-
-        public double? AcCurrentL3
-        {
-            get => ToDouble(AcCurrentL3I, CurrentSf);
-            set => AcCurrentL3I = FromDouble<ushort>(value, CurrentSf);
         }
     }
 }

@@ -138,6 +138,67 @@ public enum SunSpecMeterEvents : uint
 }
 
 [Flags]
+public enum SunSpecConnectionStatus : ushort
+{
+    None = 0,
+    Connected = 1 << 0,
+    Available = 1 << 1,
+    Operating = 1 << 2,
+    Test = 1 << 3,
+    Null = 0xffff,
+}
+
+[Flags]
+public enum SunSpecLimitsReached : uint
+{
+    None = 0,
+    MaxActivePower = 1 << 0,
+    MaxApparentPower = 1 << 1,
+    MaxReactivePowerAvailable = 1 << 2,
+    MaxReactivePowerQ1 = 1 << 3,
+    MaxReactivePowerQ2 = 1 << 4,
+    MaxReactivePowerQ3 = 1 << 5,
+    MaxReactivePowerQ4 = 1 << 6,
+    MinimumPowerFactorQ1 = 1 << 7,
+    MinimumPowerFactorQ2 = 1 << 8,
+    MinimumPowerFactorQ3 = 1 << 9,
+    MinimumPowerFactorQ4 = 1 << 10,
+    Null = 0xffffffff,
+}
+
+[Flags]
+public enum SunSpecLimitControlsActive : uint
+{
+    None = 0,
+    FixedActivePower = 1 << 0,
+    FixedReactivePower = 1 << 1,
+    FixedPowerFactor = 1 << 2,
+    VoltageReactivePower = 1 << 3,
+    FrequencyActivePowerHardLimit = 1 << 4,
+    FrequencyActivePowerCurve = 1 << 5,
+    DynamicReactiveCurrent = 1 << 6,
+    Lvrt = 1 << 7,
+    Hvrt = 1 << 8,
+    ActivePowerPowerFactor = 1 << 9,
+    VoltageActivePower = 1 << 10,
+    Scheduled = 1 << 12,
+    Lfrt = 1 << 13,
+    Hfrt = 1 << 14,
+    Null = 0xffffffff,
+}
+
+[Flags]
+public enum SunSpecVoltageRideThroughModesAvailable : ushort
+{
+    None = 0,
+    Lvrt = 1 << 0,
+    Hvrt = 1 << 1,
+    Lfrt = 1 << 2,
+    Hfrt = 1 << 3,
+    Null = 0xffff,
+}
+
+[Flags]
 public enum SunSpecInverterEvents2 : uint
 {
     None = 0,

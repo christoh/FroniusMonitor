@@ -17,7 +17,7 @@ internal partial class Program
             .MinimumLevel
             .Verbose()
             .WriteTo
-            .Console(formatProvider: CultureInfo.InvariantCulture)
+            .Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}{Exception}", formatProvider: CultureInfo.InvariantCulture)
             .CreateLogger();
 
         Settings? settings = null;
@@ -56,7 +56,7 @@ internal partial class Program
             .AddSingleton<FritzBoxDataCollector>()
             .AddSingleton<ModbusServerService>()
             .AddSingleton<IDataControlService, DataControlService>()
-            //.AddTransient<ISunSpecClient, SunSpecClient>()
+            .AddTransient<ISunSpecClient, SunSpecClient>()
             .AddLogging(builder => builder.AddSerilog())
             ;
 
@@ -72,7 +72,7 @@ internal partial class Program
                 {
                     m.EndPoint = new IPEndPoint(IPAddress.Parse(settings.ServerIpAddress), settings.ServerPort);
                     m.Mappings = settings.ModbusMappings;
-                });
+                })
                 ;
         }
 

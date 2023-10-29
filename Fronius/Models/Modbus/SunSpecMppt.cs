@@ -49,6 +49,12 @@
             set => Set(value);
         }
 
+        public double? DcCurrent
+        {
+            get => ToDouble(DcCurrentI, DcCurrentSf);
+            set => DcCurrentI = FromDouble<ushort>(value, DcCurrentSf);
+        }
+
         [Modbus(10)]
         public ushort DcVoltageI
         {
@@ -56,11 +62,23 @@
             set => Set(value);
         }
 
+        public double? DcVoltage
+        {
+            get => ToDouble(DcVoltageI, DcVoltageSf);
+            set => DcVoltageI = FromDouble<ushort>(value, DcVoltageSf);
+        }
+
         [Modbus(11)]
-        public ushort DcEnergyI
+        public ushort DcPowerI
         {
             get => Get<ushort>();
             set => Set(value);
+        }
+
+        public double? DcPower
+        {
+            get => ToDouble(DcPowerI, DcPowerSf);
+            set => DcPowerI = FromDouble<ushort>(value, DcPowerSf);
         }
 
         [Modbus(12)]
@@ -70,11 +88,23 @@
             set => Set(value);
         }
 
+        public double? DcLifeTimeEnergy
+        {
+            get => ToDouble(DcLifeTimeEnergyI, DcEnergySf, true);
+            set => DcLifeTimeEnergyI = FromDouble<uint>(value, DcEnergySf);
+        }
+
         [Modbus(14)]
-        public uint TimeStamp
+        public uint TimeStampI
         {
             get => Get<uint>();
             set => Set(value);
+        }
+
+        public DateTime? TimeStamp
+        {
+            get => ToDateTime(TimeStampI);
+            set => TimeStampI = ToSunSpecTime(value);
         }
 
         [Modbus(16)]
@@ -82,6 +112,12 @@
         {
             get => Get<short>();
             set => Set(value);
+        }
+
+        public double? Temperature
+        {
+            get => ToDouble(TemperatureI);
+            set => TemperatureI = FromDouble<short>(value);
         }
 
         [Modbus(17)]
