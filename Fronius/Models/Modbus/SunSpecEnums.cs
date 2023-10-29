@@ -241,6 +241,30 @@ public enum SunSpecDerType : ushort
     Null = 0xffff,
 }
 
+public enum SunSpecOnOff : ushort
+{
+    Disabled = 0,
+    Enabled = 1,
+    Null = 0xffff,
+}
+
+public enum SunSpecConnectionState : ushort
+{
+    Disconnected = 0,
+    Connected = 1,
+    Null = 0xffff,
+}
+
+public enum SunSpecReactivePowerLimitMode : ushort
+{
+    None = 0,
+    RelativeToMaxActivePower = 1,
+    RelativeToMaxReactivePower = 2,
+    RelativeToAvailableReactivePower = 3,
+    Null = 0xffff,
+
+}
+
 public enum SunSpecReactivePowerOnChargeDischargeChange : ushort
 {
     Switch = 1,

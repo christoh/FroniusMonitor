@@ -120,6 +120,7 @@ public class SunSpecClient : ISunSpecClient
                 120 => new SunSpecNamePlate(data, sunSpecModel, (ushort)(register + 2)),
                 121 => new SunSpecInverterBasicSettings(data, sunSpecModel, (ushort)(register + 2)),
                 122 => new SunSpecInverterExtendedMeasurements(data, sunSpecModel, (ushort)(register + 2)),
+                123 => new SunSpecInverterControls(data, sunSpecModel, (ushort)(register + 2)),
                 160 => new SunSpecMultipleMppt(data, sunSpecModel, (ushort)(register + 2)),
                 >= 201 and <= 204 => new SunSpecMeterInt(data, sunSpecModel, (ushort)(register + 2)),
                 >= 211 and <= 214 => new SunSpecMeterFloat(data, sunSpecModel, (ushort)(register + 2)),
