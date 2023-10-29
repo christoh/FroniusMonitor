@@ -25,7 +25,7 @@ public class SunSpecClient : ISunSpecClient
         }
 
         var ipAddresses = await Dns.GetHostAddressesAsync(hostname).ConfigureAwait(false) ?? throw new SocketException((int)SocketError.HostNotFound);
-        logger.LogInformation("IP addresses found: {IpAddresses}", string.Join(", ", ipAddresses.Select(i => i.ToString())));
+        logger.LogTrace("IP addresses found: {IpAddresses}", string.Join(", ", ipAddresses.Select(i => i.ToString())));
         var client = new ModbusTcpClient();
         Exception? exception = null;
 
@@ -36,12 +36,12 @@ public class SunSpecClient : ISunSpecClient
 
             try
             {
-                logger.LogInformation("Connecting to {IpAddress}:{port}", ipAddress, port);
+                logger.LogTrace("Connecting to {IpAddress}:{port}", ipAddress, port);
                 await Task.Run(() => client.Connect(new IPEndPoint(ipAddress, port), ModbusEndianness.BigEndian)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Connection failed");
+                logger.LogError(ex, "Connection to {IpAddress}:{port} failed", ipAddress, port);
                 exception = ex;
                 continue;
             }
@@ -128,6 +128,12 @@ public class SunSpecClient : ISunSpecClient
             if (sunSpecModelBase != null)
             {
                 result.Add(sunSpecModelBase);
+                logger.LogTrace("Added {ModelBase} to SunSpec group", sunSpecModelBase.GetType().Name);
+            }
+
+            if (sunSpecModelBase == null && sunSpecModel != 0xffff)
+            {
+                logger.LogWarning("Unknown SunSpecModel {ModelNumber} received", sunSpecModel);
             }
         }
 

@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.Fronius.Services.DataCollectors;
 
-public class FritzBoxDataCollector : IDataCollector
+public class FritzBoxDataCollector : IHomeAutomationRunner
 {
     private readonly ILogger<FritzBoxDataCollector> logger;
     private readonly IDataControlService dataControlService;
@@ -57,21 +57,24 @@ public class FritzBoxDataCollector : IDataCollector
         tokenSource = null;
     }, token);
 
-    protected virtual async ValueTask DisposeAsyncCore()
+    protected virtual void Dispose(bool isDisposing)
     {
-        try
+        if (isDisposing)
         {
-            await StopAsync().ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            logger.LogCritical(ex, "Fritz!Box thread did not stop correctly");
+            try
+            {
+                StopAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                logger.LogCritical(ex, "Fritz!Box thread did not stop correctly");
+            }
         }
     }
 
-    public async ValueTask DisposeAsync()
+    public void Dispose()
     {
-        await DisposeAsyncCore();
+        Dispose(true);
         GC.SuppressFinalize(this);
     }
 

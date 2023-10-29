@@ -4,46 +4,59 @@ using FluentModbus;
 namespace De.Hochstaetter.Fronius.Services.Modbus;
 
 [SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
-public class SunSpecMeterService
+public class ModbusServerService : IHomeAutomationRunner
 {
-    private readonly ILogger<SunSpecMeterService> logger;
+    private readonly ILogger<ModbusServerService> logger;
     private readonly IDataControlService dataControlService;
-    private readonly IEnumerable<ModbusMapping> mappings;
+    private readonly ModbusServerServiceParameters parameters;
     private ModbusTcpServer? server;
+    private ushort maxAddress;
 
-    public SunSpecMeterService(IEnumerable<ModbusMapping> mappings, ILogger<SunSpecMeterService> logger, IDataControlService dataControlService)
+    public ModbusServerService(ILogger<ModbusServerService> logger, IDataControlService dataControlService, IOptionsMonitor<ModbusServerServiceParameters> options)
     {
         this.logger = logger;
         this.dataControlService = dataControlService;
-        this.mappings = mappings;
+        parameters = options.CurrentValue;
     }
 
-    public Task StartAsync(IPEndPoint endPoint) => Task.Run(() =>
+    public async Task StartAsync(CancellationToken token = default)
     {
-        dataControlService.DeviceUpdate += OnDeviceUpdate;
+        await StopAsync(token).ConfigureAwait(false);
 
-        server = new ModbusTcpServer(logger, true)
+        await Task.Run(() =>
         {
-            MaxConnections = 0,
-            RequestValidator = (_, functionCode, address, numberOfRegisters) =>
+            server = new ModbusTcpServer(logger, true)
             {
-                if (functionCode != ModbusFunctionCode.ReadHoldingRegisters)
+                MaxConnections = 0,
+                RequestValidator = (_, functionCode, address, numberOfRegisters) =>
                 {
-                    return ModbusExceptionCode.IllegalFunction;
+                    if (functionCode != ModbusFunctionCode.ReadHoldingRegisters)
+                    {
+                        return ModbusExceptionCode.IllegalFunction;
+                    }
+
+                    if (address < 40000 || address + numberOfRegisters > maxAddress)
+                    {
+                        return ModbusExceptionCode.IllegalDataAddress;
+                    }
+
+                    return ModbusExceptionCode.OK;
                 }
+            };
 
-                if (address < 40000 || address + numberOfRegisters > 49999)
-                {
-                    return ModbusExceptionCode.IllegalDataAddress;
-                }
+            server.Start(parameters.EndPoint);
+            dataControlService.DeviceUpdate += OnDeviceUpdate;
+        }, token).ConfigureAwait(false);
+    }
 
-                return ModbusExceptionCode.OK;
-            }
-        };
+    public Task StopAsync(CancellationToken token = default) => Task.Run(() =>
+    {
+        dataControlService.DeviceUpdate -= OnDeviceUpdate;
+        server?.Dispose();
+        server = null;
+    }, token);
 
-        server.Start(endPoint);
-    });
-
+    //TODO: Extend to handle 3 phase power meters and probably other devices
     private void OnDeviceUpdate(object? s, DeviceUpdateEventArgs e)
     {
         if (e.Device is not IPowerMeter1P { CanMeasurePower: true } meter)
@@ -51,7 +64,7 @@ public class SunSpecMeterService
             return;
         }
 
-        var mapping = mappings.SingleOrDefault(m => string.Equals(m.SerialNumber, meter.SerialNumber, StringComparison.Ordinal));
+        var mapping = parameters.Mappings.SingleOrDefault(m => string.Equals(m.SerialNumber, meter.SerialNumber, StringComparison.Ordinal));
 
         if (mapping == null)
         {
@@ -62,7 +75,7 @@ public class SunSpecMeterService
         UpdateMeter(meter, mapping, e.DeviceAction);
     }
 
-    public void UpdateMeter(IPowerMeter1P meter, ModbusMapping mapping, DeviceAction deviceAction)
+    private void UpdateMeter(IPowerMeter1P meter, ModbusMapping mapping, DeviceAction deviceAction)
     {
         if (server == null)
         {
@@ -147,8 +160,30 @@ public class SunSpecMeterService
                 }
 
                 registers.SetBigEndian<short>(absoluteRegister++, -1);
-                registers.SetBigEndian<short>(absoluteRegister, 0);
+                registers.SetBigEndian<short>(absoluteRegister++, 0);
+                maxAddress = absoluteRegister;
             }
         }
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            try
+            {
+                StopAsync().GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Could not stop {Service}", GetType().Name);
+            };
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 }

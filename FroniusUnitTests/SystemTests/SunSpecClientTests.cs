@@ -12,7 +12,7 @@ public class SunSpecClientTests
     {
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel
-            .Verbose()
+            .Information()
             .WriteTo
             .Debug(formatProvider: CultureInfo.InvariantCulture)
             .CreateLogger();

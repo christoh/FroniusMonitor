@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace De.Hochstaetter.Fronius.Services.DataCollectors
+﻿namespace De.Hochstaetter.Fronius.Services.DataCollectors
 {
-    public class SunSpecDataCollector:IDataCollector
+    public class SunSpecDataCollector : IHomeAutomationRunner
     {
         public Task StartAsync(CancellationToken token = default)
         {
@@ -18,10 +12,18 @@ namespace De.Hochstaetter.Fronius.Services.DataCollectors
             throw new NotImplementedException();
         }
 
-        public ValueTask DisposeAsync()
+        protected virtual void Dispose(bool disposing)
         {
+            if (disposing)
+            {
+                // TODO release managed resources here
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
             GC.SuppressFinalize(this);
-            return ValueTask.CompletedTask;
         }
     }
 }

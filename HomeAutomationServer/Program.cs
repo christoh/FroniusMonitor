@@ -2,7 +2,7 @@
 
 internal partial class Program
 {
-    private static SunSpecMeterService? server;
+    private static ModbusServerService? server;
 
     [GeneratedRegex("^(?<UserName>(?!:).+):(?<Password>(?!:).+)$", RegexOptions.Compiled)]
     private static partial Regex PasswordRegex();
@@ -54,7 +54,7 @@ internal partial class Program
             .AddTransient<IFritzBoxService, FritzBoxService>()
             .AddSingleton<IAesKeyProvider, AesKeyProvider>()
             .AddSingleton<FritzBoxDataCollector>()
-            .AddSingleton<SunSpecMeterService>()
+            .AddSingleton<ModbusServerService>()
             .AddSingleton<IDataControlService, DataControlService>()
             //.AddTransient<ISunSpecClient, SunSpecClient>()
             .AddLogging(builder => builder.AddSerilog())
@@ -63,19 +63,23 @@ internal partial class Program
         if (settings != null)
         {
             serviceCollection
-                .AddSingleton<IEnumerable<ModbusMapping>>(settings.ModbusMappings)
                 .Configure<FritzBoxParameters>(f =>
                 {
                     f.Connections = settings.FritzBoxConnections;
                     f.RefreshRate = TimeSpan.FromSeconds(60);
                 })
+                .Configure<ModbusServerServiceParameters>(m =>
+                {
+                    m.EndPoint = new IPEndPoint(IPAddress.Parse(settings.ServerIpAddress), settings.ServerPort);
+                    m.Mappings = settings.ModbusMappings;
+                });
                 ;
         }
 
         var serviceProvider = serviceCollection.BuildServiceProvider();
         IoC.Update(serviceProvider);
         logger = IoC.Get<ILogger<Program>>();
-        server = IoC.Get<SunSpecMeterService>();
+        server = IoC.Get<ModbusServerService>();
 
         switch (settingsLoadException)
         {
@@ -111,7 +115,7 @@ internal partial class Program
         }
 
         logger.LogInformation("Starting server on {IpAddress}:{Port}", settings.ServerIpAddress, settings.ServerPort);
-        await server.StartAsync(new IPEndPoint(IPAddress.Parse(settings.ServerIpAddress), settings.ServerPort)).ConfigureAwait(true);
+        await server.StartAsync().ConfigureAwait(true);
         var fritzBoxDataCollector = IoC.Get<FritzBoxDataCollector>();
         await fritzBoxDataCollector.StartAsync().ConfigureAwait(true);
 
