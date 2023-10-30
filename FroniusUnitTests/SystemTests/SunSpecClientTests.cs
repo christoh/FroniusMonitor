@@ -1,8 +1,6 @@
 ﻿using System.Linq;
 using De.Hochstaetter.Fronius.Contracts.Modbus;
 using De.Hochstaetter.Fronius.Models.Modbus;
-using Serilog;
-using Serilog.Formatting;
 
 namespace FroniusUnitTests.SystemTests;
 
@@ -20,8 +18,8 @@ public class SunSpecClientTests
             .CreateLogger();
 
         var services = new ServiceCollection()
-                .AddSingleton<ISunSpecClient, SunSpecClient>()
-                .AddLogging(builder => builder.AddSerilog());
+            .AddSingleton<ISunSpecClient, SunSpecClient>()
+            .AddLogging(builder => builder.AddSerilog());
 
         var provider = services.BuildServiceProvider();
         client = provider.GetRequiredService<ISunSpecClient>();

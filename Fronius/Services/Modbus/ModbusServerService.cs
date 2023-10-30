@@ -41,7 +41,15 @@ public class ModbusServerService : IHomeAutomationRunner
 
                     if (startingRegister < 40000 || startingRegister + numberOfRegisters > maxAddress)
                     {
-                        logger.LogWarning("Client tried to read {NumberOfRegisters} register starting at {StartingRegister}: {ModbusExceptionCode}", numberOfRegisters, startingRegister, ModbusExceptionCode.IllegalDataAddress);
+                        logger.LogWarning
+                        (
+                            "Client tried to read {NumberOfRegisters} register(s) starting at {StartingRegister} from address {ModbusAddress}: {ModbusExceptionCode}",
+                            numberOfRegisters,
+                            startingRegister,
+                            modbusAddress,
+                            ModbusExceptionCode.IllegalDataAddress
+                        );
+
                         return ModbusExceptionCode.IllegalDataAddress;
                     }
 
@@ -51,9 +59,9 @@ public class ModbusServerService : IHomeAutomationRunner
 
             logger.LogInformation
             (
-                    "Starting server on {IpAddress}:{Port}",
-                    Parameters.EndPoint.AddressFamily == AddressFamily.InterNetworkV6 ? $"[{Parameters.EndPoint.Address}]" : Parameters.EndPoint.Address,
-                    Parameters.EndPoint.Port
+                "Starting server on {IpAddress}:{Port}",
+                Parameters.EndPoint.AddressFamily == AddressFamily.InterNetworkV6 ? $"[{Parameters.EndPoint.Address}]" : Parameters.EndPoint.Address,
+                Parameters.EndPoint.Port
             );
 
             server.Start(new ModbusTcpClientProvider(Parameters.EndPoint));
@@ -123,11 +131,13 @@ public class ModbusServerService : IHomeAutomationRunner
                 sunSpecMeter.PhaseVoltageL1 = meter.Voltage;
                 sunSpecMeter.ActivePowerL1 = meter.ActivePower;
                 break;
+
             case 2:
                 sunSpecMeter.CurrentL2 = meter.Current;
                 sunSpecMeter.PhaseVoltageL2 = meter.Voltage;
                 sunSpecMeter.ActivePowerL2 = meter.ActivePower;
                 break;
+
             case 3:
                 sunSpecMeter.CurrentL3 = meter.Current;
                 sunSpecMeter.PhaseVoltageL3 = meter.Voltage;
@@ -191,7 +201,7 @@ public class ModbusServerService : IHomeAutomationRunner
             catch (Exception ex)
             {
                 logger.LogError(ex, "Could not stop {Service}", GetType().Name);
-            };
+            }
         }
     }
 

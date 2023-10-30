@@ -85,6 +85,22 @@ internal partial class Program
         var serviceProvider = serviceCollection.BuildServiceProvider();
         IoC.Update(serviceProvider);
         logger = IoC.Get<ILogger<Program>>();
+
+        AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+        {
+            var logLevel = e.IsTerminating ? LogLevel.Critical : LogLevel.Error;
+            var senderName = s.GetType().Name;
+
+            if (e.ExceptionObject is not Exception ex)
+            {
+                logger.Log(logLevel, "{SenderName}, {Object}", senderName, e.ExceptionObject.ToString());
+            }
+            else
+            {
+                logger.Log(logLevel, ex, senderName);
+            }
+        };
+
         server = IoC.Get<ModbusServerService>();
 
         switch (settingsLoadException)
@@ -126,7 +142,7 @@ internal partial class Program
 
         while (true)
         {
-            await Task.Delay(5000).ConfigureAwait(true);
+            await Task.Delay(TimeSpan.FromMinutes(5)).ConfigureAwait(true);
         }
     }
 }
