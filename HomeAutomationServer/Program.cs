@@ -18,7 +18,7 @@ internal partial class Program
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel
 #if DEBUG
-            .Verbose()
+            .Debug()
 #else
             .Information()
 #endif

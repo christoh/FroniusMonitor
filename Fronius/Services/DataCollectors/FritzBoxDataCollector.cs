@@ -20,7 +20,7 @@ public class FritzBoxDataCollector : IHomeAutomationRunner
     private FritzBoxParameters Parameters => options.CurrentValue;
     private IEnumerable<WebConnection> Connections => Parameters.Connections ?? throw new ArgumentNullException(nameof(options), @$"{nameof(options)} are not configured");
 
-    
+
     public async Task StartAsync(CancellationToken token = default)
     {
         await StopAsync(token).ConfigureAwait(false);
@@ -30,7 +30,7 @@ public class FritzBoxDataCollector : IHomeAutomationRunner
         {
             var fritzBoxService = IoC.Get<IFritzBoxService>();
             fritzBoxService.Connection = webConnection;
-            logger.LogInformation("Adding Fritz!Box at {Url} with user name {UserName}",webConnection.BaseUrl, webConnection.UserName);
+            logger.LogInformation("Adding Fritz!Box at {Url} with user name {UserName}", webConnection.BaseUrl, webConnection.UserName);
             fritzBoxServices.Add(fritzBoxService);
         }
 
@@ -90,9 +90,9 @@ public class FritzBoxDataCollector : IHomeAutomationRunner
                 linkedTokenSource.CancelAfter(TimeSpan.FromSeconds(10));
 
                 // ReSharper disable once AccessToDisposedClosure
-                IReadOnlyList<(WebConnection Connection, Task<FritzBoxDeviceList> Task)> connectionTasks = 
+                IReadOnlyList<(WebConnection Connection, Task<FritzBoxDeviceList> Task)> connectionTasks =
                     fritzBoxServices.Select(service => (service.Connection!, service.GetFritzBoxDevices(linkedTokenSource.Token))).ToArray();
-                
+
                 var tasks = connectionTasks.Select(c => c.Task).ToArray();
 
                 try
@@ -101,7 +101,7 @@ public class FritzBoxDataCollector : IHomeAutomationRunner
                 }
                 catch (OperationCanceledException)
                 {
-                    connectionTasks.Where(ct => ct.Task.IsCanceled).Apply(ct => logger.LogWarning("No response from Fritz!Box at {Url}",ct.Connection.BaseUrl));
+                    connectionTasks.Where(ct => ct.Task.IsCanceled).Apply(ct => logger.LogWarning("No response from Fritz!Box at {Url}", ct.Connection.BaseUrl));
                     token.ThrowIfCancellationRequested();
                 }
 
@@ -119,6 +119,7 @@ public class FritzBoxDataCollector : IHomeAutomationRunner
                 if (currentDevices != null)
                 {
                     var devicesToDelete = currentDevices.Keys.Where(k => !fritzBoxDevices.Select(f => f.Id).Contains(k));
+                    await dataControlService.RemoveAsync(devicesToDelete, token).ConfigureAwait(true);
                 }
 
                 currentDevices = fritzBoxDevices.ToDictionary(f => f.Id);

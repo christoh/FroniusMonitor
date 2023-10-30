@@ -53,24 +53,27 @@ public class SunSpecClient : ISunSpecClient
             {
                 try
                 {
+                    logger.LogTrace("Reading from modbus register {ModbusRegister}", register);
                     var id = await client.ReadStringAsync(modbusAddress, register, 4).ConfigureAwait(false);
 
                     if (id != "SunS")
                     {
+                        logger.LogTrace("Register {ModbusRegister} has no SunSpec magic", register);
                         continue;
                     }
 
                     baseRegister = register;
                     break;
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // continue;
+                    logger.LogTrace(ex, "Could not read 2 registers starting at {ModbusRegister}", register);
                 }
             }
 
             if (baseRegister == 0xffff)
             {
+                logger.LogError("Modbus address {ModbusAddress} is not a SunSpec device", modbusAddress);
                 throw new InvalidDataException("Not a SunSpec device");
             }
 

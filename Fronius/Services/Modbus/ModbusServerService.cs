@@ -8,7 +8,7 @@ public class ModbusServerService : IHomeAutomationRunner
 {
     private readonly ILogger<ModbusServerService> logger;
     private readonly IDataControlService dataControlService;
-    private readonly ModbusServerServiceParameters parameters;
+    private readonly IOptionsMonitor<ModbusServerServiceParameters> options;
     private ModbusTcpServer? server;
     private ushort maxAddress;
 
@@ -16,8 +16,10 @@ public class ModbusServerService : IHomeAutomationRunner
     {
         this.logger = logger;
         this.dataControlService = dataControlService;
-        parameters = options.CurrentValue;
+        this.options = options;
     }
+
+    private ModbusServerServiceParameters Parameters => options.CurrentValue ?? throw new ArgumentNullException(nameof(options), @$"{nameof(options)} are not configured");
 
     public async Task StartAsync(CancellationToken token = default)
     {
@@ -33,13 +35,13 @@ public class ModbusServerService : IHomeAutomationRunner
                 {
                     if (functionCode != ModbusFunctionCode.ReadHoldingRegisters)
                     {
-                        logger.LogError("Client requested {FunctionCode} for address {ModbusAddress}: {ModbusExceptionCode}", functionCode, modbusAddress, ModbusExceptionCode.IllegalFunction);
+                        logger.LogWarning("Client requested {FunctionCode} for address {ModbusAddress}: {ModbusExceptionCode}", functionCode, modbusAddress, ModbusExceptionCode.IllegalFunction);
                         return ModbusExceptionCode.IllegalFunction;
                     }
 
                     if (startingRegister < 40000 || startingRegister + numberOfRegisters > maxAddress)
                     {
-                        logger.LogError("Client tried to read {NumberOfRegisters} register starting at {StartingRegister}: {ModbusExceptionCode}", numberOfRegisters, startingRegister, ModbusExceptionCode.IllegalDataAddress);
+                        logger.LogWarning("Client tried to read {NumberOfRegisters} register starting at {StartingRegister}: {ModbusExceptionCode}", numberOfRegisters, startingRegister, ModbusExceptionCode.IllegalDataAddress);
                         return ModbusExceptionCode.IllegalDataAddress;
                     }
 
@@ -50,11 +52,11 @@ public class ModbusServerService : IHomeAutomationRunner
             logger.LogInformation
             (
                     "Starting server on {IpAddress}:{Port}",
-                    parameters.EndPoint.AddressFamily == AddressFamily.InterNetworkV6 ? $"[{parameters.EndPoint.Address}]" : parameters.EndPoint.Address,
-                    parameters.EndPoint.Port
+                    Parameters.EndPoint.AddressFamily == AddressFamily.InterNetworkV6 ? $"[{Parameters.EndPoint.Address}]" : Parameters.EndPoint.Address,
+                    Parameters.EndPoint.Port
             );
 
-            server.Start(new ModbusTcpClientProvider(parameters.EndPoint));
+            server.Start(new ModbusTcpClientProvider(Parameters.EndPoint));
             dataControlService.DeviceUpdate += OnDeviceUpdate;
         }, token).ConfigureAwait(false);
     }
@@ -74,7 +76,7 @@ public class ModbusServerService : IHomeAutomationRunner
             return;
         }
 
-        var mapping = parameters.Mappings.SingleOrDefault(m => string.Equals(m.SerialNumber, meter.SerialNumber, StringComparison.Ordinal));
+        var mapping = Parameters.Mappings.SingleOrDefault(m => string.Equals(m.SerialNumber, meter.SerialNumber, StringComparison.Ordinal));
 
         if (mapping == null)
         {
@@ -112,6 +114,8 @@ public class ModbusServerService : IHomeAutomationRunner
             EnergyActiveConsumed = meter.EnergyConsumed
         };
 
+        logger.LogTrace("{DeviceAction}: {DisplayName}: {Power} W / {Voltage} V / {Current} A / {Energy} Wh", deviceAction, meter.DisplayName, meter.ActivePower, meter.Voltage, meter.Current, meter.EnergyConsumed);
+
         switch (mapping.Phase)
         {
             case 1:
@@ -135,8 +139,8 @@ public class ModbusServerService : IHomeAutomationRunner
         {
             if (deviceAction == DeviceAction.Delete)
             {
-                server.RemoveUnit(mapping.ModbusAddress);
                 logger.LogInformation("Removing power meter {DisplayName} at modbus address {ModbusAddress}", meter.DisplayName, mapping.ModbusAddress);
+                server.RemoveUnit(mapping.ModbusAddress);
                 return;
             }
 
@@ -169,7 +173,7 @@ public class ModbusServerService : IHomeAutomationRunner
                     absoluteRegister += model.DataLength;
                 }
 
-                registers.SetBigEndian<short>(absoluteRegister++, -1);
+                registers.SetBigEndian<ushort>(absoluteRegister++, 0xffff);
                 registers.SetBigEndian<short>(absoluteRegister++, 0);
                 maxAddress = absoluteRegister;
             }

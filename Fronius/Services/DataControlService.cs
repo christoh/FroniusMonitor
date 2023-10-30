@@ -32,12 +32,21 @@ public class DataControlService : IDataControlService
 
     public void AddOrUpdate(IHaveUniqueId entity) => AddOrUpdate(entity.Id, entity);
 
+    public async ValueTask RemoveAsync(IEnumerable<string> entities, CancellationToken token = default)
+    {
+        await Task.Run(() => entities.Apply(Remove), token).ConfigureAwait(false);
+    }
+
     public void Remove(string id)
     {
         if (Entities.TryRemove(id, out var entity))
         {
             logger.LogInformation("Removing device {Device}", entity is IHaveDisplayName haveDisplayName ? haveDisplayName.DisplayName : id);
             DeviceUpdate?.Invoke(this, new DeviceUpdateEventArgs(id, entity, DeviceAction.Delete));
+        }
+        else
+        {
+            logger.LogError("Could not remove device {Device}", entity is IHaveDisplayName haveDisplayName ? haveDisplayName.DisplayName : id);
         }
     }
 
