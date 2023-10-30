@@ -28,15 +28,18 @@ public class ModbusServerService : IHomeAutomationRunner
             server = new ModbusTcpServer(logger, true)
             {
                 MaxConnections = 0,
-                RequestValidator = (_, functionCode, address, numberOfRegisters) =>
+
+                RequestValidator = (modbusAddress, functionCode, startingRegister, numberOfRegisters) =>
                 {
                     if (functionCode != ModbusFunctionCode.ReadHoldingRegisters)
                     {
+                        logger.LogError("Client requested {FunctionCode} for address {ModbusAddress}: {ModbusExceptionCode}", functionCode, modbusAddress, ModbusExceptionCode.IllegalFunction);
                         return ModbusExceptionCode.IllegalFunction;
                     }
 
-                    if (address < 40000 || address + numberOfRegisters > maxAddress)
+                    if (startingRegister < 40000 || startingRegister + numberOfRegisters > maxAddress)
                     {
+                        logger.LogError("Client tried to read {NumberOfRegisters} register starting at {StartingRegister}: {ModbusExceptionCode}", numberOfRegisters, startingRegister, ModbusExceptionCode.IllegalDataAddress);
                         return ModbusExceptionCode.IllegalDataAddress;
                     }
 
@@ -44,7 +47,14 @@ public class ModbusServerService : IHomeAutomationRunner
                 }
             };
 
-            server.Start(parameters.EndPoint);
+            logger.LogInformation
+            (
+                    "Starting server on {IpAddress}:{Port}",
+                    parameters.EndPoint.AddressFamily == AddressFamily.InterNetworkV6 ? $"[{parameters.EndPoint.Address}]" : parameters.EndPoint.Address,
+                    parameters.EndPoint.Port
+            );
+
+            server.Start(new ModbusTcpClientProvider(parameters.EndPoint));
             dataControlService.DeviceUpdate += OnDeviceUpdate;
         }, token).ConfigureAwait(false);
     }

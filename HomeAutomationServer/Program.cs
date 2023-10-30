@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.HomeAutomationServer;
+﻿using System.Net.Sockets;
+
+namespace De.Hochstaetter.HomeAutomationServer;
 
 internal partial class Program
 {
@@ -15,7 +17,11 @@ internal partial class Program
     {
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel
+#if DEBUG
             .Verbose()
+#else
+            .Information()
+#endif
             .Enrich.WithComputed("SourceContextName", "Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)")
             .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] ({SourceContextName:l}) {Message:lj}{NewLine}{Exception}", formatProvider: CultureInfo.InvariantCulture)
             .CreateLogger();
@@ -114,7 +120,6 @@ internal partial class Program
             return 2;
         }
 
-        logger.LogInformation("Starting server on {IpAddress}:{Port}", settings.ServerIpAddress, settings.ServerPort);
         await server.StartAsync().ConfigureAwait(true);
         var fritzBoxDataCollector = IoC.Get<FritzBoxDataCollector>();
         await fritzBoxDataCollector.StartAsync().ConfigureAwait(true);

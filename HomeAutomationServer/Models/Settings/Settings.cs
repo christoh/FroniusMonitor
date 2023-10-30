@@ -10,7 +10,7 @@ public class Settings
     private static int settingLock;
 
     //[DefaultValue("0.0.0.0")]
-    public string ServerIpAddress { get; set; } = "0.0.0.0";
+    public string ServerIpAddress { get; set; } = "::";
 
     //[DefaultValue((ushort)1502)]
     public ushort ServerPort { get; set; } = 1502;

@@ -32,12 +32,23 @@ public class SunSpecClientTests
     {
         await client.ConnectAsync("192.168.44.10", 502, 1).ConfigureAwait(false);
         var device = await client.GetDataAsync().ConfigureAwait(false);
+        var commonBlock = device.OfType<SunSpecCommonBlock>().Single();
         var inverter = device.OfType<ISunSpecInverter>().Single();
         var namePlate = device.OfType<SunSpecNamePlate>().Single();
         var basicSettings = device.OfType<SunSpecInverterBasicSettings>().Single();
         var multipleMppts = device.OfType<SunSpecMultipleMppt>().Single();
         var extendedMeasurements = device.OfType<SunSpecInverterExtendedMeasurements>().Single();
         var controls = device.OfType<SunSpecInverterControls>().Single();
+
+        Assert.AreEqual("Fronius", commonBlock.Manufacturer);
+        Assert.LessOrEqual(inverter.PowerFactorTotal, 1);
+        Assert.GreaterOrEqual(inverter.PowerFactorTotal, -1);
+        Assert.AreEqual((ushort)0xffff, basicSettings.ConnectedPhaseI);
+        Assert.IsNull(namePlate.AmpereHoursCapacity);
+        Assert.AreEqual(4, multipleMppts.NumberOfTrackers);
+        Assert.GreaterOrEqual(extendedMeasurements.IsolationResistance, 100000);
+        Assert.AreEqual(SunSpecOnOff.Disabled, controls.ActivePowerLimitEnabled);
+        Assert.LessOrEqual(controls.RelativeActivePowerLimit, 1);
     }
 
     [Test]
