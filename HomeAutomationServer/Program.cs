@@ -1,6 +1,4 @@
-﻿using System.Net.Sockets;
-
-namespace De.Hochstaetter.HomeAutomationServer;
+﻿namespace De.Hochstaetter.HomeAutomationServer;
 
 internal partial class Program
 {
@@ -61,6 +59,7 @@ internal partial class Program
             .AddSingleton<IAesKeyProvider, AesKeyProvider>()
             .AddSingleton<FritzBoxDataCollector>()
             .AddSingleton<ModbusServerService>()
+            .AddSingleton<SettingsChangeTracker>()
             .AddSingleton<IDataControlService, DataControlService>()
             .AddTransient<ISunSpecClient, SunSpecClient>()
             .AddLogging(builder => builder.AddSerilog())
@@ -69,7 +68,7 @@ internal partial class Program
         if (settings != null)
         {
             serviceCollection
-                .Configure<FritzBoxParameters>(f =>
+                .Configure<FritzBoxDataCollectorParameters>(f =>
                 {
                     f.Connections = settings.FritzBoxConnections;
                     f.RefreshRate = TimeSpan.FromSeconds(60);
@@ -78,12 +77,14 @@ internal partial class Program
                 {
                     m.EndPoint = new IPEndPoint(IPAddress.Parse(settings.ServerIpAddress), settings.ServerPort);
                     m.Mappings = settings.ModbusMappings;
+                    m.AutoMap = true;
                 })
                 ;
         }
 
         var serviceProvider = serviceCollection.BuildServiceProvider();
         IoC.Update(serviceProvider);
+
         logger = IoC.Get<ILogger<Program>>();
 
         AppDomain.CurrentDomain.UnhandledException += (s, e) =>
@@ -119,6 +120,9 @@ internal partial class Program
         {
             return 1;
         }
+
+        var tracker = IoC.Get<SettingsChangeTracker>();
+        tracker.SettingsChanged += (_, _) => _ = settings.SaveAsync();
 
         if (args is [var arg0, ..])
         {

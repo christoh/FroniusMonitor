@@ -5,20 +5,20 @@ public class FritzBoxDataCollector : IHomeAutomationRunner
     private readonly ILogger<FritzBoxDataCollector> logger;
     private readonly IDataControlService dataControlService;
     private readonly IList<IFritzBoxService> fritzBoxServices = new List<IFritzBoxService>();
-    private readonly IOptionsMonitor<FritzBoxParameters> options;
+    private readonly IOptionsMonitor<FritzBoxDataCollectorParameters> options;
     private IDictionary<string, IPowerConsumer1P>? currentDevices;
     private CancellationTokenSource? tokenSource;
     private Thread? runner;
 
-    public FritzBoxDataCollector(ILogger<FritzBoxDataCollector> logger, IDataControlService dataControlService, IOptionsMonitor<FritzBoxParameters> options)
+    public FritzBoxDataCollector(ILogger<FritzBoxDataCollector> logger, IDataControlService dataControlService, IOptionsMonitor<FritzBoxDataCollectorParameters> options)
     {
         this.logger = logger;
         this.dataControlService = dataControlService;
         this.options = options;
     }
 
-    private FritzBoxParameters Parameters => options.CurrentValue;
-    private IEnumerable<WebConnection> Connections => Parameters.Connections ?? throw new ArgumentNullException(nameof(options), @$"{nameof(options)} are not configured");
+    private FritzBoxDataCollectorParameters DataCollectorParameters => options.CurrentValue;
+    private IEnumerable<WebConnection> Connections => DataCollectorParameters.Connections ?? throw new ArgumentNullException(nameof(options), @$"{nameof(options)} are not configured");
 
 
     public async Task StartAsync(CancellationToken token = default)
@@ -135,7 +135,7 @@ public class FritzBoxDataCollector : IHomeAutomationRunner
                 logger.LogError(ex, "{Exception}", ex.Message);
             }
 
-            await Task.Delay(Parameters.RefreshRate, token).ConfigureAwait(true);
+            await Task.Delay(DataCollectorParameters.RefreshRate, token).ConfigureAwait(true);
         }
     }
 }

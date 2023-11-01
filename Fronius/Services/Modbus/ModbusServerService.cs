@@ -9,14 +9,22 @@ public class ModbusServerService : IHomeAutomationRunner
     private readonly ILogger<ModbusServerService> logger;
     private readonly IDataControlService dataControlService;
     private readonly IOptionsMonitor<ModbusServerServiceParameters> options;
+    private readonly SettingsChangeTracker tracker;
     private ModbusTcpServer? server;
     private ushort maxAddress;
 
-    public ModbusServerService(ILogger<ModbusServerService> logger, IDataControlService dataControlService, IOptionsMonitor<ModbusServerServiceParameters> options)
+    public ModbusServerService
+    (
+        SettingsChangeTracker tracker,
+        ILogger<ModbusServerService> logger,
+        IDataControlService dataControlService,
+        IOptionsMonitor<ModbusServerServiceParameters> options
+    )
     {
         this.logger = logger;
         this.dataControlService = dataControlService;
         this.options = options;
+        this.tracker = tracker;
     }
 
     private ModbusServerServiceParameters Parameters => options.CurrentValue ?? throw new ArgumentNullException(nameof(options), @$"{nameof(options)} are not configured");
@@ -88,8 +96,32 @@ public class ModbusServerService : IHomeAutomationRunner
 
         if (mapping == null)
         {
-            logger.LogWarning("Power meter {DisplayName} ({SerialNumber}) has no Modbus mapping", meter.DisplayName, meter.SerialNumber);
-            return;
+            if (!Parameters.AutoMap)
+            {
+                logger.LogWarning("Power meter {DisplayName} ({SerialNumber}) has no Modbus mapping", meter.DisplayName, meter.SerialNumber);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(meter.SerialNumber))
+            {
+                logger.LogError("Cannot auto map add {DisplayName} ({SerialNumber}). Serial number is null or empty", meter.DisplayName, meter.SerialNumber);
+                return;
+            }
+
+            byte modbusAddress = 2;
+
+            for (; modbusAddress < byte.MaxValue; modbusAddress++)
+            {
+                if (modbusAddress is < 15 or > 83 && !Parameters.Mappings.Select(m => m.ModbusAddress).Contains(modbusAddress))
+                {
+                    break;
+                }
+            }
+
+            mapping = new() { ModbusAddress = modbusAddress, Phase = 1, SerialNumber = meter.SerialNumber };
+            Parameters.Mappings.Add(mapping);
+            tracker.NotifySettingsChanged(options);
+            logger.LogInformation("Auto mapped {DisplayName} ({SerialNumber}) to modbus address {ModbusAddress}", meter.DisplayName, meter.SerialNumber, mapping.ModbusAddress);
         }
 
         UpdateMeter(meter, mapping, e.DeviceAction);
