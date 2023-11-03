@@ -34,6 +34,7 @@ global using De.Hochstaetter.Fronius.Models.Modbus;
 global using De.Hochstaetter.Fronius.Models.Settings;
 global using De.Hochstaetter.Fronius.Models.ToshibaAc;
 global using De.Hochstaetter.Fronius.Models.Wifi;
+global using FluentModbus;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;
 global using Microsoft.Extensions.Options;

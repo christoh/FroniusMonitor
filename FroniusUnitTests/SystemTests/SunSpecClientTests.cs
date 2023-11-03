@@ -36,7 +36,8 @@ public class SunSpecClientTests
         var basicSettings = device.OfType<SunSpecInverterBasicSettings>().Single();
         var multipleMppts = device.OfType<SunSpecMultipleMppt>().Single();
         var extendedMeasurements = device.OfType<SunSpecInverterExtendedMeasurements>().Single();
-        var controls = device.OfType<SunSpecInverterControls>().Single();
+        var inverterControls = device.OfType<SunSpecInverterControls>().Single();
+        var storageControls = device.OfType<SunSpecStorageControls>().Single();
 
         Assert.AreEqual("Fronius", commonBlock.Manufacturer);
         Assert.LessOrEqual(inverter.PowerFactorTotal, 1);
@@ -45,8 +46,32 @@ public class SunSpecClientTests
         Assert.IsNull(namePlate.AmpereHoursCapacity);
         Assert.AreEqual(4, multipleMppts.NumberOfTrackers);
         Assert.GreaterOrEqual(extendedMeasurements.IsolationResistance, 100000);
-        Assert.AreEqual(SunSpecOnOff.Disabled, controls.ActivePowerLimitEnabled);
-        Assert.LessOrEqual(controls.RelativeActivePowerLimit, 1);
+        Assert.AreEqual(SunSpecOnOff.Disabled, inverterControls.ActivePowerLimitEnabled);
+        Assert.LessOrEqual(inverterControls.RelativeActivePowerLimit, 1);
+
+        storageControls.RelativeOutgoingActivePowerMax = 0;
+        storageControls.RelativeIncomingActivePowerMax = 0;
+        storageControls.ChargingLimits = SunSpecChargingLimits.Charging | SunSpecChargingLimits.Discharging;
+
+        await client.WriteRegisters
+        (
+            storageControls,
+            nameof(SunSpecStorageControls.RelativeOutgoingActivePowerMaxI),
+            nameof(SunSpecStorageControls.RelativeIncomingActivePowerMaxI),
+            nameof(SunSpecStorageControls.ChargingLimits)
+        ).ConfigureAwait(false);
+
+        storageControls.RelativeOutgoingActivePowerMax = 1;
+        storageControls.RelativeIncomingActivePowerMax = 1;
+        storageControls.ChargingLimits = SunSpecChargingLimits.None;
+
+        await client.WriteRegisters
+        (
+            storageControls,
+            nameof(SunSpecStorageControls.RelativeOutgoingActivePowerMaxI),
+            nameof(SunSpecStorageControls.RelativeIncomingActivePowerMaxI),
+            nameof(SunSpecStorageControls.ChargingLimits)
+        ).ConfigureAwait(false);
     }
 
     [Test]

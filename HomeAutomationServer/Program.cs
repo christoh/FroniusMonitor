@@ -71,7 +71,7 @@ internal partial class Program
                 .Configure<FritzBoxDataCollectorParameters>(f =>
                 {
                     f.Connections = settings.FritzBoxConnections;
-                    f.RefreshRate = TimeSpan.FromSeconds(60);
+                    f.RefreshRate = TimeSpan.FromSeconds(30);
                 })
                 .Configure<ModbusServerServiceParameters>(m =>
                 {
@@ -94,11 +94,11 @@ internal partial class Program
 
             if (e.ExceptionObject is not Exception ex)
             {
-                logger.Log(logLevel, "{SenderName}, {Object}", senderName, e.ExceptionObject.ToString());
+                logger.Log(logLevel, "Unhandled exception in {SenderName}: {Object}", senderName, e.ExceptionObject.ToString());
             }
             else
             {
-                logger.Log(logLevel, ex, senderName);
+                logger.Log(logLevel, ex, "Unhandled exception in {SenderName}", senderName);
             }
         };
 

@@ -1,5 +1,4 @@
 ﻿using De.Hochstaetter.Fronius.Models.Events;
-using FluentModbus;
 
 namespace De.Hochstaetter.Fronius.Services.Modbus;
 

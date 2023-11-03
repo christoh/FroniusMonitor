@@ -255,6 +255,36 @@ public enum SunSpecConnectionState : ushort
     Null = 0xffff,
 }
 
+[Flags]
+public enum SunSpecChargingLimits : ushort
+{
+    None = 0,
+    Charging = 1 << 0,
+    Discharging = 1 << 1,
+    Null = 0xffff,
+}
+
+public enum SunSpecStorageState : ushort
+{
+    None = 0,
+    Off = 1,
+    Empty = 2,
+    Discharging = 3,
+    Charging = 4,
+    Full = 5,
+    Holding = 6,
+    Testing = 7,
+    Null = 0xffff,
+}
+
+public enum SunSpecChargingSource : ushort
+{
+    None = 0,
+    Pv = 0,
+    Grid = 1,
+    Null = 0xffff,
+}
+
 public enum SunSpecReactivePowerLimitMode : ushort
 {
     None = 0,

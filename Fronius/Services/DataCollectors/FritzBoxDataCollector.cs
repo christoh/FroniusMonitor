@@ -4,7 +4,7 @@ public class FritzBoxDataCollector : IHomeAutomationRunner
 {
     private readonly ILogger<FritzBoxDataCollector> logger;
     private readonly IDataControlService dataControlService;
-    private readonly IList<IFritzBoxService> fritzBoxServices = new List<IFritzBoxService>();
+    private IReadOnlyList<IFritzBoxService> fritzBoxServices = null!;
     private readonly IOptionsMonitor<FritzBoxDataCollectorParameters> options;
     private IDictionary<string, IPowerConsumer1P>? currentDevices;
     private CancellationTokenSource? tokenSource;
@@ -26,13 +26,13 @@ public class FritzBoxDataCollector : IHomeAutomationRunner
         await StopAsync(token).ConfigureAwait(false);
         tokenSource = new CancellationTokenSource();
 
-        foreach (var webConnection in Connections)
+        fritzBoxServices = Connections.Select(c =>
         {
-            var fritzBoxService = IoC.Get<IFritzBoxService>();
-            fritzBoxService.Connection = webConnection;
-            logger.LogInformation("Adding Fritz!Box at {Url} with user name {UserName}", webConnection.BaseUrl, webConnection.UserName);
-            fritzBoxServices.Add(fritzBoxService);
-        }
+            var result = IoC.Get<IFritzBoxService>();
+            result.Connection = c;
+            logger.LogInformation("Adding Fritz!Box at {Url} with user name {UserName}", c.BaseUrl, c.UserName);
+            return result;
+        }).ToArray();
 
         (runner = new(RunLoop)).Start();
     }
@@ -110,20 +110,28 @@ public class FritzBoxDataCollector : IHomeAutomationRunner
                     .SelectMany(t => t.Exception!.InnerExceptions)
                     .Apply(ex => logger.LogError(ex, "{Exception}", ex.Message));
 
-                IReadOnlyList<IPowerConsumer1P> fritzBoxDevices = tasks
+                var allFritzBoxDevices = tasks
                     .Where(t => t.IsCompletedSuccessfully)
                     .SelectMany(t => t.Result.Devices)
                     .Cast<IPowerConsumer1P>()
-                    .Where(p => p is { IsPresent: true }).ToArray();
+                    .ToList();
+
+                var presentFritzBoxDevices = allFritzBoxDevices
+                    .Where(p => p is { IsPresent: true })
+                    .ToDictionary(f => f.Id);
+
+                allFritzBoxDevices
+                    .Where(p => p is { IsPresent: false })
+                    .Apply(p => logger.LogDebug("No DECT connection to {DisplayName} ({SerialNumber})", p.DisplayName, p.SerialNumber));
 
                 if (currentDevices != null)
                 {
-                    var devicesToDelete = currentDevices.Keys.Where(k => !fritzBoxDevices.Select(f => f.Id).Contains(k));
+                    var devicesToDelete = currentDevices.Keys.Where(k => !presentFritzBoxDevices.ContainsKey(k));
                     await dataControlService.RemoveAsync(devicesToDelete, token).ConfigureAwait(true);
                 }
 
-                currentDevices = fritzBoxDevices.ToDictionary(f => f.Id);
-                await dataControlService.AddOrUpdateAsync(fritzBoxDevices, token).ConfigureAwait(true);
+                currentDevices = presentFritzBoxDevices;
+                await dataControlService.AddOrUpdateAsync(presentFritzBoxDevices.Values, token).ConfigureAwait(true);
             }
             catch (OperationCanceledException)
             {

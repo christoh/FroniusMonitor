@@ -1,6 +1,4 @@
-﻿using FluentModbus;
-
-namespace De.Hochstaetter.Fronius.Models.Modbus;
+﻿namespace De.Hochstaetter.Fronius.Models.Modbus;
 
 internal sealed class ModbusTcpClientProvider : ITcpClientProvider
 {

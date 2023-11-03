@@ -1,6 +1,4 @@
-﻿using FluentModbus;
-
-namespace De.Hochstaetter.Fronius.Services.Modbus;
+﻿namespace De.Hochstaetter.Fronius.Services.Modbus;
 
 public class SunSpecClient : ISunSpecClient
 {
@@ -14,10 +12,10 @@ public class SunSpecClient : ISunSpecClient
     }
 
     protected ModbusTcpClient? ModbusClient { get; private set; }
-    protected int ModbusAddress { get; private set; } = ~0;
+    protected byte ModbusAddress { get; private set; } = 255;
     public bool IsConnected => ModbusClient is { IsConnected: true };
 
-    public async Task ConnectAsync(string hostname, int port, ushort modbusAddress, TimeSpan timeout = default)
+    public async Task ConnectAsync(string hostname, int port, byte modbusAddress, TimeSpan timeout = default)
     {
         if (timeout == default)
         {
@@ -95,10 +93,34 @@ public class SunSpecClient : ISunSpecClient
         {
             ModbusClient?.Dispose();
             ModbusClient = null;
-            ModbusAddress = ~0;
+            ModbusAddress = 255;
         }
     }
 
+    public async Task WriteRegisters(SunSpecModelBase entity, params string[] propertyNames)
+    {
+        if (ModbusClient == null || !IsConnected)
+        {
+            throw new InvalidOperationException("Not connected");
+        }
+
+        foreach (var propertyName in propertyNames)
+        {
+            var propertyInfo = entity.GetType().GetProperty(propertyName) ?? throw new ArgumentException($"Public property {propertyName} does not exist for {entity.GetType().Name}");
+
+            if (propertyInfo.GetCustomAttribute<ModbusAttribute>() is not { IsReadOnly: false } attribute)
+            {
+                throw new InvalidOperationException($"{propertyName} is not a writable Modbus property");
+            }
+
+            var register = entity.AbsoluteRegister + attribute.Start;
+
+            var propertyType = propertyInfo.PropertyType;
+            var size = typeof(string).IsAssignableFrom(propertyType) ? attribute.Length : propertyType.GetSize();
+            var slice = entity.RawData.Slice(attribute.Start << 1, size).ToArray();
+            await ModbusClient.WriteMultipleRegistersAsync(ModbusAddress, register, slice);
+        }
+    }
     public async Task<IList<SunSpecModelBase>> GetDataAsync(CancellationToken token = default)
     {
         if (!IsConnected)
@@ -124,6 +146,7 @@ public class SunSpecClient : ISunSpecClient
                 121 => new SunSpecInverterBasicSettings(data, sunSpecModel, (ushort)(register + 2)),
                 122 => new SunSpecInverterExtendedMeasurements(data, sunSpecModel, (ushort)(register + 2)),
                 123 => new SunSpecInverterControls(data, sunSpecModel, (ushort)(register + 2)),
+                124 => new SunSpecStorageControls(data, sunSpecModel, (ushort)(register + 2)),
                 160 => new SunSpecMultipleMppt(data, sunSpecModel, (ushort)(register + 2)),
                 >= 201 and <= 204 => new SunSpecMeterInt(data, sunSpecModel, (ushort)(register + 2)),
                 >= 211 and <= 214 => new SunSpecMeterFloat(data, sunSpecModel, (ushort)(register + 2)),
