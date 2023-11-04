@@ -1,8 +1,4 @@
-﻿using System.Linq;
-using De.Hochstaetter.Fronius.Contracts.Modbus;
-using De.Hochstaetter.Fronius.Models.Modbus;
-
-namespace FroniusUnitTests.SystemTests;
+﻿namespace FroniusUnitTests.SystemTests;
 
 [TestFixture]
 public class SunSpecClientTests
@@ -29,48 +25,49 @@ public class SunSpecClientTests
     public async Task Inverter_Success()
     {
         await client.ConnectAsync("192.168.44.10", 502, 1).ConfigureAwait(false);
-        var device = await client.GetDataAsync().ConfigureAwait(false);
-        var commonBlock = device.OfType<SunSpecCommonBlock>().Single();
-        var inverter = device.OfType<ISunSpecInverter>().Single();
-        var namePlate = device.OfType<SunSpecNamePlate>().Single();
-        var basicSettings = device.OfType<SunSpecInverterBasicSettings>().Single();
-        var multipleMppts = device.OfType<SunSpecMultipleMppt>().Single();
-        var extendedMeasurements = device.OfType<SunSpecInverterExtendedMeasurements>().Single();
-        var inverterControls = device.OfType<SunSpecInverterControls>().Single();
-        var storageControls = device.OfType<SunSpecStorageControls>().Single();
+        var inverter = new SunSpecInverter(await client.GetDataAsync().ConfigureAwait(false));
 
-        Assert.AreEqual("Fronius", commonBlock.Manufacturer);
-        Assert.LessOrEqual(inverter.PowerFactorTotal, 1);
-        Assert.GreaterOrEqual(inverter.PowerFactorTotal, -1);
-        Assert.AreEqual((ushort)0xffff, basicSettings.ConnectedPhaseI);
-        Assert.IsNull(namePlate.AmpereHoursCapacity);
-        Assert.AreEqual(4, multipleMppts.NumberOfTrackers);
-        Assert.GreaterOrEqual(extendedMeasurements.IsolationResistance, 100000);
-        Assert.AreEqual(SunSpecOnOff.Disabled, inverterControls.ActivePowerLimitEnabled);
-        Assert.LessOrEqual(inverterControls.RelativeActivePowerLimit, 1);
+        Assert.AreEqual("Fronius", inverter.Manufacturer);
+        Assert.LessOrEqual(inverter.InverterBaseSensors?.PowerFactorTotal, 1);
+        Assert.GreaterOrEqual(inverter.InverterBaseSensors?.PowerFactorTotal, -1);
+        Assert.AreEqual((ushort)0xffff, inverter.BasicSettings?.ConnectedPhaseI);
+        Assert.IsNull(inverter.NamePlate?.AmpereHoursCapacity);
+        Assert.AreEqual(4, inverter.Tracker?.NumberOfTrackers);
+        Assert.GreaterOrEqual(inverter.ExtendedSensors?.IsolationResistance, 100000);
+        Assert.AreEqual(SunSpecOnOff.Disabled, inverter.ExtendedSettings?.ActivePowerLimitEnabled);
+        Assert.LessOrEqual(inverter.ExtendedSettings?.RelativeActivePowerLimit, 1);
 
-        storageControls.RelativeOutgoingActivePowerMax = 0;
-        storageControls.RelativeIncomingActivePowerMax = 0;
-        storageControls.ChargingLimits = SunSpecChargingLimits.Charging | SunSpecChargingLimits.Discharging;
+        if (inverter.StorageSettings == null)
+        {
+            Assert.IsNotNull(inverter.StorageSettings);
+            return;
+        }
+
+        var storageSettings = inverter.StorageSettings;
+        storageSettings.RelativeOutgoingActivePowerMax = 0;
+        storageSettings.RelativeIncomingActivePowerMax = 0;
+        storageSettings.ChargingLimits = SunSpecChargingLimits.Charging | SunSpecChargingLimits.Discharging;
 
         await client.WriteRegisters
         (
-            storageControls,
-            nameof(SunSpecStorageControls.RelativeOutgoingActivePowerMaxI),
-            nameof(SunSpecStorageControls.RelativeIncomingActivePowerMaxI),
-            nameof(SunSpecStorageControls.ChargingLimits)
+            storageSettings,
+            default,
+            nameof(SunSpecStorageBaseSettings.RelativeOutgoingActivePowerMaxI),
+            nameof(SunSpecStorageBaseSettings.RelativeIncomingActivePowerMaxI),
+            nameof(SunSpecStorageBaseSettings.ChargingLimits)
         ).ConfigureAwait(false);
 
-        storageControls.RelativeOutgoingActivePowerMax = 1;
-        storageControls.RelativeIncomingActivePowerMax = 1;
-        storageControls.ChargingLimits = SunSpecChargingLimits.None;
+        storageSettings.RelativeOutgoingActivePowerMax = 1;
+        storageSettings.RelativeIncomingActivePowerMax = 1;
+        storageSettings.ChargingLimits = SunSpecChargingLimits.None;
 
         await client.WriteRegisters
         (
-            storageControls,
-            nameof(SunSpecStorageControls.RelativeOutgoingActivePowerMaxI),
-            nameof(SunSpecStorageControls.RelativeIncomingActivePowerMaxI),
-            nameof(SunSpecStorageControls.ChargingLimits)
+            storageSettings,
+            default,
+            nameof(SunSpecStorageBaseSettings.RelativeOutgoingActivePowerMaxI),
+            nameof(SunSpecStorageBaseSettings.RelativeIncomingActivePowerMaxI),
+            nameof(SunSpecStorageBaseSettings.ChargingLimits)
         ).ConfigureAwait(false);
     }
 

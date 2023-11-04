@@ -8,5 +8,5 @@ public interface ISunSpecClient : IDisposable
     
     public Task<IList<SunSpecModelBase>> GetDataAsync(CancellationToken token = default);
 
-    public Task WriteRegisters(SunSpecModelBase entity, params string[] propertyNames);
+    public Task WriteRegisters(SunSpecModelBase entity, CancellationToken token = default, params string[] propertyNames);
 }

@@ -97,7 +97,7 @@ public class SunSpecClient : ISunSpecClient
         }
     }
 
-    public async Task WriteRegisters(SunSpecModelBase entity, params string[] propertyNames)
+    public async Task WriteRegisters(SunSpecModelBase entity, CancellationToken token = default, params string[] propertyNames)
     {
         if (ModbusClient == null || !IsConnected)
         {
@@ -114,13 +114,13 @@ public class SunSpecClient : ISunSpecClient
             }
 
             var register = entity.AbsoluteRegister + attribute.Start;
-
             var propertyType = propertyInfo.PropertyType;
             var size = typeof(string).IsAssignableFrom(propertyType) ? attribute.Length : propertyType.GetSize();
             var slice = entity.RawData.Slice(attribute.Start << 1, size).ToArray();
-            await ModbusClient.WriteMultipleRegistersAsync(ModbusAddress, register, slice);
+            await ModbusClient.WriteMultipleRegistersAsync(ModbusAddress, register, slice, token).ConfigureAwait(false);
         }
     }
+    
     public async Task<IList<SunSpecModelBase>> GetDataAsync(CancellationToken token = default)
     {
         if (!IsConnected)
@@ -140,13 +140,13 @@ public class SunSpecClient : ISunSpecClient
             var sunSpecModelBase = sunSpecModel switch
             {
                 1 => (SunSpecModelBase)new SunSpecCommonBlock(data, sunSpecModel, (ushort)(register + 2)),
-                >= 101 and <= 103 => new SunSpecInverterInt(data, sunSpecModel, (ushort)(register + 2)),
-                >= 111 and <= 113 => new SunSpecInverterFloat(data, sunSpecModel, (ushort)(register + 2)),
+                >= 101 and <= 103 => new SunSpecBaseInverterInt(data, sunSpecModel, (ushort)(register + 2)),
+                >= 111 and <= 113 => new SunSpecBaseInverterFloat(data, sunSpecModel, (ushort)(register + 2)),
                 120 => new SunSpecNamePlate(data, sunSpecModel, (ushort)(register + 2)),
-                121 => new SunSpecInverterBasicSettings(data, sunSpecModel, (ushort)(register + 2)),
-                122 => new SunSpecInverterExtendedMeasurements(data, sunSpecModel, (ushort)(register + 2)),
-                123 => new SunSpecInverterControls(data, sunSpecModel, (ushort)(register + 2)),
-                124 => new SunSpecStorageControls(data, sunSpecModel, (ushort)(register + 2)),
+                121 => new SunSpecInverterBaseSettings(data, sunSpecModel, (ushort)(register + 2)),
+                122 => new SunSpecInverterExtendedSensors(data, sunSpecModel, (ushort)(register + 2)),
+                123 => new SunSpecInverterExtendedSettings(data, sunSpecModel, (ushort)(register + 2)),
+                124 => new SunSpecStorageBaseSettings(data, sunSpecModel, (ushort)(register + 2)),
                 160 => new SunSpecMultipleMppt(data, sunSpecModel, (ushort)(register + 2)),
                 >= 201 and <= 204 => new SunSpecMeterInt(data, sunSpecModel, (ushort)(register + 2)),
                 >= 211 and <= 214 => new SunSpecMeterFloat(data, sunSpecModel, (ushort)(register + 2)),
