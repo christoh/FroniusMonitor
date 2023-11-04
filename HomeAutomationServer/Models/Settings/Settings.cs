@@ -18,6 +18,8 @@ public class Settings
     public List<WebConnection> FritzBoxConnections = new();
 
     public List<ModbusMapping> ModbusMappings = new();
+    
+    public List<ModbusConnection> SunSpecClients = new();
 
     [XmlIgnore] public static string SettingsFileName { get; set; } = Path.Combine(AppContext.BaseDirectory, "Settings.xml");
 
