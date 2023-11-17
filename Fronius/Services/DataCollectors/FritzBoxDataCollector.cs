@@ -124,11 +124,11 @@ public class FritzBoxDataCollector : IHomeAutomationRunner
                     .Where(p => p is { IsPresent: false })
                     .Apply(p => logger.LogDebug("No DECT connection to {DisplayName} ({SerialNumber})", p.DisplayName, p.SerialNumber));
 
-                if (currentDevices != null)
-                {
-                    var devicesToDelete = currentDevices.Keys.Where(k => !presentFritzBoxDevices.ContainsKey(k));
-                    await dataControlService.RemoveAsync(devicesToDelete, token).ConfigureAwait(true);
-                }
+                //if (currentDevices != null)
+                //{
+                //    var devicesToDelete = currentDevices.Keys.Where(k => !presentFritzBoxDevices.ContainsKey(k));
+                //    await dataControlService.RemoveAsync(devicesToDelete, token).ConfigureAwait(true);
+                //}
 
                 currentDevices = presentFritzBoxDevices;
                 await dataControlService.AddOrUpdateAsync(presentFritzBoxDevices.Values, token).ConfigureAwait(true);
