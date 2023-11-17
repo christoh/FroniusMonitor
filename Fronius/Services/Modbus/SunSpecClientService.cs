@@ -1,16 +1,12 @@
-﻿using De.Hochstaetter.Fronius.Services.DataCollectors;
-
-namespace De.Hochstaetter.Fronius.Services.Modbus;
+﻿namespace De.Hochstaetter.Fronius.Services.Modbus;
 
 public sealed class SunSpecClientService : IHomeAutomationRunner
 {
-
     private readonly ILogger<SunSpecClientService> logger;
     private readonly IDataControlService dataControlService;
-    private readonly IDictionary<ModbusConnection, SunSpecClient> sunSpecClients = new ConcurrentDictionary<ModbusConnection, SunSpecClient>();
+    private readonly IDictionary<ModbusConnection, ISunSpecClient> sunSpecClients = new ConcurrentDictionary<ModbusConnection, ISunSpecClient>();
     private readonly IOptionsMonitor<SunSpecClientParameters> options;
-    private IDictionary<string, SunSpecModelBase>? currentDevices;
-    private CancellationTokenSource tokenSource=new();
+    private CancellationTokenSource? tokenSource;
     private Thread? runner;
 
     public SunSpecClientService
@@ -25,6 +21,8 @@ public sealed class SunSpecClientService : IHomeAutomationRunner
         this.options = options;
     }
 
+    private SunSpecClientParameters Parameters => options.CurrentValue;
+
     public void Dispose()
     {
         try
@@ -33,20 +31,38 @@ public sealed class SunSpecClientService : IHomeAutomationRunner
         }
         catch
         {
-            //
+            logger.LogError("Could not stop {ServiceName}", GetType().Name);
         }
     }
 
     public async Task StartAsync(CancellationToken token = default)
     {
         await StopAsync(token).ConfigureAwait(false);
-        (runner = new Thread(Runner)).Start();
 
+        foreach (var connection in Parameters.ModbusConnections as IEnumerable<ModbusConnection> ?? Array.Empty<ModbusConnection>())
+        {
+            var client = IoC.Get<ISunSpecClient>();
+
+            try
+            {
+                logger.LogInformation("Connecting to SunSpec device {ModbusConnection}", connection);
+                await client.ConnectAsync(connection.HostName, connection.Port, connection.ModbusAddress).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Could not connect to {ModbusConnection}", connection);
+            }
+
+            sunSpecClients[connection] = client;
+        }
+
+        tokenSource = new();
+        (runner = new Thread(Runner)).Start();
     }
 
     public Task StopAsync(CancellationToken token = default) => Task.Run(() =>
     {
-        tokenSource.Cancel();
+        tokenSource?.Cancel();
 
         try
         {
@@ -57,10 +73,10 @@ public sealed class SunSpecClientService : IHomeAutomationRunner
             logger.LogError(ex, "Could not stop the runner thread");
         }
 
-        tokenSource.Dispose();
-        tokenSource = new();
-        sunSpecClients?.Values.Apply(client => client.Dispose());
-
+        tokenSource?.Dispose();
+        tokenSource = null;
+        sunSpecClients.Values.Apply(client => client.Dispose());
+        sunSpecClients.Clear();
     }, token);
 
     private async void Runner()
@@ -69,50 +85,50 @@ public sealed class SunSpecClientService : IHomeAutomationRunner
         {
             while (true)
             {
-                tokenSource.Token.ThrowIfCancellationRequested();
-
-                await foreach (var device in GetDevices())
-                {
-                    dataControlService.AddOrUpdate(device.Key.DisplayName, device.Value);
-                    tokenSource.Token.ThrowIfCancellationRequested();
-                }
-
-                await Task.Delay(options.CurrentValue.RefreshRate, tokenSource.Token);
+                tokenSource!.Token.ThrowIfCancellationRequested();
+                var start = DateTime.UtcNow;
+                await Parallel.ForEachAsync(sunSpecClients, tokenSource.Token, UpdateDevice);
+                var executionTime = (DateTime.UtcNow - start).TotalMilliseconds;
+                var waitTime = Math.Max(0, Parameters.RefreshRate.TotalMilliseconds - executionTime);
+                await Task.Delay((int)waitTime, tokenSource.Token).ConfigureAwait(true);
             }
         }
-        catch (OperationCanceledException)
-        {
-            
-        }
+        catch (OperationCanceledException) { }
     }
 
-    private async IAsyncEnumerable<KeyValuePair<ModbusConnection, SunSpecGroupBase>> GetDevices()
+    private async ValueTask UpdateDevice(KeyValuePair<ModbusConnection, ISunSpecClient> entity, CancellationToken token)
     {
-        foreach (var entity in sunSpecClients.ToList())
+        IEnumerable<SunSpecModelBase> group;
+
+        try
         {
-            IEnumerable<SunSpecModelBase> group;
+            group = await entity.Value.GetDataAsync(token).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            entity.Value.Dispose();
+            logger.LogError(ex, "Could not retrieve data from {X}", entity.Key);
 
             try
             {
-                group = await entity.Value.GetDataAsync().ConfigureAwait(false);
+                await entity.Value.ConnectAsync(entity.Key.HostName, entity.Key.Port, entity.Key.ModbusAddress, TimeSpan.FromSeconds(1.5));
             }
-            catch (Exception ex)
+            catch (Exception ex2)
             {
-                sunSpecClients.Remove(entity);
-                entity.Value.Dispose();
-                logger.LogError(ex, "Could not retrieve data from {X}", entity.Key);
-                continue;
+                logger.LogError(ex2, "Could not connect to {ModbusConnection}", entity.Key);
             }
 
-            if (group.Select(g => g.ModelNumber).Any(modelNumber => modelNumber is (>= 101 and <= 104) or (>= 111 and <= 114)))
-            {
-                yield return new KeyValuePair<ModbusConnection, SunSpecGroupBase>(entity.Key, new SunSpecInverter(group));
-            }
+            return;
+        }
 
-            if (group.Select(g => g.ModelNumber).Any(modelNumber => modelNumber is (>= 201 and <= 204) or (>= 211 and <= 214)))
-            {
-                yield return new KeyValuePair<ModbusConnection, SunSpecGroupBase>(entity.Key, new SunSpecMeter(group));
-            }
+        if (group.Select(g => g.ModelNumber).Any(modelNumber => modelNumber is (>= 101 and <= 104) or (>= 111 and <= 114)))
+        {
+            dataControlService.AddOrUpdate(entity.Key.DisplayName, new SunSpecInverter(group));
+        }
+
+        if (group.Select(g => g.ModelNumber).Any(modelNumber => modelNumber is (>= 201 and <= 204) or (>= 211 and <= 214)))
+        {
+            dataControlService.AddOrUpdate(entity.Key.DisplayName, new SunSpecMeter(group));
         }
     }
 }

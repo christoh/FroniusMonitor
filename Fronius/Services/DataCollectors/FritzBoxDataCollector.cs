@@ -6,7 +6,7 @@ public class FritzBoxDataCollector : IHomeAutomationRunner
     private readonly IDataControlService dataControlService;
     private IReadOnlyList<IFritzBoxService> fritzBoxServices = null!;
     private readonly IOptionsMonitor<FritzBoxDataCollectorParameters> options;
-    private IDictionary<string, IPowerConsumer1P>? currentDevices;
+    //private IDictionary<string, IPowerConsumer1P>? currentDevices;
     private CancellationTokenSource? tokenSource;
     private Thread? runner;
 
@@ -130,7 +130,7 @@ public class FritzBoxDataCollector : IHomeAutomationRunner
                 //    await dataControlService.RemoveAsync(devicesToDelete, token).ConfigureAwait(true);
                 //}
 
-                currentDevices = presentFritzBoxDevices;
+                //currentDevices = presentFritzBoxDevices;
                 await dataControlService.AddOrUpdateAsync(presentFritzBoxDevices.Values, token).ConfigureAwait(true);
             }
             catch (OperationCanceledException)

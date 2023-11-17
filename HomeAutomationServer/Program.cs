@@ -61,6 +61,7 @@ internal partial class Program
             .AddSingleton<ModbusServerService>()
             .AddSingleton<SettingsChangeTracker>()
             .AddSingleton<IDataControlService, DataControlService>()
+            .AddSingleton<SunSpecClientService>()
             .AddTransient<ISunSpecClient, SunSpecClient>()
             .AddLogging(builder => builder.AddSerilog())
             ;
@@ -78,6 +79,11 @@ internal partial class Program
                     m.EndPoint = new IPEndPoint(IPAddress.Parse(settings.ServerIpAddress), settings.ServerPort);
                     m.Mappings = settings.ModbusMappings;
                     m.AutoMap = true;
+                })
+                .Configure<SunSpecClientParameters>(s =>
+                {
+                    s.ModbusConnections = settings.SunSpecClients;
+                    s.RefreshRate= TimeSpan.FromSeconds(1);
                 })
                 ;
         }
@@ -143,6 +149,7 @@ internal partial class Program
         await server.StartAsync().ConfigureAwait(true);
         var fritzBoxDataCollector = IoC.Get<FritzBoxDataCollector>();
         await fritzBoxDataCollector.StartAsync().ConfigureAwait(true);
+        await IoC.Get<SunSpecClientService>().StartAsync().ConfigureAwait(true);
 
         while (true)
         {

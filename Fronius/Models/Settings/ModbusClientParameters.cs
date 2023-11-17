@@ -1,4 +1,7 @@
-﻿namespace De.Hochstaetter.Fronius.Models.Settings
+﻿namespace De.Hochstaetter.Fronius.Models.Settings;
+
+public class ModbusClientParameters
 {
-    public record ModbusClientParameters(ICollection<ModbusConnection> ModbusConnections, TimeSpan RefreshRate);
+    public List<ModbusConnection>? ModbusConnections { get; set; }
+    public TimeSpan RefreshRate { get; set; }
 }

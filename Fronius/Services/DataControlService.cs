@@ -21,10 +21,15 @@ public class DataControlService : IDataControlService
     {
         var isNew = !Entities.ContainsKey(id);
         Entities[id] = entity;
+        var displayName = entity is IHaveDisplayName haveDisplayName ? haveDisplayName.DisplayName : id;
 
         if (isNew)
         {
-            logger.LogInformation("Adding new device {Device}", entity is IHaveDisplayName haveDisplayName ? haveDisplayName.DisplayName : id);
+            logger.LogInformation("Adding new device {Device}", displayName);
+        }
+        else
+        {
+            logger.LogDebug("Updating device {Device}", displayName);
         }
 
         DeviceUpdate?.Invoke(this, new DeviceUpdateEventArgs(id, entity, isNew ? DeviceAction.Add : DeviceAction.Change));
@@ -46,7 +51,7 @@ public class DataControlService : IDataControlService
         }
         else
         {
-            logger.LogError("Could not remove device {Device}", entity is IHaveDisplayName haveDisplayName ? haveDisplayName.DisplayName : id);
+            logger.LogTrace("Could not remove device {Device}", entity is IHaveDisplayName haveDisplayName ? haveDisplayName.DisplayName : id);
         }
     }
 
