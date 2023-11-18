@@ -32,7 +32,7 @@
         private Guid deviceUniqueId;
 
         [JsonPropertyName("ACDeviceUniqueId")]
-        public Guid DeviceUniqueId
+        public override Guid DeviceUniqueId
         {
             get => deviceUniqueId;
             set => Set(ref deviceUniqueId, value);

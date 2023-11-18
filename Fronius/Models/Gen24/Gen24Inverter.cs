@@ -48,7 +48,7 @@ public class Gen24Inverter : Gen24DeviceBase
     public double? PowerActiveSum
     {
         get => powerActiveSum;
-        set => Set(ref powerActiveSum, value, () => NotifyOfPropertyChange(nameof(PowerFactorAverage)));
+        set => Set(ref powerActiveSum, value, () => NotifyOfPropertyChange(nameof(PowerFactorTotal)));
     }
 
     private double? powerReactiveSum;
@@ -66,7 +66,7 @@ public class Gen24Inverter : Gen24DeviceBase
     public double? PowerApparentSum
     {
         get => powerApparentSum;
-        set => Set(ref powerApparentSum, value, () => NotifyOfPropertyChange(nameof(PowerFactorAverage)));
+        set => Set(ref powerApparentSum, value, () => NotifyOfPropertyChange(nameof(PowerFactorTotal)));
     }
 
     private TimeSpan? backupModeUpTime;
@@ -237,8 +237,7 @@ public class Gen24Inverter : Gen24DeviceBase
     public double? AcPhaseVoltageAverage => (AcVoltageL1 + AcVoltageL2 + AcVoltageL3) / 3d;
     public double? AcLineVoltageAverage => (AcVoltageL12 + AcVoltageL23 + AcVoltageL31) / 3d;
     public double? AcCurrentSum => AcCurrentL1 + AcCurrentL2 + AcCurrentL3;
-    public double? PowerFactorAverage => PowerActiveSum / PowerApparentSum;
-
+    public double? PowerFactorTotal => PowerActiveSum / PowerApparentSum;
 
     public double? AcPowerL1 => AcVoltageL1 * AcCurrentL1;
     public double? AcPowerL2 => AcVoltageL2 * AcCurrentL2;

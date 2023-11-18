@@ -2653,6 +2653,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to String control address (Tauro only).
+        /// </summary>
+        public static string ScAddress {
+            get {
+                return ResourceManager.GetString("ScAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Wifi networks in range.
         /// </summary>
         public static string ScannedWifis {

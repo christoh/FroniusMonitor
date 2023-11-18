@@ -1,6 +1,4 @@
-﻿using FluentModbus;
-
-namespace De.Hochstaetter.Fronius.Extensions;
+﻿namespace De.Hochstaetter.Fronius.Extensions;
 
 public static class ModbusExtensions
 {

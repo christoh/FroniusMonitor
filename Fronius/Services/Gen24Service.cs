@@ -3,20 +3,14 @@
 namespace De.Hochstaetter.Fronius.Services;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
-public class Gen24Service : BindableBase, IGen24Service
+public class Gen24Service(IGen24JsonService gen24JsonService) : BindableBase, IGen24Service
 {
-    private readonly IGen24JsonService gen24JsonService;
     private DigestAuthHttp? froniusHttpClient;
     private DateTime lastSolarApiCall = DateTime.UtcNow.AddSeconds(-4);
     private JObject? invariantConfigToken, localConfigToken;
     private JObject? localUiToken, invariantUiToken;
     private JObject? localEventToken, invariantEventToken;
     private JObject? localChannelToken, invariantChannelToken;
-
-    public Gen24Service(IGen24JsonService gen24JsonService)
-    {
-        this.gen24JsonService = gen24JsonService;
-    }
 
     private WebConnection? connection;
 
@@ -144,7 +138,7 @@ public class Gen24Service : BindableBase, IGen24Service
         return GetLocalizedString(localChannelToken, invariantChannelToken, key);
     }
 
-    public async ValueTask<string> GetEventDescription(string code, CancellationToken token = default)
+    public async Task<string> GetEventDescription(string code, CancellationToken token = default)
     {
         (localEventToken, invariantEventToken) = await EnsureText("app/assets/i18n/StateCodeTranslations",
             localEventToken, invariantEventToken, token).ConfigureAwait(false);

@@ -2,8 +2,6 @@
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
-using De.Hochstaetter.Fronius.Extensions;
-using De.Hochstaetter.Fronius.Models.Settings;
 
 namespace De.Hochstaetter.HomeAutomationServer.Models.Settings;
 
@@ -12,7 +10,7 @@ public class Settings
     private static int settingLock;
 
     //[DefaultValue("0.0.0.0")]
-    public string ServerIpAddress { get; set; } = "0.0.0.0";
+    public string ServerIpAddress { get; set; } = "::";
 
     //[DefaultValue((ushort)1502)]
     public ushort ServerPort { get; set; } = 1502;
@@ -20,6 +18,8 @@ public class Settings
     public List<WebConnection> FritzBoxConnections = new();
 
     public List<ModbusMapping> ModbusMappings = new();
+    
+    public List<ModbusConnection> SunSpecClients = new();
 
     [XmlIgnore] public static string SettingsFileName { get; set; } = Path.Combine(AppContext.BaseDirectory, "Settings.xml");
 

@@ -1,8 +1,6 @@
-﻿using Microsoft.WindowsAzure.Storage.Blob.Protocol;
+﻿namespace De.Hochstaetter.Fronius.Contracts;
 
-namespace De.Hochstaetter.Fronius.Contracts;
-
-public interface IPowerMeter1P : IHaveDisplayName
+public interface IPowerMeter1P : IHaveDisplayName, IHaveUniqueId
 {
     double? ActivePower => Current * Voltage;
     double? Voltage => ActivePower / Current;
@@ -10,8 +8,5 @@ public interface IPowerMeter1P : IHaveDisplayName
     double? Frequency { get; }
     double? EnergyConsumed { get; }
     bool CanMeasurePower { get; }
-    string? Manufacturer { get; }
-    string? Model { get; }
-    string? SerialNumber { get; }
     string? DeviceVersion { get; }
 }

@@ -157,7 +157,7 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
 
         var devices = await Deserialize<List<ToshibaHvacMapping>>($"/api/AC/GetConsumerACMapping?consumerId={session.ConsumerId}").ConfigureAwait(false);
         AllDevices = new BindableCollection<ToshibaHvacMapping>(devices, context);
-        //var supi = await Deserialize<ToshibaHvacStatusDevice>($"/api/AC/GetCurrentACState?ACId={AllDevices[0].Devices[0].AcId}").ConfigureAwait(false);
+        // var supi = await Deserialize<ToshibaHvacStatusDevice>($"/api/AC/GetCurrentACState?ACId={AllDevices[0].Devices[0].AcId}").ConfigureAwait(false);
         return azureCredentials;
     }
 

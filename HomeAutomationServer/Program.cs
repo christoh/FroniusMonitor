@@ -1,15 +1,8 @@
-﻿using System.Net;
-using System.Text.RegularExpressions;
-using De.Hochstaetter.Fronius.Extensions;
-using De.Hochstaetter.Fronius.Models.Settings;
-using De.Hochstaetter.HomeAutomationServer.Crypto;
-using De.Hochstaetter.HomeAutomationServer.DataCollectors;
-
-namespace De.Hochstaetter.HomeAutomationServer;
+﻿namespace De.Hochstaetter.HomeAutomationServer;
 
 internal partial class Program
 {
-    private static SunSpecMeterService? server;
+    private static ModbusServerService? server;
 
     [GeneratedRegex("^(?<UserName>(?!:).+):(?<Password>(?!:).+)$", RegexOptions.Compiled)]
     private static partial Regex PasswordRegex();
@@ -22,9 +15,13 @@ internal partial class Program
     {
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel
-            .Verbose()
-            .WriteTo
-            .Console(formatProvider: CultureInfo.InvariantCulture)
+#if DEBUG
+            .Debug()
+#else
+            .Information()
+#endif
+            .Enrich.WithComputed("SourceContextName", "Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)")
+            .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] ({SourceContextName:l}) {Message:lj}{NewLine}{Exception}", formatProvider: CultureInfo.InvariantCulture)
             .CreateLogger();
 
         Settings? settings = null;
@@ -32,7 +29,7 @@ internal partial class Program
 
         try
         {
-            settings = await Settings.LoadAsync().ConfigureAwait(true);
+            settings = await Settings.LoadAsync().ConfigureAwait(false);
         }
         catch (FileNotFoundException ex)
         {
@@ -46,7 +43,7 @@ internal partial class Program
             });
 
             settings.ModbusMappings.Add(new ModbusMapping());
-            await settings.SaveAsync().ConfigureAwait(true);
+            await settings.SaveAsync().ConfigureAwait(false);
             settingsLoadException = ex;
         }
         catch (Exception ex)
@@ -54,35 +51,73 @@ internal partial class Program
             settingsLoadException = ex;
         }
 
-        var serviceCollection = new ServiceCollection();
+        IServiceCollection serviceCollection = new ServiceCollection();
 
         serviceCollection
+            .AddOptions()
             .AddTransient<IFritzBoxService, FritzBoxService>()
             .AddSingleton<IAesKeyProvider, AesKeyProvider>()
-            .AddSingleton<SunSpecMeterService>()
             .AddSingleton<FritzBoxDataCollector>()
-            .AddTransient<ISunSpecMeterClient, SunSpecMeterClient>()
+            .AddSingleton<ModbusServerService>()
+            .AddSingleton<SettingsChangeTracker>()
+            .AddSingleton<IDataControlService, DataControlService>()
+            .AddSingleton<SunSpecClientService>()
+            .AddTransient<ISunSpecClient, SunSpecClient>()
             .AddLogging(builder => builder.AddSerilog())
             ;
 
         if (settings != null)
         {
-            serviceCollection.AddSingleton(settings);
+            serviceCollection
+                .Configure<FritzBoxDataCollectorParameters>(f =>
+                {
+                    f.Connections = settings.FritzBoxConnections;
+                    f.RefreshRate = TimeSpan.FromSeconds(30);
+                })
+                .Configure<ModbusServerServiceParameters>(m =>
+                {
+                    m.EndPoint = new IPEndPoint(IPAddress.Parse(settings.ServerIpAddress), settings.ServerPort);
+                    m.Mappings = settings.ModbusMappings;
+                    m.AutoMap = true;
+                })
+                .Configure<SunSpecClientParameters>(s =>
+                {
+                    s.ModbusConnections = settings.SunSpecClients;
+                    s.RefreshRate= TimeSpan.FromSeconds(10);
+                })
+                ;
         }
 
         var serviceProvider = serviceCollection.BuildServiceProvider();
         IoC.Update(serviceProvider);
+
         logger = IoC.Get<ILogger<Program>>();
-        server = IoC.Get<SunSpecMeterService>();
+
+        AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+        {
+            var logLevel = e.IsTerminating ? LogLevel.Critical : LogLevel.Error;
+            var senderName = s.GetType().Name;
+
+            if (e.ExceptionObject is not Exception ex)
+            {
+                logger.Log(logLevel, "Unhandled exception in {SenderName}: {Object}", senderName, e.ExceptionObject.ToString());
+            }
+            else
+            {
+                logger.Log(logLevel, ex, "Unhandled exception in {SenderName}", senderName);
+            }
+        };
+
+        server = IoC.Get<ModbusServerService>();
 
         switch (settingsLoadException)
         {
             case FileNotFoundException:
-                logger.LogWarning($"{Settings.SettingsFileName} does not exist. Created a default file.");
+                logger.LogWarning("{FileName} does not exist. Created a default file.", Settings.SettingsFileName);
                 break;
 
             case not null:
-                logger.LogCritical($"{Settings.SettingsFileName} could not be loaded. Must exit.");
+                logger.LogCritical("{FileName} could not be loaded. Must exit.", Settings.SettingsFileName);
                 Environment.ExitCode = settingsLoadException.HResult;
                 return settingsLoadException.HResult;
         }
@@ -91,6 +126,9 @@ internal partial class Program
         {
             return 1;
         }
+
+        var tracker = IoC.Get<SettingsChangeTracker>();
+        tracker.SettingsChanged += (_, _) => _ = settings.SaveAsync();
 
         if (args is [var arg0, ..])
         {
@@ -108,14 +146,11 @@ internal partial class Program
             return 2;
         }
 
-        logger.LogInformation($"Starting server on {settings.ServerIpAddress}:{settings.ServerPort}");
-        await server.StartAsync(new IPEndPoint(IPAddress.Parse(settings.ServerIpAddress), settings.ServerPort)).ConfigureAwait(true);
+        await server.StartAsync().ConfigureAwait(false);
         var fritzBoxDataCollector = IoC.Get<FritzBoxDataCollector>();
-        await fritzBoxDataCollector.StartAsync().ConfigureAwait(true);
-
-        while (true)
-        {
-            await Task.Delay(5000).ConfigureAwait(true);
-        }
+        await fritzBoxDataCollector.StartAsync().ConfigureAwait(false);
+        await IoC.Get<SunSpecClientService>().StartAsync().ConfigureAwait(false);
+        await Task.Delay(-1).ConfigureAwait(false);
+        return 0;
     }
 }
