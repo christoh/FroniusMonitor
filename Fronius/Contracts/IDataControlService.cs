@@ -10,5 +10,6 @@ namespace De.Hochstaetter.Fronius.Contracts
         public ValueTask AddOrUpdateAsync(IEnumerable<IHaveUniqueId> entities, CancellationToken token = default);
         public void AddOrUpdate(IHaveUniqueId entity);
         public ValueTask RemoveAsync(IEnumerable<string> entities, CancellationToken token = default);
+        public void Remove(string id);
     }
 }

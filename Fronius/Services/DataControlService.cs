@@ -2,16 +2,9 @@
 
 namespace De.Hochstaetter.Fronius.Services;
 
-public class DataControlService : IDataControlService
+public class DataControlService(ILogger<DataControlService> logger) : IDataControlService
 {
-    private readonly ILogger<DataControlService> logger;
-
     public event EventHandler<DeviceUpdateEventArgs>? DeviceUpdate;
-
-    public DataControlService(ILogger<DataControlService> logger)
-    {
-        this.logger = logger;
-    }
 
     private ConcurrentDictionary<string, object> Entities { get; } = new();
 
@@ -29,7 +22,7 @@ public class DataControlService : IDataControlService
         }
         else
         {
-            logger.LogDebug("Updating device {Device}", displayName);
+            logger.LogTrace("Updating device {Device}", displayName);
         }
 
         DeviceUpdate?.Invoke(this, new DeviceUpdateEventArgs(id, entity, isNew ? DeviceAction.Add : DeviceAction.Change));

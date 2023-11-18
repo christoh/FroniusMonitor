@@ -97,7 +97,7 @@ public partial class MainWindow
         }
 
         view.Show();
-        return view;
+        return view ?? throw new NullReferenceException("No view");
     }
 
     private void ZoomIn()

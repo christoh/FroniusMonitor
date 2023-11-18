@@ -2,29 +2,16 @@
 
 namespace De.Hochstaetter.Fronius.Services.Modbus;
 
-[SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
-public class ModbusServerService : IHomeAutomationRunner
+public class ModbusServerService
+(
+    SettingsChangeTracker tracker,
+    ILogger<ModbusServerService> logger,
+    IDataControlService dataControlService,
+    IOptionsMonitor<ModbusServerServiceParameters> options
+) : IHomeAutomationRunner
 {
-    private readonly ILogger<ModbusServerService> logger;
-    private readonly IDataControlService dataControlService;
-    private readonly IOptionsMonitor<ModbusServerServiceParameters> options;
-    private readonly SettingsChangeTracker tracker;
     private ModbusTcpServer? server;
     private ushort maxAddress;
-
-    public ModbusServerService
-    (
-        SettingsChangeTracker tracker,
-        ILogger<ModbusServerService> logger,
-        IDataControlService dataControlService,
-        IOptionsMonitor<ModbusServerServiceParameters> options
-    )
-    {
-        this.logger = logger;
-        this.dataControlService = dataControlService;
-        this.options = options;
-        this.tracker = tracker;
-    }
 
     private ModbusServerServiceParameters Parameters => options.CurrentValue ?? throw new ArgumentNullException(nameof(options), @$"{nameof(options)} are not configured");
 

@@ -1,10 +1,10 @@
 ﻿namespace De.Hochstaetter.Fronius.Services;
 
-public class DataCollectionService : BindableBase, IDataCollectionService
+public class DataCollectionService(SettingsBase settings, IGen24Service gen24Service, IFritzBoxService fritzBoxService,
+        IWattPilotService wattPilotService, IToshibaHvacService hvacService, SynchronizationContext context)
+    : BindableBase, IDataCollectionService
 {
     private static readonly TimeSpan webRequestTimeOut = TimeSpan.FromSeconds(100000);
-    private readonly IWattPilotService wattPilotService;
-    private readonly SettingsBase settings;
     private Timer? timer;
     private DateTime lastConfigUpdate = DateTime.UnixEpoch;
     private int updateSemaphore;
@@ -14,29 +14,12 @@ public class DataCollectionService : BindableBase, IDataCollectionService
 
     public event EventHandler<SolarDataEventArgs>? NewDataReceived;
 
-    public DataCollectionService(SettingsBase settings, IGen24Service gen24Service, IFritzBoxService fritzBoxService,
-        IWattPilotService wattPilotService, IToshibaHvacService acService, SynchronizationContext context)
-    {
-        Gen24Service = gen24Service;
-        FritzBoxService = fritzBoxService;
-        this.wattPilotService = wattPilotService;
-        this.settings = settings;
-        HvacService = acService;
-        SwitchableDevices = new BindableCollection<ISwitchable>(context);
-        Container2 = IoC.Injector!.CreateScope().ServiceProvider;
-
-        if (settings.HaveTwoInverters)
-        {
-            Gen24Service2 = Container2.GetRequiredService<IGen24Service>();
-        }
-    }
-
-    public IGen24Service Gen24Service { get; }
-    public IFritzBoxService FritzBoxService { get; }
+    public IGen24Service Gen24Service => gen24Service;
+    public IFritzBoxService FritzBoxService => fritzBoxService;
 
     public IServiceProvider Container => IoC.Injector!;
 
-    public IServiceProvider Container2 { get; }
+    public IServiceProvider Container2 { get; } = IoC.Injector!.CreateScope().ServiceProvider;
 
     private IGen24Service? gen24Service2;
 
@@ -46,9 +29,9 @@ public class DataCollectionService : BindableBase, IDataCollectionService
         set => Set(ref gen24Service2, value);
     }
 
-    public BindableCollection<ISwitchable> SwitchableDevices { get; }
+    public BindableCollection<ISwitchable> SwitchableDevices { get; } = new(context);
 
-    public IToshibaHvacService HvacService { get; }
+    public IToshibaHvacService HvacService => hvacService;
 
     private HomeAutomationSystem? homeAutomationSystem;
 
@@ -161,6 +144,11 @@ public class DataCollectionService : BindableBase, IDataCollectionService
     [SuppressMessage("ReSharper", "ParameterHidesMember")]
     public async Task Start(WebConnection? gen24WebConnection, WebConnection? gen24WebConnection2, WebConnection? fritzBoxConnection, WebConnection? wattPilotConnection)
     {
+        if (settings.HaveTwoInverters)
+        {
+            Gen24Service2 = Container2.GetRequiredService<IGen24Service>();
+        }
+        
         Stop();
         WattPilotConnection = wattPilotConnection;
         using var tokenSource = new CancellationTokenSource(webRequestTimeOut);

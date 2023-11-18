@@ -96,12 +96,12 @@ public partial class App
         IoC.Get<MainWindow>().Show();
     }
 
-    private static void OnPowerModeChanged(object sender, PowerModeChangedEventArgs e)
+    private static async void OnPowerModeChanged(object sender, PowerModeChangedEventArgs e)
     {
         switch (e.Mode)
         {
             case PowerModes.Resume:
-                IoC.Get<IDataCollectionService>().HvacService.Stop();
+                await IoC.Get<IDataCollectionService>().HvacService.Stop().ConfigureAwait(false);
                 break;
         }
     }

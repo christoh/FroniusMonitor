@@ -1,22 +1,12 @@
 ﻿namespace FroniusPhone.ViewModels;
 
-public class OverviewViewModel : ViewModelBase
+public class OverviewViewModel(IDataCollectionService dataCollectionService, Settings settings) : ViewModelBase
 {
-    public OverviewViewModel(IDataCollectionService dataCollectionService, Settings settings)
-    {
-        this.dataCollectionService = dataCollectionService;
-        this.settings = settings;
-    }
-
-    private IDataCollectionService dataCollectionService;
-
     public IDataCollectionService DataCollectionService
     {
         get => dataCollectionService;
         set => Set(ref dataCollectionService, value);
     }
-
-    private Settings settings;
 
     public Settings Settings
     {

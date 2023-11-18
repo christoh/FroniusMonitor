@@ -29,7 +29,7 @@ internal partial class Program
 
         try
         {
-            settings = await Settings.LoadAsync().ConfigureAwait(true);
+            settings = await Settings.LoadAsync().ConfigureAwait(false);
         }
         catch (FileNotFoundException ex)
         {
@@ -43,7 +43,7 @@ internal partial class Program
             });
 
             settings.ModbusMappings.Add(new ModbusMapping());
-            await settings.SaveAsync().ConfigureAwait(true);
+            await settings.SaveAsync().ConfigureAwait(false);
             settingsLoadException = ex;
         }
         catch (Exception ex)
@@ -83,7 +83,7 @@ internal partial class Program
                 .Configure<SunSpecClientParameters>(s =>
                 {
                     s.ModbusConnections = settings.SunSpecClients;
-                    s.RefreshRate= TimeSpan.FromSeconds(1);
+                    s.RefreshRate= TimeSpan.FromSeconds(10);
                 })
                 ;
         }
@@ -146,14 +146,11 @@ internal partial class Program
             return 2;
         }
 
-        await server.StartAsync().ConfigureAwait(true);
+        await server.StartAsync().ConfigureAwait(false);
         var fritzBoxDataCollector = IoC.Get<FritzBoxDataCollector>();
-        await fritzBoxDataCollector.StartAsync().ConfigureAwait(true);
-        await IoC.Get<SunSpecClientService>().StartAsync().ConfigureAwait(true);
-
-        while (true)
-        {
-            await Task.Delay(TimeSpan.FromMinutes(5)).ConfigureAwait(true);
-        }
+        await fritzBoxDataCollector.StartAsync().ConfigureAwait(false);
+        await IoC.Get<SunSpecClientService>().StartAsync().ConfigureAwait(false);
+        await Task.Delay(-1).ConfigureAwait(false);
+        return 0;
     }
 }

@@ -15,7 +15,7 @@ public interface IGen24Service
     Task<string> GetUiString(string path, CancellationToken token = default);
     Task<string> GetFroniusName<T>(T enumValue, CancellationToken token = default) where T : Enum;
     public Task<string> GetChannelString(string category, CancellationToken token = default);
-    ValueTask<string> GetEventDescription(string code, CancellationToken token = default);
+    Task<string> GetEventDescription(string code, CancellationToken token = default);
     ValueTask<Gen24StandByStatus?> GetInverterStandByStatus(CancellationToken token = default);
     ValueTask RequestInverterStandBy(bool isStandBy, CancellationToken token = default);
 }
