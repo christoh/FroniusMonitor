@@ -1,9 +1,10 @@
 ﻿namespace De.Hochstaetter.Fronius.Services;
 
-public class DataCollectionService(SettingsBase settings, IGen24Service gen24Service, IFritzBoxService fritzBoxService,
-        IWattPilotService wattPilotService, IToshibaHvacService hvacService, SynchronizationContext context)
-    : BindableBase, IDataCollectionService
+public class DataCollectionService : BindableBase, IDataCollectionService
 {
+    private readonly SettingsBase settings;
+    private readonly IWattPilotService wattPilotService;
+
     private static readonly TimeSpan webRequestTimeOut = TimeSpan.FromSeconds(100000);
     private Timer? timer;
     private DateTime lastConfigUpdate = DateTime.UnixEpoch;
@@ -14,12 +15,36 @@ public class DataCollectionService(SettingsBase settings, IGen24Service gen24Ser
 
     public event EventHandler<SolarDataEventArgs>? NewDataReceived;
 
-    public IGen24Service Gen24Service => gen24Service;
-    public IFritzBoxService FritzBoxService => fritzBoxService;
+    public DataCollectionService
+    (
+        SettingsBase settings,
+        IGen24Service gen24Service,
+        IFritzBoxService fritzBoxService,
+        IWattPilotService wattPilotService,
+        IToshibaHvacService hvacService,
+        SynchronizationContext context
+    )
+    {
+        Gen24Service = gen24Service;
+        FritzBoxService = fritzBoxService;
+        Container2 = IoC.Injector!.CreateScope().ServiceProvider;
+        SwitchableDevices = new(context);
+        HvacService = hvacService;
+        this.settings = settings;
+        this.wattPilotService = wattPilotService;
+
+        if (settings.HaveTwoInverters)
+        {
+            Gen24Service2 = Container2.GetRequiredService<IGen24Service>();
+        }
+    }
+
+    public IGen24Service Gen24Service { get; }
+    public IFritzBoxService FritzBoxService { get; }
 
     public IServiceProvider Container => IoC.Injector!;
 
-    public IServiceProvider Container2 { get; } = IoC.Injector!.CreateScope().ServiceProvider;
+    public IServiceProvider Container2 { get; }
 
     private IGen24Service? gen24Service2;
 
@@ -29,9 +54,9 @@ public class DataCollectionService(SettingsBase settings, IGen24Service gen24Ser
         set => Set(ref gen24Service2, value);
     }
 
-    public BindableCollection<ISwitchable> SwitchableDevices { get; } = new(context);
+    public BindableCollection<ISwitchable> SwitchableDevices { get; }
 
-    public IToshibaHvacService HvacService => hvacService;
+    public IToshibaHvacService HvacService { get; }
 
     private HomeAutomationSystem? homeAutomationSystem;
 
@@ -144,11 +169,6 @@ public class DataCollectionService(SettingsBase settings, IGen24Service gen24Ser
     [SuppressMessage("ReSharper", "ParameterHidesMember")]
     public async Task Start(WebConnection? gen24WebConnection, WebConnection? gen24WebConnection2, WebConnection? fritzBoxConnection, WebConnection? wattPilotConnection)
     {
-        if (settings.HaveTwoInverters)
-        {
-            Gen24Service2 = Container2.GetRequiredService<IGen24Service>();
-        }
-        
         Stop();
         WattPilotConnection = wattPilotConnection;
         using var tokenSource = new CancellationTokenSource(webRequestTimeOut);
@@ -280,13 +300,13 @@ public class DataCollectionService(SettingsBase settings, IGen24Service gen24Ser
         var componentsToken = (await webClientService.GetFroniusJsonResponse("components/", token: token).ConfigureAwait(false)).Token;
         var configToken = (await webClientService.GetFroniusJsonResponse("config/", token: token).ConfigureAwait(false)).Token;
 
-#if DEBUG
+        #if DEBUG
         // ReSharper disable UnusedVariable
         var configString = configToken.ToString();
         var versionString = versionsToken.ToString();
         var componentsString = componentsToken.ToString();
         // ReSharper restore UnusedVariable
-#endif
+        #endif
 
         return await Task.Run(() => Gen24Config.Parse(versionsToken, componentsToken, configToken), token).ConfigureAwait(false);
     }

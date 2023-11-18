@@ -1,21 +1,12 @@
 ﻿namespace De.Hochstaetter.Fronius.Services.DataCollectors;
 
-public class FritzBoxDataCollector : IHomeAutomationRunner
+public class FritzBoxDataCollector(ILogger<FritzBoxDataCollector> logger, IDataControlService dataControlService, IOptionsMonitor<FritzBoxDataCollectorParameters> options) : IHomeAutomationRunner
 {
-    private readonly ILogger<FritzBoxDataCollector> logger;
-    private readonly IDataControlService dataControlService;
     private IReadOnlyList<IFritzBoxService> fritzBoxServices = null!;
-    private readonly IOptionsMonitor<FritzBoxDataCollectorParameters> options;
+
     //private IDictionary<string, IPowerConsumer1P>? currentDevices;
     private CancellationTokenSource? tokenSource;
     private Thread? runner;
-
-    public FritzBoxDataCollector(ILogger<FritzBoxDataCollector> logger, IDataControlService dataControlService, IOptionsMonitor<FritzBoxDataCollectorParameters> options)
-    {
-        this.logger = logger;
-        this.dataControlService = dataControlService;
-        this.options = options;
-    }
 
     private FritzBoxDataCollectorParameters DataCollectorParameters => options.CurrentValue;
     private IEnumerable<WebConnection> Connections => DataCollectorParameters.Connections ?? throw new ArgumentNullException(nameof(options), @$"{nameof(options)} are not configured");
@@ -37,25 +28,33 @@ public class FritzBoxDataCollector : IHomeAutomationRunner
         (runner = new(RunLoop)).Start();
     }
 
-    public Task StopAsync(CancellationToken token = default) => Task.Run(() =>
+    public async Task StopAsync(CancellationToken token = default)
     {
-        tokenSource?.Cancel();
-
-        if (runner != null)
+        if (tokenSource != null)
         {
-            logger.LogInformation("Waiting for Fritz!Box thread to stop");
-
-            if (!runner.Join(TimeSpan.FromSeconds(15)))
-            {
-                throw new InvalidOperationException("Unable to gracefully end Fritz!Box thread");
-            }
-
-            runner = null;
+            await tokenSource.CancelAsync().ConfigureAwait(false);
         }
 
+        await Task.Run(() =>
+        {
+            if (runner != null)
+            {
+                logger.LogInformation("Waiting for Fritz!Box thread to stop");
+
+                if (!runner.Join(TimeSpan.FromSeconds(15)))
+                {
+                    throw new InvalidOperationException("Unable to gracefully end Fritz!Box thread");
+                }
+
+                runner = null;
+            }
+        }, token).ConfigureAwait(false);
+        
+        var devices = dataControlService.Entities.Where(e => e.Value is FritzBoxDevice).Select(e => e.Key).ToList();
+        await dataControlService.RemoveAsync(devices, token).ConfigureAwait(false);
         tokenSource?.Dispose();
         tokenSource = null;
-    }, token);
+    }
 
     protected virtual void Dispose(bool isDisposing)
     {

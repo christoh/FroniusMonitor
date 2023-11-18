@@ -11,7 +11,7 @@ public class ModbusServerService
 ) : IHomeAutomationRunner
 {
     private ModbusTcpServer? server;
-    private ushort maxAddress;
+    private ushort maxAddress; //TODO: must be per device
 
     private ModbusServerServiceParameters Parameters => options.CurrentValue ?? throw new ArgumentNullException(nameof(options), @$"{nameof(options)} are not configured");
 

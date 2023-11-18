@@ -3,11 +3,10 @@
 internal partial class Program
 {
     private static ModbusServerService? server;
-
+    
     [GeneratedRegex("^(?<UserName>(?!:).+):(?<Password>(?!:).+)$", RegexOptions.Compiled)]
     private static partial Regex PasswordRegex();
 
-    private static readonly Regex regex = PasswordRegex();
     private static ILogger? logger;
 
 
@@ -132,18 +131,18 @@ internal partial class Program
 
         if (args is [var arg0, ..])
         {
-            var match = regex.Match(arg0);
+            var match = PasswordRegex().Match(arg0);
 
-            if (match.Success)
+            if (!match.Success)
             {
-                var userName = match.Groups["UserName"].Value;
-                var password = match.Groups["Password"].Value;
-                settings.FritzBoxConnections.Where(c => c.UserName == userName).Apply(c => { c.Password = password; });
-                await settings.SaveAsync().ConfigureAwait(false);
-                return 0;
+                return 2;
             }
 
-            return 2;
+            var userName = match.Groups["UserName"].Value;
+            var password = match.Groups["Password"].Value;
+            settings.FritzBoxConnections.Where(c => c.UserName == userName).Apply(c => { c.Password = password; });
+            await settings.SaveAsync().ConfigureAwait(false);
+            return 0;
         }
 
         await server.StartAsync().ConfigureAwait(false);

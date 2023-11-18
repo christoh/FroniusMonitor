@@ -50,7 +50,7 @@ public class SunSpecCommonBlock : SunSpecModelBase
         set => Set(value);
     }
 
-    public override string ToString() => $"{Manufacturer ?? "---"} - {ModelName ?? "---"}";
+    public override string ToString() => $"{Manufacturer ?? "---"} - {ModelName ?? "---"} - {SerialNumber ?? "---"}";
 
     public override IReadOnlyList<ushort> SupportedModels { get; } = new ushort[] { 1, };
 
