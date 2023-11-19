@@ -261,7 +261,7 @@ public class DataCollectionService : BindableBase, IDataCollectionService
                 await UpdateConfigData(result, token).ConfigureAwait(false);
 
                 var task1 = result.Gen24Config?.Components is not null ? Gen24Service.GetFroniusData(result.Gen24Config.Components, token) : Task.FromResult<Gen24Sensors?>(null)!;
-                var task2 = result.Gen24Config2?.Components is not null ? Gen24Service.GetFroniusData(result.Gen24Config2.Components, token) : Task.FromResult<Gen24Sensors?>(null)!;
+                var task2 = result.Gen24Config2?.Components is not null && Gen24Service2 is not null ? Gen24Service2.GetFroniusData(result.Gen24Config2.Components, token) : Task.FromResult<Gen24Sensors?>(null)!;
 
                 await Task.WhenAll(task1, task2).ConfigureAwait(false);
 

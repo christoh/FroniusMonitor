@@ -1,9 +1,10 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Gen24
 {
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    public class Gen24Restrictions:Gen24DeviceBase
+    public class Gen24Restrictions : Gen24DeviceBase
     {
         private double? maxStorageChargeFromGridPower;
+
         [FroniusProprietaryImport("BAT_MODE_POWERRESTRICTION_CHARGE_FROM_AC_U16")]
         public double? MaxStorageChargeFromGridPower
         {
@@ -12,6 +13,7 @@
         }
 
         private double maxStateOfCharge;
+
         [FroniusProprietaryImport("BAT_PERCENT_POWERRESTRICTION_SOC_MAX_F64", Unit.Percent)]
         public double MaxStateOfCharge
         {
@@ -20,6 +22,7 @@
         }
 
         private double minStateOfCharge;
+
         [FroniusProprietaryImport("BAT_PERCENT_POWERRESTRICTION_SOC_MIN_F64", Unit.Percent)]
         public double MinStateOfCharge
         {
@@ -28,6 +31,7 @@
         }
 
         private double? storageLimitDischarge;
+
         [FroniusProprietaryImport("DCLINK_POWERACTIVE_LIMIT_DISCHARGE_F64")]
         public double? StorageLimitDischarge
         {
@@ -36,6 +40,7 @@
         }
 
         private double? storageLimitCharge;
+
         [FroniusProprietaryImport("DCLINK_POWERACTIVE_MAX_F32")]
         public double? StorageLimitCharge
         {

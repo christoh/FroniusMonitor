@@ -55,12 +55,15 @@ internal partial class Program
         serviceCollection
             .AddOptions()
             .AddTransient<IFritzBoxService, FritzBoxService>()
+            .AddTransient<IGen24Service, Gen24Service>()
+            .AddSingleton<IGen24JsonService, Gen24JsonService>()
             .AddSingleton<IAesKeyProvider, AesKeyProvider>()
-            .AddSingleton<FritzBoxDataCollector>()
             .AddSingleton<ModbusServerService>()
             .AddSingleton<SettingsChangeTracker>()
             .AddSingleton<IDataControlService, DataControlService>()
-            .AddSingleton<SunSpecClientService>()
+            .AddSingleton<SunSpecDataCollector>()
+            .AddSingleton<FritzBoxDataCollector>()
+            .AddSingleton<Gen24DataCollector>()
             .AddTransient<ISunSpecClient, SunSpecClient>()
             .AddLogging(builder => builder.AddSerilog())
             ;
@@ -83,6 +86,12 @@ internal partial class Program
                 {
                     s.ModbusConnections = settings.SunSpecClients;
                     s.RefreshRate= TimeSpan.FromSeconds(10);
+                })
+                .Configure<Gen24DataCollectorParameters>(g =>
+                {
+                    g.Connections=settings.Gen24Connections;
+                    g.RefreshRate= TimeSpan.FromSeconds(30);
+                    g.ConfigRefreshRate=TimeSpan.FromMinutes(5);
                 })
                 ;
         }
@@ -148,7 +157,8 @@ internal partial class Program
         await server.StartAsync().ConfigureAwait(false);
         var fritzBoxDataCollector = IoC.Get<FritzBoxDataCollector>();
         await fritzBoxDataCollector.StartAsync().ConfigureAwait(false);
-        await IoC.Get<SunSpecClientService>().StartAsync().ConfigureAwait(false);
+        //await IoC.Get<SunSpecDataCollector>().StartAsync().ConfigureAwait(false);
+        await IoC.Get<Gen24DataCollector>().StartAsync().ConfigureAwait(false);
         await Task.Delay(-1).ConfigureAwait(false);
         return 0;
     }

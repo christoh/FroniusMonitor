@@ -1,11 +1,11 @@
-﻿namespace De.Hochstaetter.Fronius.Services.Modbus;
+﻿namespace De.Hochstaetter.Fronius.Services.DataCollectors;
 
-public sealed class SunSpecClientService
+public sealed class SunSpecDataCollector
 (
-    ILogger<SunSpecClientService> logger,
+    ILogger<SunSpecDataCollector> logger,
     IDataControlService dataControlService,
     IOptionsMonitor<SunSpecClientParameters> options
-) : IHomeAutomationRunner
+) : IHomeAutomationRunner, IAsyncDisposable
 {
     private CancellationTokenSource? tokenSource;
 
@@ -16,6 +16,18 @@ public sealed class SunSpecClientService
         try
         {
             StopAsync().GetAwaiter().GetResult();
+        }
+        catch
+        {
+            logger.LogError("Could not stop {ServiceName}", GetType().Name);
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            await StopAsync().ConfigureAwait(false);
         }
         catch
         {
@@ -42,14 +54,14 @@ public sealed class SunSpecClientService
                 logger.LogError(ex, "Could not connect to {ModbusConnection}", connection);
             }
 
-            _ = UpdateDevice(connection, client, tokenSource.Token);
+            _ = UpdateDevice(connection, client);
         }
     }
 
     public async Task StopAsync(CancellationToken token = default)
     {
         logger.LogInformation("Stopping {ServiceName}", GetType().Name);
-        
+
         if (tokenSource != null)
         {
             await tokenSource.CancelAsync().ConfigureAwait(false);
@@ -60,8 +72,13 @@ public sealed class SunSpecClientService
         tokenSource = null;
     }
 
-    private async Task UpdateDevice(ModbusConnection connection, ISunSpecClient client, CancellationToken token)
+    private async Task UpdateDevice(ModbusConnection connection, ISunSpecClient client)
     {
+        if (tokenSource == null)
+        {
+            return;
+        }
+        
         try
         {
             var start = DateTime.UtcNow;
@@ -69,7 +86,7 @@ public sealed class SunSpecClientService
 
             try
             {
-                group = await client.GetDataAsync(token).ConfigureAwait(false);
+                group = await client.GetDataAsync(tokenSource.Token).ConfigureAwait(false);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
@@ -78,7 +95,7 @@ public sealed class SunSpecClientService
 
                 try
                 {
-                    token.ThrowIfCancellationRequested();
+                    tokenSource.Token.ThrowIfCancellationRequested();
                     await client.ConnectAsync(connection.HostName, connection.Port, connection.ModbusAddress, TimeSpan.FromSeconds(1.5));
                 }
                 catch (Exception ex2)
@@ -89,20 +106,20 @@ public sealed class SunSpecClientService
                 return;
             }
 
-            if (group.Select(g => g.ModelNumber).Any(modelNumber => modelNumber is (>= 101 and <= 104) or (>= 111 and <= 114)))
+            if (group.Select(g => g.ModelNumber).Any(modelNumber => modelNumber is >= 101 and <= 104 or >= 111 and <= 114))
             {
                 dataControlService.AddOrUpdate(connection.DisplayName, new SunSpecInverter(group));
             }
 
-            if (group.Select(g => g.ModelNumber).Any(modelNumber => modelNumber is (>= 201 and <= 204) or (>= 211 and <= 214)))
+            if (group.Select(g => g.ModelNumber).Any(modelNumber => modelNumber is >= 201 and <= 204 or >= 211 and <= 214))
             {
                 dataControlService.AddOrUpdate(connection.DisplayName, new SunSpecMeter(group));
             }
 
             var executionTime = (DateTime.UtcNow - start).TotalMilliseconds;
             var waitTime = Math.Max(0, Parameters.RefreshRate.TotalMilliseconds - executionTime);
-            await Task.Delay((int)waitTime, token).ConfigureAwait(false);
-            _ = UpdateDevice(connection, client, token);
+            await Task.Delay((int)waitTime, tokenSource.Token).ConfigureAwait(false);
+            _ = UpdateDevice(connection, client);
         }
         catch (OperationCanceledException)
         {

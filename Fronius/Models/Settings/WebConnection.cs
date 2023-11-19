@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Settings;
 
-public class WebConnection : BindableBase, ICloneable
+public class WebConnection : BindableBase, ICloneable, IHaveDisplayName
 {
     public static Aes Aes;
 
@@ -12,6 +12,8 @@ public class WebConnection : BindableBase, ICloneable
         Aes.Padding = PaddingMode.PKCS7;
         Aes.Key = IoC.Injector == null ? new byte[16] : IoC.Get<IAesKeyProvider>().GetAesKey();
     }
+
+    public string DisplayName => BaseUrl;
 
     private string baseUrl = "";
 
@@ -80,7 +82,6 @@ public class WebConnection : BindableBase, ICloneable
         }
     }
 
-
     private string? calculatedChecksum;
 
     [XmlIgnore]
@@ -97,6 +98,8 @@ public class WebConnection : BindableBase, ICloneable
             }
         }
     }
+
+    public override string ToString() => DisplayName;
 
     public object Clone() => MemberwiseClone();
 }
