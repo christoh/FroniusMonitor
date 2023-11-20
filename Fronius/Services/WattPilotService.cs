@@ -267,7 +267,10 @@ public class WattPilotService : BindableBase, IWattPilotService
 
     public async ValueTask Stop()
     {
-        tokenSource?.Cancel();
+        if (tokenSource != null)
+        {
+            await tokenSource.CancelAsync().ConfigureAwait(false);
+        }
 
         while (Connection != null)
         {

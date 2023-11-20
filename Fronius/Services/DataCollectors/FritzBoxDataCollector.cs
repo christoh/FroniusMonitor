@@ -1,15 +1,14 @@
-﻿namespace De.Hochstaetter.Fronius.Services.DataCollectors;
+﻿using Microsoft.Extensions.Logging;
+
+namespace De.Hochstaetter.Fronius.Services.DataCollectors;
 
 public class FritzBoxDataCollector(ILogger<FritzBoxDataCollector> logger, IDataControlService dataControlService, IOptionsMonitor<FritzBoxDataCollectorParameters> options) : IHomeAutomationRunner
 {
-    private IReadOnlyList<IFritzBoxService> fritzBoxServices = null!;
-
-    //private IDictionary<string, IPowerConsumer1P>? currentDevices;
     private CancellationTokenSource? tokenSource;
-    private Thread? runner;
 
-    private FritzBoxDataCollectorParameters DataCollectorParameters => options.CurrentValue;
-    private IEnumerable<WebConnection> Connections => DataCollectorParameters.Connections ?? throw new ArgumentNullException(nameof(options), @$"{nameof(options)} are not configured");
+    private FritzBoxDataCollectorParameters Parameters => options.CurrentValue;
+    private IEnumerable<WebConnection> Connections => Parameters.Connections ?? throw new ArgumentNullException(nameof(options), @$"{nameof(options)} are not configured");
+    private readonly ConcurrentDictionary<WebConnection, Task> runningTasks = new();
 
 
     public async Task StartAsync(CancellationToken token = default)
@@ -17,15 +16,13 @@ public class FritzBoxDataCollector(ILogger<FritzBoxDataCollector> logger, IDataC
         await StopAsync(token).ConfigureAwait(false);
         tokenSource = new CancellationTokenSource();
 
-        fritzBoxServices = Connections.Select(c =>
+        foreach (var connection in Connections)
         {
-            var result = IoC.Get<IFritzBoxService>();
-            result.Connection = c;
-            logger.LogInformation("Adding Fritz!Box at {Url} with user name {UserName}", c.BaseUrl, c.UserName);
-            return result;
-        }).ToArray();
-
-        (runner = new(RunLoop)).Start();
+            var service = IoC.Get<IFritzBoxService>();
+            service.Connection = connection;
+            logger.LogInformation("Adding Fritz!Box at {Url} with user name {UserName}", connection.BaseUrl, connection.UserName);
+            runningTasks[connection] = Update(service);
+        }
     }
 
     public async Task StopAsync(CancellationToken token = default)
@@ -33,23 +30,10 @@ public class FritzBoxDataCollector(ILogger<FritzBoxDataCollector> logger, IDataC
         if (tokenSource != null)
         {
             await tokenSource.CancelAsync().ConfigureAwait(false);
+            await Task.Delay(TimeSpan.FromSeconds(0.2), token).ConfigureAwait(false);
+            await Task.WhenAll(runningTasks.Values).ConfigureAwait(false);
         }
 
-        await Task.Run(() =>
-        {
-            if (runner != null)
-            {
-                logger.LogInformation("Waiting for Fritz!Box thread to stop");
-
-                if (!runner.Join(TimeSpan.FromSeconds(15)))
-                {
-                    throw new InvalidOperationException("Unable to gracefully end Fritz!Box thread");
-                }
-
-                runner = null;
-            }
-        }, token).ConfigureAwait(false);
-        
         var devices = dataControlService.Entities.Where(e => e.Value is FritzBoxDevice).Select(e => e.Key).ToList();
         await dataControlService.RemoveAsync(devices, token).ConfigureAwait(false);
         tokenSource?.Dispose();
@@ -77,72 +61,42 @@ public class FritzBoxDataCollector(ILogger<FritzBoxDataCollector> logger, IDataC
         GC.SuppressFinalize(this);
     }
 
-    private async void RunLoop()
+    private async Task Update(IFritzBoxService service)
     {
-        var token = tokenSource!.Token;
+        var startTime = DateTime.UtcNow;
 
-        while (true)
+        if (tokenSource == null)
+        {
+            return;
+        }
+
+        try
         {
             try
             {
-                using var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
-                linkedTokenSource.CancelAfter(TimeSpan.FromSeconds(10));
+                var allFritzBoxDevices = (await service.GetFritzBoxDevices(tokenSource.Token).ConfigureAwait(false)).Devices.Cast<IPowerMeter1P>().ToList();
 
-                // ReSharper disable once AccessToDisposedClosure
-                IReadOnlyList<(WebConnection Connection, Task<FritzBoxDeviceList> Task)> connectionTasks =
-                    fritzBoxServices.Select(service => (service.Connection!, service.GetFritzBoxDevices(linkedTokenSource.Token))).ToArray();
-
-                var tasks = connectionTasks.Select(c => c.Task).ToArray();
-
-                try
-                {
-                    await Task.WhenAll(tasks).ConfigureAwait(true);
-                }
-                catch (OperationCanceledException)
-                {
-                    connectionTasks.Where(ct => ct.Task.IsCanceled).Apply(ct => logger.LogWarning("No response from Fritz!Box at {Url}", ct.Connection.BaseUrl));
-                    token.ThrowIfCancellationRequested();
-                }
-
-                tasks
-                    .Where(t => t is { IsFaulted: true, Exception: not null })
-                    .SelectMany(t => t.Exception!.InnerExceptions)
-                    .Apply(ex => logger.LogError(ex, "{Exception}", ex.Message));
-
-                var allFritzBoxDevices = tasks
-                    .Where(t => t.IsCompletedSuccessfully)
-                    .SelectMany(t => t.Result.Devices)
-                    .Cast<IPowerConsumer1P>()
-                    .ToList();
-
-                var presentFritzBoxDevices = allFritzBoxDevices
-                    .Where(p => p is { IsPresent: true })
-                    .ToDictionary(f => f.Id);
+                var presentFritzBoxDevices = allFritzBoxDevices.Where(p => p is { IsPresent: true });
 
                 allFritzBoxDevices
                     .Where(p => p is { IsPresent: false })
                     .Apply(p => logger.LogDebug("No DECT connection to {DisplayName} ({SerialNumber})", p.DisplayName, p.SerialNumber));
 
-                //if (currentDevices != null)
-                //{
-                //    var devicesToDelete = currentDevices.Keys.Where(k => !presentFritzBoxDevices.ContainsKey(k));
-                //    await dataControlService.RemoveAsync(devicesToDelete, token).ConfigureAwait(true);
-                //}
-
-                //currentDevices = presentFritzBoxDevices;
-                await dataControlService.AddOrUpdateAsync(presentFritzBoxDevices.Values, token).ConfigureAwait(true);
+                await dataControlService.AddOrUpdateAsync(presentFritzBoxDevices, tokenSource.Token).ConfigureAwait(false);
+                logger.LogDebug("FritzBox {WebConnection} updated in {Duration:N0} ms", service.Connection, (DateTime.UtcNow - startTime).Milliseconds);
             }
-            catch (OperationCanceledException)
-            {
-                logger.LogInformation("The Fritz!Box thread has ended");
-                break;
-            }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 logger.LogError(ex, "{Exception}", ex.Message);
             }
 
-            await Task.Delay(DataCollectorParameters.RefreshRate, token).ConfigureAwait(true);
+            var duration = (DateTime.UtcNow - startTime);
+            await Task.Delay(Math.Max(0, (int)(Parameters.RefreshRate - duration).TotalMilliseconds), tokenSource.Token).ConfigureAwait(false);
+            runningTasks[service.Connection!] = Update(service);
+        }
+        catch (OperationCanceledException)
+        {
+            logger.LogInformation("Stopped Fritz!Box {WebConnection}", service.Connection);
         }
     }
 }

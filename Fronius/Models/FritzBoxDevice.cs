@@ -67,7 +67,7 @@ public class FritzBoxDevice : BindableBase, IPowerConsumer1P
         get => functionMask;
         set => Set(ref functionMask, value, () => NotifyOfPropertyChange(nameof(Features)));
     }
-
+    
     [XmlIgnore]
     public FritzBoxFeatures Features
     {
@@ -209,7 +209,7 @@ public class FritzBoxDevice : BindableBase, IPowerConsumer1P
     double? IDimmable.Level => LevelControl?.Level;
 
     bool IHsvColorControl.HasHsvColorControl => (Features & FritzBoxFeatures.ColoredLight) != FritzBoxFeatures.None
-                                                && Color is { SupportedModes: { } }
+                                                && Color is { SupportedModes: not null }
                                                 && (Color.SupportedModes.Value & FritzBoxColorMode.Hsv) != FritzBoxColorMode.None;
 
     bool IHsvColorControl.IsHsvEnabled => !wasSwitched && IsPresentAndUnlocked && ((IHsvColorControl)this).HasHsvColorControl;

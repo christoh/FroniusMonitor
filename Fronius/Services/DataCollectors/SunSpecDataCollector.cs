@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.Fronius.Services.DataCollectors;
+﻿using System;
+
+namespace De.Hochstaetter.Fronius.Services.DataCollectors;
 
 public sealed class SunSpecDataCollector
 (
@@ -108,12 +110,15 @@ public sealed class SunSpecDataCollector
 
             if (group.Select(g => g.ModelNumber).Any(modelNumber => modelNumber is >= 101 and <= 104 or >= 111 and <= 114))
             {
-                dataControlService.AddOrUpdate(connection.DisplayName, new SunSpecInverter(group));
+                var inverter = new SunSpecInverter(group);
+                dataControlService.AddOrUpdate(connection.DisplayName, inverter);
+                logger.LogDebug("{DeviceType} {DeviceName} updated in {Duration:N0} ms", nameof(SunSpecInverter), inverter, (DateTime.UtcNow-start).TotalMilliseconds);
             }
-
-            if (group.Select(g => g.ModelNumber).Any(modelNumber => modelNumber is >= 201 and <= 204 or >= 211 and <= 214))
+            else if (group.Select(g => g.ModelNumber).Any(modelNumber => modelNumber is >= 201 and <= 204 or >= 211 and <= 214))
             {
-                dataControlService.AddOrUpdate(connection.DisplayName, new SunSpecMeter(group));
+                var meter=new SunSpecMeter(group);
+                dataControlService.AddOrUpdate(connection.DisplayName, meter);
+                logger.LogDebug("{DeviceType} {DeviceName} updated in {Duration:N0} ms", nameof(SunSpecMeter), meter, (DateTime.UtcNow - start).TotalMilliseconds);
             }
 
             var executionTime = (DateTime.UtcNow - start).TotalMilliseconds;

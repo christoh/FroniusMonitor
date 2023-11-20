@@ -74,7 +74,7 @@ internal partial class Program
                 .Configure<FritzBoxDataCollectorParameters>(f =>
                 {
                     f.Connections = settings.FritzBoxConnections;
-                    f.RefreshRate = TimeSpan.FromSeconds(30);
+                    f.RefreshRate = TimeSpan.FromSeconds(15);
                 })
                 .Configure<ModbusServerServiceParameters>(m =>
                 {
@@ -91,7 +91,7 @@ internal partial class Program
                 {
                     g.Connections=settings.Gen24Connections;
                     g.RefreshRate= TimeSpan.FromSeconds(30);
-                    g.ConfigRefreshRate=TimeSpan.FromMinutes(5);
+                    g.ConfigRefreshRate=TimeSpan.FromMinutes(10.1);
                 })
                 ;
         }
@@ -159,6 +159,10 @@ internal partial class Program
         await fritzBoxDataCollector.StartAsync().ConfigureAwait(false);
         //await IoC.Get<SunSpecDataCollector>().StartAsync().ConfigureAwait(false);
         await IoC.Get<Gen24DataCollector>().StartAsync().ConfigureAwait(false);
+        //await Task.Delay(TimeSpan.FromSeconds(30));
+        //await IoC.Get<SunSpecDataCollector>().StopAsync().ConfigureAwait(false);
+        //await IoC.Get<Gen24DataCollector>().StopAsync().ConfigureAwait(false);
+        //await fritzBoxDataCollector.StopAsync().ConfigureAwait(false);
         await Task.Delay(-1).ConfigureAwait(false);
         return 0;
     }

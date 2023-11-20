@@ -7,6 +7,8 @@ public sealed class Gen24DataCollector
     IDataControlService dataControlService
 ) : IHomeAutomationRunner
 {
+    private readonly ConcurrentDictionary<WebConnection, Task> runningSensorTasks = new(), runningConfigTasks = new();
+
     private CancellationTokenSource? tokenSource;
     private Gen24DataCollectorParameters Parameters => options.CurrentValue;
     private IEnumerable<WebConnection> Connections => Parameters.Connections ?? throw new ArgumentNullException(nameof(options), @$"{nameof(options)} are not configured");
@@ -36,8 +38,8 @@ public sealed class Gen24DataCollector
             var gen24System = new Gen24System { Service = gen24Service };
             var semaphore = new SemaphoreSlim(1, 1);
             logger.LogInformation("Adding Gen24 inverter {WebConnection}", connection);
-            _ = UpdateConfig(gen24System, semaphore);
-            _ = Update(gen24System, semaphore);
+            runningSensorTasks[connection] = Update(gen24System, semaphore);
+            runningConfigTasks[connection] = UpdateConfig(gen24System, semaphore);
         }
     }
 
@@ -46,7 +48,8 @@ public sealed class Gen24DataCollector
         if (tokenSource != null)
         {
             await tokenSource.CancelAsync().ConfigureAwait(false);
-            await Task.Delay(TimeSpan.FromSeconds(2), token);
+            await Task.Delay(TimeSpan.FromSeconds(0.2), token).ConfigureAwait(false);
+            await Task.WhenAll(runningConfigTasks.Values.Concat(runningSensorTasks.Values)).ConfigureAwait(false);
         }
 
         tokenSource = null;
@@ -84,6 +87,7 @@ public sealed class Gen24DataCollector
                     {
                         gen24System.Sensors = await gen24System.Service.GetFroniusData(gen24System.Config.Components, tokenSource.Token).ConfigureAwait(false);
                         dataControlService.AddOrUpdate(gen24System.Service.Connection!.DisplayName, gen24System);
+                        logger.LogDebug("{Entity} sensors updated in {Duration:N0} ms", gen24System.DisplayName, (DateTime.UtcNow - start).TotalMilliseconds);
                     }
                 }
                 catch (Exception ex) when (ex is not OperationCanceledException)
@@ -93,19 +97,16 @@ public sealed class Gen24DataCollector
             }
             finally
             {
-                if (!tokenSource.IsCancellationRequested)
-                {
-                    var duration = DateTime.UtcNow - start;
-                    var waitTime = Math.Max(0, (Parameters.RefreshRate - duration).TotalMilliseconds);
-                    await Task.Delay((int)(waitTime), tokenSource.Token).ConfigureAwait(false);
-                    _ = Update(gen24System, semaphore);
-                }
+                var duration = DateTime.UtcNow - start;
+                var waitTime = Math.Max(0, (Parameters.RefreshRate - duration).TotalMilliseconds);
+                await Task.Delay((int)(waitTime), tokenSource.Token).ConfigureAwait(false);
+                runningSensorTasks[gen24System.Service.Connection!] = Update(gen24System, semaphore);
             }
         }
         catch (OperationCanceledException)
         {
             dataControlService.Remove(gen24System.Service.Connection!.DisplayName);
-            logger.LogInformation("Updating {ModbusConnection} stopped", gen24System.Service.Connection);
+            logger.LogInformation("Updating {WebConnection} sensors stopped", gen24System.Service.Connection);
             semaphore.Dispose();
         }
     }
@@ -119,7 +120,8 @@ public sealed class Gen24DataCollector
 
         try
         {
-            await Task.Delay(Parameters.ConfigRefreshRate, tokenSource.Token).ConfigureAwait(false);
+            await Task.Delay(Parameters.ConfigRefreshRate / 2, tokenSource.Token).ConfigureAwait(false);
+            var startTime = DateTime.UtcNow;
 
             try
             {
@@ -128,6 +130,7 @@ public sealed class Gen24DataCollector
                 if (gen24System.Config != null)
                 {
                     dataControlService.AddOrUpdate(gen24System.Service.Connection!.DisplayName, gen24System);
+                    logger.LogDebug("{Entity} config updated in {Duration:N0} ms", gen24System.DisplayName, (DateTime.UtcNow-startTime).TotalMilliseconds);
                 }
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
@@ -138,11 +141,15 @@ public sealed class Gen24DataCollector
 
             if (!tokenSource.IsCancellationRequested)
             {
-                _ = UpdateConfig(gen24System, semaphore);
+                var duration = DateTime.UtcNow - startTime;
+                var waitTime = (int)Math.Max(0, (Parameters.ConfigRefreshRate / 2 - duration).TotalMilliseconds);
+                await Task.Delay(waitTime, tokenSource.Token).ConfigureAwait(false);
+                runningConfigTasks[gen24System.Service.Connection!] = UpdateConfig(gen24System, semaphore);
             }
         }
         catch (OperationCanceledException)
         {
+            logger.LogInformation("Updating {WebConnection} config stopped", gen24System.Service.Connection);
         }
     }
 
