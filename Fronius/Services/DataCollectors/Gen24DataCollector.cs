@@ -5,7 +5,7 @@ public sealed class Gen24DataCollector
     ILogger<Gen24DataCollector> logger,
     IOptionsMonitor<Gen24DataCollectorParameters> options,
     IDataControlService dataControlService
-) : IHomeAutomationRunner
+) : IHomeAutomationRunner, IAsyncDisposable
 {
     private readonly ConcurrentDictionary<WebConnection, Task> runningSensorTasks = new(), runningConfigTasks = new();
 
@@ -19,6 +19,18 @@ public sealed class Gen24DataCollector
         try
         {
             StopAsync().GetAwaiter().GetResult();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Could not properly stop {ServiceName}", GetType().Name);
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            await StopAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -153,7 +165,7 @@ public sealed class Gen24DataCollector
         }
     }
 
-    private async Task<Gen24Config?> ReadGen24Config(Gen24System gen24System, SemaphoreSlim semaphore, CancellationToken token)
+    private static async Task<Gen24Config?> ReadGen24Config(Gen24System gen24System, SemaphoreSlim semaphore, CancellationToken token)
     {
         if (!await semaphore.WaitAsync(TimeSpan.FromSeconds(7), token).ConfigureAwait(false))
         {

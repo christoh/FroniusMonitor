@@ -1,8 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
+﻿namespace De.Hochstaetter.Fronius.Services.DataCollectors;
 
-namespace De.Hochstaetter.Fronius.Services.DataCollectors;
-
-public class FritzBoxDataCollector(ILogger<FritzBoxDataCollector> logger, IDataControlService dataControlService, IOptionsMonitor<FritzBoxDataCollectorParameters> options) : IHomeAutomationRunner
+public sealed class FritzBoxDataCollector
+(
+    ILogger<FritzBoxDataCollector> logger,
+    IDataControlService dataControlService,
+    IOptionsMonitor<FritzBoxDataCollectorParameters> options
+) : IHomeAutomationRunner, IAsyncDisposable
 {
     private CancellationTokenSource? tokenSource;
 
@@ -40,25 +43,28 @@ public class FritzBoxDataCollector(ILogger<FritzBoxDataCollector> logger, IDataC
         tokenSource = null;
     }
 
-    protected virtual void Dispose(bool isDisposing)
+    public async ValueTask DisposeAsync()
     {
-        if (isDisposing)
+        try
         {
-            try
-            {
-                StopAsync().ConfigureAwait(false).GetAwaiter().GetResult();
-            }
-            catch (Exception ex)
-            {
-                logger.LogCritical(ex, "Fritz!Box thread did not stop correctly");
-            }
+            await StopAsync().ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            logger.LogCritical(ex, "Fritz!Box thread did not stop correctly");
         }
     }
 
     public void Dispose()
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
+        try
+        {
+            StopAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+        catch (Exception ex)
+        {
+            logger.LogCritical(ex, "Fritz!Box thread did not stop correctly");
+        }
     }
 
     private async Task Update(IFritzBoxService service)
@@ -90,7 +96,7 @@ public class FritzBoxDataCollector(ILogger<FritzBoxDataCollector> logger, IDataC
                 logger.LogError(ex, "{Exception}", ex.Message);
             }
 
-            var duration = (DateTime.UtcNow - startTime);
+            var duration = DateTime.UtcNow - startTime;
             await Task.Delay(Math.Max(0, (int)(Parameters.RefreshRate - duration).TotalMilliseconds), tokenSource.Token).ConfigureAwait(false);
             runningTasks[service.Connection!] = Update(service);
         }
