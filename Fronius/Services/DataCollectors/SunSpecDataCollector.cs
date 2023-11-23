@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace De.Hochstaetter.Fronius.Services.DataCollectors;
+﻿namespace De.Hochstaetter.Fronius.Services.DataCollectors;
 
 public sealed class SunSpecDataCollector
 (
@@ -80,7 +78,7 @@ public sealed class SunSpecDataCollector
         {
             return;
         }
-        
+
         try
         {
             var start = DateTime.UtcNow;
@@ -108,17 +106,25 @@ public sealed class SunSpecDataCollector
                 return;
             }
 
+            SunSpecGroupBase? device = null;
+
             if (group.Select(g => g.ModelNumber).Any(modelNumber => modelNumber is >= 101 and <= 104 or >= 111 and <= 114))
             {
-                var inverter = new SunSpecInverter(group);
-                dataControlService.AddOrUpdate(connection.DisplayName, inverter);
-                logger.LogDebug("{DeviceType} {DeviceName} updated in {Duration:N0} ms", nameof(SunSpecInverter), inverter, (DateTime.UtcNow-start).TotalMilliseconds);
+                device = new SunSpecInverter(group);
             }
             else if (group.Select(g => g.ModelNumber).Any(modelNumber => modelNumber is >= 201 and <= 204 or >= 211 and <= 214))
             {
-                var meter=new SunSpecMeter(group);
-                dataControlService.AddOrUpdate(connection.DisplayName, meter);
-                logger.LogDebug("{DeviceType} {DeviceName} updated in {Duration:N0} ms", nameof(SunSpecMeter), meter, (DateTime.UtcNow - start).TotalMilliseconds);
+                device = new SunSpecMeter(group);
+            }
+            else
+            {
+                logger.LogWarning("Unknown device type received");
+            }
+
+            if (device != null)
+            {
+                dataControlService.AddOrUpdate(connection.DisplayName, device);
+                logger.LogDebug("{DeviceType} {DeviceName} updated in {Duration:N0} ms", nameof(SunSpecInverter), device, (DateTime.UtcNow - start).TotalMilliseconds);
             }
 
             var executionTime = (DateTime.UtcNow - start).TotalMilliseconds;
