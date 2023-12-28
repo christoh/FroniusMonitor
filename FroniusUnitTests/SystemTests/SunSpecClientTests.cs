@@ -1,5 +1,7 @@
 ﻿namespace FroniusUnitTests.SystemTests;
 
+using Assert = NUnit.Framework.Legacy.ClassicAssert;
+
 [TestFixture]
 public class SunSpecClientTests
 {
@@ -28,14 +30,14 @@ public class SunSpecClientTests
         var inverter = new SunSpecInverter(await client.GetDataAsync().ConfigureAwait(false));
 
         Assert.AreEqual("Fronius", inverter.Manufacturer);
-        Assert.LessOrEqual(inverter.InverterBaseSensors?.PowerFactorTotal, 1);
-        Assert.GreaterOrEqual(inverter.InverterBaseSensors?.PowerFactorTotal, -1);
+        Assert.LessOrEqual(inverter.InverterBaseSensors?.PowerFactorTotal??0, 1);
+        Assert.GreaterOrEqual(inverter.InverterBaseSensors?.PowerFactorTotal ?? 0, -1);
         Assert.AreEqual((ushort)0xffff, inverter.BasicSettings?.ConnectedPhaseI);
         Assert.IsNull(inverter.NamePlate?.AmpereHoursCapacity);
         Assert.AreEqual(4, inverter.Tracker?.NumberOfTrackers);
-        Assert.GreaterOrEqual(inverter.ExtendedSensors?.IsolationResistance, 100000);
+        Assert.GreaterOrEqual(inverter.ExtendedSensors?.IsolationResistance ?? 0, 100000);
         Assert.AreEqual(SunSpecOnOff.Disabled, inverter.ExtendedSettings?.ActivePowerLimitEnabled);
-        Assert.LessOrEqual(inverter.ExtendedSettings?.RelativeActivePowerLimit, 1);
+        Assert.LessOrEqual(inverter.ExtendedSettings?.RelativeActivePowerLimit ?? 0, 1);
 
         if (inverter.StorageSettings == null)
         {

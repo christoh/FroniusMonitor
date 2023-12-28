@@ -7,9 +7,9 @@ public partial class App
 {
     public const double ZoomFactor = 1.025;
     private static readonly Mutex mutex = new(true, $"{Environment.UserName}_HomeAutomationControlCenter");
-    public static bool HaveSettings = true;
+    public static bool HaveSettings { get; set; } = true;
     public static readonly IServiceCollection ServiceCollection = new ServiceCollection();
-    public static Timer? SolarSystemQueryTimer;
+    public static Timer? SolarSystemQueryTimer {get; set; }
 
     static App()
     {
@@ -29,6 +29,7 @@ public partial class App
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        var context = SynchronizationContext.Current ?? throw new InvalidOperationException($"No {nameof(SynchronizationContext)} in {nameof(OnStartup)}");
 
         DispatcherUnhandledException += OnUnhandledException;
 
@@ -54,7 +55,7 @@ public partial class App
         var injector = ServiceCollection
             .AddScoped<IGen24Service, Gen24Service>()
             .AddSingleton<IFritzBoxService, FritzBoxService>()
-            .AddSingleton(SynchronizationContext.Current!)
+            .AddSingleton(context)
             .AddSingleton<IDataCollectionService, DataCollectionService>()
             .AddSingleton<MainWindow>()
             .AddSingleton<MainViewModel>()

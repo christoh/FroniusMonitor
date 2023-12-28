@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using De.Hochstaetter.Fronius.Extensions;
+using Assert = NUnit.Framework.Legacy.ClassicAssert;
 
 namespace FroniusUnitTests.UnitTests;
 

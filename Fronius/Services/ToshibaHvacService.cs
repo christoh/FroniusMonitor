@@ -69,8 +69,11 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
 
     public async ValueTask Stop()
     {
-        tokenSource?.Cancel();
-        tokenSource = null;
+        if (tokenSource != null)
+        {
+            await tokenSource.CancelAsync();
+            tokenSource = null;
+        }
 
         if (azureClient != null)
         {
