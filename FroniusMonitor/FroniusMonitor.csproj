@@ -1,156 +1,157 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows7.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <EnableWindowsTargeting>true</EnableWindowsTargeting>
-    <UseWPF>true</UseWPF>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Configuration>Release</Configuration>	  
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <RootNamespace>De.Hochstaetter.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-    <ApplicationIcon>Assets\Images\sun.ico</ApplicationIcon>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows7.0</TargetFramework>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<Nullable>enable</Nullable>
+		<EnableWindowsTargeting>true</EnableWindowsTargeting>
+		<UseWPF>true</UseWPF>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Configuration>Release</Configuration>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<RootNamespace>De.Hochstaetter.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+		<ApplicationIcon>Assets\Images\sun.ico</ApplicationIcon>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <NoWarn>1701;1702;IDE0079</NoWarn>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<NoWarn>1701;1702;IDE0079</NoWarn>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <NoWarn>1701;1702;IDE0079</NoWarn>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<NoWarn>1701;1702;IDE0079</NoWarn>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Properties\**" />
-    <EmbeddedResource Remove="Properties\**" />
-    <None Remove="Properties\**" />
-    <Page Remove="Properties\**" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Remove="Properties\**" />
+		<EmbeddedResource Remove="Properties\**" />
+		<None Remove="Properties\**" />
+		<Page Remove="Properties\**" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Page Remove="SolarPanels\Sample solar panel layout.xaml" />
-  </ItemGroup>
+	<ItemGroup>
+		<Page Remove="SolarPanels\Sample solar panel layout.xaml" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Content Include="SolarPanels\Sample solar panel layout.xaml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+	<ItemGroup>
+		<Content Include="SolarPanels\Sample solar panel layout.xaml">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Fronius\Fronius.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Fronius\Fronius.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Resource Include="Assets\Fonts\D7MONO.ttf">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Assets\Fonts\DOTMATRI.TTF">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Assets\Fonts\DOTMBold.TTF">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Assets\Fonts\EHSMB.TTF">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
-  </ItemGroup>
+	<ItemGroup>
+		<Resource Include="Assets\Fonts\D7MONO.ttf">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\Fonts\DOTMATRI.TTF">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\Fonts\DOTMBold.TTF">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\Fonts\EHSMB.TTF">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Assets\Images\ChargingTrafficSignSettings.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Assets\Images\Car.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Assets\Images\FritzLogo.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Assets\Images\EnergyFlow.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Assets\Images\HomeWithBatteryIcon.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Assets\Images\Chevron.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Assets\Images\EventLogIcon.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Assets\Images\ChargingTrafficSign.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Assets\Images\SettingsImportIcon.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Assets\Images\SettingsExportIcon.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Assets\Images\ModbusLogo.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Assets\Images\TemperatureInside.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Update="Assets\Images\ChargingTrafficSignSettings.xaml.cs">
+			<SubType>Code</SubType>
+		</Compile>
+		<Compile Update="Assets\Images\Car.xaml.cs">
+			<SubType>Code</SubType>
+		</Compile>
+		<Compile Update="Assets\Images\FritzLogo.xaml.cs">
+			<SubType>Code</SubType>
+		</Compile>
+		<Compile Update="Assets\Images\EnergyFlow.xaml.cs">
+			<SubType>Code</SubType>
+		</Compile>
+		<Compile Update="Assets\Images\HomeWithBatteryIcon.xaml.cs">
+			<SubType>Code</SubType>
+		</Compile>
+		<Compile Update="Assets\Images\Chevron.xaml.cs">
+			<SubType>Code</SubType>
+		</Compile>
+		<Compile Update="Assets\Images\EventLogIcon.xaml.cs">
+			<SubType>Code</SubType>
+		</Compile>
+		<Compile Update="Assets\Images\ChargingTrafficSign.xaml.cs">
+			<SubType>Code</SubType>
+		</Compile>
+		<Compile Update="Assets\Images\SettingsImportIcon.xaml.cs">
+			<SubType>Code</SubType>
+		</Compile>
+		<Compile Update="Assets\Images\SettingsExportIcon.xaml.cs">
+			<SubType>Code</SubType>
+		</Compile>
+		<Compile Update="Assets\Images\ModbusLogo.xaml.cs">
+			<SubType>Code</SubType>
+		</Compile>
+		<Compile Update="Assets\Images\TemperatureInside.xaml.cs">
+			<SubType>Code</SubType>
+		</Compile>
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Update="Assets\Images\EQC.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Update="Assets\Images\EQC.png">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Page Update="Assets\Images\ChargingTrafficSignSettings.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Assets\Images\Car.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Assets\Images\FritzLogo.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Assets\Images\EnergyFlow.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Assets\Images\HomeWithBatteryIcon.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Assets\Images\Chevron.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Assets\Images\EventLogIcon.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Assets\Images\ChargingTrafficSign.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Assets\Images\SettingsImportIcon.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Assets\Images\SettingsExportIcon.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Assets\Images\ModbusLogo.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-  </ItemGroup>
+	<ItemGroup>
+		<Page Update="Assets\Images\ChargingTrafficSignSettings.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Assets\Images\Car.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Assets\Images\FritzLogo.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Assets\Images\EnergyFlow.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Assets\Images\HomeWithBatteryIcon.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Assets\Images\Chevron.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Assets\Images\EventLogIcon.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Assets\Images\ChargingTrafficSign.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Assets\Images\SettingsImportIcon.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Assets\Images\SettingsExportIcon.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Assets\Images\ModbusLogo.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+	</ItemGroup>
 
 </Project>
