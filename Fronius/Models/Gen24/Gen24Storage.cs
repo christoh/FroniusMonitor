@@ -1,7 +1,7 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Gen24;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
-public class Gen24Storage:Gen24DeviceBase
+public class Gen24Storage : Gen24DeviceBase
 {
     private double? current;
 
@@ -9,7 +9,7 @@ public class Gen24Storage:Gen24DeviceBase
     public double? Current
     {
         get => current;
-        set => Set(ref current, value,()=>NotifyOfPropertyChange(nameof(Power)));
+        set => Set(ref current, value, () => NotifyOfPropertyChange(nameof(Power)));
     }
 
     private double? currentInternal;
@@ -42,7 +42,7 @@ public class Gen24Storage:Gen24DeviceBase
     public double? LifeTimeDischarged
     {
         get => lifeTimeDischarged;
-        set => Set(ref lifeTimeDischarged, value,()=>NotifyOfPropertyChange(nameof(Efficiency)));
+        set => Set(ref lifeTimeDischarged, value, () => NotifyOfPropertyChange(nameof(Efficiency)));
     }
 
     private double? maxCapacity;
