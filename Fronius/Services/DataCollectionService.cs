@@ -282,10 +282,8 @@ public class DataCollectionService : BindableBase, IDataCollectionService
         var task1 = GetConfigToken(Gen24Service, token);
         var task2 = GetConfigToken(Gen24Service2, token);
 
-        await Task.WhenAll(task1, task2).ConfigureAwait(false);
-
-        result.Gen24Config = task1.Result;
-        result.Gen24Config2 = task2.Result;
+        result.Gen24Config = await task1.ConfigureAwait(false);
+        result.Gen24Config2 = await task2.ConfigureAwait(false);
         lastConfigUpdate = DateTime.UtcNow;
     }
 

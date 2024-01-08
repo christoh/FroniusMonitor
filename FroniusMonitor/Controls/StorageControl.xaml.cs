@@ -24,6 +24,17 @@ public partial class StorageControl
         set => SetValue(Gen24SensorsProperty, value);
     }
 
+    public static readonly DependencyProperty HomeAutomationSystemProperty = DependencyProperty.Register
+    (
+        nameof(HomeAutomationSystem), typeof(HomeAutomationSystem), typeof(StorageControl)
+    );
+
+    public HomeAutomationSystem HomeAutomationSystem
+    {
+        get => (HomeAutomationSystem)GetValue(HomeAutomationSystemProperty);
+        set => SetValue(HomeAutomationSystemProperty, value);
+    }
+
     public StorageControl()
     {
         InitializeComponent();

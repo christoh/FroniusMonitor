@@ -1,20 +1,17 @@
 ﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
-public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
+public class SelfConsumptionOptimizationViewModel(
+    IGen24Service gen24Service,
+    IGen24JsonService gen24JsonService,
+    IFritzBoxService fritzBoxService,
+    IWattPilotService wattPilotService,
+    IDataCollectionService dataCollectionService)
+    : SettingsViewModelBase(dataCollectionService, gen24Service, gen24JsonService, fritzBoxService, wattPilotService)
 {
     private static readonly IEnumerable<ChargingRuleType> ruleTypes = Enum.GetValues<ChargingRuleType>();
 
     private Gen24BatterySettings oldSettings = null!;
     private BindableCollection<Gen24ChargingRule> oldChargingRules = null!;
-
-    public SelfConsumptionOptimizationViewModel
-    (
-        IGen24Service gen24Service,
-        IGen24JsonService gen24JsonService,
-        IFritzBoxService fritzBoxService,
-        IWattPilotService wattPilotService,
-        IDataCollectionService dataCollectionService
-    ) : base(dataCollectionService, gen24Service, gen24JsonService, fritzBoxService, wattPilotService) { }
 
     public IEnumerable<ChargingRuleType> RuleTypes => ruleTypes;
 
@@ -195,7 +192,7 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
                 ShowBox(Loc.UtcBug, Loc.Warning, MessageBoxButton.OK, MessageBoxImage.Warning);
                 IsInUpdate = true;
             }
-            
+
             oldChargingRules = Gen24ChargingRule.Parse(configToken["timeofuse"], Ctx);
             Undo();
         }
@@ -348,6 +345,12 @@ public class SelfConsumptionOptimizationViewModel : SettingsViewModelBase
             }
 
             oldSettings = Settings;
+
+            if (Gen24Service == DataCollectionService.Gen24Service && DataCollectionService.HomeAutomationSystem?.Gen24Config != null)
+            {
+                DataCollectionService.HomeAutomationSystem.Gen24Config.BatterySettings = oldSettings;
+            }
+
             oldChargingRules = ChargingRules;
             Undo();
             ToastText = Loc.SettingsSavedToInverter;

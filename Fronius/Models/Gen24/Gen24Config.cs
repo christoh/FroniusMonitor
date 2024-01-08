@@ -1,4 +1,5 @@
 ﻿using De.Hochstaetter.Fronius.Models.Gen24.Settings;
+using De.Hochstaetter.Fronius.Services;
 
 namespace De.Hochstaetter.Fronius.Models.Gen24;
 
@@ -28,6 +29,14 @@ public class Gen24Config : BindableBase, ICloneable
         set => Set(ref inverterSettings, value);
     }
 
+    private Gen24BatterySettings? batterySettings;
+
+    public Gen24BatterySettings? BatterySettings
+    {
+        get => batterySettings;
+        set => Set(ref batterySettings, value);
+    }
+
     private double? maxAcPower;
 
     public double? MaxAcPower
@@ -44,6 +53,7 @@ public class Gen24Config : BindableBase, ICloneable
             Components = Gen24Components.Parse(componentsToken),
             InverterSettings = Gen24InverterSettings.Parse(configToken),
             MaxAcPower = configToken["setup"]?["powerunit"]?["system"]?.Value<double>("DEVICE_POWERACTIVE_NOMINAL_F32"),
+            BatterySettings = Gen24BatterySettings.Parse(configToken?["batteries"]?["batteries"]),
         };
 
         return gen24Config;

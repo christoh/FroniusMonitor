@@ -7,7 +7,7 @@ public class HomeAutomationSystem : BindableBase
     public Gen24Sensors? Gen24Sensors
     {
         get => gen24Sensors;
-        set => Set(ref gen24Sensors, value);
+        set => Set(ref gen24Sensors, value, () => NotifyOfPropertyChange(nameof(StorageNetCapacity)));
     }
 
     private Gen24Sensors? gen24Sensors2;
@@ -23,7 +23,7 @@ public class HomeAutomationSystem : BindableBase
     public Gen24Config? Gen24Config
     {
         get => gen24Config;
-        set => Set(ref gen24Config, value);
+        set => Set(ref gen24Config, value, () => NotifyOfPropertyChange(nameof(StorageNetCapacity)));
     }
 
     private Gen24Config? gen24Config2;
@@ -57,5 +57,7 @@ public class HomeAutomationSystem : BindableBase
         get => wattPilot;
         set => Set(ref wattPilot, value);
     }
+
+    public double? StorageNetCapacity => Gen24Sensors?.Storage?.MaxCapacity * (Gen24Sensors?.Storage?.StateOfCharge - (Gen24Sensors?.Restrictions?.MinStateOfCharge ?? (Math.Max(Gen24Config?.BatterySettings?.BackupReserve ?? 0, Gen24Config?.BatterySettings?.SocMin ?? 0) / 100d)));
 }
 

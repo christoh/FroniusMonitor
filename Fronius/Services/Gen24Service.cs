@@ -60,10 +60,14 @@ public class Gen24Service(IGen24JsonService gen24JsonService) : BindableBase, IG
             gen24Sensors.Storage.GroupId = uint.Parse(storages.FirstOrDefault() ?? "16580608");
         }
 
-        var restrictions = components.Groups["Application"]
-            .Select(key => dataToken[key])
-            .FirstOrDefault(t => t?["attributes"]?["PowerRestrictionControllerVersion"] != null);
-        gen24Sensors.Restrictions = gen24JsonService.ReadFroniusData<Gen24Restrictions>(restrictions);
+        if (components.Groups.TryGetValue("Application", out var applications))
+        {
+            var restrictions = applications
+                .Select(key => dataToken[key])
+                .FirstOrDefault(t => t?["attributes"]?["PowerRestrictionControllerVersion"] != null);
+
+            gen24Sensors.Restrictions = gen24JsonService.ReadFroniusData<Gen24Restrictions>(restrictions);
+        }
 
         if (components.Groups.TryGetValue("PowerMeter", out var powerMeters))
         {

@@ -13,7 +13,7 @@ public enum OptimizationMode
 }
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
-public class Gen24BatterySettings : BindableBase, ICloneable
+public class Gen24BatterySettings : Gen24ParsingBase
 {
     private bool? isEnabled;
 
@@ -158,5 +158,7 @@ public class Gen24BatterySettings : BindableBase, ICloneable
         set => Set(ref isInServiceMode, value);
     }
 
-    public object Clone() => MemberwiseClone();
+    public static Gen24BatterySettings Parse(JToken? token) => Gen24JsonService.ReadFroniusData<Gen24BatterySettings>(token);
+
+    public override object Clone() => MemberwiseClone();
 }
