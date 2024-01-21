@@ -345,13 +345,17 @@ public class SelfConsumptionOptimizationViewModel(
             }
 
             oldSettings = Settings;
+            oldChargingRules = ChargingRules;
 
             if (Gen24Service == DataCollectionService.Gen24Service && DataCollectionService.HomeAutomationSystem?.Gen24Config != null)
             {
                 DataCollectionService.HomeAutomationSystem.Gen24Config.BatterySettings = oldSettings;
             }
+            else if (Gen24Service == DataCollectionService.Gen24Service2 && DataCollectionService.HomeAutomationSystem?.Gen24Config2 != null)
+            {
+                DataCollectionService.HomeAutomationSystem.Gen24Config2.BatterySettings = oldSettings;
+            }
 
-            oldChargingRules = ChargingRules;
             Undo();
             ToastText = Loc.SettingsSavedToInverter;
         }

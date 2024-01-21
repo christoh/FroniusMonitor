@@ -299,9 +299,18 @@
                     return;
                 }
 
-                var success = await UpdateInverter("config/powerlimits", limitsToken).ConfigureAwait(false);
-
+                await UpdateInverter("config/powerlimits", limitsToken).ConfigureAwait(false);
                 oldSettings = Settings;
+
+                if (Gen24Service == DataCollectionService.Gen24Service && DataCollectionService.HomeAutomationSystem?.Gen24Config != null)
+                {
+                    DataCollectionService.HomeAutomationSystem.Gen24Config.InverterSettings = Settings;
+                }
+                else if (Gen24Service == DataCollectionService.Gen24Service2 && DataCollectionService.HomeAutomationSystem?.Gen24Config2 != null)
+                {
+                    DataCollectionService.HomeAutomationSystem.Gen24Config2.InverterSettings = Settings;
+                }
+
                 Undo();
                 ToastText = Loc.SettingsSavedToInverter;
                 return;
