@@ -1,14 +1,15 @@
 ﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels
 {
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    public class InverterSettingsViewModel : SettingsViewModelBase
+    public class InverterSettingsViewModel(
+        IDataCollectionService dataCollectionService,
+        IGen24Service gen24Service,
+        IGen24JsonService gen24JsonService,
+        IFritzBoxService fritzBoxService,
+        IWattPilotService wattPilotService)
+        : SettingsViewModelBase(dataCollectionService, gen24Service, gen24JsonService, fritzBoxService, wattPilotService)
     {
         private Gen24InverterSettings oldSettings = null!;
-
-        public InverterSettingsViewModel(IDataCollectionService dataCollectionService, IGen24Service gen24Service,
-                IGen24JsonService gen24JsonService, IFritzBoxService fritzBoxService, IWattPilotService wattPilotService)
-            : base(dataCollectionService, gen24Service, gen24JsonService, fritzBoxService, wattPilotService)
-        { }
 
         private ICommand? undoCommand;
         public ICommand UndoCommand => undoCommand ??= new NoParameterCommand(Undo);

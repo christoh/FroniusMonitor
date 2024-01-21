@@ -1,19 +1,22 @@
 ﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
-public class SelfConsumptionOptimizationViewModel(
+public class SelfConsumptionOptimizationViewModel
+(
     IGen24Service gen24Service,
     IGen24JsonService gen24JsonService,
     IFritzBoxService fritzBoxService,
     IWattPilotService wattPilotService,
-    IDataCollectionService dataCollectionService)
-    : SettingsViewModelBase(dataCollectionService, gen24Service, gen24JsonService, fritzBoxService, wattPilotService)
+    IDataCollectionService dataCollectionService
+) : SettingsViewModelBase(dataCollectionService, gen24Service, gen24JsonService, fritzBoxService, wattPilotService)
 {
     private static readonly IEnumerable<ChargingRuleType> ruleTypes = Enum.GetValues<ChargingRuleType>();
 
     private Gen24BatterySettings oldSettings = null!;
     private BindableCollection<Gen24ChargingRule> oldChargingRules = null!;
 
+#pragma warning disable CA1822 // Mark members as static
     public IEnumerable<ChargingRuleType> RuleTypes => ruleTypes;
+#pragma warning restore CA1822 // Mark members as static
 
     private Gen24BatterySettings settings = null!;
 
@@ -179,14 +182,14 @@ public class SelfConsumptionOptimizationViewModel(
                 Title = $"{Loc.EnergyFlow} - {inverterSettings.SystemName}";
             }
 
-            if (!softwareVersions.ContainsKey("DEVICEGROUP"))
+            if (!softwareVersions.TryGetValue("DEVICEGROUP", out var value))
             {
                 ShowBox(Loc.NoGen24Symo, Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error);
                 Close();
                 return;
             }
 
-            if (softwareVersions["DEVICEGROUP"] == new Version(1, 19, 7, 1))
+            if (value == new Version(1, 19, 7, 1))
             {
                 IsInUpdate = false;
                 ShowBox(Loc.UtcBug, Loc.Warning, MessageBoxButton.OK, MessageBoxImage.Warning);

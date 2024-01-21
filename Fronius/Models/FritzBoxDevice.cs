@@ -1,6 +1,7 @@
 ﻿namespace De.Hochstaetter.Fronius.Models;
 
 [Flags]
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
 public enum FritzBoxFeatures : uint
 {
     None = 0,

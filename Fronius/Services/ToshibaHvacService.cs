@@ -10,10 +10,8 @@ using Microsoft.Azure.Devices.Client.Exceptions;
 
 namespace De.Hochstaetter.Fronius.Services;
 
-public class ToshibaHvacService : BindableBase, IToshibaHvacService
+public class ToshibaHvacService(SynchronizationContext context) : BindableBase, IToshibaHvacService
 {
-    private readonly SynchronizationContext context;
-
     private string? azureDeviceId;
     private AzureConnection? azureConnection;
 
@@ -40,11 +38,6 @@ public class ToshibaHvacService : BindableBase, IToshibaHvacService
         #if DEBUG
         jsonOptions.WriteIndented = true;
         #endif
-    }
-
-    public ToshibaHvacService(SynchronizationContext context)
-    {
-        this.context = context;
     }
 
     private CancellationToken Token => tokenSource?.Token ?? throw new WebException("Connection closed", WebExceptionStatus.ConnectionClosed);
