@@ -1,14 +1,7 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Charging;
 
-public class WattPilotPhaseMap: IHaveDisplayName
+public class WattPilotPhaseMap(byte l1Map, byte l2Map, byte l3Map) : IHaveDisplayName
 {
-    public WattPilotPhaseMap(byte l1Map, byte l2Map, byte l3Map)
-    {
-        L1Map = l1Map;
-        L2Map = l2Map;
-        L3Map = l3Map;
-    }
-
     public static IReadOnlyList<WattPilotPhaseMap> All => new[]
     {
         new WattPilotPhaseMap(1,2,3),
@@ -22,9 +15,9 @@ public class WattPilotPhaseMap: IHaveDisplayName
         new WattPilotPhaseMap(0,0,1),
     };
 
-    public byte L1Map { get; }
-    public byte L2Map { get; }
-    public byte L3Map { get; }
+    public byte L1Map { get; } = l1Map;
+    public byte L2Map { get; } = l2Map;
+    public byte L3Map { get; } = l3Map;
     public string DisplayName => ToString();
 
     public override string ToString() => $"{ToString(L1Map)} / {ToString(L2Map)} / {ToString(L3Map)}";

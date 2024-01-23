@@ -37,6 +37,14 @@ public enum WifiScanStatus
     Failed=3,
 }
 
+public enum WifiState
+{
+    None=0,
+    Scanning=1,
+    Connecting=2,
+    Connected=3,
+}
+
 public enum CableLockBehavior
 {
     Normal = 0,

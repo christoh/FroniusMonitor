@@ -171,6 +171,14 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref wifiScanStatus, value);
     }
 
+    private WifiState wifiState;
+    [WattPilot("wsms")]
+    public WifiState WifiState
+    {
+        get => wifiState;
+        set => Set(ref wifiState, value);
+    }
+
     private List<WattPilotWifiInfo>? scannedWifis;
     [WattPilot("scan")]
     public List<WattPilotWifiInfo>? ScannedWifis
@@ -1041,6 +1049,22 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     {
         get => disableProtectiveEarth;
         set => Set(ref disableProtectiveEarth, value);
+    }
+
+    private bool? loadBalancingEnabled;
+    [WattPilot("loe", false)]
+    public bool? LoadBalancingEnabled
+    {
+        get => loadBalancingEnabled;
+        set => Set(ref loadBalancingEnabled, value);
+    }
+
+    private WattPilotLoadBalancingCurrents? loadBalancingCurrents;
+    [WattPilot("lot",false, typeof(WattPilotLoadBalancingCurrents))]
+    public WattPilotLoadBalancingCurrents? LoadBalancingCurrents
+    {
+        get => loadBalancingCurrents;
+        set => Set(ref loadBalancingCurrents, value);
     }
 
     public string? CableLockBehaviorDisplayName => CableLockBehavior?.ToDisplayName();

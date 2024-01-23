@@ -173,8 +173,8 @@ public class WattPilotService : BindableBase, IWattPilotService
                 oldWattPilot != null &&
                 (
                     ReferenceEquals(oldValue, newValue) ||
-                    (oldValue is not null && oldValue.Equals(newValue)) ||
-                    (newValue is not null && newValue.Equals(oldValue)) ||
+                    oldValue is not null && oldValue.Equals(newValue) ||
+                    newValue is not null && newValue.Equals(oldValue) ||
                     propertyInfo.GetCustomAttribute<WattPilotAttribute>()!.IsReadOnly
                 )
             )
@@ -225,9 +225,9 @@ public class WattPilotService : BindableBase, IWattPilotService
 
         var authMessage = new JObject
         {
-            {"type", "auth"},
-            {"token3", token3},
-            {"hash", hash},
+            { "type", "auth" },
+            { "token3", token3 },
+            { "hash", hash },
         }.ToString();
 
         if (clientWebSocket == null) throw new WebSocketException(WebSocketError.ConnectionClosedPrematurely);
@@ -320,9 +320,9 @@ public class WattPilotService : BindableBase, IWattPilotService
     public async ValueTask SendValue(WattPilot instance, string propertyName)
     {
         var instanceType = instance.GetType();
-        var propertyInfo = instanceType.GetProperty(propertyName)??throw new ArgumentException(string.Format(Resources.NotAMemberOf, instanceType.Name), propertyName);
-        var attribute = propertyInfo.GetCustomAttribute<WattPilotAttribute>()??throw new ArgumentException(string.Format(Resources.NotAMemberOf, instanceType.Name), propertyName);
-        var key = attribute.TokenName??throw new ArgumentException(string.Format(Resources.NotAMemberOf, instanceType.Name), propertyName);
+        var propertyInfo = instanceType.GetProperty(propertyName) ?? throw new ArgumentException(string.Format(Resources.NotAMemberOf, instanceType.Name), propertyName);
+        var attribute = propertyInfo.GetCustomAttribute<WattPilotAttribute>() ?? throw new ArgumentException(string.Format(Resources.NotAMemberOf, instanceType.Name), propertyName);
+        var key = attribute.TokenName ?? throw new ArgumentException(string.Format(Resources.NotAMemberOf, instanceType.Name), propertyName);
 
         var value = propertyInfo.GetValue(instance);
 
@@ -330,21 +330,24 @@ public class WattPilotService : BindableBase, IWattPilotService
 
         var data = new JObject
         {
-            {"type", "setValue"},
-            {"requestId", id},
-            {"key", key},
+            { "type", "setValue" },
+            { "requestId", id },
+            { "key", key },
             {
                 "value",
-                value == null ? null
-                : value is bool boolValue ? boolValue
-                : value is byte byteValue ? byteValue
-                : value is uint uintValue ? uintValue
-                : value is Enum enumValue ? (int)Convert.ChangeType(enumValue, TypeCode.Int32)
-                : value is int intValue ? intValue
-                : value is string stringValue ? stringValue
-                : value is double doubleValue ? doubleValue
-                : value is float floatValue ? floatValue
-                : throw new NotSupportedException("Unsupported Type")
+                value switch
+                {
+                    null => null,
+                    bool boolValue => boolValue,
+                    byte byteValue => byteValue,
+                    uint uintValue => uintValue,
+                    Enum enumValue => (int)Convert.ChangeType(enumValue, TypeCode.Int32),
+                    int intValue => intValue,
+                    string stringValue => stringValue,
+                    double doubleValue => doubleValue,
+                    float floatValue => floatValue,
+                    _ => throw new NotSupportedException("Unsupported Type")
+                }
             },
         }.ToString();
 
@@ -357,10 +360,10 @@ public class WattPilotService : BindableBase, IWattPilotService
 
                 var message = new JObject
                 {
-                    {"type", "securedMsg"},
-                    {"data", data},
-                    {"requestId", FormattableString.Invariant($"{id}sm")},
-                    {"hmac", hash},
+                    { "type", "securedMsg" },
+                    { "data", data },
+                    { "requestId", FormattableString.Invariant($"{id}sm") },
+                    { "hmac", hash },
                 };
 
                 data = message.ToString();
@@ -385,7 +388,7 @@ public class WattPilotService : BindableBase, IWattPilotService
 
         foreach (var token in jObject)
         {
-            //Debug.Print($"{token.Key}: {token.Value}");
+            Debug.Print($"{token.Key}: {token.Value}");
             IReadOnlyList<PropertyInfo> propertyInfos = instance.GetType().GetProperties().Where(p => p.GetCustomAttributes<WattPilotAttribute>().Any(a => a.TokenName == token.Key)).ToArray();
 
             if (!propertyInfos.Any())
@@ -424,6 +427,7 @@ public class WattPilotService : BindableBase, IWattPilotService
             SetValue<float>() ||
             SetValue<double>() ||
             SetValue<int>() ||
+            SetValue<long>() ||
             SetValue<byte>() ||
             SetValue<string>()
         )
