@@ -250,7 +250,7 @@ public class WattPilotService : BindableBase, IWattPilotService
         }
     }
 
-    private async Task<string> GetHashedPassword()
+    private async ValueTask<string> GetHashedPassword()
     {
         if (hashedPassword == null)
         {
