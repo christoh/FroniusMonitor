@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.Fronius.Services;
+﻿using De.Hochstaetter.Fronius.Models.Events;
+
+namespace De.Hochstaetter.Fronius.Services;
 
 public class WattPilotService : BindableBase, IWattPilotService
 {
@@ -12,6 +14,8 @@ public class WattPilotService : BindableBase, IWattPilotService
     private string? hashedPassword;
     private string? oldEncryptedPassword;
     private WattPilot? savedWattPilot;
+
+    public event EventHandler<NewWattPilotFirmwareEventArgs>? NewFirmwareAvailable;
 
     private CancellationToken Token => tokenSource?.Token ?? throw new WebSocketException(WebSocketError.ConnectionClosedPrematurely);
 
@@ -131,6 +135,17 @@ public class WattPilotService : BindableBase, IWattPilotService
             tokenSource = new CancellationTokenSource();
             readThread = new Thread(Reader);
             readThread.Start();
+
+            if (WattPilot?.Version is not null && WattPilot?.LatestVersion is not null && WattPilot.LatestVersion > WattPilot.Version)
+            {
+                NewFirmwareAvailable?.Invoke(this, new NewWattPilotFirmwareEventArgs
+                (
+                    WattPilot.Version,
+                    WattPilot.LatestVersion,
+                    string.IsNullOrWhiteSpace(WattPilot.DeviceName) ? "WattPilot" : WattPilot.DeviceName,
+                    WattPilot.SerialNumber ?? "0"
+                ));
+            }
         }
         catch
         {
@@ -345,8 +360,8 @@ public class WattPilotService : BindableBase, IWattPilotService
                 value is string stringValue ? stringValue :
                 value is double doubleValue ? doubleValue :
                 value is float floatValue ? floatValue :
-                value is IEnumerable<byte> bytes?JArray.FromObject(bytes.Select(b=>(int)b)):
-                value is IEnumerable<int> integers?JArray.FromObject(integers):
+                value is IEnumerable<byte> bytes ? JArray.FromObject(bytes.Select(b => (int)b)) :
+                value is IEnumerable<int> integers ? JArray.FromObject(integers) :
                 attribute.Type != null && attribute.Type.IsInstanceOfType(value) ? JToken.FromObject(value) :
                 throw new NotSupportedException("Unsupported Type")
             },
@@ -376,7 +391,7 @@ public class WattPilotService : BindableBase, IWattPilotService
 
         lock (outstandingAcknowledges)
         {
-            outstandingAcknowledges.Add(new WattPilotAcknowledge(id,propertyInfo,value));
+            outstandingAcknowledges.Add(new WattPilotAcknowledge(id, propertyInfo, value));
         }
     }
 

@@ -2257,6 +2257,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to New firmware {0} is available. Your current firmware is {1}..
+        /// </summary>
+        public static string NewFirmwareAvailable {
+            get {
+                return ResourceManager.GetString("NewFirmwareAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Minimum energy for next trip.
         /// </summary>
         public static string NextTripEnergyToCharge {

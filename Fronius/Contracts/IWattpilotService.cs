@@ -1,7 +1,10 @@
-﻿namespace De.Hochstaetter.Fronius.Contracts
+﻿using De.Hochstaetter.Fronius.Models.Events;
+
+namespace De.Hochstaetter.Fronius.Contracts
 {
     public interface IWattPilotService
     {
+        public event EventHandler<NewWattPilotFirmwareEventArgs>? NewFirmwareAvailable;
         WebConnection? Connection { get; }
         WattPilot? WattPilot { get; }
         IReadOnlyList<WattPilotAcknowledge> UnsuccessfulWrites { get; }

@@ -1,29 +1,25 @@
 ﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
-public class MainViewModel : ViewModelBase
+public class MainViewModel(IDataCollectionService dataCollectionService, IFritzBoxService fritzBoxService, IWattPilotService wattPilotService) : ViewModelBase
 {
-    private readonly IFritzBoxService fritzBoxService;
+    private bool wattPilotFirmwareUpdateMessageShown;
 
-    public MainViewModel(IDataCollectionService dataCollectionService, IFritzBoxService fritzBoxService, IWattPilotService wattPilotService)
-    {
-        this.fritzBoxService = fritzBoxService;
-        DataCollectionService = dataCollectionService;
-        WattPilotService = wattPilotService;
-        ExportSettingsCommand = new NoParameterCommand(ExportSettings);
-        LoadSettingsCommand = new NoParameterCommand(LoadSettings);
-        DownloadChargeLogCommand = new NoParameterCommand(DownloadChargeLog);
-        RebootWattPilotCommand = new NoParameterCommand(RebootWattPilot);
-    }
+    private ICommand? exportSettingsCommand;
+    public ICommand ExportSettingsCommand => exportSettingsCommand ??= new NoParameterCommand(ExportSettings);
 
-    public ICommand ExportSettingsCommand { get; }
-    public ICommand LoadSettingsCommand { get; }
-    public ICommand DownloadChargeLogCommand { get; }
-    public ICommand RebootWattPilotCommand { get; }
+    private ICommand? loadSettingsCommand;
+    public ICommand LoadSettingsCommand => loadSettingsCommand ??= new NoParameterCommand(LoadSettings);
 
-    public IDataCollectionService DataCollectionService { get; }
+    private ICommand? downloadChargeLogCommand;
+    public ICommand DownloadChargeLogCommand => downloadChargeLogCommand ??= new NoParameterCommand(DownloadChargeLog);
 
-    public IWattPilotService WattPilotService { get; }
-    
+    private ICommand? rebootWattPilotCommand;
+    public ICommand RebootWattPilotCommand => rebootWattPilotCommand ??= new NoParameterCommand(RebootWattPilot);
+
+    public IDataCollectionService DataCollectionService => dataCollectionService;
+
+    public IWattPilotService WattPilotService { get; } = wattPilotService;
+
     public bool IncludeInverterPower
     {
         get => App.Settings.AddInverterPowerToConsumption;
@@ -43,6 +39,22 @@ public class MainViewModel : ViewModelBase
     internal override async Task OnInitialize()
     {
         await base.OnInitialize().ConfigureAwait(false);
+
+        WattPilotService.NewFirmwareAvailable += (_, e) =>
+        {
+            if (!wattPilotFirmwareUpdateMessageShown)
+            {
+                wattPilotFirmwareUpdateMessageShown = true;
+
+                Dispatcher.InvokeAsync(() => MessageBox.Show
+                (
+                    string.Format(Loc.NewFirmwareAvailable, e.NewFirmware, e.CurrentFirmware),
+                    e.Name,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information
+                ), DispatcherPriority.Background);
+            }
+        };
 
         await DataCollectionService.Start
         (

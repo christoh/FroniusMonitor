@@ -1317,4 +1317,7 @@
   <data name="AwattarCountry_FinlandTibber" xml:space="preserve">
 	  <value>Finnland Tibber</value>
   </data>
+  <data name="NewFirmwareAvailable" xml:space="preserve">
+	  <value>Eine neue Firmware {0} ist verfügbar. Deine derzeitige Firmware ist {1}.</value>
+  </data>
 </root>

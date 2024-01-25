@@ -1359,4 +1359,7 @@
   <data name="AwattarCountry_Greece" xml:space="preserve">
 	  <value>Greece</value>
   </data>
+  <data name="NewFirmwareAvailable" xml:space="preserve">
+	  <value>New firmware {0} is available. Your current firmware is {1}.</value>
+  </data>
 </root>
