@@ -80,6 +80,18 @@ public class MinMaxIntRuleExtension : ValidationRuleExtension
     }
 }
 
+public class WattPilotFallbackCurrentRuleExtension : ValidationRuleExtension
+{
+    public string PropertyDisplayName { get; set; } = Resources.DefaultPropertyDisplayName;
+
+    public override ValidationResult Validate(object? value)
+    {
+        return int.TryParse(value?.ToString(), NumberStyles.AllowLeadingSign|NumberStyles.AllowThousands, CultureInfo.CurrentCulture, out var intValue) && intValue is >= 6 and <= 32 or 0
+            ? ValidationResult.ValidResult
+            : StringResult.Create(() => string.Format(Resources.FallbackCurrentError, PropertyDisplayName));
+    }
+}
+
 public class ChargingRuleDateExtension : ValidationRuleExtension
 {
     public override ValidationResult Validate(object? value)

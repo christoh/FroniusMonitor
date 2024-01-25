@@ -925,6 +925,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enable Load Balancing.
+        /// </summary>
+        public static string EnableLoadBalancing {
+            get {
+                return ResourceManager.GetString("EnableLoadBalancing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Enable Modbus slave over TCP.
         /// </summary>
         public static string EnableModbusTcp {
@@ -1038,6 +1047,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string ExportSettings {
             get {
                 return ResourceManager.GetString("ExportSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} must be between 6 and 32 or 0.
+        /// </summary>
+        public static string FallbackCurrentError {
+            get {
+                return ResourceManager.GetString("FallbackCurrentError", resourceCulture);
             }
         }
         
@@ -1465,6 +1483,51 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Load Balancing.
+        /// </summary>
+        public static string LoadBalancing {
+            get {
+                return ResourceManager.GetString("LoadBalancing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to High.
+        /// </summary>
+        public static string LoadBalancingPriority_High {
+            get {
+                return ResourceManager.GetString("LoadBalancingPriority_High", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Low.
+        /// </summary>
+        public static string LoadBalancingPriority_Low {
+            get {
+                return ResourceManager.GetString("LoadBalancingPriority_Low", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Medium.
+        /// </summary>
+        public static string LoadBalancingPriority_Medium {
+            get {
+                return ResourceManager.GetString("LoadBalancingPriority_Medium", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Maximum current for all Wattpilots.
+        /// </summary>
+        public static string LoadBalancingSharedMaxCurrent {
+            get {
+                return ResourceManager.GetString("LoadBalancingSharedMaxCurrent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Load settings.
         /// </summary>
         public static string LoadSettings {
@@ -1533,6 +1596,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string MaximumChargingCurrentPhase1 {
             get {
                 return ResourceManager.GetString("MaximumChargingCurrentPhase1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Maximum current for DNO line.
+        /// </summary>
+        public static string MaximumCurrentDnoLine {
+            get {
+                return ResourceManager.GetString("MaximumCurrentDnoLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Maximum current in case of power or network failure.
+        /// </summary>
+        public static string MaximumFallbackCurrent {
+            get {
+                return ResourceManager.GetString("MaximumFallbackCurrent", resourceCulture);
             }
         }
         
@@ -2406,6 +2487,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string PowerLimit {
             get {
                 return ResourceManager.GetString("PowerLimit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Priority.
+        /// </summary>
+        public static string Priority {
+            get {
+                return ResourceManager.GetString("Priority", resourceCulture);
             }
         }
         

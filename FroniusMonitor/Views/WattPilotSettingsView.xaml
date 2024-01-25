@@ -127,6 +127,7 @@
                         <TextBlock Margin="0" Text="{x:Static p:Resources.IsWifiClientEnabled}" />
                     </CheckBox>
                     <CheckBox Content="{x:Static p:Resources.UnlockCableOnPowerFailure}" IsChecked="{Binding WattPilot.UnlockCableOnPowerFailure}" />
+                    <CheckBox Content="{x:Static p:Resources.EnableLoadBalancing}" IsChecked="{Binding WattPilot.LoadBalancingEnabled}" />
                     <CheckBox Content="{x:Static p:Resources.RequireRfidAuth}" IsChecked="{Binding WattPilot.AccessMode, Converter={co:AccessMode2Bool}}" />
                     <CheckBox Content="{x:Static p:Resources.AuthCurrentUser}" IsChecked="{Binding IsUserAuthenticated}" />
                     <CheckBox IsChecked="{Binding WattPilot.CloudAccessEnabled}">
@@ -176,130 +177,195 @@
                 </StackPanel>
             </GroupBox>
 
-            <GroupBox Margin="8,4,8,0" Header="{x:Static p:Resources.EcoSettings}" x:Name="EcoSettings">
-                <StackPanel Margin="8" Grid.IsSharedSizeScope="True">
+            <Grid Margin="8,0,8,0"  Grid.IsSharedSizeScope="True">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <GroupBox Margin="0,8,0,0" Grid.Row="0" Header="{x:Static p:Resources.EcoSettings}" x:Name="EcoSettings">
+                    <StackPanel Margin="8">
 
-                    <CheckBox IsChecked="{Binding WattPilot.PvSurplusEnabled}" Content="{x:Static p:Resources.PvSurplusEnabled}" />
-                    <CheckBox IsChecked="{Binding WattPilot.AwattarEnabled}" Content="{x:Static p:Resources.AwattarEnabled}" />
-                    <CheckBox IsChecked="{Binding WattPilot.NoFeedIn}" Content="{x:Static p:Resources.NoFeedIn}" ToolTip="{x:Static p:Resources.NoFeedIn_ToolTip}"
+                        <CheckBox IsChecked="{Binding WattPilot.PvSurplusEnabled}" Content="{x:Static p:Resources.PvSurplusEnabled}" />
+                        <CheckBox IsChecked="{Binding WattPilot.AwattarEnabled}" Content="{x:Static p:Resources.AwattarEnabled}" />
+                        <CheckBox IsChecked="{Binding WattPilot.NoFeedIn}" Content="{x:Static p:Resources.NoFeedIn}" ToolTip="{x:Static p:Resources.NoFeedIn_ToolTip}"
                               Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}" />
 
-                    <Grid Margin="0,8,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" SharedSizeGroup="G1" />
-                            <ColumnDefinition Width="Auto" SharedSizeGroup="G2" />
-                            <ColumnDefinition Width="Auto" SharedSizeGroup="G3" />
-                        </Grid.ColumnDefinitions>
-
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-
-                        <TextBlock Grid.Column="0" Grid.Row="0" Text="{x:Static p:Resources.AwattarCountry}" Visibility="{Binding WattPilot.AwattarEnabled, Converter={co:Bool2Visibility}}" />
-                        <TextBlock Grid.Column="1" Grid.Row="0" Text=":" Visibility="{Binding WattPilot.AwattarEnabled, Converter={co:Bool2Visibility}}" />
-
-                        <ComboBox Grid.Column="2" Grid.Row="0" MinWidth="250" ItemsSource="{Binding EnergyPriceCountries}" SelectedItem="{Binding WattPilot.EnergyPriceCountry}"
-                                  Visibility="{Binding WattPilot.AwattarEnabled, Converter={co:Bool2Visibility}}">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Margin="0,2,0,0" Height="20" Text="{Binding Converter={co:Enum2DisplayName}}" />
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-
-                        <TextBlock Grid.Column="0" Grid.Row="1" Text="{x:Static p:Resources.EcoRoundingMode}" Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}" />
-                        <TextBlock Grid.Column="1" Grid.Row="1" Text=":" Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}" />
-
-                        <ComboBox Grid.Column="2" Grid.Row="1" MinWidth="250" ItemsSource="{Binding EcoRoundingModes}" SelectedItem="{Binding WattPilot.RoundingMode}"
-                                  Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Margin="0,2,0,0" Height="20" Text="{Binding Converter={co:Enum2DisplayName}}" />
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-
-                    </Grid>
-
-                    <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center" Visibility="{Binding WattPilot.AwattarEnabled, Converter={co:Bool2Visibility}}">
-                        <TextBlock Margin="0,0,4,0">
-                            <Run Text="{x:Static p:Resources.MaxEnergyPrice}" /><Run Text=":" />
-                        </TextBlock>
-                        <TextBox MinHeight="0" TextAlignment="Center" Width="40"
-                                 Text="{co:ValidationBinding Path=WattPilot.MaxEnergyPrice, StringFormat=N1, Rule={v:MinMaxFloatRule Minimum=-200, Maximum=1000, PropertyDisplayName={x:Static p:Resources.MaxEnergyPrice}}}" />
-                        <TextBlock Margin="4,0,0,0" Text="ct/kWh" />
-                    </StackPanel>
-                    <Slider Value="{Binding WattPilot.MaxEnergyPrice, Mode=TwoWay}" HorizontalAlignment="Stretch" TickFrequency=".1" IsSnapToTickEnabled="True" Minimum="-10" Maximum="100"
-                            Visibility="{Binding WattPilot.AwattarEnabled, Converter={co:Bool2Visibility}}" />
-
-                    <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center" Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}">
-                        <TextBlock Margin="0,0,4,0">
-                            <Run Text="{x:Static p:Resources.PvSurplusBatteryLevel}" /><Run Text=":" />
-                        </TextBlock>
-                        <TextBox MinHeight="0" TextAlignment="Center" Width="40"
-                                 Text="{co:ValidationBinding WattPilot.PvSurplusBatteryLevel, Rule={v:MinMaxIntRule Minimum=0, Maximum=100, PropertyDisplayName={x:Static p:Resources.PvSurplusBatteryLevel}}}" />
-                        <TextBlock Margin="4,0,0,0" Text="%" />
-                    </StackPanel>
-                    <Slider Value="{Binding WattPilot.PvSurplusBatteryLevel, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="0" Maximum="100"
-                            Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}" />
-
-                    <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center" Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}">
-                        <TextBlock Margin="0,0,4,0">
-                            <Run Text="{x:Static p:Resources.OhmPilotTemperatureLimit}" /><Run Text=":" />
-                        </TextBlock>
-                        <TextBox MinHeight="0" TextAlignment="Center" Width="40"
-                                 Text="{co:ValidationBinding Path=WattPilot.OhmPilotTemperatureLimitCelsius, Rule={v:MinMaxIntRule Minimum=0, Maximum=100, PropertyDisplayName={x:Static p:Resources.OhmPilotTemperatureLimit}}}" />
-                        <TextBlock Margin="4,0,0,0" Text="°C" />
-                    </StackPanel>
-                    <Slider Value="{Binding WattPilot.OhmPilotTemperatureLimitCelsius, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="0" Maximum="100"
-                            Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}" />
-
-                    <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center" Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}">
-                        <TextBlock Margin="0,0,4,0">
-                            <Run Text="{x:Static p:Resources.PvSurplusPowerThreshold}" /><Run Text=":" />
-                        </TextBlock>
-                        <TextBox MinHeight="0" TextAlignment="Center" Width="40"
-                                 Text="{co:ValidationBinding Path=WattPilot.PvSurplusPowerThreshold, Rule={v:MinMaxIntRule Minimum=0, Maximum=22000, PropertyDisplayName={x:Static p:Resources.PvSurplusPowerThreshold}}}" />
-                        <TextBlock Margin="4,0,0,0" Text="W" />
-                    </StackPanel>
-                    <Slider Value="{Binding WattPilot.PvSurplusPowerThreshold, Mode=TwoWay}" TickFrequency="1" IsSnapToTickEnabled="True" HorizontalAlignment="Stretch" Minimum="0" Maximum="{Binding WattPilot.MaximumWattPilotPower}"
-                            Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}" />
-
-                    <StackPanel Margin="0,24,0,0" x:Name="NextTripSettings">
-                        <Grid>
+                        <Grid Margin="0,8,0,0">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="G1" />
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="G2" />
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="G3" />
                             </Grid.ColumnDefinitions>
 
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Column="0" Grid.Row="0" Text="{x:Static p:Resources.NextTripTime}" />
-                            <TextBlock Grid.Column="1" Grid.Row="0" Text=":" />
-                            <TextBox Grid.Column="2" Grid.Row="0" MinWidth="250" MaxLength="32" Text="{co:ValidationBinding NextTripTimeString, Rule={v:ChargingRuleDate}}" />
+                            <TextBlock Grid.Column="0" Grid.Row="0" Text="{x:Static p:Resources.AwattarCountry}" Visibility="{Binding WattPilot.AwattarEnabled, Converter={co:Bool2Visibility}}" />
+                            <TextBlock Grid.Column="1" Grid.Row="0" Text=":" Visibility="{Binding WattPilot.AwattarEnabled, Converter={co:Bool2Visibility}}" />
+
+                            <ComboBox Grid.Column="2" Grid.Row="0" MinWidth="250" ItemsSource="{Binding EnergyPriceCountries}" SelectedItem="{Binding WattPilot.EnergyPriceCountry}"
+                                  Visibility="{Binding WattPilot.AwattarEnabled, Converter={co:Bool2Visibility}}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Margin="0,2,0,0" Height="20" Text="{Binding Converter={co:Enum2DisplayName}}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+
+                            <TextBlock Grid.Column="0" Grid.Row="1" Text="{x:Static p:Resources.EcoRoundingMode}" Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}" />
+                            <TextBlock Grid.Column="1" Grid.Row="1" Text=":" Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}" />
+
+                            <ComboBox Grid.Column="2" Grid.Row="1" MinWidth="250" ItemsSource="{Binding EcoRoundingModes}" SelectedItem="{Binding WattPilot.RoundingMode}"
+                                  Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Margin="0,2,0,0" Height="20" Text="{Binding Converter={co:Enum2DisplayName}}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+
                         </Grid>
 
-                        <CheckBox IsChecked="{Binding WattPilot.NextTripRemainInEcoMode}" Content="{x:Static p:Resources.NextTripRemainInEcoMode}" />
+                        <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center" Visibility="{Binding WattPilot.AwattarEnabled, Converter={co:Bool2Visibility}}">
+                            <TextBlock Margin="0,0,4,0">
+                            <Run Text="{x:Static p:Resources.MaxEnergyPrice}" /><Run Text=":" />
+                            </TextBlock>
+                            <TextBox MinHeight="0" TextAlignment="Center" Width="40"
+                                 Text="{co:ValidationBinding Path=WattPilot.MaxEnergyPrice, StringFormat=N1, Rule={v:MinMaxFloatRule Minimum=-200, Maximum=1000, PropertyDisplayName={x:Static p:Resources.MaxEnergyPrice}}}" />
+                            <TextBlock Margin="4,0,0,0" Text="ct/kWh" />
+                        </StackPanel>
+                        <Slider Value="{Binding WattPilot.MaxEnergyPrice, Mode=TwoWay}" HorizontalAlignment="Stretch" TickFrequency=".1" IsSnapToTickEnabled="True" Minimum="-10" Maximum="100"
+                            Visibility="{Binding WattPilot.AwattarEnabled, Converter={co:Bool2Visibility}}" />
 
                         <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center" Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}">
                             <TextBlock Margin="0,0,4,0">
-                                <Run Text="{x:Static p:Resources.NextTripEnergyToCharge}" /><Run Text=":" />
+                            <Run Text="{x:Static p:Resources.PvSurplusBatteryLevel}" /><Run Text=":" />
                             </TextBlock>
                             <TextBox MinHeight="0" TextAlignment="Center" Width="40"
-                                     Text="{co:ValidationBinding Path=NextTripEnergyToCharge,ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, Rule={v:MinMaxFloatRule Minimum=0, Maximum=300, PropertyDisplayName={x:Static p:Resources.NextTripEnergyToCharge}}}" />
-                            <TextBlock Margin="4,0,0,0" Text="kWh" />
+                                 Text="{co:ValidationBinding WattPilot.PvSurplusBatteryLevel, Rule={v:MinMaxIntRule Minimum=0, Maximum=100, PropertyDisplayName={x:Static p:Resources.PvSurplusBatteryLevel}}}" />
+                            <TextBlock Margin="4,0,0,0" Text="%" />
                         </StackPanel>
-                        <Slider Value="{Binding NextTripEnergyToCharge, Mode=TwoWay}" TickFrequency="1" IsSnapToTickEnabled="True" HorizontalAlignment="Stretch" Minimum="0" Maximum="150"
+                        <Slider Value="{Binding WattPilot.PvSurplusBatteryLevel, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="0" Maximum="100"
+                            Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}" />
+
+                        <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center" Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}">
+                            <TextBlock Margin="0,0,4,0">
+                            <Run Text="{x:Static p:Resources.OhmPilotTemperatureLimit}" /><Run Text=":" />
+                            </TextBlock>
+                            <TextBox MinHeight="0" TextAlignment="Center" Width="40"
+                                 Text="{co:ValidationBinding Path=WattPilot.OhmPilotTemperatureLimitCelsius, Rule={v:MinMaxIntRule Minimum=0, Maximum=100, PropertyDisplayName={x:Static p:Resources.OhmPilotTemperatureLimit}}}" />
+                            <TextBlock Margin="4,0,0,0" Text="°C" />
+                        </StackPanel>
+                        <Slider Value="{Binding WattPilot.OhmPilotTemperatureLimitCelsius, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="0" Maximum="100"
+                            Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}" />
+
+                        <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center" Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}">
+                            <TextBlock Margin="0,0,4,0">
+                            <Run Text="{x:Static p:Resources.PvSurplusPowerThreshold}" /><Run Text=":" />
+                            </TextBlock>
+                            <TextBox MinHeight="0" TextAlignment="Center" Width="40"
+                                 Text="{co:ValidationBinding Path=WattPilot.PvSurplusPowerThreshold, Rule={v:MinMaxIntRule Minimum=0, Maximum=22000, PropertyDisplayName={x:Static p:Resources.PvSurplusPowerThreshold}}}" />
+                            <TextBlock Margin="4,0,0,0" Text="W" />
+                        </StackPanel>
+                        <Slider Value="{Binding WattPilot.PvSurplusPowerThreshold, Mode=TwoWay}" TickFrequency="1" IsSnapToTickEnabled="True" HorizontalAlignment="Stretch" Minimum="0" Maximum="{Binding WattPilot.MaximumWattPilotPower}"
+                            Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}" />
+
+                        <StackPanel Margin="0,24,0,0" x:Name="NextTripSettings">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Column="0" Grid.Row="0" Text="{x:Static p:Resources.NextTripTime}" />
+                                <TextBlock Grid.Column="1" Grid.Row="0" Text=":" />
+                                <TextBox Grid.Column="2" Grid.Row="0" MinWidth="250" MaxLength="32" Text="{co:ValidationBinding NextTripTimeString, Rule={v:ChargingRuleDate}}" />
+                            </Grid>
+
+                            <CheckBox IsChecked="{Binding WattPilot.NextTripRemainInEcoMode}" Content="{x:Static p:Resources.NextTripRemainInEcoMode}" />
+
+                            <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center" Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}">
+                                <TextBlock Margin="0,0,4,0">
+                                <Run Text="{x:Static p:Resources.NextTripEnergyToCharge}" /><Run Text=":" />
+                                </TextBlock>
+                                <TextBox MinHeight="0" TextAlignment="Center" Width="40"
+                                     Text="{co:ValidationBinding Path=NextTripEnergyToCharge,ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, Rule={v:MinMaxFloatRule Minimum=0, Maximum=300, PropertyDisplayName={x:Static p:Resources.NextTripEnergyToCharge}}}" />
+                                <TextBlock Margin="4,0,0,0" Text="kWh" />
+                            </StackPanel>
+                            <Slider Value="{Binding NextTripEnergyToCharge, Mode=TwoWay}" TickFrequency="1" IsSnapToTickEnabled="True" HorizontalAlignment="Stretch" Minimum="0" Maximum="150"
                                 Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}" />
+                        </StackPanel>
                     </StackPanel>
-                </StackPanel>
-            </GroupBox>
+                </GroupBox>
+                
+                <GroupBox Grid.Row="1" Header="{x:Static p:Resources.LoadBalancing}" Visibility="{Binding WattPilot.LoadBalancingEnabled, Converter={co:Bool2Visibility}}" Margin="0,8,0,0">
+                    <StackPanel>
+                        <Grid Margin="0,8,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="G1" />
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="G2" />
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="G3" />
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Column="0" Grid.Row="0" Text="{x:Static p:Resources.Priority}"/>
+                            <TextBlock Grid.Column="1" Grid.Row="0" Text=":"/>
+
+                            <ComboBox Grid.Column="2" Grid.Row="0" MinWidth="250" ItemsSource="{Binding LoadBalancingPriorities}" SelectedItem="{Binding WattPilot.LoadBalancingPriority}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Margin="0,2,0,0" Height="20" Text="{Binding Converter={co:Enum2DisplayName}}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </Grid>
+                        <StackPanel IsEnabled="{Binding EnableDanger}" Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center">
+                            <TextBlock Margin="0,0,4,0">
+                                <Run Text="{x:Static p:Resources.LoadBalancingSharedMaxCurrent}" /><Run Text=":" />
+                            </TextBlock>
+                            <TextBox MinHeight="0" TextAlignment="Center" Width="40"
+                                     Text="{co:ValidationBinding Path=WattPilot.LoadBalancingCurrents.DynamicMaximumCurrent, FallbackValue=6, StringFormat=N0, Rule={v:MinMaxIntRule Minimum=6, Maximum=96, PropertyDisplayName={x:Static p:Resources.LoadBalancingSharedMaxCurrent}}}" />
+                            <TextBlock Margin="4,0,0,0" Text="A" />
+                        </StackPanel>
+                        <Slider IsEnabled="{Binding EnableDanger}" Value="{Binding WattPilot.LoadBalancingCurrents.DynamicMaximumCurrent, FallbackValue=6, Mode=TwoWay}" HorizontalAlignment="Stretch" TickFrequency="1" IsSnapToTickEnabled="True" Minimum="6" Maximum="96"/>
+
+                        <StackPanel IsEnabled="{Binding EnableDanger}" Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center">
+                            <TextBlock Margin="0,0,4,0">
+                                <Run Text="{x:Static p:Resources.MaximumCurrentDnoLine}" /><Run Text=":" />
+                            </TextBlock>
+                            <TextBox MinHeight="0" TextAlignment="Center" Width="40"
+                                     Text="{co:ValidationBinding Path=WattPilot.LoadBalancingCurrents.MaximumCurrentDnoLine, FallbackValue=6, StringFormat=N0, Rule={v:MinMaxIntRule Minimum=6, Maximum=100, PropertyDisplayName={x:Static p:Resources.MaximumCurrentDnoLine}}}" />
+                            <TextBlock Margin="4,0,0,0" Text="A" />
+                        </StackPanel>
+                        <Slider IsEnabled="{Binding EnableDanger}" Value="{Binding WattPilot.LoadBalancingCurrents.MaximumCurrentDnoLine, FallbackValue=6, Mode=TwoWay}" HorizontalAlignment="Stretch" TickFrequency="1" IsSnapToTickEnabled="True" Minimum="6" Maximum="100"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center">
+                            <TextBlock Margin="0,0,4,0">
+                                <Run Text="{x:Static p:Resources.MaximumFallbackCurrent}" /><Run Text=":" />
+                            </TextBlock>
+                            <TextBox MinHeight="0" TextAlignment="Center" Width="40"
+                                     Text="{co:ValidationBinding Path=WattPilot.LoadBalancingFallbackCurrent, FallbackValue=6, StringFormat=N0, Rule={v:WattPilotFallbackCurrentRule PropertyDisplayName={x:Static p:Resources.MaximumFallbackCurrent}}}" />
+                            <TextBlock Margin="4,0,0,0" Text="A" />
+                        </StackPanel>
+                        <Slider Value="{Binding WattPilot.LoadBalancingFallbackCurrent, FallbackValue=6, Mode=TwoWay}" HorizontalAlignment="Stretch" Ticks="0,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32" IsSnapToTickEnabled="True" Minimum="0" Maximum="32"/>
+
+                    </StackPanel>
+                </GroupBox>
+
+            </Grid>
 
             <GroupBox Margin="0,8,8,0" Header="{x:Static p:Resources.CarSettings}">
                 <StackPanel Margin="8" Grid.IsSharedSizeScope="True">

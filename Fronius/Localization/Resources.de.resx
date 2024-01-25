@@ -1251,4 +1251,34 @@
   <data name="ScAddress" xml:space="preserve">
 	  <value>Stringkontroll-Adresse (nur Tauro)</value>
   </data>
+  <data name="FallbackCurrentError" xml:space="preserve">
+	  <value>{0} muss zwischen 6 und 32 liegen oder 0 sein</value>
+  </data>
+  <data name="LoadBalancingPriority_Low" xml:space="preserve">
+	  <value>Niedrig</value>
+  </data>
+  <data name="LoadBalancingPriority_Medium" xml:space="preserve">
+	  <value>Mittel</value>
+  </data>
+  <data name="LoadBalancingPriority_High" xml:space="preserve">
+	  <value>Hoch</value>
+  </data>
+  <data name="EnableLoadBalancing" xml:space="preserve">
+	  <value>Lastverteilung aktivieren</value>
+  </data>
+  <data name="LoadBalancing" xml:space="preserve">
+	  <value>Lastverteilung</value>
+  </data>
+  <data name="Priority" xml:space="preserve">
+	  <value>Priorität</value>
+  </data>
+  <data name="LoadBalancingSharedMaxCurrent" xml:space="preserve">
+	  <value>Maximaler Strom für alle Wattpiloten</value>
+  </data>
+  <data name="MaximumCurrentDnoLine" xml:space="preserve">
+	  <value>Maximaler Strom am Netzanschluss</value>
+  </data>
+  <data name="MaximumFallbackCurrent" xml:space="preserve">
+	  <value>Maximaler Strom bei Strom- oder Netzwerkausfall</value>
+  </data>
 </root>

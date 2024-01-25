@@ -1293,4 +1293,34 @@
   <data name="ScAddress" xml:space="preserve">
 	  <value>String control address (Tauro only)</value>
   </data>
+  <data name="FallbackCurrentError" xml:space="preserve">
+	  <value>{0} must be between 6 and 32 or 0</value>
+  </data>
+  <data name="LoadBalancingPriority_Low" xml:space="preserve">
+	  <value>Low</value>
+  </data>
+  <data name="LoadBalancingPriority_Medium" xml:space="preserve">
+	  <value>Medium</value>
+  </data>
+  <data name="LoadBalancingPriority_High" xml:space="preserve">
+	  <value>High</value>
+  </data>
+  <data name="EnableLoadBalancing" xml:space="preserve">
+	  <value>Enable Load Balancing</value>
+  </data>
+  <data name="LoadBalancing" xml:space="preserve">
+	  <value>Load Balancing</value>
+  </data>
+  <data name="Priority" xml:space="preserve">
+	  <value>Priority</value>
+  </data>
+  <data name="LoadBalancingSharedMaxCurrent" xml:space="preserve">
+	  <value>Maximum current for all Wattpilots</value>
+  </data>
+  <data name="MaximumCurrentDnoLine" xml:space="preserve">
+	  <value>Maximum current for DNO line</value>
+  </data>
+  <data name="MaximumFallbackCurrent" xml:space="preserve">
+	  <value>Maximum current in case of power or network failure</value>
+  </data>
 </root>

@@ -335,19 +335,18 @@ public class WattPilotService : BindableBase, IWattPilotService
             { "key", key },
             {
                 "value",
-                value switch
-                {
-                    null => null,
-                    bool boolValue => boolValue,
-                    byte byteValue => byteValue,
-                    uint uintValue => uintValue,
-                    Enum enumValue => (int)Convert.ChangeType(enumValue, TypeCode.Int32),
-                    int intValue => intValue,
-                    string stringValue => stringValue,
-                    double doubleValue => doubleValue,
-                    float floatValue => floatValue,
-                    _ => throw new NotSupportedException("Unsupported Type")
-                }
+                value == null ? null :
+                value is bool boolValue ? boolValue :
+                value is byte byteValue ? byteValue :
+                value is uint uintValue ? uintValue :
+                value is long longValue ? longValue :
+                value is Enum enumValue ? (int)Convert.ChangeType(enumValue, TypeCode.Int32) :
+                value is int intValue ? intValue :
+                value is string stringValue ? stringValue :
+                value is double doubleValue ? doubleValue :
+                value is float floatValue ? floatValue :
+                attribute.Type != null && attribute.Type.IsInstanceOfType(value) ? JToken.FromObject(value) :
+                throw new NotSupportedException("Unsupported Type")
             },
         }.ToString();
 

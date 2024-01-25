@@ -7,6 +7,7 @@
 		<Nullable>enable</Nullable>
 		<EnableWindowsTargeting>true</EnableWindowsTargeting>
 		<UseWPF>true</UseWPF>
+		<XamlDebuggingInformation>True</XamlDebuggingInformation>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Configuration>Release</Configuration>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>

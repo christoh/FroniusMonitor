@@ -31,18 +31,18 @@ public enum ModelStatus
 
 public enum WifiScanStatus
 {
-    None=0,
-    Scanning=1,
-    Finished=2,
-    Failed=3,
+    None = 0,
+    Scanning = 1,
+    Finished = 2,
+    Failed = 3,
 }
 
 public enum WifiState
 {
-    None=0,
-    Scanning=1,
-    Connecting=2,
-    Connected=3,
+    None = 0,
+    Scanning = 1,
+    Connecting = 2,
+    Connected = 3,
 }
 
 public enum CableLockBehavior
@@ -137,4 +137,11 @@ public enum Phases : byte
     L2 = 1 << 1,
     L3 = 1 << 2,
     All = L1 | L2 | L3,
+}
+
+public enum LoadBalancingPriority : byte
+{
+    Low = 60,
+    Medium = 50,
+    High = 40,
 }

@@ -61,6 +61,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private string? wifiPassword;
+
     [WattPilot("wak", false)]
     public string? WifiPassword
     {
@@ -69,6 +70,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private bool? isWifiClientEnabled;
+
     [WattPilot("wen", false)]
     public bool? IsWifiClientEnabled
     {
@@ -107,6 +109,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private WattPilotInverter? inverter;
+
     [WattPilot("cci")]
     public WattPilotInverter? Inverter
     {
@@ -115,6 +118,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private byte? l1Map;
+
     [WattPilot("map", 0)]
     public byte? L1Map
     {
@@ -123,6 +127,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private byte? l2Map;
+
     [WattPilot("map", 1)]
     public byte? L2Map
     {
@@ -131,6 +136,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private byte? l3Map;
+
     [WattPilot("map", 2)]
     public byte? L3Map
     {
@@ -150,6 +156,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private int? wifiSignal;
+
     [WattPilot("rssi")]
     public int? WifiSignal
     {
@@ -164,6 +171,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private WifiScanStatus wifiScanStatus;
+
     [WattPilot("scas")]
     public WifiScanStatus WifiScanStatus
     {
@@ -172,6 +180,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private WifiState wifiState;
+
     [WattPilot("wsms")]
     public WifiState WifiState
     {
@@ -180,6 +189,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private List<WattPilotWifiInfo>? scannedWifis;
+
     [WattPilot("scan")]
     public List<WattPilotWifiInfo>? ScannedWifis
     {
@@ -282,7 +292,6 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
             NotifyOfPropertyChange(nameof(PowerL1KiloWatts));
             NotifyOfPropertyChange(nameof(PowerSumKiloWatts));
         });
-
     }
 
     private double? powerL2;
@@ -297,7 +306,6 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
             NotifyOfPropertyChange(nameof(PowerL2KiloWatts));
             NotifyOfPropertyChange(nameof(PowerSumKiloWatts));
         });
-
     }
 
     private double? powerL3;
@@ -384,6 +392,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     public double? PowerFactorL0 => PowerFactorPercentN / 100;
 
     private bool? l1ChargerEnabled;
+
     [WattPilot("pha", 0)]
     public bool? L1ChargerEnabled
     {
@@ -392,6 +401,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private bool? l2ChargerEnabled;
+
     [WattPilot("pha", 1)]
     public bool? L2ChargerEnabled
     {
@@ -400,6 +410,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private bool? l3ChargerEnabled;
+
     [WattPilot("pha", 2)]
     public bool? L3ChargerEnabled
     {
@@ -408,6 +419,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private bool? l1CableEnabled;
+
     [WattPilot("pha", 3)]
     public bool? L1CableEnabled
     {
@@ -416,6 +428,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private bool? l2CableEnabled;
+
     [WattPilot("pha", 4)]
     public bool? L2CableEnabled
     {
@@ -424,6 +437,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private bool? l3CableEnabled;
+
     [WattPilot("pha", 5)]
     public bool? L3CableEnabled
     {
@@ -432,8 +446,9 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private byte? numberOfCarPhases;
+
     /// <summary>
-    /// Only updated when in Eco mode
+    ///     Only updated when in Eco mode
     /// </summary>
     [WattPilot("pnp")]
     public byte? NumberOfCarPhases
@@ -624,6 +639,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private bool? nextTripRemainInEcoMode;
+
     [WattPilot("fre", false)]
     public bool? NextTripRemainInEcoMode
     {
@@ -644,6 +660,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private byte? maximumChargingCurrentPhase1;
+
     [WattPilot("la1", false)]
     public byte? MaximumChargingCurrentPhase1
     {
@@ -802,6 +819,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private bool buttonEnableModeSwitch;
+
     [WattPilot("bam", false)]
     public bool ButtonEnableModeSwitch
     {
@@ -843,6 +861,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private double? energyCurrentSession;
+
     [WattPilot("wh")]
     public double? EnergyCurrentSession
     {
@@ -909,7 +928,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     private byte? authenticatedCardIndex;
 
     /// <summary>
-    /// null = Unauthenticated, 0=guest charging, 1=card index 0, 2= card index 1, ...
+    ///     null = Unauthenticated, 0=guest charging, 1=card index 0, 2= card index 1, ...
     /// </summary>
     [WattPilot("trx", false)]
     public byte? AuthenticatedCardIndex
@@ -1017,6 +1036,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private WattPilotWifiInfo? currentWifi;
+
     [WattPilot("ccw", typeof(WattPilotWifiInfo))]
     public WattPilotWifiInfo? CurrentWifi
     {
@@ -1052,6 +1072,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private bool? loadBalancingEnabled;
+
     [WattPilot("loe", false)]
     public bool? LoadBalancingEnabled
     {
@@ -1060,11 +1081,28 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private WattPilotLoadBalancingCurrents? loadBalancingCurrents;
-    [WattPilot("lot",false, typeof(WattPilotLoadBalancingCurrents))]
+
+    [WattPilot("lot", false, typeof(WattPilotLoadBalancingCurrents))]
     public WattPilotLoadBalancingCurrents? LoadBalancingCurrents
     {
         get => loadBalancingCurrents;
         set => Set(ref loadBalancingCurrents, value);
+    }
+
+    private int? loadBalancingFallbackCurrent;
+    [WattPilot("lof", false)]
+    public int? LoadBalancingFallbackCurrent
+    {
+        get => loadBalancingFallbackCurrent;
+        set => Set(ref loadBalancingFallbackCurrent, value);
+    }
+
+    private LoadBalancingPriority loadBalancingPriority;
+    [WattPilot("lop", false)]
+    public LoadBalancingPriority LoadBalancingPriority
+    {
+        get => loadBalancingPriority;
+        set => Set(ref loadBalancingPriority, value);
     }
 
     public string? CableLockBehaviorDisplayName => CableLockBehavior?.ToDisplayName();
@@ -1086,7 +1124,12 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
                 newCards[i] = new WattPilotCard { Energy = Cards[i].Energy, HaveCardId = Cards[i].HaveCardId, Name = Cards[i].Name, };
             }
 
-            result.Cards = newCards;
+            result.cards = newCards;
+        }
+
+        if (LoadBalancingCurrents is not null)
+        {
+            result.loadBalancingCurrents = LoadBalancingCurrents.Copy();
         }
 
         return result;

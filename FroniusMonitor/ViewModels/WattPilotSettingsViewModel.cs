@@ -1,16 +1,8 @@
 ﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
-public class WattPilotSettingsViewModel : ViewModelBase
+public class WattPilotSettingsViewModel(IDataCollectionService dataCollectionService, IWattPilotService wattPilotService) : ViewModelBase
 {
-    private readonly IDataCollectionService dataCollectionService;
-    private readonly IWattPilotService wattPilotService;
     private WattPilot oldWattPilot = null!;
-
-    public WattPilotSettingsViewModel(IDataCollectionService dataCollectionService, IWattPilotService wattPilotService)
-    {
-        this.dataCollectionService = dataCollectionService;
-        this.wattPilotService = wattPilotService;
-    }
 
     public static IReadOnlyList<CableLockBehavior> CableLockBehaviors { get; } = Enum.GetValues<CableLockBehavior>();
     public static IReadOnlyList<ChargingLogic> ChargingLogicList { get; } = Enum.GetValues<ChargingLogic>();
@@ -18,6 +10,7 @@ public class WattPilotSettingsViewModel : ViewModelBase
     public static IReadOnlyList<PhaseSwitchMode> PhaseSwitchModes { get; } = Enum.GetValues<PhaseSwitchMode>();
     public static IReadOnlyList<AwattarCountry> EnergyPriceCountries { get; } = Enum.GetValues<AwattarCountry>().OrderBy(c => c.ToDisplayName()).ToArray();
     public static IReadOnlyList<ForcedCharge> ForcedChargeList { get; } = Enum.GetValues<ForcedCharge>().OrderBy(c => c.ToDisplayName()).ToArray();
+    public static IReadOnlyList<LoadBalancingPriority> LoadBalancingPriorities { get; } = Enum.GetValues<LoadBalancingPriority>();
 
     private WattPilot wattPilot = null!;
 
@@ -141,7 +134,7 @@ public class WattPilotSettingsViewModel : ViewModelBase
 
         if (localWattPilot == null)
         {
-            ShowBox(Resources.NoWattPilot, Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error);
+            ShowBox(Loc.NoWattPilot, Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error);
             Close();
             return;
         }
@@ -171,6 +164,7 @@ public class WattPilotSettingsViewModel : ViewModelBase
         }
 
         WattPilot = (WattPilot)oldWattPilot.Clone();
+
         Title = $"{WattPilot.DeviceName} {WattPilot.SerialNumber}";
         RequiresChargingInterval = (WattPilot.MinimumChargingInterval ?? 0) != 0;
 
@@ -182,6 +176,11 @@ public class WattPilotSettingsViewModel : ViewModelBase
 
     private async void Apply()
     {
+        if (WattPilot.LoadBalancingCurrents is not null && WattPilot.LoadBalancingCurrents != oldWattPilot.LoadBalancingCurrents)
+        {
+            WattPilot.LoadBalancingCurrents.TimeStamp = DateTime.UtcNow;
+        }
+
         try
         {
             foreach (var error in NotifiedValidationErrors)
@@ -205,8 +204,8 @@ public class WattPilotSettingsViewModel : ViewModelBase
             {
                 ShowBox
                 (
-                    $"{Resources.PleaseCorrectErrors}:{Environment.NewLine}{errors.Aggregate(string.Empty, (c, n) => c + Environment.NewLine + "• " + n)}",
-                    Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error
+                    $"{Loc.PleaseCorrectErrors}:{Environment.NewLine}{errors.Aggregate(string.Empty, (c, n) => c + Environment.NewLine + "• " + n)}",
+                    Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error
                 );
 
                 return;
@@ -260,7 +259,7 @@ public class WattPilotSettingsViewModel : ViewModelBase
                     ShowBox
                     (
                         "The following settings were not written to the Wattpilot:" + Environment.NewLine + Environment.NewLine + notWritten,
-                        Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error
+                        Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error
                     );
                 }
             }
@@ -268,7 +267,7 @@ public class WattPilotSettingsViewModel : ViewModelBase
             {
                 sentSomething = false;
                 IsInUpdate = false;
-                ShowBox(ex.Message, Resources.Warning, MessageBoxButton.OK, MessageBoxImage.Warning);
+                ShowBox(ex.Message, Loc.Warning, MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             finally
             {
@@ -278,7 +277,7 @@ public class WattPilotSettingsViewModel : ViewModelBase
 
                     if (sentSomething)
                     {
-                        ToastText = Resources.SentToWattPilot;
+                        ToastText = Loc.SentToWattPilot;
                     }
 
                     oldWattPilot = WattPilot;
@@ -292,7 +291,7 @@ public class WattPilotSettingsViewModel : ViewModelBase
                     ShowBox
                     (
                         "The following settings were not confirmed by the Wattpilot:" + Environment.NewLine + Environment.NewLine + notWritten,
-                        Resources.Warning, MessageBoxButton.OK, MessageBoxImage.Warning
+                        Loc.Warning, MessageBoxButton.OK, MessageBoxImage.Warning
                     );
                 }
             }
