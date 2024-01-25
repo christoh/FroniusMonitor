@@ -1,6 +1,4 @@
-﻿using Microsoft.Azure.Amqp.Framing;
-
-namespace De.Hochstaetter.Fronius.Models.Modbus;
+﻿namespace De.Hochstaetter.Fronius.Models.Modbus;
 
 public class SunSpecCommonBlock : SunSpecModelBase
 {

@@ -161,7 +161,7 @@ public class DataCollectionService : BindableBase, IDataCollectionService
             NewLineChars = Environment.NewLine,
         });
 
-        serializer.Serialize(writer, SmartMeterHistory as List<SmartMeterCalibrationHistoryItem> ?? SmartMeterHistory.ToList());
+        serializer.Serialize(writer, SmartMeterHistory as List<SmartMeterCalibrationHistoryItem> ?? [.. SmartMeterHistory]);
 
         return SmartMeterHistory;
     });

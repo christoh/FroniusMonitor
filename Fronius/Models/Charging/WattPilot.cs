@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.Fronius.Models.Charging;
+﻿using Newtonsoft.Json;
+
+namespace De.Hochstaetter.Fronius.Models.Charging;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
@@ -108,6 +110,15 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref version, value);
     }
 
+    private Version? latestVersion;
+
+    [WattPilot("onv")]
+    public Version? LatestVersion
+    {
+        get => latestVersion;
+        set => Set(ref latestVersion, value);
+    }
+
     private WattPilotInverter? inverter;
 
     [WattPilot("cci")]
@@ -117,42 +128,20 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref inverter, value);
     }
 
-    private byte? l1Map;
+    private byte[]? map;
 
-    [WattPilot("map", 0)]
-    public byte? L1Map
+    [WattPilot("map", false, typeof(byte[]))]
+    [JsonProperty("map")]
+    public byte[]? Map
     {
-        get => l1Map;
-        set => Set(ref l1Map, value, () => NotifyOfPropertyChange(nameof(PhaseMap)));
+        get => map;
+        set => Set(ref map, value, () => NotifyOfPropertyChange(nameof(PhaseMap)));
     }
 
-    private byte? l2Map;
-
-    [WattPilot("map", 1)]
-    public byte? L2Map
+    public WattPilotPhaseMap? PhaseMap
     {
-        get => l2Map;
-        set => Set(ref l2Map, value, () => NotifyOfPropertyChange(nameof(PhaseMap)));
-    }
-
-    private byte? l3Map;
-
-    [WattPilot("map", 2)]
-    public byte? L3Map
-    {
-        get => l3Map;
-        set => Set(ref l3Map, value, () => NotifyOfPropertyChange(nameof(PhaseMap)));
-    }
-
-    public WattPilotPhaseMap PhaseMap
-    {
-        get => new(L1Map ?? 0, L2Map ?? 0, L3Map ?? 0);
-        set
-        {
-            L1Map = value.L1Map;
-            L2Map = value.L2Map;
-            L3Map = value.L3Map;
-        }
+        get => Map == null ? null : new(Map[0], Map[1], Map[2]);
+        set => Map = value == null ? null : [value.L1Map, value.L2Map, value.L3Map];
     }
 
     private int? wifiSignal;
@@ -1090,6 +1079,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private int? loadBalancingFallbackCurrent;
+
     [WattPilot("lof", false)]
     public int? LoadBalancingFallbackCurrent
     {
@@ -1098,6 +1088,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private LoadBalancingPriority loadBalancingPriority;
+
     [WattPilot("lop", false)]
     public LoadBalancingPriority LoadBalancingPriority
     {

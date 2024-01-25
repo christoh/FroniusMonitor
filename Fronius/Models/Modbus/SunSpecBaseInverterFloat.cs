@@ -1,9 +1,7 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Modbus;
 
-public class SunSpecBaseInverterFloat : SunSpecModelBase, ISunSpecInverter
+public class SunSpecBaseInverterFloat(ReadOnlyMemory<byte> data, ushort modelNumber, ushort absoluteRegister) : SunSpecModelBase(data, modelNumber, absoluteRegister), ISunSpecInverter
 {
-    public SunSpecBaseInverterFloat(ReadOnlyMemory<byte> data, ushort modelNumber, ushort absoluteRegister) : base(data, modelNumber, absoluteRegister) { }
-
     public override IReadOnlyList<ushort> SupportedModels { get; } = new ushort[] { 111, 112, 113 };
     public override ushort MinimumDataLength => 60;
 

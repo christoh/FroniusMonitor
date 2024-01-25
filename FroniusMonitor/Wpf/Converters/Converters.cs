@@ -263,12 +263,12 @@ public class SocToColor : ConverterBase
                         color.B = Round(lower.Color.B, upper.Color.B);
                         color.A = 0xff;
 
+                        break;
+
                         byte Round(byte lowerColor, byte upperColor)
                         {
-                            return (byte)Math.Round((1 - percentage) * lowerColor + percentage * upperColor);
+                            return (byte)Math.Round((1 - percentage) * lowerColor + percentage * upperColor, MidpointRounding.AwayFromZero);
                         }
-
-                        break;
                 }
 
                 break;
@@ -402,15 +402,8 @@ public class SeverityToVisibility : ConverterBase
 
 public class Bool2Double : BoolToAnything<double> { }
 
-public class GetTemperatureTicks : ConverterBase
+public class GetTemperatureTicks(double tickDistance) : ConverterBase
 {
-    private readonly double tickDistance;
-
-    public GetTemperatureTicks(double tickDistance)
-    {
-        this.tickDistance = tickDistance;
-    }
-
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is not Slider slider)
@@ -806,13 +799,13 @@ public class MpptPowerMode2Visibility : EqualityToAnything<MpptPowerMode, Visibi
 public class ToshibaHvacSwingMode2Brush : EqualityToAnything<ToshibaHvacSwingMode, Brush>
 {
     private static readonly ToshibaHvacSwingMode[] fixedModes =
-    {
+    [
         ToshibaHvacSwingMode.Fixed1,
         ToshibaHvacSwingMode.Fixed2,
         ToshibaHvacSwingMode.Fixed3,
         ToshibaHvacSwingMode.Fixed4,
-        ToshibaHvacSwingMode.Fixed5,
-    };
+        ToshibaHvacSwingMode.Fixed5
+    ];
 
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {

@@ -7,7 +7,7 @@ public class WattPilotService : BindableBase, IWattPilotService
     private ClientWebSocket? clientWebSocket;
     private static readonly Random random = new(unchecked((int)DateTime.UtcNow.Ticks));
     private Thread? readThread;
-    private readonly List<WattPilotAcknowledge> outstandingAcknowledges = new();
+    private readonly List<WattPilotAcknowledge> outstandingAcknowledges = [];
     private readonly byte[] buffer = new byte[8192];
     private string? hashedPassword;
     private string? oldEncryptedPassword;
@@ -41,7 +41,7 @@ public class WattPilotService : BindableBase, IWattPilotService
 
             lock (outstandingAcknowledges)
             {
-                result = outstandingAcknowledges.ToArray();
+                result = [.. outstandingAcknowledges];
             }
 
             return result;
@@ -345,6 +345,8 @@ public class WattPilotService : BindableBase, IWattPilotService
                 value is string stringValue ? stringValue :
                 value is double doubleValue ? doubleValue :
                 value is float floatValue ? floatValue :
+                value is IEnumerable<byte> bytes?JArray.FromObject(bytes.Select(b=>(int)b)):
+                value is IEnumerable<int> integers?JArray.FromObject(integers):
                 attribute.Type != null && attribute.Type.IsInstanceOfType(value) ? JToken.FromObject(value) :
                 throw new NotSupportedException("Unsupported Type")
             },
@@ -374,7 +376,7 @@ public class WattPilotService : BindableBase, IWattPilotService
 
         lock (outstandingAcknowledges)
         {
-            outstandingAcknowledges.Add(new WattPilotAcknowledge { RequestId = id, PropertyInfo = propertyInfo, Value = value });
+            outstandingAcknowledges.Add(new WattPilotAcknowledge(id,propertyInfo,value));
         }
     }
 
@@ -418,147 +420,37 @@ public class WattPilotService : BindableBase, IWattPilotService
 
     private void SetWattPilotValue(object instance, PropertyInfo propertyInfo, JToken? token)
     {
-        var nonNullableType = Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? propertyInfo.PropertyType;
-
-        if
-        (
-            SetValue<bool>() ||
-            SetValue<float>() ||
-            SetValue<double>() ||
-            SetValue<int>() ||
-            SetValue<long>() ||
-            SetValue<byte>() ||
-            SetValue<string>()
-        )
+        try
         {
+            propertyInfo.SetValue(instance, token?.ToObject(propertyInfo.PropertyType));
             return;
         }
-
-        if (propertyInfo.Name == nameof(WattPilot.Cards))
+        catch
         {
-            if (token is JArray jArray)
-            {
-                var cards = new WattPilotCard[jArray.Count];
-
-                for (var i = 0; i < jArray.Count; i++)
-                {
-                    if (jArray[i] is not JObject jObject) continue;
-                    cards[i] = new WattPilotCard();
-                    UpdateWattPilot(cards[i], jObject);
-                }
-
-                propertyInfo.SetValue(instance, cards);
-                return;
-            }
-
-            propertyInfo.SetValue(instance, null);
-            return;
+            //
         }
 
+        if (token is JObject subObject)
         {
-            if (token is JObject subObject)
+            var subInstance = Activator.CreateInstance(propertyInfo.PropertyType);
+
+            if (subInstance != null)
             {
-                var subInstance = Activator.CreateInstance(propertyInfo.PropertyType);
-
-                if (subInstance != null)
-                {
-                    propertyInfo.SetValue(instance, subInstance);
-                    UpdateWattPilot(subInstance, subObject);
-                    return;
-                }
-            }
-        }
-
-        {
-            if (token is JArray array)
-            {
-                if (Activator.CreateInstance(propertyInfo.PropertyType) is not IList list)
-                {
-                    return;
-                }
-
-                var subType = propertyInfo.PropertyType.GetGenericArguments()[0];
-
-                foreach (var arrayItem in array)
-                {
-                    if (arrayItem is not JObject subObject || IoC.Get(subType) is not { } subInstance)
-                    {
-                        continue;
-                    }
-
-                    UpdateWattPilot(subInstance, subObject);
-                    list.Add(subInstance);
-                }
-
-                propertyInfo.SetValue(instance, list);
+                propertyInfo.SetValue(instance, subInstance);
+                UpdateWattPilot(subInstance, subObject);
                 return;
             }
         }
 
         var stringValue = token?.Value<string>();
 
-        if (stringValue == null)
-        {
-            propertyInfo.SetValue(instance, null);
-            return;
-        }
-
         if (propertyInfo.PropertyType.IsAssignableFrom(typeof(IPAddress)))
         {
-            propertyInfo.SetValue(instance, IPAddress.Parse(stringValue));
+            propertyInfo.SetValue(instance, stringValue == null ? null : IPAddress.Parse(stringValue));
             return;
         }
 
-        if (propertyInfo.PropertyType.IsAssignableFrom(typeof(DateTime)))
-        {
-            if (DateTime.TryParse(stringValue + "Z", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dateTime))
-            {
-                propertyInfo.SetValue(instance, dateTime);
-            }
-
-            if (stringValue.LastIndexOf('.') >= 0)
-            {
-                var dateString = stringValue[..stringValue.LastIndexOf('.')] + 'Z';
-
-                if (DateTime.TryParse(dateString, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out dateTime))
-                {
-                    propertyInfo.SetValue(instance, dateTime);
-                }
-            }
-
-            return;
-        }
-
-        if (nonNullableType.IsEnum)
-        {
-            propertyInfo.SetValue(instance, Enum.Parse(nonNullableType, stringValue));
-            return;
-        }
-
-        if (propertyInfo.PropertyType.IsAssignableFrom(typeof(Version)))
-        {
-            propertyInfo.SetValue(instance, new Version(stringValue));
-            return;
-        }
-
-        Debugger.Break();
-
-        bool SetValue<T>()
-        {
-            if (!propertyInfo.PropertyType.IsAssignableFrom(typeof(T)))
-            {
-                return false;
-            }
-
-            if (token?.Value<string>() != null)
-            {
-                propertyInfo.SetValue(instance, token.Value<T>());
-                return true;
-            }
-
-            propertyInfo.SetValue(instance, null);
-            return true;
-        }
+        Debugger.Break(); // Unhandled Json
     }
 
     private async void Reader()

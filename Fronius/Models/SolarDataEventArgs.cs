@@ -1,11 +1,6 @@
 ﻿namespace De.Hochstaetter.Fronius.Models;
 
-public class SolarDataEventArgs : EventArgs
+public class SolarDataEventArgs(HomeAutomationSystem? homeAutomationSystem) : EventArgs
 {
-    public SolarDataEventArgs(HomeAutomationSystem? homeAutomationSystem)
-    {
-        HomeAutomationSystem = homeAutomationSystem;
-    }
-
-    public HomeAutomationSystem? HomeAutomationSystem { get; set; }
+    public HomeAutomationSystem? HomeAutomationSystem { get; set; } = homeAutomationSystem;
 }

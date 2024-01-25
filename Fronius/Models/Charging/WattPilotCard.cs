@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Newtonsoft.Json;
 
 namespace De.Hochstaetter.Fronius.Models.Charging
 {
     public class WattPilotCard : BindableBase, IHaveDisplayName
     {
         private string? name;
+
         [WattPilot("name")]
+        [JsonProperty("name")]
         public string? Name
         {
             get => name;
@@ -16,7 +15,9 @@ namespace De.Hochstaetter.Fronius.Models.Charging
         }
 
         private double? energy;
+
         [WattPilot("energy")]
+        [JsonProperty("energy")]
         public double? Energy
         {
             get => energy;
@@ -24,7 +25,9 @@ namespace De.Hochstaetter.Fronius.Models.Charging
         }
 
         private bool? haveCardId;
+
         [WattPilot("cardId")]
+        [JsonProperty("cardId")]
         public bool? HaveCardId
         {
             get => haveCardId;

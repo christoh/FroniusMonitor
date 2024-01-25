@@ -304,11 +304,119 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Belgium.
+        /// </summary>
+        public static string AwattarCountry_Belgium {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Belgium", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Denmark Zone 1.
+        /// </summary>
+        public static string AwattarCountry_Denmark1 {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Denmark1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Denmark Zone 2.
+        /// </summary>
+        public static string AwattarCountry_Denmark2 {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Denmark2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Denmark Zone 1 Tibber.
+        /// </summary>
+        public static string AwattarCountry_DenmarkTibber1 {
+            get {
+                return ResourceManager.GetString("AwattarCountry_DenmarkTibber1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Denmark Zone 2 Tibber.
+        /// </summary>
+        public static string AwattarCountry_DenmarkTibber2 {
+            get {
+                return ResourceManager.GetString("AwattarCountry_DenmarkTibber2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Estonia.
+        /// </summary>
+        public static string AwattarCountry_Estonia {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Estonia", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Finland.
+        /// </summary>
+        public static string AwattarCountry_Finland {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Finland", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Finland Tibber.
+        /// </summary>
+        public static string AwattarCountry_FinlandTibber {
+            get {
+                return ResourceManager.GetString("AwattarCountry_FinlandTibber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to France.
+        /// </summary>
+        public static string AwattarCountry_France {
+            get {
+                return ResourceManager.GetString("AwattarCountry_France", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Germany.
         /// </summary>
         public static string AwattarCountry_Germany {
             get {
                 return ResourceManager.GetString("AwattarCountry_Germany", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Germany / Luxembourg.
+        /// </summary>
+        public static string AwattarCountry_GermanyLuxembourg {
+            get {
+                return ResourceManager.GetString("AwattarCountry_GermanyLuxembourg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Greece.
+        /// </summary>
+        public static string AwattarCountry_Greece {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Greece", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Switzerland.
+        /// </summary>
+        public static string AwattarCountry_Switzerland {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Switzerland", resourceCulture);
             }
         }
         
@@ -1519,7 +1627,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Maximum current for all Wattpilots.
+        ///   Looks up a localized string similar to Maximum charging current for all Wattpilots.
         /// </summary>
         public static string LoadBalancingSharedMaxCurrent {
             get {
@@ -1609,7 +1717,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Maximum current in case of power or network failure.
+        ///   Looks up a localized string similar to Maximum charging current in case of power or network failure.
         /// </summary>
         public static string MaximumFallbackCurrent {
             get {

@@ -1,11 +1,14 @@
 ﻿// ReSharper disable StringLiteralTypo
 
+using Newtonsoft.Json;
+
 namespace De.Hochstaetter.Fronius.Models.Charging
 {
     public class WattPilotWifiInfo : BindableBase, IHaveDisplayName
     {
         private string? ssid;
 
+        [JsonProperty("ssid")]
         [WattPilot("ssid")]
         public string? Ssid
         {
@@ -15,6 +18,7 @@ namespace De.Hochstaetter.Fronius.Models.Charging
 
         private bool? isB;
 
+        [JsonProperty("b")]
         [WattPilot("b")]
         [WattPilot("f", 2)]
         public bool? IsB
@@ -25,6 +29,7 @@ namespace De.Hochstaetter.Fronius.Models.Charging
 
         private bool? isG;
 
+        [JsonProperty("g")]
         [WattPilot("f", 3)]
         [WattPilot("g")]
         public bool? IsG
@@ -36,6 +41,7 @@ namespace De.Hochstaetter.Fronius.Models.Charging
         private bool? isN;
 
         [WattPilot("f", 4)]
+        [JsonProperty("n")]
         [WattPilot("n")]
         public bool? IsN
         {
@@ -45,6 +51,7 @@ namespace De.Hochstaetter.Fronius.Models.Charging
 
         private IPAddress? ipV4Address;
 
+        [JsonProperty("ip")]
         [WattPilot("ip")]
         public IPAddress? IpV4Address
         {
@@ -63,6 +70,7 @@ namespace De.Hochstaetter.Fronius.Models.Charging
 
         private int? channel;
 
+        [JsonProperty("channel")]
         [WattPilot("channel")]
         public int? Channel
         {
@@ -72,6 +80,7 @@ namespace De.Hochstaetter.Fronius.Models.Charging
 
         private WifiEncryption? encryption;
 
+        [JsonProperty("encryptionType")]
         [WattPilot("encryptionType")]
         public WifiEncryption? Encryption
         {
@@ -81,6 +90,7 @@ namespace De.Hochstaetter.Fronius.Models.Charging
 
         private WifiCipher? pairwiseCipher;
 
+        [JsonProperty("pairwiseCipher")]
         [WattPilot("pairwiseCipher")]
         [WattPilot("f", 0)]
         public WifiCipher? PairwiseCipher
@@ -91,6 +101,7 @@ namespace De.Hochstaetter.Fronius.Models.Charging
 
         private WifiCipher? groupCipher;
 
+        [JsonProperty("groupCipher")]
         [WattPilot("groupCipher")]
         [WattPilot("f", 1)]
         public WifiCipher? GroupCipher
@@ -101,6 +112,7 @@ namespace De.Hochstaetter.Fronius.Models.Charging
 
         private bool? supportsLowRate;
 
+        [JsonProperty("lr")]
         [WattPilot("lr")]
         [WattPilot("f", 5)]
         public bool? SupportsLowRate
@@ -111,6 +123,7 @@ namespace De.Hochstaetter.Fronius.Models.Charging
 
         private bool? allowWps;
 
+        [JsonProperty("wps")]
         [WattPilot("wps")]
         [WattPilot("f", 6)]
         public bool? AllowWps
@@ -121,6 +134,7 @@ namespace De.Hochstaetter.Fronius.Models.Charging
 
         private bool? isFtmResponder;
 
+        [JsonProperty("ftmResponder")]
         [WattPilot("ftmResponder")]
         [WattPilot("f", 7)]
         public bool? IsFtmResponder
@@ -131,6 +145,7 @@ namespace De.Hochstaetter.Fronius.Models.Charging
 
         private bool? isFtmInitiator;
 
+        [JsonProperty("ftmInitiator")]
         [WattPilot("ftmInitiator")]
         [WattPilot("f", 8)]
         public bool? IsFtmInitiator
@@ -141,6 +156,7 @@ namespace De.Hochstaetter.Fronius.Models.Charging
 
         private string? macAddressString;
 
+        [JsonProperty("bssid")]
         [WattPilot("bssid")]
         public string? MacAddressString
         {
@@ -150,6 +166,7 @@ namespace De.Hochstaetter.Fronius.Models.Charging
 
         private int? wifiSignal;
 
+        [JsonProperty("rssi")]
         [WattPilot("rssi")]
         public int? WifiSignal
         {
@@ -159,6 +176,7 @@ namespace De.Hochstaetter.Fronius.Models.Charging
 
         private IPAddress? netMask;
 
+        [JsonProperty("netmask")]
         [WattPilot("netmask")]
         public IPAddress? NetMask
         {
@@ -167,6 +185,7 @@ namespace De.Hochstaetter.Fronius.Models.Charging
         }
 
         private IPAddress? gateway;
+        [JsonProperty("gw")]
         [WattPilot("gw")]
         public IPAddress? Gateway
         {

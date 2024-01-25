@@ -101,10 +101,30 @@ public enum ForcedCharge
     ForcedOn = 2,
 }
 
-public enum AwattarCountry : byte
+public enum AwattarCountry : int
 {
     Austria = 0,
-    Germany = 1,
+    GermanyLuxembourg = 1,
+    Switzerland = 10035,
+    Belgium = 10043,
+    Denmark1 = 10024,
+    Denmark2 =10036,
+    DenmarkTibber1=10055,
+    DenmarkTibber2=10056,
+    Estonia = 10020,
+    Finland=10004,
+    FinlandTibber=10049,
+    France=10015,
+    Greece=10006,
+    ItalyCalabria=10017,
+    ItalyCenterNorth=10031,
+    ItalyCenterSouth=10009,
+    ItalyNorth=10034,
+    ItalySacoAc=10023,
+    ItalySacoDc=10001,
+    ItalySardinia=10029,
+    ItalySicily=10005,
+    ItalySouth=10041,
 }
 
 public enum EcoRoundingMode : byte

@@ -2,7 +2,7 @@
 
 public abstract class SunSpecModelBase : BindableBase
 {
-    private static readonly DateTime SunSpecBigBangTime = new(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+    private static readonly DateTime sunSpecBigBangTime = new(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
     [SuppressMessage("ReSharper", "VirtualMemberCallInConstructor")]
     private SunSpecModelBase(ushort modelNumber, ushort absoluteRegister)
@@ -120,9 +120,9 @@ public abstract class SunSpecModelBase : BindableBase
         );
     }
 
-    protected static DateTime? ToDateTime(uint sunSpecTime) => sunSpecTime == ~0U ? null : SunSpecBigBangTime.AddSeconds(sunSpecTime);
+    protected static DateTime? ToDateTime(uint sunSpecTime) => sunSpecTime == ~0U ? null : sunSpecBigBangTime.AddSeconds(sunSpecTime);
 
-    protected static uint ToSunSpecTime(DateTime? time) => time.HasValue ? (uint)Math.Round((time.Value.ToUniversalTime() - SunSpecBigBangTime).TotalSeconds, MidpointRounding.AwayFromZero) : ~0U;
+    protected static uint ToSunSpecTime(DateTime? time) => time.HasValue ? (uint)Math.Round((time.Value.ToUniversalTime() - sunSpecBigBangTime).TotalSeconds, MidpointRounding.AwayFromZero) : ~0U;
 
     private ModbusAttribute GetAttribute(string propertyName)
     {

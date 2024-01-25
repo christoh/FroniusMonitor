@@ -1,9 +1,7 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Modbus;
 
-public class SunSpecStorageBaseSettings : SunSpecModelBase
+public class SunSpecStorageBaseSettings(ReadOnlyMemory<byte> data, ushort modelNumber, ushort absoluteRegister) : SunSpecModelBase(data, modelNumber, absoluteRegister)
 {
-    public SunSpecStorageBaseSettings(ReadOnlyMemory<byte> data, ushort modelNumber, ushort absoluteRegister) : base(data, modelNumber, absoluteRegister) { }
-
     public override IReadOnlyList<ushort> SupportedModels { get; } = new ushort[] { 124, };
 
     public override ushort MinimumDataLength => 24;

@@ -1,9 +1,7 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Modbus;
 
-public class SunSpecInverterExtendedSettings : SunSpecModelBase
+public class SunSpecInverterExtendedSettings(ReadOnlyMemory<byte> data, ushort modelNumber, ushort absoluteRegister) : SunSpecModelBase(data, modelNumber, absoluteRegister)
 {
-    public SunSpecInverterExtendedSettings(ReadOnlyMemory<byte> data, ushort modelNumber, ushort absoluteRegister) : base(data, modelNumber, absoluteRegister) { }
-
     public override IReadOnlyList<ushort> SupportedModels { get; } = new ushort[] { 123, };
 
     public override ushort MinimumDataLength => 24;

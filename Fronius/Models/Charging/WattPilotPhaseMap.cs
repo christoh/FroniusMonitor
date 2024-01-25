@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Charging;
 
-public record WattPilotPhaseMap(byte L1Map, byte L2Map, byte L3Map) : IHaveDisplayName
+public record WattPilotPhaseMap(byte L1Map, byte L2Map, byte L3Map)
 {
     public static IReadOnlyList<WattPilotPhaseMap> All => new[]
     {
@@ -15,11 +15,11 @@ public record WattPilotPhaseMap(byte L1Map, byte L2Map, byte L3Map) : IHaveDispl
         new WattPilotPhaseMap(0,0,1),
     };
 
-    public string DisplayName => ToString();
-
-    public int[] Array = [L1Map, L2Map, L3Map];
-
     public override string ToString() => $"{ToString(L1Map)} / {ToString(L2Map)} / {ToString(L3Map)}";
 
-    private static string ToString(byte map) => map == 0 ? "-" : "L" + map.ToString(CultureInfo.CurrentCulture);
+    private static string ToString(byte map) => map switch
+    {
+        0 => "-",
+        _ => "L" + map.ToString(CultureInfo.CurrentCulture)
+    };
 }

@@ -1273,12 +1273,48 @@
 	  <value>Priorität</value>
   </data>
   <data name="LoadBalancingSharedMaxCurrent" xml:space="preserve">
-	  <value>Maximaler Strom für alle Wattpiloten</value>
+	  <value>Maximaler Ladestrom für alle Wattpiloten</value>
   </data>
   <data name="MaximumCurrentDnoLine" xml:space="preserve">
 	  <value>Maximaler Strom am Netzanschluss</value>
   </data>
   <data name="MaximumFallbackCurrent" xml:space="preserve">
-	  <value>Maximaler Strom bei Strom- oder Netzwerkausfall</value>
+	  <value>Maximaler Ladestrom bei Strom- oder Netzwerkausfall</value>
+  </data>
+  <data name="AwattarCountry_GermanyLuxembourg" xml:space="preserve">
+	  <value>Deutschland / Luxemburg</value>
+  </data>
+  <data name="AwattarCountry_Switzerland" xml:space="preserve">
+	  <value>Schweiz</value>
+  </data>
+  <data name="AwattarCountry_Belgium" xml:space="preserve">
+	  <value>Belgien</value>
+  </data>
+  <data name="AwattarCountry_Denmark1" xml:space="preserve">
+	  <value>Dänemark Zone 1</value>
+  </data>
+  <data name="AwattarCountry_Denmark2" xml:space="preserve">
+	  <value>Dänemark Zone 2</value>
+  </data>
+  <data name="AwattarCountry_DenmarkTibber1" xml:space="preserve">
+	  <value>Dänemark Zone 1 Tibber</value>
+  </data>
+  <data name="AwattarCountry_DenmarkTibber2" xml:space="preserve">
+	  <value>Dänemark Zone 2 Tibber</value>
+  </data>
+  <data name="AwattarCountry_Estonia" xml:space="preserve">
+	  <value>Estland</value>
+  </data>
+  <data name="AwattarCountry_Finland" xml:space="preserve">
+	  <value>Finnland</value>
+  </data>
+  <data name="AwattarCountry_France" xml:space="preserve">
+	  <value>Frankreich</value>
+  </data>
+  <data name="AwattarCountry_Greece" xml:space="preserve">
+	  <value>Griechenland</value>
+  </data>
+  <data name="AwattarCountry_FinlandTibber" xml:space="preserve">
+	  <value>Finnland Tibber</value>
   </data>
 </root>
