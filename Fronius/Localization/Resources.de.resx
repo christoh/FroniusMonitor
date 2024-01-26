@@ -823,19 +823,19 @@
 	  <value>PV-Überschuss verwenden</value>
   </data>
   <data name="AwattarEnabled" xml:space="preserve">
-	  <value>Awattar/Lumina-Strompreis verwenden</value>
+	  <value>Dynamischen Strompreis verwenden</value>
   </data>
   <data name="AwattarCountry_Austria" xml:space="preserve">
 	  <value>Österreich</value>
   </data>
   <data name="AwattarCountry" xml:space="preserve">
-	  <value>Awattar/Lumina-Land</value>
+	  <value>Preisregion</value>
   </data>
   <data name="AwattarCountry_Germany" xml:space="preserve">
 	  <value>Deutschland</value>
   </data>
   <data name="MaxEnergyPrice" xml:space="preserve">
-	  <value>Maximaler Awattar/Lumina-Strompreis</value>
+	  <value>Maximaler Netto-Strompreis</value>
   </data>
   <data name="PvSurplusBatteryLevel" xml:space="preserve">
 	  <value>Minimaler SoC PV-Batterie</value>
@@ -1285,7 +1285,7 @@
 	  <value>Deutschland / Luxemburg</value>
   </data>
   <data name="AwattarCountry_Switzerland" xml:space="preserve">
-	  <value>Schweiz</value>
+	  <value>Schweiz / Liechtenstein</value>
   </data>
   <data name="AwattarCountry_Belgium" xml:space="preserve">
 	  <value>Belgien</value>
@@ -1319,5 +1319,68 @@
   </data>
   <data name="NewFirmwareAvailable" xml:space="preserve">
 	  <value>Eine neue Firmware {0} ist verfügbar. Deine derzeitige Firmware ist {1}.</value>
+  </data>
+  <data name="AwattarCountry_Croatia" xml:space="preserve">
+	  <value>Kroatien</value>
+  </data>
+  <data name="AwattarCountry_Latvia" xml:space="preserve">
+	  <value>Lettland</value>
+  </data>
+  <data name="AwattarCountry_Lithuania" xml:space="preserve">
+	  <value>Litauen</value>
+  </data>
+  <data name="AwattarCountry_Netherlands" xml:space="preserve">
+	  <value>Niederlande</value>
+  </data>
+  <data name="AwattarCountry_Poland" xml:space="preserve">
+	  <value>Polen</value>
+  </data>
+  <data name="AwattarCountry_Romania" xml:space="preserve">
+	  <value>Rumänien</value>
+  </data>
+  <data name="AwattarCountry_Serbia" xml:space="preserve">
+	  <value>Serbien</value>
+  </data>
+  <data name="AwattarCountry_Slovakia" xml:space="preserve">
+	  <value>Slowakei</value>
+  </data>
+  <data name="AwattarCountry_Slovenia" xml:space="preserve">
+	  <value>Slowenien</value>
+  </data>
+  <data name="AwattarCountry_Spain" xml:space="preserve">
+	  <value>Spanien</value>
+  </data>
+  <data name="AwattarCountry_Czechia" xml:space="preserve">
+	  <value>Tschechien</value>
+  </data>
+  <data name="AwattarCountry_Hungary" xml:space="preserve">
+	  <value>Ungarn</value>
+  </data>
+  <data name="AwattarCountry_ItalyCalabria" xml:space="preserve">
+	  <value>Italien (Kalabrien)</value>
+  </data>
+  <data name="AwattarCountry_ItalyCenterNorth" xml:space="preserve">
+	  <value>Italien (Zentral-Nord)</value>
+  </data>
+  <data name="AwattarCountry_ItalyCenterSouth" xml:space="preserve">
+	  <value>Italien (Zentral-Süd)</value>
+  </data>
+  <data name="AwattarCountry_ItalyNorth" xml:space="preserve">
+	  <value>Italien (Nord)</value>
+  </data>
+  <data name="AwattarCountry_ItalySacoAc" xml:space="preserve">
+	  <value>Italien (SACO AC)</value>
+  </data>
+  <data name="AwattarCountry_ItalySacoDc" xml:space="preserve">
+	  <value>Italien (SACO DC)</value>
+  </data>
+  <data name="AwattarCountry_ItalySardinia" xml:space="preserve">
+	  <value>Italien (Sardinien)</value>
+  </data>
+  <data name="AwattarCountry_ItalySicily" xml:space="preserve">
+	  <value>Italien (Sizilien)</value>
+  </data>
+  <data name="AwattarCountry_ItalySouth" xml:space="preserve">
+	  <value>Italien (Süd)</value>
   </data>
 </root>

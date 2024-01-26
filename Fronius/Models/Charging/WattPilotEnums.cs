@@ -1,4 +1,5 @@
-﻿namespace De.Hochstaetter.Fronius.Models.Charging;
+﻿// ReSharper disable UnusedMember.Global
+namespace De.Hochstaetter.Fronius.Models.Charging;
 
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
 public enum ModelStatus
@@ -101,6 +102,7 @@ public enum ForcedCharge
     ForcedOn = 2,
 }
 
+[SuppressMessage("ReSharper", "IdentifierTypo")]
 public enum AwattarCountry : int
 {
     Austria = 0,
@@ -108,23 +110,57 @@ public enum AwattarCountry : int
     Switzerland = 10035,
     Belgium = 10043,
     Denmark1 = 10024,
-    Denmark2 =10036,
-    DenmarkTibber1=10055,
-    DenmarkTibber2=10056,
+    Denmark2 = 10036,
+    DenmarkTibber1 = 10055,
+    DenmarkTibber2 = 10056,
     Estonia = 10020,
-    Finland=10004,
-    FinlandTibber=10049,
-    France=10015,
-    Greece=10006,
-    ItalyCalabria=10017,
-    ItalyCenterNorth=10031,
-    ItalyCenterSouth=10009,
-    ItalyNorth=10034,
-    ItalySacoAc=10023,
-    ItalySacoDc=10001,
-    ItalySardinia=10029,
-    ItalySicily=10005,
-    ItalySouth=10041,
+    Finland = 10004,
+    FinlandTibber = 10049,
+    France = 10015,
+    Greece = 10006,
+    ItalyCalabria = 10017,
+    ItalyCenterNorth = 10031,
+    ItalyCenterSouth = 10009,
+    ItalyNorth = 10034,
+    ItalySacoAc = 10023,
+    ItalySacoDc = 10001,
+    ItalySardinia = 10029,
+    ItalySicily = 10005,
+    ItalySouth = 10041,
+    Croatia = 10003,
+    Latvia = 10010,
+    Lithuania = 10030,
+    Montenegro = 10012,
+    Netherlands = 10038,
+    Poland = 10037,
+    Portugal = 10027,
+    Romania = 10044,
+    Serbia = 10039,
+    Slovakia = 10040,
+    Slovenia = 10025,
+    Spain = 10018,
+    Czechia = 10019,
+    Ukraine = 10002,
+    Hungary = 10042,
+    Sweden1 = 10062,
+    Sweden2 = 10063,
+    Sweden3 = 10064,
+    Sweden4 = 10065,
+    Sweden1Tibber = 10045,
+    Sweden2Tibber = 10046,
+    Sweden3Tibber = 10047,
+    Sweden4Tibber = 10048,
+    Norway1 = 10057,
+    Norway2 = 10058,
+    Norway3 = 10059,
+    Norway4 = 10060,
+    Norway5 = 10061,
+    NorwayVirtualNo2Nsl = 10021,
+    NorwayTibber1 = 10050,
+    NorwayTibber2 = 10051,
+    NorwayTibber3 = 10052,
+    NorwayTibber4 = 10053,
+    NorwayTibber5 = 10054,
 }
 
 public enum EcoRoundingMode : byte
@@ -149,15 +185,15 @@ public enum CarType : byte
     Eqc2019,
 }
 
-[Flags]
-public enum Phases : byte
-{
-    None = 0,
-    L1 = 1 << 0,
-    L2 = 1 << 1,
-    L3 = 1 << 2,
-    All = L1 | L2 | L3,
-}
+//[Flags]
+//public enum Phases : byte
+//{
+//    None = 0,
+//    L1 = 1 << 0,
+//    L2 = 1 << 1,
+//    L3 = 1 << 2,
+//    All = L1 | L2 | L3,
+//}
 
 public enum LoadBalancingPriority : byte
 {

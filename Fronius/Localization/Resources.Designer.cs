@@ -286,7 +286,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Awattar/Lumina country.
+        ///   Looks up a localized string similar to Price region.
         /// </summary>
         public static string AwattarCountry {
             get {
@@ -309,6 +309,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string AwattarCountry_Belgium {
             get {
                 return ResourceManager.GetString("AwattarCountry_Belgium", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Croatia.
+        /// </summary>
+        public static string AwattarCountry_Croatia {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Croatia", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Czechia.
+        /// </summary>
+        public static string AwattarCountry_Czechia {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Czechia", resourceCulture);
             }
         }
         
@@ -412,7 +430,178 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Switzerland.
+        ///   Looks up a localized string similar to Hungary.
+        /// </summary>
+        public static string AwattarCountry_Hungary {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Hungary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Italy (Calabria).
+        /// </summary>
+        public static string AwattarCountry_ItalyCalabria {
+            get {
+                return ResourceManager.GetString("AwattarCountry_ItalyCalabria", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Italy (Center North).
+        /// </summary>
+        public static string AwattarCountry_ItalyCenterNorth {
+            get {
+                return ResourceManager.GetString("AwattarCountry_ItalyCenterNorth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Italy (Center South).
+        /// </summary>
+        public static string AwattarCountry_ItalyCenterSouth {
+            get {
+                return ResourceManager.GetString("AwattarCountry_ItalyCenterSouth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Italy (North).
+        /// </summary>
+        public static string AwattarCountry_ItalyNorth {
+            get {
+                return ResourceManager.GetString("AwattarCountry_ItalyNorth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Italy (SACO AC).
+        /// </summary>
+        public static string AwattarCountry_ItalySacoAc {
+            get {
+                return ResourceManager.GetString("AwattarCountry_ItalySacoAc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Italy (SACO DC).
+        /// </summary>
+        public static string AwattarCountry_ItalySacoDc {
+            get {
+                return ResourceManager.GetString("AwattarCountry_ItalySacoDc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Italy (Sardinia).
+        /// </summary>
+        public static string AwattarCountry_ItalySardinia {
+            get {
+                return ResourceManager.GetString("AwattarCountry_ItalySardinia", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Italy (Sicily).
+        /// </summary>
+        public static string AwattarCountry_ItalySicily {
+            get {
+                return ResourceManager.GetString("AwattarCountry_ItalySicily", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Italy (South).
+        /// </summary>
+        public static string AwattarCountry_ItalySouth {
+            get {
+                return ResourceManager.GetString("AwattarCountry_ItalySouth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Latvia.
+        /// </summary>
+        public static string AwattarCountry_Latvia {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Latvia", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lithuania.
+        /// </summary>
+        public static string AwattarCountry_Lithuania {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Lithuania", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Netherlands.
+        /// </summary>
+        public static string AwattarCountry_Netherlands {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Netherlands", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Poland.
+        /// </summary>
+        public static string AwattarCountry_Poland {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Poland", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Romania.
+        /// </summary>
+        public static string AwattarCountry_Romania {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Romania", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Serbia.
+        /// </summary>
+        public static string AwattarCountry_Serbia {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Serbia", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Slovakia.
+        /// </summary>
+        public static string AwattarCountry_Slovakia {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Slovakia", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Slovenia.
+        /// </summary>
+        public static string AwattarCountry_Slovenia {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Slovenia", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Spain.
+        /// </summary>
+        public static string AwattarCountry_Spain {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Spain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Switzerland / Liechtenstein.
         /// </summary>
         public static string AwattarCountry_Switzerland {
             get {
@@ -421,7 +610,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Use Awattar/Lumina energy price.
+        ///   Looks up a localized string similar to Use dynamic energy price.
         /// </summary>
         public static string AwattarEnabled {
             get {
@@ -1672,7 +1861,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Maximum Awattar/Lumina energy price.
+        ///   Looks up a localized string similar to Maximum net energy price.
         /// </summary>
         public static string MaxEnergyPrice {
             get {
