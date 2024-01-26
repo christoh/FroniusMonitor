@@ -128,7 +128,9 @@
                         <TextBlock Margin="0" Text="{x:Static p:Resources.IsWifiClientEnabled}" />
                     </CheckBox>
                     <CheckBox Content="{x:Static p:Resources.UnlockCableOnPowerFailure}" IsChecked="{Binding WattPilot.UnlockCableOnPowerFailure}" />
-                    <CheckBox Content="{x:Static p:Resources.EnableLoadBalancing}" IsChecked="{Binding WattPilot.LoadBalancingEnabled}" />
+                    <CheckBox IsEnabled="{Binding EnableDanger}" IsChecked="{Binding WattPilot.LoadBalancingEnabled}">
+                        <TextBlock Margin="0" Text="{x:Static p:Resources.EnableLoadBalancing}" />
+                    </CheckBox>
                     <CheckBox Content="{x:Static p:Resources.RequireRfidAuth}" IsChecked="{Binding WattPilot.AccessMode, Converter={co:AccessMode2Bool}}" />
                     <CheckBox Content="{x:Static p:Resources.AuthCurrentUser}" IsChecked="{Binding IsUserAuthenticated}" />
                     <CheckBox IsChecked="{Binding WattPilot.CloudAccessEnabled}">
