@@ -206,7 +206,9 @@ public partial class InverterControl
                     DcPower.Visibility = Visibility.Visible;
                     DcPowerHeadline.Text = Loc.DcPower + (Mode == InverterDisplayMode.DcRelativePower ? " %" : string.Empty);
                     DcPowerFirstGauge.ShowPercent = Mode == InverterDisplayMode.DcRelativePower;
-                    DcPowerAggregateGauge.DisplayName = Mode == InverterDisplayMode.DcPower ? Loc.Sum : Loc.Total;
+                    DcPowerAggregateGauge.Value = gen24Sensors?.Cache?.Solar2Power / gen24Sensors?.Cache?.Solar1Power * 100;
+                    //DcPowerAggregateGauge.DisplayName = Mode == InverterDisplayMode.DcPower ? Loc.Sum : Loc.Total;
+
                     break;
 
                 case InverterDisplayMode.MoreEfficiency:

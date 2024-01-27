@@ -1096,6 +1096,46 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref loadBalancingPriority, value);
     }
 
+    private int? randomDelayPowerFailure;
+    [WattPilot("rdre", false)]
+    public int? RandomDelayPowerFailure
+    {
+        get => randomDelayPowerFailure;
+        set => Set(ref randomDelayPowerFailure, value);
+    }
+
+    private int? randomDelayAwattarStart;
+    [WattPilot("rdbf", false)]
+    public int? RandomDelayAwattarStart
+    {
+        get => randomDelayAwattarStart;
+        set => Set(ref randomDelayAwattarStart, value);
+    }
+
+    private int? randomDelayAwattarStop;
+    [WattPilot("rdef", false)]
+    public int? RandomDelayAwattarStop
+    {
+        get => randomDelayAwattarStop;
+        set => Set(ref randomDelayAwattarStop, value);
+    }
+
+    private int? randomDelayTimerStart;
+    [WattPilot("rdbs, false")]
+    public int? RandomDelayTimerStart
+    {
+        get => randomDelayTimerStart;
+        set => Set(ref randomDelayTimerStart, value);
+    }
+
+    private int? randomDelayTimerStop;
+    [WattPilot("rdes, false")]
+    public int? RandomDelayTimerStop
+    {
+        get => randomDelayTimerStop;
+        set => Set(ref randomDelayTimerStop, value);
+    }
+
     public string? CableLockBehaviorDisplayName => CableLockBehavior?.ToDisplayName();
 
     public string DisplayName => $"{DeviceName ?? HostName ?? SerialNumber ?? Resources.Unknown}";

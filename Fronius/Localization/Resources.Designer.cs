@@ -601,6 +601,78 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sweden Elspot 1.
+        /// </summary>
+        public static string AwattarCountry_Sweden1 {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Sweden1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sweden Elspot 1 Tibber.
+        /// </summary>
+        public static string AwattarCountry_Sweden1Tibber {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Sweden1Tibber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sweden Elspot 2.
+        /// </summary>
+        public static string AwattarCountry_Sweden2 {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Sweden2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sweden Elspot 2 Tibber.
+        /// </summary>
+        public static string AwattarCountry_Sweden2Tibber {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Sweden2Tibber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sweden Elspot 3.
+        /// </summary>
+        public static string AwattarCountry_Sweden3 {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Sweden3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Swden Elspot 3 Tibber.
+        /// </summary>
+        public static string AwattarCountry_Sweden3Tibber {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Sweden3Tibber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sweden Elspot 4.
+        /// </summary>
+        public static string AwattarCountry_Sweden4 {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Sweden4", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        public static string AwattarCountry_Sweden4Tibber {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Sweden4Tibber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Switzerland / Liechtenstein.
         /// </summary>
         public static string AwattarCountry_Switzerland {

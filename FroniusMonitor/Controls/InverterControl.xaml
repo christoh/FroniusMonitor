@@ -301,17 +301,19 @@
                                                          High="{Binding Config.InverterSettings.Mppt.Mppt2.WattPeak, FallbackValue=4500, Converter={co:Multiply Factor=.90}}"
                                                          VeryHigh="{Binding Config.InverterSettings.Mppt.Mppt2.WattPeak, FallbackValue=4750, Converter={co:Multiply Factor=.95}}" />
 
-                                <c:LinearHorizontalGauge x:Name="DcPowerAggregateGauge" ShowPercent="{Binding ShowPercent, ElementName=DcPowerFirstGauge}"
+                                <!--<c:LinearHorizontalGauge x:Name="DcPowerAggregateGauge" ShowPercent="{Binding ShowPercent, ElementName=DcPowerFirstGauge}"
                                                          Value="{Binding Sensors.Cache.SolarPowerSum, FallbackValue={x:Null}}"
                                                          Maximum="{Binding Config.InverterSettings.Mppt.WattPeakTotal, FallbackValue=10000}"
                                                          VeryLow="{Binding Config.InverterSettings.Mppt.WattPeakTotal, FallbackValue=500, Converter={co:Multiply Factor=.05}}"
                                                          Low="{Binding Config.InverterSettings.Mppt.WattPeakTotal, FallbackValue=1000, Converter={co:Multiply Factor=.10}}"
                                                          High="{Binding Config.InverterSettings.Mppt.WattPeakTotal, FallbackValue=9000, Converter={co:Multiply Factor=.90}}"
-                                                         VeryHigh="{Binding Config.InverterSettings.Mppt.WattPeakTotal, FallbackValue=9500, Converter={co:Multiply Factor=.95}}" />
+                                                         VeryHigh="{Binding Config.InverterSettings.Mppt.WattPeakTotal, FallbackValue=9500, Converter={co:Multiply Factor=.95}}" />-->
+
+                                <c:LinearHorizontalGauge x:Name="DcPowerAggregateGauge" ShowPercent="False" UnitSymbol="%" StringFormat="N1" DisplayName="2/1" Maximum="2000000" Minimum="1000000"/>
 
                                 <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Battery}" ShowPercent="{Binding ShowPercent, ElementName=DcPowerFirstGauge}"
                                                          Value="{Binding Sensors.Cache.StoragePower, FallbackValue={x:Null}}"
-                                                         Minimum="0" Maximum="7000" />
+                                                         Minimum="0" Maximum="{Binding Sensors.Storage.VoltageOuter, FallbackValue=8184, Converter={co:Multiply Factor=22}}" />
                             </StackPanel>
                         </Grid>
 

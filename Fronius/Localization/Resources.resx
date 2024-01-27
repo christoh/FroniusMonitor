@@ -1425,4 +1425,28 @@
   <data name="AwattarCountry_ItalySouth" xml:space="preserve">
 	  <value>Italy (South)</value>
   </data>
+  <data name="AwattarCountry_Sweden1" xml:space="preserve">
+	  <value>Sweden Elspot 1</value>
+  </data>
+  <data name="AwattarCountry_Sweden2" xml:space="preserve">
+	  <value>Sweden Elspot 2</value>
+  </data>
+  <data name="AwattarCountry_Sweden3" xml:space="preserve">
+	  <value>Sweden Elspot 3</value>
+  </data>
+  <data name="AwattarCountry_Sweden4" xml:space="preserve">
+	  <value>Sweden Elspot 4</value>
+  </data>
+  <data name="AwattarCountry_Sweden1Tibber" xml:space="preserve">
+	  <value>Sweden Elspot 1 Tibber</value>
+  </data>
+  <data name="AwattarCountry_Sweden2Tibber" xml:space="preserve">
+	  <value>Sweden Elspot 2 Tibber</value>
+  </data>
+  <data name="AwattarCountry_Sweden3Tibber" xml:space="preserve">
+	  <value>Swden Elspot 3 Tibber</value>
+  </data>
+  <data name="AwattarCountry_Sweden4Tibber" xml:space="preserve">
+	  <value>Sweden Elspot 4 Tibber</value>
+  </data>
 </root>
