@@ -156,11 +156,11 @@ public enum AwattarCountry : int
     Norway4 = 10060,
     Norway5 = 10061,
     NorwayVirtualNo2Nsl = 10021,
-    NorwayTibber1 = 10050,
-    NorwayTibber2 = 10051,
-    NorwayTibber3 = 10052,
-    NorwayTibber4 = 10053,
-    NorwayTibber5 = 10054,
+    Norway1Tibber = 10050,
+    Norway2Tibber = 10051,
+    Norway3Tibber = 10052,
+    Norway4Tibber = 10053,
+    Norway5Tibber = 10054,
 }
 
 public enum EcoRoundingMode : byte

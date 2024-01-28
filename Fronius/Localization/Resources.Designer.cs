@@ -547,6 +547,105 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Norway Elspot 1.
+        /// </summary>
+        public static string AwattarCountry_Norway1 {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Norway1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Norway Elspot 1 Tibber.
+        /// </summary>
+        public static string AwattarCountry_Norway1Tibber {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Norway1Tibber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Norway Elspot 2.
+        /// </summary>
+        public static string AwattarCountry_Norway2 {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Norway2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Norway Elspot 2 Tibber.
+        /// </summary>
+        public static string AwattarCountry_Norway2Tibber {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Norway2Tibber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Norway Elspot 3.
+        /// </summary>
+        public static string AwattarCountry_Norway3 {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Norway3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Norway Elspot 3 Tibber.
+        /// </summary>
+        public static string AwattarCountry_Norway3Tibber {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Norway3Tibber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Norway Elspot 4.
+        /// </summary>
+        public static string AwattarCountry_Norway4 {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Norway4", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Norway Elspot 4 Tibber.
+        /// </summary>
+        public static string AwattarCountry_Norway4Tibber {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Norway4Tibber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Norway Elspot 5.
+        /// </summary>
+        public static string AwattarCountry_Norway5 {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Norway5", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Norway Elspot 5 Tibber.
+        /// </summary>
+        public static string AwattarCountry_Norway5Tibber {
+            get {
+                return ResourceManager.GetString("AwattarCountry_Norway5Tibber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        public static string AwattarCountry_NorwayVirtualNo2Nsl {
+            get {
+                return ResourceManager.GetString("AwattarCountry_NorwayVirtualNo2Nsl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Poland.
         /// </summary>
         public static string AwattarCountry_Poland {
@@ -664,7 +763,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Sweden Elspot 4 Tibber.
         /// </summary>
         public static string AwattarCountry_Sweden4Tibber {
             get {
@@ -1560,6 +1659,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string GridPowerManagement {
             get {
                 return ResourceManager.GetString("GridPowerManagement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to g.
+        /// </summary>
+        public static string GrossShort {
+            get {
+                return ResourceManager.GetString("GrossShort", resourceCulture);
             }
         }
         
@@ -2505,6 +2613,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string NetMask {
             get {
                 return ResourceManager.GetString("NetMask", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to n.
+        /// </summary>
+        public static string NetShort {
+            get {
+                return ResourceManager.GetString("NetShort", resourceCulture);
             }
         }
         

@@ -1449,4 +1449,43 @@
   <data name="AwattarCountry_Sweden4Tibber" xml:space="preserve">
 	  <value>Sweden Elspot 4 Tibber</value>
   </data>
+  <data name="NetShort" xml:space="preserve">
+	  <value>n</value>
+  </data>
+  <data name="GrossShort" xml:space="preserve">
+	  <value>g</value>
+  </data>
+  <data name="AwattarCountry_Norway1" xml:space="preserve">
+	  <value>Norway Elspot 1</value>
+  </data>
+  <data name="AwattarCountry_Norway2" xml:space="preserve">
+	  <value>Norway Elspot 2</value>
+  </data>
+  <data name="AwattarCountry_Norway3" xml:space="preserve">
+	  <value>Norway Elspot 3</value>
+  </data>
+  <data name="AwattarCountry_Norway4" xml:space="preserve">
+	  <value>Norway Elspot 4</value>
+  </data>
+  <data name="AwattarCountry_Norway5" xml:space="preserve">
+	  <value>Norway Elspot 5</value>
+  </data>
+  <data name="AwattarCountry_Norway1Tibber" xml:space="preserve">
+	  <value>Norway Elspot 1 Tibber</value>
+  </data>
+  <data name="AwattarCountry_Norway2Tibber" xml:space="preserve">
+	  <value>Norway Elspot 2 Tibber</value>
+  </data>
+  <data name="AwattarCountry_Norway3Tibber" xml:space="preserve">
+	  <value>Norway Elspot 3 Tibber</value>
+  </data>
+  <data name="AwattarCountry_Norway4Tibber" xml:space="preserve">
+	  <value>Norway Elspot 4 Tibber</value>
+  </data>
+  <data name="AwattarCountry_Norway5Tibber" xml:space="preserve">
+	  <value>Norway Elspot 5 Tibber</value>
+  </data>
+  <data name="AwattarCountry_NorwayVirtualNo2Nsl" xml:space="preserve">
+	  <value>Norway Virtual Bidding Zone NO2NSL</value>
+  </data>
 </root>

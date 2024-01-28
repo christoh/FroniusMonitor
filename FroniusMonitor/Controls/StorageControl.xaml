@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
              xmlns:gl="clr-namespace:System.Globalization;assembly=System.Globalization"
              xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
              mc:Ignorable="d"
              d:DesignHeight="1000" d:DesignWidth="700">
     <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:StorageControl}}">
@@ -20,7 +21,8 @@
 
             <TextBlock Margin="0,290,0,0" HorizontalAlignment="Center" FontSize="80" FontWeight="Bold">
                 <Run Text="{Binding HomeAutomationSystem.StorageNetCapacity, StringFormat=N0, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---}" />
-                <Run Text="Wh n" />
+                <Run Text="Wh" />
+                <Run Text="{x:Static p:Resources.NetShort}"/>
             </TextBlock>
 
             <TextBlock Margin="0,375,0,0" HorizontalAlignment="Center" FontSize="80" FontWeight="Bold">
@@ -37,7 +39,8 @@
 
             <TextBlock Margin="0,570,0,0" HorizontalAlignment="Center" FontSize="80">
                 <Run Text="{Binding Gen24Sensors.Storage.AvailableCapacity, StringFormat=N0, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---}" />
-                <Run Text="Wh g" />
+                <Run Text="Wh" />
+                <Run Text="{x:Static p:Resources.GrossShort}"/>
             </TextBlock>
 
             <TextBlock Margin="0,655,0,0" HorizontalAlignment="Center" FontSize="80">
@@ -46,8 +49,8 @@
             </TextBlock>
 
             <TextBlock Margin="0,740,0,0" HorizontalAlignment="Center" FontSize="80">
-                <Run Text="{Binding Gen24Sensors.Storage.Power, StringFormat=N0, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---}" />
-                <Run Text="W" />
+                <Run Text="{Binding Gen24Sensors.Storage.Current, StringFormat=N3, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---}" />
+                <Run Text="A" />
             </TextBlock>
 
             <TextBlock Margin="0,825,0,0" HorizontalAlignment="Center" FontSize="80">

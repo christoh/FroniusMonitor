@@ -40,6 +40,17 @@ public partial class InverterControl
     private bool isInStandByChange;
     private string? lastStatusCode;
     private DateTime lastStandbySwitchUpdate = DateTime.UnixEpoch;
+    private bool isInStartingAnimation;
+
+    private static readonly ColorAnimation startingAnimation = new()
+    {
+        To = Colors.AntiqueWhite,
+        From = Colors.LightGray,
+        AutoReverse = true,
+        RepeatBehavior = RepeatBehavior.Forever,
+        Duration = TimeSpan.FromSeconds(1.5),
+    };
+
 
     #region Dependency Properties
 
@@ -187,7 +198,27 @@ public partial class InverterControl
                 return;
             }
 
-            BackgroundProvider.Background = gen24Sensors?.InverterStatus?.ToBrush() ?? Brushes.LightGray;
+            if (gen24Sensors?.InverterStatus?.StatusCode is "STATE_STARTUP")
+            {
+                if (!isInStartingAnimation)
+                {
+                    var brush = new SolidColorBrush(Colors.LightGray);
+                    BackgroundProvider.Background = brush;
+                    BackgroundProvider.Background.BeginAnimation(SolidColorBrush.ColorProperty, startingAnimation);
+                    isInStartingAnimation = true;
+                }
+            }
+            else
+            {
+                if (isInStartingAnimation)
+                {
+                    BackgroundProvider.BeginAnimation(SolidColorBrush.ColorProperty, null);
+                }
+
+                isInStartingAnimation = false;
+                BackgroundProvider.Background = gen24Sensors?.InverterStatus?.ToBrush() ?? Brushes.LightGray;
+            }
+            
             InverterModelName.Text = $"{gen24Config.Versions?.ModelName ?? "---"} ({gen24Sensors?.InverterStatus?.StatusMessage ?? Loc.Unknown})";
             InverterName.Text = gen24Common?.SystemName ?? "---";
 
@@ -206,8 +237,32 @@ public partial class InverterControl
                     DcPower.Visibility = Visibility.Visible;
                     DcPowerHeadline.Text = Loc.DcPower + (Mode == InverterDisplayMode.DcRelativePower ? " %" : string.Empty);
                     DcPowerFirstGauge.ShowPercent = Mode == InverterDisplayMode.DcRelativePower;
-                    DcPowerAggregateGauge.Value = gen24Sensors?.Cache?.Solar2Power / gen24Sensors?.Cache?.Solar1Power * 100;
-                    //DcPowerAggregateGauge.DisplayName = Mode == InverterDisplayMode.DcPower ? Loc.Sum : Loc.Total;
+
+                    switch (Mode)
+                    {
+                        case InverterDisplayMode.DcPower:
+                            DcPowerAggregateGauge.DisplayName = Loc.Sum;
+                            DcPowerAggregateGauge.Value = gen24Sensors?.Cache?.SolarPowerSum;
+                            DcPowerAggregateGauge.Maximum = gen24Config.InverterSettings?.Mppt?.WattPeakTotal ?? 10000;
+                            DcPowerAggregateGauge.Minimum = 0;
+                            DcPowerAggregateGauge.VeryLow = (gen24Config.InverterSettings?.Mppt?.WattPeakTotal ?? 10000) * 0.05;
+                            DcPowerAggregateGauge.Low = (gen24Config.InverterSettings?.Mppt?.WattPeakTotal ?? 10000) * 0.1;
+                            DcPowerAggregateGauge.High = (gen24Config.InverterSettings?.Mppt?.WattPeakTotal ?? 10000) * 0.9;
+                            DcPowerAggregateGauge.VeryHigh = (gen24Config.InverterSettings?.Mppt?.WattPeakTotal ?? 10000) * 0.95;
+                            DcPowerAggregateGauge.StringFormat = "N0";
+                            DcPowerAggregateGauge.UnitSymbol = "W";
+                            break;
+
+                        case InverterDisplayMode.DcRelativePower:
+                            DcPowerAggregateGauge.Value = gen24Sensors?.Cache?.Solar2Power / gen24Sensors?.Cache?.Solar1Power * 100;
+                            DcPowerAggregateGauge.Minimum = 1_000_000;
+                            DcPowerAggregateGauge.Maximum = 2_000_000;
+                            DcPowerAggregateGauge.StringFormat = "N1";
+                            DcPowerAggregateGauge.UnitSymbol = "%";
+                            DcPowerAggregateGauge.DisplayName = "2/1";
+                            break;
+
+                    }
 
                     break;
 

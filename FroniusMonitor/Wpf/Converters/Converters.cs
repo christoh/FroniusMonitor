@@ -309,6 +309,8 @@ public class Bool2Visibility : BoolToAnything<Visibility>
 
 public class Bool2String : BoolToAnything<string> { }
 
+public class Bool2Thickness : BoolToAnything<Thickness> { }
+
 public class MultiBool2Anything<T> : MultiConverterBase
 {
     public virtual T? All { get; set; }

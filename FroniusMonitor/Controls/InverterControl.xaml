@@ -309,7 +309,7 @@
                                                          High="{Binding Config.InverterSettings.Mppt.WattPeakTotal, FallbackValue=9000, Converter={co:Multiply Factor=.90}}"
                                                          VeryHigh="{Binding Config.InverterSettings.Mppt.WattPeakTotal, FallbackValue=9500, Converter={co:Multiply Factor=.95}}" />-->
 
-                                <c:LinearHorizontalGauge x:Name="DcPowerAggregateGauge" ShowPercent="False" UnitSymbol="%" StringFormat="N1" DisplayName="2/1" Maximum="2000000" Minimum="1000000"/>
+                                <c:LinearHorizontalGauge x:Name="DcPowerAggregateGauge" ShowPercent="False"/>
 
                                 <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Battery}" ShowPercent="{Binding ShowPercent, ElementName=DcPowerFirstGauge}"
                                                          Value="{Binding Sensors.Cache.StoragePower, FallbackValue={x:Null}}"
