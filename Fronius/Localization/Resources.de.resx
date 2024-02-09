@@ -1264,10 +1264,10 @@
 	  <value>Hoch</value>
   </data>
   <data name="EnableLoadBalancing" xml:space="preserve">
-	  <value>Lastverteilung aktivieren</value>
+	  <value>Lastmanagement aktivieren</value>
   </data>
   <data name="LoadBalancing" xml:space="preserve">
-	  <value>Lastverteilung</value>
+	  <value>Lastmanagement</value>
   </data>
   <data name="Priority" xml:space="preserve">
 	  <value>Priorität</value>
