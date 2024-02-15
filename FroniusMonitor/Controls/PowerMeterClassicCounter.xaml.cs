@@ -56,23 +56,17 @@ public partial class PowerMeterClassicCounter
     {
         var value = (int)Math.Round(IsInCalibration ? calibratedValue : Value, MidpointRounding.AwayFromZero);
 
-        foreach (var textBlock in textBlocks)
+        for (byte i = 0; i < textBlocks.Count; i++)
         {
-            var text = (value % 10).ToString("D1");
+            var digitString = (value % 10).ToString("D1", CultureInfo.CurrentCulture);
             value /= 10;
-
-            if (text == "0" && value == 0)
-            {
-                text = "";
-            }
-
-            textBlock.Text = text;
+            textBlocks[i].Text = value == 0 && i > 3 && digitString == "0" ? string.Empty : digitString;
         }
     }
 
     private void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
-        if (e.ClickCount > 1 && e.ChangedButton == MouseButton.Left)
+        if (e is { ClickCount: > 1, ChangedButton: MouseButton.Left })
         {
             calibratedValue = Value;
             IsInCalibration = true;
