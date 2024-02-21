@@ -226,7 +226,7 @@
                                 <c:LinearHorizontalGauge DisplayName="L1" Value="{Binding Sensors.Cache.InverterPowerFactorL1, FallbackValue={x:Null}}" />
                                 <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding Sensors.Cache.InverterPowerFactorL2, FallbackValue={x:Null}}" />
                                 <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding Sensors.Cache.InverterPowerFactorL3, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Average}" Value="{Binding Sensors.Cache.InverterPowerFactorAverage, FallbackValue={x:Null}}" />
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.AverageShort}" Value="{Binding Sensors.Cache.InverterPowerFactorAverage, FallbackValue={x:Null}}" />
                             </StackPanel>
                         </Grid>
 
