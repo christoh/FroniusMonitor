@@ -22,7 +22,7 @@
                 </TransformGroup>
             </c:Arrow.LayoutTransform>
         </c:Arrow>
-        <TextBlock Text="--- W" x:Name="TextBlock" FontSize="14" FontWeight="Bold" Canvas.Top="15" Canvas.Left="20" Width="85"
+        <TextBlock FontSize="14" FontWeight="Bold" Canvas.Top="15" Canvas.Left="20" Width="85"
                    TextAlignment="{Binding TextPlacement, Converter={co:PlacementMode2TextAlignment Center=Center, Left=Center, Right=Center, Relative=Center}}"
                    Margin="{Binding TextPlacement, Converter={co:PlacementMode2Thickness Center='0,35,0,0', Left='-25,88,0,0', Right='80,88,0,0', Relative='0,35,0,0'}}"
                    VerticalAlignment="{Binding TextPlacement, Converter={co:PlacementMode2VerticalAlignment Center=Center, Left=Center, Right=Center, Relative=Center}}"
@@ -30,6 +30,7 @@
             <TextBlock.RenderTransform>
                 <RotateTransform Angle="{Binding TextPlacement, Converter={co:PlacementMode2Double Center=0, Left=-90, Top=-90, Right=-90, Relative=0}}"/>
             </TextBlock.RenderTransform>
+            <Run x:Name="TextBlock" Text="--- W"/><Run FontSize="8" BaselineAlignment="Subscript" Text="{Binding IsAc, Converter={co:Bool2String True='AC', False='DC'}}"></Run>
         </TextBlock>
         </Canvas>
     </Grid>

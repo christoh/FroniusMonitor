@@ -108,7 +108,7 @@
                                            Sensors="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors, FallbackValue={x:Null}}"
                                            Config="{Binding DataCollectionService.HomeAutomationSystem.Gen24Config, FallbackValue={x:Null}}"/>
                         <c:PowerFlowArrow VerticalAlignment="Top" Fill="#ffd000" HasRightPlacement="True" x:Name="LoadArrowPrimaryInverter" Margin="15,0"
-                                          Visibility="{Binding Settings.HaveTwoInverters, FallbackValue=Collapsed, Converter={co:Bool2Visibility}}"
+                                          Visibility="{Binding Settings.HaveTwoInverters, FallbackValue=Collapsed, Converter={co:Bool2Visibility}}" IsAc="True"
                                           Power="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors.PowerFlow.LoadPower, FallbackValue={x:Null}}" />
                         <c:InverterControl Height="200" Versions="{Binding DataCollectionService.HomeAutomationSystem.Gen24Config2.Versions, FallbackValue={x:Null}}" IsSecondary="True"
                                            Sensors="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors2, FallbackValue={x:Null}}"
@@ -136,14 +136,14 @@
                 <Grid Grid.Row="1" Grid.Column="0">
                     <StackPanel Orientation="Horizontal" Margin="120,-40,0,0">
 
-                        <c:PowerFlowArrow Angle="-30" Fill="LightGray"
+                        <c:PowerFlowArrow Angle="-30" Fill="LightGray" IsAc="True"
                                           Power="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors.PowerFlow.GridPowerCorrected, FallbackValue={x:Null}}" />
 
                         <c:PowerFlowArrow Angle="30" Margin="80,0,0,0" Fill="LightGreen" HasRightPlacement="True"
                                           Power="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors.PowerFlow.StoragePower, FallbackValue={x:Null}}"
                                           Visibility="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors.Storage, Converter={co:NullToVisibility Null=Hidden}, FallbackValue=Hidden}" />
 
-                        <c:PowerFlowArrow x:Name="LoadArrow" Fill="LightGray" DefaultsToOutgoing="True" 
+                        <c:PowerFlowArrow x:Name="LoadArrow" Fill="LightGray" DefaultsToOutgoing="True" IsAc="True"
                                           HasRightPlacement="{Binding Settings.HaveTwoInverters, FallbackValue=Collapsed, Converter={co:BoolInverter}}" 
                                           Margin="{Binding Settings.HaveTwoInverters, Converter={co:Bool2Thickness True='180,0,0,0', False='15,0,0,0'}, FallbackValue='15,0,0,0'}"
                                           Angle="{Binding Settings.HaveTwoInverters, Converter={co:Bool2Double False=30, True=-30}, FallbackValue=30}"
@@ -160,7 +160,7 @@
                                 <ScaleTransform ScaleX="{Binding ScaleX, ElementName=WattPilotTransform}" ScaleY="{Binding ScaleY, ElementName=WattPilotTransform}" />
                             </StackPanel.LayoutTransform>
                             <!--<c:PowerFlowArrow x:Name="CarArrow" Angle="0" Fill="{Binding ElementName=LoadArrow, Path=Fill}" HasRightPlacement="True" DefaultsToOutgoing="False"
-                                          Margin="0,0,0,0" HorizontalAlignment="Right"
+                                          Margin="0,0,0,0" HorizontalAlignment="Right" IsAc="True"
                                           Visibility="{Binding SolarSystemService.SolarSystem.WattPilot.PowerL1, FallbackValue=Collapsed, Converter={co:NullToVisibility}}">
                                 <c:PowerFlowArrow.Power>
                                     <MultiBinding Converter="{co:Sum}">
@@ -234,7 +234,7 @@
                         </c:House.ConsumptionWatts>
                     </c:House>
                     <c:PowerFlowArrow Grid.Column="4" x:Name="WattPilotArrow" Fill="{Binding ElementName=LoadArrow, Path=Fill}" HasRightPlacement="False" DefaultsToOutgoing="False"
-                                      Margin="-10,30,0,0" Power="{Binding DataCollectionService.HomeAutomationSystem.WattPilot.PowerTotal, FallbackValue=0}">
+                                      Margin="-10,30,0,0" Power="{Binding DataCollectionService.HomeAutomationSystem.WattPilot.PowerTotal, FallbackValue=0}" IsAc="True">
                         <c:PowerFlowArrow.LayoutTransform>
                             <ScaleTransform ScaleX="{Binding ElementName=WattPilotTransform, Path=ScaleX}" ScaleY="{Binding ElementName=WattPilotTransform, Path=ScaleY}" />
                         </c:PowerFlowArrow.LayoutTransform>

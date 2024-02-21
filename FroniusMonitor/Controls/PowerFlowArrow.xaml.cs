@@ -16,6 +16,17 @@ public partial class PowerFlowArrow
         set => SetValue(PowerProperty, value);
     }
 
+    public static readonly DependencyProperty IsAcProperty = DependencyProperty.Register
+    (
+        nameof(IsAc), typeof(bool), typeof(PowerFlowArrow)
+    );
+
+    public bool IsAc
+    {
+        get => (bool)GetValue(IsAcProperty);
+        set => SetValue(IsAcProperty, value);
+    }
+
     public static readonly DependencyProperty FillProperty = Shape.FillProperty.AddOwner
     (
         typeof(PowerFlowArrow)
