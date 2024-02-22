@@ -54,7 +54,7 @@
             </TextBlock>
 
             <TextBlock Margin="0,825,0,0" HorizontalAlignment="Center" FontSize="80">
-                <Run Text="{Binding Gen24Sensors.Storage.StateOfHealth, StringFormat=P2, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---}" />
+                <Run Text="{Binding Gen24Sensors.Storage.StateOfHealth, StringFormat=P1, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---}" />
                 <Run Text="SoH" />
             </TextBlock>
 
