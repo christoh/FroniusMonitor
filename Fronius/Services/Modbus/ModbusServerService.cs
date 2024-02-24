@@ -1,4 +1,5 @@
 ﻿using De.Hochstaetter.Fronius.Models.Events;
+using De.Hochstaetter.Fronius.Models.Modbus;
 
 namespace De.Hochstaetter.Fronius.Services.Modbus;
 
@@ -73,47 +74,89 @@ public class ModbusServerService
     //TODO: Extend to handle 3 phase power meters and probably other devices
     private void OnDeviceUpdate(object? s, DeviceUpdateEventArgs e)
     {
-        if (e.Device is not IPowerMeter1P { CanMeasurePower: true, EnergyConsumed: > 0 } meter)
+        switch (e.Device)
+        {
+            case IPowerMeter1P { CanMeasurePower: true, EnergyConsumed: > 0 } meter:
+                {
+                    var mapping = Parameters.Mappings.SingleOrDefault(m => string.Equals(m.SerialNumber, meter.SerialNumber, StringComparison.Ordinal));
+
+                    if (mapping == null)
+                    {
+                        if (!Parameters.AutoMap)
+                        {
+                            logger.LogWarning("Power meter {DisplayName} ({SerialNumber}) has no Modbus mapping", meter.DisplayName, meter.SerialNumber);
+                            return;
+                        }
+
+                        if (string.IsNullOrWhiteSpace(meter.SerialNumber))
+                        {
+                            logger.LogError("Cannot auto map add {DisplayName} ({SerialNumber}). Serial number is null or empty", meter.DisplayName, meter.SerialNumber);
+                            return;
+                        }
+
+                        byte modbusAddress = 2;
+
+                        for (; modbusAddress < byte.MaxValue; modbusAddress++)
+                        {
+                            if (modbusAddress is < 15 or > 83 && !Parameters.Mappings.Select(m => m.ModbusAddress).Contains(modbusAddress))
+                            {
+                                break;
+                            }
+                        }
+
+                        mapping = new() { ModbusAddress = modbusAddress, Phase = 1, SerialNumber = meter.SerialNumber };
+                        Parameters.Mappings.Add(mapping);
+                        tracker.NotifySettingsChanged(options);
+                        logger.LogInformation("Auto mapped {DisplayName} ({SerialNumber}) to modbus address {ModbusAddress}", meter.DisplayName, meter.SerialNumber, mapping.ModbusAddress);
+                    }
+
+                    UpdateMeter1P(meter, mapping, e.DeviceAction);
+                    break;
+                }
+
+            case SunSpecMeter meter:
+                {
+                    var mapping = Parameters.Mappings.SingleOrDefault(m => string.Equals(m.SerialNumber, meter.SerialNumber, StringComparison.Ordinal));
+
+                    if (mapping == null)
+                    {
+                        logger.LogWarning("Power meter {DisplayName} ({SerialNumber}) has no Modbus mapping", meter.DisplayName, meter.SerialNumber);
+                        break;
+                    }
+
+                    UpdateSunSpecMeter(meter, mapping, e.DeviceAction);
+                    break;
+                }
+        }
+    }
+
+    private void UpdateSunSpecMeter(SunSpecMeter meter, ModbusMapping mapping, DeviceAction deviceAction)
+    {
+        if (server == null)
         {
             return;
         }
 
-        var mapping = Parameters.Mappings.SingleOrDefault(m => string.Equals(m.SerialNumber, meter.SerialNumber, StringComparison.Ordinal));
-
-        if (mapping == null)
+        lock (server.Lock)
         {
-            if (!Parameters.AutoMap)
+            if (deviceAction == DeviceAction.Delete)
             {
-                logger.LogWarning("Power meter {DisplayName} ({SerialNumber}) has no Modbus mapping", meter.DisplayName, meter.SerialNumber);
+                logger.LogInformation("Removing power meter {DisplayName} at modbus address {ModbusAddress}", meter.DisplayName, mapping.ModbusAddress);
+                server.RemoveUnit(mapping.ModbusAddress);
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(meter.SerialNumber))
+            if (deviceAction == DeviceAction.Add)
             {
-                logger.LogError("Cannot auto map add {DisplayName} ({SerialNumber}). Serial number is null or empty", meter.DisplayName, meter.SerialNumber);
-                return;
+                logger.LogInformation("Adding power meter {DisplayName} at modbus address {ModbusAddress}", meter.DisplayName, mapping.ModbusAddress);
+                server.AddUnit(mapping.ModbusAddress);
             }
 
-            byte modbusAddress = 2;
-
-            for (; modbusAddress < byte.MaxValue; modbusAddress++)
-            {
-                if (modbusAddress is < 15 or > 83 && !Parameters.Mappings.Select(m => m.ModbusAddress).Contains(modbusAddress))
-                {
-                    break;
-                }
-            }
-
-            mapping = new() { ModbusAddress = modbusAddress, Phase = 1, SerialNumber = meter.SerialNumber };
-            Parameters.Mappings.Add(mapping);
-            tracker.NotifySettingsChanged(options);
-            logger.LogInformation("Auto mapped {DisplayName} ({SerialNumber}) to modbus address {ModbusAddress}", meter.DisplayName, meter.SerialNumber, mapping.ModbusAddress);
+            WriteModbus(mapping, meter.Models.ToArray());
         }
-
-        UpdateMeter(meter, mapping, e.DeviceAction);
     }
 
-    private void UpdateMeter(IPowerMeter1P meter, ModbusMapping mapping, DeviceAction deviceAction)
+    private void UpdateMeter1P(IPowerMeter1P meter, ModbusMapping mapping, DeviceAction deviceAction)
     {
         if (server == null)
         {
@@ -178,34 +221,38 @@ public class ModbusServerService
                 server.AddUnit(mapping.ModbusAddress);
             }
 
-            WriteModbus(sunSpecCommonBlock, sunSpecMeter);
-            return;
-
-            unsafe void WriteModbus(params SunSpecModelBase[] models)
-            {
-                var registers = server.GetHoldingRegisters(mapping.ModbusAddress);
-                registers.WriteString(40000, 2, "SunS");
-                ushort absoluteRegister = 40002;
-
-                foreach (var model in models)
-                {
-                    registers.SetBigEndian(absoluteRegister++, model.ModelNumber);
-                    registers.SetBigEndian(absoluteRegister++, model.DataLength);
-
-                    fixed (short* registerPointer = registers[absoluteRegister..])
-                    fixed (byte* dataPointer = model.RawData.Span)
-                    {
-                        Buffer.MemoryCopy(dataPointer, registerPointer, registers[absoluteRegister..].Length, model.RawData.Length);
-                    }
-
-                    absoluteRegister += model.DataLength;
-                }
-
-                registers.SetBigEndian<ushort>(absoluteRegister++, 0xffff);
-                registers.SetBigEndian<short>(absoluteRegister++, 0);
-                maxAddress = absoluteRegister;
-            }
+            WriteModbus(mapping, sunSpecCommonBlock, sunSpecMeter);
         }
+    }
+
+    private unsafe void WriteModbus(ModbusMapping mapping, params SunSpecModelBase[] models)
+    {
+        if (server == null)
+        {
+            return;
+        }
+
+        var registers = server.GetHoldingRegisters(mapping.ModbusAddress);
+        registers.WriteString(40000, 2, "SunS");
+        ushort absoluteRegister = 40002;
+
+        foreach (var model in models)
+        {
+            registers.SetBigEndian(absoluteRegister++, model.ModelNumber);
+            registers.SetBigEndian(absoluteRegister++, model.DataLength);
+
+            fixed (short* registerPointer = registers[absoluteRegister..])
+            fixed (byte* dataPointer = model.RawData.Span)
+            {
+                Buffer.MemoryCopy(dataPointer, registerPointer, registers[absoluteRegister..].Length, model.RawData.Length);
+            }
+
+            absoluteRegister += model.DataLength;
+        }
+
+        registers.SetBigEndian<ushort>(absoluteRegister++, 0xffff);
+        registers.SetBigEndian<short>(absoluteRegister++, 0);
+        maxAddress = absoluteRegister;
     }
 
     protected virtual void Dispose(bool disposing)

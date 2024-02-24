@@ -85,7 +85,7 @@ internal partial class Program
                 .Configure<SunSpecClientParameters>(s =>
                 {
                     s.ModbusConnections = settings.SunSpecClients;
-                    s.RefreshRate= TimeSpan.FromSeconds(10);
+                    s.RefreshRate= TimeSpan.FromSeconds(1);
                 })
                 .Configure<Gen24DataCollectorParameters>(g =>
                 {
