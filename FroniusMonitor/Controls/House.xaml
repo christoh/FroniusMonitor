@@ -18,12 +18,12 @@
 
             <TextBlock Canvas.Left="70" Width="205" Canvas.Top="115" TextAlignment="Center" FontSize="36" FontWeight="Bold">
                 <Run Text="{Binding ProductionWatts, Mode=OneWay, StringFormat=N1, TargetNullValue='---', FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" />
-                <Run Text="W" />
+                <Run Text="W" /><Run Text="DC" FontSize="18" BaselineAlignment="Subscript"/>
             </TextBlock>
 
             <TextBlock Canvas.Left="70" Width="205" Canvas.Bottom="-5" TextAlignment="Center" FontSize="36" FontWeight="Bold">
                 <Run Text="{Binding ConsumptionWatts, Mode=OneWay, StringFormat=N1, TargetNullValue='---', FallbackValue='---', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" />
-                <Run Text="W" />
+                <Run Text="W" /><Run Text="AC" FontSize="18" BaselineAlignment="Subscript"/>
             </TextBlock>
 
             <local:Gen24 Width="80" Canvas.Bottom="40" Canvas.Left="75" />
