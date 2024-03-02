@@ -1,15 +1,9 @@
 ﻿namespace De.Hochstaetter.Fronius.Services.Modbus;
 
-public class SunSpecClient : ISunSpecClient
+public class SunSpecClient(ILogger<SunSpecClient> logger) : ISunSpecClient
 {
-    private static readonly ushort[] baseRegisters = { 40000, 50000 };
-    private readonly ILogger<SunSpecClient> logger;
+    private static readonly ushort[] baseRegisters = [40000, 50000];
     private ushort baseRegister = 0xffff;
-
-    public SunSpecClient(ILogger<SunSpecClient> logger)
-    {
-        this.logger = logger;
-    }
 
     protected ModbusTcpClient? ModbusClient { get; private set; }
     protected byte ModbusAddress { get; private set; } = 255;
