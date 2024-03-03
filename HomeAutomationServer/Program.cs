@@ -176,7 +176,7 @@ internal partial class Program
         await server.StartAsync().ConfigureAwait(false);
         var fritzBoxDataCollector = IoC.Get<FritzBoxDataCollector>();
         await fritzBoxDataCollector.StartAsync().ConfigureAwait(false);
-        //await IoC.Get<SunSpecDataCollector>().StartAsync().ConfigureAwait(false);
+        await IoC.Get<SunSpecDataCollector>().StartAsync().ConfigureAwait(false);
         await IoC.Get<Gen24DataCollector>().StartAsync().ConfigureAwait(false);
         //await Task.Delay(TimeSpan.FromSeconds(30));
         //await IoC.Get<SunSpecDataCollector>().StopAsync().ConfigureAwait(false);

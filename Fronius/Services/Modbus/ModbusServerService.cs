@@ -73,6 +73,10 @@ public class ModbusServerService
         server = null;
     }, token);
 
+    private SunSpecInverter? lastInverter;
+    private SunSpecMeter? lastMeter;
+    private ModbusMapping? lastMapping;
+
     //TODO: Extend to handle 3 phase power meters and probably other devices
     private void OnDeviceUpdate(object? s, DeviceUpdateEventArgs e)
     {
@@ -116,6 +120,10 @@ public class ModbusServerService
                     break;
                 }
 
+            case SunSpecInverter inverter:
+                lastInverter = inverter;
+                UpdateFakeMeter(e.DeviceAction);
+                break;
             case SunSpecMeter meter:
                 {
                     var mapping = Parameters.Mappings.SingleOrDefault(m => string.Equals(m.SerialNumber, meter.SerialNumber, StringComparison.Ordinal));
@@ -126,10 +134,41 @@ public class ModbusServerService
                         break;
                     }
 
-                    UpdateSunSpecMeter(meter, mapping, e.DeviceAction);
+                    lastMapping = mapping;
+                    lastMeter = meter;
+                    //UpdateSunSpecMeter(meter, mapping, e.DeviceAction);
+                    UpdateFakeMeter(e.DeviceAction);
                     break;
                 }
         }
+    }
+
+    private void UpdateFakeMeter(DeviceAction deviceAction)
+    {
+        if (lastMapping is null || lastMeter is null || lastInverter?.InverterBaseSensors is null)
+        {
+            return;
+        }
+
+        var meter = new SunSpecMeter(lastMeter.Models);
+        var commonBlock = meter.Models.OfType<SunSpecCommonBlock>().First();
+        commonBlock.Manufacturer = "Hochstaetter";
+        commonBlock.SerialNumber = "08154711007";
+        commonBlock.ModelName = "HomeAutomationServer";
+        commonBlock.Version = "1.0.0-1";
+        commonBlock.Options = "<primary>";
+
+        var meterFloatBlock = meter.Models.OfType<SunSpecMeterFloat>().First();
+        meterFloatBlock.ActivePowerL1 += lastInverter.InverterBaseSensors.AcCurrentL1 * lastInverter.InverterBaseSensors.AcVoltageL1;
+        meterFloatBlock.ActivePowerL2 += lastInverter.InverterBaseSensors.AcCurrentL2 * lastInverter.InverterBaseSensors.AcVoltageL2;
+        meterFloatBlock.ActivePowerL3 += lastInverter.InverterBaseSensors.AcCurrentL3 * lastInverter.InverterBaseSensors.AcVoltageL3;
+        meterFloatBlock.ActivePowerSum = meterFloatBlock.ActivePowerL1 + meterFloatBlock.ActivePowerL2 + meterFloatBlock.ActivePowerL3;
+        meterFloatBlock.ApparentPowerSum += lastInverter.InverterBaseSensors.PowerApparentSum;
+        meterFloatBlock.ApparentPowerL1 = meterFloatBlock.ApparentPowerL2 = meterFloatBlock.ApparentPowerL3 = meterFloatBlock.ApparentPowerSum / 3;
+        meterFloatBlock.ReactivePowerSum += lastInverter.InverterBaseSensors.PowerReactiveSum;
+        meterFloatBlock.ReactivePowerL1 = meterFloatBlock.ReactivePowerL2 = meterFloatBlock.ReactivePowerL3 = meterFloatBlock.ReactivePowerSum / 3;
+
+        UpdateSunSpecMeter(meter, lastMapping, deviceAction);
     }
 
     private void UpdateSunSpecMeter(SunSpecMeter meter, ModbusMapping mapping, DeviceAction deviceAction)
