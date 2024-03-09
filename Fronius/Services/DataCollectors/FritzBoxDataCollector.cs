@@ -13,7 +13,6 @@ public sealed class FritzBoxDataCollector
     private IEnumerable<WebConnection> Connections => Parameters.Connections ?? throw new ArgumentNullException(nameof(options), @$"{nameof(options)} are not configured");
     private readonly ConcurrentDictionary<WebConnection, Task> runningTasks = new();
 
-
     public async Task StartAsync(CancellationToken token = default)
     {
         await StopAsync(token).ConfigureAwait(false);

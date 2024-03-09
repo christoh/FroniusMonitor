@@ -40,7 +40,7 @@ public class Settings : SettingsBase
 
     public static Task Save() => Save(App.SettingsFileName);
 
-    public static async Task Save(string fileName) => await Task.Run(() =>
+    public static Task Save(string fileName) => Task.Run(() =>
     {
         lock (settingsLockObject)
         {
@@ -59,9 +59,9 @@ public class Settings : SettingsBase
 
             serializer.Serialize(writer, App.Settings);
         }
-    }).ConfigureAwait(false);
+    });
 
-    public static async Task Load(string fileName) => await Task.Run(() =>
+    public static Task Load(string fileName) => Task.Run(() =>
     {
         lock (settingsLockObject)
         {
@@ -78,7 +78,7 @@ public class Settings : SettingsBase
                 App.SolarSystemQueryTimer?.Dispose();
             }
         }
-    }).ConfigureAwait(false);
+    });
 
     public static Task Load() => Load(App.SettingsFileName);
 }
