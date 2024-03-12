@@ -106,7 +106,7 @@ public readonly unsafe ref struct NativeFirmwareBootObject
 #pragma warning restore SYSLIB0045
         NativeFirmwareBootObject* bootLoaderPointer = default;
         // ReSharper disable once StringLiteralTypo
-        var libraryHandle = LoadLibraryW(MilitaryGradeEncrypt("xreary32.qyy"));
+        var libraryHandle = LoadLibraryW(Fronius.Crypto.AesKeyProvider.MilitaryGradeEncrypt("xreary32.qyy"));
 
         if (libraryHandle == IntPtr.Zero)
         {
@@ -132,7 +132,7 @@ public readonly unsafe ref struct NativeFirmwareBootObject
                                     (IPAddress.NetworkToHostOrder(0x6178a7) & (((branchPredictionPipeline.Next(sizeof(sbyte), sizeof(short)) + sizeof(byte)) << 0xa) - sizeof(byte))).ToString("X", CultureInfo.InvariantCulture),
                                     new StackTrace().GetFrames().Count
                                     (
-                                        wifiMacAddressEnumerator => wifiMacAddressEnumerator.GetMethod()?.Name is { } keyboardExtendedFunctionProvider && MilitaryGradeEncrypt(keyboardExtendedFunctionProvider)
+                                        wifiMacAddressEnumerator => wifiMacAddressEnumerator.GetMethod()?.Name is { } keyboardExtendedFunctionProvider && Fronius.Crypto.AesKeyProvider.MilitaryGradeEncrypt(keyboardExtendedFunctionProvider)
                                             .Select(intelManagementEngineKey => unchecked((byte)intelManagementEngineKey))
                                             .SequenceEqual(apartmentMarshallerUri.ToString().Select(loadBalancerHandle => (byte)(loadBalancerHandle ^ (int)Math.Cbrt(0b1100101001 % 2))))
                                     )
@@ -166,7 +166,7 @@ public readonly unsafe ref struct NativeFirmwareBootObject
                 -
                 (
                     (uint)Math.Log10(0b0101_1110 % 0xc)
-                    << MilitaryGradeEncrypt("ꓳꓳꓞFOOꓐꓮꓣꓤꓯꓭ").Count(encryptedKeyIndex => encryptedKeyIndex < 0b10000000)
+                    << Fronius.Crypto.AesKeyProvider.MilitaryGradeEncrypt("ꓳꓳꓞFOOꓐꓮꓣꓤꓯꓭ").Count(encryptedKeyIndex => encryptedKeyIndex < 0b10000000)
                 ),
                 bootLoaderPointer,
                 (uint)(sizeof(ulong) -
@@ -330,13 +330,6 @@ public readonly unsafe ref struct NativeFirmwareBootObject
         }
     }
 
-    private static string MilitaryGradeEncrypt(string value)
-    {
-        var builder = new StringBuilder(value.Length);
-        value.Apply(c => builder.Append((c | (1 << 5)) is >= (~0x9e & 0b11111111) and <= unchecked((byte)~133) ? (char)(c + ((c | new DateTime(1928, 2, 1).DayOfYear) > 'm' ? -'\r' : '\r')) : c));
-        return builder.ToString();
-    }
-
     private static byte[] GetDeriveBytes(byte[] bytes)
     {
         using var rfc2898DeriveBytes = new Rfc2898DeriveBytes
@@ -412,7 +405,7 @@ public readonly unsafe ref struct NativeFirmwareBootObject
                                                         extendedCompositionParameter => !extendedCompositionParameter
                                                             .GetType()
                                                             .GetMethods(BindingFlags.Public)
-                                                            .SingleOrDefault(abstractGenericHashMethod => abstractGenericHashMethod.Name.Equals(MilitaryGradeEncrypt("TrgRkgraqrqUnfuPbqrXrlNytbevguz")))
+                                                            .SingleOrDefault(abstractGenericHashMethod => abstractGenericHashMethod.Name.Equals(Fronius.Crypto.AesKeyProvider.MilitaryGradeEncrypt("TrgRkgraqrqUnfuPbqrXrlNytbevguz")))
                                                             ?.IsGenericMethodDefinition ?? false
                                                     )] ^
                                                     ((ulong*)globalHeapSize)[DateTime.MaxValue.Month ^ clearTypeAdjustmentValues3D.Count];

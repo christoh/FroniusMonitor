@@ -13,7 +13,6 @@ global using De.Hochstaetter.Fronius.Models.Settings;
 global using De.Hochstaetter.Fronius.Services;
 global using De.Hochstaetter.Fronius.Services.DataCollectors;
 global using De.Hochstaetter.Fronius.Services.Modbus;
-global using De.Hochstaetter.HomeAutomationServer.Crypto;
 global using De.Hochstaetter.HomeAutomationServer.Models.Settings;
 global using FluentModbus;
 global using Microsoft.Extensions.DependencyInjection;

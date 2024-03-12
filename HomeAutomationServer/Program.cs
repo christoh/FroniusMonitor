@@ -1,9 +1,11 @@
-﻿namespace De.Hochstaetter.HomeAutomationServer;
+﻿using De.Hochstaetter.Fronius.Crypto;
+
+namespace De.Hochstaetter.HomeAutomationServer;
 
 internal partial class Program
 {
     private static ModbusServerService? server;
-    
+
     [GeneratedRegex("^(?<UserName>(?!:).+):(?<Password>(?!:).+)$", RegexOptions.Compiled)]
     private static partial Regex PasswordRegex();
 
@@ -25,6 +27,11 @@ internal partial class Program
 
         Settings? settings = null;
         Exception? settingsLoadException = null;
+
+        IServiceCollection serviceCollection = new ServiceCollection().AddSingleton<IAesKeyProvider, AesKeyProvider>();
+
+        var provider = serviceCollection.BuildServiceProvider();
+        IoC.Update(provider);
 
         try
         {
@@ -50,14 +57,11 @@ internal partial class Program
             settingsLoadException = ex;
         }
 
-        IServiceCollection serviceCollection = new ServiceCollection();
-
         serviceCollection
             .AddOptions()
             .AddTransient<IFritzBoxService, FritzBoxService>()
             .AddTransient<IGen24Service, Gen24Service>()
             .AddSingleton<IGen24JsonService, Gen24JsonService>()
-            .AddSingleton<IAesKeyProvider, AesKeyProvider>()
             .AddSingleton<ModbusServerService>()
             .AddSingleton<SettingsChangeTracker>()
             .AddSingleton<IDataControlService, DataControlService>()
@@ -85,13 +89,13 @@ internal partial class Program
                 .Configure<SunSpecClientParameters>(s =>
                 {
                     s.ModbusConnections = settings.SunSpecClients;
-                    s.RefreshRate= TimeSpan.FromSeconds(1);
+                    s.RefreshRate = TimeSpan.FromSeconds(1);
                 })
                 .Configure<Gen24DataCollectorParameters>(g =>
                 {
-                    g.Connections=settings.Gen24Connections;
-                    g.RefreshRate= TimeSpan.FromSeconds(30);
-                    g.ConfigRefreshRate=TimeSpan.FromMinutes(10.1);
+                    g.Connections = settings.Gen24Connections;
+                    g.RefreshRate = TimeSpan.FromSeconds(30);
+                    g.ConfigRefreshRate = TimeSpan.FromMinutes(10.1);
                 })
                 ;
         }
@@ -138,18 +142,33 @@ internal partial class Program
         var tracker = IoC.Get<SettingsChangeTracker>();
         tracker.SettingsChanged += (_, _) => _ = settings.SaveAsync();
 
-        if (args is [var arg0, ..])
+        foreach (var arg in args)
         {
-            var match = PasswordRegex().Match(arg0);
+            var match = PasswordRegex().Match(arg);
 
             if (!match.Success)
             {
-                return 2;
+                continue;
             }
 
             var userName = match.Groups["UserName"].Value;
             var password = match.Groups["Password"].Value;
-            settings.FritzBoxConnections.Where(c => c.UserName == userName).Apply(c => { c.Password = password; });
+            
+            settings.FritzBoxConnections.Where(c => c.UserName == userName).Apply(c =>
+            {
+                c.Password = password;
+                c.PasswordChecksum = c.CalculatedChecksum;
+            });
+            
+            settings.Gen24Connections.Where(c => c.UserName == userName).Apply(c =>
+            {
+                c.Password = password;
+                c.PasswordChecksum = c.CalculatedChecksum;
+            });
+        }
+
+        if (args.Length > 0)
+        {
             await settings.SaveAsync().ConfigureAwait(false);
             return 0;
         }

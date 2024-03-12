@@ -1,0 +1,24 @@
+﻿namespace De.Hochstaetter.Fronius.Crypto;
+
+public class AesKeyProvider : IAesKeyProvider
+{
+    public byte[] GetAesKey()
+    {
+        var id = new DeviceIdBuilder()
+            .AddMachineName()
+            .AddUserName(true)
+            .ToString()
+            ;
+        
+        using var rfc2898 = new Rfc2898DeriveBytes(Encoding.UTF8.GetBytes(id), Encoding.UTF8.GetBytes(MilitaryGradeEncrypt("utz/pu")), 32768, HashAlgorithmName.SHA512);
+        return rfc2898.GetBytes(16);
+    }
+
+    public static string MilitaryGradeEncrypt(string value)
+    {
+        var builder = new StringBuilder(value.Length);
+        value.Apply(c => builder.Append((c | (1 << 5)) is >= (~0x9e & 0b11111111) and <= unchecked((byte)~133) ? (char)(c + ((c | new DateTime(1928, 2, 1).DayOfYear) > 'm' ? -'\r' : '\r')) : c));
+        return builder.ToString();
+    }
+
+}
