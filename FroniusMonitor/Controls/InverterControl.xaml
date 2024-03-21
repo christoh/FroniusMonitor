@@ -598,6 +598,24 @@
                                                          ShowPercent="True" Minimum="0" Maximum="1" Low=".92" VeryLow=".90" />
                             </StackPanel>
                         </Grid>
+
+                        <Grid x:Name="DcGauge" Visibility="Collapsed" Margin="4">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                                <TextBlock FontSize="12" Foreground="Black" FontWeight="Bold" Grid.Row="0"
+                                           Width="{Binding ActualWidth, ElementName=DcGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
+                                    <Run Text="{Binding Sensors.Inverter.SolarPowerSum, FallbackValue=0, TargetNullValue=0, StringFormat=N1, Mode=OneWay}"/>
+                                    <Run Text="W"/><Run FontSize="6" Text="DC" BaselineAlignment="Subscript"/>
+                                </TextBlock>
+                                
+                                <c:MultiColorGauge Value="{Binding Sensors.Inverter.SolarPowerSum, FallbackValue=0, TargetNullValue=0, Mode=OneWay}"
+                                                   Minimum="0" Grid.Row="1"
+                                                   Maximum="{Binding Config.InverterSettings.Mppt.WattPeakTotal, FallbackValue=10000, TargetNullValue=0, Mode=OneWay}"
+                                                   GaugeColors="{x:Static c:InverterControl.GaugeColors}"
+                                                   Width="92" Template="{StaticResource HalfCircleGauge}"/>
+                        </Grid>
                     </Grid>
                 </Border>
 

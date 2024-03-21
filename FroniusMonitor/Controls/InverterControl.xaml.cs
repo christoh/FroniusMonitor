@@ -11,6 +11,7 @@ public enum InverterDisplayMode
     AcPowerApparent,
     AcPowerReactive,
     AcPowerFactor,
+    DcGauge,
     DcVoltage,
     DcCurrent,
     DcPower,
@@ -32,10 +33,10 @@ public partial class InverterControl
     private readonly IDataCollectionService? dataCollectionService = IoC.TryGetRegistered<IDataCollectionService>();
     private IGen24Service? gen24Service;
     private IServiceProvider provider = IoC.Injector!;
-    private static readonly IReadOnlyList<InverterDisplayMode> acModes = new[] { InverterDisplayMode.AcPowerActive, InverterDisplayMode.AcPowerApparent, InverterDisplayMode.AcPowerReactive, InverterDisplayMode.AcPowerFactor, InverterDisplayMode.AcCurrent, InverterDisplayMode.AcPhaseVoltage, InverterDisplayMode.AcLineVoltage, };
-    private static readonly IReadOnlyList<InverterDisplayMode> dcModes = new[] { InverterDisplayMode.DcPower, InverterDisplayMode.DcRelativePower, InverterDisplayMode.DcCurrent, InverterDisplayMode.DcVoltage, };
-    private static readonly IReadOnlyList<InverterDisplayMode> moreModes = new[] { InverterDisplayMode.MoreEfficiency, InverterDisplayMode.More, InverterDisplayMode.MoreTemperatures, InverterDisplayMode.MoreFans, InverterDisplayMode.MoreOp, InverterDisplayMode.MoreVersions };
-    private static readonly IReadOnlyList<InverterDisplayMode> energyModes = new[] { InverterDisplayMode.EnergySolar, InverterDisplayMode.EnergyInverter, InverterDisplayMode.EnergyRectifier, InverterDisplayMode.EnergyStorage, };
+    private static readonly IReadOnlyList<InverterDisplayMode> acModes = [InverterDisplayMode.AcPowerActive, InverterDisplayMode.AcPowerApparent, InverterDisplayMode.AcPowerReactive, InverterDisplayMode.AcPowerFactor, InverterDisplayMode.AcCurrent, InverterDisplayMode.AcPhaseVoltage, InverterDisplayMode.AcLineVoltage,];
+    private static readonly IReadOnlyList<InverterDisplayMode> dcModes = [InverterDisplayMode.DcGauge, InverterDisplayMode.DcPower, InverterDisplayMode.DcRelativePower, InverterDisplayMode.DcCurrent, InverterDisplayMode.DcVoltage,];
+    private static readonly IReadOnlyList<InverterDisplayMode> moreModes = [InverterDisplayMode.MoreEfficiency, InverterDisplayMode.More, InverterDisplayMode.MoreTemperatures, InverterDisplayMode.MoreFans, InverterDisplayMode.MoreOp, InverterDisplayMode.MoreVersions];
+    private static readonly IReadOnlyList<InverterDisplayMode> energyModes = [InverterDisplayMode.EnergySolar, InverterDisplayMode.EnergyInverter, InverterDisplayMode.EnergyRectifier, InverterDisplayMode.EnergyStorage,];
     private int currentAcIndex, currentDcIndex, currentMoreIndex, energyIndex;
     private bool isInStandByChange;
     private string? lastStatusCode;
@@ -50,6 +51,14 @@ public partial class InverterControl
         RepeatBehavior = RepeatBehavior.Forever,
         Duration = TimeSpan.FromSeconds(1.5),
     };
+
+    public static IReadOnlyList<MultiColorGauge.ColorEntry> GaugeColors { get; } =
+    [
+        new MultiColorGauge.ColorEntry(0, Colors.Green),
+        new MultiColorGauge.ColorEntry(.75, Colors.Yellow),
+        new MultiColorGauge.ColorEntry(.95, Colors.OrangeRed),
+        new MultiColorGauge.ColorEntry(1, Colors.Red),
+    ];
 
 
     #region Dependency Properties
@@ -218,7 +227,7 @@ public partial class InverterControl
                 isInStartingAnimation = false;
                 BackgroundProvider.Background = gen24Sensors?.InverterStatus?.ToBrush() ?? Brushes.LightGray;
             }
-            
+
             InverterModelName.Text = $"{gen24Config.Versions?.ModelName ?? "---"} ({gen24Sensors?.InverterStatus?.StatusMessage ?? Loc.Unknown})";
             InverterName.Text = gen24Common?.SystemName ?? "---";
 

@@ -1,28 +1,15 @@
 ﻿namespace De.Hochstaetter.FroniusMonitor.Wpf.Validation;
 
-internal class StringResult : IHaveDisplayName
+internal class StringResult(Func<string> func) : IHaveDisplayName
 {
-    private readonly Func<string> func;
-
-    public StringResult(Func<string> func)
-    {
-        this.func = func;
-    }
-
     public override string ToString() => func();
     public string DisplayName => func();
 
     public static ValidationResult Create(Func<string> localFunc) => new(false, new StringResult(localFunc));
 }
 
-public class MarkupRule : ValidationRule
+public class MarkupRule(ValidationRuleExtension extension) : ValidationRule
 {
-    private readonly ValidationRuleExtension extension;
-
-    public MarkupRule(ValidationRuleExtension extension)
-    {
-        this.extension = extension;
-    }
     public override ValidationResult Validate(object? value, CultureInfo cultureInfo) => extension.Validate(value);
 }
 
@@ -56,12 +43,12 @@ public class MinMaxFloatRuleExtension : ValidationRuleExtension
 {
     public float Minimum { get; set; } = float.MinValue;
     public float Maximum { get; set; } = float.MaxValue;
-    public string PropertyDisplayName { get; set; } = Resources.DefaultPropertyDisplayName;
+    public string PropertyDisplayName { get; set; } = Loc.DefaultPropertyDisplayName;
 
     public override ValidationResult Validate(object? value)
     {
         return !float.TryParse(value?.ToString(), NumberStyles.Any, CultureInfo.CurrentCulture, out var floatValue) || floatValue < Minimum || floatValue > Maximum 
-            ? StringResult.Create(() => string.Format(Resources.MustBeBetween, PropertyDisplayName, Minimum, Maximum)) 
+            ? StringResult.Create(() => string.Format(Loc.MustBeBetween, PropertyDisplayName, Minimum, Maximum)) 
             : ValidationResult.ValidResult;
     }
 }
@@ -70,25 +57,25 @@ public class MinMaxIntRuleExtension : ValidationRuleExtension
 {
     public int Minimum { get; set; } = 0;
     public int Maximum { get; set; } = 50000;
-    public string PropertyDisplayName { get; set; } = Resources.DefaultPropertyDisplayName;
+    public string PropertyDisplayName { get; set; } = Loc.DefaultPropertyDisplayName;
 
     public override ValidationResult Validate(object? value)
     {
         return int.TryParse(value?.ToString(), NumberStyles.AllowLeadingSign|NumberStyles.AllowThousands, CultureInfo.CurrentCulture, out var intValue) && intValue >= Minimum && intValue <= Maximum
             ? ValidationResult.ValidResult
-            : StringResult.Create(() => string.Format(Resources.MustBeBetween, PropertyDisplayName, Minimum, Maximum));
+            : StringResult.Create(() => string.Format(Loc.MustBeBetween, PropertyDisplayName, Minimum, Maximum));
     }
 }
 
 public class WattPilotFallbackCurrentRuleExtension : ValidationRuleExtension
 {
-    public string PropertyDisplayName { get; set; } = Resources.DefaultPropertyDisplayName;
+    public string PropertyDisplayName { get; set; } = Loc.DefaultPropertyDisplayName;
 
     public override ValidationResult Validate(object? value)
     {
         return int.TryParse(value?.ToString(), NumberStyles.AllowLeadingSign|NumberStyles.AllowThousands, CultureInfo.CurrentCulture, out var intValue) && intValue is >= 6 and <= 32 or 0
             ? ValidationResult.ValidResult
-            : StringResult.Create(() => string.Format(Resources.FallbackCurrentError, PropertyDisplayName));
+            : StringResult.Create(() => string.Format(Loc.FallbackCurrentError, PropertyDisplayName));
     }
 }
 
@@ -102,7 +89,7 @@ public class ChargingRuleDateExtension : ValidationRuleExtension
         }
 
         var match = Gen24ChargingRule.TimeRegex.Match(text);
-        var invalidTime = StringResult.Create(() => string.Format(Resources.InvalidChargingRuleTime, text));
+        var invalidTime = StringResult.Create(() => string.Format(Loc.InvalidChargingRuleTime, text));
 
         if (!match.Success)
         {
