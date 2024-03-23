@@ -55,7 +55,7 @@ public partial class InverterControl
     public static IReadOnlyList<MultiColorGauge.ColorEntry> GaugeColors { get; } =
     [
         new MultiColorGauge.ColorEntry(0, Colors.Green),
-        new MultiColorGauge.ColorEntry(.75, Colors.Yellow),
+        new MultiColorGauge.ColorEntry(.75, Colors.YellowGreen),
         new MultiColorGauge.ColorEntry(.95, Colors.OrangeRed),
         new MultiColorGauge.ColorEntry(1, Colors.Red),
     ];

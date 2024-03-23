@@ -8,6 +8,7 @@
              xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
              xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
              xmlns:l="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Localization"
+             xmlns:gl="clr-namespace:System.Globalization;assembly=System.Globalization"
              mc:Ignorable="d"
              d:DesignHeight="127" d:DesignWidth="110">
     <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:InverterControl}}">
@@ -309,7 +310,7 @@
                                                          High="{Binding Config.InverterSettings.Mppt.WattPeakTotal, FallbackValue=9000, Converter={co:Multiply Factor=.90}}"
                                                          VeryHigh="{Binding Config.InverterSettings.Mppt.WattPeakTotal, FallbackValue=9500, Converter={co:Multiply Factor=.95}}" />-->
 
-                                <c:LinearHorizontalGauge x:Name="DcPowerAggregateGauge" ShowPercent="False"/>
+                                <c:LinearHorizontalGauge x:Name="DcPowerAggregateGauge" ShowPercent="False" />
 
                                 <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Battery}" ShowPercent="{Binding ShowPercent, ElementName=DcPowerFirstGauge}"
                                                          Value="{Binding Sensors.Cache.StoragePower, FallbackValue={x:Null}}"
@@ -429,7 +430,7 @@
                                 <c:LinearHorizontalGauge DisplayName="Gen24" Value="{Binding Sensors.Cache.InverterFrequency, FallbackValue={x:Null}}" />
                                 <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Grid}" Value="{Binding Sensors.Cache.FeedInPointFrequency, FallbackValue={x:Null}}" />
                                 <c:LinearHorizontalGauge Minimum="0" Maximum="5000" Low="0" VeryLow="0" High="2000" VeryHigh="4000" StringFormat="N0" UnitSymbol="ms"
-                                                         DisplayName="{x:Static p:Resources.Latency}" Value="{Binding Sensors.Cache.Latency.TotalMilliseconds, FallbackValue={x:Null}}"/>
+                                                         DisplayName="{x:Static p:Resources.Latency}" Value="{Binding Sensors.Cache.Latency.TotalMilliseconds, FallbackValue={x:Null}}" />
                                 <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Time}" UnitSymbol="{x:Null}" Value="{Binding Sensors.Cache.DataTime, FallbackValue={x:Null}}" StringFormat="T" />
                             </StackPanel>
                         </Grid>
@@ -599,22 +600,26 @@
                             </StackPanel>
                         </Grid>
 
-                        <Grid x:Name="DcGauge" Visibility="Collapsed" Margin="4">
+                        <Grid x:Name="DcGauge" Visibility="Collapsed" Margin="2,0">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
-                                <TextBlock FontSize="12" Foreground="Black" FontWeight="Bold" Grid.Row="0"
-                                           Width="{Binding ActualWidth, ElementName=DcGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
-                                    <Run Text="{Binding Sensors.Inverter.SolarPowerSum, FallbackValue=0, TargetNullValue=0, StringFormat=N1, Mode=OneWay}"/>
-                                    <Run Text="W"/><Run FontSize="6" Text="DC" BaselineAlignment="Subscript"/>
-                                </TextBlock>
-                                
-                                <c:MultiColorGauge Value="{Binding Sensors.Inverter.SolarPowerSum, FallbackValue=0, TargetNullValue=0, Mode=OneWay}"
-                                                   Minimum="0" Grid.Row="1"
-                                                   Maximum="{Binding Config.InverterSettings.Mppt.WattPeakTotal, FallbackValue=10000, TargetNullValue=0, Mode=OneWay}"
-                                                   GaugeColors="{x:Static c:InverterControl.GaugeColors}"
-                                                   Width="92" Template="{StaticResource HalfCircleGauge}"/>
+
+                            <TextBlock FontSize="10" FontWeight="Normal" Text="{x:Static p:Resources.DcPower}" TextAlignment="Center" />
+
+                            <TextBlock FontSize="10" FontWeight="Medium" Grid.Row="1" Margin="0,0,0,2"
+                                       Width="{Binding ActualWidth, ElementName=DcGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
+                                <Run Text="{Binding Sensors.Inverter.SolarPowerSum, FallbackValue=0, TargetNullValue=0, StringFormat=N1, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" />
+                                <Run Text="W" />
+                            </TextBlock>
+
+                            <c:MultiColorGauge Value="{Binding Sensors.Inverter.SolarPowerSum, FallbackValue=0, TargetNullValue=0, Mode=OneWay}"
+                                               Minimum="0" Grid.Row="2"
+                                               Maximum="{Binding Config.InverterSettings.Mppt.WattPeakTotal, FallbackValue=10000, TargetNullValue=0, Mode=OneWay}"
+                                               GaugeColors="{x:Static c:InverterControl.GaugeColors}"
+                                               Width="92" Template="{StaticResource HalfCircleGauge}" />
                         </Grid>
                     </Grid>
                 </Border>

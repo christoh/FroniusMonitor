@@ -15,4 +15,11 @@ public class MultiColorGauge : ProgressBar
         get => (IReadOnlyList<ColorEntry>)GetValue(GaugeColorsProperty);
         set => SetValue(GaugeColorsProperty, value);
     }
+
+    internal static DependencyPropertyKey TemplateMetadataPropertyKey = DependencyProperty.RegisterReadOnly
+    (
+        nameof(TemplateMetadata), typeof(object), typeof(MultiColorGauge), new PropertyMetadata(null)
+    );
+
+    public object TemplateMetadata => GetValue(TemplateMetadataPropertyKey.DependencyProperty);
 }

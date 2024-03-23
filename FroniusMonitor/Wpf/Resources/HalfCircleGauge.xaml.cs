@@ -4,10 +4,28 @@ namespace De.Hochstaetter.FroniusMonitor.Wpf.Resources;
 
 public partial class HalfCircleGauge
 {
+    internal record GaugeMetaData(HalfCircleGauge HalfCircleGauge, Polygon Hand, double HandLength, Canvas Canvas, Canvas OuterCanvas);
+
     private readonly DependencyPropertyDescriptor? valueDescriptor = DependencyPropertyDescriptor.FromProperty(RangeBase.ValueProperty, typeof(MultiColorGauge));
     private readonly DependencyPropertyDescriptor? minimumDescriptor = DependencyPropertyDescriptor.FromProperty(RangeBase.MinimumProperty, typeof(MultiColorGauge));
     private readonly DependencyPropertyDescriptor? maximumDescriptor = DependencyPropertyDescriptor.FromProperty(RangeBase.MaximumProperty, typeof(MultiColorGauge));
     private readonly DependencyPropertyDescriptor? colorsDescriptor = DependencyPropertyDescriptor.FromProperty(MultiColorGauge.GaugeColorsProperty, typeof(MultiColorGauge));
+
+    public static readonly DependencyProperty AnimatedValueProperty = DependencyProperty.RegisterAttached
+    (
+        "AnimatedValue", typeof(double), typeof(MultiColorGauge),
+        new PropertyMetadata(OnAnimatedAngleChanged)
+    );
+
+    public static double GetAnimatedValue(UIElement element)
+    {
+        return (double)element.GetValue(AnimatedValueProperty);
+    }
+
+    public static void SetAnimatedValue(UIElement element, double value)
+    {
+        element.SetValue(AnimatedValueProperty, value);
+    }
 
     public HalfCircleGauge()
     {
@@ -16,10 +34,26 @@ public partial class HalfCircleGauge
 
     private void OnTemplateLoaded(object sender, EventArgs? _ = null)
     {
-        if (sender is not FrameworkElement { TemplatedParent: MultiColorGauge gauge })
+        if (sender is not FrameworkElement { TemplatedParent: FrameworkElement element })
         {
             return;
         }
+
+        var (gauge, canvas, outerCanvas) = GetGaugeAndCanvas(element);
+        var handLength = outerCanvas.Width * 0.45;
+
+        var hand = new Polygon
+        {
+            Points = new PointCollection([new Point(4, 0), new Point(0, handLength), new Point(8, handLength)]),
+            Fill = Brushes.Black,
+            StrokeThickness = 0,
+            RenderTransform = new RotateTransform(-90, 4, handLength - 5),
+        };
+
+        hand.SetValue(Canvas.BottomProperty, 8d);
+        hand.SetValue(Canvas.LeftProperty, outerCanvas.Width / 2 - 4);
+        outerCanvas.Children.Add(hand);
+        gauge.SetValue(MultiColorGauge.TemplateMetadataPropertyKey, new GaugeMetaData(this, hand, handLength, canvas, outerCanvas));
 
         valueDescriptor?.AddValueChanged(gauge, OnValueChanged);
         minimumDescriptor?.AddValueChanged(gauge, OnValueChanged);
@@ -30,23 +64,29 @@ public partial class HalfCircleGauge
 
     private static void OnValueChanged(object? sender, EventArgs? _ = null)
     {
-        var (gauge, canvas) = GetGaugeAndCanvas(sender);
-
-        if (canvas == null)
+        if (sender is MultiColorGauge gauge)
         {
-            return;
+            SetValue(gauge);
         }
-
-        SetValue(gauge!, canvas);
     }
 
-    private static void SetValue(MultiColorGauge gauge, Canvas canvas)
+    private static void SetValue(RangeBase gauge)
     {
         var relativeValue = Math.Max(Math.Min(gauge.Maximum, gauge.Value), gauge.Minimum) / (gauge.Maximum - gauge.Minimum);
-        canvas.Children.OfType<Rectangle>().Apply(rect => ColorShape(rect, gauge, relativeValue));
+        var animation = new DoubleAnimation(relativeValue, TimeSpan.FromSeconds(.5)) { AccelerationRatio = .33, DecelerationRatio = .33 };
+        gauge.BeginAnimation(AnimatedValueProperty, animation);
     }
 
-    private static void ColorShape(Shape rect, MultiColorGauge gauge, double relativeValue)
+    private static void OnAnimatedAngleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var gauge = (MultiColorGauge)d;
+        var (_, hand, handLength, canvas, _) = (GaugeMetaData)gauge.TemplateMetadata;
+        var relativeValue = (double)e.NewValue;
+        hand.RenderTransform = new RotateTransform((relativeValue - 0.5) * 180, 4, handLength - 5);
+        canvas.Children.OfType<Rectangle>().Apply(rect => ColorShape(gauge, rect, relativeValue));
+    }
+
+    private static void ColorShape(MultiColorGauge gauge, Shape rect, double relativeValue)
     {
         var rectRelativeValue = Math.Round((double)rect.Tag, 6);
 
@@ -75,12 +115,12 @@ public partial class HalfCircleGauge
 
     private static void OnParametersChanged(object? sender, EventArgs? _ = null)
     {
-        var (gauge, canvas) = GetGaugeAndCanvas(sender);
-
-        if (canvas == null)
+        if (sender is not MultiColorGauge gauge)
         {
             return;
         }
+
+        var (_, _, _, canvas, _) = (GaugeMetaData)gauge.TemplateMetadata;
 
         try
         {
@@ -91,10 +131,7 @@ public partial class HalfCircleGauge
                 const double height = 5;
                 const double width = 18;
                 var (sin, cos) = Math.SinCos(angle / (180 / Math.PI));
-                var translationLength = width / 2 - canvas.Height;
-                var transform = new TransformGroup();
-                transform.Children.Add(new RotateTransform(angle, width / 2, height / 2));
-                transform.Children.Add(new TranslateTransform(cos * translationLength, sin * translationLength));
+                var translationLength = canvas.Width / 2 - width / 2;
 
                 var rect = new Rectangle
                 {
@@ -103,28 +140,33 @@ public partial class HalfCircleGauge
                     Fill = Brushes.LightGray,
                     StrokeThickness = 0,
                     Stroke = Brushes.Transparent,
-                    RenderTransform = transform,
+                    RenderTransform = new RotateTransform(angle, width / 2, height / 2),
                     Tag = angle / 180,
                 };
 
-                rect.SetValue(Canvas.BottomProperty, 0d);
-                rect.SetValue(Canvas.LeftProperty, (canvas.Width - width) / 2);
+                rect.SetValue(Canvas.BottomProperty, sin * translationLength);
+                rect.SetValue(Canvas.RightProperty, cos * translationLength + canvas.Width / 2 - width / 2);
                 canvas.Children.Add(rect);
             }
         }
         finally
         {
-            SetValue(gauge!, canvas);
+            SetValue(gauge);
         }
     }
 
-    private static (MultiColorGauge? Gauge, Canvas? Canvas) GetGaugeAndCanvas(object? sender)
+    private static (MultiColorGauge Gauge, Canvas Canvas, Canvas OuterCanvas) GetGaugeAndCanvas(object? sender)
     {
-        if (sender is MultiColorGauge gauge && gauge.Template.FindName("Canvas", gauge) is Canvas canvas)
+        if
+        (
+            sender is MultiColorGauge gauge &&
+            gauge.Template.FindName("Canvas", gauge) is Canvas canvas &&
+            gauge.Template.FindName("OuterCanvas", gauge) is Canvas outerCanvas
+        )
         {
-            return (gauge, canvas);
+            return (gauge, canvas, outerCanvas);
         }
 
-        return (null, null);
+        throw new InvalidOperationException("Must define Canvas and OuterCanvas");
     }
 }
