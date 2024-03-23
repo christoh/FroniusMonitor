@@ -7,6 +7,7 @@ public enum WattPilotDisplayMode : byte
     Voltage,
     Current,
     Power,
+    PowerGauge,
     PowerFactor,
     EnergyCards,
     MoreFrequency,
@@ -16,36 +17,45 @@ public enum WattPilotDisplayMode : byte
 
 public partial class WattPilotControl
 {
-    private static readonly IReadOnlyList<WattPilotDisplayMode> powerModes = new[]
-    {
+    private static readonly IReadOnlyList<WattPilotDisplayMode> powerModes =
+    [
+        WattPilotDisplayMode.PowerGauge,
         WattPilotDisplayMode.Power,
         WattPilotDisplayMode.PowerFactor,
-    };
+    ];
 
-    private static readonly IReadOnlyList<WattPilotDisplayMode> voltageModes = new[]
-    {
+    private static readonly IReadOnlyList<WattPilotDisplayMode> voltageModes =
+    [
         WattPilotDisplayMode.Voltage,
-    };
+    ];
 
-    private static readonly IReadOnlyList<WattPilotDisplayMode> currentModes = new[]
-    {
+    private static readonly IReadOnlyList<WattPilotDisplayMode> currentModes =
+    [
         WattPilotDisplayMode.Current,
-    };
+    ];
 
-    private static readonly IReadOnlyList<WattPilotDisplayMode> moreModes = new[]
-    {
+    private static readonly IReadOnlyList<WattPilotDisplayMode> moreModes =
+    [
         WattPilotDisplayMode.MoreFrequency,
         WattPilotDisplayMode.NeutralWire,
         WattPilotDisplayMode.EnergyCards,
         WattPilotDisplayMode.MoreWifi,
-    };
+    ];
+
+    public static IReadOnlyList<MultiColorGauge.ColorEntry> LowIsBad { get; } =
+    [
+        new MultiColorGauge.ColorEntry(0,Colors.Red),
+        new MultiColorGauge.ColorEntry(.05,Colors.OrangeRed),
+        new MultiColorGauge.ColorEntry(.5,Colors.Green),
+        new MultiColorGauge.ColorEntry(1,Colors.Green),
+    ];
 
     private int powerIndex, voltageIndex, moreIndex, currentIndex;
 
     public static readonly DependencyProperty ModeProperty = DependencyProperty.Register
     (
         nameof(Mode), typeof(WattPilotDisplayMode), typeof(WattPilotControl),
-        new PropertyMetadata(WattPilotDisplayMode.Power, (d, _) => ((WattPilotControl)d).OnModeChanged())
+        new PropertyMetadata(WattPilotDisplayMode.PowerGauge, (d, _) => ((WattPilotControl)d).OnModeChanged())
     );
 
     public WattPilotDisplayMode Mode

@@ -210,7 +210,11 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     public double? VoltageL1
     {
         get => voltageL1;
-        set => Set(ref voltageL1, value, () => NotifyOfPropertyChange(nameof(VoltageAverage)));
+        set => Set(ref voltageL1, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(VoltageAverage));
+            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossible));
+        });
     }
 
     private double? voltageL2;
@@ -219,7 +223,11 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     public double? VoltageL2
     {
         get => voltageL2;
-        set => Set(ref voltageL2, value, () => NotifyOfPropertyChange(nameof(VoltageAverage)));
+        set => Set(ref voltageL2, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(VoltageAverage));
+            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossible));
+        });
     }
 
     private double? voltageL3;
@@ -228,7 +236,11 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     public double? VoltageL3
     {
         get => voltageL3;
-        set => Set(ref voltageL3, value, () => NotifyOfPropertyChange(nameof(VoltageAverage)));
+        set => Set(ref voltageL3, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(VoltageAverage));
+            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossible));
+        });
     }
 
     private double? voltageL0;
@@ -280,6 +292,9 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
             NotifyOfPropertyChange(nameof(PowerSum));
             NotifyOfPropertyChange(nameof(PowerL1KiloWatts));
             NotifyOfPropertyChange(nameof(PowerSumKiloWatts));
+            NotifyOfPropertyChange(nameof(ChargingPhases));
+            NotifyOfPropertyChange(nameof(MaximumChargingCurrentPossible));
+            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossible));
         });
     }
 
@@ -294,6 +309,9 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
             NotifyOfPropertyChange(nameof(PowerSum));
             NotifyOfPropertyChange(nameof(PowerL2KiloWatts));
             NotifyOfPropertyChange(nameof(PowerSumKiloWatts));
+            NotifyOfPropertyChange(nameof(ChargingPhases));
+            NotifyOfPropertyChange(nameof(MaximumChargingCurrentPossible));
+            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossible));
         });
     }
 
@@ -308,6 +326,9 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
             NotifyOfPropertyChange(nameof(PowerSum));
             NotifyOfPropertyChange(nameof(PowerL3KiloWatts));
             NotifyOfPropertyChange(nameof(PowerSumKiloWatts));
+            NotifyOfPropertyChange(nameof(ChargingPhases));
+            NotifyOfPropertyChange(nameof(MaximumChargingCurrentPossible));
+            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossible));
         });
     }
 
@@ -320,7 +341,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref powerL0, value);
     }
 
-    public double PowerSum => PowerL1 ?? 0 + PowerL2 ?? 0 + PowerL3 ?? 0;
+    public double PowerSum => (PowerL1 ?? 0) + (PowerL2 ?? 0) + (PowerL3 ?? 0);
 
     public double? PowerL1KiloWatts => PowerL1 / 1000d;
     public double? PowerL2KiloWatts => PowerL2 / 1000d;
@@ -645,7 +666,11 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     public byte? AbsoluteMaximumChargingCurrent
     {
         get => absoluteMaximumChargingCurrent;
-        set => Set(ref absoluteMaximumChargingCurrent, value);
+        set => Set(ref absoluteMaximumChargingCurrent, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(MaximumChargingCurrentPossible));
+            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossible));
+        });
     }
 
     private byte? maximumChargingCurrentPhase1;
@@ -654,7 +679,20 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     public byte? MaximumChargingCurrentPhase1
     {
         get => maximumChargingCurrentPhase1;
-        set => Set(ref maximumChargingCurrentPhase1, value);
+        set => Set(ref maximumChargingCurrentPhase1, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(MaximumChargingCurrentPossible));
+            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossible));
+        });
+    }
+
+    private byte? maximumChargingCurrentPhase3;
+
+    [WattPilot("la3", false)]
+    public byte? MaximumChargingCurrentPhase3
+    {
+        get => maximumChargingCurrentPhase3;
+        set => Set(ref maximumChargingCurrentPhase3, value);
     }
 
     private bool? unlockCableOnPowerFailure;
@@ -716,7 +754,62 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     public byte? MaximumChargingCurrent
     {
         get => maximumChargingCurrent;
-        set => Set(ref maximumChargingCurrent, value);
+        set => Set(ref maximumChargingCurrent, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(MaximumChargingCurrentPossible));
+            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossible));
+        });
+    }
+
+    public byte ChargingPhases
+    {
+        get
+        {
+            var phases = (byte)new[] { PowerL1, PowerL2, PowerL3 }.Count(p => p is > 10);
+
+            if (phases == 0)
+            {
+                phases = PhaseSwitchMode == Charging.PhaseSwitchMode.Phase1 ? (byte)1 : (byte)3;
+            }
+
+            return phases;
+        }
+    }
+
+    public byte MaximumChargingCurrentPossible
+    {
+        get
+        {
+            var result = MaximumChargingCurrent;
+
+            if (AbsoluteMaximumChargingCurrent < result)
+            {
+                result = AbsoluteMaximumChargingCurrent;
+            }
+
+            if (ChargingPhases == 1 && MaximumChargingCurrentPhase1 < result)
+            {
+                result = MaximumChargingCurrentPhase1;
+            }
+
+            if (CableCurrentMaximum < result)
+            {
+                result = CableCurrentMaximum;
+            }
+
+            result *= ChargingPhases;
+            return result ?? 0;
+        }
+    }
+
+    public double MaximumChargingPowerPossible
+    {
+        get
+        {
+            var voltages = new[] { VoltageL1 ?? 0, VoltageL2 ?? 0, VoltageL3 ?? 0 }[..Math.Max(ChargingPhases, (byte)1)];
+            var result = MaximumChargingCurrentPossible * voltages.Average();
+            return result;
+        }
     }
 
     private string? downloadLink;
@@ -858,16 +951,20 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref energyCurrentSession, value);
     }
 
-    private double? cableCurrentMaximum;
+    private byte? cableCurrentMaximum;
 
     /// <summary>
     ///     Maximum current that the connected cable supports.
     /// </summary>
     [WattPilot("cbl")]
-    public double? CableCurrentMaximum
+    public byte? CableCurrentMaximum
     {
         get => cableCurrentMaximum;
-        set => Set(ref cableCurrentMaximum, value);
+        set => Set(ref cableCurrentMaximum, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(MaximumChargingCurrentPossible));
+            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossible));
+        });
     }
 
     private byte? maximumWattPilotPowerKiloWatts;
@@ -890,7 +987,13 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     public PhaseSwitchMode? PhaseSwitchMode
     {
         get => phaseSwitchMode;
-        set => Set(ref phaseSwitchMode, value, () => NotifyOfPropertyChange(nameof(AllowPauseAndHasPhaseSwitch)));
+        set => Set(ref phaseSwitchMode, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(AllowPauseAndHasPhaseSwitch));
+            NotifyOfPropertyChange(nameof(ChargingPhases));
+            NotifyOfPropertyChange(nameof(MaximumChargingCurrentPossible));
+            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossible));
+        });
     }
 
     private bool? noFeedIn;

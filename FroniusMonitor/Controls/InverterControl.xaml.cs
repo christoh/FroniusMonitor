@@ -33,10 +33,45 @@ public partial class InverterControl
     private readonly IDataCollectionService? dataCollectionService = IoC.TryGetRegistered<IDataCollectionService>();
     private IGen24Service? gen24Service;
     private IServiceProvider provider = IoC.Injector!;
-    private static readonly IReadOnlyList<InverterDisplayMode> acModes = [InverterDisplayMode.AcPowerActive, InverterDisplayMode.AcPowerApparent, InverterDisplayMode.AcPowerReactive, InverterDisplayMode.AcPowerFactor, InverterDisplayMode.AcCurrent, InverterDisplayMode.AcPhaseVoltage, InverterDisplayMode.AcLineVoltage,];
-    private static readonly IReadOnlyList<InverterDisplayMode> dcModes = [InverterDisplayMode.DcGauge, InverterDisplayMode.DcPower, InverterDisplayMode.DcRelativePower, InverterDisplayMode.DcCurrent, InverterDisplayMode.DcVoltage,];
-    private static readonly IReadOnlyList<InverterDisplayMode> moreModes = [InverterDisplayMode.MoreEfficiency, InverterDisplayMode.More, InverterDisplayMode.MoreTemperatures, InverterDisplayMode.MoreFans, InverterDisplayMode.MoreOp, InverterDisplayMode.MoreVersions];
-    private static readonly IReadOnlyList<InverterDisplayMode> energyModes = [InverterDisplayMode.EnergySolar, InverterDisplayMode.EnergyInverter, InverterDisplayMode.EnergyRectifier, InverterDisplayMode.EnergyStorage,];
+
+    private static readonly IReadOnlyList<InverterDisplayMode> acModes = 
+    [
+        InverterDisplayMode.AcPowerActive,
+        InverterDisplayMode.AcPowerApparent,
+        InverterDisplayMode.AcPowerReactive,
+        InverterDisplayMode.AcPowerFactor,
+        InverterDisplayMode.AcCurrent,
+        InverterDisplayMode.AcPhaseVoltage,
+        InverterDisplayMode.AcLineVoltage,
+    ];
+
+    private static readonly IReadOnlyList<InverterDisplayMode> dcModes =
+    [
+        InverterDisplayMode.DcGauge,
+        InverterDisplayMode.DcPower,
+        InverterDisplayMode.DcRelativePower,
+        InverterDisplayMode.DcCurrent,
+        InverterDisplayMode.DcVoltage,
+    ];
+    
+    private static readonly IReadOnlyList<InverterDisplayMode> moreModes =
+    [
+        InverterDisplayMode.MoreEfficiency,
+        InverterDisplayMode.More,
+        InverterDisplayMode.MoreTemperatures,
+        InverterDisplayMode.MoreFans,
+        InverterDisplayMode.MoreOp,
+        InverterDisplayMode.MoreVersions
+    ];
+    
+    private static readonly IReadOnlyList<InverterDisplayMode> energyModes =
+    [
+        InverterDisplayMode.EnergySolar,
+        InverterDisplayMode.EnergyInverter,
+        InverterDisplayMode.EnergyRectifier,
+        InverterDisplayMode.EnergyStorage,
+    ];
+    
     private int currentAcIndex, currentDcIndex, currentMoreIndex, energyIndex;
     private bool isInStandByChange;
     private string? lastStatusCode;
@@ -66,7 +101,7 @@ public partial class InverterControl
     public static readonly DependencyProperty ModeProperty = DependencyProperty.Register
     (
         nameof(Mode), typeof(InverterDisplayMode), typeof(InverterControl),
-        new PropertyMetadata(InverterDisplayMode.AcPowerActive, (d, _) => ((InverterControl)d).OnModeChanged())
+        new PropertyMetadata(InverterDisplayMode.DcGauge, (d, _) => ((InverterControl)d).OnModeChanged())
     );
 
     public InverterDisplayMode Mode

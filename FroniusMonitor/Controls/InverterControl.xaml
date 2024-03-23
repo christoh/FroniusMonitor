@@ -9,6 +9,7 @@
              xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
              xmlns:l="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Localization"
              xmlns:gl="clr-namespace:System.Globalization;assembly=System.Globalization"
+             xmlns:t="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Resources"
              mc:Ignorable="d"
              d:DesignHeight="127" d:DesignWidth="110">
     <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:InverterControl}}">
@@ -136,7 +137,7 @@
                             </StackPanel>
                         </Grid>
 
-                        <Grid x:Name="AcPowerActive">
+                        <Grid x:Name="AcPowerActive" Visibility="Collapsed">
                             <Grid.Resources>
                                 <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource AcPowerGaugeStyle}" />
                             </Grid.Resources>
@@ -316,6 +317,28 @@
                                                          Value="{Binding Sensors.Cache.StoragePower, FallbackValue={x:Null}}"
                                                          Minimum="0" Maximum="{Binding Sensors.Storage.VoltageOuter, FallbackValue=8184, Converter={co:Multiply Factor=22}}" />
                             </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="DcGauge" Visibility="Visible" Margin="2,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock FontSize="10" FontWeight="Normal" Text="{x:Static p:Resources.DcPower}" TextAlignment="Center" />
+
+                            <TextBlock FontSize="10" FontWeight="Medium" Grid.Row="1" Margin="0,0,0,2"
+                                       Width="{Binding ActualWidth, ElementName=DcGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
+                                <Run Text="{Binding Sensors.Inverter.SolarPowerSum, FallbackValue=0, TargetNullValue=0, StringFormat=N1, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" />
+                                <Run Text="W" />
+                            </TextBlock>
+
+                            <c:MultiColorGauge Value="{Binding Sensors.Inverter.SolarPowerSum, FallbackValue=0, TargetNullValue=0, Mode=OneWay}"
+                                               Minimum="0" Grid.Row="2"
+                                               Maximum="{Binding Config.InverterSettings.Mppt.WattPeakTotal, FallbackValue=10000, TargetNullValue=10000, Mode=OneWay}"
+                                               GaugeColors="{x:Static c:InverterControl.GaugeColors}"
+                                               Width="92" Style="{StaticResource DefaultHalfCircleGauge}" />
                         </Grid>
 
                         <Grid x:Name="DcVoltage" Visibility="Collapsed">
@@ -598,28 +621,6 @@
                                 <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Efficiency}" Value="{Binding Sensors.Cache.StorageEfficiency, FallbackValue={x:Null}}"
                                                          ShowPercent="True" Minimum="0" Maximum="1" Low=".92" VeryLow=".90" />
                             </StackPanel>
-                        </Grid>
-
-                        <Grid x:Name="DcGauge" Visibility="Collapsed" Margin="2,0">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-
-                            <TextBlock FontSize="10" FontWeight="Normal" Text="{x:Static p:Resources.DcPower}" TextAlignment="Center" />
-
-                            <TextBlock FontSize="10" FontWeight="Medium" Grid.Row="1" Margin="0,0,0,2"
-                                       Width="{Binding ActualWidth, ElementName=DcGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
-                                <Run Text="{Binding Sensors.Inverter.SolarPowerSum, FallbackValue=0, TargetNullValue=0, StringFormat=N1, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" />
-                                <Run Text="W" />
-                            </TextBlock>
-
-                            <c:MultiColorGauge Value="{Binding Sensors.Inverter.SolarPowerSum, FallbackValue=0, TargetNullValue=0, Mode=OneWay}"
-                                               Minimum="0" Grid.Row="2"
-                                               Maximum="{Binding Config.InverterSettings.Mppt.WattPeakTotal, FallbackValue=10000, TargetNullValue=0, Mode=OneWay}"
-                                               GaugeColors="{x:Static c:InverterControl.GaugeColors}"
-                                               Width="92" Template="{StaticResource HalfCircleGauge}" />
                         </Grid>
                     </Grid>
                 </Border>

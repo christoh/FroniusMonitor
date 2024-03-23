@@ -8,6 +8,7 @@
              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
              xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
              xmlns:vm="clr-namespace:De.Hochstaetter.Fronius.Models.Charging;assembly=Fronius"
+             xmlns:gl="clr-namespace:System.Globalization;assembly=System.Runtime"
              mc:Ignorable="d"
              d:DesignHeight="127" d:DesignWidth="110">
     <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:WattPilotControl}}">
@@ -116,7 +117,7 @@
                             </StackPanel>
                         </Grid>
 
-                        <Grid x:Name="Power">
+                        <Grid x:Name="Power" Visibility="Collapsed">
                             <Grid.Resources>
                                 <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource InverterControlGaugeStyle}">
                                     <d:Style.DataContext>
@@ -142,11 +143,35 @@
                                 <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding PowerL2KiloWatts, FallbackValue={x:Null}}" />
                                 <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding PowerL3KiloWatts, FallbackValue={x:Null}}" />
                                 <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Sum}" Value="{Binding PowerSumKiloWatts, FallbackValue={x:Null}}"
-                                                         Maximum="{Binding MaximumChargingCurrent, FallbackValue=0, Converter={co:Multiply Factor=0.69}}"
-                                                         VeryHigh="{Binding MaximumChargingCurrent, FallbackValue=0, Converter={co:Multiply Factor=0.69}}"
-                                                         Low="{Binding MaximumChargingCurrent, FallbackValue=0, Converter={co:Multiply Factor=0.207}}"
-                                                         VeryLow="{Binding MaximumChargingCurrent, FallbackValue=0, Converter={co:Multiply Factor=0.138}}" />
+                                                         Maximum="{Binding MaximumChargingPowerPossible, FallbackValue=0, Converter={co:Multiply Factor=0.001}}"
+                                                         VeryHigh="{Binding MaximumChargingPowerPossible, FallbackValue=0, Converter={co:Multiply Factor=0.0011}}"
+                                                         High="{Binding MaximumChargingPowerPossible, FallbackValue=0, Converter={co:Multiply Factor=0.00101}}"
+                                                         Low="{Binding MaximumChargingPowerPossible, FallbackValue=0, Converter={co:Multiply Factor=0.0003}}"
+                                                         VeryLow="{Binding MaximumChargingPowerPossible, FallbackValue=0, Converter={co:Multiply Factor=0.00015}}" />
                             </StackPanel>
+                        </Grid>
+                        
+                        <Grid x:Name="PowerGauge">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock FontSize="10" FontWeight="Normal" Text="{x:Static p:Resources.Power}" TextAlignment="Center" />
+
+                            <TextBlock FontSize="10" FontWeight="Medium" Grid.Row="1" Margin="0,0,0,2"
+                                       Width="{Binding ActualWidth, ElementName=PowerGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
+                                <Run Text="{Binding PowerSumKiloWatts, FallbackValue=0, TargetNullValue=0, StringFormat=N1, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" />
+                                <Run Text="kW" />
+                            </TextBlock>
+
+                            <c:MultiColorGauge Value="{Binding PowerSum, FallbackValue=0, TargetNullValue=0, Mode=OneWay}"
+                                               Minimum="0" Grid.Row="2"
+                                               Maximum="{Binding MaximumChargingPowerPossible, FallbackValue=6, TargetNullValue=6, Mode=OneWay, Converter={co:Multiply Factor=1}}"
+                                               GaugeColors="{x:Static c:WattPilotControl.LowIsBad}"
+                                               Width="92" Style="{StaticResource DefaultHalfCircleGauge}" />
+                            
                         </Grid>
 
                         <Grid x:Name="PowerFactor" Visibility="Collapsed">
