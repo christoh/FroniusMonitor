@@ -9,7 +9,6 @@
              xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
              xmlns:l="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Localization"
              xmlns:gl="clr-namespace:System.Globalization;assembly=System.Globalization"
-             xmlns:t="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Resources"
              mc:Ignorable="d"
              d:DesignHeight="127" d:DesignWidth="110">
     <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:InverterControl}}">
@@ -109,6 +108,37 @@
                             </StackPanel>
                         </Grid>
 
+                        <StackPanel x:Name="AcPhaseVoltageGauge" Visibility="Collapsed" >
+                            <TextBlock Text="{x:Static p:Resources.NetHealth}" HorizontalAlignment="Center" FontSize="10" Margin="0,0,0,4"/>
+                            <UniformGrid Rows="2" Columns="2">
+                            <UniformGrid.Resources>
+                                <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource DefaultHalfCircleGauge}">
+                                    <Setter Property="Minimum" Value="220" />
+                                    <Setter Property="Maximum" Value="240" />
+                                    <Setter Property="GaugeColors" Value="{x:Static c:InverterControl.MidIsGood}" />
+                                    <Setter Property="ColorAllTicks" Value="True" />
+                                </Style>
+                            </UniformGrid.Resources>
+
+                            <!-- ReSharper disable Xaml.RedundantAttachedProperty -->
+                            <c:MultiColorGauge Grid.Row="0" Grid.Column="0" Margin="1"
+                                               Value="{Binding Sensors.Cache.InverterPhaseVoltageL1, FallbackValue=0, TargetNullValue=0}"
+                                               ColorAllTicks="{Binding Sensors.Cache.InverterPhaseVoltageL1, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}"/>
+
+                            <c:MultiColorGauge Grid.Row="0" Grid.Column="1" Margin="1"
+                                               Value="{Binding Sensors.Cache.InverterPhaseVoltageL2, FallbackValue=0, TargetNullValue=0}"
+                                               ColorAllTicks="{Binding Sensors.Cache.InverterPhaseVoltageL2, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" />
+
+                            <c:MultiColorGauge Grid.Row="1" Grid.Column="0" Margin="1"
+                                               Value="{Binding Sensors.Cache.InverterPhaseVoltageL3, FallbackValue=0, TargetNullValue=0}"
+                                               ColorAllTicks="{Binding Sensors.Cache.InverterPhaseVoltageL3, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" />
+
+                            <c:MultiColorGauge Grid.Row="1" Grid.Column="1" Margin="1" Minimum="49.5" Maximum="50.5"
+                                               Value="{Binding Sensors.Cache.InverterFrequency, FallbackValue=0, TargetNullValue=0}"
+                                               ColorAllTicks="{Binding Sensors.Cache.InverterFrequency, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" />
+                            <!-- ReSharper restore Xaml.RedundantAttachedProperty -->
+                        </UniformGrid>
+                        </StackPanel>
                         <Grid x:Name="AcLineVoltage" Visibility="Collapsed">
                             <Grid.Resources>
                                 <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource InverterControlGaugeStyle}">
@@ -157,6 +187,28 @@
                                                          High="{Binding Config.MaxAcPower, FallbackValue=9000, Converter={co:Multiply Factor=.9}}"
                                                          VeryHigh="{Binding Config.MaxAcPower, FallbackValue=9600, Converter={co:Multiply Factor=.96}}" />
                             </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="AcPowerActiveGauge" Visibility="Collapsed" Margin="2,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock FontSize="10" FontWeight="Normal" Text="{x:Static p:Resources.ActivePower}" TextAlignment="Center" />
+
+                            <TextBlock FontSize="10" FontWeight="Medium" Grid.Row="1" Margin="0,0,0,2"
+                                       Width="{Binding ActualWidth, ElementName=AcPowerActiveGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
+                                <Run Text="{Binding Sensors.Cache.InverterActivePowerSum, FallbackValue=0, TargetNullValue=0, StringFormat=N1, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" />
+                                <Run Text="W" />
+                            </TextBlock>
+
+                            <c:MultiColorGauge Value="{Binding Sensors.Cache.InverterActivePowerSum, FallbackValue=-100000, TargetNullValue=-100000, Mode=OneWay}"
+                                               Minimum="{Binding Config.MaxAcPower, FallbackValue=-10000, TargetNullValue=-10000, Converter={co:Multiply Factor=-1}, Mode=OneWay}" Grid.Row="2"
+                                               Maximum="{Binding Config.MaxAcPower, FallbackValue=10000, TargetNullValue=10000, Mode=OneWay}"
+                                               GaugeColors="{x:Static c:InverterControl.MidIsGood}" ColorAllTicks="True" 
+                                               Width="92"/>
                         </Grid>
 
                         <Grid x:Name="AcPowerApparent" Visibility="Collapsed">
@@ -319,7 +371,7 @@
                             </StackPanel>
                         </Grid>
 
-                        <Grid x:Name="DcGauge" Visibility="Visible" Margin="2,0">
+                        <Grid x:Name="DcPowerGauge" Margin="2,0">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
@@ -329,7 +381,7 @@
                             <TextBlock FontSize="10" FontWeight="Normal" Text="{x:Static p:Resources.DcPower}" TextAlignment="Center" />
 
                             <TextBlock FontSize="10" FontWeight="Medium" Grid.Row="1" Margin="0,0,0,2"
-                                       Width="{Binding ActualWidth, ElementName=DcGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
+                                       Width="{Binding ActualWidth, ElementName=DcPowerGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
                                 <Run Text="{Binding Sensors.Inverter.SolarPowerSum, FallbackValue=0, TargetNullValue=0, StringFormat=N1, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" />
                                 <Run Text="W" />
                             </TextBlock>
@@ -337,7 +389,7 @@
                             <c:MultiColorGauge Value="{Binding Sensors.Inverter.SolarPowerSum, FallbackValue=0, TargetNullValue=0, Mode=OneWay}"
                                                Minimum="0" Grid.Row="2"
                                                Maximum="{Binding Config.InverterSettings.Mppt.WattPeakTotal, FallbackValue=10000, TargetNullValue=10000, Mode=OneWay}"
-                                               GaugeColors="{x:Static c:InverterControl.GaugeColors}"
+                                               GaugeColors="{x:Static c:InverterControl.HighIsBad}"
                                                Width="92" Style="{StaticResource DefaultHalfCircleGauge}" />
                         </Grid>
 

@@ -6,6 +6,7 @@ public enum WattPilotDisplayMode : byte
 {
     Voltage,
     Current,
+    CurrentGauge,
     Power,
     PowerGauge,
     PowerFactor,
@@ -31,6 +32,7 @@ public partial class WattPilotControl
 
     private static readonly IReadOnlyList<WattPilotDisplayMode> currentModes =
     [
+        WattPilotDisplayMode.CurrentGauge,
         WattPilotDisplayMode.Current,
     ];
 
@@ -46,7 +48,7 @@ public partial class WattPilotControl
     [
         new MultiColorGauge.ColorEntry(0,Colors.Red),
         new MultiColorGauge.ColorEntry(.05,Colors.OrangeRed),
-        new MultiColorGauge.ColorEntry(.5,Colors.Green),
+        new MultiColorGauge.ColorEntry(.5,Colors.YellowGreen),
         new MultiColorGauge.ColorEntry(1,Colors.Green),
     ];
 

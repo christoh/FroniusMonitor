@@ -44,4 +44,15 @@ public class MultiColorGauge : ProgressBar
         get => (Brush)GetValue(TickFillProperty);
         set => SetValue(TickFillProperty, value);
     }
+
+    public static readonly DependencyProperty ColorAllTicksProperty = DependencyProperty.Register
+    (
+        nameof(ColorAllTicks), typeof(bool), typeof(MultiColorGauge)
+    );
+
+    public bool ColorAllTicks
+    {
+        get => (bool)GetValue(ColorAllTicksProperty);
+        set => SetValue(ColorAllTicksProperty, value);
+    }
 }

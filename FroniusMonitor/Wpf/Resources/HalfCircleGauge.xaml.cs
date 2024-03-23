@@ -15,6 +15,7 @@ public partial class HalfCircleGauge
     private readonly DependencyPropertyDescriptor? colorsDescriptor = DependencyPropertyDescriptor.FromProperty(MultiColorGauge.GaugeColorsProperty, typeof(MultiColorGauge));
     private readonly DependencyPropertyDescriptor? handFillDescriptor = DependencyPropertyDescriptor.FromProperty(MultiColorGauge.HandFillProperty, typeof(MultiColorGauge));
     private readonly DependencyPropertyDescriptor? tickFillDescriptor = DependencyPropertyDescriptor.FromProperty(MultiColorGauge.TickFillProperty, typeof(MultiColorGauge));
+    private readonly DependencyPropertyDescriptor? colorAllTicksDescriptor = DependencyPropertyDescriptor.FromProperty(MultiColorGauge.ColorAllTicksProperty, typeof(MultiColorGauge));
 
     public static readonly DependencyProperty AnimatedValueProperty = DependencyProperty.RegisterAttached
     (
@@ -30,6 +31,21 @@ public partial class HalfCircleGauge
     public static void SetAnimatedValue(DependencyObject element, double value)
     {
         element.SetValue(AnimatedValueProperty, value);
+    }
+
+    public static readonly DependencyProperty MinimumMaximumStringFormatProperty = DependencyProperty.RegisterAttached
+    (
+        nameof(GetMinimumMaximumStringFormat)[3..], typeof(string), typeof(HalfCircleGauge), new FrameworkPropertyMetadata("N0")
+    );
+
+    public static string GetMinimumMaximumStringFormat(DependencyObject element)
+    {
+        return (string)element.GetValue(MinimumMaximumStringFormatProperty);
+    }
+
+    public static void SetMinimumMaximumStringFormat(DependencyObject element, string value)
+    {
+        element.SetValue(MinimumMaximumStringFormatProperty, value);
     }
 
     #endregion
@@ -68,6 +84,7 @@ public partial class HalfCircleGauge
         colorsDescriptor?.AddValueChanged(gauge, OnValueChanged);
         handFillDescriptor?.AddValueChanged(gauge, OnHandBrushChanged);
         tickFillDescriptor?.AddValueChanged(gauge, OnParametersChanged);
+        colorAllTicksDescriptor?.AddValueChanged(gauge, OnParametersChanged);
         OnParametersChanged(gauge);
     }
 
@@ -81,7 +98,7 @@ public partial class HalfCircleGauge
 
     private static void SetValue(RangeBase gauge, bool skipAnimation = false)
     {
-        var relativeValue = Math.Max(Math.Min(gauge.Maximum, gauge.Value), gauge.Minimum) / (gauge.Maximum - gauge.Minimum);
+        var relativeValue = (Math.Max(Math.Min(gauge.Maximum, gauge.Value), gauge.Minimum) - gauge.Minimum) / (gauge.Maximum - gauge.Minimum);
 
         var animation = skipAnimation
             ? null
@@ -105,14 +122,18 @@ public partial class HalfCircleGauge
         var (hand, handLength, canvas, _) = (GaugeMetaData)gauge.TemplateMetadata;
         var relativeValue = (double)e.NewValue;
         hand.RenderTransform = new RotateTransform((relativeValue - 0.5) * 180, 4, handLength - 5);
-        canvas.Children.OfType<Rectangle>().Apply(rect => ColorShape(gauge, rect, relativeValue));
+
+        if (!gauge.ColorAllTicks)
+        {
+            canvas.Children.OfType<Rectangle>().Apply(rect => ColorShape(gauge, rect, relativeValue));
+        }
     }
 
     private static void ColorShape(MultiColorGauge gauge, Shape rect, double relativeValue)
     {
         var rectRelativeValue = Math.Round((double)rect.Tag, 6);
 
-        if (rectRelativeValue > relativeValue || relativeValue <= 0 || gauge.GaugeColors == null)
+        if (!gauge.ColorAllTicks && ((rectRelativeValue > relativeValue || relativeValue <= 0)) || gauge.GaugeColors == null)
         {
             rect.Fill = gauge.TickFill;
             return;
@@ -173,6 +194,11 @@ public partial class HalfCircleGauge
         finally
         {
             SetValue(gauge, true);
+
+            if (gauge.ColorAllTicks)
+            {
+                canvas.Children.OfType<Rectangle>().Apply(rect => ColorShape(gauge, rect, 0));
+            }
         }
     }
 

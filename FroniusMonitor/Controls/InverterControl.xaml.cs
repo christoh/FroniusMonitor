@@ -5,13 +5,15 @@ namespace De.Hochstaetter.FroniusMonitor.Controls;
 public enum InverterDisplayMode
 {
     AcPhaseVoltage,
+    AcPhaseVoltageGauge,
     AcLineVoltage,
     AcCurrent,
     AcPowerActive,
+    AcPowerActiveGauge,
     AcPowerApparent,
     AcPowerReactive,
     AcPowerFactor,
-    DcGauge,
+    DcPowerGauge,
     DcVoltage,
     DcCurrent,
     DcPower,
@@ -36,18 +38,20 @@ public partial class InverterControl
 
     private static readonly IReadOnlyList<InverterDisplayMode> acModes = 
     [
+        InverterDisplayMode.AcPowerActiveGauge,
         InverterDisplayMode.AcPowerActive,
         InverterDisplayMode.AcPowerApparent,
         InverterDisplayMode.AcPowerReactive,
         InverterDisplayMode.AcPowerFactor,
         InverterDisplayMode.AcCurrent,
+        InverterDisplayMode.AcPhaseVoltageGauge,
         InverterDisplayMode.AcPhaseVoltage,
         InverterDisplayMode.AcLineVoltage,
     ];
 
     private static readonly IReadOnlyList<InverterDisplayMode> dcModes =
     [
-        InverterDisplayMode.DcGauge,
+        InverterDisplayMode.DcPowerGauge,
         InverterDisplayMode.DcPower,
         InverterDisplayMode.DcRelativePower,
         InverterDisplayMode.DcCurrent,
@@ -87,9 +91,20 @@ public partial class InverterControl
         Duration = TimeSpan.FromSeconds(1.5),
     };
 
-    public static IReadOnlyList<MultiColorGauge.ColorEntry> GaugeColors { get; } =
+    public static IReadOnlyList<MultiColorGauge.ColorEntry> HighIsBad { get; } =
     [
         new MultiColorGauge.ColorEntry(0, Colors.Green),
+        new MultiColorGauge.ColorEntry(.75, Colors.YellowGreen),
+        new MultiColorGauge.ColorEntry(.95, Colors.OrangeRed),
+        new MultiColorGauge.ColorEntry(1, Colors.Red),
+    ];
+
+    public static IReadOnlyList<MultiColorGauge.ColorEntry> MidIsGood { get; } =
+    [
+        new MultiColorGauge.ColorEntry(0, Colors.Red),
+        new MultiColorGauge.ColorEntry(.05, Colors.OrangeRed),
+        new MultiColorGauge.ColorEntry(.25, Colors.YellowGreen),
+        new MultiColorGauge.ColorEntry(0.5,Colors.Green),
         new MultiColorGauge.ColorEntry(.75, Colors.YellowGreen),
         new MultiColorGauge.ColorEntry(.95, Colors.OrangeRed),
         new MultiColorGauge.ColorEntry(1, Colors.Red),
@@ -101,7 +116,7 @@ public partial class InverterControl
     public static readonly DependencyProperty ModeProperty = DependencyProperty.Register
     (
         nameof(Mode), typeof(InverterDisplayMode), typeof(InverterControl),
-        new PropertyMetadata(InverterDisplayMode.DcGauge, (d, _) => ((InverterControl)d).OnModeChanged())
+        new PropertyMetadata(InverterDisplayMode.DcPowerGauge, (d, _) => ((InverterControl)d).OnModeChanged())
     );
 
     public InverterDisplayMode Mode

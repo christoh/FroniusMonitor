@@ -117,6 +117,29 @@
                             </StackPanel>
                         </Grid>
 
+                        <Grid x:Name="CurrentGauge" Visibility="Collapsed">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock FontSize="10" FontWeight="Normal" Text="{x:Static p:Resources.Current}" TextAlignment="Center" />
+
+                            <TextBlock FontSize="10" FontWeight="Medium" Grid.Row="1" Margin="0,0,0,2"
+                                       Width="{Binding ActualWidth, ElementName=CurrentGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
+                                <Run Text="{Binding CurrentSum, FallbackValue=0, TargetNullValue=0, StringFormat=N1, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" />
+                                <Run Text="A" />
+                            </TextBlock>
+
+                            <c:MultiColorGauge Value="{Binding CurrentSum, FallbackValue=0, TargetNullValue=0, Mode=OneWay}"
+                                               Minimum="0" Grid.Row="2"
+                                               Maximum="{Binding MaximumChargingCurrentPossible, FallbackValue=6, TargetNullValue=6, Mode=OneWay, Converter={co:Multiply Factor=1}}"
+                                               GaugeColors="{x:Static c:WattPilotControl.LowIsBad}"
+                                               Width="92" Style="{StaticResource DefaultHalfCircleGauge}" />
+                            
+                        </Grid>
+                        
                         <Grid x:Name="Power" Visibility="Collapsed">
                             <Grid.Resources>
                                 <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource InverterControlGaugeStyle}">
@@ -168,7 +191,7 @@
 
                             <c:MultiColorGauge Value="{Binding PowerSum, FallbackValue=0, TargetNullValue=0, Mode=OneWay}"
                                                Minimum="0" Grid.Row="2"
-                                               Maximum="{Binding MaximumChargingPowerPossible, FallbackValue=6, TargetNullValue=6, Mode=OneWay, Converter={co:Multiply Factor=1}}"
+                                               Maximum="{Binding MaximumChargingPowerPossible, FallbackValue=16, TargetNullValue=16, Mode=OneWay, Converter={co:Multiply Factor=1}}"
                                                GaugeColors="{x:Static c:WattPilotControl.LowIsBad}"
                                                Width="92" Style="{StaticResource DefaultHalfCircleGauge}" />
                             

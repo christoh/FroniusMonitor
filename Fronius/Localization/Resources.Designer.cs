@@ -637,7 +637,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Norway Virtual Bidding Zone NO2NSL.
         /// </summary>
         public static string AwattarCountry_NorwayVirtualNo2Nsl {
             get {
@@ -2604,6 +2604,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Name {
             get {
                 return ResourceManager.GetString("Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        public static string NetHealth {
+            get {
+                return ResourceManager.GetString("NetHealth", resourceCulture);
             }
         }
         
