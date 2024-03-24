@@ -207,7 +207,7 @@
                             <c:MultiColorGauge Value="{Binding Sensors.Cache.InverterActivePowerSum, FallbackValue=-100000, TargetNullValue=-100000, Mode=OneWay}"
                                                Minimum="{Binding Config.MaxAcPower, FallbackValue=-10000, TargetNullValue=-10000, Converter={co:Multiply Factor=-1}, Mode=OneWay}" Grid.Row="2"
                                                Maximum="{Binding Config.MaxAcPower, FallbackValue=10000, TargetNullValue=10000, Mode=OneWay}"
-                                               GaugeColors="{x:Static c:InverterControl.MidIsGood}" ColorAllTicks="True" 
+                                               GaugeColors="{x:Static c:InverterControl.MidIsGood}" ColorAllTicks="{Binding Sensors.Cache.InverterActivePowerSum, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" 
                                                Width="92"/>
                         </Grid>
 

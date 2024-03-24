@@ -9,13 +9,13 @@ public partial class HalfCircleGauge
 
     #region Dependency Properties
 
-    private readonly DependencyPropertyDescriptor? valueDescriptor = DependencyPropertyDescriptor.FromProperty(RangeBase.ValueProperty, typeof(MultiColorGauge));
-    private readonly DependencyPropertyDescriptor? minimumDescriptor = DependencyPropertyDescriptor.FromProperty(RangeBase.MinimumProperty, typeof(MultiColorGauge));
-    private readonly DependencyPropertyDescriptor? maximumDescriptor = DependencyPropertyDescriptor.FromProperty(RangeBase.MaximumProperty, typeof(MultiColorGauge));
-    private readonly DependencyPropertyDescriptor? colorsDescriptor = DependencyPropertyDescriptor.FromProperty(MultiColorGauge.GaugeColorsProperty, typeof(MultiColorGauge));
-    private readonly DependencyPropertyDescriptor? handFillDescriptor = DependencyPropertyDescriptor.FromProperty(MultiColorGauge.HandFillProperty, typeof(MultiColorGauge));
-    private readonly DependencyPropertyDescriptor? tickFillDescriptor = DependencyPropertyDescriptor.FromProperty(MultiColorGauge.TickFillProperty, typeof(MultiColorGauge));
-    private readonly DependencyPropertyDescriptor? colorAllTicksDescriptor = DependencyPropertyDescriptor.FromProperty(MultiColorGauge.ColorAllTicksProperty, typeof(MultiColorGauge));
+    private static readonly DependencyPropertyDescriptor? valueDescriptor = DependencyPropertyDescriptor.FromProperty(RangeBase.ValueProperty, typeof(MultiColorGauge));
+    private static readonly DependencyPropertyDescriptor? minimumDescriptor = DependencyPropertyDescriptor.FromProperty(RangeBase.MinimumProperty, typeof(MultiColorGauge));
+    private static readonly DependencyPropertyDescriptor? maximumDescriptor = DependencyPropertyDescriptor.FromProperty(RangeBase.MaximumProperty, typeof(MultiColorGauge));
+    private static readonly DependencyPropertyDescriptor? colorsDescriptor = DependencyPropertyDescriptor.FromProperty(MultiColorGauge.GaugeColorsProperty, typeof(MultiColorGauge));
+    private static readonly DependencyPropertyDescriptor? handFillDescriptor = DependencyPropertyDescriptor.FromProperty(MultiColorGauge.HandFillProperty, typeof(MultiColorGauge));
+    private static readonly DependencyPropertyDescriptor? tickFillDescriptor = DependencyPropertyDescriptor.FromProperty(MultiColorGauge.TickFillProperty, typeof(MultiColorGauge));
+    private static readonly DependencyPropertyDescriptor? colorAllTicksDescriptor = DependencyPropertyDescriptor.FromProperty(MultiColorGauge.ColorAllTicksProperty, typeof(MultiColorGauge));
 
     public static readonly DependencyProperty AnimatedValueProperty = DependencyProperty.RegisterAttached
     (
@@ -104,8 +104,8 @@ public partial class HalfCircleGauge
             ? null
             : new DoubleAnimation(double.IsFinite(relativeValue) ? relativeValue : 0, TimeSpan.FromSeconds(.5))
             {
-                AccelerationRatio = .2,
-                DecelerationRatio = .2,
+                AccelerationRatio = .33,
+                DecelerationRatio = .33,
             };
 
         gauge.BeginAnimation(AnimatedValueProperty, animation);
@@ -133,7 +133,7 @@ public partial class HalfCircleGauge
     {
         var rectRelativeValue = Math.Round((double)rect.Tag, 6);
 
-        if (!gauge.ColorAllTicks && ((rectRelativeValue > relativeValue || relativeValue <= 0)) || gauge.GaugeColors == null)
+        if (!gauge.ColorAllTicks && (rectRelativeValue > relativeValue || relativeValue <= 0) || gauge.GaugeColors == null)
         {
             rect.Fill = gauge.TickFill;
             return;

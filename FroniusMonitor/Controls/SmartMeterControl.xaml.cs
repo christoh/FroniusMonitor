@@ -4,15 +4,18 @@ namespace De.Hochstaetter.FroniusMonitor.Controls;
 
 public enum MeterDisplayMode
 {
+    PowerActiveGauge,
     PowerActive,
     PowerApparent,
     PowerReactive,
     PowerFactor,
     PowerOutOfBalance,
     PhaseVoltage,
+    PhaseVoltageGauge,
     LineVoltage,
     Current,
     CurrentOutOfBalance,
+    CurrentOutOfBalanceGauge,
     More,
     MoreEnergy,
 }
@@ -21,6 +24,7 @@ public partial class SmartMeterControl
 {
     private static readonly IReadOnlyList<MeterDisplayMode> powerModes = new[]
     {
+        MeterDisplayMode.PowerActiveGauge,
         MeterDisplayMode.PowerActive, MeterDisplayMode.PowerApparent,
         MeterDisplayMode.PowerReactive, MeterDisplayMode.PowerFactor,
         MeterDisplayMode.PowerOutOfBalance
@@ -28,12 +32,12 @@ public partial class SmartMeterControl
 
     private static readonly IReadOnlyList<MeterDisplayMode> voltageModes = new[]
     {
-        MeterDisplayMode.PhaseVoltage, MeterDisplayMode.LineVoltage
+        MeterDisplayMode.PhaseVoltageGauge, MeterDisplayMode.PhaseVoltage, MeterDisplayMode.LineVoltage
     };
 
     private static readonly IReadOnlyList<MeterDisplayMode> currentModes = new[]
     {
-        MeterDisplayMode.Current, MeterDisplayMode.CurrentOutOfBalance
+        MeterDisplayMode.Current, MeterDisplayMode.CurrentOutOfBalanceGauge, MeterDisplayMode.CurrentOutOfBalance
     };
 
     private static readonly IReadOnlyList<MeterDisplayMode> moreModes = new[]
@@ -61,7 +65,7 @@ public partial class SmartMeterControl
     public static readonly DependencyProperty ModeProperty = DependencyProperty.Register
     (
         nameof(Mode), typeof(MeterDisplayMode), typeof(SmartMeterControl),
-        new PropertyMetadata(MeterDisplayMode.PowerActive, (d, _) => ((SmartMeterControl)d).SmartMeterDataChanged())
+        new PropertyMetadata(MeterDisplayMode.PowerActiveGauge, (d, _) => ((SmartMeterControl)d).SmartMeterDataChanged())
     );
 
     public MeterDisplayMode Mode

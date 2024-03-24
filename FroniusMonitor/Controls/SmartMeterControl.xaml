@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
              xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls" xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
+             xmlns:gl="clr-namespace:System.Globalization;assembly=System.Runtime"
              mc:Ignorable="d"
              d:DesignHeight="127" d:DesignWidth="110">
     <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SmartMeterControl}}">
@@ -33,7 +34,29 @@
 
                 <Border Grid.Row="1" Width="100" Height="94" Margin="4" Background="{Binding MeterStatus, FallbackValue={x:Null}, Converter={co:Gen24Status2PanelBrush}}" BorderThickness=".2" BorderBrush="Black">
                     <Grid>
-                        <Grid x:Name="PowerActive">
+                        <Grid x:Name="PowerActiveGauge" Visibility="Visible">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock FontSize="10" FontWeight="Normal" Text="{x:Static p:Resources.ActivePower}" TextAlignment="Center" />
+
+                            <TextBlock FontSize="10" FontWeight="Medium" Grid.Row="1" Margin="0,0,0,2"
+                                       Width="{Binding ActualWidth, ElementName=PowerActiveGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
+                                <Run Text="{Binding SmartMeter.ActivePowerSum, FallbackValue=0, TargetNullValue=0, StringFormat=N1, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" />
+                                <Run Text="W" />
+                            </TextBlock>
+
+                            <c:MultiColorGauge Value="{Binding SmartMeter.ActivePowerSum, FallbackValue=-35000, TargetNullValue=-35000, Mode=OneWay}"
+                                               Minimum="-35000" Grid.Row="2"
+                                               Maximum="35000"
+                                               GaugeColors="{x:Static c:InverterControl.MidIsGood}" ColorAllTicks="{Binding SmartMeter.ActivePowerSum, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" 
+                                               Width="92"/>
+                        </Grid>
+                        
+                        <Grid x:Name="PowerActive" Visibility="Collapsed">
                             <Grid.Resources>
                                 <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource PowerGaugeStyle}">
                                     <Setter Property="UnitSymbol" Value="W" />
@@ -170,6 +193,38 @@
                             </StackPanel>
                         </Grid>
 
+                        <StackPanel x:Name="PhaseVoltageGauge" Visibility="Collapsed">
+                            <TextBlock Text="{x:Static p:Resources.NetHealth}" HorizontalAlignment="Center" FontSize="10" Margin="0,0,0,4"/>
+                            <UniformGrid Rows="2" Columns="2" Margin="0,6,0,0">
+                            <UniformGrid.Resources>
+                                <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource DefaultHalfCircleGauge}">
+                                    <Setter Property="Minimum" Value="220" />
+                                    <Setter Property="Maximum" Value="240" />
+                                    <Setter Property="GaugeColors" Value="{x:Static c:InverterControl.MidIsGood}" />
+                                    <Setter Property="ColorAllTicks" Value="True" />
+                                </Style>
+                            </UniformGrid.Resources>
+
+                            <!-- ReSharper disable Xaml.RedundantAttachedProperty -->
+                            <c:MultiColorGauge Grid.Row="0" Grid.Column="0" Margin="1"
+                                               Value="{Binding SmartMeter.PhaseVoltageL1, FallbackValue=0, TargetNullValue=0}"
+                                               ColorAllTicks="{Binding SmartMeter.PhaseVoltageL1, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}"/>
+
+                            <c:MultiColorGauge Grid.Row="0" Grid.Column="1" Margin="1"
+                                               Value="{Binding SmartMeter.PhaseVoltageL2, FallbackValue=0, TargetNullValue=0}"
+                                               ColorAllTicks="{Binding SmartMeter.PhaseVoltageL2, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" />
+
+                            <c:MultiColorGauge Grid.Row="1" Grid.Column="0" Margin="1"
+                                               Value="{Binding SmartMeter.PhaseVoltageL3, FallbackValue=0, TargetNullValue=0}"
+                                               ColorAllTicks="{Binding SmartMeter.PhaseVoltageL3, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" />
+
+                            <c:MultiColorGauge Grid.Row="1" Grid.Column="1" Margin="1" Minimum="49.5" Maximum="50.5"
+                                               Value="{Binding SmartMeter.Frequency, FallbackValue=0, TargetNullValue=0}"
+                                               ColorAllTicks="{Binding SmartMeter.Frequency, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" />
+                            <!-- ReSharper restore Xaml.RedundantAttachedProperty -->
+                        </UniformGrid>
+                        </StackPanel>
+
                         <Grid x:Name="LineVoltage" Visibility="Collapsed">
                             <Grid.Resources>
                                 <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource InverterControlGaugeStyle}">
@@ -224,6 +279,27 @@
                             </StackPanel>
                         </Grid>
 
+                        <Grid x:Name="CurrentOutOfBalanceGauge" Visibility="Collapsed">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock FontSize="10" FontWeight="Normal" Text="{x:Static p:Resources.OutOfBalance}" TextAlignment="Center" />
+
+                            <TextBlock FontSize="10" FontWeight="Medium" Grid.Row="1" Margin="0,0,0,2"
+                                       Width="{Binding ActualWidth, ElementName=CurrentOutOfBalanceGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
+                                <Run Text="{Binding SmartMeter.OutOfBalanceCurrentMax, FallbackValue=0, TargetNullValue=0, StringFormat=N1, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" />
+                                <Run Text="A" />
+                            </TextBlock>
+
+                            <c:MultiColorGauge Value="{Binding SmartMeter.OutOfBalanceCurrentMax, FallbackValue=0, TargetNullValue=0, Mode=OneWay}"
+                                               Minimum="0" Grid.Row="2"
+                                               Maximum="20"
+                                               GaugeColors="{x:Static c:InverterControl.HighIsBad}" ColorAllTicks="False" 
+                                               Width="92"/>
+                        </Grid>
                         <Grid x:Name="CurrentOutOfBalance" Visibility="Collapsed">
                             <Grid.Resources>
                                 <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource InverterControlGaugeStyle}">
