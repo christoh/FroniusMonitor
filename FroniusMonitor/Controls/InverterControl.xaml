@@ -112,34 +112,34 @@
                         <StackPanel x:Name="AcPhaseVoltageGauge" Visibility="Collapsed" >
                             <TextBlock Text="{x:Static p:Resources.NetHealth}" HorizontalAlignment="Center" FontSize="10" Margin="0,0,0,4"/>
                             <UniformGrid Rows="2" Columns="2">
-                            <UniformGrid.Resources>
-                                <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource DefaultHalfCircleGauge}">
-                                    <Setter Property="Minimum" Value="220" />
-                                    <Setter Property="Maximum" Value="240" />
-                                    <Setter Property="GaugeColors" Value="{x:Static c:InverterControl.MidIsGood}" />
-                                    <Setter Property="ColorAllTicks" Value="True" />
-                                </Style>
-                            </UniformGrid.Resources>
+                                <UniformGrid.Resources>
+                                    <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource DefaultHalfCircleGauge}">
+                                        <Setter Property="Minimum" Value="220" />
+                                        <Setter Property="Maximum" Value="240" />
+                                        <Setter Property="GaugeColors" Value="{x:Static c:InverterControl.MidIsGood}" />
+                                        <Setter Property="ColorAllTicks" Value="True" />
+                                    </Style>
+                                </UniformGrid.Resources>
 
-                            <!-- ReSharper disable Xaml.RedundantAttachedProperty -->
-                            <c:MultiColorGauge Grid.Row="0" Grid.Column="0" Margin="1"
+                                <!-- ReSharper disable Xaml.RedundantAttachedProperty -->
+                                <c:MultiColorGauge Grid.Row="0" Grid.Column="0" Margin="1"
                                                Value="{Binding Sensors.Cache.InverterPhaseVoltageL1, FallbackValue=0, TargetNullValue=0}"
                                                ColorAllTicks="{Binding Sensors.Cache.InverterPhaseVoltageL1, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}"/>
 
-                            <c:MultiColorGauge Grid.Row="0" Grid.Column="1" Margin="1"
+                                <c:MultiColorGauge Grid.Row="0" Grid.Column="1" Margin="1"
                                                Value="{Binding Sensors.Cache.InverterPhaseVoltageL2, FallbackValue=0, TargetNullValue=0}"
                                                ColorAllTicks="{Binding Sensors.Cache.InverterPhaseVoltageL2, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" />
 
-                            <c:MultiColorGauge Grid.Row="1" Grid.Column="0" Margin="1"
+                                <c:MultiColorGauge Grid.Row="1" Grid.Column="0" Margin="1"
                                                Value="{Binding Sensors.Cache.InverterPhaseVoltageL3, FallbackValue=0, TargetNullValue=0}"
                                                ColorAllTicks="{Binding Sensors.Cache.InverterPhaseVoltageL3, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" />
 
-                            <c:MultiColorGauge Grid.Row="1" Grid.Column="1" Margin="1" Minimum="49.8" Maximum="50.2"
+                                <c:MultiColorGauge Grid.Row="1" Grid.Column="1" Margin="1" Minimum="49.8" Maximum="50.2"
                                                Value="{Binding Sensors.Cache.FeedInPointFrequency, FallbackValue=0, TargetNullValue=0}"
                                                ColorAllTicks="{Binding Sensors.Cache.FeedInPointFrequency, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}"
                                                t:HalfCircleGauge.MinimumMaximumStringFormat="N1"/>
-                            <!-- ReSharper restore Xaml.RedundantAttachedProperty -->
-                        </UniformGrid>
+                                <!-- ReSharper restore Xaml.RedundantAttachedProperty -->
+                            </UniformGrid>
                         </StackPanel>
                         <Grid x:Name="AcLineVoltage" Visibility="Collapsed">
                             <Grid.Resources>
@@ -206,11 +206,19 @@
                                 <Run Text="W" />
                             </TextBlock>
 
-                            <c:MultiColorGauge Value="{Binding Sensors.Cache.InverterActivePowerSum, FallbackValue=-100000, TargetNullValue=-100000, Mode=OneWay}"
-                                               Minimum="{Binding Config.MaxAcPower, FallbackValue=-10000, TargetNullValue=-10000, Converter={co:Multiply Factor=-1}, Mode=OneWay}" Grid.Row="2"
+                            <c:MultiColorGauge Grid.Row="2" Value="{Binding Sensors.Cache.InverterActivePowerSum, FallbackValue=-100000, TargetNullValue=-100000, Mode=OneWay}"
                                                Maximum="{Binding Config.MaxAcPower, FallbackValue=10000, TargetNullValue=10000, Mode=OneWay}"
-                                               GaugeColors="{x:Static c:InverterControl.MidIsGood}" ColorAllTicks="{Binding Sensors.Cache.InverterActivePowerSum, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" 
-                                               Width="92"/>
+                                               GaugeColors="{x:Static c:InverterControl.MidIsGood}" ColorAllTicks="{Binding Sensors.Storage, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" 
+                                               Width="92">
+                                <c:MultiColorGauge.Minimum>
+                                    <MultiBinding Converter="{co:AcPowerMinimum}">
+                                        <!-- ReSharper disable Xaml.PossibleNullReferenceException -->
+                                        <Binding Path="Config.MaxAcPower"/>
+                                        <Binding Path="Sensors.Storage"/>
+                                        <!-- ReSharper restore Xaml.PossibleNullReferenceException -->
+                                    </MultiBinding>
+                                </c:MultiColorGauge.Minimum>
+                            </c:MultiColorGauge>
                         </Grid>
 
                         <Grid x:Name="AcPowerApparent" Visibility="Collapsed">
@@ -368,7 +376,7 @@
                                 <c:LinearHorizontalGauge x:Name="DcPowerAggregateGauge" ShowPercent="False" />
 
                                 <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Battery}" ShowPercent="{Binding ShowPercent, ElementName=DcPowerFirstGauge}"
-                                                         Value="{Binding Sensors.Cache.StoragePower, FallbackValue={x:Null}}"
+                                                         Value="{Binding Sensors.Cache.StoragePower, FallbackValue={x:Null}}" Visibility="{Binding Sensors.Storage, FallbackValue=Collapsed, Converter={co:NullToVisibility Null=Hidden}}"
                                                          Minimum="0" Maximum="{Binding Sensors.Storage.VoltageOuter, FallbackValue=8184, Converter={co:Multiply Factor=22}}" />
                             </StackPanel>
                         </Grid>
@@ -451,7 +459,7 @@
                                                          Maximum="37.5" High="30" VeryHigh="34.5" Low="1" VeryLow="0.5" />
                                 <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Battery}" Value="{Binding Sensors.Cache.StorageCurrent, FallbackValue={x:Null}}"
                                                          Minimum="0" Maximum="22" VeryLow="-1" VeryHigh="21" High="19" Low="-1"
-                                                         Visibility="{Binding Sensors.Storage, FallbackValue=Collapsed, Converter={co:NullToVisibility}}" />
+                                                         Visibility="{Binding Sensors.Storage, FallbackValue=Collapsed, Converter={co:NullToVisibility Null=Hidden}}" />
                             </StackPanel>
                         </Grid>
 

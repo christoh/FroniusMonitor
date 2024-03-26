@@ -922,3 +922,16 @@ public class StrictestLimitConverter : ConverterBase
         return result * (IsMinimum ? -1 : 1);
     }
 }
+
+public class AcPowerMinimum:MultiConverterBase
+{
+    public override object? Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (values.Length < 2 || values[0] is not IConvertible maxAcPower || values[1] is not Gen24Storage)
+        {
+            return 0d;
+        }
+
+        return -maxAcPower.ToDouble(culture);
+    }
+}
