@@ -16,6 +16,7 @@ public class ModbusServerService
 
     private ModbusServerServiceParameters Parameters => options.CurrentValue ?? throw new ArgumentNullException(nameof(options), @$"{nameof(options)} are not configured");
 
+    [SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
     public async Task StartAsync(CancellationToken token = default)
     {
         await StopAsync(token).ConfigureAwait(false);
@@ -64,6 +65,7 @@ public class ModbusServerService
         }, token).ConfigureAwait(false);
     }
 
+    [SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
     public Task StopAsync(CancellationToken token = default) => Task.Run(() =>
     {
         dataControlService.DeviceUpdate -= OnDeviceUpdate;
@@ -177,9 +179,9 @@ public class ModbusServerService
         {
             TotalCurrent = meter.Current,
             PhaseVoltageAverage = meter.Voltage,
-            Frequency = 50,
+            //Frequency = 50,
             ActivePowerSum = meter.ActivePower,
-            EnergyActiveProduced = 0,
+            //EnergyActiveProduced = 0,
             EnergyActiveConsumed = meter.EnergyConsumed
         };
 
