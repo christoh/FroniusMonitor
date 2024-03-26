@@ -62,7 +62,7 @@ public partial class HalfCircleGauge
             return;
         }
 
-        var (gauge, canvas, outerCanvas) = GetGaugeAndCanvas(element);
+        var (gauge, canvas, outerCanvas, minimumTextBlock, maximumTextBlock) = GetGaugeAndCanvas(element);
         var handLength = outerCanvas.Width * 0.45;
 
         var hand = new Polygon
@@ -78,22 +78,29 @@ public partial class HalfCircleGauge
         outerCanvas.Children.Add(hand);
         gauge.SetValue(MultiColorGauge.TemplateMetadataPropertyKey, new GaugeMetaData(hand, handLength, canvas, outerCanvas));
 
-        valueDescriptor?.AddValueChanged(gauge, OnValueChanged);
-        minimumDescriptor?.AddValueChanged(gauge, OnValueChanged);
-        maximumDescriptor?.AddValueChanged(gauge, OnValueChanged);
-        colorsDescriptor?.AddValueChanged(gauge, OnValueChanged);
+        valueDescriptor?.AddValueChanged(gauge, (_, _) => SetValue(gauge));
+        minimumDescriptor?.AddValueChanged(gauge, (_, _) => OnMinimumMaximumChanged(gauge, minimumTextBlock, maximumTextBlock));
+        maximumDescriptor?.AddValueChanged(gauge, (_, _) => OnMinimumMaximumChanged(gauge, minimumTextBlock, maximumTextBlock));
+        colorsDescriptor?.AddValueChanged(gauge, (_, _) => SetValue(gauge));
         handFillDescriptor?.AddValueChanged(gauge, OnHandBrushChanged);
-        tickFillDescriptor?.AddValueChanged(gauge, OnParametersChanged);
-        colorAllTicksDescriptor?.AddValueChanged(gauge, OnParametersChanged);
-        OnParametersChanged(gauge);
+        tickFillDescriptor?.AddValueChanged(gauge, (_, _) => OnParametersChanged(gauge, minimumTextBlock, maximumTextBlock));
+        colorAllTicksDescriptor?.AddValueChanged(gauge, (_, _) => OnParametersChanged(gauge, minimumTextBlock, maximumTextBlock));
+        OnParametersChanged(gauge, minimumTextBlock, maximumTextBlock);
     }
 
-    private static void OnValueChanged(object? sender, EventArgs? _ = null)
+    private static void OnMinimumMaximumChanged(RangeBase gauge, TextBlock? minimumTextBlock, TextBlock? maximumTextBlock, bool skipAnimation = false)
     {
-        if (sender is MultiColorGauge gauge)
+        if (minimumTextBlock != null)
         {
-            SetValue(gauge);
+            minimumTextBlock.Text = gauge.Minimum.ToString(GetMinimumMaximumStringFormat(gauge), CultureInfo.CurrentCulture);
         }
+
+        if (maximumTextBlock != null)
+        {
+            maximumTextBlock.Text = gauge.Maximum.ToString(GetMinimumMaximumStringFormat(gauge), CultureInfo.CurrentCulture);
+        }
+
+        SetValue(gauge, skipAnimation);
     }
 
     private static void SetValue(RangeBase gauge, bool skipAnimation = false)
@@ -156,13 +163,8 @@ public partial class HalfCircleGauge
         rect.Fill = brush;
     }
 
-    private static void OnParametersChanged(object? sender, EventArgs? _ = null)
+    private static void OnParametersChanged(MultiColorGauge gauge, TextBlock? minimumTextBlock, TextBlock? maximumTextBlock)
     {
-        if (sender is not MultiColorGauge gauge)
-        {
-            return;
-        }
-
         var (_, _, canvas, _) = (GaugeMetaData)gauge.TemplateMetadata;
 
         try
@@ -193,7 +195,7 @@ public partial class HalfCircleGauge
         }
         finally
         {
-            SetValue(gauge, true);
+            OnMinimumMaximumChanged(gauge, minimumTextBlock, maximumTextBlock, true);
 
             if (gauge.ColorAllTicks)
             {
@@ -212,16 +214,18 @@ public partial class HalfCircleGauge
         metaData.Hand.Fill = gauge.HandFill;
     }
 
-    private static (MultiColorGauge Gauge, Canvas Canvas, Canvas OuterCanvas) GetGaugeAndCanvas(object? sender)
+    private static (MultiColorGauge Gauge, Canvas Canvas, Canvas OuterCanvas, TextBlock MinimumTextBlock, TextBlock MaximumTextBlock) GetGaugeAndCanvas(object? sender)
     {
         if
         (
             sender is MultiColorGauge gauge &&
             gauge.Template.FindName("Canvas", gauge) is Canvas canvas &&
-            gauge.Template.FindName("OuterCanvas", gauge) is Canvas outerCanvas
+            gauge.Template.FindName("OuterCanvas", gauge) is Canvas outerCanvas &&
+            gauge.Template.FindName("MinimumTextBlock", gauge) is TextBlock minimumTextBlock &&
+            gauge.Template.FindName("MaximumTextBlock", gauge) is TextBlock maximumTextBlock
         )
         {
-            return (gauge, canvas, outerCanvas);
+            return (gauge, canvas, outerCanvas, minimumTextBlock, maximumTextBlock);
         }
 
         throw new InvalidOperationException("Must define Canvas and OuterCanvas");

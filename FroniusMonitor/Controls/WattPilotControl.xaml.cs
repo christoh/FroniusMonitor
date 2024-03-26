@@ -5,6 +5,7 @@ namespace De.Hochstaetter.FroniusMonitor.Controls;
 public enum WattPilotDisplayMode : byte
 {
     Voltage,
+    VoltageGauge,
     Current,
     CurrentGauge,
     Power,
@@ -27,6 +28,7 @@ public partial class WattPilotControl
 
     private static readonly IReadOnlyList<WattPilotDisplayMode> voltageModes =
     [
+        WattPilotDisplayMode.VoltageGauge,
         WattPilotDisplayMode.Voltage,
     ];
 

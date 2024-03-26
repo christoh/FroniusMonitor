@@ -85,6 +85,17 @@ public partial class SmartMeterControl
         set => SetValue(MeterStatusProperty, value);
     }
 
+    public static readonly DependencyProperty Gen24ConfigProperty = DependencyProperty.Register
+    (
+        nameof(Gen24Config), typeof(Gen24Config), typeof(SmartMeterControl)
+    );
+
+    public Gen24Config? Gen24Config
+    {
+        get => (Gen24Config?)GetValue(Gen24ConfigProperty);
+        set => SetValue(Gen24ConfigProperty, value);
+    }
+
     #endregion
 
     public SmartMeterControl()

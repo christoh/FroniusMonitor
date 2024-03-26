@@ -9,6 +9,7 @@
              xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
              xmlns:l="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Localization"
              xmlns:gl="clr-namespace:System.Globalization;assembly=System.Globalization"
+             xmlns:t="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Resources"
              mc:Ignorable="d"
              d:DesignHeight="127" d:DesignWidth="110">
     <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:InverterControl}}">
@@ -135,7 +136,8 @@
 
                             <c:MultiColorGauge Grid.Row="1" Grid.Column="1" Margin="1" Minimum="49.5" Maximum="50.5"
                                                Value="{Binding Sensors.Cache.InverterFrequency, FallbackValue=0, TargetNullValue=0}"
-                                               ColorAllTicks="{Binding Sensors.Cache.InverterFrequency, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" />
+                                               ColorAllTicks="{Binding Sensors.Cache.InverterFrequency, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}"
+                                               t:HalfCircleGauge.MinimumMaximumStringFormat="N1"/>
                             <!-- ReSharper restore Xaml.RedundantAttachedProperty -->
                         </UniformGrid>
                         </StackPanel>

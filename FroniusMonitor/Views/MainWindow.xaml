@@ -215,7 +215,8 @@
 
                     <c:SmartMeterControl Height="200" HorizontalAlignment="Left" Grid.Column="1" Margin="10,0,0,0"
                                          MeterStatus="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors.MeterStatus, FallbackValue={x:Null}}"
-                                         SmartMeter="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors.PrimaryPowerMeter, FallbackValue={x:Null}}" />
+                                         SmartMeter="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors.PrimaryPowerMeter, FallbackValue={x:Null}}"
+                                         Gen24Config="{Binding DataCollectionService.HomeAutomationSystem.Gen24Config, FallbackValue={x:Null}}"/>
 
                     <c:StorageControl Height="200" Grid.Column="2" Margin="8,0,0,0" HomeAutomationSystem="{Binding DataCollectionService.HomeAutomationSystem}"
                                       Gen24Sensors="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors, FallbackValue={x:Null}}"

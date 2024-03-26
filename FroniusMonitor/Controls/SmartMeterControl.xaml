@@ -7,6 +7,7 @@
              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
              xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls" xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
              xmlns:gl="clr-namespace:System.Globalization;assembly=System.Runtime"
+             xmlns:t="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Resources"
              mc:Ignorable="d"
              d:DesignHeight="127" d:DesignWidth="110">
     <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SmartMeterControl}}">
@@ -49,11 +50,11 @@
                                 <Run Text="W" />
                             </TextBlock>
 
-                            <c:MultiColorGauge Value="{Binding SmartMeter.ActivePowerSum, FallbackValue=-35000, TargetNullValue=-35000, Mode=OneWay}"
-                                               Minimum="-35000" Grid.Row="2"
-                                               Maximum="35000"
+                            <c:MultiColorGauge Value="{Binding SmartMeter.ActivePowerSum, FallbackValue=-24150, TargetNullValue=-24150, Mode=OneWay}"
+                                               Minimum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter IsMinimum=True}, FallbackValue=-24150}"
+                                               Maximum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter IsMinimum=False}, FallbackValue=24150}"
                                                GaugeColors="{x:Static c:InverterControl.MidIsGood}" ColorAllTicks="{Binding SmartMeter.ActivePowerSum, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" 
-                                               Width="92"/>
+                                               Width="92" Grid.Row="2"/>
                         </Grid>
                         
                         <Grid x:Name="PowerActive" Visibility="Collapsed">
@@ -220,6 +221,7 @@
 
                             <c:MultiColorGauge Grid.Row="1" Grid.Column="1" Margin="1" Minimum="49.5" Maximum="50.5"
                                                Value="{Binding SmartMeter.Frequency, FallbackValue=0, TargetNullValue=0}"
+                                               t:HalfCircleGauge.MinimumMaximumStringFormat="N1"
                                                ColorAllTicks="{Binding SmartMeter.Frequency, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" />
                             <!-- ReSharper restore Xaml.RedundantAttachedProperty -->
                         </UniformGrid>

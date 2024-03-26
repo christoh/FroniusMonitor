@@ -9,6 +9,7 @@
              xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
              xmlns:vm="clr-namespace:De.Hochstaetter.Fronius.Models.Charging;assembly=Fronius"
              xmlns:gl="clr-namespace:System.Globalization;assembly=System.Runtime"
+             xmlns:t="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Resources"
              mc:Ignorable="d"
              d:DesignHeight="127" d:DesignWidth="110">
     <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:WattPilotControl}}">
@@ -83,6 +84,39 @@
                                                          StringFormat="N1" />
                             </StackPanel>
                         </Grid>
+
+                        <StackPanel x:Name="VoltageGauge" Visibility="Collapsed" >
+                            <TextBlock Text="{x:Static p:Resources.NetHealth}" HorizontalAlignment="Center" FontSize="10" Margin="0,0,0,4"/>
+                            <UniformGrid Rows="2" Columns="2">
+                            <UniformGrid.Resources>
+                                <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource DefaultHalfCircleGauge}">
+                                    <Setter Property="Minimum" Value="220" />
+                                    <Setter Property="Maximum" Value="240" />
+                                    <Setter Property="GaugeColors" Value="{x:Static c:InverterControl.MidIsGood}" />
+                                    <Setter Property="ColorAllTicks" Value="True" />
+                                </Style>
+                            </UniformGrid.Resources>
+
+                            <!-- ReSharper disable Xaml.RedundantAttachedProperty -->
+                            <c:MultiColorGauge Grid.Row="0" Grid.Column="0" Margin="1"
+                                               Value="{Binding VoltageL1, FallbackValue=0, TargetNullValue=0}"
+                                               ColorAllTicks="{Binding VoltageL1, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}"/>
+
+                            <c:MultiColorGauge Grid.Row="0" Grid.Column="1" Margin="1"
+                                               Value="{Binding VoltageL2, FallbackValue=0, TargetNullValue=0}"
+                                               ColorAllTicks="{Binding VoltageL2, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" />
+
+                            <c:MultiColorGauge Grid.Row="1" Grid.Column="0" Margin="1"
+                                               Value="{Binding VoltageL3, FallbackValue=0, TargetNullValue=0}"
+                                               ColorAllTicks="{Binding VoltageL3, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" />
+
+                            <c:MultiColorGauge Grid.Row="1" Grid.Column="1" Margin="1" Minimum="49.5" Maximum="50.5"
+                                               Value="{Binding Frequency, FallbackValue=0, TargetNullValue=0}"
+                                               ColorAllTicks="{Binding Frequency, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}"
+                                               t:HalfCircleGauge.MinimumMaximumStringFormat="N1"/>
+                            <!-- ReSharper restore Xaml.RedundantAttachedProperty -->
+                        </UniformGrid>
+                        </StackPanel>
 
                         <Grid x:Name="Current" Visibility="Collapsed">
                             <Grid.Resources>

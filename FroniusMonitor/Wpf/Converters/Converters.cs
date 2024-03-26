@@ -28,6 +28,7 @@ public abstract class MultiConverterBase : MarkupExtension, IMultiValueConverter
 
 
 #if DEBUG
+// ReSharper disable once UnusedMember.Global
 public class DoNothing : ConverterBase
 {
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -75,13 +76,13 @@ public abstract class PlacementModeToAnything<T> : ConverterBase
     }
 }
 
-public class PlacementMode2Thickness : PlacementModeToAnything<Thickness> { }
+public class PlacementMode2Thickness : PlacementModeToAnything<Thickness>;
 
-public class PlacementMode2Double : PlacementModeToAnything<double> { }
+public class PlacementMode2Double : PlacementModeToAnything<double>;
 
-public class PlacementMode2VerticalAlignment : PlacementModeToAnything<VerticalAlignment> { }
+public class PlacementMode2VerticalAlignment : PlacementModeToAnything<VerticalAlignment>;
 
-public class PlacementMode2TextAlignment : PlacementModeToAnything<TextAlignment> { }
+public class PlacementMode2TextAlignment : PlacementModeToAnything<TextAlignment>;
 
 public class DateConverter : ConverterBase
 {
@@ -122,22 +123,12 @@ public class NullToAnything<T> : ConverterBase
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value is null ? Null : NotNull;
 }
 
-public class NullToThickness : NullToAnything<Thickness> { }
+public class NullToThickness : NullToAnything<Thickness>;
 
 public class NullToVisibility : NullToAnything<Visibility>
 {
     public override Visibility Null { get; set; } = Visibility.Collapsed;
     public override Visibility NotNull { get; set; } = Visibility.Visible;
-}
-
-public class NullToString : ConverterBase
-{
-    public string NullText { get; init; } = "---";
-
-    public override object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-    {
-        return value ?? NullText;
-    }
 }
 
 public class NullToBrush : NullToAnything<Brush>
@@ -151,8 +142,6 @@ public class NullToBool : NullToAnything<bool>
     public override bool NotNull { get; set; } = true;
     public override bool Null { get; set; } = false;
 }
-
-public class NullToDouble : NullToAnything<double> { }
 
 public class ToUpper : ConverterBase
 {
@@ -294,7 +283,7 @@ public abstract class BoolToAnything<T> : ConverterBase
     }
 }
 
-public class Bool2Brush : BoolToAnything<Brush> { }
+public class Bool2Brush : BoolToAnything<Brush>;
 
 //public class Bool2DataTemplate : BoolToAnything<DataTemplate> { }
 
@@ -307,9 +296,9 @@ public class Bool2Visibility : BoolToAnything<Visibility>
     }
 }
 
-public class Bool2String : BoolToAnything<string> { }
+public class Bool2String : BoolToAnything<string>;
 
-public class Bool2Thickness : BoolToAnything<Thickness> { }
+public class Bool2Thickness : BoolToAnything<Thickness>;
 
 public class MultiBool2Anything<T> : MultiConverterBase
 {
@@ -349,7 +338,7 @@ public class MultiBool2Visibility : MultiBool2Anything<Visibility>
     public override Visibility Invalid { get; set; } = Visibility.Collapsed;
 }
 
-public class MultiBool2Bool : MultiBool2Anything<bool> { }
+public class MultiBool2Bool : MultiBool2Anything<bool>;
 
 public class ModbusInterfaceRole2Visibility : MultiConverterBase
 {
@@ -402,7 +391,7 @@ public class SeverityToVisibility : ConverterBase
     }
 }
 
-public class Bool2Double : BoolToAnything<double> { }
+public class Bool2Double : BoolToAnything<double>;
 
 public class GetTemperatureTicks(double tickDistance) : ConverterBase
 {
@@ -456,7 +445,7 @@ public class OptimizationMode2Anything<T> : ConverterBase
     }
 }
 
-public class OptimizationMode2Bool : OptimizationMode2Anything<bool> { }
+public class OptimizationMode2Bool : OptimizationMode2Anything<bool>;
 
 public class OptimizationMode2Visibility : OptimizationMode2Anything<Visibility>
 {
@@ -492,7 +481,7 @@ public class SocLimits2Anything<T> : ConverterBase
     }
 }
 
-public class SocLimits2Bool : SocLimits2Anything<bool> { }
+public class SocLimits2Bool : SocLimits2Anything<bool>;
 
 public class SocLimits2Visibility : SocLimits2Anything<Visibility>
 {
@@ -650,6 +639,8 @@ public class CarStatus2Opacity : ConverterBase
     }
 }
 
+// ReSharper disable GrammarMistakeInComment
+
 //public class WattPilotPhase2Brush : ConverterBase
 //{
 //    public Phases Phase { get; set; }
@@ -725,6 +716,8 @@ public class CarStatus2Opacity : ConverterBase
 //    }
 //}
 
+// ReSharper restore GrammarMistakeInComment
+
 public class LinuxVersion : ConverterBase
 {
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -748,7 +741,7 @@ public class PowerStatus2Brush : MultiConverterBase
 
 public class Gen24Status2PanelBrush : ConverterBase
 {
-    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public override object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         return value is Gen24Status status ? status.ToPanelBrush() : Brushes.Gainsboro;
     }
@@ -766,7 +759,7 @@ public class TypeToAnything<TTo> : ConverterBase
     }
 }
 
-public class TypeToVisibility : TypeToAnything<Visibility> { }
+public class TypeToVisibility : TypeToAnything<Visibility>;
 
 public class EqualityToAnything<TFrom, TTo> : ConverterBase
 {
@@ -780,23 +773,23 @@ public class EqualityToAnything<TFrom, TTo> : ConverterBase
     }
 }
 
-public class ByteEqualityToString : EqualityToAnything<byte, string> { }
+public class ByteEqualityToString : EqualityToAnything<byte, string>;
 
-public class String2Bool : EqualityToAnything<string, bool> { }
+public class String2Bool : EqualityToAnything<string, bool>;
 
-public class String2Visibility : EqualityToAnything<string, Visibility> { }
+public class String2Visibility : EqualityToAnything<string, Visibility>;
 
-public class ToshibaAcOperatingMode2Visibility : EqualityToAnything<ToshibaHvacOperatingMode, Visibility> { }
+public class ToshibaAcOperatingMode2Visibility : EqualityToAnything<ToshibaHvacOperatingMode, Visibility>;
 
-public class PowerLimitMode2Visibility : EqualityToAnything<PowerLimitMode, Visibility> { }
+public class PowerLimitMode2Visibility : EqualityToAnything<PowerLimitMode, Visibility>;
 
-public class ToshibaAcOperatingMode2Brush : EqualityToAnything<ToshibaHvacOperatingMode, Brush> { }
+public class ToshibaAcOperatingMode2Brush : EqualityToAnything<ToshibaHvacOperatingMode, Brush>;
 
-public class ToshibaHvacWifiLedStatus2Brush : EqualityToAnything<ToshibaHvacWifiLedStatus, Brush> { }
+public class ToshibaHvacWifiLedStatus2Brush : EqualityToAnything<ToshibaHvacWifiLedStatus, Brush>;
 
-public class ToshibaHvacSwingMode2Visibility : EqualityToAnything<ToshibaHvacSwingMode, Visibility> { }
+public class ToshibaHvacSwingMode2Visibility : EqualityToAnything<ToshibaHvacSwingMode, Visibility>;
 
-public class MpptPowerMode2Visibility : EqualityToAnything<MpptPowerMode, Visibility> { }
+public class MpptPowerMode2Visibility : EqualityToAnything<MpptPowerMode, Visibility>;
 
 public class ToshibaHvacSwingMode2Brush : EqualityToAnything<ToshibaHvacSwingMode, Brush>
 {
@@ -902,5 +895,30 @@ public class Multiply : ConverterBase
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         return value is not IConvertible convertible ? value : convertible.ToDouble(UseConverterCulture ? culture : CultureInfo.CurrentCulture) * Factor;
+    }
+}
+
+public class StrictestLimitConverter : ConverterBase
+{
+    public bool IsMinimum { get; set; }
+
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        double result = 24150;
+
+        if (value is Gen24PowerLimits { ActivePower: { } activePower } && activePower.PowerLimitMode != PowerLimitMode.Off)
+        {
+            if (activePower.HardLimit.IsEnabled)
+            {
+                result = activePower.HardLimit.PowerLimit * (activePower.PowerLimitMode == PowerLimitMode.WeakestPhase ? 3 : 1);
+            }
+
+            if (activePower.SoftLimit.IsEnabled)
+            {
+                result = activePower.SoftLimit.PowerLimit * (activePower.PowerLimitMode == PowerLimitMode.WeakestPhase ? 3 : 1);
+            }
+        }
+
+        return result * (IsMinimum ? -1 : 1);
     }
 }

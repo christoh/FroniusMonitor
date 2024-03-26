@@ -298,7 +298,7 @@ public class DataCollectionService : BindableBase, IDataCollectionService
         var componentsToken = (await webClientService.GetFroniusJsonResponse("components/", token: token).ConfigureAwait(false)).Token;
         var configToken = (await webClientService.GetFroniusJsonResponse("config/", token: token).ConfigureAwait(false)).Token;
 
-        #if DEBUG
+#if DEBUG
         // ReSharper disable UnusedVariable
         var configString = configToken.ToString();
         var versionString = versionsToken.ToString();
