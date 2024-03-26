@@ -187,26 +187,26 @@ public class ModbusServerService
 
         logger.LogTrace("{DeviceAction}: {DisplayName}: {Power} W / {Voltage} V / {Current} A / {Energy} Wh", deviceAction, meter.DisplayName, meter.ActivePower, meter.Voltage, meter.Current, meter.EnergyConsumed);
 
-        switch (mapping.Phase)
-        {
-            case 1:
-                sunSpecMeter.CurrentL1 = meter.Current;
-                sunSpecMeter.PhaseVoltageL1 = meter.Voltage;
-                sunSpecMeter.ActivePowerL1 = meter.ActivePower;
-                break;
+        //switch (mapping.Phase)
+        //{
+        //    case 1:
+        //        sunSpecMeter.CurrentL1 = meter.Current;
+        //        sunSpecMeter.PhaseVoltageL1 = meter.Voltage;
+        //        sunSpecMeter.ActivePowerL1 = meter.ActivePower;
+        //        break;
 
-            case 2:
-                sunSpecMeter.CurrentL2 = meter.Current;
-                sunSpecMeter.PhaseVoltageL2 = meter.Voltage;
-                sunSpecMeter.ActivePowerL2 = meter.ActivePower;
-                break;
+        //    case 2:
+        //        sunSpecMeter.CurrentL2 = meter.Current;
+        //        sunSpecMeter.PhaseVoltageL2 = meter.Voltage;
+        //        sunSpecMeter.ActivePowerL2 = meter.ActivePower;
+        //        break;
 
-            case 3:
-                sunSpecMeter.CurrentL3 = meter.Current;
-                sunSpecMeter.PhaseVoltageL3 = meter.Voltage;
-                sunSpecMeter.ActivePowerL3 = meter.ActivePower;
-                break;
-        }
+        //    case 3:
+        //        sunSpecMeter.CurrentL3 = meter.Current;
+        //        sunSpecMeter.PhaseVoltageL3 = meter.Voltage;
+        //        sunSpecMeter.ActivePowerL3 = meter.ActivePower;
+        //        break;
+        //}
 
         lock (server.Lock)
         {
