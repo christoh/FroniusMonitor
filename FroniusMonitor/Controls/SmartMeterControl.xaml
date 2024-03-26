@@ -219,7 +219,7 @@
                                                Value="{Binding SmartMeter.PhaseVoltageL3, FallbackValue=0, TargetNullValue=0}"
                                                ColorAllTicks="{Binding SmartMeter.PhaseVoltageL3, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" />
 
-                            <c:MultiColorGauge Grid.Row="1" Grid.Column="1" Margin="1" Minimum="49.5" Maximum="50.5"
+                            <c:MultiColorGauge Grid.Row="1" Grid.Column="1" Margin="1" Minimum="49" Maximum="51"
                                                Value="{Binding SmartMeter.Frequency, FallbackValue=0, TargetNullValue=0}"
                                                t:HalfCircleGauge.MinimumMaximumStringFormat="N1"
                                                ColorAllTicks="{Binding SmartMeter.Frequency, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" />

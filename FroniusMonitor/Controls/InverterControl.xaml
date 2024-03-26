@@ -134,7 +134,7 @@
                                                Value="{Binding Sensors.Cache.InverterPhaseVoltageL3, FallbackValue=0, TargetNullValue=0}"
                                                ColorAllTicks="{Binding Sensors.Cache.InverterPhaseVoltageL3, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" />
 
-                            <c:MultiColorGauge Grid.Row="1" Grid.Column="1" Margin="1" Minimum="49.5" Maximum="50.5"
+                            <c:MultiColorGauge Grid.Row="1" Grid.Column="1" Margin="1" Minimum="49.8" Maximum="50.2"
                                                Value="{Binding Sensors.Cache.FeedInPointFrequency, FallbackValue=0, TargetNullValue=0}"
                                                ColorAllTicks="{Binding Sensors.Cache.FeedInPointFrequency, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}"
                                                t:HalfCircleGauge.MinimumMaximumStringFormat="N1"/>

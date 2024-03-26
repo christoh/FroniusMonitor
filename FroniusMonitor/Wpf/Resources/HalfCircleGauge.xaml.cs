@@ -5,7 +5,11 @@ namespace De.Hochstaetter.FroniusMonitor.Wpf.Resources;
 public partial class HalfCircleGauge
 {
     // ReSharper disable once NotAccessedPositionalProperty.Local
-    private record GaugeMetaData(Polygon Hand, double HandLength, Canvas Canvas, Canvas OuterCanvas);
+    private record GaugeMetaData(Polygon Hand, double HandLength, Canvas Canvas, Canvas OuterCanvas)
+    {
+        public double OldMinimum = double.MinValue;
+        public double OldMaximum = double.MaxValue;
+    }
 
     #region Dependency Properties
 
@@ -88,19 +92,33 @@ public partial class HalfCircleGauge
         OnParametersChanged(gauge, minimumTextBlock, maximumTextBlock);
     }
 
-    private static void OnMinimumMaximumChanged(RangeBase gauge, TextBlock? minimumTextBlock, TextBlock? maximumTextBlock, bool skipAnimation = false)
+    private static void OnMinimumMaximumChanged(MultiColorGauge gauge, TextBlock? minimumTextBlock, TextBlock? maximumTextBlock, bool skipAnimation = false)
     {
-        if (minimumTextBlock != null)
+        if (gauge.TemplateMetadata is not GaugeMetaData metaData)
+        {
+            return;
+        }
+
+        bool needsChange = false;
+        
+        if (minimumTextBlock != null && !metaData.OldMinimum.Equals(gauge.Minimum))
         {
             minimumTextBlock.Text = gauge.Minimum.ToString(GetMinimumMaximumStringFormat(gauge), CultureInfo.CurrentCulture);
+            metaData.OldMinimum= gauge.Minimum;
+            needsChange = true;
         }
 
-        if (maximumTextBlock != null)
+        if (maximumTextBlock != null && !metaData.OldMaximum.Equals(gauge.Maximum))
         {
             maximumTextBlock.Text = gauge.Maximum.ToString(GetMinimumMaximumStringFormat(gauge), CultureInfo.CurrentCulture);
+            metaData.OldMaximum= gauge.Maximum;
+            needsChange = true;
         }
 
-        SetValue(gauge, skipAnimation);
+        if (needsChange)
+        {
+            SetValue(gauge, skipAnimation);
+        }
     }
 
     private static void SetValue(RangeBase gauge, bool skipAnimation = false)
