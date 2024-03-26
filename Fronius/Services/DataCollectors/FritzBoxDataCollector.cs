@@ -77,9 +77,11 @@ public sealed class FritzBoxDataCollector
 
         try
         {
+            var token = tokenSource?.Token ?? throw new OperationCanceledException();
+            
             try
             {
-                var allFritzBoxDevices = (await service.GetFritzBoxDevices(tokenSource.Token).ConfigureAwait(false)).Devices.Cast<IPowerMeter1P>().ToList();
+                var allFritzBoxDevices = (await service.GetFritzBoxDevices(token).ConfigureAwait(false)).Devices.Cast<IPowerMeter1P>().ToList();
 
                 var presentFritzBoxDevices = allFritzBoxDevices.Where(p => p is { IsPresent: true });
 
@@ -87,7 +89,7 @@ public sealed class FritzBoxDataCollector
                     .Where(p => p is { IsPresent: false })
                     .Apply(p => logger.LogDebug("No DECT connection to {DisplayName} ({SerialNumber})", p.DisplayName, p.SerialNumber));
 
-                await dataControlService.AddOrUpdateAsync(presentFritzBoxDevices, tokenSource.Token).ConfigureAwait(false);
+                await dataControlService.AddOrUpdateAsync(presentFritzBoxDevices, token).ConfigureAwait(false);
                 logger.LogDebug("FritzBox {WebConnection} updated in {Duration:N0} ms", service.Connection, (DateTime.UtcNow - startTime).Milliseconds);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
@@ -96,7 +98,7 @@ public sealed class FritzBoxDataCollector
             }
 
             var duration = DateTime.UtcNow - startTime;
-            await Task.Delay(Math.Max(0, (int)(Parameters.RefreshRate - duration).TotalMilliseconds), tokenSource.Token).ConfigureAwait(false);
+            await Task.Delay(Math.Max(0, (int)(Parameters.RefreshRate - duration).TotalMilliseconds), token).ConfigureAwait(false);
             runningTasks[service.Connection!] = Update(service);
         }
         catch (OperationCanceledException)
