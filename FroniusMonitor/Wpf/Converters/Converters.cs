@@ -123,6 +123,8 @@ public class NullToAnything<T> : ConverterBase
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value is null ? Null : NotNull;
 }
 
+public class NullToColorMap : NullToAnything<IReadOnlyList<MultiColorGauge.ColorEntry>>;
+
 public class NullToThickness : NullToAnything<Thickness>;
 
 public class NullToVisibility : NullToAnything<Visibility>
