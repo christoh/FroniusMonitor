@@ -797,7 +797,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
                 result = CableCurrentMaximum;
             }
 
-            result *= ChargingPhases;
+            result = (byte?)(result * ChargingPhases);
             return result ?? 0;
         }
     }

@@ -1654,6 +1654,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Grid Health.
+        /// </summary>
+        public static string GridHealth {
+            get {
+                return ResourceManager.GetString("GridHealth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Grid power management.
         /// </summary>
         public static string GridPowerManagement {
@@ -2604,15 +2613,6 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Name {
             get {
                 return ResourceManager.GetString("Name", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        public static string NetHealth {
-            get {
-                return ResourceManager.GetString("NetHealth", resourceCulture);
             }
         }
         

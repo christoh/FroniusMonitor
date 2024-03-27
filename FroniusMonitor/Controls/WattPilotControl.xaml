@@ -86,7 +86,7 @@
                         </Grid>
 
                         <StackPanel x:Name="VoltageGauge" Visibility="Collapsed" >
-                            <TextBlock Text="{x:Static p:Resources.NetHealth}" HorizontalAlignment="Center" FontSize="10" Margin="0,0,0,4"/>
+                            <TextBlock Text="{x:Static p:Resources.GridHealth}" HorizontalAlignment="Center" FontSize="10" Margin="0,0,0,4"/>
                             <UniformGrid Rows="2" Columns="2">
                             <UniformGrid.Resources>
                                 <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource DefaultHalfCircleGauge}">

@@ -1434,7 +1434,7 @@
   <data name="AwattarCountry_NorwayVirtualNo2Nsl" xml:space="preserve">
 	  <value>Norwegen virtuelle Bieterzone NO2NSL</value>
   </data>
-  <data name="NetHealth" xml:space="preserve">
+  <data name="GridHealth" xml:space="preserve">
 	  <value>Netzgesundheit</value>
   </data>
 </root>
