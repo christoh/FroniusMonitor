@@ -92,7 +92,7 @@
                                 <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource DefaultHalfCircleGauge}">
                                     <Setter Property="Minimum" Value="220" />
                                     <Setter Property="Maximum" Value="240" />
-                                    <Setter Property="GaugeColors" Value="{x:Static c:InverterControl.MidIsGood}" />
+                                    <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.MidIsGood}" />
                                     <Setter Property="ColorAllTicks" Value="True" />
                                 </Style>
                             </UniformGrid.Resources>
@@ -169,7 +169,7 @@
                             <c:MultiColorGauge Value="{Binding CurrentSum, FallbackValue=0, TargetNullValue=0, Mode=OneWay}"
                                                Minimum="0" Grid.Row="2"
                                                Maximum="{Binding MaximumChargingCurrentPossible, FallbackValue=6, TargetNullValue=6, Mode=OneWay, Converter={co:Multiply Factor=1}}"
-                                               GaugeColors="{x:Static c:WattPilotControl.LowIsBad}"
+                                               GaugeColors="{x:Static c:MultiColorGauge.LowIsBad}"
                                                Width="92" Style="{StaticResource DefaultHalfCircleGauge}" />
                             
                         </Grid>
@@ -226,7 +226,7 @@
                             <c:MultiColorGauge Value="{Binding PowerSum, FallbackValue=0, TargetNullValue=0, Mode=OneWay}"
                                                Minimum="0" Grid.Row="2"
                                                Maximum="{Binding MaximumChargingPowerPossible, FallbackValue=16, TargetNullValue=16, Mode=OneWay, Converter={co:Multiply Factor=1}}"
-                                               GaugeColors="{x:Static c:WattPilotControl.LowIsBad}"
+                                               GaugeColors="{x:Static c:MultiColorGauge.LowIsBad}"
                                                Width="92" Style="{StaticResource DefaultHalfCircleGauge}" />
                             
                         </Grid>

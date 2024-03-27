@@ -55,4 +55,36 @@ public class MultiColorGauge : ProgressBar
         get => (bool)GetValue(ColorAllTicksProperty);
         set => SetValue(ColorAllTicksProperty, value);
     }
+
+    public static IReadOnlyList<ColorEntry> HighIsBad { get; } =
+    [
+        new ColorEntry(0, Colors.Green),
+        new ColorEntry(.75, Colors.YellowGreen),
+        new ColorEntry(.95, Colors.OrangeRed),
+        new ColorEntry(1, Colors.Red),
+    ];
+
+    public static IReadOnlyList<ColorEntry> MidIsGood { get; } =
+    [
+        new ColorEntry(0, Colors.Red),
+        new ColorEntry(.05, Colors.OrangeRed),
+        new ColorEntry(.25, Colors.YellowGreen),
+        new ColorEntry(0.5,Colors.Green),
+        new ColorEntry(.75, Colors.YellowGreen),
+        new ColorEntry(.95, Colors.OrangeRed),
+        new ColorEntry(1, Colors.Red),
+    ];
+
+    public static IReadOnlyList<MultiColorGauge.ColorEntry> LowIsBad { get; } =
+    [
+        new MultiColorGauge.ColorEntry(0,Colors.Red),
+        new MultiColorGauge.ColorEntry(.05,Colors.OrangeRed),
+        new MultiColorGauge.ColorEntry(.5,Colors.YellowGreen),
+        new MultiColorGauge.ColorEntry(1,Colors.Green),
+    ];
+
+    static MultiColorGauge()
+    {
+        ValueProperty.OverrideMetadata(typeof(MultiColorGauge), new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsRender, (d, e) => { }, (_, x) => x));
+    }
 }

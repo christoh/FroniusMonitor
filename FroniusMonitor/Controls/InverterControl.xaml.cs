@@ -91,26 +91,6 @@ public partial class InverterControl
         Duration = TimeSpan.FromSeconds(1.5),
     };
 
-    public static IReadOnlyList<MultiColorGauge.ColorEntry> HighIsBad { get; } =
-    [
-        new MultiColorGauge.ColorEntry(0, Colors.Green),
-        new MultiColorGauge.ColorEntry(.75, Colors.YellowGreen),
-        new MultiColorGauge.ColorEntry(.95, Colors.OrangeRed),
-        new MultiColorGauge.ColorEntry(1, Colors.Red),
-    ];
-
-    public static IReadOnlyList<MultiColorGauge.ColorEntry> MidIsGood { get; } =
-    [
-        new MultiColorGauge.ColorEntry(0, Colors.Red),
-        new MultiColorGauge.ColorEntry(.05, Colors.OrangeRed),
-        new MultiColorGauge.ColorEntry(.25, Colors.YellowGreen),
-        new MultiColorGauge.ColorEntry(0.5,Colors.Green),
-        new MultiColorGauge.ColorEntry(.75, Colors.YellowGreen),
-        new MultiColorGauge.ColorEntry(.95, Colors.OrangeRed),
-        new MultiColorGauge.ColorEntry(1, Colors.Red),
-    ];
-
-
     #region Dependency Properties
 
     public static readonly DependencyProperty ModeProperty = DependencyProperty.Register

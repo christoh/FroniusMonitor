@@ -46,14 +46,6 @@ public partial class WattPilotControl
         WattPilotDisplayMode.MoreWifi,
     ];
 
-    public static IReadOnlyList<MultiColorGauge.ColorEntry> LowIsBad { get; } =
-    [
-        new MultiColorGauge.ColorEntry(0,Colors.Red),
-        new MultiColorGauge.ColorEntry(.05,Colors.OrangeRed),
-        new MultiColorGauge.ColorEntry(.5,Colors.YellowGreen),
-        new MultiColorGauge.ColorEntry(1,Colors.Green),
-    ];
-
     private int powerIndex, voltageIndex, moreIndex, currentIndex;
 
     public static readonly DependencyProperty ModeProperty = DependencyProperty.Register

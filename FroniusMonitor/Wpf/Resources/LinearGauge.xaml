@@ -1,0 +1,33 @@
+﻿<ResourceDictionary x:Class="De.Hochstaetter.FroniusMonitor.Wpf.Resources.LinearGauge"
+                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
+                    xmlns:t="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Resources">
+
+    <ControlTemplate TargetType="c:MultiColorGauge" x:Key="LinearGauge">
+        <Viewbox Initialized="OnRootElementInitialized">
+            <StackPanel Width="100">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{TemplateBinding t:LinearGauge.Label}" HorizontalAlignment="Left" TextAlignment="Left" FontFamily="Calibri"/>
+                    <!-- ReSharper disable once MarkupAttributeTypo -->
+                    <TextBlock Grid.Column="1" x:Name="ValueTextBlock" HorizontalAlignment="Right" TextAlignment="Right" FontFamily="Calibri"/>
+                    <TextBlock Grid.Column="2" Margin="2,0,0,0" Text="{TemplateBinding t:LinearGauge.UnitName}" HorizontalAlignment="Right" TextAlignment="Right" FontFamily="Calibri"/>
+                </Grid>
+            </StackPanel>
+        </Viewbox>
+    </ControlTemplate>
+    
+    <Style x:Key="DefaultLinearGauge" TargetType="c:MultiColorGauge">
+        <Setter Property="Foreground" Value="Black"/>
+        <Setter Property="TickFill" Value="DarkGray"/>
+        <Setter Property="t:LinearGauge.StringFormat" Value="N1"/>
+        <Setter Property="Template" Value="{StaticResource LinearGauge}"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    </Style>
+
+</ResourceDictionary>

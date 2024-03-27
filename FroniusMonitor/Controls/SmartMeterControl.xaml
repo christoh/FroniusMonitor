@@ -53,10 +53,10 @@
                             <c:MultiColorGauge Value="{Binding SmartMeter.ActivePowerSum, FallbackValue=-24150, TargetNullValue=-24150, Mode=OneWay}"
                                                Minimum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter IsMinimum=True}, FallbackValue=-24150}"
                                                Maximum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter IsMinimum=False}, FallbackValue=24150}"
-                                               GaugeColors="{x:Static c:InverterControl.MidIsGood}" ColorAllTicks="{Binding SmartMeter.ActivePowerSum, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" 
-                                               Width="92" Grid.Row="2"/>
+                                               GaugeColors="{x:Static c:MultiColorGauge.MidIsGood}" ColorAllTicks="{Binding SmartMeter.ActivePowerSum, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}"
+                                               Width="92" Grid.Row="2" />
                         </Grid>
-                        
+
                         <Grid x:Name="PowerActive" Visibility="Collapsed">
                             <Grid.Resources>
                                 <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource PowerGaugeStyle}">
@@ -138,7 +138,7 @@
                                 <c:LinearHorizontalGauge DisplayName="L12" Value="{Binding SmartMeter.OutOfBalancePowerL12, FallbackValue={x:Null}}" />
                                 <c:LinearHorizontalGauge DisplayName="L23" Value="{Binding SmartMeter.OutOfBalancePowerL23, FallbackValue={x:Null}}" />
                                 <c:LinearHorizontalGauge DisplayName="L31" Value="{Binding SmartMeter.OutOfBalancePowerL31, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="Max." Value="{Binding SmartMeter.OutOfBalancePowerMax, FallbackValue={x:Null}}"/>
+                                <c:LinearHorizontalGauge DisplayName="Max." Value="{Binding SmartMeter.OutOfBalancePowerMax, FallbackValue={x:Null}}" />
                             </StackPanel>
                         </Grid>
 
@@ -146,8 +146,8 @@
                             <Grid.Resources>
                                 <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource InverterControlGaugeStyle}">
                                     <Setter Property="Maximum" Value="1" />
-                                    <Setter Property="Low" Value=".5"/>
-                                    <Setter Property="VeryLow" Value=".2"/>
+                                    <Setter Property="Low" Value=".5" />
+                                    <Setter Property="VeryLow" Value=".2" />
                                     <Setter Property="StringFormat" Value="N3" />
                                 </Style>
                             </Grid.Resources>
@@ -162,7 +162,7 @@
                                 <c:LinearHorizontalGauge DisplayName="L1" Value="{Binding SmartMeter.PowerFactorL1, FallbackValue={x:Null}}" />
                                 <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding SmartMeter.PowerFactorL2, FallbackValue={x:Null}}" />
                                 <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding SmartMeter.PowerFactorL3, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Total}" Value="{Binding SmartMeter.PowerFactorTotal, FallbackValue={x:Null}}"/>
+                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Total}" Value="{Binding SmartMeter.PowerFactorTotal, FallbackValue={x:Null}}" />
                             </StackPanel>
                         </Grid>
 
@@ -178,6 +178,14 @@
                                     <Setter Property="UnitSymbol" Value="V" />
                                     <Setter Property="StringFormat" Value="N1" />
                                 </Style>
+
+                                <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource DefaultLinearGauge}">
+                                    <Setter Property="Minimum" Value="210" />
+                                    <Setter Property="Maximum" Value="250" />
+                                    <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.MidIsGood}" />
+                                    <Setter Property="t:LinearGauge.UnitName" Value="V" />
+                                    <Setter Property="Margin" Value="4,0" />
+                                </Style>
                             </Grid.Resources>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
@@ -187,7 +195,9 @@
                             <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.PhaseVoltage}" Margin="0,0,0,2" TextAlignment="Center" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                                <c:LinearHorizontalGauge DisplayName="L1" Value="{Binding SmartMeter.PhaseVoltageL1, FallbackValue={x:Null}}" />
+                                <!--<c:LinearHorizontalGauge DisplayName="L1" Value="{Binding SmartMeter.PhaseVoltageL1, FallbackValue={x:Null}}" />-->
+                                <c:MultiColorGauge Value="{Binding SmartMeter.PhaseVoltageL1, TargetNullValue=0, FallbackValue=0}" t:LinearGauge.Label="L1" />
+
                                 <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding SmartMeter.PhaseVoltageL2, FallbackValue={x:Null}}" />
                                 <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding SmartMeter.PhaseVoltageL3, FallbackValue={x:Null}}" />
                                 <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.AverageShort}" Value="{Binding SmartMeter.PhaseVoltageAverage, FallbackValue={x:Null}}" />
@@ -195,36 +205,36 @@
                         </Grid>
 
                         <StackPanel x:Name="PhaseVoltageGauge" Visibility="Collapsed">
-                            <TextBlock Text="{x:Static p:Resources.GridHealth}" HorizontalAlignment="Center" FontSize="10" Margin="0,0,0,4"/>
+                            <TextBlock Text="{x:Static p:Resources.GridHealth}" HorizontalAlignment="Center" FontSize="10" Margin="0,0,0,4" />
                             <UniformGrid Rows="2" Columns="2" Margin="0,6,0,0">
-                            <UniformGrid.Resources>
-                                <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource DefaultHalfCircleGauge}">
-                                    <Setter Property="Minimum" Value="220" />
-                                    <Setter Property="Maximum" Value="240" />
-                                    <Setter Property="GaugeColors" Value="{x:Static c:InverterControl.MidIsGood}" />
-                                    <Setter Property="ColorAllTicks" Value="True" />
-                                </Style>
-                            </UniformGrid.Resources>
+                                <UniformGrid.Resources>
+                                    <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource DefaultHalfCircleGauge}">
+                                        <Setter Property="Minimum" Value="220" />
+                                        <Setter Property="Maximum" Value="240" />
+                                        <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.MidIsGood}" />
+                                        <Setter Property="ColorAllTicks" Value="True" />
+                                    </Style>
+                                </UniformGrid.Resources>
 
-                            <!-- ReSharper disable Xaml.RedundantAttachedProperty -->
-                            <c:MultiColorGauge Grid.Row="0" Grid.Column="0" Margin="1"
-                                               Value="{Binding SmartMeter.PhaseVoltageL1, FallbackValue=0, TargetNullValue=0}"
-                                               ColorAllTicks="{Binding SmartMeter.PhaseVoltageL1, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}"/>
+                                <!-- ReSharper disable Xaml.RedundantAttachedProperty -->
+                                <c:MultiColorGauge Grid.Row="0" Grid.Column="0" Margin="1"
+                                                   Value="{Binding SmartMeter.PhaseVoltageL1, FallbackValue=0, TargetNullValue=0}"
+                                                   ColorAllTicks="{Binding SmartMeter.PhaseVoltageL1, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" />
 
-                            <c:MultiColorGauge Grid.Row="0" Grid.Column="1" Margin="1"
-                                               Value="{Binding SmartMeter.PhaseVoltageL2, FallbackValue=0, TargetNullValue=0}"
-                                               ColorAllTicks="{Binding SmartMeter.PhaseVoltageL2, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" />
+                                <c:MultiColorGauge Grid.Row="0" Grid.Column="1" Margin="1"
+                                                   Value="{Binding SmartMeter.PhaseVoltageL2, FallbackValue=0, TargetNullValue=0}"
+                                                   ColorAllTicks="{Binding SmartMeter.PhaseVoltageL2, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" />
 
-                            <c:MultiColorGauge Grid.Row="1" Grid.Column="0" Margin="1"
-                                               Value="{Binding SmartMeter.PhaseVoltageL3, FallbackValue=0, TargetNullValue=0}"
-                                               ColorAllTicks="{Binding SmartMeter.PhaseVoltageL3, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" />
+                                <c:MultiColorGauge Grid.Row="1" Grid.Column="0" Margin="1"
+                                                   Value="{Binding SmartMeter.PhaseVoltageL3, FallbackValue=0, TargetNullValue=0}"
+                                                   ColorAllTicks="{Binding SmartMeter.PhaseVoltageL3, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" />
 
-                            <c:MultiColorGauge Grid.Row="1" Grid.Column="1" Margin="1" Minimum="49" Maximum="51"
-                                               Value="{Binding SmartMeter.Frequency, FallbackValue=0, TargetNullValue=0}"
-                                               t:HalfCircleGauge.MinimumMaximumStringFormat="N1"
-                                               ColorAllTicks="{Binding SmartMeter.Frequency, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" />
-                            <!-- ReSharper restore Xaml.RedundantAttachedProperty -->
-                        </UniformGrid>
+                                <c:MultiColorGauge Grid.Row="1" Grid.Column="1" Margin="1" Minimum="49" Maximum="51"
+                                                   Value="{Binding SmartMeter.Frequency, FallbackValue=0, TargetNullValue=0}"
+                                                   t:HalfCircleGauge.MinimumMaximumStringFormat="N1"
+                                                   ColorAllTicks="{Binding SmartMeter.Frequency, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" />
+                                <!-- ReSharper restore Xaml.RedundantAttachedProperty -->
+                            </UniformGrid>
                         </StackPanel>
 
                         <Grid x:Name="LineVoltage" Visibility="Collapsed">
@@ -277,7 +287,7 @@
                                 <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding SmartMeter.CurrentL2, FallbackValue={x:Null}}" />
                                 <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding SmartMeter.CurrentL3, FallbackValue={x:Null}}" />
                                 <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Sum}" Value="{Binding SmartMeter.TotalCurrent, FallbackValue={x:Null}}"
-                                                         Maximum="105" High="84" VeryHigh="96"/>
+                                                         Maximum="105" High="84" VeryHigh="96" />
                             </StackPanel>
                         </Grid>
 
@@ -299,8 +309,8 @@
                             <c:MultiColorGauge Value="{Binding SmartMeter.OutOfBalanceCurrentMax, FallbackValue=0, TargetNullValue=0, Mode=OneWay}"
                                                Minimum="0" Grid.Row="2"
                                                Maximum="20"
-                                               GaugeColors="{x:Static c:InverterControl.HighIsBad}" ColorAllTicks="False" 
-                                               Width="92"/>
+                                               GaugeColors="{x:Static c:MultiColorGauge.HighIsBad}" ColorAllTicks="False"
+                                               Width="92" />
                         </Grid>
                         <Grid x:Name="CurrentOutOfBalance" Visibility="Collapsed">
                             <Grid.Resources>
@@ -309,7 +319,7 @@
                                     <Setter Property="High" Value="13" />
                                     <Setter Property="VeryHigh" Value="16" />
                                     <Setter Property="StringFormat" Value="N3" />
-                                    <Setter Property="Maximum" Value="35"></Setter>
+                                    <Setter Property="Maximum" Value="35" />
                                 </Style>
                             </Grid.Resources>
                             <Grid.RowDefinitions>
@@ -323,14 +333,14 @@
                                 <c:LinearHorizontalGauge DisplayName="L12" Value="{Binding SmartMeter.OutOfBalanceCurrentL12, FallbackValue={x:Null}}" />
                                 <c:LinearHorizontalGauge DisplayName="L23" Value="{Binding SmartMeter.OutOfBalanceCurrentL23, FallbackValue={x:Null}}" />
                                 <c:LinearHorizontalGauge DisplayName="L31" Value="{Binding SmartMeter.OutOfBalanceCurrentL31, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="Max." Value="{Binding SmartMeter.OutOfBalanceCurrentMax, FallbackValue={x:Null}}"/>
+                                <c:LinearHorizontalGauge DisplayName="Max." Value="{Binding SmartMeter.OutOfBalanceCurrentMax, FallbackValue={x:Null}}" />
                             </StackPanel>
                         </Grid>
 
                         <Grid x:Name="MoreEnergy" Visibility="Collapsed">
                             <Grid.Resources>
                                 <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource InverterControlGaugeStyle}">
-                                    <Setter Property="StringFormat" Value="N1"/>
+                                    <Setter Property="StringFormat" Value="N1" />
                                 </Style>
                             </Grid.Resources>
                             <Grid.RowDefinitions>
@@ -339,15 +349,15 @@
                             </Grid.RowDefinitions>
 
                             <TextBlock Grid.Row="0" FontSize="10" Margin="0,0,0,2" TextAlignment="Center">
-                                <Run Text="{x:Static p:Resources.Energy}"/>
-                                <Run Text="(kWh)"/>
+                                <Run Text="{x:Static p:Resources.Energy}" />
+                                <Run Text="(kWh)" />
                             </TextBlock>
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                                 <c:LinearHorizontalGauge DisplayName="1.8.0" Value="{Binding SmartMeter.EnergyActiveConsumed, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
                                 <c:LinearHorizontalGauge DisplayName="2.8.0" Value="{Binding SmartMeter.EnergyActiveProduced, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
                                 <c:LinearHorizontalGauge DisplayName="3.8.0" Value="{Binding SmartMeter.EnergyReactiveConsumed, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
-                                <c:LinearHorizontalGauge DisplayName="4.8.0" Value="{Binding SmartMeter.EnergyReactiveProduced, FallbackValue=0, Converter={co:Multiply Factor=.001}}"/>
+                                <c:LinearHorizontalGauge DisplayName="4.8.0" Value="{Binding SmartMeter.EnergyReactiveProduced, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
                             </StackPanel>
                         </Grid>
 
@@ -362,15 +372,15 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" FontSize="10" Margin="0,0,0,2" TextAlignment="Center" Text="{Binding SmartMeter.SerialNumber, FallbackValue='---'}"/>
+                            <TextBlock Grid.Row="0" FontSize="10" Margin="0,0,0,2" TextAlignment="Center" Text="{Binding SmartMeter.SerialNumber, FallbackValue='---'}" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                                 <c:LinearHorizontalGauge DisplayName="Frq." Value="{Binding SmartMeter.Frequency, FallbackValue={x:Null}}" StringFormat="N1"
-                                                         Minimum="45" Maximum="55" Low="49.8" High="50.2" VeryHigh="51" VeryLow="49" UnitSymbol="Hz"/>
+                                                         Minimum="45" Maximum="55" Low="49.8" High="50.2" VeryHigh="51" VeryLow="49" UnitSymbol="Hz" />
                                 <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Time}" Value="{Binding SmartMeter.DataTime, FallbackValue={x:Null}}" StringFormat="T"
-                                                         Minimum="0" Maximum="5000"/>
+                                                         Minimum="0" Maximum="5000" />
                                 <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Latency}" Value="{Binding SmartMeter.Latency.TotalMilliseconds, FallbackValue={x:Null}}"
-                                                         StringFormat="N0" Minimum="0" Maximum="5000" Low="0" VeryLow="0" High="2000" VeryHigh="4000" UnitSymbol="ms"/>
+                                                         StringFormat="N0" Minimum="0" Maximum="5000" Low="0" VeryLow="0" High="2000" VeryHigh="4000" UnitSymbol="ms" />
                             </StackPanel>
                         </Grid>
                     </Grid>

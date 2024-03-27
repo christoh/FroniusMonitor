@@ -2,12 +2,7 @@
 
 public abstract class CommandBase : ICommand
 {
-    private readonly SynchronizationContext? synchronizationContext;
-
-    protected CommandBase()
-    {
-        synchronizationContext = SynchronizationContext.Current;
-    }
+    private readonly SynchronizationContext? synchronizationContext = SynchronizationContext.Current;
 
     public abstract bool CanExecute(object? parameter);
     public abstract void Execute(object? parameter);
@@ -31,17 +26,8 @@ public abstract class CommandBase : ICommand
     public event EventHandler? CanExecuteChanged;
 }
 
-public class Command<T> : CommandBase
+public class Command<T>(Action<T?> action, Func<T?, bool>? canExecuteFunc = null) : CommandBase
 {
-    private readonly Action<T?> action;
-    private readonly Func<T?, bool>? canExecuteFunc;
-
-    public Command(Action<T?> action, Func<T?, bool>? canExecuteFunc = null)
-    {
-        this.action = action;
-        this.canExecuteFunc = canExecuteFunc;
-    }
-
     public override bool CanExecute(object? parameter)
     {
         return canExecuteFunc?.Invoke(parameter is T t ? t : default) ?? true;
@@ -53,17 +39,8 @@ public class Command<T> : CommandBase
     }
 }
 
-public class NoParameterCommand : CommandBase
+public class NoParameterCommand(Action action, Func<bool>? canExecuteFunc = null) : CommandBase
 {
-    private readonly Action action;
-    private readonly Func<bool>? canExecuteFunc;
-
-    public NoParameterCommand(Action action, Func<bool>? canExecuteFunc = null)
-    {
-        this.action = action;
-        this.canExecuteFunc = canExecuteFunc;
-    }
-
     public override bool CanExecute(object? parameter)
     {
         return canExecuteFunc?.Invoke() ?? true;

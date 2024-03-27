@@ -116,7 +116,7 @@
                                     <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource DefaultHalfCircleGauge}">
                                         <Setter Property="Minimum" Value="220" />
                                         <Setter Property="Maximum" Value="240" />
-                                        <Setter Property="GaugeColors" Value="{x:Static c:InverterControl.MidIsGood}" />
+                                        <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.MidIsGood}" />
                                         <Setter Property="ColorAllTicks" Value="True" />
                                     </Style>
                                 </UniformGrid.Resources>
@@ -208,7 +208,7 @@
 
                             <c:MultiColorGauge Grid.Row="2" Value="{Binding Sensors.Cache.InverterActivePowerSum, FallbackValue=-100000, TargetNullValue=-100000, Mode=OneWay}"
                                                Maximum="{Binding Config.MaxAcPower, FallbackValue=10000, TargetNullValue=10000, Mode=OneWay}"
-                                               GaugeColors="{Binding Sensors.Storage, FallbackValue={x:Null}, Converter={co:NullToColorMap NotNull={x:Static c:InverterControl.MidIsGood}, Null={x:Static c:InverterControl.HighIsBad}}}"
+                                               GaugeColors="{Binding Sensors.Storage, FallbackValue={x:Null}, Converter={co:NullToColorMap NotNull={x:Static c:MultiColorGauge.MidIsGood}, Null={x:Static c:MultiColorGauge.HighIsBad}}}"
                                                ColorAllTicks="{Binding Sensors.Storage, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" 
                                                Width="92">
                                 <c:MultiColorGauge.Minimum>
@@ -400,7 +400,7 @@
                             <c:MultiColorGauge Value="{Binding Sensors.Inverter.SolarPowerSum, FallbackValue=0, TargetNullValue=0, Mode=OneWay}"
                                                Minimum="0" Grid.Row="2"
                                                Maximum="{Binding Config.InverterSettings.Mppt.WattPeakTotal, FallbackValue=10000, TargetNullValue=10000, Mode=OneWay}"
-                                               GaugeColors="{x:Static c:InverterControl.HighIsBad}"
+                                               GaugeColors="{x:Static c:MultiColorGauge.HighIsBad}"
                                                Width="92" Style="{StaticResource DefaultHalfCircleGauge}" />
                         </Grid>
 
