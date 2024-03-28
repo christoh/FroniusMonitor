@@ -5,6 +5,25 @@ public partial class LinearGauge
     #region Dependency Properties
 
     private static readonly DependencyPropertyDescriptor? valueDescriptor = DependencyPropertyDescriptor.FromProperty(RangeBase.ValueProperty, typeof(MultiColorGauge));
+    private static readonly DependencyPropertyDescriptor? minimumDescriptor = DependencyPropertyDescriptor.FromProperty(RangeBase.MinimumProperty, typeof(MultiColorGauge));
+    private static readonly DependencyPropertyDescriptor? maximumDescriptor = DependencyPropertyDescriptor.FromProperty(RangeBase.MaximumProperty, typeof(MultiColorGauge));
+    private static readonly DependencyPropertyDescriptor? tickFillDescriptor = DependencyPropertyDescriptor.FromProperty(MultiColorGauge.TickFillProperty, typeof(MultiColorGauge));
+
+    public static readonly DependencyProperty LinearAnimatedValueProperty = DependencyProperty.RegisterAttached
+    (
+        nameof(GetLinearAnimatedValue)[3..], typeof(double), typeof(MultiColorGauge),
+        new PropertyMetadata(OnAnimatedValueChanged)
+    );
+
+    public static double GetLinearAnimatedValue(DependencyObject element)
+    {
+        return (double)element.GetValue(LinearAnimatedValueProperty);
+    }
+
+    public static void SetLinearAnimatedValue(DependencyObject element, double value)
+    {
+        element.SetValue(LinearAnimatedValueProperty, value);
+    }
 
     public static readonly DependencyProperty LabelProperty = DependencyProperty.RegisterAttached
     (
@@ -67,6 +86,9 @@ public partial class LinearGauge
         (
             sender is not FrameworkElement rootElement ||
             rootElement.FindName("ValueTextBlock") is not TextBlock valueTextBlock ||
+            rootElement.FindName("InnerBorder") is not Border innerBorder ||
+            rootElement.FindName("OuterBorder") is not Border outerBorder ||
+            rootElement.FindName("Grid") is not Grid grid ||
             rootElement.TemplatedParent is not MultiColorGauge gauge
         )
         {
@@ -75,12 +97,44 @@ public partial class LinearGauge
 
         //RangeBase.ValueProperty.OverrideMetadata(typeof(MultiColorGauge), new FrameworkPropertyMetadata(0d, (_, _) => OnValueChanged(gauge, valueTextBlock)));
 
-        valueDescriptor?.AddValueChanged(gauge, (_, _) => OnValueChanged(gauge, valueTextBlock));
-        OnValueChanged(gauge, valueTextBlock);
+        valueDescriptor?.AddValueChanged(gauge, (_, _) => OnValueChanged(gauge, valueTextBlock, grid, innerBorder));
+        minimumDescriptor?.AddValueChanged(gauge, (_, _) => OnValueChanged(gauge, valueTextBlock, grid, innerBorder));
+        maximumDescriptor?.AddValueChanged(gauge, (_, _) => OnValueChanged(gauge, valueTextBlock, grid, innerBorder));
+        tickFillDescriptor?.AddValueChanged(gauge, (_, _) => outerBorder.Background = gauge.TickFill);
+        OnValueChanged(gauge, valueTextBlock, grid, innerBorder);
     }
 
-    private static void OnValueChanged(MultiColorGauge gauge, TextBlock valueTextBlock)
+    private static void OnValueChanged(MultiColorGauge gauge, TextBlock valueTextBlock, Grid grid, Border innerBorder)
     {
         valueTextBlock.Text = gauge.Value.ToString(GetStringFormat(gauge), CultureInfo.CurrentCulture);
+        var relativeValue = (Math.Max(Math.Min(gauge.Maximum, gauge.Value), gauge.Minimum) - gauge.Minimum) / (gauge.Maximum - gauge.Minimum);
+        //innerBorder.Width = grid.Width * relativeValue;
+
+        var animation = new DoubleAnimation(relativeValue, TimeSpan.FromSeconds(.2))
+        {
+            AccelerationRatio = .33,
+            DecelerationRatio = .33,
+        };
+
+        gauge.BeginAnimation(LinearAnimatedValueProperty, animation);
+    }
+
+    private static void OnAnimatedValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if
+        (
+            d is not MultiColorGauge gauge ||
+            e.NewValue is not double animatedValue ||
+            gauge.Template.FindName("Grid", gauge) is not Grid grid ||
+            grid.FindName("InnerBorder") is not Border innerBorder
+        )
+        {
+            return;
+        }
+
+        innerBorder.Width = grid.Width * animatedValue;
+        var brush = new SolidColorBrush(MultiColorGauge.GetColorForRelativeValue(gauge, animatedValue));
+        brush.Freeze();
+        innerBorder.Background = brush;
     }
 }

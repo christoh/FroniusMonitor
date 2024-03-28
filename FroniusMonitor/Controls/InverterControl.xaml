@@ -53,6 +53,14 @@
                         <Setter Property="Minimum" Value="999999" />
                         <Setter Property="Maximum" Value="1000000" />
                     </Style>
+                    
+                    <Style TargetType="c:MultiColorGauge" x:Key="AcPowerLinearGaugeStyle" BasedOn="{StaticResource DefaultLinearGauge}">
+                        <Setter Property="Minimum" Value="{Binding Config.MaxAcPower, FallbackValue=3333.333333333, Converter={co:Multiply Factor=-.33333333333333}}" />
+                        <Setter Property="Maximum" Value="{Binding Config.MaxAcPower, FallbackValue=3333.333333333, Converter={co:Multiply Factor=.33333333333333}}" />
+                        <Setter Property="t:LinearGauge.UnitName" Value="W"/>
+                        <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.MidIsGood}"/>
+                        <Setter Property="Margin" Value="4,0,4,1"/>
+                    </Style>
 
                 </Grid.Resources>
                 <Viewbox Grid.Row="0">
@@ -172,6 +180,7 @@
                         <Grid x:Name="AcPowerActive" Visibility="Collapsed">
                             <Grid.Resources>
                                 <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource AcPowerGaugeStyle}" />
+                                <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource AcPowerLinearGaugeStyle}"/>
                             </Grid.Resources>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
@@ -181,13 +190,19 @@
                             <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.ActivePower}" TextAlignment="Center" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                                <c:LinearHorizontalGauge DisplayName="L1" Value="{Binding Sensors.Cache.InverterActivePowerL1, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding Sensors.Cache.InverterActivePowerL2, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding Sensors.Cache.InverterActivePowerL3, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Sum}" Value="{Binding Sensors.Cache.InverterActivePowerSum, FallbackValue={x:Null}}"
+                                <c:MultiColorGauge t:LinearGauge.Label="L1" Value="{Binding Sensors.Cache.InverterActivePowerL1, FallbackValue=0, TargetNullValue=0}"/>
+                                <c:MultiColorGauge t:LinearGauge.Label="L2" Value="{Binding Sensors.Cache.InverterActivePowerL2, FallbackValue=0, TargetNullValue=0}"/>
+                                <c:MultiColorGauge t:LinearGauge.Label="L3" Value="{Binding Sensors.Cache.InverterActivePowerL3, FallbackValue=0, TargetNullValue=0}"/>
+                                
+                                <c:MultiColorGauge t:LinearGauge.Label="{x:Static p:Resources.Sum}" Value="{Binding Sensors.Cache.InverterActivePowerSum, FallbackValue=0, TargetNullValue=0}"
+                                                   Maximum="{Binding Config.MaxAcPower, FallbackValue=10000}"
+                                                   Minimum="{Binding Config.MaxAcPower, FallbackValue=10000, Converter={co:Multiply Factor=-1}}"
+                                                   />
+
+                                <!--<c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Sum}" Value="{Binding Sensors.Cache.InverterActivePowerSum, FallbackValue={x:Null}}"
                                                          Maximum="{Binding Config.MaxAcPower, FallbackValue=10000}"
                                                          High="{Binding Config.MaxAcPower, FallbackValue=9000, Converter={co:Multiply Factor=.9}}"
-                                                         VeryHigh="{Binding Config.MaxAcPower, FallbackValue=9600, Converter={co:Multiply Factor=.96}}" />
+                                                         VeryHigh="{Binding Config.MaxAcPower, FallbackValue=9600, Converter={co:Multiply Factor=.96}}" />-->
                             </StackPanel>
                         </Grid>
 

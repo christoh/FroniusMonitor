@@ -100,18 +100,18 @@ public partial class HalfCircleGauge
         }
 
         bool needsChange = false;
-        
+
         if (minimumTextBlock != null && !metaData.OldMinimum.Equals(gauge.Minimum))
         {
             minimumTextBlock.Text = gauge.Minimum.ToString(GetMinimumMaximumStringFormat(gauge), CultureInfo.CurrentCulture);
-            metaData.OldMinimum= gauge.Minimum;
+            metaData.OldMinimum = gauge.Minimum;
             needsChange = true;
         }
 
         if (maximumTextBlock != null && !metaData.OldMaximum.Equals(gauge.Maximum))
         {
             maximumTextBlock.Text = gauge.Maximum.ToString(GetMinimumMaximumStringFormat(gauge), CultureInfo.CurrentCulture);
-            metaData.OldMaximum= gauge.Maximum;
+            metaData.OldMaximum = gauge.Maximum;
             needsChange = true;
         }
 
@@ -164,19 +164,7 @@ public partial class HalfCircleGauge
             return;
         }
 
-        var upper = gauge.GaugeColors.First(c => c.Value > rectRelativeValue || c.Value >= 1);
-        var lower = gauge.GaugeColors.Last(c => c.Value < upper.Value || c.Value <= 0);
-
-        var lowerPercentage = (upper.Value - rectRelativeValue) / (upper.Value - lower.Value);
-
-        var color = Color.FromRgb
-        (
-            (byte)Math.Round(lowerPercentage * lower.Color.R + (1 - lowerPercentage) * upper.Color.R, MidpointRounding.AwayFromZero),
-            (byte)Math.Round(lowerPercentage * lower.Color.G + (1 - lowerPercentage) * upper.Color.G, MidpointRounding.AwayFromZero),
-            (byte)Math.Round(lowerPercentage * lower.Color.B + (1 - lowerPercentage) * upper.Color.B, MidpointRounding.AwayFromZero)
-        );
-
-        var brush = new SolidColorBrush(color);
+        var brush = new SolidColorBrush(MultiColorGauge.GetColorForRelativeValue(gauge, rectRelativeValue));
         brush.Freeze();
         rect.Fill = brush;
     }
@@ -238,9 +226,9 @@ public partial class HalfCircleGauge
         (
             sender is MultiColorGauge gauge &&
             gauge.Template.FindName("Canvas", gauge) is Canvas canvas &&
-            gauge.Template.FindName("OuterCanvas", gauge) is Canvas outerCanvas &&
-            gauge.Template.FindName("MinimumTextBlock", gauge) is TextBlock minimumTextBlock &&
-            gauge.Template.FindName("MaximumTextBlock", gauge) is TextBlock maximumTextBlock
+            canvas.FindName("OuterCanvas") is Canvas outerCanvas &&
+            canvas.FindName("MinimumTextBlock") is TextBlock minimumTextBlock &&
+            canvas.FindName("MaximumTextBlock") is TextBlock maximumTextBlock
         )
         {
             return (gauge, canvas, outerCanvas, minimumTextBlock, maximumTextBlock);
