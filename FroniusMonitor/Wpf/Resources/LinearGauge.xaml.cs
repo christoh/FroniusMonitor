@@ -132,7 +132,15 @@ public partial class LinearGauge
             return;
         }
 
-        innerBorder.Width = grid.Width * animatedValue;
+        var width = grid.Width * Math.Abs(animatedValue - gauge.Origin);
+        
+        if (grid.FindName("MidpointMarker") is FrameworkElement midpointMarker)
+        {
+            midpointMarker.Margin = new Thickness(gauge.Origin * grid.Width - midpointMarker.Width / 2, 0, 0, 0);
+        }
+
+        innerBorder.Width = width;
+        innerBorder.Margin = new Thickness(animatedValue > gauge.Origin ? grid.Width * gauge.Origin : grid.Width * gauge.Origin - width, 0, 0, 0);
         var brush = new SolidColorBrush(MultiColorGauge.GetColorForRelativeValue(gauge, animatedValue));
         brush.Freeze();
         innerBorder.Background = brush;

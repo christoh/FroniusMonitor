@@ -16,6 +16,18 @@ public class MultiColorGauge : ProgressBar
         set => SetValue(GaugeColorsProperty, value);
     }
 
+    public static readonly DependencyProperty OriginProperty = DependencyProperty.Register
+    (
+        nameof(Origin), typeof(double), typeof(MultiColorGauge),
+        new FrameworkPropertyMetadata(0.0)
+    );
+
+    public double Origin
+    {
+        get => (double)GetValue(OriginProperty);
+        set => SetValue(OriginProperty, value);
+    }
+
     internal static DependencyPropertyKey TemplateMetadataPropertyKey = DependencyProperty.RegisterReadOnly
     (
         nameof(TemplateMetadata), typeof(object), typeof(MultiColorGauge), new FrameworkPropertyMetadata(null)
@@ -86,12 +98,12 @@ public class MultiColorGauge : ProgressBar
         new ColorEntry(1, Colors.Green),
     ];
 
-    public static IReadOnlyList<MultiColorGauge.ColorEntry> LowIsBad { get; } =
+    public static IReadOnlyList<ColorEntry> LowIsBad { get; } =
     [
-        new MultiColorGauge.ColorEntry(0,Colors.Red),
-        new MultiColorGauge.ColorEntry(.05,Colors.OrangeRed),
-        new MultiColorGauge.ColorEntry(.5,Colors.YellowGreen),
-        new MultiColorGauge.ColorEntry(1,Colors.Green),
+        new ColorEntry(0,Colors.Red),
+        new ColorEntry(.05,Colors.OrangeRed),
+        new ColorEntry(.5,Colors.YellowGreen),
+        new ColorEntry(1,Colors.Green),
     ];
 
     static MultiColorGauge()

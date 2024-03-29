@@ -145,6 +145,8 @@ public class NullToBool : NullToAnything<bool>
     public override bool Null { get; set; } = false;
 }
 
+public class NullToDouble : NullToAnything<double>;
+
 public class ToUpper : ConverterBase
 {
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value?.ToString()?.ToUpper(CultureInfo.CurrentCulture);
