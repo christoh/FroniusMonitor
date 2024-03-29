@@ -92,27 +92,23 @@
                                 <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource DefaultHalfCircleGauge}">
                                     <Setter Property="Minimum" Value="220" />
                                     <Setter Property="Maximum" Value="240" />
+                                    <Setter Property="Origin" Value=".5"/>
                                     <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.MidIsGood}" />
-                                    <Setter Property="ColorAllTicks" Value="True" />
                                 </Style>
                             </UniformGrid.Resources>
 
                             <!-- ReSharper disable Xaml.RedundantAttachedProperty -->
                             <c:MultiColorGauge Grid.Row="0" Grid.Column="0" Margin="1"
-                                               Value="{Binding VoltageL1, FallbackValue=0, TargetNullValue=0}"
-                                               ColorAllTicks="{Binding VoltageL1, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}"/>
+                                               Value="{Binding VoltageL1, FallbackValue=0, TargetNullValue=0}"/>
 
                             <c:MultiColorGauge Grid.Row="0" Grid.Column="1" Margin="1"
-                                               Value="{Binding VoltageL2, FallbackValue=0, TargetNullValue=0}"
-                                               ColorAllTicks="{Binding VoltageL2, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" />
+                                               Value="{Binding VoltageL2, FallbackValue=0, TargetNullValue=0}" />
 
                             <c:MultiColorGauge Grid.Row="1" Grid.Column="0" Margin="1"
-                                               Value="{Binding VoltageL3, FallbackValue=0, TargetNullValue=0}"
-                                               ColorAllTicks="{Binding VoltageL3, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" />
+                                               Value="{Binding VoltageL3, FallbackValue=0, TargetNullValue=0}" />
 
                             <c:MultiColorGauge Grid.Row="1" Grid.Column="1" Margin="1" Minimum="49" Maximum="51"
                                                Value="{Binding Frequency, FallbackValue=0, TargetNullValue=0}"
-                                               ColorAllTicks="{Binding Frequency, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}"
                                                t:HalfCircleGauge.MinimumMaximumStringFormat="N1"/>
                             <!-- ReSharper restore Xaml.RedundantAttachedProperty -->
                         </UniformGrid>

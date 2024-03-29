@@ -71,7 +71,11 @@ public partial class HalfCircleGauge
 
         var hand = new Polygon
         {
-            Points = new PointCollection([new Point(4, 0), new Point(0, handLength), new Point(8, handLength)]),
+            Points = new PointCollection(
+            [
+                new Point(4, 0), new Point(0, handLength), new Point(8, handLength)
+            ]),
+
             Fill = gauge.HandFill,
             StrokeThickness = 0,
             RenderTransform = new RotateTransform(-90, 4, handLength - 5),
@@ -158,15 +162,20 @@ public partial class HalfCircleGauge
     {
         var rectRelativeValue = Math.Round((double)rect.Tag, 6);
 
-        if (!gauge.ColorAllTicks && (rectRelativeValue > relativeValue || relativeValue <= 0) || gauge.GaugeColors == null)
+        if
+        (
+            gauge.ColorAllTicks ||
+            relativeValue <= rectRelativeValue && rectRelativeValue <= gauge.Origin ||
+            relativeValue >= rectRelativeValue && rectRelativeValue >= gauge.Origin
+        )
         {
-            rect.Fill = gauge.TickFill;
+            var brush = new SolidColorBrush(MultiColorGauge.GetColorForRelativeValue(gauge, rectRelativeValue));
+            brush.Freeze();
+            rect.Fill = brush;
             return;
         }
 
-        var brush = new SolidColorBrush(MultiColorGauge.GetColorForRelativeValue(gauge, rectRelativeValue));
-        brush.Freeze();
-        rect.Fill = brush;
+        rect.Fill = gauge.TickFill;
     }
 
     private static void OnParametersChanged(MultiColorGauge gauge, TextBlock? minimumTextBlock, TextBlock? maximumTextBlock)

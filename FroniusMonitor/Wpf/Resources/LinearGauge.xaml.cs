@@ -8,6 +8,7 @@ public partial class LinearGauge
     private static readonly DependencyPropertyDescriptor? minimumDescriptor = DependencyPropertyDescriptor.FromProperty(RangeBase.MinimumProperty, typeof(MultiColorGauge));
     private static readonly DependencyPropertyDescriptor? maximumDescriptor = DependencyPropertyDescriptor.FromProperty(RangeBase.MaximumProperty, typeof(MultiColorGauge));
     private static readonly DependencyPropertyDescriptor? tickFillDescriptor = DependencyPropertyDescriptor.FromProperty(MultiColorGauge.TickFillProperty, typeof(MultiColorGauge));
+    private static readonly DependencyPropertyDescriptor? originDescriptor = DependencyPropertyDescriptor.FromProperty(MultiColorGauge.OriginProperty, typeof(MultiColorGauge));
 
     public static readonly DependencyProperty LinearAnimatedValueProperty = DependencyProperty.RegisterAttached
     (
@@ -86,29 +87,25 @@ public partial class LinearGauge
         (
             sender is not FrameworkElement rootElement ||
             rootElement.FindName("ValueTextBlock") is not TextBlock valueTextBlock ||
-            rootElement.FindName("InnerBorder") is not Border innerBorder ||
             rootElement.FindName("OuterBorder") is not Border outerBorder ||
-            rootElement.FindName("Grid") is not Grid grid ||
             rootElement.TemplatedParent is not MultiColorGauge gauge
         )
         {
             return;
         }
 
-        //RangeBase.ValueProperty.OverrideMetadata(typeof(MultiColorGauge), new FrameworkPropertyMetadata(0d, (_, _) => OnValueChanged(gauge, valueTextBlock)));
-
-        valueDescriptor?.AddValueChanged(gauge, (_, _) => OnValueChanged(gauge, valueTextBlock, grid, innerBorder));
-        minimumDescriptor?.AddValueChanged(gauge, (_, _) => OnValueChanged(gauge, valueTextBlock, grid, innerBorder));
-        maximumDescriptor?.AddValueChanged(gauge, (_, _) => OnValueChanged(gauge, valueTextBlock, grid, innerBorder));
+        valueDescriptor?.AddValueChanged(gauge, (_, _) => OnValueChanged(gauge, valueTextBlock));
+        minimumDescriptor?.AddValueChanged(gauge, (_, _) => OnValueChanged(gauge, valueTextBlock));
+        maximumDescriptor?.AddValueChanged(gauge, (_, _) => OnValueChanged(gauge, valueTextBlock));
+        originDescriptor?.AddValueChanged(gauge, (_, _) => OnValueChanged(gauge, valueTextBlock));
         tickFillDescriptor?.AddValueChanged(gauge, (_, _) => outerBorder.Background = gauge.TickFill);
-        OnValueChanged(gauge, valueTextBlock, grid, innerBorder);
+        OnValueChanged(gauge, valueTextBlock);
     }
 
-    private static void OnValueChanged(MultiColorGauge gauge, TextBlock valueTextBlock, Grid grid, Border innerBorder)
+    private static void OnValueChanged(RangeBase gauge, TextBlock valueTextBlock)
     {
         valueTextBlock.Text = gauge.Value.ToString(GetStringFormat(gauge), CultureInfo.CurrentCulture);
         var relativeValue = (Math.Max(Math.Min(gauge.Maximum, gauge.Value), gauge.Minimum) - gauge.Minimum) / (gauge.Maximum - gauge.Minimum);
-        //innerBorder.Width = grid.Width * relativeValue;
 
         var animation = new DoubleAnimation(relativeValue, TimeSpan.FromSeconds(.2))
         {
@@ -133,7 +130,7 @@ public partial class LinearGauge
         }
 
         var width = grid.Width * Math.Abs(animatedValue - gauge.Origin);
-        
+
         if (grid.FindName("MidpointMarker") is FrameworkElement midpointMarker)
         {
             midpointMarker.Visibility = gauge.Origin > .00001 ? Visibility.Visible : Visibility.Hidden;

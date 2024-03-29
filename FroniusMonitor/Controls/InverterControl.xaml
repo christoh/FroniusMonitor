@@ -36,18 +36,6 @@
                         <Setter Property="Margin" Value="4,0" />
                     </Style>
 
-                    <Style TargetType="c:LinearHorizontalGauge" x:Key="AcPowerGaugeStyle" BasedOn="{StaticResource InverterControlGaugeStyle}">
-                        <d:Style.DataContext>
-                            <x:Type Type="c:InverterControl" />
-                        </d:Style.DataContext>
-                        <Setter Property="Minimum" Value="0" />
-                        <Setter Property="Maximum" Value="{Binding Config.MaxAcPower, FallbackValue=3333.333333333, Converter={co:Multiply Factor=.33333333333333}}" />
-                        <Setter Property="VeryHigh" Value="{Binding Config.MaxAcPower, FallbackValue=3200, Converter={co:Multiply Factor=.32}}" />
-                        <Setter Property="High" Value="{Binding Config.MaxAcPower, FallbackValue=3000, Converter={co:Multiply Factor=.3}}" />
-                        <Setter Property="UnitSymbol" Value="W" />
-                        <Setter Property="StringFormat" Value="N0" />
-                    </Style>
-
                     <Style TargetType="c:LinearHorizontalGauge" x:Key="AcEnergyGaugeStyle" BasedOn="{StaticResource InverterControlGaugeStyle}">
                         <Setter Property="StringFormat" Value="N1" />
                         <Setter Property="Minimum" Value="999999" />
@@ -133,26 +121,22 @@
                                         <Setter Property="Minimum" Value="220" />
                                         <Setter Property="Maximum" Value="240" />
                                         <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.MidIsGood}" />
-                                        <Setter Property="ColorAllTicks" Value="True" />
+                                        <Setter Property="Origin" Value="0.5" />
                                     </Style>
                                 </UniformGrid.Resources>
 
                                 <!-- ReSharper disable Xaml.RedundantAttachedProperty -->
                                 <c:MultiColorGauge Grid.Row="0" Grid.Column="0" Margin="1"
-                                               Value="{Binding Sensors.Cache.InverterPhaseVoltageL1, FallbackValue=0, TargetNullValue=0}"
-                                               ColorAllTicks="{Binding Sensors.Cache.InverterPhaseVoltageL1, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}"/>
+                                               Value="{Binding Sensors.Cache.InverterPhaseVoltageL1, FallbackValue=0, TargetNullValue=0}"/>
 
                                 <c:MultiColorGauge Grid.Row="0" Grid.Column="1" Margin="1"
-                                               Value="{Binding Sensors.Cache.InverterPhaseVoltageL2, FallbackValue=0, TargetNullValue=0}"
-                                               ColorAllTicks="{Binding Sensors.Cache.InverterPhaseVoltageL2, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" />
+                                               Value="{Binding Sensors.Cache.InverterPhaseVoltageL2, FallbackValue=0, TargetNullValue=0}"/>
 
                                 <c:MultiColorGauge Grid.Row="1" Grid.Column="0" Margin="1"
-                                               Value="{Binding Sensors.Cache.InverterPhaseVoltageL3, FallbackValue=0, TargetNullValue=0}"
-                                               ColorAllTicks="{Binding Sensors.Cache.InverterPhaseVoltageL3, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" />
+                                               Value="{Binding Sensors.Cache.InverterPhaseVoltageL3, FallbackValue=0, TargetNullValue=0}"/>
 
                                 <c:MultiColorGauge Grid.Row="1" Grid.Column="1" Margin="1" Minimum="49.8" Maximum="50.2"
                                                Value="{Binding Sensors.Cache.FeedInPointFrequency, FallbackValue=0, TargetNullValue=0}"
-                                               ColorAllTicks="{Binding Sensors.Cache.FeedInPointFrequency, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}"
                                                t:HalfCircleGauge.MinimumMaximumStringFormat="N1"/>
                                 <!-- ReSharper restore Xaml.RedundantAttachedProperty -->
                             </UniformGrid>
@@ -230,7 +214,7 @@
                             <c:MultiColorGauge Grid.Row="2" Value="{Binding Sensors.Cache.InverterActivePowerSum, FallbackValue=-100000, TargetNullValue=-100000, Mode=OneWay}"
                                                Maximum="{Binding Config.MaxAcPower, FallbackValue=10000, TargetNullValue=10000, Mode=OneWay}"
                                                GaugeColors="{Binding Sensors.Storage, FallbackValue={x:Null}, Converter={co:NullToColorMap NotNull={x:Static c:MultiColorGauge.MidIsGood}, Null={x:Static c:MultiColorGauge.HighIsBad}}}"
-                                               ColorAllTicks="{Binding Sensors.Storage, Converter={co:NullToBool Null=False, NotNull=True}, FallbackValue=False}" 
+                                               Origin="{Binding Sensors.Storage, Converter={co:NullToDouble Null=0, NotNull=.5}, FallbackValue=0}" 
                                                Width="92">
                                 <c:MultiColorGauge.Minimum>
                                     <MultiBinding Converter="{co:AcPowerMinimum}">
