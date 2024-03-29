@@ -53,9 +53,19 @@
                         <Setter Property="Minimum" Value="999999" />
                         <Setter Property="Maximum" Value="1000000" />
                     </Style>
-                    
+
                     <Style TargetType="c:MultiColorGauge" x:Key="AcPowerLinearGaugeStyle" BasedOn="{StaticResource DefaultLinearGauge}">
-                        <Setter Property="Minimum" Value="{Binding Config.MaxAcPower, FallbackValue=3333.333333333, Converter={co:Multiply Factor=-.33333333333333}}" />
+                        <Setter Property="Minimum">
+                            <Setter.Value>
+                                <MultiBinding Converter="{co:AcPowerMinimum}">
+                                    <!-- ReSharper disable Xaml.PossibleNullReferenceException -->
+                                    <Binding Path="Config.MaxAcPower" Converter="{co:Multiply Factor=.3333333333333333}"/>
+                                    <Binding Path="Sensors.Storage"/>
+                                    <!-- ReSharper restore Xaml.PossibleNullReferenceException -->
+                                </MultiBinding>
+                            </Setter.Value>
+                        </Setter>
+
                         <Setter Property="Maximum" Value="{Binding Config.MaxAcPower, FallbackValue=3333.333333333, Converter={co:Multiply Factor=.33333333333333}}" />
                         <Setter Property="t:LinearGauge.UnitName" Value="W"/>
                         <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.MidIsGood}"/>
@@ -179,8 +189,9 @@
 
                         <Grid x:Name="AcPowerActive" Visibility="Collapsed">
                             <Grid.Resources>
-                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource AcPowerGaugeStyle}" />
-                                <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource AcPowerLinearGaugeStyle}"/>
+                                <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource AcPowerLinearGaugeStyle}">
+                                    <Setter Property="GaugeColors" Value="{Binding Sensors.Storage, FallbackValue={x:Null}, Converter={co:NullToColorMap NotNull={x:Static c:MultiColorGauge.MidIsGood}, Null={x:Static c:MultiColorGauge.HighIsBad}}}"/>
+                                </Style>
                             </Grid.Resources>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
@@ -193,16 +204,18 @@
                                 <c:MultiColorGauge t:LinearGauge.Label="L1" Value="{Binding Sensors.Cache.InverterActivePowerL1, FallbackValue=0, TargetNullValue=0}"/>
                                 <c:MultiColorGauge t:LinearGauge.Label="L2" Value="{Binding Sensors.Cache.InverterActivePowerL2, FallbackValue=0, TargetNullValue=0}"/>
                                 <c:MultiColorGauge t:LinearGauge.Label="L3" Value="{Binding Sensors.Cache.InverterActivePowerL3, FallbackValue=0, TargetNullValue=0}"/>
-                                
-                                <c:MultiColorGauge t:LinearGauge.Label="{x:Static p:Resources.Sum}" Value="{Binding Sensors.Cache.InverterActivePowerSum, FallbackValue=0, TargetNullValue=0}"
-                                                   Maximum="{Binding Config.MaxAcPower, FallbackValue=10000}"
-                                                   Minimum="{Binding Config.MaxAcPower, FallbackValue=10000, Converter={co:Multiply Factor=-1}}"
-                                                   />
 
-                                <!--<c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Sum}" Value="{Binding Sensors.Cache.InverterActivePowerSum, FallbackValue={x:Null}}"
-                                                         Maximum="{Binding Config.MaxAcPower, FallbackValue=10000}"
-                                                         High="{Binding Config.MaxAcPower, FallbackValue=9000, Converter={co:Multiply Factor=.9}}"
-                                                         VeryHigh="{Binding Config.MaxAcPower, FallbackValue=9600, Converter={co:Multiply Factor=.96}}" />-->
+                                <c:MultiColorGauge t:LinearGauge.Label="{x:Static p:Resources.Sum}" Value="{Binding Sensors.Cache.InverterActivePowerSum, FallbackValue=0, TargetNullValue=0}"
+                                                   Maximum="{Binding Config.MaxAcPower, FallbackValue=10000}">
+                                    <c:MultiColorGauge.Minimum>
+                                        <MultiBinding Converter="{co:AcPowerMinimum}">
+                                            <!-- ReSharper disable Xaml.PossibleNullReferenceException -->
+                                            <Binding Path="Config.MaxAcPower"/>
+                                            <Binding Path="Sensors.Storage"/>
+                                            <!-- ReSharper restore Xaml.PossibleNullReferenceException -->
+                                        </MultiBinding>
+                                    </c:MultiColorGauge.Minimum>
+                                </c:MultiColorGauge>
                             </StackPanel>
                         </Grid>
 
@@ -239,8 +252,10 @@
 
                         <Grid x:Name="AcPowerApparent" Visibility="Collapsed">
                             <Grid.Resources>
-                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource AcPowerGaugeStyle}">
-                                    <Setter Property="UnitSymbol" Value="VA" />
+                                <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource AcPowerLinearGaugeStyle}">
+                                    <Setter Property="Minimum" Value="0"/>
+                                    <Setter Property="t:LinearGauge.UnitName" Value="VA"/>
+                                    <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.HighIsBad}"/>
                                 </Style>
                             </Grid.Resources>
                             <Grid.RowDefinitions>
@@ -251,20 +266,21 @@
                             <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.ApparentPower}" TextAlignment="Center" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                                <c:LinearHorizontalGauge DisplayName="L1" Value="{Binding Sensors.Cache.InverterApparentPowerL1, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding Sensors.Cache.InverterApparentPowerL2, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding Sensors.Cache.InverterApparentPowerL3, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Sum}" Value="{Binding Sensors.Cache.InverterApparentPowerSum, FallbackValue={x:Null}}"
-                                                         Maximum="{Binding Config.MaxAcPower, FallbackValue=10000}"
-                                                         High="{Binding Config.MaxAcPower, FallbackValue=9000, Converter={co:Multiply Factor=.9}}"
-                                                         VeryHigh="{Binding Config.MaxAcPower, FallbackValue=9600, Converter={co:Multiply Factor=.96}}" />
+                                <c:MultiColorGauge t:LinearGauge.Label="L1" Value="{Binding Sensors.Cache.InverterApparentPowerL1, FallbackValue=0, TargetNullValue=0}" />
+                                <c:MultiColorGauge t:LinearGauge.Label="L2" Value="{Binding Sensors.Cache.InverterApparentPowerL2, FallbackValue=0, TargetNullValue=0}" />
+                                <c:MultiColorGauge t:LinearGauge.Label="L3" Value="{Binding Sensors.Cache.InverterApparentPowerL3, FallbackValue=0, TargetNullValue=0}" />
+                                <c:MultiColorGauge t:LinearGauge.Label="{x:Static p:Resources.Sum}" Value="{Binding Sensors.Cache.InverterApparentPowerSum, FallbackValue=0, TargetNullValue=0}"
+                                                   Maximum="{Binding Config.MaxAcPower, FallbackValue=10000, TargetNullValue=10000}"/>
                             </StackPanel>
                         </Grid>
 
                         <Grid x:Name="AcPowerReactive" Visibility="Collapsed">
                             <Grid.Resources>
-                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource AcPowerGaugeStyle}">
-                                    <Setter Property="UnitSymbol" Value="var" />
+                                <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource AcPowerLinearGaugeStyle}">
+                                    <Setter Property="Minimum" Value="{Binding Config.MaxAcPower, Converter={co:Multiply Factor=-.3333333333333}, TargetNullValue=0, FallbackValue=0}"/>
+                                    <Setter Property="Maximum" Value="{Binding Config.MaxAcPower, Converter={co:Multiply Factor=.3333333333333}, TargetNullValue=0, FallbackValue=0}"/>
+                                    <Setter Property="t:LinearGauge.UnitName" Value="VA(r)"/>
+                                    <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.MidIsGood}"/>
                                 </Style>
                             </Grid.Resources>
                             <Grid.RowDefinitions>
@@ -275,13 +291,12 @@
                             <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.ReactivePower}" TextAlignment="Center" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                                <c:LinearHorizontalGauge DisplayName="L1" Value="{Binding Sensors.Cache.InverterReactivePowerL1, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding Sensors.Cache.InverterReactivePowerL2, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding Sensors.Cache.InverterReactivePowerL3, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Sum}" Value="{Binding Sensors.Cache.InverterReactivePowerSum, FallbackValue={x:Null}}"
-                                                         Maximum="{Binding Config.MaxAcPower, FallbackValue=10000}"
-                                                         High="{Binding Config.MaxAcPower, FallbackValue=9000, Converter={co:Multiply Factor=.9}}"
-                                                         VeryHigh="{Binding Config.MaxAcPower, FallbackValue=9600, Converter={co:Multiply Factor=.96}}" />
+                                <c:MultiColorGauge t:LinearGauge.Label="L1" Value="{Binding Sensors.Cache.InverterReactivePowerL1, FallbackValue=0, TargetNullValue=0}" />
+                                <c:MultiColorGauge t:LinearGauge.Label="L2" Value="{Binding Sensors.Cache.InverterReactivePowerL2, FallbackValue=0, TargetNullValue=0}" />
+                                <c:MultiColorGauge t:LinearGauge.Label="L3" Value="{Binding Sensors.Cache.InverterReactivePowerL3, FallbackValue=0, TargetNullValue=0}" />
+                                <c:MultiColorGauge t:LinearGauge.Label="{x:Static p:Resources.Sum}" Value="{Binding Sensors.Cache.InverterReactivePowerSum, FallbackValue=0, TargetNullValue=0}"
+                                                   Maximum="{Binding Config.MaxAcPower, FallbackValue=10000, TargetNullValue=10000}"
+                                                   Minimum="{Binding Config.MaxAcPower, FallbackValue=-10000, TargetNullValue=-10000, Converter={co:Multiply Factor=-1}}"/>
                             </StackPanel>
                         </Grid>
 
