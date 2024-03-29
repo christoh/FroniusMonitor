@@ -136,6 +136,7 @@ public partial class LinearGauge
         
         if (grid.FindName("MidpointMarker") is FrameworkElement midpointMarker)
         {
+            midpointMarker.Visibility = gauge.Origin > .00001 ? Visibility.Visible : Visibility.Hidden;
             midpointMarker.Margin = new Thickness(gauge.Origin * grid.Width - midpointMarker.Width / 2, 0, 0, 0);
         }
 
