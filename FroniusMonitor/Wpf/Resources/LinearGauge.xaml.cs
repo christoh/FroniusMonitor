@@ -9,6 +9,7 @@ public partial class LinearGauge
     private static readonly DependencyPropertyDescriptor? maximumDescriptor = DependencyPropertyDescriptor.FromProperty(RangeBase.MaximumProperty, typeof(MultiColorGauge));
     private static readonly DependencyPropertyDescriptor? tickFillDescriptor = DependencyPropertyDescriptor.FromProperty(MultiColorGauge.TickFillProperty, typeof(MultiColorGauge));
     private static readonly DependencyPropertyDescriptor? originDescriptor = DependencyPropertyDescriptor.FromProperty(MultiColorGauge.OriginProperty, typeof(MultiColorGauge));
+    private static readonly DependencyPropertyDescriptor? showPercentDescriptor = DependencyPropertyDescriptor.FromProperty(MultiColorGauge.ShowPercentProperty, typeof(MultiColorGauge));
 
     public static readonly DependencyProperty LinearAnimatedValueProperty = DependencyProperty.RegisterAttached
     (
@@ -26,26 +27,26 @@ public partial class LinearGauge
         element.SetValue(LinearAnimatedValueProperty, value);
     }
 
-    public static readonly DependencyProperty LabelProperty = DependencyProperty.RegisterAttached
+    public static readonly DependencyProperty DisplayUnitNameProperty = DependencyProperty.RegisterAttached
     (
-        nameof(GetLabel)[3..], typeof(string), typeof(LinearGauge),
+        nameof(GetDisplayUnitName)[3..], typeof(string), typeof(LinearGauge),
         new FrameworkPropertyMetadata(string.Empty)
     );
 
-    public static string? GetLabel(DependencyObject element)
+    public static string? GetDisplayUnitName(DependencyObject element)
     {
-        return (string?)element.GetValue(LabelProperty);
+        return (string?)element.GetValue(DisplayUnitNameProperty);
     }
 
-    public static void SetLabel(DependencyObject element, string? value)
+    public static void SetDisplayUnitName(DependencyObject element, string? value)
     {
-        element.SetValue(LabelProperty, value ?? string.Empty);
+        element.SetValue(DisplayUnitNameProperty, value ?? string.Empty);
     }
 
     public static readonly DependencyProperty UnitNameProperty = DependencyProperty.RegisterAttached
     (
         nameof(GetUnitName)[3..], typeof(string), typeof(LinearGauge),
-        new FrameworkPropertyMetadata(string.Empty)
+        new FrameworkPropertyMetadata(string.Empty, OnUnitNameChanged)
     );
 
     public static string? GetUnitName(DependencyObject element)
@@ -57,6 +58,7 @@ public partial class LinearGauge
     {
         element.SetValue(UnitNameProperty, value ?? string.Empty);
     }
+
 
     public static readonly DependencyProperty StringFormatProperty = DependencyProperty.RegisterAttached
     (
@@ -98,14 +100,17 @@ public partial class LinearGauge
         minimumDescriptor?.AddValueChanged(gauge, (_, _) => OnValueChanged(gauge, valueTextBlock));
         maximumDescriptor?.AddValueChanged(gauge, (_, _) => OnValueChanged(gauge, valueTextBlock));
         originDescriptor?.AddValueChanged(gauge, (_, _) => OnValueChanged(gauge, valueTextBlock));
+        showPercentDescriptor?.AddValueChanged(gauge, (_, _) => OnValueChanged(gauge, valueTextBlock));
         tickFillDescriptor?.AddValueChanged(gauge, (_, _) => outerBorder.Background = gauge.TickFill);
         OnValueChanged(gauge, valueTextBlock);
     }
 
-    private static void OnValueChanged(RangeBase gauge, TextBlock valueTextBlock)
+    private static void OnValueChanged(MultiColorGauge gauge, TextBlock valueTextBlock)
     {
-        valueTextBlock.Text = gauge.Value.ToString(GetStringFormat(gauge), CultureInfo.CurrentCulture);
         var relativeValue = (Math.Max(Math.Min(gauge.Maximum, gauge.Value), gauge.Minimum) - gauge.Minimum) / (gauge.Maximum - gauge.Minimum);
+        var value = gauge.ShowPercent ? relativeValue * 100 : gauge.Value;
+        valueTextBlock.Text = value.ToString(GetStringFormat(gauge), CultureInfo.CurrentCulture);
+        SetDisplayUnitName(gauge, gauge.ShowPercent ? "%" : GetUnitName(gauge));
 
         var animation = new DoubleAnimation(relativeValue, TimeSpan.FromSeconds(.2))
         {
@@ -114,6 +119,12 @@ public partial class LinearGauge
         };
 
         gauge.BeginAnimation(LinearAnimatedValueProperty, animation);
+    }
+
+    private static void OnUnitNameChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var gauge = (MultiColorGauge)d;
+        SetDisplayUnitName(gauge, gauge.ShowPercent ? "%" : GetUnitName(gauge));
     }
 
     private static void OnAnimatedValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

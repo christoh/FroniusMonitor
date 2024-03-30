@@ -28,6 +28,28 @@ public class MultiColorGauge : ProgressBar
         set => SetValue(OriginProperty, value);
     }
 
+    public static readonly DependencyProperty LabelProperty = DependencyProperty.Register
+    (
+        nameof(Label), typeof(string), typeof(MultiColorGauge), new FrameworkPropertyMetadata(string.Empty)
+    );
+
+    public string? Label
+    {
+        get => (string?)GetValue(LabelProperty);
+        set => SetValue(LabelProperty, value ?? string.Empty);
+    }
+
+    public static readonly DependencyProperty ShowPercentProperty = DependencyProperty.Register
+    (
+        nameof(ShowPercent), typeof(bool), typeof(MultiColorGauge)
+    );
+
+    public bool ShowPercent
+    {
+        get => (bool)GetValue(ShowPercentProperty);
+        set => SetValue(ShowPercentProperty, value);
+    }
+
     internal static DependencyPropertyKey TemplateMetadataPropertyKey = DependencyProperty.RegisterReadOnly
     (
         nameof(TemplateMetadata), typeof(object), typeof(MultiColorGauge), new FrameworkPropertyMetadata(null)
@@ -67,7 +89,7 @@ public class MultiColorGauge : ProgressBar
         get => (bool)GetValue(ColorAllTicksProperty);
         set => SetValue(ColorAllTicksProperty, value);
     }
-    
+
     public static IReadOnlyList<ColorEntry> HighIsBad { get; } =
     [
         new ColorEntry(0, Colors.Green),
@@ -81,7 +103,7 @@ public class MultiColorGauge : ProgressBar
         new ColorEntry(0, Colors.Red),
         new ColorEntry(.05, Colors.OrangeRed),
         new ColorEntry(.25, Colors.YellowGreen),
-        new ColorEntry(0.5,Colors.Green),
+        new ColorEntry(0.5, Colors.Green),
         new ColorEntry(.75, Colors.YellowGreen),
         new ColorEntry(.95, Colors.OrangeRed),
         new ColorEntry(1, Colors.Red),
@@ -92,7 +114,7 @@ public class MultiColorGauge : ProgressBar
         new ColorEntry(0, Colors.Green),
         new ColorEntry(.05, Colors.YellowGreen),
         new ColorEntry(.25, Colors.OrangeRed),
-        new ColorEntry(0.5,Colors.Red),
+        new ColorEntry(0.5, Colors.Red),
         new ColorEntry(.75, Colors.OrangeRed),
         new ColorEntry(.95, Colors.YellowGreen),
         new ColorEntry(1, Colors.Green),
@@ -100,10 +122,10 @@ public class MultiColorGauge : ProgressBar
 
     public static IReadOnlyList<ColorEntry> LowIsBad { get; } =
     [
-        new ColorEntry(0,Colors.Red),
-        new ColorEntry(.05,Colors.OrangeRed),
-        new ColorEntry(.5,Colors.YellowGreen),
-        new ColorEntry(1,Colors.Green),
+        new ColorEntry(0, Colors.Red),
+        new ColorEntry(.05, Colors.OrangeRed),
+        new ColorEntry(.5, Colors.YellowGreen),
+        new ColorEntry(1, Colors.Green),
     ];
 
     static MultiColorGauge()

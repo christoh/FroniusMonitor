@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using De.Hochstaetter.FroniusMonitor.Wpf.Resources;
 
 namespace De.Hochstaetter.FroniusMonitor.Controls;
 
@@ -36,7 +37,7 @@ public partial class InverterControl
     private IGen24Service? gen24Service;
     private IServiceProvider provider = IoC.Injector!;
 
-    private static readonly IReadOnlyList<InverterDisplayMode> acModes = 
+    private static readonly IReadOnlyList<InverterDisplayMode> acModes =
     [
         InverterDisplayMode.AcPowerActiveGauge,
         InverterDisplayMode.AcPowerActive,
@@ -57,7 +58,7 @@ public partial class InverterControl
         InverterDisplayMode.DcCurrent,
         InverterDisplayMode.DcVoltage,
     ];
-    
+
     private static readonly IReadOnlyList<InverterDisplayMode> moreModes =
     [
         InverterDisplayMode.MoreEfficiency,
@@ -67,7 +68,7 @@ public partial class InverterControl
         InverterDisplayMode.MoreOp,
         InverterDisplayMode.MoreVersions
     ];
-    
+
     private static readonly IReadOnlyList<InverterDisplayMode> energyModes =
     [
         InverterDisplayMode.EnergySolar,
@@ -75,7 +76,7 @@ public partial class InverterControl
         InverterDisplayMode.EnergyRectifier,
         InverterDisplayMode.EnergyStorage,
     ];
-    
+
     private int currentAcIndex, currentDcIndex, currentMoreIndex, energyIndex;
     private bool isInStandByChange;
     private string? lastStatusCode;
@@ -280,27 +281,22 @@ public partial class InverterControl
                     switch (Mode)
                     {
                         case InverterDisplayMode.DcPower:
-                            DcPowerAggregateGauge.DisplayName = Loc.Sum;
-                            DcPowerAggregateGauge.Value = gen24Sensors?.Cache?.SolarPowerSum;
+                            DcPowerAggregateGauge.Label = Loc.Sum;
+                            DcPowerAggregateGauge.Value = gen24Sensors?.Cache?.SolarPowerSum ?? 0;
                             DcPowerAggregateGauge.Maximum = gen24Config.InverterSettings?.Mppt?.WattPeakTotal ?? 10000;
                             DcPowerAggregateGauge.Minimum = 0;
-                            DcPowerAggregateGauge.VeryLow = (gen24Config.InverterSettings?.Mppt?.WattPeakTotal ?? 10000) * 0.05;
-                            DcPowerAggregateGauge.Low = (gen24Config.InverterSettings?.Mppt?.WattPeakTotal ?? 10000) * 0.1;
-                            DcPowerAggregateGauge.High = (gen24Config.InverterSettings?.Mppt?.WattPeakTotal ?? 10000) * 0.9;
-                            DcPowerAggregateGauge.VeryHigh = (gen24Config.InverterSettings?.Mppt?.WattPeakTotal ?? 10000) * 0.95;
-                            DcPowerAggregateGauge.StringFormat = "N0";
-                            DcPowerAggregateGauge.UnitSymbol = "W";
+                            LinearGauge.SetStringFormat(DcPowerAggregateGauge, "N0");
+                            LinearGauge.SetUnitName(DcPowerAggregateGauge, "W");
                             break;
 
                         case InverterDisplayMode.DcRelativePower:
-                            DcPowerAggregateGauge.Value = gen24Sensors?.Cache?.Solar2Power / gen24Sensors?.Cache?.Solar1Power * 100;
-                            DcPowerAggregateGauge.Minimum = 1_000_000;
-                            DcPowerAggregateGauge.Maximum = 2_000_000;
-                            DcPowerAggregateGauge.StringFormat = "N1";
-                            DcPowerAggregateGauge.UnitSymbol = "%";
-                            DcPowerAggregateGauge.DisplayName = "2/1";
+                            DcPowerAggregateGauge.Value = gen24Sensors?.Cache?.Solar2Power / gen24Sensors?.Cache?.Solar1Power * 100 ?? 0;
+                            DcPowerAggregateGauge.Minimum = 50;
+                            DcPowerAggregateGauge.Maximum = 150;
+                            LinearGauge.SetStringFormat(DcPowerAggregateGauge, "N1");
+                            LinearGauge.SetUnitName(DcPowerAggregateGauge, "%");
+                            DcPowerAggregateGauge.Label = "2/1";
                             break;
-
                     }
 
                     break;
