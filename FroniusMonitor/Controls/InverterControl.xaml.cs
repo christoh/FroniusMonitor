@@ -285,6 +285,7 @@ public partial class InverterControl
                             DcPowerAggregateGauge.Value = gen24Sensors?.Cache?.SolarPowerSum ?? 0;
                             DcPowerAggregateGauge.Maximum = gen24Config.InverterSettings?.Mppt?.WattPeakTotal ?? 10000;
                             DcPowerAggregateGauge.Minimum = 0;
+                            DcPowerAggregateGauge.GaugeColors = MultiColorGauge.HighIsBad;
                             LinearGauge.SetStringFormat(DcPowerAggregateGauge, "N0");
                             LinearGauge.SetUnitName(DcPowerAggregateGauge, "W");
                             break;
@@ -296,6 +297,7 @@ public partial class InverterControl
                             LinearGauge.SetStringFormat(DcPowerAggregateGauge, "N1");
                             LinearGauge.SetUnitName(DcPowerAggregateGauge, "%");
                             DcPowerAggregateGauge.Label = "2/1";
+                            DcPowerAggregateGauge.GaugeColors = MultiColorGauge.LowIsBad;
                             break;
                     }
 
