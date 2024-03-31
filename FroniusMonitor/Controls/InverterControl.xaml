@@ -358,9 +358,15 @@
 
                                 <c:MultiColorGauge x:Name="DcPowerAggregateGauge" ShowPercent="False" />
 
-                                <c:MultiColorGauge Label="{x:Static p:Resources.Battery}" ShowPercent="{Binding ShowPercent, ElementName=DcPowerFirstGauge}"
-                                                   Value="{Binding Sensors.Cache.StoragePower, FallbackValue=0, Mode=OneWay}" Visibility="{Binding Sensors.Storage, FallbackValue=Collapsed, Converter={co:NullToVisibility Null=Hidden}}"
-                                                   Maximum="{Binding Sensors.Storage.VoltageOuter, FallbackValue=8184, Converter={co:Multiply Factor=22}}" />
+                                <c:MultiColorGauge Label="{x:Static p:Resources.Battery}"
+                                                   ShowPercent="{Binding ShowPercent, ElementName=DcPowerFirstGauge}"
+                                                   Value="{Binding Sensors.Cache.StoragePower, FallbackValue=0, Mode=OneWay}"
+                                                   Visibility="{Binding Sensors.Storage, FallbackValue=Collapsed, Converter={co:NullToVisibility Null=Hidden}}"
+                                                   Maximum="{Binding Sensors.Storage.VoltageOuter, FallbackValue=8184, Converter={co:Multiply Factor=22}}"
+                                                   Minimum="{Binding Sensors.Storage.VoltageOuter, FallbackValue=8184, Converter={co:Multiply Factor=-22}}"
+                                                   GaugeColors="{x:Static c:MultiColorGauge.MidIsGood}"
+                                                   Origin="0.5"
+                                                   />
                             </StackPanel>
                         </Grid>
 
