@@ -209,10 +209,10 @@ public class Gen24Cache : Gen24DeviceBase
         set => Set(ref inverterReactivePowerSum, value);
     }
 
-    public double? InverterPowerFactorL1 => InverterActivePowerL1 / InverterApparentPowerL1;
-    public double? InverterPowerFactorL2 => InverterActivePowerL2 / InverterApparentPowerL2;
-    public double? InverterPowerFactorL3 => InverterActivePowerL3 / InverterApparentPowerL3;
-    public double? InverterPowerFactorAverage => InverterActivePowerSum / InverterApparentPowerSum;
+    public double? InverterPowerFactorL1 => InverterApparentPowerL1 is 0.0 ? null : InverterActivePowerL1 / InverterApparentPowerL1;
+    public double? InverterPowerFactorL2 => InverterApparentPowerL2 is 0.0 ? null : InverterActivePowerL2 / InverterApparentPowerL2;
+    public double? InverterPowerFactorL3 => InverterApparentPowerL3 is 0.0 ? null : InverterActivePowerL3 / InverterApparentPowerL3;
+    public double? InverterPowerFactorAverage => InverterApparentPowerSum is 0.0 ? null : InverterActivePowerSum / InverterApparentPowerSum;
 
     private TimeSpan backupModeUpTime;
 

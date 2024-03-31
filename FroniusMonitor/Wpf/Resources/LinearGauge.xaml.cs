@@ -117,10 +117,10 @@ public partial class LinearGauge
         originDescriptor?.AddValueChanged(gauge, (_, _) => OnValueChanged(gauge, valueTextBlock));
         showPercentDescriptor?.AddValueChanged(gauge, (_, _) => OnValueChanged(gauge, valueTextBlock));
         tickFillDescriptor?.AddValueChanged(gauge, (_, _) => outerBorder.Background = gauge.TickFill);
-        OnValueChanged(gauge, valueTextBlock);
+        OnValueChanged(gauge, valueTextBlock, true);
     }
 
-    private static void OnValueChanged(MultiColorGauge gauge, TextBlock valueTextBlock)
+    private static void OnValueChanged(MultiColorGauge gauge, TextBlock valueTextBlock, bool skipAnimation = false)
     {
         var relativeValue = (Math.Max(Math.Min(gauge.Maximum, gauge.Value), gauge.Minimum) - gauge.Minimum) / (gauge.Maximum - gauge.Minimum);
 
@@ -133,6 +133,14 @@ public partial class LinearGauge
         valueTextBlock.Text = value.ToString(GetStringFormat(gauge), CultureInfo.CurrentCulture);
         SetDisplayUnitName(gauge, gauge.ShowPercent ? "%" : GetUnitName(gauge));
 
+        if (skipAnimation)
+        {
+            gauge.BeginAnimation(LinearAnimatedValueProperty, null);
+            SetLinearAnimatedValue(gauge, relativeValue);
+            OnAnimatedValueChanged(gauge, new DependencyPropertyChangedEventArgs(LinearAnimatedValueProperty,null,relativeValue));
+            return;
+        }
+        
         var animation = new DoubleAnimation(relativeValue, TimeSpan.FromSeconds(.2))
         {
             AccelerationRatio = .33,

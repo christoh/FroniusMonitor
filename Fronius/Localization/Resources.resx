@@ -1497,4 +1497,7 @@
   <data name="Fan2" xml:space="preserve">
 	  <value>Fan 2</value>
   </data>
+  <data name="Frequency" xml:space="preserve">
+	  <value>Frequency</value>
+  </data>
 </root>
