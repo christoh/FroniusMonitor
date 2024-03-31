@@ -60,6 +60,13 @@
                         <Setter Property="Margin" Value="4,0,4,1" />
                     </Style>
 
+                    <Style TargetType="c:MultiColorGauge" x:Key="LinearEnergyGaugeStyle" BasedOn="{StaticResource AcPowerLinearGaugeStyle}">
+                        <Setter Property="Minimum" Value="999999" />
+                        <Setter Property="Maximum" Value="1000000" />
+                        <Setter Property="t:LinearGauge.UnitName" Value="kWh" />
+                        <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.LowIsBad}" />
+                    </Style>
+
                     <Style TargetType="c:MultiColorGauge" x:Key="AcVoltageLinearGaugeStyle" BasedOn="{StaticResource AcPowerLinearGaugeStyle}">
                         <Setter Property="Minimum" Value="210" />
                         <Setter Property="Maximum" Value="250" />
@@ -482,7 +489,7 @@
                             </Grid.RowDefinitions>
 
                             <TextBlock Grid.Row="0" FontSize="10" Text="{Binding Sensors.DataManager.SerialNumber, FallbackValue=''}" TextAlignment="Center" />
-                            <TextBlock Grid.Row="1" FontSize="10" TextAlignment="Center" Margin="0,0,0,1" Text="{Binding Sensors.Cache.DataTime, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue={x:Null}, Mode=OneWay, StringFormat=T}"/>
+                            <TextBlock Grid.Row="1" FontSize="10" TextAlignment="Center" Margin="0,0,0,1" Text="{Binding Sensors.Cache.DataTime, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue={x:Null}, Mode=OneWay, StringFormat=T}" />
 
                             <StackPanel Grid.Row="2" VerticalAlignment="Center">
                                 <c:MultiColorGauge Label="Gen24"
@@ -501,7 +508,7 @@
                                     <Setter Property="Minimum" Value="15" />
                                     <Setter Property="Maximum" Value="80" />
                                     <Setter Property="t:LinearGauge.UnitName" Value="°C" />
-                                    <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.HighIsBad}"/>
+                                    <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.HighIsBad}" />
                                 </Style>
                             </Grid.Resources>
                             <Grid.RowDefinitions>
@@ -525,8 +532,8 @@
                                     <Setter Property="Minimum" Value="0" />
                                     <Setter Property="Maximum" Value="1" />
                                     <Setter Property="ShowPercent" Value="True" />
-                                    <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.HighIsBad}"/>
-                                    <Setter Property="t:LinearGauge.StringFormat" Value="N2"/>
+                                    <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.HighIsBad}" />
+                                    <Setter Property="t:LinearGauge.StringFormat" Value="N2" />
                                 </Style>
                             </Grid.Resources>
                             <Grid.RowDefinitions>
@@ -568,80 +575,95 @@
                                                    Maximum="{Binding Sensors.Cache.InverterUpTime.TotalDays, FallbackValue=0, Mode=OneWay}" />
                                 <c:MultiColorGauge Label="{x:Static p:Resources.BackupOpTime}"
                                                    Value="{Binding Sensors.Cache.RelativeBackupModeUpTime, FallbackValue=0, Mode=OneWay}"
-                                                   Minimum="0" Maximum="1" t:LinearGauge.StringFormat="N4" ShowPercent="True" />
+                                                   Maximum="1" t:LinearGauge.StringFormat="N4" ShowPercent="True" />
                             </StackPanel>
                         </Grid>
 
                         <Grid x:Name="EnergySolar" Visibility="Collapsed">
                             <Grid.Resources>
-                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource AcEnergyGaugeStyle}" />
+                                <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource LinearEnergyGaugeStyle}">
+                                    <Setter Property="Minimum" Value="0"/>
+                                    <Setter Property="Maximum" Value="{Binding Sensors.Cache.SolarEnergyLifeTimeSum, FallbackValue=0, Mode=OneWay, Converter={co:Multiply Factor=.001}}"/>
+                                </Style>
                             </Grid.Resources>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" FontSize="10" Margin="0,0,0,2" TextAlignment="Center">
-                                <Run Text="{x:Static p:Resources.SolarPanels}" />
-                                <Run Text="(kWh)" />
-                            </TextBlock>
+                            <TextBlock Grid.Row="0" FontSize="10" Margin="0,0,0,2" TextAlignment="Center" Text="{x:Static p:Resources.SolarPanels}" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                                <c:LinearHorizontalGauge DisplayName="{l:Channel 'MPPT1'}" Value="{Binding Sensors.Cache.Solar1EnergyLifeTime, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
-                                <c:LinearHorizontalGauge DisplayName="{l:Channel 'MPPT2'}" Value="{Binding Sensors.Cache.Solar2EnergyLifeTime, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
-                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Sum}" Value="{Binding Sensors.Cache.SolarEnergyLifeTimeSum, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
-                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Efficiency}" Value="{Binding Sensors.Cache.InverterEfficiency, FallbackValue={x:Null}}"
-                                                         Minimum="0" Maximum="1" Low=".92" VeryLow=".90" ShowPercent="True" />
+                                <c:MultiColorGauge Label="{l:Channel 'MPPT1'}"
+                                                   Value="{Binding Sensors.Cache.Solar1EnergyLifeTime, FallbackValue=0, Mode=OneWay, Converter={co:Multiply Factor=.001}}" />
+                                <c:MultiColorGauge Label="{l:Channel 'MPPT2'}"
+                                                   Value="{Binding Sensors.Cache.Solar2EnergyLifeTime, FallbackValue=0, Mode=OneWay, Converter={co:Multiply Factor=.001}}" />
+                                <c:MultiColorGauge Label="{x:Static p:Resources.Sum}"
+                                                   Value="{Binding Sensors.Cache.SolarEnergyLifeTimeSum, FallbackValue=0, Mode=OneWay, Converter={co:Multiply Factor=.001}}" />
+                                <c:MultiColorGauge Label="{x:Static p:Resources.Efficiency}" Value="{Binding Sensors.Cache.InverterEfficiency, FallbackValue=0, Mode=OneWay}"
+                                                   Minimum="0" Maximum="1" ShowPercent="True" />
                             </StackPanel>
                         </Grid>
 
                         <Grid x:Name="EnergyInverter" Visibility="Collapsed">
                             <Grid.Resources>
-                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource AcEnergyGaugeStyle}" />
+                                <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource LinearEnergyGaugeStyle}">
+                                    <Setter Property="Minimum" Value="0"/>
+                                    <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.OneThirdIsGood}"/>
+                                    <Setter Property="Maximum" Value="{Binding Sensors.Cache.InverterEnergyProducedSum, FallbackValue=0, Mode=OneWay, Converter={co:Multiply Factor=.001}}"/>
+                                </Style>
                             </Grid.Resources>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" FontSize="10" Margin="0,0,0,2" TextAlignment="Center">
-                                <Run Text="{x:Static p:Resources.Inverter}" />
-                                <Run Text="(kWh)" />
-                            </TextBlock>
+                            <TextBlock Grid.Row="0" FontSize="10" Margin="0,0,0,2" TextAlignment="Center" Text="{x:Static p:Resources.Inverter}" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                                <c:LinearHorizontalGauge DisplayName="L1" Value="{Binding Sensors.Cache.InverterEnergyProducedL1, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
-                                <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding Sensors.Cache.InverterEnergyProducedL2, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
-                                <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding Sensors.Cache.InverterEnergyProducedL3, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
-                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Sum}" Value="{Binding Sensors.Cache.InverterEnergyProducedSum, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
+                                <c:MultiColorGauge Label="L1"
+                                                   Value="{Binding Sensors.Cache.InverterEnergyProducedL1, FallbackValue=0, Mode=OneWay, Converter={co:Multiply Factor=.001}}" />
+                                <c:MultiColorGauge Label="L2"
+                                                   Value="{Binding Sensors.Cache.InverterEnergyProducedL2, FallbackValue=0, Mode=OneWay, Converter={co:Multiply Factor=.001}}" />
+                                <c:MultiColorGauge Label="L3"
+                                                   Value="{Binding Sensors.Cache.InverterEnergyProducedL3, FallbackValue=0, Mode=OneWay, Converter={co:Multiply Factor=.001}}" />
+                                <c:MultiColorGauge Label="{x:Static p:Resources.Sum}" GaugeColors="{x:Static c:MultiColorGauge.AllIsGood}"
+                                                   Value="{Binding Sensors.Cache.InverterEnergyProducedSum, FallbackValue=0, Mode=OneWay, Converter={co:Multiply Factor=.001}}" />
                             </StackPanel>
                         </Grid>
 
                         <Grid x:Name="EnergyRectifier" Visibility="Collapsed">
                             <Grid.Resources>
-                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource AcEnergyGaugeStyle}" />
+                                <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource LinearEnergyGaugeStyle}">
+                                    <Setter Property="Minimum" Value="0"/>
+                                    <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.OneThirdIsGood}"/>
+                                    <Setter Property="Maximum" Value="{Binding Sensors.Cache.InverterEnergyConsumedSum, FallbackValue=0, Mode=OneWay, Converter={co:Multiply Factor=.001}}"/>
+                                </Style>
                             </Grid.Resources>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" FontSize="10" Margin="0,0,0,2" TextAlignment="Center">
-                                <Run Text="{x:Static p:Resources.Rectifier}" />
-                                <Run Text="(kWh)" />
-                            </TextBlock>
+                            <TextBlock Grid.Row="0" FontSize="10" Margin="0,0,0,2" TextAlignment="Center" Text="{x:Static p:Resources.Rectifier}"/>
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                                <c:LinearHorizontalGauge DisplayName="L1" Value="{Binding Sensors.Cache.InverterEnergyConsumedL1, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
-                                <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding Sensors.Cache.InverterEnergyConsumedL2, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
-                                <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding Sensors.Cache.InverterEnergyConsumedL3, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
-                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Sum}" Value="{Binding Sensors.Cache.InverterEnergyConsumedSum, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
+                                <c:MultiColorGauge Label="L1"
+                                                   Value="{Binding Sensors.Cache.InverterEnergyConsumedL1, FallbackValue=0, Mode=OneWay, Converter={co:Multiply Factor=.001}}" />
+                                <c:MultiColorGauge Label="L2"
+                                                   Value="{Binding Sensors.Cache.InverterEnergyConsumedL2, FallbackValue=0, Mode=OneWay, Converter={co:Multiply Factor=.001}}" />
+                                <c:MultiColorGauge Label="L3"
+                                                   Value="{Binding Sensors.Cache.InverterEnergyConsumedL3, FallbackValue=0, Mode=OneWay, Converter={co:Multiply Factor=.001}}" />
+                                <c:MultiColorGauge Label="{x:Static p:Resources.Sum}" GaugeColors="{x:Static c:MultiColorGauge.AllIsGood}"
+                                                   Value="{Binding Sensors.Cache.InverterEnergyConsumedSum, FallbackValue=0, Mode=OneWay, Converter={co:Multiply Factor=.001}}" />
                             </StackPanel>
                         </Grid>
 
                         <Grid x:Name="EnergyStorage" Visibility="Collapsed">
                             <Grid.Resources>
-                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource AcEnergyGaugeStyle}" />
+                                <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource LinearEnergyGaugeStyle}">
+                                    <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.AllIsGood}"/>
+                                </Style>
                             </Grid.Resources>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
@@ -654,10 +676,13 @@
                             </TextBlock>
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                                <c:LinearHorizontalGauge DisplayName="In" Value="{Binding Sensors.Cache.StorageLifeTimeEnergyCharged, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
-                                <c:LinearHorizontalGauge DisplayName="Out" Value="{Binding Sensors.Cache.StorageLifeTimeEnergyDischarged, FallbackValue=0, Converter={co:Multiply Factor=.001}}" />
-                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Efficiency}" Value="{Binding Sensors.Cache.StorageEfficiency, FallbackValue={x:Null}}"
-                                                         ShowPercent="True" Minimum="0" Maximum="1" Low=".92" VeryLow=".90" />
+                                <c:MultiColorGauge Label="In" Value="{Binding Sensors.Cache.StorageLifeTimeEnergyCharged, FallbackValue=0, Mode=OneWay, Converter={co:Multiply Factor=.001}}" />
+                                <c:MultiColorGauge Label="Out"
+                                                   Value="{Binding Sensors.Cache.StorageLifeTimeEnergyDischarged, FallbackValue=0, Mode=OneWay, Converter={co:Multiply Factor=.001}}" 
+                                                   Minimum="0" Maximum="{Binding Sensors.Cache.StorageLifeTimeEnergyCharged, FallbackValue=0, Mode=OneWay, Converter={co:Multiply Factor=.001}}"
+                                                   GaugeColors="{x:Static c:MultiColorGauge.LowIsBad}"/>
+                                <c:MultiColorGauge Label="{x:Static p:Resources.Efficiency}" Value="{Binding Sensors.Cache.StorageEfficiency, FallbackValue=0, Mode=OneWay}"
+                                                   ShowPercent="True" Minimum="0" Maximum="1" GaugeColors="{x:Static c:MultiColorGauge.LowIsBad}" />
                             </StackPanel>
                         </Grid>
                     </Grid>

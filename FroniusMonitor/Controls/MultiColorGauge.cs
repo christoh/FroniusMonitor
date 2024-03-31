@@ -109,6 +109,17 @@ public class MultiColorGauge : ProgressBar
         new ColorEntry(1, Colors.Red),
     ];
 
+    public static IReadOnlyList<ColorEntry> OneThirdIsGood { get; } =
+    [
+        new ColorEntry(0, Colors.Red),
+        new ColorEntry(.2, Colors.OrangeRed),
+        new ColorEntry(.3, Colors.YellowGreen),
+        new ColorEntry(1d/3d, Colors.Green),
+        new ColorEntry(.36333333, Colors.YellowGreen),
+        new ColorEntry(.5, Colors.OrangeRed),
+        new ColorEntry(1, Colors.Red),
+    ];
+
     public static IReadOnlyList<ColorEntry> MidIsBad { get; } =
     [
         new ColorEntry(0, Colors.Green),
@@ -125,6 +136,12 @@ public class MultiColorGauge : ProgressBar
         new ColorEntry(0, Colors.Red),
         new ColorEntry(.05, Colors.OrangeRed),
         new ColorEntry(.5, Colors.YellowGreen),
+        new ColorEntry(1, Colors.Green),
+    ];
+
+    public static IReadOnlyList<ColorEntry> AllIsGood { get; } =
+    [
+        new ColorEntry(0, Colors.Green),
         new ColorEntry(1, Colors.Green),
     ];
 
