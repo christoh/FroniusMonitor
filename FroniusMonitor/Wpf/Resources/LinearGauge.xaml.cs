@@ -137,10 +137,10 @@ public partial class LinearGauge
         {
             gauge.BeginAnimation(LinearAnimatedValueProperty, null);
             SetLinearAnimatedValue(gauge, relativeValue);
-            OnAnimatedValueChanged(gauge, new DependencyPropertyChangedEventArgs(LinearAnimatedValueProperty,null,relativeValue));
+            OnAnimatedValueChanged(gauge, new DependencyPropertyChangedEventArgs(LinearAnimatedValueProperty, null, relativeValue));
             return;
         }
-        
+
         var animation = new DoubleAnimation(relativeValue, TimeSpan.FromSeconds(.2))
         {
             AccelerationRatio = .33,

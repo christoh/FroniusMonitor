@@ -1,30 +1,28 @@
 ﻿<ResourceDictionary x:Class="De.Hochstaetter.FroniusMonitor.Wpf.Resources.HalfCircleGauge"
                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
-                    xmlns:gl="clr-namespace:System.Globalization;assembly=System.Globalization"
-                    xmlns:t="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Resources">
-    
+                    xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls">
+
     <ControlTemplate x:Key="HalfCircleGauge" TargetType="c:MultiColorGauge">
         <Viewbox Initialized="OnTemplateLoaded">
             <Canvas x:Name="OuterCanvas" Width="150" Height="90">
                 <Canvas x:Name="Canvas" Width="150" Height="77" />
                 <TextBlock x:Name="MinimumTextBlock" FontSize="10" Foreground="{TemplateBinding Foreground}" FontWeight="Bold" Canvas.Bottom="0"
-                           Width="150" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Left"/>
+                           Width="150" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Left" />
                 <TextBlock x:Name="MaximumTextBlock" FontSize="10" Foreground="{TemplateBinding Foreground}" FontWeight="Bold" Canvas.Bottom="0" Canvas.Right="0"
-                           Width="150" HorizontalAlignment="Right" VerticalAlignment="Top" TextAlignment="Right"/>
+                           Width="150" HorizontalAlignment="Right" VerticalAlignment="Top" TextAlignment="Right" />
             </Canvas>
         </Viewbox>
     </ControlTemplate>
 
     <Style TargetType="c:MultiColorGauge" x:Key="DefaultHalfCircleGauge">
-        <Setter Property="HandFill" Value="DarkSlateGray"/>
-        <Setter Property="Foreground" Value="Black"/>
-        <Setter Property="TickFill" Value="DarkGray"/>
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Template" Value="{StaticResource HalfCircleGauge}"/>
+        <Setter Property="HandFill" Value="DarkSlateGray" />
+        <Setter Property="Foreground" Value="Black" />
+        <Setter Property="TickFill" Value="DarkGray" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Template" Value="{StaticResource HalfCircleGauge}" />
     </Style>
 
-    <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource DefaultHalfCircleGauge}"/>
-    
+    <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource DefaultHalfCircleGauge}" />
+
 </ResourceDictionary>

@@ -564,14 +564,6 @@
                 </Setter>
             </Style>
 
-            <Style TargetType="c:LinearHorizontalGauge" x:Key="InverterControlGaugeStyle">
-                <Setter Property="FontSize" Value="12" />
-                <Setter Property="FontFamily" Value="Calibri" />
-                <Setter Property="FontWeight" Value="Medium" />
-                <Setter Property="ProgressBarHeight" Value="14" />
-                <Setter Property="Margin" Value="3,1" />
-            </Style>
-
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/FroniusMonitor;component/Wpf/Resources/HalfCircleGauge.xaml" />
                 <ResourceDictionary Source="/FroniusMonitor;component/Wpf/Resources/LinearGauge.xaml" />

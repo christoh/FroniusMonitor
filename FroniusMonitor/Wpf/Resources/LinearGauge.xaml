@@ -8,34 +8,34 @@
         <Viewbox Initialized="OnRootElementInitialized">
             <Grid Width="100" x:Name="Grid">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <Grid.Resources>
                     <Style TargetType="TextBlock">
-                        <Setter Property="HorizontalAlignment" Value="Right"/>
+                        <Setter Property="HorizontalAlignment" Value="Right" />
                         <!-- ReSharper disable once MarkupAttributeTypo -->
-                        <Setter Property="FontFamily" Value="Segoe UI"/>
-                        <Setter Property="FontSize" Value="9"/>
-                        <Setter Property="FontWeight" Value="Normal"/>
+                        <Setter Property="FontFamily" Value="Segoe UI" />
+                        <Setter Property="FontSize" Value="9" />
+                        <Setter Property="FontWeight" Value="Normal" />
                     </Style>
                 </Grid.Resources>
 
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="{TemplateBinding Label}" HorizontalAlignment="Left"/>
-                <TextBlock Grid.Row="0" Grid.Column="1" x:Name="ValueTextBlock"/>
-                <TextBlock Grid.Row="0" Grid.Column="2" Margin="2,0,1,0" Text="{Binding Path=(t:LinearGauge.DisplayUnitName), RelativeSource={RelativeSource TemplatedParent}, Mode=OneWay}" Foreground="Blue"/>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="{TemplateBinding Label}" HorizontalAlignment="Left" />
+                <TextBlock Grid.Row="0" Grid.Column="1" x:Name="ValueTextBlock" />
+                <TextBlock Grid.Row="0" Grid.Column="2" Margin="2,0,1,0" Text="{Binding Path=(t:LinearGauge.DisplayUnitName), RelativeSource={RelativeSource TemplatedParent}, Mode=OneWay}" Foreground="Blue" />
                 <Border x:Name="OuterBorder" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" Background="{TemplateBinding TickFill}" CornerRadius="0">
                     <Canvas Width="100" Height="6">
-                        <Border Canvas.Left="0" Canvas.Top="0" x:Name="InnerBorder" HorizontalAlignment="Left" Height="6" Width="0" Background="Green" CornerRadius="{Binding CornerRadius, ElementName=OuterBorder}"/>
-                        <Rectangle Canvas.Left="0" Canvas.Top="0" x:Name="MidpointMarker" Height="6" Width="1" Fill="Black" StrokeThickness="0" HorizontalAlignment="Left"/>
+                        <Border Canvas.Left="0" Canvas.Top="0" x:Name="InnerBorder" HorizontalAlignment="Left" Height="6" Width="0" Background="Green" CornerRadius="{Binding CornerRadius, ElementName=OuterBorder}" />
+                        <Rectangle Canvas.Left="0" Canvas.Top="0" x:Name="MidpointMarker" Height="6" Width="1" Fill="Black" StrokeThickness="0" HorizontalAlignment="Left" />
                     </Canvas>
                 </Border>
             </Grid>
@@ -43,11 +43,11 @@
     </ControlTemplate>
 
     <Style x:Key="DefaultLinearGauge" TargetType="c:MultiColorGauge">
-        <Setter Property="Foreground" Value="Black"/>
-        <Setter Property="TickFill" Value="DarkGray"/>
-        <Setter Property="t:LinearGauge.StringFormat" Value="N1"/>
-        <Setter Property="Template" Value="{StaticResource LinearGauge}"/>
-        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="Foreground" Value="Black" />
+        <Setter Property="TickFill" Value="DarkGray" />
+        <Setter Property="t:LinearGauge.StringFormat" Value="N1" />
+        <Setter Property="Template" Value="{StaticResource LinearGauge}" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
     </Style>
 
 </ResourceDictionary>

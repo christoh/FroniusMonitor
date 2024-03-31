@@ -361,7 +361,7 @@
 
                             <TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{Binding SmartMeter.SerialNumber, FallbackValue='---'}" />
                             <TextBlock Grid.Row="1" FontSize="10" TextAlignment="Center"
-                                       Text="{Binding SmartMeter.DataTime, FallbackValue='', StringFormat=T, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" />
+                                       Text="{Binding SmartMeter.DataTime, FallbackValue='', Converter={co:DateConverter}}" />
 
                             <StackPanel Grid.Row="2" VerticalAlignment="Center">
                                 <c:MultiColorGauge Label="{x:Static p:Resources.Frequency}"
@@ -372,8 +372,8 @@
                                                    t:LinearGauge.UnitName="Hz" />
                                 <c:MultiColorGauge Label="{x:Static p:Resources.Latency}" Origin="0"
                                                    Value="{Binding SmartMeter.Latency.TotalMilliseconds, FallbackValue=999999, Mode=OneWay}"
-                                                   t:LinearGauge.StringFormat="N0" Minimum="0" Maximum="2000" t:LinearGauge.UnitName="ms" 
-                                                   GaugeColors="{x:Static c:MultiColorGauge.HighIsBad}"/>
+                                                   t:LinearGauge.StringFormat="N0" Minimum="0" Maximum="2000" t:LinearGauge.UnitName="ms"
+                                                   GaugeColors="{x:Static c:MultiColorGauge.HighIsBad}" />
                             </StackPanel>
                         </Grid>
                     </Grid>

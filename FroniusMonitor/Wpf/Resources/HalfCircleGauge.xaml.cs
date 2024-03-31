@@ -103,7 +103,7 @@ public partial class HalfCircleGauge
             return;
         }
 
-        bool needsChange = false;
+        var needsChange = false;
 
         if (minimumTextBlock != null && !metaData.OldMinimum.Equals(gauge.Minimum))
         {
