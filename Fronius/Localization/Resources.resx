@@ -1491,4 +1491,10 @@
   <data name="GridHealth" xml:space="preserve">
 	  <value>Grid Health</value>
   </data>
+  <data name="Fan1" xml:space="preserve">
+	  <value>Fan 1</value>
+  </data>
+  <data name="Fan2" xml:space="preserve">
+	  <value>Fan 2</value>
+  </data>
 </root>

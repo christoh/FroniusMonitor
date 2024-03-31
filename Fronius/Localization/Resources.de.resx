@@ -358,7 +358,7 @@
 	  <value>Temperaturen</value>
   </data>
   <data name="Fans" xml:space="preserve">
-	  <value>Ventilatoren</value>
+	  <value>Lüfter</value>
   </data>
   <data name="Misc" xml:space="preserve">
 	  <value>Sonstiges</value>
@@ -1436,5 +1436,11 @@
   </data>
   <data name="GridHealth" xml:space="preserve">
 	  <value>Netzgesundheit</value>
+  </data>
+  <data name="Fan1" xml:space="preserve">
+	  <value>Lüfter 1</value>
+  </data>
+  <data name="Fan2" xml:space="preserve">
+	  <value>Lüfter 2</value>
   </data>
 </root>
