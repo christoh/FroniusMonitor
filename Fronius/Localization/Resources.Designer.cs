@@ -979,6 +979,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to In.
+        /// </summary>
+        public static string Charged {
+            get {
+                return ResourceManager.GetString("Charged", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Allow charge battery from other producers in your home.
         /// </summary>
         public static string ChargeFromAc {
@@ -1281,6 +1290,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string DisableProtectiveEarth {
             get {
                 return ResourceManager.GetString("DisableProtectiveEarth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Out.
+        /// </summary>
+        public static string Discharged {
+            get {
+                return ResourceManager.GetString("Discharged", resourceCulture);
             }
         }
         

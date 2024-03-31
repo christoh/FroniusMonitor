@@ -356,7 +356,7 @@
                                                    Value="{Binding Sensors.Cache.Solar2Power, FallbackValue=0, Mode=OneWay}"
                                                    Maximum="{Binding Config.InverterSettings.Mppt.Mppt2.WattPeak, FallbackValue=5000, Mode=OneWay}" />
 
-                                <c:MultiColorGauge x:Name="DcPowerAggregateGauge" ShowPercent="False" />
+                                <c:MultiColorGauge x:Name="DcPowerAggregateGauge" />
 
                                 <c:MultiColorGauge Label="{x:Static p:Resources.Battery}" t:LinearGauge.UseAbsoluteValue="True"
                                                    ShowPercent="{Binding ShowPercent, ElementName=DcPowerFirstGauge}"
@@ -364,8 +364,7 @@
                                                    Visibility="{Binding Sensors.Storage, FallbackValue=Collapsed, Converter={co:NullToVisibility Null=Hidden}}"
                                                    Maximum="{Binding Sensors.Storage.VoltageOuter, FallbackValue=8184, Converter={co:Multiply Factor=22}}"
                                                    Minimum="{Binding Sensors.Storage.VoltageOuter, FallbackValue=-8184, Converter={co:Multiply Factor=-22}}"
-                                                   GaugeColors="{x:Static c:MultiColorGauge.MidIsGood}"
-                                                   Origin="0.5" />
+                                                   GaugeColors="{x:Static c:MultiColorGauge.MidIsGood}" Origin="0.5" />
                             </StackPanel>
                         </Grid>
 
@@ -693,8 +692,9 @@
                             <TextBlock Grid.Row="0" FontSize="10" Margin="0,0,0,1" TextAlignment="Center" Text="{x:Static p:Resources.Battery}" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                                <c:MultiColorGauge Label="In" Value="{Binding Sensors.Cache.StorageLifeTimeEnergyCharged, FallbackValue=0, Mode=OneWay, Converter={co:Multiply Factor=.001}}" />
-                                <c:MultiColorGauge Label="Out"
+                                <c:MultiColorGauge Label="{x:Static p:Resources.Charged}"
+                                                   Value="{Binding Sensors.Cache.StorageLifeTimeEnergyCharged, FallbackValue=0, Mode=OneWay, Converter={co:Multiply Factor=.001}}" />
+                                <c:MultiColorGauge Label="{x:Static p:Resources.Discharged}"
                                                    Value="{Binding Sensors.Cache.StorageLifeTimeEnergyDischarged, FallbackValue=0, Mode=OneWay, Converter={co:Multiply Factor=.001}}"
                                                    Minimum="0" Maximum="{Binding Sensors.Cache.StorageLifeTimeEnergyCharged, FallbackValue=0, Mode=OneWay, Converter={co:Multiply Factor=.001}}"
                                                    GaugeColors="{x:Static c:MultiColorGauge.LowIsBad}" />

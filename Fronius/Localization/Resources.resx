@@ -1500,4 +1500,10 @@
   <data name="Frequency" xml:space="preserve">
 	  <value>Frequency</value>
   </data>
+  <data name="Charged" xml:space="preserve">
+	  <value>In</value>
+  </data>
+  <data name="Discharged" xml:space="preserve">
+	  <value>Out</value>
+  </data>
 </root>
