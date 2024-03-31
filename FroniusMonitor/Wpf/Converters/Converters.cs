@@ -927,7 +927,7 @@ public class StrictestLimitConverter : ConverterBase
     }
 }
 
-public class AcPowerMinimum:MultiConverterBase
+public class AcPowerMinimum : MultiConverterBase
 {
     public override object? Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
     {
@@ -937,5 +937,45 @@ public class AcPowerMinimum:MultiConverterBase
         }
 
         return -maxAcPower.ToDouble(culture);
+    }
+}
+
+public class LifeTimeEnergyToGaugeColors : MultiConverterBase
+{
+    public override object Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
+    {
+        var result = new List<MultiColorGauge.ColorEntry>([new MultiColorGauge.ColorEntry(0, Colors.Red), new MultiColorGauge.ColorEntry(1, Colors.Red)]);
+
+        if (values.Length > 1 && values[0] is IConvertible wattPeakCurrentTracker && values[1] is IConvertible wattPeakTotal)
+        {
+            var optimumRelativeEnergy = wattPeakCurrentTracker.ToDouble(culture) / wattPeakTotal.ToDouble(culture);
+
+            if (optimumRelativeEnergy is > 0 and < 1)
+            {
+                if (optimumRelativeEnergy - .2 > 0)
+                {
+                    result.Insert(result.Count - 1, new MultiColorGauge.ColorEntry(optimumRelativeEnergy - .2, Colors.OrangeRed));
+                }
+
+                if (optimumRelativeEnergy - .1 > 0)
+                {
+                    result.Insert(result.Count - 1, new MultiColorGauge.ColorEntry(optimumRelativeEnergy - .1, Colors.YellowGreen));
+                }
+
+                result.Insert(result.Count - 1, new MultiColorGauge.ColorEntry(optimumRelativeEnergy, Colors.Green));
+
+                if (optimumRelativeEnergy + .1 < 1)
+                {
+                    result.Insert(result.Count - 1, new MultiColorGauge.ColorEntry(optimumRelativeEnergy + .1, Colors.YellowGreen));
+                }
+
+                if (optimumRelativeEnergy + .2 < 1)
+                {
+                    result.Insert(result.Count - 1, new MultiColorGauge.ColorEntry(optimumRelativeEnergy + .2, Colors.OrangeRed));
+                }
+            }
+        }
+
+        return result;
     }
 }
