@@ -59,7 +59,6 @@ public partial class LinearGauge
         element.SetValue(UnitNameProperty, value ?? string.Empty);
     }
 
-
     public static readonly DependencyProperty StringFormatProperty = DependencyProperty.RegisterAttached
     (
         nameof(GetStringFormat)[3..], typeof(string), typeof(LinearGauge),
@@ -74,6 +73,22 @@ public partial class LinearGauge
     public static void SetStringFormat(DependencyObject element, string? value)
     {
         element.SetValue(StringFormatProperty, value ?? string.Empty);
+    }
+
+    public static readonly DependencyProperty UseAbsoluteValueProperty = DependencyProperty.RegisterAttached
+    (
+        nameof(GetUseAbsoluteValue)[3..], typeof(bool), typeof(LinearGauge),
+        new FrameworkPropertyMetadata(false, OnUseAbsoluteValueChanged)
+    );
+
+    public static bool GetUseAbsoluteValue(DependencyObject element)
+    {
+        return (bool)element.GetValue(UseAbsoluteValueProperty);
+    }
+
+    public static void SetUseAbsoluteValue(DependencyObject element, bool value)
+    {
+        element.SetValue(UseAbsoluteValueProperty, value);
     }
 
     #endregion
@@ -108,7 +123,13 @@ public partial class LinearGauge
     private static void OnValueChanged(MultiColorGauge gauge, TextBlock valueTextBlock)
     {
         var relativeValue = (Math.Max(Math.Min(gauge.Maximum, gauge.Value), gauge.Minimum) - gauge.Minimum) / (gauge.Maximum - gauge.Minimum);
-        var value = gauge.ShowPercent ? relativeValue * 100 : gauge.Value;
+
+        if (!double.IsFinite(relativeValue))
+        {
+            relativeValue = 0;
+        }
+
+        var value = gauge.ShowPercent ? GetUseAbsoluteValue(gauge) ? (relativeValue - gauge.Origin) * 100 / gauge.Origin : relativeValue * 100 : gauge.Value; //BUG: Only works if Origin is at 0
         valueTextBlock.Text = value.ToString(GetStringFormat(gauge), CultureInfo.CurrentCulture);
         SetDisplayUnitName(gauge, gauge.ShowPercent ? "%" : GetUnitName(gauge));
 
@@ -119,6 +140,16 @@ public partial class LinearGauge
         };
 
         gauge.BeginAnimation(LinearAnimatedValueProperty, animation);
+    }
+
+    private static void OnUseAbsoluteValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var gauge = (MultiColorGauge)d;
+
+        if (gauge.FindName("ValueTextBlock") is TextBlock textBlock)
+        {
+            OnValueChanged(gauge, textBlock);
+        }
     }
 
     private static void OnUnitNameChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

@@ -358,12 +358,12 @@
 
                                 <c:MultiColorGauge x:Name="DcPowerAggregateGauge" ShowPercent="False" />
 
-                                <c:MultiColorGauge Label="{x:Static p:Resources.Battery}"
+                                <c:MultiColorGauge Label="{x:Static p:Resources.Battery}" t:LinearGauge.UseAbsoluteValue="True"
                                                    ShowPercent="{Binding ShowPercent, ElementName=DcPowerFirstGauge}"
-                                                   Value="{Binding Sensors.Cache.StoragePower, FallbackValue=0, Mode=OneWay}"
+                                                   Value="{Binding Sensors.Cache.StoragePower, FallbackValue=0, TargetNullValue=0, Mode=OneWay}"
                                                    Visibility="{Binding Sensors.Storage, FallbackValue=Collapsed, Converter={co:NullToVisibility Null=Hidden}}"
                                                    Maximum="{Binding Sensors.Storage.VoltageOuter, FallbackValue=8184, Converter={co:Multiply Factor=22}}"
-                                                   Minimum="{Binding Sensors.Storage.VoltageOuter, FallbackValue=8184, Converter={co:Multiply Factor=-22}}"
+                                                   Minimum="{Binding Sensors.Storage.VoltageOuter, FallbackValue=-8184, Converter={co:Multiply Factor=-22}}"
                                                    GaugeColors="{x:Static c:MultiColorGauge.MidIsGood}"
                                                    Origin="0.5"
                                                    />
@@ -395,10 +395,10 @@
                         <Grid x:Name="DcVoltage" Visibility="Collapsed">
                             <Grid.Resources>
                                 <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource AcPowerLinearGaugeStyle}">
-                                    <Setter Property="Minimum" Value="0" />
+                                    <Setter Property="Minimum" Value="80" />
                                     <Setter Property="Maximum" Value="800" />
                                     <Setter Property="t:LinearGauge.UnitName" Value="V" />
-                                    <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.HighIsBad}" />
+                                    <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.ExtremeIsBad}" />
                                 </Style>
                             </Grid.Resources>
                             <Grid.RowDefinitions>
@@ -412,9 +412,11 @@
                                 <c:MultiColorGauge Label="{l:Channel 'MPPT1'}" Value="{Binding Sensors.Cache.Solar1Voltage, FallbackValue=0, Mode=OneWay}" />
                                 <c:MultiColorGauge Label="{l:Channel 'MPPT2'}" Value="{Binding Sensors.Cache.Solar2Voltage, FallbackValue=0, Mode=OneWay}" />
                                 <c:MultiColorGauge Label="{x:Static p:Resources.DcLink}" Value="{Binding Sensors.Cache.DcLinkVoltage, FallbackValue=0, Mode=OneWay}"
-                                                   Minimum="550" Maximum="800" />
+                                                   Minimum="550" Maximum="800" GaugeColors="{x:Static c:MultiColorGauge.ExtremeIsBad}" />
                                 <c:MultiColorGauge Label="{x:Static p:Resources.Battery}" Value="{Binding Sensors.Cache.StorageVoltageOuter, FallbackValue=0, Mode=OneWay}"
-                                                   Minimum="278" Maximum="410" />
+                                                   Minimum="{Binding Sensors.Storage.MinVoltage, Mode=OneWay, FallbackValue=280}"
+                                                   Maximum="{Binding Sensors.Storage.MaxVoltage, Mode=OneWay, FallbackValue=320}"
+                                                   GaugeColors="{x:Static c:MultiColorGauge.MidIsGood}" />
                             </StackPanel>
                         </Grid>
 
@@ -441,7 +443,7 @@
                                                    Maximum="12.5" />
                                 <c:MultiColorGauge Label="{x:Static p:Resources.Sum}" Value="{Binding Sensors.Cache.SolarCurrentSum, FallbackValue=0, Mode=OneWay}"
                                                    Maximum="37.5" />
-                                <c:MultiColorGauge Label="{x:Static p:Resources.Battery}" Value="{Binding Sensors.Cache.StorageCurrent, FallbackValue=0, Mode=OneWay}"
+                                <c:MultiColorGauge Label="{x:Static p:Resources.Battery}" Value="{Binding Sensors.Cache.StorageCurrent, TargetNullValue=0, FallbackValue=0, Mode=OneWay}"
                                                    Maximum="22" Visibility="{Binding Sensors.Storage, FallbackValue=Collapsed, Converter={co:NullToVisibility Null=Hidden}}" />
                             </StackPanel>
                         </Grid>
