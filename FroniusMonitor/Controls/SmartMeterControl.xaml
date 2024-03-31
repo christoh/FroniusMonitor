@@ -20,12 +20,13 @@
                 </Grid.RowDefinitions>
 
                 <Grid.Resources>
-                    <Style TargetType="c:LinearHorizontalGauge" x:Key="PowerGaugeStyle" BasedOn="{StaticResource InverterControlGaugeStyle}">
-                        <Setter Property="StringFormat" Value="N0" />
-                        <Setter Property="Maximum" Value="8050" />
-                        <Setter Property="High" Value="6000" />
-                        <Setter Property="UnitSymbol" Value="VA" />
-                        <Setter Property="VeryHigh" Value="7000" />
+                    <Style TargetType="c:MultiColorGauge" x:Key="PowerLinearGaugeStyle" BasedOn="{StaticResource DefaultLinearGauge}">
+                        <Setter Property="Minimum" Value="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter IsMinimum=True, IsOnePhase=True}, FallbackValue=-8050, Mode=OneWay}" />
+                        <Setter Property="Maximum" Value="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter IsOnePhase=True}, FallbackValue=8050, Mode=OneWay}" />
+                        <Setter Property="t:LinearGauge.UnitName" Value="W" />
+                        <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.MidIsGood}"/>
+                        <Setter Property="Origin" Value=".5"/>
+                        <Setter Property="Margin" Value="4,0,4,2"></Setter>
                     </Style>
                 </Grid.Resources>
 
@@ -54,14 +55,13 @@
                                                Minimum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter IsMinimum=True}, FallbackValue=-24150}"
                                                Maximum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter IsMinimum=False}, FallbackValue=24150}"
                                                GaugeColors="{x:Static c:MultiColorGauge.MidIsGood}"
-                                               Origin="0.5"
+                                               Origin=".5"
                                                Width="92" Grid.Row="2" />
                         </Grid>
 
                         <Grid x:Name="PowerActive" Visibility="Collapsed">
                             <Grid.Resources>
-                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource PowerGaugeStyle}">
-                                    <Setter Property="UnitSymbol" Value="W" />
+                                <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource PowerLinearGaugeStyle}">
                                 </Style>
                             </Grid.Resources>
                             <Grid.RowDefinitions>
@@ -69,63 +69,73 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" FontSize="10" Margin="0,0,0,2" TextAlignment="Center" Text="{x:Static p:Resources.ActivePower}" />
+                            <TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{x:Static p:Resources.ActivePower}" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                                <c:LinearHorizontalGauge DisplayName="L1" Value="{Binding SmartMeter.ActivePowerL1, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding SmartMeter.ActivePowerL2, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding SmartMeter.ActivePowerL3, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Sum}" Value="{Binding SmartMeter.ActivePowerSum, FallbackValue={x:Null}}"
-                                                         Maximum="24150" High="18000" VeryHigh="21000" />
+                                <c:MultiColorGauge Label="L1" Value="{Binding SmartMeter.ActivePowerL1, FallbackValue=0, Mode=OneWay}" />
+                                <c:MultiColorGauge Label="L2" Value="{Binding SmartMeter.ActivePowerL2, FallbackValue=0, Mode=OneWay}" />
+                                <c:MultiColorGauge Label="L3" Value="{Binding SmartMeter.ActivePowerL3, FallbackValue=0, Mode=OneWay}" />
+                                <c:MultiColorGauge Label="{x:Static p:Resources.Sum}" Value="{Binding SmartMeter.ActivePowerSum, FallbackValue=0, Mode=OneWay}"
+                                                   Minimum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter IsMinimum=True}, FallbackValue=-24150, Mode=OneWay}"
+                                                   Maximum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter}, FallbackValue=-24150, Mode=OneWay}"/>
                             </StackPanel>
                         </Grid>
 
                         <Grid x:Name="PowerApparent" Visibility="Collapsed">
                             <Grid.Resources>
-                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource PowerGaugeStyle}" />
+                                <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource PowerLinearGaugeStyle}">
+                                    <Setter Property="t:LinearGauge.UnitName" Value="VA"/>
+                                    <Setter Property="Minimum" Value="0"/>
+                                    <Setter Property="Origin" Value="0"/>
+                                    <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.HighIsBad}"/>
+                                </Style>
                             </Grid.Resources>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" FontSize="10" Margin="0,0,0,2" TextAlignment="Center" Text="{x:Static p:Resources.ApparentPower}" />
+                            <TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{x:Static p:Resources.ApparentPower}" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                                <c:LinearHorizontalGauge DisplayName="L1" Value="{Binding SmartMeter.ApparentPowerL1, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding SmartMeter.ApparentPowerL2, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding SmartMeter.ApparentPowerL3, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Sum}" Value="{Binding SmartMeter.ApparentPowerSum, FallbackValue={x:Null}}"
-                                                         Maximum="24150" High="18000" VeryHigh="21000" />
+                                <c:MultiColorGauge Label="L1" Value="{Binding SmartMeter.ApparentPowerL1, FallbackValue=0, Mode=OneWay}" />
+                                <c:MultiColorGauge Label="L2" Value="{Binding SmartMeter.ApparentPowerL2, FallbackValue=0, Mode=OneWay}" />
+                                <c:MultiColorGauge Label="L3" Value="{Binding SmartMeter.ApparentPowerL3, FallbackValue=0, Mode=OneWay}" />
+                                <c:MultiColorGauge Label="{x:Static p:Resources.Sum}" Value="{Binding SmartMeter.ApparentPowerSum, FallbackValue=0, Mode=OneWay}"
+                                                   Maximum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter}, FallbackValue=-24150, Mode=OneWay}"/>
                             </StackPanel>
                         </Grid>
 
                         <Grid x:Name="PowerReactive" Visibility="Collapsed">
                             <Grid.Resources>
-                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource PowerGaugeStyle}" />
+                                <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource PowerLinearGaugeStyle}">
+                                    <Setter Property="t:LinearGauge.UnitName" Value="VA(r)"/>
+                                </Style>
                             </Grid.Resources>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" FontSize="10" Margin="0,0,0,2" TextAlignment="Center" Text="{x:Static p:Resources.ReactivePower}" />
+                            <TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{x:Static p:Resources.ReactivePower}" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                                <c:LinearHorizontalGauge DisplayName="L1" Value="{Binding SmartMeter.ReactivePowerL1, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding SmartMeter.ReactivePowerL2, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding SmartMeter.ReactivePowerL3, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Sum}" Value="{Binding SmartMeter.ReactivePowerSum, FallbackValue={x:Null}}"
-                                                         Maximum="24150" High="18000" VeryHigh="21000" />
+                                <c:MultiColorGauge Label="L1" Value="{Binding SmartMeter.ReactivePowerL1, FallbackValue=0, Mode=OneWay}" />
+                                <c:MultiColorGauge Label="L2" Value="{Binding SmartMeter.ReactivePowerL2, FallbackValue=0, Mode=OneWay}" />
+                                <c:MultiColorGauge Label="L3" Value="{Binding SmartMeter.ReactivePowerL3, FallbackValue=0, Mode=OneWay}" />
+                                <c:MultiColorGauge Label="{x:Static p:Resources.Sum}" Value="{Binding SmartMeter.ReactivePowerSum, FallbackValue=0, Mode=OneWay}"
+                                                   Minimum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter IsMinimum=True}, FallbackValue=-24150, Mode=OneWay}"
+                                                   Maximum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter}, FallbackValue=-24150, Mode=OneWay}"/>
                             </StackPanel>
                         </Grid>
 
                         <Grid x:Name="PowerOutOfBalance" Visibility="Collapsed">
                             <Grid.Resources>
-                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource PowerGaugeStyle}">
-                                    <Setter Property="UnitSymbol" Value="W" />
-                                    <Setter Property="High" Value="2990" />
-                                    <Setter Property="VeryHigh" Value="3680" />
+                                <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource PowerLinearGaugeStyle}">
+                                    <Setter Property="Maximum" Value="3680" />
+                                    <Setter Property="Minimum" Value="0" />
+                                    <Setter Property="Origin" Value="0"/>
+                                    <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.HighIsBad}"/>
                                 </Style>
                             </Grid.Resources>
                             <Grid.RowDefinitions>
@@ -133,23 +143,24 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" FontSize="10" Margin="0,0,0,2" TextAlignment="Center" Text="{x:Static p:Resources.OutOfBalance}" />
+                            <TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{x:Static p:Resources.OutOfBalance}" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                                <c:LinearHorizontalGauge DisplayName="L12" Value="{Binding SmartMeter.OutOfBalancePowerL12, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="L23" Value="{Binding SmartMeter.OutOfBalancePowerL23, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="L31" Value="{Binding SmartMeter.OutOfBalancePowerL31, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="Max." Value="{Binding SmartMeter.OutOfBalancePowerMax, FallbackValue={x:Null}}" />
+                                <c:MultiColorGauge Label="L12" Value="{Binding SmartMeter.OutOfBalancePowerL12, FallbackValue=0, Mode=OneWay}" />
+                                <c:MultiColorGauge Label="L23" Value="{Binding SmartMeter.OutOfBalancePowerL23, FallbackValue=0, Mode=OneWay}" />
+                                <c:MultiColorGauge Label="L31" Value="{Binding SmartMeter.OutOfBalancePowerL31, FallbackValue=0, Mode=OneWay}" />
+                                <c:MultiColorGauge Label="Maximum" Value="{Binding SmartMeter.OutOfBalancePowerMax, FallbackValue=0, Mode=OneWay}" />
                             </StackPanel>
                         </Grid>
 
                         <Grid x:Name="PowerFactor" Visibility="Collapsed">
                             <Grid.Resources>
-                                <Style TargetType="c:LinearHorizontalGauge" BasedOn="{StaticResource InverterControlGaugeStyle}">
+                                <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource PowerLinearGaugeStyle}">
                                     <Setter Property="Maximum" Value="1" />
-                                    <Setter Property="Low" Value=".5" />
-                                    <Setter Property="VeryLow" Value=".2" />
-                                    <Setter Property="StringFormat" Value="N3" />
+                                    <Setter Property="Minimum" Value="-1" />
+                                    <Setter Property="t:LinearGauge.UnitName" Value="" />
+                                    <Setter Property="t:LinearGauge.StringFormat" Value="N3" />
+                                    <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.MidIsBad}"/>
                                 </Style>
                             </Grid.Resources>
                             <Grid.RowDefinitions>
@@ -157,13 +168,13 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" FontSize="10" Margin="0,0,0,2" TextAlignment="Center" Text="cos(φ)" />
+                            <TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="cos(φ)" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                                <c:LinearHorizontalGauge DisplayName="L1" Value="{Binding SmartMeter.PowerFactorL1, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="L2" Value="{Binding SmartMeter.PowerFactorL2, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="L3" Value="{Binding SmartMeter.PowerFactorL3, FallbackValue={x:Null}}" />
-                                <c:LinearHorizontalGauge DisplayName="{x:Static p:Resources.Total}" Value="{Binding SmartMeter.PowerFactorTotal, FallbackValue={x:Null}}" />
+                                <c:MultiColorGauge Label="L1" Value="{Binding SmartMeter.PowerFactorL1, FallbackValue=0, Mode=OneWay}" />
+                                <c:MultiColorGauge Label="L2" Value="{Binding SmartMeter.PowerFactorL2, FallbackValue=0, Mode=OneWay}" />
+                                <c:MultiColorGauge Label="L3" Value="{Binding SmartMeter.PowerFactorL3, FallbackValue=0, Mode=OneWay}" />
+                                <c:MultiColorGauge Label="{x:Static p:Resources.Total}" Value="{Binding SmartMeter.PowerFactorTotal, FallbackValue=0, Mode=OneWay}" />
                             </StackPanel>
                         </Grid>
 

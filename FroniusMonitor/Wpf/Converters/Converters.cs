@@ -905,6 +905,7 @@ public class Multiply : ConverterBase
 public class StrictestLimitConverter : ConverterBase
 {
     public bool IsMinimum { get; set; }
+    public bool IsOnePhase { get; set; }
 
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
@@ -914,16 +915,16 @@ public class StrictestLimitConverter : ConverterBase
         {
             if (activePower.HardLimit.IsEnabled)
             {
-                result = activePower.HardLimit.PowerLimit * (activePower.PowerLimitMode == PowerLimitMode.WeakestPhase ? 3 : 1);
+                result = activePower.HardLimit.PowerLimit * (activePower.PowerLimitMode == PowerLimitMode.WeakestPhase ? 3d : 1d) / (IsOnePhase ? 3d : 1d);
             }
 
             if (activePower.SoftLimit.IsEnabled)
             {
-                result = activePower.SoftLimit.PowerLimit * (activePower.PowerLimitMode == PowerLimitMode.WeakestPhase ? 3 : 1);
+                result = activePower.SoftLimit.PowerLimit * (activePower.PowerLimitMode == PowerLimitMode.WeakestPhase ? 3d : 1d) / (IsOnePhase ? 3d : 1d);
             }
         }
 
-        return result * (IsMinimum ? -1 : 1);
+        return Math.Min(result, IsOnePhase ? 8050 : 24150) * (IsMinimum ? -1 : 1);
     }
 }
 
