@@ -7,8 +7,8 @@
              xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
              xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
-             xmlns:gl="clr-namespace:System.Globalization;assembly=System.Runtime"
              xmlns:t="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Resources"
+             xmlns:m="clr-namespace:De.Hochstaetter.FroniusMonitor.Models"
              mc:Ignorable="d"
              d:DesignHeight="127" d:DesignWidth="110">
     <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:WattPilotControl}}">
@@ -78,10 +78,10 @@
                             <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.PhaseVoltage}" TextAlignment="Center" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                                <c:MultiColorGauge Label="L1" Value="{Binding VoltageL1, FallbackValue=0, Mode=OneWay}" />
-                                <c:MultiColorGauge Label="L2" Value="{Binding VoltageL2, FallbackValue=0, Mode=OneWay}" />
-                                <c:MultiColorGauge Label="L3" Value="{Binding VoltageL3, FallbackValue=0, Mode=OneWay}" />
-                                <c:MultiColorGauge Label="{x:Static p:Resources.AverageShort}" Value="{Binding VoltageAverage, FallbackValue=0, Mode=OneWay}"
+                                <c:MultiColorGauge Label="L1" Value="{m:GaugeBinding VoltageL1}" />
+                                <c:MultiColorGauge Label="L2" Value="{m:GaugeBinding VoltageL2}" />
+                                <c:MultiColorGauge Label="L3" Value="{m:GaugeBinding VoltageL3}" />
+                                <c:MultiColorGauge Label="{x:Static p:Resources.AverageShort}" Value="{m:GaugeBinding VoltageAverage}"
                                                    StringFormat="N1" />
                             </StackPanel>
                         </Grid>
@@ -100,16 +100,16 @@
 
                                 <!-- ReSharper disable Xaml.RedundantAttachedProperty -->
                                 <c:MultiColorGauge Grid.Row="0" Grid.Column="0" Margin="1"
-                                                   Value="{Binding VoltageL1, FallbackValue=0, TargetNullValue=0}" />
+                                                   Value="{m:GaugeBinding VoltageL1}" />
 
                                 <c:MultiColorGauge Grid.Row="0" Grid.Column="1" Margin="1"
-                                                   Value="{Binding VoltageL2, FallbackValue=0, TargetNullValue=0}" />
+                                                   Value="{m:GaugeBinding VoltageL2}" />
 
                                 <c:MultiColorGauge Grid.Row="1" Grid.Column="0" Margin="1"
-                                                   Value="{Binding VoltageL3, FallbackValue=0, TargetNullValue=0}" />
+                                                   Value="{m:GaugeBinding VoltageL3}" />
 
                                 <c:MultiColorGauge Grid.Row="1" Grid.Column="1" Margin="1" Minimum="49" Maximum="51"
-                                                   Value="{Binding Frequency, FallbackValue=0, TargetNullValue=0}"
+                                                   Value="{m:GaugeBinding Frequency}"
                                                    t:HalfCircleGauge.MinimumMaximumStringFormat="N1" />
                                 <!-- ReSharper restore Xaml.RedundantAttachedProperty -->
                             </UniformGrid>
@@ -118,7 +118,7 @@
                         <Grid x:Name="Current" Visibility="Collapsed">
                             <Grid.Resources>
                                 <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource WattPilotLinearGauge}">
-                                    <Setter Property="Maximum" Value="{Binding MaximumChargingCurrentPossible, TargetNullValue=0, FallbackValue=0, Mode=OneWay}" />
+                                    <Setter Property="Maximum" Value="{m:GaugeBinding MaximumChargingCurrentPossible}" />
                                     <Setter Property="UnitName" Value="A" />
                                     <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.HighIsBad}" />
                                 </Style>
@@ -131,10 +131,10 @@
                             <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.Current}" TextAlignment="Center" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                                <c:MultiColorGauge Label="L1" Value="{Binding CurrentL1, TargetNullValue=0, FallbackValue=0, Mode=OneWay}" />
-                                <c:MultiColorGauge Label="L2" Value="{Binding CurrentL2, TargetNullValue=0, FallbackValue=0, Mode=OneWay}" />
-                                <c:MultiColorGauge Label="L3" Value="{Binding CurrentL3, TargetNullValue=0, FallbackValue=0, Mode=OneWay}" />
-                                <c:MultiColorGauge Label="{x:Static p:Resources.Sum}" Value="{Binding CurrentSum, TargetNullValue=0, FallbackValue=0, Mode=OneWay}"
+                                <c:MultiColorGauge Label="L1" Value="{m:GaugeBinding CurrentL1}" />
+                                <c:MultiColorGauge Label="L2" Value="{m:GaugeBinding CurrentL2}" />
+                                <c:MultiColorGauge Label="L3" Value="{m:GaugeBinding CurrentL3}" />
+                                <c:MultiColorGauge Label="{x:Static p:Resources.Sum}" Value="{m:GaugeBinding CurrentSum}"
                                                    Maximum="{Binding MaximumChargingCurrentPossible, FallbackValue=0, Converter={co:Multiply Factor=3}}" />
                             </StackPanel>
                         </Grid>
@@ -150,13 +150,13 @@
 
                             <TextBlock FontSize="10" FontWeight="Medium" Grid.Row="1" Margin="0,0,0,2"
                                        Width="{Binding ActualWidth, ElementName=CurrentGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
-                                <Run Text="{Binding CurrentSum, FallbackValue=0, TargetNullValue=0, StringFormat=N1, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" />
+                                <Run Text="{m:GaugeBinding CurrentSum, StringFormat=N1}" />
                                 <Run Text="A" />
                             </TextBlock>
 
-                            <c:MultiColorGauge Value="{Binding CurrentSum, FallbackValue=0, TargetNullValue=0, Mode=OneWay}"
+                            <c:MultiColorGauge Value="{m:GaugeBinding CurrentSum, FallbackValue=0, TargetNullValue=0}"
                                                Minimum="0" Grid.Row="2"
-                                               Maximum="{Binding MaximumChargingCurrentPossible, FallbackValue=6, TargetNullValue=6, Mode=OneWay, Converter={co:Multiply Factor=1}}"
+                                               Maximum="{Binding MaximumChargingCurrentPossible, FallbackValue=6, TargetNullValue=6}"
                                                GaugeColors="{x:Static c:MultiColorGauge.LowIsBad}"
                                                Width="92" Style="{StaticResource DefaultHalfCircleGauge}" />
 
@@ -165,7 +165,7 @@
                         <Grid x:Name="Power" Visibility="Collapsed">
                             <Grid.Resources>
                                 <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource WattPilotLinearGauge}">
-                                    <Setter Property="Maximum" Value="{Binding MaximumChargingCurrentPossible, TargetNullValue=0, Mode=OneWay, FallbackValue=0, Converter={co:Multiply Factor=.230}}" />
+                                    <Setter Property="Maximum" Value="{m:GaugeBinding MaximumChargingCurrentPossible, Converter={co:Multiply Factor=.230}}" />
                                     <Setter Property="UnitName" Value="kW" />
                                     <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.HighIsBad}" />
                                 </Style>
@@ -178,11 +178,11 @@
                             <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.Power}" TextAlignment="Center" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                                <c:MultiColorGauge Label="L1" Value="{Binding PowerL1KiloWatts, TargetNullValue=0, FallbackValue=0, Mode=OneWay}" />
-                                <c:MultiColorGauge Label="L2" Value="{Binding PowerL2KiloWatts, TargetNullValue=0, FallbackValue=0, Mode=OneWay}" />
-                                <c:MultiColorGauge Label="L3" Value="{Binding PowerL3KiloWatts, TargetNullValue=0, FallbackValue=0, Mode=OneWay}" />
-                                <c:MultiColorGauge Label="{x:Static p:Resources.Sum}" Value="{Binding PowerSumKiloWatts, TargetNullValue=0, FallbackValue=0, Mode=OneWay}"
-                                                   Maximum="{Binding MaximumChargingPowerPossible, TargetNullValue=0, Mode=OneWay, FallbackValue=0, Converter={co:Multiply Factor=0.001}}" />
+                                <c:MultiColorGauge Label="L1" Value="{m:GaugeBinding PowerL1KiloWatts}" />
+                                <c:MultiColorGauge Label="L2" Value="{m:GaugeBinding PowerL2KiloWatts}" />
+                                <c:MultiColorGauge Label="L3" Value="{m:GaugeBinding PowerL3KiloWatts}" />
+                                <c:MultiColorGauge Label="{x:Static p:Resources.Sum}" Value="{m:GaugeBinding PowerSumKiloWatts}"
+                                                   Maximum="{m:GaugeBinding MaximumChargingPowerPossible, Converter={co:Multiply Factor=0.001}}" />
                             </StackPanel>
                         </Grid>
 
@@ -197,13 +197,13 @@
 
                             <TextBlock FontSize="10" FontWeight="Medium" Grid.Row="1" Margin="0,0,0,2"
                                        Width="{Binding ActualWidth, ElementName=PowerGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
-                                <Run Text="{Binding PowerSumKiloWatts, FallbackValue=0, TargetNullValue=0, StringFormat=N1, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" />
+                                <Run Text="{m:GaugeBinding PowerSumKiloWatts, StringFormat=N1}" />
                                 <Run Text="kW" />
                             </TextBlock>
 
                             <c:MultiColorGauge Value="{Binding PowerSum, FallbackValue=0, TargetNullValue=0, Mode=OneWay}"
                                                Minimum="0" Grid.Row="2"
-                                               Maximum="{Binding MaximumChargingPowerPossible, FallbackValue=16, TargetNullValue=16, Mode=OneWay, Converter={co:Multiply Factor=1}}"
+                                               Maximum="{m:GaugeBinding MaximumChargingPowerPossible, FallbackValue=16, TargetNullValue=16, Converter={co:Multiply Factor=1}}"
                                                GaugeColors="{x:Static c:MultiColorGauge.LowIsBad}"
                                                Width="92" Style="{StaticResource DefaultHalfCircleGauge}" />
 
@@ -226,10 +226,10 @@
                             <TextBlock Grid.Row="0" FontSize="10" Text="cos(φ)" TextAlignment="Center" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                                <c:MultiColorGauge Label="L1" Value="{Binding PowerFactorL1, FallbackValue=0, TargetNullValue=0, Mode=OneWay}" />
-                                <c:MultiColorGauge Label="L2" Value="{Binding PowerFactorL2, FallbackValue=0, TargetNullValue=0, Mode=OneWay}" />
-                                <c:MultiColorGauge Label="L3" Value="{Binding PowerFactorL3, FallbackValue=0, TargetNullValue=0, Mode=OneWay}" />
-                                <c:MultiColorGauge Label="L0" Value="{Binding PowerFactorL0, FallbackValue=0, TargetNullValue=0, Mode=OneWay}" />
+                                <c:MultiColorGauge Label="L1" Value="{m:GaugeBinding PowerFactorL1}" />
+                                <c:MultiColorGauge Label="L2" Value="{m:GaugeBinding PowerFactorL2}" />
+                                <c:MultiColorGauge Label="L3" Value="{m:GaugeBinding PowerFactorL3}" />
+                                <c:MultiColorGauge Label="L0" Value="{m:GaugeBinding PowerFactorL0}" />
                             </StackPanel>
                         </Grid>
 
@@ -248,14 +248,14 @@
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                                 <c:MultiColorGauge Label="{x:Static p:Resources.Power}"
-                                                   Value="{Binding PowerL0, FallbackValue=0, TargetNullValue=0, Mode=OneWay}"
+                                                   Value="{m:GaugeBinding PowerL0}"
                                                    Maximum="10"
                                                    UnitName="W" />
                                 <c:MultiColorGauge Label="{x:Static p:Resources.Voltage}"
-                                                   Value="{Binding VoltageL0, FallbackValue=0, TargetNullValue=0, Mode=OneWay}"
+                                                   Value="{m:GaugeBinding VoltageL0}"
                                                    Maximum="5" StringFormat="N0" UnitName="V" />
                                 <c:MultiColorGauge Label="cos(φ)"
-                                                   Value="{Binding PowerFactorL0, FallbackValue=0, TargetNullValue=0, Mode=OneWay}"
+                                                   Value="{m:GaugeBinding PowerFactorL0}"
                                                    Maximum="1" GaugeColors="{x:Static c:MultiColorGauge.LowIsBad}"
                                                    UnitName="" StringFormat="N2" />
                             </StackPanel>
@@ -273,17 +273,17 @@
 
                             <TextBlock Grid.Row="0" FontSize="10" Text="{Binding SerialNumber}" TextAlignment="Center" />
                             <TextBlock Grid.Row="1" FontSize="10"
-                                       Text="{Binding TimeStampUtc, FallbackValue={x:Null}, Converter={co:DateConverter}}"
+                                       Text="{Binding TimeStampUtc, FallbackValue='', Converter={co:DateConverter}}"
                                        TextAlignment="Center" />
 
                             <StackPanel Grid.Row="2" VerticalAlignment="Center">
 
                                 <c:MultiColorGauge Label="Frq." GaugeColors="{x:Static c:MultiColorGauge.MidIsGood}"
-                                                   Value="{Binding Frequency, FallbackValue=0, TargetNullValue=0, Mode=OneWay}"
+                                                   Value="{m:GaugeBinding Frequency}"
                                                    UnitName="Hz" Minimum="49" Maximum="51" StringFormat="N3" />
 
                                 <c:MultiColorGauge Label="{x:Static p:Resources.Latency}" GaugeColors="{x:Static c:MultiColorGauge.HighIsBad}"
-                                                   Value="{Binding Latency.TotalMilliseconds, FallbackValue=0, TargetNullValue=0, Mode=OneWay}"
+                                                   Value="{m:GaugeBinding Latency.TotalMilliseconds}"
                                                    StringFormat="N0" Minimum="0" Maximum="2000" UnitName="ms" />
                             </StackPanel>
                         </Grid>
