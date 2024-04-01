@@ -49,6 +49,17 @@ public abstract class SettingsBase : BindableBase, ICloneable
         set => Set(ref froniusConnection2, value);
     }
 
+    private double maximumDnoLineCurrentPerPhase = 35;
+
+    [XmlElement, DefaultValue(35d)]
+    public double MaximumDnoLineCurrentPerPhase
+    {
+        get => maximumDnoLineCurrentPerPhase;
+        set => Set(ref maximumDnoLineCurrentPerPhase, value, () => NotifyOfPropertyChange(nameof(MaximumDnoLineCurrentTotal)));
+    }
+
+    [XmlIgnore] public double MaximumDnoLineCurrentTotal => MaximumDnoLineCurrentPerPhase * 3;
+
     private WebConnection wattPilotConnection = new() { BaseUrl = "ws://192.168.178.YYY", Password = string.Empty };
 
     [XmlElement, DefaultValue(null)]
@@ -86,6 +97,7 @@ public abstract class SettingsBase : BindableBase, ICloneable
     }
 
     private bool haveTwoInverters;
+
     [XmlAttribute]
     public bool HaveTwoInverters
     {

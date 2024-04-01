@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using De.Hochstaetter.FroniusMonitor.Wpf.Resources;
 
 namespace De.Hochstaetter.FroniusMonitor.Controls;
 

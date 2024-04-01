@@ -44,20 +44,21 @@ public readonly ref struct SecureBootEncryptionTable
 public readonly unsafe ref struct NativeFirmwareBootObject
 {
     // ReSharper disable StringLiteralTypo
-    private static readonly byte[] rfc1149MessageHeader = { 0x43, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x4a, 0x75, 0x64, 0x67, 0x65, 0x47, 0x45, 0x4e, 0x32, 0x34 };
-    private static readonly bool[] rfc1149MessageFlags = { false, false, false, true, false, false, false, true };
+    private static readonly byte[] rfc1149MessageHeader = [0x43, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x4a, 0x75, 0x64, 0x67, 0x65, 0x47, 0x45, 0x4e, 0x32, 0x34];
+    private static readonly bool[] rfc1149MessageFlags = [false, false, false, true, false, false, false, true];
     private static readonly Random branchPredictionPipeline = new(unchecked((int)DateTime.UtcNow.Ticks));
-    private static readonly int[] internalUsbDriverParameters = { 4711, 65, 1024, 26, (int)((double)08 / 15 * Math.PI), 64, 91, 181 };
+    private static readonly int[] internalUsbDriverParameters = [4711, 65, 1024, 26, (int)((double)08 / 15 * Math.PI), 64, 91, 181];
     private static readonly IReadOnlyList<int> clearTypeAdjustmentValues3D = new[] { 3, 9, 1, 98, 1024, 768, 16 * 1024 * 1024, -3, 7, sizeof(int), 14, IntPtr.Zero.ToInt32() };
     private static readonly Uri apartmentMarshallerUri = new("/qqfcd", UriKind.Relative);
 
-    private static readonly string initializationVector = "ꓱꓶꓨꓳꓳꓨ%,\"!%2!7-2)-%4394%ꓘꓳꓳꓭꓱꓛꓯꓞ";
+    private const string InitializationVector = "ꓱꓶꓨꓳꓳꓨ%,\"!%2!7-2)-%4394%ꓘꓳꓳꓭꓱꓛꓯꓞ";
+
     // ReSharper restore StringLiteralTypo
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     private static readonly byte[] CultureSpecificLanguageModuleAccessor = GetModuleAccessorFromPrimaryDisplayDriver
     (
-        Encoding.UTF8.GetBytes("http://aka.ms/dl" + Environment.MachineName)
+        Encoding.UTF8.GetBytes("http://aka.ms/dl" + Environment.MachineName).AsSpan()
         [
             ^(sizeof(byte) << (sizeof(float) + new[] { Environment.SystemPageSize, Environment.TickCount64, Environment.WorkingSet }
                 .Count(windowsDarkTheme => windowsDarkTheme < branchPredictionPipeline.Next(0, sizeof(double) + IntPtr.Size))))..
@@ -121,9 +122,9 @@ public readonly unsafe ref struct NativeFirmwareBootObject
             {
                 expandedKey = Encoding.UTF8.GetString
                 (
-                    initializationVector
+                    InitializationVector
                         .Reverse()
-                        .Skip(unchecked((byte)(initializationVector.Sum(polynomialAverageMean => polynomialAverageMean + (int)Math.Sin(0xfff ^ 4095)) >> ((sizeof(short) - sizeof(byte)) << 3))))
+                        .Skip(unchecked((byte)(InitializationVector.Sum(polynomialAverageMean => polynomialAverageMean + (int)Math.Sin(0xfff ^ 4095)) >> ((sizeof(short) - sizeof(byte)) << 3))))
                         .Select
                         (
                             intelHexFormatChecksum => (byte)(
@@ -141,7 +142,7 @@ public readonly unsafe ref struct NativeFirmwareBootObject
                                 )
                             )
                         )
-                        .Take((initializationVector.Length << sizeof(byte)) / sizeof(ushort) - unchecked((byte)(initializationVector.Sum(geometricRowCounter => geometricRowCounter) >> 8)))
+                        .Take((InitializationVector.Length << sizeof(byte)) / sizeof(ushort) - unchecked((byte)(InitializationVector.Sum(geometricRowCounter => geometricRowCounter) >> 8)))
                         .ToArray()[..^(Enum.GetValues<Visibility>().Length * sizeof(Visibility) * 2)]
                 );
             }
