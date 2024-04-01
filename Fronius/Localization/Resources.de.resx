@@ -1452,4 +1452,7 @@
   <data name="Discharged" xml:space="preserve">
 	  <value>Raus</value>
   </data>
+  <data name="DaysShort" xml:space="preserve">
+	  <value>Tage</value>
+  </data>
 </root>

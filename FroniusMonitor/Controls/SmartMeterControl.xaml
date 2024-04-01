@@ -60,7 +60,7 @@
 
                             <TextBlock FontSize="10" FontWeight="Medium" Grid.Row="1" Margin="0,0,0,2"
                                        Width="{Binding ActualWidth, ElementName=PowerActiveGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
-                                <Run Text="{Binding SmartMeter.ActivePowerSum, FallbackValue=0, TargetNullValue=0, StringFormat=N1, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" />
+                                <Run Text="{Binding SmartMeter.ActivePowerSum, FallbackValue=0, TargetNullValue=0, Mode=OneWay, StringFormat=N1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" />
                                 <Run Text="W" />
                             </TextBlock>
 
@@ -68,8 +68,7 @@
                                                Minimum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter IsMinimum=True}, FallbackValue=-24150}"
                                                Maximum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter IsMinimum=False}, FallbackValue=24150}"
                                                GaugeColors="{x:Static c:MultiColorGauge.MidIsGood}"
-                                               Origin=".5"
-                                               Width="92" Grid.Row="2" />
+                                               Origin=".5" Width="92" Grid.Row="2" />
                         </Grid>
 
                         <Grid x:Name="PowerActive" Visibility="Collapsed">

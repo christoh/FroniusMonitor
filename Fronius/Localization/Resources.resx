@@ -1506,4 +1506,7 @@
   <data name="Discharged" xml:space="preserve">
 	  <value>Out</value>
   </data>
+  <data name="DaysShort" xml:space="preserve">
+	  <value>Days</value>
+  </data>
 </root>

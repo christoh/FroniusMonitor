@@ -1195,6 +1195,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Days.
+        /// </summary>
+        public static string DaysShort {
+            get {
+                return ResourceManager.GetString("DaysShort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to DC current.
         /// </summary>
         public static string DcCurrent {
