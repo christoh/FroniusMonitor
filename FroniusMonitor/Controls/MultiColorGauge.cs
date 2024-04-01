@@ -61,6 +61,18 @@ public class MultiColorGauge : ProgressBar
         set => SetValue(UnitNameProperty, value);
     }
 
+    public static readonly DependencyProperty AnimationDurationProperty = DependencyProperty.Register
+    (
+        nameof(AnimationDuration), typeof(TimeSpan), typeof(MultiColorGauge),
+        new PropertyMetadata(TimeSpan.FromSeconds(.5))
+    );
+
+    public TimeSpan AnimationDuration
+    {
+        get => (TimeSpan)GetValue(AnimationDurationProperty);
+        set => SetValue(AnimationDurationProperty, value);
+    }
+
     public static readonly DependencyProperty ShowPercentProperty = DependencyProperty.Register
     (
         nameof(ShowPercent), typeof(bool), typeof(MultiColorGauge)

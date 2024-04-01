@@ -127,7 +127,7 @@ public partial class LinearGauge
             return;
         }
 
-        var animation = new DoubleAnimation(relativeValue, TimeSpan.FromSeconds(.5))
+        var animation = new DoubleAnimation(relativeValue, gauge.AnimationDuration)
         {
             AccelerationRatio = .33,
             DecelerationRatio = .33,

@@ -124,13 +124,13 @@ public partial class HalfCircleGauge
         }
     }
 
-    private static void SetValue(RangeBase gauge, bool skipAnimation = false)
+    private static void SetValue(MultiColorGauge gauge, bool skipAnimation = false)
     {
         var relativeValue = (Math.Max(Math.Min(gauge.Maximum, gauge.Value), gauge.Minimum) - gauge.Minimum) / (gauge.Maximum - gauge.Minimum);
 
         var animation = skipAnimation
             ? null
-            : new DoubleAnimation(double.IsFinite(relativeValue) ? relativeValue : 0, TimeSpan.FromSeconds(.5))
+            : new DoubleAnimation(double.IsFinite(relativeValue) ? relativeValue : 0, gauge.AnimationDuration)
             {
                 AccelerationRatio = .33,
                 DecelerationRatio = .33,
