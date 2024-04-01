@@ -123,7 +123,7 @@ public class NullToAnything<T> : ConverterBase
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value is null ? Null : NotNull;
 }
 
-public class NullToColorMap : NullToAnything<IReadOnlyList<MultiColorGauge.ColorEntry>>;
+public class NullToColorMap : NullToAnything<IReadOnlyList<ColorThreshold>>;
 
 public class NullToThickness : NullToAnything<Thickness>;
 
@@ -218,15 +218,15 @@ public class GridMeterConsumptionCorrector : GridMeterCorrectorBase
 
 public class SocToColor : ConverterBase
 {
-    private static readonly IReadOnlyList<BatteryColor> batteryColors = new BatteryColor[]
-    {
+    private static readonly IReadOnlyList<ColorThreshold> batteryColors =
+    [
         new(0, Colors.DarkRed),
         new(0.05, Colors.Red),
         new(0.25, Colors.Yellow),
         new(0.40, Colors.YellowGreen),
         new(0.5, Colors.LightGreen),
         new(1, Colors.LawnGreen),
-    };
+    ];
 
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
@@ -250,18 +250,9 @@ public class SocToColor : ConverterBase
                     default:
                         var lower = batteryColors.Last(bc => soc >= bc.Soc);
                         var upper = batteryColors.First(bc => bc.Soc > lower.Soc);
-                        var percentage = (soc - lower.Soc) / (upper.Soc - lower.Soc);
-                        color.R = Round(lower.Color.R, upper.Color.R);
-                        color.G = Round(lower.Color.G, upper.Color.G);
-                        color.B = Round(lower.Color.B, upper.Color.B);
-                        color.A = 0xff;
-
+                        var percentage = (float)((soc - lower.Soc) / (upper.Soc - lower.Soc));
+                        color = lower.Color * (1 - percentage) + upper.Color * percentage;
                         break;
-
-                        byte Round(byte lowerColor, byte upperColor)
-                        {
-                            return (byte)Math.Round((1 - percentage) * lowerColor + percentage * upperColor, MidpointRounding.AwayFromZero);
-                        }
                 }
 
                 break;
@@ -945,7 +936,7 @@ public class LifeTimeEnergyToGaugeColors : MultiConverterBase
 {
     public override object Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
     {
-        var result = new List<MultiColorGauge.ColorEntry>([new MultiColorGauge.ColorEntry(0, Colors.Red), new MultiColorGauge.ColorEntry(1, Colors.Red)]);
+        var result = new List<ColorThreshold>([new ColorThreshold(0, Colors.Red), new ColorThreshold(1, Colors.Red)]);
 
         if (values.Length > 1 && values[0] is IConvertible wattPeakCurrentTracker && values[1] is IConvertible wattPeakTotal)
         {
@@ -955,24 +946,24 @@ public class LifeTimeEnergyToGaugeColors : MultiConverterBase
             {
                 if (optimumRelativeEnergy - .2 > 0)
                 {
-                    result.Insert(result.Count - 1, new MultiColorGauge.ColorEntry(optimumRelativeEnergy - .2, Colors.OrangeRed));
+                    result.Insert(result.Count - 1, new ColorThreshold(optimumRelativeEnergy - .2, Colors.OrangeRed));
                 }
 
                 if (optimumRelativeEnergy - .1 > 0)
                 {
-                    result.Insert(result.Count - 1, new MultiColorGauge.ColorEntry(optimumRelativeEnergy - .1, Colors.YellowGreen));
+                    result.Insert(result.Count - 1, new ColorThreshold(optimumRelativeEnergy - .1, Colors.YellowGreen));
                 }
 
-                result.Insert(result.Count - 1, new MultiColorGauge.ColorEntry(optimumRelativeEnergy, Colors.Green));
+                result.Insert(result.Count - 1, new ColorThreshold(optimumRelativeEnergy, Colors.Green));
 
                 if (optimumRelativeEnergy + .1 < 1)
                 {
-                    result.Insert(result.Count - 1, new MultiColorGauge.ColorEntry(optimumRelativeEnergy + .1, Colors.YellowGreen));
+                    result.Insert(result.Count - 1, new ColorThreshold(optimumRelativeEnergy + .1, Colors.YellowGreen));
                 }
 
                 if (optimumRelativeEnergy + .2 < 1)
                 {
-                    result.Insert(result.Count - 1, new MultiColorGauge.ColorEntry(optimumRelativeEnergy + .2, Colors.OrangeRed));
+                    result.Insert(result.Count - 1, new ColorThreshold(optimumRelativeEnergy + .2, Colors.OrangeRed));
                 }
             }
         }

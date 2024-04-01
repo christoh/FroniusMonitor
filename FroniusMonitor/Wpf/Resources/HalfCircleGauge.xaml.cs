@@ -4,8 +4,7 @@ namespace De.Hochstaetter.FroniusMonitor.Wpf.Resources;
 
 public partial class HalfCircleGauge
 {
-    // ReSharper disable once NotAccessedPositionalProperty.Local
-    private record GaugeMetaData(Polygon Hand, double HandLength, Canvas Canvas, Canvas OuterCanvas)
+    private record GaugeMetaData(Polygon Hand, double HandLength, Canvas Canvas)
     {
         public double OldMinimum = double.MinValue;
         public double OldMaximum = double.MaxValue;
@@ -84,7 +83,7 @@ public partial class HalfCircleGauge
         hand.SetValue(Canvas.BottomProperty, 8d);
         hand.SetValue(Canvas.LeftProperty, outerCanvas.Width / 2 - 4);
         outerCanvas.Children.Add(hand);
-        gauge.SetValue(MultiColorGauge.TemplateMetadataPropertyKey, new GaugeMetaData(hand, handLength, canvas, outerCanvas));
+        gauge.SetValue(MultiColorGauge.TemplateMetadataPropertyKey, new GaugeMetaData(hand, handLength, canvas));
 
         valueDescriptor?.AddValueChanged(gauge, (_, _) => SetValue(gauge));
         minimumDescriptor?.AddValueChanged(gauge, (_, _) => OnMinimumMaximumChanged(gauge, minimumTextBlock, maximumTextBlock));
@@ -148,7 +147,7 @@ public partial class HalfCircleGauge
     private static void OnAnimatedAngleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         var gauge = (MultiColorGauge)d;
-        var (hand, handLength, canvas, _) = (GaugeMetaData)gauge.TemplateMetadata;
+        var (hand, handLength, canvas) = (GaugeMetaData)gauge.TemplateMetadata;
         var relativeValue = (double)e.NewValue;
         hand.RenderTransform = new RotateTransform((relativeValue - 0.5) * 180, 4, handLength - 5);
 
@@ -180,7 +179,7 @@ public partial class HalfCircleGauge
 
     private static void OnParametersChanged(MultiColorGauge gauge, TextBlock? minimumTextBlock, TextBlock? maximumTextBlock)
     {
-        var (_, _, canvas, _) = (GaugeMetaData)gauge.TemplateMetadata;
+        var (_, _, canvas) = (GaugeMetaData)gauge.TemplateMetadata;
 
         try
         {
@@ -243,6 +242,6 @@ public partial class HalfCircleGauge
             return (gauge, canvas, outerCanvas, minimumTextBlock, maximumTextBlock);
         }
 
-        throw new InvalidOperationException("Must define Canvas and OuterCanvas");
+        throw new InvalidOperationException("Required elements not found");
     }
 }

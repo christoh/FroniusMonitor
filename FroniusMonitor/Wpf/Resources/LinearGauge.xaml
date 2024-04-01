@@ -45,7 +45,7 @@
     <Style x:Key="DefaultLinearGauge" TargetType="c:MultiColorGauge">
         <Setter Property="Foreground" Value="Black" />
         <Setter Property="TickFill" Value="DarkGray" />
-        <Setter Property="t:LinearGauge.StringFormat" Value="N1" />
+        <Setter Property="StringFormat" Value="N1" />
         <Setter Property="Template" Value="{StaticResource LinearGauge}" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
     </Style>

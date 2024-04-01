@@ -1,3 +1,3 @@
 ﻿namespace De.Hochstaetter.FroniusMonitor.Models;
 
-public record BatteryColor(double Soc, Color Color);
+public record ColorThreshold(double Soc, Color Color);

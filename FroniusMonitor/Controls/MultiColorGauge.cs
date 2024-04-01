@@ -2,17 +2,15 @@
 
 public class MultiColorGauge : ProgressBar
 {
-    public record ColorEntry(double Value, Color Color);
-
     public static readonly DependencyProperty GaugeColorsProperty = DependencyProperty.Register
     (
-        nameof(GaugeColors), typeof(IReadOnlyList<ColorEntry>), typeof(MultiColorGauge),
+        nameof(GaugeColors), typeof(IReadOnlyList<ColorThreshold>), typeof(MultiColorGauge),
         new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.Journal)
     );
 
-    public IEnumerable<ColorEntry>? GaugeColors
+    public IEnumerable<ColorThreshold>? GaugeColors
     {
-        get => (IReadOnlyList<ColorEntry>)GetValue(GaugeColorsProperty);
+        get => (IReadOnlyList<ColorThreshold>)GetValue(GaugeColorsProperty);
         set => SetValue(GaugeColorsProperty, value);
     }
 
@@ -37,6 +35,30 @@ public class MultiColorGauge : ProgressBar
     {
         get => (string?)GetValue(LabelProperty);
         set => SetValue(LabelProperty, value ?? string.Empty);
+    }
+
+    public static readonly DependencyProperty StringFormatProperty = DependencyProperty.Register
+    (
+        nameof(StringFormat), typeof(string), typeof(MultiColorGauge),
+        new FrameworkPropertyMetadata("N1")
+    );
+
+    public string StringFormat
+    {
+        get => (string)GetValue(StringFormatProperty);
+        set => SetValue(StringFormatProperty, value);
+    }
+
+    public static readonly DependencyProperty UnitNameProperty = DependencyProperty.Register
+    (
+        nameof(UnitName), typeof(string), typeof(MultiColorGauge),
+        new PropertyMetadata(string.Empty)
+    );
+
+    public string UnitName
+    {
+        get => (string)GetValue(UnitNameProperty);
+        set => SetValue(UnitNameProperty, value);
     }
 
     public static readonly DependencyProperty ShowPercentProperty = DependencyProperty.Register
@@ -90,84 +112,84 @@ public class MultiColorGauge : ProgressBar
         set => SetValue(ColorAllTicksProperty, value);
     }
 
-    public static IReadOnlyList<ColorEntry> HighIsBad { get; } =
+    public static IReadOnlyList<ColorThreshold> HighIsBad { get; } =
     [
-        new ColorEntry(0, Colors.Green),
-        new ColorEntry(.75, Colors.YellowGreen),
-        new ColorEntry(.95, Colors.OrangeRed),
-        new ColorEntry(1, Colors.Red),
+        new ColorThreshold(0, Colors.Green),
+        new ColorThreshold(.75, Colors.YellowGreen),
+        new ColorThreshold(.95, Colors.OrangeRed),
+        new ColorThreshold(1, Colors.Red),
     ];
 
-    public static IReadOnlyList<ColorEntry> MidIsGood { get; } =
+    public static IReadOnlyList<ColorThreshold> MidIsGood { get; } =
     [
-        new ColorEntry(0, Colors.Red),
-        new ColorEntry(.05, Colors.OrangeRed),
-        new ColorEntry(.25, Colors.YellowGreen),
-        new ColorEntry(0.5, Colors.Green),
-        new ColorEntry(.75, Colors.YellowGreen),
-        new ColorEntry(.95, Colors.OrangeRed),
-        new ColorEntry(1, Colors.Red),
+        new ColorThreshold(0, Colors.Red),
+        new ColorThreshold(.05, Colors.OrangeRed),
+        new ColorThreshold(.25, Colors.YellowGreen),
+        new ColorThreshold(0.5, Colors.Green),
+        new ColorThreshold(.75, Colors.YellowGreen),
+        new ColorThreshold(.95, Colors.OrangeRed),
+        new ColorThreshold(1, Colors.Red),
     ];
 
-    public static IReadOnlyList<ColorEntry> ExtremeIsBad { get; } =
+    public static IReadOnlyList<ColorThreshold> ExtremeIsBad { get; } =
     [
-        new ColorEntry(0, Colors.Red),
-        new ColorEntry(.01, Colors.OrangeRed),
-        new ColorEntry(.10, Colors.YellowGreen),
-        new ColorEntry(0.20, Colors.Green),
-        new ColorEntry(0.70, Colors.Green),
-        new ColorEntry(.90, Colors.YellowGreen),
-        new ColorEntry(.99, Colors.OrangeRed),
-        new ColorEntry(1, Colors.Red),
+        new ColorThreshold(0, Colors.Red),
+        new ColorThreshold(.01, Colors.OrangeRed),
+        new ColorThreshold(.10, Colors.YellowGreen),
+        new ColorThreshold(0.20, Colors.Green),
+        new ColorThreshold(0.70, Colors.Green),
+        new ColorThreshold(.90, Colors.YellowGreen),
+        new ColorThreshold(.99, Colors.OrangeRed),
+        new ColorThreshold(1, Colors.Red),
     ];
 
-    public static IReadOnlyList<ColorEntry> OneThirdIsGood { get; } =
+    public static IReadOnlyList<ColorThreshold> OneThirdIsGood { get; } =
     [
-        new ColorEntry(0, Colors.Red),
-        new ColorEntry(.2, Colors.OrangeRed),
-        new ColorEntry(.3, Colors.YellowGreen),
-        new ColorEntry(1d / 3d, Colors.Green),
-        new ColorEntry(.36333333, Colors.YellowGreen),
-        new ColorEntry(.5, Colors.OrangeRed),
-        new ColorEntry(1, Colors.Red),
+        new ColorThreshold(0, Colors.Red),
+        new ColorThreshold(.2, Colors.OrangeRed),
+        new ColorThreshold(.3, Colors.YellowGreen),
+        new ColorThreshold(1d / 3d, Colors.Green),
+        new ColorThreshold(.36333333, Colors.YellowGreen),
+        new ColorThreshold(.5, Colors.OrangeRed),
+        new ColorThreshold(1, Colors.Red),
     ];
 
-    public static IReadOnlyList<ColorEntry> MidIsBad { get; } =
+    public static IReadOnlyList<ColorThreshold> MidIsBad { get; } =
     [
-        new ColorEntry(0, Colors.Green),
-        new ColorEntry(.05, Colors.YellowGreen),
-        new ColorEntry(.25, Colors.OrangeRed),
-        new ColorEntry(0.5, Colors.Red),
-        new ColorEntry(.75, Colors.OrangeRed),
-        new ColorEntry(.95, Colors.YellowGreen),
-        new ColorEntry(1, Colors.Green),
+        new ColorThreshold(0, Colors.Green),
+        new ColorThreshold(.05, Colors.YellowGreen),
+        new ColorThreshold(.25, Colors.OrangeRed),
+        new ColorThreshold(0.5, Colors.Red),
+        new ColorThreshold(.75, Colors.OrangeRed),
+        new ColorThreshold(.95, Colors.YellowGreen),
+        new ColorThreshold(1, Colors.Green),
     ];
 
-    public static IReadOnlyList<ColorEntry> HigherThan15IsBad { get; } =
+    public static IReadOnlyList<ColorThreshold> HigherThan15IsBad { get; } =
     [
-        new ColorEntry(0, Colors.Green),
-        new ColorEntry(.10, Colors.YellowGreen),
-        new ColorEntry(.15, Colors.OrangeRed),
-        new ColorEntry(1, Colors.Red),
+        new ColorThreshold(0, Colors.Green),
+        new ColorThreshold(.10, Colors.YellowGreen),
+        new ColorThreshold(.15, Colors.OrangeRed),
+        new ColorThreshold(1, Colors.Red),
     ];
 
-    public static IReadOnlyList<ColorEntry> LowIsBad { get; } =
+    public static IReadOnlyList<ColorThreshold> LowIsBad { get; } =
     [
-        new ColorEntry(0, Colors.Red),
-        new ColorEntry(.05, Colors.OrangeRed),
-        new ColorEntry(.5, Colors.YellowGreen),
-        new ColorEntry(1, Colors.Green),
+        new ColorThreshold(0, Colors.Red),
+        new ColorThreshold(.05, Colors.OrangeRed),
+        new ColorThreshold(.5, Colors.YellowGreen),
+        new ColorThreshold(1, Colors.Green),
     ];
 
-    public static IReadOnlyList<ColorEntry> AllIsGood { get; } =
+    public static IReadOnlyList<ColorThreshold> AllIsGood { get; } =
     [
-        new ColorEntry(0, Colors.Green),
-        new ColorEntry(1, Colors.Green),
+        new ColorThreshold(0, Colors.Green),
+        new ColorThreshold(1, Colors.Green),
     ];
 
     static MultiColorGauge()
     {
-        ValueProperty.OverrideMetadata(typeof(MultiColorGauge), new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsRender, (d, e) => { }, (_, x) => x));
+        ValueProperty.OverrideMetadata(typeof(MultiColorGauge), new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsRender, (_, _) => { }, (_, x) => x));
     }
 
     internal static Color GetColorForRelativeValue(MultiColorGauge gauge, double relativeValue)
@@ -177,16 +199,10 @@ public class MultiColorGauge : ProgressBar
             return Colors.Green;
         }
 
-        var upper = gauge.GaugeColors.First(c => c.Value > relativeValue || c.Value >= 1);
-        var lower = gauge.GaugeColors.Last(c => c.Value < upper.Value || c.Value <= 0);
+        var upper = gauge.GaugeColors.First(c => c.Soc > relativeValue || c.Soc >= 1);
+        var lower = gauge.GaugeColors.Last(c => c.Soc < upper.Soc || c.Soc <= 0);
 
-        var lowerPercentage = (upper.Value - relativeValue) / (upper.Value - lower.Value);
-
-        return Color.FromRgb
-        (
-            (byte)Math.Round(lowerPercentage * lower.Color.R + (1 - lowerPercentage) * upper.Color.R, MidpointRounding.AwayFromZero),
-            (byte)Math.Round(lowerPercentage * lower.Color.G + (1 - lowerPercentage) * upper.Color.G, MidpointRounding.AwayFromZero),
-            (byte)Math.Round(lowerPercentage * lower.Color.B + (1 - lowerPercentage) * upper.Color.B, MidpointRounding.AwayFromZero)
-        );
+        var lowerPercentage = (float)((upper.Soc - relativeValue) / (upper.Soc - lower.Soc));
+        return lower.Color * lowerPercentage + upper.Color * (1 - lowerPercentage);
     }
 }
