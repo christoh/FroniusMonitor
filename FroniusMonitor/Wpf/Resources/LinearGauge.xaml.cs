@@ -63,6 +63,22 @@ public partial class LinearGauge
         element.SetValue(UseAbsoluteValueProperty, value);
     }
 
+    public static readonly DependencyProperty GaugeHeightProperty = DependencyProperty.RegisterAttached
+    (
+        nameof(GetGaugeHeight)[3..], typeof(double), typeof(LinearGauge),
+        new FrameworkPropertyMetadata(6d)
+    );
+
+    public static double GetGaugeHeight(DependencyObject element)
+    {
+        return (double)element.GetValue(GaugeHeightProperty);
+    }
+
+    public static void SetGaugeHeight(DependencyObject element, double value)
+    {
+        element.SetValue(GaugeHeightProperty, value);
+    }
+
     #endregion
 
     private record LinearGaugeMetadata(Border InnerBorder, TextBlock ValueTextBlock, Grid Grid, FrameworkElement MidPointMarker);
