@@ -218,3 +218,20 @@ public class MultiColorGauge : ProgressBar
         return lower.Color * lowerPercentage + upper.Color * (1 - lowerPercentage);
     }
 }
+
+public class DemoGaugeExtension : MarkupExtension
+{
+    public override object ProvideValue(IServiceProvider serviceProvider)
+    {
+        return new MultiColorGauge
+        {
+            Style = new StaticResourceExtension("DefaultHalfCircleGauge").ProvideValue(serviceProvider) as Style ?? throw new NullReferenceException("Style 'DefaultHalfCircleGauge' does not exist"),
+            Minimum = 0,
+            Maximum = 100,
+            Value = 33,
+            ColorAllTicks = true,
+            GaugeColors = MultiColorGauge.HighIsBad,
+        };
+    }
+}
+

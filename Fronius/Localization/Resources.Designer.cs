@@ -1123,6 +1123,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Always fully color gauges.
+        /// </summary>
+        public static string ColorAllGaugeTicks {
+            get {
+                return ResourceManager.GetString("ColorAllGaugeTicks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Common Modbus slave settings.
         /// </summary>
         public static string CommonModbusSlaveSettings {

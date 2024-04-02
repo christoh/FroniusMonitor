@@ -91,7 +91,18 @@ public partial class HalfCircleGauge
         colorsDescriptor?.AddValueChanged(gauge, (_, _) => SetValue(gauge));
         handFillDescriptor?.AddValueChanged(gauge, OnHandBrushChanged);
         tickFillDescriptor?.AddValueChanged(gauge, (_, _) => OnParametersChanged(gauge, minimumTextBlock, maximumTextBlock));
-        colorAllTicksDescriptor?.AddValueChanged(gauge, (_, _) => OnParametersChanged(gauge, minimumTextBlock, maximumTextBlock));
+
+        colorAllTicksDescriptor?.AddValueChanged(gauge, (_, _) =>
+        {
+            OnParametersChanged(gauge, minimumTextBlock, maximumTextBlock);
+
+            if (!gauge.ColorAllTicks)
+            {
+                var relativeValue=SetValue(gauge, true);
+                OnAnimatedAngleChanged(gauge, new DependencyPropertyChangedEventArgs(AnimatedValueProperty, relativeValue, relativeValue));
+            }
+        });
+
         OnParametersChanged(gauge, minimumTextBlock, maximumTextBlock);
     }
 
@@ -124,7 +135,7 @@ public partial class HalfCircleGauge
         }
     }
 
-    private static void SetValue(MultiColorGauge gauge, bool skipAnimation = false)
+    private static double SetValue(MultiColorGauge gauge, bool skipAnimation = false)
     {
         var relativeValue = (Math.Max(Math.Min(gauge.Maximum, gauge.Value), gauge.Minimum) - gauge.Minimum) / (gauge.Maximum - gauge.Minimum);
 
@@ -142,6 +153,8 @@ public partial class HalfCircleGauge
         {
             SetAnimatedValue(gauge, relativeValue);
         }
+
+        return relativeValue;
     }
 
     private static void OnAnimatedAngleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -164,8 +177,8 @@ public partial class HalfCircleGauge
         if
         (
             gauge.ColorAllTicks ||
-            relativeValue <= rectRelativeValue && rectRelativeValue <= gauge.Origin ||
-            relativeValue >= rectRelativeValue && rectRelativeValue >= gauge.Origin
+            relativeValue < rectRelativeValue && rectRelativeValue <= gauge.Origin ||
+            relativeValue > rectRelativeValue && rectRelativeValue >= gauge.Origin
         )
         {
             var brush = new SolidColorBrush(MultiColorGauge.GetColorForRelativeValue(gauge, rectRelativeValue));

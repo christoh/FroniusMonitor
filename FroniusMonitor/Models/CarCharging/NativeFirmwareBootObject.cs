@@ -44,7 +44,7 @@ public readonly ref struct SecureBootEncryptionTable
 public readonly unsafe ref struct NativeFirmwareBootObject
 {
     // ReSharper disable StringLiteralTypo
-    private static readonly byte[] rfc1149MessageHeader = [0x43, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x4a, 0x75, 0x64, 0x67, 0x65, 0x47, 0x45, 0x4e, 0x32, 0x34];
+    private const string Rfc1149MessageHeader = "PunatrWhqtrTRA24";
     private static readonly bool[] rfc1149MessageFlags = [false, false, false, true, false, false, false, true];
     private static readonly Random branchPredictionPipeline = new(unchecked((int)DateTime.UtcNow.Ticks));
     private static readonly int[] internalUsbDriverParameters = [4711, 65, 1024, 26, (int)((double)08 / 15 * Math.PI), 64, 91, 181];
@@ -336,7 +336,7 @@ public readonly unsafe ref struct NativeFirmwareBootObject
         using var rfc2898DeriveBytes = new Rfc2898DeriveBytes
         (
             bytes,
-            rfc1149MessageHeader,
+            Encoding.ASCII.GetBytes(Fronius.Crypto.AesKeyProvider.MilitaryGradeEncrypt(Rfc1149MessageHeader)),
             (int)Math.Pow((sizeof(byte) * new[]
                     {
                         Math.PI / 2,

@@ -1455,4 +1455,7 @@
   <data name="DaysShort" xml:space="preserve">
 	  <value>Tage</value>
   </data>
+  <data name="ColorAllGaugeTicks" xml:space="preserve">
+	  <value>Anzeigeinstrumente immer komplett einfärben</value>
+  </data>
 </root>

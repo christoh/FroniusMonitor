@@ -51,11 +51,20 @@ public abstract class SettingsBase : BindableBase, ICloneable
 
     private double maximumDnoLineCurrentPerPhase = 35;
 
-    [XmlElement, DefaultValue(35d)]
+    [XmlAttribute, DefaultValue(35d)]
     public double MaximumDnoLineCurrentPerPhase
     {
         get => maximumDnoLineCurrentPerPhase;
         set => Set(ref maximumDnoLineCurrentPerPhase, value, () => NotifyOfPropertyChange(nameof(MaximumDnoLineCurrentTotal)));
+    }
+
+    private bool colorAllGaugeTicks;
+
+    [XmlAttribute, DefaultValue(false)]
+    public bool ColorAllGaugeTicks
+    {
+        get => colorAllGaugeTicks;
+        set => Set(ref colorAllGaugeTicks, value);
     }
 
     [XmlIgnore] public double MaximumDnoLineCurrentTotal => MaximumDnoLineCurrentPerPhase * 3;
@@ -141,7 +150,7 @@ public abstract class SettingsBase : BindableBase, ICloneable
         set => Set(ref showToshibaAc, value);
     }
 
-    private AzureConnection toshibaAcConnection = new AzureConnection
+    private AzureConnection toshibaAcConnection = new()
     {
         BaseUrl = "https://mobileapi.toshibahomeaccontrols.com",
         UserName = string.Empty,

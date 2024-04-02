@@ -1509,4 +1509,7 @@
   <data name="DaysShort" xml:space="preserve">
 	  <value>Days</value>
   </data>
+  <data name="ColorAllGaugeTicks" xml:space="preserve">
+	  <value>Always fully color gauges</value>
+  </data>
 </root>

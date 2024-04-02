@@ -7,13 +7,14 @@
         xmlns:gl="clr-namespace:System.Globalization;assembly=System.Globalization"
         mc:Ignorable="d"
         Title="{x:Static p:Resources.AppName}" Height="860" Width="1080"
-        d:DataContext="{d:DesignInstance Type=vm:MainViewModel, IsDesignTimeCreatable=False}"
+        d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
         xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
         xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
         xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
         xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
         xmlns:models="clr-namespace:De.Hochstaetter.Fronius.Models;assembly=Fronius"
-        xmlns:toshiba="clr-namespace:De.Hochstaetter.Fronius.Models.ToshibaAc;assembly=Fronius">
+        xmlns:toshiba="clr-namespace:De.Hochstaetter.Fronius.Models.ToshibaAc;assembly=Fronius"
+        xmlns:t="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Resources">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -41,6 +42,7 @@
                     <MenuItem Header="_Auto-fit" Click="OnAutoSizeChecked" />
                     <MenuItem Header="{x:Static p:Resources.IncludeInverterPower}" Icon="{vi:Gen24}" IsChecked="{Binding IncludeInverterPower}" IsCheckable="True" />
                     <MenuItem Header="{x:Static p:Resources.Events}" Click="ShowEventLog" Icon="{vi:EventLogIcon}" />
+                    <MenuItem Header="{x:Static p:Resources.ColorAllGaugeTicks}" IsCheckable="True" IsChecked="{Binding Settings.ColorAllGaugeTicks}" Checked="SaveSettings" Unchecked="SaveSettings" Icon="{c:DemoGauge}"/>
                     <MenuItem Visibility="{Binding Settings.HaveFritzBox, Converter={co:Bool2Visibility}}" Header="{x:Static p:Resources.ShowAvm}" IsChecked="{Binding Settings.ShowFritzBox, Mode=TwoWay}" IsCheckable="True" Icon="{vi:FritzLogo}" Checked="OnShowAvmChanged" Unchecked="OnShowAvmChanged" />
                     <MenuItem Visibility="{Binding Settings.HaveWattPilot, Converter={co:Bool2Visibility}}" Header="{x:Static p:Resources.WattPilotHeader}" IsChecked="{Binding Settings.ShowWattPilot, Mode=TwoWay}" IsCheckable="True" Icon="{vi:ChargingTrafficSign}" Checked="ShowWattPilot" Unchecked="ShowWattPilot" />
                 </MenuItem>
