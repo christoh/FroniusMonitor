@@ -1,6 +1,4 @@
-﻿using De.Hochstaetter.FroniusMonitor.Controls;
-
-namespace De.Hochstaetter.FroniusMonitor.Wpf.Resources;
+﻿namespace De.Hochstaetter.FroniusMonitor.Wpf.Resources;
 
 public partial class LinearGauge
 {
@@ -110,7 +108,13 @@ public partial class LinearGauge
         minimumDescriptor?.AddValueChanged(gauge, (_, _) => OnValueChanged(gauge, valueTextBlock));
         maximumDescriptor?.AddValueChanged(gauge, (_, _) => OnValueChanged(gauge, valueTextBlock));
         originDescriptor?.AddValueChanged(gauge, (_, _) => OnValueChanged(gauge, valueTextBlock));
-        showPercentDescriptor?.AddValueChanged(gauge, (_, _) => OnValueChanged(gauge, valueTextBlock));
+        
+        showPercentDescriptor?.AddValueChanged(gauge, (_, _) =>
+        {
+            SetUnitName(gauge);
+            OnValueChanged(gauge, valueTextBlock);
+        });
+        
         tickFillDescriptor?.AddValueChanged(gauge, (_, _) => outerBorder.Background = gauge.TickFill);
         unitNameDescriptor?.AddValueChanged(gauge, (_, _) => SetUnitName(gauge));
         stringFormatDescriptor?.AddValueChanged(gauge, (_, _) => SetValueTextBlock(gauge, valueTextBlock));
@@ -126,6 +130,7 @@ public partial class LinearGauge
         {
             relativeValue = 0;
         }
+        
         var value = gauge.ShowPercent ? GetUseAbsoluteValue(gauge) ? (relativeValue - gauge.Origin) * 100 / gauge.Origin : relativeValue * 100 : gauge.Value; //BUG: Only works if Origin is at 0
         valueTextBlock.Text = value.ToString(gauge.StringFormat, CultureInfo.CurrentCulture);
         return relativeValue;
