@@ -72,8 +72,8 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
 
     public async ValueTask<HttpResponseMessage> GetResponse(string url, string? stringContent, IEnumerable<HttpStatusCode>? allowedStatusCodesEnumerable = null, CancellationToken token = default)
     {
-        allowedStatusCodesEnumerable ??= new[] { HttpStatusCode.OK };
-        var allowedStatusCodes = allowedStatusCodesEnumerable as IList<HttpStatusCode> ?? allowedStatusCodesEnumerable.ToArray();
+        allowedStatusCodesEnumerable ??= [HttpStatusCode.OK];
+        var allowedStatusCodes = allowedStatusCodesEnumerable as IReadOnlyList<HttpStatusCode> ?? allowedStatusCodesEnumerable.ToList();
 
         if (url.Length == 0 || url[0] != '/')
         {
@@ -104,7 +104,7 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
             nonce = await GetAuthHeaderToken("nonce").ConfigureAwait(false) ?? string.Empty;
             encoding = Encoding.GetEncoding(await GetAuthHeaderToken("charset").ConfigureAwait(false) ?? "UTF-8");
             var algorithm = await GetAuthHeaderToken("algorithm").ConfigureAwait(false);
-            var qops = (await GetAuthHeaderToken("qop").ConfigureAwait(false))?.Split(",") ?? Array.Empty<string>();
+            var qops = (await GetAuthHeaderToken("qop").ConfigureAwait(false))?.Split(",") ?? [];
 
             if (algorithm != "MD5" || !qops.Contains("auth"))
             {
