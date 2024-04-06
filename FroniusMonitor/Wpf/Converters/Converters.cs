@@ -1,4 +1,6 @@
-﻿using De.Hochstaetter.Fronius.Models.Settings;
+﻿using System.Reflection;
+using De.Hochstaetter.Fronius.Attributes;
+using De.Hochstaetter.Fronius.Models.Settings;
 
 namespace De.Hochstaetter.FroniusMonitor.Wpf.Converters;
 
@@ -521,6 +523,24 @@ public class Enum2DisplayName : ConverterBase
         }
 
         return value;
+    }
+}
+
+public class ChargingRuleToDisplayName : ConverterBase
+{
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not ChargingRuleType ruleType)
+        {
+            return value;
+        }
+
+        var attribute = typeof(ChargingRuleType)
+            .GetMember(ruleType.ToString())
+            .Single()
+            .GetCustomAttribute(typeof(EnumParseAttribute)) as EnumParseAttribute ?? throw new NotSupportedException("Enum member has no ParseAs attribute");
+
+        return IoC.Get<IGen24Service>().GetConfigString("TIME_OF_USE.REGULATION_" + attribute.ParseAs).GetAwaiter().GetResult();
     }
 }
 

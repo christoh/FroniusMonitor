@@ -2,44 +2,35 @@
 
 namespace De.Hochstaetter.FroniusMonitor.Wpf.Localization;
 
-public abstract class LocBase : UpdateableMarkupExtension
+public abstract class LocBase(string? key, Task<string>? task, bool doNotShowKey = false) : UpdateableMarkupExtension
 {
-    private readonly Task<string>? task;
-    private readonly string? key;
-
-    protected LocBase(string? key, Task<string>? task)
-    {
-        this.task = task;
-        this.key = key;
-    }
-
     protected override object ProvideUpdateableValue(IServiceProvider serviceProvider)
     {
         if (task is not null)
         {
             if (task.Status != TaskStatus.WaitingForActivation && TargetProperty is not DependencyProperty)
             {
-                return task.Result;
+                return task.GetAwaiter().GetResult();
             }
 
             Task.Run(async () => { UpdateValue(await task.ConfigureAwait(false)); });
         }
 
-        return key ?? string.Empty;
+        return doNotShowKey || key == null ? string.Empty : key;
     }
 }
 
-public class Config : LocBase
+public class Config(string path, bool doNotShowKey) : LocBase(path, IoC.TryGetRegistered<IGen24Service>()?.GetConfigString(path), doNotShowKey)
 {
-    public Config(string path) : base(path, IoC.TryGetRegistered<IGen24Service>()?.GetConfigString(path)) { }
+    public Config(string path) : this(path, false) { }
 }
 
-public class Ui : LocBase
+public class Ui(string path, bool doNotShowKey) : LocBase(path, IoC.TryGetRegistered<IGen24Service>()?.GetUiString(path), doNotShowKey)
 {
-    public Ui(string path) : base(path, IoC.TryGetRegistered<IGen24Service>()?.GetUiString(path)) { }
+    public Ui(string path) : this(path, false) { }
 }
 
-public class Channel : LocBase
+public class Channel(string key, bool doNotShowKey) : LocBase(key, IoC.TryGetRegistered<IGen24Service>()?.GetChannelString(key), doNotShowKey)
 {
-    public Channel(string key) : base(key, IoC.TryGetRegistered<IGen24Service>()?.GetChannelString(key)) { }
+    public Channel(string path) : this(path, false) { }
 }

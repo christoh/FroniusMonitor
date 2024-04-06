@@ -232,7 +232,13 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <DataGrid Grid.Row="0" CanUserAddRows="False" RowHeaderWidth="20" SelectionUnit="FullRow" SelectionMode="Single" ItemsSource="{Binding ChargingRules}" AutoGenerateColumns="False" GridLinesVisibility="Vertical" AlternatingRowBackground="AntiqueWhite" BorderThickness="1">
+                <DataGrid Grid.Row="0"
+                          ColumnWidth="Auto" CanUserAddRows="False" RowHeaderWidth="20"
+                          SelectionUnit="FullRow" SelectionMode="Single"
+                          ItemsSource="{Binding ChargingRules}" AutoGenerateColumns="False"
+                          GridLinesVisibility="Vertical"
+                          AlternatingRowBackground="AntiqueWhite"
+                          BorderThickness="1">
                     <DataGrid.RowStyle>
                         <Style TargetType="DataGridRow">
                             <Setter Property="ToolTip" Value="{x:Static p:Resources.RuleTooltip}" />
@@ -271,7 +277,7 @@
                             <Setter Property="ItemTemplate">
                                 <Setter.Value>
                                     <DataTemplate DataType="m:ChargingRuleType">
-                                        <TextBlock Height="24" Padding="0,2,0,0" Text="{Binding Converter={co:Enum2DisplayName}}" />
+                                        <TextBlock Height="24" Padding="0,2,0,0" Text="{Binding Converter={co:ChargingRuleToDisplayName}}" />
                                     </DataTemplate>
                                 </Setter.Value>
                             </Setter>
@@ -309,15 +315,15 @@
                         <DataGridCheckBoxColumn Header="{x:Static p:Resources.Active}" Binding="{Binding IsActive, UpdateSourceTrigger=PropertyChanged}" CanUserReorder="False" CanUserResize="True" CanUserSort="True" SortMemberPath="IsActive"
                                                 HeaderStyle="{StaticResource Es}" ElementStyle="{StaticResource CheckBoxStyle}" />
 
-                        <DataGridTextColumn Header="{x:Static p:Resources.Start}" Binding="{co:ValidationBinding StartTime, Rule={v:ChargingRuleDate}}" SortMemberPath="StartTime"
+                        <DataGridTextColumn Header="{l:Ui 'BATTERY_CONTROL_SCHEDULE.TIME_FROM', 'True'}" Binding="{co:ValidationBinding StartTime, Rule={v:ChargingRuleDate}}" SortMemberPath="StartTime"
                                             HeaderStyle="{StaticResource Es}" CanUserReorder="False" CanUserResize="True" CanUserSort="True" SortDirection="Ascending"
                                             ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
 
-                        <DataGridTextColumn Header="{x:Static p:Resources.End}" Binding="{co:ValidationBinding EndTime, Rule={v:ChargingRuleDate}}" SortMemberPath="EndTime"
+                        <DataGridTextColumn Header="{l:Ui 'BATTERY_CONTROL_SCHEDULE.TIME_UNTIL', 'True'}" Binding="{co:ValidationBinding EndTime, Rule={v:ChargingRuleDate}}" SortMemberPath="EndTime"
                                             HeaderStyle="{StaticResource Es}" CanUserReorder="False" CanUserResize="True" CanUserSort="True"
                                             ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
 
-                        <DataGridTemplateColumn Header="{x:Static p:Resources.RuleType}" HeaderStyle="{StaticResource Es}" CanUserReorder="False" CanUserResize="True" CanUserSort="True" SortMemberPath="RuleType">
+                        <DataGridTemplateColumn Header="{l:Ui 'BATTERY_CONTROL_SCHEDULE.REGULATION', 'True'}" HeaderStyle="{StaticResource Es}" CanUserReorder="False" CanUserResize="True" CanUserSort="True" SortMemberPath="RuleType">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate DataType="{x:Type m:Gen24ChargingRule}">
                                     <ComboBox SelectedItem="{Binding RuleType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ItemsSource="{Binding Path=DataContext.(vm:SelfConsumptionOptimizationViewModel.RuleTypes), RelativeSource={RelativeSource FindAncestor, AncestorType=DataGrid}}" />
@@ -325,7 +331,7 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
-                        <DataGridTextColumn Header="{x:Static p:Resources.Power}" SortMemberPath="Power" Binding="{co:ValidationBinding Power, Rule={v:MinMaxIntRule PropertyDisplayName={x:Static p:Resources.Power}, Minimum=0, Maximum=50000}}"
+                        <DataGridTextColumn Header="{l:Ui 'BATTERY_CONTROL_SCHEDULE.POWER', 'True'}" SortMemberPath="Power" Binding="{co:ValidationBinding Power, Rule={v:MinMaxIntRule PropertyDisplayName={l:Ui 'BATTERY_CONTROL_SCHEDULE.POWER'}, Minimum=0, Maximum=50000}}"
                                             HeaderStyle="{StaticResource Es}" CanUserReorder="False" CanUserResize="True" CanUserSort="True"
                                             ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
 
