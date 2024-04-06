@@ -18,6 +18,7 @@ public enum InverterDisplayMode
     DcCurrent,
     DcPower,
     DcRelativePower,
+    MpptComparison,
     EnergyInverter,
     EnergyRectifier,
     EnergyStorage,
@@ -54,6 +55,7 @@ public partial class InverterControl
         InverterDisplayMode.DcPowerGauge,
         InverterDisplayMode.DcPower,
         InverterDisplayMode.DcRelativePower,
+        InverterDisplayMode.MpptComparison,
         InverterDisplayMode.DcCurrent,
         InverterDisplayMode.DcVoltage,
     ];

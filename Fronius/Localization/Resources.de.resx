@@ -1236,4 +1236,7 @@
   <data name="ColorAllGaugeTicks" xml:space="preserve">
 	  <value>Anzeigeinstrumente immer komplett einfärben</value>
   </data>
+  <data name="MpptComparison" xml:space="preserve">
+	  <value>String 2/1</value>
+  </data>
 </root>

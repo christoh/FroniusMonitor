@@ -2320,6 +2320,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to String 2/1.
+        /// </summary>
+        public static string MpptComparison {
+            get {
+                return ResourceManager.GetString("MpptComparison", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} must be between {1:N0} and {2:N0}.
         /// </summary>
         public static string MustBeBetween {

@@ -991,3 +991,26 @@ public class LifeTimeEnergyToGaugeColors : MultiConverterBase
         return result;
     }
 }
+
+public class MpptComparison : MultiConverterBase
+{
+    public string StringFormat { get; set; } = "N1";
+    public string UnitName { get; set; } = "%";
+
+    public override object? Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (values.Length < 2 || values[0] is not IConvertible powerMppt1 || values[1] is not IConvertible powerMppt2)
+        {
+            return targetType.IsAssignableFrom(typeof(double)) ? 0 : null;
+        }
+
+        var percentage = powerMppt2.ToDouble(culture) / powerMppt1.ToDouble(culture) * 100;
+
+        object result=
+            targetType.IsAssignableFrom(typeof(double))
+                ? percentage
+                : $"{percentage.ToString(StringFormat,CultureInfo.CurrentCulture)} {UnitName}";
+
+        return result;
+    }
+}

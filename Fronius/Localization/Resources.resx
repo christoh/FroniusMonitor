@@ -1290,4 +1290,7 @@
   <data name="ColorAllGaugeTicks" xml:space="preserve">
 	  <value>Always fully color gauges</value>
   </data>
+  <data name="MpptComparison" xml:space="preserve">
+	  <value>String 2/1</value>
+  </data>
 </root>
