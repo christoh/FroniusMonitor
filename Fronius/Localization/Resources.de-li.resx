@@ -14,14 +14,8 @@
 	<data name="SunspecMode_Float" xml:space="preserve">
 		<value>Fliesskomma</value>
 	</data>
-	<data name="Thursday" xml:space="preserve">
-		<value>Dunschtig</value>
-	</data>
 	<data name="Tuesday_One" xml:space="preserve">
 		<value>Z</value>
-	</data>
-	<data name="Wednesday" xml:space="preserve">
-		<value>Mittwuch</value>
 	</data>
 	<data name="CableLockBehavior_AutoUnlock" xml:space="preserve">
 		<value>Immer entriegeln, wenn kein Strom fliesst</value>

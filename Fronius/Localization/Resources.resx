@@ -120,17 +120,8 @@
   <data name="Active" xml:space="preserve">
     <value>Active</value>
   </data>
-  <data name="Booting" xml:space="preserve">
-    <value>Booting</value>
-  </data>
-  <data name="Devices" xml:space="preserve">
-    <value>Devices</value>
-  </data>
   <data name="Error" xml:space="preserve">
     <value>Error</value>
-  </data>
-  <data name="Idle" xml:space="preserve">
-    <value>Idle</value>
   </data>
   <data name="Inactive" xml:space="preserve">
     <value>Inactive</value>
@@ -138,47 +129,14 @@
   <data name="IncorrectData" xml:space="preserve">
     <value>Incorrect response from data manager</value>
   </data>
-  <data name="Invalid" xml:space="preserve">
-    <value>Invalid</value>
-  </data>
   <data name="Inverter" xml:space="preserve">
     <value>Inverter</value>
-  </data>
-  <data name="Inverters" xml:space="preserve">
-    <value>Inverters</value>
-  </data>
-  <data name="Meter" xml:space="preserve">
-    <value>Smart meter</value>
-  </data>
-  <data name="Meters" xml:space="preserve">
-    <value>Smart Meters</value>
-  </data>
-  <data name="MySolarSystem" xml:space="preserve">
-    <value>My solar system</value>
-  </data>
-  <data name="NA" xml:space="preserve">
-    <value>N/A</value>
   </data>
   <data name="NoSystemConnection" xml:space="preserve">
     <value>You did not specify complete inverter connection parameters</value>
   </data>
-  <data name="Ohmpilot" xml:space="preserve">
-    <value>Ohm pilot</value>
-  </data>
-  <data name="Ohmpilots" xml:space="preserve">
-    <value>Ohm Pilots</value>
-  </data>
   <data name="Ready" xml:space="preserve">
     <value>Ready</value>
-  </data>
-  <data name="Running" xml:space="preserve">
-    <value>Running</value>
-  </data>
-  <data name="SensorCard" xml:space="preserve">
-    <value>Sensor</value>
-  </data>
-  <data name="SensorCards" xml:space="preserve">
-    <value>Sensors</value>
   </data>
   <data name="Sleeping" xml:space="preserve">
     <value>Sleeping</value>
@@ -189,39 +147,6 @@
   <data name="Starting" xml:space="preserve">
     <value>Starting</value>
   </data>
-  <data name="StartUp0" xml:space="preserve">
-    <value>Starting (1/7)</value>
-  </data>
-  <data name="StartUp1" xml:space="preserve">
-    <value>Starting (2/7)</value>
-  </data>
-  <data name="StartUp2" xml:space="preserve">
-    <value>Starting (3/7)</value>
-  </data>
-  <data name="StartUp3" xml:space="preserve">
-    <value>Starting (4/7)</value>
-  </data>
-  <data name="StartUp4" xml:space="preserve">
-    <value>Starting (5/7)</value>
-  </data>
-  <data name="StartUp5" xml:space="preserve">
-    <value>Starting (6/7)</value>
-  </data>
-  <data name="StartUp6" xml:space="preserve">
-    <value>Starting (7/7)</value>
-  </data>
-  <data name="Storage" xml:space="preserve">
-    <value>Storage</value>
-  </data>
-  <data name="Storages" xml:space="preserve">
-    <value>Storages</value>
-  </data>
-  <data name="StringControl" xml:space="preserve">
-    <value>String control</value>
-  </data>
-  <data name="StringControls" xml:space="preserve">
-    <value>String Controls</value>
-  </data>
   <data name="Unknown" xml:space="preserve">
     <value>Unknown</value>
   </data>
@@ -231,20 +156,8 @@
   <data name="AppName" xml:space="preserve">
 	  <value>Home Automation Control Center</value>
   </data>
-  <data name="StoragePowerMessage" xml:space="preserve">
-    <value>{0} at {1:N0} W of power</value>
-  </data>
-  <data name="Charging" xml:space="preserve">
-    <value>Charging</value>
-  </data>
-  <data name="Discharging" xml:space="preserve">
-    <value>Discharging</value>
-  </data>
   <data name="ProviderMeter" xml:space="preserve">
 	  <value>Meter supplied by your distribution network operator</value>
-  </data>
-  <data name="PleaseWait" xml:space="preserve">
-    <value>Wait ...</value>
   </data>
   <data name="Power" xml:space="preserve">
     <value>Power</value>
@@ -273,9 +186,6 @@
   <data name="LineVoltage" xml:space="preserve">
     <value>Line voltage</value>
   </data>
-  <data name="PowerFactor" xml:space="preserve">
-    <value>Power factor</value>
-  </data>
   <data name="OutOfBalance" xml:space="preserve">
     <value>Out of balance</value>
   </data>
@@ -285,9 +195,6 @@
   <data name="AcCurrent" xml:space="preserve">
     <value>AC current</value>
   </data>
-  <data name="AcVoltage" xml:space="preserve">
-    <value>AC voltage</value>
-  </data>
   <data name="DcPower" xml:space="preserve">
 	  <value>DC Power</value>
   </data>
@@ -296,12 +203,6 @@
   </data>
   <data name="DcVoltage" xml:space="preserve">
     <value>DC voltage</value>
-  </data>
-  <data name="AcPower" xml:space="preserve">
-    <value>AC power</value>
-  </data>
-  <data name="PowerFlow" xml:space="preserve">
-    <value>Power flow</value>
   </data>
   <data name="Efficiency" xml:space="preserve">
     <value>Efficiency</value>
@@ -351,20 +252,11 @@
   <data name="LoadSettings" xml:space="preserve">
 	  <value>Load settings</value>
   </data>
-  <data name="AcPhaseVoltage" xml:space="preserve">
-    <value>AC phase voltage</value>
-  </data>
-  <data name="ACLineVoltage" xml:space="preserve">
-    <value>AC line voltage</value>
-  </data>
   <data name="SolarPanels" xml:space="preserve">
     <value>Solar panels</value>
   </data>
   <data name="Temperatures" xml:space="preserve">
     <value>Temperatures</value>
-  </data>
-  <data name="Fans" xml:space="preserve">
-    <value>Fans</value>
   </data>
   <data name="Misc" xml:space="preserve">
     <value>Miscellaneous</value>
@@ -402,50 +294,17 @@
   <data name="End" xml:space="preserve">
     <value>End</value>
   </data>
-  <data name="Device" xml:space="preserve">
-    <value>Device</value>
-  </data>
-  <data name="Id" xml:space="preserve">
-    <value>Id</value>
-  </data>
   <data name="Name" xml:space="preserve">
     <value>Name</value>
   </data>
   <data name="Severity" xml:space="preserve">
     <value>Severity</value>
   </data>
-  <data name="Automatic" xml:space="preserve">
-    <value>Automatic</value>
-  </data>
-  <data name="Manual" xml:space="preserve">
-    <value>Manual</value>
-  </data>
-  <data name="FeedIn" xml:space="preserve">
-    <value>Feed-In</value>
-  </data>
-  <data name="Consumption" xml:space="preserve">
-    <value>Consumption</value>
-  </data>
-  <data name="AllowGridCharge" xml:space="preserve">
-    <value>Allow charge battery from grid</value>
-  </data>
-  <data name="ChargeFromAc" xml:space="preserve">
-    <value>Allow charge battery from other producers in your home</value>
-  </data>
-  <data name="UseManufacturerDefaults" xml:space="preserve">
-    <value>Use Manufacturer defaults</value>
-  </data>
   <data name="GridPowerManagement" xml:space="preserve">
 	  <value>Grid power management</value>
   </data>
   <data name="BatteryChargingOptions" xml:space="preserve">
 	  <value>Battery options</value>
-  </data>
-  <data name="MinimumSoc" xml:space="preserve">
-    <value>Minimum SoC</value>
-  </data>
-  <data name="MaximumSoc" xml:space="preserve">
-    <value>Maximum SoC</value>
   </data>
   <data name="Undo" xml:space="preserve">
     <value>Undo</value>
@@ -462,9 +321,6 @@
   <data name="Warning" xml:space="preserve">
     <value>Warning</value>
   </data>
-  <data name="Success" xml:space="preserve">
-    <value>Success</value>
-  </data>
   <data name="NoSettingsChanged" xml:space="preserve">
     <value>No settings were changed</value>
   </data>
@@ -474,20 +330,11 @@
   <data name="CalibrateBattery" xml:space="preserve">
 	  <value>Calibrate battery</value>
   </data>
-  <data name="SocLimits" xml:space="preserve">
-    <value>SoC Limits</value>
-  </data>
-  <data name="MaxHomeChargingPower" xml:space="preserve">
-    <value>Maximum power from home producers to battery</value>
-  </data>
   <data name="MeterAddress" xml:space="preserve">
     <value>Meter address</value>
   </data>
   <data name="MeterAddressError" xml:space="preserve">
     <value>Meter address must be between 1 and 247</value>
-  </data>
-  <data name="SunspecAddress" xml:space="preserve">
-	  <value>SunSpec address</value>
   </data>
   <data name="SunspecAddressError" xml:space="preserve">
 	  <value>SunSpec address must be between 1 and 255</value>
@@ -579,9 +426,6 @@
   <data name="BatteryIsAcCoupled" xml:space="preserve">
 	  <value>Battery is AC coupled</value>
   </data>
-  <data name="Message" xml:space="preserve">
-	  <value>Message</value>
-  </data>
   <data name="BackupConfiguration" xml:space="preserve">
 	  <value>Backup configuration</value>
   </data>
@@ -606,15 +450,6 @@
   <data name="Saturday_One" xml:space="preserve">
 	  <value>S</value>
   </data>
-  <data name="Wednesday" xml:space="preserve">
-	  <value>Wednesday</value>
-  </data>
-  <data name="Thursday" xml:space="preserve">
-	  <value>Thursday</value>
-  </data>
-  <data name="BatteryChargingRules" xml:space="preserve">
-	  <value>Battery charging rules</value>
-  </data>
   <data name="ChargingRuleType_MinimumCharge" xml:space="preserve">
 	  <value>Min. charging power</value>
   </data>
@@ -636,26 +471,8 @@
   <data name="RuleTooltip" xml:space="preserve">
 	  <value>Use the right mouse button to add or delete rules.</value>
   </data>
-  <data name="RuleType" xml:space="preserve">
-	  <value>Rule Type</value>
-  </data>
-  <data name="InvalidTime" xml:space="preserve">
-	  <value>Invalid time</value>
-  </data>
   <data name="InvalidChargingRuleTime" xml:space="preserve">
 	  <value>{0} does not match a time between 00:00 to 24:00</value>
-  </data>
-  <data name="StartUtc" xml:space="preserve">
-	  <value>Start (UTC)</value>
-  </data>
-  <data name="StartLocal" xml:space="preserve">
-	  <value>Start (local)</value>
-  </data>
-  <data name="EndUtc" xml:space="preserve">
-	  <value>End (UTC)</value>
-  </data>
-  <data name="EndLocal" xml:space="preserve">
-	  <value>End (local)</value>
   </data>
   <data name="EndBeforeStart" xml:space="preserve">
 	  <value>'{0}': Start time is after end time</value>
@@ -665,9 +482,6 @@
   </data>
   <data name="SettingsSavedToInverter" xml:space="preserve">
 	  <value>The settings have been sent to the inverter.</value>
-  </data>
-  <data name="Credentials" xml:space="preserve">
-	  <value>Credentials</value>
   </data>
   <data name="Gen24InverterHeader" xml:space="preserve">
 	  <value>Fronius Gen24 inverter</value>
@@ -984,9 +798,6 @@
   <data name="AbsoluteMaximumChargingCurrent" xml:space="preserve">
 	  <value>Charging current limit</value>
   </data>
-  <data name="NextTripSettings" xml:space="preserve">
-	  <value>Next Trip Settings</value>
-  </data>
   <data name="NextTripTime" xml:space="preserve">
 	  <value>Next trip time</value>
   </data>
@@ -1022,9 +833,6 @@
   </data>
   <data name="HiddenWifi" xml:space="preserve">
 	  <value>(hidden Wifi)</value>
-  </data>
-  <data name="Type" xml:space="preserve">
-	  <value>Type</value>
   </data>
   <data name="Mode" xml:space="preserve">
 	  <value>Mode</value>
@@ -1062,9 +870,6 @@
   <data name="FroniusManager" xml:space="preserve">
 	  <value>Fronius Gen24 Manager</value>
   </data>
-  <data name="Options" xml:space="preserve">
-	  <value>Options</value>
-  </data>
   <data name="User" xml:space="preserve">
 	  <value>User</value>
   </data>
@@ -1077,14 +882,8 @@
   <data name="ToshibaHvac" xml:space="preserve">
 	  <value>Toshiba HVAC</value>
   </data>
-  <data name="PowerLimit" xml:space="preserve">
-	  <value>Power limit</value>
-  </data>
   <data name="ToshibaHvacUrlTooltip" xml:space="preserve">
 	  <value>You should not change the URL unless Toshiba changes the host name</value>
-  </data>
-  <data name="Protocol" xml:space="preserve">
-	  <value>Protocol</value>
   </data>
   <data name="Protocol_Amqp" xml:space="preserve">
 	  <value>AMQP (Advanced Message Queuing Protocol)</value>
@@ -1200,9 +999,6 @@
   <data name="Gateway" xml:space="preserve">
 	  <value>Gateway</value>
   </data>
-  <data name="Average" xml:space="preserve">
-	  <value>Average</value>
-  </data>
   <data name="Sum" xml:space="preserve">
 	  <value>Sum</value>
   </data>
@@ -1212,23 +1008,11 @@
   <data name="Total" xml:space="preserve">
 	  <value>Total</value>
   </data>
-  <data name="Site" xml:space="preserve">
-	  <value>Site</value>
-  </data>
   <data name="Loss" xml:space="preserve">
 	  <value>Loss</value>
   </data>
-  <data name="SelfSufficiency" xml:space="preserve">
-	  <value>Self-sufficiency</value>
-  </data>
   <data name="Grid" xml:space="preserve">
 	  <value>Grid</value>
-  </data>
-  <data name="Date" xml:space="preserve">
-	  <value>Date</value>
-  </data>
-  <data name="Time" xml:space="preserve">
-	  <value>Time</value>
   </data>
   <data name="SelfConsumptionShort" xml:space="preserve">
 	  <value>Cons.</value>
@@ -1248,9 +1032,6 @@
   <data name="BatteryModule" xml:space="preserve">
 	  <value>Batt. mod.</value>
   </data>
-  <data name="Fan" xml:space="preserve">
-	  <value>Fan</value>
-  </data>
   <data name="BackupOpTime" xml:space="preserve">
 	  <value>Backup</value>
   </data>
@@ -1259,9 +1040,6 @@
   </data>
   <data name="AverageShort" xml:space="preserve">
 	  <value>Average</value>
-  </data>
-  <data name="Visible" xml:space="preserve">
-	  <value>Visible</value>
   </data>
   <data name="SelfSufficiencyShort" xml:space="preserve">
 	  <value>Self-suf.</value>

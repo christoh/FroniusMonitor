@@ -17,12 +17,6 @@
 	<data name="Thursday_One" xml:space="preserve">
 		<value>D</value>
 	</data>
-	<data name="Wednesday" xml:space="preserve">
-		<value>Mittwuch</value>
-	</data>
-	<data name="Thursday" xml:space="preserve">
-		<value>Dunschtig</value>
-	</data>
 	<data name="SunspecMode_Float" xml:space="preserve">
 		<value>Fliesskomma</value>
 	</data>
