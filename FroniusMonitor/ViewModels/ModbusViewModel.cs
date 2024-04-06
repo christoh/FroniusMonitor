@@ -1,13 +1,14 @@
 ﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
-public class ModbusViewModel : SettingsViewModelBase
+public class ModbusViewModel(
+    IDataCollectionService dataCollectionService,
+    IGen24Service gen24Service,
+    IGen24JsonService gen24JsonService,
+    IFritzBoxService fritzBoxService,
+    IWattPilotService wattPilotService)
+    : SettingsViewModelBase(dataCollectionService, gen24Service, gen24JsonService, fritzBoxService, wattPilotService)
 {
     private Gen24ModbusSettings oldSettings = null!;
-
-    public ModbusViewModel(IDataCollectionService dataCollectionService, IGen24Service gen24Service,
-            IGen24JsonService gen24JsonService, IFritzBoxService fritzBoxService, IWattPilotService wattPilotService)
-        : base(dataCollectionService, gen24Service, gen24JsonService, fritzBoxService, wattPilotService)
-    { }
 
     private Gen24ModbusSettings settings = null!;
 

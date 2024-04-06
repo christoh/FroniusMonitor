@@ -66,7 +66,7 @@ public class Gen24Sensors : BindableBase
         set => Set(ref meterStatus, value);
     }
 
-    public ObservableCollection<Gen24PowerMeter3P> Meters { get; } = new();
+    public ObservableCollection<Gen24PowerMeter3P> Meters { get; } = [];
 
     public Gen24PowerMeter3P? PrimaryPowerMeter => Meters.SingleOrDefault(m => m.Usage == MeterUsage.Inverter);
 }

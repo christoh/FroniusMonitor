@@ -177,8 +177,8 @@ public partial class HalfCircleGauge
         if
         (
             gauge.ColorAllTicks ||
-            relativeValue < rectRelativeValue && rectRelativeValue <= gauge.Origin ||
-            relativeValue > rectRelativeValue && rectRelativeValue >= gauge.Origin
+            relativeValue <= rectRelativeValue && rectRelativeValue <= gauge.Origin ||
+            relativeValue >= rectRelativeValue && rectRelativeValue >= gauge.Origin
         )
         {
             var brush = new SolidColorBrush(MultiColorGauge.GetColorForRelativeValue(gauge, rectRelativeValue));

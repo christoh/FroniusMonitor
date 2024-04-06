@@ -379,4 +379,9 @@ public partial class InverterControl
     {
         IoC.Get<MainWindow>().GetView<EventLogView>(provider).Focus();
     }
+
+    private void OnDetailsClicked(object sender, RoutedEventArgs e)
+    {
+        IoC.Get<MainWindow>().GetView<InverterDetailsView>(provider).Focus();
+    }
 }

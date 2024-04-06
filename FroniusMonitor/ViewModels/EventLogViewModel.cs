@@ -1,14 +1,7 @@
 ﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
-public class EventLogViewModel : ViewModelBase
+public class EventLogViewModel(IGen24Service gen24Service) : ViewModelBase
 {
-    private readonly IGen24Service gen24Service;
-
-    public EventLogViewModel(IGen24Service gen24Service)
-    {
-        this.gen24Service = gen24Service;
-    }
-
     private IOrderedEnumerable<Gen24Event>? events;
 
     public IOrderedEnumerable<Gen24Event>? Events

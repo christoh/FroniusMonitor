@@ -1239,4 +1239,22 @@
   <data name="MpptComparison" xml:space="preserve">
 	  <value>String 2/1</value>
   </data>
+  <data name="SumPv" xml:space="preserve">
+	  <value>Summe PV</value>
+  </data>
+  <data name="AcPhaseVoltageFeedIn" xml:space="preserve">
+	  <value>AC-Phasenspannung Netz</value>
+  </data>
+  <data name="ΔAcPhaseVoltageFeedIn" xml:space="preserve">
+	  <value>Δ-AC-Phasenspannung Wechselrichter</value>
+  </data>
+  <data name="AcLineVoltageFeedIn" xml:space="preserve">
+	  <value>AC-Leiterspannung Netz</value>
+  </data>
+  <data name="ΔAcLineVoltageFeedIn" xml:space="preserve">
+	  <value>Δ-AC-Leiterspannung Wechselrichter</value>
+  </data>
+  <data name="ΔFrequency" xml:space="preserve">
+	  <value>Δ-Frequenz</value>
+  </data>
 </root>

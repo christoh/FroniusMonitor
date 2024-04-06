@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using De.Hochstaetter.Fronius.Attributes;
 using De.Hochstaetter.Fronius.Models.Settings;
+using Microsoft.Azure.Amqp.Framing;
 
 namespace De.Hochstaetter.FroniusMonitor.Wpf.Converters;
 
@@ -762,6 +763,30 @@ public class Gen24Status2PanelBrush : ConverterBase
     }
 }
 
+public class Gen24Status2Brush : MultiConverterBase, IValueConverter
+{
+
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is Gen24Status status ? status.ToBrush() : Brushes.Gainsboro;
+    }
+
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotSupportedException();
+    }
+
+    public override object? Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (values.Length < 2 || values[0] is not Gen24Status status || values[1] is not bool useRunningColor)
+        {
+            return Brushes.Gainsboro;
+        }
+
+        return status.ToBrush(useRunningColor);
+    }
+}
+
 public class TypeToAnything<TTo> : ConverterBase
 {
     public Type? Type { get; set; }
@@ -1006,11 +1031,47 @@ public class MpptComparison : MultiConverterBase
 
         var percentage = powerMppt2.ToDouble(culture) / powerMppt1.ToDouble(culture) * 100;
 
-        object result=
+        object result =
             targetType.IsAssignableFrom(typeof(double))
                 ? percentage
-                : $"{percentage.ToString(StringFormat,CultureInfo.CurrentCulture)} {UnitName}";
+                : $"{percentage.ToString(StringFormat, CultureInfo.CurrentCulture)} {UnitName}";
 
         return result;
+    }
+}
+
+public class Gauge2Text : MultiConverterBase
+{
+    public override object? Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (values.Length < 1 || values[0] is not MultiColorGauge gauge)
+        {
+            return null;
+        }
+
+        return gauge.Value.ToString(gauge.StringFormat, CultureInfo.CurrentCulture) + " " + gauge.UnitName;
+    }
+}
+
+public class DeltaConverter : MultiConverterBase
+{
+    public override object? Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (values.Length < 1)
+        {
+            return 0d;
+        }
+
+        if (values.Length < 2)
+        {
+            return values[0];
+        }
+
+        if (values[0] is not IConvertible minuend || values[1] is not IConvertible subtrahend)
+        {
+            return 0d;
+        }
+
+        return minuend.ToDouble(culture) - subtrahend.ToDouble(culture);
     }
 }

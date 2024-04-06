@@ -8,9 +8,9 @@
         <Viewbox Initialized="OnTemplateLoaded">
             <Canvas x:Name="OuterCanvas" Width="150" Height="90">
                 <Canvas x:Name="Canvas" Width="150" Height="77" />
-                <TextBlock x:Name="MinimumTextBlock" FontSize="10" Foreground="{TemplateBinding Foreground}" FontWeight="Bold" Canvas.Bottom="0"
+                <TextBlock x:Name="MinimumTextBlock" FontSize="11" Foreground="{TemplateBinding Foreground}" FontWeight="Medium" Canvas.Bottom="0"
                            Width="150" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Left" />
-                <TextBlock x:Name="MaximumTextBlock" FontSize="10" Foreground="{TemplateBinding Foreground}" FontWeight="Bold" Canvas.Bottom="0" Canvas.Right="0"
+                <TextBlock x:Name="MaximumTextBlock" FontSize="11" Foreground="{TemplateBinding Foreground}" FontWeight="Medium" Canvas.Bottom="0" Canvas.Right="0"
                            Width="150" HorizontalAlignment="Right" VerticalAlignment="Top" TextAlignment="Right" />
             </Canvas>
         </Viewbox>

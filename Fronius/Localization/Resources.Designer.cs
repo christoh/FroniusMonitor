@@ -88,11 +88,29 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to AC Line Voltage Grid.
+        /// </summary>
+        public static string AcLineVoltageFeedIn {
+            get {
+                return ResourceManager.GetString("AcLineVoltageFeedIn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to AC module.
         /// </summary>
         public static string AcModule {
             get {
                 return ResourceManager.GetString("AcModule", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to AC Phase Voltage Grid.
+        /// </summary>
+        public static string AcPhaseVoltageFeedIn {
+            get {
+                return ResourceManager.GetString("AcPhaseVoltageFeedIn", resourceCulture);
             }
         }
         
@@ -1155,6 +1173,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string DeleteRule {
             get {
                 return ResourceManager.GetString("DeleteRule", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Details.
+        /// </summary>
+        public static string Details {
+            get {
+                return ResourceManager.GetString("Details", resourceCulture);
             }
         }
         
@@ -3220,6 +3247,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sum PV.
+        /// </summary>
+        public static string SumPv {
+            get {
+                return ResourceManager.GetString("SumPv", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to S.
         /// </summary>
         public static string Sunday_One {
@@ -3585,6 +3621,33 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string WifiSsid {
             get {
                 return ResourceManager.GetString("WifiSsid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Δ AC Line Voltage Inverter.
+        /// </summary>
+        public static string ΔAcLineVoltageFeedIn {
+            get {
+                return ResourceManager.GetString("ΔAcLineVoltageFeedIn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Δ AC Phase Voltage Inverter.
+        /// </summary>
+        public static string ΔAcPhaseVoltageFeedIn {
+            get {
+                return ResourceManager.GetString("ΔAcPhaseVoltageFeedIn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Δ Frequency.
+        /// </summary>
+        public static string ΔFrequency {
+            get {
+                return ResourceManager.GetString("ΔFrequency", resourceCulture);
             }
         }
     }

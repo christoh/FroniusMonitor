@@ -1293,4 +1293,25 @@
   <data name="MpptComparison" xml:space="preserve">
 	  <value>String 2/1</value>
   </data>
+  <data name="Details" xml:space="preserve">
+	  <value>Details</value>
+  </data>
+  <data name="SumPv" xml:space="preserve">
+	  <value>Sum PV</value>
+  </data>
+  <data name="AcPhaseVoltageFeedIn" xml:space="preserve">
+	  <value>AC Phase Voltage Grid</value>
+  </data>
+  <data name="ΔAcPhaseVoltageFeedIn" xml:space="preserve">
+	  <value>Δ AC Phase Voltage Inverter</value>
+  </data>
+  <data name="AcLineVoltageFeedIn" xml:space="preserve">
+	  <value>AC Line Voltage Grid</value>
+  </data>
+  <data name="ΔAcLineVoltageFeedIn" xml:space="preserve">
+	  <value>Δ AC Line Voltage Inverter</value>
+  </data>
+  <data name="ΔFrequency" xml:space="preserve">
+	  <value>Δ Frequency</value>
+  </data>
 </root>
