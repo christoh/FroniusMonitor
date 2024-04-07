@@ -80,6 +80,10 @@
                             </Grid>
                         </Border>
                     </DataTemplate>
+                    
+                    <Style TargetType="ContentControl">
+                        <Setter Property="ContentTemplate" Value="{StaticResource Gauge}"/>
+                    </Style>
 
                     <Style TargetType="GroupBox">
                         <Setter Property="FontSize" Value="16" />
@@ -116,28 +120,28 @@
                             </Style>
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Maximum="{m:GaugeBinding Inverter.Config.InverterSettings.Mppt.Mppt1.WattPeak, FallbackValue=5000}"
                                          Value="{m:GaugeBinding Inverter.Sensors.Cache.Solar1Power}" Label="{l:Channel 'MPPT1'}" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Maximum="{m:GaugeBinding Inverter.Config.InverterSettings.Mppt.Mppt2.WattPeak, FallbackValue=5000}"
                                          Value="{m:GaugeBinding Inverter.Sensors.Cache.Solar2Power}" Label="{l:Channel 'MPPT2'}" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Maximum="{m:GaugeBinding Inverter.Config.InverterSettings.Mppt.WattPeakTotal, FallbackValue=10000, TargetNullValue=10000}"
                                          Value="{m:GaugeBinding Inverter.Sensors.Cache.SolarPowerSum}" Label="{x:Static p:Resources.SumPv}" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}" Visibility="{Binding Inverter.Sensors.Storage, Converter={co:NullToVisibility}}">
+                            <ContentControl Visibility="{Binding Inverter.Sensors.Storage, Converter={co:NullToVisibility}}">
                                 <c:Gauge Origin=".5" Value="{m:GaugeBinding Inverter.Sensors.Cache.StoragePower}" Label="{x:Static p:Resources.Battery}"
                                          Maximum="{Binding Inverter.Sensors.Storage.VoltageOuter, FallbackValue=8184, Converter={co:Multiply Factor=22}}"
                                          Minimum="{Binding Inverter.Sensors.Storage.VoltageOuter, FallbackValue=-8184, Converter={co:Multiply Factor=-22}}" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Minimum="50" Maximum="150" UnitName="%" GaugeColors="{x:Static c:Gauge.ExtremeIsBad}" Label="{x:Static p:Resources.MpptComparison}">
                                     <c:Gauge.Value>
                                         <MultiBinding Converter="{co:MpptComparison}">
@@ -166,20 +170,20 @@
 
                         <StackPanel Orientation="Horizontal">
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.Solar1Voltage}" Label="{l:Channel 'MPPT1'}" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.Solar2Voltage}" Label="{l:Channel 'MPPT2'}" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.DcLinkVoltage}" Label="Link"
                                          Minimum="550" Maximum="800" GaugeColors="{x:Static c:Gauge.VeryLowIsBad}" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.StorageVoltageOuter}" Label="{x:Static p:Resources.Battery}"
                                          Minimum="{m:GaugeBinding Inverter.Sensors.Storage.MinVoltage, FallbackValue=160}"
                                          Maximum="{m:GaugeBinding Inverter.Sensors.Storage.MaxVoltage, FallbackValue=531}"
@@ -200,19 +204,19 @@
                             </Style>
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Maximum="25" Value="{m:GaugeBinding Inverter.Sensors.Cache.Solar1Current}" Label="{l:Channel 'MPPT1'}" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Maximum="12.5" Value="{m:GaugeBinding Inverter.Sensors.Cache.Solar2Current}" Label="{l:Channel 'MPPT2'}" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Maximum="37.5" Value="{m:GaugeBinding Inverter.Sensors.Cache.SolarCurrentSum}" Label="{x:Static p:Resources.SumPv}" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}" Visibility="{Binding Inverter.Sensors.Storage, Converter={co:NullToVisibility}}">
+                            <ContentControl Visibility="{Binding Inverter.Sensors.Storage, Converter={co:NullToVisibility}}">
                                 <c:Gauge Maximum="22" Minimum="-22" Origin=".5" Value="{m:GaugeBinding Inverter.Sensors.Cache.StorageCurrent}" Label="{x:Static p:Resources.Battery}" />
                             </ContentControl>
                         </StackPanel>
@@ -231,19 +235,19 @@
                             </Style>
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterAmbientTemperature}" Label="{x:Static p:Resources.Ambient}" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.TemperatureInverterAcModule}" Label="{x:Static p:Resources.AcModule}" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.TemperatureInverterDcModule}" Label="{x:Static p:Resources.DcModule}" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.TemperatureInverterBatteryModule}" Label="{x:Static p:Resources.BatteryModule}" />
                             </ContentControl>
                         </StackPanel>
@@ -262,11 +266,11 @@
                             </Style>
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.Fan1RelativeRpm, Converter={co:Multiply Factor=100}}" Label="{x:Static p:Resources.Fan1}" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.Fan2RelativeRpm, Converter={co:Multiply Factor=100}}" Label="{x:Static p:Resources.Fan2}" />
                             </ContentControl>
                         </StackPanel>
@@ -287,15 +291,15 @@
                             </Style>
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.FeedInPointPhaseVoltageL1}" Label="L1" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.FeedInPointPhaseVoltageL2}" Label="L2" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.FeedInPointPhaseVoltageL3}" Label="L3" />
                             </ContentControl>
                         </StackPanel>
@@ -316,7 +320,7 @@
                             </Style>
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Label="L1">
                                     <c:Gauge.Value>
                                         <MultiBinding Converter="{co:DeltaConverter}">
@@ -327,7 +331,7 @@
                                 </c:Gauge>
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Label="L2">
                                     <c:Gauge.Value>
                                         <MultiBinding Converter="{co:DeltaConverter}">
@@ -338,7 +342,7 @@
                                 </c:Gauge>
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Label="L3">
                                     <c:Gauge.Value>
                                         <MultiBinding Converter="{co:DeltaConverter}">
@@ -366,15 +370,15 @@
                             </Style>
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.FeedInPointLineVoltageL12}" Label="L12" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.FeedInPointLineVoltageL23}" Label="L23" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.FeedInPointLineVoltageL31}" Label="L31" />
                             </ContentControl>
                         </StackPanel>
@@ -394,7 +398,7 @@
                             </Style>
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Label="L12">
                                     <c:Gauge.Value>
                                         <MultiBinding Converter="{co:DeltaConverter}">
@@ -405,7 +409,7 @@
                                 </c:Gauge>
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Label="L23">
                                     <c:Gauge.Value>
                                         <MultiBinding Converter="{co:DeltaConverter}">
@@ -416,7 +420,7 @@
                                 </c:Gauge>
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Label="L31">
                                     <c:Gauge.Value>
                                         <MultiBinding Converter="{co:DeltaConverter}">
@@ -443,17 +447,17 @@
                             </Style>
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.FeedInPointFrequency}" Label="{x:Static p:Resources.Grid}"
                                          v:InverterDetailsView.AlwaysUseRunningBackground="True" t:HalfCircleGauge.MinimumMaximumStringFormat="N1" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterFrequency}" Label="{x:Static p:Resources.Inverter}"
                                          t:HalfCircleGauge.MinimumMaximumStringFormat="N1" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Label="{x:Static p:Resources.ΔFrequency}" Minimum="-5" Maximum="5" UnitName="mHz">
                                     <c:Gauge.Value>
                                         <MultiBinding Converter="{co:DeltaConverter}">
@@ -475,19 +479,19 @@
                             </Style>
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterActivePowerL1}" Label="L1" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterActivePowerL2}" Label="L2" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterActivePowerL3}" Label="L3" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{Binding Inverter.Sensors.Cache.InverterActivePowerSum, FallbackValue=-100000, TargetNullValue=-100000, Mode=OneWay}"
                                          Maximum="{Binding Inverter.Config.MaxAcPower, FallbackValue=10000, TargetNullValue=10000, Mode=OneWay}"
                                          Label="{x:Static p:Resources.Sum}">
@@ -514,19 +518,19 @@
                             </Style>
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterApparentPowerL1}" Label="L1" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterApparentPowerL2}" Label="L2" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterApparentPowerL3}" Label="L3" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{Binding Inverter.Sensors.Cache.InverterApparentPowerSum, FallbackValue=-100000, TargetNullValue=-100000, Mode=OneWay}"
                                          Maximum="{Binding Inverter.Config.MaxAcPower, FallbackValue=10000, TargetNullValue=10000, Mode=OneWay}"
                                          Label="{x:Static p:Resources.Sum}" />
@@ -545,19 +549,19 @@
                             </Style>
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterReactivePowerL1}" Label="L1" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterReactivePowerL2}" Label="L2" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterReactivePowerL3}" Label="L3" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{Binding Inverter.Sensors.Cache.InverterReactivePowerSum, FallbackValue=-100000, TargetNullValue=-100000, Mode=OneWay}"
                                          Minimum="{Binding Inverter.Config.MaxAcPower, FallbackValue=-10000, TargetNullValue=-10000, Mode=OneWay, Converter={co:Multiply Factor=-1}}"
                                          Maximum="{Binding Inverter.Config.MaxAcPower, FallbackValue=10000, TargetNullValue=10000, Mode=OneWay}"
@@ -579,19 +583,19 @@
                             </Style>
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterPowerFactorL1}" Label="L1" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterPowerFactorL2}" Label="L2" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterPowerFactorL3}" Label="L3" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterPowerFactorAverage}" Label="{x:Static p:Resources.Total}" />
                             </ContentControl>
                         </StackPanel>
@@ -604,12 +608,12 @@
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}" />
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.PowerFlow.PowerLoss}" Label="{x:Static p:Resources.Loss}"
                                          UnitName="W" Minimum="0" Maximum="500" GaugeColors="{x:Static c:Gauge.HighIsBad}" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.PowerFlow.Efficiency, Converter={co:Multiply Factor=100}}"
                                          Label="{x:Static p:Resources.Efficiency}"
                                          UnitName="%" Minimum="0" Maximum="100" GaugeColors="{x:Static c:Gauge.LowIsBad}" />
@@ -630,19 +634,19 @@
                             </Style>
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterCurrentL1}" Label="L1" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterCurrentL2}" Label="L2" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterCurrentL3}" Label="L3" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterCurrentSum}" Label="{x:Static p:Resources.Sum}"
                                          Maximum="{Binding Inverter.Config.MaxAcPower, Converter={co:Multiply Factor=0.00434784}, FallbackValue=14.4928}" />
                             </ContentControl>
@@ -664,15 +668,15 @@
                             </Style>
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterOutOfBalanceCurrentL12}" Label="L12" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterOutOfBalanceCurrentL23}" Label="L23" />
                             </ContentControl>
 
-                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                            <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterOutOfBalanceCurrentL31}" Label="L31" />
                             </ContentControl>
                         </StackPanel>
