@@ -1,6 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Models.Gen24;
-
-namespace De.Hochstaetter.FroniusMonitor.ViewModels;
+﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
 public class InverterDetailsViewModel(
     IDataCollectionService dataCollectionService,
@@ -50,6 +48,12 @@ public class InverterDetailsViewModel(
         {
             await base.OnInitialize().ConfigureAwait(false);
         }
+    }
+
+    internal override Task CleanUp()
+    {
+        dataCollectionService.NewDataReceived -= OnNewDataReceived;
+        return base.CleanUp();
     }
 
     private void OnNewDataReceived(object? s = null, SolarDataEventArgs? e = null)

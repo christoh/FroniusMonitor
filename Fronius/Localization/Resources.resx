@@ -1314,4 +1314,7 @@
   <data name="ΔFrequency" xml:space="preserve">
 	  <value>Δ Frequency</value>
   </data>
+  <data name="Fans" xml:space="preserve">
+	  <value>Fans</value>
+  </data>
 </root>

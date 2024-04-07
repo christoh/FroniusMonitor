@@ -11,368 +11,650 @@
         xmlns:t="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Resources"
         xmlns:l="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Localization"
         xmlns:v="clr-namespace:De.Hochstaetter.FroniusMonitor.Views"
+        xmlns:a="clr-namespace:De.Hochstaetter.FroniusMonitor"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=viewModels:InverterDetailsViewModel}"
-        Title="{Binding Title}" SizeToContent="Width" Height="800">
-    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Margin="10">
-        <!-- ReSharper disable Xaml.PossibleNullReferenceException -->
-        <StackPanel>
-            <StackPanel.Resources>
-                <Style TargetType="TextBlock" x:Key="Header">
-                    <Setter Property="FontSize" Value="16" />
-                    <Setter Property="Margin" Value="2,0,0,4" />
-                    <Setter Property="FontWeight" Value="Medium" />
-                    <Setter Property="HorizontalAlignment" Value="Left" />
-                </Style>
+        Title="{Binding Title}" Width="1080" Height="768">
+    <Grid>
+        <Grid.LayoutTransform>
+            <ScaleTransform x:Name="Scaler" ScaleX="1" ScaleY="{Binding ScaleX, RelativeSource={RelativeSource Self}}" />
+        </Grid.LayoutTransform>
 
-                <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource DefaultHalfCircleGauge}" x:Key="HalfCircleGauge" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-                <DataTemplate DataType="{x:Type ContentControl}" x:Key="Gauge">
-                    <Border Width="120"
-                            BorderThickness="1" BorderBrush="DimGray" Margin="2">
-                        <Border.Background>
-                            <MultiBinding Converter="{co:Gen24Status2Brush}">
-                                <Binding RelativeSource="{RelativeSource TemplatedParent}"
-                                         Path="DataContext.(c:MultiColorGauge.DataContext).(viewModels:InverterDetailsViewModel.Inverter).Sensors.InverterStatus" />
-                                <Binding RelativeSource="{RelativeSource TemplatedParent}"
-                                         Path="Content.(v:InverterDetailsView.AlwaysUseRunningBackground)" />
-                            </MultiBinding>
-                        </Border.Background>
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Text="{Binding Title}" TextAlignment="Center" FontSize="18" FontWeight="Medium" Margin="10,10,10,8" TextWrapping="Wrap" />
 
-                            <Grid.Resources>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="TextAlignment" Value="Center" />
-                                    <Setter Property="FontSize" Value="16" />
-                                </Style>
-                            </Grid.Resources>
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <!-- ReSharper disable Xaml.PossibleNullReferenceException -->
+            <WrapPanel Orientation="Horizontal" Margin="10,0,4,0">
+                <WrapPanel.Resources>
 
-                            <TextBlock Grid.Row="0" FontWeight="Normal" Text="{Binding Path=Content.(c:MultiColorGauge.Label), RelativeSource={RelativeSource TemplatedParent}}" Margin="0,3,0,0" />
-                            <TextBlock Grid.Row="1" FontSize="17" FontWeight="Medium" Margin="0,0,0,3" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}">
-                                <TextBlock.Text>
-                                    <MultiBinding Converter="{co:Gauge2Text}">
-                                        <Binding Path="(ContentControl.Content)" />
-                                        <Binding Path="(ContentControl.Content).(c:MultiColorGauge.Value)" />
-                                        <Binding Path="(ContentControl.Content).(c:MultiColorGauge.StringFormat)" />
-                                        <Binding Path="(ContentControl.Content).(c:MultiColorGauge.UnitName)" />
-                                        <Binding Path="(ContentControl.Content).(c:MultiColorGauge.ShowPercent)" />
-                                        <Binding Path="(ContentControl.Content).(c:MultiColorGauge.Minimum)" />
-                                        <Binding Path="(ContentControl.Content).(c:MultiColorGauge.Maximum)" />
-                                    </MultiBinding>
-                                </TextBlock.Text>
-                            </TextBlock>
-                            <ContentPresenter Grid.Row="2" Margin="4,0,4,4" Content="{TemplateBinding Content}" />
-                        </Grid>
-                    </Border>
-                </DataTemplate>
+                    <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource DefaultHalfCircleGauge}" x:Key="HalfCircleGauge">
+                        <Setter Property="ColorAllTicks" Value="{Binding ColorAllGaugeTicks, Source={x:Static a:App.Settings}}"></Setter>
+                    </Style>
 
-                <Style TargetType="WrapPanel">
-                    <Setter Property="Orientation" Value="Horizontal" />
-                    <Setter Property="Margin" Value="0,0,0,12" />
-                </Style>
-            </StackPanel.Resources>
+                    <DataTemplate DataType="{x:Type ContentControl}" x:Key="Gauge">
+                        <Border Width="120"
+                                BorderThickness="1" BorderBrush="DimGray" Margin="2">
+                            <Border.Background>
+                                <MultiBinding Converter="{co:Gen24Status2Brush}">
+                                    <Binding RelativeSource="{RelativeSource TemplatedParent}"
+                                             Path="DataContext.(c:MultiColorGauge.DataContext).(viewModels:InverterDetailsViewModel.Inverter).Sensors.InverterStatus" />
+                                    <Binding RelativeSource="{RelativeSource TemplatedParent}"
+                                             Path="Content.(v:InverterDetailsView.AlwaysUseRunningBackground)" />
+                                </MultiBinding>
+                            </Border.Background>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
 
-            <TextBlock Text="{Binding Title}" TextAlignment="Center" FontSize="18" FontWeight="Medium" Margin="0,0,0,8" />
+                                <Grid.Resources>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="TextAlignment" Value="Center" />
+                                        <Setter Property="FontSize" Value="16" />
+                                    </Style>
+                                </Grid.Resources>
 
-            <StackPanel>
-                <StackPanel.Resources>
-                    <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource HalfCircleGauge}">
+                                <TextBlock Grid.Row="0" FontWeight="Normal" Text="{Binding Path=Content.(c:MultiColorGauge.Label), RelativeSource={RelativeSource TemplatedParent}}" Margin="0,3,0,0" />
+
+                                <TextBlock Grid.Row="1" FontSize="17" FontWeight="Medium" Margin="0,0,0,3" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}">
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{co:Gauge2Text}">
+                                            <Binding Path="(ContentControl.Content)" />
+                                            <Binding Path="(ContentControl.Content).(c:MultiColorGauge.Value)" />
+                                            <Binding Path="(ContentControl.Content).(c:MultiColorGauge.StringFormat)" />
+                                            <Binding Path="(ContentControl.Content).(c:MultiColorGauge.UnitName)" />
+                                            <Binding Path="(ContentControl.Content).(c:MultiColorGauge.ShowPercent)" />
+                                            <Binding Path="(ContentControl.Content).(c:MultiColorGauge.Minimum)" />
+                                            <Binding Path="(ContentControl.Content).(c:MultiColorGauge.Maximum)" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                                <ContentPresenter Grid.Row="2" Margin="4,0,4,4" Content="{TemplateBinding Content}" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+
+                    <Style TargetType="GroupBox">
+                        <Setter Property="FontSize" Value="16" />
+                        <Setter Property="FontWeight" Value="Medium" />
+                        <Setter Property="Margin" Value="4" />
+                        <Setter Property="BorderThickness" Value="2" />
+                        <Setter Property="BorderBrush" Value="Gray" />
+                        <Setter Property="Padding" Value="4" />
+                    </Style>
+
+                    <Style TargetType="c:MultiColorGauge" x:Key="AcPowerGauge" BasedOn="{StaticResource HalfCircleGauge}">
+                        <Setter Property="Minimum">
+                            <Setter.Value>
+                                <MultiBinding Converter="{co:AcPowerMinimum}">
+                                    <Binding Path="Inverter.Config.MaxAcPower" Converter="{co:Multiply Factor=.33333333333333333333}" />
+                                    <Binding Path="Inverter.Sensors.Storage" />
+                                </MultiBinding>
+                            </Setter.Value>
+                        </Setter>
+                        <Setter Property="Maximum" Value="{Binding Inverter.Config.MaxAcPower, Converter={co:Multiply Factor=.33333333333333333333}, FallbackValue=3333.333333333333}" />
                         <Setter Property="StringFormat" Value="N1" />
-                        <Setter Property="UnitName" Value="W" />
-                        <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.HighIsBad}" />
+                        <Setter Property="GaugeColors" Value="{Binding Inverter.Sensors.Storage, FallbackValue={x:Null}, Converter={co:NullToColorMap NotNull={x:Static c:MultiColorGauge.MidIsGood}, Null={x:Static c:MultiColorGauge.HighIsBad}}}" />
+                        <Setter Property="Origin" Value="{Binding Inverter.Sensors.Storage, Converter={co:NullToDouble Null=0, NotNull=.5}, FallbackValue=0}" />
                     </Style>
-                </StackPanel.Resources>
-                <TextBlock Style="{StaticResource Header}" Text="{x:Static p:Resources.DcPower}" />
-                <WrapPanel>
-                    <ContentControl ContentTemplate="{StaticResource Gauge}">
-                        <c:MultiColorGauge Maximum="{m:GaugeBinding Inverter.Config.InverterSettings.Mppt.Mppt1.WattPeak, FallbackValue=5000}"
-                                           Value="{m:GaugeBinding Inverter.Sensors.Cache.Solar1Power}" Label="{l:Channel 'MPPT1'}" />
-                    </ContentControl>
+                </WrapPanel.Resources>
 
-                    <ContentControl ContentTemplate="{StaticResource Gauge}">
-                        <c:MultiColorGauge Maximum="{m:GaugeBinding Inverter.Config.InverterSettings.Mppt.Mppt2.WattPeak, FallbackValue=5000}"
-                                           Value="{m:GaugeBinding Inverter.Sensors.Cache.Solar2Power}" Label="{l:Channel 'MPPT2'}" />
-                    </ContentControl>
+                <GroupBox Header="{x:Static p:Resources.DcPower}">
+                    <StackPanel>
+                        <StackPanel.Resources>
+                            <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource HalfCircleGauge}">
+                                <Setter Property="StringFormat" Value="N1" />
+                                <Setter Property="UnitName" Value="W" />
+                                <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.HighIsBad}" />
+                            </Style>
+                        </StackPanel.Resources>
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Maximum="{m:GaugeBinding Inverter.Config.InverterSettings.Mppt.Mppt1.WattPeak, FallbackValue=5000}"
+                                                   Value="{m:GaugeBinding Inverter.Sensors.Cache.Solar1Power}" Label="{l:Channel 'MPPT1'}" />
+                            </ContentControl>
 
-                    <ContentControl ContentTemplate="{StaticResource Gauge}">
-                        <c:MultiColorGauge Maximum="{m:GaugeBinding Inverter.Config.InverterSettings.Mppt.WattPeakTotal, FallbackValue=10000, TargetNullValue=10000}"
-                                           Value="{m:GaugeBinding Inverter.Sensors.Cache.SolarPowerSum}" Label="{x:Static p:Resources.SumPv}" />
-                    </ContentControl>
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Maximum="{m:GaugeBinding Inverter.Config.InverterSettings.Mppt.Mppt2.WattPeak, FallbackValue=5000}"
+                                                   Value="{m:GaugeBinding Inverter.Sensors.Cache.Solar2Power}" Label="{l:Channel 'MPPT2'}" />
+                            </ContentControl>
 
-                    <ContentControl ContentTemplate="{StaticResource Gauge}" Visibility="{Binding Inverter.Sensors.Storage, Converter={co:NullToVisibility}}">
-                        <c:MultiColorGauge Origin=".5" Value="{m:GaugeBinding Inverter.Sensors.Cache.StoragePower}" Label="{x:Static p:Resources.Battery}"
-                                           Maximum="{Binding Inverter.Sensors.Storage.VoltageOuter, FallbackValue=8184, Converter={co:Multiply Factor=22}}"
-                                           Minimum="{Binding Inverter.Sensors.Storage.VoltageOuter, FallbackValue=-8184, Converter={co:Multiply Factor=-22}}" />
-                    </ContentControl>
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Maximum="{m:GaugeBinding Inverter.Config.InverterSettings.Mppt.WattPeakTotal, FallbackValue=10000, TargetNullValue=10000}"
+                                                   Value="{m:GaugeBinding Inverter.Sensors.Cache.SolarPowerSum}" Label="{x:Static p:Resources.SumPv}" />
+                            </ContentControl>
 
-                    <ContentControl ContentTemplate="{StaticResource Gauge}">
-                        <c:MultiColorGauge Minimum="50" Maximum="150" UnitName="%" GaugeColors="{x:Static c:MultiColorGauge.ExtremeIsBad}" Label="{x:Static p:Resources.MpptComparison}">
-                            <c:MultiColorGauge.Value>
-                                <MultiBinding Converter="{co:MpptComparison}">
-                                    <Binding Path="Inverter.Sensors.Inverter.Solar1Power" />
-                                    <Binding Path="Inverter.Sensors.Inverter.Solar2Power" />
-                                </MultiBinding>
-                            </c:MultiColorGauge.Value>
-                        </c:MultiColorGauge>
-                    </ContentControl>
-                </WrapPanel>
-            </StackPanel>
+                            <ContentControl ContentTemplate="{StaticResource Gauge}" Visibility="{Binding Inverter.Sensors.Storage, Converter={co:NullToVisibility}}">
+                                <c:MultiColorGauge Origin=".5" Value="{m:GaugeBinding Inverter.Sensors.Cache.StoragePower}" Label="{x:Static p:Resources.Battery}"
+                                                   Maximum="{Binding Inverter.Sensors.Storage.VoltageOuter, FallbackValue=8184, Converter={co:Multiply Factor=22}}"
+                                                   Minimum="{Binding Inverter.Sensors.Storage.VoltageOuter, FallbackValue=-8184, Converter={co:Multiply Factor=-22}}" />
+                            </ContentControl>
 
-            <StackPanel>
-                <StackPanel.Resources>
-                    <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource HalfCircleGauge}">
-                        <Setter Property="StringFormat" Value="N1" />
-                        <Setter Property="UnitName" Value="V" />
-                        <Setter Property="Minimum" Value="80" />
-                        <Setter Property="Maximum" Value="800" />
-                        <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.HighIsBad}" />
-                        <Setter Property="v:InverterDetailsView.AlwaysUseRunningBackground" Value="True" />
-                    </Style>
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Minimum="50" Maximum="150" UnitName="%" GaugeColors="{x:Static c:MultiColorGauge.ExtremeIsBad}" Label="{x:Static p:Resources.MpptComparison}">
+                                    <c:MultiColorGauge.Value>
+                                        <MultiBinding Converter="{co:MpptComparison}">
+                                            <Binding Path="Inverter.Sensors.Inverter.Solar1Power" />
+                                            <Binding Path="Inverter.Sensors.Inverter.Solar2Power" />
+                                        </MultiBinding>
+                                    </c:MultiColorGauge.Value>
+                                </c:MultiColorGauge>
+                            </ContentControl>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
 
-                </StackPanel.Resources>
-                <TextBlock Style="{StaticResource Header}" Text="{x:Static p:Resources.DcVoltage}" />
-                <WrapPanel>
+                <GroupBox Header="{x:Static p:Resources.DcVoltage}">
+                    <StackPanel>
+                        <StackPanel.Resources>
+                            <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource HalfCircleGauge}">
+                                <Setter Property="StringFormat" Value="N1" />
+                                <Setter Property="UnitName" Value="V" />
+                                <Setter Property="Minimum" Value="80" />
+                                <Setter Property="Maximum" Value="800" />
+                                <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.HighIsBad}" />
+                                <Setter Property="v:InverterDetailsView.AlwaysUseRunningBackground" Value="True" />
+                            </Style>
+                        </StackPanel.Resources>
 
-                    <ContentControl ContentTemplate="{StaticResource Gauge}">
-                        <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.Solar1Voltage}" Label="{l:Channel 'MPPT1'}" />
-                    </ContentControl>
+                        <StackPanel Orientation="Horizontal">
 
-                    <ContentControl ContentTemplate="{StaticResource Gauge}">
-                        <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.Solar2Voltage}" Label="{l:Channel 'MPPT2'}" />
-                    </ContentControl>
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.Solar1Voltage}" Label="{l:Channel 'MPPT1'}" />
+                            </ContentControl>
 
-                    <ContentControl ContentTemplate="{StaticResource Gauge}">
-                        <c:MultiColorGauge Origin=".5" Value="{m:GaugeBinding Inverter.Sensors.Cache.StorageVoltageOuter}" Label="{x:Static p:Resources.Battery}"
-                                           Minimum="{m:GaugeBinding Inverter.Sensors.Storage.MinVoltage, FallbackValue=160}"
-                                           Maximum="{m:GaugeBinding Inverter.Sensors.Storage.MaxVoltage, FallbackValue=531}" />
-                    </ContentControl>
-                </WrapPanel>
-            </StackPanel>
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.Solar2Voltage}" Label="{l:Channel 'MPPT2'}" />
+                            </ContentControl>
 
-            <StackPanel>
-                <StackPanel.Resources>
-                    <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource HalfCircleGauge}">
-                        <Setter Property="StringFormat" Value="N3" />
-                        <Setter Property="UnitName" Value="A" />
-                        <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.HighIsBad}" />
-                        <Setter Property="t:HalfCircleGauge.MinimumMaximumStringFormat" Value="N1" />
-                    </Style>
-                </StackPanel.Resources>
-                <TextBlock Style="{StaticResource Header}" Text="{x:Static p:Resources.DcCurrent}" />
-                <WrapPanel>
-                    <ContentControl ContentTemplate="{StaticResource Gauge}">
-                        <c:MultiColorGauge Maximum="25" Value="{m:GaugeBinding Inverter.Sensors.Cache.Solar1Current}" Label="{l:Channel 'MPPT1'}" />
-                    </ContentControl>
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Origin=".5" Value="{m:GaugeBinding Inverter.Sensors.Cache.StorageVoltageOuter}" Label="{x:Static p:Resources.Battery}"
+                                                   Minimum="{m:GaugeBinding Inverter.Sensors.Storage.MinVoltage, FallbackValue=160}"
+                                                   Maximum="{m:GaugeBinding Inverter.Sensors.Storage.MaxVoltage, FallbackValue=531}" />
+                            </ContentControl>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
 
-                    <ContentControl ContentTemplate="{StaticResource Gauge}">
-                        <c:MultiColorGauge Maximum="12.5" Value="{m:GaugeBinding Inverter.Sensors.Cache.Solar2Current}" Label="{l:Channel 'MPPT2'}" />
-                    </ContentControl>
+                <GroupBox Header="{x:Static p:Resources.DcCurrent}">
+                    <StackPanel>
+                        <StackPanel.Resources>
+                            <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource HalfCircleGauge}">
+                                <Setter Property="StringFormat" Value="N3" />
+                                <Setter Property="UnitName" Value="A" />
+                                <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.HighIsBad}" />
+                                <Setter Property="t:HalfCircleGauge.MinimumMaximumStringFormat" Value="N1" />
+                            </Style>
+                        </StackPanel.Resources>
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Maximum="25" Value="{m:GaugeBinding Inverter.Sensors.Cache.Solar1Current}" Label="{l:Channel 'MPPT1'}" />
+                            </ContentControl>
 
-                    <ContentControl ContentTemplate="{StaticResource Gauge}">
-                        <c:MultiColorGauge Maximum="37.5" Value="{m:GaugeBinding Inverter.Sensors.Cache.SolarCurrentSum}" Label="{x:Static p:Resources.SumPv}" />
-                    </ContentControl>
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Maximum="12.5" Value="{m:GaugeBinding Inverter.Sensors.Cache.Solar2Current}" Label="{l:Channel 'MPPT2'}" />
+                            </ContentControl>
 
-                    <ContentControl ContentTemplate="{StaticResource Gauge}" Visibility="{Binding Inverter.Sensors.Storage, Converter={co:NullToVisibility}}">
-                        <c:MultiColorGauge Maximum="22" Minimum="-22" Origin=".5" Value="{m:GaugeBinding Inverter.Sensors.Cache.StorageCurrent}" Label="{x:Static p:Resources.Battery}" />
-                    </ContentControl>
-                </WrapPanel>
-            </StackPanel>
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Maximum="37.5" Value="{m:GaugeBinding Inverter.Sensors.Cache.SolarCurrentSum}" Label="{x:Static p:Resources.SumPv}" />
+                            </ContentControl>
 
-            <StackPanel>
-                <StackPanel.Resources>
-                    <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource HalfCircleGauge}">
-                        <Setter Property="StringFormat" Value="N1" />
-                        <Setter Property="UnitName" Value="V" />
-                        <Setter Property="Minimum" Value="220" />
-                        <Setter Property="Maximum" Value="240" />
-                        <Setter Property="Origin" Value=".5" />
-                        <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.MidIsGood}" />
-                        <Setter Property="v:InverterDetailsView.AlwaysUseRunningBackground" Value="True" />
-                    </Style>
-                </StackPanel.Resources>
-                <TextBlock Style="{StaticResource Header}" Text="{x:Static p:Resources.AcPhaseVoltageFeedIn}" />
-                <WrapPanel>
-                    <ContentControl ContentTemplate="{StaticResource Gauge}">
-                        <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.FeedInPointPhaseVoltageL1}" Label="L1" />
-                    </ContentControl>
+                            <ContentControl ContentTemplate="{StaticResource Gauge}" Visibility="{Binding Inverter.Sensors.Storage, Converter={co:NullToVisibility}}">
+                                <c:MultiColorGauge Maximum="22" Minimum="-22" Origin=".5" Value="{m:GaugeBinding Inverter.Sensors.Cache.StorageCurrent}" Label="{x:Static p:Resources.Battery}" />
+                            </ContentControl>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
 
-                    <ContentControl ContentTemplate="{StaticResource Gauge}">
-                        <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.FeedInPointPhaseVoltageL2}" Label="L2" />
-                    </ContentControl>
+                <GroupBox Header="{x:Static p:Resources.Temperatures}">
+                    <StackPanel>
+                        <StackPanel.Resources>
+                            <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource HalfCircleGauge}">
+                                <Setter Property="UnitName" Value="°C" />
+                                <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.HighIsBad}" />
+                                <Setter Property="Minimum" Value="0" />
+                                <Setter Property="Maximum" Value="100" />
+                                <Setter Property="v:InverterDetailsView.AlwaysUseRunningBackground" Value="True" />
+                            </Style>
+                        </StackPanel.Resources>
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterAmbientTemperature}" Label="{x:Static p:Resources.Ambient}" />
+                            </ContentControl>
 
-                    <ContentControl ContentTemplate="{StaticResource Gauge}">
-                        <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.FeedInPointPhaseVoltageL3}" Label="L3" />
-                    </ContentControl>
-                </WrapPanel>
-            </StackPanel>
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.TemperatureInverterAcModule}" Label="{x:Static p:Resources.AcModule}" />
+                            </ContentControl>
 
-            <StackPanel>
-                <StackPanel.Resources>
-                    <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource HalfCircleGauge}">
-                        <Setter Property="StringFormat" Value="N2" />
-                        <Setter Property="UnitName" Value="V" />
-                        <Setter Property="Minimum" Value="-0.7" />
-                        <Setter Property="Maximum" Value="0.7" />
-                        <Setter Property="Origin" Value=".5" />
-                        <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.MidIsGood}" />
-                        <Setter Property="t:HalfCircleGauge.MinimumMaximumStringFormat" Value="N1" />
-                    </Style>
-                </StackPanel.Resources>
-                <TextBlock Style="{StaticResource Header}" Text="{x:Static p:Resources.ΔAcPhaseVoltageFeedIn}" />
-                <WrapPanel>
-                    <ContentControl ContentTemplate="{StaticResource Gauge}">
-                        <c:MultiColorGauge Label="L1">
-                            <c:MultiColorGauge.Value>
-                                <MultiBinding Converter="{co:DeltaConverter}">
-                                    <Binding Path="Inverter.Sensors.Cache.InverterPhaseVoltageL1" />
-                                    <Binding Path="Inverter.Sensors.Cache.FeedInPointPhaseVoltageL1" />
-                                </MultiBinding>
-                            </c:MultiColorGauge.Value>
-                        </c:MultiColorGauge>
-                    </ContentControl>
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.TemperatureInverterDcModule}" Label="{x:Static p:Resources.DcModule}" />
+                            </ContentControl>
 
-                    <ContentControl ContentTemplate="{StaticResource Gauge}">
-                        <c:MultiColorGauge Label="L2">
-                            <c:MultiColorGauge.Value>
-                                <MultiBinding Converter="{co:DeltaConverter}">
-                                    <Binding Path="Inverter.Sensors.Cache.InverterPhaseVoltageL2" />
-                                    <Binding Path="Inverter.Sensors.Cache.FeedInPointPhaseVoltageL2" />
-                                </MultiBinding>
-                            </c:MultiColorGauge.Value>
-                        </c:MultiColorGauge>
-                    </ContentControl>
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.TemperatureInverterBatteryModule}" Label="{x:Static p:Resources.BatteryModule}" />
+                            </ContentControl>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
 
-                    <ContentControl ContentTemplate="{StaticResource Gauge}">
-                        <c:MultiColorGauge Label="L3">
-                            <c:MultiColorGauge.Value>
-                                <MultiBinding Converter="{co:DeltaConverter}">
-                                    <Binding Path="Inverter.Sensors.Cache.InverterPhaseVoltageL3" />
-                                    <Binding Path="Inverter.Sensors.Cache.FeedInPointPhaseVoltageL3" />
-                                </MultiBinding>
-                            </c:MultiColorGauge.Value>
-                        </c:MultiColorGauge>
-                    </ContentControl>
-                </WrapPanel>
-            </StackPanel>
+                <GroupBox Header="{x:Static p:Resources.Fans}">
+                    <StackPanel>
+                        <StackPanel.Resources>
+                            <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource HalfCircleGauge}">
+                                <Setter Property="UnitName" Value="%" />
+                                <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.HighIsBad}" />
+                                <Setter Property="Minimum" Value="0" />
+                                <Setter Property="Maximum" Value="100" />
+                                <Setter Property="v:InverterDetailsView.AlwaysUseRunningBackground" Value="True" />
+                            </Style>
+                        </StackPanel.Resources>
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.Fan1RelativeRpm, Converter={co:Multiply Factor=100}}" Label="{x:Static p:Resources.Fan1}" />
+                            </ContentControl>
 
-            <StackPanel>
-                <StackPanel.Resources>
-                    <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource HalfCircleGauge}">
-                        <Setter Property="StringFormat" Value="N1" />
-                        <Setter Property="UnitName" Value="V" />
-                        <Setter Property="Minimum" Value="383.37168574084177751131265854635" />
-                        <Setter Property="Maximum" Value="413.37168574084177751131265854635" />
-                        <Setter Property="Origin" Value=".5" />
-                        <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.MidIsGood}" />
-                        <Setter Property="v:InverterDetailsView.AlwaysUseRunningBackground" Value="True" />
-                    </Style>
-                </StackPanel.Resources>
-                <TextBlock Style="{StaticResource Header}" Text="{x:Static p:Resources.AcLineVoltageFeedIn}" />
-                <WrapPanel>
-                    <ContentControl ContentTemplate="{StaticResource Gauge}">
-                        <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.FeedInPointLineVoltageL12}" Label="L12" />
-                    </ContentControl>
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.Fan2RelativeRpm, Converter={co:Multiply Factor=100}}" Label="{x:Static p:Resources.Fan2}" />
+                            </ContentControl>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
 
-                    <ContentControl ContentTemplate="{StaticResource Gauge}">
-                        <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.FeedInPointLineVoltageL23}" Label="L23" />
-                    </ContentControl>
+                <GroupBox Header="{x:Static p:Resources.AcPhaseVoltageFeedIn}">
+                    <StackPanel>
+                        <StackPanel.Resources>
+                            <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource HalfCircleGauge}">
+                                <Setter Property="StringFormat" Value="N1" />
+                                <Setter Property="UnitName" Value="V" />
+                                <Setter Property="Minimum" Value="220" />
+                                <Setter Property="Maximum" Value="240" />
+                                <Setter Property="Origin" Value=".5" />
+                                <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.MidIsGood}" />
+                                <Setter Property="v:InverterDetailsView.AlwaysUseRunningBackground" Value="True" />
+                            </Style>
+                        </StackPanel.Resources>
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.FeedInPointPhaseVoltageL1}" Label="L1" />
+                            </ContentControl>
 
-                    <ContentControl ContentTemplate="{StaticResource Gauge}">
-                        <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.FeedInPointLineVoltageL31}" Label="L31" />
-                    </ContentControl>
-                </WrapPanel>
-            </StackPanel>
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.FeedInPointPhaseVoltageL2}" Label="L2" />
+                            </ContentControl>
 
-            <StackPanel>
-                <StackPanel.Resources>
-                    <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource HalfCircleGauge}">
-                        <Setter Property="StringFormat" Value="N2" />
-                        <Setter Property="UnitName" Value="V" />
-                        <Setter Property="Minimum" Value="-1" />
-                        <Setter Property="Maximum" Value="1" />
-                        <Setter Property="Origin" Value=".5" />
-                        <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.MidIsGood}" />
-                    </Style>
-                </StackPanel.Resources>
-                <TextBlock Style="{StaticResource Header}" Text="{x:Static p:Resources.ΔAcLineVoltageFeedIn}" />
-                <WrapPanel>
-                    <ContentControl ContentTemplate="{StaticResource Gauge}">
-                        <c:MultiColorGauge Label="L12">
-                            <c:MultiColorGauge.Value>
-                                <MultiBinding Converter="{co:DeltaConverter}">
-                                    <Binding Path="Inverter.Sensors.Cache.InverterLineVoltageL12" />
-                                    <Binding Path="Inverter.Sensors.Cache.FeedInPointLineVoltageL12" />
-                                </MultiBinding>
-                            </c:MultiColorGauge.Value>
-                        </c:MultiColorGauge>
-                    </ContentControl>
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.FeedInPointPhaseVoltageL3}" Label="L3" />
+                            </ContentControl>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
 
-                    <ContentControl ContentTemplate="{StaticResource Gauge}">
-                        <c:MultiColorGauge Label="L23">
-                            <c:MultiColorGauge.Value>
-                                <MultiBinding Converter="{co:DeltaConverter}">
-                                    <Binding Path="Inverter.Sensors.Cache.InverterLineVoltageL23" />
-                                    <Binding Path="Inverter.Sensors.Cache.FeedInPointLineVoltageL23" />
-                                </MultiBinding>
-                            </c:MultiColorGauge.Value>
-                        </c:MultiColorGauge>
-                    </ContentControl>
+                <GroupBox Header="{x:Static p:Resources.ΔAcPhaseVoltageFeedIn}">
+                    <StackPanel>
+                        <StackPanel.Resources>
+                            <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource HalfCircleGauge}">
+                                <Setter Property="StringFormat" Value="N2" />
+                                <Setter Property="UnitName" Value="V" />
+                                <Setter Property="Minimum" Value="-0.7" />
+                                <Setter Property="Maximum" Value="0.7" />
+                                <Setter Property="Origin" Value=".5" />
+                                <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.MidIsGood}" />
+                                <Setter Property="t:HalfCircleGauge.MinimumMaximumStringFormat" Value="N1" />
+                            </Style>
+                        </StackPanel.Resources>
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Label="L1">
+                                    <c:MultiColorGauge.Value>
+                                        <MultiBinding Converter="{co:DeltaConverter}">
+                                            <Binding Path="Inverter.Sensors.Cache.InverterPhaseVoltageL1" />
+                                            <Binding Path="Inverter.Sensors.Cache.FeedInPointPhaseVoltageL1" />
+                                        </MultiBinding>
+                                    </c:MultiColorGauge.Value>
+                                </c:MultiColorGauge>
+                            </ContentControl>
 
-                    <ContentControl ContentTemplate="{StaticResource Gauge}">
-                        <c:MultiColorGauge Label="L31">
-                            <c:MultiColorGauge.Value>
-                                <MultiBinding Converter="{co:DeltaConverter}">
-                                    <Binding Path="Inverter.Sensors.Cache.InverterLineVoltageL31" />
-                                    <Binding Path="Inverter.Sensors.Cache.FeedInPointLineVoltageL31" />
-                                </MultiBinding>
-                            </c:MultiColorGauge.Value>
-                        </c:MultiColorGauge>
-                    </ContentControl>
-                </WrapPanel>
-            </StackPanel>
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Label="L2">
+                                    <c:MultiColorGauge.Value>
+                                        <MultiBinding Converter="{co:DeltaConverter}">
+                                            <Binding Path="Inverter.Sensors.Cache.InverterPhaseVoltageL2" />
+                                            <Binding Path="Inverter.Sensors.Cache.FeedInPointPhaseVoltageL2" />
+                                        </MultiBinding>
+                                    </c:MultiColorGauge.Value>
+                                </c:MultiColorGauge>
+                            </ContentControl>
 
-            <StackPanel>
-                <StackPanel.Resources>
-                    <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource HalfCircleGauge}">
-                        <Setter Property="StringFormat" Value="N3" />
-                        <Setter Property="UnitName" Value="Hz" />
-                        <Setter Property="Minimum" Value="49.8" />
-                        <Setter Property="Maximum" Value="50.2" />
-                        <Setter Property="Origin" Value=".5" />
-                        <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.MidIsGood}" />
-                    </Style>
-                </StackPanel.Resources>
-                <TextBlock Style="{StaticResource Header}" Text="{x:Static p:Resources.Frequency}" />
-                <WrapPanel>
-                    <ContentControl ContentTemplate="{StaticResource Gauge}">
-                        <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.FeedInPointFrequency}" Label="{x:Static p:Resources.Grid}"
-                                           v:InverterDetailsView.AlwaysUseRunningBackground="True" t:HalfCircleGauge.MinimumMaximumStringFormat="N1"/>
-                    </ContentControl>
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Label="L3">
+                                    <c:MultiColorGauge.Value>
+                                        <MultiBinding Converter="{co:DeltaConverter}">
+                                            <Binding Path="Inverter.Sensors.Cache.InverterPhaseVoltageL3" />
+                                            <Binding Path="Inverter.Sensors.Cache.FeedInPointPhaseVoltageL3" />
+                                        </MultiBinding>
+                                    </c:MultiColorGauge.Value>
+                                </c:MultiColorGauge>
+                            </ContentControl>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
 
-                    <ContentControl ContentTemplate="{StaticResource Gauge}">
-                        <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterFrequency}" Label="{x:Static p:Resources.Inverter}"
-                                           t:HalfCircleGauge.MinimumMaximumStringFormat="N1"/>
-                    </ContentControl>
+                <GroupBox Header="{x:Static p:Resources.AcLineVoltageFeedIn}">
+                    <StackPanel>
+                        <StackPanel.Resources>
+                            <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource HalfCircleGauge}">
+                                <Setter Property="StringFormat" Value="N1" />
+                                <Setter Property="UnitName" Value="V" />
+                                <Setter Property="Minimum" Value="383.37168574084177751131265854635" />
+                                <Setter Property="Maximum" Value="413.37168574084177751131265854635" />
+                                <Setter Property="Origin" Value=".5" />
+                                <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.MidIsGood}" />
+                                <Setter Property="v:InverterDetailsView.AlwaysUseRunningBackground" Value="True" />
+                            </Style>
+                        </StackPanel.Resources>
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.FeedInPointLineVoltageL12}" Label="L12" />
+                            </ContentControl>
 
-                    <ContentControl ContentTemplate="{StaticResource Gauge}">
-                        <c:MultiColorGauge Label="{x:Static p:Resources.ΔFrequency}" Minimum="-5" Maximum="5" UnitName="mHz">
-                            <c:MultiColorGauge.Value>
-                                <MultiBinding Converter="{co:DeltaConverter}">
-                                    <Binding Path="Inverter.Sensors.Cache.InverterFrequency" Converter="{co:Multiply Factor=1000}" />
-                                    <Binding Path="Inverter.Sensors.Cache.FeedInPointFrequency" Converter="{co:Multiply Factor=1000}"/>
-                                </MultiBinding>
-                            </c:MultiColorGauge.Value>
-                        </c:MultiColorGauge>
-                    </ContentControl>
-                </WrapPanel>
-            </StackPanel>
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.FeedInPointLineVoltageL23}" Label="L23" />
+                            </ContentControl>
 
-        </StackPanel>
-        <!-- ReSharper restore Xaml.PossibleNullReferenceException -->
-    </ScrollViewer>
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.FeedInPointLineVoltageL31}" Label="L31" />
+                            </ContentControl>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="{x:Static p:Resources.ΔAcLineVoltageFeedIn}">
+                    <StackPanel>
+                        <StackPanel.Resources>
+                            <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource HalfCircleGauge}">
+                                <Setter Property="StringFormat" Value="N2" />
+                                <Setter Property="UnitName" Value="V" />
+                                <Setter Property="Minimum" Value="-1" />
+                                <Setter Property="Maximum" Value="1" />
+                                <Setter Property="Origin" Value=".5" />
+                                <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.MidIsGood}" />
+                            </Style>
+                        </StackPanel.Resources>
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Label="L12">
+                                    <c:MultiColorGauge.Value>
+                                        <MultiBinding Converter="{co:DeltaConverter}">
+                                            <Binding Path="Inverter.Sensors.Cache.InverterLineVoltageL12" />
+                                            <Binding Path="Inverter.Sensors.Cache.FeedInPointLineVoltageL12" />
+                                        </MultiBinding>
+                                    </c:MultiColorGauge.Value>
+                                </c:MultiColorGauge>
+                            </ContentControl>
+
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Label="L23">
+                                    <c:MultiColorGauge.Value>
+                                        <MultiBinding Converter="{co:DeltaConverter}">
+                                            <Binding Path="Inverter.Sensors.Cache.InverterLineVoltageL23" />
+                                            <Binding Path="Inverter.Sensors.Cache.FeedInPointLineVoltageL23" />
+                                        </MultiBinding>
+                                    </c:MultiColorGauge.Value>
+                                </c:MultiColorGauge>
+                            </ContentControl>
+
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Label="L31">
+                                    <c:MultiColorGauge.Value>
+                                        <MultiBinding Converter="{co:DeltaConverter}">
+                                            <Binding Path="Inverter.Sensors.Cache.InverterLineVoltageL31" />
+                                            <Binding Path="Inverter.Sensors.Cache.FeedInPointLineVoltageL31" />
+                                        </MultiBinding>
+                                    </c:MultiColorGauge.Value>
+                                </c:MultiColorGauge>
+                            </ContentControl>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="{x:Static p:Resources.Frequency}">
+                    <StackPanel>
+                        <StackPanel.Resources>
+                            <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource HalfCircleGauge}">
+                                <Setter Property="StringFormat" Value="N3" />
+                                <Setter Property="UnitName" Value="Hz" />
+                                <Setter Property="Minimum" Value="49.8" />
+                                <Setter Property="Maximum" Value="50.2" />
+                                <Setter Property="Origin" Value=".5" />
+                                <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.MidIsGood}" />
+                            </Style>
+                        </StackPanel.Resources>
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.FeedInPointFrequency}" Label="{x:Static p:Resources.Grid}"
+                                                   v:InverterDetailsView.AlwaysUseRunningBackground="True" t:HalfCircleGauge.MinimumMaximumStringFormat="N1" />
+                            </ContentControl>
+
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterFrequency}" Label="{x:Static p:Resources.Inverter}"
+                                                   t:HalfCircleGauge.MinimumMaximumStringFormat="N1" />
+                            </ContentControl>
+
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Label="{x:Static p:Resources.ΔFrequency}" Minimum="-5" Maximum="5" UnitName="mHz">
+                                    <c:MultiColorGauge.Value>
+                                        <MultiBinding Converter="{co:DeltaConverter}">
+                                            <Binding Path="Inverter.Sensors.Cache.InverterFrequency" Converter="{co:Multiply Factor=1000}" />
+                                            <Binding Path="Inverter.Sensors.Cache.FeedInPointFrequency" Converter="{co:Multiply Factor=1000}" />
+                                        </MultiBinding>
+                                    </c:MultiColorGauge.Value>
+                                </c:MultiColorGauge>
+                            </ContentControl>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="{x:Static p:Resources.ActivePower}">
+                    <StackPanel>
+                        <StackPanel.Resources>
+                            <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource AcPowerGauge}">
+                                <Setter Property="UnitName" Value="W" />
+                            </Style>
+                        </StackPanel.Resources>
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterActivePowerL1}" Label="L1" />
+                            </ContentControl>
+
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterActivePowerL2}" Label="L2" />
+                            </ContentControl>
+
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterActivePowerL3}" Label="L3" />
+                            </ContentControl>
+
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{Binding Inverter.Sensors.Cache.InverterActivePowerSum, FallbackValue=-100000, TargetNullValue=-100000, Mode=OneWay}"
+                                                   Maximum="{Binding Inverter.Config.MaxAcPower, FallbackValue=10000, TargetNullValue=10000, Mode=OneWay}"
+                                                   Label="{x:Static p:Resources.Sum}">
+                                    <c:MultiColorGauge.Minimum>
+                                        <MultiBinding Converter="{co:AcPowerMinimum}">
+                                            <Binding Path="Inverter.Config.MaxAcPower" />
+                                            <Binding Path="Inverter.Sensors.Storage" />
+                                        </MultiBinding>
+                                    </c:MultiColorGauge.Minimum>
+                                </c:MultiColorGauge>
+                            </ContentControl>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="{x:Static p:Resources.ApparentPower}">
+                    <StackPanel>
+                        <StackPanel.Resources>
+                            <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource AcPowerGauge}">
+                                <Setter Property="UnitName" Value="VA" />
+                                <Setter Property="Minimum" Value="0" />
+                                <Setter Property="Origin" Value="0" />
+                                <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.HighIsBad}" />
+                            </Style>
+                        </StackPanel.Resources>
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterApparentPowerL1}" Label="L1" />
+                            </ContentControl>
+
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterApparentPowerL2}" Label="L2" />
+                            </ContentControl>
+
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterApparentPowerL3}" Label="L3" />
+                            </ContentControl>
+
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{Binding Inverter.Sensors.Cache.InverterApparentPowerSum, FallbackValue=-100000, TargetNullValue=-100000, Mode=OneWay}"
+                                                   Maximum="{Binding Inverter.Config.MaxAcPower, FallbackValue=10000, TargetNullValue=10000, Mode=OneWay}"
+                                                   Label="{x:Static p:Resources.Sum}" />
+                            </ContentControl>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="{x:Static p:Resources.ReactivePower}">
+                    <StackPanel>
+                        <StackPanel.Resources>
+                            <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource AcPowerGauge}">
+                                <Setter Property="UnitName" Value="VA(r)" />
+                                <Setter Property="Origin" Value=".5" />
+                                <Setter Property="Minimum" Value="{Binding Inverter.Config.MaxAcPower, FallbackValue=-10000, TargetNullValue=-10000, Mode=OneWay, Converter={co:Multiply Factor=-0.3333333333333}}" />
+                            </Style>
+                        </StackPanel.Resources>
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterReactivePowerL1}" Label="L1" />
+                            </ContentControl>
+
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterReactivePowerL2}" Label="L2" />
+                            </ContentControl>
+
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterReactivePowerL3}" Label="L3" />
+                            </ContentControl>
+
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{Binding Inverter.Sensors.Cache.InverterReactivePowerSum, FallbackValue=-100000, TargetNullValue=-100000, Mode=OneWay}"
+                                                   Minimum="{Binding Inverter.Config.MaxAcPower, FallbackValue=-10000, TargetNullValue=-10000, Mode=OneWay, Converter={co:Multiply Factor=-1}}"
+                                                   Maximum="{Binding Inverter.Config.MaxAcPower, FallbackValue=10000, TargetNullValue=10000, Mode=OneWay}"
+                                                   Label="{x:Static p:Resources.Sum}" />
+                            </ContentControl>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="cos(ϕ)">
+                    <StackPanel>
+                        <StackPanel.Resources>
+                            <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource HalfCircleGauge}">
+                                <Setter Property="Minimum" Value="-1" />
+                                <Setter Property="Maximum" Value="1" />
+                                <Setter Property="Origin" Value=".5" />
+                                <Setter Property="StringFormat" Value="N5" />
+                                <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.MidIsBad}" />
+                            </Style>
+                        </StackPanel.Resources>
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterPowerFactorL1}" Label="L1" />
+                            </ContentControl>
+
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterPowerFactorL2}" Label="L2" />
+                            </ContentControl>
+
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterPowerFactorL3}" Label="L3" />
+                            </ContentControl>
+
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterPowerFactorAverage}" Label="{x:Static p:Resources.Total}" />
+                            </ContentControl>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="{x:Static p:Resources.AcCurrent}">
+                    <StackPanel>
+                        <StackPanel.Resources>
+                            <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource HalfCircleGauge}">
+                                <Setter Property="Maximum" Value="{Binding Inverter.Config.MaxAcPower, Converter={co:Multiply Factor=0.00144928}, FallbackValue=14.4928}" />
+                                <Setter Property="UnitName" Value="A" />
+                                <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.HighIsBad}"/>
+                                <Setter Property="StringFormat" Value="N3" />
+                                <Setter Property="t:HalfCircleGauge.MinimumMaximumStringFormat" Value="N1" />
+                            </Style>
+                        </StackPanel.Resources>
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterCurrentL1}" Label="L1" />
+                            </ContentControl>
+
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterCurrentL2}" Label="L2" />
+                            </ContentControl>
+
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterCurrentL3}" Label="L3" />
+                            </ContentControl>
+
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterCurrentSum}" Label="{x:Static p:Resources.Sum}"
+                                                   Maximum="{Binding Inverter.Config.MaxAcPower, Converter={co:Multiply Factor=0.00434784}, FallbackValue=14.4928}" />
+                            </ContentControl>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="{x:Static p:Resources.OutOfBalance}">
+                    <StackPanel>
+                        <StackPanel.Resources>
+                            <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource HalfCircleGauge}">
+                                <Setter Property="Minimum" Value="0" />
+                                <Setter Property="Maximum" Value="{Binding Inverter.Config.MaxAcPower, Converter={co:Multiply Factor=0.00144928}, FallbackValue=14.4928}" />
+                                <Setter Property="Origin" Value="0" />
+                                <Setter Property="UnitName" Value="A" />
+                                <Setter Property="StringFormat" Value="N3" />
+                                <Setter Property="GaugeColors" Value="{x:Static c:MultiColorGauge.HighIsBad}" />
+                                <Setter Property="t:HalfCircleGauge.MinimumMaximumStringFormat" Value="N1" />
+                            </Style>
+                        </StackPanel.Resources>
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterOutOfBalanceCurrentL12}" Label="L12" />
+                            </ContentControl>
+
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterOutOfBalanceCurrentL23}" Label="L23" />
+                            </ContentControl>
+
+                            <ContentControl ContentTemplate="{StaticResource Gauge}">
+                                <c:MultiColorGauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterOutOfBalanceCurrentL31}" Label="L31" />
+                            </ContentControl>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+            </WrapPanel>
+            <!-- ReSharper restore Xaml.PossibleNullReferenceException -->
+        </ScrollViewer>
+    </Grid>
 </Window>

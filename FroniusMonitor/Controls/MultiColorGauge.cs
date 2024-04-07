@@ -169,11 +169,11 @@ public class MultiColorGauge : ProgressBar
     public static IReadOnlyList<ColorThreshold> MidIsBad { get; } =
     [
         new ColorThreshold(0, Colors.Green),
-        new ColorThreshold(.05, Colors.YellowGreen),
-        new ColorThreshold(.25, Colors.OrangeRed),
+        new ColorThreshold(.20, Colors.YellowGreen),
+        new ColorThreshold(.3333333, Colors.OrangeRed),
         new ColorThreshold(0.5, Colors.Red),
-        new ColorThreshold(.75, Colors.OrangeRed),
-        new ColorThreshold(.95, Colors.YellowGreen),
+        new ColorThreshold(.6666667, Colors.OrangeRed),
+        new ColorThreshold(.8, Colors.YellowGreen),
         new ColorThreshold(1, Colors.Green),
     ];
 

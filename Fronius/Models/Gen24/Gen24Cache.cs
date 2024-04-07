@@ -9,7 +9,12 @@ public class Gen24Cache : Gen24DeviceBase
     public double? InverterCurrentL1
     {
         get => inverterCurrentL1;
-        set => Set(ref inverterCurrentL1, value, () => NotifyOfPropertyChange(nameof(InverterCurrentSum)));
+        set => Set(ref inverterCurrentL1, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(InverterCurrentSum));
+            NotifyOfPropertyChange(nameof(InverterOutOfBalanceCurrentL12));
+            NotifyOfPropertyChange(nameof(InverterOutOfBalanceCurrentL31));
+        });
     }
 
     private double? inverterCurrentL2;
@@ -18,7 +23,12 @@ public class Gen24Cache : Gen24DeviceBase
     public double? InverterCurrentL2
     {
         get => inverterCurrentL2;
-        set => Set(ref inverterCurrentL2, value, () => NotifyOfPropertyChange(nameof(InverterCurrentSum)));
+        set => Set(ref inverterCurrentL2, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(InverterCurrentSum));
+            NotifyOfPropertyChange(nameof(InverterOutOfBalanceCurrentL23));
+            NotifyOfPropertyChange(nameof(InverterOutOfBalanceCurrentL12));
+        });
     }
 
     private double? inverterCurrentL3;
@@ -27,8 +37,17 @@ public class Gen24Cache : Gen24DeviceBase
     public double? InverterCurrentL3
     {
         get => inverterCurrentL3;
-        set => Set(ref inverterCurrentL3, value, () => NotifyOfPropertyChange(nameof(InverterCurrentSum)));
+        set => Set(ref inverterCurrentL3, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(InverterCurrentSum));
+            NotifyOfPropertyChange(nameof(InverterOutOfBalanceCurrentL23));
+            NotifyOfPropertyChange(nameof(InverterOutOfBalanceCurrentL31));
+        });
     }
+
+    public double? InverterOutOfBalanceCurrentL12 => !InverterCurrentL1.HasValue || !InverterCurrentL2.HasValue ? null : Math.Abs(InverterCurrentL1.Value - InverterCurrentL2.Value);
+    public double? InverterOutOfBalanceCurrentL23 => !InverterCurrentL2.HasValue || !InverterCurrentL3.HasValue ? null : Math.Abs(InverterCurrentL2.Value - InverterCurrentL3.Value);
+    public double? InverterOutOfBalanceCurrentL31 => !InverterCurrentL3.HasValue || !InverterCurrentL1.HasValue ? null : Math.Abs(InverterCurrentL3.Value - InverterCurrentL1.Value);
 
     public double? InverterCurrentSum => InverterCurrentL1 + InverterCurrentL2 + InverterCurrentL3;
 
@@ -209,11 +228,10 @@ public class Gen24Cache : Gen24DeviceBase
         set => Set(ref inverterReactivePowerSum, value);
     }
 
-    public double? InverterPowerFactorL1 => InverterApparentPowerL1 is 0.0 ? null : InverterActivePowerL1 / InverterApparentPowerL1;
-    public double? InverterPowerFactorL2 => InverterApparentPowerL2 is 0.0 ? null : InverterActivePowerL2 / InverterApparentPowerL2;
-    public double? InverterPowerFactorL3 => InverterApparentPowerL3 is 0.0 ? null : InverterActivePowerL3 / InverterApparentPowerL3;
-    public double? InverterPowerFactorAverage => InverterApparentPowerSum is 0.0 ? null : InverterActivePowerSum / InverterApparentPowerSum;
-
+    public double? InverterPowerFactorL1 => InverterApparentPowerL1 is 0.0 || !InverterActivePowerL1.HasValue|| !InverterApparentPowerL1.HasValue ? null : Math.Min(Math.Max(-1,InverterActivePowerL1.Value / InverterApparentPowerL1.Value),1);
+    public double? InverterPowerFactorL2 => InverterApparentPowerL2 is 0.0 || !InverterActivePowerL2.HasValue|| !InverterApparentPowerL2.HasValue ? null : Math.Min(Math.Max(-1,InverterActivePowerL2.Value / InverterApparentPowerL2.Value),1);
+    public double? InverterPowerFactorL3 => InverterApparentPowerL3 is 0.0 || !InverterActivePowerL3.HasValue|| !InverterApparentPowerL3.HasValue ? null : Math.Min(Math.Max(-1,InverterActivePowerL3.Value / InverterApparentPowerL3.Value),1);
+    public double? InverterPowerFactorAverage => InverterApparentPowerSum is 0.0 || !InverterActivePowerSum.HasValue|| !InverterApparentPowerSum.HasValue ? null : Math.Min(Math.Max(-1,InverterActivePowerSum.Value / InverterApparentPowerSum.Value),1);
     private TimeSpan backupModeUpTime;
 
     [FroniusProprietaryImport("ACBRIDGE_TIME_BACKUPMODE_UPTIME_SUM_F32")]

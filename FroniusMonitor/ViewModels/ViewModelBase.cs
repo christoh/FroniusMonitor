@@ -37,6 +37,8 @@ public abstract class ViewModelBase : BindableBase
         }
     }
 
+    internal virtual Task CleanUp() => Task.CompletedTask;
+
     internal void HandleValidationErrorChange(ValidationErrorEventArgs e)
     {
         switch (e.Action)

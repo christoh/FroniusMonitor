@@ -1257,4 +1257,7 @@
   <data name="ΔFrequency" xml:space="preserve">
 	  <value>Δ-Frequenz</value>
   </data>
+  <data name="Fans" xml:space="preserve">
+	  <value>Lüfter</value>
+  </data>
 </root>

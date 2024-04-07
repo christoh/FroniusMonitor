@@ -1438,6 +1438,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Fans.
+        /// </summary>
+        public static string Fans {
+            get {
+                return ResourceManager.GetString("Fans", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to |All files (*.*)|*.
         /// </summary>
         public static string FilterAllFiles {

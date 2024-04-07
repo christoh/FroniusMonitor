@@ -28,6 +28,79 @@ public partial class InverterDetailsView : IInverterScoped
         {
             _ = viewModel.OnInitialize();
         };
+
+        Closed += (s, e) =>
+        {
+            _= viewModel.CleanUp();
+        };
+        
+        PreviewMouseWheel+=OnMouseWheel ;
+        PreviewKeyDown += OnKeyDown;
+    }
+
+    private void OnMouseWheel(object _, MouseWheelEventArgs e)
+    {
+        if (e.Handled || Keyboard.IsKeyUp(Key.LeftCtrl) && Keyboard.IsKeyUp(Key.RightCtrl))
+        {
+            return;
+        }
+
+        e.Handled = true;
+
+        if (e.Delta > 0)
+        {
+            ZoomIn();
+        }
+        else
+        {
+            ZoomOut();
+        }
+    }
+
+    protected void OnKeyDown(object _, KeyEventArgs e)
+    {
+        if (e.Handled || Keyboard.IsKeyUp(Key.LeftCtrl) && Keyboard.IsKeyUp(Key.RightCtrl)) return;
+
+        e.Handled = true;
+
+        switch (e.Key)
+        {
+            case Key.Add:
+            case Key.OemPlus:
+                ZoomIn();
+                break;
+
+            case Key.Subtract:
+            case Key.OemMinus:
+                ZoomOut();
+                break;
+
+            case Key.NumPad0:
+            case Key.D0:
+                Zoom0();
+                break;
+
+            default:
+                e.Handled = false;
+                break;
+        }
+    }
+    
+    private void ZoomIn()
+    {
+        Scaler.ScaleX *= App.ZoomFactor;
+        //Scaler.ScaleY = Scaler.ScaleX;
+    }
+
+    private void ZoomOut()
+    {
+        Scaler.ScaleX /= App.ZoomFactor;
+        //ConsumerScaler.ScaleY = ConsumerScaler.ScaleX;
+    }
+
+    private void Zoom0()
+    {
+        Scaler.ScaleX = 1;
     }
 
     public IGen24Service Gen24Service { get; }
