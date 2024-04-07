@@ -4,7 +4,7 @@
                     xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
                     xmlns:t="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Resources">
 
-    <ControlTemplate TargetType="c:MultiColorGauge" x:Key="LinearGauge">
+    <ControlTemplate TargetType="c:Gauge" x:Key="LinearGauge">
         <Viewbox Initialized="OnRootElementInitialized">
             <Grid Width="100" x:Name="Grid">
                 <Grid.ColumnDefinitions>
@@ -42,7 +42,7 @@
         </Viewbox>
     </ControlTemplate>
 
-    <Style x:Key="DefaultLinearGauge" TargetType="c:MultiColorGauge">
+    <Style x:Key="DefaultLinearGauge" TargetType="c:Gauge">
         <Setter Property="Foreground" Value="Black" />
         <Setter Property="TickFill" Value="DarkGray" />
         <Setter Property="StringFormat" Value="N1" />

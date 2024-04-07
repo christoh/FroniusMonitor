@@ -4,18 +4,18 @@ public partial class LinearGauge
 {
     #region Dependency Properties
 
-    private static readonly DependencyPropertyDescriptor? valueDescriptor = DependencyPropertyDescriptor.FromProperty(RangeBase.ValueProperty, typeof(MultiColorGauge));
-    private static readonly DependencyPropertyDescriptor? minimumDescriptor = DependencyPropertyDescriptor.FromProperty(RangeBase.MinimumProperty, typeof(MultiColorGauge));
-    private static readonly DependencyPropertyDescriptor? maximumDescriptor = DependencyPropertyDescriptor.FromProperty(RangeBase.MaximumProperty, typeof(MultiColorGauge));
-    private static readonly DependencyPropertyDescriptor? tickFillDescriptor = DependencyPropertyDescriptor.FromProperty(MultiColorGauge.TickFillProperty, typeof(MultiColorGauge));
-    private static readonly DependencyPropertyDescriptor? originDescriptor = DependencyPropertyDescriptor.FromProperty(MultiColorGauge.OriginProperty, typeof(MultiColorGauge));
-    private static readonly DependencyPropertyDescriptor? showPercentDescriptor = DependencyPropertyDescriptor.FromProperty(MultiColorGauge.ShowPercentProperty, typeof(MultiColorGauge));
-    private static readonly DependencyPropertyDescriptor? unitNameDescriptor = DependencyPropertyDescriptor.FromProperty(MultiColorGauge.UnitNameProperty, typeof(MultiColorGauge));
-    private static readonly DependencyPropertyDescriptor? stringFormatDescriptor = DependencyPropertyDescriptor.FromProperty(MultiColorGauge.StringFormatProperty, typeof(MultiColorGauge));
+    private static readonly DependencyPropertyDescriptor? valueDescriptor = DependencyPropertyDescriptor.FromProperty(RangeBase.ValueProperty, typeof(Gauge));
+    private static readonly DependencyPropertyDescriptor? minimumDescriptor = DependencyPropertyDescriptor.FromProperty(RangeBase.MinimumProperty, typeof(Gauge));
+    private static readonly DependencyPropertyDescriptor? maximumDescriptor = DependencyPropertyDescriptor.FromProperty(RangeBase.MaximumProperty, typeof(Gauge));
+    private static readonly DependencyPropertyDescriptor? tickFillDescriptor = DependencyPropertyDescriptor.FromProperty(Gauge.TickFillProperty, typeof(Gauge));
+    private static readonly DependencyPropertyDescriptor? originDescriptor = DependencyPropertyDescriptor.FromProperty(Gauge.OriginProperty, typeof(Gauge));
+    private static readonly DependencyPropertyDescriptor? showPercentDescriptor = DependencyPropertyDescriptor.FromProperty(Gauge.ShowPercentProperty, typeof(Gauge));
+    private static readonly DependencyPropertyDescriptor? unitNameDescriptor = DependencyPropertyDescriptor.FromProperty(Gauge.UnitNameProperty, typeof(Gauge));
+    private static readonly DependencyPropertyDescriptor? stringFormatDescriptor = DependencyPropertyDescriptor.FromProperty(Gauge.StringFormatProperty, typeof(Gauge));
 
     public static readonly DependencyProperty LinearAnimatedValueProperty = DependencyProperty.RegisterAttached
     (
-        nameof(GetLinearAnimatedValue)[3..], typeof(double), typeof(MultiColorGauge),
+        nameof(GetLinearAnimatedValue)[3..], typeof(double), typeof(Gauge),
         new PropertyMetadata(OnAnimatedValueChanged)
     );
 
@@ -96,13 +96,13 @@ public partial class LinearGauge
             rootElement.FindName("InnerBorder") is not Border innerBorder ||
             rootElement.FindName("Grid") is not Grid grid ||
             rootElement.FindName("MidpointMarker") is not FrameworkElement midPointMarker ||
-            rootElement.TemplatedParent is not MultiColorGauge gauge
+            rootElement.TemplatedParent is not Gauge gauge
         )
         {
             return;
         }
 
-        gauge.SetValue(MultiColorGauge.TemplateMetadataPropertyKey, new LinearGaugeMetadata(innerBorder, valueTextBlock, grid, midPointMarker));
+        gauge.SetValue(Gauge.TemplateMetadataPropertyKey, new LinearGaugeMetadata(innerBorder, valueTextBlock, grid, midPointMarker));
 
         valueDescriptor?.AddValueChanged(gauge, (_, _) => OnValueChanged(gauge, valueTextBlock));
         minimumDescriptor?.AddValueChanged(gauge, (_, _) => OnValueChanged(gauge, valueTextBlock));
@@ -122,7 +122,7 @@ public partial class LinearGauge
         OnValueChanged(gauge, valueTextBlock, true);
     }
 
-    private static double SetValueTextBlock(MultiColorGauge gauge, TextBlock valueTextBlock)
+    private static double SetValueTextBlock(Gauge gauge, TextBlock valueTextBlock)
     {
         var relativeValue = (Math.Max(Math.Min(gauge.Maximum, gauge.Value), gauge.Minimum) - gauge.Minimum) / (gauge.Maximum - gauge.Minimum);
 
@@ -136,7 +136,7 @@ public partial class LinearGauge
         return relativeValue;
     }
 
-    private static void OnValueChanged(MultiColorGauge gauge, TextBlock valueTextBlock, bool skipAnimation = false)
+    private static void OnValueChanged(Gauge gauge, TextBlock valueTextBlock, bool skipAnimation = false)
     {
         var relativeValue = SetValueTextBlock(gauge, valueTextBlock);
 
@@ -159,7 +159,7 @@ public partial class LinearGauge
 
     private static void OnUseAbsoluteValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        var gauge = (MultiColorGauge)d;
+        var gauge = (Gauge)d;
 
         if (gauge.TemplateMetadata is LinearGaugeMetadata metadata)
         {
@@ -167,7 +167,7 @@ public partial class LinearGauge
         }
     }
 
-    private static void SetUnitName(MultiColorGauge gauge)
+    private static void SetUnitName(Gauge gauge)
     {
         SetDisplayUnitName(gauge, gauge.ShowPercent ? "%" : gauge.UnitName);
     }
@@ -176,7 +176,7 @@ public partial class LinearGauge
     {
         if
         (
-            d is not MultiColorGauge gauge ||
+            d is not Gauge gauge ||
             e.NewValue is not double animatedValue ||
             gauge.TemplateMetadata is not LinearGaugeMetadata metadata
         )
@@ -194,7 +194,7 @@ public partial class LinearGauge
         innerBorder.Margin = new Thickness(animatedValue > gauge.Origin ? grid.Width * gauge.Origin : grid.Width * gauge.Origin - width, 0, 0, 0);
 
 
-        var baseColor = MultiColorGauge.GetColorForRelativeValue(gauge, animatedValue);
+        var baseColor = Gauge.GetColorForRelativeValue(gauge, animatedValue);
         var brush = new LinearGradientBrush(baseColor, baseColor * 0.4f + Colors.Black * 0.6f, 90);
         brush.Freeze();
         innerBorder.Background = brush;

@@ -12,17 +12,17 @@ public partial class HalfCircleGauge
 
     #region Dependency Properties
 
-    private static readonly DependencyPropertyDescriptor? valueDescriptor = DependencyPropertyDescriptor.FromProperty(RangeBase.ValueProperty, typeof(MultiColorGauge));
-    private static readonly DependencyPropertyDescriptor? minimumDescriptor = DependencyPropertyDescriptor.FromProperty(RangeBase.MinimumProperty, typeof(MultiColorGauge));
-    private static readonly DependencyPropertyDescriptor? maximumDescriptor = DependencyPropertyDescriptor.FromProperty(RangeBase.MaximumProperty, typeof(MultiColorGauge));
-    private static readonly DependencyPropertyDescriptor? colorsDescriptor = DependencyPropertyDescriptor.FromProperty(MultiColorGauge.GaugeColorsProperty, typeof(MultiColorGauge));
-    private static readonly DependencyPropertyDescriptor? handFillDescriptor = DependencyPropertyDescriptor.FromProperty(MultiColorGauge.HandFillProperty, typeof(MultiColorGauge));
-    private static readonly DependencyPropertyDescriptor? tickFillDescriptor = DependencyPropertyDescriptor.FromProperty(MultiColorGauge.TickFillProperty, typeof(MultiColorGauge));
-    private static readonly DependencyPropertyDescriptor? colorAllTicksDescriptor = DependencyPropertyDescriptor.FromProperty(MultiColorGauge.ColorAllTicksProperty, typeof(MultiColorGauge));
+    private static readonly DependencyPropertyDescriptor? valueDescriptor = DependencyPropertyDescriptor.FromProperty(RangeBase.ValueProperty, typeof(Gauge));
+    private static readonly DependencyPropertyDescriptor? minimumDescriptor = DependencyPropertyDescriptor.FromProperty(RangeBase.MinimumProperty, typeof(Gauge));
+    private static readonly DependencyPropertyDescriptor? maximumDescriptor = DependencyPropertyDescriptor.FromProperty(RangeBase.MaximumProperty, typeof(Gauge));
+    private static readonly DependencyPropertyDescriptor? colorsDescriptor = DependencyPropertyDescriptor.FromProperty(Gauge.GaugeColorsProperty, typeof(Gauge));
+    private static readonly DependencyPropertyDescriptor? handFillDescriptor = DependencyPropertyDescriptor.FromProperty(Gauge.HandFillProperty, typeof(Gauge));
+    private static readonly DependencyPropertyDescriptor? tickFillDescriptor = DependencyPropertyDescriptor.FromProperty(Gauge.TickFillProperty, typeof(Gauge));
+    private static readonly DependencyPropertyDescriptor? colorAllTicksDescriptor = DependencyPropertyDescriptor.FromProperty(Gauge.ColorAllTicksProperty, typeof(Gauge));
 
     public static readonly DependencyProperty AnimatedValueProperty = DependencyProperty.RegisterAttached
     (
-        nameof(GetAnimatedValue)[3..], typeof(double), typeof(MultiColorGauge),
+        nameof(GetAnimatedValue)[3..], typeof(double), typeof(Gauge),
         new PropertyMetadata(OnAnimatedAngleChanged)
     );
 
@@ -83,7 +83,7 @@ public partial class HalfCircleGauge
         hand.SetValue(Canvas.BottomProperty, 8d);
         hand.SetValue(Canvas.LeftProperty, outerCanvas.Width / 2 - 4);
         outerCanvas.Children.Add(hand);
-        gauge.SetValue(MultiColorGauge.TemplateMetadataPropertyKey, new GaugeMetaData(hand, handLength, canvas));
+        gauge.SetValue(Gauge.TemplateMetadataPropertyKey, new GaugeMetaData(hand, handLength, canvas));
 
         valueDescriptor?.AddValueChanged(gauge, (_, _) => SetValue(gauge));
         minimumDescriptor?.AddValueChanged(gauge, (_, _) => OnMinimumMaximumChanged(gauge, minimumTextBlock, maximumTextBlock));
@@ -106,7 +106,7 @@ public partial class HalfCircleGauge
         OnParametersChanged(gauge, minimumTextBlock, maximumTextBlock);
     }
 
-    private static void OnMinimumMaximumChanged(MultiColorGauge gauge, TextBlock? minimumTextBlock, TextBlock? maximumTextBlock, bool skipAnimation = false)
+    private static void OnMinimumMaximumChanged(Gauge gauge, TextBlock? minimumTextBlock, TextBlock? maximumTextBlock, bool skipAnimation = false)
     {
         if (gauge.TemplateMetadata is not GaugeMetaData metaData)
         {
@@ -135,7 +135,7 @@ public partial class HalfCircleGauge
         }
     }
 
-    private static double SetValue(MultiColorGauge gauge, bool skipAnimation = false)
+    private static double SetValue(Gauge gauge, bool skipAnimation = false)
     {
         var relativeValue = (Math.Max(Math.Min(gauge.Maximum, gauge.Value), gauge.Minimum) - gauge.Minimum) / (gauge.Maximum - gauge.Minimum);
 
@@ -159,7 +159,7 @@ public partial class HalfCircleGauge
 
     private static void OnAnimatedAngleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        var gauge = (MultiColorGauge)d;
+        var gauge = (Gauge)d;
         var (hand, handLength, canvas) = (GaugeMetaData)gauge.TemplateMetadata;
         var relativeValue = (double)e.NewValue;
         hand.RenderTransform = new RotateTransform((relativeValue - 0.5) * 180, 4, handLength - 5);
@@ -170,7 +170,7 @@ public partial class HalfCircleGauge
         }
     }
 
-    private static void ColorShape(MultiColorGauge gauge, Shape rect, double relativeValue)
+    private static void ColorShape(Gauge gauge, Shape rect, double relativeValue)
     {
         var rectRelativeValue = Math.Round((double)rect.Tag, 6);
 
@@ -181,7 +181,7 @@ public partial class HalfCircleGauge
             relativeValue >= rectRelativeValue && rectRelativeValue >= gauge.Origin
         )
         {
-            var brush = new SolidColorBrush(MultiColorGauge.GetColorForRelativeValue(gauge, rectRelativeValue));
+            var brush = new SolidColorBrush(Gauge.GetColorForRelativeValue(gauge, rectRelativeValue));
             brush.Freeze();
             rect.Fill = brush;
             return;
@@ -190,7 +190,7 @@ public partial class HalfCircleGauge
         rect.Fill = gauge.TickFill;
     }
 
-    private static void OnParametersChanged(MultiColorGauge gauge, TextBlock? minimumTextBlock, TextBlock? maximumTextBlock)
+    private static void OnParametersChanged(Gauge gauge, TextBlock? minimumTextBlock, TextBlock? maximumTextBlock)
     {
         var (_, _, canvas) = (GaugeMetaData)gauge.TemplateMetadata;
 
@@ -233,7 +233,7 @@ public partial class HalfCircleGauge
 
     private static void OnHandBrushChanged(object? sender, EventArgs? _ = null)
     {
-        if (sender is not MultiColorGauge { TemplateMetadata: GaugeMetaData metaData } gauge)
+        if (sender is not Gauge { TemplateMetadata: GaugeMetaData metaData } gauge)
         {
             return;
         }
@@ -241,11 +241,11 @@ public partial class HalfCircleGauge
         metaData.Hand.Fill = gauge.HandFill;
     }
 
-    private static (MultiColorGauge Gauge, Canvas Canvas, Canvas OuterCanvas, TextBlock MinimumTextBlock, TextBlock MaximumTextBlock) GetGaugeAndCanvas(object? sender)
+    private static (Gauge Gauge, Canvas Canvas, Canvas OuterCanvas, TextBlock MinimumTextBlock, TextBlock MaximumTextBlock) GetGaugeAndCanvas(object? sender)
     {
         if
         (
-            sender is MultiColorGauge gauge &&
+            sender is Gauge gauge &&
             gauge.Template.FindName("Canvas", gauge) is Canvas canvas &&
             canvas.FindName("OuterCanvas") is Canvas outerCanvas &&
             canvas.FindName("MinimumTextBlock") is TextBlock minimumTextBlock &&

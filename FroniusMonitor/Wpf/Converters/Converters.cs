@@ -1044,7 +1044,7 @@ public class Gauge2Text : MultiConverterBase
 {
     public override object? Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (values.Length < 1 || values[0] is not MultiColorGauge gauge)
+        if (values.Length < 1 || values[0] is not Gauge gauge)
         {
             return null;
         }

@@ -4,7 +4,7 @@
                     xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
                     xmlns:a="clr-namespace:De.Hochstaetter.FroniusMonitor">
 
-    <ControlTemplate x:Key="HalfCircleGauge" TargetType="c:MultiColorGauge">
+    <ControlTemplate x:Key="HalfCircleGauge" TargetType="c:Gauge">
         <Viewbox Initialized="OnTemplateLoaded">
             <Canvas x:Name="OuterCanvas" Width="150" Height="90">
                 <Canvas x:Name="Canvas" Width="150" Height="77" />
@@ -16,7 +16,7 @@
         </Viewbox>
     </ControlTemplate>
 
-    <Style TargetType="c:MultiColorGauge" x:Key="DefaultHalfCircleGauge">
+    <Style TargetType="c:Gauge" x:Key="DefaultHalfCircleGauge">
         <Setter Property="HandFill" Value="DarkSlateGray" />
         <Setter Property="Foreground" Value="Black" />
         <Setter Property="TickFill" Value="DarkGray" />
@@ -25,6 +25,6 @@
         <Setter Property="ColorAllTicks" Value="{Binding Path=ColorAllGaugeTicks, Source={x:Static a:App.Settings}, FallbackValue=False}"/>
     </Style>
 
-    <Style TargetType="c:MultiColorGauge" BasedOn="{StaticResource DefaultHalfCircleGauge}" />
+    <Style TargetType="c:Gauge" BasedOn="{StaticResource DefaultHalfCircleGauge}" />
 
 </ResourceDictionary>

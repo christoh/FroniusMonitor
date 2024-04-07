@@ -1,10 +1,10 @@
 ﻿namespace De.Hochstaetter.FroniusMonitor.Controls;
 
-public class MultiColorGauge : ProgressBar
+public class Gauge : ProgressBar
 {
     public static readonly DependencyProperty GaugeColorsProperty = DependencyProperty.Register
     (
-        nameof(GaugeColors), typeof(IReadOnlyList<ColorThreshold>), typeof(MultiColorGauge),
+        nameof(GaugeColors), typeof(IReadOnlyList<ColorThreshold>), typeof(Gauge),
         new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.Journal)
     );
 
@@ -16,7 +16,7 @@ public class MultiColorGauge : ProgressBar
 
     public static readonly DependencyProperty OriginProperty = DependencyProperty.Register
     (
-        nameof(Origin), typeof(double), typeof(MultiColorGauge),
+        nameof(Origin), typeof(double), typeof(Gauge),
         new FrameworkPropertyMetadata(0.0)
     );
 
@@ -28,7 +28,7 @@ public class MultiColorGauge : ProgressBar
 
     public static readonly DependencyProperty LabelProperty = DependencyProperty.Register
     (
-        nameof(Label), typeof(string), typeof(MultiColorGauge), new FrameworkPropertyMetadata(string.Empty)
+        nameof(Label), typeof(string), typeof(Gauge), new FrameworkPropertyMetadata(string.Empty)
     );
 
     public string? Label
@@ -39,7 +39,7 @@ public class MultiColorGauge : ProgressBar
 
     public static readonly DependencyProperty StringFormatProperty = DependencyProperty.Register
     (
-        nameof(StringFormat), typeof(string), typeof(MultiColorGauge),
+        nameof(StringFormat), typeof(string), typeof(Gauge),
         new FrameworkPropertyMetadata("N1")
     );
 
@@ -51,7 +51,7 @@ public class MultiColorGauge : ProgressBar
 
     public static readonly DependencyProperty UnitNameProperty = DependencyProperty.Register
     (
-        nameof(UnitName), typeof(string), typeof(MultiColorGauge),
+        nameof(UnitName), typeof(string), typeof(Gauge),
         new PropertyMetadata(string.Empty)
     );
 
@@ -63,7 +63,7 @@ public class MultiColorGauge : ProgressBar
 
     public static readonly DependencyProperty AnimationDurationProperty = DependencyProperty.Register
     (
-        nameof(AnimationDuration), typeof(TimeSpan), typeof(MultiColorGauge),
+        nameof(AnimationDuration), typeof(TimeSpan), typeof(Gauge),
         new PropertyMetadata(TimeSpan.FromSeconds(.5))
     );
 
@@ -75,7 +75,7 @@ public class MultiColorGauge : ProgressBar
 
     public static readonly DependencyProperty ShowPercentProperty = DependencyProperty.Register
     (
-        nameof(ShowPercent), typeof(bool), typeof(MultiColorGauge)
+        nameof(ShowPercent), typeof(bool), typeof(Gauge)
     );
 
     public bool ShowPercent
@@ -86,14 +86,14 @@ public class MultiColorGauge : ProgressBar
 
     internal static DependencyPropertyKey TemplateMetadataPropertyKey = DependencyProperty.RegisterReadOnly
     (
-        nameof(TemplateMetadata), typeof(object), typeof(MultiColorGauge), new FrameworkPropertyMetadata(null)
+        nameof(TemplateMetadata), typeof(object), typeof(Gauge), new FrameworkPropertyMetadata(null)
     );
 
     public object TemplateMetadata => GetValue(TemplateMetadataPropertyKey.DependencyProperty);
 
     public static readonly DependencyProperty HandFillProperty = DependencyProperty.Register
     (
-        nameof(HandFill), typeof(Brush), typeof(MultiColorGauge), new FrameworkPropertyMetadata(Brushes.DarkSlateGray)
+        nameof(HandFill), typeof(Brush), typeof(Gauge), new FrameworkPropertyMetadata(Brushes.DarkSlateGray)
     );
 
     public Brush HandFill
@@ -104,7 +104,7 @@ public class MultiColorGauge : ProgressBar
 
     public static readonly DependencyProperty TickFillProperty = DependencyProperty.Register
     (
-        nameof(TickFill), typeof(Brush), typeof(MultiColorGauge), new FrameworkPropertyMetadata(Brushes.LightGray)
+        nameof(TickFill), typeof(Brush), typeof(Gauge), new FrameworkPropertyMetadata(Brushes.LightGray)
     );
 
     public Brush TickFill
@@ -115,7 +115,7 @@ public class MultiColorGauge : ProgressBar
 
     public static readonly DependencyProperty ColorAllTicksProperty = DependencyProperty.Register
     (
-        nameof(ColorAllTicks), typeof(bool), typeof(MultiColorGauge)
+        nameof(ColorAllTicks), typeof(bool), typeof(Gauge)
     );
 
     public bool ColorAllTicks
@@ -193,18 +193,26 @@ public class MultiColorGauge : ProgressBar
         new ColorThreshold(1, Colors.Green),
     ];
 
+    public static IReadOnlyList<ColorThreshold> VeryLowIsBad { get; } =
+    [
+        new ColorThreshold(0, Colors.Red),
+        new ColorThreshold(.025, Colors.OrangeRed),
+        new ColorThreshold(.1, Colors.YellowGreen),
+        new ColorThreshold(1, Colors.Green),
+    ];
+
     public static IReadOnlyList<ColorThreshold> AllIsGood { get; } =
     [
         new ColorThreshold(0, Colors.Green),
         new ColorThreshold(1, Colors.Green),
     ];
 
-    static MultiColorGauge()
+    static Gauge()
     {
-        ValueProperty.OverrideMetadata(typeof(MultiColorGauge), new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsRender, (_, _) => { }, (_, x) => x));
+        ValueProperty.OverrideMetadata(typeof(Gauge), new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsRender, (_, _) => { }, (_, x) => x));
     }
 
-    internal static Color GetColorForRelativeValue(MultiColorGauge gauge, double relativeValue)
+    internal static Color GetColorForRelativeValue(Gauge gauge, double relativeValue)
     {
         if (gauge.GaugeColors == null || !gauge.GaugeColors.Any())
         {
@@ -223,14 +231,14 @@ public class DemoGaugeExtension : MarkupExtension
 {
     public override object ProvideValue(IServiceProvider serviceProvider)
     {
-        return new MultiColorGauge
+        return new Gauge
         {
             Style = new StaticResourceExtension("DefaultHalfCircleGauge").ProvideValue(serviceProvider) as Style ?? throw new NullReferenceException("Style 'DefaultHalfCircleGauge' does not exist"),
             Minimum = 0,
             Maximum = 100,
             Value = 33,
             ColorAllTicks = true,
-            GaugeColors = MultiColorGauge.HighIsBad,
+            GaugeColors = Gauge.HighIsBad,
         };
     }
 }
