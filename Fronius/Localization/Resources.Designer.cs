@@ -1006,6 +1006,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Go to&quot;View&quot; and check at least one item..
+        /// </summary>
+        public static string CheckAtLeastOneView {
+            get {
+                return ResourceManager.GetString("CheckAtLeastOneView", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Choose.
         /// </summary>
         public static string Choose {
@@ -3036,6 +3045,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Severity {
             get {
                 return ResourceManager.GetString("Severity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show All.
+        /// </summary>
+        public static string ShowAll {
+            get {
+                return ResourceManager.GetString("ShowAll", resourceCulture);
             }
         }
         

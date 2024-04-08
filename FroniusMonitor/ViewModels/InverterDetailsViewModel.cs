@@ -29,6 +29,14 @@ public class InverterDetailsViewModel(
         set => Set(ref isSecondary, value);
     }
 
+    private bool isNoneSelected;
+
+    public bool IsNoneSelected
+    {
+        get => isNoneSelected;
+        set => Set(ref isNoneSelected, value);
+    }
+
     internal override async Task OnInitialize()
     {
         try

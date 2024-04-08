@@ -20,6 +20,7 @@ public partial class InverterDetailsView : IInverterScoped
 
     public InverterDetailsView(InverterDetailsViewModel viewModel, IGen24Service gen24Service)
     {
+        this.viewModel = viewModel;
         InitializeComponent();
         DataContext = viewModel;
         Gen24Service = gen24Service;
@@ -31,12 +32,14 @@ public partial class InverterDetailsView : IInverterScoped
 
         Closed += (s, e) =>
         {
-            _= viewModel.CleanUp();
+            _ = viewModel.CleanUp();
         };
-        
-        PreviewMouseWheel+=OnMouseWheel ;
+
+        PreviewMouseWheel += OnMouseWheel;
         PreviewKeyDown += OnKeyDown;
     }
+
+    private readonly InverterDetailsViewModel viewModel;
 
     private void OnMouseWheel(object _, MouseWheelEventArgs e)
     {
@@ -85,7 +88,7 @@ public partial class InverterDetailsView : IInverterScoped
                 break;
         }
     }
-    
+
     private void ZoomIn()
     {
         Scaler.ScaleX *= App.ZoomFactor;
@@ -104,4 +107,19 @@ public partial class InverterDetailsView : IInverterScoped
     }
 
     public IGen24Service Gen24Service { get; }
+
+    private void CheckAllViews(object sender, RoutedEventArgs e)
+    {
+        var all = GetAllViewMenuItems();
+        all[1..].Apply(item => item.IsChecked = all[0].IsChecked);
+    }
+
+    private void CheckShowAll(object sender, RoutedEventArgs e)
+    {
+        var all = GetAllViewMenuItems();
+        all[0].IsChecked = all[1..].All(i => i.IsChecked);
+        viewModel.IsNoneSelected = all[1..].All(i => !i.IsChecked);
+    }
+
+    private MenuItem[] GetAllViewMenuItems() => View.Items.OfType<MenuItem>().ToArray();
 }

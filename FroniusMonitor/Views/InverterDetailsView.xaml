@@ -14,17 +14,50 @@
         xmlns:a="clr-namespace:De.Hochstaetter.FroniusMonitor"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=viewModels:InverterDetailsViewModel}"
-        Title="{Binding Title}" Width="1080" Height="768">
+        Title="{Binding Title}" Width="682" Height="979" MinHeight="200" MinWidth="300">
     <Grid>
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="{Binding Title}" TextAlignment="Center" FontSize="18" FontWeight="Medium" Margin="10,10,10,16" TextWrapping="Wrap" />
+        <Menu Grid.Row="0">
+            <MenuItem x:Name="View" Header="{x:Static p:Resources.View}" IsCheckable="False" IsChecked="False" Click="CheckShowAll">
+                <MenuItem.Resources>
+                    <Style TargetType="MenuItem">
+                        <Setter Property="IsCheckable" Value="True" />
+                        <Setter Property="IsChecked" Value="False" />
+                    </Style>
+                </MenuItem.Resources>
+                <MenuItem Header="{x:Static p:Resources.ShowAll}" IsCheckable="True" Click="CheckAllViews"/>
+                <MenuItem x:Name="DcPower" Header="{x:Static p:Resources.DcPower}" IsChecked="True"/>
+                <MenuItem x:Name="DcVoltage" Header="{x:Static p:Resources.DcVoltage}" IsChecked="True" />
+                <MenuItem x:Name="DcCurrent" Header="{x:Static p:Resources.DcCurrent}" IsChecked="True" />
+                <MenuItem x:Name="Temperatures" Header="{x:Static p:Resources.Temperatures}"/>
+                <MenuItem x:Name="Fans" Header="{x:Static p:Resources.Fans}"/>
+                <MenuItem x:Name="AcPhaseVoltageFeedIn" Header="{x:Static p:Resources.AcPhaseVoltageFeedIn}"/>
+                <MenuItem x:Name="ΔAcPhaseVoltageFeedIn" Header="{x:Static p:Resources.ΔAcPhaseVoltageFeedIn}"/>
+                <MenuItem x:Name="AcLineVoltageFeedIn" Header="{x:Static p:Resources.AcLineVoltageFeedIn}"/>
+                <MenuItem x:Name="ΔAcLineVoltageFeedIn" Header="{x:Static p:Resources.ΔAcLineVoltageFeedIn}"/>
+                <MenuItem x:Name="Frequency" Header="{x:Static p:Resources.Frequency}"/>
+                <MenuItem x:Name="ActivePower" Header="{x:Static p:Resources.ActivePower}" IsChecked="True"/>
+                <MenuItem x:Name="ApparentPower" Header="{x:Static p:Resources.ApparentPower}"/>
+                <MenuItem x:Name="ReactivePower" Header="{x:Static p:Resources.ReactivePower}"/>
+                <MenuItem x:Name="PowerFactor" Header="cos(ϕ)"/>
+                <MenuItem x:Name="Efficiency" Header="{x:Static p:Resources.Efficiency}" IsChecked="True"/>
+                <MenuItem x:Name="AcCurrent" Header="{x:Static p:Resources.AcCurrent}"/>
+                <MenuItem x:Name="OutOfBalance" Header="{x:Static p:Resources.OutOfBalance}"/>
+            </MenuItem>
+        </Menu>
 
-        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <TextBlock Grid.Row="1" Text="{Binding Title}" TextAlignment="Center" FontSize="18" FontWeight="Medium" Margin="10,10,10,16" TextWrapping="Wrap" />
+
+        <TextBlock Grid.Row="2" Text="{x:Static p:Resources.CheckAtLeastOneView}" TextAlignment="Center" FontSize="14" Margin="10,10,10,16" TextWrapping="Wrap" Visibility="{Binding IsNoneSelected, Converter={co:Bool2Visibility}}" />
+
+        <ScrollViewer Grid.Row="3" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
             <!-- ReSharper disable Xaml.PossibleNullReferenceException -->
             <WrapPanel Orientation="Horizontal" Margin="10,0,4,0">
                 <WrapPanel.LayoutTransform>
@@ -80,9 +113,9 @@
                             </Grid>
                         </Border>
                     </DataTemplate>
-                    
+
                     <Style TargetType="ContentControl">
-                        <Setter Property="ContentTemplate" Value="{StaticResource Gauge}"/>
+                        <Setter Property="ContentTemplate" Value="{StaticResource Gauge}" />
                     </Style>
 
                     <Style TargetType="GroupBox">
@@ -110,7 +143,7 @@
                     </Style>
                 </WrapPanel.Resources>
 
-                <GroupBox Header="{x:Static p:Resources.DcPower}">
+                <GroupBox Header="{x:Static p:Resources.DcPower}" Visibility="{Binding IsChecked, ElementName=DcPower, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -155,7 +188,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.DcVoltage}">
+                <GroupBox Header="{x:Static p:Resources.DcVoltage}" Visibility="{Binding IsChecked, ElementName=DcVoltage, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -187,13 +220,13 @@
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.StorageVoltageOuter}" Label="{x:Static p:Resources.Battery}"
                                          Minimum="{m:GaugeBinding Inverter.Sensors.Storage.MinVoltage, FallbackValue=160}"
                                          Maximum="{m:GaugeBinding Inverter.Sensors.Storage.MaxVoltage, FallbackValue=531}"
-                                         GaugeColors="{x:Static c:Gauge.ExtremeIsBad}"/>
+                                         GaugeColors="{x:Static c:Gauge.ExtremeIsBad}" />
                             </ContentControl>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.DcCurrent}">
+                <GroupBox Header="{x:Static p:Resources.DcCurrent}" Visibility="{Binding IsChecked, ElementName=DcCurrent, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -219,7 +252,7 @@
                             <ContentControl Visibility="{Binding Inverter.Sensors.Storage, Converter={co:NullToVisibility}}">
                                 <c:Gauge Maximum="22" Minimum="-22" Origin=".5" Value="{m:GaugeBinding Inverter.Sensors.Cache.StorageCurrent}" Label="{x:Static p:Resources.Battery}" />
                             </ContentControl>
-                            
+
                             <ContentControl>
                                 <c:Gauge Minimum="50" Maximum="150" UnitName="%" GaugeColors="{x:Static c:Gauge.ExtremeIsBad}" Label="{x:Static p:Resources.MpptComparison}">
                                     <c:Gauge.Value>
@@ -230,12 +263,12 @@
                                     </c:Gauge.Value>
                                 </c:Gauge>
                             </ContentControl>
-                            
+
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.Temperatures}">
+                <GroupBox Header="{x:Static p:Resources.Temperatures}" Visibility="{Binding IsChecked, ElementName=Temperatures, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -266,7 +299,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.Fans}">
+                <GroupBox Header="{x:Static p:Resources.Fans}" Visibility="{Binding IsChecked, ElementName=Fans, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -289,7 +322,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.AcPhaseVoltageFeedIn}">
+                <GroupBox Header="{x:Static p:Resources.AcPhaseVoltageFeedIn}" Visibility="{Binding IsChecked, ElementName=AcPhaseVoltageFeedIn, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -318,7 +351,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.ΔAcPhaseVoltageFeedIn}">
+                <GroupBox Header="{x:Static p:Resources.ΔAcPhaseVoltageFeedIn}" Visibility="{Binding IsChecked, ElementName=ΔAcPhaseVoltageFeedIn, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -368,7 +401,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.AcLineVoltageFeedIn}">
+                <GroupBox Header="{x:Static p:Resources.AcLineVoltageFeedIn}" Visibility="{Binding IsChecked, ElementName=AcLineVoltageFeedIn, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -397,7 +430,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.ΔAcLineVoltageFeedIn}">
+                <GroupBox Header="{x:Static p:Resources.ΔAcLineVoltageFeedIn}" Visibility="{Binding IsChecked, ElementName=ΔAcLineVoltageFeedIn, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -446,7 +479,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.Frequency}">
+                <GroupBox Header="{x:Static p:Resources.Frequency}" Visibility="{Binding IsChecked, ElementName=Frequency, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -483,7 +516,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.ActivePower}">
+                <GroupBox Header="{x:Static p:Resources.ActivePower}" Visibility="{Binding IsChecked, ElementName=ActivePower, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource AcPowerGauge}">
@@ -519,7 +552,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.ApparentPower}">
+                <GroupBox Header="{x:Static p:Resources.ApparentPower}" Visibility="{Binding IsChecked, ElementName=ApparentPower, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource AcPowerGauge}">
@@ -551,7 +584,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.ReactivePower}">
+                <GroupBox Header="{x:Static p:Resources.ReactivePower}" Visibility="{Binding IsChecked, ElementName=ReactivePower, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource AcPowerGauge}">
@@ -583,7 +616,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="cos(ϕ)">
+                <GroupBox Header="cos(ϕ)" Visibility="{Binding IsChecked, ElementName=PowerFactor, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -614,7 +647,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.Efficiency}">
+                <GroupBox Header="{x:Static p:Resources.Efficiency}" Visibility="{Binding IsChecked, ElementName=Efficiency, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}" />
@@ -634,7 +667,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.AcCurrent}">
+                <GroupBox Header="{x:Static p:Resources.AcCurrent}" Visibility="{Binding IsChecked, ElementName=AcCurrent, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -666,7 +699,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.OutOfBalance}">
+                <GroupBox Header="{x:Static p:Resources.OutOfBalance}" Visibility="{Binding IsChecked, ElementName=OutOfBalance, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">

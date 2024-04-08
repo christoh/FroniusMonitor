@@ -1260,4 +1260,10 @@
   <data name="Fans" xml:space="preserve">
 	  <value>Lüfter</value>
   </data>
+  <data name="ShowAll" xml:space="preserve">
+	  <value>Alle anzeigen</value>
+  </data>
+  <data name="CheckAtLeastOneView" xml:space="preserve">
+	  <value>Gehe zu "Ansicht" und wähle mindestens einen Eintrag aus.</value>
+  </data>
 </root>
