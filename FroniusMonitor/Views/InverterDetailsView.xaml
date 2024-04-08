@@ -16,20 +16,20 @@
         d:DataContext="{d:DesignInstance Type=viewModels:InverterDetailsViewModel}"
         Title="{Binding Title}" Width="1080" Height="768">
     <Grid>
-        <Grid.LayoutTransform>
-            <ScaleTransform x:Name="Scaler" ScaleX="1" ScaleY="{Binding ScaleX, RelativeSource={RelativeSource Self}}" />
-        </Grid.LayoutTransform>
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="{Binding Title}" TextAlignment="Center" FontSize="18" FontWeight="Medium" Margin="10,10,10,8" TextWrapping="Wrap" />
+        <TextBlock Grid.Row="0" Text="{Binding Title}" TextAlignment="Center" FontSize="18" FontWeight="Medium" Margin="10,10,10,16" TextWrapping="Wrap" />
 
         <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
             <!-- ReSharper disable Xaml.PossibleNullReferenceException -->
             <WrapPanel Orientation="Horizontal" Margin="10,0,4,0">
+                <WrapPanel.LayoutTransform>
+                    <ScaleTransform x:Name="Scaler" ScaleX="1" ScaleY="{Binding ScaleX, RelativeSource={RelativeSource Self}}" />
+                </WrapPanel.LayoutTransform>
                 <WrapPanel.Resources>
 
                     <Style TargetType="c:Gauge" BasedOn="{StaticResource DefaultHalfCircleGauge}" x:Key="HalfCircleGauge">
