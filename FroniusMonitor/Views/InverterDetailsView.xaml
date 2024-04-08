@@ -219,6 +219,18 @@
                             <ContentControl Visibility="{Binding Inverter.Sensors.Storage, Converter={co:NullToVisibility}}">
                                 <c:Gauge Maximum="22" Minimum="-22" Origin=".5" Value="{m:GaugeBinding Inverter.Sensors.Cache.StorageCurrent}" Label="{x:Static p:Resources.Battery}" />
                             </ContentControl>
+                            
+                            <ContentControl>
+                                <c:Gauge Minimum="50" Maximum="150" UnitName="%" GaugeColors="{x:Static c:Gauge.ExtremeIsBad}" Label="{x:Static p:Resources.MpptComparison}">
+                                    <c:Gauge.Value>
+                                        <MultiBinding Converter="{co:MpptComparison}">
+                                            <Binding Path="Inverter.Sensors.Inverter.Solar1Current" />
+                                            <Binding Path="Inverter.Sensors.Inverter.Solar2Current" />
+                                        </MultiBinding>
+                                    </c:Gauge.Value>
+                                </c:Gauge>
+                            </ContentControl>
+                            
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
