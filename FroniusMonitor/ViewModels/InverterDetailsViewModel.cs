@@ -5,12 +5,15 @@ public class InverterDetailsViewModel(
     IGen24Service gen24Service
 ) : ViewModelBase
 {
-    private string title = string.Empty;
 
-    public string Title
+    public string Title => Loc.InverterDetailsView + " " + Header;
+
+    private string header = string.Empty;
+
+    public string Header
     {
-        get => title;
-        set => Set(ref title, value);
+        get => header;
+        set => Set(ref header, value, () => NotifyOfPropertyChange(nameof(Title)));
     }
 
     private Gen24System inverter = null!;
@@ -64,10 +67,11 @@ public class InverterDetailsViewModel(
         return base.CleanUp();
     }
 
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     private void OnNewDataReceived(object? s = null, SolarDataEventArgs? e = null)
     {
         Inverter.Config = IsSecondary ? dataCollectionService.HomeAutomationSystem?.Gen24Config2 : dataCollectionService.HomeAutomationSystem?.Gen24Config;
         Inverter.Sensors = IsSecondary ? dataCollectionService.HomeAutomationSystem?.Gen24Sensors2 : dataCollectionService.HomeAutomationSystem?.Gen24Sensors;
-        Title = $"{Inverter.Config?.InverterSettings?.SystemName ?? "---"} - {Inverter.Config?.Versions?.ModelName ?? "---"} ({Inverter.Sensors?.InverterStatus?.StatusMessage ?? Loc.Unknown})";
+        Header = $"{Inverter.Config?.InverterSettings?.SystemName ?? "---"} - {Inverter.Config?.Versions?.ModelName ?? "---"} ({Inverter.Config?.Versions?.SwVersions["DEVICEGROUP"].ToLinuxString() ?? "0.0.0-0"}) - {Inverter.Sensors?.InverterStatus?.StatusMessageCaption ?? Loc.Unknown}";
     }
 }

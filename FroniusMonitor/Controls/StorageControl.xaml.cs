@@ -76,4 +76,9 @@ public partial class StorageControl
             PlusPole.Background = Enclosure.BorderBrush = brush;
         }
     }
+
+    private void OnDetailsClicked(object sender, RoutedEventArgs e)
+    {
+        IoC.Get<MainWindow>().GetView<BatteryDetailsView>(IoC.Injector).Focus();
+    }
 }

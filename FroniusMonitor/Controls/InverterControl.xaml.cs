@@ -260,7 +260,7 @@ public partial class InverterControl
                 BackgroundProvider.Background = gen24Sensors?.InverterStatus?.ToBrush() ?? Brushes.LightGray;
             }
 
-            InverterModelName.Text = $"{gen24Config.Versions?.ModelName ?? "---"} ({gen24Sensors?.InverterStatus?.StatusMessage ?? Loc.Unknown})";
+            InverterModelName.Text = $"{gen24Config.Versions?.ModelName ?? "---"} ({gen24Sensors?.InverterStatus?.StatusMessageCaption ?? Loc.Unknown})";
             InverterName.Text = gen24Common?.SystemName ?? "---";
 
             Enum.GetNames<InverterDisplayMode>().Apply(enumName =>

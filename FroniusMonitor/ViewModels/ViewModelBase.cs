@@ -50,7 +50,7 @@ public abstract class ViewModelBase : BindableBase
                 notifiedValidationErrors.Remove(e.Error);
                 break;
             default:
-                throw new NotImplementedException($"{nameof(ValidationErrorEventAction)} {e.Action} is not yet implemented");
+                throw new NotSupportedException($"{nameof(ValidationErrorEventAction)} {e.Action} is not supported");
         }
 
         NotifyOfPropertyChange(nameof(HasNotifiedValidationErrors));

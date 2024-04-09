@@ -64,6 +64,7 @@ public partial class App
             .AddSingleton<IToshibaHvacService, ToshibaHvacService>()
             .AddSingleton<SettingsBase>(Settings)
             .AddTransient<EventLogView>()
+            .AddTransient<BatteryDetailsView>()
             .AddTransient<SelfConsumptionOptimizationView>()
             .AddTransient<ModbusView>()
             .AddTransient<SettingsView>()
@@ -77,6 +78,7 @@ public partial class App
             .AddTransient<WattPilotSettingsViewModel>()
             .AddTransient<InverterSettingsViewModel>()
             .AddTransient<InverterDetailsViewModel>()
+            .AddTransient<BatteryDetailsViewModel>()
             .BuildServiceProvider()
             ;
 

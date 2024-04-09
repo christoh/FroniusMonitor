@@ -2,6 +2,8 @@
 {
     public class Gen24Status : BindableBase
     {
+        private static readonly IGen24Service? gen24Service = IoC.TryGetRegistered<IGen24Service>();
+
         private uint? id;
         [FroniusProprietaryImport("id", FroniusDataType.Root)]
         public uint? Id
@@ -15,7 +17,11 @@
         public DeviceType DeviceType
         {
             get => deviceType;
-            set => Set(ref deviceType, value);
+            set => Set(ref deviceType, value, () =>
+            {
+                NotifyOfPropertyChange(nameof(StatusMessage));
+                NotifyOfPropertyChange(nameof(StatusMessageCaption));
+            });
         }
 
         private string? statusCode;
@@ -23,7 +29,11 @@
         public string? StatusCode
         {
             get => statusCode;
-            set => Set(ref statusCode, value, () => NotifyOfPropertyChange(nameof(StatusMessage)));
+            set => Set(ref statusCode, value, () =>
+            {
+                NotifyOfPropertyChange(nameof(StatusMessage));
+                NotifyOfPropertyChange(nameof(StatusMessageCaption));
+            });
         }
 
         private byte? status;
@@ -34,6 +44,9 @@
             set => Set(ref status, value);
         }
 
-        public string? StatusMessage => Resources.ResourceManager.GetString(StatusCode ?? "STATE_UNKNOWN") ?? StatusCode;
+        [SuppressMessage("ReSharper", "StringLiteralTypo")]
+        public string? StatusMessage => gen24Service?.GetUiString((DeviceType == DeviceType.PowerMeter ? "POWERMETER" : "INVERTER") + ".DEVICESTATE." + StatusCode).GetAwaiter().GetResult();
+
+        public string? StatusMessageCaption => Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName == "en" ? StatusMessage?[0].ToString().ToUpperInvariant() + StatusMessage?[1..] : StatusMessage;
     }
 }

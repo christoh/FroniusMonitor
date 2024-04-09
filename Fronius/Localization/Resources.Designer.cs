@@ -790,6 +790,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Battery Details.
+        /// </summary>
+        public static string BatteryDetailsView {
+            get {
+                return ResourceManager.GetString("BatteryDetailsView", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Battery is AC coupled.
         /// </summary>
         public static string BatteryIsAcCoupled {
@@ -885,6 +894,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Cancel {
             get {
                 return ResourceManager.GetString("Cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Capacity.
+        /// </summary>
+        public static string Capacity {
+            get {
+                return ResourceManager.GetString("Capacity", resourceCulture);
             }
         }
         
@@ -1582,6 +1600,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Gross.
+        /// </summary>
+        public static string Gross {
+            get {
+                return ResourceManager.GetString("Gross", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to g.
         /// </summary>
         public static string GrossShort {
@@ -1740,6 +1767,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string InverterCommReadError {
             get {
                 return ResourceManager.GetString("InverterCommReadError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Inverter Details.
+        /// </summary>
+        public static string InverterDetailsView {
+            get {
+                return ResourceManager.GetString("InverterDetailsView", resourceCulture);
             }
         }
         
@@ -2406,6 +2442,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Name {
             get {
                 return ResourceManager.GetString("Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Net.
+        /// </summary>
+        public static string Net {
+            get {
+                return ResourceManager.GetString("Net", resourceCulture);
             }
         }
         
@@ -3139,6 +3184,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to State Of Charge.
+        /// </summary>
+        public static string SoC {
+            get {
+                return ResourceManager.GetString("SoC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to State of Health.
+        /// </summary>
+        public static string SoH {
+            get {
+                return ResourceManager.GetString("SoH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Solar panel layout.
         /// </summary>
         public static string SolarPanelLayout {
@@ -3189,78 +3252,6 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Starting {
             get {
                 return ResourceManager.GetString("Starting", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Disconnected.
-        /// </summary>
-        public static string STATE_DISCONNECTED {
-            get {
-                return ResourceManager.GetString("STATE_DISCONNECTED", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Error.
-        /// </summary>
-        public static string STATE_ERROR {
-            get {
-                return ResourceManager.GetString("STATE_ERROR", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Ready.
-        /// </summary>
-        public static string STATE_READY {
-            get {
-                return ResourceManager.GetString("STATE_READY", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Running.
-        /// </summary>
-        public static string STATE_RUNNING {
-            get {
-                return ResourceManager.GetString("STATE_RUNNING", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Starting.
-        /// </summary>
-        public static string STATE_STARTUP {
-            get {
-                return ResourceManager.GetString("STATE_STARTUP", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Stopped.
-        /// </summary>
-        public static string STATE_STOPPED {
-            get {
-                return ResourceManager.GetString("STATE_STOPPED", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unknown.
-        /// </summary>
-        public static string STATE_UNKNOWN {
-            get {
-                return ResourceManager.GetString("STATE_UNKNOWN", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Warning.
-        /// </summary>
-        public static string STATE_WARNING {
-            get {
-                return ResourceManager.GetString("STATE_WARNING", resourceCulture);
             }
         }
         

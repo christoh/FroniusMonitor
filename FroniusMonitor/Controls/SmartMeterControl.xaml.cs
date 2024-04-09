@@ -22,28 +22,28 @@ public enum MeterDisplayMode
 
 public partial class SmartMeterControl
 {
-    private static readonly IReadOnlyList<MeterDisplayMode> powerModes = new[]
-    {
+    private static readonly IReadOnlyList<MeterDisplayMode> powerModes =
+    [
         MeterDisplayMode.PowerActiveGauge,
         MeterDisplayMode.PowerActive, MeterDisplayMode.PowerApparent,
         MeterDisplayMode.PowerReactive, MeterDisplayMode.PowerFactor,
         MeterDisplayMode.PowerOutOfBalance
-    };
+    ];
 
-    private static readonly IReadOnlyList<MeterDisplayMode> voltageModes = new[]
-    {
+    private static readonly IReadOnlyList<MeterDisplayMode> voltageModes =
+    [
         MeterDisplayMode.PhaseVoltageGauge, MeterDisplayMode.PhaseVoltage, MeterDisplayMode.LineVoltage
-    };
+    ];
 
-    private static readonly IReadOnlyList<MeterDisplayMode> currentModes = new[]
-    {
+    private static readonly IReadOnlyList<MeterDisplayMode> currentModes =
+    [
         MeterDisplayMode.Current, MeterDisplayMode.CurrentOutOfBalanceGauge, MeterDisplayMode.CurrentOutOfBalance
-    };
+    ];
 
-    private static readonly IReadOnlyList<MeterDisplayMode> moreModes = new[]
-    {
+    private static readonly IReadOnlyList<MeterDisplayMode> moreModes =
+    [
         MeterDisplayMode.MoreEnergy, MeterDisplayMode.More
-    };
+    ];
 
     private int currentPowerModeIndex, currentVoltageModeIndex, currentCurrentIndex, currentMoreIndex;
     private readonly IDataCollectionService? dataCollectionService = IoC.TryGetRegistered<IDataCollectionService>();
@@ -112,7 +112,7 @@ public partial class SmartMeterControl
             return;
         }
 
-        Title.Text = $"{SmartMeter.Model} ({dataCollectionService?.HomeAutomationSystem?.Gen24Sensors?.MeterStatus?.StatusMessage ?? Loc.Unknown})";
+        Title.Text = $"{SmartMeter.Model} ({dataCollectionService?.HomeAutomationSystem?.Gen24Sensors?.MeterStatus?.StatusMessageCaption ?? Loc.Unknown})";
         BackgroundProvider.Background = dataCollectionService?.HomeAutomationSystem?.Gen24Sensors?.MeterStatus?.ToBrush() ?? Brushes.LightGray;
 
         Enum.GetNames<MeterDisplayMode>().Apply(enumName =>

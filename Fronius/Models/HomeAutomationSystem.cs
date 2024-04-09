@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.Fronius.Models;
+﻿using De.Hochstaetter.Fronius.Models.Gen24.Settings;
+
+namespace De.Hochstaetter.Fronius.Models;
 
 public class HomeAutomationSystem : BindableBase
 {
@@ -7,7 +9,13 @@ public class HomeAutomationSystem : BindableBase
     public Gen24Sensors? Gen24Sensors
     {
         get => gen24Sensors;
-        set => Set(ref gen24Sensors, value, () => NotifyOfPropertyChange(nameof(StorageNetCapacity)));
+        set => Set(ref gen24Sensors, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(StorageNetCapacity));
+            NotifyOfPropertyChange(nameof(NetStateOfChange));
+            NotifyOfPropertyChange(nameof(NetStateOfChangeIfFull));
+            NotifyOfPropertyChange(nameof(MaxStorageNetCapacity));
+        });
     }
 
     private Gen24Sensors? gen24Sensors2;
@@ -23,7 +31,13 @@ public class HomeAutomationSystem : BindableBase
     public Gen24Config? Gen24Config
     {
         get => gen24Config;
-        set => Set(ref gen24Config, value, () => NotifyOfPropertyChange(nameof(StorageNetCapacity)));
+        set => Set(ref gen24Config, value, () =>
+        {
+            NotifyOfPropertyChange(nameof(StorageNetCapacity));
+            NotifyOfPropertyChange(nameof(NetStateOfChange));
+            NotifyOfPropertyChange(nameof(NetStateOfChangeIfFull));
+            NotifyOfPropertyChange(nameof(MaxStorageNetCapacity));
+        });
     }
 
     private Gen24Config? gen24Config2;
@@ -58,6 +72,17 @@ public class HomeAutomationSystem : BindableBase
         set => Set(ref wattPilot, value);
     }
 
-    public double? StorageNetCapacity => Gen24Sensors?.Storage?.MaxCapacity * (Gen24Sensors?.Storage?.StateOfCharge - (Gen24Sensors?.Restrictions?.MinStateOfCharge ?? (Math.Max(Gen24Config?.BatterySettings?.BackupReserve ?? 0, Gen24Config?.BatterySettings?.SocMin ?? 0) / 100d)));
+    public double? StorageNetCapacity => Gen24Sensors?.Storage?.MaxCapacity * NetStateOfChangeIfFull;
+
+    public double? MaxStorageNetCapacity => Gen24Sensors?.Storage?.MaxCapacity * GetNetStateOfChargeIfFull(1);
+
+    public double? NetStateOfChange => NetStateOfChangeIfFull / (Gen24Config?.BatterySettings?.Limits is SocLimits.UseManufacturerDefault or null ? 100 : Gen24Config?.BatterySettings?.SocMax ?? 100) * 100d;
+
+    public double? NetStateOfChangeIfFull => GetNetStateOfChargeIfFull(Gen24Sensors?.Storage?.StateOfCharge);
+
+    private double? GetNetStateOfChargeIfFull(double? stateOfCharge)
+    {
+        return stateOfCharge - Math.Max(Gen24Config?.BatterySettings?.BackupReserve ?? 0, Gen24Config?.BatterySettings?.Limits is SocLimits.UseManufacturerDefault or null ? 5 : Gen24Config?.BatterySettings?.SocMin ?? 0) / 100d;
+    }
 }
 

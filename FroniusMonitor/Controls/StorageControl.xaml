@@ -7,8 +7,14 @@
              xmlns:gl="clr-namespace:System.Globalization;assembly=System.Globalization"
              xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
              mc:Ignorable="d"
              d:DesignHeight="1000" d:DesignWidth="700">
+    <UserControl.ContextMenu>
+        <ContextMenu>
+            <MenuItem Header="{x:Static p:Resources.Details}" Icon="{vi:MagnifyingGlass}" Click="OnDetailsClicked"/>
+        </ContextMenu>
+    </UserControl.ContextMenu>
     <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:StorageControl}}">
         <Grid Height="1000" Width="700">
             <Border x:Name="Enclosure" CornerRadius="15" BorderBrush="DarkGreen" BorderThickness="30" Height="880" Width="660" VerticalAlignment="Top" Margin="0,100,0,0"/>
