@@ -113,7 +113,9 @@
                                      Text="{co:ValidationBinding Path=SocMin, Rule={v:MinMaxIntRule Minimum=0, Maximum=100, PropertyDisplayName={l:Config 'BATTERIES.BAT_M0_SOC_MIN'}}}" />
                             <TextBlock Margin="4,0,0,0" Text="%" />
                         </StackPanel>
-                        <Slider Value="{Binding SocMin, Mode=TwoWay}" Grid.Row="1" HorizontalAlignment="Stretch" Minimum="5" Maximum="100" />
+                        <Slider Value="{Binding SocMin, Mode=TwoWay}" Grid.Row="1" HorizontalAlignment="Stretch"
+                                Minimum="{Binding Storage.MinimumStateOfCharge, Converter={co:Multiply Factor=100}, FallbackValue=0}"
+                                Maximum="{Binding Storage.MaximumStateOfCharge, Converter={co:Multiply Factor=100}, FallbackValue=100}" />
                         <StackPanel Orientation="Horizontal" Margin="0,8,0,-2" HorizontalAlignment="Center" Grid.Row="2">
                             <TextBlock Margin="0,0,4,0">
                                 <Run Text="{l:Config 'BATTERIES.BAT_M0_SOC_MAX'}" /><Run Text=":" />
@@ -122,7 +124,9 @@
                                      Text="{co:ValidationBinding Path=SocMax, Rule={v:MinMaxIntRule Minimum=0, Maximum=100, PropertyDisplayName={l:Config 'BATTERIES.BAT_M0_SOC_MAX'}}}" />
                             <TextBlock Margin="4,0,0,0" Text="%" />
                         </StackPanel>
-                        <Slider Value="{Binding SocMax, Mode=TwoWay}" Grid.Row="3" HorizontalAlignment="Stretch" Minimum="5" Maximum="100" />
+                        <Slider Value="{Binding SocMax, Mode=TwoWay}" Grid.Row="3" HorizontalAlignment="Stretch"
+                                Minimum="{Binding Storage.MinimumStateOfCharge, Converter={co:Multiply Factor=100}, FallbackValue=0}"
+                                Maximum="{Binding Storage.MaximumStateOfCharge, Converter={co:Multiply Factor=100}, FallbackValue=100}" />
                     </Grid>
                 </Grid>
             </GroupBox>
@@ -210,16 +214,20 @@
                                  Text="{co:ValidationBinding Path=Settings.BackupCriticalSoc, Rule={v:RegExRule Pattern='^100$|^0*([0-9]{1,2})$', Message={x:Static p:Resources.MustBePercent}}}" />
                         <TextBlock Margin="4,0,0,0" Text="%" />
                     </StackPanel>
-                    <Slider Value="{Binding Settings.BackupCriticalSoc, Mode=TwoWay}" Grid.Row="1" HorizontalAlignment="Stretch" Minimum="0" Maximum="100" />
+                    <Slider Value="{Binding Settings.BackupCriticalSoc, Mode=TwoWay}" Grid.Row="1" HorizontalAlignment="Stretch" 
+                            Minimum="{Binding Storage.MinimumStateOfCharge, Converter={co:Multiply Factor=100}, FallbackValue=0}"
+                            Maximum="{Binding Storage.MaximumStateOfCharge, Converter={co:Multiply Factor=100}, FallbackValue=100}" />
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,-2" HorizontalAlignment="Center" Grid.Row="2">
                         <TextBlock Margin="0,0,4,0">
                             <Run Text="{l:Config 'BATTERIES.HYB_BACKUP_RESERVED'}" /><Run Text=":" />
                         </TextBlock>
                         <TextBox TextAlignment="Center" Width="40"
-                                 Text="{co:ValidationBinding Path=Settings.BackupReserve, Rule={v:MinMaxIntRule Minimum=5, Maximum=95}}" />
+                                 Text="{co:ValidationBinding Path=Settings.BackupReserve, Rule={v:RegExRule Pattern='^100$|^0*([0-9]{1,2})$', Message={x:Static p:Resources.MustBePercent}}}" />
                         <TextBlock Margin="4,0,0,0" Text="%" />
                     </StackPanel>
-                    <Slider Value="{Binding Settings.BackupReserve, Mode=TwoWay}" Grid.Row="3" HorizontalAlignment="Stretch" Minimum="5" Maximum="95" />
+                    <Slider Value="{Binding Settings.BackupReserve, Mode=TwoWay}" Grid.Row="3" HorizontalAlignment="Stretch"
+                            Minimum="{Binding Storage.MinimumStateOfCharge, Converter={co:Multiply Factor=100}, FallbackValue=0}" 
+                            Maximum="{Binding Storage.MaximumStateOfCharge, Converter={co:Multiply Factor=100}, FallbackValue=100}" />
                 </Grid>
             </GroupBox>
 

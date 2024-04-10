@@ -42,6 +42,10 @@ public class SelfConsumptionOptimizationViewModel
         });
     }
 
+    public bool IsSecondary => ReferenceEquals(Gen24Service, DataCollectionService.Gen24Service2);
+
+    public Gen24Storage? Storage => IsSecondary ? DataCollectionService.HomeAutomationSystem?.Gen24Sensors2?.Storage : DataCollectionService.HomeAutomationSystem?.Gen24Sensors?.Storage;
+    
     private string title = Loc.EnergyFlow;
 
     public string Title
@@ -147,6 +151,8 @@ public class SelfConsumptionOptimizationViewModel
     {
         IsInUpdate = true;
 
+        DataCollectionService.NewDataReceived += OnDataCollectionServiceOnNewDataReceived;
+
         try
         {
             await base.OnInitialize().ConfigureAwait(false);
@@ -202,6 +208,18 @@ public class SelfConsumptionOptimizationViewModel
         finally
         {
             IsInUpdate = false;
+        }
+
+        return;
+
+        void OnDataCollectionServiceOnNewDataReceived(object? s, SolarDataEventArgs e)
+        {
+            NotifyOfPropertyChange(nameof(Storage));
+
+            if (Storage != null)
+            {
+                DataCollectionService.NewDataReceived -= OnDataCollectionServiceOnNewDataReceived;
+            }
         }
     }
 

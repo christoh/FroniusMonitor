@@ -96,7 +96,23 @@ public class Gen24Storage : Gen24DeviceBase
         set => Set(ref stateOfCharge, value);
     }
 
+    private double minimumStateOfCharge;
 
+    public double MinimumStateOfCharge
+    {
+        get => minimumStateOfCharge;
+        set => Set(ref minimumStateOfCharge, value);
+    }
+
+    private double maximumStateOfCharge;
+
+    public double MaximumStateOfCharge
+    {
+        get => maximumStateOfCharge;
+        set => Set(ref maximumStateOfCharge, value);
+    }
+    
+    
     private double? stateOfHealth;
     [FroniusProprietaryImport("BAT_VALUE_STATE_OF_HEALTH_RELATIVE_U16", Unit.Percent)]
     public double? StateOfHealth

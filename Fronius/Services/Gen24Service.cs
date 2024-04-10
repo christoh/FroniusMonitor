@@ -56,8 +56,13 @@ public class Gen24Service(IGen24JsonService gen24JsonService) : BindableBase, IG
 
         if (components.Groups.TryGetValue("BatteryManagementSystem", out var storages))
         {
-            gen24Sensors.Storage = gen24JsonService.ReadFroniusData<Gen24Storage>(dataToken[storages.FirstOrDefault() ?? "16580608"]);
-            gen24Sensors.Storage.GroupId = uint.Parse(storages.FirstOrDefault() ?? "16580608");
+            var storageGroupId = storages.FirstOrDefault() ?? "16580608";
+            var storageToken = dataToken[storageGroupId];
+            var nameplate = JObject.Parse(storageToken?["attributes"]?["nameplate"]?.Value<string>()??"{}");
+            gen24Sensors.Storage = gen24JsonService.ReadFroniusData<Gen24Storage>(storageToken);
+            gen24Sensors.Storage.MinimumStateOfCharge= (nameplate["min_soc"]?.Value<int>() ?? 0)/100d;
+            gen24Sensors.Storage.MaximumStateOfCharge=(nameplate["max_soc"]?.Value<int>() ?? 100)/100d;
+            gen24Sensors.Storage.GroupId = uint.Parse(storageGroupId);
         }
 
         if (components.Groups.TryGetValue("Application", out var applications))
