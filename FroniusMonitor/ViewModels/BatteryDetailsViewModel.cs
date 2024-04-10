@@ -32,6 +32,6 @@ public class BatteryDetailsViewModel : ViewModelBase
     {
         HomeAutomationSystem = h;
         Battery = h?.Gen24Sensors?.Storage;
-        Header = $"{Battery?.Model} (HW: {Battery?.HardwareVersion?.ToLinuxString() ?? "---"} / FW: {Battery?.SoftwareVersion?.ToLinuxString() ?? "---"})";
+        Header = $"{Battery?.Model} (HW: {Battery?.HardwareVersion?.ToLinuxString() ?? "---"} / FW: {Battery?.SoftwareVersion?.ToLinuxString() ?? "---"}) - {Battery?.StatusString ?? Loc.Unknown}";
     }
 }

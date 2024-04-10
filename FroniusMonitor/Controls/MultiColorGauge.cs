@@ -196,7 +196,7 @@ public class Gauge : ProgressBar
     public static IReadOnlyList<ColorThreshold> VeryHighIsGood { get; } =
     [
         new ColorThreshold(0, Colors.Red),
-        new ColorThreshold(.8, Colors.OrangeRed),
+        new ColorThreshold(.7, Colors.OrangeRed),
         new ColorThreshold(.9, Colors.YellowGreen),
         new ColorThreshold(1, Colors.Green),
     ];

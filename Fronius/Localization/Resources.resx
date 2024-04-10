@@ -1326,4 +1326,13 @@
   <data name="Outer" xml:space="preserve">
 	  <value>Outer</value>
   </data>
+  <data name="CellMin" xml:space="preserve">
+	  <value>Cells Min.</value>
+  </data>
+  <data name="CellMax" xml:space="preserve">
+	  <value>Cells Max.</value>
+  </data>
+  <data name="CellAverage" xml:space="preserve">
+	  <value>Cells Avg.</value>
+  </data>
 </root>

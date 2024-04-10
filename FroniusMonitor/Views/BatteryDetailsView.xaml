@@ -14,7 +14,7 @@
         xmlns:a="clr-namespace:De.Hochstaetter.FroniusMonitor"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=viewModels:BatteryDetailsViewModel}"
-        Title="{Binding Title}" Height="450" Width="800">
+        Title="{Binding Title}" Height="606" Width="835">
     <Grid>
 
         <Grid.RowDefinitions>
@@ -111,7 +111,8 @@
                         <StackPanel Orientation="Horizontal">
                             <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Battery.StateOfHealth, Converter={co:Multiply Factor=100}}" Label="SoH"
-                                         Style="{StaticResource PercentageGauge}" Minimum="70" />
+                                         Style="{StaticResource PercentageGauge}" Minimum="0" 
+                                         GaugeColors="{x:Static c:Gauge.VeryHighIsGood}"/>
                             </ContentControl>
                         </StackPanel>
                     </StackPanel>
@@ -204,6 +205,37 @@
 
                             <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Battery.Power}" Label="{x:Static p:Resources.Outer}"/>
+                            </ContentControl>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+                
+                <GroupBox Header="{x:Static p:Resources.Temperatures}">
+                    <StackPanel>
+                        <StackPanel.Resources>
+                            <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
+                                <Setter Property="UnitName" Value="°C" />
+                                <Setter Property="StringFormat" Value="N1"/>
+                                <Setter Property="Minimum" Value="0" />
+                                <Setter Property="Maximum" Value="50" />
+                                <Setter Property="GaugeColors" Value="{x:Static c:Gauge.MidIsGood}" />
+                            </Style>
+                        </StackPanel.Resources>
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl>
+                                <c:Gauge Value="{m:GaugeBinding Battery.AmbientTemperature}" Label="{x:Static p:Resources.Ambient}"/>
+                            </ContentControl>
+
+                            <ContentControl>
+                                <c:Gauge Value="{m:GaugeBinding Battery.CellTemperatureMin}" Label="{x:Static p:Resources.CellMin}"/>
+                            </ContentControl>
+
+                            <ContentControl>
+                                <c:Gauge Value="{m:GaugeBinding Battery.CellTemperatureAverage}" Label="{x:Static p:Resources.CellAverage}"/>
+                            </ContentControl>
+
+                            <ContentControl>
+                                <c:Gauge Value="{m:GaugeBinding Battery.CellTemperatureMax}" Label="{x:Static p:Resources.CellMax}"/>
                             </ContentControl>
                         </StackPanel>
                     </StackPanel>

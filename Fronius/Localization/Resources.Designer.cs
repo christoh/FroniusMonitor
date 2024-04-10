@@ -916,6 +916,33 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cells Avg..
+        /// </summary>
+        public static string CellAverage {
+            get {
+                return ResourceManager.GetString("CellAverage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cells Max..
+        /// </summary>
+        public static string CellMax {
+            get {
+                return ResourceManager.GetString("CellMax", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cells Min..
+        /// </summary>
+        public static string CellMin {
+            get {
+                return ResourceManager.GetString("CellMin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Change.
         /// </summary>
         public static string Change {
