@@ -29,4 +29,7 @@
 	<data name="SynchronizeTime" xml:space="preserve">
 		<value>NTP-Zeitsynchronisierung benützen</value>
 	</data>
+	<data name="Outer" xml:space="preserve">
+		<value>Aussen</value>
+	</data>
 </root>

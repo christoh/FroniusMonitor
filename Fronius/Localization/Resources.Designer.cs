@@ -1726,6 +1726,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Internal.
+        /// </summary>
+        public static string Inner {
+            get {
+                return ResourceManager.GetString("Inner", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} does not match a time between 00:00 to 24:00.
         /// </summary>
         public static string InvalidChargingRuleTime {
@@ -2640,6 +2649,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string OpTime {
             get {
                 return ResourceManager.GetString("OpTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Outer.
+        /// </summary>
+        public static string Outer {
+            get {
+                return ResourceManager.GetString("Outer", resourceCulture);
             }
         }
         

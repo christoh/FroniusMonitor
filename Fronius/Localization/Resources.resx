@@ -1320,4 +1320,10 @@
   <data name="Capacity" xml:space="preserve">
 	  <value>Capacity</value>
   </data>
+  <data name="Inner" xml:space="preserve">
+	  <value>Internal</value>
+  </data>
+  <data name="Outer" xml:space="preserve">
+	  <value>Outer</value>
+  </data>
 </root>
