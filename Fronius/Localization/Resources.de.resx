@@ -1270,10 +1270,10 @@
 	  <value>Außen</value>
   </data>
   <data name="CellMin" xml:space="preserve">
-	  <value>Zelle Min.</value>
+	  <value>Zellen Min.</value>
   </data>
   <data name="CellMax" xml:space="preserve">
-	  <value>Zelle Max.</value>
+	  <value>Zellen Max.</value>
   </data>
   <data name="CellAverage" xml:space="preserve">
 	  <value>Zellen Ø</value>
