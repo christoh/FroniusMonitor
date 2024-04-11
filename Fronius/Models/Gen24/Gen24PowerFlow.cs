@@ -91,7 +91,7 @@ public class Gen24PowerFlow : Gen24DeviceBase
 
     private static double consumedFactor = 1;
 
-    public static double ConsumedFactor
+    private static double ConsumedFactor
     {
         get
         {
@@ -108,7 +108,7 @@ public class Gen24PowerFlow : Gen24DeviceBase
 
     private static double producedFactor = 1;
 
-    public static double ProducedFactor
+    private static double ProducedFactor
     {
         get
         {
