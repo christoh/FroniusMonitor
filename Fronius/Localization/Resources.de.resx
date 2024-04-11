@@ -1278,4 +1278,10 @@
   <data name="CellAverage" xml:space="preserve">
 	  <value>Zellen Ø</value>
   </data>
+  <data name="AcPhaseVoltageInverter" xml:space="preserve">
+	  <value>AC-Phasenspannung Wechselrichter</value>
+  </data>
+  <data name="AcLineVoltageInverter" xml:space="preserve">
+	  <value>AC-Leiterspannung Wechselrichter</value>
+  </data>
 </root>

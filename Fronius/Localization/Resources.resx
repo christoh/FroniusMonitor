@@ -1335,4 +1335,10 @@
   <data name="CellAverage" xml:space="preserve">
 	  <value>Cells Avg.</value>
   </data>
+  <data name="AcPhaseVoltageInverter" xml:space="preserve">
+	  <value>AC Phase Voltage Inverter</value>
+  </data>
+  <data name="AcLineVoltageInverter" xml:space="preserve">
+	  <value>AC Line Voltage Inverter</value>
+  </data>
 </root>

@@ -39,8 +39,10 @@
                 <MenuItem x:Name="Temperatures" Header="{x:Static p:Resources.Temperatures}"/>
                 <MenuItem x:Name="Fans" Header="{x:Static p:Resources.Fans}"/>
                 <MenuItem x:Name="AcPhaseVoltageFeedIn" Header="{x:Static p:Resources.AcPhaseVoltageFeedIn}"/>
+                <MenuItem x:Name="AcPhaseVoltageInverter" Header="{x:Static p:Resources.AcPhaseVoltageInverter}"/>
                 <MenuItem x:Name="ΔAcPhaseVoltageFeedIn" Header="{x:Static p:Resources.ΔAcPhaseVoltageFeedIn}"/>
                 <MenuItem x:Name="AcLineVoltageFeedIn" Header="{x:Static p:Resources.AcLineVoltageFeedIn}"/>
+                <MenuItem x:Name="AcLineVoltageInverter" Header="{x:Static p:Resources.AcLineVoltageInverter}"/>
                 <MenuItem x:Name="ΔAcLineVoltageFeedIn" Header="{x:Static p:Resources.ΔAcLineVoltageFeedIn}"/>
                 <MenuItem x:Name="Frequency" Header="{x:Static p:Resources.Frequency}"/>
                 <MenuItem x:Name="ActivePower" Header="{x:Static p:Resources.ActivePower}" IsChecked="True"/>
@@ -306,6 +308,34 @@
                     </StackPanel>
                 </GroupBox>
 
+                <GroupBox Header="{x:Static p:Resources.AcPhaseVoltageInverter}" Visibility="{Binding IsChecked, ElementName=AcPhaseVoltageInverter, Converter={co:Bool2Visibility}}">
+                    <StackPanel>
+                        <StackPanel.Resources>
+                            <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
+                                <Setter Property="StringFormat" Value="N1" />
+                                <Setter Property="UnitName" Value="V" />
+                                <Setter Property="Minimum" Value="220" />
+                                <Setter Property="Maximum" Value="240" />
+                                <Setter Property="Origin" Value=".5" />
+                                <Setter Property="GaugeColors" Value="{x:Static c:Gauge.MidIsGood}" />
+                            </Style>
+                        </StackPanel.Resources>
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl>
+                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterPhaseVoltageL1}" Label="L1" />
+                            </ContentControl>
+
+                            <ContentControl>
+                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterPhaseVoltageL2}" Label="L2" />
+                            </ContentControl>
+
+                            <ContentControl>
+                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterPhaseVoltageL3}" Label="L3" />
+                            </ContentControl>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
                 <GroupBox Header="{x:Static p:Resources.ΔAcPhaseVoltageFeedIn}" Visibility="{Binding IsChecked, ElementName=ΔAcPhaseVoltageFeedIn, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
@@ -380,6 +410,34 @@
 
                             <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.FeedInPointLineVoltageL31}" Label="L31" />
+                            </ContentControl>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="{x:Static p:Resources.AcLineVoltageInverter}" Visibility="{Binding IsChecked, ElementName=AcLineVoltageInverter, Converter={co:Bool2Visibility}}">
+                    <StackPanel>
+                        <StackPanel.Resources>
+                            <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
+                                <Setter Property="StringFormat" Value="N1" />
+                                <Setter Property="UnitName" Value="V" />
+                                <Setter Property="Minimum" Value="383.37168574084177751131265854635" />
+                                <Setter Property="Maximum" Value="413.37168574084177751131265854635" />
+                                <Setter Property="Origin" Value=".5" />
+                                <Setter Property="GaugeColors" Value="{x:Static c:Gauge.MidIsGood}" />
+                            </Style>
+                        </StackPanel.Resources>
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl>
+                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterLineVoltageL12}" Label="L12" />
+                            </ContentControl>
+
+                            <ContentControl>
+                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterLineVoltageL23}" Label="L23" />
+                            </ContentControl>
+
+                            <ContentControl>
+                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.InverterLineVoltageL31}" Label="L31" />
                             </ContentControl>
                         </StackPanel>
                     </StackPanel>

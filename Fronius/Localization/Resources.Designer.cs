@@ -97,6 +97,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to AC Line Voltage Inverter.
+        /// </summary>
+        public static string AcLineVoltageInverter {
+            get {
+                return ResourceManager.GetString("AcLineVoltageInverter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to AC module.
         /// </summary>
         public static string AcModule {
@@ -111,6 +120,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string AcPhaseVoltageFeedIn {
             get {
                 return ResourceManager.GetString("AcPhaseVoltageFeedIn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to AC Phase Voltage Inverter.
+        /// </summary>
+        public static string AcPhaseVoltageInverter {
+            get {
+                return ResourceManager.GetString("AcPhaseVoltageInverter", resourceCulture);
             }
         }
         
