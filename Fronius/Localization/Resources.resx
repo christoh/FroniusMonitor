@@ -1344,4 +1344,10 @@
   <data name="WattPilotDetails" xml:space="preserve">
 	  <value>Wattpilot Details</value>
   </data>
+  <data name="Wifi" xml:space="preserve">
+	  <value>Wi-Fi</value>
+  </data>
+  <data name="WifiSignal" xml:space="preserve">
+	  <value>Wi-Fi Signal</value>
+  </data>
 </root>

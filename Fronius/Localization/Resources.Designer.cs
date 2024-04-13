@@ -3706,6 +3706,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Wi-Fi.
+        /// </summary>
+        public static string Wifi {
+            get {
+                return ResourceManager.GetString("Wifi", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wi-Fi Signal.
+        /// </summary>
+        public static string WifiSignal {
+            get {
+                return ResourceManager.GetString("WifiSignal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Wi-Fi name.
         /// </summary>
         public static string WifiSsid {

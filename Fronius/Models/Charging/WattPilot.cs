@@ -795,7 +795,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     public double? MaximumChargingPowerPossibleL1 => VoltageL1 * MaximumChargingCurrentPossiblePerPhase;
-    public double? MaximumChargingPowerPossibleL2 => VoltageL3 * MaximumChargingCurrentPossiblePerPhase;
+    public double? MaximumChargingPowerPossibleL2 => VoltageL2 * MaximumChargingCurrentPossiblePerPhase;
     public double? MaximumChargingPowerPossibleL3 => VoltageL3 * MaximumChargingCurrentPossiblePerPhase;
 
     public byte MaximumChargingCurrentPossiblePerPhase
