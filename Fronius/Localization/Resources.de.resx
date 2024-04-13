@@ -1284,4 +1284,7 @@
   <data name="AcLineVoltageInverter" xml:space="preserve">
 	  <value>AC-Leiterspannung Wechselrichter</value>
   </data>
+  <data name="WattPilotDetails" xml:space="preserve">
+	  <value>Wattpilotdetails</value>
+  </data>
 </root>

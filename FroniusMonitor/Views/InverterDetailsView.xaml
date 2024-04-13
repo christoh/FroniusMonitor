@@ -170,7 +170,7 @@
 
                             <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Cache.DcLinkVoltage}" Label="Link"
-                                         Minimum="550" Maximum="800" GaugeColors="{x:Static c:Gauge.VeryLowIsBad}" />
+                                         Minimum="400" Maximum="800" GaugeColors="{x:Static c:Gauge.LowIsBad}" />
                             </ContentControl>
 
                             <ContentControl>

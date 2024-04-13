@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Numerics;
+using System.Reflection;
 using De.Hochstaetter.Fronius.Attributes;
 using De.Hochstaetter.Fronius.Models.Settings;
 using Microsoft.Azure.Amqp.Framing;
@@ -1075,3 +1076,38 @@ public class DeltaConverter : MultiConverterBase
         return minuend.ToDouble(culture) - subtrahend.ToDouble(culture);
     }
 }
+
+public class WattPilotTitleConverter:MultiConverterBase
+{
+    public override object? Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if
+        (
+            values.Length < 5 ||
+            values[0] is not bool isTitle ||
+            values[1] is not string deviceName ||
+            values[2] is not Version firmwareVersion ||
+            values[3] is not string currentUser ||
+            values[4] is not byte maximumPowerKiloWatts
+        )
+        {
+            return Loc.Unknown;
+        }
+
+        var index = (byte?)values[4];
+        
+        var builder=new StringBuilder();
+
+        if (isTitle)
+        {
+            builder.Append($"{Loc.WattPilotDetails} - ");
+        }
+
+        builder.Append(deviceName + " - ");
+        builder.Append($"Wattpilot {maximumPowerKiloWatts}J ");
+        builder.Append($"({firmwareVersion}) - ");
+        builder.Append(currentUser);
+        
+        return builder.ToString();
+    }
+} 

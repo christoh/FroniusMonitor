@@ -362,26 +362,26 @@ public partial class InverterControl
 
     private void OnSettingsClicked(object sender, RoutedEventArgs e)
     {
-        IoC.Get<MainWindow>().GetView<InverterSettingsView>(provider).Focus();
+        IoC.TryGetRegistered<MainWindow>()?.GetView<InverterSettingsView>(provider).Focus();
     }
 
     private void OnEnergyFlowClicked(object sender, RoutedEventArgs e)
     {
-        IoC.Get<MainWindow>().GetView<SelfConsumptionOptimizationView>(provider).Focus();
+        IoC.TryGetRegistered<MainWindow>()?.GetView<SelfConsumptionOptimizationView>(provider).Focus();
     }
 
     private void OnModbusClicked(object sender, RoutedEventArgs e)
     {
-        IoC.Get<MainWindow>().GetView<ModbusView>(provider).Focus();
+        IoC.TryGetRegistered<MainWindow>()?.GetView<ModbusView>(provider).Focus();
     }
 
     private void OnEventLogClicked(object sender, RoutedEventArgs e)
     {
-        IoC.Get<MainWindow>().GetView<EventLogView>(provider).Focus();
+        IoC.TryGetRegistered<MainWindow>()?.GetView<EventLogView>(provider).Focus();
     }
 
     private void OnDetailsClicked(object sender, RoutedEventArgs e)
     {
-        IoC.Get<MainWindow>().GetView<InverterDetailsView>(provider).Focus();
+        IoC.TryGetRegistered<MainWindow>()?.GetView<InverterDetailsView>(provider).Focus();
     }
 }

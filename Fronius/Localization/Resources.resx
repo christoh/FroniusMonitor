@@ -1341,4 +1341,7 @@
   <data name="AcLineVoltageInverter" xml:space="preserve">
 	  <value>AC Line Voltage Inverter</value>
   </data>
+  <data name="WattPilotDetails" xml:space="preserve">
+	  <value>Wattpilot Details</value>
+  </data>
 </root>

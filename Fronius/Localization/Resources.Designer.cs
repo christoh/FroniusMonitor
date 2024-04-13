@@ -3652,6 +3652,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Wattpilot Details.
+        /// </summary>
+        public static string WattPilotDetails {
+            get {
+                return ResourceManager.GetString("WattPilotDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Fronius Wattpilot.
         /// </summary>
         public static string WattPilotHeader {

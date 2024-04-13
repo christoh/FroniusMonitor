@@ -17,6 +17,7 @@
                 <Grid.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="{x:Static p:Resources.Settings}" Icon="{vi:ChargingTrafficSignSettings}" Click="OnSettingsClicked" />
+                        <MenuItem Header="{x:Static p:Resources.Details}" Icon="{vi:MagnifyingGlass}" Click="OnDetailsClicked"/>
                     </ContextMenu>
                 </Grid.ContextMenu>
                 <Grid.RowDefinitions>
@@ -182,7 +183,7 @@
                                 <c:Gauge Label="L2" Value="{m:GaugeBinding PowerL2KiloWatts}" />
                                 <c:Gauge Label="L3" Value="{m:GaugeBinding PowerL3KiloWatts}" />
                                 <c:Gauge Label="{x:Static p:Resources.Sum}" Value="{m:GaugeBinding PowerSumKiloWatts}"
-                                                   Maximum="{m:GaugeBinding MaximumChargingPowerPossible, Converter={co:Multiply Factor=0.001}}" />
+                                                   Maximum="{m:GaugeBinding MaximumChargingPowerPossibleSum, Converter={co:Multiply Factor=0.001}}" />
                             </StackPanel>
                         </Grid>
 
@@ -203,7 +204,7 @@
 
                             <c:Gauge Value="{Binding PowerSum, FallbackValue=0, TargetNullValue=0, Mode=OneWay}"
                                                Minimum="0" Grid.Row="2"
-                                               Maximum="{m:GaugeBinding MaximumChargingPowerPossible, FallbackValue=16, TargetNullValue=16, Converter={co:Multiply Factor=1}}"
+                                               Maximum="{m:GaugeBinding MaximumChargingPowerPossibleSum, FallbackValue=16, TargetNullValue=16, Converter={co:Multiply Factor=1}}"
                                                GaugeColors="{x:Static c:Gauge.LowIsBad}"
                                                Width="92" Style="{StaticResource DefaultHalfCircleGauge}" />
 
