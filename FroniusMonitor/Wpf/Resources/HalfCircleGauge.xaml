@@ -4,10 +4,10 @@
                     xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
                     xmlns:a="clr-namespace:De.Hochstaetter.FroniusMonitor"
                     xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
-                    xmlns:viewModels="clr-namespace:De.Hochstaetter.FroniusMonitor.ViewModels"
+                    xmlns:vm="clr-namespace:De.Hochstaetter.FroniusMonitor.ViewModels"
                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                     xmlns:v="clr-namespace:De.Hochstaetter.FroniusMonitor.Views"
-                    mc:Ignorable="d" 
+                    mc:Ignorable="d"
                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008">
 
     <ControlTemplate x:Key="HalfCircleGauge" TargetType="c:Gauge">
@@ -39,7 +39,7 @@
                 <MultiBinding Converter="{co:Gen24Status2Brush}" FallbackValue="Gray">
                     <!-- ReSharper disable once Xaml.PossibleNullReferenceException -->
                     <Binding RelativeSource="{RelativeSource TemplatedParent}"
-                             Path="DataContext.(c:Gauge.DataContext).(viewModels:InverterDetailsViewModel.Inverter).Sensors.InverterStatus" />
+                             Path="DataContext.(c:Gauge.DataContext).(vm:InverterDetailsViewModel.Inverter).Sensors.InverterStatus" />
                     <Binding RelativeSource="{RelativeSource TemplatedParent}"
                              Path="Content.(v:InverterDetailsView.AlwaysUseRunningBackground)" />
                 </MultiBinding>
@@ -80,7 +80,7 @@
 
     <DataTemplate DataType="{x:Type ContentControl}" x:Key="BatteryGauge">
         <Border Width="120" BorderThickness="1" BorderBrush="DimGray" Margin="2"
-                Background="{Binding Path=DataContext.(c:Gauge.DataContext).(viewModels:BatteryDetailsViewModel.Battery).IsAwake, Converter={co:Bool2Brush False=LightGray, True=AntiqueWhite}, FallbackValue=DarkGray, RelativeSource={RelativeSource TemplatedParent}}">
+                Background="{Binding Path=DataContext.(c:Gauge.DataContext).(vm:BatteryDetailsViewModel.Battery).IsAwake, Converter={co:Bool2Brush False=LightGray, True=AntiqueWhite}, FallbackValue=DarkGray, RelativeSource={RelativeSource TemplatedParent}}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -117,7 +117,7 @@
 
     <DataTemplate DataType="{x:Type ContentControl}" x:Key="WattPilotGauge">
         <Border Width="120" BorderThickness="1" BorderBrush="DimGray" Margin="2"
-                Background="{Binding Path=DataContext.(c:Gauge.DataContext), Converter={co:NullToBrush Null=LightGray, NotNull=AntiqueWhite}, FallbackValue=DarkGray, RelativeSource={RelativeSource TemplatedParent}}">
+                Background="{Binding Path=DataContext.(vm:WattPilotDetailsViewModel.WattPilotService).WattPilot, Converter={co:NullToBrush Null=LightGray, NotNull=AntiqueWhite }, FallbackValue=DarkGray, RelativeSource={RelativeSource FindAncestor, AncestorType=v:WattPilotDetailsView}}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />

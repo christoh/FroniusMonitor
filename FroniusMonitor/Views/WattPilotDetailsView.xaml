@@ -76,7 +76,7 @@
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
                                 <Setter Property="GaugeColors" Value="{x:Static c:Gauge.LowIsBad}" />
                                 <Setter Property="UnitName" Value="kW" />
-                                <Setter Property="t:HalfCircleGauge.MinimumMaximumStringFormat" Value="N3"/>
+                                <Setter Property="t:HalfCircleGauge.MinimumMaximumStringFormat" Value="N3" />
                             </Style>
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
@@ -183,7 +183,7 @@
                                 <Setter Property="GaugeColors" Value="{x:Static c:Gauge.LowIsBad}" />
                                 <Setter Property="StringFormat" Value="N0" />
                                 <Setter Property="UnitName" Value="dBm" />
-                                <Setter Property="Minimum" Value="-70" />
+                                <Setter Property="Minimum" Value="-90" />
                                 <Setter Property="Maximum" Value="-30" />
                             </Style>
                         </StackPanel.Resources>

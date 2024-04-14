@@ -62,8 +62,7 @@ public partial class WattPilotControl
 
     public static readonly DependencyProperty WattPilotServiceProperty = DependencyProperty.Register
     (
-        nameof(WattPilotService), typeof(IWattPilotService), typeof(WattPilotControl),
-        new PropertyMetadata((d, _) => ((WattPilotControl)d).OnWattPilotServiceChanged())
+        nameof(WattPilotService), typeof(IWattPilotService), typeof(WattPilotControl)
     );
 
     public IWattPilotService WattPilotService
@@ -72,7 +71,17 @@ public partial class WattPilotControl
         set => SetValue(WattPilotServiceProperty, value);
     }
 
-    private void OnWattPilotServiceChanged() { }
+
+    public static readonly DependencyProperty HomeAutomationSystemProperty = DependencyProperty.Register
+    (
+        nameof(HomeAutomationSystem), typeof(HomeAutomationSystem), typeof(WattPilotControl)
+    );
+
+    public HomeAutomationSystem HomeAutomationSystem
+    {
+        get => (HomeAutomationSystem)GetValue(HomeAutomationSystemProperty);
+        set => SetValue(HomeAutomationSystemProperty, value);
+    }
 
     public WattPilotControl()
     {

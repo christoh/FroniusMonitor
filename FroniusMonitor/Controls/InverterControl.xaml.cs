@@ -292,7 +292,7 @@ public partial class InverterControl
                             break;
 
                         case InverterDisplayMode.DcRelativePower:
-                            DcPowerAggregateGauge.Value = gen24Sensors?.Cache?.Solar2Power / gen24Sensors?.Cache?.Solar1Power * 100 ?? 0;
+                            DcPowerAggregateGauge.Value = (gen24Sensors?.Cache?.Solar2Power / gen24Config?.InverterSettings?.Mppt?.Mppt2?.WattPeak) / (gen24Sensors?.Cache?.Solar1Power / gen24Config?.InverterSettings?.Mppt?.Mppt1?.WattPeak) * 100 ?? 0;
                             DcPowerAggregateGauge.Minimum = 50;
                             DcPowerAggregateGauge.Maximum = 150;
                             DcPowerAggregateGauge.StringFormat = "N1";

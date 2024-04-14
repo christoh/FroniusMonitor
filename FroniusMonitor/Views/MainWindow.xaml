@@ -269,7 +269,7 @@
                                 </Style.Triggers>
                             </Style>
                         </Grid.Style>
-                        <c:WattPilotControl Height="200" WattPilotService="{Binding WattPilotService}" />
+                        <c:WattPilotControl Height="200" WattPilotService="{Binding WattPilotService}" HomeAutomationSystem="{Binding DataCollectionService.HomeAutomationSystem}" />
                     </Grid>
 
                 </Grid>

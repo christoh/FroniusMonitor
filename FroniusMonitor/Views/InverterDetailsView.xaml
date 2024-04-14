@@ -137,6 +137,8 @@
                                         <MultiBinding Converter="{co:MpptComparison}">
                                             <Binding Path="Inverter.Sensors.Inverter.Solar1Power" />
                                             <Binding Path="Inverter.Sensors.Inverter.Solar2Power" />
+                                            <Binding Path="Inverter.Config.InverterSettings.Mppt.Mppt1.WattPeak"/>
+                                            <Binding Path="Inverter.Config.InverterSettings.Mppt.Mppt2.WattPeak"/>
                                         </MultiBinding>
                                     </c:Gauge.Value>
                                 </c:Gauge>

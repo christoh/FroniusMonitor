@@ -1030,7 +1030,10 @@ public class MpptComparison : MultiConverterBase
             return targetType.IsAssignableFrom(typeof(double)) ? 0 : null;
         }
 
-        var percentage = powerMppt2.ToDouble(culture) / powerMppt1.ToDouble(culture) * 100;
+        var wattPeakMppt1 = values.Length >= 3 ? ((values[2] as IConvertible) ?? 1d).ToDouble(CultureInfo.CurrentCulture) : 1d;
+        var wattPeakMppt2 = values.Length >= 4 ? ((values[3] as IConvertible) ?? 1d).ToDouble(CultureInfo.CurrentCulture) : 1d;
+
+        var percentage = (powerMppt2.ToDouble(culture)/wattPeakMppt2) / (powerMppt1.ToDouble(culture)/wattPeakMppt1) * 100;
 
         object result =
             targetType.IsAssignableFrom(typeof(double))
@@ -1077,7 +1080,7 @@ public class DeltaConverter : MultiConverterBase
     }
 }
 
-public class WattPilotTitleConverter:MultiConverterBase
+public class WattPilotTitleConverter : MultiConverterBase
 {
     public override object? Convert(object?[] values, Type targetType, object? parameter, CultureInfo culture)
     {
@@ -1095,8 +1098,8 @@ public class WattPilotTitleConverter:MultiConverterBase
         }
 
         var index = (byte?)values[4];
-        
-        var builder=new StringBuilder();
+
+        var builder = new StringBuilder();
 
         if (isTitle)
         {
@@ -1107,7 +1110,7 @@ public class WattPilotTitleConverter:MultiConverterBase
         builder.Append($"Wattpilot {maximumPowerKiloWatts}J ");
         builder.Append($"({firmwareVersion}) - ");
         builder.Append(currentUser);
-        
+
         return builder.ToString();
     }
-} 
+}

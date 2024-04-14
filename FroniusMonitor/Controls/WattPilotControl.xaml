@@ -17,7 +17,7 @@
                 <Grid.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="{x:Static p:Resources.Settings}" Icon="{vi:ChargingTrafficSignSettings}" Click="OnSettingsClicked" />
-                        <MenuItem Header="{x:Static p:Resources.Details}" Icon="{vi:MagnifyingGlass}" Click="OnDetailsClicked"/>
+                        <MenuItem Header="{x:Static p:Resources.Details}" Icon="{vi:MagnifyingGlass}" Click="OnDetailsClicked" />
                     </ContextMenu>
                 </Grid.ContextMenu>
                 <Grid.RowDefinitions>
@@ -37,7 +37,7 @@
                         <Setter Property="Margin" Value="4,0,4,2" />
                     </Style>
                 </Grid.Resources>
-                <Grid Grid.Row="0">
+                <Grid Grid.Row="0" DataContext="{Binding Path=HomeAutomationSystem.WattPilot, RelativeSource={RelativeSource FindAncestor, AncestorType=c:WattPilotControl}}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
@@ -57,7 +57,8 @@
 
                 </Grid>
 
-                <Border Grid.Row="2" Width="100" Height="94" Margin="4" Background="{Binding Converter={co:NullToBrush NotNull=Cornsilk, Null=LightGray}, FallbackValue=LightGray}" BorderThickness=".2" BorderBrush="Black">
+                <Border DataContext="{Binding Path=HomeAutomationSystem.WattPilot, RelativeSource={RelativeSource FindAncestor, AncestorType=c:WattPilotControl}}"
+                        Grid.Row="2" Width="100" Height="94" Margin="4" Background="{Binding Converter={co:NullToBrush NotNull=Cornsilk, Null=LightGray}, FallbackValue=LightGray}" BorderThickness=".2" BorderBrush="Black">
                     <Grid>
 
                         <Grid x:Name="Voltage" Visibility="Collapsed">
@@ -83,7 +84,7 @@
                                 <c:Gauge Label="L2" Value="{m:GaugeBinding VoltageL2}" />
                                 <c:Gauge Label="L3" Value="{m:GaugeBinding VoltageL3}" />
                                 <c:Gauge Label="{x:Static p:Resources.AverageShort}" Value="{m:GaugeBinding VoltageAverage}"
-                                                   StringFormat="N1" />
+                                         StringFormat="N1" />
                             </StackPanel>
                         </Grid>
 
@@ -101,17 +102,17 @@
 
                                 <!-- ReSharper disable Xaml.RedundantAttachedProperty -->
                                 <c:Gauge Grid.Row="0" Grid.Column="0" Margin="1"
-                                                   Value="{m:GaugeBinding VoltageL1}" />
+                                         Value="{m:GaugeBinding VoltageL1}" />
 
                                 <c:Gauge Grid.Row="0" Grid.Column="1" Margin="1"
-                                                   Value="{m:GaugeBinding VoltageL2}" />
+                                         Value="{m:GaugeBinding VoltageL2}" />
 
                                 <c:Gauge Grid.Row="1" Grid.Column="0" Margin="1"
-                                                   Value="{m:GaugeBinding VoltageL3}" />
+                                         Value="{m:GaugeBinding VoltageL3}" />
 
                                 <c:Gauge Grid.Row="1" Grid.Column="1" Margin="1" Minimum="49" Maximum="51"
-                                                   Value="{m:GaugeBinding Frequency}"
-                                                   t:HalfCircleGauge.MinimumMaximumStringFormat="N1" />
+                                         Value="{m:GaugeBinding Frequency}"
+                                         t:HalfCircleGauge.MinimumMaximumStringFormat="N1" />
                                 <!-- ReSharper restore Xaml.RedundantAttachedProperty -->
                             </UniformGrid>
                         </StackPanel>
@@ -136,7 +137,7 @@
                                 <c:Gauge Label="L2" Value="{m:GaugeBinding CurrentL2}" />
                                 <c:Gauge Label="L3" Value="{m:GaugeBinding CurrentL3}" />
                                 <c:Gauge Label="{x:Static p:Resources.Sum}" Value="{m:GaugeBinding CurrentSum}"
-                                                   Maximum="{Binding MaximumChargingCurrentPossible, FallbackValue=0, Converter={co:Multiply Factor=3}}" />
+                                         Maximum="{Binding MaximumChargingCurrentPossible, FallbackValue=0, Converter={co:Multiply Factor=3}}" />
                             </StackPanel>
                         </Grid>
 
@@ -156,10 +157,10 @@
                             </TextBlock>
 
                             <c:Gauge Value="{m:GaugeBinding CurrentSum, FallbackValue=0, TargetNullValue=0}"
-                                               Minimum="0" Grid.Row="2"
-                                               Maximum="{Binding MaximumChargingCurrentPossible, FallbackValue=6, TargetNullValue=6}"
-                                               GaugeColors="{x:Static c:Gauge.LowIsBad}"
-                                               Width="92" Style="{StaticResource DefaultHalfCircleGauge}" />
+                                     Minimum="0" Grid.Row="2"
+                                     Maximum="{Binding MaximumChargingCurrentPossible, FallbackValue=6, TargetNullValue=6}"
+                                     GaugeColors="{x:Static c:Gauge.LowIsBad}"
+                                     Width="92" Style="{StaticResource DefaultHalfCircleGauge}" />
 
                         </Grid>
 
@@ -183,7 +184,7 @@
                                 <c:Gauge Label="L2" Value="{m:GaugeBinding PowerL2KiloWatts}" />
                                 <c:Gauge Label="L3" Value="{m:GaugeBinding PowerL3KiloWatts}" />
                                 <c:Gauge Label="{x:Static p:Resources.Sum}" Value="{m:GaugeBinding PowerSumKiloWatts}"
-                                                   Maximum="{m:GaugeBinding MaximumChargingPowerPossibleSum, Converter={co:Multiply Factor=0.001}}" />
+                                         Maximum="{m:GaugeBinding MaximumChargingPowerPossibleSum, Converter={co:Multiply Factor=0.001}}" />
                             </StackPanel>
                         </Grid>
 
@@ -203,10 +204,10 @@
                             </TextBlock>
 
                             <c:Gauge Value="{Binding PowerSum, FallbackValue=0, TargetNullValue=0, Mode=OneWay}"
-                                               Minimum="0" Grid.Row="2"
-                                               Maximum="{m:GaugeBinding MaximumChargingPowerPossibleSum, FallbackValue=16, TargetNullValue=16, Converter={co:Multiply Factor=1}}"
-                                               GaugeColors="{x:Static c:Gauge.LowIsBad}"
-                                               Width="92" Style="{StaticResource DefaultHalfCircleGauge}" />
+                                     Minimum="0" Grid.Row="2"
+                                     Maximum="{m:GaugeBinding MaximumChargingPowerPossibleSum, FallbackValue=16, TargetNullValue=16, Converter={co:Multiply Factor=1}}"
+                                     GaugeColors="{x:Static c:Gauge.LowIsBad}"
+                                     Width="92" Style="{StaticResource DefaultHalfCircleGauge}" />
 
                         </Grid>
 
@@ -249,16 +250,16 @@
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                                 <c:Gauge Label="{x:Static p:Resources.Power}"
-                                                   Value="{m:GaugeBinding PowerL0}"
-                                                   Maximum="10"
-                                                   UnitName="W" />
+                                         Value="{m:GaugeBinding PowerL0}"
+                                         Maximum="10"
+                                         UnitName="W" />
                                 <c:Gauge Label="{x:Static p:Resources.Voltage}"
-                                                   Value="{m:GaugeBinding VoltageL0}"
-                                                   Maximum="5" StringFormat="N0" UnitName="V" />
+                                         Value="{m:GaugeBinding VoltageL0}"
+                                         Maximum="5" StringFormat="N0" UnitName="V" />
                                 <c:Gauge Label="cos(φ)"
-                                                   Value="{m:GaugeBinding PowerFactorL0}"
-                                                   Maximum="1" GaugeColors="{x:Static c:Gauge.LowIsBad}"
-                                                   UnitName="" StringFormat="N2" />
+                                         Value="{m:GaugeBinding PowerFactorL0}"
+                                         Maximum="1" GaugeColors="{x:Static c:Gauge.LowIsBad}"
+                                         UnitName="" StringFormat="N2" />
                             </StackPanel>
                         </Grid>
 
@@ -280,12 +281,12 @@
                             <StackPanel Grid.Row="2" VerticalAlignment="Center">
 
                                 <c:Gauge Label="Frq." GaugeColors="{x:Static c:Gauge.MidIsGood}"
-                                                   Value="{m:GaugeBinding Frequency}"
-                                                   UnitName="Hz" Minimum="49" Maximum="51" StringFormat="N3" />
+                                         Value="{m:GaugeBinding Frequency}"
+                                         UnitName="Hz" Minimum="49" Maximum="51" StringFormat="N3" />
 
                                 <c:Gauge Label="{x:Static p:Resources.Latency}" GaugeColors="{x:Static c:Gauge.HighIsBad}"
-                                                   Value="{m:GaugeBinding Latency.TotalMilliseconds}"
-                                                   StringFormat="N0" Minimum="0" Maximum="2000" UnitName="ms" />
+                                         Value="{m:GaugeBinding Latency.TotalMilliseconds}"
+                                         StringFormat="N0" Minimum="0" Maximum="2000" UnitName="ms" />
                             </StackPanel>
                         </Grid>
 

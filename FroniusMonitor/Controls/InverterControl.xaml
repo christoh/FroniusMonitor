@@ -269,17 +269,21 @@
                                     <MultiBinding Converter="{co:MpptComparison}">
                                         <Binding Path="Sensors.Inverter.Solar1Power"/>
                                         <Binding Path="Sensors.Inverter.Solar2Power"/>
+                                        <Binding Path="Config.InverterSettings.Mppt.Mppt1.WattPeak"/>
+                                        <Binding Path="Config.InverterSettings.Mppt.Mppt2.WattPeak"/>
                                     </MultiBinding>
                                 </TextBlock.Text>
                             </TextBlock>
 
                             <c:Gauge Grid.Row="2" Width="92"
-                                               Maximum="130" Minimum="70"
-                                               GaugeColors="{x:Static c:Gauge.LowIsBad}">
+                                               Maximum="150" Minimum="50"
+                                               GaugeColors="{x:Static c:Gauge.ExtremeIsBad}">
                                 <c:Gauge.Value>
                                     <MultiBinding Converter="{co:MpptComparison}">
                                         <Binding Path="Sensors.Inverter.Solar1Power"/>
                                         <Binding Path="Sensors.Inverter.Solar2Power"/>
+                                        <Binding Path="Config.InverterSettings.Mppt.Mppt1.WattPeak"/>
+                                        <Binding Path="Config.InverterSettings.Mppt.Mppt2.WattPeak"/>
                                     </MultiBinding>
                                 </c:Gauge.Value>
                                     
