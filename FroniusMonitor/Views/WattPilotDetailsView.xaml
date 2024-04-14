@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:viewModels="clr-namespace:De.Hochstaetter.FroniusMonitor.ViewModels"
+        xmlns:vm="clr-namespace:De.Hochstaetter.FroniusMonitor.ViewModels"
         xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
         xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
         xmlns:m="clr-namespace:De.Hochstaetter.FroniusMonitor.Models"
@@ -11,7 +11,7 @@
         xmlns:a="clr-namespace:De.Hochstaetter.FroniusMonitor"
         xmlns:t="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Resources"
         mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance Type=viewModels:WattPilotDetailsViewModel}"
+        d:DataContext="{d:DesignInstance Type=vm:WattPilotDetailsViewModel}"
         Width="708" Height="780" MinHeight="200" MinWidth="300">
     <Window.Title>
         <MultiBinding Converter="{co:WattPilotTitleConverter}">

@@ -1350,4 +1350,7 @@
   <data name="WifiSignal" xml:space="preserve">
 	  <value>Wi-Fi Signal</value>
   </data>
+  <data name="SmartMeterDetailsView" xml:space="preserve">
+	  <value>Smart Meter Details</value>
+  </data>
 </root>

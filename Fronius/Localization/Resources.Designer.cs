@@ -3247,6 +3247,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Smart Meter Details.
+        /// </summary>
+        public static string SmartMeterDetailsView {
+            get {
+                return ResourceManager.GetString("SmartMeterDetailsView", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to State Of Charge.
         /// </summary>
         public static string SoC {

@@ -152,4 +152,41 @@
         </Border>
     </DataTemplate>
 
+    <DataTemplate DataType="{x:Type ContentControl}" x:Key="SmartMeterGauge">
+        <Border Width="120" BorderThickness="1" BorderBrush="DimGray" Margin="2"
+                Background="{Binding Path=DataContext.(vm:SmartMeterDetailsViewModel.Status), Converter={co:Gen24Status2Brush}, FallbackValue=DarkGray, RelativeSource={RelativeSource FindAncestor, AncestorType=v:SmartMeterDetailsView}}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid.Resources>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="TextAlignment" Value="Center" />
+                        <Setter Property="FontSize" Value="16" />
+                    </Style>
+                </Grid.Resources>
+
+                <TextBlock Grid.Row="0" FontWeight="Normal" Text="{Binding Path=Content.(c:Gauge.Label), RelativeSource={RelativeSource TemplatedParent}}" Margin="0,3,0,0" />
+
+                <TextBlock Grid.Row="1" FontSize="17" FontWeight="Medium" Margin="0,0,0,3" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}">
+                    <TextBlock.Text>
+                        <MultiBinding Converter="{co:Gauge2Text}">
+                            <Binding Path="(ContentControl.Content)" />
+                            <Binding Path="(ContentControl.Content).(c:Gauge.Value)" />
+                            <Binding Path="(ContentControl.Content).(c:Gauge.StringFormat)" />
+                            <Binding Path="(ContentControl.Content).(c:Gauge.UnitName)" />
+                            <Binding Path="(ContentControl.Content).(c:Gauge.ShowPercent)" />
+                            <Binding Path="(ContentControl.Content).(c:Gauge.Minimum)" />
+                            <Binding Path="(ContentControl.Content).(c:Gauge.Maximum)" />
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+                <ContentPresenter Grid.Row="2" Margin="4,0,4,4" Content="{TemplateBinding Content}" />
+            </Grid>
+        </Border>
+    </DataTemplate>
+
 </ResourceDictionary>

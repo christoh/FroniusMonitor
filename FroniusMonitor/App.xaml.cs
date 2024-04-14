@@ -65,6 +65,7 @@ public partial class App
             .AddSingleton<SettingsBase>(Settings)
             .AddTransient<EventLogView>()
             .AddTransient<BatteryDetailsView>()
+            .AddTransient<SmartMeterDetailsView>()
             .AddTransient<SelfConsumptionOptimizationView>()
             .AddTransient<ModbusView>()
             .AddTransient<SettingsView>()
@@ -81,6 +82,7 @@ public partial class App
             .AddTransient<InverterDetailsViewModel>()
             .AddTransient<BatteryDetailsViewModel>()
             .AddTransient<WattPilotDetailsViewModel>()
+            .AddTransient<SmartMeterDetailsViewModel>()
             .BuildServiceProvider()
             ;
 

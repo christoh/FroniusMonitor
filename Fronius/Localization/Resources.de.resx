@@ -1293,4 +1293,7 @@
   <data name="WifiSignal" xml:space="preserve">
 	  <value>WLAN-Signal</value>
   </data>
+  <data name="SmartMeterDetailsView" xml:space="preserve">
+	  <value>Smartmeterdetails</value>
+  </data>
 </root>

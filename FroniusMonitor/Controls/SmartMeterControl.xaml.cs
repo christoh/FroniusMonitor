@@ -137,4 +137,9 @@ public partial class SmartMeterControl
     private void OnCurrentClick(object sender, RoutedEventArgs e) => SetMode(currentModes, ref currentCurrentIndex);
 
     private void OnMoreClick(object sender, RoutedEventArgs e) => SetMode(moreModes, ref currentMoreIndex);
+
+    private void OnDetailsClick(object sender, RoutedEventArgs e)
+    {
+        IoC.TryGetRegistered<MainWindow>()?.GetView<SmartMeterDetailsView>().Focus();
+    }
 }

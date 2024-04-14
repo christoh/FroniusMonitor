@@ -285,7 +285,6 @@
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
-                                <Setter Property="StringFormat" Value="N1" />
                                 <Setter Property="UnitName" Value="V" />
                                 <Setter Property="Minimum" Value="220" />
                                 <Setter Property="Maximum" Value="240" />
@@ -314,7 +313,6 @@
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
-                                <Setter Property="StringFormat" Value="N1" />
                                 <Setter Property="UnitName" Value="V" />
                                 <Setter Property="Minimum" Value="220" />
                                 <Setter Property="Maximum" Value="240" />
@@ -392,7 +390,6 @@
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
-                                <Setter Property="StringFormat" Value="N1" />
                                 <Setter Property="UnitName" Value="V" />
                                 <Setter Property="Minimum" Value="383.37168574084177751131265854635" />
                                 <Setter Property="Maximum" Value="413.37168574084177751131265854635" />
@@ -421,7 +418,6 @@
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
-                                <Setter Property="StringFormat" Value="N1" />
                                 <Setter Property="UnitName" Value="V" />
                                 <Setter Property="Minimum" Value="383.37168574084177751131265854635" />
                                 <Setter Property="Maximum" Value="413.37168574084177751131265854635" />

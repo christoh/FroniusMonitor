@@ -9,8 +9,15 @@
              xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
              xmlns:t="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Resources"
              xmlns:m="clr-namespace:De.Hochstaetter.FroniusMonitor.Models"
+             xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
              mc:Ignorable="d"
              d:DesignHeight="127" d:DesignWidth="110">
+    <UserControl.ContextMenu>
+        <ContextMenu>
+            <MenuItem Header="{x:Static p:Resources.Details}" Icon="{vi:MagnifyingGlass}" Click="OnDetailsClick"/>
+        </ContextMenu>
+    </UserControl.ContextMenu>
+
     <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SmartMeterControl}}">
         <Border BorderBrush="DimGray" BorderThickness="1" Width="110">
             <Grid x:Name="BackgroundProvider" Background="LightGray">
