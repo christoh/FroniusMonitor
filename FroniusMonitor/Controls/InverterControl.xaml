@@ -162,8 +162,8 @@
                         <Grid x:Name="AcLineVoltage" Visibility="Collapsed">
                             <Grid.Resources>
                                 <Style TargetType="c:Gauge" BasedOn="{StaticResource AcVoltageLinearGaugeStyle}">
-                                    <Setter Property="Minimum" Value="380" />
-                                    <Setter Property="Maximum" Value="420" />
+                                    <Setter Property="Minimum" Value="381.05117766515300457603819513129" />
+                                    <Setter Property="Maximum" Value="415.69219381653055044658712196141" />
                                     <Setter Property="FontSize" Value="20"/>
                                     <Setter Property="t:LinearGauge.GaugeHeight" Value="12"/>
                                 </Style>
