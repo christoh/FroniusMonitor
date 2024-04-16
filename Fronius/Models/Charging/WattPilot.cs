@@ -204,6 +204,24 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref isSecured, value);
     }
 
+    private double? temperatureConnector;
+
+    [WattPilot("tma", 0)]
+    public double? TemperatureConnector
+    {
+        get => temperatureConnector;
+        set => Set(ref temperatureConnector, value);
+    }
+
+    private double? temperatureBoard;
+
+    [WattPilot("tma", 1)]
+    public double? TemperatureBoard
+    {
+        get => temperatureBoard;
+        set => Set(ref temperatureBoard, value);
+    }
+
     private double? voltageL1;
 
     [WattPilot("nrg", 0)]
@@ -783,7 +801,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     public byte MaximumChargingCurrentPossible => (byte)(MaximumChargingCurrentPossiblePerPhase * ChargingPhases);
-    
+
     public double MaximumChargingPowerPossibleSum
     {
         get
