@@ -1353,4 +1353,10 @@
   <data name="SmartMeterDetailsView" xml:space="preserve">
 	  <value>Smart Meter Details</value>
   </data>
+  <data name="Plug" xml:space="preserve">
+	  <value>Plug</value>
+  </data>
+  <data name="Board" xml:space="preserve">
+	  <value>Board</value>
+  </data>
 </root>

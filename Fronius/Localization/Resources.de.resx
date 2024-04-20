@@ -1296,4 +1296,7 @@
   <data name="SmartMeterDetailsView" xml:space="preserve">
 	  <value>Smartmeterdetails</value>
   </data>
+  <data name="Plug" xml:space="preserve">
+	  <value>Stecker</value>
+  </data>
 </root>

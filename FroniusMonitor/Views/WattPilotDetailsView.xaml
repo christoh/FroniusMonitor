@@ -12,7 +12,7 @@
         xmlns:t="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Resources"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=vm:WattPilotDetailsViewModel}"
-        Width="708" Height="780" MinHeight="200" MinWidth="300">
+        Width="835" Height="779" MinHeight="200" MinWidth="300">
     <Window.Title>
         <MultiBinding Converter="{co:WattPilotTitleConverter}">
             <Binding Converter="{co:String2Bool Value=True, Equal=True, NotEqual=True}" />
@@ -139,6 +139,28 @@
 
                             <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding VoltageL3}" Label="L3" />
+                            </ContentControl>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="{x:Static p:Resources.Temperatures}">
+                    <StackPanel>
+                        <StackPanel.Resources>
+                            <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
+                                <Setter Property="GaugeColors" Value="{x:Static c:Gauge.HighIsBad}" />
+                                <Setter Property="UnitName" Value="°C" />
+                                <Setter Property="Minimum" Value="0" />
+                                <Setter Property="Maximum" Value="90" />
+                            </Style>
+                        </StackPanel.Resources>
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl>
+                                <c:Gauge Value="{m:GaugeBinding TemperatureConnector}" Label="{x:Static p:Resources.Plug}" />
+                            </ContentControl>
+
+                            <ContentControl>
+                                <c:Gauge Value="{m:GaugeBinding TemperatureBoard}" Label="{x:Static p:Resources.Board}" />
                             </ContentControl>
                         </StackPanel>
                     </StackPanel>

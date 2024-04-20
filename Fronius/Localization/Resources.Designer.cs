@@ -844,6 +844,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Board.
+        /// </summary>
+        public static string Board {
+            get {
+                return ResourceManager.GetString("Board", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Allow current level selection via hardware button.
         /// </summary>
         public static string ButtonEnableCharging {
@@ -2811,6 +2820,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string PleaseCorrectErrors {
             get {
                 return ResourceManager.GetString("PleaseCorrectErrors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Plug.
+        /// </summary>
+        public static string Plug {
+            get {
+                return ResourceManager.GetString("Plug", resourceCulture);
             }
         }
         

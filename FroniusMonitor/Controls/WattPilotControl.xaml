@@ -290,6 +290,30 @@
                             </StackPanel>
                         </Grid>
 
+                        <Grid x:Name="MoreTemperatures" Visibility="Collapsed">
+                            <Grid.Resources>
+                                <Style TargetType="c:Gauge" BasedOn="{StaticResource WattPilotLinearGauge}">
+                                    <Setter Property="Minimum" Value="0"/>
+                                    <Setter Property="Maximum" Value="90"/>
+                                    <Setter Property="UnitName" Value="°C"/>
+                                    <Setter Property="GaugeColors" Value="{x:Static c:Gauge.HighIsBad}"/>
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.Temperatures}" TextAlignment="Center" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+
+                                <c:Gauge Label="{x:Static p:Resources.Plug}" Value="{m:GaugeBinding TemperatureConnector}"/>
+
+                                <c:Gauge Label="{x:Static p:Resources.Board}" Value="{m:GaugeBinding TemperatureBoard}"/>
+                            </StackPanel>
+                        </Grid>
+
                         <Grid x:Name="MoreWifi" Visibility="Collapsed" Margin="2,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />

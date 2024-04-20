@@ -15,6 +15,7 @@ public enum WattPilotDisplayMode : byte
     MoreFrequency,
     NeutralWire,
     MoreWifi,
+    MoreTemperatures,
 }
 
 public partial class WattPilotControl
@@ -42,6 +43,7 @@ public partial class WattPilotControl
     [
         WattPilotDisplayMode.MoreFrequency,
         WattPilotDisplayMode.NeutralWire,
+        WattPilotDisplayMode.MoreTemperatures,
         WattPilotDisplayMode.EnergyCards,
         WattPilotDisplayMode.MoreWifi,
     ];
