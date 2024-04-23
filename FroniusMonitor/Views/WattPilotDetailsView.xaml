@@ -10,9 +10,10 @@
         xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
         xmlns:a="clr-namespace:De.Hochstaetter.FroniusMonitor"
         xmlns:t="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Resources"
+        xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=vm:WattPilotDetailsViewModel}"
-        Width="835" Height="779" MinHeight="200" MinWidth="300">
+        Width="835" Height="787" MinHeight="200" MinWidth="300">
     <Window.Title>
         <MultiBinding Converter="{co:WattPilotTitleConverter}">
             <Binding Converter="{co:String2Bool Value=True, Equal=True, NotEqual=True}" />
@@ -23,13 +24,35 @@
         </MultiBinding>
     </Window.Title>
     <Grid DataContext="{Binding DataCollectionService.HomeAutomationSystem.WattPilot, FallbackValue={x:Null}}">
+        <Grid.ContextMenu>
+            <ContextMenu>
+                <MenuItem Header="{x:Static p:Resources.Settings}"
+                          IsEnabled="{Binding DataContext.WattPilotService, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Converter={co:NullToBool}}"
+                          Icon="{vi:ChargingTrafficSignSettings}"
+                          Click="OnSettingsClicked" />
+                <MenuItem Header="{x:Static p:Resources.Reboot}" Icon="{vi:RebootIcon}"
+                          IsEnabled="{Binding DataContext.WattPilotService, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Converter={co:NullToBool}}"
+                          Click="OnRebootWattPilotClicked" />
+            </ContextMenu>
+        </Grid.ContextMenu>
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
+
+        <Menu Grid.Row="0">
+            <MenuItem Header="WattPilot">
+                <MenuItem Header="{x:Static p:Resources.Settings}"
+                          IsEnabled="{Binding DataContext.WattPilotService, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Converter={co:NullToBool}}"
+                          Icon="{vi:ChargingTrafficSignSettings}"
+                          Click="OnSettingsClicked" />
+                <MenuItem Header="{x:Static p:Resources.Reboot}" Icon="{vi:RebootIcon}"
+                          IsEnabled="{Binding DataContext.WattPilotService, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Converter={co:NullToBool}}"
+                          Click="OnRebootWattPilotClicked" />
+            </MenuItem>
+        </Menu>
 
         <TextBlock Grid.Row="1" TextAlignment="Center" FontSize="18" FontWeight="Medium" Margin="10,10,10,16" TextWrapping="Wrap">
             <TextBlock.Text>
@@ -43,7 +66,7 @@
             </TextBlock.Text>
         </TextBlock>
 
-        <ScrollViewer Grid.Row="3" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
             <!-- ReSharper disable Xaml.PossibleNullReferenceException -->
             <WrapPanel Orientation="Horizontal" Margin="10,0,4,0">
                 <WrapPanel.LayoutTransform>

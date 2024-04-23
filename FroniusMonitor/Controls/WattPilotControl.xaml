@@ -16,7 +16,14 @@
             <Grid x:Name="BackgroundProvider" DataContext="{Binding WattPilotService.WattPilot}" Background="{Binding Converter={co:NullToBrush}, FallbackValue=LightGray}">
                 <Grid.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="{x:Static p:Resources.Settings}" Icon="{vi:ChargingTrafficSignSettings}" Click="OnSettingsClicked" />
+                        <MenuItem Header="{x:Static p:Resources.Settings}"
+                                  IsEnabled="{Binding DataContext.WattPilotService, RelativeSource={RelativeSource FindAncestor, AncestorType=Border}, Converter={co:NullToBool}}"
+                                  Icon="{vi:ChargingTrafficSignSettings}"
+                                  Click="OnSettingsClicked" />
+                        <MenuItem Header="{x:Static p:Resources.Reboot}" Icon="{vi:RebootIcon}"
+                                  IsEnabled="{Binding DataContext.WattPilotService, RelativeSource={RelativeSource FindAncestor, AncestorType=Border}, Converter={co:NullToBool}}"
+                                  Click="OnRebootWattPilotClicked"
+                                  />
                         <MenuItem Header="{x:Static p:Resources.Details}" Icon="{vi:MagnifyingGlass}" Click="OnDetailsClicked" />
                     </ContextMenu>
                 </Grid.ContextMenu>

@@ -14,5 +14,6 @@ namespace De.Hochstaetter.Fronius.Contracts
         void BeginSendValues();
         ValueTask SendValue(WattPilot instance, string propertyName);
         ValueTask<List<string>> Send(WattPilot? localWattPilot = null, WattPilot? oldWattPilot = null);
+        Task RebootWattPilot();
     }
 }

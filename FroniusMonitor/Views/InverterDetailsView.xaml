@@ -12,6 +12,7 @@
         xmlns:l="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Localization"
         xmlns:v="clr-namespace:De.Hochstaetter.FroniusMonitor.Views"
         xmlns:a="clr-namespace:De.Hochstaetter.FroniusMonitor"
+        xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=viewModels:InverterDetailsViewModel}"
         Title="{Binding Title}" Width="682" Height="979" MinHeight="200" MinWidth="300">
@@ -23,8 +24,23 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
+        
+        <Grid.ContextMenu>
+            <ContextMenu>
+                <MenuItem Header="{x:Static p:Resources.Settings}" Icon="{vi:SettingsIcon}" Click="OnSettingsClicked" />
+                <MenuItem Header="{x:Static p:Resources.EnergyFlow}" Icon="{vi:EnergyFLow}" Click="OnEnergyFlowClicked" />
+                <MenuItem Header="{x:Static p:Resources.Modbus}" Icon="{vi:ModbusLogo}" Click="OnModbusClicked" />
+                <MenuItem Header="{x:Static p:Resources.EventLog}" Icon="{vi:EventLogIcon}" Click="OnEventLogClicked" />
+            </ContextMenu>
+        </Grid.ContextMenu>
 
         <Menu Grid.Row="0">
+            <MenuItem Header="{x:Static p:Resources.Inverter}">
+                <MenuItem Header="{x:Static p:Resources.Settings}" Icon="{vi:SettingsIcon}" Click="OnSettingsClicked" />
+                <MenuItem Header="{x:Static p:Resources.EnergyFlow}" Icon="{vi:EnergyFLow}" Click="OnEnergyFlowClicked" />
+                <MenuItem Header="{x:Static p:Resources.Modbus}" Icon="{vi:ModbusLogo}" Click="OnModbusClicked" />
+                <MenuItem Header="{x:Static p:Resources.EventLog}" Icon="{vi:EventLogIcon}" Click="OnEventLogClicked" />
+            </MenuItem>
             <MenuItem x:Name="View" Header="{x:Static p:Resources.View}" IsCheckable="False" IsChecked="False" Click="CheckShowAll">
                 <MenuItem.Resources>
                     <Style TargetType="MenuItem">

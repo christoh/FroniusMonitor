@@ -299,4 +299,16 @@ public partial class MainWindow
     {
         Settings.Save();
     }
+
+    private async void OnRebootWattPilotClicked(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            await IoC.Get<IWattPilotService>().RebootWattPilot().ConfigureAwait(true);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(this, ex.Message, Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
 }

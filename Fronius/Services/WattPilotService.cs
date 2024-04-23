@@ -216,6 +216,28 @@ public class WattPilotService : BindableBase, IWattPilotService
         return errors;
     }
 
+    public async Task RebootWattPilot()
+    {
+        BeginSendValues();
+
+        if (WattPilot?.Clone() is not WattPilot newWattPilot)
+        {
+            throw new IOException(Resources.NoWattPilot);
+        }
+
+        newWattPilot.Reboot = true;
+        var errors = await Send(newWattPilot, WattPilot).ConfigureAwait(false);
+
+        if (errors.Count > 0)
+        {
+            var notWritten = "• " + string.Join(Environment.NewLine + "• ", errors);
+            throw new IOException("The following settings were not written to the Wattpilot:" + Environment.NewLine + Environment.NewLine + notWritten);
+        }
+
+        await Stop().ConfigureAwait(false);
+    }
+
+
     private async Task Authenticate(JObject token)
     {
         var token1 = token["token1"]?.Value<string>();
@@ -404,7 +426,7 @@ public class WattPilotService : BindableBase, IWattPilotService
 
         foreach (var token in jObject)
         {
-            // Debug.Print($"{token.Key}: {token.Value}");
+            Debug.Print($"{token.Key}: {token.Value?.ToString().Replace("\r", "").Replace("\n", "")}");
             IReadOnlyList<PropertyInfo> propertyInfos = instance.GetType().GetProperties().Where(p => p.GetCustomAttributes<WattPilotAttribute>().Any(a => a.TokenName == token.Key)).ToArray();
 
             if (!propertyInfos.Any())

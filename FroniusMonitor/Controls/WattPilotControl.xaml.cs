@@ -121,4 +121,25 @@ public partial class WattPilotControl
     {
         IoC.TryGetRegistered<MainWindow>()?.GetView<WattPilotDetailsView>().Focus();;
     }
+
+    private async void OnRebootWattPilotClicked(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            await WattPilotService.RebootWattPilot().ConfigureAwait(true);
+        }
+        catch (Exception ex)
+        {
+            var window = Window.GetWindow(this);
+
+            if (window != null)
+            {
+                MessageBox.Show(window, ex.Message, Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            else
+            {
+                MessageBox.Show(ex.Message, Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+    }
 }

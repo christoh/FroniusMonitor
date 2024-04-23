@@ -13,9 +13,6 @@ public class MainViewModel(IDataCollectionService dataCollectionService, IFritzB
     private ICommand? downloadChargeLogCommand;
     public ICommand DownloadChargeLogCommand => downloadChargeLogCommand ??= new NoParameterCommand(DownloadChargeLog);
 
-    private ICommand? rebootWattPilotCommand;
-    public ICommand RebootWattPilotCommand => rebootWattPilotCommand ??= new NoParameterCommand(RebootWattPilot);
-
     public IDataCollectionService DataCollectionService => dataCollectionService;
 
     public IWattPilotService WattPilotService { get; } = wattPilotService;
@@ -91,38 +88,38 @@ public class MainViewModel(IDataCollectionService dataCollectionService, IFritzB
         _ = Settings.Save();
     }
 
-    private async void RebootWattPilot()
-    {
-        WattPilotService.BeginSendValues();
+    //private async void RebootWattPilot()
+    //{
+    //    WattPilotService.BeginSendValues();
 
-        if (WattPilotService.WattPilot?.Clone() is not WattPilot newWattPilot)
-        {
-            await Dispatcher.InvokeAsync(() => MessageBox.Show(IoC.Get<MainWindow>(), Resources.NoWattPilot, Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error));
-            return;
-        }
+    //    if (WattPilotService.WattPilot?.Clone() is not WattPilot newWattPilot)
+    //    {
+    //        await Dispatcher.InvokeAsync(() => MessageBox.Show(IoC.Get<MainWindow>(), Resources.NoWattPilot, Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error));
+    //        return;
+    //    }
 
-        newWattPilot.Reboot = true;
-        var errors = await WattPilotService.Send(newWattPilot, WattPilotService.WattPilot).ConfigureAwait(false);
+    //    newWattPilot.Reboot = true;
+    //    var errors = await WattPilotService.Send(newWattPilot, WattPilotService.WattPilot).ConfigureAwait(false);
 
-        if (errors.Count > 0)
-        {
-            var notWritten = "• " + string.Join(Environment.NewLine + "• ", errors);
+    //    if (errors.Count > 0)
+    //    {
+    //        var notWritten = "• " + string.Join(Environment.NewLine + "• ", errors);
 
-            await Dispatcher.InvokeAsync(() =>
-            {
-                MessageBox.Show
-                (
-                    IoC.Get<MainWindow>(),
-                    "The following settings were not written to the Wattpilot:" + Environment.NewLine + Environment.NewLine + notWritten,
-                    Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error
-                );
-            });
+    //        await Dispatcher.InvokeAsync(() =>
+    //        {
+    //            MessageBox.Show
+    //            (
+    //                IoC.Get<MainWindow>(),
+    //                "The following settings were not written to the Wattpilot:" + Environment.NewLine + Environment.NewLine + notWritten,
+    //                Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error
+    //            );
+    //        });
 
-            return;
-        }
+    //        return;
+    //    }
 
-        await WattPilotService.Stop().ConfigureAwait(false);
-    }
+    //    await WattPilotService.Stop().ConfigureAwait(false);
+    //}
 
     private void DownloadChargeLog()
     {
