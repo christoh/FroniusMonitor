@@ -13,7 +13,7 @@
         xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=vm:WattPilotDetailsViewModel}"
-        Width="835" Height="787" MinHeight="200" MinWidth="300">
+        Width="835" Height="795" MinHeight="200" MinWidth="300">
     <Window.Title>
         <MultiBinding Converter="{co:WattPilotTitleConverter}">
             <Binding Converter="{co:String2Bool Value=True, Equal=True, NotEqual=True}" />
