@@ -3,6 +3,7 @@
 namespace De.Hochstaetter.Fronius.Models.Charging;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
 public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
 {
     private string? serialNumber;
