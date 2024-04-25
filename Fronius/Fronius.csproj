@@ -23,8 +23,8 @@
 
   <ItemGroup>
     <PackageReference Include="DeviceId" Version="6.6.0" />
-    <PackageReference Include="FluentModbus" Version="5.1.0" />
-    <PackageReference Include="Microsoft.Azure.Devices.Client" Version="1.42.0" />
+    <PackageReference Include="FluentModbus" Version="5.2.0" />
+    <PackageReference Include="Microsoft.Azure.Devices.Client" Version="1.42.3" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
