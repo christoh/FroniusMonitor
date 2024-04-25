@@ -1285,15 +1285,6 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Download charging log.
-        /// </summary>
-        public static string DownloadChargeLog {
-            get {
-                return ResourceManager.GetString("DownloadChargeLog", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Drifts file.
         /// </summary>
         public static string DriftsFile {
@@ -2581,6 +2572,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No charging log link available from Wattpilot.
+        /// </summary>
+        public static string NoChargingLogFromWattPilot {
+            get {
+                return ResourceManager.GetString("NoChargingLogFromWattPilot", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to PV does not feed the grid.
         /// </summary>
         public static string NoFeedIn {
@@ -2662,6 +2662,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Not connected to Wattpilot.
+        /// </summary>
+        public static string NoWattPilotConnection {
+            get {
+                return ResourceManager.GetString("NoWattPilotConnection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Off.
         /// </summary>
         public static string Off {
@@ -2694,6 +2703,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string On {
             get {
                 return ResourceManager.GetString("On", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Download charging log.
+        /// </summary>
+        public static string OpenChargingLog {
+            get {
+                return ResourceManager.GetString("OpenChargingLog", resourceCulture);
             }
         }
         

@@ -1,30 +1,43 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Views
+﻿namespace De.Hochstaetter.FroniusMonitor.Views;
+
+public partial class WattPilotDetailsView
 {
-    public partial class WattPilotDetailsView
+    private readonly WattPilotDetailsViewModel viewModel;
+    private readonly IWattPilotService wattPilotService;
+
+    public WattPilotDetailsView(WattPilotDetailsViewModel viewModel, IWattPilotService wattPilotService)
     {
-        private readonly WattPilotDetailsViewModel viewModel;
-        public WattPilotDetailsView(WattPilotDetailsViewModel viewModel)
-        {
-            InitializeComponent();
-            DataContext = this.viewModel = viewModel;
-        }
+        InitializeComponent();
+        DataContext = this.viewModel = viewModel;
+        this.wattPilotService = wattPilotService;
+    }
 
-        private void OnSettingsClicked(object sender, RoutedEventArgs e)
-        {
-            IoC.TryGetRegistered<MainWindow>()?.GetView<WattPilotSettingsView>().Focus();
-        }
+    private void OnSettingsClicked(object sender, RoutedEventArgs e)
+    {
+        IoC.TryGetRegistered<MainWindow>()?.GetView<WattPilotSettingsView>().Focus();
+    }
 
-        private async void OnRebootWattPilotClicked(object sender, RoutedEventArgs e)
+    private async void OnRebootWattPilotClicked(object sender, RoutedEventArgs e)
+    {
+        try
         {
-            try
-            {
-                await viewModel.WattPilotService.RebootWattPilot().ConfigureAwait(true);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(this, ex.Message, Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            await viewModel.WattPilotService.RebootWattPilot().ConfigureAwait(true);
         }
+        catch (Exception ex)
+        {
+            MessageBox.Show(this, ex.Message, Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
 
+    private void OpenChargingLogClicked(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            wattPilotService.OpenChargingLog();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(Window.GetWindow(this)!, ex.Message, Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 }

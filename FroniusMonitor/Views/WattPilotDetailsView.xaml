@@ -27,12 +27,14 @@
         <Grid.ContextMenu>
             <ContextMenu>
                 <MenuItem Header="{x:Static p:Resources.Settings}"
-                          IsEnabled="{Binding DataContext.WattPilotService, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Converter={co:NullToBool}}"
+                          IsEnabled="{Binding Converter={co:NullToBool}, FallbackValue=False}"
                           Icon="{vi:ChargingTrafficSignSettings}"
                           Click="OnSettingsClicked" />
                 <MenuItem Header="{x:Static p:Resources.Reboot}" Icon="{vi:RebootIcon}"
-                          IsEnabled="{Binding DataContext.WattPilotService, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Converter={co:NullToBool}}"
+                          IsEnabled="{Binding FallbackValue=False, Converter={co:NullToBool}}"
                           Click="OnRebootWattPilotClicked" />
+                <MenuItem Header="{x:Static p:Resources.OpenChargingLog}" Icon="{vi:EventLogIcon}" Click="OpenChargingLogClicked"  IsEnabled="{Binding DownloadLink, FallbackValue=False, Converter={co:NullToBool}}" />
+
             </ContextMenu>
         </Grid.ContextMenu>
 
@@ -45,12 +47,13 @@
         <Menu Grid.Row="0">
             <MenuItem Header="WattPilot">
                 <MenuItem Header="{x:Static p:Resources.Settings}"
-                          IsEnabled="{Binding DataContext.WattPilotService, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Converter={co:NullToBool}}"
+                          IsEnabled="{Binding FallbackValue=False, Converter={co:NullToBool}}"
                           Icon="{vi:ChargingTrafficSignSettings}"
                           Click="OnSettingsClicked" />
                 <MenuItem Header="{x:Static p:Resources.Reboot}" Icon="{vi:RebootIcon}"
-                          IsEnabled="{Binding DataContext.WattPilotService, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Converter={co:NullToBool}}"
+                          IsEnabled="{Binding FallbackValue=False, Converter={co:NullToBool}}"
                           Click="OnRebootWattPilotClicked" />
+                <MenuItem Header="{x:Static p:Resources.OpenChargingLog}" Icon="{vi:EventLogIcon}" Click="OpenChargingLogClicked"  IsEnabled="{Binding DownloadLink, FallbackValue=False, Converter={co:NullToBool}}" />
             </MenuItem>
         </Menu>
 

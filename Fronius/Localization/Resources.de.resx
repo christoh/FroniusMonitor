@@ -546,8 +546,8 @@
   <data name="ModelStatus_NotChargingBecauseMinPauseDuration" xml:space="preserve">
 	  <value>Pause (Minimum-Pausendauer)</value>
   </data>
-  <data name="DownloadChargeLog" xml:space="preserve">
-	  <value>Ladelog herunterladen</value>
+  <data name="OpenChargingLog" xml:space="preserve">
+	  <value>Ladelog anzeigen</value>
   </data>
   <data name="NoWattPilot" xml:space="preserve">
 	  <value>Kein Wattpilot gefunden</value>
@@ -1298,5 +1298,11 @@
   </data>
   <data name="Plug" xml:space="preserve">
 	  <value>Stecker</value>
+  </data>
+  <data name="NoWattPilotConnection" xml:space="preserve">
+	  <value>Keine Verbindung mit dem WattPilot</value>
+  </data>
+  <data name="NoChargingLogFromWattPilot" xml:space="preserve">
+	  <value>Kein Link für den Ladelog verfügbar</value>
   </data>
 </root>

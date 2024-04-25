@@ -142,4 +142,16 @@ public partial class WattPilotControl
             }
         }
     }
+
+    private void OpenChargingLogClicked(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            WattPilotService.OpenChargingLog();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(Window.GetWindow(this)!, ex.Message, Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
 }

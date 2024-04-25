@@ -237,6 +237,22 @@ public class WattPilotService : BindableBase, IWattPilotService
         await Stop().ConfigureAwait(false);
     }
 
+    public void OpenChargingLog()
+    {
+        var link = WattPilot?.DownloadLink;
+
+        if (WattPilot == null)
+        {
+            throw new WebSocketException(Resources.NoWattPilotConnection);
+        }
+
+        if (link == null)
+        {
+            throw new InvalidDataException(Resources.NoChargingLogFromWattPilot);
+        }
+
+        Process.Start(new ProcessStartInfo { FileName = link, UseShellExecute = true });
+    }
 
     private async Task Authenticate(JObject token)
     {

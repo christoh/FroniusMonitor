@@ -17,13 +17,14 @@
                 <Grid.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="{x:Static p:Resources.Settings}"
-                                  IsEnabled="{Binding DataContext.WattPilotService, RelativeSource={RelativeSource FindAncestor, AncestorType=Border}, Converter={co:NullToBool}}"
+                                  IsEnabled="{Binding FallbackValue=False, Converter={co:NullToBool}}"
                                   Icon="{vi:ChargingTrafficSignSettings}"
                                   Click="OnSettingsClicked" />
                         <MenuItem Header="{x:Static p:Resources.Reboot}" Icon="{vi:RebootIcon}"
-                                  IsEnabled="{Binding DataContext.WattPilotService, RelativeSource={RelativeSource FindAncestor, AncestorType=Border}, Converter={co:NullToBool}}"
-                                  Click="OnRebootWattPilotClicked"
-                                  />
+                                  IsEnabled="{Binding FallbackValue=False, Converter={co:NullToBool}}"
+                                  Click="OnRebootWattPilotClicked"/>
+                        <MenuItem Header="{x:Static p:Resources.OpenChargingLog}" Icon="{vi:EventLogIcon}" Click="OpenChargingLogClicked" IsEnabled="{Binding DownloadLink, FallbackValue=False, Converter={co:NullToBool}}" />
+
                         <MenuItem Header="{x:Static p:Resources.Details}" Icon="{vi:MagnifyingGlass}" Click="OnDetailsClicked" />
                     </ContextMenu>
                 </Grid.ContextMenu>

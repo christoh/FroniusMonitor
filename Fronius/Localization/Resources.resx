@@ -573,8 +573,8 @@
   <data name="ModelStatus_NotChargingBecauseMinPauseDuration" xml:space="preserve">
 	  <value>Pause (minimum pause duration)</value>
   </data>
-  <data name="DownloadChargeLog" xml:space="preserve">
-	  <value>Download charging log</value>
+  <data name="OpenChargingLog" xml:space="preserve">
+	  <value>Show charging log</value>
   </data>
   <data name="NoWattPilot" xml:space="preserve">
 	  <value>No Wattpilot found</value>
@@ -1358,5 +1358,11 @@
   </data>
   <data name="Board" xml:space="preserve">
 	  <value>Board</value>
+  </data>
+  <data name="NoWattPilotConnection" xml:space="preserve">
+	  <value>Not connected to Wattpilot</value>
+  </data>
+  <data name="NoChargingLogFromWattPilot" xml:space="preserve">
+	  <value>No charging log link available from Wattpilot</value>
   </data>
 </root>

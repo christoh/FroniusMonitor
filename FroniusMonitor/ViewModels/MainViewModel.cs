@@ -123,23 +123,28 @@ public class MainViewModel(IDataCollectionService dataCollectionService, IFritzB
 
     private void DownloadChargeLog()
     {
-        var link = DataCollectionService.HomeAutomationSystem?.WattPilot?.DownloadLink;
-        if (link == null) return;
-        Process.Start(new ProcessStartInfo { FileName = link, UseShellExecute = true });
+        try
+        {
+            WattPilotService.OpenChargingLog();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(IoC.GetRegistered<MainWindow>(), ex.Message, Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     private async void LoadSettings()
     {
         var dialog = new OpenFileDialog
         {
-            Filter = string.Format(Resources.SettingsFilter, Resources.AppName),
+            Filter = string.Format(Loc.SettingsFilter, Loc.AppName),
             AddExtension = false,
             CheckFileExists = true,
             CheckPathExists = true,
             DereferenceLinks = true,
             Multiselect = false,
             ValidateNames = true,
-            Title = Resources.LoadSettings
+            Title = Loc.LoadSettings
         };
 
         var result = dialog.ShowDialog();
@@ -159,7 +164,7 @@ public class MainViewModel(IDataCollectionService dataCollectionService, IFritzB
             }
             catch (Exception ex)
             {
-                await Dispatcher.InvokeAsync(() => MessageBox.Show(ex.Message, Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error));
+                await Dispatcher.InvokeAsync(() => MessageBox.Show(ex.Message, Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error));
                 return;
             }
 
@@ -184,10 +189,10 @@ public class MainViewModel(IDataCollectionService dataCollectionService, IFritzB
             AddExtension = false,
             CheckPathExists = true,
             OverwritePrompt = true,
-            Filter = string.Format(Resources.SettingsFilter, Resources.AppName),
+            Filter = string.Format(Loc.SettingsFilter, Loc.AppName),
             DereferenceLinks = true,
             FileName = Path.GetFileName(App.SettingsFileName),
-            Title = Resources.ExportSettings,
+            Title = Loc.ExportSettings,
             ValidateNames = true,
         };
 
@@ -204,7 +209,7 @@ public class MainViewModel(IDataCollectionService dataCollectionService, IFritzB
         }
         catch (Exception ex)
         {
-            await Dispatcher.InvokeAsync(() => MessageBox.Show(ex.Message, Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error));
+            await Dispatcher.InvokeAsync(() => MessageBox.Show(ex.Message, Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error));
         }
     }
 }
