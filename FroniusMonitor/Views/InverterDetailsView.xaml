@@ -151,8 +151,8 @@
                                 <c:Gauge Minimum="50" Maximum="150" UnitName="%" GaugeColors="{x:Static c:Gauge.ExtremeIsBad}" Label="{x:Static p:Resources.MpptComparison}">
                                     <c:Gauge.Value>
                                         <MultiBinding Converter="{co:MpptComparison}">
-                                            <Binding Path="Inverter.Sensors.Inverter.Solar1Power" />
-                                            <Binding Path="Inverter.Sensors.Inverter.Solar2Power" />
+                                            <Binding Path="Inverter.Sensors.Cache.Solar1Power" />
+                                            <Binding Path="Inverter.Sensors.Cache.Solar2Power" />
                                             <Binding Path="Inverter.Config.InverterSettings.Mppt.Mppt1.WattPeak"/>
                                             <Binding Path="Inverter.Config.InverterSettings.Mppt.Mppt2.WattPeak"/>
                                         </MultiBinding>
@@ -232,8 +232,8 @@
                                 <c:Gauge Minimum="50" Maximum="150" UnitName="%" GaugeColors="{x:Static c:Gauge.ExtremeIsBad}" Label="{x:Static p:Resources.MpptComparison}">
                                     <c:Gauge.Value>
                                         <MultiBinding Converter="{co:MpptComparison}">
-                                            <Binding Path="Inverter.Sensors.Inverter.Solar1Current" />
-                                            <Binding Path="Inverter.Sensors.Inverter.Solar2Current" />
+                                            <Binding Path="Inverter.Sensors.Cache.Solar1Current" />
+                                            <Binding Path="Inverter.Sensors.Cache.Solar2Current" />
                                         </MultiBinding>
                                     </c:Gauge.Value>
                                 </c:Gauge>

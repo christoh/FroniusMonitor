@@ -267,8 +267,8 @@
                                        Width="{Binding ActualWidth, ElementName=MpptComparison}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
                                 <TextBlock.Text>
                                     <MultiBinding Converter="{co:MpptComparison}">
-                                        <Binding Path="Sensors.Inverter.Solar1Power"/>
-                                        <Binding Path="Sensors.Inverter.Solar2Power"/>
+                                        <Binding Path="Sensors.Cache.Solar1Power"/>
+                                        <Binding Path="Sensors.Cache.Solar2Power"/>
                                         <Binding Path="Config.InverterSettings.Mppt.Mppt1.WattPeak"/>
                                         <Binding Path="Config.InverterSettings.Mppt.Mppt2.WattPeak"/>
                                     </MultiBinding>
@@ -280,8 +280,8 @@
                                                GaugeColors="{x:Static c:Gauge.ExtremeIsBad}">
                                 <c:Gauge.Value>
                                     <MultiBinding Converter="{co:MpptComparison}">
-                                        <Binding Path="Sensors.Inverter.Solar1Power"/>
-                                        <Binding Path="Sensors.Inverter.Solar2Power"/>
+                                        <Binding Path="Sensors.Cache.Solar1Power"/>
+                                        <Binding Path="Sensors.Cache.Solar2Power"/>
                                         <Binding Path="Config.InverterSettings.Mppt.Mppt1.WattPeak"/>
                                         <Binding Path="Config.InverterSettings.Mppt.Mppt2.WattPeak"/>
                                     </MultiBinding>
@@ -424,8 +424,8 @@
                                                    ShowPercent="{Binding ShowPercent, ElementName=DcPowerFirstGauge}"
                                                    Value="{m:GaugeBinding Sensors.Cache.StoragePower}"
                                                    Visibility="{Binding Sensors.Storage, FallbackValue=Collapsed, Converter={co:NullToVisibility Null=Hidden}}"
-                                                   Maximum="{Binding Sensors.Storage.VoltageOuter, FallbackValue=8184, Converter={co:Multiply Factor=22}}"
-                                                   Minimum="{Binding Sensors.Storage.VoltageOuter, FallbackValue=-8184, Converter={co:Multiply Factor=-22}}"
+                                                   Maximum="{Binding Sensors.Cache.StorageVoltageOuter, FallbackValue=8184, Converter={co:Multiply Factor=22}}"
+                                                   Minimum="{Binding Sensors.Cache.StorageVoltageOuter, FallbackValue=-8184, Converter={co:Multiply Factor=-22}}"
                                                    GaugeColors="{x:Static c:Gauge.MidIsGood}" Origin="0.5" />
                             </StackPanel>
                         </Grid>
@@ -441,11 +441,11 @@
 
                             <TextBlock FontSize="10" FontWeight="Medium" Grid.Row="1" Margin="0,0,0,2"
                                        Width="{Binding ActualWidth, ElementName=DcPowerGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
-                                <Run Text="{m:GaugeBinding Sensors.Inverter.SolarPowerSum, StringFormat=N1}" />
+                                <Run Text="{m:GaugeBinding Sensors.Cache.SolarPowerSum, StringFormat=N1}" />
                                 <Run Text="W" />
                             </TextBlock>
 
-                            <c:Gauge Value="{m:GaugeBinding Sensors.Inverter.SolarPowerSum}"
+                            <c:Gauge Value="{m:GaugeBinding Sensors.Cache.SolarPowerSum}"
                                                Minimum="0" Grid.Row="2"
                                                Maximum="{Binding Config.InverterSettings.Mppt.WattPeakTotal, FallbackValue=10000, TargetNullValue=10000}"
                                                GaugeColors="{x:Static c:Gauge.HighIsBad}"

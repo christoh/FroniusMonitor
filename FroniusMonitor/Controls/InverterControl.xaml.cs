@@ -283,7 +283,7 @@ public partial class InverterControl
                     {
                         case InverterDisplayMode.DcPower:
                             DcPowerAggregateGauge.Label = Loc.Sum;
-                            DcPowerAggregateGauge.Value = gen24Sensors?.Cache?.SolarPowerSum ?? 0;
+                            DcPowerAggregateGauge.Value = gen24Sensors?.Inverter?.SolarPowerSum ?? 0;
                             DcPowerAggregateGauge.Maximum = gen24Config.InverterSettings?.Mppt?.WattPeakTotal ?? 10000;
                             DcPowerAggregateGauge.Minimum = 0;
                             DcPowerAggregateGauge.GaugeColors = Gauge.HighIsBad;
@@ -292,7 +292,7 @@ public partial class InverterControl
                             break;
 
                         case InverterDisplayMode.DcRelativePower:
-                            DcPowerAggregateGauge.Value = (gen24Sensors?.Cache?.Solar2Power / gen24Config?.InverterSettings?.Mppt?.Mppt2?.WattPeak) / (gen24Sensors?.Cache?.Solar1Power / gen24Config?.InverterSettings?.Mppt?.Mppt1?.WattPeak) * 100 ?? 0;
+                            DcPowerAggregateGauge.Value = (gen24Sensors?.Inverter?.Solar2Power / gen24Config?.InverterSettings?.Mppt?.Mppt2?.WattPeak) / (gen24Sensors?.Cache?.Solar1Power / gen24Config?.InverterSettings?.Mppt?.Mppt1?.WattPeak) * 100 ?? 0;
                             DcPowerAggregateGauge.Minimum = 50;
                             DcPowerAggregateGauge.Maximum = 150;
                             DcPowerAggregateGauge.StringFormat = "N1";
