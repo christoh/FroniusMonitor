@@ -30,7 +30,7 @@ public class Gen24PowerLimits : Gen24ParsingBase
 
     public static Gen24PowerLimits ParseFromConfig(JToken? configToken)
     {
-        var token = configToken?["powerlimits"]?["powerLimits"]?["exportLimits"]?.Value<JToken>();
+        var token = configToken?["limit_settings"]?["powerLimits"]?["exportLimits"]?.Value<JToken>();
         return Parse(token);
     }
 

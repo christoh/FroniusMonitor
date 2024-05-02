@@ -71,8 +71,8 @@ public class Gen24InverterSettings : Gen24ParsingBase
         return Parse
         (
             configToken?["common"]?["ui"]?.Value<JToken>() ?? new JObject(),
-            configToken?["setup"]?["powerunit"]?["mppt"]?.Value<JToken>() ?? new JObject(),
-            configToken?["powerlimits"]?["powerLimits"]?.Value<JToken>() ?? new JObject()
+            configToken?["powerunit"]?["powerunit"]?["mppt"]?.Value<JToken>() ?? new JObject(),
+            configToken?["limit_settings"]?["powerLimits"]?.Value<JToken>() ?? new JObject()
         );
     }
 

@@ -239,7 +239,7 @@
         }
 
         [SuppressMessage("ReSharper", "StringLiteralTypo")]
-        private async void Apply()
+        private async void Apply() // Bug: Does not work with firmware 1.30.7-1
         {
             IsInUpdate = true;
 
@@ -247,8 +247,8 @@
             {
                 var hasUpdates = false;
                 await UpdateIfRequired(Settings, oldSettings, "config/common").ConfigureAwait(false);
-                await UpdateIfRequired(Settings.Mppt?.Mppt1, oldSettings.Mppt?.Mppt1, "config/setup/powerunit/mppt/mppt1").ConfigureAwait(false);
-                await UpdateIfRequired(Settings.Mppt?.Mppt2, oldSettings.Mppt?.Mppt2, "config/setup/powerunit/mppt/mppt2").ConfigureAwait(false);
+                await UpdateIfRequired(Settings.Mppt?.Mppt1, oldSettings.Mppt?.Mppt1, "config/powerunit/mppt/mppt1").ConfigureAwait(false);
+                await UpdateIfRequired(Settings.Mppt?.Mppt2, oldSettings.Mppt?.Mppt2, "config/powerunit/mppt/mppt2").ConfigureAwait(false);
 
                 if (Settings.PowerLimitSettings.ExportLimits.ActivePower.PowerLimitMode == PowerLimitMode.Off)
                 {
@@ -354,10 +354,10 @@
         [SuppressMessage("ReSharper", "StringLiteralTypo")]
         private async ValueTask<Gen24InverterSettings> ReadDataFromInverter()
         {
-            var mpptToken = (await Gen24Service.GetFroniusJsonResponse("config/setup/powerunit/mppt").ConfigureAwait(false)).Token;
+            var mpptToken = (await Gen24Service.GetFroniusJsonResponse("config/powerunit/mppt").ConfigureAwait(false)).Token;
             var commonToken = (await Gen24Service.GetFroniusJsonResponse("config/common").ConfigureAwait(false)).Token;
-            var powerLimitToken = (await Gen24Service.GetFroniusJsonResponse("config/powerlimits").ConfigureAwait(false)).Token;
-            return Gen24InverterSettings.Parse(commonToken, mpptToken, powerLimitToken);
+            var powerLimitToken = (await Gen24Service.GetFroniusJsonResponse("config/limit_settings").ConfigureAwait(false)).Token;
+            return Gen24InverterSettings.Parse(commonToken, mpptToken, powerLimitToken["powerLimits"]);
         }
 
         private void Undo()
