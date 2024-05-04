@@ -48,7 +48,7 @@ public abstract class SettingsViewModelBase : ViewModelBase
 
         try
         {
-            result = await Gen24Service.GetFroniusJsonResponse(uri, token, new[] { HttpStatusCode.OK, HttpStatusCode.BadRequest }).ConfigureAwait(false);
+            result = await Gen24Service.GetFroniusJsonResponse(uri, token, [HttpStatusCode.OK, HttpStatusCode.BadRequest]).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

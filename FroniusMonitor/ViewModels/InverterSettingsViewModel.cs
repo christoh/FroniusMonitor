@@ -89,20 +89,20 @@
             });
         }
 
-        private IEnumerable<ListItemModel<PowerLimitMode>> powerLimitModes = null!;
+        private IEnumerable<ListItemModel<PhaseMode>> phaseModes = null!;
 
-        public IEnumerable<ListItemModel<PowerLimitMode>> PowerLimitModes
+        public IEnumerable<ListItemModel<PhaseMode>> PhaseModes
         {
-            get => powerLimitModes;
-            set => Set(ref powerLimitModes, value);
+            get => phaseModes;
+            set => Set(ref phaseModes, value);
         }
 
-        private ListItemModel<PowerLimitMode> selectedPowerLimitMode = null!;
+        private ListItemModel<PhaseMode> selectedPhaseMode = null!;
 
-        public ListItemModel<PowerLimitMode> SelectedPowerLimitMode
+        public ListItemModel<PhaseMode> SelectedPhaseMode
         {
-            get => selectedPowerLimitMode;
-            set => Set(ref selectedPowerLimitMode, value, () => Settings.PowerLimitSettings.ExportLimits.ActivePower.PowerLimitMode = value.Value);
+            get => selectedPhaseMode;
+            set => Set(ref selectedPhaseMode, value, () => Settings.PowerLimitSettings.ExportLimits.ActivePower.PhaseMode = value.Value);
         }
 
         private string title = Loc.InverterSettings;
@@ -223,11 +223,10 @@
                     new ListItemModel<MpptOnOff> { Value = MpptOnOff.OnMlsd, DisplayName = await Gen24Service.GetFroniusName(MpptOnOff.OnMlsd).ConfigureAwait(false) },
                 };
 
-                PowerLimitModes = new[]
+                PhaseModes = new[]
                 {
-                    new ListItemModel<PowerLimitMode> { Value = PowerLimitMode.Off, DisplayName = await Gen24Service.GetFroniusName(PowerLimitMode.Off).ConfigureAwait(false) },
-                    new ListItemModel<PowerLimitMode> { Value = PowerLimitMode.EntireSystem, DisplayName = await Gen24Service.GetConfigString("EXPORTLIMIT.WLIM_MAX_W").ConfigureAwait(false) },
-                    new ListItemModel<PowerLimitMode> { Value = PowerLimitMode.WeakestPhase, DisplayName = await Gen24Service.GetConfigString("EXPORTLIMIT.WLIM_MAX_FEEDIN_PER_PHASE").ConfigureAwait(false) },
+                    new ListItemModel<PhaseMode> { Value = PhaseMode.PhaseSum, DisplayName = await Gen24Service.GetConfigString("EXPORTLIMIT.WLIM_MAX_W").ConfigureAwait(false) },
+                    new ListItemModel<PhaseMode> { Value = PhaseMode.WeakestPhase, DisplayName = await Gen24Service.GetConfigString("EXPORTLIMIT.WLIM_MAX_FEEDIN_PER_PHASE").ConfigureAwait(false) },
                 };
 
                 Undo();
@@ -245,12 +244,33 @@
 
             try
             {
-                var hasUpdates = false;
                 await UpdateIfRequired(Settings, oldSettings, "config/common").ConfigureAwait(false);
-                await UpdateIfRequired(Settings.Mppt?.Mppt1, oldSettings.Mppt?.Mppt1, "config/powerunit/mppt/mppt1").ConfigureAwait(false);
-                await UpdateIfRequired(Settings.Mppt?.Mppt2, oldSettings.Mppt?.Mppt2, "config/powerunit/mppt/mppt2").ConfigureAwait(false);
 
-                if (Settings.PowerLimitSettings.ExportLimits.ActivePower.PowerLimitMode == PowerLimitMode.Off)
+                JObject? mppt1Token = Settings.Mppt?.Mppt1 is { } mppt1 && oldSettings.Mppt?.Mppt1 is { } oldMppt1 ? Gen24JsonService.GetUpdateToken(mppt1, oldMppt1) : null;
+                JObject? mppt2Token = Settings.Mppt?.Mppt2 is { } mppt2 && oldSettings.Mppt?.Mppt2 is { } oldMppt2 ? Gen24JsonService.GetUpdateToken(mppt2, oldMppt2) : null;
+
+                var hasUpdates = mppt1Token is not null && mppt1Token.HasValues || mppt2Token is not null && mppt2Token.HasValues;
+
+                if (hasUpdates)
+                {
+                    var trackerToken = new JObject();
+
+                    if (mppt1Token is not null && mppt1Token.HasValues)
+                    {
+                        trackerToken.Add("mppt1", mppt1Token);
+                    }
+
+                    if (mppt2Token is not null && mppt2Token.HasValues)
+                    {
+                        trackerToken.Add("mppt2", mppt2Token);
+                    }
+
+                    var mpptToken = new JObject { { "mppt", trackerToken } };
+                    await UpdateInverter("config/powerunit", mpptToken);
+                }
+
+
+                if (!Settings.PowerLimitSettings.ExportLimits.ActivePower.IsEnabled)
                 {
                     Settings.PowerLimitSettings = new();
                 }
@@ -300,7 +320,7 @@
                     return;
                 }
 
-                await UpdateInverter("config/powerlimits", limitsToken).ConfigureAwait(false);
+                await UpdateInverter("config/limit_settings", limitsToken).ConfigureAwait(false);
                 oldSettings = Settings;
 
                 if (Gen24Service == DataCollectionService.Gen24Service && DataCollectionService.HomeAutomationSystem?.Gen24Config != null)
@@ -387,7 +407,7 @@
             WattPeakMppt2 = Settings.Mppt?.Mppt2?.WattPeak ?? 0;
             UpdateLogWattPeakMppt2();
 
-            SelectedPowerLimitMode = PowerLimitModes.First(plm => plm.Value == Settings.PowerLimitSettings.ExportLimits.ActivePower.PowerLimitMode);
+            SelectedPhaseMode = PhaseModes.First(plm => plm.Value == Settings.PowerLimitSettings.ExportLimits.ActivePower.PhaseMode);
             wattPeakReferenceValue = Settings.PowerLimitSettings.Visualization.WattPeakReferenceValue;
             softLimit = Settings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit.PowerLimit;
             hardLimit = Settings.PowerLimitSettings.ExportLimits.ActivePower.HardLimit.PowerLimit;

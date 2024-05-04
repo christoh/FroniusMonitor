@@ -232,6 +232,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -239,11 +240,12 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{l:Config 'EXPORTLIMIT.MODE.mode'}" />
-                    <TextBlock Grid.Row="0" Grid.Column="1" Text=":" />
-                    <ComboBox HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="2" ItemsSource="{Binding PowerLimitModes}" SelectedItem="{Binding SelectedPowerLimitMode}" />
+                    <CheckBox Content="{l:Config 'EXPORTLIMIT.activated'}" IsChecked="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.IsEnabled}"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{l:Config 'EXPORTLIMIT.PHASE_MODE.phaseMode'}" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text=":" />
+                    <ComboBox HorizontalAlignment="Stretch" Grid.Row="1" Grid.Column="2" ItemsSource="{Binding PhaseModes}" SelectedItem="{Binding SelectedPhaseMode}" />
 
-                    <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Visibility="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.PowerLimitMode, Converter={co:PowerLimitMode2Visibility Value=Off, Equal=Collapsed, NotEqual=Visible}, FallbackValue=Collapsed}">
+                    <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Visibility="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.PowerLimitMode, Converter={co:PowerLimitMode2Visibility Value=Off, Equal=Collapsed, NotEqual=Visible}, FallbackValue=Collapsed}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
