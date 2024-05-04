@@ -244,23 +244,26 @@
 
             try
             {
+                var hasCommonUpdates = false;
                 await UpdateIfRequired(Settings, oldSettings, "config/common").ConfigureAwait(false);
 
                 JObject? mppt1Token = Settings.Mppt?.Mppt1 is { } mppt1 && oldSettings.Mppt?.Mppt1 is { } oldMppt1 ? Gen24JsonService.GetUpdateToken(mppt1, oldMppt1) : null;
                 JObject? mppt2Token = Settings.Mppt?.Mppt2 is { } mppt2 && oldSettings.Mppt?.Mppt2 is { } oldMppt2 ? Gen24JsonService.GetUpdateToken(mppt2, oldMppt2) : null;
 
-                var hasUpdates = mppt1Token is not null && mppt1Token.HasValues || mppt2Token is not null && mppt2Token.HasValues;
+                var hasMppt1Updates = mppt1Token is not null && mppt1Token.HasValues;
+                var hasMppt2Updates = mppt2Token is not null && mppt2Token.HasValues;
+                var hasMpptUpdates = hasMppt1Updates || hasMppt2Updates;
 
-                if (hasUpdates)
+                if (hasMpptUpdates)
                 {
                     var trackerToken = new JObject();
 
-                    if (mppt1Token is not null && mppt1Token.HasValues)
+                    if (hasMppt1Updates)
                     {
                         trackerToken.Add("mppt1", mppt1Token);
                     }
 
-                    if (mppt2Token is not null && mppt2Token.HasValues)
+                    if (hasMppt2Updates)
                     {
                         trackerToken.Add("mppt2", mppt2Token);
                     }
@@ -289,6 +292,7 @@
                     }
                 }
 
+                var hasPowerLimitUpdates = false;
                 var visualizationToken = Gen24JsonService.GetUpdateToken(Settings.PowerLimitSettings.Visualization, oldSettings.PowerLimitSettings.Visualization);
                 visualizationToken.Add("exportLimits", new JObject { { "activePower", new JObject { { "displayModeSoftLimit", "absolute" } } }, });
 
@@ -311,16 +315,16 @@
                 if (new[] { visualizationToken, hardLimitToken, softLimitToken, activePowerToken, exportLimitsToken, limitsToken }
                     .Any(t => t.Children().Any(c => c is JProperty p && p.Value.Children().Any(v => v.Children().Any(child => child is JValue)))))
                 {
-                    hasUpdates = true;
+                    hasPowerLimitUpdates = true;
                 }
 
-                if (!hasUpdates)
+                if (!hasMpptUpdates && !hasPowerLimitUpdates && !hasCommonUpdates)
                 {
                     ShowNoSettingsChanged();
                     return;
                 }
 
-                await UpdateInverter("config/limit_settings", limitsToken).ConfigureAwait(false);
+                await UpdateInverter("config/limit_settings/powerLimits", limitsToken).ConfigureAwait(false);
                 oldSettings = Settings;
 
                 if (Gen24Service == DataCollectionService.Gen24Service && DataCollectionService.HomeAutomationSystem?.Gen24Config != null)
@@ -357,7 +361,7 @@
 
                             if (success)
                             {
-                                hasUpdates = true;
+                                hasCommonUpdates = true;
                             }
                         }
                     }

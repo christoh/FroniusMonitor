@@ -14,6 +14,12 @@ public enum PhaseMode : byte
     [EnumParse(ParseAs = "phaseSum")] PhaseSum,
 }
 
+public enum NetworkMode : byte
+{
+    [EnumParse(ParseAs = "limitLocal")] Local,
+    [EnumParse(ParseAs = "limitNetwork")] Network,
+}
+
 public class Gen24PowerLimit : BindableBase, ICloneable
 {
     private static readonly IGen24JsonService gen24JsonService = IoC.TryGet<IGen24JsonService>()!;
@@ -40,6 +46,20 @@ public class Gen24PowerLimit : BindableBase, ICloneable
     {
         get => isEnabled;
         set => Set(ref isEnabled, value, AdjustObsoleteProperties);
+    }
+
+    private NetworkMode netWorkMode;
+    [FroniusProprietaryImport("networkMode", FroniusDataType.Root)]
+    public NetworkMode NetWorkMode
+    {
+        get => netWorkMode;
+        set => Set(ref netWorkMode, value, () => NotifyOfPropertyChange(nameof(IsNetworkModeEnabled)));
+    }
+
+    public bool IsNetworkModeEnabled
+    {
+        get => NetWorkMode == NetworkMode.Network;
+        set => NetWorkMode = value ? NetworkMode.Network : NetworkMode.Local;
     }
 
     private PhaseMode phaseMode;
@@ -76,13 +96,13 @@ public class Gen24PowerLimit : BindableBase, ICloneable
                     IsEnabled = true;
                     PhaseMode = PhaseMode.PhaseSum;
                     break;
-                
+
                 case PowerLimitMode.WeakestPhase:
                     IsEnabled = true;
                     PhaseMode = PhaseMode.WeakestPhase;
                     break;
                 case PowerLimitMode.Off:
-                    IsEnabled=false;
+                    IsEnabled = false;
                     break;
             }
         });
@@ -100,7 +120,9 @@ public class Gen24PowerLimit : BindableBase, ICloneable
     {
         var gen24PowerLimit = new Gen24PowerLimit
         {
-            PowerLimitMode = PowerLimitMode,
+            PhaseMode = PhaseMode,
+            IsEnabled = IsEnabled,
+            NetWorkMode = NetWorkMode,
             HardLimit = (Gen24PowerLimitDefinition)HardLimit.Clone(),
             SoftLimit = (Gen24PowerLimitDefinition)SoftLimit.Clone(),
         };
