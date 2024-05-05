@@ -1,4 +1,5 @@
-﻿using De.Hochstaetter.Fronius.Models.Gen24.Commands;
+﻿using System.Collections.Immutable;
+using De.Hochstaetter.Fronius.Models.Gen24.Commands;
 
 namespace De.Hochstaetter.Fronius.Services;
 
@@ -46,6 +47,44 @@ public class Gen24Service(IGen24JsonService gen24JsonService) : BindableBase, IG
         return eventList.OrderByDescending(e => e.EventTime);
     }
 
+    public async Task<IReadOnlyDictionary<Guid, Gen24ConnectedInverter>> GetConnectedDevices(bool doScan)
+    {
+        var uriString = $"commands/SystemPowerControl/GetDeviceStatus?doScan={(doScan ? "true" : "false")}";
+        var (token, statusCode) = await GetFroniusJsonResponse(uriString).ConfigureAwait(false);
+
+        if (token["success"]?.Value<bool>() is not true)
+        {
+            throw new Gen24Exception(0, "Could not get connected inverters", "success is not true", uriString);
+        }
+
+        var resultToken = token["resultData"] ?? throw new Gen24Exception(0, "Could not get connected inverters", "No resultData present", uriString);
+
+        var devices = new List<Gen24ConnectedInverter>();
+
+        if (resultToken["autodetectedControlledDevices"] is JObject autoDetectedControlledDevicesToken)
+        {
+            GetControlledDevices(autoDetectedControlledDevicesToken, true);
+        }
+
+        if (resultToken["staticControlledDevices"] is JObject staticControlledDevices)
+        {
+            GetControlledDevices(staticControlledDevices, false);
+        }
+
+        return devices.ToImmutableDictionary(d => d.Id);
+
+        void GetControlledDevices(JObject devicesToken, bool isAutoDetected)
+        {
+            foreach (var propertyToken in devicesToken.Children<JProperty>())
+            {
+                var inverter = gen24JsonService.ReadFroniusData<Gen24ConnectedInverter>(propertyToken.Value);
+                inverter.IsAutoDetected = isAutoDetected;
+                inverter.Id = Guid.Parse(propertyToken.Name);
+                devices.Add(inverter);
+            }
+        }
+    }
+
     [SuppressMessage("ReSharper", "CommentTypo")]
     public async Task<Gen24Sensors> GetFroniusData(Gen24Components components, CancellationToken token = default)
     {
@@ -58,10 +97,10 @@ public class Gen24Service(IGen24JsonService gen24JsonService) : BindableBase, IG
         {
             var storageGroupId = storages.FirstOrDefault() ?? "16580608";
             var storageToken = dataToken[storageGroupId];
-            var nameplate = JObject.Parse(storageToken?["attributes"]?["nameplate"]?.Value<string>()??"{}");
+            var nameplate = JObject.Parse(storageToken?["attributes"]?["nameplate"]?.Value<string>() ?? "{}");
             gen24Sensors.Storage = gen24JsonService.ReadFroniusData<Gen24Storage>(storageToken);
-            gen24Sensors.Storage.MinimumStateOfCharge= (nameplate["min_soc"]?.Value<int>() ?? 0)/100d;
-            gen24Sensors.Storage.MaximumStateOfCharge=(nameplate["max_soc"]?.Value<int>() ?? 100)/100d;
+            gen24Sensors.Storage.MinimumStateOfCharge = (nameplate["min_soc"]?.Value<int>() ?? 0) / 100d;
+            gen24Sensors.Storage.MaximumStateOfCharge = (nameplate["max_soc"]?.Value<int>() ?? 100) / 100d;
             gen24Sensors.Storage.GroupId = uint.Parse(storageGroupId);
         }
 
@@ -103,7 +142,7 @@ public class Gen24Service(IGen24JsonService gen24JsonService) : BindableBase, IG
                     {
                         gen24Sensors.MeterStatus = status;
                     }
-                    
+
                     break;
             }
         }

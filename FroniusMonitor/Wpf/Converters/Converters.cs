@@ -832,6 +832,8 @@ public class ToshibaHvacSwingMode2Visibility : EqualityToAnything<ToshibaHvacSwi
 
 public class MpptPowerMode2Visibility : EqualityToAnything<MpptPowerMode, Visibility>;
 
+public class Int2Visibility : EqualityToAnything<int, Visibility>;
+
 public class ToshibaHvacSwingMode2Brush : EqualityToAnything<ToshibaHvacSwingMode, Brush>
 {
     private static readonly ToshibaHvacSwingMode[] fixedModes =
@@ -948,16 +950,16 @@ public class StrictestLimitConverter : ConverterBase
     {
         double result = 24150;
 
-        if (value is Gen24PowerLimits { ActivePower: { } activePower } && activePower.PowerLimitMode != PowerLimitMode.Off)
+        if (value is Gen24PowerLimits { ActivePower: { } activePower } && activePower.IsEnabled)
         {
             if (activePower.HardLimit.IsEnabled)
             {
-                result = activePower.HardLimit.PowerLimit * (activePower.PowerLimitMode == PowerLimitMode.WeakestPhase ? 3d : 1d) / (IsOnePhase ? 3d : 1d);
+                result = activePower.HardLimit.PowerLimit * (activePower.PhaseMode == PhaseMode.WeakestPhase ? 3d : 1d) / (IsOnePhase ? 3d : 1d);
             }
 
             if (activePower.SoftLimit.IsEnabled)
             {
-                result = activePower.SoftLimit.PowerLimit * (activePower.PowerLimitMode == PowerLimitMode.WeakestPhase ? 3d : 1d) / (IsOnePhase ? 3d : 1d);
+                result = activePower.SoftLimit.PowerLimit * (activePower.PhaseMode == PhaseMode.WeakestPhase ? 3d : 1d) / (IsOnePhase ? 3d : 1d);
             }
         }
 

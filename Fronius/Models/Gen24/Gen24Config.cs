@@ -45,6 +45,7 @@ public class Gen24Config : BindableBase, ICloneable
         set => Set(ref maxAcPower, value);
     }
 
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public static Gen24Config Parse(JToken versionsToken, JToken componentsToken, JToken configToken)
     {
         var gen24Config = new Gen24Config
@@ -52,7 +53,7 @@ public class Gen24Config : BindableBase, ICloneable
             Versions = Gen24Versions.Parse(versionsToken),
             Components = Gen24Components.Parse(componentsToken),
             InverterSettings = Gen24InverterSettings.Parse(configToken),
-            MaxAcPower = configToken["setup"]?["powerunit"]?["system"]?.Value<double>("DEVICE_POWERACTIVE_NOMINAL_F32"),
+            MaxAcPower = configToken["powerunit"]?["powerunit"]?["system"]?.Value<double>("DEVICE_POWERACTIVE_NOMINAL_F32"),
             BatterySettings = Gen24BatterySettings.Parse(configToken?["batteries"]?["batteries"]),
         };
 
@@ -61,7 +62,7 @@ public class Gen24Config : BindableBase, ICloneable
 
     public object Clone()
     {
-        var gen24Config = new Gen24Config()
+        var gen24Config = new Gen24Config
         {
             Versions = Versions,
             Components = Components,

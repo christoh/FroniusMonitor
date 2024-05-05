@@ -1305,4 +1305,7 @@
   <data name="NoChargingLogFromWattPilot" xml:space="preserve">
 	  <value>Kein Link für den Ladelog verfügbar</value>
   </data>
+  <data name="Inverters" xml:space="preserve">
+	  <value>Wechselrichter</value>
+  </data>
 </root>

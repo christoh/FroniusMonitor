@@ -174,6 +174,14 @@
             });
         }
 
+        private IReadOnlyDictionary<Guid,Gen24ConnectedInverter> connectedInverters = null!;
+
+        public IReadOnlyDictionary<Guid, Gen24ConnectedInverter> ConnectedInverters
+        {
+            get => connectedInverters;
+            set => Set(ref connectedInverters, value);
+        }
+
         private double hardLimit;
 
         public double HardLimit
@@ -209,25 +217,30 @@
                 await base.OnInitialize().ConfigureAwait(false);
                 oldSettings = await ReadDataFromInverter().ConfigureAwait(false);
 
-                PowerModes = new[]
+                if (oldSettings.PowerLimitSettings.ExportLimits.ActivePower.IsNetworkModeEnabled)
                 {
+                    ConnectedInverters = await gen24Service.GetConnectedDevices(true);
+                }
+
+                PowerModes =
+                [
                     new ListItemModel<MpptPowerMode> { Value = MpptPowerMode.Off, DisplayName = await Gen24Service.GetFroniusName(MpptPowerMode.Off).ConfigureAwait(false) },
                     new ListItemModel<MpptPowerMode> { Value = MpptPowerMode.Auto, DisplayName = await Gen24Service.GetFroniusName(MpptPowerMode.Auto).ConfigureAwait(false) },
                     new ListItemModel<MpptPowerMode> { Value = MpptPowerMode.Fix, DisplayName = await Gen24Service.GetFroniusName(MpptPowerMode.Fix).ConfigureAwait(false) },
-                };
+                ];
 
-                DynamicPeakManagerModes = new[]
-                {
+                DynamicPeakManagerModes =
+                [
                     new ListItemModel<MpptOnOff> { Value = MpptOnOff.Off, DisplayName = await Gen24Service.GetFroniusName(MpptOnOff.Off).ConfigureAwait(false) },
                     new ListItemModel<MpptOnOff> { Value = MpptOnOff.On, DisplayName = await Gen24Service.GetFroniusName(MpptOnOff.On).ConfigureAwait(false) },
                     new ListItemModel<MpptOnOff> { Value = MpptOnOff.OnMlsd, DisplayName = await Gen24Service.GetFroniusName(MpptOnOff.OnMlsd).ConfigureAwait(false) },
-                };
+                ];
 
-                PhaseModes = new[]
-                {
+                PhaseModes =
+                [
                     new ListItemModel<PhaseMode> { Value = PhaseMode.PhaseSum, DisplayName = await Gen24Service.GetConfigString("EXPORTLIMIT.WLIM_MAX_W").ConfigureAwait(false) },
                     new ListItemModel<PhaseMode> { Value = PhaseMode.WeakestPhase, DisplayName = await Gen24Service.GetConfigString("EXPORTLIMIT.WLIM_MAX_FEEDIN_PER_PHASE").ConfigureAwait(false) },
-                };
+                ];
 
                 Undo();
             }

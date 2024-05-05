@@ -1365,4 +1365,7 @@
   <data name="NoChargingLogFromWattPilot" xml:space="preserve">
 	  <value>No charging log link available from Wattpilot</value>
   </data>
+  <data name="Inverters" xml:space="preserve">
+	  <value>Inverters</value>
+  </data>
 </root>

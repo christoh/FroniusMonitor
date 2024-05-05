@@ -1834,6 +1834,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Inverters.
+        /// </summary>
+        public static string Inverters {
+            get {
+                return ResourceManager.GetString("Inverters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Inverter Settings.
         /// </summary>
         public static string InverterSettings {
@@ -2707,7 +2716,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Download charging log.
+        ///   Looks up a localized string similar to Show charging log.
         /// </summary>
         public static string OpenChargingLog {
             get {

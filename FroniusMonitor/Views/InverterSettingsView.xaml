@@ -9,6 +9,8 @@
                     xmlns:l="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Localization"
                     xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
                     xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
+                    xmlns:settings="clr-namespace:De.Hochstaetter.Fronius.Models.Gen24.Settings;assembly=Fronius"
+                    xmlns:gen24="clr-namespace:De.Hochstaetter.Fronius.Models.Gen24;assembly=Fronius"
                     mc:Ignorable="d"
                     ResizeMode="NoResize"
                     SizeToContent="WidthAndHeight"
@@ -234,6 +236,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -317,6 +320,106 @@
                                     Visibility="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit.IsEnabled, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}" />
                         </StackPanel>
                     </Grid>
+                    <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,16,0,0" Visibility="{Binding ConnectedInverters.Count, FallbackValue=Collapsed, Converter={co:Int2Visibility Value=0, Equal=Collapsed, NotEqual=Visible}}">
+                        <TextBlock Text="{x:Static p:Resources.Inverters}" TextAlignment="Left" HorizontalAlignment="Left"/>
+                        <DataGrid ColumnWidth="Auto" CanUserAddRows="False" RowHeaderWidth="20"
+                                  SelectionUnit="FullRow" SelectionMode="Single"
+                                  ItemsSource="{Binding ConnectedInverters.Values}" AutoGenerateColumns="False"
+                                  GridLinesVisibility="Vertical"
+                                  AlternatingRowBackground="AntiqueWhite"
+                                  BorderThickness="1">
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Setter Property="ToolTip" Value="{x:Static p:Resources.RuleTooltip}" />
+                                <Setter Property="Tag" Value="{Binding Path=DataContext, RelativeSource={RelativeSource FindAncestor, AncestorType=DataGrid}}" />
+                                <Setter Property="ContextMenu">
+                                    <Setter.Value>
+                                        <ContextMenu Placement="Center">
+                                            <MenuItem Header="{x:Static p:Resources.AddRule}"
+                                                  Command="{Binding Path=PlacementTarget.(FrameworkElement.Tag).(vm:SelfConsumptionOptimizationViewModel.AddChargingRuleCommand), RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
+                                            <MenuItem Header="{x:Static p:Resources.DeleteRule}"
+                                                  Command="{Binding Path=PlacementTarget.(FrameworkElement.Tag).(vm:SelfConsumptionOptimizationViewModel.DeleteChargingRuleCommand), RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}"
+                                                  CommandParameter="{Binding Path=PlacementTarget.(FrameworkElement.DataContext),RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
+                                        </ContextMenu>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </DataGrid.RowStyle>
+                        <DataGrid.Resources>
+                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightSkyBlue" />
+                            <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="LightSkyBlue" />
+                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black" />
+
+                            <Style TargetType="DataGridColumnHeader" x:Key="Es">
+                                <Setter Property="Padding" Value="10,8" />
+                            </Style>
+
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="MinHeight" Value="32" />
+                                <Setter Property="VerticalContentAlignment" Value="Bottom" />
+                                <Setter Property="VerticalAlignment" Value="Bottom" />
+                            </Style>
+
+
+                            <Style TargetType="CheckBox" x:Key="CheckBoxStyle">
+                                <Setter Property="Margin" Value="8,2,8,0" />
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                            </Style>
+
+                            <Style TargetType="TextBox" x:Key="TextBoxStyle">
+                                <Setter Property="Margin" Value="0,0" />
+                                <Setter Property="Background" Value="White" />
+                                <Setter Property="Padding" Value="6,7,0,0" />
+                                <Setter Property="MaxWidth" Value="80" />
+                                <Setter Property="BorderThickness" Value="0" />
+                                <Setter Property="VerticalAlignment" Value="Stretch" />
+                                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                <EventSetter Event="Validation.Error" Handler="OnValidationChanged" />
+                                <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}" />
+                            </Style>
+
+                            <Style TargetType="TextBlock" x:Key="TextBlockStyle">
+                                <Setter Property="Margin" Value="8,0" />
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                            </Style>
+
+                        </DataGrid.Resources>
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="{l:Ui 'SYSTEM_POWER_CONTROL.status', 'True'}" Binding="{Binding Status}" IsReadOnly="True" SortMemberPath="Status"
+                                                HeaderStyle="{StaticResource Es}" CanUserReorder="True" CanUserResize="True" CanUserSort="True"
+                                                ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
+
+                            <DataGridTextColumn Header="{l:Ui 'SYSTEM_POWER_CONTROL.name', 'True'}" Binding="{Binding DisplayName}" IsReadOnly="True" SortMemberPath="DisplayName"
+                                                HeaderStyle="{StaticResource Es}" CanUserReorder="True" CanUserResize="True" CanUserSort="True" SortDirection="Ascending"
+                                                ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
+
+                            <DataGridTextColumn Header="{l:Ui 'SYSTEM_POWER_CONTROL.deviceType', 'True'}" Binding="{Binding DeviceType}" IsReadOnly="True" SortMemberPath="DeviceType"
+                                                HeaderStyle="{StaticResource Es}" CanUserReorder="True" CanUserResize="True" CanUserSort="True"
+                                                ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
+
+                            <DataGridTextColumn Header="{l:Ui 'SYSTEM_POWER_CONTROL.serial', 'True'}" Binding="{Binding SerialNumber}" IsReadOnly="True" SortMemberPath="SerialNumber"
+                                                HeaderStyle="{StaticResource Es}" CanUserReorder="True" CanUserResize="True" CanUserSort="True"
+                                                ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
+
+                            <DataGridTextColumn Header="{l:Ui 'SYSTEM_POWER_CONTROL.hostname', 'True'}" Binding="{Binding Hostname}" IsReadOnly="True" SortMemberPath="HostName"
+                                                HeaderStyle="{StaticResource Es}" CanUserReorder="True" CanUserResize="True" CanUserSort="True"
+                                                ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
+
+                            <DataGridTextColumn Header="{l:Ui 'SYSTEM_POWER_CONTROL.ipAddress', 'True'}" Binding="{Binding IpAddressString}" IsReadOnly="True" SortMemberPath="IpAddressString"
+                                                HeaderStyle="{StaticResource Es}" CanUserReorder="True" CanUserResize="True" CanUserSort="True"
+                                                ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
+
+                            <DataGridCheckBoxColumn Header="{l:Ui 'SYSTEM_POWER_CONTROL.useInverter', 'True'}" Binding="{Binding UseDevice}" 
+                                                    ElementStyle="{StaticResource CheckBoxStyle}"
+                                                    SortMemberPath="UseDevice" HeaderStyle="{StaticResource Es}" CanUserReorder="True" CanUserResize="True" CanUserSort="True"/>
+
+                        </DataGrid.Columns>
+
+                    </DataGrid>
+                    </StackPanel>
                 </Grid>
             </GroupBox>
 

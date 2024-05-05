@@ -18,4 +18,5 @@ public interface IGen24Service
     Task<string> GetEventDescription(string code, CancellationToken token = default);
     ValueTask<Gen24StandByStatus?> GetInverterStandByStatus(CancellationToken token = default);
     ValueTask RequestInverterStandBy(bool isStandBy, CancellationToken token = default);
+    Task<IReadOnlyDictionary<Guid, Gen24ConnectedInverter>> GetConnectedDevices(bool doScan);
 }
