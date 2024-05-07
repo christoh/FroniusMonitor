@@ -1,6 +1,7 @@
 ﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels
 {
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
+    #pragma warning disable CS9107
     public class InverterSettingsViewModel(
         IDataCollectionService dataCollectionService,
         IGen24Service gen24Service,
@@ -8,6 +9,7 @@
         IFritzBoxService fritzBoxService,
         IWattPilotService wattPilotService)
         : SettingsViewModelBase(dataCollectionService, gen24Service, gen24JsonService, fritzBoxService, wattPilotService)
+    #pragma warning restore CS9107
     {
         private Gen24InverterSettings oldSettings = null!;
 
@@ -174,7 +176,7 @@
             });
         }
 
-        private IReadOnlyDictionary<Guid,Gen24ConnectedInverter> connectedInverters = null!;
+        private IReadOnlyDictionary<Guid, Gen24ConnectedInverter> connectedInverters = null!;
 
         public IReadOnlyDictionary<Guid, Gen24ConnectedInverter> ConnectedInverters
         {
@@ -226,20 +228,20 @@
                 [
                     new ListItemModel<MpptPowerMode> { Value = MpptPowerMode.Off, DisplayName = await Gen24Service.GetFroniusName(MpptPowerMode.Off).ConfigureAwait(false) },
                     new ListItemModel<MpptPowerMode> { Value = MpptPowerMode.Auto, DisplayName = await Gen24Service.GetFroniusName(MpptPowerMode.Auto).ConfigureAwait(false) },
-                    new ListItemModel<MpptPowerMode> { Value = MpptPowerMode.Fix, DisplayName = await Gen24Service.GetFroniusName(MpptPowerMode.Fix).ConfigureAwait(false) },
+                    new ListItemModel<MpptPowerMode> { Value = MpptPowerMode.Fix, DisplayName = await Gen24Service.GetFroniusName(MpptPowerMode.Fix).ConfigureAwait(false) }
                 ];
 
                 DynamicPeakManagerModes =
                 [
                     new ListItemModel<MpptOnOff> { Value = MpptOnOff.Off, DisplayName = await Gen24Service.GetFroniusName(MpptOnOff.Off).ConfigureAwait(false) },
                     new ListItemModel<MpptOnOff> { Value = MpptOnOff.On, DisplayName = await Gen24Service.GetFroniusName(MpptOnOff.On).ConfigureAwait(false) },
-                    new ListItemModel<MpptOnOff> { Value = MpptOnOff.OnMlsd, DisplayName = await Gen24Service.GetFroniusName(MpptOnOff.OnMlsd).ConfigureAwait(false) },
+                    new ListItemModel<MpptOnOff> { Value = MpptOnOff.OnMlsd, DisplayName = await Gen24Service.GetFroniusName(MpptOnOff.OnMlsd).ConfigureAwait(false) }
                 ];
 
                 PhaseModes =
                 [
                     new ListItemModel<PhaseMode> { Value = PhaseMode.PhaseSum, DisplayName = await Gen24Service.GetConfigString("EXPORTLIMIT.WLIM_MAX_W").ConfigureAwait(false) },
-                    new ListItemModel<PhaseMode> { Value = PhaseMode.WeakestPhase, DisplayName = await Gen24Service.GetConfigString("EXPORTLIMIT.WLIM_MAX_FEEDIN_PER_PHASE").ConfigureAwait(false) },
+                    new ListItemModel<PhaseMode> { Value = PhaseMode.WeakestPhase, DisplayName = await Gen24Service.GetConfigString("EXPORTLIMIT.WLIM_MAX_FEEDIN_PER_PHASE").ConfigureAwait(false) }
                 ];
 
                 Undo();
@@ -260,8 +262,8 @@
                 var hasCommonUpdates = false;
                 await UpdateIfRequired(Settings, oldSettings, "config/common").ConfigureAwait(false);
 
-                JObject? mppt1Token = Settings.Mppt?.Mppt1 is { } mppt1 && oldSettings.Mppt?.Mppt1 is { } oldMppt1 ? Gen24JsonService.GetUpdateToken(mppt1, oldMppt1) : null;
-                JObject? mppt2Token = Settings.Mppt?.Mppt2 is { } mppt2 && oldSettings.Mppt?.Mppt2 is { } oldMppt2 ? Gen24JsonService.GetUpdateToken(mppt2, oldMppt2) : null;
+                var mppt1Token = Settings.Mppt?.Mppt1 is { } mppt1 && oldSettings.Mppt?.Mppt1 is { } oldMppt1 ? Gen24JsonService.GetUpdateToken(mppt1, oldMppt1) : null;
+                var mppt2Token = Settings.Mppt?.Mppt2 is { } mppt2 && oldSettings.Mppt?.Mppt2 is { } oldMppt2 ? Gen24JsonService.GetUpdateToken(mppt2, oldMppt2) : null;
 
                 var hasMppt1Updates = mppt1Token is not null && mppt1Token.HasValues;
                 var hasMppt2Updates = mppt2Token is not null && mppt2Token.HasValues;
@@ -307,7 +309,7 @@
 
                 var hasPowerLimitUpdates = false;
                 var visualizationToken = Gen24JsonService.GetUpdateToken(Settings.PowerLimitSettings.Visualization, oldSettings.PowerLimitSettings.Visualization);
-                visualizationToken.Add("exportLimits", new JObject { { "activePower", new JObject { { "displayModeSoftLimit", "absolute" } } }, });
+                visualizationToken.Add("exportLimits", new JObject { { "activePower", new JObject { { "displayModeSoftLimit", "absolute" } } } });
 
                 var hardLimitToken = Gen24JsonService.GetUpdateToken(Settings.PowerLimitSettings.ExportLimits.ActivePower.HardLimit, oldSettings.PowerLimitSettings.ExportLimits.ActivePower.HardLimit);
                 var softLimitToken = Gen24JsonService.GetUpdateToken(Settings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit, oldSettings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit);
@@ -322,7 +324,7 @@
                 var limitsToken = new JObject
                 {
                     { "visualization", visualizationToken },
-                    { "exportLimits", exportLimitsToken },
+                    { "exportLimits", exportLimitsToken }
                 };
 
                 if (new[] { visualizationToken, hardLimitToken, softLimitToken, activePowerToken, exportLimitsToken, limitsToken }
