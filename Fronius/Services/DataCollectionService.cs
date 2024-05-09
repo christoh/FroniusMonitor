@@ -281,6 +281,7 @@
 
             result.Gen24Config = await task1.ConfigureAwait(false);
             result.Gen24Config2 = await task2.ConfigureAwait(false);
+            
             lastConfigUpdate = DateTime.UtcNow;
         }
 

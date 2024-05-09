@@ -1528,6 +1528,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Firmware {0} has breaking changes. Upgrade this software..
+        /// </summary>
+        public static string FirmwareTooNew {
+            get {
+                return ResourceManager.GetString("FirmwareTooNew", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Firmware {0} is too old. Upgrade to at least {1}..
+        /// </summary>
+        public static string FirmwareTooOld {
+            get {
+                return ResourceManager.GetString("FirmwareTooOld", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Forced charge.
         /// </summary>
         public static string ForcedCharge {

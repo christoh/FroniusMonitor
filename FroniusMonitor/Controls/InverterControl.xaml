@@ -769,6 +769,11 @@
                                                    ShowPercent="True" Minimum="0" Maximum="1" />
                             </StackPanel>
                         </Grid>
+                        
+                        <TextBlock Text="{Binding Config.VersionWarning}" FontSize="8" TextWrapping="Wrap" Foreground="Red" TextAlignment="Center"
+                                   VerticalAlignment="Center" FontWeight="Bold" Background="#80ffffff"
+                                   Visibility="{Binding Config.VersionWarning, Converter={co:NullToVisibility}, FallbackValue=Collapsed}"/>
+                        
                     </Grid>
                 </Border>
                 <!-- ReSharper restore Xaml.PossibleNullReferenceException -->

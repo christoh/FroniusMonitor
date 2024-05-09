@@ -1368,4 +1368,10 @@
   <data name="Inverters" xml:space="preserve">
 	  <value>Inverters</value>
   </data>
+  <data name="FirmwareTooOld" xml:space="preserve">
+	  <value>Firmware {0} is too old. Upgrade to at least {1}.</value>
+  </data>
+  <data name="FirmwareTooNew" xml:space="preserve">
+	  <value>Firmware {0} has breaking changes. Upgrade this software.</value>
+  </data>
 </root>

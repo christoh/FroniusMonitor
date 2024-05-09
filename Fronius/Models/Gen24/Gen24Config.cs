@@ -1,5 +1,4 @@
 ﻿using De.Hochstaetter.Fronius.Models.Gen24.Settings;
-using De.Hochstaetter.Fronius.Services;
 
 namespace De.Hochstaetter.Fronius.Models.Gen24;
 
@@ -10,7 +9,7 @@ public class Gen24Config : BindableBase, ICloneable
     public Gen24Versions? Versions
     {
         get => versions;
-        set => Set(ref versions, value);
+        set => Set(ref versions, value, () => NotifyOfPropertyChange(nameof(VersionWarning)));
     }
 
     private Gen24Components? components;
@@ -43,6 +42,30 @@ public class Gen24Config : BindableBase, ICloneable
     {
         get => maxAcPower;
         set => Set(ref maxAcPower, value);
+    }
+
+
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
+    public string? VersionWarning
+    {
+        get
+        {
+            Version? firmwareVersion = null;
+            Versions?.SwVersions.TryGetValue("DEVICEGROUP", out firmwareVersion);
+            var firmwareVersionString = firmwareVersion?.ToLinuxString() ?? Resources.Unknown;
+
+            if (Versions?.CommandApi < new Version(6, 1) || Versions?.ConfigApi < new Version(8, 0))
+            {
+                return string.Format(Resources.FirmwareTooOld, firmwareVersionString, "1.30.7-1");
+            }
+
+            if (Versions?.CommandApi >= new Version(7, 0) || Versions?.ConfigApi >= new Version(9, 0))
+            {
+                return string.Format(Resources.FirmwareTooNew, firmwareVersionString);
+            }
+
+            return null;
+        }
     }
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]

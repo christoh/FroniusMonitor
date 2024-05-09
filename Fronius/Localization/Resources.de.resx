@@ -1308,4 +1308,10 @@
   <data name="Inverters" xml:space="preserve">
 	  <value>Wechselrichter</value>
   </data>
+  <data name="FirmwareTooOld" xml:space="preserve">
+	  <value>Firmware {0} ist zu alt. Aktualisiere auf mindestens {1}.</value>
+  </data>
+  <data name="FirmwareTooNew" xml:space="preserve">
+	  <value>Firmware {0} hat breaking changes. Aktualisiere diese Software.</value>
+  </data>
 </root>
