@@ -413,7 +413,7 @@
                                                 HeaderStyle="{StaticResource Es}" CanUserReorder="True" CanUserResize="True" CanUserSort="True"
                                                 ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
 
-                            <DataGridCheckBoxColumn Header="{l:Ui 'SYSTEM_POWER_CONTROL.useInverter', 'True'}" Binding="{Binding UseDevice}" x:Name="CheckBoxColumn"
+                            <DataGridCheckBoxColumn Header="{l:Ui 'SYSTEM_POWER_CONTROL.useInverter', 'True'}" Binding="{Binding UseDevice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" x:Name="CheckBoxColumn"
                                                     ElementStyle="{StaticResource CheckBoxStyle}" IsReadOnly="True"
                                                     SortMemberPath="UseDevice" HeaderStyle="{StaticResource Es}" CanUserReorder="True" CanUserResize="True" CanUserSort="True">
                             </DataGridCheckBoxColumn>

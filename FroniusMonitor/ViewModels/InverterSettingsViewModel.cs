@@ -3,7 +3,7 @@
 namespace De.Hochstaetter.FroniusMonitor.ViewModels
 {
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-#pragma warning disable CS9107
+    #pragma warning disable CS9107
     public class InverterSettingsViewModel(
         IDataCollectionService dataCollectionService,
         IGen24Service gen24Service,
@@ -11,8 +11,10 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
         IFritzBoxService fritzBoxService,
         IWattPilotService wattPilotService)
         : SettingsViewModelBase(dataCollectionService, gen24Service, gen24JsonService, fritzBoxService, wattPilotService)
-#pragma warning restore CS9107
+    #pragma warning restore CS9107
     {
+        private bool needsConnectedInverterUpdate;
+        private IDictionary<Guid, Gen24ConnectedInverter>? oldConnectedInverters;
         private Gen24InverterSettings oldSettings = null!;
 
         private ICommand? undoCommand;
@@ -184,9 +186,9 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
             });
         }
 
-        private IDictionary<Guid, Gen24ConnectedInverter> connectedInverters = null!;
+        private IDictionary<Guid, Gen24ConnectedInverter>? connectedInverters;
 
-        public IDictionary<Guid, Gen24ConnectedInverter> ConnectedInverters
+        public IDictionary<Guid, Gen24ConnectedInverter>? ConnectedInverters
         {
             get => connectedInverters;
             set => Set(ref connectedInverters, value);
@@ -230,6 +232,7 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
                 if (oldSettings.PowerLimitSettings.ExportLimits.ActivePower.IsNetworkModeEnabled)
                 {
                     ConnectedInverters = new ConcurrentDictionary<Guid, Gen24ConnectedInverter>(await gen24Service.GetConnectedDevices(true));
+                    oldConnectedInverters = new ConcurrentDictionary<Guid, Gen24ConnectedInverter>(ConnectedInverters.Values.Select(i => i.Copy()).ToDictionary(i => i.Id));
                 }
 
                 PowerModes =
@@ -267,6 +270,18 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
 
             try
             {
+                if (!needsConnectedInverterUpdate && ConnectedInverters != null)
+                {
+                    foreach (var connectedInverter in ConnectedInverters.Values)
+                    {
+                        if (oldConnectedInverters == null || !oldConnectedInverters.TryGetValue(connectedInverter.Id, out var oldConnectedInverter) || oldConnectedInverter.UseDevice != connectedInverter.UseDevice)
+                        {
+                            needsConnectedInverterUpdate = true;
+                            break;
+                        }
+                    }
+                }
+
                 var hasCommonUpdates = false;
                 await UpdateIfRequired(Settings, oldSettings, "config/common").ConfigureAwait(false);
 
@@ -341,7 +356,39 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
                     hasPowerLimitUpdates = true;
                 }
 
-                if (!hasMpptUpdates && !hasPowerLimitUpdates && !hasCommonUpdates)
+                if (needsConnectedInverterUpdate && ConnectedInverters != null)
+                {
+                    var staticToken = new JObject();
+                    var detectedToken = new JObject();
+
+                    if (Settings.PowerLimitSettings.ExportLimits.ActivePower.IsNetworkModeEnabled)
+                    {
+                        foreach (var connectedInverter in ConnectedInverters.Values.Where(i => !i.IsAutoDetected))
+                        {
+                            staticToken.Add(connectedInverter.Id.ToString("D"), new JObject
+                            {
+                                { "name", connectedInverter.DisplayName },
+                                { "hostname", connectedInverter.Hostname },
+                                { "ipAddress", connectedInverter.IpAddressString },
+                                { "modbusId", connectedInverter.ModbusAddress },
+                            });
+                        }
+
+                        foreach (var connectedInverter in ConnectedInverters.Values.Where(i => i is { IsAutoDetected: true, UseDevice: true }))
+                        {
+                            detectedToken.Add(connectedInverter.Id.ToString("D"), new JObject
+                            {
+                                { "dataSourceId", connectedInverter.DataSourceId },
+                                { "serial", connectedInverter.SerialNumber },
+                            });
+                        }
+                    }
+
+                    exportLimitsToken.Add("autodetectedControlledDevices", detectedToken);
+                    exportLimitsToken.Add("staticControlledDevices", staticToken);
+                }
+
+                if (!hasMpptUpdates && !hasPowerLimitUpdates && !hasCommonUpdates && !needsConnectedInverterUpdate)
                 {
                     ShowNoSettingsChanged();
                     return;
@@ -349,6 +396,7 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
 
                 await UpdateInverter("config/limit_settings/powerLimits", limitsToken).ConfigureAwait(false);
                 oldSettings = Settings;
+                oldConnectedInverters = ConnectedInverters == null ? null : new ConcurrentDictionary<Guid, Gen24ConnectedInverter>(ConnectedInverters.Values.Select(i => new KeyValuePair<Guid, Gen24ConnectedInverter>(i.Id, i.Copy())));
 
                 if (Gen24Service == DataCollectionService.Gen24Service && DataCollectionService.HomeAutomationSystem?.Gen24Config != null)
                 {
@@ -409,7 +457,9 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
 
         private void Undo()
         {
+            needsConnectedInverterUpdate = false;
             Settings = (Gen24InverterSettings)oldSettings.Clone();
+            ConnectedInverters = oldConnectedInverters == null ? null : new ConcurrentDictionary<Guid, Gen24ConnectedInverter>(oldConnectedInverters.Values.Select(i => new KeyValuePair<Guid, Gen24ConnectedInverter>(i.Id, i.Copy())));
 
             if (Settings.PowerLimitSettings.Visualization.WattPeakReferenceValue == 0)
             {
@@ -477,13 +527,14 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
 
         private void DeleteConnectedInverter(Gen24ConnectedInverter? connectedInverter)
         {
-            if (connectedInverter == null)
+            if (connectedInverter == null || ConnectedInverters == null)
             {
                 return;
             }
-            
+
             ConnectedInverters.Remove(connectedInverter.Id);
             NotifyOfPropertyChange(nameof(ConnectedInverters));
+            needsConnectedInverterUpdate = true;
         }
 
         private void AddConnectedInverter()
@@ -496,8 +547,11 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
             }
 
             var connectedInverter = newConnectedInverterView.ViewModel.ConnectedInverter;
+
+            ConnectedInverters ??= new ConcurrentDictionary<Guid, Gen24ConnectedInverter>();
             ConnectedInverters[connectedInverter.Id] = connectedInverter;
             NotifyOfPropertyChange(nameof(ConnectedInverters));
+            needsConnectedInverterUpdate = true;
         }
     }
 }

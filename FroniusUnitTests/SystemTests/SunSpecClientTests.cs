@@ -37,7 +37,8 @@ public class SunSpecClientTests
         Assert.AreEqual(4, inverter.Tracker?.NumberOfTrackers);
         Assert.GreaterOrEqual(inverter.ExtendedSensors?.IsolationResistance ?? 0, 100000);
         Assert.AreEqual(SunSpecOnOff.Disabled, inverter.ExtendedSettings?.ActivePowerLimitEnabled);
-        Assert.LessOrEqual(inverter.ExtendedSettings?.RelativeActivePowerLimit ?? 0, 1);
+        Assert.AreEqual(inverter.ExtendedSettings?.RelativeActivePowerLimit ?? 0, 1);
+        Assert.AreEqual(inverter.ExtendedSettings?.ActivePowerLimitEnabled ?? 0, SunSpecOnOff.Disabled);
 
         if (inverter.StorageSettings == null)
         {

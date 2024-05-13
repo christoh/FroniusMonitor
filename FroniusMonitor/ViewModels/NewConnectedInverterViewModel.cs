@@ -36,5 +36,7 @@ public class NewConnectedInverterViewModel : ViewModelBase
             ConnectedInverter.IpAddress = ipAddress;
             ConnectedInverter.Hostname = string.Empty;
         }
+
+        ConnectedInverter.UseDevice = true;
     }
 }

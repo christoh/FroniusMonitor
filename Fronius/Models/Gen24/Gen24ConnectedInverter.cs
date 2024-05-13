@@ -109,5 +109,10 @@
             get => isAutoDetected;
             set => Set(ref isAutoDetected, value);
         }
+
+        public Gen24ConnectedInverter Copy()
+        {
+            return (Gen24ConnectedInverter)MemberwiseClone();
+        }
     }
 }

@@ -84,7 +84,7 @@ public class ModbusViewModel(
                 
                 ShowBox
                 (
-                    string.Format(Resources.InverterCommReadError, ex is TaskCanceledException ? Loc.InverterTimeout : ex.Message),
+                    string.Format(Loc.InverterCommReadError, ex is TaskCanceledException ? Loc.InverterTimeout : ex.Message),
                     ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error
                 );
 
@@ -142,8 +142,8 @@ public class ModbusViewModel(
             {
                 ShowBox
                 (
-                    $"{Resources.PleaseCorrectErrors}:{Environment.NewLine}{errorList.Aggregate(string.Empty, (c, n) => c + Environment.NewLine + "• " + n)}",
-                    Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error
+                    $"{Loc.PleaseCorrectErrors}:{Environment.NewLine}{errorList.Aggregate(string.Empty, (c, n) => c + Environment.NewLine + "• " + n)}",
+                    Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error
                 );
 
                 return;
@@ -186,7 +186,7 @@ public class ModbusViewModel(
 
             oldSettings = Settings;
             Undo();
-            ToastText = Resources.SettingsSavedToInverter;
+            ToastText = Loc.SettingsSavedToInverter;
         }
         finally
         {
