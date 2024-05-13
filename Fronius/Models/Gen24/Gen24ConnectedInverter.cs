@@ -35,6 +35,14 @@
             set => Set(ref deviceType, value);
         }
 
+        private byte modbusAddress = 1;
+        [FroniusProprietaryImport("modbusId", FroniusDataType.Root)]
+        public byte ModbusAddress
+        {
+            get => modbusAddress;
+            set => Set(ref modbusAddress, value);
+        }
+
         private string hostname = string.Empty;
 
         [FroniusProprietaryImport("hostname", FroniusDataType.Root)]

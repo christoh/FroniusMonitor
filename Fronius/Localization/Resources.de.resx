@@ -1314,4 +1314,19 @@
   <data name="FirmwareTooNew" xml:space="preserve">
 	  <value>Firmware {0} hat breaking changes. Aktualisiere diese Software.</value>
   </data>
+  <data name="DeleteInverter" xml:space="preserve">
+	  <value>Wechselrichter löschen</value>
+  </data>
+  <data name="AddInverter" xml:space="preserve">
+	  <value>Wechselrichter hinzufügen</value>
+  </data>
+  <data name="HostnameOrIpv4Address" xml:space="preserve">
+	  <value>Hostname oder IPv4-Adresse</value>
+  </data>
+  <data name="NoHostnameOrIpv4Address" xml:space="preserve">
+	  <value>Muss ein gültiger Hostname oder eine IPv4-Adresse sein</value>
+  </data>
+  <data name="NewInverter" xml:space="preserve">
+	  <value>Neuer Wechselrichter</value>
+  </data>
 </root>

@@ -1,7 +1,9 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels
+﻿using System.Collections.Concurrent;
+
+namespace De.Hochstaetter.FroniusMonitor.ViewModels
 {
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    #pragma warning disable CS9107
+#pragma warning disable CS9107
     public class InverterSettingsViewModel(
         IDataCollectionService dataCollectionService,
         IGen24Service gen24Service,
@@ -9,7 +11,7 @@
         IFritzBoxService fritzBoxService,
         IWattPilotService wattPilotService)
         : SettingsViewModelBase(dataCollectionService, gen24Service, gen24JsonService, fritzBoxService, wattPilotService)
-    #pragma warning restore CS9107
+#pragma warning restore CS9107
     {
         private Gen24InverterSettings oldSettings = null!;
 
@@ -20,6 +22,12 @@
         public ICommand ApplyCommand => applyCommand ??= new NoParameterCommand(Apply);
 
         private IEnumerable<ListItemModel<MpptPowerMode>> powerModes = null!;
+
+        private ICommand? deleteConnectedInverterCommand;
+        public ICommand DeleteConnectedInverterCommand => deleteConnectedInverterCommand ??= new Command<Gen24ConnectedInverter>(DeleteConnectedInverter);
+
+        private ICommand? addConnectedInverterCommand;
+        public ICommand AddConnectedInverterCommand => addConnectedInverterCommand ??= new NoParameterCommand(AddConnectedInverter);
 
         public IEnumerable<ListItemModel<MpptPowerMode>> PowerModes
         {
@@ -176,9 +184,9 @@
             });
         }
 
-        private IReadOnlyDictionary<Guid, Gen24ConnectedInverter> connectedInverters = null!;
+        private IDictionary<Guid, Gen24ConnectedInverter> connectedInverters = null!;
 
-        public IReadOnlyDictionary<Guid, Gen24ConnectedInverter> ConnectedInverters
+        public IDictionary<Guid, Gen24ConnectedInverter> ConnectedInverters
         {
             get => connectedInverters;
             set => Set(ref connectedInverters, value);
@@ -221,7 +229,7 @@
 
                 if (oldSettings.PowerLimitSettings.ExportLimits.ActivePower.IsNetworkModeEnabled)
                 {
-                    ConnectedInverters = await gen24Service.GetConnectedDevices(true);
+                    ConnectedInverters = new ConcurrentDictionary<Guid, Gen24ConnectedInverter>(await gen24Service.GetConnectedDevices(true));
                 }
 
                 PowerModes =
@@ -465,6 +473,31 @@
         {
             LogWattPeakMppt2 = WattPeakMppt2 == 0 ? -0.30980391997148633857556748281473 : Math.Log10(WattPeakMppt2);
             UpdateWattPeakMppt2();
+        }
+
+        private void DeleteConnectedInverter(Gen24ConnectedInverter? connectedInverter)
+        {
+            if (connectedInverter == null)
+            {
+                return;
+            }
+            
+            ConnectedInverters.Remove(connectedInverter.Id);
+            NotifyOfPropertyChange(nameof(ConnectedInverters));
+        }
+
+        private void AddConnectedInverter()
+        {
+            var newConnectedInverterView = IoC.Get<NewConnectedInverterView>();
+
+            if (newConnectedInverterView.ShowDialog() is not true)
+            {
+                return;
+            }
+
+            var connectedInverter = newConnectedInverterView.ViewModel.ConnectedInverter;
+            ConnectedInverters[connectedInverter.Id] = connectedInverter;
+            NotifyOfPropertyChange(nameof(ConnectedInverters));
         }
     }
 }

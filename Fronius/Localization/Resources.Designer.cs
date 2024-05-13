@@ -151,6 +151,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add inverter.
+        /// </summary>
+        public static string AddInverter {
+            get {
+                return ResourceManager.GetString("AddInverter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add rule.
         /// </summary>
         public static string AddRule {
@@ -1249,6 +1258,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Delete inverter.
+        /// </summary>
+        public static string DeleteInverter {
+            get {
+                return ResourceManager.GetString("DeleteInverter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Delete rule.
         /// </summary>
         public static string DeleteRule {
@@ -1704,6 +1722,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string HiddenWifi {
             get {
                 return ResourceManager.GetString("HiddenWifi", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Host name or IPv4 address.
+        /// </summary>
+        public static string HostnameOrIpv4Address {
+            get {
+                return ResourceManager.GetString("HostnameOrIpv4Address", resourceCulture);
             }
         }
         
@@ -2572,6 +2599,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to New inverter.
+        /// </summary>
+        public static string NewInverter {
+            get {
+                return ResourceManager.GetString("NewInverter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Minimum energy for next trip.
         /// </summary>
         public static string NextTripEnergyToCharge {
@@ -2640,6 +2676,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string NoGen24Symo {
             get {
                 return ResourceManager.GetString("NoGen24Symo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Must be a valid host name or IPv4 address.
+        /// </summary>
+        public static string NoHostnameOrIpv4Address {
+            get {
+                return ResourceManager.GetString("NoHostnameOrIpv4Address", resourceCulture);
             }
         }
         

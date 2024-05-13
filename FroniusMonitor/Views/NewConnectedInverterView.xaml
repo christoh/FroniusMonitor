@@ -1,0 +1,67 @@
+﻿<c:ValidationWindow x:Class="De.Hochstaetter.FroniusMonitor.Views.NewConnectedInverterView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:De.Hochstaetter.FroniusMonitor.Views"
+        xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+        xmlns:vm="clr-namespace:De.Hochstaetter.FroniusMonitor.ViewModels"
+        xmlns:l="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Localization"
+        xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
+        xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
+        xmlns:v="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Validation"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance vm:NewConnectedInverterViewModel}"
+
+        Title="{x:Static p:Resources.AddInverter}" SizeToContent="Height" Width="600" ResizeMode="CanMinimize">
+    <Grid Margin="16">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <Grid.Resources>
+            <Style TargetType="TextBlock">
+                <Setter Property="Margin" Value="0,2,8,0"/>
+                <Setter Property="TextAlignment" Value="Right"/>
+            </Style>
+            
+            <Style TargetType="TextBox">
+                <Setter Property="Padding" Value="0,1,0,3"/>
+                <Setter Property="Margin" Value="0,0,0,4"/>
+                <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}" />
+                <EventSetter Event="Validation.Error" Handler="OnValidationChanged" />
+            </Style>
+        </Grid.Resources>
+        
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="{l:Ui 'SYSTEM_POWER_CONTROL.name'}"/>
+        <TextBlock Grid.Row="0" Grid.Column="1" Text=":"/>
+        <TextBox Grid.Row="0" Grid.Column="2" Text="{co:ValidationBinding ConnectedInverter.DisplayName, Rule={v:RegExRule Pattern='^.{0,30}$', Message='Must be between 1 and 30 characters.'}}" MaxLength="30"/>
+        
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.HostnameOrIpv4Address}"/>
+        <TextBlock Grid.Row="1" Grid.Column="1" Text=":"/>
+        <TextBox Grid.Row="1" Grid.Column="2" Text="{co:ValidationBinding HostnameOrIpAddress, Rule={v:Ipv4OrHostname}}"/>
+        
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="{l:Ui 'SYSTEM_POWER_CONTROL.modbusId'}"/>
+        <TextBlock Grid.Row="2" Grid.Column="1" Text=":"/>
+        <TextBox Grid.Row="2" Grid.Column="2" Text="{co:ValidationBinding ConnectedInverter.ModbusAddress, ValidatesOnExceptions=False, Rule={v:MinMaxIntRule Minimum=0, Maximum=255}}" MaxLength="3"/>
+        
+        <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Right" Orientation="Horizontal" Margin="0,16,0,0">
+            <StackPanel.Resources>
+                <Style TargetType="Button">
+                    <Setter Property="Padding" Value="6"/>
+                    <Setter Property="Margin" Value="8,0,0,0"/>
+                </Style>
+            </StackPanel.Resources>
+            <Button IsCancel="True" Content="{x:Static p:Resources.Cancel}"/>
+            <Button IsDefault="True" Content="{x:Static p:Resources.Ok}" Click="OnOkClicked" IsEnabled="{Binding HasVisibleNotifiedValidationErrors, Converter={co:BoolInverter}}"/>
+        </StackPanel>
+    </Grid>
+</c:ValidationWindow>

@@ -73,6 +73,7 @@ public partial class App
             .AddTransient<WattPilotDetailsView>()
             .AddTransient<InverterSettingsView>()
             .AddTransient<InverterDetailsView>()
+            .AddTransient<NewConnectedInverterView>()
             .AddTransient<EventLogViewModel>()
             .AddTransient<SelfConsumptionOptimizationViewModel>()
             .AddTransient<ModbusViewModel>()
@@ -83,6 +84,7 @@ public partial class App
             .AddTransient<BatteryDetailsViewModel>()
             .AddTransient<WattPilotDetailsViewModel>()
             .AddTransient<SmartMeterDetailsViewModel>()
+            .AddTransient<NewConnectedInverterViewModel>()
             .BuildServiceProvider()
             ;
 

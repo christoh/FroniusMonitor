@@ -1374,4 +1374,19 @@
   <data name="FirmwareTooNew" xml:space="preserve">
 	  <value>Firmware {0} has breaking changes. Upgrade this software.</value>
   </data>
+  <data name="DeleteInverter" xml:space="preserve">
+	  <value>Delete inverter</value>
+  </data>
+  <data name="AddInverter" xml:space="preserve">
+	  <value>Add inverter</value>
+  </data>
+  <data name="HostnameOrIpv4Address" xml:space="preserve">
+	  <value>Host name or IPv4 address</value>
+  </data>
+  <data name="NoHostnameOrIpv4Address" xml:space="preserve">
+	  <value>Must be a valid host name or IPv4 address</value>
+  </data>
+  <data name="NewInverter" xml:space="preserve">
+	  <value>New inverter</value>
+  </data>
 </root>
