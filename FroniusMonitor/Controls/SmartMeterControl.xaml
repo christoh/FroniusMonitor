@@ -38,8 +38,8 @@
                     </Style>
 
                     <Style TargetType="c:Gauge" x:Key="VoltageLinearGaugeStyle" BasedOn="{StaticResource PowerLinearGaugeStyle}">
-                        <Setter Property="Minimum" Value="210" />
-                        <Setter Property="Maximum" Value="250" />
+                        <Setter Property="Minimum" Value="207" />
+                        <Setter Property="Maximum" Value="253" />
                         <Setter Property="UnitName" Value="V" />
                     </Style>
 
@@ -222,8 +222,8 @@
                             <UniformGrid Rows="2" Columns="2" Margin="0,6,0,0">
                                 <UniformGrid.Resources>
                                     <Style TargetType="c:Gauge" BasedOn="{StaticResource DefaultHalfCircleGauge}">
-                                        <Setter Property="Minimum" Value="220" />
-                                        <Setter Property="Maximum" Value="240" />
+                                        <Setter Property="Minimum" Value="207" />
+                                        <Setter Property="Maximum" Value="253" />
                                         <Setter Property="GaugeColors" Value="{x:Static c:Gauge.MidIsGood}" />
                                         <Setter Property="Origin" Value=".5" />
                                     </Style>
@@ -249,8 +249,8 @@
                         <Grid x:Name="LineVoltage" Visibility="Collapsed">
                             <Grid.Resources>
                                 <Style TargetType="c:Gauge" BasedOn="{StaticResource VoltageLinearGaugeStyle}">
-                                    <Setter Property="Minimum" Value="380" />
-                                    <Setter Property="Maximum" Value="420" />
+                                    <Setter Property="Minimum" Value="358.5345171668" />
+                                    <Setter Property="Maximum" Value="438.2088543149" />
                                 </Style>
                             </Grid.Resources>
                             <Grid.RowDefinitions>

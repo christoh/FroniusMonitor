@@ -145,8 +145,8 @@
                                 <Setter Property="GaugeColors" Value="{x:Static c:Gauge.MidIsGood}" />
                                 <Setter Property="StringFormat" Value="N0" />
                                 <Setter Property="UnitName" Value="V" />
-                                <Setter Property="Minimum" Value="220" />
-                                <Setter Property="Maximum" Value="240" />
+                                <Setter Property="Minimum" Value="207" />
+                                <Setter Property="Maximum" Value="253" />
                             </Style>
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">

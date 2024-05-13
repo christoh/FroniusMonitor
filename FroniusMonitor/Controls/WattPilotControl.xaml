@@ -101,8 +101,8 @@
                             <UniformGrid Rows="2" Columns="2" VerticalAlignment="Center" Margin="0,8,0,0">
                                 <UniformGrid.Resources>
                                     <Style TargetType="c:Gauge" BasedOn="{StaticResource DefaultHalfCircleGauge}">
-                                        <Setter Property="Minimum" Value="220" />
-                                        <Setter Property="Maximum" Value="240" />
+                                        <Setter Property="Minimum" Value="207" />
+                                        <Setter Property="Maximum" Value="253" />
                                         <Setter Property="Origin" Value=".5" />
                                         <Setter Property="GaugeColors" Value="{x:Static c:Gauge.MidIsGood}" />
                                     </Style>

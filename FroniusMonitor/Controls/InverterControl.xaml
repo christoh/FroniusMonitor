@@ -63,8 +63,8 @@
                     </Style>
 
                     <Style TargetType="c:Gauge" x:Key="AcVoltageLinearGaugeStyle" BasedOn="{StaticResource AcPowerLinearGaugeStyle}">
-                        <Setter Property="Minimum" Value="210" />
-                        <Setter Property="Maximum" Value="250" />
+                        <Setter Property="Minimum" Value="207" />
+                        <Setter Property="Maximum" Value="253" />
                         <Setter Property="Origin" Value=".5" />
                         <Setter Property="UnitName" Value="V" />
                     </Style>
@@ -135,8 +135,8 @@
                             <UniformGrid Rows="2" Columns="2">
                                 <UniformGrid.Resources>
                                     <Style TargetType="c:Gauge" BasedOn="{StaticResource DefaultHalfCircleGauge}">
-                                        <Setter Property="Minimum" Value="220" />
-                                        <Setter Property="Maximum" Value="240" />
+                                        <Setter Property="Minimum" Value="207" />
+                                        <Setter Property="Maximum" Value="253" />
                                         <Setter Property="GaugeColors" Value="{x:Static c:Gauge.MidIsGood}" />
                                         <Setter Property="Origin" Value="0.5" />
                                     </Style>
@@ -162,8 +162,8 @@
                         <Grid x:Name="AcLineVoltage" Visibility="Collapsed">
                             <Grid.Resources>
                                 <Style TargetType="c:Gauge" BasedOn="{StaticResource AcVoltageLinearGaugeStyle}">
-                                    <Setter Property="Minimum" Value="381.05117766515300457603819513129" />
-                                    <Setter Property="Maximum" Value="415.69219381653055044658712196141" />
+                                    <Setter Property="Minimum" Value="358.5345171668" />
+                                    <Setter Property="Maximum" Value="438.2088543149" />
                                     <Setter Property="FontSize" Value="20"/>
                                     <Setter Property="t:LinearGauge.GaugeHeight" Value="12"/>
                                 </Style>
