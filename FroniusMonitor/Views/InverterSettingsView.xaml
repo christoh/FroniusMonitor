@@ -90,11 +90,13 @@
                     <TextBlock Grid.Row="0" Grid.Column="1" Text=":" />
                     <TextBox Grid.Row="0" Grid.Column="2" MaxLength="30" Text="{Binding Settings.SystemName}" />
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Time zone" />
-                    <TextBlock Grid.Row="1" Grid.Column="1" Text=":" />
-                    <TextBox Grid.Row="1" Grid.Column="2" MaxLength="30" Text="{Binding Settings.TimeZoneName}" />
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Time zone" IsEnabled="{Binding EnableDanger}" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text=":" IsEnabled="{Binding EnableDanger}"/>
+                    <TextBox Grid.Row="1" Grid.Column="2" MaxLength="30" Text="{Binding Settings.TimeZoneName}" IsEnabled="{Binding EnableDanger}" />
 
-                    <CheckBox Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2" IsChecked="{Binding Settings.TimeSync}" Content="{x:Static p:Resources.SynchronizeTime}" />
+                    <CheckBox Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2" IsChecked="{Binding Settings.TimeSync}" IsEnabled="{Binding EnableDanger}">
+                        <TextBlock Text="{x:Static p:Resources.SynchronizeTime}" Margin="0"/>
+                    </CheckBox>
                 </Grid>
             </GroupBox>
 
