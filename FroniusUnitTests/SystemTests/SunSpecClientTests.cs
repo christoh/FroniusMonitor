@@ -39,6 +39,7 @@ public class SunSpecClientTests
         Assert.AreEqual(SunSpecOnOff.Disabled, inverter.ExtendedSettings?.ActivePowerLimitEnabled);
         Assert.AreEqual(inverter.ExtendedSettings?.RelativeActivePowerLimit ?? 0, 1);
         Assert.AreEqual(inverter.ExtendedSettings?.ActivePowerLimitEnabled ?? 0, SunSpecOnOff.Disabled);
+        Assert.AreEqual(SunSpecChargingLimits.None,inverter.StorageSettings?.ChargingLimits);
 
         if (inverter.StorageSettings == null)
         {
@@ -80,5 +81,6 @@ public class SunSpecClientTests
         await client.ConnectAsync("192.168.44.10", 502, 200).ConfigureAwait(false);
         var device = await client.GetDataAsync().ConfigureAwait(false);
         var sunSpecMeter = new SunSpecMeter(device);
+        Assert.IsNotNull(sunSpecMeter);
     }
 }

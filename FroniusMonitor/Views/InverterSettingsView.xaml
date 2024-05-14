@@ -9,8 +9,8 @@
                     xmlns:l="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Localization"
                     xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
                     xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
-                    xmlns:settings="clr-namespace:De.Hochstaetter.Fronius.Models.Gen24.Settings;assembly=Fronius"
                     xmlns:gen24="clr-namespace:De.Hochstaetter.Fronius.Models.Gen24;assembly=Fronius"
+                    xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
                     mc:Ignorable="d"
                     ResizeMode="NoResize"
                     SizeToContent="WidthAndHeight"
@@ -124,8 +124,8 @@
                     </ComboBox>
 
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="{l:Channel 'PV_MODE_DYNAMICPEAK_01_U16'}" x:Name="DynamicPeakManager1"
-                               Visibility="{Binding Settings.Mppt.Mppt1.PowerMode, Converter={co:MpptPowerMode2Visibility Value=Auto, Equal=Visible, NotEqual=Collapsed}, FallbackValue=Collapsed }"/>
-                    <TextBlock Grid.Row="1" Grid.Column="1" Text=":" Visibility="{Binding ElementName=DynamicPeakManager1, Path=Visibility}"/>
+                               Visibility="{Binding Settings.Mppt.Mppt1.PowerMode, Converter={co:MpptPowerMode2Visibility Value=Auto, Equal=Visible, NotEqual=Collapsed}, FallbackValue=Collapsed }" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text=":" Visibility="{Binding ElementName=DynamicPeakManager1, Path=Visibility}" />
                     <ComboBox MinWidth="140" Grid.Row="1" Grid.Column="2" ItemsSource="{Binding DynamicPeakManagerModes}" SelectedItem="{Binding SelectedDynamicPeakManagerModeMppt1}"
                               Visibility="{Binding ElementName=DynamicPeakManager1, Path=Visibility}">
                         <ComboBox.ItemTemplate>
@@ -189,7 +189,7 @@
                     </ComboBox>
 
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="{l:Channel 'PV_MODE_DYNAMICPEAK_02_U16'}" x:Name="DynamicPeakManager2"
-                               Visibility="{Binding Settings.Mppt.Mppt2.PowerMode, Converter={co:MpptPowerMode2Visibility Value=Auto, Equal=Visible, NotEqual=Collapsed}, FallbackValue=Collapsed}"/>
+                               Visibility="{Binding Settings.Mppt.Mppt2.PowerMode, Converter={co:MpptPowerMode2Visibility Value=Auto, Equal=Visible, NotEqual=Collapsed}, FallbackValue=Collapsed}" />
                     <TextBlock Grid.Row="1" Grid.Column="1" Text=":" Visibility="{Binding ElementName=DynamicPeakManager2, Path=Visibility}" />
                     <ComboBox MinWidth="140" Grid.Row="1" Grid.Column="2" ItemsSource="{Binding DynamicPeakManagerModes}" SelectedItem="{Binding SelectedDynamicPeakManagerModeMppt2}"
                               Visibility="{Binding ElementName=DynamicPeakManager2, Path=Visibility}">
@@ -239,21 +239,21 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <CheckBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Content="{l:Config 'EXPORTLIMIT.activated'}" IsChecked="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.IsEnabled}" Margin="0,8"/>
+                    <CheckBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Content="{l:Config 'EXPORTLIMIT.activated'}" IsChecked="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.IsEnabled}" Margin="0,8" />
                     <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,8" Content="{l:Config 'EXPORTLIMIT.NETWORK_MODE.clusterModeActivated'}"
                               IsChecked="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.IsNetworkModeEnabled}"
-                              Visibility="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.IsEnabled, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}"/>
+                              Visibility="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.IsEnabled, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}" />
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="{l:Config 'EXPORTLIMIT.PHASE_MODE.phaseMode'}"
-                               Visibility="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.IsEnabled, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}"/>
-                    <TextBlock Grid.Row="2" Grid.Column="1" Text=":" 
-                               Visibility="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.IsEnabled, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}"/>
-                    <ComboBox HorizontalAlignment="Stretch" Grid.Row="2" Grid.Column="2" ItemsSource="{Binding PhaseModes}" SelectedItem="{Binding SelectedPhaseMode}" 
-                              Visibility="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.IsEnabled, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}"/>
+                               Visibility="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.IsEnabled, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}" />
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text=":"
+                               Visibility="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.IsEnabled, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}" />
+                    <ComboBox HorizontalAlignment="Stretch" Grid.Row="2" Grid.Column="2" ItemsSource="{Binding PhaseModes}" SelectedItem="{Binding SelectedPhaseMode}"
+                              Visibility="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.IsEnabled, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}" />
 
                     <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Visibility="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.IsEnabled, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}">
                         <Grid.RowDefinitions>
@@ -289,7 +289,7 @@
                                          Text="{co:ValidationBinding Path=WattPeakReferenceValue, FallbackValue=20000, StringFormat=F0, Rule={v:MinMaxFloatRule Minimum=0, Maximum=200000, PropertyDisplayName={l:Config 'EXPORTLIMIT.WPEAK'}}}" />
                                 <TextBlock Margin="4,0,0,0" Text="W" />
                             </StackPanel>
-                            <Slider Value="{Binding WattPeakReferenceValue, Mode=TwoWay, FallbackValue=10000}" HorizontalAlignment="Stretch" TickFrequency="1" IsSnapToTickEnabled="True" Minimum="0" Maximum="20000"/>
+                            <Slider Value="{Binding WattPeakReferenceValue, Mode=TwoWay, FallbackValue=10000}" HorizontalAlignment="Stretch" TickFrequency="1" IsSnapToTickEnabled="True" Minimum="0" Maximum="20000" />
                         </StackPanel>
 
                         <StackPanel Grid.Row="4" Margin="0,8,0,0">
@@ -320,107 +320,134 @@
                                     Visibility="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit.IsEnabled, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}" />
                         </StackPanel>
                     </Grid>
-                    <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,16,0,0" Visibility="{Binding ConnectedInverters.Count, FallbackValue=Collapsed, Converter={co:Int2Visibility Value=0, Equal=Collapsed, NotEqual=Visible}}">
-                        <TextBlock Text="{x:Static p:Resources.Inverters}" TextAlignment="Left" HorizontalAlignment="Left"/>
+                    <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,16,0,0" Visibility="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.IsNetworkModeEnabled, FallbackValue=Collapsed, Converter={co:Bool2Visibility}}">
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <StackPanel.Resources>
+                                <Style TargetType="Button" BasedOn="{StaticResource TransparentButton}">
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="BurlyWood" />
+                                        </Trigger>
+                                        <Trigger Property="IsPressed" Value="True">
+                                            <Setter Property="Margin" Value="0,-2,0,2"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Resources>
+
+                            <TextBlock Text="{x:Static p:Resources.Inverters}" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,8,0" />
+
+                            <Button Command="{Binding RefreshConnectedInvertersCommand}" ToolTip="{x:Static p:Resources.Refresh}">
+                                <vi:RefreshIcon Height="16" Margin="4" />
+                            </Button>
+                            
+                            <FrameworkElement Width="4"/>
+
+                            <Button Command="{Binding AddConnectedInverterCommand}" ToolTip="{l:Ui 'SYSTEM_POWER_CONTROL.ADD_STATIC_INVERTER'}" >
+                                <vi:PlusIcon Height="16" Margin="4" />
+                            </Button>
+                        </StackPanel>
+
                         <DataGrid ColumnWidth="Auto" CanUserAddRows="False" RowHeaderWidth="20"
                                   SelectionUnit="FullRow" SelectionMode="Single"
-                                  ItemsSource="{Binding ConnectedInverters.Values}" AutoGenerateColumns="False"
+                                  ItemsSource="{Binding ConnectedInverters.Values, FallbackValue={x:Null}}" AutoGenerateColumns="False"
                                   GridLinesVisibility="Vertical"
                                   AlternatingRowBackground="AntiqueWhite"
                                   BorderThickness="1">
-                        <DataGrid.RowStyle>
-                            <Style TargetType="DataGridRow">
-                                <Setter Property="ToolTip" Value="{x:Static p:Resources.RuleTooltip}" />
-                                <Setter Property="Tag" Value="{Binding Path=DataContext, RelativeSource={RelativeSource FindAncestor, AncestorType=DataGrid}}" />
-                                <Setter Property="ContextMenu">
-                                    <Setter.Value>
-                                        <ContextMenu Placement="Center">
-                                            <MenuItem Header="{x:Static p:Resources.AddInverter}"
-                                                  Command="{Binding Path=PlacementTarget.(FrameworkElement.Tag).(vm:InverterSettingsViewModel.AddConnectedInverterCommand), RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
-                                            <MenuItem Header="{x:Static p:Resources.DeleteInverter}" Visibility="{Binding IsAutoDetected, Converter={co:Bool2Visibility False=Visible, True=Collapsed}}"
-                                                  Command="{Binding Path=PlacementTarget.(FrameworkElement.Tag).(vm:InverterSettingsViewModel.DeleteConnectedInverterCommand), RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}"
-                                                  CommandParameter="{Binding Path=PlacementTarget.(FrameworkElement.DataContext),RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
-                                        </ContextMenu>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </DataGrid.RowStyle>
-                        <DataGrid.Resources>
-                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightSkyBlue" />
-                            <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="LightSkyBlue" />
-                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black" />
+                            <DataGrid.RowStyle>
+                                <Style TargetType="DataGridRow">
+                                    <Setter Property="ToolTip" Value="{x:Static p:Resources.RuleTooltip}" />
+                                    <Setter Property="Tag" Value="{Binding Path=DataContext, RelativeSource={RelativeSource FindAncestor, AncestorType=DataGrid}}" />
+                                    <Setter Property="ContextMenu">
+                                        <Setter.Value>
+                                            <ContextMenu Placement="Center">
+                                                <MenuItem Header="{l:Ui 'SYSTEM_POWER_CONTROL.ADD_STATIC_INVERTER'}"
+                                                          Command="{Binding Path=PlacementTarget.(FrameworkElement.Tag).(vm:InverterSettingsViewModel.AddConnectedInverterCommand), RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
+                                                <MenuItem Header="{l:Ui 'SYSTEM_POWER_CONTROL.DELETE_INVERTER'}" Visibility="{Binding IsAutoDetected, Converter={co:Bool2Visibility False=Visible, True=Collapsed}}"
+                                                          Command="{Binding Path=PlacementTarget.(FrameworkElement.Tag).(vm:InverterSettingsViewModel.DeleteConnectedInverterCommand), RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}"
+                                                          CommandParameter="{Binding Path=PlacementTarget.(FrameworkElement.DataContext),RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
+                                            </ContextMenu>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </DataGrid.RowStyle>
+                            <DataGrid.Resources>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightSkyBlue" />
+                                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="LightSkyBlue" />
+                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black" />
 
-                            <Style TargetType="DataGridColumnHeader" x:Key="Es">
-                                <Setter Property="Padding" Value="10,8" />
-                            </Style>
+                                <Style TargetType="DataGridColumnHeader" x:Key="Es">
+                                    <Setter Property="Padding" Value="10,8" />
+                                </Style>
 
-                            <Style TargetType="DataGridCell">
-                                <Setter Property="MinHeight" Value="32" />
-                                <Setter Property="VerticalContentAlignment" Value="Bottom" />
-                                <Setter Property="VerticalAlignment" Value="Bottom" />
-                            </Style>
+                                <Style TargetType="DataGridCell">
+                                    <Setter Property="MinHeight" Value="32" />
+                                    <Setter Property="VerticalContentAlignment" Value="Bottom" />
+                                    <Setter Property="VerticalAlignment" Value="Bottom" />
+                                </Style>
 
 
-                            <Style TargetType="CheckBox" x:Key="CheckBoxStyle">
-                                <Setter Property="Margin" Value="8,2,8,0" />
-                                <Setter Property="VerticalAlignment" Value="Center" />
-                                <Setter Property="HorizontalAlignment" Value="Center" />
-                                <Setter Property="IsEnabled" Value="{Binding Path=DataContext.(gen24:Gen24ConnectedInverter.IsAutoDetected), Mode=TwoWay, RelativeSource={RelativeSource Self}}"/>
-                            </Style>
+                                <Style TargetType="CheckBox" x:Key="CheckBoxStyle">
+                                    <Setter Property="Margin" Value="8,2,8,0" />
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                    <Setter Property="HorizontalAlignment" Value="Center" />
+                                    <Setter Property="IsEnabled" Value="{Binding Path=DataContext.(gen24:Gen24ConnectedInverter.IsAutoDetected), Mode=TwoWay, RelativeSource={RelativeSource Self}}" />
+                                </Style>
 
-                            <Style TargetType="TextBox" x:Key="TextBoxStyle">
-                                <Setter Property="Margin" Value="0,0" />
-                                <Setter Property="Background" Value="White" />
-                                <Setter Property="Padding" Value="6,7,0,0" />
-                                <Setter Property="MaxWidth" Value="80" />
-                                <Setter Property="BorderThickness" Value="0" />
-                                <Setter Property="VerticalAlignment" Value="Stretch" />
-                                <Setter Property="HorizontalAlignment" Value="Stretch" />
-                                <EventSetter Event="Validation.Error" Handler="OnValidationChanged" />
-                                <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}" />
-                            </Style>
+                                <Style TargetType="TextBox" x:Key="TextBoxStyle">
+                                    <Setter Property="Margin" Value="0,0" />
+                                    <Setter Property="Background" Value="White" />
+                                    <Setter Property="Padding" Value="6,7,0,0" />
+                                    <Setter Property="MaxWidth" Value="80" />
+                                    <Setter Property="BorderThickness" Value="0" />
+                                    <Setter Property="VerticalAlignment" Value="Stretch" />
+                                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                    <EventSetter Event="Validation.Error" Handler="OnValidationChanged" />
+                                    <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}" />
+                                </Style>
 
-                            <Style TargetType="TextBlock" x:Key="TextBlockStyle">
-                                <Setter Property="Margin" Value="8,0" />
-                                <Setter Property="VerticalAlignment" Value="Center" />
-                                <Setter Property="HorizontalAlignment" Value="Stretch" />
-                            </Style>
+                                <Style TargetType="TextBlock" x:Key="TextBlockStyle">
+                                    <Setter Property="Margin" Value="8,0" />
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                </Style>
 
-                        </DataGrid.Resources>
+                            </DataGrid.Resources>
 
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="{l:Ui 'SYSTEM_POWER_CONTROL.status', 'True'}" Binding="{Binding Status}" IsReadOnly="True" SortMemberPath="Status"
-                                                HeaderStyle="{StaticResource Es}" CanUserReorder="True" CanUserResize="True" CanUserSort="True"
-                                                ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="{l:Ui 'SYSTEM_POWER_CONTROL.status', 'True'}" Binding="{Binding Status}" IsReadOnly="True" SortMemberPath="Status"
+                                                    HeaderStyle="{StaticResource Es}" CanUserReorder="True" CanUserResize="True" CanUserSort="True"
+                                                    ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
 
-                            <DataGridTextColumn Header="{l:Ui 'SYSTEM_POWER_CONTROL.name', 'True'}" Binding="{Binding DisplayName}" IsReadOnly="True" SortMemberPath="DisplayName"
-                                                HeaderStyle="{StaticResource Es}" CanUserReorder="True" CanUserResize="True" CanUserSort="True" SortDirection="Ascending"
-                                                ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
+                                <DataGridTextColumn Header="{l:Ui 'SYSTEM_POWER_CONTROL.name', 'True'}" Binding="{Binding DisplayName}" IsReadOnly="True" SortMemberPath="DisplayName"
+                                                    HeaderStyle="{StaticResource Es}" CanUserReorder="True" CanUserResize="True" CanUserSort="True" SortDirection="Ascending"
+                                                    ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
 
-                            <DataGridTextColumn Header="{l:Ui 'SYSTEM_POWER_CONTROL.deviceType', 'True'}" Binding="{Binding DeviceType}" IsReadOnly="True" SortMemberPath="DeviceType"
-                                                HeaderStyle="{StaticResource Es}" CanUserReorder="True" CanUserResize="True" CanUserSort="True"
-                                                ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
+                                <DataGridTextColumn Header="{l:Ui 'SYSTEM_POWER_CONTROL.deviceType', 'True'}" Binding="{Binding DeviceType}" IsReadOnly="True" SortMemberPath="DeviceType"
+                                                    HeaderStyle="{StaticResource Es}" CanUserReorder="True" CanUserResize="True" CanUserSort="True"
+                                                    ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
 
-                            <DataGridTextColumn Header="{l:Ui 'SYSTEM_POWER_CONTROL.serial', 'True'}" Binding="{Binding SerialNumber}" IsReadOnly="True" SortMemberPath="SerialNumber"
-                                                HeaderStyle="{StaticResource Es}" CanUserReorder="True" CanUserResize="True" CanUserSort="True"
-                                                ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
+                                <DataGridTextColumn Header="{l:Ui 'SYSTEM_POWER_CONTROL.serial', 'True'}" Binding="{Binding SerialNumber}" IsReadOnly="True" SortMemberPath="SerialNumber"
+                                                    HeaderStyle="{StaticResource Es}" CanUserReorder="True" CanUserResize="True" CanUserSort="True"
+                                                    ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
 
-                            <DataGridTextColumn Header="{l:Ui 'SYSTEM_POWER_CONTROL.hostname', 'True'}" Binding="{Binding Hostname}" IsReadOnly="True" SortMemberPath="HostName"
-                                                HeaderStyle="{StaticResource Es}" CanUserReorder="True" CanUserResize="True" CanUserSort="True"
-                                                ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
+                                <DataGridTextColumn Header="{l:Ui 'SYSTEM_POWER_CONTROL.hostname', 'True'}" Binding="{Binding Hostname}" IsReadOnly="True" SortMemberPath="HostName"
+                                                    HeaderStyle="{StaticResource Es}" CanUserReorder="True" CanUserResize="True" CanUserSort="True"
+                                                    ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
 
-                            <DataGridTextColumn Header="{l:Ui 'SYSTEM_POWER_CONTROL.ipAddress', 'True'}" Binding="{Binding IpAddressString}" IsReadOnly="True" SortMemberPath="IpAddressString"
-                                                HeaderStyle="{StaticResource Es}" CanUserReorder="True" CanUserResize="True" CanUserSort="True"
-                                                ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
+                                <DataGridTextColumn Header="{l:Ui 'SYSTEM_POWER_CONTROL.ipAddress', 'True'}" Binding="{Binding IpAddressString}" IsReadOnly="True" SortMemberPath="IpAddressString"
+                                                    HeaderStyle="{StaticResource Es}" CanUserReorder="True" CanUserResize="True" CanUserSort="True"
+                                                    ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
 
-                            <DataGridCheckBoxColumn Header="{l:Ui 'SYSTEM_POWER_CONTROL.useInverter', 'True'}" Binding="{Binding UseDevice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" x:Name="CheckBoxColumn"
-                                                    ElementStyle="{StaticResource CheckBoxStyle}" IsReadOnly="True"
-                                                    SortMemberPath="UseDevice" HeaderStyle="{StaticResource Es}" CanUserReorder="True" CanUserResize="True" CanUserSort="True">
-                            </DataGridCheckBoxColumn>
+                                <DataGridCheckBoxColumn Header="{l:Ui 'SYSTEM_POWER_CONTROL.useInverter', 'True'}" Binding="{Binding UseDevice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" x:Name="CheckBoxColumn"
+                                                        ElementStyle="{StaticResource CheckBoxStyle}" IsReadOnly="True"
+                                                        SortMemberPath="UseDevice" HeaderStyle="{StaticResource Es}" CanUserReorder="True" CanUserResize="True" CanUserSort="True" />
 
-                        </DataGrid.Columns>
+                            </DataGrid.Columns>
 
-                    </DataGrid>
+                        </DataGrid>
                     </StackPanel>
                 </Grid>
             </GroupBox>

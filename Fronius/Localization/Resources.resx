@@ -1389,4 +1389,10 @@
   <data name="NewInverter" xml:space="preserve">
 	  <value>New inverter</value>
   </data>
+  <data name="Refresh" xml:space="preserve">
+	  <value>Refresh</value>
+  </data>
+  <data name="InvalidInverterName" xml:space="preserve">
+	  <value>Inverter name must be between 1 and 30 characters.</value>
+  </data>
 </root>

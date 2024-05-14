@@ -1834,6 +1834,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Inverter name must be between 1 and 30 characters..
+        /// </summary>
+        public static string InvalidInverterName {
+            get {
+                return ResourceManager.GetString("InvalidInverterName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid parameters.
         /// </summary>
         public static string InvalidParameters {
@@ -3063,6 +3072,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Rectifier {
             get {
                 return ResourceManager.GetString("Rectifier", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Refresh.
+        /// </summary>
+        public static string Refresh {
+            get {
+                return ResourceManager.GetString("Refresh", resourceCulture);
             }
         }
         

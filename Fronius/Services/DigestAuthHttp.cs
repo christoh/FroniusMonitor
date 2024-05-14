@@ -129,7 +129,7 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
 
             Task<string?> GetAuthHeaderToken(string varName) => Task.Run(() =>
             {
-                var regex = new Regex($@"{varName}=(""([^""]*)""|([^,]*))");
+                var regex = new Regex($"{varName}=(\"([^\"]*)\"|([^,]*))");
                 var matchHeader = regex.Match(wwwAuthenticateHeader);
                 return !matchHeader.Success ? null : matchHeader.Groups.OfType<Group>().Last(group => group.Length > 0).Value;
             }, token);
