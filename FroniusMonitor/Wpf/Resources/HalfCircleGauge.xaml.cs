@@ -143,8 +143,8 @@ public partial class HalfCircleGauge
             ? null
             : new DoubleAnimation(double.IsFinite(relativeValue) ? relativeValue : 0, gauge.AnimationDuration)
             {
-                AccelerationRatio = .33,
-                DecelerationRatio = .33,
+                AccelerationRatio = .1,
+                DecelerationRatio = .1,
             };
 
         gauge.BeginAnimation(AnimatedValueProperty, animation);

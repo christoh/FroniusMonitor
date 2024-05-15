@@ -150,8 +150,8 @@ public partial class LinearGauge
 
         var animation = new DoubleAnimation(relativeValue, gauge.AnimationDuration)
         {
-            AccelerationRatio = .33,
-            DecelerationRatio = .33,
+            AccelerationRatio = .1,
+            DecelerationRatio = .1,
         };
 
         gauge.BeginAnimation(LinearAnimatedValueProperty, animation);

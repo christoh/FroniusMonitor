@@ -64,7 +64,7 @@ public class Gauge : ProgressBar
     public static readonly DependencyProperty AnimationDurationProperty = DependencyProperty.Register
     (
         nameof(AnimationDuration), typeof(TimeSpan), typeof(Gauge),
-        new PropertyMetadata(TimeSpan.FromSeconds(.5))
+        new PropertyMetadata(TimeSpan.FromSeconds(1))
     );
 
     public TimeSpan AnimationDuration
