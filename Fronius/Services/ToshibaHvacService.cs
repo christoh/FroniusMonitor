@@ -196,7 +196,7 @@ public class ToshibaHvacService(SynchronizationContext context) : BindableBase, 
         try
         {
             var command = JsonSerializer.Deserialize<ToshibaHvacAzureSmMobileCommand>(request.Data, jsonOptions)!;
-            var device = AllDevices!.SelectMany(d => d.Devices).First(d => d.DeviceUniqueId.ToString("D") == command.DeviceUniqueId.ToLowerInvariant());
+            var device = AllDevices!.SelectMany(d => d.Devices).First(d => string.Equals(d.DeviceUniqueId.ToString("D"), command.DeviceUniqueId, StringComparison.InvariantCultureIgnoreCase));
 
             switch (command.CommandName)
             {

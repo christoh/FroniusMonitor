@@ -12,6 +12,8 @@ public partial class WattPilotDetailsView
         this.wattPilotService = wattPilotService;
     }
 
+    protected override ScaleTransform Scaler => WrapPanelScaler;
+
     private void OnSettingsClicked(object sender, RoutedEventArgs e)
     {
         IoC.TryGetRegistered<MainWindow>()?.GetView<WattPilotSettingsView>().Focus();

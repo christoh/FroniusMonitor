@@ -7,6 +7,8 @@ public partial class MainWindow
     private static readonly DoubleAnimation scaleAnimation = new() { Duration = TimeSpan.FromMilliseconds(200) };
     private static readonly DoubleAnimation rotateAnimation = new() { Duration = TimeSpan.FromMilliseconds(200) };
 
+    private readonly HashSet<Window> controlledWindows = [];
+
     public static readonly DependencyProperty PowerFlowProperty = DependencyProperty.Register
     (
         nameof(PowerFlow), typeof(Gen24PowerFlow), typeof(MainWindow),
@@ -68,7 +70,11 @@ public partial class MainWindow
                 Settings.Save();
             }
         };
+
+        Closed += (_, _) => controlledWindows.ToArray().Apply(w => w.Close());
     }
+
+    protected override ScaleTransform Scaler => ConsumerScaler;
 
     private void OnControllerGridRowHeightChanged(object sender, SizeChangedEventArgs e)
     {
@@ -83,7 +89,7 @@ public partial class MainWindow
 
     public T GetView<T>(IServiceProvider? container = null) where T : Window
     {
-        var view = OwnedWindows.OfType<T>().SingleOrDefault
+        var view = controlledWindows.OfType<T>().SingleOrDefault
         (
             w => container == null ||
                  w is not IInverterScoped scoped ||
@@ -93,79 +99,19 @@ public partial class MainWindow
         if (view == null)
         {
             view = (container ?? IoC.Injector!).GetRequiredService<T>();
-            view.Owner = this;
+            view.Closed += (_, _) => controlledWindows.Remove(view);
+            controlledWindows.Add(view);
         }
 
         view.Show();
+
+        if (view.WindowState == WindowState.Minimized)
+        {
+            view.WindowState= WindowState.Normal;
+        }
+
         return view ?? throw new NullReferenceException("No view");
     }
-
-    private void ZoomIn()
-    {
-        ConsumerScaler.ScaleX *= App.ZoomFactor;
-        ConsumerScaler.ScaleY = ConsumerScaler.ScaleX;
-    }
-
-    private void ZoomOut()
-    {
-        ConsumerScaler.ScaleX /= App.ZoomFactor;
-        ConsumerScaler.ScaleY = ConsumerScaler.ScaleX;
-    }
-
-    private void Zoom0()
-    {
-        ConsumerScaler.ScaleX = ConsumerScaler.ScaleY = 1;
-    }
-
-
-    protected override void OnPreviewMouseWheel(MouseWheelEventArgs e)
-    {
-        if (e.Handled || Keyboard.IsKeyUp(Key.LeftCtrl) && Keyboard.IsKeyUp(Key.RightCtrl))
-        {
-            return;
-        }
-
-        e.Handled = true;
-
-        if (e.Delta > 0)
-        {
-            ZoomIn();
-        }
-        else
-        {
-            ZoomOut();
-        }
-    }
-
-    protected override void OnPreviewKeyDown(KeyEventArgs e)
-    {
-        if (e.Handled || Keyboard.IsKeyUp(Key.LeftCtrl) && Keyboard.IsKeyUp(Key.RightCtrl)) return;
-
-        e.Handled = true;
-
-        switch (e.Key)
-        {
-            case Key.Add:
-            case Key.OemPlus:
-                ZoomIn();
-                break;
-
-            case Key.Subtract:
-            case Key.OemMinus:
-                ZoomOut();
-                break;
-
-            case Key.NumPad0:
-            case Key.D0:
-                Zoom0();
-                break;
-
-            default:
-                e.Handled = false;
-                break;
-        }
-    }
-
 
     private void OnPowerFlowChanged()
     {

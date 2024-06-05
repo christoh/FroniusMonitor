@@ -17,6 +17,8 @@ public partial class BatteryDetailsView
         OnNewDataReceived();
     }
 
+    protected override ScaleTransform Scaler => WrapPanelScaler;
+
     private void OnNewDataReceived(object? _ = null, SolarDataEventArgs? __ = null)
     {
         viewModel.OnNewDataReceived(dataCollectionService.HomeAutomationSystem);

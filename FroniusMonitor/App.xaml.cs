@@ -5,7 +5,6 @@ namespace De.Hochstaetter.FroniusMonitor;
 
 public partial class App
 {
-    public const double ZoomFactor = 1.025;
     private static readonly Mutex mutex = new(true, $"{Environment.UserName}_HomeAutomationControlCenter");
     public static bool HaveSettings { get; set; } = true;
     public static readonly IServiceCollection ServiceCollection = new ServiceCollection();

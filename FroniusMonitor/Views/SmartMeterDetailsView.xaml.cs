@@ -27,6 +27,8 @@ public partial class SmartMeterDetailsView
 
     private SmartMeterDetailsViewModel ViewModel { get; }
 
+    protected override ScaleTransform Scaler => WrapPanelScaler;
+
     private void OnNewDataReceived(object? o, SolarDataEventArgs e)
     {
         if (e.HomeAutomationSystem != null)
