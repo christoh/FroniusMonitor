@@ -1125,7 +1125,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
 
     private bool? allowChargingFromBattery;
 
-    [WattPilot("pdte")]
+    [WattPilot("pdte", false)]
     public bool? AllowChargingFromBattery
     {
         get => allowChargingFromBattery;
@@ -1134,7 +1134,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
 
     private byte? pvSurplusBatteryLevelStopCharge;
 
-    [WattPilot("pdt")]
+    [WattPilot("pdt", false)]
     public byte? PvSurplusBatteryLevelStopCharge
     {
         get => pvSurplusBatteryLevelStopCharge;
@@ -1142,7 +1142,8 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private bool? restrictChargingFromBattery;
-    [WattPilot("pdle")]
+
+    [WattPilot("pdle", false)]
     public bool? RestrictChargingFromBattery
     {
         get => restrictChargingFromBattery;
@@ -1150,7 +1151,8 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private int allowChargingFromBatteryStartSeconds;
-    [WattPilot("pdls")]
+
+    [WattPilot("pdls", false)]
     public int AllowChargingFromBatteryStartSeconds
     {
         get => allowChargingFromBatteryStartSeconds;
@@ -1158,11 +1160,36 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private int allowChargingFromBatteryStopSeconds;
-    [WattPilot("pdlo")]
+
+    [WattPilot("pdlo", false)]
     public int AllowChargingFromBatteryStopSeconds
     {
         get => allowChargingFromBatteryStopSeconds;
         set => Set(ref allowChargingFromBatteryStopSeconds, value, () => NotifyOfPropertyChange(nameof(AllowChargingFromBatteryStop)));
+    }
+
+    private bool enableBatteryBoost;
+    [WattPilot("ebe", false)]
+    public bool EnableBatteryBoost
+    {
+        get => enableBatteryBoost;
+        set => Set(ref enableBatteryBoost, value);
+    }
+
+    private bool enableSingleTimeBoost;
+    [WattPilot("ebo", false)]
+    public bool EnableSingleTimeBoost
+    {
+        get => enableSingleTimeBoost;
+        set => Set(ref enableSingleTimeBoost, value);
+    }
+
+    private byte minimumSocInBoost;
+    [WattPilot("ebt", false)]
+    public byte MinimumSocInBoost
+    {
+        get => minimumSocInBoost;
+        set => Set(ref minimumSocInBoost, value);
     }
 
     public DateTime AllowChargingFromBatteryStop
@@ -1286,6 +1313,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private int? randomDelayPowerFailure;
+
     [WattPilot("rdre", false)]
     public int? RandomDelayPowerFailure
     {
@@ -1294,6 +1322,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private int? randomDelayAwattarStart;
+
     [WattPilot("rdbf", false)]
     public int? RandomDelayAwattarStart
     {
@@ -1302,6 +1331,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private int? randomDelayAwattarStop;
+
     [WattPilot("rdef", false)]
     public int? RandomDelayAwattarStop
     {
@@ -1310,6 +1340,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private int? randomDelayTimerStart;
+
     [WattPilot("rdbs, false")]
     public int? RandomDelayTimerStart
     {
@@ -1318,6 +1349,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private int? randomDelayTimerStop;
+
     [WattPilot("rdes, false")]
     public int? RandomDelayTimerStop
     {

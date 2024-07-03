@@ -169,6 +169,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Allow charging from battery.
+        /// </summary>
+        public static string AllowChargingFromBattery {
+            get {
+                return ResourceManager.GetString("AllowChargingFromBattery", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Allow charging pause.
         /// </summary>
         public static string AllowChargingPause {
@@ -2347,7 +2356,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Charging (Battery).
         /// </summary>
         public static string ModelStatus_ChargingBecauseEnoughBattery {
             get {
@@ -3022,11 +3031,20 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Minimum SoC PV battery.
+        ///   Looks up a localized string similar to Minimum SoC for charging with PV surplus.
         /// </summary>
         public static string PvSurplusBatteryLevel {
             get {
                 return ResourceManager.GetString("PvSurplusBatteryLevel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Minimum SoC for charging from battery.
+        /// </summary>
+        public static string PvSurplusBatteryLevelStopCharge {
+            get {
+                return ResourceManager.GetString("PvSurplusBatteryLevelStopCharge", resourceCulture);
             }
         }
         

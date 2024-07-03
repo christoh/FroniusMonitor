@@ -619,7 +619,7 @@
 	  <value>Maximaler Netto-Strompreis</value>
   </data>
   <data name="PvSurplusBatteryLevel" xml:space="preserve">
-	  <value>Minimaler SoC PV-Batterie</value>
+	  <value>Minimaler SoC um mit PV-Überschuss zu laden</value>
   </data>
   <data name="OhmPilotTemperatureLimit" xml:space="preserve">
 	  <value>Minimale Ohmpilot-Temperatur</value>
@@ -1337,5 +1337,11 @@
   </data>
   <data name="ModelStatus_ChargingBecauseEnoughBattery" xml:space="preserve">
 	  <value>Laden (Akku)</value>
+  </data>
+  <data name="AllowChargingFromBattery" xml:space="preserve">
+	  <value>Laden aus der Batterie erlauben</value>
+  </data>
+  <data name="PvSurplusBatteryLevelStopCharge" xml:space="preserve">
+	  <value>Minimaler SoC um aus Batterie zu laden</value>
   </data>
 </root>

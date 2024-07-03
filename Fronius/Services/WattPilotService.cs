@@ -7,7 +7,6 @@ public class WattPilotService : BindableBase, IWattPilotService
     private uint requestId;
     private CancellationTokenSource? tokenSource;
     private ClientWebSocket? clientWebSocket;
-    private static readonly Random random = new(unchecked((int)DateTime.UtcNow.Ticks));
     private Thread? readThread;
     private readonly List<WattPilotAcknowledge> outstandingAcknowledges = [];
     private readonly byte[] buffer = new byte[8192];
@@ -258,9 +257,8 @@ public class WattPilotService : BindableBase, IWattPilotService
     {
         var token1 = token["token1"]?.Value<string>();
         var token2 = token["token2"]?.Value<string>();
-        var token3Bytes = new byte[16];
+        var token3Bytes = RandomNumberGenerator.GetBytes(16);
 
-        random.NextBytes(token3Bytes);
         var token3 = string.Join(string.Empty, token3Bytes.Select(b => b.ToString("x2")));
 
         var localHashedPassword = await GetHashedPassword().ConfigureAwait(false);
