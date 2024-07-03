@@ -1111,16 +1111,70 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         private set => Set(ref latency, value);
     }
 
-    private int? pvSurplusBatteryLevel;
+    private int? pvSurplusBatteryLevelStartCharge;
 
     /// <summary>
     ///     Used to tune PV surplus charging. See also <see cref="OhmPilotTemperatureLimitCelsius" />
     /// </summary>
     [WattPilot("fam", false)]
-    public int? PvSurplusBatteryLevel
+    public int? PvSurplusBatteryLevelStartCharge
     {
-        get => pvSurplusBatteryLevel;
-        set => Set(ref pvSurplusBatteryLevel, value);
+        get => pvSurplusBatteryLevelStartCharge;
+        set => Set(ref pvSurplusBatteryLevelStartCharge, value);
+    }
+
+    private bool? allowChargingFromBattery;
+
+    [WattPilot("pdte")]
+    public bool? AllowChargingFromBattery
+    {
+        get => allowChargingFromBattery;
+        set => Set(ref allowChargingFromBattery, value);
+    }
+
+    private byte? pvSurplusBatteryLevelStopCharge;
+
+    [WattPilot("pdt")]
+    public byte? PvSurplusBatteryLevelStopCharge
+    {
+        get => pvSurplusBatteryLevelStopCharge;
+        set => Set(ref pvSurplusBatteryLevelStopCharge, value);
+    }
+
+    private bool? restrictChargingFromBattery;
+    [WattPilot("pdle")]
+    public bool? RestrictChargingFromBattery
+    {
+        get => restrictChargingFromBattery;
+        set => Set(ref restrictChargingFromBattery, value);
+    }
+
+    private int allowChargingFromBatteryStartSeconds;
+    [WattPilot("pdls")]
+    public int AllowChargingFromBatteryStartSeconds
+    {
+        get => allowChargingFromBatteryStartSeconds;
+        set => Set(ref allowChargingFromBatteryStartSeconds, value, () => NotifyOfPropertyChange(nameof(AllowChargingFromBatteryStart)));
+    }
+
+    private int allowChargingFromBatteryStopSeconds;
+    [WattPilot("pdlo")]
+    public int AllowChargingFromBatteryStopSeconds
+    {
+        get => allowChargingFromBatteryStopSeconds;
+        set => Set(ref allowChargingFromBatteryStopSeconds, value, () => NotifyOfPropertyChange(nameof(AllowChargingFromBatteryStop)));
+    }
+
+    public DateTime AllowChargingFromBatteryStop
+    {
+        get => new DateTime(1, 1, 1, 0, 0, 0, DateTimeKind.Local).AddSeconds(AllowChargingFromBatteryStopSeconds);
+        set => AllowChargingFromBatteryStopSeconds = (int)Math.Round(value.TimeOfDay.TotalSeconds, MidpointRounding.AwayFromZero);
+    }
+
+    public DateTime AllowChargingFromBatteryStart
+    {
+        get => new DateTime(1, 1, 1, 0, 0, 0, DateTimeKind.Local).AddSeconds(AllowChargingFromBatteryStartSeconds);
+        set => AllowChargingFromBatteryStartSeconds = (int)Math.Round(value.TimeOfDay.TotalSeconds, MidpointRounding.AwayFromZero);
     }
 
     private bool? reboot;
@@ -1135,7 +1189,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     private int? ohmPilotTemperatureLimitCelsius;
 
     /// <summary>
-    ///     Used to tune PV surplus charging. See also <see cref="PvSurplusBatteryLevel" />
+    ///     Used to tune PV surplus charging. See also <see cref="PvSurplusBatteryLevelStartCharge" />
     /// </summary>
     [WattPilot("fot", false)]
     public int? OhmPilotTemperatureLimitCelsius

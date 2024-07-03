@@ -271,7 +271,7 @@
     <value>End</value>
   </data>
   <data name="Name" xml:space="preserve">
-    <value>Name</value>
+    <value>RestrictChargingFromBattery</value>
   </data>
   <data name="Severity" xml:space="preserve">
     <value>Severity</value>
@@ -928,7 +928,7 @@
 	  <value>Change</value>
   </data>
   <data name="SelectDriftsFile" xml:space="preserve">
-	  <value>Select Location and Name of the drifts file</value>
+	  <value>Select Location and RestrictChargingFromBattery of the drifts file</value>
   </data>
   <data name="OpTime" xml:space="preserve">
 	  <value>Op times</value>
@@ -1394,5 +1394,8 @@
   </data>
   <data name="InvalidInverterName" xml:space="preserve">
 	  <value>Inverter name must be between 1 and 30 characters.</value>
+  </data>
+  <data name="ModelStatus_ChargingBecauseEnoughBattery" xml:space="preserve">
+	  <value>Charging (Battery)</value>
   </data>
 </root>

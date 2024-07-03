@@ -265,7 +265,7 @@
 	  <value>Ende</value>
   </data>
   <data name="Name" xml:space="preserve">
-	  <value>Name</value>
+	  <value>RestrictChargingFromBattery</value>
   </data>
   <data name="Severity" xml:space="preserve">
 	  <value>Schwere</value>
@@ -556,7 +556,7 @@
 	  <value>Allgemein</value>
   </data>
   <data name="WattPilotName" xml:space="preserve">
-	  <value>Name des Wattpiloten</value>
+	  <value>RestrictChargingFromBattery des Wattpiloten</value>
   </data>
   <data name="MaximumChargingCurrent" xml:space="preserve">
 	  <value>Gewünschter Ladestrom</value>
@@ -760,7 +760,7 @@
 	  <value>Nullleiter</value>
   </data>
   <data name="WifiSsid" xml:space="preserve">
-	  <value>WLAN-Name</value>
+	  <value>WLAN-RestrictChargingFromBattery</value>
   </data>
   <data name="WattPilotWifiPassword" xml:space="preserve">
 	  <value>WLAN-Kennwort</value>
@@ -1334,5 +1334,8 @@
   </data>
   <data name="InvalidInverterName" xml:space="preserve">
 	  <value>Der Wechselrichtername muss zwischen 1 und 30 Zeichen beinhalten.</value>
+  </data>
+  <data name="ModelStatus_ChargingBecauseEnoughBattery" xml:space="preserve">
+	  <value>Laden (Akku)</value>
   </data>
 </root>

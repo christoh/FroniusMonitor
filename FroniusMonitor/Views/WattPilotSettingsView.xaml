@@ -249,10 +249,10 @@
                                 <Run Text="{x:Static p:Resources.PvSurplusBatteryLevel}" /><Run Text=":" />
                             </TextBlock>
                             <TextBox MinHeight="0" TextAlignment="Center" Width="40"
-                                     Text="{co:ValidationBinding WattPilot.PvSurplusBatteryLevel, Rule={v:MinMaxIntRule Minimum=0, Maximum=100, PropertyDisplayName={x:Static p:Resources.PvSurplusBatteryLevel}}}" />
+                                     Text="{co:ValidationBinding WattPilot.PvSurplusBatteryLevelStartCharge, Rule={v:MinMaxIntRule Minimum=0, Maximum=100, PropertyDisplayName={x:Static p:Resources.PvSurplusBatteryLevel}}}" />
                             <TextBlock Margin="4,0,0,0" Text="%" />
                         </StackPanel>
-                        <Slider Value="{Binding WattPilot.PvSurplusBatteryLevel, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="0" Maximum="100"
+                        <Slider Value="{Binding WattPilot.PvSurplusBatteryLevelStartCharge, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="0" Maximum="100"
                                 Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}" />
 
                         <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center" Visibility="{Binding WattPilot.PvSurplusEnabled, Converter={co:Bool2Visibility}}">

@@ -27,7 +27,8 @@ public enum ModelStatus
     ChargingBecauseChargePauseNotAllowed = 20,
     NotChargingBecauseSimulateUnplugging = 22,
     NotChargingBecausePhaseSwitch = 23,
-    NotChargingBecauseMinPauseDuration = 24
+    NotChargingBecauseMinPauseDuration = 24,
+    ChargingBecauseEnoughBattery = 33,
 }
 
 public enum WifiScanStatus

@@ -2347,6 +2347,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        public static string ModelStatus_ChargingBecauseEnoughBattery {
+            get {
+                return ResourceManager.GetString("ModelStatus_ChargingBecauseEnoughBattery", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Charging (full power).
         /// </summary>
         public static string ModelStatus_ChargingBecauseFallbackDefault {
@@ -2554,7 +2563,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Name.
+        ///   Looks up a localized string similar to RestrictChargingFromBattery.
         /// </summary>
         public static string Name {
             get {
@@ -3211,7 +3220,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Select Location and Name of the drifts file.
+        ///   Looks up a localized string similar to Select Location and RestrictChargingFromBattery of the drifts file.
         /// </summary>
         public static string SelectDriftsFile {
             get {
