@@ -271,7 +271,7 @@
     <value>End</value>
   </data>
   <data name="Name" xml:space="preserve">
-    <value>RestrictChargingFromBattery</value>
+	  <value>Name</value>
   </data>
   <data name="Severity" xml:space="preserve">
     <value>Severity</value>
@@ -928,7 +928,7 @@
 	  <value>Change</value>
   </data>
   <data name="SelectDriftsFile" xml:space="preserve">
-	  <value>Select Location and RestrictChargingFromBattery of the drifts file</value>
+	  <value>Select location and name of the drifts file</value>
   </data>
   <data name="OpTime" xml:space="preserve">
 	  <value>Op times</value>
@@ -1399,9 +1399,15 @@
 	  <value>Charging (Battery)</value>
   </data>
   <data name="AllowChargingFromBattery" xml:space="preserve">
-	  <value>Allow charging from battery</value>
+	  <value>Allow charging from home battery</value>
   </data>
   <data name="PvSurplusBatteryLevelStopCharge" xml:space="preserve">
-	  <value>Minimum SoC for charging from battery</value>
+	  <value>Minimum SoC for charging from home battery</value>
+  </data>
+  <data name="FromBatteryOnlyFrom" xml:space="preserve">
+	  <value>From battery only from</value>
+  </data>
+  <data name="To" xml:space="preserve">
+	  <value>to</value>
   </data>
 </root>

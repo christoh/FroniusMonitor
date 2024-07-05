@@ -1129,8 +1129,10 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     public bool? AllowChargingFromBattery
     {
         get => allowChargingFromBattery;
-        set => Set(ref allowChargingFromBattery, value);
+        set => Set(ref allowChargingFromBattery, value, () => NotifyOfPropertyChange(nameof(CanModifyChargingFromBatteryOptions)));
     }
+
+    public bool CanModifyChargingFromBatteryOptions => AllowChargingFromBattery.HasValue && AllowChargingFromBattery.Value && PvSurplusEnabled.HasValue && PvSurplusEnabled.Value;
 
     private byte? pvSurplusBatteryLevelStopCharge;
 
@@ -1156,7 +1158,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     public int AllowChargingFromBatteryStartSeconds
     {
         get => allowChargingFromBatteryStartSeconds;
-        set => Set(ref allowChargingFromBatteryStartSeconds, value, () => NotifyOfPropertyChange(nameof(AllowChargingFromBatteryStart)));
+        set => Set(ref allowChargingFromBatteryStartSeconds, value, () => NotifyOfPropertyChange(nameof(AllowChargingFromBatteryStartString)));
     }
 
     private int allowChargingFromBatteryStopSeconds;
@@ -1165,10 +1167,33 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     public int AllowChargingFromBatteryStopSeconds
     {
         get => allowChargingFromBatteryStopSeconds;
-        set => Set(ref allowChargingFromBatteryStopSeconds, value, () => NotifyOfPropertyChange(nameof(AllowChargingFromBatteryStop)));
+        set => Set(ref allowChargingFromBatteryStopSeconds, value, () => NotifyOfPropertyChange(nameof(AllowChargingFromBatteryStopString)));
+    }
+    
+    
+    public string AllowChargingFromBatteryStartString
+    {
+        get => $"{AllowChargingFromBatteryStartSeconds / 3600:D2}:{AllowChargingFromBatteryStartSeconds%3600/60:D2}";
+        set 
+        {
+            var split = value.Split(':');
+            AllowChargingFromBatteryStartSeconds = int.Parse(split[0]) * 3600 + int.Parse(split[1])*60;
+        }
     }
 
+    public string AllowChargingFromBatteryStopString
+    {
+        get => $"{AllowChargingFromBatteryStopSeconds / 3600:D2}:{AllowChargingFromBatteryStopSeconds%3600/60:D2}";
+        set 
+        {
+            var split = value.Split(':');
+            AllowChargingFromBatteryStopSeconds = int.Parse(split[0]) * 3600 + int.Parse(split[1])*60;
+        }
+    }
+
+
     private bool enableBatteryBoost;
+
     [WattPilot("ebe", false)]
     public bool EnableBatteryBoost
     {
@@ -1177,6 +1202,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private bool enableSingleTimeBoost;
+
     [WattPilot("ebo", false)]
     public bool EnableSingleTimeBoost
     {
@@ -1185,23 +1211,12 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private byte minimumSocInBoost;
+
     [WattPilot("ebt", false)]
     public byte MinimumSocInBoost
     {
         get => minimumSocInBoost;
         set => Set(ref minimumSocInBoost, value);
-    }
-
-    public DateTime AllowChargingFromBatteryStop
-    {
-        get => new DateTime(1, 1, 1, 0, 0, 0, DateTimeKind.Local).AddSeconds(AllowChargingFromBatteryStopSeconds);
-        set => AllowChargingFromBatteryStopSeconds = (int)Math.Round(value.TimeOfDay.TotalSeconds, MidpointRounding.AwayFromZero);
-    }
-
-    public DateTime AllowChargingFromBatteryStart
-    {
-        get => new DateTime(1, 1, 1, 0, 0, 0, DateTimeKind.Local).AddSeconds(AllowChargingFromBatteryStartSeconds);
-        set => AllowChargingFromBatteryStartSeconds = (int)Math.Round(value.TimeOfDay.TotalSeconds, MidpointRounding.AwayFromZero);
     }
 
     private bool? reboot;
@@ -1237,7 +1252,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     public bool? PvSurplusEnabled
     {
         get => pvSurplusEnabled;
-        set => Set(ref pvSurplusEnabled, value);
+        set => Set(ref pvSurplusEnabled, value, () => NotifyOfPropertyChange(nameof(CanModifyChargingFromBatteryOptions)));
     }
 
     private WattPilotWifiInfo? currentWifi;

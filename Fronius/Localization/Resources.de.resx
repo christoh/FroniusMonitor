@@ -264,9 +264,6 @@
   <data name="End" xml:space="preserve">
 	  <value>Ende</value>
   </data>
-  <data name="Name" xml:space="preserve">
-	  <value>RestrictChargingFromBattery</value>
-  </data>
   <data name="Severity" xml:space="preserve">
 	  <value>Schwere</value>
   </data>
@@ -556,7 +553,7 @@
 	  <value>Allgemein</value>
   </data>
   <data name="WattPilotName" xml:space="preserve">
-	  <value>RestrictChargingFromBattery des Wattpiloten</value>
+	  <value>Name des Wattpiloten</value>
   </data>
   <data name="MaximumChargingCurrent" xml:space="preserve">
 	  <value>Gewünschter Ladestrom</value>
@@ -760,7 +757,7 @@
 	  <value>Nullleiter</value>
   </data>
   <data name="WifiSsid" xml:space="preserve">
-	  <value>WLAN-RestrictChargingFromBattery</value>
+	  <value>WLAN-Name</value>
   </data>
   <data name="WattPilotWifiPassword" xml:space="preserve">
 	  <value>WLAN-Kennwort</value>
@@ -1339,9 +1336,15 @@
 	  <value>Laden (Akku)</value>
   </data>
   <data name="AllowChargingFromBattery" xml:space="preserve">
-	  <value>Laden aus der Batterie erlauben</value>
+	  <value>Laden aus dem Hausakku erlauben</value>
   </data>
   <data name="PvSurplusBatteryLevelStopCharge" xml:space="preserve">
-	  <value>Minimaler SoC um aus Batterie zu laden</value>
+	  <value>Minimaler SoC um aus dem Hausakku zu laden</value>
+  </data>
+  <data name="FromBatteryOnlyFrom" xml:space="preserve">
+	  <value>Aus dem Akku nur von</value>
+  </data>
+  <data name="To" xml:space="preserve">
+	  <value>bis</value>
   </data>
 </root>

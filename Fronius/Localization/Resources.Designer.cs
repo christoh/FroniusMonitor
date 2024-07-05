@@ -169,7 +169,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Allow charging from battery.
+        ///   Looks up a localized string similar to Allow charging from home battery.
         /// </summary>
         public static string AllowChargingFromBattery {
             get {
@@ -1636,6 +1636,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to From battery only from.
+        /// </summary>
+        public static string FromBatteryOnlyFrom {
+            get {
+                return ResourceManager.GetString("FromBatteryOnlyFrom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Fronius Gen24 Manager.
         /// </summary>
         public static string FroniusManager {
@@ -2572,7 +2581,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to RestrictChargingFromBattery.
+        ///   Looks up a localized string similar to Name.
         /// </summary>
         public static string Name {
             get {
@@ -3040,7 +3049,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Minimum SoC for charging from battery.
+        ///   Looks up a localized string similar to Minimum SoC for charging from home battery.
         /// </summary>
         public static string PvSurplusBatteryLevelStopCharge {
             get {
@@ -3238,7 +3247,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Select Location and RestrictChargingFromBattery of the drifts file.
+        ///   Looks up a localized string similar to Select location and name of the drifts file.
         /// </summary>
         public static string SelectDriftsFile {
             get {
@@ -3585,6 +3594,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Thursday_One {
             get {
                 return ResourceManager.GetString("Thursday_One", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to to.
+        /// </summary>
+        public static string To {
+            get {
+                return ResourceManager.GetString("To", resourceCulture);
             }
         }
         
