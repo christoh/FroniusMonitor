@@ -1347,4 +1347,13 @@
   <data name="To" xml:space="preserve">
 	  <value>bis</value>
   </data>
+  <data name="EnableOutOfBalanceControl" xml:space="preserve">
+	  <value>Schieflast begrenzen</value>
+  </data>
+  <data name="MaximumOutOfBalanceCurrent" xml:space="preserve">
+	  <value>Maximale Schieflast</value>
+  </data>
+  <data name="OpenConfigPdf" xml:space="preserve">
+	  <value>Konfigurationsdokument öffnen</value>
+  </data>
 </root>

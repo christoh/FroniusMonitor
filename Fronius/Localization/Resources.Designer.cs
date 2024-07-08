@@ -1420,6 +1420,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Limit out-of-balance current.
+        /// </summary>
+        public static string EnableOutOfBalanceControl {
+            get {
+                return ResourceManager.GetString("EnableOutOfBalanceControl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Control Toshiba A/C systems.
         /// </summary>
         public static string EnableToshibaAc {
@@ -2122,6 +2131,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Maximum out-of-balance current.
+        /// </summary>
+        public static string MaximumOutOfBalanceCurrent {
+            get {
+                return ResourceManager.GetString("MaximumOutOfBalanceCurrent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Meter address.
         /// </summary>
         public static string MeterAddress {
@@ -2820,6 +2838,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string OpenChargingLog {
             get {
                 return ResourceManager.GetString("OpenChargingLog", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open Configuration Document.
+        /// </summary>
+        public static string OpenConfigPdf {
+            get {
+                return ResourceManager.GetString("OpenConfigPdf", resourceCulture);
             }
         }
         

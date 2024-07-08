@@ -131,6 +131,9 @@
                     <CheckBox IsEnabled="{Binding EnableDanger}" IsChecked="{Binding WattPilot.LoadBalancingEnabled}">
                         <TextBlock Margin="0" Text="{x:Static p:Resources.EnableLoadBalancing}" />
                     </CheckBox>
+                    <CheckBox IsEnabled="{Binding EnableDanger}" IsChecked="{Binding WattPilot.EnableOutOfBalanceControl}">
+                        <TextBlock Margin="0" Text="{x:Static p:Resources.EnableOutOfBalanceControl}" />
+                    </CheckBox>
                     <CheckBox Content="{x:Static p:Resources.RequireRfidAuth}" IsChecked="{Binding WattPilot.AccessMode, Converter={co:AccessMode2Bool}}" />
                     <CheckBox Content="{x:Static p:Resources.AuthCurrentUser}" IsChecked="{Binding IsUserAuthenticated}" />
                     <CheckBox IsChecked="{Binding WattPilot.CloudAccessEnabled}">
@@ -156,6 +159,18 @@
                         <TextBlock Margin="4,0,0,0" Text="A" />
                     </StackPanel>
                     <Slider Value="{Binding WattPilot.MaximumChargingCurrent, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="{Binding WattPilot.MinimumChargingCurrent}" Maximum="{Binding WattPilot.AbsoluteMaximumChargingCurrent}" />
+
+                    <StackPanel IsEnabled="{Binding EnableDanger}" Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center" Visibility="{Binding WattPilot.EnableOutOfBalanceControl, Converter={co:Bool2Visibility}}">
+                        <TextBlock Margin="0,0,4,0">
+                            <Run Text="{x:Static p:Resources.MaximumOutOfBalanceCurrent}" /><Run Text=":" />
+                        </TextBlock>
+                        <TextBox MinHeight="0" TextAlignment="Center" Width="40"
+                                 Text="{co:ValidationBinding Path=WattPilot.MaximumOutOfBalanceCurrent, Rule={v:MinMaxIntRule PropertyDisplayName={x:Static p:Resources.MaximumOutOfBalanceCurrent}, Minimum=0, Maximum=64}}" />
+                        <TextBlock Margin="4,0,0,0" Text="A" />
+                    </StackPanel>
+                    <Slider IsEnabled="{Binding EnableDanger}" Value="{Binding WattPilot.MaximumOutOfBalanceCurrent, Mode=TwoWay}" HorizontalAlignment="Stretch"
+                            Minimum="6" Maximum="{Binding WattPilot.Is16AmpereVariant, Converter={co:Bool2Double Null=32, False=32, True=16}}"
+                            Visibility="{Binding WattPilot.EnableOutOfBalanceControl, Converter={co:Bool2Visibility}}"/>
 
                     <StackPanel IsEnabled="{Binding EnableDanger}" Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center">
                         <TextBlock Margin="0,0,4,0">

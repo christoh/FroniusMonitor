@@ -42,4 +42,16 @@ public partial class WattPilotDetailsView
             MessageBox.Show(Window.GetWindow(this)!, ex.Message, Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
+
+    private void OpenConfigPdfClicked(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            wattPilotService.OpenConfigPdf();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(Window.GetWindow(this)!, ex.Message, Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
 }

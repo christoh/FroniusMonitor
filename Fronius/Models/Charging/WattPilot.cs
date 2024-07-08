@@ -1300,6 +1300,30 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref loadBalancingEnabled, value);
     }
 
+    private bool? enableOutOfBalanceControl;
+    [WattPilot("ule", false)]
+    public bool? EnableOutOfBalanceControl
+    {
+        get => enableOutOfBalanceControl;
+        set => Set(ref enableOutOfBalanceControl, value);
+    }
+
+    private bool? showOutOfBalanceControlInVoltAmpere;
+    [WattPilot("ulu", false)]
+    public bool? ShowOutOfBalanceControlInVoltAmpere
+    {
+        get => showOutOfBalanceControlInVoltAmpere;
+        set => Set(ref showOutOfBalanceControlInVoltAmpere, value);
+    }
+
+    private byte? maximumOutOfBalanceCurrent;
+    [WattPilot("ula", false)]
+    public byte? MaximumOutOfBalanceCurrent
+    {
+        get => maximumOutOfBalanceCurrent;
+        set => Set(ref maximumOutOfBalanceCurrent, value);
+    }
+
     private WattPilotLoadBalancingCurrents? loadBalancingCurrents;
 
     [WattPilot("lot", false, typeof(WattPilotLoadBalancingCurrents))]

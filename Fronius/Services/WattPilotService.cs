@@ -2,7 +2,7 @@
 
 namespace De.Hochstaetter.Fronius.Services;
 
-public class WattPilotService : BindableBase, IWattPilotService
+public class WattPilotService(SettingsBase settings) : BindableBase, IWattPilotService
 {
     private uint requestId;
     private CancellationTokenSource? tokenSource;
@@ -236,9 +236,20 @@ public class WattPilotService : BindableBase, IWattPilotService
         await Stop().ConfigureAwait(false);
     }
 
+    public void OpenConfigPdf()
+    {
+        var link = $"{WattPilot?.DownloadLink?.Replace("export", "documentation")}&lang={(settings.Language??CultureInfo.CurrentUICulture.Name).Split('-')[0]}";
+        OpenLink(link);
+    }
+
     public void OpenChargingLog()
     {
         var link = WattPilot?.DownloadLink;
+        OpenLink(link);
+    }
+
+    private void OpenLink(string? link)
+    {
 
         if (WattPilot == null)
         {

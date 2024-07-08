@@ -1410,4 +1410,13 @@
   <data name="To" xml:space="preserve">
 	  <value>to</value>
   </data>
+  <data name="EnableOutOfBalanceControl" xml:space="preserve">
+	  <value>Limit out-of-balance current</value>
+  </data>
+  <data name="MaximumOutOfBalanceCurrent" xml:space="preserve">
+	  <value>Maximum out-of-balance current</value>
+  </data>
+  <data name="OpenConfigPdf" xml:space="preserve">
+	  <value>Open Configuration Document</value>
+  </data>
 </root>

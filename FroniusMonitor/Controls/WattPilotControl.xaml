@@ -24,7 +24,7 @@
                                   IsEnabled="{Binding FallbackValue=False, Converter={co:NullToBool}}"
                                   Click="OnRebootWattPilotClicked"/>
                         <MenuItem Header="{x:Static p:Resources.OpenChargingLog}" Icon="{vi:EventLogIcon}" Click="OpenChargingLogClicked" IsEnabled="{Binding DownloadLink, FallbackValue=False, Converter={co:NullToBool}}" />
-
+                        <MenuItem Header="{x:Static p:Resources.OpenConfigPdf}" Icon="{vi:PdfIcon}" Click="OpenConfigPdfClicked"  IsEnabled="{Binding DownloadLink, FallbackValue=False, Converter={co:NullToBool}}" />
                         <MenuItem Header="{x:Static p:Resources.Details}" Icon="{vi:MagnifyingGlass}" Click="OnDetailsClicked" />
                     </ContextMenu>
                 </Grid.ContextMenu>

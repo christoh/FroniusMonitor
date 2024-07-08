@@ -16,5 +16,6 @@ namespace De.Hochstaetter.Fronius.Contracts
         ValueTask<List<string>> Send(WattPilot? localWattPilot = null, WattPilot? oldWattPilot = null);
         Task RebootWattPilot();
         void OpenChargingLog();
+        void OpenConfigPdf();
     }
 }
