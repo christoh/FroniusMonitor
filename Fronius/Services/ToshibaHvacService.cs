@@ -100,8 +100,14 @@ public class ToshibaHvacService(SynchronizationContext context) : BindableBase, 
                 tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
 
                 var azureCredentials = await RefreshAll().ConfigureAwait(false);
-                var auth = AuthenticationMethodFactory.CreateAuthenticationWithToken(azureCredentials.DeviceId, azureCredentials.SasToken);
-                azureClient = DeviceClient.Create(azureCredentials.HostName, auth, azureConnection.TransportType);
+
+                var connectionString = $"HostName={azureCredentials.HostName};DeviceId={azureCredentials.DeviceId};SharedAccessKey={azureCredentials.PrimaryKey}";
+                azureClient=DeviceClient.CreateFromConnectionString(connectionString,azureConnection.TransportType);
+
+                //var auth = AuthenticationMethodFactory.CreateAuthenticationWithToken(azureCredentials.DeviceId, azureCredentials.SasToken);
+                //azureClient = DeviceClient.Create(azureCredentials.HostName, auth, azureConnection.TransportType);
+                
+                azureClient.SetRetryPolicy(new ExponentialBackoff(5,TimeSpan.FromMilliseconds(100), TimeSpan.FromSeconds(5), TimeSpan.FromMilliseconds(100.0)));
                 azureClient.SetConnectionStatusChangesHandler(OnAzureConnectionStatusChange);
                 await azureClient.OpenAsync(Token).ConfigureAwait(false);
                 await azureClient.SetMethodHandlerAsync("smmobile", HandleSmMobileMethod, null, Token).ConfigureAwait(false);
