@@ -4,7 +4,7 @@
     {
         private string name = string.Empty;
 
-        [JsonPropertyName("RestrictChargingFromBattery")]
+        [JsonPropertyName("Name")]
         public string Name
         {
             get => name;

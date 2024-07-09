@@ -35,9 +35,9 @@ public class ToshibaHvacService(SynchronizationContext context) : BindableBase, 
         jsonOptions.Converters.Add(new ToshibaHexConverter<ToshibaHvacFanSpeed>());
         jsonOptions.Converters.Add(new ToshibaHexConverter<ToshibaHvacPowerState>());
         jsonOptions.Converters.Add(new ToshibaStateDataConverter());
-        #if DEBUG
+#if DEBUG
         jsonOptions.WriteIndented = true;
-        #endif
+#endif
     }
 
     private CancellationToken Token => tokenSource?.Token ?? throw new WebException("Connection closed", WebExceptionStatus.ConnectionClosed);
@@ -105,7 +105,7 @@ public class ToshibaHvacService(SynchronizationContext context) : BindableBase, 
                 await azureClient.OpenAsync(Token).ConfigureAwait(false);
                 await azureClient.SetMethodHandlerAsync("smmobile", HandleSmMobileMethod, null, Token).ConfigureAwait(false);
 
-                #if DEBUG
+#if DEBUG
 
                 // ReSharper disable once UnusedParameter.Local
                 await azureClient.SetReceiveMessageHandlerAsync(async (message, userContext) =>
@@ -115,7 +115,7 @@ public class ToshibaHvacService(SynchronizationContext context) : BindableBase, 
 
                 await azureClient.SetMethodDefaultHandlerAsync(HandleOtherMethods, null, Token).ConfigureAwait(false);
 
-                #endif
+#endif
 
                 tokenSource?.Dispose();
                 tokenSource = new CancellationTokenSource();
@@ -144,7 +144,7 @@ public class ToshibaHvacService(SynchronizationContext context) : BindableBase, 
 
         postData = new Dictionary<string, string>
         {
-            { "DeviceID", azureDeviceId!},
+            { "DeviceID", azureConnection.UserName.ToLower()+"_"+azureDeviceId },
             { "DeviceType", "1" },
             { "Username", azureConnection.UserName},
         };
@@ -224,7 +224,7 @@ public class ToshibaHvacService(SynchronizationContext context) : BindableBase, 
         return new MethodResponse(0);
     }, Token);
 
-    #if DEBUG
+#if DEBUG
 
     private Task<MethodResponse> HandleOtherMethods(MethodRequest request, object _) => Task.Run(() =>
     {
@@ -233,7 +233,7 @@ public class ToshibaHvacService(SynchronizationContext context) : BindableBase, 
         return new MethodResponse(0);
     }, Token);
 
-    #endif
+#endif
 
     private async ValueTask<T> Deserialize<T>(string uri, IEnumerable<KeyValuePair<string, string>>? postVariables = null) where T : new()
     {
@@ -259,16 +259,16 @@ public class ToshibaHvacService(SynchronizationContext context) : BindableBase, 
 
         using var response = (await client.SendAsync(message, Token).ConfigureAwait(false)).EnsureSuccessStatusCode();
 
-        #if DEBUG // This allows you to see the raw JSON string
+#if DEBUG // This allows you to see the raw JSON string
         var jsonText = await response.Content.ReadAsStringAsync(Token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
         Debug.Print(jsonText);
         var jDocument = JsonDocument.Parse(jsonText);
         var result = jDocument.Deserialize<ToshibaHvacResponse<T>>(jsonOptions) ?? throw new InvalidDataException("No data");
 
-        #else
+#else
         var result = await response.Content.ReadFromJsonAsync<ToshibaHvacResponse<T>>(jsonOptions, Token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
 
-        #endif
+#endif
 
         if (!result.IsSuccess)
         {
