@@ -1,11 +1,11 @@
 ﻿using System.Text.Json;
 
-namespace De.Hochstaetter.Fronius.Models.JsonConverters
+namespace De.Hochstaetter.Fronius.Models.JsonConverters;
+
+internal class ToshibaStateDataConverter : JsonConverter<ToshibaHvacStateData>
 {
-    internal class ToshibaStateDataConverter : JsonConverter<ToshibaHvacStateData>
+    public override ToshibaHvacStateData? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        public override ToshibaHvacStateData? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
             var text = (reader.GetString() ?? throw new FormatException("No Json Text")).Trim();
             var result = new byte[text.Length / 2];
 
@@ -17,9 +17,8 @@ namespace De.Hochstaetter.Fronius.Models.JsonConverters
             return new ToshibaHvacStateData {StateData = result};
         }
 
-        public override void Write(Utf8JsonWriter writer, ToshibaHvacStateData value, JsonSerializerOptions options)
-        {
+    public override void Write(Utf8JsonWriter writer, ToshibaHvacStateData value, JsonSerializerOptions options)
+    {
             writer.WriteStringValue(value.ToString());
         }
-    }
 }

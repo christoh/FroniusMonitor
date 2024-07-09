@@ -1,39 +1,39 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Controls
+﻿namespace De.Hochstaetter.FroniusMonitor.Controls;
+
+public class PasswordBox : TextBox
 {
-    public class PasswordBox : TextBox
+    private bool isChangeFromInside;
+    private const char PasswordChar = '●';
+    private ButtonBase? visibilityButton;
+    private VisibilityIcon? visibilityIcon;
+    private const string VisibilityButtonName = "ShowHideButton";
+
+    public static DependencyProperty PasswordProperty = DependencyProperty.Register
+    (
+        nameof(Password), typeof(string), typeof(PasswordBox),
+        new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, (d, _) => ((PasswordBox)d).OnAnyChange())
+    );
+
+    public static DependencyProperty VisibleProperty = DependencyProperty.Register
+    (
+        nameof(Visible), typeof(bool), typeof(PasswordBox),
+        new PropertyMetadata((d, _) => ((PasswordBox)d).OnAnyChange())
+    );
+
+    public static readonly DependencyProperty ShowPasswordOnClickOnlyProperty = DependencyProperty.Register
+    (
+        nameof(ShowPasswordOnClickOnly), typeof(bool), typeof(PasswordBox),
+        new PropertyMetadata(true)
+    );
+
+    public bool ShowPasswordOnClickOnly
     {
-        private bool isChangeFromInside;
-        private const char PasswordChar = '●';
-        private ButtonBase? visibilityButton;
-        private VisibilityIcon? visibilityIcon;
-        private const string VisibilityButtonName = "ShowHideButton";
+        get => (bool)GetValue(ShowPasswordOnClickOnlyProperty);
+        set => SetValue(ShowPasswordOnClickOnlyProperty, value);
+    }
 
-        public static DependencyProperty PasswordProperty = DependencyProperty.Register
-        (
-            nameof(Password), typeof(string), typeof(PasswordBox),
-            new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, (d, _) => ((PasswordBox)d).OnAnyChange())
-        );
-
-        public static DependencyProperty VisibleProperty = DependencyProperty.Register
-        (
-            nameof(Visible), typeof(bool), typeof(PasswordBox),
-            new PropertyMetadata((d, _) => ((PasswordBox)d).OnAnyChange())
-        );
-
-        public static readonly DependencyProperty ShowPasswordOnClickOnlyProperty = DependencyProperty.Register
-        (
-            nameof(ShowPasswordOnClickOnly), typeof(bool), typeof(PasswordBox),
-            new PropertyMetadata(true)
-        );
-
-        public bool ShowPasswordOnClickOnly
-        {
-            get => (bool)GetValue(ShowPasswordOnClickOnlyProperty);
-            set => SetValue(ShowPasswordOnClickOnlyProperty, value);
-        }
-
-        public PasswordBox()
-        {
+    public PasswordBox()
+    {
             TextChanged += OnTextChanged;
             CommandBindings.Add(new CommandBinding(ApplicationCommands.Copy, DoCopy));
             CommandBindings.Add(new CommandBinding(ApplicationCommands.Cut, DoCut));
@@ -91,20 +91,20 @@
             };
         }
 
-        public string Password
-        {
-            get => (string)GetValue(PasswordProperty);
-            set => SetValue(PasswordProperty, value);
-        }
+    public string Password
+    {
+        get => (string)GetValue(PasswordProperty);
+        set => SetValue(PasswordProperty, value);
+    }
 
-        public bool Visible
-        {
-            get => (bool)GetValue(VisibleProperty);
-            set => SetValue(VisibleProperty, value);
-        }
+    public bool Visible
+    {
+        get => (bool)GetValue(VisibleProperty);
+        set => SetValue(VisibleProperty, value);
+    }
 
-        private void OnShowHideClick(object sender, RoutedEventArgs e)
-        {
+    private void OnShowHideClick(object sender, RoutedEventArgs e)
+    {
             if (!ShowPasswordOnClickOnly)
             {
                 Visible = !Visible;
@@ -112,16 +112,16 @@
             }
         }
 
-        private void OnShowHideMouseEnterOrLeave(object sender, MouseEventArgs e)
-        {
+    private void OnShowHideMouseEnterOrLeave(object sender, MouseEventArgs e)
+    {
             if (ShowPasswordOnClickOnly)
             {
                 Visible = visibilityButton is {IsMouseOver: true} && e.LeftButton == MouseButtonState.Pressed;
             }
         }
 
-        private void OnShowHideMouseUpOrDown(object sender, MouseButtonEventArgs e)
-        {
+    private void OnShowHideMouseUpOrDown(object sender, MouseButtonEventArgs e)
+    {
             if (e.ChangedButton != MouseButton.Left || e.Handled || !ShowPasswordOnClickOnly)
             {
                 return;
@@ -131,8 +131,8 @@
             e.Handled = true;
         }
 
-        private void OnAnyChange()
-        {
+    private void OnAnyChange()
+    {
             UpdateText();
 
             if (visibilityIcon != null && visibilityIcon.Visible != Visible)
@@ -141,14 +141,14 @@
             }
         }
 
-        private void DoCopy(object sender, ExecutedRoutedEventArgs e)
-        {
+    private void DoCopy(object sender, ExecutedRoutedEventArgs e)
+    {
             Clipboard.SetText(Password.Substring(SelectionStart, SelectionLength));
             e.Handled = true;
         }
 
-        private void DoCut(object sender, ExecutedRoutedEventArgs e)
-        {
+    private void DoCut(object sender, ExecutedRoutedEventArgs e)
+    {
             DoCopy(sender, e);
 
             if (IsReadOnly)
@@ -161,8 +161,8 @@
             CaretIndex = savedCaretIndex;
         }
 
-        private void DoPaste(object sender, ExecutedRoutedEventArgs e)
-        {
+    private void DoPaste(object sender, ExecutedRoutedEventArgs e)
+    {
             if (IsReadOnly)
             {
                 return;
@@ -175,8 +175,8 @@
             e.Handled = true;
         }
 
-        private void OnTextChanged(object sender, TextChangedEventArgs e)
-        {
+    private void OnTextChanged(object sender, TextChangedEventArgs e)
+    {
             if (isChangeFromInside)
             {
                 return;
@@ -212,8 +212,8 @@
             CaretIndex = savedCaretIndex;
         }
 
-        private void UpdateText()
-        {
+    private void UpdateText()
+    {
             isChangeFromInside = true;
 
             try
@@ -225,5 +225,4 @@
                 isChangeFromInside = false;
             }
         }
-    }
 }

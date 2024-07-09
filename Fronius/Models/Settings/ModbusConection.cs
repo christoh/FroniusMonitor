@@ -1,47 +1,47 @@
-﻿namespace De.Hochstaetter.Fronius.Models.Settings
+﻿namespace De.Hochstaetter.Fronius.Models.Settings;
+
+[SuppressMessage("ReSharper", "CommentTypo")]
+public partial class ModbusConnection : BindableBase, IHaveDisplayName
 {
-    [SuppressMessage("ReSharper", "CommentTypo")]
-    public partial class ModbusConnection : BindableBase, IHaveDisplayName
+    // TODO: No full syntax checking. Only suitable for splitting. Also ::ffff:1.2.3.4 and fe80::1234%eth0 is not supported.
+    [GeneratedRegex(@"^\[?(?<HostName>[\-0-9A-Za-z._]+|[0-9a-fA-F:]+)\]?(:(?<Port>[0-9]+))?\/(?<ModbusAddress>[0-9]+)$", RegexOptions.Compiled | RegexOptions.CultureInvariant)]
+    private static partial Regex ParserRegex();
+
+    private string hostName = "192.168.178.xxx";
+
+    [XmlAttribute]
+    public string HostName
     {
-        // TODO: No full syntax checking. Only suitable for splitting. Also ::ffff:1.2.3.4 and fe80::1234%eth0 is not supported.
-        [GeneratedRegex(@"^\[?(?<HostName>[\-0-9A-Za-z._]+|[0-9a-fA-F:]+)\]?(:(?<Port>[0-9]+))?\/(?<ModbusAddress>[0-9]+)$", RegexOptions.Compiled | RegexOptions.CultureInvariant)]
-        private static partial Regex ParserRegex();
+        get => hostName;
+        set => Set(ref hostName, value);
+    }
 
-        private string hostName = "192.168.178.xxx";
+    private ushort port = 502;
 
-        [XmlAttribute]
-        public string HostName
-        {
-            get => hostName;
-            set => Set(ref hostName, value);
-        }
+    [XmlAttribute]
+    public ushort Port
+    {
+        get => port;
+        set => Set(ref port, value);
+    }
 
-        private ushort port = 502;
+    private byte modbusAddress;
 
-        [XmlAttribute]
-        public ushort Port
-        {
-            get => port;
-            set => Set(ref port, value);
-        }
+    [XmlAttribute]
+    public byte ModbusAddress
+    {
+        get => modbusAddress;
+        set => Set(ref modbusAddress, value);
+    }
 
-        private byte modbusAddress;
+    [XmlIgnore] public string KeyString => $"{SurroundIpV6Address(hostName)}:{Port}/{ModbusAddress}";
 
-        [XmlAttribute]
-        public byte ModbusAddress
-        {
-            get => modbusAddress;
-            set => Set(ref modbusAddress, value);
-        }
+    [XmlIgnore] public string DisplayName => KeyString;
 
-        [XmlIgnore] public string KeyString => $"{SurroundIpV6Address(hostName)}:{Port}/{ModbusAddress}";
+    public override string ToString() => DisplayName;
 
-        [XmlIgnore] public string DisplayName => KeyString;
-
-        public override string ToString() => DisplayName;
-
-        public static ModbusConnection Parse(string keyString)
-        {
+    public static ModbusConnection Parse(string keyString)
+    {
             var split = keyString.Split('/');
 
             if (split.Length != 2)
@@ -66,9 +66,8 @@
             };
         }
 
-        private string SurroundIpV6Address(string hostNameOrAddress)
-        {
+    private string SurroundIpV6Address(string hostNameOrAddress)
+    {
             return IPAddress.TryParse(hostNameOrAddress, out var ipAddress) && ipAddress.AddressFamily == AddressFamily.InterNetworkV6 ? $"[{hostNameOrAddress}]" : hostNameOrAddress;
         }
-    }
 }

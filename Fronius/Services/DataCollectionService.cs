@@ -1,30 +1,30 @@
-﻿namespace De.Hochstaetter.Fronius.Services
+﻿namespace De.Hochstaetter.Fronius.Services;
+
+public class DataCollectionService : BindableBase, IDataCollectionService
 {
-    public class DataCollectionService : BindableBase, IDataCollectionService
+    private readonly SettingsBase settings;
+    private readonly IWattPilotService wattPilotService;
+
+    private static readonly TimeSpan webRequestTimeOut = TimeSpan.FromSeconds(100000);
+    private Timer? timer;
+    private DateTime lastConfigUpdate = DateTime.UnixEpoch;
+    private int updateSemaphore;
+    private int fritzBoxCounter, froniusCounter;
+    private int suspendFritzBoxCounter;
+    private const int FritzBoxUpdateRate = 3;
+
+    public event EventHandler<SolarDataEventArgs>? NewDataReceived;
+
+    public DataCollectionService
+    (
+        SettingsBase settings,
+        IGen24Service gen24Service,
+        IFritzBoxService fritzBoxService,
+        IWattPilotService wattPilotService,
+        IToshibaHvacService hvacService,
+        SynchronizationContext context
+    )
     {
-        private readonly SettingsBase settings;
-        private readonly IWattPilotService wattPilotService;
-
-        private static readonly TimeSpan webRequestTimeOut = TimeSpan.FromSeconds(100000);
-        private Timer? timer;
-        private DateTime lastConfigUpdate = DateTime.UnixEpoch;
-        private int updateSemaphore;
-        private int fritzBoxCounter, froniusCounter;
-        private int suspendFritzBoxCounter;
-        private const int FritzBoxUpdateRate = 3;
-
-        public event EventHandler<SolarDataEventArgs>? NewDataReceived;
-
-        public DataCollectionService
-        (
-            SettingsBase settings,
-            IGen24Service gen24Service,
-            IFritzBoxService fritzBoxService,
-            IWattPilotService wattPilotService,
-            IToshibaHvacService hvacService,
-            SynchronizationContext context
-        )
-        {
             Gen24Service = gen24Service;
             FritzBoxService = fritzBoxService;
             Container2 = IoC.Injector!.CreateScope().ServiceProvider;
@@ -39,136 +39,136 @@
             }
         }
 
-        public IGen24Service Gen24Service { get; }
-        public IFritzBoxService FritzBoxService { get; }
+    public IGen24Service Gen24Service { get; }
+    public IFritzBoxService FritzBoxService { get; }
 
-        public IServiceProvider Container => IoC.Injector!;
+    public IServiceProvider Container => IoC.Injector!;
 
-        public IServiceProvider Container2 { get; }
+    public IServiceProvider Container2 { get; }
 
-        private IGen24Service? gen24Service2;
+    private IGen24Service? gen24Service2;
 
-        public IGen24Service? Gen24Service2
+    public IGen24Service? Gen24Service2
+    {
+        get => gen24Service2;
+        set => Set(ref gen24Service2, value);
+    }
+
+    public BindableCollection<ISwitchable> SwitchableDevices { get; }
+
+    public IToshibaHvacService HvacService { get; }
+
+    private HomeAutomationSystem? homeAutomationSystem;
+
+    public HomeAutomationSystem? HomeAutomationSystem
+    {
+        get => homeAutomationSystem;
+        private set => Set(ref homeAutomationSystem, value);
+    }
+
+    private WebConnection? wattPilotConnection;
+
+    public WebConnection? WattPilotConnection
+    {
+        get => wattPilotConnection;
+        set => Set(ref wattPilotConnection, value);
+    }
+
+    private string lastConnectionError = string.Empty;
+
+    public string LastConnectionError
+    {
+        get => lastConnectionError;
+        set => Set(ref lastConnectionError, value);
+    }
+
+    private bool isConnected;
+
+    public bool IsConnected
+    {
+        get => isConnected;
+        set => Set(ref isConnected, value);
+    }
+
+    public int FroniusUpdateRate { get; set; }
+
+    public IList<SmartMeterCalibrationHistoryItem> SmartMeterHistory { get; private set; } = new List<SmartMeterCalibrationHistoryItem>();
+
+    public Task<IList<SmartMeterCalibrationHistoryItem>> ReadCalibrationHistory() => Task.Run(() =>
+    {
+        if (string.IsNullOrWhiteSpace(settings.DriftFileName) || !File.Exists(settings.DriftFileName))
         {
-            get => gen24Service2;
-            set => Set(ref gen24Service2, value);
+            return new List<SmartMeterCalibrationHistoryItem>();
         }
 
-        public BindableCollection<ISwitchable> SwitchableDevices { get; }
-
-        public IToshibaHvacService HvacService { get; }
-
-        private HomeAutomationSystem? homeAutomationSystem;
-
-        public HomeAutomationSystem? HomeAutomationSystem
+        try
         {
-            get => homeAutomationSystem;
-            private set => Set(ref homeAutomationSystem, value);
+            var serializer = new XmlSerializer(typeof(List<SmartMeterCalibrationHistoryItem>));
+            using var stream = new FileStream(settings.DriftFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+            return serializer.Deserialize(stream) as IList<SmartMeterCalibrationHistoryItem> ?? new List<SmartMeterCalibrationHistoryItem>();
+        }
+        catch (Exception)
+        {
+            return new List<SmartMeterCalibrationHistoryItem>();
+        }
+    });
+
+    public Task<IList<SmartMeterCalibrationHistoryItem>> AddCalibrationHistoryItem(double consumedEnergyOffset, double producedEnergyOffset) => Task.Run(() =>
+    {
+        if (string.IsNullOrWhiteSpace(settings.DriftFileName))
+        {
+            return SmartMeterHistory;
         }
 
-        private WebConnection? wattPilotConnection;
+        var directoryName = Path.GetDirectoryName(settings.DriftFileName);
 
-        public WebConnection? WattPilotConnection
+        if (!Directory.Exists(Path.GetDirectoryName(settings.DriftFileName)))
         {
-            get => wattPilotConnection;
-            set => Set(ref wattPilotConnection, value);
-        }
-
-        private string lastConnectionError = string.Empty;
-
-        public string LastConnectionError
-        {
-            get => lastConnectionError;
-            set => Set(ref lastConnectionError, value);
-        }
-
-        private bool isConnected;
-
-        public bool IsConnected
-        {
-            get => isConnected;
-            set => Set(ref isConnected, value);
-        }
-
-        public int FroniusUpdateRate { get; set; }
-
-        public IList<SmartMeterCalibrationHistoryItem> SmartMeterHistory { get; private set; } = new List<SmartMeterCalibrationHistoryItem>();
-
-        public Task<IList<SmartMeterCalibrationHistoryItem>> ReadCalibrationHistory() => Task.Run(() =>
-        {
-            if (string.IsNullOrWhiteSpace(settings.DriftFileName) || !File.Exists(settings.DriftFileName))
-            {
-                return new List<SmartMeterCalibrationHistoryItem>();
-            }
-
             try
             {
-                var serializer = new XmlSerializer(typeof(List<SmartMeterCalibrationHistoryItem>));
-                using var stream = new FileStream(settings.DriftFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-                return serializer.Deserialize(stream) as IList<SmartMeterCalibrationHistoryItem> ?? new List<SmartMeterCalibrationHistoryItem>();
+                Directory.CreateDirectory(directoryName!);
             }
-            catch (Exception)
-            {
-                return new List<SmartMeterCalibrationHistoryItem>();
-            }
-        });
-
-        public Task<IList<SmartMeterCalibrationHistoryItem>> AddCalibrationHistoryItem(double consumedEnergyOffset, double producedEnergyOffset) => Task.Run(() =>
-        {
-            if (string.IsNullOrWhiteSpace(settings.DriftFileName))
+            catch
             {
                 return SmartMeterHistory;
             }
+        }
 
-            var directoryName = Path.GetDirectoryName(settings.DriftFileName);
+        var newItem = new SmartMeterCalibrationHistoryItem
+        {
+            CalibrationDate = DateTime.UtcNow,
+            ConsumedOffset = consumedEnergyOffset,
+            ProducedOffset = producedEnergyOffset,
+            EnergyRealConsumed = HomeAutomationSystem?.Gen24Sensors?.PrimaryPowerMeter?.EnergyActiveConsumed ?? double.NaN,
+            EnergyRealProduced = HomeAutomationSystem?.Gen24Sensors?.PrimaryPowerMeter?.EnergyActiveProduced ?? double.NaN
+        };
 
-            if (!Directory.Exists(Path.GetDirectoryName(settings.DriftFileName)))
-            {
-                try
-                {
-                    Directory.CreateDirectory(directoryName!);
-                }
-                catch
-                {
-                    return SmartMeterHistory;
-                }
-            }
+        SmartMeterHistory.Add(newItem);
 
-            var newItem = new SmartMeterCalibrationHistoryItem
-            {
-                CalibrationDate = DateTime.UtcNow,
-                ConsumedOffset = consumedEnergyOffset,
-                ProducedOffset = producedEnergyOffset,
-                EnergyRealConsumed = HomeAutomationSystem?.Gen24Sensors?.PrimaryPowerMeter?.EnergyActiveConsumed ?? double.NaN,
-                EnergyRealProduced = HomeAutomationSystem?.Gen24Sensors?.PrimaryPowerMeter?.EnergyActiveProduced ?? double.NaN
-            };
+        if (SmartMeterHistory.Count > 50)
+        {
+            SmartMeterHistory.RemoveAt(1);
+        }
 
-            SmartMeterHistory.Add(newItem);
+        var serializer = new XmlSerializer(typeof(List<SmartMeterCalibrationHistoryItem>));
+        using var stream = new FileStream(settings.DriftFileName, FileMode.Create, FileAccess.Write, FileShare.None);
 
-            if (SmartMeterHistory.Count > 50)
-            {
-                SmartMeterHistory.RemoveAt(1);
-            }
-
-            var serializer = new XmlSerializer(typeof(List<SmartMeterCalibrationHistoryItem>));
-            using var stream = new FileStream(settings.DriftFileName, FileMode.Create, FileAccess.Write, FileShare.None);
-
-            using var writer = XmlWriter.Create(stream, new XmlWriterSettings
-            {
-                Encoding = Encoding.UTF8,
-                Indent = true,
-                IndentChars = new string(' ', 3),
-                NewLineChars = Environment.NewLine
-            });
-
-            serializer.Serialize(writer, SmartMeterHistory as List<SmartMeterCalibrationHistoryItem> ?? [.. SmartMeterHistory]);
-
-            return SmartMeterHistory;
+        using var writer = XmlWriter.Create(stream, new XmlWriterSettings
+        {
+            Encoding = Encoding.UTF8,
+            Indent = true,
+            IndentChars = new string(' ', 3),
+            NewLineChars = Environment.NewLine
         });
 
-        [SuppressMessage("ReSharper", "ParameterHidesMember")]
-        public async Task Start(WebConnection? gen24WebConnection, WebConnection? gen24WebConnection2, WebConnection? fritzBoxConnection, WebConnection? wattPilotConnection)
-        {
+        serializer.Serialize(writer, SmartMeterHistory as List<SmartMeterCalibrationHistoryItem> ?? [.. SmartMeterHistory]);
+
+        return SmartMeterHistory;
+    });
+
+    [SuppressMessage("ReSharper", "ParameterHidesMember")]
+    public async Task Start(WebConnection? gen24WebConnection, WebConnection? gen24WebConnection2, WebConnection? fritzBoxConnection, WebConnection? wattPilotConnection)
+    {
             Stop();
             WattPilotConnection = wattPilotConnection;
             using var tokenSource = new CancellationTokenSource(webRequestTimeOut);
@@ -191,26 +191,26 @@
             timer = new Timer(TimerElapsed, null, 0, 1000);
         }
 
-        public void Stop()
-        {
+    public void Stop()
+    {
             timer?.Dispose();
             timer = null;
             WattPilotConnection = null;
         }
 
-        public void InvalidateFritzBox()
-        {
+    public void InvalidateFritzBox()
+    {
             fritzBoxCounter = 0;
             timer?.Change(0, 1000);
         }
 
-        public void SuspendPowerConsumers()
-        {
+    public void SuspendPowerConsumers()
+    {
             Interlocked.Increment(ref suspendFritzBoxCounter);
         }
 
-        public void ResumePowerConsumers()
-        {
+    public void ResumePowerConsumers()
+    {
             Interlocked.Decrement(ref suspendFritzBoxCounter);
 
             if (suspendFritzBoxCounter < 0)
@@ -219,8 +219,8 @@
             }
         }
 
-        private async ValueTask<HomeAutomationSystem> CreateSolarSystem(WebConnection? gen24WebConnection, WebConnection? gen24WebConnection2, WebConnection? fritzBoxConnection, CancellationToken token)
-        {
+    private async ValueTask<HomeAutomationSystem> CreateSolarSystem(WebConnection? gen24WebConnection, WebConnection? gen24WebConnection2, WebConnection? fritzBoxConnection, CancellationToken token)
+    {
             var result = new HomeAutomationSystem();
             SmartMeterHistory = await ReadCalibrationHistory().ConfigureAwait(false);
 
@@ -274,8 +274,8 @@
             }
         }
 
-        private async Task UpdateConfigData(HomeAutomationSystem result, CancellationToken token)
-        {
+    private async Task UpdateConfigData(HomeAutomationSystem result, CancellationToken token)
+    {
             var task1 = GetConfigToken(Gen24Service, token);
             var task2 = GetConfigToken(Gen24Service2, token);
 
@@ -285,30 +285,30 @@
             lastConfigUpdate = DateTime.UtcNow;
         }
 
-        private static async Task<Gen24Config?> GetConfigToken(IGen24Service? webClientService, CancellationToken token)
+    private static async Task<Gen24Config?> GetConfigToken(IGen24Service? webClientService, CancellationToken token)
+    {
+        if (webClientService is null)
         {
-            if (webClientService is null)
-            {
-                return null;
-            }
-
-            var versionsToken = (await webClientService.GetFroniusJsonResponse("status/version", token: token).ConfigureAwait(false)).Token;
-            var componentsToken = (await webClientService.GetFroniusJsonResponse("components/", token: token).ConfigureAwait(false)).Token;
-            var configToken = (await webClientService.GetFroniusJsonResponse("config/", token: token).ConfigureAwait(false)).Token;
-
-            #if DEBUG
-            // ReSharper disable UnusedVariable
-            var configString = configToken.ToString();
-            var versionString = versionsToken.ToString();
-            var componentsString = componentsToken.ToString();
-            // ReSharper restore UnusedVariable
-            #endif
-
-            return await Task.Run(() => Gen24Config.Parse(versionsToken, componentsToken, configToken), token).ConfigureAwait(false);
+            return null;
         }
 
-        private async Task<FritzBoxDeviceList?> TryGetFritzBoxData(CancellationToken token)
-        {
+        var versionsToken = (await webClientService.GetFroniusJsonResponse("status/version", token: token).ConfigureAwait(false)).Token;
+        var componentsToken = (await webClientService.GetFroniusJsonResponse("components/", token: token).ConfigureAwait(false)).Token;
+        var configToken = (await webClientService.GetFroniusJsonResponse("config/", token: token).ConfigureAwait(false)).Token;
+
+        #if DEBUG
+        // ReSharper disable UnusedVariable
+        var configString = configToken.ToString();
+        var versionString = versionsToken.ToString();
+        var componentsString = componentsToken.ToString();
+        // ReSharper restore UnusedVariable
+        #endif
+
+        return await Task.Run(() => Gen24Config.Parse(versionsToken, componentsToken, configToken), token).ConfigureAwait(false);
+    }
+
+    private async Task<FritzBoxDeviceList?> TryGetFritzBoxData(CancellationToken token)
+    {
             try
             {
                 if (FritzBoxService.Connection == null)
@@ -351,8 +351,8 @@
             }
         }
 
-        private async Task<WattPilot?> TryStartWattPilot()
-        {
+    private async Task<WattPilot?> TryStartWattPilot()
+    {
             if (wattPilotService.Connection == null && WattPilotConnection != null)
             {
                 await wattPilotService.Start(WattPilotConnection).ConfigureAwait(false);
@@ -365,8 +365,8 @@
             return wattPilotService.WattPilot;
         }
 
-        private async Task TryStartToshibaAc()
-        {
+    private async Task TryStartToshibaAc()
+    {
             if (settings is { HaveToshibaAc: true, ShowToshibaAc: true } && !HvacService.IsRunning)
             {
                 await HvacService.Start(settings.ToshibaAcConnection, settings.AzureDeviceIdString).ConfigureAwait(false);
@@ -381,8 +381,8 @@
             }
         }
 
-        private async Task<Gen24Sensors?> TryGetGen24System(IGen24Service? gen24Service, Gen24Components? components, CancellationToken token)
-        {
+    private async Task<Gen24Sensors?> TryGetGen24System(IGen24Service? gen24Service, Gen24Components? components, CancellationToken token)
+    {
             if (gen24Service?.Connection is null || components is null)
             {
                 return null;
@@ -399,8 +399,8 @@
             }
         }
 
-        private async void TimerElapsed(object? _)
-        {
+    private async void TimerElapsed(object? _)
+    {
             if (Interlocked.Exchange(ref updateSemaphore, 1) != 0)
             {
                 return;
@@ -492,6 +492,5 @@
                 Interlocked.Exchange(ref updateSemaphore, 0);
             }
         }
-    }
 }
 //

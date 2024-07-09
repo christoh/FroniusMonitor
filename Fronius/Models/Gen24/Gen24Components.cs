@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace De.Hochstaetter.Fronius.Models.Gen24
+namespace De.Hochstaetter.Fronius.Models.Gen24;
+
+public class Gen24Components : BindableBase
 {
-    public class Gen24Components : BindableBase
+    private IDictionary<string, IList<string>> groups = new Dictionary<string, IList<string>>();
+
+    public IDictionary<string, IList<string>> Groups
     {
-        private IDictionary<string, IList<string>> groups = new Dictionary<string, IList<string>>();
+        get => groups;
+        set => Set(ref groups, value);
+    }
 
-        public IDictionary<string, IList<string>> Groups
-        {
-            get => groups;
-            set => Set(ref groups, value);
-        }
-
-        public static Gen24Components Parse(JToken token)
-        {
+    public static Gen24Components Parse(JToken token)
+    {
             var result = new Gen24Components();
 
             if (token["Body"]?["Data"] is not JObject listToken)
@@ -31,5 +31,4 @@ namespace De.Hochstaetter.Fronius.Models.Gen24
 
             return result;
         }
-    }
 }

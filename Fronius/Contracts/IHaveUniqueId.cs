@@ -1,15 +1,14 @@
-﻿namespace De.Hochstaetter.Fronius.Contracts
+﻿namespace De.Hochstaetter.Fronius.Contracts;
+
+public interface IHaveUniqueId
 {
-    public interface IHaveUniqueId
-    {
-        string Id => string.Join('‖', new[] { Manufacturer, Model, SerialNumber }.Where(s => !string.IsNullOrEmpty(s)));
+    string Id => string.Join('‖', new[] { Manufacturer, Model, SerialNumber }.Where(s => !string.IsNullOrEmpty(s)));
         
-        bool IsPresent { get; }
+    bool IsPresent { get; }
         
-        string? Manufacturer { get; }
+    string? Manufacturer { get; }
         
-        public string? Model { get; }
+    public string? Model { get; }
         
-        public string? SerialNumber { get; }
-    }
+    public string? SerialNumber { get; }
 }

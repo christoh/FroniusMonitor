@@ -1,64 +1,63 @@
-﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc
+﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc;
+
+public abstract class ToshibaHvacDeviceBase : BindableBase, ISwitchable
 {
-    public abstract class ToshibaHvacDeviceBase : BindableBase, ISwitchable
+    private ToshibaHvacStateData state = new();
+
+    [JsonPropertyName("ACStateData")]
+    public ToshibaHvacStateData State
     {
-        private ToshibaHvacStateData state = new();
+        get => state;
+        set => Set(ref state, value);
+    }
 
-        [JsonPropertyName("ACStateData")]
-        public ToshibaHvacStateData State
-        {
-            get => state;
-            set => Set(ref state, value);
-        }
+    private Version firmwareVersion = default!;
 
-        private Version firmwareVersion = default!;
+    [JsonPropertyName("FirmwareVersion")]
+    public Version FirmwareVersion
+    {
+        get => firmwareVersion;
+        set => Set(ref firmwareVersion, value);
+    }
 
-        [JsonPropertyName("FirmwareVersion")]
-        public Version FirmwareVersion
-        {
-            get => firmwareVersion;
-            set => Set(ref firmwareVersion, value);
-        }
+    private ushort meritFeature;
 
-        private ushort meritFeature;
+    [JsonPropertyName("MeritFeature")]
+    public ushort MeritFeature
+    {
+        get => meritFeature;
+        set => Set(ref meritFeature, value);
+    }
 
-        [JsonPropertyName("MeritFeature")]
-        public ushort MeritFeature
-        {
-            get => meritFeature;
-            set => Set(ref meritFeature, value);
-        }
+    private ObservableCollection<ToshibaHvacModeValue> modes = new();
 
-        private ObservableCollection<ToshibaHvacModeValue> modes = new();
+    [JsonPropertyName("ModeValues")]
+    public ObservableCollection<ToshibaHvacModeValue> Modes
+    {
+        get => modes;
+        set => Set(ref modes, value);
+    }
 
-        [JsonPropertyName("ModeValues")]
-        public ObservableCollection<ToshibaHvacModeValue> Modes
-        {
-            get => modes;
-            set => Set(ref modes, value);
-        }
+    public abstract Guid DeviceUniqueId { get; set; }
 
-        public abstract Guid DeviceUniqueId { get; set; }
+    public bool IsSwitchingEnabled => false;
+    public bool? IsTurnedOn => State.IsTurnedOn;
+    public bool CanSwitch => true;
 
-        public bool IsSwitchingEnabled => false;
-        public bool? IsTurnedOn => State.IsTurnedOn;
-        public bool CanSwitch => true;
-
-        public Task TurnOnOff(bool turnOn)
-        {
+    public Task TurnOnOff(bool turnOn)
+    {
             throw new NotImplementedException();
         }
 
-        [JsonIgnore]
-        public bool IsPresent => true;
+    [JsonIgnore]
+    public bool IsPresent => true;
         
-        [JsonIgnore]
-        public string Manufacturer => "Toshiba";
+    [JsonIgnore]
+    public string Manufacturer => "Toshiba";
         
-        [JsonIgnore]
-        public string Model => "HVAC";
+    [JsonIgnore]
+    public string Model => "HVAC";
 
-        [JsonIgnore]
-        public string SerialNumber => DeviceUniqueId.ToString("N");
-    }
+    [JsonIgnore]
+    public string SerialNumber => DeviceUniqueId.ToString("N");
 }

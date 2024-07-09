@@ -1,7 +1,6 @@
-﻿namespace De.Hochstaetter.Fronius.Contracts
+﻿namespace De.Hochstaetter.Fronius.Contracts;
+
+public interface IHaveToolTip
 {
-    public interface IHaveToolTip
-    {
-        public string ToolTip { get; }
-    }
+    public string ToolTip { get; }
 }

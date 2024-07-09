@@ -4,12 +4,12 @@ using System.Xml.Serialization;
 using De.Hochstaetter.Fronius.Extensions;
 using De.Hochstaetter.Fronius.Models.Settings;
 
-namespace FroniusPhone.Models
+namespace FroniusPhone.Models;
+
+public class Settings : SettingsBase
 {
-    public class Settings : SettingsBase
+    public void Load(string? fileName = null)
     {
-        public void Load(string? fileName = null)
-        {
             fileName ??= App.SettingsFileName;
             var serializer = new XmlSerializer(typeof(Settings));
             var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
@@ -17,13 +17,13 @@ namespace FroniusPhone.Models
             typeof(Settings).GetProperties().Apply(propertyInfo => propertyInfo.SetValue(this, propertyInfo.GetValue(settings)));
         }
 
-        public async ValueTask LoadAsync(string? fileName = null)
-        {
+    public async ValueTask LoadAsync(string? fileName = null)
+    {
             await Task.Run(() => Load(fileName)).ConfigureAwait(false);
         }
 
-        public void Save(string? fileName = null)
-        {
+    public void Save(string? fileName = null)
+    {
             if (fileName == null)
             {
                 Directory.CreateDirectory(App.PerUserDataDir);
@@ -45,9 +45,8 @@ namespace FroniusPhone.Models
             serializer.Serialize(writer, this);
         }
 
-        public async ValueTask SaveAsync(string? fileName = null)
-        {
+    public async ValueTask SaveAsync(string? fileName = null)
+    {
             await Task.Run(() => Save(fileName)).ConfigureAwait(false);
         }
-    }
 }

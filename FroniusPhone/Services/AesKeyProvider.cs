@@ -4,13 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FroniusPhone.Services
+namespace FroniusPhone.Services;
+
+internal class AesKeyProvider:IAesKeyProvider
 {
-    internal class AesKeyProvider:IAesKeyProvider
+    public byte[] GetAesKey()
     {
-        public byte[] GetAesKey()
-        {
             return new byte[16];
         }
-    }
 }

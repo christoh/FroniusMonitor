@@ -1,7 +1,6 @@
-﻿namespace De.Hochstaetter.Fronius.Contracts
+﻿namespace De.Hochstaetter.Fronius.Contracts;
+
+public interface IAesKeyProvider
 {
-    public interface IAesKeyProvider
-    {
-        public byte[] GetAesKey();
-    }
+    public byte[] GetAesKey();
 }

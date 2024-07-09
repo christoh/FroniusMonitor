@@ -6,12 +6,12 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace De.Hochstaetter.Fronius.Models.JsonConverters
+namespace De.Hochstaetter.Fronius.Models.JsonConverters;
+
+internal class ToshibaHexConverter<T> : JsonConverter<T> where T : IConvertible, IFormattable
 {
-    internal class ToshibaHexConverter<T> : JsonConverter<T> where T : IConvertible, IFormattable
+    public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
             if (reader.TokenType == JsonTokenType.Number)
             {
                 var longValue = reader.GetInt64();
@@ -32,9 +32,8 @@ namespace De.Hochstaetter.Fronius.Models.JsonConverters
                 : (T)Convert.ChangeType(ulongValue, typeToConvert);
         }
 
-        public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
-        {
+    public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
+    {
             writer.WriteStringValue(value.ToString("x", CultureInfo.InvariantCulture));
         }
-    }
 }

@@ -1,51 +1,50 @@
-﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc
+﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc;
+
+public class ToshibaHvacSession : BindableBase
 {
-    public class ToshibaHvacSession : BindableBase
+    private Guid consumerId;
+
+    [JsonPropertyName("consumerId")]
+    [JsonRequired]
+    public Guid ConsumerId
     {
-        private Guid consumerId;
+        get => consumerId;
+        set => Set(ref consumerId, value);
+    }
 
-        [JsonPropertyName("consumerId")]
-        [JsonRequired]
-        public Guid ConsumerId
-        {
-            get => consumerId;
-            set => Set(ref consumerId, value);
-        }
+    private string accessToken = string.Empty;
 
-        private string accessToken = string.Empty;
+    [JsonPropertyName("access_token")]
+    [JsonRequired]
+    public string AccessToken
+    {
+        get => accessToken;
+        set => Set(ref accessToken, value);
+    }
 
-        [JsonPropertyName("access_token")]
-        [JsonRequired]
-        public string AccessToken
-        {
-            get => accessToken;
-            set => Set(ref accessToken, value);
-        }
+    private string tokenType = string.Empty;
 
-        private string tokenType = string.Empty;
+    [JsonPropertyName("token_type")]
+    public string TokenType
+    {
+        get => tokenType;
+        set => Set(ref tokenType, value);
+    }
 
-        [JsonPropertyName("token_type")]
-        public string TokenType
-        {
-            get => tokenType;
-            set => Set(ref tokenType, value);
-        }
+    private string consumerMasterId = string.Empty;
 
-        private string consumerMasterId = string.Empty;
+    [JsonPropertyName("consumerMasterId")]
+    public string ConsumerMasterId
+    {
+        get => consumerMasterId;
+        set => Set(ref consumerMasterId, value);
+    }
 
-        [JsonPropertyName("consumerMasterId")]
-        public string ConsumerMasterId
-        {
-            get => consumerMasterId;
-            set => Set(ref consumerMasterId, value);
-        }
-
-        private int countryId;
-        [JsonPropertyName("countryId")]
-        public int CountryId
-        {
-            get => countryId;
-            set => Set(ref countryId, value);
-        }
+    private int countryId;
+    [JsonPropertyName("countryId")]
+    public int CountryId
+    {
+        get => countryId;
+        set => Set(ref countryId, value);
     }
 }

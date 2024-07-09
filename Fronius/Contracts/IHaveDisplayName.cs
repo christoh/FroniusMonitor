@@ -1,7 +1,6 @@
-﻿namespace De.Hochstaetter.Fronius.Contracts
+﻿namespace De.Hochstaetter.Fronius.Contracts;
+
+public interface IHaveDisplayName
 {
-    public interface IHaveDisplayName
-    {
-        public string DisplayName { get; }
-    }
+    public string DisplayName { get; }
 }

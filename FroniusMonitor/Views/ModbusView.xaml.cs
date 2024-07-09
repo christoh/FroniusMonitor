@@ -1,9 +1,9 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Views
+﻿namespace De.Hochstaetter.FroniusMonitor.Views;
+
+public partial class ModbusView : IInverterScoped
 {
-    public partial class ModbusView : IInverterScoped
+    public ModbusView(ModbusViewModel viewModel, IGen24Service gen24Service)
     {
-        public ModbusView(ModbusViewModel viewModel, IGen24Service gen24Service)
-        {
             InitializeComponent();
             viewModel.View = this;
             DataContext = viewModel;
@@ -16,6 +16,5 @@
             };
         }
 
-        public IGen24Service Gen24Service { get; }
-    }
+    public IGen24Service Gen24Service { get; }
 }

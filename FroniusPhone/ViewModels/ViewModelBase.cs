@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FroniusPhone.ViewModels
+namespace FroniusPhone.ViewModels;
+
+public abstract class ViewModelBase : BindableBase
 {
-    public abstract class ViewModelBase : BindableBase
-    {
-        public IDispatcher Dispatcher { protected get; set; } = null!;
-    }
+    public IDispatcher Dispatcher { protected get; set; } = null!;
 }
