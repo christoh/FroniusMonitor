@@ -58,4 +58,13 @@ public class ToshibaHvacAzureSmMobileCommand : BindableBase
         get => timeStamp;
         set => Set(ref timeStamp, value);
     }
+
+    private string? timeZone;
+    
+    [JsonPropertyName("timeZone")]
+    public string? TimeZone
+    {
+        get => timeZone;
+        set => Set(ref timeZone, value);
+    }
 }
