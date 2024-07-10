@@ -871,6 +871,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Allow boost until car is disconnected.
+        /// </summary>
+        public static string BoostUntilCarDisconnects {
+            get {
+                return ResourceManager.GetString("BoostUntilCarDisconnects", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Allow current level selection via hardware button.
         /// </summary>
         public static string ButtonEnableCharging {
@@ -1312,6 +1321,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Grid Requirements.
+        /// </summary>
+        public static string DnoRequirements {
+            get {
+                return ResourceManager.GetString("DnoRequirements", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Drifts file.
         /// </summary>
         public static string DriftsFile {
@@ -1389,6 +1407,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string EnableBattery {
             get {
                 return ResourceManager.GetString("EnableBattery", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable one-time charge from home battery (boost).
+        /// </summary>
+        public static string EnableBatteryBoost {
+            get {
+                return ResourceManager.GetString("EnableBatteryBoost", resourceCulture);
             }
         }
         
@@ -2203,6 +2230,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        public static string MinimumSocInBoost {
+            get {
+                return ResourceManager.GetString("MinimumSocInBoost", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Minimum time between phase switches.
         /// </summary>
         public static string MinimumTimeBetweenPhaseSwitches {
@@ -2446,11 +2482,29 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error (Cable blocked).
+        /// </summary>
+        public static string ModelStatus_NotChargingBecauseAdapterBlocking {
+            get {
+                return ResourceManager.GetString("ModelStatus_NotChargingBecauseAdapterBlocking", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Pause (energy limit).
         /// </summary>
         public static string ModelStatus_NotChargingBecauseEnergyLimit {
             get {
                 return ResourceManager.GetString("ModelStatus_NotChargingBecauseEnergyLimit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error!.
+        /// </summary>
+        public static string ModelStatus_NotChargingBecauseError {
+            get {
+                return ResourceManager.GetString("ModelStatus_NotChargingBecauseError", resourceCulture);
             }
         }
         
@@ -2491,6 +2545,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error (grid limits).
+        /// </summary>
+        public static string ModelStatus_NotChargingBecauseGridMonitoring {
+            get {
+                return ResourceManager.GetString("ModelStatus_NotChargingBecauseGridMonitoring", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pause (load management).
+        /// </summary>
+        public static string ModelStatus_NotChargingBecauseLoadManagement {
+            get {
+                return ResourceManager.GetString("ModelStatus_NotChargingBecauseLoadManagement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Pause (minimum pause duration).
         /// </summary>
         public static string ModelStatus_NotChargingBecauseMinPauseDuration {
@@ -2509,11 +2581,38 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Pause (OCPP).
+        /// </summary>
+        public static string ModelStatus_NotChargingBecauseOcpp {
+            get {
+                return ResourceManager.GetString("ModelStatus_NotChargingBecauseOcpp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pause (OCPP fallback).
+        /// </summary>
+        public static string ModelStatus_NotChargingBecauseOcppFallback {
+            get {
+                return ResourceManager.GetString("ModelStatus_NotChargingBecauseOcppFallback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Pause (phase switch).
         /// </summary>
         public static string ModelStatus_NotChargingBecausePhaseSwitch {
             get {
                 return ResourceManager.GetString("ModelStatus_NotChargingBecausePhaseSwitch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pause (grid reconnect delay).
+        /// </summary>
+        public static string ModelStatus_NotChargingBecauseReconnectDelay {
+            get {
+                return ResourceManager.GetString("ModelStatus_NotChargingBecauseReconnectDelay", resourceCulture);
             }
         }
         
@@ -2541,6 +2640,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string ModelStatus_NotChargingBecauseTemperatureLimit {
             get {
                 return ResourceManager.GetString("ModelStatus_NotChargingBecauseTemperatureLimit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fehler (under frequency).
+        /// </summary>
+        public static string ModelStatus_NotChargingBecauseUnderFrequencyControl {
+            get {
+                return ResourceManager.GetString("ModelStatus_NotChargingBecauseUnderFrequencyControl", resourceCulture);
             }
         }
         

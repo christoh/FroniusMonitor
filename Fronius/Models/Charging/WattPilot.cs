@@ -1152,19 +1152,19 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref restrictChargingFromBattery, value);
     }
 
-    private int allowChargingFromBatteryStartSeconds;
+    private int? allowChargingFromBatteryStartSeconds;
 
     [WattPilot("pdls", false)]
-    public int AllowChargingFromBatteryStartSeconds
+    public int? AllowChargingFromBatteryStartSeconds
     {
         get => allowChargingFromBatteryStartSeconds;
         set => Set(ref allowChargingFromBatteryStartSeconds, value, () => NotifyOfPropertyChange(nameof(AllowChargingFromBatteryStartString)));
     }
 
-    private int allowChargingFromBatteryStopSeconds;
+    private int? allowChargingFromBatteryStopSeconds;
 
     [WattPilot("pdlo", false)]
-    public int AllowChargingFromBatteryStopSeconds
+    public int? AllowChargingFromBatteryStopSeconds
     {
         get => allowChargingFromBatteryStopSeconds;
         set => Set(ref allowChargingFromBatteryStopSeconds, value, () => NotifyOfPropertyChange(nameof(AllowChargingFromBatteryStopString)));
@@ -1192,28 +1192,28 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
 
-    private bool enableBatteryBoost;
+    private bool? enableBatteryBoost;
 
     [WattPilot("ebe", false)]
-    public bool EnableBatteryBoost
+    public bool? EnableBatteryBoost
     {
         get => enableBatteryBoost;
         set => Set(ref enableBatteryBoost, value);
     }
 
-    private bool enableSingleTimeBoost;
+    private bool? enableSingleTimeBoost;
 
     [WattPilot("ebo", false)]
-    public bool EnableSingleTimeBoost
+    public bool? EnableSingleTimeBoost
     {
         get => enableSingleTimeBoost;
         set => Set(ref enableSingleTimeBoost, value);
     }
 
-    private byte minimumSocInBoost;
+    private byte? minimumSocInBoost;
 
     [WattPilot("ebt", false)]
-    public byte MinimumSocInBoost
+    public byte? MinimumSocInBoost
     {
         get => minimumSocInBoost;
         set => Set(ref minimumSocInBoost, value);

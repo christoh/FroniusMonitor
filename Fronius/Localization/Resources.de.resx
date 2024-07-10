@@ -522,9 +522,6 @@
   <data name="ModelStatus_NotChargingBecauseFallbackGoEAwattar" xml:space="preserve">
 	  <value>Pause (Go-E-Strompreis)</value>
   </data>
-  <data name="ModelStatus_NotChargingBecauseFallbackAwattar" xml:space="preserve">
-	  <value>Pause (Eco)</value>
-  </data>
   <data name="ModelStatus_NotChargingBecauseFallbackAutomaticStop" xml:space="preserve">
 	  <value>Pause (nächste Fahrt)</value>
   </data>
@@ -1355,5 +1352,35 @@
   </data>
   <data name="OpenConfigPdf" xml:space="preserve">
 	  <value>Konfigurationsdokument öffnen</value>
+  </data>
+  <data name="DnoRequirements" xml:space="preserve">
+	  <value>Netzanforderungen</value>
+  </data>
+  <data name="EnableBatteryBoost" xml:space="preserve">
+	  <value>Einmaliges Laden aus der Hausbatterie erlauben (boost)</value>
+  </data>
+  <data name="BoostUntilCarDisconnects" xml:space="preserve">
+	  <value>Boost erlauben bis das Auto abgehängt wird</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseError" xml:space="preserve">
+	  <value>Fehler!</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseLoadManagement" xml:space="preserve">
+	  <value>Pause (Lastmanagement)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseReconnectDelay" xml:space="preserve">
+	  <value>Pause (Netzwiederherstellung)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseAdapterBlocking" xml:space="preserve">
+	  <value>Fehler (Kabel blockiert)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseUnderFrequencyControl" xml:space="preserve">
+	  <value>Fehler (Unterfrequenz)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseGridMonitoring" xml:space="preserve">
+	  <value>Fehler (Netzgrenzwerte)</value>
+  </data>
+  <data name="MinimumSocInBoost" xml:space="preserve">
+	  <value>Maximaler SoC im Boost-Modus</value>
   </data>
 </root>

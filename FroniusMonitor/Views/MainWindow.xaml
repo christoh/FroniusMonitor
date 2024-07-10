@@ -51,6 +51,10 @@
                     <MenuItem Header="{x:Static p:Resources.OpenChargingLog}" Icon="{vi:EventLogIcon}" Command="{Binding DownloadChargeLogCommand}" Visibility="{Binding DataCollectionService.HomeAutomationSystem.WattPilot.DownloadLink, FallbackValue=Collapsed, Converter={co:NullToVisibility}}" />
                     <MenuItem Header="{x:Static p:Resources.Reboot}" Icon="{vi:RebootIcon}" Visibility="{Binding WattPilotService.WattPilot, Converter={co:NullToVisibility}, FallbackValue=Collapsed}" Click="OnRebootWattPilotClicked" />
                 </MenuItem>
+                <MenuItem Header="Tools">
+                    <MenuItem Header="Garbage Collection" Command="{Binding GarbageCollectionCommand}"/>
+                </MenuItem>
+
             </Menu>
             <ToggleButton x:Name="RibbonExpander" Grid.Column="1" Style="{StaticResource TransparentButton}" Background="{x:Static SystemColors.MenuBarBrush}" Checked="OnRibbonExpanderChanged" Unchecked="OnRibbonExpanderChanged">
                 <vi:Chevron x:Name="Chevron" Angle="0" Width="8" Height="8" Margin="0,3,18,0" />

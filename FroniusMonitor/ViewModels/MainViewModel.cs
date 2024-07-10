@@ -3,6 +3,7 @@
 public class MainViewModel(IDataCollectionService dataCollectionService, IFritzBoxService fritzBoxService, IWattPilotService wattPilotService) : ViewModelBase
 {
     private bool wattPilotFirmwareUpdateMessageShown;
+    private bool isGarbageCollecting;
 
     private ICommand? exportSettingsCommand;
     public ICommand ExportSettingsCommand => exportSettingsCommand ??= new NoParameterCommand(ExportSettings);
@@ -12,6 +13,9 @@ public class MainViewModel(IDataCollectionService dataCollectionService, IFritzB
 
     private ICommand? downloadChargeLogCommand;
     public ICommand DownloadChargeLogCommand => downloadChargeLogCommand ??= new NoParameterCommand(DownloadChargeLog);
+
+    private ICommand? garbageCollectionCommand;
+    public ICommand GarbageCollectionCommand => garbageCollectionCommand ??= new NoParameterCommand(GarbageCollection);
 
     public IDataCollectionService DataCollectionService => dataCollectionService;
 
@@ -88,39 +92,6 @@ public class MainViewModel(IDataCollectionService dataCollectionService, IFritzB
         _ = Settings.Save();
     }
 
-    //private async void RebootWattPilot()
-    //{
-    //    WattPilotService.BeginSendValues();
-
-    //    if (WattPilotService.WattPilot?.Clone() is not WattPilot newWattPilot)
-    //    {
-    //        await Dispatcher.InvokeAsync(() => MessageBox.Show(IoC.Get<MainWindow>(), Resources.NoWattPilot, Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error));
-    //        return;
-    //    }
-
-    //    newWattPilot.Reboot = true;
-    //    var errors = await WattPilotService.Send(newWattPilot, WattPilotService.WattPilot).ConfigureAwait(false);
-
-    //    if (errors.Count > 0)
-    //    {
-    //        var notWritten = "• " + string.Join(Environment.NewLine + "• ", errors);
-
-    //        await Dispatcher.InvokeAsync(() =>
-    //        {
-    //            MessageBox.Show
-    //            (
-    //                IoC.Get<MainWindow>(),
-    //                "The following settings were not written to the Wattpilot:" + Environment.NewLine + Environment.NewLine + notWritten,
-    //                Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error
-    //            );
-    //        });
-
-    //        return;
-    //    }
-
-    //    await WattPilotService.Stop().ConfigureAwait(false);
-    //}
-
     private void DownloadChargeLog()
     {
         try
@@ -179,6 +150,29 @@ public class MainViewModel(IDataCollectionService dataCollectionService, IFritzB
                 App.Settings.HaveFritzBox && App.Settings.ShowFritzBox ? App.Settings.FritzBoxConnection : null,
                 App.Settings.HaveWattPilot && App.Settings.ShowWattPilot ? App.Settings.WattPilotConnection : null
             ).ConfigureAwait(false);
+        }
+    }
+
+    private async void GarbageCollection()
+    {
+        if (isGarbageCollecting)
+        {
+            return;
+        }
+
+        try
+        {
+            isGarbageCollecting= true;
+            
+            await Task.Run(() =>
+            {
+                GC.WaitForPendingFinalizers();
+                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
+            }).ConfigureAwait(false);
+        }
+        finally
+        {
+            isGarbageCollecting = false;
         }
     }
 

@@ -175,7 +175,7 @@ public class ToshibaHvacService(SynchronizationContext context, SettingsBase set
         {
             CommandName = "CMD_FCU_TO_AC",
             DeviceUniqueId = settings.ToshibaAcConnection.UserName.ToLower() + "_" + azureDeviceId!,
-            MessageId = $"MB_{azureDeviceId![..Math.Min(15, azureDeviceId.Length)].ToUpperInvariant()}-{++messageId % 10000000:D8}",
+            MessageId = $"MB_{azureDeviceId![..Math.Min(15, azureDeviceId!.Length)].ToUpperInvariant()}-{++messageId % 10000000:D8}",
             TargetIds = targetIdStrings,
             TimeStamp = DateTime.UtcNow.TimeOfDay.ToString(),
             PayLoad = JsonDocument.Parse($"{{ \"data\":\"{state}\"}}").RootElement

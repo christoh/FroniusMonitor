@@ -1,4 +1,5 @@
 ﻿// ReSharper disable UnusedMember.Global
+
 namespace De.Hochstaetter.Fronius.Models.Charging;
 
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
@@ -28,7 +29,16 @@ public enum ModelStatus
     NotChargingBecauseSimulateUnplugging = 22,
     NotChargingBecausePhaseSwitch = 23,
     NotChargingBecauseMinPauseDuration = 24,
+    NotChargingBecauseError = 26,
+    NotChargingBecauseLoadManagement = 27,
+    NotChargingBecauseOcpp = 28,
+    NotChargingBecauseReconnectDelay = 29,
+    NotChargingBecauseAdapterBlocking = 30,
+    NotChargingBecauseUnderFrequencyControl = 31,
+    NotChargingBecauseUnbalancedLoad = 32,
     ChargingBecauseEnoughBattery = 33,
+    NotChargingBecauseGridMonitoring = 34,
+    NotChargingBecauseOcppFallback = 35
 }
 
 public enum WifiScanStatus
@@ -36,7 +46,7 @@ public enum WifiScanStatus
     None = 0,
     Scanning = 1,
     Finished = 2,
-    Failed = 3,
+    Failed = 3
 }
 
 public enum WifiState
@@ -44,14 +54,14 @@ public enum WifiState
     None = 0,
     Scanning = 1,
     Connecting = 2,
-    Connected = 3,
+    Connected = 3
 }
 
 public enum CableLockBehavior
 {
     Normal = 0,
     AutoUnlock = 1,
-    AlwaysLock = 2,
+    AlwaysLock = 2
 }
 
 public enum CarStatus : byte
@@ -68,39 +78,39 @@ public enum PhaseSwitchMode : byte
 {
     Auto = 0,
     Phase1 = 1,
-    Phases3 = 2,
+    Phases3 = 2
 }
 
 public enum AccessMode : byte
 {
     Everyone = 0,
-    RequireAuth = 1,
+    RequireAuth = 1
 }
 
 public enum ChargingLogic : byte
 {
     /// <summary>
-    /// Immediately charge the car until the car stops charging
+    ///     Immediately charge the car until the car stops charging
     /// </summary>
     None = 3,
 
     /// <summary>
-    /// Use enabled eco settings (PV surplus, awattar, etc.)
+    ///     Use enabled eco settings (PV surplus, awattar, etc.)
     /// </summary>
     Eco = 4,
 
     /// <summary>
-    /// Ensure the car receives a certain amount of energy at a specific time.
-    /// Make use of eco settings
+    ///     Ensure the car receives a certain amount of energy at a specific time.
+    ///     Make use of eco settings
     /// </summary>
-    NextTrip = 5,
+    NextTrip = 5
 }
 
 public enum ForcedCharge
 {
     Default = 0,
     ForcedOff = 1,
-    ForcedOn = 2,
+    ForcedOn = 2
 }
 
 [SuppressMessage("ReSharper", "IdentifierTypo")]
@@ -161,14 +171,14 @@ public enum AwattarCountry : int
     Norway2Tibber = 10051,
     Norway3Tibber = 10052,
     Norway4Tibber = 10053,
-    Norway5Tibber = 10054,
+    Norway5Tibber = 10054
 }
 
 public enum EcoRoundingMode : byte
 {
     PreferFromGrid = 0,
     NoPreference = 1,
-    PreferToGrid = 2,
+    PreferToGrid = 2
 }
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
@@ -183,7 +193,7 @@ public enum CarType : byte
     citroenCZero,
     peugeotIon,
     vwID3_4,
-    Eqc2019,
+    Eqc2019
 }
 
 //[Flags]
@@ -200,5 +210,5 @@ public enum LoadBalancingPriority : byte
 {
     Low = 60,
     Medium = 50,
-    High = 40,
+    High = 40
 }

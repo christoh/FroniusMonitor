@@ -131,9 +131,6 @@
                     <CheckBox IsEnabled="{Binding EnableDanger}" IsChecked="{Binding WattPilot.LoadBalancingEnabled}">
                         <TextBlock Margin="0" Text="{x:Static p:Resources.EnableLoadBalancing}" />
                     </CheckBox>
-                    <CheckBox IsEnabled="{Binding EnableDanger}" IsChecked="{Binding WattPilot.EnableOutOfBalanceControl}">
-                        <TextBlock Margin="0" Text="{x:Static p:Resources.EnableOutOfBalanceControl}" />
-                    </CheckBox>
                     <CheckBox Content="{x:Static p:Resources.RequireRfidAuth}" IsChecked="{Binding WattPilot.AccessMode, Converter={co:AccessMode2Bool}}" />
                     <CheckBox Content="{x:Static p:Resources.AuthCurrentUser}" IsChecked="{Binding IsUserAuthenticated}" />
                     <CheckBox IsChecked="{Binding WattPilot.CloudAccessEnabled}">
@@ -149,6 +146,9 @@
                     </CheckBox>
                     <CheckBox IsChecked="{Binding WattPilot.ButtonEnableCurrentSelection}" Content="{x:Static p:Resources.ButtonEnableCharging}" />
                     <CheckBox IsChecked="{Binding WattPilot.ButtonEnableModeSwitch}" Content="{x:Static p:Resources.ButtonEnableModeSwitch}" />
+                    <CheckBox IsChecked="{Binding WattPilot.EnableBatteryBoost}" Content="{x:Static p:Resources.EnableBatteryBoost}" />
+                    <CheckBox IsChecked="{Binding WattPilot.EnableSingleTimeBoost, Converter={co:BoolInverter}}" Content="{x:Static p:Resources.BoostUntilCarDisconnects}"
+                              Visibility="{Binding WattPilot.EnableBatteryBoost, Converter={co:Bool2Visibility}}" />
 
                     <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center">
                         <TextBlock Margin="0,0,4,0">
@@ -159,39 +159,18 @@
                         <TextBlock Margin="4,0,0,0" Text="A" />
                     </StackPanel>
                     <Slider Value="{Binding WattPilot.MaximumChargingCurrent, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="{Binding WattPilot.MinimumChargingCurrent}" Maximum="{Binding WattPilot.AbsoluteMaximumChargingCurrent}" />
-
-                    <StackPanel IsEnabled="{Binding EnableDanger}" Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center" Visibility="{Binding WattPilot.EnableOutOfBalanceControl, Converter={co:Bool2Visibility}}">
+                    
+                    <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center" Visibility="{Binding WattPilot.EnableBatteryBoost, Converter={co:Bool2Visibility}}">
                         <TextBlock Margin="0,0,4,0">
-                            <Run Text="{x:Static p:Resources.MaximumOutOfBalanceCurrent}" /><Run Text=":" />
+                            <Run Text="{x:Static p:Resources.MinimumSocInBoost}" /><Run Text=":" />
                         </TextBlock>
                         <TextBox MinHeight="0" TextAlignment="Center" Width="40"
-                                 Text="{co:ValidationBinding Path=WattPilot.MaximumOutOfBalanceCurrent, Rule={v:MinMaxIntRule PropertyDisplayName={x:Static p:Resources.MaximumOutOfBalanceCurrent}, Minimum=0, Maximum=64}}" />
-                        <TextBlock Margin="4,0,0,0" Text="A" />
+                                 Text="{co:ValidationBinding WattPilot.MinimumSocInBoost, Rule={v:MinMaxIntRule Minimum=0, Maximum=100, PropertyDisplayName={x:Static p:Resources.PvSurplusBatteryLevel}}}" />
+                        <TextBlock Margin="4,0,0,0" Text="%" />
                     </StackPanel>
-                    <Slider IsEnabled="{Binding EnableDanger}" Value="{Binding WattPilot.MaximumOutOfBalanceCurrent, Mode=TwoWay}" HorizontalAlignment="Stretch"
-                            Minimum="6" Maximum="{Binding WattPilot.Is16AmpereVariant, Converter={co:Bool2Double Null=32, False=32, True=16}}"
-                            Visibility="{Binding WattPilot.EnableOutOfBalanceControl, Converter={co:Bool2Visibility}}"/>
-
-                    <StackPanel IsEnabled="{Binding EnableDanger}" Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center">
-                        <TextBlock Margin="0,0,4,0">
-                            <Run Text="{x:Static p:Resources.AbsoluteMaximumChargingCurrent}" /><Run Text=":" />
-                        </TextBlock>
-                        <TextBox MinHeight="0" TextAlignment="Center" Width="40"
-                                 Text="{co:ValidationBinding Path=WattPilot.AbsoluteMaximumChargingCurrent, Rule={v:MinMaxIntRule PropertyDisplayName={x:Static p:Resources.AbsoluteMaximumChargingCurrent}, Minimum=0, Maximum=32}}" />
-                        <TextBlock Margin="4,0,0,0" Text="A" />
-                    </StackPanel>
-                    <Slider IsEnabled="{Binding EnableDanger}" Value="{Binding WattPilot.AbsoluteMaximumChargingCurrent, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="6" Maximum="{Binding WattPilot.Is16AmpereVariant, Converter={co:Bool2Double Null=32, False=32, True=16}}" />
-
-                    <StackPanel IsEnabled="{Binding EnableDanger}" Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center">
-                        <TextBlock Margin="0,0,4,0">
-                            <Run Text="{x:Static p:Resources.MaximumChargingCurrentPhase1}" /><Run Text=":" />
-                        </TextBlock>
-                        <TextBox MinHeight="0" TextAlignment="Center" Width="40"
-                                 Text="{co:ValidationBinding Path=WattPilot.MaximumChargingCurrentPhase1, Rule={v:MinMaxIntRule PropertyDisplayName={x:Static p:Resources.MaximumChargingCurrentPhase1}, Minimum=0, Maximum=16}}" />
-                        <TextBlock Margin="4,0,0,0" Text="A" />
-                    </StackPanel>
-                    <Slider IsEnabled="{Binding EnableDanger}" Value="{Binding WattPilot.MaximumChargingCurrentPhase1, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="6" Maximum="16" />
-
+                    <Slider Value="{Binding WattPilot.MinimumSocInBoost, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="0" Maximum="100"
+                            Visibility="{Binding WattPilot.EnableBatteryBoost, Converter={co:Bool2Visibility}}" />
+                    
                 </StackPanel>
             </GroupBox>
 
@@ -520,95 +499,137 @@
                 </StackPanel>
             </GroupBox>
 
-            <GroupBox Margin="0,8,8,0" Header="{x:Static p:Resources.ScannedWifis}" SnapsToDevicePixels="True">
-                <StackPanel Margin="8" Grid.IsSharedSizeScope="True">
-                    <DataGrid BorderThickness="1" BorderBrush="Black" IsReadOnly="True" GridLinesVisibility="None" AlternatingRowBackground="AntiqueWhite" ItemsSource="{Binding WattPilot.ScannedWifis}" AutoGenerateColumns="False">
-                        <DataGrid.RowStyle>
-                            <Style TargetType="DataGridRow">
-                                <Setter Property="ToolTip">
-                                    <Setter.Value>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                            </Grid.RowDefinitions>
-                                            <Grid.Resources>
-                                                <Style TargetType="TextBlock">
-                                                    <Setter Property="FontSize" Value="12" />
-                                                </Style>
-                                                <Style TargetType="Viewbox">
-                                                    <Setter Property="HorizontalAlignment" Value="Right" />
-                                                </Style>
-                                            </Grid.Resources>
+            <StackPanel>
+                <GroupBox Margin="0,8,8,0" Header="{x:Static p:Resources.ScannedWifis}" SnapsToDevicePixels="True">
+                    <StackPanel Margin="8" Grid.IsSharedSizeScope="True">
+                        <DataGrid BorderThickness="1" BorderBrush="Black" IsReadOnly="True" GridLinesVisibility="None" AlternatingRowBackground="AntiqueWhite" ItemsSource="{Binding WattPilot.ScannedWifis}" AutoGenerateColumns="False">
+                            <DataGrid.RowStyle>
+                                <Style TargetType="DataGridRow">
+                                    <Setter Property="ToolTip">
+                                        <Setter.Value>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+                                                <Grid.Resources>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="FontSize" Value="12" />
+                                                    </Style>
+                                                    <Style TargetType="Viewbox">
+                                                        <Setter Property="HorizontalAlignment" Value="Right" />
+                                                    </Style>
+                                                </Grid.Resources>
 
-                                            <Viewbox Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="0,0,0,1">
-                                                <TextBlock FontSize="14" Text="{Binding Ssid, FallbackValue='---'}" HorizontalAlignment="Center" />
-                                            </Viewbox>
+                                                <Viewbox Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="0,0,0,1">
+                                                    <TextBlock FontSize="14" Text="{Binding Ssid, FallbackValue='---'}" HorizontalAlignment="Center" />
+                                                </Viewbox>
 
-                                            <TextBlock Grid.Column="0" Grid.Row="2" Text="{x:Static p:Resources.Mode}" />
-                                            <Viewbox Grid.Column="1" Grid.Row="2">
-                                                <TextBlock HorizontalAlignment="Right">
+                                                <TextBlock Grid.Column="0" Grid.Row="2" Text="{x:Static p:Resources.Mode}" />
+                                                <Viewbox Grid.Column="1" Grid.Row="2">
+                                                    <TextBlock HorizontalAlignment="Right">
                                                     <Run Text="{Binding Type, Mode=OneWay, FallbackValue='---'}" />
-                                                </TextBlock>
-                                            </Viewbox>
+                                                    </TextBlock>
+                                                </Viewbox>
 
-                                            <TextBlock Grid.Column="0" Grid.Row="3" Text="{x:Static p:Resources.Channel}" />
-                                            <Viewbox Grid.Column="1" Grid.Row="3">
-                                                <TextBlock Text="{Binding Channel, FallbackValue='---'}" HorizontalAlignment="Right" />
-                                            </Viewbox>
+                                                <TextBlock Grid.Column="0" Grid.Row="3" Text="{x:Static p:Resources.Channel}" />
+                                                <Viewbox Grid.Column="1" Grid.Row="3">
+                                                    <TextBlock Text="{Binding Channel, FallbackValue='---'}" HorizontalAlignment="Right" />
+                                                </Viewbox>
 
-                                            <TextBlock Grid.Column="0" Grid.Row="4" Text="{x:Static p:Resources.Signal}" />
-                                            <Viewbox Grid.Column="1" Grid.Row="4">
-                                                <TextBlock HorizontalAlignment="Right">
+                                                <TextBlock Grid.Column="0" Grid.Row="4" Text="{x:Static p:Resources.Signal}" />
+                                                <Viewbox Grid.Column="1" Grid.Row="4">
+                                                    <TextBlock HorizontalAlignment="Right">
                                                     <Run Text="{Binding WifiSignal, FallbackValue='---'}" />
                                                     <Run Text="dBm" />
-                                                </TextBlock>
-                                            </Viewbox>
+                                                    </TextBlock>
+                                                </Viewbox>
 
-                                            <TextBlock Grid.Column="0" Grid.Row="5" Text="Auth" />
-                                            <Viewbox Grid.Column="1" Grid.Row="5">
-                                                <TextBlock Text="{Binding Encryption, FallbackValue='---', Converter={co:ToUpper}}" HorizontalAlignment="Right" />
-                                            </Viewbox>
+                                                <TextBlock Grid.Column="0" Grid.Row="5" Text="Auth" />
+                                                <Viewbox Grid.Column="1" Grid.Row="5">
+                                                    <TextBlock Text="{Binding Encryption, FallbackValue='---', Converter={co:ToUpper}}" HorizontalAlignment="Right" />
+                                                </Viewbox>
 
-                                            <TextBlock Grid.Column="0" Grid.Row="6" Text="{x:Static p:Resources.CipherP}" />
-                                            <Viewbox Grid.Column="1" Grid.Row="6">
-                                                <TextBlock Text="{Binding PairwiseCipher, FallbackValue='---', Converter={co:ToUpper}}" HorizontalAlignment="Right" />
-                                            </Viewbox>
+                                                <TextBlock Grid.Column="0" Grid.Row="6" Text="{x:Static p:Resources.CipherP}" />
+                                                <Viewbox Grid.Column="1" Grid.Row="6">
+                                                    <TextBlock Text="{Binding PairwiseCipher, FallbackValue='---', Converter={co:ToUpper}}" HorizontalAlignment="Right" />
+                                                </Viewbox>
 
-                                            <TextBlock Grid.Column="0" Grid.Row="7" Text="{x:Static p:Resources.CipherG}" />
-                                            <Viewbox Grid.Column="1" Grid.Row="7">
-                                                <TextBlock Text="{Binding GroupCipher, FallbackValue='---', Converter={co:ToUpper}}" HorizontalAlignment="Right" />
-                                            </Viewbox>
-                                        </Grid>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </DataGrid.RowStyle>
-                        <DataGrid.Columns>
-                            <DataGridTemplateColumn Header="{x:Static p:Resources.Signal}" SortMemberPath="WifiSignal" CanUserSort="True" CanUserResize="False">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <c:WifiControl HorizontalAlignment="Center" Width="14" SnapsToDevicePixels="False" Margin="2,2,0,0" Fill="Black" SignalStrength="{Binding WifiSignal}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTextColumn Binding="{Binding Ssid}" Header="{x:Static p:Resources.WifiSsid}" CanUserResize="False" />
-                            <DataGridTextColumn Binding="{Binding Encryption, Converter={co:ToUpper}}" Header="Encryption" CanUserResize="False" />
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </StackPanel>
-            </GroupBox>
+                                                <TextBlock Grid.Column="0" Grid.Row="7" Text="{x:Static p:Resources.CipherG}" />
+                                                <Viewbox Grid.Column="1" Grid.Row="7">
+                                                    <TextBlock Text="{Binding GroupCipher, FallbackValue='---', Converter={co:ToUpper}}" HorizontalAlignment="Right" />
+                                                </Viewbox>
+                                            </Grid>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </DataGrid.RowStyle>
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn Header="{x:Static p:Resources.Signal}" SortMemberPath="WifiSignal" CanUserSort="True" CanUserResize="False">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <c:WifiControl HorizontalAlignment="Center" Width="14" SnapsToDevicePixels="False" Margin="2,2,0,0" Fill="Black" SignalStrength="{Binding WifiSignal}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Binding="{Binding Ssid}" Header="{x:Static p:Resources.WifiSsid}" CanUserResize="False" />
+                                <DataGridTextColumn Binding="{Binding Encryption, Converter={co:ToUpper}}" Header="Encryption" CanUserResize="False" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </GroupBox>
 
+                <GroupBox Margin="0,8,8,0" Header="{x:Static p:Resources.DnoRequirements}" SnapsToDevicePixels="True">
+                    <StackPanel>
+                        <CheckBox IsEnabled="{Binding EnableDanger}" IsChecked="{Binding WattPilot.EnableOutOfBalanceControl}">
+                            <TextBlock Margin="0" Text="{x:Static p:Resources.EnableOutOfBalanceControl}" />
+                        </CheckBox>
+
+                        <StackPanel IsEnabled="{Binding EnableDanger}" Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center" Visibility="{Binding WattPilot.EnableOutOfBalanceControl, Converter={co:Bool2Visibility}}">
+                            <TextBlock Margin="0,0,4,0">
+                            <Run Text="{x:Static p:Resources.MaximumOutOfBalanceCurrent}" /><Run Text=":" />
+                            </TextBlock>
+                            <TextBox MinHeight="0" TextAlignment="Center" Width="40"
+                                 Text="{co:ValidationBinding Path=WattPilot.MaximumOutOfBalanceCurrent, Rule={v:MinMaxIntRule PropertyDisplayName={x:Static p:Resources.MaximumOutOfBalanceCurrent}, Minimum=0, Maximum=64}}" />
+                            <TextBlock Margin="4,0,0,0" Text="A" />
+                        </StackPanel>
+                        <Slider IsEnabled="{Binding EnableDanger}" Value="{Binding WattPilot.MaximumOutOfBalanceCurrent, Mode=TwoWay}" HorizontalAlignment="Stretch"
+                            Minimum="6" Maximum="{Binding WattPilot.Is16AmpereVariant, Converter={co:Bool2Double Null=32, False=32, True=16}}"
+                            Visibility="{Binding WattPilot.EnableOutOfBalanceControl, Converter={co:Bool2Visibility}}"/>
+
+                        <StackPanel IsEnabled="{Binding EnableDanger}" Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center">
+                            <TextBlock Margin="0,0,4,0">
+                            <Run Text="{x:Static p:Resources.AbsoluteMaximumChargingCurrent}" /><Run Text=":" />
+                            </TextBlock>
+                            <TextBox MinHeight="0" TextAlignment="Center" Width="40"
+                                 Text="{co:ValidationBinding Path=WattPilot.AbsoluteMaximumChargingCurrent, Rule={v:MinMaxIntRule PropertyDisplayName={x:Static p:Resources.AbsoluteMaximumChargingCurrent}, Minimum=0, Maximum=32}}" />
+                            <TextBlock Margin="4,0,0,0" Text="A" />
+                        </StackPanel>
+                        <Slider IsEnabled="{Binding EnableDanger}" Value="{Binding WattPilot.AbsoluteMaximumChargingCurrent, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="6" Maximum="{Binding WattPilot.Is16AmpereVariant, Converter={co:Bool2Double Null=32, False=32, True=16}}" />
+
+                        <StackPanel IsEnabled="{Binding EnableDanger}" Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center">
+                            <TextBlock Margin="0,0,4,0">
+                            <Run Text="{x:Static p:Resources.MaximumChargingCurrentPhase1}" /><Run Text=":" />
+                            </TextBlock>
+                            <TextBox MinHeight="0" TextAlignment="Center" Width="40"
+                                 Text="{co:ValidationBinding Path=WattPilot.MaximumChargingCurrentPhase1, Rule={v:MinMaxIntRule PropertyDisplayName={x:Static p:Resources.MaximumChargingCurrentPhase1}, Minimum=0, Maximum=16}}" />
+                            <TextBlock Margin="4,0,0,0" Text="A" />
+                        </StackPanel>
+                        <Slider IsEnabled="{Binding EnableDanger}" Value="{Binding WattPilot.MaximumChargingCurrentPhase1, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="6" Maximum="16" />
+
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
 
             <GroupBox Width="250" Style="{StaticResource ErrorGroupBox}" Margin="0,8,8,0" />
 

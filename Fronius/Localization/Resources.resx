@@ -1419,4 +1419,40 @@
   <data name="OpenConfigPdf" xml:space="preserve">
 	  <value>Open Configuration Document</value>
   </data>
+  <data name="DnoRequirements" xml:space="preserve">
+	  <value>Grid Requirements</value>
+  </data>
+  <data name="EnableBatteryBoost" xml:space="preserve">
+	  <value>Enable one-time charge from home battery (boost)</value>
+  </data>
+  <data name="BoostUntilCarDisconnects" xml:space="preserve">
+	  <value>Allow boost until car is disconnected</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseError" xml:space="preserve">
+	  <value>Error!</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseLoadManagement" xml:space="preserve">
+	  <value>Pause (load management)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseOcpp" xml:space="preserve">
+	  <value>Pause (OCPP)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseReconnectDelay" xml:space="preserve">
+	  <value>Pause (grid reconnect delay)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseAdapterBlocking" xml:space="preserve">
+	  <value>Error (Cable blocked)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseUnderFrequencyControl" xml:space="preserve">
+	  <value>Fehler (under frequency)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseGridMonitoring" xml:space="preserve">
+	  <value>Error (grid limits)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseOcppFallback" xml:space="preserve">
+	  <value>Pause (OCPP fallback)</value>
+  </data>
+  <data name="MinimumSocInBoost" xml:space="preserve">
+	  <value>Maximum SoC in boost mode</value>
+  </data>
 </root>
