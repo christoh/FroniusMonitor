@@ -500,7 +500,7 @@
             </GroupBox>
 
             <StackPanel>
-                <GroupBox Margin="0,8,8,0" Header="{x:Static p:Resources.ScannedWifis}" SnapsToDevicePixels="True">
+                <GroupBox Margin="0,8,8,0" Header="{x:Static p:Resources.ScannedWifis}" SnapsToDevicePixels="True" Visibility="Collapsed">
                     <StackPanel Margin="8" Grid.IsSharedSizeScope="True">
                         <DataGrid BorderThickness="1" BorderBrush="Black" IsReadOnly="True" GridLinesVisibility="None" AlternatingRowBackground="AntiqueWhite" ItemsSource="{Binding WattPilot.ScannedWifis}" AutoGenerateColumns="False">
                             <DataGrid.RowStyle>
@@ -619,13 +619,73 @@
 
                         <StackPanel IsEnabled="{Binding EnableDanger}" Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center">
                             <TextBlock Margin="0,0,4,0">
-                            <Run Text="{x:Static p:Resources.MaximumChargingCurrentPhase1}" /><Run Text=":" />
+                                <Run Text="{x:Static p:Resources.MaximumChargingCurrentPhase1}" /><Run Text=":" />
                             </TextBlock>
                             <TextBox MinHeight="0" TextAlignment="Center" Width="40"
-                                 Text="{co:ValidationBinding Path=WattPilot.MaximumChargingCurrentPhase1, Rule={v:MinMaxIntRule PropertyDisplayName={x:Static p:Resources.MaximumChargingCurrentPhase1}, Minimum=0, Maximum=16}}" />
+                                     Text="{co:ValidationBinding Path=WattPilot.MaximumChargingCurrentPhase1, Rule={v:MinMaxIntRule PropertyDisplayName={x:Static p:Resources.MaximumChargingCurrentPhase1}, Minimum=0, Maximum=16}}" />
                             <TextBlock Margin="4,0,0,0" Text="A" />
                         </StackPanel>
                         <Slider IsEnabled="{Binding EnableDanger}" Value="{Binding WattPilot.MaximumChargingCurrentPhase1, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="6" Maximum="16" />
+
+                        <StackPanel IsEnabled="{Binding EnableDanger}" Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center">
+                            <TextBlock Margin="0,0,4,0">
+                                <Run Text="{x:Static p:Resources.RandomDelayPowerFailure}" /><Run Text=":" />
+                            </TextBlock>
+                            <TextBox MinHeight="0" TextAlignment="Center" Width="40"
+                                     Text="{co:ValidationBinding Path=WattPilot.RandomDelayPowerFailure, Rule={v:MinMaxIntRule PropertyDisplayName={x:Static p:Resources.RandomDelayPowerFailure}, Minimum=0, Maximum=1200}}" />
+                            <TextBlock Margin="4,0,0,0" Text="s" />
+                        </StackPanel>
+                        <Slider IsEnabled="{Binding EnableDanger}" Value="{Binding WattPilot.RandomDelayPowerFailure, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="0" Maximum="1200" TickFrequency="20" IsSnapToTickEnabled="True" />
+
+                        <StackPanel IsEnabled="{Binding EnableDanger}" Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center">
+                            <TextBlock Margin="0,0,4,0">
+                                <Run Text="{x:Static p:Resources.RandomDelayAwattarStart}" /><Run Text=":" />
+                            </TextBlock>
+                            <TextBox MinHeight="0" TextAlignment="Center" Width="40"
+                                     Text="{co:ValidationBinding Path=WattPilot.RandomDelayAwattarStart, Rule={v:MinMaxIntRule PropertyDisplayName={x:Static p:Resources.RandomDelayAwattarStart}, Minimum=0, Maximum=1200}}" />
+                            <TextBlock Margin="4,0,0,0" Text="s" />
+                        </StackPanel>
+                        <Slider IsEnabled="{Binding EnableDanger}" Value="{Binding WattPilot.RandomDelayAwattarStart, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="0" Maximum="1200" TickFrequency="20" IsSnapToTickEnabled="True" />
+
+                        <StackPanel IsEnabled="{Binding EnableDanger}" Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center">
+                            <TextBlock Margin="0,0,4,0">
+                                <Run Text="{x:Static p:Resources.RandomDelayAwattarStop}" /><Run Text=":" />
+                            </TextBlock>
+                            <TextBox MinHeight="0" TextAlignment="Center" Width="40"
+                                     Text="{co:ValidationBinding Path=WattPilot.RandomDelayAwattarStop, Rule={v:MinMaxIntRule PropertyDisplayName={x:Static p:Resources.RandomDelayAwattarStop}, Minimum=0, Maximum=1200}}" />
+                            <TextBlock Margin="4,0,0,0" Text="s" />
+                        </StackPanel>
+                        <Slider IsEnabled="{Binding EnableDanger}" Value="{Binding WattPilot.RandomDelayAwattarStop, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="0" Maximum="1200" TickFrequency="20" IsSnapToTickEnabled="True" />
+
+                        <StackPanel IsEnabled="{Binding EnableDanger}" Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center">
+                            <TextBlock Margin="0,0,4,0">
+                                <Run Text="{x:Static p:Resources.RandomDelayTimerStart}" /><Run Text=":" />
+                            </TextBlock>
+                            <TextBox MinHeight="0" TextAlignment="Center" Width="40"
+                                     Text="{co:ValidationBinding Path=WattPilot.RandomDelayTimerStart, Rule={v:MinMaxIntRule PropertyDisplayName={x:Static p:Resources.RandomDelayTimerStart}, Minimum=0, Maximum=1200}}" />
+                            <TextBlock Margin="4,0,0,0" Text="s" />
+                        </StackPanel>
+                        <Slider IsEnabled="{Binding EnableDanger}" Value="{Binding WattPilot.RandomDelayTimerStart, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="0" Maximum="1200" TickFrequency="20" IsSnapToTickEnabled="True" />
+
+                        <StackPanel IsEnabled="{Binding EnableDanger}" Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center">
+                            <TextBlock Margin="0,0,4,0">
+                                <Run Text="{x:Static p:Resources.RandomDelayTimerStop}" /><Run Text=":" />
+                            </TextBlock>
+                            <TextBox MinHeight="0" TextAlignment="Center" Width="40"
+                                     Text="{co:ValidationBinding Path=WattPilot.RandomDelayTimerStop, Rule={v:MinMaxIntRule PropertyDisplayName={x:Static p:Resources.RandomDelayTimerStop}, Minimum=0, Maximum=1200}}" />
+                            <TextBlock Margin="4,0,0,0" Text="s" />
+                        </StackPanel>
+                        <Slider IsEnabled="{Binding EnableDanger}" Value="{Binding WattPilot.RandomDelayTimerStop, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="0" Maximum="1200" TickFrequency="20" IsSnapToTickEnabled="True" />
+
+                        <StackPanel IsEnabled="{Binding EnableDanger}" Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center">
+                            <TextBlock Margin="0,0,4,0">
+                                <Run Text="{x:Static p:Resources.RandomDelayCarConnect}" /><Run Text=":" />
+                            </TextBlock>
+                            <TextBox MinHeight="0" TextAlignment="Center" Width="40"
+                                     Text="{co:ValidationBinding Path=WattPilot.RandomDelayCarConnect, Rule={v:MinMaxIntRule PropertyDisplayName={x:Static p:Resources.RandomDelayCarConnect}, Minimum=0, Maximum=1200}}" />
+                            <TextBlock Margin="4,0,0,0" Text="s" />
+                        </StackPanel>
+                        <Slider IsEnabled="{Binding EnableDanger}" Value="{Binding WattPilot.RandomDelayCarConnect, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="0" Maximum="1200" TickFrequency="20" IsSnapToTickEnabled="True" />
 
                     </StackPanel>
                 </GroupBox>

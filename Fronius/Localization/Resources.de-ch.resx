@@ -32,4 +32,7 @@
 	<data name="Outer" xml:space="preserve">
 		<value>Aussen</value>
 	</data>
+	<data name="RandomDelayCarConnect" xml:space="preserve">
+		<value>Zufällige Verzögerung beim Anschliessen des Autos</value>
+	</data>
 </root>

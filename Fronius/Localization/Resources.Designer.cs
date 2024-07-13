@@ -2230,7 +2230,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Maximum SoC in boost mode.
         /// </summary>
         public static string MinimumSocInBoost {
             get {
@@ -3207,6 +3207,60 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string PvSurplusPowerThreshold {
             get {
                 return ResourceManager.GetString("PvSurplusPowerThreshold", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Random delay on start cost based charging.
+        /// </summary>
+        public static string RandomDelayAwattarStart {
+            get {
+                return ResourceManager.GetString("RandomDelayAwattarStart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Random delay on stop cost based charging.
+        /// </summary>
+        public static string RandomDelayAwattarStop {
+            get {
+                return ResourceManager.GetString("RandomDelayAwattarStop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Random delay on car connect.
+        /// </summary>
+        public static string RandomDelayCarConnect {
+            get {
+                return ResourceManager.GetString("RandomDelayCarConnect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Random delay on grid connect.
+        /// </summary>
+        public static string RandomDelayPowerFailure {
+            get {
+                return ResourceManager.GetString("RandomDelayPowerFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Random delay on start scheduled charging.
+        /// </summary>
+        public static string RandomDelayTimerStart {
+            get {
+                return ResourceManager.GetString("RandomDelayTimerStart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Random delay on stop scheduled charging.
+        /// </summary>
+        public static string RandomDelayTimerStop {
+            get {
+                return ResourceManager.GetString("RandomDelayTimerStop", resourceCulture);
             }
         }
         

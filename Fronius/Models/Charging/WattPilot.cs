@@ -1380,7 +1380,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
 
     private int? randomDelayTimerStart;
 
-    [WattPilot("rdbs, false")]
+    [WattPilot("rdbs", false)]
     public int? RandomDelayTimerStart
     {
         get => randomDelayTimerStart;
@@ -1389,11 +1389,20 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
 
     private int? randomDelayTimerStop;
 
-    [WattPilot("rdes, false")]
+    [WattPilot("rdes", false)]
     public int? RandomDelayTimerStop
     {
         get => randomDelayTimerStop;
         set => Set(ref randomDelayTimerStop, value);
+    }
+
+    private int? randomDelayCarConnect;
+    
+    [WattPilot("rdpl", false)]
+    public int? RandomDelayCarConnect
+    {
+        get => randomDelayCarConnect;
+        set => Set(ref randomDelayCarConnect, value);
     }
 
     public string? CableLockBehaviorDisplayName => CableLockBehavior?.ToDisplayName();

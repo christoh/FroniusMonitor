@@ -1455,4 +1455,22 @@
   <data name="MinimumSocInBoost" xml:space="preserve">
 	  <value>Maximum SoC in boost mode</value>
   </data>
+  <data name="RandomDelayPowerFailure" xml:space="preserve">
+	  <value>Random delay on grid connect</value>
+  </data>
+  <data name="RandomDelayAwattarStart" xml:space="preserve">
+	  <value>Random delay on start cost based charging</value>
+  </data>
+  <data name="RandomDelayAwattarStop" xml:space="preserve">
+	  <value>Random delay on stop cost based charging</value>
+  </data>
+  <data name="RandomDelayTimerStart" xml:space="preserve">
+	  <value>Random delay on start scheduled charging</value>
+  </data>
+  <data name="RandomDelayTimerStop" xml:space="preserve">
+	  <value>Random delay on stop scheduled charging</value>
+  </data>
+  <data name="RandomDelayCarConnect" xml:space="preserve">
+	  <value>Random delay on car connect</value>
+  </data>
 </root>
