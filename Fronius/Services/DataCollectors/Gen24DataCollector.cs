@@ -1,7 +1,6 @@
 ﻿namespace De.Hochstaetter.Fronius.Services.DataCollectors;
 
-public sealed class Gen24DataCollector
-(
+public sealed class Gen24DataCollector(
     ILogger<Gen24DataCollector> logger,
     IOptionsMonitor<Gen24DataCollectorParameters> options,
     IDataControlService dataControlService
@@ -10,6 +9,7 @@ public sealed class Gen24DataCollector
     private readonly ConcurrentDictionary<WebConnection, Task> runningSensorTasks = new(), runningConfigTasks = new();
 
     private CancellationTokenSource? tokenSource;
+    private DateTime lastLogTime = DateTime.MinValue;
     private Gen24DataCollectorParameters Parameters => options.CurrentValue;
     private IEnumerable<WebConnection> Connections => Parameters.Connections ?? throw new ArgumentNullException(nameof(options), @$"{nameof(options)} are not configured");
 
@@ -102,6 +102,51 @@ public sealed class Gen24DataCollector
                         gen24System.Sensors = await gen24System.Service.GetFroniusData(gen24System.Config.Components, token).ConfigureAwait(false);
                         dataControlService.AddOrUpdate(gen24System.Service.Connection!.DisplayName, gen24System);
                         logger.LogDebug("{Entity} sensors updated in {Duration:N0} ms", gen24System.DisplayName, (DateTime.UtcNow - start).TotalMilliseconds);
+
+                        if (gen24System.Sensors?.PrimaryPowerMeter?.DataTime != null)
+                        {
+                            var fileName = Path.Combine("/var/log", @$"EnergyHistory-{gen24System.Sensors.PrimaryPowerMeter.SerialNumber}.log");
+
+                            if (gen24System.Sensors.PrimaryPowerMeter.DataTime - lastLogTime >= TimeSpan.FromMinutes(2) && gen24System.Sensors.PrimaryPowerMeter.DataTime.Value.Minute % 5 == 0)
+                            {
+                                var item = new SmartMeterCalibrationHistoryItem
+                                {
+                                    CalibrationDate = gen24System.Sensors.PrimaryPowerMeter.DataTime ?? DateTime.UtcNow,
+                                    EnergyRealConsumed = gen24System.Sensors.PrimaryPowerMeter.EnergyActiveConsumed ?? double.NaN,
+                                    EnergyRealProduced = gen24System.Sensors.PrimaryPowerMeter.EnergyActiveProduced ?? double.NaN
+                                };
+
+                                List<SmartMeterCalibrationHistoryItem>? history = null;
+
+                                var serializer = new XmlSerializer(typeof(List<SmartMeterCalibrationHistoryItem>));
+
+                                if (File.Exists(fileName))
+                                {
+                                    try
+                                    {
+                                        await using var inStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                                        history = (List<SmartMeterCalibrationHistoryItem>?)serializer.Deserialize(inStream);
+                                    }
+                                    catch (Exception) { /**/ }
+                                }
+
+                                history ??= [];
+
+                                if (history.Count >= 5000)
+                                {
+                                    history.RemoveAt(0);
+                                }
+
+                                history.Add(item);
+
+                                await using var stream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None);
+                                await using var writer = new XmlTextWriter(stream, Encoding.UTF8);
+                                writer.Indentation = 4;
+                                writer.Formatting = Formatting.Indented;
+                                serializer.Serialize(writer, history.ToList());
+                                lastLogTime = gen24System.Sensors.PrimaryPowerMeter.DataTime ?? DateTime.UtcNow;
+                            }
+                        }
                     }
                 }
                 catch (Exception ex) when (ex is not OperationCanceledException)
@@ -113,7 +158,7 @@ public sealed class Gen24DataCollector
             {
                 var duration = DateTime.UtcNow - start;
                 var waitTime = Math.Max(0, (Parameters.RefreshRate - duration).TotalMilliseconds);
-                await Task.Delay((int)(waitTime), token).ConfigureAwait(false);
+                await Task.Delay((int)waitTime, token).ConfigureAwait(false);
                 token.ThrowIfCancellationRequested();
                 runningSensorTasks[gen24System.Service.Connection!] = Update(gen24System, semaphore);
             }
