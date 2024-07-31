@@ -826,7 +826,7 @@
 	  <value>G Cipher</value>
   </data>
   <data name="ScannedWifis" xml:space="preserve">
-	  <value>Wifi networks in range</value>
+	  <value>Wifi</value>
   </data>
   <data name="UpdateRate" xml:space="preserve">
 	  <value>Update rate</value>
@@ -1472,5 +1472,32 @@
   </data>
   <data name="RandomDelayCarConnect" xml:space="preserve">
 	  <value>Random delay on car connect</value>
+  </data>
+  <data name="Delays" xml:space="preserve">
+	  <value>Delays</value>
+  </data>
+  <data name="GridMonitoring" xml:space="preserve">
+	  <value>Grid Monitoring</value>
+  </data>
+  <data name="EnableGridMonitoringOnStartUp" xml:space="preserve">
+	  <value>Enable grid monitoring</value>
+  </data>
+  <data name="StartUpMonitoringMinimumVoltage" xml:space="preserve">
+	  <value>Minimum voltage on grid connect</value>
+  </data>
+  <data name="StartUpMonitoringMaximumVoltage" xml:space="preserve">
+	  <value>Maximum voltage on grid connect</value>
+  </data>
+  <data name="StartUpMonitoringMinimumFrequency" xml:space="preserve">
+	  <value>Minimum frequency on grid connect</value>
+  </data>
+  <data name="StartUpMonitoringMaximumFrequency" xml:space="preserve">
+	  <value>Maximum frequency on grid connect</value>
+  </data>
+  <data name="GridMonitoringTimeOnStartUp" xml:space="preserve">
+	  <value>Monitoring time on grid connect</value>
+  </data>
+  <data name="StartUpRampUpRate" xml:space="preserve">
+	  <value>Current ramp-up rate on grid connect</value>
   </data>
 </root>

@@ -1276,6 +1276,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Delays.
+        /// </summary>
+        public static string Delays {
+            get {
+                return ResourceManager.GetString("Delays", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Delete inverter.
         /// </summary>
         public static string DeleteInverter {
@@ -1425,6 +1434,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string EnableFritzBox {
             get {
                 return ResourceManager.GetString("EnableFritzBox", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable grid monitoring.
+        /// </summary>
+        public static string EnableGridMonitoringOnStartUp {
+            get {
+                return ResourceManager.GetString("EnableGridMonitoringOnStartUp", resourceCulture);
             }
         }
         
@@ -1722,6 +1740,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string GridHealth {
             get {
                 return ResourceManager.GetString("GridHealth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Grid Monitoring.
+        /// </summary>
+        public static string GridMonitoring {
+            get {
+                return ResourceManager.GetString("GridMonitoring", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Monitoring time on grid connect.
+        /// </summary>
+        public static string GridMonitoringTimeOnStartUp {
+            get {
+                return ResourceManager.GetString("GridMonitoringTimeOnStartUp", resourceCulture);
             }
         }
         
@@ -3409,7 +3445,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Wifi networks in range.
+        ///   Looks up a localized string similar to Wifi.
         /// </summary>
         public static string ScannedWifis {
             get {
@@ -3675,6 +3711,51 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Starting {
             get {
                 return ResourceManager.GetString("Starting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Maximum frequency on grid connect.
+        /// </summary>
+        public static string StartUpMonitoringMaximumFrequency {
+            get {
+                return ResourceManager.GetString("StartUpMonitoringMaximumFrequency", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Maximum voltage on grid connect.
+        /// </summary>
+        public static string StartUpMonitoringMaximumVoltage {
+            get {
+                return ResourceManager.GetString("StartUpMonitoringMaximumVoltage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Minimum frequency on grid connect.
+        /// </summary>
+        public static string StartUpMonitoringMinimumFrequency {
+            get {
+                return ResourceManager.GetString("StartUpMonitoringMinimumFrequency", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Minimum voltage on grid connect.
+        /// </summary>
+        public static string StartUpMonitoringMinimumVoltage {
+            get {
+                return ResourceManager.GetString("StartUpMonitoringMinimumVoltage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Current ramp-up rate on grid connect.
+        /// </summary>
+        public static string StartUpRampUpRate {
+            get {
+                return ResourceManager.GetString("StartUpRampUpRate", resourceCulture);
             }
         }
         

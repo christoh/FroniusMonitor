@@ -105,7 +105,7 @@ public sealed class Gen24DataCollector(
 
                         if (gen24System.Sensors?.PrimaryPowerMeter?.DataTime != null)
                         {
-                            var fileName = Path.Combine("/var/log", @$"EnergyHistory-{gen24System.Sensors.PrimaryPowerMeter.SerialNumber}.log");
+                            var fileName = Path.Combine(Parameters.LogDirectory, @$"EnergyHistory-{gen24System.Sensors.PrimaryPowerMeter.SerialNumber}.log");
 
                             if (gen24System.Sensors.PrimaryPowerMeter.DataTime - lastLogTime >= TimeSpan.FromMinutes(2) && gen24System.Sensors.PrimaryPowerMeter.DataTime.Value.Minute % 5 == 0)
                             {

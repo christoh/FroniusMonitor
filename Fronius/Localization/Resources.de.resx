@@ -784,7 +784,7 @@
 	  <value>G-Chiffre</value>
   </data>
   <data name="ScannedWifis" xml:space="preserve">
-	  <value>WLAN-Netze in der Umgebung</value>
+	  <value>WLAN</value>
   </data>
   <data name="UpdateRate" xml:space="preserve">
 	  <value>Aktualisierungsrate</value>
@@ -1400,5 +1400,32 @@
   </data>
   <data name="RandomDelayCarConnect" xml:space="preserve">
 	  <value>Zufällige Verzögerung beim Anschließen des Autos</value>
+  </data>
+  <data name="Delays" xml:space="preserve">
+	  <value>Verzögerungen</value>
+  </data>
+  <data name="GridMonitoring" xml:space="preserve">
+	  <value>Netzüberwachung</value>
+  </data>
+  <data name="EnableGridMonitoringOnStartUp" xml:space="preserve">
+	  <value>Netzüberwachung aktivieren</value>
+  </data>
+  <data name="StartUpMonitoringMinimumVoltage" xml:space="preserve">
+	  <value>Minimalspannung bei Verbinden mit dem Netz</value>
+  </data>
+  <data name="StartUpMonitoringMaximumVoltage" xml:space="preserve">
+	  <value>Maximalspannung bei Verbinden mit dem Netz</value>
+  </data>
+  <data name="StartUpMonitoringMinimumFrequency" xml:space="preserve">
+	  <value>Minimalfrequenz bei Verbinden mit dem Netz</value>
+  </data>
+  <data name="StartUpMonitoringMaximumFrequency" xml:space="preserve">
+	  <value>Maximalfrequenz bei Verbinden mit dem Netz</value>
+  </data>
+  <data name="GridMonitoringTimeOnStartUp" xml:space="preserve">
+	  <value>Überwachungszeit bei Verbinden mit dem Netz</value>
+  </data>
+  <data name="StartUpRampUpRate" xml:space="preserve">
+	  <value>Stromanstiegsrate bei Verbinden mit dem Netz</value>
   </data>
 </root>

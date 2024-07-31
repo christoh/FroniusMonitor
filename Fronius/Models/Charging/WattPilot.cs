@@ -673,6 +673,62 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref nextTripRemainInEcoMode, value);
     }
 
+    private bool? enableGridMonitoringOnStartUp;
+    [WattPilot("rsre", false)]
+    public bool? EnableGridMonitoringOnStartUp
+    {
+        get => enableGridMonitoringOnStartUp;
+        set => Set(ref enableGridMonitoringOnStartUp, value);
+    }
+
+    private int gridMonitoringTimeOnStartUp;
+    [WattPilot("gmtr", false)]
+    public int GridMonitoringTimeOnStartUp
+    {
+        get => gridMonitoringTimeOnStartUp;
+        set => Set(ref gridMonitoringTimeOnStartUp, value);
+    }
+
+    private float? startUpMonitoringMinimumVoltage;
+    [WattPilot("rmiv", false)]
+    public float? StartUpMonitoringMinimumVoltage
+    {
+        get => startUpMonitoringMinimumVoltage;
+        set => Set(ref startUpMonitoringMinimumVoltage, value);
+    }
+
+    private float? startUpMonitoringMaximumVoltage;
+    [WattPilot("rmav", false)]
+    public float? StartUpMonitoringMaximumVoltage
+    {
+        get => startUpMonitoringMaximumVoltage;
+        set => Set(ref startUpMonitoringMaximumVoltage, value);
+    }
+
+    private float? startUpMonitoringMinimumFrequency;
+    [WattPilot("rmif", false)]
+    public float? StartUpMonitoringMinimumFrequency
+    {
+        get => startUpMonitoringMinimumFrequency;
+        set => Set(ref startUpMonitoringMinimumFrequency, value);
+    }
+
+    private float? startUpMonitoringMaximumFrequency;
+    [WattPilot("rmaf", false)]
+    public float? StartUpMonitoringMaximumFrequency
+    {
+        get => startUpMonitoringMaximumFrequency;
+        set => Set(ref startUpMonitoringMaximumFrequency, value);
+    }
+
+    private float? startUpRampUpRate;
+    [WattPilot("rsrr", false)]
+    public float? StartUpRampUpRate
+    {
+        get => startUpRampUpRate;
+        set => Set(ref startUpRampUpRate, value);
+    }
+
     private byte? absoluteMaximumChargingCurrent;
 
     /// <summary>
@@ -1169,25 +1225,25 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         get => allowChargingFromBatteryStopSeconds;
         set => Set(ref allowChargingFromBatteryStopSeconds, value, () => NotifyOfPropertyChange(nameof(AllowChargingFromBatteryStopString)));
     }
-    
-    
+
+
     public string AllowChargingFromBatteryStartString
     {
-        get => $"{AllowChargingFromBatteryStartSeconds / 3600:D2}:{AllowChargingFromBatteryStartSeconds%3600/60:D2}";
-        set 
+        get => $"{AllowChargingFromBatteryStartSeconds / 3600:D2}:{AllowChargingFromBatteryStartSeconds % 3600 / 60:D2}";
+        set
         {
             var split = value.Split(':');
-            AllowChargingFromBatteryStartSeconds = int.Parse(split[0]) * 3600 + int.Parse(split[1])*60;
+            AllowChargingFromBatteryStartSeconds = int.Parse(split[0]) * 3600 + int.Parse(split[1]) * 60;
         }
     }
 
     public string AllowChargingFromBatteryStopString
     {
-        get => $"{AllowChargingFromBatteryStopSeconds / 3600:D2}:{AllowChargingFromBatteryStopSeconds%3600/60:D2}";
-        set 
+        get => $"{AllowChargingFromBatteryStopSeconds / 3600:D2}:{AllowChargingFromBatteryStopSeconds % 3600 / 60:D2}";
+        set
         {
             var split = value.Split(':');
-            AllowChargingFromBatteryStopSeconds = int.Parse(split[0]) * 3600 + int.Parse(split[1])*60;
+            AllowChargingFromBatteryStopSeconds = int.Parse(split[0]) * 3600 + int.Parse(split[1]) * 60;
         }
     }
 
@@ -1397,7 +1453,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private int? randomDelayCarConnect;
-    
+
     [WattPilot("rdpl", false)]
     public int? RandomDelayCarConnect
     {
