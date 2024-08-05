@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
              xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
+             xmlns:gen24="clr-namespace:De.Hochstaetter.Fronius.Models.Gen24;assembly=Fronius"
              mc:Ignorable="d"
              d:DesignHeight="100" d:DesignWidth="80">
     <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:PowerMeterClassic}}">
@@ -22,12 +23,18 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" Text="1.8.0" FontSize="40" Foreground="White" Margin="22,100,0,0"/>
+                <TextBlock Grid.Row="0" FontSize="40" Foreground="White" Margin="22,100,0,0">
+                    <Run Text="1.8.0:"/>
+                    <Run Text="{Binding ConsumedFactor, StringFormat=P2, Mode=OneWay}"/>
+                </TextBlock>
                 <local:PowerMeterClassicCounter
                     Value="{Binding SmartMeter.EnergyActiveConsumed, Converter={co:GridMeterConsumptionCorrector}, FallbackValue=0}" Grid.Row="1"
                     HorizontalAlignment="Center" Height="180" Width="750" CalibrationCompleted="OnConsumedPowerCalibrated" />
 
-                <TextBlock Grid.Row="2" Text="2.8.0" FontSize="40" Foreground="White" Margin="22,20,0,0"/>
+                <TextBlock Grid.Row="2" FontSize="40" Foreground="White" Margin="22,20,0,0">
+                    <Run Text="2.8.0:"/>
+                    <Run Text="{Binding ProducedFactor, StringFormat=P2, Mode=OneWay}"/>
+                </TextBlock>
                 <local:PowerMeterClassicCounter
                     Value="{Binding SmartMeter.EnergyActiveProduced, Converter={co:GridMeterProductionCorrector}, FallbackValue=0}" Grid.Row="3"
                     HorizontalAlignment="Center" Height="180" Width="750" CalibrationCompleted="OnProducedPowerCalibrated"/>

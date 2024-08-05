@@ -16,6 +16,22 @@ public partial class PowerMeterClassic
         set => SetValue(SmartMeterControlProperty, value);
     }
 
+    private static readonly DependencyPropertyKey consumedFactorPropertyKey = DependencyProperty.RegisterReadOnly
+    (
+        nameof(ConsumedFactor), typeof(double), typeof(PowerMeterClassic),
+        new PropertyMetadata(1.0)
+    );
+
+    public double ConsumedFactor => (double)GetValue(consumedFactorPropertyKey.DependencyProperty);
+
+    private static readonly DependencyPropertyKey producedFactorPropertyKey = DependencyProperty.RegisterReadOnly
+    (
+        nameof(ProducedFactor), typeof(double), typeof(PowerMeterClassic),
+        new PropertyMetadata(1.0)
+    );
+
+    public double ProducedFactor => (double)GetValue(producedFactorPropertyKey.DependencyProperty);
+
     public PowerMeterClassic()
     {
         InitializeComponent();
@@ -29,6 +45,9 @@ public partial class PowerMeterClassic
             {
                 return;
             }
+
+            SetValue(consumedFactorPropertyKey, Gen24PowerFlow.CalculateSmartMeterFactor(false));
+            SetValue(producedFactorPropertyKey, Gen24PowerFlow.CalculateSmartMeterFactor(true));
 
             var power = SmartMeter.ActivePowerSum ?? 0;
             var absolutePower = Math.Max(Math.Abs(power), .001);

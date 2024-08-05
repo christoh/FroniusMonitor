@@ -97,8 +97,7 @@ public class Gen24PowerFlow : Gen24DeviceBase
         {
             if (oldSmartMeterHistoryCountConsumed != history.Count)
             {
-                var consumed = (IReadOnlyList<SmartMeterCalibrationHistoryItem>)history.Where(item => double.IsFinite(item.ConsumedOffset)).ToList();
-                consumedFactor = CalculateSmartMeterFactor(consumed, false);
+                consumedFactor = CalculateSmartMeterFactor(false);
                 oldSmartMeterHistoryCountConsumed = history.Count;
             }
 
@@ -114,8 +113,7 @@ public class Gen24PowerFlow : Gen24DeviceBase
         {
             if (oldSmartMeterHistoryCountProduced != history.Count)
             {
-                var produced = (IReadOnlyList<SmartMeterCalibrationHistoryItem>)history.Where(item => double.IsFinite(item.ProducedOffset)).ToList();
-                producedFactor = CalculateSmartMeterFactor(produced, true);
+                producedFactor = CalculateSmartMeterFactor(true);
                 oldSmartMeterHistoryCountProduced = history.Count;
             }
 
@@ -172,13 +170,15 @@ public class Gen24PowerFlow : Gen24DeviceBase
     public double PowerLoss => (StoragePower ?? 0) + (SolarPower ?? 0) - (InverterAcPower ?? 0);
     public double? Efficiency => 1 - PowerLoss / DcInputPower;
 
-    private static double CalculateSmartMeterFactor(IReadOnlyList<SmartMeterCalibrationHistoryItem> list, bool isProduced)
+    public static double CalculateSmartMeterFactor(bool isProduced)
     {
+        var list = history.Where(item => double.IsFinite(isProduced?item.ProducedOffset:item.ConsumedOffset)).ToList();
+
         if (list.Count < 2)
         {
             return 1.0;
         }
-
+        
         var first = list[0];
         var last = list[^1];
         var rawEnergy = (isProduced ? last.EnergyRealProduced : last.EnergyRealConsumed) - (isProduced ? first.EnergyRealProduced : first.EnergyRealConsumed);
