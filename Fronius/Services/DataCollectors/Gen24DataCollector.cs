@@ -113,7 +113,9 @@ public sealed class Gen24DataCollector(
                                 {
                                     CalibrationDate = gen24System.Sensors.PrimaryPowerMeter.DataTime ?? DateTime.UtcNow,
                                     EnergyRealConsumed = gen24System.Sensors.PrimaryPowerMeter.EnergyActiveConsumed ?? double.NaN,
-                                    EnergyRealProduced = gen24System.Sensors.PrimaryPowerMeter.EnergyActiveProduced ?? double.NaN
+                                    EnergyRealProduced = gen24System.Sensors.PrimaryPowerMeter.EnergyActiveProduced ?? double.NaN,
+                                    ConsumedOffset = double.NaN,
+                                    ProducedOffset = double.NaN,
                                 };
 
                                 List<SmartMeterCalibrationHistoryItem>? history = null;
