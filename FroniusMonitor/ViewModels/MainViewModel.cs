@@ -17,6 +17,9 @@ public class MainViewModel(IDataCollectionService dataCollectionService, IFritzB
     private ICommand? garbageCollectionCommand;
     public ICommand GarbageCollectionCommand => garbageCollectionCommand ??= new NoParameterCommand(GarbageCollection);
 
+    private ICommand? importBayernwerkCommand;
+    public ICommand ImportBayernwerkCommand => importBayernwerkCommand ??= new NoParameterCommand(ImportBayernwerkFile);
+
     public IDataCollectionService DataCollectionService => dataCollectionService;
 
     public IWattPilotService WattPilotService { get; } = wattPilotService;
@@ -162,8 +165,8 @@ public class MainViewModel(IDataCollectionService dataCollectionService, IFritzB
 
         try
         {
-            isGarbageCollecting= true;
-            
+            isGarbageCollecting = true;
+
             await Task.Run(() =>
             {
                 GC.WaitForPendingFinalizers();
@@ -204,6 +207,36 @@ public class MainViewModel(IDataCollectionService dataCollectionService, IFritzB
         catch (Exception ex)
         {
             await Dispatcher.InvokeAsync(() => MessageBox.Show(ex.Message, Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error));
+        }
+    }
+
+    private async void ImportBayernwerkFile()
+    {
+        var openFileDialog = new OpenFileDialog
+        {
+            Filter = Loc.FilterExcelFile + Loc.FilterAllFiles,
+            CheckFileExists = true,
+            CheckPathExists = true,
+            Multiselect = false,
+            ShowHiddenItems = false,
+            ValidateNames = true,
+            Title = Loc.ImportBayernwerk,
+        };
+
+        var result = openFileDialog.ShowDialog();
+
+        if (result is not true)
+        {
+            return;
+        }
+
+        try
+        {
+            await dataCollectionService.DoBayernwerkCalibration(openFileDialog.FileName).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }

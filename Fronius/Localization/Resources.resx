@@ -1500,4 +1500,25 @@
   <data name="StartUpRampUpRate" xml:space="preserve">
 	  <value>Current ramp-up rate on grid connect</value>
   </data>
+  <data name="NoEnergyHistoryFile" xml:space="preserve">
+	  <value>No energy history file configured</value>
+  </data>
+  <data name="NoDriftFile" xml:space="preserve">
+	  <value>No drift file configured</value>
+  </data>
+  <data name="FileHasNoEnergyHistory" xml:space="preserve">
+	  <value>File {0} contains no energy history</value>
+  </data>
+  <data name="NoEnergyHistoryMatch" xml:space="preserve">
+	  <value>No common entry found in Excel sheet and energy history</value>
+  </data>
+  <data name="ExcelFileAlreadyImported" xml:space="preserve">
+	  <value>Excel file already imported</value>
+  </data>
+  <data name="FilterExcelFile" xml:space="preserve">
+	  <value>Excel files (*.xlsx)|*.xlsx</value>
+  </data>
+  <data name="ImportBayernwerk" xml:space="preserve">
+	  <value>Import Bayernwerk imSys Excel File</value>
+  </data>
 </root>

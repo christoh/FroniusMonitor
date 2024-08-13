@@ -31,6 +31,14 @@ public abstract class SettingsBase : BindableBase, ICloneable
         set => Set(ref driftFileName, value);
     }
 
+    private string? energyHistoryFileName;
+    [DefaultValue(null)]
+    public string? EnergyHistoryFileName
+    {
+        get => energyHistoryFileName;
+        set => Set(ref energyHistoryFileName, value);
+    }
+
     private WebConnection froniusConnection = new() { BaseUrl = "http://192.168.178.XXX", UserName = string.Empty, Password = string.Empty };
 
     [XmlElement, DefaultValue(null)]

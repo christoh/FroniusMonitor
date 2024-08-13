@@ -94,39 +94,51 @@ public class DataCollectionService : BindableBase, IDataCollectionService
 
     public int FroniusUpdateRate { get; set; }
 
-    public IList<SmartMeterCalibrationHistoryItem> SmartMeterHistory { get; private set; } = new List<SmartMeterCalibrationHistoryItem>();
+    public IList<SmartMeterCalibrationHistoryItem> SmartMeterHistory { get; private set; } = [];
 
     public Task<IList<SmartMeterCalibrationHistoryItem>> ReadCalibrationHistory() => Task.Run(() =>
     {
         if (string.IsNullOrWhiteSpace(settings.DriftFileName) || !File.Exists(settings.DriftFileName))
         {
-            return new List<SmartMeterCalibrationHistoryItem>();
+            return [];
         }
 
         try
         {
             var serializer = new XmlSerializer(typeof(List<SmartMeterCalibrationHistoryItem>));
             using var stream = new FileStream(settings.DriftFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-            return serializer.Deserialize(stream) as IList<SmartMeterCalibrationHistoryItem> ?? new List<SmartMeterCalibrationHistoryItem>();
+            return serializer.Deserialize(stream) as IList<SmartMeterCalibrationHistoryItem> ?? [];
         }
         catch (Exception)
         {
-            return new List<SmartMeterCalibrationHistoryItem>();
+            return [];
         }
     });
 
-    public async ValueTask DoBayernwerkCalibration(string energyHistoryFileName, string excelFileName)
+    public async ValueTask DoBayernwerkCalibration(string excelFileName)
     {
         IReadOnlyList<SmartMeterCalibrationHistoryItem> energyHistory;
 
+        if (settings.EnergyHistoryFileName == null)
+        {
+            throw new FileNotFoundException(Resources.NoEnergyHistoryFile);
+        }
 
-        await using (var fileStream = new FileStream(energyHistoryFileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+        if (settings.DriftFileName == null)
+        {
+            throw new FileNotFoundException(Resources.NoDriftFile);
+        }
+
+        await using (var fileStream = new FileStream(settings.EnergyHistoryFileName, FileMode.Open, FileAccess.Read, FileShare.Read))
         {
             var energyHistorySerializer = new XmlSerializer(typeof(SmartMeterCalibrationHistoryItem[]));
-            energyHistory = energyHistorySerializer.Deserialize(fileStream) as IReadOnlyList<SmartMeterCalibrationHistoryItem> ?? throw new InvalidDataException("File contains no energy history");
+
+            energyHistory = energyHistorySerializer.Deserialize(fileStream) as IReadOnlyList<SmartMeterCalibrationHistoryItem>
+                            ?? throw new InvalidDataException(string.Format(Resources.FileHasNoEnergyHistory, settings.EnergyHistoryFileName));
         }
 
         XLWorkbook workbook;
+
         await using (var fileStream = new FileStream(excelFileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
         {
             workbook = new XLWorkbook(fileStream);
@@ -139,7 +151,7 @@ public class DataCollectionService : BindableBase, IDataCollectionService
         {
             cell = cell.CellAbove();
         }
-        
+
         var dataCell = cell.CellLeft();
         var producedEnergy = dataCell.GetValue<double>() * 1000;
         var time = dataCell.CellLeft().GetDateTime().ToUniversalTime();
@@ -147,20 +159,22 @@ public class DataCollectionService : BindableBase, IDataCollectionService
 
         if (historyEntry == null || Math.Abs((historyEntry.CalibrationDate - time).TotalMinutes) > 2)
         {
-            throw new InvalidOperationException("No common entry found in Excel sheet and energy history");
+            throw new InvalidOperationException(Resources.NoEnergyHistoryMatch);
         }
 
         historyEntry.ProducedOffset = producedEnergy - historyEntry.EnergyRealProduced;
         historyEntry.ConsumedOffset = double.NaN;
 
-        if (Math.Abs((SmartMeterHistory[^1].CalibrationDate - historyEntry.CalibrationDate).TotalMinutes) < 60)
+        if (SmartMeterHistory.Last(i => double.IsFinite(i.ProducedOffset)).CalibrationDate >= historyEntry.CalibrationDate)
         {
-            throw new InvalidOperationException("Excel file already imported");
+            throw new InvalidOperationException(Resources.ExcelFileAlreadyImported);
         }
+
+        await AddCalibrationHistoryItem(historyEntry).ConfigureAwait(false);
     }
 
 
-    public Task<IList<SmartMeterCalibrationHistoryItem>> AddCalibrationHistoryItem(double consumedEnergyOffset, double producedEnergyOffset) => Task.Run(() =>
+    public Task<IList<SmartMeterCalibrationHistoryItem>> AddCalibrationHistoryItem(double consumedEnergyOffset, double producedEnergyOffset) => Task.Run(async () =>
     {
         if (string.IsNullOrWhiteSpace(settings.DriftFileName))
         {
@@ -190,23 +204,31 @@ public class DataCollectionService : BindableBase, IDataCollectionService
             EnergyRealProduced = HomeAutomationSystem?.Gen24Sensors?.PrimaryPowerMeter?.EnergyActiveProduced ?? double.NaN
         };
 
-        SmartMeterHistory.Add(newItem);
-
-        var serializer = new XmlSerializer(typeof(List<SmartMeterCalibrationHistoryItem>));
-        using var stream = new FileStream(settings.DriftFileName, FileMode.Create, FileAccess.Write, FileShare.None);
-
-        using var writer = XmlWriter.Create(stream, new XmlWriterSettings
-        {
-            Encoding = Encoding.UTF8,
-            Indent = true,
-            IndentChars = new string(' ', 3),
-            NewLineChars = Environment.NewLine
-        });
-
-        serializer.Serialize(writer, SmartMeterHistory as List<SmartMeterCalibrationHistoryItem> ?? [.. SmartMeterHistory]);
+        await AddCalibrationHistoryItem(newItem).ConfigureAwait(false);
 
         return SmartMeterHistory;
     });
+
+    private async ValueTask AddCalibrationHistoryItem(SmartMeterCalibrationHistoryItem newItem)
+    {
+        await Task.Run(() =>
+        {
+            SmartMeterHistory.Add(newItem);
+
+            var serializer = new XmlSerializer(typeof(List<SmartMeterCalibrationHistoryItem>));
+            using var stream = new FileStream(settings.DriftFileName!, FileMode.Create, FileAccess.Write, FileShare.None);
+
+            using var writer = XmlWriter.Create(stream, new XmlWriterSettings
+            {
+                Encoding = Encoding.UTF8,
+                Indent = true,
+                IndentChars = new string(' ', 3),
+                NewLineChars = Environment.NewLine
+            });
+
+            serializer.Serialize(writer, SmartMeterHistory as List<SmartMeterCalibrationHistoryItem> ?? [.. SmartMeterHistory]);
+        });
+    }
 
     [SuppressMessage("ReSharper", "ParameterHidesMember")]
     public async Task Start(WebConnection? gen24WebConnection, WebConnection? gen24WebConnection2, WebConnection? fritzBoxConnection, WebConnection? wattPilotConnection)

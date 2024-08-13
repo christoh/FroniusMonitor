@@ -1,0 +1,11 @@
+﻿<Viewbox x:Class="De.Hochstaetter.FroniusMonitor.Assets.Images.BayernwerkLogo"
+         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+         mc:Ignorable="d"
+         d:DesignHeight="38.5" d:DesignWidth="25.35">
+    <Canvas Height="38.5" Width="25.35">
+        <Path Fill="#0091bb" Data="M19.79,24.43c-.15,4-1.25,8-6.09,8.36a26.17,26.17,0,0,1-6.16-.13c-1-.19-1.8-1.06-1.8-2.8V17.44A11.88,11.88,0,0,1,8.22,16c3.21-1.44,8-.85,10.19,2.24a10.18,10.18,0,0,1,1.38,6.21m5.52-1.71a16.2,16.2,0,0,0-1.37-5.93,11.12,11.12,0,0,0-3.29-4.13A14.72,14.72,0,0,0,9.58,9.89,16.58,16.58,0,0,0,5.74,11V0H0V29.21A18.53,18.53,0,0,0,.61,35a4.87,4.87,0,0,0,3.31,2.82,15.82,15.82,0,0,0,4.33.65c.92,0,1.85,0,2.78,0s1.89,0,2.77-.09a12.64,12.64,0,0,0,4.72-1.07A10.18,10.18,0,0,0,22,34.66a15.4,15.4,0,0,0,3.25-8.59,22,22,0,0,0,0-3.35" />
+    </Canvas>
+</Viewbox>

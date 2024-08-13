@@ -1546,6 +1546,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Excel file already imported.
+        /// </summary>
+        public static string ExcelFileAlreadyImported {
+            get {
+                return ResourceManager.GetString("ExcelFileAlreadyImported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Export.
         /// </summary>
         public static string Export {
@@ -1600,11 +1609,29 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to File {0} contains no energy history.
+        /// </summary>
+        public static string FileHasNoEnergyHistory {
+            get {
+                return ResourceManager.GetString("FileHasNoEnergyHistory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to |All files (*.*)|*.
         /// </summary>
         public static string FilterAllFiles {
             get {
                 return ResourceManager.GetString("FilterAllFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Excel files (*.xlsx)|*.xlsx.
+        /// </summary>
+        public static string FilterExcelFile {
+            get {
+                return ResourceManager.GetString("FilterExcelFile", resourceCulture);
             }
         }
         
@@ -1866,6 +1893,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string HvacModeHeating {
             get {
                 return ResourceManager.GetString("HvacModeHeating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Import Bayernwerk imSys Excel File.
+        /// </summary>
+        public static string ImportBayernwerk {
+            get {
+                return ResourceManager.GetString("ImportBayernwerk", resourceCulture);
             }
         }
         
@@ -2838,6 +2874,33 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string NoChargingLogFromWattPilot {
             get {
                 return ResourceManager.GetString("NoChargingLogFromWattPilot", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No drift file configured.
+        /// </summary>
+        public static string NoDriftFile {
+            get {
+                return ResourceManager.GetString("NoDriftFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No energy history file configured.
+        /// </summary>
+        public static string NoEnergyHistoryFile {
+            get {
+                return ResourceManager.GetString("NoEnergyHistoryFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No common entry found in Excel sheet and energy history.
+        /// </summary>
+        public static string NoEnergyHistoryMatch {
+            get {
+                return ResourceManager.GetString("NoEnergyHistoryMatch", resourceCulture);
             }
         }
         

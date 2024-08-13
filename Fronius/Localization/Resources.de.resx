@@ -1428,4 +1428,25 @@
   <data name="StartUpRampUpRate" xml:space="preserve">
 	  <value>Stromanstiegsrate bei Verbinden mit dem Netz</value>
   </data>
+  <data name="NoEnergyHistoryFile" xml:space="preserve">
+	  <value>Keine Datei für die Energiehistorie konfiguriert</value>
+  </data>
+  <data name="NoDriftFile" xml:space="preserve">
+	  <value>Keine Driftdatei konfiguiert</value>
+  </data>
+  <data name="FileHasNoEnergyHistory" xml:space="preserve">
+	  <value>Die Datei {0} enthält keine Energiehistorie</value>
+  </data>
+  <data name="NoEnergyHistoryMatch" xml:space="preserve">
+	  <value>Kein gemeinsamer Eintrag in der Energiehistorie und dem Excel-Sheet gefunden</value>
+  </data>
+  <data name="ExcelFileAlreadyImported" xml:space="preserve">
+	  <value>Excel-Datei bereits importiert</value>
+  </data>
+  <data name="FilterExcelFile" xml:space="preserve">
+	  <value>Excel-Dateien (*.xlsx)|*.xlsx</value>
+  </data>
+  <data name="ImportBayernwerk" xml:space="preserve">
+	  <value>imSys-Excel-Datei vom Bayernwerk importieren</value>
+  </data>
 </root>
