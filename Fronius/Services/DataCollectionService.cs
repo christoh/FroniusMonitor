@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.Fronius.Services;
+﻿using ClosedXML.Excel;
+
+namespace De.Hochstaetter.Fronius.Services;
 
 public class DataCollectionService : BindableBase, IDataCollectionService
 {
@@ -113,6 +115,51 @@ public class DataCollectionService : BindableBase, IDataCollectionService
         }
     });
 
+    public async ValueTask DoBayernwerkCalibration(string energyHistoryFileName, string excelFileName)
+    {
+        IReadOnlyList<SmartMeterCalibrationHistoryItem> energyHistory;
+
+
+        await using (var fileStream = new FileStream(energyHistoryFileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+        {
+            var energyHistorySerializer = new XmlSerializer(typeof(SmartMeterCalibrationHistoryItem[]));
+            energyHistory = energyHistorySerializer.Deserialize(fileStream) as IReadOnlyList<SmartMeterCalibrationHistoryItem> ?? throw new InvalidDataException("File contains no energy history");
+        }
+
+        XLWorkbook workbook;
+        await using (var fileStream = new FileStream(excelFileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+        {
+            workbook = new XLWorkbook(fileStream);
+        }
+
+        var column = workbook.FindColumns(c => c.Contains("F1")).First();
+        var cell = column.LastCellUsed();
+
+        while (!cell.Value.IsText || cell.GetValue<string>() != "VAL")
+        {
+            cell = cell.CellAbove();
+        }
+        
+        var dataCell = cell.CellLeft();
+        var producedEnergy = dataCell.GetValue<double>() * 1000;
+        var time = dataCell.CellLeft().GetDateTime().ToUniversalTime();
+        var historyEntry = energyHistory.MinBy(i => Math.Abs(i.CalibrationDate.Ticks - time.Ticks));
+
+        if (historyEntry == null || Math.Abs((historyEntry.CalibrationDate - time).TotalMinutes) > 2)
+        {
+            throw new InvalidOperationException("No common entry found in Excel sheet and energy history");
+        }
+
+        historyEntry.ProducedOffset = producedEnergy - historyEntry.EnergyRealProduced;
+        historyEntry.ConsumedOffset = double.NaN;
+
+        if (Math.Abs((SmartMeterHistory[^1].CalibrationDate - historyEntry.CalibrationDate).TotalMinutes) < 60)
+        {
+            throw new InvalidOperationException("Excel file already imported");
+        }
+    }
+
+
     public Task<IList<SmartMeterCalibrationHistoryItem>> AddCalibrationHistoryItem(double consumedEnergyOffset, double producedEnergyOffset) => Task.Run(() =>
     {
         if (string.IsNullOrWhiteSpace(settings.DriftFileName))
@@ -144,11 +191,6 @@ public class DataCollectionService : BindableBase, IDataCollectionService
         };
 
         SmartMeterHistory.Add(newItem);
-
-        if (SmartMeterHistory.Count > 50)
-        {
-            SmartMeterHistory.RemoveAt(1);
-        }
 
         var serializer = new XmlSerializer(typeof(List<SmartMeterCalibrationHistoryItem>));
         using var stream = new FileStream(settings.DriftFileName, FileMode.Create, FileAccess.Write, FileShare.None);
