@@ -1461,4 +1461,22 @@
   <data name="NoValidCells" xml:space="preserve">
 	  <value>Das Excel-Sheet hat keine gültigen Zeilen</value>
   </data>
+  <data name="CableLockStatus_Unknown" xml:space="preserve">
+	  <value>Unbekannt</value>
+  </data>
+  <data name="CableLockStatus_LockFailed" xml:space="preserve">
+	  <value>Verriegeln fehlgeschlagen</value>
+  </data>
+  <data name="CableLockStatus_LockUnlockPowerOut" xml:space="preserve">
+	  <value>Kein Strom für Verriegelungsmechanismus</value>
+  </data>
+  <data name="CableLockStatus_Locked" xml:space="preserve">
+	  <value>Verriegelt</value>
+  </data>
+  <data name="CableLockStatus_Unlocked" xml:space="preserve">
+	  <value>Entriegelt</value>
+  </data>
+  <data name="CableLockStatus_UnlockFailed" xml:space="preserve">
+	  <value>Entriegelung fehlgeschlagen</value>
+  </data>
 </root>

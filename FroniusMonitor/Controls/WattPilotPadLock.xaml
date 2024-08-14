@@ -1,12 +1,15 @@
-﻿<Viewbox x:Class="De.Hochstaetter.FroniusMonitor.Assets.Images.PadLock"
+﻿<Viewbox x:Class="De.Hochstaetter.FroniusMonitor.Controls.WattPilotPadLock"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
+             xmlns:local="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
+             xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="20.53" d:DesignWidth="15.01">
-    <Canvas Height="20.53" Width="15.01">
+    <Canvas Height="20.53" Width="15.01" Background="Transparent"
+            DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:WattPilotPadLock}}"
+            ToolTip="{Binding CableLockStatus, Converter={co:Enum2DisplayName}}">
         <Canvas.RenderTransform>
             <TranslateTransform X="-4.50005" Y="-1.99"/>
         </Canvas.RenderTransform>

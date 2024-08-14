@@ -1533,4 +1533,22 @@
   <data name="NoValidCells" xml:space="preserve">
 	  <value>Excel sheet has no valid rows</value>
   </data>
+  <data name="CableLockStatus_Unknown" xml:space="preserve">
+	  <value>Unknown</value>
+  </data>
+  <data name="CableLockStatus_LockFailed" xml:space="preserve">
+	  <value>Lock failed</value>
+  </data>
+  <data name="CableLockStatus_LockUnlockPowerOut" xml:space="preserve">
+	  <value>Lock/Unlock power failure</value>
+  </data>
+  <data name="CableLockStatus_Locked" xml:space="preserve">
+	  <value>Locked</value>
+  </data>
+  <data name="CableLockStatus_Unlocked" xml:space="preserve">
+	  <value>Unlocked</value>
+  </data>
+  <data name="CableLockStatus_UnlockFailed" xml:space="preserve">
+	  <value>Unlock failed</value>
+  </data>
 </root>

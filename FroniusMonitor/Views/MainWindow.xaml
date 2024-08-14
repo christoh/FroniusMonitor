@@ -1,20 +1,19 @@
 ﻿<c:ScalableWindow x:Class="De.Hochstaetter.FroniusMonitor.Views.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="clr-namespace:De.Hochstaetter.FroniusMonitor.ViewModels"
-        xmlns:gl="clr-namespace:System.Globalization;assembly=System.Globalization"
-        mc:Ignorable="d"
-        Title="{x:Static p:Resources.AppName}" Height="860" Width="1080"
-        d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
-        xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
-        xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
-        xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
-        xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
-        xmlns:models="clr-namespace:De.Hochstaetter.Fronius.Models;assembly=Fronius"
-        xmlns:toshiba="clr-namespace:De.Hochstaetter.Fronius.Models.ToshibaAc;assembly=Fronius"
-        xmlns:t="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Resources">
+                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                  xmlns:vm="clr-namespace:De.Hochstaetter.FroniusMonitor.ViewModels"
+                  xmlns:gl="clr-namespace:System.Globalization;assembly=System.Globalization"
+                  mc:Ignorable="d"
+                  Title="{x:Static p:Resources.AppName}" Height="860" Width="1080"
+                  d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
+                  xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
+                  xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
+                  xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
+                  xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+                  xmlns:models="clr-namespace:De.Hochstaetter.Fronius.Models;assembly=Fronius"
+                  xmlns:toshiba="clr-namespace:De.Hochstaetter.Fronius.Models.ToshibaAc;assembly=Fronius">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -42,7 +41,7 @@
                     <MenuItem Header="_Auto-fit" Click="OnAutoSizeChecked" />
                     <MenuItem Header="{x:Static p:Resources.IncludeInverterPower}" Icon="{vi:Gen24}" IsChecked="{Binding IncludeInverterPower}" IsCheckable="True" />
                     <MenuItem Header="{x:Static p:Resources.Events}" Click="ShowEventLog" Icon="{vi:EventLogIcon}" />
-                    <MenuItem Header="{x:Static p:Resources.ColorAllGaugeTicks}" IsCheckable="True" IsChecked="{Binding Settings.ColorAllGaugeTicks}" Checked="SaveSettings" Unchecked="SaveSettings" Icon="{c:DemoGauge}"/>
+                    <MenuItem Header="{x:Static p:Resources.ColorAllGaugeTicks}" IsCheckable="True" IsChecked="{Binding Settings.ColorAllGaugeTicks}" Checked="SaveSettings" Unchecked="SaveSettings" Icon="{c:DemoGauge}" />
                     <MenuItem Visibility="{Binding Settings.HaveFritzBox, Converter={co:Bool2Visibility}}" Header="{x:Static p:Resources.ShowAvm}" IsChecked="{Binding Settings.ShowFritzBox, Mode=TwoWay}" IsCheckable="True" Icon="{vi:FritzLogo}" Checked="OnShowAvmChanged" Unchecked="OnShowAvmChanged" />
                     <MenuItem Visibility="{Binding Settings.HaveWattPilot, Converter={co:Bool2Visibility}}" Header="{x:Static p:Resources.WattPilotHeader}" IsChecked="{Binding Settings.ShowWattPilot, Mode=TwoWay}" IsCheckable="True" Icon="{vi:ChargingTrafficSign}" Checked="ShowWattPilot" Unchecked="ShowWattPilot" />
                 </MenuItem>
@@ -52,8 +51,8 @@
                     <MenuItem Header="{x:Static p:Resources.Reboot}" Icon="{vi:RebootIcon}" Visibility="{Binding WattPilotService.WattPilot, Converter={co:NullToVisibility}, FallbackValue=Collapsed}" Click="OnRebootWattPilotClicked" />
                 </MenuItem>
                 <MenuItem Header="Tools">
-                    <MenuItem Header="{x:Static p:Resources.ImportBayernwerk}" Command="{Binding ImportBayernwerkCommand}" Icon="{vi:BayernwerkLogo}"/>
-                    <MenuItem Header="Garbage Collection" Command="{Binding GarbageCollectionCommand}"/>
+                    <MenuItem Header="{x:Static p:Resources.ImportBayernwerk}" Command="{Binding ImportBayernwerkCommand}" Icon="{vi:BayernwerkLogo}" />
+                    <MenuItem Header="Garbage Collection" Command="{Binding GarbageCollectionCommand}" />
                 </MenuItem>
 
             </Menu>
@@ -113,14 +112,14 @@
                         </StackPanel>
                         <c:InverterControl Height="200" Versions="{Binding DataCollectionService.HomeAutomationSystem.Gen24Config.Versions, FallbackValue={x:Null}}"
                                            Sensors="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors, FallbackValue={x:Null}}"
-                                           Config="{Binding DataCollectionService.HomeAutomationSystem.Gen24Config, FallbackValue={x:Null}}"/>
+                                           Config="{Binding DataCollectionService.HomeAutomationSystem.Gen24Config, FallbackValue={x:Null}}" />
                         <c:PowerFlowArrow VerticalAlignment="Top" Fill="#ffd000" HasRightPlacement="True" x:Name="LoadArrowPrimaryInverter" Margin="15,0"
                                           Visibility="{Binding Settings.HaveTwoInverters, FallbackValue=Collapsed, Converter={co:Bool2Visibility}}" IsAc="True"
                                           Power="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors.PowerFlow.LoadPower, FallbackValue={x:Null}}" />
                         <c:InverterControl Height="200" Versions="{Binding DataCollectionService.HomeAutomationSystem.Gen24Config2.Versions, FallbackValue={x:Null}}" IsSecondary="True"
                                            Sensors="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors2, FallbackValue={x:Null}}"
                                            Config="{Binding DataCollectionService.HomeAutomationSystem.Gen24Config2, FallbackValue={x:Null}}"
-                                           Visibility="{Binding Settings.HaveTwoInverters, FallbackValue=Collapsed, Converter={co:Bool2Visibility}}"/>
+                                           Visibility="{Binding Settings.HaveTwoInverters, FallbackValue=Collapsed, Converter={co:Bool2Visibility}}" />
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Visibility="{Binding Settings.HaveTwoInverters, FallbackValue=Collapsed, Converter={co:Bool2Visibility}}">
                             <StackPanel Orientation="Vertical">
@@ -151,10 +150,9 @@
                                           Visibility="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors.Storage, Converter={co:NullToVisibility Null=Hidden}, FallbackValue=Hidden}" />
 
                         <c:PowerFlowArrow x:Name="LoadArrow" Fill="LightGray" DefaultsToOutgoing="True" IsAc="True"
-                                          HasRightPlacement="{Binding Settings.HaveTwoInverters, FallbackValue=Collapsed, Converter={co:BoolInverter}}" 
+                                          HasRightPlacement="{Binding Settings.HaveTwoInverters, FallbackValue=Collapsed, Converter={co:BoolInverter}}"
                                           Margin="{Binding Settings.HaveTwoInverters, Converter={co:Bool2Thickness True='180,0,0,0', False='15,0,0,0'}, FallbackValue='15,0,0,0'}"
-                                          Angle="{Binding Settings.HaveTwoInverters, Converter={co:Bool2Double False=30, True=-30}, FallbackValue=30}"
-                                          >
+                                          Angle="{Binding Settings.HaveTwoInverters, Converter={co:Bool2Double False=30, True=-30}, FallbackValue=30}">
                             <c:PowerFlowArrow.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Header="{x:Static p:Resources.IncludeInverterPower}" IsChecked="{Binding IncludeInverterPower}" IsCheckable="True" />
@@ -188,7 +186,7 @@
                             <vi:Car Width="150" HorizontalAlignment="Right" Margin="0,0,0,10" VerticalAlignment="Bottom"
                                     Status="{Binding DataCollectionService.HomeAutomationSystem.WattPilot.CarStatus, FallbackValue={x:Null}}"
                                     EnergyWatts="{Binding DataCollectionService.HomeAutomationSystem.WattPilot.EnergyCurrentSession, FallbackValue=0}"
-                                    CurrentUser="{Binding DataCollectionService.HomeAutomationSystem.WattPilot.CurrentUser, FallbackValue=''}"/>
+                                    CurrentUser="{Binding DataCollectionService.HomeAutomationSystem.WattPilot.CurrentUser, FallbackValue=''}" />
                         </Grid>
 
                         <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="10,0,0,10">
@@ -196,10 +194,14 @@
                                 <ScaleTransform ScaleX="{Binding ScaleX, ElementName=WattPilotTransform}" ScaleY="{Binding ScaleY, ElementName=WattPilotTransform}" />
                             </StackPanel.LayoutTransform>
 
-                            <TextBlock FontSize="14" FontWeight="Medium" TextAlignment="Center" Margin="0" Visibility="{Binding DataCollectionService.HomeAutomationSystem.WattPilot.CableCurrentMaximum, FallbackValue=Collapsed, Converter={co:NullToVisibility}}">
-                                <Run Text="{Binding DataCollectionService.HomeAutomationSystem.WattPilot.CableCurrentMaximum, FallbackValue='-',Mode=OneWay, StringFormat=N0, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" />
-                                <Run Text="A" />
-                            </TextBlock>
+                            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Visibility="{Binding DataCollectionService.HomeAutomationSystem.WattPilot.CableCurrentMaximum, FallbackValue=Collapsed, Converter={co:NullToVisibility}}">
+                                <TextBlock FontSize="14" FontWeight="Medium" TextAlignment="Center" Margin="0">
+                                    <Run Text="{Binding DataCollectionService.HomeAutomationSystem.WattPilot.CableCurrentMaximum, FallbackValue='-',Mode=OneWay, StringFormat=N0, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" />
+                                    <Run Text="A" />
+                                </TextBlock>
+
+                                <c:WattPilotPadLock Margin="4,0,0,0" CableLockStatus="{Binding DataCollectionService.HomeAutomationSystem.WattPilot.CableLockStatus, FallbackValue=Unknown}" Height="16"/>
+                            </StackPanel>
                             <vi:Typ2 Width="60" Margin="0,0,0,0" WattPilot="{Binding DataCollectionService.HomeAutomationSystem.WattPilot, FallbackValue={x:Null}}"
                                      Visibility="{Binding DataCollectionService.HomeAutomationSystem.WattPilot.CableCurrentMaximum, FallbackValue=Collapsed, Converter={co:NullToVisibility}}" />
 
@@ -223,7 +225,7 @@
                     <c:SmartMeterControl Height="200" HorizontalAlignment="Left" Grid.Column="1" Margin="10,0,0,0"
                                          MeterStatus="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors.MeterStatus, FallbackValue={x:Null}}"
                                          SmartMeter="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors.PrimaryPowerMeter, FallbackValue={x:Null}}"
-                                         Gen24Config="{Binding DataCollectionService.HomeAutomationSystem.Gen24Config, FallbackValue={x:Null}}"/>
+                                         Gen24Config="{Binding DataCollectionService.HomeAutomationSystem.Gen24Config, FallbackValue={x:Null}}" />
 
                     <c:StorageControl Height="200" Grid.Column="2" Margin="8,0,0,0" HomeAutomationSystem="{Binding DataCollectionService.HomeAutomationSystem}"
                                       Gen24Sensors="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors, FallbackValue={x:Null}}"
@@ -236,8 +238,8 @@
                             <MultiBinding Converter="{co:HouseConsumptionConverter}">
                                 <Binding Path="DataCollectionService.HomeAutomationSystem.SitePowerFlow.LoadPowerCorrected" FallbackValue="{x:Null}" />
                                 <Binding Path="DataCollectionService.HomeAutomationSystem.WattPilot.PowerTotal" FallbackValue="{x:Null}" />
-                                <Binding Path="DataCollectionService.HomeAutomationSystem.SitePowerFlow.PowerLoss" FallbackValue="{x:Null}"/>
-                                <Binding Path="Settings.AddInverterPowerToConsumption" FallbackValue="{x:Null}"/>
+                                <Binding Path="DataCollectionService.HomeAutomationSystem.SitePowerFlow.PowerLoss" FallbackValue="{x:Null}" />
+                                <Binding Path="Settings.AddInverterPowerToConsumption" FallbackValue="{x:Null}" />
                             </MultiBinding>
                         </c:House.ConsumptionWatts>
                     </c:House>

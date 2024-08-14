@@ -1,11 +1,11 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Assets.Images;
+﻿namespace De.Hochstaetter.FroniusMonitor.Controls;
 
-public partial class PadLock
+public partial class WattPilotPadLock
 {
     public static readonly DependencyProperty CableLockStatusProperty = DependencyProperty.Register
     (
-        nameof(CableLockStatus), typeof(CableLockStatus), typeof(PadLock),
-        new PropertyMetadata((d, e) => ((PadLock)d).OnCableLockStatusChanged())
+        nameof(CableLockStatus), typeof(CableLockStatus), typeof(WattPilotPadLock),
+        new PropertyMetadata((d, _) => ((WattPilotPadLock)d).OnCableLockStatusChanged())
     );
 
     public CableLockStatus CableLockStatus
@@ -15,7 +15,7 @@ public partial class PadLock
     }
 
 
-    public PadLock()
+    public WattPilotPadLock()
     {
         InitializeComponent();
     }
@@ -44,14 +44,14 @@ public partial class PadLock
             _ => throw new NotSupportedException(),
         };
 
-        MainBody.Stroke = CableLockStatus switch
+        MainBody.Fill = CableLockStatus switch
         {
             CableLockStatus.Unknown => Brushes.DarkGray,
-            CableLockStatus.LockFailed => Brushes.Red,
+            CableLockStatus.LockFailed => Brushes.OrangeRed,
             CableLockStatus.LockUnlockPowerOut => Brushes.DarkOrange,
-            CableLockStatus.Locked => Brushes.DarkGreen,
-            CableLockStatus.Unlocked => Brushes.DarkGreen,
-            CableLockStatus.UnlockFailed => Brushes.Red,
+            CableLockStatus.Locked => Brushes.ForestGreen,
+            CableLockStatus.Unlocked => Brushes.ForestGreen,
+            CableLockStatus.UnlockFailed => Brushes.OrangeRed,
             _ => throw new NotSupportedException(),
         };
     }

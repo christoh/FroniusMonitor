@@ -934,6 +934,60 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Locked.
+        /// </summary>
+        public static string CableLockStatus_Locked {
+            get {
+                return ResourceManager.GetString("CableLockStatus_Locked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lock failed.
+        /// </summary>
+        public static string CableLockStatus_LockFailed {
+            get {
+                return ResourceManager.GetString("CableLockStatus_LockFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lock/Unlock power failure.
+        /// </summary>
+        public static string CableLockStatus_LockUnlockPowerOut {
+            get {
+                return ResourceManager.GetString("CableLockStatus_LockUnlockPowerOut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown.
+        /// </summary>
+        public static string CableLockStatus_Unknown {
+            get {
+                return ResourceManager.GetString("CableLockStatus_Unknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unlocked.
+        /// </summary>
+        public static string CableLockStatus_Unlocked {
+            get {
+                return ResourceManager.GetString("CableLockStatus_Unlocked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unlock failed.
+        /// </summary>
+        public static string CableLockStatus_UnlockFailed {
+            get {
+                return ResourceManager.GetString("CableLockStatus_UnlockFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Calibrate battery.
         /// </summary>
         public static string CalibrateBattery {
@@ -3004,7 +3058,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Excel sheet has no valid rows.
         /// </summary>
         public static string NoValidCells {
             get {
