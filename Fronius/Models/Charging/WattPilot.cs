@@ -16,6 +16,22 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref serialNumber, value);
     }
 
+    private bool? sendRfidSerialToCloud;
+    [WattPilot("rde", false)]
+    public bool? SendRfidSerialToCloud
+    {
+        get => sendRfidSerialToCloud;
+        set => Set(ref sendRfidSerialToCloud, value);
+    }
+
+    private string? lastRfidSerial;
+    [WattPilot("lri")]
+    public string? LastRfidSerial
+    {
+        get => lastRfidSerial;
+        set => Set(ref lastRfidSerial, value);
+    }
+
     private string? hostName;
 
     [FroniusProprietaryImport("hostname", FroniusDataType.Root)]
@@ -33,6 +49,22 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     {
         get => accessMode;
         set => Set(ref accessMode, value);
+    }
+
+    private CableLockStatus? cableLockStatus;
+    [WattPilot("cus")]
+    public CableLockStatus? CableLockStatus
+    {
+        get => cableLockStatus;
+        set => Set(ref cableLockStatus, value);
+    }
+
+    private CableLockFeedback? cableLockFeedback;
+    [WattPilot("ffb")]
+    public CableLockFeedback? CableLockFeedback
+    {
+        get => cableLockFeedback;
+        set => Set(ref cableLockFeedback, value);
     }
 
     private ChargingLogic? chargingLogic;

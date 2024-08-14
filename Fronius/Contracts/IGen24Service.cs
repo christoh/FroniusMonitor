@@ -1,6 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Models.Gen24.Commands;
-
-namespace De.Hochstaetter.Fronius.Contracts;
+﻿namespace De.Hochstaetter.Fronius.Contracts;
 
 public interface IGen24Service
 {

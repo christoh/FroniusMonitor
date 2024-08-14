@@ -44,6 +44,9 @@ public class SettingsViewModel : SettingsViewModelBase
     private ICommand? changeDriftsFileCommand;
     public ICommand ChangeDriftsFileCommand => changeDriftsFileCommand ??= new NoParameterCommand(ChangeDriftsFile);
 
+    private ICommand? changeEnergyHistoryFileCommand;
+    public ICommand ChangeEnergyHistoryFileCommand => changeEnergyHistoryFileCommand ??= new NoParameterCommand(ChangeEnergyHistoryFile);
+
     private ICommand? choosePanelLayoutFileCommand;
     public ICommand ChoosePanelLayoutFileCommand => choosePanelLayoutFileCommand ??= new NoParameterCommand(ChoosePanelLayoutFile);
 
@@ -129,9 +132,31 @@ public class SettingsViewModel : SettingsViewModelBase
 
         var result = dialog.ShowDialog();
 
-        if (result.HasValue && result.Value)
+        if (result is true)
         {
             Settings.DriftFileName = dialog.FileName;
+        }
+    }
+
+    private void ChangeEnergyHistoryFile()
+    {
+        var dialog = new OpenFileDialog
+        {
+            CheckFileExists = true,
+            CheckPathExists = true,
+            DefaultExt = ".xml",
+            DereferenceLinks = true,
+            InitialDirectory = string.IsNullOrWhiteSpace(Settings.EnergyHistoryFileName) ? null : Path.GetDirectoryName(Settings.EnergyHistoryFileName),
+            ValidateNames = true,
+            Title = Loc.SelectEnergyHistoryFile,
+            Filter = "Log files (*.log)|*.log" + Loc.FilterAllFiles
+        };
+
+        var result = dialog.ShowDialog();
+
+        if (result is true)
+        {
+            Settings.EnergyHistoryFileName = dialog.FileName;
         }
     }
 

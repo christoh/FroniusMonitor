@@ -922,13 +922,13 @@
 	  <value>{0} is already running.</value>
   </data>
   <data name="DriftsFile" xml:space="preserve">
-	  <value>Drifts file</value>
+	  <value>Drift file</value>
   </data>
   <data name="Change" xml:space="preserve">
 	  <value>Change</value>
   </data>
   <data name="SelectDriftsFile" xml:space="preserve">
-	  <value>Select location and name of the drifts file</value>
+	  <value>Select location and name of the drift file</value>
   </data>
   <data name="OpTime" xml:space="preserve">
 	  <value>Op times</value>
@@ -1513,12 +1513,24 @@
 	  <value>No common entry found in Excel sheet and energy history</value>
   </data>
   <data name="ExcelFileAlreadyImported" xml:space="preserve">
-	  <value>Excel file already imported</value>
+	  <value>Excel file already imported or newer manual calibration present</value>
   </data>
   <data name="FilterExcelFile" xml:space="preserve">
 	  <value>Excel files (*.xlsx)|*.xlsx</value>
   </data>
   <data name="ImportBayernwerk" xml:space="preserve">
 	  <value>Import Bayernwerk imSys Excel File</value>
+  </data>
+  <data name="SelectEnergyHistoryFile" xml:space="preserve">
+	  <value>Select location and name of the energy history file</value>
+  </data>
+  <data name="FilterLogFiles" xml:space="preserve">
+	  <value>Log files (*.log)|*.log</value>
+  </data>
+  <data name="EnergyHistoryFile" xml:space="preserve">
+	  <value>Energy history file</value>
+  </data>
+  <data name="NoValidCells" xml:space="preserve">
+	  <value>Excel sheet has no valid rows</value>
   </data>
 </root>

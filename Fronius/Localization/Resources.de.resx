@@ -874,7 +874,7 @@
 	  <value>Ändern</value>
   </data>
   <data name="SelectDriftsFile" xml:space="preserve">
-	  <value>Wähle den Ort und den Namen der Drifts-Datei</value>
+	  <value>Wähle den Ort und den Namen der Drift-Datei</value>
   </data>
   <data name="OpTime" xml:space="preserve">
 	  <value>Betriebszeiten</value>
@@ -1441,12 +1441,24 @@
 	  <value>Kein gemeinsamer Eintrag in der Energiehistorie und dem Excel-Sheet gefunden</value>
   </data>
   <data name="ExcelFileAlreadyImported" xml:space="preserve">
-	  <value>Excel-Datei bereits importiert</value>
+	  <value>Excel-Datei bereits importiert oder neuere manuelle Kalibrierung vorhanden</value>
   </data>
   <data name="FilterExcelFile" xml:space="preserve">
 	  <value>Excel-Dateien (*.xlsx)|*.xlsx</value>
   </data>
   <data name="ImportBayernwerk" xml:space="preserve">
 	  <value>imSys-Excel-Datei vom Bayernwerk importieren</value>
+  </data>
+  <data name="SelectEnergyHistoryFile" xml:space="preserve">
+	  <value>Wähle den Ort und Namen der Energiehistorien-Datei</value>
+  </data>
+  <data name="FilterLogFiles" xml:space="preserve">
+	  <value>Log-Dateien (*.log)|*.log</value>
+  </data>
+  <data name="EnergyHistoryFile" xml:space="preserve">
+	  <value>Energiehistorien-Datei</value>
+  </data>
+  <data name="NoValidCells" xml:space="preserve">
+	  <value>Das Excel-Sheet hat keine gültigen Zeilen</value>
   </data>
 </root>

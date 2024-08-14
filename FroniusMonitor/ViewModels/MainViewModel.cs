@@ -232,7 +232,7 @@ public class MainViewModel(IDataCollectionService dataCollectionService, IFritzB
 
         try
         {
-            await dataCollectionService.DoBayernwerkCalibration(openFileDialog.FileName).ConfigureAwait(false);
+            await dataCollectionService.ImportBayernwerkExcelFile(openFileDialog.FileName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

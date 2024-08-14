@@ -87,6 +87,23 @@ public enum AccessMode : byte
     RequireAuth = 1
 }
 
+public enum CableLockStatus : byte
+{
+    Unknown = 0,
+    Unlocked = 1,
+    UnlockFailed = 2,
+    Locked = 3,
+    LockFailed = 4,
+    LockUnlockPowerOut = 5
+}
+
+public enum CableLockFeedback : byte
+{
+    NoProblem = 0,
+    ProblemLock = 1,
+    ProblemUnlock = 2
+}
+
 public enum ChargingLogic : byte
 {
     /// <summary>

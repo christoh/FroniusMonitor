@@ -2,6 +2,7 @@
 
 global using System.Collections;
 global using System.Collections.Concurrent;
+global using System.Collections.Immutable;
 global using System.Collections.ObjectModel;
 global using System.Collections.Specialized;
 global using System.ComponentModel;
@@ -30,6 +31,7 @@ global using De.Hochstaetter.Fronius.Localization;
 global using De.Hochstaetter.Fronius.Models;
 global using De.Hochstaetter.Fronius.Models.Gen24;
 global using De.Hochstaetter.Fronius.Models.Charging;
+global using De.Hochstaetter.Fronius.Models.Gen24.Commands;
 global using De.Hochstaetter.Fronius.Models.Modbus;
 global using De.Hochstaetter.Fronius.Models.Settings;
 global using De.Hochstaetter.Fronius.Models.ToshibaAc;

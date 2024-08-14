@@ -21,8 +21,8 @@ public interface IDataCollectionService
     void ResumePowerConsumers();
     void InvalidateFritzBox();
     Task<IList<SmartMeterCalibrationHistoryItem>> ReadCalibrationHistory();
-    Task<IList<SmartMeterCalibrationHistoryItem>> AddCalibrationHistoryItem(double consumedEnergyOffsetWattHours, double producedEnergyOffsetWattHours);
+    Task AddCalibrationHistoryItem(double consumedEnergyOffsetWattHours, double producedEnergyOffsetWattHours);
     IServiceProvider Container { get; }
     IServiceProvider Container2 { get; }
-    ValueTask DoBayernwerkCalibration(string excelFileName);
+    ValueTask ImportBayernwerkExcelFile(string excelFileName);
 }

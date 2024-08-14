@@ -1339,7 +1339,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Drifts file.
+        ///   Looks up a localized string similar to Drift file.
         /// </summary>
         public static string DriftsFile {
             get {
@@ -1519,6 +1519,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Energy history file.
+        /// </summary>
+        public static string EnergyHistoryFile {
+            get {
+                return ResourceManager.GetString("EnergyHistoryFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error.
         /// </summary>
         public static string Error {
@@ -1546,7 +1555,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Excel file already imported.
+        ///   Looks up a localized string similar to Excel file already imported or newer manual calibration present.
         /// </summary>
         public static string ExcelFileAlreadyImported {
             get {
@@ -1632,6 +1641,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string FilterExcelFile {
             get {
                 return ResourceManager.GetString("FilterExcelFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Log files (*.log)|*.log.
+        /// </summary>
+        public static string FilterLogFiles {
+            get {
+                return ResourceManager.GetString("FilterLogFiles", resourceCulture);
             }
         }
         
@@ -2986,6 +3004,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        public static string NoValidCells {
+            get {
+                return ResourceManager.GetString("NoValidCells", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No Wattpilot found.
         /// </summary>
         public static string NoWattPilot {
@@ -3535,11 +3562,20 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Select location and name of the drifts file.
+        ///   Looks up a localized string similar to Select location and name of the drift file.
         /// </summary>
         public static string SelectDriftsFile {
             get {
                 return ResourceManager.GetString("SelectDriftsFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select location and name of the energy history file.
+        /// </summary>
+        public static string SelectEnergyHistoryFile {
+            get {
+                return ResourceManager.GetString("SelectEnergyHistoryFile", resourceCulture);
             }
         }
         
