@@ -1204,6 +1204,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        public static string CloudWebSocketEnabled {
+            get {
+                return ResourceManager.GetString("CloudWebSocketEnabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Always fully color gauges.
         /// </summary>
         public static string ColorAllGaugeTicks {
@@ -3648,6 +3657,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string SelfSufficiencyShort {
             get {
                 return ResourceManager.GetString("SelfSufficiencyShort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Allow RFID card ids in APIs (including cloud).
+        /// </summary>
+        public static string SendRfidSerialToCloud {
+            get {
+                return ResourceManager.GetString("SendRfidSerialToCloud", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If RFID card ids are sent to the cloud, go-E and the cloud provider (Hetzner) can read them and clone the card. If you enable this, do not use a public charging card for your Wattpilot..
+        /// </summary>
+        public static string SendRfidSerialToCloud_ToolTip {
+            get {
+                return ResourceManager.GetString("SendRfidSerialToCloud_ToolTip", resourceCulture);
             }
         }
         

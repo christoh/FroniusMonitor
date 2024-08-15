@@ -130,31 +130,41 @@
                         <c:PasswordBox IsReadOnly="{Binding EnableDanger, Converter={co:BoolInverter}}" Grid.Column="2" Grid.Row="6" MinWidth="250" Password="{Binding WattPilot.CloudAccessKey}" />
                     </Grid>
 
-                    <CheckBox IsEnabled="{Binding EnableDanger}" IsChecked="{Binding WattPilot.IsWifiClientEnabled}">
-                        <TextBlock Margin="0" Text="{x:Static p:Resources.IsWifiClientEnabled}" />
-                    </CheckBox>
-                    <CheckBox Content="{x:Static p:Resources.UnlockCableOnPowerFailure}" IsChecked="{Binding WattPilot.UnlockCableOnPowerFailure}" />
-                    <CheckBox IsEnabled="{Binding EnableDanger}" IsChecked="{Binding WattPilot.LoadBalancingEnabled}">
-                        <TextBlock Margin="0" Text="{x:Static p:Resources.EnableLoadBalancing}" />
-                    </CheckBox>
-                    <CheckBox Content="{x:Static p:Resources.RequireRfidAuth}" IsChecked="{Binding WattPilot.AccessMode, Converter={co:AccessMode2Bool}}" />
-                    <CheckBox Content="{x:Static p:Resources.AuthCurrentUser}" IsChecked="{Binding IsUserAuthenticated}" />
-                    <CheckBox IsChecked="{Binding WattPilot.CloudAccessEnabled}">
-                        <TextBlock Margin="0">
-                            <Run Text="{x:Static p:Resources.EnableApiLink}" />
-                            <Hyperlink Command="{Binding NavigateToApiCommand}">
-                                <TextBlock Margin="0" Text="{Binding ApiLink}" />
-                            </Hyperlink>
-                        </TextBlock>
-                    </CheckBox>
-                    <CheckBox IsEnabled="{Binding EnableDanger}" IsChecked="{Binding WattPilot.DisableProtectiveEarth}">
-                        <TextBlock Margin="0" Text="{x:Static p:Resources.DisableProtectiveEarth}" />
-                    </CheckBox>
-                    <CheckBox IsChecked="{Binding WattPilot.ButtonEnableCurrentSelection}" Content="{x:Static p:Resources.ButtonEnableCharging}" />
-                    <CheckBox IsChecked="{Binding WattPilot.ButtonEnableModeSwitch}" Content="{x:Static p:Resources.ButtonEnableModeSwitch}" />
-                    <CheckBox IsChecked="{Binding WattPilot.EnableBatteryBoost}" Content="{x:Static p:Resources.EnableBatteryBoost}" />
-                    <CheckBox IsChecked="{Binding WattPilot.EnableSingleTimeBoost, Converter={co:BoolInverter}}" Content="{x:Static p:Resources.BoostUntilCarDisconnects}"
-                              Visibility="{Binding WattPilot.EnableBatteryBoost, Converter={co:Bool2Visibility}}" />
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                        <StackPanel>
+                            <CheckBox IsEnabled="{Binding EnableDanger}" IsChecked="{Binding WattPilot.IsWifiClientEnabled}">
+                                <TextBlock Margin="0" Text="{x:Static p:Resources.IsWifiClientEnabled}" />
+                            </CheckBox>
+                            <CheckBox Content="{x:Static p:Resources.UnlockCableOnPowerFailure}" IsChecked="{Binding WattPilot.UnlockCableOnPowerFailure}" />
+                            <CheckBox IsEnabled="{Binding EnableDanger}" IsChecked="{Binding WattPilot.LoadBalancingEnabled}">
+                                <TextBlock Margin="0" Text="{x:Static p:Resources.EnableLoadBalancing}" />
+                            </CheckBox>
+                            <CheckBox Content="{x:Static p:Resources.RequireRfidAuth}" IsChecked="{Binding WattPilot.AccessMode, Converter={co:AccessMode2Bool}}" />
+                            <CheckBox Content="{x:Static p:Resources.AuthCurrentUser}" IsChecked="{Binding IsUserAuthenticated}" />
+                            <CheckBox IsChecked="{Binding WattPilot.CloudAccessEnabled}">
+                                <TextBlock Margin="0">
+                                    <Run Text="{x:Static p:Resources.EnableApiLink}" />
+                                    <Hyperlink Command="{Binding NavigateToApiCommand}">
+                                        <TextBlock Margin="0" Text="{Binding ApiLink}" />
+                                    </Hyperlink>
+                                </TextBlock>
+                            </CheckBox>
+                            <CheckBox IsEnabled="{Binding EnableDanger}" Content="{x:Static p:Resources.CloudWebSocketEnabled}" IsChecked="{Binding WattPilot.CloudWebSocketEnabled}" />
+                        </StackPanel>
+                        
+                        <StackPanel Margin="8,0,0,0">
+                            <CheckBox Content="{x:Static p:Resources.SendRfidSerialToCloud}" IsChecked="{Binding WattPilot.SendRfidSerialToCloud}" ToolTip="{x:Static p:Resources.SendRfidSerialToCloud_ToolTip}" />
+                            <CheckBox IsEnabled="{Binding EnableDanger}" IsChecked="{Binding WattPilot.DisableProtectiveEarth}">
+                                <TextBlock Margin="0" Text="{x:Static p:Resources.DisableProtectiveEarth}" />
+                            </CheckBox>
+                            <CheckBox IsChecked="{Binding WattPilot.ButtonEnableCurrentSelection}" Content="{x:Static p:Resources.ButtonEnableCharging}" />
+                            <CheckBox IsChecked="{Binding WattPilot.ButtonEnableModeSwitch}" Content="{x:Static p:Resources.ButtonEnableModeSwitch}" />
+                            <CheckBox IsChecked="{Binding WattPilot.EnableBatteryBoost}" Content="{x:Static p:Resources.EnableBatteryBoost}" />
+                            <CheckBox IsChecked="{Binding WattPilot.EnableSingleTimeBoost, Converter={co:BoolInverter}}"
+                                  Content="{x:Static p:Resources.BoostUntilCarDisconnects}"
+                                  Visibility="{Binding WattPilot.EnableBatteryBoost, Converter={co:Bool2Visibility}}" />
+                        </StackPanel>
+                    </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center">
                         <TextBlock Margin="0,0,4,0">

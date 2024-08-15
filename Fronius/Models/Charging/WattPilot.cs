@@ -24,6 +24,14 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref sendRfidSerialToCloud, value);
     }
 
+    private bool? cloudWebSocketEnabled;
+    [WattPilot("cwe", false)]
+    public bool? CloudWebSocketEnabled
+    {
+        get => cloudWebSocketEnabled;
+        set => Set(ref cloudWebSocketEnabled, value);
+    }
+
     private string? lastRfidSerial;
     [WattPilot("lri")]
     public string? LastRfidSerial

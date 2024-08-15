@@ -1479,4 +1479,13 @@
   <data name="CableLockStatus_UnlockFailed" xml:space="preserve">
 	  <value>Entriegelung fehlgeschlagen</value>
   </data>
+  <data name="SendRfidSerialToCloud" xml:space="preserve">
+	  <value>Erlaube RFID-Karten-Ids in APIs (inklusive Cloud)</value>
+  </data>
+  <data name="SendRfidSerialToCloud_ToolTip" xml:space="preserve">
+	  <value>Wenn Du RFID-Karten-IDs in die cloud sendest, können go-E und der Cloud-Provider (Hetzner) diese auslesen und die Karte clonen. Wenn Du das aktivierst, benutze keine öffentliche Ladekarte an Deinem Wattpilot. </value>
+  </data>
+  <data name="CloudWebSocketEnabled" xml:space="preserve">
+	  <value>Zugriff für Websockets über die Cloud aktivieren</value>
+  </data>
 </root>

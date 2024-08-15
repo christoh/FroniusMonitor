@@ -1551,4 +1551,13 @@
   <data name="CableLockStatus_UnlockFailed" xml:space="preserve">
 	  <value>Unlock failed</value>
   </data>
+  <data name="SendRfidSerialToCloud" xml:space="preserve">
+	  <value>Allow RFID card ids in APIs (including cloud)</value>
+  </data>
+  <data name="SendRfidSerialToCloud_ToolTip" xml:space="preserve">
+	  <value>If RFID card ids are sent to the cloud, go-E and the cloud provider (Hetzner) can read them and clone the card. If you enable this, do not use a public charging card for your Wattpilot.</value>
+  </data>
+  <data name="CloudWebSocketEnabled" xml:space="preserve">
+	  <value>Enable Websocket access in the cloud</value>
+  </data>
 </root>
