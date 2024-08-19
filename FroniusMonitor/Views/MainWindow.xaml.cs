@@ -205,6 +205,11 @@ public partial class MainWindow
         GetView<WattPilotSettingsView>().Focus();
     }
 
+    private void MenuItem_OnClick(object sender, RoutedEventArgs e)
+    {
+        GetView<PriceView>().Focus();
+    }
+
     private void OnRibbonExpanderChanged(object? sender = null, RoutedEventArgs? e = null)
     {
         if (RibbonExpander.IsChecked.HasValue && RibbonExpander.IsChecked.Value)

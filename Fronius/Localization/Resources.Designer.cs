@@ -1204,7 +1204,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Enable Websocket access in the cloud.
         /// </summary>
         public static string CloudWebSocketEnabled {
             get {
@@ -4188,6 +4188,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string UnlockCableOnPowerFailure {
             get {
                 return ResourceManager.GetString("UnlockCableOnPowerFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unsupported price zone.
+        /// </summary>
+        public static string UnsupportedPriceZone {
+            get {
+                return ResourceManager.GetString("UnsupportedPriceZone", resourceCulture);
             }
         }
         

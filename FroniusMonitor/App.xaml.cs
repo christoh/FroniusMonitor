@@ -1,4 +1,5 @@
 ﻿using De.Hochstaetter.Fronius.Models.Settings;
+using DocumentFormat.OpenXml.InkML;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace De.Hochstaetter.FroniusMonitor;
@@ -8,7 +9,7 @@ public partial class App
     private static readonly Mutex mutex = new(true, $"{Environment.UserName}_HomeAutomationControlCenter");
     public static bool HaveSettings { get; set; } = true;
     public static readonly IServiceCollection ServiceCollection = new ServiceCollection();
-    public static Timer? SolarSystemQueryTimer {get; set; }
+    public static Timer? SolarSystemQueryTimer { get; set; }
 
     static App()
     {
@@ -61,6 +62,7 @@ public partial class App
             .AddSingleton<IGen24JsonService, Gen24JsonService>()
             .AddSingleton<IWattPilotService, WattPilotService>()
             .AddSingleton<IToshibaHvacService, ToshibaHvacService>()
+            .AddSingleton<IElectricityPriceService, AwattarService>()
             .AddSingleton<SettingsBase>(Settings)
             .AddTransient<EventLogView>()
             .AddTransient<BatteryDetailsView>()
@@ -69,6 +71,7 @@ public partial class App
             .AddTransient<ModbusView>()
             .AddTransient<SettingsView>()
             .AddTransient<WattPilotSettingsView>()
+            .AddTransient<PriceView>()
             .AddTransient<WattPilotDetailsView>()
             .AddTransient<InverterSettingsView>()
             .AddTransient<InverterDetailsView>()
@@ -78,6 +81,7 @@ public partial class App
             .AddTransient<ModbusViewModel>()
             .AddTransient<SettingsViewModel>()
             .AddTransient<WattPilotSettingsViewModel>()
+            .AddTransient<PriceViewModel>()
             .AddTransient<InverterSettingsViewModel>()
             .AddTransient<InverterDetailsViewModel>()
             .AddTransient<BatteryDetailsViewModel>()

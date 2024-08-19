@@ -1,0 +1,23 @@
+﻿<c:ScalableWindow x:Class="De.Hochstaetter.FroniusMonitor.Views.PriceView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:oxy="http://oxyplot.org/wpf/contrib"
+        xmlns:local="clr-namespace:De.Hochstaetter.FroniusMonitor.Views"
+        xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
+        xmlns:vm="clr-namespace:De.Hochstaetter.FroniusMonitor.ViewModels"
+        xmlns:oxyPlot="clr-namespace:OxyPlot;assembly=OxyPlot"
+        xmlns:axes="clr-namespace:OxyPlot.Axes;assembly=OxyPlot"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=vm:PriceViewModel}"
+        Title="PriceView" Height="450" Width="800">
+    <Grid>
+        <Grid.LayoutTransform>
+            <ScaleTransform x:Name="ScaleTransform"/>
+        </Grid.LayoutTransform>
+
+        <oxy:Plot Title="Electricity Prices" Model="{Binding PlotModel}">
+        </oxy:Plot>
+    </Grid>
+</c:ScalableWindow>

@@ -1560,4 +1560,7 @@
   <data name="CloudWebSocketEnabled" xml:space="preserve">
 	  <value>Enable Websocket access in the cloud</value>
   </data>
+  <data name="UnsupportedPriceZone" xml:space="preserve">
+	  <value>Unsupported price zone</value>
+  </data>
 </root>
