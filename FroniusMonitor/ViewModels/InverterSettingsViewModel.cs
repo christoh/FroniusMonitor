@@ -453,9 +453,10 @@ public class InverterSettingsViewModel(
     private async ValueTask<Gen24InverterSettings> ReadDataFromInverter()
     {
         var mpptToken = (await Gen24Service.GetFroniusJsonResponse("config/powerunit/mppt").ConfigureAwait(false)).Token;
+        var systemToken = (await Gen24Service.GetFroniusJsonResponse("config/powerunit/system").ConfigureAwait(false)).Token;
         var commonToken = (await Gen24Service.GetFroniusJsonResponse("config/common").ConfigureAwait(false)).Token;
         var powerLimitToken = (await Gen24Service.GetFroniusJsonResponse("config/limit_settings").ConfigureAwait(false)).Token;
-        return Gen24InverterSettings.Parse(commonToken, mpptToken, powerLimitToken["powerLimits"]);
+        return Gen24InverterSettings.Parse(commonToken, mpptToken, powerLimitToken["powerLimits"], systemToken);
     }
 
     private void Undo()

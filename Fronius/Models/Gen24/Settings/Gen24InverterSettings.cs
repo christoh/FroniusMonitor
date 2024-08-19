@@ -13,6 +13,7 @@ public class Gen24InverterSettings : Gen24ParsingBase
     }
 
     private string? timeZoneName;
+
     [FroniusProprietaryImport("timezone", FroniusDataType.Root)]
     public string? TimeZoneName
     {
@@ -21,6 +22,7 @@ public class Gen24InverterSettings : Gen24ParsingBase
     }
 
     private bool? timeSync;
+
     [FroniusProprietaryImport("timesync", FroniusDataType.Root)]
     public bool? TimeSync
     {
@@ -44,6 +46,14 @@ public class Gen24InverterSettings : Gen24ParsingBase
         set => Set(ref powerLimitSettings, value);
     }
 
+    private Gen24AcSystemSettings acSystemSettings = new();
+
+    public Gen24AcSystemSettings AcSystemSettings
+    {
+        get => acSystemSettings;
+        set => Set(ref acSystemSettings, value);
+    }
+
     public override object Clone()
     {
         var clone = new Gen24InverterSettings
@@ -58,11 +68,12 @@ public class Gen24InverterSettings : Gen24ParsingBase
         return clone;
     }
 
-    public static Gen24InverterSettings Parse(JToken? uiToken, JToken? mpptToken, JToken? powerLimitToken)
+    public static Gen24InverterSettings Parse(JToken? uiToken, JToken? mpptToken, JToken? powerLimitToken, JToken? systemToken)
     {
         var inverterSettings = Gen24JsonService.ReadFroniusData<Gen24InverterSettings>(uiToken);
         inverterSettings.Mppt = Gen24Mppt.Parse(mpptToken);
         inverterSettings.PowerLimitSettings = Gen24PowerLimitSettings.Parse(powerLimitToken);
+        inverterSettings.AcSystemSettings = Gen24AcSystemSettings.Parse(systemToken);
         return inverterSettings;
     }
 
@@ -72,7 +83,8 @@ public class Gen24InverterSettings : Gen24ParsingBase
         (
             configToken?["common"]?["ui"]?.Value<JToken>() ?? new JObject(),
             configToken?["powerunit"]?["powerunit"]?["mppt"]?.Value<JToken>() ?? new JObject(),
-            configToken?["limit_settings"]?["powerLimits"]?.Value<JToken>() ?? new JObject()
+            configToken?["limit_settings"]?["powerLimits"]?.Value<JToken>() ?? new JObject(),
+            configToken?["powerunit"]?["powerunit"]?["system"]?.Value<JToken>() ?? new JObject()
         );
     }
 
