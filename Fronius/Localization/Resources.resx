@@ -1563,4 +1563,7 @@
   <data name="UnsupportedPriceZone" xml:space="preserve">
 	  <value>Unsupported price zone</value>
   </data>
+  <data name="ElectricityPrice" xml:space="preserve">
+	  <value>Electricity Price</value>
+  </data>
 </root>

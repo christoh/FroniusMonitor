@@ -1,36 +1,17 @@
 ﻿namespace De.Hochstaetter.Fronius.Services
 {
-    public class WattPilotElectricityService : BindableBase, IElectricityPriceService
+    public class WattPilotElectricityService : ElectricityPushPriceServiceBase, IElectricityPriceService
     {
-        private IEnumerable<WattPilotElectricityPrice>? rawValues;
+        private AwattarCountry priceZone;
 
-        public IEnumerable<WattPilotElectricityPrice>? RawValues
+        public AwattarCountry PriceZone
         {
-            get => rawValues;
-            set => Set(ref rawValues, value);
+            get => priceZone;
+            set => Set(ref priceZone, value);
         }
 
-        public bool IsPush => true;
         public bool CanSetPriceZone => false;
 
-        public Task<IEnumerable<IElectricityPrice>?> GetGetElectricityPricesAsync(string priceZoneCode, double offset = 0, double factor = 1, CancellationToken token = default)
-        {
-            if (RawValues == null)
-            {
-                return Task.FromResult<IEnumerable<IElectricityPrice>?>(null);
-            }
-
-            var result = RawValues.Select(p =>
-            {
-                var newPrice = (WattPilotElectricityPrice)p.Clone();
-                newPrice.CentsPerKiloWattHour *= (decimal)factor;
-                newPrice.CentsPerKiloWattHour += (decimal)offset;
-                return newPrice;
-            }).ToArray();
-
-            return Task.FromResult<IEnumerable<IElectricityPrice>?>(result);
-        }
-
-        public Task<IEnumerable<string>> GetSupportedPriceZones() => Task.FromResult<IEnumerable<string>>(["**"]);
+        public Task<IEnumerable<AwattarCountry>> GetSupportedPriceZones() => Task.FromResult<IEnumerable<AwattarCountry>>(Array.Empty<AwattarCountry>());
     }
 }

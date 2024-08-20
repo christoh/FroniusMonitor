@@ -9,9 +9,12 @@
         xmlns:vm="clr-namespace:De.Hochstaetter.FroniusMonitor.ViewModels"
         xmlns:oxyPlot="clr-namespace:OxyPlot;assembly=OxyPlot"
         xmlns:axes="clr-namespace:OxyPlot.Axes;assembly=OxyPlot"
+        xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+        xmlns:converters="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=vm:PriceViewModel}"
-        Title="PriceView" Height="450" Width="800">
+        Title="{x:Static p:Resources.ElectricityPrice}" Height="450" Width="1100"
+        MinWidth="300" MinHeight="200">
     <Grid>
         <Grid.LayoutTransform>
             <ScaleTransform x:Name="ScaleTransform"/>

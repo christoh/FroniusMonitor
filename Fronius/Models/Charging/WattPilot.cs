@@ -8,7 +8,14 @@ namespace De.Hochstaetter.Fronius.Models.Charging;
 public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
 {
     private string? serialNumber;
-    private readonly WattPilotElectricityService? wattPilotElectricityPriceService = IoC.TryGetRegistered<IElectricityPriceService>() as WattPilotElectricityService;
+
+    private bool isUpdating;
+
+    public bool IsUpdating
+    {
+        get => isUpdating;
+        set => Set(ref isUpdating, value);
+    }
 
     [FroniusProprietaryImport("serial", FroniusDataType.Root)]
     [WattPilot("sse")]
@@ -603,7 +610,14 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     public AwattarCountry EnergyPriceCountry
     {
         get => energyPriceCountry;
-        set => Set(ref energyPriceCountry, value);
+
+        set => Set(ref energyPriceCountry, value, () =>
+        {
+            //if (IoC.TryGetRegistered<IElectricityPriceService>() is WattPilotElectricityService wattPilotElectricityPriceService)
+            //{
+            //    wattPilotElectricityPriceService.PriceZone = value;
+            //}
+        });
     }
 
     private float? maxEnergyPrice;
@@ -1154,7 +1168,14 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         get => electricityPrices;
         set => Set(ref electricityPrices, value, () =>
         {
-            if (value != null && wattPilotElectricityPriceService != null)
+            if (IoC.TryGetRegistered<IElectricityPriceService>() is not WattPilotElectricityService wattPilotElectricityPriceService)
+            {
+                return;
+            }
+
+            wattPilotElectricityPriceService.PriceZone = EnergyPriceCountry;
+                
+            if (value != null)
             {
                 wattPilotElectricityPriceService.RawValues = value;
             }
@@ -1526,6 +1547,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     public object Clone()
     {
         var result = (WattPilot)MemberwiseClone();
+        result.IsUpdating = false;
 
         if (Cards != null)
         {

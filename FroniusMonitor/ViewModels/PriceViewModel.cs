@@ -70,31 +70,36 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
 
         private async Task RefreshPrices()
         {
-            Prices = (await electricityPriceService.GetGetElectricityPricesAsync("de", 17.879, 1.2257).ConfigureAwait(false))?.ToArray() ?? throw new InvalidOperationException();
+            Prices = (await electricityPriceService.GetGetElectricityPricesAsync(17.879, 1.2257).ConfigureAwait(false))?.ToArray() ?? throw new InvalidOperationException();
             Points = Prices.Select(p => new DataPoint(DateTimeAxis.ToDouble(p.StartTime.ToLocalTime().AddHours(.5)), (double)p.CentsPerKiloWattHour)).ToList();
+
+            const double adjustment = 1.000000001;
 
             var model = new PlotModel
             {
-                Title = "Electricity Prices",
+                Title = $"{Loc.ElectricityPrice} ({electricityPriceService.PriceZone.ToDisplayName()})",
                 TitleFontWeight = 600,
                 TitleFontSize = 20,
+                
                 Axes =
                 {
                     new DateTimeAxis
                     {
-                        //AbsoluteMinimum = Prices.Select(p => DateTimeAxis.ToDouble(p.StartTime.AddHours(2))).Min(),
-                        //Minimum = Prices.Select(p => DateTimeAxis.ToDouble(p.StartTime.AddHours(2))).Min(),
-                        //AbsoluteMaximum = Prices.Select(p => DateTimeAxis.ToDouble(p.StartTime.AddHours(1))).Max(),
-                        //Maximum = Prices.Select(p => DateTimeAxis.ToDouble(p.StartTime.AddHours(1))).Max(),
+                        AbsoluteMinimum = Prices.Select(p => DateTimeAxis.ToDouble(p.StartTime.ToLocalTime())).Min(),
+                        Minimum = Prices.Select(p => DateTimeAxis.ToDouble(p.StartTime.ToLocalTime())).Min(),
+                        AbsoluteMaximum = Prices.Select(p => DateTimeAxis.ToDouble(p.StartTime.ToLocalTime())).Max(),
+                        Maximum = Prices.Select(p => DateTimeAxis.ToDouble(p.StartTime.ToLocalTime())).Max(),
                         IsZoomEnabled = false,
                         IsPanEnabled = false,
-                        MinorIntervalType = DateTimeIntervalType.Hours,
-                        IntervalType = DateTimeIntervalType.Hours,
-                        IntervalLength = 50,
-                        FontSize = 16,
+                        IntervalType = DateTimeIntervalType.Days,
+                        MajorStep = 2 / 24d * adjustment, MinorStep = 1 / 24d * adjustment,
+                        EdgeRenderingMode = EdgeRenderingMode.PreferSharpness,
+                        StringFormat = "HH:mm",
+                        IntervalLength = 48,
+                        FontSize = 14,
                         PositionAtZeroCrossing = false,
                         MajorGridlineStyle = LineStyle.Solid,
-                        MinorGridlineStyle = LineStyle.None
+                        MinorGridlineStyle = LineStyle.Solid,
                     },
                     new LinearAxis
                     {
@@ -106,7 +111,8 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
                         AbsoluteMaximum = Points.Select(p => p.Y).Max() + 5,
                         IsZoomEnabled = false,
                         IsPanEnabled = false,
-                        FontSize = 16
+                        FontSize = 16,
+                        EdgeRenderingMode = EdgeRenderingMode.PreferSharpness,
                     }
                 }
             };
@@ -114,7 +120,8 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
             var series = new LinearBarSeries { FillColor = OxyColors.LightGreen, BarWidth = 90, NegativeFillColor = OxyColors.Orange };
             series.Points.AddRange(Points);
             model.Series.Add(series);
-            var lineSeries = new LineSeries { Color = OxyColors.Transparent, LabelFormatString = "{1:N2}" };
+
+            var lineSeries = new LineSeries { Color = OxyColors.Transparent, LabelFormatString = "{1:N2}", FontSize = 10, LabelMargin = 2, FontWeight = 600};
             lineSeries.Points.AddRange(Points);
             model.Series.Add(lineSeries);
             PlotModel = model;

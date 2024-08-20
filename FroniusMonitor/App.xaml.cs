@@ -6,6 +6,7 @@ namespace De.Hochstaetter.FroniusMonitor
     public partial class App
     {
         private static readonly Mutex mutex = new(true, $"{Environment.UserName}_HomeAutomationControlCenter");
+        private static IElectricityPriceService? electricityPriceService;
         public static bool HaveSettings { get; set; } = true;
         public static readonly IServiceCollection ServiceCollection = new ServiceCollection();
         public static Timer? SolarSystemQueryTimer { get; set; }
@@ -61,8 +62,30 @@ namespace De.Hochstaetter.FroniusMonitor
                     .AddSingleton<IGen24JsonService, Gen24JsonService>()
                     .AddSingleton<IWattPilotService, WattPilotService>()
                     .AddSingleton<IToshibaHvacService, ToshibaHvacService>()
-                    .AddSingleton<IElectricityPriceService, WattPilotElectricityService>()
                     .AddSingleton<SettingsBase>(Settings)
+
+                    .AddTransient(_ =>
+                    {
+                        var newType = Settings.ElectricityPriceService switch
+                        {
+                            ElectricityPriceService.WattPilot => typeof(WattPilotElectricityService),
+                            ElectricityPriceService.Awattar => typeof(AwattarService),
+                            _ => throw new NotSupportedException($"Unknown electricity price service. Must be any of {string.Join(", ", Enum.GetNames(typeof(ElectricityPriceService)))}")
+                        };
+
+                        if (electricityPriceService is IDisposable disposable && electricityPriceService.GetType() != newType)
+                        {
+                            disposable.Dispose();
+                        }
+
+                        if (electricityPriceService?.GetType() == newType)
+                        {
+                            return electricityPriceService;
+                        }
+
+                        return electricityPriceService = Activator.CreateInstance(newType) as IElectricityPriceService ?? throw new InvalidCastException($"Cannot cast {newType.Name} to {nameof(IElectricityPriceService)}");
+                    })
+
                     .AddTransient<EventLogView>()
                     .AddTransient<BatteryDetailsView>()
                     .AddTransient<SmartMeterDetailsView>()
@@ -107,9 +130,9 @@ namespace De.Hochstaetter.FroniusMonitor
 
             SystemEvents.PowerModeChanged += OnPowerModeChanged;
             var mainWindow = IoC.Get<MainWindow>();
-            #if DEBUG
-            mainWindow.WindowState = WindowState.Minimized;
-            #endif
+            //#if DEBUG
+            //mainWindow.WindowState = WindowState.Minimized;
+            //#endif
             mainWindow.Show();
         }
 

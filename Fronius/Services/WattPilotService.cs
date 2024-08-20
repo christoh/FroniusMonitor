@@ -83,6 +83,7 @@ public class WattPilotService(SettingsBase settings) : BindableBase, IWattPilotS
             if (type == "deltaStatus" && savedWattPilot != null)
             {
                 WattPilot = savedWattPilot;
+                WattPilot.IsUpdating = true;
                 UpdateWattPilot(WattPilot, token["status"] as JObject);
             }
             else
@@ -94,6 +95,7 @@ public class WattPilotService(SettingsBase settings) : BindableBase, IWattPilotS
                 }
 
                 WattPilot = WattPilot.Parse(token);
+                WattPilot.IsUpdating = true;
                 savedWattPilot = null;
 
                 result = await clientWebSocket.ReceiveAsync(buffer, Token).ConfigureAwait(false);
@@ -165,6 +167,12 @@ public class WattPilotService(SettingsBase settings) : BindableBase, IWattPilotS
 
             clientWebSocket?.Dispose();
             clientWebSocket = null;
+
+            if (WattPilot != null)
+            {
+                WattPilot.IsUpdating = false;
+            }
+
             WattPilot = null;
             Connection = null;
             throw;
@@ -238,7 +246,7 @@ public class WattPilotService(SettingsBase settings) : BindableBase, IWattPilotS
 
     public void OpenConfigPdf()
     {
-        var link = $"{WattPilot?.DownloadLink?.Replace("export", "documentation")}&lang={(settings.Language??CultureInfo.CurrentUICulture.Name).Split('-')[0]}";
+        var link = $"{WattPilot?.DownloadLink?.Replace("export", "documentation")}&lang={(settings.Language ?? CultureInfo.CurrentUICulture.Name).Split('-')[0]}";
         OpenLink(link);
     }
 
@@ -250,7 +258,6 @@ public class WattPilotService(SettingsBase settings) : BindableBase, IWattPilotS
 
     private void OpenLink(string? link)
     {
-
         if (WattPilot == null)
         {
             throw new WebSocketException(Resources.NoWattPilotConnection);
@@ -588,6 +595,12 @@ public class WattPilotService(SettingsBase settings) : BindableBase, IWattPilotS
             clientWebSocket?.Dispose();
             clientWebSocket = null;
             savedWattPilot = WattPilot;
+
+            if (WattPilot != null)
+            {
+                WattPilot.IsUpdating = false;
+            }
+
             WattPilot = null;
             readThread = null;
             Connection = null;

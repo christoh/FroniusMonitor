@@ -1,7 +1,7 @@
 ﻿namespace De.Hochstaetter.Fronius.Models;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
-public class AwattarElectricityPrice : BindableBase, IElectricityPrice
+public class AwattarElectricityPrice : BindableBase, IElectricityPrice, ICloneable
 {
     private long startMilliseconds;
 
@@ -59,6 +59,8 @@ public class AwattarElectricityPrice : BindableBase, IElectricityPrice
     //    set => Set(ref unitName, value);
     //}
 
+    public object Clone() => MemberwiseClone();
+    
     #if DEBUG
     public override string ToString() => $"{StartTime.ToLocalTime():g}: {CentsPerKiloWattHour:N2} ct/kWh";
     #endif
