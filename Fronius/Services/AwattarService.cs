@@ -2,10 +2,14 @@
 
 namespace De.Hochstaetter.Fronius.Services;
 
-public sealed class AwattarService : IElectricityPriceService, IDisposable
+public sealed class AwattarService : BindableBase, IElectricityPriceService, IDisposable
 {
     private HttpClient? client = new();
     private readonly string[] supportedPriceZones = ["at", "de"];
+
+    public bool IsPush => false;
+    public bool CanSetPriceZone => true;
+    public IEnumerable<WattPilotElectricityPrice>? RawValues => null;
 
     public async Task<IEnumerable<IElectricityPrice>?> GetGetElectricityPricesAsync(string priceZoneCode, double offset = 0, double factor = 1, CancellationToken token = default)
     {

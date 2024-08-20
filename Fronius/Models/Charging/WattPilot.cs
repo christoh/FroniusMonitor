@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using De.Hochstaetter.Fronius.Services;
+using Newtonsoft.Json;
 
 namespace De.Hochstaetter.Fronius.Models.Charging;
 
@@ -7,6 +8,7 @@ namespace De.Hochstaetter.Fronius.Models.Charging;
 public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
 {
     private string? serialNumber;
+    private readonly WattPilotElectricityService? wattPilotElectricityPriceService = IoC.TryGetRegistered<IElectricityPriceService>() as WattPilotElectricityService;
 
     [FroniusProprietaryImport("serial", FroniusDataType.Root)]
     [WattPilot("sse")]
@@ -1143,6 +1145,20 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     {
         get => cards;
         set => Set(ref cards, value);
+    }
+
+    private IList<WattPilotElectricityPrice>? electricityPrices;
+    [WattPilot("awpl")]
+    public IList<WattPilotElectricityPrice>? ElectricityPrices
+    {
+        get => electricityPrices;
+        set => Set(ref electricityPrices, value, () =>
+        {
+            if (value != null && wattPilotElectricityPriceService != null)
+            {
+                wattPilotElectricityPriceService.RawValues = value;
+            }
+        });
     }
 
     private byte? authenticatedCardIndex;
