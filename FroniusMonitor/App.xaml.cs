@@ -63,10 +63,10 @@ namespace De.Hochstaetter.FroniusMonitor
                     .AddSingleton<IWattPilotService, WattPilotService>()
                     .AddSingleton<IToshibaHvacService, ToshibaHvacService>()
                     .AddSingleton<SettingsBase>(Settings)
-
-                    .AddTransient(_ =>
+                    
+                    .AddTransient<IElectricityPriceService>(_ =>
                     {
-                        var newType = Settings.ElectricityPriceService switch
+                        var newType = Settings.ElectricityPrice.Service switch
                         {
                             ElectricityPriceService.WattPilot => typeof(WattPilotElectricityService),
                             ElectricityPriceService.Awattar => typeof(AwattarService),
@@ -83,7 +83,14 @@ namespace De.Hochstaetter.FroniusMonitor
                             return electricityPriceService;
                         }
 
-                        return electricityPriceService = Activator.CreateInstance(newType) as IElectricityPriceService ?? throw new InvalidCastException($"Cannot cast {newType.Name} to {nameof(IElectricityPriceService)}");
+                        electricityPriceService = Activator.CreateInstance(newType) as IElectricityPriceService ?? throw new InvalidCastException($"Cannot cast {newType.Name} to {nameof(IElectricityPriceService)}");
+
+                        if (electricityPriceService.CanSetPriceRegion && electricityPriceService.GetSupportedPriceZones().GetAwaiter().GetResult().Contains(Settings.ElectricityPrice.PriceRegion))
+                        {
+                            electricityPriceService.PriceRegion = Settings.ElectricityPrice.PriceRegion;
+                        }
+
+                        return electricityPriceService;
                     })
 
                     .AddTransient<EventLogView>()

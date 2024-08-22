@@ -13,6 +13,8 @@ public partial class SettingsView
             viewModel.Dispatcher = Dispatcher;
             await viewModel.OnInitialize().ConfigureAwait(false);
         };
+
+        Closed += (_, _) => _ = viewModel.CleanUp();
     }
 
     private void OnCancelClick(object sender, RoutedEventArgs e)

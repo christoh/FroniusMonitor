@@ -343,7 +343,7 @@ public class WattPilotService(SettingsBase settings) : BindableBase, IWattPilotS
 
         while (Connection != null)
         {
-            await Task.Delay(200, CancellationToken.None).ConfigureAwait(false);
+            await Task.Delay(50, CancellationToken.None).ConfigureAwait(false);
         }
     }
 

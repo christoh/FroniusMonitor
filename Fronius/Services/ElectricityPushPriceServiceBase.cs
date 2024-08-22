@@ -12,13 +12,13 @@ public abstract class ElectricityPushPriceServiceBase : BindableBase
         set => Set(ref rawValues, value);
     }
 
-    public virtual Task<IEnumerable<IElectricityPrice>> GetGetElectricityPricesAsync(double offset = 0, double factor = 1, CancellationToken token = default)
+    public virtual Task<IEnumerable<IElectricityPrice>> GetGetElectricityPricesAsync(decimal offset = 0, decimal factor = 1, CancellationToken token = default)
     {
         var result = RawValues?.Select(price =>
         {
             var newPrice = (IElectricityPrice)price.Clone();
-            newPrice.CentsPerKiloWattHour *= (decimal)factor;
-            newPrice.CentsPerKiloWattHour += (decimal)offset;
+            newPrice.CentsPerKiloWattHour *= factor;
+            newPrice.CentsPerKiloWattHour += offset;
             return newPrice;
         }) ?? Array.Empty<AwattarElectricityPrice>();
 

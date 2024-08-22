@@ -74,7 +74,7 @@
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="VerticalContentAlignment" Value="Center" />
             </Style>
-            
+
             <Style TargetType="ButtonBase" x:Key="SmallButton">
                 <Setter Property="HorizontalAlignment" Value="Left"/>
                 <Setter Property="Padding" Value="8,0"/>
@@ -356,6 +356,45 @@
                 </Grid>
             </GroupBox>
 
+            <GroupBox Margin="0,8,0,0" Header="Electricity Price">
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Price service" Margin="0,7,0,0"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text=":" Margin="4,7,4,0"/>
+                    <ComboBox Grid.Row="0" Grid.Column="2" SelectedItem="{Binding Settings.ElectricityPrice.Service}"
+                              ItemsSource="{Binding PriceServices}" ItemTemplate="{StaticResource ComboBoxTemplate}"/>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Price region" Margin="0,7,0,0" Visibility="{Binding PriceService.CanSetPriceRegion, Converter={co:Bool2Visibility}}"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text=":" Margin="4,7,4,0" Visibility="{Binding PriceService.CanSetPriceRegion, Converter={co:Bool2Visibility}}"/>
+                    <ComboBox Grid.Row="1" Grid.Column="2" SelectedItem="{Binding SelectedPriceRegion}" Visibility="{Binding PriceService.CanSetPriceRegion, Converter={co:Bool2Visibility}}"
+                              ItemsSource="{Binding PriceRegions}" ItemTemplate="{StaticResource ComboBoxTemplate}"/>
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Price surcharge consumption (%)" Margin="0,7,0,0"/>
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text=":" Margin="4,7,4,0"/>
+                    <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding Settings.ElectricityPrice.PriceSurchargeBuyPercent}"/>
+
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Price offset consumption (cents)" Margin="0,7,0,0"/>
+                    <TextBlock Grid.Row="3" Grid.Column="1" Text=":" Margin="4,7,4,0"/>
+                    <TextBox Grid.Row="3" Grid.Column="2" Text="{Binding Settings.ElectricityPrice.PriceOffsetBuy}"/>
+
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="V.A.T. rate (%)" Margin="0,7,0,0"/>
+                    <TextBlock Grid.Row="4" Grid.Column="1" Text=":" Margin="4,7,4,0"/>
+                    <TextBox Grid.Row="4" Grid.Column="2" Text="{Binding Settings.ElectricityPrice.VatRatePercent}"/>
+                </Grid>
+            </GroupBox>
         </StackPanel>
 
         <Grid Margin="0,0,8,16" Grid.Column="0" Grid.Row="1" ColumnSpan="2">

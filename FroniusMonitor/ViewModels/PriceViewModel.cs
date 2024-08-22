@@ -1,10 +1,11 @@
-﻿using OxyPlot;
+﻿using De.Hochstaetter.Fronius.Models.Settings;
+using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
 
 namespace De.Hochstaetter.FroniusMonitor.ViewModels
 {
-    public class PriceViewModel(IElectricityPriceService electricityPriceService) : ViewModelBase
+    public class PriceViewModel(IElectricityPriceService electricityPriceService, SettingsBase settings) : ViewModelBase
     {
         private IReadOnlyList<IElectricityPrice> prices = null!;
         private Timer? timer;
@@ -37,25 +38,55 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
 
             if (electricityPriceService.IsPush)
             {
-                electricityPriceService.PropertyChanged += OnElectricityPriceServiceOnPropertyChanged;
-                await RefreshPrices().ConfigureAwait(false);
+                electricityPriceService.PropertyChanged += OnServicePropertyChanged;
             }
             else
             {
                 timer = new(_ => RefreshPrices().GetAwaiter().GetResult(), null, TimeSpan.Zero, TimeSpan.FromMinutes(20));
             }
+
+            await RefreshPrices().ConfigureAwait(false);
+            settings.ElectricityPrice.ElectricityPriceServiceChanged += OnElectricityPriceServiceChanged;
         }
 
-        private void OnElectricityPriceServiceOnPropertyChanged(object? s, PropertyChangedEventArgs e)
+        private async void OnElectricityPriceServiceChanged(object? o, ElectricityPriceService service)
         {
-            _ = RefreshPrices();
+            electricityPriceService.PropertyChanged -= OnServicePropertyChanged;
+            electricityPriceService = IoC.Get<IElectricityPriceService>();
+
+            if (electricityPriceService.IsPush)
+            {
+                electricityPriceService.PropertyChanged += OnServicePropertyChanged;
+            }
+            else
+            {
+                await RefreshPrices().ConfigureAwait(false);
+
+                if (timer != null)
+                {
+                    await timer.DisposeAsync().ConfigureAwait(false);
+                }
+
+                timer = new(_ => RefreshPrices().GetAwaiter().GetResult(), null, TimeSpan.Zero, TimeSpan.FromMinutes(20));
+            }
+        }
+
+        private void OnServicePropertyChanged(object? s, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(IElectricityPriceService.RawValues):
+                    _ = RefreshPrices();
+                    break;
+            }
         }
 
         internal override async Task CleanUp()
         {
             try
             {
-                electricityPriceService.PropertyChanged -= OnElectricityPriceServiceOnPropertyChanged;
+                electricityPriceService.PropertyChanged -= OnServicePropertyChanged;
+                settings.ElectricityPrice.ElectricityPriceServiceChanged -= OnElectricityPriceServiceChanged;
 
                 if (timer != null)
                 {
@@ -70,25 +101,30 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
 
         private async Task RefreshPrices()
         {
-            Prices = (await electricityPriceService.GetGetElectricityPricesAsync(17.879, 1.2257).ConfigureAwait(false))?.ToArray() ?? throw new InvalidOperationException();
+            Prices = (await electricityPriceService.GetGetElectricityPricesAsync
+            (
+                settings.ElectricityPrice.PriceOffsetBuy * settings.ElectricityPrice.VatFactor,
+                settings.ElectricityPrice.PriceFactorBuy * settings.ElectricityPrice.VatFactor
+            ).ConfigureAwait(false)).ToArray() ?? throw new InvalidOperationException();
+
             Points = Prices.Select(p => new DataPoint(DateTimeAxis.ToDouble(p.StartTime.ToLocalTime().AddHours(.5)), (double)p.CentsPerKiloWattHour)).ToList();
 
             const double adjustment = 1.000000001;
 
             var model = new PlotModel
             {
-                Title = $"{Loc.ElectricityPrice} ({electricityPriceService.PriceZone.ToDisplayName()})",
+                Title = $"{Loc.ElectricityPrice} ({electricityPriceService.PriceRegion.ToDisplayName()})",
                 TitleFontWeight = 600,
                 TitleFontSize = 20,
-                
+
                 Axes =
                 {
                     new DateTimeAxis
                     {
                         AbsoluteMinimum = Prices.Select(p => DateTimeAxis.ToDouble(p.StartTime.ToLocalTime())).Min(),
                         Minimum = Prices.Select(p => DateTimeAxis.ToDouble(p.StartTime.ToLocalTime())).Min(),
-                        AbsoluteMaximum = Prices.Select(p => DateTimeAxis.ToDouble(p.StartTime.ToLocalTime())).Max(),
-                        Maximum = Prices.Select(p => DateTimeAxis.ToDouble(p.StartTime.ToLocalTime())).Max(),
+                        AbsoluteMaximum = Prices.Select(p => DateTimeAxis.ToDouble(p.EndTime.ToLocalTime())).Max(),
+                        Maximum = Prices.Select(p => DateTimeAxis.ToDouble(p.EndTime.ToLocalTime())).Max(),
                         IsZoomEnabled = false,
                         IsPanEnabled = false,
                         IntervalType = DateTimeIntervalType.Days,
@@ -121,7 +157,7 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
             series.Points.AddRange(Points);
             model.Series.Add(series);
 
-            var lineSeries = new LineSeries { Color = OxyColors.Transparent, LabelFormatString = "{1:N2}", FontSize = 10, LabelMargin = 2, FontWeight = 600};
+            var lineSeries = new LineSeries { Color = OxyColors.Transparent, LabelFormatString = "{1:N2}", FontSize = 10, LabelMargin = 2, FontWeight = 600 };
             lineSeries.Points.AddRange(Points);
             model.Series.Add(lineSeries);
             PlotModel = model;

@@ -7,15 +7,29 @@ namespace De.Hochstaetter.Fronius.Models.Charging;
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
 public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
 {
-    private string? serialNumber;
-
     private bool isUpdating;
 
     public bool IsUpdating
     {
         get => isUpdating;
-        set => Set(ref isUpdating, value);
+        set => Set(ref isUpdating, value, () =>
+        {
+            if
+            (
+                !value ||
+                ElectricityPrices == null ||
+                IoC.TryGetRegistered<IElectricityPriceService>() is not WattPilotElectricityService wattPilotElectricityPriceService
+            )
+            {
+                return;
+            }
+
+            wattPilotElectricityPriceService.PriceRegion = EnergyPriceCountry;
+            wattPilotElectricityPriceService.RawValues = ElectricityPrices;
+        });
     }
+
+    private string? serialNumber;
 
     [FroniusProprietaryImport("serial", FroniusDataType.Root)]
     [WattPilot("sse")]
@@ -26,6 +40,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private bool? sendRfidSerialToCloud;
+
     [WattPilot("rde", false)]
     public bool? SendRfidSerialToCloud
     {
@@ -34,6 +49,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private bool? cloudWebSocketEnabled;
+
     [WattPilot("cwe", false)]
     public bool? CloudWebSocketEnabled
     {
@@ -42,6 +58,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private string? lastRfidSerial;
+
     [WattPilot("lri")]
     public string? LastRfidSerial
     {
@@ -69,6 +86,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private CableLockStatus? cableLockStatus;
+
     [WattPilot("cus")]
     public CableLockStatus? CableLockStatus
     {
@@ -77,6 +95,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private CableLockFeedback? cableLockFeedback;
+
     [WattPilot("ffb")]
     public CableLockFeedback? CableLockFeedback
     {
@@ -730,6 +749,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private bool? enableGridMonitoringOnStartUp;
+
     [WattPilot("rsre", false)]
     public bool? EnableGridMonitoringOnStartUp
     {
@@ -738,6 +758,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private int gridMonitoringTimeOnStartUp;
+
     [WattPilot("gmtr", false)]
     public int GridMonitoringTimeOnStartUp
     {
@@ -746,6 +767,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private float? startUpMonitoringMinimumVoltage;
+
     [WattPilot("rmiv", false)]
     public float? StartUpMonitoringMinimumVoltage
     {
@@ -754,6 +776,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private float? startUpMonitoringMaximumVoltage;
+
     [WattPilot("rmav", false)]
     public float? StartUpMonitoringMaximumVoltage
     {
@@ -762,6 +785,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private float? startUpMonitoringMinimumFrequency;
+
     [WattPilot("rmif", false)]
     public float? StartUpMonitoringMinimumFrequency
     {
@@ -770,6 +794,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private float? startUpMonitoringMaximumFrequency;
+
     [WattPilot("rmaf", false)]
     public float? StartUpMonitoringMaximumFrequency
     {
@@ -778,6 +803,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private float? startUpRampUpRate;
+
     [WattPilot("rsrr", false)]
     public float? StartUpRampUpRate
     {
@@ -1162,6 +1188,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private IList<WattPilotElectricityPrice>? electricityPrices;
+
     [WattPilot("awpl")]
     public IList<WattPilotElectricityPrice>? ElectricityPrices
     {
@@ -1173,8 +1200,8 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
                 return;
             }
 
-            wattPilotElectricityPriceService.PriceZone = EnergyPriceCountry;
-                
+            wattPilotElectricityPriceService.PriceRegion = EnergyPriceCountry;
+
             if (value != null)
             {
                 wattPilotElectricityPriceService.RawValues = value;
@@ -1434,6 +1461,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private bool? enableOutOfBalanceControl;
+
     [WattPilot("ule", false)]
     public bool? EnableOutOfBalanceControl
     {
@@ -1442,6 +1470,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private bool? showOutOfBalanceControlInVoltAmpere;
+
     [WattPilot("ulu", false)]
     public bool? ShowOutOfBalanceControlInVoltAmpere
     {
@@ -1450,6 +1479,7 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
     private byte? maximumOutOfBalanceCurrent;
+
     [WattPilot("ula", false)]
     public byte? MaximumOutOfBalanceCurrent
     {

@@ -2,10 +2,10 @@
 
 public interface IElectricityPriceService : INotifyPropertyChanged
 {
-    public Task<IEnumerable<IElectricityPrice>> GetGetElectricityPricesAsync(double offset = 0, double factor = 1, CancellationToken token = default);
+    public Task<IEnumerable<IElectricityPrice>> GetGetElectricityPricesAsync(decimal offset = 0, decimal factor = 1, CancellationToken token = default);
     public Task<IEnumerable<AwattarCountry>> GetSupportedPriceZones();
     public bool IsPush { get; }
-    public bool CanSetPriceZone { get; }
+    public bool CanSetPriceRegion { get; }
     public IEnumerable<IElectricityPrice>? RawValues { get; }
-    public AwattarCountry PriceZone { get; set; }
+    public AwattarCountry PriceRegion { get; set; }
 }

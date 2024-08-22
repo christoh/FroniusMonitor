@@ -6,13 +6,13 @@ public abstract class SettingsBase : BindableBase, ICloneable
 
     private WebConnection fritzBoxConnection = new() { BaseUrl = "http://192.168.178.1", UserName = string.Empty, Password = string.Empty };
 
-    private ElectricityPriceService electricityPriceService = ElectricityPriceService.Awattar;
+    private ElectricityPriceSettings electricityPrice = new();
 
     [XmlElement]
-    public ElectricityPriceService ElectricityPriceService
+    public ElectricityPriceSettings ElectricityPrice
     {
-        get => electricityPriceService;
-        set => Set(ref electricityPriceService, value);
+        get => electricityPrice;
+        set => Set(ref electricityPrice, value);
     }
 
     [XmlElement, DefaultValue(null)]

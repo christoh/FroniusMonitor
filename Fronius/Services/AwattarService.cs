@@ -10,39 +10,48 @@ public sealed class AwattarService : ElectricityPushPriceServiceBase, IElectrici
 
     public AwattarService()
     {
-        var nextQuery = GetNextQuery();
-        timer = new Timer(TimerCallback, null, nextQuery, TimeSpan.Zero);
-        _ = Refresh();
+        timer = new Timer(TimerCallback, null, DurationToNextQuery, TimeSpan.Zero);
     }
 
-    public bool CanSetPriceZone => true;
+    public bool CanSetPriceRegion => true;
 
-    private AwattarCountry priceZone = AwattarCountry.GermanyLuxembourg;
+    private AwattarCountry priceZone = (AwattarCountry)(-1);
 
-    public AwattarCountry PriceZone
+    public AwattarCountry PriceRegion
     {
         get => priceZone;
-        set => Set(ref priceZone, value, preFunc: () => supportedPriceZones.Contains(value) ? value : throw new ArgumentException(Resources.UnsupportedPriceZone));
+        set => Set(ref priceZone, value, () => _ = Refresh(), () => supportedPriceZones.Contains(value) ? value : throw new ArgumentException(Resources.UnsupportedPriceZone));
+    }
+
+    private static TimeSpan DurationToNextQuery
+    {
+        get
+        {
+            const long ticksPerHour = 36_000_000_000L;
+
+            // Full hour plus 90 seconds
+            return new DateTime(DateTime.UtcNow.Ticks / ticksPerHour * ticksPerHour).AddSeconds(3690) - DateTime.UtcNow;
+        }
     }
 
     public Task<IEnumerable<AwattarCountry>> GetSupportedPriceZones() => Task.FromResult<IEnumerable<AwattarCountry>>(supportedPriceZones);
 
     public void Dispose()
     {
-        client?.Dispose();
-        client = null;
         timer?.Dispose();
         timer = null;
+        client?.Dispose();
+        client = null;
     }
 
     private async Task Refresh(CancellationToken token = default)
     {
-        if (!supportedPriceZones.Contains(PriceZone))
+        if (!supportedPriceZones.Contains(PriceRegion))
         {
             throw new NotSupportedException(Resources.UnsupportedPriceZone);
         }
 
-        var tld = PriceZone switch
+        var tld = PriceRegion switch
         {
             AwattarCountry.GermanyLuxembourg => "de",
             AwattarCountry.Austria => "at",
@@ -55,11 +64,7 @@ public sealed class AwattarService : ElectricityPushPriceServiceBase, IElectrici
 
     private void TimerCallback(object? state)
     {
-        timer?.Change(GetNextQuery(), TimeSpan.Zero);
+        timer?.Change(DurationToNextQuery, TimeSpan.Zero);
         _ = Refresh();
-    }
-    private static TimeSpan GetNextQuery()
-    {
-        return new DateTime(DateTime.UtcNow.Ticks / 36_000_000_000L * 36_000_000_000L).AddSeconds(3690) - DateTime.UtcNow;
     }
 }

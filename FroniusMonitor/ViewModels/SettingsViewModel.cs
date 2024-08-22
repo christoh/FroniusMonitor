@@ -3,40 +3,41 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
-public class SettingsViewModel : SettingsViewModelBase
+public class SettingsViewModel(
+    IGen24Service gen24Service,
+    IGen24JsonService gen24JsonService,
+    IFritzBoxService fritzBoxService,
+    IWattPilotService wattPilotService,
+    IDataCollectionService dataCollectionService
+) : SettingsViewModelBase(dataCollectionService, gen24Service, gen24JsonService, fritzBoxService, wattPilotService)
 {
     private static readonly IEnumerable<ListItemModel<string?>> cultures = new[]
     {
-        new ListItemModel<string?> {DisplayName = Resources.MatchWindowsLanguage, Value = null},
-        new ListItemModel<string?> {DisplayName = GetCultureName("en"), Value = "en"},
-        new ListItemModel<string?> {DisplayName = GetCultureName("de"), Value = "de"},
-        new ListItemModel<string?> {DisplayName = GetCultureName("de-CH"), Value = "de-CH"},
-        new ListItemModel<string?> {DisplayName = GetCultureName("de-LI"), Value = "de-LI"},
+        new ListItemModel<string?> { DisplayName = Resources.MatchWindowsLanguage, Value = null },
+        new ListItemModel<string?> { DisplayName = GetCultureName("en"), Value = "en" },
+        new ListItemModel<string?> { DisplayName = GetCultureName("de"), Value = "de" },
+        new ListItemModel<string?> { DisplayName = GetCultureName("de-CH"), Value = "de-CH" },
+        new ListItemModel<string?> { DisplayName = GetCultureName("de-LI"), Value = "de-LI" },
     };
 
     private static readonly IEnumerable<ListItemModel<Protocol>> azureProtocols = new[]
     {
-        new EnumListItemModel<Protocol> {Value = Protocol.Amqp},
-        new EnumListItemModel<Protocol> {Value = Protocol.Mqtt},
+        new EnumListItemModel<Protocol> { Value = Protocol.Amqp },
+        new EnumListItemModel<Protocol> { Value = Protocol.Mqtt },
     };
 
     private static readonly IEnumerable<ListItemModel<TunnelMode>> tunnelModes = new[]
     {
-        new EnumListItemModel<TunnelMode> {Value = TunnelMode.Auto},
-        new EnumListItemModel<TunnelMode> {Value = TunnelMode.Websocket},
-        new EnumListItemModel<TunnelMode> {Value = TunnelMode.NoTunnel},
+        new EnumListItemModel<TunnelMode> { Value = TunnelMode.Auto },
+        new EnumListItemModel<TunnelMode> { Value = TunnelMode.Websocket },
+        new EnumListItemModel<TunnelMode> { Value = TunnelMode.NoTunnel },
     };
 
-    public SettingsViewModel
-    (
-        IGen24Service gen24Service,
-        IGen24JsonService gen24JsonService,
-        IFritzBoxService fritzBoxService,
-        IWattPilotService wattPilotService,
-        IDataCollectionService dataCollectionService
-    ) : base(dataCollectionService, gen24Service, gen24JsonService, fritzBoxService, wattPilotService)
-    {
-    }
+    private static readonly IEnumerable<ElectricityPriceService> priceServices = Enum.GetValues<ElectricityPriceService>();
+
+    private readonly ElectricityPriceSettings oldElectricityPriceSettings = new();
+
+    private bool isOkPressed;
 
     private ICommand? okCommand;
     public ICommand OkCommand => okCommand ??= new NoParameterCommand(Ok);
@@ -57,6 +58,8 @@ public class SettingsViewModel : SettingsViewModelBase
 
     public IEnumerable<ListItemModel<TunnelMode>> TunnelModes => tunnelModes;
 
+    public IEnumerable<ElectricityPriceService> PriceServices => priceServices;
+
     public ListItemModel<Protocol> SelectedProtocol
     {
         get => AzureProtocols.FirstOrDefault(p => p.Value == Settings.ToshibaAcConnection.Protocol, new ListItemModel<Protocol>());
@@ -74,6 +77,16 @@ public class SettingsViewModel : SettingsViewModelBase
         set
         {
             Settings.ToshibaAcConnection.TunnelMode = value.Value;
+            NotifyOfPropertyChange();
+        }
+    }
+
+    public ListItemModel<AwattarCountry> SelectedPriceRegion
+    {
+        get => PriceRegions.FirstOrDefault(z => z.Value == Settings.ElectricityPrice.PriceRegion, new EnumListItemModel<AwattarCountry> { Value = PriceService.GetSupportedPriceZones().GetAwaiter().GetResult().FirstOrDefault() });
+        set
+        {
+            priceService.PriceRegion = Settings.ElectricityPrice.PriceRegion = value.Value;
             NotifyOfPropertyChange();
         }
     }
@@ -98,20 +111,66 @@ public class SettingsViewModel : SettingsViewModelBase
         set => Set(ref selectedCulture, value);
     }
 
-    private static readonly IEnumerable<string> gen24UserNames = new[] { "customer", "technician", "support" };
+    private IElectricityPriceService priceService = IoC.TryGet<IElectricityPriceService>()!;
+
+    public IElectricityPriceService PriceService
+    {
+        get => priceService;
+        set => Set(ref priceService, value);
+    }
+
+    private IEnumerable<ListItemModel<AwattarCountry>> priceRegions = [];
+
+    public IEnumerable<ListItemModel<AwattarCountry>> PriceRegions
+    {
+        get => priceRegions;
+        set => Set(ref priceRegions, value, () => NotifyOfPropertyChange(nameof(SelectedPriceRegion)));
+    }
+
+    private static readonly IEnumerable<string> gen24UserNames = ["customer", "technician", "support"];
 
     public IEnumerable<string> Gen24UserNames => gen24UserNames;
 
-    private static readonly IReadOnlyList<byte> froniusUpdateRates = new byte[] { 1, 2, 3, 4, 5, 10, 20, 30, 60 };
+    private static readonly IReadOnlyList<byte> froniusUpdateRates = [1, 2, 3, 4, 5, 10, 20, 30, 60];
 
     public IReadOnlyList<byte> FroniusUpdateRates => froniusUpdateRates;
 
     internal override async Task OnInitialize()
     {
+        oldElectricityPriceSettings.CopyFrom(App.Settings.ElectricityPrice);
+        App.Settings.ElectricityPrice.ElectricityPriceServiceChanged += OnElectricityPriceServiceChanged;
         await base.OnInitialize().ConfigureAwait(false);
         Settings = (Settings)App.Settings.Clone();
         SelectedCulture = Cultures.SingleOrDefault(c => c.Value?.ToUpperInvariant() == Settings.Language?.ToUpperInvariant()) ?? Cultures.First();
         NotifyOfPropertyChange(nameof(SelectedProtocol));
+        OnElectricityPriceServiceChanged(null, default);
+    }
+
+    internal override Task CleanUp()
+    {
+        if (!isOkPressed)
+        {
+            App.Settings.ElectricityPrice.CopyFrom(oldElectricityPriceSettings);
+
+            if (PriceService.CanSetPriceRegion)
+            {
+                PriceService.PriceRegion = oldElectricityPriceSettings.PriceRegion;
+            }
+        }
+
+        App.Settings.ElectricityPrice.ElectricityPriceServiceChanged -= OnElectricityPriceServiceChanged;
+        return base.CleanUp();
+    }
+
+    private async void OnElectricityPriceServiceChanged(object? sender, ElectricityPriceService e)
+    {
+        PriceService = IoC.Get<IElectricityPriceService>();
+
+        PriceRegions = (await PriceService.GetSupportedPriceZones())
+            .Select(zone => new EnumListItemModel<AwattarCountry> { Value = zone })
+            .OrderBy(zoneModel => zoneModel.DisplayName)
+            .ToList()
+            ;
     }
 
     private void ChangeDriftsFile()
@@ -215,6 +274,7 @@ public class SettingsViewModel : SettingsViewModelBase
     {
         try
         {
+            isOkPressed = true;
             Close();
             Settings.FroniusConnection.BaseUrl = FixUrl(Settings.FroniusConnection.BaseUrl);
             Settings.FroniusConnection2.BaseUrl = FixUrl(Settings.FroniusConnection2.BaseUrl);
