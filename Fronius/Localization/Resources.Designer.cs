@@ -3112,6 +3112,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No valid data received.
+        /// </summary>
+        public static string NoValidData {
+            get {
+                return ResourceManager.GetString("NoValidData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No Wattpilot found.
         /// </summary>
         public static string NoWattPilot {
@@ -3895,6 +3904,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Solar production.
+        /// </summary>
+        public static string SolarProduction {
+            get {
+                return ResourceManager.GetString("SolarProduction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Standby.
         /// </summary>
         public static string Standby {
@@ -4413,6 +4431,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string WifiSsid {
             get {
                 return ResourceManager.GetString("WifiSsid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wind production.
+        /// </summary>
+        public static string WindProduction {
+            get {
+                return ResourceManager.GetString("WindProduction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wind and solar production.
+        /// </summary>
+        public static string WindSolar {
+            get {
+                return ResourceManager.GetString("WindSolar", resourceCulture);
             }
         }
         

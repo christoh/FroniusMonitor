@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using De.Hochstaetter.Fronius.Contracts;
+using De.Hochstaetter.Fronius.Models.Charging;
 using De.Hochstaetter.Fronius.Services;
 
 namespace FroniusUnitTests.SystemTests;
@@ -14,7 +15,8 @@ public class AwattarTests
     [Test]
     public async Task DoTest()
     {
-        var enumerable = await service.GetElectricityPricesAsync("de", 17.879, 1.2257);
+        service.PriceRegion = AwattarCountry.GermanyLuxembourg;
+        var enumerable = await service.GetElectricityPricesAsync(17.879m, 1.2257m);
         Assert.That(enumerable != null);
         Debug.Assert(enumerable != null);
         var result = enumerable as IReadOnlyList<IElectricityPrice> ?? enumerable.ToList();

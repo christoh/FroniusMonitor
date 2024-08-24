@@ -11,7 +11,7 @@
                   xmlns:gl="clr-namespace:System.Globalization;assembly=mscorlib"
                   mc:Ignorable="d"
                   d:DataContext="{d:DesignInstance Type=vm:PriceViewModel}"
-                  Title="{x:Static p:Resources.ElectricityPrice}" Height="550" Width="1100"
+                  Title="{x:Static p:Resources.ElectricityPrice}" Height="550" Width="1280"
                   MinWidth="300" MinHeight="200">
     <Grid>
         <Grid.LayoutTransform>
@@ -23,8 +23,17 @@
         </Grid.RowDefinitions>
 
         <oxy:Plot Grid.Row="0" Title="Electricity Prices" Model="{Binding PlotModel}" />
+        <Viewbox Grid.Row="0" Margin="50" Stretch="Uniform" StretchDirection="Both">
+            <ItemsControl ItemsSource="{Binding Errors}" VerticalAlignment="Center" >
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock VerticalAlignment="Center" Foreground="#A0ff0000" Text="{Binding}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Viewbox>
 
-        <GroupBox Header="Settings" Grid.Row="1" Margin="8" HorizontalAlignment="Center">
+        <GroupBox Header="Settings" Grid.Row="1" Margin="8" HorizontalAlignment="Center" IsEnabled="{Binding IsBusy, Converter={co:BoolInverter}}">
             <Grid Margin="10">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -54,11 +63,15 @@
                 <RadioButton Grid.Row="1" Grid.Column="2" Content="{x:Static p:Resources.Historic}" GroupName="Historic" IsChecked="{Binding ShowHistoricData}"
                              Visibility="{Binding ElectricityPriceService.SupportsHistoricData, Converter={co:Bool2Visibility}}" />
 
-                <DatePicker Grid.Row="0" Grid.RowSpan="2" Grid.Column="3" Margin="16,2,0,0" VerticalAlignment="Center" IsEnabled="{Binding ShowHistoricData}"
-                            SelectedDate="{Binding Date, StringFormat=d, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, UpdateSourceTrigger=PropertyChanged}"
-                            DisplayDateEnd="{Binding Converter={co:ElectricityPriceEndDate}, Mode=OneWay}"
-                            DisplayDateStart="2013/12/22 00:00"
-                            Visibility="{Binding ElectricityPriceService.SupportsHistoricData, Converter={co:Bool2Visibility}}" />
+                <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.RowSpan="2" Grid.Column="3" IsEnabled="{Binding ShowHistoricData}"
+                            Visibility="{Binding ElectricityPriceService.SupportsHistoricData, Converter={co:Bool2Visibility}}">
+                    <Button Content="&lt;&lt;" Margin="16,1,0,0" Height="24" Click="DecreaseDate" x:Name="DecreaseButton"/>
+                    <DatePicker VerticalAlignment="Center" x:Name="DatePicker"
+                                SelectedDate="{Binding Date, StringFormat=d, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, UpdateSourceTrigger=PropertyChanged}"
+                                DisplayDateEnd="{Binding Converter={co:ElectricityPriceEndDate}, Mode=OneWay}"
+                                DisplayDateStart="2013/12/22 00:00" SelectedDateChanged="SelectedDateChanged"/>
+                    <Button Content="&gt;&gt;" Margin="0,1,0,0" Height="24" Click="IncreaseDate" x:Name="IncreaseButton"/>
+                </StackPanel>
             </Grid>
         </GroupBox>
     </Grid>

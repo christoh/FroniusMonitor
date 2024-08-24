@@ -1,5 +1,4 @@
-﻿using Irony.Parsing;
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
 
 namespace De.Hochstaetter.Fronius.Services;
 
@@ -54,8 +53,15 @@ public sealed class AwattarService : ElectricityPushPriceServiceBase, IElectrici
         var (tld, fromUnix, toUnix) = GetQueryParameters(from, to);
         var query = FormattableString.Invariant($"https://api.awattar.{tld}/v1/power/productions{fromUnix}{toUnix}");
 
-        return
-            (await (client?.GetFromJsonAsync<AwattarEnergyList>(query, token).ConfigureAwait(false) ?? throw new ObjectDisposedException(GetType().Name)))?.Energies ?? [];
+        var result = (await (client?.GetFromJsonAsync<AwattarEnergyList>(query, token).ConfigureAwait(false) ?? throw new ObjectDisposedException(GetType().Name)))?.Energies ?? [];
+
+        //foreach (var awattarEnergy in result.Where(a => a.StartTime.ToLocalTime().Date > DateTime.Now.Date))
+        //{
+        //    awattarEnergy.SolarProduction *= 20;
+        //    awattarEnergy.WindProduction *= 20;
+        //}
+
+        return result;
     }
 
     private (string tld, string fromUnix, string toUnix) GetQueryParameters(DateTime? from, DateTime? to)

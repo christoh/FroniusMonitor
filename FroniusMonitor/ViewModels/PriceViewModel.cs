@@ -1,6 +1,8 @@
-﻿using De.Hochstaetter.Fronius.Models.Settings;
+﻿using System.Text.Json;
+using De.Hochstaetter.Fronius.Models.Settings;
 using OxyPlot;
 using OxyPlot.Axes;
+using OxyPlot.Legends;
 using OxyPlot.Series;
 
 namespace De.Hochstaetter.FroniusMonitor.ViewModels
@@ -24,14 +26,6 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
         {
             get => prices;
             set => Set(ref prices, value);
-        }
-
-        private IReadOnlyList<DataPoint> pricePoints = null!;
-
-        public IReadOnlyList<DataPoint> PricePoints
-        {
-            get => pricePoints;
-            set => Set(ref pricePoints, value);
         }
 
         private PlotModel? plotModel;
@@ -74,13 +68,29 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
             set => Set(ref date, value, OnSettingsChanged);
         }
 
+        private BindableCollection<string> errors = [];
+
+        public BindableCollection<string> Errors
+        {
+            get => errors;
+            set => Set(ref errors, value);
+        }
+
+        private bool isBusy;
+
+        public bool IsBusy
+        {
+            get => isBusy;
+            set => Set(ref isBusy, value);
+        }
+
         internal override async Task OnInitialize()
         {
             await base.OnInitialize().ConfigureAwait(false);
 
-            if (electricityPriceService.IsPush)
+            if (ElectricityPriceService.IsPush)
             {
-                electricityPriceService.PropertyChanged += OnServicePropertyChanged;
+                ElectricityPriceService.PropertyChanged += OnServicePropertyChanged;
             }
             else
             {
@@ -93,13 +103,14 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
 
         private async void OnElectricityPriceServiceChanged(object? o, ElectricityPriceService service)
         {
-            electricityPriceService.PropertyChanged -= OnServicePropertyChanged;
+            ElectricityPriceService.PropertyChanged -= OnServicePropertyChanged;
             electricityPriceService = IoC.Get<IElectricityPriceService>();
+            ShowHistoricData = ElectricityPriceService.SupportsHistoricData && ShowHistoricData;
             NotifyOfPropertyChange(nameof(ElectricityPriceService));
 
-            if (electricityPriceService.IsPush)
+            if (ElectricityPriceService.IsPush)
             {
-                electricityPriceService.PropertyChanged += OnServicePropertyChanged;
+                ElectricityPriceService.PropertyChanged += OnServicePropertyChanged;
             }
             else
             {
@@ -128,7 +139,7 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
         {
             try
             {
-                electricityPriceService.PropertyChanged -= OnServicePropertyChanged;
+                ElectricityPriceService.PropertyChanged -= OnServicePropertyChanged;
                 settings.ElectricityPrice.ElectricityPriceServiceChanged -= OnElectricityPriceServiceChanged;
 
                 if (timer != null)
@@ -169,144 +180,194 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
 
         private async Task RefreshPrices()
         {
-            var (factor, offset, vatFactor) = GetFactorAndOffset();
-
-            Prices = (await electricityPriceService.GetElectricityPricesAsync
-            (
-                offset,
-                factor,
-                vatFactor,
-                ShowHistoricData ? Date : null,
-                ShowHistoricData ? Date.AddDays(1) : null
-            ).ConfigureAwait(false)).ToArray() ?? throw new InvalidOperationException();
-
-            IReadOnlyList<AwattarEnergy> energies = [];
-
-            if (electricityPriceService is AwattarService awattarService)
+            try
             {
-                energies = (await awattarService.GetHistoricEnergyDataAsync
-                (
-                    ShowHistoricData ? Date : null,
-                    ShowHistoricData ? Date.AddDays(1) : null
-                ).ConfigureAwait(false)).ToList();
-            }
+                IsBusy = true;
 
-            PricePoints = Prices.Select(p => new DataPoint(DateTimeAxis.ToDouble(p.StartTime.ToLocalTime().AddHours(.5)), (double)p.CentsPerKiloWattHour)).ToList();
+                var (factor, offset, vatFactor) = GetFactorAndOffset();
 
-            const double adjustment = 1.000000001;
-            const double margin = 1.1;
-            var priceMin = PricePoints.Select(p => p.Y).Min();
-            var priceMax = PricePoints.Select(p => p.Y).Max();
-
-            var priceMinimum = priceMin > 0 ? priceMin / margin : priceMin * margin;
-            var priceMaximum = priceMax + (priceMax - priceMinimum) * 0.6 * margin;
-
-            var model = new PlotModel
-            {
-                Title = $"{Loc.ElectricityPrice} ({electricityPriceService.PriceRegion.ToDisplayName()})",
-                TitleFontWeight = 600,
-                TitleFontSize = 20,
-
-                Axes =
+                try
                 {
-                    new DateTimeAxis
-                    {
-                        AbsoluteMinimum = Prices.Select(p => DateTimeAxis.ToDouble(p.StartTime.ToLocalTime())).Min(),
-                        Minimum = Prices.Select(p => DateTimeAxis.ToDouble(p.StartTime.ToLocalTime())).Min(),
-                        AbsoluteMaximum = Prices.Select(p => DateTimeAxis.ToDouble(p.EndTime.ToLocalTime())).Max(),
-                        Maximum = Prices.Select(p => DateTimeAxis.ToDouble(p.EndTime.ToLocalTime())).Max(),
-                        IsZoomEnabled = false,
-                        IsPanEnabled = false,
-                        IntervalType = DateTimeIntervalType.Days,
-                        MajorStep = 2 / 24d * adjustment, MinorStep = 1 / 24d * adjustment,
-                        EdgeRenderingMode = EdgeRenderingMode.PreferSharpness,
-                        StringFormat = "HH:mm",
-                        IntervalLength = 48,
-                        FontSize = 14,
-                        PositionAtZeroCrossing = false,
-                        MajorGridlineStyle = LineStyle.Solid,
-                        MinorGridlineStyle = LineStyle.Solid,
-                    },
+                    Prices = [];
+                    Errors.Clear();
 
-                    new LinearAxis
-                    {
-                        Position = AxisPosition.Left,
-                        PositionAtZeroCrossing = false,
-                        Minimum = priceMin > 0 ? priceMin / margin : priceMin * margin,
-                        AbsoluteMinimum = priceMinimum,
-                        Maximum = priceMaximum,
-                        AbsoluteMaximum = priceMaximum,
-                        IsZoomEnabled = false,
-                        IsPanEnabled = false,
-                        FontSize = 16,
-                        EdgeRenderingMode = EdgeRenderingMode.PreferSharpness,
-                    },
+                    Prices = (await ElectricityPriceService.GetElectricityPricesAsync
+                    (
+                        offset,
+                        factor,
+                        vatFactor,
+                        ShowHistoricData ? Date : null,
+                        ShowHistoricData ? Date.AddDays(1) : null
+                    ).ConfigureAwait(false)).ToArray() ?? throw new InvalidOperationException();
                 }
-            };
-
-            var series = new LinearBarSeries { FillColor = OxyColors.LightGreen, BarWidth = 90, NegativeFillColor = OxyColors.Orange };
-            series.Points.AddRange(PricePoints);
-            model.Series.Add(series);
-
-            var lineSeries = new LineSeries { Color = OxyColors.Transparent, LabelFormatString = "{1:N2}", FontSize = 10, LabelMargin = 2 };
-            lineSeries.Points.AddRange(PricePoints);
-            model.Series.Add(lineSeries);
-
-            if (electricityPriceService is AwattarService)
-            {
-                var energyMin = -energies.Max(e => (e.SolarProduction + e.WindProduction) / 1000);
-
-                model.Axes.Add(new LinearAxis
+                catch (JsonException)
                 {
-                    Position = AxisPosition.Right,
-                    PositionAtZeroCrossing = false,
-                    Minimum = energyMin * 3,
-                    AbsoluteMinimum = energyMin * 3,
-                    Maximum = 0,
-                    AbsoluteMaximum = 0,
-                    IsZoomEnabled = false,
-                    IsPanEnabled = false,
-                    Key = "Energy",
-                    FontSize = 16,
-                    EdgeRenderingMode = EdgeRenderingMode.PreferSharpness,
-                });
+                    Errors.Add($"{Loc.ElectricityPrice}: {Loc.NoValidData}");
+                }
+                catch (Exception ex)
+                {
+                    Errors.Add($"{Loc.ElectricityPrice}: {ex.Message}");
+                }
 
-                var solar = new RectangleBarSeries { FillColor = OxyColor.FromArgb(255, 255, 0xd0, 0), YAxisKey = "Energy", };
+                IReadOnlyList<AwattarEnergy> energies = [];
 
-                energies.Apply
+                if (ElectricityPriceService is AwattarService awattarService)
+                {
+                    try
+                    {
+                        energies = (await awattarService.GetHistoricEnergyDataAsync
+                        (
+                            ShowHistoricData ? Date : null,
+                            ShowHistoricData ? Date.AddDays(1) : Prices.Any() ? Prices[^1].EndTime : null
+                        ).ConfigureAwait(false)).ToList();
+                    }
+                    catch (JsonException)
+                    {
+                        Errors.Add($"{Loc.WindSolar}: {Loc.NoValidData}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Errors.Add($"{Loc.WindSolar}: {ex.Message}");
+                    }
+                }
+
+                const double adjustment = 1.000000001;
+                const double margin = 1.1;
+                var priceMin = Prices.Select(p => (double)p.CentsPerKiloWattHour).Min();
+                var priceMax = Prices.Select(p => (double)p.CentsPerKiloWattHour).Max();
+
+                var priceMinimum = priceMin > 0 ? priceMin / margin : priceMin * margin;
+                var priceMaximum = priceMax + (priceMax - priceMinimum) * (energies.Count == 0 ? 0.1 : 0.6) * margin;
+
+                var model = new PlotModel
+                {
+                    Title = $"{Loc.ElectricityPrice} ({ElectricityPriceService.PriceRegion.ToDisplayName()})",
+                    TitleFontWeight = 600,
+                    TitleFontSize = 20,
+                    IsLegendVisible = true,
+
+                    Axes =
+                    {
+                        new DateTimeAxis
+                        {
+                            AbsoluteMinimum = Prices.Select(p => DateTimeAxis.ToDouble(p.StartTime.ToLocalTime())).Min(),
+                            Minimum = Prices.Select(p => DateTimeAxis.ToDouble(p.StartTime.ToLocalTime())).Min(),
+                            AbsoluteMaximum = Prices.Select(p => DateTimeAxis.ToDouble(p.EndTime.ToLocalTime())).Max(),
+                            Maximum = Prices.Select(p => DateTimeAxis.ToDouble(p.EndTime.ToLocalTime())).Max(),
+                            IsZoomEnabled = false,
+                            IsPanEnabled = false,
+                            IntervalType = DateTimeIntervalType.Days,
+                            MajorStep = 2 / 24d * adjustment, MinorStep = 1 / 24d * adjustment,
+                            EdgeRenderingMode = EdgeRenderingMode.PreferSharpness,
+                            StringFormat = "HH:mm",
+                            IntervalLength = 48,
+                            FontSize = 14,
+                            PositionAtZeroCrossing = false,
+                            MajorGridlineStyle = LineStyle.Solid,
+                            MinorGridlineStyle = LineStyle.Solid,
+                        },
+
+                        new LinearAxis
+                        {
+                            Position = AxisPosition.Left,
+                            PositionAtZeroCrossing = false,
+                            Minimum = priceMin > 0 ? priceMin / margin : priceMin * margin,
+                            AbsoluteMinimum = priceMinimum,
+                            Maximum = priceMaximum, Unit = "ct/kWh",
+                            AbsoluteMaximum = priceMaximum,
+                            IsZoomEnabled = false,
+                            IsPanEnabled = false,
+                            FontSize = 16,
+                            EdgeRenderingMode = EdgeRenderingMode.PreferSharpness,
+                        },
+                    }
+                };
+
+                model.Legends.Add(new Legend() { Key = "Legend", IsLegendVisible = true, LegendPlacement = LegendPlacement.Outside });
+                var priceSeries = new RectangleBarSeries { FillColor = OxyColors.LightGreen, StrokeThickness = 0.5, RenderInLegend = true, LegendKey = "Legend", Title = Loc.ElectricityPrice };
+
+                Prices.Apply
                 (
-                    s => solar.Items.Add
+                    price => priceSeries.Items.Add
                     (
                         new RectangleBarItem
                         (
-                            DateTimeAxis.ToDouble(s.StartTime.ToLocalTime()),
+                            DateTimeAxis.ToDouble(price.StartTime.ToLocalTime()),
                             0,
-                            DateTimeAxis.ToDouble(s.EndTime.ToLocalTime()),
-                            -s.SolarProduction / 1000
+                            DateTimeAxis.ToDouble(price.EndTime.ToLocalTime()),
+                            (double)price.CentsPerKiloWattHour
                         )
                     )
                 );
 
-                var wind = new RectangleBarSeries { FillColor = OxyColors.DodgerBlue, YAxisKey = "Energy", };
+                model.Series.Add(priceSeries);
 
-                energies.Apply
-                (
-                    s => wind.Items.Add
+                var lineSeries = new LineSeries { Color = OxyColors.Transparent, LabelFormatString = "{1:N2}", FontSize = 12, LabelMargin = 2 };
+                lineSeries.Points.AddRange(Prices.Select(p => new DataPoint((DateTimeAxis.ToDouble(p.StartTime.ToLocalTime()) + DateTimeAxis.ToDouble(p.EndTime.ToLocalTime())) / 2, (double)p.CentsPerKiloWattHour)));
+                model.Series.Add(lineSeries);
+
+                if (ElectricityPriceService is AwattarService && energies.Count > 0)
+                {
+                    var energyMin = -energies.Max(e => (e.SolarProduction + e.WindProduction) / 1000);
+
+                    model.Axes.Add(new LinearAxis
+                    {
+                        Unit = "GW",
+                        Position = AxisPosition.Right,
+                        PositionAtZeroCrossing = false,
+                        Minimum = energyMin * 3,
+                        AbsoluteMinimum = energyMin * 3,
+                        Maximum = 0,
+                        AbsoluteMaximum = 0,
+                        IsZoomEnabled = false,
+                        IsPanEnabled = false,
+                        StringFormat = "#,0;#,0",
+                        Key = "Energy",
+                        FontSize = 16,
+                        EdgeRenderingMode = EdgeRenderingMode.PreferSharpness,
+                    });
+
+                    var solarSeries = new RectangleBarSeries { FillColor = OxyColor.FromArgb(255, 255, 0xd0, 0), YAxisKey = "Energy", StrokeThickness = 0.5, LegendKey = "Legend", Title = Loc.SolarProduction };
+
+                    energies.Apply
                     (
-                        new RectangleBarItem
+                        s => solarSeries.Items.Add
                         (
-                            DateTimeAxis.ToDouble(s.StartTime.ToLocalTime()),
-                            -s.SolarProduction / 1000,
-                            DateTimeAxis.ToDouble(s.EndTime.ToLocalTime()),
-                            (-s.SolarProduction - s.WindProduction) / 1000)
-                    )
-                );
+                            new RectangleBarItem
+                            (
+                                DateTimeAxis.ToDouble(s.StartTime.ToLocalTime()),
+                                0,
+                                DateTimeAxis.ToDouble(s.EndTime.ToLocalTime()),
+                                -s.SolarProduction / 1000
+                            )
+                        )
+                    );
 
-                model.Series.Add(solar);
-                model.Series.Add(wind);
+                    var windSeries = new RectangleBarSeries { FillColor = OxyColors.DodgerBlue, YAxisKey = "Energy", StrokeThickness = 0.5, LegendKey = "Legend", Title = Loc.WindProduction };
+
+                    energies.Apply
+                    (
+                        s => windSeries.Items.Add
+                        (
+                            new RectangleBarItem
+                            (
+                                DateTimeAxis.ToDouble(s.StartTime.ToLocalTime()),
+                                -s.SolarProduction / 1000,
+                                DateTimeAxis.ToDouble(s.EndTime.ToLocalTime()),
+                                (-s.SolarProduction - s.WindProduction) / 1000)
+                        )
+                    );
+
+                    model.Series.Add(solarSeries);
+                    model.Series.Add(windSeries);
+                }
+
+                PlotModel = model;
             }
-
-            PlotModel = model;
+            finally
+            {
+                IsBusy = false;
+            }
         }
     }
 }

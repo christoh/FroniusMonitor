@@ -1135,6 +1135,6 @@ public class ElectricityPriceEndDate:ConverterBase
 {
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        return DateTime.UtcNow.Hour > 11 ? DateTime.UtcNow.AddDays(1).Date.ToLocalTime() : DateTime.Now.Date;
+        return DateTime.Now.Hour > 12 ? DateTime.UtcNow.AddDays(1).Date.ToLocalTime() : DateTime.Now.Date;
     }
 }

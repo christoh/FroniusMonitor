@@ -1584,4 +1584,16 @@
   <data name="Historic" xml:space="preserve">
 	  <value>Historic</value>
   </data>
+  <data name="NoValidData" xml:space="preserve">
+	  <value>No valid data received</value>
+  </data>
+  <data name="WindSolar" xml:space="preserve">
+	  <value>Wind and solar production</value>
+  </data>
+  <data name="SolarProduction" xml:space="preserve">
+	  <value>Solar production</value>
+  </data>
+  <data name="WindProduction" xml:space="preserve">
+	  <value>Wind production</value>
+  </data>
 </root>
