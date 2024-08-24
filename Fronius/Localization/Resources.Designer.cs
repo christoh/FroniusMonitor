@@ -898,6 +898,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Buying price.
+        /// </summary>
+        public static string BuyingPrice {
+            get {
+                return ResourceManager.GetString("BuyingPrice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cable unlock behavior.
         /// </summary>
         public static string CableLockBehavior {
@@ -1933,6 +1942,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Historic.
+        /// </summary>
+        public static string Historic {
+            get {
+                return ResourceManager.GetString("Historic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Host name or IPv4 address.
         /// </summary>
         public static string HostnameOrIpv4Address {
@@ -2262,6 +2280,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Loss {
             get {
                 return ResourceManager.GetString("Loss", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Market price.
+        /// </summary>
+        public static string MarketPrice {
+            get {
+                return ResourceManager.GetString("MarketPrice", resourceCulture);
             }
         }
         
@@ -4066,6 +4093,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Today.
+        /// </summary>
+        public static string Today {
+            get {
+                return ResourceManager.GetString("Today", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Toshiba HVACs.
         /// </summary>
         public static string ToshibaAcHeader {
@@ -4377,6 +4413,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string WifiSsid {
             get {
                 return ResourceManager.GetString("WifiSsid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Net (without VAT).
+        /// </summary>
+        public static string WithoutVat {
+            get {
+                return ResourceManager.GetString("WithoutVat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gross (including VAT).
+        /// </summary>
+        public static string WithVat {
+            get {
+                return ResourceManager.GetString("WithVat", resourceCulture);
             }
         }
         

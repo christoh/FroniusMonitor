@@ -1566,4 +1566,22 @@
   <data name="ElectricityPrice" xml:space="preserve">
 	  <value>Electricity Price</value>
   </data>
+  <data name="BuyingPrice" xml:space="preserve">
+	  <value>Buying price</value>
+  </data>
+  <data name="MarketPrice" xml:space="preserve">
+	  <value>Market price</value>
+  </data>
+  <data name="WithoutVat" xml:space="preserve">
+	  <value>Net (without VAT)</value>
+  </data>
+  <data name="WithVat" xml:space="preserve">
+	  <value>Gross (including VAT)</value>
+  </data>
+  <data name="Today" xml:space="preserve">
+	  <value>Today</value>
+  </data>
+  <data name="Historic" xml:space="preserve">
+	  <value>Historic</value>
+  </data>
 </root>

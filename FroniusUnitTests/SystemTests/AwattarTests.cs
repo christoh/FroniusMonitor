@@ -14,7 +14,7 @@ public class AwattarTests
     [Test]
     public async Task DoTest()
     {
-        var enumerable = await service.GetGetElectricityPricesAsync("de", 17.879, 1.2257);
+        var enumerable = await service.GetElectricityPricesAsync("de", 17.879, 1.2257);
         Assert.That(enumerable != null);
         Debug.Assert(enumerable != null);
         var result = enumerable as IReadOnlyList<IElectricityPrice> ?? enumerable.ToList();

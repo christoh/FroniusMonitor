@@ -800,6 +800,20 @@ public class TypeToAnything<TTo> : ConverterBase
     }
 }
 
+public abstract class AnythingToBool<T> : ConverterBase
+{
+    public T? True { get; set; }
+
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is T tValue && tValue.Equals(True);
+    }
+}
+
+public class ElectricityPriceDisplayToBool : AnythingToBool<ElectricityPriceDisplay>
+{
+}
+
 public class TypeToVisibility : TypeToAnything<Visibility>;
 
 public class EqualityToAnything<TFrom, TTo> : ConverterBase
@@ -1035,7 +1049,7 @@ public class MpptComparison : MultiConverterBase
         var wattPeakMppt1 = values.Length >= 3 ? ((values[2] as IConvertible) ?? 1d).ToDouble(CultureInfo.CurrentCulture) : 1d;
         var wattPeakMppt2 = values.Length >= 4 ? ((values[3] as IConvertible) ?? 1d).ToDouble(CultureInfo.CurrentCulture) : 1d;
 
-        var percentage = (powerMppt2.ToDouble(culture)/wattPeakMppt2) / (powerMppt1.ToDouble(culture)/wattPeakMppt1) * 100;
+        var percentage = (powerMppt2.ToDouble(culture) / wattPeakMppt2) / (powerMppt1.ToDouble(culture) / wattPeakMppt1) * 100;
 
         object result =
             targetType.IsAssignableFrom(typeof(double))
@@ -1114,5 +1128,13 @@ public class WattPilotTitleConverter : MultiConverterBase
         builder.Append(currentUser);
 
         return builder.ToString();
+    }
+}
+
+public class ElectricityPriceEndDate:ConverterBase
+{
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return DateTime.UtcNow.Hour > 11 ? DateTime.UtcNow.AddDays(1).Date.ToLocalTime() : DateTime.Now.Date;
     }
 }

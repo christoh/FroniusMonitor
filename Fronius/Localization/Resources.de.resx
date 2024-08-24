@@ -1494,4 +1494,22 @@
   <data name="ElectricityPrice" xml:space="preserve">
 	  <value>Strompreis</value>
   </data>
+  <data name="BuyingPrice" xml:space="preserve">
+	  <value>Bezugspreis</value>
+  </data>
+  <data name="MarketPrice" xml:space="preserve">
+	  <value>Marktpreis</value>
+  </data>
+  <data name="WithoutVat" xml:space="preserve">
+	  <value>Netto (ohne Mehrwertsteuer)</value>
+  </data>
+  <data name="WithVat" xml:space="preserve">
+	  <value>Brutto (mit Mehrwertsteuer)</value>
+  </data>
+  <data name="Today" xml:space="preserve">
+	  <value>Heute</value>
+  </data>
+  <data name="Historic" xml:space="preserve">
+	  <value>Historisch</value>
+  </data>
 </root>

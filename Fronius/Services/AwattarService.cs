@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Json;
+﻿using Irony.Parsing;
+using System.Net.Http.Json;
 
 namespace De.Hochstaetter.Fronius.Services;
 
@@ -14,6 +15,7 @@ public sealed class AwattarService : ElectricityPushPriceServiceBase, IElectrici
     }
 
     public bool CanSetPriceRegion => true;
+    public override bool SupportsHistoricData => true;
 
     private AwattarCountry priceZone = (AwattarCountry)(-1);
 
@@ -36,6 +38,40 @@ public sealed class AwattarService : ElectricityPushPriceServiceBase, IElectrici
 
     public Task<IEnumerable<AwattarCountry>> GetSupportedPriceZones() => Task.FromResult<IEnumerable<AwattarCountry>>(supportedPriceZones);
 
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
+    public override async Task<IEnumerable<IElectricityPrice>> GetHistoricPriceDataAsync(DateTime? from, DateTime? to, CancellationToken token = default)
+    {
+        var (tld, fromUnix, toUnix) = GetQueryParameters(from, to);
+        var query = FormattableString.Invariant($"https://api.awattar.{tld}/v1/marketdata{fromUnix}{toUnix}");
+
+        return
+            (await (client?.GetFromJsonAsync<AwattarPriceList>(query, token).ConfigureAwait(false) ?? throw new ObjectDisposedException(GetType().Name)))?.Prices ?? [];
+    }
+
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
+    public async Task<IEnumerable<AwattarEnergy>> GetHistoricEnergyDataAsync(DateTime? from, DateTime? to, CancellationToken token = default)
+    {
+        var (tld, fromUnix, toUnix) = GetQueryParameters(from, to);
+        var query = FormattableString.Invariant($"https://api.awattar.{tld}/v1/power/productions{fromUnix}{toUnix}");
+
+        return
+            (await (client?.GetFromJsonAsync<AwattarEnergyList>(query, token).ConfigureAwait(false) ?? throw new ObjectDisposedException(GetType().Name)))?.Energies ?? [];
+    }
+
+    private (string tld, string fromUnix, string toUnix) GetQueryParameters(DateTime? from, DateTime? to)
+    {
+        var tld = PriceRegion switch
+        {
+            AwattarCountry.GermanyLuxembourg => "de",
+            AwattarCountry.Austria => "at",
+            _ => throw new NotSupportedException(Resources.UnsupportedPriceZone)
+        };
+
+        var fromUnix = from == null ? string.Empty : FormattableString.Invariant($"?start={GetUnixMilliseconds(from)}");
+        var toUnix = to == null ? string.Empty : FormattableString.Invariant($"{(from == null ? "?" : "&")}end={GetUnixMilliseconds(to)}");
+        return (tld, fromUnix, toUnix);
+    }
+
     public void Dispose()
     {
         timer?.Dispose();
@@ -44,6 +80,8 @@ public sealed class AwattarService : ElectricityPushPriceServiceBase, IElectrici
         client = null;
     }
 
+    private static long? GetUnixMilliseconds(DateTime? date) => date is null ? null : (long)Math.Round((date.Value.ToUniversalTime() - DateTime.UnixEpoch).TotalMilliseconds, MidpointRounding.AwayFromZero);
+
     private async Task Refresh(CancellationToken token = default)
     {
         if (!supportedPriceZones.Contains(PriceRegion))
@@ -51,15 +89,7 @@ public sealed class AwattarService : ElectricityPushPriceServiceBase, IElectrici
             throw new NotSupportedException(Resources.UnsupportedPriceZone);
         }
 
-        var tld = PriceRegion switch
-        {
-            AwattarCountry.GermanyLuxembourg => "de",
-            AwattarCountry.Austria => "at",
-            _ => throw new NotSupportedException(Resources.UnsupportedPriceZone)
-        };
-
-        // ReSharper disable once StringLiteralTypo
-        RawValues = (await (client?.GetFromJsonAsync<AwattarPriceList>($"https://api.awattar.{tld}/v1/marketdata", token).ConfigureAwait(false) ?? throw new ObjectDisposedException(GetType().Name)))?.Prices;
+        RawValues = await GetHistoricPriceDataAsync(null, new DateTime(2064, 12, 25), token).ConfigureAwait(false);
     }
 
     private void TimerCallback(object? state)
