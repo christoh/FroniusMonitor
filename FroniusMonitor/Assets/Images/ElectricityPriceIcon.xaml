@@ -1,0 +1,18 @@
+﻿<ContentControl x:Class="De.Hochstaetter.FroniusMonitor.Assets.Images.ElectricityPriceIcon"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:local="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
+                mc:Ignorable="d"
+                d:DesignHeight="74.4" d:DesignWidth="68.8">
+    <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:ElectricityPriceIcon}}">
+        <Canvas Height="74.4" Width="68.8" Background="{Binding Background}">
+            <Canvas.RenderTransform>
+                <TranslateTransform X="-15.6" Y="-12.8" />
+            </Canvas.RenderTransform>
+            <Path Fill="{Binding Foreground, FallbackValue=Black}" Data="M48.25,25.71v3.68a13,13,0,0,0-7.4,2.74A8.89,8.89,0,0,0,38.57,35,9.15,9.15,0,0,0,38,41.82a9.07,9.07,0,0,0,5.79,6,16.38,16.38,0,0,0,4.51.9V61.14a10.9,10.9,0,0,1-3.65-.94,6.29,6.29,0,0,1-2.48-2.05A6,6,0,0,1,41.05,55v0L37.55,55a8.87,8.87,0,0,0,.32,2.18,9.49,9.49,0,0,0,2.38,4.18A10.35,10.35,0,0,0,44,63.76a15.24,15.24,0,0,0,4.21.88v4h3.5V64.63a13,13,0,0,0,7.4-2.74,8.89,8.89,0,0,0,2.28-2.82A9.18,9.18,0,0,0,60.3,49a9.33,9.33,0,0,0-4-2.75,16.38,16.38,0,0,0-4.51-.9V32.88a10.9,10.9,0,0,1,3.65.94,6.29,6.29,0,0,1,2.48,2A6,6,0,0,1,59,39v0l3.5.06a8.76,8.76,0,0,0-.32-2.18,9.49,9.49,0,0,0-2.38-4.18A10.35,10.35,0,0,0,56,30.26a15.6,15.6,0,0,0-4.21-.89V25.71Zm0,19.48a13,13,0,0,1-3.31-.67,5.62,5.62,0,0,1-3.87-5.9,5.57,5.57,0,0,1,2-3.8,9.4,9.4,0,0,1,5.17-1.92Zm6.81,4.31a5.62,5.62,0,0,1,3.87,5.9,5.57,5.57,0,0,1-2,3.8,9.47,9.47,0,0,1-5.17,1.92V48.83A12.57,12.57,0,0,1,55.06,49.5Z" />
+            <Path Fill="{Binding Foreground, FallbackValue=Black}" Data="M81.62,33.83A34.32,34.32,0,0,0,50,12.87h0a34,34,0,0,0-13.37,2.72A34.5,34.5,0,0,0,15.68,47.35,6.34,6.34,0,0,0,22,53.68H34.32V50.93H22a3.59,3.59,0,0,1-3.58-3.58A31.78,31.78,0,0,1,37.7,18.13,31.15,31.15,0,0,1,50,15.63h0a31.57,31.57,0,1,1,0,63.13h0a6.75,6.75,0,0,0-6.73-6.25H40.41v-.43a.68.68,0,0,0-.68-.69H36a.68.68,0,0,0-.68.69V74.5H28.78a1.06,1.06,0,0,0,0,2.11h6.54v5.3H28.78a1.06,1.06,0,0,0,0,2.11h6.54v2.42a.68.68,0,0,0,.68.69h3.73a.68.68,0,0,0,.68-.69V86h2.84a6.75,6.75,0,0,0,6.36-4.5H50A34.34,34.34,0,0,0,81.62,33.83Z" />
+        </Canvas>
+    </Viewbox>
+</ContentControl>

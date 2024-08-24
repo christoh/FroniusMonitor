@@ -44,13 +44,7 @@
                     <MenuItem Header="{x:Static p:Resources.ColorAllGaugeTicks}" IsCheckable="True" IsChecked="{Binding Settings.ColorAllGaugeTicks}" Checked="SaveSettings" Unchecked="SaveSettings" Icon="{c:DemoGauge}" />
                     <MenuItem Visibility="{Binding Settings.HaveFritzBox, Converter={co:Bool2Visibility}}" Header="{x:Static p:Resources.ShowAvm}" IsChecked="{Binding Settings.ShowFritzBox, Mode=TwoWay}" IsCheckable="True" Icon="{vi:FritzLogo}" Checked="OnShowAvmChanged" Unchecked="OnShowAvmChanged" />
                     <MenuItem Visibility="{Binding Settings.HaveWattPilot, Converter={co:Bool2Visibility}}" Header="{x:Static p:Resources.WattPilotHeader}" IsChecked="{Binding Settings.ShowWattPilot, Mode=TwoWay}" IsCheckable="True" Icon="{vi:ChargingTrafficSign}" Checked="ShowWattPilot" Unchecked="ShowWattPilot" />
-                    <MenuItem Header="{x:Static p:Resources.ElectricityPrice}" Click="MenuItem_OnClick">
-                        <MenuItem.Icon>
-                            <Viewbox>
-                                <TextBlock Text="$$"/>
-                            </Viewbox>
-                        </MenuItem.Icon>
-                    </MenuItem>
+                    <MenuItem Header="{x:Static p:Resources.ElectricityPrice}" Click="ShowElectricityPrice" Icon="{vi:ElectricityPriceIcon Foreground=Crimson}"/>
                 </MenuItem>
                 <MenuItem Header="Wattpilot" Visibility="{Binding DataCollectionService.HomeAutomationSystem.WattPilot, Converter={co:NullToVisibility}, FallbackValue=Collapsed}">
                     <MenuItem Header="{x:Static p:Resources.Settings}" Click="ShowWattPilotSettings" Icon="{vi:ChargingTrafficSignSettings}" Visibility="{Binding WattPilotService.WattPilot, Converter={co:NullToVisibility}, FallbackValue=Collapsed}" />
@@ -83,6 +77,7 @@
             <MenuItem Header="{x:Static p:Resources.ToshibaAcHeader}" Icon="{vi:AcIcon}" IsCheckable="True" IsChecked="{Binding Settings.ShowToshibaAc, Mode=TwoWay}" Visibility="{Binding Settings.HaveToshibaAc, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}" Checked="SaveSettings" Unchecked="SaveSettings" />
             <MenuItem Header="{x:Static p:Resources.Events}" Click="ShowEventLog" Icon="{vi:EventLogIcon}" Visibility="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors, FallbackValue=Collapsed, Converter={co:NullToVisibility}}" />
             <MenuItem Header="{x:Static p:Resources.Settings}" Click="ShowWattPilotSettings" Icon="{vi:ChargingTrafficSignSettings}" Visibility="{Binding WattPilotService.WattPilot, Converter={co:NullToVisibility}, FallbackValue=Collapsed}" />
+            <MenuItem Header="{x:Static p:Resources.ElectricityPrice}" Click="ShowElectricityPrice" Icon="{vi:ElectricityPriceIcon Foreground=Crimson}"/>
         </StackPanel>
 
         <Viewbox Grid.Row="2" Margin="16">

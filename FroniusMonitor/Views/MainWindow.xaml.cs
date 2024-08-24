@@ -205,7 +205,7 @@ public partial class MainWindow
         GetView<WattPilotSettingsView>().Focus();
     }
 
-    private void MenuItem_OnClick(object sender, RoutedEventArgs e)
+    private void ShowElectricityPrice(object sender, RoutedEventArgs e)
     {
         GetView<PriceView>().Focus();
     }

@@ -1483,6 +1483,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Electricity Price (negative).
+        /// </summary>
+        public static string ElectricityPriceNegative {
+            get {
+                return ResourceManager.GetString("ElectricityPriceNegative", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Enable API at.
         /// </summary>
         public static string EnableApiLink {

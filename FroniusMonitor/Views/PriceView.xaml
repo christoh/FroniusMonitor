@@ -9,6 +9,8 @@
                   xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
                   xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
                   xmlns:gl="clr-namespace:System.Globalization;assembly=mscorlib"
+                  xmlns:charging="clr-namespace:De.Hochstaetter.Fronius.Models.Charging;assembly=Fronius"
+                  xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
                   mc:Ignorable="d"
                   d:DataContext="{d:DesignInstance Type=vm:PriceViewModel}"
                   Title="{x:Static p:Resources.ElectricityPrice}" Height="550" Width="1280"
@@ -23,7 +25,7 @@
         </Grid.RowDefinitions>
 
         <oxy:Plot Grid.Row="0" Title="Electricity Prices" Model="{Binding PlotModel}" />
-        <Viewbox Grid.Row="0" Margin="50" Stretch="Uniform" StretchDirection="Both">
+        <Viewbox Grid.Row="0" Margin="50" Stretch="Uniform" StretchDirection="Both" MaxWidth="600">
             <ItemsControl ItemsSource="{Binding Errors}" VerticalAlignment="Center" >
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
@@ -33,7 +35,7 @@
             </ItemsControl>
         </Viewbox>
 
-        <GroupBox Header="Settings" Grid.Row="1" Margin="8" HorizontalAlignment="Center" IsEnabled="{Binding IsBusy, Converter={co:BoolInverter}}">
+        <GroupBox BorderBrush="#60000000" Header="{x:Static p:Resources.Settings}" Grid.Row="1" Margin="8" HorizontalAlignment="Center" IsEnabled="{Binding IsBusy, Converter={co:BoolInverter}}">
             <Grid Margin="10">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -65,12 +67,32 @@
 
                 <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.RowSpan="2" Grid.Column="3" IsEnabled="{Binding ShowHistoricData}"
                             Visibility="{Binding ElectricityPriceService.SupportsHistoricData, Converter={co:Bool2Visibility}}">
-                    <Button Content="&lt;&lt;" Margin="16,1,0,0" Height="24" Click="DecreaseDate" x:Name="DecreaseButton"/>
+                    <StackPanel.Resources>
+                        <Style TargetType="Button" BasedOn="{StaticResource TransparentButton}">
+                            <Setter Property="FontSize" Value="28"/>
+                            <Setter Property="Margin" Value="0,1,0,0"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value=".3"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Resources>
+                    <Button Margin="16,1,2,0" Click="DecreaseDate" x:Name="DecreaseButton">
+                        <Button.Content>
+                            <TextBlock Text="&lt;" Margin="0,-7,0,0"/>
+                        </Button.Content>
+                        </Button>
                     <DatePicker VerticalAlignment="Center" x:Name="DatePicker"
                                 SelectedDate="{Binding Date, StringFormat=d, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, UpdateSourceTrigger=PropertyChanged}"
                                 DisplayDateEnd="{Binding Converter={co:ElectricityPriceEndDate}, Mode=OneWay}"
                                 DisplayDateStart="2013/12/22 00:00" SelectedDateChanged="SelectedDateChanged"/>
-                    <Button Content="&gt;&gt;" Margin="0,1,0,0" Height="24" Click="IncreaseDate" x:Name="IncreaseButton"/>
+                    <Button Click="IncreaseDate" x:Name="IncreaseButton">
+                        <Button.Content>
+                            <TextBlock Text=">" Margin="2,-7,0,0"/>
+                        </Button.Content>
+                    </Button>
                 </StackPanel>
             </Grid>
         </GroupBox>

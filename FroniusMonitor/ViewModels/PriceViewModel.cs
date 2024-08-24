@@ -233,8 +233,8 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
 
                 const double adjustment = 1.000000001;
                 const double margin = 1.1;
-                var priceMin = Math.Min(Prices.Select(p => (double)p.CentsPerKiloWattHour).Min(), 0);
-                var priceMax = Prices.Select(p => (double)p.CentsPerKiloWattHour).Max();
+                var priceMin = Prices.Count == 0 ? 0 : Math.Min(Prices.Select(p => (double)p.CentsPerKiloWattHour).Min(), 0);
+                var priceMax = Prices.Count == 0 ? 0 : Prices.Select(p => (double)p.CentsPerKiloWattHour).Max();
 
                 var priceMinimum = priceMin > 0 ? priceMin / margin : priceMin * margin;
                 var priceMaximum = priceMax + (priceMax - priceMinimum) * (energies.Count == 0 ? 0.1 : 0.6) * margin;
@@ -250,10 +250,10 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
                     {
                         new DateTimeAxis
                         {
-                            AbsoluteMinimum = Prices.Select(p => DateTimeAxis.ToDouble(p.StartTime.ToLocalTime())).Min(),
-                            Minimum = Prices.Select(p => DateTimeAxis.ToDouble(p.StartTime.ToLocalTime())).Min(),
-                            AbsoluteMaximum = Prices.Select(p => DateTimeAxis.ToDouble(p.EndTime.ToLocalTime())).Max(),
-                            Maximum = Prices.Select(p => DateTimeAxis.ToDouble(p.EndTime.ToLocalTime())).Max(),
+                            AbsoluteMinimum = Prices.Count == 0 ? 0 : Prices.Select(p => DateTimeAxis.ToDouble(p.StartTime.ToLocalTime())).Min(),
+                            Minimum = Prices.Count == 0 ? 0 : Prices.Select(p => DateTimeAxis.ToDouble(p.StartTime.ToLocalTime())).Min(),
+                            AbsoluteMaximum = Prices.Count == 0 ? 1 : Prices.Select(p => DateTimeAxis.ToDouble(p.EndTime.ToLocalTime())).Max(),
+                            Maximum = Prices.Count == 0 ? 1 : Prices.Select(p => DateTimeAxis.ToDouble(p.EndTime.ToLocalTime())).Max(),
                             IsZoomEnabled = false,
                             IsPanEnabled = false,
                             IntervalType = DateTimeIntervalType.Days,
@@ -271,10 +271,11 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
                         {
                             Position = AxisPosition.Left,
                             PositionAtZeroCrossing = false,
-                            Minimum = priceMin > 0 ? priceMin / margin : priceMin * margin,
+                            Minimum = priceMinimum,
                             AbsoluteMinimum = priceMinimum,
-                            Maximum = priceMaximum, Unit = "ct/kWh",
-                            AbsoluteMaximum = priceMaximum,
+                            Maximum = Math.Max(priceMaximum, priceMinimum + 1),
+                            Unit = "ct/kWh",
+                            AbsoluteMaximum = Math.Max(priceMaximum, priceMinimum + 1),
                             IsZoomEnabled = false,
                             IsPanEnabled = false,
                             FontSize = 16,
@@ -283,24 +284,62 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
                     }
                 };
 
-                model.Legends.Add(new Legend() { Key = "Legend", IsLegendVisible = true, LegendPlacement = LegendPlacement.Outside });
-                var priceSeries = new RectangleBarSeries { FillColor = OxyColors.LightGreen, StrokeThickness = 0.5, RenderInLegend = true, LegendKey = "Legend", Title = Loc.ElectricityPrice };
+                model.Legends.Add(new Legend
+                {
+                    Key = "Legend",
+                    IsLegendVisible = true,
+                    LegendPlacement = LegendPlacement.Outside,
+                    EdgeRenderingMode = EdgeRenderingMode.PreferSharpness,
+                    LegendBorderThickness = .5,
+                    LegendBorder = OxyColors.Black,
+                    LegendLineSpacing = 5,
+                });
 
-                Prices.Apply
-                (
-                    price => priceSeries.Items.Add
+                var positivePrices = Prices.Where(p => p.CentsPerKiloWattHour >= 0m).ToList();
+
+                if (positivePrices.Count > 0)
+                {
+                    var positivePriceSeries = new RectangleBarSeries { FillColor = OxyColors.LightSeaGreen, StrokeThickness = 0.5, LegendKey = "Legend", Title = Loc.ElectricityPrice };
+
+                    positivePrices.ForEach
                     (
-                        new RectangleBarItem
+                        price => positivePriceSeries.Items.Add
                         (
-                            DateTimeAxis.ToDouble(price.StartTime.ToLocalTime()),
-                            0,
-                            DateTimeAxis.ToDouble(price.EndTime.ToLocalTime()),
-                            (double)price.CentsPerKiloWattHour
+                            new RectangleBarItem
+                            (
+                                DateTimeAxis.ToDouble(price.StartTime.ToLocalTime()),
+                                0,
+                                DateTimeAxis.ToDouble(price.EndTime.ToLocalTime()),
+                                (double)price.CentsPerKiloWattHour
+                            )
                         )
-                    )
-                );
+                    );
 
-                model.Series.Add(priceSeries);
+                    model.Series.Add(positivePriceSeries);
+                }
+
+                var negativePrices = Prices.Where(p => p.CentsPerKiloWattHour < 0m).ToList();
+
+                if (negativePrices.Count > 0)
+                {
+                    var negativePriceSeries = new RectangleBarSeries { FillColor = OxyColors.Coral, StrokeThickness = 0.5, LegendKey = "Legend", Title = Loc.ElectricityPriceNegative };
+
+                    negativePrices.ForEach
+                    (
+                        price => negativePriceSeries.Items.Add
+                        (
+                            new RectangleBarItem
+                            (
+                                DateTimeAxis.ToDouble(price.StartTime.ToLocalTime()),
+                                0,
+                                DateTimeAxis.ToDouble(price.EndTime.ToLocalTime()),
+                                (double)price.CentsPerKiloWattHour
+                            )
+                        )
+                    );
+
+                    model.Series.Add(negativePriceSeries);
+                }
 
                 var lineSeriesPrice = new LineSeries { Color = OxyColors.Transparent, LabelFormatString = "{1:N2}", FontSize = 12, LabelMargin = 2 };
                 lineSeriesPrice.Points.AddRange(Prices.Select(p => new DataPoint((DateTimeAxis.ToDouble(p.StartTime.ToLocalTime()) + DateTimeAxis.ToDouble(p.EndTime.ToLocalTime())) / 2, (double)p.CentsPerKiloWattHour)));
@@ -315,8 +354,8 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
                         Unit = "GW",
                         Position = AxisPosition.Right,
                         PositionAtZeroCrossing = false,
-                        Minimum = energyMin * 2.75,
-                        AbsoluteMinimum = energyMin * 2.75,
+                        Minimum = energyMin * 3,
+                        AbsoluteMinimum = energyMin * 3,
                         Maximum = 0,
                         AbsoluteMaximum = 0,
                         IsZoomEnabled = false,
@@ -336,14 +375,14 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
                             new RectangleBarItem
                             (
                                 DateTimeAxis.ToDouble(s.StartTime.ToLocalTime()),
-                                -s.WindProduction / 1000,
+                                0,
                                 DateTimeAxis.ToDouble(s.EndTime.ToLocalTime()),
-                                -(s.WindProduction + s.SolarProduction) / 1000
+                                -s.SolarProduction / 1000
                             )
                         )
                     );
 
-                    var windSeries = new RectangleBarSeries { FillColor = OxyColors.DodgerBlue, YAxisKey = "Energy", StrokeThickness = 0.5, LegendKey = "Legend", Title = Loc.WindProduction };
+                    var windSeries = new RectangleBarSeries { FillColor = OxyColors.DeepSkyBlue, YAxisKey = "Energy", StrokeThickness = 0.5, LegendKey = "Legend", Title = Loc.WindProduction };
 
                     energies.Apply
                     (
@@ -352,19 +391,19 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
                             new RectangleBarItem
                             (
                                 DateTimeAxis.ToDouble(s.StartTime.ToLocalTime()),
-                                0,
+                                -s.SolarProduction / 1000,
                                 DateTimeAxis.ToDouble(s.EndTime.ToLocalTime()),
-                                -s.WindProduction / 1000
+                                -(s.WindProduction+s.SolarProduction) / 1000
                             )
                         )
                     );
 
-                    var lineSeriesProduction = new LineSeries { Color = OxyColors.Transparent, LabelFormatString = "{1:#.0;#.0}", FontSize = 12, LabelMargin = -20,YAxisKey = "Energy"};
-                    lineSeriesProduction.Points.AddRange(energies.Select(p => new DataPoint((DateTimeAxis.ToDouble(p.StartTime.ToLocalTime()) + DateTimeAxis.ToDouble(p.EndTime.ToLocalTime())) / 2, -(p.WindProduction+p.SolarProduction)/1000)));
+                    var lineSeriesProduction = new LineSeries { Color = OxyColors.Transparent, LabelFormatString = "{1:#.0;#.0}", FontSize = 12, LabelMargin = -17, YAxisKey = "Energy" };
+                    lineSeriesProduction.Points.AddRange(energies.Select(p => new DataPoint((DateTimeAxis.ToDouble(p.StartTime.ToLocalTime()) + DateTimeAxis.ToDouble(p.EndTime.ToLocalTime())) / 2, -(p.WindProduction + p.SolarProduction) / 1000)));
 
-                    model.Series.Add(lineSeriesProduction);
                     model.Series.Add(solarSeries);
                     model.Series.Add(windSeries);
+                    model.Series.Add(lineSeriesProduction);
                 }
 
                 PlotModel = model;

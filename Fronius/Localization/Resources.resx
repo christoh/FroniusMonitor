@@ -1596,4 +1596,7 @@
   <data name="WindProduction" xml:space="preserve">
 	  <value>Wind production</value>
   </data>
+  <data name="ElectricityPriceNegative" xml:space="preserve">
+	  <value>Electricity Price (negative)</value>
+  </data>
 </root>
