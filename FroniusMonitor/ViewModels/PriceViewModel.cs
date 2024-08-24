@@ -233,7 +233,7 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
 
                 const double adjustment = 1.000000001;
                 const double margin = 1.1;
-                var priceMin = Prices.Select(p => (double)p.CentsPerKiloWattHour).Min();
+                var priceMin = Math.Min(Prices.Select(p => (double)p.CentsPerKiloWattHour).Min(), 0);
                 var priceMax = Prices.Select(p => (double)p.CentsPerKiloWattHour).Max();
 
                 var priceMinimum = priceMin > 0 ? priceMin / margin : priceMin * margin;
@@ -302,9 +302,9 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
 
                 model.Series.Add(priceSeries);
 
-                var lineSeries = new LineSeries { Color = OxyColors.Transparent, LabelFormatString = "{1:N2}", FontSize = 12, LabelMargin = 2 };
-                lineSeries.Points.AddRange(Prices.Select(p => new DataPoint((DateTimeAxis.ToDouble(p.StartTime.ToLocalTime()) + DateTimeAxis.ToDouble(p.EndTime.ToLocalTime())) / 2, (double)p.CentsPerKiloWattHour)));
-                model.Series.Add(lineSeries);
+                var lineSeriesPrice = new LineSeries { Color = OxyColors.Transparent, LabelFormatString = "{1:N2}", FontSize = 12, LabelMargin = 2 };
+                lineSeriesPrice.Points.AddRange(Prices.Select(p => new DataPoint((DateTimeAxis.ToDouble(p.StartTime.ToLocalTime()) + DateTimeAxis.ToDouble(p.EndTime.ToLocalTime())) / 2, (double)p.CentsPerKiloWattHour)));
+                model.Series.Add(lineSeriesPrice);
 
                 if (ElectricityPriceService is AwattarService && energies.Count > 0)
                 {
@@ -315,8 +315,8 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
                         Unit = "GW",
                         Position = AxisPosition.Right,
                         PositionAtZeroCrossing = false,
-                        Minimum = energyMin * 3,
-                        AbsoluteMinimum = energyMin * 3,
+                        Minimum = energyMin * 2.75,
+                        AbsoluteMinimum = energyMin * 2.75,
                         Maximum = 0,
                         AbsoluteMaximum = 0,
                         IsZoomEnabled = false,
@@ -336,9 +336,9 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
                             new RectangleBarItem
                             (
                                 DateTimeAxis.ToDouble(s.StartTime.ToLocalTime()),
-                                0,
+                                -s.WindProduction / 1000,
                                 DateTimeAxis.ToDouble(s.EndTime.ToLocalTime()),
-                                -s.SolarProduction / 1000
+                                -(s.WindProduction + s.SolarProduction) / 1000
                             )
                         )
                     );
@@ -352,12 +352,17 @@ namespace De.Hochstaetter.FroniusMonitor.ViewModels
                             new RectangleBarItem
                             (
                                 DateTimeAxis.ToDouble(s.StartTime.ToLocalTime()),
-                                -s.SolarProduction / 1000,
+                                0,
                                 DateTimeAxis.ToDouble(s.EndTime.ToLocalTime()),
-                                (-s.SolarProduction - s.WindProduction) / 1000)
+                                -s.WindProduction / 1000
+                            )
                         )
                     );
 
+                    var lineSeriesProduction = new LineSeries { Color = OxyColors.Transparent, LabelFormatString = "{1:#.0;#.0}", FontSize = 12, LabelMargin = -20,YAxisKey = "Energy"};
+                    lineSeriesProduction.Points.AddRange(energies.Select(p => new DataPoint((DateTimeAxis.ToDouble(p.StartTime.ToLocalTime()) + DateTimeAxis.ToDouble(p.EndTime.ToLocalTime())) / 2, -(p.WindProduction+p.SolarProduction)/1000)));
+
+                    model.Series.Add(lineSeriesProduction);
                     model.Series.Add(solarSeries);
                     model.Series.Add(windSeries);
                 }
