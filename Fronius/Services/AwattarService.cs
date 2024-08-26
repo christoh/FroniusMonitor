@@ -48,7 +48,7 @@ public sealed class AwattarService : ElectricityPushPriceServiceBase, IElectrici
     }
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    public async Task<IEnumerable<AwattarEnergy>> GetHistoricEnergyDataAsync(DateTime? from, DateTime? to, CancellationToken token = default)
+    public async Task<IEnumerable<AwattarEnergy>> GetDataAsync(DateTime? from, DateTime? to, CancellationToken token = default)
     {
         var (tld, fromUnix, toUnix) = GetQueryParameters(from, to);
         var query = FormattableString.Invariant($"https://api.awattar.{tld}/v1/power/productions{fromUnix}{toUnix}");
@@ -85,6 +85,8 @@ public sealed class AwattarService : ElectricityPushPriceServiceBase, IElectrici
         client?.Dispose();
         client = null;
     }
+
+    ~AwattarService() => Dispose();
 
     private static long? GetUnixMilliseconds(DateTime? date) => date is null ? null : (long)Math.Round((date.Value.ToUniversalTime() - DateTime.UnixEpoch).TotalMilliseconds, MidpointRounding.AwayFromZero);
 

@@ -2,19 +2,19 @@
 
 public class AwattarEnergy : AwattarBase
 {
-    private double solarProduction;
+    private double solarProductionMegaWatt;
     [JsonPropertyName("solar")]
-    public double SolarProduction
+    public double SolarProductionMegaWatt
     {
-        get => solarProduction;
-        set => Set(ref solarProduction, value);
+        get => solarProductionMegaWatt;
+        set => Set(ref solarProductionMegaWatt, value);
     }
 
-    private double windProduction;
+    private double windProductionMegaWatt;
     [JsonPropertyName("wind")]
-    public double WindProduction
+    public double WindProductionMegaWatt
     {
-        get => windProduction;
-        set => Set(ref windProduction, value);
+        get => windProductionMegaWatt;
+        set => Set(ref windProductionMegaWatt, value);
     }
 }
