@@ -1,0 +1,15 @@
+services:
+
+  home-automation-server:
+    ports:
+      - "502:502"
+    restart: always
+    volumes:
+      - /d/Docker/HomeAutomationServer/Settings.xml:/app/Settings.xml
+      - /d/Docker/HomeAutomationServer/EnergyHistory-2456552877.log:/var/log/EnergyHistory-2456552877.log
+    user: root
+    build:
+      context: .
+      dockerfile: HomeAutomationServer/Dockerfile
+    environment:
+      - HOME_AUTOMATION_SECRET=Djd./.ed$0|ks.c!eii\e6

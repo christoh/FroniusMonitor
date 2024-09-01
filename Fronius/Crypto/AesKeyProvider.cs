@@ -4,12 +4,12 @@ public class AesKeyProvider : IAesKeyProvider
 {
     public byte[] GetAesKey()
     {
-        var id = new DeviceIdBuilder()
-            .AddMachineName()
-            .AddUserName(true)
-            .ToString()
-            ;
-        
+        var id = Environment.GetEnvironmentVariable("HOME_AUTOMATION_SECRET") ?? 
+                 new DeviceIdBuilder()
+                     .AddMachineName()
+                     .AddUserName(true)
+                     .ToString();
+
         using var rfc2898 = new Rfc2898DeriveBytes(Encoding.UTF8.GetBytes(id), Encoding.UTF8.GetBytes(MilitaryGradeEncrypt("utz/pu")), 32768, HashAlgorithmName.SHA512);
         return rfc2898.GetBytes(16);
     }
