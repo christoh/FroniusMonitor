@@ -1,8 +1,7 @@
-FROM localhost:5000/lse-aspnetcore-sdk-80-bookworm AS builder
+FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS builder
 
 WORKDIR /FroniusMonitor
 
-RUN apt-get update && apt-get -y full-upgrade
 RUN dotnet workload update
 
 COPY . .
@@ -12,15 +11,23 @@ RUN rm -fr /FroniusMonitor/Fronius/bin /FroniusMonitor/Fronius/obj bin obj
 RUN dotnet build -c Release -v=m
 
 
-FROM localhost:5000/lse-aspnetcore-runtime-80-bookworm
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine
 
-RUN apt-get update && apt-get install -y procps && apt-get -y full-upgrade
+RUN apk --no-cache update && apk --no-cache upgrade
+RUN echo "export ENV=~/.ashrc" >> /etc/profile
+
+RUN echo "#!/bin/ash" > /root/.ashrc
+RUN echo "alias ll='ls -laF'" >> /root/.ashrc
+RUN ln -s /root/.ashrc /home/app/.ashrc
+RUN chmod 755 /root
+
 WORKDIR /app
 
 COPY --from=builder /FroniusMonitor/HomeAutomationServer/bin/Release/net8.0/ .
 
 USER root
 
-EXPOSE 502/tcp
+EXPOSE 1502/tcp
 
-ENTRYPOINT [ "/bin/bash", "-c", "/app/HomeAutomationServer" ]
+ENTRYPOINT [ "/bin/ash", "-lc" ]
+CMD [ "/app/HomeAutomationServer" ]
