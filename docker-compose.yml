@@ -11,5 +11,8 @@ services:
     build:
       context: .
       dockerfile: HomeAutomationServer/Dockerfile
+      platforms:
+        - linux/amd64
+        - linux/arm64
     environment:
       - HOME_AUTOMATION_SECRET=Djd./.ed$0|ks.c!eii\e6

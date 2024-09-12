@@ -29,7 +29,22 @@ EOF
 COPY <<"EOF" ./root/.ashrc
 #!/bin/ash
 alias ll='ls -laF'
+alias ps='ps -o pid,ppid,user,tty,nice,vsz,rss,time,args'
 test -f /etc/motd && cat /etc/motd
+
+if [ `id -u` == 0 ]; then
+    export PS1='[\[\033[01;31m\]\u@docker:home-automation\[\033[00m\] \[\033[01;34m\]\w\[\033[0m\]] \$ '
+else
+    export PS1='[\[\033[01;32m\]\u@docker:home-automation\[\033[00m\] \[\033[01;34m\]\w\[\033[0m\]] \$ '
+fi
+
+case "$TERM" in
+xterm*|rxvt*)
+    export PS1="\[\e]0;\u@\docker:home-automation: \w\a\]$PS1"
+    ;;
+*)
+    ;;
+esac
 EOF
 
 COPY <<"EOF" ./etc/motd
@@ -40,8 +55,8 @@ COPY <<"EOF" ./etc/motd
 / __  / (_) | | | | | |  __/ /  _  \ |_| | || (_) | | | | | | (_| | |_| | (_) | | | |
 \/ /_/ \___/|_| |_| |_|\___| \_/ \_/\__,_|\__\___/|_| |_| |_|\__,_|\__|_|\___/|_| |_|
 
-Welcome to Christoph's Home Automation Server
-=============================================
+Welcome to Bettina and Christoph's Home Automation Server
+=========================================================
 
 EOF
 
