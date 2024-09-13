@@ -2,22 +2,19 @@
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS builder
 
-RUN apk --no-cache update && apk --no-cache upgrade && dotnet workload update
-
 WORKDIR /build
 
 COPY . .
 
 WORKDIR /build/HomeAutomationServer
 
-RUN <<"EOF"
-rm -fr /build/Fronius/bin /build/Fronius/obj bin obj
-mkdir -p /runner/app
-dotnet publish -c Release -v=m -o /runner/app
-mkdir -p /runner/root
+RUN apk --no-cache update && apk --no-cache upgrade && dotnet workload update && \
+rm -fr /build/Fronius/bin /build/Fronius/obj bin obj && \
+mkdir -p /runner/app && \
+mkdir -p /runner/root && \
 mkdir -p /runner/home/app
-mkdir -p /runner
-EOF
+
+RUN dotnet publish -c Release -v=m -o /runner/app
 
 WORKDIR /runner
 
@@ -64,7 +61,7 @@ COPY <<"EOF" ./startup.sh
 #!/bin/ash
 cat /etc/motd
 cd /app
-exec /app/HomeAutomationServer
+exec dotnet ./HomeAutomationServer.dll
 EOF
 
 # ----- Runner -----
