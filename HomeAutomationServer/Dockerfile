@@ -20,11 +20,17 @@ WORKDIR /runner
 
 COPY <<"EOF" ./root/.profile
 #!/bin/ash
+cd
 export ENV=~/.ashrc
 EOF
 
 COPY <<"EOF" ./root/.ashrc
 #!/bin/ash
+
+if [ "$(id -u)" != "0" ]; then
+  exec sudo ash -li
+fi
+
 alias ll='ls -laF'
 alias ps='ps -o pid,ppid,user,tty,nice,vsz,rss,time,args'
 test -f /etc/motd && cat /etc/motd
@@ -64,19 +70,20 @@ cd /app
 exec dotnet ./HomeAutomationServer.dll
 EOF
 
+COPY <<"EOF" ./etc/sudoers
+app ALL=(ALL:ALL) NOPASSWD: ALL
+EOF
+
 # ----- Runner -----
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine
 COPY --from=builder /runner/ /
 
-RUN <<"EOF"
-apk --no-cache update && apk --no-cache upgrade
-ln -s /root/.ashrc /home/app/.ashrc
-ln -s /root/.profile /home/app/.profile
-chmod 755 /root /startup.sh /root/.ashrc /root/.profile
-chown -R app:app /home/app
-#chown -R app:app /app
-EOF
+RUN apk --no-cache update && apk --no-cache upgrade && apk --no-cache add sudo &&\
+    ln -s /root/.ashrc /home/app/.ashrc &&\
+    ln -s /root/.profile /home/app/.profile &&\
+    chmod 755 /root /startup.sh /root/.ashrc /root/.profile &&\
+    chown -R app:app /home/app
 
 WORKDIR /home/app
 USER app
