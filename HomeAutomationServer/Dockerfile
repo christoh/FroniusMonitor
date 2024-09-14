@@ -27,18 +27,16 @@ EOF
 COPY <<"EOF" ./root/.ashrc
 #!/bin/ash
 
-if [ "$(id -u)" != "0" ]; then
-  exec sudo ash -li
-fi
-
 alias ll='ls -laF'
 alias ps='ps -o pid,ppid,user,tty,nice,vsz,rss,time,args'
+alias root='exec sudo ash -li'
 test -f /etc/motd && cat /etc/motd
 
 if [ `id -u` == 0 ]; then
     export PS1='[\[\033[01;31m\]\u@docker:home-automation\[\033[00m\] \[\033[01;34m\]\w\[\033[0m\]] \$ '
 else
     export PS1='[\[\033[01;32m\]\u@docker:home-automation\[\033[00m\] \[\033[01;34m\]\w\[\033[0m\]] \$ '
+    echo -e "\033[01;34mIf you need root access (neccessary for nothing), type 'root'\033[01;0m\n"
 fi
 
 case "$TERM" in

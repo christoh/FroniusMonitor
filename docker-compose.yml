@@ -1,18 +1,21 @@
+# Customize this file before you use it
+
 services:
 
   home-automation-server:
     ports:
+      # instead of 502 you can use your own port. However, many inverters only work with 502. Don't change 1502. This is the unprivileged port in the container
       - "502:1502"
     restart: always
     volumes:
-      - /d/Docker/HomeAutomationServer/Settings.xml:/app/Settings.xml
-      - /d/Docker/HomeAutomationServer/EnergyHistory-2456552877.log:/var/log/EnergyHistory-2456552877.log
+      - /d/Docker/HomeAutomationServer/Settings.xml:/app/Settings.xml # Map to the Settings.xml file on the Docker host
+      - /d/Docker/HomeAutomationServer/EnergyHistory-2456552877.log:/var/log/EnergyHistory-2456552877.log # Map to log on your Docker host
     user: app
     build:
       context: .
       dockerfile: HomeAutomationServer/Dockerfile
       platforms:
         - linux/amd64
-        #- linux/arm64
+        #- linux/arm64 # arm64 currently does not build
     environment:
-      - HOME_AUTOMATION_SECRET=Djd./.ed$0|ks.c!eii\e6
+      - HOME_AUTOMATION_SECRET=Djd./.ed$0|ks.c!eii\e6 # Choose your very own and unique secret. Use the same secret on your computer where you set the passwords for the Settings.xml file
