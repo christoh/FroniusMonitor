@@ -56,7 +56,7 @@ public class Gen24Config : BindableBase, ICloneable
 
             if (Versions?.CommandApi < new Version(6, 1) || Versions?.ConfigApi < new Version(8, 2))
             {
-                return string.Format(Resources.FirmwareTooOld, firmwareVersionString, "1.32.51-1");
+                return string.Format(Resources.FirmwareTooOld, firmwareVersionString, "1.33.7-1");
             }
 
             if (Versions?.CommandApi >= new Version(7, 0) || Versions?.ConfigApi >= new Version(9, 0))
