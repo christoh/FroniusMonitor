@@ -28,8 +28,9 @@ COPY <<"EOF" ./root/.ashrc
 #!/bin/ash
 
 alias ll='ls -laF'
+alias sudo='doas'
 alias ps='ps -o pid,ppid,user,tty,nice,vsz,rss,time,args'
-alias root='exec sudo ash -li'
+alias root='exec doas ash -li'
 test -f /etc/motd && cat /etc/motd
 
 if [ `id -u` == 0 ]; then
@@ -68,8 +69,12 @@ cd /app
 exec dotnet ./HomeAutomationServer.dll
 EOF
 
-COPY <<"EOF" ./etc/sudoers
-app ALL=(ALL:ALL) NOPASSWD: ALL
+#COPY <<"EOF" ./etc/sudoers
+#app ALL=(ALL:ALL) NOPASSWD: ALL
+#EOF
+
+COPY <<"EOF" ./etc/doas.conf
+permit nopass app as root
 EOF
 
 # ----- Runner -----
@@ -77,7 +82,7 @@ EOF
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine
 COPY --from=builder /runner/ /
 
-RUN apk --no-cache update && apk --no-cache upgrade && apk --no-cache add sudo &&\
+RUN apk --no-cache upgrade && apk --no-cache add doas &&\
     ln -s /root/.ashrc /home/app/.ashrc &&\
     ln -s /root/.profile /home/app/.profile &&\
     chmod 755 /root /startup.sh /root/.ashrc /root/.profile &&\
