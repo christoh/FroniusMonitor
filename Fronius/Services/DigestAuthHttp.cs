@@ -7,10 +7,13 @@
 public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
 {
     private static readonly Random random = new(unchecked((int)DateTime.UtcNow.Ticks));
+    private static readonly object hashLockObject=new();
+    
     private readonly MD5 md5 = MD5.Create();
     private readonly HttpClient httpClient = new();
     private readonly WebConnection connection;
     private readonly TimeSpan cnonceDuration;
+    
     private string? ha1;
     private string? realm;
     private string? nonce;
@@ -157,7 +160,7 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
 
         return request;
     }
-
+    
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     private async ValueTask<string> CreateDigestHeader(HttpRequestMessage request, CancellationToken token)
     {
@@ -174,7 +177,12 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
 
         Task<string> CalculateMd5Hash(string input) => Task.Run(() =>
         {
-            var hash = md5.ComputeHash(encoding.GetBytes(input));
+            byte[] hash;
+
+            lock (hashLockObject)
+            {
+                hash = md5.ComputeHash(encoding.GetBytes(input));
+            }
 
             return hash
                 .Aggregate
