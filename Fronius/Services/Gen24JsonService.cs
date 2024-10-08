@@ -154,13 +154,13 @@ public class Gen24JsonService : IGen24JsonService
             }
             else
             {
-                if (!jObject.ContainsKey(attribute.PropertyName))
+                if (!jObject.TryGetValue(attribute.PropertyName, out var token))
                 {
                     jObject.Add(attribute.PropertyName, new JObject { { attribute.Name, new JValue(jsonValueNew) } });
                 }
                 else
                 {
-                    jObject[attribute.PropertyName]![attribute.Name] = new JValue(jsonValueNew);
+                    token[attribute.Name] = new JValue(jsonValueNew);
                 }
             }
         }
