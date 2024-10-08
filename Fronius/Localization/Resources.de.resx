@@ -1527,4 +1527,13 @@
   <data name="ElectricityPriceNegative" xml:space="preserve">
 	  <value>Strompreis (negativ)</value>
   </data>
+  <data name="SupportOhmPilotSoc" xml:space="preserve">
+	  <value>Bat­te­rie­un­ter­stüt­zu­ng für Smart Ohm­pi­lot</value>
+  </data>
+  <data name="EnergyHysteresis" xml:space="preserve">
+	  <value>Energie-Hysterese</value>
+  </data>
+  <data name="SupportSocHysteresisMinimum" xml:space="preserve">
+	  <value>Minimaler SoC für Hysterese</value>
+  </data>
 </root>

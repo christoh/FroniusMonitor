@@ -1618,6 +1618,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Energy hysteresis.
+        /// </summary>
+        public static string EnergyHysteresis {
+            get {
+                return ResourceManager.GetString("EnergyHysteresis", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error.
         /// </summary>
         public static string Error {
@@ -4062,6 +4071,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string SunspecMode_Int {
             get {
                 return ResourceManager.GetString("SunspecMode_Int", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Battery Support for Smart Ohmpilot.
+        /// </summary>
+        public static string SupportOhmPilotSoc {
+            get {
+                return ResourceManager.GetString("SupportOhmPilotSoc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Minimum SoC for hysteresis.
+        /// </summary>
+        public static string SupportSocHysteresisMinimum {
+            get {
+                return ResourceManager.GetString("SupportSocHysteresisMinimum", resourceCulture);
             }
         }
         

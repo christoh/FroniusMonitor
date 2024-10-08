@@ -44,6 +44,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <GroupBox Header="{x:Static p:Resources.GridPowerManagement}" Grid.Row="0" Margin="8,8,8,4">
                 <Grid Margin="8,16,8,8">
@@ -130,6 +131,63 @@
                     </Grid>
                 </Grid>
             </GroupBox>
+            <GroupBox Grid.Row="2" Header="{x:Static p:Resources.SupportOhmPilotSoc}" Margin="8,4">
+                <StackPanel Margin="8,12,8,0">
+                    <CheckBox IsChecked="{Binding Settings.EnableSupportSoc}">
+                        <CheckBox.Content>
+                            <TextBlock Text="{l:Config 'BATTERIES.supportSocActive'}" />
+                        </CheckBox.Content>
+                    </CheckBox>
+                    <StackPanel Visibility="{Binding Settings.EnableSupportSoc, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}" Margin="0">
+                        <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                            <TextBlock Text="{l:Config 'BATTERIES.supportSocMode'}" />
+                            <RadioButton IsChecked="{Binding Settings.SupportSocMode, Mode=TwoWay, Converter={co:SocLimits2Bool UseDefault=True, Override=False}}"
+                                         Margin="16,0,8,0" Content="{l:Config 'BATTERIES.supportSocMode_auto'}" />
+                            <RadioButton IsChecked="{Binding Settings.SupportSocMode, Mode=TwoWay, Converter={co:SocLimits2Bool UseDefault=False, Override=True}}"
+                                         Content="{l:Config 'BATTERIES.supportSocMode_manual'}" />
+                        </StackPanel>
+                        <StackPanel Visibility="{Binding Settings.SupportSocMode, Converter={co:SocLimits2Visibility UseDefault=Collapsed, Override=Visible}, FallbackValue=Collapsed}">
+                            <StackPanel Orientation="Horizontal" Margin="0,16,0,-2" HorizontalAlignment="Center">
+                                <TextBlock Margin="0,0,4,0">
+                                    <Run Text="{l:Config 'BATTERIES.supportSoc'}" /><Run Text=":" />
+                                </TextBlock>
+                                <TextBox TextAlignment="Center" Width="40"
+                                         Text="{co:ValidationBinding Path=Settings.SupportSocPercent, Rule={v:MinMaxIntRule Minimum=0, Maximum=100, PropertyDisplayName={l:Config 'BATTERIES.supportSoc'}}}" />
+                                <TextBlock Margin="4,0,0,0" Text="%" />
+                            </StackPanel>
+                            <Slider Value="{Binding Settings.SupportSocPercent, Mode=TwoWay}" HorizontalAlignment="Stretch"
+                                    Minimum="{Binding Storage.MinimumStateOfCharge, Converter={co:Multiply Factor=100}, FallbackValue=0}"
+                                    Maximum="{Binding Storage.MaximumStateOfCharge, Converter={co:Multiply Factor=100}, FallbackValue=100}"/>
+
+                            <StackPanel IsEnabled="{Binding EnableDanger}">
+                                <StackPanel Orientation="Horizontal" Margin="0,12,0,-2" HorizontalAlignment="Center">
+                                    <TextBlock Margin="0,0,4,0">
+                                    <Run Text="{x:Static p:Resources.EnergyHysteresis}" /><Run Text=":" />
+                                    </TextBlock>
+                                    <TextBox TextAlignment="Center" Width="40"
+                                         Text="{co:ValidationBinding Path=Settings.SupportSocHysteresisWatts, Rule={v:MinMaxFloatRule Minimum=0, Maximum=5000, PropertyDisplayName={x:Static p:Resources.EnergyHysteresis}}}" />
+                                    <TextBlock Margin="4,0,0,0" Text="Wh" />
+                                </StackPanel>
+                                <Slider Value="{Binding Settings.SupportSocHysteresisWatts, Mode=TwoWay}" HorizontalAlignment="Stretch"
+                                    Minimum="0" TickFrequency="1" IsSnapToTickEnabled="True"
+                                    Maximum="5000"/>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,12,0,-2" HorizontalAlignment="Center">
+                                    <TextBlock Margin="0,0,4,0">
+                                        <Run Text="{x:Static p:Resources.SupportSocHysteresisMinimum}" /><Run Text=":" />
+                                    </TextBlock>
+                                    <TextBox TextAlignment="Center" Width="40"
+                                             Text="{co:ValidationBinding Path=Settings.SupportSocHysteresisMinimumPercent, Rule={v:MinMaxIntRule Minimum=0, Maximum=100, PropertyDisplayName={x:Static p:Resources.SupportSocHysteresisMinimum}}}" />
+                                    <TextBlock Margin="4,0,0,0" Text="%" />
+                                </StackPanel>
+                                <Slider Value="{Binding Settings.SupportSocHysteresisMinimumPercent, Mode=TwoWay}" HorizontalAlignment="Stretch"
+                                        Minimum="{Binding Storage.MinimumStateOfCharge, Converter={co:Multiply Factor=100}, FallbackValue=0}"
+                                        Maximum="{Binding Storage.MaximumStateOfCharge, Converter={co:Multiply Factor=100}, FallbackValue=100}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
         </Grid>
 
         <Grid Grid.Row="0" Grid.Column="1">
@@ -215,7 +273,7 @@
                                  Text="{co:ValidationBinding Path=Settings.BackupCriticalSoc, Rule={v:RegExRule Pattern='^100$|^0*([0-9]{1,2})$', Message={x:Static p:Resources.MustBePercent}}}" />
                         <TextBlock Margin="4,0,0,0" Text="%" />
                     </StackPanel>
-                    <Slider Value="{Binding Settings.BackupCriticalSoc, Mode=TwoWay}" Grid.Row="1" HorizontalAlignment="Stretch" 
+                    <Slider Value="{Binding Settings.BackupCriticalSoc, Mode=TwoWay}" Grid.Row="1" HorizontalAlignment="Stretch"
                             Minimum="{Binding Storage.MinimumStateOfCharge, Converter={co:Multiply Factor=100}, FallbackValue=0}"
                             Maximum="{Binding Storage.MaximumStateOfCharge, Converter={co:Multiply Factor=100}, FallbackValue=100}" />
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,-2" HorizontalAlignment="Center" Grid.Row="2">
@@ -227,13 +285,13 @@
                         <TextBlock Margin="4,0,0,0" Text="%" />
                     </StackPanel>
                     <Slider Value="{Binding Settings.BackupReserve, Mode=TwoWay}" Grid.Row="3" HorizontalAlignment="Stretch"
-                            Minimum="{Binding Storage.MinimumStateOfCharge, Converter={co:Multiply Factor=100}, FallbackValue=0}" 
+                            Minimum="{Binding Storage.MinimumStateOfCharge, Converter={co:Multiply Factor=100}, FallbackValue=0}"
                             Maximum="{Binding Storage.MaximumStateOfCharge, Converter={co:Multiply Factor=100}, FallbackValue=100}" />
                     <CheckBox Grid.Row="4" IsChecked="{Binding Settings.EnableSystemDeadlockPrevention}" Margin="0,16,0,0">
                         <CheckBox.Content>
                             <TextBlock Text="{l:Config 'BATTERIES.HYB_BACKUP_SYSTEMDEADLOCKPREVENTION'}" />
                         </CheckBox.Content>
-                        </CheckBox>
+                    </CheckBox>
                 </Grid>
             </GroupBox>
 

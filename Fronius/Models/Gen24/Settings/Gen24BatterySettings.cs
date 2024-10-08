@@ -159,6 +159,64 @@
             set => Set(ref enableSystemDeadlockPrevention, value);
         }
 
+        private byte? supportSocPercent;
+        [FroniusProprietaryImport("supportSoc", FroniusDataType.Root)]
+        public byte? SupportSocPercent
+        {
+            get => supportSocPercent;
+            set => Set(ref supportSocPercent, value, () => NotifyOfPropertyChange(nameof(SupportSoC)));
+        }
+
+        private int? supportSocHysteresisJoule;
+        [FroniusProprietaryImport("supportSocHysteresisEnergy", FroniusDataType.Root)]
+        public int? SupportSocHysteresisJoule
+        {
+            get => supportSocHysteresisJoule;
+            set => Set(ref supportSocHysteresisJoule, value, ()=>NotifyOfPropertyChange(nameof(SupportSocHysteresisWatts)));
+        }
+
+        public double? SupportSocHysteresisWatts
+        {
+            get => SupportSocHysteresisJoule / 3600d;
+            set => SupportSocHysteresisJoule = !value.HasValue ? null : (int)Math.Round(value.Value * 3600, MidpointRounding.AwayFromZero);
+        }
+
+        private byte? supportSocHysteresisMinimumPercent;
+        [FroniusProprietaryImport("supportSocHysteresisMin", FroniusDataType.Root)]
+        public byte? SupportSocHysteresisMinimumPercent
+        {
+            get => supportSocHysteresisMinimumPercent;
+            set => Set(ref supportSocHysteresisMinimumPercent, value,()=>NotifyOfPropertyChange(nameof(SupportSocHysteresisMinimum)));
+        }
+
+        public double? SupportSocHysteresisMinimum
+        {
+            get => SupportSocHysteresisMinimumPercent / 100d;
+            set => SupportSocHysteresisMinimumPercent = !value.HasValue ? null : (byte)Math.Round(value.Value * 100, MidpointRounding.AwayFromZero);
+        }
+
+        public double? SupportSoC
+        {
+            get => SupportSocPercent / 100d;
+            set => SupportSocPercent = !value.HasValue ? null : (byte)Math.Round(value.Value * 100d, MidpointRounding.AwayFromZero);
+        }
+
+        private SocLimits? supportSocMode;
+        [FroniusProprietaryImport("supportSocMode", FroniusDataType.Root)]
+        public SocLimits? SupportSocMode
+        {
+            get => supportSocMode;
+            set => Set(ref supportSocMode, value);
+        }
+
+        private bool? enableSupportSoc;
+        [FroniusProprietaryImport("supportSocActive", FroniusDataType.Root)]
+        public bool? EnableSupportSoc
+        {
+            get => enableSupportSoc;
+            set => Set(ref enableSupportSoc, value);
+        }
+
         private bool isInServiceMode;
 
         [FroniusProprietaryImport("BAT_SERVICE_ON", FroniusDataType.Root)]
