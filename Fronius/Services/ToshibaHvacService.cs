@@ -61,22 +61,38 @@ public class ToshibaHvacService(SynchronizationContext context, SettingsBase set
         private set => Set(ref allDevices, value);
     }
 
+    private bool isStopping;
+    
     public async ValueTask Stop()
     {
-        if (tokenSource != null)
+        if (isStopping)
         {
-            await tokenSource.CancelAsync();
-            tokenSource = null;
+            return;
         }
 
-        if (azureClient != null)
+        try
         {
-            await azureClient.DisposeAsync().ConfigureAwait(false);
-        }
+            isStopping = true;
+            
+            if (tokenSource != null)
+            {
+                await tokenSource.CancelAsync();
+                tokenSource = null;
+            }
 
-        AllDevices?.Clear();
-        session = null;
-        azureClient = null;
+            if (azureClient != null)
+            {
+                await azureClient.DisposeAsync().ConfigureAwait(false);
+            }
+
+            AllDevices?.Clear();
+            session = null;
+            azureClient = null;
+        }
+        finally
+        {
+            isStopping=false;
+        }
     }
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]

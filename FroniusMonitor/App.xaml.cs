@@ -1,4 +1,5 @@
-﻿using De.Hochstaetter.Fronius.Models.Settings;
+﻿using System.Net.NetworkInformation;
+using De.Hochstaetter.Fronius.Models.Settings;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace De.Hochstaetter.FroniusMonitor
@@ -63,7 +64,7 @@ namespace De.Hochstaetter.FroniusMonitor
                     .AddSingleton<IWattPilotService, WattPilotService>()
                     .AddSingleton<IToshibaHvacService, ToshibaHvacService>()
                     .AddSingleton<SettingsBase>(Settings)
-                    
+
                     .AddTransient<IElectricityPriceService>(_ =>
                     {
                         var newType = Settings.ElectricityPrice.Service switch
@@ -135,7 +136,8 @@ namespace De.Hochstaetter.FroniusMonitor
                 }
             }
 
-            SystemEvents.PowerModeChanged += OnPowerModeChanged;
+            //SystemEvents.PowerModeChanged += OnPowerModeChanged;
+            NetworkChange.NetworkAddressChanged += OnNetworkAvailabilityChanged;
             var mainWindow = IoC.Get<MainWindow>();
             //#if DEBUG
             //mainWindow.WindowState = WindowState.Minimized;
@@ -143,15 +145,20 @@ namespace De.Hochstaetter.FroniusMonitor
             mainWindow.Show();
         }
 
-        private static async void OnPowerModeChanged(object sender, PowerModeChangedEventArgs e)
+        private static async void OnNetworkAvailabilityChanged(object? sender, EventArgs e)
         {
-            switch (e.Mode)
-            {
-                case PowerModes.Resume:
-                    await IoC.Get<IDataCollectionService>().HvacService.Stop().ConfigureAwait(false);
-                    break;
-            }
+            await IoC.Get<IDataCollectionService>().HvacService.Stop().ConfigureAwait(false);
         }
+
+        //private static async void OnPowerModeChanged(object sender, PowerModeChangedEventArgs e)
+        //{
+        //    switch (e.Mode)
+        //    {
+        //        case PowerModes.Resume:
+        //            await IoC.Get<IDataCollectionService>().HvacService.Stop().ConfigureAwait(false);
+        //            break;
+        //    }
+        //}
 
         private static void OnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
