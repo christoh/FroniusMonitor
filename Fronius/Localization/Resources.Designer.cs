@@ -61,6 +61,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to About.
+        /// </summary>
+        public static string About {
+            get {
+                return ResourceManager.GetString("About", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Charging current limit.
         /// </summary>
         public static string AbsoluteMaximumChargingCurrent {
@@ -1947,6 +1956,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string HaveTwoInverters {
             get {
                 return ResourceManager.GetString("HaveTwoInverters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Help.
+        /// </summary>
+        public static string Help {
+            get {
+                return ResourceManager.GetString("Help", resourceCulture);
             }
         }
         
@@ -4350,6 +4368,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string UtcBug {
             get {
                 return ResourceManager.GetString("UtcBug", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Version.
+        /// </summary>
+        public static string Version {
+            get {
+                return ResourceManager.GetString("Version", resourceCulture);
             }
         }
         

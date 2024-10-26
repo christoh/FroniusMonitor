@@ -1608,4 +1608,13 @@
   <data name="SupportSocHysteresisMinimum" xml:space="preserve">
 	  <value>Minimum SoC for hysteresis</value>
   </data>
+  <data name="Version" xml:space="preserve">
+	  <value>Version</value>
+  </data>
+  <data name="Help" xml:space="preserve">
+	  <value>Help</value>
+  </data>
+  <data name="About" xml:space="preserve">
+	  <value>About</value>
+  </data>
 </root>

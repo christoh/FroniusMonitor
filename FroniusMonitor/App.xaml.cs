@@ -1,4 +1,5 @@
 ﻿using System.Net.NetworkInformation;
+using System.Reflection;
 using De.Hochstaetter.Fronius.Models.Settings;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -24,6 +25,11 @@ namespace De.Hochstaetter.FroniusMonitor
         public static string AppName => "FroniusMonitor";
         public static string PerUserDataDir => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Hochstätter", AppName);
         public static string SettingsFileName => Path.Combine(PerUserDataDir, "Settings.fms");
+        public static Version? Version { get; private set; }
+        public static string VersionString => Version?.ToString() ?? "???";
+        public static DateTime BuildTimeUtc { get; private set; } = DateTime.UnixEpoch;
+        public static string BuildTimeString => $"{BuildTimeUtc:g} UTC";
+        public static string GitCommitId { get; private set; } = "---";
 
         public static Settings Settings { get; set; } = null!;
 
@@ -64,7 +70,6 @@ namespace De.Hochstaetter.FroniusMonitor
                     .AddSingleton<IWattPilotService, WattPilotService>()
                     .AddSingleton<IToshibaHvacService, ToshibaHvacService>()
                     .AddSingleton<SettingsBase>(Settings)
-
                     .AddTransient<IElectricityPriceService>(_ =>
                     {
                         var newType = Settings.ElectricityPrice.Service switch
@@ -93,7 +98,6 @@ namespace De.Hochstaetter.FroniusMonitor
 
                         return electricityPriceService;
                     })
-
                     .AddTransient<EventLogView>()
                     .AddTransient<BatteryDetailsView>()
                     .AddTransient<SmartMeterDetailsView>()
@@ -102,6 +106,7 @@ namespace De.Hochstaetter.FroniusMonitor
                     .AddTransient<SettingsView>()
                     .AddTransient<WattPilotSettingsView>()
                     .AddTransient<PriceView>()
+                    .AddTransient<AboutView>()
                     .AddTransient<WattPilotDetailsView>()
                     .AddTransient<InverterSettingsView>()
                     .AddTransient<InverterDetailsView>()
@@ -136,8 +141,25 @@ namespace De.Hochstaetter.FroniusMonitor
                 }
             }
 
-            //SystemEvents.PowerModeChanged += OnPowerModeChanged;
             NetworkChange.NetworkAddressChanged += OnNetworkAvailabilityChanged;
+            var productVersion = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductVersion;
+            Version = Assembly.GetExecutingAssembly().GetName().Version;
+
+            if (Version != null)
+            {
+                BuildTimeUtc = new DateTime(2000,1,1).AddDays(Version.Build).AddSeconds(unchecked((uint)Version.Revision) << 1).ToUniversalTime();
+            }
+
+            if (productVersion != null)
+            {
+                var plusIndex = productVersion.IndexOf('+');
+
+                if (plusIndex >= 0)
+                {
+                    GitCommitId = productVersion[(plusIndex + 1)..];
+                }
+            }
+
             var mainWindow = IoC.Get<MainWindow>();
             //#if DEBUG
             //mainWindow.WindowState = WindowState.Minimized;
@@ -149,16 +171,6 @@ namespace De.Hochstaetter.FroniusMonitor
         {
             await IoC.Get<IDataCollectionService>().HvacService.Stop().ConfigureAwait(false);
         }
-
-        //private static async void OnPowerModeChanged(object sender, PowerModeChangedEventArgs e)
-        //{
-        //    switch (e.Mode)
-        //    {
-        //        case PowerModes.Resume:
-        //            await IoC.Get<IDataCollectionService>().HvacService.Stop().ConfigureAwait(false);
-        //            break;
-        //    }
-        //}
 
         private static void OnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {

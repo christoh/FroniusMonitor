@@ -55,6 +55,9 @@
                     <MenuItem Header="{x:Static p:Resources.ImportBayernwerk}" Command="{Binding ImportBayernwerkCommand}" Icon="{vi:BayernwerkLogo}" />
                     <MenuItem Header="Garbage Collection" Command="{Binding GarbageCollectionCommand}" />
                 </MenuItem>
+                <MenuItem Header="{x:Static p:Resources.Help}">
+                    <MenuItem Header="{x:Static p:Resources.About}" Click="OnAboutClicked"/>
+                </MenuItem>
 
             </Menu>
             <ToggleButton x:Name="RibbonExpander" Grid.Column="1" Style="{StaticResource TransparentButton}" Background="{x:Static SystemColors.MenuBarBrush}" Checked="OnRibbonExpanderChanged" Unchecked="OnRibbonExpanderChanged">

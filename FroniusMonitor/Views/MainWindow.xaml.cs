@@ -107,7 +107,7 @@ public partial class MainWindow
 
         if (view.WindowState == WindowState.Minimized)
         {
-            view.WindowState= WindowState.Normal;
+            view.WindowState = WindowState.Normal;
         }
 
         return view ?? throw new NullReferenceException("No view");
@@ -261,5 +261,12 @@ public partial class MainWindow
         {
             MessageBox.Show(this, ex.Message, Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error);
         }
+    }
+
+    private void OnAboutClicked(object sender, RoutedEventArgs e)
+    {
+        var aboutWindow = IoC.Get<AboutView>();
+        aboutWindow.Owner = this;
+        aboutWindow.ShowDialog();
     }
 }

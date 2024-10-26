@@ -1536,4 +1536,10 @@
   <data name="SupportSocHysteresisMinimum" xml:space="preserve">
 	  <value>Minimaler SoC für Hysterese</value>
   </data>
+  <data name="Help" xml:space="preserve">
+	  <value>Hilfe</value>
+  </data>
+  <data name="About" xml:space="preserve">
+	  <value>Über</value>
+  </data>
 </root>
