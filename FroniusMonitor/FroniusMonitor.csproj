@@ -3,6 +3,8 @@
 	<PropertyGroup>
 		<Version>1.0</Version>
 		<AssemblyVersion>1.0.*</AssemblyVersion>
+		<Copyright>© 2021-2025 Christoph H. Hochstätter</Copyright>
+		<Product>Home Automation Control Center</Product>
 		<Deterministic>false</Deterministic>
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net8.0-windows7.0</TargetFramework>
@@ -16,14 +18,7 @@
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<RootNamespace>De.Hochstaetter.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
 		<ApplicationIcon>Assets\Images\sun.ico</ApplicationIcon>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<NoWarn>1701;1702;IDE0079</NoWarn>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<NoWarn>1701;1702;IDE0079</NoWarn>
+		<NoWarn>1701;1702;IDE0079;NU1803;CS7035</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -51,21 +46,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Fronius\Fronius.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Resource Include="Assets\Fonts\D7MONO.ttf">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
-		</Resource>
-		<Resource Include="Assets\Fonts\DOTMATRI.TTF">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
-		</Resource>
-		<Resource Include="Assets\Fonts\DOTMBold.TTF">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
-		</Resource>
-		<Resource Include="Assets\Fonts\EHSMB.TTF">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
-		</Resource>
 	</ItemGroup>
 
 	<ItemGroup>

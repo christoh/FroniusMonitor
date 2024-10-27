@@ -10,7 +10,7 @@
         mc:Ignorable="d"
         WindowStartupLocation="CenterOwner"
         Title="{x:Static p:Resources.AppName}"
-        Height="180" Width="400"
+        Height="200" Width="400"
         ResizeMode="NoResize">
     <Grid Margin="16">
         <Grid.RowDefinitions>
@@ -22,18 +22,28 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Column="1" Grid.Row="0">
+            <StackPanel.Resources>
+                <Style TargetType="TextBox">
+                    <Setter Property="IsReadOnly" Value="True"/>
+                    <Setter Property="BorderThickness" Value="0"/>
+                </Style>
+            </StackPanel.Resources>
             <TextBlock Margin="0,0,0,8">
                 <Run FontSize="14" FontWeight="Medium" Text="{x:Static p:Resources.AppName}"/>
+                <Run FontSize="14" FontWeight="Medium" Text="{x:Static app:App.ShortVersionString}"/>
             </TextBlock>
-            <TextBlock>
-                <Run Text="{x:Static p:Resources.Version}"/>
-                <Run Text="{x:Static app:App.VersionString}"/>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Margin="0,0,0,2" Text="{x:Static p:Resources.Version}"/>
+                <TextBox Text="{x:Static app:App.VersionString}"/>
+                <TextBlock>
                 <Run Text="("/><Run Text="{x:Static app:App.BuildTimeString}"/><Run Text=")"/>
-            </TextBlock>
-            <TextBlock>
-                <Run Text="Git Commit ID:"/>
-                <Run Text="{x:Static app:App.GitCommitId}"/>
-            </TextBlock>
+                </TextBlock>
+            </StackPanel>
+            <TextBlock Margin="0,0,0,2" Text="Copyright © 2021-2025, Christoph H. Hochstätter"/>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Git commit ID:"/>
+                <TextBox Text="{x:Static app:App.GitCommitId}" IsReadOnly="True" BorderThickness="0"></TextBox>
+            </StackPanel>
         </StackPanel>
         <DockPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
             <Button Content="{x:Static p:Resources.Ok}" IsCancel="True" MinWidth="60" Height="24" HorizontalAlignment="Right" DockPanel.Dock="Right"/>

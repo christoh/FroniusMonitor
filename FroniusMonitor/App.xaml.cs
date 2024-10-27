@@ -27,6 +27,7 @@ namespace De.Hochstaetter.FroniusMonitor
         public static string SettingsFileName => Path.Combine(PerUserDataDir, "Settings.fms");
         public static Version? Version { get; private set; }
         public static string VersionString => Version?.ToString() ?? "???";
+        public static string ShortVersionString => Version == null ? "???" : FormattableString.Invariant($"{Version.Major}.{Version.Minor}");
         public static DateTime BuildTimeUtc { get; private set; } = DateTime.UnixEpoch;
         public static string BuildTimeString => $"{BuildTimeUtc:g} UTC";
         public static string GitCommitId { get; private set; } = "---";
@@ -141,7 +142,7 @@ namespace De.Hochstaetter.FroniusMonitor
                 }
             }
 
-            NetworkChange.NetworkAddressChanged += OnNetworkAvailabilityChanged;
+            NetworkChange.NetworkAddressChanged += OnNetworkAddressChanged;
             var productVersion = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductVersion;
             Version = Assembly.GetExecutingAssembly().GetName().Version;
 
@@ -167,9 +168,14 @@ namespace De.Hochstaetter.FroniusMonitor
             mainWindow.Show();
         }
 
-        private static async void OnNetworkAvailabilityChanged(object? sender, EventArgs e)
+        private static async void OnNetworkAddressChanged(object? sender, EventArgs e)
         {
-            await IoC.Get<IDataCollectionService>().HvacService.Stop().ConfigureAwait(false);
+            var hvacService = IoC.Get<IDataCollectionService>().HvacService;
+
+            if (!hvacService.IsConnected)
+            {
+                await hvacService.Stop().ConfigureAwait(false);
+            }
         }
 
         private static void OnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
