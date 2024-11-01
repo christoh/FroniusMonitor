@@ -155,7 +155,8 @@ namespace De.Hochstaetter.Fronius.Services
 
             var dataCell = cell.CellLeft();
             var producedEnergy = dataCell.GetValue<double>() * 1000;
-            var time = dataCell.CellLeft().GetDateTime().ToUniversalTime();
+            var dateTimeCell = dataCell.CellLeft().CellLeft();
+            var time = dateTimeCell.GetDateTime().ToUniversalTime();
             var historyEntry = energyHistory.MinBy(i => Math.Abs(i.CalibrationDate.Ticks - time.Ticks));
 
             if (historyEntry == null || Math.Abs((historyEntry.CalibrationDate - time).TotalMinutes) > 2)
