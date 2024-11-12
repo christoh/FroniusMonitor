@@ -7,7 +7,7 @@
 		<Product>Home Automation Control Center</Product>
 		<Deterministic>false</Deterministic>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net9.0-windows7.0</TargetFramework>
+		<TargetFramework>net8.0-windows7.0</TargetFramework>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<Nullable>enable</Nullable>
 		<EnableWindowsTargeting>true</EnableWindowsTargeting>
@@ -18,7 +18,7 @@
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<RootNamespace>De.Hochstaetter.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
 		<ApplicationIcon>Assets\Images\sun.ico</ApplicationIcon>
-		<NoWarn>1701;1702;IDE0079;CS7035</NoWarn>
+		<NoWarn>1701;1702;IDE0079;NU1803;CS7035</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -39,10 +39,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
 		<PackageReference Include="OxyPlot.Contrib.Wpf" Version="2.1.2" />
 		<PackageReference Include="OxyPlot.Wpf" Version="2.2.0" />
-		<PackageReference Include="System.IO.Packaging" Version="9.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
