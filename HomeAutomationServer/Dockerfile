@@ -1,6 +1,6 @@
 # ----- Builder -----
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS builder
+FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS builder
 
 WORKDIR /build
 
@@ -79,7 +79,7 @@ EOF
 
 # ----- Runner -----
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine
+FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine
 COPY --from=builder /runner/ /
 
 RUN apk --no-cache upgrade && apk --no-cache add doas &&\
