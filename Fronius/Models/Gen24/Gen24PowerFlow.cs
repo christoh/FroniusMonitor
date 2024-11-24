@@ -167,18 +167,21 @@ public class Gen24PowerFlow : Gen24DeviceBase
 
     public IEnumerable<double> AllPowers => new[] { StoragePower, GridPower, SolarPower, LoadPower ?? -InverterAcPower }.Where(ps => ps.HasValue).Select(ps => ps!.Value);
     public double DcInputPower => new[] { StoragePower ?? 0, SolarPower ?? 0 }.Where(ps => ps > 0).Sum();
-    public double PowerLoss => (StoragePower ?? 0) + (SolarPower ?? 0) - (InverterAcPower ?? 0);
-    public double? Efficiency => 1 - PowerLoss / DcInputPower;
+    public double AcInputPower => new[] { GridPower ?? 0d, LoadPower ?? -InverterAcPower ?? 0 }.Where(ps => ps > 0).Sum();
+    public double AcOutputPower => new[] { GridPower ?? 0d, LoadPower ?? -InverterAcPower ?? 0 }.Where(ps => ps < 0).Sum();
+    public double DcOutputPower => new[] { StoragePower ?? 0, SolarPower ?? 0 }.Where(ps => ps is < 0).Sum();
+    public double PowerLoss => AllPowers.Sum();
+    public double? Efficiency => 1 - PowerLoss / (AcInputPower - Math.Min(AcInputPower, -AcOutputPower) + DcInputPower - Math.Min(DcInputPower, -DcOutputPower));
 
     public static double CalculateSmartMeterFactor(bool isProduced)
     {
-        var list = history.Where(item => double.IsFinite(isProduced?item.ProducedOffset:item.ConsumedOffset)).ToList();
+        var list = history.Where(item => double.IsFinite(isProduced ? item.ProducedOffset : item.ConsumedOffset)).ToList();
 
         if (list.Count < 2)
         {
             return 1.0;
         }
-        
+
         var first = list[0];
         var last = list[^1];
         var rawEnergy = (isProduced ? last.EnergyRealProduced : last.EnergyRealConsumed) - (isProduced ? first.EnergyRealProduced : first.EnergyRealConsumed);
