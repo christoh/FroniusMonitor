@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Json;
+﻿using System.Net.Http.Headers;
+using System.Net.Http.Json;
 
 namespace De.Hochstaetter.Fronius.Services;
 
@@ -7,10 +8,15 @@ public sealed class AwattarService : ElectricityPushPriceServiceBase, IElectrici
     private HttpClient? client = new();
     private Timer? timer;
     private readonly AwattarCountry[] supportedPriceZones = [AwattarCountry.Austria, AwattarCountry.GermanyLuxembourg];
+    private string awattarBearer;
+
+    // https://api.awattar.de/v1/prices?zipcode=85375&consumption=1800&gridoperator=9901068000001&tariff=hourly-2&domain=awattar&date=2024-11-25
 
     public AwattarService()
     {
         timer = new Timer(TimerCallback, null, DurationToNextQuery, TimeSpan.Zero);
+        var settings = IoC.Get<SettingsBase>();
+        awattarBearer = settings.AwattarBearer ?? string.Empty;
     }
 
     public bool CanSetPriceRegion => true;
@@ -40,6 +46,8 @@ public sealed class AwattarService : ElectricityPushPriceServiceBase, IElectrici
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public override async Task<IEnumerable<IElectricityPrice>> GetHistoricPriceDataAsync(DateTime? from, DateTime? to, CancellationToken token = default)
     {
+
+
         var (tld, fromUnix, toUnix) = GetQueryParameters(from, to);
         var query = FormattableString.Invariant($"https://api.awattar.{tld}/v1/marketdata{fromUnix}{toUnix}");
 
@@ -52,6 +60,13 @@ public sealed class AwattarService : ElectricityPushPriceServiceBase, IElectrici
     {
         var (tld, fromUnix, toUnix) = GetQueryParameters(from, to);
         var query = FormattableString.Invariant($"https://api.awattar.{tld}/v1/power/productions{fromUnix}{toUnix}");
+
+        //if (client != null)
+        //{
+        //    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", awattarBearer);
+        //    var x = await client.GetStringAsync("https://api.awattar.de/v1/prices?zipcode=85375&consumption=1800&gridoperator=9901068000001&tariff=hourly-2&domain=awattar&date=2024-11-25", token).ConfigureAwait(false);
+        //}
+
 
         var result = (await (client?.GetFromJsonAsync<AwattarEnergyList>(query, token).ConfigureAwait(false) ?? throw new ObjectDisposedException(GetType().Name)))?.Energies ?? [];
 
