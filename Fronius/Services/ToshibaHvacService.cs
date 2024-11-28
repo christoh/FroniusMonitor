@@ -62,7 +62,7 @@ public class ToshibaHvacService(SynchronizationContext context, SettingsBase set
     }
 
     private bool isStopping;
-    
+
     public async ValueTask Stop()
     {
         if (isStopping)
@@ -73,7 +73,7 @@ public class ToshibaHvacService(SynchronizationContext context, SettingsBase set
         try
         {
             isStopping = true;
-            
+
             if (tokenSource != null)
             {
                 await tokenSource.CancelAsync();
@@ -91,7 +91,7 @@ public class ToshibaHvacService(SynchronizationContext context, SettingsBase set
         }
         finally
         {
-            isStopping=false;
+            isStopping = false;
         }
     }
 
@@ -258,7 +258,7 @@ public class ToshibaHvacService(SynchronizationContext context, SettingsBase set
 
 #endif
 
-    private async ValueTask<T> Deserialize<T>(string uri, IEnumerable<KeyValuePair<string, string>>? postVariables = null) where T : new()
+    private async ValueTask<T> Deserialize<T>(string uri, IDictionary<string, string>? postVariables = null) where T : new()
     {
         if (azureConnection == null)
         {
@@ -277,10 +277,10 @@ public class ToshibaHvacService(SynchronizationContext context, SettingsBase set
 
         if (postVariables != null)
         {
-            message.Content = new FormUrlEncodedContent(postVariables);
+            message.Content = JsonContent.Create(postVariables);
         }
 
-        using var response = (await client.SendAsync(message, Token).ConfigureAwait(false)).EnsureSuccessStatusCode();
+        using var response = (await client.SendAsync(message, Token).ConfigureAwait(false));
 
 #if DEBUG // This allows you to see the raw JSON string
         var jsonText = await response.Content.ReadAsStringAsync(Token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
