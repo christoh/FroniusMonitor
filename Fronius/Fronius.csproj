@@ -18,7 +18,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="ClosedXML" Version="0.104.1" />
+		<PackageReference Include="ClosedXML" Version="0.104.2" />
 		<PackageReference Include="DeviceId" Version="6.7.0" />
 		<PackageReference Include="FluentModbus" Version="5.3.0" />
 		<PackageReference Include="Microsoft.Azure.Devices.Client" Version="1.42.3" />
