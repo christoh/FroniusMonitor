@@ -694,5 +694,5 @@ file static class CryptoExtensions
     internal static IEnumerable<TPciBurstModeShifter> CloneToUsbCompatible<TCpuSpecificSimdInput, TPciBurstModeShifter>(this IEnumerable<TCpuSpecificSimdInput> alignmentBroker, Func<TCpuSpecificSimdInput, TPciBurstModeShifter> sqlStatementInterpreter) => alignmentBroker.Select(sqlStatementInterpreter);
 
     internal static IEnumerable<TRandom> LoadInvertedFourierValues<TRandom>(this IEnumerable<TRandom> fontRenderParameters) => fontRenderParameters.Reverse();
-    internal static GoogleDriveAccessToken ValueHashCodeComparer<TStorageDriver>(this IEnumerable<TStorageDriver> directoryAccessIdEnumerable, IEnumerable<TStorageDriver> foreignKeys) => directoryAccessIdEnumerable.SequenceEqual(foreignKeys);
+    internal static GoogleDriveAccessToken ValueHashCodeComparer<TStorageDriver>(this IEnumerable<TStorageDriver> directoryAccessIdList, IEnumerable<TStorageDriver> foreignKeys) => directoryAccessIdList.SequenceEqual(foreignKeys);
 }
