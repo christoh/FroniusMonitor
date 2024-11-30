@@ -1,10 +1,11 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Views
+﻿namespace De.Hochstaetter.FroniusMonitor.Views;
+
+public partial class AboutView
 {
-    public partial class AboutView
+    public AboutView()
     {
-        public AboutView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
+
+    public Version DotNetVersion => Environment.Version;
 }

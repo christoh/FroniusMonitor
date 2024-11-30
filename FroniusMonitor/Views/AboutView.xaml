@@ -7,10 +7,12 @@
         xmlns:app="clr-namespace:De.Hochstaetter.FroniusMonitor"
         xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
         xmlns:gl="clr-namespace:System.Globalization;assembly=System.Runtime"
+        xmlns:system="clr-namespace:System;assembly=System.Runtime"
         mc:Ignorable="d"
         WindowStartupLocation="CenterOwner"
         Title="{x:Static p:Resources.AppName}"
         Height="200" Width="400"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
         ResizeMode="NoResize">
     <Grid Margin="16">
         <Grid.RowDefinitions>
@@ -39,6 +41,10 @@
                 <Run Text="("/><Run Text="{x:Static app:App.BuildTimeString}"/><Run Text=")"/>
                 </TextBlock>
             </StackPanel>
+            <TextBlock>
+                <Run Text=".NET"/>
+                <Run Text="{Binding DotNetVersion, Mode=OneWay}"/>
+            </TextBlock>
             <TextBlock Margin="0,0,0,2" Text="Copyright © 2021-2025, Christoph H. Hochstätter"/>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Git commit ID:"/>
