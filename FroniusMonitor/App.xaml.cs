@@ -70,6 +70,7 @@ namespace De.Hochstaetter.FroniusMonitor
                     .AddSingleton<IGen24JsonService, Gen24JsonService>()
                     .AddSingleton<IWattPilotService, WattPilotService>()
                     .AddSingleton<IToshibaHvacService, ToshibaHvacService>()
+                    .AddSingleton<ISmartMeterImportService, BayernWerkImportService>()
                     .AddSingleton<SettingsBase>(Settings)
                     .AddTransient<IElectricityPriceService>(_ =>
                     {

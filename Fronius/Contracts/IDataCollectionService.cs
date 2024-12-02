@@ -22,7 +22,7 @@ public interface IDataCollectionService
     void InvalidateFritzBox();
     Task<IList<SmartMeterCalibrationHistoryItem>> ReadCalibrationHistory();
     Task AddCalibrationHistoryItem(double consumedEnergyOffsetWattHours, double producedEnergyOffsetWattHours);
+    Task AddCalibrationHistoryItem(SmartMeterCalibrationHistoryItem? newItem);
     IServiceProvider Container { get; }
     IServiceProvider Container2 { get; }
-    ValueTask ImportBayernwerkExcelFile(string excelFileName);
 }

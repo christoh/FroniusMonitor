@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
-public class MainViewModel(IDataCollectionService dataCollectionService, IFritzBoxService fritzBoxService, IWattPilotService wattPilotService) : ViewModelBase
+public class MainViewModel(IDataCollectionService dataCollectionService, IFritzBoxService fritzBoxService, IWattPilotService wattPilotService, ISmartMeterImportService smartMeterImportService) : ViewModelBase
 {
     private bool wattPilotFirmwareUpdateMessageShown;
     private bool isGarbageCollecting;
@@ -232,7 +232,7 @@ public class MainViewModel(IDataCollectionService dataCollectionService, IFritzB
 
         try
         {
-            await dataCollectionService.ImportBayernwerkExcelFile(openFileDialog.FileName).ConfigureAwait(false);
+            await smartMeterImportService.ImportSmartMeterData(openFileDialog.FileName).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

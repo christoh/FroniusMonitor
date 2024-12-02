@@ -2914,6 +2914,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} must be a string containing an Excel filename.
+        /// </summary>
+        public static string MustBeExcelFileName {
+            get {
+                return ResourceManager.GetString("MustBeExcelFileName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to IP address must be a valid IPv4 address.
         /// </summary>
         public static string MustBeIpv4Address {

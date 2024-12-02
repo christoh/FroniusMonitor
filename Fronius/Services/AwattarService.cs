@@ -69,13 +69,6 @@ public sealed class AwattarService : ElectricityPushPriceServiceBase, IElectrici
 
 
         var result = (await (client?.GetFromJsonAsync<AwattarEnergyList>(query, token).ConfigureAwait(false) ?? throw new ObjectDisposedException(GetType().Name)))?.Energies ?? [];
-
-        //foreach (var awattarEnergy in result.Where(a => a.StartTime.ToLocalTime().Date > DateTime.Now.Date))
-        //{
-        //    awattarEnergy.SolarProduction *= 20;
-        //    awattarEnergy.WindProduction *= 20;
-        //}
-
         return result;
     }
 

@@ -22,6 +22,7 @@ global using System.Text.Json.Serialization;
 global using System.Text.RegularExpressions;
 global using System.Xml;
 global using System.Xml.Serialization;
+global using ClosedXML.Excel;
 global using De.Hochstaetter.Fronius.Attributes;
 global using De.Hochstaetter.Fronius.Contracts;
 global using De.Hochstaetter.Fronius.Contracts.Modbus;

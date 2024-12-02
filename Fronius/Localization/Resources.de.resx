@@ -1542,4 +1542,7 @@
   <data name="About" xml:space="preserve">
 	  <value>Über</value>
   </data>
+  <data name="MustBeExcelFileName" xml:space="preserve">
+	  <value>{0} muss ein string sein, der einen Excel-Dateinamen enthält</value>
+  </data>
 </root>

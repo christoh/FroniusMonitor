@@ -1,6 +1,4 @@
-﻿using ClosedXML.Excel;
-
-namespace De.Hochstaetter.Fronius.Services
+﻿namespace De.Hochstaetter.Fronius.Services
 {
     public class DataCollectionService : BindableBase, IDataCollectionService
     {
@@ -115,69 +113,6 @@ namespace De.Hochstaetter.Fronius.Services
             }
         });
 
-        public async ValueTask ImportBayernwerkExcelFile(string excelFileName)
-        {
-            IReadOnlyList<SmartMeterCalibrationHistoryItem> energyHistory;
-
-            if (settings.EnergyHistoryFileName == null)
-            {
-                throw new FileNotFoundException(Resources.NoEnergyHistoryFile);
-            }
-
-            if (settings.DriftFileName == null)
-            {
-                throw new FileNotFoundException(Resources.NoDriftFile);
-            }
-
-            await using (var fileStream = new FileStream(settings.EnergyHistoryFileName, FileMode.Open, FileAccess.Read, FileShare.Read))
-            {
-                var energyHistorySerializer = new XmlSerializer(typeof(SmartMeterCalibrationHistoryItem[]));
-
-                energyHistory = energyHistorySerializer.Deserialize(fileStream) as IReadOnlyList<SmartMeterCalibrationHistoryItem>
-                                ?? throw new InvalidDataException(string.Format(Resources.FileHasNoEnergyHistory, settings.EnergyHistoryFileName));
-            }
-
-            XLWorkbook workbook;
-
-            await using (var fileStream = new FileStream(excelFileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            {
-                workbook = new XLWorkbook(fileStream);
-            }
-
-            var cell = workbook.Worksheet(1).Range("F:F").Cells()
-                .Where(c => c.Value.IsText && c.GetValue<string>() == "VAL")
-                .MaxBy(c => c.WorksheetRow().RowNumber());
-
-            if (cell == null)
-            {
-                throw new InvalidDataException(Resources.NoValidCells);
-            }
-
-            var dataCell = cell.CellLeft();
-            var producedEnergy = dataCell.GetValue<double>() * 1000;
-            var dateTimeCell = dataCell.CellLeft().CellLeft();
-            var time = dateTimeCell.GetDateTime().ToUniversalTime();
-            var historyEntry = energyHistory.MinBy(i => Math.Abs(i.CalibrationDate.Ticks - time.Ticks));
-
-            if (historyEntry == null || Math.Abs((historyEntry.CalibrationDate - time).TotalMinutes) > 2)
-            {
-                throw new InvalidOperationException(Resources.NoEnergyHistoryMatch);
-            }
-
-            historyEntry.ProducedOffset = producedEnergy - historyEntry.EnergyRealProduced;
-            historyEntry.ConsumedOffset = double.NaN;
-
-            var lastProductionEntry = SmartMeterHistory.LastOrDefault(i => double.IsFinite(i.ProducedOffset));
-
-            if (lastProductionEntry != null && lastProductionEntry.CalibrationDate >= historyEntry.CalibrationDate)
-            {
-                throw new InvalidOperationException(Resources.ExcelFileAlreadyImported);
-            }
-
-            await AddCalibrationHistoryItem(historyEntry).ConfigureAwait(false);
-        }
-
-
         public async Task AddCalibrationHistoryItem(double consumedEnergyOffset, double producedEnergyOffset)
         {
             SmartMeterCalibrationHistoryItem? newItem = null;
@@ -216,7 +151,7 @@ namespace De.Hochstaetter.Fronius.Services
             await AddCalibrationHistoryItem(newItem).ConfigureAwait(false);
         }
 
-        private async ValueTask AddCalibrationHistoryItem(SmartMeterCalibrationHistoryItem? newItem)
+        public async Task AddCalibrationHistoryItem(SmartMeterCalibrationHistoryItem? newItem)
         {
             if (newItem == null)
             {
