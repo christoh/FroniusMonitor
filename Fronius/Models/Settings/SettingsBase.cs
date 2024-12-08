@@ -48,12 +48,12 @@ public abstract class SettingsBase : BindableBase, ICloneable
         set => Set(ref energyHistoryFileName, value);
     }
 
-    private string? awattarBearer;
+    private AwattarParameters? awattar;
     [DefaultValue(null)]
-    public string? AwattarBearer
+    public AwattarParameters? Awattar
     {
-        get => awattarBearer;
-        set => Set(ref awattarBearer, value);
+        get => awattar;
+        set => Set(ref awattar, value);
     }
 
     private WebConnection froniusConnection = new() { BaseUrl = "http://192.168.178.XXX", UserName = string.Empty, Password = string.Empty };

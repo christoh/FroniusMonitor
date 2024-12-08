@@ -39,7 +39,6 @@ namespace FroniusUnitTests.SystemTests
             var service = IoC.Get<IDataCollectionService>();
             var property = typeof(DataCollectionService).GetProperty(nameof(DataCollectionService.SmartMeterHistory));
             property!.SetValue(service, await service.ReadCalibrationHistory());
-            await service.ImportBayernwerkExcelFile(excelFileName);
         }
     }
 }

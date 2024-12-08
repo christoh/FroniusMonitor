@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace De.Hochstaetter.Fronius.Services;
 
@@ -8,15 +9,21 @@ public sealed class AwattarService : ElectricityPushPriceServiceBase, IElectrici
     private HttpClient? client = new();
     private Timer? timer;
     private readonly AwattarCountry[] supportedPriceZones = [AwattarCountry.Austria, AwattarCountry.GermanyLuxembourg];
-    private string awattarBearer;
-
+    private readonly SettingsBase settings;
     // https://api.awattar.de/v1/prices?zipcode=85375&consumption=1800&gridoperator=9901068000001&tariff=hourly-2&domain=awattar&date=2024-11-25
 
     public AwattarService()
     {
         timer = new Timer(TimerCallback, null, DurationToNextQuery, TimeSpan.Zero);
-        var settings = IoC.Get<SettingsBase>();
-        awattarBearer = settings.AwattarBearer ?? string.Empty;
+        settings = IoC.Get<SettingsBase>();
+    }
+
+    private ICollection<AwattarPriceComponent>? prices;
+
+    public ICollection<AwattarPriceComponent>? Prices
+    {
+        get => prices;
+        set => Set(ref prices, value);
     }
 
     public bool CanSetPriceRegion => true;
@@ -56,19 +63,35 @@ public sealed class AwattarService : ElectricityPushPriceServiceBase, IElectrici
     }
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    public async Task<IEnumerable<AwattarEnergy>> GetDataAsync(DateTime? from, DateTime? to, CancellationToken token = default)
+    public async Task<AwattarEnergyList> GetDataAsync(DateTime? from, DateTime? to, CancellationToken token = default)
     {
         var (tld, fromUnix, toUnix) = GetQueryParameters(from, to);
         var query = FormattableString.Invariant($"https://api.awattar.{tld}/v1/power/productions{fromUnix}{toUnix}");
 
-        //if (client != null)
-        //{
-        //    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", awattarBearer);
-        //    var x = await client.GetStringAsync("https://api.awattar.de/v1/prices?zipcode=85375&consumption=1800&gridoperator=9901068000001&tariff=hourly-2&domain=awattar&date=2024-11-25", token).ConfigureAwait(false);
-        //}
+        if (client != null && settings.Awattar != null && Prices == null)
+        {
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", settings.Awattar.Bearer);
+            var queryString = $"https://api.awattar.{tld}/v1/prices?zipcode={settings.Awattar.PostalCode}&consumption=1800&gridoperator={settings.Awattar.GridOperatorId}&tariff=hourly-2&domain=awattar&date={from ?? to:yyyy-MM-dd}";
+
+            try
+            {
+                Prices = (await client.GetFromJsonAsync<AwattarPriceInfo>(queryString, token).ConfigureAwait(false))?.Data.Prices;
+
+                if (Prices != null)
+                {
+                    Prices.Add(new AwattarPriceComponent { Description = "Aufschlag Awattar", Name = "Aufschlag Awattar", PriceUnit = "Cent/kWh", TaxRate = 0.19m, Price = 1.5m });
+                    settings.ElectricityPrice.PriceOffsetBuy = Prices.Where(p => p.PriceUnit == "Cent/kWh").Sum(p => p.Price);
+                }
+            }
+            catch
+            {
+                // We don't care
+            }
+        }
 
 
-        var result = (await (client?.GetFromJsonAsync<AwattarEnergyList>(query, token).ConfigureAwait(false) ?? throw new ObjectDisposedException(GetType().Name)))?.Energies ?? [];
+        var result = (await (client?.GetFromJsonAsync<AwattarEnergyList>(query, token).ConfigureAwait(false) ?? throw new ObjectDisposedException(GetType().Name))) ?? new();
+        result.Prices = Prices;
         return result;
     }
 
