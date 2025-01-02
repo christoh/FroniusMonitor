@@ -46,6 +46,7 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <Grid.Resources>
@@ -94,6 +95,8 @@
                         </Button.Content>
                     </Button>
                 </StackPanel>
+                
+                <Button Padding="8" Margin="4" Click="OnPriceComponentsClick" Grid.Column="4" Grid.Row="0" Grid.RowSpan="2" Content="Price Components"></Button>
             </Grid>
         </GroupBox>
     </Grid>

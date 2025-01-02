@@ -39,8 +39,10 @@ public class AwattarPriceComponent : BindableBase
     public decimal Price
     {
         get => price;
-        set => Set(ref price, value);
+        set => Set(ref price, value, () => NotifyOfPropertyChange(nameof(GrossPrice)));
     }
+
+    public decimal GrossPrice => Price + Price * TaxRate;
 
     private string? description;
 
@@ -55,7 +57,7 @@ public class AwattarPriceComponent : BindableBase
     public decimal TaxRate
     {
         get => taxRate;
-        set => Set(ref taxRate, value);
+        set => Set(ref taxRate, value, () => NotifyOfPropertyChange(nameof(GrossPrice)));
     }
 
     private string? name;

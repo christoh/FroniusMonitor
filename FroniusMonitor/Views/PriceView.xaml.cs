@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Views;
+﻿using System.Collections.Immutable;
+
+namespace De.Hochstaetter.FroniusMonitor.Views;
 
 public partial class PriceView
 {
@@ -43,5 +45,13 @@ public partial class PriceView
 
         IncreaseButton.IsEnabled = date < maxDate;
         DecreaseButton.IsEnabled = date > minDate;
+    }
+
+    private void OnPriceComponentsClick(object sender, RoutedEventArgs e)
+    {
+        if (viewModel.ElectricityPriceService is AwattarService service)
+        {
+            new PriceComponentsView((service.Prices ?? []).Where(p => p.PriceUnit == "Cent/kWh" && p.Price!=0m).ToList()).Show();
+        }
     }
 }
