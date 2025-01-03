@@ -1545,4 +1545,10 @@
   <data name="MustBeExcelFileName" xml:space="preserve">
 	  <value>{0} muss ein string sein, der einen Excel-Dateinamen enthält</value>
   </data>
+  <data name="Vat" xml:space="preserve">
+	  <value>MWSt</value>
+  </data>
+  <data name="Unit" xml:space="preserve">
+	  <value>Einheit</value>
+  </data>
 </root>

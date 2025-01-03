@@ -4300,6 +4300,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unit.
+        /// </summary>
+        public static string Unit {
+            get {
+                return ResourceManager.GetString("Unit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unknown.
         /// </summary>
         public static string Unknown {
@@ -4377,6 +4386,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string UtcBug {
             get {
                 return ResourceManager.GetString("UtcBug", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Vat.
+        /// </summary>
+        public static string Vat {
+            get {
+                return ResourceManager.GetString("Vat", resourceCulture);
             }
         }
         

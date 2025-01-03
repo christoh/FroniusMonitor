@@ -1620,4 +1620,10 @@
   <data name="MustBeExcelFileName" xml:space="preserve">
 	  <value>{0} must be a string containing an Excel filename</value>
   </data>
+  <data name="Vat" xml:space="preserve">
+	  <value>Vat</value>
+  </data>
+  <data name="Unit" xml:space="preserve">
+	  <value>Unit</value>
+  </data>
 </root>

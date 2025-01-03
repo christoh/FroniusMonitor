@@ -51,7 +51,7 @@ public partial class PriceView
     {
         if (viewModel.ElectricityPriceService is AwattarService service)
         {
-            new PriceComponentsView((service.Prices ?? []).Where(p => p.PriceUnit == "Cent/kWh" && p.Price!=0m).ToList()).Show();
+            new PriceComponentsView().Show();
         }
     }
 }
