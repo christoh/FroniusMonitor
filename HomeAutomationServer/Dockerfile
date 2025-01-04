@@ -8,11 +8,13 @@ COPY . .
 
 WORKDIR /build/HomeAutomationServer
 
-RUN apk --no-cache update && apk --no-cache upgrade && dotnet workload update && \
-rm -fr /build/Fronius/bin /build/Fronius/obj bin obj && \
-mkdir -p /runner/app && \
-mkdir -p /runner/root && \
-mkdir -p /runner/home/app
+RUN apk --no-cache update && \
+    apk --no-cache upgrade && \
+    dotnet workload update && \
+    rm -fr /build/Fronius/bin /build/Fronius/obj bin obj && \
+    mkdir -p /runner/app && \
+    mkdir -p /runner/root && \
+    mkdir -p /runner/home/app
 
 RUN dotnet publish -c Release -v=m -o /runner/app
 
@@ -20,6 +22,9 @@ WORKDIR /runner
 
 COPY <<"EOF" ./root/.profile
 #!/bin/ash
+echo ""
+echo Alpine Linux $(cat /etc/alpine-release)
+test -f /etc/motd && cat /etc/motd
 cd
 export ENV=~/.ashrc
 EOF
@@ -31,7 +36,6 @@ alias ll='ls -laF'
 alias sudo='doas'
 alias ps='ps -o pid,ppid,user,tty,nice,vsz,rss,time,args'
 alias root='exec doas ash -li'
-test -f /etc/motd && cat /etc/motd
 
 if [ `id -u` == 0 ]; then
     export PS1='[\[\033[01;31m\]\u@docker:home-automation\[\033[00m\] \[\033[01;34m\]\w\[\033[0m\]] \$ '
@@ -82,7 +86,8 @@ EOF
 FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine
 COPY --from=builder /runner/ /
 
-RUN apk --no-cache upgrade && apk --no-cache add doas &&\
+RUN apk --no-cache upgrade &&\
+    apk --no-cache add doas alpine-release &&\
     ln -s /root/.ashrc /home/app/.ashrc &&\
     ln -s /root/.profile /home/app/.profile &&\
     chmod 755 /root /startup.sh /root/.ashrc /root/.profile &&\
