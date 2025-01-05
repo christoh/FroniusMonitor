@@ -68,7 +68,6 @@ EOF
 
 COPY <<"EOF" ./startup.sh
 #!/bin/ash
-cat /etc/motd
 cd /app
 exec dotnet ./HomeAutomationServer.dll
 EOF
