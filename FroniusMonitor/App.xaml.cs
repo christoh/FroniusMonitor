@@ -108,6 +108,7 @@ namespace De.Hochstaetter.FroniusMonitor
                     .AddTransient<SettingsView>()
                     .AddTransient<WattPilotSettingsView>()
                     .AddTransient<PriceView>()
+                    .AddTransient<PriceComponentsView>()
                     .AddTransient<AboutView>()
                     .AddTransient<WattPilotDetailsView>()
                     .AddTransient<InverterSettingsView>()

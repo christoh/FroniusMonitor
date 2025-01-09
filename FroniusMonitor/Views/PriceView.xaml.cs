@@ -49,9 +49,9 @@ public partial class PriceView
 
     private void OnPriceComponentsClick(object sender, RoutedEventArgs e)
     {
-        if (viewModel.ElectricityPriceService is AwattarService service)
+        if (viewModel.ElectricityPriceService is AwattarService)
         {
-            new PriceComponentsView().Show();
+            IoC.Get<MainWindow>().GetView<PriceComponentsView>().Focus();
         }
     }
 }
