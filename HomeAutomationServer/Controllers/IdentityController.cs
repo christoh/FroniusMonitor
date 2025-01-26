@@ -1,8 +1,6 @@
-﻿using System.Security.Cryptography;
-using System.Text;
+﻿using System.Text;
 using De.Hochstaetter.HomeAutomationServer.Misc;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
-using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
@@ -24,13 +22,13 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
         if (dbUser == null || !dbUser.Authenticate(password))
         {
             Response.Cookies.Delete("auth", cookieOptions);
-            logger.LogWarning("Login failed for user {Username}",user);
+            logger.LogWarning("Login failed for user {Username}", user);
             return Unauthorized(Helpers.GetValidationDetails(nameof(password), "The username or the password was incorrect"));
         }
 
         Response.Cookies.Delete("auth", cookieOptions);
         Response.Cookies.Append("auth", "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes($"{user}:{password}")), cookieOptions);
-        logger.LogInformation("{Username} logged in successfully",user);
+        logger.LogInformation("{Username} logged in successfully", user);
         return Ok();
     }
 
@@ -38,10 +36,11 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
     [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult Logout()
     {
-        if (HttpContext.User.Identity?.Name is {} userName)
+        if (HttpContext.User.Identity?.Name is { } userName)
         {
-            logger.LogInformation("{Username} logged out",userName);
+            logger.LogInformation("{Username} logged out", userName);
         }
+
         Response.Cookies.Delete("auth", cookieOptions);
         return Ok();
     }
@@ -49,13 +48,13 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
     [HttpGet("adduser")]
     [BasicAuthorize(Roles = nameof(Roles.Administrator))]
     [ProducesResponseType<User>(StatusCodes.Status200OK)]
-    public async Task<IActionResult> AddUser([FromQuery] string user,[FromQuery] string password,[FromQuery] string roles)
+    public async Task<IActionResult> AddUser([FromQuery] string user, [FromQuery] string password, [FromQuery] string roles)
     {
         if (userDb.CurrentValue.Users.Select(u => u.Username).Contains(user))
         {
             return BadRequest(Helpers.GetValidationDetails(nameof(user), $"User {user} already exists"));
         }
-        
+
         var split = roles.Split(',');
         var eRoles = Roles.None;
 
@@ -70,7 +69,7 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
                 return BadRequest(Helpers.GetValidationDetails(nameof(roles), $"Unknown role '{roleString}'"));
             }
         }
-        
+
         var dbUser = new User { Username = user, Roles = eRoles };
         dbUser.SetPassword(password);
         userDb.CurrentValue.Users.Add(dbUser);

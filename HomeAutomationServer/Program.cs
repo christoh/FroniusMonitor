@@ -1,11 +1,8 @@
-﻿using System.Security.Cryptography;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using De.Hochstaetter.Fronius.Crypto;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.OpenApi.Models;
 using Settings = De.Hochstaetter.HomeAutomationServer.Models.Settings.Settings;
 
 namespace De.Hochstaetter.HomeAutomationServer;
@@ -85,7 +82,7 @@ internal partial class Program
         if (settings != null)
         {
             builder.Services.AddSingleton(settings);
-            
+
             builder.Services
                 .Configure<FritzBoxDataCollectorParameters>(f =>
                 {
@@ -109,10 +106,7 @@ internal partial class Program
                     g.RefreshRate = TimeSpan.FromSeconds(30);
                     g.ConfigRefreshRate = TimeSpan.FromMinutes(10.1);
                 })
-                .Configure<UserList>(u =>
-                {
-                    u.Users = settings.Users;
-                });
+                .Configure<UserList>(u => { u.Users = settings.Users; });
         }
 
         builder.Services.AddControllers()
@@ -126,8 +120,8 @@ internal partial class Program
 
         builder.Services.AddOpenApi();
 
-        builder.Services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("Basic",null);
-        
+        builder.Services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, Services.AuthenticationService>("Basic", null);
+
         //builder.Services.AddAuthentication()
         //    .AddScheme<UserList, MyAuthenticationHandler>("MyAuthenticationSchemeName", options => {});
 

@@ -1,11 +1,12 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
-using Newtonsoft.Json;
 
 namespace De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 
 [Flags]
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum Roles
 {
     None = 0,
@@ -20,28 +21,68 @@ public enum Roles
 
 public class User
 {
+    private string? passwordCache;
+
     [XmlAttribute] public string Username { get; set; } = string.Empty;
-    [XmlAttribute] public string PasswordHash { get; set; } = string.Empty;
-    [XmlAttribute] public string Salt { get; set; } = Convert.ToBase64String(RandomNumberGenerator.GetBytes(8));
+
+    private string passwordHash = string.Empty;
+
+    [XmlAttribute]
+    public string PasswordHash
+    {
+        get => passwordHash;
+        set
+        {
+            passwordHash = value;
+            passwordCache = null;
+        }
+    }
+
+    private string salt = Convert.ToBase64String(RandomNumberGenerator.GetBytes(8));
+
+    [XmlAttribute]
+    public string Salt
+    {
+        get => salt;
+        set
+        {
+            salt = value;
+            passwordCache = null;
+        }
+    }
+
     [XmlIgnore] [JsonIgnore] private byte[] SaltBytes => Convert.FromBase64String(Salt);
 
     [XmlAttribute] public Roles Roles { get; set; } = Roles.None;
 
     public void SetPassword(string password)
     {
-        var hashBytes = GetHashBytes(password);
-        PasswordHash = Convert.ToBase64String(SHA3_512.HashData(hashBytes));
+        Salt = Convert.ToBase64String(RandomNumberGenerator.GetBytes(8));
+        PasswordHash = GetHash(password);
+        passwordCache = password;
     }
 
     public bool Authenticate(string password)
     {
-        var hashBytes = GetHashBytes(password);
-        var hash = Convert.ToBase64String(SHA3_512.HashData(hashBytes));
-        return hash == PasswordHash;
+        if (!string.IsNullOrEmpty(passwordCache) && password == passwordCache)
+        {
+            return true;
+        }
+
+        var hash = GetHash(password);
+
+        if (hash != PasswordHash)
+        {
+            return false;
+        }
+
+        passwordCache = password;
+        return true;
     }
 
-    private byte[] GetHashBytes(string password)
+    private string GetHash(string password)
     {
-        return SaltBytes.Concat(Encoding.UTF8.GetBytes(password)).ToArray();
+        var hashBytes = SaltBytes.Concat(Encoding.UTF8.GetBytes(password)).ToArray();
+        return Convert.ToBase64String(SHA3_512.HashData(hashBytes));
     }
 }
