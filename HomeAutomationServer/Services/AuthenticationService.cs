@@ -4,6 +4,7 @@ using System.Text.Encodings.Web;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 
 namespace De.Hochstaetter.HomeAutomationServer.Services;
 
@@ -23,6 +24,7 @@ public class AuthenticationService(IOptionsMonitor<UserList> options, ILoggerFac
             if (!Request.Cookies.TryGetValue("auth", out authHeader!))
             {
                 Logger.LogDebug("No cookie and no auth header provided");
+                SetAuthHeader();
                 return Task.FromResult(AuthenticateResult.NoResult());
             }
         }
@@ -37,6 +39,7 @@ public class AuthenticationService(IOptionsMonitor<UserList> options, ILoggerFac
         if (split.Length != 2)
         {
             Logger.LogWarning("Incorrect auth header for basic authentication");
+            SetAuthHeader();
             return Task.FromResult(AuthenticateResult.Fail("Incorrect Auth header"));
         }
 
@@ -47,6 +50,7 @@ public class AuthenticationService(IOptionsMonitor<UserList> options, ILoggerFac
         if (user == null || !user.Authenticate(password))
         {
             Logger.LogWarning("Password for user {Username} is not correct", username);
+            SetAuthHeader();
             return Task.FromResult(AuthenticateResult.Fail("Access denied"));
         }
 
@@ -65,5 +69,10 @@ public class AuthenticationService(IOptionsMonitor<UserList> options, ILoggerFac
 
         var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(identity, claims));
         return Task.FromResult(AuthenticateResult.Success(new AuthenticationTicket(claimsPrincipal, identity.AuthenticationType)));
+    }
+
+    private void SetAuthHeader()
+    {
+        Response.Headers.WWWAuthenticate = new StringValues(["Basic", "Realm=\"Home Automation Server\""]);
     }
 }

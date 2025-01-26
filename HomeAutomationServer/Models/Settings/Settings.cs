@@ -25,6 +25,8 @@ public class Settings
     public List<WebConnection> Gen24Connections = [];
 
     public HashSet<User> Users = [];
+    
+    public WebServerSettings WebServerSettings = new WebServerSettings();
 
     [XmlIgnore] public static string SettingsFileName { get; set; } = Path.Combine(AppContext.BaseDirectory, "Settings.xml");
 

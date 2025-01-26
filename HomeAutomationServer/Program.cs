@@ -3,6 +3,7 @@ using De.Hochstaetter.Fronius.Crypto;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Settings = De.Hochstaetter.HomeAutomationServer.Models.Settings.Settings;
 
 namespace De.Hochstaetter.HomeAutomationServer;
@@ -81,6 +82,11 @@ internal partial class Program
 
         if (settings != null)
         {
+            if (settings.WebServerSettings.Urls is { Length: > 0 })
+            {
+                builder.WebHost.UseUrls(settings.WebServerSettings.Urls);
+            }
+            
             builder.Services.AddSingleton(settings);
 
             builder.Services
