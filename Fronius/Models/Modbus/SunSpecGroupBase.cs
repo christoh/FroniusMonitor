@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Modbus;
 
-public abstract class SunSpecGroupBase : IHaveDisplayName
+public abstract class SunSpecGroupBase : IHaveDisplayName, IHaveUniqueId
 {
     private readonly SunSpecCommonBlock common;
 
@@ -17,8 +17,10 @@ public abstract class SunSpecGroupBase : IHaveDisplayName
     }
     public IReadOnlyList<SunSpecModelBase> Models { get; }
 
+    public bool IsPresent => true;
     public string? Manufacturer => common.Manufacturer;
-    public string? ModelName => common.ModelName;
+    public string? Model => common.ModelName;
+    //public string? ModelName => common.ModelName;
     public string? SerialNumber => common.SerialNumber;
     public string? Version => common.Version;
     public string? Options => common.Options;

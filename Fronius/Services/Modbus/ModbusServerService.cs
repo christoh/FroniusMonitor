@@ -76,7 +76,7 @@ public class ModbusServerService
     //TODO: Extend to handle 3 phase power meters and probably other devices
     private void OnDeviceUpdate(object? s, DeviceUpdateEventArgs e)
     {
-        switch (e.Device)
+        switch (e.Device.Device)
         {
             case IPowerMeter1P { CanMeasurePower: true, EnergyConsumed: > 0 } meter:
                 {

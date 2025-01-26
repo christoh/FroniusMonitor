@@ -15,6 +15,7 @@ global using De.Hochstaetter.Fronius.Services.DataCollectors;
 global using De.Hochstaetter.Fronius.Services.Modbus;
 global using De.Hochstaetter.HomeAutomationServer.Models.Settings;
 global using FluentModbus;
+global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;
 global using Serilog;

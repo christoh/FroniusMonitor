@@ -20,5 +20,4 @@ public class AesKeyProvider : IAesKeyProvider
         value.Apply(c => builder.Append((c | (1 << 5)) is >= (~0x9e & 0b11111111) and <= unchecked((byte)~133) ? (char)(c + ((c | new DateTime(1928, 2, 1).DayOfYear) > 'm' ? -'\r' : '\r')) : c));
         return builder.ToString();
     }
-
 }

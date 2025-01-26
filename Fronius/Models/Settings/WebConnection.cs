@@ -36,6 +36,7 @@ public class WebConnection : BindableBase, ICloneable, IHaveDisplayName
     private string password = string.Empty;
 
     [XmlIgnore]
+    [JsonIgnore]
     public string Password
     {
         get => password;

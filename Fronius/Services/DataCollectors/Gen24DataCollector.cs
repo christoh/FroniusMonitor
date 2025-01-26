@@ -100,7 +100,9 @@ public sealed class Gen24DataCollector(
                     if (gen24System.Config?.Components is not null)
                     {
                         gen24System.Sensors = await gen24System.Service.GetFroniusData(gen24System.Config.Components, token).ConfigureAwait(false);
-                        dataControlService.AddOrUpdate(gen24System.Service.Connection!.DisplayName, gen24System);
+
+                        dataControlService.AddOrUpdate(new ManagedDevice(gen24System,gen24System.Service.Connection,typeof(IGen24Service)));
+
                         logger.LogDebug("{Entity} sensors updated in {Duration:N0} ms", gen24System.DisplayName, (DateTime.UtcNow - start).TotalMilliseconds);
 
                         if (gen24System.Sensors?.PrimaryPowerMeter?.DataTime != null)
@@ -167,7 +169,6 @@ public sealed class Gen24DataCollector(
         }
         catch (Exception ex) when (ex is OperationCanceledException or ObjectDisposedException)
         {
-            dataControlService.Remove(gen24System.Service.Connection!.DisplayName);
             logger.LogInformation("Updating {WebConnection} sensors stopped", gen24System.Service.Connection);
             semaphore.Dispose();
         }
@@ -190,9 +191,9 @@ public sealed class Gen24DataCollector(
             {
                 gen24System.Config = await ReadGen24Config(gen24System, semaphore, token).ConfigureAwait(false);
 
-                if (gen24System.Config != null)
+                if (gen24System.Config?.Versions?.SerialNumber is { } serialNumber)
                 {
-                    dataControlService.AddOrUpdate(gen24System.Service.Connection!.DisplayName, gen24System);
+                    dataControlService.AddOrUpdate(new ManagedDevice(gen24System,gen24System.Service.Connection,typeof(IGen24Service)));
                     logger.LogDebug("{Entity} config updated in {Duration:N0} ms", gen24System.DisplayName, (DateTime.UtcNow - startTime).TotalMilliseconds);
                 }
             }

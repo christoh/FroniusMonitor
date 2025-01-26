@@ -2,6 +2,7 @@
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
+using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 
 namespace De.Hochstaetter.HomeAutomationServer.Models.Settings;
 
@@ -15,13 +16,15 @@ public class Settings
     //[DefaultValue((ushort)1502)]
     public ushort ServerPort { get; set; } = 1502;
 
-    public List<WebConnection> FritzBoxConnections = new();
+    public List<WebConnection> FritzBoxConnections = [];
 
-    public List<ModbusMapping> ModbusMappings = new();
+    public List<ModbusMapping> ModbusMappings = [];
 
-    public List<ModbusConnection> SunSpecClients = new();
+    public List<ModbusConnection> SunSpecClients = [];
 
-    public List<WebConnection> Gen24Connections = new();
+    public List<WebConnection> Gen24Connections = [];
+
+    public List<User> Users = [];
 
     [XmlIgnore] public static string SettingsFileName { get; set; } = Path.Combine(AppContext.BaseDirectory, "Settings.xml");
 

@@ -2,7 +2,7 @@
 
 public interface IHaveUniqueId
 {
-    string Id => string.Join('‖', new[] { Manufacturer, Model, SerialNumber }.Where(s => !string.IsNullOrEmpty(s)));
+    string Id => string.Join(';', new[] { ReplaceProblems(Manufacturer), ReplaceProblems(Model), ReplaceProblems(SerialNumber) }.Where(s => !string.IsNullOrEmpty(s)));
         
     bool IsPresent { get; }
         
@@ -11,4 +11,9 @@ public interface IHaveUniqueId
     public string? Model { get; }
         
     public string? SerialNumber { get; }
+
+    private string? ReplaceProblems(string? input)
+    {
+        return input?.Replace('/', '-').Replace(' ', '_');
+    }
 }

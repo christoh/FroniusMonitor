@@ -123,7 +123,7 @@ public sealed class SunSpecDataCollector
 
             if (device != null)
             {
-                dataControlService.AddOrUpdate(connection.DisplayName, device);
+                dataControlService.AddOrUpdate(connection.DisplayName, new ManagedDevice(device,connection,typeof(ISunSpecClient)));
                 logger.LogDebug("{DeviceType} {DeviceName} updated in {Duration:N0} ms", nameof(SunSpecInverter), device, (DateTime.UtcNow - start).TotalMilliseconds);
             }
 

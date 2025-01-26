@@ -22,7 +22,7 @@ public enum SiteType : sbyte
 public class Gen24PowerFlow : Gen24DeviceBase
 {
     private SiteType? siteType;
-    private static readonly IList<SmartMeterCalibrationHistoryItem> history = IoC.TryGet<IDataCollectionService>()?.SmartMeterHistory!;
+    private static readonly IList<SmartMeterCalibrationHistoryItem>? history = IoC.TryGet<IDataCollectionService>()?.SmartMeterHistory!;
     private static int oldSmartMeterHistoryCountProduced;
     private static int oldSmartMeterHistoryCountConsumed;
 
@@ -95,7 +95,7 @@ public class Gen24PowerFlow : Gen24DeviceBase
     {
         get
         {
-            if (oldSmartMeterHistoryCountConsumed != history.Count)
+            if (history != null && oldSmartMeterHistoryCountConsumed != history.Count)
             {
                 consumedFactor = CalculateSmartMeterFactor(false);
                 oldSmartMeterHistoryCountConsumed = history.Count;
@@ -111,7 +111,7 @@ public class Gen24PowerFlow : Gen24DeviceBase
     {
         get
         {
-            if (oldSmartMeterHistoryCountProduced != history.Count)
+            if (history != null && oldSmartMeterHistoryCountProduced != history.Count)
             {
                 producedFactor = CalculateSmartMeterFactor(true);
                 oldSmartMeterHistoryCountProduced = history.Count;
@@ -165,17 +165,24 @@ public class Gen24PowerFlow : Gen24DeviceBase
         set => Set(ref mainInverterId, value);
     }
 
+    [JsonIgnore]
     public IEnumerable<double> AllPowers => new[] { StoragePower, GridPower, SolarPower, LoadPower ?? -InverterAcPower }.Where(ps => ps.HasValue).Select(ps => ps!.Value);
+    [JsonIgnore]
     public double DcInputPower => new[] { StoragePower ?? 0, SolarPower ?? 0 }.Where(ps => ps > 0).Sum();
+    [JsonIgnore]
     public double AcInputPower => new[] { GridPower ?? 0d, LoadPower ?? -InverterAcPower ?? 0 }.Where(ps => ps > 0).Sum();
+    [JsonIgnore]
     public double AcOutputPower => new[] { GridPower ?? 0d, LoadPower ?? -InverterAcPower ?? 0 }.Where(ps => ps < 0).Sum();
+    [JsonIgnore]
     public double DcOutputPower => new[] { StoragePower ?? 0, SolarPower ?? 0 }.Where(ps => ps is < 0).Sum();
+    [JsonIgnore]
     public double PowerLoss => AllPowers.Sum();
+    [JsonIgnore]
     public double? Efficiency => 1 - PowerLoss / (AcInputPower - Math.Min(AcInputPower, -AcOutputPower) + DcInputPower - Math.Min(DcInputPower, -DcOutputPower));
 
     public static double CalculateSmartMeterFactor(bool isProduced)
     {
-        var list = history.Where(item => double.IsFinite(isProduced ? item.ProducedOffset : item.ConsumedOffset)).ToList();
+        var list = history?.Where(item => double.IsFinite(isProduced ? item.ProducedOffset : item.ConsumedOffset)).ToList() ?? [];
 
         if (list.Count < 2)
         {

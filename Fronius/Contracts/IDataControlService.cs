@@ -4,11 +4,11 @@ namespace De.Hochstaetter.Fronius.Contracts;
 
 public interface IDataControlService
 {
-    public event EventHandler<Models.Events.DeviceUpdateEventArgs>? DeviceUpdate;
-    public IReadOnlyDictionary<string, object> Entities { get; }
-    public void AddOrUpdate(string id, object entity);
-    public ValueTask AddOrUpdateAsync(IEnumerable<IHaveUniqueId> entities, CancellationToken token = default);
-    public void AddOrUpdate(IHaveUniqueId entity);
-    public ValueTask RemoveAsync(IEnumerable<string> entities, CancellationToken token = default);
+    public event EventHandler<DeviceUpdateEventArgs>? DeviceUpdate;
+    public IReadOnlyDictionary<string, ManagedDevice> Entities { get; }
+    public void AddOrUpdate(string id, ManagedDevice entity);
+    public ValueTask AddOrUpdateAsync(IEnumerable<ManagedDevice> entities, CancellationToken token = default);
+    public void AddOrUpdate(ManagedDevice entity);
+    public ValueTask RemoveAsync(IEnumerable<string> ids, CancellationToken token = default);
     public void Remove(string id);
 }

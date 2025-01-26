@@ -1,4 +1,11 @@
-﻿using De.Hochstaetter.Fronius.Crypto;
+﻿using System.Security.Cryptography;
+using System.Text.Json.Serialization;
+using De.Hochstaetter.Fronius.Crypto;
+using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.OpenApi.Models;
+using Settings = De.Hochstaetter.HomeAutomationServer.Models.Settings.Settings;
 
 namespace De.Hochstaetter.HomeAutomationServer;
 
@@ -11,16 +18,18 @@ internal partial class Program
 
     private static ILogger? logger;
 
-
     private static async Task<int> Main(string[] args)
     {
+        var builder = WebApplication.CreateBuilder(args);
+        builder.Logging.ClearProviders();
+
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel
-#if DEBUG
+            #if DEBUG
             .Debug()
-#else
+            #else
             .Information()
-#endif
+            #endif
             .Enrich.WithComputed("SourceContextName", "Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)")
             .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] ({SourceContextName:l}) {Message:lj}{NewLine}{Exception}", formatProvider: CultureInfo.InvariantCulture)
             .CreateLogger();
@@ -28,9 +37,9 @@ internal partial class Program
         Settings? settings = null;
         Exception? settingsLoadException = null;
 
-        IServiceCollection serviceCollection = new ServiceCollection().AddSingleton<IAesKeyProvider, AesKeyProvider>();
+        builder.Services.AddSingleton<IAesKeyProvider, AesKeyProvider>();
 
-        var provider = serviceCollection.BuildServiceProvider();
+        var provider = builder.Services.BuildServiceProvider();
         IoC.Update(provider);
 
         try
@@ -57,7 +66,7 @@ internal partial class Program
             settingsLoadException = ex;
         }
 
-        serviceCollection
+        builder.Services
             .AddOptions()
             .AddTransient<IFritzBoxService, FritzBoxService>()
             .AddTransient<IGen24Service, Gen24Service>()
@@ -69,12 +78,12 @@ internal partial class Program
             .AddSingleton<FritzBoxDataCollector>()
             .AddSingleton<Gen24DataCollector>()
             .AddTransient<ISunSpecClient, SunSpecClient>()
-            .AddLogging(builder => builder.AddSerilog())
+            .AddLogging(b => b.AddSerilog())
             ;
 
         if (settings != null)
         {
-            serviceCollection
+            builder.Services
                 .Configure<FritzBoxDataCollectorParameters>(f =>
                 {
                     f.Connections = settings.FritzBoxConnections;
@@ -97,11 +106,43 @@ internal partial class Program
                     g.RefreshRate = TimeSpan.FromSeconds(30);
                     g.ConfigRefreshRate = TimeSpan.FromMinutes(10.1);
                 })
-                ;
+                .Configure<UserList>(u =>
+                {
+                    u.Users = settings.Users;
+                });
         }
 
-        var serviceProvider = serviceCollection.BuildServiceProvider();
-        IoC.Update(serviceProvider);
+        builder.Services.AddControllers()
+            .AddJsonOptions(o =>
+            {
+                o.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals;
+                o.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                o.JsonSerializerOptions.IgnoreReadOnlyProperties = true;
+                o.JsonSerializerOptions.IgnoreReadOnlyFields = true;
+            });
+
+        builder.Services.AddOpenApi();
+        
+        //builder.Services.AddAuthentication()
+        //    .AddScheme<UserList, MyAuthenticationHandler>("MyAuthenticationSchemeName", options => {});
+
+        
+        var app = builder.Build();
+        //if (app.Environment.IsDevelopment())
+        //{
+        app.MapOpenApi();
+        //}
+
+        app.UseHttpsRedirection();
+        //app.UseAuthentication();
+        //app.UseAuthorization();
+
+        //app.UseCors();
+        //app.UseAuthentication();
+        //app.UseAuthorization();
+
+        app.MapControllers();
+        IoC.Update(app.Services);
 
         logger = IoC.Get<ILogger<Program>>();
 
@@ -153,13 +194,13 @@ internal partial class Program
 
             var userName = match.Groups["UserName"].Value;
             var password = match.Groups["Password"].Value;
-            
+
             settings.FritzBoxConnections.Where(c => c.UserName == userName).Apply(c =>
             {
                 c.Password = password;
                 c.PasswordChecksum = c.CalculatedChecksum;
             });
-            
+
             settings.Gen24Connections.Where(c => c.UserName == userName).Apply(c =>
             {
                 c.Password = password;
@@ -182,7 +223,8 @@ internal partial class Program
         //await IoC.Get<SunSpecDataCollector>().StopAsync().ConfigureAwait(false);
         //await IoC.Get<Gen24DataCollector>().StopAsync().ConfigureAwait(false);
         //await fritzBoxDataCollector.StopAsync().ConfigureAwait(false);
-        await Task.Delay(-1).ConfigureAwait(false);
+        // Configure the HTTP request pipeline.
+        await app.RunAsync().ConfigureAwait(false);
         return 0;
     }
 }

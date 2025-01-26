@@ -36,7 +36,7 @@ public sealed class FritzBoxDataCollector
             await Task.WhenAll(runningTasks.Values).ConfigureAwait(false);
         }
 
-        var devices = dataControlService.Entities.Where(e => e.Value is FritzBoxDevice).Select(e => e.Key).ToList();
+        var devices = dataControlService.Entities.Where(e => e.Value.Device is FritzBoxDevice).Select(e => e.Key).ToList();
         await dataControlService.RemoveAsync(devices, token).ConfigureAwait(false);
         tokenSource?.Dispose();
         tokenSource = null;
@@ -78,7 +78,7 @@ public sealed class FritzBoxDataCollector
         try
         {
             var token = tokenSource?.Token ?? throw new OperationCanceledException();
-            
+
             try
             {
                 var allFritzBoxDevices = (await service.GetFritzBoxDevices(token).ConfigureAwait(false)).Devices.Cast<IPowerMeter1P>().ToList();
@@ -89,7 +89,7 @@ public sealed class FritzBoxDataCollector
                     .Where(p => p is { IsPresent: false })
                     .Apply(p => logger.LogDebug("No DECT connection to {DisplayName} ({SerialNumber})", p.DisplayName, p.SerialNumber));
 
-                await dataControlService.AddOrUpdateAsync(presentFritzBoxDevices, token).ConfigureAwait(false);
+                await dataControlService.AddOrUpdateAsync(presentFritzBoxDevices.Select(d => new ManagedDevice(d, service.Connection, typeof(IFritzBoxService))), token).ConfigureAwait(false);
                 logger.LogDebug("FritzBox {WebConnection} updated in {Duration:N0} ms", service.Connection, (DateTime.UtcNow - startTime).Milliseconds);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
