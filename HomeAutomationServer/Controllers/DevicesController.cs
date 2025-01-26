@@ -1,7 +1,6 @@
 ﻿using De.Hochstaetter.Fronius.Models.WebApi;
 using De.Hochstaetter.HomeAutomationServer.Misc;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 
 namespace De.Hochstaetter.HomeAutomationServer.Controllers;
@@ -11,6 +10,7 @@ namespace De.Hochstaetter.HomeAutomationServer.Controllers;
 public class DevicesController(ILogger<DevicesController> logger, IDataControlService controlService) : ControllerBase
 {
     [HttpGet]
+    [BasicAuthorize(Roles = "User")]
     [ProducesResponseType<IDictionary<string, DeviceInfo>>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public IActionResult ListDevices()
@@ -39,6 +39,7 @@ public class DevicesController(ILogger<DevicesController> logger, IDataControlSe
     }
 
     [HttpGet("{id}")]
+    [BasicAuthorize(Roles = "User")]
     [ProducesResponseType<object>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     public IActionResult GetDevice([FromRoute] string id)
@@ -52,6 +53,7 @@ public class DevicesController(ILogger<DevicesController> logger, IDataControlSe
     }
 
     [HttpGet("{id}/credentials")]
+    [BasicAuthorize(Roles = "Administrator")]
     [ProducesResponseType<object>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     public IActionResult GetCredentials([FromRoute] string id)

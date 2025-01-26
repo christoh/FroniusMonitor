@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 using De.Hochstaetter.Fronius.Crypto;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
@@ -83,6 +84,8 @@ internal partial class Program
 
         if (settings != null)
         {
+            builder.Services.AddSingleton(settings);
+            
             builder.Services
                 .Configure<FritzBoxDataCollectorParameters>(f =>
                 {
@@ -122,18 +125,19 @@ internal partial class Program
             });
 
         builder.Services.AddOpenApi();
+
+        builder.Services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("Basic",null);
         
         //builder.Services.AddAuthentication()
         //    .AddScheme<UserList, MyAuthenticationHandler>("MyAuthenticationSchemeName", options => {});
 
-        
         var app = builder.Build();
         //if (app.Environment.IsDevelopment())
         //{
         app.MapOpenApi();
         //}
 
-        app.UseHttpsRedirection();
+        //app.UseHttpsRedirection();
         //app.UseAuthentication();
         //app.UseAuthorization();
 
