@@ -7,7 +7,7 @@ namespace De.Hochstaetter.HomeAutomationServer.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class DevicesController(ILogger<DevicesController> logger, IDataControlService controlService) : ControllerBase
+public class DevicesController(IDataControlService controlService) : ControllerBase
 {
     [HttpGet]
     [BasicAuthorize(Roles = "User")]
@@ -32,8 +32,6 @@ public class DevicesController(ILogger<DevicesController> logger, IDataControlSe
 
             result.Add(e.Key, info);
         });
-
-        var x = Thread.CurrentPrincipal;
 
         return result.Count == 0 ? NoContent() : Ok(result);
     }

@@ -164,10 +164,12 @@ public sealed class Gen24DataCollector(
                 var waitTime = Math.Max(0, (Parameters.RefreshRate - duration).TotalMilliseconds);
                 await Task.Delay((int)waitTime, token).ConfigureAwait(false);
                 token.ThrowIfCancellationRequested();
+                var connection = gen24System.Service.Connection;
+                gen24System.Service.Connection=(connection?.Clone()) as WebConnection;
                 runningSensorTasks[gen24System.Service.Connection!] = Update(gen24System, semaphore);
             }
         }
-        catch (Exception ex) when (ex is OperationCanceledException or ObjectDisposedException)
+        catch (OperationCanceledException)
         {
             logger.LogInformation("Updating {WebConnection} sensors stopped", gen24System.Service.Connection);
             semaphore.Dispose();

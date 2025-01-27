@@ -1,10 +1,8 @@
 ﻿using De.Hochstaetter.Fronius.Models.Events;
-using De.Hochstaetter.Fronius.Models.Modbus;
 
 namespace De.Hochstaetter.Fronius.Services.Modbus;
 
-public class ModbusServerService
-(
+public class ModbusServerService(
     SettingsChangeTracker tracker,
     ILogger<ModbusServerService> logger,
     IDataControlService dataControlService,
@@ -79,56 +77,56 @@ public class ModbusServerService
         switch (e.Device.Device)
         {
             case IPowerMeter1P { CanMeasurePower: true, EnergyConsumed: > 0 } meter:
+            {
+                var mapping = Parameters.Mappings.SingleOrDefault(m => string.Equals(m.SerialNumber, meter.SerialNumber, StringComparison.Ordinal));
+
+                if (mapping == null)
                 {
-                    var mapping = Parameters.Mappings.SingleOrDefault(m => string.Equals(m.SerialNumber, meter.SerialNumber, StringComparison.Ordinal));
-
-                    if (mapping == null)
-                    {
-                        if (!Parameters.AutoMap)
-                        {
-                            logger.LogWarning("Power meter {DisplayName} ({SerialNumber}) has no Modbus mapping", meter.DisplayName, meter.SerialNumber);
-                            return;
-                        }
-
-                        if (string.IsNullOrWhiteSpace(meter.SerialNumber))
-                        {
-                            logger.LogError("Cannot auto map add {DisplayName} ({SerialNumber}). Serial number is null or empty", meter.DisplayName, meter.SerialNumber);
-                            return;
-                        }
-
-                        byte modbusAddress = 2;
-
-                        for (; modbusAddress < byte.MaxValue; modbusAddress++)
-                        {
-                            if (modbusAddress is < 15 or > 83 && !Parameters.Mappings.Select(m => m.ModbusAddress).Contains(modbusAddress))
-                            {
-                                break;
-                            }
-                        }
-
-                        mapping = new() { ModbusAddress = modbusAddress, Phase = 1, SerialNumber = meter.SerialNumber };
-                        Parameters.Mappings.Add(mapping);
-                        tracker.NotifySettingsChanged(options);
-                        logger.LogInformation("Auto mapped {DisplayName} ({SerialNumber}) to modbus address {ModbusAddress}", meter.DisplayName, meter.SerialNumber, mapping.ModbusAddress);
-                    }
-
-                    UpdateMeter1P(meter, mapping, e.DeviceAction);
-                    break;
-                }
-
-            case SunSpecMeter meter:
-                {
-                    var mapping = Parameters.Mappings.SingleOrDefault(m => string.Equals(m.SerialNumber, meter.SerialNumber, StringComparison.Ordinal));
-
-                    if (mapping == null)
+                    if (!Parameters.AutoMap)
                     {
                         logger.LogWarning("Power meter {DisplayName} ({SerialNumber}) has no Modbus mapping", meter.DisplayName, meter.SerialNumber);
-                        break;
+                        return;
                     }
 
-                    UpdateSunSpecMeter(meter, mapping, e.DeviceAction);
+                    if (string.IsNullOrWhiteSpace(meter.SerialNumber))
+                    {
+                        logger.LogError("Cannot auto map add {DisplayName} ({SerialNumber}). Serial number is null or empty", meter.DisplayName, meter.SerialNumber);
+                        return;
+                    }
+
+                    byte modbusAddress = 2;
+
+                    for (; modbusAddress < byte.MaxValue; modbusAddress++)
+                    {
+                        if (modbusAddress is < 15 or > 83 && !Parameters.Mappings.Select(m => m.ModbusAddress).Contains(modbusAddress))
+                        {
+                            break;
+                        }
+                    }
+
+                    mapping = new() { ModbusAddress = modbusAddress, Phase = 1, SerialNumber = meter.SerialNumber };
+                    Parameters.Mappings.Add(mapping);
+                    tracker.NotifySettingsChanged(options);
+                    logger.LogInformation("Auto mapped {DisplayName} ({SerialNumber}) to modbus address {ModbusAddress}", meter.DisplayName, meter.SerialNumber, mapping.ModbusAddress);
+                }
+
+                UpdateMeter1P(meter, mapping, e.DeviceAction);
+                break;
+            }
+
+            case SunSpecMeter meter:
+            {
+                var mapping = Parameters.Mappings.SingleOrDefault(m => string.Equals(m.SerialNumber, meter.SerialNumber, StringComparison.Ordinal));
+
+                if (mapping == null)
+                {
+                    logger.LogWarning("Power meter {DisplayName} ({SerialNumber}) has no Modbus mapping", meter.DisplayName, meter.SerialNumber);
                     break;
                 }
+
+                UpdateSunSpecMeter(meter, mapping, e.DeviceAction);
+                break;
+            }
         }
     }
 

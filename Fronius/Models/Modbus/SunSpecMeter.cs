@@ -89,5 +89,4 @@ public class SunSpecMeter : SunSpecGroupBase, IPowerMeter3P, ISunSpecMeter
     public double? EnergyReactiveProducedQ4L3 => meter.EnergyReactiveProducedQ4L3;
 
     public SunSpecMeterEvents Events => meter.Events;
-
 }

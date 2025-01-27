@@ -15,12 +15,12 @@ public abstract class SunSpecGroupBase : IHaveDisplayName, IHaveUniqueId
 
         common = Models.OfType<SunSpecCommonBlock>().First();
     }
+    
     public IReadOnlyList<SunSpecModelBase> Models { get; }
 
     public bool IsPresent => true;
     public string? Manufacturer => common.Manufacturer;
     public string? Model => common.ModelName;
-    //public string? ModelName => common.ModelName;
     public string? SerialNumber => common.SerialNumber;
     public string? Version => common.Version;
     public string? Options => common.Options;

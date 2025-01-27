@@ -30,9 +30,11 @@ public abstract class SunSpecModelBase : BindableBase
 
     public ushort DataLength => (ushort)(Data.Length >> 1);
     public ReadOnlyMemory<byte> RawData => Data;
-    public ushort ModelNumber { get; private set; }
-    protected Memory<byte> Data { get; private set; }
+    public ushort ModelNumber { get; set; }
+    public Memory<byte> Data { get; set; }
     public ushort AbsoluteRegister { get; private set; }
+    
+    [JsonIgnore]
     public abstract IReadOnlyList<ushort> SupportedModels { get; }
     public abstract ushort MinimumDataLength { get; }
 

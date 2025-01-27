@@ -79,9 +79,12 @@ public sealed class SunSpecDataCollector
             return;
         }
 
+        SunSpecGroupBase? device = null;
+        var isCancelled = false;
+        var start = DateTime.UtcNow;
+
         try
         {
-            var start = DateTime.UtcNow;
             IEnumerable<SunSpecModelBase> group;
 
             try
@@ -91,22 +94,24 @@ public sealed class SunSpecDataCollector
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 client.Dispose();
+                client = IoC.Get<ISunSpecClient>();
                 logger.LogError(ex, "Could not retrieve data from {X}", connection);
 
                 try
                 {
                     tokenSource.Token.ThrowIfCancellationRequested();
-                    await client.ConnectAsync(connection.HostName, connection.Port, connection.ModbusAddress, TimeSpan.FromSeconds(1.5));
+                    await client.ConnectAsync(connection.HostName, connection.Port, connection.ModbusAddress, TimeSpan.FromSeconds(1.5)).ConfigureAwait(false);
                 }
                 catch (Exception ex2)
                 {
+                    client.Dispose();
+                    client = IoC.Get<ISunSpecClient>();
                     logger.LogError(ex2, "Could not connect to {ModbusConnection}", connection);
                 }
 
                 return;
             }
 
-            SunSpecGroupBase? device = null;
 
             if (group.Select(g => g.ModelNumber).Any(modelNumber => modelNumber is >= 101 and <= 104 or >= 111 and <= 114))
             {
@@ -123,20 +128,32 @@ public sealed class SunSpecDataCollector
 
             if (device != null)
             {
-                dataControlService.AddOrUpdate(connection.DisplayName, new ManagedDevice(device,connection,typeof(ISunSpecClient)));
+                dataControlService.AddOrUpdate(new ManagedDevice(device, connection, typeof(ISunSpecClient)));
                 logger.LogDebug("{DeviceType} {DeviceName} updated in {Duration:N0} ms", nameof(SunSpecInverter), device, (DateTime.UtcNow - start).TotalMilliseconds);
             }
-
-            var executionTime = (DateTime.UtcNow - start).TotalMilliseconds;
-            var waitTime = Math.Max(0, Parameters.RefreshRate.TotalMilliseconds - executionTime);
-            await Task.Delay((int)waitTime, tokenSource.Token).ConfigureAwait(false);
-            _ = UpdateDevice(connection, client);
         }
         catch (OperationCanceledException)
         {
+            isCancelled = true;
             client.Dispose();
-            dataControlService.Remove(connection.DisplayName);
+
+            if (device is IHaveUniqueId id)
+            {
+                dataControlService.Remove(id.Id);
+            }
+
             logger.LogInformation("Updating {ModbusConnection} stopped", connection.DisplayName);
+        }
+        finally
+        {
+            var executionTime = (DateTime.UtcNow - start).TotalMilliseconds;
+            var waitTime = Math.Max(0, Parameters.RefreshRate.TotalMilliseconds - executionTime);
+
+            if (!isCancelled)
+            {
+                await Task.Delay((int)waitTime, tokenSource.Token).ConfigureAwait(false);
+                _ = UpdateDevice(connection, client);
+            }
         }
     }
 }
