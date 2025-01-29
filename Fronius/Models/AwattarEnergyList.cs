@@ -2,21 +2,18 @@
 {
     public class AwattarEnergyList : BindableBase
     {
-        private List<AwattarEnergy> energies = [];
-
         [JsonPropertyName("data")]
         public List<AwattarEnergy> Energies
         {
-            get => energies;
-            set => Set(ref energies, value);
-        }
+            get;
+            set => Set(ref field, value);
+        } = [];
 
-        private IEnumerable<AwattarPriceComponent>? prices;
         [JsonIgnore]
         public IEnumerable<AwattarPriceComponent>? Prices
         {
-            get => prices;
-            set => Set(ref prices, value);
+            get;
+            set => Set(ref field, value);
         }
     }
 }

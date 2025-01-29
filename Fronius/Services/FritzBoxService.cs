@@ -20,13 +20,11 @@ public class FritzBoxService : BindableBase, IFritzBoxService
     };
 
     private string? fritzBoxSid;
-    
-    private WebConnection? connection;
 
     public WebConnection? Connection
     {
-        get => connection;
-        set => Set(ref connection, value);
+        get;
+        set => Set(ref field, value);
     }
 
 

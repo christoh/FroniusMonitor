@@ -2,48 +2,38 @@
 
 public class SmartMeterCalibrationHistoryItem : BindableBase
 {
-    private double energyRealConsumed;
-
     [XmlAttribute("Crl")]
     public double EnergyRealConsumed
     {
-        get => energyRealConsumed;
-        set => Set(ref energyRealConsumed, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private double energyRealProduced;
 
     [XmlAttribute("Prl")]
     public double EnergyRealProduced
     {
-        get => energyRealProduced;
-        set => Set(ref energyRealProduced, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private DateTime calibrationDate;
 
     [XmlAttribute("Date")]
     public DateTime CalibrationDate
     {
-        get => calibrationDate;
-        set => Set(ref calibrationDate, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private double consumedOffset;
 
     [XmlAttribute("CrlOffset")]
     public double ConsumedOffset
     {
-        get => consumedOffset;
-        set => Set(ref consumedOffset, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private double producedOffset;
 
     [XmlAttribute("PrlOffset")]
     public double ProducedOffset
     {
-        get => producedOffset;
-        set => Set(ref producedOffset, value);
+        get;
+        set => Set(ref field, value);
     }
 }

@@ -24,36 +24,30 @@ public class Gen24PowerLimit : BindableBase, ICloneable
 {
     private static readonly IGen24JsonService gen24JsonService = IoC.TryGet<IGen24JsonService>()!;
 
-    private Gen24PowerLimitDefinition softLimit = new();
-
     public Gen24PowerLimitDefinition SoftLimit
     {
-        get => softLimit;
-        set => Set(ref softLimit, value);
-    }
-
-    private Gen24PowerLimitDefinition hardLimit = new();
+        get;
+        set => Set(ref field, value);
+    } = new();
 
     public Gen24PowerLimitDefinition HardLimit
     {
-        get => hardLimit;
-        set => Set(ref hardLimit, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = new();
 
-    private bool isEnabled;
     [FroniusProprietaryImport("activated", FroniusDataType.Root)]
     public bool IsEnabled
     {
-        get => isEnabled;
-        set => Set(ref isEnabled, value, AdjustObsoleteProperties);
+        get;
+        set => Set(ref field, value, AdjustObsoleteProperties);
     }
 
-    private NetworkMode netWorkMode;
     [FroniusProprietaryImport("networkMode", FroniusDataType.Root)]
     public NetworkMode NetWorkMode
     {
-        get => netWorkMode;
-        set => Set(ref netWorkMode, value, () => NotifyOfPropertyChange(nameof(IsNetworkModeEnabled)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(IsNetworkModeEnabled)));
     }
 
     public bool IsNetworkModeEnabled
@@ -62,12 +56,11 @@ public class Gen24PowerLimit : BindableBase, ICloneable
         set => NetWorkMode = value ? NetworkMode.Network : NetworkMode.Local;
     }
 
-    private PhaseMode phaseMode;
     [FroniusProprietaryImport("phaseMode", FroniusDataType.Root)]
     public PhaseMode PhaseMode
     {
-        get => phaseMode;
-        set => Set(ref phaseMode, value, AdjustObsoleteProperties);
+        get;
+        set => Set(ref field, value, AdjustObsoleteProperties);
     }
 
     private void AdjustObsoleteProperties()
@@ -82,13 +75,11 @@ public class Gen24PowerLimit : BindableBase, ICloneable
 
     }
 
-    private PowerLimitMode powerLimitMode = PowerLimitMode.Off;
-
     [Obsolete("Use IsEnabled and PhaseMode instead to reflect firmware >= 1.30")]
     public PowerLimitMode PowerLimitMode
     {
-        get => powerLimitMode;
-        set => Set(ref powerLimitMode, value, () =>
+        get;
+        set => Set(ref field, value, () =>
         {
             switch (value)
             {
@@ -101,12 +92,13 @@ public class Gen24PowerLimit : BindableBase, ICloneable
                     IsEnabled = true;
                     PhaseMode = PhaseMode.WeakestPhase;
                     break;
+
                 case PowerLimitMode.Off:
                     IsEnabled = false;
                     break;
             }
         });
-    }
+    } = PowerLimitMode.Off;
 
     public static Gen24PowerLimit Parse(JToken? token)
     {

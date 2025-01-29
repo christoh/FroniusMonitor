@@ -3,56 +3,44 @@
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public class Gen24InverterSettings : Gen24ParsingBase
 {
-    private string? systemName = string.Empty;
-
     [FroniusProprietaryImport("systemName", FroniusDataType.Root)]
     public string? SystemName
     {
-        get => systemName;
-        set => Set(ref systemName, value);
-    }
-
-    private string? timeZoneName;
+        get;
+        set => Set(ref field, value);
+    } = string.Empty;
 
     [FroniusProprietaryImport("timezone", FroniusDataType.Root)]
     public string? TimeZoneName
     {
-        get => timeZoneName;
-        set => Set(ref timeZoneName, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? timeSync;
 
     [FroniusProprietaryImport("timesync", FroniusDataType.Root)]
     public bool? TimeSync
     {
-        get => timeSync;
-        set => Set(ref timeSync, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private Gen24Mppt? mppt;
 
     public Gen24Mppt? Mppt
     {
-        get => mppt;
-        set => Set(ref mppt, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private Gen24PowerLimitSettings powerLimitSettings = new();
 
     public Gen24PowerLimitSettings PowerLimitSettings
     {
-        get => powerLimitSettings;
-        set => Set(ref powerLimitSettings, value);
-    }
-
-    private Gen24AcSystemSettings acSystemSettings = new();
+        get;
+        set => Set(ref field, value);
+    } = new();
 
     public Gen24AcSystemSettings AcSystemSettings
     {
-        get => acSystemSettings;
-        set => Set(ref acSystemSettings, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = new();
 
     public override object Clone()
     {

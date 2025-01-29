@@ -2,22 +2,18 @@
 
 public class Gen24PowerLimitDefinition : Gen24ParsingBase
 {
-    private bool isEnabled;
-
     [FroniusProprietaryImport("enabled", FroniusDataType.Root)]
     public bool IsEnabled
     {
-        get => isEnabled;
-        set => Set(ref isEnabled, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private double powerLimit;
 
     [FroniusProprietaryImport("powerLimit", FroniusDataType.Root)]
     public double PowerLimit
     {
-        get => powerLimit;
-        set => Set(ref powerLimit, value);
+        get;
+        set => Set(ref field, value);
     }
 
     public static Gen24PowerLimitDefinition Parse(JToken? token)

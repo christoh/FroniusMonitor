@@ -5,20 +5,20 @@ public class MainViewModel(IDataCollectionService dataCollectionService, IFritzB
     private bool wattPilotFirmwareUpdateMessageShown;
     private bool isGarbageCollecting;
 
-    private ICommand? exportSettingsCommand;
-    public ICommand ExportSettingsCommand => exportSettingsCommand ??= new NoParameterCommand(ExportSettings);
+    [field: AllowNull, MaybeNull]
+    public ICommand ExportSettingsCommand => field ??= new NoParameterCommand(ExportSettings);
 
-    private ICommand? loadSettingsCommand;
-    public ICommand LoadSettingsCommand => loadSettingsCommand ??= new NoParameterCommand(LoadSettings);
+    [field: AllowNull, MaybeNull]
+    public ICommand LoadSettingsCommand => field ??= new NoParameterCommand(LoadSettings);
 
-    private ICommand? downloadChargeLogCommand;
-    public ICommand DownloadChargeLogCommand => downloadChargeLogCommand ??= new NoParameterCommand(DownloadChargeLog);
+    [field: AllowNull, MaybeNull]
+    public ICommand DownloadChargeLogCommand => field ??= new NoParameterCommand(DownloadChargeLog);
 
-    private ICommand? garbageCollectionCommand;
-    public ICommand GarbageCollectionCommand => garbageCollectionCommand ??= new NoParameterCommand(GarbageCollection);
+    [field: AllowNull, MaybeNull]
+    public ICommand GarbageCollectionCommand => field ??= new NoParameterCommand(GarbageCollection);
 
-    private ICommand? importBayernwerkCommand;
-    public ICommand ImportBayernwerkCommand => importBayernwerkCommand ??= new NoParameterCommand(ImportBayernwerkFile);
+    [field: AllowNull, MaybeNull]
+    public ICommand ImportBayernwerkCommand => field ??= new NoParameterCommand(ImportBayernwerkFile);
 
     public IDataCollectionService DataCollectionService => dataCollectionService;
 

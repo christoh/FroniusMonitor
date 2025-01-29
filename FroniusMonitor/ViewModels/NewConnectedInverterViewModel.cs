@@ -2,21 +2,17 @@
 
 public class NewConnectedInverterViewModel : ViewModelBase
 {
-    private Gen24ConnectedInverter connectedInverter = new();
-
     public Gen24ConnectedInverter ConnectedInverter
     {
-        get => connectedInverter;
-        set => Set(ref connectedInverter, value);
-    }
-
-    private string hostnameOrIpAddress = "192.168.178.1";
+        get;
+        set => Set(ref field, value);
+    } = new();
 
     public string HostnameOrIpAddress
     {
-        get => hostnameOrIpAddress;
-        set => Set(ref hostnameOrIpAddress, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = "192.168.178.1";
 
     internal override async Task OnInitialize()
     {

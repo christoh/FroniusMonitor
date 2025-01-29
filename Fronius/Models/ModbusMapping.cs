@@ -8,14 +8,12 @@ public class ModbusMapping : IHaveDisplayName
     [XmlAttribute]
     public string SerialNumber { get; set; } = string.Empty;
 
-    private byte phase = 1;
-
     [XmlAttribute]
     public byte Phase
     {
-        get => phase;
-        set => phase = value is >= 1 and <= 3 ? value : throw new InvalidDataException(Resources.IncorrectPhaseNumber);
-    }
+        get;
+        set => field = value is >= 1 and <= 3 ? value : throw new InvalidDataException(Resources.IncorrectPhaseNumber);
+    } = 1;
 
     public string DisplayName => $"{SerialNumber} => {ModbusAddress}";
 

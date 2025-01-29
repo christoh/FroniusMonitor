@@ -24,28 +24,23 @@ public class FritzBoxPowerMeter : BindableBase
         set => EnergyConsumed = FritzBoxDevice.GetDoubleValue(value, 1);
     }
 
-    private double? energyConsumed;
-
     [XmlIgnore]
     public double? EnergyConsumed
     {
-        get => energyConsumed;
-        set => Set(ref energyConsumed, value, () => NotifyOfPropertyChange(nameof(EnergyString)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(EnergyString)));
     }
 
-    private double? voltage;
     [XmlIgnore]
     public double? Voltage
     {
-        get => voltage;
-        set => Set(ref voltage, value,()=>NotifyOfPropertyChange(nameof(VoltageString)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(VoltageString)));
     }
-
-    private double? powerWatts;
 
     public double? PowerWatts
     {
-        get => powerWatts;
-        set => Set(ref powerWatts, value,()=>NotifyOfPropertyChange(nameof(PowerString)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(PowerString)));
     }
 }

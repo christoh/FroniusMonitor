@@ -8,36 +8,28 @@ public class InverterDetailsViewModel(
 
     public string Title => Loc.InverterDetailsView + " " + Header;
 
-    private string header = string.Empty;
-
     public string Header
     {
-        get => header;
-        set => Set(ref header, value, () => NotifyOfPropertyChange(nameof(Title)));
-    }
-
-    private Gen24System inverter = null!;
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(Title)));
+    } = string.Empty;
 
     public Gen24System Inverter
     {
-        get => inverter;
-        set => Set(ref inverter, value);
-    }
-
-    private bool isSecondary;
+        get;
+        set => Set(ref field, value);
+    } = null!;
 
     public bool IsSecondary
     {
-        get => isSecondary;
-        set => Set(ref isSecondary, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool isNoneSelected;
 
     public bool IsNoneSelected
     {
-        get => isNoneSelected;
-        set => Set(ref isNoneSelected, value);
+        get;
+        set => Set(ref field, value);
     }
 
     internal override async Task OnInitialize()

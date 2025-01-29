@@ -15,41 +15,33 @@ public class WebConnection : BindableBase, ICloneable, IHaveDisplayName
 
     public string DisplayName => BaseUrl;
 
-    private string baseUrl = "";
-
     [DefaultValue(""), XmlAttribute]
     public string BaseUrl
     {
-        get => baseUrl;
-        set => Set(ref baseUrl, value);
-    }
-
-    private string userName = "";
+        get;
+        set => Set(ref field, value);
+    } = "";
 
     [DefaultValue(""), XmlAttribute]
     public string UserName
     {
-        get => userName;
-        set => Set(ref userName, value);
-    }
-
-    private string password = string.Empty;
+        get;
+        set => Set(ref field, value);
+    } = "";
 
     [XmlIgnore]
     [JsonIgnore]
     public string Password
     {
-        get => password;
-        set => Set(ref password, value, () => calculatedChecksum = null);
-    }
-
-    private string? passwordChecksum;
+        get;
+        set => Set(ref field, value, () => calculatedChecksum = null);
+    } = string.Empty;
 
     [XmlAttribute, DefaultValue(null)]
     public string? PasswordChecksum
     {
-        get => passwordChecksum;
-        set => Set(ref passwordChecksum, value);
+        get;
+        set => Set(ref field, value);
     }
 
     [DefaultValue(""), XmlAttribute("Password")]

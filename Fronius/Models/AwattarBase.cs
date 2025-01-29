@@ -2,22 +2,18 @@
 
 public abstract class AwattarBase : BindableBase
 {
-    private long startMilliseconds;
-
     [JsonPropertyName("start_timestamp")]
     public long StartMilliseconds
     {
-        get => startMilliseconds;
-        set => Set(ref startMilliseconds, value, () => NotifyOfPropertyChange(nameof(StartTime)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(StartTime)));
     }
-
-    private long endMilliseconds;
 
     [JsonPropertyName("end_timestamp")]
     public long EndMilliseconds
     {
-        get => endMilliseconds;
-        set => Set(ref endMilliseconds, value, () => NotifyOfPropertyChange(nameof(EndTime)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(EndTime)));
     }
 
     [JsonIgnore]

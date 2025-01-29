@@ -2,21 +2,17 @@
 
 public class Gen24PowerLimitSettings : BindableBase, ICloneable
 {
-    private Gen24PowerLimits exportLimits = new();
-
     public Gen24PowerLimits ExportLimits
     {
-        get => exportLimits;
-        set => Set(ref exportLimits, value);
-    }
-
-    private Gen24PowerLimitsVisualization visualization = new();
+        get;
+        set => Set(ref field, value);
+    } = new();
 
     public Gen24PowerLimitsVisualization Visualization
     {
-        get => visualization;
-        set => Set(ref visualization, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = new();
 
     public static Gen24PowerLimitSettings ParseFromConfig(JToken? configToken)
     {

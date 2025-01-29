@@ -3,13 +3,11 @@
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public class AwattarElectricityPrice : AwattarBase, IElectricityPrice
 {
-    private decimal euroPerMegaWattHour;
-
     [JsonPropertyName("marketprice")]
     public decimal EuroPerMegaWattHour
     {
-        get => euroPerMegaWattHour;
-        set => Set(ref euroPerMegaWattHour, value, () => NotifyOfPropertyChange(nameof(CentsPerKiloWattHour)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(CentsPerKiloWattHour)));
     }
 
     [JsonIgnore]

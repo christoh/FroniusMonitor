@@ -4,12 +4,10 @@ public abstract class ElectricityPushPriceServiceBase : BindableBase
 {
     public bool IsPush => true;
 
-    private IEnumerable<IElectricityPrice>? rawValues;
-
     public virtual IEnumerable<IElectricityPrice>? RawValues
     {
-        get => rawValues;
-        set => Set(ref rawValues, value);
+        get;
+        set => Set(ref field, value);
     }
 
     public abstract bool SupportsHistoricData { get; }

@@ -4,7 +4,6 @@ public partial class PowerMeterClassicCounter
 {
     private readonly IReadOnlyList<TextBlock> textBlocks;
     private double calibratedValue;
-    private bool isInCalibration;
     private readonly DoubleAnimation animation = new(1, TimeSpan.FromMilliseconds(200));
 
     public event EventHandler<double>? CalibrationCompleted;
@@ -29,10 +28,10 @@ public partial class PowerMeterClassicCounter
 
     private bool IsInCalibration
     {
-        get => isInCalibration;
+        get;
         set
         {
-            isInCalibration = value;
+            field = value;
 
             switch (value)
             {
@@ -42,6 +41,7 @@ public partial class PowerMeterClassicCounter
                     PlusScaler.BeginAnimation(ScaleTransform.ScaleXProperty, animation);
                     ButtonScaler.BeginAnimation(ScaleTransform.ScaleXProperty, animation);
                     break;
+
                 case false:
                     animation.To = 0;
                     MinusScaler.BeginAnimation(ScaleTransform.ScaleXProperty, animation);

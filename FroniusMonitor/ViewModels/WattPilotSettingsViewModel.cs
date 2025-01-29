@@ -12,57 +12,45 @@ public class WattPilotSettingsViewModel(IDataCollectionService dataCollectionSer
     public static IReadOnlyList<ForcedCharge> ForcedChargeList { get; } = Enum.GetValues<ForcedCharge>().OrderBy(c => c.ToDisplayName()).ToArray();
     public static IReadOnlyList<LoadBalancingPriority> LoadBalancingPriorities { get; } = Enum.GetValues<LoadBalancingPriority>();
 
-    private WattPilot wattPilot = null!;
-
     public WattPilot WattPilot
     {
-        get => wattPilot;
-        set => Set(ref wattPilot, value, () =>
+        get;
+        set => Set(ref field, value, () =>
         {
             NotifyOfPropertyChange(nameof(ApiLink));
             NotifyOfPropertyChange(nameof(ApiUri));
         });
-    }
-
-    private bool enableDanger;
+    } = null!;
 
     public bool EnableDanger
     {
-        get => enableDanger;
-        set => Set(ref enableDanger, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private string toastText = string.Empty;
 
     public string ToastText
     {
-        get => toastText;
-        set => Set(ref toastText, value);
-    }
-
-    private string nextTripTimeString = string.Empty;
+        get;
+        set => Set(ref field, value);
+    } = string.Empty;
 
     public string NextTripTimeString
     {
-        get => nextTripTimeString;
-        set => Set(ref nextTripTimeString, value);
-    }
-
-    private string title = "Wattpilot";
+        get;
+        set => Set(ref field, value);
+    } = string.Empty;
 
     public string Title
     {
-        get => title;
-        set => Set(ref title, value);
-    }
-
-    private float nextTripEnergyToCharge;
+        get;
+        set => Set(ref field, value);
+    } = "Wattpilot";
 
     public float NextTripEnergyToCharge
     {
-        get => nextTripEnergyToCharge;
+        get;
 
-        set => Set(ref nextTripEnergyToCharge, value, () =>
+        set => Set(ref field, value, () =>
         {
             if (WattPilot != null!)
             {
@@ -71,28 +59,22 @@ public class WattPilotSettingsViewModel(IDataCollectionService dataCollectionSer
         });
     }
 
-    private bool isInUpdate;
-
     public bool IsInUpdate
     {
-        get => isInUpdate;
-        set => Set(ref isInUpdate, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private string wattPilotWifiPassword = string.Empty;
 
     public string WattPilotWifiPassword
     {
-        get => wattPilotWifiPassword;
-        set => Set(ref wattPilotWifiPassword, value);
-    }
-
-    private bool requiresChargingInterval;
+        get;
+        set => Set(ref field, value);
+    } = string.Empty;
 
     public bool RequiresChargingInterval
     {
-        get => requiresChargingInterval;
-        set => Set(ref requiresChargingInterval, value, () =>
+        get;
+        set => Set(ref field, value, () =>
         {
             if (value && WattPilot.MinimumChargingInterval < 300000)
             {
@@ -101,25 +83,23 @@ public class WattPilotSettingsViewModel(IDataCollectionService dataCollectionSer
         });
     }
 
-    private bool isUserAuthenticated;
-
     public bool IsUserAuthenticated
     {
-        get => isUserAuthenticated;
-        set => Set(ref isUserAuthenticated, value);
+        get;
+        set => Set(ref field, value);
     }
 
     public string ApiLink => "https://" + (WattPilot.SerialNumber ?? "<Serial>") + ".api.v3.go-e.io";
     public string ApiUri => ApiLink + $"/api/status?token={WattPilot.CloudAccessKey ?? "<Token>"}";
 
-    private ICommand? applyCommand;
-    public ICommand ApplyCommand => applyCommand ??= new NoParameterCommand(Apply);
+    [field: AllowNull, MaybeNull]
+    public ICommand ApplyCommand => field ??= new NoParameterCommand(Apply);
 
-    private ICommand? undoCommand;
-    public ICommand UndoCommand => undoCommand ??= new NoParameterCommand(() => Undo());
+    [field: AllowNull, MaybeNull]
+    public ICommand UndoCommand => field ??= new NoParameterCommand(() => Undo());
 
-    private ICommand? navigateToApiCommand;
-    public ICommand NavigateToApiCommand => navigateToApiCommand ??= new NoParameterCommand(NavigateToApi);
+    [field: AllowNull, MaybeNull]
+    public ICommand NavigateToApiCommand => field ??= new NoParameterCommand(NavigateToApi);
 
     private void NavigateToApi()
     {

@@ -2,120 +2,101 @@
 
 public class ToshibaHvacStatusDevice : ToshibaHvacDeviceBase
 {
-    private Guid acId;
-
     [JsonPropertyName("ACId")]
     public Guid AcId
     {
-        get => acId;
-        set => Set(ref acId, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private Guid id;
 
     [JsonPropertyName("Id")]
     public Guid Id
     {
-        get => id;
-        set => Set(ref id, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private ToshibaHvacPowerState powerState;
 
     [JsonPropertyName("OnOff")]
     public ToshibaHvacPowerState PowerState
     {
-        get => powerState;
-        set => Set(ref powerState, value, () => NotifyOfPropertyChange(nameof(IsTurnedOn)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(IsTurnedOn)));
     }
-
-    private Guid deviceUniqueId;
 
     [JsonPropertyName("ACDeviceUniqueId")]
     public override Guid DeviceUniqueId
     {
-        get => deviceUniqueId;
-        set => Set(ref deviceUniqueId, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private string versionInfo = string.Empty;
     [JsonPropertyName("VersionInfo")]
     public string VersionInfo
     {
-        get => versionInfo;
-        set => Set(ref versionInfo, value);
-    }
-
-    private int acModelId;
+        get;
+        set => Set(ref field, value);
+    } = string.Empty;
 
     [JsonPropertyName("Model")]
     public int AcModelId
     {
-        get => acModelId;
-        set => Set(ref acModelId, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private DateTime updatedDate;
     [JsonPropertyName("UpdatedDate")]
     public DateTime UpdatedDate
     {
-        get => updatedDate;
-        set => Set(ref updatedDate, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private double latitude;
     [JsonPropertyName("Lat")]
     public double Latitude
     {
-        get => latitude;
-        set => Set(ref latitude, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private double longitude;
     [JsonPropertyName("Long")]
     public double Longitude
     {
-        get => longitude;
-        set => Set(ref longitude, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private bool isMapped;
     [JsonPropertyName("IsMapped")]
     public bool IsMapped
     {
-        get => isMapped;
-        set => Set(ref isMapped, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private DateTime firstConnectionTime;
     [JsonPropertyName("FirstConnectionTime")]
     public DateTime FirstConnectionTime
     {
-        get => firstConnectionTime;
-        set => Set(ref firstConnectionTime, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private DateTime lastConnectionTime;
     [JsonPropertyName("LastConnectionTime")]
     public DateTime LastConnectionTime
     {
-        get => lastConnectionTime;
-        set => Set(ref lastConnectionTime, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private string consumerMasterId = string.Empty;
     [JsonPropertyName("ConsumerMasterId")]
     public string ConsumerMasterId
     {
-        get => consumerMasterId;
-        set => Set(ref consumerMasterId, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = string.Empty;
 
-    private Guid partitionKey;
     [JsonPropertyName("PartitionKey")]
     public Guid PartitionKey
     {
-        get => partitionKey;
-        set => Set(ref partitionKey, value);
+        get;
+        set => Set(ref field, value);
     }
 }

@@ -2,12 +2,10 @@
 {
     public class WattPilotElectricityService : ElectricityPushPriceServiceBase, IElectricityPriceService
     {
-        private AwattarCountry priceZone;
-
         public AwattarCountry PriceRegion
         {
-            get => priceZone;
-            set => Set(ref priceZone, value);
+            get;
+            set => Set(ref field, value);
         }
 
         public bool CanSetPriceRegion => false;

@@ -4,75 +4,60 @@ namespace De.Hochstaetter.Fronius.Models;
 
 public class AwattarPriceInfo : BindableBase
 {
-    private string? @object;
-
     public string? Object
     {
-        get => @object;
-        set => Set(ref @object, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private AwattarData data = new();
 
     public AwattarData Data
     {
-        get => data;
-        set => Set(ref data, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = new();
 }
 
 public class AwattarData : BindableBase
 {
-    private List<AwattarPriceComponent> prices = [];
-
     public List<AwattarPriceComponent> Prices
     {
-        get => prices;
-        set => Set(ref prices, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = [];
 }
 
 public class AwattarPriceComponent : BindableBase
 {
-    private decimal price;
     [JsonConverter(typeof(AwattarPriceInfoConverter))]
     public decimal Price
     {
-        get => price;
-        set => Set(ref price, value, () => NotifyOfPropertyChange(nameof(GrossPrice)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(GrossPrice)));
     }
 
     public decimal GrossPrice => Price + Price * TaxRate;
 
-    private string? description;
-
     public string? Description
     {
-        get => description;
-        set => Set(ref description, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private decimal taxRate;
 
     public decimal TaxRate
     {
-        get => taxRate;
-        set => Set(ref taxRate, value, () => NotifyOfPropertyChange(nameof(GrossPrice)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(GrossPrice)));
     }
-
-    private string? name;
 
     public string? Name
     {
-        get => name;
-        set => Set(ref name, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private string? priceUnit;
 
     public string? PriceUnit
     {
-        get => priceUnit;
-        set => Set(ref priceUnit, value);
+        get;
+        set => Set(ref field, value);
     }
 }

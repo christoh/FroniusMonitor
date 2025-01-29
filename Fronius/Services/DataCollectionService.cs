@@ -46,48 +46,38 @@
 
         public IServiceProvider Container2 { get; }
 
-        private IGen24Service? gen24Service2;
-
         public IGen24Service? Gen24Service2
         {
-            get => gen24Service2;
-            set => Set(ref gen24Service2, value);
+            get;
+            set => Set(ref field, value);
         }
 
         public BindableCollection<ISwitchable> SwitchableDevices { get; }
 
         public IToshibaHvacService HvacService { get; }
 
-        private HomeAutomationSystem? homeAutomationSystem;
-
         public HomeAutomationSystem? HomeAutomationSystem
         {
-            get => homeAutomationSystem;
-            private set => Set(ref homeAutomationSystem, value);
+            get;
+            private set => Set(ref field, value);
         }
-
-        private WebConnection? wattPilotConnection;
 
         public WebConnection? WattPilotConnection
         {
-            get => wattPilotConnection;
-            set => Set(ref wattPilotConnection, value);
+            get;
+            set => Set(ref field, value);
         }
-
-        private string lastConnectionError = string.Empty;
 
         public string LastConnectionError
         {
-            get => lastConnectionError;
-            set => Set(ref lastConnectionError, value);
-        }
-
-        private bool isConnected;
+            get;
+            set => Set(ref field, value);
+        } = string.Empty;
 
         public bool IsConnected
         {
-            get => isConnected;
-            set => Set(ref isConnected, value);
+            get;
+            set => Set(ref field, value);
         }
 
         public int FroniusUpdateRate { get; set; }

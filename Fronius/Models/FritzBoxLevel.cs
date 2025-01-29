@@ -18,19 +18,17 @@ public class FritzBoxLevel : BindableBase
         set => Level = FritzBoxDevice.GetDoubleValue(value, 100);
     }
 
-    private double? level;
     [XmlIgnore]
     public double? Level
     {
-        get => level;
-        set => Set(ref level, value,()=>NotifyOfPropertyChange(nameof(LevelString)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(LevelString)));
     }
 
-    private double? levelAbsolute;
     [XmlIgnore]
     public double? LevelAbsolute
     {
-        get => levelAbsolute;
-        set => Set(ref levelAbsolute, value,()=>NotifyOfPropertyChange(nameof(LevelAbsoluteString)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(LevelAbsoluteString)));
     }
 }

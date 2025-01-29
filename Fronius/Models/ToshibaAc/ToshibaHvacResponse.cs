@@ -2,33 +2,27 @@
 
 public class ToshibaHvacResponse<T> : BindableBase where T : new()
 {
-    private bool isSuccess;
-
     [JsonPropertyName("IsSuccess")]
     [JsonRequired]
     public bool IsSuccess
     {
-        get => isSuccess;
-        set => Set(ref isSuccess, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private T data = new();
 
     [JsonPropertyName("ResObj")]
     [JsonRequired]
     public T Data
     {
-        get => data;
-        set => Set(ref data, value);
-    }
-
-    private string message = string.Empty;
+        get;
+        set => Set(ref field, value);
+    } = new();
 
     [JsonPropertyName("Message")]
     [JsonRequired]
     public string Message
     {
-        get => message;
-        set => Set(ref message, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = string.Empty;
 }

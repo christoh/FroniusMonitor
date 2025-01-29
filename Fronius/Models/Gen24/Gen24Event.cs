@@ -14,20 +14,18 @@ public class Gen24Event : BindableBase
 {
     private readonly IGen24Service gen24Service = IoC.Get<IGen24Service>();
 
-    private DateTime? activeUntil;
     [FroniusProprietaryImport("activeUntil", FroniusDataType.Root)]
     public DateTime? ActiveUntil
     {
-        get => activeUntil;
-        set => Set(ref activeUntil, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private DateTime? eventTime;
     [FroniusProprietaryImport("timestamp", FroniusDataType.Root)]
     public DateTime? EventTime
     {
-        get => eventTime;
-        set => Set(ref eventTime, value);
+        get;
+        set => Set(ref field, value);
     }
 
     private string? label;
@@ -46,24 +44,22 @@ public class Gen24Event : BindableBase
         set => Set(ref prefix, value, () => NotifyOfPropertyChange(nameof(Code)));
     }
 
-    private uint? eventId;
     [FroniusProprietaryImport("eventID", FroniusDataType.Root)]
     public uint? EventId
     {
-        get => eventId;
-        set => Set(ref eventId, value, () => NotifyOfPropertyChange(nameof(Code)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(Code)));
     }
 
     public string Code => (string.IsNullOrEmpty(Prefix) ? string.Empty : $"{Prefix}-") + (EventId.HasValue ? EventId.Value.ToString(CultureInfo.InvariantCulture) : string.Empty);
 
     public string Message => gen24Service.GetEventDescription(Code).Result;
 
-    private Severity severity;
     [FroniusProprietaryImport("severity", FroniusDataType.Root)]
     public Severity Severity
     {
-        get => severity;
-        set => Set(ref severity, value);
+        get;
+        set => Set(ref field, value);
     }
 
     public override string ToString() => $"{EventTime:g}: {prefix}-{EventId}: {label}";

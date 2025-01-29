@@ -45,20 +45,16 @@ public class ToshibaHvacService(SynchronizationContext context, SettingsBase set
 
     public bool IsRunning => tokenSource is not null;
 
-    private bool isConnected;
-
     public bool IsConnected
     {
-        get => isConnected;
-        private set => Set(ref isConnected, value);
+        get;
+        private set => Set(ref field, value);
     }
-
-    private BindableCollection<ToshibaHvacMapping>? allDevices;
 
     public BindableCollection<ToshibaHvacMapping>? AllDevices
     {
-        get => allDevices;
-        private set => Set(ref allDevices, value);
+        get;
+        private set => Set(ref field, value);
     }
 
     private bool isStopping;

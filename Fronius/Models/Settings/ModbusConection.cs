@@ -16,22 +16,18 @@ public partial class ModbusConnection : BindableBase, IHaveDisplayName
         set => Set(ref hostName, value);
     }
 
-    private ushort port = 502;
-
     [XmlAttribute]
     public ushort Port
     {
-        get => port;
-        set => Set(ref port, value);
-    }
-
-    private byte modbusAddress;
+        get;
+        set => Set(ref field, value);
+    } = 502;
 
     [XmlAttribute]
     public byte ModbusAddress
     {
-        get => modbusAddress;
-        set => Set(ref modbusAddress, value);
+        get;
+        set => Set(ref field, value);
     }
 
     [XmlIgnore] public string KeyString => $"{SurroundIpV6Address(hostName)}:{Port}/{ModbusAddress}";

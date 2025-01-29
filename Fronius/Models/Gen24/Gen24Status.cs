@@ -4,44 +4,40 @@ public class Gen24Status : BindableBase
 {
     private static readonly IGen24Service? gen24Service = IoC.TryGetRegistered<IGen24Service>();
 
-    private uint? id;
     [FroniusProprietaryImport("id", FroniusDataType.Root)]
     public uint? Id
     {
-        get => id;
-        set => Set(ref id, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private DeviceType deviceType;
     [FroniusProprietaryImport("type", FroniusDataType.Root)]
     public DeviceType DeviceType
     {
-        get => deviceType;
-        set => Set(ref deviceType, value, () =>
+        get;
+        set => Set(ref field, value, () =>
         {
             NotifyOfPropertyChange(nameof(StatusMessage));
             NotifyOfPropertyChange(nameof(StatusMessageCaption));
         });
     }
 
-    private string? statusCode;
     [FroniusProprietaryImport("statusMessage", FroniusDataType.Root)]
     public string? StatusCode
     {
-        get => statusCode;
-        set => Set(ref statusCode, value, () =>
+        get;
+        set => Set(ref field, value, () =>
         {
             NotifyOfPropertyChange(nameof(StatusMessage));
             NotifyOfPropertyChange(nameof(StatusMessageCaption));
         });
     }
 
-    private byte? status;
     [FroniusProprietaryImport("status", FroniusDataType.Root)]
     public byte? Status
     {
-        get => status;
-        set => Set(ref status, value);
+        get;
+        set => Set(ref field, value);
     }
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]

@@ -17,35 +17,31 @@ public class InverterSettingsViewModel(
     private IReadOnlyDictionary<Guid, Gen24ConnectedInverter>? oldConnectedInverters;
     private Gen24InverterSettings oldSettings = null!;
 
-    private ICommand? undoCommand;
-    public ICommand UndoCommand => undoCommand ??= new NoParameterCommand(Undo);
+    [field: AllowNull, MaybeNull]
+    public ICommand UndoCommand => field ??= new NoParameterCommand(Undo);
 
-    private ICommand? applyCommand;
-    public ICommand ApplyCommand => applyCommand ??= new NoParameterCommand(Apply);
+    [field: AllowNull, MaybeNull]
+    public ICommand ApplyCommand => field ??= new NoParameterCommand(Apply);
 
-    private IEnumerable<ListItemModel<MpptPowerMode>> powerModes = null!;
+    [field: AllowNull, MaybeNull]
+    public ICommand DeleteConnectedInverterCommand => field ??= new Command<Gen24ConnectedInverter>(DeleteConnectedInverter);
 
-    private ICommand? deleteConnectedInverterCommand;
-    public ICommand DeleteConnectedInverterCommand => deleteConnectedInverterCommand ??= new Command<Gen24ConnectedInverter>(DeleteConnectedInverter);
+    [field: AllowNull, MaybeNull]
+    public ICommand AddConnectedInverterCommand => field ??= new NoParameterCommand(AddConnectedInverter);
 
-    private ICommand? addConnectedInverterCommand;
-    public ICommand AddConnectedInverterCommand => addConnectedInverterCommand ??= new NoParameterCommand(AddConnectedInverter);
-
-    private ICommand? refreshConnectedInvertersCommand;
-    public ICommand RefreshConnectedInvertersCommand => refreshConnectedInvertersCommand ??= new NoParameterCommand(() => _ = RefreshConnectedInverters());
+    [field: AllowNull, MaybeNull]
+    public ICommand RefreshConnectedInvertersCommand => field ??= new NoParameterCommand(() => _ = RefreshConnectedInverters());
 
     public IEnumerable<ListItemModel<MpptPowerMode>> PowerModes
     {
-        get => powerModes;
-        set => Set(ref powerModes, value);
-    }
-
-    private ListItemModel<MpptPowerMode>? selectedPowerModeMppt1;
+        get;
+        set => Set(ref field, value);
+    } = null!;
 
     public ListItemModel<MpptPowerMode>? SelectedPowerModeMppt1
     {
-        get => selectedPowerModeMppt1;
-        set => Set(ref selectedPowerModeMppt1, value, () =>
+        get;
+        set => Set(ref field, value, () =>
         {
             if (Settings.Mppt?.Mppt1 != null)
             {
@@ -54,12 +50,10 @@ public class InverterSettingsViewModel(
         });
     }
 
-    private ListItemModel<MpptPowerMode>? selectedPowerModeMppt2;
-
     public ListItemModel<MpptPowerMode>? SelectedPowerModeMppt2
     {
-        get => selectedPowerModeMppt2;
-        set => Set(ref selectedPowerModeMppt2, value, () =>
+        get;
+        set => Set(ref field, value, () =>
         {
             if (Settings.Mppt?.Mppt2 != null)
             {
@@ -68,20 +62,16 @@ public class InverterSettingsViewModel(
         });
     }
 
-    private IEnumerable<ListItemModel<MpptOnOff>> dynamicPeakManagerModes = null!;
-
     public IEnumerable<ListItemModel<MpptOnOff>> DynamicPeakManagerModes
     {
-        get => dynamicPeakManagerModes;
-        set => Set(ref dynamicPeakManagerModes, value);
-    }
-
-    private ListItemModel<MpptOnOff>? selectedDynamicPeakManagerModeMppt1;
+        get;
+        set => Set(ref field, value);
+    } = null!;
 
     public ListItemModel<MpptOnOff>? SelectedDynamicPeakManagerModeMppt1
     {
-        get => selectedDynamicPeakManagerModeMppt1;
-        set => Set(ref selectedDynamicPeakManagerModeMppt1, value, () =>
+        get;
+        set => Set(ref field, value, () =>
         {
             if (Settings.Mppt?.Mppt1 != null)
             {
@@ -90,12 +80,10 @@ public class InverterSettingsViewModel(
         });
     }
 
-    private ListItemModel<MpptOnOff>? selectedDynamicPeakManagerModeMppt2;
-
     public ListItemModel<MpptOnOff>? SelectedDynamicPeakManagerModeMppt2
     {
-        get => selectedDynamicPeakManagerModeMppt2;
-        set => Set(ref selectedDynamicPeakManagerModeMppt2, value, () =>
+        get;
+        set => Set(ref field, value, () =>
         {
             if (Settings.Mppt?.Mppt2 != null)
             {
@@ -104,76 +92,58 @@ public class InverterSettingsViewModel(
         });
     }
 
-    private IEnumerable<ListItemModel<PhaseMode>> phaseModes = null!;
-
     public IEnumerable<ListItemModel<PhaseMode>> PhaseModes
     {
-        get => phaseModes;
-        set => Set(ref phaseModes, value);
-    }
-
-    private ListItemModel<PhaseMode> selectedPhaseMode = null!;
+        get;
+        set => Set(ref field, value);
+    } = null!;
 
     public ListItemModel<PhaseMode> SelectedPhaseMode
     {
-        get => selectedPhaseMode;
-        set => Set(ref selectedPhaseMode, value, () => Settings.PowerLimitSettings.ExportLimits.ActivePower.PhaseMode = value.Value);
-    }
-
-    private string title = Loc.InverterSettings;
+        get;
+        set => Set(ref field, value, () => Settings.PowerLimitSettings.ExportLimits.ActivePower.PhaseMode = value.Value);
+    } = null!;
 
     public string Title
     {
-        get => title;
-        set => Set(ref title, value);
-    }
-
-    private Gen24InverterSettings settings = null!;
+        get;
+        set => Set(ref field, value);
+    } = Loc.InverterSettings;
 
     public Gen24InverterSettings Settings
     {
-        get => settings;
-        set => Set(ref settings, value);
-    }
-
-    private double logWattPeakMppt1;
+        get;
+        set => Set(ref field, value);
+    } = null!;
 
     public double LogWattPeakMppt1
     {
-        get => logWattPeakMppt1;
-        set => Set(ref logWattPeakMppt1, value, UpdateWattPeakMppt1);
+        get;
+        set => Set(ref field, value, UpdateWattPeakMppt1);
     }
-
-    private uint wattPeakMppt1;
 
     public uint WattPeakMppt1
     {
-        get => wattPeakMppt1;
-        set => Set(ref wattPeakMppt1, value, UpdateLogWattPeakMppt1);
+        get;
+        set => Set(ref field, value, UpdateLogWattPeakMppt1);
     }
-
-    private double logWattPeakMppt2;
 
     public double LogWattPeakMppt2
     {
-        get => logWattPeakMppt2;
-        set => Set(ref logWattPeakMppt2, value, UpdateWattPeakMppt2);
+        get;
+        set => Set(ref field, value, UpdateWattPeakMppt2);
     }
-
-    private uint wattPeakMppt2;
 
     public uint WattPeakMppt2
     {
-        get => wattPeakMppt2;
-        set => Set(ref wattPeakMppt2, value, UpdateLogWattPeakMppt2);
+        get;
+        set => Set(ref field, value, UpdateLogWattPeakMppt2);
     }
-
-    private bool enableDanger;
 
     public bool EnableDanger
     {
-        get => enableDanger;
-        set => Set(ref enableDanger, value);
+        get;
+        set => Set(ref field, value);
     }
 
     private double softLimit;
@@ -189,12 +159,10 @@ public class InverterSettingsViewModel(
         });
     }
 
-    private IDictionary<Guid, Gen24ConnectedInverter>? connectedInverters;
-
     public IDictionary<Guid, Gen24ConnectedInverter>? ConnectedInverters
     {
-        get => connectedInverters;
-        set => Set(ref connectedInverters, value);
+        get;
+        set => Set(ref field, value);
     }
 
     private double hardLimit;

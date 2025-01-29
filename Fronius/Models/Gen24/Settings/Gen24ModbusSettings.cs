@@ -41,47 +41,38 @@ public class Gen24ModbusSettings : Gen24ParsingBase, ICloneable
 
     public IReadOnlyList<ushort> TcpPorts => tcpPorts;
 
-    private ModbusInterfaceRole rtu0 = ModbusInterfaceRole.Disabled;
-
     public ModbusInterfaceRole Rtu0
     {
-        get => rtu0;
-        set => Set(ref rtu0, value);
-    }
-
-    private ModbusInterfaceRole rtu1 = ModbusInterfaceRole.Disabled;
+        get;
+        set => Set(ref field, value);
+    } = ModbusInterfaceRole.Disabled;
 
     public ModbusInterfaceRole Rtu1
     {
-        get => rtu1;
-        set => Set(ref rtu1, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = ModbusInterfaceRole.Disabled;
 
-    private int? baudRate;
     [FroniusProprietaryImport("baud", FroniusDataType.Root)]
     public int? BaudRate
     {
-        get => baudRate;
-        set => Set(ref baudRate, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? isDemoMode;
 
     [FroniusProprietaryImport("demo", FroniusDataType.Root)]
     public bool? IsDemoMode
     {
-        get => isDemoMode;
-        set => Set(ref isDemoMode, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private byte? meterAddress; // Range 1-247, default 200
 
     [FroniusProprietaryImport("meterAddress", FroniusDataType.Root)]
     public byte? MeterAddress
     {
-        get => meterAddress;
+        get;
 
-        set => Set(ref meterAddress, value, () =>
+        set => Set(ref field, value, () =>
         {
             if (value is < 1 or > 247)
             {
@@ -90,40 +81,32 @@ public class Gen24ModbusSettings : Gen24ParsingBase, ICloneable
         });
     }
 
-    private ModbusSlaveMode? mode;
-
     [FroniusProprietaryImport("mode", FroniusDataType.Root)]
     public ModbusSlaveMode? Mode
     {
-        get => mode;
-        set => Set(ref mode, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private ModbusParity? parity;
 
     [FroniusProprietaryImport("parity", FroniusDataType.Root)]
     public ModbusParity? Parity
     {
-        get => parity;
-        set => Set(ref parity, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private ushort? tcpPort;
 
     [FroniusProprietaryImport("port", FroniusDataType.Root)]
     public ushort? TcpPort
     {
-        get => tcpPort;
-        set => Set(ref tcpPort, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private byte? sunSpecAddress;
 
     [FroniusProprietaryImport("scAddress", FroniusDataType.Root)]
     public byte? SunSpecAddress
     {
-        get => sunSpecAddress;
-        set => Set(ref sunSpecAddress, value, () =>
+        get;
+        set => Set(ref field, value, () =>
         {
             if (value is 0)
             {
@@ -132,46 +115,36 @@ public class Gen24ModbusSettings : Gen24ParsingBase, ICloneable
         });
     }
 
-    private byte? inverterAddress;
-
     [FroniusProprietaryImport("rtu_inverter_slave_id", FroniusDataType.Root)]
     public byte? InverterAddress
     {
-        get => inverterAddress;
-        set => Set(ref inverterAddress, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private SunspecMode? sunspecMode;
 
     [FroniusProprietaryImport("sunspecMode", FroniusDataType.Root)]
     public SunspecMode? SunspecMode
     {
-        get => sunspecMode;
-        set => Set(ref sunspecMode, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? allowControl;
 
     public bool? AllowControl
     {
-        get => allowControl;
-        set => Set(ref allowControl, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? restrictControl;
 
     public bool? RestrictControl
     {
-        get => restrictControl;
-        set => Set(ref restrictControl, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private string? ipAddress;
 
     public string? IpAddress
     {
-        get => ipAddress;
-        set => Set(ref ipAddress, value, () =>
+        get;
+        set => Set(ref field, value, () =>
         {
             if (!string.IsNullOrEmpty(value) && !value.Split(',').All(IsValidIpOrIpWithMask))
             {

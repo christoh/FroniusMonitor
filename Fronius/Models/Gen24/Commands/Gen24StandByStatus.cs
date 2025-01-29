@@ -2,21 +2,17 @@
 
 public class Gen24StandByStatus : Gen24NoResultCommand
 {
-    private bool isStandBy;
-
     [FroniusProprietaryImport("standby", FroniusDataType.Root)]
     public bool IsStandBy
     {
-        get => isStandBy;
-        set => Set(ref isStandBy, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool hasRequestHighestPriority;
 
     [FroniusProprietaryImport("hasRequestHighestPriority", FroniusDataType.Root)]
     public bool HasRequestHighestPriority
     {
-        get => hasRequestHighestPriority;
-        set => Set(ref hasRequestHighestPriority, value);
+        get;
+        set => Set(ref field, value);
     }
 }

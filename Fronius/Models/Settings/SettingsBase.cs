@@ -4,178 +4,147 @@ public abstract class SettingsBase : BindableBase, ICloneable
 {
     public event EventHandler<EventArgs>? SettingsChanged;
 
-    private WebConnection fritzBoxConnection = new() { BaseUrl = "http://192.168.178.1", UserName = string.Empty, Password = string.Empty };
-
-    private ElectricityPriceSettings electricityPrice = new();
-
     [XmlElement]
     public ElectricityPriceSettings ElectricityPrice
     {
-        get => electricityPrice;
-        set => Set(ref electricityPrice, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = new();
 
     [XmlElement, DefaultValue(null)]
     public WebConnection FritzBoxConnection
     {
-        get => fritzBoxConnection;
-        set => Set(ref fritzBoxConnection, value);
-    }
-
-    private byte froniusUpdateRate = 5;
+        get;
+        set => Set(ref field, value);
+    } = new() { BaseUrl = "http://192.168.178.1", UserName = string.Empty, Password = string.Empty };
 
     [DefaultValue((byte)5)]
     public byte FroniusUpdateRate
     {
-        get => froniusUpdateRate;
-        set => Set(ref froniusUpdateRate, value);
-    }
-
-    private string? driftFileName;
+        get;
+        set => Set(ref field, value);
+    } = 5;
 
     [DefaultValue(null)]
     public string? DriftFileName
     {
-        get => driftFileName;
-        set => Set(ref driftFileName, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private string? energyHistoryFileName;
     [DefaultValue(null)]
     public string? EnergyHistoryFileName
     {
-        get => energyHistoryFileName;
-        set => Set(ref energyHistoryFileName, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private AwattarParameters? awattar;
     [DefaultValue(null)]
     public AwattarParameters? Awattar
     {
-        get => awattar;
-        set => Set(ref awattar, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private WebConnection froniusConnection = new() { BaseUrl = "http://192.168.178.XXX", UserName = string.Empty, Password = string.Empty };
 
     [XmlElement, DefaultValue(null)]
     public WebConnection FroniusConnection
     {
-        get => froniusConnection;
-        set => Set(ref froniusConnection, value);
-    }
-
-    private WebConnection froniusConnection2 = new() { BaseUrl = "http://192.168.178.XXX", UserName = string.Empty, Password = string.Empty };
+        get;
+        set => Set(ref field, value);
+    } = new() { BaseUrl = "http://192.168.178.XXX", UserName = string.Empty, Password = string.Empty };
 
     [XmlElement, DefaultValue(null)]
     public WebConnection FroniusConnection2
     {
-        get => froniusConnection2;
-        set => Set(ref froniusConnection2, value);
-    }
-
-    private double maximumDnoLineCurrentPerPhase = 35;
+        get;
+        set => Set(ref field, value);
+    } = new() { BaseUrl = "http://192.168.178.XXX", UserName = string.Empty, Password = string.Empty };
 
     [XmlAttribute, DefaultValue(35d)]
     public double MaximumDnoLineCurrentPerPhase
     {
-        get => maximumDnoLineCurrentPerPhase;
-        set => Set(ref maximumDnoLineCurrentPerPhase, value, () => NotifyOfPropertyChange(nameof(MaximumDnoLineCurrentTotal)));
-    }
-
-    private bool colorAllGaugeTicks;
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(MaximumDnoLineCurrentTotal)));
+    } = 35;
 
     [XmlAttribute, DefaultValue(false)]
     public bool ColorAllGaugeTicks
     {
-        get => colorAllGaugeTicks;
-        set => Set(ref colorAllGaugeTicks, value);
+        get;
+        set => Set(ref field, value);
     }
 
     [XmlIgnore] public double MaximumDnoLineCurrentTotal => MaximumDnoLineCurrentPerPhase * 3;
 
-    private WebConnection wattPilotConnection = new() { BaseUrl = "ws://192.168.178.YYY", Password = string.Empty };
-
     [XmlElement, DefaultValue(null)]
     public WebConnection WattPilotConnection
     {
-        get => wattPilotConnection;
-        set => Set(ref wattPilotConnection, value);
-    }
-
-    private string? language;
+        get;
+        set => Set(ref field, value);
+    } = new() { BaseUrl = "ws://192.168.178.YYY", Password = string.Empty };
 
     [XmlAttribute, DefaultValue(null)]
     public string? Language
     {
-        get => language;
-        set => Set(ref language, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool showFritzBox;
 
     [XmlAttribute]
     public bool ShowFritzBox
     {
-        get => showFritzBox;
-        set => Set(ref showFritzBox, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool haveWattPilot;
 
     [XmlAttribute]
     public bool HaveWattPilot
     {
-        get => haveWattPilot;
-        set => Set(ref haveWattPilot, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool haveTwoInverters;
 
     [XmlAttribute]
     public bool HaveTwoInverters
     {
-        get => haveTwoInverters;
-        set => Set(ref haveTwoInverters, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool showWattPilot;
 
     [XmlAttribute]
     public bool ShowWattPilot
     {
-        get => showWattPilot;
-        set => Set(ref showWattPilot, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool haveFritzBox;
 
     [XmlAttribute]
     public bool HaveFritzBox
     {
-        get => haveFritzBox;
-        set => Set(ref haveFritzBox, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool haveToshibaAc;
 
     [XmlAttribute]
     public bool HaveToshibaAc
     {
-        get => haveToshibaAc;
-        set => Set(ref haveToshibaAc, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool showToshibaAc;
 
     [XmlAttribute]
     public bool ShowToshibaAc
     {
-        get => showToshibaAc;
-        set => Set(ref showToshibaAc, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private AzureConnection toshibaAcConnection = new()
+    [XmlElement]
+    public AzureConnection ToshibaAcConnection
+    {
+        get;
+        set => Set(ref field, value);
+    } = new()
     {
         BaseUrl = "https://mobileapi.toshibahomeaccontrols.com",
         UserName = string.Empty,
@@ -184,21 +153,12 @@ public abstract class SettingsBase : BindableBase, ICloneable
         TunnelMode = TunnelMode.Auto
     };
 
-    [XmlElement]
-    public AzureConnection ToshibaAcConnection
-    {
-        get => toshibaAcConnection;
-        set => Set(ref toshibaAcConnection, value);
-    }
-
-    private Guid azureDeviceId = Guid.NewGuid();
-
     [XmlIgnore]
     public Guid AzureDeviceId
     {
-        get => azureDeviceId;
-        set => Set(ref azureDeviceId, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = Guid.NewGuid();
 
     [XmlElement(nameof(AzureDeviceId))]
     public string AzureDeviceIdString
@@ -207,13 +167,11 @@ public abstract class SettingsBase : BindableBase, ICloneable
         set => AzureDeviceId = Guid.Parse(value, CultureInfo.InvariantCulture);
     }
 
-    private bool addInverterPowerToConsumption;
-
     [XmlElement, DefaultValue(false)]
     public bool AddInverterPowerToConsumption
     {
-        get => addInverterPowerToConsumption;
-        set => Set(ref addInverterPowerToConsumption, value);
+        get;
+        set => Set(ref field, value);
     }
 
     protected static void UpdateChecksum(params WebConnection?[] connections)

@@ -7,7 +7,7 @@
 public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
 {
     private static readonly Random random = new(unchecked((int)DateTime.UtcNow.Ticks));
-    private static readonly object hashLockObject=new();
+    private static readonly Lock hashLock=new();
     
     private readonly MD5 md5 = MD5.Create();
     private readonly HttpClient httpClient = new();
@@ -179,7 +179,7 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
         {
             byte[] hash;
 
-            lock (hashLockObject)
+            lock (hashLock)
             {
                 hash = md5.ComputeHash(encoding.GetBytes(input));
             }

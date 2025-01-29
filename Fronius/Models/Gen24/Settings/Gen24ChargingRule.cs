@@ -12,20 +12,18 @@ public class Gen24ChargingRule : BindableBase, ICloneable
 {
     public static Regex TimeRegex { get; } = new(@"^([0-9]{1,2}):([0-9]{1,2})$", RegexOptions.Compiled);
 
-    private string? startTime;
     [FroniusProprietaryImport("TimeTable", "Start", Unit.Time)]
     public string? StartTime
     {
-        get => startTime;
-        set => Set(ref startTime, value, () => NotifyOfPropertyChange(nameof(StartTimeDate)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(StartTimeDate)));
     }
 
-    private string? endTime;
     [FroniusProprietaryImport("TimeTable", "End", Unit.Time)]
     public string? EndTime
     {
-        get => endTime;
-        set => Set(ref endTime, value, () => NotifyOfPropertyChange(nameof(EndTimeDate)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(EndTimeDate)));
     }
 
     public DateTime? StartTimeDate => GetDate(StartTime);
@@ -33,93 +31,74 @@ public class Gen24ChargingRule : BindableBase, ICloneable
     public DateTime? EndTimeDate => GetDate(EndTime);
 
 
-    private bool? monday;
-
     [FroniusProprietaryImport("Weekdays", "Mon")]
     public bool? Monday
     {
-        get => monday;
-        set => Set(ref monday, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? tuesday;
 
     [FroniusProprietaryImport("Weekdays", "Tue")]
     public bool? Tuesday
     {
-        get => tuesday;
-        set => Set(ref tuesday, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? wednesday;
 
     [FroniusProprietaryImport("Weekdays", "Wed")]
     public bool? Wednesday
     {
-        get => wednesday;
-        set => Set(ref wednesday, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? thursday;
 
     [FroniusProprietaryImport("Weekdays", "Thu")]
     public bool? Thursday
     {
-        get => thursday;
-        set => Set(ref thursday, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? friday;
 
     [FroniusProprietaryImport("Weekdays", "Fri")]
     public bool? Friday
     {
-        get => friday;
-        set => Set(ref friday, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? saturday;
 
     [FroniusProprietaryImport("Weekdays", "Sat")]
     public bool? Saturday
     {
-        get => saturday;
-        set => Set(ref saturday, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? sunday;
 
     [FroniusProprietaryImport("Weekdays", "Sun")]
     public bool? Sunday
     {
-        get => sunday;
-        set => Set(ref sunday, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? isActive;
 
     [FroniusProprietaryImport("Active", FroniusDataType.Root)]
     public bool? IsActive
     {
-        get => isActive;
-        set => Set(ref isActive, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private int? power;
 
     [FroniusProprietaryImport("Power", FroniusDataType.Root)]
     public int? Power
     {
-        get => power;
-        set => Set(ref power, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private ChargingRuleType? ruleType;
     [FroniusProprietaryImport("ScheduleType", FroniusDataType.Root)]
     public ChargingRuleType? RuleType
     {
-        get => ruleType;
-        set => Set(ref ruleType, value);
+        get;
+        set => Set(ref field, value);
     }
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]

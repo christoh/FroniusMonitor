@@ -51,24 +51,21 @@ public class FritzBoxDevice : BindableBase, IPowerConsumer1P
     [XmlIgnore]
     public IFritzBoxService? FritzBoxService { private get; set; }
 
-    private uint id;
     [XmlAttribute("id")]
     public uint Id
     {
-        get => id;
-        set => Set(ref id, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private uint functionMask;
 
     // ReSharper disable once StringLiteralTypo
     [XmlAttribute("functionbitmask")]
     public uint FunctionMask
     {
-        get => functionMask;
-        set => Set(ref functionMask, value, () => NotifyOfPropertyChange(nameof(Features)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(Features)));
     }
-    
+
     [XmlIgnore]
     public FritzBoxFeatures Features
     {
@@ -76,123 +73,99 @@ public class FritzBoxDevice : BindableBase, IPowerConsumer1P
         set => FunctionMask = (uint)value;
     }
 
-    private string ain = string.Empty;
-
     [XmlAttribute("identifier")]
     public string Ain
     {
-        get => ain;
-        set => Set(ref ain, value);
-    }
-
-    private string? firmwareVersionString;
+        get;
+        set => Set(ref field, value);
+    } = string.Empty;
 
     // ReSharper disable once StringLiteralTypo
     [XmlAttribute("fwversion")]
     public string? FirmwareVersionString
     {
-        get => firmwareVersionString;
-        set => Set(ref firmwareVersionString, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private string? manufacturer;
 
     [XmlAttribute("manufacturer")]
     public string? Manufacturer
     {
-        get => manufacturer;
-        set => Set(ref manufacturer, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private string? model;
 
     // ReSharper disable once StringLiteralTypo
     [XmlAttribute("productname")]
     public string? Model
     {
-        get => model;
-        set => Set(ref model, value);
+        get;
+        set => Set(ref field, value);
     }
 
     public bool CanSwitch => (Features & FritzBoxFeatures.TurnOnOff) != FritzBoxFeatures.None;
 
-    private string displayName = string.Empty;
-
     [XmlElement("name")]
     public string DisplayName
     {
-        get => displayName;
-        set => Set(ref displayName, value);
-    }
-
-    private bool isBusy;
+        get;
+        set => Set(ref field, value);
+    } = string.Empty;
 
     [XmlElement("txbusy")]
     public bool IsBusy
     {
-        get => isBusy;
-        set => Set(ref isBusy, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool isPresent;
 
     [XmlElement("present")]
     public bool IsPresent
     {
-        get => isPresent;
-        set => Set(ref isPresent, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private FritzBoxSwitch? @switch;
 
     [XmlElement("switch")]
     public FritzBoxSwitch? Switch
     {
-        get => @switch;
-        set => Set(ref @switch, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private FritzBoxLevel? levelControl;
     [XmlElement("levelcontrol")]
     public FritzBoxLevel? LevelControl
     {
-        get => levelControl;
-        set => Set(ref levelControl, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private FritzBoxSimpleSwitch? simpleSwitch;
 
     [XmlElement("simpleonoff")]
     public FritzBoxSimpleSwitch? SimpleSwitch
     {
-        get => simpleSwitch;
-        set => Set(ref simpleSwitch, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private FritzBoxPowerMeter? powerMeter;
 
     [XmlElement("powermeter")]
     public FritzBoxPowerMeter? PowerMeter
     {
-        get => powerMeter;
-        set => Set(ref powerMeter, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private FritzBoxTemperatureSensor? temperatureSensor;
 
     [XmlElement("temperature")]
     public FritzBoxTemperatureSensor? TemperatureSensor
     {
-        get => temperatureSensor;
-        set => Set(ref temperatureSensor, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private FritzBoxColorControl? color;
     [XmlElement("colorcontrol")]
     public FritzBoxColorControl? Color
     {
-        get => color;
-        set => Set(ref color, value);
+        get;
+        set => Set(ref field, value);
     }
 
     private bool IsPresentAndUnlocked => IsPresent && (Switch is not { IsUiLocked: { } } || !Switch.IsUiLocked.Value);

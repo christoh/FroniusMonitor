@@ -10,13 +10,11 @@ public enum FritzBoxSwitching
 [XmlType("switch")]
 public class FritzBoxSwitch : BindableBase
 {
-    private string? isTurnedOnString;
-
     [XmlElement("state")]
     public string? IsTurnedOnString
     {
-        get => isTurnedOnString;
-        set => Set(ref isTurnedOnString, value, () => NotifyOfPropertyChange(nameof(IsTurnedOn)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(IsTurnedOn)));
     }
 
     [XmlIgnore]
@@ -26,22 +24,18 @@ public class FritzBoxSwitch : BindableBase
         set => IsTurnedOnString = FritzBoxDevice.GetStringState(value);
     }
 
-    private FritzBoxSwitching? switching;
-
     [XmlElement("mode")]
     public FritzBoxSwitching? Switching
     {
-        get => switching;
-        set => Set(ref switching, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private string? isUiLockedString;
 
     [XmlElement("lock")]
     public string? IsUiLockedString
     {
-        get => isUiLockedString;
-        set => Set(ref isUiLockedString, value, () => NotifyOfPropertyChange(nameof(IsUiLocked)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(IsUiLocked)));
     }
 
     [XmlIgnore]
@@ -51,13 +45,11 @@ public class FritzBoxSwitch : BindableBase
         set => IsUiLockedString = FritzBoxDevice.GetStringState(value);
     }
 
-    private string? isDeviceLockedString;
-
     [XmlElement("devicelock")]
     public string? IsDeviceLockedString
     {
-        get => isDeviceLockedString;
-        set => Set(ref isDeviceLockedString, value, () => NotifyOfPropertyChange(nameof(IsDeviceLocked)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(IsDeviceLocked)));
     }
 
     [XmlIgnore]
@@ -72,13 +64,11 @@ public class FritzBoxSwitch : BindableBase
 [XmlType("simpleonoff")]
 public class FritzBoxSimpleSwitch : BindableBase
 {
-    private string? isTurnedOnString;
-
     [XmlElement("state")]
     public string? IsTurnedOnString
     {
-        get => isTurnedOnString;
-        set => Set(ref isTurnedOnString, value, () => NotifyOfPropertyChange(nameof(IsTurnedOn)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(IsTurnedOn)));
     }
 
     [XmlIgnore]

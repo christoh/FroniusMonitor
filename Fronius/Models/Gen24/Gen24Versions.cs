@@ -4,93 +4,81 @@
 //TODO: This class is incomplete
 public class Gen24Versions : BindableBase
 {
-    private Version? commandApi;
     [FroniusProprietaryImport("apiversions", "commandsApi")]
     public Version? CommandApi
     {
-        get => commandApi;
-        set => Set(ref commandApi, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private Version? configApi;
     [FroniusProprietaryImport("apiversions", "configApi")]
     public Version? ConfigApi
     {
-        get => configApi;
-        set => Set(ref configApi, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private Version? setupAppApi;
     [FroniusProprietaryImport("apiversions", "setupAppApi")]
     public Version? SetupAppApi
     {
-        get => setupAppApi;
-        set => Set(ref setupAppApi, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private Version? statusApi;
     [FroniusProprietaryImport("apiversions", "statusApi")]
     public Version? StatusApi
     {
-        get => statusApi;
-        set => Set(ref statusApi, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private Version? updateApi;
     [FroniusProprietaryImport("apiversions", "updateApi")]
     public Version? UpdateApi
     {
-        get => updateApi;
-        set => Set(ref updateApi, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private string? modelName;
     [FroniusProprietaryImport("devicename", FroniusDataType.Root)]
     public string? ModelName
     {
-        get => modelName;
-        set => Set(ref modelName, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private string? articleNumber;
     [FroniusProprietaryImport("articleNumber", FroniusDataType.Root)]
     public string? ArticleNumber
     {
-        get => articleNumber;
-        set => Set(ref articleNumber, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private string? commonName;
     [FroniusProprietaryImport("commonName", FroniusDataType.Root)]
     public string? CommonName
     {
-        get => commonName;
-        set => Set(ref commonName, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private string? serialNumber;
     [FroniusProprietaryImport("serialNumber", FroniusDataType.Root)]
     public string? SerialNumber
     {
-        get => serialNumber;
-        set => Set(ref serialNumber, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private byte? numberOfPhases;
     [FroniusProprietaryImport("numberOfPhases", FroniusDataType.Root)]
     public byte? NumberOfPhases
     {
-        get => numberOfPhases;
-        set => Set(ref numberOfPhases, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private IDictionary<string, Version> swVersions = new Dictionary<string, Version>();
 
     public IDictionary<string, Version> SwVersions
     {
-        get => swVersions;
-        set => Set(ref swVersions, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = new Dictionary<string, Version>();
 
     public static Gen24Versions Parse(JToken token)
     {

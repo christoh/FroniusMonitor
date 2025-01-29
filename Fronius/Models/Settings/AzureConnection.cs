@@ -18,23 +18,19 @@ public enum TunnelMode : byte
 
 public class AzureConnection : WebConnection
 {
-    private TunnelMode tunnelMode = TunnelMode.Auto;
-
     [XmlAttribute("TunnelMode"), DefaultValue(TunnelMode.Auto)]
     public TunnelMode TunnelMode
     {
-        get => tunnelMode;
-        set => Set(ref tunnelMode, value,NotifyProtocols);
-    }
-
-    private Protocol protocol = Protocol.Amqp;
+        get;
+        set => Set(ref field, value, NotifyProtocols);
+    } = TunnelMode.Auto;
 
     [XmlAttribute("Protocol"), DefaultValue(Protocol.Amqp)]
     public Protocol Protocol
     {
-        get => protocol;
-        set => Set(ref protocol, value, NotifyProtocols);
-    }
+        get;
+        set => Set(ref field, value, NotifyProtocols);
+    } = Protocol.Amqp;
 
     public bool CanUseTunnel => Protocol != Protocol.Http1;
 

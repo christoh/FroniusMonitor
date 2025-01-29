@@ -21,7 +21,6 @@ public enum SiteType : sbyte
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public class Gen24PowerFlow : Gen24DeviceBase
 {
-    private SiteType? siteType;
     private static readonly IList<SmartMeterCalibrationHistoryItem>? history = IoC.TryGet<IDataCollectionService>()?.SmartMeterHistory!;
     private static int oldSmartMeterHistoryCountProduced;
     private static int oldSmartMeterHistoryCountConsumed;
@@ -29,67 +28,53 @@ public class Gen24PowerFlow : Gen24DeviceBase
     [FroniusProprietaryImport("state", FroniusDataType.Attribute)]
     public SiteType? SiteType
     {
-        get => siteType;
-        set => Set(ref siteType, value);
+        get;
+        set => Set(ref field, value);
     }
 
     public string? SiteTypeDisplayName => SiteType?.ToDisplayName();
 
-    private string? backupModeDisplayName;
-
     [FroniusProprietaryImport("BackupMode", FroniusDataType.Attribute)]
     public string? BackupModeDisplayName
     {
-        get => backupModeDisplayName;
-        set => Set(ref backupModeDisplayName, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private double? inverterLifeTimeEnergyProduced;
 
     [FroniusProprietaryImport("ACBRIDGE_ENERGYACTIVE_PRODUCED_SUM_U64", Unit.Joule)]
     public double? InverterLifeTimeEnergyProduced
     {
-        get => inverterLifeTimeEnergyProduced;
-        set => Set(ref inverterLifeTimeEnergyProduced, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private double? inverterPowerNominal;
 
     [FroniusProprietaryImport("ACBRIDGE_POWERACTIVE_AC_NOMINAL_F64")]
     public double? InverterPowerNominal
     {
-        get => inverterPowerNominal;
-        set => Set(ref inverterPowerNominal, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private double? storagePowerConfigured;
 
     [FroniusProprietaryImport("BAT_POWERACTIVE_DC_CONFIGURED_F64")]
     public double? StoragePowerConfigured
     {
-        get => storagePowerConfigured;
-        set => Set(ref storagePowerConfigured, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private double? storagePower;
 
     [FroniusProprietaryImport("BAT_POWERACTIVE_MEAN_SUM_F64")]
     public double? StoragePower
     {
-        get => storagePower;
-        set => Set(ref storagePower, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private double? loadPower;
 
     [FroniusProprietaryImport("GRID_POWERACTIVE_LOAD_MEAN_SUM_F64")]
     public double? LoadPower
     {
-        get => loadPower;
-        set => Set(ref loadPower, value, () => NotifyOfPropertyChange(nameof(LoadPowerCorrected)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(LoadPowerCorrected)));
     }
-
-    private static double consumedFactor = 1;
 
     private static double ConsumedFactor
     {
@@ -97,15 +82,13 @@ public class Gen24PowerFlow : Gen24DeviceBase
         {
             if (history != null && oldSmartMeterHistoryCountConsumed != history.Count)
             {
-                consumedFactor = CalculateSmartMeterFactor(false);
+                field = CalculateSmartMeterFactor(false);
                 oldSmartMeterHistoryCountConsumed = history.Count;
             }
 
-            return consumedFactor;
+            return field;
         }
-    }
-
-    private static double producedFactor = 1;
+    } = 1;
 
     private static double ProducedFactor
     {
@@ -113,56 +96,48 @@ public class Gen24PowerFlow : Gen24DeviceBase
         {
             if (history != null && oldSmartMeterHistoryCountProduced != history.Count)
             {
-                producedFactor = CalculateSmartMeterFactor(true);
+                field = CalculateSmartMeterFactor(true);
                 oldSmartMeterHistoryCountProduced = history.Count;
             }
 
-            return producedFactor;
+            return field;
         }
-    }
+    } = 1;
 
     public double? LoadPowerCorrected => LoadPower + GridPower - GridPowerCorrected;
 
     public double? GridPowerCorrected => GridPower * (GridPower < 0 ? ProducedFactor : ConsumedFactor);
 
-    private double? inverterAcPower;
-
     [FroniusProprietaryImport("GRID_POWERACTIVE_GENERATED_MEAN_SUM_F64")]
     public double? InverterAcPower
     {
-        get => inverterAcPower;
-        set => Set(ref inverterAcPower, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private double? gridPower;
 
     [FroniusProprietaryImport("GRID_POWERACTIVE_MEAN_SUM_F64")]
     public double? GridPower
     {
-        get => gridPower;
-        set => Set(ref gridPower, value, () =>
+        get;
+        set => Set(ref field, value, () =>
         {
             NotifyOfPropertyChange(nameof(GridPowerCorrected));
             NotifyOfPropertyChange(nameof(LoadPowerCorrected));
         });
     }
 
-    private double? solarPower;
-
     [FroniusProprietaryImport("PV_POWERACTIVE_MEAN_SUM_F64")]
     public double? SolarPower
     {
-        get => solarPower;
-        set => Set(ref solarPower, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private string? mainInverterId;
 
     [FroniusProprietaryImport("main", FroniusDataType.Attribute)]
     public string? MainInverterId
     {
-        get => mainInverterId;
-        set => Set(ref mainInverterId, value);
+        get;
+        set => Set(ref field, value);
     }
 
     [JsonIgnore]

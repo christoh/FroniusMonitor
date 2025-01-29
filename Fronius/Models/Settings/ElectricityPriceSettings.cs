@@ -4,29 +4,26 @@ public class ElectricityPriceSettings : BindableBase
 {
     public event EventHandler<ElectricityPriceService>? ElectricityPriceServiceChanged;
 
-    private ElectricityPriceService service = ElectricityPriceService.Awattar;
     [XmlAttribute]
     public ElectricityPriceService Service
     {
-        get => service;
-        set => Set(ref service, value, () => Task.Run(() => ElectricityPriceServiceChanged?.Invoke(this, value)));
-    }
+        get;
+        set => Set(ref field, value, () => Task.Run(() => ElectricityPriceServiceChanged?.Invoke(this, value)));
+    } = ElectricityPriceService.Awattar;
 
-    private decimal priceFactorBuy = 1;
     [XmlIgnore]
     public decimal PriceFactorBuy
     {
-        get => priceFactorBuy;
-        set => Set(ref priceFactorBuy, value, () => NotifyOfPropertyChange(nameof(PriceSurchargeBuyPercent)));
-    }
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(PriceSurchargeBuyPercent)));
+    } = 1;
 
-    private decimal priceOffsetBuy;
     //[DefaultValue(0m)]
     [XmlAttribute]
     public decimal PriceOffsetBuy
     {
-        get => priceOffsetBuy;
-        set => Set(ref priceOffsetBuy, value);
+        get;
+        set => Set(ref field, value);
     }
 
     [XmlAttribute("PriceSurchargeBuy")]
@@ -36,17 +33,16 @@ public class ElectricityPriceSettings : BindableBase
         set => PriceFactorBuy = 1 + value / 100;
     }
 
-    private decimal vatFactor = 1.19m;
     [XmlIgnore]
     public decimal VatFactor
     {
-        get => vatFactor;
-        set => Set(ref vatFactor, value, () =>
+        get;
+        set => Set(ref field, value, () =>
         {
             NotifyOfPropertyChange(nameof(VatRatePercent));
             NotifyOfPropertyChange(nameof(VatRate));
         });
-    }
+    } = 1.19m;
 
     [XmlAttribute(nameof(VatRate))]
     public decimal VatRatePercent
@@ -62,13 +58,12 @@ public class ElectricityPriceSettings : BindableBase
         set => VatFactor = 1 + value;
     }
 
-    private AwattarCountry priceRegion = AwattarCountry.GermanyLuxembourg;
     [XmlAttribute]
     public AwattarCountry PriceRegion
     {
-        get => priceRegion;
-        set => Set(ref priceRegion, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = AwattarCountry.GermanyLuxembourg;
 
     public void CopyFrom(ElectricityPriceSettings other)
     {

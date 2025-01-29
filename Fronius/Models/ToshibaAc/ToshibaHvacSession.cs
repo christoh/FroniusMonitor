@@ -2,49 +2,40 @@
 
 public class ToshibaHvacSession : BindableBase
 {
-    private Guid consumerId;
-
     [JsonPropertyName("consumerId")]
     [JsonRequired]
     public Guid ConsumerId
     {
-        get => consumerId;
-        set => Set(ref consumerId, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private string accessToken = string.Empty;
 
     [JsonPropertyName("access_token")]
     [JsonRequired]
     public string AccessToken
     {
-        get => accessToken;
-        set => Set(ref accessToken, value);
-    }
-
-    private string tokenType = string.Empty;
+        get;
+        set => Set(ref field, value);
+    } = string.Empty;
 
     [JsonPropertyName("token_type")]
     public string TokenType
     {
-        get => tokenType;
-        set => Set(ref tokenType, value);
-    }
-
-    private string consumerMasterId = string.Empty;
+        get;
+        set => Set(ref field, value);
+    } = string.Empty;
 
     [JsonPropertyName("consumerMasterId")]
     public string ConsumerMasterId
     {
-        get => consumerMasterId;
-        set => Set(ref consumerMasterId, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = string.Empty;
 
-    private int countryId;
     [JsonPropertyName("countryId")]
     public int CountryId
     {
-        get => countryId;
-        set => Set(ref countryId, value);
+        get;
+        set => Set(ref field, value);
     }
 }

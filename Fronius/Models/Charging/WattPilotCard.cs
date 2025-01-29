@@ -4,34 +4,28 @@ namespace De.Hochstaetter.Fronius.Models.Charging;
 
 public class WattPilotCard : BindableBase, IHaveDisplayName
 {
-    private string? name;
-
     [WattPilot("name")]
     [JsonProperty("name")]
     public string? Name
     {
-        get => name;
-        set => Set(ref name, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private double? energy;
 
     [WattPilot("energy")]
     [JsonProperty("energy")]
     public double? Energy
     {
-        get => energy;
-        set => Set(ref energy, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? haveCardId;
 
     [WattPilot("cardId")]
     [JsonProperty("cardId")]
     public bool? HaveCardId
     {
-        get => haveCardId;
-        set => Set(ref haveCardId, value);
+        get;
+        set => Set(ref field, value);
     }
 
     public string DisplayName => $"{Name ?? Resources.Unknown}: {Energy ?? 0} / {(HaveCardId.HasValue ? HaveCardId.Value : Resources.Unknown)}";

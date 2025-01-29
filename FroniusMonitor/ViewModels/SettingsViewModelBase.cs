@@ -15,31 +15,25 @@ public abstract class SettingsViewModelBase : ViewModelBase
         DataCollectionService = dataCollectionService;
     }
 
-    private IDataCollectionService dataCollectionService = null!;
-
     public IDataCollectionService DataCollectionService
     {
-        get => dataCollectionService;
-        set => Set(ref dataCollectionService, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = null!;
 
     public IGen24Service Gen24Service { get; }
     public IFritzBoxService FritzBoxService { get; }
 
-    private string toastText = string.Empty;
-
     public string ToastText
     {
-        get => toastText;
-        set => Set(ref toastText, value);
-    }
-
-    private bool isInUpdate;
+        get;
+        set => Set(ref field, value);
+    } = string.Empty;
 
     public bool IsInUpdate
     {
-        get => isInUpdate;
-        set => Set(ref isInUpdate, value);
+        get;
+        set => Set(ref field, value);
     }
 
     protected async Task<bool> UpdateInverter(string uri, JToken token)

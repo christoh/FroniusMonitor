@@ -39,20 +39,20 @@ public class SettingsViewModel(
 
     private bool isOkPressed;
 
-    private ICommand? okCommand;
-    public ICommand OkCommand => okCommand ??= new NoParameterCommand(Ok);
+    [field: AllowNull, MaybeNull]
+    public ICommand OkCommand => field ??= new NoParameterCommand(Ok);
 
-    private ICommand? changeDriftsFileCommand;
-    public ICommand ChangeDriftsFileCommand => changeDriftsFileCommand ??= new NoParameterCommand(ChangeDriftsFile);
+    [field: AllowNull, MaybeNull]
+    public ICommand ChangeDriftsFileCommand => field ??= new NoParameterCommand(ChangeDriftsFile);
 
-    private ICommand? changeEnergyHistoryFileCommand;
-    public ICommand ChangeEnergyHistoryFileCommand => changeEnergyHistoryFileCommand ??= new NoParameterCommand(ChangeEnergyHistoryFile);
+    [field: AllowNull, MaybeNull]
+    public ICommand ChangeEnergyHistoryFileCommand => field ??= new NoParameterCommand(ChangeEnergyHistoryFile);
 
-    private ICommand? choosePanelLayoutFileCommand;
-    public ICommand ChoosePanelLayoutFileCommand => choosePanelLayoutFileCommand ??= new NoParameterCommand(ChoosePanelLayoutFile);
+    [field: AllowNull, MaybeNull]
+    public ICommand ChoosePanelLayoutFileCommand => field ??= new NoParameterCommand(ChoosePanelLayoutFile);
 
-    private ICommand? deletePanelLayoutFileCommand;
-    public ICommand DeletePanelLayoutFileCommand => deletePanelLayoutFileCommand ??= new NoParameterCommand(() => Settings.CustomSolarPanelLayout = null);
+    [field: AllowNull, MaybeNull]
+    public ICommand DeletePanelLayoutFileCommand => field ??= new NoParameterCommand(() => Settings.CustomSolarPanelLayout = null);
 
     public IEnumerable<ListItemModel<Protocol>> AzureProtocols => azureProtocols;
 
@@ -93,23 +93,19 @@ public class SettingsViewModel(
 
     public bool CanUseTunnel => Settings.ToshibaAcConnection.CanUseTunnel;
 
-    private Settings settings = null!;
-
     public Settings Settings
     {
-        get => settings;
-        set => Set(ref settings, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = null!;
 
     public IEnumerable<ListItemModel<string?>> Cultures => cultures;
 
-    private ListItemModel<string?> selectedCulture = null!;
-
     public ListItemModel<string?> SelectedCulture
     {
-        get => selectedCulture;
-        set => Set(ref selectedCulture, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = null!;
 
     private IElectricityPriceService priceService = IoC.TryGet<IElectricityPriceService>()!;
 
@@ -119,13 +115,11 @@ public class SettingsViewModel(
         set => Set(ref priceService, value);
     }
 
-    private IEnumerable<ListItemModel<AwattarCountry>> priceRegions = [];
-
     public IEnumerable<ListItemModel<AwattarCountry>> PriceRegions
     {
-        get => priceRegions;
-        set => Set(ref priceRegions, value, () => NotifyOfPropertyChange(nameof(SelectedPriceRegion)));
-    }
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(SelectedPriceRegion)));
+    } = [];
 
     private static readonly IEnumerable<string> gen24UserNames = ["customer", "technician", "support"];
 

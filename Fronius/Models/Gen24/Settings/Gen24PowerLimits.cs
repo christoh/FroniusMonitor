@@ -3,22 +3,18 @@
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public class Gen24PowerLimits : Gen24ParsingBase
 {
-    private bool enableFailSafeMode;
-
     [FroniusProprietaryImport("failSafeModeEnabled", FroniusDataType.Root)]
     public bool EnableFailSafeMode
     {
-        get => enableFailSafeMode;
-        set => Set(ref enableFailSafeMode, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private Gen24PowerLimit activePower = new();
 
     public Gen24PowerLimit ActivePower
     {
-        get => activePower;
-        set => Set(ref activePower, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = new();
 
     //private Gen24PowerLimit? reactivePower;
 

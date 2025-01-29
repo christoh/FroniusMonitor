@@ -10,12 +10,10 @@
         private JObject? localEventToken, invariantEventToken;
         private JObject? localChannelToken, invariantChannelToken;
 
-        private WebConnection? connection;
-
         public WebConnection? Connection
         {
-            get => connection;
-            set => Set(ref connection, value, () =>
+            get;
+            set => Set(ref field, value, () =>
             {
                 lock (froniusHttpClientLockObject)
                 {

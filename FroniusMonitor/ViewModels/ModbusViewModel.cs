@@ -10,13 +10,11 @@ public class ModbusViewModel(
 {
     private Gen24ModbusSettings oldSettings = null!;
 
-    private Gen24ModbusSettings settings = null!;
-
     public Gen24ModbusSettings Settings
     {
-        get => settings;
-        set => Set(ref settings, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = null!;
 
     public IReadOnlyList<ModbusInterfaceRole> ModBusInterfaceRoles => Enum.GetValues<ModbusInterfaceRole>();
 
@@ -24,28 +22,22 @@ public class ModbusViewModel(
 
     public IReadOnlyList<SunspecMode> SunspecModes => Enum.GetValues<SunspecMode>();
 
-    private string title = Loc.Modbus;
-
     public string Title
     {
-        get => title;
-        set => Set(ref title, value);
-    }
-
-    private bool enableTcp;
+        get;
+        set => Set(ref field, value);
+    } = Loc.Modbus;
 
     public bool EnableTcp
     {
-        get => enableTcp;
-        set => Set(ref enableTcp, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool enableDanger;
 
     public bool EnableDanger
     {
-        get => enableDanger;
-        set => Set(ref enableDanger, value, () =>
+        get;
+        set => Set(ref field, value, () =>
         {
             if (!value)
             {
@@ -57,11 +49,11 @@ public class ModbusViewModel(
         });
     }
 
-    private ICommand? applyCommand;
-    public ICommand ApplyCommand => applyCommand ??= new NoParameterCommand(Apply);
+    [field: AllowNull, MaybeNull]
+    public ICommand ApplyCommand => field ??= new NoParameterCommand(Apply);
 
-    private ICommand? undoCommand;
-    public ICommand UndoCommand => undoCommand ??= new NoParameterCommand(Undo);
+    [field: AllowNull, MaybeNull]
+    public ICommand UndoCommand => field ??= new NoParameterCommand(Undo);
 
     internal override async Task OnInitialize()
     {

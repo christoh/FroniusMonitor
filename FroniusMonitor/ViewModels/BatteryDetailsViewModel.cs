@@ -4,28 +4,22 @@ public class BatteryDetailsViewModel : ViewModelBase
 {
     public string Title => Loc.BatteryDetailsView + " " + Header;
 
-    private string header = string.Empty;
-
     public string Header
     {
-        get => header;
-        set => Set(ref header, value, () => NotifyOfPropertyChange(nameof(Title)));
-    }
-
-    private Gen24Storage? battery;
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(Title)));
+    } = string.Empty;
 
     public Gen24Storage? Battery
     {
-        get => battery;
-        set => Set(ref battery, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private HomeAutomationSystem? homeAutomationSystem;
 
     public HomeAutomationSystem? HomeAutomationSystem
     {
-        get => homeAutomationSystem;
-        set => Set(ref homeAutomationSystem, value);
+        get;
+        set => Set(ref field, value);
     }
 
     internal void OnNewDataReceived(HomeAutomationSystem? h)

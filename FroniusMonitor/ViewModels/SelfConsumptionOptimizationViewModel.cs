@@ -18,72 +18,58 @@ public class SelfConsumptionOptimizationViewModel
     public IEnumerable<ChargingRuleType> RuleTypes => ruleTypes;
 #pragma warning restore CA1822 // Mark members as static
 
-    private Gen24BatterySettings settings = null!;
+public Gen24BatterySettings Settings
+{
+    get;
+    set => Set(ref field, value);
+} = null!;
 
-    public Gen24BatterySettings Settings
+public bool EnableDanger
+{
+    get;
+    set => Set(ref field, value, () =>
     {
-        get => settings;
-        set => Set(ref settings, value);
-    }
-
-    private bool enableDanger;
-
-    public bool EnableDanger
-    {
-        get => enableDanger;
-        set => Set(ref enableDanger, value, () =>
+        if (!value)
         {
-            if (!value)
-            {
-                Settings.IsEnabled = oldSettings.IsEnabled;
-                Settings.IsInCalibration = oldSettings.IsInCalibration;
-                Settings.IsAcCoupled = oldSettings.IsAcCoupled;
-            }
-        });
-    }
+            Settings.IsEnabled = oldSettings.IsEnabled;
+            Settings.IsInCalibration = oldSettings.IsInCalibration;
+            Settings.IsAcCoupled = oldSettings.IsAcCoupled;
+        }
+    });
+}
 
-    public bool IsSecondary => ReferenceEquals(Gen24Service, DataCollectionService.Gen24Service2);
+public bool IsSecondary => ReferenceEquals(Gen24Service, DataCollectionService.Gen24Service2);
 
     public Gen24Storage? Storage => IsSecondary ? DataCollectionService.HomeAutomationSystem?.Gen24Sensors2?.Storage : DataCollectionService.HomeAutomationSystem?.Gen24Sensors?.Storage;
-    
-    private string title = Loc.EnergyFlow;
 
     public string Title
     {
-        get => title;
-        set => Set(ref title, value);
-    }
-
-    private double logGridPower;
+        get;
+        set => Set(ref field, value);
+    } = Loc.EnergyFlow;
 
     public double LogGridPower
     {
-        get => logGridPower;
-        set => Set(ref logGridPower, value, UpdateGridPower);
+        get;
+        set => Set(ref field, value, UpdateGridPower);
     }
-
-    private double logHomePower;
 
     public double LogHomePower
     {
-        get => logHomePower;
-        set => Set(ref logHomePower, value, UpdateHomePower);
+        get;
+        set => Set(ref field, value, UpdateHomePower);
     }
-
-    private int? batteryAcChargingMaxPower;
 
     public int? BatteryAcChargingMaxPower
     {
-        get => batteryAcChargingMaxPower;
-        set => Set(ref batteryAcChargingMaxPower, value, UpdateLogHomePower);
+        get;
+        set => Set(ref field, value, UpdateLogHomePower);
     }
-
-    private int? requestedGridPower;
 
     public int? RequestedGridPower
     {
-        get => requestedGridPower;
-        set => Set(ref requestedGridPower, value, UpdateLogGridPower);
+        get;
+        set => Set(ref field, value, UpdateLogGridPower);
     }
 
     private bool isFeedIn;
@@ -126,25 +112,23 @@ public class SelfConsumptionOptimizationViewModel
         });
     }
 
-    private BindableCollection<Gen24ChargingRule> chargingRules = null!;
-
     public BindableCollection<Gen24ChargingRule> ChargingRules
     {
-        get => chargingRules;
-        set => Set(ref chargingRules, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = null!;
 
-    private ICommand? undoCommand;
-    public ICommand UndoCommand => undoCommand ??= new NoParameterCommand(Undo);
+    [field: AllowNull, MaybeNull]
+    public ICommand UndoCommand => field ??= new NoParameterCommand(Undo);
 
-    private ICommand? applyCommand;
-    public ICommand ApplyCommand => applyCommand ??= new NoParameterCommand(Apply);
+    [field: AllowNull, MaybeNull]
+    public ICommand ApplyCommand => field ??= new NoParameterCommand(Apply);
 
-    private ICommand? deleteChargingRuleCommand;
-    public ICommand DeleteChargingRuleCommand => deleteChargingRuleCommand ??= new Command<Gen24ChargingRule>(DeleteChargingRule!);
+    [field: AllowNull, MaybeNull]
+    public ICommand DeleteChargingRuleCommand => field ??= new Command<Gen24ChargingRule>(DeleteChargingRule!);
 
-    private ICommand? addChargingRuleCommand;
-    public ICommand AddChargingRuleCommand => addChargingRuleCommand ??= new NoParameterCommand(AddChargingRule);
+    [field: AllowNull, MaybeNull]
+    public ICommand AddChargingRuleCommand => field ??= new NoParameterCommand(AddChargingRule);
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     internal override async Task OnInitialize()

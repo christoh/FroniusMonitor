@@ -2,21 +2,17 @@
 
 public class EventLogViewModel(IGen24Service gen24Service) : ViewModelBase
 {
-    private IOrderedEnumerable<Gen24Event>? events;
-
     public IOrderedEnumerable<Gen24Event>? Events
     {
-        get => events;
-        set => Set(ref events, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private string title = string.Empty;
 
     public string Title
     {
-        get => title;
-        set => Set(ref title, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = string.Empty;
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     internal override async Task OnInitialize()

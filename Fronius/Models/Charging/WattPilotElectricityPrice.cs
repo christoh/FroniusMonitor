@@ -5,24 +5,20 @@ namespace De.Hochstaetter.Fronius.Models.Charging
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public class WattPilotElectricityPrice : BindableBase, IElectricityPrice, ICloneable
     {
-        private decimal centsPerKiloWattHour;
-
         [JsonProperty("marketprice")]
         [WattPilot("marketprice")]
         public decimal CentsPerKiloWattHour
         {
-            get => centsPerKiloWattHour;
-            set => Set(ref centsPerKiloWattHour, value);
+            get;
+            set => Set(ref field, value);
         }
-
-        private long startSeconds;
 
         [JsonProperty("start")]
         [WattPilot("start")]
         public long StartSeconds
         {
-            get => startSeconds;
-            set => Set(ref startSeconds, value, () => NotifyOfPropertyChange(nameof(StartTime)));
+            get;
+            set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(StartTime)));
         }
 
         [Newtonsoft.Json.JsonIgnore]
@@ -32,14 +28,12 @@ namespace De.Hochstaetter.Fronius.Models.Charging
             set => StartSeconds = (long)Math.Round((value - DateTime.UnixEpoch).TotalSeconds, MidpointRounding.AwayFromZero);
         }
 
-        private long endSeconds;
-
         [JsonProperty("end")]
         [WattPilot("end")]
         public long EndSeconds
         {
-            get => endSeconds;
-            set => Set(ref endSeconds, value, () => NotifyOfPropertyChange(nameof(EndTime)));
+            get;
+            set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(EndTime)));
         }
 
         [Newtonsoft.Json.JsonIgnore]

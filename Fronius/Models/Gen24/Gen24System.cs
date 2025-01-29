@@ -4,20 +4,16 @@ namespace De.Hochstaetter.Fronius.Models.Gen24;
 
 public class Gen24System : BindableBase, IHaveDisplayName, IHaveUniqueId
 {
-    private Gen24Config? config;
-
     public Gen24Config? Config
     {
-        get => config;
-        set => Set(ref config, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private Gen24Sensors? sensors;
 
     public Gen24Sensors? Sensors
     {
-        get => sensors;
-        set => Set(ref sensors, value);
+        get;
+        set => Set(ref field, value);
     }
 
     [JsonIgnore] public IGen24Service Service { get; init; } = null!;

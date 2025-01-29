@@ -18,36 +18,28 @@ public enum MpptPowerMode : byte
 
 public abstract class Gen24MpptBase : BindableBase, ICloneable
 {
-    private MpptOnOff? dynamicPeakManager;
-
     public virtual MpptOnOff? DynamicPeakManager
     {
-        get => dynamicPeakManager;
-        set => Set(ref dynamicPeakManager, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private MpptPowerMode? powerMode;
 
     public virtual MpptPowerMode? PowerMode
     {
-        get => powerMode;
-        set => Set(ref powerMode, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private uint? wattPeak;
 
     public virtual uint? WattPeak
     {
-        get => wattPeak;
-        set => Set(ref wattPeak, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private double? dcFixedVoltage;
 
     public virtual double? DcFixedVoltage
     {
-        get => dcFixedVoltage;
-        set => Set(ref dcFixedVoltage, value);
+        get;
+        set => Set(ref field, value);
     }
 
     public virtual object Clone() => MemberwiseClone();

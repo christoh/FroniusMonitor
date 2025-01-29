@@ -7,12 +7,10 @@ namespace De.Hochstaetter.Fronius.Models.Charging;
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
 public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
 {
-    private bool isUpdating;
-
     public bool IsUpdating
     {
-        get => isUpdating;
-        set => Set(ref isUpdating, value, () =>
+        get;
+        set => Set(ref field, value, () =>
         {
             if
             (
@@ -29,182 +27,144 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         });
     }
 
-    private string? serialNumber;
-
     [FroniusProprietaryImport("serial", FroniusDataType.Root)]
     [WattPilot("sse")]
     public string? SerialNumber
     {
-        get => serialNumber;
-        set => Set(ref serialNumber, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? sendRfidSerialToCloud;
 
     [WattPilot("rde", false)]
     public bool? SendRfidSerialToCloud
     {
-        get => sendRfidSerialToCloud;
-        set => Set(ref sendRfidSerialToCloud, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? cloudWebSocketEnabled;
 
     [WattPilot("cwe", false)]
     public bool? CloudWebSocketEnabled
     {
-        get => cloudWebSocketEnabled;
-        set => Set(ref cloudWebSocketEnabled, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private string? lastRfidSerial;
 
     [WattPilot("lri")]
     public string? LastRfidSerial
     {
-        get => lastRfidSerial;
-        set => Set(ref lastRfidSerial, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private string? hostName;
 
     [FroniusProprietaryImport("hostname", FroniusDataType.Root)]
     [WattPilot("ffna")]
     public string? HostName
     {
-        get => hostName;
-        set => Set(ref hostName, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private AccessMode? accessMode;
 
     [WattPilot("acs", false)]
     public AccessMode? AccessMode
     {
-        get => accessMode;
-        set => Set(ref accessMode, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private CableLockStatus? cableLockStatus;
 
     [WattPilot("cus")]
     public CableLockStatus? CableLockStatus
     {
-        get => cableLockStatus;
-        set => Set(ref cableLockStatus, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private CableLockFeedback? cableLockFeedback;
 
     [WattPilot("ffb")]
     public CableLockFeedback? CableLockFeedback
     {
-        get => cableLockFeedback;
-        set => Set(ref cableLockFeedback, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private ChargingLogic? chargingLogic;
 
     [WattPilot("lmo", false)]
     public ChargingLogic? ChargingLogic
     {
-        get => chargingLogic;
-        set => Set(ref chargingLogic, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private string? deviceName;
 
     [WattPilot("fna", false)]
     [FroniusProprietaryImport("friendly_name", FroniusDataType.Root)]
     public string? DeviceName
     {
-        get => deviceName;
-        set => Set(ref deviceName, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private string? wattPilotSsid;
 
     [WattPilot("wan", false)]
     public string? WattPilotSsid
     {
-        get => wattPilotSsid;
-        set => Set(ref wattPilotSsid, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private string? wifiPassword;
 
     [WattPilot("wak", false)]
     public string? WifiPassword
     {
-        get => wifiPassword;
-        set => Set(ref wifiPassword, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? isWifiClientEnabled;
 
     [WattPilot("wen", false)]
     public bool? IsWifiClientEnabled
     {
-        get => isWifiClientEnabled;
-        set => Set(ref isWifiClientEnabled, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private string? manufacturer;
 
     [WattPilot("oem")]
     [FroniusProprietaryImport("manufacturer", FroniusDataType.Root)]
     public string? Manufacturer
     {
-        get => manufacturer;
-        set => Set(ref manufacturer, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private string? model;
 
     [WattPilot("typ")]
     [FroniusProprietaryImport("devicetype", FroniusDataType.Root)]
     public string? Model
     {
-        get => model;
-        set => Set(ref model, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private Version? version;
 
     [FroniusProprietaryImport("version", FroniusDataType.Root)]
     [WattPilot("fwv")]
     public Version? Version
     {
-        get => version;
-        set => Set(ref version, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private Version? latestVersion;
 
     [WattPilot("onv")]
     public Version? LatestVersion
     {
-        get => latestVersion;
-        set => Set(ref latestVersion, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private WattPilotInverter? inverter;
 
     [WattPilot("cci")]
     public WattPilotInverter? Inverter
     {
-        get => inverter;
-        set => Set(ref inverter, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private byte[]? map;
 
     [WattPilot("map", false, typeof(byte[]))]
     [JsonProperty("map")]
     public byte[]? Map
     {
-        get => map;
-        set => Set(ref map, value, () => NotifyOfPropertyChange(nameof(PhaseMap)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(PhaseMap)));
     }
 
     public WattPilotPhaseMap? PhaseMap
@@ -213,13 +173,11 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Map = value == null ? null : [value.L1Map, value.L2Map, value.L3Map];
     }
 
-    private int? wifiSignal;
-
     [WattPilot("rssi")]
     public int? WifiSignal
     {
-        get => wifiSignal;
-        set => Set(ref wifiSignal, value, () =>
+        get;
+        set => Set(ref field, value, () =>
         {
             if (CurrentWifi != null)
             {
@@ -228,76 +186,60 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         });
     }
 
-    private WifiScanStatus wifiScanStatus;
-
     [WattPilot("scas")]
     public WifiScanStatus WifiScanStatus
     {
-        get => wifiScanStatus;
-        set => Set(ref wifiScanStatus, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private WifiState wifiState;
 
     [WattPilot("wsms")]
     public WifiState WifiState
     {
-        get => wifiState;
-        set => Set(ref wifiState, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private List<WattPilotWifiInfo>? scannedWifis;
 
     [WattPilot("scan")]
     public List<WattPilotWifiInfo>? ScannedWifis
     {
-        get => scannedWifis;
-        set => Set(ref scannedWifis, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private int? protocol;
 
     [FroniusProprietaryImport("protocol", FroniusDataType.Root)]
     public int? Protocol
     {
-        get => protocol;
-        set => Set(ref protocol, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? isSecured;
 
     [FroniusProprietaryImport("secured", FroniusDataType.Root)]
     public bool? IsSecured
     {
-        get => isSecured;
-        set => Set(ref isSecured, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private double? temperatureConnector;
 
     [WattPilot("tma", 0)]
     public double? TemperatureConnector
     {
-        get => temperatureConnector;
-        set => Set(ref temperatureConnector, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private double? temperatureBoard;
 
     [WattPilot("tma", 1)]
     public double? TemperatureBoard
     {
-        get => temperatureBoard;
-        set => Set(ref temperatureBoard, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private double? voltageL1;
 
     [WattPilot("nrg", 0)]
     public double? VoltageL1
     {
-        get => voltageL1;
-        set => Set(ref voltageL1, value, () =>
+        get;
+        set => Set(ref field, value, () =>
         {
             NotifyOfPropertyChange(nameof(VoltageAverage));
             NotifyOfPropertyChange(nameof(MaximumChargingPowerPossibleSum));
@@ -305,13 +247,11 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         });
     }
 
-    private double? voltageL2;
-
     [WattPilot("nrg", 1)]
     public double? VoltageL2
     {
-        get => voltageL2;
-        set => Set(ref voltageL2, value, () =>
+        get;
+        set => Set(ref field, value, () =>
         {
             NotifyOfPropertyChange(nameof(VoltageAverage));
             NotifyOfPropertyChange(nameof(MaximumChargingPowerPossibleSum));
@@ -319,13 +259,11 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         });
     }
 
-    private double? voltageL3;
-
     [WattPilot("nrg", 2)]
     public double? VoltageL3
     {
-        get => voltageL3;
-        set => Set(ref voltageL3, value, () =>
+        get;
+        set => Set(ref field, value, () =>
         {
             NotifyOfPropertyChange(nameof(VoltageAverage));
             NotifyOfPropertyChange(nameof(MaximumChargingPowerPossibleSum));
@@ -333,51 +271,41 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         });
     }
 
-    private double? voltageL0;
-
     [WattPilot("nrg", 3)]
     public double? VoltageL0
     {
-        get => voltageL0;
-        set => Set(ref voltageL0, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private double? currentL1;
 
     [WattPilot("nrg", 4)]
     public double? CurrentL1
     {
-        get => currentL1;
-        set => Set(ref currentL1, value, () => NotifyOfPropertyChange(nameof(CurrentSum)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(CurrentSum)));
     }
-
-    private double? currentL2;
 
     [WattPilot("nrg", 5)]
     public double? CurrentL2
     {
-        get => currentL2;
-        set => Set(ref currentL2, value, () => NotifyOfPropertyChange(nameof(CurrentSum)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(CurrentSum)));
     }
-
-    private double? currentL3;
 
     [WattPilot("nrg", 6)]
     public double? CurrentL3
     {
-        get => currentL3;
-        set => Set(ref currentL3, value, () => NotifyOfPropertyChange(nameof(CurrentSum)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(CurrentSum)));
     }
 
     public double? CurrentSum => CurrentL1 + CurrentL2 + CurrentL3;
 
-    private double? powerL1;
-
     [WattPilot("nrg", 7)]
     public double? PowerL1
     {
-        get => powerL1;
-        set => Set(ref powerL1, value, () =>
+        get;
+        set => Set(ref field, value, () =>
         {
             NotifyOfPropertyChange(nameof(PowerSum));
             NotifyOfPropertyChange(nameof(PowerL1KiloWatts));
@@ -386,13 +314,11 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         });
     }
 
-    private double? powerL2;
-
     [WattPilot("nrg", 8)]
     public double? PowerL2
     {
-        get => powerL2;
-        set => Set(ref powerL2, value, () =>
+        get;
+        set => Set(ref field, value, () =>
         {
             NotifyOfPropertyChange(nameof(PowerSum));
             NotifyOfPropertyChange(nameof(PowerL2KiloWatts));
@@ -401,13 +327,11 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         });
     }
 
-    private double? powerL3;
-
     [WattPilot("nrg", 9)]
     public double? PowerL3
     {
-        get => powerL3;
-        set => Set(ref powerL3, value, () =>
+        get;
+        set => Set(ref field, value, () =>
         {
             NotifyOfPropertyChange(nameof(PowerSum));
             NotifyOfPropertyChange(nameof(PowerL3KiloWatts));
@@ -416,13 +340,11 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         });
     }
 
-    private double? powerL0;
-
     [WattPilot("nrg", 10)]
     public double? PowerL0
     {
-        get => powerL0;
-        set => Set(ref powerL0, value);
+        get;
+        set => Set(ref field, value);
     }
 
     public double PowerSum => (PowerL1 ?? 0) + (PowerL2 ?? 0) + (PowerL3 ?? 0);
@@ -435,49 +357,39 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
 
     public double? VoltageAverage => (VoltageL1 + VoltageL2 + VoltageL3) / 3;
 
-    private double? powerTotal;
-
     [WattPilot("nrg", 11)]
     public double? PowerTotal
     {
-        get => powerTotal;
-        set => Set(ref powerTotal, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private double? powerFactorPercentL1;
 
     [WattPilot("nrg", 12)]
     public double? PowerFactorPercentL1
     {
-        get => powerFactorPercentL1;
-        set => Set(ref powerFactorPercentL1, value, () => NotifyOfPropertyChange(nameof(PowerFactorL1)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(PowerFactorL1)));
     }
-
-    private double? powerFactorPercentL2;
 
     [WattPilot("nrg", 13)]
     public double? PowerFactorPercentL2
     {
-        get => powerFactorPercentL2;
-        set => Set(ref powerFactorPercentL2, value, () => NotifyOfPropertyChange(nameof(PowerFactorL2)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(PowerFactorL2)));
     }
-
-    private double? powerFactorPercentL3;
 
     [WattPilot("nrg", 14)]
     public double? PowerFactorPercentL3
     {
-        get => powerFactorPercentL3;
-        set => Set(ref powerFactorPercentL3, value, () => NotifyOfPropertyChange(nameof(PowerFactorL3)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(PowerFactorL3)));
     }
-
-    private double? powerFactorPercentN;
 
     [WattPilot("nrg", 15)]
     public double? PowerFactorPercentN
     {
-        get => powerFactorPercentN;
-        set => Set(ref powerFactorPercentN, value, () => NotifyOfPropertyChange(nameof(PowerFactorL0)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(PowerFactorL0)));
     }
 
     public double? PowerFactorL1 => PowerFactorPercentL1 / 100;
@@ -485,61 +397,47 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     public double? PowerFactorL3 => PowerFactorPercentL3 / 100;
     public double? PowerFactorL0 => PowerFactorPercentN / 100;
 
-    private bool? l1ChargerEnabled;
-
     [WattPilot("pha", 0)]
     public bool? L1ChargerEnabled
     {
-        get => l1ChargerEnabled;
-        set => Set(ref l1ChargerEnabled, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? l2ChargerEnabled;
 
     [WattPilot("pha", 1)]
     public bool? L2ChargerEnabled
     {
-        get => l2ChargerEnabled;
-        set => Set(ref l2ChargerEnabled, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? l3ChargerEnabled;
 
     [WattPilot("pha", 2)]
     public bool? L3ChargerEnabled
     {
-        get => l3ChargerEnabled;
-        set => Set(ref l3ChargerEnabled, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? l1CableEnabled;
 
     [WattPilot("pha", 3)]
     public bool? L1CableEnabled
     {
-        get => l1CableEnabled;
-        set => Set(ref l1CableEnabled, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? l2CableEnabled;
 
     [WattPilot("pha", 4)]
     public bool? L2CableEnabled
     {
-        get => l2CableEnabled;
-        set => Set(ref l2CableEnabled, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? l3CableEnabled;
 
     [WattPilot("pha", 5)]
     public bool? L3CableEnabled
     {
-        get => l3CableEnabled;
-        set => Set(ref l3CableEnabled, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private byte? numberOfCarPhases;
 
     /// <summary>
     ///     Only updated when in Eco mode
@@ -547,33 +445,27 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [WattPilot("pnp")]
     public byte? NumberOfCarPhases
     {
-        get => numberOfCarPhases;
-        set => Set(ref numberOfCarPhases, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private ModelStatus? status;
 
     [WattPilot("modelStatus")]
     public ModelStatus? Status
     {
-        get => status;
-        set => Set(ref status, value, () => NotifyOfPropertyChange(nameof(StatusDisplayName)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(StatusDisplayName)));
     }
 
     public string? StatusDisplayName => Status?.ToDisplayName();
 
-    private ModelStatus? statusInternal;
-
     [WattPilot("msi")]
     public ModelStatus? StatusInternal
     {
-        get => statusInternal;
-        set => Set(ref statusInternal, value, () => NotifyOfPropertyChange(nameof(StatusInternalDisplayName)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(StatusInternalDisplayName)));
     }
 
     public string? StatusInternalDisplayName => StatusInternal?.ToDisplayName();
-
-    private byte? minimumChargingCurrent;
 
     /// <summary>
     ///     Normally 6A. Can be changed to a higher value if your car can not handle 6A
@@ -581,11 +473,9 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [WattPilot("mca", false)]
     public byte? MinimumChargingCurrent
     {
-        get => minimumChargingCurrent;
-        set => Set(ref minimumChargingCurrent, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private int? minimumChargingInterval;
 
     /// <summary>
     ///     Charge the car at least every amount of milliseconds. Use this if you car disconnects after it has not been charged
@@ -594,11 +484,9 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [WattPilot("mci", false)]
     public int? MinimumChargingInterval
     {
-        get => minimumChargingInterval;
-        set => Set(ref minimumChargingInterval, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private int? minimumPauseDuration;
 
     /// <summary>
     ///     Charging pause duration in milliseconds. Some cars need a minimum pause duration before charging can continue. Set
@@ -607,20 +495,16 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [WattPilot("mcpd", false)]
     public int? MinimumPauseDuration
     {
-        get => minimumPauseDuration;
-        set => Set(ref minimumPauseDuration, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? allowChargingPause;
 
     [WattPilot("fap", false)] //go-eCharger uses "acp" for this
     public bool? AllowChargingPause
     {
-        get => allowChargingPause;
-        set => Set(ref allowChargingPause, value, () => NotifyOfPropertyChange(nameof(AllowPauseAndHasPhaseSwitch)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(AllowPauseAndHasPhaseSwitch)));
     }
-
-    private AwattarCountry energyPriceCountry;
 
     /// <summary>
     ///     Used to get the correct market price for energy
@@ -628,9 +512,9 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [WattPilot("awc", false)]
     public AwattarCountry EnergyPriceCountry
     {
-        get => energyPriceCountry;
+        get;
 
-        set => Set(ref energyPriceCountry, value, () =>
+        set => Set(ref field, value, () =>
         {
             //if (IoC.TryGetRegistered<IElectricityPriceService>() is WattPilotElectricityService wattPilotElectricityPriceService)
             //{
@@ -639,19 +523,15 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         });
     }
 
-    private float? maxEnergyPrice;
-
     /// <summary>
     ///     Maximum energy price to allow charging in ct/kWh
     /// </summary>
     [WattPilot("awp", false)]
     public float? MaxEnergyPrice
     {
-        get => maxEnergyPrice;
-        set => Set(ref maxEnergyPrice, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? simulateUnplugging;
 
     /// <summary>
     ///     Some cars need this. If yours does not, leave it to false
@@ -659,11 +539,9 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [WattPilot("su", false)]
     public bool? SimulateUnplugging
     {
-        get => simulateUnplugging;
-        set => Set(ref simulateUnplugging, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? simulateUnpluggingAlways;
 
     /// <summary>
     ///     Unclear, what this is good for. The app only uses <see cref="SimulateUnplugging" />
@@ -671,11 +549,9 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [WattPilot("sua", false)]
     public bool? SimulateUnpluggingAlways
     {
-        get => simulateUnpluggingAlways;
-        set => Set(ref simulateUnpluggingAlways, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private int? minimumTimeBetweenPhaseSwitches;
 
     /// <summary>
     ///     Minimum time before a phase switch occurs in milliseconds
@@ -683,11 +559,9 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [WattPilot("mptwt", false)]
     public int? MinimumTimeBetweenPhaseSwitches
     {
-        get => minimumTimeBetweenPhaseSwitches;
-        set => Set(ref minimumTimeBetweenPhaseSwitches, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private int? phaseSwitchTriggerTime;
 
     /// <summary>
     ///     Minimum time in milliseconds the PV surplus must be above or below <see cref="PhaseSwitchPower" /> before the phase
@@ -696,11 +570,9 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [WattPilot("mpwst", false)]
     public int? PhaseSwitchTriggerTime
     {
-        get => phaseSwitchTriggerTime;
-        set => Set(ref phaseSwitchTriggerTime, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private float? phaseSwitchPower;
 
     /// <summary>
     ///     If PV surplus is above that power, switch to 3 phases. If PV surplus is below, switch to 1 phase.
@@ -709,13 +581,11 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [WattPilot("spl3", false)]
     public float? PhaseSwitchPower
     {
-        get => phaseSwitchPower;
-        set => Set(ref phaseSwitchPower, value);
+        get;
+        set => Set(ref field, value);
     }
 
     public bool? AllowPauseAndHasPhaseSwitch => PhaseSwitchMode == Charging.PhaseSwitchMode.Auto && AllowChargingPause.HasValue && AllowChargingPause.Value;
-
-    private int? nextTripTime;
 
     /// <summary>
     ///     Next trip departure time in seconds from day start (local-time)
@@ -723,11 +593,9 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [WattPilot("ftt", false)]
     public int? NextTripTime
     {
-        get => nextTripTime;
-        set => Set(ref nextTripTime, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private int? nextTripEnergyToCharge;
 
     /// <summary>
     ///     Next trip minimum energy to charge
@@ -735,83 +603,65 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [WattPilot("fte", false)]
     public int? NextTripEnergyToCharge
     {
-        get => nextTripEnergyToCharge;
-        set => Set(ref nextTripEnergyToCharge, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? nextTripRemainInEcoMode;
 
     [WattPilot("fre", false)]
     public bool? NextTripRemainInEcoMode
     {
-        get => nextTripRemainInEcoMode;
-        set => Set(ref nextTripRemainInEcoMode, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? enableGridMonitoringOnStartUp;
 
     [WattPilot("rsre", false)]
     public bool? EnableGridMonitoringOnStartUp
     {
-        get => enableGridMonitoringOnStartUp;
-        set => Set(ref enableGridMonitoringOnStartUp, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private int gridMonitoringTimeOnStartUp;
 
     [WattPilot("gmtr", false)]
     public int GridMonitoringTimeOnStartUp
     {
-        get => gridMonitoringTimeOnStartUp;
-        set => Set(ref gridMonitoringTimeOnStartUp, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private float? startUpMonitoringMinimumVoltage;
 
     [WattPilot("rmiv", false)]
     public float? StartUpMonitoringMinimumVoltage
     {
-        get => startUpMonitoringMinimumVoltage;
-        set => Set(ref startUpMonitoringMinimumVoltage, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private float? startUpMonitoringMaximumVoltage;
 
     [WattPilot("rmav", false)]
     public float? StartUpMonitoringMaximumVoltage
     {
-        get => startUpMonitoringMaximumVoltage;
-        set => Set(ref startUpMonitoringMaximumVoltage, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private float? startUpMonitoringMinimumFrequency;
 
     [WattPilot("rmif", false)]
     public float? StartUpMonitoringMinimumFrequency
     {
-        get => startUpMonitoringMinimumFrequency;
-        set => Set(ref startUpMonitoringMinimumFrequency, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private float? startUpMonitoringMaximumFrequency;
 
     [WattPilot("rmaf", false)]
     public float? StartUpMonitoringMaximumFrequency
     {
-        get => startUpMonitoringMaximumFrequency;
-        set => Set(ref startUpMonitoringMaximumFrequency, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private float? startUpRampUpRate;
 
     [WattPilot("rsrr", false)]
     public float? StartUpRampUpRate
     {
-        get => startUpRampUpRate;
-        set => Set(ref startUpRampUpRate, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private byte? absoluteMaximumChargingCurrent;
 
     /// <summary>
     ///     Set this in accordance with your DNO, e.g. don´t use 32 A if your house only supports 35A
@@ -819,8 +669,8 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [WattPilot("ama", false)]
     public byte? AbsoluteMaximumChargingCurrent
     {
-        get => absoluteMaximumChargingCurrent;
-        set => Set(ref absoluteMaximumChargingCurrent, value, () =>
+        get;
+        set => Set(ref field, value, () =>
         {
             NotifyOfPropertyChange(nameof(MaximumChargingCurrentPossible));
             NotifyOfPropertyChange(nameof(MaximumChargingPowerPossibleSum));
@@ -830,14 +680,12 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
             NotifyOfPropertyChange(nameof(MaximumChargingCurrentPossiblePerPhase));
         });
     }
-
-    private byte? maximumChargingCurrentPhase1;
 
     [WattPilot("la1", false)]
     public byte? MaximumChargingCurrentPhase1
     {
-        get => maximumChargingCurrentPhase1;
-        set => Set(ref maximumChargingCurrentPhase1, value, () =>
+        get;
+        set => Set(ref field, value, () =>
         {
             NotifyOfPropertyChange(nameof(MaximumChargingCurrentPossible));
             NotifyOfPropertyChange(nameof(MaximumChargingPowerPossibleSum));
@@ -848,16 +696,12 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         });
     }
 
-    private byte? maximumChargingCurrentPhase3;
-
     [WattPilot("la3", false)]
     public byte? MaximumChargingCurrentPhase3
     {
-        get => maximumChargingCurrentPhase3;
-        set => Set(ref maximumChargingCurrentPhase3, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? unlockCableOnPowerFailure;
 
     /// <summary>
     ///     Gets or sets whether you want the cable to unlock if the WattPilot is not powered.
@@ -865,11 +709,9 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [WattPilot("upo", false)]
     public bool? UnlockCableOnPowerFailure
     {
-        get => unlockCableOnPowerFailure;
-        set => Set(ref unlockCableOnPowerFailure, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private EcoRoundingMode roundingMode;
 
     /// <summary>
     ///     If you don´t have a house battery, you can specify whether you prefer power from/to grid. If you have a battery,
@@ -878,11 +720,9 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [WattPilot("frm", false)]
     public EcoRoundingMode RoundingMode
     {
-        get => roundingMode;
-        set => Set(ref roundingMode, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private float? pvSurplusPowerThreshold;
 
     /// <summary>
     ///     Minimum power in Watts to start PV surplus charging
@@ -890,11 +730,9 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [WattPilot("fst", false)]
     public float? PvSurplusPowerThreshold
     {
-        get => pvSurplusPowerThreshold;
-        set => Set(ref pvSurplusPowerThreshold, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private int? minimumChargingTime;
 
     /// <summary>
     ///     Once charging has started, it continues for at least <see cref="MinimumChargingTime" /> milliseconds.
@@ -902,11 +740,9 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [WattPilot("fmt", false)]
     public int? MinimumChargingTime
     {
-        get => minimumChargingTime;
-        set => Set(ref minimumChargingTime, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private byte? maximumChargingCurrent;
 
     /// <summary>
     ///     The current active charging limit. Must be between <see cref="MinimumChargingCurrent" /> and
@@ -915,8 +751,8 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [WattPilot("amp", false)]
     public byte? MaximumChargingCurrent
     {
-        get => maximumChargingCurrent;
-        set => Set(ref maximumChargingCurrent, value, () =>
+        get;
+        set => Set(ref field, value, () =>
         {
             NotifyOfPropertyChange(nameof(MaximumChargingCurrentPossible));
             NotifyOfPropertyChange(nameof(MaximumChargingCurrentPossiblePerPhase));
@@ -980,16 +816,12 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         }
     }
 
-    private string? downloadLink;
-
     [WattPilot("dll")]
     public string? DownloadLink
     {
-        get => downloadLink;
-        set => Set(ref downloadLink, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private string? cloudAccessKey;
 
     /// <summary>
     ///     Token to be used at https://&lt;serial number&gt;.api.v3.go-e.io/
@@ -998,11 +830,9 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [WattPilot("cak", false)]
     public string? CloudAccessKey
     {
-        get => cloudAccessKey;
-        set => Set(ref cloudAccessKey, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? cloudAccessEnabled;
 
     /// <summary>
     ///     True: Can use go-E charger Cloud Api
@@ -1010,20 +840,16 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [WattPilot("cae", false)]
     public bool? CloudAccessEnabled
     {
-        get => cloudAccessEnabled;
-        set => Set(ref cloudAccessEnabled, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private CarStatus? carStatus;
 
     [WattPilot("car")]
     public CarStatus? CarStatus
     {
-        get => carStatus;
-        set => Set(ref carStatus, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private double? allowedCurrent;
 
     /// <summary>
     ///     Read-Only: is null when no car is connected
@@ -1031,20 +857,16 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [WattPilot("acu")]
     public double? AllowedCurrent
     {
-        get => allowedCurrent;
-        set => Set(ref allowedCurrent, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private double? allowedCurrentInternal;
 
     [WattPilot("acui")]
     public double? AllowedCurrentInternal
     {
-        get => allowedCurrentInternal;
-        set => Set(ref allowedCurrentInternal, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? isChargingAllowed;
 
     /// <summary>
     ///     Read-only: All prerequisites met (RFID auth, <see cref="ButtonEnableCurrentSelection" />, etc.)
@@ -1052,11 +874,9 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [WattPilot("alw")]
     public bool? IsChargingAllowed
     {
-        get => isChargingAllowed;
-        set => Set(ref isChargingAllowed, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? buttonEnableCurrentSelection;
 
     /// <summary>
     ///     Read-write: Allow/Disallow changing the current levels via button
@@ -1064,29 +884,23 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [WattPilot("bac", false)]
     public bool? ButtonEnableCurrentSelection
     {
-        get => buttonEnableCurrentSelection;
-        set => Set(ref buttonEnableCurrentSelection, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool buttonEnableModeSwitch;
 
     [WattPilot("bam", false)]
     public bool ButtonEnableModeSwitch
     {
-        get => buttonEnableModeSwitch;
-        set => Set(ref buttonEnableModeSwitch, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private ForcedCharge forcedCharge;
 
     [WattPilot("frc", false)]
     public ForcedCharge ForcedCharge
     {
-        get => forcedCharge;
-        set => Set(ref forcedCharge, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private double? totalEnergy;
 
     /// <summary>
     ///     Total energy delivered by the charger. Includes energy of current charging session
@@ -1094,11 +908,9 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [WattPilot("eto")]
     public double? TotalEnergy
     {
-        get => totalEnergy;
-        set => Set(ref totalEnergy, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private double? totalEnergyWithoutCurrentSession;
 
     /// <summary>
     ///     Total energy delivered by the charger. Does not include energy of current charging session
@@ -1106,20 +918,16 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [WattPilot("etop")]
     public double? TotalEnergyWithoutCurrentSession
     {
-        get => totalEnergyWithoutCurrentSession;
-        set => Set(ref totalEnergyWithoutCurrentSession, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private double? energyCurrentSession;
 
     [WattPilot("wh")]
     public double? EnergyCurrentSession
     {
-        get => energyCurrentSession;
-        set => Set(ref energyCurrentSession, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private byte? cableCurrentMaximum;
 
     /// <summary>
     ///     Maximum current that the connected cable supports.
@@ -1127,8 +935,8 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [WattPilot("cbl")]
     public byte? CableCurrentMaximum
     {
-        get => cableCurrentMaximum;
-        set => Set(ref cableCurrentMaximum, value, () =>
+        get;
+        set => Set(ref field, value, () =>
         {
             NotifyOfPropertyChange(nameof(MaximumChargingCurrentPossible));
             NotifyOfPropertyChange(nameof(MaximumChargingCurrentPossiblePerPhase));
@@ -1136,27 +944,23 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         });
     }
 
-    private byte? maximumWattPilotPowerKiloWatts;
-
     /// <summary>
     ///     Maximum Power that the WattPilot is able to deliver (11 or 22 kW)
     /// </summary>
     [WattPilot("var")]
     public byte? MaximumWattPilotPowerKiloWatts
     {
-        get => maximumWattPilotPowerKiloWatts;
-        set => Set(ref maximumWattPilotPowerKiloWatts, value, () => NotifyOfPropertyChange(nameof(MaximumWattPilotPower)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(MaximumWattPilotPower)));
     }
 
     public double? MaximumWattPilotPower => MaximumWattPilotPowerKiloWatts * 1000d;
 
-    private PhaseSwitchMode? phaseSwitchMode;
-
     [WattPilot("psm", false)]
     public PhaseSwitchMode? PhaseSwitchMode
     {
-        get => phaseSwitchMode;
-        set => Set(ref phaseSwitchMode, value, () =>
+        get;
+        set => Set(ref field, value, () =>
         {
             NotifyOfPropertyChange(nameof(AllowPauseAndHasPhaseSwitch));
             NotifyOfPropertyChange(nameof(ChargingPhases));
@@ -1166,16 +970,14 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         });
     }
 
-    private bool? noFeedIn;
-
     /// <summary>
     ///     If your inverter does not feed the grid, enable this
     /// </summary>
     [WattPilot("fzf", false)]
     public bool? NoFeedIn
     {
-        get => noFeedIn;
-        set => Set(ref noFeedIn, value);
+        get;
+        set => Set(ref field, value);
     }
 
     private IList<WattPilotCard>? cards;
@@ -1187,13 +989,11 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref cards, value);
     }
 
-    private IList<WattPilotElectricityPrice>? electricityPrices;
-
     [WattPilot("awpl")]
     public IList<WattPilotElectricityPrice>? ElectricityPrices
     {
-        get => electricityPrices;
-        set => Set(ref electricityPrices, value, () =>
+        get;
+        set => Set(ref field, value, () =>
         {
             if (IoC.TryGetRegistered<IElectricityPriceService>() is not WattPilotElectricityService wattPilotElectricityPriceService)
             {
@@ -1209,16 +1009,14 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         });
     }
 
-    private byte? authenticatedCardIndex;
-
     /// <summary>
     ///     null = Unauthenticated, 0=guest charging, 1=card index 0, 2= card index 1, ...
     /// </summary>
     [WattPilot("trx", false)]
     public byte? AuthenticatedCardIndex
     {
-        get => authenticatedCardIndex;
-        set => Set(ref authenticatedCardIndex, value, () => NotifyOfPropertyChange(nameof(CurrentUser)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(CurrentUser)));
     }
 
     public string CurrentUser => AuthenticatedCardIndex switch
@@ -1228,16 +1026,14 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         _ => Cards?[AuthenticatedCardIndex.Value - 1].Name ?? "---",
     };
 
-    private bool? is16AmpereVariant;
-
     /// <summary>
     ///     Is this the 16 Amperes limited version ("Go 11 J" or "Home 11 J")?
     /// </summary>
     [WattPilot("adi")]
     public bool? Is16AmpereVariant
     {
-        get => is16AmpereVariant;
-        set => Set(ref is16AmpereVariant, value, () => NotifyOfPropertyChange(nameof(MaxWattPilotCurrent)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(MaxWattPilotCurrent)));
     }
 
     /// <summary>
@@ -1245,33 +1041,25 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     /// </summary>
     public byte? MaxWattPilotCurrent => !Is16AmpereVariant.HasValue ? null : Is16AmpereVariant.Value ? (byte)16 : (byte)32;
 
-    private double? frequency;
-
     [WattPilot("fhz")]
     public double? Frequency
     {
-        get => frequency;
-        set => Set(ref frequency, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private DateTime? timeStampUtc;
 
     [WattPilot("utc")]
     public DateTime? TimeStampUtc
     {
-        get => timeStampUtc;
-        set => Set(ref timeStampUtc, value, () => Latency = DateTime.UtcNow - TimeStampUtc);
+        get;
+        set => Set(ref field, value, () => Latency = DateTime.UtcNow - TimeStampUtc);
     }
-
-    private TimeSpan? latency;
 
     public TimeSpan? Latency
     {
-        get => latency;
-        private set => Set(ref latency, value);
+        get;
+        private set => Set(ref field, value);
     }
-
-    private int? pvSurplusBatteryLevelStartCharge;
 
     /// <summary>
     ///     Used to tune PV surplus charging. See also <see cref="OhmPilotTemperatureLimitCelsius" />
@@ -1279,55 +1067,45 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [WattPilot("fam", false)]
     public int? PvSurplusBatteryLevelStartCharge
     {
-        get => pvSurplusBatteryLevelStartCharge;
-        set => Set(ref pvSurplusBatteryLevelStartCharge, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? allowChargingFromBattery;
 
     [WattPilot("pdte", false)]
     public bool? AllowChargingFromBattery
     {
-        get => allowChargingFromBattery;
-        set => Set(ref allowChargingFromBattery, value, () => NotifyOfPropertyChange(nameof(CanModifyChargingFromBatteryOptions)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(CanModifyChargingFromBatteryOptions)));
     }
 
     public bool CanModifyChargingFromBatteryOptions => AllowChargingFromBattery.HasValue && AllowChargingFromBattery.Value && PvSurplusEnabled.HasValue && PvSurplusEnabled.Value;
 
-    private byte? pvSurplusBatteryLevelStopCharge;
-
     [WattPilot("pdt", false)]
     public byte? PvSurplusBatteryLevelStopCharge
     {
-        get => pvSurplusBatteryLevelStopCharge;
-        set => Set(ref pvSurplusBatteryLevelStopCharge, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? restrictChargingFromBattery;
 
     [WattPilot("pdle", false)]
     public bool? RestrictChargingFromBattery
     {
-        get => restrictChargingFromBattery;
-        set => Set(ref restrictChargingFromBattery, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private int? allowChargingFromBatteryStartSeconds;
 
     [WattPilot("pdls", false)]
     public int? AllowChargingFromBatteryStartSeconds
     {
-        get => allowChargingFromBatteryStartSeconds;
-        set => Set(ref allowChargingFromBatteryStartSeconds, value, () => NotifyOfPropertyChange(nameof(AllowChargingFromBatteryStartString)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(AllowChargingFromBatteryStartString)));
     }
-
-    private int? allowChargingFromBatteryStopSeconds;
 
     [WattPilot("pdlo", false)]
     public int? AllowChargingFromBatteryStopSeconds
     {
-        get => allowChargingFromBatteryStopSeconds;
-        set => Set(ref allowChargingFromBatteryStopSeconds, value, () => NotifyOfPropertyChange(nameof(AllowChargingFromBatteryStopString)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(AllowChargingFromBatteryStopString)));
     }
 
 
@@ -1352,43 +1130,33 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
 
-    private bool? enableBatteryBoost;
-
     [WattPilot("ebe", false)]
     public bool? EnableBatteryBoost
     {
-        get => enableBatteryBoost;
-        set => Set(ref enableBatteryBoost, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? enableSingleTimeBoost;
 
     [WattPilot("ebo", false)]
     public bool? EnableSingleTimeBoost
     {
-        get => enableSingleTimeBoost;
-        set => Set(ref enableSingleTimeBoost, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private byte? minimumSocInBoost;
 
     [WattPilot("ebt", false)]
     public byte? MinimumSocInBoost
     {
-        get => minimumSocInBoost;
-        set => Set(ref minimumSocInBoost, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? reboot;
 
     [WattPilot("rst", false)]
     public bool? Reboot
     {
-        get => reboot;
-        set => Set(ref reboot, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private int? ohmPilotTemperatureLimitCelsius;
 
     /// <summary>
     ///     Used to tune PV surplus charging. See also <see cref="PvSurplusBatteryLevelStartCharge" />
@@ -1396,8 +1164,8 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [WattPilot("fot", false)]
     public int? OhmPilotTemperatureLimitCelsius
     {
-        get => ohmPilotTemperatureLimitCelsius;
-        set => Set(ref ohmPilotTemperatureLimitCelsius, value, () => NotifyOfPropertyChange(nameof(OhmPilotTemperatureLimitFahrenheit)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(OhmPilotTemperatureLimitFahrenheit)));
     }
 
     public double? OhmPilotTemperatureLimitFahrenheit
@@ -1406,85 +1174,67 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => OhmPilotTemperatureLimitCelsius = value.HasValue ? (int)Math.Round((value.Value - 32) / 1.8, MidpointRounding.AwayFromZero) : null;
     }
 
-    private bool? pvSurplusEnabled;
-
     [WattPilot("fup", false)]
     public bool? PvSurplusEnabled
     {
-        get => pvSurplusEnabled;
-        set => Set(ref pvSurplusEnabled, value, () => NotifyOfPropertyChange(nameof(CanModifyChargingFromBatteryOptions)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(CanModifyChargingFromBatteryOptions)));
     }
-
-    private WattPilotWifiInfo? currentWifi;
 
     [WattPilot("ccw", typeof(WattPilotWifiInfo))]
     public WattPilotWifiInfo? CurrentWifi
     {
-        get => currentWifi;
-        set => Set(ref currentWifi, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? awattarEnabled;
 
     [WattPilot("ful", false)]
     public bool? AwattarEnabled
     {
-        get => awattarEnabled;
-        set => Set(ref awattarEnabled, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private CableLockBehavior? cableLockBehavior;
 
     [WattPilot("ust", false)]
     public CableLockBehavior? CableLockBehavior
     {
-        get => cableLockBehavior;
-        set => Set(ref cableLockBehavior, value, () => NotifyOfPropertyChange(nameof(CableLockBehaviorDisplayName)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(CableLockBehaviorDisplayName)));
     }
-
-    private bool? disableProtectiveEarth;
 
     [WattPilot("nmo", false)]
     public bool? DisableProtectiveEarth
     {
-        get => disableProtectiveEarth;
-        set => Set(ref disableProtectiveEarth, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? loadBalancingEnabled;
 
     [WattPilot("loe", false)]
     public bool? LoadBalancingEnabled
     {
-        get => loadBalancingEnabled;
-        set => Set(ref loadBalancingEnabled, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? enableOutOfBalanceControl;
 
     [WattPilot("ule", false)]
     public bool? EnableOutOfBalanceControl
     {
-        get => enableOutOfBalanceControl;
-        set => Set(ref enableOutOfBalanceControl, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool? showOutOfBalanceControlInVoltAmpere;
 
     [WattPilot("ulu", false)]
     public bool? ShowOutOfBalanceControlInVoltAmpere
     {
-        get => showOutOfBalanceControlInVoltAmpere;
-        set => Set(ref showOutOfBalanceControlInVoltAmpere, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private byte? maximumOutOfBalanceCurrent;
 
     [WattPilot("ula", false)]
     public byte? MaximumOutOfBalanceCurrent
     {
-        get => maximumOutOfBalanceCurrent;
-        set => Set(ref maximumOutOfBalanceCurrent, value);
+        get;
+        set => Set(ref field, value);
     }
 
     private WattPilotLoadBalancingCurrents? loadBalancingCurrents;
@@ -1496,76 +1246,60 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref loadBalancingCurrents, value);
     }
 
-    private int? loadBalancingFallbackCurrent;
-
     [WattPilot("lof", false)]
     public int? LoadBalancingFallbackCurrent
     {
-        get => loadBalancingFallbackCurrent;
-        set => Set(ref loadBalancingFallbackCurrent, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private LoadBalancingPriority loadBalancingPriority;
 
     [WattPilot("lop", false)]
     public LoadBalancingPriority LoadBalancingPriority
     {
-        get => loadBalancingPriority;
-        set => Set(ref loadBalancingPriority, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private int? randomDelayPowerFailure;
 
     [WattPilot("rdre", false)]
     public int? RandomDelayPowerFailure
     {
-        get => randomDelayPowerFailure;
-        set => Set(ref randomDelayPowerFailure, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private int? randomDelayAwattarStart;
 
     [WattPilot("rdbf", false)]
     public int? RandomDelayAwattarStart
     {
-        get => randomDelayAwattarStart;
-        set => Set(ref randomDelayAwattarStart, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private int? randomDelayAwattarStop;
 
     [WattPilot("rdef", false)]
     public int? RandomDelayAwattarStop
     {
-        get => randomDelayAwattarStop;
-        set => Set(ref randomDelayAwattarStop, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private int? randomDelayTimerStart;
 
     [WattPilot("rdbs", false)]
     public int? RandomDelayTimerStart
     {
-        get => randomDelayTimerStart;
-        set => Set(ref randomDelayTimerStart, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private int? randomDelayTimerStop;
 
     [WattPilot("rdes", false)]
     public int? RandomDelayTimerStop
     {
-        get => randomDelayTimerStop;
-        set => Set(ref randomDelayTimerStop, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private int? randomDelayCarConnect;
 
     [WattPilot("rdpl", false)]
     public int? RandomDelayCarConnect
     {
-        get => randomDelayCarConnect;
-        set => Set(ref randomDelayCarConnect, value);
+        get;
+        set => Set(ref field, value);
     }
 
     public string? CableLockBehaviorDisplayName => CableLockBehavior?.ToDisplayName();

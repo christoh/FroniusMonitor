@@ -4,44 +4,34 @@ namespace De.Hochstaetter.Fronius.Models.Gen24;
 
 public class Gen24Config : BindableBase, ICloneable
 {
-    private Gen24Versions? versions;
-
     public Gen24Versions? Versions
     {
-        get => versions;
-        set => Set(ref versions, value, () => NotifyOfPropertyChange(nameof(VersionWarning)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(VersionWarning)));
     }
-
-    private Gen24Components? components;
 
     public Gen24Components? Components
     {
-        get => components;
-        set => Set(ref components, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private Gen24InverterSettings? inverterSettings;
 
     public Gen24InverterSettings? InverterSettings
     {
-        get => inverterSettings;
-        set => Set(ref inverterSettings, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private Gen24BatterySettings? batterySettings;
 
     public Gen24BatterySettings? BatterySettings
     {
-        get => batterySettings;
-        set => Set(ref batterySettings, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private double? maxAcPower;
 
     public double? MaxAcPower
     {
-        get => maxAcPower;
-        set => Set(ref maxAcPower, value);
+        get;
+        set => Set(ref field, value);
     }
 
 

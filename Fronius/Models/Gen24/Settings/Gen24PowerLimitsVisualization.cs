@@ -2,13 +2,11 @@
 
 public class Gen24PowerLimitsVisualization : Gen24ParsingBase
 {
-
-    private double wattPeakReferenceValue;
     [FroniusProprietaryImport("wattPeakReferenceValue", FroniusDataType.Root)]
     public double WattPeakReferenceValue
     {
-        get => wattPeakReferenceValue;
-        set => Set(ref wattPeakReferenceValue, value);
+        get;
+        set => Set(ref field, value);
     }
 
     public static Gen24PowerLimitsVisualization Parse(JToken? token)

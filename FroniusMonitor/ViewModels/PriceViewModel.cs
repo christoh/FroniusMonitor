@@ -23,72 +23,57 @@ public class PriceViewModel(
 {
     private const string LegendKey = "L";
     private const string EnergyAxisKey = "E";
-        
-    private IReadOnlyList<IElectricityPrice> prices = null!;
+
     private Timer? timer;
 
     public IElectricityPriceService ElectricityPriceService => electricityPriceService;
 
     public IReadOnlyList<IElectricityPrice> Prices
     {
-        get => prices;
-        set => Set(ref prices, value);
-    }
-
-    private PlotModel? plotModel;
+        get;
+        set => Set(ref field, value);
+    } = null!;
 
     public PlotModel? PlotModel
     {
-        get => plotModel;
-        set => Set(ref plotModel, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private bool useVat = true;
 
     public bool UseVat
     {
-        get => useVat;
-        set => Set(ref useVat, value, OnSettingsChanged);
-    }
-
-    private ElectricityPriceDisplay priceDisplay = ElectricityPriceDisplay.Buy;
+        get;
+        set => Set(ref field, value, OnSettingsChanged);
+    } = true;
 
     public ElectricityPriceDisplay PriceDisplay
     {
-        get => priceDisplay;
-        set => Set(ref priceDisplay, value, OnSettingsChanged);
-    }
-
-    private bool showHistoricData;
+        get;
+        set => Set(ref field, value, OnSettingsChanged);
+    } = ElectricityPriceDisplay.Buy;
 
     public bool ShowHistoricData
     {
-        get => showHistoricData;
-        set => Set(ref showHistoricData, value, OnSettingsChanged);
+        get;
+        set => Set(ref field, value, OnSettingsChanged);
     }
-
-    private DateTime date = DateTime.Now.Date;
 
     public DateTime Date
     {
-        get => date;
-        set => Set(ref date, value, OnSettingsChanged);
-    }
-
-    private BindableCollection<string> errors = [];
+        get;
+        set => Set(ref field, value, OnSettingsChanged);
+    } = DateTime.Now.Date;
 
     public BindableCollection<string> Errors
     {
-        get => errors;
-        set => Set(ref errors, value);
-    }
-
-    private bool isBusy;
+        get;
+        set => Set(ref field, value);
+    } = [];
 
     public bool IsBusy
     {
-        get => isBusy;
-        set => Set(ref isBusy, value);
+        get;
+        set => Set(ref field, value);
     }
 
     internal override async Task OnInitialize()

@@ -2,47 +2,41 @@
 
 public class ToshibaHvacMapping : BindableBase
 {
-    private Guid groupId;
     [JsonPropertyName("GroupId")]
     [JsonRequired]
     public Guid GroupId
     {
-        get => groupId;
-        set => Set(ref groupId, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private string groupName = string.Empty;
     [JsonPropertyName("GroupName")]
     public string GroupName
     {
-        get => groupName;
-        set => Set(ref groupName, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = string.Empty;
 
-    private Guid consumerId;
     [JsonPropertyName("ConsumerId")]
     public Guid ConsumerId
     {
-        get => consumerId;
-        set => Set(ref consumerId, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private string timeZone = string.Empty;
 
     [JsonPropertyName("TimeZone")]
     public string TimeZone
     {
-        get => timeZone;
-        set => Set(ref timeZone, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = string.Empty;
 
-    private ObservableCollection<ToshibaHvacMappingDevice> devices = new();
     [JsonPropertyName("ACList")]
     public ObservableCollection<ToshibaHvacMappingDevice> Devices
     {
-        get => devices;
-        set => Set(ref devices, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = new();
 
     public override string ToString() => GroupName;
 }

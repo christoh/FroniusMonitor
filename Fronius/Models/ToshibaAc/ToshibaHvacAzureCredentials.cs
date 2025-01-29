@@ -2,54 +2,47 @@
 
 public class ToshibaHvacAzureCredentials : BindableBase
 {
-    private string hostName = string.Empty;
-
-    private string deviceId = string.Empty;
     [JsonPropertyName("DeviceId")]
     public string DeviceId
     {
-        get => deviceId;
-        set => Set(ref deviceId, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = string.Empty;
 
     [JsonPropertyName("HostName")]
     [JsonRequired]
     public string HostName
     {
-        get => hostName;
-        set => Set(ref hostName, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = string.Empty;
 
-    private string primaryKey = string.Empty;
     [JsonPropertyName("PrimaryKey")]
     public string PrimaryKey
     {
-        get => primaryKey;
-        set => Set(ref primaryKey, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = string.Empty;
 
-    private string secondaryKey = string.Empty;
     [JsonPropertyName("SecondaryKey")]
     public string SecondaryKey
     {
-        get => secondaryKey;
-        set => Set(ref secondaryKey, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = string.Empty;
 
-    private string sasToken = string.Empty;
     [JsonPropertyName("SasToken")]
     [JsonRequired]
     public string SasToken
     {
-        get => sasToken;
-        set => Set(ref sasToken, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = string.Empty;
 
-    private DateTime registerDate;
     [JsonPropertyName("RegisterDate")]
     public DateTime RegisterDate
     {
-        get => registerDate;
-        set => Set(ref registerDate, value);
+        get;
+        set => Set(ref field, value);
     }
 }

@@ -23,29 +23,23 @@ public class Gen24Mppt : BindableBase, ICloneable
 {
     private static readonly IGen24JsonService gen24JsonService = IoC.TryGet<IGen24JsonService>()!;
 
-    private StringCombination? stringCombination;
-
     [FroniusProprietaryImport("PV_MODE_COMBINE_U16", FroniusDataType.Root)]
     public StringCombination? StringCombination
     {
-        get => stringCombination;
-        set => Set(ref stringCombination, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private Gen24Mppt1? mppt1;
 
     public Gen24Mppt1? Mppt1
     {
-        get => mppt1;
-        set => Set(ref mppt1, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private Gen24Mppt2? mppt2;
 
     public Gen24Mppt2? Mppt2
     {
-        get => mppt2;
-        set => Set(ref mppt2, value);
+        get;
+        set => Set(ref field, value);
     }
 
     public double? WattPeakTotal => Mppt1?.WattPeak + Mppt2?.WattPeak;

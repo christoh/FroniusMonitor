@@ -2,36 +2,32 @@
 
 public class Gen24SolarWebSettings : BindableBase, ICloneable
 {
-    private bool customerRemoteControlProfileActive;
-    [FroniusProprietaryImport("customerRemoteControlProfileActive",  FroniusDataType.Root)]
+    [FroniusProprietaryImport("customerRemoteControlProfileActive", FroniusDataType.Root)]
     public bool CustomerRemoteControlProfileActive
     {
-        get => customerRemoteControlProfileActive;
-        set => Set(ref customerRemoteControlProfileActive, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private bool enableRemoteControl;
-    [FroniusProprietaryImport("enableRemoteControl",  FroniusDataType.Root)]
+    [FroniusProprietaryImport("enableRemoteControl", FroniusDataType.Root)]
     public bool EnableRemoteControl
     {
-        get => enableRemoteControl;
-        set => Set(ref enableRemoteControl, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private bool sendDataToSolarWeb;
-    [FroniusProprietaryImport("sendDataToSolarWeb",  FroniusDataType.Root)]
+    [FroniusProprietaryImport("sendDataToSolarWeb", FroniusDataType.Root)]
     public bool SendDataToSolarWeb
     {
-        get => sendDataToSolarWeb;
-        set => Set(ref sendDataToSolarWeb, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private bool technicianRemoteControlProfileActive;
-    [FroniusProprietaryImport("technicianRemoteControlProfileActive",  FroniusDataType.Root)]
+    [FroniusProprietaryImport("technicianRemoteControlProfileActive", FroniusDataType.Root)]
     public bool TechnicianRemoteControlProfileActive
     {
-        get => technicianRemoteControlProfileActive;
-        set => Set(ref technicianRemoteControlProfileActive, value);
+        get;
+        set => Set(ref field, value);
     }
 
     public object Clone() => MemberwiseClone();

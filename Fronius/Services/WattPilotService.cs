@@ -18,13 +18,11 @@ public class WattPilotService(SettingsBase settings) : BindableBase, IWattPilotS
 
     private CancellationToken Token => tokenSource?.Token ?? throw new WebSocketException(WebSocketError.ConnectionClosedPrematurely);
 
-    private WebConnection? connection;
-
     public WebConnection? Connection
     {
-        get => connection;
+        get;
 
-        private set => Set(ref connection, value, null, () =>
+        private set => Set(ref field, value, null, () =>
         {
             if (value?.Password != null && value.EncryptedPassword != oldEncryptedPassword)
             {
@@ -51,12 +49,10 @@ public class WattPilotService(SettingsBase settings) : BindableBase, IWattPilotS
         }
     }
 
-    private WattPilot? wattPilot;
-
     public WattPilot? WattPilot
     {
-        get => wattPilot;
-        private set => Set(ref wattPilot, value);
+        get;
+        private set => Set(ref field, value);
     }
 
     [SuppressMessage("ReSharper", "ParameterHidesMember")]

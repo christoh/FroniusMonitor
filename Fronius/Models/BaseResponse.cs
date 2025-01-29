@@ -2,33 +2,29 @@
 
 public class BaseResponse : BindableBase
 {
-    private int statusCode;
     public int StatusCode
     {
-        get => statusCode;
-        set => Set(ref statusCode, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private string reason = string.Empty;
     public string Reason
     {
-        get => reason;
-        set => Set(ref reason, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = string.Empty;
 
-    private string userMessage = string.Empty;
     public string UserMessage
     {
-        get => userMessage;
-        set => Set(ref userMessage, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = string.Empty;
 
-    private DateTime timestamp = DateTime.MinValue;
     public DateTime Timestamp
     {
-        get => timestamp;
-        set => Set(ref timestamp, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = DateTime.MinValue;
 
     public virtual string DisplayName => string.Empty;
     public override string ToString() => DisplayName;

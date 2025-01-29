@@ -4,22 +4,18 @@
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public class FritzBoxDeviceList : BindableBase
 {
-    private uint version;
-
     [XmlAttribute("version")]
     public uint Version
     {
-        get => version;
-        set => Set(ref version, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private string? firmwareVersionString;
 
     [XmlAttribute("fwversion")]
     public string? FirmwareVersionString
     {
-        get => firmwareVersionString;
-        set => Set(ref firmwareVersionString, value);
+        get;
+        set => Set(ref field, value);
     }
 
     [XmlElement("device")] public List<FritzBoxDevice> Devices { get; } = new();

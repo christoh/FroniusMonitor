@@ -25,31 +25,27 @@ public class User
 
     [XmlAttribute] public string Username { get; set; } = string.Empty;
 
-    private string passwordHash = string.Empty;
-
     [XmlAttribute]
     public string PasswordHash
     {
-        get => passwordHash;
+        get;
         set
         {
-            passwordHash = value;
+            field = value;
             passwordCache = null;
         }
-    }
-
-    private string salt = Convert.ToBase64String(RandomNumberGenerator.GetBytes(8));
+    } = string.Empty;
 
     [XmlAttribute]
     public string Salt
     {
-        get => salt;
+        get;
         set
         {
-            salt = value;
+            field = value;
             passwordCache = null;
         }
-    }
+    } = Convert.ToBase64String(RandomNumberGenerator.GetBytes(8));
 
     [XmlIgnore] [JsonIgnore] private byte[] SaltBytes => Convert.FromBase64String(Salt);
 

@@ -7,13 +7,11 @@ namespace De.Hochstaetter.Fronius.Models.Gen24;
 
 public class Gen24Components : BindableBase
 {
-    private IDictionary<string, IList<string>> groups = new Dictionary<string, IList<string>>();
-
     public IDictionary<string, IList<string>> Groups
     {
-        get => groups;
-        set => Set(ref groups, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = new Dictionary<string, IList<string>>();
 
     public static Gen24Components Parse(JToken token)
     {

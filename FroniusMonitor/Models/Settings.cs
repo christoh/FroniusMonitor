@@ -6,36 +6,32 @@ public class Settings : SettingsBase
 {
     private static readonly object settingsLockObject = new();
 
-    private Size? mainWindowSize;
-    [DefaultValue(null),XmlElement("WindowSize")]
+    [DefaultValue(null), XmlElement("WindowSize")]
     public Size? MainWindowSize
     {
-        get => mainWindowSize;
-        set => Set(ref mainWindowSize, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private double controllerGridRowHeight = 375;
     [DefaultValue(375), XmlElement("ControllerGridRowHeight")]
     public double ControllerGridRowHeight
     {
-        get => controllerGridRowHeight;
-        set => Set(ref controllerGridRowHeight, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = 375;
 
-    private bool showRibbon;
     [DefaultValue(false), XmlAttribute("ShowRibbon")]
     public bool ShowRibbon
     {
-        get => showRibbon;
-        set => Set(ref showRibbon, value);
+        get;
+        set => Set(ref field, value);
     }
 
-    private string? customSolarPanelLayout;
     [DefaultValue(null)]
     public string? CustomSolarPanelLayout
     {
-        get => customSolarPanelLayout;
-        set => Set(ref customSolarPanelLayout, value);
+        get;
+        set => Set(ref field, value);
     }
 
     public static Task Save() => Save(App.SettingsFileName);

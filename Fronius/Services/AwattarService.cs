@@ -18,24 +18,20 @@ public sealed class AwattarService : ElectricityPushPriceServiceBase, IElectrici
         settings = IoC.Get<SettingsBase>();
     }
 
-    private ICollection<AwattarPriceComponent>? prices;
-
     public ICollection<AwattarPriceComponent>? Prices
     {
-        get => prices;
-        set => Set(ref prices, value);
+        get;
+        set => Set(ref field, value);
     }
 
     public bool CanSetPriceRegion => true;
     public override bool SupportsHistoricData => true;
 
-    private AwattarCountry priceZone = (AwattarCountry)(-1);
-
     public AwattarCountry PriceRegion
     {
-        get => priceZone;
-        set => Set(ref priceZone, value, () => _ = Refresh(), () => supportedPriceZones.Contains(value) ? value : throw new ArgumentException(Resources.UnsupportedPriceZone));
-    }
+        get;
+        set => Set(ref field, value, () => _ = Refresh(), () => supportedPriceZones.Contains(value) ? value : throw new ArgumentException(Resources.UnsupportedPriceZone));
+    } = (AwattarCountry)(-1);
 
     private static TimeSpan DurationToNextQuery
     {

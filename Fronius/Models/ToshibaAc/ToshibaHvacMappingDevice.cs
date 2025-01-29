@@ -2,59 +2,47 @@
 
 public class ToshibaHvacMappingDevice : ToshibaHvacDeviceBase
 {
-    private string name = string.Empty;
-
     [JsonPropertyName("Name")]
     public string Name
     {
-        get => name;
-        set => Set(ref name, value);
-    }
-
-    private Guid acId;
+        get;
+        set => Set(ref field, value);
+    } = string.Empty;
 
     [JsonPropertyName("Id")]
     public Guid AcId
     {
-        get => acId;
-        set => Set(ref acId, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private Guid deviceUniqueId;
 
     [JsonPropertyName("DeviceUniqueId")]
     public override Guid DeviceUniqueId
     {
-        get => deviceUniqueId;
-        set => Set(ref deviceUniqueId, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private int acModelId;
 
     [JsonPropertyName("ACModelId")]
     public int AcModelId
     {
-        get => acModelId;
-        set => Set(ref acModelId, value);
+        get;
+        set => Set(ref field, value);
     }
-
-    private string description = string.Empty;
 
     [JsonPropertyName("Description")]
     public string Description
     {
-        get => description;
-        set => Set(ref description, value);
-    }
-
-    private string createdDate = string.Empty;
+        get;
+        set => Set(ref field, value);
+    } = string.Empty;
 
     [JsonPropertyName("CreatedDate")]
     public string CreatedDate
     {
-        get => createdDate;
-        set => Set(ref createdDate, value);
-    }
+        get;
+        set => Set(ref field, value);
+    } = string.Empty;
 
     public override string ToString() => $"{Name} ({Description})";
 }
