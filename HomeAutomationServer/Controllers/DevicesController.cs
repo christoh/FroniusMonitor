@@ -36,6 +36,14 @@ public class DevicesController(IDataControlService controlService) : ControllerB
         return result.Count == 0 ? NoContent() : Ok(result);
     }
 
+    [HttpGet("getTypes")]
+    [BasicAuthorize(Roles = "User")]
+    [ProducesResponseType<IEnumerable<string>>(StatusCodes.Status200OK)]
+    public IActionResult GetTypes()
+    {
+        return Ok(controlService.Entities.Select(d => d.Value.Device.GetType().Name).Distinct());
+    }
+
     [HttpGet("{id}")]
     [BasicAuthorize(Roles = "User")]
     [ProducesResponseType<object>(StatusCodes.Status200OK)]

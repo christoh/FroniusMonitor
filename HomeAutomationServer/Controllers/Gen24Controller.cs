@@ -1,5 +1,4 @@
 ﻿using De.Hochstaetter.Fronius.Models.Gen24;
-using De.Hochstaetter.HomeAutomationServer.Misc;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using Microsoft.AspNetCore.Http;
 
@@ -7,7 +6,7 @@ namespace De.Hochstaetter.HomeAutomationServer.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class Gen24Controller(ILogger<Gen24Controller> logger, IDataControlService controlService) : HomeAutomationControllerBase(controlService)
+public class Gen24SystemController(ILogger<Gen24SystemController> logger, IDataControlService controlService) : HomeAutomationControllerBase(controlService)
 {
     [HttpGet]
     [BasicAuthorize(Roles = "User")]

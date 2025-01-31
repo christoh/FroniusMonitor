@@ -14,6 +14,7 @@ public class Gen24Sensors : BindableBase
         set => Set(ref field, value);
     }
 
+
     public Gen24Restrictions? Restrictions
     {
         get;
