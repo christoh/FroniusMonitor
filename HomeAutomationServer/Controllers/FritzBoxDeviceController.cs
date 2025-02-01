@@ -7,7 +7,7 @@ namespace De.Hochstaetter.HomeAutomationServer.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 #pragma warning disable CS9107
-public class FritzBoxDeviceController(IDataControlService controlService, ILogger<FritzBoxDeviceController> logger) : HomeAutomationControllerBase(controlService)
+public class FritzBoxDeviceController(IDataControlService controlService, ILogger<FritzBoxDeviceController> logger) : DeviceControllerBase(controlService, logger)
 {
     [HttpGet]
     [BasicAuthorize(Roles = "User")]

@@ -1,10 +1,14 @@
 ﻿namespace De.Hochstaetter.Fronius.Models;
 
 [Flags]
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum FritzBoxColorMode : uint
 {
+    [JsonStringEnumMemberName("none")]
     None = 0,
+    [JsonStringEnumMemberName("hsv")]
     Hsv = 1,
+    [JsonStringEnumMemberName("temperature")]
     Temperature = 4,
 }
 
@@ -13,6 +17,7 @@ public enum FritzBoxColorMode : uint
 public class FritzBoxColorControl : BindableBase
 {
     [XmlAttribute("supported_modes")]
+    [JsonIgnore]
     public string? SupportedModesString
     {
         get => FritzBoxDevice.GetStringValue((double?)SupportedModes,1);
@@ -20,6 +25,7 @@ public class FritzBoxColorControl : BindableBase
     }
 
     [XmlAttribute("current_mode")]
+    [JsonIgnore]
     public string? CurrentModeString
     {
         get => FritzBoxDevice.GetStringValue((double?)SupportedModes,1);

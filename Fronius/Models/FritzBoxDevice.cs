@@ -2,23 +2,40 @@
 
 [Flags]
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum FritzBoxFeatures : uint
 {
+    [JsonStringEnumMemberName("none")]
     None = 0,
+    [JsonStringEnumMemberName("hanFunDevice")]
     HanFunDevice = 1 << 0,
+    [JsonStringEnumMemberName("light")]
     Light = 1 << 2,
+    [JsonStringEnumMemberName("alarmSensor")]
     AlarmSensor = 1 << 4,
+    [JsonStringEnumMemberName("avmButton")]
     AvmButton = 1 << 5,
+    [JsonStringEnumMemberName("temperatureRegulation")]
     TemperatureRegulation = 1 << 6,
+    [JsonStringEnumMemberName("powerMeter")]
     PowerMeter = 1 << 7,
+    [JsonStringEnumMemberName("temperatureSensor")]
     TemperatureSensor = 1 << 8,
+    [JsonStringEnumMemberName("acOutlet")]
     AcOutlet = 1 << 9,
+    [JsonStringEnumMemberName("dectRepeater")]
     DectRepeater = 1 << 10,
+    [JsonStringEnumMemberName("microphone")]
     Microphone = 1 << 11,
+    [JsonStringEnumMemberName("hanFunUnit")]
     HanFunUnit = 1 << 13,
+    [JsonStringEnumMemberName("turnOnOff")]
     TurnOnOff = 1 << 15,
+    [JsonStringEnumMemberName("hasLevels")]
     HasLevels = 1 << 16,
+    [JsonStringEnumMemberName("coloredLight")]
     ColoredLight = 1 << 17,
+    [JsonStringEnumMemberName("blind")]
     Blind = 1 << 18,
 }
 

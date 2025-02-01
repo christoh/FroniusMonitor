@@ -5,6 +5,8 @@
 		<TargetFramework>net9.0</TargetFramework>
 		<LangVersion>preview</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<AssemblyVersion>0.9.*</AssemblyVersion>
+		<Deterministic>false</Deterministic>
 		<Configuration>Release</Configuration>
 		<Nullable>enable</Nullable>
 		<RootNamespace>De.Hochstaetter.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>

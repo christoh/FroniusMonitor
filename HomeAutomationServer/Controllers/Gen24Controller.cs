@@ -6,7 +6,7 @@ namespace De.Hochstaetter.HomeAutomationServer.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class Gen24SystemController(ILogger<Gen24SystemController> logger, IDataControlService controlService) : HomeAutomationControllerBase(controlService)
+public class Gen24SystemController(IDataControlService controlService, ILogger<Gen24SystemController> logger) : DeviceControllerBase(controlService, logger)
 {
     [HttpGet]
     [BasicAuthorize(Roles = "User")]

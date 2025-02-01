@@ -134,7 +134,7 @@ internal partial class Program
         var app = builder.Build();
         //if (app.Environment.IsDevelopment())
         //{
-        app.MapOpenApi();
+        app.MapOpenApi().RequireAuthorization(r => r.RequireRole("Developer"));
         //}
 
         //app.UseHttpsRedirection();

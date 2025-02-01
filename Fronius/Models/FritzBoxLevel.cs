@@ -12,6 +12,7 @@ public class FritzBoxLevel : BindableBase
     }
 
     [XmlElement("levelpercentage")]
+    [JsonIgnore]
     public string? LevelString
     {
         get => FritzBoxDevice.GetStringValue(Level, 100);

@@ -4,6 +4,7 @@
 public class FritzBoxPowerMeter : BindableBase
 {
     [XmlElement("voltage")]
+    [JsonIgnore]
     public string? VoltageString
     {
         get => FritzBoxDevice.GetStringValue(Voltage);
@@ -11,6 +12,7 @@ public class FritzBoxPowerMeter : BindableBase
     }
 
     [XmlElement("power")]
+    [JsonIgnore]
     public string? PowerString
     {
         get => FritzBoxDevice.GetStringValue(PowerWatts);
@@ -18,6 +20,7 @@ public class FritzBoxPowerMeter : BindableBase
     }
 
     [XmlElement("energy")]
+    [JsonIgnore]
     public string? EnergyString
     {
         get => FritzBoxDevice.GetStringValue(EnergyConsumed, 1);

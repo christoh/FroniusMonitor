@@ -4,6 +4,7 @@
 public class FritzBoxTemperatureSensor : BindableBase
 {
     [XmlElement("celsius")]
+    [JsonIgnore]
     public string? TemperatureString
     {
         get => FritzBoxDevice.GetStringValue(Temperature, 10);
@@ -11,6 +12,7 @@ public class FritzBoxTemperatureSensor : BindableBase
     }
 
     [XmlElement("offset")]
+    [JsonIgnore]
     public string? OffsetString
     {
         get => FritzBoxDevice.GetStringValue(Offset, 10);

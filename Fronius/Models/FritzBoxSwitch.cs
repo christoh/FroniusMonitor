@@ -1,16 +1,18 @@
 ﻿namespace De.Hochstaetter.Fronius.Models;
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum FritzBoxSwitching
 {
-    [XmlEnum("auto")] Automatic,
-    [XmlEnum("manuell")] Manual,
-    [XmlEnum("")] Unknown,
+    [JsonStringEnumMemberName("auto")][XmlEnum("auto")] Automatic,
+    [JsonStringEnumMemberName("manual")][XmlEnum("manuell")] Manual,
+    [JsonStringEnumMemberName("unknown")][XmlEnum("")] Unknown,
 }
 
 [XmlType("switch")]
 public class FritzBoxSwitch : BindableBase
 {
     [XmlElement("state")]
+    [JsonIgnore]
     public string? IsTurnedOnString
     {
         get;
@@ -32,6 +34,7 @@ public class FritzBoxSwitch : BindableBase
     }
 
     [XmlElement("lock")]
+    [JsonIgnore]
     public string? IsUiLockedString
     {
         get;
@@ -46,6 +49,7 @@ public class FritzBoxSwitch : BindableBase
     }
 
     [XmlElement("devicelock")]
+    [JsonIgnore]
     public string? IsDeviceLockedString
     {
         get;
@@ -65,6 +69,7 @@ public class FritzBoxSwitch : BindableBase
 public class FritzBoxSimpleSwitch : BindableBase
 {
     [XmlElement("state")]
+    [JsonIgnore]
     public string? IsTurnedOnString
     {
         get;

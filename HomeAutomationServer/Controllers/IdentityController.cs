@@ -28,7 +28,7 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
 
         Response.Cookies.Delete("auth", cookieOptions);
         Response.Cookies.Append("auth", "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes($"{user}:{password}")), cookieOptions);
-        logger.LogInformation("{Username} logged in successfully", user);
+        logger.LogInformation("{Username} logged in successfully from {Ip}", user, HttpContext.Connection.RemoteIpAddress);
         return Ok();
     }
 
@@ -50,8 +50,10 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
     [ProducesResponseType<User>(StatusCodes.Status200OK)]
     public async Task<IActionResult> AddUser([FromQuery] string user, [FromQuery] string password, [FromQuery] string roles)
     {
+        logger.LogInformation("User {NewUsername} will be added by {Username} from {Ip}", user, HttpContext.User.Identity!.Name, HttpContext.Connection.RemoteIpAddress);
         if (userDb.CurrentValue.Users.Select(u => u.Username).Contains(user))
         {
+            logger.LogError("User {NewUsername} already exists", user);
             return BadRequest(Helpers.GetValidationDetails(nameof(user), $"User {user} already exists"));
         }
 
@@ -66,6 +68,7 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
             }
             else
             {
+                logger.LogError("Unknown role '{Role}'", roleString);
                 return BadRequest(Helpers.GetValidationDetails(nameof(roles), $"Unknown role '{roleString}'"));
             }
         }
