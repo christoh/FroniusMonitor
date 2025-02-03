@@ -24,11 +24,11 @@ internal partial class Program
 
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel
-            #if DEBUG
+#if DEBUG
             .Debug()
-            #else
+#else
             .Information()
-            #endif
+#endif
             .Enrich.WithComputed("SourceContextName", "Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)")
             .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] ({SourceContextName:l}) {Message:lj}{NewLine}{Exception}", formatProvider: CultureInfo.InvariantCulture)
             .CreateLogger();
@@ -78,6 +78,7 @@ internal partial class Program
             .AddSingleton<Gen24DataCollector>()
             .AddTransient<ISunSpecClient, SunSpecClient>()
             .AddLogging(b => b.AddSerilog())
+            .AddCors(o => o.AddDefaultPolicy(p => p.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin()))
             ;
 
         if (settings != null)
@@ -86,7 +87,7 @@ internal partial class Program
             {
                 builder.WebHost.UseUrls(settings.WebServerSettings.Urls);
             }
-            
+
             builder.Services.AddSingleton(settings);
 
             builder.Services
@@ -146,6 +147,7 @@ internal partial class Program
         //app.UseAuthorization();
 
         app.MapControllers();
+        app.UseCors();
         IoC.Update(app.Services);
 
         logger = IoC.Get<ILogger<Program>>();
