@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+
+namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
 public class SelfConsumptionOptimizationViewModel
 (
