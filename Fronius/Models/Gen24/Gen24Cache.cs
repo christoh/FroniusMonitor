@@ -45,19 +45,17 @@ public class Gen24Cache : Gen24DeviceBase
 
     public double? InverterCurrentSum => InverterCurrentL1 + InverterCurrentL2 + InverterCurrentL3;
 
-    private double? inverterEnergyConsumedL1;
-
     [FroniusProprietaryImport("ACBRIDGE_ENERGYACTIVE_ACTIVECONSUMED_SUM_01_U64", Unit.Joule)]
     public double? InverterEnergyConsumedL1
     {
-        get => inverterEnergyConsumedL1;
-        set => Set(ref inverterEnergyConsumedL1, value, () => NotifyOfPropertyChange(nameof(InverterEnergyConsumedSum)));
+        get;
+        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(InverterEnergyConsumedSum)));
     }
 
     [FroniusProprietaryImport("ACBRIDGE_ENERGYACTIVE_ACTIVECONSUMED_SUM_02_U64", Unit.Joule)]
     public double? InverterEnergyConsumedL2
     {
-        get => inverterEnergyConsumedL1;
+        get;
         set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(InverterEnergyConsumedSum)));
     }
 
