@@ -1551,4 +1551,7 @@
   <data name="Unit" xml:space="preserve">
 	  <value>Einheit</value>
   </data>
+  <data name="PvPower" xml:space="preserve">
+	  <value>PV-Leistung</value>
+  </data>
 </root>

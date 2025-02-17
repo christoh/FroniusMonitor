@@ -3454,6 +3454,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to PV Power.
+        /// </summary>
+        public static string PvPower {
+            get {
+                return ResourceManager.GetString("PvPower", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Minimum SoC for charging with PV surplus.
         /// </summary>
         public static string PvSurplusBatteryLevel {

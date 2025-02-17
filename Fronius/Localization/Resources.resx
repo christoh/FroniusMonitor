@@ -1626,4 +1626,7 @@
   <data name="Unit" xml:space="preserve">
 	  <value>Unit</value>
   </data>
+  <data name="PvPower" xml:space="preserve">
+	  <value>PV Power</value>
+  </data>
 </root>

@@ -437,7 +437,7 @@
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock FontSize="10" FontWeight="Normal" Text="{x:Static p:Resources.DcPower}" TextAlignment="Center" />
+                            <TextBlock FontSize="10" FontWeight="Normal" Text="{x:Static p:Resources.PvPower}" TextAlignment="Center" />
 
                             <TextBlock FontSize="10" FontWeight="Medium" Grid.Row="1" Margin="0,0,0,2"
                                        Width="{Binding ActualWidth, ElementName=DcPowerGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
