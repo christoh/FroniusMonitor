@@ -205,7 +205,6 @@ public partial class InverterControl
         });
 
         var inverter = gen24Sensors?.Inverter;
-        var dataManager = gen24Sensors?.DataManager;
         var sitePowerFlow = e.HomeAutomationSystem?.SitePowerFlow;
 
         if
@@ -231,10 +230,9 @@ public partial class InverterControl
 
         _ = Dispatcher.InvokeAsync(() =>
         {
-            var cache = gen24Sensors?.Cache;
             var gen24Common = IsSecondary ? e.HomeAutomationSystem?.Gen24Config2?.InverterSettings : e.HomeAutomationSystem?.Gen24Config?.InverterSettings;
 
-            if (cache == null && inverter == null && dataManager == null)
+            if (inverter == null)
             {
                 return;
             }
@@ -292,7 +290,7 @@ public partial class InverterControl
                             break;
 
                         case InverterDisplayMode.DcRelativePower:
-                            DcPowerAggregateGauge.Value = (gen24Sensors?.Inverter?.Solar2Power / gen24Config?.InverterSettings?.Mppt?.Mppt2?.WattPeak) / (gen24Sensors?.Cache?.Solar1Power / gen24Config?.InverterSettings?.Mppt?.Mppt1?.WattPeak) * 100 ?? 0;
+                            DcPowerAggregateGauge.Value = (gen24Sensors?.Inverter?.Solar2Power / gen24Config?.InverterSettings?.Mppt?.Mppt2?.WattPeak) / (gen24Sensors?.Inverter?.Solar1Power / gen24Config?.InverterSettings?.Mppt?.Mppt1?.WattPeak) * 100 ?? 0;
                             DcPowerAggregateGauge.Minimum = 50;
                             DcPowerAggregateGauge.Maximum = 150;
                             DcPowerAggregateGauge.StringFormat = "N1";

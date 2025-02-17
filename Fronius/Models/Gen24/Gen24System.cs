@@ -24,5 +24,5 @@ public class Gen24System : BindableBase, IHaveDisplayName, IHaveUniqueId
     public bool IsPresent => true;
     public string? Manufacturer => "Fronius";
     public string? Model => Config?.Versions?.ModelName;
-    public string? SerialNumber => Sensors?.DataManager?.SerialNumber ?? Config?.Versions?.SerialNumber;
+    public string? SerialNumber => Config?.Versions?.SerialNumber;
 }

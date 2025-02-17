@@ -174,7 +174,7 @@ public bool IsSecondary => ReferenceEquals(Gen24Service, DataCollectionService.G
                 Title = $"{Loc.EnergyFlow} - {inverterSettings.SystemName}";
             }
 
-            if (!softwareVersions.TryGetValue("DEVICEGROUP", out var value))
+            if (!softwareVersions.TryGetValue("GEN24", out var value))
             {
                 ShowBox(Loc.NoGen24Symo, Loc.Error, MessageBoxButton.OK, MessageBoxImage.Error);
                 Close();

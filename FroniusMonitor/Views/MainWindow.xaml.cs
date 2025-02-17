@@ -141,28 +141,28 @@ public partial class MainWindow
             return;
         }
 
-        var totalIncomingPower = new[] { powerFlow.SolarPower, powerFlow.StoragePower, powerFlow.GridPower }.Where(ps => ps is > 0).Select(ps => ps!.Value).Sum();
+        var totalIncomingPower = new[] { powerFlow.SolarPower, powerFlow.StoragePower, powerFlow.GridPower }.Where(ps => ps > 0).Sum();
 
         double r = 0, g = 0, b = 0;
 
         if (powerFlow.SolarPower > 0)
         {
-            r = 0xff * powerFlow.SolarPower.Value;
-            g = 0xd0 * powerFlow.SolarPower.Value;
+            r = 0xff * powerFlow.SolarPower;
+            g = 0xd0 * powerFlow.SolarPower;
         }
 
         if (powerFlow.StoragePower > 0)
         {
-            r += Colors.LightGreen.R * powerFlow.StoragePower.Value;
-            g += Colors.LightGreen.G * powerFlow.StoragePower.Value;
-            b += Colors.LightGreen.B * powerFlow.StoragePower.Value;
+            r += Colors.LightGreen.R * powerFlow.StoragePower;
+            g += Colors.LightGreen.G * powerFlow.StoragePower;
+            b += Colors.LightGreen.B * powerFlow.StoragePower;
         }
 
         if (powerFlow.GridPower > 0)
         {
-            r += Colors.LightGray.R * powerFlow.GridPower.Value;
-            g += Colors.LightGray.G * powerFlow.GridPower.Value;
-            b += Colors.LightGray.B * powerFlow.GridPower.Value;
+            r += Colors.LightGray.R * powerFlow.GridPower;
+            g += Colors.LightGray.G * powerFlow.GridPower;
+            b += Colors.LightGray.B * powerFlow.GridPower;
         }
 
         r /= totalIncomingPower;

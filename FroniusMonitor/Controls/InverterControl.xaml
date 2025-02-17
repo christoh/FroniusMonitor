@@ -117,16 +117,16 @@
 
                             <StackPanel Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">
                                 <TextBlock Text="Gen24" FontSize="8" FontWeight="Medium" TextAlignment="Center" Margin="0,0,0,1"/>
-                                <c:Gauge Label="L1" Value="{m:GaugeBinding Sensors.Cache.InverterPhaseVoltageL1}" />
-                                <c:Gauge Label="L2" Value="{m:GaugeBinding Sensors.Cache.InverterPhaseVoltageL2}" />
-                                <c:Gauge Label="L3" Value="{m:GaugeBinding Sensors.Cache.InverterPhaseVoltageL3}" />
+                                <c:Gauge Label="L1" Value="{m:GaugeBinding Sensors.Inverter.AcVoltageL1}" />
+                                <c:Gauge Label="L2" Value="{m:GaugeBinding Sensors.Inverter.AcVoltageL2}" />
+                                <c:Gauge Label="L3" Value="{m:GaugeBinding Sensors.Inverter.AcVoltageL3}" />
                             </StackPanel>
                             
                             <StackPanel Grid.Row="1" Grid.Column="1" VerticalAlignment="Center">
                                 <TextBlock Text="{x:Static p:Resources.Grid}" FontWeight="Medium" FontSize="8" TextAlignment="Center" Margin="0,0,0,1"/>
-                                <c:Gauge Label="L1" Value="{m:GaugeBinding Sensors.Cache.FeedInPointPhaseVoltageL1}" />
-                                <c:Gauge Label="L2" Value="{m:GaugeBinding Sensors.Cache.FeedInPointPhaseVoltageL2}" />
-                                <c:Gauge Label="L3" Value="{m:GaugeBinding Sensors.Cache.FeedInPointPhaseVoltageL3}" />
+                                <c:Gauge Label="L1" Value="{m:GaugeBinding Sensors.Inverter.FeedInPointPhaseVoltageL1}" />
+                                <c:Gauge Label="L2" Value="{m:GaugeBinding Sensors.Inverter.FeedInPointPhaseVoltageL2}" />
+                                <c:Gauge Label="L3" Value="{m:GaugeBinding Sensors.Inverter.FeedInPointPhaseVoltageL3}" />
                             </StackPanel>
                         </Grid>
 
@@ -144,16 +144,16 @@
 
                                 <!-- ReSharper disable Xaml.RedundantAttachedProperty -->
                                 <c:Gauge Grid.Row="0" Grid.Column="0" Margin="1"
-                                                   Value="{m:GaugeBinding Sensors.Cache.FeedInPointPhaseVoltageL1}" />
+                                                   Value="{m:GaugeBinding Sensors.Inverter.FeedInPointPhaseVoltageL1}" />
 
                                 <c:Gauge Grid.Row="0" Grid.Column="1" Margin="1"
-                                                   Value="{m:GaugeBinding Sensors.Cache.FeedInPointPhaseVoltageL2}" />
+                                                   Value="{m:GaugeBinding Sensors.Inverter.FeedInPointPhaseVoltageL2}" />
 
                                 <c:Gauge Grid.Row="1" Grid.Column="0" Margin="1"
-                                                   Value="{m:GaugeBinding Sensors.Cache.FeedInPointPhaseVoltageL3}" />
+                                                   Value="{m:GaugeBinding Sensors.Inverter.FeedInPointPhaseVoltageL3}" />
 
                                 <c:Gauge Grid.Row="1" Grid.Column="1" Margin="1" Minimum="49.8" Maximum="50.2"
-                                                   Value="{m:GaugeBinding Sensors.Cache.FeedInPointFrequency}"
+                                                   Value="{m:GaugeBinding Sensors.Inverter.FeedInPointFrequency}"
                                                    t:HalfCircleGauge.MinimumMaximumStringFormat="N1" />
                                 <!-- ReSharper restore Xaml.RedundantAttachedProperty -->
                             </UniformGrid>
@@ -181,16 +181,16 @@
 
                             <StackPanel Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">
                                 <TextBlock Text="Gen24" FontSize="8" FontWeight="Medium" TextAlignment="Center" Margin="0,0,0,1"/>
-                                <c:Gauge Label="L12" Value="{m:GaugeBinding Sensors.Cache.InverterLineVoltageL12}" />
-                                <c:Gauge Label="L23" Value="{m:GaugeBinding Sensors.Cache.InverterLineVoltageL23}" />
-                                <c:Gauge Label="L31" Value="{m:GaugeBinding Sensors.Cache.InverterLineVoltageL31}" />
+                                <c:Gauge Label="L12" Value="{m:GaugeBinding Sensors.Inverter.AcVoltageL12}" />
+                                <c:Gauge Label="L23" Value="{m:GaugeBinding Sensors.Inverter.AcVoltageL23}" />
+                                <c:Gauge Label="L31" Value="{m:GaugeBinding Sensors.Inverter.AcVoltageL31}" />
                             </StackPanel>
 
                             <StackPanel Grid.Row="1" Grid.Column="1" VerticalAlignment="Center">
                                 <TextBlock Text="{x:Static p:Resources.Grid}" FontSize="8" FontWeight="Medium" TextAlignment="Center" Margin="0,0,0,1"/>
-                                <c:Gauge Label="L12" Value="{m:GaugeBinding Sensors.Cache.FeedInPointLineVoltageL12}" />
-                                <c:Gauge Label="L23" Value="{m:GaugeBinding Sensors.Cache.FeedInPointLineVoltageL23}" />
-                                <c:Gauge Label="L31" Value="{m:GaugeBinding Sensors.Cache.FeedInPointLineVoltageL31}" />
+                                <c:Gauge Label="L12" Value="{m:GaugeBinding Sensors.Inverter.FeedInPointLineVoltageL12}" />
+                                <c:Gauge Label="L23" Value="{m:GaugeBinding Sensors.Inverter.FeedInPointLineVoltageL23}" />
+                                <c:Gauge Label="L31" Value="{m:GaugeBinding Sensors.Inverter.FeedInPointLineVoltageL31}" />
                             </StackPanel>
                         </Grid>
 
@@ -209,11 +209,11 @@
                             <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.ActivePower}" TextAlignment="Center" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                                <c:Gauge Label="L1" Value="{m:GaugeBinding Sensors.Cache.InverterActivePowerL1}" />
-                                <c:Gauge Label="L2" Value="{m:GaugeBinding Sensors.Cache.InverterActivePowerL2}" />
-                                <c:Gauge Label="L3" Value="{m:GaugeBinding Sensors.Cache.InverterActivePowerL3}" />
+                                <c:Gauge Label="L1" Value="{m:GaugeBinding Sensors.Inverter.ActivePowerL1}" />
+                                <c:Gauge Label="L2" Value="{m:GaugeBinding Sensors.Inverter.ActivePowerL2}" />
+                                <c:Gauge Label="L3" Value="{m:GaugeBinding Sensors.Inverter.ActivePowerL3}" />
 
-                                <c:Gauge Label="{x:Static p:Resources.Sum}" Value="{m:GaugeBinding Sensors.Cache.InverterActivePowerSum}"
+                                <c:Gauge Label="{x:Static p:Resources.Sum}" Value="{m:GaugeBinding Sensors.Inverter.PowerActiveSum}"
                                                    Maximum="{Binding Config.MaxAcPower, FallbackValue=10000}">
                                     <c:Gauge.Minimum>
                                         <MultiBinding Converter="{co:AcPowerMinimum}">
@@ -236,12 +236,12 @@
 
                             <TextBlock FontSize="10" FontWeight="Medium" Grid.Row="1" Margin="0,0,0,2"
                                        Width="{Binding ActualWidth, ElementName=AcPowerActiveGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
-                                <Run Text="{m:GaugeBinding Sensors.Cache.InverterActivePowerSum, StringFormat=N1}" />
+                                <Run Text="{m:GaugeBinding Sensors.Inverter.PowerActiveSum, StringFormat=N1}" />
                                 <Run Text="W" />
                             </TextBlock>
 
                             <c:Gauge Grid.Row="2" Width="92"
-                                               Value="{Binding Sensors.Cache.InverterActivePowerSum, FallbackValue=-100000, TargetNullValue=-100000, Mode=OneWay}"
+                                               Value="{Binding Sensors.Inverter.PowerActiveSum, FallbackValue=-100000, TargetNullValue=-100000, Mode=OneWay}"
                                                Maximum="{Binding Config.MaxAcPower, FallbackValue=10000, TargetNullValue=10000, Mode=OneWay}"
                                                GaugeColors="{Binding Sensors.Storage, FallbackValue={x:Null}, Converter={co:NullToColorMap NotNull={x:Static c:Gauge.MidIsGood}, Null={x:Static c:Gauge.HighIsBad}}}"
                                                Origin="{Binding Sensors.Storage, Converter={co:NullToDouble Null=0, NotNull=.5}, FallbackValue=0}">
@@ -267,8 +267,8 @@
                                        Width="{Binding ActualWidth, ElementName=MpptComparison}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
                                 <TextBlock.Text>
                                     <MultiBinding Converter="{co:MpptComparison}">
-                                        <Binding Path="Sensors.Cache.Solar1Power"/>
-                                        <Binding Path="Sensors.Cache.Solar2Power"/>
+                                        <Binding Path="Sensors.Inverter.Solar1Power"/>
+                                        <Binding Path="Sensors.Inverter.Solar2Power"/>
                                         <Binding Path="Config.InverterSettings.Mppt.Mppt1.WattPeak"/>
                                         <Binding Path="Config.InverterSettings.Mppt.Mppt2.WattPeak"/>
                                     </MultiBinding>
@@ -280,8 +280,8 @@
                                                GaugeColors="{x:Static c:Gauge.ExtremeIsBad}">
                                 <c:Gauge.Value>
                                     <MultiBinding Converter="{co:MpptComparison}">
-                                        <Binding Path="Sensors.Cache.Solar1Power"/>
-                                        <Binding Path="Sensors.Cache.Solar2Power"/>
+                                        <Binding Path="Sensors.Inverter.Solar1Power"/>
+                                        <Binding Path="Sensors.Inverter.Solar2Power"/>
                                         <Binding Path="Config.InverterSettings.Mppt.Mppt1.WattPeak"/>
                                         <Binding Path="Config.InverterSettings.Mppt.Mppt2.WattPeak"/>
                                     </MultiBinding>
@@ -306,10 +306,10 @@
                             <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.ApparentPower}" TextAlignment="Center" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                                <c:Gauge Label="L1" Value="{m:GaugeBinding Sensors.Cache.InverterApparentPowerL1}" />
-                                <c:Gauge Label="L2" Value="{m:GaugeBinding Sensors.Cache.InverterApparentPowerL2}" />
-                                <c:Gauge Label="L3" Value="{m:GaugeBinding Sensors.Cache.InverterApparentPowerL3}" />
-                                <c:Gauge Label="{x:Static p:Resources.Sum}" Value="{m:GaugeBinding Sensors.Cache.InverterApparentPowerSum}"
+                                <c:Gauge Label="L1" Value="{m:GaugeBinding Sensors.Inverter.ApparentPowerL1}" />
+                                <c:Gauge Label="L2" Value="{m:GaugeBinding Sensors.Inverter.ApparentPowerL2}" />
+                                <c:Gauge Label="L3" Value="{m:GaugeBinding Sensors.Inverter.ApparentPowerL3}" />
+                                <c:Gauge Label="{x:Static p:Resources.Sum}" Value="{m:GaugeBinding Sensors.Inverter.PowerApparentSum}"
                                                    Maximum="{Binding Config.MaxAcPower, FallbackValue=10000, TargetNullValue=10000}" />
                             </StackPanel>
                         </Grid>
@@ -332,10 +332,10 @@
                             <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.ReactivePower}" TextAlignment="Center" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                                <c:Gauge Label="L1" Value="{m:GaugeBinding Sensors.Cache.InverterReactivePowerL1}" />
-                                <c:Gauge Label="L2" Value="{m:GaugeBinding Sensors.Cache.InverterReactivePowerL2}" />
-                                <c:Gauge Label="L3" Value="{m:GaugeBinding Sensors.Cache.InverterReactivePowerL3}" />
-                                <c:Gauge Label="{x:Static p:Resources.Sum}" Value="{m:GaugeBinding Sensors.Cache.InverterReactivePowerSum}"
+                                <c:Gauge Label="L1" Value="{m:GaugeBinding Sensors.Inverter.ReactivePowerL1}" />
+                                <c:Gauge Label="L2" Value="{m:GaugeBinding Sensors.Inverter.ReactivePowerL2}" />
+                                <c:Gauge Label="L3" Value="{m:GaugeBinding Sensors.Inverter.ReactivePowerL3}" />
+                                <c:Gauge Label="{x:Static p:Resources.Sum}" Value="{m:GaugeBinding Sensors.Inverter.PowerReactiveSum}"
                                                    Maximum="{Binding Config.MaxAcPower, FallbackValue=10000, TargetNullValue=10000}"
                                                    Minimum="{Binding Config.MaxAcPower, FallbackValue=-10000, TargetNullValue=-10000, Converter={co:Multiply Factor=-1}}" />
                             </StackPanel>
@@ -360,10 +360,10 @@
                             <TextBlock Grid.Row="0" FontSize="10" Text="cos(φ)" Margin="0,0,0,1" TextAlignment="Center" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                                <c:Gauge Label="L1" Value="{m:GaugeBinding Sensors.Cache.InverterPowerFactorL1}" />
-                                <c:Gauge Label="L2" Value="{m:GaugeBinding Sensors.Cache.InverterPowerFactorL2}" />
-                                <c:Gauge Label="L3" Value="{m:GaugeBinding Sensors.Cache.InverterPowerFactorL3}" />
-                                <c:Gauge Label="{x:Static p:Resources.Total}" Value="{m:GaugeBinding Sensors.Cache.InverterPowerFactorAverage}" />
+                                <c:Gauge Label="L1" Value="{m:GaugeBinding Sensors.Inverter.PowerFactorL1}" />
+                                <c:Gauge Label="L2" Value="{m:GaugeBinding Sensors.Inverter.PowerFactorL2}" />
+                                <c:Gauge Label="L3" Value="{m:GaugeBinding Sensors.Inverter.PowerFactorL3}" />
+                                <c:Gauge Label="{x:Static p:Resources.Total}" Value="{m:GaugeBinding Sensors.Inverter.PowerFactorAverage}" />
                             </StackPanel>
                         </Grid>
 
@@ -385,11 +385,11 @@
                             <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.AcCurrent}" Margin="0,0,0,2" TextAlignment="Center" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                                <c:Gauge Label="L1" Value="{m:GaugeBinding Sensors.Cache.InverterCurrentL1}" />
-                                <c:Gauge Label="L2" Value="{m:GaugeBinding Sensors.Cache.InverterCurrentL2}" />
-                                <c:Gauge Label="L3" Value="{m:GaugeBinding Sensors.Cache.InverterCurrentL3}" />
+                                <c:Gauge Label="L1" Value="{m:GaugeBinding Sensors.Inverter.CurrentL1}" />
+                                <c:Gauge Label="L2" Value="{m:GaugeBinding Sensors.Inverter.CurrentL2}" />
+                                <c:Gauge Label="L3" Value="{m:GaugeBinding Sensors.Inverter.CurrentL3}" />
                                 <c:Gauge Label="{x:Static p:Resources.Sum}"
-                                                   Value="{m:GaugeBinding Sensors.Cache.InverterCurrentSum}"
+                                                   Value="{m:GaugeBinding Sensors.Inverter.CurrentSum}"
                                                    Maximum="{m:GaugeBinding Config.MaxAcPower, Converter={co:Multiply Factor=0.00434783}}" />
                             </StackPanel>
                         </Grid>
@@ -411,21 +411,21 @@
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
 
                                 <c:Gauge Label="{l:Channel 'MPPT1'}" x:Name="DcPowerFirstGauge"
-                                                   Value="{m:GaugeBinding Sensors.Cache.Solar1Power}"
+                                                   Value="{m:GaugeBinding Sensors.Inverter.Solar1Power}"
                                                    Maximum="{m:GaugeBinding Config.InverterSettings.Mppt.Mppt1.WattPeak, FallbackValue=5000}" />
 
                                 <c:Gauge Label="{l:Channel 'MPPT2'}" ShowPercent="{Binding ShowPercent, ElementName=DcPowerFirstGauge}"
-                                                   Value="{m:GaugeBinding Sensors.Cache.Solar2Power}"
+                                                   Value="{m:GaugeBinding Sensors.Inverter.Solar2Power}"
                                                    Maximum="{m:GaugeBinding Config.InverterSettings.Mppt.Mppt2.WattPeak, FallbackValue=5000}" />
 
                                 <c:Gauge x:Name="DcPowerAggregateGauge" />
 
                                 <c:Gauge Label="{x:Static p:Resources.Battery}" t:LinearGauge.UseAbsoluteValue="True"
                                                    ShowPercent="{Binding ShowPercent, ElementName=DcPowerFirstGauge}"
-                                                   Value="{m:GaugeBinding Sensors.Cache.StoragePower}"
+                                                   Value="{m:GaugeBinding Sensors.Inverter.StoragePower}"
                                                    Visibility="{Binding Sensors.Storage, FallbackValue=Collapsed, Converter={co:NullToVisibility Null=Hidden}}"
-                                                   Maximum="{Binding Sensors.Cache.StorageVoltageOuter, FallbackValue=8184, Converter={co:Multiply Factor=22}}"
-                                                   Minimum="{Binding Sensors.Cache.StorageVoltageOuter, FallbackValue=-8184, Converter={co:Multiply Factor=-22}}"
+                                                   Maximum="{Binding Sensors.Inverter.StorageVoltageOuter, FallbackValue=8184, Converter={co:Multiply Factor=22}}"
+                                                   Minimum="{Binding Sensors.Inverter.StorageVoltageOuter, FallbackValue=-8184, Converter={co:Multiply Factor=-22}}"
                                                    GaugeColors="{x:Static c:Gauge.MidIsGood}" Origin="0.5" />
                             </StackPanel>
                         </Grid>
@@ -441,11 +441,11 @@
 
                             <TextBlock FontSize="10" FontWeight="Medium" Grid.Row="1" Margin="0,0,0,2"
                                        Width="{Binding ActualWidth, ElementName=DcPowerGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
-                                <Run Text="{m:GaugeBinding Sensors.Cache.SolarPowerSum, StringFormat=N1}" />
+                                <Run Text="{m:GaugeBinding Sensors.Inverter.SolarPowerSum, StringFormat=N1}" />
                                 <Run Text="W" />
                             </TextBlock>
 
-                            <c:Gauge Value="{m:GaugeBinding Sensors.Cache.SolarPowerSum}"
+                            <c:Gauge Value="{m:GaugeBinding Sensors.Inverter.SolarPowerSum}"
                                                Minimum="0" Grid.Row="2"
                                                Maximum="{Binding Config.InverterSettings.Mppt.WattPeakTotal, FallbackValue=10000, TargetNullValue=10000}"
                                                GaugeColors="{x:Static c:Gauge.HighIsBad}"
@@ -469,11 +469,11 @@
                             <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.DcVoltage}" Margin="0,0,0,1" TextAlignment="Center" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                                <c:Gauge Label="{l:Channel 'MPPT1'}" Value="{m:GaugeBinding Sensors.Cache.Solar1Voltage}" />
-                                <c:Gauge Label="{l:Channel 'MPPT2'}" Value="{m:GaugeBinding Sensors.Cache.Solar2Voltage}" />
-                                <c:Gauge Label="{x:Static p:Resources.DcLink}" Value="{m:GaugeBinding Sensors.Cache.DcLinkVoltage}"
+                                <c:Gauge Label="{l:Channel 'MPPT1'}" Value="{m:GaugeBinding Sensors.Inverter.Solar1Voltage}" />
+                                <c:Gauge Label="{l:Channel 'MPPT2'}" Value="{m:GaugeBinding Sensors.Inverter.Solar2Voltage}" />
+                                <c:Gauge Label="{x:Static p:Resources.DcLink}" Value="{m:GaugeBinding Sensors.Inverter.DcLinkVoltage}"
                                                    Minimum="550" Maximum="800" GaugeColors="{x:Static c:Gauge.ExtremeIsBad}" />
-                                <c:Gauge Label="{x:Static p:Resources.Battery}" Value="{m:GaugeBinding Sensors.Cache.StorageVoltageOuter}"
+                                <c:Gauge Label="{x:Static p:Resources.Battery}" Value="{m:GaugeBinding Sensors.Inverter.StorageVoltageOuter}"
                                                    Minimum="{Binding Sensors.Storage.MinVoltage, FallbackValue=280}"
                                                    Maximum="{Binding Sensors.Storage.MaxVoltage, FallbackValue=320}"
                                                    GaugeColors="{x:Static c:Gauge.MidIsGood}" />
@@ -498,16 +498,16 @@
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                                 <c:Gauge Label="{l:Channel 'MPPT1'}"
-                                                   Value="{m:GaugeBinding Sensors.Cache.Solar1Current}"
+                                                   Value="{m:GaugeBinding Sensors.Inverter.Solar1Current}"
                                                    Maximum="25" />
                                 <c:Gauge Label="{l:Channel 'MPPT2'}"
-                                                   Value="{m:GaugeBinding Sensors.Cache.Solar2Current}"
+                                                   Value="{m:GaugeBinding Sensors.Inverter.Solar2Current}"
                                                    Maximum="12.5" />
                                 <c:Gauge Label="{x:Static p:Resources.Sum}"
-                                                   Value="{m:GaugeBinding Sensors.Cache.SolarCurrentSum}"
+                                                   Value="{m:GaugeBinding Sensors.Inverter.SolarCurrentSum}"
                                                    Maximum="37.5" />
                                 <c:Gauge Label="{x:Static p:Resources.Battery}"
-                                                   Value="{m:GaugeBinding Sensors.Cache.StorageCurrent, TargetNullValue=0, FallbackValue=0, Mode=OneWay}"
+                                                   Value="{m:GaugeBinding Sensors.Inverter.StorageCurrent, TargetNullValue=0, FallbackValue=0, Mode=OneWay}"
                                                    Maximum="22" Visibility="{Binding Sensors.Storage, FallbackValue=Collapsed, Converter={co:NullToVisibility Null=Hidden}}" />
                             </StackPanel>
                         </Grid>
@@ -554,17 +554,17 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" FontSize="10" Text="{Binding Sensors.DataManager.SerialNumber, FallbackValue=''}" TextAlignment="Center" />
-                            <TextBlock Grid.Row="1" FontSize="10" TextAlignment="Center" Margin="0,0,0,1" Text="{Binding Sensors.Cache.DataTime, Converter={co:DateConverter}, FallbackValue='', Mode=OneWay}" />
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{Binding Config.Versions.SerialNumber, FallbackValue=''}" TextAlignment="Center" />
+                            <TextBlock Grid.Row="1" FontSize="10" TextAlignment="Center" Margin="0,0,0,1" Text="{Binding Sensors.Inverter.DataTime, Converter={co:DateConverter}, FallbackValue='', Mode=OneWay}" />
 
                             <StackPanel Grid.Row="2" VerticalAlignment="Center">
                                 <c:Gauge Label="Gen24"
-                                                   Value="{m:GaugeBinding Sensors.Cache.InverterFrequency}" />
+                                                   Value="{m:GaugeBinding Sensors.Inverter.InverterFrequency}" />
                                 <c:Gauge Label="{x:Static p:Resources.Grid}"
-                                                   Value="{m:GaugeBinding Sensors.Cache.FeedInPointFrequency}" />
+                                                   Value="{m:GaugeBinding Sensors.Inverter.FeedInPointFrequency}" />
                                 <c:Gauge Minimum="0" Maximum="2000" StringFormat="N0" UnitName="ms"
                                                    Label="{x:Static p:Resources.Latency}" GaugeColors="{x:Static c:Gauge.HighIsBad}"
-                                                   Value="{m:GaugeBinding Sensors.Cache.Latency.TotalMilliseconds}" />
+                                                   Value="{m:GaugeBinding Sensors.Inverter.Latency.TotalMilliseconds}" />
                             </StackPanel>
                         </Grid>
 
@@ -585,10 +585,10 @@
                             <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.Temperatures}" Margin="0,0,0,1" TextAlignment="Center" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                                <c:Gauge Label="{x:Static p:Resources.Ambient}" Value="{m:GaugeBinding Sensors.Cache.InverterAmbientTemperature}" />
-                                <c:Gauge Label="{x:Static p:Resources.AcModule}" Value="{m:GaugeBinding Sensors.Cache.TemperatureInverterAcModule}" />
-                                <c:Gauge Label="{x:Static p:Resources.DcModule}" Value="{m:GaugeBinding Sensors.Cache.TemperatureInverterDcModule}" />
-                                <c:Gauge Label="{x:Static p:Resources.BatteryModule}" Value="{m:GaugeBinding Sensors.Cache.TemperatureInverterBatteryModule}" />
+                                <c:Gauge Label="{x:Static p:Resources.Ambient}" Value="{m:GaugeBinding Sensors.Inverter.AmbientTemperature}" />
+                                <c:Gauge Label="{x:Static p:Resources.AcModule}" Value="{m:GaugeBinding Sensors.Inverter.TemperatureInverterAcModule}" />
+                                <c:Gauge Label="{x:Static p:Resources.DcModule}" Value="{m:GaugeBinding Sensors.Inverter.TemperatureInverterDcModule}" />
+                                <c:Gauge Label="{x:Static p:Resources.BatteryModule}" Value="{m:GaugeBinding Sensors.Inverter.TemperatureInverterBatteryModule}" />
                             </StackPanel>
                         </Grid>
 
@@ -610,9 +610,9 @@
                             <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.Misc}" Margin="0,0,0,1" TextAlignment="Center" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                                <c:Gauge Label="{x:Static p:Resources.Fan1}" Value="{m:GaugeBinding Sensors.Cache.Fan1RelativeRpm}" />
-                                <c:Gauge Label="{x:Static p:Resources.Fan2}" Value="{m:GaugeBinding Sensors.Cache.Fan2RelativeRpm}" />
-                                <c:Gauge Label="Iso" Value="{m:GaugeBinding Sensors.Cache.IsolatorResistance, Converter={co:Multiply Factor=.000001}}"
+                                <c:Gauge Label="{x:Static p:Resources.Fan1}" Value="{m:GaugeBinding Sensors.Inverter.Fan1RelativeRpm}" />
+                                <c:Gauge Label="{x:Static p:Resources.Fan2}" Value="{m:GaugeBinding Sensors.Inverter.Fan2RelativeRpm}" />
+                                <c:Gauge Label="Iso" Value="{m:GaugeBinding Sensors.Inverter.IsolatorResistance, Converter={co:Multiply Factor=.000001}}"
                                                    Minimum="0" Maximum="10" ShowPercent="False" UnitName="MΩ" GaugeColors="{x:Static c:Gauge.LowIsBad}" />
                             </StackPanel>
                         </Grid>
@@ -635,13 +635,13 @@
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                                 <c:Gauge Label="Total"
-                                                   Value="{m:GaugeBinding Sensors.Cache.InverterUpTime.TotalDays}"
+                                                   Value="{m:GaugeBinding Sensors.Inverter.InverterUpTime.TotalDays}"
                                                    Maximum="1826.25" GaugeColors="{x:Static c:Gauge.AllIsGood}" />
                                 <c:Gauge Label="{x:Static p:Resources.BackupOpTime}"
-                                                   Value="{m:GaugeBinding Sensors.Cache.BackupModeUpTime.TotalDays}"
-                                                   Maximum="{m:GaugeBinding Sensors.Cache.InverterUpTime.TotalDays}" />
+                                                   Value="{m:GaugeBinding Sensors.Inverter.BackupModeUpTime.TotalDays}"
+                                                   Maximum="{m:GaugeBinding Sensors.Inverter.InverterUpTime.TotalDays}" />
                                 <c:Gauge Label="{x:Static p:Resources.BackupOpTime}"
-                                                   Value="{m:GaugeBinding Sensors.Cache.RelativeBackupModeUpTime}"
+                                                   Value="{m:GaugeBinding Sensors.Inverter.RelativeBackupModeUpTime}"
                                                    Maximum="1" StringFormat="N4" ShowPercent="True" />
                             </StackPanel>
                         </Grid>
@@ -650,7 +650,7 @@
                             <Grid.Resources>
                                 <Style TargetType="c:Gauge" BasedOn="{StaticResource LinearEnergyGaugeStyle}">
                                     <Setter Property="Minimum" Value="0" />
-                                    <Setter Property="Maximum" Value="{m:GaugeBinding Sensors.Cache.SolarEnergyLifeTimeSum, Converter={co:Multiply Factor=.001}}" />
+                                    <Setter Property="Maximum" Value="{m:GaugeBinding Sensors.Inverter.SolarEnergyLifeTimeSum, Converter={co:Multiply Factor=.001}}" />
                                 </Style>
                             </Grid.Resources>
                             <Grid.RowDefinitions>
@@ -662,7 +662,7 @@
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                                 <c:Gauge Label="{l:Channel 'MPPT1'}"
-                                                   Value="{m:GaugeBinding Sensors.Cache.Solar1EnergyLifeTime, Converter={co:Multiply Factor=.001}}">
+                                                   Value="{m:GaugeBinding Sensors.Inverter.Solar1EnergyLifeTime, Converter={co:Multiply Factor=.001}}">
                                     <c:Gauge.GaugeColors>
                                         <MultiBinding Converter="{co:LifeTimeEnergyToGaugeColors}">
                                             <Binding Path="Config.InverterSettings.Mppt.Mppt1.WattPeak" />
@@ -671,7 +671,7 @@
                                     </c:Gauge.GaugeColors>
                                 </c:Gauge>
                                 <c:Gauge Label="{l:Channel 'MPPT2'}"
-                                                   Value="{m:GaugeBinding Sensors.Cache.Solar2EnergyLifeTime, Converter={co:Multiply Factor=.001}}">
+                                                   Value="{m:GaugeBinding Sensors.Inverter.Solar2EnergyLifeTime, Converter={co:Multiply Factor=.001}}">
                                     <c:Gauge.GaugeColors>
                                         <MultiBinding Converter="{co:LifeTimeEnergyToGaugeColors}">
                                             <Binding Path="Config.InverterSettings.Mppt.Mppt2.WattPeak" />
@@ -680,8 +680,8 @@
                                     </c:Gauge.GaugeColors>
                                 </c:Gauge>
                                 <c:Gauge Label="{x:Static p:Resources.Sum}"
-                                                   Value="{m:GaugeBinding Sensors.Cache.SolarEnergyLifeTimeSum, Converter={co:Multiply Factor=.001}}" />
-                                <c:Gauge Label="{x:Static p:Resources.Efficiency}" Value="{m:GaugeBinding Sensors.Cache.InverterEfficiency}"
+                                                   Value="{m:GaugeBinding Sensors.Inverter.SolarEnergyLifeTimeSum, Converter={co:Multiply Factor=.001}}" />
+                                <c:Gauge Label="{x:Static p:Resources.Efficiency}" Value="{m:GaugeBinding Sensors.Inverter.Efficiency}"
                                                    Minimum="0" Maximum="1" ShowPercent="True" />
                             </StackPanel>
                         </Grid>
@@ -691,7 +691,7 @@
                                 <Style TargetType="c:Gauge" BasedOn="{StaticResource LinearEnergyGaugeStyle}">
                                     <Setter Property="Minimum" Value="0" />
                                     <Setter Property="GaugeColors" Value="{x:Static c:Gauge.OneThirdIsGood}" />
-                                    <Setter Property="Maximum" Value="{m:GaugeBinding Sensors.Cache.InverterEnergyProducedSum, Converter={co:Multiply Factor=.001}}" />
+                                    <Setter Property="Maximum" Value="{m:GaugeBinding Sensors.Inverter.EnergyProducedSum, Converter={co:Multiply Factor=.001}}" />
                                 </Style>
                             </Grid.Resources>
                             <Grid.RowDefinitions>
@@ -703,13 +703,13 @@
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                                 <c:Gauge Label="L1"
-                                                   Value="{m:GaugeBinding Sensors.Cache.InverterEnergyProducedL1, Converter={co:Multiply Factor=.001}}" />
+                                                   Value="{m:GaugeBinding Sensors.Inverter.EnergyProducedL1, Converter={co:Multiply Factor=.001}}" />
                                 <c:Gauge Label="L2"
-                                                   Value="{m:GaugeBinding Sensors.Cache.InverterEnergyProducedL2, Converter={co:Multiply Factor=.001}}" />
+                                                   Value="{m:GaugeBinding Sensors.Inverter.EnergyProducedL2, Converter={co:Multiply Factor=.001}}" />
                                 <c:Gauge Label="L3"
-                                                   Value="{m:GaugeBinding Sensors.Cache.InverterEnergyProducedL3, Converter={co:Multiply Factor=.001}}" />
+                                                   Value="{m:GaugeBinding Sensors.Inverter.EnergyProducedL3, Converter={co:Multiply Factor=.001}}" />
                                 <c:Gauge Label="{x:Static p:Resources.Sum}" GaugeColors="{x:Static c:Gauge.AllIsGood}"
-                                                   Value="{m:GaugeBinding Sensors.Cache.InverterEnergyProducedSum, Converter={co:Multiply Factor=.001}}" />
+                                                   Value="{m:GaugeBinding Sensors.Inverter.EnergyProducedSum, Converter={co:Multiply Factor=.001}}" />
                             </StackPanel>
                         </Grid>
 
@@ -718,7 +718,7 @@
                                 <Style TargetType="c:Gauge" BasedOn="{StaticResource LinearEnergyGaugeStyle}">
                                     <Setter Property="Minimum" Value="0" />
                                     <Setter Property="GaugeColors" Value="{x:Static c:Gauge.OneThirdIsGood}" />
-                                    <Setter Property="Maximum" Value="{m:GaugeBinding Sensors.Cache.InverterEnergyConsumedSum, Converter={co:Multiply Factor=.001}}" />
+                                    <Setter Property="Maximum" Value="{m:GaugeBinding Sensors.Inverter.EnergyConsumedSum, Converter={co:Multiply Factor=.001}}" />
                                 </Style>
                             </Grid.Resources>
                             <Grid.RowDefinitions>
@@ -730,13 +730,13 @@
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                                 <c:Gauge Label="L1"
-                                                   Value="{m:GaugeBinding Sensors.Cache.InverterEnergyConsumedL1, Converter={co:Multiply Factor=.001}}" />
+                                                   Value="{m:GaugeBinding Sensors.Inverter.EnergyConsumedL1, Converter={co:Multiply Factor=.001}}" />
                                 <c:Gauge Label="L2"
-                                                   Value="{m:GaugeBinding Sensors.Cache.InverterEnergyConsumedL2, Converter={co:Multiply Factor=.001}}" />
+                                                   Value="{m:GaugeBinding Sensors.Inverter.EnergyConsumedL2, Converter={co:Multiply Factor=.001}}" />
                                 <c:Gauge Label="L3"
-                                                   Value="{m:GaugeBinding Sensors.Cache.InverterEnergyConsumedL3, Converter={co:Multiply Factor=.001}}" />
+                                                   Value="{m:GaugeBinding Sensors.Inverter.EnergyConsumedL3, Converter={co:Multiply Factor=.001}}" />
                                 <c:Gauge Label="{x:Static p:Resources.Sum}" GaugeColors="{x:Static c:Gauge.AllIsGood}"
-                                                   Value="{m:GaugeBinding Sensors.Cache.InverterEnergyConsumedSum, Converter={co:Multiply Factor=.001}}" />
+                                                   Value="{m:GaugeBinding Sensors.Inverter.EnergyConsumedSum, Converter={co:Multiply Factor=.001}}" />
                             </StackPanel>
                         </Grid>
 
@@ -755,17 +755,17 @@
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                                 <c:Gauge Label="{x:Static p:Resources.Charged}"
-                                                   Value="{m:GaugeBinding Sensors.Cache.StorageLifeTimeEnergyCharged, Converter={co:Multiply Factor=.001}}"
+                                                   Value="{m:GaugeBinding Sensors.Inverter.StorageLifeTimeEnergyCharged, Converter={co:Multiply Factor=.001}}"
                                                    GaugeColors="{x:Static c:Gauge.AllIsGood}"
                                                    Maximum="0" Minimum="-1"/>
 
                                 <c:Gauge Label="{x:Static p:Resources.Discharged}"
-                                                   Value="{m:GaugeBinding Sensors.Cache.StorageLifeTimeEnergyDischarged, Converter={co:Multiply Factor=.001}}"
+                                                   Value="{m:GaugeBinding Sensors.Inverter.StorageLifeTimeEnergyDischarged, Converter={co:Multiply Factor=.001}}"
                                                    Minimum="0"
-                                                   Maximum="{m:GaugeBinding Sensors.Cache.StorageLifeTimeEnergyCharged, Converter={co:Multiply Factor=.001}}" />
+                                                   Maximum="{m:GaugeBinding Sensors.Inverter.StorageLifeTimeEnergyCharged, Converter={co:Multiply Factor=.001}}" />
 
                                 <c:Gauge Label="{x:Static p:Resources.Efficiency}"
-                                                   Value="{m:GaugeBinding Sensors.Cache.StorageEfficiency}"
+                                                   Value="{m:GaugeBinding Sensors.Inverter.StorageEfficiency}"
                                                    ShowPercent="True" Minimum="0" Maximum="1" />
                             </StackPanel>
                         </Grid>

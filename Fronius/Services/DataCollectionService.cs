@@ -473,9 +473,6 @@
                         StoragePower = (powerFlow?.StoragePower ?? 0) + (powerFlow2?.StoragePower ?? 0),
                         SolarPower = (powerFlow?.SolarPower ?? 0) + (powerFlow2?.SolarPower ?? 0),
                         InverterAcPower = (powerFlow?.InverterAcPower ?? 0) + (powerFlow2?.InverterAcPower ?? 0),
-                        BackupModeDisplayName = powerFlow?.BackupModeDisplayName,
-                        InverterPowerNominal = powerFlow?.InverterPowerNominal + powerFlow2?.InverterPowerNominal,
-                        StoragePowerConfigured = powerFlow?.StoragePowerConfigured + powerFlow2?.StoragePowerConfigured ?? 0
                     };
 
                     newFritzBoxData = fritzBoxTask is { IsCompletedSuccessfully: true, Result: not null };

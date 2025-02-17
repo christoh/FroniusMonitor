@@ -99,15 +99,6 @@
                 gen24Sensors.Storage.GroupId = uint.Parse(storageGroupId);
             }
 
-            if (components.Groups.TryGetValue("Application", out var applications))
-            {
-                var restrictions = applications
-                    .Select(key => dataToken[key])
-                    .FirstOrDefault(t => t?["attributes"]?["PowerRestrictionControllerVersion"] != null);
-
-                gen24Sensors.Restrictions = gen24JsonService.ReadFroniusData<Gen24Restrictions>(restrictions);
-            }
-
             if (components.Groups.TryGetValue("PowerMeter", out var powerMeters))
             {
                 foreach (var powerMeter in powerMeters)
@@ -142,9 +133,14 @@
                 }
             }
 
-            gen24Sensors.DataManager = gen24JsonService.ReadFroniusData<Gen24DataManager>(dataToken[components.Groups["DataManager"].Single()]);
-            gen24Sensors.PowerFlow = gen24JsonService.ReadFroniusData<Gen24PowerFlow>(dataToken[components.Groups["Site"].Single()]);
-            gen24Sensors.Cache = gen24JsonService.ReadFroniusData<Gen24Cache>(dataToken[components.Groups["CACHE"].FirstOrDefault() ?? "393216"]);
+            gen24Sensors.PowerFlow = new Gen24PowerFlow
+            {
+                GridPower = gen24Sensors.PrimaryPowerMeter?.ActivePowerSum??0,
+                StoragePower = gen24Sensors.Inverter?.StoragePower??0,
+                SolarPower = gen24Sensors.Inverter?.SolarPowerSum??0,
+                LoadPower = -(gen24Sensors.Inverter?.PowerActiveSum??0)-(gen24Sensors.PrimaryPowerMeter?.ActivePowerSum??0),
+                InverterAcPower = gen24Sensors.Inverter?.PowerActiveSum??0,
+            };
 
             return gen24Sensors;
         }

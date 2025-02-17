@@ -15,25 +15,7 @@ public class Gen24Sensors : BindableBase
     }
 
 
-    public Gen24Restrictions? Restrictions
-    {
-        get;
-        set => Set(ref field, value);
-    }
-
-    public Gen24DataManager? DataManager
-    {
-        get;
-        set => Set(ref field, value);
-    }
-
     public Gen24PowerFlow? PowerFlow
-    {
-        get;
-        set => Set(ref field, value);
-    }
-
-    public Gen24Cache? Cache
     {
         get;
         set => Set(ref field, value);

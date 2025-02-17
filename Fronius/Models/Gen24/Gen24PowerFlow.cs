@@ -25,52 +25,52 @@ public class Gen24PowerFlow : Gen24DeviceBase
     private static int oldSmartMeterHistoryCountProduced;
     private static int oldSmartMeterHistoryCountConsumed;
 
-    [FroniusProprietaryImport("state", FroniusDataType.Attribute)]
-    public SiteType? SiteType
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    //[FroniusProprietaryImport("state", FroniusDataType.Attribute)]
+    //public SiteType? SiteType
+    //{
+    //    get;
+    //    set => Set(ref field, value);
+    //}
 
-    public string? SiteTypeDisplayName => SiteType?.ToDisplayName();
+    //public string? SiteTypeDisplayName => SiteType?.ToDisplayName();
 
-    [FroniusProprietaryImport("BackupMode", FroniusDataType.Attribute)]
-    public string? BackupModeDisplayName
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    //[FroniusProprietaryImport("BackupMode", FroniusDataType.Attribute)]
+    //public string? BackupModeDisplayName
+    //{
+    //    get;
+    //    set => Set(ref field, value);
+    //}
 
-    [FroniusProprietaryImport("ACBRIDGE_ENERGYACTIVE_PRODUCED_SUM_U64", Unit.Joule)]
-    public double? InverterLifeTimeEnergyProduced
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    //[FroniusProprietaryImport("ACBRIDGE_ENERGYACTIVE_PRODUCED_SUM_U64", Unit.Joule)]
+    //public double? InverterLifeTimeEnergyProduced
+    //{
+    //    get;
+    //    set => Set(ref field, value);
+    //}
 
-    [FroniusProprietaryImport("ACBRIDGE_POWERACTIVE_AC_NOMINAL_F64")]
-    public double? InverterPowerNominal
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    //[FroniusProprietaryImport("ACBRIDGE_POWERACTIVE_AC_NOMINAL_F64")]
+    //public double? InverterPowerNominal
+    //{
+    //    get;
+    //    set => Set(ref field, value);
+    //}
 
-    [FroniusProprietaryImport("BAT_POWERACTIVE_DC_CONFIGURED_F64")]
-    public double? StoragePowerConfigured
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    //[FroniusProprietaryImport("BAT_POWERACTIVE_DC_CONFIGURED_F64")]
+    //public double? StoragePowerConfigured
+    //{
+    //    get;
+    //    set => Set(ref field, value);
+    //}
 
     [FroniusProprietaryImport("BAT_POWERACTIVE_MEAN_SUM_F64")]
-    public double? StoragePower
+    public double StoragePower
     {
         get;
         set => Set(ref field, value);
     }
 
     [FroniusProprietaryImport("GRID_POWERACTIVE_LOAD_MEAN_SUM_F64")]
-    public double? LoadPower
+    public double LoadPower
     {
         get;
         set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(LoadPowerCorrected)));
@@ -104,19 +104,19 @@ public class Gen24PowerFlow : Gen24DeviceBase
         }
     } = 1;
 
-    public double? LoadPowerCorrected => LoadPower + GridPower - GridPowerCorrected;
+    public double LoadPowerCorrected => LoadPower + GridPower - GridPowerCorrected;
 
-    public double? GridPowerCorrected => GridPower * (GridPower < 0 ? ProducedFactor : ConsumedFactor);
+    public double GridPowerCorrected => GridPower * (GridPower < 0 ? ProducedFactor : ConsumedFactor);
 
     [FroniusProprietaryImport("GRID_POWERACTIVE_GENERATED_MEAN_SUM_F64")]
-    public double? InverterAcPower
+    public double InverterAcPower
     {
         get;
         set => Set(ref field, value);
     }
 
     [FroniusProprietaryImport("GRID_POWERACTIVE_MEAN_SUM_F64")]
-    public double? GridPower
+    public double GridPower
     {
         get;
         set => Set(ref field, value, () =>
@@ -127,7 +127,7 @@ public class Gen24PowerFlow : Gen24DeviceBase
     }
 
     [FroniusProprietaryImport("PV_POWERACTIVE_MEAN_SUM_F64")]
-    public double? SolarPower
+    public double SolarPower
     {
         get;
         set => Set(ref field, value);
@@ -141,15 +141,15 @@ public class Gen24PowerFlow : Gen24DeviceBase
     }
 
     [JsonIgnore]
-    public IEnumerable<double> AllPowers => new[] { StoragePower, GridPower, SolarPower, LoadPower ?? -InverterAcPower }.Where(ps => ps.HasValue).Select(ps => ps!.Value);
+    public IEnumerable<double> AllPowers => [StoragePower, GridPower, SolarPower, LoadPower];
     [JsonIgnore]
-    public double DcInputPower => new[] { StoragePower ?? 0, SolarPower ?? 0 }.Where(ps => ps > 0).Sum();
+    public double DcInputPower => new[] { StoragePower, SolarPower }.Where(ps => ps > 0).Sum();
     [JsonIgnore]
-    public double AcInputPower => new[] { GridPower ?? 0d, LoadPower ?? -InverterAcPower ?? 0 }.Where(ps => ps > 0).Sum();
+    public double AcInputPower => new[] { GridPower, LoadPower }.Where(ps => ps > 0).Sum();
     [JsonIgnore]
-    public double AcOutputPower => new[] { GridPower ?? 0d, LoadPower ?? -InverterAcPower ?? 0 }.Where(ps => ps < 0).Sum();
+    public double AcOutputPower => new[] { GridPower , LoadPower }.Where(ps => ps < 0).Sum();
     [JsonIgnore]
-    public double DcOutputPower => new[] { StoragePower ?? 0, SolarPower ?? 0 }.Where(ps => ps is < 0).Sum();
+    public double DcOutputPower => new[] { StoragePower , SolarPower }.Where(ps => ps < 0).Sum();
     [JsonIgnore]
     public double PowerLoss => AllPowers.Sum();
     [JsonIgnore]
