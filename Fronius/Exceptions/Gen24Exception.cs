@@ -1,15 +1,9 @@
 ﻿namespace De.Hochstaetter.Fronius.Exceptions;
 
-public class Gen24Exception : Exception
+public class Gen24Exception(int status, string message, string userMessage, string urlString)
+    : Exception(message)
 {
-    public int Status { get; }
-    public string UserMessage { get; }
-    public string UrlString { get; }
-
-    public Gen24Exception(int status, string message, string userMessage, string urlString) : base(message)
-    {
-            Status = status;
-            UserMessage = userMessage;
-            UrlString = urlString;
-        }
+    public int Status { get; } = status;
+    public string UserMessage { get; } = userMessage;
+    public string UrlString { get; } = urlString;
 }
