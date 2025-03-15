@@ -10,7 +10,7 @@ WORKDIR /build/HomeAutomationServer
 
 RUN apk --no-cache update && \
     apk --no-cache upgrade && \
-    dotnet workload update && \
+    #dotnet workload update && \
     rm -fr /build/Fronius/bin /build/Fronius/obj bin obj && \
     mkdir -p /runner/app && \
     mkdir -p /runner/root && \
@@ -25,6 +25,8 @@ COPY <<"EOF" ./root/.profile
 echo ""
 echo Alpine Linux $(cat /etc/alpine-release)
 test -f /etc/motd && cat /etc/motd
+fastfetch
+echo ""
 cd
 export ENV=~/.ashrc
 EOF
@@ -34,7 +36,7 @@ COPY <<"EOF" ./root/.ashrc
 
 alias ll='ls -laF'
 alias sudo='doas'
-alias ps='ps -o pid,ppid,user,tty,nice,vsz,rss,time,args'
+alias ps='ps -o pid,ppid,user,tty,nice,vsz,rss,time,args -T'
 alias root='exec doas ash -li'
 
 if [ `id -u` == 0 ]; then
@@ -86,7 +88,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine
 COPY --from=builder /runner/ /
 
 RUN apk --no-cache upgrade &&\
-    apk --no-cache add doas alpine-release &&\
+    apk --no-cache add doas fastfetch alpine-release &&\
     ln -s /root/.ashrc /home/app/.ashrc &&\
     ln -s /root/.profile /home/app/.profile &&\
     chmod 755 /root /startup.sh /root/.ashrc /root/.profile &&\
