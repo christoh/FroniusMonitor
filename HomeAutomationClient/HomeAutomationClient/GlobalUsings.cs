@@ -1,0 +1,11 @@
+global using System;
+global using System.Collections.Generic;
+global using System.Linq;
+global using System.Text;
+global using System.Threading.Tasks;
+global using System.Xml.Linq;
+global using Avalonia;
+global using Avalonia.Controls;
+global using Avalonia.Controls.Shapes;
+global using Avalonia.Markup.Xaml;
+global using Avalonia.Media;

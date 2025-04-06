@@ -1,0 +1,18 @@
+<c:Gauge xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:c="clr-namespace:HomeAutomationClient.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="HomeAutomationClient.Controls.HalfCircleGauge">
+    <Viewbox Initialized="OnTemplateLoaded" DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:Gauge}}">
+        <Canvas x:Name="OuterCanvas" Width="150" Height="90" Background="{Binding Background}">
+            <Canvas x:Name="Canvas" Width="150" Height="77" Background="Transparent"/>
+            <TextBlock x:Name="MinimumTextBlock" FontSize="11" Foreground="{Binding Foreground}" FontWeight="Medium" Canvas.Bottom="0"
+                       HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Left" />
+            <TextBlock x:Name="MaximumTextBlock" FontSize="11" Foreground="{Binding Foreground}" FontWeight="Medium" Canvas.Bottom="0" Canvas.Right="0"
+                       HorizontalAlignment="Right" VerticalAlignment="Top" TextAlignment="Right" />
+        </Canvas>
+    </Viewbox>
+    
+</c:Gauge>

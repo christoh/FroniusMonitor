@@ -126,93 +126,93 @@ public class Gauge : ProgressBar
 
     public static IReadOnlyList<ColorThreshold> HighIsBad { get; } =
     [
-        new ColorThreshold(0, Colors.Green),
-        new ColorThreshold(.75, Colors.YellowGreen),
-        new ColorThreshold(.95, Colors.OrangeRed),
-        new ColorThreshold(1, Colors.Red),
+        new(0, Colors.Green),
+        new(.75, Colors.YellowGreen),
+        new(.95, Colors.OrangeRed),
+        new(1, Colors.Red),
     ];
 
     public static IReadOnlyList<ColorThreshold> MidIsGood { get; } =
     [
-        new ColorThreshold(0, Colors.Red),
-        new ColorThreshold(.05, Colors.OrangeRed),
-        new ColorThreshold(.25, Colors.YellowGreen),
-        new ColorThreshold(0.5, Colors.Green),
-        new ColorThreshold(.75, Colors.YellowGreen),
-        new ColorThreshold(.95, Colors.OrangeRed),
-        new ColorThreshold(1, Colors.Red),
+        new(0, Colors.Red),
+        new(.05, Colors.OrangeRed),
+        new(.25, Colors.YellowGreen),
+        new(0.5, Colors.Green),
+        new(.75, Colors.YellowGreen),
+        new(.95, Colors.OrangeRed),
+        new(1, Colors.Red),
     ];
 
     public static IReadOnlyList<ColorThreshold> ExtremeIsBad { get; } =
     [
-        new ColorThreshold(0, Colors.Red),
-        new ColorThreshold(.01, Colors.OrangeRed),
-        new ColorThreshold(.10, Colors.YellowGreen),
-        new ColorThreshold(0.20, Colors.Green),
-        new ColorThreshold(0.70, Colors.Green),
-        new ColorThreshold(.90, Colors.YellowGreen),
-        new ColorThreshold(.99, Colors.OrangeRed),
-        new ColorThreshold(1, Colors.Red),
+        new(0, Colors.Red),
+        new(.01, Colors.OrangeRed),
+        new(.10, Colors.YellowGreen),
+        new(0.20, Colors.Green),
+        new(0.70, Colors.Green),
+        new(.90, Colors.YellowGreen),
+        new(.99, Colors.OrangeRed),
+        new(1, Colors.Red),
     ];
 
     public static IReadOnlyList<ColorThreshold> OneThirdIsGood { get; } =
     [
-        new ColorThreshold(0, Colors.Red),
-        new ColorThreshold(.2, Colors.OrangeRed),
-        new ColorThreshold(.3, Colors.YellowGreen),
-        new ColorThreshold(1d / 3d, Colors.Green),
-        new ColorThreshold(.36333333, Colors.YellowGreen),
-        new ColorThreshold(.5, Colors.OrangeRed),
-        new ColorThreshold(1, Colors.Red),
+        new(0, Colors.Red),
+        new(.2, Colors.OrangeRed),
+        new(.3, Colors.YellowGreen),
+        new(1d / 3d, Colors.Green),
+        new(.36333333, Colors.YellowGreen),
+        new(.5, Colors.OrangeRed),
+        new(1, Colors.Red),
     ];
 
     public static IReadOnlyList<ColorThreshold> MidIsBad { get; } =
     [
-        new ColorThreshold(0, Colors.Green),
-        new ColorThreshold(.20, Colors.YellowGreen),
-        new ColorThreshold(.3333333, Colors.OrangeRed),
-        new ColorThreshold(0.5, Colors.Red),
-        new ColorThreshold(.6666667, Colors.OrangeRed),
-        new ColorThreshold(.8, Colors.YellowGreen),
-        new ColorThreshold(1, Colors.Green),
+        new(0, Colors.Green),
+        new(.20, Colors.YellowGreen),
+        new(.3333333, Colors.OrangeRed),
+        new(0.5, Colors.Red),
+        new(.6666667, Colors.OrangeRed),
+        new(.8, Colors.YellowGreen),
+        new(1, Colors.Green),
     ];
 
     public static IReadOnlyList<ColorThreshold> HigherThan15IsBad { get; } =
     [
-        new ColorThreshold(0, Colors.Green),
-        new ColorThreshold(.10, Colors.YellowGreen),
-        new ColorThreshold(.15, Colors.OrangeRed),
-        new ColorThreshold(1, Colors.Red),
+        new(0, Colors.Green),
+        new(.10, Colors.YellowGreen),
+        new(.15, Colors.OrangeRed),
+        new(1, Colors.Red),
     ];
 
     public static IReadOnlyList<ColorThreshold> LowIsBad { get; } =
     [
-        new ColorThreshold(0, Colors.Red),
-        new ColorThreshold(.05, Colors.OrangeRed),
-        new ColorThreshold(.5, Colors.YellowGreen),
-        new ColorThreshold(1, Colors.Green),
+        new(0, Colors.Red),
+        new(.05, Colors.OrangeRed),
+        new(.5, Colors.YellowGreen),
+        new(1, Colors.Green),
     ];
     
     public static IReadOnlyList<ColorThreshold> VeryHighIsGood { get; } =
     [
-        new ColorThreshold(0, Colors.Red),
-        new ColorThreshold(.7, Colors.OrangeRed),
-        new ColorThreshold(.9, Colors.YellowGreen),
-        new ColorThreshold(1, Colors.Green),
+        new(0, Colors.Red),
+        new(.7, Colors.OrangeRed),
+        new(.9, Colors.YellowGreen),
+        new(1, Colors.Green),
     ];
 
     public static IReadOnlyList<ColorThreshold> VeryLowIsBad { get; } =
     [
-        new ColorThreshold(0, Colors.Red),
-        new ColorThreshold(.025, Colors.OrangeRed),
-        new ColorThreshold(.1, Colors.YellowGreen),
-        new ColorThreshold(1, Colors.Green),
+        new(0, Colors.Red),
+        new(.025, Colors.OrangeRed),
+        new(.1, Colors.YellowGreen),
+        new(1, Colors.Green),
     ];
 
     public static IReadOnlyList<ColorThreshold> AllIsGood { get; } =
     [
-        new ColorThreshold(0, Colors.Green),
-        new ColorThreshold(1, Colors.Green),
+        new(0, Colors.Green),
+        new(1, Colors.Green),
     ];
 
     static Gauge()

@@ -6,6 +6,7 @@
 		<LangVersion>preview</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<AssemblyVersion>0.9.*</AssemblyVersion>
+		<Configuration>Release</Configuration>
 		<Deterministic>false</Deterministic>
 		<Configuration>Release</Configuration>
 		<Nullable>enable</Nullable>

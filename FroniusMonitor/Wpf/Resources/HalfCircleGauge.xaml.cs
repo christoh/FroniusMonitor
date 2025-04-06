@@ -98,7 +98,7 @@ public partial class HalfCircleGauge
 
             if (!gauge.ColorAllTicks)
             {
-                var relativeValue=SetValue(gauge, true);
+                var relativeValue = SetValue(gauge, true);
                 OnAnimatedAngleChanged(gauge, new DependencyPropertyChangedEventArgs(AnimatedValueProperty, relativeValue, relativeValue));
             }
         });
@@ -173,12 +173,14 @@ public partial class HalfCircleGauge
     private static void ColorShape(Gauge gauge, Shape rect, double relativeValue)
     {
         var rectRelativeValue = Math.Round((double)rect.Tag, 6);
+        var correctedAnimatedValue = (relativeValue - 0.5) * 1.02 + 0.5;
+
 
         if
         (
             gauge.ColorAllTicks ||
-            relativeValue <= rectRelativeValue && rectRelativeValue <= gauge.Origin ||
-            relativeValue >= rectRelativeValue && rectRelativeValue >= gauge.Origin
+            correctedAnimatedValue <= rectRelativeValue && rectRelativeValue <= gauge.Origin && (correctedAnimatedValue > 0 || gauge.Origin > 0) ||
+            correctedAnimatedValue >= rectRelativeValue && rectRelativeValue >= gauge.Origin
         )
         {
             var brush = new SolidColorBrush(Gauge.GetColorForRelativeValue(gauge, rectRelativeValue));
