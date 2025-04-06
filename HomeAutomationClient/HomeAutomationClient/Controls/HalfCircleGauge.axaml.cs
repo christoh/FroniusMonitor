@@ -1,7 +1,6 @@
-using System.Diagnostics;
 using De.Hochstaetter.Fronius.Extensions;
 
-namespace HomeAutomationClient.Controls;
+namespace De.Hochstaetter.HomeAutomationClient.Controls;
 
 public partial class HalfCircleGauge : Gauge
 {

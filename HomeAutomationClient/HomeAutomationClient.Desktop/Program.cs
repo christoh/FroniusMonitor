@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using System;
+using De.Hochstaetter.HomeAutomationClient;
 
 namespace HomeAutomationClient.Desktop
 {

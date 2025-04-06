@@ -2,14 +2,15 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
-namespace HomeAutomationClient.ViewModels;
+namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {
     [ObservableProperty]
-    private string greeting = "Home Automation Control Center Alpha Test";
+    public partial string Greeting { get; set; } = "Home Automation Control Center Alpha Test";
 
-    [ObservableProperty] private double value=1000;
+    [ObservableProperty]
+    public partial double Value { get; set; } = 1000;
 
     public ICommand? AdjustValueCommand => field ??= new RelayCommand<double>(v => Value += v);
     public ICommand? MinValueCommand => field ??= new RelayCommand(() => Value = 1000);

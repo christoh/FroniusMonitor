@@ -2,9 +2,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:c="clr-namespace:HomeAutomationClient.Controls"
+             xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="HomeAutomationClient.Controls.HalfCircleGauge">
+             x:Class="De.Hochstaetter.HomeAutomationClient.Controls.HalfCircleGauge">
     <Viewbox Initialized="OnTemplateLoaded" DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:Gauge}}">
         <Canvas x:Name="OuterCanvas" Width="150" Height="90" Background="{Binding Background}">
             <Canvas x:Name="Canvas" Width="150" Height="77" Background="Transparent"/>

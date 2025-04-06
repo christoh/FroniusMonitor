@@ -1,7 +1,7 @@
 using Avalonia.Controls.Templates;
-using HomeAutomationClient.ViewModels;
+using De.Hochstaetter.HomeAutomationClient.ViewModels;
 
-namespace HomeAutomationClient
+namespace De.Hochstaetter.HomeAutomationClient
 {
     public class ViewLocator : IDataTemplate
     {

@@ -1,11 +1,7 @@
-﻿using Avalonia.Animation;
-using Avalonia.Animation.Easings;
-using Avalonia.Collections;
-using Avalonia.Controls.Primitives;
-using Avalonia.Data;
-using HomeAutomationClient.Models;
+﻿using Avalonia.Data;
+using De.Hochstaetter.HomeAutomationClient.Models;
 
-namespace HomeAutomationClient.Controls;
+namespace De.Hochstaetter.HomeAutomationClient.Controls;
 
 public class Gauge : ContentControl
 {

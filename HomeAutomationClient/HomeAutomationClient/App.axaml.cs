@@ -1,10 +1,9 @@
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
-using HomeAutomationClient.ViewModels;
-using HomeAutomationClient.Views;
+using De.Hochstaetter.HomeAutomationClient.Views;
+using De.Hochstaetter.HomeAutomationClient.ViewModels;
 
-namespace HomeAutomationClient
+namespace De.Hochstaetter.HomeAutomationClient
 {
     public partial class App : Application
     {

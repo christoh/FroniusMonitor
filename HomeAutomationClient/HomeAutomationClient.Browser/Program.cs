@@ -1,8 +1,8 @@
 ﻿using Avalonia;
 using Avalonia.Browser;
-using HomeAutomationClient;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
+using De.Hochstaetter.HomeAutomationClient;
 
 internal sealed partial class Program
 {
