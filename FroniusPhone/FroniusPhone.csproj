@@ -51,9 +51,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.2" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="9.0.40" />
-		<PackageReference Include="System.IO.Packaging" Version="9.0.2" />	</ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.3" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="9.0.50" />
+		<PackageReference Include="System.IO.Packaging" Version="9.0.3" />	</ItemGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Fronius\Fronius.csproj" />

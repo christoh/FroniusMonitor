@@ -4,6 +4,7 @@
 		<OutputType>Exe</OutputType>
 		<Configuration>Release</Configuration>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<RootNamespace>De.Hochstaetter.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
