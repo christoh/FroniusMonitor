@@ -1,9 +1,12 @@
+using Avalonia.Media.Immutable;
 using De.Hochstaetter.Fronius.Extensions;
 
 namespace De.Hochstaetter.HomeAutomationClient.Controls;
 
 public partial class HalfCircleGauge : Gauge
 {
+    private record AngleBrush(double RelativeValue, IImmutableBrush Brush);
+
     private Polygon? hand;
 
     public HalfCircleGauge()
@@ -30,14 +33,40 @@ public partial class HalfCircleGauge : Gauge
         hand.SetValue(Canvas.BottomProperty, 8d);
         hand.SetValue(Canvas.LeftProperty, OuterCanvas.Width / 2 - 4);
         OuterCanvas.Children.Add(hand);
-        OnParametersChanged();
 
-        if (!ColorAllTicks)
+        try
         {
-            SetValue(true);
-            OnAnimatedAngleChanged();
-        }
+            Canvas.Children.OfType<Rectangle>().ToList().Apply(c => Canvas.Children.Remove(c));
+            const double height = 5;
+            const double width = 18;
 
+            for (var angle = 0d; angle < 180.0001; angle += 180d / 26d)
+            {
+                var (sin, cos) = Math.SinCos(angle / (180 / Math.PI));
+                var translationLength = Canvas.Width / 2 - width / 2;
+
+                var rect = new Rectangle
+                {
+                    Height = height,
+                    Width = width,
+                    Fill = TickFill,
+                    StrokeThickness = 0,
+                    RenderTransform = new RotateTransform(angle, 0, 0),
+                    Tag = new AngleBrush(angle / 180, new ImmutableSolidColorBrush(GetColorForRelativeValue(angle / 180)))
+                };
+
+                rect.SetValue(Canvas.BottomProperty, sin * translationLength);
+                rect.SetValue(Canvas.RightProperty, cos * translationLength + Canvas.Width / 2 - width / 2);
+                Canvas.Children.Add(rect);
+            }
+        }
+        finally
+        {
+            if (ColorAllTicks)
+            {
+                ColorShapes();
+            }
+        }
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
@@ -52,8 +81,8 @@ public partial class HalfCircleGauge : Gauge
                 break;
 
             case nameof(Minimum):
-                SetValue();
                 MinimumTextBlock.Text = Minimum.ToString(StringFormat);
+                SetValue();
                 break;
 
             case nameof(Value):
@@ -62,6 +91,16 @@ public partial class HalfCircleGauge : Gauge
 
             case nameof(AnimatedValue):
                 OnAnimatedAngleChanged();
+                break;
+
+            case nameof(ColorAllTicks):
+            case nameof(Origin):
+            case nameof(TickFill):
+                ColorShapes();
+                break;
+
+            case nameof(GaugeColors):
+                ColorShapes(true);
                 break;
         }
     }
@@ -82,79 +121,37 @@ public partial class HalfCircleGauge : Gauge
 
         if (!ColorAllTicks)
         {
-            Canvas.Children.OfType<Rectangle>().Apply(ColorShape);
+            ColorShapes();
         }
     }
 
-    private void ColorShape(Shape rect)
+    private void ColorShapes(bool recalculateColors = false)
     {
-        var rectRelativeValue = Math.Round((double)rect.Tag!,8);
-        var correctedAnimatedValue = (AnimatedValue - 0.5) * 1.02 + 0.5;
-
-        if
-        (
-            ColorAllTicks ||
-            correctedAnimatedValue <= rectRelativeValue && rectRelativeValue <= Origin && (correctedAnimatedValue > 0 || Origin > 0) ||
-            correctedAnimatedValue >= rectRelativeValue && rectRelativeValue >= Origin
-        )
+        Canvas.Children.OfType<Rectangle>().Apply(rect =>
         {
-            IBrush brush = new SolidColorBrush(GetColorForRelativeValue(rectRelativeValue)).ToImmutable();
-            rect.Fill = brush;
-            return;
-        }
+            var (rectRelativeValue, brush) = (AngleBrush)rect.Tag!;
 
-        rect.Fill = TickFill;
-    }
-    private void OnParametersChanged()
-    {
-        try
-        {
-            Canvas.Children.OfType<Rectangle>().ToList().Apply(c => Canvas.Children.Remove(c));
-            const double height = 5;
-            const double width = 18;
-
-            for (double angle = 0; angle < 180.0001; angle += 180d / 26d)
+            if (recalculateColors)
             {
-                var (sin, cos) = Math.SinCos(angle / (180 / Math.PI));
-                var translationLength = Canvas.Width / 2 - width / 2;
-
-                var rect = new Rectangle
-                {
-                    Height = height,
-                    Width = width,
-                    Fill = TickFill,
-                    StrokeThickness = 0,
-                    RenderTransform = new RotateTransform(angle, 0, 0),
-                    Tag = angle / 180,
-                };
-
-                rect.SetValue(Canvas.BottomProperty, sin * translationLength);
-                rect.SetValue(Canvas.RightProperty, cos * translationLength + Canvas.Width / 2 - width / 2);
-                Canvas.Children.Add(rect);
+                brush = new ImmutableSolidColorBrush(GetColorForRelativeValue(rectRelativeValue));
+                rect.Tag = new AngleBrush(rectRelativeValue, brush);
             }
-        }
-        finally
-        {
-            if (ColorAllTicks)
+
+            rectRelativeValue = Math.Round(rectRelativeValue, 8);
+            var correctedAnimatedValue = (AnimatedValue - 0.5) * 1.02 + 0.5;
+
+            if
+            (
+                ColorAllTicks ||
+                correctedAnimatedValue <= rectRelativeValue && rectRelativeValue <= Origin && (correctedAnimatedValue > 0 || Origin > 0) ||
+                correctedAnimatedValue >= rectRelativeValue && rectRelativeValue >= Origin
+            )
             {
-                Canvas.Children.OfType<Rectangle>().Apply(ColorShape);
+                rect.Fill = brush;
+                return;
             }
-        }
-    }
-}
 
-public class DemoGaugeExtension : MarkupExtension
-{
-    public override object ProvideValue(IServiceProvider serviceProvider)
-    {
-        return new HalfCircleGauge
-        {
-            //Style = new StaticResourceExtension("DefaultHalfCircleGauge").ProvideValue(serviceProvider) as Style ?? throw new NullReferenceException("Style 'DefaultHalfCircleGauge' does not exist"),
-            Minimum = 0,
-            Maximum = 100,
-            Value = 33,
-            ColorAllTicks = true,
-            GaugeColors = Gauge.HighIsBad,
-        };
+            rect.Fill = TickFill;
+        });
     }
 }

@@ -4,6 +4,8 @@ namespace De.Hochstaetter.FroniusMonitor.Wpf.Resources;
 
 public partial class HalfCircleGauge
 {
+    private record AngleBrush(double RelativeValue, Brush Brush);
+
     private record GaugeMetaData(Polygon Hand, double HandLength, Canvas Canvas)
     {
         public double OldMinimum = double.MinValue;
@@ -172,9 +174,9 @@ public partial class HalfCircleGauge
 
     private static void ColorShape(Gauge gauge, Shape rect, double relativeValue)
     {
-        var rectRelativeValue = Math.Round((double)rect.Tag, 6);
+        var(rectRelativeValue, brush) = (AngleBrush)rect.Tag;
+        rectRelativeValue = Math.Round(rectRelativeValue, 6);
         var correctedAnimatedValue = (relativeValue - 0.5) * 1.02 + 0.5;
-
 
         if
         (
@@ -183,8 +185,8 @@ public partial class HalfCircleGauge
             correctedAnimatedValue >= rectRelativeValue && rectRelativeValue >= gauge.Origin
         )
         {
-            var brush = new SolidColorBrush(Gauge.GetColorForRelativeValue(gauge, rectRelativeValue));
-            brush.Freeze();
+            //var brush = new SolidColorBrush(Gauge.GetColorForRelativeValue(gauge, rectRelativeValue));
+            //brush.Freeze();
             rect.Fill = brush;
             return;
         }
@@ -204,6 +206,9 @@ public partial class HalfCircleGauge
 
             for (double angle = 0; angle < 180.0001; angle += 180d / 26d)
             {
+                var brush = new SolidColorBrush(Gauge.GetColorForRelativeValue(gauge, angle / 180));
+                brush.Freeze();
+
                 var (sin, cos) = Math.SinCos(angle / (180 / Math.PI));
                 var translationLength = canvas.Width / 2 - width / 2;
 
@@ -214,7 +219,7 @@ public partial class HalfCircleGauge
                     Fill = gauge.TickFill,
                     StrokeThickness = 0,
                     RenderTransform = new RotateTransform(angle, width / 2, height / 2),
-                    Tag = angle / 180,
+                    Tag = new AngleBrush(angle / 180, brush)
                 };
 
                 rect.SetValue(Canvas.BottomProperty, sin * translationLength);

@@ -5,6 +5,7 @@
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
              xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
              xmlns:vm="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels"
+             xmlns:m="clr-namespace:De.Hochstaetter.HomeAutomationClient.Misc"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.MainView"
              x:DataType="vm:MainViewModel">
@@ -15,24 +16,49 @@
 	</Design.DataContext>
 
 	<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+        <StackPanel.Resources>
+            <system:Double x:Key="M1">-1</system:Double>
+            <system:Double x:Key="P1">1</system:Double>
+        </StackPanel.Resources>
+        <StackPanel.Styles>
+            <Style Selector="Button">
+                <Setter Property="Margin" Value="5,0"/>
+            </Style>
+        </StackPanel.Styles>
 		<TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" FontSize="20" Margin="0,0,0,16"/>
         <TextBlock Text="{Binding Value}" FontSize="16" Margin="0,0,0,16" HorizontalAlignment="Center"/>
-        <c:HalfCircleGauge Height="240" Minimum="1000" Maximum="1200" Foreground="Blue" ColorAllTicks="False" Origin="0" Value="{Binding Value}" GaugeColors="{x:Static c:Gauge.HighIsBad}"/>
+        <c:HalfCircleGauge Height="240"
+                           Minimum="{Binding Minimum}"
+                           Maximum="{Binding Maximum}"
+                           Foreground="DarkBlue"
+                           ColorAllTicks="{Binding ColorAllTicks}"
+                           Origin="{Binding Origin}"
+                           Value="{Binding Value}"
+                           GaugeColors="{Binding GaugeColorScheme}"/>
         <StackPanel Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Center">
-            <StackPanel.Resources>
-                <system:Double x:Key="M1">-1</system:Double>
-                <system:Double x:Key="P1">1</system:Double>
-            </StackPanel.Resources>
-            <StackPanel.Styles>
-                <Style Selector="Button">
-                    <Setter Property="Margin" Value="5,0"/>
-                </Style>
-            </StackPanel.Styles>
-            <Button Content="-1" Command="{Binding AdjustValueCommand}" CommandParameter="{StaticResource M1}"/>
-            <Button Content="+1" Command="{Binding AdjustValueCommand}" CommandParameter="{StaticResource P1}"/>
-            <Button Content="Min" Command="{Binding MinValueCommand}"/>
-            <Button Content="Mid" Command="{Binding MidValueCommand}"/>
-            <Button Content="Max" Command="{Binding MaxValueCommand}"/>
+            <Button FontSize="18" FontWeight="Bold" Content="-1" Command="{Binding AdjustValueCommand}" CommandParameter="{StaticResource M1}"/>
+            <Button FontSize="18" FontWeight="Bold" Content="+1" Command="{Binding AdjustValueCommand}" CommandParameter="{StaticResource P1}"/>
+            <Button FontSize="18" FontWeight="Bold" Content="Min" Command="{Binding MinValueCommand}"/>
+            <Button FontSize="18" FontWeight="Bold" Content="Mid" Command="{Binding MidValueCommand}"/>
+            <Button FontSize="18" FontWeight="Bold" Content="Max" Command="{Binding MaxValueCommand}"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Center">
+            <Button Content="Color all / Color up to value" Command="{Binding SwitchTickColoringCommand}"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Center">
+            <Button Content="High is bad" Command="{Binding SetColorSchemeCommand}" CommandParameter="{x:Static m:GaugeColors.HighIsBad}"/>
+            <Button Content="Mid is good" Command="{Binding SetColorSchemeCommand}" CommandParameter="{x:Static m:GaugeColors.MidIsGood}"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Center">
+            <Button Content="Min=-2000" Command="{Binding SetMinimumCommand}" CommandParameter="-2000"/>
+            <Button Content="Min=0" Command="{Binding SetMinimumCommand}" CommandParameter="0"/>
+            <Button Content="Min=1000" Command="{Binding SetMinimumCommand}" CommandParameter="1000"/>
+            <Button Content="Max=1200" Command="{Binding SetMaximumCommand}" CommandParameter="1200"/>
+            <Button Content="Max=2000" Command="{Binding SetMaximumCommand}" CommandParameter="2000"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Center">
+            <Button Content="Origin=0" Command="{Binding SetOriginCommand}" CommandParameter="0"/>
+            <Button Content="Origin=0.5" Command="{Binding SetOriginCommand}" CommandParameter="0.5"/>
         </StackPanel>
 	</StackPanel>
 </UserControl>

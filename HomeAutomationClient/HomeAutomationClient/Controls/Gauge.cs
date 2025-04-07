@@ -1,18 +1,21 @@
-﻿using Avalonia.Data;
-using De.Hochstaetter.HomeAutomationClient.Models;
+﻿using System.Threading;
+using Avalonia.Animation;
+using Avalonia.Animation.Easings;
+using Avalonia.Data;
+using Avalonia.Styling;
 
 namespace De.Hochstaetter.HomeAutomationClient.Controls;
 
 public class Gauge : ContentControl
 {
-    public static readonly StyledProperty<double> MinimumProperty = AvaloniaProperty.Register<Gauge, double>(nameof(Minimum), 0d);
+    public static readonly StyledProperty<double> MinimumProperty = AvaloniaProperty.Register<Gauge, double>(nameof(Minimum));
 
     public double Minimum
     {
         get => GetValue(MinimumProperty);
         set => SetValue(MinimumProperty, value);
     }
-
+    
     public static readonly StyledProperty<double> MaximumProperty = AvaloniaProperty.Register<Gauge, double>(nameof(Maximum), 1d);
 
     public double Maximum
@@ -21,7 +24,7 @@ public class Gauge : ContentControl
         set => SetValue(MaximumProperty, value);
     }
 
-    public static readonly StyledProperty<double> ValueProperty = AvaloniaProperty.Register<Gauge, double>(nameof(Value), 0d);
+    public static readonly StyledProperty<double> ValueProperty = AvaloniaProperty.Register<Gauge, double>(nameof(Value));
 
     public double Value
     {
@@ -29,7 +32,15 @@ public class Gauge : ContentControl
         set => SetValue(ValueProperty, value);
     }
 
-    public static readonly StyledProperty<double> AnimatedValueProperty = AvaloniaProperty.Register<Gauge, double>(nameof(AnimatedValue), 0d);
+    public static readonly StyledProperty<Easing> AnimationEasingProperty = AvaloniaProperty.Register<Gauge, Easing>(nameof(AnimationEasing), new CubicEaseOut());
+    
+    public Easing AnimationEasing
+    {
+        get => GetValue(AnimationEasingProperty);
+        set => SetValue(AnimationEasingProperty, value);
+    }
+
+    public static readonly StyledProperty<double> AnimatedValueProperty = AvaloniaProperty.Register<Gauge, double>(nameof(AnimatedValue));
 
     public double AnimatedValue
     {
@@ -37,9 +48,9 @@ public class Gauge : ContentControl
         set => SetValue(AnimatedValueProperty, value);
     }
 
-    public static readonly StyledProperty<IReadOnlyList<ColorThreshold>?> GaugeColorsProperty = AvaloniaProperty.Register<Gauge, IReadOnlyList<ColorThreshold>?>(nameof(GaugeColors));
+    public static readonly StyledProperty<IEnumerable<ColorThreshold>?> GaugeColorsProperty = AvaloniaProperty.Register<Gauge, IEnumerable<ColorThreshold>?>(nameof(GaugeColors));
 
-    public IReadOnlyList<ColorThreshold>? GaugeColors
+    public IEnumerable<ColorThreshold>? GaugeColors
     {
         get => GetValue(GaugeColorsProperty);
         set => SetValue(GaugeColorsProperty, value);
@@ -52,7 +63,7 @@ public class Gauge : ContentControl
         get => GetValue(OriginProperty);
         set => SetValue(OriginProperty, value);
     }
-
+    
     public static readonly StyledProperty<string> LabelProperty = AvaloniaProperty.Register<Gauge, string>(nameof(Label), string.Empty);
 
     public string? Label
@@ -112,7 +123,7 @@ public class Gauge : ContentControl
         get => GetValue(TickFillProperty);
         set => SetValue(TickFillProperty, value);
     }
-    
+
     public static readonly StyledProperty<bool> ColorAllTicksProperty = AvaloniaProperty.Register<Gauge, bool>(nameof(ColorAllTicks));
 
     public bool ColorAllTicks
@@ -120,98 +131,7 @@ public class Gauge : ContentControl
         get => GetValue(ColorAllTicksProperty);
         set => SetValue(ColorAllTicksProperty, value);
     }
-
-    public static IReadOnlyList<ColorThreshold> HighIsBad { get; } =
-    [
-        new(0, Colors.Green),
-        new(.75, Colors.YellowGreen),
-        new(.95, Colors.OrangeRed),
-        new(1, Colors.Red),
-    ];
-
-    public static IReadOnlyList<ColorThreshold> MidIsGood { get; } =
-    [
-        new(0, Colors.Red),
-        new(.05, Colors.OrangeRed),
-        new(.25, Colors.YellowGreen),
-        new(0.5, Colors.Green),
-        new(.75, Colors.YellowGreen),
-        new(.95, Colors.OrangeRed),
-        new(1, Colors.Red),
-    ];
-
-    public static IReadOnlyList<ColorThreshold> ExtremeIsBad { get; } =
-    [
-        new(0, Colors.Red),
-        new(.01, Colors.OrangeRed),
-        new(.10, Colors.YellowGreen),
-        new(0.20, Colors.Green),
-        new(0.70, Colors.Green),
-        new(.90, Colors.YellowGreen),
-        new(.99, Colors.OrangeRed),
-        new(1, Colors.Red),
-    ];
-
-    public static IReadOnlyList<ColorThreshold> OneThirdIsGood { get; } =
-    [
-        new(0, Colors.Red),
-        new(.2, Colors.OrangeRed),
-        new(.3, Colors.YellowGreen),
-        new(1d / 3d, Colors.Green),
-        new(.36333333, Colors.YellowGreen),
-        new(.5, Colors.OrangeRed),
-        new(1, Colors.Red),
-    ];
-
-    public static IReadOnlyList<ColorThreshold> MidIsBad { get; } =
-    [
-        new(0, Colors.Green),
-        new(.20, Colors.YellowGreen),
-        new(.3333333, Colors.OrangeRed),
-        new(0.5, Colors.Red),
-        new(.6666667, Colors.OrangeRed),
-        new(.8, Colors.YellowGreen),
-        new(1, Colors.Green),
-    ];
-
-    public static IReadOnlyList<ColorThreshold> HigherThan15IsBad { get; } =
-    [
-        new(0, Colors.Green),
-        new(.10, Colors.YellowGreen),
-        new(.15, Colors.OrangeRed),
-        new(1, Colors.Red),
-    ];
-
-    public static IReadOnlyList<ColorThreshold> LowIsBad { get; } =
-    [
-        new(0, Colors.Red),
-        new(.05, Colors.OrangeRed),
-        new(.5, Colors.YellowGreen),
-        new(1, Colors.Green),
-    ];
-
-    public static IReadOnlyList<ColorThreshold> VeryHighIsGood { get; } =
-    [
-        new(0, Colors.Red),
-        new(.7, Colors.OrangeRed),
-        new(.9, Colors.YellowGreen),
-        new(1, Colors.Green),
-    ];
-
-    public static IReadOnlyList<ColorThreshold> VeryLowIsBad { get; } =
-    [
-        new(0, Colors.Red),
-        new(.025, Colors.OrangeRed),
-        new(.1, Colors.YellowGreen),
-        new(1, Colors.Green),
-    ];
-
-    public static IReadOnlyList<ColorThreshold> AllIsGood { get; } =
-    [
-        new(0, Colors.Green),
-        new(1, Colors.Green),
-    ];
-
+    
     protected Color GetColorForRelativeValue(double relativeValue)
     {
         if (GaugeColors == null || !GaugeColors.Any())
@@ -219,10 +139,10 @@ public class Gauge : ContentControl
             return Colors.Green;
         }
 
-        var upper = GaugeColors.First(c => c.Soc > relativeValue || c.Soc >= 1);
-        var lower = GaugeColors.Last(c => c.Soc < upper.Soc || c.Soc <= 0);
+        var upper = GaugeColors.First(c => c.RelativeValue > relativeValue || c.RelativeValue >= 1);
+        var lower = GaugeColors.Last(c => c.RelativeValue < upper.RelativeValue || c.RelativeValue <= 0);
 
-        var lowerPercentage = (float)((upper.Soc - relativeValue) / (upper.Soc - lower.Soc));
+        var lowerPercentage = (float)((upper.RelativeValue - relativeValue) / (upper.RelativeValue - lower.RelativeValue));
 
         return new Color
         (
@@ -232,26 +152,59 @@ public class Gauge : ContentControl
             (byte)Math.Round(lower.Color.B * lowerPercentage + upper.Color.B * (1 - lowerPercentage))
         );
     }
-    
-    protected double SetValue(bool skipAnimation = false)
+
+    private CancellationTokenSource? animationTokenSource;
+
+    // ReSharper disable once AsyncVoidMethod
+    protected async void SetValue(bool sKipAnimation = false)
     {
         var relativeValue = (Math.Max(Math.Min(Maximum, Value), Minimum) - Minimum) / (Maximum - Minimum);
 
-        //if (skipAnimation)
-        //{
-            AnimatedValue = relativeValue;
-            return relativeValue;
-        //}
-        
-        //var animation = new Animation
-        //{
-        //    Duration = AnimationDuration,
-        //    Easing = new LinearEasing(),
-        //    FillMode = FillMode.Forward,
-        //    IterationCount = new IterationCount(1),
-        //    Children = { new KeyFrame{Cue = new Cue(AnimatedValue),Setters = { Capacity = 1,ResetBehavior = ResetBehavior.Remove, Validate = }} }
-        //};
-    }
+        try
+        {
+            if (sKipAnimation)
+            {
+                AnimatedValue = relativeValue;
+                return;
+            }
 
-    
+            if (animationTokenSource is { IsCancellationRequested: false })
+            {
+                //DO NOT use CancelAsync here, as it will not cancel the animation
+                // ReSharper disable once MethodHasAsyncOverload
+                animationTokenSource.Cancel();
+            }
+
+            animationTokenSource?.Dispose();
+            animationTokenSource = new CancellationTokenSource();
+
+            var animation = new Animation
+            {
+                Duration = AnimationDuration,
+                Easing = AnimationEasing,
+                IterationCount = new IterationCount(1),
+                Children =
+                {
+                    new KeyFrame { Cue = new Cue(0), Setters = { new Setter { Property = AnimatedValueProperty, Value = AnimatedValue }, } },
+                    new KeyFrame { Cue = new Cue(1), Setters = { new Setter { Property = AnimatedValueProperty, Value = relativeValue }, } },
+                }
+            };
+
+            AnimatedValue = relativeValue;
+            await animation.RunAsync(this, animationTokenSource.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            // Animation was cancelled
+        }
+        catch
+        {
+            // Handle other exceptions if necessary
+        }
+        finally
+        {
+            animationTokenSource?.Dispose();
+            animationTokenSource = null;
+        }
+    }
 }
