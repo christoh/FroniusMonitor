@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using Avalonia.Data.Converters;
+﻿using Avalonia.Data.Converters;
 
 namespace De.Hochstaetter.HomeAutomationClient.Converters;
 

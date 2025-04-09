@@ -1,12 +1,17 @@
+using System.Diagnostics;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
+using De.Hochstaetter.Fronius;
 using De.Hochstaetter.HomeAutomationClient.Views;
 using De.Hochstaetter.HomeAutomationClient.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace De.Hochstaetter.HomeAutomationClient
 {
     public partial class App : Application
     {
+        public static IServiceCollection? ServiceCollection { get; set; }
+
         public override void Initialize()
         {
             AvaloniaXamlLoader.Load(this);
@@ -14,22 +19,28 @@ namespace De.Hochstaetter.HomeAutomationClient
 
         public override void OnFrameworkInitializationCompleted()
         {
+            ServiceCollection ??= new ServiceCollection();
+            
+            ServiceCollection
+                .AddSingleton<MainView>()
+                .AddSingleton<MainViewModel>()
+                .AddTransient<GaugeTestView>()
+                .AddTransient<GaugeTestViewModel>()
+                ;
+            
+            var serviceProvider= ServiceCollection.BuildServiceProvider();
+            IoC.Update(serviceProvider);
+
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
                 // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
                 DisableAvaloniaDataAnnotationValidation();
-                desktop.MainWindow = new MainWindow
-                {
-                    DataContext = new MainViewModel()
-                };
+                desktop.MainWindow = new MainWindow();
             }
             else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
             {
-                singleViewPlatform.MainView = new MainView
-                {
-                    DataContext = new MainViewModel()
-                };
+                singleViewPlatform.MainView = IoC.Get<MainView>();
             }
 
             base.OnFrameworkInitializationCompleted();

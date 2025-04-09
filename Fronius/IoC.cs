@@ -3,7 +3,7 @@
 public class IoC : IServiceProvider
 {
     public static IServiceProvider? Injector { get; private set; }
-
+    
     public static T Get<T>() => (T)Get(typeof(T));
     public static T? TryGetRegistered<T>() => (T?)TryGetRegistered(typeof(T));
     public static T? TryGet<T>() => (T?)TryGet(typeof(T));
@@ -35,18 +35,25 @@ public class IoC : IServiceProvider
 
     public static async void Update(IServiceProvider newInjector)
     {
-        var oldInjector = Injector;
-        Injector = newInjector;
-
-        switch (oldInjector)
+        try
         {
-            case IAsyncDisposable asyncDisposable:
-                await asyncDisposable.DisposeAsync().ConfigureAwait(false);
-                break;
+            var oldInjector = Injector;
+            Injector = newInjector;
 
-            case IDisposable disposable:
-                await Task.Run(disposable.Dispose).ConfigureAwait(false);
-                break;
+            switch (oldInjector)
+            {
+                case IAsyncDisposable asyncDisposable:
+                    await asyncDisposable.DisposeAsync().ConfigureAwait(false);
+                    break;
+
+                case IDisposable disposable:
+                    await Task.Run(disposable.Dispose).ConfigureAwait(false);
+                    break;
+            }
+        }
+        catch (Exception e)
+        {
+            // Log.Error(e, "Error while disposing old IoC");
         }
     }
 
