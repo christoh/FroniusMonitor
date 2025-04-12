@@ -2,5 +2,8 @@
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels
 {
-    public abstract class ViewModelBase : BindableBase;
+    public abstract class ViewModelBase : BindableBase
+    {
+        
+    }
 }

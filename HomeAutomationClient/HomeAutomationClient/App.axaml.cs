@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
-using De.Hochstaetter.Fronius;
 using De.Hochstaetter.HomeAutomationClient.Views;
 using De.Hochstaetter.HomeAutomationClient.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,8 +25,10 @@ namespace De.Hochstaetter.HomeAutomationClient
                 .AddSingleton<MainViewModel>()
                 .AddTransient<GaugeTestView>()
                 .AddTransient<GaugeTestViewModel>()
+                .AddTransient<LinearGaugeTestView>()
+                .AddTransient<LinearGaugeTestViewModel>()
                 ;
-            
+
             var serviceProvider= ServiceCollection.BuildServiceProvider();
             IoC.Update(serviceProvider);
 

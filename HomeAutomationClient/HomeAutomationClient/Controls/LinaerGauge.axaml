@@ -1,0 +1,33 @@
+<c:Gauge xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+             mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="50"
+             x:Class="De.Hochstaetter.HomeAutomationClient.Controls.LinearGauge">
+        <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:LinearGauge}}">
+            <Grid Width="100" x:Name="Grid"
+                  ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto">
+
+                <Grid.Styles>
+                    <Style Selector="TextBlock">
+                        <Setter Property="HorizontalAlignment" Value="Right" />
+                        <!-- ReSharper disable once MarkupAttributeTypo -->
+                        <Setter Property="FontFamily" Value="Segoe UI" />
+                        <Setter Property="FontSize" Value="{Binding FontSize}" />
+                        <Setter Property="FontWeight" Value="Normal" />
+                    </Style>
+                </Grid.Styles>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Label}" HorizontalAlignment="Left" />
+                <TextBlock Grid.Row="0" Grid.Column="1" x:Name="ValueTextBlock" />
+                <TextBlock Grid.Row="0" Grid.Column="2" Margin="2,0,1,0" Text="{Binding UnitName, Mode=OneWay}" Foreground="Blue" />
+                <Border x:Name="OuterBorder" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" Background="{Binding TickFill}" CornerRadius="0">
+                    <Canvas Width="100" Height="{Binding GaugeHeight}">
+                        <Border x:Name="InnerBorder" HorizontalAlignment="Left" Height="{Binding GaugeHeight}" Width="0" Background="Green" CornerRadius="{Binding CornerRadius, ElementName=OuterBorder}" />
+                        <Rectangle x:Name="MidpointMarker" Height="{Binding GaugeHeight}" Width="1" Fill="Black" StrokeThickness="0" HorizontalAlignment="Left" />
+                    </Canvas>
+                </Border>
+            </Grid>
+        </Viewbox>
+</c:Gauge>

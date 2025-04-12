@@ -3,6 +3,7 @@ using Avalonia.Animation;
 using Avalonia.Animation.Easings;
 using Avalonia.Data;
 using Avalonia.Styling;
+using De.Hochstaetter.HomeAutomationClient.Extensions;
 
 namespace De.Hochstaetter.HomeAutomationClient.Controls;
 
@@ -104,18 +105,6 @@ public class Gauge : ContentControl
         set => SetValue(ShowPercentProperty, value);
     }
 
-    internal static readonly StyledProperty<object?> TemplateMetadataProperty = AvaloniaProperty.Register<Gauge, object?>(nameof(TemplateMetadata), defaultBindingMode: BindingMode.OneWayToSource);
-
-    public object? TemplateMetadata => GetValue(TemplateMetadataProperty);
-
-    public static readonly StyledProperty<IBrush?> HandFillProperty = AvaloniaProperty.Register<Gauge, IBrush?>(nameof(HandFill), Brushes.DarkSlateGray);
-
-    public IBrush? HandFill
-    {
-        get => GetValue(HandFillProperty);
-        set => SetValue(HandFillProperty, value);
-    }
-
     public static readonly StyledProperty<IBrush?> TickFillProperty = AvaloniaProperty.Register<Gauge, IBrush?>(nameof(TickFill), Brushes.LightGray);
 
     public IBrush? TickFill
@@ -124,14 +113,6 @@ public class Gauge : ContentControl
         set => SetValue(TickFillProperty, value);
     }
 
-    public static readonly StyledProperty<bool> ColorAllTicksProperty = AvaloniaProperty.Register<Gauge, bool>(nameof(ColorAllTicks));
-
-    public bool ColorAllTicks
-    {
-        get => GetValue(ColorAllTicksProperty);
-        set => SetValue(ColorAllTicksProperty, value);
-    }
-    
     protected Color GetColorForRelativeValue(double relativeValue)
     {
         if (GaugeColors == null || !GaugeColors.Any())
@@ -143,14 +124,7 @@ public class Gauge : ContentControl
         var lower = GaugeColors.Last(c => c.RelativeValue < upper.RelativeValue || c.RelativeValue <= 0);
 
         var lowerPercentage = (float)((upper.RelativeValue - relativeValue) / (upper.RelativeValue - lower.RelativeValue));
-
-        return new Color
-        (
-            (byte)Math.Round(lower.Color.A * lowerPercentage + upper.Color.A * (1 - lowerPercentage)),
-            (byte)Math.Round(lower.Color.R * lowerPercentage + upper.Color.R * (1 - lowerPercentage)),
-            (byte)Math.Round(lower.Color.G * lowerPercentage + upper.Color.G * (1 - lowerPercentage)),
-            (byte)Math.Round(lower.Color.B * lowerPercentage + upper.Color.B * (1 - lowerPercentage))
-        );
+        return upper.Color.MixWith(lower.Color, lowerPercentage);
     }
 
     private CancellationTokenSource? animationTokenSource;

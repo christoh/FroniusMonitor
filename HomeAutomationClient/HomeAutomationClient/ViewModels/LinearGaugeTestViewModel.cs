@@ -1,14 +1,18 @@
-﻿namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-public partial class GaugeTestViewModel : ViewModelBase
+namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
+
+internal partial class LinearGaugeTestViewModel : ViewModelBase
 {
     private readonly ICache? cache = IoC.TryGetRegistered<ICache>();
 
     [ObservableProperty] public partial string Greeting { get; set; } = "Home Automation Control Center Alpha Test";
 
     [ObservableProperty] public partial double Value { get; set; } = 1000;
-
-    [ObservableProperty] public partial bool ColorAllTicks { get; set; }
 
     [ObservableProperty] public partial double Origin { get; set; } = 0d;
 
@@ -17,7 +21,7 @@ public partial class GaugeTestViewModel : ViewModelBase
     [ObservableProperty] public partial double Minimum { get; set; } = 1000;
 
     [ObservableProperty] public partial double Maximum { get; set; } = 1200;
-    
+
     public string ApiUri => cache?.Get<string>("apiUri") ?? string.Empty;
 
     public ICommand? AdjustValueCommand => field ??= new RelayCommand<double>(v => Value += v);
@@ -28,5 +32,4 @@ public partial class GaugeTestViewModel : ViewModelBase
     public ICommand? MinValueCommand => field ??= new RelayCommand(() => Value = Minimum);
     public ICommand? MidValueCommand => field ??= new RelayCommand(() => Value = (Maximum + Minimum) / 2);
     public ICommand? MaxValueCommand => field ??= new RelayCommand(() => Value = Maximum);
-    public ICommand? SwitchTickColoringCommand => field ??= new RelayCommand(() => ColorAllTicks = !ColorAllTicks);
 }

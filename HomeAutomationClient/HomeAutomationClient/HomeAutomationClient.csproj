@@ -31,4 +31,10 @@
 	<ItemGroup>
 	  <Folder Include="Resources\" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Controls\LinaerGauge.axaml.cs">
+	    <DependentUpon>LinaerGauge.axaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
 </Project>

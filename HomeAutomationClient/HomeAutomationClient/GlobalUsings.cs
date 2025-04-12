@@ -14,5 +14,6 @@ global using Avalonia.Markup.Xaml;
 global using Avalonia.Media;
 global using CommunityToolkit.Mvvm.ComponentModel;
 global using CommunityToolkit.Mvvm.Input;
+global using De.Hochstaetter.Fronius;
 global using De.Hochstaetter.HomeAutomationClient.Misc;
 global using De.Hochstaetter.HomeAutomationClient.Models;

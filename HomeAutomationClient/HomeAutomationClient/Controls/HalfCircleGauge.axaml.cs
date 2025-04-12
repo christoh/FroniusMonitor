@@ -5,8 +5,23 @@ namespace De.Hochstaetter.HomeAutomationClient.Controls;
 
 public partial class HalfCircleGauge : Gauge
 {
-    private record AngleBrush(double RelativeValue, IImmutableBrush Brush);
+    public static readonly StyledProperty<IBrush?> HandFillProperty = AvaloniaProperty.Register<Gauge, IBrush?>(nameof(HandFill), Brushes.DarkSlateGray);
 
+    public IBrush? HandFill
+    {
+        get => GetValue(HandFillProperty);
+        set => SetValue(HandFillProperty, value);
+    }
+
+    public static readonly StyledProperty<bool> ColorAllTicksProperty = AvaloniaProperty.Register<Gauge, bool>(nameof(ColorAllTicks));
+
+    public bool ColorAllTicks
+    {
+        get => GetValue(ColorAllTicksProperty);
+        set => SetValue(ColorAllTicksProperty, value);
+    }
+    
+    private record AngleBrush(double RelativeValue, IImmutableBrush Brush);
     private Polygon? hand;
 
     public HalfCircleGauge()

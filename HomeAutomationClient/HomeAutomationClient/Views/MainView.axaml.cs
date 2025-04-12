@@ -1,4 +1,3 @@
-using De.Hochstaetter.Fronius;
 using De.Hochstaetter.HomeAutomationClient.ViewModels;
 
 namespace De.Hochstaetter.HomeAutomationClient.Views

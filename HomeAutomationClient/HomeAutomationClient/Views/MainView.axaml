@@ -7,5 +7,8 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="550"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.MainView"
              x:DataType="vm:MainViewModel">
-    <views:GaugeTestView/>
+    <StackPanel Orientation="Horizontal">
+        <views:GaugeTestView/>
+        <views:LinearGaugeTestView/>
+    </StackPanel>
 </UserControl>
