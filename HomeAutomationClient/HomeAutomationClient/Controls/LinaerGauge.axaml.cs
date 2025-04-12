@@ -25,7 +25,6 @@ public partial class LinearGauge : Gauge
 
         switch (change.Property.Name)
         {
-            case nameof(Origin):
             case nameof(Minimum):
             case nameof(Maximum):
             case nameof(Value):
@@ -37,6 +36,7 @@ public partial class LinearGauge : Gauge
                 break;
             
             case nameof(AnimatedValue):
+            case nameof(Origin):
                 OnAnimatedValueChanged();
                 break;
         }
@@ -56,14 +56,18 @@ public partial class LinearGauge : Gauge
 
     private void SetColor()
     {
-        var baseColor = GetColorForRelativeValue(AnimatedValue);
+        var lowerValue = Math.Min(Origin, AnimatedValue);
+        var upperValue = Math.Max(Origin, AnimatedValue);
 
-        var brush = new ImmutableLinearGradientBrush(
-            [
-                new ImmutableGradientStop(0,baseColor),
-                new ImmutableGradientStop(1,baseColor.MixWith(Colors.Black,.6f)),
-            ], startPoint: new RelativePoint(0, 0, RelativeUnit.Relative),endPoint: new RelativePoint(0, 1, RelativeUnit.Relative)
-            ); //new SolidColorBrush(baseColor).ToImmutable();   //( baseColor, baseColor * 0.4f + Colors.Black * 0.6f, 90);
+        var gradientStops = GaugeColors
+            .Where(g => g.RelativeValue < upperValue && g.RelativeValue > lowerValue)
+            .Select(g => new ImmutableGradientStop((g.RelativeValue-lowerValue) / (upperValue-lowerValue), g.Color))
+            .Prepend(new ImmutableGradientStop(0, GetColorForRelativeValue(lowerValue)))
+            .Append(new ImmutableGradientStop(1,GetColorForRelativeValue(upperValue)))
+            .ToList()
+            ;
+        
+        var brush = new ImmutableLinearGradientBrush(gradientStops);
 
         InnerBorder.Background = brush;
     }

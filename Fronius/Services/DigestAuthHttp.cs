@@ -7,13 +7,13 @@
 public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
 {
     private static readonly Random random = new(unchecked((int)DateTime.UtcNow.Ticks));
-    private static readonly Lock hashLock=new();
-    
+    private static readonly Lock hashLock = new();
+
     private readonly MD5 md5 = MD5.Create();
     private readonly HttpClient httpClient = new();
     private readonly WebConnection connection;
     private readonly TimeSpan cnonceDuration;
-    
+
     private string? ha1;
     private string? realm;
     private string? nonce;
@@ -51,10 +51,7 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
         var (stringResult, httpStatusCode) = await GetString(url, stringContent, allowedStatusCodes, token).ConfigureAwait(false);
         JToken resultToken = new JObject();
 
-        await Task.Run(() =>
-        {
-            resultToken = JToken.Parse(stringResult);
-        }, token).ConfigureAwait(false);
+        await Task.Run(() => { resultToken = JToken.Parse(stringResult); }, token).ConfigureAwait(false);
 
         return (resultToken, httpStatusCode);
     }
@@ -160,7 +157,7 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
 
         return request;
     }
-    
+
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     private async ValueTask<string> CreateDigestHeader(HttpRequestMessage request, CancellationToken token)
     {

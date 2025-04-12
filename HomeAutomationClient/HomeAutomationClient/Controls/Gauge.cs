@@ -49,9 +49,9 @@ public class Gauge : ContentControl
         set => SetValue(AnimatedValueProperty, value);
     }
 
-    public static readonly StyledProperty<IEnumerable<ColorThreshold>?> GaugeColorsProperty = AvaloniaProperty.Register<Gauge, IEnumerable<ColorThreshold>?>(nameof(GaugeColors));
+    public static readonly StyledProperty<IEnumerable<ColorThreshold>> GaugeColorsProperty = AvaloniaProperty.Register<Gauge, IEnumerable<ColorThreshold>>(nameof(GaugeColors),Misc.GaugeColors.HighIsBad);
 
-    public IEnumerable<ColorThreshold>? GaugeColors
+    public IEnumerable<ColorThreshold> GaugeColors
     {
         get => GetValue(GaugeColorsProperty);
         set => SetValue(GaugeColorsProperty, value);

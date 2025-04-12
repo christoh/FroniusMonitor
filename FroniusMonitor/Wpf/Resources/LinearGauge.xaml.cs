@@ -108,13 +108,13 @@ public partial class LinearGauge
         minimumDescriptor?.AddValueChanged(gauge, (_, _) => OnValueChanged(gauge, valueTextBlock));
         maximumDescriptor?.AddValueChanged(gauge, (_, _) => OnValueChanged(gauge, valueTextBlock));
         originDescriptor?.AddValueChanged(gauge, (_, _) => OnValueChanged(gauge, valueTextBlock));
-        
+
         showPercentDescriptor?.AddValueChanged(gauge, (_, _) =>
         {
             SetUnitName(gauge);
             OnValueChanged(gauge, valueTextBlock);
         });
-        
+
         tickFillDescriptor?.AddValueChanged(gauge, (_, _) => outerBorder.Background = gauge.TickFill);
         unitNameDescriptor?.AddValueChanged(gauge, (_, _) => SetUnitName(gauge));
         stringFormatDescriptor?.AddValueChanged(gauge, (_, _) => SetValueTextBlock(gauge, valueTextBlock));
@@ -130,7 +130,7 @@ public partial class LinearGauge
         {
             relativeValue = 0;
         }
-        
+
         var value = gauge.ShowPercent ? GetUseAbsoluteValue(gauge) ? (relativeValue - gauge.Origin) * 100 / gauge.Origin : relativeValue * 100 : gauge.Value; //BUG: Only works if Origin is at 0
         valueTextBlock.Text = value.ToString(gauge.StringFormat, CultureInfo.CurrentCulture);
         return relativeValue;
@@ -194,8 +194,21 @@ public partial class LinearGauge
         innerBorder.Margin = new Thickness(animatedValue > gauge.Origin ? grid.Width * gauge.Origin : grid.Width * gauge.Origin - width, 0, 0, 0);
 
 
-        var baseColor = Gauge.GetColorForRelativeValue(gauge, animatedValue);
-        var brush = new LinearGradientBrush(baseColor, baseColor * 0.4f + Colors.Black * 0.6f, 90);
+        var lowerValue = Math.Min(gauge.Origin, animatedValue);
+        var upperValue = Math.Max(gauge.Origin, animatedValue);
+
+        var gradientStops = gauge.GaugeColors?
+            .Where(g => g.Soc < upperValue && g.Soc > lowerValue)
+            .Select(g => new GradientStop(g.Color, (g.Soc - lowerValue) / (upperValue - lowerValue)))
+            .Prepend(new GradientStop(Gauge.GetColorForRelativeValue(gauge, lowerValue), 0))
+            .Append(new GradientStop(Gauge.GetColorForRelativeValue(gauge, upperValue), 1))
+            ??
+            [
+                new GradientStop(Colors.Green, 0),
+                new GradientStop(Colors.Green, 1)
+            ];
+
+        var brush = new LinearGradientBrush(new(gradientStops));
         brush.Freeze();
         innerBorder.Background = brush;
     }

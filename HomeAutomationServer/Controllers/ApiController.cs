@@ -11,10 +11,10 @@ public class ApiController(ILogger<ApiController> logger) : ControllerBase
     public IActionResult About()
     {
         logger.LogDebug("Api info was queried by {Ip}", HttpContext.Connection.RemoteIpAddress);
-        
+
         return Ok(new WebApiInfo
         {
-            OsVersion = $"{Environment.OSVersion.VersionString} {(Environment.Is64BitOperatingSystem ? "64" : "32")}-bit",
+            OsVersion = $"{Environment.OSVersion.VersionString} {nint.Size << 3}-bit",
             OsName = $"{Environment.OSVersion.Platform.ToString()}",
             Manufacturer = "Christoph Hochstätter",
             ProductName = "Home Automation Server",
