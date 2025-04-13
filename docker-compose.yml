@@ -3,6 +3,7 @@
 services:
 
   home-automation-server:
+    image: ghcr.io/christoh/home-automation-server:latest
     ports:
       # instead of 502 you can use your own port. However, many inverters only work with 502. Don't change 1502. This is the unprivileged port in the container
       - "502:1502"
@@ -12,6 +13,8 @@ services:
       - /d/Docker/HomeAutomationServer/EnergyHistory-2456552877.log:/var/log/EnergyHistory-2456552877.log # Map to log on your Docker host
     user: app
     build:
+      tags:
+        - ghcr.io/christoh/home-automation-server:latest
       context: .
       dockerfile: HomeAutomationServer/Dockerfile
       platforms:
@@ -21,7 +24,10 @@ services:
       - HOME_AUTOMATION_SECRET=Djd./.ed$0|ks.c!eii\e6 # Choose your very own and unique secret. Use the same secret on your computer where you set the passwords for the Settings.xml file
 
   home-automation-client:
+    image: ghcr.io/christoh/home-automation-client:latest
     build:
+      tags:
+        - ghcr.io/christoh/home-automation-client:latest
       dockerfile: HomeAutomationClient/HomeAutomationClient.Browser/Dockerfile
       context: .
       platforms:

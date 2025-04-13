@@ -80,6 +80,7 @@ server {
         try_files $uri $uri/ =404;
         error_page 404 =200 /;
         brotli_static on;
+        gzip_static on;
     }
 
 	listen 42741;
@@ -87,18 +88,25 @@ server {
 }
 EOF
 
+COPY <<"EOF" ./startup.sh
+#!/bin/ash
+test -f /etc/motd && cat /etc/motd
+nginx -g 'daemon off;'
+EOF
+
+RUN chmod 744 ./startup.sh
+
 # Runner
 
 FROM alpine:latest
 
 RUN apk --no-cache update && \
     apk --no-cache upgrade && \
-    apk --no-cache add nginx nginx-mod-http-brotli fastfetch 
+    apk --no-cache add nginx nginx-mod-http-brotli fastfetch curl
 
 WORKDIR /
-
 COPY --from=builder /build/root /
-
 EXPOSE 42741
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["/startup.sh"]
+HEALTHCHECK CMD curl http://127.0.0.1:42741 -sD - | fgrep "<title>Home Automation Control Center</title>" || exit 1
