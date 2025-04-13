@@ -1,8 +1,7 @@
 # Builder (cannot use Alpine)
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:9.0 AS builder
 
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS builder
-
-WORKDIR /build
+WORKDIR /build/FroniusMonitor
 
 RUN apt-get update -y
 RUN apt-get upgrade -y
@@ -11,25 +10,13 @@ RUN dotnet workload install wasm-tools
 
 COPY . .
 RUN ls -laF .
+WORKDIR ./HomeAutomationClient/HomeAutomationClient.Browser
 RUN rm -fr app bin obj
-WORKDIR /build/HomeAutomationClient.Browser
-RUN dotnet publish -c Release -o app
-RUN ls -laF /build/app
+RUN mkdir -p /build/root/app
+RUN dotnet publish -c Release -o /build/root/app
 
-# Runner
-
-FROM alpine:latest
-
-RUN apk --no-cache update && \
-    apk --no-cache upgrade && \
-    apk --no-cache add nginx nginx-mod-http-brotli fastfetch 
-
-WORKDIR /
-
-COPY --from=builder /build/app/wwwroot /app
-
-RUN chmod -R 755 /app && \
-    mkdir -p ./root
+WORKDIR /build/root
+RUN chmod -R 755 app/wwwroot
 
 COPY <<"EOF" ./root/.profile
 #!/bin/ash
@@ -83,7 +70,7 @@ EOF
 
 COPY <<"EOF" ./etc/nginx/http.d/default.conf
 server {
-        root /app;
+        root /app/wwwroot;
         index index.html;
 
         location / {
@@ -96,6 +83,18 @@ server {
 	listen [::]:42741;
 }
 EOF
+
+# Runner
+
+FROM alpine:latest
+
+RUN apk --no-cache update && \
+    apk --no-cache upgrade && \
+    apk --no-cache add nginx nginx-mod-http-brotli fastfetch 
+
+WORKDIR /
+
+COPY --from=builder /build/root /
 
 EXPOSE 42741
 
