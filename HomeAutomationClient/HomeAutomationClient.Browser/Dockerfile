@@ -6,9 +6,9 @@ RUN apk --no-cache update && \
 
 WORKDIR /
 
-COPY app/wwwroot app
+COPY app/wwwroot /app
 
-RUN chmod -R 755 ./app && \
+RUN chmod -R 755 /app && \
     mkdir -p ./root
 
 COPY <<"EOF" ./root/.profile
