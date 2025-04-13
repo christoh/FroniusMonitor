@@ -51,7 +51,7 @@ public class IoC : IServiceProvider
                     break;
             }
         }
-        catch (Exception e)
+        catch
         {
             // Log.Error(e, "Error while disposing old IoC");
         }
