@@ -22,8 +22,8 @@ services:
 
   home-automation-client:
     build:
-      dockerfile: Dockerfile
-      context: ./HomeAutomationClient/HomeAutomationClient.Browser
+      dockerfile: HomeAutomationClient/HomeAutomationClient.Browser/Dockerfile
+      context: .
       platforms:
         - linux/amd64
         - linux/arm64

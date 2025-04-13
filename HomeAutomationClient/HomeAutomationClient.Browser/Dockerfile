@@ -1,3 +1,23 @@
+# Builder (cannot use Alpine)
+
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS builder
+
+WORKDIR /build
+
+RUN apt-get update -y
+RUN apt-get upgrade -y
+RUN apt-get install -y --no-install-recommends python3
+RUN dotnet workload install wasm-tools
+
+COPY . .
+RUN ls -laF .
+RUN rm -fr app bin obj
+WORKDIR /build/HomeAutomationClient.Browser
+RUN dotnet publish -c Release -o app
+RUN ls -laF /build/app
+
+# Runner
+
 FROM alpine:latest
 
 RUN apk --no-cache update && \
@@ -6,7 +26,7 @@ RUN apk --no-cache update && \
 
 WORKDIR /
 
-COPY app/wwwroot /app
+COPY --from=builder /build/app/wwwroot /app
 
 RUN chmod -R 755 /app && \
     mkdir -p ./root
