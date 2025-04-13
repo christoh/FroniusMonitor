@@ -130,7 +130,7 @@ public class Gauge : ContentControl
     private CancellationTokenSource? animationTokenSource;
 
     // ReSharper disable once AsyncVoidMethod
-    protected async void SetValue(bool sKipAnimation = false)
+    protected virtual async void SetValue(bool sKipAnimation = false)
     {
         var relativeValue = (Math.Max(Math.Min(Maximum, Value), Minimum) - Minimum) / (Maximum - Minimum);
 

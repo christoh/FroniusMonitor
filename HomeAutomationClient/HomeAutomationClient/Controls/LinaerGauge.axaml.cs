@@ -19,6 +19,13 @@ public partial class LinearGauge : Gauge
         InitializeComponent();
     }
 
+
+    private void OnInitialized(object? sender, EventArgs e)
+    {
+        SetValue(true);
+        SetColor();
+    }
+    
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
@@ -30,15 +37,28 @@ public partial class LinearGauge : Gauge
             case nameof(Value):
                 SetValue();
                 break;
-            
+
             case nameof(GaugeColors):
                 SetColor();
                 break;
-            
+
             case nameof(AnimatedValue):
             case nameof(Origin):
                 OnAnimatedValueChanged();
                 break;
+        }
+    }
+
+    protected override void SetValue(bool sKipAnimation = false)
+    {
+        try
+        {
+            var value = ShowPercent ? (Value - Minimum) / (Maximum - Minimum) * 100 : Value;
+            ValueTextBlock.Text = value.ToString(StringFormat, CultureInfo.CurrentCulture);
+        }
+        finally
+        {
+            base.SetValue(sKipAnimation);
         }
     }
 
@@ -61,12 +81,12 @@ public partial class LinearGauge : Gauge
 
         var gradientStops = GaugeColors
             .Where(g => g.RelativeValue < upperValue && g.RelativeValue > lowerValue)
-            .Select(g => new ImmutableGradientStop((g.RelativeValue-lowerValue) / (upperValue-lowerValue), g.Color))
+            .Select(g => new ImmutableGradientStop((g.RelativeValue - lowerValue) / (upperValue - lowerValue), g.Color))
             .Prepend(new ImmutableGradientStop(0, GetColorForRelativeValue(lowerValue)))
-            .Append(new ImmutableGradientStop(1,GetColorForRelativeValue(upperValue)))
+            .Append(new ImmutableGradientStop(1, GetColorForRelativeValue(upperValue)))
             .ToList()
             ;
-        
+
         var brush = new ImmutableLinearGradientBrush(gradientStops);
 
         InnerBorder.Background = brush;

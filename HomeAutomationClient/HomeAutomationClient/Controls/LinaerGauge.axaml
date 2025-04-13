@@ -5,7 +5,7 @@
          xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
          mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="50"
          x:Class="De.Hochstaetter.HomeAutomationClient.Controls.LinearGauge">
-    <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:LinearGauge}}">
+    <Viewbox Initialized="OnInitialized" DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:LinearGauge}}">
         <Grid Width="100" x:Name="Grid"
               ColumnDefinitions="Auto,*,Auto"
               RowDefinitions="Auto,Auto,Auto">
@@ -14,7 +14,6 @@
                 <Style Selector="TextBlock">
                     <Setter Property="HorizontalAlignment" Value="Right" />
                     <!-- ReSharper disable once MarkupAttributeTypo -->
-                    <Setter Property="FontFamily" Value="Segoe UI" />
                     <Setter Property="FontSize" Value="{Binding FontSize}" />
                     <Setter Property="FontWeight" Value="Normal" />
                 </Style>

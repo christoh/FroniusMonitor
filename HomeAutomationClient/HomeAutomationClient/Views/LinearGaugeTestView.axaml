@@ -19,17 +19,17 @@
 				<Setter Property="Margin" Value="5,0"/>
 			</Style>
 		</StackPanel.Styles>
-		<TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" FontSize="20" Margin="0,0,0,16"/>
-        <TextBlock Text="{Binding ApiUri}" HorizontalAlignment="Center"/>
-		<TextBlock Text="{Binding Value}" FontSize="20" FontWeight="Bold" Margin="0,0,0,16" HorizontalAlignment="Center"/>
+		<TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" FontSize="20"/>
+        <TextBlock Text="{Binding ApiUri}" HorizontalAlignment="Center" Margin="0,0,0,16"/>
 		<controls:LinearGauge Width="250"
                            Minimum="{Binding Minimum}"
                            Maximum="{Binding Maximum}"
                            AnimationEasing="SineEaseOut"
-                           FontSize="9"
+                           FontSize="7"
                            Label="Power"
                            UnitName="W"
                            Foreground="DarkBlue"
+                           StringFormat="N1"
                            Origin="{Binding Origin}"
                            Value="{Binding Value}"
                            GaugeColors="{Binding GaugeColorScheme}"/>
