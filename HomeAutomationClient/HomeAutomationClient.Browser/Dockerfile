@@ -70,14 +70,17 @@ EOF
 
 COPY <<"EOF" ./etc/nginx/http.d/default.conf
 server {
-        root /app/wwwroot;
-        index index.html;
 
-        location / {
-                try_files $uri $uri/ =404;
-                error_page 404 =200 /;
-                brotli_static on;
-        }
+    error_log /dev/stdout warn;
+    access_log /dev/stdout main;
+    root /app/wwwroot;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+        error_page 404 =200 /;
+        brotli_static on;
+    }
 
 	listen 42741;
 	listen [::]:42741;
