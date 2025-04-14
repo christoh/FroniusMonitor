@@ -63,13 +63,14 @@ COPY <<"EOF" ./etc/motd
 / __  / (_) | | | | | |  __/ /  _  \ |_| | || (_) | | | | | | (_| | |_| | (_) | | | |
 \/ /_/ \___/|_| |_| |_|\___| \_/ \_/\__,_|\__\___/|_| |_| |_|\__,_|\__|_|\___/|_| |_|
 
-Welcome to Bettina and Christoph's Home Automation Server
-=========================================================
+Welcome to Home Automation Server
+=================================
 
 EOF
 
 COPY <<"EOF" ./startup.sh
 #!/bin/ash
+test -f /etc/motd && cat /etc/motd
 cd /app
 exec dotnet ./HomeAutomationServer.dll
 EOF
@@ -81,6 +82,56 @@ EOF
 COPY <<"EOF" ./etc/doas.conf
 permit nopass app as root
 EOF
+
+COPY <<"EOF" ./root/.config/fastfetch/config.jsonc
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  "modules": [
+    "title",
+    "separator",
+    "os",
+    "host",
+    "kernel",
+    "uptime",
+    "packages",
+    "shell",
+    "display",
+    "wmtheme",
+    "theme",
+    "font",
+    {
+       "type": "cpu",
+       "showPeCoreCount": true,
+       "temp": true
+    },
+    "CPUCache",
+    "gpu",
+        "OpenGL",
+        "OpenCl",
+    "memory",
+        "PhysicalMemory",
+    "swap",
+    "disk",
+        "PhysicalDisk",
+        "Uptime",
+        "LoadAvg",
+        "TPM",
+        {
+            "type": "localip",
+            "showAllIps": false,
+            "showIpv6": true,
+            "format": "{ipv6} [v6] {ipv4} [v4]"
+        },
+        "PublicIp",
+    "battery",
+    "poweradapter",
+    "locale",
+    "break",
+    "colors"
+  ]
+}
+EOF
+
 
 # ----- Runner -----
 
@@ -98,6 +149,6 @@ WORKDIR /home/app
 USER app
 EXPOSE 1502/tcp
 
-ENTRYPOINT [ "/bin/ash", "-lc" ]
+ENTRYPOINT [ "/bin/ash", "-c" ]
 CMD [ "/startup.sh" ]
 

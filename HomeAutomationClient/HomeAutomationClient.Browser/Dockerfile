@@ -83,8 +83,8 @@ server {
         gzip_static on;
     }
 
-	listen 42741;
-	listen [::]:42741;
+    listen 42741;
+    listen [::]:42741;
 }
 EOF
 
@@ -144,6 +144,7 @@ COPY <<"EOF" ./root/.config/fastfetch/config.jsonc
   ]
 }
 EOF
+
 # Runner
 
 FROM alpine:latest
