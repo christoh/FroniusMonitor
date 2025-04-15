@@ -20,6 +20,7 @@ services:
       platforms:
         - linux/amd64
         - linux/arm64 
+        - linux/arm/v7
 #    environment:
 #      - HOME_AUTOMATION_SECRET=Djd./.ed$0|ks.c!eii\e6 # Choose your very own and unique secret. Use the same secret on your computer where you set the passwords for the Settings.xml file
 
