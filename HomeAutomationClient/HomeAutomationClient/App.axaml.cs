@@ -2,7 +2,6 @@ using System.Diagnostics;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using De.Hochstaetter.HomeAutomationClient.Views;
-using De.Hochstaetter.HomeAutomationClient.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace De.Hochstaetter.HomeAutomationClient
@@ -19,7 +18,7 @@ namespace De.Hochstaetter.HomeAutomationClient
         public override void OnFrameworkInitializationCompleted()
         {
             ServiceCollection ??= new ServiceCollection();
-            
+
             ServiceCollection
                 .AddSingleton<MainView>()
                 .AddSingleton<MainViewModel>()
@@ -29,7 +28,7 @@ namespace De.Hochstaetter.HomeAutomationClient
                 .AddTransient<LinearGaugeTestViewModel>()
                 ;
 
-            var serviceProvider= ServiceCollection.BuildServiceProvider();
+            var serviceProvider = ServiceCollection.BuildServiceProvider();
             IoC.Update(serviceProvider);
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
@@ -50,8 +49,7 @@ namespace De.Hochstaetter.HomeAutomationClient
         private void DisableAvaloniaDataAnnotationValidation()
         {
             // Get an array of plugins to remove
-            var dataValidationPluginsToRemove =
-                BindingPlugins.DataValidators.OfType<DataAnnotationsValidationPlugin>().ToArray();
+            var dataValidationPluginsToRemove = BindingPlugins.DataValidators.OfType<DataAnnotationsValidationPlugin>().ToArray();
 
             // remove each entry found
             foreach (var plugin in dataValidationPluginsToRemove)

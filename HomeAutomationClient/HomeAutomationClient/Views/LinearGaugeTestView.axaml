@@ -6,7 +6,8 @@
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
              xmlns:controls="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
              xmlns:m="clr-namespace:De.Hochstaetter.HomeAutomationClient.Misc"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="250"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.LinearGaugeTestView"
              x:DataType="vm:LinearGaugeTestViewModel">
 	<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -19,15 +20,13 @@
 				<Setter Property="Margin" Value="5,0"/>
 			</Style>
 		</StackPanel.Styles>
-		<TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" FontSize="20"/>
-        <TextBlock Text="{Binding ApiUri}" HorizontalAlignment="Center" Margin="0,0,0,16"/>
 		<controls:LinearGauge Width="250"
                            Minimum="{Binding Minimum}"
                            Maximum="{Binding Maximum}"
                            AnimationEasing="SineEaseOut"
                            FontSize="7"
-                           Label="Power"
-                           UnitName="W"
+                           Label="{x:Static p:Resources.Voltage}"
+                           UnitName="V"
                            Foreground="DarkBlue"
                            StringFormat="N1"
                            Origin="{Binding Origin}"

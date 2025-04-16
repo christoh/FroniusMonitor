@@ -2,10 +2,6 @@
 
 public partial class GaugeTestViewModel : ViewModelBase
 {
-    private readonly ICache? cache = IoC.TryGetRegistered<ICache>();
-
-    [ObservableProperty] public partial string Greeting { get; set; } = "Home Automation Control Center Alpha Test";
-
     [ObservableProperty] public partial double Value { get; set; } = 1000;
 
     [ObservableProperty] public partial bool ColorAllTicks { get; set; }
@@ -18,8 +14,6 @@ public partial class GaugeTestViewModel : ViewModelBase
 
     [ObservableProperty] public partial double Maximum { get; set; } = 1200;
     
-    public string ApiUri => cache?.Get<string>("apiUri") ?? string.Empty;
-
     public ICommand? AdjustValueCommand => field ??= new RelayCommand<double>(v => Value += v);
     public ICommand? SetMinimumCommand => field ??= new RelayCommand<string>(v => Minimum = double.Parse(v!, NumberStyles.Float, CultureInfo.InvariantCulture));
     public ICommand? SetMaximumCommand => field ??= new RelayCommand<string>(v => Maximum = double.Parse(v!, NumberStyles.Float, CultureInfo.InvariantCulture));

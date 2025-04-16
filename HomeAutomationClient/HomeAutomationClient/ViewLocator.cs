@@ -1,5 +1,4 @@
 using Avalonia.Controls.Templates;
-using De.Hochstaetter.HomeAutomationClient.ViewModels;
 
 namespace De.Hochstaetter.HomeAutomationClient
 {

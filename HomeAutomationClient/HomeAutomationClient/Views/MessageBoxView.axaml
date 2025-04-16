@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             xmlns:converters="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="De.Hochstaetter.HomeAutomationClient.Views.MessageBoxView"
+             x:DataType="viewModels:MessageBoxViewModel">
+    <StackPanel MinWidth="400" Margin="16" MaxWidth="800">
+        <TextBlock Text="{Binding Parameters.Text}" TextWrapping="Wrap" Margin="0,0,0,8" IsVisible="{Binding Parameters.Text, Converter={converters:Null2Bool}}" />
+        <ItemsControl ItemsSource="{Binding Parameters.Buttons}" HorizontalAlignment="Right">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="system:String">
+                    <Button Margin="4,0,0,0" Content="{Binding}" Click="OnButtonClicked" />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </StackPanel>
+</UserControl>

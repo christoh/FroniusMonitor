@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Avalonia.Controls;
 using Avalonia.Media.Immutable;
 using De.Hochstaetter.HomeAutomationClient.Extensions;

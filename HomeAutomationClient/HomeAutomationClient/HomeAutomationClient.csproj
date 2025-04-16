@@ -29,12 +29,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Resources\" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <Compile Update="Controls\LinaerGauge.axaml.cs">
 	    <DependentUpon>LinaerGauge.axaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\MessageBoxView.axaml.cs">
+	    <DependentUpon>MessageBoxView.axaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 </Project>
