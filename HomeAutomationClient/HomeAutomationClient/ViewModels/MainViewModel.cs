@@ -1,7 +1,4 @@
-﻿using System.Threading;
-using De.Hochstaetter.HomeAutomationClient.Adapters;
-using De.Hochstaetter.HomeAutomationClient.Models.Dialogs;
-using De.Hochstaetter.HomeAutomationClient.Views;
+﻿using De.Hochstaetter.HomeAutomationClient.Assets.Images;
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 
@@ -15,14 +12,11 @@ public partial class MainViewModel : ViewModelBase
 
     public string UiCulture => Thread.CurrentThread.CurrentUICulture.Name;
 
-    [ObservableProperty]
-    private bool isDialogVisible;
+    [ObservableProperty] public partial bool IsDialogVisible { get; set; }
 
-    [ObservableProperty]
-    private object? dialogContent;
+    [ObservableProperty] public partial object? DialogContent { get; set; }
 
-    [ObservableProperty]
-    private string? titleText;
+    [ObservableProperty] public partial string? TitleText { get; set; }
 
     public ICommand? ShowDialogCommand => field ??= new RelayCommand(async void () =>
     {
@@ -33,8 +27,16 @@ public partial class MainViewModel : ViewModelBase
                 "Test Dialog",
                 new MessageBoxParameters
                 {
-                    Buttons = [Resources.Cancel, Resources.Ok],
-                    Text = "Hello, Dialog!",
+                    Buttons = [Resources.Ok, Resources.Cancel],
+                    Text = "Hello, World! This is a test for a MessageBox that has some longer text items and everything still needs to look good and the text must properly wrap. Please also have a look at the following items.",
+                    ItemList =
+                    [
+                        "Always prefer composition over inheritance",
+                        "If you create an async method, you must ensure that you properly await it. Carefully choose between Task<T> and ValueTask<T> and don't forget to set ConfigureAwait() properly.",
+                        "This is an additional bullet item.",
+                    ],
+                    TextBelowItemList = $"Did you understand everything? If not, press '{Resources.Cancel}'.",
+                    Icon = new WarningIcon(),
                 }
             );
 
@@ -43,6 +45,28 @@ public partial class MainViewModel : ViewModelBase
         catch
         {
             // ignore
+        }
+    });
+
+    public ICommand? ShowSimpleDialogCommand => field ??= new RelayCommand(async void () =>
+    {
+        try
+        {
+            using var dialog = new MessageBoxViewModel
+            (
+                Resources.Error,
+                new MessageBoxParameters
+                {
+                    Text = string.Format(Resources.InverterCommReadError, "Atomkraftwerk 1"),
+                    Icon = new ErrorIcon(),
+                }
+            );
+
+            var result = await dialog.ShowDialogAsync().ConfigureAwait(false);
+        }
+        catch
+        {
+            // async void must be caught to avoid unhandled exceptions
         }
     });
 
@@ -60,7 +84,7 @@ public partial class MainViewModel : ViewModelBase
         }
         catch
         {
-            // ignore
+            // async void must be caught to avoid unhandled exceptions
         }
     });
 }

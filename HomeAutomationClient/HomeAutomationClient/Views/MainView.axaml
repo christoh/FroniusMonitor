@@ -9,8 +9,8 @@
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.MainView"
              x:DataType="vm:MainViewModel">
 	<Grid RowDefinitions="Auto,*">
-        <StackPanel IsEnabled="{Binding IsDialogVisible, Converter={co:BoolInverter}}" x:Name="MainContentElement" Orientation="Vertical" Margin="16" Grid.Row="0" VerticalAlignment="Top">
-			<TextBlock Text="Home Automation Control Center Alpha Text" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" />
+		<StackPanel IsEnabled="{Binding IsDialogVisible, Converter={co:BoolInverter}}" x:Name="MainContentElement" Orientation="Vertical" Margin="16" Grid.Row="0" VerticalAlignment="Top">
+			<TextBlock Text="Home Automation Control Center UI Test" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" />
 			<TextBlock Text="{Binding ApiUri, TargetNullValue='http://www.hochstaetter.de/api'}" HorizontalAlignment="Center" />
 			<TextBlock HorizontalAlignment="Center" Margin="0,0,0,20">
 				<Run Text="Culture:" />
@@ -20,31 +20,34 @@
 				<Run Text="{Binding UiCulture, Mode=OneWay}" />
 			</TextBlock>
 		</StackPanel>
-        <Grid Grid.Row="1" x:Name="InnerGrid" IsEnabled="{Binding IsDialogVisible, Converter={co:BoolInverter}}">
-		<ScrollViewer VerticalAlignment="Top" AllowAutoHide="False" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto"
-					  Height="{Binding ElementName=InnerGrid, Path=Bounds.Height}">
-			<WrapPanel Orientation="Horizontal" Width="{Binding ElementName=InnerGrid, Path=Bounds.Width}">
-				<WrapPanel.Styles>
-					<Style Selector="HeaderedContentControl">
-						<Setter Property="Margin" Value="4"/>
-					</Style>
-				</WrapPanel.Styles>
-				<HeaderedContentControl Classes="GroupBox" Header="Half Circle Gauge">
-					<Viewbox Width="300">
-						<views:GaugeTestView />
-					</Viewbox>
-				</HeaderedContentControl>
-                <HeaderedContentControl Classes="GroupBox" Header="Linear Gauge">
-                    <Viewbox Width="300">
-                        <views:LinearGaugeTestView />
-                    </Viewbox>
-                </HeaderedContentControl>
-                <HeaderedContentControl Classes="GroupBox" Header="Dialog">
-                    <Button Content="Show a Dialog" Command="{Binding ShowDialogCommand}"></Button>
-                </HeaderedContentControl>
-			</WrapPanel>
-		</ScrollViewer>
-        </Grid>
+		<Grid Grid.Row="1" x:Name="InnerGrid" IsEnabled="{Binding IsDialogVisible, Converter={co:BoolInverter}}">
+			<ScrollViewer VerticalAlignment="Top" AllowAutoHide="False" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto"
+						  Height="{Binding ElementName=InnerGrid, Path=Bounds.Height}">
+				<WrapPanel Orientation="Horizontal" Width="{Binding ElementName=InnerGrid, Path=Bounds.Width}">
+					<WrapPanel.Styles>
+						<Style Selector="HeaderedContentControl">
+							<Setter Property="Margin" Value="4"/>
+						</Style>
+					</WrapPanel.Styles>
+					<HeaderedContentControl Classes="GroupBox" Header="Half Circle Gauge">
+						<Viewbox Width="300">
+							<views:GaugeTestView />
+						</Viewbox>
+					</HeaderedContentControl>
+					<HeaderedContentControl Classes="GroupBox" Header="Linear Gauge">
+						<Viewbox Width="300">
+							<views:LinearGaugeTestView />
+						</Viewbox>
+					</HeaderedContentControl>
+					<HeaderedContentControl Classes="GroupBox" Header="Dialog">
+						<StackPanel>
+							<Button Content="Complex Error MessageBox" Command="{Binding ShowDialogCommand}"></Button>
+							<Button Content="Simple Error MessageBox" Command="{Binding ShowSimpleDialogCommand}"></Button>
+						</StackPanel>
+					</HeaderedContentControl>
+				</WrapPanel>
+			</ScrollViewer>
+		</Grid>
 		<Grid Grid.Row="0" Grid.RowSpan="2" Background="#80000000" x:Name="DialogOverlay" IsVisible="{Binding IsDialogVisible}">
 			<StackPanel Background="White" HorizontalAlignment="Center" VerticalAlignment="Center">
 				<Grid RowDefinitions="Auto,*" ColumnDefinitions="*,Auto" Background="SandyBrown">
@@ -59,10 +62,11 @@
 							<Setter Property="Background" Value="#c08B4513" />
 							<Setter Property="Foreground" Value="White"></Setter>
 							<Setter Property="Content" Value="X" />
+                            <Setter Property="Command" Value="{Binding DialogClosedCommand}"/>
 						</Style>
 					</Grid.Styles>
 					<TextBlock x:Name="TitleTextBlock" Grid.Row="0" Grid.Column="0" Padding="5" Text="{Binding TitleText}" />
-					<Button Classes="TransparentButton CloseButton" Grid.Row="0" Grid.Column="1" Command="{Binding DialogClosedCommand}" />
+					<Button Classes="TransparentButton CloseButton" Grid.Row="0" Grid.Column="1" />
 				</Grid>
 				<UserControl MinWidth="100" x:Name="DialogHost" Content="{Binding DialogContent}"/>
 			</StackPanel>

@@ -29,7 +29,7 @@ public partial class HalfCircleGauge : Gauge
         InitializeComponent();
     }
 
-    private void OnTemplateLoaded(object? sender, EventArgs e)
+    private void OnViewBoxInitialized(object? sender, EventArgs e)
     {
         var handLength = OuterCanvas.Width * 0.45;
 

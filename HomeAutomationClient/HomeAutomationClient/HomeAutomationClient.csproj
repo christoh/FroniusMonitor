@@ -13,6 +13,18 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <AvaloniaResource Remove="Assets\Images\ErrorIcon.axaml.cs" />
+	  <AvaloniaResource Remove="Assets\Images\InfoIcon.axaml.cs" />
+	  <AvaloniaResource Remove="Assets\Images\WarningIcon.axaml.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <AvaloniaXaml Remove="Assets\Images\ErrorIcon.axaml" />
+	  <AvaloniaXaml Remove="Assets\Images\InfoIcon.axaml" />
+	  <AvaloniaXaml Remove="Assets\Images\WarningIcon.axaml" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
 		<PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
 		<PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
@@ -35,5 +47,17 @@
 	  <Compile Update="Views\MessageBoxView.axaml.cs">
 	    <DependentUpon>MessageBoxView.axaml</DependentUpon>
 	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <AvaloniaResource Update="Assets\Images\ErrorIcon.axaml">
+	    <SubType>Designer</SubType>
+	  </AvaloniaResource>
+	  <AvaloniaResource Update="Assets\Images\InfoIcon.axaml">
+	    <SubType>Designer</SubType>
+	  </AvaloniaResource>
+	  <AvaloniaResource Update="Assets\Images\WarningIcon.axaml">
+	    <SubType>Designer</SubType>
+	  </AvaloniaResource>
 	</ItemGroup>
 </Project>

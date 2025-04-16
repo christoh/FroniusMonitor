@@ -1,0 +1,13 @@
+<ContentControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="100" d:DesignHeight="100"
+             x:Class="De.Hochstaetter.HomeAutomationClient.Assets.Images.InfoIcon">
+    <Viewbox ClipToBounds="True" >
+        <Canvas Width="100" Height="100">
+            <Ellipse Width="100" Height="100" Fill="Blue" />
+            <TextBlock Canvas.Left="12.5" Text="i" Foreground="White" FontSize="84" FontWeight="Bold" Margin="26,0"/>
+        </Canvas>
+    </Viewbox>
+</ContentControl>

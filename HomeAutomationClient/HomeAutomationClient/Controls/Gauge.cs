@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using Avalonia.Animation;
+﻿using Avalonia.Animation;
 using Avalonia.Animation.Easings;
 using Avalonia.Data;
 using Avalonia.Styling;

@@ -1,6 +1,4 @@
-﻿using System.Threading;
-using Avalonia.Threading;
-using De.Hochstaetter.HomeAutomationClient.Models.Dialogs;
+﻿using Avalonia.Threading;
 using De.Hochstaetter.HomeAutomationClient.Views;
 
 namespace De.Hochstaetter.HomeAutomationClient.Adapters;

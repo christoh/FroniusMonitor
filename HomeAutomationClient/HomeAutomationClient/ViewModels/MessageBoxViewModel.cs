@@ -1,6 +1,4 @@
-﻿using System.Threading;
-using De.Hochstaetter.HomeAutomationClient.Adapters;
-using De.Hochstaetter.HomeAutomationClient.Models.Dialogs;
+﻿using De.Hochstaetter.HomeAutomationClient.Adapters;
 using De.Hochstaetter.HomeAutomationClient.Views;
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
