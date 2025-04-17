@@ -1,0 +1,21 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="260"
+             x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.LoginView"
+             x:DataType="dialogs:LoginViewModel" MaxWidth="800" MinWidth="500">
+    <StackPanel Margin="16" HorizontalAlignment="Stretch">
+        <TextBlock Text="{x:Static p:Resources.PleaseLogin}" TextWrapping="Wrap" FontSize="16" Margin="0,0,0,16"/>
+        <TextBlock Text="{x:Static p:Resources.Username}"/>
+        <TextBox Text="{Binding UserName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="0,0,0,16"/>
+        <TextBlock Text="{x:Static p:Resources.Password}"/>
+        <TextBox PasswordChar="*" Text="{Binding Password, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+        <TextBlock Text="{Binding LoginFailedMessage}" Foreground="Red" TextWrapping="Wrap" FontWeight="Medium" Margin="0,2,0,0"></TextBlock>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,32,0,0">
+            <Button MinWidth="50" HorizontalContentAlignment="Center" Content="{x:Static p:Resources.Ok}" Command="{Binding LoginCommand}"/>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

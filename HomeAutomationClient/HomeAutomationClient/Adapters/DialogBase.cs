@@ -1,7 +1,4 @@
-﻿using Avalonia.Threading;
-using De.Hochstaetter.HomeAutomationClient.Views;
-
-namespace De.Hochstaetter.HomeAutomationClient.Adapters;
+﻿namespace De.Hochstaetter.HomeAutomationClient.Adapters;
 
 public abstract partial class DialogBase<TParameters, TResult, TBody> : ViewModelBase, IDialogBase where TBody : ContentControl, IDialogControl, new()
 {
@@ -25,8 +22,7 @@ public abstract partial class DialogBase<TParameters, TResult, TBody> : ViewMode
 
     public TBody DialogBody { get; }
 
-    [ObservableProperty]
-    public partial string Title { get; set; } = string.Empty;
+    [ObservableProperty] public partial string Title { get; set; } = string.Empty;
 
     public virtual async Task<TResult?> ShowDialogAsync()
     {
@@ -36,7 +32,7 @@ public abstract partial class DialogBase<TParameters, TResult, TBody> : ViewMode
             {
                 throw new ObjectDisposedException($"{GetType().Name} was disposed");
             }
-            
+
             var mainViewModel = IoC.GetRegistered<MainViewModel>();
             mainViewModel.IsDialogVisible = true;
             await Task.Delay(-1, TokenSource.Token).ConfigureAwait(false);

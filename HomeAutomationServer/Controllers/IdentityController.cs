@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Security.Cryptography;
+using System.Text;
 using De.Hochstaetter.HomeAutomationServer.Misc;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -11,6 +12,17 @@ namespace De.Hochstaetter.HomeAutomationServer.Controllers;
 public class IdentityController(Settings settings, ILogger<IdentityController> logger, IOptionsMonitor<UserList> userDb) : ControllerBase
 {
     private static readonly CookieOptions cookieOptions = new() { Path = "/api", MaxAge = new TimeSpan(7, 0, 0, 0) };
+
+    [HttpGet("requestKey")]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<string>(StatusCodes.Status200OK)]
+    public IActionResult RequestKey([FromQuery] string user)
+    {
+        var dbUser = userDb.CurrentValue.Users.SingleOrDefault(u => string.Equals(user, u.Username, StringComparison.OrdinalIgnoreCase));
+        var salt = IoC.Get<IAesKeyProvider>().GetAesKey().Concat(dbUser?.SaltBytes ?? []).ToArray();
+        var hashCode = Convert.ToBase64String(new Rfc2898DeriveBytes(user, salt, 32768, HashAlgorithmName.SHA256).GetBytes(16));
+        return Ok(hashCode);
+    }
 
     [HttpGet("login")]
     [ProducesResponseType(StatusCodes.Status200OK)]

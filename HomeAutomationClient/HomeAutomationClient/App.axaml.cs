@@ -1,8 +1,4 @@
-using System.Diagnostics;
-using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core.Plugins;
-using De.Hochstaetter.HomeAutomationClient.Views;
-using Microsoft.Extensions.DependencyInjection;
+using De.Hochstaetter.HomeAutomationClient.Views.Dialogs;
 
 namespace De.Hochstaetter.HomeAutomationClient
 {
@@ -26,6 +22,14 @@ namespace De.Hochstaetter.HomeAutomationClient
                 .AddTransient<GaugeTestViewModel>()
                 .AddTransient<LinearGaugeTestView>()
                 .AddTransient<LinearGaugeTestViewModel>()
+                .AddTransient<UiDemoView>()
+                .AddTransient<UiDemoViewModel>()
+                
+                .AddTransient<HomeAutomationServerConnection>()
+                
+                .AddSingleton<IServerBasedAesKeyProvider, AesKeyProvider>()
+                .AddSingleton<IAesKeyProvider,IAesKeyProvider>(provider=>IoC.GetRegistered<IServerBasedAesKeyProvider>())
+                .AddSingleton<IWebClientService, WebClientService>()
                 ;
 
             var serviceProvider = ServiceCollection.BuildServiceProvider();
@@ -36,7 +40,7 @@ namespace De.Hochstaetter.HomeAutomationClient
                 // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
                 // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
                 DisableAvaloniaDataAnnotationValidation();
-                desktop.MainWindow = new MainWindow();
+                desktop.MainWindow = IoC.Get<MainWindow>();
             }
             else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
             {

@@ -47,7 +47,7 @@ public class User
         }
     } = Convert.ToBase64String(RandomNumberGenerator.GetBytes(8));
 
-    [XmlIgnore] [JsonIgnore] private byte[] SaltBytes => Convert.FromBase64String(Salt);
+    [XmlIgnore] [JsonIgnore] internal byte[] SaltBytes => Convert.FromBase64String(Salt);
 
     [XmlAttribute] public Roles Roles { get; set; } = Roles.None;
 

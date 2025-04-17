@@ -2,11 +2,13 @@ namespace De.Hochstaetter.HomeAutomationClient.Views;
 
 public partial class LinearGaugeTestView : UserControl
 {
-    private GaugeTestViewModel? ViewModel => DataContext as GaugeTestViewModel;
+    private readonly LinearGaugeTestViewModel viewModel= IoC.GetRegistered<LinearGaugeTestViewModel>();
 
     public LinearGaugeTestView()
     {
+        ;
         InitializeComponent();
-        DataContext = IoC.TryGetRegistered<LinearGaugeTestViewModel>();
+        DataContext = viewModel;
+        Loaded += (_, _) => viewModel.Initialize();
     }
 }

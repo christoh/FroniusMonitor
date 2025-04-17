@@ -4,16 +4,11 @@ namespace De.Hochstaetter.HomeAutomationClient.Views;
 
 public partial class MainView : UserControl
 {
-    private MainViewModel viewModel;
-
     public MainView()
     {
+        MainViewModel mainViewModel;
         InitializeComponent();
-        DataContext = viewModel = IoC.GetRegistered<MainViewModel>();
-    }
-
-    private void OnDialogCloseClick(object? sender, RoutedEventArgs e)
-    {
-        DialogOverlay.IsVisible = false;
+        DataContext = mainViewModel = IoC.GetRegistered<MainViewModel>();
+        Loaded += (_, _) => _ = mainViewModel.Initialize();
     }
 }

@@ -3364,6 +3364,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please Login with your Username and Password.
+        /// </summary>
+        public static string PleaseLogin {
+            get {
+                return ResourceManager.GetString("PleaseLogin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Plug.
         /// </summary>
         public static string Plug {

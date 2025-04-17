@@ -1629,4 +1629,7 @@
   <data name="PvPower" xml:space="preserve">
 	  <value>PV Power</value>
   </data>
+  <data name="PleaseLogin" xml:space="preserve">
+	  <value>Please Login with your Username and Password</value>
+  </data>
 </root>

@@ -2,9 +2,20 @@
 
 public class WebConnection : BindableBase, ICloneable, IHaveDisplayName
 {
-    public static Aes Aes;
+    public static Aes Aes { get; private set; } = null!;
 
     static WebConnection()
+    {
+        CreateAes();
+    }
+
+    public static void InvalidateKey()
+    {
+        Aes.Dispose();
+        CreateAes();
+    }
+
+    private static void CreateAes()
     {
         Aes = Aes.Create();
         Aes.KeySize = 128;
@@ -13,7 +24,7 @@ public class WebConnection : BindableBase, ICloneable, IHaveDisplayName
         Aes.Key = IoC.Injector == null ? new byte[16] : IoC.Get<IAesKeyProvider>().GetAesKey();
     }
 
-    public string DisplayName => BaseUrl;
+    [JsonIgnore] public string DisplayName => BaseUrl;
 
     [DefaultValue(""), XmlAttribute]
     public string BaseUrl
@@ -49,14 +60,22 @@ public class WebConnection : BindableBase, ICloneable, IHaveDisplayName
     {
         get
         {
+            var result = string.Empty;
+
             try
             {
                 using var encrypt = Aes.CreateEncryptor();
                 var bytes = Encoding.UTF8.GetBytes(Password);
-                return Convert.ToBase64String(encrypt.TransformFinalBlock(bytes, 0, bytes.Length));
+                result = Convert.ToBase64String(encrypt.TransformFinalBlock(bytes, 0, bytes.Length));
+                return result;
+            }
+            catch (PlatformNotSupportedException)
+            {
+                return result;
             }
             catch
             {
+                Debugger.Break();
                 return string.Empty;
             }
         }
@@ -68,8 +87,10 @@ public class WebConnection : BindableBase, ICloneable, IHaveDisplayName
                 var bytes = Convert.FromBase64String(value);
                 Password = Encoding.UTF8.GetString(decrypt.TransformFinalBlock(bytes, 0, bytes.Length));
             }
-            catch
+            catch (PlatformNotSupportedException) { }
+            catch (Exception ex)
             {
+                Debugger.Break();
                 Password = string.Empty;
             }
         }
@@ -77,7 +98,7 @@ public class WebConnection : BindableBase, ICloneable, IHaveDisplayName
 
     private string? calculatedChecksum;
 
-    [XmlIgnore]
+    [XmlIgnore, JsonIgnore]
     public string CalculatedChecksum
     {
         get

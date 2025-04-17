@@ -1554,4 +1554,7 @@
   <data name="PvPower" xml:space="preserve">
 	  <value>PV-Leistung</value>
   </data>
+  <data name="PleaseLogin" xml:space="preserve">
+	  <value>Bitte melde Dich mit Deinem Benutzernamen und Deinem Kennwort an</value>
+  </data>
 </root>

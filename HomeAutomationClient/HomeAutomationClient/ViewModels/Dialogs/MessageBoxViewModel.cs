@@ -1,7 +1,7 @@
 ﻿using De.Hochstaetter.HomeAutomationClient.Adapters;
-using De.Hochstaetter.HomeAutomationClient.Views;
+using MessageBoxView = De.Hochstaetter.HomeAutomationClient.Views.Dialogs.MessageBoxView;
 
-namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
+namespace De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs;
 
 public class MessageBoxViewModel(string dialogTitle, MessageBoxParameters parameters)
     : DialogBase<MessageBoxParameters, MessageBoxResult, MessageBoxView>(dialogTitle, parameters)
