@@ -14,9 +14,9 @@ public class UiDemoViewModel : ViewModelBase
         {
             using var dialog = new MessageBoxViewModel
             (
-                "Test Dialog",
-                new MessageBoxParameters
+                new MessageBox
                 {
+                    Title = "Test Dialog",
                     Buttons = [Resources.Ok, Resources.Cancel],
                     Text = "Hello, World! This is a test for a MessageBox that has some longer text items and everything still needs to look good and the text must properly wrap. Please also have a look at the following items.",
                     ItemList =
@@ -44,9 +44,9 @@ public class UiDemoViewModel : ViewModelBase
         {
             using var dialog = new MessageBoxViewModel
             (
-                Resources.Error,
-                new MessageBoxParameters
+                new MessageBox
                 {
+                    Title = Resources.Error,
                     Text = string.Format(Resources.InverterCommReadError, "Atomkraftwerk 1"),
                     Icon = new ErrorIcon(),
                 }

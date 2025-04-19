@@ -4,41 +4,42 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
-             xmlns:converters="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
+             xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.MessageBoxView"
              x:DataType="viewModels:MessageBoxViewModel">
     <Grid MinWidth="200" Margin="16" MaxWidth="600"
           RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*">
         <ContentControl Grid.Row="0" Grid.Column="0" Height="32" Width="32" VerticalAlignment="Top" Content="{Binding Parameters.Icon}"
-                        Margin="0,8,16,0" IsVisible="{Binding Parameters.Icon, Converter={converters:Null2Bool}}"/>
+                        Margin="0,8,16,0" IsVisible="{Binding Parameters.Icon, Converter={co:Null2Bool}}"/>
         <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">
         <TextBlock Text="{Binding Parameters.Text}" TextWrapping="Wrap" Margin="0,0,0,8"
-                   IsVisible="{Binding Parameters.Text, Converter={converters:Null2Bool}}" />
+                   IsVisible="{Binding Parameters.Text, Converter={co:Null2Bool}}" />
 
         <ItemsControl ItemsSource="{Binding Parameters.ItemList}" HorizontalAlignment="Right" Margin="0,0,0,8"
-                      IsVisible="{Binding Parameters.ItemList, Converter={converters:Null2Bool}}">
+                      IsVisible="{Binding Parameters.ItemList, Converter={co:Null2Bool}}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <StackPanel Orientation="Vertical" Grid.IsSharedSizeScope="True"/>
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Left"/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="system:String">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" SharedSizeGroup="Group1"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="•" Grid.Column="0" Margin="0,0,8,2"/>
-                            <TextBlock Text="{Binding}" Grid.Column="1" TextWrapping="Wrap" Margin="0,0,0,2"/>
+                        <Grid ColumnDefinitions="Auto,*" HorizontalAlignment="Left">
+                            <TextBlock HorizontalAlignment="Left"
+                                       DataContext="{Binding Path=((viewModels:MessageBoxViewModel)DataContext).Parameters, FallbackValue={x:Null},
+									   RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+                                       Text="{Binding Path=ItemList, FallbackValue='', Converter={co:Any2String Any='•', Empty=''}}"
+                                       Grid.Column="0" 
+                                       Margin="{Binding Path=ItemList, FallbackValue='0,0,0,2', Converter={co:Any2Thickness Any='0,0,6,2', Empty='0,0,0,2'}}"/>
+                            <TextBlock HorizontalAlignment="Left" Text="{Binding}" Grid.Column="1" TextWrapping="Wrap" Margin="0,0,0,2"/>
                         </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
 
         <TextBlock Text="{Binding Parameters.TextBelowItemList}" TextWrapping="Wrap" Margin="0,0,0,8"
-                   IsVisible="{Binding Parameters.TextBelowItemList, Converter={converters:Null2Bool}}" />
+                   IsVisible="{Binding Parameters.TextBelowItemList, Converter={co:Null2Bool}}" />
 
         </StackPanel>
         <ItemsControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding Parameters.Buttons}" HorizontalAlignment="Right">

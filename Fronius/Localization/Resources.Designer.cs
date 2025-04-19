@@ -889,6 +889,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Logging in.
+        /// </summary>
+        public static string BusyLoggingIn {
+            get {
+                return ResourceManager.GetString("BusyLoggingIn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Allow current level selection via hardware button.
         /// </summary>
         public static string ButtonEnableCharging {
@@ -1020,6 +1029,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Cancel {
             get {
                 return ResourceManager.GetString("Cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot login user.
+        /// </summary>
+        public static string CannotLogin {
+            get {
+                return ResourceManager.GetString("CannotLogin", resourceCulture);
             }
         }
         
@@ -1245,6 +1263,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string CommonModbusSlaveSettings {
             get {
                 return ResourceManager.GetString("CommonModbusSlaveSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connecting.
+        /// </summary>
+        public static string ConnectingToHas {
+            get {
+                return ResourceManager.GetString("ConnectingToHas", resourceCulture);
             }
         }
         
@@ -1996,6 +2023,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to HTTP Error.
+        /// </summary>
+        public static string HttpError {
+            get {
+                return ResourceManager.GetString("HttpError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Automatically Cool or Heat.
         /// </summary>
         public static string HvacModeAuto {
@@ -2307,6 +2343,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string LoadSettings {
             get {
                 return ResourceManager.GetString("LoadSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Incorrect username and/or password.
+        /// </summary>
+        public static string LoginIncorrect {
+            get {
+                return ResourceManager.GetString("LoginIncorrect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Login.
+        /// </summary>
+        public static string LoginNoun {
+            get {
+                return ResourceManager.GetString("LoginNoun", resourceCulture);
             }
         }
         

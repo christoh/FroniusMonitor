@@ -1,26 +1,16 @@
 ﻿namespace De.Hochstaetter.HomeAutomationClient.Adapters;
 
-public abstract partial class DialogBase<TParameters, TResult, TBody> : ViewModelBase, IDialogBase where TBody : ContentControl, IDialogControl, new()
+public abstract partial class DialogBase<TParameters, TResult, TBody>(TParameters parameters) : ViewModelBase, IDialogBase
+    where TBody : ContentControl, IDialogControl, new()
+    where TParameters : DialogParameters
 {
-    protected CancellationTokenSource? TokenSource { get; private set; } = new();
+    private readonly MainViewModel mainViewModel = IoC.GetRegistered<MainViewModel>();
 
-    protected DialogBase(string title, TParameters parameters)
-    {
-        Title = title;
-        Parameters = parameters;
-        DialogBody = new TBody { DataContext = this, };
+    protected CancellationTokenSource? TokenSource { get; private set; }
 
-        var mainViewModel = IoC.GetRegistered<MainViewModel>();
-
-        mainViewModel.DialogContent = DialogBody;
-        mainViewModel.TitleText = title;
-    }
-
-    public TParameters? Parameters { get; protected set; }
+    public TParameters Parameters { get; protected set; } = parameters;
 
     public TResult? Result { get; protected set; }
-
-    public TBody DialogBody { get; }
 
     [ObservableProperty] public partial string Title { get; set; } = string.Empty;
 
@@ -28,14 +18,16 @@ public abstract partial class DialogBase<TParameters, TResult, TBody> : ViewMode
     {
         try
         {
-            if (TokenSource == null)
-            {
-                throw new ObjectDisposedException($"{GetType().Name} was disposed");
-            }
+            mainViewModel.DialogQueue.Push(mainViewModel.CurrentDialog);
 
-            var mainViewModel = IoC.GetRegistered<MainViewModel>();
-            mainViewModel.IsDialogVisible = true;
-            await Task.Delay(-1, TokenSource.Token).ConfigureAwait(false);
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                TokenSource = new();
+                var dialogItem = new DialogQueueItem(Parameters.Title, new TBody { DataContext = this, }, Parameters.ShowCloseBox);
+                mainViewModel.CurrentDialog = dialogItem;
+            });
+
+            await Task.Delay(-1, TokenSource!.Token).ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {
@@ -60,10 +52,7 @@ public abstract partial class DialogBase<TParameters, TResult, TBody> : ViewMode
 
     protected void Close()
     {
-        var mainViewModel = IoC.GetRegistered<MainViewModel>();
-        mainViewModel.IsDialogVisible = false;
-        mainViewModel.DialogContent = null;
-        mainViewModel.TitleText = null;
+        Dispatcher.UIThread.Invoke(() => { mainViewModel.CurrentDialog = mainViewModel.DialogQueue.TryPop(out var previousDialog) ? previousDialog : null; });
         TokenSource?.Cancel();
     }
 }

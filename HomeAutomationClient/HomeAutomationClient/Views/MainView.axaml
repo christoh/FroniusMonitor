@@ -27,10 +27,10 @@
                             <Setter Property="Command" Value="{Binding DialogClosedCommand}"/>
 						</Style>
 					</Grid.Styles>
-					<TextBlock x:Name="TitleTextBlock" Grid.Row="0" Grid.Column="0" Padding="5" Text="{Binding TitleText}" />
-					<Button Classes="TransparentButton CloseButton" Grid.Row="0" Grid.Column="1" IsTabStop="False" />
+					<TextBlock x:Name="TitleTextBlock" Grid.Row="0" Grid.Column="0" Padding="5" Text="{Binding CurrentDialog.Title, FallbackValue=''}" />
+					<Button Classes="TransparentButton CloseButton" Grid.Row="0" Grid.Column="1" IsTabStop="False" IsVisible="{Binding CurrentDialog.ShowCloseBox, FallbackValue=True}"/>
 				</Grid>
-				<UserControl MinWidth="100" x:Name="DialogHost" Content="{Binding DialogContent}"/>
+				<UserControl MinWidth="100" x:Name="DialogHost" Content="{Binding CurrentDialog.Body, FallbackValue={x:Null}}"/>
 			</StackPanel>
 		</Grid>
 	</Grid>

@@ -1,5 +1,4 @@
 ﻿using De.Hochstaetter.Fronius.Models.WebApi;
-using De.Hochstaetter.HomeAutomationServer.Misc;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using Microsoft.AspNetCore.Http;
 
@@ -12,7 +11,7 @@ public class DevicesController(IDataControlService controlService, ILogger<Devic
     [HttpGet]
     [BasicAuthorize(Roles = "User")]
     [ProducesResponseType<IDictionary<string, DeviceInfo>>(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public IActionResult ListDevices()
     {
         var result = new Dictionary<string, DeviceInfo>();
@@ -20,7 +19,7 @@ public class DevicesController(IDataControlService controlService, ILogger<Devic
         {
             var info = new DeviceInfo();
             var type = e.Value.Device.GetType();
-            info.Interfaces = type.GetInterfaces().Select(i => i.Name + (i.IsGenericType ? $"${string.Join(',', i.GenericTypeArguments.Select(g => g.Name))}>" : string.Empty));
+            info.Interfaces = type.GetInterfaces().Select(i => i.Name + (i.IsGenericType ? $"${string.Join(',', i.GenericTypeArguments.Select(g => g.Name))}>" : string.Empty)).ToList();
             info.DeviceType = type.Name;
             info.CredentialType = e.Value.Credentials?.GetType().Name;
             info.ServiceType = e.Value.ServiceType?.Name;
@@ -34,7 +33,7 @@ public class DevicesController(IDataControlService controlService, ILogger<Devic
         });
 
         logger.LogDebug("Device list requested by {Username} from {Ip}", HttpContext.User.Identity!.Name, HttpContext.Connection.RemoteIpAddress);
-        return result.Count == 0 ? NoContent() : Ok(result);
+        return result.Count == 0 ? NotFound(Helpers.GetProblemDetails("No devices found", "The Home Automation Server currently has no devices")) : Ok(result);
     }
 
     [HttpGet("getTypes")]
@@ -50,6 +49,7 @@ public class DevicesController(IDataControlService controlService, ILogger<Devic
     [BasicAuthorize(Roles = "User")]
     [ProducesResponseType<object>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public IActionResult GetDevice([FromRoute] string id)
     {
         if (controlService.Entities.TryGetValue(id, out var device))
@@ -59,13 +59,14 @@ public class DevicesController(IDataControlService controlService, ILogger<Devic
         }
 
         logger.LogError("{Username} requested {DeviceName} from {Ip} but it was not found", HttpContext.User.Identity!.Name, id, HttpContext.Connection.RemoteIpAddress);
-        return BadRequest(Helpers.GetValidationDetails(nameof(id), $"The device {id} was not found"));
+        return NotFound(Helpers.GetProblemDetails("Unknown device", $"The device {id} was not found"));
     }
 
     [HttpGet("{id}/credentials")]
     [BasicAuthorize(Roles = "Administrator")]
     [ProducesResponseType<object>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public IActionResult GetCredentials([FromRoute] string id)
     {
         if (controlService.Entities.TryGetValue(id, out var device))
@@ -75,6 +76,6 @@ public class DevicesController(IDataControlService controlService, ILogger<Devic
         }
 
         logger.LogError("The device {DeviceName} was not found", id);
-        return BadRequest(Helpers.GetValidationDetails(nameof(id), $"The device {id} was not found"));
+        return NotFound(Helpers.GetProblemDetails("Unknown device", $"The device {id} was not found"));
     }
 }

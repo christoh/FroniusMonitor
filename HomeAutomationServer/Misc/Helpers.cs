@@ -2,8 +2,8 @@
 
 internal static class Helpers
 {
-    public static ValidationProblemDetails GetValidationDetails(string key, string message)
+    public static ProblemDetails GetProblemDetails(string? title, string? message)
     {
-        return new ValidationProblemDetails(new Dictionary<string, string[]>([new KeyValuePair<string, string[]>(key, [message])]));
+        return new ProblemDetails { Detail = message, Title = title, };
     }
 }

@@ -1,4 +1,4 @@
-﻿using Avalonia.Threading;
+﻿using System.Collections.Concurrent;
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 
@@ -9,31 +9,29 @@ public sealed partial class MainViewModel : ViewModelBase
     public MainViewModel(IWebClientService webClient, IServerBasedAesKeyProvider keyProvider)
     {
         ApiUri = cache?.Get<string>(CacheKeys.ApiUri) ?? "https://home-automation.example.com";
-        webClient.Initialize(ApiUri);
+        webClient.Initialize(ApiUri, "hacc", "0.9.0.0");
     }
 
     public string ApiUri { get; }
 
-    [ObservableProperty] public partial object? MainViewContent { get; set; }
+    [ObservableProperty]
+    public partial object? MainViewContent { get; set; }
 
-    [ObservableProperty] public partial bool IsDialogVisible { get; set; }
+    public bool IsDialogVisible => CurrentDialog != null;
 
-    [ObservableProperty] public partial object? DialogContent { get; set; }
-
-    [ObservableProperty] public partial string? TitleText { get; set; }
-
-
+    [ObservableProperty,NotifyPropertyChangedFor(nameof(IsDialogVisible))]
+    public partial DialogQueueItem? CurrentDialog { get; set; }
+    
+    public ConcurrentStack<DialogQueueItem?> DialogQueue { get; } = new();
+    
     public ICommand? DialogClosedCommand => field ??= new RelayCommand(async void () =>
     {
         try
         {
-            if (DialogContent is IDialogControl { DataContext: IDialogBase dialogBase })
+            if (CurrentDialog?.Body is IDialogControl { DataContext: IDialogBase dialogBase })
             {
                 await dialogBase.AbortAsync().ConfigureAwait(false);
-                return;
             }
-
-            IsDialogVisible = false;
         }
         catch
         {
@@ -43,7 +41,12 @@ public sealed partial class MainViewModel : ViewModelBase
 
     public override async Task Initialize()
     {
-        var loginViewModel = new LoginViewModel("Home Automation Control Center - Login");
+        var loginViewModel = new LoginViewModel(new DialogParameters
+        {
+            Title = $"{AppConstants.AppName} - {Resources.LoginNoun}",
+            ShowCloseBox = false,
+        });
+
         var isLoggedIn = await loginViewModel.ShowDialogAsync();
         await Dispatcher.UIThread.InvokeAsync(() => MainViewContent = new UiDemoView());
     }

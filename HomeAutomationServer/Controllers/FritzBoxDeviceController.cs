@@ -12,12 +12,13 @@ public class FritzBoxDeviceController(IDataControlService controlService, ILogge
     [HttpGet]
     [BasicAuthorize(Roles = "User")]
     [ProducesResponseType<IDictionary<string, Gen24System>>(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public IActionResult GetFritzBoxDevices() => GetDevices<FritzBoxDevice>();
 
     [HttpGet("{id}")]
     [BasicAuthorize(Roles = "User")]
     [ProducesResponseType<FritzBoxDevice>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public IActionResult GetFritzBoxDevice([FromRoute] string id) => GetDevice<FritzBoxDevice>(id);
 }

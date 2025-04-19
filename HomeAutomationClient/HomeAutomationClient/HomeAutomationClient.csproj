@@ -6,6 +6,7 @@
 		<Configuration>Release</Configuration>
 		<RootNamespace>De.Hochstaetter.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
 		<AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+		<PublishTrimmed>false</PublishTrimmed>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -16,6 +17,8 @@
 	  <AvaloniaResource Remove="Assets\Images\ErrorIcon.axaml.cs" />
 	  <AvaloniaResource Remove="Assets\Images\InfoIcon.axaml.cs" />
 	  <AvaloniaResource Remove="Assets\Images\WarningIcon.axaml.cs" />
+	  <AvaloniaResource Remove="Assets\LoadingIndicators.Avalonia\LoadingIndicator.cs" />
+	  <AvaloniaResource Remove="Assets\LoadingIndicators.Avalonia\LoadingIndicatorMode.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

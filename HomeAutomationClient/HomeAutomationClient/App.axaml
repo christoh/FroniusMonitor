@@ -16,5 +16,10 @@
 	</Application.Styles>
 
 	<Application.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<MergeResourceInclude Source="Assets/LoadingIndicators.Avalonia/LoadingIndicators.axaml"/>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
 	</Application.Resources>
 </Application>

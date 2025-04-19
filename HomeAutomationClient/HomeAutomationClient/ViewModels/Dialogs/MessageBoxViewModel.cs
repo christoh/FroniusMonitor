@@ -1,14 +1,13 @@
-﻿using De.Hochstaetter.HomeAutomationClient.Adapters;
-using MessageBoxView = De.Hochstaetter.HomeAutomationClient.Views.Dialogs.MessageBoxView;
+﻿using MessageBoxView = De.Hochstaetter.HomeAutomationClient.Views.Dialogs.MessageBoxView;
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs;
 
-public class MessageBoxViewModel(string dialogTitle, MessageBoxParameters parameters)
-    : DialogBase<MessageBoxParameters, MessageBoxResult, MessageBoxView>(dialogTitle, parameters)
+public class MessageBoxViewModel(MessageBox parameters)
+    : DialogBase<MessageBox, MessageBoxResult, MessageBoxView>(parameters)
 {
     public void OnButtonClicked(int index)
     {
-        if (Parameters == null || index > Parameters.Buttons.Count - 1)
+        if (index > Parameters.Buttons.Count - 1)
         {
             index = ~0;
         }

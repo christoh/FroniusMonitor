@@ -1632,4 +1632,22 @@
   <data name="PleaseLogin" xml:space="preserve">
 	  <value>Please Login with your Username and Password</value>
   </data>
+  <data name="BusyLoggingIn" xml:space="preserve">
+	  <value>Logging in</value>
+  </data>
+  <data name="LoginNoun" xml:space="preserve">
+	  <value>Login</value>
+  </data>
+  <data name="HttpError" xml:space="preserve">
+	  <value>HTTP Error</value>
+  </data>
+  <data name="ConnectingToHas" xml:space="preserve">
+	  <value>Connecting</value>
+  </data>
+  <data name="CannotLogin" xml:space="preserve">
+	  <value>Cannot login user</value>
+  </data>
+  <data name="LoginIncorrect" xml:space="preserve">
+	  <value>Incorrect username and/or password</value>
+  </data>
 </root>

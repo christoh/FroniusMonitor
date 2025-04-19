@@ -1,5 +1,3 @@
-using De.Hochstaetter.HomeAutomationClient.Views.Dialogs;
-
 namespace De.Hochstaetter.HomeAutomationClient
 {
     public partial class App : Application
@@ -24,11 +22,11 @@ namespace De.Hochstaetter.HomeAutomationClient
                 .AddTransient<LinearGaugeTestViewModel>()
                 .AddTransient<UiDemoView>()
                 .AddTransient<UiDemoViewModel>()
-                
+
                 .AddTransient<HomeAutomationServerConnection>()
-                
+
                 .AddSingleton<IServerBasedAesKeyProvider, AesKeyProvider>()
-                .AddSingleton<IAesKeyProvider,IAesKeyProvider>(provider=>IoC.GetRegistered<IServerBasedAesKeyProvider>())
+                .AddSingleton<IAesKeyProvider, IAesKeyProvider>(provider => IoC.GetRegistered<IServerBasedAesKeyProvider>())
                 .AddSingleton<IWebClientService, WebClientService>()
                 ;
 

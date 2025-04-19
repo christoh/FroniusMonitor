@@ -1,5 +1,9 @@
-﻿using De.Hochstaetter.Fronius.Models.Settings;
+﻿namespace De.Hochstaetter.HomeAutomationClient.Models;
 
-namespace De.Hochstaetter.HomeAutomationClient.Models;
-
-public class HomeAutomationServerConnection : WebConnection { }
+public class HomeAutomationServerConnection : WebConnection
+{
+    public HomeAutomationServerConnection()
+    {
+        IsSlowPlatform = true;
+    }
+}

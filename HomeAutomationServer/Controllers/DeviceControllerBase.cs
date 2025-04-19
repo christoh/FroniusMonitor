@@ -1,8 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using De.Hochstaetter.Fronius.Models.Gen24;
-using De.Hochstaetter.HomeAutomationServer.Misc;
-
-namespace De.Hochstaetter.HomeAutomationServer.Controllers;
+﻿namespace De.Hochstaetter.HomeAutomationServer.Controllers;
 
 public abstract class DeviceControllerBase(IDataControlService controlService, ILogger logger) : ControllerBase
 {
@@ -31,7 +27,7 @@ public abstract class DeviceControllerBase(IDataControlService controlService, I
         }
 
         logger.LogError("No devices of type {DeviceType} were found", typeof(T).Name);
-        return NoContent();
+        return NotFound(Helpers.GetProblemDetails("No devices found", $"No devices of type {typeof(T).Name} were found"));
     }
 
     protected IActionResult GetDevice<T>(string id)
@@ -43,6 +39,6 @@ public abstract class DeviceControllerBase(IDataControlService controlService, I
         }
 
         logger.LogError("A '{DeviceType}' with id '{Id}' was not found", typeof(T).Name, id);
-        return BadRequest(Helpers.GetValidationDetails(nameof(id), $"A '{typeof(T).Name}' with id '{id}' was not found"));
+        return NotFound(Helpers.GetProblemDetails("Device not found", $"A '{typeof(T).Name}' with id '{id}' was not found"));
     }
 }

@@ -1,36 +1,32 @@
-﻿using System.Net;
-using De.Hochstaetter.Fronius.Models.Settings;
-using De.Hochstaetter.HomeAutomationClient.Adapters;
-using De.Hochstaetter.HomeAutomationClient.Views.Dialogs;
+﻿using De.Hochstaetter.HomeAutomationClient.MessageBoxes;
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs;
 
-public partial class LoginViewModel(string title, object? parameters = null) : DialogBase<object?, bool, LoginView>(title, parameters)
+public partial class LoginViewModel(DialogParameters parameters) : DialogBase<DialogParameters, bool, LoginView>(parameters)
 {
     private static readonly ICache cache = IoC.GetRegistered<ICache>();
     private readonly IWebClientService webClient = IoC.GetRegistered<IWebClientService>();
     private readonly IServerBasedAesKeyProvider keyProvider = IoC.GetRegistered<IServerBasedAesKeyProvider>();
     private HomeAutomationServerConnection? connection;
 
-    [ObservableProperty] private string? userName = cache.Get<string>(CacheKeys.UserName);
+    [ObservableProperty, Required(AllowEmptyStrings = false)]
+    public partial string UserName { get; set; } = string.Empty;
 
-    [ObservableProperty] private string? password;
-
-    [ObservableProperty] private bool isAuthenticated;
-
-    [ObservableProperty] private bool isInitialized;
-
-    [ObservableProperty, NotifyPropertyChangedFor(nameof(LoginFailed))]
-    private string? loginFailedMessage;
-
-    public bool LoginFailed => LoginFailedMessage != null;
+    [ObservableProperty, Required(AllowEmptyStrings = false)]
+    public partial string Password { get; set; } = string.Empty;
 
     public ICommand? LoginCommand => field ??= new RelayCommand(() => _ = Login());
 
     public override async Task Initialize()
     {
+        BusyText = Resources.ConnectingToHas;
+
         try
         {
+            PropertyChanged += OnAnyPropertyChanged;
+            await keyProvider.SetKeyFromUserName(null);
+            UserName = (await cache.GetAsync<HomeAutomationServerConnection>(CacheKeys.Connection))?.UserName ?? string.Empty;
+
             if (!string.IsNullOrEmpty(UserName))
             {
                 await keyProvider.SetKeyFromUserName(UserName);
@@ -48,12 +44,32 @@ public partial class LoginViewModel(string title, object? parameters = null) : D
                 return;
             }
 
-            await Login().ConfigureAwait(false);
+            //await Login();
+        }
+        catch(Exception ex)
+        {
+            await ex.Show();
         }
         finally
         {
-            await base.Initialize().ConfigureAwait(false);
-            IsInitialized = true;
+            BusyText = null;
+            await base.Initialize();
+        }
+    }
+
+    private void OnAnyPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (string.IsNullOrEmpty(e.PropertyName))
+        {
+            ValidateAllProperties();
+            return;
+        }
+
+        var propertyInfo = GetType().GetProperty(e.PropertyName);
+
+        if (propertyInfo != null)
+        {
+            ValidateProperty(propertyInfo.GetValue(this), e.PropertyName);
         }
     }
 
@@ -68,31 +84,51 @@ public partial class LoginViewModel(string title, object? parameters = null) : D
     {
         try
         {
-            if (string.IsNullOrEmpty(Password) || string.IsNullOrEmpty(UserName))
+            ValidateAllProperties();
+
+            if (HasErrors)
             {
                 return;
             }
 
-            var result = await webClient.Login(UserName, Password).ConfigureAwait(false);
-            LoginFailedMessage = result == HttpStatusCode.OK ? null : result + $" ({(int)result})";
+            BusyText = Resources.BusyLoggingIn;
 
-            if (!LoginFailed)
+            var problemDetails = await webClient.Login(UserName, Password);
+
+            if (problemDetails != null)
             {
-                await cache.AddOrUpdateAsync(CacheKeys.UserName, UserName).ConfigureAwait(false);
-                await keyProvider.SetKeyFromUserName(UserName).ConfigureAwait(false);
-                connection = IoC.GetRegistered<HomeAutomationServerConnection>();
-                WebConnection.InvalidateKey();
-                connection.UserName = UserName;
-                connection.Password = Password;
-                connection.BaseUrl = IoC.Get<MainViewModel>().ApiUri;
-                connection.PasswordChecksum = connection.CalculatedChecksum;
-                await cache.AddOrUpdateAsync(CacheKeys.Connection, connection);
-                Close();
+                await problemDetails.Show();
+                return;
             }
+
+            await keyProvider.SetKeyFromUserName(UserName);
+            connection = IoC.GetRegistered<HomeAutomationServerConnection>();
+            WebConnection.InvalidateKey();
+            connection.UserName = UserName;
+            connection.Password = Password;
+            connection.BaseUrl = IoC.Get<MainViewModel>().ApiUri;
+            await connection.UpdateChecksumAsync();
+            await cache.AddOrUpdateAsync(CacheKeys.Connection, connection);
+
+            var apiResult = await webClient.ListDevices();
+
+            await new MessageBox
+            {
+                Icon = new InfoIcon(),
+                Title = "Test",
+                Text = "The following devices were found:",
+                ItemList = apiResult.Payload?.Values.Select(d => $"{d.DeviceType}: {d.DisplayName}").ToList(),
+            }.Show();
+
+            Close();
         }
         catch (Exception ex)
         {
-            LoginFailedMessage = ex.Message;
+            await ex.Show();
+        }
+        finally
+        {
+            BusyText = null;
         }
     }
 }

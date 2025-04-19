@@ -1557,4 +1557,22 @@
   <data name="PleaseLogin" xml:space="preserve">
 	  <value>Bitte melde Dich mit Deinem Benutzernamen und Deinem Kennwort an</value>
   </data>
+  <data name="BusyLoggingIn" xml:space="preserve">
+	  <value>Anmelden</value>
+  </data>
+  <data name="LoginNoun" xml:space="preserve">
+	  <value>Anmeldung</value>
+  </data>
+  <data name="HttpError" xml:space="preserve">
+	  <value>HTTP-Fehler</value>
+  </data>
+  <data name="ConnectingToHas" xml:space="preserve">
+	  <value>Verbinde</value>
+  </data>
+  <data name="CannotLogin" xml:space="preserve">
+	  <value>Kann Benutzer nicht anmelden</value>
+  </data>
+  <data name="LoginIncorrect" xml:space="preserve">
+	  <value>Ungültige Kombination aus Benutzername und Kennwort</value>
+  </data>
 </root>

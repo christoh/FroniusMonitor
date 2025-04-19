@@ -2,6 +2,8 @@
 
 public class WebConnection : BindableBase, ICloneable, IHaveDisplayName
 {
+    protected bool IsSlowPlatform;
+
     public static Aes Aes { get; private set; } = null!;
 
     static WebConnection()
@@ -31,7 +33,7 @@ public class WebConnection : BindableBase, ICloneable, IHaveDisplayName
     {
         get;
         set => Set(ref field, value);
-    } = "";
+    } = string.Empty;
 
     [DefaultValue(""), XmlAttribute]
     public string UserName
@@ -75,7 +77,6 @@ public class WebConnection : BindableBase, ICloneable, IHaveDisplayName
             }
             catch
             {
-                Debugger.Break();
                 return string.Empty;
             }
         }
@@ -90,7 +91,6 @@ public class WebConnection : BindableBase, ICloneable, IHaveDisplayName
             catch (PlatformNotSupportedException) { }
             catch (Exception ex)
             {
-                Debugger.Break();
                 Password = string.Empty;
             }
         }
@@ -107,11 +107,13 @@ public class WebConnection : BindableBase, ICloneable, IHaveDisplayName
 
             string CalculateChecksum()
             {
-                using var deriveBytes = new Rfc2898DeriveBytes(Encoding.UTF8.GetBytes(Password), Aes.Key, 131072, HashAlgorithmName.SHA256);
+                using var deriveBytes = new Rfc2898DeriveBytes(Encoding.UTF8.GetBytes(Password), Aes.Key, IsSlowPlatform ? 256 : 131072, HashAlgorithmName.SHA256);
                 return Convert.ToBase64String(deriveBytes.GetBytes(8));
             }
         }
     }
+
+    public Task UpdateChecksumAsync() => Task.Run(() => PasswordChecksum = CalculatedChecksum);
 
     public override string ToString() => DisplayName;
 

@@ -1,6 +1,5 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
-using De.Hochstaetter.HomeAutomationServer.Misc;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
@@ -26,7 +25,8 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
 
     [HttpGet("login")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     public IActionResult Login([FromQuery] string user, [FromQuery] string password)
     {
         var dbUser = userDb.CurrentValue.Users.SingleOrDefault(u => string.Equals(user, u.Username, StringComparison.OrdinalIgnoreCase));
@@ -35,7 +35,7 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
         {
             Response.Cookies.Delete("auth", cookieOptions);
             logger.LogWarning("Login failed for user {Username}", user);
-            return Unauthorized(Helpers.GetValidationDetails(nameof(password), "The username or the password was incorrect"));
+            return Unauthorized(Helpers.GetProblemDetails(Loc.CannotLogin, Loc.LoginIncorrect));
         }
 
         Response.Cookies.Delete("auth", cookieOptions);
@@ -60,13 +60,16 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
     [HttpGet("adduser")]
     [BasicAuthorize(Roles = nameof(Roles.Administrator))]
     [ProducesResponseType<User>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
     public async Task<IActionResult> AddUser([FromQuery] string user, [FromQuery] string password, [FromQuery] string roles)
     {
         logger.LogInformation("User {NewUsername} will be added by {Username} from {Ip}", user, HttpContext.User.Identity!.Name, HttpContext.Connection.RemoteIpAddress);
+
         if (userDb.CurrentValue.Users.Select(u => u.Username).Contains(user))
         {
             logger.LogError("User {NewUsername} already exists", user);
-            return BadRequest(Helpers.GetValidationDetails(nameof(user), $"User {user} already exists"));
+            return UnprocessableEntity(Helpers.GetProblemDetails("Cannot add user", $"User {user} already exists"));
         }
 
         var split = roles.Split(',');
@@ -81,7 +84,7 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
             else
             {
                 logger.LogError("Unknown role '{Role}'", roleString);
-                return BadRequest(Helpers.GetValidationDetails(nameof(roles), $"Unknown role '{roleString}'"));
+                return UnprocessableEntity(Helpers.GetProblemDetails("Cannot add user", $"Unknown role '{roleString}'"));
             }
         }
 

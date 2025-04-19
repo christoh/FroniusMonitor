@@ -2,7 +2,7 @@
 
 namespace De.Hochstaetter.Fronius.Models;
 
-public abstract class BindableBase : ObservableObject
+public abstract class BindableBase : ObservableValidator
 {
     protected virtual bool SetProperty<T>(ref T backingField, T value, Action? postAction = null, Func<T>? preFunc = null, [CallerMemberName] string? propertyName = null, bool notifyAlways = false)
     {

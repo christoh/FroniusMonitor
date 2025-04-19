@@ -1,10 +1,15 @@
-﻿namespace De.Hochstaetter.Fronius.Contracts.HomeAutomationClient;
+﻿using De.Hochstaetter.Fronius.Models.HomeAutomationClient;
+using De.Hochstaetter.Fronius.Models.WebApi;
+
+namespace De.Hochstaetter.Fronius.Contracts.HomeAutomationClient;
 
 public interface IWebClientService : IDisposable
 {
-    public Task<byte[]> GetKeyForUserName(string userName);
+    Task<byte[]> GetKeyForUserName(string userName, CancellationToken token = default);
 
-    public void Initialize(string baseUri);
+    void Initialize(string baseUri, string productName, string version);
 
-    public Task<HttpStatusCode> Login(string userName, string password);
+    Task<ProblemDetails?> Login(string userName, string password, CancellationToken token = default);
+
+    Task<ApiResult<IDictionary<string, DeviceInfo>>> ListDevices(CancellationToken token = default);
 }

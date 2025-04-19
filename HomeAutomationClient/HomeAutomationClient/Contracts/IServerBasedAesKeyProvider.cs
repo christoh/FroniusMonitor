@@ -8,5 +8,5 @@ namespace De.Hochstaetter.HomeAutomationClient.Contracts;
 
 public interface IServerBasedAesKeyProvider:IAesKeyProvider
 {
-    public Task SetKeyFromUserName(string username);
+    public Task SetKeyFromUserName(string? username);
 }

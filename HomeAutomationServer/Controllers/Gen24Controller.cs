@@ -11,12 +11,13 @@ public class Gen24SystemController(IDataControlService controlService, ILogger<G
     [HttpGet]
     [BasicAuthorize(Roles = "User")]
     [ProducesResponseType<IDictionary<string, Gen24System>>(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public IActionResult GetInverters() => GetDevices<Gen24System>();
 
     [HttpGet("{id}")]
     [BasicAuthorize(Roles = "User")]
-    [ProducesResponseType<Gen24System>(StatusCodes.Status200OK)]
+    [ProducesResponseType<IDictionary<string, Gen24System>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public IActionResult GetInverter([FromRoute] string id) => GetDevice<Gen24System>(id);
 }
