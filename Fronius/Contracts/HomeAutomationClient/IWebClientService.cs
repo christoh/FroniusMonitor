@@ -12,4 +12,6 @@ public interface IWebClientService : IDisposable
     Task<ProblemDetails?> Login(string userName, string password, CancellationToken token = default);
 
     Task<ApiResult<IDictionary<string, DeviceInfo>>> ListDevices(CancellationToken token = default);
+    
+    Task<ApiResult<IDictionary<string, Gen24System>>> GetGen24Devices(CancellationToken token = default);
 }

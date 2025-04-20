@@ -30,9 +30,14 @@ public sealed class WebClientService : IWebClientService
         return await Get($"Identity/login?user={userName}&password={password}", token).ConfigureAwait(false);
     }
 
-    public async Task<ApiResult<IDictionary<string, DeviceInfo>>> ListDevices(CancellationToken token = default)
+    public Task<ApiResult<IDictionary<string, DeviceInfo>>> ListDevices(CancellationToken token = default)
     {
-        return await GetResult<IDictionary<string, DeviceInfo>>("Devices", token).ConfigureAwait(false);
+        return GetResult<IDictionary<string, DeviceInfo>>("Devices", token);
+    }
+
+    public Task<ApiResult<IDictionary<string, Gen24System>>> GetGen24Devices(CancellationToken token = default)
+    {
+        return GetResult<IDictionary<string, Gen24System>>("Gen24System", token);
     }
 
     private async ValueTask<ProblemDetails?> Get(string queryString, CancellationToken token = default)
@@ -65,7 +70,7 @@ public sealed class WebClientService : IWebClientService
         }
     }
 
-    private async ValueTask<ApiResult<T>> GetResult<T>(string queryString, CancellationToken token = default)
+    private async Task<ApiResult<T>> GetResult<T>(string queryString, CancellationToken token = default)
     {
         HttpResponseMessage? responseMessage = null;
 

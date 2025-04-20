@@ -51,14 +51,14 @@
 				</Grid.Styles>
 
 				<Viewbox Grid.Row="0">
-					<TextBlock FontSize="8" TextAlignment="Center" x:Name="InverterName" Text="---" />
+					<TextBlock FontSize="8" TextAlignment="Center" x:Name="InverterName" Text="{Binding Inverter.Config.InverterSettings.SystemName, FallbackValue='---'}" />
 				</Viewbox>
 				<Viewbox Grid.Row="1">
-					<TextBlock FontSize="8" x:Name="InverterModelName" Text="---" TextAlignment="Center" />
+					<TextBlock FontSize="8" x:Name="InverterModelName" Text="{Binding Inverter.Config.Versions.ModelName, FallbackValue='---'}" TextAlignment="Center" />
 				</Viewbox>
 				<Border Grid.Row="2" Width="100" Height="85" Margin="4" Background="{Binding Inverter.Sensors.InverterStatus, FallbackValue={x:Null}, Converter={co:Gen24Status2PanelBrush}}" BorderThickness=".2" BorderBrush="Black">
 					<Grid>
-						<Viewbox x:Name="MoreVersions" IsVisible="False" Grid.IsSharedSizeScope="True" StretchDirection="DownOnly">
+						<Viewbox x:Name="MoreVersions" IsVisible="True" Grid.IsSharedSizeScope="True" StretchDirection="DownOnly">
 							<ItemsControl ItemsSource="{Binding Inverter.Config.Versions.SwVersions, FallbackValue={x:Null}}">
 								<ItemsControl.ItemTemplate>
 									<DataTemplate>
@@ -81,7 +81,7 @@
 					<RadioButton Classes="DeviceButton" Content="DC" Click="OnDcClicked" />
 					<RadioButton Classes="DeviceButton" Content="{x:Static p:Resources.Energy}" Click="OnEnergyClicked" />
 					<RadioButton Classes="DeviceButton" Content="{x:Static p:Resources.More}" Click="OnMoreClicked" />
-					<ToggleButton Margin="3,0,0,0" x:Name="StandByButton" Content="Status" Height="6" />
+					<ToggleButton Margin="3,0,0,0" x:Name="StandByButton" Content="Status" Height="6" IsChecked="True"/>
 				</WrapPanel>
 			</Grid>
 		</Border>

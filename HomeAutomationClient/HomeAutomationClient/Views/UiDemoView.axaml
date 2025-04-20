@@ -2,51 +2,54 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:converters="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
              xmlns:views="clr-namespace:De.Hochstaetter.HomeAutomationClient.Views"
              xmlns:viewModels="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="500"
+             xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+             mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="500"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.UiDemoView"
              x:DataType="viewModels:UiDemoViewModel">
-	<Grid RowDefinitions="Auto,*">
-		<StackPanel x:Name="MainContentElement" Orientation="Vertical" Margin="16" Grid.Row="0" VerticalAlignment="Top">
-			<TextBlock Text="Home Automation Control Center UI Test" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" />
-			<TextBlock Text="{Binding ApiUri, TargetNullValue='http://www.hochstaetter.de/api'}" HorizontalAlignment="Center" />
-			<TextBlock HorizontalAlignment="Center" Margin="0,0,0,20">
-				<Run Text="Culture:" />
-				<Run Text="{Binding Culture, Mode=OneWay}" />
-				<Run Text="," />
-				<Run Text="UICulture:" />
-				<Run Text="{Binding UiCulture, Mode=OneWay}" />
-			</TextBlock>
-		</StackPanel>
-		<Grid Grid.Row="1" x:Name="InnerGrid">
-			<ScrollViewer VerticalAlignment="Top" AllowAutoHide="False" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto"
-						  Height="{Binding ElementName=InnerGrid, Path=Bounds.Height}">
-				<WrapPanel Orientation="Horizontal" Width="{Binding ElementName=InnerGrid, Path=Bounds.Width}">
-					<WrapPanel.Styles>
-						<Style Selector="HeaderedContentControl">
-							<Setter Property="Margin" Value="4"/>
-						</Style>
-					</WrapPanel.Styles>
-					<HeaderedContentControl Classes="GroupBox" Header="Half Circle Gauge">
-						<Viewbox Width="300">
-							<views:GaugeTestView />
-						</Viewbox>
-					</HeaderedContentControl>
-					<HeaderedContentControl Classes="GroupBox" Header="Linear Gauge">
-						<Viewbox Width="300">
-							<views:LinearGaugeTestView />
-						</Viewbox>
-					</HeaderedContentControl>
-					<HeaderedContentControl Classes="GroupBox" Header="Dialog">
-						<StackPanel>
-							<Button Content="Complex Error MessageBox" Command="{Binding ShowDialogCommand}"></Button>
-							<Button Content="Simple Error MessageBox" Command="{Binding ShowSimpleDialogCommand}"></Button>
-						</StackPanel>
-					</HeaderedContentControl>
-				</WrapPanel>
-			</ScrollViewer>
-		</Grid>
-	</Grid>
+    <Grid RowDefinitions="Auto,*">
+        <StackPanel x:Name="MainContentElement" Orientation="Vertical" Margin="16" Grid.Row="0" VerticalAlignment="Top">
+            <TextBlock Text="Home Automation Control Center UI Test" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" />
+            <TextBlock Text="{Binding ApiUri, TargetNullValue='http://www.hochstaetter.de/api'}" HorizontalAlignment="Center" />
+            <TextBlock HorizontalAlignment="Center" Margin="0,0,0,20">
+                <Run Text="Culture:" />
+                <Run Text="{Binding Culture, Mode=OneWay}" />
+                <Run Text="," />
+                <Run Text="UICulture:" />
+                <Run Text="{Binding UiCulture, Mode=OneWay}" />
+            </TextBlock>
+        </StackPanel>
+        <Grid Grid.Row="1" x:Name="InnerGrid">
+            <ScrollViewer VerticalAlignment="Top" AllowAutoHide="False" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto"
+                          Height="{Binding ElementName=InnerGrid, Path=Bounds.Height}">
+                <WrapPanel Orientation="Horizontal" Width="{Binding ElementName=InnerGrid, Path=Bounds.Width}">
+                    <WrapPanel.Styles>
+                        <Style Selector="HeaderedContentControl">
+                            <Setter Property="Margin" Value="4" />
+                        </Style>
+                    </WrapPanel.Styles>
+                    <HeaderedContentControl Classes="GroupBox" Header="Half Circle Gauge">
+                        <Viewbox Width="300">
+                            <views:GaugeTestView />
+                        </Viewbox>
+                    </HeaderedContentControl>
+                    <HeaderedContentControl Classes="GroupBox" Header="Linear Gauge">
+                        <Viewbox Width="300">
+                            <views:LinearGaugeTestView />
+                        </Viewbox>
+                    </HeaderedContentControl>
+                    <HeaderedContentControl Classes="GroupBox" Header="Dialog">
+                        <StackPanel>
+                            <Button Content="Complex Error MessageBox" Command="{Binding ShowComplexDialogCommand}" />
+                            <Button Content="Simple Error MessageBox" Command="{Binding ShowSimpleDialogCommand}" />
+                        </StackPanel>
+                    </HeaderedContentControl>
+                    <HeaderedContentControl Classes="GroupBox" Header="Inverter">
+                        <c:InverterControl Inverter="{Binding Inverter}" Width="250" />
+                    </HeaderedContentControl>
+                </WrapPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
 </UserControl>
