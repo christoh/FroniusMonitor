@@ -16,6 +16,7 @@
 	<ItemGroup>
 	  <AvaloniaResource Remove="Assets\Images\ErrorIcon.axaml.cs" />
 	  <AvaloniaResource Remove="Assets\Images\InfoIcon.axaml.cs" />
+	  <AvaloniaResource Remove="Assets\Images\VisibilityIcon.axaml.cs" />
 	  <AvaloniaResource Remove="Assets\Images\WarningIcon.axaml.cs" />
 	  <AvaloniaResource Remove="Assets\LoadingIndicators.Avalonia\LoadingIndicator.cs" />
 	  <AvaloniaResource Remove="Assets\LoadingIndicators.Avalonia\LoadingIndicatorMode.cs" />
@@ -24,7 +25,12 @@
 	<ItemGroup>
 	  <AvaloniaXaml Remove="Assets\Images\ErrorIcon.axaml" />
 	  <AvaloniaXaml Remove="Assets\Images\InfoIcon.axaml" />
+	  <AvaloniaXaml Remove="Assets\Images\VisibilityIcon.axaml" />
 	  <AvaloniaXaml Remove="Assets\Images\WarningIcon.axaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="Assets\Images\sun.ico" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -44,6 +50,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Controls\InverterControl.axaml.cs">
+	    <DependentUpon>InverterControl.axaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Controls\LinaerGauge.axaml.cs">
 	    <DependentUpon>LinaerGauge.axaml</DependentUpon>
 	  </Compile>
@@ -53,10 +62,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <AvaloniaResource Update="Assets\Images\ErrorIcon.axaml">
+		<AvaloniaResource Update="Assets\Images\ErrorIcon.axaml">
+			<SubType>Designer</SubType>
+		</AvaloniaResource>
+	  <AvaloniaResource Update="Assets\Images\InfoIcon.axaml">
 	    <SubType>Designer</SubType>
 	  </AvaloniaResource>
-	  <AvaloniaResource Update="Assets\Images\InfoIcon.axaml">
+	  <AvaloniaResource Update="Assets\Images\VisibilityIcon.axaml">
 	    <SubType>Designer</SubType>
 	  </AvaloniaResource>
 	  <AvaloniaResource Update="Assets\Images\WarningIcon.axaml">

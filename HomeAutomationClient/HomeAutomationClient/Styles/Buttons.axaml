@@ -1,18 +1,40 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-  <Design.PreviewWith>
-    <Border Padding="20">
-      <!-- Add Controls for Previewer Here -->
-    </Border>
-  </Design.PreviewWith>
+	<Design.PreviewWith>
+		<Border Padding="20">
+			<RadioButton Content="AC" Classes="DeviceButton"></RadioButton>
+		</Border>
+	</Design.PreviewWith>
 
-  <!-- Add Styles Here -->
-  <Style Selector="Button.TransparentButton">
-      <Setter Property="Background" Value="Transparent" />
-      <Setter Property="CornerRadius" Value="0" />
-      <Setter Property="BorderThickness" Value="0" />
-      <Setter Property="HorizontalAlignment" Value="Stretch" />
-      <Setter Property="VerticalAlignment" Value="Stretch" />
-  </Style>
+	<!-- Add Styles Here -->
+	<Style Selector="Button.TransparentButton">
+		<Setter Property="Background" Value="Transparent" />
+		<Setter Property="CornerRadius" Value="0" />
+		<Setter Property="BorderThickness" Value="0" />
+		<Setter Property="HorizontalAlignment" Value="Stretch" />
+		<Setter Property="VerticalAlignment" Value="Stretch" />
+	</Style>
+
+	<Style Selector="RadioButton.DeviceButton">
+		<Setter Property="ClickMode" Value="Press" />
+        <Style Selector="^:checked /template/ Border">
+            <Setter Property="Background" Value="LightSalmon" />
+        </Style>
+        <Style Selector="^:pointerover /template/ Border">
+            <Setter Property="Background" Value="Coral" />
+        </Style>
+        <Style Selector="^:pressed /template/ Border">
+            <Setter Property="Margin" Value="2,0,2,2"></Setter>
+        </Style>
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate>
+                        <Border x:Name="Border" Background="BurlyWood" Margin="2,1" Padding="1">
+							<ContentPresenter x:Name="Content" FontSize="6" Content="{TemplateBinding Content}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+						</Border>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
 
 </Styles>

@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.HomeAutomationClient.Adapters;
+﻿namespace De.Hochstaetter.HomeAutomationClient.ViewModels.Adapters;
 
 public abstract partial class DialogBase<TParameters, TResult, TBody>(TParameters parameters) : ViewModelBase, IDialogBase
     where TBody : ContentControl, IDialogControl, new()
@@ -12,7 +12,17 @@ public abstract partial class DialogBase<TParameters, TResult, TBody>(TParameter
 
     public TResult? Result { get; protected set; }
 
-    [ObservableProperty] public partial string Title { get; set; } = string.Empty;
+    public override string? BusyText
+    {
+        get => mainViewModel.DialogBusyText;
+        set
+        {
+            mainViewModel.DialogBusyText = value;
+        }
+    }
+
+    [ObservableProperty]
+    public partial string Title { get; set; } = string.Empty;
 
     public virtual async Task<TResult?> ShowDialogAsync()
     {
@@ -23,7 +33,8 @@ public abstract partial class DialogBase<TParameters, TResult, TBody>(TParameter
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 TokenSource = new();
-                var dialogItem = new DialogQueueItem(Parameters.Title, new TBody { DataContext = this, }, Parameters.ShowCloseBox);
+                var dialogItem = new DialogQueueItem(Parameters.Title, new TBody { DataContext = this, }, Parameters.ShowCloseBox, BusyText);
+                BusyText = null;
                 mainViewModel.CurrentDialog = dialogItem;
             });
 
@@ -52,7 +63,12 @@ public abstract partial class DialogBase<TParameters, TResult, TBody>(TParameter
 
     protected void Close()
     {
-        Dispatcher.UIThread.Invoke(() => { mainViewModel.CurrentDialog = mainViewModel.DialogQueue.TryPop(out var previousDialog) ? previousDialog : null; });
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            mainViewModel.CurrentDialog = mainViewModel.DialogQueue.TryPop(out var previousDialog) ? previousDialog : null;
+            BusyText = mainViewModel.CurrentDialog?.BusyText;
+        });
+        
         TokenSource?.Cancel();
     }
 }

@@ -1,3 +1,5 @@
+using Avalonia.Interactivity;
+
 namespace De.Hochstaetter.HomeAutomationClient.Views.Dialogs;
 
 public partial class LoginView : UserControl, IDialogControl

@@ -1,0 +1,89 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+             xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
+             xmlns:misc="clr-namespace:De.Hochstaetter.HomeAutomationClient.Misc"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             mc:Ignorable="d" d:DesignWidth="110" d:DesignHeight="127"
+             x:Class="De.Hochstaetter.HomeAutomationClient.Controls.InverterControl">
+	<Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:InverterControl}}">
+		<Border BorderBrush="DimGray" BorderThickness="1" Width="110">
+			<Grid x:Name="BackgroundProvider" RowDefinitions="Auto,Auto,Auto,Auto" Background="LightGray">
+				<Grid.Styles>
+					<Style Selector="Viewbox">
+						<Setter Property="StretchDirection" Value="DownOnly" />
+						<Setter Property="Margin" Value="4,0" />
+					</Style>
+
+					<Style Selector="c|LinearGauge.AcPowerLinearGaugeStyle">
+						<Setter Property="Minimum">
+							<Setter.Value>
+								<MultiBinding Converter="{co:AcPowerMinimum}">
+									<!-- ReSharper disable Xaml.PossibleNullReferenceException -->
+									<Binding Path="Inverter.Config.MaxAcPower" Converter="{co:Multiply Factor=.3333333333333333}" />
+									<Binding Path="Inverter.Sensors.Storage" />
+									<!-- ReSharper restore Xaml.PossibleNullReferenceException -->
+								</MultiBinding>
+							</Setter.Value>
+						</Setter>
+
+						<Setter Property="Maximum" Value="{Binding Inverter.Config.MaxAcPower, FallbackValue=3333.333333333, Converter={co:Multiply Factor=.33333333333333}}" />
+						<Setter Property="UnitName" Value="W" />
+						<Setter Property="GaugeColors" Value="{x:Static misc:GaugeColors.MidIsGood}" />
+						<Setter Property="Margin" Value="4,0,4,1" />
+					</Style>
+
+					<Style Selector="c|LinearGauge.LinearEnergyGaugeStyle">
+						<Setter Property="Minimum" Value="999999" />
+						<Setter Property="Maximum" Value="1000000" />
+						<Setter Property="UnitName" Value="kWh" />
+						<Setter Property="GaugeColors" Value="{x:Static misc:GaugeColors.LowIsBad}" />
+					</Style>
+
+					<Style Selector="c|LinearGauge.AcVoltageLinearGaugeStyle">
+						<Setter Property="Minimum" Value="207" />
+						<Setter Property="Maximum" Value="253" />
+						<Setter Property="Origin" Value=".5" />
+						<Setter Property="UnitName" Value="V" />
+					</Style>
+				</Grid.Styles>
+
+				<Viewbox Grid.Row="0">
+					<TextBlock FontSize="8" TextAlignment="Center" x:Name="InverterName" Text="---" />
+				</Viewbox>
+				<Viewbox Grid.Row="1">
+					<TextBlock FontSize="8" x:Name="InverterModelName" Text="---" TextAlignment="Center" />
+				</Viewbox>
+				<Border Grid.Row="2" Width="100" Height="85" Margin="4" Background="{Binding Inverter.Sensors.InverterStatus, FallbackValue={x:Null}, Converter={co:Gen24Status2PanelBrush}}" BorderThickness=".2" BorderBrush="Black">
+					<Grid>
+						<Viewbox x:Name="MoreVersions" IsVisible="False" Grid.IsSharedSizeScope="True" StretchDirection="DownOnly">
+							<ItemsControl ItemsSource="{Binding Inverter.Config.Versions.SwVersions, FallbackValue={x:Null}}">
+								<ItemsControl.ItemTemplate>
+									<DataTemplate>
+										<Grid>
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="Auto" SharedSizeGroup="Key" />
+												<ColumnDefinition Width="Auto" SharedSizeGroup="Value" />
+											</Grid.ColumnDefinitions>
+											<TextBlock Grid.Column="0" HorizontalAlignment="Left" Margin="2,0,8,0" Text="{Binding Path=Key}" Foreground="#082A18" />
+											<TextBlock TextAlignment="Right" Grid.Column="1" Margin="8,0,2,0" Text="{Binding Path=Value, Converter={co:LinuxVersion}}" Foreground="#082A18" />
+										</Grid>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+						</Viewbox>
+					</Grid>
+				</Border>
+				<WrapPanel MaxWidth="110" Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
+					<RadioButton Classes="DeviceButton" IsChecked="True" Content="AC" Click="OnAcClicked" />
+					<RadioButton Classes="DeviceButton" Content="DC" Click="OnDcClicked" />
+					<RadioButton Classes="DeviceButton" Content="{x:Static p:Resources.Energy}" Click="OnEnergyClicked" />
+					<RadioButton Classes="DeviceButton" Content="{x:Static p:Resources.More}" Click="OnMoreClicked" />
+					<ToggleButton Margin="3,0,0,0" x:Name="StandByButton" Content="Status" Height="6" />
+				</WrapPanel>
+			</Grid>
+		</Border>
+	</Viewbox>
+</UserControl>

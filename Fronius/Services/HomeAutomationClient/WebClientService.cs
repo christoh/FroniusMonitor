@@ -8,7 +8,7 @@ namespace De.Hochstaetter.Fronius.Services.HomeAutomationClient;
 
 public sealed class WebClientService : IWebClientService
 {
-    private readonly HttpClient httpClient = new() { Timeout = TimeSpan.FromSeconds(7), };
+    private readonly HttpClient httpClient = new() { Timeout = TimeSpan.FromSeconds(7) };
 
     public void Initialize(string baseUri, string productName, string version)
     {

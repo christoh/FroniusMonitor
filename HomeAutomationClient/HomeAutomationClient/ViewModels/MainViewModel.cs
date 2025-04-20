@@ -14,17 +14,23 @@ public sealed partial class MainViewModel : ViewModelBase
 
     public string ApiUri { get; }
 
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(IsDialogBusy))]
+    public partial string? DialogBusyText { get; set; }
+
+    public bool IsDialogBusy => DialogBusyText != null && IsDialogVisible;
+
     [ObservableProperty]
     public partial object? MainViewContent { get; set; }
 
     public bool IsDialogVisible => CurrentDialog != null;
 
-    [ObservableProperty,NotifyPropertyChangedFor(nameof(IsDialogVisible))]
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(IsDialogVisible), nameof(IsDialogBusy))]
     public partial DialogQueueItem? CurrentDialog { get; set; }
-    
+
     public ConcurrentStack<DialogQueueItem?> DialogQueue { get; } = new();
-    
-    public ICommand? DialogClosedCommand => field ??= new RelayCommand(async void () =>
+
+    [RelayCommand]
+    public async Task DialogClosed()
     {
         try
         {
@@ -37,7 +43,7 @@ public sealed partial class MainViewModel : ViewModelBase
         {
             // async void must be caught to avoid unhandled exceptions
         }
-    });
+    }
 
     public override async Task Initialize()
     {

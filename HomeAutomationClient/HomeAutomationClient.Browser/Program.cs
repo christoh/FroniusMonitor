@@ -16,11 +16,11 @@ internal sealed partial class Program
     private static async Task Main(string[] args)
     {
         var cache = new Cache();
-#if DEBUG
+        #if DEBUG
         await cache.AddOrUpdateAsync(CacheKeys.ApiUri, "https://home.hochstaetter.de/api/");
-#else
+        #else
         await cache.AddOrUpdateAsync(CacheKeys.ApiUri, args[0] + (args[0].EndsWith('/') ? string.Empty : "/") + "api/");
-#endif
+        #endif
         App.ServiceCollection = new ServiceCollection();
         App.ServiceCollection.AddSingleton<ICache>(cache);
 

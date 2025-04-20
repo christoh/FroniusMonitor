@@ -2,7 +2,7 @@
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs;
 
-public partial class LoginViewModel(DialogParameters parameters) : DialogBase<DialogParameters, bool, LoginView>(parameters)
+public partial class LoginViewModel(DialogParameters parameters) : Adapters.DialogBase<DialogParameters, bool, LoginView>(parameters)
 {
     private static readonly ICache cache = IoC.GetRegistered<ICache>();
     private readonly IWebClientService webClient = IoC.GetRegistered<IWebClientService>();
@@ -15,7 +15,8 @@ public partial class LoginViewModel(DialogParameters parameters) : DialogBase<Di
     [ObservableProperty, Required(AllowEmptyStrings = false)]
     public partial string Password { get; set; } = string.Empty;
 
-    public ICommand? LoginCommand => field ??= new RelayCommand(() => _ = Login());
+    [ObservableProperty]
+    private bool isPasswordVisible;
 
     public override async Task Initialize()
     {
@@ -80,6 +81,13 @@ public partial class LoginViewModel(DialogParameters parameters) : DialogBase<Di
         return Task.CompletedTask;
     }
 
+    [RelayCommand]
+    public void PasswordVisible()
+    {
+        IsPasswordVisible = !IsPasswordVisible;
+    }
+    
+    [RelayCommand]
     private async Task Login()
     {
         try
@@ -120,6 +128,7 @@ public partial class LoginViewModel(DialogParameters parameters) : DialogBase<Di
                 ItemList = apiResult.Payload?.Values.Select(d => $"{d.DeviceType}: {d.DisplayName}").ToList(),
             }.Show();
 
+            Result = true;
             Close();
         }
         catch (Exception ex)

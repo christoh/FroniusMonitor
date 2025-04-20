@@ -27,14 +27,17 @@ internal static class ErrorBoxes
 
     public static async ValueTask Show(this Exception ex)
     {
-        await Dispatcher.UIThread.InvokeAsync(async () =>
+        if (!Design.IsDesignMode)
         {
-            await new MessageBox
+            await Dispatcher.UIThread.InvokeAsync(async () =>
             {
-                Icon = new ErrorIcon(),
-                Title = $"{ex.GetType().Name}: {ex.Message}",
-                Text = ex.ToString(),
-            }.Show().ConfigureAwait(false);
-        });
+                await new MessageBox
+                {
+                    Icon = new ErrorIcon(),
+                    Title = $"{ex.GetType().Name}: {ex.Message}",
+                    Text = ex.ToString(),
+                }.Show().ConfigureAwait(false);
+            });
+        }
     }
 }

@@ -3,7 +3,8 @@
     public record DialogQueueItem(
         string Title,
         object Body,
-        bool ShowCloseBox
+        bool ShowCloseBox,
+        string? BusyText
     )
     {
     }

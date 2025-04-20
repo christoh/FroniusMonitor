@@ -4,42 +4,39 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
              xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
-             xmlns:li="clr-namespace:De.Hochstaetter.HomeAutomationClient.Assets.LoadingIndicators.Avalonia"
+             xmlns:images="clr-namespace:De.Hochstaetter.HomeAutomationClient.Assets.Images"
+             xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
              mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="300"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.LoginView"
              x:DataType="dialogs:LoginViewModel" MaxWidth="800" MinWidth="500">
-    <Grid RowDefinitions="*">
-        <StackPanel Margin="16" HorizontalAlignment="Stretch">
-            <StackPanel.Styles>
-                <Style Selector="StackPanel.InputBlock">
-                    <Setter Property="MinHeight" Value="75" />
-                </Style>
-            </StackPanel.Styles>
-            
-            <TextBlock Text="{x:Static p:Resources.PleaseLogin}" TextWrapping="Wrap" FontSize="16" Margin="0,0,0,32" />
+	<StackPanel Margin="16" HorizontalAlignment="Stretch">
+		<StackPanel.Styles>
+			<Style Selector="StackPanel.InputBlock">
+				<Setter Property="MinHeight" Value="75" />
+			</Style>
+		</StackPanel.Styles>
 
-            <StackPanel Classes="InputBlock">
-                <TextBlock Text="{x:Static p:Resources.Username}" />
-                <TextBox Text="{Binding UserName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-            </StackPanel>
+		<TextBlock Text="{x:Static p:Resources.PleaseLogin}" TextWrapping="Wrap" FontSize="16" Margin="0,0,0,32" />
 
-            <StackPanel Classes="InputBlock">
-                <TextBlock Text="{x:Static p:Resources.Password}" />
-                <TextBox PasswordChar="●" Text="{Binding Password, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-            </StackPanel>
+		<StackPanel Classes="InputBlock">
+			<TextBlock Text="{x:Static p:Resources.Username}" />
+			<TextBox Text="{Binding UserName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+		</StackPanel>
 
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button MinWidth="50" HorizontalContentAlignment="Center" Content="{x:Static p:Resources.Ok}" Command="{Binding LoginCommand}" />
-            </StackPanel>
-            
-        </StackPanel>
-        <Grid Background="#10000000" IsVisible="{Binding IsBusy}" RowDefinitions="Auto,Auto">
-            <StackPanel VerticalAlignment="Center">
-                <li:LoadingIndicator IsActive="True" Mode="Arcs" Foreground="DarkBlue" SpeedRatio="0.5" Height="210" Margin="0,0,0,-30" />
-                <TextBlock HorizontalAlignment="Center" FontSize="24" Foreground="DarkBlue">
-                    <Run Text="{Binding BusyText}" />
-                </TextBlock>
-            </StackPanel>
-        </Grid>
-    </Grid>
+		<StackPanel Classes="InputBlock">
+			<TextBlock Text="{x:Static p:Resources.Password}" />
+			<TextBox PasswordChar="{Binding IsPasswordVisible, Converter={co:Bool2Char}}" Text="{Binding Password, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+				<TextBox.InnerRightContent>
+					<Button Classes="TransparentButton" Command="{Binding PasswordVisible}">
+						<images:VisibilityIcon Visible="{Binding IsPasswordVisible}"/>
+					</Button>
+				</TextBox.InnerRightContent>
+			</TextBox>
+		</StackPanel>
+
+		<StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+			<Button MinWidth="50" HorizontalContentAlignment="Center" Content="{x:Static p:Resources.Ok}" Command="{Binding LoginCommand}" />
+		</StackPanel>
+
+	</StackPanel>
 </UserControl>

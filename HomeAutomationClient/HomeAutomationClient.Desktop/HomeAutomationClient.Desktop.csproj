@@ -8,6 +8,8 @@
 		<RootNamespace>De.Hochstaetter.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
 		<Configuration>Release</Configuration>
 		<BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+		<ApplicationIcon>sun.ico</ApplicationIcon>
+		<LangVersion>preview</LangVersion>
 	</PropertyGroup>
 
 	<PropertyGroup>
