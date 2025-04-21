@@ -77,6 +77,11 @@ public partial class LinearGauge : Gauge
 
     private void SetColor()
     {
+        if (GaugeColors == null)
+        {
+            return;
+        }
+        
         var lowerValue = Math.Min(Origin, AnimatedValue);
         var upperValue = Math.Max(Origin, AnimatedValue);
 

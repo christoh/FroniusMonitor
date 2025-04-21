@@ -197,3 +197,12 @@ public class Gen24Status2Brush : MultiConverterBase, IValueConverter
         return status.ToBrush(useRunningColor);
     }
 }
+
+public class InverterDisplayMode2Bool : EqualityConverterBase<InverterDisplayMode, bool>
+{
+    public InverterDisplayMode2Bool(InverterDisplayMode value) : base(value)
+    {
+        Equal = true;
+        NotEqual = false;
+    }
+}

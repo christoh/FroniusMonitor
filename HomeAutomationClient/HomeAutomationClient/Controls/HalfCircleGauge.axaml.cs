@@ -99,6 +99,11 @@ public partial class HalfCircleGauge : Gauge
                 MinimumTextBlock.Text = Minimum.ToString(StringFormat);
                 SetValue();
                 break;
+            
+            case nameof(StringFormat):
+                MaximumTextBlock.Text = Maximum.ToString(StringFormat);
+                MinimumTextBlock.Text = Minimum.ToString(StringFormat);
+                break;
 
             case nameof(Value):
                 SetValue();
@@ -107,7 +112,7 @@ public partial class HalfCircleGauge : Gauge
             case nameof(AnimatedValue):
                 OnAnimatedAngleChanged();
                 break;
-
+            
             case nameof(ColorAllTicks):
             case nameof(Origin):
             case nameof(TickFill):

@@ -94,7 +94,7 @@ internal partial class Program
                 .Configure<FritzBoxDataCollectorParameters>(f =>
                 {
                     f.Connections = settings.FritzBoxConnections;
-                    f.RefreshRate = TimeSpan.FromSeconds(15);
+                    f.RefreshRate = TimeSpan.FromSeconds(3);
                 })
                 .Configure<ModbusServerServiceParameters>(m =>
                 {
@@ -110,7 +110,7 @@ internal partial class Program
                 .Configure<Gen24DataCollectorParameters>(g =>
                 {
                     g.Connections = settings.Gen24Connections;
-                    g.RefreshRate = TimeSpan.FromSeconds(30);
+                    g.RefreshRate = TimeSpan.FromSeconds(5);
                     g.ConfigRefreshRate = TimeSpan.FromMinutes(10.1);
                 })
                 .Configure<UserList>(u => { u.Users = settings.Users; });

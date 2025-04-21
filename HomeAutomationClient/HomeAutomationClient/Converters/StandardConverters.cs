@@ -21,17 +21,17 @@ public abstract class Null2AnythingBase<T> : ConverterBase
     }
 }
 
+public class Null2ColorMap : Null2AnythingBase<IReadOnlyList<ColorThreshold>>;
+
+public class Null2Double : Null2AnythingBase<double>;
+
+
 public class Null2Bool : Null2AnythingBase<bool>
 {
     public Null2Bool()
     {
         Null = false;
         NotNull = true;
-    }
-
-    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-    {
-        return value is null ? Null : NotNull;
     }
 }
 

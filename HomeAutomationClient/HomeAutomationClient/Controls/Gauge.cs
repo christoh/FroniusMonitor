@@ -15,7 +15,7 @@ public class Gauge : ContentControl
         get => GetValue(MinimumProperty);
         set => SetValue(MinimumProperty, value);
     }
-    
+
     public static readonly StyledProperty<double> MaximumProperty = AvaloniaProperty.Register<Gauge, double>(nameof(Maximum), 1d);
 
     public double Maximum
@@ -33,7 +33,7 @@ public class Gauge : ContentControl
     }
 
     public static readonly StyledProperty<Easing> AnimationEasingProperty = AvaloniaProperty.Register<Gauge, Easing>(nameof(AnimationEasing), new CubicEaseOut());
-    
+
     public Easing AnimationEasing
     {
         get => GetValue(AnimationEasingProperty);
@@ -48,9 +48,9 @@ public class Gauge : ContentControl
         set => SetValue(AnimatedValueProperty, value);
     }
 
-    public static readonly StyledProperty<IEnumerable<ColorThreshold>> GaugeColorsProperty = AvaloniaProperty.Register<Gauge, IEnumerable<ColorThreshold>>(nameof(GaugeColors),Misc.GaugeColors.HighIsBad);
+    public static readonly StyledProperty<IEnumerable<ColorThreshold>?> GaugeColorsProperty = AvaloniaProperty.Register<Gauge, IEnumerable<ColorThreshold>?>(nameof(GaugeColors), Misc.GaugeColors.HighIsBad);
 
-    public IEnumerable<ColorThreshold> GaugeColors
+    public IEnumerable<ColorThreshold>? GaugeColors
     {
         get => GetValue(GaugeColorsProperty);
         set => SetValue(GaugeColorsProperty, value);
@@ -63,7 +63,7 @@ public class Gauge : ContentControl
         get => GetValue(OriginProperty);
         set => SetValue(OriginProperty, value);
     }
-    
+
     public static readonly StyledProperty<string> LabelProperty = AvaloniaProperty.Register<Gauge, string>(nameof(Label), string.Empty);
 
     public string? Label
@@ -104,7 +104,7 @@ public class Gauge : ContentControl
         set => SetValue(ShowPercentProperty, value);
     }
 
-    public static readonly StyledProperty<IBrush?> TickFillProperty = AvaloniaProperty.Register<Gauge, IBrush?>(nameof(TickFill), Brushes.LightGray);
+    public static readonly StyledProperty<IBrush?> TickFillProperty = AvaloniaProperty.Register<Gauge, IBrush?>(nameof(TickFill), Brushes.DarkGray);
 
     public IBrush? TickFill
     {

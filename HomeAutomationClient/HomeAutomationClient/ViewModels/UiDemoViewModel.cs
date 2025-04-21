@@ -1,9 +1,13 @@
-﻿using De.Hochstaetter.HomeAutomationClient.MessageBoxes;
+﻿using System.Timers;
+using De.Hochstaetter.HomeAutomationClient.MessageBoxes;
+using Timer = System.Threading.Timer;
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 
 public partial class UiDemoViewModel(IWebClientService webClient) : ViewModelBase
 {
+    private Timer timer;
+
     public string Culture => Thread.CurrentThread.CurrentCulture.Name;
 
     public string ApiUri => IoC.GetRegistered<MainViewModel>().ApiUri;
@@ -16,8 +20,20 @@ public partial class UiDemoViewModel(IWebClientService webClient) : ViewModelBas
     public override async Task Initialize()
     {
         await base.Initialize();
-        var inverters = await webClient.GetGen24Devices();
-        Inverter = inverters.Payload?.Values.First();
+        timer = new Timer(TimerElapsed, null, 0, 1000);
+    }
+
+    private async void TimerElapsed(object? state)
+    {
+        try
+        {
+            var inverters = await webClient.GetGen24Devices();
+            Inverter = inverters.Payload?.Values.First();
+        }
+        catch
+        {
+            // ignore
+        }
     }
 
     [RelayCommand]

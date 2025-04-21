@@ -50,18 +50,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Controls\InverterControl.axaml.cs">
-	    <DependentUpon>InverterControl.axaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Controls\LinaerGauge.axaml.cs">
-	    <DependentUpon>LinaerGauge.axaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\Dialogs\MessageBoxView.axaml.cs">
-	    <DependentUpon>MessageBoxView.axaml</DependentUpon>
-	  </Compile>
-	</ItemGroup>
-
-	<ItemGroup>
 		<AvaloniaResource Update="Assets\Images\ErrorIcon.axaml">
 			<SubType>Designer</SubType>
 		</AvaloniaResource>

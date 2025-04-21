@@ -46,7 +46,7 @@
                         </StackPanel>
                     </HeaderedContentControl>
                     <HeaderedContentControl Classes="GroupBox" Header="Inverter">
-                        <c:InverterControl Inverter="{Binding Inverter}" Width="250" />
+                        <c:InverterControl Inverter="{Binding Inverter}" Height="210" />
                     </HeaderedContentControl>
                 </WrapPanel>
             </ScrollViewer>
