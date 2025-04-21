@@ -47,6 +47,8 @@ public sealed partial class MainViewModel : ViewModelBase
 
     public override async Task Initialize()
     {
+        await base.Initialize();
+        
         var loginViewModel = new LoginViewModel(new DialogParameters
         {
             Title = $"{AppConstants.AppName} - {Resources.LoginNoun}",

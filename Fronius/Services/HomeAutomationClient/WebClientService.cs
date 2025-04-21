@@ -78,12 +78,9 @@ public sealed class WebClientService : IWebClientService
         {
             responseMessage = await httpClient.GetAsync(queryString, token).ConfigureAwait(false);
 
-            if (responseMessage.StatusCode != HttpStatusCode.OK)
-            {
-                return ApiResult<T>.FromProblemDetails(await GetErrors(responseMessage, token).ConfigureAwait(false)!);
-            }
-
-            return new ApiResult<T> { Payload = await responseMessage.Content.ReadFromJsonAsync<T>(token).ConfigureAwait(false) };
+            return responseMessage.StatusCode != HttpStatusCode.OK 
+                ? ApiResult<T>.FromProblemDetails(await GetErrors(responseMessage, token).ConfigureAwait(false)!) 
+                : new ApiResult<T> { Payload = await responseMessage.Content.ReadFromJsonAsync<T>(token).ConfigureAwait(false) };
         }
         catch (Exception ex)
         {

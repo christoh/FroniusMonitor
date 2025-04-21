@@ -27,7 +27,6 @@
                            FontSize="7"
                            Label="{x:Static p:Resources.Voltage}"
                            UnitName="V"
-                           Foreground="DarkBlue"
                            StringFormat="N1"
                            Origin="{Binding Origin}"
                            Value="{Binding Value}"

@@ -29,9 +29,9 @@
 		<controls:HalfCircleGauge Height="240"
                            Minimum="{Binding Minimum}"
                            Maximum="{Binding Maximum}"
-                           Foreground="DarkBlue"
                            ColorAllTicks="{Binding ColorAllTicks}"
                            Origin="{Binding Origin}"
+                           HandFill="{DynamicResource HandFill}"
                            Value="{Binding Value}"
                            GaugeColors="{Binding GaugeColorScheme}"/>
 		<StackPanel Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Center">

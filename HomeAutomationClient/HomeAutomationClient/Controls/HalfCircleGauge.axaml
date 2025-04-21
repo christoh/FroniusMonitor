@@ -5,7 +5,7 @@
              xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
              mc:Ignorable="d" d:DesignWidth="150" d:DesignHeight="90"
              x:Class="De.Hochstaetter.HomeAutomationClient.Controls.HalfCircleGauge">
-    <Viewbox Initialized="OnViewBoxInitialized" DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:Gauge}}">
+    <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:Gauge}}">
         <Canvas x:Name="OuterCanvas" Width="150" Height="90" Background="{Binding Background}">
             <Canvas x:Name="Canvas" Width="150" Height="77" Background="Transparent"/>
             <TextBlock x:Name="MinimumTextBlock" FontSize="11" Foreground="{Binding Foreground}" FontWeight="Medium" Canvas.Bottom="0"

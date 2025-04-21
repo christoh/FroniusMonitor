@@ -18,7 +18,7 @@
 	<Style Selector="RadioButton.DeviceButton">
 		<Setter Property="ClickMode" Value="Press" />
         <Style Selector="^:checked /template/ Border">
-            <Setter Property="Background" Value="LightSalmon" />
+            <Setter Property="Background" Value="{DynamicResource DeviceButtonSelectedBackground}" />
         </Style>
         <Style Selector="^:pointerover /template/ Border">
             <Setter Property="Background" Value="Coral" />
@@ -29,7 +29,7 @@
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate>
-                        <Border x:Name="Border" Background="BurlyWood" Margin="2,1" Padding="1">
+                        <Border x:Name="Border" Background="{DynamicResource DeviceButtonBackground}" Margin="2,1" Padding="1">
 							<ContentPresenter x:Name="Content" FontSize="6" Content="{TemplateBinding Content}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
 						</Border>
 				</ControlTemplate>

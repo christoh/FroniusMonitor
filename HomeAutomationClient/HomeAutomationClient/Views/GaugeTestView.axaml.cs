@@ -8,6 +8,6 @@ public partial class GaugeTestView : UserControl
     {
         InitializeComponent();
         DataContext = viewModel;
-        Loaded += (_, _) => viewModel.Initialize();
+        _ = viewModel.Initialize();
     }
 }

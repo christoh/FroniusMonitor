@@ -20,13 +20,6 @@ public partial class LinearGauge : Gauge
         InitializeComponent();
     }
 
-
-    private void OnInitialized(object? sender, EventArgs e)
-    {
-        SetValue(true);
-        SetColor();
-    }
-    
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
@@ -54,7 +47,7 @@ public partial class LinearGauge : Gauge
     {
         try
         {
-            var value = ShowPercent ? (Value - Minimum) / (Maximum - Minimum) * 100 : Value;
+            var value = ShowPercent ? (Value - Math.Max(0, Minimum)) / (Maximum - Math.Max(0, Minimum)) * 100 : Value;
             ValueTextBlock.Text = value.ToString(StringFormat, CultureInfo.CurrentCulture);
         }
         finally
@@ -81,7 +74,7 @@ public partial class LinearGauge : Gauge
         {
             return;
         }
-        
+
         var lowerValue = Math.Min(Origin, AnimatedValue);
         var upperValue = Math.Max(Origin, AnimatedValue);
 

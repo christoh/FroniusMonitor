@@ -9,7 +9,12 @@ public partial class MessageBoxView : UserControl, IDialogControl
     public MessageBoxView()
     {
         InitializeComponent();
-        Loaded += (_, _) => ViewModel?.Initialize();
+    }
+
+    protected override void OnDataContextChanged(EventArgs e)
+    {
+        base.OnDataContextChanged(e);
+        _ = ViewModel?.Initialize();
     }
 
     private void OnButtonClicked(object? sender, RoutedEventArgs e)

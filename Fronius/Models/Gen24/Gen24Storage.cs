@@ -206,14 +206,14 @@ public class Gen24Storage : Gen24DeviceBase
     }
 
     [FroniusProprietaryImport("max_udc", FroniusDataType.Attribute)]
-    public double MaxVoltage
+    public double? MaxVoltage
     {
         get;
         set => Set(ref field, value);
     }
 
     [FroniusProprietaryImport("min_udc", FroniusDataType.Attribute)]
-    public double MinVoltage
+    public double? MinVoltage
     {
         get;
         set => Set(ref field, value);

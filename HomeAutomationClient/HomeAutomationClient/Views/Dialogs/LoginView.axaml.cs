@@ -9,6 +9,11 @@ public partial class LoginView : UserControl, IDialogControl
     public LoginView()
     {
         InitializeComponent();
-        Loaded += (_, _) => ViewModel?.Initialize();
+    }
+
+    protected override void OnDataContextChanged(EventArgs e)
+    {
+        base.OnDataContextChanged(e);
+        _ = ViewModel?.Initialize();
     }
 }

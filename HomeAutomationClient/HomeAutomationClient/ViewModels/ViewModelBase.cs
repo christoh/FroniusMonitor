@@ -10,5 +10,8 @@ public abstract partial class ViewModelBase : BindableBase
 
     public bool IsBusy => BusyText != null;
 
-    public virtual Task Initialize() => Task.CompletedTask;
+    public virtual Task Initialize()
+    {
+        return Task.CompletedTask;
+    }
 }

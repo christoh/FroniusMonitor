@@ -4,6 +4,8 @@ using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Localization;
 using Settings = De.Hochstaetter.HomeAutomationServer.Models.Settings.Settings;
 
 namespace De.Hochstaetter.HomeAutomationServer;
@@ -81,6 +83,14 @@ internal partial class Program
             .AddCors(o => o.AddDefaultPolicy(p => p.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin()))
             ;
 
+        var supportedCultures = new List<CultureInfo>
+        {
+            CultureInfo.InvariantCulture,
+            new CultureInfo("de"),
+            new CultureInfo("de-CH"),
+            new CultureInfo("de-LI"),
+        };
+
         if (settings != null)
         {
             if (settings.WebServerSettings.Urls is { Length: > 0 })
@@ -89,6 +99,14 @@ internal partial class Program
             }
 
             builder.Services.AddSingleton(settings);
+
+            builder.Services.AddLocalization();
+            builder.Services.Configure<RequestLocalizationOptions>(options =>
+            {
+                options.DefaultRequestCulture = new RequestCulture(CultureInfo.InvariantCulture);
+                options.SupportedCultures = supportedCultures;
+                options.SupportedUICultures = supportedCultures;
+            });
 
             builder.Services
                 .Configure<FritzBoxDataCollectorParameters>(f =>
@@ -145,6 +163,13 @@ internal partial class Program
         //app.UseCors();
         //app.UseAuthentication();
         //app.UseAuthorization();
+
+        app.UseRequestLocalization(options =>
+        {
+            options.DefaultRequestCulture = new RequestCulture(CultureInfo.InvariantCulture);
+            options.SupportedCultures = supportedCultures;
+            options.SupportedUICultures = supportedCultures;
+        });
 
         app.MapControllers();
         app.UseCors();

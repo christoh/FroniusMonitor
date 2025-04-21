@@ -1,6 +1,4 @@
-﻿using De.Hochstaetter.HomeAutomationClient.MessageBoxes;
-
-namespace De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs;
+﻿namespace De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs;
 
 public partial class LoginViewModel(DialogParameters parameters) : Adapters.DialogBase<DialogParameters, bool, LoginView>(parameters)
 {
@@ -20,6 +18,7 @@ public partial class LoginViewModel(DialogParameters parameters) : Adapters.Dial
 
     public override async Task Initialize()
     {
+        await base.Initialize();
         BusyText = Resources.ConnectingToHas;
 
         try
@@ -54,7 +53,6 @@ public partial class LoginViewModel(DialogParameters parameters) : Adapters.Dial
         finally
         {
             BusyText = null;
-            await base.Initialize();
         }
     }
 

@@ -174,27 +174,11 @@ public class Gen24Status2PanelBrush : ConverterBase
     }
 }
 
-public class Gen24Status2Brush : MultiConverterBase, IValueConverter
+public class Gen24Status2Brush : ConverterBase
 {
-
-    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         return value is Gen24Status status ? status.ToBrush() : Brushes.Gainsboro;
-    }
-
-    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-    {
-        throw new NotSupportedException();
-    }
-
-    public override object? Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
-    {
-        if (values.Count < 2 || values[0] is not Gen24Status status || values[1] is not bool useRunningColor)
-        {
-            return Brushes.Gainsboro;
-        }
-
-        return status.ToBrush(useRunningColor);
     }
 }
 

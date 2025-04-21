@@ -57,5 +57,5 @@ public class IoC : IServiceProvider
         }
     }
 
-    public object? GetService(Type serviceType) => Get(serviceType);
+    public object? GetService(Type serviceType) => TryGet(serviceType);
 }

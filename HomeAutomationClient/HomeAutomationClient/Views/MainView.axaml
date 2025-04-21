@@ -10,9 +10,9 @@
              x:DataType="vm:MainViewModel">
     <Grid RowDefinitions="*">
         <UserControl Grid.Row="0" Content="{Binding MainViewContent}" IsEnabled="{Binding IsDialogVisible, Converter={co:BoolInverter}}"/>
-        <Grid Grid.Row="0" Background="#80000000" x:Name="DialogOverlay" IsVisible="{Binding IsDialogVisible}">
+        <Grid Grid.Row="0" Background="{DynamicResource DisableBrush}" x:Name="DialogOverlay" IsVisible="{Binding IsDialogVisible}">
 			<Grid RowDefinitions="Auto,*" Background="White" HorizontalAlignment="Center" VerticalAlignment="Center">
-				<Grid ColumnDefinitions="Auto,*,Auto" Background="#0060c0">
+				<Grid ColumnDefinitions="Auto,*,Auto" Background="{DynamicResource SystemControlBackgroundAccentBrush}">
 					<Grid.Styles>
 						<Style Selector="Button.CloseButton">
 							<Style.Resources>
@@ -21,21 +21,21 @@
 								<SolidColorBrush x:Key="ButtonForegroundPointerOver">White</SolidColorBrush>
 								<!-- ReSharper restore Xaml.RedundantResource -->
 							</Style.Resources>
-							<Setter Property="Background" Value="#0060c0" />
-							<Setter Property="Foreground" Value="White"/>
+							<Setter Property="Background" Value="{DynamicResource SystemControlBackgroundAccentBrush}" />
+							<Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundChromeWhiteBrush}"/>
 							<Setter Property="Content" Value="X" />
                             <Setter Property="Command" Value="{Binding DialogClosedCommand}"/>
 						</Style>
 					</Grid.Styles>
                     <Image Margin="4,0,0,0" Source="/Assets/Images/sun.ico" Width="16"/>
-					<TextBlock x:Name="TitleTextBlock" Grid.Row="0" Grid.Column="1" Padding="5" Text="{Binding CurrentDialog.Title, FallbackValue=''}" Foreground="White" />
+					<TextBlock x:Name="TitleTextBlock" Grid.Row="0" Grid.Column="1" Padding="5" Text="{Binding CurrentDialog.Title, FallbackValue=''}" Foreground="{DynamicResource SystemControlForegroundChromeWhiteBrush}" />
 					<Button Classes="TransparentButton CloseButton" Grid.Row="0" Grid.Column="2" IsTabStop="False" IsVisible="{Binding CurrentDialog.ShowCloseBox, FallbackValue=True}"/>
 				</Grid>
-				<UserControl Grid.Row="1" Background="White" MinWidth="100" x:Name="DialogHost" Content="{Binding CurrentDialog.Body, FallbackValue={x:Null}}"/>
+				<UserControl Grid.Row="1" MinWidth="100" Background="{DynamicResource BackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" x:Name="DialogHost" Content="{Binding CurrentDialog.Body, FallbackValue={x:Null}}"/>
                 <Grid Grid.Row="1" Background="#10000000" IsVisible="{Binding IsDialogBusy}" RowDefinitions="Auto,Auto">
                     <StackPanel VerticalAlignment="Center">
-                        <li:LoadingIndicator IsActive="True" Mode="Arcs" Foreground="DarkRed" SpeedRatio="0.5" Height="210" Margin="0,0,0,-30" />
-                        <TextBlock HorizontalAlignment="Center" FontSize="24" Foreground="DarkRed">
+                        <li:LoadingIndicator IsActive="True" Mode="Arcs" Foreground="{DynamicResource SystemControlBackgroundAccentBrush}" SpeedRatio="0.5" Height="210" Margin="0,0,0,-30" />
+                        <TextBlock HorizontalAlignment="Center" FontSize="24" Foreground="{DynamicResource SystemControlBackgroundAccentBrush}">
                             <Run Text="{Binding BusyText}" />
                         </TextBlock>
                     </StackPanel>

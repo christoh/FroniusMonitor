@@ -5,7 +5,5 @@
         object Body,
         bool ShowCloseBox,
         string? BusyText
-    )
-    {
-    }
+    );
 }

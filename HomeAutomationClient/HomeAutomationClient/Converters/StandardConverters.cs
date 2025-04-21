@@ -71,3 +71,36 @@ public class Bool2Char : Bool2AnythingBase<char>
         Null = '•';
     }
 }
+
+public class DateConverter : ConverterBase
+{
+    public string StringFormat { get; set; } = "G";
+    public bool UseUtc { get; set; } = false;
+    public bool UseCurrentCulture { get; set; } = true;
+
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not DateTime date)
+        {
+            return null;
+        }
+
+        return (UseUtc ? date.ToUniversalTime() : date.ToLocalTime()).ToString(StringFormat, UseCurrentCulture ? CultureInfo.CurrentCulture : culture);
+    }
+
+    public override object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        var effectiveCulture = UseCurrentCulture ? CultureInfo.CurrentCulture : culture;
+
+        return DateTime.TryParse
+        (
+            value is IConvertible convertible ? convertible.ToString(effectiveCulture) : value?.ToString(),
+            effectiveCulture,
+            UseUtc ? DateTimeStyles.AssumeUniversal : DateTimeStyles.AssumeLocal,
+            out var date
+        )
+            ? date
+            : value;
+    }
+}
+

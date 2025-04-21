@@ -35,6 +35,7 @@ global using De.Hochstaetter.HomeAutomationClient.Assets.Images;
 global using De.Hochstaetter.HomeAutomationClient.Contracts;
 global using De.Hochstaetter.HomeAutomationClient.Controls;
 global using De.Hochstaetter.HomeAutomationClient.Crypto;
+global using De.Hochstaetter.HomeAutomationClient.MessageBoxes;
 global using De.Hochstaetter.HomeAutomationClient.Misc;
 global using De.Hochstaetter.HomeAutomationClient.Models;
 global using De.Hochstaetter.HomeAutomationClient.Models.Dialogs;

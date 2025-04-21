@@ -1,12 +1,18 @@
-﻿using System.Timers;
-using De.Hochstaetter.HomeAutomationClient.MessageBoxes;
+﻿using System.Collections.ObjectModel;
 using Timer = System.Threading.Timer;
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 
-public partial class UiDemoViewModel(IWebClientService webClient) : ViewModelBase
+public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewModelBase, IDisposable
 {
-    private Timer timer;
+    public class KeyedInverter
+    {
+        public required string Key { get; init; }
+
+        public required Gen24System Inverter { get; init; }
+    }
+
+    private Timer? timer;
 
     public string Culture => Thread.CurrentThread.CurrentCulture.Name;
 
@@ -15,20 +21,51 @@ public partial class UiDemoViewModel(IWebClientService webClient) : ViewModelBas
     public string UiCulture => Thread.CurrentThread.CurrentUICulture.Name;
 
     [ObservableProperty]
-    private Gen24System? inverter;
+    public partial ObservableCollection<KeyedInverter> Inverters { get; set; } = [];
 
     public override async Task Initialize()
     {
         await base.Initialize();
-        timer = new Timer(TimerElapsed, null, 0, 1000);
+        timer = new(TimerElapsed, null, 0, 1000);
+    }
+
+    public void Dispose()
+    {
+        timer?.Dispose();
+        GC.SuppressFinalize(this);
+    }
+
+    ~UiDemoViewModel()
+    {
+        Dispose();
     }
 
     private async void TimerElapsed(object? state)
     {
         try
         {
-            var inverters = await webClient.GetGen24Devices();
-            Inverter = inverters.Payload?.Values.First();
+            var inverters = (await webClient.GetGen24Devices()).Payload;
+
+            if (inverters == null)
+            {
+                return;
+            }
+
+            foreach (var inverter in Inverters)
+            {
+                var updatedInverter = inverters.FirstOrDefault(i => i.Key == inverter.Key);
+
+                if (updatedInverter.Key != null)
+                {
+                    inverter.Inverter?.CopyFrom(updatedInverter.Value);
+                    inverters.Remove(updatedInverter);
+                }
+            }
+
+            foreach (var inverter in inverters)
+            {
+                Inverters.Add(new KeyedInverter { Key = inverter.Key, Inverter = inverter.Value });
+            }
         }
         catch
         {
@@ -73,7 +110,6 @@ public partial class UiDemoViewModel(IWebClientService webClient) : ViewModelBas
                 Text = string.Format(Resources.InverterCommReadError, "Atomkraftwerk 1"),
                 Icon = new ErrorIcon(),
             }.Show();
-
         }
         catch
         {

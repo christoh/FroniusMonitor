@@ -2,6 +2,7 @@
 using System.Text;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 
 namespace De.Hochstaetter.HomeAutomationServer.Controllers;
@@ -11,7 +12,7 @@ namespace De.Hochstaetter.HomeAutomationServer.Controllers;
 public class IdentityController(Settings settings, ILogger<IdentityController> logger, IOptionsMonitor<UserList> userDb) : ControllerBase
 {
     private static readonly CookieOptions cookieOptions = new() { Path = "/api", MaxAge = new TimeSpan(7, 0, 0, 0) };
-
+    
     [HttpGet("requestKey")]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<string>(StatusCodes.Status200OK)]

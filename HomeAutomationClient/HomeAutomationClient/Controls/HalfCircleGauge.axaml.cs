@@ -5,6 +5,9 @@ namespace De.Hochstaetter.HomeAutomationClient.Controls;
 
 public partial class HalfCircleGauge : Gauge
 {
+    private record AngleBrush(double RelativeValue, IImmutableBrush Brush);
+    private readonly Polygon? hand;
+
     public static readonly StyledProperty<IBrush?> HandFillProperty = AvaloniaProperty.Register<Gauge, IBrush?>(nameof(HandFill), Brushes.DarkSlateGray);
 
     public IBrush? HandFill
@@ -21,16 +24,9 @@ public partial class HalfCircleGauge : Gauge
         set => SetValue(ColorAllTicksProperty, value);
     }
     
-    private record AngleBrush(double RelativeValue, IImmutableBrush Brush);
-    private Polygon? hand;
-
     public HalfCircleGauge()
     {
         InitializeComponent();
-    }
-
-    private void OnViewBoxInitialized(object? sender, EventArgs e)
-    {
         var handLength = OuterCanvas.Width * 0.45;
 
         hand = new Polygon
@@ -51,6 +47,8 @@ public partial class HalfCircleGauge : Gauge
 
         try
         {
+            MinimumTextBlock.Text = Minimum.ToString(StringFormat);
+            MaximumTextBlock.Text = Maximum.ToString(StringFormat);
             Canvas.Children.OfType<Rectangle>().ToList().Apply(c => Canvas.Children.Remove(c));
             const double height = 5;
             const double width = 18;
@@ -107,6 +105,15 @@ public partial class HalfCircleGauge : Gauge
 
             case nameof(Value):
                 SetValue();
+                break;
+            
+            case nameof(HandFill):
+                if (hand == null)
+                {
+                    return;
+                }
+                
+                hand.Fill = HandFill;
                 break;
 
             case nameof(AnimatedValue):

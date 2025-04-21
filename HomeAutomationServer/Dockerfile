@@ -71,6 +71,7 @@ EOF
 COPY <<"EOF" ./startup.sh
 #!/bin/ash
 test -f /etc/motd && cat /etc/motd
+export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 cd /app
 exec dotnet ./HomeAutomationServer.dll
 EOF
@@ -139,7 +140,8 @@ FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine
 COPY --from=builder /runner/ /
 
 RUN apk --no-cache upgrade &&\
-    apk --no-cache add doas fastfetch alpine-release &&\
+    apk --no-cache add doas fastfetch alpine-release icu-libs &&\
+    unset DOTNET_SYSTEM_GLOBALIZATION_INVARIANT &&\
     ln -s /root/.ashrc /home/app/.ashrc &&\
     ln -s /root/.profile /home/app/.profile &&\
     chmod 755 /root /startup.sh /root/.ashrc /root/.profile &&\

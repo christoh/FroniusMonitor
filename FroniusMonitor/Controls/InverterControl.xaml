@@ -474,8 +474,8 @@
                                 <c:Gauge Label="{x:Static p:Resources.DcLink}" Value="{m:GaugeBinding Sensors.Inverter.DcLinkVoltage}"
                                          Minimum="550" Maximum="800" GaugeColors="{x:Static c:Gauge.ExtremeIsBad}" />
                                 <c:Gauge Label="{x:Static p:Resources.Battery}" Value="{m:GaugeBinding Sensors.Inverter.StorageVoltageOuter}"
-                                         Minimum="{Binding Sensors.Storage.MinVoltage, FallbackValue=280}"
-                                         Maximum="{Binding Sensors.Storage.MaxVoltage, FallbackValue=320}"
+                                         Minimum="{Binding Sensors.Storage.MinVoltage, FallbackValue=280, TargetNullValue=280}"
+                                         Maximum="{Binding Sensors.Storage.MaxVoltage, FallbackValue=320, TargetNullValue=320}"
                                          GaugeColors="{x:Static c:Gauge.MidIsGood}" />
                             </StackPanel>
                         </Grid>
@@ -508,7 +508,7 @@
                                          Maximum="37.5" />
                                 <c:Gauge Label="{x:Static p:Resources.Battery}"
                                          Value="{m:GaugeBinding Sensors.Inverter.StorageCurrent, TargetNullValue=0, FallbackValue=0, Mode=OneWay}"
-                                         Maximum="22" Visibility="{Binding Sensors.Storage, FallbackValue=Collapsed, Converter={co:NullToVisibility Null=Hidden}}" />
+                                         Maximum="22" Minimum="-22" Origin=".5" Visibility="{Binding Sensors.Storage, FallbackValue=Collapsed, Converter={co:NullToVisibility Null=Hidden}}" />
                             </StackPanel>
                         </Grid>
 

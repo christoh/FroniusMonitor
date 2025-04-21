@@ -9,6 +9,6 @@ public partial class MainView : UserControl
         MainViewModel mainViewModel;
         InitializeComponent();
         DataContext = mainViewModel = IoC.GetRegistered<MainViewModel>();
-        Loaded += (_, _) => _ = mainViewModel.Initialize();
+        _ = mainViewModel.Initialize();
     }
 }

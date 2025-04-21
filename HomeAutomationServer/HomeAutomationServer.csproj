@@ -9,6 +9,7 @@
 		<Configuration>Release</Configuration>
 		<Deterministic>false</Deterministic>
 		<Configuration>Release</Configuration>
+		<InvariantGlobalization>false</InvariantGlobalization>
 		<Nullable>enable</Nullable>
 		<RootNamespace>De.Hochstaetter.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>

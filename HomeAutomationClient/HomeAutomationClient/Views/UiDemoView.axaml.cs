@@ -9,6 +9,6 @@ public partial class UiDemoView : UserControl
         UiDemoViewModel viewModel;
         InitializeComponent();
         DataContext = viewModel = IoC.GetRegistered<UiDemoViewModel>();
-        Loaded += (_, _) => viewModel.Initialize();
+        _ = viewModel.Initialize();
     }
 }
