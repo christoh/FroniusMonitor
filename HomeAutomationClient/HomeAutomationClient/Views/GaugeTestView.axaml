@@ -30,6 +30,7 @@
                            Minimum="{Binding Minimum}"
                            Maximum="{Binding Maximum}"
                            ColorAllTicks="{Binding ColorAllTicks}"
+                           TickFill="{DynamicResource TickFill}"
                            Origin="{Binding Origin}"
                            HandFill="{DynamicResource HandFill}"
                            Value="{Binding Value}"

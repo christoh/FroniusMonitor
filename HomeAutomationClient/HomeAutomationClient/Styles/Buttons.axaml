@@ -21,7 +21,7 @@
             <Setter Property="Background" Value="{DynamicResource DeviceButtonSelectedBackground}" />
         </Style>
         <Style Selector="^:pointerover /template/ Border">
-            <Setter Property="Background" Value="Coral" />
+            <Setter Property="Background" Value="{DynamicResource DeviceButtonMouseOver}" />
         </Style>
         <Style Selector="^:pressed /template/ Border">
             <Setter Property="Margin" Value="2,0,2,2"></Setter>

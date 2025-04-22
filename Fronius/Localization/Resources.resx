@@ -1650,4 +1650,7 @@
   <data name="LoginIncorrect" xml:space="preserve">
 	  <value>Incorrect username and/or password</value>
   </data>
+  <data name="Loading" xml:space="preserve">
+	  <value>Loading</value>
+  </data>
 </root>

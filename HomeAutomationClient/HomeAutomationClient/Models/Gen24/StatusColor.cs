@@ -1,12 +1,13 @@
-﻿using Avalonia.Media.Immutable;
+﻿using Avalonia.Markup.Xaml.MarkupExtensions;
+using Avalonia.Media.Immutable;
 
 namespace De.Hochstaetter.HomeAutomationClient.Models.Gen24;
 
 public static class StatusColor
 {
     public static bool IsDark => Application.Current?.ActualThemeVariant.Key is "Dark";
-    public static readonly IImmutableSolidColorBrush RunningOuter = new ImmutableSolidColorBrush(Color.FromUInt32(0xff003060));
-    public static readonly IImmutableSolidColorBrush RunningInner = new ImmutableSolidColorBrush(Color.FromUInt32(0xff002030));
+    public static readonly IImmutableSolidColorBrush RunningOuter = new ImmutableSolidColorBrush(Color.FromUInt32(0xff003050));
+    public static readonly IImmutableSolidColorBrush RunningInner = new ImmutableSolidColorBrush(Color.FromUInt32(0xff000030));
     public static readonly IImmutableSolidColorBrush StoppedOuter = new ImmutableSolidColorBrush(Color.FromUInt32(0xff606060));
     public static readonly IImmutableSolidColorBrush StoppedInner = new ImmutableSolidColorBrush(Color.FromUInt32(0xff202020));
 

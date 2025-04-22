@@ -69,7 +69,8 @@
 				<Viewbox Grid.Row="1">
 					<TextBlock FontSize="8" x:Name="InverterModelName" Text="{Binding Inverter.Config.Versions.ModelName, FallbackValue='---'}" TextAlignment="Center" />
 				</Viewbox>
-				<Border Grid.Row="2" Width="100" Height="85" Margin="4" Background="{Binding Inverter.Sensors.InverterStatus, FallbackValue={x:Null}, Converter={co:Gen24Status2PanelBrush}}" BorderThickness=".2" BorderBrush="Black">
+				<Border Grid.Row="2" Width="100" Height="85" Margin="4" BorderThickness=".2" BorderBrush="Black"
+                        Background="{Binding Inverter.Sensors.InverterStatus, FallbackValue={x:Null}, Converter={co:Gen24Status2PanelBrush}}">
 					<Grid Margin="-3.8,0">
                         <Viewbox x:Name="MoreVersions" IsVisible="{Binding Mode, Converter={co:InverterDisplayMode2Bool MoreVersions}}" Grid.IsSharedSizeScope="True" StretchDirection="DownOnly">
 							<ItemsControl ItemsSource="{Binding Inverter.Config.Versions.SwVersions, FallbackValue={x:Null}}">

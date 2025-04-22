@@ -5,6 +5,7 @@
              xmlns:vm="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels"
              xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
              xmlns:li="clr-namespace:De.Hochstaetter.HomeAutomationClient.Assets.LoadingIndicators.Avalonia"
+             xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="650"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.MainView"
              x:DataType="vm:MainViewModel">
@@ -32,14 +33,7 @@
 					<Button Classes="TransparentButton CloseButton" Grid.Row="0" Grid.Column="2" IsTabStop="False" IsVisible="{Binding CurrentDialog.ShowCloseBox, FallbackValue=True}"/>
 				</Grid>
 				<UserControl Grid.Row="1" MinWidth="100" Background="{DynamicResource BackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" x:Name="DialogHost" Content="{Binding CurrentDialog.Body, FallbackValue={x:Null}}"/>
-                <Grid Grid.Row="1" Background="#10000000" IsVisible="{Binding IsDialogBusy}" RowDefinitions="Auto,Auto">
-                    <StackPanel VerticalAlignment="Center">
-                        <li:LoadingIndicator IsActive="True" Mode="Arcs" Foreground="{DynamicResource SystemControlBackgroundAccentBrush}" SpeedRatio="0.5" Height="210" Margin="0,0,0,-30" />
-                        <TextBlock HorizontalAlignment="Center" FontSize="24" Foreground="{DynamicResource SystemControlBackgroundAccentBrush}">
-                            <Run Text="{Binding BusyText}" />
-                        </TextBlock>
-                    </StackPanel>
-                </Grid>
+                <c:BusyAnimation Grid.Row="1" BusyText="{Binding DialogBusyText}"/>
 			</Grid>
 		</Grid>
 	</Grid>

@@ -25,18 +25,24 @@
                     <SolidColorBrush x:Key='TickFill'>DarkGray</SolidColorBrush>
                     <SolidColorBrush x:Key='DeviceButtonBackground'>BurlyWood</SolidColorBrush>
                     <SolidColorBrush x:Key='DeviceButtonSelectedBackground'>LightSalmon</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceButtonMouseOver'>Coral</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceOuterBackgroundRunning'>AntiqueWhite</SolidColorBrush>
                     <SolidColorBrush x:Key='UnitForeground'>Blue</SolidColorBrush>
                     <SolidColorBrush x:Key='HandFill'>DarkSlateGray</SolidColorBrush>
+                    <SolidColorBrush x:Key='AnimationBackground'>#10000000</SolidColorBrush>
 				</ResourceDictionary>
 				<ResourceDictionary x:Key='Dark'>
 					<SolidColorBrush x:Key='BackgroundBrush'>Black</SolidColorBrush>
 					<SolidColorBrush x:Key='ForegroundBrush'>White</SolidColorBrush>
 					<SolidColorBrush x:Key='DisableBrush'>#40FFFFFF</SolidColorBrush>
-                    <SolidColorBrush x:Key='TickFill'>#505050</SolidColorBrush>
-                    <SolidColorBrush x:Key='DeviceButtonBackground'>SaddleBrown</SolidColorBrush>
-                    <SolidColorBrush x:Key='DeviceButtonSelectedBackground'>Brown</SolidColorBrush>
+                    <SolidColorBrush x:Key='TickFill'>#808080</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceButtonBackground'>#005080</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceButtonSelectedBackground'>DarkCyan</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceButtonMouseOver'>CadetBlue</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceOuterBackgroundRunning'>#ff003050</SolidColorBrush>
                     <SolidColorBrush x:Key='UnitForeground'>Cyan</SolidColorBrush>
                     <SolidColorBrush x:Key='HandFill'>#408080</SolidColorBrush>
+                    <SolidColorBrush x:Key='AnimationBackground'>#20ffffff</SolidColorBrush>
 				</ResourceDictionary>
 			</ResourceDictionary.ThemeDictionaries>
 

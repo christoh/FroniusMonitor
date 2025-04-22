@@ -1,0 +1,17 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:avalonia="clr-namespace:De.Hochstaetter.HomeAutomationClient.Assets.LoadingIndicators.Avalonia"
+             xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="De.Hochstaetter.HomeAutomationClient.Controls.BusyAnimation">
+    <Grid Background="{DynamicResource AnimationBackground}" IsVisible="{Binding IsBusy}" DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:BusyAnimation}}">
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+            <avalonia:LoadingIndicator IsActive="True" Mode="Arcs" Foreground="{DynamicResource SystemControlBackgroundAccentBrush}" SpeedRatio="0.5" Height="210" Margin="0,0,0,-30" />
+            <TextBlock HorizontalAlignment="Center" FontSize="24" Foreground="{DynamicResource SystemControlBackgroundAccentBrush}">
+                <Run Text="{Binding BusyText}" />
+            </TextBlock>
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -25,6 +25,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
     public override async Task Initialize()
     {
+        BusyText = Resources.Loading;
         await base.Initialize();
         timer = new(TimerElapsed, null, 0, 1000);
     }
@@ -44,7 +45,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
     {
         try
         {
-            var inverters = (await webClient.GetGen24Devices()).Payload;
+            var inverters = (await webClient.GetGen24Devices().ConfigureAwait(false)).Payload;
 
             if (inverters == null)
             {
@@ -64,12 +65,16 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
             foreach (var inverter in inverters)
             {
-                Inverters.Add(new KeyedInverter { Key = inverter.Key, Inverter = inverter.Value });
+                Dispatcher.UIThread.InvokeAsync(() => Inverters.Add(new KeyedInverter { Key = inverter.Key, Inverter = inverter.Value }));
             }
         }
         catch
         {
             // ignore
+        }
+        finally
+        {
+            BusyText = null;
         }
     }
 
