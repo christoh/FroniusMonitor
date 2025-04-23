@@ -21,6 +21,9 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
     public string UiCulture => Thread.CurrentThread.CurrentUICulture.Name;
 
     [ObservableProperty]
+    public partial bool ColorAllTicks { get; set; } = true;
+    
+    [ObservableProperty]
     public partial ObservableCollection<KeyedInverter> Inverters { get; set; } = [];
 
     public override async Task Initialize()
@@ -39,6 +42,12 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
     ~UiDemoViewModel()
     {
         Dispose();
+    }
+
+    [RelayCommand]
+    private void ToggleColorAll()
+    {
+        ColorAllTicks = !ColorAllTicks;
     }
 
     private async void TimerElapsed(object? state)

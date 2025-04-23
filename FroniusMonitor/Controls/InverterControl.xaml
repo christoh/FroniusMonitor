@@ -89,8 +89,8 @@
                                                 <ColumnDefinition Width="Auto" SharedSizeGroup="Key" />
                                                 <ColumnDefinition Width="Auto" SharedSizeGroup="Value" />
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Grid.Column="0" HorizontalAlignment="Left" Margin="2,0,8,0" Text="{Binding Path=Key}" Foreground="#082A18" />
-                                            <TextBlock TextAlignment="Right" Grid.Column="1" Margin="8,0,2,0" Text="{Binding Path=Value, Converter={co:LinuxVersion}}" Foreground="#082A18" />
+                                            <TextBlock Grid.Column="0" HorizontalAlignment="Left" Margin="2,0,8,0" Text="{Binding Path=Key}" />
+                                            <TextBlock TextAlignment="Right" Grid.Column="1" Margin="8,0,2,0" Text="{Binding Path=Value, Converter={co:LinuxVersion}}" />
                                         </Grid>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>

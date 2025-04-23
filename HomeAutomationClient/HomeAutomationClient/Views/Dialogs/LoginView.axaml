@@ -8,8 +8,8 @@
              xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
              mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="300"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.LoginView"
-             x:DataType="dialogs:LoginViewModel" MaxWidth="800" MinWidth="500">
-	<StackPanel Margin="16" HorizontalAlignment="Stretch">
+             x:DataType="dialogs:LoginViewModel" MaxWidth="400" MinWidth="200">
+    <StackPanel Margin="16" HorizontalAlignment="Stretch">
 		<StackPanel.Styles>
 			<Style Selector="StackPanel.InputBlock">
 				<Setter Property="MinHeight" Value="75" />
@@ -35,7 +35,7 @@
 		</StackPanel>
 
 		<StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-			<Button MinWidth="50" HorizontalContentAlignment="Center" Content="{x:Static p:Resources.Ok}" Command="{Binding LoginCommand}" />
+			<Button x:Name="OkButton" IsDefault="True" MinWidth="50" HorizontalContentAlignment="Center" Content="{x:Static p:Resources.Ok}" Command="{Binding LoginCommand}" />
 		</StackPanel>
 
 	</StackPanel>

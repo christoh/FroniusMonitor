@@ -1,3 +1,4 @@
+using Avalonia.Input;
 using Avalonia.Interactivity;
 
 namespace De.Hochstaetter.HomeAutomationClient.Views;

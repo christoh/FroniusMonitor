@@ -1,11 +1,12 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.IO.Compression;
+using System.Text.Json.Serialization;
 using De.Hochstaetter.Fronius.Crypto;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.Extensions.Localization;
+using Microsoft.AspNetCore.ResponseCompression;
 using Settings = De.Hochstaetter.HomeAutomationServer.Models.Settings.Settings;
 
 namespace De.Hochstaetter.HomeAutomationServer;
@@ -81,6 +82,13 @@ internal partial class Program
             .AddTransient<ISunSpecClient, SunSpecClient>()
             .AddLogging(b => b.AddSerilog())
             .AddCors(o => o.AddDefaultPolicy(p => p.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin()))
+            .AddResponseCompression(o =>
+            {
+                o.EnableForHttps = true;
+                o.Providers.Clear();
+                o.Providers.Add(new BrotliCompressionProvider(new BrotliCompressionProviderOptions { Level = CompressionLevel.SmallestSize }));
+                o.Providers.Add(new GzipCompressionProvider(new GzipCompressionProviderOptions { Level = CompressionLevel.SmallestSize }));
+            })
             ;
 
         var supportedCultures = new List<CultureInfo>
@@ -151,19 +159,8 @@ internal partial class Program
         //    .AddScheme<UserList, MyAuthenticationHandler>("MyAuthenticationSchemeName", options => {});
 
         var app = builder.Build();
-        //if (app.Environment.IsDevelopment())
-        //{
+        app.UseResponseCompression();
         app.MapOpenApi().RequireAuthorization(r => r.RequireRole("Developer"));
-        //}
-
-        //app.UseHttpsRedirection();
-        //app.UseAuthentication();
-        //app.UseAuthorization();
-
-        //app.UseCors();
-        //app.UseAuthentication();
-        //app.UseAuthorization();
-
         app.UseRequestLocalization(options =>
         {
             options.DefaultRequestCulture = new RequestCulture(CultureInfo.InvariantCulture);

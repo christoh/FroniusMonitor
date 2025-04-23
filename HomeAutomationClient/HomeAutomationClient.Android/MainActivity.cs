@@ -2,6 +2,7 @@
 using Android.Content.PM;
 using Avalonia;
 using Avalonia.Android;
+using De.Hochstaetter.HomeAutomationClient;
 
 namespace HomeAutomationClient.Android
 {

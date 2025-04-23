@@ -1,3 +1,4 @@
+using Avalonia.Input;
 using Avalonia.Interactivity;
 
 namespace De.Hochstaetter.HomeAutomationClient.Views.Dialogs;
@@ -9,11 +10,23 @@ public partial class LoginView : UserControl, IDialogControl
     public LoginView()
     {
         InitializeComponent();
+        this.AddHandler(InputElement.KeyDownEvent,OnPreviewKeyDown,RoutingStrategies.Tunnel);
     }
 
     protected override void OnDataContextChanged(EventArgs e)
     {
         base.OnDataContextChanged(e);
         _ = ViewModel?.Initialize();
+    }
+    
+    void OnPreviewKeyDown(object? sender, KeyEventArgs e)
+    {
+        switch (e.Key)
+        {
+            case Key.Enter:
+                OkButton.Focus();
+                ViewModel?.LoginCommand.Execute(null);
+                break;
+        }
     }
 }

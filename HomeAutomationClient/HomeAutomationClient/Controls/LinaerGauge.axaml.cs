@@ -18,6 +18,8 @@ public partial class LinearGauge : Gauge
     public LinearGauge()
     {
         InitializeComponent();
+        // ReSharper disable once VirtualMemberCallInConstructor
+        SetValue(true);
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
@@ -40,6 +42,10 @@ public partial class LinearGauge : Gauge
             case nameof(Origin):
                 OnAnimatedValueChanged();
                 break;
+            
+            case nameof(StringFormat):
+                SetValue(true);
+                break;
         }
     }
 
@@ -48,7 +54,7 @@ public partial class LinearGauge : Gauge
         try
         {
             var value = ShowPercent ? (Value - Math.Max(0, Minimum)) / (Maximum - Math.Max(0, Minimum)) * 100 : Value;
-            ValueTextBlock.Text = value.ToString(StringFormat, CultureInfo.CurrentCulture);
+            ValueTextBlock.Text = !double.IsFinite(value) ? "---" : value.ToString(StringFormat, CultureInfo.CurrentCulture);
         }
         finally
         {

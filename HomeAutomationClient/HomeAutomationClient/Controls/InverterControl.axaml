@@ -20,6 +20,7 @@
                     <Style Selector="c|HalfCircleGauge">
                         <Setter Property="TickFill" Value="{DynamicResource TickFill}"/>
                         <Setter Property="HandFill" Value="{DynamicResource HandFill}"/>
+                        <Setter Property="ColorAllTicks" Value="{Binding ColorAllTicks}"/>
                     </Style>
 
 					<Style Selector="c|LinearGauge.AcPowerLinearGaugeStyle">
@@ -81,8 +82,8 @@
 												<ColumnDefinition Width="Auto" SharedSizeGroup="Key" />
 												<ColumnDefinition Width="Auto" SharedSizeGroup="Value" />
 											</Grid.ColumnDefinitions>
-											<TextBlock Grid.Column="0" HorizontalAlignment="Left" Margin="2,0,8,0" Text="{Binding Path=Key}" Foreground="#082A18" />
-											<TextBlock TextAlignment="Right" Grid.Column="1" Margin="8,0,2,0" Text="{Binding Path=Value, Converter={co:LinuxVersion}}" Foreground="#082A18" />
+											<TextBlock Grid.Column="0" HorizontalAlignment="Left" Margin="2,0,8,0" Text="{Binding Path=Key}" />
+											<TextBlock TextAlignment="Right" Grid.Column="1" Margin="8,0,2,0" Text="{Binding Path=Value, Converter={co:LinuxVersion}}" />
 										</Grid>
 									</DataTemplate>
 								</ItemsControl.ItemTemplate>
@@ -495,10 +496,13 @@
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                                 <c:LinearGauge Classes="AcPowerLinearGaugeStyle Local" Label="{x:Static p:Resources.Loss}" x:Name="MoreEfficiencyLoss"
-                                         Maximum="300" ShowPercent="False" GaugeColors="{x:Static m:GaugeColors.HighIsBad}" />
-                                <c:LinearGauge Classes="AcPowerLinearGaugeStyle Local" Label="{x:Static p:Resources.Efficiency}" x:Name="MoreEfficiencyEfficiency" />
-                                <c:LinearGauge Classes="AcPowerLinearGaugeStyle Local" Label="{x:Static p:Resources.SelfConsumptionShort}" x:Name="MoreEfficiencySelfConsumption" />
-                                <c:LinearGauge Classes="AcPowerLinearGaugeStyle Local" Label="{x:Static p:Resources.SelfSufficiencyShort}" x:Name="MoreEfficiencySelfSufficiency" />
+                                               Maximum="300" ShowPercent="False" GaugeColors="{x:Static m:GaugeColors.HighIsBad}"
+                                               Value="{Binding Inverter.Sensors.PowerFlow.PowerLoss, FallbackValue=0, TargetNullValue=0}"/>
+                                <c:LinearGauge Classes="AcPowerLinearGaugeStyle Local" Label="{x:Static p:Resources.Efficiency}" x:Name="MoreEfficiencyEfficiency"
+                                               GaugeColors="{x:Static m:GaugeColors.LowIsBad}" UnitName="%" ShowPercent="True" Maximum="1" Minimum="0"
+                                               Value="{Binding Inverter.Sensors.PowerFlow.Efficiency, FallbackValue='0', TargetNullValue='0'}"/>
+                                <!--<c:LinearGauge Classes="AcPowerLinearGaugeStyle Local" Label="{x:Static p:Resources.SelfConsumptionShort}" x:Name="MoreEfficiencySelfConsumption" />
+                                <c:LinearGauge Classes="AcPowerLinearGaugeStyle Local" Label="{x:Static p:Resources.SelfSufficiencyShort}" x:Name="MoreEfficiencySelfSufficiency" />-->
                             </StackPanel>
                         </Grid>
 
@@ -524,6 +528,77 @@
                                 <c:LinearGauge Classes="AcPowerLinearGaugeStyle Local" Minimum="0" Maximum="2000" StringFormat="N0" UnitName="ms"
                                                Label="{x:Static p:Resources.Latency}" GaugeColors="{x:Static m:GaugeColors.HighIsBad}"
                                                Value="{Binding Inverter.Sensors.Inverter.Latency.TotalMilliseconds, FallbackValue=0, TargetNullValue=0, Mode=OneWay}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="MoreTemperatures"  IsVisible="{Binding Mode, Converter={co:InverterDisplayMode2Bool MoreTemperatures}}" RowDefinitions="Auto,*">
+                            <Grid.Styles>
+                                <Style Selector="c|LinearGauge.Local">
+                                    <Setter Property="Minimum" Value="15" />
+                                    <Setter Property="Maximum" Value="80" />
+                                    <Setter Property="UnitName" Value="°C" />
+                                    <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.HighIsBad}" />
+                                </Style>
+                            </Grid.Styles>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.Temperatures}" Margin="0,0,0,1" TextAlignment="Center" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearGauge Classes="AcPowerLinearGaugeStyle Local" Label="{x:Static p:Resources.Ambient}" Value="{Binding Inverter.Sensors.Inverter.AmbientTemperature, FallbackValue=0, TargetNullValue=0}" />
+                                <c:LinearGauge Classes="AcPowerLinearGaugeStyle Local" Label="{x:Static p:Resources.AcModule}" Value="{Binding Inverter.Sensors.Inverter.TemperatureInverterAcModule, FallbackValue=0, TargetNullValue=0}" />
+                                <c:LinearGauge Classes="AcPowerLinearGaugeStyle Local" Label="{x:Static p:Resources.DcModule}" Value="{Binding Inverter.Sensors.Inverter.TemperatureInverterDcModule, FallbackValue=0, TargetNullValue=0}" />
+                                <c:LinearGauge Classes="AcPowerLinearGaugeStyle Local" Label="{x:Static p:Resources.BatteryModule}" Value="{Binding Inverter.Sensors.Inverter.TemperatureInverterBatteryModule, FallbackValue=0, TargetNullValue=0}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="MoreFans" IsVisible="{Binding Mode, Converter={co:InverterDisplayMode2Bool MoreFans}}" RowDefinitions="Auto,*">
+                            <Grid.Styles>
+                                <Style Selector="c|LinearGauge.Local">
+                                    <Setter Property="Minimum" Value="0" />
+                                    <Setter Property="Maximum" Value="1" />
+                                    <Setter Property="UnitName" Value="%"/>
+                                    <Setter Property="ShowPercent" Value="True" />
+                                    <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.HighIsBad}" />
+                                    <Setter Property="StringFormat" Value="N2" />
+                                </Style>
+                            </Grid.Styles>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.Fans}" Margin="0,0,0,1" TextAlignment="Center" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearGauge Classes="AcPowerLinearGaugeStyle Local" Label="{x:Static p:Resources.Fan1}" Value="{Binding Inverter.Sensors.Inverter.Fan1RelativeRpm, FallbackValue=0, TargetNullValue=0}" />
+                                <c:LinearGauge Classes="AcPowerLinearGaugeStyle Local" Label="{x:Static p:Resources.Fan2}" Value="{Binding Inverter.Sensors.Inverter.Fan2RelativeRpm, FallbackValue=0, TargetNullValue=0}" />
+                                <c:LinearGauge Classes="AcPowerLinearGaugeStyle Local" Label="Iso" Value="{Binding Inverter.Sensors.Inverter.IsolatorResistance, FallbackValue=0, TargetNullValue=0, Converter={co:Multiply Factor=.000001}}"
+                                               Minimum="0" Maximum="10" ShowPercent="False" UnitName="MΩ" GaugeColors="{x:Static m:GaugeColors.LowIsBad}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="MoreOp" IsVisible="{Binding Mode, Converter={co:InverterDisplayMode2Bool MoreOp}}" RowDefinitions="Auto,*">
+                            <Grid.Styles>
+                                <Style Selector="c|LinearGauge.Local">
+                                    <Setter Property="StringFormat" Value="N3" />
+                                    <Setter Property="UnitName" Value="{x:Static p:Resources.DaysShort}" />
+                                    <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.HigherThan15IsBad}" />
+                                    <Setter Property="Minimum" Value="0" />
+                                </Style>
+                            </Grid.Styles>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.OpTime}" Margin="0,0,0,1" TextAlignment="Center" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearGauge Classes="AcPowerLinearGaugeStyle Local" Label="Total"
+                                               Value="{ReflectionBinding Inverter.Sensors.Inverter.InverterUpTime.TotalDays, FallbackValue=0, TargetNullValue=0}"
+                                               Maximum="1826.25" GaugeColors="{x:Static m:GaugeColors.AllIsGood}" />
+                                <c:LinearGauge Classes="AcPowerLinearGaugeStyle Local" Label="{x:Static p:Resources.BackupOpTime}"
+                                               Value="{ReflectionBinding Inverter.Sensors.Inverter.BackupModeUpTime.TotalDays, FallbackValue=0, TargetNullValue=0}"
+                                               Maximum="{ReflectionBinding Inverter.Sensors.Inverter.InverterUpTime.TotalDays, FallbackValue=1, TargetNullValue=1}" />
+                                <c:LinearGauge Classes="AcPowerLinearGaugeStyle Local" Label="{x:Static p:Resources.BackupOpTime}"
+                                               Value="{Binding Inverter.Sensors.Inverter.RelativeBackupModeUpTime, FallbackValue=0, TargetNullValue=0}"
+                                               Maximum="1" StringFormat="N4" ShowPercent="True" UnitName="%" />
                             </StackPanel>
                         </Grid>
 

@@ -25,43 +25,6 @@ public class Gen24PowerFlow : Gen24DeviceBase
     private static int oldSmartMeterHistoryCountProduced;
     private static int oldSmartMeterHistoryCountConsumed;
 
-    //[FroniusProprietaryImport("state", FroniusDataType.Attribute)]
-    //public SiteType? SiteType
-    //{
-    //    get;
-    //    set => Set(ref field, value);
-    //}
-
-    //public string? SiteTypeDisplayName => SiteType?.ToDisplayName();
-
-    //[FroniusProprietaryImport("BackupMode", FroniusDataType.Attribute)]
-    //public string? BackupModeDisplayName
-    //{
-    //    get;
-    //    set => Set(ref field, value);
-    //}
-
-    //[FroniusProprietaryImport("ACBRIDGE_ENERGYACTIVE_PRODUCED_SUM_U64", Unit.Joule)]
-    //public double? InverterLifeTimeEnergyProduced
-    //{
-    //    get;
-    //    set => Set(ref field, value);
-    //}
-
-    //[FroniusProprietaryImport("ACBRIDGE_POWERACTIVE_AC_NOMINAL_F64")]
-    //public double? InverterPowerNominal
-    //{
-    //    get;
-    //    set => Set(ref field, value);
-    //}
-
-    //[FroniusProprietaryImport("BAT_POWERACTIVE_DC_CONFIGURED_F64")]
-    //public double? StoragePowerConfigured
-    //{
-    //    get;
-    //    set => Set(ref field, value);
-    //}
-
     [FroniusProprietaryImport("BAT_POWERACTIVE_MEAN_SUM_F64")]
     public double StoragePower
     {

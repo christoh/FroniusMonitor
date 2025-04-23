@@ -84,6 +84,14 @@ public partial class InverterControl : UserControl
         get => GetValue(InverterProperty);
         set => SetValue(InverterProperty, value);
     }
+    
+    public static readonly StyledProperty<bool> ColorAllTicksProperty = AvaloniaProperty.Register<InverterControl, bool>(nameof(ColorAllTicks));
+    
+    public bool ColorAllTicks
+    {
+        get => GetValue(ColorAllTicksProperty);
+        set => SetValue(ColorAllTicksProperty, value);
+    }
 
     public static readonly StyledProperty<InverterDisplayMode> ModeProperty = AvaloniaProperty.Register<InverterControl, InverterDisplayMode>(nameof(Mode), InverterDisplayMode.DcPowerGauge);
 

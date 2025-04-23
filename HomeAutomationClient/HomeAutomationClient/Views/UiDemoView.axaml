@@ -8,9 +8,9 @@
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="1000"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.UiDemoView"
              x:DataType="viewModels:UiDemoViewModel">
-	<Grid RowDefinitions="*">
-        <c:BusyAnimation BusyText="{Binding BusyText}" Grid.Row="0"/>
-        <Grid RowDefinitions="Auto,*" Grid.Row="0">
+    <Grid RowDefinitions="*">
+		<c:BusyAnimation BusyText="{Binding BusyText}" Grid.Row="0"/>
+		<Grid RowDefinitions="Auto,*" Grid.Row="0">
 			<StackPanel x:Name="MainContentElement" Orientation="Vertical" Margin="16" Grid.Row="0" VerticalAlignment="Top">
 				<TextBlock Text="Home Automation Control Center UI Test" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" />
 				<TextBlock Text="{Binding ApiUri, TargetNullValue='http://www.hochstaetter.de/api'}" HorizontalAlignment="Center" />
@@ -48,18 +48,21 @@
 							</StackPanel>
 						</HeaderedContentControl>
 						<HeaderedContentControl Classes="GroupBox" Header="Inverter">
-							<ItemsControl ItemsSource="{Binding Inverters}">
-								<ItemsControl.ItemsPanel>
-									<ItemsPanelTemplate>
-										<StackPanel Orientation="Horizontal" />
-									</ItemsPanelTemplate>
-								</ItemsControl.ItemsPanel>
-								<ItemsControl.ItemTemplate>
-									<DataTemplate>
-										<c:InverterControl Height="210" Inverter="{Binding Inverter}" Margin="8,0"/>
-									</DataTemplate>
-								</ItemsControl.ItemTemplate>
-							</ItemsControl>
+							<StackPanel>
+								<ItemsControl ItemsSource="{Binding Inverters}">
+									<ItemsControl.ItemsPanel>
+										<ItemsPanelTemplate>
+											<StackPanel Orientation="Horizontal" />
+										</ItemsPanelTemplate>
+									</ItemsControl.ItemsPanel>
+									<ItemsControl.ItemTemplate>
+										<DataTemplate>
+											<c:InverterControl ColorAllTicks="{Binding Path=((viewModels:UiDemoViewModel)DataContext).ColorAllTicks, FallbackValue=False, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}" Height="210" Inverter="{Binding Inverter}" Margin="8,0"/>
+										</DataTemplate>
+									</ItemsControl.ItemTemplate>
+								</ItemsControl>
+                                <Button Margin="0,16,0,0" Content="Color all" Command="{Binding ToggleColorAllCommand}"></Button>
+							</StackPanel>
 						</HeaderedContentControl>
 					</WrapPanel>
 				</ScrollViewer>

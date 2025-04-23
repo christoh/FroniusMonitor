@@ -6,7 +6,7 @@ using De.Hochstaetter.HomeAutomationClient.Extensions;
 
 namespace De.Hochstaetter.HomeAutomationClient.Controls;
 
-public class Gauge : ContentControl
+public abstract class Gauge : ContentControl
 {
     public static readonly StyledProperty<double> MinimumProperty = AvaloniaProperty.Register<Gauge, double>(nameof(Minimum));
 
@@ -131,7 +131,7 @@ public class Gauge : ContentControl
     // ReSharper disable once AsyncVoidMethod
     protected virtual async void SetValue(bool sKipAnimation = false)
     {
-        var relativeValue = (Math.Max(Math.Min(Maximum, Value), Minimum) - Minimum) / (Maximum - Minimum);
+        var relativeValue = (Math.Max(Math.Min(Maximum, double.IsNaN(Value) ? 0 : Value), Minimum) - Minimum) / (Maximum - Minimum);
 
         try
         {

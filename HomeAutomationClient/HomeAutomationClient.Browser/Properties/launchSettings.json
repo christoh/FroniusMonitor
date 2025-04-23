@@ -3,6 +3,7 @@
     "HomeAutomationClient.Browser": {
       "commandName": "Project",
       "launchBrowser": true,
+      "dotnetRunMessages": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "HOME_AUTOMATION_SERVER": "http://192.168.44.50/api/"

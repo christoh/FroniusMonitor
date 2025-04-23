@@ -4,7 +4,8 @@ public partial class GaugeTestViewModel : ViewModelBase
 {
     [ObservableProperty] public partial double Value { get; set; } = 1000;
 
-    [ObservableProperty] public partial bool ColorAllTicks { get; set; }
+    [ObservableProperty]
+    public partial bool ColorAllTicks { get; set; } = true;
 
     [ObservableProperty] public partial double Origin { get; set; } = 0d;
 
