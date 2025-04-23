@@ -37,7 +37,7 @@ public class Gen24Service(IGen24JsonService gen24JsonService) : BindableBase, IG
 
         Parallel.ForEach
         (
-            (await GetFroniusJsonResponse("status/events", token: token).ConfigureAwait(false)).Token,
+            (await GetFroniusJsonResponse("api/status/events", token: token).ConfigureAwait(false)).Token,
             eventToken => { eventList.Add(gen24JsonService.ReadFroniusData<Gen24Event>(eventToken)); }
         );
 
@@ -46,7 +46,7 @@ public class Gen24Service(IGen24JsonService gen24JsonService) : BindableBase, IG
 
     public async Task<IReadOnlyDictionary<Guid, Gen24ConnectedInverter>> GetConnectedDevices(bool doScan)
     {
-        var uriString = $"commands/SystemPowerControl/GetDeviceStatus?doScan={(doScan ? "true" : "false")}";
+        var uriString = $"api/commands/SystemPowerControl/GetDeviceStatus?doScan={(doScan ? "true" : "false")}";
         var (token, _) = await GetFroniusJsonResponse(uriString).ConfigureAwait(false);
 
         if (token["success"]?.Value<bool>() is not true)
@@ -87,7 +87,7 @@ public class Gen24Service(IGen24JsonService gen24JsonService) : BindableBase, IG
     {
         var gen24Sensors = new Gen24Sensors();
 
-        var (_, dataToken) = await GetJsonResponse<BaseResponse>("components/readable", true, token: token).ConfigureAwait(false);
+        var (_, dataToken) = await GetJsonResponse<BaseResponse>("api/components/readable", true, token: token).ConfigureAwait(false);
         gen24Sensors.Inverter = gen24JsonService.ReadFroniusData<Gen24Inverter>(dataToken[components.Groups["Inverter"].FirstOrDefault() ?? "1"]);
 
         if (components.Groups.TryGetValue("BatteryManagementSystem", out var storages))
@@ -112,7 +112,7 @@ public class Gen24Service(IGen24JsonService gen24JsonService) : BindableBase, IG
             }
         }
 
-        var (jToken, _) = await GetFroniusJsonResponse("status/devices", token: token).ConfigureAwait(false);
+        var (jToken, _) = await GetFroniusJsonResponse("api/status/devices", token: token).ConfigureAwait(false);
 
         foreach (var statusToken in (JArray)jToken)
         {
@@ -313,12 +313,12 @@ public class Gen24Service(IGen24JsonService gen24JsonService) : BindableBase, IG
     }
 
     public ValueTask<Gen24StandByStatus?> GetInverterStandByStatus(CancellationToken token = default) =>
-        SendFroniusCommand<Gen24StandByStatus>("commands/StandbyState", token: token);
+        SendFroniusCommand<Gen24StandByStatus>("api/commands/StandbyState", token: token);
 
     public async ValueTask RequestInverterStandBy(bool isStandBy, CancellationToken token = default)
     {
         var jToken = JObject.Parse($"{{\"requestState\": {(isStandBy ? "0" : "1")}}}");
-        await SendFroniusCommand<Gen24NoResultCommand>("commands/StandbyRequestState", jToken, token).ConfigureAwait(false);
+        await SendFroniusCommand<Gen24NoResultCommand>("api/commands/StandbyRequestState", jToken, token).ConfigureAwait(false);
     }
 
     private async Task<DigestAuthHttp> GetFroniusHttpClient(CancellationToken token = default)

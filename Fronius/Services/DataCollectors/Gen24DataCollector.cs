@@ -229,9 +229,9 @@ public sealed class Gen24DataCollector(
 
         try
         {
-            var versionsToken = (await gen24System.Service.GetFroniusJsonResponse("status/version", token: token).ConfigureAwait(false)).Token;
-            var componentsToken = (await gen24System.Service.GetFroniusJsonResponse("components/", token: token).ConfigureAwait(false)).Token;
-            var configToken = (await gen24System.Service.GetFroniusJsonResponse("config/", token: token).ConfigureAwait(false)).Token;
+            var versionsToken = (await gen24System.Service.GetFroniusJsonResponse("api/status/version", token: token).ConfigureAwait(false)).Token;
+            var componentsToken = (await gen24System.Service.GetFroniusJsonResponse("api/components/", token: token).ConfigureAwait(false)).Token;
+            var configToken = (await gen24System.Service.GetFroniusJsonResponse("api/config/", token: token).ConfigureAwait(false)).Token;
 
 #if DEBUG
             // ReSharper disable UnusedVariable

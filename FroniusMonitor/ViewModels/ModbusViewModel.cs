@@ -66,7 +66,7 @@ public class ModbusViewModel(
 
             try
             {
-                var configToken = (await Gen24Service.GetFroniusJsonResponse("config/", token: tokenSource.Token).ConfigureAwait(false)).Token;
+                var configToken = (await Gen24Service.GetFroniusJsonResponse("api/config/", token: tokenSource.Token).ConfigureAwait(false)).Token;
                 oldSettings = Gen24ModbusSettings.Parse(configToken["modbus"]?["modbus"]);
                 inverterSettings = Gen24InverterSettings.Parse(configToken);
             }
@@ -171,7 +171,7 @@ public class ModbusViewModel(
                 return;
             }
 
-            if (!await UpdateInverter("config/modbus", updateToken))
+            if (!await UpdateInverter("api/config/modbus", updateToken))
             {
                 return;
             }

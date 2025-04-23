@@ -293,9 +293,9 @@
                 return null;
             }
 
-            var versionsToken = (await webClientService.GetFroniusJsonResponse("status/version", token: token).ConfigureAwait(false)).Token;
-            var componentsToken = (await webClientService.GetFroniusJsonResponse("components/", token: token).ConfigureAwait(false)).Token;
-            var configToken = (await webClientService.GetFroniusJsonResponse("config/", token: token).ConfigureAwait(false)).Token;
+            var versionsToken = (await webClientService.GetFroniusJsonResponse("api/status/version", token: token).ConfigureAwait(false)).Token;
+            var componentsToken = (await webClientService.GetFroniusJsonResponse("api/components/", token: token).ConfigureAwait(false)).Token;
+            var configToken = (await webClientService.GetFroniusJsonResponse("api/config/", token: token).ConfigureAwait(false)).Token;
 
 #if DEBUG
             // ReSharper disable UnusedVariable

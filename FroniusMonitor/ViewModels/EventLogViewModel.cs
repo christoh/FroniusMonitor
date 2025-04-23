@@ -21,7 +21,7 @@ public class EventLogViewModel(IGen24Service gen24Service) : ViewModelBase
         {
             Title = await gen24Service.GetUiString("EVENTLOG.TITLE").ConfigureAwait(false);
             await base.OnInitialize().ConfigureAwait(false);
-            var inverterBaseSettings = await gen24Service.ReadGen24Entity<Gen24InverterSettings>("config/common").ConfigureAwait(false);
+            var inverterBaseSettings = await gen24Service.ReadGen24Entity<Gen24InverterSettings>("api/config/common").ConfigureAwait(false);
 
             if (!string.IsNullOrWhiteSpace(inverterBaseSettings.SystemName))
             {

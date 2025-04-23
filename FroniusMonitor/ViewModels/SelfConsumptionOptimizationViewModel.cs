@@ -149,8 +149,8 @@ public bool IsSecondary => ReferenceEquals(Gen24Service, DataCollectionService.G
 
             try
             {
-                configToken = (await Gen24Service.GetFroniusJsonResponse("config/", token: tokenSource.Token).ConfigureAwait(false)).Token;
-                softwareVersions = Gen24Versions.Parse((await Gen24Service.GetFroniusJsonResponse("status/version", token: tokenSource.Token).ConfigureAwait(false)).Token).SwVersions;
+                configToken = (await Gen24Service.GetFroniusJsonResponse("api/config/", token: tokenSource.Token).ConfigureAwait(false)).Token;
+                softwareVersions = Gen24Versions.Parse((await Gen24Service.GetFroniusJsonResponse("api/status/version", token: tokenSource.Token).ConfigureAwait(false)).Token).SwVersions;
             }
             catch (Exception ex)
             {
@@ -337,7 +337,7 @@ public bool IsSecondary => ReferenceEquals(Gen24Service, DataCollectionService.G
 
             if (nonRulesChanged)
             {
-                if (!await UpdateInverter("config/batteries", updateToken).ConfigureAwait(false))
+                if (!await UpdateInverter("api/config/batteries", updateToken).ConfigureAwait(false))
                 {
                     return;
                 }
@@ -345,7 +345,7 @@ public bool IsSecondary => ReferenceEquals(Gen24Service, DataCollectionService.G
 
             if (rulesChanged)
             {
-                if (!await UpdateInverter("config/timeofuse", rulesToken).ConfigureAwait(false))
+                if (!await UpdateInverter("api/config/timeofuse", rulesToken).ConfigureAwait(false))
                 {
                     return;
                 }

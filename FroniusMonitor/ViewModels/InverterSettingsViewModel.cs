@@ -255,7 +255,7 @@ public class InverterSettingsViewModel(
             }
 
             var hasCommonUpdates = false;
-            await UpdateIfRequired(Settings, oldSettings, "config/common").ConfigureAwait(false);
+            await UpdateIfRequired(Settings, oldSettings, "api/config/common").ConfigureAwait(false);
 
             var mppt1Token = Settings.Mppt?.Mppt1 is { } mppt1 && oldSettings.Mppt?.Mppt1 is { } oldMppt1 ? Gen24JsonService.GetUpdateToken(mppt1, oldMppt1) : null;
             var mppt2Token = Settings.Mppt?.Mppt2 is { } mppt2 && oldSettings.Mppt?.Mppt2 is { } oldMppt2 ? Gen24JsonService.GetUpdateToken(mppt2, oldMppt2) : null;
@@ -279,7 +279,7 @@ public class InverterSettingsViewModel(
                 }
 
                 var mpptToken = new JObject { { "mppt", trackerToken } };
-                await UpdateInverter("config/powerunit", mpptToken);
+                await UpdateInverter("api/config/powerunit", mpptToken);
             }
 
 
@@ -366,7 +366,7 @@ public class InverterSettingsViewModel(
                 return;
             }
 
-            await UpdateInverter("config/limit_settings/powerLimits", limitsToken).ConfigureAwait(false);
+            await UpdateInverter("api/config/limit_settings/powerLimits", limitsToken).ConfigureAwait(false);
             oldSettings = Settings;
             oldConnectedInverters = ConnectedInverters == null ? null : new ConcurrentDictionary<Guid, Gen24ConnectedInverter>(ConnectedInverters.Values.Select(i => new KeyValuePair<Guid, Gen24ConnectedInverter>(i.Id, i.Copy())));
 
@@ -420,10 +420,10 @@ public class InverterSettingsViewModel(
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     private async ValueTask<Gen24InverterSettings> ReadDataFromInverter()
     {
-        var mpptToken = (await Gen24Service.GetFroniusJsonResponse("config/powerunit/mppt").ConfigureAwait(false)).Token;
-        var systemToken = (await Gen24Service.GetFroniusJsonResponse("config/powerunit/system").ConfigureAwait(false)).Token;
-        var commonToken = (await Gen24Service.GetFroniusJsonResponse("config/common").ConfigureAwait(false)).Token;
-        var powerLimitToken = (await Gen24Service.GetFroniusJsonResponse("config/limit_settings").ConfigureAwait(false)).Token;
+        var mpptToken = (await Gen24Service.GetFroniusJsonResponse("api/config/powerunit/mppt").ConfigureAwait(false)).Token;
+        var systemToken = (await Gen24Service.GetFroniusJsonResponse("api/config/powerunit/system").ConfigureAwait(false)).Token;
+        var commonToken = (await Gen24Service.GetFroniusJsonResponse("api/config/common").ConfigureAwait(false)).Token;
+        var powerLimitToken = (await Gen24Service.GetFroniusJsonResponse("api/config/limit_settings").ConfigureAwait(false)).Token;
         return Gen24InverterSettings.Parse(commonToken, mpptToken, powerLimitToken["powerLimits"], systemToken);
     }
 
