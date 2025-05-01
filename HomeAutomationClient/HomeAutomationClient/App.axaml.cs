@@ -28,6 +28,7 @@ namespace De.Hochstaetter.HomeAutomationClient
                 .AddSingleton<IServerBasedAesKeyProvider, AesKeyProvider>()
                 .AddSingleton<IAesKeyProvider, IAesKeyProvider>(provider => IoC.GetRegistered<IServerBasedAesKeyProvider>())
                 .AddSingleton<IWebClientService, WebClientService>()
+                .AddSingleton<IGen24LocalizationService, Gen24LocalizationService>()
                 ;
 
             var serviceProvider = ServiceCollection.BuildServiceProvider();

@@ -2,6 +2,8 @@
 
 public abstract class DeviceControllerBase(IDataControlService controlService, ILogger logger) : ControllerBase
 {
+    protected IDataControlService ControlService => controlService;
+
     protected IActionResult GetDevices<T>()
     {
         logger.LogDebug("All devices of type {DeviceType} were queried by {Ip}", typeof(T).Name, HttpContext.Connection.RemoteIpAddress);

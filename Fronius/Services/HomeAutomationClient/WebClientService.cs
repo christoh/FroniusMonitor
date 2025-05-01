@@ -1,6 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using De.Hochstaetter.Fronius.Contracts.HomeAutomationClient;
+using System.Text.Json;
 using De.Hochstaetter.Fronius.Models.HomeAutomationClient;
 using De.Hochstaetter.Fronius.Models.WebApi;
 
@@ -38,6 +38,11 @@ public sealed class WebClientService : IWebClientService
     public Task<ApiResult<IDictionary<string, Gen24System>>> GetGen24Devices(CancellationToken token = default)
     {
         return GetResult<IDictionary<string, Gen24System>>("Gen24System", token);
+    }
+
+    public Task<ApiResult<JsonElement>> GetGen24Localization(string deviceId, string iso2LanguageCode, string name, CancellationToken token = default)
+    {
+        return GetResult<JsonElement>($"gen24system/{deviceId}/{iso2LanguageCode}/{name}", token);
     }
 
     private async ValueTask<ProblemDetails?> Get(string queryString, CancellationToken token = default)
@@ -78,8 +83,8 @@ public sealed class WebClientService : IWebClientService
         {
             responseMessage = await httpClient.GetAsync(queryString, token).ConfigureAwait(false);
 
-            return responseMessage.StatusCode != HttpStatusCode.OK 
-                ? ApiResult<T>.FromProblemDetails(await GetErrors(responseMessage, token).ConfigureAwait(false)!) 
+            return responseMessage.StatusCode != HttpStatusCode.OK
+                ? ApiResult<T>.FromProblemDetails(await GetErrors(responseMessage, token).ConfigureAwait(false)!)
                 : new ApiResult<T> { Payload = await responseMessage.Content.ReadFromJsonAsync<T>(token).ConfigureAwait(false) };
         }
         catch (Exception ex)

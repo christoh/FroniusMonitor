@@ -25,6 +25,7 @@ global using System.Xml.Serialization;
 global using ClosedXML.Excel;
 global using De.Hochstaetter.Fronius.Attributes;
 global using De.Hochstaetter.Fronius.Contracts;
+global using De.Hochstaetter.Fronius.Contracts.HomeAutomationClient;
 global using De.Hochstaetter.Fronius.Contracts.Modbus;
 global using De.Hochstaetter.Fronius.Exceptions;
 global using De.Hochstaetter.Fronius.Extensions;

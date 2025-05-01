@@ -1578,4 +1578,7 @@
   <data name="Loading" xml:space="preserve">
 	  <value>Laden</value>
   </data>
+  <data name="DeviceNotFound" xml:space="preserve">
+	  <value>Das Gerät '{0}' wurde nicht gefunden</value>
+  </data>
 </root>

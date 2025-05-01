@@ -1,4 +1,5 @@
-﻿using Avalonia.Data.Converters;
+﻿using System.Diagnostics.CodeAnalysis;
+using Avalonia.Data.Converters;
 using De.Hochstaetter.Fronius.Extensions;
 using De.Hochstaetter.HomeAutomationClient.Models.Gen24;
 
@@ -188,5 +189,30 @@ public class InverterDisplayMode2Bool : EqualityConverterBase<InverterDisplayMod
     {
         Equal = true;
         NotEqual = false;
+    }
+}
+
+[SuppressMessage("ReSharper", "StringLiteralTypo")]
+public class InverterStatusLocalizeExtension : ConverterBase
+{
+    private static readonly IGen24LocalizationService gen24Localization = IoC.GetRegistered<IGen24LocalizationService>();
+
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is not string statusStatusString
+            ? value
+            : gen24Localization.GetLocalizedString(Gen24LocalizationSection.Ui, $"INVERTER.DEVICESTATE.{statusStatusString}");
+    }
+}
+[SuppressMessage("ReSharper", "StringLiteralTypo")]
+public class PowerMeterStatusLocalizeExtension : ConverterBase
+{
+    private static readonly IGen24LocalizationService gen24Localization = IoC.GetRegistered<IGen24LocalizationService>();
+
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is not string statusStatusString
+            ? value
+            : gen24Localization.GetLocalizedString(Gen24LocalizationSection.Ui, $"POWERMETER.DEVICESTATE.{statusStatusString}");
     }
 }
