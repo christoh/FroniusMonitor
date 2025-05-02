@@ -1,0 +1,64 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+             xmlns:gl="clr-namespace:System.Globalization;assembly=System.Runtime"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
+             xmlns:m="clr-namespace:De.Hochstaetter.HomeAutomationClient.Misc"
+             mc:Ignorable="d" d:DesignWidth="350" d:DesignHeight="500"
+             x:Class="De.Hochstaetter.HomeAutomationClient.Controls.EnergyStorageControl">
+    <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=controls:EnergyStorageControl}}">
+        <Grid Height="1000" Width="700">
+            <Border x:Name="Enclosure" CornerRadius="15" BorderThickness="30" Height="880" Width="660" VerticalAlignment="Top" Margin="0,100,0,0"/>
+
+            <Rectangle Width="580" Height="800" x:Name="BackgroundRectangle" Fill="{DynamicResource DeviceInnerBackgroundRunning}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,60"/>
+            <Rectangle Width="580" x:Name="SocRectangle" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,60"/>
+
+            <TextBlock Margin="0,120,0,0" FontWeight="Bold" HorizontalAlignment="Center" FontSize="150"
+                       Text="{Binding Gen24System.Sensors.Storage.StateOfCharge, StringFormat=P1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=--- %}" />
+
+            <TextBlock Margin="0,290,0,0" HorizontalAlignment="Center" FontSize="80" FontWeight="Bold">
+                <Run Text="{Binding Gen24System.StorageNetCapacity, StringFormat=N0, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---}" />
+                <Run Text="Wh" />
+                <Run Text="{x:Static p:Resources.NetShort}"/>
+            </TextBlock>
+
+            <TextBlock Margin="0,375,0,0" HorizontalAlignment="Center" FontSize="80" FontWeight="Bold">
+                <Run Text="{Binding Gen24System.Sensors.Storage.AmbientTemperature, StringFormat=N1, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---}" />
+                <Run Text="°C Amb" />
+            </TextBlock>
+
+            <TextBlock Margin="0,485,0,0" HorizontalAlignment="Center" FontSize="80">
+                <Run Text="{Binding Gen24System.Sensors.Storage.CellTemperatureMin, StringFormat=N1, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---}" />
+                <Run Text="-" />
+                <Run Text="{Binding Gen24System.Sensors.Storage.CellTemperatureMax, StringFormat=N1, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---}" />
+                <Run Text="°C" />
+            </TextBlock>
+
+            <TextBlock Margin="0,570,0,0" HorizontalAlignment="Center" FontSize="80">
+                <Run Text="{Binding Gen24System.Sensors.Storage.AvailableCapacity, StringFormat=N0, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---}" />
+                <Run Text="Wh" />
+                <Run Text="{x:Static p:Resources.GrossShort}"/>
+            </TextBlock>
+
+            <TextBlock Margin="0,655,0,0" HorizontalAlignment="Center" FontSize="80">
+                <Run Text="{Binding Gen24System.Sensors.Storage.VoltageOuter, StringFormat=N1, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---}" />
+                <Run Text="V" />
+            </TextBlock>
+
+            <TextBlock Margin="0,740,0,0" HorizontalAlignment="Center" FontSize="80">
+                <Run Text="{Binding Gen24System.Sensors.Storage.Current, StringFormat=N3, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---}" />
+                <Run Text="A" />
+            </TextBlock>
+
+            <TextBlock Margin="0,825,0,0" HorizontalAlignment="Center" FontSize="80">
+                <Run Text="{Binding Gen24System.Sensors.Storage.StateOfHealth, StringFormat=P1, Mode=OneWay, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---}" />
+                <Run Text="SoH" />
+            </TextBlock>
+
+            <Border x:Name="PlusPole" VerticalAlignment="Top" CornerRadius="30,30,0,0" Width="200" Height="110" />
+        </Grid>
+    </Viewbox>
+</UserControl>

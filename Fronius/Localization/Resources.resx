@@ -1642,7 +1642,7 @@
 	  <value>HTTP Error</value>
   </data>
   <data name="ConnectingToHas" xml:space="preserve">
-	  <value>Connecting</value>
+	  <value>Connecting to Home Automation Server</value>
   </data>
   <data name="CannotLogin" xml:space="preserve">
 	  <value>Cannot login user</value>
@@ -1655,5 +1655,11 @@
   </data>
   <data name="DeviceNotFound" xml:space="preserve">
 	  <value>The device '{0}' was not found</value>
+  </data>
+  <data name="GetInverterLocalization" xml:space="preserve">
+	  <value>Getting inverter localization files</value>
+  </data>
+  <data name="CryptoInit" xml:space="preserve">
+	  <value>Exchanging cryptographic keys</value>
   </data>
 </root>

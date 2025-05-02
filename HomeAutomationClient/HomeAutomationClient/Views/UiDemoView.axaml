@@ -5,68 +5,91 @@
              xmlns:views="clr-namespace:De.Hochstaetter.HomeAutomationClient.Views"
              xmlns:viewModels="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels"
              xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
-             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="1000"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="500"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.UiDemoView"
              x:DataType="viewModels:UiDemoViewModel">
-    <Grid RowDefinitions="*">
-		<c:BusyAnimation BusyText="{Binding BusyText}" Grid.Row="0"/>
-		<Grid RowDefinitions="Auto,*" Grid.Row="0">
-			<StackPanel x:Name="MainContentElement" Orientation="Vertical" Margin="16" Grid.Row="0" VerticalAlignment="Top">
-				<TextBlock Text="Home Automation Control Center UI Test" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" />
-				<TextBlock Text="{Binding ApiUri, TargetNullValue='http://www.hochstaetter.de/api'}" HorizontalAlignment="Center" />
-				<TextBlock HorizontalAlignment="Center" Margin="0,0,0,20">
-					<Run Text="Culture:" />
-					<Run Text="{Binding Culture, Mode=OneWay}" />
-					<Run Text="," />
-					<Run Text="UICulture:" />
-					<Run Text="{Binding UiCulture, Mode=OneWay}" />
-				</TextBlock>
-			</StackPanel>
-			<Grid Grid.Row="1" x:Name="InnerGrid">
-				<ScrollViewer VerticalAlignment="Top" AllowAutoHide="False" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto"
-							  Height="{Binding ElementName=InnerGrid, Path=Bounds.Height}">
-					<WrapPanel Orientation="Horizontal" Width="{Binding ElementName=InnerGrid, Path=Bounds.Width}">
-						<WrapPanel.Styles>
-							<Style Selector="HeaderedContentControl">
-								<Setter Property="Margin" Value="4" />
-							</Style>
-						</WrapPanel.Styles>
-						<HeaderedContentControl Classes="GroupBox" Header="Half Circle Gauge">
-							<Viewbox Width="300">
-								<views:GaugeTestView />
-							</Viewbox>
-						</HeaderedContentControl>
-						<HeaderedContentControl Classes="GroupBox" Header="Linear Gauge">
-							<Viewbox Width="300">
-								<views:LinearGaugeTestView />
-							</Viewbox>
-						</HeaderedContentControl>
-						<HeaderedContentControl Classes="GroupBox" Header="Dialog">
-							<StackPanel>
-								<Button Content="Complex Error MessageBox" Command="{Binding ShowComplexDialogCommand}" />
-								<Button Content="Simple Error MessageBox" Command="{Binding ShowSimpleDialogCommand}" />
-							</StackPanel>
-						</HeaderedContentControl>
-						<HeaderedContentControl Classes="GroupBox" Header="Inverter">
-							<StackPanel>
-								<ItemsControl ItemsSource="{Binding Inverters}">
-									<ItemsControl.ItemsPanel>
-										<ItemsPanelTemplate>
-											<StackPanel Orientation="Horizontal" />
-										</ItemsPanelTemplate>
-									</ItemsControl.ItemsPanel>
-									<ItemsControl.ItemTemplate>
-										<DataTemplate>
-											<c:InverterControl ColorAllTicks="{Binding Path=((viewModels:UiDemoViewModel)DataContext).ColorAllTicks, FallbackValue=False, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}" Height="210" Inverter="{Binding Inverter}" Margin="8,0"/>
-										</DataTemplate>
-									</ItemsControl.ItemTemplate>
-								</ItemsControl>
-                                <Button Margin="0,16,0,0" Content="Color all" Command="{Binding ToggleColorAllCommand}"></Button>
-							</StackPanel>
-						</HeaderedContentControl>
-					</WrapPanel>
-				</ScrollViewer>
-			</Grid>
-		</Grid>
-	</Grid>
+    <Grid RowDefinitions="*" x:Name="RootElement">
+        <c:BusyAnimation BusyText="{Binding BusyText}" Grid.Row="0" />
+        <Grid RowDefinitions="Auto,*,Auto" Grid.Row="0">
+
+            <StackPanel x:Name="MainContentElement" Orientation="Vertical" Margin="16" Grid.Row="0" VerticalAlignment="Top">
+                <TextBlock Text="Home Automation Control Center UI Test" FontSize="24" TextAlignment="Center" FontWeight="Bold" TextWrapping="Wrap" HorizontalAlignment="Center" />
+                <!--<TextBlock Text="{Binding ApiUri, TargetNullValue='http://www.hochstaetter.de/api'}" HorizontalAlignment="Center" />
+                <TextBlock HorizontalAlignment="Center" Margin="0,0,0,20">
+                    <Run Text="Culture:" />
+                    <Run Text="{Binding Culture, Mode=OneWay}" />
+                    <Run Text="," />
+                    <Run Text="UICulture:" />
+                    <Run Text="{Binding UiCulture, Mode=OneWay}" />
+                </TextBlock>-->
+            </StackPanel>
+            <Grid Grid.Row="1" x:Name="InnerGrid">
+                <ScrollViewer VerticalAlignment="Top" AllowAutoHide="False" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto"
+                              Height="{Binding ElementName=InnerGrid, Path=Bounds.Height}">
+                    <WrapPanel Orientation="Horizontal" Width="{Binding ElementName=InnerGrid, Path=Bounds.Width}">
+                        <WrapPanel.Styles>
+                            <Style Selector="HeaderedContentControl">
+                                <Setter Property="Margin" Value="4" />
+                            </Style>
+                        </WrapPanel.Styles>
+                        <!--<HeaderedContentControl Classes="GroupBox" Header="Half Circle Gauge">
+                            <Viewbox Width="300">
+                                <views:GaugeTestView />
+                            </Viewbox>
+                        </HeaderedContentControl>
+                        <HeaderedContentControl Classes="GroupBox" Header="Linear Gauge">
+                            <Viewbox Width="300">
+                                <views:LinearGaugeTestView />
+                            </Viewbox>
+                        </HeaderedContentControl>
+                        <HeaderedContentControl Classes="GroupBox" Header="Dialog">
+                            <StackPanel>
+                                <Button Content="Complex Error MessageBox" Command="{Binding ShowComplexDialogCommand}" />
+                                <Button Content="Simple Error MessageBox" Command="{Binding ShowSimpleDialogCommand}" />
+                            </StackPanel>
+                        </HeaderedContentControl>-->
+                        <HeaderedContentControl IsVisible="{Binding ShowInverters}" MaxWidth="{Binding Bounds.Width, ElementName=RootElement}" Classes="GroupBox" Header="{x:Static p:Resources.Inverters}">
+                            <StackPanel MaxWidth="{Binding Bounds.Width, ElementName=RootElement}">
+                                <ItemsControl ItemsSource="{Binding Inverters}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel Orientation="Horizontal" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <c:InverterControl ColorAllTicks="{Binding Path=((viewModels:UiDemoViewModel)DataContext).ColorAllTicks, FallbackValue={x:False}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+                                                               Height="250"
+                                                               Inverter="{Binding Inverter}"
+                                                               StandbyCommand="{Binding Path=((viewModels:UiDemoViewModel)DataContext).StandbyCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+                                                               StandbyCommandParameter="{Binding Inverter, RelativeSource={RelativeSource Self}}"
+                                                               Margin="8" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </HeaderedContentControl>
+                        <HeaderedContentControl Classes="GroupBox" Header="Smart Meter" IsVisible="{Binding SmartMeter, Converter={co:Null2Bool}}">
+                            <c:SmartMeterControl Height="250" VerticalAlignment="Top" Margin="8"
+                                                 MeterStatus="{Binding MeterStatus}"
+                                                 SmartMeter="{Binding SmartMeter}"
+                                                 Gen24Config="{Binding Gen24Config}"
+                                                 ColorAllTicks="{Binding ColorAllTicks}" />
+                        </HeaderedContentControl>
+                        <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.Battery}" IsVisible="{Binding BatteryGen24System, Converter={co:Null2Bool}}">
+                            <c:EnergyStorageControl Height="250" VerticalAlignment="Top" Margin="8"
+                                                    Gen24System="{Binding BatteryGen24System}"/>
+                        </HeaderedContentControl>
+                    </WrapPanel>
+                </ScrollViewer>
+            </Grid>
+            <StackPanel Grid.Row="2" Margin="16" Orientation="Horizontal">
+                <TextBlock Text="Color all ticks" Margin="0,0,8,0" />
+                <ToggleButton Classes="OnOff" Height="16"
+                              IsChecked="{Binding ColorAllTicks}" />
+            </StackPanel>
+        </Grid>
+    </Grid>
 </UserControl>

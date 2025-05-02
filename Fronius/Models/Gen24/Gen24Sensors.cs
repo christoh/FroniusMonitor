@@ -33,7 +33,7 @@ public class Gen24Sensors : BindableBase
         set => Set(ref field, value);
     }
 
-    public ObservableCollection<Gen24PowerMeter3P> Meters { get; } = [];
+    public ObservableCollection<Gen24PowerMeter3P> Meters { get; init; } = [];
 
     public Gen24PowerMeter3P? PrimaryPowerMeter => Meters.SingleOrDefault(m => m.Usage == MeterUsage.Inverter);
 }

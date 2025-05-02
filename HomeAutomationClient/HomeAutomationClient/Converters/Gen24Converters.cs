@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Avalonia.Data.Converters;
 using De.Hochstaetter.Fronius.Extensions;
 using De.Hochstaetter.HomeAutomationClient.Models.Gen24;
 
@@ -177,7 +176,7 @@ public class Gen24Status2PanelBrush : ConverterBase
 
 public class Gen24Status2Brush : ConverterBase
 {
-    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public override object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         return value is Gen24Status status ? status.ToBrush() : Brushes.Gainsboro;
     }
@@ -186,6 +185,15 @@ public class Gen24Status2Brush : ConverterBase
 public class InverterDisplayMode2Bool : EqualityConverterBase<InverterDisplayMode, bool>
 {
     public InverterDisplayMode2Bool(InverterDisplayMode value) : base(value)
+    {
+        Equal = true;
+        NotEqual = false;
+    }
+}
+
+public class MeterDisplayMode2Bool : EqualityConverterBase<MeterDisplayMode, bool>
+{
+    public MeterDisplayMode2Bool(MeterDisplayMode value) : base(value)
     {
         Equal = true;
         NotEqual = false;
@@ -204,6 +212,7 @@ public class InverterStatusLocalizeExtension : ConverterBase
             : gen24Localization.GetLocalizedString(Gen24LocalizationSection.Ui, $"INVERTER.DEVICESTATE.{statusStatusString}");
     }
 }
+
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public class PowerMeterStatusLocalizeExtension : ConverterBase
 {

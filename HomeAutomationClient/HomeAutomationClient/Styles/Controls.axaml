@@ -1,0 +1,51 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls">
+  <Design.PreviewWith>
+    <Border Padding="20">
+        <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Horizontal">
+                <c:EnergyStorageControl Width="200" Margin="10"/>
+                <c:InverterControl Width="200" Margin="10"/>
+                <c:SmartMeterControl Width="200" Margin="10"/>
+            </StackPanel>
+            <ThemeVariantScope RequestedThemeVariant="Dark">
+            <StackPanel Background="{DynamicResource BackgroundBrush}" Orientation="Horizontal">
+                <c:EnergyStorageControl Width="200" Margin="10"/>
+                <c:InverterControl Width="200" Margin="10"/>
+                <c:SmartMeterControl Width="200" Margin="10"/>
+            </StackPanel>
+            </ThemeVariantScope>
+        </StackPanel>
+    </Border>
+  </Design.PreviewWith>
+
+    <Style Selector="c|EnergyStorageControl">
+        <Setter Property="Soc0" Value="{DynamicResource Soc0}"/>
+        <Setter Property="Soc1" Value="{DynamicResource Soc1}"/>
+        <Setter Property="Soc2" Value="{DynamicResource Soc2}"/>
+        <Setter Property="Soc3" Value="{DynamicResource Soc3}"/>
+        <Setter Property="Soc4" Value="{DynamicResource Soc4}"/>
+        <Setter Property="Soc5" Value="{DynamicResource Soc5}"/>
+        <Setter Property="StatusGreen" Value="{DynamicResource BatteryBorderRunning}"/>
+        <Setter Property="StatusYellow" Value="{DynamicResource BatteryBorderWarning}"/>
+        <Setter Property="StatusRed" Value="{DynamicResource BatteryBorderFault}"/>
+    </Style>
+    
+    <Style Selector=":is(c|DeviceControlBase)">
+        <Setter Property="CleaningBackground" Value="{DynamicResource DeviceCleaning}"/>
+        <Setter Property="LcdBackground" Value="{DynamicResource Lcd}"/>
+
+        <Setter Property="OuterRunning" Value="{DynamicResource DeviceOuterBackgroundRunning}"/>
+        <Setter Property="OuterFault" Value="{DynamicResource DeviceOuterBackgroundFault}"/>
+        <Setter Property="OuterOther" Value="{DynamicResource DeviceOuterBackgroundOther}"/>
+        <Setter Property="OuterWarning" Value="{DynamicResource DeviceOuterBackgroundWarning}"/>
+        <Setter Property="OuterStartup" Value="{DynamicResource DeviceOuterBackgroundStartUp}"/>
+
+        <Setter Property="InnerRunning" Value="{DynamicResource DeviceInnerBackgroundRunning}"/>
+        <Setter Property="InnerFault" Value="{DynamicResource DeviceInnerBackgroundFault}"/>
+        <Setter Property="InnerOther" Value="{DynamicResource DeviceInnerBackgroundOther}"/>
+        <Setter Property="InnerWarning" Value="{DynamicResource DeviceInnerBackgroundWarning}"/>
+        <Setter Property="InnerStartup" Value="{DynamicResource DeviceInnerBackgroundStartup}"/>
+    </Style>
+</Styles>

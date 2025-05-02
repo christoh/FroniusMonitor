@@ -1,6 +1,7 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:homeAutomationClient="clr-namespace:De.Hochstaetter.HomeAutomationClient"
+             xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
              x:Class="De.Hochstaetter.HomeAutomationClient.App"
              >
 	<!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
@@ -13,37 +14,106 @@
 		<FluentTheme />
 		<StyleInclude Source="Styles/Buttons.axaml"/>
 		<StyleInclude Source="Styles/HeaderedContentControls.axaml"/>
+        <StyleInclude Source="Styles/Controls.axaml"/>
 	</Application.Styles>
 
 	<Application.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.ThemeDictionaries>
-				<ResourceDictionary x:Key='Light'>
+                
+                <ResourceDictionary x:Key='Light'>
 					<SolidColorBrush x:Key='BackgroundBrush'>White</SolidColorBrush>
 					<SolidColorBrush x:Key='ForegroundBrush'>Black</SolidColorBrush>
                     <SolidColorBrush x:Key='DisableBrush'>#80000000</SolidColorBrush>
-                    <SolidColorBrush x:Key='TickFill'>DarkGray</SolidColorBrush>
+
+                    <!-- Device Control -->
                     <SolidColorBrush x:Key='DeviceButtonBackground'>BurlyWood</SolidColorBrush>
                     <SolidColorBrush x:Key='DeviceButtonSelectedBackground'>LightSalmon</SolidColorBrush>
                     <SolidColorBrush x:Key='DeviceButtonMouseOver'>Coral</SolidColorBrush>
+
                     <SolidColorBrush x:Key='DeviceOuterBackgroundRunning'>AntiqueWhite</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceOuterBackgroundFault'>Red</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceOuterBackgroundWarning'>Orange</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceOuterBackgroundStartUp'>BurlyWood</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceOuterBackgroundOther'>LightGray</SolidColorBrush>
+                    
+                    <SolidColorBrush x:Key='DeviceInnerBackgroundRunning'>Cornsilk</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceInnerBackgroundFault'>OrangeRed</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceInnerBackgroundWarning'>Goldenrod</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceInnerBackgroundStartup'>LightSalmon</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceInnerBackgroundOther'>Gainsboro</SolidColorBrush>
+                    <SolidColorBrush x:Key="Lcd">#B3DBC6</SolidColorBrush>
+                    <SolidColorBrush x:Key="DeviceCleaning">Azure</SolidColorBrush>
+                    
+                    <!-- Gauge -->
                     <SolidColorBrush x:Key='UnitForeground'>Blue</SolidColorBrush>
                     <SolidColorBrush x:Key='HandFill'>DarkSlateGray</SolidColorBrush>
+                    <SolidColorBrush x:Key='TickFill'>DarkGray</SolidColorBrush>
                     <SolidColorBrush x:Key='AnimationBackground'>#10000000</SolidColorBrush>
-				</ResourceDictionary>
+                    
+                    <!-- OnOff Button -->
+                    <SolidColorBrush x:Key='ThumbFill'>DarkCyan</SolidColorBrush>
+                    <SolidColorBrush x:Key='SliderBackground'>LightSalmon</SolidColorBrush>
+                    
+                    <!-- Battery -->
+                    <Color x:Key="Soc0">DarkRed</Color>
+                    <Color x:Key="Soc1">Red</Color>
+                    <Color x:Key="Soc2">Yellow</Color>
+                    <Color x:Key="Soc3">YellowGreen</Color>
+                    <Color x:Key="Soc4">LightGreen</Color>
+                    <Color x:Key="Soc5">LawnGreen</Color>
+                    <SolidColorBrush x:Key="BatteryBorderRunning">DarkGreen</SolidColorBrush>
+                    <SolidColorBrush x:Key="BatteryBorderFault">Red</SolidColorBrush>
+                    <SolidColorBrush x:Key="BatteryBorderWarning">Gold</SolidColorBrush>
+                    
+                </ResourceDictionary>
 				<ResourceDictionary x:Key='Dark'>
-					<SolidColorBrush x:Key='BackgroundBrush'>Black</SolidColorBrush>
+                    
+                    <SolidColorBrush x:Key='BackgroundBrush'>Black</SolidColorBrush>
 					<SolidColorBrush x:Key='ForegroundBrush'>White</SolidColorBrush>
 					<SolidColorBrush x:Key='DisableBrush'>#40FFFFFF</SolidColorBrush>
-                    <SolidColorBrush x:Key='TickFill'>#606060</SolidColorBrush>
+
+                    <!-- Device Control -->
                     <SolidColorBrush x:Key='DeviceButtonBackground'>#005080</SolidColorBrush>
                     <SolidColorBrush x:Key='DeviceButtonSelectedBackground'>DarkCyan</SolidColorBrush>
                     <SolidColorBrush x:Key='DeviceButtonMouseOver'>CadetBlue</SolidColorBrush>
+                    
                     <SolidColorBrush x:Key='DeviceOuterBackgroundRunning'>#ff003050</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceOuterBackgroundFault'>DarkRed</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceOuterBackgroundWarning'>DarkGoldenrod</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceOuterBackgroundStartUp'>SaddleBrown</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceOuterBackgroundOther'>#ff606060</SolidColorBrush>
+                    
+                    <SolidColorBrush x:Key='DeviceInnerBackgroundRunning'>#ff101010</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceInnerBackgroundFault'>#d00000</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceInnerBackgroundWarning'>DarkOrange</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceInnerBackgroundStartup'>Brown</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceInnerBackgroundOther'>#404040</SolidColorBrush>
+                    <SolidColorBrush x:Key="Lcd">#335B46</SolidColorBrush>
+                    <SolidColorBrush x:Key="DeviceCleaning">Blue</SolidColorBrush>
+
+                    <!-- Gauge -->
                     <SolidColorBrush x:Key='UnitForeground'>Cyan</SolidColorBrush>
                     <SolidColorBrush x:Key='HandFill'>#C54F26</SolidColorBrush>
+                    <SolidColorBrush x:Key='TickFill'>#606060</SolidColorBrush>
                     <SolidColorBrush x:Key='AnimationBackground'>#20ffffff</SolidColorBrush>
-				</ResourceDictionary>
+                    
+                    <!-- OnOff Button -->
+                    <SolidColorBrush x:Key='ThumbFill'>DarkCyan</SolidColorBrush>
+                    <SolidColorBrush x:Key='SliderBackground'>#c54f26</SolidColorBrush>
+                    
+                    <!-- Battery -->
+                    <Color x:Key="Soc0">Red</Color>
+                    <Color x:Key="Soc1">DarkRed</Color>
+                    <Color x:Key="Soc2">DarkGoldenrod</Color>
+                    <Color x:Key="Soc3">Olive</Color>
+                    <Color x:Key="Soc4">DarkGreen</Color>
+                    <Color x:Key="Soc5">Green</Color>
+                    <SolidColorBrush x:Key="BatteryBorderRunning">#ff006080</SolidColorBrush>
+                    <SolidColorBrush x:Key="BatteryBorderFault">DarkRed</SolidColorBrush>
+                    <SolidColorBrush x:Key="BatteryBorderWarning">Goldenrod</SolidColorBrush>
+                    
+                </ResourceDictionary>
 			</ResourceDictionary.ThemeDictionaries>
 
 			<ResourceDictionary.MergedDictionaries>

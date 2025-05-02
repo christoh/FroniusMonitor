@@ -1,12 +1,99 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+        xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters">
 	<Design.PreviewWith>
 		<Border Padding="20">
-			<RadioButton Content="AC" Classes="DeviceButton"></RadioButton>
+			<StackPanel>
+				<WrapPanel Orientation="Horizontal">
+					<RadioButton Content="AC" Classes="DeviceButton"/>
+					<ToggleButton Height="8" Classes="OnOff"/>
+				</WrapPanel>
+				<ThemeVariantScope RequestedThemeVariant="Dark">
+					<WrapPanel Orientation="Horizontal" Background="{DynamicResource BackgroundBrush}">
+						<RadioButton Content="AC" Classes="DeviceButton"/>
+						<ToggleButton Height="8" Classes="OnOff"/>
+					</WrapPanel>
+				</ThemeVariantScope>
+			</StackPanel>
 		</Border>
 	</Design.PreviewWith>
 
 	<!-- Add Styles Here -->
+	<Style Selector="ToggleButton.OnOff">
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="ToggleButton">
+					<Viewbox>
+						<Grid Width="100" Height="30">
+							<Border Background="{TemplateBinding Background}"
+									CornerRadius="15"
+									BorderBrush="{TemplateBinding BorderBrush}"
+									HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+									BorderThickness="2">
+								<Grid ColumnDefinitions="*,*">
+									<Grid.Styles>
+										<Style Selector="Border">
+											<Setter Property="Background" Value="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=ToggleButton}}" />
+											<Setter Property="Width" Value="47" />
+											<Setter Property="Height" Value="24" />
+											<Setter Property="HorizontalAlignment" Value="Center" />
+											<Setter Property="VerticalAlignment" Value="Center" />
+											<Setter Property="CornerRadius" Value="15" />
+										</Style>
+										<Style Selector="TextBlock">
+											<Setter Property="FontSize" Value="18" />
+											<Setter Property="HorizontalAlignment" Value="Center" />
+											<Setter Property="Foreground" Value="{Binding BorderBrush, RelativeSource={RelativeSource FindAncestor, AncestorType=ToggleButton}}" />
+										</Style>
+									</Grid.Styles>
+									<Viewbox Grid.Column="0" StretchDirection="DownOnly">
+										<TextBlock Text="{x:Static p:Resources.On}" />
+									</Viewbox>
+									<Viewbox Grid.Column="1" StretchDirection="DownOnly">
+										<TextBlock Text="{x:Static p:Resources.Off}" />
+									</Viewbox>
+									<Border Margin="1,0,0,0" Classes="Thumb" x:Name="Thumb" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left"/>
+								</Grid>
+							</Border>
+						</Grid>
+					</Viewbox>
+				</ControlTemplate>
+
+			</Setter.Value>
+		</Setter>
+		<Setter Property="Background" Value="{DynamicResource SliderBackground}" />
+		<Setter Property="Foreground" Value="{DynamicResource ThumbFill}" />
+		<Setter Property="BorderBrush" Value="{DynamicResource ForegroundBrush}" />
+		<Style Selector="^:disabled">
+			<Setter Property="Opacity" Value=".3"></Setter>
+		</Style>
+        <Style Selector="^:checked /template/ Border.Thumb">
+            <Style.Animations>
+                <Animation Duration="0:0:0.15" IterationCount="1" FillMode="Forward">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="Margin" Value="1,0,0,0" />
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="Margin" Value="48,0,0,0" />
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+        <Style Selector="^:unchecked /template/ Border.Thumb">
+            <Style.Animations>
+                <Animation Duration="0:0:0.15" IterationCount="1" FillMode="Forward">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="Margin" Value="48,0,0,0" />
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="Margin" Value="1,0,0,0" />
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+	</Style>
+
 	<Style Selector="Button.TransparentButton">
 		<Setter Property="Background" Value="Transparent" />
 		<Setter Property="CornerRadius" Value="0" />
@@ -17,21 +104,21 @@
 
 	<Style Selector="RadioButton.DeviceButton">
 		<Setter Property="ClickMode" Value="Press" />
-        <Style Selector="^:checked /template/ Border">
-            <Setter Property="Background" Value="{DynamicResource DeviceButtonSelectedBackground}" />
-        </Style>
-        <Style Selector="^:pointerover /template/ Border">
-            <Setter Property="Background" Value="{DynamicResource DeviceButtonMouseOver}" />
-        </Style>
-        <Style Selector="^:pressed /template/ Border">
-            <Setter Property="Margin" Value="2,0,2,2"></Setter>
-        </Style>
+		<Style Selector="^:checked /template/ Border">
+			<Setter Property="Background" Value="{DynamicResource DeviceButtonSelectedBackground}" />
+		</Style>
+		<Style Selector="^:pointerover /template/ Border">
+			<Setter Property="Background" Value="{DynamicResource DeviceButtonMouseOver}" />
+		</Style>
+		<Style Selector="^:pressed /template/ Border">
+			<Setter Property="Margin" Value="1,0,1,2"></Setter>
+		</Style>
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate>
-                        <Border x:Name="Border" Background="{DynamicResource DeviceButtonBackground}" Margin="2,1" Padding="1">
-							<ContentPresenter x:Name="Content" FontSize="6" Content="{TemplateBinding Content}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-						</Border>
+					<Border x:Name="Border" Background="{DynamicResource DeviceButtonBackground}" Margin="1,1" Padding="1">
+						<ContentPresenter x:Name="Content" FontSize="6" Content="{TemplateBinding Content}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+					</Border>
 				</ControlTemplate>
 			</Setter.Value>
 		</Setter>

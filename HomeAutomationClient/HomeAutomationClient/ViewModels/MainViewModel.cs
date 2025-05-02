@@ -43,9 +43,9 @@ public sealed partial class MainViewModel : ViewModelBase
                 await dialogBase.AbortAsync().ConfigureAwait(false);
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // async void must be caught to avoid unhandled exceptions
+            await ex.Show().ConfigureAwait(false);
         }
     }
 
@@ -53,8 +53,7 @@ public sealed partial class MainViewModel : ViewModelBase
     {
         try
         {
-            await base.Initialize();
-
+            await base.Initialize().ConfigureAwait(false);
 
             var loginViewModel = new LoginViewModel(new DialogParameters
             {
@@ -62,10 +61,15 @@ public sealed partial class MainViewModel : ViewModelBase
                 ShowCloseBox = false,
             });
 
-            var isLoggedIn = await loginViewModel.ShowDialogAsync();
-            BusyText= Resources.Loading;
+            var isLoggedIn = await loginViewModel.ShowDialogAsync().ConfigureAwait(false);
+            BusyText = Resources.GetInverterLocalization;
             await gen24Loc.Initialize().ConfigureAwait(false);
             await Dispatcher.UIThread.InvokeAsync(() => MainViewContent = new UiDemoView());
+        }
+        catch (Exception ex)
+        {
+            BusyText = null;
+            await ex.Show().ConfigureAwait(false);
         }
         finally
         {

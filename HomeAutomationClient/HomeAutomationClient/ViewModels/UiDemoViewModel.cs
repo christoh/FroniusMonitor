@@ -22,13 +22,27 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
     [ObservableProperty]
     public partial bool ColorAllTicks { get; set; } = true;
-    
+
     [ObservableProperty]
     public partial ObservableCollection<KeyedInverter> Inverters { get; set; } = [];
 
+    [ObservableProperty]
+    public partial Gen24PowerMeter3P? SmartMeter { get; set; }
+
+    [ObservableProperty]
+    public partial Gen24Status? MeterStatus { get; set; }
+
+    [ObservableProperty]
+    public partial Gen24Config? Gen24Config { get; set; }
+    
+    [ObservableProperty]
+    public partial Gen24System? BatteryGen24System { get; set; }
+
+    public bool ShowInverters => Inverters.Count > 0;
+
     public override async Task Initialize()
     {
-        BusyText = Resources.Loading;
+        BusyText = Resources.ConnectingToHas;
         await base.Initialize();
         timer = new(TimerElapsed, null, 0, 1000);
     }
@@ -44,12 +58,6 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
         Dispose();
     }
 
-    [RelayCommand]
-    private void ToggleColorAll()
-    {
-        ColorAllTicks = !ColorAllTicks;
-    }
-
     private async void TimerElapsed(object? state)
     {
         try
@@ -63,18 +71,30 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
             foreach (var inverter in Inverters)
             {
+                if (inverter.Inverter.Sensors is { Storage: not null, PrimaryPowerMeter: not null })
+                {
+                    Gen24Config = inverter.Inverter.Config;
+                    MeterStatus = inverter.Inverter.Sensors.MeterStatus;
+                    SmartMeter = inverter.Inverter.Sensors.PrimaryPowerMeter;
+                    BatteryGen24System = inverter.Inverter;
+                }
+
                 var updatedInverter = inverters.FirstOrDefault(i => i.Key == inverter.Key);
 
                 if (updatedInverter.Key != null)
                 {
-                    inverter.Inverter?.CopyFrom(updatedInverter.Value);
+                    inverter.Inverter.CopyFrom(updatedInverter.Value);
                     inverters.Remove(updatedInverter);
                 }
             }
 
             foreach (var inverter in inverters)
             {
-                Dispatcher.UIThread.InvokeAsync(() => Inverters.Add(new KeyedInverter { Key = inverter.Key, Inverter = inverter.Value }));
+                _ = Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    Inverters.Add(new KeyedInverter { Key = inverter.Key, Inverter = inverter.Value });
+                    NotifyOfPropertyChange(nameof(ShowInverters));
+                });
             }
         }
         catch
@@ -85,6 +105,12 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
         {
             BusyText = null;
         }
+    }
+
+    [RelayCommand]
+    private async Task Standby(Gen24System gen24System)
+    {
+        await new NotImplementedException("Coming soon").Show().ConfigureAwait(false);
     }
 
     [RelayCommand]

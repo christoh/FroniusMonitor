@@ -9,9 +9,10 @@
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="650"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.MainView"
              x:DataType="vm:MainViewModel">
-    <Grid RowDefinitions="*">
-        <UserControl Grid.Row="0" Content="{Binding MainViewContent}" IsEnabled="{Binding IsDialogVisible, Converter={co:BoolInverter}}"/>
-        <Grid Grid.Row="0" Background="{DynamicResource DisableBrush}" x:Name="DialogOverlay" IsVisible="{Binding IsDialogVisible}">
+	<Grid RowDefinitions="*">
+		<UserControl Grid.Row="0" Content="{Binding MainViewContent}" IsEnabled="{Binding IsDialogVisible, Converter={co:BoolInverter}}"/>
+		<c:BusyAnimation BusyText="{Binding BusyText}" Grid.Row="0"/>
+		<Grid Grid.Row="0" Background="{DynamicResource DisableBrush}" x:Name="DialogOverlay" IsVisible="{Binding IsDialogVisible}">
 			<Grid RowDefinitions="Auto,*" Background="White" HorizontalAlignment="Center" VerticalAlignment="Center">
 				<Grid ColumnDefinitions="Auto,*,Auto" Background="{DynamicResource SystemControlBackgroundAccentBrush}">
 					<Grid.Styles>
@@ -25,15 +26,15 @@
 							<Setter Property="Background" Value="{DynamicResource SystemControlBackgroundAccentBrush}" />
 							<Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundChromeWhiteBrush}"/>
 							<Setter Property="Content" Value="X" />
-                            <Setter Property="Command" Value="{Binding DialogClosedCommand}"/>
+							<Setter Property="Command" Value="{Binding DialogClosedCommand}"/>
 						</Style>
 					</Grid.Styles>
-                    <Image Margin="4,0,0,0" Source="/Assets/Images/sun.ico" Width="16"/>
+					<Image Margin="4,0,0,0" Source="/Assets/Images/sun.ico" Width="16"/>
 					<TextBlock x:Name="TitleTextBlock" Grid.Row="0" Grid.Column="1" Padding="5" Text="{Binding CurrentDialog.Title, FallbackValue=''}" Foreground="{DynamicResource SystemControlForegroundChromeWhiteBrush}" />
 					<Button Classes="TransparentButton CloseButton" Grid.Row="0" Grid.Column="2" IsTabStop="False" IsVisible="{Binding CurrentDialog.ShowCloseBox, FallbackValue=True}"/>
 				</Grid>
 				<UserControl Grid.Row="1" MinWidth="100" Background="{DynamicResource BackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" x:Name="DialogHost" Content="{Binding CurrentDialog.Body, FallbackValue={x:Null}}"/>
-                <c:BusyAnimation Grid.Row="1" BusyText="{Binding DialogBusyText}"/>
+				<c:BusyAnimation Grid.Row="1" BusyText="{Binding DialogBusyText}"/>
 			</Grid>
 		</Grid>
 	</Grid>

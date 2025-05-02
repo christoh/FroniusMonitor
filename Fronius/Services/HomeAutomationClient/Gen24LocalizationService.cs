@@ -76,7 +76,7 @@ public class Gen24LocalizationService(IWebClientService webClient) : IGen24Local
             {
                 return null;
             }
-
+            
             return currentDictionary.ValueKind == JsonValueKind.String ? currentDictionary.GetString() : null;
         }
     }

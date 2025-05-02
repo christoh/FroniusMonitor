@@ -1,4 +1,7 @@
 using System.Security.Cryptography;
+using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
+using Avalonia.Styling;
 
 namespace De.Hochstaetter.HomeAutomationClient.Views;
 

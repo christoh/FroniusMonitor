@@ -1267,7 +1267,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Connecting.
+        ///   Looks up a localized string similar to Connecting to Home Automation Server.
         /// </summary>
         public static string ConnectingToHas {
             get {
@@ -1290,6 +1290,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string CouldNotChangeStandBy {
             get {
                 return ResourceManager.GetString("CouldNotChangeStandBy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exchanging cryptographic keys.
+        /// </summary>
+        public static string CryptoInit {
+            get {
+                return ResourceManager.GetString("CryptoInit", resourceCulture);
             }
         }
         
@@ -1911,6 +1920,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Gen24InverterHeader {
             get {
                 return ResourceManager.GetString("Gen24InverterHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Getting inverter localization files.
+        /// </summary>
+        public static string GetInverterLocalization {
+            get {
+                return ResourceManager.GetString("GetInverterLocalization", resourceCulture);
             }
         }
         

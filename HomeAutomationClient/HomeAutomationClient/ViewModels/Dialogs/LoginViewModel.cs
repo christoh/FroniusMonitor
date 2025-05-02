@@ -19,7 +19,7 @@ public partial class LoginViewModel(DialogParameters parameters) : Adapters.Dial
     public override async Task Initialize()
     {
         await base.Initialize();
-        BusyText = Resources.ConnectingToHas;
+        BusyText = Resources.CryptoInit;
 
         try
         {
@@ -29,9 +29,9 @@ public partial class LoginViewModel(DialogParameters parameters) : Adapters.Dial
 
             if (!string.IsNullOrEmpty(UserName))
             {
-                await keyProvider.SetKeyFromUserName(UserName);
+                await keyProvider.SetKeyFromUserName(UserName).ConfigureAwait(false);
                 WebConnection.InvalidateKey();
-                var cachedConnection = await cache.GetAsync<HomeAutomationServerConnection>(CacheKeys.Connection);
+                var cachedConnection = await cache.GetAsync<HomeAutomationServerConnection>(CacheKeys.Connection).ConfigureAwait(false);
 
                 if (cachedConnection != null)
                 {
@@ -48,6 +48,7 @@ public partial class LoginViewModel(DialogParameters parameters) : Adapters.Dial
         }
         catch(Exception ex)
         {
+            BusyText = null;
             await ex.Show();
         }
         finally
@@ -116,21 +117,12 @@ public partial class LoginViewModel(DialogParameters parameters) : Adapters.Dial
             await connection.UpdateChecksumAsync();
             await cache.AddOrUpdateAsync(CacheKeys.Connection, connection);
 
-            var apiResult = await webClient.ListDevices();
-
-            await new MessageBox
-            {
-                Icon = new InfoIcon(),
-                Title = "Test",
-                Text = "The following devices were found:",
-                ItemList = apiResult.Payload?.Values.Select(d => $"{d.DeviceType}: {d.DisplayName}").ToList(),
-            }.Show();
-
             Result = true;
             Close();
         }
         catch (Exception ex)
         {
+            BusyText = null;
             await ex.Show();
         }
         finally

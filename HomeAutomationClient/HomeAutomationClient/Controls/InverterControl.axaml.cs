@@ -32,7 +32,7 @@ public enum InverterDisplayMode
 }
 
 
-public partial class InverterControl : UserControl
+public partial class InverterControl : DeviceControlBase
 {
     private static readonly IReadOnlyList<InverterDisplayMode> acModes =
     [
@@ -84,9 +84,33 @@ public partial class InverterControl : UserControl
         get => GetValue(InverterProperty);
         set => SetValue(InverterProperty, value);
     }
-    
+
+    public static readonly StyledProperty<ICommand?> StandbyCommandProperty = AvaloniaProperty.Register<InverterControl, ICommand?>(nameof(StandbyCommand));
+
+    public ICommand? StandbyCommand
+    {
+        get => GetValue(StandbyCommandProperty);
+        set => SetValue(StandbyCommandProperty, value);
+    }
+
+    public static readonly StyledProperty<object?> StandbyCommandParameterProperty = AvaloniaProperty.Register<InverterControl, object?>(nameof(StandbyCommandParameter));
+
+    public object? StandbyCommandParameter
+    {
+        get => GetValue(StandbyCommandParameterProperty);
+        set => SetValue(StandbyCommandParameterProperty, value);
+    }
+
+    public static readonly StyledProperty<bool> IsStandbyProperty = AvaloniaProperty.Register<InverterControl, bool>(nameof(IsStandby));
+
+    public bool IsStandby
+    {
+        get => GetValue(IsStandbyProperty);
+        set => SetValue(IsStandbyProperty, value);
+    }
+
     public static readonly StyledProperty<bool> ColorAllTicksProperty = AvaloniaProperty.Register<InverterControl, bool>(nameof(ColorAllTicks));
-    
+
     public bool ColorAllTicks
     {
         get => GetValue(ColorAllTicksProperty);
@@ -105,7 +129,44 @@ public partial class InverterControl : UserControl
     {
         InitializeComponent();
     }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+
+        switch (change.Property.Name)
+        {
+            case nameof(Inverter):
+                ChangeInner();
+                ChangeOuter();
+                break;
+        }
+    }
     
+    protected override void ChangeOuter()
+    {
+        BackgroundProvider.Background = Inverter?.Sensors?.InverterStatus?.StatusCode switch
+        {
+            "STATE_ERROR" => OuterFault,
+            "STATE_RUNNING" => OuterRunning,
+            "STATE_WARNING" => OuterWarning,
+            "STATE_STARTUP" => OuterStartup,
+            _ => OuterOther,
+        };
+    }
+    
+    protected override void ChangeInner()
+    {
+        InnerBackgroundProvider.Background = Inverter?.Sensors?.InverterStatus?.StatusCode switch
+        {
+            "STATE_ERROR" => InnerFault,
+            "STATE_RUNNING" => InnerRunning,
+            "STATE_WARNING" => InnerWarning,
+            "STATE_STARTUP" => InnerStartup,
+            _ => InnerOther,
+        };
+    }
+
     private void CycleMode(IReadOnlyList<InverterDisplayMode> modeList, ref int index)
     {
         index = modeList.Contains(Mode) ? ++index % modeList.Count : 0;
@@ -119,5 +180,12 @@ public partial class InverterControl : UserControl
     private void OnEnergyClicked(object sender, RoutedEventArgs e) => CycleMode(energyModes, ref energyIndex);
 
     private void OnMoreClicked(object sender, RoutedEventArgs e) => CycleMode(moreModes, ref currentMoreIndex);
-    
+
+    private void OnStandbyClicked(object? sender, RoutedEventArgs e)
+    {
+        if (StandbyCommand?.CanExecute(StandbyCommandParameter) is true)
+        {
+            StandbyCommand?.Execute(StandbyCommandParameter);
+        }
+    }
 }

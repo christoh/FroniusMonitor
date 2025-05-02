@@ -150,8 +150,10 @@ EOF
 FROM alpine:latest
 
 RUN apk --no-cache update && \
-    apk --no-cache upgrade && \
-    apk --no-cache add nginx nginx-mod-http-brotli fastfetch curl
+    apk --no-cache upgrade
+
+RUN apk --no-cache add nginx nginx-mod-http-brotli
+RUN apk --no-cache add fastfetch curl
 
 WORKDIR /
 COPY --from=builder /build/root /
@@ -159,3 +161,4 @@ EXPOSE 42741
 
 CMD ["/startup.sh"]
 HEALTHCHECK CMD curl http://127.0.0.1:42741 -sD - | fgrep "<title>Home Automation Control Center</title>" || exit 1
+

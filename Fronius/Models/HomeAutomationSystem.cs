@@ -58,12 +58,16 @@ public class HomeAutomationSystem : BindableBase
         set => Set(ref field, value);
     }
 
+    [Obsolete("Use same property in Gen24System")]
     public double? StorageNetCapacity => Gen24Sensors?.Storage?.MaxCapacity * NetStateOfChangeIfFull;
 
+    [Obsolete("Use same property in Gen24System")]
     public double? MaxStorageNetCapacity => Gen24Sensors?.Storage?.MaxCapacity * GetNetStateOfChargeIfFull((Gen24Config?.BatterySettings?.Limits is SocLimits.UseManufacturerDefault or null ? 100 : Gen24Config?.BatterySettings?.SocMax ?? 100) / 100d);
 
+    [Obsolete("Use same property in Gen24System")]
     public double? NetStateOfChange => StorageNetCapacity / MaxStorageNetCapacity;
 
+    [Obsolete("Use same property in Gen24System")]
     public double? NetStateOfChangeIfFull => GetNetStateOfChargeIfFull(Gen24Sensors?.Storage?.StateOfCharge);
 
     private double? GetNetStateOfChargeIfFull(double? stateOfCharge)

@@ -1567,7 +1567,7 @@
 	  <value>HTTP-Fehler</value>
   </data>
   <data name="ConnectingToHas" xml:space="preserve">
-	  <value>Verbinde</value>
+	  <value>Verbinde mit dem Home Automation Server</value>
   </data>
   <data name="CannotLogin" xml:space="preserve">
 	  <value>Kann Benutzer nicht anmelden</value>
@@ -1580,5 +1580,11 @@
   </data>
   <data name="DeviceNotFound" xml:space="preserve">
 	  <value>Das Gerät '{0}' wurde nicht gefunden</value>
+  </data>
+  <data name="GetInverterLocalization" xml:space="preserve">
+	  <value>Lade Sprachdateien vom Wechselrichter</value>
+  </data>
+  <data name="CryptoInit" xml:space="preserve">
+	  <value>Tausche kryptografische Schlüssel aus</value>
   </data>
 </root>
