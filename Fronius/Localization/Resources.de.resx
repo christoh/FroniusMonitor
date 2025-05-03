@@ -1600,6 +1600,6 @@
 	  <value>Das Gerät '{0}' hat Ein- und Ausschalten deaktiviert</value>
   </data>
   <data name="HttpForbidden" xml:space="preserve">
-	  <value>Sie sind nicht berechtigt, diese Aktion auszuführen</value>
+	  <value>Du bist nicht berechtigt, diese Aktion auszuführen</value>
   </data>
 </root>
