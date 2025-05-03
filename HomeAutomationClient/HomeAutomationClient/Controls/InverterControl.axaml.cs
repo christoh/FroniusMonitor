@@ -136,6 +136,7 @@ public partial class InverterControl : DeviceControlBase
 
         switch (change.Property.Name)
         {
+            //TODO: Handle INotifyPropertyChanged for Inverter
             case nameof(Inverter):
                 ChangeInner();
                 ChangeOuter();

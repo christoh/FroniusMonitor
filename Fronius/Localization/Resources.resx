@@ -1662,4 +1662,19 @@
   <data name="CryptoInit" xml:space="preserve">
 	  <value>Exchanging cryptographic keys</value>
   </data>
+  <data name="UnknownDevice" xml:space="preserve">
+	  <value>Unknown Device</value>
+  </data>
+  <data name="CanOnlyTurnOnOrOff" xml:space="preserve">
+	  <value>Can only switch 'on' or 'off'</value>
+  </data>
+  <data name="DeviceNotSwitchable" xml:space="preserve">
+	  <value>The device '{0}' is not switchable</value>
+  </data>
+  <data name="DeviceSwitchingDisabled" xml:space="preserve">
+	  <value>The device '{0}' has switching disabled</value>
+  </data>
+  <data name="HttpForbidden" xml:space="preserve">
+	  <value>You are not allowed to perform this action</value>
+  </data>
 </root>

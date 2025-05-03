@@ -22,7 +22,7 @@ internal static class ErrorBoxes
 
     public static async ValueTask Show(this MessageBox parameters)
     {
-        await new MessageBoxViewModel(parameters).ShowDialogAsync().ConfigureAwait(false);
+        await new MessageBoxViewModel(parameters).ShowDialogAsync();
     }
 
     public static async ValueTask Show(this Exception ex)

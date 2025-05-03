@@ -17,4 +17,8 @@ public interface IWebClientService : IDisposable
     Task<ApiResult<IDictionary<string, Gen24System>>> GetGen24Devices(CancellationToken token = default);
 
     Task<ApiResult<JsonElement>> GetGen24Localization(string deviceId, string iso2LanguageCode, string name, CancellationToken token = default);
+
+    Task<ApiResult<IDictionary<string, FritzBoxDevice>>> GetFritzBoxDevices(CancellationToken token = default);
+
+    Task<ApiResult<bool>> SwitchDevice(string deviceId, bool turnOn, CancellationToken token = default);
 }

@@ -53,21 +53,28 @@ public partial class PowerConsumer
 
     private async void OnPowerButtonClick(object sender, RoutedEventArgs e)
     {
-        if (Device is not { IsPresent: true, CanSwitch: true })
-        {
-            return;
-        }
-
-        dataCollectionService.SuspendPowerConsumers();
-
         try
         {
-            await Device.TurnOnOff(!Device.IsTurnedOn.HasValue || !Device.IsTurnedOn.Value).ConfigureAwait(false);
-            await Task.Delay(1000).ConfigureAwait(false);
+            if (Device is not { IsPresent: true, CanSwitch: true })
+            {
+                return;
+            }
+
+            dataCollectionService.SuspendPowerConsumers();
+
+            try
+            {
+                await Device.TurnOnOff(!Device.IsTurnedOn.HasValue || !Device.IsTurnedOn.Value).ConfigureAwait(false);
+                await Task.Delay(1000).ConfigureAwait(false);
+            }
+            finally
+            {
+                dataCollectionService.ResumePowerConsumers();
+            }
         }
-        finally
+        catch
         {
-            dataCollectionService.ResumePowerConsumers();
+            // async void must be caught
         }
     }
 

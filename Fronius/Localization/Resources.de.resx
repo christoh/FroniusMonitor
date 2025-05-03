@@ -1587,4 +1587,19 @@
   <data name="CryptoInit" xml:space="preserve">
 	  <value>Tausche kryptografische Schlüssel aus</value>
   </data>
+  <data name="UnknownDevice" xml:space="preserve">
+	  <value>Unbekanntes Gerät</value>
+  </data>
+  <data name="CanOnlyTurnOnOrOff" xml:space="preserve">
+	  <value>Kann nur nach 'on' oder 'off' schalten</value>
+  </data>
+  <data name="DeviceNotSwitchable" xml:space="preserve">
+	  <value>Das Gerät '{0}' ist nicht schaltbar</value>
+  </data>
+  <data name="DeviceSwitchingDisabled" xml:space="preserve">
+	  <value>Das Gerät '{0}' hat Ein- und Ausschalten deaktiviert</value>
+  </data>
+  <data name="HttpForbidden" xml:space="preserve">
+	  <value>Sie sind nicht berechtigt, diese Aktion auszuführen</value>
+  </data>
 </root>

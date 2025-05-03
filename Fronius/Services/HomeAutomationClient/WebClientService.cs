@@ -18,6 +18,8 @@ public sealed class WebClientService : IWebClientService
         httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(productName, version));
     }
 
+    #region Identity
+
     public async Task<byte[]> GetKeyForUserName(string userName, CancellationToken token = default)
     {
         var keyString = await httpClient.GetStringAsync($"Identity/requestKey?user={userName}", token).ConfigureAwait(false);
@@ -30,10 +32,23 @@ public sealed class WebClientService : IWebClientService
         return await Get($"Identity/login?user={userName}&password={password}", token).ConfigureAwait(false);
     }
 
+    #endregion
+
+    #region Devices
+
     public Task<ApiResult<IDictionary<string, DeviceInfo>>> ListDevices(CancellationToken token = default)
     {
         return GetResult<IDictionary<string, DeviceInfo>>("Devices", token);
     }
+
+    public Task<ApiResult<bool>> SwitchDevice(string deviceId, bool turnOn, CancellationToken token = default)
+    {
+        return GetResult<bool>($"Devices/{deviceId}/switch/{(turnOn ? "on" : "off")}", token);
+    }
+
+    #endregion
+
+    #region Gen24
 
     public Task<ApiResult<IDictionary<string, Gen24System>>> GetGen24Devices(CancellationToken token = default)
     {
@@ -44,6 +59,17 @@ public sealed class WebClientService : IWebClientService
     {
         return GetResult<JsonElement>($"gen24system/{deviceId}/{iso2LanguageCode}/{name}", token);
     }
+
+    #endregion
+
+    #region Fritzbox
+
+    public Task<ApiResult<IDictionary<string, FritzBoxDevice>>> GetFritzBoxDevices(CancellationToken token = default)
+    {
+        return GetResult<IDictionary<string, FritzBoxDevice>>("FritzBoxDevice", token);
+    }
+
+    #endregion
 
     private async ValueTask<ProblemDetails?> Get(string queryString, CancellationToken token = default)
     {
@@ -94,7 +120,8 @@ public sealed class WebClientService : IWebClientService
                 Title = ex.GetType().Name,
                 Detail = ex.Message,
                 Status = responseMessage?.StatusCode,
-            });
+                Errors = new Dictionary<string, List<string>> { { "Errors", [ex.Message] } },
+            }, ex);
         }
         finally
         {

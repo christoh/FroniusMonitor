@@ -1042,6 +1042,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Can only switch &apos;on&apos; or &apos;off&apos;.
+        /// </summary>
+        public static string CanOnlyTurnOnOrOff {
+            get {
+                return ResourceManager.GetString("CanOnlyTurnOnOrOff", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Capacity.
         /// </summary>
         public static string Capacity {
@@ -1434,6 +1443,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string DeviceNotFound {
             get {
                 return ResourceManager.GetString("DeviceNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The device &apos;{0}&apos; is not switchable.
+        /// </summary>
+        public static string DeviceNotSwitchable {
+            get {
+                return ResourceManager.GetString("DeviceNotSwitchable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The device &apos;{0}&apos; has switching disabled.
+        /// </summary>
+        public static string DeviceSwitchingDisabled {
+            get {
+                return ResourceManager.GetString("DeviceSwitchingDisabled", resourceCulture);
             }
         }
         
@@ -2055,6 +2082,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string HttpError {
             get {
                 return ResourceManager.GetString("HttpError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You are not allowed to perform this action.
+        /// </summary>
+        public static string HttpForbidden {
+            get {
+                return ResourceManager.GetString("HttpForbidden", resourceCulture);
             }
         }
         
@@ -4422,6 +4458,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Unknown {
             get {
                 return ResourceManager.GetString("Unknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown Device.
+        /// </summary>
+        public static string UnknownDevice {
+            get {
+                return ResourceManager.GetString("UnknownDevice", resourceCulture);
             }
         }
         

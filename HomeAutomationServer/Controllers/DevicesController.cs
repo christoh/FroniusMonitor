@@ -1,4 +1,5 @@
-﻿using De.Hochstaetter.Fronius.Models.WebApi;
+﻿using System.Security.Authentication;
+using De.Hochstaetter.Fronius.Models.WebApi;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using Microsoft.AspNetCore.Http;
 
@@ -15,6 +16,7 @@ public class DevicesController(IDataControlService controlService, ILogger<Devic
     public IActionResult ListDevices()
     {
         var result = new Dictionary<string, DeviceInfo>();
+
         controlService.Entities.Apply(e =>
         {
             var info = new DeviceInfo();
@@ -59,7 +61,7 @@ public class DevicesController(IDataControlService controlService, ILogger<Devic
         }
 
         logger.LogError("{Username} requested {DeviceName} from {Ip} but it was not found", HttpContext.User.Identity!.Name, id, HttpContext.Connection.RemoteIpAddress);
-        return NotFound(Helpers.GetProblemDetails("Unknown device", $"The device {id} was not found"));
+        return NotFound(Helpers.GetProblemDetails(Loc.UnknownDevice, string.Format(Loc.DeviceNotFound, id)));
     }
 
     [HttpGet("{id}/credentials")]
@@ -76,6 +78,66 @@ public class DevicesController(IDataControlService controlService, ILogger<Devic
         }
 
         logger.LogError("The device {DeviceName} was not found", id);
-        return NotFound(Helpers.GetProblemDetails("Unknown device", $"The device {id} was not found"));
+        return NotFound(Helpers.GetProblemDetails(Loc.UnknownDevice, string.Format(Loc.DeviceNotFound, id)));
+    }
+
+    [HttpGet("{id}/switch/{state}")]
+    [BasicAuthorize(Roles = "PowerUser")]
+    [ProducesResponseType<bool?>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> SwitchDevice([FromRoute] string id, [FromRoute] string state)
+    {
+        bool turnOn;
+        bool? previousState;
+
+        try
+        {
+            turnOn = state.ToLowerInvariant() switch
+            {
+                "on" => true,
+                "off" => false,
+                _ => throw new ArgumentException(Loc.CanOnlyTurnOnOrOff),
+            };
+
+            if (!controlService.Entities.TryGetValue(id, out var device))
+            {
+                logger.LogError("The device {DeviceName} was not found", id);
+                return NotFound(Helpers.GetProblemDetails(Loc.UnknownDevice, string.Format(Loc.DeviceNotFound, id)));
+            }
+
+            var deviceName = device.Device is IHaveDisplayName namedDevice ? namedDevice.DisplayName : id;
+
+            logger.LogInformation
+            (
+                "{Username} want to switch {DeviceName} to {OnOff} from {Ip}",
+                HttpContext.User.Identity!.Name,
+                device.Device.Id,
+                turnOn ? "on" : "off",
+                HttpContext.Connection.RemoteIpAddress
+            );
+
+            if (device.Device is not ISwitchable switchableDevice)
+            {
+                logger.LogError("The device {DeviceName} is not switchable", id);
+                return UnprocessableEntity(Helpers.GetProblemDetails(Loc.Error, string.Format(Loc.DeviceNotSwitchable, deviceName)));
+            }
+
+            if (!switchableDevice.IsSwitchingEnabled)
+            {
+                logger.LogError("Switching is disabled for {DeviceName}", id);
+                return UnprocessableEntity(Helpers.GetProblemDetails(Loc.Error, string.Format(Loc.DeviceSwitchingDisabled, deviceName)));
+            }
+
+            previousState = switchableDevice.IsTurnedOn;
+            await switchableDevice.TurnOnOff(turnOn).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            return UnprocessableEntity(Helpers.GetProblemDetails(ex.GetType().Name, ex.Message));
+        }
+
+        return Ok(!previousState.HasValue || previousState.Value != turnOn);
     }
 }
