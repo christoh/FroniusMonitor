@@ -264,10 +264,10 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
     });
 
     [RelayCommand]
-    private async Task Standby(Gen24System gen24System)
+    private Task Standby(string key) => TaskExceptionHandler(async () =>
     {
-        await new NotImplementedException("Coming soon").Show().ConfigureAwait(false);
-    }
+        await new NotImplementedException("Coming soon").Show();
+    });
 
     [RelayCommand]
     private async Task ShowComplexDialog()
