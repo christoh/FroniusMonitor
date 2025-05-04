@@ -1438,7 +1438,61 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The device &apos;{0}&apos; was not found.
+        ///   Looks up a localized string similar to Coloring is diabled for device &apos;{0}&apos;..
+        /// </summary>
+        public static string DeviceColoringDisabled {
+            get {
+                return ResourceManager.GetString("DeviceColoringDisabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Support for color temperature is disabled on device &apos;{0}&apos;..
+        /// </summary>
+        public static string DeviceColorTemperatureDisabled {
+            get {
+                return ResourceManager.GetString("DeviceColorTemperatureDisabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dimming is disabled for device &apos;{0}&apos;..
+        /// </summary>
+        public static string DeviceDimmingDisabled {
+            get {
+                return ResourceManager.GetString("DeviceDimmingDisabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The device &apos;{0}&apos; has no support for color temperature..
+        /// </summary>
+        public static string DeviceHasNoColorTemperature {
+            get {
+                return ResourceManager.GetString("DeviceHasNoColorTemperature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The device &apos;{0}&apos; has no color support..
+        /// </summary>
+        public static string DeviceNotColorable {
+            get {
+                return ResourceManager.GetString("DeviceNotColorable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The device &apos;{0}&apos; is not dimmable..
+        /// </summary>
+        public static string DeviceNotDimmable {
+            get {
+                return ResourceManager.GetString("DeviceNotDimmable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The device &apos;{0}&apos; was not found..
         /// </summary>
         public static string DeviceNotFound {
             get {
@@ -1447,7 +1501,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The device &apos;{0}&apos; is not switchable.
+        ///   Looks up a localized string similar to The device &apos;{0}&apos; is not switchable..
         /// </summary>
         public static string DeviceNotSwitchable {
             get {
@@ -1456,7 +1510,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The device &apos;{0}&apos; has switching disabled.
+        ///   Looks up a localized string similar to The device &apos;{0}&apos; has switching disabled..
         /// </summary>
         public static string DeviceSwitchingDisabled {
             get {

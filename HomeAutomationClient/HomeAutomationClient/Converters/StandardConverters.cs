@@ -72,6 +72,8 @@ public class Bool2Char : Bool2AnythingBase<char>
     }
 }
 
+public class Bool2Double : Bool2AnythingBase<double>;
+
 public class DateConverter : ConverterBase
 {
     public string StringFormat { get; set; } = "G";

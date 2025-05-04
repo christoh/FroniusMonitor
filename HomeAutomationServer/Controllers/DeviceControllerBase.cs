@@ -22,14 +22,7 @@ public abstract class DeviceControllerBase(IDataControlService controlService, I
         });
 
         var result = new Dictionary<string, T>(list);
-
-        if (result.Count > 0)
-        {
-            return Ok(result);
-        }
-
-        logger.LogError("No devices of type {DeviceType} were found", typeof(T).Name);
-        return NotFound(Helpers.GetProblemDetails("No devices found", $"No devices of type {typeof(T).Name} were found"));
+        return Ok(result);
     }
 
     protected IActionResult GetDevice<T>(string id)

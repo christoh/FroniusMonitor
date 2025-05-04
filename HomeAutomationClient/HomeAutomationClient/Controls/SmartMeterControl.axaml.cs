@@ -1,5 +1,3 @@
-using Avalonia.Interactivity;
-
 namespace De.Hochstaetter.HomeAutomationClient.Controls;
 
 public enum MeterDisplayMode
@@ -97,11 +95,11 @@ public partial class SmartMeterControl : DeviceControlBase
         InitializeComponent();
     }
 
-    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs e)
     {
-        base.OnPropertyChanged(change);
+        base.OnPropertyChanged(e);
 
-        switch (change.Property.Name)
+        switch (e.Property.Name)
         {
             case nameof(MeterStatus):
                 ChangeInner();

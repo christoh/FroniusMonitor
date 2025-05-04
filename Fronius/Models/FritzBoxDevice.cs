@@ -40,7 +40,7 @@ public enum FritzBoxFeatures : uint
 }
 
 [XmlType("device")]
-public class FritzBoxDevice : BindableBase, IPowerConsumer1P
+public partial class FritzBoxDevice : BindableBase, IPowerConsumer1P
 {
     public void CopyFrom(FritzBoxDevice other)
     {
@@ -83,7 +83,7 @@ public class FritzBoxDevice : BindableBase, IPowerConsumer1P
         set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(Features)));
     }
 
-    [XmlIgnore]
+    [XmlIgnore, JsonIgnore]
     public FritzBoxFeatures Features
     {
         get => (FritzBoxFeatures)FunctionMask;

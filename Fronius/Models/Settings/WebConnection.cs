@@ -89,7 +89,7 @@ public class WebConnection : BindableBase, ICloneable, IHaveDisplayName
                 Password = Encoding.UTF8.GetString(decrypt.TransformFinalBlock(bytes, 0, bytes.Length));
             }
             catch (PlatformNotSupportedException) { }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Password = string.Empty;
             }

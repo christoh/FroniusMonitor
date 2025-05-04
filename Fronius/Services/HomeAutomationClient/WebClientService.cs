@@ -46,6 +46,42 @@ public sealed class WebClientService : IWebClientService
         return GetResult<bool>($"Devices/{deviceId}/switch/{(turnOn ? "on" : "off")}", token);
     }
 
+    public Task<ApiResult<bool>> SetDeviceBrightness(string deviceId, double amount, CancellationToken token = default)
+    {
+        return GetResult<bool>($"Devices/{deviceId}/setBrightness?amount={amount.ToString(CultureInfo.InvariantCulture)}", token);
+    }
+
+    public Task<ApiResult<bool>> SetColorTemperature(string deviceId, double temperatureKelvin, CancellationToken token = default)
+    {
+        return GetResult<bool>($"Devices/{deviceId}/setColorTemperature?temperatureKelvin={temperatureKelvin.ToString(CultureInfo.InvariantCulture)}", token);
+    }
+
+    public Task<ApiResult<bool>> SetHsv(string deviceId, double? hueDegrees = null, double? saturation = null, double? value = null, CancellationToken token = default)
+    {
+        var builder = new StringBuilder($"Devices/{deviceId}/setHsv?");
+
+        if (hueDegrees.HasValue)
+        {
+            builder.Append($"hueDegrees={hueDegrees.Value.ToString(CultureInfo.InvariantCulture)}&");
+        }
+
+        if (saturation.HasValue)
+        {
+            builder.Append($"saturation={saturation.Value.ToString(CultureInfo.InvariantCulture)}&");
+        }
+
+        if (value.HasValue)
+        {
+            builder.Append($"value={value.Value.ToString(CultureInfo.InvariantCulture)}&");
+        }
+
+        builder.Remove(builder.Length - 1, 1);
+
+        var query = builder.ToString();
+
+        return GetResult<bool>(query, token);
+    }
+
     #endregion
 
     #region Gen24
@@ -57,7 +93,7 @@ public sealed class WebClientService : IWebClientService
 
     public Task<ApiResult<JsonElement>> GetGen24Localization(string deviceId, string iso2LanguageCode, string name, CancellationToken token = default)
     {
-        return GetResult<JsonElement>($"gen24system/{deviceId}/{iso2LanguageCode}/{name}", token);
+        return GetResult<JsonElement>($"gen24system/{deviceId}/i18n/{iso2LanguageCode}/{name}", token);
     }
 
     #endregion
@@ -110,8 +146,12 @@ public sealed class WebClientService : IWebClientService
             responseMessage = await httpClient.GetAsync(queryString, token).ConfigureAwait(false);
 
             return responseMessage.StatusCode != HttpStatusCode.OK
-                ? ApiResult<T>.FromProblemDetails(await GetErrors(responseMessage, token).ConfigureAwait(false)!)
-                : new ApiResult<T> { Payload = await responseMessage.Content.ReadFromJsonAsync<T>(token).ConfigureAwait(false) };
+                ? ApiResult<T>.FromProblemDetails(await GetErrors(responseMessage, token).ConfigureAwait(false), responseMessage.StatusCode)
+                : new ApiResult<T>
+                {
+                    Payload = await responseMessage.Content.ReadFromJsonAsync<T>(token).ConfigureAwait(false),
+                    Status = responseMessage.StatusCode,
+                };
         }
         catch (Exception ex)
         {
@@ -121,7 +161,7 @@ public sealed class WebClientService : IWebClientService
                 Detail = ex.Message,
                 Status = responseMessage?.StatusCode,
                 Errors = new Dictionary<string, List<string>> { { "Errors", [ex.Message] } },
-            }, ex);
+            }, responseMessage?.StatusCode, ex);
         }
         finally
         {

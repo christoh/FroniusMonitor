@@ -1579,7 +1579,7 @@
 	  <value>Laden</value>
   </data>
   <data name="DeviceNotFound" xml:space="preserve">
-	  <value>Das Gerät '{0}' wurde nicht gefunden</value>
+	  <value>Das Gerät ''{0}' wurde nicht gefunden.</value>
   </data>
   <data name="GetInverterLocalization" xml:space="preserve">
 	  <value>Lade Sprachdateien vom Wechselrichter</value>
@@ -1594,12 +1594,30 @@
 	  <value>Kann nur nach 'on' oder 'off' schalten</value>
   </data>
   <data name="DeviceNotSwitchable" xml:space="preserve">
-	  <value>Das Gerät '{0}' ist nicht schaltbar</value>
+	  <value>Das Gerät '{0}' ist nicht schaltbar.</value>
   </data>
   <data name="DeviceSwitchingDisabled" xml:space="preserve">
-	  <value>Das Gerät '{0}' hat Ein- und Ausschalten deaktiviert</value>
+	  <value>Das Gerät '{0}' hat Ein- und Ausschalten deaktiviert.</value>
   </data>
   <data name="HttpForbidden" xml:space="preserve">
 	  <value>Du bist nicht berechtigt, diese Aktion auszuführen</value>
+  </data>
+  <data name="DeviceNotDimmable" xml:space="preserve">
+	  <value>Das Gerät '{0}' is nicht dimmbar.</value>
+  </data>
+  <data name="DeviceDimmingDisabled" xml:space="preserve">
+	  <value>Dimmen ist beim Gerät '{0}' deaktiviert.</value>
+  </data>
+  <data name="DeviceNotColorable" xml:space="preserve">
+	  <value>Das Gerät '{0}' unterstützt keine Farben.</value>
+  </data>
+  <data name="DeviceColoringDisabled" xml:space="preserve">
+	  <value>Farbunterstützung für Gerät '{0}' ist deaktiviert.</value>
+  </data>
+  <data name="DeviceHasNoColorTemperature" xml:space="preserve">
+	  <value>Das Gerät '{0}' unterstützt keine Farbtemperatur.</value>
+  </data>
+  <data name="DeviceColorTemperatureDisabled" xml:space="preserve">
+	  <value>Farbtemperatur für Gerät '{0}' is deaktiviert.</value>
   </data>
 </root>

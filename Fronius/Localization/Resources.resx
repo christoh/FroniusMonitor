@@ -1654,7 +1654,7 @@
 	  <value>Loading</value>
   </data>
   <data name="DeviceNotFound" xml:space="preserve">
-	  <value>The device '{0}' was not found</value>
+	  <value>The device '{0}' was not found.</value>
   </data>
   <data name="GetInverterLocalization" xml:space="preserve">
 	  <value>Getting inverter localization files</value>
@@ -1669,12 +1669,30 @@
 	  <value>Can only switch 'on' or 'off'</value>
   </data>
   <data name="DeviceNotSwitchable" xml:space="preserve">
-	  <value>The device '{0}' is not switchable</value>
+	  <value>The device '{0}' is not switchable.</value>
   </data>
   <data name="DeviceSwitchingDisabled" xml:space="preserve">
-	  <value>The device '{0}' has switching disabled</value>
+	  <value>The device '{0}' has switching disabled.</value>
   </data>
   <data name="HttpForbidden" xml:space="preserve">
 	  <value>You are not allowed to perform this action</value>
+  </data>
+  <data name="DeviceNotDimmable" xml:space="preserve">
+	  <value>The device '{0}' is not dimmable.</value>
+  </data>
+  <data name="DeviceDimmingDisabled" xml:space="preserve">
+	  <value>Dimming is disabled for device '{0}'.</value>
+  </data>
+  <data name="DeviceNotColorable" xml:space="preserve">
+	  <value>The device '{0}' has no color support.</value>
+  </data>
+  <data name="DeviceColoringDisabled" xml:space="preserve">
+	  <value>Coloring is diabled for device '{0}'.</value>
+  </data>
+  <data name="DeviceHasNoColorTemperature" xml:space="preserve">
+	  <value>The device '{0}' has no support for color temperature.</value>
+  </data>
+  <data name="DeviceColorTemperatureDisabled" xml:space="preserve">
+	  <value>Support for color temperature is disabled on device '{0}'.</value>
   </data>
 </root>

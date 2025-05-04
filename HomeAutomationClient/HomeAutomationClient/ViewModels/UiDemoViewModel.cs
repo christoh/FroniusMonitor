@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
 using De.Hochstaetter.Fronius.Models;
 using Timer = System.Threading.Timer;
 
@@ -21,12 +20,6 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
     }
 
     private Timer? timer;
-
-    public string Culture => Thread.CurrentThread.CurrentCulture.Name;
-
-    public string ApiUri => IoC.GetRegistered<MainViewModel>().ApiUri;
-
-    public string UiCulture => Thread.CurrentThread.CurrentUICulture.Name;
 
     [ObservableProperty]
     public partial bool ColorAllTicks { get; set; } = true;
@@ -55,7 +48,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
     public override async Task Initialize()
     {
-        BusyText = Resources.ConnectingToHas;
+        BusyText = Loc.ConnectingToHas;
         await base.Initialize();
         timer = new(TimerElapsed, null, 0, 1000);
     }
@@ -144,53 +137,131 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
     }
 
     [RelayCommand]
-    private async Task SwitchDevice(string key)
+    private Task SetBrightness(ValueChangeCommandParameter<double> change) => TaskExceptionHandler(async () =>
     {
-        try
+        if (change.Key is not string key || Math.Abs(change.NewValue - change.OldValue) < .000001)
         {
-            BusyText = "Switching device...";
-            var keyedDevice = FritzBoxDevices.First(d => d.Key == key);
-            ISwitchable device = keyedDevice.Device;
-            var isTurnedOn = device.IsTurnedOn;
-            var result = await webClient.SwitchDevice(key, device.IsTurnedOn is not true);
+            return;
+        }
 
-            if ((result.Status is not null and not HttpStatusCode.OK)||result.Exception!=null)
+        BusyText = string.Empty;
+        var keyedDevice = FritzBoxDevices.First(d => d.Key == key);
+        var result = await webClient.SetDeviceBrightness(key, change.NewValue);
+
+        if (result.Status is not HttpStatusCode.OK)
+        {
+            if (keyedDevice.Device.LevelControl != null)
             {
-                if (device is FritzBoxDevice { SimpleSwitch:not null} fritzBoxDevice)
-                {
-                    fritzBoxDevice.SimpleSwitch.IsTurnedOn = isTurnedOn;
-                    var index= FritzBoxDevices.IndexOf(keyedDevice);
-                    FritzBoxDevices.Remove(keyedDevice);
-                    FritzBoxDevices.Insert(index,keyedDevice);
-                }
-
-                if (result.Status is HttpStatusCode.Forbidden)
-                {
-                    await new MessageBox { Title = $"{Resources.HttpError} {(int)result.Status} ({result.Status})", Text = Resources.HttpForbidden, Buttons = [Resources.Ok], Icon = new ErrorIcon() }.Show();
-                }
-                else
-                {
-                    await new MessageBox
-                    {
-                        Title = result.Title ?? $"{Resources.HttpError} {(int)result.Status} ({result.Status})",
-                        Text = result.Errors?.Count > 1?result.Detail:null,
-                        ItemList = result.Errors?.Count < 1 ? null : result.Errors?.SelectMany(e => e.Value).ToList(),
-                        Icon = new ErrorIcon(),
-                        Buttons = [Resources.Ok],
-                    }.Show();
-                }
+                keyedDevice.Device.LevelControl.Level = change.NewValue;
+                keyedDevice.Device.Refresh();
+                keyedDevice.Device.LevelControl.Level = change.OldValue;
+                keyedDevice.Device.Refresh();
             }
+
+            await ShowHttpError(result);
         }
-        catch (Exception ex)
+    });
+
+    [RelayCommand]
+    private Task SwitchDevice(string key) => TaskExceptionHandler(async () =>
+    {
+        BusyText = string.Empty;
+        var keyedDevice = FritzBoxDevices.First(d => d.Key == key);
+        ISwitchable device = keyedDevice.Device;
+        var isTurnedOn = device.IsTurnedOn;
+        var result = await webClient.SwitchDevice(key, device.IsTurnedOn is not true);
+
+        if (result.Status is not HttpStatusCode.OK || result.Exception != null)
         {
-            BusyText = null;
-            await ex.Show().ConfigureAwait(false);
+            if (keyedDevice.Device.SimpleSwitch != null)
+            {
+                keyedDevice.Device.SimpleSwitch.IsTurnedOn = !isTurnedOn;
+                keyedDevice.Device.Refresh();
+                keyedDevice.Device.SimpleSwitch.IsTurnedOn = isTurnedOn;
+                keyedDevice.Device.Refresh();
+            }
+
+            await ShowHttpError(result);
         }
-        finally
+    });
+
+    [RelayCommand]
+    private Task SetColorTemperature(ValueChangeCommandParameter<double> change) => TaskExceptionHandler(async () =>
+    {
+        if (change.Key is not string key || Math.Abs(change.NewValue - change.OldValue) < .001)
         {
-            BusyText = null;
+            return;
         }
-    }
+
+        BusyText = string.Empty;
+        var keyedDevice = FritzBoxDevices.First(d => d.Key == key);
+        var result= await webClient.SetColorTemperature(key, change.NewValue);
+        
+        if (result.Status is not HttpStatusCode.OK)
+        {
+            if (keyedDevice.Device.Color != null)
+            {
+                keyedDevice.Device.Color.TemperatureKelvin = change.NewValue;
+                keyedDevice.Device.Refresh();
+                keyedDevice.Device.Color.TemperatureKelvin = change.OldValue;
+                keyedDevice.Device.Refresh();
+            }
+            
+            await ShowHttpError(result);
+        }
+    });
+
+    [RelayCommand]
+    private Task SetHue(ValueChangeCommandParameter<double> change) => TaskExceptionHandler(async () =>
+    {
+        if (change.Key is not string key || Math.Abs(change.NewValue - change.OldValue) < .001)
+        {
+            return;
+        }
+
+        BusyText = string.Empty;
+        var keyedDevice = FritzBoxDevices.First(d => d.Key == key);
+        var result= await webClient.SetHsv(key, hueDegrees:change.NewValue);
+        
+        if (result.Status is not HttpStatusCode.OK)
+        {
+            if (keyedDevice.Device.Color != null)
+            {
+                keyedDevice.Device.Color.HueDegrees = change.NewValue;
+                keyedDevice.Device.Refresh();
+                keyedDevice.Device.Color.HueDegrees = change.OldValue;
+                keyedDevice.Device.Refresh();
+            }
+            
+            await ShowHttpError(result);
+        }
+    });
+
+    [RelayCommand]
+    private Task SetSaturation(ValueChangeCommandParameter<double> change) => TaskExceptionHandler(async () =>
+    {
+        if (change.Key is not string key || Math.Abs(change.NewValue - change.OldValue) < .001)
+        {
+            return;
+        }
+
+        BusyText = string.Empty;
+        var keyedDevice = FritzBoxDevices.First(d => d.Key == key);
+        var result= await webClient.SetHsv(key, saturation:change.NewValue);
+        
+        if (result.Status is not HttpStatusCode.OK)
+        {
+            if (keyedDevice.Device.Color != null)
+            {
+                keyedDevice.Device.Color.SaturationAbsolute = Math.Round(change.NewValue*255,MidpointRounding.AwayFromZero);
+                keyedDevice.Device.Refresh();
+                keyedDevice.Device.Color.SaturationAbsolute = Math.Round(change.OldValue*255,MidpointRounding.AwayFromZero);
+                keyedDevice.Device.Refresh();
+            }
+            
+            await ShowHttpError(result);
+        }
+    });
 
     [RelayCommand]
     private async Task Standby(Gen24System gen24System)
@@ -206,7 +277,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
             await new MessageBox
             {
                 Title = "Test Dialog",
-                Buttons = [Resources.Ok, Resources.Cancel],
+                Buttons = [Loc.Ok, Loc.Cancel],
                 Text = "Hello, World! This is a test for a MessageBox that has some longer text items and everything still needs to look good and the text must properly wrap. Please also have a look at the following items.",
                 ItemList =
                 [
@@ -214,7 +285,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
                     "If you create an async method, you must ensure that you properly await it. Carefully choose between Task<T> and ValueTask<T> and don't forget to set ConfigureAwait() properly.",
                     "This is an additional bullet item.",
                 ],
-                TextBelowItemList = $"Did you understand everything? If not, press '{Resources.Cancel}'.",
+                TextBelowItemList = $"Did you understand everything? If not, press '{Loc.Cancel}'.",
                 Icon = new WarningIcon(),
             }.Show();
         }
@@ -231,8 +302,8 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
         {
             await new MessageBox
             {
-                Title = Resources.Error,
-                Text = string.Format(Resources.InverterCommReadError, "Atomkraftwerk 1"),
+                Title = Loc.Error,
+                Text = string.Format(Loc.InverterCommReadError, "Atomkraftwerk 1"),
                 Icon = new ErrorIcon(),
             }.Show();
         }

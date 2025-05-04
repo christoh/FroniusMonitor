@@ -21,7 +21,7 @@ public class Gen24SystemController(IDataControlService controlService, ILogger<G
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public IActionResult GetInverter([FromRoute] string id) => GetDevice<Gen24System>(id);
 
-    [HttpGet("{id}/{iso2LanguageCode}/{name}")]
+    [HttpGet("{id}/i18n/{iso2LanguageCode}/{name}")]
     [BasicAuthorize(Roles = "User")]
     [ProducesResponseType<IDictionary<string, object>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]

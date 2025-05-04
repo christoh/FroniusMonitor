@@ -2,6 +2,8 @@
 
 public abstract class DeviceControlBase : UserControl
 {
+    public static readonly StyledProperty<object?> DeviceKeyProperty = AvaloniaProperty.Register<PowerConsumer, object?>(nameof(DeviceKey));
+   
     public static readonly StyledProperty<IBrush?> InnerRunningProperty = AvaloniaProperty.Register<DeviceControlBase, IBrush?>(nameof(InnerRunning));
     public static readonly StyledProperty<IBrush?> InnerFaultProperty = AvaloniaProperty.Register<DeviceControlBase, IBrush?>(nameof(InnerFault));
     public static readonly StyledProperty<IBrush?> InnerWarningProperty = AvaloniaProperty.Register<DeviceControlBase, IBrush?>(nameof(InnerWarning));
@@ -17,6 +19,12 @@ public abstract class DeviceControlBase : UserControl
     public static readonly StyledProperty<IBrush?> LcdBackgroundProperty = AvaloniaProperty.Register<DeviceControlBase, IBrush?>(nameof(LcdBackground));
     public static readonly StyledProperty<IBrush?> CleaningBackgroundProperty = AvaloniaProperty.Register<DeviceControlBase, IBrush?>(nameof(CleaningBackground));
     
+    public object? DeviceKey
+    {
+        get => GetValue(DeviceKeyProperty);
+        set => SetValue(DeviceKeyProperty, value);
+    }
+
     public IBrush? CleaningBackground
     {
         get => GetValue(CleaningBackgroundProperty);
@@ -89,11 +97,11 @@ public abstract class DeviceControlBase : UserControl
         set => SetValue(LcdBackgroundProperty, value);
     }
     
-    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs e)
     {
-        base.OnPropertyChanged(change);
+        base.OnPropertyChanged(e);
 
-        switch (change.Property.Name)
+        switch (e.Property.Name)
         {
             case nameof(OuterFault):
             case nameof(OuterRunning):

@@ -70,7 +70,7 @@
 				<ResourceDictionary x:Key='Dark'>
                     
                     <SolidColorBrush x:Key='BackgroundBrush'>Black</SolidColorBrush>
-					<SolidColorBrush x:Key='ForegroundBrush'>White</SolidColorBrush>
+					<SolidColorBrush x:Key='ForegroundBrush'>#e8e8e8</SolidColorBrush>
 					<SolidColorBrush x:Key='DisableBrush'>#40FFFFFF</SolidColorBrush>
 
                     <!-- Device Control -->
@@ -78,7 +78,7 @@
                     <SolidColorBrush x:Key='DeviceButtonSelectedBackground'>DarkCyan</SolidColorBrush>
                     <SolidColorBrush x:Key='DeviceButtonMouseOver'>CadetBlue</SolidColorBrush>
                     
-                    <SolidColorBrush x:Key='DeviceOuterBackgroundRunning'>#ff003050</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceOuterBackgroundRunning'>#ff005070</SolidColorBrush>
                     <SolidColorBrush x:Key='DeviceOuterBackgroundFault'>DarkRed</SolidColorBrush>
                     <SolidColorBrush x:Key='DeviceOuterBackgroundWarning'>DarkGoldenrod</SolidColorBrush>
                     <SolidColorBrush x:Key='DeviceOuterBackgroundStartUp'>SaddleBrown</SolidColorBrush>
@@ -88,7 +88,7 @@
                     <SolidColorBrush x:Key='DeviceInnerBackgroundFault'>#d00000</SolidColorBrush>
                     <SolidColorBrush x:Key='DeviceInnerBackgroundWarning'>DarkOrange</SolidColorBrush>
                     <SolidColorBrush x:Key='DeviceInnerBackgroundStartup'>Brown</SolidColorBrush>
-                    <SolidColorBrush x:Key='DeviceInnerBackgroundOther'>#404040</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceInnerBackgroundOther'>#282828</SolidColorBrush>
                     <SolidColorBrush x:Key="Lcd">#335B46</SolidColorBrush>
                     <SolidColorBrush x:Key="DeviceCleaning">Blue</SolidColorBrush>
 

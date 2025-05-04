@@ -53,7 +53,7 @@ public class FritzBoxColorControl : BindableBase
         set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(HueDegreesString)));
     }
 
-    [XmlElement("hue")]
+    [XmlElement("hue"), JsonIgnore]
     public string? HueDegreesString
     {
         get => FritzBoxDevice.GetStringValue(HueDegrees, 1);
@@ -67,7 +67,7 @@ public class FritzBoxColorControl : BindableBase
         set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(SaturationString)));
     }
 
-    [XmlElement("saturation")]
+    [XmlElement("saturation"), JsonIgnore]
     public string? SaturationString
     {
         get => FritzBoxDevice.GetStringValue(SaturationAbsolute, 1);
@@ -81,7 +81,7 @@ public class FritzBoxColorControl : BindableBase
         set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(UnmappedHueDegreesString)));
     }
 
-    [XmlElement("unmapped_hue")]
+    [XmlElement("unmapped_hue"), JsonIgnore]
     public string? UnmappedHueDegreesString
     {
         get => FritzBoxDevice.GetStringValue(UnmappedHueDegrees, 1);
@@ -95,7 +95,7 @@ public class FritzBoxColorControl : BindableBase
         set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(UnmappedSaturationString)));
     }
 
-    [XmlElement("unmapped_saturation")]
+    [XmlElement("unmapped_saturation"), JsonIgnore]
     public string? UnmappedSaturationString
     {
         get => FritzBoxDevice.GetStringValue(UnmappedSaturation, 1);
@@ -109,7 +109,7 @@ public class FritzBoxColorControl : BindableBase
         set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(TemperatureKelvinString)));
     }
 
-    [XmlElement("temperature")]
+    [XmlElement("temperature"), JsonIgnore]
     public string? TemperatureKelvinString
     {
         get => FritzBoxDevice.GetStringValue(TemperatureKelvin, 1);

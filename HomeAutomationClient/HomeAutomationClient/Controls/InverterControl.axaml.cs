@@ -1,5 +1,3 @@
-using Avalonia.Interactivity;
-
 namespace De.Hochstaetter.HomeAutomationClient.Controls;
 
 public enum InverterDisplayMode
@@ -93,21 +91,13 @@ public partial class InverterControl : DeviceControlBase
         set => SetValue(StandbyCommandProperty, value);
     }
 
-    public static readonly StyledProperty<object?> StandbyCommandParameterProperty = AvaloniaProperty.Register<InverterControl, object?>(nameof(StandbyCommandParameter));
+    //public static readonly StyledProperty<bool> IsStandbyProperty = AvaloniaProperty.Register<InverterControl, bool>(nameof(IsStandby));
 
-    public object? StandbyCommandParameter
-    {
-        get => GetValue(StandbyCommandParameterProperty);
-        set => SetValue(StandbyCommandParameterProperty, value);
-    }
-
-    public static readonly StyledProperty<bool> IsStandbyProperty = AvaloniaProperty.Register<InverterControl, bool>(nameof(IsStandby));
-
-    public bool IsStandby
-    {
-        get => GetValue(IsStandbyProperty);
-        set => SetValue(IsStandbyProperty, value);
-    }
+    //public bool IsStandby
+    //{
+    //    get => GetValue(IsStandbyProperty);
+    //    set => SetValue(IsStandbyProperty, value);
+    //}
 
     public static readonly StyledProperty<bool> ColorAllTicksProperty = AvaloniaProperty.Register<InverterControl, bool>(nameof(ColorAllTicks));
 
@@ -130,20 +120,39 @@ public partial class InverterControl : DeviceControlBase
         InitializeComponent();
     }
 
-    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs e)
     {
-        base.OnPropertyChanged(change);
+        base.OnPropertyChanged(e);
 
-        switch (change.Property.Name)
+        switch (e.Property.Name)
         {
-            //TODO: Handle INotifyPropertyChanged for Inverter
             case nameof(Inverter):
-                ChangeInner();
-                ChangeOuter();
+                if (e.OldValue is INotifyPropertyChanged oldDevice)
+                {
+                    oldDevice.PropertyChanged -= OnInverterPropertyChanged;
+                }
+
+                if (e.NewValue is INotifyPropertyChanged newDevice)
+                {
+                    newDevice.PropertyChanged += OnInverterPropertyChanged;
+                    OnInverterPropertyChanged(Inverter, new PropertyChangedEventArgs(string.Empty));
+                }
                 break;
         }
     }
     
+    private void OnInverterPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == string.Empty)
+        {
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                ChangeOuter();
+                ChangeInner();
+            });
+        }
+    }
+
     protected override void ChangeOuter()
     {
         BackgroundProvider.Background = Inverter?.Sensors?.InverterStatus?.StatusCode switch
@@ -155,7 +164,7 @@ public partial class InverterControl : DeviceControlBase
             _ => OuterOther,
         };
     }
-    
+
     protected override void ChangeInner()
     {
         InnerBackgroundProvider.Background = Inverter?.Sensors?.InverterStatus?.StatusCode switch
@@ -184,9 +193,9 @@ public partial class InverterControl : DeviceControlBase
 
     private void OnStandbyClicked(object? sender, RoutedEventArgs e)
     {
-        if (StandbyCommand?.CanExecute(StandbyCommandParameter) is true)
+        if (StandbyCommand?.CanExecute(DeviceKey) is true)
         {
-            StandbyCommand?.Execute(StandbyCommandParameter);
+            StandbyCommand?.Execute(DeviceKey);
         }
     }
 }

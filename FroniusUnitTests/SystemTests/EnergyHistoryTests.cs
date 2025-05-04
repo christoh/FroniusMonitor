@@ -32,7 +32,7 @@ namespace FroniusUnitTests.SystemTests
         [Test]
         public async Task TestEnergyHistory()
         {
-            const string excelFileName = @"C:\Users\hocc\Downloads\2024-08-13_2024-08-14_Messwerte_1EFR2375141563.xlsx";
+            //const string excelFileName = @"C:\Users\hocc\Downloads\2024-08-13_2024-08-14_Messwerte_1EFR2375141563.xlsx";
             var settings = IoC.Get<SettingsBase>();
             settings.EnergyHistoryFileName = @"V:\var\log\EnergyHistory-2456552877.log";
             settings.DriftFileName = @"C:\Users\hocc\OneDrive\Dokumente\FroniusMonitor\Drifts-Meter2.xml";

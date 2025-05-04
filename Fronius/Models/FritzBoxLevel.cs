@@ -5,6 +5,7 @@
 public class FritzBoxLevel : BindableBase
 {
     [XmlElement("level")]
+    [JsonIgnore]
     public string? LevelAbsoluteString
     {
         get => FritzBoxDevice.GetStringValue(LevelAbsolute, 1);
