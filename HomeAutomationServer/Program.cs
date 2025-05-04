@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.ResponseCompression;
-using Microsoft.Extensions.Azure;
+using Serilog.Sinks.SystemConsole.Themes;
+using AuthenticationService = De.Hochstaetter.HomeAutomationServer.Services.AuthenticationService;
 using Settings = De.Hochstaetter.HomeAutomationServer.Models.Settings.Settings;
 
 namespace De.Hochstaetter.HomeAutomationServer;
@@ -34,7 +35,13 @@ internal partial class Program
             .Information()
 #endif
             .Enrich.WithComputed("SourceContextName", "Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)")
-            .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] ({SourceContextName:l}) {Message:lj}{NewLine}{Exception}", formatProvider: CultureInfo.InvariantCulture)
+            .WriteTo.Console
+            (
+                outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] ({SourceContextName:l}) {Message:lj}{NewLine}{Exception}",
+                formatProvider: CultureInfo.InvariantCulture,
+                applyThemeToRedirectedOutput: true,
+                theme: AnsiConsoleTheme.Sixteen
+            )
             .CreateLogger();
 
         Settings? settings = null;
@@ -97,10 +104,7 @@ internal partial class Program
 
         var supportedCultures = new List<CultureInfo>
         {
-            CultureInfo.InvariantCulture,
-            new CultureInfo("de"),
-            new CultureInfo("de-CH"),
-            new CultureInfo("de-LI"),
+            CultureInfo.InvariantCulture, new("de"), new("de-CH"), new("de-LI"),
         };
 
         if (settings != null)
@@ -113,6 +117,7 @@ internal partial class Program
             builder.Services.AddSingleton(settings);
 
             builder.Services.AddLocalization();
+
             builder.Services.Configure<RequestLocalizationOptions>(options =>
             {
                 options.DefaultRequestCulture = new RequestCulture(CultureInfo.InvariantCulture);
@@ -157,7 +162,7 @@ internal partial class Program
 
         builder.Services.AddOpenApi();
 
-        builder.Services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, Services.AuthenticationService>("Basic", null);
+        builder.Services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, AuthenticationService>("Basic", null);
 
         //builder.Services.AddAuthentication()
         //    .AddScheme<UserList, MyAuthenticationHandler>("MyAuthenticationSchemeName", options => {});
@@ -165,6 +170,7 @@ internal partial class Program
         var app = builder.Build();
         app.UseResponseCompression();
         app.MapOpenApi().RequireAuthorization(r => r.RequireRole("Developer"));
+
         app.UseRequestLocalization(options =>
         {
             options.DefaultRequestCulture = new RequestCulture(CultureInfo.InvariantCulture);

@@ -88,7 +88,7 @@ public sealed class Gen24DataCollector(
                     {
                         gen24System.Config = await ReadGen24Config(gen24System, semaphore, token).ConfigureAwait(false);
                     }
-                    catch (Exception ex) when (ex is not OperationCanceledException)
+                    catch (Exception ex) when (ex is not TaskCanceledException)
                     {
                         logger.LogError(ex, "Could not read config for GEN24 inverter {BaseUri}", gen24System.Service.Connection);
                         return;
@@ -101,7 +101,7 @@ public sealed class Gen24DataCollector(
                     {
                         gen24System.Sensors = await gen24System.Service.GetFroniusData(gen24System.Config.Components, token).ConfigureAwait(false);
 
-                        dataControlService.AddOrUpdate(new ManagedDevice(gen24System,gen24System.Service.Connection,typeof(IGen24Service)));
+                        dataControlService.AddOrUpdate(new ManagedDevice(gen24System, gen24System.Service.Connection, typeof(IGen24Service)));
 
                         logger.LogDebug("{Entity} sensors updated in {Duration:N0} ms", gen24System.DisplayName, (DateTime.UtcNow - start).TotalMilliseconds);
 
@@ -153,7 +153,7 @@ public sealed class Gen24DataCollector(
                         }
                     }
                 }
-                catch (Exception ex) when (ex is not OperationCanceledException)
+                catch (Exception ex) when (ex is not TaskCanceledException)
                 {
                     logger.LogError(ex, "Could not read config for GEN24 inverter {BaseUri}", gen24System.Service.Connection);
                 }
@@ -165,11 +165,11 @@ public sealed class Gen24DataCollector(
                 await Task.Delay((int)waitTime, token).ConfigureAwait(false);
                 token.ThrowIfCancellationRequested();
                 var connection = gen24System.Service.Connection;
-                gen24System.Service.Connection=(connection?.Clone()) as WebConnection;
+                gen24System.Service.Connection = (connection?.Clone()) as WebConnection;
                 runningSensorTasks[gen24System.Service.Connection!] = Update(gen24System, semaphore);
             }
         }
-        catch (OperationCanceledException)
+        catch (TaskCanceledException)
         {
             logger.LogInformation("Updating {WebConnection} sensors stopped", gen24System.Service.Connection);
             semaphore.Dispose();
@@ -193,28 +193,23 @@ public sealed class Gen24DataCollector(
             {
                 gen24System.Config = await ReadGen24Config(gen24System, semaphore, token).ConfigureAwait(false);
 
-                if (gen24System.Config?.Versions?.SerialNumber is { } serialNumber)
+                if (gen24System.Config?.Versions?.SerialNumber != null)
                 {
-                    dataControlService.AddOrUpdate(new ManagedDevice(gen24System,gen24System.Service.Connection,typeof(IGen24Service)));
+                    dataControlService.AddOrUpdate(new ManagedDevice(gen24System, gen24System.Service.Connection, typeof(IGen24Service)));
                     logger.LogDebug("{Entity} config updated in {Duration:N0} ms", gen24System.DisplayName, (DateTime.UtcNow - startTime).TotalMilliseconds);
                 }
             }
-            catch (Exception ex) when (ex is not OperationCanceledException)
+            catch (Exception ex) when (ex is not TaskCanceledException)
             {
                 logger.LogError(ex, "Could not read config for GEN24 inverter {BaseUri}", gen24System.Service.Connection);
-                return;
             }
-
-            if (!token.IsCancellationRequested)
+            finally
             {
-                var duration = DateTime.UtcNow - startTime;
-                var waitTime = (int)Math.Max(0, (Parameters.ConfigRefreshRate / 2 - duration).TotalMilliseconds);
-                await Task.Delay(waitTime, token).ConfigureAwait(false);
                 token.ThrowIfCancellationRequested();
                 runningConfigTasks[gen24System.Service.Connection!] = UpdateConfig(gen24System, semaphore);
             }
         }
-        catch (Exception ex) when (ex is OperationCanceledException or ObjectDisposedException)
+        catch (Exception ex) when (ex is TaskCanceledException)
         {
             logger.LogInformation("Updating {WebConnection} config stopped", gen24System.Service.Connection);
         }
@@ -222,7 +217,7 @@ public sealed class Gen24DataCollector(
 
     private static async Task<Gen24Config?> ReadGen24Config(Gen24System gen24System, SemaphoreSlim semaphore, CancellationToken token)
     {
-        if (!await semaphore.WaitAsync(TimeSpan.FromSeconds(7), token).ConfigureAwait(false))
+        if (!await semaphore.WaitAsync(TimeSpan.FromSeconds(10), token).ConfigureAwait(false))
         {
             return null;
         }

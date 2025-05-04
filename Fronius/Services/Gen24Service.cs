@@ -137,11 +137,11 @@ public class Gen24Service(IGen24JsonService gen24JsonService) : BindableBase, IG
 
         gen24Sensors.PowerFlow = new Gen24PowerFlow
         {
-            GridPower = gen24Sensors.PrimaryPowerMeter?.ActivePowerSum??0,
-            StoragePower = gen24Sensors.Inverter?.StoragePower??0,
-            SolarPower = gen24Sensors.Inverter?.SolarPowerSum??0,
-            LoadPower = -(gen24Sensors.Inverter?.PowerActiveSum??0)-(gen24Sensors.PrimaryPowerMeter?.ActivePowerSum??0),
-            InverterAcPower = gen24Sensors.Inverter?.PowerActiveSum??0,
+            GridPower = gen24Sensors.PrimaryPowerMeter?.ActivePowerSum ?? 0,
+            StoragePower = gen24Sensors.Inverter?.StoragePower ?? 0,
+            SolarPower = gen24Sensors.Inverter?.SolarPowerSum ?? 0,
+            LoadPower = -(gen24Sensors.Inverter?.PowerActiveSum ?? 0) - (gen24Sensors.PrimaryPowerMeter?.ActivePowerSum ?? 0),
+            InverterAcPower = gen24Sensors.Inverter?.PowerActiveSum ?? 0,
         };
 
         return gen24Sensors;
@@ -332,8 +332,7 @@ public class Gen24Service(IGen24JsonService gen24JsonService) : BindableBase, IG
 
         lock (froniusHttpClientLockObject)
         {
-            froniusHttpClient ??= new DigestAuthHttp(Connection ?? throw new ArgumentNullException(null, @"No inverter connection"));
-            client = froniusHttpClient;
+            client = froniusHttpClient ??= new DigestAuthHttp(Connection ?? throw new ArgumentNullException(null, @"No inverter connection"));
         }
 
         var nextAllowedCall = lastSolarApiCall.AddSeconds(.2) - DateTime.UtcNow;

@@ -8,7 +8,7 @@ namespace De.Hochstaetter.HomeAutomationServer.Models.Settings;
 
 public class Settings
 {
-    private static readonly object settingLock = new();
+    private static readonly Lock settingLock = new();
 
     //[DefaultValue("0.0.0.0")]
     public string ServerIpAddress { get; set; } = "::";

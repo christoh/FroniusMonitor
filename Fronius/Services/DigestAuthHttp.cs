@@ -4,15 +4,13 @@
 // Algorithm must be MD5 (MD5-sess and SHA are not supported)
 // qop must be auth (auth-int and none is not supported)
 
-public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
+public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDuration) : IDisposable, IAsyncDisposable
 {
     private static readonly Random random = new(unchecked((int)DateTime.UtcNow.Ticks));
-    private static readonly Lock hashLock = new();
+    private readonly Lock hashLock = new();
 
     private readonly MD5 md5 = MD5.Create();
-    private readonly HttpClient httpClient = new();
-    private readonly WebConnection connection;
-    private readonly TimeSpan cnonceDuration;
+    //private readonly HttpClient httpClient = new();
 
     private string? ha1;
     private string? realm;
@@ -22,19 +20,11 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
     private DateTime cnonceDate;
     private uint nc;
 
-    public DigestAuthHttp(WebConnection connection, TimeSpan cnonceDuration)
-    {
-        this.connection = connection;
-        this.cnonceDuration = cnonceDuration;
-        httpClient.BaseAddress = new Uri(connection.BaseUrl);
-    }
-
     public DigestAuthHttp(WebConnection connection) : this(connection, new TimeSpan(0, 1, 0, 0)) { }
 
     public void Dispose()
     {
         md5.Dispose();
-        httpClient.Dispose();
     }
 
     public ValueTask DisposeAsync() => new(Task.Run(Dispose));
@@ -84,7 +74,7 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
 
         try
         {
-            var response = await httpClient.SendAsync(request, token).ConfigureAwait(false);
+            var response = await SendAsync(request, token).ConfigureAwait(false);
 
             if (response.StatusCode != HttpStatusCode.Unauthorized)
             {
@@ -115,7 +105,7 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
             cnonce = unchecked((uint)random.Next(int.MinValue, int.MaxValue)).ToString("x8");
             cnonceDate = DateTime.UtcNow;
             request = await CreateRequest(url, stringContent, token).ConfigureAwait(false);
-            response = await httpClient.SendAsync(request, token).ConfigureAwait(false);
+            response = await SendAsync(request, token).ConfigureAwait(false);
             ThrowOnWrongStatusCode();
             return response;
 
@@ -138,6 +128,14 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
         {
             request.Dispose();
         }
+    }
+
+    private Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken token)
+    {
+        var httpClient = new HttpClient();
+        httpClient.BaseAddress = new Uri(connection.BaseUrl);
+        _ = Task.Delay(TimeSpan.FromSeconds(30), CancellationToken.None).ContinueWith(_ => { httpClient.Dispose(); }, CancellationToken.None);
+        return httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);
     }
 
     private async ValueTask<HttpRequestMessage> CreateRequest(string url, string? stringContent, CancellationToken token)
