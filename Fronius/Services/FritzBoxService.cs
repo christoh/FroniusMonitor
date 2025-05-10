@@ -3,22 +3,6 @@
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public class FritzBoxService : BindableBase, IFritzBoxService
 {
-    private static readonly Dictionary<int, IEnumerable<int>> allowedFritzBoxColors = new()
-    {
-        { 358, new[] { 180, 112, 54 } },
-        { 35, new[] { 214, 140, 72 } },
-        { 52, new[] { 153, 102, 51 } },
-        { 92, new[] { 123, 79, 38 } },
-        { 120, new[] { 160, 82, 38 } },
-        { 160, new[] { 145, 84, 41 } },
-        { 195, new[] { 179, 118, 59 } },
-        { 212, new[] { 169, 110, 56 } },
-        { 225, new[] { 204, 135, 67 } },
-        { 266, new[] { 169, 110, 54 } },
-        { 296, new[] { 140, 92, 46 } },
-        { 335, new[] { 180, 107, 51 } },
-    };
-
     private string? fritzBoxSid;
 
     public WebConnection? Connection
@@ -100,13 +84,13 @@ public class FritzBoxService : BindableBase, IFritzBoxService
 
     public async ValueTask SetFritzBoxColor(string ain, double hueDegrees, double saturation, CancellationToken token = default)
     {
-        var intHue = allowedFritzBoxColors.Keys.MinBy(k => Math.Min(Math.Abs(hueDegrees - k), Math.Abs(hueDegrees + 360 - k)));
-        var intSaturation = allowedFritzBoxColors[intHue].MinBy(s => Math.Abs(s - saturation * 255));
+        var intHue = Math.Min(Math.Max(0,(int)Math.Round(hueDegrees)),359);
+        var intSaturation = Math.Min(Math.Max(0,(int)Math.Round(saturation*255)),255);
         ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
         
         using var _ = await GetFritzBoxResponse
         (
-            $"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setcolor&hue={intHue}&saturation={intSaturation}&duration=0",
+            $"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setunmappedcolor&hue={intHue}&saturation={intSaturation}&duration=0",
             token: token
         ).ConfigureAwait(false);
     }
