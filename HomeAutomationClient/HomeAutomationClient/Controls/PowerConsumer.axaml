@@ -61,38 +61,38 @@
 					</Grid.Styles>
 
 					<TextBlock Grid.Row="0" Grid.Column="1"
-                               IsVisible="{Binding Path=Device.CanDim, FallbackValue=Visible}">
+                               IsVisible="{Binding Path=Device.CanDim, FallbackValue={x:True}}">
 						<Run Text="B:" />
 						<Run Text="{Binding Value, ElementName=DimSlider, Mode=OneWay, StringFormat=P0, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---, TargetNullValue=---}" />
 					</TextBlock>
 
 					<Slider Classes="Default" Grid.Row="0" Grid.Column="0" x:Name="DimSlider" Minimum="0" Maximum="1"
-                                             IsVisible="{Binding Path=Device.CanDim, FallbackValue=Visible}"
+                                             IsVisible="{Binding Path=Device.CanDim, FallbackValue={x:True}}"
                                              Value="{Binding Path=Device.Level, Mode=OneWay, FallbackValue=0, TargetNullValue=0}"
                                              IsEnabled="{Binding Path=Device.IsDimmingEnabled, FallbackValue=False}"/>
 
 					<TextBlock Grid.Row="1" Grid.Column="1" Opacity="{Binding Path=Device.IsColorTemperatureActive, Converter={co:Bool2Double False=.5, True=1}, FallbackValue=.5}"
-                               IsVisible="{Binding Path=Device.HasColorTemperatureControl, FallbackValue=Visible}">
+                               IsVisible="{Binding Path=Device.HasColorTemperatureControl, FallbackValue={x:True}}">
 						<Run Text="{Binding Value, ElementName=TemperatureSlider, Mode=OneWay, StringFormat=N0, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---, TargetNullValue=---}" />
 						<Run Text="K" />
 					</TextBlock>
 
 					<Slider Classes="Default" Grid.Row="1" Grid.Column="0" x:Name="TemperatureSlider"
-                                             IsVisible="{Binding Path=Device.HasColorTemperatureControl, FallbackValue=Visible}"
+                                             IsVisible="{Binding Path=Device.HasColorTemperatureControl, FallbackValue={x:True}}"
                                              Minimum="{Binding Path=Device.MinTemperatureKelvin, Mode=OneWay, FallbackValue=2700}"
                                              Maximum="{Binding Path=Device.MaxTemperatureKelvin, Mode=OneWay, FallbackValue=6500}"
                                              Value="{Binding Path=Device.ColorTemperatureKelvin, Mode=OneWay, FallbackValue=0, TargetNullValue=0}"
                                              IsEnabled="{Binding Path=Device.IsColorTemperatureEnabled, FallbackValue=False}"/>
 
 					<TextBlock Grid.Row="2" Grid.Column="1" Opacity="{Binding Path=Device.IsHsvActive, Converter={co:Bool2Double False=.5, True=1}, FallbackValue=.5}"
-                               IsVisible="{Binding Path=Device.HasHsvColorControl, FallbackValue=Visible}">
+                               IsVisible="{Binding Path=Device.HasHsvColorControl, FallbackValue={x:True}}">
 						<Run Text="H:" />
 						<Run Text="{Binding Value, ElementName=HueSlider, Mode=OneWay, StringFormat=N0, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---, TargetNullValue=---}" />
 						<Run Text="°" />
 					</TextBlock>
 
 					<Slider Classes="Default" Grid.Row="2" Grid.Column="0" x:Name="HueSlider" Minimum="0" Maximum="360" TickFrequency="30"
-                                             IsVisible="{Binding Path=Device.HasHsvColorControl, FallbackValue=Visible}"
+                                             IsVisible="{Binding Path=Device.HasHsvColorControl, FallbackValue={x:True}}"
                                              Value="{Binding Path=Device.HueDegrees, Mode=OneWay, FallbackValue=0, TargetNullValue=0}"
                                              IsEnabled="{Binding Path=Device.IsHsvEnabled, FallbackValue=False}">
 						<Slider.Template>
@@ -221,13 +221,13 @@
 					</Slider>
 
 					<TextBlock Grid.Row="3" Grid.Column="1" Opacity="{Binding Path=Device.IsHsvActive, Converter={co:Bool2Double False=.5, True=1}, FallbackValue=.5}"
-                               IsVisible="{Binding Path=Device.HasHsvColorControl, FallbackValue=Visible}">
+                               IsVisible="{Binding Path=Device.HasHsvColorControl, FallbackValue={x:True}}">
 						<Run Text="S:" />
 						<Run Text="{Binding Value, ElementName=SaturationSlider, Mode=OneWay, StringFormat=P0, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=---, TargetNullValue=---}" />
 					</TextBlock>
 
 					<Slider Classes="Default" Grid.Row="3" Grid.Column="0" Minimum="0" Maximum="1" x:Name="SaturationSlider"
-                                             IsVisible="{Binding Path=Device.HasHsvColorControl, FallbackValue=Visible}"
+                                             IsVisible="{Binding Path=Device.HasHsvColorControl, FallbackValue={x:True}}"
                                              Value="{Binding Path=Device.Saturation, Mode=OneWay, FallbackValue=0, TargetNullValue=0}"
                                              IsEnabled="{Binding Path=Device.IsHsvEnabled, FallbackValue=False}"/>
 

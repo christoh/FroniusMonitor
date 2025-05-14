@@ -453,8 +453,8 @@
                                 <c:LinearGauge Classes="AcPowerLinearGaugeStyle Local" Label="{x:Static p:Resources.DcLink}" Value="{Binding Inverter.Sensors.Inverter.DcLinkVoltage, FallbackValue=0, TargetNullValue=0}"
                                                Minimum="550" Maximum="800" GaugeColors="{x:Static m:GaugeColors.ExtremeIsBad}" />
                                 <c:LinearGauge Classes="AcPowerLinearGaugeStyle Local" Label="{x:Static p:Resources.Battery}" Value="{Binding Inverter.Sensors.Inverter.StorageVoltageOuter, FallbackValue=0, TargetNullValue=0}"
-                                               Minimum="{Binding Inverter.Sensors.Storage.MinVoltage, FallbackValue=280}"
-                                               Maximum="{Binding Inverter.Sensors.Storage.MaxVoltage, FallbackValue=320}"
+                                               Minimum="{Binding Inverter.Sensors.Storage,Converter={co:StorageValueConverterBase PropertyName='MinVoltage', FallBackValue=280}, FallbackValue=280}"
+                                               Maximum="{Binding Inverter.Sensors.Storage,Converter={co:StorageValueConverterBase PropertyName='MaxVoltage', FallBackValue=330}, FallbackValue=330}"
                                                GaugeColors="{x:Static m:GaugeColors.MidIsGood}" />
                             </StackPanel>
                         </Grid>

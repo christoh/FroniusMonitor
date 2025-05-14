@@ -225,3 +225,23 @@ public class PowerMeterStatusLocalizeExtension : ConverterBase
             : gen24Localization.GetLocalizedString(Gen24LocalizationSection.Ui, $"POWERMETER.DEVICESTATE.{statusStatusString}");
     }
 }
+
+public class StorageValueConverterBase:ConverterBase
+{
+    public string? PropertyName { get; set; }
+    public double FallBackValue { get; set; }
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        switch (value)
+        {
+            case Gen24Storage storage when PropertyName!=null:
+            {
+                var pi = typeof(Gen24Storage).GetProperty(PropertyName);
+                return pi?.GetValue(storage)??FallBackValue;
+            }
+
+            default:
+                return FallBackValue;
+        }
+    }
+}

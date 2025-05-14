@@ -5,12 +5,10 @@ namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 public sealed partial class MainViewModel : ViewModelBase
 {
     private readonly ICache? cache = IoC.TryGetRegistered<ICache>();
-    private readonly IWebClientService webClient;
     private readonly IGen24LocalizationService gen24Loc;
 
     public MainViewModel(IWebClientService webClient, IServerBasedAesKeyProvider keyProvider, IGen24LocalizationService gen24Loc)
     {
-        this.webClient = webClient;
         this.gen24Loc = gen24Loc;
         ApiUri = cache?.Get<string>(CacheKeys.ApiUri) ?? "https://home-automation.example.com";
         webClient.Initialize(ApiUri, "hacc", "0.5.0.0");
@@ -61,7 +59,7 @@ public sealed partial class MainViewModel : ViewModelBase
                 ShowCloseBox = false,
             });
 
-            var isLoggedIn = await loginViewModel.ShowDialogAsync().ConfigureAwait(false);
+            await loginViewModel.ShowDialogAsync().ConfigureAwait(false);
             BusyText = Resources.GetInverterLocalization;
             await gen24Loc.Initialize().ConfigureAwait(false);
             await Dispatcher.UIThread.InvokeAsync(() => MainViewContent = new UiDemoView());
