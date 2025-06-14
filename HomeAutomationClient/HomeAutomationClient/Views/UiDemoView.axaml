@@ -11,7 +11,6 @@
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.UiDemoView"
              x:DataType="vm:UiDemoViewModel">
 	<Grid RowDefinitions="*" x:Name="RootElement">
-		<c:BusyAnimation BusyText="{Binding BusyText}" Grid.Row="0" />
 		<Grid RowDefinitions="Auto,Auto,*,Auto" Grid.Row="0">
 
 			<StackPanel x:Name="MainContentElement" Orientation="Vertical" Margin="16" Grid.Row="0" VerticalAlignment="Top">
@@ -108,5 +107,6 @@
                               IsChecked="{Binding ColorAllTicks}" />
 			</StackPanel>
 		</Grid>
+        <c:BusyAnimation BusyText="{Binding BusyText}" Grid.Row="0" />
 	</Grid>
 </UserControl>

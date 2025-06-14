@@ -7,7 +7,7 @@ public sealed partial class MainViewModel : ViewModelBase
     private readonly ICache? cache = IoC.TryGetRegistered<ICache>();
     private readonly IGen24LocalizationService gen24Loc;
 
-    public MainViewModel(IWebClientService webClient, IServerBasedAesKeyProvider keyProvider, IGen24LocalizationService gen24Loc)
+    public MainViewModel(IWebClientService webClient, IGen24LocalizationService gen24Loc)
     {
         this.gen24Loc = gen24Loc;
         ApiUri = cache?.Get<string>(CacheKeys.ApiUri) ?? "https://home-automation.example.com";
@@ -55,12 +55,12 @@ public sealed partial class MainViewModel : ViewModelBase
 
             var loginViewModel = new LoginViewModel(new DialogParameters
             {
-                Title = $"{AppConstants.AppName} - {Resources.LoginNoun}",
+                Title = $"{AppConstants.AppName} - {Loc.LoginNoun}",
                 ShowCloseBox = false,
             });
 
             await loginViewModel.ShowDialogAsync().ConfigureAwait(false);
-            BusyText = Resources.GetInverterLocalization;
+            BusyText = Loc.GetInverterLocalization;
             await gen24Loc.Initialize().ConfigureAwait(false);
             await Dispatcher.UIThread.InvokeAsync(() => MainViewContent = new UiDemoView());
         }

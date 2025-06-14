@@ -34,16 +34,18 @@ namespace De.Hochstaetter.HomeAutomationClient
             var serviceProvider = ServiceCollection.BuildServiceProvider();
             IoC.Update(serviceProvider);
 
-            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            switch (ApplicationLifetime)
             {
-                // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
-                // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
-                DisableAvaloniaDataAnnotationValidation();
-                desktop.MainWindow = IoC.Get<MainWindow>();
-            }
-            else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
-            {
-                singleViewPlatform.MainView = IoC.Get<MainView>();
+                case IClassicDesktopStyleApplicationLifetime desktop:
+                    // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
+                    // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
+                    DisableAvaloniaDataAnnotationValidation();
+                    desktop.MainWindow = IoC.Get<MainWindow>();
+                    break;
+
+                case ISingleViewApplicationLifetime singleViewPlatform:
+                    singleViewPlatform.MainView = IoC.Get<MainView>();
+                    break;
             }
 
             base.OnFrameworkInitializationCompleted();

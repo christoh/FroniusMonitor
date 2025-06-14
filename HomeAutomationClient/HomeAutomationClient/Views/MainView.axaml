@@ -14,7 +14,7 @@
 		<c:BusyAnimation BusyText="{Binding BusyText}" Grid.Row="0"/>
 		<Grid Grid.Row="0" Background="{DynamicResource DisableBrush}" x:Name="DialogOverlay" IsVisible="{Binding IsDialogVisible}">
 			<Grid RowDefinitions="Auto,*" Background="White" HorizontalAlignment="Center" VerticalAlignment="Center">
-				<Grid ColumnDefinitions="Auto,*,Auto" Background="{DynamicResource SystemControlBackgroundAccentBrush}">
+				<Grid ZIndex="2" ColumnDefinitions="Auto,*,Auto" Background="{DynamicResource SystemControlBackgroundAccentBrush}">
 					<Grid.Styles>
 						<Style Selector="Button.CloseButton">
 							<Style.Resources>
@@ -33,8 +33,8 @@
 					<TextBlock x:Name="TitleTextBlock" Grid.Row="0" Grid.Column="1" Padding="5" Text="{Binding CurrentDialog.Title, FallbackValue=''}" Foreground="{DynamicResource SystemControlForegroundChromeWhiteBrush}" />
 					<Button Classes="TransparentButton CloseButton" Grid.Row="0" Grid.Column="2" IsTabStop="False" IsVisible="{Binding CurrentDialog.ShowCloseBox, FallbackValue=True}"/>
 				</Grid>
-				<UserControl Grid.Row="1" MinWidth="100" Background="{DynamicResource BackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" x:Name="DialogHost" Content="{Binding CurrentDialog.Body, FallbackValue={x:Null}}"/>
-				<c:BusyAnimation Grid.Row="1" BusyText="{Binding DialogBusyText}"/>
+				<UserControl Grid.Row="1" ZIndex="2" MinWidth="100" Background="{DynamicResource BackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" x:Name="DialogHost" Content="{Binding CurrentDialog.Body, FallbackValue={x:Null}}"/>
+				<c:BusyAnimation ZIndex="3" Grid.Row="1" BusyText="{Binding DialogBusyText}"/>
 			</Grid>
 		</Grid>
 	</Grid>
