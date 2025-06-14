@@ -393,6 +393,7 @@ public class WattPilotService(SettingsBase settings) : BindableBase, IWattPilotS
 
         var id = Interlocked.Increment(ref requestId);
 
+        // ReSharper disable once ReplaceConditionalExpressionWithNullCoalescing
         var data = new JObject
         {
             { "type", "setValue" },
@@ -455,17 +456,16 @@ public class WattPilotService(SettingsBase settings) : BindableBase, IWattPilotS
         foreach (var token in jObject)
         {
             //Debug.Print($"{token.Key}: {token.Value?.ToString().Replace("\r", "").Replace("\n", "")}");
-            IReadOnlyList<PropertyInfo> propertyInfos = instance.GetType().GetProperties().Where(p => p.GetCustomAttributes<WattPilotAttribute>().Any(a => a.TokenName == token.Key)).ToArray();
+            var propertyInfos = instance.GetType().GetProperties().Where(p => p.GetCustomAttributes<WattPilotAttribute>().Any(a => a.TokenName == token.Key)).ToArray();
 
-            if (!propertyInfos.Any())
+            switch (propertyInfos.Length)
             {
-                continue;
-            }
+                case 0:
+                    continue;
 
-            if (propertyInfos.Count == 1)
-            {
-                SetWattPilotValue(instance, propertyInfos[0], token.Value);
-                continue;
+                case 1:
+                    SetWattPilotValue(instance, propertyInfos[0], token.Value);
+                    continue;
             }
 
             if (token.Value is JArray array)
