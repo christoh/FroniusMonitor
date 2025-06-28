@@ -13,12 +13,9 @@ using Settings = De.Hochstaetter.HomeAutomationServer.Models.Settings.Settings;
 
 namespace De.Hochstaetter.HomeAutomationServer;
 
-internal partial class Program
+internal class Program
 {
     private static ModbusServerService? server;
-
-    [GeneratedRegex("^(?<UserName>(?!:).+):(?<Password>(?!:).+)$", RegexOptions.Compiled)]
-    private static partial Regex PasswordRegex();
 
     private static ILogger? logger;
 
@@ -218,40 +215,6 @@ internal partial class Program
             return 1;
         }
 
-        var tracker = IoC.Get<SettingsChangeTracker>();
-        tracker.SettingsChanged += (_, _) => _ = settings.SaveAsync();
-
-        foreach (var arg in args)
-        {
-            var match = PasswordRegex().Match(arg);
-
-            if (!match.Success)
-            {
-                continue;
-            }
-
-            var userName = match.Groups["UserName"].Value;
-            var password = match.Groups["Password"].Value;
-
-            settings.FritzBoxConnections.Where(c => c.UserName == userName).Apply(c =>
-            {
-                c.Password = password;
-                c.PasswordChecksum = c.CalculatedChecksum;
-            });
-
-            settings.Gen24Connections.Where(c => c.UserName == userName).Apply(c =>
-            {
-                c.Password = password;
-                c.PasswordChecksum = c.CalculatedChecksum;
-            });
-        }
-
-        if (args.Length > 0)
-        {
-            await settings.SaveAsync().ConfigureAwait(false);
-            return 0;
-        }
-
         await server.StartAsync().ConfigureAwait(false);
         var fritzBoxDataCollector = IoC.Get<FritzBoxDataCollector>();
         await fritzBoxDataCollector.StartAsync().ConfigureAwait(false);
@@ -262,6 +225,7 @@ internal partial class Program
         //await IoC.Get<Gen24DataCollector>().StopAsync().ConfigureAwait(false);
         //await fritzBoxDataCollector.StopAsync().ConfigureAwait(false);
         // Configure the HTTP request pipeline.
+        await settings.SaveAsync().ConfigureAwait(false);
         await app.RunAsync().ConfigureAwait(false);
         return 0;
     }

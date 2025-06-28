@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.ComponentModel;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
@@ -23,7 +24,22 @@ public class User
 {
     private string? passwordCache;
 
-    [XmlAttribute] public string Username { get; set; } = string.Empty;
+    [XmlAttribute]
+    public string Username { get; set; } = string.Empty;
+
+    [XmlAttribute, DefaultValue(null)]
+    public string? ClearTextPassword
+    {
+        get => null;
+
+        set
+        {
+            if (value != null)
+            {
+                PasswordHash = GetHash(value);
+            }
+        }
+    }
 
     [XmlAttribute]
     public string PasswordHash
@@ -47,9 +63,11 @@ public class User
         }
     } = Convert.ToBase64String(RandomNumberGenerator.GetBytes(8));
 
-    [XmlIgnore] [JsonIgnore] internal byte[] SaltBytes => Convert.FromBase64String(Salt);
+    [XmlIgnore] [JsonIgnore]
+    internal byte[] SaltBytes => Convert.FromBase64String(Salt);
 
-    [XmlAttribute] public Roles Roles { get; set; } = Roles.None;
+    [XmlAttribute]
+    public Roles Roles { get; set; } = Roles.None;
 
     public void SetPassword(string password)
     {

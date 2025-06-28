@@ -26,7 +26,8 @@ public class WebConnection : BindableBase, ICloneable, IHaveDisplayName
         Aes.Key = IoC.Injector == null ? new byte[16] : IoC.Get<IAesKeyProvider>().GetAesKey();
     }
 
-    [JsonIgnore] public string DisplayName => BaseUrl;
+    [JsonIgnore]
+    public string DisplayName => BaseUrl;
 
     [DefaultValue(""), XmlAttribute]
     public string BaseUrl
@@ -49,6 +50,19 @@ public class WebConnection : BindableBase, ICloneable, IHaveDisplayName
         get;
         set => Set(ref field, value, () => calculatedChecksum = null);
     } = string.Empty;
+
+    [XmlAttribute, DefaultValue(null)]
+    public string? ClearTextPassword
+    {
+        get => null;
+        set
+        {
+            if (value != null)
+            {
+                Password = value;
+            }
+        }
+    }
 
     [XmlAttribute, DefaultValue(null)]
     public string? PasswordChecksum
