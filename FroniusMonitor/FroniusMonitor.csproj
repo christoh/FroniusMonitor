@@ -19,7 +19,7 @@
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<RootNamespace>De.Hochstaetter.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
 		<ApplicationIcon>Assets\Images\sun.ico</ApplicationIcon>
-		<NoWarn>1701;1702;IDE0079;CS7035</NoWarn>
+		<NoWarn>1701;1702;IDE0079;CS7035;NU1900</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -93,7 +93,12 @@ public sealed class WebClientService : IWebClientService
 
     public Task<ApiResult<JsonElement>> GetGen24Localization(string deviceId, string iso2LanguageCode, string name, CancellationToken token = default)
     {
-        return GetResult<JsonElement>($"gen24system/{deviceId}/i18n/{iso2LanguageCode}/{name}", token);
+        return GetResult<JsonElement>(FormattableString.Invariant($"gen24system/{deviceId}/i18n/{iso2LanguageCode}/{name}"), token);
+    }
+    
+    public Task<ApiResult<bool>> RequestGen24StandBy(string deviceId, bool isStandBy, CancellationToken token = default)
+    {
+        return GetResult<bool>(FormattableString.Invariant($"gen24system/{deviceId}/requestStandBy?isStandBy={isStandBy}"), token);
     }
 
     #endregion

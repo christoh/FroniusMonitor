@@ -63,7 +63,8 @@ public class User
         }
     } = Convert.ToBase64String(RandomNumberGenerator.GetBytes(8));
 
-    [XmlIgnore] [JsonIgnore]
+    [XmlIgnore]
+    [JsonIgnore]
     internal byte[] SaltBytes => Convert.FromBase64String(Salt);
 
     [XmlAttribute]
