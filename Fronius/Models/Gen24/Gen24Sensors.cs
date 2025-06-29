@@ -1,37 +1,27 @@
-﻿namespace De.Hochstaetter.Fronius.Models.Gen24;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-public class Gen24Sensors : BindableBase
+namespace De.Hochstaetter.Fronius.Models.Gen24;
+
+public partial class Gen24Sensors : BindableBase
 {
-    public Gen24Inverter? Inverter
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    
+    [ObservableProperty]
+    public partial Gen24Inverter? Inverter { get; set; }
 
-    public Gen24Storage? Storage
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial Gen24Storage? Storage { get; set; }
 
+    [ObservableProperty]
+    public partial Gen24PowerFlow? PowerFlow { get; set; }
 
-    public Gen24PowerFlow? PowerFlow
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial Gen24Status? InverterStatus { get; set; }
 
-    public Gen24Status? InverterStatus
-    {
-        get;
-        set => Set(ref field, value);
-    }
-
-    public Gen24Status? MeterStatus
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial Gen24Status? MeterStatus { get; set; }
+    
+    [ObservableProperty]
+    public partial Gen24StandByStatus? StandByStatus { get; set; }
 
     public ObservableCollection<Gen24PowerMeter3P> Meters { get; init; } = [];
 

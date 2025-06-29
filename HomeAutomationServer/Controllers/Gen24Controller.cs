@@ -1,7 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-using De.Hochstaetter.Fronius.Models.Gen24;
+﻿using De.Hochstaetter.Fronius.Models.Gen24;
+using De.Hochstaetter.Fronius.Models.Gen24.Commands;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace De.Hochstaetter.HomeAutomationServer.Controllers;
 
@@ -24,6 +25,7 @@ public class Gen24SystemController(IDataControlService controlService, ILogger<G
 
     [HttpGet("{id}/requestStandBy")]
     [BasicAuthorize(Roles = "Operator")]
+    [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> RequestStandBy([FromRoute] string id, [FromQuery, Required] bool isStandBy)
@@ -39,6 +41,31 @@ public class Gen24SystemController(IDataControlService controlService, ILogger<G
 
             await gen24Service!.RequestInverterStandBy(isStandBy).ConfigureAwait(false);
             return Ok(true);
+        }
+        catch (Exception ex)
+        {
+            return UnprocessableEntity(Helpers.GetProblemDetails(ex.GetType().Name, $"The request for stand-by mode on inverter {id} failed: {ex.Message}"));
+        }
+    }
+
+    [HttpGet("{id}/getStandByStatus")]
+    [BasicAuthorize(Roles = "User")]
+    [ProducesResponseType<Gen24StandByStatus>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetStandbyStatus([FromRoute]string id)
+    {
+        try
+        {
+            var (errorResponse, gen24Service) = GetManagedGen24System(id);
+
+            if (errorResponse != null)
+            {
+                return errorResponse;
+            }
+
+            var status = await gen24Service!.GetInverterStandByStatus().ConfigureAwait(false);
+            return Ok(status);
         }
         catch (Exception ex)
         {

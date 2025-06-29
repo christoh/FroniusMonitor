@@ -723,7 +723,7 @@
                     <RadioButton Classes="DeviceButton" IsChecked="True" Content="DC" Click="OnDcClicked" />
                     <RadioButton Classes="DeviceButton" Content="{x:Static p:Resources.Energy}" Click="OnEnergyClicked" />
                     <RadioButton Classes="DeviceButton" Content="{x:Static p:Resources.More}" Click="OnMoreClicked" />
-                    <ToggleButton Classes="OnOff" Margin="-2,0,0,0" x:Name="StandByButton" Content="Status" Height="7" IsChecked="True" Click="OnStandbyClicked" />
+                    <ToggleButton Classes="OnOff" Margin="-2,0,0,0" x:Name="StandByButton" Content="Status" Height="7" IsChecked="{Binding Inverter.Sensors.StandByStatus.IsStandBy, Converter={co:BoolInverter}, FallbackValue={x:False}}" Click="OnStandbyClicked" />
                 </StackPanel>
             </Grid>
         </Border>

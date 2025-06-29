@@ -99,7 +99,10 @@ public sealed class Gen24DataCollector(
                 {
                     if (gen24System.Config?.Components is not null)
                     {
-                        gen24System.Sensors = await gen24System.Service.GetFroniusData(gen24System.Config.Components, token).ConfigureAwait(false);
+                        var sensorsTask= gen24System.Service.GetFroniusData(gen24System.Config.Components, token);
+                        var standByStatusTask = gen24System.Service.GetInverterStandByStatus(token);
+                        gen24System.Sensors = await sensorsTask.ConfigureAwait(false);
+                        gen24System.Sensors.StandByStatus = await standByStatusTask.ConfigureAwait(false);
 
                         dataControlService.AddOrUpdate(new ManagedDevice(gen24System, gen24System.Service.Connection, typeof(IGen24Service)));
 

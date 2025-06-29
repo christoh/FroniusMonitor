@@ -266,7 +266,8 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
     [RelayCommand]
     private Task Standby(string key) => TaskExceptionHandler(async () =>
     {
-        await new NotImplementedException("Coming soon").Show();
+        var device=Inverters.First(i => i.Key == key).Inverter;
+        //await webClient.RequestGen24StandBy(key,device.Sensors.InverterStatus.)
     });
 
     [RelayCommand]
