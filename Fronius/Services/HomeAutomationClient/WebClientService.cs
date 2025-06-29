@@ -123,7 +123,7 @@ public sealed class WebClientService : IWebClientService
         return GetResult<bool>(FormattableString.Invariant($"gen24system/{deviceId}/requestStandBy?isStandBy={isStandBy}"), token);
     }
 
-    public Task<ApiResult<Gen24StandByStatus>> GetStandbyStatus(string deviceId, CancellationToken token = default)
+    public Task<ApiResult<Gen24StandByStatus>> GetGen24StandbyStatus(string deviceId, CancellationToken token = default)
     {
         return GetResult<Gen24StandByStatus>(FormattableString.Invariant($"gen24system/{deviceId}/GetStandbyStatus"), token);
     }

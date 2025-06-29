@@ -6,6 +6,8 @@ namespace De.Hochstaetter.Fronius.Contracts.HomeAutomationClient;
 
 public interface IWebClientService : IDisposable
 {
+    #region Identity
+
     Task<byte[]> GetKeyForUserName(string userName, CancellationToken token = default);
 
     void Initialize(string baseUri, string productName, string version);
@@ -13,7 +15,10 @@ public interface IWebClientService : IDisposable
     Task<ProblemDetails?> Login(string userName, string password, CancellationToken token = default);
 
     Task<ApiResult<IDictionary<string, DeviceInfo>>> ListDevices(CancellationToken token = default);
-    
+
+    #endregion
+
+    #region IPowerConsumer
     Task<ApiResult<bool>> SwitchDevice(string deviceId, bool turnOn, CancellationToken token = default);
 
     Task<ApiResult<bool>> SetDeviceBrightness(string deviceId, double amount, CancellationToken token = default);
@@ -21,6 +26,11 @@ public interface IWebClientService : IDisposable
     Task<ApiResult<bool>> SetColorTemperature(string deviceId, double temperatureKelvin, CancellationToken token = default);
 
     Task<ApiResult<bool>> SetHsv(string deviceId, double? hueDegrees = null, double? saturation = null, double? value = null, CancellationToken token = default);
+    Task<ApiResult<IDictionary<string, FritzBoxDevice>>> GetFritzBoxDevices(CancellationToken token = default);
+
+    #endregion
+    
+    #region GEN24
 
     Task<ApiResult<IDictionary<string, Gen24System>>> GetGen24Devices(CancellationToken token = default);
 
@@ -28,7 +38,7 @@ public interface IWebClientService : IDisposable
 
     Task<ApiResult<bool>> RequestGen24StandBy(string deviceId, bool isStandBy, CancellationToken token = default);
 
-    Task<ApiResult<IDictionary<string, FritzBoxDevice>>> GetFritzBoxDevices(CancellationToken token = default);
-
-    Task<ApiResult<Gen24StandByStatus>> GetStandbyStatus(string deviceId, CancellationToken token = default);
+    Task<ApiResult<Gen24StandByStatus>> GetGen24StandbyStatus(string deviceId, CancellationToken token = default);
+    
+    #endregion
 }
