@@ -86,21 +86,43 @@ public sealed class WebClientService : IWebClientService
 
     #region Gen24
 
-    public Task<ApiResult<IDictionary<string, Gen24System>>> GetGen24Devices(CancellationToken token = default)
+    public async Task<ApiResult<IDictionary<string, Gen24System>>> GetGen24Devices(CancellationToken token = default)
     {
-        return GetResult<IDictionary<string, Gen24System>>("Gen24System", token);
+        var result = await GetResult<IDictionary<string, Gen24System>>("Gen24System", token);
+
+        if (result is { Status: HttpStatusCode.OK, Payload: not null })
+        {
+            result.Payload.Values.Apply(inverter =>
+            {
+                if (inverter.Sensors is null)
+                {
+                    return;
+                }
+                
+                inverter.Sensors.PowerFlow = new Gen24PowerFlow
+                {
+                    GridPower = inverter.Sensors.PrimaryPowerMeter?.ActivePowerSum ?? 0,
+                    StoragePower = inverter.Sensors.Inverter?.StoragePower ?? 0,
+                    SolarPower = inverter.Sensors.Inverter?.SolarPowerSum ?? 0,
+                    LoadPower = -(inverter.Sensors.Inverter?.PowerActiveSum ?? 0) - (inverter.Sensors.PrimaryPowerMeter?.ActivePowerSum ?? 0),
+                    InverterAcPower = inverter.Sensors.Inverter?.PowerActiveSum ?? 0,
+                };
+            });
+        }
+
+        return result;
     }
 
     public Task<ApiResult<JsonElement>> GetGen24Localization(string deviceId, string iso2LanguageCode, string name, CancellationToken token = default)
     {
         return GetResult<JsonElement>(FormattableString.Invariant($"gen24system/{deviceId}/i18n/{iso2LanguageCode}/{name}"), token);
     }
-    
+
     public Task<ApiResult<bool>> RequestGen24StandBy(string deviceId, bool isStandBy, CancellationToken token = default)
     {
         return GetResult<bool>(FormattableString.Invariant($"gen24system/{deviceId}/requestStandBy?isStandBy={isStandBy}"), token);
     }
-    
+
     public Task<ApiResult<Gen24StandByStatus>> GetStandbyStatus(string deviceId, CancellationToken token = default)
     {
         return GetResult<Gen24StandByStatus>(FormattableString.Invariant($"gen24system/{deviceId}/GetStandbyStatus"), token);

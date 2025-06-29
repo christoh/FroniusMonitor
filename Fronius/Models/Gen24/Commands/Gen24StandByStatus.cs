@@ -1,18 +1,14 @@
-﻿namespace De.Hochstaetter.Fronius.Models.Gen24.Commands;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-public class Gen24StandByStatus : Gen24NoResultCommand
+namespace De.Hochstaetter.Fronius.Models.Gen24.Commands;
+
+public partial class Gen24StandByStatus : Gen24NoResultCommand
 {
     [FroniusProprietaryImport("standby", FroniusDataType.Root)]
-    public bool IsStandBy
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial bool IsStandBy { get; set; }
 
     [FroniusProprietaryImport("hasRequestHighestPriority", FroniusDataType.Root)]
-    public bool HasRequestHighestPriority
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial bool HasRequestHighestPriority { get; set; }
 }

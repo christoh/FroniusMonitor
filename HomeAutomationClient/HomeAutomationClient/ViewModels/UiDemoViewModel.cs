@@ -195,8 +195,8 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
         BusyText = string.Empty;
         var keyedDevice = FritzBoxDevices.First(d => d.Key == key);
-        var result= await webClient.SetColorTemperature(key, change.NewValue);
-        
+        var result = await webClient.SetColorTemperature(key, change.NewValue);
+
         if (result.Status is not HttpStatusCode.OK)
         {
             if (keyedDevice.Device.Color != null)
@@ -206,7 +206,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
                 keyedDevice.Device.Color.TemperatureKelvin = change.OldValue;
                 keyedDevice.Device.Refresh();
             }
-            
+
             await ShowHttpError(result);
         }
     });
@@ -221,8 +221,8 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
         BusyText = string.Empty;
         var keyedDevice = FritzBoxDevices.First(d => d.Key == key);
-        var result= await webClient.SetHsv(key, hueDegrees:change.NewValue);
-        
+        var result = await webClient.SetHsv(key, hueDegrees: change.NewValue);
+
         if (result.Status is not HttpStatusCode.OK)
         {
             if (keyedDevice.Device.Color != null)
@@ -232,7 +232,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
                 keyedDevice.Device.Color.HueDegrees = change.OldValue;
                 keyedDevice.Device.Refresh();
             }
-            
+
             await ShowHttpError(result);
         }
     });
@@ -247,28 +247,42 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
         BusyText = string.Empty;
         var keyedDevice = FritzBoxDevices.First(d => d.Key == key);
-        var result= await webClient.SetHsv(key, saturation:change.NewValue);
-        
+        var result = await webClient.SetHsv(key, saturation: change.NewValue);
+
         if (result.Status is not HttpStatusCode.OK)
         {
             if (keyedDevice.Device.Color != null)
             {
-                keyedDevice.Device.Color.SaturationAbsolute = Math.Round(change.NewValue*255,MidpointRounding.AwayFromZero);
+                keyedDevice.Device.Color.SaturationAbsolute = Math.Round(change.NewValue * 255, MidpointRounding.AwayFromZero);
                 keyedDevice.Device.Refresh();
-                keyedDevice.Device.Color.SaturationAbsolute = Math.Round(change.OldValue*255,MidpointRounding.AwayFromZero);
+                keyedDevice.Device.Color.SaturationAbsolute = Math.Round(change.OldValue * 255, MidpointRounding.AwayFromZero);
                 keyedDevice.Device.Refresh();
             }
-            
+
             await ShowHttpError(result);
         }
     });
 
-    [RelayCommand]
-    private Task Standby(string key) => TaskExceptionHandler(async () =>
-    {
-        var device=Inverters.First(i => i.Key == key).Inverter;
-        //await webClient.RequestGen24StandBy(key,device.Sensors.InverterStatus.)
-    });
+    //[RelayCommand]
+    //private Task Standby(string key) => TaskExceptionHandler(async () =>
+    //{
+    //    var inverter = Inverters.First(i => i.Key == key).Inverter;
+
+    //    if (inverter.Sensors?.StandByStatus is not null)
+    //    {
+    //        var oldStatus=inverter.Sensors.StandByStatus;
+    //        var result = await webClient.RequestGen24StandBy(key, !inverter.Sensors.StandByStatus.IsStandBy);
+
+    //        if (result.Status is not HttpStatusCode.OK)
+    //        {
+    //            inverter.Sensors.StandByStatus.IsStandBy = oldStatus.IsStandBy;
+    //            await ShowHttpError(result);
+    //            return;
+    //        }
+            
+    //        inverter.Sensors.StandByStatus.IsStandBy = !oldStatus.IsStandBy;
+    //    }
+    //});
 
     [RelayCommand]
     private async Task ShowComplexDialog()

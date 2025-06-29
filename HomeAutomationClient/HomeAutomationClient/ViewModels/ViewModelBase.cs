@@ -32,7 +32,7 @@ public abstract partial class ViewModelBase : BindableBase
         }
     }
 
-    protected static async Task ShowHttpError<T>(ApiResult<T> result)
+    public static async Task ShowHttpError<T>(ApiResult<T> result)
     {
         if (result.Status is HttpStatusCode.Forbidden)
         {

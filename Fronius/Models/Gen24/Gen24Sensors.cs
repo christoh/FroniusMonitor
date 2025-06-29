@@ -12,6 +12,7 @@ public partial class Gen24Sensors : BindableBase
     public partial Gen24Storage? Storage { get; set; }
 
     [ObservableProperty]
+    [JsonIgnore]
     public partial Gen24PowerFlow? PowerFlow { get; set; }
 
     [ObservableProperty]

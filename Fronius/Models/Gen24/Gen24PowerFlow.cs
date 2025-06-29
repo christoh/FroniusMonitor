@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.Fronius.Models.Gen24;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+
+namespace De.Hochstaetter.Fronius.Models.Gen24;
 
 /*
  * mandatory field
@@ -10,34 +12,39 @@
 
 public enum SiteType : sbyte
 {
-    [EnumParse(ParseAs = "produce-only")] ProduceOnly,
-    [EnumParse(ParseAs = "meter")] Meter,
-    [EnumParse(ParseAs = "vague-meter")] VagueMeter,
-    [EnumParse(ParseAs = "bidirectional")] BiDirectional,
-    [EnumParse(ParseAs = "ac-coupled")] AcCoupled,
-    [EnumParse(IsDefault = true)] Unknown,
+    [EnumParse(ParseAs = "produce-only")]
+    ProduceOnly,
+
+    [EnumParse(ParseAs = "meter")]
+    Meter,
+
+    [EnumParse(ParseAs = "vague-meter")]
+    VagueMeter,
+
+    [EnumParse(ParseAs = "bidirectional")]
+    BiDirectional,
+
+    [EnumParse(ParseAs = "ac-coupled")]
+    AcCoupled,
+
+    [EnumParse(IsDefault = true)]
+    Unknown,
 }
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
-public class Gen24PowerFlow : Gen24DeviceBase
+public partial class Gen24PowerFlow : Gen24DeviceBase
 {
     private static readonly IList<SmartMeterCalibrationHistoryItem>? history = IoC.TryGet<IDataCollectionService>()?.SmartMeterHistory!;
     private static int oldSmartMeterHistoryCountProduced;
     private static int oldSmartMeterHistoryCountConsumed;
 
-    [FroniusProprietaryImport("BAT_POWERACTIVE_MEAN_SUM_F64")]
-    public double StoragePower
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [JsonIgnore]
+    [ObservableProperty]
+    public partial double StoragePower { get; set; }
 
-    [FroniusProprietaryImport("GRID_POWERACTIVE_LOAD_MEAN_SUM_F64")]
-    public double LoadPower
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(LoadPowerCorrected)));
-    }
+    [JsonIgnore]
+    [ObservableProperty]
+    public partial double LoadPower { get; set; }
 
     private static double ConsumedFactor
     {
@@ -71,50 +78,36 @@ public class Gen24PowerFlow : Gen24DeviceBase
 
     public double GridPowerCorrected => GridPower * (GridPower < 0 ? ProducedFactor : ConsumedFactor);
 
-    [FroniusProprietaryImport("GRID_POWERACTIVE_GENERATED_MEAN_SUM_F64")]
-    public double InverterAcPower
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [JsonIgnore]
+    [ObservableProperty]
+    public partial double InverterAcPower { get; set; }
 
-    [FroniusProprietaryImport("GRID_POWERACTIVE_MEAN_SUM_F64")]
-    public double GridPower
-    {
-        get;
-        set => Set(ref field, value, () =>
-        {
-            NotifyOfPropertyChange(nameof(GridPowerCorrected));
-            NotifyOfPropertyChange(nameof(LoadPowerCorrected));
-        });
-    }
+    [JsonIgnore]
+    [ObservableProperty]
+    public partial double GridPower { get; set; }
 
-    [FroniusProprietaryImport("PV_POWERACTIVE_MEAN_SUM_F64")]
-    public double SolarPower
-    {
-        get;
-        set => Set(ref field, value);
-    }
-
-    [FroniusProprietaryImport("main", FroniusDataType.Attribute)]
-    public string? MainInverterId
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [JsonIgnore]
+    [ObservableProperty]
+    public partial double SolarPower { get; set; }
 
     [JsonIgnore]
     public IEnumerable<double> AllPowers => [StoragePower, GridPower, SolarPower, LoadPower];
+
     [JsonIgnore]
     public double DcInputPower => new[] { StoragePower, SolarPower }.Where(ps => ps > 0).Sum();
+
     [JsonIgnore]
     public double AcInputPower => new[] { GridPower, LoadPower }.Where(ps => ps > 0).Sum();
+
     [JsonIgnore]
-    public double AcOutputPower => new[] { GridPower , LoadPower }.Where(ps => ps < 0).Sum();
+    public double AcOutputPower => new[] { GridPower, LoadPower }.Where(ps => ps < 0).Sum();
+
     [JsonIgnore]
-    public double DcOutputPower => new[] { StoragePower , SolarPower }.Where(ps => ps < 0).Sum();
+    public double DcOutputPower => new[] { StoragePower, SolarPower }.Where(ps => ps < 0).Sum();
+
     [JsonIgnore]
     public double PowerLoss => AllPowers.Sum();
+
     [JsonIgnore]
     public double? Efficiency => 1 - PowerLoss / (AcInputPower - Math.Min(AcInputPower, -AcOutputPower) + DcInputPower - Math.Min(DcInputPower, -DcOutputPower));
 

@@ -8,6 +8,11 @@ public class BoolInverter : ConverterBase
     {
         return value is bool b ? !b : null;
     }
+
+    public override object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is bool b ? !b : null;
+    }
 }
 
 public abstract class Null2AnythingBase<T> : ConverterBase
@@ -46,9 +51,9 @@ public abstract class Any2AnythingBase<T> : ConverterBase
     }
 }
 
-public class Any2String : Any2AnythingBase<string> { }
+public class Any2String : Any2AnythingBase<string>;
 
-public class Any2Thickness : Any2AnythingBase<Thickness> { }
+public class Any2Thickness : Any2AnythingBase<Thickness>;
 
 public abstract class Bool2AnythingBase<T> : ConverterBase
 {

@@ -1,3 +1,5 @@
+using Avalonia.Controls.Primitives;
+
 namespace De.Hochstaetter.HomeAutomationClient.Controls;
 
 public enum InverterDisplayMode
@@ -73,6 +75,8 @@ public partial class InverterControl : DeviceControlBase
         InverterDisplayMode.EnergyStorage,
     ];
 
+    private static readonly IWebClientService webClient = IoC.Get<IWebClientService>();
+
     private int currentAcIndex, currentDcIndex, currentMoreIndex, energyIndex;
 
     public static readonly StyledProperty<Gen24System> InverterProperty = AvaloniaProperty.Register<InverterControl, Gen24System>(nameof(Inverter));
@@ -82,22 +86,6 @@ public partial class InverterControl : DeviceControlBase
         get => GetValue(InverterProperty);
         set => SetValue(InverterProperty, value);
     }
-
-    public static readonly StyledProperty<ICommand?> StandbyCommandProperty = AvaloniaProperty.Register<InverterControl, ICommand?>(nameof(StandbyCommand));
-
-    public ICommand? StandbyCommand
-    {
-        get => GetValue(StandbyCommandProperty);
-        set => SetValue(StandbyCommandProperty, value);
-    }
-
-    //public static readonly StyledProperty<bool> IsStandbyProperty = AvaloniaProperty.Register<InverterControl, bool>(nameof(IsStandby));
-
-    //public bool IsStandby
-    //{
-    //    get => GetValue(IsStandbyProperty);
-    //    set => SetValue(IsStandbyProperty, value);
-    //}
 
     public static readonly StyledProperty<bool> ColorAllTicksProperty = AvaloniaProperty.Register<InverterControl, bool>(nameof(ColorAllTicks));
 
@@ -140,7 +128,7 @@ public partial class InverterControl : DeviceControlBase
                 break;
         }
     }
-    
+
     private void OnInverterPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == string.Empty)
@@ -191,11 +179,26 @@ public partial class InverterControl : DeviceControlBase
 
     private void OnMoreClicked(object sender, RoutedEventArgs e) => CycleMode(moreModes, ref currentMoreIndex);
 
-    private void OnStandbyClicked(object? sender, RoutedEventArgs e)
+    private async void OnStandbyClicked(object? sender, RoutedEventArgs e)
     {
-        if (StandbyCommand?.CanExecute(DeviceKey) is true)
+        try
         {
-            StandbyCommand?.Execute(DeviceKey);
+            if (sender is not ToggleButton { IsChecked: not null } button || DeviceKey is not string deviceKey)
+            {
+                return;
+            }
+
+            var result = await webClient.RequestGen24StandBy(deviceKey, !button.IsChecked.Value);
+
+            if (result.Status != HttpStatusCode.OK)
+            {
+                button.IsChecked = !button.IsChecked.Value;
+                await ViewModelBase.ShowHttpError(result);
+            }
+        }
+        catch
+        {
+            // async void must be caught
         }
     }
 }
