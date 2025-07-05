@@ -402,6 +402,7 @@
             }
         }
 
+        [SuppressMessage("ReSharper", "AsyncVoidMethod", Justification = "The few lines outside of try-catch never throw")]
         private async void TimerElapsed(object? _)
         {
             if (Interlocked.Exchange(ref updateSemaphore, 1) != 0)
