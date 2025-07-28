@@ -42,7 +42,7 @@ public sealed class Gen24DataCollector(
     {
         await StopAsync(token);
         tokenSource = new CancellationTokenSource();
-
+        
         foreach (var connection in Connections)
         {
             var gen24Service = IoC.Get<IGen24Service>();

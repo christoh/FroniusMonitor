@@ -1,7 +1,9 @@
 ﻿using System.IO.Compression;
 using System.Text.Json.Serialization;
 using De.Hochstaetter.Fronius.Crypto;
+using De.Hochstaetter.HomeAutomationServer.Hubs;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
+using De.Hochstaetter.HomeAutomationServer.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -84,6 +86,7 @@ internal class Program
             .AddSingleton<SunSpecDataCollector>()
             .AddSingleton<FritzBoxDataCollector>()
             .AddSingleton<Gen24DataCollector>()
+            .AddSingleton<SignalRDispatcher>()
             .AddTransient<ISunSpecClient, SunSpecClient>()
             .AddLogging(b => b.AddSerilog())
             .AddCors(o => o.AddDefaultPolicy(p => p.SetIsOriginAllowed(_ => true)
@@ -158,8 +161,8 @@ internal class Program
             });
 
         builder.Services.AddOpenApi();
-
         builder.Services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, AuthenticationService>("Basic", null);
+        builder.Services.AddSignalR();
 
         //builder.Services.AddAuthentication()
         //    .AddScheme<UserList, MyAuthenticationHandler>("MyAuthenticationSchemeName", options => {});
@@ -177,6 +180,7 @@ internal class Program
 
         app.MapControllers();
         app.UseCors();
+        app.MapHub<HomeAutomationHub>("/home-automation-hub");
         IoC.Update(app.Services);
 
         logger = IoC.Get<ILogger<Program>>();
@@ -220,6 +224,7 @@ internal class Program
         await fritzBoxDataCollector.StartAsync().ConfigureAwait(false);
         await IoC.Get<SunSpecDataCollector>().StartAsync().ConfigureAwait(false);
         await IoC.Get<Gen24DataCollector>().StartAsync().ConfigureAwait(false);
+        await IoC.Get<SignalRDispatcher>().StartAsync().ConfigureAwait(false);
         //await Task.Delay(TimeSpan.FromSeconds(30));
         //await IoC.Get<SunSpecDataCollector>().StopAsync().ConfigureAwait(false);
         //await IoC.Get<Gen24DataCollector>().StopAsync().ConfigureAwait(false);
