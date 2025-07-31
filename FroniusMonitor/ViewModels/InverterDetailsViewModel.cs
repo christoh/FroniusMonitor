@@ -64,6 +64,6 @@ public class InverterDetailsViewModel(
     {
         Inverter.Config = IsSecondary ? dataCollectionService.HomeAutomationSystem?.Gen24Config2 : dataCollectionService.HomeAutomationSystem?.Gen24Config;
         Inverter.Sensors = IsSecondary ? dataCollectionService.HomeAutomationSystem?.Gen24Sensors2 : dataCollectionService.HomeAutomationSystem?.Gen24Sensors;
-        Header = $"{Inverter.Config?.InverterSettings?.SystemName ?? "---"} - {Inverter.Config?.Versions?.ModelName ?? "---"} ({Inverter.Config?.Versions?.SwVersions["GEN24"].ToLinuxString() ?? "0.0.0-0"}) - {Inverter.Sensors?.InverterStatus?.StatusMessageCaption ?? Loc.Unknown}";
+        Header = $"{Inverter.Config?.InverterSettings?.SystemName ?? "---"} - {Inverter.Config?.Versions?.ModelName ?? "---"} ({Inverter.Config?.Versions?.SwVersions["GEN24"].ToLinuxString() ?? "0.0.0-0"}) - {Inverter.Sensors?.InverterStatus?.StatusMessageCaption() ?? Loc.Unknown}";
     }
 }

@@ -162,7 +162,14 @@ internal class Program
 
         builder.Services.AddOpenApi();
         builder.Services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, AuthenticationService>("Basic", null);
-        builder.Services.AddSignalR();
+        builder.Services.AddSignalR()
+            .AddJsonProtocol(o =>
+            {
+                o.PayloadSerializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals;
+                o.PayloadSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                o.PayloadSerializerOptions.IgnoreReadOnlyProperties = true;
+                o.PayloadSerializerOptions.IgnoreReadOnlyFields = true;
+            });
 
         //builder.Services.AddAuthentication()
         //    .AddScheme<UserList, MyAuthenticationHandler>("MyAuthenticationSchemeName", options => {});
@@ -180,7 +187,7 @@ internal class Program
 
         app.MapControllers();
         app.UseCors();
-        app.MapHub<HomeAutomationHub>("/home-automation-hub");
+        app.MapHub<HomeAutomationHub>("/hub");
         IoC.Update(app.Services);
 
         logger = IoC.Get<ILogger<Program>>();

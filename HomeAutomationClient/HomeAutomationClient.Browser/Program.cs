@@ -18,8 +18,10 @@ internal sealed partial class Program
         var cache = new Cache();
         #if DEBUG
         await cache.AddOrUpdateAsync(CacheKeys.ApiUri, "https://home.hochstaetter.de/api/");
+        await cache.AddOrUpdateAsync(CacheKeys.HubUri, "https://home.hochstaetter.de/hub");
         #else
         await cache.AddOrUpdateAsync(CacheKeys.ApiUri, args[0] + (args[0].EndsWith('/') ? string.Empty : "/") + "api/");
+        await cache.AddOrUpdateAsync(CacheKeys.HubUri, args[0] + (args[0].EndsWith('/') ? string.Empty : "/") + "hub");
         #endif
         App.ServiceCollection = new ServiceCollection();
         App.ServiceCollection.AddSingleton<ICache>(cache);

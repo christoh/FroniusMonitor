@@ -2,7 +2,15 @@
 
 public class Gen24Status : BindableBase
 {
-    private static readonly IGen24Service? gen24Service = IoC.TryGetRegistered<IGen24Service>();
+    private static IGen24Service? gen24Service;
+
+    public static IGen24Service? Gen24Service
+    {
+        get
+        {
+            return (gen24Service ??= IoC.TryGet<IGen24Service>());
+        }
+    }
 
     [FroniusProprietaryImport("id", FroniusDataType.Root)]
     public uint? Id
@@ -41,7 +49,7 @@ public class Gen24Status : BindableBase
     }
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    public string? StatusMessage => gen24Service?.GetUiString((DeviceType == DeviceType.PowerMeter ? "POWERMETER" : "INVERTER") + ".DEVICESTATE." + StatusCode).GetAwaiter().GetResult();
+    public string? StatusMessage() => Gen24Service?.GetUiString((DeviceType == DeviceType.PowerMeter ? "POWERMETER" : "INVERTER") + ".DEVICESTATE." + StatusCode).GetAwaiter().GetResult();
 
-    public string? StatusMessageCaption => Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName == "en" ? StatusMessage?[0].ToString().ToUpperInvariant() + StatusMessage?[1..] : StatusMessage;
+    public string? StatusMessageCaption() => Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName == "en" ? StatusMessage()?[0].ToString().ToUpperInvariant() + StatusMessage()?[1..] : StatusMessage();
 }

@@ -44,7 +44,7 @@ public class SmartMeterDetailsViewModel : ViewModelBase
         Status = newHomeAutomationSystem.Gen24Sensors?.MeterStatus;
         Meter = newHomeAutomationSystem.Gen24Sensors?.PrimaryPowerMeter;
         Config = newHomeAutomationSystem.Gen24Config;
-        Header = $"{Meter?.Model ?? Loc.Unknown} ({Meter?.SoftwareVersion?.ToLinuxString() ?? "---"}) - {Status?.StatusMessage}";
+        Header = $"{Meter?.Model ?? Loc.Unknown} ({Meter?.SoftwareVersion?.ToLinuxString() ?? "---"}) - {Status?.StatusMessage()}";
         Title = $"{Loc.SmartMeterDetailsView} - {Header}";
     }
 }

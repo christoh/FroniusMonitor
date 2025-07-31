@@ -112,7 +112,7 @@ public partial class SmartMeterControl
             return;
         }
 
-        Title.Text = $"{SmartMeter.Model} ({dataCollectionService?.HomeAutomationSystem?.Gen24Sensors?.MeterStatus?.StatusMessageCaption ?? Loc.Unknown})";
+        Title.Text = $"{SmartMeter.Model} ({dataCollectionService?.HomeAutomationSystem?.Gen24Sensors?.MeterStatus?.StatusMessageCaption() ?? Loc.Unknown})";
         BackgroundProvider.Background = dataCollectionService?.HomeAutomationSystem?.Gen24Sensors?.MeterStatus?.ToBrush() ?? Brushes.LightGray;
 
         Enum.GetNames<MeterDisplayMode>().Apply(enumName =>

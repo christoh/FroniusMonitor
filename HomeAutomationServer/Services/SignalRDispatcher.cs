@@ -4,7 +4,11 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace De.Hochstaetter.HomeAutomationServer.Services;
 
-public sealed class SignalRDispatcher(IHubContext<HomeAutomationHub> hubContext, IDataControlService controlService) : IHomeAutomationRunner
+public sealed class SignalRDispatcher(
+    IHubContext<HomeAutomationHub> hubContext,
+    IDataControlService controlService,
+    ILogger<SignalRDispatcher> logger
+) : IHomeAutomationRunner
 {
     public void Dispose()
     {
@@ -25,9 +29,16 @@ public sealed class SignalRDispatcher(IHubContext<HomeAutomationHub> hubContext,
 
     private void OnDeviceUpdate(object? sender, DeviceUpdateEventArgs e)
     {
-        if (e.DeviceAction is DeviceAction.Add or DeviceAction.Change)
+        try
         {
-            _ = hubContext.Clients.All.SendAsync("DeviceUpdate", e.Device.Device.GetType().Name, e.Id, e.Device.Device).ConfigureAwait(false);
+            if (e.DeviceAction is DeviceAction.Add or DeviceAction.Change)
+            {
+                _ = hubContext.Clients.All.SendAsync(e.Device.Device.GetType().Name, e.Id, e.Device.Device);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "SignalR failed");
         }
     }
 }

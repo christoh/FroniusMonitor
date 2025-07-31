@@ -1,10 +1,12 @@
 ﻿using System.Collections.ObjectModel;
+using System.Text.Json.Serialization;
 using De.Hochstaetter.Fronius.Models;
+using Microsoft.AspNetCore.SignalR.Client;
 using Timer = System.Threading.Timer;
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 
-public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewModelBase, IDisposable
+public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewModelBase, IAsyncDisposable, IDisposable
 {
     public class KeyedInverter
     {
@@ -20,6 +22,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
     }
 
     private Timer? timer;
+    private HubConnection? connection;
 
     [ObservableProperty]
     public partial bool ColorAllTicks { get; set; } = true;
@@ -51,17 +54,69 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
         BusyText = Loc.ConnectingToHas;
         await base.Initialize();
         timer = new(TimerElapsed, null, 0, 1000);
+
+        var hubUri = IoC.TryGetRegistered<ICache>()?.Get<string>(CacheKeys.HubUri) ?? "http://www.example.com/hub";
+
+        connection = new HubConnectionBuilder()
+            .WithUrl(new Uri("http://localhost:4711/hub"))
+            .WithAutomaticReconnect()
+            .AddJsonProtocol(o =>
+            {
+                o.PayloadSerializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals;
+                o.PayloadSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                o.PayloadSerializerOptions.IgnoreReadOnlyProperties = true;
+                o.PayloadSerializerOptions.IgnoreReadOnlyFields = true;
+            })
+            .Build();
+
+        await connection.StartAsync();
+
+        connection.On<string, Gen24System>(nameof(Gen24System), OnGen24Update);
+
+        connection.On<string, FritzBoxDevice>(nameof(FritzBoxDevice), OnFritzBoxUpdate);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (timer != null)
+        {
+            await timer.DisposeAsync();
+        }
+
+        if (connection != null)
+        {
+            await connection.DisposeAsync();
+        }
+
+        GC.SuppressFinalize(this);
     }
 
     public void Dispose()
     {
         timer?.Dispose();
+
+        _ = Task.Run(async () =>
+        {
+            if (connection != null)
+            {
+                await connection.DisposeAsync();
+            }
+        });
+
         GC.SuppressFinalize(this);
     }
 
-    ~UiDemoViewModel()
+    ~UiDemoViewModel() => Dispose();
+
+
+    private void OnFritzBoxUpdate(string id, FritzBoxDevice fritzBoxDevice)
     {
-        Dispose();
+
+    }
+
+    private void OnGen24Update(string id, Gen24System gen24System)
+    {
+
     }
 
     private async void TimerElapsed(object? state)
@@ -279,7 +334,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
     //            await ShowHttpError(result);
     //            return;
     //        }
-            
+
     //        inverter.Sensors.StandByStatus.IsStandBy = !oldStatus.IsStandBy;
     //    }
     //});
