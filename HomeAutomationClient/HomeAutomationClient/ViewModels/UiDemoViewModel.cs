@@ -21,7 +21,6 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
         public required FritzBoxDevice Device { get; init; }
     }
 
-    private Timer? timer;
     private HubConnection? connection;
 
     [ObservableProperty]
@@ -51,38 +50,37 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
     public override async Task Initialize()
     {
-        BusyText = Loc.ConnectingToHas;
-        await base.Initialize();
-        timer = new(TimerElapsed, null, 0, 1000);
+        try
+        {
+            BusyText = Loc.ConnectingToHas;
+            await base.Initialize();
 
-        var hubUri = IoC.TryGetRegistered<ICache>()?.Get<string>(CacheKeys.HubUri) ?? "http://www.example.com/hub";
+            var hubUri = IoC.TryGetRegistered<ICache>()?.Get<string>(CacheKeys.HubUri) ?? "http://www.example.com/hub";
 
-        connection = new HubConnectionBuilder()
-            .WithUrl(new Uri("http://localhost:4711/hub"))
-            .WithAutomaticReconnect()
-            .AddJsonProtocol(o =>
-            {
-                o.PayloadSerializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals;
-                o.PayloadSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-                o.PayloadSerializerOptions.IgnoreReadOnlyProperties = true;
-                o.PayloadSerializerOptions.IgnoreReadOnlyFields = true;
-            })
-            .Build();
+            connection = new HubConnectionBuilder()
+                .WithUrl(hubUri)
+                .WithAutomaticReconnect()
+                .AddJsonProtocol(o =>
+                {
+                    o.PayloadSerializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals;
+                    o.PayloadSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                    o.PayloadSerializerOptions.IgnoreReadOnlyProperties = true;
+                    o.PayloadSerializerOptions.IgnoreReadOnlyFields = true;
+                })
+                .Build();
 
-        await connection.StartAsync();
-
-        connection.On<string, Gen24System>(nameof(Gen24System), OnGen24Update);
-
-        connection.On<string, FritzBoxDevice>(nameof(FritzBoxDevice), OnFritzBoxUpdate);
+            await connection.StartAsync();
+            connection.On<string, Gen24System>(nameof(Gen24System), OnGen24Update);
+            connection.On<string, FritzBoxDevice>(nameof(FritzBoxDevice), OnFritzBoxUpdate);
+        }
+        finally
+        {
+            BusyText = null;
+        }
     }
 
     public async ValueTask DisposeAsync()
     {
-        if (timer != null)
-        {
-            await timer.DisposeAsync();
-        }
-
         if (connection != null)
         {
             await connection.DisposeAsync();
@@ -93,8 +91,6 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
     public void Dispose()
     {
-        timer?.Dispose();
-
         _ = Task.Run(async () =>
         {
             if (connection != null)
@@ -108,86 +104,54 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
     ~UiDemoViewModel() => Dispose();
 
+    private void OnGen24Update(string id, Gen24System gen24System)
+    {
+        var inverter = Inverters.FirstOrDefault(i => i.Key == id);
+
+        if (inverter == null)
+        {
+            inverter = new KeyedInverter { Key = id, Inverter = gen24System };
+
+            _ = Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                Inverters.Add(inverter);
+                NotifyOfPropertyChange(nameof(ShowInverters));
+            });
+        }
+        else
+        {
+            inverter.Inverter.CopyFrom(gen24System);
+        }
+
+        if (inverter.Inverter.Sensors is { Storage: not null, PrimaryPowerMeter: not null })
+        {
+            Gen24Config = inverter.Inverter.Config;
+            MeterStatus = inverter.Inverter.Sensors.MeterStatus;
+            SmartMeter = inverter.Inverter.Sensors.PrimaryPowerMeter;
+            BatteryGen24System = inverter.Inverter;
+        }
+    }
 
     private void OnFritzBoxUpdate(string id, FritzBoxDevice fritzBoxDevice)
     {
-
-    }
-
-    private void OnGen24Update(string id, Gen24System gen24System)
-    {
-
-    }
-
-    private async void TimerElapsed(object? state)
-    {
-        try
+        if (!fritzBoxDevice.CanSwitch)
         {
-            var invertersTask = webClient.GetGen24Devices();
-            var fritzBoxTask = webClient.GetFritzBoxDevices();
-
-            var inverters = (await invertersTask.ConfigureAwait(false)).Payload;
-
-            if (inverters != null)
-            {
-                foreach (var inverter in Inverters)
-                {
-                    if (inverter.Inverter.Sensors is { Storage: not null, PrimaryPowerMeter: not null })
-                    {
-                        Gen24Config = inverter.Inverter.Config;
-                        MeterStatus = inverter.Inverter.Sensors.MeterStatus;
-                        SmartMeter = inverter.Inverter.Sensors.PrimaryPowerMeter;
-                        BatteryGen24System = inverter.Inverter;
-                    }
-
-                    var updatedInverter = inverters.FirstOrDefault(i => i.Key == inverter.Key);
-
-                    if (updatedInverter.Key != null)
-                    {
-                        inverter.Inverter.CopyFrom(updatedInverter.Value);
-                        inverters.Remove(updatedInverter);
-                    }
-                }
-
-                foreach (var inverter in inverters)
-                {
-                    _ = Dispatcher.UIThread.InvokeAsync(() =>
-                    {
-                        Inverters.Add(new KeyedInverter { Key = inverter.Key, Inverter = inverter.Value });
-                        NotifyOfPropertyChange(nameof(ShowInverters));
-                    });
-                }
-            }
-
-            var fritzBoxDevices = (await fritzBoxTask.ConfigureAwait(false)).Payload;
-
-            if (fritzBoxDevices != null)
-            {
-                foreach (var fritzBoxDevice in FritzBoxDevices)
-                {
-                    var updatedFritzBoxDevice = fritzBoxDevices.FirstOrDefault(i => i.Key == fritzBoxDevice.Key);
-
-                    if (updatedFritzBoxDevice.Key != null)
-                    {
-                        fritzBoxDevice.Device.CopyFrom(updatedFritzBoxDevice.Value);
-                        fritzBoxDevices.Remove(updatedFritzBoxDevice);
-                    }
-                }
-
-                foreach (var fritzBoxDevice in fritzBoxDevices.Where(f => f.Value.CanSwitch))
-                {
-                    FritzBoxDevices.Add(new KeyedFritzBoxDevice { Key = fritzBoxDevice.Key, Device = fritzBoxDevice.Value });
-                    NotifyOfPropertyChange(nameof(ShowPowerConsumers));
-                }
-            }
+            return;
         }
-        catch
+
+        var updateDevice = FritzBoxDevices.FirstOrDefault(f => f.Key == id);
+
+        if (updateDevice == null)
         {
-            // ignore
+            _ = Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                FritzBoxDevices.Add(new KeyedFritzBoxDevice { Key = id, Device = fritzBoxDevice });
+                NotifyOfPropertyChange(nameof(ShowPowerConsumers));
+            });
         }
-        finally
+        else
         {
-            BusyText = null;
+            updateDevice.Device.CopyFrom(fritzBoxDevice);
         }
     }
 
