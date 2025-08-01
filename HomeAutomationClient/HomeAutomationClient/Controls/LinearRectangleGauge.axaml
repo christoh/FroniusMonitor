@@ -1,0 +1,11 @@
+<c:Gauge xmlns="https://github.com/avaloniaui"
+         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+         xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="50"
+         x:Class="De.Hochstaetter.HomeAutomationClient.Controls.LinearRectangleGauge">
+    <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:LinearRectangleGauge}}" Stretch="Fill">
+        <Canvas x:Name="RectangleHost" Width="100" Height="100" Background="{Binding Background}"/>
+    </Viewbox>
+</c:Gauge>

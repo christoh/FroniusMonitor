@@ -43,6 +43,12 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
     [ObservableProperty]
     public partial Gen24System? BatteryGen24System { get; set; }
 
+    [ObservableProperty]
+    public partial Gen24PowerFlow SitePowerFlow { get; set; } = new();
+
+    [ObservableProperty]
+    public partial double SitePvPeakPower { get; set; }
+
     public bool ShowInverters => Inverters.Count > 0;
 
     public bool ShowPowerConsumers => FritzBoxDevices.Count > 0;
@@ -105,29 +111,45 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
     private void OnGen24Update(string id, Gen24System gen24System)
     {
-        var inverter = Inverters.FirstOrDefault(i => i.Key == id);
-
-        if (inverter == null)
+        try
         {
-            inverter = new KeyedInverter { Key = id, Inverter = gen24System };
+            gen24System.Sensors?.GeneratePowerFlow();
 
-            _ = Dispatcher.UIThread.InvokeAsync(() =>
+            var inverter = Inverters.FirstOrDefault(i => i.Key == id);
+
+            if (inverter == null)
             {
-                Inverters = new(Inverters.Append(inverter).OrderBy(i => i.Inverter.Config?.InverterSettings?.SystemName));
-                NotifyOfPropertyChange(nameof(ShowInverters));
-            });
-        }
-        else
-        {
-            inverter.Inverter.CopyFrom(gen24System);
-        }
+                inverter = new KeyedInverter { Key = id, Inverter = gen24System };
 
-        if (inverter.Inverter.Sensors is { Storage: not null, PrimaryPowerMeter: not null })
+                Dispatcher.UIThread.Invoke(() =>
+                {
+                    Inverters = new(Inverters.Append(inverter).OrderBy(i => i.Inverter.Config?.InverterSettings?.SystemName));
+                    NotifyOfPropertyChange(nameof(ShowInverters));
+                });
+            }
+            else
+            {
+                inverter.Inverter.CopyFrom(gen24System);
+            }
+
+            if (inverter.Inverter.Sensors is { Storage: not null, PrimaryPowerMeter: not null })
+            {
+                Gen24Config = inverter.Inverter.Config;
+                MeterStatus = inverter.Inverter.Sensors.MeterStatus;
+                SmartMeter = inverter.Inverter.Sensors.PrimaryPowerMeter;
+                BatteryGen24System = inverter.Inverter;
+            }
+
+            SitePowerFlow.SolarPower = Inverters.Sum(i => i.Inverter.Sensors?.PowerFlow?.SolarPower ?? 0);
+            SitePowerFlow.GridPower = Inverters.Sum(i => i.Inverter.Sensors?.PowerFlow?.GridPower ?? 0);
+            SitePowerFlow.StoragePower = Inverters.Sum(i => i.Inverter.Sensors?.PowerFlow?.StoragePower ?? 0);
+            SitePowerFlow.LoadPower = Inverters.Sum(i => i.Inverter.Sensors?.PowerFlow?.LoadPower ?? 0);
+            SitePowerFlow.InverterAcPower = Inverters.Sum(i => i.Inverter.Sensors?.PowerFlow?.InverterAcPower ?? 0);
+            SitePvPeakPower = Inverters.Sum(i => (i.Inverter.Config?.InverterSettings?.Mppt?.Mppt1?.WattPeak + i.Inverter.Config?.InverterSettings?.Mppt?.Mppt2?.WattPeak) ?? 0);
+        }
+        catch
         {
-            Gen24Config = inverter.Inverter.Config;
-            MeterStatus = inverter.Inverter.Sensors.MeterStatus;
-            SmartMeter = inverter.Inverter.Sensors.PrimaryPowerMeter;
-            BatteryGen24System = inverter.Inverter;
+            // Ignore errors
         }
     }
 

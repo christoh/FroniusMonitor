@@ -34,6 +34,24 @@
 								<Setter Property="Margin" Value="4" />
 							</Style>
 						</StackPanel.Styles>
+                        <HeaderedContentControl Classes="GroupBox" Header="Linear Gauge">
+                            <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,Auto" RowSpacing="5">
+                                <Grid.Styles>
+                                    <Style Selector="c|LinearRectangleGauge">
+										<Setter Property="Width" Value="200" />
+                                        <Setter Property="Height" Value="20" />
+										<Setter Property="TickFill" Value="{DynamicResource TickFill}" />
+                                        <Setter Property="Minimum" Value="0" />
+                                        <Setter Property="NumberOfTicks" Value="30"/>
+									</Style>
+                                </Grid.Styles>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.PvPower}" Margin="0,3,8,0" />
+                                <c:LinearRectangleGauge Grid.Row="0" Grid.Column="1" Maximum="{Binding SitePvPeakPower}" Value="{Binding SitePowerFlow.SolarPower}"/>
+                                
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Consumption" Margin="0,3,8,0" />
+                                <c:LinearRectangleGauge Grid.Row="1" Grid.Column="1" Maximum="{Binding SitePvPeakPower}" Value="{Binding SitePowerFlow.LoadPower, Converter={co:Multiply Factor=-1}}"/>
+                            </Grid>
+                        </HeaderedContentControl>
 						<!--<HeaderedContentControl Classes="GroupBox" Header="Half Circle Gauge">
                             <Viewbox Width="300">
                                 <views:GaugeTestView />

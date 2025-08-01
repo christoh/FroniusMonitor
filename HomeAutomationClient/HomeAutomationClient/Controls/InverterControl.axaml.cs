@@ -79,9 +79,9 @@ public partial class InverterControl : DeviceControlBase
 
     private int currentAcIndex, currentDcIndex, currentMoreIndex, energyIndex;
 
-    public static readonly StyledProperty<Gen24System> InverterProperty = AvaloniaProperty.Register<InverterControl, Gen24System>(nameof(Inverter));
+    public static readonly StyledProperty<Gen24System?> InverterProperty = AvaloniaProperty.Register<InverterControl, Gen24System?>(nameof(Inverter));
 
-    public Gen24System Inverter
+    public Gen24System? Inverter
     {
         get => GetValue(InverterProperty);
         set => SetValue(InverterProperty, value);

@@ -1,6 +1,5 @@
 ﻿using Avalonia.Animation;
 using Avalonia.Animation.Easings;
-using Avalonia.Data;
 using Avalonia.Styling;
 using De.Hochstaetter.HomeAutomationClient.Extensions;
 
@@ -112,6 +111,8 @@ public abstract class Gauge : ContentControl
         set => SetValue(TickFillProperty, value);
     }
 
+    protected record AngleBrush(double RelativeValue, IImmutableBrush Brush);
+    
     protected Color GetColorForRelativeValue(double relativeValue)
     {
         if (GaugeColors == null || !GaugeColors.Any())

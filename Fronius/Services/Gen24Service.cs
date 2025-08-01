@@ -135,15 +135,7 @@ public class Gen24Service(IGen24JsonService gen24JsonService) : BindableBase, IG
             }
         }
 
-        gen24Sensors.PowerFlow = new Gen24PowerFlow
-        {
-            GridPower = gen24Sensors.PrimaryPowerMeter?.ActivePowerSum ?? 0,
-            StoragePower = gen24Sensors.Inverter?.StoragePower ?? 0,
-            SolarPower = gen24Sensors.Inverter?.SolarPowerSum ?? 0,
-            LoadPower = -(gen24Sensors.Inverter?.PowerActiveSum ?? 0) - (gen24Sensors.PrimaryPowerMeter?.ActivePowerSum ?? 0),
-            InverterAcPower = gen24Sensors.Inverter?.PowerActiveSum ?? 0,
-        };
-
+        gen24Sensors.GeneratePowerFlow();
         return gen24Sensors;
     }
 

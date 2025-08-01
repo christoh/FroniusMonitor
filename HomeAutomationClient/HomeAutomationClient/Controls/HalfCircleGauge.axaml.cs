@@ -5,7 +5,6 @@ namespace De.Hochstaetter.HomeAutomationClient.Controls;
 
 public partial class HalfCircleGauge : Gauge
 {
-    private record AngleBrush(double RelativeValue, IImmutableBrush Brush);
     private readonly Polygon? hand;
 
     public static readonly StyledProperty<IBrush?> HandFillProperty = AvaloniaProperty.Register<Gauge, IBrush?>(nameof(HandFill), Brushes.DarkSlateGray);
@@ -65,7 +64,7 @@ public partial class HalfCircleGauge : Gauge
                     Fill = TickFill,
                     StrokeThickness = 0,
                     RenderTransform = new RotateTransform(angle, 0, 0),
-                    Tag = new AngleBrush(angle / 180, new ImmutableSolidColorBrush(GetColorForRelativeValue(angle / 180)))
+                    Tag = new AngleBrush(angle / 180, new ImmutableSolidColorBrush(GetColorForRelativeValue(angle / 180))),
                 };
 
                 rect.SetValue(Canvas.BottomProperty, sin * translationLength);
