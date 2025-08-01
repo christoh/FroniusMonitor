@@ -20,7 +20,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
         public required FritzBoxDevice Device { get; init; }
     }
 
-    private HubConnection? connection;
+    private HubConnection? hubConnection;
 
     [ObservableProperty]
     public partial bool ColorAllTicks { get; set; } = true;
@@ -56,7 +56,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
             var hubUri = IoC.TryGetRegistered<ICache>()?.Get<string>(CacheKeys.HubUri) ?? "http://www.example.com/hub";
 
-            connection = new HubConnectionBuilder()
+            hubConnection = new HubConnectionBuilder()
                 .WithUrl(hubUri)
                 .WithAutomaticReconnect()
                 .AddJsonProtocol(o =>
@@ -68,9 +68,9 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
                 })
                 .Build();
 
-            await connection.StartAsync();
-            connection.On<string, Gen24System>(nameof(Gen24System), OnGen24Update);
-            connection.On<string, FritzBoxDevice>(nameof(FritzBoxDevice), OnFritzBoxUpdate);
+            await hubConnection.StartAsync();
+            hubConnection.On<string, Gen24System>(nameof(Gen24System), OnGen24Update);
+            hubConnection.On<string, FritzBoxDevice>(nameof(FritzBoxDevice), OnFritzBoxUpdate);
         }
         finally
         {
@@ -80,9 +80,9 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
     public async ValueTask DisposeAsync()
     {
-        if (connection != null)
+        if (hubConnection != null)
         {
-            await connection.DisposeAsync();
+            await hubConnection.DisposeAsync();
         }
 
         GC.SuppressFinalize(this);
@@ -92,9 +92,9 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
     {
         _ = Task.Run(async () =>
         {
-            if (connection != null)
+            if (hubConnection != null)
             {
-                await connection.DisposeAsync();
+                await hubConnection.DisposeAsync();
             }
         });
 
@@ -113,7 +113,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
             _ = Dispatcher.UIThread.InvokeAsync(() =>
             {
-                Inverters.Add(inverter);
+                Inverters = new(Inverters.Append(inverter).OrderBy(i => i.Inverter.Config?.InverterSettings?.SystemName));
                 NotifyOfPropertyChange(nameof(ShowInverters));
             });
         }
@@ -144,7 +144,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
         {
             _ = Dispatcher.UIThread.InvokeAsync(() =>
             {
-                FritzBoxDevices.Add(new KeyedFritzBoxDevice { Key = id, Device = fritzBoxDevice });
+                FritzBoxDevices = new(FritzBoxDevices.Append(new KeyedFritzBoxDevice { Key = id, Device = fritzBoxDevice }).OrderBy(d => d.Device.DisplayName));
                 NotifyOfPropertyChange(nameof(ShowPowerConsumers));
             });
         }
