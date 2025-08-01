@@ -2,7 +2,6 @@
 using System.Text.Json.Serialization;
 using De.Hochstaetter.Fronius.Models;
 using Microsoft.AspNetCore.SignalR.Client;
-using Timer = System.Threading.Timer;
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 

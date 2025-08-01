@@ -27,13 +27,13 @@ public sealed class SignalRDispatcher(
         return Task.CompletedTask;
     }
 
-    private void OnDeviceUpdate(object? sender, DeviceUpdateEventArgs e)
+    private async void OnDeviceUpdate(object? sender, DeviceUpdateEventArgs e)
     {
         try
         {
             if (e.DeviceAction is DeviceAction.Add or DeviceAction.Change)
             {
-                _ = hubContext.Clients.All.SendAsync(e.Device.Device.GetType().Name, e.Id, e.Device.Device);
+                await hubContext.Clients.All.SendAsync(e.Device.Device.GetType().Name, e.Id, e.Device.Device).ConfigureAwait(false);
             }
         }
         catch (Exception ex)

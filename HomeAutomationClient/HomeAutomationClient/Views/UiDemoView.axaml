@@ -25,13 +25,16 @@
                 </TextBlock>-->
 			</StackPanel>
 			<Grid Grid.Row="1" x:Name="InnerGrid">
-				<WrapPanel Orientation="Horizontal" Width="{Binding ElementName=InnerGrid, Path=Bounds.Width}">
-					<WrapPanel.Styles>
-						<Style Selector="HeaderedContentControl">
-							<Setter Property="Margin" Value="4" />
-						</Style>
-					</WrapPanel.Styles>
-					<!--<HeaderedContentControl Classes="GroupBox" Header="Half Circle Gauge">
+				<ScrollViewer VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto"
+                              VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                              VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AllowAutoHide="False" Margin="0,0,0,16">
+					<StackPanel Orientation="Horizontal">
+						<StackPanel.Styles>
+							<Style Selector="HeaderedContentControl">
+								<Setter Property="Margin" Value="4" />
+							</Style>
+						</StackPanel.Styles>
+						<!--<HeaderedContentControl Classes="GroupBox" Header="Half Circle Gauge">
                             <Viewbox Width="300">
                                 <views:GaugeTestView />
                             </Viewbox>
@@ -47,58 +50,63 @@
                                 <Button Content="Simple Error MessageBox" Command="{Binding ShowSimpleDialogCommand}" />
                             </StackPanel>
                         </HeaderedContentControl>-->
-					<HeaderedContentControl IsVisible="{Binding ShowInverters}" Classes="GroupBox" Header="{x:Static p:Resources.Inverters}">
-						<ItemsControl ItemsSource="{Binding Inverters}">
-							<ItemsControl.ItemsPanel>
-								<ItemsPanelTemplate>
-									<WrapPanel Orientation="Horizontal" />
-								</ItemsPanelTemplate>
-							</ItemsControl.ItemsPanel>
-							<ItemsControl.ItemTemplate>
-								<DataTemplate>
-									<c:InverterControl ColorAllTicks="{Binding Path=((vm:UiDemoViewModel)DataContext).ColorAllTicks, FallbackValue={x:False}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
-													   Height="250"
-													   Inverter="{Binding Inverter}"
-													   DeviceKey="{Binding Key}"
-													   Margin="8" />
-								</DataTemplate>
-							</ItemsControl.ItemTemplate>
-						</ItemsControl>
-					</HeaderedContentControl>
-					<HeaderedContentControl Classes="GroupBox" Header="Smart Meter" IsVisible="{Binding SmartMeter, Converter={co:Null2Bool}}">
-						<c:SmartMeterControl Height="250" VerticalAlignment="Top" Margin="8"
-											 MeterStatus="{Binding MeterStatus}"
-											 SmartMeter="{Binding SmartMeter}"
-											 Gen24Config="{Binding Gen24Config}"
-											 ColorAllTicks="{Binding ColorAllTicks}" />
-					</HeaderedContentControl>
-					<HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.Battery}" IsVisible="{Binding BatteryGen24System, Converter={co:Null2Bool}}">
-						<c:EnergyStorageControl Height="250" VerticalAlignment="Top" Margin="8"
-												Gen24System="{Binding BatteryGen24System}"/>
-					</HeaderedContentControl>
-				</WrapPanel>
+						<HeaderedContentControl IsVisible="{Binding ShowInverters}" Classes="GroupBox" Header="{x:Static p:Resources.Inverters}">
+							<ItemsControl ItemsSource="{Binding Inverters}">
+								<ItemsControl.ItemsPanel>
+									<ItemsPanelTemplate>
+										<StackPanel Orientation="Horizontal" />
+									</ItemsPanelTemplate>
+								</ItemsControl.ItemsPanel>
+								<ItemsControl.ItemTemplate>
+									<DataTemplate>
+										<c:InverterControl ColorAllTicks="{Binding Path=((vm:UiDemoViewModel)DataContext).ColorAllTicks, FallbackValue={x:False}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+														   Height="250"
+														   Inverter="{Binding Inverter}"
+														   DeviceKey="{Binding Key}"
+														   Margin="8" />
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+						</HeaderedContentControl>
+						<HeaderedContentControl Classes="GroupBox" Header="Smart Meter" IsVisible="{Binding SmartMeter, Converter={co:Null2Bool}}">
+							<c:SmartMeterControl Height="250" VerticalAlignment="Top" Margin="8"
+												 MeterStatus="{Binding MeterStatus}"
+												 SmartMeter="{Binding SmartMeter}"
+												 Gen24Config="{Binding Gen24Config}"
+												 ColorAllTicks="{Binding ColorAllTicks}" />
+						</HeaderedContentControl>
+						<HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.Battery}" IsVisible="{Binding BatteryGen24System, Converter={co:Null2Bool}}">
+							<c:EnergyStorageControl Height="250" VerticalAlignment="Top" Margin="8"
+													Gen24System="{Binding BatteryGen24System}"/>
+						</HeaderedContentControl>
+					</StackPanel>
+				</ScrollViewer>
 			</Grid>
 			<HeaderedContentControl Grid.Row="2" IsVisible="{Binding ShowPowerConsumers}" Classes="GroupBox" Header="Power Consumer">
-				<ItemsControl ItemsSource="{Binding FritzBoxDevices}" x:Name="PowerConsumerItemsControl">
-					<ItemsControl.ItemsPanel>
-						<ItemsPanelTemplate>
-							<WrapPanel Orientation="Vertical" />
-						</ItemsPanelTemplate>
-					</ItemsControl.ItemsPanel>
-					<ItemsControl.ItemTemplate>
-						<DataTemplate>
-							<c:PowerConsumer Width="180"
-                                             Device="{Binding Device}"
-                                             Margin="8"
-                                             DeviceKey="{Binding Key}"
-                                             SwitchCommand="{Binding ((vm:UiDemoViewModel)DataContext).SwitchDeviceCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
-                                             SetColorTemperatureCommand="{Binding ((vm:UiDemoViewModel)DataContext).SetColorTemperatureCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
-                                             SetHueCommand="{Binding ((vm:UiDemoViewModel)DataContext).SetHueCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
-                                             SetSaturationCommand="{Binding ((vm:UiDemoViewModel)DataContext).SetSaturationCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
-                                             SetBrightnessCommand="{Binding ((vm:UiDemoViewModel)DataContext).SetBrightnessCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"/>
-						</DataTemplate>
-					</ItemsControl.ItemTemplate>
-				</ItemsControl>
+				<ScrollViewer VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto"
+                              VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                              VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AllowAutoHide="False">
+					<ItemsControl ItemsSource="{Binding FritzBoxDevices}" x:Name="PowerConsumerItemsControl">
+						<ItemsControl.ItemsPanel>
+							<ItemsPanelTemplate>
+								<WrapPanel Orientation="Vertical" />
+							</ItemsPanelTemplate>
+						</ItemsControl.ItemsPanel>
+						<ItemsControl.ItemTemplate>
+							<DataTemplate>
+								<c:PowerConsumer Width="180"
+												 Device="{Binding Device}"
+												 Margin="8"
+												 DeviceKey="{Binding Key}"
+												 SwitchCommand="{Binding ((vm:UiDemoViewModel)DataContext).SwitchDeviceCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+												 SetColorTemperatureCommand="{Binding ((vm:UiDemoViewModel)DataContext).SetColorTemperatureCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+												 SetHueCommand="{Binding ((vm:UiDemoViewModel)DataContext).SetHueCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+												 SetSaturationCommand="{Binding ((vm:UiDemoViewModel)DataContext).SetSaturationCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+												 SetBrightnessCommand="{Binding ((vm:UiDemoViewModel)DataContext).SetBrightnessCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"/>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+				</ScrollViewer>
 			</HeaderedContentControl>
 			<StackPanel Grid.Row="3" Margin="16" Orientation="Horizontal">
 				<TextBlock Text="{x:Static p:Resources.ColorAllGaugeTicks}" Margin="0,0,8,0" />
@@ -106,6 +114,6 @@
                               IsChecked="{Binding ColorAllTicks}" />
 			</StackPanel>
 		</Grid>
-        <c:BusyAnimation BusyText="{Binding BusyText}" Grid.Row="0" />
+		<c:BusyAnimation BusyText="{Binding BusyText}" Grid.Row="0" />
 	</Grid>
 </UserControl>

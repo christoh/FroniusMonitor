@@ -187,7 +187,7 @@ internal class Program
 
         app.MapControllers();
         app.UseCors();
-        app.MapHub<HomeAutomationHub>("/hub");
+        app.MapHub<HomeAutomationHub>("/hub");//.RequireAuthorization(r=>r.RequireRole("User"));
         IoC.Update(app.Services);
 
         logger = IoC.Get<ILogger<Program>>();
