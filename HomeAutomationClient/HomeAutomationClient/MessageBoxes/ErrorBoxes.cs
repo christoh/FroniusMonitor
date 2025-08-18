@@ -20,9 +20,9 @@ internal static class ErrorBoxes
         }.Show().ConfigureAwait(false);
     }
 
-    public static async ValueTask Show(this MessageBox parameters)
+    public static async ValueTask<MessageBoxResult?> Show(this MessageBox parameters)
     {
-        await new MessageBoxViewModel(parameters).ShowDialogAsync();
+        return await new MessageBoxViewModel(parameters).ShowDialogAsync();
     }
 
     public static async ValueTask Show(this Exception ex)

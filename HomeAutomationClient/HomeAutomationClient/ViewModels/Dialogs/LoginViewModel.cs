@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs;
 
-public partial class LoginViewModel(DialogParameters parameters) : Adapters.DialogBase<DialogParameters, bool, LoginView>(parameters)
+public partial class LoginViewModel(DialogParameters parameters) : DialogBase<DialogParameters, bool, LoginView>(parameters)
 {
     private static readonly ICache cache = IoC.GetRegistered<ICache>();
     private readonly IWebClientService webClient = IoC.GetRegistered<IWebClientService>();
@@ -38,13 +38,6 @@ public partial class LoginViewModel(DialogParameters parameters) : Adapters.Dial
                     Password = cachedConnection.Password;
                 }
             }
-
-            if (string.IsNullOrEmpty(Password) || string.IsNullOrEmpty(UserName))
-            {
-                return;
-            }
-
-            //await Login();
         }
         catch(Exception ex)
         {
