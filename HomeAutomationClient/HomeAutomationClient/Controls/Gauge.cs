@@ -112,7 +112,7 @@ public abstract class Gauge : ContentControl
     }
 
     protected record AngleBrush(double RelativeValue, IImmutableBrush Brush);
-    
+
     protected Color GetColorForRelativeValue(double relativeValue)
     {
         if (GaugeColors == null || !GaugeColors.Any())
@@ -156,15 +156,15 @@ public abstract class Gauge : ContentControl
             {
                 Duration = AnimationDuration,
                 Easing = AnimationEasing,
+                FillMode = FillMode.Forward,
                 IterationCount = new IterationCount(1),
                 Children =
                 {
                     new KeyFrame { Cue = new Cue(0), Setters = { new Setter { Property = AnimatedValueProperty, Value = AnimatedValue }, } },
                     new KeyFrame { Cue = new Cue(1), Setters = { new Setter { Property = AnimatedValueProperty, Value = relativeValue }, } },
-                }
+                },
             };
 
-            AnimatedValue = relativeValue;
             await animation.RunAsync(this, animationTokenSource.Token);
         }
         catch (OperationCanceledException)

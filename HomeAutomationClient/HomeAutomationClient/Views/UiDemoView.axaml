@@ -52,12 +52,12 @@
                                 <c:LinearRectangleGauge Grid.Row="1" Grid.Column="1" Maximum="{Binding SitePvPeakPower}" Value="{Binding SitePowerFlow.LoadPower, Converter={co:Multiply Factor=-1}}"/>
                             </Grid>
                         </HeaderedContentControl>
-						<!--<HeaderedContentControl Classes="GroupBox" Header="Half Circle Gauge">
+						<HeaderedContentControl Classes="GroupBox" Header="Half Circle Gauge">
                             <Viewbox Width="300">
                                 <views:GaugeTestView />
                             </Viewbox>
                         </HeaderedContentControl>
-                        <HeaderedContentControl Classes="GroupBox" Header="Linear Gauge">
+                        <!--<HeaderedContentControl Classes="GroupBox" Header="Linear Gauge">
                             <Viewbox Width="300">
                                 <views:LinearGaugeTestView />
                             </Viewbox>
