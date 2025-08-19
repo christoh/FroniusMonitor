@@ -376,7 +376,7 @@ public class Gen24Inverter : Gen24DeviceBase
         set => Set(ref field, value);
     }
 
-    [FroniusProprietaryImport("DEVICE_TEMPERATURE_AMBIENTEMEAN_F32")]
+    [FroniusProprietaryImport("DEVICE_TEMPERATURE_AMBIENTMEAN_01_F32")]
     public double? AmbientTemperature
     {
         get;

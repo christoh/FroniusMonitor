@@ -133,6 +133,7 @@ public abstract class Gauge : ContentControl
     protected virtual async void SetValue(bool sKipAnimation = false)
     {
         var relativeValue = (Math.Max(Math.Min(Maximum, double.IsNaN(Value) ? 0 : Value), Minimum) - Minimum) / (Maximum - Minimum);
+        relativeValue = double.IsFinite(relativeValue) ? relativeValue : Math.Min(Math.Max(Origin,0),1);
 
         try
         {
