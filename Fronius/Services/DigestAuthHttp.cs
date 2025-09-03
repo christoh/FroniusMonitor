@@ -70,7 +70,12 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
             url = '/' + url;
         }
 
-        var request = await CreateRequest(url, stringContent, token).ConfigureAwait(false);
+        HttpRequestMessage request;
+
+        lock (hashLock)
+        {
+            request = CreateRequest(url, stringContent, token);
+        }
 
         try
         {
@@ -83,28 +88,31 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
             }
 
             request.Dispose();
-            ha1 = null;
 
             var wwwAuthenticateHeader =
                 response.Headers.GetValues("X-WWW-Authenticate").SingleOrDefault() ??
                 response.Headers.GetValues("WWW-Authenticate").Single();
 
-            response.Dispose();
-            realm = await GetAuthHeaderToken("realm").ConfigureAwait(false) ?? string.Empty;
-            nonce = await GetAuthHeaderToken("nonce").ConfigureAwait(false) ?? string.Empty;
-            encoding = Encoding.GetEncoding(await GetAuthHeaderToken("charset").ConfigureAwait(false) ?? "UTF-8");
-            var algorithm = await GetAuthHeaderToken("algorithm").ConfigureAwait(false);
-            var qops = (await GetAuthHeaderToken("qop").ConfigureAwait(false))?.Split(",") ?? [];
-
-            if (algorithm != "SHA256" || !qops.Contains("auth"))
+            lock (hashLock)
             {
-                throw new NotSupportedException("Only SHA256 with qop=auth is supported");
-            }
+                ha1 = null;
+                response.Dispose();
+                realm = GetAuthHeaderToken("realm") ?? string.Empty;
+                nonce = GetAuthHeaderToken("nonce") ?? string.Empty;
+                encoding = Encoding.GetEncoding(GetAuthHeaderToken("charset") ?? "UTF-8");
+                var algorithm = GetAuthHeaderToken("algorithm");
+                var qops = (GetAuthHeaderToken("qop"))?.Split(",") ?? [];
 
-            nc = 0;
-            cnonce = unchecked((uint)random.Next(int.MinValue, int.MaxValue)).ToString("x8")+unchecked((uint)random.Next(int.MinValue, int.MaxValue)).ToString("x8");
-            cnonceDate = DateTime.UtcNow;
-            request = await CreateRequest(url, stringContent, token).ConfigureAwait(false);
+                if (algorithm != "SHA256" || !qops.Contains("auth"))
+                {
+                    throw new NotSupportedException("Only SHA256 with qop=auth is supported");
+                }
+
+                nc = 0;
+                cnonce = unchecked((uint)random.Next(int.MinValue, int.MaxValue)).ToString("x8") + unchecked((uint)random.Next(int.MinValue, int.MaxValue)).ToString("x8");
+                cnonceDate = DateTime.UtcNow;
+                request = CreateRequest(url, stringContent, token);
+            }
             response = await SendAsync(request, token).ConfigureAwait(false);
             ThrowOnWrongStatusCode();
             return response;
@@ -117,12 +125,12 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
                 }
             }
 
-            Task<string?> GetAuthHeaderToken(string varName) => Task.Run(() =>
+            string? GetAuthHeaderToken(string varName)
             {
                 var regex = new Regex($"{varName}=(\"([^\"]*)\"|([^,]*))");
                 var matchHeader = regex.Match(wwwAuthenticateHeader);
                 return !matchHeader.Success ? null : matchHeader.Groups.OfType<Group>().Last(group => group.Length > 0).Value;
-            }, token);
+            }
         }
         finally
         {
@@ -138,31 +146,31 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
         return httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);
     }
 
-    private async ValueTask<HttpRequestMessage> CreateRequest(string url, string? stringContent, CancellationToken token)
+    private HttpRequestMessage CreateRequest(string url, string? stringContent, CancellationToken token)
     {
         var request = new HttpRequestMessage(stringContent != null ? HttpMethod.Post : HttpMethod.Get, url);
 
 
         if (stringContent != null)
         {
-            await Task.Run(() => request.Content = new StringContent(stringContent, Encoding.UTF8, "application/json"), token).ConfigureAwait(false);
+            request.Content = new StringContent(stringContent, Encoding.UTF8, "application/json");
         }
 
         if (!string.IsNullOrEmpty(cnonce) && DateTime.UtcNow - cnonceDate < cnonceDuration && nc < 99_999_999)
         {
-            request.Headers.Add("Authorization", await CreateDigestHeader(request, token).ConfigureAwait(false));
+            request.Headers.Add("Authorization", CreateDigestHeader(request, token));
         }
 
         return request;
     }
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    private async ValueTask<string> CreateDigestHeader(HttpRequestMessage request, CancellationToken token)
+    private string CreateDigestHeader(HttpRequestMessage request, CancellationToken token)
     {
         encoding ??= Encoding.UTF8;
-        ha1 ??= await CalculateHash($"{connection.UserName}:{realm}:{connection.Password}").ConfigureAwait(false);
-        var ha2 = await CalculateHash($"{request.Method.Method}:{request.RequestUri?.OriginalString}").ConfigureAwait(false);
-        var digestResponse = await CalculateHash($"{ha1}:{nonce}:{++nc:00000000}:{cnonce}:auth:{ha2}").ConfigureAwait(false);
+        ha1 ??= CalculateHash($"{connection.UserName}:{realm}:{connection.Password}");
+        var ha2 = CalculateHash($"{request.Method.Method}:{request.RequestUri?.OriginalString}");
+        var digestResponse = CalculateHash($"{ha1}:{nonce}:{++nc:00000000}:{cnonce}:auth:{ha2}");
 
         return $"Digest username=\"{connection.UserName}\", " +
                $"realm=\"{realm}\", nonce=\"{nonce}\", " +
@@ -170,14 +178,9 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
                $"response=\"{digestResponse}\", " +
                $"qop=auth, nc={nc:00000000}, cnonce=\"{cnonce}\"";
 
-        Task<string> CalculateHash(string input) => Task.Run(() =>
+        string CalculateHash(string input)
         {
-            byte[] hash;
-
-            lock (hashLock)
-            {
-                hash = sha256.ComputeHash(encoding.GetBytes(input));
-            }
+            var hash = sha256.ComputeHash(encoding.GetBytes(input));
 
             return hash
                 .Aggregate
@@ -186,6 +189,6 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
                     (stringBuilder, hashByte) => stringBuilder.Append(hashByte.ToString("x2"))
                 )
                 .ToString();
-        }, token);
+        }
     }
 }
