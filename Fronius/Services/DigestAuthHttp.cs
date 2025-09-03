@@ -1,7 +1,7 @@
 ﻿namespace De.Hochstaetter.Fronius.Services;
 
 // ReSharper disable once CommentTypo
-// Algorithm must be MD5 (MD5-sess and SHA are not supported)
+// Algorithm must be SHA256
 // qop must be auth (auth-int and none is not supported)
 
 public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDuration) : IDisposable, IAsyncDisposable
@@ -9,7 +9,7 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
     private static readonly Random random = new(unchecked((int)DateTime.UtcNow.Ticks));
     private readonly Lock hashLock = new();
 
-    private readonly MD5 md5 = MD5.Create();
+    private readonly SHA256 sha256 = SHA256.Create();
     //private readonly HttpClient httpClient = new();
 
     private string? ha1;
@@ -24,7 +24,7 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
 
     public void Dispose()
     {
-        md5.Dispose();
+        sha256.Dispose();
     }
 
     public ValueTask DisposeAsync() => new(Task.Run(Dispose));
@@ -96,13 +96,13 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
             var algorithm = await GetAuthHeaderToken("algorithm").ConfigureAwait(false);
             var qops = (await GetAuthHeaderToken("qop").ConfigureAwait(false))?.Split(",") ?? [];
 
-            if (algorithm != "MD5" || !qops.Contains("auth"))
+            if (algorithm != "SHA256" || !qops.Contains("auth"))
             {
-                throw new NotSupportedException("Only MD5 with qop=auth is supported");
+                throw new NotSupportedException("Only SHA256 with qop=auth is supported");
             }
 
             nc = 0;
-            cnonce = unchecked((uint)random.Next(int.MinValue, int.MaxValue)).ToString("x8");
+            cnonce = unchecked((uint)random.Next(int.MinValue, int.MaxValue)).ToString("x8")+unchecked((uint)random.Next(int.MinValue, int.MaxValue)).ToString("x8");
             cnonceDate = DateTime.UtcNow;
             request = await CreateRequest(url, stringContent, token).ConfigureAwait(false);
             response = await SendAsync(request, token).ConfigureAwait(false);
@@ -160,23 +160,23 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
     private async ValueTask<string> CreateDigestHeader(HttpRequestMessage request, CancellationToken token)
     {
         encoding ??= Encoding.UTF8;
-        ha1 ??= await CalculateMd5Hash($"{connection.UserName}:{realm}:{connection.Password}").ConfigureAwait(false);
-        var ha2 = await CalculateMd5Hash($"{request.Method.Method}:{request.RequestUri?.OriginalString}").ConfigureAwait(false);
-        var digestResponse = await CalculateMd5Hash($"{ha1}:{nonce}:{++nc:00000000}:{cnonce}:auth:{ha2}").ConfigureAwait(false);
+        ha1 ??= await CalculateHash($"{connection.UserName}:{realm}:{connection.Password}").ConfigureAwait(false);
+        var ha2 = await CalculateHash($"{request.Method.Method}:{request.RequestUri?.OriginalString}").ConfigureAwait(false);
+        var digestResponse = await CalculateHash($"{ha1}:{nonce}:{++nc:00000000}:{cnonce}:auth:{ha2}").ConfigureAwait(false);
 
         return $"Digest username=\"{connection.UserName}\", " +
                $"realm=\"{realm}\", nonce=\"{nonce}\", " +
                $"uri=\"{request.RequestUri?.OriginalString}\", " +
-               $"algorithm=MD5, response=\"{digestResponse}\", " +
+               $"response=\"{digestResponse}\", " +
                $"qop=auth, nc={nc:00000000}, cnonce=\"{cnonce}\"";
 
-        Task<string> CalculateMd5Hash(string input) => Task.Run(() =>
+        Task<string> CalculateHash(string input) => Task.Run(() =>
         {
             byte[] hash;
 
             lock (hashLock)
             {
-                hash = md5.ComputeHash(encoding.GetBytes(input));
+                hash = sha256.ComputeHash(encoding.GetBytes(input));
             }
 
             return hash
