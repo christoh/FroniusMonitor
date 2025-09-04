@@ -1,15 +1,16 @@
 ﻿namespace De.Hochstaetter.Fronius.Services;
 
 // ReSharper disable once CommentTypo
-// Algorithm must be SHA256
+// Algorithm must be SHA256 (bug in 1.38.6-1), SHA-256 or MD5
 // qop must be auth (auth-int and none is not supported)
 
 public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDuration) : IDisposable, IAsyncDisposable
 {
     private static readonly Random random = new(unchecked((int)DateTime.UtcNow.Ticks));
+
     private readonly Lock hashLock = new();
 
-    private readonly SHA256 sha256 = SHA256.Create();
+    private HashAlgorithm? sha256;
     //private readonly HttpClient httpClient = new();
 
     private string? ha1;
@@ -24,7 +25,7 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
 
     public void Dispose()
     {
-        sha256.Dispose();
+        sha256?.Dispose();
     }
 
     public ValueTask DisposeAsync() => new(Task.Run(Dispose));
@@ -103,10 +104,14 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
                 var algorithm = GetAuthHeaderToken("algorithm");
                 var qops = (GetAuthHeaderToken("qop"))?.Split(",") ?? [];
 
-                if (algorithm != "SHA256" || !qops.Contains("auth"))
+                sha256?.Dispose();
+
+                sha256 = algorithm switch
                 {
-                    throw new NotSupportedException("Only SHA256 with qop=auth is supported");
-                }
+                    "SHA256" or "SHA-256" => SHA256.Create(),
+                    "MD5" => MD5.Create(),
+                    _ => throw new NotSupportedException("Only SHA256 with qop=auth is supported")
+                };
 
                 nc = 0;
                 cnonce = unchecked((uint)random.Next(int.MinValue, int.MaxValue)).ToString("x8") + unchecked((uint)random.Next(int.MinValue, int.MaxValue)).ToString("x8");
