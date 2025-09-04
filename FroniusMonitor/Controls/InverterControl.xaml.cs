@@ -195,121 +195,128 @@ public partial class InverterControl
 
     private async void NewDataReceived(object? sender, SolarDataEventArgs e)
     {
-        Gen24Sensors? gen24Sensors = null!;
-        Gen24Config? gen24Config = null!;
-
-        Dispatcher.Invoke(() =>
+        try
         {
-            gen24Sensors = IsSecondary ? e.HomeAutomationSystem?.Gen24Sensors2 : e.HomeAutomationSystem?.Gen24Sensors;
-            gen24Config = IsSecondary ? e.HomeAutomationSystem?.Gen24Config2 : e.HomeAutomationSystem?.Gen24Config;
-        });
+            Gen24Sensors? gen24Sensors = null!;
+            Gen24Config? gen24Config = null!;
 
-        var inverter = gen24Sensors?.Inverter;
-        var sitePowerFlow = e.HomeAutomationSystem?.SitePowerFlow;
-
-        if
-        (
-            !isInStandByChange &&
-            ((DateTime.UtcNow - lastStandbySwitchUpdate).TotalMinutes > 5 || lastStatusCode != gen24Sensors?.InverterStatus?.StatusCode) &&
-            gen24Service != null
-        )
-        {
-            try
+            Dispatcher.Invoke(() =>
             {
-                var standByStatus = await gen24Service.GetInverterStandByStatus().ConfigureAwait(false);
-                _ = Dispatcher.InvokeAsync(() => StandByButton.IsChecked = !standByStatus!.IsStandBy);
-                lastStandbySwitchUpdate = DateTime.UtcNow;
-            }
-            catch
-            {
-                // if it does not update, we don't care
-            }
-        }
-
-        lastStatusCode = gen24Sensors?.InverterStatus?.StatusCode;
-
-        _ = Dispatcher.InvokeAsync(() =>
-        {
-            var gen24Common = IsSecondary ? e.HomeAutomationSystem?.Gen24Config2?.InverterSettings : e.HomeAutomationSystem?.Gen24Config?.InverterSettings;
-
-            if (inverter == null)
-            {
-                return;
-            }
-
-            if (gen24Sensors?.InverterStatus?.StatusCode is "STATE_STARTUP")
-            {
-                if (!isInStartingAnimation)
-                {
-                    var brush = new SolidColorBrush(Colors.LightGray);
-                    BackgroundProvider.Background = brush;
-                    BackgroundProvider.Background.BeginAnimation(SolidColorBrush.ColorProperty, startingAnimation);
-                    isInStartingAnimation = true;
-                }
-            }
-            else
-            {
-                if (isInStartingAnimation)
-                {
-                    BackgroundProvider.BeginAnimation(SolidColorBrush.ColorProperty, null);
-                }
-
-                isInStartingAnimation = false;
-                BackgroundProvider.Background = gen24Sensors?.InverterStatus?.ToBrush() ?? Brushes.LightGray;
-            }
-
-            InverterModelName.Text = $"{gen24Config.Versions?.ModelName ?? "---"} ({gen24Sensors?.InverterStatus?.StatusMessageCaption() ?? Loc.Unknown})";
-            InverterName.Text = gen24Common?.SystemName ?? "---";
-
-            Enum.GetNames<InverterDisplayMode>().Apply(enumName =>
-            {
-                if (GetType().GetField(enumName, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public)?.GetValue(this) is FrameworkElement element)
-                {
-                    element.Visibility = Mode.ToString() == enumName ? Visibility.Visible : Visibility.Collapsed;
-                }
+                gen24Sensors = IsSecondary ? e.HomeAutomationSystem?.Gen24Sensors2 : e.HomeAutomationSystem?.Gen24Sensors;
+                gen24Config = IsSecondary ? e.HomeAutomationSystem?.Gen24Config2 : e.HomeAutomationSystem?.Gen24Config;
             });
 
-            switch (Mode)
+            var inverter = gen24Sensors?.Inverter;
+            var sitePowerFlow = e.HomeAutomationSystem?.SitePowerFlow;
+
+            if
+            (
+                !isInStandByChange &&
+                ((DateTime.UtcNow - lastStandbySwitchUpdate).TotalMinutes > 5 || lastStatusCode != gen24Sensors?.InverterStatus?.StatusCode) &&
+                gen24Service != null
+            )
             {
-                case InverterDisplayMode.DcRelativePower:
-                case InverterDisplayMode.DcPower:
-                    DcPower.Visibility = Visibility.Visible;
-                    DcPowerHeadline.Text = Loc.DcPower + (Mode == InverterDisplayMode.DcRelativePower ? " %" : string.Empty);
-                    DcPowerFirstGauge.ShowPercent = Mode == InverterDisplayMode.DcRelativePower;
+                try
+                {
+                    var standByStatus = await gen24Service.GetInverterStandByStatus().ConfigureAwait(false);
+                    _ = Dispatcher.InvokeAsync(() => StandByButton.IsChecked = !standByStatus!.IsStandBy);
+                    lastStandbySwitchUpdate = DateTime.UtcNow;
+                }
+                catch
+                {
+                    // if it does not update, we don't care
+                }
+            }
 
-                    switch (Mode)
+            lastStatusCode = gen24Sensors?.InverterStatus?.StatusCode;
+
+            _ = Dispatcher.InvokeAsync(() =>
+            {
+                var gen24Common = IsSecondary ? e.HomeAutomationSystem?.Gen24Config2?.InverterSettings : e.HomeAutomationSystem?.Gen24Config?.InverterSettings;
+
+                if (inverter == null)
+                {
+                    return;
+                }
+
+                if (gen24Sensors?.InverterStatus?.StatusCode is "STATE_STARTUP")
+                {
+                    if (!isInStartingAnimation)
                     {
-                        case InverterDisplayMode.DcPower:
-                            DcPowerAggregateGauge.Label = Loc.Sum;
-                            DcPowerAggregateGauge.Value = gen24Sensors?.Inverter?.SolarPowerSum ?? 0;
-                            DcPowerAggregateGauge.Maximum = gen24Config.InverterSettings?.Mppt?.WattPeakTotal ?? 10000;
-                            DcPowerAggregateGauge.Minimum = 0;
-                            DcPowerAggregateGauge.GaugeColors = Gauge.HighIsBad;
-                            DcPowerAggregateGauge.StringFormat = "N0";
-                            DcPowerAggregateGauge.UnitName = "W";
-                            break;
-
-                        case InverterDisplayMode.DcRelativePower:
-                            DcPowerAggregateGauge.Value = (gen24Sensors?.Inverter?.Solar2Power / gen24Config?.InverterSettings?.Mppt?.Mppt2?.WattPeak) / (gen24Sensors?.Inverter?.Solar1Power / gen24Config?.InverterSettings?.Mppt?.Mppt1?.WattPeak) * 100 ?? 0;
-                            DcPowerAggregateGauge.Minimum = 50;
-                            DcPowerAggregateGauge.Maximum = 150;
-                            DcPowerAggregateGauge.StringFormat = "N1";
-                            DcPowerAggregateGauge.UnitName = "%";
-                            DcPowerAggregateGauge.Label = "2/1";
-                            DcPowerAggregateGauge.GaugeColors = Gauge.LowIsBad;
-                            break;
+                        var brush = new SolidColorBrush(Colors.LightGray);
+                        BackgroundProvider.Background = brush;
+                        BackgroundProvider.Background.BeginAnimation(SolidColorBrush.ColorProperty, startingAnimation);
+                        isInStartingAnimation = true;
+                    }
+                }
+                else
+                {
+                    if (isInStartingAnimation)
+                    {
+                        BackgroundProvider.BeginAnimation(SolidColorBrush.ColorProperty, null);
                     }
 
-                    break;
+                    isInStartingAnimation = false;
+                    BackgroundProvider.Background = gen24Sensors?.InverterStatus?.ToBrush() ?? Brushes.LightGray;
+                }
 
-                case InverterDisplayMode.MoreEfficiency:
-                    MoreEfficiencyLoss.Value = gen24Sensors?.PowerFlow?.PowerLoss ?? 0;
-                    MoreEfficiencyEfficiency.Value = gen24Sensors?.PowerFlow?.Efficiency ?? 0;
-                    MoreEfficiencySelfConsumption.Value = Math.Max(Math.Min(-sitePowerFlow?.LoadPowerCorrected / sitePowerFlow?.InverterAcPower ?? 0, 1), 0);
-                    MoreEfficiencySelfSufficiency.Value = sitePowerFlow?.LoadPowerCorrected > 0 ? 1 : Math.Max(Math.Min(-sitePowerFlow?.InverterAcPower / sitePowerFlow?.LoadPowerCorrected ?? 0, 1d), 0);
-                    break;
-            }
-        });
+                InverterModelName.Text = $"{gen24Config.Versions?.ModelName ?? "---"} ({gen24Sensors?.InverterStatus?.StatusMessageCaption() ?? Loc.Unknown})";
+                InverterName.Text = gen24Common?.SystemName ?? "---";
+
+                Enum.GetNames<InverterDisplayMode>().Apply(enumName =>
+                {
+                    if (GetType().GetField(enumName, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public)?.GetValue(this) is FrameworkElement element)
+                    {
+                        element.Visibility = Mode.ToString() == enumName ? Visibility.Visible : Visibility.Collapsed;
+                    }
+                });
+
+                switch (Mode)
+                {
+                    case InverterDisplayMode.DcRelativePower:
+                    case InverterDisplayMode.DcPower:
+                        DcPower.Visibility = Visibility.Visible;
+                        DcPowerHeadline.Text = Loc.DcPower + (Mode == InverterDisplayMode.DcRelativePower ? " %" : string.Empty);
+                        DcPowerFirstGauge.ShowPercent = Mode == InverterDisplayMode.DcRelativePower;
+
+                        switch (Mode)
+                        {
+                            case InverterDisplayMode.DcPower:
+                                DcPowerAggregateGauge.Label = Loc.Sum;
+                                DcPowerAggregateGauge.Value = gen24Sensors?.Inverter?.SolarPowerSum ?? 0;
+                                DcPowerAggregateGauge.Maximum = gen24Config.InverterSettings?.Mppt?.WattPeakTotal ?? 10000;
+                                DcPowerAggregateGauge.Minimum = 0;
+                                DcPowerAggregateGauge.GaugeColors = Gauge.HighIsBad;
+                                DcPowerAggregateGauge.StringFormat = "N0";
+                                DcPowerAggregateGauge.UnitName = "W";
+                                break;
+
+                            case InverterDisplayMode.DcRelativePower:
+                                DcPowerAggregateGauge.Value = (gen24Sensors?.Inverter?.Solar2Power / gen24Config?.InverterSettings?.Mppt?.Mppt2?.WattPeak) / (gen24Sensors?.Inverter?.Solar1Power / gen24Config?.InverterSettings?.Mppt?.Mppt1?.WattPeak) * 100 ?? 0;
+                                DcPowerAggregateGauge.Minimum = 50;
+                                DcPowerAggregateGauge.Maximum = 150;
+                                DcPowerAggregateGauge.StringFormat = "N1";
+                                DcPowerAggregateGauge.UnitName = "%";
+                                DcPowerAggregateGauge.Label = "2/1";
+                                DcPowerAggregateGauge.GaugeColors = Gauge.LowIsBad;
+                                break;
+                        }
+
+                        break;
+
+                    case InverterDisplayMode.MoreEfficiency:
+                        MoreEfficiencyLoss.Value = gen24Sensors?.PowerFlow?.PowerLoss ?? 0;
+                        MoreEfficiencyEfficiency.Value = gen24Sensors?.PowerFlow?.Efficiency ?? 0;
+                        MoreEfficiencySelfConsumption.Value = Math.Max(Math.Min(-sitePowerFlow?.LoadPowerCorrected / sitePowerFlow?.InverterAcPower ?? 0, 1), 0);
+                        MoreEfficiencySelfSufficiency.Value = sitePowerFlow?.LoadPowerCorrected > 0 ? 1 : Math.Max(Math.Min(-sitePowerFlow?.InverterAcPower / sitePowerFlow?.LoadPowerCorrected ?? 0, 1d), 0);
+                        break;
+                }
+            });
+        }
+        catch
+        {
+            // Ignore errors in UI update
+        }
     }
 
     private void CycleMode(IReadOnlyList<InverterDisplayMode> modeList, ref int index)

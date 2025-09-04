@@ -41,7 +41,7 @@ public class Gen24Config : BindableBase, ICloneable
         get
         {
             Version? firmwareVersion = null;
-            Versions?.SwVersions.TryGetValue("DEVICEGROUP", out firmwareVersion);
+            Versions?.SwVersions.TryGetValue("GEN24", out firmwareVersion);
             var firmwareVersionString = firmwareVersion?.ToLinuxString() ?? Resources.Unknown;
 
             if (Versions?.CommandApi < new Version(8,0) || Versions?.ConfigApi < new Version(9, 1))
@@ -49,7 +49,7 @@ public class Gen24Config : BindableBase, ICloneable
                 return string.Format(Resources.FirmwareTooOld, firmwareVersionString, "1.36.5-1");
             }
 
-            if (Versions?.CommandApi >= new Version(9, 0) || Versions?.ConfigApi >= new Version(10, 0))
+            if (Versions?.CommandApi >= new Version(9, 0) || Versions?.ConfigApi >= new Version(11, 0))
             {
                 return string.Format(Resources.FirmwareTooNew, firmwareVersionString);
             }

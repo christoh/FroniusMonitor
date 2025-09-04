@@ -7,6 +7,7 @@
 		<RootNamespace>De.Hochstaetter.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
 		<PublishTrimmed>false</PublishTrimmed>
 		<Nullable>enable</Nullable>
+		<UserSecretsId>fd7e4816-270f-4bb3-9abf-bec39a784410</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>

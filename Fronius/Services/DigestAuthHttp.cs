@@ -1,30 +1,30 @@
 ﻿namespace De.Hochstaetter.Fronius.Services;
 
 // ReSharper disable once CommentTypo
-// Algorithm must be SHA256
-// qop must be auth (auth-int and none is not supported)
+// Algorithm must be SHA256 (bug in 1.38.6-1), SHA-256 or MD5
+// qop must be auth (auth-int and none are not supported)
 
 public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDuration) : IDisposable, IAsyncDisposable
 {
     private static readonly Random random = new(unchecked((int)DateTime.UtcNow.Ticks));
+
     private readonly Lock hashLock = new();
 
-    private readonly SHA256 sha256 = SHA256.Create();
-    //private readonly HttpClient httpClient = new();
-
+    private HashAlgorithm? hashAlgorithm;
     private string? ha1;
     private string? realm;
     private string? nonce;
     private string? cnonce;
+    private string? algorithm;
     private Encoding? encoding;
     private DateTime cnonceDate;
     private uint nc;
 
-    public DigestAuthHttp(WebConnection connection) : this(connection, new TimeSpan(0, 1, 0, 0)) { }
+    public DigestAuthHttp(WebConnection connection) : this(connection, new TimeSpan(1, 0, 0, 0)) { }
 
     public void Dispose()
     {
-        sha256.Dispose();
+        hashAlgorithm?.Dispose();
     }
 
     public ValueTask DisposeAsync() => new(Task.Run(Dispose));
@@ -100,19 +100,29 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
                 realm = GetAuthHeaderToken("realm") ?? string.Empty;
                 nonce = GetAuthHeaderToken("nonce") ?? string.Empty;
                 encoding = Encoding.GetEncoding(GetAuthHeaderToken("charset") ?? "UTF-8");
-                var algorithm = GetAuthHeaderToken("algorithm");
+                algorithm = GetAuthHeaderToken("algorithm");
                 var qops = (GetAuthHeaderToken("qop"))?.Split(",") ?? [];
 
-                if (algorithm != "SHA256" || !qops.Contains("auth"))
+                hashAlgorithm?.Dispose();
+
+                if (!qops.Contains("auth"))
                 {
-                    throw new NotSupportedException("Only SHA256 with qop=auth is supported");
+                    throw new NotSupportedException("Only qop=auth is supported");
                 }
+
+                hashAlgorithm = algorithm switch
+                {
+                    "SHA256" or "SHA-256" => SHA256.Create(),
+                    "MD5" => MD5.Create(),
+                    _ => throw new NotSupportedException("Only SHA-256 and MD5 are supported"),
+                };
 
                 nc = 0;
                 cnonce = unchecked((uint)random.Next(int.MinValue, int.MaxValue)).ToString("x8") + unchecked((uint)random.Next(int.MinValue, int.MaxValue)).ToString("x8");
                 cnonceDate = DateTime.UtcNow;
                 request = CreateRequest(url, stringContent, token);
             }
+            
             response = await SendAsync(request, token).ConfigureAwait(false);
             ThrowOnWrongStatusCode();
             return response;
@@ -167,20 +177,24 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     private string CreateDigestHeader(HttpRequestMessage request, CancellationToken token)
     {
+        token.ThrowIfCancellationRequested();
         encoding ??= Encoding.UTF8;
         ha1 ??= CalculateHash($"{connection.UserName}:{realm}:{connection.Password}");
+        token.ThrowIfCancellationRequested();
         var ha2 = CalculateHash($"{request.Method.Method}:{request.RequestUri?.OriginalString}");
+        token.ThrowIfCancellationRequested();
         var digestResponse = CalculateHash($"{ha1}:{nonce}:{++nc:00000000}:{cnonce}:auth:{ha2}");
+        token.ThrowIfCancellationRequested();
 
         return $"Digest username=\"{connection.UserName}\", " +
                $"realm=\"{realm}\", nonce=\"{nonce}\", " +
                $"uri=\"{request.RequestUri?.OriginalString}\", " +
-               $"response=\"{digestResponse}\", " +
+               $"algorithm={algorithm}, response=\"{digestResponse}\", " +
                $"qop=auth, nc={nc:00000000}, cnonce=\"{cnonce}\"";
 
         string CalculateHash(string input)
         {
-            var hash = sha256.ComputeHash(encoding.GetBytes(input));
+            var hash = hashAlgorithm!.ComputeHash(encoding.GetBytes(input));
 
             return hash
                 .Aggregate

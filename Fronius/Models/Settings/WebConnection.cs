@@ -60,6 +60,7 @@ public class WebConnection : BindableBase, ICloneable, IHaveDisplayName
             if (value != null)
             {
                 Password = value;
+                PasswordChecksum = CalculatedChecksum;
             }
         }
     }

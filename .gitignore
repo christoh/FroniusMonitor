@@ -351,3 +351,4 @@ MigrationBackup/
 /Setup/Output/Fronius Monitor-Setup-v.1.0.0.0.exe
 /HomeAutomationServer/Properties/launchSettings.json
 /HomeAutomationClient/HomeAutomationClient.Browser/app
+/HomeAutomationClient/HomeAutomationClient.Browser/Properties/launchSettings.json
