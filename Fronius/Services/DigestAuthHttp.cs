@@ -4,7 +4,7 @@
 // Algorithm must be SHA256 (bug in 1.38.6-1), SHA-256 or MD5
 // qop must be auth (auth-int and none are not supported)
 
-public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDuration) : IDisposable, IAsyncDisposable
+public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
 {
     private static readonly Random random = new(unchecked((int)DateTime.UtcNow.Ticks));
 
@@ -19,15 +19,38 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
     private Encoding? encoding;
     private DateTime cnonceDate;
     private uint nc;
+    private readonly HttpClient httpClient;
+    private readonly WebConnection connection;
+    private readonly TimeSpan cnonceDuration;
 
-    public DigestAuthHttp(WebConnection connection) : this(connection, new TimeSpan(1, 0, 0, 0)) { }
+    public DigestAuthHttp(WebConnection connection) : this(connection, new TimeSpan(0, 0, 1, 0)) { }
+
+    public DigestAuthHttp(WebConnection connection, TimeSpan cnonceDuration)
+    {
+        this.connection = connection;
+        this.cnonceDuration = cnonceDuration;
+        httpClient = new HttpClient();
+        httpClient.BaseAddress = new Uri(connection.BaseUrl);
+    }
 
     public void Dispose()
     {
-        hashAlgorithm?.Dispose();
+        try
+        {
+            hashAlgorithm?.Dispose();
+            httpClient.Dispose();
+        }
+        catch
+        {
+            // Dispose must not throw
+        }
+
+        GC.SuppressFinalize(this);
     }
 
-    public ValueTask DisposeAsync() => new(Task.Run(Dispose));
+    ~DigestAuthHttp() => Dispose();
+
+    public async ValueTask DisposeAsync() => await Task.Run(Dispose).ConfigureAwait(false);
 
     public async ValueTask<(JToken, HttpStatusCode)> GetJsonToken(string url, JToken? jToken, IEnumerable<HttpStatusCode>? allowedStatusCodes = null, CancellationToken token = default)
     {
@@ -40,7 +63,6 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
 
         var (stringResult, httpStatusCode) = await GetString(url, stringContent, allowedStatusCodes, token).ConfigureAwait(false);
         JToken resultToken = new JObject();
-
         await Task.Run(() => { resultToken = JToken.Parse(stringResult); }, token).ConfigureAwait(false);
 
         return (resultToken, httpStatusCode);
@@ -48,16 +70,8 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
 
     public async ValueTask<(string, HttpStatusCode)> GetString(string url, string? stringContent = null, IEnumerable<HttpStatusCode>? allowedStatusCodes = null, CancellationToken token = default)
     {
-        var response = await GetResponse(url, stringContent, allowedStatusCodes, token).ConfigureAwait(false);
-
-        try
-        {
-            return (await response.Content.ReadAsStringAsync(token).ConfigureAwait(false), response.StatusCode);
-        }
-        finally
-        {
-            response.Dispose();
-        }
+        using var response = await GetResponse(url, stringContent, allowedStatusCodes, token).ConfigureAwait(false);
+        return (await response.Content.ReadAsStringAsync(token).ConfigureAwait(false), response.StatusCode);
     }
 
     public async ValueTask<HttpResponseMessage> GetResponse(string url, string? stringContent, IEnumerable<HttpStatusCode>? allowedStatusCodesEnumerable = null, CancellationToken token = default)
@@ -74,123 +88,125 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
 
         lock (hashLock)
         {
-            request = CreateRequest(url, stringContent, token);
+            request = CreateRequest();
         }
 
-        try
+        var response = await SendAsync(request, token).ConfigureAwait(false);
+
+        if (response.StatusCode != HttpStatusCode.Unauthorized)
         {
-            var response = await SendAsync(request, token).ConfigureAwait(false);
-
-            if (response.StatusCode != HttpStatusCode.Unauthorized)
-            {
-                ThrowOnWrongStatusCode();
-                return response;
-            }
-
-            request.Dispose();
-
-            var wwwAuthenticateHeader =
-                response.Headers.GetValues("X-WWW-Authenticate").SingleOrDefault() ??
-                response.Headers.GetValues("WWW-Authenticate").Single();
-
-            lock (hashLock)
-            {
-                ha1 = null;
-                response.Dispose();
-                realm = GetAuthHeaderToken("realm") ?? string.Empty;
-                nonce = GetAuthHeaderToken("nonce") ?? string.Empty;
-                encoding = Encoding.GetEncoding(GetAuthHeaderToken("charset") ?? "UTF-8");
-                algorithm = GetAuthHeaderToken("algorithm");
-                var qops = (GetAuthHeaderToken("qop"))?.Split(",") ?? [];
-
-                hashAlgorithm?.Dispose();
-
-                if (!qops.Contains("auth"))
-                {
-                    throw new NotSupportedException("Only qop=auth is supported");
-                }
-
-                hashAlgorithm = algorithm switch
-                {
-                    "SHA256" or "SHA-256" => SHA256.Create(),
-                    "MD5" => MD5.Create(),
-                    _ => throw new NotSupportedException("Only SHA-256 and MD5 are supported"),
-                };
-
-                nc = 0;
-                cnonce = unchecked((uint)random.Next(int.MinValue, int.MaxValue)).ToString("x8") + unchecked((uint)random.Next(int.MinValue, int.MaxValue)).ToString("x8");
-                cnonceDate = DateTime.UtcNow;
-                request = CreateRequest(url, stringContent, token);
-            }
-            
-            response = await SendAsync(request, token).ConfigureAwait(false);
             ThrowOnWrongStatusCode();
             return response;
-
-            void ThrowOnWrongStatusCode()
-            {
-                if (!allowedStatusCodes.Contains(response.StatusCode))
-                {
-                    throw new HttpRequestException(response.ReasonPhrase, null, response.StatusCode);
-                }
-            }
-
-            string? GetAuthHeaderToken(string varName)
-            {
-                var regex = new Regex($"{varName}=(\"([^\"]*)\"|([^,]*))");
-                var matchHeader = regex.Match(wwwAuthenticateHeader);
-                return !matchHeader.Success ? null : matchHeader.Groups.OfType<Group>().Last(group => group.Length > 0).Value;
-            }
         }
-        finally
+
+        request.Dispose();
+
+        var wwwAuthenticateHeader =
+            response.Headers.GetValues("X-WWW-Authenticate").SingleOrDefault() ??
+            response.Headers.GetValues("WWW-Authenticate").Single();
+
+        lock (hashLock)
         {
-            request.Dispose();
+            ha1 = null;
+            response.Dispose();
+            realm = GetAuthHeaderToken("realm") ?? string.Empty;
+            nonce = GetAuthHeaderToken("nonce") ?? string.Empty;
+            encoding = Encoding.GetEncoding(GetAuthHeaderToken("charset") ?? "UTF-8");
+            algorithm = GetAuthHeaderToken("algorithm");
+            var qops = GetAuthHeaderToken("qop")?.Split(",") ?? [];
+
+            hashAlgorithm?.Dispose();
+
+            if (!qops.Contains("auth"))
+            {
+                throw new NotSupportedException("Only qop=auth is supported");
+            }
+
+            hashAlgorithm = algorithm switch
+            {
+                "SHA256" or "SHA-256" => SHA256.Create(),
+                "MD5" => MD5.Create(),
+                _ => throw new NotSupportedException("Only SHA-256 and MD5 are supported"),
+            };
+
+            nc = 0;
+            UpdateClientNonce();
+            request = CreateRequest();
         }
+
+        using (request)
+        {
+            response = await SendAsync(request, token).ConfigureAwait(false);
+        }
+
+        ThrowOnWrongStatusCode();
+        return response;
+
+        void ThrowOnWrongStatusCode()
+        {
+            if (!allowedStatusCodes.Contains(response.StatusCode))
+            {
+                throw new HttpRequestException(response.ReasonPhrase, null, response.StatusCode);
+            }
+        }
+
+        string? GetAuthHeaderToken(string varName)
+        {
+            var regex = new Regex($"{varName}=(\"([^\"]*)\"|([^,]*))");
+            var matchHeader = regex.Match(wwwAuthenticateHeader);
+            return !matchHeader.Success ? null : matchHeader.Groups.OfType<Group>().Last(group => group.Length > 0).Value;
+        }
+
+        HttpRequestMessage CreateRequest()
+        {
+            var requestMessage = new HttpRequestMessage(stringContent != null ? HttpMethod.Post : HttpMethod.Get, url);
+
+
+            if (stringContent != null)
+            {
+                requestMessage.Content = new StringContent(stringContent, Encoding.UTF8, "application/json");
+            }
+
+            if (nc == uint.MaxValue || string.IsNullOrEmpty(cnonce))
+            {
+                return requestMessage;
+            }
+
+            if (DateTime.UtcNow - cnonceDate > cnonceDuration)
+            {
+                UpdateClientNonce();
+            }
+
+            requestMessage.Headers.Add("Authorization", CreateDigestHeader(requestMessage, token));
+            return requestMessage;
+        }
+    }
+
+    private void UpdateClientNonce()
+    {
+        cnonce = unchecked((uint)random.Next(int.MinValue, int.MaxValue)).ToString("x8") + unchecked((uint)random.Next(int.MinValue, int.MaxValue)).ToString("x8");
+        cnonceDate = DateTime.UtcNow;
     }
 
     private Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken token)
     {
-        var httpClient = new HttpClient();
-        httpClient.BaseAddress = new Uri(connection.BaseUrl);
-        _ = Task.Delay(TimeSpan.FromSeconds(30), CancellationToken.None).ContinueWith(_ => { httpClient.Dispose(); }, CancellationToken.None);
         return httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);
     }
 
-    private HttpRequestMessage CreateRequest(string url, string? stringContent, CancellationToken token)
-    {
-        var request = new HttpRequestMessage(stringContent != null ? HttpMethod.Post : HttpMethod.Get, url);
-
-
-        if (stringContent != null)
-        {
-            request.Content = new StringContent(stringContent, Encoding.UTF8, "application/json");
-        }
-
-        if (!string.IsNullOrEmpty(cnonce) && DateTime.UtcNow - cnonceDate < cnonceDuration && nc < 99_999_999)
-        {
-            request.Headers.Add("Authorization", CreateDigestHeader(request, token));
-        }
-
-        return request;
-    }
-
-    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     private string CreateDigestHeader(HttpRequestMessage request, CancellationToken token)
     {
-        token.ThrowIfCancellationRequested();
         encoding ??= Encoding.UTF8;
         ha1 ??= CalculateHash($"{connection.UserName}:{realm}:{connection.Password}");
-        token.ThrowIfCancellationRequested();
         var ha2 = CalculateHash($"{request.Method.Method}:{request.RequestUri?.OriginalString}");
-        token.ThrowIfCancellationRequested();
-        var digestResponse = CalculateHash($"{ha1}:{nonce}:{++nc:00000000}:{cnonce}:auth:{ha2}");
-        token.ThrowIfCancellationRequested();
+        var digestResponse = CalculateHash($"{ha1}:{nonce}:{++nc:x8}:{cnonce}:auth:{ha2}");
 
-        return $"Digest username=\"{connection.UserName}\", " +
-               $"realm=\"{realm}\", nonce=\"{nonce}\", " +
-               $"uri=\"{request.RequestUri?.OriginalString}\", " +
-               $"algorithm={algorithm}, response=\"{digestResponse}\", " +
-               $"qop=auth, nc={nc:00000000}, cnonce=\"{cnonce}\"";
+        var header = $"Digest username=\"{connection.UserName}\", " +
+                     $"realm=\"{realm}\", nonce=\"{nonce}\", " +
+                     $"uri=\"{request.RequestUri?.OriginalString}\", " +
+                     $"algorithm={algorithm}, response=\"{digestResponse}\", " +
+                     $"qop=auth, nc={nc:x8}, cnonce=\"{cnonce}\"";
+
+        return header;
 
         string CalculateHash(string input)
         {
