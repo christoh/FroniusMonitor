@@ -177,7 +177,7 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
                 UpdateClientNonce();
             }
 
-            requestMessage.Headers.Add("Authorization", CreateDigestHeader(requestMessage, token));
+            requestMessage.Headers.Add("Authorization", CreateDigestHeader(requestMessage));
             return requestMessage;
         }
     }
@@ -193,7 +193,7 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
         return httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);
     }
 
-    private string CreateDigestHeader(HttpRequestMessage request, CancellationToken token)
+    private string CreateDigestHeader(HttpRequestMessage request)
     {
         encoding ??= Encoding.UTF8;
         ha1 ??= CalculateHash($"{connection.UserName}:{realm}:{connection.Password}");
