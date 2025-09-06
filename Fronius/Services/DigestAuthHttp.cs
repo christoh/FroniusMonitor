@@ -6,7 +6,7 @@
 
 public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
 {
-    private static readonly RandomNumberGenerator random=RandomNumberGenerator.Create();
+    private static readonly RandomNumberGenerator random = RandomNumberGenerator.Create();
 
     private readonly Lock hashLock = new();
 
@@ -161,7 +161,6 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
         {
             var requestMessage = new HttpRequestMessage(stringContent != null ? HttpMethod.Post : HttpMethod.Get, url);
 
-
             if (stringContent != null)
             {
                 requestMessage.Content = new StringContent(stringContent, Encoding.UTF8, "application/json");
@@ -174,7 +173,10 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
 
             if (DateTime.UtcNow - cnonceDate > cnonceDuration)
             {
-                UpdateClientNonce();
+                lock (hashLock)
+                {
+                    UpdateClientNonce();
+                }
             }
 
             requestMessage.Headers.Add("Authorization", CreateDigestHeader(requestMessage));
@@ -184,7 +186,6 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
 
     private unsafe void UpdateClientNonce()
     {
-        hashAlgorithm!.Initialize();
         Span<byte> bytes = stackalloc byte[sizeof(ulong)];
         random.GetBytes(bytes);
 
@@ -203,18 +204,22 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
 
     private string CreateDigestHeader(HttpRequestMessage request)
     {
-        encoding ??= Encoding.UTF8;
-        ha1 ??= CalculateHash($"{connection.UserName}:{realm}:{connection.Password}");
-        var ha2 = CalculateHash($"{request.Method.Method}:{request.RequestUri?.OriginalString}");
-        var digestResponse = CalculateHash($"{ha1}:{nonce}:{++nc:x8}:{cnonce}:auth:{ha2}");
+        lock (hashLock)
+        {
+            encoding ??= Encoding.UTF8;
+            ha1 ??= CalculateHash($"{connection.UserName}:{realm}:{connection.Password}");
+            var ha2 = CalculateHash($"{request.Method.Method}:{request.RequestUri?.OriginalString}");
+            var digestResponse = CalculateHash($"{ha1}:{nonce}:{++nc:x8}:{cnonce}:auth:{ha2}");
 
-        var header = $"Digest username=\"{connection.UserName}\", " +
-                     $"realm=\"{realm}\", nonce=\"{nonce}\", " +
-                     $"uri=\"{request.RequestUri?.OriginalString}\", " +
-                     $"algorithm={algorithm}, response=\"{digestResponse}\", " +
-                     $"qop=auth, nc={nc:x8}, cnonce=\"{cnonce}\"";
+            var header = $"Digest username=\"{connection.UserName}\", " +
+                         $"realm=\"{realm}\", nonce=\"{nonce}\", " +
+                         $"uri=\"{request.RequestUri?.OriginalString}\", " +
+                         $"algorithm={algorithm}, response=\"{digestResponse}\", " +
+                         $"qop=auth, nc={nc:x8}, cnonce=\"{cnonce}\"";
 
-        return header;
+
+            return header;
+        }
 
         string CalculateHash(string input)
         {
