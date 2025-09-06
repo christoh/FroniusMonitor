@@ -6,7 +6,7 @@
 
 public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
 {
-    private static readonly Random random = new(unchecked((int)DateTime.UtcNow.Ticks));
+    private static readonly RandomNumberGenerator random=RandomNumberGenerator.Create();
 
     private readonly Lock hashLock = new();
 
@@ -182,9 +182,17 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
         }
     }
 
-    private void UpdateClientNonce()
+    private unsafe void UpdateClientNonce()
     {
-        cnonce = unchecked((uint)random.Next(int.MinValue, int.MaxValue)).ToString("x8") + unchecked((uint)random.Next(int.MinValue, int.MaxValue)).ToString("x8");
+        hashAlgorithm!.Initialize();
+        Span<byte> bytes = stackalloc byte[sizeof(ulong)];
+        random.GetBytes(bytes);
+
+        fixed (byte* pointer = bytes)
+        {
+            cnonce = (*(ulong*)pointer).ToString("x16");
+        }
+
         cnonceDate = DateTime.UtcNow;
     }
 
