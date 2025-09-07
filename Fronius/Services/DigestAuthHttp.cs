@@ -1,16 +1,28 @@
-﻿namespace De.Hochstaetter.Fronius.Services;
+﻿using System.Net.Http.Headers;
+
+namespace De.Hochstaetter.Fronius.Services;
 
 // ReSharper disable once CommentTypo
 // Algorithm must be SHA256 (bug in 1.38.6-1), SHA-256 or MD5
 // qop must be auth (auth-int and none are not supported)
 
-public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
+public sealed class DigestAuthHttp : IDisposable
 {
+    private enum HashAlgorithm
+    {
+        None = 0,
+        Sha256,
+        Md5,
+    }
+
     private static readonly RandomNumberGenerator random = RandomNumberGenerator.Create();
 
     private readonly Lock hashLock = new();
+    private readonly HttpClient httpClient;
+    private readonly WebConnection connection;
+    private readonly TimeSpan cnonceDuration;
 
-    private HashAlgorithm? hashAlgorithm;
+    private HashAlgorithm hashAlgorithm = HashAlgorithm.None;
     private string? ha1;
     private string? realm;
     private string? nonce;
@@ -19,9 +31,6 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
     private Encoding? encoding;
     private DateTime cnonceDate;
     private uint nc;
-    private readonly HttpClient httpClient;
-    private readonly WebConnection connection;
-    private readonly TimeSpan cnonceDuration;
 
     public DigestAuthHttp(WebConnection connection) : this(connection, new TimeSpan(0, 0, 1, 0)) { }
 
@@ -35,22 +44,11 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
 
     public void Dispose()
     {
-        try
-        {
-            hashAlgorithm?.Dispose();
-            httpClient.Dispose();
-        }
-        catch
-        {
-            // Dispose must not throw
-        }
-
+        httpClient.Dispose();
         GC.SuppressFinalize(this);
     }
 
     ~DigestAuthHttp() => Dispose();
-
-    public async ValueTask DisposeAsync() => await Task.Run(Dispose).ConfigureAwait(false);
 
     public async ValueTask<(JToken, HttpStatusCode)> GetJsonToken(string url, JToken? jToken, IEnumerable<HttpStatusCode>? allowedStatusCodes = null, CancellationToken token = default)
     {
@@ -113,24 +111,17 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
             nonce = GetAuthHeaderToken("nonce") ?? string.Empty;
             encoding = Encoding.GetEncoding(GetAuthHeaderToken("charset") ?? "UTF-8");
             algorithm = GetAuthHeaderToken("algorithm");
-            var stale = GetAuthHeaderToken("stale");
             var qops = GetAuthHeaderToken("qop")?.Split(",") ?? [];
-
-            if (hashAlgorithm != null && stale?.ToUpperInvariant() != "TRUE")
-            {
-                hashAlgorithm.Dispose();
-                hashAlgorithm = null;
-            }
 
             if (!qops.Contains("auth"))
             {
                 throw new NotSupportedException("Only qop=auth is supported");
             }
 
-            hashAlgorithm ??= algorithm switch
+            hashAlgorithm = algorithm switch
             {
-                "SHA256" or "SHA-256" => SHA256.Create(),
-                null or "MD5" => MD5.Create(),
+                "SHA-256" or "SHA256" => HashAlgorithm.Sha256,
+                null or "MD5" => HashAlgorithm.Md5,
                 _ => throw new NotSupportedException("Only SHA-256 and MD5 are supported"),
             };
 
@@ -184,7 +175,7 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
                 }
             }
 
-            requestMessage.Headers.Add("Authorization", CreateDigestHeader(requestMessage));
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Digest", CreateDigestParameters(requestMessage));
             return requestMessage;
         }
     }
@@ -204,18 +195,11 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
 
     private Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken token)
     {
-        try
-        {
-            return httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);
-        }
-        catch (TaskCanceledException ex) when (!token.IsCancellationRequested)
-        {
-            IoC.TryGetRegistered<ILogger<DigestAuthHttp>>()?.LogInformation(ex, "Try sending a second time");
-            return httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);
-        }
+        return httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);
     }
 
-    private string CreateDigestHeader(HttpRequestMessage request)
+    [SuppressMessage("ReSharper", "SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault")]
+    private string CreateDigestParameters(HttpRequestMessage request)
     {
         lock (hashLock)
         {
@@ -224,10 +208,10 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
             var ha2 = CalculateHash($"{request.Method.Method}:{request.RequestUri?.OriginalString}");
             var digestResponse = CalculateHash($"{ha1}:{nonce}:{++nc:x8}:{cnonce}:auth:{ha2}");
 
-            var header = $"Digest username=\"{connection.UserName}\", " +
+            var header = $"username=\"{connection.UserName}\", " +
                          $"realm=\"{realm}\", nonce=\"{nonce}\", " +
                          $"uri=\"{request.RequestUri?.OriginalString}\", " +
-                         $"algorithm={algorithm}, response=\"{digestResponse}\", " +
+                         $"response=\"{digestResponse}\", " +
                          $"qop=auth, nc={nc:x8}, cnonce=\"{cnonce}\"";
 
             return header;
@@ -237,10 +221,10 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
         {
             var bytes = encoding.GetBytes(input);
 
-            var hash = algorithm switch
+            var hash = hashAlgorithm switch
             {
-                "SHA-256" or "SHA256" => SHA256.HashData(bytes),
-                null or "MD5" => MD5.HashData(bytes),
+                HashAlgorithm.Sha256 => SHA256.HashData(bytes),
+                HashAlgorithm.Md5 => MD5.HashData(bytes),
                 _ => throw new NotSupportedException("Only SHA-256 and MD5 are supported"),
             };
 

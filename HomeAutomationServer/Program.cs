@@ -146,7 +146,7 @@ internal class Program
                 {
                     g.Connections = settings.Gen24Connections;
                     g.RefreshRate = TimeSpan.FromSeconds(5);
-                    g.ConfigRefreshRate = TimeSpan.FromMinutes(10.1);
+                    g.ConfigRefreshRate = TimeSpan.FromMinutes(5.1);
                 })
                 .Configure<UserList>(u => { u.Users = settings.Users; });
         }

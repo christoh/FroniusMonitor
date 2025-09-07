@@ -284,7 +284,7 @@ public class Gen24Service(IGen24JsonService gen24JsonService) : BindableBase, IG
     public async ValueTask<T?> SendFroniusCommand<T>(string request, JToken? jToken = null, CancellationToken token = default) where T : Gen24NoResultCommand, new()
     {
         var client = await GetFroniusHttpClient(token);
-        var (result, statusCode) = await client.GetJsonToken(request, jToken, new[] { HttpStatusCode.OK, HttpStatusCode.BadRequest }, token).ConfigureAwait(false);
+        var (result, statusCode) = await client.GetJsonToken(request, jToken, [HttpStatusCode.OK, HttpStatusCode.BadRequest], token).ConfigureAwait(false);
 
         if (statusCode == HttpStatusCode.BadRequest)
         {
