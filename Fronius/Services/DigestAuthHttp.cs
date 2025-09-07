@@ -204,7 +204,15 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
 
     private Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken token)
     {
-        return httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);
+        try
+        {
+            return httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);
+        }
+        catch (TaskCanceledException ex) when (!token.IsCancellationRequested)
+        {
+            IoC.TryGetRegistered<ILogger<DigestAuthHttp>>()?.LogInformation(ex, "Try sending a second time");
+            return httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);
+        }
     }
 
     private string CreateDigestHeader(HttpRequestMessage request)
@@ -227,7 +235,14 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
 
         string CalculateHash(string input)
         {
-            var hash = hashAlgorithm!.ComputeHash(encoding.GetBytes(input));
+            var bytes = encoding.GetBytes(input);
+
+            var hash = algorithm switch
+            {
+                "SHA-256" or "SHA256" => SHA256.HashData(bytes),
+                null or "MD5" => MD5.HashData(bytes),
+                _ => throw new NotSupportedException("Only SHA-256 and MD5 are supported"),
+            };
 
             return hash
                 .Aggregate
