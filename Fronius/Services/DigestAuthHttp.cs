@@ -113,19 +113,24 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
             nonce = GetAuthHeaderToken("nonce") ?? string.Empty;
             encoding = Encoding.GetEncoding(GetAuthHeaderToken("charset") ?? "UTF-8");
             algorithm = GetAuthHeaderToken("algorithm");
+            var stale = GetAuthHeaderToken("stale");
             var qops = GetAuthHeaderToken("qop")?.Split(",") ?? [];
 
-            hashAlgorithm?.Dispose();
+            if (hashAlgorithm != null && stale?.ToUpperInvariant() != "TRUE")
+            {
+                hashAlgorithm.Dispose();
+                hashAlgorithm = null;
+            }
 
             if (!qops.Contains("auth"))
             {
                 throw new NotSupportedException("Only qop=auth is supported");
             }
 
-            hashAlgorithm = algorithm switch
+            hashAlgorithm ??= algorithm switch
             {
                 "SHA256" or "SHA-256" => SHA256.Create(),
-                "MD5" => MD5.Create(),
+                null or "MD5" => MD5.Create(),
                 _ => throw new NotSupportedException("Only SHA-256 and MD5 are supported"),
             };
 
@@ -216,7 +221,6 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
                          $"uri=\"{request.RequestUri?.OriginalString}\", " +
                          $"algorithm={algorithm}, response=\"{digestResponse}\", " +
                          $"qop=auth, nc={nc:x8}, cnonce=\"{cnonce}\"";
-
 
             return header;
         }
