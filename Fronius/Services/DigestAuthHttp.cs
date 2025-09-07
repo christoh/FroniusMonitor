@@ -38,7 +38,9 @@ public sealed class DigestAuthHttp : IDisposable
     {
         this.connection = connection;
         this.cnonceDuration = cnonceDuration;
+
         httpClient = new HttpClient();
+        httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("HomeAutomationClient/1.0");
         httpClient.BaseAddress = new Uri(connection.BaseUrl);
     }
 
@@ -68,6 +70,7 @@ public sealed class DigestAuthHttp : IDisposable
 
     public async ValueTask<(string, HttpStatusCode)> GetString(string url, string? stringContent = null, IEnumerable<HttpStatusCode>? allowedStatusCodes = null, CancellationToken token = default)
     {
+        await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
         using var response = await GetResponse(url, stringContent, allowedStatusCodes, token).ConfigureAwait(false);
         return (await response.Content.ReadAsStringAsync(token).ConfigureAwait(false), response.StatusCode);
     }

@@ -113,11 +113,8 @@ public class FritzBoxService : BindableBase, IFritzBoxService
             }
 
             var requestString = $"{Connection.BaseUrl}/{request}{(fritzBoxSid == null || request.StartsWith("login_sid.lua") ? string.Empty : $"&sid={fritzBoxSid}")}";
-
-            using var client = new HttpClient
-            (
-                new HttpClientHandler { ServerCertificateCustomValidationCallback = (_, _, _, _) => true, }
-            );
+            using var client = new HttpClient(new HttpClientHandler { ServerCertificateCustomValidationCallback = (_, _, _, _) => true });
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("HomeAutomationClient/1.0");
 
             // ReSharper disable once PossibleMultipleEnumeration
             response = postVariables == null
