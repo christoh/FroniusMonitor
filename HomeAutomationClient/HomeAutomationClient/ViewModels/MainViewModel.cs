@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 
@@ -7,6 +8,7 @@ public sealed partial class MainViewModel : ViewModelBase
     private readonly ICache? cache = IoC.TryGetRegistered<ICache>();
     private readonly IGen24LocalizationService gen24Loc;
 
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public MainViewModel(IWebClientService webClient, IGen24LocalizationService gen24Loc)
     {
         this.gen24Loc = gen24Loc;

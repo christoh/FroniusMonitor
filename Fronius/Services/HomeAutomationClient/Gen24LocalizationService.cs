@@ -12,7 +12,7 @@ public class Gen24LocalizationService(IWebClientService webClient) : IGen24Local
     {
         var gen24Devices = await webClient.GetGen24Devices().ConfigureAwait(false);
 
-        if (gen24Devices.HasErrors || gen24Devices.Payload == null || gen24Devices.Payload.Count < 1)
+        if (gen24Devices.Errors?.Count is > 0 ||/*gen24Devices.HasErrors || */gen24Devices.Payload == null || gen24Devices.Payload.Count < 1)
         {
             return false;
         }
@@ -29,22 +29,27 @@ public class Gen24LocalizationService(IWebClientService webClient) : IGen24Local
             {
                 taskList.Add(ReadFile("en", InvariantSections));
             }
-            
+
             continue;
 
             async Task<bool> ReadFile(string twoLetterISOLanguageName, IDictionary<Gen24LocalizationSection, JsonElement> dictionary)
             {
                 var result = await webClient.GetGen24Localization(key, twoLetterISOLanguageName, section.ToString()).ConfigureAwait(false);
 
-                if (result.HasErrors)
+                if (result.Errors?.Count is > 0)
                 {
                     return false;
                 }
 
+                //if (result.HasErrors)
+                //{
+                //    return false;
+                //}
+
                 dictionary[section] = result.Payload;
                 return true;
             }
-            
+
         }
 
         foreach (var task in taskList)
@@ -76,7 +81,7 @@ public class Gen24LocalizationService(IWebClientService webClient) : IGen24Local
             {
                 return null;
             }
-            
+
             return currentDictionary.ValueKind == JsonValueKind.String ? currentDictionary.GetString() : null;
         }
     }
