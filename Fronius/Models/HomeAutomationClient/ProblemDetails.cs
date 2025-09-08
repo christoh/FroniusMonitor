@@ -1,6 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-
-namespace De.Hochstaetter.Fronius.Models.HomeAutomationClient;
+﻿namespace De.Hochstaetter.Fronius.Models.HomeAutomationClient;
 
 public partial class ProblemDetails : BindableBase
 {

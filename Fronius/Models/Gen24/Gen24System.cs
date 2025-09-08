@@ -1,7 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using De.Hochstaetter.Fronius.Models.Gen24.Settings;
-
-namespace De.Hochstaetter.Fronius.Models.Gen24;
+﻿namespace De.Hochstaetter.Fronius.Models.Gen24;
 
 public partial class Gen24System : BindableBase, IHaveDisplayName, IHaveUniqueId
 {

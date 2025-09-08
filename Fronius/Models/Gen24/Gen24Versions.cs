@@ -2,83 +2,54 @@
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 //TODO: This class is incomplete
-public class Gen24Versions : BindableBase
+public partial class Gen24Versions : BindableBase
 {
+    [ObservableProperty]
     [FroniusProprietaryImport("apiversions", "commandsApi")]
-    public Version? CommandApi
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial Version? CommandApi { get; set; }
 
+    [ObservableProperty]
+    [FroniusProprietaryImport("apiversions", "ComponentsApi")]
+    public partial Version? ComponentsApi { get; set; }
+
+    [ObservableProperty]
     [FroniusProprietaryImport("apiversions", "configApi")]
-    public Version? ConfigApi
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial Version? ConfigApi { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("apiversions", "setupAppApi")]
-    public Version? SetupAppApi
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial Version? SetupAppApi { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("apiversions", "statusApi")]
-    public Version? StatusApi
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial Version? StatusApi { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("apiversions", "updateApi")]
-    public Version? UpdateApi
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial Version? UpdateApi { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("devicename", FroniusDataType.Root)]
-    public string? ModelName
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? ModelName { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("articleNumber", FroniusDataType.Root)]
-    public string? ArticleNumber
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? ArticleNumber { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("commonName", FroniusDataType.Root)]
-    public string? CommonName
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? CommonName { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("serialNumber", FroniusDataType.Root)]
-    public string? SerialNumber
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? SerialNumber { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("numberOfPhases", FroniusDataType.Root)]
-    public byte? NumberOfPhases
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial byte? NumberOfPhases { get; set; }
 
-    public IDictionary<string, Version> SwVersions
-    {
-        get;
-        set => Set(ref field, value);
-    } = new Dictionary<string, Version>();
+    [ObservableProperty]
+    public partial IDictionary<string, Version> SwVersions { get; set; } = new Dictionary<string, Version>();
 
     public static Gen24Versions Parse(JToken token)
     {

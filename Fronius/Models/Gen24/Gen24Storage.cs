@@ -1,223 +1,137 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Gen24;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
-public class Gen24Storage : Gen24DeviceBase
+public partial class Gen24Storage : Gen24DeviceBase
 {
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Power))]
     [FroniusProprietaryImport("BAT_CURRENT_DC_F64")]
-    public double? Current
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(Power)));
-    }
+    public partial double? Current { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PowerInternal))]
     [FroniusProprietaryImport("BAT_CURRENT_DC_INTERNAL_F64")]
-    public double? CurrentInternal
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(PowerInternal)));
-    }
+    public partial double? CurrentInternal { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("BAT_ENERGYACTIVE_ESTIMATION_MAX_CAPACITY_F64", Unit.Joule)]
-    public double? AvailableCapacity
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double? AvailableCapacity { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Efficiency))]
     [FroniusProprietaryImport("BAT_ENERGYACTIVE_LIFETIME_CHARGED_F64", Unit.Joule)]
-    public double? LifeTimeCharged
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(Efficiency)));
-    }
+    public partial double? LifeTimeCharged { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Efficiency))]
     [FroniusProprietaryImport("BAT_ENERGYACTIVE_LIFETIME_DISCHARGED_F64", Unit.Joule)]
-    public double? LifeTimeDischarged
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(Efficiency)));
-    }
+    public partial double? LifeTimeDischarged { get; set; }
 
     [FroniusProprietaryImport("BAT_ENERGYACTIVE_MAX_CAPACITY_F64", Unit.Joule)]
-    public double? MaxCapacity
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial double? MaxCapacity { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(StatusString),nameof(TrafficLight))]
     [FroniusProprietaryImport("BAT_MODE_CELL_STATE_U16")]
-    public ushort? CellState
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial ushort? CellState { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("BAT_TEMPERATURE_CELL_F64")]
-    public double? CellTemperatureAverage
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double? CellTemperatureAverage { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("BAT_TEMPERATURE_CELL_MAX_F64")]
-    public double? CellTemperatureMax
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double? CellTemperatureMax { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("BAT_TEMPERATURE_CELL_MIN_F64")]
-    public double? CellTemperatureMin
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double? CellTemperatureMin { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("BAT_VALUE_STATE_OF_CHARGE_RELATIVE_U16", Unit.Percent)]
-    public double? StateOfCharge
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double? StateOfCharge { get; set; }
 
-    public double MinimumStateOfCharge
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial double MinimumStateOfCharge { get; set; }
 
-    public double MaximumStateOfCharge
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial double MaximumStateOfCharge { get; set; }
 
 
+    [ObservableProperty]
     [FroniusProprietaryImport("BAT_VALUE_STATE_OF_HEALTH_RELATIVE_U16", Unit.Percent)]
-    public double? StateOfHealth
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double? StateOfHealth { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("BAT_VALUE_WARNING_CODE_U16")]
-    public ushort? WarningCode
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial ushort? WarningCode { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PowerInternal))]
     [FroniusProprietaryImport("BAT_VOLTAGE_DC_INTERNAL_F64")]
-    public double? VoltageInternal
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(PowerInternal)));
-    }
+    public partial double? VoltageInternal { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("DCLINK_POWERACTIVE_LIMIT_DISCHARGE_F64")]
-    public double? DisChargeLimit
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double? DisChargeLimit { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("DCLINK_POWERACTIVE_MAX_F32")]
-    public double? MaxPower
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double? MaxPower { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Power))]
     [FroniusProprietaryImport("DCLINK_VOLTAGE_MEAN_F32")]
-    public double? VoltageOuter
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(Power)));
-    }
+    public partial double? VoltageOuter { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("DEVICE_TEMPERATURE_AMBIENTEMEAN_F32")]
-    public double AmbientTemperature
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double AmbientTemperature { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("BAT_MODE_HYBRID_OPERATING_STATE_U16")]
-    public ushort? HybridOperatingState
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial ushort? HybridOperatingState { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("BAT_MODE_LAST_FAULT_PARAMETER_U16")]
-    public ushort? LastFaultParameter
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial ushort? LastFaultParameter { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("BAT_MODE_STATE_U16")]
-    public uint? State
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial uint? State { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("BAT_MODE_U16")]
-    public ushort? Mode
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial ushort? Mode { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("BAT_MODE_WAKE_ENABLE_STATUS_U16")]
-    public bool? IsAwake
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? IsAwake { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("hw_version", FroniusDataType.Attribute)]
-    public Version? HardwareVersion
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial Version? HardwareVersion { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("sw_version", FroniusDataType.Attribute)]
-    public Version? SoftwareVersion
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial Version? SoftwareVersion { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("has_internal_dcdc", FroniusDataType.Attribute)]
-    public bool? HasInternalDcDc
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? HasInternalDcDc { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("internal_dcdc_is_configurable", FroniusDataType.Attribute)]
-    public bool? CanConfigureInternalDcDc
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? CanConfigureInternalDcDc { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("max_udc", FroniusDataType.Attribute)]
-    public double? MaxVoltage
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double? MaxVoltage { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("min_udc", FroniusDataType.Attribute)]
-    public double? MinVoltage
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double? MinVoltage { get; set; }
 
     public double? Power => VoltageOuter * Current;
 

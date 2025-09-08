@@ -1,41 +1,23 @@
-﻿using De.Hochstaetter.Fronius.Models.Gen24.Settings;
+﻿namespace De.Hochstaetter.Fronius.Models.Gen24;
 
-namespace De.Hochstaetter.Fronius.Models.Gen24;
-
-public class Gen24Config : BindableBase, ICloneable
+public partial class Gen24Config : BindableBase, ICloneable
 {
-    public Gen24Versions? Versions
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(VersionWarning)));
-    }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(VersionWarning))]
+    public partial Gen24Versions? Versions { get; set; }
 
-    public Gen24Components? Components
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial Gen24Components? Components { get; set; }
 
-    public Gen24InverterSettings? InverterSettings
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial Gen24InverterSettings? InverterSettings { get; set; }
 
-    public Gen24BatterySettings? BatterySettings
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial Gen24BatterySettings? BatterySettings { get; set; }
 
-    public double? MaxAcPower
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial double? MaxAcPower { get; set; }
 
-
-    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public string? VersionWarning
     {
         get
@@ -67,7 +49,7 @@ public class Gen24Config : BindableBase, ICloneable
             Components = Gen24Components.Parse(componentsToken),
             InverterSettings = Gen24InverterSettings.Parse(configToken),
             MaxAcPower = configToken["powerunit"]?["powerunit"]?["system"]?.Value<double>("DEVICE_POWERACTIVE_NOMINAL_F32"),
-            BatterySettings = Gen24BatterySettings.Parse(configToken?["batteries"]?["batteries"]),
+            BatterySettings = Gen24BatterySettings.Parse(configToken["batteries"]?["batteries"]),
         };
 
         return gen24Config;

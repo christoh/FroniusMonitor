@@ -5,13 +5,10 @@ using System.Threading.Tasks;
 
 namespace De.Hochstaetter.Fronius.Models.Gen24;
 
-public class Gen24Components : BindableBase
+public partial class Gen24Components : BindableBase
 {
-    public IDictionary<string, IList<string>> Groups
-    {
-        get;
-        set => Set(ref field, value);
-    } = new Dictionary<string, IList<string>>();
+    [ObservableProperty]
+    public partial IDictionary<string, IList<string>> Groups { get; set; } = new Dictionary<string, IList<string>>();
 
     public static Gen24Components Parse(JToken token)
     {

@@ -1,87 +1,55 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Gen24;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
-public abstract class Gen24DeviceBase : BindableBase, ICloneable
+public abstract partial class Gen24DeviceBase : BindableBase, ICloneable
 {
     public DateTime ReceivedTime { get; } = DateTime.UtcNow;
 
     public TimeSpan Latency => ReceivedTime - (DataTime ?? ReceivedTime);
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Latency))]
     [FroniusProprietaryImport("COMPONENTS_TIME_STAMP_U64")]
-    public DateTime? DataTime
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial DateTime? DataTime { get; set ; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("manufacturer", FroniusDataType.Attribute)]
-    public string? Manufacturer
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? Manufacturer { get; set ; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("model", FroniusDataType.Attribute)]
-    public string? Model
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? Model { get; set ; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("[ENABLE]", FroniusDataType.Attribute)]
-    public bool? IsEnabled
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? IsEnabled { get; set ; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("[VISIBLE]", FroniusDataType.Attribute)]
-    public bool? IsVisible
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? IsVisible { get; set ; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("addr", FroniusDataType.Attribute)]
-    public ushort? ModbusAddress
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial ushort? ModbusAddress { get; set ; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("id", FroniusDataType.Attribute)]
-    public string? Id
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? Id { get; set ; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("if", FroniusDataType.Attribute)]
-    public string? BusId
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? BusId { get; set ; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("serial", FroniusDataType.Attribute)]
-    public string? SerialNumber
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? SerialNumber { get; set ; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("createTS", FroniusDataType.Attribute)]
-    public DateTime? CreationTime
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial DateTime? CreationTime { get; set ; }
 
-    public uint GroupId
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial uint GroupId { get; set ; }
 
     public object Clone() => MemberwiseClone();
 }

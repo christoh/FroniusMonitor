@@ -1,6 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-
-namespace De.Hochstaetter.Fronius.Models;
+﻿namespace De.Hochstaetter.Fronius.Models;
 
 public abstract class BindableBase : ObservableValidator
 {

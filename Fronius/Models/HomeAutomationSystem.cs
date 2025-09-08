@@ -1,6 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Models.Gen24.Settings;
-
-namespace De.Hochstaetter.Fronius.Models;
+﻿namespace De.Hochstaetter.Fronius.Models;
 
 #pragma warning disable CS0618 // Type or member is obsolete
 public class HomeAutomationSystem : BindableBase

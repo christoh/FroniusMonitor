@@ -1,52 +1,26 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Gen24;
 
-public class Gen24Status : BindableBase
+public partial class Gen24Status : BindableBase
 {
     private static IGen24Service? gen24Service;
 
-    public static IGen24Service? Gen24Service
-    {
-        get
-        {
-            return (gen24Service ??= IoC.TryGet<IGen24Service>());
-        }
-    }
+    public static IGen24Service? Gen24Service => gen24Service ??= IoC.TryGet<IGen24Service>();
 
+    [ObservableProperty]
     [FroniusProprietaryImport("id", FroniusDataType.Root)]
-    public uint? Id
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial uint? Id { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("type", FroniusDataType.Root)]
-    public DeviceType DeviceType
-    {
-        get;
-        set => Set(ref field, value, () =>
-        {
-            NotifyOfPropertyChange(nameof(StatusMessage));
-            NotifyOfPropertyChange(nameof(StatusMessageCaption));
-        });
-    }
-
+    public partial DeviceType DeviceType { get; set; }
+    
+    [ObservableProperty]
     [FroniusProprietaryImport("statusMessage", FroniusDataType.Root)]
-    public string? StatusCode
-    {
-        get;
-        set => Set(ref field, value, () =>
-        {
-            NotifyOfPropertyChange(nameof(StatusMessage));
-            NotifyOfPropertyChange(nameof(StatusMessageCaption));
-        });
-    }
+    public partial string? StatusCode { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("status", FroniusDataType.Root)]
-    public byte? Status
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial byte? Status { get; set; }
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public string? StatusMessage() => Gen24Service?.GetUiString((DeviceType == DeviceType.PowerMeter ? "POWERMETER" : "INVERTER") + ".DEVICESTATE." + StatusCode).GetAwaiter().GetResult();

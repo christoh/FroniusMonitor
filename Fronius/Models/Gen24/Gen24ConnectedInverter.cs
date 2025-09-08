@@ -6,49 +6,32 @@ public enum Gen24ConnectedInverterStatus : byte
     [EnumParse(ParseAs = "offline")] Offline
 }
 
-public class Gen24ConnectedInverter : BindableBase, IHaveDisplayName
+public partial class Gen24ConnectedInverter : BindableBase, IHaveDisplayName
 {
+    [ObservableProperty]
     [FroniusProprietaryImport("activated", FroniusDataType.Root)]
-    public bool UseDevice
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool UseDevice { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("dataSourceId", FroniusDataType.Root)]
-    public string DataSourceId
-    {
-        get;
-        set => Set(ref field, value);
-    } = string.Empty;
+    public partial string DataSourceId { get; set; } = string.Empty;
 
+    [ObservableProperty]
     [FroniusProprietaryImport("deviceType", FroniusDataType.Root)]
-    public string DeviceType
-    {
-        get;
-        set => Set(ref field, value);
-    } = string.Empty;
+    public partial string DeviceType { get; set; } = string.Empty;
 
+    [ObservableProperty]
     [FroniusProprietaryImport("modbusId", FroniusDataType.Root)]
-    public byte ModbusAddress
-    {
-        get;
-        set => Set(ref field, value);
-    } = 1;
+    public partial byte ModbusAddress { get; set; } = 1;
 
+    [ObservableProperty]
     [FroniusProprietaryImport("hostname", FroniusDataType.Root)]
-    public string Hostname
-    {
-        get;
-        set => Set(ref field, value);
-    } = string.Empty;
+    public partial string Hostname { get; set; } = string.Empty;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IpAddress))]
     [FroniusProprietaryImport("ipAddress", FroniusDataType.Root)]
-    public string IpAddressString
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(IpAddress)));
-    } = string.Empty;
+    public partial string IpAddressString { get; set; } = string.Empty;
 
     public IPAddress? IpAddress
     {
@@ -56,41 +39,26 @@ public class Gen24ConnectedInverter : BindableBase, IHaveDisplayName
         set => IpAddressString = value?.ToString() ?? string.Empty;
     }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("name", FroniusDataType.Root)]
-    public string DisplayName
-    {
-        get;
-        set => Set(ref field, value);
-    } = string.Empty;
+    public partial string DisplayName { get; set; } = string.Empty;
 
+    [ObservableProperty]
     [FroniusProprietaryImport("serial", FroniusDataType.Root)]
-    public string SerialNumber
-    {
-        get;
-        set => Set(ref field, value);
-    } = string.Empty;
+    public partial string SerialNumber { get; set; } = string.Empty;
 
+    [ObservableProperty]
     [FroniusProprietaryImport("status", FroniusDataType.Root)]
-    public Gen24ConnectedInverterStatus Status
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial Gen24ConnectedInverterStatus Status { get; set; }
 
-    public Guid Id
-    {
-        get;
-        set => Set(ref field, value);
-    } = Guid.NewGuid();
+    [ObservableProperty]
+    public partial Guid Id { get; set; } = Guid.NewGuid();
 
-    public bool IsAutoDetected
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial bool IsAutoDetected { get; set; }
 
     public Gen24ConnectedInverter Copy()
     {
-            return (Gen24ConnectedInverter)MemberwiseClone();
-        }
+        return (Gen24ConnectedInverter)MemberwiseClone();
+    }
 }

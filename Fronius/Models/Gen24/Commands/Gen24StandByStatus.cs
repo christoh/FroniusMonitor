@@ -1,6 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-
-namespace De.Hochstaetter.Fronius.Models.Gen24.Commands;
+﻿namespace De.Hochstaetter.Fronius.Models.Gen24.Commands;
 
 public partial class Gen24StandByStatus : Gen24NoResultCommand
 {
