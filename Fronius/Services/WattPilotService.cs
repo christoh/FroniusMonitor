@@ -2,7 +2,7 @@
 
 namespace De.Hochstaetter.Fronius.Services;
 
-public class WattPilotService(SettingsBase settings) : BindableBase, IWattPilotService
+public partial class WattPilotService(SettingsBase settings) : BindableBase, IWattPilotService
 {
     private uint requestId;
     private CancellationTokenSource? tokenSource;
@@ -49,11 +49,8 @@ public class WattPilotService(SettingsBase settings) : BindableBase, IWattPilotS
         }
     }
 
-    public WattPilot? WattPilot
-    {
-        get;
-        private set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial WattPilot? WattPilot { get; set; }
 
     [SuppressMessage("ReSharper", "ParameterHidesMember")]
     public async ValueTask Start(WebConnection connection)
@@ -295,7 +292,10 @@ public class WattPilotService(SettingsBase settings) : BindableBase, IWattPilotS
             { "hash", hash },
         }.ToString();
 
-        if (clientWebSocket == null) throw new WebSocketException(WebSocketError.ConnectionClosedPrematurely);
+        if (clientWebSocket == null)
+        {
+            throw new WebSocketException(WebSocketError.ConnectionClosedPrematurely);
+        }
 
         await clientWebSocket.SendAsync(Encoding.UTF8.GetBytes(authMessage), WebSocketMessageType.Text, WebSocketMessageFlags.DisableCompression | WebSocketMessageFlags.EndOfMessage, Token).ConfigureAwait(false);
         Token.ThrowIfCancellationRequested();

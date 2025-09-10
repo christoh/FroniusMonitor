@@ -5,7 +5,7 @@ namespace De.Hochstaetter.Fronius.Models.Charging;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
-public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
+public partial class WattPilot : BindableBase, IHaveDisplayName, ICloneable
 {
     public bool IsUpdating
     {
@@ -27,145 +27,89 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         });
     }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("serial", FroniusDataType.Root)]
     [WattPilot("sse")]
-    public string? SerialNumber
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? SerialNumber { get; set; }
 
+    [ObservableProperty]
     [WattPilot("rde", false)]
-    public bool? SendRfidSerialToCloud
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? SendRfidSerialToCloud { get; set; }
 
+    [ObservableProperty]
     [WattPilot("cwe", false)]
-    public bool? CloudWebSocketEnabled
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? CloudWebSocketEnabled { get; set; }
 
+    [ObservableProperty]
     [WattPilot("lri")]
-    public string? LastRfidSerial
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? LastRfidSerial { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("hostname", FroniusDataType.Root)]
     [WattPilot("ffna")]
-    public string? HostName
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? HostName { get; set; }
 
+    [ObservableProperty]
     [WattPilot("acs", false)]
-    public AccessMode? AccessMode
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial AccessMode? AccessMode { get; set; }
 
+    [ObservableProperty]
     [WattPilot("cus")]
-    public CableLockStatus? CableLockStatus
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial CableLockStatus? CableLockStatus { get; set; }
 
+    [ObservableProperty]
     [WattPilot("ffb")]
-    public CableLockFeedback? CableLockFeedback
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial CableLockFeedback? CableLockFeedback { get; set; }
 
+    [ObservableProperty]
     [WattPilot("lmo", false)]
-    public ChargingLogic? ChargingLogic
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial ChargingLogic? ChargingLogic { get; set; }
 
+    [ObservableProperty]
     [WattPilot("fna", false)]
     [FroniusProprietaryImport("friendly_name", FroniusDataType.Root)]
-    public string? DeviceName
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? DeviceName { get; set; }
 
+    [ObservableProperty]
     [WattPilot("wan", false)]
-    public string? WattPilotSsid
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? WattPilotSsid { get; set; }
 
+    [ObservableProperty]
     [WattPilot("wak", false)]
-    public string? WifiPassword
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? WifiPassword { get; set; }
 
+    [ObservableProperty]
     [WattPilot("wen", false)]
-    public bool? IsWifiClientEnabled
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? IsWifiClientEnabled { get; set; }
 
+    [ObservableProperty]
     [WattPilot("oem")]
     [FroniusProprietaryImport("manufacturer", FroniusDataType.Root)]
-    public string? Manufacturer
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? Manufacturer { get; set; }
 
+    [ObservableProperty]
     [WattPilot("typ")]
     [FroniusProprietaryImport("devicetype", FroniusDataType.Root)]
-    public string? Model
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? Model { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("version", FroniusDataType.Root)]
     [WattPilot("fwv")]
-    public Version? Version
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial Version? Version { get; set; }
 
+    [ObservableProperty]
     [WattPilot("onv")]
-    public Version? LatestVersion
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial Version? LatestVersion { get; set; }
 
+    [ObservableProperty]
     [WattPilot("cci")]
-    public WattPilotInverter? Inverter
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial WattPilotInverter? Inverter { get; set; }
 
-    [WattPilot("map", false, typeof(byte[]))]
+    [ObservableProperty]
     [JsonProperty("map")]
-    public byte[]? Map
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(PhaseMap)));
-    }
+    [NotifyPropertyChangedFor(nameof(PhaseMap))]
+    [WattPilot("map", false, typeof(byte[]))]
+    public partial byte[]? Map { get; set; }
 
     public WattPilotPhaseMap? PhaseMap
     {
@@ -186,166 +130,88 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         });
     }
 
+    [ObservableProperty]
     [WattPilot("scas")]
-    public WifiScanStatus WifiScanStatus
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial WifiScanStatus WifiScanStatus { get; set; }
 
+    [ObservableProperty]
     [WattPilot("wsms")]
-    public WifiState WifiState
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial WifiState WifiState { get; set; }
 
+    [ObservableProperty]
     [WattPilot("scan")]
-    public List<WattPilotWifiInfo>? ScannedWifis
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial List<WattPilotWifiInfo>? ScannedWifis { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("protocol", FroniusDataType.Root)]
-    public int? Protocol
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial int? Protocol { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("secured", FroniusDataType.Root)]
-    public bool? IsSecured
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? IsSecured { get; set; }
 
+    [ObservableProperty]
     [WattPilot("tma", 0)]
-    public double? TemperatureConnector
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double? TemperatureConnector { get; set; }
 
+    [ObservableProperty]
     [WattPilot("tma", 1)]
-    public double? TemperatureBoard
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double? TemperatureBoard { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(VoltageAverage), nameof(MaximumChargingPowerPossibleSum), nameof(MaximumChargingPowerPossibleL1))]
     [WattPilot("nrg", 0)]
-    public double? VoltageL1
-    {
-        get;
-        set => Set(ref field, value, () =>
-        {
-            NotifyOfPropertyChange(nameof(VoltageAverage));
-            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossibleSum));
-            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossibleL1));
-        });
-    }
+    public partial double? VoltageL1 { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(VoltageAverage), nameof(MaximumChargingPowerPossibleSum), nameof(MaximumChargingPowerPossibleL2))]
     [WattPilot("nrg", 1)]
-    public double? VoltageL2
-    {
-        get;
-        set => Set(ref field, value, () =>
-        {
-            NotifyOfPropertyChange(nameof(VoltageAverage));
-            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossibleSum));
-            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossibleL2));
-        });
-    }
+    public partial double? VoltageL2 { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(VoltageAverage), nameof(MaximumChargingPowerPossibleSum), nameof(MaximumChargingPowerPossibleL3))]
     [WattPilot("nrg", 2)]
-    public double? VoltageL3
-    {
-        get;
-        set => Set(ref field, value, () =>
-        {
-            NotifyOfPropertyChange(nameof(VoltageAverage));
-            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossibleSum));
-            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossibleL3));
-        });
-    }
+    public partial double? VoltageL3 { get; set; }
 
+    [ObservableProperty]
     [WattPilot("nrg", 3)]
-    public double? VoltageL0
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double? VoltageL0 { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CurrentSum))]
     [WattPilot("nrg", 4)]
-    public double? CurrentL1
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(CurrentSum)));
-    }
+    public partial double? CurrentL1 { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CurrentSum))]
     [WattPilot("nrg", 5)]
-    public double? CurrentL2
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(CurrentSum)));
-    }
+    public partial double? CurrentL2 { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CurrentSum))]
     [WattPilot("nrg", 6)]
-    public double? CurrentL3
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(CurrentSum)));
-    }
+    public partial double? CurrentL3 { get; set; }
 
     public double? CurrentSum => CurrentL1 + CurrentL2 + CurrentL3;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PowerSum), nameof(PowerL1KiloWatts), nameof(PowerSumKiloWatts), nameof(ChargingPhases))]
     [WattPilot("nrg", 7)]
-    public double? PowerL1
-    {
-        get;
-        set => Set(ref field, value, () =>
-        {
-            NotifyOfPropertyChange(nameof(PowerSum));
-            NotifyOfPropertyChange(nameof(PowerL1KiloWatts));
-            NotifyOfPropertyChange(nameof(PowerSumKiloWatts));
-            NotifyOfPropertyChange(nameof(ChargingPhases));
-        });
-    }
+    public partial double? PowerL1 { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PowerSum), nameof(PowerL2KiloWatts), nameof(PowerSumKiloWatts), nameof(ChargingPhases))]
     [WattPilot("nrg", 8)]
-    public double? PowerL2
-    {
-        get;
-        set => Set(ref field, value, () =>
-        {
-            NotifyOfPropertyChange(nameof(PowerSum));
-            NotifyOfPropertyChange(nameof(PowerL2KiloWatts));
-            NotifyOfPropertyChange(nameof(PowerSumKiloWatts));
-            NotifyOfPropertyChange(nameof(ChargingPhases));
-        });
-    }
+    public partial double? PowerL2 { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PowerSum), nameof(PowerL3KiloWatts), nameof(PowerSumKiloWatts), nameof(ChargingPhases))]
     [WattPilot("nrg", 9)]
-    public double? PowerL3
-    {
-        get;
-        set => Set(ref field, value, () =>
-        {
-            NotifyOfPropertyChange(nameof(PowerSum));
-            NotifyOfPropertyChange(nameof(PowerL3KiloWatts));
-            NotifyOfPropertyChange(nameof(PowerSumKiloWatts));
-            NotifyOfPropertyChange(nameof(ChargingPhases));
-        });
-    }
+    public partial double? PowerL3 { get; set; }
 
+    [ObservableProperty]
     [WattPilot("nrg", 10)]
-    public double? PowerL0
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double? PowerL0 { get; set; }
 
     public double PowerSum => (PowerL1 ?? 0) + (PowerL2 ?? 0) + (PowerL3 ?? 0);
 
@@ -357,344 +223,227 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
 
     public double? VoltageAverage => (VoltageL1 + VoltageL2 + VoltageL3) / 3;
 
+    [ObservableProperty]
     [WattPilot("nrg", 11)]
-    public double? PowerTotal
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double? PowerTotal { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PowerFactorL1))]
     [WattPilot("nrg", 12)]
-    public double? PowerFactorPercentL1
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(PowerFactorL1)));
-    }
+    public partial double? PowerFactorPercentL1 { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PowerFactorL2))]
     [WattPilot("nrg", 13)]
-    public double? PowerFactorPercentL2
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(PowerFactorL2)));
-    }
+    public partial double? PowerFactorPercentL2 { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PowerFactorL3))]
     [WattPilot("nrg", 14)]
-    public double? PowerFactorPercentL3
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(PowerFactorL3)));
-    }
+    public partial double? PowerFactorPercentL3 { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PowerFactorL0))]
     [WattPilot("nrg", 15)]
-    public double? PowerFactorPercentN
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(PowerFactorL0)));
-    }
+    public partial double? PowerFactorPercentN { get; set; }
 
     public double? PowerFactorL1 => PowerFactorPercentL1 / 100;
     public double? PowerFactorL2 => PowerFactorPercentL2 / 100;
     public double? PowerFactorL3 => PowerFactorPercentL3 / 100;
     public double? PowerFactorL0 => PowerFactorPercentN / 100;
 
+    [ObservableProperty]
     [WattPilot("pha", 0)]
-    public bool? L1ChargerEnabled
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? L1ChargerEnabled { get; set; }
 
+    [ObservableProperty]
     [WattPilot("pha", 1)]
-    public bool? L2ChargerEnabled
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? L2ChargerEnabled { get; set; }
 
+    [ObservableProperty]
     [WattPilot("pha", 2)]
-    public bool? L3ChargerEnabled
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? L3ChargerEnabled { get; set; }
 
+    [ObservableProperty]
     [WattPilot("pha", 3)]
-    public bool? L1CableEnabled
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? L1CableEnabled { get; set; }
 
+    [ObservableProperty]
     [WattPilot("pha", 4)]
-    public bool? L2CableEnabled
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? L2CableEnabled { get; set; }
 
+    [ObservableProperty]
     [WattPilot("pha", 5)]
-    public bool? L3CableEnabled
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? L3CableEnabled { get; set; }
 
     /// <summary>
     ///     Only updated when in Eco mode
     /// </summary>
+    [ObservableProperty]
     [WattPilot("pnp")]
-    public byte? NumberOfCarPhases
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial byte? NumberOfCarPhases { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(StatusDisplayName))]
     [WattPilot("modelStatus")]
-    public ModelStatus? Status
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(StatusDisplayName)));
-    }
+    public partial ModelStatus? Status { get; set; }
 
     public string? StatusDisplayName => Status?.ToDisplayName();
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(StatusInternalDisplayName))]
     [WattPilot("msi")]
-    public ModelStatus? StatusInternal
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(StatusInternalDisplayName)));
-    }
+    public partial ModelStatus? StatusInternal { get; set; }
 
     public string? StatusInternalDisplayName => StatusInternal?.ToDisplayName();
 
     /// <summary>
     ///     Normally 6A. Can be changed to a higher value if your car can not handle 6A
     /// </summary>
+    [ObservableProperty]
     [WattPilot("mca", false)]
-    public byte? MinimumChargingCurrent
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial byte? MinimumChargingCurrent { get; set; }
 
     /// <summary>
     ///     Charge the car at least every amount of milliseconds. Use this if you car disconnects after it has not been charged
     ///     for a while. Set to 0 to disable
     /// </summary>
+    [ObservableProperty]
     [WattPilot("mci", false)]
-    public int? MinimumChargingInterval
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial int? MinimumChargingInterval { get; set; }
 
     /// <summary>
     ///     Charging pause duration in milliseconds. Some cars need a minimum pause duration before charging can continue. Set
     ///     to 0 to disable.
     /// </summary>
+    [ObservableProperty]
     [WattPilot("mcpd", false)]
-    public int? MinimumPauseDuration
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial int? MinimumPauseDuration { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(AllowPauseAndHasPhaseSwitch))]
     [WattPilot("fap", false)] //go-eCharger uses "acp" for this
-    public bool? AllowChargingPause
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(AllowPauseAndHasPhaseSwitch)));
-    }
+    public partial bool? AllowChargingPause { get; set; }
 
     /// <summary>
     ///     Used to get the correct market price for energy
     /// </summary>
+    [ObservableProperty]
     [WattPilot("awc", false)]
-    public AwattarCountry EnergyPriceCountry
-    {
-        get;
-
-        set => Set(ref field, value, () =>
-        {
-            //if (IoC.TryGetRegistered<IElectricityPriceService>() is WattPilotElectricityService wattPilotElectricityPriceService)
-            //{
-            //    wattPilotElectricityPriceService.PriceZone = value;
-            //}
-        });
-    }
+    public partial AwattarCountry EnergyPriceCountry { get; set; }
 
     /// <summary>
     ///     Maximum energy price to allow charging in ct/kWh
     /// </summary>
+    [ObservableProperty]
     [WattPilot("awp", false)]
-    public float? MaxEnergyPrice
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial float? MaxEnergyPrice { get; set; }
 
     /// <summary>
     ///     Some cars need this. If yours does not, leave it to false
     /// </summary>
+    [ObservableProperty]
     [WattPilot("su", false)]
-    public bool? SimulateUnplugging
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? SimulateUnplugging { get; set; }
 
     /// <summary>
     ///     Unclear, what this is good for. The app only uses <see cref="SimulateUnplugging" />
     /// </summary>
+    [ObservableProperty]
     [WattPilot("sua", false)]
-    public bool? SimulateUnpluggingAlways
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? SimulateUnpluggingAlways { get; set; }
 
     /// <summary>
     ///     Minimum time before a phase switch occurs in milliseconds
     /// </summary>
+    [ObservableProperty]
     [WattPilot("mptwt", false)]
-    public int? MinimumTimeBetweenPhaseSwitches
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial int? MinimumTimeBetweenPhaseSwitches { get; set; }
 
     /// <summary>
     ///     Minimum time in milliseconds the PV surplus must be above or below <see cref="PhaseSwitchPower" /> before the phase
     ///     switch is requested
     /// </summary>
+    [ObservableProperty]
     [WattPilot("mpwst", false)]
-    public int? PhaseSwitchTriggerTime
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial int? PhaseSwitchTriggerTime { get; set; }
 
     /// <summary>
     ///     If PV surplus is above that power, switch to 3 phases. If PV surplus is below, switch to 1 phase.
     ///     Use <see cref="PhaseSwitchTriggerTime" /> to control the minimum time before the phase switch occurs.
     /// </summary>
     [WattPilot("spl3", false)]
-    public float? PhaseSwitchPower
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial float? PhaseSwitchPower { get; set; }
 
     public bool? AllowPauseAndHasPhaseSwitch => PhaseSwitchMode == Charging.PhaseSwitchMode.Auto && AllowChargingPause.HasValue && AllowChargingPause.Value;
 
     /// <summary>
     ///     Next trip departure time in seconds from day start (local-time)
     /// </summary>
+    [ObservableProperty]
     [WattPilot("ftt", false)]
-    public int? NextTripTime
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial int? NextTripTime { get; set; }
 
     /// <summary>
     ///     Next trip minimum energy to charge
     /// </summary>
+    [ObservableProperty]
     [WattPilot("fte", false)]
-    public int? NextTripEnergyToCharge
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial int? NextTripEnergyToCharge { get; set; }
 
+    [ObservableProperty]
     [WattPilot("fre", false)]
-    public bool? NextTripRemainInEcoMode
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? NextTripRemainInEcoMode { get; set; }
 
+    [ObservableProperty]
     [WattPilot("rsre", false)]
-    public bool? EnableGridMonitoringOnStartUp
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? EnableGridMonitoringOnStartUp { get; set; }
 
+    [ObservableProperty]
     [WattPilot("gmtr", false)]
-    public int GridMonitoringTimeOnStartUp
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial int GridMonitoringTimeOnStartUp { get; set; }
 
+    [ObservableProperty]
     [WattPilot("rmiv", false)]
-    public float? StartUpMonitoringMinimumVoltage
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial float? StartUpMonitoringMinimumVoltage { get; set; }
 
+    [ObservableProperty]
     [WattPilot("rmav", false)]
-    public float? StartUpMonitoringMaximumVoltage
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial float? StartUpMonitoringMaximumVoltage { get; set; }
 
+    [ObservableProperty]
     [WattPilot("rmif", false)]
-    public float? StartUpMonitoringMinimumFrequency
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial float? StartUpMonitoringMinimumFrequency { get; set; }
 
+    [ObservableProperty]
     [WattPilot("rmaf", false)]
-    public float? StartUpMonitoringMaximumFrequency
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial float? StartUpMonitoringMaximumFrequency { get; set; }
 
+    [ObservableProperty]
     [WattPilot("rsrr", false)]
-    public float? StartUpRampUpRate
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial float? StartUpRampUpRate { get; set; }
 
     /// <summary>
     ///     Set this in accordance with your DNO, e.g. don´t use 32 A if your house only supports 35A
     /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor
+    (
+        nameof(MaximumChargingCurrentPossible), nameof(MaximumChargingPowerPossibleSum), nameof(MaximumChargingPowerPossibleL1),
+        nameof(MaximumChargingPowerPossibleL2), nameof(MaximumChargingPowerPossibleL3), nameof(MaximumChargingCurrentPossiblePerPhase)
+    )]
     [WattPilot("ama", false)]
-    public byte? AbsoluteMaximumChargingCurrent
-    {
-        get;
-        set => Set(ref field, value, () =>
-        {
-            NotifyOfPropertyChange(nameof(MaximumChargingCurrentPossible));
-            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossibleSum));
-            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossibleL1));
-            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossibleL2));
-            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossibleL3));
-            NotifyOfPropertyChange(nameof(MaximumChargingCurrentPossiblePerPhase));
-        });
-    }
+    public partial byte? AbsoluteMaximumChargingCurrent { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor
+    (
+        nameof(MaximumChargingCurrentPossible), nameof(MaximumChargingPowerPossibleSum), nameof(MaximumChargingPowerPossibleL1),
+        nameof(MaximumChargingPowerPossibleL2), nameof(MaximumChargingPowerPossibleL3), nameof(MaximumChargingCurrentPossiblePerPhase)
+    )]
     [WattPilot("la1", false)]
-    public byte? MaximumChargingCurrentPhase1
-    {
-        get;
-        set => Set(ref field, value, () =>
-        {
-            NotifyOfPropertyChange(nameof(MaximumChargingCurrentPossible));
-            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossibleSum));
-            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossibleL1));
-            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossibleL2));
-            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossibleL3));
-            NotifyOfPropertyChange(nameof(MaximumChargingCurrentPossiblePerPhase));
-        });
-    }
+    public partial byte? MaximumChargingCurrentPhase1 { get; set; }
 
     [WattPilot("la3", false)]
     public byte? MaximumChargingCurrentPhase3
@@ -706,59 +455,40 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     /// <summary>
     ///     Gets or sets whether you want the cable to unlock if the WattPilot is not powered.
     /// </summary>
+    [ObservableProperty]
     [WattPilot("upo", false)]
-    public bool? UnlockCableOnPowerFailure
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? UnlockCableOnPowerFailure { get; set; }
 
     /// <summary>
     ///     If you don´t have a house battery, you can specify whether you prefer power from/to grid. If you have a battery,
     ///     this setting does not make a big difference
     /// </summary>
+    [ObservableProperty]
     [WattPilot("frm", false)]
-    public EcoRoundingMode RoundingMode
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial EcoRoundingMode RoundingMode { get; set; }
 
     /// <summary>
     ///     Minimum power in Watts to start PV surplus charging
     /// </summary>
+    [ObservableProperty]
     [WattPilot("fst", false)]
-    public float? PvSurplusPowerThreshold
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial float? PvSurplusPowerThreshold { get; set; }
 
     /// <summary>
     ///     Once charging has started, it continues for at least <see cref="MinimumChargingTime" /> milliseconds.
     /// </summary>
+    [ObservableProperty]
     [WattPilot("fmt", false)]
-    public int? MinimumChargingTime
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial int? MinimumChargingTime { get; set; }
 
     /// <summary>
     ///     The current active charging limit. Must be between <see cref="MinimumChargingCurrent" /> and
     ///     <see cref="AbsoluteMaximumChargingCurrent" />
     /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(MaximumChargingCurrentPossible),nameof(MaximumChargingCurrentPossiblePerPhase),nameof(MaximumChargingPowerPossibleSum))]
     [WattPilot("amp", false)]
-    public byte? MaximumChargingCurrent
-    {
-        get;
-        set => Set(ref field, value, () =>
-        {
-            NotifyOfPropertyChange(nameof(MaximumChargingCurrentPossible));
-            NotifyOfPropertyChange(nameof(MaximumChargingCurrentPossiblePerPhase));
-            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossibleSum));
-        });
-    }
+    public partial byte? MaximumChargingCurrent { get; set; }
 
     public byte ChargingPhases
     {
@@ -816,178 +546,117 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         }
     }
 
+    [ObservableProperty]
     [WattPilot("dll")]
-    public string? DownloadLink
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? DownloadLink { get; set; }
 
     /// <summary>
     ///     Token to be used at https://&lt;serial number&gt;.api.v3.go-e.io/
     ///     Requires that <see cref="CloudAccessEnabled" /> is true
     /// </summary>
+    [ObservableProperty]
     [WattPilot("cak", false)]
-    public string? CloudAccessKey
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? CloudAccessKey { get; set; }
 
     /// <summary>
     ///     True: Can use go-E charger Cloud Api
     /// </summary>
+    [ObservableProperty]
     [WattPilot("cae", false)]
-    public bool? CloudAccessEnabled
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? CloudAccessEnabled { get; set; }
 
+    [ObservableProperty]
     [WattPilot("car")]
-    public CarStatus? CarStatus
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial CarStatus? CarStatus { get; set; }
 
     /// <summary>
     ///     Read-Only: is null when no car is connected
     /// </summary>
+    [ObservableProperty]
     [WattPilot("acu")]
-    public double? AllowedCurrent
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double? AllowedCurrent { get; set; }
 
+    [ObservableProperty]
     [WattPilot("acui")]
-    public double? AllowedCurrentInternal
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double? AllowedCurrentInternal { get; set; }
 
     /// <summary>
     ///     Read-only: All prerequisites met (RFID auth, <see cref="ButtonEnableCurrentSelection" />, etc.)
     /// </summary>
+    [ObservableProperty]
     [WattPilot("alw")]
-    public bool? IsChargingAllowed
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? IsChargingAllowed { get; set; }
 
     /// <summary>
     ///     Read-write: Allow/Disallow changing the current levels via button
     /// </summary>
+    [ObservableProperty]
     [WattPilot("bac", false)]
-    public bool? ButtonEnableCurrentSelection
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? ButtonEnableCurrentSelection { get; set; }
 
+    [ObservableProperty]
     [WattPilot("bam", false)]
-    public bool ButtonEnableModeSwitch
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool ButtonEnableModeSwitch { get; set; }
 
+    [ObservableProperty]
     [WattPilot("frc", false)]
-    public ForcedCharge ForcedCharge
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial ForcedCharge ForcedCharge { get; set; }
 
     /// <summary>
     ///     Total energy delivered by the charger. Includes energy of current charging session
     /// </summary>
+    [ObservableProperty]
     [WattPilot("eto")]
-    public double? TotalEnergy
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double? TotalEnergy { get; set; }
 
     /// <summary>
     ///     Total energy delivered by the charger. Does not include energy of current charging session
     /// </summary>
+    [ObservableProperty]
     [WattPilot("etop")]
-    public double? TotalEnergyWithoutCurrentSession
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double? TotalEnergyWithoutCurrentSession { get; set; }
 
+    [ObservableProperty]
     [WattPilot("wh")]
-    public double? EnergyCurrentSession
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double? EnergyCurrentSession { get; set; }
 
     /// <summary>
     ///     Maximum current that the connected cable supports.
     /// </summary>
+    [ObservableProperty]
     [WattPilot("cbl")]
-    public byte? CableCurrentMaximum
-    {
-        get;
-        set => Set(ref field, value, () =>
-        {
-            NotifyOfPropertyChange(nameof(MaximumChargingCurrentPossible));
-            NotifyOfPropertyChange(nameof(MaximumChargingCurrentPossiblePerPhase));
-            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossibleSum));
-        });
-    }
+    [NotifyPropertyChangedFor(nameof(MaximumChargingCurrentPossible),nameof(MaximumChargingCurrentPossiblePerPhase),nameof(MaximumChargingPowerPossibleSum))]
+    public partial byte? CableCurrentMaximum { get; set; }
 
     /// <summary>
     ///     Maximum Power that the WattPilot is able to deliver (11 or 22 kW)
     /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(MaximumWattPilotPower))]
     [WattPilot("var")]
-    public byte? MaximumWattPilotPowerKiloWatts
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(MaximumWattPilotPower)));
-    }
+    public partial byte? MaximumWattPilotPowerKiloWatts { get; set; }
 
     public double? MaximumWattPilotPower => MaximumWattPilotPowerKiloWatts * 1000d;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor
+    (
+        nameof(AllowPauseAndHasPhaseSwitch),nameof(ChargingPhases),nameof(MaximumChargingCurrentPossible),
+        nameof(MaximumChargingCurrentPossiblePerPhase),nameof(MaximumChargingPowerPossibleSum)
+    )]
     [WattPilot("psm", false)]
-    public PhaseSwitchMode? PhaseSwitchMode
-    {
-        get;
-        set => Set(ref field, value, () =>
-        {
-            NotifyOfPropertyChange(nameof(AllowPauseAndHasPhaseSwitch));
-            NotifyOfPropertyChange(nameof(ChargingPhases));
-            NotifyOfPropertyChange(nameof(MaximumChargingCurrentPossible));
-            NotifyOfPropertyChange(nameof(MaximumChargingCurrentPossiblePerPhase));
-            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossibleSum));
-        });
-    }
+    public partial PhaseSwitchMode? PhaseSwitchMode { get; set; }
 
     /// <summary>
     ///     If your inverter does not feed the grid, enable this
     /// </summary>
+    [ObservableProperty]
     [WattPilot("fzf", false)]
-    public bool? NoFeedIn
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? NoFeedIn { get; set; }
 
-    private IList<WattPilotCard>? cards;
-
+    [ObservableProperty]
     [WattPilot("cards")]
-    public IList<WattPilotCard>? Cards
-    {
-        get => cards;
-        set => Set(ref cards, value);
-    }
+    public partial IList<WattPilotCard>? Cards { get; set; }
 
     [WattPilot("awpl")]
     public IList<WattPilotElectricityPrice>? ElectricityPrices
@@ -1012,12 +681,10 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     /// <summary>
     ///     null = Unauthenticated, 0=guest charging, 1=card index 0, 2= card index 1, ...
     /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CurrentUser))]
     [WattPilot("trx", false)]
-    public byte? AuthenticatedCardIndex
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(CurrentUser)));
-    }
+    public partial byte? AuthenticatedCardIndex { get; set; }
 
     public string CurrentUser => AuthenticatedCardIndex switch
     {
@@ -1029,24 +696,19 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     /// <summary>
     ///     Is this the 16 Amperes limited version ("Go 11 J" or "Home 11 J")?
     /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(MaxWattPilotCurrent))]
     [WattPilot("adi")]
-    public bool? Is16AmpereVariant
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(MaxWattPilotCurrent)));
-    }
+    public partial bool? Is16AmpereVariant { get; set; }
 
     /// <summary>
     ///     Maximum current that the WattPilot can deliver
     /// </summary>
     public byte? MaxWattPilotCurrent => !Is16AmpereVariant.HasValue ? null : Is16AmpereVariant.Value ? (byte)16 : (byte)32;
 
+    [ObservableProperty]
     [WattPilot("fhz")]
-    public double? Frequency
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double? Frequency { get; set; }
 
     [WattPilot("utc")]
     public DateTime? TimeStampUtc
@@ -1055,58 +717,40 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => Set(ref field, value, () => Latency = DateTime.UtcNow - TimeStampUtc);
     }
 
-    public TimeSpan? Latency
-    {
-        get;
-        private set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial TimeSpan? Latency { get; set; }
 
     /// <summary>
     ///     Used to tune PV surplus charging. See also <see cref="OhmPilotTemperatureLimitCelsius" />
     /// </summary>
+    [ObservableProperty]
     [WattPilot("fam", false)]
-    public int? PvSurplusBatteryLevelStartCharge
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial int? PvSurplusBatteryLevelStartCharge { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanModifyChargingFromBatteryOptions))]
     [WattPilot("pdte", false)]
-    public bool? AllowChargingFromBattery
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(CanModifyChargingFromBatteryOptions)));
-    }
+    public partial bool? AllowChargingFromBattery { get; set; }
 
     public bool CanModifyChargingFromBatteryOptions => AllowChargingFromBattery.HasValue && AllowChargingFromBattery.Value && PvSurplusEnabled.HasValue && PvSurplusEnabled.Value;
 
+    [ObservableProperty]
     [WattPilot("pdt", false)]
-    public byte? PvSurplusBatteryLevelStopCharge
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial byte? PvSurplusBatteryLevelStopCharge { get; set; }
 
+    [ObservableProperty]
     [WattPilot("pdle", false)]
-    public bool? RestrictChargingFromBattery
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? RestrictChargingFromBattery { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(AllowChargingFromBatteryStartString))]
     [WattPilot("pdls", false)]
-    public int? AllowChargingFromBatteryStartSeconds
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(AllowChargingFromBatteryStartString)));
-    }
+    public partial int? AllowChargingFromBatteryStartSeconds { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(AllowChargingFromBatteryStopString))]
     [WattPilot("pdlo", false)]
-    public int? AllowChargingFromBatteryStopSeconds
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(AllowChargingFromBatteryStopString)));
-    }
+    public partial int? AllowChargingFromBatteryStopSeconds { get; set; }
 
 
     public string AllowChargingFromBatteryStartString
@@ -1130,43 +774,29 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     }
 
 
+    [ObservableProperty]
     [WattPilot("ebe", false)]
-    public bool? EnableBatteryBoost
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? EnableBatteryBoost { get; set; }
 
+    [ObservableProperty]
     [WattPilot("ebo", false)]
-    public bool? EnableSingleTimeBoost
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? EnableSingleTimeBoost { get; set; }
 
+    [ObservableProperty]
     [WattPilot("ebt", false)]
-    public byte? MinimumSocInBoost
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial byte? MinimumSocInBoost { get; set; }
 
+    [ObservableProperty]
     [WattPilot("rst", false)]
-    public bool? Reboot
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? Reboot { get; set; }
 
     /// <summary>
     ///     Used to tune PV surplus charging. See also <see cref="PvSurplusBatteryLevelStartCharge" />
     /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(OhmPilotTemperatureLimitFahrenheit))]
     [WattPilot("fot", false)]
-    public int? OhmPilotTemperatureLimitCelsius
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(OhmPilotTemperatureLimitFahrenheit)));
-    }
+    public partial int? OhmPilotTemperatureLimitCelsius { get; set; }
 
     public double? OhmPilotTemperatureLimitFahrenheit
     {
@@ -1174,133 +804,79 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
         set => OhmPilotTemperatureLimitCelsius = value.HasValue ? (int)Math.Round((value.Value - 32) / 1.8, MidpointRounding.AwayFromZero) : null;
     }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanModifyChargingFromBatteryOptions))]
     [WattPilot("fup", false)]
-    public bool? PvSurplusEnabled
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(CanModifyChargingFromBatteryOptions)));
-    }
+    public partial bool? PvSurplusEnabled { get; set; }
 
+    [ObservableProperty]
     [WattPilot("ccw", typeof(WattPilotWifiInfo))]
-    public WattPilotWifiInfo? CurrentWifi
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial WattPilotWifiInfo? CurrentWifi { get; set; }
 
+    [ObservableProperty]
     [WattPilot("ful", false)]
-    public bool? AwattarEnabled
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? AwattarEnabled { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CableLockBehaviorDisplayName))]
     [WattPilot("ust", false)]
-    public CableLockBehavior? CableLockBehavior
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(CableLockBehaviorDisplayName)));
-    }
+    public partial CableLockBehavior? CableLockBehavior { get; set; }
 
+    [ObservableProperty]
     [WattPilot("nmo", false)]
-    public bool? DisableProtectiveEarth
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? DisableProtectiveEarth { get; set; }
 
+    [ObservableProperty]
     [WattPilot("loe", false)]
-    public bool? LoadBalancingEnabled
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? LoadBalancingEnabled { get; set; }
 
+    [ObservableProperty]
     [WattPilot("ule", false)]
-    public bool? EnableOutOfBalanceControl
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? EnableOutOfBalanceControl { get; set; }
 
+    [ObservableProperty]
     [WattPilot("ulu", false)]
-    public bool? ShowOutOfBalanceControlInVoltAmpere
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? ShowOutOfBalanceControlInVoltAmpere { get; set; }
 
+    [ObservableProperty]
     [WattPilot("ula", false)]
-    public byte? MaximumOutOfBalanceCurrent
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial byte? MaximumOutOfBalanceCurrent { get; set; }
 
-    private WattPilotLoadBalancingCurrents? loadBalancingCurrents;
-
+    [ObservableProperty]
     [WattPilot("lot", false, typeof(WattPilotLoadBalancingCurrents))]
-    public WattPilotLoadBalancingCurrents? LoadBalancingCurrents
-    {
-        get => loadBalancingCurrents;
-        set => Set(ref loadBalancingCurrents, value);
-    }
+    public partial WattPilotLoadBalancingCurrents? LoadBalancingCurrents { get; set; }
 
+    [ObservableProperty]
     [WattPilot("lof", false)]
-    public int? LoadBalancingFallbackCurrent
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial int? LoadBalancingFallbackCurrent { get; set; }
 
+    [ObservableProperty]
     [WattPilot("lop", false)]
-    public LoadBalancingPriority LoadBalancingPriority
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial LoadBalancingPriority LoadBalancingPriority { get; set; }
 
+    [ObservableProperty]
     [WattPilot("rdre", false)]
-    public int? RandomDelayPowerFailure
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial int? RandomDelayPowerFailure { get; set; }
 
+    [ObservableProperty]
     [WattPilot("rdbf", false)]
-    public int? RandomDelayAwattarStart
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial int? RandomDelayAwattarStart { get; set; }
 
+    [ObservableProperty]
     [WattPilot("rdef", false)]
-    public int? RandomDelayAwattarStop
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial int? RandomDelayAwattarStop { get; set; }
 
+    [ObservableProperty]
     [WattPilot("rdbs", false)]
-    public int? RandomDelayTimerStart
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial int? RandomDelayTimerStart { get; set; }
 
+    [ObservableProperty]
     [WattPilot("rdes", false)]
-    public int? RandomDelayTimerStop
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial int? RandomDelayTimerStop { get; set; }
 
+    [ObservableProperty]
     [WattPilot("rdpl", false)]
-    public int? RandomDelayCarConnect
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial int? RandomDelayCarConnect { get; set; }
 
     public string? CableLockBehaviorDisplayName => CableLockBehavior?.ToDisplayName();
 
@@ -1315,19 +891,19 @@ public class WattPilot : BindableBase, IHaveDisplayName, ICloneable
 
         if (Cards != null)
         {
-            IList<WattPilotCard> newCards = new WattPilotCard[Cards.Count];
+            WattPilotCard[] newCards = new WattPilotCard[Cards.Count];
 
             for (var i = 0; i < Cards.Count; i++)
             {
                 newCards[i] = new WattPilotCard { Energy = Cards[i].Energy, HaveCardId = Cards[i].HaveCardId, Name = Cards[i].Name, };
             }
 
-            result.cards = newCards;
+            result.Cards = newCards;
         }
 
         if (LoadBalancingCurrents is not null)
         {
-            result.loadBalancingCurrents = LoadBalancingCurrents.Copy();
+            result.LoadBalancingCurrents = LoadBalancingCurrents.Copy();
         }
 
         return result;
