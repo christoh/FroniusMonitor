@@ -99,14 +99,7 @@ public sealed class WebClientService : IWebClientService
                     return;
                 }
                 
-                inverter.Sensors.PowerFlow = new Gen24PowerFlow
-                {
-                    GridPower = inverter.Sensors.PrimaryPowerMeter?.ActivePowerSum ?? 0,
-                    StoragePower = inverter.Sensors.Inverter?.StoragePower ?? 0,
-                    SolarPower = inverter.Sensors.Inverter?.SolarPowerSum ?? 0,
-                    LoadPower = -(inverter.Sensors.Inverter?.PowerActiveSum ?? 0) - (inverter.Sensors.PrimaryPowerMeter?.ActivePowerSum ?? 0),
-                    InverterAcPower = inverter.Sensors.Inverter?.PowerActiveSum ?? 0,
-                };
+                inverter.Sensors.GeneratePowerFlow();
             });
         }
 
