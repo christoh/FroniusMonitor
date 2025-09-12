@@ -68,20 +68,15 @@ public partial class FritzBoxDevice : BindableBase, IPowerConsumer1P
     [XmlIgnore]
     public IFritzBoxService? FritzBoxService { private get; set; }
 
+    [ObservableProperty]
     [XmlAttribute("id")]
-    public uint Id
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial uint Id { get; set; }
 
     // ReSharper disable once StringLiteralTypo
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Features), nameof(CanSwitch))]
     [XmlAttribute("functionbitmask")]
-    public uint FunctionMask
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(Features)));
-    }
+    public partial uint FunctionMask { get; set; }
 
     [XmlIgnore, JsonIgnore]
     public FritzBoxFeatures Features
@@ -90,100 +85,62 @@ public partial class FritzBoxDevice : BindableBase, IPowerConsumer1P
         set => FunctionMask = (uint)value;
     }
 
+    [ObservableProperty]
     [XmlAttribute("identifier")]
-    public string Ain
-    {
-        get;
-        set => Set(ref field, value);
-    } = string.Empty;
+    public partial string Ain { get; set; } = string.Empty;
 
+    [ObservableProperty]
     // ReSharper disable once StringLiteralTypo
     [XmlAttribute("fwversion")]
-    public string? FirmwareVersionString
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? FirmwareVersionString { get; set; }
 
+    [ObservableProperty]
     [XmlAttribute("manufacturer")]
-    public string? Manufacturer
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? Manufacturer { get; set; }
 
+    [ObservableProperty]
     // ReSharper disable once StringLiteralTypo
     [XmlAttribute("productname")]
-    public string? Model
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? Model { get; set; }
 
     public bool CanSwitch => (Features & FritzBoxFeatures.TurnOnOff) != FritzBoxFeatures.None;
 
+    [ObservableProperty]
     [XmlElement("name")]
-    public string DisplayName
-    {
-        get;
-        set => Set(ref field, value);
-    } = string.Empty;
+    public partial string DisplayName { get; set; } = string.Empty;
 
+    [ObservableProperty]
     [XmlElement("txbusy")]
-    public bool IsBusy
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool IsBusy { get; set; }
 
+    [ObservableProperty]
     [XmlElement("present")]
-    public bool IsPresent
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool IsPresent { get; set; }
 
+    [ObservableProperty]
     [XmlElement("switch")]
-    public FritzBoxSwitch? Switch
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial FritzBoxSwitch? Switch { get; set; }
 
+    [ObservableProperty]
     [XmlElement("levelcontrol")]
-    public FritzBoxLevel? LevelControl
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial FritzBoxLevel? LevelControl { get; set; }
 
+    [ObservableProperty]
     [XmlElement("simpleonoff")]
-    public FritzBoxSimpleSwitch? SimpleSwitch
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial FritzBoxSimpleSwitch? SimpleSwitch { get; set; }
 
+    [ObservableProperty]
     [XmlElement("powermeter")]
-    public FritzBoxPowerMeter? PowerMeter
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial FritzBoxPowerMeter? PowerMeter { get; set; }
 
+    [ObservableProperty]
     [XmlElement("temperature")]
-    public FritzBoxTemperatureSensor? TemperatureSensor
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial FritzBoxTemperatureSensor? TemperatureSensor { get; set; }
 
+    [ObservableProperty]
     [XmlElement("colorcontrol")]
-    public FritzBoxColorControl? Color
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial FritzBoxColorControl? Color { get; set; }
+
 
     private bool IsPresentAndUnlocked => IsPresent && (Switch is not { IsUiLocked: { } } || !Switch.IsUiLocked.Value);
     double? ITemperatureSensor.TemperatureCelsius => TemperatureSensor?.Temperature;
