@@ -1,14 +1,12 @@
 ﻿namespace De.Hochstaetter.Fronius.Models;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
-public class AwattarElectricityPrice : AwattarBase, IElectricityPrice
+public partial class AwattarElectricityPrice : AwattarBase, IElectricityPrice
 {
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CentsPerKiloWattHour))]
     [JsonPropertyName("marketprice")]
-    public decimal EuroPerMegaWattHour
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(CentsPerKiloWattHour)));
-    }
+    public partial decimal EuroPerMegaWattHour { get; set; }
 
     [JsonIgnore]
     public decimal CentsPerKiloWattHour

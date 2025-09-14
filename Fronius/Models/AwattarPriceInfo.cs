@@ -2,62 +2,40 @@
 
 namespace De.Hochstaetter.Fronius.Models;
 
-public class AwattarPriceInfo : BindableBase
+public partial class AwattarPriceInfo : BindableBase
 {
-    public string? Object
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial string? Object { get; set; }
 
-    public AwattarData Data
-    {
-        get;
-        set => Set(ref field, value);
-    } = new();
+    [ObservableProperty]
+    public partial AwattarData Data { get; set; } = new();
 }
 
-public class AwattarData : BindableBase
+public partial class AwattarData : BindableBase
 {
-    public List<AwattarPriceComponent> Prices
-    {
-        get;
-        set => Set(ref field, value);
-    } = [];
+    [ObservableProperty]
+    public partial List<AwattarPriceComponent> Prices { get; set; } = [];
 }
 
-public class AwattarPriceComponent : BindableBase
+public partial class AwattarPriceComponent : BindableBase
 {
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(GrossPrice))]
     [JsonConverter(typeof(AwattarPriceInfoConverter))]
-    public decimal Price
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(GrossPrice)));
-    }
+    public partial decimal Price { get; set; }
 
     public decimal GrossPrice => Price + Price * TaxRate;
 
-    public string? Description
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial string? Description { get; set; }
 
-    public decimal TaxRate
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(GrossPrice)));
-    }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(GrossPrice))]
+    public partial decimal TaxRate { get; set; }
 
-    public string? Name
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial string? Name { get; set; }
 
-    public string? PriceUnit
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial string? PriceUnit { get; set; }
 }

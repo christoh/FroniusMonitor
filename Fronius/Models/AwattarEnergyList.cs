@@ -1,19 +1,13 @@
 ﻿namespace De.Hochstaetter.Fronius.Models
 {
-    public class AwattarEnergyList : BindableBase
+    public partial class AwattarEnergyList : BindableBase
     {
+        [ObservableProperty]
         [JsonPropertyName("data")]
-        public List<AwattarEnergy> Energies
-        {
-            get;
-            set => Set(ref field, value);
-        } = [];
+        public partial List<AwattarEnergy> Energies { get; set; } = [];
 
+        [ObservableProperty]
         [JsonIgnore]
-        public IEnumerable<AwattarPriceComponent>? Prices
-        {
-            get;
-            set => Set(ref field, value);
-        }
+        public partial IEnumerable<AwattarPriceComponent>? Prices { get; set; }
     }
 }

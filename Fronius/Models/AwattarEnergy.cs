@@ -1,18 +1,12 @@
 ﻿namespace De.Hochstaetter.Fronius.Models;
 
-public class AwattarEnergy : AwattarBase
+public partial class AwattarEnergy : AwattarBase
 {
+    [ObservableProperty]
     [JsonPropertyName("solar")]
-    public double SolarProductionMegaWatt
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double SolarProductionMegaWatt { get; set; }
 
+    [ObservableProperty]
     [JsonPropertyName("wind")]
-    public double WindProductionMegaWatt
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double WindProductionMegaWatt { get; set; }
 }

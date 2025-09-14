@@ -1,20 +1,16 @@
 ﻿namespace De.Hochstaetter.Fronius.Models;
 
-public abstract class AwattarBase : BindableBase
+public abstract partial class AwattarBase : BindableBase
 {
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(StartTime))]
     [JsonPropertyName("start_timestamp")]
-    public long StartMilliseconds
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(StartTime)));
-    }
+    public partial long StartMilliseconds { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(EndTime))]
     [JsonPropertyName("end_timestamp")]
-    public long EndMilliseconds
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(EndTime)));
-    }
+    public partial long EndMilliseconds { get; set; }
 
     [JsonIgnore]
     public DateTime StartTime
