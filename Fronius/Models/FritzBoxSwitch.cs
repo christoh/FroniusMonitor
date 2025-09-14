@@ -9,15 +9,13 @@ public enum FritzBoxSwitching
 }
 
 [XmlType("switch")]
-public class FritzBoxSwitch : BindableBase
+public partial class FritzBoxSwitch : BindableBase
 {
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsTurnedOn))]
     [XmlElement("state")]
     [JsonIgnore]
-    public string? IsTurnedOnString
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(IsTurnedOn)));
-    }
+    public partial string? IsTurnedOnString { get; set; }
 
     [XmlIgnore]
     public bool? IsTurnedOn
@@ -26,20 +24,15 @@ public class FritzBoxSwitch : BindableBase
         set => IsTurnedOnString = FritzBoxDevice.GetStringState(value);
     }
 
+    [ObservableProperty]
     [XmlElement("mode")]
-    public FritzBoxSwitching? Switching
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial FritzBoxSwitching? Switching { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsUiLocked))]
     [XmlElement("lock")]
     [JsonIgnore]
-    public string? IsUiLockedString
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(IsUiLocked)));
-    }
+    public partial string? IsUiLockedString { get; set; }
 
     [XmlIgnore]
     public bool? IsUiLocked
@@ -48,13 +41,11 @@ public class FritzBoxSwitch : BindableBase
         set => IsUiLockedString = FritzBoxDevice.GetStringState(value);
     }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsDeviceLocked))]
     [XmlElement("devicelock")]
     [JsonIgnore]
-    public string? IsDeviceLockedString
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(IsDeviceLocked)));
-    }
+    public partial string? IsDeviceLockedString { get; set; }
 
     [XmlIgnore]
     public bool? IsDeviceLocked
@@ -66,15 +57,13 @@ public class FritzBoxSwitch : BindableBase
 
 // ReSharper disable once StringLiteralTypo
 [XmlType("simpleonoff")]
-public class FritzBoxSimpleSwitch : BindableBase
+public partial class FritzBoxSimpleSwitch : BindableBase
 {
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsTurnedOn))]
     [XmlElement("state")]
     [JsonIgnore]
-    public string? IsTurnedOnString
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(IsTurnedOn)));
-    }
+    public partial string? IsTurnedOnString { get; set; }
 
     [XmlIgnore]
     public bool? IsTurnedOn

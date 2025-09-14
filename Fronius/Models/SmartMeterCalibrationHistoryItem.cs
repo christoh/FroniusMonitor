@@ -1,39 +1,24 @@
 ﻿namespace De.Hochstaetter.Fronius.Models;
 
-public class SmartMeterCalibrationHistoryItem : BindableBase
+public partial class SmartMeterCalibrationHistoryItem : BindableBase
 {
+    [ObservableProperty]
     [XmlAttribute("Crl")]
-    public double EnergyRealConsumed
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double EnergyRealConsumed { get; set; }
 
+    [ObservableProperty]
     [XmlAttribute("Prl")]
-    public double EnergyRealProduced
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double EnergyRealProduced { get; set; }
 
+    [ObservableProperty]
     [XmlAttribute("Date")]
-    public DateTime CalibrationDate
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial DateTime CalibrationDate { get; set; }
 
+    [ObservableProperty]
     [XmlAttribute("CrlOffset")]
-    public double ConsumedOffset
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double ConsumedOffset { get; set; }
 
+    [ObservableProperty]
     [XmlAttribute("PrlOffset")]
-    public double ProducedOffset
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double ProducedOffset { get; set; }
 }

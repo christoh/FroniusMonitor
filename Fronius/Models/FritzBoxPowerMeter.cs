@@ -1,7 +1,8 @@
 ﻿namespace De.Hochstaetter.Fronius.Models;
 
 [XmlType("powermeter")]
-public class FritzBoxPowerMeter : BindableBase
+[SuppressMessage("ReSharper", "StringLiteralTypo")]
+public partial class FritzBoxPowerMeter : BindableBase
 {
     [XmlElement("voltage")]
     [JsonIgnore]
@@ -27,23 +28,17 @@ public class FritzBoxPowerMeter : BindableBase
         set => EnergyConsumed = FritzBoxDevice.GetDoubleValue(value, 1);
     }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(EnergyString))]
     [XmlIgnore]
-    public double? EnergyConsumed
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(EnergyString)));
-    }
+    public partial double? EnergyConsumed { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(VoltageString))]
     [XmlIgnore]
-    public double? Voltage
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(VoltageString)));
-    }
+    public partial double? Voltage { get; set; }
 
-    public double? PowerWatts
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(PowerString)));
-    }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PowerString))]
+    public partial double? PowerWatts { get; set; }
 }

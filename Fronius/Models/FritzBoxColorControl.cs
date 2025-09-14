@@ -14,7 +14,7 @@ public enum FritzBoxColorMode : uint
 
 [XmlType("colorcontrol")]
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
-public class FritzBoxColorControl : BindableBase
+public partial class FritzBoxColorControl : BindableBase
 {
     [XmlAttribute("supported_modes")]
     [JsonIgnore]
@@ -32,26 +32,20 @@ public class FritzBoxColorControl : BindableBase
         set => CurrentMode = (FritzBoxColorMode?)FritzBoxDevice.GetUintValue(value);
     }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SupportedModesString))]
     [XmlIgnore]
-    public FritzBoxColorMode? SupportedModes
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(SupportedModesString)));
-    }
+    public partial FritzBoxColorMode? SupportedModes { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CurrentModeString))]
     [XmlIgnore]
-    public FritzBoxColorMode? CurrentMode
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(CurrentModeString)));
-    }
+    public partial FritzBoxColorMode? CurrentMode { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HueDegreesString))]
     [XmlIgnore]
-    public double? HueDegrees
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(HueDegreesString)));
-    }
+    public partial double? HueDegrees { get; set; }
 
     [XmlElement("hue"), JsonIgnore]
     public string? HueDegreesString
@@ -60,12 +54,10 @@ public class FritzBoxColorControl : BindableBase
         set => HueDegrees = FritzBoxDevice.GetDoubleValue(value, 1);
     }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SaturationString))]
     [XmlIgnore]
-    public double? SaturationAbsolute
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(SaturationString)));
-    }
+    public partial double? SaturationAbsolute { get; set; }
 
     [XmlElement("saturation"), JsonIgnore]
     public string? SaturationString
@@ -74,12 +66,10 @@ public class FritzBoxColorControl : BindableBase
         set => SaturationAbsolute = FritzBoxDevice.GetDoubleValue(value, 1);
     }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(UnmappedHueDegreesString))]
     [XmlIgnore]
-    public double? UnmappedHueDegrees
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(UnmappedHueDegreesString)));
-    }
+    public partial double? UnmappedHueDegrees { get; set; }
 
     [XmlElement("unmapped_hue"), JsonIgnore]
     public string? UnmappedHueDegreesString
@@ -88,12 +78,10 @@ public class FritzBoxColorControl : BindableBase
         set => UnmappedHueDegrees = FritzBoxDevice.GetDoubleValue(value, 1);
     }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(UnmappedSaturationString))]
     [XmlIgnore]
-    public double? UnmappedSaturation
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(UnmappedSaturationString)));
-    }
+    public partial double? UnmappedSaturation { get; set; }
 
     [XmlElement("unmapped_saturation"), JsonIgnore]
     public string? UnmappedSaturationString
@@ -102,12 +90,10 @@ public class FritzBoxColorControl : BindableBase
         set => UnmappedSaturation = FritzBoxDevice.GetDoubleValue(value, 1);
     }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TemperatureKelvinString))]
     [XmlIgnore]
-    public double? TemperatureKelvin
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(TemperatureKelvinString)));
-    }
+    public partial double? TemperatureKelvin { get; set; }
 
     [XmlElement("temperature"), JsonIgnore]
     public string? TemperatureKelvinString

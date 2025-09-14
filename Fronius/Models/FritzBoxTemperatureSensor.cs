@@ -1,7 +1,7 @@
 ﻿namespace De.Hochstaetter.Fronius.Models;
 
 [XmlType("rawTemperature")]
-public class FritzBoxTemperatureSensor : BindableBase
+public partial class FritzBoxTemperatureSensor : BindableBase
 {
     [XmlElement("celsius")]
     [JsonIgnore]
@@ -20,26 +20,14 @@ public class FritzBoxTemperatureSensor : BindableBase
     }
 
     [XmlIgnore]
-    public double? Temperature
-    {
-        get;
-        set => Set(ref field, value, () =>
-        {
-            NotifyOfPropertyChange(nameof(TemperatureString));
-            NotifyOfPropertyChange(nameof(RawTemperature));
-        });
-    }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TemperatureString),nameof(RawTemperature))]
+    public partial double? Temperature { get; set; }
 
     [XmlIgnore]
-    public double? Offset
-    {
-        get;
-        set => Set(ref field, value, () =>
-        {
-            NotifyOfPropertyChange(nameof(OffsetString));
-            NotifyOfPropertyChange(nameof(RawTemperature));
-        });
-    }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(OffsetString),nameof(RawTemperature))]
+    public partial double? Offset { get; set; }
 
     [XmlIgnore] public double? RawTemperature => Temperature - Offset;
 }

@@ -2,23 +2,17 @@
 
 [XmlRoot("devicelist")]
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
-public class FritzBoxDeviceList : BindableBase
+public partial class FritzBoxDeviceList : BindableBase
 {
+    [ObservableProperty]
     [XmlAttribute("version")]
-    public uint Version
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial uint Version { get; set; }
 
+    [ObservableProperty]
     [XmlAttribute("fwversion")]
-    public string? FirmwareVersionString
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? FirmwareVersionString { get; set; }
 
-    [XmlElement("device")] public List<FritzBoxDevice> Devices { get; } = new();
+    [XmlElement("device")] public List<FritzBoxDevice> Devices { get; } = [];
 
     [XmlIgnore] public List<IPowerMeter1P> DevicesWithPowerMeter => Devices.Where(d => d.PowerMeter != null).Cast<IPowerMeter1P>().ToList();
     [XmlIgnore] public IEnumerable<ISwitchable> PowerConsumers => Devices.Where(d => d.CanSwitch).Cast<ISwitchable>().ToList();

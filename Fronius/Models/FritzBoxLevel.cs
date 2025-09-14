@@ -2,7 +2,7 @@
 
 [XmlType("levelcontrol")]
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
-public class FritzBoxLevel : BindableBase
+public partial class FritzBoxLevel : BindableBase
 {
     [XmlElement("level")]
     [JsonIgnore]
@@ -20,17 +20,13 @@ public class FritzBoxLevel : BindableBase
         set => Level = FritzBoxDevice.GetDoubleValue(value, 100);
     }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(LevelString))]
     [XmlIgnore]
-    public double? Level
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(LevelString)));
-    }
+    public partial double? Level { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(LevelAbsoluteString))]
     [XmlIgnore]
-    public double? LevelAbsolute
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(LevelAbsoluteString)));
-    }
+    public partial double? LevelAbsolute { get; set; }
 }
