@@ -1,28 +1,13 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc;
 
-public class ToshibaHvacModeValue : BindableBase
+public partial class ToshibaHvacModeValue : BindableBase
 {
-    [JsonPropertyName("Mode")]
-    [JsonRequired]
-    public ToshibaHvacOperatingMode Mode
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty, JsonPropertyName("Mode"), JsonRequired]
+    public partial ToshibaHvacOperatingMode Mode { get; set; }
 
-    [JsonPropertyName("Temp")]
-    [JsonRequired]
-    public sbyte TargetTemperatureCelsius
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty, JsonPropertyName("Temp"), JsonRequired]
+    public partial sbyte TargetTemperatureCelsius { get; set; }
 
-    [JsonPropertyName("FanSpeed")]
-    [JsonRequired]
-    public ToshibaHvacFanSpeed FanSpeed
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty, JsonPropertyName("FanSpeed"), JsonRequired]
+    public partial ToshibaHvacFanSpeed FanSpeed { get; set; }
 }

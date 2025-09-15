@@ -2,55 +2,34 @@
 
 namespace De.Hochstaetter.Fronius.Models.ToshibaAc;
 
-public class ToshibaHvacAzureSmMobileCommand : BindableBase
+public partial class ToshibaHvacAzureSmMobileCommand : BindableBase
 {
+    [ObservableProperty]
     [JsonPropertyName("sourceId")]
     [JsonRequired]
-    public string DeviceUniqueId
-    {
-        get;
-        set => Set(ref field, value);
-    } = string.Empty;
+    public partial string DeviceUniqueId { get; set; } = string.Empty;
 
+    [ObservableProperty]
     [JsonPropertyName("messageId")]
-    public string MessageId
-    {
-        get;
-        set => Set(ref field, value);
-    } = string.Empty;
+    public partial string MessageId { get; set; } = string.Empty;
 
+    [ObservableProperty]
     [JsonPropertyName("targetId")]
-    public IList<string> TargetIds
-    {
-        get;
-        set => Set(ref field, value);
-    } = Array.Empty<string>();
+    public partial IList<string> TargetIds { get; set; } = Array.Empty<string>();
 
+    [ObservableProperty]
     [JsonPropertyName("cmd")]
-    public string CommandName
-    {
-        get;
-        set => Set(ref field, value);
-    } = string.Empty;
+    public partial string CommandName { get; set; } = string.Empty;
 
+    [ObservableProperty]
     [JsonPropertyName("payload")]
-    public JsonElement PayLoad
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial JsonElement PayLoad { get; set; }
 
+    [ObservableProperty]
     [JsonPropertyName("timeStamp")]
-    public string TimeStamp
-    {
-        get;
-        set => Set(ref field, value);
-    } = string.Empty;
+    public partial string TimeStamp { get; set; } = string.Empty;
 
+    [ObservableProperty]
     [JsonPropertyName("timeZone")]
-    public string? TimeZone
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? TimeZone { get; set; }
 }

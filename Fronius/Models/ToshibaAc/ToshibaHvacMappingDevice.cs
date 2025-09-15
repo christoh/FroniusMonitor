@@ -1,48 +1,24 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc;
 
-public class ToshibaHvacMappingDevice : ToshibaHvacDeviceBase
+public partial class ToshibaHvacMappingDevice : ToshibaHvacDeviceBase
 {
-    [JsonPropertyName("Name")]
-    public string Name
-    {
-        get;
-        set => Set(ref field, value);
-    } = string.Empty;
+    [ObservableProperty, JsonPropertyName("Name")]
+    public partial string Name { get; set; } = string.Empty;
 
-    [JsonPropertyName("Id")]
-    public Guid AcId
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty, JsonPropertyName("Id")]
+    public partial Guid AcId { get; set; } 
 
-    [JsonPropertyName("DeviceUniqueId")]
-    public override Guid DeviceUniqueId
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [JsonPropertyName("DeviceUniqueId"), ObservableProperty, NotifyPropertyChangedFor(nameof(SerialNumber))]
+    public override partial Guid DeviceUniqueId { get; set; } 
 
-    [JsonPropertyName("ACModelId")]
-    public int AcModelId
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty, JsonPropertyName("ACModelId")]
+    public partial int AcModelId { get; set; } 
 
-    [JsonPropertyName("Description")]
-    public string Description
-    {
-        get;
-        set => Set(ref field, value);
-    } = string.Empty;
+    [ObservableProperty, JsonPropertyName("Description")]
+    public partial string Description { get; set; }  = string.Empty;
 
-    [JsonPropertyName("CreatedDate")]
-    public string CreatedDate
-    {
-        get;
-        set => Set(ref field, value);
-    } = string.Empty;
+    [ObservableProperty, JsonPropertyName("CreatedDate")]
+    public partial string CreatedDate { get; set; }  = string.Empty;
 
     public override string ToString() => $"{Name} ({Description})";
 }

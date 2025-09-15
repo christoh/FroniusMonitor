@@ -1,28 +1,13 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc;
 
-public class ToshibaHvacResponse<T> : BindableBase where T : new()
+public partial class ToshibaHvacResponse<T> : BindableBase where T : new()
 {
-    [JsonPropertyName("IsSuccess")]
-    [JsonRequired]
-    public bool IsSuccess
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty, JsonPropertyName("IsSuccess"), JsonRequired]
+    public partial bool IsSuccess { get; set; }
 
-    [JsonPropertyName("ResObj")]
-    [JsonRequired]
-    public T Data
-    {
-        get;
-        set => Set(ref field, value);
-    } = new();
+    [ObservableProperty, JsonPropertyName("ResObj"), JsonRequired]
+    public partial T Data { get; set; } = new();
 
-    [JsonPropertyName("Message")]
-    [JsonRequired]
-    public string Message
-    {
-        get;
-        set => Set(ref field, value);
-    } = string.Empty;
+    [ObservableProperty, JsonPropertyName("Message"), JsonRequired]
+    public partial string Message { get; set; } = string.Empty;
 }

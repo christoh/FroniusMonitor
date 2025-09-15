@@ -1,102 +1,46 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc;
 
-public class ToshibaHvacStatusDevice : ToshibaHvacDeviceBase
+public partial class ToshibaHvacStatusDevice : ToshibaHvacDeviceBase
 {
-    [JsonPropertyName("ACId")]
-    public Guid AcId
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty, JsonPropertyName("ACId")]
+    public partial Guid AcId { get; set; }
 
-    [JsonPropertyName("Id")]
-    public Guid Id
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty, JsonPropertyName("Id")]
+    public partial Guid Id { get; set; }
 
-    [JsonPropertyName("OnOff")]
-    public ToshibaHvacPowerState PowerState
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(IsTurnedOn)));
-    }
+    [ObservableProperty, JsonPropertyName("OnOff"), NotifyPropertyChangedFor(nameof(IsTurnedOn))]
+    public partial ToshibaHvacPowerState PowerState { get; set; }
 
-    [JsonPropertyName("ACDeviceUniqueId")]
-    public override Guid DeviceUniqueId
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(SerialNumber)), JsonPropertyName("ACDeviceUniqueId")]
+    public override partial Guid DeviceUniqueId { get; set; }
 
-    [JsonPropertyName("VersionInfo")]
-    public string VersionInfo
-    {
-        get;
-        set => Set(ref field, value);
-    } = string.Empty;
+    [ObservableProperty, JsonPropertyName("VersionInfo")]
+    public partial string VersionInfo { get; set; } = string.Empty;
 
-    [JsonPropertyName("Model")]
-    public int AcModelId
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty, JsonPropertyName("Model")]
+    public partial int AcModelId { get; set; }
 
-    [JsonPropertyName("UpdatedDate")]
-    public DateTime UpdatedDate
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty, JsonPropertyName("UpdatedDate")]
+    public partial DateTime UpdatedDate { get; set; }
 
-    [JsonPropertyName("Lat")]
-    public double Latitude
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty, JsonPropertyName("Lat")]
+    public partial double Latitude { get; set; }
 
-    [JsonPropertyName("Long")]
-    public double Longitude
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty, JsonPropertyName("Long")]
+    public partial double Longitude { get; set; }
 
-    [JsonPropertyName("IsMapped")]
-    public bool IsMapped
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty, JsonPropertyName("IsMapped")]
+    public partial bool IsMapped { get; set; }
 
-    [JsonPropertyName("FirstConnectionTime")]
-    public DateTime FirstConnectionTime
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty, JsonPropertyName("FirstConnectionTime")]
+    public partial DateTime FirstConnectionTime { get; set; }
 
-    [JsonPropertyName("LastConnectionTime")]
-    public DateTime LastConnectionTime
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty, JsonPropertyName("LastConnectionTime")]
+    public partial DateTime LastConnectionTime { get; set; }
 
-    [JsonPropertyName("ConsumerMasterId")]
-    public string ConsumerMasterId
-    {
-        get;
-        set => Set(ref field, value);
-    } = string.Empty;
+    [ObservableProperty, JsonPropertyName("ConsumerMasterId")]
+    public partial string ConsumerMasterId { get; set; } = string.Empty;
 
-    [JsonPropertyName("PartitionKey")]
-    public Guid PartitionKey
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty, JsonPropertyName("PartitionKey")]
+    public partial Guid PartitionKey { get; set; }
 }

@@ -19,16 +19,14 @@ public class ToshibaHvacStateData : BindableBase
 
     public ToshibaHvacStateData()
     {
-        stateData = new byte[19];
-        Array.Fill<byte>((byte[])stateData, 0xff);
+        StateData = new byte[19];
+        Array.Fill<byte>((byte[])StateData, 0xff);
     }
-
-    private IList<byte> stateData;
 
     public IList<byte> StateData
     {
-        get => stateData;
-        set => Set(ref stateData, value, () => stateDataMap.Values.Apply(propertyList => propertyList.Split('|').Apply(NotifyOfPropertyChange)));
+        get => field;
+        set => Set(ref field, value, () => stateDataMap.Values.Apply(propertyList => propertyList.Split('|').Apply(NotifyOfPropertyChange)));
     }
 
     public bool IsTurnedOn

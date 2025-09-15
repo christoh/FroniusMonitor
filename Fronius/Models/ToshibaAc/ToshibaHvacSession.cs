@@ -1,41 +1,19 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc;
 
-public class ToshibaHvacSession : BindableBase
+public partial class ToshibaHvacSession : BindableBase
 {
-    [JsonPropertyName("consumerId")]
-    [JsonRequired]
-    public Guid ConsumerId
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty, JsonPropertyName("consumerId"), JsonRequired]
+    public partial Guid ConsumerId { get; set; }
 
-    [JsonPropertyName("access_token")]
-    [JsonRequired]
-    public string AccessToken
-    {
-        get;
-        set => Set(ref field, value);
-    } = string.Empty;
+    [ObservableProperty, JsonPropertyName("access_token"), JsonRequired]
+    public partial string AccessToken { get; set; } = string.Empty;
 
-    [JsonPropertyName("token_type")]
-    public string TokenType
-    {
-        get;
-        set => Set(ref field, value);
-    } = string.Empty;
+    [ObservableProperty, JsonPropertyName("token_type")]
+    public partial string TokenType { get; set; } = string.Empty;
 
-    [JsonPropertyName("consumerMasterId")]
-    public string ConsumerMasterId
-    {
-        get;
-        set => Set(ref field, value);
-    } = string.Empty;
+    [ObservableProperty, JsonPropertyName("consumerMasterId")]
+    public partial string ConsumerMasterId { get; set; } = string.Empty;
 
-    [JsonPropertyName("countryId")]
-    public int CountryId
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty, JsonPropertyName("countryId")]
+    public partial int CountryId { get; set; }
 }

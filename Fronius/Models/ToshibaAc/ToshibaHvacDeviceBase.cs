@@ -1,34 +1,18 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc;
 
-public abstract class ToshibaHvacDeviceBase : BindableBase, ISwitchable
+public abstract partial class ToshibaHvacDeviceBase : BindableBase, ISwitchable
 {
-    [JsonPropertyName("ACStateData")]
-    public ToshibaHvacStateData State
-    {
-        get;
-        set => Set(ref field, value);
-    } = new();
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(IsTurnedOn)), JsonPropertyName("ACStateData")]
+    public partial ToshibaHvacStateData State { get; set; } = new();
 
-    [JsonPropertyName("FirmwareVersion")]
-    public Version FirmwareVersion
-    {
-        get;
-        set => Set(ref field, value);
-    } = default!;
+    [ObservableProperty, JsonPropertyName("FirmwareVersion")]
+    public partial Version FirmwareVersion { get; set; } = default!;
 
-    [JsonPropertyName("MeritFeature")]
-    public ushort MeritFeature
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty, JsonPropertyName("MeritFeature")]
+    public partial ushort MeritFeature { get; set; }
 
-    [JsonPropertyName("ModeValues")]
-    public ObservableCollection<ToshibaHvacModeValue> Modes
-    {
-        get;
-        set => Set(ref field, value);
-    } = new();
+    [ObservableProperty, JsonPropertyName("ModeValues")]
+    public partial ObservableCollection<ToshibaHvacModeValue> Modes { get; set; } = new();
 
     public abstract Guid DeviceUniqueId { get; set; }
 
@@ -38,15 +22,15 @@ public abstract class ToshibaHvacDeviceBase : BindableBase, ISwitchable
 
     public Task TurnOnOff(bool turnOn)
     {
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
+    }
 
     [JsonIgnore]
     public bool IsPresent => true;
-        
+
     [JsonIgnore]
     public string Manufacturer => "Toshiba";
-        
+
     [JsonIgnore]
     public string Model => "HVAC";
 
