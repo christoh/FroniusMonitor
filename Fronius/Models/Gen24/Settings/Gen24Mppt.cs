@@ -1,6 +1,7 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Gen24.Settings;
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
 public enum StringCombination : byte
 {
     [EnumParse(ParseNumeric = true)] CombineStrings_12 = 1,
@@ -19,28 +20,21 @@ public enum StringCombination : byte
     [EnumParse(ParseNumeric = true)] NotCombined = 0,
 }
 
-public class Gen24Mppt : BindableBase, ICloneable
+public partial class Gen24Mppt : BindableBase, ICloneable
 {
     private static readonly IGen24JsonService gen24JsonService = IoC.TryGet<IGen24JsonService>()!;
 
+    [ObservableProperty]
     [FroniusProprietaryImport("PV_MODE_COMBINE_U16", FroniusDataType.Root)]
-    public StringCombination? StringCombination
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial StringCombination? StringCombination { get; set; }
 
-    public Gen24Mppt1? Mppt1
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(WattPeakTotal))]
+    public partial Gen24Mppt1? Mppt1 { get; set; }
 
-    public Gen24Mppt2? Mppt2
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(WattPeakTotal))]
+    public partial Gen24Mppt2? Mppt2 { get; set; }
 
     public double? WattPeakTotal => Mppt1?.WattPeak + Mppt2?.WattPeak;
 

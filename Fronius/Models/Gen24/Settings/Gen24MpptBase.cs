@@ -16,31 +16,19 @@ public enum MpptPowerMode : byte
     [EnumParse(ParseNumeric = true, ParseAs = "fix")] Fix = 2,
 }
 
-public abstract class Gen24MpptBase : BindableBase, ICloneable
+public abstract partial class Gen24MpptBase : BindableBase, ICloneable
 {
-    public virtual MpptOnOff? DynamicPeakManager
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public virtual partial MpptOnOff? DynamicPeakManager { get; set; }
 
-    public virtual MpptPowerMode? PowerMode
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public virtual partial MpptPowerMode? PowerMode { get; set; }
 
-    public virtual uint? WattPeak
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public virtual partial uint? WattPeak { get; set; }
 
-    public virtual double? DcFixedVoltage
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public virtual partial double? DcFixedVoltage { get; set; }
 
     public virtual object Clone() => MemberwiseClone();
 }

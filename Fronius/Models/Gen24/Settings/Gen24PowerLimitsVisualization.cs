@@ -1,13 +1,10 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Gen24.Settings;
 
-public class Gen24PowerLimitsVisualization : Gen24ParsingBase
+public partial class Gen24PowerLimitsVisualization : Gen24ParsingBase
 {
+    [ObservableProperty]
     [FroniusProprietaryImport("wattPeakReferenceValue", FroniusDataType.Root)]
-    public double WattPeakReferenceValue
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial double WattPeakReferenceValue { get; set; }
 
     public static Gen24PowerLimitsVisualization Parse(JToken? token)
     {

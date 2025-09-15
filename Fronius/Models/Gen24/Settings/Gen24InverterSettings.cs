@@ -1,46 +1,28 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Gen24.Settings;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
-public class Gen24InverterSettings : Gen24ParsingBase
+public partial class Gen24InverterSettings : Gen24ParsingBase
 {
+    [ObservableProperty]
     [FroniusProprietaryImport("systemName", FroniusDataType.Root)]
-    public string? SystemName
-    {
-        get;
-        set => Set(ref field, value);
-    } = string.Empty;
+    public partial string? SystemName { get; set; } = string.Empty;
 
+    [ObservableProperty]
     [FroniusProprietaryImport("timezone", FroniusDataType.Root)]
-    public string? TimeZoneName
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? TimeZoneName { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("timesync", FroniusDataType.Root)]
-    public bool? TimeSync
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? TimeSync { get; set; }
 
-    public Gen24Mppt? Mppt
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial Gen24Mppt? Mppt { get; set; }
 
-    public Gen24PowerLimitSettings PowerLimitSettings
-    {
-        get;
-        set => Set(ref field, value);
-    } = new();
+    [ObservableProperty]
+    public partial Gen24PowerLimitSettings PowerLimitSettings { get; set; } = new();
 
-    public Gen24AcSystemSettings AcSystemSettings
-    {
-        get;
-        set => Set(ref field, value);
-    } = new();
+    [ObservableProperty]
+    public partial Gen24AcSystemSettings AcSystemSettings { get; set; } = new();
 
     public override object Clone()
     {

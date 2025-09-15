@@ -31,41 +31,29 @@ public enum SunspecMode
 }
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
-public class Gen24ModbusSettings : Gen24ParsingBase, ICloneable
+public partial class Gen24ModbusSettings : Gen24ParsingBase, ICloneable
 {
-    private static readonly IReadOnlyList<int> baudRates = new[] { 9600, 19200 };
+    private static readonly IReadOnlyList<int> baudRates = [9600, 19200];
 
-    private static readonly IReadOnlyList<ushort> tcpPorts = new[] { (ushort)502, (ushort)1502 };
+    private static readonly IReadOnlyList<ushort> tcpPorts = [502, 1502];
 
     public IReadOnlyList<int> BaudRates => baudRates;
 
     public IReadOnlyList<ushort> TcpPorts => tcpPorts;
 
-    public ModbusInterfaceRole Rtu0
-    {
-        get;
-        set => Set(ref field, value);
-    } = ModbusInterfaceRole.Disabled;
+    [ObservableProperty]
+    public partial ModbusInterfaceRole Rtu0 { get; set; } = ModbusInterfaceRole.Disabled;
 
-    public ModbusInterfaceRole Rtu1
-    {
-        get;
-        set => Set(ref field, value);
-    } = ModbusInterfaceRole.Disabled;
+    [ObservableProperty]
+    public partial ModbusInterfaceRole Rtu1 { get; set; } = ModbusInterfaceRole.Disabled;
 
+    [ObservableProperty]
     [FroniusProprietaryImport("baud", FroniusDataType.Root)]
-    public int? BaudRate
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial int? BaudRate { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("demo", FroniusDataType.Root)]
-    public bool? IsDemoMode
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? IsDemoMode { get; set; }
 
     [FroniusProprietaryImport("meterAddress", FroniusDataType.Root)]
     public byte? MeterAddress
@@ -81,26 +69,17 @@ public class Gen24ModbusSettings : Gen24ParsingBase, ICloneable
         });
     }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("mode", FroniusDataType.Root)]
-    public ModbusSlaveMode? Mode
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial ModbusSlaveMode? Mode { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("parity", FroniusDataType.Root)]
-    public ModbusParity? Parity
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial ModbusParity? Parity { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("port", FroniusDataType.Root)]
-    public ushort? TcpPort
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial ushort? TcpPort { get; set; }
 
     [FroniusProprietaryImport("scAddress", FroniusDataType.Root)]
     public byte? SunSpecAddress
@@ -115,31 +94,19 @@ public class Gen24ModbusSettings : Gen24ParsingBase, ICloneable
         });
     }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("rtu_inverter_slave_id", FroniusDataType.Root)]
-    public byte? InverterAddress
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial byte? InverterAddress { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("sunspecMode", FroniusDataType.Root)]
-    public SunspecMode? SunspecMode
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial SunspecMode? SunspecMode { get; set; }
 
-    public bool? AllowControl
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial bool? AllowControl { get; set; }
 
-    public bool? RestrictControl
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial bool? RestrictControl { get; set; }
 
     public string? IpAddress
     {

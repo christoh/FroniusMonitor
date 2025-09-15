@@ -106,7 +106,7 @@ public class ChargingRuleDateExtension : ValidationRuleExtension
             return new ValidationResult(false, $"Must bind to {nameof(String)}");
         }
 
-        var match = Gen24ChargingRule.TimeRegex.Match(text);
+        var match = Gen24ChargingRule.TimeRegex().Match(text);
         var invalidTime = StringResult.Create(() => string.Format(Loc.InvalidChargingRuleTime, text));
 
         if (!match.Success)

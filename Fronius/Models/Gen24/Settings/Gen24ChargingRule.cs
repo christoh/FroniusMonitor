@@ -8,98 +8,65 @@ public enum ChargingRuleType
     [EnumParse(ParseAs = "DISCHARGE_MAX")] MaximumDischarge,
 }
 
-public class Gen24ChargingRule : BindableBase, ICloneable
+public partial class Gen24ChargingRule : BindableBase, ICloneable
 {
-    public static Regex TimeRegex { get; } = new(@"^([0-9]{1,2}):([0-9]{1,2})$", RegexOptions.Compiled);
+    [GeneratedRegex(@"^([0-9]{1,2}):([0-9]{1,2})$", RegexOptions.Compiled)]
+    public static partial Regex TimeRegex();
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(StartTimeDate))]
     [FroniusProprietaryImport("TimeTable", "Start", Unit.Time)]
-    public string? StartTime
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(StartTimeDate)));
-    }
+    public partial string? StartTime { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(EndTimeDate))]
     [FroniusProprietaryImport("TimeTable", "End", Unit.Time)]
-    public string? EndTime
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(EndTimeDate)));
-    }
+    public partial string? EndTime { get; set; }
 
     public DateTime? StartTimeDate => GetDate(StartTime);
 
     public DateTime? EndTimeDate => GetDate(EndTime);
 
 
+    [ObservableProperty]
     [FroniusProprietaryImport("Weekdays", "Mon")]
-    public bool? Monday
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? Monday { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("Weekdays", "Tue")]
-    public bool? Tuesday
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? Tuesday { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("Weekdays", "Wed")]
-    public bool? Wednesday
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? Wednesday { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("Weekdays", "Thu")]
-    public bool? Thursday
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? Thursday { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("Weekdays", "Fri")]
-    public bool? Friday
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? Friday { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("Weekdays", "Sat")]
-    public bool? Saturday
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? Saturday { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("Weekdays", "Sun")]
-    public bool? Sunday
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? Sunday { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("Active", FroniusDataType.Root)]
-    public bool? IsActive
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? IsActive { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("Power", FroniusDataType.Root)]
-    public int? Power
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial int? Power { get; set; }
 
+    [ObservableProperty]
     [FroniusProprietaryImport("ScheduleType", FroniusDataType.Root)]
-    public ChargingRuleType? RuleType
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial ChargingRuleType? RuleType { get; set; }
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public static BindableCollection<Gen24ChargingRule> Parse(JToken? token, SynchronizationContext? ctx)
@@ -168,7 +135,7 @@ public class Gen24ChargingRule : BindableBase, ICloneable
             return null;
         }
 
-        var match = TimeRegex.Match(timeString);
+        var match = TimeRegex().Match(timeString);
 
         if (!match.Success)
         {
@@ -195,28 +162,29 @@ public class Gen24ChargingRule : BindableBase, ICloneable
             return true;
         }
 
-        if (obj is Gen24ChargingRule other)
+        if (obj is not Gen24ChargingRule other)
         {
-            var type = GetType();
-
-            if (type != other.GetType())
-            {
-                return false;
-            }
-
-            var fields = type.GetFields(BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance);
-
-            return fields.All(f =>
-            {
-                var thisValue = f.GetValue(this);
-                var otherValue = f.GetValue(other);
-                return ReferenceEquals(thisValue, other) || (thisValue?.Equals(otherValue) ?? false);
-            });
+            return false;
         }
 
-        return false;
+        var type = GetType();
+
+        if (type != other.GetType())
+        {
+            return false;
+        }
+
+        var fields = type.GetFields(BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance);
+
+        return fields.All(f =>
+        {
+            var thisValue = f.GetValue(this);
+            var otherValue = f.GetValue(other);
+            return ReferenceEquals(thisValue, other) || (thisValue?.Equals(otherValue) ?? false);
+        });
     }
 
+    [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
     public override int GetHashCode()
     {
         return StartTime?.GetHashCode() ?? 0 ^ EndTime?.GetHashCode() ?? 0 ^ Power?.GetHashCode() ?? 0 ^ RuleType?.GetHashCode() ?? 0;

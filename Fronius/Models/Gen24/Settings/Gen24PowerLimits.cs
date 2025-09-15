@@ -1,20 +1,14 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Gen24.Settings;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
-public class Gen24PowerLimits : Gen24ParsingBase
+public partial class Gen24PowerLimits : Gen24ParsingBase
 {
+    [ObservableProperty]
     [FroniusProprietaryImport("failSafeModeEnabled", FroniusDataType.Root)]
-    public bool EnableFailSafeMode
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool EnableFailSafeMode { get; set; }
 
-    public Gen24PowerLimit ActivePower
-    {
-        get;
-        set => Set(ref field, value);
-    } = new();
+    [ObservableProperty]
+    public partial Gen24PowerLimit ActivePower { get; set; } = new();
 
     //private Gen24PowerLimit? reactivePower;
 
