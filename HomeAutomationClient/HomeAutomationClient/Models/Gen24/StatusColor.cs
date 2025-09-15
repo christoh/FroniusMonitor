@@ -19,11 +19,11 @@ public static class StatusColor
             "STATE_ERROR" => Brushes.Red,
             "STATE_RUNNING" when IsDark => RunningOuter,
             "STATE_RUNNING" => Brushes.AntiqueWhite,
-            "STATE_WARNING" when IsDark=> Brushes.DarkOrange,
+            "STATE_WARNING" when IsDark => Brushes.DarkOrange,
             "STATE_WARNING" => Brushes.Orange,
             "STATE_STARTUP" when IsDark => Brushes.SaddleBrown,
             "STATE_STARTUP" => Brushes.BurlyWood,
-            _ when IsDark=> StoppedOuter,
+            _ when IsDark => StoppedOuter,
             _ => Brushes.LightGray,
         };
     }
@@ -36,9 +36,9 @@ public static class StatusColor
             "STATE_ERROR" => Brushes.OrangeRed,
             "STATE_RUNNING" when IsDark => RunningInner,
             "STATE_RUNNING" => Brushes.Cornsilk,
-            "STATE_WARNING" when IsDark=> Brushes.DarkOrange,
+            "STATE_WARNING" when IsDark => Brushes.DarkOrange,
             "STATE_WARNING" => Brushes.Orange,
-            _ when IsDark=> StoppedInner,
+            _ when IsDark => StoppedInner,
             _ => Brushes.Gainsboro,
         };
     }
