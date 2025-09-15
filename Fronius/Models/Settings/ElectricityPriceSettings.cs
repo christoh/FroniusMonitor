@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Settings;
 
-public class ElectricityPriceSettings : BindableBase
+public partial class ElectricityPriceSettings : BindableBase
 {
     public event EventHandler<ElectricityPriceService>? ElectricityPriceServiceChanged;
 
@@ -11,20 +11,16 @@ public class ElectricityPriceSettings : BindableBase
         set => Set(ref field, value, () => Task.Run(() => ElectricityPriceServiceChanged?.Invoke(this, value)));
     } = ElectricityPriceService.Awattar;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PriceSurchargeBuyPercent))]
     [XmlIgnore]
-    public decimal PriceFactorBuy
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(PriceSurchargeBuyPercent)));
-    } = 1;
+    // As of 2025 virtually no provider is using this, so default to 1
+    public partial decimal PriceFactorBuy { get; set; } = 1;
 
+    [ObservableProperty]
     //[DefaultValue(0m)]
     [XmlAttribute]
-    public decimal PriceOffsetBuy
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial decimal PriceOffsetBuy { get; set; }
 
     [XmlAttribute("PriceSurchargeBuy")]
     public decimal PriceSurchargeBuyPercent
@@ -33,16 +29,10 @@ public class ElectricityPriceSettings : BindableBase
         set => PriceFactorBuy = 1 + value / 100;
     }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(VatRatePercent),nameof(VatRate))]
     [XmlIgnore]
-    public decimal VatFactor
-    {
-        get;
-        set => Set(ref field, value, () =>
-        {
-            NotifyOfPropertyChange(nameof(VatRatePercent));
-            NotifyOfPropertyChange(nameof(VatRate));
-        });
-    } = 1.19m;
+    public partial decimal VatFactor { get; set; } = 1.19m;
 
     [XmlAttribute(nameof(VatRate))]
     public decimal VatRatePercent
@@ -59,11 +49,8 @@ public class ElectricityPriceSettings : BindableBase
     }
 
     [XmlAttribute]
-    public AwattarCountry PriceRegion
-    {
-        get;
-        set => Set(ref field, value);
-    } = AwattarCountry.GermanyLuxembourg;
+    [ObservableProperty]
+    public partial AwattarCountry PriceRegion { get; set; } = AwattarCountry.GermanyLuxembourg;
 
     public void CopyFrom(ElectricityPriceSettings other)
     {

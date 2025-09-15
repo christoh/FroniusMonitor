@@ -1,26 +1,17 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Settings;
 
 [XmlType("Awattar")]
-public class AwattarParameters : BindableBase
+public partial class AwattarParameters : BindableBase
 {
+    [ObservableProperty]
     [XmlAttribute]
-    public string Bearer
-    {
-        get;
-        set => Set(ref field, value);
-    } = string.Empty;
+    public partial string Bearer { get; set; } = string.Empty;
 
+    [ObservableProperty]
     [XmlAttribute]
-    public string PostalCode
-    {
-        get;
-        set => Set(ref field, value);
-    } = "85375";
+    public partial string PostalCode { get; set; } = "85375"; // Neufahrn bei Freising
 
+    [ObservableProperty]
     [XmlAttribute]
-    public string GridOperatorId
-    {
-        get;
-        set => Set(ref field, value);
-    } = "9901068000001";
+    public partial string GridOperatorId { get; set; } = "9901068000001"; // Bayernwerk (E.ON Bayern)
 }

@@ -7,30 +7,22 @@ public partial class ModbusConnection : BindableBase, IHaveDisplayName
     [GeneratedRegex(@"^\[?(?<HostName>[\-0-9A-Za-z._]+|[0-9a-fA-F:]+)\]?(:(?<Port>[0-9]+))?\/(?<ModbusAddress>[0-9]+)$", RegexOptions.Compiled | RegexOptions.CultureInvariant)]
     private static partial Regex ParserRegex();
 
-    private string hostName = "192.168.178.xxx";
-
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(KeyString),nameof(DisplayName))]
     [XmlAttribute]
-    public string HostName
-    {
-        get => hostName;
-        set => Set(ref hostName, value);
-    }
+    public partial string HostName { get; set; } = "192.168.178.xxx";
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(KeyString),nameof(DisplayName))]
     [XmlAttribute]
-    public ushort Port
-    {
-        get;
-        set => Set(ref field, value);
-    } = 502;
+    public partial ushort Port { get; set; } = 502;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(KeyString),nameof(DisplayName))]
     [XmlAttribute]
-    public byte ModbusAddress
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial byte ModbusAddress { get; set; }
 
-    [XmlIgnore] public string KeyString => $"{SurroundIpV6Address(hostName)}:{Port}/{ModbusAddress}";
+    [XmlIgnore] public string KeyString => $"{SurroundIpV6Address(HostName)}:{Port}/{ModbusAddress}";
 
     [XmlIgnore] public string DisplayName => KeyString;
 
@@ -38,32 +30,32 @@ public partial class ModbusConnection : BindableBase, IHaveDisplayName
 
     public static ModbusConnection Parse(string keyString)
     {
-            var split = keyString.Split('/');
+        var split = keyString.Split('/');
 
-            if (split.Length != 2)
-            {
-                throw new ArgumentException("Must contain exactly one forward slash");
-            }
-
-            var match = ParserRegex().Match(keyString);
-
-            if (!match.Success)
-            {
-                throw new ArgumentException("No valid Modbus address");
-            }
-
-            var portMatch = match.Groups["Port"];
-
-            return new ModbusConnection
-            {
-                HostName = match.Groups["HostName"].Value,
-                Port = portMatch.Success ? ushort.Parse(match.Groups["Port"].Value, NumberStyles.None, CultureInfo.InvariantCulture):(ushort)502,
-                ModbusAddress = byte.Parse(match.Groups["ModbusAddress"].Value, NumberStyles.None, CultureInfo.InvariantCulture),
-            };
+        if (split.Length != 2)
+        {
+            throw new ArgumentException("Must contain exactly one forward slash");
         }
 
-    private string SurroundIpV6Address(string hostNameOrAddress)
+        var match = ParserRegex().Match(keyString);
+
+        if (!match.Success)
+        {
+            throw new ArgumentException("No valid Modbus address");
+        }
+
+        var portMatch = match.Groups["Port"];
+
+        return new ModbusConnection
+        {
+            HostName = match.Groups["HostName"].Value,
+            Port = portMatch.Success ? ushort.Parse(match.Groups["Port"].Value, NumberStyles.None, CultureInfo.InvariantCulture) : (ushort)502,
+            ModbusAddress = byte.Parse(match.Groups["ModbusAddress"].Value, NumberStyles.None, CultureInfo.InvariantCulture),
+        };
+    }
+
+    private static string SurroundIpV6Address(string hostNameOrAddress)
     {
-            return IPAddress.TryParse(hostNameOrAddress, out var ipAddress) && ipAddress.AddressFamily == AddressFamily.InterNetworkV6 ? $"[{hostNameOrAddress}]" : hostNameOrAddress;
-        }
+        return IPAddress.TryParse(hostNameOrAddress, out var ipAddress) && ipAddress.AddressFamily == AddressFamily.InterNetworkV6 ? $"[{hostNameOrAddress}]" : hostNameOrAddress;
+    }
 }

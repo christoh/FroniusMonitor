@@ -16,21 +16,17 @@ public enum TunnelMode : byte
     NoTunnel,
 }
 
-public class AzureConnection : WebConnection
+public partial class AzureConnection : WebConnection
 {
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TransportType))]
     [XmlAttribute("TunnelMode"), DefaultValue(TunnelMode.Auto)]
-    public TunnelMode TunnelMode
-    {
-        get;
-        set => Set(ref field, value, NotifyProtocols);
-    } = TunnelMode.Auto;
+    public partial TunnelMode TunnelMode { get; set; } = TunnelMode.Auto;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TransportType),nameof(CanUseTunnel))]
     [XmlAttribute("Protocol"), DefaultValue(Protocol.Amqp)]
-    public Protocol Protocol
-    {
-        get;
-        set => Set(ref field, value, NotifyProtocols);
-    } = Protocol.Amqp;
+    public partial Protocol Protocol { get; set; } = Protocol.Amqp;
 
     public bool CanUseTunnel => Protocol != Protocol.Http1;
 
@@ -43,7 +39,7 @@ public class AzureConnection : WebConnection
             TunnelMode.Auto => TransportType.Amqp,
             TunnelMode.Websocket => TransportType.Amqp_WebSocket_Only,
             TunnelMode.NoTunnel => TransportType.Amqp_Tcp_Only,
-            _ => throw new NotSupportedException(nameof(TunnelMode))
+            _ => throw new NotSupportedException(nameof(TunnelMode)),
         },
 
         Protocol.Mqtt => TunnelMode switch
@@ -51,15 +47,9 @@ public class AzureConnection : WebConnection
             TunnelMode.Auto => TransportType.Mqtt,
             TunnelMode.Websocket => TransportType.Mqtt_WebSocket_Only,
             TunnelMode.NoTunnel => TransportType.Mqtt_Tcp_Only,
-            _ => throw new NotSupportedException(nameof(TunnelMode))
+            _ => throw new NotSupportedException(nameof(TunnelMode)),
         },
 
-        _ => throw new NotSupportedException(nameof(Protocol))
+        _ => throw new NotSupportedException(nameof(Protocol)),
     };
-
-    private void NotifyProtocols()
-    {
-        NotifyOfPropertyChange(nameof(TransportType));
-        NotifyOfPropertyChange(nameof(Protocol));
-    }
 }

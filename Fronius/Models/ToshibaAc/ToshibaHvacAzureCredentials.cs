@@ -1,48 +1,30 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc;
 
-public class ToshibaHvacAzureCredentials : BindableBase
+public partial class ToshibaHvacAzureCredentials : BindableBase
 {
+    [ObservableProperty]
     [JsonPropertyName("DeviceId")]
-    public string DeviceId
-    {
-        get;
-        set => Set(ref field, value);
-    } = string.Empty;
+    public partial string DeviceId { get; set; } = string.Empty;
 
+    [ObservableProperty]
     [JsonPropertyName("HostName")]
     [JsonRequired]
-    public string HostName
-    {
-        get;
-        set => Set(ref field, value);
-    } = string.Empty;
+    public partial string HostName { get; set; } = string.Empty;
 
+    [ObservableProperty]
     [JsonPropertyName("PrimaryKey")]
-    public string PrimaryKey
-    {
-        get;
-        set => Set(ref field, value);
-    } = string.Empty;
+    public partial string PrimaryKey { get; set; } = string.Empty;
 
+    [ObservableProperty]
     [JsonPropertyName("SecondaryKey")]
-    public string SecondaryKey
-    {
-        get;
-        set => Set(ref field, value);
-    } = string.Empty;
+    public partial string SecondaryKey { get; set; } = string.Empty;
 
+    [ObservableProperty]
     [JsonPropertyName("SasToken")]
     [JsonRequired]
-    public string SasToken
-    {
-        get;
-        set => Set(ref field, value);
-    } = string.Empty;
+    public partial string SasToken { get; set; } = string.Empty;
 
+    [ObservableProperty]
     [JsonPropertyName("RegisterDate")]
-    public DateTime RegisterDate
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial DateTime RegisterDate { get; set; }
 }

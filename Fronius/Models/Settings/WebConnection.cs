@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Settings;
 
-public class WebConnection : BindableBase, ICloneable, IHaveDisplayName
+public partial class WebConnection : BindableBase, ICloneable, IHaveDisplayName
 {
     protected bool IsSlowPlatform;
 
@@ -29,22 +29,13 @@ public class WebConnection : BindableBase, ICloneable, IHaveDisplayName
     [JsonIgnore]
     public string DisplayName => BaseUrl;
 
-    [DefaultValue(""), XmlAttribute]
-    public string BaseUrl
-    {
-        get;
-        set => Set(ref field, value);
-    } = string.Empty;
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(DisplayName)), DefaultValue(""), XmlAttribute]
+    public partial string BaseUrl { get; set; } = string.Empty;
 
-    [DefaultValue(""), XmlAttribute]
-    public string UserName
-    {
-        get;
-        set => Set(ref field, value);
-    } = "";
+    [ObservableProperty, DefaultValue(""), XmlAttribute]
+    public partial string UserName { get; set; }  = string.Empty;
 
-    [XmlIgnore]
-    [JsonIgnore]
+    [XmlIgnore, JsonIgnore]
     public string Password
     {
         get;
@@ -65,12 +56,8 @@ public class WebConnection : BindableBase, ICloneable, IHaveDisplayName
         }
     }
 
-    [XmlAttribute, DefaultValue(null)]
-    public string? PasswordChecksum
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty, XmlAttribute, DefaultValue(null)]
+    public partial string? PasswordChecksum { get; set; } 
 
     [DefaultValue(""), XmlAttribute("Password")]
     public string EncryptedPassword
