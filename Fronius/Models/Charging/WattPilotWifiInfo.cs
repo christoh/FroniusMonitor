@@ -4,159 +4,109 @@ using Newtonsoft.Json;
 
 namespace De.Hochstaetter.Fronius.Models.Charging;
 
-public class WattPilotWifiInfo : BindableBase, IHaveDisplayName
+public partial class WattPilotWifiInfo : BindableBase, IHaveDisplayName
 {
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DisplayName))]
     [JsonProperty("ssid")]
     [WattPilot("ssid")]
-    public string? Ssid
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(DisplayName));
-    }
+    public partial string? Ssid { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Type))]
     [JsonProperty("b")]
     [WattPilot("b")]
     [WattPilot("f", 2)]
-    public bool? IsB
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(Type)));
-    }
+    public partial bool? IsB { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Type))]
     [JsonProperty("g")]
     [WattPilot("f", 3)]
     [WattPilot("g")]
-    public bool? IsG
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(Type)));
-    }
+    public partial bool? IsG { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Type))]
     [WattPilot("f", 4)]
     [JsonProperty("n")]
     [WattPilot("n")]
-    public bool? IsN
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(Type)));
-    }
+    public partial bool? IsN { get; set; }
 
+    [ObservableProperty]
     [JsonProperty("ip")]
     [WattPilot("ip")]
-    public IPAddress? IpV4Address
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial IPAddress? IpV4Address { get; set; }
 
+    [ObservableProperty]
     [WattPilot("f", 9)]
-    public string? CountryCode
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? CountryCode { get; set; }
 
+    [ObservableProperty]
     [JsonProperty("channel")]
     [WattPilot("channel")]
-    public int? Channel
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial int? Channel { get; set; }
 
+    [ObservableProperty]
     [JsonProperty("encryptionType")]
     [WattPilot("encryptionType")]
-    public WifiEncryption? Encryption
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial WifiEncryption? Encryption { get; set; }
 
+    [ObservableProperty]
     [JsonProperty("pairwiseCipher")]
     [WattPilot("pairwiseCipher")]
     [WattPilot("f", 0)]
-    public WifiCipher? PairwiseCipher
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial WifiCipher? PairwiseCipher { get; set; }
 
+    [ObservableProperty]
     [JsonProperty("groupCipher")]
     [WattPilot("groupCipher")]
     [WattPilot("f", 1)]
-    public WifiCipher? GroupCipher
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial WifiCipher? GroupCipher { get; set; }
 
+    [ObservableProperty]
     [JsonProperty("lr")]
     [WattPilot("lr")]
     [WattPilot("f", 5)]
-    public bool? SupportsLowRate
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? SupportsLowRate { get; set; }
 
+    [ObservableProperty]
     [JsonProperty("wps")]
     [WattPilot("wps")]
     [WattPilot("f", 6)]
-    public bool? AllowWps
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? AllowWps { get; set; }
 
+    [ObservableProperty]
     [JsonProperty("ftmResponder")]
     [WattPilot("ftmResponder")]
     [WattPilot("f", 7)]
-    public bool? IsFtmResponder
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? IsFtmResponder { get; set; }
 
+    [ObservableProperty]
     [JsonProperty("ftmInitiator")]
     [WattPilot("ftmInitiator")]
     [WattPilot("f", 8)]
-    public bool? IsFtmInitiator
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? IsFtmInitiator { get; set; }
 
+    [ObservableProperty]
     [JsonProperty("bssid")]
     [WattPilot("bssid")]
-    public string? MacAddressString
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? MacAddressString { get; set; }
 
+    [ObservableProperty]
     [JsonProperty("rssi")]
     [WattPilot("rssi")]
-    public int? WifiSignal
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial int? WifiSignal { get; set; }
 
+    [ObservableProperty]
     [JsonProperty("netmask")]
     [WattPilot("netmask")]
-    public IPAddress? NetMask
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial IPAddress? NetMask { get; set; }
 
+    [ObservableProperty]
     [JsonProperty("gw")]
     [WattPilot("gw")]
-    public IPAddress? Gateway
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial IPAddress? Gateway { get; set; }
 
     public string Type
     {

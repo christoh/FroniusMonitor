@@ -2,39 +2,28 @@
 
 namespace De.Hochstaetter.Fronius.Models.Charging;
 
-public class WattPilotLoadBalancingCurrents : BindableBase, ICloneable
+public partial class WattPilotLoadBalancingCurrents : BindableBase, ICloneable
 {
+    [ObservableProperty]
     [JsonProperty("amp")]
     [WattPilot("amp", false)]
-    public int LocalMaximumCurrent
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial int LocalMaximumCurrent { get; set; }
 
+    [ObservableProperty]
     [JsonProperty("dyn")]
     [WattPilot("dyn", false)]
-    public int DynamicMaximumCurrent
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial int DynamicMaximumCurrent { get; set; }
 
+    [ObservableProperty]
     [JsonProperty("sta")]
     [WattPilot("sta", false)]
-    public int MaximumCurrentDnoLine
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial int MaximumCurrentDnoLine { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TimeStamp))]
     [JsonProperty("ts")]
     [WattPilot("ts", false)]
-    public long TimeStampEpoch
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(TimeStamp)));
-    }
+    public partial long TimeStampEpoch { get; set; }
 
     [Newtonsoft.Json.JsonIgnore]
     public DateTime TimeStamp

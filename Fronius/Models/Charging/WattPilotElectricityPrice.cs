@@ -3,23 +3,18 @@
 namespace De.Hochstaetter.Fronius.Models.Charging
 {
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    public class WattPilotElectricityPrice : BindableBase, IElectricityPrice, ICloneable
+    public partial class WattPilotElectricityPrice : BindableBase, IElectricityPrice
     {
+        [ObservableProperty]
         [JsonProperty("marketprice")]
         [WattPilot("marketprice")]
-        public decimal CentsPerKiloWattHour
-        {
-            get;
-            set => Set(ref field, value);
-        }
+        public partial decimal CentsPerKiloWattHour { get; set; }
 
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(StartTime))]
         [JsonProperty("start")]
         [WattPilot("start")]
-        public long StartSeconds
-        {
-            get;
-            set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(StartTime)));
-        }
+        public partial long StartSeconds { get; set; }
 
         [Newtonsoft.Json.JsonIgnore]
         public DateTime StartTime
@@ -28,13 +23,11 @@ namespace De.Hochstaetter.Fronius.Models.Charging
             set => StartSeconds = (long)Math.Round((value - DateTime.UnixEpoch).TotalSeconds, MidpointRounding.AwayFromZero);
         }
 
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(EndTime))]
         [JsonProperty("end")]
         [WattPilot("end")]
-        public long EndSeconds
-        {
-            get;
-            set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(EndTime)));
-        }
+        public partial long EndSeconds { get; set; }
 
         [Newtonsoft.Json.JsonIgnore]
         public DateTime EndTime
@@ -42,7 +35,6 @@ namespace De.Hochstaetter.Fronius.Models.Charging
             get => DateTime.UnixEpoch.AddSeconds(EndSeconds);
             set => EndSeconds = (long)Math.Round((value - DateTime.UnixEpoch).TotalSeconds, MidpointRounding.AwayFromZero);
         }
-
 
         public object Clone() => MemberwiseClone();
         

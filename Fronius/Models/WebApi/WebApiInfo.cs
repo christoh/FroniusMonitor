@@ -1,34 +1,19 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.WebApi;
 
-public class WebApiInfo : BindableBase
+public partial class WebApiInfo : BindableBase
 {
-    public string? ProductName
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial string? ProductName { get; set; }
 
-    public Version? Version
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial Version? Version { get; set; }
 
-    public string? Manufacturer
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial string? Manufacturer { get; set; }
 
-    public string? OsName
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial string? OsName { get; set; }
 
-    public string? OsVersion
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial string? OsVersion { get; set; }
 }

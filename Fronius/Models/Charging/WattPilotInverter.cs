@@ -1,90 +1,55 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Charging;
 
-public class WattPilotInverter : BindableBase, IHaveDisplayName
+public partial class WattPilotInverter : BindableBase, IHaveDisplayName
 {
+    [ObservableProperty]
     [WattPilot("id")]
-    public string? Id
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? Id { get; set; }
 
+    [ObservableProperty]
     [WattPilot("paired")]
-    public bool? IsPaired
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? IsPaired { get; set; }
 
+    [ObservableProperty]
     [WattPilot("deviceFamily")]
-    public string? DeviceFamily
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? DeviceFamily { get; set; }
 
     public string DisplayName => Label ?? string.Empty;
     public override string ToString() => DisplayName;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DisplayName))]
     [WattPilot("label")]
-    public string? Label
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(DisplayName)));
-    }
+    public partial string? Label { get; set; }
 
+    [ObservableProperty]
     [WattPilot("model")]
-    public string? ModelName
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? ModelName { get; set; }
 
+    [ObservableProperty]
     [WattPilot("commonName")]
-    public string? CommonName
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial string? CommonName { get; set; }
 
+    [ObservableProperty]
     [WattPilot("connected")]
-    public bool? IsConnected
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? IsConnected { get; set; }
 
+    [ObservableProperty]
     [WattPilot("reachableMdns")]
-    public bool? HasMdns
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? HasMdns { get; set; }
 
+    [ObservableProperty]
     [WattPilot("reachableUdp")]
-    public bool? HasUdp
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool? HasUdp { get; set; }
 
+    [ObservableProperty]
     [WattPilot("reachableHttp")]
-    public bool HasHttp
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial bool HasHttp { get; set; }
 
+    [ObservableProperty]
     [WattPilot("status")]
-    public byte? StatusCode
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    public partial byte? StatusCode { get; set; }
 
-    public string? Message
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial string? Message { get; set; }
 }
