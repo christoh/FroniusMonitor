@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.Fronius.Services
 {
-    public class DataCollectionService : BindableBase, IDataCollectionService
+    public partial class DataCollectionService : BindableBase, IDataCollectionService
     {
         private readonly SettingsBase settings;
         private readonly IWattPilotService wattPilotService;
@@ -45,44 +45,30 @@
         public IServiceProvider Container => IoC.Injector!;
 
         public IServiceProvider Container2 { get; }
-
-        public IGen24Service? Gen24Service2
-        {
-            get;
-            set => Set(ref field, value);
-        }
-
         public BindableCollection<ISwitchable> SwitchableDevices { get; }
 
         public IToshibaHvacService HvacService { get; }
 
-        public HomeAutomationSystem? HomeAutomationSystem
-        {
-            get;
-            private set => Set(ref field, value);
-        }
+        [ObservableProperty]
+        public partial IGen24Service? Gen24Service2 { get; set; }
 
-        public WebConnection? WattPilotConnection
-        {
-            get;
-            set => Set(ref field, value);
-        }
+        [ObservableProperty]
+        public partial HomeAutomationSystem? HomeAutomationSystem { get; set; }
 
-        public string LastConnectionError
-        {
-            get;
-            set => Set(ref field, value);
-        } = string.Empty;
+        [ObservableProperty]
+        public partial WebConnection? WattPilotConnection { get; set; }
 
-        public bool IsConnected
-        {
-            get;
-            set => Set(ref field, value);
-        }
+        [ObservableProperty]
+        public partial string LastConnectionError { get; set; } = string.Empty;
 
-        public int FroniusUpdateRate { get; set; }
+        [ObservableProperty]
+        public partial bool IsConnected { get; set; }
 
-        public IList<SmartMeterCalibrationHistoryItem> SmartMeterHistory { get; private set; } = [];
+        [ObservableProperty]
+        public partial int FroniusUpdateRate { get; set; }
+
+        [ObservableProperty]
+        public partial IList<SmartMeterCalibrationHistoryItem> SmartMeterHistory { get; private set; } = [];
 
         public Task<IList<SmartMeterCalibrationHistoryItem>> ReadCalibrationHistory() => Task.Run(() =>
         {
@@ -495,4 +481,3 @@
         }
     }
 }
-//

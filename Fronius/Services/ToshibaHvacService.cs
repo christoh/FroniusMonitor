@@ -11,14 +11,14 @@ using Microsoft.Azure.Devices.Client.Exceptions;
 
 namespace De.Hochstaetter.Fronius.Services;
 
-public class ToshibaHvacService(SynchronizationContext context, SettingsBase settings) : BindableBase, IToshibaHvacService
+public partial class ToshibaHvacService(SynchronizationContext context, SettingsBase settings) : BindableBase, IToshibaHvacService
 {
+    private static readonly JsonSerializerOptions jsonOptions = new(JsonSerializerDefaults.Web);
+
     private string? azureDeviceId;
     private AzureConnection? azureConnection;
-
+    private bool isStopping;
     private ToshibaHvacSession? session;
-    private static readonly JsonSerializerOptions jsonOptions = new(JsonSerializerDefaults.Web);
-    private CancellationTokenSource? tokenSource;
     private DeviceClient? azureClient;
     private ulong messageId;// = BitConverter.ToUInt64(RandomNumberGenerator.GetBytes(8));
     private bool isStarting;
@@ -41,23 +41,18 @@ public class ToshibaHvacService(SynchronizationContext context, SettingsBase set
 #endif
     }
 
-    private CancellationToken Token => tokenSource?.Token ?? throw new WebException("Connection closed", WebExceptionStatus.ConnectionClosed);
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(Token), nameof(IsRunning))]
+    private partial CancellationTokenSource? TokenSource { get; set; }
 
-    public bool IsRunning => tokenSource is not null;
+    private CancellationToken Token => TokenSource?.Token ?? throw new WebException("Connection closed", WebExceptionStatus.ConnectionClosed);
 
-    public bool IsConnected
-    {
-        get;
-        private set => Set(ref field, value);
-    }
+    public bool IsRunning => TokenSource is not null;
 
-    public BindableCollection<ToshibaHvacMapping>? AllDevices
-    {
-        get;
-        private set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial bool IsConnected { get; private set; }
 
-    private bool isStopping;
+    [ObservableProperty]
+    public partial BindableCollection<ToshibaHvacMapping>? AllDevices { get; private set; }
 
     public async ValueTask Stop()
     {
@@ -70,10 +65,10 @@ public class ToshibaHvacService(SynchronizationContext context, SettingsBase set
         {
             isStopping = true;
 
-            if (tokenSource != null)
+            if (TokenSource != null)
             {
-                await tokenSource.CancelAsync();
-                tokenSource = null;
+                await TokenSource.CancelAsync();
+                TokenSource = null;
             }
 
             if (azureClient != null)
@@ -109,7 +104,7 @@ public class ToshibaHvacService(SynchronizationContext context, SettingsBase set
 
             try
             {
-                tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+                TokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
 
                 var azureCredentials = await RefreshAll().ConfigureAwait(false);
 
@@ -136,8 +131,8 @@ public class ToshibaHvacService(SynchronizationContext context, SettingsBase set
 
 #endif
 
-                tokenSource?.Dispose();
-                tokenSource = new CancellationTokenSource();
+                TokenSource?.Dispose();
+                TokenSource = new CancellationTokenSource();
             }
             catch
             {

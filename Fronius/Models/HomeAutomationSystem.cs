@@ -1,61 +1,29 @@
 ﻿namespace De.Hochstaetter.Fronius.Models;
 
-#pragma warning disable CS0618 // Type or member is obsolete
-public class HomeAutomationSystem : BindableBase
+public partial class HomeAutomationSystem : BindableBase
 {
-    public Gen24Sensors? Gen24Sensors
-    {
-        get;
-        set => Set(ref field, value, () =>
-        {
-            NotifyOfPropertyChange(nameof(StorageNetCapacity));
-            NotifyOfPropertyChange(nameof(NetStateOfChange));
-            NotifyOfPropertyChange(nameof(NetStateOfChangeIfFull));
-            NotifyOfPropertyChange(nameof(MaxStorageNetCapacity));
-        });
-    }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(StorageNetCapacity), nameof(NetStateOfChange), nameof(NetStateOfChangeIfFull), nameof(MaxStorageNetCapacity))]
+    public partial Gen24Sensors? Gen24Sensors { get; set; }
 
-    public Gen24Sensors? Gen24Sensors2
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial Gen24Sensors? Gen24Sensors2 { get; set; }
 
-    public Gen24Config? Gen24Config
-    {
-        get;
-        set => Set(ref field, value, () =>
-        {
-            NotifyOfPropertyChange(nameof(StorageNetCapacity));
-            NotifyOfPropertyChange(nameof(NetStateOfChange));
-            NotifyOfPropertyChange(nameof(NetStateOfChangeIfFull));
-            NotifyOfPropertyChange(nameof(MaxStorageNetCapacity));
-        });
-    }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(StorageNetCapacity), nameof(NetStateOfChange), nameof(NetStateOfChangeIfFull), nameof(MaxStorageNetCapacity))]
+    public partial Gen24Config? Gen24Config { get; set; }
 
-    public Gen24Config? Gen24Config2
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial Gen24Config? Gen24Config2 { get; set; }
 
-    public FritzBoxDeviceList? FritzBox
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial FritzBoxDeviceList? FritzBox { get; set; }
 
-    public Gen24PowerFlow? SitePowerFlow
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial Gen24PowerFlow? SitePowerFlow { get; set; }
 
-    public WattPilot? WattPilot
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial WattPilot? WattPilot { get; set; }
 
     public double? StorageNetCapacity => Gen24Sensors?.Storage?.MaxCapacity * NetStateOfChangeIfFull;
 
@@ -70,5 +38,4 @@ public class HomeAutomationSystem : BindableBase
         return stateOfCharge - Math.Max(Gen24Config?.BatterySettings?.BackupReserve ?? 0, Gen24Config?.BatterySettings?.Limits is SocLimits.UseManufacturerDefault or null ? 5 : Gen24Config?.BatterySettings?.SocMin ?? 0) / 100d;
     }
 }
-#pragma warning restore CS0618 // Type or member is obsolete
 

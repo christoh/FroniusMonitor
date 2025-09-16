@@ -4,7 +4,7 @@ using System.Text.Json;
 
 namespace De.Hochstaetter.Fronius.Services;
 
-public sealed class AwattarService : ElectricityPushPriceServiceBase, IElectricityPriceService, IDisposable
+public sealed partial class AwattarService : ElectricityPushPriceServiceBase, IElectricityPriceService, IDisposable
 {
     private HttpClient? client = new();
     private Timer? timer;
@@ -18,11 +18,8 @@ public sealed class AwattarService : ElectricityPushPriceServiceBase, IElectrici
         settings = IoC.Get<SettingsBase>();
     }
 
-    public ICollection<AwattarPriceComponent>? Prices
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial ICollection<AwattarPriceComponent>? Prices { get; set; }
 
     public bool CanSetPriceRegion => true;
     public override bool SupportsHistoricData => true;

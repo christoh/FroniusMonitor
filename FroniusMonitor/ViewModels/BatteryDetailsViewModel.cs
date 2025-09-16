@@ -1,26 +1,20 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-public class BatteryDetailsViewModel : ViewModelBase
+namespace De.Hochstaetter.FroniusMonitor.ViewModels;
+
+public partial class BatteryDetailsViewModel : ViewModelBase
 {
     public string Title => Loc.BatteryDetailsView + " " + Header;
 
-    public string Header
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(Title)));
-    } = string.Empty;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Title))]
+    public partial string Header { get; set; } = string.Empty;
 
-    public Gen24Storage? Battery
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial Gen24Storage? Battery { get; set; }
 
-    public HomeAutomationSystem? HomeAutomationSystem
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [ObservableProperty]
+    public partial HomeAutomationSystem? HomeAutomationSystem { get; set; }
 
     internal void OnNewDataReceived(HomeAutomationSystem? h)
     {

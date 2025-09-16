@@ -1,12 +1,9 @@
 ﻿namespace De.Hochstaetter.Fronius.Services
 {
-    public class WattPilotElectricityService : ElectricityPushPriceServiceBase, IElectricityPriceService
+    public partial class WattPilotElectricityService : ElectricityPushPriceServiceBase, IElectricityPriceService
     {
-        public AwattarCountry PriceRegion
-        {
-            get;
-            set => Set(ref field, value);
-        }
+        [ObservableProperty]
+        public partial AwattarCountry PriceRegion { get; set; }
 
         public bool CanSetPriceRegion => false;
         public override bool SupportsHistoricData => false;

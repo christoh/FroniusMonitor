@@ -4,7 +4,7 @@ namespace De.Hochstaetter.FroniusMonitor.Models;
 
 public class Settings : SettingsBase
 {
-    private static readonly object settingsLockObject = new();
+    private static readonly Lock settingsLock = new();
 
     [DefaultValue(null), XmlElement("WindowSize")]
     public Size? MainWindowSize
@@ -38,7 +38,7 @@ public class Settings : SettingsBase
 
     public static Task Save(string fileName) => Task.Run(() =>
     {
-        lock (settingsLockObject)
+        lock (settingsLock)
         {
             UpdateChecksum(App.Settings.WattPilotConnection, App.Settings.FritzBoxConnection, App.Settings.FroniusConnection, App.Settings.FroniusConnection2, App.Settings.ToshibaAcConnection);
             var serializer = new XmlSerializer(typeof(Settings));
@@ -59,7 +59,7 @@ public class Settings : SettingsBase
 
     public static Task Load(string fileName) => Task.Run(() =>
     {
-        lock (settingsLockObject)
+        lock (settingsLock)
         {
             try
             {
