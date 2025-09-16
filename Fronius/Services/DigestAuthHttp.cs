@@ -26,6 +26,7 @@ public sealed class DigestAuthHttp : IDisposable
     private string? ha1;
     private string? realm;
     private string? nonce;
+    private string? opaque;
     private string? cnonce;
     private string? algorithm;
     private Encoding? encoding;
@@ -40,7 +41,7 @@ public sealed class DigestAuthHttp : IDisposable
         this.cnonceDuration = cnonceDuration;
 
         httpClient = new HttpClient();
-        httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("HomeAutomationClient/1.0");
+        httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("HomeAutomationClient", "1.0"));
         httpClient.BaseAddress = new Uri(connection.BaseUrl);
     }
 
@@ -114,6 +115,7 @@ public sealed class DigestAuthHttp : IDisposable
             nonce = GetAuthHeaderToken("nonce") ?? string.Empty;
             encoding = Encoding.GetEncoding(GetAuthHeaderToken("charset") ?? "UTF-8");
             algorithm = GetAuthHeaderToken("algorithm");
+            opaque = GetAuthHeaderToken("opaque");
             var qops = GetAuthHeaderToken("qop")?.Split(",") ?? [];
 
             if (!qops.Contains("auth"))
@@ -211,13 +213,12 @@ public sealed class DigestAuthHttp : IDisposable
             var ha2 = CalculateHash($"{request.Method.Method}:{request.RequestUri?.OriginalString}");
             var digestResponse = CalculateHash($"{ha1}:{nonce}:{++nc:x8}:{cnonce}:auth:{ha2}");
 
-            var header = $"username=\"{connection.UserName}\", " +
-                         $"realm=\"{realm}\", nonce=\"{nonce}\", " +
-                         $"uri=\"{request.RequestUri?.OriginalString}\", " +
-                         $"response=\"{digestResponse}\", " +
-                         $"qop=auth, nc={nc:x8}, cnonce=\"{cnonce}\"";
-
-            return header;
+            return $"username=\"{connection.UserName}\", " +
+                   $"realm=\"{realm}\", nonce=\"{nonce}\", " +
+                   $"uri=\"{request.RequestUri?.OriginalString}\", " +
+                   $"response=\"{digestResponse}\", " +
+                   (opaque != null ? $"opaque=\"{opaque}\", " : string.Empty) +
+                   $"algorithm={algorithm}, qop=auth, nc={nc:x8}, cnonce=\"{cnonce}\"";
         }
 
         string CalculateHash(string input)
