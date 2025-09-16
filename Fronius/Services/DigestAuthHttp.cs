@@ -1,12 +1,10 @@
-﻿using System.Net.Http.Headers;
-
-namespace De.Hochstaetter.Fronius.Services;
+﻿namespace De.Hochstaetter.Fronius.Services;
 
 // ReSharper disable once CommentTypo
 // Algorithm must be SHA256 (bug in 1.38.6-1), SHA-256 or MD5
 // qop must be auth (auth-int and none are not supported)
 
-public sealed class DigestAuthHttp : IDisposable
+public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
 {
     private enum HashAlgorithm
     {
@@ -45,21 +43,30 @@ public sealed class DigestAuthHttp : IDisposable
         httpClient.BaseAddress = new Uri(connection.BaseUrl);
     }
 
+    ~DigestAuthHttp() => Dispose();
+
     public void Dispose()
     {
         httpClient.Dispose();
         GC.SuppressFinalize(this);
     }
 
-    ~DigestAuthHttp() => Dispose();
+    #pragma warning disable CA1816 // GC.SuppressFinalize(this) is guaranteed to be called in Dispose()
+    public async ValueTask DisposeAsync()
+    {
+        await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
+        Dispose();
+    }
+    #pragma warning restore CA1816
 
     public async ValueTask<(JToken, HttpStatusCode)> GetJsonToken(string url, JToken? jToken, IEnumerable<HttpStatusCode>? allowedStatusCodes = null, CancellationToken token = default)
     {
+        await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
         string? stringContent = null;
 
         if (jToken != null)
         {
-            await Task.Run(() => stringContent = jToken.ToString(), token).ConfigureAwait(false);
+            stringContent = jToken.ToString();
         }
 
         var (stringResult, httpStatusCode) = await GetString(url, stringContent, allowedStatusCodes, token).ConfigureAwait(false);
@@ -90,7 +97,7 @@ public sealed class DigestAuthHttp : IDisposable
 
         lock (hashLock)
         {
-            request = CreateRequest();
+            CreateRequest();
         }
 
         var response = await SendAsync(request, token).ConfigureAwait(false);
@@ -131,8 +138,7 @@ public sealed class DigestAuthHttp : IDisposable
             };
 
             nc = 0;
-            UpdateClientNonce();
-            request = CreateRequest();
+            CreateRequest();
         }
 
         using (request)
@@ -158,87 +164,81 @@ public sealed class DigestAuthHttp : IDisposable
             return !matchHeader.Success ? null : matchHeader.Groups.OfType<Group>().Last(group => group.Length > 0).Value;
         }
 
-        HttpRequestMessage CreateRequest()
+        void CreateRequest()
         {
-            var requestMessage = new HttpRequestMessage(stringContent != null ? HttpMethod.Post : HttpMethod.Get, url);
+            request = new HttpRequestMessage(stringContent != null ? HttpMethod.Post : HttpMethod.Get, url);
 
             if (stringContent != null)
             {
-                requestMessage.Content = new StringContent(stringContent, Encoding.UTF8, "application/json");
+                request.Content = new StringContent(stringContent, Encoding.UTF8, "application/json");
             }
 
-            if (nc == uint.MaxValue || string.IsNullOrEmpty(cnonce))
+            if (nc == uint.MaxValue || string.IsNullOrEmpty(nonce))
             {
-                return requestMessage;
+                return;
             }
 
             if (DateTime.UtcNow - cnonceDate > cnonceDuration)
             {
-                lock (hashLock)
-                {
-                    UpdateClientNonce();
-                }
+                UpdateClientNonce();
             }
 
-            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Digest", CreateDigestParameters(requestMessage));
-            return requestMessage;
+            request.Headers.Authorization = new AuthenticationHeaderValue("Digest", CreateDigestParameters());
+            return;
+
+            string CreateDigestParameters()
+            {
+                ha1 ??= CalculateHash($"{connection.UserName}:{realm}:{connection.Password}");
+                var ha2 = CalculateHash($"{request.Method.Method}:{request.RequestUri?.OriginalString}");
+                var digestResponse = CalculateHash($"{ha1}:{nonce}:{++nc:x8}:{cnonce}:auth:{ha2}");
+
+                return $"username=\"{connection.UserName}\", " +
+                       $"realm=\"{realm}\", nonce=\"{nonce}\", " +
+                       $"uri=\"{request.RequestUri?.OriginalString}\", " +
+                       $"response=\"{digestResponse}\", " +
+                       (opaque != null ? $"opaque=\"{opaque}\", " : string.Empty) +
+                       $"algorithm={algorithm}, qop=auth, nc={nc:x8}, cnonce=\"{cnonce}\"";
+
+                [SuppressMessage("ReSharper", "SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault")]
+                string CalculateHash(string input)
+                {
+                    var bytes = encoding!.GetBytes(input);
+
+                    var hash = hashAlgorithm switch
+                    {
+                        HashAlgorithm.Sha256 => SHA256.HashData(bytes),
+                        HashAlgorithm.Md5 => MD5.HashData(bytes),
+                        _ => throw new NotSupportedException("Only SHA-256 and MD5 are supported"),
+                    };
+
+                    return hash
+                        .Aggregate
+                        (
+                            new StringBuilder(hash.Length << 1),
+                            (stringBuilder, hashByte) => stringBuilder.Append(hashByte.ToString("x2"))
+                        )
+                        .ToString();
+                }
+            }
         }
-    }
 
-    private unsafe void UpdateClientNonce()
-    {
-        Span<byte> bytes = stackalloc byte[sizeof(ulong)];
-        random.GetBytes(bytes);
-
-        fixed (byte* pointer = bytes)
+        unsafe void UpdateClientNonce()
         {
-            cnonce = (*(ulong*)pointer).ToString("x16");
-        }
+            Span<byte> bytes = stackalloc byte[sizeof(ulong)];
+            random.GetBytes(bytes);
 
-        cnonceDate = DateTime.UtcNow;
+            fixed (byte* pointer = bytes)
+            {
+                cnonce = (*(ulong*)pointer).ToString("x16");
+            }
+
+            cnonceDate = DateTime.UtcNow;
+        }
     }
+
 
     private Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken token)
     {
         return httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);
-    }
-
-    [SuppressMessage("ReSharper", "SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault")]
-    private string CreateDigestParameters(HttpRequestMessage request)
-    {
-        lock (hashLock)
-        {
-            encoding ??= Encoding.UTF8;
-            ha1 ??= CalculateHash($"{connection.UserName}:{realm}:{connection.Password}");
-            var ha2 = CalculateHash($"{request.Method.Method}:{request.RequestUri?.OriginalString}");
-            var digestResponse = CalculateHash($"{ha1}:{nonce}:{++nc:x8}:{cnonce}:auth:{ha2}");
-
-            return $"username=\"{connection.UserName}\", " +
-                   $"realm=\"{realm}\", nonce=\"{nonce}\", " +
-                   $"uri=\"{request.RequestUri?.OriginalString}\", " +
-                   $"response=\"{digestResponse}\", " +
-                   (opaque != null ? $"opaque=\"{opaque}\", " : string.Empty) +
-                   $"algorithm={algorithm}, qop=auth, nc={nc:x8}, cnonce=\"{cnonce}\"";
-        }
-
-        string CalculateHash(string input)
-        {
-            var bytes = encoding.GetBytes(input);
-
-            var hash = hashAlgorithm switch
-            {
-                HashAlgorithm.Sha256 => SHA256.HashData(bytes),
-                HashAlgorithm.Md5 => MD5.HashData(bytes),
-                _ => throw new NotSupportedException("Only SHA-256 and MD5 are supported"),
-            };
-
-            return hash
-                .Aggregate
-                (
-                    new StringBuilder(hash.Length << 1),
-                    (stringBuilder, hashByte) => stringBuilder.Append(hashByte.ToString("x2"))
-                )
-                .ToString();
-        }
     }
 }

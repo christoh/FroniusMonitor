@@ -11,6 +11,7 @@ global using System.Diagnostics.CodeAnalysis;
 global using System.Diagnostics.Contracts;
 global using System.Globalization;
 global using System.Net;
+global using System.Net.Http.Headers;
 global using System.Net.Sockets;
 global using System.Net.WebSockets;
 global using System.Reflection;

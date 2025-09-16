@@ -1,6 +1,5 @@
 ﻿// ReSharper disable RedundantUsingDirective
 
-using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Net.Http.Json;
 using De.Hochstaetter.Fronius.Models.JsonConverters;
