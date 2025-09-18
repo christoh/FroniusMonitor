@@ -303,7 +303,7 @@
                     return null;
                 }
 
-                var devices = await FritzBoxService.GetFritzBoxDevices(token).ConfigureAwait(false);
+                var devices = await FritzBoxService.GetDevices(token).ConfigureAwait(false);
 
                 await Task.Run(() =>
                 {

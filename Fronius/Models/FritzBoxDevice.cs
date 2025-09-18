@@ -189,34 +189,26 @@ public partial class FritzBoxDevice : BindableBase, IPowerConsumer1P
     public async Task TurnOnOff(bool turnOn)
     {
         InitiateSwitching();
-
-        if (turnOn)
-        {
-            await FritzBoxService!.TurnOnFritzBoxDevice(Ain).ConfigureAwait(false);
-        }
-        else
-        {
-            await FritzBoxService!.TurnOffFritzBoxDevice(Ain).ConfigureAwait(false);
-        }
+        await FritzBoxService!.SwitchDevice(Ain, turnOn).ConfigureAwait(false);
     }
 
     public async Task SetLevel(double level)
     {
         InitiateSwitching();
-        await FritzBoxService!.SetFritzBoxLevel(Ain, level).ConfigureAwait(false);
+        await FritzBoxService!.SetLevel(Ain, level).ConfigureAwait(false);
     }
 
     public async Task SetHsv(double hueDegrees, double saturation, double value)
     {
         InitiateSwitching();
-        await FritzBoxService!.SetFritzBoxColor(Ain, hueDegrees, saturation).ConfigureAwait(false);
-        await FritzBoxService!.SetFritzBoxLevel(Ain, value).ConfigureAwait(false);
+        await FritzBoxService!.SetColor(Ain, hueDegrees, saturation).ConfigureAwait(false);
+        await FritzBoxService!.SetLevel(Ain, value).ConfigureAwait(false);
     }
 
     public async Task SetColorTemperature(double colorTemperatureKelvin)
     {
         InitiateSwitching();
-        await FritzBoxService!.SetFritzBoxColorTemperature(Ain, colorTemperatureKelvin).ConfigureAwait(false);
+        await FritzBoxService!.SetColorTemperature(Ain, colorTemperatureKelvin).ConfigureAwait(false);
     }
 
     private void InitiateSwitching()

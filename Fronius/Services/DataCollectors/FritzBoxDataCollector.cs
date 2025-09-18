@@ -81,7 +81,7 @@ public sealed class FritzBoxDataCollector
 
             try
             {
-                var allFritzBoxDevices = (await service.GetFritzBoxDevices(token).ConfigureAwait(false)).Devices.Cast<IPowerMeter1P>().ToList();
+                var allFritzBoxDevices = (await service.GetDevices(token).ConfigureAwait(false)).Devices.Cast<IPowerMeter1P>().ToList();
 
                 var presentFritzBoxDevices = allFritzBoxDevices.Where(p => p is { IsPresent: true });
 

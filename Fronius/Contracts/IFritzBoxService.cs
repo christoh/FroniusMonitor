@@ -4,10 +4,9 @@ public interface IFritzBoxService
 {
     WebConnection? Connection { get; set; }
     ValueTask FritzBoxLogin(CancellationToken token = default);
-    Task<FritzBoxDeviceList> GetFritzBoxDevices(CancellationToken token = default);
-    ValueTask TurnOnFritzBoxDevice(string ain, CancellationToken token = default);
-    ValueTask TurnOffFritzBoxDevice(string ain, CancellationToken token = default);
-    ValueTask SetFritzBoxLevel(string ain, double level, CancellationToken token = default);
-    ValueTask SetFritzBoxColorTemperature(string ain, double temperatureKelvin, CancellationToken token = default);
-    ValueTask SetFritzBoxColor(string ain, double hueDegrees, double saturation, CancellationToken token = default);
+    Task<FritzBoxDeviceList> GetDevices(CancellationToken token = default);
+    ValueTask SwitchDevice(string ain, bool turnOn, CancellationToken token = default);
+    ValueTask SetLevel(string ain, double level, CancellationToken token = default);
+    ValueTask SetColorTemperature(string ain, double temperatureKelvin, CancellationToken token = default);
+    ValueTask SetColor(string ain, double hueDegrees, double saturation, CancellationToken token = default);
 }

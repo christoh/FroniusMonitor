@@ -37,7 +37,7 @@
             }
         }
 
-        public async Task<FritzBoxDeviceList> GetFritzBoxDevices(CancellationToken token = default)
+        public async Task<FritzBoxDeviceList> GetDevices(CancellationToken token = default)
         {
             await using var stream = await GetStreamResponse("webservices/homeautoswitch.lua?switchcmd=getdevicelistinfos", token: token)
                 .ConfigureAwait(false) ?? throw new InvalidDataException();
@@ -48,26 +48,21 @@
             return result;
         }
 
-        public async ValueTask TurnOnFritzBoxDevice(string ain, CancellationToken token = default)
+        public async ValueTask SwitchDevice(string ain, bool turnOn, CancellationToken token = default)
         {
             ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
-            using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setswitchon", token: token).ConfigureAwait(false);
+            using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setswitcho{(turnOn ? "n" : "ff")}", token: token).ConfigureAwait(false);
         }
 
-        public async ValueTask TurnOffFritzBoxDevice(string ain, CancellationToken token = default)
-        {
-            ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
-            using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setswitchoff", token: token).ConfigureAwait(false);
-        }
 
-        public async ValueTask SetFritzBoxLevel(string ain, double level, CancellationToken token = default)
+        public async ValueTask SetLevel(string ain, double level, CancellationToken token = default)
         {
             var byteLevel = Math.Max((byte)Math.Round(level * 255, MidpointRounding.AwayFromZero), (byte)2);
             ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
             using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setlevel&level={byteLevel}", token: token).ConfigureAwait(false);
         }
 
-        public async ValueTask SetFritzBoxColorTemperature(string ain, double temperatureKelvin, CancellationToken token = default)
+        public async ValueTask SetColorTemperature(string ain, double temperatureKelvin, CancellationToken token = default)
         {
             var intTemperature = (int)Math.Round(temperatureKelvin, MidpointRounding.AwayFromZero);
             ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
@@ -79,7 +74,7 @@
             ).ConfigureAwait(false);
         }
 
-        public async ValueTask SetFritzBoxColor(string ain, double hueDegrees, double saturation, CancellationToken token = default)
+        public async ValueTask SetColor(string ain, double hueDegrees, double saturation, CancellationToken token = default)
         {
             var intHue = Math.Min(Math.Max(0, (int)Math.Round(hueDegrees)), 359);
             var intSaturation = Math.Min(Math.Max(0, (int)Math.Round(saturation * 255)), 255);
@@ -137,13 +132,13 @@
         }
 
         [SuppressMessage("ReSharper", "UnusedMember.Local")]
-        #pragma warning disable IDE0051
+#pragma warning disable IDE0051
         private async ValueTask<string> GetStringResponse(string request)
         {
             var response = await GetFritzBoxResponse(request).ConfigureAwait(false);
             return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         }
-        #pragma warning restore IDE0051
+#pragma warning restore IDE0051
 
         private async ValueTask<XmlDocument> GetXmlResponse(string request, IEnumerable<KeyValuePair<string, string>>? postVariables = null, CancellationToken token = default)
         {

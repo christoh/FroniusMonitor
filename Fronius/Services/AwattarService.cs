@@ -106,6 +106,7 @@ public sealed partial class AwattarService : ElectricityPushPriceServiceBase, IE
         timer = null;
         client?.Dispose();
         client = null;
+        GC.SuppressFinalize(this);
     }
 
     ~AwattarService() => Dispose();
