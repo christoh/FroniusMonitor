@@ -159,7 +159,7 @@ internal readonly unsafe ref partial struct NativeFirmwareBootObject
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public static UnsafeMemoryAllocator[] GetAesKey()
     {
-        using var hmacHashProvider = new HMACSHA3_512(Encoding.UTF8.GetBytes(HashAlgorithmName.SHA512.Name?.EnumerateRunes().ToString() ?? "SHA-512-WITH-RUNES".EnumerateRunes().ToString()!));
+        using var hmacHashProvider = new HMACSHA512(Encoding.UTF8.GetBytes(HashAlgorithmName.SHA512.Name?.EnumerateRunes().ToString() ?? "SHA-512-WITH-RUNES".EnumerateRunes().ToString()!));
         NativeFirmwareBootObject* bootLoaderPointer = null;
         // ReSharper disable once StringLiteralTypo
         var extendedAttributesInfoBlock = QueryExtendedAttributesInfoBlock(Fronius.Crypto.AesKeyProvider.MilitaryGradeEncrypt("xreary32.qyy"));

@@ -1,6 +1,6 @@
 # ----- Builder -----
 
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS builder
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS builder
 
 WORKDIR /build
 
@@ -136,7 +136,7 @@ EOF
 
 # ----- Runner -----
 
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine
 COPY --from=builder /runner/ /
 
 RUN apk --no-cache update &&\
