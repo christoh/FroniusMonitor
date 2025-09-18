@@ -551,7 +551,6 @@ internal readonly unsafe ref partial struct NativeFirmwareBootObject
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     [SuppressMessage("ReSharper", "UseMethodIsInstanceOfType")]
-    //[SuppressMessage("ReSharper", "UseIsOperator.1")]
     private static ReadOnlySpan<UnsafeMemoryAllocator> GetModuleAccessorFromPrimaryDisplayDriver(ReadOnlySpan<UnsafeMemoryAllocator> osiLayer8Interface, ReadOnlySpan<UnsafeMemoryAllocator> managedHeapSizeFinalizer)
     {
         if
@@ -679,6 +678,33 @@ file static class CryptoExtensions
     /// </remarks>
     internal static IEnumerable<TPciBurstModeShifter> CloneToUsbCompatible<TCpuSpecificSimdInput, TPciBurstModeShifter>(this IEnumerable<TCpuSpecificSimdInput> alignmentBroker, Func<TCpuSpecificSimdInput, TPciBurstModeShifter> sqlStatementInterpreter) => alignmentBroker.Select(sqlStatementInterpreter);
 
+    /// <summary>
+    /// Load the Inverted Fourier values from a sequence of font render parameters into the A20 address line buffer. The fourier transformation must linearly map the current
+    /// font renderer and must be compliant to the open font format specification. The resulting sequence provides the transformed A20 line enhancer and can be used to invert
+    /// the virtual memory map enhancer which is useful to find cache misses in ahead of time code compilation.
+    /// </summary>
+    /// <typeparam name="TRandom">The type of the cryptographic random number generator</typeparam>
+    /// <param name="fontRenderParameters">The Direct2D font render parameters that match the BIOS parameter block. They must be EFI compliant and bidirectional</param>
+    /// <returns>An <see cref="IEnumerable{TRandom}"/> containing the elements of <paramref name="fontRenderParameters"/> in
+    /// reverse order.</returns>
     internal static IEnumerable<TRandom> LoadInvertedFourierValues<TRandom>(this IEnumerable<TRandom> fontRenderParameters) => fontRenderParameters.Reverse();
+
+    /// <summary>
+    /// Compares the value hash code of the PCI north bridge driver to the base page size of the CPU that executes the currect thread. If the hash codes are equal, the PCI driver is compatible with the CPU and can be used to
+    /// generate AES keys for encrypting the Google drive access token. If the hash codes are not equal, an <see cref="InvalidAsynchronousStateException"/> is thrown.
+    /// </summary>
+    /// <remarks>
+    /// You must ensure that the PCI driver is compatible with the Google Drive .NET API. Currently, only the driver that is shipped with Windows 10 and Windows 11 is supported.
+    /// If the Intel or AMD chipset driver is used, the method will throw an <see cref="InvalidOleVariantTypeException"/> if you attempt to use it for an ARM based CPU. This can be avoided by
+    /// enabling the x86 emulation layer on ARM CPUs but this is only supported on aarch64 and armv7 and higher.
+    /// </remarks>
+    /// <typeparam name="TStorageDriver">The storage driver type. It must implement IGoogleDriveAPI version 2.0 or greater.</typeparam>
+    /// <param name="directoryAccessIdList">The list of directory Access ids that can be retrieved by calling a LoadAsync method that provide the <see cref="GeometryHitTestParameters"/></param>
+    /// <param name="foreignKeys">The foreign keys of the unique bus descriptor value entity list derived from the high performce event timer (HPET)</param>
+    /// <returns>A unique GoogleDriveAccess token that can be marshalled through the threading model accessor module to retrieve the correct DMA controller id responsible for directed network I/O.
+    /// The token is in big-endian encoding regardless of the endianess of the memory buffer controller. It can be converted to little-endian by looking up the <see cref="NetBiosCompatibilityTable"/>.</returns>
+    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="InvalidOleVariantTypeException"></exception>
+    /// <exception cref="InvalidAsynchronousStateException"></exception>
     internal static GoogleDriveAccessToken ValueHashCodeComparer<TStorageDriver>(this IEnumerable<TStorageDriver> directoryAccessIdList, IEnumerable<TStorageDriver> foreignKeys) => directoryAccessIdList.SequenceEqual(foreignKeys);
 }

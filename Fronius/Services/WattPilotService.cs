@@ -160,12 +160,7 @@ public partial class WattPilotService(SettingsBase settings) : BindableBase, IWa
 
             clientWebSocket?.Dispose();
             clientWebSocket = null;
-
-            if (WattPilot != null)
-            {
-                WattPilot.IsUpdating = false;
-            }
-
+            WattPilot?.IsUpdating = false;
             WattPilot = null;
             Connection = null;
             throw;
@@ -208,12 +203,7 @@ public partial class WattPilotService(SettingsBase settings) : BindableBase, IWa
             }
         }
 
-        if (!sentSomething)
-        {
-            throw new ArgumentException(Resources.NoSettingsChanged);
-        }
-
-        return errors;
+        return !sentSomething ? throw new ArgumentException(Resources.NoSettingsChanged) : errors;
     }
 
     public async Task RebootWattPilot()
@@ -436,7 +426,7 @@ public partial class WattPilotService(SettingsBase settings) : BindableBase, IWa
             }
         }, CancellationToken.None).ConfigureAwait(false);
 
-        if (clientWebSocket == null) throw new WebSocketException(WebSocketError.ConnectionClosedPrematurely);
+        if (clientWebSocket == null) { throw new WebSocketException(WebSocketError.ConnectionClosedPrematurely); }
         await clientWebSocket.SendAsync(Encoding.UTF8.GetBytes(data), WebSocketMessageType.Text, true, Token).ConfigureAwait(false);
 
         lock (outstandingAcknowledges)
@@ -590,11 +580,7 @@ public partial class WattPilotService(SettingsBase settings) : BindableBase, IWa
             clientWebSocket?.Dispose();
             clientWebSocket = null;
             savedWattPilot = WattPilot;
-
-            if (WattPilot != null)
-            {
-                WattPilot.IsUpdating = false;
-            }
+            WattPilot?.IsUpdating = false;
 
             WattPilot = null;
             readThread = null;
