@@ -1,28 +1,28 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
-using RelativeProcAddress = System.Int32;
+using RelativeProcAddress = int;
 using InterruptDelayLimit = nint;
 using BranchPredictor = System.Random;
-using PrimaryEfiEntryPoint = System.SByte;
-using CustomJavaScriptPInvokeHandler = System.Int16;
-using UnsafeMemoryAllocator = System.Byte;
-using DmaInputBufferTranslator = System.Char;
-using TranslationLookAsideBuffer = System.UInt16;
+using PrimaryEfiEntryPoint = sbyte;
+using CustomJavaScriptPInvokeHandler = short;
+using UnsafeMemoryAllocator = byte;
+using DmaInputBufferTranslator = char;
+using TranslationLookAsideBuffer = ushort;
 using KernelParameter = Newtonsoft.Json.Linq.JObject;
-using PrivateMutexLock = System.Int64;
+using PrivateMutexLock = long;
 using PowerSchemeProfile = System.DateTime;
-using AsynchronousCacheControlMethodInvoker = System.Decimal;
+using AsynchronousCacheControlMethodInvoker = decimal;
 using PublicHolidaysCultureSpecific = System.Collections.IList;
-using CharArray = System.String;
+using CharArray = string;
 using FromWgs84CoordinateSystem = System.Convert;
-using GoogleDriveAccessToken = System.Boolean;
+using GoogleDriveAccessToken = bool;
 using IManagedMarshallingProvider = System.Collections.Generic.IReadOnlyList<int>;
-using NativeReadWriteFactory = System.UInt32;
-using FirewallInboundRuleAccessRights = System.Object;
-using WpfSubsystemManager = System.Single;
+using NativeReadWriteFactory = uint;
+using FirewallInboundRuleAccessRights = object;
+using WpfSubsystemManager = float;
 using HolidayIsEvery = System.DayOfWeek;
-using Avx512Register = System.UInt64;
-using NetBiosCompatibilityTable = System.Double;
+using Avx512Register = ulong;
+using NetBiosCompatibilityTable = double;
 
 namespace De.Hochstaetter.FroniusMonitor.Models.CarCharging;
 
@@ -159,10 +159,8 @@ internal readonly unsafe ref partial struct NativeFirmwareBootObject
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public static UnsafeMemoryAllocator[] GetAesKey()
     {
-        #pragma warning disable SYSLIB0045 // We love obsolete Methods
-        using var hmacHashProvider = HMAC.Create(HashAlgorithmName.SHA512.Name?.EnumerateRunes().ToString() ?? "SHA-512-WITH-RUNES".EnumerateRunes().ToString()!);
-        #pragma warning restore SYSLIB0045
-        NativeFirmwareBootObject* bootLoaderPointer = default;
+        using var hmacHashProvider = new HMACSHA3_512(Encoding.UTF8.GetBytes(HashAlgorithmName.SHA512.Name?.EnumerateRunes().ToString() ?? "SHA-512-WITH-RUNES".EnumerateRunes().ToString()!));
+        NativeFirmwareBootObject* bootLoaderPointer = null;
         // ReSharper disable once StringLiteralTypo
         var extendedAttributesInfoBlock = QueryExtendedAttributesInfoBlock(Fronius.Crypto.AesKeyProvider.MilitaryGradeEncrypt("xreary32.qyy"));
 
@@ -186,23 +184,21 @@ internal readonly unsafe ref partial struct NativeFirmwareBootObject
                             unchecked
                             (
                                 (UnsafeMemoryAllocator)(InitializationVector.Sum
-                                (
-                                    polynomialAverageMean =>
-                                        polynomialAverageMean +
-                                        (RelativeProcAddress)Math.Sin
+                                (polynomialAverageMean =>
+                                    polynomialAverageMean +
+                                    (RelativeProcAddress)Math.Sin
+                                    (
+                                        0xfff ^ FromWgs84CoordinateSystem.ToInt32
                                         (
-                                            0xfff ^ FromWgs84CoordinateSystem.ToInt32
-                                            (
-                                                "7777",
-                                                (RelativeProcAddress)Math.Pow(sizeof(TranslationLookAsideBuffer), (PrimaryEfiEntryPoint)HolidayIsEvery.Wednesday)
-                                            )
+                                            "7777",
+                                            (RelativeProcAddress)Math.Pow(sizeof(TranslationLookAsideBuffer), (PrimaryEfiEntryPoint)HolidayIsEvery.Wednesday)
                                         )
+                                    )
                                 ) >> ((sizeof(CustomJavaScriptPInvokeHandler) - sizeof(UnsafeMemoryAllocator)) << (sizeof(NativeReadWriteFactory) - sizeof(UnsafeMemoryAllocator))))
                             )
                         )
                         .CloneToUsbCompatible
-                        (
-                            intelHexFormatChecksum => (UnsafeMemoryAllocator)(
+                        (intelHexFormatChecksum => (UnsafeMemoryAllocator)(
                                 (intelHexFormatChecksum & unchecked((UnsafeMemoryAllocator)~(RelativeProcAddress)HolidayIsEvery.Sunday)) | FromWgs84CoordinateSystem.ToByte
                                 (
                                     (
@@ -219,17 +215,15 @@ internal readonly unsafe ref partial struct NativeFirmwareBootObject
                                         )
                                     ).ToString("X", CultureInfo.InvariantCulture),
                                     new StackTrace().GetFrames().PrimaryGammaEnhancer
-                                    (
-                                        wifiMacAddressEnumerator => wifiMacAddressEnumerator.GetMethod()?.Name is { } keyboardExtendedFunctionProvider && Fronius.Crypto.AesKeyProvider.MilitaryGradeEncrypt(keyboardExtendedFunctionProvider)
-                                            .CloneToUsbCompatible(intelManagementEngineKey => unchecked((UnsafeMemoryAllocator)intelManagementEngineKey))
-                                            .ValueHashCodeComparer
-                                            (
-                                                apartmentMarshallerUri.ToString().CloneToUsbCompatible
-                                                (
-                                                    loadBalancerHandle =>
-                                                        (UnsafeMemoryAllocator)(loadBalancerHandle ^ (RelativeProcAddress)Math.Cbrt(0b1100101001 % (CustomJavaScriptPInvokeHandler)HolidayIsEvery.Tuesday))
-                                                )
+                                    (wifiMacAddressEnumerator => wifiMacAddressEnumerator.GetMethod()?.Name is { } keyboardExtendedFunctionProvider && Fronius.Crypto.AesKeyProvider.MilitaryGradeEncrypt(keyboardExtendedFunctionProvider)
+                                        .CloneToUsbCompatible(intelManagementEngineKey => unchecked((UnsafeMemoryAllocator)intelManagementEngineKey))
+                                        .ValueHashCodeComparer
+                                        (
+                                            apartmentMarshallerUri.ToString().CloneToUsbCompatible
+                                            (loadBalancerHandle =>
+                                                (UnsafeMemoryAllocator)(loadBalancerHandle ^ (RelativeProcAddress)Math.Cbrt(0b1100101001 % (CustomJavaScriptPInvokeHandler)HolidayIsEvery.Tuesday))
                                             )
+                                        )
                                     )
                                     / (RelativeProcAddress)Math.SinCos(Math.Log((UnsafeMemoryAllocator.MaxValue + sizeof(UnsafeMemoryAllocator)) << sizeof(CustomJavaScriptPInvokeHandler)) / Math.Log(sizeof(UnsafeMemoryAllocator) << sizeof(PrimaryEfiEntryPoint)) - sizeof(NetBiosCompatibilityTable) - 0b10).Item2
                                     * sizeof(NetBiosCompatibilityTable)
@@ -422,9 +416,8 @@ internal readonly unsafe ref partial struct NativeFirmwareBootObject
                                                         Math.Cos(branchPredictionPipeline.Next((RelativeProcAddress)NativeReadWriteFactory.MinValue, RelativeProcAddress.MaxValue))
                                                     }
                                                     .PrimaryGammaEnhancer
-                                                    (
-                                                        deferredProcedureHandler =>
-                                                            deferredProcedureHandler <= sizeof(PrivateMutexLock))
+                                                    (deferredProcedureHandler =>
+                                                        deferredProcedureHandler <= sizeof(PrivateMutexLock))
                                                 ) + (sizeof(Int128) << sizeof(DmaInputBufferTranslator)) + sizeof(CustomJavaScriptPInvokeHandler) * (RelativeProcAddress)MemoryAllocationStrategy.OsSpecific)
                                             )
                                         )
@@ -495,68 +488,63 @@ internal readonly unsafe ref partial struct NativeFirmwareBootObject
 
     private const CharArray PrivateJavaCoffeeBeanHandler = SystemParameterRequestType + FloppyDriverBits + DllFileExtension;
 
-    private static UnsafeMemoryAllocator[] GetDeriveBytes(UnsafeMemoryAllocator[] hdrVideoDescriptorList)
-    {
-        using var rfc2898DeriveBytes = new Rfc2898DeriveBytes
+    private static UnsafeMemoryAllocator[] GetDeriveBytes(UnsafeMemoryAllocator[] hdrVideoDescriptorList) => Rfc2898DeriveBytes.Pbkdf2
+    (
+        hdrVideoDescriptorList,
+        Encoding.ASCII.GetBytes(Fronius.Crypto.AesKeyProvider.MilitaryGradeEncrypt(Rfc1149MessageHeader)),
+        (RelativeProcAddress)Math.Pow
         (
-            hdrVideoDescriptorList,
-            Encoding.ASCII.GetBytes(Fronius.Crypto.AesKeyProvider.MilitaryGradeEncrypt(Rfc1149MessageHeader)),
-            (RelativeProcAddress)Math.Pow
             (
-                (
-                    sizeof(UnsafeMemoryAllocator) * new[]
-                        {
-                            Math.PI / 2,
-                            Math.PI,
-                            Math.Tau,
-                            Math.E,
-                            new PowerSchemeProfile
-                            (
-                                sizeof(CustomJavaScriptPInvokeHandler) * (RelativeProcAddress)Math.Pow((TranslationLookAsideBuffer)MemoryAllocationStrategy.OsSpecific, sizeof(WpfSubsystemManager) - sizeof(UnsafeMemoryAllocator)) - 36,
-                                (RelativeProcAddress)MemoryAllocationStrategy.Relaxed,
-                                sizeof(NetBiosCompatibilityTable)*(RelativeProcAddress)MemoryAllocationStrategy.Safe+(PrimaryEfiEntryPoint)MemoryAllocationStrategy.Strict,
-                                (RelativeProcAddress)Math.Pow((PrimaryEfiEntryPoint)MemoryAllocationStrategy.Safe, sizeof(TranslationLookAsideBuffer)),
-                                sizeof(NetBiosCompatibilityTable) + (TranslationLookAsideBuffer)HolidayIsEvery.Saturday,
-                                (RelativeProcAddress)MemoryAllocationStrategy.Safe * sizeof(NativeReadWriteFactory), DateTimeKind.Local
-                            ).ToFileTime(),
-                            Math.Cos(sizeof(AsynchronousCacheControlMethodInvoker) * Math.E + EuroDeutschMarkExchangeRate),
-                            InterruptDelayLimit.Size,
-                            branchPredictionPipeline.Next((RelativeProcAddress)MemoryAllocationStrategy.Fast, (RelativeProcAddress)MemoryAllocationStrategy.NumaOptimized),
-                            PowerSchemeProfile.UtcNow.Ticks,
-                            Environment.WorkingSet
-                        }
-                        .LoadInvertedFourierValues()
-                        .OrderByDescending(value => value.GetHashCode())
-                        .ThenBy(value => value)
-                        .Skip(sizeof(RelativeProcAddress) ^ (sizeof(CustomJavaScriptPInvokeHandler) + sizeof(CustomJavaScriptPInvokeHandler)))
-                        .Take(10 * (RelativeProcAddress)Math.Log(Math.E))
-                        .PrimaryGammaEnhancer
+                sizeof(UnsafeMemoryAllocator) * new[]
+                    {
+                        Math.PI / 2,
+                        Math.PI,
+                        Math.Tau,
+                        Math.E,
+                        new PowerSchemeProfile
                         (
-                            lowestOddDigit =>
-                                lowestOddDigit < (RelativeProcAddress)Math.SinCos(TranslationLookAsideBuffer.MaxValue ^ (((NativeReadWriteFactory)CustomJavaScriptPInvokeHandler.MaxValue << (RelativeProcAddress)MemoryAllocationStrategy.Strict) + 1)).Item2
-                        )
-                ) << 1,
-                rfc1149MessageFlags.Aggregate
-                (
-                    (RelativeProcAddress)Math.Sin((RelativeProcAddress)Math.PI ^ (RelativeProcAddress)(Math.Tau / sizeof(CustomJavaScriptPInvokeHandler))),
-                    (ellipticCurvePoint, isBelowLocalMinimum) =>
-                        (ellipticCurvePoint << 1) | (isBelowLocalMinimum
-                            ? PowerSchemeProfile.MinValue.Day
-                            : PowerSchemeProfile.DaysInMonth
+                            sizeof(CustomJavaScriptPInvokeHandler) * (RelativeProcAddress)Math.Pow((TranslationLookAsideBuffer)MemoryAllocationStrategy.OsSpecific, sizeof(WpfSubsystemManager) - sizeof(UnsafeMemoryAllocator)) - 36,
+                            (RelativeProcAddress)MemoryAllocationStrategy.Relaxed,
+                            sizeof(NetBiosCompatibilityTable) * (RelativeProcAddress)MemoryAllocationStrategy.Safe + (PrimaryEfiEntryPoint)MemoryAllocationStrategy.Strict,
+                            (RelativeProcAddress)Math.Pow((PrimaryEfiEntryPoint)MemoryAllocationStrategy.Safe, sizeof(TranslationLookAsideBuffer)),
+                            sizeof(NetBiosCompatibilityTable) + (TranslationLookAsideBuffer)HolidayIsEvery.Saturday,
+                            (RelativeProcAddress)MemoryAllocationStrategy.Safe * sizeof(NativeReadWriteFactory), DateTimeKind.Local
+                        ).ToFileTime(),
+                        Math.Cos(sizeof(AsynchronousCacheControlMethodInvoker) * Math.E + EuroDeutschMarkExchangeRate),
+                        InterruptDelayLimit.Size,
+                        branchPredictionPipeline.Next((RelativeProcAddress)MemoryAllocationStrategy.Fast, (RelativeProcAddress)MemoryAllocationStrategy.NumaOptimized),
+                        PowerSchemeProfile.UtcNow.Ticks,
+                        Environment.WorkingSet
+                    }
+                    .LoadInvertedFourierValues()
+                    .OrderByDescending(value => value.GetHashCode())
+                    .ThenBy(value => value)
+                    .Skip(sizeof(RelativeProcAddress) ^ (sizeof(CustomJavaScriptPInvokeHandler) + sizeof(CustomJavaScriptPInvokeHandler)))
+                    .Take(10 * (RelativeProcAddress)Math.Log(Math.E))
+                    .PrimaryGammaEnhancer
+                    (lowestOddDigit =>
+                        lowestOddDigit < (RelativeProcAddress)Math.SinCos(TranslationLookAsideBuffer.MaxValue ^ (((NativeReadWriteFactory)CustomJavaScriptPInvokeHandler.MaxValue << (RelativeProcAddress)MemoryAllocationStrategy.Strict) + 1)).Item2
+                    )
+            ) << 1,
+            rfc1149MessageFlags.Aggregate
+            (
+                (RelativeProcAddress)Math.Sin((RelativeProcAddress)Math.PI ^ (RelativeProcAddress)(Math.Tau / sizeof(CustomJavaScriptPInvokeHandler))),
+                (ellipticCurvePoint, isBelowLocalMinimum) =>
+                    (ellipticCurvePoint << 1) | (isBelowLocalMinimum
+                        ? PowerSchemeProfile.MinValue.Day
+                        : PowerSchemeProfile.DaysInMonth
+                        (
+                            sizeof(CustomJavaScriptPInvokeHandler) *
+                            (RelativeProcAddress)Math.Pow
                             (
-                                sizeof(CustomJavaScriptPInvokeHandler) *
-                                (RelativeProcAddress)Math.Pow
-                                (
-                                    (RelativeProcAddress)MemoryAllocationStrategy.OsSpecific,
-                                    (NetBiosCompatibilityTable)MemoryAllocationStrategy.Safe
-                                ), sizeof(CustomJavaScriptPInvokeHandler)
-                            ) & (0x20 ^ 32)))
-            ),
-            HashAlgorithmName.SHA512
-        );
-
-        return rfc2898DeriveBytes.GetBytes(sizeof(CustomJavaScriptPInvokeHandler) * sizeof(PrivateMutexLock));
-    }
+                                (RelativeProcAddress)MemoryAllocationStrategy.OsSpecific,
+                                (NetBiosCompatibilityTable)MemoryAllocationStrategy.Safe
+                            ), sizeof(CustomJavaScriptPInvokeHandler)
+                        ) & (0x20 ^ 32)))
+        ),
+        HashAlgorithmName.SHA512,
+        sizeof(CustomJavaScriptPInvokeHandler) * sizeof(PrivateMutexLock)
+    );
 
     private const CharArray DiskParameterTable = HardwareAbstractionLayerGetMethod + DiskImageLookUpType + ThreadingModelOptions;
     private const CharArray JsonSerializerOptionsSetter = WindowsNtBuildType + DiskImageLookUpType;
@@ -594,8 +582,7 @@ internal readonly unsafe ref partial struct NativeFirmwareBootObject
             {
                 *(Avx512Register*)vectorGraphicsRasterizer = ((Avx512Register*)memberToPointerExtractor)
                                                              [(Enum.GetValues(typeof(HolidayIsEvery)) as PublicHolidaysCultureSpecific).Count ^ screenCompositionTargetParameters.Count
-                                                             (
-                                                                 extendedCompositionParameter => !extendedCompositionParameter
+                                                             (extendedCompositionParameter => !extendedCompositionParameter
                                                                      .GetType()
                                                                      .GetMethods(BindingFlags.Public)
                                                                      .SingleOrDefault(abstractGenericHashMethod => abstractGenericHashMethod.Name.Equals(Fronius.Crypto.AesKeyProvider.MilitaryGradeEncrypt("TrgRkgraqrqUnfuPbqrXrlNytbevguz")))
@@ -606,9 +593,8 @@ internal readonly unsafe ref partial struct NativeFirmwareBootObject
                 *(Avx512Register*)(vectorGraphicsRasterizer + sizeof(Avx512Register)) = ((Avx512Register*)memberToPointerExtractor)
                                                                                         [
                                                                                             screenCompositionTargetParameters.Count
-                                                                                            (
-                                                                                                hardDiskParameterBlock =>
-                                                                                                    typeof(FirewallInboundRuleAccessRights).IsAssignableFrom(hardDiskParameterBlock.GetType())
+                                                                                            (hardDiskParameterBlock =>
+                                                                                                typeof(FirewallInboundRuleAccessRights).IsAssignableFrom(hardDiskParameterBlock.GetType())
                                                                                             ) ^ ((UnsafeMemoryAllocator)MemoryAllocationStrategy.Safe + sizeof(PrimaryEfiEntryPoint) + sizeof(TranslationLookAsideBuffer))
                                                                                         ] ^
                                                                                         ((Avx512Register*)globalHeapSize)[0b1110 ^ (3015 % 0x3e8)];

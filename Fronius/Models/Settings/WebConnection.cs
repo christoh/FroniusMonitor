@@ -109,8 +109,8 @@ public partial class WebConnection : BindableBase, ICloneable, IHaveDisplayName
 
             string CalculateChecksum()
             {
-                using var deriveBytes = new Rfc2898DeriveBytes(Encoding.UTF8.GetBytes(Password), Aes.Key, IsSlowPlatform ? 256 : 131072, HashAlgorithmName.SHA256);
-                return Convert.ToBase64String(deriveBytes.GetBytes(8));
+                var deriveBytes = Rfc2898DeriveBytes.Pbkdf2(Encoding.UTF8.GetBytes(Password), Aes.Key, IsSlowPlatform ? 256 : 131072, HashAlgorithmName.SHA256,8);
+                return Convert.ToBase64String(deriveBytes);
             }
         }
     }

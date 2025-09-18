@@ -321,8 +321,7 @@ public partial class WattPilotService(SettingsBase settings) : BindableBase, IWa
         {
             await Task.Run(() =>
             {
-                using var deriveBytes = new Rfc2898DeriveBytes(Encoding.UTF8.GetBytes(Connection?.Password ?? string.Empty), Encoding.UTF8.GetBytes(WattPilot?.SerialNumber ?? string.Empty), 100000, HashAlgorithmName.SHA512);
-                var hash0 = deriveBytes.GetBytes(24);
+                var hash0 = Rfc2898DeriveBytes.Pbkdf2(Encoding.UTF8.GetBytes(Connection?.Password ?? string.Empty), Encoding.UTF8.GetBytes(WattPilot?.SerialNumber ?? string.Empty), 100000, HashAlgorithmName.SHA512, 24);
                 hashedPassword = Convert.ToBase64String(hash0);
             }, Token).ConfigureAwait(false);
         }

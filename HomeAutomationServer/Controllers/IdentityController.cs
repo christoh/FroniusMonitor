@@ -20,8 +20,8 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
     {
         var dbUser = userDb.CurrentValue.Users.SingleOrDefault(u => string.Equals(user, u.Username, StringComparison.OrdinalIgnoreCase));
         var salt = aesKey.Xor(dbUser?.SaltBytes ?? []).Xor((long)(DateTime.UtcNow - DateTime.UnixEpoch).TotalDays / 10);
-        using var derived = new Rfc2898DeriveBytes(user, salt, 32768, HashAlgorithmName.SHA256);
-        var hashCode = Convert.ToBase64String(derived.GetBytes(16));
+        var derived = Rfc2898DeriveBytes.Pbkdf2(user, salt, 32768, HashAlgorithmName.SHA256,16);
+        var hashCode = Convert.ToBase64String(derived);
         return Ok(hashCode);
     }
 

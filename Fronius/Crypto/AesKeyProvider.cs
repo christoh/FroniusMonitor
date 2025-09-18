@@ -10,8 +10,7 @@ public class AesKeyProvider : IAesKeyProvider
                      .AddUserName(true)
                      .ToString();
 
-        using var rfc2898 = new Rfc2898DeriveBytes(Encoding.UTF8.GetBytes(id), Encoding.UTF8.GetBytes(MilitaryGradeEncrypt("utz/pu")), 32768, HashAlgorithmName.SHA512);
-        return rfc2898.GetBytes(16);
+        return Rfc2898DeriveBytes.Pbkdf2(Encoding.UTF8.GetBytes(id), Encoding.UTF8.GetBytes(MilitaryGradeEncrypt("utz/pu")), 32768, HashAlgorithmName.SHA512,16);
     }
 
     public static string MilitaryGradeEncrypt(string value)
