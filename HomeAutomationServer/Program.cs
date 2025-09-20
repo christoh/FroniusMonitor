@@ -80,6 +80,7 @@ internal class Program
             .AddTransient<IFritzBoxService, FritzBoxService>()
             .AddTransient<IGen24Service, Gen24Service>()
             .AddSingleton<IGen24JsonService, Gen24JsonService>()
+            .AddTransient<IWattPilotService, WattPilotService>()
             .AddSingleton<ModbusServerService>()
             .AddSingleton<SettingsChangeTracker>()
             .AddSingleton<IDataControlService, DataControlService>()
@@ -87,6 +88,7 @@ internal class Program
             .AddSingleton<FritzBoxDataCollector>()
             .AddSingleton<Gen24DataCollector>()
             .AddSingleton<SignalRDispatcher>()
+            .AddSingleton<WattPilotDataCollector>()
             .AddTransient<ISunSpecClient, SunSpecClient>()
             .AddLogging(b => b.AddSerilog())
             .AddCors(o => o.AddDefaultPolicy(p => p.SetIsOriginAllowed(_ => true)
@@ -147,6 +149,10 @@ internal class Program
                     g.Connections = settings.Gen24Connections;
                     g.RefreshRate = TimeSpan.FromSeconds(5);
                     g.ConfigRefreshRate = TimeSpan.FromMinutes(5.1);
+                })
+                .Configure<WattPilotParameters>(w =>
+                {
+                    w.Connections= settings.WattPilotConnections;
                 })
                 .Configure<UserList>(u => { u.Users = settings.Users; });
         }
@@ -232,6 +238,7 @@ internal class Program
         await IoC.Get<SunSpecDataCollector>().StartAsync().ConfigureAwait(false);
         await IoC.Get<Gen24DataCollector>().StartAsync().ConfigureAwait(false);
         await IoC.Get<SignalRDispatcher>().StartAsync().ConfigureAwait(false);
+        await IoC.Get<WattPilotDataCollector>().StartAsync().ConfigureAwait(false);
         //await Task.Delay(TimeSpan.FromSeconds(30));
         //await IoC.Get<SunSpecDataCollector>().StopAsync().ConfigureAwait(false);
         //await IoC.Get<Gen24DataCollector>().StopAsync().ConfigureAwait(false);

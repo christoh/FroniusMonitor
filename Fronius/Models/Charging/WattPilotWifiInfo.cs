@@ -35,6 +35,7 @@ public partial class WattPilotWifiInfo : BindableBase, IHaveDisplayName
 
     [ObservableProperty]
     [JsonProperty("ip")]
+    //[System.Text.Json.Serialization.JsonIgnore]
     [WattPilot("ip")]
     public partial IPAddress? IpV4Address { get; set; }
 

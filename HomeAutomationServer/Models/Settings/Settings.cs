@@ -18,6 +18,8 @@ public class Settings
 
     public List<WebConnection> FritzBoxConnections = [];
 
+    public List<WebConnection> WattPilotConnections = [];
+
     public List<ModbusMapping> ModbusMappings = [];
 
     public List<ModbusConnection> SunSpecClients = [];

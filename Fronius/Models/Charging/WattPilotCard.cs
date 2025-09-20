@@ -22,6 +22,7 @@ public partial class WattPilotCard : BindableBase, IHaveDisplayName
     [JsonProperty("cardId")]
     public partial bool? HaveCardId { get; set; }
 
+    [System.Text.Json.Serialization.JsonIgnore]
     public string DisplayName => $"{Name ?? Resources.Unknown}: {Energy ?? 0} / {(HaveCardId.HasValue ? HaveCardId.Value : Resources.Unknown)}";
 
     public override string ToString() => DisplayName;

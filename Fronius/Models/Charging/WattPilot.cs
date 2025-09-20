@@ -5,13 +5,14 @@ namespace De.Hochstaetter.Fronius.Models.Charging;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
-public partial class WattPilot : BindableBase, IHaveDisplayName, ICloneable
+public partial class WattPilot : BindableBase, IHaveDisplayName, IHaveUniqueId, ICloneable
 {
     public bool IsUpdating
     {
         get;
         set => Set(ref field, value, () =>
         {
+            NotifyOfPropertyChange(nameof(IsPresent));
             if
             (
                 !value ||
@@ -81,6 +82,8 @@ public partial class WattPilot : BindableBase, IHaveDisplayName, ICloneable
     [ObservableProperty]
     [WattPilot("wen", false)]
     public partial bool? IsWifiClientEnabled { get; set; }
+
+    public bool IsPresent => IsUpdating;
 
     [ObservableProperty]
     [WattPilot("oem")]

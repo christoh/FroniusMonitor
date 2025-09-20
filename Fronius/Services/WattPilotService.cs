@@ -2,7 +2,7 @@
 
 namespace De.Hochstaetter.Fronius.Services;
 
-public partial class WattPilotService(SettingsBase settings) : BindableBase, IWattPilotService
+public partial class WattPilotService() : BindableBase, IWattPilotService
 {
     private readonly List<WattPilotAcknowledge> outstandingAcknowledges = [];
     private readonly byte[] buffer = new byte[8192];
@@ -56,7 +56,7 @@ public partial class WattPilotService(SettingsBase settings) : BindableBase, IWa
     public partial WattPilot? WattPilot { get; set; }
 
     [SuppressMessage("ReSharper", "ParameterHidesMember")]
-    public async ValueTask Start(WebConnection connection)
+    public async ValueTask StartAsync(WebConnection connection)
     {
         try
         {
@@ -227,12 +227,12 @@ public partial class WattPilotService(SettingsBase settings) : BindableBase, IWa
             throw new IOException("The following settings were not written to the Wattpilot:" + Environment.NewLine + Environment.NewLine + notWritten);
         }
 
-        await Stop().ConfigureAwait(false);
+        await StopAsync().ConfigureAwait(false);
     }
 
     public void OpenConfigPdf()
     {
-        var link = $"{WattPilot?.DownloadLink?.Replace("export", "documentation")}&lang={(settings.Language ?? CultureInfo.CurrentUICulture.Name).Split('-')[0]}";
+        var link = $"{WattPilot?.DownloadLink?.Replace("export", "documentation")}&lang={(Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName ?? CultureInfo.CurrentUICulture.Name).Split('-')[0]}";
         OpenLink(link);
     }
 
@@ -317,7 +317,7 @@ public partial class WattPilotService(SettingsBase settings) : BindableBase, IWa
         ).ToBase64();
     }
 
-    public async ValueTask Stop()
+    public async ValueTask StopAsync()
     {
         if (tokenSource != null)
         {
@@ -437,16 +437,25 @@ public partial class WattPilotService(SettingsBase settings) : BindableBase, IWa
         }
     }
 
-    private void UpdateWattPilot(object instance, JObject? jObject)
+    private void UpdateWattPilot(WattPilot instance, JObject? jObject)
     {
         if (jObject == null)
         {
             return;
         }
 
+        ParseToken(instance, jObject);
+
+        if (OnUpdate != null)
+        {
+            _ = Task.Run(() => OnUpdate(this, new(instance, jObject)), Token);
+        }
+    }
+
+    public static void ParseToken(object instance, JObject jObject)
+    {
         foreach (var token in jObject)
         {
-            _ = Task.Run(() => OnUpdate?.Invoke(this, new(token.Key, token.Value?.ToString())), tokenSource?.Token ?? CancellationToken.None);
             // Debug.Print($"{token.Key}: {token.Value?.ToString().Replace("\r", "").Replace("\n", "")}");
             var propertyInfos = instance.GetType().GetProperties().Where(p => p.GetCustomAttributes<WattPilotAttribute>().Any(a => a.TokenName == token.Key)).ToArray();
 
@@ -475,7 +484,7 @@ public partial class WattPilotService(SettingsBase settings) : BindableBase, IWa
         }
     }
 
-    private void SetWattPilotValue(object instance, PropertyInfo propertyInfo, JToken? token)
+    private static void SetWattPilotValue(object instance, PropertyInfo propertyInfo, JToken? token)
     {
         try
         {
@@ -494,7 +503,7 @@ public partial class WattPilotService(SettingsBase settings) : BindableBase, IWa
             if (subInstance != null)
             {
                 propertyInfo.SetValue(instance, subInstance);
-                UpdateWattPilot(subInstance, subObject);
+                ParseToken(subInstance, subObject);
                 return;
             }
         }
@@ -589,7 +598,11 @@ public partial class WattPilotService(SettingsBase settings) : BindableBase, IWa
             readThread = null;
             var connection = Connection?.Clone() as WebConnection;
             Connection = null;
-            _ = Task.Run(() => OnLostConnection?.Invoke(this, new WattPilotServiceStoppedEventArgs(savedWattPilot, connection)), CancellationToken.None);
+
+            if (OnLostConnection != null)
+            {
+                _ = Task.Run(() => OnLostConnection(this, new WattPilotServiceStoppedEventArgs(savedWattPilot, connection)), CancellationToken.None);
+            }
         }
     }
 }

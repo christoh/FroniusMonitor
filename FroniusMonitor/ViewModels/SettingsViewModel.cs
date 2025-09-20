@@ -306,7 +306,7 @@ public class SettingsViewModel(
             IoC.Get<MainViewModel>().NotifyOfPropertyChange(nameof(Settings));
 
             Settings.ShowWattPilot = false;
-            await WattPilotService.Stop().ConfigureAwait(false);
+            await WattPilotService.StopAsync().ConfigureAwait(false);
             await DataCollectionService.HvacService.Stop().ConfigureAwait(false);
 
             await DataCollectionService.Start

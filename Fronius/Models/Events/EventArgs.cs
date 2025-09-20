@@ -13,4 +13,4 @@ public record NewWattPilotFirmwareEventArgs(Version CurrentFirmware, Version New
 
 public record WattPilotServiceStoppedEventArgs(WattPilot? WattPilot, WebConnection? WebConnection);
 
-public record WattPilotUpdateEventArgs(string Token, string? Value);
+public record WattPilotUpdateEventArgs(WattPilot WattPilot, JObject JObject);

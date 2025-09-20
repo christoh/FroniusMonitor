@@ -344,11 +344,11 @@
         {
             if (wattPilotService.Connection == null && WattPilotConnection != null)
             {
-                await wattPilotService.Start(WattPilotConnection).ConfigureAwait(false);
+                await wattPilotService.StartAsync(WattPilotConnection).ConfigureAwait(false);
             }
             else if (WattPilotConnection == null)
             {
-                await wattPilotService.Stop();
+                await wattPilotService.StopAsync();
             }
 
             return wattPilotService.WattPilot;
