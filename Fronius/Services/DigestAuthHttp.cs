@@ -13,8 +13,6 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
         Md5,
     }
 
-    private static readonly RandomNumberGenerator random = RandomNumberGenerator.Create();
-
     private readonly Lock hashLock = new();
     private readonly HttpClient httpClient;
     private readonly WebConnection connection;
@@ -51,13 +49,13 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
         GC.SuppressFinalize(this);
     }
 
-    #pragma warning disable CA1816 // GC.SuppressFinalize(this) is guaranteed to be called in Dispose()
+#pragma warning disable CA1816 // GC.SuppressFinalize(this) is guaranteed to be called in Dispose()
     public async ValueTask DisposeAsync()
     {
         await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
         Dispose();
     }
-    #pragma warning restore CA1816
+#pragma warning restore CA1816
 
     public async ValueTask<(JToken, HttpStatusCode)> GetJsonToken(string url, JToken? jToken, IEnumerable<HttpStatusCode>? allowedStatusCodes = null, CancellationToken token = default)
     {
@@ -222,16 +220,9 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
             }
         }
 
-        unsafe void UpdateClientNonce()
+        void UpdateClientNonce()
         {
-            Span<byte> bytes = stackalloc byte[sizeof(ulong)];
-            random.GetBytes(bytes);
-
-            fixed (byte* pointer = bytes)
-            {
-                cnonce = (*(ulong*)pointer).ToString("x16");
-            }
-
+            cnonce = RandomNumberGenerator.GetHexString(16, true);
             cnonceDate = DateTime.UtcNow;
         }
     }

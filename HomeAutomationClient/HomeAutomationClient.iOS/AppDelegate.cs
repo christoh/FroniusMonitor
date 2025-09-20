@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.iOS;
 using Avalonia.Media;
+using De.Hochstaetter.HomeAutomationClient;
 using Foundation;
 using UIKit;
 

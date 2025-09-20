@@ -6,10 +6,7 @@ public partial class WebConnection : BindableBase, ICloneable, IHaveDisplayName
 
     public static Aes Aes { get; private set; } = null!;
 
-    static WebConnection()
-    {
-        CreateAes();
-    }
+    static WebConnection() => CreateAes();
 
     public static void InvalidateKey()
     {
@@ -33,7 +30,7 @@ public partial class WebConnection : BindableBase, ICloneable, IHaveDisplayName
     public partial string BaseUrl { get; set; } = string.Empty;
 
     [ObservableProperty, DefaultValue(""), XmlAttribute]
-    public partial string UserName { get; set; }  = string.Empty;
+    public partial string UserName { get; set; } = string.Empty;
 
     [XmlIgnore, JsonIgnore]
     public string Password
@@ -57,7 +54,7 @@ public partial class WebConnection : BindableBase, ICloneable, IHaveDisplayName
     }
 
     [ObservableProperty, XmlAttribute, DefaultValue(null)]
-    public partial string? PasswordChecksum { get; set; } 
+    public partial string? PasswordChecksum { get; set; }
 
     [DefaultValue(""), XmlAttribute("Password")]
     public string EncryptedPassword
@@ -70,7 +67,7 @@ public partial class WebConnection : BindableBase, ICloneable, IHaveDisplayName
             {
                 using var encrypt = Aes.CreateEncryptor();
                 var bytes = Encoding.UTF8.GetBytes(Password);
-                result = Convert.ToBase64String(encrypt.TransformFinalBlock(bytes, 0, bytes.Length));
+                result = encrypt.TransformFinalBlock(bytes, 0, bytes.Length).ToBase64();
                 return result;
             }
             catch (PlatformNotSupportedException)
@@ -109,8 +106,14 @@ public partial class WebConnection : BindableBase, ICloneable, IHaveDisplayName
 
             string CalculateChecksum()
             {
-                var deriveBytes = Rfc2898DeriveBytes.Pbkdf2(Encoding.UTF8.GetBytes(Password), Aes.Key, IsSlowPlatform ? 256 : 131072, HashAlgorithmName.SHA256,8);
-                return Convert.ToBase64String(deriveBytes);
+                return Rfc2898DeriveBytes.Pbkdf2
+                (
+                    Encoding.UTF8.GetBytes(Password),
+                    Aes.Key,
+                    IsSlowPlatform ? 256 : 131072,
+                    HashAlgorithmName.SHA256,
+                    8
+                ).ToBase64();
             }
         }
     }

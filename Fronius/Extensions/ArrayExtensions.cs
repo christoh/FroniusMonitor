@@ -22,15 +22,15 @@ public static class ArrayExtensions
 
         return result;
     }
-    
+
     public static unsafe byte[] Xor(this byte[] first, long second)
     {
         if (first.Length < sizeof(long))
         {
             throw new ArgumentException($@"Array must be at least {sizeof(long)} bytes", nameof(first));
         }
-        
-        var result= new byte[first.Length];
+
+        var result = new byte[first.Length];
         Array.Copy(first, result, first.Length);
 
         fixed (byte* f = result)
@@ -40,4 +40,11 @@ public static class ArrayExtensions
 
         return result;
     }
+
+    public static string ToHexString(this Span<byte> bytes, bool lowerCase = true)
+    {
+        return lowerCase ? Convert.ToHexStringLower(bytes) : Convert.ToHexString(bytes);
+    }
+
+    public static string ToBase64(this Span<byte> bytes, Base64FormattingOptions options = Base64FormattingOptions.None) => Convert.ToBase64String(bytes, options);
 }

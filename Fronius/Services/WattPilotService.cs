@@ -4,12 +4,13 @@ namespace De.Hochstaetter.Fronius.Services;
 
 public partial class WattPilotService(SettingsBase settings) : BindableBase, IWattPilotService
 {
+    private readonly List<WattPilotAcknowledge> outstandingAcknowledges = [];
+    private readonly byte[] buffer = new byte[8192];
+
     private uint requestId;
     private CancellationTokenSource? tokenSource;
     private ClientWebSocket? clientWebSocket;
     private Thread? readThread;
-    private readonly List<WattPilotAcknowledge> outstandingAcknowledges = [];
-    private readonly byte[] buffer = new byte[8192];
     private string? hashedPassword;
     private string? oldEncryptedPassword;
     private WattPilot? savedWattPilot;
@@ -258,20 +259,15 @@ public partial class WattPilotService(SettingsBase settings) : BindableBase, IWa
     {
         var token1 = token["token1"]?.Value<string>();
         var token2 = token["token2"]?.Value<string>();
-        var token3Bytes = RandomNumberGenerator.GetBytes(16);
-
-        var token3 = string.Join(string.Empty, token3Bytes.Select(b => b.ToString("x2")));
+        var token3 = RandomNumberGenerator.GetHexString(32, true);
 
         var localHashedPassword = await GetHashedPassword().ConfigureAwait(false);
         Token.ThrowIfCancellationRequested();
 
-        var hash = await Task.Run(() =>
-        {
-            var hash1Input = Encoding.UTF8.GetBytes(token1 + localHashedPassword);
-            var hash1 = string.Join(string.Empty, SHA256.HashData(hash1Input).Select(b => b.ToString("x2")));
-            var hashInput = Encoding.UTF8.GetBytes(token3 + token2 + hash1);
-            return string.Join(string.Empty, SHA256.HashData(hashInput).Select(b => b.ToString("x2")));
-        }, Token).ConfigureAwait(false);
+        var hash1Input = Encoding.UTF8.GetBytes(token1 + localHashedPassword);
+        var hash1 = SHA256.HashData(hash1Input).ToHexString();
+        var hashInput = Encoding.UTF8.GetBytes(token3 + token2 + hash1);
+        var hash = SHA256.HashData(hashInput).ToHexString();
 
         Token.ThrowIfCancellationRequested();
 
@@ -307,16 +303,16 @@ public partial class WattPilotService(SettingsBase settings) : BindableBase, IWa
 
     private async ValueTask<string> GetHashedPassword()
     {
-        if (hashedPassword == null)
-        {
-            await Task.Run(() =>
-            {
-                var hash0 = Rfc2898DeriveBytes.Pbkdf2(Encoding.UTF8.GetBytes(Connection?.Password ?? string.Empty), Encoding.UTF8.GetBytes(WattPilot?.SerialNumber ?? string.Empty), 100000, HashAlgorithmName.SHA512, 24);
-                hashedPassword = Convert.ToBase64String(hash0);
-            }, Token).ConfigureAwait(false);
-        }
+        await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
 
-        return hashedPassword!;
+        return hashedPassword ??= Rfc2898DeriveBytes.Pbkdf2
+        (
+            Encoding.UTF8.GetBytes(Connection?.Password ?? string.Empty),
+            Encoding.UTF8.GetBytes(WattPilot?.SerialNumber ?? string.Empty),
+            100000,
+            HashAlgorithmName.SHA512,
+            24
+        ).ToBase64();
     }
 
     public async ValueTask Stop()
@@ -407,26 +403,30 @@ public partial class WattPilotService(SettingsBase settings) : BindableBase, IWa
             },
         }.ToString();
 
-        await Task.Run(() =>
+        if (instance.IsSecured.HasValue && instance.IsSecured.Value)
         {
-            if (instance.IsSecured.HasValue && instance.IsSecured.Value)
+            var hash = HMACSHA256.HashData
+            (
+                Encoding.UTF8.GetBytes(await GetHashedPassword().ConfigureAwait(false)),
+                Encoding.UTF8.GetBytes(data)
+            ).ToHexString();
+
+            var message = new JObject
             {
-                using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(GetHashedPassword().Result));
-                var hash = string.Join(string.Empty, hmac.ComputeHash(Encoding.UTF8.GetBytes(data)).Select(b => b.ToString("x2", CultureInfo.InvariantCulture)));
+                { "type", "securedMsg" },
+                { "data", data },
+                { "requestId", FormattableString.Invariant($"{id}sm") },
+                { "hmac", hash },
+            };
 
-                var message = new JObject
-                {
-                    { "type", "securedMsg" },
-                    { "data", data },
-                    { "requestId", FormattableString.Invariant($"{id}sm") },
-                    { "hmac", hash },
-                };
+            data = message.ToString();
+        }
 
-                data = message.ToString();
-            }
-        }, CancellationToken.None).ConfigureAwait(false);
+        if (clientWebSocket == null)
+        {
+            throw new WebSocketException(WebSocketError.ConnectionClosedPrematurely);
+        }
 
-        if (clientWebSocket == null) { throw new WebSocketException(WebSocketError.ConnectionClosedPrematurely); }
         await clientWebSocket.SendAsync(Encoding.UTF8.GetBytes(data), WebSocketMessageType.Text, true, Token).ConfigureAwait(false);
 
         lock (outstandingAcknowledges)
