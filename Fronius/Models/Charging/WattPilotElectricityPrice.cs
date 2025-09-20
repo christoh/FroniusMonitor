@@ -16,6 +16,7 @@ namespace De.Hochstaetter.Fronius.Models.Charging
         [WattPilot("start")]
         public partial long StartSeconds { get; set; }
 
+        [System.Text.Json.Serialization.JsonIgnore]
         [Newtonsoft.Json.JsonIgnore]
         public DateTime StartTime
         {
@@ -29,6 +30,7 @@ namespace De.Hochstaetter.Fronius.Models.Charging
         [WattPilot("end")]
         public partial long EndSeconds { get; set; }
 
+        [System.Text.Json.Serialization.JsonIgnore]
         [Newtonsoft.Json.JsonIgnore]
         public DateTime EndTime
         {

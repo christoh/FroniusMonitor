@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using De.Hochstaetter.Fronius.Models;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -71,6 +72,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
                     o.PayloadSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                     o.PayloadSerializerOptions.IgnoreReadOnlyProperties = true;
                     o.PayloadSerializerOptions.IgnoreReadOnlyFields = true;
+                    o.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
                 })
                 .Build();
 

@@ -7,6 +7,15 @@ namespace De.Hochstaetter.Fronius.Services.HomeAutomationClient;
 
 public sealed class WebClientService : IWebClientService
 {
+    private static readonly JsonSerializerOptions jsonOptions = new()
+    {
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
+        NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        IgnoreReadOnlyProperties = true,
+        IgnoreReadOnlyFields = true,
+    };
+
     private readonly HttpClient httpClient = new() { Timeout = TimeSpan.FromSeconds(7) };
 
     public void Initialize(string baseUri, string productName, string version)
@@ -97,7 +106,7 @@ public sealed class WebClientService : IWebClientService
                 {
                     return;
                 }
-                
+
                 inverter.Sensors.GeneratePowerFlow();
             });
         }
@@ -173,7 +182,7 @@ public sealed class WebClientService : IWebClientService
                 ? ApiResult<T>.FromProblemDetails(await GetErrors(responseMessage, token).ConfigureAwait(false), responseMessage.StatusCode)
                 : new ApiResult<T>
                 {
-                    Payload = await responseMessage.Content.ReadFromJsonAsync<T>(token).ConfigureAwait(false),
+                    Payload = await responseMessage.Content.ReadFromJsonAsync<T>(jsonOptions, token).ConfigureAwait(false),
                     Status = responseMessage.StatusCode,
                 };
         }
@@ -195,7 +204,7 @@ public sealed class WebClientService : IWebClientService
 
     private static async ValueTask<ProblemDetails?> GetErrors(HttpResponseMessage message, CancellationToken token)
     {
-        return await message.Content.ReadFromJsonAsync<ProblemDetails?>(token).ConfigureAwait(false);
+        return await message.Content.ReadFromJsonAsync<ProblemDetails?>(jsonOptions, token).ConfigureAwait(false);
     }
 
     public void Dispose()

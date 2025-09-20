@@ -1,6 +1,4 @@
-﻿using System.IO.Compression;
-using System.Text.Json.Serialization;
-using De.Hochstaetter.Fronius.Crypto;
+﻿using De.Hochstaetter.Fronius.Crypto;
 using De.Hochstaetter.HomeAutomationServer.Hubs;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using De.Hochstaetter.HomeAutomationServer.Services;
@@ -10,6 +8,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.ResponseCompression;
 using Serilog.Sinks.SystemConsole.Themes;
+using System.IO.Compression;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using AuthenticationService = De.Hochstaetter.HomeAutomationServer.Services.AuthenticationService;
 using Settings = De.Hochstaetter.HomeAutomationServer.Models.Settings.Settings;
 
@@ -164,6 +165,7 @@ internal class Program
                 o.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                 o.JsonSerializerOptions.IgnoreReadOnlyProperties = true;
                 o.JsonSerializerOptions.IgnoreReadOnlyFields = true;
+                o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)) ;
             });
 
         builder.Services.AddOpenApi();
@@ -175,6 +177,7 @@ internal class Program
                 o.PayloadSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                 o.PayloadSerializerOptions.IgnoreReadOnlyProperties = true;
                 o.PayloadSerializerOptions.IgnoreReadOnlyFields = true;
+                o.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)) ;
             });
 
         //builder.Services.AddAuthentication()

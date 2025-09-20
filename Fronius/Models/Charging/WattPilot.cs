@@ -114,6 +114,7 @@ public partial class WattPilot : BindableBase, IHaveDisplayName, IHaveUniqueId, 
     [WattPilot("map", false, typeof(byte[]))]
     public partial byte[]? Map { get; set; }
 
+    [System.Text.Json.Serialization.JsonIgnore]
     public WattPilotPhaseMap? PhaseMap
     {
         get => Map == null ? null : new(Map[0], Map[1], Map[2]);
@@ -755,7 +756,7 @@ public partial class WattPilot : BindableBase, IHaveDisplayName, IHaveUniqueId, 
     [WattPilot("pdlo", false)]
     public partial int? AllowChargingFromBatteryStopSeconds { get; set; }
 
-
+    [System.Text.Json.Serialization.JsonIgnore]
     public string AllowChargingFromBatteryStartString
     {
         get => $"{AllowChargingFromBatteryStartSeconds / 3600:D2}:{AllowChargingFromBatteryStartSeconds % 3600 / 60:D2}";
@@ -766,6 +767,7 @@ public partial class WattPilot : BindableBase, IHaveDisplayName, IHaveUniqueId, 
         }
     }
 
+    [System.Text.Json.Serialization.JsonIgnore]
     public string AllowChargingFromBatteryStopString
     {
         get => $"{AllowChargingFromBatteryStopSeconds / 3600:D2}:{AllowChargingFromBatteryStopSeconds % 3600 / 60:D2}";
@@ -801,6 +803,7 @@ public partial class WattPilot : BindableBase, IHaveDisplayName, IHaveUniqueId, 
     [WattPilot("fot", false)]
     public partial int? OhmPilotTemperatureLimitCelsius { get; set; }
 
+    [System.Text.Json.Serialization.JsonIgnore]
     public double? OhmPilotTemperatureLimitFahrenheit
     {
         get => OhmPilotTemperatureLimitCelsius * 1.8 + 32;

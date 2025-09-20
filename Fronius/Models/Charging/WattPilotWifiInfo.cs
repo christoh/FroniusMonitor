@@ -33,11 +33,19 @@ public partial class WattPilotWifiInfo : BindableBase, IHaveDisplayName
     [WattPilot("n")]
     public partial bool? IsN { get; set; }
 
+    [System.Text.Json.Serialization.JsonIgnore]
+    public IPAddress? IpV4Address
+    {
+        get => string.IsNullOrWhiteSpace(IpV4AddressString) ? null : IPAddress.Parse(IpV4AddressString);
+        set => IpV4AddressString = value?.ToString();
+    }
+
     [ObservableProperty]
-    [JsonProperty("ip")]
-    //[System.Text.Json.Serialization.JsonIgnore]
+    [NotifyPropertyChangedFor(nameof(IpV4Address))]
+    [JsonPropertyName("ipV4Address")]
     [WattPilot("ip")]
-    public partial IPAddress? IpV4Address { get; set; }
+    [JsonProperty("ip")]
+    public partial string? IpV4AddressString { get; set; }
 
     [ObservableProperty]
     [WattPilot("f", 9)]
@@ -92,6 +100,7 @@ public partial class WattPilotWifiInfo : BindableBase, IHaveDisplayName
     [ObservableProperty]
     [JsonProperty("bssid")]
     [WattPilot("bssid")]
+    [JsonPropertyName("macAddress")]
     public partial string? MacAddressString { get; set; }
 
     [ObservableProperty]
@@ -99,43 +108,62 @@ public partial class WattPilotWifiInfo : BindableBase, IHaveDisplayName
     [WattPilot("rssi")]
     public partial int? WifiSignal { get; set; }
 
-    [ObservableProperty]
-    [JsonProperty("netmask")]
-    [WattPilot("netmask")]
-    public partial IPAddress? NetMask { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore]
+    public IPAddress? NetMask
+    {
+        get => !string.IsNullOrWhiteSpace(NetMaskString) ? IPAddress.Parse(NetMaskString) : null;
+        set => NetMaskString = value?.ToString();
+    }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(NetMask))]
+    [JsonPropertyName("netMask")]
+    [JsonProperty("netmask")]
+    [WattPilot("netmask")]
+    public partial string? NetMaskString { get; set; }
+
+    [System.Text.Json.Serialization.JsonIgnore]
+    public IPAddress? Gateway
+    {
+        get => !string.IsNullOrWhiteSpace(GatewayString) ? IPAddress.Parse(GatewayString) : null;
+        set => GatewayString = value?.ToString();
+    }
+
+    [ObservableProperty]
+    [JsonPropertyName("gateway")]
+    [NotifyPropertyChangedFor(nameof(Gateway))]
     [JsonProperty("gw")]
     [WattPilot("gw")]
-    public partial IPAddress? Gateway { get; set; }
+    public partial string? GatewayString { get; set; }
+
 
     public string Type
     {
         get
         {
-                var isFirst = true;
-                var builder = new StringBuilder(10);
-                builder.Append("802.11 ");
-                Add(IsB, 'b');
-                Add(IsG, 'g');
-                Add(IsN, 'n');
+            var isFirst = true;
+            var builder = new StringBuilder(10);
+            builder.Append("802.11 ");
+            Add(IsB, 'b');
+            Add(IsG, 'g');
+            Add(IsN, 'n');
 
-                return builder.ToString();
+            return builder.ToString();
 
-                void Add(bool? hasIt, char name)
+            void Add(bool? hasIt, char name)
+            {
+                if (hasIt is true)
                 {
-                    if (hasIt is true)
+                    if (!isFirst)
                     {
-                        if (!isFirst)
-                        {
-                            builder.Append('/');
-                        }
-
-                        builder.Append(name);
-                        isFirst = false;
+                        builder.Append('/');
                     }
+
+                    builder.Append(name);
+                    isFirst = false;
                 }
             }
+        }
     }
 
     public override string ToString() => Ssid ?? Resources.HiddenWifi;
