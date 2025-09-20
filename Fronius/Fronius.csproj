@@ -13,7 +13,6 @@
 		<NoWarn>1701;1702;IDE0079;NU1803;CS7035;NU1900;CA1873</NoWarn>
 	</PropertyGroup>
 
-
 	<ItemGroup>
 		<None Include="..\.editorconfig" Link=".editorconfig" />
 	</ItemGroup>
