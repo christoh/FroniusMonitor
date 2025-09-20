@@ -1,0 +1,24 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="docker-compose.yml" />
+    <File Path="tounix.sh" />
+  </Folder>
+  <Project Path="Fronius/Fronius.csproj" />
+  <Project Path="FroniusMonitor/FroniusMonitor.csproj" />
+  <Project Path="FroniusPhone/FroniusPhone.csproj">
+    <Deploy />
+  </Project>
+  <Project Path="FroniusUnitTests/FroniusUnitTests.csproj" />
+  <Project Path="HomeAutomationClient/HomeAutomationClient.Android/HomeAutomationClient.Android.csproj">
+    <Deploy />
+  </Project>
+  <Project Path="HomeAutomationClient/HomeAutomationClient.Browser/HomeAutomationClient.Browser.csproj" />
+  <Project Path="HomeAutomationClient/HomeAutomationClient.Desktop/HomeAutomationClient.Desktop.csproj" />
+  <Project Path="HomeAutomationClient/HomeAutomationClient.iOS/HomeAutomationClient.iOS.csproj">
+    <Deploy />
+  </Project>
+  <Project Path="HomeAutomationClient/HomeAutomationClient/HomeAutomationClient.csproj" />
+  <Project Path="HomeAutomationServer/HomeAutomationServer.csproj" />
+</Solution>

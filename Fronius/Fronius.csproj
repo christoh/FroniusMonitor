@@ -26,7 +26,6 @@
 		<PackageReference Include="Microsoft.Azure.Devices.Client" Version="1.42.3" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.0-rc.1.25451.107" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-		<PackageReference Include="System.IO.Packaging" Version="9.0.9" />
 	</ItemGroup>
 
 	<ItemGroup>
