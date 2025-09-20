@@ -4,7 +4,7 @@
 // Algorithm must be SHA256 (bug in 1.38.6-1), SHA-256 or MD5
 // qop must be auth (auth-int and none are not supported)
 
-public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
+public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDuration) : IDisposable, IAsyncDisposable
 {
     private enum HashAlgorithm
     {
@@ -14,12 +14,9 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
     }
 
     private readonly Lock hashLock = new();
-    private readonly HttpClient httpClient;
-    private readonly WebConnection connection;
-    private readonly TimeSpan cnonceDuration;
 
     private HashAlgorithm hashAlgorithm = HashAlgorithm.None;
-    private string? ha1;
+    private string? hashA1;
     private string? realm;
     private string? nonce;
     private string? opaque;
@@ -29,33 +26,47 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
     private DateTime cnonceDate;
     private uint nc;
 
-    public DigestAuthHttp(WebConnection connection) : this(connection, new TimeSpan(0, 0, 1, 0)) { }
+    public DigestAuthHttp(WebConnection connection) : this(connection, TimeSpan.FromMinutes(1)) { }
 
-    public DigestAuthHttp(WebConnection connection, TimeSpan cnonceDuration)
+    [field: AllowNull, MaybeNull]
+    private HttpClient HttpClient
     {
-        this.connection = connection;
-        this.cnonceDuration = cnonceDuration;
+        get
+        {
+            if (field == null)
+            {
+                lock (hashLock)
+                {
+                    field = new()
+                    {
+                        BaseAddress = new(connection.BaseUrl),
+                    };
 
-        httpClient = new HttpClient();
-        httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("HomeAutomationClient", "1.0"));
-        httpClient.BaseAddress = new Uri(connection.BaseUrl);
+                    field.DefaultRequestHeaders.UserAgent.Add(new("HomeAutomationClient", "1.0"));
+                }
+            }
+
+            return field;
+        }
+
+        set;
     }
 
     ~DigestAuthHttp() => Dispose();
 
+    #pragma warning disable CA1816
     public void Dispose()
     {
-        httpClient.Dispose();
-        GC.SuppressFinalize(this);
+        HttpClient.Dispose();
+        HttpClient = null!;
     }
 
-#pragma warning disable CA1816 // GC.SuppressFinalize(this) is guaranteed to be called in Dispose()
     public async ValueTask DisposeAsync()
     {
         await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
         Dispose();
     }
-#pragma warning restore CA1816
+    #pragma warning restore CA1816
 
     public async ValueTask<(JToken, HttpStatusCode)> GetJsonToken(string url, JToken? jToken, IEnumerable<HttpStatusCode>? allowedStatusCodes = null, CancellationToken token = default)
     {
@@ -114,7 +125,7 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
 
         lock (hashLock)
         {
-            ha1 = null;
+            hashA1 = null;
             response.Dispose();
             realm = GetAuthHeaderToken("realm") ?? string.Empty;
             nonce = GetAuthHeaderToken("nonce") ?? string.Empty;
@@ -186,9 +197,9 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
 
             string CreateDigestParameters()
             {
-                ha1 ??= CalculateHash($"{connection.UserName}:{realm}:{connection.Password}");
-                var ha2 = CalculateHash($"{request.Method.Method}:{request.RequestUri?.OriginalString}");
-                var digestResponse = CalculateHash($"{ha1}:{nonce}:{++nc:x8}:{cnonce}:auth:{ha2}");
+                hashA1 ??= CalculateHash($"{connection.UserName}:{realm}:{connection.Password}");
+                var hashA2 = CalculateHash($"{request.Method.Method}:{request.RequestUri?.OriginalString}");
+                var digestResponse = CalculateHash($"{hashA1}:{nonce}:{++nc:x8}:{cnonce}:auth:{hashA2}");
 
                 return $"username=\"{connection.UserName}\", " +
                        $"realm=\"{realm}\", nonce=\"{nonce}\", " +
@@ -230,6 +241,6 @@ public sealed class DigestAuthHttp : IDisposable, IAsyncDisposable
 
     private Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken token)
     {
-        return httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);
+        return HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);
     }
 }
