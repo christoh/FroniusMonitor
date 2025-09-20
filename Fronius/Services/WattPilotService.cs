@@ -16,6 +16,8 @@ public partial class WattPilotService(SettingsBase settings) : BindableBase, IWa
     private WattPilot? savedWattPilot;
 
     public event EventHandler<NewWattPilotFirmwareEventArgs>? NewFirmwareAvailable;
+    public event EventHandler<WattPilotServiceStoppedEventArgs>? OnLostConnection;
+    public event EventHandler<WattPilotUpdateEventArgs>? OnUpdate;
 
     private CancellationToken Token => tokenSource?.Token ?? throw new WebSocketException(WebSocketError.ConnectionClosedPrematurely);
 
@@ -444,7 +446,8 @@ public partial class WattPilotService(SettingsBase settings) : BindableBase, IWa
 
         foreach (var token in jObject)
         {
-            //Debug.Print($"{token.Key}: {token.Value?.ToString().Replace("\r", "").Replace("\n", "")}");
+            _ = Task.Run(() => OnUpdate?.Invoke(this, new(token.Key, token.Value?.ToString())), tokenSource?.Token ?? CancellationToken.None);
+            // Debug.Print($"{token.Key}: {token.Value?.ToString().Replace("\r", "").Replace("\n", "")}");
             var propertyInfos = instance.GetType().GetProperties().Where(p => p.GetCustomAttributes<WattPilotAttribute>().Any(a => a.TokenName == token.Key)).ToArray();
 
             switch (propertyInfos.Length)
@@ -584,7 +587,9 @@ public partial class WattPilotService(SettingsBase settings) : BindableBase, IWa
 
             WattPilot = null;
             readThread = null;
+            var connection = Connection?.Clone() as WebConnection;
             Connection = null;
+            _ = Task.Run(() => OnLostConnection?.Invoke(this, new WattPilotServiceStoppedEventArgs(savedWattPilot, connection)), CancellationToken.None);
         }
     }
 }

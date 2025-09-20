@@ -10,3 +10,7 @@ public record DeviceUpdateEventArgs(string Id, ManagedDevice Device, DeviceActio
 public record SettingsChangedEventArgs(object? Parameters);
 
 public record NewWattPilotFirmwareEventArgs(Version CurrentFirmware, Version NewFirmware, string Name, string SerialNumber);
+
+public record WattPilotServiceStoppedEventArgs(WattPilot? WattPilot, WebConnection? WebConnection);
+
+public record WattPilotUpdateEventArgs(string Token, string? Value);
