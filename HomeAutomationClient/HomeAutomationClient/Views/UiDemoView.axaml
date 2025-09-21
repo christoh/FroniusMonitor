@@ -79,7 +79,7 @@
 									<DataTemplate>
 										<c:InverterControl ColorAllTicks="{Binding Path=((vm:UiDemoViewModel)DataContext).ColorAllTicks, FallbackValue={x:False}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
 														   Height="250"
-														   Inverter="{Binding Inverter}"
+														   Inverter="{Binding Device}"
 														   DeviceKey="{Binding Key}"
 														   Margin="8" />
 									</DataTemplate>

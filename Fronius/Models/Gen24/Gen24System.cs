@@ -34,7 +34,6 @@ public partial class Gen24System : BindableBase, IHaveDisplayName, IHaveUniqueId
         ArgumentNullException.ThrowIfNull(other, nameof(other));
         Config = other.Config;
         Sensors = other.Sensors;
-        Sensors?.GeneratePowerFlow();
         Refresh();
     }
 

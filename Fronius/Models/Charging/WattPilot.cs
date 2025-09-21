@@ -490,7 +490,7 @@ public partial class WattPilot : BindableBase, IHaveDisplayName, IHaveUniqueId, 
     ///     <see cref="AbsoluteMaximumChargingCurrent" />
     /// </summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(MaximumChargingCurrentPossible),nameof(MaximumChargingCurrentPossiblePerPhase),nameof(MaximumChargingPowerPossibleSum))]
+    [NotifyPropertyChangedFor(nameof(MaximumChargingCurrentPossible), nameof(MaximumChargingCurrentPossiblePerPhase), nameof(MaximumChargingPowerPossibleSum))]
     [WattPilot("amp", false)]
     public partial byte? MaximumChargingCurrent { get; set; }
 
@@ -629,7 +629,7 @@ public partial class WattPilot : BindableBase, IHaveDisplayName, IHaveUniqueId, 
     /// </summary>
     [ObservableProperty]
     [WattPilot("cbl")]
-    [NotifyPropertyChangedFor(nameof(MaximumChargingCurrentPossible),nameof(MaximumChargingCurrentPossiblePerPhase),nameof(MaximumChargingPowerPossibleSum))]
+    [NotifyPropertyChangedFor(nameof(MaximumChargingCurrentPossible), nameof(MaximumChargingCurrentPossiblePerPhase), nameof(MaximumChargingPowerPossibleSum))]
     public partial byte? CableCurrentMaximum { get; set; }
 
     /// <summary>
@@ -645,8 +645,8 @@ public partial class WattPilot : BindableBase, IHaveDisplayName, IHaveUniqueId, 
     [ObservableProperty]
     [NotifyPropertyChangedFor
     (
-        nameof(AllowPauseAndHasPhaseSwitch),nameof(ChargingPhases),nameof(MaximumChargingCurrentPossible),
-        nameof(MaximumChargingCurrentPossiblePerPhase),nameof(MaximumChargingPowerPossibleSum)
+        nameof(AllowPauseAndHasPhaseSwitch), nameof(ChargingPhases), nameof(MaximumChargingCurrentPossible),
+        nameof(MaximumChargingCurrentPossiblePerPhase), nameof(MaximumChargingPowerPossibleSum)
     )]
     [WattPilot("psm", false)]
     public partial PhaseSwitchMode? PhaseSwitchMode { get; set; }
@@ -913,6 +913,14 @@ public partial class WattPilot : BindableBase, IHaveDisplayName, IHaveUniqueId, 
         }
 
         return result;
+    }
+
+    public void CopyFrom(WattPilot other)
+    {
+        foreach (var property in typeof(WattPilot).GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.CanWrite /*&& p.GetCustomAttribute<ObservablePropertyAttribute>() != null*/))
+        {
+            property.SetValue(this, property.GetValue(other));
+        }
     }
 
     public static WattPilot Parse(JToken token)

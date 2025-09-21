@@ -2,24 +2,19 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using De.Hochstaetter.Fronius.Models;
+using De.Hochstaetter.Fronius.Models.Charging;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 
 public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewModelBase, IAsyncDisposable, IDisposable
 {
-    public class KeyedInverter
+    public class KeyedDevice<T>
     {
         public required string Key { get; init; }
-
-        public required Gen24System Inverter { get; init; }
+        public required T Device { get; init; }
     }
 
-    public class KeyedFritzBoxDevice
-    {
-        public required string Key { get; init; }
-        public required FritzBoxDevice Device { get; init; }
-    }
 
     private HubConnection? hubConnection;
 
@@ -27,10 +22,13 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
     public partial bool ColorAllTicks { get; set; } = true;
 
     [ObservableProperty]
-    public partial ObservableCollection<KeyedInverter> Inverters { get; set; } = [];
+    public partial ObservableCollection<KeyedDevice<Gen24System>> Inverters { get; set; } = [];
 
     [ObservableProperty]
-    public partial ObservableCollection<KeyedFritzBoxDevice> FritzBoxDevices { get; set; } = [];
+    public partial ObservableCollection<KeyedDevice<FritzBoxDevice>> FritzBoxDevices { get; set; } = [];
+
+    [ObservableProperty]
+    public partial ObservableCollection<KeyedDevice<WattPilot>> WattPilots { get; set; } = [];
 
     [ObservableProperty]
     public partial Gen24PowerMeter3P? SmartMeter { get; set; }
@@ -79,6 +77,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
             await hubConnection.StartAsync();
             hubConnection.On<string, Gen24System>(nameof(Gen24System), OnGen24Update);
             hubConnection.On<string, FritzBoxDevice>(nameof(FritzBoxDevice), OnFritzBoxUpdate);
+            hubConnection.On<string, WattPilot>(nameof(WattPilot), OnWattPilotUpdate);
         }
         finally
         {
@@ -111,6 +110,30 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
     ~UiDemoViewModel() => Dispose();
 
+    private void OnWattPilotUpdate(string id, WattPilot wattPilot)
+    {
+        try
+        {
+            var existingDevice = WattPilots.FirstOrDefault(i => i.Key == id);
+
+            if (existingDevice == null)
+            {
+                Dispatcher.UIThread.Invoke(() =>
+                {
+                    WattPilots.Add(new KeyedDevice<WattPilot> { Device = wattPilot, Key = id });
+                });
+            }
+            else
+            {
+                existingDevice.Device.CopyFrom(wattPilot);
+            }
+        }
+        catch
+        {
+            // Ignore errors
+        }
+    }
+
     private void OnGen24Update(string id, Gen24System gen24System)
     {
         try
@@ -121,33 +144,33 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
             if (inverter == null)
             {
-                inverter = new KeyedInverter { Key = id, Inverter = gen24System };
+                inverter = new KeyedDevice<Gen24System> { Key = id, Device = gen24System };
 
                 Dispatcher.UIThread.Invoke(() =>
                 {
-                    Inverters = new(Inverters.Append(inverter).OrderBy(i => i.Inverter.Config?.InverterSettings?.SystemName));
+                    Inverters = new(Inverters.Append(inverter).OrderBy(i => i.Device.Config?.InverterSettings?.SystemName));
                     NotifyOfPropertyChange(nameof(ShowInverters));
                 });
             }
             else
             {
-                inverter.Inverter.CopyFrom(gen24System);
+                inverter.Device.CopyFrom(gen24System);
             }
 
-            if (inverter.Inverter.Sensors is { Storage: not null, PrimaryPowerMeter: not null })
+            if (inverter.Device.Sensors is { Storage: not null, PrimaryPowerMeter: not null })
             {
-                Gen24Config = inverter.Inverter.Config;
-                MeterStatus = inverter.Inverter.Sensors.MeterStatus;
-                SmartMeter = inverter.Inverter.Sensors.PrimaryPowerMeter;
-                BatteryGen24System = inverter.Inverter;
+                Gen24Config = inverter.Device.Config;
+                MeterStatus = inverter.Device.Sensors.MeterStatus;
+                SmartMeter = inverter.Device.Sensors.PrimaryPowerMeter;
+                BatteryGen24System = inverter.Device;
             }
 
-            SitePowerFlow.SolarPower = Inverters.Sum(i => i.Inverter.Sensors?.PowerFlow?.SolarPower ?? 0);
-            SitePowerFlow.GridPower = Inverters.Sum(i => i.Inverter.Sensors?.PowerFlow?.GridPower ?? 0);
-            SitePowerFlow.StoragePower = Inverters.Sum(i => i.Inverter.Sensors?.PowerFlow?.StoragePower ?? 0);
-            SitePowerFlow.LoadPower = Inverters.Sum(i => i.Inverter.Sensors?.PowerFlow?.LoadPower ?? 0);
-            SitePowerFlow.InverterAcPower = Inverters.Sum(i => i.Inverter.Sensors?.PowerFlow?.InverterAcPower ?? 0);
-            SitePvPeakPower = Inverters.Sum(i => (i.Inverter.Config?.InverterSettings?.Mppt?.Mppt1?.WattPeak + i.Inverter.Config?.InverterSettings?.Mppt?.Mppt2?.WattPeak) ?? 0);
+            SitePowerFlow.SolarPower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.SolarPower ?? 0);
+            SitePowerFlow.GridPower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.GridPower ?? 0);
+            SitePowerFlow.StoragePower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.StoragePower ?? 0);
+            SitePowerFlow.LoadPower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.LoadPower ?? 0);
+            SitePowerFlow.InverterAcPower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.InverterAcPower ?? 0);
+            SitePvPeakPower = Inverters.Sum(i => (i.Device.Config?.InverterSettings?.Mppt?.Mppt1?.WattPeak + i.Device.Config?.InverterSettings?.Mppt?.Mppt2?.WattPeak) ?? 0);
         }
         catch
         {
@@ -168,7 +191,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
         {
             _ = Dispatcher.UIThread.InvokeAsync(() =>
             {
-                FritzBoxDevices = new(FritzBoxDevices.Append(new KeyedFritzBoxDevice { Key = id, Device = fritzBoxDevice }).OrderBy(d => d.Device.DisplayName));
+                FritzBoxDevices = new(FritzBoxDevices.Append(new KeyedDevice<FritzBoxDevice> { Key = id, Device = fritzBoxDevice }).OrderBy(d => d.Device.DisplayName));
                 NotifyOfPropertyChange(nameof(ShowPowerConsumers));
             });
         }
