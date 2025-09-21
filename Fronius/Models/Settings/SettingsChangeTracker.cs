@@ -1,6 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Models.Events;
-
-namespace De.Hochstaetter.Fronius.Models.Settings;
+﻿namespace De.Hochstaetter.Fronius.Models.Settings;
 
 public class SettingsChangeTracker
 {

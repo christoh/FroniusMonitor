@@ -10,10 +10,12 @@ public sealed class WebClientService : IWebClientService
     private static readonly JsonSerializerOptions jsonOptions = new()
     {
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         IgnoreReadOnlyProperties = true,
         IgnoreReadOnlyFields = true,
+        IncludeFields = false,
     };
 
     private readonly HttpClient httpClient = new() { Timeout = TimeSpan.FromSeconds(7) };
@@ -91,12 +93,21 @@ public sealed class WebClientService : IWebClientService
     }
 
     #endregion
+    
+    #region WattPilot
+    public async Task<ApiResult<Dictionary<string, WattPilot>>> GetWattPilots(CancellationToken token = default)
+    {
+        var result = await GetResult<Dictionary<string, WattPilot>>("WattPilot", token);
+        return result;
+    }
+    
+    #endregion
 
     #region Gen24
 
-    public async Task<ApiResult<IDictionary<string, Gen24System>>> GetGen24Devices(CancellationToken token = default)
+    public async Task<ApiResult<Dictionary<string, Gen24System>>> GetGen24Devices(CancellationToken token = default)
     {
-        var result = await GetResult<IDictionary<string, Gen24System>>("Gen24System", token);
+        var result = await GetResult<Dictionary<string, Gen24System>>("Gen24System", token);
 
         if (result is { Status: HttpStatusCode.OK, Payload: not null })
         {

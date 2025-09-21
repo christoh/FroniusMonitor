@@ -1,6 +1,8 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using De.Hochstaetter.Fronius.Extensions;
 using De.Hochstaetter.Fronius.Models;
 using De.Hochstaetter.Fronius.Models.Charging;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -15,7 +17,6 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
         public required T Device { get; init; }
     }
 
-
     private HubConnection? hubConnection;
 
     [ObservableProperty]
@@ -29,6 +30,9 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
     [ObservableProperty]
     public partial ObservableCollection<KeyedDevice<WattPilot>> WattPilots { get; set; } = [];
+
+    [ObservableProperty]
+    public partial List<KeyedDevice<ConcurrentQueue<WattPilotUpdate>>> WattPilotUpdates { get; set; } = [];
 
     [ObservableProperty]
     public partial Gen24PowerMeter3P? SmartMeter { get; set; }
@@ -59,6 +63,27 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
             BusyText = Loc.ConnectingToHas;
             await base.Initialize();
 
+            //var wattPilotResult = await webClient.GetWattPilots().ConfigureAwait(false);
+
+            //if (wattPilotResult.Payload is { } wattPilots)
+            //{
+            //    WattPilots = new ObservableCollection<KeyedDevice<WattPilot>>(wattPilots.Select(wp => new KeyedDevice<WattPilot> { Device = wp.Value, Key = wp.Key }));
+            //}
+
+            //var gen24Result = await webClient.GetGen24Devices().ConfigureAwait(false);
+
+            //if (gen24Result.Payload is { } gen24Systems)
+            //{
+            //    Inverters = new ObservableCollection<KeyedDevice<Gen24System>>(gen24Systems.Select(wp => new KeyedDevice<Gen24System> { Device = wp.Value, Key = wp.Key }));
+            //}
+
+            //var fritzBoxResult = await webClient.GetFritzBoxDevices().ConfigureAwait(false);
+
+            //if (fritzBoxResult.Payload is { } fritzBoxDevices)
+            //{
+            //    FritzBoxDevices = new ObservableCollection<KeyedDevice<FritzBoxDevice>>(fritzBoxDevices.Select(wp => new KeyedDevice<FritzBoxDevice> { Device = wp.Value, Key = wp.Key }));
+            //}
+
             var hubUri = IoC.TryGetRegistered<ICache>()?.Get<string>(CacheKeys.HubUri) ?? "http://www.example.com/hub";
 
             hubConnection = new HubConnectionBuilder()
@@ -74,7 +99,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
                 })
                 .Build();
 
-            await hubConnection.StartAsync();
+            await hubConnection.StartAsync().ConfigureAwait(false);
             hubConnection.On<string, Gen24System>(nameof(Gen24System), OnGen24Update);
             hubConnection.On<string, FritzBoxDevice>(nameof(FritzBoxDevice), OnFritzBoxUpdate);
             hubConnection.On<string, WattPilot>(nameof(WattPilot), OnWattPilotUpdate);
@@ -111,9 +136,50 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
     ~UiDemoViewModel() => Dispose();
 
-    private void OnWattPilotUpdateMessage(string id, WattPilotUpdate update)
+    private async void OnWattPilotUpdateMessage(string id, WattPilotUpdate update)
     {
-        
+        try
+        {
+            var keyedQueue = WattPilotUpdates.FirstOrDefault(q => q.Key == id);
+
+            if (keyedQueue == null)
+            {
+                keyedQueue = new KeyedDevice<ConcurrentQueue<WattPilotUpdate>> { Key = id, Device = new ConcurrentQueue<WattPilotUpdate>() };
+                WattPilotUpdates.Add(keyedQueue);
+            }
+
+            keyedQueue.Device.Enqueue(update);
+
+            var existingDevice = WattPilots.FirstOrDefault(i => i.Device.SerialNumber == update.SerialNumber);
+
+            if (existingDevice == null)
+            {
+                var pilots = await webClient.GetWattPilots().ConfigureAwait(false);
+
+                if (pilots is { Status: HttpStatusCode.OK, Payload: { } wattPilots })
+                {
+                    WattPilots = new ObservableCollection<KeyedDevice<WattPilot>>(wattPilots.Select(wp => new KeyedDevice<WattPilot> { Device = wp.Value, Key = wp.Key }));
+                }
+
+                return;
+            }
+
+            while (!keyedQueue.Device.IsEmpty)
+            {
+                if (keyedQueue.Device.TryDequeue(out var result))
+                {
+                    existingDevice.Device.UpdateFromJsonString(result.JsonMessage);
+                }
+                else
+                {
+                    throw new InvalidOperationException("Cannot read update queue");
+                }
+            }
+        }
+        catch
+        {
+            // Ignore errors
+        }
     }
 
     private void OnWattPilotUpdate(string id, WattPilot wattPilot)
@@ -124,10 +190,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
             if (existingDevice == null)
             {
-                Dispatcher.UIThread.Invoke(() =>
-                {
-                    WattPilots.Add(new KeyedDevice<WattPilot> { Device = wattPilot, Key = id });
-                });
+                Dispatcher.UIThread.Invoke(() => { WattPilots.Add(new KeyedDevice<WattPilot> { Device = wattPilot, Key = id }); });
             }
             else
             {
@@ -176,7 +239,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
             SitePowerFlow.StoragePower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.StoragePower ?? 0);
             SitePowerFlow.LoadPower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.LoadPower ?? 0);
             SitePowerFlow.InverterAcPower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.InverterAcPower ?? 0);
-            SitePvPeakPower = Inverters.Sum(i => (i.Device.Config?.InverterSettings?.Mppt?.Mppt1?.WattPeak + i.Device.Config?.InverterSettings?.Mppt?.Mppt2?.WattPeak) ?? 0);
+            SitePvPeakPower = Inverters.Sum(i => i.Device.Config?.InverterSettings?.Mppt?.Mppt1?.WattPeak + i.Device.Config?.InverterSettings?.Mppt?.Mppt2?.WattPeak ?? 0);
         }
         catch
         {

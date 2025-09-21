@@ -1,5 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Models.Events;
-using Formatting = Newtonsoft.Json.Formatting;
+﻿using Formatting = Newtonsoft.Json.Formatting;
 
 namespace De.Hochstaetter.Fronius.Services.DataCollectors;
 

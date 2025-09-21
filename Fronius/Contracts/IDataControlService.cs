@@ -1,6 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Models.Events;
-
-namespace De.Hochstaetter.Fronius.Contracts;
+﻿namespace De.Hochstaetter.Fronius.Contracts;
 
 public interface IDataControlService
 {

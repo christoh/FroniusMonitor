@@ -1,8 +1,6 @@
-﻿using De.Hochstaetter.Fronius.Models.Events;
+﻿namespace De.Hochstaetter.Fronius.Services;
 
-namespace De.Hochstaetter.Fronius.Services;
-
-public partial class WattPilotService() : BindableBase, IWattPilotService
+public partial class WattPilotService : BindableBase, IWattPilotService
 {
     private readonly List<WattPilotAcknowledge> outstandingAcknowledges = [];
     private readonly byte[] buffer = new byte[8192];
@@ -232,7 +230,7 @@ public partial class WattPilotService() : BindableBase, IWattPilotService
 
     public void OpenConfigPdf()
     {
-        var link = $"{WattPilot?.DownloadLink?.Replace("export", "documentation")}&lang={(Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName ?? CultureInfo.CurrentUICulture.Name).Split('-')[0]}";
+        var link = $"{WattPilot?.DownloadLink?.Replace("export", "documentation")}&lang={(Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName).Split('-')[0]}";
         OpenLink(link);
     }
 
@@ -444,79 +442,12 @@ public partial class WattPilotService() : BindableBase, IWattPilotService
             return;
         }
 
-        ParseToken(instance, jObject);
+        instance.UpdateFromJObject(jObject);
 
         if (OnUpdate != null)
         {
             _ = Task.Run(() => OnUpdate(this, new(instance, jObject)), Token);
         }
-    }
-
-    public static void ParseToken(object instance, JObject jObject)
-    {
-        foreach (var token in jObject)
-        {
-            // Debug.Print($"{token.Key}: {token.Value?.ToString().Replace("\r", "").Replace("\n", "")}");
-            var propertyInfos = instance.GetType().GetProperties().Where(p => p.GetCustomAttributes<WattPilotAttribute>().Any(a => a.TokenName == token.Key)).ToArray();
-
-            switch (propertyInfos.Length)
-            {
-                case 0:
-                    continue;
-
-                case 1:
-                    SetWattPilotValue(instance, propertyInfos[0], token.Value);
-                    continue;
-            }
-
-            if (token.Value is JArray array)
-            {
-                foreach (var propertyInfo in propertyInfos)
-                {
-                    var attribute = propertyInfo.GetCustomAttributes<WattPilotAttribute>().SingleOrDefault(a => a.TokenName == token.Key);
-
-                    if (attribute?.Index >= 0 && attribute.Index < array.Count)
-                    {
-                        SetWattPilotValue(instance, propertyInfo, array[attribute.Index]);
-                    }
-                }
-            }
-        }
-    }
-
-    private static void SetWattPilotValue(object instance, PropertyInfo propertyInfo, JToken? token)
-    {
-        try
-        {
-            propertyInfo.SetValue(instance, token?.ToObject(propertyInfo.PropertyType));
-            return;
-        }
-        catch
-        {
-            //
-        }
-
-        if (token is JObject subObject)
-        {
-            var subInstance = Activator.CreateInstance(propertyInfo.PropertyType);
-
-            if (subInstance != null)
-            {
-                propertyInfo.SetValue(instance, subInstance);
-                ParseToken(subInstance, subObject);
-                return;
-            }
-        }
-
-        var stringValue = token?.Value<string>();
-
-        if (propertyInfo.PropertyType.IsAssignableFrom(typeof(IPAddress)))
-        {
-            propertyInfo.SetValue(instance, stringValue == null ? null : IPAddress.Parse(stringValue));
-            return;
-        }
-
-        Debugger.Break(); // Unhandled Json
     }
 
     private async void Reader()

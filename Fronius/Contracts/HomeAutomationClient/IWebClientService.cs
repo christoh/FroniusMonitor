@@ -32,7 +32,7 @@ public interface IWebClientService : IDisposable
     
     #region GEN24
 
-    Task<ApiResult<IDictionary<string, Gen24System>>> GetGen24Devices(CancellationToken token = default);
+    Task<ApiResult<Dictionary<string, Gen24System>>> GetGen24Devices(CancellationToken token = default);
 
     Task<ApiResult<JsonElement>> GetGen24Localization(string deviceId, string iso2LanguageCode, string name, CancellationToken token = default);
 
@@ -40,5 +40,11 @@ public interface IWebClientService : IDisposable
 
     Task<ApiResult<Gen24StandByStatus>> GetGen24StandbyStatus(string deviceId, CancellationToken token = default);
     
+    #endregion
+
+    #region WattPilot
+
+    Task<ApiResult<Dictionary<string, WattPilot>>> GetWattPilots(CancellationToken token = default);
+
     #endregion
 }

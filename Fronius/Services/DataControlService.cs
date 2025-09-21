@@ -1,6 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Models.Events;
-
-namespace De.Hochstaetter.Fronius.Services;
+﻿namespace De.Hochstaetter.Fronius.Services;
 
 public class DataControlService(ILogger<DataControlService> logger) : IDataControlService
 {

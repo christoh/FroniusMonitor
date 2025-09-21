@@ -12,7 +12,6 @@ using System.IO.Compression;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using AuthenticationService = De.Hochstaetter.HomeAutomationServer.Services.AuthenticationService;
-using Settings = De.Hochstaetter.HomeAutomationServer.Models.Settings.Settings;
 
 namespace De.Hochstaetter.HomeAutomationServer;
 

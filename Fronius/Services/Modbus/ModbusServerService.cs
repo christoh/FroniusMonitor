@@ -1,6 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Models.Events;
-
-namespace De.Hochstaetter.Fronius.Services.Modbus;
+﻿namespace De.Hochstaetter.Fronius.Services.Modbus;
 
 public class ModbusServerService(
     SettingsChangeTracker tracker,
