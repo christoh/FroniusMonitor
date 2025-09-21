@@ -168,7 +168,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
             {
                 if (keyedQueue.Device.TryDequeue(out var result))
                 {
-                    existingDevice.Device.UpdateFromJsonString(result.JsonMessage);
+                    existingDevice.Device.UpdateFromJson(result.JsonMessage);
                 }
                 else
                 {

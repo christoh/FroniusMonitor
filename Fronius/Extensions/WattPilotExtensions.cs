@@ -2,9 +2,9 @@
 
 public static class WattPilotExtensions
 {
-    public static void UpdateFromJObject(this WattPilot instance, JObject jObject) => ParseUpdateToken(instance, jObject);
+    public static void UpdateFromJson(this WattPilot instance, JObject jObject) => ParseUpdateToken(instance, jObject);
 
-    public static void UpdateFromJsonString(this WattPilot instance, string json) => ParseUpdateToken(instance, JObject.Parse(json));
+    public static void UpdateFromJson(this WattPilot instance, string json) => ParseUpdateToken(instance, JObject.Parse(json));
 
     private static void ParseUpdateToken(object instance, JObject jObject)
     {

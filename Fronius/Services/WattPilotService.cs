@@ -442,7 +442,7 @@ public partial class WattPilotService : BindableBase, IWattPilotService
             return;
         }
 
-        instance.UpdateFromJObject(jObject);
+        instance.UpdateFromJson(jObject);
 
         if (OnUpdate != null)
         {
