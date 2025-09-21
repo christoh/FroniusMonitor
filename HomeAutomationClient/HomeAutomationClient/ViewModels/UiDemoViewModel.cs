@@ -78,6 +78,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
             hubConnection.On<string, Gen24System>(nameof(Gen24System), OnGen24Update);
             hubConnection.On<string, FritzBoxDevice>(nameof(FritzBoxDevice), OnFritzBoxUpdate);
             hubConnection.On<string, WattPilot>(nameof(WattPilot), OnWattPilotUpdate);
+            hubConnection.On<string, WattPilotUpdate>(nameof(WattPilotUpdate), OnWattPilotUpdateMessage);
         }
         finally
         {
@@ -109,6 +110,11 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
     }
 
     ~UiDemoViewModel() => Dispose();
+
+    private void OnWattPilotUpdateMessage(string id, WattPilotUpdate update)
+    {
+        
+    }
 
     private void OnWattPilotUpdate(string id, WattPilot wattPilot)
     {

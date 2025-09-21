@@ -1,4 +1,6 @@
-﻿using De.Hochstaetter.Fronius.Models.Events;
+﻿using System.Diagnostics;
+using De.Hochstaetter.Fronius.Models.Charging;
+using De.Hochstaetter.Fronius.Models.Events;
 using De.Hochstaetter.HomeAutomationServer.Hubs;
 using Microsoft.AspNetCore.SignalR;
 
@@ -13,7 +15,10 @@ public sealed class SignalRDispatcher(
     public void Dispose()
     {
         controlService.DeviceUpdate -= OnDeviceUpdate;
+        GC.SuppressFinalize(this);
     }
+    
+    ~SignalRDispatcher() => Dispose();
 
     public async Task StartAsync(CancellationToken token = default)
     {
@@ -31,7 +36,7 @@ public sealed class SignalRDispatcher(
     {
         try
         {
-            if (e.DeviceAction is DeviceAction.Add or DeviceAction.Change)
+            if (e.DeviceAction is DeviceAction.Add or DeviceAction.Change && !e.Device.SupportsPushMessages)
             {
                 await hubContext.Clients.All.SendAsync(e.Device.Device.GetType().Name, e.Id, e.Device.Device).ConfigureAwait(false);
             }

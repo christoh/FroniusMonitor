@@ -64,15 +64,25 @@ public sealed class WattPilotDataCollector(
 
     private void OnUpdate(object? sender, WattPilotUpdateEventArgs e)
     {
-        logger.LogDebug("Wattpilot: {Token}", e.JObject.ToString(Formatting.None));
-
         if (sender is not IWattPilotService service)
         {
-            throw new InvalidCastException($"{nameof(sender)} must be {nameof(IWattPilotService)}");
+            logger.LogError("Sender must be {Sender}", nameof(IWattPilotService));
+            return;
         }
 
-        services[service].LastMessageReceived = DateTime.UtcNow;
-        dataControlService.AddOrUpdate(((IHaveUniqueId)e.WattPilot).Id, new ManagedDevice(e.WattPilot, services[service].Connection, typeof(IWattPilotService)));
+        try
+        {
+            var jsonMessage = e.JObject.ToString(Formatting.None);
+            logger.LogDebug("Wattpilot '{WattPilot}': {Token}", e.WattPilot.DisplayName, jsonMessage);
+            services[service].LastMessageReceived = DateTime.UtcNow;
+            var updateMessage = new WattPilotUpdate(e.WattPilot.SerialNumber ?? string.Empty, jsonMessage);
+            dataControlService.AddOrUpdate(((IHaveUniqueId)e.WattPilot).Id, new ManagedDevice(e.WattPilot, services[service].Connection, typeof(IWattPilotService), true));
+            dataControlService.AddOrUpdate(((IHaveUniqueId)updateMessage).Id, new ManagedDevice(updateMessage, services[service].Connection, typeof(IWattPilotService)));
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Unable to update WattPilot {WattPilot}", service.WattPilot?.DisplayName);
+        }
     }
 
     private async ValueTask StartServiceAsync(IWattPilotService service)

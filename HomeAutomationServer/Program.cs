@@ -79,6 +79,7 @@ internal class Program
         builder.Services
             .AddOptions()
             .AddTransient<IFritzBoxService, FritzBoxService>()
+            //.AddSingleton<HomeAutomationHub>()
             .AddTransient<IGen24Service, Gen24Service>()
             .AddSingleton<IGen24JsonService, Gen24JsonService>()
             .AddTransient<IWattPilotService, WattPilotService>()
