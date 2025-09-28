@@ -54,7 +54,7 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
 
     ~DigestAuthHttp() => Dispose();
 
-    #pragma warning disable CA1816
+#pragma warning disable CA1816
     public void Dispose()
     {
         HttpClient.Dispose();
@@ -66,7 +66,7 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
         await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
         Dispose();
     }
-    #pragma warning restore CA1816
+#pragma warning restore CA1816
 
     public async ValueTask<(JToken, HttpStatusCode)> GetJsonToken(string url, JToken? jToken, IEnumerable<HttpStatusCode>? allowedStatusCodes = null, CancellationToken token = default)
     {
@@ -109,10 +109,28 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
             CreateRequest();
         }
 
-        var response = await SendAsync(request, token).ConfigureAwait(false);
+        HttpResponseMessage response;
+
+        try
+        {
+            response = await SendAsync(request, token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException ex)
+        {
+            request.Dispose();
+
+            lock (hashLock)
+            {
+                HttpClient = null!;
+                CreateRequest();
+            }
+
+            response = await SendAsync(request, token).ConfigureAwait(false);
+        }
 
         if (response.StatusCode != HttpStatusCode.Unauthorized)
         {
+            request.Dispose();
             ThrowOnWrongStatusCode();
             return response;
         }
