@@ -115,7 +115,7 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
         {
             response = await SendAsync(request, token).ConfigureAwait(false);
         }
-        catch (OperationCanceledException ex)
+        catch (OperationCanceledException)
         {
             request.Dispose();
 
