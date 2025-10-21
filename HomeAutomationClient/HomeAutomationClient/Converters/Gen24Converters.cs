@@ -200,6 +200,15 @@ public class MeterDisplayMode2Bool : EqualityConverterBase<MeterDisplayMode, boo
     }
 }
 
+public class WattPilotDisplayMode2Bool : EqualityConverterBase<WattPilotDisplayMode, bool>
+{
+    public WattPilotDisplayMode2Bool(WattPilotDisplayMode value) : base(value)
+    {
+        Equal = true;
+        NotEqual = false;
+    }
+}
+
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public class InverterStatusLocalizeExtension : ConverterBase
 {

@@ -1,0 +1,97 @@
+<c:DeviceControlBase xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+             xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
+             xmlns:m="clr-namespace:De.Hochstaetter.HomeAutomationClient.Misc"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             mc:Ignorable="d" d:DesignWidth="220" d:DesignHeight="272"
+             x:Class="De.Hochstaetter.HomeAutomationClient.Controls.WattPilotControl">
+	<Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:WattPilotControl}}">
+		<Border BorderBrush="DimGray" BorderThickness="1" Width="110">
+			<Border.Styles>
+				<Style Selector="c|HalfCircleGauge">
+					<Setter Property="TickFill" Value="{DynamicResource TickFill}" />
+					<Setter Property="HandFill" Value="{DynamicResource HandFill}" />
+					<Setter Property="ColorAllTicks" Value="{Binding ColorAllTicks}"/>
+				</Style>
+			</Border.Styles>
+			<Grid x:Name="BackgroundProvider" RowDefinitions="Auto,Auto,Auto">
+				<Grid Grid.Row="0" RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*">
+					<Viewbox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" StretchDirection="DownOnly" Margin="2,0">
+						<TextBlock FontSize="8" TextAlignment="Center" Text="{Binding WattPilot.DeviceName, FallbackValue=---, TargetNullValue=???}" />
+					</Viewbox>
+					<Viewbox Grid.Row="1" Grid.Column="1" StretchDirection="DownOnly" Margin="2,0">
+						<TextBlock FontSize="8" TextAlignment="Center" Text="{Binding WattPilot.StatusDisplayName, FallbackValue=---, TargetNullValue=???}" />
+					</Viewbox>
+					<!--<c:WifiControl Grid.Row="1" Grid.Column="0" Fill="Black" SignalStrength="{Binding WifiSignal, FallbackValue=-200}" Height="5" Margin="4,1,-2,0" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                   IsConnected="{Binding WifiSignal, Converter={co:NullToBool}, FallbackValue=False}" />-->
+
+				</Grid>
+				<Border Grid.Row="1" x:Name="InnerBackgroundProvider" Width="100" Height="94" Margin="4" BorderThickness=".2" BorderBrush="Black">
+					<Grid>
+
+						<StackPanel x:Name="VoltageGauge" IsVisible="{Binding Mode, Converter={co:WattPilotDisplayMode2Bool VoltageGauge}}">
+                            <TextBlock Text="{x:Static p:Resources.GridHealth}" HorizontalAlignment="Center" FontSize="10" />
+                            <UniformGrid Rows="2" Columns="2" VerticalAlignment="Center" Margin="0,8,0,0">
+                                <UniformGrid.Resources>
+                                    <ControlTheme x:Key="Local" TargetType="c:HalfCircleGauge">
+                                        <Setter Property="Minimum" Value="207" />
+                                        <Setter Property="Maximum" Value="253" />
+										<Setter Property="AnimationDuration" Value="00:00:01.0"/>
+										<Setter Property="AnimationEasing" Value="LinearEasing"/>
+                                        <Setter Property="Origin" Value=".5" />
+                                        <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.MidIsGood}" />
+                                    </ControlTheme>
+                                </UniformGrid.Resources>
+
+                                <!-- ReSharper disable Xaml.RedundantAttachedProperty -->
+                                <c:HalfCircleGauge Grid.Row="0" Grid.Column="0" Margin="1" Theme="{StaticResource Local}"
+                                         Value="{Binding WattPilot.VoltageL1}" />
+
+								<c:HalfCircleGauge Grid.Row="0" Grid.Column="1" Margin="1" Theme="{StaticResource Local}"
+                                                   Value="{Binding WattPilot.VoltageL2}" />
+
+								<c:HalfCircleGauge Grid.Row="1" Grid.Column="0" Margin="1" Theme="{StaticResource Local}"
+                                                   Value="{Binding WattPilot.VoltageL3}" />
+
+								<c:HalfCircleGauge Grid.Row="1" Grid.Column="1" Margin="1" Minimum="49" Maximum="51" Theme="{StaticResource Local}"
+                                                   Value="{Binding WattPilot.Frequency}"
+                                                   StringFormat="N1" />
+                                <!-- ReSharper restore Xaml.RedundantAttachedProperty -->
+                            </UniformGrid>
+                        </StackPanel>
+
+
+						<Grid x:Name="PowerGauge" RowDefinitions="Auto,Auto,Auto" IsVisible="{Binding Mode, Converter={co:WattPilotDisplayMode2Bool PowerGauge}}">
+
+							<TextBlock FontSize="10" FontWeight="Normal" Text="{x:Static p:Resources.Power}" TextAlignment="Center" />
+
+							<TextBlock FontSize="10" FontWeight="Medium" Grid.Row="1" Margin="0,0,0,2"
+                                       Width="{Binding Bounds.Width, ElementName=PowerGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
+								<Run Text="{Binding WattPilot.PowerSumKiloWatts, StringFormat=N1}" />
+								<Run Text="kW" />
+							</TextBlock>
+
+							<c:HalfCircleGauge Value="{Binding WattPilot.PowerSum, FallbackValue=0, TargetNullValue=0, Mode=OneWay}"
+                                     Minimum="0" Grid.Row="2"
+                                     Maximum="{Binding WattPilot.MaximumChargingPowerPossibleSum, FallbackValue=16, TargetNullValue=16}"
+                                     GaugeColors="{x:Static m:GaugeColors.LowIsBad}"
+                                     Width="92" />
+
+						</Grid>
+					</Grid>
+				</Border>
+                <Viewbox Width="108" Grid.Row="2" StretchDirection="DownOnly" HorizontalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <RadioButton Classes="DeviceButton" IsChecked="True" Content="{x:Static p:Resources.Power}" Click="OnPowerClick" />
+                        <RadioButton Classes="DeviceButton" Content="{x:Static p:Resources.Voltage}" Click="OnVoltageClick" />
+                        <RadioButton Classes="DeviceButton" Content="{x:Static p:Resources.Current}" Click="OnCurrentClick" />
+                        <RadioButton Classes="DeviceButton" Content="{x:Static p:Resources.More}" Click="OnMoreClick" />
+                    </StackPanel>
+                </Viewbox>
+			</Grid>
+		</Border>
+	</Viewbox>
+</c:DeviceControlBase>

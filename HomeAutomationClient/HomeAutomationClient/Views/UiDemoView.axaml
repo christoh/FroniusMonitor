@@ -7,7 +7,7 @@
              xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
              xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
-             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="500"
+             mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="500"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.UiDemoView"
              x:DataType="vm:UiDemoViewModel">
 	<Grid RowDefinitions="*" x:Name="RootElement">
@@ -86,13 +86,31 @@
 								</ItemsControl.ItemTemplate>
 							</ItemsControl>
 						</HeaderedContentControl>
-						<HeaderedContentControl Classes="GroupBox" Header="Smart Meter" IsVisible="{Binding SmartMeter, Converter={co:Null2Bool}}">
-							<c:SmartMeterControl Height="250" VerticalAlignment="Top" Margin="8"
-												 MeterStatus="{Binding MeterStatus}"
-												 SmartMeter="{Binding SmartMeter}"
-												 Gen24Config="{Binding Gen24Config}"
-												 ColorAllTicks="{Binding ColorAllTicks}" />
-						</HeaderedContentControl>
+                        <HeaderedContentControl Classes="GroupBox" Header="Smart Meter" IsVisible="{Binding SmartMeter, Converter={co:Null2Bool}}">
+                            <c:SmartMeterControl Height="250" VerticalAlignment="Top" Margin="8"
+                                                 MeterStatus="{Binding MeterStatus}"
+                                                 SmartMeter="{Binding SmartMeter}"
+                                                 Gen24Config="{Binding Gen24Config}"
+                                                 ColorAllTicks="{Binding ColorAllTicks}" />
+                        </HeaderedContentControl>
+                        <HeaderedContentControl Classes="GroupBox" Header="Wattpilot" IsVisible="{Binding ShowWattPilots}" >
+                            <ItemsControl ItemsSource="{Binding WattPilots}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <c:WattPilotControl ColorAllTicks="{Binding Path=((vm:UiDemoViewModel)DataContext).ColorAllTicks, FallbackValue={x:False}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+                                                            Height="250"
+                                                            WattPilot="{Binding Device}"
+                                                            DeviceKey="{Binding Key}"
+                                                            Margin="8" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </HeaderedContentControl>
 						<HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.Battery}" IsVisible="{Binding BatteryGen24System, Converter={co:Null2Bool}}">
 							<c:EnergyStorageControl Height="250" VerticalAlignment="Top" Margin="8"
 													Gen24System="{Binding BatteryGen24System}"/>

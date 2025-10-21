@@ -54,6 +54,8 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
     public bool ShowInverters => Inverters.Count > 0;
 
+    public bool ShowWattPilots => WattPilots.Count > 0;
+
     public bool ShowPowerConsumers => FritzBoxDevices.Count > 0;
 
     public override async Task Initialize()
@@ -161,6 +163,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
                     WattPilots = new ObservableCollection<KeyedDevice<WattPilot>>(wattPilots.Select(wp => new KeyedDevice<WattPilot> { Device = wp.Value, Key = wp.Key }));
                 }
 
+                NotifyOfPropertyChange(nameof(ShowWattPilots));
                 return;
             }
 
@@ -191,6 +194,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
             if (existingDevice == null)
             {
                 Dispatcher.UIThread.Invoke(() => { WattPilots.Add(new KeyedDevice<WattPilot> { Device = wattPilot, Key = id }); });
+                NotifyOfPropertyChange(nameof(ShowWattPilots));
             }
             else
             {
