@@ -31,44 +31,124 @@
 				</Grid>
 				<Border Grid.Row="1" x:Name="InnerBackgroundProvider" Width="100" Height="94" Margin="4" BorderThickness=".2" BorderBrush="Black">
 					<Grid>
+						<Grid.Styles>
+							<Style Selector="c|LinearGauge.LinearGaugeStyle">
+								<Setter Property="Margin" Value="4,0,4,1" />
+								<Setter Property="TickFill" Value="{DynamicResource TickFill}" />
+								<Setter Property="StringFormat" Value="N1" />
+								<Setter Property="FontSize" Value="9"></Setter>
+							</Style>
+
+						</Grid.Styles>
+
+						<Grid x:Name="Voltage" IsVisible="{Binding Mode, Converter={co:WattPilotDisplayMode2Bool Voltage}}" RowDefinitions="Auto,*">
+							<Grid.Styles>
+								<Style Selector="c|LinearGauge.Voltage">
+									<Setter Property="Minimum" Value="210" />
+									<Setter Property="Maximum" Value="250" />
+									<Setter Property="Origin" Value="0.5" />
+									<Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.MidIsGood}" />
+									<Setter Property="UnitName" Value="V" />
+									<Setter Property="StringFormat" Value="N0" />
+								</Style>
+							</Grid.Styles>
+
+							<TextBlock Grid.Row="0" FontSize="11" Text="{x:Static p:Resources.PhaseVoltage}" TextAlignment="Center" />
+
+							<StackPanel Grid.Row="1" VerticalAlignment="Center">
+								<c:LinearGauge Classes="LinearGaugeStyle Voltage" Label="L1" Value="{Binding WattPilot.VoltageL1}" />
+								<c:LinearGauge Classes="LinearGaugeStyle Voltage" Label="L2" Value="{Binding WattPilot.VoltageL2}" />
+								<c:LinearGauge Classes="LinearGaugeStyle Voltage" Label="L3" Value="{Binding WattPilot.VoltageL3}" />
+								<c:LinearGauge Classes="LinearGaugeStyle Voltage" Label="{x:Static p:Resources.AverageShort}" Value="{Binding WattPilot.VoltageAverage}" StringFormat="N1" />
+							</StackPanel>
+						</Grid>
 
 						<StackPanel x:Name="VoltageGauge" IsVisible="{Binding Mode, Converter={co:WattPilotDisplayMode2Bool VoltageGauge}}">
-                            <TextBlock Text="{x:Static p:Resources.GridHealth}" HorizontalAlignment="Center" FontSize="10" />
-                            <UniformGrid Rows="2" Columns="2" VerticalAlignment="Center" Margin="0,8,0,0">
-                                <UniformGrid.Resources>
-                                    <ControlTheme x:Key="Local" TargetType="c:HalfCircleGauge">
-                                        <Setter Property="Minimum" Value="207" />
-                                        <Setter Property="Maximum" Value="253" />
+							<TextBlock Text="{x:Static p:Resources.GridHealth}" HorizontalAlignment="Center" FontSize="11" />
+							<UniformGrid Rows="2" Columns="2" VerticalAlignment="Center" Margin="0,8,0,0">
+								<UniformGrid.Resources>
+									<ControlTheme x:Key="Local" TargetType="c:HalfCircleGauge">
+										<Setter Property="Minimum" Value="207" />
+										<Setter Property="Maximum" Value="253" />
 										<Setter Property="AnimationDuration" Value="00:00:01.0"/>
 										<Setter Property="AnimationEasing" Value="LinearEasing"/>
-                                        <Setter Property="Origin" Value=".5" />
-                                        <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.MidIsGood}" />
-                                    </ControlTheme>
-                                </UniformGrid.Resources>
+										<Setter Property="Origin" Value=".5" />
+										<Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.MidIsGood}" />
+									</ControlTheme>
+								</UniformGrid.Resources>
 
-                                <!-- ReSharper disable Xaml.RedundantAttachedProperty -->
-                                <c:HalfCircleGauge Grid.Row="0" Grid.Column="0" Margin="1" Theme="{StaticResource Local}"
-                                         Value="{Binding WattPilot.VoltageL1}" />
+								<!-- ReSharper disable Xaml.RedundantAttachedProperty -->
+								<c:HalfCircleGauge Grid.Row="0" Grid.Column="0" Margin="1" Theme="{StaticResource Local}" Value="{Binding WattPilot.VoltageL1}" />
+								<c:HalfCircleGauge Grid.Row="0" Grid.Column="1" Margin="1" Theme="{StaticResource Local}" Value="{Binding WattPilot.VoltageL2}" />
+								<c:HalfCircleGauge Grid.Row="1" Grid.Column="0" Margin="1" Theme="{StaticResource Local}" Value="{Binding WattPilot.VoltageL3}" />
+								<c:HalfCircleGauge Grid.Row="1" Grid.Column="1" Margin="1" Minimum="49" Maximum="51" Theme="{StaticResource Local}" Value="{Binding WattPilot.Frequency}" StringFormat="N1" />
+								<!-- ReSharper restore Xaml.RedundantAttachedProperty -->
+							</UniformGrid>
+						</StackPanel>
 
-								<c:HalfCircleGauge Grid.Row="0" Grid.Column="1" Margin="1" Theme="{StaticResource Local}"
-                                                   Value="{Binding WattPilot.VoltageL2}" />
+						<Grid x:Name="Current" IsVisible="{Binding Mode, Converter={co:WattPilotDisplayMode2Bool Current}}" RowDefinitions="Auto,*">
+							<Grid.Styles>
+								<Style Selector="c|LinearGauge.Current">
+									<Setter Property="Maximum" Value="{Binding WattPilot.MaximumChargingCurrentPossible}" />
+									<Setter Property="UnitName" Value="A" />
+									<Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.HighIsBad}" />
+								</Style>
+							</Grid.Styles>
 
-								<c:HalfCircleGauge Grid.Row="1" Grid.Column="0" Margin="1" Theme="{StaticResource Local}"
-                                                   Value="{Binding WattPilot.VoltageL3}" />
+							<TextBlock Grid.Row="0" FontSize="11" Text="{x:Static p:Resources.Current}" TextAlignment="Center" />
 
-								<c:HalfCircleGauge Grid.Row="1" Grid.Column="1" Margin="1" Minimum="49" Maximum="51" Theme="{StaticResource Local}"
-                                                   Value="{Binding WattPilot.Frequency}"
-                                                   StringFormat="N1" />
-                                <!-- ReSharper restore Xaml.RedundantAttachedProperty -->
-                            </UniformGrid>
-                        </StackPanel>
+							<StackPanel Grid.Row="1" VerticalAlignment="Center">
+								<c:LinearGauge Classes="LinearGaugeStyle Current" Label="L1" Value="{Binding WattPilot.CurrentL1}" />
+								<c:LinearGauge Classes="LinearGaugeStyle Current" Label="L2" Value="{Binding WattPilot.CurrentL2}" />
+								<c:LinearGauge Classes="LinearGaugeStyle Current" Label="L3" Value="{Binding WattPilot.CurrentL3}" />
+								<c:LinearGauge Classes="LinearGaugeStyle Current" Label="{x:Static p:Resources.Sum}" Value="{Binding WattPilot.CurrentSum}"
+                                               Maximum="{Binding WattPilot.MaximumChargingCurrentPossible, FallbackValue=0, Converter={co:Multiply Factor=3}}" />
+							</StackPanel>
+						</Grid>
+
+						<Grid x:Name="CurrentGauge" IsVisible="{Binding Mode, Converter={co:WattPilotDisplayMode2Bool CurrentGauge}}" RowDefinitions="Auto,Auto,Auto">
+
+							<TextBlock FontSize="11" FontWeight="Normal" Text="{x:Static p:Resources.Current}" TextAlignment="Center" />
+
+							<TextBlock FontSize="11" FontWeight="Medium" Grid.Row="1" Margin="0,0,0,2"
+                                       Width="{Binding Bounds.Width, ElementName=CurrentGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
+								<Run Text="{Binding WattPilot.CurrentSum, StringFormat=N1}" />
+								<Run Text="A" />
+							</TextBlock>
+
+							<c:HalfCircleGauge Value="{Binding WattPilot.CurrentSum, FallbackValue=0, TargetNullValue=0}"
+                                     Minimum="0" Grid.Row="2"
+                                     Maximum="{Binding WattPilot.MaximumChargingCurrentPossible, FallbackValue=6, TargetNullValue=6}"
+                                     GaugeColors="{x:Static m:GaugeColors.LowIsBad}"
+                                     Width="92"/>
+						</Grid>
+
+                        <Grid x:Name="Power" IsVisible="{Binding Mode, Converter={co:WattPilotDisplayMode2Bool Power}}" RowDefinitions="Auto,*">
+                            <Grid.Styles>
+                                <Style Selector="c|LinearGauge.Power">
+                                    <Setter Property="Maximum" Value="{Binding WattPilot.MaximumChargingCurrentPossible, Converter={co:Multiply Factor=.230}}" />
+                                    <Setter Property="UnitName" Value="kW" />
+                                    <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.HighIsBad}" />
+                                </Style>
+                            </Grid.Styles>
+
+                            <TextBlock Grid.Row="0" FontSize="11" Text="{x:Static p:Resources.Power}" TextAlignment="Center" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearGauge Classes="LinearGaugeStyle Power" Label="L1" Value="{Binding WattPilot.PowerL1KiloWatts}" />
+								<c:LinearGauge Classes="LinearGaugeStyle Power" Label="L2" Value="{Binding WattPilot.PowerL2KiloWatts}" />
+								<c:LinearGauge Classes="LinearGaugeStyle Power" Label="L3" Value="{Binding WattPilot.PowerL3KiloWatts}" />
+								<c:LinearGauge Classes="LinearGaugeStyle Power" Label="{x:Static p:Resources.Sum}" Value="{Binding WattPilot.PowerSumKiloWatts}"
+                                               Maximum="{Binding WattPilot.MaximumChargingPowerPossibleSum, Converter={co:Multiply Factor=0.001}}" />
+                            </StackPanel>
+                        </Grid>
 
 
 						<Grid x:Name="PowerGauge" RowDefinitions="Auto,Auto,Auto" IsVisible="{Binding Mode, Converter={co:WattPilotDisplayMode2Bool PowerGauge}}">
 
-							<TextBlock FontSize="10" FontWeight="Normal" Text="{x:Static p:Resources.Power}" TextAlignment="Center" />
+							<TextBlock FontSize="11" FontWeight="Normal" Text="{x:Static p:Resources.Power}" TextAlignment="Center" />
 
-							<TextBlock FontSize="10" FontWeight="Medium" Grid.Row="1" Margin="0,0,0,2"
+							<TextBlock FontSize="11" FontWeight="Medium" Grid.Row="1" Margin="0,0,0,2"
                                        Width="{Binding Bounds.Width, ElementName=PowerGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
 								<Run Text="{Binding WattPilot.PowerSumKiloWatts, StringFormat=N1}" />
 								<Run Text="kW" />
@@ -81,16 +161,38 @@
                                      Width="92" />
 
 						</Grid>
+
+						<Grid x:Name="PowerFactor" IsVisible="{Binding Mode, Converter={co:WattPilotDisplayMode2Bool PowerFactor}}" RowDefinitions="Auto,*">
+                            <Grid.Styles>
+                                <Style Selector="c|LinearGauge.PowerFactor">
+                                    <Setter Property="Maximum" Value="1" />
+                                    <Setter Property="StringFormat" Value="N2" />
+                                    <Setter Property="UnitName" Value="" />
+                                    <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.LowIsBad}" />
+                                </Style>
+                            </Grid.Styles>
+
+                            <TextBlock Grid.Row="0" FontSize="11" Text="cos(φ)" TextAlignment="Center" />
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                <c:LinearGauge Classes="LinearGaugeStyle PowerFactor" Label="L1" Value="{Binding WattPilot.PowerFactorL1}" />
+								<c:LinearGauge Classes="LinearGaugeStyle PowerFactor" Label="L2" Value="{Binding WattPilot.PowerFactorL2}" />
+								<c:LinearGauge Classes="LinearGaugeStyle PowerFactor" Label="L3" Value="{Binding WattPilot.PowerFactorL3}" />
+								<c:LinearGauge Classes="LinearGaugeStyle PowerFactor" Label="L0" Value="{Binding WattPilot.PowerFactorL0}" />
+                            </StackPanel>
+                        </Grid>
+
+
 					</Grid>
 				</Border>
-                <Viewbox Width="108" Grid.Row="2" StretchDirection="DownOnly" HorizontalAlignment="Center">
-                    <StackPanel Orientation="Horizontal">
-                        <RadioButton Classes="DeviceButton" IsChecked="True" Content="{x:Static p:Resources.Power}" Click="OnPowerClick" />
-                        <RadioButton Classes="DeviceButton" Content="{x:Static p:Resources.Voltage}" Click="OnVoltageClick" />
-                        <RadioButton Classes="DeviceButton" Content="{x:Static p:Resources.Current}" Click="OnCurrentClick" />
-                        <RadioButton Classes="DeviceButton" Content="{x:Static p:Resources.More}" Click="OnMoreClick" />
-                    </StackPanel>
-                </Viewbox>
+				<Viewbox Width="108" Grid.Row="2" StretchDirection="DownOnly" HorizontalAlignment="Center">
+					<StackPanel Orientation="Horizontal">
+						<RadioButton Classes="DeviceButton" IsChecked="True" Content="{x:Static p:Resources.Power}" Click="OnPowerClick" />
+						<RadioButton Classes="DeviceButton" Content="{x:Static p:Resources.Voltage}" Click="OnVoltageClick" />
+						<RadioButton Classes="DeviceButton" Content="{x:Static p:Resources.Current}" Click="OnCurrentClick" />
+						<RadioButton Classes="DeviceButton" Content="{x:Static p:Resources.More}" Click="OnMoreClick" />
+					</StackPanel>
+				</Viewbox>
 			</Grid>
 		</Border>
 	</Viewbox>

@@ -119,7 +119,7 @@ public partial class WattPilotControl
 
     private void OnDetailsClicked(object sender, RoutedEventArgs e)
     {
-        IoC.TryGetRegistered<MainWindow>()?.GetView<WattPilotDetailsView>().Focus();;
+        IoC.TryGetRegistered<MainWindow>()?.GetView<WattPilotDetailsView>().Focus();
     }
 
     private async void OnRebootWattPilotClicked(object sender, RoutedEventArgs e)
