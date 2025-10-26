@@ -1,5 +1,5 @@
 # Builder (cannot use Alpine)
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0 AS builder
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0.100-rc.1 AS builder
 
 WORKDIR /build/FroniusMonitor
 
