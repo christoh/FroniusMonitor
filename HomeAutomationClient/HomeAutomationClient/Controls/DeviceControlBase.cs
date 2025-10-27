@@ -2,7 +2,7 @@
 
 public abstract class DeviceControlBase : UserControl
 {
-    public static readonly StyledProperty<object?> DeviceKeyProperty = AvaloniaProperty.Register<PowerConsumer, object?>(nameof(DeviceKey));
+    public static readonly StyledProperty<object?> DeviceKeyProperty = AvaloniaProperty.Register<DeviceControlBase, object?>(nameof(DeviceKey));
    
     public static readonly StyledProperty<IBrush?> InnerRunningProperty = AvaloniaProperty.Register<DeviceControlBase, IBrush?>(nameof(InnerRunning));
     public static readonly StyledProperty<IBrush?> InnerFaultProperty = AvaloniaProperty.Register<DeviceControlBase, IBrush?>(nameof(InnerFault));

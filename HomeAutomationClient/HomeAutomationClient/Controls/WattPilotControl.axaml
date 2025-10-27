@@ -15,6 +15,7 @@
 					<Setter Property="TickFill" Value="{DynamicResource TickFill}" />
 					<Setter Property="HandFill" Value="{DynamicResource HandFill}" />
 					<Setter Property="ColorAllTicks" Value="{Binding ColorAllTicks}"/>
+                    <Setter Property="AnimationDuration" Value="00:00:00.9"/>
 				</Style>
 			</Border.Styles>
 			<Grid x:Name="BackgroundProvider" RowDefinitions="Auto,Auto,Auto">
@@ -37,6 +38,7 @@
 								<Setter Property="TickFill" Value="{DynamicResource TickFill}" />
 								<Setter Property="StringFormat" Value="N1" />
 								<Setter Property="FontSize" Value="9"></Setter>
+                                <Setter Property="AnimationDuration" Value="00:00:00.9"/>
 							</Style>
 
 						</Grid.Styles>
@@ -70,8 +72,6 @@
 									<ControlTheme x:Key="Local" TargetType="c:HalfCircleGauge">
 										<Setter Property="Minimum" Value="207" />
 										<Setter Property="Maximum" Value="253" />
-										<Setter Property="AnimationDuration" Value="00:00:01.0"/>
-										<Setter Property="AnimationEasing" Value="LinearEasing"/>
 										<Setter Property="Origin" Value=".5" />
 										<Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.MidIsGood}" />
 									</ControlTheme>

@@ -127,13 +127,15 @@ public abstract class Gauge : ContentControl
         return upper.Color.MixWith(lower.Color, lowerPercentage);
     }
 
-    private CancellationTokenSource? animationTokenSource;
+    //private CancellationTokenSource? animationTokenSource;
 
+
+    private bool isInAnimation;
     // ReSharper disable once AsyncVoidMethod
     protected virtual async void SetValue(bool sKipAnimation = false)
     {
         var relativeValue = (Math.Max(Math.Min(Maximum, double.IsNaN(Value) ? 0 : Value), Minimum) - Minimum) / (Maximum - Minimum);
-        relativeValue = double.IsFinite(relativeValue) ? relativeValue : Math.Min(Math.Max(Origin,0),1);
+        relativeValue = double.IsFinite(relativeValue) ? relativeValue : Math.Min(Math.Max(Origin, 0), 1);
 
         try
         {
@@ -143,21 +145,11 @@ public abstract class Gauge : ContentControl
                 return;
             }
 
-            if (animationTokenSource is { IsCancellationRequested: false })
-            {
-                //DO NOT use CancelAsync here, as it will not cancel the animation
-                // ReSharper disable once MethodHasAsyncOverload
-                animationTokenSource.Cancel();
-            }
-
-            animationTokenSource?.Dispose();
-            animationTokenSource = new CancellationTokenSource();
-
             var animation = new Animation
             {
                 Duration = AnimationDuration,
                 Easing = AnimationEasing,
-                FillMode = FillMode.Forward,
+                FillMode = FillMode.Both,
                 IterationCount = new IterationCount(1),
                 Children =
                 {
@@ -166,20 +158,23 @@ public abstract class Gauge : ContentControl
                 },
             };
 
-            await animation.RunAsync(this, animationTokenSource.Token);
-        }
-        catch (OperationCanceledException)
-        {
-            // Animation was cancelled
-        }
-        catch
-        {
-            // Handle other exceptions if necessary
+            if (isInAnimation)
+            {
+                while (isInAnimation)
+                {
+                    await Task.Delay(TimeSpan.FromMilliseconds(20));
+                }
+
+                AnimatedValue = relativeValue;
+                return;
+            }
+
+            isInAnimation = true;
+            await animation.RunAsync(this);
         }
         finally
         {
-            animationTokenSource?.Dispose();
-            animationTokenSource = null;
+            isInAnimation = false;
         }
     }
 }
