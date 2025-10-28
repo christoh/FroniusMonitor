@@ -4,7 +4,7 @@ public class DataControlService(ILogger<DataControlService> logger) : IDataContr
 {
     public event EventHandler<DeviceUpdateEventArgs>? DeviceUpdate;
 
-    private ConcurrentDictionary<string, ManagedDevice> Entities { get; } = new();
+    private Dictionary<string, ManagedDevice> Entities { get; } = new();
 
     IReadOnlyDictionary<string, ManagedDevice> IDataControlService.Entities => Entities;
 
@@ -35,7 +35,7 @@ public class DataControlService(ILogger<DataControlService> logger) : IDataContr
 
     public void Remove(string id)
     {
-        if (Entities.TryRemove(id, out var entity))
+        if (Entities.Remove(id, out var entity))
         {
             logger.LogInformation("Removing device {Device}", entity.Device is IHaveDisplayName haveDisplayName ? haveDisplayName.DisplayName : id);
             DeviceUpdate?.Invoke(this, new DeviceUpdateEventArgs(id, entity, DeviceAction.Delete));
