@@ -83,13 +83,13 @@ public sealed class FritzBoxDataCollector
             {
                 var allFritzBoxDevices = (await service.GetDevices(token).ConfigureAwait(false)).Devices.Cast<IPowerMeter1P>().ToList();
 
-                var presentFritzBoxDevices = allFritzBoxDevices.Where(p => p is { IsPresent: true });
+                //var presentFritzBoxDevices = allFritzBoxDevices.Where(p => p is { IsPresent: true });
 
                 allFritzBoxDevices
                     .Where(p => p is { IsPresent: false })
                     .Apply(p => logger.LogDebug("No DECT connection to {DisplayName} ({SerialNumber})", p.DisplayName, p.SerialNumber));
 
-                await dataControlService.AddOrUpdateAsync(presentFritzBoxDevices.Select(d => new ManagedDevice(d, service.Connection, typeof(IFritzBoxService))), token).ConfigureAwait(false);
+                await dataControlService.AddOrUpdateAsync(allFritzBoxDevices.Select(d => new ManagedDevice(d, service.Connection, typeof(IFritzBoxService))), token).ConfigureAwait(false);
                 logger.LogDebug("FritzBox {WebConnection} updated in {Duration:N0} ms", service.Connection, (DateTime.UtcNow - startTime).Milliseconds);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)

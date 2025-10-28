@@ -15,6 +15,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
     {
         public required string Key { get; init; }
         public required T Device { get; init; }
+        public override string ToString() => Device?.ToString() ?? Key;
     }
 
     private HubConnection? hubConnection;
@@ -22,13 +23,13 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
     [ObservableProperty]
     public partial bool ColorAllTicks { get; set; } = true;
 
-    [ObservableProperty]
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(ShowInverters))]
     public partial ObservableCollection<KeyedDevice<Gen24System>> Inverters { get; set; } = [];
 
-    [ObservableProperty]
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(ShowPowerConsumers))]
     public partial ObservableCollection<KeyedDevice<FritzBoxDevice>> FritzBoxDevices { get; set; } = [];
 
-    [ObservableProperty]
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(ShowWattPilots))]
     public partial ObservableCollection<KeyedDevice<WattPilot>> WattPilots { get; set; } = [];
 
     [ObservableProperty]
@@ -65,26 +66,28 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
             BusyText = Loc.ConnectingToHas;
             await base.Initialize();
 
-            //var wattPilotResult = await webClient.GetWattPilots().ConfigureAwait(false);
+            var wattPilotResult = await webClient.GetWattPilots();
 
-            //if (wattPilotResult.Payload is { } wattPilots)
-            //{
-            //    WattPilots = new ObservableCollection<KeyedDevice<WattPilot>>(wattPilots.Select(wp => new KeyedDevice<WattPilot> { Device = wp.Value, Key = wp.Key }));
-            //}
+            if (wattPilotResult.Payload is { } wattPilots)
+            {
+                WattPilots = new ObservableCollection<KeyedDevice<WattPilot>>(wattPilots.Select(wp => new KeyedDevice<WattPilot> { Device = wp.Value, Key = wp.Key }));
+            }
 
-            //var gen24Result = await webClient.GetGen24Devices().ConfigureAwait(false);
+            var gen24Result = await webClient.GetGen24Devices();
 
-            //if (gen24Result.Payload is { } gen24Systems)
-            //{
-            //    Inverters = new ObservableCollection<KeyedDevice<Gen24System>>(gen24Systems.Select(wp => new KeyedDevice<Gen24System> { Device = wp.Value, Key = wp.Key }));
-            //}
+            if (gen24Result.Payload is { } gen24Systems)
+            {
+                Inverters = new ObservableCollection<KeyedDevice<Gen24System>>(gen24Systems.Select(i => new KeyedDevice<Gen24System> { Device = i.Value, Key = i.Key }));
+            }
 
-            //var fritzBoxResult = await webClient.GetFritzBoxDevices().ConfigureAwait(false);
+            var fritzBoxResult = await webClient.GetFritzBoxDevices();
 
-            //if (fritzBoxResult.Payload is { } fritzBoxDevices)
-            //{
-            //    FritzBoxDevices = new ObservableCollection<KeyedDevice<FritzBoxDevice>>(fritzBoxDevices.Select(wp => new KeyedDevice<FritzBoxDevice> { Device = wp.Value, Key = wp.Key }));
-            //}
+            if (fritzBoxResult.Payload is { } fritzBoxDevices)
+            {
+                FritzBoxDevices = new ObservableCollection<KeyedDevice<FritzBoxDevice>>(fritzBoxDevices.Where(fb=>fb.Value.CanSwitch).Select(fb => new KeyedDevice<FritzBoxDevice> { Device = fb.Value, Key = fb.Key }));
+            }
+
+            NotifyOfPropertyChange(nameof(ShowPowerConsumers));
 
             var hubUri = IoC.TryGetRegistered<ICache>()?.Get<string>(CacheKeys.HubUri) ?? "http://www.example.com/hub";
 
@@ -264,7 +267,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
         {
             _ = Dispatcher.UIThread.InvokeAsync(() =>
             {
-                FritzBoxDevices = new(FritzBoxDevices.Append(new KeyedDevice<FritzBoxDevice> { Key = id, Device = fritzBoxDevice }).OrderBy(d => d.Device.DisplayName));
+                FritzBoxDevices.Add(new KeyedDevice<FritzBoxDevice> { Key = id, Device = fritzBoxDevice });
                 NotifyOfPropertyChange(nameof(ShowPowerConsumers));
             });
         }
