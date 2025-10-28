@@ -4,6 +4,9 @@ public class DataControlService(ILogger<DataControlService> logger) : IDataContr
 {
     public event EventHandler<DeviceUpdateEventArgs>? DeviceUpdate;
 
+    private readonly Lock updateLock = new();
+
+    // Do not use ConcurrentDictionary here to preserve the order
     private Dictionary<string, ManagedDevice> Entities { get; } = new();
 
     IReadOnlyDictionary<string, ManagedDevice> IDataControlService.Entities => Entities;
@@ -11,7 +14,12 @@ public class DataControlService(ILogger<DataControlService> logger) : IDataContr
     public void AddOrUpdate(string id, ManagedDevice entity)
     {
         var isNew = !Entities.ContainsKey(id);
-        Entities[id] = entity;
+
+        lock (updateLock)
+        {
+            Entities[id] = entity;
+        }
+
         var displayName = entity.Device is IHaveDisplayName haveDisplayName ? haveDisplayName.DisplayName : id;
 
         if (isNew)
@@ -26,7 +34,7 @@ public class DataControlService(ILogger<DataControlService> logger) : IDataContr
         DeviceUpdate?.Invoke(this, new DeviceUpdateEventArgs(id, entity, isNew ? DeviceAction.Add : DeviceAction.Change));
     }
 
-    public void AddOrUpdate(ManagedDevice entity) => AddOrUpdate(entity.Device.Id,entity);
+    public void AddOrUpdate(ManagedDevice entity) => AddOrUpdate(entity.Device.Id, entity);
 
     public async ValueTask RemoveAsync(IEnumerable<string> ids, CancellationToken token = default)
     {
@@ -35,7 +43,15 @@ public class DataControlService(ILogger<DataControlService> logger) : IDataContr
 
     public void Remove(string id)
     {
-        if (Entities.Remove(id, out var entity))
+        bool success;
+        ManagedDevice? entity;
+
+        lock (updateLock)
+        {
+            success = Entities.Remove(id, out entity);
+        }
+        
+        if (success && entity is not null)
         {
             logger.LogInformation("Removing device {Device}", entity.Device is IHaveDisplayName haveDisplayName ? haveDisplayName.DisplayName : id);
             DeviceUpdate?.Invoke(this, new DeviceUpdateEventArgs(id, entity, DeviceAction.Delete));
