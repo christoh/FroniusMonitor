@@ -1,6 +1,6 @@
 # ----- Builder -----
 
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS builder
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0-alpine3.22 AS builder
 
 WORKDIR /build
 
