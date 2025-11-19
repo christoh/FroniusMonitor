@@ -308,7 +308,9 @@
             return resultData is { HasValues: true } ? gen24JsonService.ReadFroniusData<T>(resultData) : null;
         }
 
-        public ValueTask<Gen24StandByStatus?> GetInverterStandByStatus(CancellationToken token = default) => SendFroniusCommand<Gen24StandByStatus>("api/commands/StandbyState", token: token);
+        public ValueTask<Gen24StandByStatus?> GetInverterStandByStatus(CancellationToken token = default) => SendFroniusCommand<Gen24StandByStatus>("api/commands/StandbyState", null, token);
+
+        public Task<Gen24SystemPreservation?> GetSystemPreservation(CancellationToken token = default) => SendFroniusCommand<Gen24SystemPreservation>("api/commands/GetNightPreservationLimit", null, token).AsTask();
 
         public async ValueTask RequestInverterStandBy(bool isStandBy, CancellationToken token = default)
         {

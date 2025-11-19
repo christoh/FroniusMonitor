@@ -16,6 +16,9 @@
     public partial class Gen24BatterySettings : Gen24ParsingBase
     {
         [ObservableProperty]
+        public partial double? SocMinPreserve { get; set; }
+
+        [ObservableProperty]
         [FroniusProprietaryImport("BAT_ENABLED", FroniusDataType.Root)]
         public partial bool? IsEnabled { get; set; }
 

@@ -269,6 +269,17 @@
             result.Gen24Config = await task1.ConfigureAwait(false);
             result.Gen24Config2 = await task2.ConfigureAwait(false);
 
+            var getSystemPreservationTask = Gen24Service.GetSystemPreservation(token);
+            var getSystemPreservationTask2 = Gen24Service2?.GetSystemPreservation(token);
+
+
+            result.Gen24Config?.BatterySettings?.SocMinPreserve = (await getSystemPreservationTask)?.MinSoc;
+
+            if (getSystemPreservationTask2 != null)
+            {
+                result.Gen24Config2!.BatterySettings?.SocMinPreserve = (await getSystemPreservationTask2)?.MinSoc;
+            }
+
             lastConfigUpdate = DateTime.UtcNow;
         }
 

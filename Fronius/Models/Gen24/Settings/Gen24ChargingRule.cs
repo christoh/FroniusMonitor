@@ -15,12 +15,12 @@ public partial class Gen24ChargingRule : BindableBase, ICloneable
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(StartTimeDate))]
-    [FroniusProprietaryImport("TimeTable", "Start", Unit.Time)]
+    [FroniusProprietaryImport("TimeTable", "Start", Unit.ParsableTime)]
     public partial string? StartTime { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(EndTimeDate))]
-    [FroniusProprietaryImport("TimeTable", "End", Unit.Time)]
+    [FroniusProprietaryImport("TimeTable", "End", Unit.ParsableTime)]
     public partial string? EndTime { get; set; }
 
     public DateTime? StartTimeDate => GetDate(StartTime);

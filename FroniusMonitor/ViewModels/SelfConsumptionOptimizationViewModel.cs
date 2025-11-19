@@ -1,8 +1,8 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.Input;
 
 namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
-public class SelfConsumptionOptimizationViewModel
+public partial class SelfConsumptionOptimizationViewModel
 (
     IGen24Service gen24Service,
     IGen24JsonService gen24JsonService,
@@ -20,27 +20,27 @@ public class SelfConsumptionOptimizationViewModel
     public IEnumerable<ChargingRuleType> RuleTypes => ruleTypes;
 #pragma warning restore CA1822 // Mark members as static
 
-public Gen24BatterySettings Settings
-{
-    get;
-    set => Set(ref field, value);
-} = null!;
-
-public bool EnableDanger
-{
-    get;
-    set => Set(ref field, value, () =>
+    public Gen24BatterySettings Settings
     {
-        if (!value)
-        {
-            Settings.IsEnabled = oldSettings.IsEnabled;
-            Settings.IsInCalibration = oldSettings.IsInCalibration;
-            Settings.IsAcCoupled = oldSettings.IsAcCoupled;
-        }
-    });
-}
+        get;
+        set => Set(ref field, value);
+    } = null!;
 
-public bool IsSecondary => ReferenceEquals(Gen24Service, DataCollectionService.Gen24Service2);
+    public bool EnableDanger
+    {
+        get;
+        set => Set(ref field, value, () =>
+        {
+            if (!value)
+            {
+                Settings.IsEnabled = oldSettings.IsEnabled;
+                Settings.IsInCalibration = oldSettings.IsInCalibration;
+                Settings.IsAcCoupled = oldSettings.IsAcCoupled;
+            }
+        });
+    }
+
+    public bool IsSecondary => ReferenceEquals(Gen24Service, DataCollectionService.Gen24Service2);
 
     public Gen24Storage? Storage => IsSecondary ? DataCollectionService.HomeAutomationSystem?.Gen24Sensors2?.Storage : DataCollectionService.HomeAutomationSystem?.Gen24Sensors?.Storage;
 
@@ -120,23 +120,10 @@ public bool IsSecondary => ReferenceEquals(Gen24Service, DataCollectionService.G
         set => Set(ref field, value);
     } = null!;
 
-    [field: AllowNull, MaybeNull]
-    public ICommand UndoCommand => field ??= new NoParameterCommand(Undo);
-
-    [field: AllowNull, MaybeNull]
-    public ICommand ApplyCommand => field ??= new NoParameterCommand(Apply);
-
-    [field: AllowNull, MaybeNull]
-    public ICommand DeleteChargingRuleCommand => field ??= new Command<Gen24ChargingRule>(DeleteChargingRule!);
-
-    [field: AllowNull, MaybeNull]
-    public ICommand AddChargingRuleCommand => field ??= new NoParameterCommand(AddChargingRule);
-
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     internal override async Task OnInitialize()
     {
         IsInUpdate = true;
-
         DataCollectionService.NewDataReceived += OnDataCollectionServiceOnNewDataReceived;
 
         try
@@ -232,11 +219,13 @@ public bool IsSecondary => ReferenceEquals(Gen24Service, DataCollectionService.G
         LogGridPower = Math.Log10(RequestedGridPower ?? double.NegativeInfinity);
     }
 
+    [RelayCommand]
     private void DeleteChargingRule(Gen24ChargingRule rule)
     {
         ChargingRules.Remove(rule);
     }
 
+    [RelayCommand]
     private void AddChargingRule()
     {
         ChargingRules.Add(new Gen24ChargingRule
@@ -256,6 +245,7 @@ public bool IsSecondary => ReferenceEquals(Gen24Service, DataCollectionService.G
         });
     }
 
+    [RelayCommand]
     private void Undo()
     {
         Dispatcher.Invoke(() => { ChargingRules = new BindableCollection<Gen24ChargingRule>(((BindableCollection<Gen24ChargingRule>)oldChargingRules.Clone()).OrderBy(r => r.StartTime).ThenBy(r => r.EndTime), SynchronizationContext.Current); });
@@ -273,12 +263,13 @@ public bool IsSecondary => ReferenceEquals(Gen24Service, DataCollectionService.G
         NotifyOfPropertyChange(nameof(BatteryAcChargingMaxPower));
     }
 
-    private async void Apply()
+    [RelayCommand]
+    private async Task Apply()
     {
-        IsInUpdate = true;
-
         try
         {
+            IsInUpdate = true;
+
             foreach (var error in NotifiedValidationErrors)
             {
                 if

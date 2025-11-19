@@ -48,21 +48,14 @@ public class Gen24JsonService : IGen24JsonService
             }
             else if (propertyInfo.PropertyType.IsAssignableFrom(typeof(DateTime)))
             {
-                if (attribute.Unit != Unit.Time)
+                if (attribute.Unit is Unit.UnixMilliSeconds or not Unit.ParsableTime)
                 {
                     var doubleValue = (double)Convert.ChangeType(stringValue, typeof(double), CultureInfo.InvariantCulture);
-                    value = DateTime.UnixEpoch.AddMilliseconds(doubleValue);
+                    value = DateTime.UnixEpoch.AddMilliseconds(doubleValue * (attribute.Unit == Unit.UnixMilliSeconds ? 1d : 1000d));
                 }
                 else
                 {
-                    if (!DateTime.TryParse(stringValue, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var dateTime))
-                    {
-                        value = null;
-                    }
-                    else
-                    {
-                        value = dateTime;
-                    }
+                    value = !DateTime.TryParse(stringValue, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var dateTime) ? null : dateTime;
                 }
             }
             else if (attribute.DataType == FroniusDataType.Channel && propertyInfo.PropertyType.IsAssignableFrom(typeof(bool)))
@@ -183,7 +176,7 @@ public class Gen24JsonService : IGen24JsonService
         {
             Enum enumValue => GetFroniusEnumString(enumValue),
 
-            DateTime date => attribute.Unit != Unit.Time
+            DateTime date => attribute.Unit != Unit.ParsableTime
                 ? (long)Math.Round((date.ToUniversalTime() - DateTime.UnixEpoch).TotalSeconds, MidpointRounding.AwayFromZero)
                 : date.ToString("HH:mm", CultureInfo.InvariantCulture),
 

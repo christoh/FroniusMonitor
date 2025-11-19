@@ -13,7 +13,8 @@ public enum Unit : byte
     Default = 0,
     Joule,
     Percent,
-    Time
+    ParsableTime,
+    UnixMilliSeconds,
 }
 
 [AttributeUsage(AttributeTargets.Property)]

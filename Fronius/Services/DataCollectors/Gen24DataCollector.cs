@@ -242,7 +242,9 @@ public sealed class Gen24DataCollector(
             // ReSharper restore UnusedVariable
 #endif
 
-            return Gen24Config.Parse(versionsToken, componentsToken, configToken);
+            var result= Gen24Config.Parse(versionsToken, componentsToken, configToken);
+            result.BatterySettings?.SocMinPreserve = (await gen24System.Service.GetSystemPreservation(token))?.MinSoc;
+            return result;
         }
         finally
         {
