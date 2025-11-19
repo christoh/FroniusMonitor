@@ -15,7 +15,7 @@
 					<Setter Property="TickFill" Value="{DynamicResource TickFill}" />
 					<Setter Property="HandFill" Value="{DynamicResource HandFill}" />
 					<Setter Property="ColorAllTicks" Value="{Binding ColorAllTicks}"/>
-                    <Setter Property="AnimationDuration" Value="00:00:00.9"/>
+                    <Setter Property="AnimationDuration" Value="00:00:00.7"/>
 				</Style>
 			</Border.Styles>
 			<Grid x:Name="BackgroundProvider" RowDefinitions="Auto,Auto,Auto">
@@ -38,7 +38,7 @@
 								<Setter Property="TickFill" Value="{DynamicResource TickFill}" />
 								<Setter Property="StringFormat" Value="N1" />
 								<Setter Property="FontSize" Value="9"></Setter>
-                                <Setter Property="AnimationDuration" Value="00:00:00.9"/>
+                                <Setter Property="AnimationDuration" Value="00:00:00.7"/>
 							</Style>
 
 						</Grid.Styles>
