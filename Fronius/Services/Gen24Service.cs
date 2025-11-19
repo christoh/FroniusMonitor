@@ -90,7 +90,7 @@
             var (_, dataToken) = await GetJsonResponse<BaseResponse>("api/components/readable", true, token: token).ConfigureAwait(false);
             gen24Sensors.Inverter = gen24JsonService.ReadFroniusData<Gen24Inverter>(dataToken[components.Groups["Inverter"].FirstOrDefault() ?? "1"]);
 
-            if (components.Groups.TryGetValue("BatteryManagementSystem", out var storages))
+            if (components.Groups.TryGetValue("Storage", out var storages))
             {
                 var storageGroupId = storages.FirstOrDefault() ?? "16580608";
                 var storageToken = dataToken[storageGroupId];
@@ -98,7 +98,7 @@
                 gen24Sensors.Storage = gen24JsonService.ReadFroniusData<Gen24Storage>(storageToken);
                 gen24Sensors.Storage.MinimumStateOfCharge = (nameplate["min_soc"]?.Value<int>() ?? 0) / 100d;
                 gen24Sensors.Storage.MaximumStateOfCharge = (nameplate["max_soc"]?.Value<int>() ?? 100) / 100d;
-                gen24Sensors.Storage.GroupId = uint.Parse(storageGroupId);
+                gen24Sensors.Storage.GroupId = storageGroupId;
             }
 
             if (components.Groups.TryGetValue("PowerMeter", out var powerMeters))
@@ -107,7 +107,7 @@
                 {
                     var meter = dataToken[powerMeter];
                     var gen24PowerMeter = gen24JsonService.ReadFroniusData<Gen24PowerMeter3P>(meter);
-                    gen24PowerMeter.GroupId = uint.Parse(powerMeter);
+                    gen24PowerMeter.GroupId = powerMeter;
                     gen24Sensors.Meters.Add(gen24PowerMeter);
                 }
             }

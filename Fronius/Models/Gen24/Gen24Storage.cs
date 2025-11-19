@@ -49,7 +49,7 @@ public partial class Gen24Storage : Gen24DeviceBase
     public partial double? CellTemperatureMin { get; set; }
 
     [ObservableProperty]
-    [FroniusProprietaryImport("BAT_VALUE_STATE_OF_CHARGE_RELATIVE_U16", Unit.Percent)]
+    [FroniusProprietaryImport("BAT_VALUE_STATE_OF_CHARGE_RELATIVE_F32", Unit.Percent)]
     public partial double? StateOfCharge { get; set; }
 
     [ObservableProperty]

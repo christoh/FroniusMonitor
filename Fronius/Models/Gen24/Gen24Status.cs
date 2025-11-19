@@ -8,7 +8,7 @@ public partial class Gen24Status : BindableBase
 
     [ObservableProperty]
     [FroniusProprietaryImport("id", FroniusDataType.Root)]
-    public partial uint? Id { get; set; }
+    public partial string? Id { get; set; }
 
     [ObservableProperty]
     [FroniusProprietaryImport("type", FroniusDataType.Root)]

@@ -2,6 +2,11 @@
 
 public partial class Gen24Config : BindableBase, ICloneable
 {
+    private static readonly Version minimumCommandApi = new(8, 4, 1);
+    private static readonly Version minimumConfigApi = new(10, 2, 0);
+    private static readonly Version minimumComponentsApi = new(1, 1, 0);
+    private static readonly Version minimumStatusApi = new(6, 1, 0);
+    
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(VersionWarning))]
     public partial Gen24Versions? Versions { get; set; }
@@ -26,12 +31,29 @@ public partial class Gen24Config : BindableBase, ICloneable
             Versions?.SwVersions.TryGetValue("GEN24", out firmwareVersion);
             var firmwareVersionString = firmwareVersion?.ToLinuxString() ?? Resources.Unknown;
 
-            if (Versions?.CommandApi < new Version(8,0) || Versions?.ConfigApi < new Version(9, 1))
+            if (Versions == null)
             {
-                return string.Format(Resources.FirmwareTooOld, firmwareVersionString, "1.36.5-1");
+                return null;
             }
 
-            if (Versions?.CommandApi >= new Version(9, 0) || Versions?.ConfigApi >= new Version(11, 0))
+            if
+            (
+                Versions.CommandApi < minimumCommandApi ||
+                Versions.ConfigApi < minimumConfigApi ||
+                Versions.ComponentsApi < minimumComponentsApi ||
+                Versions.StatusApi < minimumStatusApi
+            )
+            {
+                return string.Format(Resources.FirmwareTooOld, firmwareVersionString, "1.39.5-1");
+            }
+
+            if
+            (
+                Versions.CommandApi?.Major > minimumCommandApi.Major ||
+                Versions.ConfigApi?.Major > minimumConfigApi.Major ||
+                Versions.ComponentsApi?.Major > minimumComponentsApi.Major ||
+                Versions.StatusApi?.Major > minimumStatusApi.Major
+            )
             {
                 return string.Format(Resources.FirmwareTooNew, firmwareVersionString);
             }

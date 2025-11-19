@@ -51,7 +51,7 @@ public class Gen24JsonService : IGen24JsonService
                 if (attribute.Unit != Unit.Time)
                 {
                     var doubleValue = (double)Convert.ChangeType(stringValue, typeof(double), CultureInfo.InvariantCulture);
-                    value = DateTime.UnixEpoch.AddSeconds(doubleValue);
+                    value = DateTime.UnixEpoch.AddMilliseconds(doubleValue);
                 }
                 else
                 {
@@ -122,8 +122,10 @@ public class Gen24JsonService : IGen24JsonService
         return fieldInfo == null ? null : Enum.Parse(type, fieldInfo.Name);
     }
 
+    [SuppressMessage("ReSharper", "PreferConcreteValueOverDefault")]
     public JObject GetUpdateToken<T>(T newEntity, T? oldEntity = default) where T : BindableBase => GetUpdateToken(typeof(T), newEntity, oldEntity);
 
+    [SuppressMessage("ReSharper", "PreferConcreteValueOverDefault")]
     public JObject GetUpdateToken(Type type, BindableBase newEntity, BindableBase? oldEntity = default)
     {
         var jObject = new JObject();

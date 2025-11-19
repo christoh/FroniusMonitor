@@ -40,6 +40,7 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
                     field = new()
                     {
                         BaseAddress = new(connection.BaseUrl),
+                        Timeout = TimeSpan.FromSeconds(30),
                     };
 
                     field.DefaultRequestHeaders.UserAgent.Add(new("HomeAutomationClient", "1.0"));

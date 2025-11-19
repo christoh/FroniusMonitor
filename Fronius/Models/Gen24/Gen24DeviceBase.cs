@@ -49,7 +49,7 @@ public abstract partial class Gen24DeviceBase : BindableBase, ICloneable
     public partial DateTime? CreationTime { get; set ; }
 
     [ObservableProperty]
-    public partial uint GroupId { get; set ; }
+    public partial string? GroupId { get; set ; }
 
     public object Clone() => MemberwiseClone();
 }
