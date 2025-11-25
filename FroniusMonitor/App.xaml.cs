@@ -22,15 +22,14 @@ namespace De.Hochstaetter.FroniusMonitor
             }
         }
 
-        
+
         public static string AppName => "FroniusMonitor";
         public static string PerUserDataDir => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Hochstätter", AppName);
         public static string SettingsFileName => Path.Combine(PerUserDataDir, "Settings.fms");
-        public static Version? Version { get; private set; }
-        public static string VersionString => $"{ThisAssembly.Git.SemVer.Major}.{ThisAssembly.Git.SemVer.Minor}.{ThisAssembly.Git.SemVer.Patch}.{ThisAssembly.Git.SemVer.DashLabel}";
-        public static string ShortVersionString => $"{ThisAssembly.Git.SemVer.Major}.{ThisAssembly.Git.SemVer.Minor}.{ThisAssembly.Git.SemVer.Patch}";
-        public static DateTime CommitTimeUtc { get; private set; } = DateTime.UnixEpoch;
-        public static string BuildTimeString => $"{CommitTimeUtc:g} UTC";
+        public static string VersionString => $"{ThisAssembly.Git.SemVer.Major}.{ThisAssembly.Git.SemVer.Minor}.{ThisAssembly.Git.SemVer.Patch}";
+        public static string ShortVersionString => $"{ThisAssembly.Git.SemVer.Major}.{ThisAssembly.Git.SemVer.Minor}";
+        public static DateTimeOffset CommitTimeUtc { get; } = DateTimeOffset.Parse(ThisAssembly.Git.CommitDate);
+        public static string BuildTimeString => $"{CommitTimeUtc.UtcDateTime} UTC";
         public static string GitCommitId { get; private set; } = "---";
 
         public static Settings Settings { get; set; } = null!;
@@ -146,9 +145,6 @@ namespace De.Hochstaetter.FroniusMonitor
             }
 
             NetworkChange.NetworkAddressChanged += OnNetworkAddressChanged;
-            CommitTimeUtc = DateTime.Parse(ThisAssembly.Git.CommitDate).ToUniversalTime();
-            Version = new Version();
-
             // ReSharper disable once HeuristicUnreachableCode
             GitCommitId = ThisAssembly.Git.IsDirty ? "(Developer Build)" : ThisAssembly.Git.Sha;
 
@@ -161,11 +157,18 @@ namespace De.Hochstaetter.FroniusMonitor
 
         private static async void OnNetworkAddressChanged(object? sender, EventArgs e)
         {
-            var hvacService = IoC.Get<IDataCollectionService>().HvacService;
-
-            if (!hvacService.IsConnected)
+            try
             {
-                await hvacService.Stop().ConfigureAwait(false);
+                var hvacService = IoC.Get<IDataCollectionService>().HvacService;
+
+                if (!hvacService.IsConnected)
+                {
+                    await hvacService.Stop().ConfigureAwait(false);
+                }
+            }
+            catch
+            {
+                // async void must be caught
             }
         }
 

@@ -8,10 +8,3 @@ using System.Reflection;
                                               //(used if a resource is not found in the page,
                                               // app, or any theme specific resource dictionaries)
 )]
-
-//[assembly: AssemblyInformationalVersion(
-//    ThisAssembly.Git.SemVer.Major + "." +
-//    ThisAssembly.Git.SemVer.Minor + "." +
-//    ThisAssembly.Git.Commits + "-" +
-//    ThisAssembly.Git.Branch + "+" +
-//    ThisAssembly.Git.Commit)]
