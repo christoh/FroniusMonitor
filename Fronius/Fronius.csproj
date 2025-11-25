@@ -23,8 +23,12 @@
 		<PackageReference Include="DeviceId" Version="6.9.0" />
 		<PackageReference Include="FluentModbus" Version="5.3.2" />
 		<PackageReference Include="Microsoft.Azure.Devices.Client" Version="1.42.3" />
-		<PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.0-rc.2.25502.107" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+		<PackageReference Include="GitInfo" Version="3.6.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 	</ItemGroup>
 
 	<ItemGroup>

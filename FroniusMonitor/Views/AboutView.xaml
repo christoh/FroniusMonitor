@@ -43,7 +43,7 @@
             </StackPanel>
             <TextBlock>
                 <Run Text=".NET"/>
-                <Run Text="{Binding DotNetVersion, Mode=OneWay}"/>
+                <Run Text="{Binding DotNetVersion, Mode=OneTime}"/>
             </TextBlock>
             <TextBlock Margin="0,0,0,2" Text="Copyright © 2021-2025, Christoph H. Hochstätter"/>
             <StackPanel Orientation="Horizontal">

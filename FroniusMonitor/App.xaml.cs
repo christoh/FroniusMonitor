@@ -22,14 +22,15 @@ namespace De.Hochstaetter.FroniusMonitor
             }
         }
 
+        
         public static string AppName => "FroniusMonitor";
         public static string PerUserDataDir => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Hochstätter", AppName);
         public static string SettingsFileName => Path.Combine(PerUserDataDir, "Settings.fms");
         public static Version? Version { get; private set; }
-        public static string VersionString => Version?.ToString() ?? "???";
-        public static string ShortVersionString => Version == null ? "???" : FormattableString.Invariant($"{Version.Major}.{Version.Minor}");
-        public static DateTime BuildTimeUtc { get; private set; } = DateTime.UnixEpoch;
-        public static string BuildTimeString => $"{BuildTimeUtc:g} UTC";
+        public static string VersionString => $"{ThisAssembly.Git.SemVer.Major}.{ThisAssembly.Git.SemVer.Minor}.{ThisAssembly.Git.SemVer.Patch}.{ThisAssembly.Git.SemVer.DashLabel}";
+        public static string ShortVersionString => $"{ThisAssembly.Git.SemVer.Major}.{ThisAssembly.Git.SemVer.Minor}.{ThisAssembly.Git.SemVer.Patch}";
+        public static DateTime CommitTimeUtc { get; private set; } = DateTime.UnixEpoch;
+        public static string BuildTimeString => $"{CommitTimeUtc:g} UTC";
         public static string GitCommitId { get; private set; } = "---";
 
         public static Settings Settings { get; set; } = null!;
@@ -145,23 +146,11 @@ namespace De.Hochstaetter.FroniusMonitor
             }
 
             NetworkChange.NetworkAddressChanged += OnNetworkAddressChanged;
-            var productVersion = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductVersion;
-            Version = Assembly.GetExecutingAssembly().GetName().Version;
+            CommitTimeUtc = DateTime.Parse(ThisAssembly.Git.CommitDate).ToUniversalTime();
+            Version = new Version();
 
-            if (Version != null)
-            {
-                BuildTimeUtc = new DateTime(2000,1,1).AddDays(Version.Build).AddSeconds(unchecked((uint)Version.Revision) << 1).ToUniversalTime();
-            }
-
-            if (productVersion != null)
-            {
-                var plusIndex = productVersion.IndexOf('+');
-
-                if (plusIndex >= 0)
-                {
-                    GitCommitId = productVersion[(plusIndex + 1)..];
-                }
-            }
+            // ReSharper disable once HeuristicUnreachableCode
+            GitCommitId = ThisAssembly.Git.IsDirty ? "(Developer Build)" : ThisAssembly.Git.Sha;
 
             var mainWindow = IoC.Get<MainWindow>();
             //#if DEBUG
