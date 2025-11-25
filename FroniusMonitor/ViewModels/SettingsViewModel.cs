@@ -1,9 +1,11 @@
-﻿using De.Hochstaetter.Fronius.Models.Settings;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using De.Hochstaetter.Fronius.Models.Settings;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
-public class SettingsViewModel(
+public partial class SettingsViewModel(
     IGen24Service gen24Service,
     IGen24JsonService gen24JsonService,
     IFritzBoxService fritzBoxService,
@@ -11,54 +13,27 @@ public class SettingsViewModel(
     IDataCollectionService dataCollectionService
 ) : SettingsViewModelBase(dataCollectionService, gen24Service, gen24JsonService, fritzBoxService, wattPilotService)
 {
-    private static readonly IEnumerable<ListItemModel<string?>> cultures = new[]
-    {
-        new ListItemModel<string?> { DisplayName = Resources.MatchWindowsLanguage, Value = null },
-        new ListItemModel<string?> { DisplayName = GetCultureName("en"), Value = "en" },
-        new ListItemModel<string?> { DisplayName = GetCultureName("de"), Value = "de" },
-        new ListItemModel<string?> { DisplayName = GetCultureName("de-CH"), Value = "de-CH" },
-        new ListItemModel<string?> { DisplayName = GetCultureName("de-LI"), Value = "de-LI" },
-    };
-
-    private static readonly IEnumerable<ListItemModel<Protocol>> azureProtocols = new[]
-    {
-        new EnumListItemModel<Protocol> { Value = Protocol.Amqp },
-        new EnumListItemModel<Protocol> { Value = Protocol.Mqtt },
-    };
-
-    private static readonly IEnumerable<ListItemModel<TunnelMode>> tunnelModes = new[]
-    {
-        new EnumListItemModel<TunnelMode> { Value = TunnelMode.Auto },
-        new EnumListItemModel<TunnelMode> { Value = TunnelMode.Websocket },
-        new EnumListItemModel<TunnelMode> { Value = TunnelMode.NoTunnel },
-    };
-
-    private static readonly IEnumerable<ElectricityPriceService> priceServices = Enum.GetValues<ElectricityPriceService>();
-
     private readonly ElectricityPriceSettings oldElectricityPriceSettings = new();
 
     private bool isOkPressed;
 
     [field: AllowNull, MaybeNull]
-    public ICommand OkCommand => field ??= new NoParameterCommand(Ok);
-
-    [field: AllowNull, MaybeNull]
-    public ICommand ChangeDriftsFileCommand => field ??= new NoParameterCommand(ChangeDriftsFile);
-
-    [field: AllowNull, MaybeNull]
-    public ICommand ChangeEnergyHistoryFileCommand => field ??= new NoParameterCommand(ChangeEnergyHistoryFile);
-
-    [field: AllowNull, MaybeNull]
-    public ICommand ChoosePanelLayoutFileCommand => field ??= new NoParameterCommand(ChoosePanelLayoutFile);
-
-    [field: AllowNull, MaybeNull]
     public ICommand DeletePanelLayoutFileCommand => field ??= new NoParameterCommand(() => Settings.CustomSolarPanelLayout = null);
 
-    public IEnumerable<ListItemModel<Protocol>> AzureProtocols => azureProtocols;
+    public IEnumerable<ListItemModel<Protocol>> AzureProtocols { get; }= 
+    [
+        new EnumListItemModel<Protocol> { Value = Protocol.Amqp },
+        new EnumListItemModel<Protocol> { Value = Protocol.Mqtt },
+    ];
 
-    public IEnumerable<ListItemModel<TunnelMode>> TunnelModes => tunnelModes;
+    public IEnumerable<ListItemModel<TunnelMode>> TunnelModes { get; } =
+    [
+        new EnumListItemModel<TunnelMode> { Value = TunnelMode.Auto },
+        new EnumListItemModel<TunnelMode> { Value = TunnelMode.Websocket },
+        new EnumListItemModel<TunnelMode> { Value = TunnelMode.NoTunnel },
+    ];
 
-    public IEnumerable<ElectricityPriceService> PriceServices => priceServices;
+    public IEnumerable<ElectricityPriceService> PriceServices { get; } = Enum.GetValues<ElectricityPriceService>();
 
     public ListItemModel<Protocol> SelectedProtocol
     {
@@ -86,48 +61,37 @@ public class SettingsViewModel(
         get => PriceRegions.FirstOrDefault(z => z.Value == Settings.ElectricityPrice.PriceRegion, new EnumListItemModel<AwattarCountry> { Value = PriceService.GetSupportedPriceZones().GetAwaiter().GetResult().FirstOrDefault() });
         set
         {
-            priceService.PriceRegion = Settings.ElectricityPrice.PriceRegion = value.Value;
+            PriceService.PriceRegion = Settings.ElectricityPrice.PriceRegion = value.Value;
             NotifyOfPropertyChange();
         }
     }
 
     public bool CanUseTunnel => Settings.ToshibaAcConnection.CanUseTunnel;
 
-    public Settings Settings
-    {
-        get;
-        set => Set(ref field, value);
-    } = null!;
+    [ObservableProperty]
+    public partial Settings Settings { get; set; } = null!;
 
-    public IEnumerable<ListItemModel<string?>> Cultures => cultures;
+    public IEnumerable<ListItemModel<string?>> Cultures { get; } =
+    [
+        new() { DisplayName = Loc.MatchWindowsLanguage, Value = null },
+        new() { DisplayName = GetCultureName("en"), Value = "en" },
+        new() { DisplayName = GetCultureName("de"), Value = "de" },
+        new() { DisplayName = GetCultureName("de-CH"), Value = "de-CH" },
+        new() { DisplayName = GetCultureName("de-LI"), Value = "de-LI" },
+    ];
 
-    public ListItemModel<string?> SelectedCulture
-    {
-        get;
-        set => Set(ref field, value);
-    } = null!;
+    [ObservableProperty]
+    public partial ListItemModel<string?> SelectedCulture { get; set; } = null!;
 
-    private IElectricityPriceService priceService = IoC.TryGet<IElectricityPriceService>()!;
+    [ObservableProperty]
+    public partial IElectricityPriceService PriceService { get; set; } = IoC.TryGet<IElectricityPriceService>()!;
 
-    public IElectricityPriceService PriceService
-    {
-        get => priceService;
-        set => Set(ref priceService, value);
-    }
+    [ObservableProperty,NotifyPropertyChangedFor(nameof(SelectedPriceRegion))]
+    public partial IEnumerable<ListItemModel<AwattarCountry>> PriceRegions { get; set; } = [];
 
-    public IEnumerable<ListItemModel<AwattarCountry>> PriceRegions
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(SelectedPriceRegion)));
-    } = [];
+    public IEnumerable<string> Gen24UserNames { get; } = ["customer", "technician", "support"];
 
-    private static readonly IEnumerable<string> gen24UserNames = ["customer", "technician", "support"];
-
-    public IEnumerable<string> Gen24UserNames => gen24UserNames;
-
-    private static readonly IReadOnlyList<byte> froniusUpdateRates = [1, 2, 3, 4, 5, 10, 20, 30, 60];
-
-    public IReadOnlyList<byte> FroniusUpdateRates => froniusUpdateRates;
+    public IReadOnlyList<byte> FroniusUpdateRates { get; } = [1, 2, 3, 4, 5, 10, 20, 30, 60];
 
     internal override async Task OnInitialize()
     {
@@ -167,6 +131,7 @@ public class SettingsViewModel(
             ;
     }
 
+    [RelayCommand]
     private void ChangeDriftsFile()
     {
         var dialog = new SaveFileDialog
@@ -180,7 +145,7 @@ public class SettingsViewModel(
             OverwritePrompt = false,
             ValidateNames = true,
             Title = Loc.SelectDriftsFile,
-            Filter = "Extensible Markup Language (*.xml)|*.xaml" + Loc.FilterAllFiles
+            Filter = "Extensible Markup Language (*.xml)|*.xml" + Loc.FilterAllFiles
         };
 
         var result = dialog.ShowDialog();
@@ -191,6 +156,7 @@ public class SettingsViewModel(
         }
     }
 
+    [RelayCommand]
     private void ChangeEnergyHistoryFile()
     {
         var dialog = new OpenFileDialog
@@ -213,7 +179,8 @@ public class SettingsViewModel(
         }
     }
 
-    public async void ChoosePanelLayoutFile()
+    [RelayCommand]
+    public async Task ChoosePanelLayoutFile()
     {
         var dialog = new OpenFileDialog
         {
@@ -224,7 +191,7 @@ public class SettingsViewModel(
             FileName = string.IsNullOrWhiteSpace(Settings.CustomSolarPanelLayout) ? "Sample solar panel layout.xaml" : Path.GetFileName(Settings.CustomSolarPanelLayout),
             InitialDirectory = string.IsNullOrWhiteSpace(Settings.CustomSolarPanelLayout) ? Path.Combine(AppContext.BaseDirectory, "SolarPanels") : Path.GetDirectoryName(Settings.CustomSolarPanelLayout),
             ValidateNames = true,
-            Title = Resources.ChoosePanelLayoutFile,
+            Title = Loc.ChoosePanelLayoutFile,
             Filter = "Extensible Application Markup Language (*.xaml)|*.xaml" + Loc.FilterAllFiles,
         };
 
@@ -264,7 +231,8 @@ public class SettingsViewModel(
         return string.Join(" / ", set);
     }
 
-    private async void Ok()
+    [RelayCommand]
+    private async Task Ok()
     {
         try
         {
@@ -317,12 +285,19 @@ public class SettingsViewModel(
                 Settings.HaveWattPilot ? Settings.WattPilotConnection : null
             ).ConfigureAwait(false);
         }
+        catch (Exception ex)
+        {
+
+            ShowBox(ex.Message, ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error);
+        }
         finally
         {
             await Settings.Save().ConfigureAwait(false);
             App.Settings.NotifySettingsChanged();
             _ = Dispatcher.InvokeAsync(() => IoC.Get<MainWindow>().Activate());
         }
+
+        return;
 
         static string FixUrl(string url, bool isWebSocket = false)
         {
