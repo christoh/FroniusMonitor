@@ -11,7 +11,7 @@
         mc:Ignorable="d"
         WindowStartupLocation="CenterOwner"
         Title="{x:Static p:Resources.AppName}"
-        Height="200" Width="400"
+        SizeToContent="WidthAndHeight"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         ResizeMode="NoResize">
     <Grid Margin="16">
@@ -38,20 +38,20 @@
                 <TextBlock Margin="0,0,0,2" Text="{x:Static p:Resources.Version}"/>
                 <TextBox Text="{x:Static app:App.VersionString}"/>
                 <TextBlock>
-                <Run Text="("/><Run Text="{x:Static app:App.BuildTimeString}"/><Run Text=")"/>
+                <Run Text="("/><Run Text="{x:Static app:App.CommitTimeString}"/><Run Text=")"/>
                 </TextBlock>
             </StackPanel>
             <TextBlock>
                 <Run Text=".NET"/>
                 <Run Text="{Binding DotNetVersion, Mode=OneTime}"/>
+                <Run Text="/"/>
+                <Run Text="Windows"/>
+                <Run Text="{Binding WindowsVersion, Mode=OneTime}"/>
             </TextBlock>
-            <TextBlock Margin="0,0,0,2" Text="Copyright © 2021-2025, Christoph H. Hochstätter"/>
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Git commit ID:"/>
-                <TextBox Text="{x:Static app:App.GitCommitId}" IsReadOnly="True" BorderThickness="0"></TextBox>
-            </StackPanel>
+            <TextBlock Margin="0,0,0,2" Text="{x:Static app:App.CopyrightMessage}"/>
+            <TextBox Text="{Binding BuildInfo, Mode=OneTime}"/>
         </StackPanel>
-        <DockPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+        <DockPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,16,0,0">
             <Button Content="{x:Static p:Resources.Ok}" IsCancel="True" MinWidth="60" Height="24" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
         </DockPanel>
     </Grid>

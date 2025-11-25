@@ -29,8 +29,12 @@ namespace De.Hochstaetter.FroniusMonitor
         public static string VersionString => $"{ThisAssembly.Git.SemVer.Major}.{ThisAssembly.Git.SemVer.Minor}.{ThisAssembly.Git.SemVer.Patch}";
         public static string ShortVersionString => $"{ThisAssembly.Git.SemVer.Major}.{ThisAssembly.Git.SemVer.Minor}";
         public static DateTimeOffset CommitTimeUtc { get; } = DateTimeOffset.Parse(ThisAssembly.Git.CommitDate);
-        public static string BuildTimeString => $"{CommitTimeUtc.UtcDateTime} UTC";
-        public static string GitCommitId { get; private set; } = "---";
+        public static string CommitTimeString => $"{CommitTimeUtc.UtcDateTime} UTC";
+        public static string CopyrightMessage => FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).LegalCopyright??string.Empty;
+        public static string BranchName = ThisAssembly.Git.Branch;
+
+        // ReSharper disable once HeuristicUnreachableCode
+        public static string GitCommitId => ThisAssembly.Git.IsDirty ? "(Developer Build)" : ThisAssembly.Git.Commit;
 
         public static Settings Settings { get; set; } = null!;
 
@@ -145,9 +149,6 @@ namespace De.Hochstaetter.FroniusMonitor
             }
 
             NetworkChange.NetworkAddressChanged += OnNetworkAddressChanged;
-            // ReSharper disable once HeuristicUnreachableCode
-            GitCommitId = ThisAssembly.Git.IsDirty ? "(Developer Build)" : ThisAssembly.Git.Sha;
-
             var mainWindow = IoC.Get<MainWindow>();
             //#if DEBUG
             //mainWindow.WindowState = WindowState.Minimized;
