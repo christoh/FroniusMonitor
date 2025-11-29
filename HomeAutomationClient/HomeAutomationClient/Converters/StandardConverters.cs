@@ -79,6 +79,8 @@ public class Bool2Char : Bool2AnythingBase<char>
 
 public class Bool2Double : Bool2AnythingBase<double>;
 
+public class Bool2String : Bool2AnythingBase<string>;
+
 public class DateConverter : ConverterBase
 {
     public string StringFormat { get; set; } = "G";
@@ -87,12 +89,11 @@ public class DateConverter : ConverterBase
 
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is not DateTime date)
-        {
-            return null;
-        }
-
-        return (UseUtc ? date.ToUniversalTime() : date.ToLocalTime()).ToString(StringFormat, UseCurrentCulture ? CultureInfo.CurrentCulture : culture);
+        return value is not DateTime date 
+            ? null 
+            : (UseUtc 
+                ? date.ToUniversalTime() 
+                : date.ToLocalTime()).ToString(StringFormat, UseCurrentCulture ? CultureInfo.CurrentCulture : culture);
     }
 
     public override object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -111,3 +112,7 @@ public class DateConverter : ConverterBase
     }
 }
 
+public class ToUpper : ConverterBase
+{
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value?.ToString()?.ToUpper(CultureInfo.CurrentCulture);
+}

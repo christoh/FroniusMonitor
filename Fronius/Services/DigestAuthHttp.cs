@@ -220,13 +220,13 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
                 var hashA2 = CalculateHash($"{request.Method.Method}:{request.RequestUri?.OriginalString}");
                 var digestResponse = CalculateHash($"{hashA1}:{nonce}:{++nc:x8}:{cnonce}:auth:{hashA2}");
 
-                return $"username=\"{connection.UserName}\", " +
-                       $"realm=\"{realm}\", nonce=\"{nonce}\", " +
-                       $"uri=\"{request.RequestUri?.OriginalString}\", " +
-                       $"response=\"{digestResponse}\", " +
+                return $"""username="{connection.UserName}", """ +
+                       $"""realm="{realm}", nonce="{nonce}", """ +
+                       $"""uri="{request.RequestUri?.OriginalString}", """ +
+                       $"""response="{digestResponse}", """ +
                        (opaque != null ? $"opaque=\"{opaque}\", " : string.Empty) +
                        $"algorithm={algorithm}, qop=auth, nc={nc:x8}, cnonce=\"{cnonce}\"";
-
+                
                 [SuppressMessage("ReSharper", "SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault")]
                 string CalculateHash(string input)
                 {

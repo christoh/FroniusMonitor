@@ -127,10 +127,8 @@ public abstract class Gauge : ContentControl
         return upper.Color.MixWith(lower.Color, lowerPercentage);
     }
 
-    //private CancellationTokenSource? animationTokenSource;
-
-
     private bool isInAnimation;
+
     // ReSharper disable once AsyncVoidMethod
     protected virtual async void SetValue(bool sKipAnimation = false)
     {
@@ -139,12 +137,6 @@ public abstract class Gauge : ContentControl
 
         try
         {
-            if (sKipAnimation)
-            {
-                AnimatedValue = relativeValue;
-                return;
-            }
-
             var animation = new Animation
             {
                 Duration = AnimationDuration,
@@ -158,22 +150,26 @@ public abstract class Gauge : ContentControl
                 },
             };
 
-            if (isInAnimation)
+            if (isInAnimation || sKipAnimation)
             {
                 while (isInAnimation)
                 {
                     await Task.Delay(TimeSpan.FromMilliseconds(20));
                 }
 
-                AnimatedValue = relativeValue;
                 return;
             }
 
             isInAnimation = true;
             await animation.RunAsync(this);
         }
+        catch
+        {
+            // Just set value
+        }
         finally
         {
+            AnimatedValue = relativeValue;
             isInAnimation = false;
         }
     }
