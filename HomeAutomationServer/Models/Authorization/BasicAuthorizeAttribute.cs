@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 
-namespace De.Hochstaetter.HomeAutomationServer.Models.Authorization
+namespace De.Hochstaetter.HomeAutomationServer.Models.Authorization;
+
+public class BasicAuthorizeAttribute : AuthorizeAttribute
 {
-    public class BasicAuthorizeAttribute : AuthorizeAttribute
+    public BasicAuthorizeAttribute()
     {
-        public BasicAuthorizeAttribute()
-        {
-            AuthenticationSchemes = "Basic";
-        }
+        AuthenticationSchemes = "Basic";
     }
 }

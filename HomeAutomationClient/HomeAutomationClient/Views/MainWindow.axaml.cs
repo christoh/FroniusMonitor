@@ -1,10 +1,9 @@
-namespace De.Hochstaetter.HomeAutomationClient.Views
+namespace De.Hochstaetter.HomeAutomationClient.Views;
+
+public partial class MainWindow : Window
 {
-    public partial class MainWindow : Window
+    public MainWindow()
     {
-        public MainWindow()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }
