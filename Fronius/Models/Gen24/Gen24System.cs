@@ -39,7 +39,8 @@ public partial class Gen24System : BindableBase, IHaveDisplayName, IHaveUniqueId
 
     private double? GetNetStateOfChargeIfFull(double? stateOfCharge)
     {
-        return stateOfCharge - Math.Max(Config?.BatterySettings?.BackupReserve ?? 0, Config?.BatterySettings?.Limits is SocLimits.UseManufacturerDefault or null ? 5 : Config?.BatterySettings?.SocMin ?? 0) / 100d;
+        var socMin = Config?.BatterySettings?.SocMin ?? 0;
+        var socMinPreserve = Config?.BatterySettings?.EnableSystemDeadlockPrevention is true ? Config?.BatterySettings?.SocMinPreserve ?? -1 : -1;
+        return stateOfCharge - Math.Max(Config?.BatterySettings?.BackupReserve ?? 0, Math.Max(socMinPreserve, Config?.BatterySettings?.Limits is SocLimits.UseManufacturerDefault or null ? 5 : socMin)) / 100d;
     }
-
 }

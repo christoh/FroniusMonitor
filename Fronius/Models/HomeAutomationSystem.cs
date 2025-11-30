@@ -36,7 +36,7 @@ public partial class HomeAutomationSystem : BindableBase
     private double? GetNetStateOfChargeIfFull(double? stateOfCharge)
     {
         var socMin = Gen24Config?.BatterySettings?.SocMin ?? 0;
-        var socMinPreserve = Gen24Config?.BatterySettings?.SocMinPreserve ?? -1;
+        var socMinPreserve = Gen24Config?.BatterySettings?.EnableSystemDeadlockPrevention is true? Gen24Config?.BatterySettings?.SocMinPreserve ?? -1:-1;
         return stateOfCharge - Math.Max(Gen24Config?.BatterySettings?.BackupReserve ?? 0, Math.Max(socMinPreserve, Gen24Config?.BatterySettings?.Limits is SocLimits.UseManufacturerDefault or null ? 5 : socMin)) / 100d;
     }
 }

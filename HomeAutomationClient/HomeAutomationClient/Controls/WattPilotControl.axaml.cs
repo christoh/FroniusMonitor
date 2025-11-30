@@ -1,7 +1,4 @@
-using De.Hochstaetter.Fronius.Extensions;
 using De.Hochstaetter.Fronius.Models.Charging;
-using System.Linq;
-using System.Reflection;
 
 namespace De.Hochstaetter.HomeAutomationClient.Controls;
 
@@ -90,6 +87,7 @@ public partial class WattPilotControl : DeviceControlBase
     {
         InnerBackgroundProvider.Background = InnerRunning;
     }
+
     protected override void ChangeOuter()
     {
         BackgroundProvider.Background = OuterRunning;
