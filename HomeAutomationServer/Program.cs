@@ -1,5 +1,6 @@
 ﻿using De.Hochstaetter.Fronius.Crypto;
 using De.Hochstaetter.HomeAutomationServer.Hubs;
+using De.Hochstaetter.HomeAutomationServer.Models;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using De.Hochstaetter.HomeAutomationServer.Services;
 using Microsoft.AspNetCore.Authentication;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.ResponseCompression;
 using Serilog.Sinks.SystemConsole.Themes;
 using System.IO.Compression;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using AuthenticationService = De.Hochstaetter.HomeAutomationServer.Services.AuthenticationService;

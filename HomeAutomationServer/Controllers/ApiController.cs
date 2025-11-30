@@ -1,6 +1,8 @@
 ﻿using De.Hochstaetter.Fronius.Models.WebApi;
+using De.Hochstaetter.HomeAutomationServer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using System.Runtime.InteropServices;
 
 namespace De.Hochstaetter.HomeAutomationServer.Controllers;
 
@@ -16,11 +18,12 @@ public class ApiController(ILogger<ApiController> logger) : ControllerBase
 
         return Ok(new WebApiInfo
         {
-            OsVersion = $"{Environment.OSVersion.VersionString} {nint.Size << 3}-bit",
-            OsName = $"{Environment.OSVersion.Platform.ToString()}",
+            OsVersion = $"{RuntimeInformation.OSDescription}",
+            OsArch = $"{RuntimeInformation.OSArchitecture}",
+            DotNetVersion = $"{RuntimeInformation.FrameworkDescription}",
             Manufacturer = "Christoph Hochstätter",
-            ProductName = "Home Automation Server",
-            Version = new Version("0.5.0.0"),
+            ProductName = $"Home Automation Server {RuntimeInformation.ProcessArchitecture}",
+            Version = GitInfo.VersionString,
         });
     }
 }
