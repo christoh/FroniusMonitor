@@ -26,8 +26,12 @@
 					<Viewbox Grid.Row="1" Grid.Column="1" StretchDirection="DownOnly" Margin="2,0">
 						<TextBlock FontSize="8" TextAlignment="Center" Text="{Binding WattPilot.StatusDisplayName, FallbackValue=---, TargetNullValue=???}" />
 					</Viewbox>
-					<!--<c:WifiControl Grid.Row="1" Grid.Column="0" Fill="Black" SignalStrength="{Binding WifiSignal, FallbackValue=-200}" Height="5" Margin="4,1,-2,0" VerticalAlignment="Center" HorizontalAlignment="Center"
-                                   IsConnected="{Binding WifiSignal, Converter={co:NullToBool}, FallbackValue=False}" />-->
+					<c:WifiControl Grid.Row="1" Grid.Column="0" Fill="{DynamicResource ForegroundBrush}" SignalStrength="{Binding WattPilot.WifiSignal, FallbackValue=-200}" Height="5" Margin="3,0,1,0" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                   IsConnected="{Binding WattPilot.WifiSignal, Converter={co:NullToBool}, FallbackValue=False}">
+                        <c:WifiControl.RenderTransform>
+                            <TranslateTransform Y="-.5"/>
+                        </c:WifiControl.RenderTransform>
+                    </c:WifiControl>
 
 				</Grid>
 				<Border Grid.Row="1" x:Name="InnerBackgroundProvider" Width="100" Height="94" Margin="4" BorderThickness=".2" BorderBrush="Black">

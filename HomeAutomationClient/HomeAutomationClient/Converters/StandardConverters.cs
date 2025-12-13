@@ -116,3 +116,18 @@ public class ToUpper : ConverterBase
 {
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value?.ToString()?.ToUpper(CultureInfo.CurrentCulture);
 }
+
+public class NullToAnything<T> : ConverterBase
+{
+    public virtual T? Null { get; set; }
+    public virtual T? NotNull { get; set; }
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value is null ? Null : NotNull;
+}
+
+
+public class NullToBool : NullToAnything<bool>
+{
+    public override bool NotNull { get; set; } = true;
+    public override bool Null { get; set; } = false;
+}
+

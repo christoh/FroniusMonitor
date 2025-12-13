@@ -41,18 +41,18 @@ public partial class WifiControl
 
     private void OnIsConnectedChanged()
     {
-            Connection.Opacity = !IsConnected ? 0.3 : 1;
-        }
+        Connection.Opacity = !IsConnected ? 0.3 : 1;
+    }
 
     public WifiControl()
     {
-            InitializeComponent();
-        }
+        InitializeComponent();
+    }
 
     private void OnSignalStrengthChanged()
     {
-            High.Opacity = !IsConnected || SignalStrength < -52 ? 0.3 : 1;
-            Medium.Opacity = !IsConnected || SignalStrength < -58 ? 0.3 : 1;
-            Low.Opacity = !IsConnected || SignalStrength < -65 ? 0.3 : 1;
-        }
+        High.Opacity = !IsConnected || SignalStrength < -52 ? 0.3 : 1;
+        Medium.Opacity = !IsConnected || SignalStrength < -58 ? 0.3 : 1;
+        Low.Opacity = !IsConnected || SignalStrength < -65 ? 0.3 : 1;
+    }
 }
