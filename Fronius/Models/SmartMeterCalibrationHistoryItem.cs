@@ -21,4 +21,8 @@ public partial class SmartMeterCalibrationHistoryItem : BindableBase
     [ObservableProperty]
     [XmlAttribute("PrlOffset")]
     public partial double ProducedOffset { get; set; }
+
+    #if DEBUG
+    public override string ToString()=>$"{CalibrationDate:g} P: {EnergyRealProduced} ({ProducedOffset}) / C: {EnergyRealConsumed} ({ConsumedOffset})";
+    #endif
 }
