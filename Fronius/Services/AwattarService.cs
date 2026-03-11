@@ -14,6 +14,7 @@ public sealed partial class AwattarService : ElectricityPushPriceServiceBase, IE
     {
         timer = new Timer(TimerCallback, null, DurationToNextQuery, TimeSpan.Zero);
         settings = IoC.Get<SettingsBase>();
+        client!.DefaultRequestHeaders.UserAgent.Add(new("HomeAutomationClient", FroniusGitInfo.Version.ToString()));
     }
 
     [ObservableProperty]

@@ -1,6 +1,5 @@
 ﻿namespace De.Hochstaetter.Fronius.Services;
 
-// ReSharper disable once CommentTypo
 // Algorithm must be SHA256 (bug in 1.38.6-1), SHA-256 or MD5
 // qop must be auth (auth-int and none are not supported)
 
@@ -43,7 +42,7 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
                         Timeout = TimeSpan.FromSeconds(30),
                     };
 
-                    field.DefaultRequestHeaders.UserAgent.Add(new("HomeAutomationClient", "1.0"));
+                    field.DefaultRequestHeaders.UserAgent.Add(new("HomeAutomationClient", FroniusGitInfo.Version.ToString()));
                 }
             }
 

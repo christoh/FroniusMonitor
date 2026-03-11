@@ -256,6 +256,7 @@ public partial class ToshibaHvacService(SynchronizationContext context, Settings
         }
 
         using var client = new HttpClient();
+        client.DefaultRequestHeaders.UserAgent.Add(new("HomeAutomationClient", FroniusGitInfo.Version.ToString()));
         client.BaseAddress = new Uri(azureConnection.BaseUrl);
 
         var message = new HttpRequestMessage(postVariables == null ? HttpMethod.Get : HttpMethod.Post, uri);
