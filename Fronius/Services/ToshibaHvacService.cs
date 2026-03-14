@@ -180,7 +180,7 @@ public partial class ToshibaHvacService(SynchronizationContext context, Settings
             MessageId = $"MB_{azureDeviceId![..Math.Min(15, azureDeviceId!.Length)].ToUpperInvariant()}-{++messageId % 10000000:D8}",
             TargetIds = targetIdStrings,
             TimeStamp = DateTime.UtcNow.TimeOfDay.ToString(),
-            PayLoad = JsonDocument.Parse($"{{ \"data\":\"{state}\"}}").RootElement
+            PayLoad = JsonDocument.Parse($"{{ \"data\":\"{state}\"}}").RootElement,
         };
 
         await using var memoryStream = new MemoryStream();
@@ -267,24 +267,19 @@ public partial class ToshibaHvacService(SynchronizationContext context, Settings
             message.Content = JsonContent.Create(postVariables);
         }
 
-        using var response = (await client.SendAsync(message, Token).ConfigureAwait(false));
+        using var response = await client.SendAsync(message, Token).ConfigureAwait(false);
 
 #if DEBUG // This allows you to see the raw JSON string
         var jsonText = await response.Content.ReadAsStringAsync(Token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
         Debug.Print(jsonText);
         var jDocument = JsonDocument.Parse(jsonText);
         var result = jDocument.Deserialize<ToshibaHvacResponse<T>>(jsonOptions) ?? throw new InvalidDataException("No data");
-
 #else
         var result = await response.Content.ReadFromJsonAsync<ToshibaHvacResponse<T>>(jsonOptions, Token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
-
 #endif
 
-        if (!result.IsSuccess)
-        {
-            throw new InvalidDataException(result.Message);
-        }
-
-        return result.Data;
+        return !result.IsSuccess 
+            ? throw new InvalidDataException(result.Message) 
+            : result.Data;
     }
 }
