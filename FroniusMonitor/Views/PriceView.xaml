@@ -52,6 +52,8 @@
                 <Grid.Resources>
                     <Style TargetType="RadioButton">
                         <Setter Property="Margin" Value="16,2,0,0" />
+                        <Setter Property="SnapsToDevicePixels" Value="False"/>
+                        <Setter Property="UseLayoutRounding" Value="True"/>
                     </Style>
                 </Grid.Resources>
 

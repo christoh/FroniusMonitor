@@ -27,7 +27,6 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
 
     public DigestAuthHttp(WebConnection connection) : this(connection, TimeSpan.FromMinutes(1)) { }
 
-    [field: AllowNull, MaybeNull]
     private HttpClient HttpClient
     {
         get

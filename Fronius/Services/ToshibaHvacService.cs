@@ -1,12 +1,8 @@
-﻿// ReSharper disable RedundantUsingDirective
-
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Net.Http.Json;
 using De.Hochstaetter.Fronius.Models.JsonConverters;
 using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Client.Exceptions;
-
-// ReSharper restore RedundantUsingDirective
 
 namespace De.Hochstaetter.Fronius.Services;
 
@@ -166,7 +162,7 @@ public partial class ToshibaHvacService(SynchronizationContext context, Settings
 
         var devices = await Deserialize<List<ToshibaHvacMapping>>($"/api/AC/GetConsumerACMapping?consumerId={session.ConsumerId}").ConfigureAwait(false);
         AllDevices = new BindableCollection<ToshibaHvacMapping>(devices, context);
-        // var supi = await Deserialize<ToshibaHvacStatusDevice>($"/api/AC/GetCurrentACState?ACId={AllDevices[0].Devices[0].AcId}").ConfigureAwait(false);
+        // var test = await Deserialize<ToshibaHvacStatusDevice>($"/api/AC/GetCurrentACState?ACId={AllDevices[0].Devices[0].AcId}").ConfigureAwait(false);
         return azureCredentials;
     }
 
