@@ -22,13 +22,8 @@ public class BayernWerkImportService(SettingsBase settings, IDataCollectionServi
                             ?? throw new InvalidDataException(string.Format(Resources.FileHasNoEnergyHistory, settings.EnergyHistoryFileName));
         }
 
-        XLWorkbook workbook;
-
-        await using (var fileStream = new FileStream(excelFileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-        {
-            workbook = new XLWorkbook(fileStream);
-        }
-
+        await using var xlFileStream = new FileStream(excelFileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        using var workbook = new XLWorkbook(xlFileStream);
         var sheet = workbook.Worksheet(1);
         var obisCode = sheet.Cell("C4").Value.GetText();
 
@@ -40,7 +35,7 @@ public class BayernWerkImportService(SettingsBase settings, IDataCollectionServi
         };
 
         var cell = sheet.Range("F:F").Cells()
-                       .Where(c => c.Value.IsText && c.GetValue<string>() == "VAL")
+                       .Where(c => c.Value.IsText && c.GetValue<string>() == "VAL" && c.WorksheetRow().Cell("G") is { Value.IsNumber: true } valueCell && Math.Abs(valueCell.GetValue<double>()) > .00001)
                        .MaxBy(c => c.WorksheetRow().RowNumber())
                    ?? throw new InvalidDataException(Resources.NoValidCells);
 
