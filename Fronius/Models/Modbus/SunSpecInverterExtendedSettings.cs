@@ -6,28 +6,28 @@ public class SunSpecInverterExtendedSettings(ReadOnlyMemory<byte> data, ushort m
 
     public override ushort MinimumDataLength => 24;
 
-    [Modbus(0)]
+    [Modbus(0, false)]
     public ushort ConnectDisconnectTimeWindow
     {
         get => Get<ushort>();
         set => Set(value);
     }
 
-    [Modbus(1)]
+    [Modbus(1, false)]
     public ushort ConnectDisconnectTimeOut
     {
         get => Get<ushort>();
         set => Set(value);
     }
 
-    [Modbus(2)]
+    [Modbus(2, false)]
     public SunSpecConnectionState ConnectionState
     {
         get => Get<SunSpecConnectionState>();
         set => Set(value);
     }
 
-    [Modbus(3)]
+    [Modbus(3, false)]
     public ushort RelativeActivePowerLimitI
     {
         get => Get<ushort>();
@@ -47,35 +47,35 @@ public class SunSpecInverterExtendedSettings(ReadOnlyMemory<byte> data, ushort m
         set => RelativeActivePowerLimitI = FromDouble<ushort>(value * 100, RelativeActivePowerLimitSf);
     }
 
-    [Modbus(4)]
+    [Modbus(4, false)]
     public ushort ActivePowerLimitTimeWindow
     {
         get => Get<ushort>();
         set => Set(value);
     }
 
-    [Modbus(5)]
+    [Modbus(5, false)]
     public ushort ActivePowerLimitTimeOut
     {
         get => Get<ushort>();
         set => Set(value);
     }
 
-    [Modbus(6)]
+    [Modbus(6, false)]
     public ushort ActivePowerLimitRampTime
     {
         get => Get<ushort>();
         set => Set(value);
     }
 
-    [Modbus(7)]
+    [Modbus(7, false)]
     public SunSpecOnOff ActivePowerLimitEnabled
     {
         get => Get<SunSpecOnOff>();
         set => Set(value);
     }
 
-    [Modbus(8)]
+    [Modbus(8, false)]
     public short PowerFactorI
     {
         get => Get<short>();
@@ -95,28 +95,28 @@ public class SunSpecInverterExtendedSettings(ReadOnlyMemory<byte> data, ushort m
         set => PowerFactorI = FromDouble<short>(value, PowerFactorSf);
     }
 
-    [Modbus(9)]
+    [Modbus(9, false)]
     public ushort PowerFactorTimeWindow
     {
         get => Get<ushort>();
         set => Set(value);
     }
 
-    [Modbus(10)]
+    [Modbus(10, false)]
     public ushort PowerFactorTimeOut
     {
         get => Get<ushort>();
         set => Set(value);
     }
 
-    [Modbus(11)]
+    [Modbus(11, false)]
     public ushort PowerFactorRampTime
     {
         get => Get<ushort>();
         set => Set(value);
     }
 
-    [Modbus(12)]
+    [Modbus(12, false)]
     public SunSpecOnOff PowerFactorEnabled
     {
         get => Get<SunSpecOnOff>();
@@ -130,7 +130,7 @@ public class SunSpecInverterExtendedSettings(ReadOnlyMemory<byte> data, ushort m
         set => Set(value);
     }
 
-    [Modbus(14)]
+    [Modbus(14, false)]
     public short ReactivePowerRelativeToMaxReactivePowerI
     {
         get => Get<short>();
@@ -169,21 +169,21 @@ public class SunSpecInverterExtendedSettings(ReadOnlyMemory<byte> data, ushort m
         set => ReactivePowerRelativeToAvailableReactivePowerI = FromDouble<short>(value * 100, ReactivePowerSf);
     }
 
-    [Modbus(16)]
+    [Modbus(16, false)]
     public ushort ReactivePowerTimeWindow
     {
         get => Get<ushort>();
         set => Set(value);
     }
 
-    [Modbus(17)]
+    [Modbus(17, false)]
     public ushort ReactivePowerTimeOut
     {
         get => Get<ushort>();
         set => Set(value);
     }
 
-    [Modbus(18)]
+    [Modbus(18, false)]
     public ushort ReactivePowerRampTime
     {
         get => Get<ushort>();
@@ -197,7 +197,7 @@ public class SunSpecInverterExtendedSettings(ReadOnlyMemory<byte> data, ushort m
         set => Set(value);
     }
 
-    [Modbus(20)]
+    [Modbus(20, false)]
     public SunSpecOnOff ReactivePowerLimitEnabled
     {
         get => Get<SunSpecOnOff>();

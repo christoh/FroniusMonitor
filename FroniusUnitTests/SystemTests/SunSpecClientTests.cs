@@ -1,4 +1,6 @@
-﻿namespace FroniusUnitTests.SystemTests;
+﻿using System.Threading;
+
+namespace FroniusUnitTests.SystemTests;
 
 using Assert = NUnit.Framework.Legacy.ClassicAssert;
 
@@ -26,7 +28,7 @@ public class SunSpecClientTests
     [Test]
     public async Task Inverter_Success()
     {
-        await client.ConnectAsync("192.168.44.10", 502, 1).ConfigureAwait(false);
+        await client.ConnectAsync("192.168.44.20", 502, 1).ConfigureAwait(false);
         var inverter = new SunSpecInverter(await client.GetDataAsync().ConfigureAwait(false));
 
         Assert.AreEqual("Fronius", inverter.Manufacturer);
@@ -55,7 +57,7 @@ public class SunSpecClientTests
         await client.WriteRegisters
         (
             storageSettings,
-            default,
+            CancellationToken.None,
             nameof(SunSpecStorageBaseSettings.RelativeOutgoingActivePowerMaxI),
             nameof(SunSpecStorageBaseSettings.RelativeIncomingActivePowerMaxI),
             nameof(SunSpecStorageBaseSettings.ChargingLimits)
@@ -68,7 +70,7 @@ public class SunSpecClientTests
         await client.WriteRegisters
         (
             storageSettings,
-            default,
+            CancellationToken.None,
             nameof(SunSpecStorageBaseSettings.RelativeOutgoingActivePowerMaxI),
             nameof(SunSpecStorageBaseSettings.RelativeIncomingActivePowerMaxI),
             nameof(SunSpecStorageBaseSettings.ChargingLimits)
