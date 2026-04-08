@@ -3,13 +3,13 @@
 public enum SocLimits : byte
 {
     [EnumParse(ParseAs = "auto")] UseManufacturerDefault,
-    [EnumParse(ParseAs = "manual")] Override
+    [EnumParse(ParseAs = "manual")] Override,
 }
 
 public enum OptimizationMode
 {
     [EnumParse(ParseNumeric = true)] Manual = 1,
-    [EnumParse(ParseNumeric = true)] Automatic = 0
+    [EnumParse(ParseNumeric = true)] Automatic = 0,
 }
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
