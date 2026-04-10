@@ -11,7 +11,7 @@ public class SunSpecClient(ILogger<SunSpecClient> logger) : ISunSpecClient
 
     public async Task ConnectAsync(string hostname, int port, byte modbusAddress, TimeSpan timeout = default)
     {
-        if (timeout == default)
+        if (timeout == TimeSpan.Zero)
         {
             timeout = TimeSpan.FromSeconds(5);
         }
@@ -144,7 +144,7 @@ public class SunSpecClient(ILogger<SunSpecClient> logger) : ISunSpecClient
                 160 => new SunSpecMultipleMppt(data, sunSpecModel, (ushort)(register + 2)),
                 >= 201 and <= 204 => new SunSpecMeterInt(data, sunSpecModel, (ushort)(register + 2)),
                 >= 211 and <= 214 => new SunSpecMeterFloat(data, sunSpecModel, (ushort)(register + 2)),
-                _ => null
+                _ => null,
             };
 
             if (sunSpecModelBase != null)
