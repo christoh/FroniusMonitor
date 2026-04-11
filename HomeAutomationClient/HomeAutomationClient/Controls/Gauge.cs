@@ -128,6 +128,7 @@ public abstract class Gauge : ContentControl
     }
 
     private bool isInAnimation;
+    private CancellationTokenSource? animationTokenSource;
 
     // ReSharper disable once AsyncVoidMethod
     protected virtual async void SetValue(bool sKipAnimation = false)
@@ -150,26 +151,29 @@ public abstract class Gauge : ContentControl
                 },
             };
 
+
             if (isInAnimation || sKipAnimation)
             {
-                while (isInAnimation)
-                {
-                    await Task.Delay(TimeSpan.FromMilliseconds(20));
-                }
+                animationTokenSource?.Cancel();
 
-                return;
+                if (sKipAnimation)
+                {
+                    AnimatedValue = relativeValue;
+                    return;
+                }
             }
 
             isInAnimation = true;
-            await animation.RunAsync(this);
+            animationTokenSource?.Dispose();
+            animationTokenSource = new CancellationTokenSource();
+            await animation.RunAsync(this, animationTokenSource.Token);
+            AnimatedValue = relativeValue;
         }
-        catch
+        catch (OperationCanceledException)
         {
-            // Just set value
         }
         finally
         {
-            AnimatedValue = relativeValue;
             isInAnimation = false;
         }
     }
