@@ -14,7 +14,7 @@
 				<Style Selector="c|HalfCircleGauge">
 					<Setter Property="TickFill" Value="{DynamicResource TickFill}" />
 					<Setter Property="HandFill" Value="{DynamicResource HandFill}" />
-					<Setter Property="ColorAllTicks" Value="{Binding ColorAllTicks}" />
+                    <Setter Property="ColorAllTicks" Value="{Binding ColorAllTicks}" />
 					<Setter Property="AnimationDuration" Value="00:00:01.0" />
 				</Style>
 			</Border.Styles>
