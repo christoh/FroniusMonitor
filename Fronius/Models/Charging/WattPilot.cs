@@ -163,12 +163,10 @@ public partial class WattPilot : BindableBase, IHaveDisplayName, IHaveUniqueId, 
     public partial double? TemperatureBoard { get; set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(VoltageAverage), nameof(MaximumChargingPowerPossibleSum), nameof(MaximumChargingPowerPossibleL1))]
     [WattPilot("nrg", 0)]
     public partial double? VoltageL1 { get; set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(VoltageAverage), nameof(MaximumChargingPowerPossibleSum), nameof(MaximumChargingPowerPossibleL2))]
     [WattPilot("nrg", 1)]
     public partial double? VoltageL2 { get; set; }
 
@@ -182,12 +180,10 @@ public partial class WattPilot : BindableBase, IHaveDisplayName, IHaveUniqueId, 
     public partial double? VoltageL0 { get; set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CurrentSum))]
     [WattPilot("nrg", 4)]
     public partial double? CurrentL1 { get; set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CurrentSum))]
     [WattPilot("nrg", 5)]
     public partial double? CurrentL2 { get; set; }
 
@@ -199,12 +195,12 @@ public partial class WattPilot : BindableBase, IHaveDisplayName, IHaveUniqueId, 
     public double? CurrentSum => CurrentL1 + CurrentL2 + CurrentL3;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(PowerSum), nameof(PowerL1KiloWatts), nameof(PowerSumKiloWatts), nameof(ChargingPhases))]
+    [NotifyPropertyChangedFor(nameof(PowerSum), nameof(PowerL1KiloWatts))]
     [WattPilot("nrg", 7)]
     public partial double? PowerL1 { get; set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(PowerSum), nameof(PowerL2KiloWatts), nameof(PowerSumKiloWatts), nameof(ChargingPhases))]
+    [NotifyPropertyChangedFor(nameof(PowerSum), nameof(PowerL2KiloWatts))]
     [WattPilot("nrg", 8)]
     public partial double? PowerL2 { get; set; }
 

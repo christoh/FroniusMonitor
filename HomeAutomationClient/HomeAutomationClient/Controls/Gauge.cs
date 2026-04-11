@@ -135,12 +135,12 @@ public abstract class Gauge : ContentControl
     {
         var relativeValue = (Math.Max(Math.Min(Maximum, double.IsNaN(Value) ? 0 : Value), Minimum) - Minimum) / (Maximum - Minimum);
         relativeValue = double.IsFinite(relativeValue) ? relativeValue : Math.Min(Math.Max(Origin, 0), 1);
-        double savedValue = Value;
 
         try
         {
             if (isInAnimation || sKipAnimation)
             {
+                AnimatedValue = Value;
                 // ReSharper disable once MethodHasAsyncOverload
                 animationTokenSource?.Cancel();
 
@@ -175,7 +175,6 @@ public abstract class Gauge : ContentControl
         }
         catch (OperationCanceledException)
         {
-            AnimatedValue = savedValue;
         }
         finally
         {
