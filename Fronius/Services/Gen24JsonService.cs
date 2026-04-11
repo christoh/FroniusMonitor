@@ -43,14 +43,14 @@ public class Gen24JsonService : IGen24JsonService
         {
             if (propertyInfo.PropertyType.IsAssignableFrom(typeof(TimeSpan)))
             {
-                var doubleValue = (double)Convert.ChangeType(stringValue, typeof(double), CultureInfo.InvariantCulture);
+                var doubleValue = ConvertTo<double>();
                 value = TimeSpan.FromSeconds(doubleValue);
             }
             else if (propertyInfo.PropertyType.IsAssignableFrom(typeof(DateTime)))
             {
                 if (attribute.Unit is Unit.UnixMilliSeconds or not Unit.ParsableTime)
                 {
-                    var doubleValue = (double)Convert.ChangeType(stringValue, typeof(double), CultureInfo.InvariantCulture);
+                    var doubleValue = ConvertTo<double>();
                     value = DateTime.UnixEpoch.AddMilliseconds(doubleValue * (attribute.Unit == Unit.UnixMilliSeconds ? 1d : 1000d));
                 }
                 else
@@ -60,7 +60,7 @@ public class Gen24JsonService : IGen24JsonService
             }
             else if (attribute.DataType == FroniusDataType.Channel && propertyInfo.PropertyType.IsAssignableFrom(typeof(bool)))
             {
-                value = string.IsNullOrEmpty(stringValue) ? null : (double)Convert.ChangeType(stringValue, typeof(double), CultureInfo.InvariantCulture) != 0d;
+                value = string.IsNullOrEmpty(stringValue) ? null : ConvertTo<int>() != 0;
             }
             else if (propertyInfo.PropertyType.IsAssignableFrom(typeof(Version)))
             {
@@ -92,6 +92,11 @@ public class Gen24JsonService : IGen24JsonService
         }
 
         return value;
+
+        TTarget ConvertTo<TTarget>()
+        {
+            return (TTarget)Convert.ChangeType(stringValue, typeof(TTarget), CultureInfo.InvariantCulture);
+        }
     }
 
     public object? ReadEnum(Type type, string? stringValue)

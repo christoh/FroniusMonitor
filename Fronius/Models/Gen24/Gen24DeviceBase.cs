@@ -9,7 +9,7 @@ public abstract partial class Gen24DeviceBase : BindableBase, ICloneable
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Latency))]
-    [FroniusProprietaryImport("COMPONENTS_TIME_STAMP_U64", Unit.UnixMilliSeconds)]
+    [FroniusProprietaryImport("COMPONENTS_TIME_STAMP_U64", Unit.Default)]
     public partial DateTime? DataTime { get; set ; }
 
     [ObservableProperty]
