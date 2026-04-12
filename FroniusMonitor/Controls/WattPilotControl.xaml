@@ -289,7 +289,7 @@
                             <StackPanel Grid.Row="2" VerticalAlignment="Center">
 
                                 <c:Gauge Label="Frq." GaugeColors="{x:Static c:Gauge.MidIsGood}"
-                                         Value="{m:GaugeBinding Frequency}"
+                                         Value="{m:GaugeBinding Frequency}" Origin=".5"
                                          UnitName="Hz" Minimum="49" Maximum="51" StringFormat="N3" />
 
                                 <c:Gauge Label="{x:Static p:Resources.Latency}" GaugeColors="{x:Static c:Gauge.HighIsBad}"

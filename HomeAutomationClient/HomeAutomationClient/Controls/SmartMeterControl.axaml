@@ -18,6 +18,7 @@
 						<Setter Property="Maximum" Value="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter IsOnePhase=True}, FallbackValue=8050}" />
 						<Setter Property="UnitName" Value="W" />
 						<Setter Property="FontSize" Value="9"/>
+                        <Setter Property="TickFill" Value="{DynamicResource TickFill}"/>
 						<Setter Property="StringFormat" Value="N1"/>
 						<Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.MidIsGood}" />
 						<Setter Property="Origin" Value=".5" />

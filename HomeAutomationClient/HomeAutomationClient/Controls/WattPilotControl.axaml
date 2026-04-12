@@ -197,7 +197,7 @@
 
 								<c:LinearGauge Classes="LinearGaugeStyle" Label="Frq." GaugeColors="{x:Static m:GaugeColors.MidIsGood}"
                                                Value="{Binding WattPilot.Frequency}"
-                                               UnitName="Hz" Minimum="49" Maximum="51" />
+                                               UnitName="Hz" Minimum="49" Maximum="51" Origin=".5"/>
 
 								<c:LinearGauge Classes="LinearGaugeStyle" Label="{x:Static p:Resources.Latency}" GaugeColors="{x:Static m:GaugeColors.HighIsBad}"
                                                Value="{ReflectionBinding WattPilot.Latency.TotalMilliseconds}"
