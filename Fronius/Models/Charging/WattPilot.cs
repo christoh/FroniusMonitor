@@ -170,10 +170,18 @@ public partial class WattPilot : BindableBase, IHaveDisplayName, IHaveUniqueId, 
     [WattPilot("nrg", 1)]
     public partial double? VoltageL2 { get; set; }
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(VoltageAverage), nameof(MaximumChargingPowerPossibleSum), nameof(MaximumChargingPowerPossibleL3))]
     [WattPilot("nrg", 2)]
-    public partial double? VoltageL3 { get; set; }
+    public double? VoltageL3
+    {
+        get;
+        set
+        {
+            Set(ref field, value);
+            NotifyOfPropertyChange(nameof(VoltageAverage));
+            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossibleSum));
+            NotifyOfPropertyChange(nameof(MaximumChargingPowerPossibleL3));
+        }
+    }
 
     [ObservableProperty]
     [WattPilot("nrg", 3)]
@@ -187,27 +195,41 @@ public partial class WattPilot : BindableBase, IHaveDisplayName, IHaveUniqueId, 
     [WattPilot("nrg", 5)]
     public partial double? CurrentL2 { get; set; }
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CurrentSum))]
     [WattPilot("nrg", 6)]
-    public partial double? CurrentL3 { get; set; }
+    public double? CurrentL3
+    {
+        get;
+        set
+        {
+            Set(ref field, value);
+            NotifyOfPropertyChange(nameof(CurrentSum));
+        }
+    }
 
     public double? CurrentSum => CurrentL1 + CurrentL2 + CurrentL3;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(PowerSum), nameof(PowerL1KiloWatts))]
+    [NotifyPropertyChangedFor(nameof(PowerL1KiloWatts))]
     [WattPilot("nrg", 7)]
     public partial double? PowerL1 { get; set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(PowerSum), nameof(PowerL2KiloWatts))]
+    [NotifyPropertyChangedFor(nameof(PowerL2KiloWatts))]
     [WattPilot("nrg", 8)]
     public partial double? PowerL2 { get; set; }
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(PowerSum), nameof(PowerL3KiloWatts), nameof(PowerSumKiloWatts), nameof(ChargingPhases))]
     [WattPilot("nrg", 9)]
-    public partial double? PowerL3 { get; set; }
+    public double? PowerL3
+    {
+        get;
+        set
+        {
+            Set(ref field, value, () => NotifyOfPropertyChange(nameof(PowerL3KiloWatts)));
+            NotifyOfPropertyChange(nameof(PowerSum));
+            NotifyOfPropertyChange(nameof(PowerSumKiloWatts));
+            NotifyOfPropertyChange(nameof(ChargingPhases));
+        }
+    }
 
     [ObservableProperty]
     [WattPilot("nrg", 10)]
