@@ -212,10 +212,16 @@
                                 <Setter Property="Margin" Value="0,0,8,0" />
                             </Style>
                         </StackPanel.Resources>
-                        <CheckBox Content="{l:Config 'BATTERIES.HYB_EVU_CHARGEFROMGRID'}"
-                                  IsChecked="{Binding Settings.ChargeFromGrid}" />
-                        <CheckBox Content="{l:Config 'BATTERIES.HYB_BM_CHARGEFROMAC'}"
-                                  IsChecked="{Binding Settings.ChargeFromAc}" />
+                        <TextBlock>
+                            <Run Text="{x:Static p:Resources.BatteryChargingSources}"/><Run Text=":"/>
+                        </TextBlock>
+                        <ComboBox ItemsSource="{Binding ChargingSources}" SelectedItem="{Binding SelectedChargingSources}" Margin="0,0,0,12">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Margin="0,4" Text="{Binding Converter={co:Enum2DisplayName}}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
                         <CheckBox IsEnabled="{Binding EnableDanger}"
                                   IsChecked="{Binding Settings.IsEnabled}">
                             <CheckBox.Content>

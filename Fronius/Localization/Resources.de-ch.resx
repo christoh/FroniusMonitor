@@ -32,4 +32,7 @@
 	<data name="RandomDelayCarConnect" xml:space="preserve">
 		<value>Zufällige Verzögerung beim Anschliessen des Autos</value>
 	</data>
+	<data name="Gen24ChargingSources_HomeAndGrid" xml:space="preserve">
+		<value>Jede Energiequelle einschliesslich des öffentlichen Netzes</value>
+	</data>
 </root>

@@ -1620,4 +1620,16 @@
   <data name="DeviceColorTemperatureDisabled" xml:space="preserve">
 	  <value>Farbtemperatur für Gerät '{0}' is deaktiviert.</value>
   </data>
+  <data name="BatteryChargingSources" xml:space="preserve">
+	  <value>Batterieladequellen</value>
+  </data>
+  <data name="Gen24ChargingSources_Home" xml:space="preserve">
+	  <value>Jede Energiequelle im Haus</value>
+  </data>
+  <data name="Gen24ChargingSources_HomeAndGrid" xml:space="preserve">
+	  <value>Jede Energiequelle einschließlich des öffentlichen Netzes</value>
+  </data>
+  <data name="Gen24ChargingSources_InverterPv" xml:space="preserve">
+	  <value>Nur Solarzellen dieses Wechselrichters</value>
+  </data>
 </root>

@@ -12,12 +12,14 @@ public partial class SelfConsumptionOptimizationViewModel
 ) : SettingsViewModelBase(dataCollectionService, gen24Service, gen24JsonService, fritzBoxService, wattPilotService)
 {
     private static readonly IEnumerable<ChargingRuleType> ruleTypes = Enum.GetValues<ChargingRuleType>();
+    private static readonly IEnumerable<Gen24ChargingSources> chargingSources = Enum.GetValues<Gen24ChargingSources>();
 
     private Gen24BatterySettings oldSettings = null!;
     private BindableCollection<Gen24ChargingRule> oldChargingRules = null!;
 
 #pragma warning disable CA1822 // Mark members as static
     public IEnumerable<ChargingRuleType> RuleTypes => ruleTypes;
+    public IEnumerable<Gen24ChargingSources> ChargingSources => chargingSources;
 #pragma warning restore CA1822 // Mark members as static
 
     public Gen24BatterySettings Settings
@@ -60,6 +62,12 @@ public partial class SelfConsumptionOptimizationViewModel
     {
         get;
         set => Set(ref field, value, UpdateHomePower);
+    }
+
+    public Gen24ChargingSources SelectedChargingSources
+    {
+        get;
+        set => Set(ref field, value, UpdateChargingSources);
     }
 
     public int? BatteryAcChargingMaxPower
@@ -156,6 +164,11 @@ public partial class SelfConsumptionOptimizationViewModel
             var inverterSettings = Gen24InverterSettings.Parse(configToken);
             oldSettings = Gen24JsonService.ReadFroniusData<Gen24BatterySettings>(configToken["batteries"]?["batteries"]);
 
+            if (oldSettings.ChargeFromGrid is true)
+            {
+                oldSettings.ChargeFromAc = true;
+            }
+
             if (!string.IsNullOrWhiteSpace(inverterSettings.SystemName))
             {
                 Title = $"{Loc.EnergyFlow} - {inverterSettings.SystemName}";
@@ -195,6 +208,28 @@ public partial class SelfConsumptionOptimizationViewModel
             }
         }
     }
+
+    private void UpdateChargingSources()
+    {
+        switch (SelectedChargingSources)
+        {
+            case Gen24ChargingSources.InverterPv:
+                Settings?.ChargeFromAc = false;
+                Settings?.ChargeFromGrid = false;
+                break;
+
+            case Gen24ChargingSources.Home:
+                Settings?.ChargeFromAc = true;
+                Settings?.ChargeFromGrid = false;
+                break;
+
+            case Gen24ChargingSources.HomeAndGrid:
+                Settings?.ChargeFromAc = true;
+                Settings?.ChargeFromGrid = true;
+                break;
+        }
+    }
+
 
     private void UpdateGridPower()
     {
@@ -261,6 +296,13 @@ public partial class SelfConsumptionOptimizationViewModel
         LogHomePower = Math.Log10(Math.Abs(-Settings.BatteryAcChargingMaxPower ?? .0000001));
         NotifyOfPropertyChange(nameof(RequestedGridPower));
         NotifyOfPropertyChange(nameof(BatteryAcChargingMaxPower));
+
+        SelectedChargingSources = Settings switch
+        {
+            { ChargeFromGrid: true } => Gen24ChargingSources.HomeAndGrid,
+            { ChargeFromAc: true } => Gen24ChargingSources.Home,
+            _ => Gen24ChargingSources.InverterPv,
+        };
     }
 
     [RelayCommand]

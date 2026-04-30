@@ -41,7 +41,7 @@ public class BayernWerkImportService(SettingsBase settings, IDataCollectionServi
 
         var row = cell.WorksheetRow();
         var energy = row.Cell("G").GetValue<double>() * 1000;
-        var time = row.Cell("C").GetDateTime().ToUniversalTime();
+        var time = new DateTime(row.Cell("C").GetDateTime().Ticks, DateTimeKind.Utc);
         var historyEntry = energyHistory.MinBy(i => Math.Abs(i.CalibrationDate.Ticks - time.Ticks));
 
         if (historyEntry == null || Math.Abs((historyEntry.CalibrationDate - time).TotalMinutes) > 2)

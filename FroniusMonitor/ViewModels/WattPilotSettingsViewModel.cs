@@ -1,6 +1,8 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
+﻿using CommunityToolkit.Mvvm.Input;
 
-public class WattPilotSettingsViewModel(IDataCollectionService dataCollectionService, IWattPilotService wattPilotService) : ViewModelBase
+namespace De.Hochstaetter.FroniusMonitor.ViewModels;
+
+public partial class WattPilotSettingsViewModel(IDataCollectionService dataCollectionService, IWattPilotService wattPilotService) : ViewModelBase
 {
     private WattPilot oldWattPilot = null!;
 
@@ -92,15 +94,7 @@ public class WattPilotSettingsViewModel(IDataCollectionService dataCollectionSer
     public string ApiLink => "https://" + (WattPilot.SerialNumber ?? "<Serial>") + ".api.v3.go-e.io";
     public string ApiUri => ApiLink + $"/api/status?token={WattPilot.CloudAccessKey ?? "<Token>"}";
 
-    [field: AllowNull, MaybeNull]
-    public ICommand ApplyCommand => field ??= new NoParameterCommand(Apply);
-
-    [field: AllowNull, MaybeNull]
-    public ICommand UndoCommand => field ??= new NoParameterCommand(() => Undo());
-
-    [field: AllowNull, MaybeNull]
-    public ICommand NavigateToApiCommand => field ??= new NoParameterCommand(NavigateToApi);
-
+    [RelayCommand]
     private void NavigateToApi()
     {
         Process.Start(new ProcessStartInfo(ApiUri) { UseShellExecute = true });
@@ -136,6 +130,7 @@ public class WattPilotSettingsViewModel(IDataCollectionService dataCollectionSer
         Undo();
     }
 
+    [RelayCommand]
     private void Undo(bool resetWriteOnlyFields = true)
     {
         if (resetWriteOnlyFields)
@@ -154,7 +149,8 @@ public class WattPilotSettingsViewModel(IDataCollectionService dataCollectionSer
         }
     }
 
-    private async void Apply()
+    [RelayCommand]
+    private async Task Apply()
     {
         if (WattPilot.LoadBalancingCurrents is not null && WattPilot.LoadBalancingCurrents != oldWattPilot.LoadBalancingCurrents)
         {
@@ -176,7 +172,7 @@ public class WattPilotSettingsViewModel(IDataCollectionService dataCollectionSer
                 }
             }
 
-            IList<string> errors = NotifiedValidationErrors
+            var errors = NotifiedValidationErrors
                 .Where(e => e.BindingInError is BindingExpression { Target: FrameworkElement { IsVisible: true } })
                 .Select(e => e.ErrorContent.ToString() ?? string.Empty).ToList();
 

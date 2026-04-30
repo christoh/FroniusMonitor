@@ -1695,4 +1695,16 @@
   <data name="DeviceColorTemperatureDisabled" xml:space="preserve">
 	  <value>Support for color temperature is disabled on device '{0}'.</value>
   </data>
+  <data name="BatteryChargingSources" xml:space="preserve">
+	  <value>Battery charing source</value>
+  </data>
+  <data name="Gen24ChargingSources_InverterPv" xml:space="preserve">
+	  <value>Solar panels of this inverter only</value>
+  </data>
+  <data name="Gen24ChargingSources_Home" xml:space="preserve">
+	  <value>Any power source in your home</value>
+  </data>
+  <data name="Gen24ChargingSources_HomeAndGrid" xml:space="preserve">
+	  <value>Any power source including public grid</value>
+  </data>
 </root>
