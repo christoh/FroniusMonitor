@@ -20,7 +20,7 @@ public class AwattarPriceInfoConverter : JsonConverter<decimal>
     {
         try
         {
-            writer.WriteNumberValue((decimal)value);
+            writer.WriteNumberValue(value);
         }
         catch (Exception)
         {
