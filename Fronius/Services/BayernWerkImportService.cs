@@ -35,7 +35,7 @@ public class BayernWerkImportService(SettingsBase settings, IDataCollectionServi
         };
 
         var cell = sheet.Range("F:F").Cells()
-                       .Where(c => c.Value.IsText && c.GetValue<string>() == "VAL" && c.WorksheetRow().Cell("G") is { Value.IsNumber: true } valueCell && Math.Abs(valueCell.GetValue<double>()) > .00001)
+                       .Where(c => c.Value.IsText && c.GetValue<string>() == "W" && c.WorksheetRow().Cell("G") is { Value.IsNumber: true } valueCell && Math.Abs(valueCell.GetValue<double>()) > .00001)
                        .MaxBy(c => c.WorksheetRow().RowNumber())
                    ?? throw new InvalidDataException(Resources.NoValidCells);
 
