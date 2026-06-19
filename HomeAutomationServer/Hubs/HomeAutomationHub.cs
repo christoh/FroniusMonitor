@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 
 namespace De.Hochstaetter.HomeAutomationServer.Hubs;
 
 public class HomeAutomationHub(IDataControlService controlService, ILogger<HomeAutomationHub> logger) : Hub
 {
-
     public override async Task OnConnectedAsync()
     {
         await base.OnConnectedAsync().ConfigureAwait(false);

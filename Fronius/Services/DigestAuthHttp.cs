@@ -24,6 +24,7 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
     private Encoding? encoding;
     private DateTime cnonceDate;
     private uint nc;
+    private bool isDisposed;
 
     public DigestAuthHttp(WebConnection connection) : this(connection, TimeSpan.FromMinutes(1)) { }
 
@@ -31,9 +32,11 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
     {
         get
         {
-            if (field == null)
+            ObjectDisposedException.ThrowIf(isDisposed, this);
+
+            lock (hashLock)
             {
-                lock (hashLock)
+                if (field == null)
                 {
                     field = new()
                     {
@@ -53,11 +56,18 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
 
     ~DigestAuthHttp() => Dispose();
 
-#pragma warning disable CA1816
+//#pragma warning disable CA1816
     public void Dispose()
     {
+        if (isDisposed)
+        {
+            return;
+        }
+
         HttpClient.Dispose();
         HttpClient = null!;
+        isDisposed = true;
+        GC.SuppressFinalize(this);
     }
 
     public async ValueTask DisposeAsync()
@@ -65,7 +75,6 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
         await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
         Dispose();
     }
-#pragma warning restore CA1816
 
     public async ValueTask<(JToken, HttpStatusCode)> GetJsonToken(string url, JToken? jToken, IEnumerable<HttpStatusCode>? allowedStatusCodes = null, CancellationToken token = default)
     {
@@ -114,12 +123,13 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
         {
             response = await SendAsync(request, token).ConfigureAwait(false);
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException) when (!token.IsCancellationRequested)
         {
             request.Dispose();
 
             lock (hashLock)
             {
+                HttpClient?.Dispose();
                 HttpClient = null!;
                 CreateRequest();
             }
@@ -224,7 +234,7 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
                        $"""response="{digestResponse}", """ +
                        (opaque != null ? $"opaque=\"{opaque}\", " : string.Empty) +
                        $"algorithm={algorithm}, qop=auth, nc={nc:x8}, cnonce=\"{cnonce}\"";
-                
+
                 [SuppressMessage("ReSharper", "SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault")]
                 string CalculateHash(string input)
                 {

@@ -25,8 +25,7 @@ public class Gen24ModbusSettingsTests
         // Multiple IPv4 Addresses and Subnet Masks separated by Commas
         Assert.DoesNotThrow(() => settings.IpAddress = "192.168.1.1,10.0.0.100,172.16.0.10");
         Assert.DoesNotThrow(() => settings.IpAddress = "192.168.1.0/24,10.0.0.0/8,172.16.0.0/16");
-        Assert.DoesNotThrow(() => settings.IpAddress = "192.168.1.1,10.0.0.100,172.16.0.10,"
-           + "192.168.1.0/24,10.0.0.0/8,172.16.0.0/16");
+        Assert.DoesNotThrow(() => settings.IpAddress = "192.168.1.1,10.0.0.100,172.16.0.10," + "192.168.1.0/24,10.0.0.0/8,172.16.0.0/16");
     }
 
     [Test]

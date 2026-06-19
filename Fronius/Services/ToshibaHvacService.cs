@@ -155,7 +155,7 @@ public partial class ToshibaHvacService(SynchronizationContext context, Settings
         {
             { "DeviceID", azureConnection.UserName.ToLower() + "_" + azureDeviceId },
             { "DeviceType", "1" },
-            { "Username", azureConnection.UserName }
+            { "Username", azureConnection.UserName },
         };
 
         var azureCredentials = await Deserialize<ToshibaHvacAzureCredentials>("/api/Consumer/RegisterMobileDevice", postData).ConfigureAwait(false);
