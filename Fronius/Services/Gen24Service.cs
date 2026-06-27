@@ -234,8 +234,13 @@ public class Gen24Service(IGen24JsonService gen24JsonService) : BindableBase, IG
             //i ??= new JObject();
         }
 
-
-        if (CultureInfo.CurrentUICulture.TwoLetterISOLanguageName != "en")
+        var letterCode = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName switch
+        {
+            "gsw"=> "de",
+            _ => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName,
+        };
+        
+        if (letterCode != "en")
         {
             try
             {
@@ -243,8 +248,7 @@ public class Gen24Service(IGen24JsonService gen24JsonService) : BindableBase, IG
                 {
                     await Task.Run(async () =>
                     {
-                        l = JObject.Parse((await GetFroniusStringResponse($"{baseUrl}/{CultureInfo
-                            .CurrentUICulture.TwoLetterISOLanguageName}.json", token: token).ConfigureAwait(false)).JsonString);
+                        l = JObject.Parse((await GetFroniusStringResponse($"{baseUrl}/{letterCode}.json", token: token).ConfigureAwait(false)).JsonString);
                     }, token).ConfigureAwait(false);
                 }
             }
