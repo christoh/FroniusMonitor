@@ -208,10 +208,10 @@
     <value>Efficienza</value>
   </data>
   <data name="On" xml:space="preserve">
-    <value>Acceso</value>
+    <value>on</value>
   </data>
   <data name="Off" xml:space="preserve">
-    <value>Spento</value>
+    <value>off</value>
   </data>
   <data name="AccessDenied" xml:space="preserve">
     <value>Accesso negato</value>
