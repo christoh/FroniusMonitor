@@ -26,7 +26,7 @@ internal sealed partial class Program
         App.ServiceCollection = new ServiceCollection();
         App.ServiceCollection.AddSingleton<ICache>(cache);
 
-        await LoadSatelliteAssemblies(["de", "de-CH", "de-LI"]);
+        await LoadSatelliteAssemblies(["de", "de-CH", "de-LI", "it"]);
         await BuildAvaloniaApp().WithInterFont().StartBrowserAppAsync("out");
     }
 
