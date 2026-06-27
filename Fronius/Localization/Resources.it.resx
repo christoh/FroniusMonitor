@@ -130,10 +130,10 @@
     <value>Risposta errata dal gestore dati</value>
   </data>
   <data name="Inverter" xml:space="preserve">
-    <value>Invertitore</value>
+    <value>Inverter</value>
   </data>
   <data name="NoSystemConnection" xml:space="preserve">
-    <value>Non sono stati specificati parametri di connessione completi dell'invertitore</value>
+    <value>Non sono stati specificati parametri di connessione completi dell'inverter</value>
   </data>
   <data name="Ready" xml:space="preserve">
     <value>Pronto</value>
@@ -220,7 +220,7 @@
     <value>Temperatura</value>
   </data>
   <data name="IncludeInverterPower" xml:space="preserve">
-	  <value>Includi la potenza dell'invertitore nel carico (modalità Solar.web)</value>
+	  <value>Includi la potenza dell'inverter nel carico (modalità Solar.web)</value>
   </data>
   <data name="Settings" xml:space="preserve">
 	  <value>Impostazioni</value>
@@ -289,10 +289,10 @@
     <value>Applica</value>
   </data>
   <data name="InverterCommError" xml:space="preserve">
-    <value>L'invertitore non ha accettato le impostazioni: {0}</value>
+    <value>L'inverter non ha accettato le impostazioni: {0}</value>
   </data>
   <data name="InverterCommReadError" xml:space="preserve">
-    <value>Impossibile leggere i dati dall'invertitore: {0}</value>
+    <value>Impossibile leggere i dati dall'inverter: {0}</value>
   </data>
   <data name="Warning" xml:space="preserve">
     <value>Avviso</value>
@@ -367,10 +367,10 @@
 	  <value>Abilita slave Modbus su TCP</value>
   </data>
   <data name="AllowInverterControlOverModbusTcp" xml:space="preserve">
-	  <value>Consenti il controllo dell'invertitore via TCP</value>
+	  <value>Consenti il controllo dell'inverter via TCP</value>
   </data>
   <data name="RestrictInverterControlOverModbusTcp" xml:space="preserve">
-	  <value>Limita il controllo dell'invertitore via TCP</value>
+	  <value>Limita il controllo dell'inverter via TCP</value>
   </data>
   <data name="AllowIp" xml:space="preserve">
 	  <value>Consenti il controllo solo dall'indirizzo IP</value>
@@ -457,10 +457,10 @@
 	  <value>La regola di carica '{0}' è in conflitto con '{1}'</value>
   </data>
   <data name="SettingsSavedToInverter" xml:space="preserve">
-	  <value>Le impostazioni sono state inviate all'invertitore.</value>
+	  <value>Le impostazioni sono state inviate all'inverter.</value>
   </data>
   <data name="Gen24InverterHeader" xml:space="preserve">
-	  <value>Invertitore Fronius Gen24</value>
+	  <value>Inverter Fronius Gen24</value>
   </data>
   <data name="FritzBoxHeader" xml:space="preserve">
 	  <value>AVM Fritz!Box</value>
@@ -742,7 +742,7 @@
 	  <value>Fronius Wattpilot</value>
   </data>
   <data name="ControlWattPilot" xml:space="preserve">
-	  <value>Controlla il Wattpilot collegato all'invertitore</value>
+	  <value>Controlla il Wattpilot collegato all'inverter</value>
   </data>
   <data name="Guest" xml:space="preserve">
 	  <value>Ospite</value>
@@ -784,7 +784,7 @@
 	  <value>Rimani in modalità eco</value>
   </data>
   <data name="NoGen24Symo" xml:space="preserve">
-	  <value>Impossibile verificare che l'invertitore sia un GEN24 Symo</value>
+	  <value>Impossibile verificare che l'inverter sia un GEN24 Symo</value>
   </data>
   <data name="UtcBug" xml:space="preserve">
 	  <value>A causa di un bug nel firmware 1.19.7-1, l'orario nelle regole di carica della batteria è in UTC. Valuta l'aggiornamento alla versione 1.21.6-1 o superiore.</value>
@@ -952,13 +952,13 @@
 	  <value>Impossibile cambiare lo stato di standby: {0}</value>
   </data>
   <data name="StandbyWarning" xml:space="preserve">
-	  <value>Sei sicuro di voler mettere questo invertitore in standby?</value>
+	  <value>Sei sicuro di voler mettere questo inverter in standby?</value>
   </data>
   <data name="DcRelativePower" xml:space="preserve">
 	  <value>Potenza CC %</value>
   </data>
   <data name="InverterSettings" xml:space="preserve">
-	  <value>Impostazioni invertitore</value>
+	  <value>Impostazioni inverter</value>
   </data>
   <data name="SynchronizeTime" xml:space="preserve">
 	  <value>Usa la sincronizzazione dell'ora NTP</value>
@@ -967,7 +967,7 @@
 	  <value>Ho un secondo Fronius Gen24</value>
   </data>
   <data name="InverterTimeout" xml:space="preserve">
-	  <value>Timeout di lettura dall'invertitore</value>
+	  <value>Timeout di lettura dall'inverter</value>
   </data>
   <data name="NetMask" xml:space="preserve">
 	  <value>Maschera di sottorete</value>
@@ -1279,13 +1279,13 @@
 	  <value>Tensione di fase CA rete</value>
   </data>
   <data name="ΔAcPhaseVoltageFeedIn" xml:space="preserve">
-	  <value>Δ Tensione di fase CA invertitore</value>
+	  <value>Δ Tensione di fase CA inverter</value>
   </data>
   <data name="AcLineVoltageFeedIn" xml:space="preserve">
 	  <value>Tensione concatenata CA rete</value>
   </data>
   <data name="ΔAcLineVoltageFeedIn" xml:space="preserve">
-	  <value>Δ Tensione concatenata CA invertitore</value>
+	  <value>Δ Tensione concatenata CA inverter</value>
   </data>
   <data name="ΔFrequency" xml:space="preserve">
 	  <value>Δ Frequenza</value>
@@ -1300,7 +1300,7 @@
 	  <value>Vai su "Visualizza" e seleziona almeno una voce.</value>
   </data>
   <data name="InverterDetailsView" xml:space="preserve">
-	  <value>Dettagli invertitore</value>
+	  <value>Dettagli inverter</value>
   </data>
   <data name="BatteryDetailsView" xml:space="preserve">
 	  <value>Dettagli batteria</value>
@@ -1336,10 +1336,10 @@
 	  <value>Celle media</value>
   </data>
   <data name="AcPhaseVoltageInverter" xml:space="preserve">
-	  <value>Tensione di fase CA invertitore</value>
+	  <value>Tensione di fase CA inverter</value>
   </data>
   <data name="AcLineVoltageInverter" xml:space="preserve">
-	  <value>Tensione concatenata CA invertitore</value>
+	  <value>Tensione concatenata CA inverter</value>
   </data>
   <data name="WattPilotDetails" xml:space="preserve">
 	  <value>Dettagli Wattpilot</value>
@@ -1366,7 +1366,7 @@
 	  <value>Nessun collegamento al registro di carica disponibile dal Wattpilot</value>
   </data>
   <data name="Inverters" xml:space="preserve">
-	  <value>Invertitori</value>
+	  <value>Inverter</value>
   </data>
   <data name="FirmwareTooOld" xml:space="preserve">
 	  <value>Il firmware {0} è troppo vecchio. Aggiorna almeno alla versione {1}.</value>
@@ -1375,10 +1375,10 @@
 	  <value>Il firmware {0} contiene modifiche incompatibili. Aggiorna questo software.</value>
   </data>
   <data name="DeleteInverter" xml:space="preserve">
-	  <value>Elimina invertitore</value>
+	  <value>Elimina inverter</value>
   </data>
   <data name="AddInverter" xml:space="preserve">
-	  <value>Aggiungi invertitore</value>
+	  <value>Aggiungi inverter</value>
   </data>
   <data name="HostnameOrIpv4Address" xml:space="preserve">
 	  <value>Nome host o indirizzo IPv4</value>
@@ -1387,13 +1387,13 @@
 	  <value>Deve essere un nome host o un indirizzo IPv4 valido</value>
   </data>
   <data name="NewInverter" xml:space="preserve">
-	  <value>Nuovo invertitore</value>
+	  <value>Nuovo inverter</value>
   </data>
   <data name="Refresh" xml:space="preserve">
 	  <value>Aggiorna</value>
   </data>
   <data name="InvalidInverterName" xml:space="preserve">
-	  <value>Il nome dell'invertitore deve avere da 1 a 30 caratteri.</value>
+	  <value>Il nome dell'inverter deve avere da 1 a 30 caratteri.</value>
   </data>
   <data name="ModelStatus_ChargingBecauseEnoughBattery" xml:space="preserve">
 	  <value>In carica (batteria)</value>
@@ -1660,7 +1660,7 @@
 	  <value>Il dispositivo '{0}' non è stato trovato.</value>
   </data>
   <data name="GetInverterLocalization" xml:space="preserve">
-	  <value>Recupero dei file di localizzazione dell'invertitore</value>
+	  <value>Recupero dei file di localizzazione dell'inverter</value>
   </data>
   <data name="CryptoInit" xml:space="preserve">
 	  <value>Scambio delle chiavi crittografiche</value>
@@ -1702,7 +1702,7 @@
 	  <value>Fonte di carica della batteria</value>
   </data>
   <data name="Gen24ChargingSources_InverterPv" xml:space="preserve">
-	  <value>Solo i pannelli solari di questo invertitore</value>
+	  <value>Solo i pannelli solari di questo inverter</value>
   </data>
   <data name="Gen24ChargingSources_Home" xml:space="preserve">
 	  <value>Qualsiasi fonte di energia in casa</value>
