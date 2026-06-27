@@ -4,7 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
-             xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
+             xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters" 
+             xmlns:localization="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid x:Name="RootElement" Height="85" Width="120" DataContext="{Binding RelativeSource={RelativeSource AncestorType=c:PowerFlowArrow}}">
@@ -30,7 +31,7 @@
             <TextBlock.RenderTransform>
                 <RotateTransform Angle="{Binding TextPlacement, Converter={co:PlacementMode2Double Center=0, Left=-90, Top=-90, Right=-90, Relative=0}}"/>
             </TextBlock.RenderTransform>
-            <Run x:Name="TextBlock" Text="--- W"/><Run FontSize="8" BaselineAlignment="Subscript" Text="{Binding IsAc, Converter={co:Bool2String True='AC', False='DC'}}"></Run>
+            <Run x:Name="TextBlock" Text="--- W"/><Run FontSize="8" BaselineAlignment="Subscript" Text="{Binding IsAc, Converter={co:Bool2String True='{x:Static localization:Resources.Ac}', False='{x:Static localization:Resources.Dc}'}}"></Run>
         </TextBlock>
         </Canvas>
     </Grid>
