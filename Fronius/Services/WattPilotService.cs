@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.Fronius.Services;
+﻿using DocumentFormat.OpenXml.Wordprocessing;
+
+namespace De.Hochstaetter.Fronius.Services;
 
 public partial class WattPilotService : BindableBase, IWattPilotService
 {
@@ -8,7 +10,7 @@ public partial class WattPilotService : BindableBase, IWattPilotService
     private uint requestId;
     private CancellationTokenSource? tokenSource;
     private ClientWebSocket? clientWebSocket;
-    private Thread? readThread;
+    private Task? readerTask;
     private string? hashedPassword;
     private string? oldEncryptedPassword;
     private WattPilot? savedWattPilot;
@@ -39,14 +41,10 @@ public partial class WattPilotService : BindableBase, IWattPilotService
     {
         get
         {
-            WattPilotAcknowledge[] result;
-
             lock (outstandingAcknowledges)
             {
-                result = [.. outstandingAcknowledges];
+                return [.. outstandingAcknowledges.Where(a => !a.IsConfirmed)];
             }
-
-            return result;
         }
     }
 
@@ -62,15 +60,18 @@ public partial class WattPilotService : BindableBase, IWattPilotService
             tokenSource = new CancellationTokenSource(10000);
             Connection = connection;
 
+            // The PBKDF2 hash is salted with the device serial number, so it must be recomputed for
+            // each connection in case we are now talking to a different WattPilot.
+            hashedPassword = null;
+
             clientWebSocket = new ClientWebSocket();
             clientWebSocket.Options.KeepAliveInterval = TimeSpan.FromMinutes(2);
             clientWebSocket.Options.DangerousDeflateOptions = new WebSocketDeflateOptions();
             await clientWebSocket.ConnectAsync(new Uri(connection.BaseUrl + "/ws"), Token).ConfigureAwait(false);
             Token.ThrowIfCancellationRequested();
 
-            var result = await clientWebSocket.ReceiveAsync(buffer, Token).ConfigureAwait(false);
+            var hello = await ReceiveTextMessage(Token).ConfigureAwait(false);
             Token.ThrowIfCancellationRequested();
-            var hello = Encoding.UTF8.GetString(buffer, 0, result.Count);
             var token = JObject.Parse(hello);
             var type = token["type"]?.Value<string>();
 
@@ -92,10 +93,9 @@ public partial class WattPilotService : BindableBase, IWattPilotService
                 WattPilot.IsUpdating = true;
                 savedWattPilot = null;
 
-                result = await clientWebSocket.ReceiveAsync(buffer, Token).ConfigureAwait(false);
+                var messageJson = await ReceiveTextMessage(Token).ConfigureAwait(false);
                 Token.ThrowIfCancellationRequested();
-                var auth = Encoding.UTF8.GetString(buffer, 0, result.Count);
-                token = JObject.Parse(auth);
+                token = JObject.Parse(messageJson);
                 type = token["type"]?.Value<string>();
                 var haveData = true;
 
@@ -107,9 +107,13 @@ public partial class WattPilotService : BindableBase, IWattPilotService
 
                 while (true)
                 {
-                    if (!haveData) result = await clientWebSocket.ReceiveAsync(buffer, Token).ConfigureAwait(false);
+                    if (!haveData)
+                    {
+                        messageJson = await ReceiveTextMessage(Token).ConfigureAwait(false);
+                    }
+
                     Token.ThrowIfCancellationRequested();
-                    var dataToken = JObject.Parse(Encoding.UTF8.GetString(buffer, 0, result.Count));
+                    var dataToken = JObject.Parse(messageJson);
                     var dataType = dataToken["type"]?.Value<string>();
 
                     if (dataType is "fullStatus" or "deltaStatus")
@@ -117,7 +121,7 @@ public partial class WattPilotService : BindableBase, IWattPilotService
                         UpdateWattPilot(WattPilot!, dataToken["status"] as JObject);
                     }
 
-                    if (dataType == "fullStatus" && !dataToken["partial"]!.Value<bool>())
+                    if (dataType == "fullStatus" && dataToken["partial"]?.Value<bool>() != true)
                     {
                         break;
                     }
@@ -128,8 +132,7 @@ public partial class WattPilotService : BindableBase, IWattPilotService
 
             tokenSource?.Dispose();
             tokenSource = new CancellationTokenSource();
-            readThread = new Thread(Reader);
-            readThread.Start();
+            readerTask = Task.Run(Reader, CancellationToken.None);
 
             if (WattPilot?.Version is not null && WattPilot?.LatestVersion is not null && WattPilot.LatestVersion > WattPilot.Version)
             {
@@ -285,10 +288,7 @@ public partial class WattPilotService : BindableBase, IWattPilotService
 
         await clientWebSocket.SendAsync(Encoding.UTF8.GetBytes(authMessage), WebSocketMessageType.Text, WebSocketMessageFlags.DisableCompression | WebSocketMessageFlags.EndOfMessage, Token).ConfigureAwait(false);
         Token.ThrowIfCancellationRequested();
-        var result = await clientWebSocket.ReceiveAsync(buffer, Token).ConfigureAwait(false);
-
-        Token.ThrowIfCancellationRequested();
-        var authResponse = JObject.Parse(Encoding.UTF8.GetString(buffer, 0, result.Count));
+        var authResponse = JObject.Parse(await ReceiveTextMessage(Token).ConfigureAwait(false));
 
         if (authResponse["type"]?.Value<string>() == "authError")
         {
@@ -322,9 +322,13 @@ public partial class WattPilotService : BindableBase, IWattPilotService
             await tokenSource.CancelAsync().ConfigureAwait(false);
         }
 
-        while (Connection != null)
+        // Reader never faults (it catches everything and tears down in its finally), so awaiting it
+        // simply blocks until the connection is fully closed — no unbounded polling of Connection.
+        var task = readerTask;
+
+        if (task != null)
         {
-            await Task.Delay(50, CancellationToken.None).ConfigureAwait(false);
+            await task.ConfigureAwait(false);
         }
     }
 
@@ -337,19 +341,34 @@ public partial class WattPilotService : BindableBase, IWattPilotService
     {
         lock (outstandingAcknowledges)
         {
-            outstandingAcknowledges.Apply(a => a.Event.Dispose());
+            outstandingAcknowledges.Apply(DisposeAcknowledge);
             outstandingAcknowledges.Clear();
         }
     }
 
+    // Must only be called while holding the lock on outstandingAcknowledges so that the Reader
+    // never calls Set() on an event that is being disposed (see Reader's "response" handling).
+    private static void DisposeAcknowledge(WattPilotAcknowledge acknowledge)
+    {
+        if (acknowledge.IsDisposed)
+        {
+            return;
+        }
+
+        acknowledge.IsDisposed = true;
+        acknowledge.Event.Dispose();
+    }
+
     public Task WaitSendValues(int timeout = 5000) => Task.Run(() =>
     {
-        WaitHandle[] events;
+        WattPilotAcknowledge[] acknowledges;
 
         lock (outstandingAcknowledges)
         {
-            events = outstandingAcknowledges.Select(a => a.Event.WaitHandle).ToArray();
+            acknowledges = [.. outstandingAcknowledges];
         }
+
+        var events = acknowledges.Select(a => a.Event.WaitHandle).ToArray();
 
         try
         {
@@ -362,7 +381,7 @@ public partial class WattPilotService : BindableBase, IWattPilotService
         {
             lock (outstandingAcknowledges)
             {
-                outstandingAcknowledges.Apply(a => a.Event.Dispose());
+                acknowledges.Apply(DisposeAcknowledge);
             }
         }
     }, CancellationToken.None);
@@ -450,15 +469,56 @@ public partial class WattPilotService : BindableBase, IWattPilotService
         }
     }
 
-    private async void Reader()
+    /// <summary>
+    /// Receives a complete WebSocket text message, reassembling it across frames that may
+    /// span multiple <see cref="WebSocket.ReceiveAsync(ArraySegment{byte},CancellationToken)"/>
+    /// calls and exceed the size of <see cref="buffer"/>.
+    /// </summary>
+    private async ValueTask<string> ReceiveTextMessage(CancellationToken token)
+    {
+        if (clientWebSocket == null)
+        {
+            throw new WebSocketException(WebSocketError.ConnectionClosedPrematurely);
+        }
+
+        var result = await clientWebSocket.ReceiveAsync(buffer, token).ConfigureAwait(false);
+
+        if (result.MessageType == WebSocketMessageType.Close)
+        {
+            throw new WebSocketException(WebSocketError.ConnectionClosedPrematurely, "WattPilot closed the connection");
+        }
+
+        if (result.EndOfMessage)
+        {
+            return Encoding.UTF8.GetString(buffer, 0, result.Count);
+        }
+
+        using var stream = new MemoryStream(buffer.Length * 2);
+        stream.Write(buffer, 0, result.Count);
+
+        do
+        {
+            result = await clientWebSocket.ReceiveAsync(buffer, token).ConfigureAwait(false);
+
+            if (result.MessageType == WebSocketMessageType.Close)
+            {
+                throw new WebSocketException(WebSocketError.ConnectionClosedPrematurely, "WattPilot closed the connection");
+            }
+
+            stream.Write(buffer, 0, result.Count);
+        }
+        while (!result.EndOfMessage);
+
+        return Encoding.UTF8.GetString(stream.GetBuffer(), 0, (int)stream.Length);
+    }
+
+    private async Task Reader()
     {
         try
         {
             while (tokenSource != null && !Token.IsCancellationRequested && clientWebSocket != null)
             {
-                var result = await clientWebSocket.ReceiveAsync(buffer, Token);
-                Token.ThrowIfCancellationRequested();
-                var dataToken = JObject.Parse(Encoding.UTF8.GetString(buffer, 0, result.Count));
+                var dataToken = JObject.Parse(await ReceiveTextMessage(Token).ConfigureAwait(false));
                 Token.ThrowIfCancellationRequested();
 
                 if (dataToken["type"]?.Value<string>() == "deltaStatus")
@@ -468,33 +528,32 @@ public partial class WattPilotService : BindableBase, IWattPilotService
 
                 else if (dataToken["type"]?.Value<string>() == "response")
                 {
-                    WattPilotAcknowledge? ack;
+                    JObject? status = null;
 
+                    // Match the acknowledge, mark it confirmed and signal its waiter atomically while
+                    // holding the lock. The IsDisposed guard (set under the same lock by WaitSendValues
+                    // /ClearOutstandingAcknowledges) prevents Set() on an already-disposed event.
+                    // A failed write is left unconfirmed and unsignalled so WaitSendValues times out and
+                    // reports it via UnsuccessfulWrites.
                     lock (outstandingAcknowledges)
                     {
-                        ack = outstandingAcknowledges.SingleOrDefault(a => a.RequestId == dataToken["requestId"]?.Value<uint>());
+                        var ack = outstandingAcknowledges.SingleOrDefault(a => a.RequestId == dataToken["requestId"]?.Value<uint>());
+
+                        if (ack != null && dataToken["success"]?.Value<bool>() is true)
+                        {
+                            ack.IsConfirmed = true;
+                            status = dataToken["status"] as JObject;
+
+                            if (!ack.IsDisposed)
+                            {
+                                ack.Event.Set();
+                            }
+                        }
                     }
 
-                    if (ack == null) continue;
-
-                    try
+                    if (status != null)
                     {
-                        if (dataToken["success"]?.Value<bool>() is not true)
-                        {
-                            ack.Event.Dispose();
-                        }
-                        else
-                        {
-                            ack.Event.Set();
-                            UpdateWattPilot(WattPilot!, dataToken["status"] as JObject);
-                        }
-                    }
-                    finally
-                    {
-                        lock (outstandingAcknowledges)
-                        {
-                            outstandingAcknowledges.Remove(ack);
-                        }
+                        UpdateWattPilot(WattPilot!, status);
                     }
                 }
             }
@@ -526,7 +585,6 @@ public partial class WattPilotService : BindableBase, IWattPilotService
             WattPilot?.IsUpdating = false;
 
             WattPilot = null;
-            readThread = null;
             var connection = Connection?.Clone() as WebConnection;
             Connection = null;
 
