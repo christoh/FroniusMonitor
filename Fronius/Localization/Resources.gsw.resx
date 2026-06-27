@@ -472,7 +472,7 @@
 	  <value>Url</value>
   </data>
   <data name="Password" xml:space="preserve">
-	  <value>Losig</value>
+	  <value>Chännwort</value>
   </data>
   <data name="EnableFritzBox" xml:space="preserve">
 	  <value>AVM Fritz!Box Home-Automation-Grät steuere</value>
@@ -796,7 +796,7 @@
 	  <value>WLAN-Name</value>
   </data>
   <data name="WattPilotWifiPassword" xml:space="preserve">
-	  <value>WLAN-Losig</value>
+	  <value>WLAN-Chännwort</value>
   </data>
   <data name="IsWifiClientEnabled" xml:space="preserve">
 	  <value>WLAN-Client aktiviere</value>
@@ -1633,7 +1633,7 @@
 	  <value>PV-Leistig</value>
   </data>
   <data name="PleaseLogin" xml:space="preserve">
-	  <value>Bitte mäld di mit dim Benützername und dim Losig aa</value>
+	  <value>Bitte mäld di mit dim Benützername und dim Chännwort aa</value>
   </data>
   <data name="BusyLoggingIn" xml:space="preserve">
 	  <value>Aamälde</value>
@@ -1651,7 +1651,7 @@
 	  <value>Cha de Benützer nöd aamälde</value>
   </data>
   <data name="LoginIncorrect" xml:space="preserve">
-	  <value>Ungültigi Kombination us Benützername und Losig</value>
+	  <value>Ungültigi Kombination us Benützername und Chännwort</value>
   </data>
   <data name="Loading" xml:space="preserve">
 	  <value>Lade</value>
