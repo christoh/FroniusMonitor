@@ -1461,6 +1461,9 @@
   <data name="NoValidCells" xml:space="preserve">
 	  <value>Das Excel-Sheet hat keine gültigen Zeilen</value>
   </data>
+  <data name="IncorrectObisCode" xml:space="preserve">
+	  <value>Ungültiger OBIS-Code in Zelle C4 der Excel-Datei</value>
+  </data>
   <data name="CableLockStatus_Unknown" xml:space="preserve">
 	  <value>Unbekannt</value>
   </data>

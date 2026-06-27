@@ -34,7 +34,7 @@ public class BayernWerkImportService(SettingsBase settings, IDataCollectionServi
         {
             "1-1:1.29.0" => false,
             "1-1:2.29.0" => true,
-            _ => throw new InvalidDataException("Incorrect OBIS code in Cell C4 of Excel file"),
+            _ => throw new InvalidDataException(Resources.IncorrectObisCode),
         };
 
         var cell = sheet.Column("F").CellsUsed()

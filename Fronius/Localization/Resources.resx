@@ -1533,6 +1533,9 @@
   <data name="NoValidCells" xml:space="preserve">
 	  <value>Excel sheet has no valid rows</value>
   </data>
+  <data name="IncorrectObisCode" xml:space="preserve">
+	  <value>Incorrect OBIS code in cell C4 of Excel file</value>
+  </data>
   <data name="CableLockStatus_Unknown" xml:space="preserve">
 	  <value>Unknown</value>
   </data>

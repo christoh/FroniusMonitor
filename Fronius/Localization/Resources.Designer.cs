@@ -2264,7 +2264,16 @@ namespace De.Hochstaetter.Fronius.Localization {
                 return ResourceManager.GetString("IncorrectData", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Incorrect OBIS code in cell C4 of Excel file.
+        /// </summary>
+        public static string IncorrectObisCode {
+            get {
+                return ResourceManager.GetString("IncorrectObisCode", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Phase must be from 1 to 3.
         /// </summary>
