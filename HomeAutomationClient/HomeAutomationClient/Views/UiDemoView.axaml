@@ -14,7 +14,7 @@
 		<Grid RowDefinitions="Auto,Auto,*,Auto" Grid.Row="0">
 
 			<StackPanel x:Name="MainContentElement" Orientation="Vertical" Margin="16" Grid.Row="0" VerticalAlignment="Top">
-				<TextBlock Text="Home Automation Control Center UI Test" FontSize="24" TextAlignment="Center" FontWeight="Bold" TextWrapping="Wrap" HorizontalAlignment="Center" />
+				<TextBlock Text="{x:Static p:Resources.UiTestTitle}" FontSize="24" TextAlignment="Center" FontWeight="Bold" TextWrapping="Wrap" HorizontalAlignment="Center" />
 				<!--<TextBlock Text="{Binding ApiUri, TargetNullValue='http://www.hochstaetter.de/api'}" HorizontalAlignment="Center" />
                 <TextBlock HorizontalAlignment="Center" Margin="0,0,0,20">
                     <Run Text="Culture:" />
@@ -34,7 +34,7 @@
 								<Setter Property="Margin" Value="4" />
 							</Style>
 						</StackPanel.Styles>
-                        <HeaderedContentControl Classes="GroupBox" Header="Linear Gauge">
+                        <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.LinearGauge}">
                             <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,Auto" RowSpacing="5">
                                 <Grid.Styles>
                                     <Style Selector="c|LinearRectangleGauge">
@@ -48,11 +48,11 @@
                                 <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.PvPower}" Margin="0,3,8,0" />
                                 <c:LinearRectangleGauge Grid.Row="0" Grid.Column="1" Maximum="{Binding SitePvPeakPower}" Value="{Binding SitePowerFlow.SolarPower}"/>
                                 
-                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Consumption" Margin="0,3,8,0" />
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.Consumption}" Margin="0,3,8,0" />
                                 <c:LinearRectangleGauge Grid.Row="1" Grid.Column="1" Maximum="{Binding SitePvPeakPower}" Value="{Binding SitePowerFlow.LoadPower, Converter={co:Multiply Factor=-1}}"/>
                             </Grid>
                         </HeaderedContentControl>
-						<HeaderedContentControl Classes="GroupBox" Header="Half Circle Gauge">
+						<HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.HalfCircleGauge}">
                             <Viewbox Width="300">
                                 <views:GaugeTestView />
                             </Viewbox>
@@ -86,7 +86,7 @@
 								</ItemsControl.ItemTemplate>
 							</ItemsControl>
 						</HeaderedContentControl>
-                        <HeaderedContentControl Classes="GroupBox" Header="Smart Meter" IsVisible="{Binding SmartMeter, Converter={co:Null2Bool}}">
+                        <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.SmartMeter}" IsVisible="{Binding SmartMeter, Converter={co:Null2Bool}}">
                             <c:SmartMeterControl Height="250" VerticalAlignment="Top" Margin="8"
                                                  MeterStatus="{Binding MeterStatus}"
                                                  SmartMeter="{Binding SmartMeter}"
@@ -118,7 +118,7 @@
 					</StackPanel>
 				</ScrollViewer>
 			</Grid>
-			<HeaderedContentControl Grid.Row="2" IsVisible="{Binding ShowPowerConsumers}" Classes="GroupBox" Header="Power Consumer">
+			<HeaderedContentControl Grid.Row="2" IsVisible="{Binding ShowPowerConsumers}" Classes="GroupBox" Header="{x:Static p:Resources.PowerConsumer}">
 				<ScrollViewer VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto"
                               VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"
                               VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AllowAutoHide="False">

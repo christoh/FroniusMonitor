@@ -1689,4 +1689,31 @@
   <data name="Dc" xml:space="preserve">
     <value>DC</value>
   </data>
+  <data name="UiTestTitle" xml:space="preserve">
+    <value>Home Automation Control Center UI-Test</value>
+  </data>
+  <data name="LinearGauge" xml:space="preserve">
+    <value>Lineare Anzeige</value>
+  </data>
+  <data name="HalfCircleGauge" xml:space="preserve">
+    <value>Halbkreis-Anzeige</value>
+  </data>
+  <data name="Consumption" xml:space="preserve">
+    <value>Verbrauch</value>
+  </data>
+  <data name="SmartMeter" xml:space="preserve">
+    <value>Smartmeter</value>
+  </data>
+  <data name="PowerConsumer" xml:space="preserve">
+    <value>Verbraucher</value>
+  </data>
+  <data name="GaugeHighIsBad" xml:space="preserve">
+    <value>Hoch ist schlecht</value>
+  </data>
+  <data name="GaugeMidIsGood" xml:space="preserve">
+    <value>Mitte ist gut</value>
+  </data>
+  <data name="GaugeColorMode" xml:space="preserve">
+    <value>Alle färben / Bis zum Wert färben</value>
+  </data>
 </root>

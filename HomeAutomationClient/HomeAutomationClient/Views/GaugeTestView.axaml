@@ -6,6 +6,7 @@
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
              xmlns:controls="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
              xmlns:m="clr-namespace:De.Hochstaetter.HomeAutomationClient.Misc"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
              mc:Ignorable="d"
              d:DesignWidth="700" d:DesignHeight="600"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.GaugeTestView"
@@ -43,11 +44,11 @@
 			<Button FontSize="18" FontWeight="Bold" Content="Max" Command="{Binding MaxValueCommand}"/>
 		</StackPanel>
 		<StackPanel Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Center">
-			<Button Content="Color all / Color up to value" Command="{Binding SwitchTickColoringCommand}"/>
+			<Button Content="{x:Static p:Resources.GaugeColorMode}" Command="{Binding SwitchTickColoringCommand}"/>
 		</StackPanel>
 		<StackPanel Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Center">
-			<Button Content="High is bad" Command="{Binding SetColorSchemeCommand}" CommandParameter="{x:Static m:GaugeColors.HighIsBad}"/>
-			<Button Content="Mid is good" Command="{Binding SetColorSchemeCommand}" CommandParameter="{x:Static m:GaugeColors.MidIsGood}"/>
+			<Button Content="{x:Static p:Resources.GaugeHighIsBad}" Command="{Binding SetColorSchemeCommand}" CommandParameter="{x:Static m:GaugeColors.HighIsBad}"/>
+			<Button Content="{x:Static p:Resources.GaugeMidIsGood}" Command="{Binding SetColorSchemeCommand}" CommandParameter="{x:Static m:GaugeColors.MidIsGood}"/>
 		</StackPanel>
 		<StackPanel Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Center">
 			<Button Content="Min=-2000" Command="{Binding SetMinimumCommand}" CommandParameter="-2000"/>

@@ -4703,6 +4703,87 @@ namespace De.Hochstaetter.Fronius.Localization {
                 return ResourceManager.GetString("Dc", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Home Automation Control Center UI Test.
+        /// </summary>
+        public static string UiTestTitle {
+            get {
+                return ResourceManager.GetString("UiTestTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Linear Gauge.
+        /// </summary>
+        public static string LinearGauge {
+            get {
+                return ResourceManager.GetString("LinearGauge", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Half Circle Gauge.
+        /// </summary>
+        public static string HalfCircleGauge {
+            get {
+                return ResourceManager.GetString("HalfCircleGauge", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Consumption.
+        /// </summary>
+        public static string Consumption {
+            get {
+                return ResourceManager.GetString("Consumption", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Smart Meter.
+        /// </summary>
+        public static string SmartMeter {
+            get {
+                return ResourceManager.GetString("SmartMeter", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Power Consumer.
+        /// </summary>
+        public static string PowerConsumer {
+            get {
+                return ResourceManager.GetString("PowerConsumer", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to High is bad.
+        /// </summary>
+        public static string GaugeHighIsBad {
+            get {
+                return ResourceManager.GetString("GaugeHighIsBad", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Mid is good.
+        /// </summary>
+        public static string GaugeMidIsGood {
+            get {
+                return ResourceManager.GetString("GaugeMidIsGood", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Color all / Color up to value.
+        /// </summary>
+        public static string GaugeColorMode {
+            get {
+                return ResourceManager.GetString("GaugeColorMode", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to Unit.

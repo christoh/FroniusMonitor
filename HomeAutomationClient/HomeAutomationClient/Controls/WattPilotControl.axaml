@@ -277,7 +277,7 @@
 								</TextBlock>
 							</Viewbox>
 
-							<TextBlock Grid.Column="0" Grid.Row="5" Text="Auth" />
+							<TextBlock Grid.Column="0" Grid.Row="5" Text="{x:Static p:Resources.Auth}" />
 							<Viewbox Grid.Column="1" Grid.Row="5">
 								<TextBlock Text="{Binding WattPilot.CurrentWifi.Encryption, FallbackValue='---', Converter={co:ToUpper}}" HorizontalAlignment="Right" />
 							</Viewbox>
