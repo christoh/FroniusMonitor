@@ -402,14 +402,6 @@ namespace De.Hochstaetter.Fronius.Localization {
             }
         }
         
-        /// <summary>
-        ///   Looks up a localized string similar to Germany.
-        /// </summary>
-        public static string AwattarCountry_Germany {
-            get {
-                return ResourceManager.GetString("AwattarCountry_Germany", resourceCulture);
-            }
-        }
         
         /// <summary>
         ///   Looks up a localized string similar to Germany / Luxembourg.
@@ -1419,14 +1411,6 @@ namespace De.Hochstaetter.Fronius.Localization {
             }
         }
         
-        /// <summary>
-        ///   Looks up a localized string similar to Delete inverter.
-        /// </summary>
-        public static string DeleteInverter {
-            get {
-                return ResourceManager.GetString("DeleteInverter", resourceCulture);
-            }
-        }
         
         /// <summary>
         ///   Looks up a localized string similar to Delete rule.
@@ -1887,14 +1871,6 @@ namespace De.Hochstaetter.Fronius.Localization {
             }
         }
         
-        /// <summary>
-        ///   Looks up a localized string similar to Log files (*.log)|*.log.
-        /// </summary>
-        public static string FilterLogFiles {
-            get {
-                return ResourceManager.GetString("FilterLogFiles", resourceCulture);
-            }
-        }
         
         /// <summary>
         ///   Looks up a localized string similar to Firmware {0} has breaking changes. Upgrade this software..
@@ -2499,14 +2475,6 @@ namespace De.Hochstaetter.Fronius.Localization {
             }
         }
         
-        /// <summary>
-        ///   Looks up a localized string similar to Loading.
-        /// </summary>
-        public static string Loading {
-            get {
-                return ResourceManager.GetString("Loading", resourceCulture);
-            }
-        }
         
         /// <summary>
         ///   Looks up a localized string similar to Load settings.
@@ -3795,14 +3763,6 @@ namespace De.Hochstaetter.Fronius.Localization {
             }
         }
         
-        /// <summary>
-        ///   Looks up a localized string similar to Ready.
-        /// </summary>
-        public static string Ready {
-            get {
-                return ResourceManager.GetString("Ready", resourceCulture);
-            }
-        }
         
         /// <summary>
         ///   Looks up a localized string similar to Reboot.
