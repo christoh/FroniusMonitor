@@ -2,16 +2,19 @@
 
 public static class EnumExtensions
 {
-    public static string? ToDisplayName(this Enum @enum)
+    extension(Enum @enum)
     {
+        public string? ToDisplayName()
+        {
             var type = @enum.GetType();
             var name = Enum.GetName(type, @enum);
             return typeof(Resources).GetProperty($"{type.Name}_{name}", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)?.GetValue(null)?.ToString() ?? name;
         }
 
-    public static string? ToToolTip(this Enum @enum)
-    {
+        public string? ToToolTip()
+        {
             var type = @enum.GetType();
             return typeof(Resources).GetProperty($"{type.Name}_{Enum.GetName(type, @enum)}_ToolTip", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)?.GetValue(null)?.ToString();
         }
+    }
 }
