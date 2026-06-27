@@ -16,6 +16,7 @@ public class EnergyHistoryTests
     public EnergyHistoryTests()
     {
         var services = new ServiceCollection()
+                .AddLogging()
                 .AddSingleton<IGen24Service, Gen24Service>()
                 .AddSingleton<IGen24JsonService, Gen24JsonService>()
                 .AddSingleton<IFritzBoxService, FritzBoxService>()

@@ -6,7 +6,7 @@ using Microsoft.Azure.Devices.Client.Exceptions;
 
 namespace De.Hochstaetter.Fronius.Services;
 
-public partial class ToshibaHvacService(SynchronizationContext context, SettingsBase settings) : BindableBase, IToshibaHvacService
+public partial class ToshibaHvacService(SynchronizationContext context, SettingsBase settings, ILogger<ToshibaHvacService> logger) : BindableBase, IToshibaHvacService
 {
     private static readonly JsonSerializerOptions jsonOptions = new(JsonSerializerDefaults.Web);
 
@@ -186,7 +186,12 @@ public partial class ToshibaHvacService(SynchronizationContext context, Settings
         await using var memoryStream = new MemoryStream();
         await JsonSerializer.SerializeAsync(memoryStream, command, jsonOptions, Token).ConfigureAwait(false);
         memoryStream.Position = 0;
-        Debug.Print(Encoding.UTF8.GetString(memoryStream.ToArray()));
+
+        if (logger.IsEnabled(LogLevel.Debug))
+        {
+            logger.LogDebug("Sending Toshiba command: {Command}", Encoding.UTF8.GetString(memoryStream.ToArray()));
+        }
+
         using var message = new Message(memoryStream);
         await azureClient.SendEventAsync(message, Token).ConfigureAwait(false);
         return command.MessageId;
@@ -199,8 +204,10 @@ public partial class ToshibaHvacService(SynchronizationContext context, Settings
 
     private Task<MethodResponse> HandleSmMobileMethod(MethodRequest request, object _) => Task.Run(() =>
     {
-        Debug.Print(request.Name);
-        Debug.Print(request.DataAsJson);
+        if (logger.IsEnabled(LogLevel.Debug))
+        {
+            logger.LogDebug("Received Toshiba method {MethodName}: {Data}", request.Name, request.DataAsJson);
+        }
 
         try
         {
@@ -237,8 +244,11 @@ public partial class ToshibaHvacService(SynchronizationContext context, Settings
 
     private Task<MethodResponse> HandleOtherMethods(MethodRequest request, object _) => Task.Run(() =>
     {
-        Debug.Print(request.Name);
-        Debug.Print(request.DataAsJson);
+        if (logger.IsEnabled(LogLevel.Debug))
+        {
+            logger.LogDebug("Received Toshiba method {MethodName}: {Data}", request.Name, request.DataAsJson);
+        }
+
         return new MethodResponse(0);
     }, Token);
 
@@ -271,7 +281,12 @@ public partial class ToshibaHvacService(SynchronizationContext context, Settings
 
 #if DEBUG // This allows you to see the raw JSON string
         var jsonText = await response.Content.ReadAsStringAsync(Token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
-        Debug.Print(jsonText);
+
+        if (logger.IsEnabled(LogLevel.Debug))
+        {
+            logger.LogDebug("Toshiba response from {Uri}: {Json}", uri, jsonText);
+        }
+
         var jDocument = JsonDocument.Parse(jsonText);
         var result = jDocument.Deserialize<ToshibaHvacResponse<T>>(jsonOptions) ?? throw new InvalidDataException("No data");
 #else

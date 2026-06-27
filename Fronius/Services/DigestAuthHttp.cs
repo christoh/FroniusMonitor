@@ -25,6 +25,7 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
     private DateTime cnonceDate;
     private uint nc;
     private bool isDisposed;
+    private HttpClient? httpClient;
 
     public DigestAuthHttp(WebConnection connection) : this(connection, TimeSpan.FromMinutes(1)) { }
 
@@ -36,22 +37,22 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
 
             lock (hashLock)
             {
-                if (field == null)
+                if (httpClient == null)
                 {
-                    field = new()
+                    httpClient = new()
                     {
                         BaseAddress = new(connection.BaseUrl),
                         Timeout = TimeSpan.FromSeconds(30),
                     };
 
-                    field.DefaultRequestHeaders.UserAgent.Add(new("HomeAutomationClient", FroniusGitInfo.Version.ToString()));
+                    httpClient.DefaultRequestHeaders.UserAgent.Add(new("HomeAutomationClient", FroniusGitInfo.Version.ToString()));
                 }
-            }
 
-            return field;
+                return httpClient;
+            }
         }
 
-        set;
+        set => httpClient = value;
     }
 
     ~DigestAuthHttp() => Dispose();
@@ -64,8 +65,8 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
             return;
         }
 
-        HttpClient.Dispose();
-        HttpClient = null!;
+        httpClient?.Dispose();
+        httpClient = null;
         isDisposed = true;
         GC.SuppressFinalize(this);
     }
@@ -129,8 +130,8 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
 
             lock (hashLock)
             {
-                HttpClient?.Dispose();
-                HttpClient = null!;
+                httpClient?.Dispose();
+                httpClient = null;
                 CreateRequest();
             }
 
@@ -146,9 +147,13 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
 
         request.Dispose();
 
-        var wwwAuthenticateHeader =
-            response.Headers.GetValues("X-WWW-Authenticate").SingleOrDefault() ??
-            response.Headers.GetValues("WWW-Authenticate").Single();
+        if (!response.Headers.TryGetValues("X-WWW-Authenticate", out var authValues))
+        {
+            response.Headers.TryGetValues("WWW-Authenticate", out authValues);
+        }
+
+        var wwwAuthenticateHeader = authValues?.SingleOrDefault()
+            ?? throw new HttpRequestException("No WWW-Authenticate header in 401 response", null, response.StatusCode);
 
         lock (hashLock)
         {

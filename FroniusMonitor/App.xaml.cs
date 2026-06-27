@@ -2,6 +2,7 @@
 using System.Reflection;
 using De.Hochstaetter.Fronius.Models.Settings;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace De.Hochstaetter.FroniusMonitor;
 
@@ -26,6 +27,7 @@ public partial class App
     public static string AppName => "FroniusMonitor";
     public static string PerUserDataDir => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Hochstätter", AppName);
     public static string SettingsFileName => Path.Combine(PerUserDataDir, "Settings.fms");
+    public static string LogFileName => Path.Combine(PerUserDataDir, "Log.txt");
     public static string VersionString => $"{ThisAssembly.Git.SemVer.Major}.{ThisAssembly.Git.SemVer.Minor}.{ThisAssembly.Git.SemVer.Patch}{ThisAssembly.Git.SemVer.DashLabel}";
     public static string ShortVersionString => $"{ThisAssembly.Git.SemVer.Major}.{ThisAssembly.Git.SemVer.Minor}";
     public static DateTimeOffset CommitTimeUtc { get; } = DateTimeOffset.Parse(ThisAssembly.Git.CommitDate);
@@ -64,7 +66,29 @@ public partial class App
             Settings.Save().GetAwaiter().GetResult();
         }
 
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel
+#if DEBUG
+            .Debug()
+#else
+            .Information()
+#endif
+            .Enrich.WithComputed("SourceContextName", "Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)")
+            .WriteTo.File
+            (
+                LogFileName,
+                outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] ({SourceContextName:l}) {Message:lj}{NewLine}{Exception}",
+                formatProvider: CultureInfo.InvariantCulture,
+                rollingInterval: RollingInterval.Day,
+                retainedFileTimeLimit: TimeSpan.FromDays(7)
+            )
+            //applyThemeToRedirectedOutput: true,
+            //theme: AnsiConsoleTheme.Sixteen
+            .CreateLogger();
+
+
         var injector = ServiceCollection
+                .AddLogging(b => b.AddSerilog())
                 .AddScoped<IGen24Service, Gen24Service>()
                 .AddSingleton<IFritzBoxService, FritzBoxService>()
                 .AddSingleton(context)

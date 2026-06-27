@@ -1,16 +1,26 @@
-﻿namespace De.Hochstaetter.Fronius.Extensions;
+﻿using De.Hochstaetter.Fronius.Services;
+
+namespace De.Hochstaetter.Fronius.Extensions;
 
 public static class WattPilotExtensions
 {
-    public static void UpdateFromJson(this WattPilot instance, JObject jObject) => ParseUpdateToken(instance, jObject);
-
-    public static void UpdateFromJson(this WattPilot instance, string json) => ParseUpdateToken(instance, JObject.Parse(json));
+    private static readonly ILogger<WattPilotService>? logger=IoC.TryGetRegistered<ILogger<WattPilotService>>();
+    
+    extension(WattPilot instance)
+    {
+        public void UpdateFromJson(JObject jObject) => ParseUpdateToken(instance, jObject);
+        public void UpdateFromJson(string json) => ParseUpdateToken(instance, JObject.Parse(json));
+    }
 
     private static void ParseUpdateToken(object instance, JObject jObject)
     {
         foreach (var token in jObject)
         {
-            // Debug.Print($"{token.Key}: {token.Value?.ToString().Replace("\r", "").Replace("\n", "")}");
+            if (logger?.IsEnabled(LogLevel.Debug) is true)
+            {
+                logger.LogTrace("{Key}: {Value}", token.Key, token.Value?.ToString().Replace("\r", "").Replace("\n", ""));
+            }
+
             var propertyInfos = instance.GetType().GetProperties().Where(p => p.GetCustomAttributes<WattPilotAttribute>().Any(a => a.TokenName == token.Key)).ToArray();
 
             switch (propertyInfos.Length)
