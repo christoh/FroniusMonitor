@@ -9,17 +9,20 @@ public class BayernWerkImportService(SettingsBase settings, IDataCollectionServi
             throw new ArgumentException(string.Format(Resources.MustBeExcelFileName, nameof(parameters)), nameof(parameters));
         }
 
-        IReadOnlyList<SmartMeterCalibrationHistoryItem> energyHistory;
-
-        _ = settings.EnergyHistoryFileName ?? throw new FileNotFoundException(Resources.NoEnergyHistoryFile);
+        var energyHistoryFileName = settings.EnergyHistoryFileName ?? throw new FileNotFoundException(Resources.NoEnergyHistoryFile);
         _ = settings.DriftFileName ?? throw new FileNotFoundException(Resources.NoDriftFile);
 
-        await using (var fileStream = new FileStream(settings.EnergyHistoryFileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+        // ClosedXML workbook parsing and XML deserialization are synchronous and CPU-bound, so yield off the calling (UI) thread before doing them.
+        await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
+
+        IReadOnlyList<SmartMeterCalibrationHistoryItem> energyHistory;
+
+        await using (var fileStream = new FileStream(energyHistoryFileName, FileMode.Open, FileAccess.Read, FileShare.Read))
         {
             var energyHistorySerializer = new XmlSerializer(typeof(SmartMeterCalibrationHistoryItem[]));
 
             energyHistory = energyHistorySerializer.Deserialize(fileStream) as IReadOnlyList<SmartMeterCalibrationHistoryItem>
-                            ?? throw new InvalidDataException(string.Format(Resources.FileHasNoEnergyHistory, settings.EnergyHistoryFileName));
+                            ?? throw new InvalidDataException(string.Format(Resources.FileHasNoEnergyHistory, energyHistoryFileName));
         }
 
         await using var xlFileStream = new FileStream(excelFileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
@@ -34,13 +37,14 @@ public class BayernWerkImportService(SettingsBase settings, IDataCollectionServi
             _ => throw new InvalidDataException("Incorrect OBIS code in Cell C4 of Excel file"),
         };
 
-        var cell = sheet.Range("F:F").Cells()
+        var cell = sheet.Column("F").CellsUsed()
                        .Where(c => c.Value.IsText && c.GetValue<string>() == "W" && c.WorksheetRow().Cell("G") is { Value.IsNumber: true } valueCell && Math.Abs(valueCell.GetValue<double>()) > .00001)
                        .MaxBy(c => c.WorksheetRow().RowNumber())
                    ?? throw new InvalidDataException(Resources.NoValidCells);
 
         var row = cell.WorksheetRow();
         var energy = row.Cell("G").GetValue<double>() * 1000;
+
         var time = new DateTime(row.Cell("A").GetDateTime().Ticks, DateTimeKind.Utc);
         var historyEntry = energyHistory.MinBy(i => Math.Abs(i.CalibrationDate.Ticks - time.Ticks));
 
