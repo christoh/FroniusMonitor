@@ -746,7 +746,7 @@
                                                 </TextBlock>
                                             </Viewbox>
 
-                                            <TextBlock Grid.Column="0" Grid.Row="5" Text="Auth" />
+                                            <TextBlock Grid.Column="0" Grid.Row="5" Text="{x:Static p:Resources.Auth}" />
                                             <Viewbox Grid.Column="1" Grid.Row="5">
                                                 <TextBlock Text="{Binding Encryption, FallbackValue='---', Converter={co:ToUpper}}" HorizontalAlignment="Right" />
                                             </Viewbox>
@@ -774,7 +774,7 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             <DataGridTextColumn Binding="{Binding Ssid}" Header="{x:Static p:Resources.WifiSsid}" CanUserResize="False" />
-                            <DataGridTextColumn Binding="{Binding Encryption, Converter={co:ToUpper}}" Header="Encryption" CanUserResize="False" />
+                            <DataGridTextColumn Binding="{Binding Encryption, Converter={co:ToUpper}}" Header="{x:Static p:Resources.Encryption}" CanUserResize="False" />
                         </DataGrid.Columns>
                     </DataGrid>
                 </StackPanel>

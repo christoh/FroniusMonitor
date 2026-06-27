@@ -356,7 +356,7 @@
                 </Grid>
             </GroupBox>
 
-            <GroupBox Margin="0,8,0,0" Header="Electricity Price">
+            <GroupBox Margin="0,8,0,0" Header="{x:Static p:Resources.ElectricityPrice}">
                 <Grid Margin="8">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -372,25 +372,25 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Price service" Margin="0,7,0,0"/>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.PriceService}" Margin="0,7,0,0"/>
                     <TextBlock Grid.Row="0" Grid.Column="1" Text=":" Margin="4,7,4,0"/>
                     <ComboBox Grid.Row="0" Grid.Column="2" SelectedItem="{Binding Settings.ElectricityPrice.Service}"
                               ItemsSource="{Binding PriceServices}" ItemTemplate="{StaticResource ComboBoxTemplate}"/>
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Price region" Margin="0,7,0,0" Visibility="{Binding PriceService.CanSetPriceRegion, Converter={co:Bool2Visibility}}"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.AwattarCountry}" Margin="0,7,0,0" Visibility="{Binding PriceService.CanSetPriceRegion, Converter={co:Bool2Visibility}}"/>
                     <TextBlock Grid.Row="1" Grid.Column="1" Text=":" Margin="4,7,4,0" Visibility="{Binding PriceService.CanSetPriceRegion, Converter={co:Bool2Visibility}}"/>
                     <ComboBox Grid.Row="1" Grid.Column="2" SelectedItem="{Binding SelectedPriceRegion}" Visibility="{Binding PriceService.CanSetPriceRegion, Converter={co:Bool2Visibility}}"
                               ItemsSource="{Binding PriceRegions}" ItemTemplate="{StaticResource ComboBoxTemplate}"/>
 
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Price surcharge consumption (%)" Margin="0,7,0,0"/>
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static p:Resources.PriceSurchargeConsumption}" Margin="0,7,0,0"/>
                     <TextBlock Grid.Row="2" Grid.Column="1" Text=":" Margin="4,7,4,0"/>
                     <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding Settings.ElectricityPrice.PriceSurchargeBuyPercent}"/>
 
-                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Price offset consumption (cents)" Margin="0,7,0,0"/>
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="{x:Static p:Resources.PriceOffsetConsumption}" Margin="0,7,0,0"/>
                     <TextBlock Grid.Row="3" Grid.Column="1" Text=":" Margin="4,7,4,0"/>
                     <TextBox Grid.Row="3" Grid.Column="2" Text="{Binding Settings.ElectricityPrice.PriceOffsetBuy}"/>
 
-                    <TextBlock Grid.Row="4" Grid.Column="0" Text="V.A.T. rate (%)" Margin="0,7,0,0"/>
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="{x:Static p:Resources.VatRate}" Margin="0,7,0,0"/>
                     <TextBlock Grid.Row="4" Grid.Column="1" Text=":" Margin="4,7,4,0"/>
                     <TextBox Grid.Row="4" Grid.Column="2" Text="{Binding Settings.ElectricityPrice.VatRatePercent}"/>
                 </Grid>

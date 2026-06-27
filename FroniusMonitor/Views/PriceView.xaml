@@ -24,7 +24,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <oxy:Plot Grid.Row="0" Title="Electricity Prices" Model="{Binding PlotModel}" />
+        <oxy:Plot Grid.Row="0" Title="{x:Static p:Resources.ElectricityPrice}" Model="{Binding PlotModel}" />
         <Viewbox Grid.Row="0" Margin="50" Stretch="Uniform" StretchDirection="Both" MaxWidth="600">
             <ItemsControl ItemsSource="{Binding Errors}" VerticalAlignment="Center" >
                 <ItemsControl.ItemTemplate>
@@ -98,7 +98,7 @@
                     </Button>
                 </StackPanel>
                 
-                <Button Padding="8" Margin="4" Click="OnPriceComponentsClick" Grid.Column="4" Grid.Row="0" Grid.RowSpan="2" Content="Price Components"></Button>
+                <Button Padding="8" Margin="4" Click="OnPriceComponentsClick" Grid.Column="4" Grid.Row="0" Grid.RowSpan="2" Content="{x:Static p:Resources.PriceComponents}"></Button>
             </Grid>
         </GroupBox>
     </Grid>

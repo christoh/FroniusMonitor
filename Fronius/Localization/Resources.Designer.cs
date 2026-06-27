@@ -4541,6 +4541,168 @@ namespace De.Hochstaetter.Fronius.Localization {
                 return ResourceManager.GetString("Undo", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Price service.
+        /// </summary>
+        public static string PriceService {
+            get {
+                return ResourceManager.GetString("PriceService", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Price surcharge consumption (%).
+        /// </summary>
+        public static string PriceSurchargeConsumption {
+            get {
+                return ResourceManager.GetString("PriceSurchargeConsumption", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Price offset consumption (cents).
+        /// </summary>
+        public static string PriceOffsetConsumption {
+            get {
+                return ResourceManager.GetString("PriceOffsetConsumption", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to V.A.T. rate (%).
+        /// </summary>
+        public static string VatRate {
+            get {
+                return ResourceManager.GetString("VatRate", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Price components.
+        /// </summary>
+        public static string PriceComponents {
+            get {
+                return ResourceManager.GetString("PriceComponents", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Component.
+        /// </summary>
+        public static string Component {
+            get {
+                return ResourceManager.GetString("Component", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Time zone.
+        /// </summary>
+        public static string TimeZone {
+            get {
+                return ResourceManager.GetString("TimeZone", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Encryption.
+        /// </summary>
+        public static string Encryption {
+            get {
+                return ResourceManager.GetString("Encryption", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Auth.
+        /// </summary>
+        public static string Auth {
+            get {
+                return ResourceManager.GetString("Auth", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Status.
+        /// </summary>
+        public static string Status {
+            get {
+                return ResourceManager.GetString("Status", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to POWER.
+        /// </summary>
+        public static string HvacMeritFeatureHeader {
+            get {
+                return ResourceManager.GetString("HvacMeritFeatureHeader", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to ECO.
+        /// </summary>
+        public static string HvacEco {
+            get {
+                return ResourceManager.GetString("HvacEco", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Normal.
+        /// </summary>
+        public static string HvacNormal {
+            get {
+                return ResourceManager.GetString("HvacNormal", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Hi Power.
+        /// </summary>
+        public static string HvacHiPower {
+            get {
+                return ResourceManager.GetString("HvacHiPower", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to LIMIT.
+        /// </summary>
+        public static string HvacLimit {
+            get {
+                return ResourceManager.GetString("HvacLimit", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to AUTO.
+        /// </summary>
+        public static string HvacAuto {
+            get {
+                return ResourceManager.GetString("HvacAuto", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to AC.
+        /// </summary>
+        public static string Ac {
+            get {
+                return ResourceManager.GetString("Ac", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to DC.
+        /// </summary>
+        public static string Dc {
+            get {
+                return ResourceManager.GetString("Dc", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to Unit.

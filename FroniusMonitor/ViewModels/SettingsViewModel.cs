@@ -79,6 +79,7 @@ public partial class SettingsViewModel(
         new() { DisplayName = GetCultureName("de"), Value = "de" },
         new() { DisplayName = GetCultureName("de-CH"), Value = "de-CH" },
         new() { DisplayName = GetCultureName("de-LI"), Value = "de-LI" },
+        new() { DisplayName = GetCultureName("gsw"), Value = "gsw" },
     ];
 
     [ObservableProperty]

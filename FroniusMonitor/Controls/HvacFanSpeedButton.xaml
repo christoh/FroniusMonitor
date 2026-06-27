@@ -4,6 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
+        xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
         mc:Ignorable="d"
         d:DesignHeight="100" d:DesignWidth="150">
     <Viewbox>
@@ -27,7 +28,7 @@
             <vi:QuietIcon x:Name="QuietIcon" BorderBrush="Red" Width="80" Canvas.Left="50" Canvas.Bottom="10" />
 
             <Grid Width="150" Height="100" x:Name="Auto">
-                <TextBlock Text="AUTO" FontSize="36" FontWeight="DemiBold" Margin="20,18,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                <TextBlock Text="{x:Static p:Resources.HvacAuto}" FontSize="36" FontWeight="DemiBold" Margin="20,18,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" />
             </Grid>
 
             <Polygon x:Name="Level1" Points="0,100 26,100 26,83 " />

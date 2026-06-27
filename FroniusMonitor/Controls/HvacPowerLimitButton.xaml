@@ -4,6 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
+        xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
         mc:Ignorable="d">
     <Viewbox>
         <Grid DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:HvacPowerLimitButton}}" Background="{Binding Background}">
@@ -11,7 +12,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="10" Margin="1,-2,1,1" FontWeight="DemiBold" Text="LIMIT" />
+            <TextBlock Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="10" Margin="1,-2,1,1" FontWeight="DemiBold" Text="{x:Static p:Resources.HvacLimit}" />
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*" />

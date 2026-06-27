@@ -1710,4 +1710,58 @@
   <data name="Gen24ChargingSources_HomeAndGrid" xml:space="preserve">
 	  <value>Qualsiasi fonte di energia, inclusa la rete pubblica</value>
   </data>
+  <data name="PriceService" xml:space="preserve">
+    <value>Servizio prezzi</value>
+  </data>
+  <data name="PriceSurchargeConsumption" xml:space="preserve">
+    <value>Sovrapprezzo sul consumo (%)</value>
+  </data>
+  <data name="PriceOffsetConsumption" xml:space="preserve">
+    <value>Offset prezzo consumo (centesimi)</value>
+  </data>
+  <data name="VatRate" xml:space="preserve">
+    <value>Aliquota IVA (%)</value>
+  </data>
+  <data name="PriceComponents" xml:space="preserve">
+    <value>Componenti del prezzo</value>
+  </data>
+  <data name="Component" xml:space="preserve">
+    <value>Componente</value>
+  </data>
+  <data name="TimeZone" xml:space="preserve">
+    <value>Fuso orario</value>
+  </data>
+  <data name="Encryption" xml:space="preserve">
+    <value>Crittografia</value>
+  </data>
+  <data name="Auth" xml:space="preserve">
+    <value>Autenticazione</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Stato</value>
+  </data>
+  <data name="HvacMeritFeatureHeader" xml:space="preserve">
+    <value>POTENZA</value>
+  </data>
+  <data name="HvacEco" xml:space="preserve">
+    <value>ECO</value>
+  </data>
+  <data name="HvacNormal" xml:space="preserve">
+    <value>Normale</value>
+  </data>
+  <data name="HvacHiPower" xml:space="preserve">
+    <value>Alta potenza</value>
+  </data>
+  <data name="HvacLimit" xml:space="preserve">
+    <value>LIMITE</value>
+  </data>
+  <data name="HvacAuto" xml:space="preserve">
+    <value>AUTO</value>
+  </data>
+  <data name="Ac" xml:space="preserve">
+    <value>CA</value>
+  </data>
+  <data name="Dc" xml:space="preserve">
+    <value>CC</value>
+  </data>
 </root>

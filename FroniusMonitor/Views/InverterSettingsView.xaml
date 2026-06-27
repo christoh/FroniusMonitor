@@ -90,7 +90,7 @@
                     <TextBlock Grid.Row="0" Grid.Column="1" Text=":" />
                     <TextBox Grid.Row="0" Grid.Column="2" MaxLength="30" Text="{Binding Settings.SystemName}" />
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Time zone" IsEnabled="{Binding EnableDanger}" />
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.TimeZone}" IsEnabled="{Binding EnableDanger}" />
                     <TextBlock Grid.Row="1" Grid.Column="1" Text=":" IsEnabled="{Binding EnableDanger}"/>
                     <TextBox Grid.Row="1" Grid.Column="2" MaxLength="30" Text="{Binding Settings.TimeZoneName}" IsEnabled="{Binding EnableDanger}" />
 
