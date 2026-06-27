@@ -318,12 +318,6 @@
   <data name="ModbusInterfaceRole_Disabled" xml:space="preserve">
 	  <value>Deaktiviert</value>
   </data>
-  <data name="ModbusInterfaceRole_Master" xml:space="preserve">
-	  <value>Master</value>
-  </data>
-  <data name="ModbusInterfaceRole_Slave" xml:space="preserve">
-	  <value>Slave</value>
-  </data>
   <data name="SunspecMode_Float" xml:space="preserve">
 	  <value>Fließkomma</value>
   </data>
@@ -392,9 +386,6 @@
   </data>
   <data name="BackupConfiguration" xml:space="preserve">
 	  <value>Notstrom-Konfiguration</value>
-  </data>
-  <data name="Sunday_One" xml:space="preserve">
-	  <value>S</value>
   </data>
   <data name="Tuesday_One" xml:space="preserve">
 	  <value>D</value>
@@ -1200,9 +1191,6 @@
   <data name="ColorAllGaugeTicks" xml:space="preserve">
 	  <value>Anzeigeinstrumente immer komplett einfärben</value>
   </data>
-  <data name="MpptComparison" xml:space="preserve">
-	  <value>String 2/1</value>
-  </data>
   <data name="SumPv" xml:space="preserve">
 	  <value>Summe PV</value>
   </data>
@@ -1647,32 +1635,11 @@
   <data name="Auth" xml:space="preserve">
     <value>Authentifizierung</value>
   </data>
-  <data name="Status" xml:space="preserve">
-    <value>Status</value>
-  </data>
   <data name="HvacMeritFeatureHeader" xml:space="preserve">
     <value>LEISTUNG</value>
   </data>
-  <data name="HvacEco" xml:space="preserve">
-    <value>ECO</value>
-  </data>
-  <data name="HvacNormal" xml:space="preserve">
-    <value>Normal</value>
-  </data>
   <data name="HvacHiPower" xml:space="preserve">
     <value>Hochleistung</value>
-  </data>
-  <data name="HvacLimit" xml:space="preserve">
-    <value>LIMIT</value>
-  </data>
-  <data name="HvacAuto" xml:space="preserve">
-    <value>AUTO</value>
-  </data>
-  <data name="Ac" xml:space="preserve">
-    <value>AC</value>
-  </data>
-  <data name="Dc" xml:space="preserve">
-    <value>DC</value>
   </data>
   <data name="UiTestTitle" xml:space="preserve">
     <value>Home Automation Control Center UI-Test</value>

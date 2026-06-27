@@ -129,17 +129,11 @@
   <data name="IncorrectData" xml:space="preserve">
     <value>Risposta errata dal gestore dati</value>
   </data>
-  <data name="Inverter" xml:space="preserve">
-    <value>Inverter</value>
-  </data>
   <data name="NoSystemConnection" xml:space="preserve">
     <value>Non sono stati specificati parametri di connessione completi dell'inverter</value>
   </data>
   <data name="Sleeping" xml:space="preserve">
     <value>In sospensione</value>
-  </data>
-  <data name="Standby" xml:space="preserve">
-    <value>Standby</value>
   </data>
   <data name="Starting" xml:space="preserve">
     <value>Avvio in corso</value>
@@ -228,9 +222,6 @@
   <data name="NoFritzBoxConnection" xml:space="preserve">
     <value>Non sono stati specificati parametri di connessione completi del Fritz!Box</value>
   </data>
-  <data name="Ok" xml:space="preserve">
-    <value>Ok</value>
-  </data>
   <data name="Cancel" xml:space="preserve">
     <value>Annulla</value>
   </data>
@@ -317,12 +308,6 @@
   </data>
   <data name="ModbusInterfaceRole_Disabled" xml:space="preserve">
 	  <value>Disabilitato</value>
-  </data>
-  <data name="ModbusInterfaceRole_Master" xml:space="preserve">
-	  <value>Master</value>
-  </data>
-  <data name="ModbusInterfaceRole_Slave" xml:space="preserve">
-	  <value>Slave</value>
   </data>
   <data name="ModbusParity_Even" xml:space="preserve">
 	  <value>Pari</value>
@@ -420,9 +405,6 @@
   <data name="Friday_One" xml:space="preserve">
 	  <value>V</value>
   </data>
-  <data name="Saturday_One" xml:space="preserve">
-	  <value>S</value>
-  </data>
   <data name="ChargingRuleType_MinimumCharge" xml:space="preserve">
 	  <value>Potenza di carica min.</value>
   </data>
@@ -459,17 +441,8 @@
   <data name="Gen24InverterHeader" xml:space="preserve">
 	  <value>Inverter Fronius Gen24</value>
   </data>
-  <data name="FritzBoxHeader" xml:space="preserve">
-	  <value>AVM Fritz!Box</value>
-  </data>
   <data name="Username" xml:space="preserve">
 	  <value>Nome utente</value>
-  </data>
-  <data name="Url" xml:space="preserve">
-	  <value>Url</value>
-  </data>
-  <data name="Password" xml:space="preserve">
-	  <value>Password</value>
   </data>
   <data name="EnableFritzBox" xml:space="preserve">
 	  <value>Controlla i dispositivi domotici AVM Fritz!Box</value>
@@ -486,14 +459,8 @@
   <data name="AppSettings" xml:space="preserve">
 	  <value>Impostazioni dell'applicazione</value>
   </data>
-  <data name="Modbus" xml:space="preserve">
-	  <value>Modbus</value>
-  </data>
   <data name="EnergyFlow" xml:space="preserve">
 	  <value>Flusso di energia</value>
-  </data>
-  <data name="ShowAvm" xml:space="preserve">
-	  <value>Fritz!Home</value>
   </data>
   <data name="Events" xml:space="preserve">
 	  <value>Eventi</value>
@@ -615,9 +582,6 @@
   <data name="ChargingLogic_None" xml:space="preserve">
 	  <value>Piena potenza</value>
   </data>
-  <data name="ChargingLogic_Eco" xml:space="preserve">
-	  <value>Eco</value>
-  </data>
   <data name="ChargingLogic_NextTrip" xml:space="preserve">
 	  <value>Prossimo viaggio</value>
   </data>
@@ -632,9 +596,6 @@
   </data>
   <data name="AwattarEnabled" xml:space="preserve">
 	  <value>Usa il prezzo dell'energia dinamico</value>
-  </data>
-  <data name="AwattarCountry_Austria" xml:space="preserve">
-	  <value>Austria</value>
   </data>
   <data name="AwattarCountry" xml:space="preserve">
 	  <value>Regione di prezzo</value>
@@ -731,9 +692,6 @@
   </data>
   <data name="ForcedCharge_ForcedOff" xml:space="preserve">
 	  <value>Forza la pausa</value>
-  </data>
-  <data name="WattPilotHeader" xml:space="preserve">
-	  <value>Fronius Wattpilot</value>
   </data>
   <data name="ControlWattPilot" xml:space="preserve">
 	  <value>Controlla il Wattpilot collegato all'inverter</value>
@@ -837,9 +795,6 @@
   <data name="IsInServiceMode" xml:space="preserve">
 	  <value>Modalità di servizio della batteria</value>
   </data>
-  <data name="FroniusManager" xml:space="preserve">
-	  <value>Fronius Gen24 Manager</value>
-  </data>
   <data name="User" xml:space="preserve">
 	  <value>Utente</value>
   </data>
@@ -855,15 +810,6 @@
   <data name="ToshibaHvacUrlTooltip" xml:space="preserve">
 	  <value>Non dovresti cambiare l'URL a meno che Toshiba non cambi il nome host</value>
   </data>
-  <data name="Protocol_Amqp" xml:space="preserve">
-	  <value>AMQP (Advanced Message Queuing Protocol)</value>
-  </data>
-  <data name="Protocol_Mqtt" xml:space="preserve">
-	  <value>MQTT (Message Queuing Telemetry Transport)</value>
-  </data>
-  <data name="Protocol_Http1" xml:space="preserve">
-	  <value>HTTP 1.1 (Hypertext Transfer Protocol)</value>
-  </data>
   <data name="Protocol_Amqp_ToolTip" xml:space="preserve">
 	  <value>Ideale per l'uso generale. A differenza di MQTT, supporta il rifiuto e l'abbandono dei messaggi.</value>
   </data>
@@ -878,12 +824,6 @@
   </data>
   <data name="TunnelStrategy" xml:space="preserve">
 	  <value>Strategia di tunneling</value>
-  </data>
-  <data name="TunnelMode_Auto" xml:space="preserve">
-	  <value>Auto</value>
-  </data>
-  <data name="TunnelMode_Websocket" xml:space="preserve">
-	  <value>Web socket</value>
   </data>
   <data name="TunnelMode_NoTunnel" xml:space="preserve">
 	  <value>Nessun tunneling</value>
@@ -966,9 +906,6 @@
   <data name="NetMask" xml:space="preserve">
 	  <value>Maschera di sottorete</value>
   </data>
-  <data name="Gateway" xml:space="preserve">
-	  <value>Gateway</value>
-  </data>
   <data name="Sum" xml:space="preserve">
 	  <value>Somma</value>
   </data>
@@ -984,9 +921,6 @@
   <data name="Grid" xml:space="preserve">
 	  <value>Rete</value>
   </data>
-  <data name="SelfConsumptionShort" xml:space="preserve">
-	  <value>Cons.</value>
-  </data>
   <data name="Latency" xml:space="preserve">
 	  <value>Latenza</value>
   </data>
@@ -1001,9 +935,6 @@
   </data>
   <data name="BatteryModule" xml:space="preserve">
 	  <value>Mod. batt.</value>
-  </data>
-  <data name="BackupOpTime" xml:space="preserve">
-	  <value>Backup</value>
   </data>
   <data name="Rectifier" xml:space="preserve">
 	  <value>Raddrizzatore</value>
@@ -1092,9 +1023,6 @@
   <data name="AwattarCountry_DenmarkTibber2" xml:space="preserve">
 	  <value>Danimarca Zona 2 Tibber</value>
   </data>
-  <data name="AwattarCountry_Estonia" xml:space="preserve">
-	  <value>Estonia</value>
-  </data>
   <data name="AwattarCountry_Finland" xml:space="preserve">
 	  <value>Finlandia</value>
   </data>
@@ -1125,17 +1053,8 @@
   <data name="AwattarCountry_Poland" xml:space="preserve">
 	  <value>Polonia</value>
   </data>
-  <data name="AwattarCountry_Romania" xml:space="preserve">
-	  <value>Romania</value>
-  </data>
-  <data name="AwattarCountry_Serbia" xml:space="preserve">
-	  <value>Serbia</value>
-  </data>
   <data name="AwattarCountry_Slovakia" xml:space="preserve">
 	  <value>Slovacchia</value>
-  </data>
-  <data name="AwattarCountry_Slovenia" xml:space="preserve">
-	  <value>Slovenia</value>
   </data>
   <data name="AwattarCountry_Spain" xml:space="preserve">
 	  <value>Spagna</value>
@@ -1197,9 +1116,6 @@
   <data name="AwattarCountry_Sweden4Tibber" xml:space="preserve">
 	  <value>Svezia Elspot 4 Tibber</value>
   </data>
-  <data name="NetShort" xml:space="preserve">
-	  <value>n</value>
-  </data>
   <data name="GrossShort" xml:space="preserve">
 	  <value>l</value>
   </data>
@@ -1247,12 +1163,6 @@
   </data>
   <data name="Frequency" xml:space="preserve">
 	  <value>Frequenza</value>
-  </data>
-  <data name="Charged" xml:space="preserve">
-	  <value>In</value>
-  </data>
-  <data name="Discharged" xml:space="preserve">
-	  <value>Out</value>
   </data>
   <data name="DaysShort" xml:space="preserve">
 	  <value>gg</value>
@@ -1337,9 +1247,6 @@
   </data>
   <data name="WattPilotDetails" xml:space="preserve">
 	  <value>Dettagli Wattpilot</value>
-  </data>
-  <data name="Wifi" xml:space="preserve">
-	  <value>Wi-Fi</value>
   </data>
   <data name="WifiSignal" xml:space="preserve">
 	  <value>Segnale Wi-Fi</value>
@@ -1728,9 +1635,6 @@
   <data name="HvacMeritFeatureHeader" xml:space="preserve">
     <value>POTENZA</value>
   </data>
-  <data name="HvacEco" xml:space="preserve">
-    <value>ECO</value>
-  </data>
   <data name="HvacNormal" xml:space="preserve">
     <value>Normale</value>
   </data>
@@ -1739,9 +1643,6 @@
   </data>
   <data name="HvacLimit" xml:space="preserve">
     <value>LIMITE</value>
-  </data>
-  <data name="HvacAuto" xml:space="preserve">
-    <value>AUTO</value>
   </data>
   <data name="Ac" xml:space="preserve">
     <value>CA</value>
@@ -1760,9 +1661,6 @@
   </data>
   <data name="Consumption" xml:space="preserve">
     <value>Consumo</value>
-  </data>
-  <data name="SmartMeter" xml:space="preserve">
-    <value>Smart Meter</value>
   </data>
   <data name="PowerConsumer" xml:space="preserve">
     <value>Utenza</value>

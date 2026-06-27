@@ -228,9 +228,6 @@
   <data name="NoFritzBoxConnection" xml:space="preserve">
     <value>Du häsch kei vollständigi Fritz!Box-Verbindigsparameter aagäh</value>
   </data>
-  <data name="Ok" xml:space="preserve">
-    <value>Ok</value>
-  </data>
   <data name="Cancel" xml:space="preserve">
     <value>Abbräche</value>
   </data>
@@ -266,9 +263,6 @@
   </data>
   <data name="End" xml:space="preserve">
     <value>Änd</value>
-  </data>
-  <data name="Name" xml:space="preserve">
-	  <value>Name</value>
   </data>
   <data name="Severity" xml:space="preserve">
     <value>Schwäri</value>
@@ -317,12 +311,6 @@
   </data>
   <data name="ModbusInterfaceRole_Disabled" xml:space="preserve">
 	  <value>Deaktiviert</value>
-  </data>
-  <data name="ModbusInterfaceRole_Master" xml:space="preserve">
-	  <value>Master</value>
-  </data>
-  <data name="ModbusInterfaceRole_Slave" xml:space="preserve">
-	  <value>Slave</value>
   </data>
   <data name="ModbusParity_Even" xml:space="preserve">
 	  <value>Grad</value>
@@ -402,12 +390,6 @@
   <data name="BackupConfiguration" xml:space="preserve">
 	  <value>Notstrom-Konfiguration</value>
   </data>
-  <data name="Sunday_One" xml:space="preserve">
-	  <value>S</value>
-  </data>
-  <data name="Monday_One" xml:space="preserve">
-	  <value>M</value>
-  </data>
   <data name="Tuesday_One" xml:space="preserve">
 	  <value>Z</value>
   </data>
@@ -416,12 +398,6 @@
   </data>
   <data name="Thursday_One" xml:space="preserve">
 	  <value>D</value>
-  </data>
-  <data name="Friday_One" xml:space="preserve">
-	  <value>F</value>
-  </data>
-  <data name="Saturday_One" xml:space="preserve">
-	  <value>S</value>
   </data>
   <data name="ChargingRuleType_MinimumCharge" xml:space="preserve">
 	  <value>Min. Ladeleistig</value>
@@ -459,14 +435,8 @@
   <data name="Gen24InverterHeader" xml:space="preserve">
 	  <value>Fronius Gen24-Wächselrichter</value>
   </data>
-  <data name="FritzBoxHeader" xml:space="preserve">
-	  <value>AVM Fritz!Box</value>
-  </data>
   <data name="Username" xml:space="preserve">
 	  <value>Benützername</value>
-  </data>
-  <data name="Url" xml:space="preserve">
-	  <value>Url</value>
   </data>
   <data name="Password" xml:space="preserve">
 	  <value>Chännwort</value>
@@ -486,14 +456,8 @@
   <data name="AppSettings" xml:space="preserve">
 	  <value>Aawändigs-Iistellige</value>
   </data>
-  <data name="Modbus" xml:space="preserve">
-	  <value>Modbus</value>
-  </data>
   <data name="EnergyFlow" xml:space="preserve">
 	  <value>Energiefluss</value>
-  </data>
-  <data name="ShowAvm" xml:space="preserve">
-	  <value>Fritz!Home</value>
   </data>
   <data name="Events" xml:space="preserve">
 	  <value>Ereignis</value>
@@ -548,9 +512,6 @@
   </data>
   <data name="ModelStatus_NotChargingBecauseFallbackGoEAwattar" xml:space="preserve">
 	  <value>Pause (Go-E-Strompriis)</value>
-  </data>
-  <data name="ModelStatus_NotChargingBecauseFallbackAwattar" xml:space="preserve">
-	  <value>Pause (Eco)</value>
   </data>
   <data name="ModelStatus_NotChargingBecauseFallbackAutomaticStop" xml:space="preserve">
 	  <value>Pause (nächschti Fahrt)</value>
@@ -614,9 +575,6 @@
   </data>
   <data name="ChargingLogic_None" xml:space="preserve">
 	  <value>Volli Leistig</value>
-  </data>
-  <data name="ChargingLogic_Eco" xml:space="preserve">
-	  <value>Eco</value>
   </data>
   <data name="ChargingLogic_NextTrip" xml:space="preserve">
 	  <value>Nächschti Fahrt</value>
@@ -732,9 +690,6 @@
   <data name="ForcedCharge_ForcedOff" xml:space="preserve">
 	  <value>Pause erzwinge</value>
   </data>
-  <data name="WattPilotHeader" xml:space="preserve">
-	  <value>Fronius Wattpilot</value>
-  </data>
   <data name="ControlWattPilot" xml:space="preserve">
 	  <value>Es mit em Wächselrichter verbundene Wattpilot steuere</value>
   </data>
@@ -810,9 +765,6 @@
   <data name="Channel" xml:space="preserve">
 	  <value>Kanal</value>
   </data>
-  <data name="Signal" xml:space="preserve">
-	  <value>Signal</value>
-  </data>
   <data name="CipherP" xml:space="preserve">
 	  <value>P-Chiffre</value>
   </data>
@@ -855,15 +807,6 @@
   <data name="ToshibaHvacUrlTooltip" xml:space="preserve">
 	  <value>Du settsch d URL nöd ändere, solang Toshiba si nöd änderet.</value>
   </data>
-  <data name="Protocol_Amqp" xml:space="preserve">
-	  <value>AMQP (Advanced Message Queuing Protocol)</value>
-  </data>
-  <data name="Protocol_Mqtt" xml:space="preserve">
-	  <value>MQTT (Message Queuing Telemetry Transport)</value>
-  </data>
-  <data name="Protocol_Http1" xml:space="preserve">
-	  <value>HTTP 1.1 (Hypertext Transfer Protocol)</value>
-  </data>
   <data name="Protocol_Amqp_ToolTip" xml:space="preserve">
 	  <value>Im Allgemeine di bescht Wahl. Anders als MQTT unterstützt's s Zruggwiise vo Nachrichte.</value>
   </data>
@@ -878,9 +821,6 @@
   </data>
   <data name="TunnelStrategy" xml:space="preserve">
 	  <value>Tunnelstrategie</value>
-  </data>
-  <data name="TunnelMode_Auto" xml:space="preserve">
-	  <value>Auto</value>
   </data>
   <data name="TunnelMode_Websocket" xml:space="preserve">
 	  <value>Websocket</value>
@@ -966,17 +906,11 @@
   <data name="NetMask" xml:space="preserve">
 	  <value>Subnetzmaske</value>
   </data>
-  <data name="Gateway" xml:space="preserve">
-	  <value>Gateway</value>
-  </data>
   <data name="Sum" xml:space="preserve">
 	  <value>Summe</value>
   </data>
   <data name="Battery" xml:space="preserve">
 	  <value>Batterie</value>
-  </data>
-  <data name="Total" xml:space="preserve">
-	  <value>Total</value>
   </data>
   <data name="Loss" xml:space="preserve">
 	  <value>Verluscht</value>
@@ -1197,9 +1131,6 @@
   <data name="AwattarCountry_Sweden4Tibber" xml:space="preserve">
 	  <value>Schwede Elspot 4 Tibber</value>
   </data>
-  <data name="NetShort" xml:space="preserve">
-	  <value>n</value>
-  </data>
   <data name="GrossShort" xml:space="preserve">
 	  <value>b</value>
   </data>
@@ -1259,12 +1190,6 @@
   </data>
   <data name="ColorAllGaugeTicks" xml:space="preserve">
 	  <value>Aazeigeinschtrumänt immer komplett iifärbe</value>
-  </data>
-  <data name="MpptComparison" xml:space="preserve">
-	  <value>String 2/1</value>
-  </data>
-  <data name="Details" xml:space="preserve">
-	  <value>Details</value>
   </data>
   <data name="SumPv" xml:space="preserve">
 	  <value>Summe PV</value>
@@ -1424,9 +1349,6 @@
   </data>
   <data name="ModelStatus_NotChargingBecauseLoadManagement" xml:space="preserve">
 	  <value>Pause (Lastmanagement)</value>
-  </data>
-  <data name="ModelStatus_NotChargingBecauseOcpp" xml:space="preserve">
-	  <value>Pause (OCPP)</value>
   </data>
   <data name="ModelStatus_NotChargingBecauseReconnectDelay" xml:space="preserve">
 	  <value>Pause (Netzwiederherstellig)</value>
@@ -1599,9 +1521,6 @@
   <data name="SupportSocHysteresisMinimum" xml:space="preserve">
 	  <value>Minimale SoC für d Hysterese</value>
   </data>
-  <data name="Version" xml:space="preserve">
-	  <value>Version</value>
-  </data>
   <data name="Help" xml:space="preserve">
 	  <value>Hilf</value>
   </data>
@@ -1722,32 +1641,11 @@
   <data name="Auth" xml:space="preserve">
     <value>Authentifizierig</value>
   </data>
-  <data name="Status" xml:space="preserve">
-    <value>Status</value>
-  </data>
   <data name="HvacMeritFeatureHeader" xml:space="preserve">
     <value>LEISTIG</value>
   </data>
-  <data name="HvacEco" xml:space="preserve">
-    <value>ECO</value>
-  </data>
-  <data name="HvacNormal" xml:space="preserve">
-    <value>Normal</value>
-  </data>
   <data name="HvacHiPower" xml:space="preserve">
     <value>Hochleistig</value>
-  </data>
-  <data name="HvacLimit" xml:space="preserve">
-    <value>LIMIT</value>
-  </data>
-  <data name="HvacAuto" xml:space="preserve">
-    <value>AUTO</value>
-  </data>
-  <data name="Ac" xml:space="preserve">
-    <value>AC</value>
-  </data>
-  <data name="Dc" xml:space="preserve">
-    <value>DC</value>
   </data>
   <data name="UiTestTitle" xml:space="preserve">
     <value>Home Automation Control Center UI-Test</value>
