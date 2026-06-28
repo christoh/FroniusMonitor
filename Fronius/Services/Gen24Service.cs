@@ -1,16 +1,47 @@
 ﻿namespace De.Hochstaetter.Fronius.Services;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
-public class Gen24Service(IGen24JsonService gen24JsonService) : BindableBase, IGen24Service
+public class Gen24Service : BindableBase, IGen24Service
 {
+    private readonly IGen24JsonService gen24JsonService;
     private readonly Lock froniusHttpClientLockObject = new();
+    private readonly ILogger<Gen24Service> logger;
 
     private DigestAuthHttp? froniusHttpClient;
     private DateTime lastSolarApiCall = DateTime.UtcNow.AddSeconds(-4);
-    private JObject? invariantConfigToken, localConfigToken;
-    private JObject? localUiToken, invariantUiToken;
-    private JObject? localEventToken, invariantEventToken;
-    private JObject? localChannelToken, invariantChannelToken;
+    private JObject? invariantConfigToken, localizedConfigToken;
+    private JObject? localizedUiToken, invariantUiToken;
+    private JObject? localizedEventToken, invariantEventToken;
+    private JObject? localizedChannelToken, invariantChannelToken;
+
+    public Gen24Service(IGen24JsonService gen24JsonService, ILogger<Gen24Service> logger)
+    {
+        this.gen24JsonService = gen24JsonService;
+        this.logger = logger;
+
+        // Drop the cached, language-dependent inverter localization so it is re-fetched in the new language.
+        CultureNotifier.CultureChanged += OnCultureChanged;
+    }
+
+    private async void OnCultureChanged(object? sender, EventArgs e)
+    {
+        try
+        {
+            // Only the language-specific tokens change; the invariant (en) fallback stays cached.
+            localizedEventToken = null;
+            localizedUiToken = null;
+            localizedChannelToken = null;
+            localizedConfigToken = null;
+            (localizedConfigToken, invariantConfigToken) = await EnsureText("app/assets/i18n/WeblateTranslations/config", localizedConfigToken, invariantConfigToken, CancellationToken.None).ConfigureAwait(false);
+            (localizedUiToken, invariantUiToken) = await EnsureText("app/assets/i18n/WeblateTranslations/ui", localizedUiToken, invariantUiToken, CancellationToken.None).ConfigureAwait(false);
+            (localizedChannelToken, invariantChannelToken) = await EnsureText("app/assets/i18n/WeblateTranslations/channels", localizedChannelToken, invariantChannelToken, CancellationToken.None).ConfigureAwait(false);
+            (localizedEventToken, invariantEventToken) = await EnsureText("app/assets/i18n/StateCodeTranslations", localizedEventToken, invariantEventToken, CancellationToken.None).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Could not get localization JSON from inverter");
+        }
+    }
 
     public WebConnection? Connection
     {
@@ -88,7 +119,8 @@ public class Gen24Service(IGen24JsonService gen24JsonService) : BindableBase, IG
         var gen24Sensors = new Gen24Sensors();
 
         var (_, dataToken) = await GetJsonResponse<BaseResponse>("api/components/readable", true, token: token).ConfigureAwait(false);
-        gen24Sensors.Inverter = gen24JsonService.ReadFroniusData<Gen24Inverter>(dataToken[components.Groups["Inverter"].FirstOrDefault() ?? "1"]);
+        var inverterGroupId = components.Groups.TryGetValue("Inverter", out var inverterGroups) ? inverterGroups.FirstOrDefault() ?? "1" : "1";
+        gen24Sensors.Inverter = gen24JsonService.ReadFroniusData<Gen24Inverter>(dataToken[inverterGroupId]);
 
         if (components.Groups.TryGetValue("Storage", out var storages))
         {
@@ -153,26 +185,26 @@ public class Gen24Service(IGen24JsonService gen24JsonService) : BindableBase, IG
 
     public async Task<string> GetUiString(string path, CancellationToken token = default)
     {
-        (localUiToken, invariantUiToken) = await EnsureText("app/assets/i18n/WeblateTranslations/ui", localUiToken, invariantUiToken, token).ConfigureAwait(false);
-        return GetLocalizedString(localUiToken, invariantUiToken, path);
+        (localizedUiToken, invariantUiToken) = await EnsureText("app/assets/i18n/WeblateTranslations/ui", localizedUiToken, invariantUiToken, token).ConfigureAwait(false);
+        return GetLocalizedString(localizedUiToken, invariantUiToken, path);
     }
 
     public async Task<string> GetConfigString(string path, CancellationToken token = default)
     {
-        (localConfigToken, invariantConfigToken) = await EnsureText("app/assets/i18n/WeblateTranslations/config", localConfigToken, invariantConfigToken, token).ConfigureAwait(false);
-        return GetLocalizedString(localConfigToken, invariantConfigToken, path);
+        (localizedConfigToken, invariantConfigToken) = await EnsureText("app/assets/i18n/WeblateTranslations/config", localizedConfigToken, invariantConfigToken, token).ConfigureAwait(false);
+        return GetLocalizedString(localizedConfigToken, invariantConfigToken, path);
     }
 
     public async Task<string> GetChannelString(string key, CancellationToken token = default)
     {
-        (localChannelToken, invariantChannelToken) = await EnsureText("app/assets/i18n/WeblateTranslations/channels", localChannelToken, invariantChannelToken, token).ConfigureAwait(false);
-        return GetLocalizedString(localChannelToken, invariantChannelToken, key);
+        (localizedChannelToken, invariantChannelToken) = await EnsureText("app/assets/i18n/WeblateTranslations/channels", localizedChannelToken, invariantChannelToken, token).ConfigureAwait(false);
+        return GetLocalizedString(localizedChannelToken, invariantChannelToken, key);
     }
 
     public async Task<string> GetEventDescription(string code, CancellationToken token = default)
     {
-        (localEventToken, invariantEventToken) = await EnsureText("app/assets/i18n/StateCodeTranslations", localEventToken, invariantEventToken, token).ConfigureAwait(false);
-        return GetLocalizedString(localEventToken, invariantEventToken, "StateCodes." + code);
+        (localizedEventToken, invariantEventToken) = await EnsureText("app/assets/i18n/StateCodeTranslations", localizedEventToken, invariantEventToken, token).ConfigureAwait(false);
+        return GetLocalizedString(localizedEventToken, invariantEventToken, "StateCodes." + code);
     }
 
     private static string GetLocalizedString(JObject? localToken, JObject? invariantToken, string path)
@@ -211,7 +243,7 @@ public class Gen24Service(IGen24JsonService gen24JsonService) : BindableBase, IG
         }
     }
 
-    private async ValueTask<(JObject?, JObject?)> EnsureText(string baseUrl, JObject? l, JObject? i, CancellationToken token = default)
+    private async ValueTask<(JObject?, JObject?)> EnsureText(string baseUrl, JObject? localized, JObject? invariant, CancellationToken token = default)
     {
         while (Connection?.BaseUrl == null)
         {
@@ -220,18 +252,18 @@ public class Gen24Service(IGen24JsonService gen24JsonService) : BindableBase, IG
 
         try
         {
-            if (i == null)
+            if (invariant == null)
             {
                 await Task.Run(async () =>
                 {
-                    i = JObject.Parse((await GetFroniusStringResponse($"{baseUrl}/en.json", token: token)
+                    invariant = JObject.Parse((await GetFroniusStringResponse($"{baseUrl}/en.json", token: token)
                         .ConfigureAwait(false)).JsonString);
                 }, token).ConfigureAwait(false);
             }
         }
         catch
         {
-            //i ??= new JObject();
+            //invariant ??= new JObject();
         }
 
         var letterCode = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName switch
@@ -240,25 +272,29 @@ public class Gen24Service(IGen24JsonService gen24JsonService) : BindableBase, IG
             _ => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName,
         };
         
-        if (letterCode != "en")
+        if (letterCode == "en")
+        {
+            localized = null;
+        }
+        else
         {
             try
             {
-                if (l == null)
+                if (localized == null)
                 {
                     await Task.Run(async () =>
                     {
-                        l = JObject.Parse((await GetFroniusStringResponse($"{baseUrl}/{letterCode}.json", token: token).ConfigureAwait(false)).JsonString);
+                        localized = JObject.Parse((await GetFroniusStringResponse($"{baseUrl}/{letterCode}.json", token: token).ConfigureAwait(false)).JsonString);
                     }, token).ConfigureAwait(false);
                 }
             }
             catch
             {
-                //l = new JObject();
+                //localized = new JObject();
             }
         }
 
-        return (l, i);
+        return (localized, invariant);
     }
 
     public async ValueTask<(string JsonString, HttpStatusCode StatusCode)> GetFroniusStringResponse

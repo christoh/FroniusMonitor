@@ -36,7 +36,7 @@ public partial class App
     public static DateTimeOffset CommitTimeUtc { get; } = DateTimeOffset.Parse(ThisAssembly.Git.CommitDate);
     public static string CommitTimeString => $"{CommitTimeUtc.UtcDateTime} UTC";
     public static string CopyrightMessage => FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).LegalCopyright ?? string.Empty;
-    public static string BranchName = ThisAssembly.Git.Branch;
+    public static string BranchName => ThisAssembly.Git.Branch;
 
     // ReSharper disable once HeuristicUnreachableCode
     public static string GitCommitId => ThisAssembly.Git.IsDirty ? "(Developer Build)" : ThisAssembly.Git.Commit;
@@ -52,8 +52,10 @@ public partial class App
     {
         var culture = string.IsNullOrWhiteSpace(language) ? osUiCulture : new CultureInfo(language);
         CultureInfo.DefaultThreadCurrentUICulture = culture;
+        CultureInfo.CurrentUICulture=culture;
         Thread.CurrentThread.CurrentUICulture = culture;
         Wpf.Localization.LocalizationSource.Instance.Culture = culture;
+        CultureNotifier.NotifyCultureChanged();
     }
 
     protected override void OnStartup(StartupEventArgs e)

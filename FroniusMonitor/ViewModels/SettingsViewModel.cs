@@ -249,6 +249,7 @@ public partial class SettingsViewModel(
         try
         {
             isOkPressed = true;
+            View.Hide();
             Settings.FroniusConnection.BaseUrl = FixUrl(Settings.FroniusConnection.BaseUrl);
             Settings.FroniusConnection2.BaseUrl = FixUrl(Settings.FroniusConnection2.BaseUrl);
             Settings.FritzBoxConnection.BaseUrl = FixUrl(Settings.FritzBoxConnection.BaseUrl);

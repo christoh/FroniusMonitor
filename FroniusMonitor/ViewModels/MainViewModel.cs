@@ -1,24 +1,11 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
+﻿using CommunityToolkit.Mvvm.Input;
 
-public class MainViewModel(IDataCollectionService dataCollectionService, IFritzBoxService fritzBoxService, IWattPilotService wattPilotService, ISmartMeterImportService smartMeterImportService) : ViewModelBase
+namespace De.Hochstaetter.FroniusMonitor.ViewModels;
+
+public partial class MainViewModel(IDataCollectionService dataCollectionService, IFritzBoxService fritzBoxService, IWattPilotService wattPilotService, ISmartMeterImportService smartMeterImportService) : ViewModelBase
 {
     private bool wattPilotFirmwareUpdateMessageShown;
     private bool isGarbageCollecting;
-
-    [field: AllowNull, MaybeNull]
-    public ICommand ExportSettingsCommand => field ??= new NoParameterCommand(ExportSettings);
-
-    [field: AllowNull, MaybeNull]
-    public ICommand LoadSettingsCommand => field ??= new NoParameterCommand(LoadSettings);
-
-    [field: AllowNull, MaybeNull]
-    public ICommand DownloadChargeLogCommand => field ??= new NoParameterCommand(DownloadChargeLog);
-
-    [field: AllowNull, MaybeNull]
-    public ICommand GarbageCollectionCommand => field ??= new NoParameterCommand(GarbageCollection);
-
-    [field: AllowNull, MaybeNull]
-    public ICommand ImportBayernwerkCommand => field ??= new NoParameterCommand(ImportBayernwerkFile);
 
     public IDataCollectionService DataCollectionService => dataCollectionService;
 
@@ -33,7 +20,7 @@ public class MainViewModel(IDataCollectionService dataCollectionService, IFritzB
             {
                 App.Settings.AddInverterPowerToConsumption = value;
                 NotifyOfPropertyChange();
-                Settings.Save().ConfigureAwait(false);
+                Settings.Save();
             }
         }
     }
@@ -95,6 +82,7 @@ public class MainViewModel(IDataCollectionService dataCollectionService, IFritzB
         _ = Settings.Save();
     }
 
+    [RelayCommand]
     private void DownloadChargeLog()
     {
         try
@@ -107,7 +95,8 @@ public class MainViewModel(IDataCollectionService dataCollectionService, IFritzB
         }
     }
 
-    private async void LoadSettings()
+    [RelayCommand]
+    private async Task LoadSettings()
     {
         var dialog = new OpenFileDialog
         {
@@ -156,7 +145,8 @@ public class MainViewModel(IDataCollectionService dataCollectionService, IFritzB
         }
     }
 
-    private async void GarbageCollection()
+    [RelayCommand]
+    private async Task GarbageCollection()
     {
         if (isGarbageCollecting)
         {
@@ -179,7 +169,8 @@ public class MainViewModel(IDataCollectionService dataCollectionService, IFritzB
         }
     }
 
-    private async void ExportSettings()
+    [RelayCommand]
+    private async Task ExportSettings()
     {
         var dialog = new SaveFileDialog
         {
@@ -210,7 +201,8 @@ public class MainViewModel(IDataCollectionService dataCollectionService, IFritzB
         }
     }
 
-    private async void ImportBayernwerkFile()
+    [RelayCommand]
+    private async Task ImportBayernwerkFile()
     {
         var openFileDialog = new OpenFileDialog
         {

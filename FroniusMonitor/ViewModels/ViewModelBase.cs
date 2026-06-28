@@ -21,9 +21,8 @@ public abstract class ViewModelBase : BindableBase
 
     protected SynchronizationContext Ctx { get; private set; } = null!;
 
-    internal Window View { private get; set; } = null!;
-
-
+    protected internal Window View { protected get; set; } = null!;
+    
 
     internal virtual async Task OnInitialize()
     {
