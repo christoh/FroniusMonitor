@@ -1,15 +1,16 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Logging;
 
 namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
-public partial class SelfConsumptionOptimizationViewModel
-(
+public partial class SelfConsumptionOptimizationViewModel(
     IGen24Service gen24Service,
     IGen24JsonService gen24JsonService,
     IFritzBoxService fritzBoxService,
     IWattPilotService wattPilotService,
-    IDataCollectionService dataCollectionService
-) : SettingsViewModelBase(dataCollectionService, gen24Service, gen24JsonService, fritzBoxService, wattPilotService)
+    IDataCollectionService dataCollectionService,
+    ILogger<SelfConsumptionOptimizationViewModel> logger
+) : SettingsViewModelBase(dataCollectionService, gen24Service, gen24JsonService, fritzBoxService, wattPilotService, logger)
 {
     private static readonly IEnumerable<ChargingRuleType> ruleTypes = Enum.GetValues<ChargingRuleType>();
     private static readonly IEnumerable<Gen24ChargingSources> chargingSources = Enum.GetValues<Gen24ChargingSources>();
@@ -17,10 +18,10 @@ public partial class SelfConsumptionOptimizationViewModel
     private Gen24BatterySettings oldSettings = null!;
     private BindableCollection<Gen24ChargingRule> oldChargingRules = null!;
 
-#pragma warning disable CA1822 // Mark members as static
+    #pragma warning disable CA1822 // Mark members as static
     public IEnumerable<ChargingRuleType> RuleTypes => ruleTypes;
     public IEnumerable<Gen24ChargingSources> ChargingSources => chargingSources;
-#pragma warning restore CA1822 // Mark members as static
+    #pragma warning restore CA1822 // Mark members as static
 
     public Gen24BatterySettings Settings
     {

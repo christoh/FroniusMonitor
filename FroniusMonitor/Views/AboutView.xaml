@@ -6,11 +6,12 @@
         xmlns:local="clr-namespace:De.Hochstaetter.FroniusMonitor.Views"
         xmlns:app="clr-namespace:De.Hochstaetter.FroniusMonitor"
         xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+        xmlns:l="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Localization"
         xmlns:gl="clr-namespace:System.Globalization;assembly=System.Runtime"
         xmlns:system="clr-namespace:System;assembly=System.Runtime"
         mc:Ignorable="d"
         WindowStartupLocation="CenterOwner"
-        Title="{x:Static p:Resources.AppName}"
+        Title="{l:Resource AppName}"
         SizeToContent="WidthAndHeight"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         ResizeMode="NoResize">
@@ -31,11 +32,11 @@
                 </Style>
             </StackPanel.Resources>
             <TextBlock Margin="0,0,0,8">
-                <Run FontSize="14" FontWeight="Medium" Text="{x:Static p:Resources.AppName}"/>
+                <Run FontSize="14" FontWeight="Medium" Text="{l:Resource AppName}"/>
                 <Run FontSize="14" FontWeight="Medium" Text="{x:Static app:App.ShortVersionString}"/>
             </TextBlock>
             <StackPanel Orientation="Horizontal">
-                <TextBlock Margin="0,0,0,2" Text="{x:Static p:Resources.Version}"/>
+                <TextBlock Margin="0,0,0,2" Text="{l:Resource Version}"/>
                 <TextBox Text="{x:Static app:App.VersionString}"/>
                 <TextBlock>
                 <Run Text="("/><Run Text="{x:Static app:App.CommitTimeString}"/><Run Text=")"/>
@@ -52,7 +53,7 @@
             <TextBox Text="{Binding BuildInfo, Mode=OneTime}"/>
         </StackPanel>
         <DockPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,16,0,0">
-            <Button Content="{x:Static p:Resources.Ok}" IsCancel="True" MinWidth="60" Height="24" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+            <Button Content="{l:Resource Ok}" IsCancel="True" MinWidth="60" Height="24" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
         </DockPanel>
     </Grid>
 </Window>

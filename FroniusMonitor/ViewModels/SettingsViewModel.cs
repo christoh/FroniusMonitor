@@ -2,6 +2,8 @@
 using CommunityToolkit.Mvvm.Input;
 using De.Hochstaetter.Fronius.Models.Settings;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Serilog.Core;
 
 namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
@@ -10,8 +12,9 @@ public partial class SettingsViewModel(
     IGen24JsonService gen24JsonService,
     IFritzBoxService fritzBoxService,
     IWattPilotService wattPilotService,
-    IDataCollectionService dataCollectionService
-) : SettingsViewModelBase(dataCollectionService, gen24Service, gen24JsonService, fritzBoxService, wattPilotService)
+    IDataCollectionService dataCollectionService,
+    ILogger<SettingsViewModel> logger
+) : SettingsViewModelBase(dataCollectionService, gen24Service, gen24JsonService, fritzBoxService, wattPilotService, logger)
 {
     private readonly ElectricityPriceSettings oldElectricityPriceSettings = new();
 
@@ -124,13 +127,20 @@ public partial class SettingsViewModel(
 
     private async void OnElectricityPriceServiceChanged(object? sender, ElectricityPriceService e)
     {
-        PriceService = IoC.Get<IElectricityPriceService>();
+        try
+        {
+            PriceService = IoC.Get<IElectricityPriceService>();
 
-        PriceRegions = (await PriceService.GetSupportedPriceZones())
-            .Select(zone => new EnumListItemModel<AwattarCountry> { Value = zone })
-            .OrderBy(zoneModel => zoneModel.DisplayName)
-            .ToList()
-            ;
+            PriceRegions = (await PriceService.GetSupportedPriceZones())
+                .Select(zone => new EnumListItemModel<AwattarCountry> { Value = zone })
+                .OrderBy(zoneModel => zoneModel.DisplayName)
+                .ToList()
+                ;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error occurred while changing electricity price service.");
+        }
     }
 
     [RelayCommand]
@@ -239,7 +249,6 @@ public partial class SettingsViewModel(
         try
         {
             isOkPressed = true;
-            Close();
             Settings.FroniusConnection.BaseUrl = FixUrl(Settings.FroniusConnection.BaseUrl);
             Settings.FroniusConnection2.BaseUrl = FixUrl(Settings.FroniusConnection2.BaseUrl);
             Settings.FritzBoxConnection.BaseUrl = FixUrl(Settings.FritzBoxConnection.BaseUrl);
@@ -249,14 +258,9 @@ public partial class SettingsViewModel(
             {
                 Settings.Language = SelectedCulture.Value;
 
-                ShowBox
-                (
-                    "The new language settings require that you restart the program." + Environment.NewLine +
-                    // ReSharper disable StringLiteralTypo
-                    "Die neuen Spracheinstellungen erfordern, dass Du das Programm neu startest.",
-                    // ReSharper restore StringLiteralTypo
-                    "Info", MessageBoxButton.OK, MessageBoxImage.Information
-                );
+                // Apply immediately: windows opened from now on use the new language.
+                // Already-open windows keep their current text (no restart required).
+                App.ApplyLanguage(SelectedCulture.Value);
             }
 
             FritzBoxService.Connection = Settings is { HaveFritzBox: true, ShowFritzBox: true } ? Settings.FritzBoxConnection : null;
@@ -296,6 +300,7 @@ public partial class SettingsViewModel(
         {
             await Settings.Save().ConfigureAwait(false);
             App.Settings.NotifySettingsChanged();
+            Close();
             _ = Dispatcher.InvokeAsync(() => IoC.Get<MainWindow>().Activate());
         }
 

@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:sys="clr-namespace:System;assembly=System.Runtime"
              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             xmlns:l="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Localization"
              mc:Ignorable="d"
              d:DesignHeight="180" d:DesignWidth="750">
     <UserControl.Resources>
@@ -181,8 +182,8 @@
                         </Style.Triggers>
                     </Style>
                 </StackPanel.Resources>
-                <Button FontSize="70" Height="100" Content="{x:Static p:Resources.Ok}" Click="OnOkPressed"/>
-                <Button FontSize="70" Height="100" Margin="20,0,0,0" Content="{x:Static p:Resources.Cancel}" Click="OnCancelPressed"/>
+                <Button FontSize="70" Height="100" Content="{l:Resource Ok}" Click="OnOkPressed"/>
+                <Button FontSize="70" Height="100" Margin="20,0,0,0" Content="{l:Resource Cancel}" Click="OnCancelPressed"/>
             </StackPanel>
 
         </Grid>

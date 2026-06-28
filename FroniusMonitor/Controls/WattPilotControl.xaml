@@ -6,6 +6,7 @@
              xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
              xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             xmlns:l="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Localization"
              xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
              xmlns:t="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Resources"
              xmlns:m="clr-namespace:De.Hochstaetter.FroniusMonitor.Models"
@@ -16,16 +17,16 @@
             <Grid x:Name="BackgroundProvider" DataContext="{Binding WattPilotService.WattPilot}" Background="{Binding Converter={co:NullToBrush}, FallbackValue=LightGray}">
                 <Grid.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="{x:Static p:Resources.Settings}"
+                        <MenuItem Header="{l:Resource Settings}"
                                   IsEnabled="{Binding FallbackValue=False, Converter={co:NullToBool}}"
                                   Icon="{vi:ChargingTrafficSignSettings}"
                                   Click="OnSettingsClicked" />
-                        <MenuItem Header="{x:Static p:Resources.Reboot}" Icon="{vi:RebootIcon}"
+                        <MenuItem Header="{l:Resource Reboot}" Icon="{vi:RebootIcon}"
                                   IsEnabled="{Binding FallbackValue=False, Converter={co:NullToBool}}"
                                   Click="OnRebootWattPilotClicked"/>
-                        <MenuItem Header="{x:Static p:Resources.OpenChargingLog}" Icon="{vi:EventLogIcon}" Click="OpenChargingLogClicked" IsEnabled="{Binding DownloadLink, FallbackValue=False, Converter={co:NullToBool}}" />
-                        <MenuItem Header="{x:Static p:Resources.OpenConfigPdf}" Icon="{vi:PdfIcon}" Click="OpenConfigPdfClicked"  IsEnabled="{Binding DownloadLink, FallbackValue=False, Converter={co:NullToBool}}" />
-                        <MenuItem Header="{x:Static p:Resources.Details}" Icon="{vi:MagnifyingGlass}" Click="OnDetailsClicked" />
+                        <MenuItem Header="{l:Resource OpenChargingLog}" Icon="{vi:EventLogIcon}" Click="OpenChargingLogClicked" IsEnabled="{Binding DownloadLink, FallbackValue=False, Converter={co:NullToBool}}" />
+                        <MenuItem Header="{l:Resource OpenConfigPdf}" Icon="{vi:PdfIcon}" Click="OpenConfigPdfClicked"  IsEnabled="{Binding DownloadLink, FallbackValue=False, Converter={co:NullToBool}}" />
+                        <MenuItem Header="{l:Resource Details}" Icon="{vi:MagnifyingGlass}" Click="OnDetailsClicked" />
                     </ContextMenu>
                 </Grid.ContextMenu>
                 <Grid.RowDefinitions>
@@ -85,19 +86,19 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.PhaseVoltage}" TextAlignment="Center" />
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{l:Resource PhaseVoltage}" TextAlignment="Center" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                                 <c:Gauge Label="L1" Value="{m:GaugeBinding VoltageL1}" />
                                 <c:Gauge Label="L2" Value="{m:GaugeBinding VoltageL2}" />
                                 <c:Gauge Label="L3" Value="{m:GaugeBinding VoltageL3}" />
-                                <c:Gauge Label="{x:Static p:Resources.AverageShort}" Value="{m:GaugeBinding VoltageAverage}"
+                                <c:Gauge Label="{l:Resource AverageShort}" Value="{m:GaugeBinding VoltageAverage}"
                                          StringFormat="N1" />
                             </StackPanel>
                         </Grid>
 
                         <StackPanel x:Name="VoltageGauge" Visibility="Collapsed">
-                            <TextBlock Text="{x:Static p:Resources.GridHealth}" HorizontalAlignment="Center" FontSize="10" />
+                            <TextBlock Text="{l:Resource GridHealth}" HorizontalAlignment="Center" FontSize="10" />
                             <UniformGrid Rows="2" Columns="2" VerticalAlignment="Center" Margin="0,8,0,0">
                                 <UniformGrid.Resources>
                                     <Style TargetType="c:Gauge" BasedOn="{StaticResource DefaultHalfCircleGauge}">
@@ -138,13 +139,13 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.Current}" TextAlignment="Center" />
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{l:Resource Current}" TextAlignment="Center" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                                 <c:Gauge Label="L1" Value="{m:GaugeBinding CurrentL1}" />
                                 <c:Gauge Label="L2" Value="{m:GaugeBinding CurrentL2}" />
                                 <c:Gauge Label="L3" Value="{m:GaugeBinding CurrentL3}" />
-                                <c:Gauge Label="{x:Static p:Resources.Sum}" Value="{m:GaugeBinding CurrentSum}"
+                                <c:Gauge Label="{l:Resource Sum}" Value="{m:GaugeBinding CurrentSum}"
                                          Maximum="{Binding MaximumChargingCurrentPossible, FallbackValue=0, Converter={co:Multiply Factor=3}}" />
                             </StackPanel>
                         </Grid>
@@ -156,7 +157,7 @@
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock FontSize="10" FontWeight="Normal" Text="{x:Static p:Resources.Current}" TextAlignment="Center" />
+                            <TextBlock FontSize="10" FontWeight="Normal" Text="{l:Resource Current}" TextAlignment="Center" />
 
                             <TextBlock FontSize="10" FontWeight="Medium" Grid.Row="1" Margin="0,0,0,2"
                                        Width="{Binding ActualWidth, ElementName=CurrentGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
@@ -185,13 +186,13 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.Power}" TextAlignment="Center" />
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{l:Resource Power}" TextAlignment="Center" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                                 <c:Gauge Label="L1" Value="{m:GaugeBinding PowerL1KiloWatts}" />
                                 <c:Gauge Label="L2" Value="{m:GaugeBinding PowerL2KiloWatts}" />
                                 <c:Gauge Label="L3" Value="{m:GaugeBinding PowerL3KiloWatts}" />
-                                <c:Gauge Label="{x:Static p:Resources.Sum}" Value="{m:GaugeBinding PowerSumKiloWatts}"
+                                <c:Gauge Label="{l:Resource Sum}" Value="{m:GaugeBinding PowerSumKiloWatts}"
                                          Maximum="{m:GaugeBinding MaximumChargingPowerPossibleSum, Converter={co:Multiply Factor=0.001}}" />
                             </StackPanel>
                         </Grid>
@@ -203,7 +204,7 @@
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock FontSize="10" FontWeight="Normal" Text="{x:Static p:Resources.Power}" TextAlignment="Center" />
+                            <TextBlock FontSize="10" FontWeight="Normal" Text="{l:Resource Power}" TextAlignment="Center" />
 
                             <TextBlock FontSize="10" FontWeight="Medium" Grid.Row="1" Margin="0,0,0,2"
                                        Width="{Binding ActualWidth, ElementName=PowerGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
@@ -254,14 +255,14 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.NeutralWire}" TextAlignment="Center" />
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{l:Resource NeutralWire}" TextAlignment="Center" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                                <c:Gauge Label="{x:Static p:Resources.Power}"
+                                <c:Gauge Label="{l:Resource Power}"
                                          Value="{m:GaugeBinding PowerL0}"
                                          Maximum="10"
                                          UnitName="W" />
-                                <c:Gauge Label="{x:Static p:Resources.Voltage}"
+                                <c:Gauge Label="{l:Resource Voltage}"
                                          Value="{m:GaugeBinding VoltageL0}"
                                          Maximum="5" StringFormat="N0" UnitName="V" />
                                 <c:Gauge Label="cos(φ)"
@@ -292,7 +293,7 @@
                                          Value="{m:GaugeBinding Frequency}" Origin=".5"
                                          UnitName="Hz" Minimum="49" Maximum="51" StringFormat="N3" />
 
-                                <c:Gauge Label="{x:Static p:Resources.Latency}" GaugeColors="{x:Static c:Gauge.HighIsBad}"
+                                <c:Gauge Label="{l:Resource Latency}" GaugeColors="{x:Static c:Gauge.HighIsBad}"
                                          Value="{m:GaugeBinding Latency.TotalMilliseconds}"
                                          StringFormat="N0" Minimum="0" Maximum="2000" UnitName="ms" />
                             </StackPanel>
@@ -312,13 +313,13 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.Temperatures}" TextAlignment="Center" />
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{l:Resource Temperatures}" TextAlignment="Center" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
 
-                                <c:Gauge Label="{x:Static p:Resources.Plug}" Value="{m:GaugeBinding TemperatureConnector}"/>
+                                <c:Gauge Label="{l:Resource Plug}" Value="{m:GaugeBinding TemperatureConnector}"/>
 
-                                <c:Gauge Label="{x:Static p:Resources.Board}" Value="{m:GaugeBinding TemperatureBoard}"/>
+                                <c:Gauge Label="{l:Resource Board}" Value="{m:GaugeBinding TemperatureBoard}"/>
                             </StackPanel>
                         </Grid>
 
@@ -355,19 +356,19 @@
                                 <TextBlock FontSize="8" Text="{Binding CurrentWifi.Ssid, FallbackValue='---'}" HorizontalAlignment="Center" />
                             </Viewbox>
 
-                            <TextBlock Grid.Column="0" Grid.Row="2" Text="{x:Static p:Resources.Mode}" />
+                            <TextBlock Grid.Column="0" Grid.Row="2" Text="{l:Resource Mode}" />
                             <Viewbox Grid.Column="1" Grid.Row="2">
                                 <TextBlock HorizontalAlignment="Right">
                                     <Run Text="{Binding CurrentWifi.Type, Mode=OneWay, FallbackValue='---'}" />
                                 </TextBlock>
                             </Viewbox>
 
-                            <TextBlock Grid.Column="0" Grid.Row="3" Text="{x:Static p:Resources.Channel}" />
+                            <TextBlock Grid.Column="0" Grid.Row="3" Text="{l:Resource Channel}" />
                             <Viewbox Grid.Column="1" Grid.Row="3">
                                 <TextBlock Text="{Binding CurrentWifi.Channel, FallbackValue='---'}" HorizontalAlignment="Right" />
                             </Viewbox>
 
-                            <TextBlock Grid.Column="0" Grid.Row="4" Text="{x:Static p:Resources.Signal}" />
+                            <TextBlock Grid.Column="0" Grid.Row="4" Text="{l:Resource Signal}" />
                             <Viewbox Grid.Column="1" Grid.Row="4">
                                 <TextBlock HorizontalAlignment="Right">
                                     <Run Text="{Binding CurrentWifi.WifiSignal, FallbackValue='---'}" />
@@ -375,17 +376,17 @@
                                 </TextBlock>
                             </Viewbox>
 
-                            <TextBlock Grid.Column="0" Grid.Row="5" Text="{x:Static p:Resources.Auth}" />
+                            <TextBlock Grid.Column="0" Grid.Row="5" Text="{l:Resource Auth}" />
                             <Viewbox Grid.Column="1" Grid.Row="5">
                                 <TextBlock Text="{Binding CurrentWifi.Encryption, FallbackValue='---', Converter={co:ToUpper}}" HorizontalAlignment="Right" />
                             </Viewbox>
 
-                            <TextBlock Grid.Column="0" Grid.Row="6" Text="{x:Static p:Resources.CipherP}" />
+                            <TextBlock Grid.Column="0" Grid.Row="6" Text="{l:Resource CipherP}" />
                             <Viewbox Grid.Column="1" Grid.Row="6">
                                 <TextBlock Text="{Binding CurrentWifi.PairwiseCipher, FallbackValue='---', Converter={co:ToUpper}}" HorizontalAlignment="Right" />
                             </Viewbox>
 
-                            <TextBlock Grid.Column="0" Grid.Row="7" Text="{x:Static p:Resources.CipherG}" />
+                            <TextBlock Grid.Column="0" Grid.Row="7" Text="{l:Resource CipherG}" />
                             <Viewbox Grid.Column="1" Grid.Row="7">
                                 <TextBlock Text="{Binding CurrentWifi.GroupCipher, FallbackValue='---', Converter={co:ToUpper}}" HorizontalAlignment="Right" />
                             </Viewbox>
@@ -395,12 +396,12 @@
                                 <TextBlock Text="{Binding CurrentWifi.IpV4Address, FallbackValue='---'}" HorizontalAlignment="Right" />
                             </Viewbox>
 
-                            <TextBlock Grid.Column="0" Grid.Row="9" Text="{x:Static p:Resources.NetMask}" />
+                            <TextBlock Grid.Column="0" Grid.Row="9" Text="{l:Resource NetMask}" />
                             <Viewbox Grid.Column="1" Grid.Row="9">
                                 <TextBlock Text="{Binding CurrentWifi.NetMask, FallbackValue='---'}" HorizontalAlignment="Right" />
                             </Viewbox>
 
-                            <TextBlock Grid.Column="0" Grid.Row="10" Text="{x:Static p:Resources.Gateway}" />
+                            <TextBlock Grid.Column="0" Grid.Row="10" Text="{l:Resource Gateway}" />
                             <Viewbox Grid.Column="1" Grid.Row="10">
                                 <TextBlock Text="{Binding CurrentWifi.Gateway, FallbackValue='---'}" HorizontalAlignment="Right" />
                             </Viewbox>
@@ -444,10 +445,10 @@
                     <WrapPanel.Resources>
                         <Style TargetType="RadioButton" BasedOn="{StaticResource DeviceButton}" />
                     </WrapPanel.Resources>
-                    <RadioButton IsChecked="True" Content="{x:Static p:Resources.Power}" Click="OnPowerClicked" />
-                    <RadioButton Content="{x:Static p:Resources.Voltage}" Click="OnVoltageClicked" />
-                    <RadioButton Content="{x:Static p:Resources.Current}" Click="OnCurrentClicked" />
-                    <RadioButton Content="{x:Static p:Resources.More}" Click="OnMoreClicked" />
+                    <RadioButton IsChecked="True" Content="{l:Resource Power}" Click="OnPowerClicked" />
+                    <RadioButton Content="{l:Resource Voltage}" Click="OnVoltageClicked" />
+                    <RadioButton Content="{l:Resource Current}" Click="OnCurrentClicked" />
+                    <RadioButton Content="{l:Resource More}" Click="OnMoreClicked" />
                 </WrapPanel>
             </Grid>
         </Border>

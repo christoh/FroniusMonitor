@@ -27,53 +27,53 @@
         
         <Grid.ContextMenu>
             <ContextMenu>
-                <MenuItem Header="{x:Static p:Resources.Settings}" Icon="{vi:SettingsIcon}" Click="OnSettingsClicked" />
-                <MenuItem Header="{x:Static p:Resources.EnergyFlow}" Icon="{vi:EnergyFLow}" Click="OnEnergyFlowClicked" />
-                <MenuItem Header="{x:Static p:Resources.Modbus}" Icon="{vi:ModbusLogo}" Click="OnModbusClicked" />
-                <MenuItem Header="{x:Static p:Resources.EventLog}" Icon="{vi:EventLogIcon}" Click="OnEventLogClicked" />
+                <MenuItem Header="{l:Resource Settings}" Icon="{vi:SettingsIcon}" Click="OnSettingsClicked" />
+                <MenuItem Header="{l:Resource EnergyFlow}" Icon="{vi:EnergyFLow}" Click="OnEnergyFlowClicked" />
+                <MenuItem Header="{l:Resource Modbus}" Icon="{vi:ModbusLogo}" Click="OnModbusClicked" />
+                <MenuItem Header="{l:Resource EventLog}" Icon="{vi:EventLogIcon}" Click="OnEventLogClicked" />
             </ContextMenu>
         </Grid.ContextMenu>
 
         <Menu Grid.Row="0">
-            <MenuItem Header="{x:Static p:Resources.Inverter}">
-                <MenuItem Header="{x:Static p:Resources.Settings}" Icon="{vi:SettingsIcon}" Click="OnSettingsClicked" />
-                <MenuItem Header="{x:Static p:Resources.EnergyFlow}" Icon="{vi:EnergyFLow}" Click="OnEnergyFlowClicked" />
-                <MenuItem Header="{x:Static p:Resources.Modbus}" Icon="{vi:ModbusLogo}" Click="OnModbusClicked" />
-                <MenuItem Header="{x:Static p:Resources.EventLog}" Icon="{vi:EventLogIcon}" Click="OnEventLogClicked" />
+            <MenuItem Header="{l:Resource Inverter}">
+                <MenuItem Header="{l:Resource Settings}" Icon="{vi:SettingsIcon}" Click="OnSettingsClicked" />
+                <MenuItem Header="{l:Resource EnergyFlow}" Icon="{vi:EnergyFLow}" Click="OnEnergyFlowClicked" />
+                <MenuItem Header="{l:Resource Modbus}" Icon="{vi:ModbusLogo}" Click="OnModbusClicked" />
+                <MenuItem Header="{l:Resource EventLog}" Icon="{vi:EventLogIcon}" Click="OnEventLogClicked" />
             </MenuItem>
-            <MenuItem x:Name="View" Header="{x:Static p:Resources.View}" IsCheckable="False" IsChecked="False" Click="CheckShowAll">
+            <MenuItem x:Name="View" Header="{l:Resource View}" IsCheckable="False" IsChecked="False" Click="CheckShowAll">
                 <MenuItem.Resources>
                     <Style TargetType="MenuItem">
                         <Setter Property="IsCheckable" Value="True" />
                         <Setter Property="IsChecked" Value="False" />
                     </Style>
                 </MenuItem.Resources>
-                <MenuItem Header="{x:Static p:Resources.ShowAll}" IsCheckable="True" Click="CheckAllViews"/>
-                <MenuItem x:Name="DcPower" Header="{x:Static p:Resources.DcPower}" IsChecked="True"/>
-                <MenuItem x:Name="DcVoltage" Header="{x:Static p:Resources.DcVoltage}" IsChecked="True" />
-                <MenuItem x:Name="DcCurrent" Header="{x:Static p:Resources.DcCurrent}" IsChecked="True" />
-                <MenuItem x:Name="Temperatures" Header="{x:Static p:Resources.Temperatures}"/>
-                <MenuItem x:Name="Fans" Header="{x:Static p:Resources.Fans}"/>
-                <MenuItem x:Name="AcPhaseVoltageFeedIn" Header="{x:Static p:Resources.AcPhaseVoltageFeedIn}"/>
-                <MenuItem x:Name="AcPhaseVoltageInverter" Header="{x:Static p:Resources.AcPhaseVoltageInverter}"/>
-                <MenuItem x:Name="ΔAcPhaseVoltageFeedIn" Header="{x:Static p:Resources.ΔAcPhaseVoltageFeedIn}"/>
-                <MenuItem x:Name="AcLineVoltageFeedIn" Header="{x:Static p:Resources.AcLineVoltageFeedIn}"/>
-                <MenuItem x:Name="AcLineVoltageInverter" Header="{x:Static p:Resources.AcLineVoltageInverter}"/>
-                <MenuItem x:Name="ΔAcLineVoltageFeedIn" Header="{x:Static p:Resources.ΔAcLineVoltageFeedIn}"/>
-                <MenuItem x:Name="Frequency" Header="{x:Static p:Resources.Frequency}"/>
-                <MenuItem x:Name="ActivePower" Header="{x:Static p:Resources.ActivePower}" IsChecked="True"/>
-                <MenuItem x:Name="ApparentPower" Header="{x:Static p:Resources.ApparentPower}"/>
-                <MenuItem x:Name="ReactivePower" Header="{x:Static p:Resources.ReactivePower}"/>
+                <MenuItem Header="{l:Resource ShowAll}" IsCheckable="True" Click="CheckAllViews"/>
+                <MenuItem x:Name="DcPower" Header="{l:Resource DcPower}" IsChecked="True"/>
+                <MenuItem x:Name="DcVoltage" Header="{l:Resource DcVoltage}" IsChecked="True" />
+                <MenuItem x:Name="DcCurrent" Header="{l:Resource DcCurrent}" IsChecked="True" />
+                <MenuItem x:Name="Temperatures" Header="{l:Resource Temperatures}"/>
+                <MenuItem x:Name="Fans" Header="{l:Resource Fans}"/>
+                <MenuItem x:Name="AcPhaseVoltageFeedIn" Header="{l:Resource AcPhaseVoltageFeedIn}"/>
+                <MenuItem x:Name="AcPhaseVoltageInverter" Header="{l:Resource AcPhaseVoltageInverter}"/>
+                <MenuItem x:Name="ΔAcPhaseVoltageFeedIn" Header="{l:Resource ΔAcPhaseVoltageFeedIn}"/>
+                <MenuItem x:Name="AcLineVoltageFeedIn" Header="{l:Resource AcLineVoltageFeedIn}"/>
+                <MenuItem x:Name="AcLineVoltageInverter" Header="{l:Resource AcLineVoltageInverter}"/>
+                <MenuItem x:Name="ΔAcLineVoltageFeedIn" Header="{l:Resource ΔAcLineVoltageFeedIn}"/>
+                <MenuItem x:Name="Frequency" Header="{l:Resource Frequency}"/>
+                <MenuItem x:Name="ActivePower" Header="{l:Resource ActivePower}" IsChecked="True"/>
+                <MenuItem x:Name="ApparentPower" Header="{l:Resource ApparentPower}"/>
+                <MenuItem x:Name="ReactivePower" Header="{l:Resource ReactivePower}"/>
                 <MenuItem x:Name="PowerFactor" Header="cos(ϕ)"/>
-                <MenuItem x:Name="Efficiency" Header="{x:Static p:Resources.Efficiency}" IsChecked="True"/>
-                <MenuItem x:Name="AcCurrent" Header="{x:Static p:Resources.AcCurrent}"/>
-                <MenuItem x:Name="OutOfBalance" Header="{x:Static p:Resources.OutOfBalance}"/>
+                <MenuItem x:Name="Efficiency" Header="{l:Resource Efficiency}" IsChecked="True"/>
+                <MenuItem x:Name="AcCurrent" Header="{l:Resource AcCurrent}"/>
+                <MenuItem x:Name="OutOfBalance" Header="{l:Resource OutOfBalance}"/>
             </MenuItem>
         </Menu>
 
         <TextBlock Grid.Row="1" Text="{Binding Header}" TextAlignment="Center" FontSize="18" FontWeight="Medium" Margin="10,10,10,16" TextWrapping="Wrap" />
 
-        <TextBlock Grid.Row="2" Text="{x:Static p:Resources.CheckAtLeastOneView}" TextAlignment="Center" FontSize="14" Margin="10,10,10,16" TextWrapping="Wrap" Visibility="{Binding IsNoneSelected, Converter={co:Bool2Visibility}}" />
+        <TextBlock Grid.Row="2" Text="{l:Resource CheckAtLeastOneView}" TextAlignment="Center" FontSize="14" Margin="10,10,10,16" TextWrapping="Wrap" Visibility="{Binding IsNoneSelected, Converter={co:Bool2Visibility}}" />
 
         <ScrollViewer Grid.Row="3" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
             <!-- ReSharper disable Xaml.PossibleNullReferenceException -->
@@ -116,7 +116,7 @@
                     </Style>
                 </WrapPanel.Resources>
 
-                <GroupBox Header="{x:Static p:Resources.DcPower}" Visibility="{Binding IsChecked, ElementName=DcPower, Converter={co:Bool2Visibility}}">
+                <GroupBox Header="{l:Resource DcPower}" Visibility="{Binding IsChecked, ElementName=DcPower, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -138,17 +138,17 @@
 
                             <ContentControl>
                                 <c:Gauge Maximum="{m:GaugeBinding Inverter.Config.InverterSettings.Mppt.WattPeakTotal, FallbackValue=10000, TargetNullValue=10000}"
-                                         Value="{m:GaugeBinding Inverter.Sensors.Inverter.SolarPowerSum}" Label="{x:Static p:Resources.SumPv}" />
+                                         Value="{m:GaugeBinding Inverter.Sensors.Inverter.SolarPowerSum}" Label="{l:Resource SumPv}" />
                             </ContentControl>
 
                             <ContentControl Visibility="{Binding Inverter.Sensors.Storage, Converter={co:NullToVisibility}}">
-                                <c:Gauge Origin=".5" Value="{m:GaugeBinding Inverter.Sensors.Inverter.StoragePower}" Label="{x:Static p:Resources.Battery}"
+                                <c:Gauge Origin=".5" Value="{m:GaugeBinding Inverter.Sensors.Inverter.StoragePower}" Label="{l:Resource Battery}"
                                          Maximum="{Binding Inverter.Sensors.Storage.VoltageOuter, FallbackValue=8184, Converter={co:Multiply Factor=22}}"
                                          Minimum="{Binding Inverter.Sensors.Storage.VoltageOuter, FallbackValue=-8184, Converter={co:Multiply Factor=-22}}" />
                             </ContentControl>
 
                             <ContentControl>
-                                <c:Gauge Minimum="50" Maximum="150" UnitName="%" GaugeColors="{x:Static c:Gauge.ExtremeIsBad}" Label="{x:Static p:Resources.MpptComparison}">
+                                <c:Gauge Minimum="50" Maximum="150" UnitName="%" GaugeColors="{x:Static c:Gauge.ExtremeIsBad}" Label="{l:Resource MpptComparison}">
                                     <c:Gauge.Value>
                                         <MultiBinding Converter="{co:MpptComparison}">
                                             <Binding Path="Inverter.Sensors.Inverter.Solar1Power" />
@@ -163,7 +163,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.DcVoltage}" Visibility="{Binding IsChecked, ElementName=DcVoltage, Converter={co:Bool2Visibility}}">
+                <GroupBox Header="{l:Resource DcVoltage}" Visibility="{Binding IsChecked, ElementName=DcVoltage, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -192,7 +192,7 @@
                             </ContentControl>
 
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Inverter.StorageVoltageOuter}" Label="{x:Static p:Resources.Battery}"
+                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Inverter.StorageVoltageOuter}" Label="{l:Resource Battery}"
                                          Minimum="{m:GaugeBinding Inverter.Sensors.Storage.MinVoltage, FallbackValue=160}"
                                          Maximum="{m:GaugeBinding Inverter.Sensors.Storage.MaxVoltage, FallbackValue=531}"
                                          GaugeColors="{x:Static c:Gauge.ExtremeIsBad}" />
@@ -201,7 +201,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.DcCurrent}" Visibility="{Binding IsChecked, ElementName=DcCurrent, Converter={co:Bool2Visibility}}">
+                <GroupBox Header="{l:Resource DcCurrent}" Visibility="{Binding IsChecked, ElementName=DcCurrent, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -221,15 +221,15 @@
                             </ContentControl>
 
                             <ContentControl>
-                                <c:Gauge Maximum="37.5" Value="{m:GaugeBinding Inverter.Sensors.Inverter.SolarCurrentSum}" Label="{x:Static p:Resources.SumPv}" />
+                                <c:Gauge Maximum="37.5" Value="{m:GaugeBinding Inverter.Sensors.Inverter.SolarCurrentSum}" Label="{l:Resource SumPv}" />
                             </ContentControl>
 
                             <ContentControl Visibility="{Binding Inverter.Sensors.Storage, Converter={co:NullToVisibility}}">
-                                <c:Gauge Maximum="22" Minimum="-22" Origin=".5" Value="{m:GaugeBinding Inverter.Sensors.Inverter.StorageCurrent}" Label="{x:Static p:Resources.Battery}" />
+                                <c:Gauge Maximum="22" Minimum="-22" Origin=".5" Value="{m:GaugeBinding Inverter.Sensors.Inverter.StorageCurrent}" Label="{l:Resource Battery}" />
                             </ContentControl>
 
                             <ContentControl>
-                                <c:Gauge Minimum="50" Maximum="150" UnitName="%" GaugeColors="{x:Static c:Gauge.ExtremeIsBad}" Label="{x:Static p:Resources.MpptComparison}">
+                                <c:Gauge Minimum="50" Maximum="150" UnitName="%" GaugeColors="{x:Static c:Gauge.ExtremeIsBad}" Label="{l:Resource MpptComparison}">
                                     <c:Gauge.Value>
                                         <MultiBinding Converter="{co:MpptComparison}">
                                             <Binding Path="Inverter.Sensors.Inverter.Solar1Current" />
@@ -243,7 +243,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.Temperatures}" Visibility="{Binding IsChecked, ElementName=Temperatures, Converter={co:Bool2Visibility}}">
+                <GroupBox Header="{l:Resource Temperatures}" Visibility="{Binding IsChecked, ElementName=Temperatures, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -256,25 +256,25 @@
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Inverter.AmbientTemperature}" Label="{x:Static p:Resources.Ambient}" />
+                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Inverter.AmbientTemperature}" Label="{l:Resource Ambient}" />
                             </ContentControl>
 
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Inverter.TemperatureInverterAcModule}" Label="{x:Static p:Resources.AcModule}" />
+                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Inverter.TemperatureInverterAcModule}" Label="{l:Resource AcModule}" />
                             </ContentControl>
 
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Inverter.TemperatureInverterDcModule}" Label="{x:Static p:Resources.DcModule}" />
+                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Inverter.TemperatureInverterDcModule}" Label="{l:Resource DcModule}" />
                             </ContentControl>
 
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Inverter.TemperatureInverterBatteryModule}" Label="{x:Static p:Resources.BatteryModule}" />
+                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Inverter.TemperatureInverterBatteryModule}" Label="{l:Resource BatteryModule}" />
                             </ContentControl>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.Fans}" Visibility="{Binding IsChecked, ElementName=Fans, Converter={co:Bool2Visibility}}">
+                <GroupBox Header="{l:Resource Fans}" Visibility="{Binding IsChecked, ElementName=Fans, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -287,17 +287,17 @@
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Inverter.Fan1RelativeRpm, Converter={co:Multiply Factor=100}}" Label="{x:Static p:Resources.Fan1}" />
+                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Inverter.Fan1RelativeRpm, Converter={co:Multiply Factor=100}}" Label="{l:Resource Fan1}" />
                             </ContentControl>
 
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Inverter.Fan2RelativeRpm, Converter={co:Multiply Factor=100}}" Label="{x:Static p:Resources.Fan2}" />
+                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Inverter.Fan2RelativeRpm, Converter={co:Multiply Factor=100}}" Label="{l:Resource Fan2}" />
                             </ContentControl>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.AcPhaseVoltageFeedIn}" Visibility="{Binding IsChecked, ElementName=AcPhaseVoltageFeedIn, Converter={co:Bool2Visibility}}">
+                <GroupBox Header="{l:Resource AcPhaseVoltageFeedIn}" Visibility="{Binding IsChecked, ElementName=AcPhaseVoltageFeedIn, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -325,7 +325,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.AcPhaseVoltageInverter}" Visibility="{Binding IsChecked, ElementName=AcPhaseVoltageInverter, Converter={co:Bool2Visibility}}">
+                <GroupBox Header="{l:Resource AcPhaseVoltageInverter}" Visibility="{Binding IsChecked, ElementName=AcPhaseVoltageInverter, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -352,7 +352,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.ΔAcPhaseVoltageFeedIn}" Visibility="{Binding IsChecked, ElementName=ΔAcPhaseVoltageFeedIn, Converter={co:Bool2Visibility}}">
+                <GroupBox Header="{l:Resource ΔAcPhaseVoltageFeedIn}" Visibility="{Binding IsChecked, ElementName=ΔAcPhaseVoltageFeedIn, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -402,7 +402,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.AcLineVoltageFeedIn}" Visibility="{Binding IsChecked, ElementName=AcLineVoltageFeedIn, Converter={co:Bool2Visibility}}">
+                <GroupBox Header="{l:Resource AcLineVoltageFeedIn}" Visibility="{Binding IsChecked, ElementName=AcLineVoltageFeedIn, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -430,7 +430,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.AcLineVoltageInverter}" Visibility="{Binding IsChecked, ElementName=AcLineVoltageInverter, Converter={co:Bool2Visibility}}">
+                <GroupBox Header="{l:Resource AcLineVoltageInverter}" Visibility="{Binding IsChecked, ElementName=AcLineVoltageInverter, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -457,7 +457,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.ΔAcLineVoltageFeedIn}" Visibility="{Binding IsChecked, ElementName=ΔAcLineVoltageFeedIn, Converter={co:Bool2Visibility}}">
+                <GroupBox Header="{l:Resource ΔAcLineVoltageFeedIn}" Visibility="{Binding IsChecked, ElementName=ΔAcLineVoltageFeedIn, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -506,7 +506,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.Frequency}" Visibility="{Binding IsChecked, ElementName=Frequency, Converter={co:Bool2Visibility}}">
+                <GroupBox Header="{l:Resource Frequency}" Visibility="{Binding IsChecked, ElementName=Frequency, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -520,17 +520,17 @@
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Inverter.FeedInPointFrequency}" Label="{x:Static p:Resources.Grid}"
+                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Inverter.FeedInPointFrequency}" Label="{l:Resource Grid}"
                                          v:InverterDetailsView.AlwaysUseRunningBackground="True" t:HalfCircleGauge.MinimumMaximumStringFormat="N1" />
                             </ContentControl>
 
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Inverter.InverterFrequency}" Label="{x:Static p:Resources.Inverter}"
+                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Inverter.InverterFrequency}" Label="{l:Resource Inverter}"
                                          t:HalfCircleGauge.MinimumMaximumStringFormat="N1" />
                             </ContentControl>
 
                             <ContentControl>
-                                <c:Gauge Label="{x:Static p:Resources.ΔFrequency}" Minimum="-5" Maximum="5" UnitName="mHz">
+                                <c:Gauge Label="{l:Resource ΔFrequency}" Minimum="-5" Maximum="5" UnitName="mHz">
                                     <c:Gauge.Value>
                                         <MultiBinding Converter="{co:DeltaConverter}">
                                             <Binding Path="Inverter.Sensors.Inverter.InverterFrequency" Converter="{co:Multiply Factor=1000}" />
@@ -543,7 +543,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.ActivePower}" Visibility="{Binding IsChecked, ElementName=ActivePower, Converter={co:Bool2Visibility}}">
+                <GroupBox Header="{l:Resource ActivePower}" Visibility="{Binding IsChecked, ElementName=ActivePower, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource AcPowerGauge}">
@@ -566,7 +566,7 @@
                             <ContentControl>
                                 <c:Gauge Value="{Binding Inverter.Sensors.Inverter.PowerActiveSum, FallbackValue=-100000, TargetNullValue=-100000, Mode=OneWay}"
                                          Maximum="{Binding Inverter.Config.MaxAcPower, FallbackValue=10000, TargetNullValue=10000, Mode=OneWay}"
-                                         Label="{x:Static p:Resources.Sum}">
+                                         Label="{l:Resource Sum}">
                                     <c:Gauge.Minimum>
                                         <MultiBinding Converter="{co:AcPowerMinimum}">
                                             <Binding Path="Inverter.Config.MaxAcPower" />
@@ -579,7 +579,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.ApparentPower}" Visibility="{Binding IsChecked, ElementName=ApparentPower, Converter={co:Bool2Visibility}}">
+                <GroupBox Header="{l:Resource ApparentPower}" Visibility="{Binding IsChecked, ElementName=ApparentPower, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource AcPowerGauge}">
@@ -605,13 +605,13 @@
                             <ContentControl>
                                 <c:Gauge Value="{Binding Inverter.Sensors.Inverter.PowerApparentSum, FallbackValue=-100000, TargetNullValue=-100000, Mode=OneWay}"
                                          Maximum="{Binding Inverter.Config.MaxAcPower, FallbackValue=10000, TargetNullValue=10000, Mode=OneWay}"
-                                         Label="{x:Static p:Resources.Sum}" />
+                                         Label="{l:Resource Sum}" />
                             </ContentControl>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.ReactivePower}" Visibility="{Binding IsChecked, ElementName=ReactivePower, Converter={co:Bool2Visibility}}">
+                <GroupBox Header="{l:Resource ReactivePower}" Visibility="{Binding IsChecked, ElementName=ReactivePower, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource AcPowerGauge}">
@@ -637,7 +637,7 @@
                                 <c:Gauge Value="{Binding Inverter.Sensors.Inverter.PowerReactiveSum, FallbackValue=-100000, TargetNullValue=-100000, Mode=OneWay}"
                                          Minimum="{Binding Inverter.Config.MaxAcPower, FallbackValue=-10000, TargetNullValue=-10000, Mode=OneWay, Converter={co:Multiply Factor=-1}}"
                                          Maximum="{Binding Inverter.Config.MaxAcPower, FallbackValue=10000, TargetNullValue=10000, Mode=OneWay}"
-                                         Label="{x:Static p:Resources.Sum}" />
+                                         Label="{l:Resource Sum}" />
                             </ContentControl>
                         </StackPanel>
                     </StackPanel>
@@ -668,33 +668,33 @@
                             </ContentControl>
 
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Inverter.PowerFactorAverage}" Label="{x:Static p:Resources.Total}" />
+                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Inverter.PowerFactorAverage}" Label="{l:Resource Total}" />
                             </ContentControl>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.Efficiency}" Visibility="{Binding IsChecked, ElementName=Efficiency, Converter={co:Bool2Visibility}}">
+                <GroupBox Header="{l:Resource Efficiency}" Visibility="{Binding IsChecked, ElementName=Efficiency, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}" />
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.PowerFlow.PowerLoss}" Label="{x:Static p:Resources.Loss}"
+                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.PowerFlow.PowerLoss}" Label="{l:Resource Loss}"
                                          UnitName="W" Minimum="0" Maximum="500" GaugeColors="{x:Static c:Gauge.HighIsBad}" />
                             </ContentControl>
 
                             <ContentControl>
                                 <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.PowerFlow.Efficiency, Converter={co:Multiply Factor=100}}"
-                                         Label="{x:Static p:Resources.Efficiency}"
+                                         Label="{l:Resource Efficiency}"
                                          UnitName="%" Minimum="0" Maximum="100" GaugeColors="{x:Static c:Gauge.LowIsBad}" />
                             </ContentControl>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.AcCurrent}" Visibility="{Binding IsChecked, ElementName=AcCurrent, Converter={co:Bool2Visibility}}">
+                <GroupBox Header="{l:Resource AcCurrent}" Visibility="{Binding IsChecked, ElementName=AcCurrent, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -719,14 +719,14 @@
                             </ContentControl>
 
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Inverter.CurrentSum}" Label="{x:Static p:Resources.Sum}"
+                                <c:Gauge Value="{m:GaugeBinding Inverter.Sensors.Inverter.CurrentSum}" Label="{l:Resource Sum}"
                                          Maximum="{Binding Inverter.Config.MaxAcPower, Converter={co:Multiply Factor=0.00434784}, FallbackValue=14.4928}" />
                             </ContentControl>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.OutOfBalance}" Visibility="{Binding IsChecked, ElementName=OutOfBalance, Converter={co:Bool2Visibility}}">
+                <GroupBox Header="{l:Resource OutOfBalance}" Visibility="{Binding IsChecked, ElementName=OutOfBalance, Converter={co:Bool2Visibility}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">

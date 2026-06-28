@@ -1,12 +1,15 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
+﻿using Microsoft.Extensions.Logging;
+
+namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
 public class ModbusViewModel(
     IDataCollectionService dataCollectionService,
     IGen24Service gen24Service,
     IGen24JsonService gen24JsonService,
     IFritzBoxService fritzBoxService,
-    IWattPilotService wattPilotService)
-    : SettingsViewModelBase(dataCollectionService, gen24Service, gen24JsonService, fritzBoxService, wattPilotService)
+    IWattPilotService wattPilotService,
+    ILogger<ModbusViewModel> logger)
+    : SettingsViewModelBase(dataCollectionService, gen24Service, gen24JsonService, fritzBoxService, wattPilotService, logger)
 {
     private Gen24ModbusSettings oldSettings = null!;
 

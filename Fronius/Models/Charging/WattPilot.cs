@@ -127,10 +127,7 @@ public partial class WattPilot : BindableBase, IHaveDisplayName, IHaveUniqueId, 
         get;
         set => Set(ref field, value, () =>
         {
-            if (CurrentWifi != null)
-            {
-                CurrentWifi.WifiSignal = value;
-            }
+            CurrentWifi?.WifiSignal = value;
         });
     }
 

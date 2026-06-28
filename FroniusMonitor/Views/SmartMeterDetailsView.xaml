@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:De.Hochstaetter.FroniusMonitor.ViewModels"
         xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+        xmlns:l="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Localization"
         xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
         xmlns:m="clr-namespace:De.Hochstaetter.FroniusMonitor.Models"
         xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
@@ -66,7 +67,7 @@
                     </Style>
                 </WrapPanel.Resources>
 
-                <GroupBox Header="{x:Static p:Resources.ActivePower}">
+                <GroupBox Header="{l:Resource ActivePower}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource PowerGauge}">
@@ -87,7 +88,7 @@
                             </ContentControl>
 
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Meter.ActivePowerSum}" Label="{x:Static p:Resources.Sum}"
+                                <c:Gauge Value="{m:GaugeBinding Meter.ActivePowerSum}" Label="{l:Resource Sum}"
                                          Minimum="{Binding Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter IsMinimum=True, IsOnePhase=False}, FallbackValue=-24150}"
                                          Maximum="{Binding Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter IsOnePhase=False}, FallbackValue=24050}"/>
                             </ContentControl>
@@ -96,7 +97,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.ApparentPower}">
+                <GroupBox Header="{l:Resource ApparentPower}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource PowerGauge}">
@@ -121,7 +122,7 @@
                             </ContentControl>
 
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Meter.ApparentPowerSum}" Label="{x:Static p:Resources.Sum}" GaugeColors="{x:Static c:Gauge.HighIsBad}"
+                                <c:Gauge Value="{m:GaugeBinding Meter.ApparentPowerSum}" Label="{l:Resource Sum}" GaugeColors="{x:Static c:Gauge.HighIsBad}"
                                          Maximum="{Binding Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter IsOnePhase=False}, FallbackValue=24050}"/>
                             </ContentControl>
 
@@ -129,7 +130,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.ReactivePower}">
+                <GroupBox Header="{l:Resource ReactivePower}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource PowerGauge}">
@@ -151,7 +152,7 @@
                             </ContentControl>
 
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Meter.ReactivePowerSum}" Label="{x:Static p:Resources.Sum}"
+                                <c:Gauge Value="{m:GaugeBinding Meter.ReactivePowerSum}" Label="{l:Resource Sum}"
                                          Minimum="{Binding Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter IsMinimum=True, IsOnePhase=False}, FallbackValue=-24150}"
                                          Maximum="{Binding Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter IsOnePhase=False}, FallbackValue=24050}"/>
                             </ContentControl>
@@ -187,14 +188,14 @@
                             </ContentControl>
 
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Meter.PowerFactorTotal}" Label="{x:Static p:Resources.Total}"/>
+                                <c:Gauge Value="{m:GaugeBinding Meter.PowerFactorTotal}" Label="{l:Resource Total}"/>
                             </ContentControl>
 
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.PhaseVoltage}">
+                <GroupBox Header="{l:Resource PhaseVoltage}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -222,7 +223,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.LineVoltage}">
+                <GroupBox Header="{l:Resource LineVoltage}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -250,7 +251,7 @@
                     </StackPanel>
                 </GroupBox>
                 
-                <GroupBox Header="{x:Static p:Resources.Frequency}">
+                <GroupBox Header="{l:Resource Frequency}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}"/>
@@ -258,7 +259,7 @@
                         <StackPanel Orientation="Horizontal">
 
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Meter.Frequency}" Label="{x:Static p:Resources.Grid}"
+                                <c:Gauge Value="{m:GaugeBinding Meter.Frequency}" Label="{l:Resource Grid}"
                                          Minimum="49.8" Maximum="50.2" GaugeColors="{x:Static c:Gauge.MidIsGood}"
                                          Origin=".5" UnitName="Hz" t:HalfCircleGauge.MinimumMaximumStringFormat="N1"/>
                             </ContentControl>
@@ -267,7 +268,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.Current}">
+                <GroupBox Header="{l:Resource Current}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource CurrentGauge}">
@@ -288,13 +289,13 @@
                             </ContentControl>
 
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Meter.TotalCurrent}" Label="{x:Static p:Resources.Sum}" Minimum="-105" Maximum="105" />
+                                <c:Gauge Value="{m:GaugeBinding Meter.TotalCurrent}" Label="{l:Resource Sum}" Minimum="-105" Maximum="105" />
                             </ContentControl>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.OutOfBalance}">
+                <GroupBox Header="{l:Resource OutOfBalance}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource CurrentGauge}">

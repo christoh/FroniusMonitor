@@ -14,6 +14,9 @@ public partial class App
     public static readonly IServiceCollection ServiceCollection = new ServiceCollection();
     public static Timer? SolarSystemQueryTimer { get; set; }
 
+    // Captured before we ever override the culture, so "match Windows language" (null) can be restored at runtime.
+    private static readonly CultureInfo osUiCulture = CultureInfo.CurrentUICulture;
+
     static App()
     {
         if (!mutex.WaitOne(0, false))
@@ -39,6 +42,19 @@ public partial class App
     public static string GitCommitId => ThisAssembly.Git.IsDirty ? "(Developer Build)" : ThisAssembly.Git.Commit;
 
     public static Settings Settings { get; set; } = null!;
+
+    /// <summary>
+    /// Applies the UI language at runtime. Windows opened afterwards use the new language;
+    /// already-open windows keep their text. A null/empty <paramref name="language"/> restores
+    /// the operating system display language ("match Windows language").
+    /// </summary>
+    public static void ApplyLanguage(string? language)
+    {
+        var culture = string.IsNullOrWhiteSpace(language) ? osUiCulture : new CultureInfo(language);
+        CultureInfo.DefaultThreadCurrentUICulture = culture;
+        Thread.CurrentThread.CurrentUICulture = culture;
+        Wpf.Localization.LocalizationSource.Instance.Culture = culture;
+    }
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -160,16 +176,13 @@ public partial class App
         IoC.Update(injector);
         IoC.Get<IDataCollectionService>().FroniusUpdateRate = Settings.FroniusUpdateRate;
 
-        if (!string.IsNullOrWhiteSpace(Settings.Language))
+        try
         {
-            try
-            {
-                Thread.CurrentThread.CurrentUICulture = new CultureInfo(Settings.Language);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, Loc.Warning, MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
+            ApplyLanguage(Settings.Language);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, Loc.Warning, MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
         NetworkChange.NetworkAddressChanged += OnNetworkAddressChanged;

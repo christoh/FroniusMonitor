@@ -90,12 +90,12 @@
                     <TextBlock Grid.Row="0" Grid.Column="1" Text=":" />
                     <TextBox Grid.Row="0" Grid.Column="2" MaxLength="30" Text="{Binding Settings.SystemName}" />
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.TimeZone}" IsEnabled="{Binding EnableDanger}" />
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{l:Resource TimeZone}" IsEnabled="{Binding EnableDanger}" />
                     <TextBlock Grid.Row="1" Grid.Column="1" Text=":" IsEnabled="{Binding EnableDanger}"/>
                     <TextBox Grid.Row="1" Grid.Column="2" MaxLength="30" Text="{Binding Settings.TimeZoneName}" IsEnabled="{Binding EnableDanger}" />
 
                     <CheckBox Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2" IsChecked="{Binding Settings.TimeSync}" IsEnabled="{Binding EnableDanger}">
-                        <TextBlock Text="{x:Static p:Resources.SynchronizeTime}" Margin="0"/>
+                        <TextBlock Text="{l:Resource SynchronizeTime}" Margin="0"/>
                     </CheckBox>
                 </Grid>
             </GroupBox>
@@ -339,9 +339,9 @@
                                 </Style>
                             </StackPanel.Resources>
 
-                            <TextBlock Text="{x:Static p:Resources.Inverters}" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,8,0" />
+                            <TextBlock Text="{l:Resource Inverters}" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,8,0" />
 
-                            <Button Command="{Binding RefreshConnectedInvertersCommand}" ToolTip="{x:Static p:Resources.Refresh}">
+                            <Button Command="{Binding RefreshConnectedInvertersCommand}" ToolTip="{l:Resource Refresh}">
                                 <vi:RefreshIcon Height="16" Margin="4" />
                             </Button>
                             
@@ -360,7 +360,7 @@
                                   BorderThickness="1">
                             <DataGrid.RowStyle>
                                 <Style TargetType="DataGridRow">
-                                    <Setter Property="ToolTip" Value="{x:Static p:Resources.RuleTooltip}" />
+                                    <Setter Property="ToolTip" Value="{l:Resource RuleTooltip}" />
                                     <Setter Property="Tag" Value="{Binding Path=DataContext, RelativeSource={RelativeSource FindAncestor, AncestorType=DataGrid}}" />
                                     <Setter Property="ContextMenu">
                                         <Setter.Value>
@@ -463,7 +463,7 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="{x:Static p:Resources.Danger}" Margin="0,0,4,0" VerticalAlignment="Center">
+                <TextBlock Grid.Column="0" Text="{l:Resource Danger}" Margin="0,0,4,0" VerticalAlignment="Center">
                     <Run Text=":" />
                 </TextBlock>
                 <ToggleButton Grid.Column="1" Height="18" VerticalAlignment="Center" IsChecked="{Binding EnableDanger}" />
@@ -471,8 +471,8 @@
                     <Control Style="{StaticResource BusyAnimationStyle}" Background="Transparent" />
                 </Viewbox>
                 <c:Toast Height="32" Background="Green" CornerRadius="10" Grid.Column="3" Padding="10,6" Foreground="White" MinWidth="200" Margin="0,0,16,0" Text="{Binding ToastText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <Button Grid.Column="4" VerticalAlignment="Center" Content="{x:Static p:Resources.Undo}" Command="{Binding UndoCommand}" IsEnabled="{Binding IsInUpdate, Converter={co:BoolInverter}}" />
-                <Button Grid.Column="5" VerticalAlignment="Center" Content="{x:Static p:Resources.Apply}" Command="{Binding ApplyCommand}">
+                <Button Grid.Column="4" VerticalAlignment="Center" Content="{l:Resource Undo}" Command="{Binding UndoCommand}" IsEnabled="{Binding IsInUpdate, Converter={co:BoolInverter}}" />
+                <Button Grid.Column="5" VerticalAlignment="Center" Content="{l:Resource Apply}" Command="{Binding ApplyCommand}">
                     <Button.IsEnabled>
                         <MultiBinding Converter="{co:MultiBool2Bool Any=False, All=False, Invalid=False, None=True}">
                             <Binding Path="IsInUpdate" />

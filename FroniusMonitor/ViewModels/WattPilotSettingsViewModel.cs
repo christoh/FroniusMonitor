@@ -10,8 +10,8 @@ public partial class WattPilotSettingsViewModel(IDataCollectionService dataColle
     public static IReadOnlyList<ChargingLogic> ChargingLogicList { get; } = Enum.GetValues<ChargingLogic>();
     public static IReadOnlyList<EcoRoundingMode> EcoRoundingModes { get; } = Enum.GetValues<EcoRoundingMode>();
     public static IReadOnlyList<PhaseSwitchMode> PhaseSwitchModes { get; } = Enum.GetValues<PhaseSwitchMode>();
-    public static IReadOnlyList<AwattarCountry> EnergyPriceCountries { get; } = Enum.GetValues<AwattarCountry>().OrderBy(c => c.ToDisplayName()).ToArray();
-    public static IReadOnlyList<ForcedCharge> ForcedChargeList { get; } = Enum.GetValues<ForcedCharge>().OrderBy(c => c.ToDisplayName()).ToArray();
+    public static IReadOnlyList<AwattarCountry> EnergyPriceCountries { get; } = [.. Enum.GetValues<AwattarCountry>().OrderBy(c => c.ToDisplayName())];
+    public static IReadOnlyList<ForcedCharge> ForcedChargeList { get; } = [.. Enum.GetValues<ForcedCharge>().OrderBy(c => c.ToDisplayName())];
     public static IReadOnlyList<LoadBalancingPriority> LoadBalancingPriorities { get; } = Enum.GetValues<LoadBalancingPriority>();
 
     public WattPilot WattPilot

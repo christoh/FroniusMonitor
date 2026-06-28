@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             xmlns:l="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Localization"
              xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
              xmlns:images="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
@@ -30,7 +31,7 @@
                 </Grid.RowDefinitions>
 
                 <Viewbox Grid.Row="0" StretchDirection="DownOnly">
-                    <TextBlock FontSize="12" TextAlignment="Center" Text="{x:Static p:Resources.ToshibaHvac}" />
+                    <TextBlock FontSize="12" TextAlignment="Center" Text="{l:Resource ToshibaHvac}" />
                 </Viewbox>
 
                 <Viewbox Grid.Row="1" StretchDirection="DownOnly">
@@ -58,19 +59,19 @@
                         <Style TargetType="Button" BasedOn="{StaticResource TransparentButton}" />
                     </Grid.Resources>
 
-                    <c:HvacButton Grid.Column="0" Mode="Auto" ToolTip="{x:Static p:Resources.HvacModeAuto}"
+                    <c:HvacButton Grid.Column="0" Mode="Auto" ToolTip="{l:Resource HvacModeAuto}"
                                   Background="{Binding Device.State.Mode, Converter={co:ToshibaAcOperatingMode2Brush Value=Auto, Equal=Aquamarine, NotEqual=Transparent}}" />
 
-                    <c:HvacButton Grid.Column="1" Mode="Cooling" ToolTip="{x:Static p:Resources.HvacModeCooling}"
+                    <c:HvacButton Grid.Column="1" Mode="Cooling" ToolTip="{l:Resource HvacModeCooling}"
                                   Background="{Binding Device.State.Mode, Converter={co:ToshibaAcOperatingMode2Brush Value=Cooling, Equal=Aquamarine, NotEqual=Transparent}}" />
 
-                    <c:HvacButton Grid.Column="2" Mode="Drying" ToolTip="{x:Static p:Resources.HvacModeDrying}"
+                    <c:HvacButton Grid.Column="2" Mode="Drying" ToolTip="{l:Resource HvacModeDrying}"
                                   Background="{Binding Device.State.Mode, Converter={co:ToshibaAcOperatingMode2Brush Value=Drying, Equal=Aquamarine, NotEqual=Transparent}}" />
 
-                    <c:HvacButton Grid.Column="3" Mode="Heating" ToolTip="{x:Static p:Resources.HvacModeHeating}"
+                    <c:HvacButton Grid.Column="3" Mode="Heating" ToolTip="{l:Resource HvacModeHeating}"
                                   Background="{Binding Device.State.Mode, Converter={co:ToshibaAcOperatingMode2Brush Value=Heating, Equal=Aquamarine, NotEqual=Transparent}}" />
 
-                    <c:HvacButton Grid.Column="4" Mode="FanOnly" ToolTip="{x:Static p:Resources.HvacModeFanOnly}"
+                    <c:HvacButton Grid.Column="4" Mode="FanOnly" ToolTip="{l:Resource HvacModeFanOnly}"
                                   Background="{Binding Device.State.Mode, Converter={co:ToshibaAcOperatingMode2Brush Value=FanOnly, Equal=Aquamarine, NotEqual=Transparent}}" />
 
                 </Grid>

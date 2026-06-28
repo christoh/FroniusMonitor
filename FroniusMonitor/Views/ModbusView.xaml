@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+        xmlns:l="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Localization"
         xmlns:vm="clr-namespace:De.Hochstaetter.FroniusMonitor.ViewModels"
         xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
         xmlns:m="clr-namespace:De.Hochstaetter.Fronius.Models.Gen24.Settings;assembly=Fronius"
@@ -51,7 +52,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <GroupBox Grid.Row="0" Header="{x:Static p:Resources.RtuModes}">
+        <GroupBox Grid.Row="0" Header="{l:Resource RtuModes}">
             <Grid Margin="16" IsEnabled="{Binding EnableDanger}">
                 <Grid.Resources>
                     <DataTemplate x:Key="InterfaceRoleTemplate" DataType="m:ModbusInterfaceRole">
@@ -70,17 +71,17 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Row="0" Grid.Column="0">
-                    <Run Text="{x:Static p:Resources.Rtu0Mode}" /><Run Text=":" />
+                    <Run Text="{l:Resource Rtu0Mode}" /><Run Text=":" />
                 </TextBlock>
                 <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding ModBusInterfaceRoles}" SelectedItem="{Binding Settings.Rtu0}" />
                 <TextBlock Grid.Row="1" Grid.Column="0">
-                    <Run Text="{x:Static p:Resources.Rtu1Mode}" /><Run Text=":" />
+                    <Run Text="{l:Resource Rtu1Mode}" /><Run Text=":" />
                 </TextBlock>
                 <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding ModBusInterfaceRoles}" SelectedItem="{Binding Settings.Rtu1}" />
             </Grid>
         </GroupBox>
 
-        <GroupBox Grid.Row="1" Header="{x:Static p:Resources.RtuSlaveSettings}" Margin="0,8,0,0">
+        <GroupBox Grid.Row="1" Header="{l:Resource RtuSlaveSettings}" Margin="0,8,0,0">
             <GroupBox.Visibility>
                 <MultiBinding Converter="{co:ModbusInterfaceRole2Visibility}">
                     <Binding Path="Settings.Rtu0" />
@@ -106,19 +107,19 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.BaudRate}">
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="{l:Resource BaudRate}">
                     <Run Text=":" />
                 </TextBlock>
                 <ComboBox Grid.Row="0" Grid.Column="1" SelectedItem="{Binding Settings.BaudRate}" ItemsSource="{Binding Settings.BaudRates}" />
 
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.Parity}">
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="{l:Resource Parity}">
                     <Run Text=":" />
                 </TextBlock>
                 <ComboBox Grid.Row="1" Grid.Column="1" SelectedItem="{Binding Settings.Parity}" ItemsSource="{Binding ModBusParities}" Style="{StaticResource ParityComboBox}" />
             </Grid>
         </GroupBox>
 
-        <GroupBox Grid.Row="2" Header="{x:Static p:Resources.ModbusTcpSettings}" Margin="0,8,0,0">
+        <GroupBox Grid.Row="2" Header="{l:Resource ModbusTcpSettings}" Margin="0,8,0,0">
             <Grid Margin="16">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -126,11 +127,11 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <CheckBox Grid.Row="0" Content="{x:Static p:Resources.EnableModbusTcp}" IsChecked="{Binding EnableTcp}" />
-                <CheckBox Grid.Row="1" Content="{x:Static p:Resources.AllowInverterControlOverModbusTcp}" IsChecked="{Binding Settings.AllowControl}"
+                <CheckBox Grid.Row="0" Content="{l:Resource EnableModbusTcp}" IsChecked="{Binding EnableTcp}" />
+                <CheckBox Grid.Row="1" Content="{l:Resource AllowInverterControlOverModbusTcp}" IsChecked="{Binding Settings.AllowControl}"
                           Visibility="{Binding EnableTcp, Converter={co:Bool2Visibility}}" />
                 <CheckBox Grid.Row="2" Margin="0,0,0,8"
-                          Content="{x:Static p:Resources.RestrictInverterControlOverModbusTcp}" IsChecked="{Binding Settings.RestrictControl}">
+                          Content="{l:Resource RestrictInverterControlOverModbusTcp}" IsChecked="{Binding Settings.RestrictControl}">
                     <CheckBox.Visibility>
                         <MultiBinding Converter="{co:MultiBool2Visibility}">
                             <Binding Path="EnableTcp" />
@@ -149,7 +150,7 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.AllowIp}">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{l:Resource AllowIp}">
                         <Run Text=":" />
                         <TextBlock.Visibility>
                             <MultiBinding Converter="{co:MultiBool2Visibility}">
@@ -170,7 +171,7 @@
                         </TextBox.Visibility>
                     </TextBox>
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.TcpPort}" Visibility="{Binding EnableTcp, Converter={co:Bool2Visibility}}">
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{l:Resource TcpPort}" Visibility="{Binding EnableTcp, Converter={co:Bool2Visibility}}">
                         <Run Text=":" />
                     </TextBlock>
 
@@ -183,7 +184,7 @@
             </Grid>
         </GroupBox>
 
-        <GroupBox Grid.Row="3" Header="{x:Static p:Resources.CommonModbusSlaveSettings}" Margin="0,8,0,0">
+        <GroupBox Grid.Row="3" Header="{l:Resource CommonModbusSlaveSettings}" Margin="0,8,0,0">
             <GroupBox.Visibility>
                 <MultiBinding Converter="{co:CommonModbusSettingsVisibility}">
                     <Binding Path="Settings.Rtu0" />
@@ -202,19 +203,19 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.MeterAddress}">
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="{l:Resource MeterAddress}">
                     <Run Text=":" />
                 </TextBlock>
 
                 <TextBox Grid.Row="0" Grid.Column="1" Text="{co:ValidationBinding Settings.MeterAddress}" />
 
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.ScAddress}">
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="{l:Resource ScAddress}">
                     <Run Text=":" />
                 </TextBlock>
 
                 <TextBox Grid.Row="1" Grid.Column="1" Text="{co:ValidationBinding Settings.SunSpecAddress}" />
 
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static p:Resources.SunspecMode}">
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="{l:Resource SunspecMode}">
                     <Run Text=":" />
                 </TextBlock>
 
@@ -254,13 +255,13 @@
                      Padding="10,3" Foreground="White" MinWidth="80" HorizontalAlignment="Right" Margin="0,0,0,8"
                      Text="{Binding ToastText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.Danger}" Margin="0,0,4,0">
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="{l:Resource Danger}" Margin="0,0,4,0">
                 <Run Text=":" />
             </TextBlock>
 
             <ToggleButton Grid.Row="1" Grid.Column="1" Height="18" VerticalAlignment="Center" IsChecked="{Binding EnableDanger}" />
-            <Button Grid.Row="1" Grid.Column="3" Content="{x:Static p:Resources.Undo}" Command="{Binding UndoCommand}" IsEnabled="{Binding IsInUpdate, Converter={co:BoolInverter}}"/>
-            <Button Grid.Row="1" Grid.Column="4" Content="{x:Static p:Resources.Apply}" Command="{Binding ApplyCommand}" IsEnabled="{Binding IsInUpdate, Converter={co:BoolInverter}}" />
+            <Button Grid.Row="1" Grid.Column="3" Content="{l:Resource Undo}" Command="{Binding UndoCommand}" IsEnabled="{Binding IsInUpdate, Converter={co:BoolInverter}}"/>
+            <Button Grid.Row="1" Grid.Column="4" Content="{l:Resource Apply}" Command="{Binding ApplyCommand}" IsEnabled="{Binding IsInUpdate, Converter={co:BoolInverter}}" />
         </Grid>
     </Grid>
 </Window>

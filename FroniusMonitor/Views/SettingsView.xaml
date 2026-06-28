@@ -4,6 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+        xmlns:l="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Localization"
         xmlns:vm="clr-namespace:De.Hochstaetter.FroniusMonitor.ViewModels"
         xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
         xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
@@ -11,7 +12,7 @@
         mc:Ignorable="d"
         SizeToContent="WidthAndHeight" ResizeMode="CanMinimize"
         d:DataContext="{d:DesignInstance Type={x:Type vm:SettingsViewModel}}"
-        Title="{x:Static p:Resources.Settings}">
+        Title="{l:Resource Settings}">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
@@ -86,7 +87,7 @@
 
         <StackPanel Margin="16,16,8,16" MinWidth="240" Grid.Column="0" Grid.Row="0">
 
-            <GroupBox Header="{x:Static p:Resources.Language}">
+            <GroupBox Header="{l:Resource Language}">
                 <ComboBox Margin="8" ItemsSource="{Binding Cultures}" SelectedItem="{Binding SelectedCulture}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
@@ -96,7 +97,7 @@
                 </ComboBox>
             </GroupBox>
 
-            <GroupBox Margin="0,8,0,0" Header="{x:Static p:Resources.Gen24InverterHeader}">
+            <GroupBox Margin="0,8,0,0" Header="{l:Resource Gen24InverterHeader}">
                 <Grid Margin="8">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -113,26 +114,26 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.Url}" Margin="0,8,0,0" />
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{l:Resource Url}" Margin="0,8,0,0" />
                     <TextBlock Grid.Row="0" Grid.Column="1" Text=":" Margin="4,8,4,0" />
 
                     <TextBox Grid.Row="0" Grid.Column="2"
                          Text="{Binding Settings.FroniusConnection.BaseUrl, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.Username}" Margin="0,7,0,0" />
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{l:Resource Username}" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="1" Grid.Column="1" Text=":" Margin="4,7,4,0" />
 
                     <ComboBox Grid.Row="1" Grid.Column="2"
                           SelectedItem="{Binding Settings.FroniusConnection.UserName, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           ItemsSource="{Binding Gen24UserNames}" ItemTemplate="{StaticResource ComboBoxTemplate}" />
 
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static p:Resources.Password}" Margin="0,8,0,0" />
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{l:Resource Password}" Margin="0,8,0,0" />
                     <TextBlock Grid.Row="2" Grid.Column="1" Text=":" Margin="4,8,4,0" />
 
                     <c:PasswordBox Grid.Row="2" Grid.Column="2" Template="{StaticResource PasswordBoxTemplate}"
                                Password="{Binding Settings.FroniusConnection.Password, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                    <TextBlock Grid.Row="3" Grid.Column="0" Text="{x:Static p:Resources.UpdateRate}" Margin="0,8,0,0" />
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="{l:Resource UpdateRate}" Margin="0,8,0,0" />
                     <TextBlock Grid.Row="3" Grid.Column="1" Text=":" Margin="4,8,4,0" />
 
                     <Grid Grid.Row="3" Grid.Column="2">
@@ -142,28 +143,28 @@
                         </Grid.ColumnDefinitions>
                         <ComboBox Grid.Column="0" SelectedItem="{Binding Settings.FroniusUpdateRate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                               ItemsSource="{Binding FroniusUpdateRates}" ItemTemplate="{StaticResource ComboBoxTemplate}" />
-                        <TextBlock Grid.Column="1" Text="{Binding Settings.FroniusUpdateRate, Converter={co:ByteEqualityToString Value=1, Equal={x:Static p:Resources.Second}, NotEqual={x:Static p:Resources.Seconds}}}" Margin="4,8,0,0" />
+                        <TextBlock Grid.Column="1" Text="{Binding Settings.FroniusUpdateRate, Converter={co:ByteEqualityToString Value=1, Equal={l:Resource Second}, NotEqual={l:Resource Seconds}}}" Margin="4,8,0,0" />
                     </Grid>
 
-                    <TextBlock Grid.Row="4" Grid.Column="0" Text="{x:Static p:Resources.DriftsFile}" Margin="0,8,0,0" />
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="{l:Resource DriftsFile}" Margin="0,8,0,0" />
                     <TextBlock Grid.Row="4" Grid.Column="1" Text=":" Margin="4,8,4,0" />
-                    <Button Style="{StaticResource SmallButton}" Grid.Row="4" Grid.Column="2" Content="{x:Static p:Resources.Change}" Command="{Binding ChangeDriftsFileCommand}"/>
+                    <Button Style="{StaticResource SmallButton}" Grid.Row="4" Grid.Column="2" Content="{l:Resource Change}" Command="{Binding ChangeDriftsFileCommand}"/>
 
-                    <TextBlock Grid.Row="5" Grid.Column="0" Text="{x:Static p:Resources.EnergyHistoryFile}" Margin="0,8,0,0" />
+                    <TextBlock Grid.Row="5" Grid.Column="0" Text="{l:Resource EnergyHistoryFile}" Margin="0,8,0,0" />
                     <TextBlock Grid.Row="5" Grid.Column="1" Text=":" Margin="4,8,4,0" />
-                    <Button Style="{StaticResource SmallButton}" Grid.Row="5" Grid.Column="2" Content="{x:Static p:Resources.Change}" Command="{Binding ChangeEnergyHistoryFileCommand}"/>
+                    <Button Style="{StaticResource SmallButton}" Grid.Row="5" Grid.Column="2" Content="{l:Resource Change}" Command="{Binding ChangeEnergyHistoryFileCommand}"/>
                 </Grid>
 
             </GroupBox>
 
-            <GroupBox Margin="0,8,0,0" Header="{x:Static p:Resources.WattPilotHeader}">
+            <GroupBox Margin="0,8,0,0" Header="{l:Resource WattPilotHeader}">
                 <Grid Margin="8">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <CheckBox IsChecked="{Binding Settings.HaveWattPilot}" Grid.Row="0" Content="{x:Static p:Resources.ControlWattPilot}" Margin="0,4,0,8" />
+                    <CheckBox IsChecked="{Binding Settings.HaveWattPilot}" Grid.Row="0" Content="{l:Resource ControlWattPilot}" Margin="0,4,0,8" />
 
                     <Grid Grid.Row="1" Visibility="{Binding Settings.HaveWattPilot, Converter={co:Bool2Visibility}}">
                         <Grid.RowDefinitions>
@@ -177,12 +178,12 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.Url}" Margin="0,8,0,0" />
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{l:Resource Url}" Margin="0,8,0,0" />
                         <TextBlock Grid.Row="0" Grid.Column="1" Text=":" Margin="4,8,4,0" />
 
                         <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding Settings.WattPilotConnection.BaseUrl, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.Password}" Margin="0,8,0,0" />
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{l:Resource Password}" Margin="0,8,0,0" />
                         <TextBlock Grid.Row="1" Grid.Column="1" Text=":" Margin="4,8,4,0" />
 
                         <c:PasswordBox Grid.Row="1" Grid.Column="2" Template="{StaticResource PasswordBoxTemplate}"
@@ -192,14 +193,14 @@
             </GroupBox>
 
 
-            <GroupBox Margin="0,8,0,0" Header="{x:Static p:Resources.FritzBoxHeader}">
+            <GroupBox Margin="0,8,0,0" Header="{l:Resource FritzBoxHeader}">
                 <Grid Margin="8">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <CheckBox IsChecked="{Binding Settings.HaveFritzBox}" Grid.Row="0" Content="{x:Static p:Resources.EnableFritzBox}" Margin="0,4,0,8" />
+                    <CheckBox IsChecked="{Binding Settings.HaveFritzBox}" Grid.Row="0" Content="{l:Resource EnableFritzBox}" Margin="0,4,0,8" />
 
                     <Grid Grid.Row="1" Visibility="{Binding Settings.HaveFritzBox, Converter={co:Bool2Visibility}}">
                         <Grid.RowDefinitions>
@@ -214,18 +215,18 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.Url}" Margin="0,8,0,0" />
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{l:Resource Url}" Margin="0,8,0,0" />
                         <TextBlock Grid.Row="0" Grid.Column="1" Text=":" Margin="4,8,4,0" />
 
                         <TextBox Grid.Row="0" Grid.Column="2"
                              Text="{Binding Settings.FritzBoxConnection.BaseUrl, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.Username}" Margin="0,8,0,0" />
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{l:Resource Username}" Margin="0,8,0,0" />
                         <TextBlock Grid.Row="1" Grid.Column="1" Text=":" Margin="4,8,4,0" />
 
                         <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Settings.FritzBoxConnection.UserName, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                        <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static p:Resources.Password}" Margin="0,8,0,0" />
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="{l:Resource Password}" Margin="0,8,0,0" />
                         <TextBlock Grid.Row="2" Grid.Column="1" Text=":" Margin="4,8,4,0" />
 
                         <c:PasswordBox Grid.Row="2" Grid.Column="2" Template="{StaticResource PasswordBoxTemplate}"
@@ -236,14 +237,14 @@
         </StackPanel>
 
         <StackPanel MinWidth="240" Margin="8,16,16,16" Grid.Column="1" Grid.Row="0">
-            <GroupBox Header="{x:Static p:Resources.Gen24InverterHeader}">
+            <GroupBox Header="{l:Resource Gen24InverterHeader}">
                 <Grid Margin="8">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <CheckBox IsChecked="{Binding Settings.HaveTwoInverters}" Grid.Row="0" Content="{x:Static p:Resources.HaveTwoInverters}" Margin="0,4,0,8" />
+                    <CheckBox IsChecked="{Binding Settings.HaveTwoInverters}" Grid.Row="0" Content="{l:Resource HaveTwoInverters}" Margin="0,4,0,8" />
 
                     <Grid Grid.Row="1" Visibility="{Binding Settings.HaveTwoInverters, Converter={co:Bool2Visibility}}">
                         <Grid.RowDefinitions>
@@ -260,17 +261,17 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.Url}" Margin="0,8,0,0" />
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{l:Resource Url}" Margin="0,8,0,0" />
                         <TextBlock Grid.Row="1" Grid.Column="1" Text=":" Margin="4,8,4,0" />
                         <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Settings.FroniusConnection2.BaseUrl, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                        <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static p:Resources.Username}" Margin="0,7,0,0" />
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="{l:Resource Username}" Margin="0,7,0,0" />
                         <TextBlock Grid.Row="2" Grid.Column="1" Text=":" Margin="4,7,4,0" />
                         <ComboBox Grid.Row="2" Grid.Column="2"
                           SelectedItem="{Binding Settings.FroniusConnection2.UserName, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           ItemsSource="{Binding Gen24UserNames}" ItemTemplate="{StaticResource ComboBoxTemplate}" />
 
-                        <TextBlock Grid.Row="3" Grid.Column="0" Text="{x:Static p:Resources.Password}" Margin="0,8,0,0" />
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="{l:Resource Password}" Margin="0,8,0,0" />
                         <TextBlock Grid.Row="3" Grid.Column="1" Text=":" Margin="4,8,4,0" />
                         <c:PasswordBox Grid.Row="3" Grid.Column="2" Template="{StaticResource PasswordBoxTemplate}"
                                Password="{Binding Settings.FroniusConnection2.Password, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -278,14 +279,14 @@
                 </Grid>
             </GroupBox>
 
-            <GroupBox Margin="0,8,0,0" Header="{x:Static p:Resources.ToshibaAcHeader}">
+            <GroupBox Margin="0,8,0,0" Header="{l:Resource ToshibaAcHeader}">
                 <Grid Margin="8">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <CheckBox IsChecked="{Binding Settings.HaveToshibaAc}" Grid.Row="0" Content="{x:Static p:Resources.EnableToshibaAc}" Margin="0,4,0,8" />
+                    <CheckBox IsChecked="{Binding Settings.HaveToshibaAc}" Grid.Row="0" Content="{l:Resource EnableToshibaAc}" Margin="0,4,0,8" />
 
                     <Grid Grid.Row="1" Visibility="{Binding Settings.HaveToshibaAc, Converter={co:Bool2Visibility}}">
                         <Grid.RowDefinitions>
@@ -302,30 +303,30 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.Url}" Margin="0,8,0,0" ToolTip="{x:Static p:Resources.ToshibaHvacUrlTooltip}" />
-                        <TextBlock Grid.Row="0" Grid.Column="1" Text=":" Margin="4,8,4,0" ToolTip="{x:Static p:Resources.ToshibaHvacUrlTooltip}" />
-                        <TextBox Grid.Row="0" Grid.Column="2" ToolTip="{x:Static p:Resources.ToshibaHvacUrlTooltip}"
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{l:Resource Url}" Margin="0,8,0,0" ToolTip="{l:Resource ToshibaHvacUrlTooltip}" />
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text=":" Margin="4,8,4,0" ToolTip="{l:Resource ToshibaHvacUrlTooltip}" />
+                        <TextBox Grid.Row="0" Grid.Column="2" ToolTip="{l:Resource ToshibaHvacUrlTooltip}"
                              Text="{Binding Settings.ToshibaAcConnection.BaseUrl, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.Username}" Margin="0,8,0,0" />
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{l:Resource Username}" Margin="0,8,0,0" />
                         <TextBlock Grid.Row="1" Grid.Column="1" Text=":" Margin="4,8,4,0" />
 
                         <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Settings.ToshibaAcConnection.UserName, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                        <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static p:Resources.Password}" Margin="0,8,0,0" />
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="{l:Resource Password}" Margin="0,8,0,0" />
                         <TextBlock Grid.Row="2" Grid.Column="1" Text=":" Margin="4,8,4,0" />
 
                         <c:PasswordBox Grid.Row="2" Grid.Column="2" Template="{StaticResource PasswordBoxTemplate}"
                                    Password="{Binding Settings.ToshibaAcConnection.Password, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                        <TextBlock Grid.Row="3" Grid.Column="0" Text="{x:Static p:Resources.LiveUpdateProtocol}" Margin="0,8,0,0" />
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="{l:Resource LiveUpdateProtocol}" Margin="0,8,0,0" />
                         <TextBlock Grid.Row="3" Grid.Column="1" Text=":" Margin="4,8,4,0" />
 
                         <ComboBox Grid.Row="3" Grid.Column="2" SelectedItem="{Binding SelectedProtocol, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                               ToolTip="{Binding SelectedProtocol.ToolTip}"
                               ItemsSource="{Binding AzureProtocols}" ItemTemplate="{StaticResource ComboBoxTemplateToolTip}" />
 
-                        <TextBlock Grid.Row="4" Grid.Column="0" Text="{x:Static p:Resources.TunnelStrategy}" Margin="0,8,0,0" />
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="{l:Resource TunnelStrategy}" Margin="0,8,0,0" />
                         <TextBlock Grid.Row="4" Grid.Column="1" Text=":" Margin="4,8,4,0" />
 
                         <ComboBox Grid.Row="4" Grid.Column="2" SelectedItem="{Binding SelectedTunnelMode, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, FallbackValue='---'}"
@@ -335,7 +336,7 @@
                 </Grid>
             </GroupBox>
 
-            <GroupBox Margin="0,8,0,0" Header="{x:Static p:Resources.Visualization}">
+            <GroupBox Margin="0,8,0,0" Header="{l:Resource Visualization}">
                 <Grid Margin="8">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -347,16 +348,16 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.SolarPanelLayout}" Margin="0,8,0,0"/>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{l:Resource SolarPanelLayout}" Margin="0,8,0,0"/>
                     <TextBlock Grid.Row="0" Grid.Column="1" Text=":" Margin="4,8,4,0"/>
-                    <Button Style="{StaticResource SmallButton}" Grid.Row="0" Grid.Column="2" Content="{x:Static p:Resources.Choose}" Command="{Binding ChoosePanelLayoutFileCommand}"/>
-                    <Button Style="{StaticResource SmallButton}" Margin="4,8,0,0" Grid.Row="0" Grid.Column="3" Content="{x:Static p:Resources.Reset}"
+                    <Button Style="{StaticResource SmallButton}" Grid.Row="0" Grid.Column="2" Content="{l:Resource Choose}" Command="{Binding ChoosePanelLayoutFileCommand}"/>
+                    <Button Style="{StaticResource SmallButton}" Margin="4,8,0,0" Grid.Row="0" Grid.Column="3" Content="{l:Resource Reset}"
                             Visibility="{Binding Settings.CustomSolarPanelLayout, Converter={co:NullToVisibility}}"
                             Command="{Binding DeletePanelLayoutFileCommand}"/>
                 </Grid>
             </GroupBox>
 
-            <GroupBox Margin="0,8,0,0" Header="{x:Static p:Resources.ElectricityPrice}">
+            <GroupBox Margin="0,8,0,0" Header="{l:Resource ElectricityPrice}">
                 <Grid Margin="8">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -372,25 +373,25 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.PriceService}" Margin="0,7,0,0"/>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{l:Resource PriceService}" Margin="0,7,0,0"/>
                     <TextBlock Grid.Row="0" Grid.Column="1" Text=":" Margin="4,7,4,0"/>
                     <ComboBox Grid.Row="0" Grid.Column="2" SelectedItem="{Binding Settings.ElectricityPrice.Service}"
                               ItemsSource="{Binding PriceServices}" ItemTemplate="{StaticResource ComboBoxTemplate}"/>
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.AwattarCountry}" Margin="0,7,0,0" Visibility="{Binding PriceService.CanSetPriceRegion, Converter={co:Bool2Visibility}}"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{l:Resource AwattarCountry}" Margin="0,7,0,0" Visibility="{Binding PriceService.CanSetPriceRegion, Converter={co:Bool2Visibility}}"/>
                     <TextBlock Grid.Row="1" Grid.Column="1" Text=":" Margin="4,7,4,0" Visibility="{Binding PriceService.CanSetPriceRegion, Converter={co:Bool2Visibility}}"/>
                     <ComboBox Grid.Row="1" Grid.Column="2" SelectedItem="{Binding SelectedPriceRegion}" Visibility="{Binding PriceService.CanSetPriceRegion, Converter={co:Bool2Visibility}}"
                               ItemsSource="{Binding PriceRegions}" ItemTemplate="{StaticResource ComboBoxTemplate}"/>
 
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static p:Resources.PriceSurchargeConsumption}" Margin="0,7,0,0"/>
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{l:Resource PriceSurchargeConsumption}" Margin="0,7,0,0"/>
                     <TextBlock Grid.Row="2" Grid.Column="1" Text=":" Margin="4,7,4,0"/>
                     <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding Settings.ElectricityPrice.PriceSurchargeBuyPercent}"/>
 
-                    <TextBlock Grid.Row="3" Grid.Column="0" Text="{x:Static p:Resources.PriceOffsetConsumption}" Margin="0,7,0,0"/>
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="{l:Resource PriceOffsetConsumption}" Margin="0,7,0,0"/>
                     <TextBlock Grid.Row="3" Grid.Column="1" Text=":" Margin="4,7,4,0"/>
                     <TextBox Grid.Row="3" Grid.Column="2" Text="{Binding Settings.ElectricityPrice.PriceOffsetBuy}"/>
 
-                    <TextBlock Grid.Row="4" Grid.Column="0" Text="{x:Static p:Resources.VatRate}" Margin="0,7,0,0"/>
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="{l:Resource VatRate}" Margin="0,7,0,0"/>
                     <TextBlock Grid.Row="4" Grid.Column="1" Text=":" Margin="4,7,4,0"/>
                     <TextBox Grid.Row="4" Grid.Column="2" Text="{Binding Settings.ElectricityPrice.VatRatePercent}"/>
                 </Grid>
@@ -404,8 +405,8 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="1" Content="{x:Static p:Resources.Ok}" Command="{Binding OkCommand}" IsDefault="True" />
-            <Button Grid.Column="2" Content="{x:Static p:Resources.Cancel}" Click="OnCancelClick" IsCancel="True" />
+            <Button Grid.Column="1" Content="{l:Resource Ok}" Command="{Binding OkCommand}" IsDefault="True" />
+            <Button Grid.Column="2" Content="{l:Resource Cancel}" Click="OnCancelClick" IsCancel="True" />
         </Grid>
 
     </Grid>

@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:De.Hochstaetter.FroniusMonitor.ViewModels"
         xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+        xmlns:l="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Localization"
         xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
         xmlns:m="clr-namespace:De.Hochstaetter.FroniusMonitor.Models"
         xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
@@ -26,15 +27,15 @@
     <Grid DataContext="{Binding DataCollectionService.HomeAutomationSystem.WattPilot, FallbackValue={x:Null}}">
         <Grid.ContextMenu>
             <ContextMenu>
-                <MenuItem Header="{x:Static p:Resources.Settings}"
+                <MenuItem Header="{l:Resource Settings}"
                           IsEnabled="{Binding Converter={co:NullToBool}, FallbackValue=False}"
                           Icon="{vi:ChargingTrafficSignSettings}"
                           Click="OnSettingsClicked" />
-                <MenuItem Header="{x:Static p:Resources.Reboot}" Icon="{vi:RebootIcon}"
+                <MenuItem Header="{l:Resource Reboot}" Icon="{vi:RebootIcon}"
                           IsEnabled="{Binding FallbackValue=False, Converter={co:NullToBool}}"
                           Click="OnRebootWattPilotClicked" />
-                <MenuItem Header="{x:Static p:Resources.OpenChargingLog}" Icon="{vi:EventLogIcon}" Click="OpenChargingLogClicked"  IsEnabled="{Binding DownloadLink, FallbackValue=False, Converter={co:NullToBool}}" />
-                <MenuItem Header="{x:Static p:Resources.OpenConfigPdf}" Icon="{vi:PdfIcon}" Click="OpenConfigPdfClicked"  IsEnabled="{Binding DownloadLink, FallbackValue=False, Converter={co:NullToBool}}" />
+                <MenuItem Header="{l:Resource OpenChargingLog}" Icon="{vi:EventLogIcon}" Click="OpenChargingLogClicked"  IsEnabled="{Binding DownloadLink, FallbackValue=False, Converter={co:NullToBool}}" />
+                <MenuItem Header="{l:Resource OpenConfigPdf}" Icon="{vi:PdfIcon}" Click="OpenConfigPdfClicked"  IsEnabled="{Binding DownloadLink, FallbackValue=False, Converter={co:NullToBool}}" />
 
             </ContextMenu>
         </Grid.ContextMenu>
@@ -47,14 +48,14 @@
 
         <Menu Grid.Row="0">
             <MenuItem Header="WattPilot">
-                <MenuItem Header="{x:Static p:Resources.Settings}"
+                <MenuItem Header="{l:Resource Settings}"
                           IsEnabled="{Binding FallbackValue=False, Converter={co:NullToBool}}"
                           Icon="{vi:ChargingTrafficSignSettings}"
                           Click="OnSettingsClicked" />
-                <MenuItem Header="{x:Static p:Resources.Reboot}" Icon="{vi:RebootIcon}"
+                <MenuItem Header="{l:Resource Reboot}" Icon="{vi:RebootIcon}"
                           IsEnabled="{Binding FallbackValue=False, Converter={co:NullToBool}}"
                           Click="OnRebootWattPilotClicked" />
-                <MenuItem Header="{x:Static p:Resources.OpenChargingLog}" Icon="{vi:EventLogIcon}" Click="OpenChargingLogClicked"  IsEnabled="{Binding DownloadLink, FallbackValue=False, Converter={co:NullToBool}}" />
+                <MenuItem Header="{l:Resource OpenChargingLog}" Icon="{vi:EventLogIcon}" Click="OpenChargingLogClicked"  IsEnabled="{Binding DownloadLink, FallbackValue=False, Converter={co:NullToBool}}" />
             </MenuItem>
         </Menu>
 
@@ -97,7 +98,7 @@
 
                 </WrapPanel.Resources>
 
-                <GroupBox Header="{x:Static p:Resources.Power}">
+                <GroupBox Header="{l:Resource Power}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -133,13 +134,13 @@
 
                             <ContentControl>
                                 <c:Gauge Maximum="{Binding MaximumChargingPowerPossibleSum, Converter={co:Multiply Factor=.001}, FallbackValue=22.080}"
-                                         Value="{m:GaugeBinding PowerSumKiloWatts}" Label="{x:Static p:Resources.Sum}" />
+                                         Value="{m:GaugeBinding PowerSumKiloWatts}" Label="{l:Resource Sum}" />
                             </ContentControl>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.Voltage}">
+                <GroupBox Header="{l:Resource Voltage}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -171,7 +172,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.Temperatures}">
+                <GroupBox Header="{l:Resource Temperatures}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -183,17 +184,17 @@
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding TemperatureConnector}" Label="{x:Static p:Resources.Plug}" />
+                                <c:Gauge Value="{m:GaugeBinding TemperatureConnector}" Label="{l:Resource Plug}" />
                             </ContentControl>
 
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding TemperatureBoard}" Label="{x:Static p:Resources.Board}" />
+                                <c:Gauge Value="{m:GaugeBinding TemperatureBoard}" Label="{l:Resource Board}" />
                             </ContentControl>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.Current}">
+                <GroupBox Header="{l:Resource Current}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -218,14 +219,14 @@
                             </ContentControl>
 
                             <ContentControl>
-                                <c:Gauge Minimum="0" Maximum="{Binding MaximumChargingCurrentPossible}" Value="{m:GaugeBinding CurrentSum}" Label="{x:Static p:Resources.Sum}" />
+                                <c:Gauge Minimum="0" Maximum="{Binding MaximumChargingCurrentPossible}" Value="{m:GaugeBinding CurrentSum}" Label="{l:Resource Sum}" />
                             </ContentControl>
 
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.Wifi}">
+                <GroupBox Header="{l:Resource Wifi}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -238,7 +239,7 @@
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding WifiSignal}" Label="{x:Static p:Resources.WifiSignal}" />
+                                <c:Gauge Value="{m:GaugeBinding WifiSignal}" Label="{l:Resource WifiSignal}" />
                             </ContentControl>
                         </StackPanel>
                     </StackPanel>
@@ -277,7 +278,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.Frequency}">
+                <GroupBox Header="{l:Resource Frequency}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -291,7 +292,7 @@
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Frequency}" Label="{x:Static p:Resources.Grid}" />
+                                <c:Gauge Value="{m:GaugeBinding Frequency}" Label="{l:Resource Grid}" />
                             </ContentControl>
                         </StackPanel>
                     </StackPanel>

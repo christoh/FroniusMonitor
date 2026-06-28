@@ -50,7 +50,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <GroupBox Header="{x:Static p:Resources.GridPowerManagement}" Grid.Row="0" Margin="8,8,8,4">
+            <GroupBox Header="{l:Resource GridPowerManagement}" Grid.Row="0" Margin="8,8,8,4">
                 <Grid Margin="8,16,8,8">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -135,7 +135,7 @@
                     </Grid>
                 </Grid>
             </GroupBox>
-            <GroupBox Grid.Row="2" Header="{x:Static p:Resources.SupportOhmPilotSoc}" Margin="8,4">
+            <GroupBox Grid.Row="2" Header="{l:Resource SupportOhmPilotSoc}" Margin="8,4">
                 <StackPanel Margin="8,12,8,0">
                     <CheckBox IsChecked="{Binding Settings.EnableSupportSoc}">
                         <CheckBox.Content>
@@ -166,10 +166,10 @@
                             <StackPanel IsEnabled="{Binding EnableDanger}">
                                 <StackPanel Orientation="Horizontal" Margin="0,12,0,-2" HorizontalAlignment="Center">
                                     <TextBlock Margin="0,0,4,0">
-                                    <Run Text="{x:Static p:Resources.EnergyHysteresis}" /><Run Text=":" />
+                                    <Run Text="{l:Resource EnergyHysteresis}" /><Run Text=":" />
                                     </TextBlock>
                                     <TextBox TextAlignment="Center" Width="40"
-                                         Text="{co:ValidationBinding Path=Settings.SupportSocHysteresisWatts, Rule={v:MinMaxFloatRule Minimum=0, Maximum=5000, PropertyDisplayName={x:Static p:Resources.EnergyHysteresis}}}" />
+                                         Text="{co:ValidationBinding Path=Settings.SupportSocHysteresisWatts, Rule={v:MinMaxFloatRule Minimum=0, Maximum=5000, PropertyDisplayName={l:Resource EnergyHysteresis}}}" />
                                     <TextBlock Margin="4,0,0,0" Text="Wh" />
                                 </StackPanel>
                                 <Slider Value="{Binding Settings.SupportSocHysteresisWatts, Mode=TwoWay}" HorizontalAlignment="Stretch"
@@ -178,10 +178,10 @@
 
                                 <StackPanel Orientation="Horizontal" Margin="0,12,0,-2" HorizontalAlignment="Center">
                                     <TextBlock Margin="0,0,4,0">
-                                        <Run Text="{x:Static p:Resources.SupportSocHysteresisMinimum}" /><Run Text=":" />
+                                        <Run Text="{l:Resource SupportSocHysteresisMinimum}" /><Run Text=":" />
                                     </TextBlock>
                                     <TextBox TextAlignment="Center" Width="40"
-                                             Text="{co:ValidationBinding Path=Settings.SupportSocHysteresisMinimumPercent, Rule={v:MinMaxIntRule Minimum=0, Maximum=100, PropertyDisplayName={x:Static p:Resources.SupportSocHysteresisMinimum}}}" />
+                                             Text="{co:ValidationBinding Path=Settings.SupportSocHysteresisMinimumPercent, Rule={v:MinMaxIntRule Minimum=0, Maximum=100, PropertyDisplayName={l:Resource SupportSocHysteresisMinimum}}}" />
                                     <TextBlock Margin="4,0,0,0" Text="%" />
                                 </StackPanel>
                                 <Slider Value="{Binding Settings.SupportSocHysteresisMinimumPercent, Mode=TwoWay}" HorizontalAlignment="Stretch"
@@ -200,7 +200,7 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <GroupBox Grid.Row="0" Header="{x:Static p:Resources.BatteryChargingOptions}" Margin="0,4,8,4">
+            <GroupBox Grid.Row="0" Header="{l:Resource BatteryChargingOptions}" Margin="0,4,8,4">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -213,7 +213,7 @@
                             </Style>
                         </StackPanel.Resources>
                         <TextBlock>
-                            <Run Text="{x:Static p:Resources.BatteryChargingSources}"/><Run Text=":"/>
+                            <Run Text="{l:Resource BatteryChargingSources}"/><Run Text=":"/>
                         </TextBlock>
                         <ComboBox ItemsSource="{Binding ChargingSources}" SelectedItem="{Binding SelectedChargingSources}" Margin="0,0,0,12">
                             <ComboBox.ItemTemplate>
@@ -225,25 +225,25 @@
                         <CheckBox IsEnabled="{Binding EnableDanger}"
                                   IsChecked="{Binding Settings.IsEnabled}">
                             <CheckBox.Content>
-                                <TextBlock Text="{x:Static p:Resources.EnableBattery}" />
+                                <TextBlock Text="{l:Resource EnableBattery}" />
                             </CheckBox.Content>
                         </CheckBox>
                         <CheckBox IsEnabled="{Binding EnableDanger}"
                                   IsChecked="{Binding Settings.IsInCalibration}">
                             <CheckBox.Content>
-                                <TextBlock Text="{x:Static p:Resources.CalibrateBattery}" />
+                                <TextBlock Text="{l:Resource CalibrateBattery}" />
                             </CheckBox.Content>
                         </CheckBox>
                         <CheckBox IsEnabled="{Binding EnableDanger}"
                                   IsChecked="{Binding Settings.IsInServiceMode}">
                             <CheckBox.Content>
-                                <TextBlock Text="{x:Static p:Resources.IsInServiceMode}" />
+                                <TextBlock Text="{l:Resource IsInServiceMode}" />
                             </CheckBox.Content>
                         </CheckBox>
                         <CheckBox IsEnabled="{Binding EnableDanger}"
                                   IsChecked="{Binding Settings.IsAcCoupled}">
                             <CheckBox.Content>
-                                <TextBlock Text="{x:Static p:Resources.BatteryIsAcCoupled}" />
+                                <TextBlock Text="{l:Resource BatteryIsAcCoupled}" />
                             </CheckBox.Content>
                         </CheckBox>
                     </StackPanel>
@@ -266,7 +266,7 @@
                 </Grid>
             </GroupBox>
 
-            <GroupBox Grid.Row="1" Header="{x:Static p:Resources.BackupConfiguration}" Margin="0,4,8,4">
+            <GroupBox Grid.Row="1" Header="{l:Resource BackupConfiguration}" Margin="0,4,8,4">
                 <Grid Margin="8,16,8,12">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -280,7 +280,7 @@
                             <Run Text="{l:Config 'BATTERIES.HYB_BACKUP_CRITICALSOC'}" /><Run Text=":" />
                         </TextBlock>
                         <TextBox TextAlignment="Center" Width="40"
-                                 Text="{co:ValidationBinding Path=Settings.BackupCriticalSoc, Rule={v:RegExRule Pattern='^100$|^0*([0-9]{1,2})$', Message={x:Static p:Resources.MustBePercent}}}" />
+                                 Text="{co:ValidationBinding Path=Settings.BackupCriticalSoc, Rule={v:RegExRule Pattern='^100$|^0*([0-9]{1,2})$', Message={l:Resource MustBePercent}}}" />
                         <TextBlock Margin="4,0,0,0" Text="%" />
                     </StackPanel>
                     <Slider Value="{Binding Settings.BackupCriticalSoc, Mode=TwoWay}" Grid.Row="1" HorizontalAlignment="Stretch"
@@ -291,7 +291,7 @@
                             <Run Text="{l:Config 'BATTERIES.HYB_BACKUP_RESERVED'}" /><Run Text=":" />
                         </TextBlock>
                         <TextBox TextAlignment="Center" Width="40"
-                                 Text="{co:ValidationBinding Path=Settings.BackupReserve, Rule={v:RegExRule Pattern='^100$|^0*([0-9]{1,2})$', Message={x:Static p:Resources.MustBePercent}}}" />
+                                 Text="{co:ValidationBinding Path=Settings.BackupReserve, Rule={v:RegExRule Pattern='^100$|^0*([0-9]{1,2})$', Message={l:Resource MustBePercent}}}" />
                         <TextBlock Margin="4,0,0,0" Text="%" />
                     </StackPanel>
                     <Slider Value="{Binding Settings.BackupReserve, Mode=TwoWay}" Grid.Row="3" HorizontalAlignment="Stretch"
@@ -323,14 +323,14 @@
                           BorderThickness="1">
                     <DataGrid.RowStyle>
                         <Style TargetType="DataGridRow">
-                            <Setter Property="ToolTip" Value="{x:Static p:Resources.RuleTooltip}" />
+                            <Setter Property="ToolTip" Value="{l:Resource RuleTooltip}" />
                             <Setter Property="Tag" Value="{Binding Path=DataContext, RelativeSource={RelativeSource FindAncestor, AncestorType=DataGrid}}" />
                             <Setter Property="ContextMenu">
                                 <Setter.Value>
                                     <ContextMenu Placement="Center">
-                                        <MenuItem Header="{x:Static p:Resources.AddRule}"
+                                        <MenuItem Header="{l:Resource AddRule}"
                                                   Command="{Binding Path=PlacementTarget.(FrameworkElement.Tag).(vm:SelfConsumptionOptimizationViewModel.AddChargingRuleCommand), RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
-                                        <MenuItem Header="{x:Static p:Resources.DeleteRule}"
+                                        <MenuItem Header="{l:Resource DeleteRule}"
                                                   Command="{Binding Path=PlacementTarget.(FrameworkElement.Tag).(vm:SelfConsumptionOptimizationViewModel.DeleteChargingRuleCommand), RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}"
                                                   CommandParameter="{Binding Path=PlacementTarget.(FrameworkElement.DataContext),RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
                                     </ContextMenu>
@@ -394,7 +394,7 @@
 
                     <DataGrid.Columns>
 
-                        <DataGridCheckBoxColumn Header="{x:Static p:Resources.Active}" Binding="{Binding IsActive, UpdateSourceTrigger=PropertyChanged}" CanUserReorder="False" CanUserResize="True" CanUserSort="True" SortMemberPath="IsActive"
+                        <DataGridCheckBoxColumn Header="{l:Resource Active}" Binding="{Binding IsActive, UpdateSourceTrigger=PropertyChanged}" CanUserReorder="False" CanUserResize="True" CanUserSort="True" SortMemberPath="IsActive"
                                                 HeaderStyle="{StaticResource Es}" ElementStyle="{StaticResource CheckBoxStyle}" />
 
                         <DataGridTextColumn Header="{l:Ui 'BATTERY_CONTROL_SCHEDULE.TIME_FROM', 'True'}" Binding="{co:ValidationBinding StartTime, Rule={v:ChargingRuleDate}}" SortMemberPath="StartTime"
@@ -417,32 +417,32 @@
                                             HeaderStyle="{StaticResource Es}" CanUserReorder="False" CanUserResize="True" CanUserSort="True"
                                             ElementStyle="{StaticResource TextBlockStyle}" EditingElementStyle="{StaticResource TextBoxStyle}" />
 
-                        <DataGridCheckBoxColumn Header="{x:Static p:Resources.Monday_One}" SortMemberPath="Monday" Binding="{Binding Monday, UpdateSourceTrigger=PropertyChanged}" CanUserReorder="False" CanUserResize="False" CanUserSort="True"
+                        <DataGridCheckBoxColumn Header="{l:Resource Monday_One}" SortMemberPath="Monday" Binding="{Binding Monday, UpdateSourceTrigger=PropertyChanged}" CanUserReorder="False" CanUserResize="False" CanUserSort="True"
                                                 HeaderStyle="{StaticResource Es}" ElementStyle="{StaticResource CheckBoxStyle}" />
 
-                        <DataGridCheckBoxColumn Header="{x:Static p:Resources.Tuesday_One}" SortMemberPath="Tuesday" Binding="{Binding Tuesday, UpdateSourceTrigger=PropertyChanged}" CanUserReorder="False" CanUserResize="False" CanUserSort="True"
+                        <DataGridCheckBoxColumn Header="{l:Resource Tuesday_One}" SortMemberPath="Tuesday" Binding="{Binding Tuesday, UpdateSourceTrigger=PropertyChanged}" CanUserReorder="False" CanUserResize="False" CanUserSort="True"
                                                 HeaderStyle="{StaticResource Es}" ElementStyle="{StaticResource CheckBoxStyle}" />
 
-                        <DataGridCheckBoxColumn Header="{x:Static p:Resources.Wednesday_One}" SortMemberPath="Wednesday" Binding="{Binding Wednesday, UpdateSourceTrigger=PropertyChanged}" CanUserReorder="False" CanUserResize="False" CanUserSort="True"
+                        <DataGridCheckBoxColumn Header="{l:Resource Wednesday_One}" SortMemberPath="Wednesday" Binding="{Binding Wednesday, UpdateSourceTrigger=PropertyChanged}" CanUserReorder="False" CanUserResize="False" CanUserSort="True"
                                                 HeaderStyle="{StaticResource Es}" ElementStyle="{StaticResource CheckBoxStyle}" />
 
-                        <DataGridCheckBoxColumn Header="{x:Static p:Resources.Thursday_One}" SortMemberPath="Thursday" Binding="{Binding Thursday, UpdateSourceTrigger=PropertyChanged}" CanUserReorder="False" CanUserResize="False" CanUserSort="True"
+                        <DataGridCheckBoxColumn Header="{l:Resource Thursday_One}" SortMemberPath="Thursday" Binding="{Binding Thursday, UpdateSourceTrigger=PropertyChanged}" CanUserReorder="False" CanUserResize="False" CanUserSort="True"
                                                 HeaderStyle="{StaticResource Es}" ElementStyle="{StaticResource CheckBoxStyle}" />
 
-                        <DataGridCheckBoxColumn Header="{x:Static p:Resources.Friday_One}" SortMemberPath="Friday" Binding="{Binding Friday, UpdateSourceTrigger=PropertyChanged}" CanUserReorder="False" CanUserResize="False" CanUserSort="True"
+                        <DataGridCheckBoxColumn Header="{l:Resource Friday_One}" SortMemberPath="Friday" Binding="{Binding Friday, UpdateSourceTrigger=PropertyChanged}" CanUserReorder="False" CanUserResize="False" CanUserSort="True"
                                                 HeaderStyle="{StaticResource Es}" ElementStyle="{StaticResource CheckBoxStyle}" />
 
-                        <DataGridCheckBoxColumn Header="{x:Static p:Resources.Saturday_One}" SortMemberPath="Saturday" Binding="{Binding Saturday, UpdateSourceTrigger=PropertyChanged}" CanUserReorder="False" CanUserResize="False" CanUserSort="True"
+                        <DataGridCheckBoxColumn Header="{l:Resource Saturday_One}" SortMemberPath="Saturday" Binding="{Binding Saturday, UpdateSourceTrigger=PropertyChanged}" CanUserReorder="False" CanUserResize="False" CanUserSort="True"
                                                 HeaderStyle="{StaticResource Es}" ElementStyle="{StaticResource CheckBoxStyle}" />
 
-                        <DataGridCheckBoxColumn Header="{x:Static p:Resources.Sunday_One}" SortMemberPath="Sunday" Binding="{Binding Sunday, UpdateSourceTrigger=PropertyChanged}" CanUserReorder="False" CanUserResize="False" CanUserSort="True"
+                        <DataGridCheckBoxColumn Header="{l:Resource Sunday_One}" SortMemberPath="Sunday" Binding="{Binding Sunday, UpdateSourceTrigger=PropertyChanged}" CanUserReorder="False" CanUserResize="False" CanUserSort="True"
                                                 HeaderStyle="{StaticResource Es}" ElementStyle="{StaticResource CheckBoxStyle}" />
 
                     </DataGrid.Columns>
                 </DataGrid>
 
                 <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,8,0,0">
-                    <Button Content="{x:Static p:Resources.AddRule}" Width="Auto" Command="{Binding AddChargingRuleCommand}" />
+                    <Button Content="{l:Resource AddRule}" Width="Auto" Command="{Binding AddChargingRuleCommand}" />
                 </StackPanel>
             </Grid>
         </GroupBox>
@@ -458,7 +458,7 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" Text="{x:Static p:Resources.Danger}" Margin="0,0,4,0" VerticalAlignment="Center">
+            <TextBlock Grid.Column="0" Text="{l:Resource Danger}" Margin="0,0,4,0" VerticalAlignment="Center">
                 <Run Text=":" />
             </TextBlock>
             <ToggleButton Grid.Column="1" Height="18" VerticalAlignment="Center" IsChecked="{Binding EnableDanger}" />
@@ -466,8 +466,8 @@
                 <Control Style="{StaticResource BusyAnimationStyle}" Background="Transparent" />
             </Viewbox>
             <c:Toast Height="32" Background="Green" CornerRadius="10" Grid.Column="3" Padding="10,6" Foreground="White" MinWidth="200" Margin="0,0,16,0" Text="{Binding ToastText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-            <Button Grid.Column="4" VerticalAlignment="Center" Content="{x:Static p:Resources.Undo}" Command="{Binding UndoCommand}" IsEnabled="{Binding IsInUpdate, Converter={co:BoolInverter}}" />
-            <Button Grid.Column="5" VerticalAlignment="Center" Content="{x:Static p:Resources.Apply}" Command="{Binding ApplyCommand}">
+            <Button Grid.Column="4" VerticalAlignment="Center" Content="{l:Resource Undo}" Command="{Binding UndoCommand}" IsEnabled="{Binding IsInUpdate, Converter={co:BoolInverter}}" />
+            <Button Grid.Column="5" VerticalAlignment="Center" Content="{l:Resource Apply}" Command="{Binding ApplyCommand}">
                 <Button.IsEnabled>
                     <MultiBinding Converter="{co:MultiBool2Bool Any=False, All=False, Invalid=False, None=True}">
                         <Binding Path="IsInUpdate" />

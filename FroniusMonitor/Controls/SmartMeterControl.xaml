@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             xmlns:l="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Localization"
              xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
              xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
              xmlns:t="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Resources"
@@ -14,7 +15,7 @@
              d:DesignHeight="127" d:DesignWidth="110">
     <UserControl.ContextMenu>
         <ContextMenu>
-            <MenuItem Header="{x:Static p:Resources.Details}" Icon="{vi:MagnifyingGlass}" Click="OnDetailsClick"/>
+            <MenuItem Header="{l:Resource Details}" Icon="{vi:MagnifyingGlass}" Click="OnDetailsClick"/>
         </ContextMenu>
     </UserControl.ContextMenu>
 
@@ -65,7 +66,7 @@
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock FontSize="10" FontWeight="Normal" Text="{x:Static p:Resources.ActivePower}" TextAlignment="Center" />
+                            <TextBlock FontSize="10" FontWeight="Normal" Text="{l:Resource ActivePower}" TextAlignment="Center" />
 
                             <TextBlock FontSize="10" FontWeight="Medium" Grid.Row="1" Margin="0,0,0,2"
                                        Width="{Binding ActualWidth, ElementName=PowerActiveGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
@@ -89,13 +90,13 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{x:Static p:Resources.ActivePower}" />
+                            <TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{l:Resource ActivePower}" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                                 <c:Gauge Label="L1" Value="{m:GaugeBinding SmartMeter.ActivePowerL1}" />
                                 <c:Gauge Label="L2" Value="{m:GaugeBinding SmartMeter.ActivePowerL2}" />
                                 <c:Gauge Label="L3" Value="{m:GaugeBinding SmartMeter.ActivePowerL3}" />
-                                <c:Gauge Label="{x:Static p:Resources.Sum}" Value="{Binding SmartMeter.ActivePowerSum}"
+                                <c:Gauge Label="{l:Resource Sum}" Value="{Binding SmartMeter.ActivePowerSum}"
                                                    Minimum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter IsMinimum=True}, FallbackValue=-24150}"
                                                    Maximum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter}, FallbackValue=-24150}" />
                             </StackPanel>
@@ -115,13 +116,13 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{x:Static p:Resources.ApparentPower}" />
+                            <TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{l:Resource ApparentPower}" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                                 <c:Gauge Label="L1" Value="{m:GaugeBinding SmartMeter.ApparentPowerL1}" />
                                 <c:Gauge Label="L2" Value="{m:GaugeBinding SmartMeter.ApparentPowerL2}" />
                                 <c:Gauge Label="L3" Value="{m:GaugeBinding SmartMeter.ApparentPowerL3}" />
-                                <c:Gauge Label="{x:Static p:Resources.Sum}" Value="{m:GaugeBinding SmartMeter.ApparentPowerSum}"
+                                <c:Gauge Label="{l:Resource Sum}" Value="{m:GaugeBinding SmartMeter.ApparentPowerSum}"
                                                    Maximum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter}, FallbackValue=-24150}" />
                             </StackPanel>
                         </Grid>
@@ -137,13 +138,13 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{x:Static p:Resources.ReactivePower}" />
+                            <TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{l:Resource ReactivePower}" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                                 <c:Gauge Label="L1" Value="{m:GaugeBinding SmartMeter.ReactivePowerL1}" />
                                 <c:Gauge Label="L2" Value="{m:GaugeBinding SmartMeter.ReactivePowerL2}" />
                                 <c:Gauge Label="L3" Value="{m:GaugeBinding SmartMeter.ReactivePowerL3}" />
-                                <c:Gauge Label="{x:Static p:Resources.Sum}" Value="{m:GaugeBinding SmartMeter.ReactivePowerSum}"
+                                <c:Gauge Label="{l:Resource Sum}" Value="{m:GaugeBinding SmartMeter.ReactivePowerSum}"
                                                    Minimum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter IsMinimum=True}, FallbackValue=-24150}"
                                                    Maximum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter}, FallbackValue=-24150}" />
                             </StackPanel>
@@ -163,7 +164,7 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{x:Static p:Resources.OutOfBalance}" />
+                            <TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{l:Resource OutOfBalance}" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                                 <c:Gauge Label="L12" Value="{m:GaugeBinding SmartMeter.OutOfBalancePowerL12}" />
@@ -194,7 +195,7 @@
                                 <c:Gauge Label="L1" Value="{m:GaugeBinding SmartMeter.PowerFactorL1}" />
                                 <c:Gauge Label="L2" Value="{m:GaugeBinding SmartMeter.PowerFactorL2}" />
                                 <c:Gauge Label="L3" Value="{m:GaugeBinding SmartMeter.PowerFactorL3}" />
-                                <c:Gauge Label="{x:Static p:Resources.Total}" Value="{m:GaugeBinding SmartMeter.PowerFactorTotal}" />
+                                <c:Gauge Label="{l:Resource Total}" Value="{m:GaugeBinding SmartMeter.PowerFactorTotal}" />
                             </StackPanel>
                         </Grid>
 
@@ -207,18 +208,18 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.PhaseVoltage}" TextAlignment="Center" />
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{l:Resource PhaseVoltage}" TextAlignment="Center" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                                 <c:Gauge Value="{m:GaugeBinding SmartMeter.PhaseVoltageL1}" Label="L1" />
                                 <c:Gauge Value="{m:GaugeBinding SmartMeter.PhaseVoltageL2}" Label="L2" />
                                 <c:Gauge Value="{m:GaugeBinding SmartMeter.PhaseVoltageL3}" Label="L3" />
-                                <c:Gauge Value="{m:GaugeBinding SmartMeter.PhaseVoltageAverage}" Label="{x:Static p:Resources.AverageShort}" />
+                                <c:Gauge Value="{m:GaugeBinding SmartMeter.PhaseVoltageAverage}" Label="{l:Resource AverageShort}" />
                             </StackPanel>
                         </Grid>
 
                         <StackPanel x:Name="PhaseVoltageGauge" Visibility="Collapsed">
-                            <TextBlock Text="{x:Static p:Resources.GridHealth}" HorizontalAlignment="Center" FontSize="10" Margin="0,0,0,4" />
+                            <TextBlock Text="{l:Resource GridHealth}" HorizontalAlignment="Center" FontSize="10" Margin="0,0,0,4" />
                             <UniformGrid Rows="2" Columns="2" Margin="0,6,0,0">
                                 <UniformGrid.Resources>
                                     <Style TargetType="c:Gauge" BasedOn="{StaticResource DefaultHalfCircleGauge}">
@@ -258,13 +259,13 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.LineVoltage}" TextAlignment="Center" />
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{l:Resource LineVoltage}" TextAlignment="Center" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                                 <c:Gauge Label="L12" Value="{m:GaugeBinding SmartMeter.LineVoltageL12}" />
                                 <c:Gauge Label="L23" Value="{m:GaugeBinding SmartMeter.LineVoltageL23}" />
                                 <c:Gauge Label="L31" Value="{m:GaugeBinding SmartMeter.LineVoltageL31}" />
-                                <c:Gauge Label="{x:Static p:Resources.AverageShort}" Value="{m:GaugeBinding SmartMeter.LineVoltageAverage}" />
+                                <c:Gauge Label="{l:Resource AverageShort}" Value="{m:GaugeBinding SmartMeter.LineVoltageAverage}" />
                             </StackPanel>
                         </Grid>
 
@@ -277,13 +278,13 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.Current}" TextAlignment="Center" />
+                            <TextBlock Grid.Row="0" FontSize="10" Text="{l:Resource Current}" TextAlignment="Center" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                                 <c:Gauge Label="L1" Value="{m:GaugeBinding SmartMeter.CurrentL1}" />
                                 <c:Gauge Label="L2" Value="{m:GaugeBinding SmartMeter.CurrentL2}" />
                                 <c:Gauge Label="L3" Value="{m:GaugeBinding SmartMeter.CurrentL3}" />
-                                <c:Gauge Label="{x:Static p:Resources.Sum}" Value="{m:GaugeBinding SmartMeter.TotalCurrent}"
+                                <c:Gauge Label="{l:Resource Sum}" Value="{m:GaugeBinding SmartMeter.TotalCurrent}"
                                                    Maximum="105" Minimum="-105" />
                             </StackPanel>
                         </Grid>
@@ -295,7 +296,7 @@
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock FontSize="10" FontWeight="Normal" Text="{x:Static p:Resources.OutOfBalance}" TextAlignment="Center" />
+                            <TextBlock FontSize="10" FontWeight="Normal" Text="{l:Resource OutOfBalance}" TextAlignment="Center" />
 
                             <TextBlock FontSize="10" FontWeight="Medium" Grid.Row="1" Margin="0,0,0,2"
                                        Width="{Binding ActualWidth, ElementName=CurrentOutOfBalanceGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
@@ -322,7 +323,7 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{x:Static p:Resources.OutOfBalance}" />
+                            <TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{l:Resource OutOfBalance}" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                                 <c:Gauge Label="L12" Value="{m:GaugeBinding SmartMeter.OutOfBalanceCurrentL12}" />
@@ -347,7 +348,7 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{x:Static p:Resources.Energy}" />
+                            <TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{l:Resource Energy}" />
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                                 <c:Gauge Label="1.8.0" Value="{m:GaugeBinding SmartMeter.EnergyActiveConsumed, Converter={co:Multiply Factor=.001}}" />
@@ -372,13 +373,13 @@
                                        Text="{Binding SmartMeter.DataTime, FallbackValue='', Converter={co:DateConverter}}" />
 
                             <StackPanel Grid.Row="2" VerticalAlignment="Center">
-                                <c:Gauge Label="{x:Static p:Resources.Frequency}"
+                                <c:Gauge Label="{l:Resource Frequency}"
                                                    Value="{m:GaugeBinding SmartMeter.Frequency}"
                                                    StringFormat="N1"
                                                    Minimum="49" Maximum="51"
                                                    GaugeColors="{x:Static c:Gauge.MidIsGood}"
                                                    UnitName="Hz" />
-                                <c:Gauge Label="{x:Static p:Resources.Latency}" Origin="0"
+                                <c:Gauge Label="{l:Resource Latency}" Origin="0"
                                                    Value="{m:GaugeBinding SmartMeter.Latency.TotalMilliseconds}"
                                                    StringFormat="N0" Minimum="0" Maximum="2000" UnitName="ms"
                                                    GaugeColors="{x:Static c:Gauge.HighIsBad}" />
@@ -392,10 +393,10 @@
                     <WrapPanel.Resources>
                         <Style TargetType="RadioButton" BasedOn="{StaticResource DeviceButton}" />
                     </WrapPanel.Resources>
-                    <RadioButton IsChecked="True" Content="{x:Static p:Resources.Power}" Click="OnPowerClick" />
-                    <RadioButton Content="{x:Static p:Resources.Voltage}" Click="OnVoltageClick" />
-                    <RadioButton Content="{x:Static p:Resources.Current}" Click="OnCurrentClick" />
-                    <RadioButton Content="{x:Static p:Resources.More}" Click="OnMoreClick" />
+                    <RadioButton IsChecked="True" Content="{l:Resource Power}" Click="OnPowerClick" />
+                    <RadioButton Content="{l:Resource Voltage}" Click="OnVoltageClick" />
+                    <RadioButton Content="{l:Resource Current}" Click="OnCurrentClick" />
+                    <RadioButton Content="{l:Resource More}" Click="OnMoreClick" />
                 </WrapPanel>
             </Grid>
         </Border>

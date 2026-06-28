@@ -145,7 +145,7 @@ public class Gen24Service(IGen24JsonService gen24JsonService) : BindableBase, IG
 
         var attribute = typeof(T)
             .GetMember(enumValueString).Single()
-            .GetCustomAttribute(typeof(EnumParseAttribute)) as EnumParseAttribute;
+            .GetCustomAttribute<EnumParseAttribute>();
 
         var key = attribute?.ParseAs ?? enumValueString;
         return GetChannelString(key, token);

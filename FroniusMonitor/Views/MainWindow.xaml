@@ -6,12 +6,13 @@
                   xmlns:vm="clr-namespace:De.Hochstaetter.FroniusMonitor.ViewModels"
                   xmlns:gl="clr-namespace:System.Globalization;assembly=System.Globalization"
                   mc:Ignorable="d"
-                  Title="{x:Static p:Resources.AppName}" Height="860" Width="1080"
+                  Title="{l:Resource AppName}" Height="860" Width="1080"
                   d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
                   xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
                   xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
                   xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
                   xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+                  xmlns:l="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Localization"
                   xmlns:models="clr-namespace:De.Hochstaetter.Fronius.Models;assembly=Fronius"
                   xmlns:toshiba="clr-namespace:De.Hochstaetter.Fronius.Models.ToshibaAc;assembly=Fronius">
     <Grid>
@@ -29,34 +30,34 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <Menu>
-                <MenuItem Header="{x:Static p:Resources.Settings}">
-                    <MenuItem Header="{x:Static p:Resources.AppSettings}" Click="ShowSettings" Icon="{vi:SettingsIcon}" />
-                    <MenuItem Header="{x:Static p:Resources.Export}" Command="{Binding ExportSettingsCommand}" Icon="{vi:SettingsExportIcon}" />
-                    <MenuItem Header="{x:Static p:Resources.Load}" Command="{Binding LoadSettingsCommand}" Icon="{vi:SettingsImportIcon}" />
+                <MenuItem Header="{l:Resource Settings}">
+                    <MenuItem Header="{l:Resource AppSettings}" Click="ShowSettings" Icon="{vi:SettingsIcon}" />
+                    <MenuItem Header="{l:Resource Export}" Command="{Binding ExportSettingsCommand}" Icon="{vi:SettingsExportIcon}" />
+                    <MenuItem Header="{l:Resource Load}" Command="{Binding LoadSettingsCommand}" Icon="{vi:SettingsImportIcon}" />
                     <Separator />
-                    <MenuItem Header="{x:Static p:Resources.ModbusSettings}" Click="ShowModbusSettings" Icon="{vi:ModbusLogo}" />
-                    <MenuItem Header="{x:Static p:Resources.EnergyFlow}" Icon="{vi:EnergyFLow}" Click="ShowSelfConsumptionOptimization" />
+                    <MenuItem Header="{l:Resource ModbusSettings}" Click="ShowModbusSettings" Icon="{vi:ModbusLogo}" />
+                    <MenuItem Header="{l:Resource EnergyFlow}" Icon="{vi:EnergyFLow}" Click="ShowSelfConsumptionOptimization" />
                 </MenuItem>
-                <MenuItem Header="{x:Static p:Resources.View}">
+                <MenuItem Header="{l:Resource View}">
                     <MenuItem Header="_Auto-fit" Click="OnAutoSizeChecked" />
-                    <MenuItem Header="{x:Static p:Resources.IncludeInverterPower}" Icon="{vi:Gen24}" IsChecked="{Binding IncludeInverterPower}" IsCheckable="True" />
-                    <MenuItem Header="{x:Static p:Resources.Events}" Click="ShowEventLog" Icon="{vi:EventLogIcon}" />
-                    <MenuItem Header="{x:Static p:Resources.ColorAllGaugeTicks}" IsCheckable="True" IsChecked="{Binding Settings.ColorAllGaugeTicks}" Checked="SaveSettings" Unchecked="SaveSettings" Icon="{c:DemoGauge}" />
-                    <MenuItem Visibility="{Binding Settings.HaveFritzBox, Converter={co:Bool2Visibility}}" Header="{x:Static p:Resources.ShowAvm}" IsChecked="{Binding Settings.ShowFritzBox, Mode=TwoWay}" IsCheckable="True" Icon="{vi:FritzLogo}" Checked="OnShowAvmChanged" Unchecked="OnShowAvmChanged" />
-                    <MenuItem Visibility="{Binding Settings.HaveWattPilot, Converter={co:Bool2Visibility}}" Header="{x:Static p:Resources.WattPilotHeader}" IsChecked="{Binding Settings.ShowWattPilot, Mode=TwoWay}" IsCheckable="True" Icon="{vi:ChargingTrafficSign}" Checked="ShowWattPilot" Unchecked="ShowWattPilot" />
-                    <MenuItem Header="{x:Static p:Resources.ElectricityPrice}" Click="ShowElectricityPrice" Icon="{vi:ElectricityPriceIcon Foreground=Crimson}"/>
+                    <MenuItem Header="{l:Resource IncludeInverterPower}" Icon="{vi:Gen24}" IsChecked="{Binding IncludeInverterPower}" IsCheckable="True" />
+                    <MenuItem Header="{l:Resource Events}" Click="ShowEventLog" Icon="{vi:EventLogIcon}" />
+                    <MenuItem Header="{l:Resource ColorAllGaugeTicks}" IsCheckable="True" IsChecked="{Binding Settings.ColorAllGaugeTicks}" Checked="SaveSettings" Unchecked="SaveSettings" Icon="{c:DemoGauge}" />
+                    <MenuItem Visibility="{Binding Settings.HaveFritzBox, Converter={co:Bool2Visibility}}" Header="{l:Resource ShowAvm}" IsChecked="{Binding Settings.ShowFritzBox, Mode=TwoWay}" IsCheckable="True" Icon="{vi:FritzLogo}" Checked="OnShowAvmChanged" Unchecked="OnShowAvmChanged" />
+                    <MenuItem Visibility="{Binding Settings.HaveWattPilot, Converter={co:Bool2Visibility}}" Header="{l:Resource WattPilotHeader}" IsChecked="{Binding Settings.ShowWattPilot, Mode=TwoWay}" IsCheckable="True" Icon="{vi:ChargingTrafficSign}" Checked="ShowWattPilot" Unchecked="ShowWattPilot" />
+                    <MenuItem Header="{l:Resource ElectricityPrice}" Click="ShowElectricityPrice" Icon="{vi:ElectricityPriceIcon Foreground=Crimson}"/>
                 </MenuItem>
                 <MenuItem Header="Wattpilot" Visibility="{Binding DataCollectionService.HomeAutomationSystem.WattPilot, Converter={co:NullToVisibility}, FallbackValue=Collapsed}">
-                    <MenuItem Header="{x:Static p:Resources.Settings}" Click="ShowWattPilotSettings" Icon="{vi:ChargingTrafficSignSettings}" Visibility="{Binding WattPilotService.WattPilot, Converter={co:NullToVisibility}, FallbackValue=Collapsed}" />
-                    <MenuItem Header="{x:Static p:Resources.OpenChargingLog}" Icon="{vi:EventLogIcon}" Command="{Binding DownloadChargeLogCommand}" Visibility="{Binding DataCollectionService.HomeAutomationSystem.WattPilot.DownloadLink, FallbackValue=Collapsed, Converter={co:NullToVisibility}}" />
-                    <MenuItem Header="{x:Static p:Resources.Reboot}" Icon="{vi:RebootIcon}" Visibility="{Binding WattPilotService.WattPilot, Converter={co:NullToVisibility}, FallbackValue=Collapsed}" Click="OnRebootWattPilotClicked" />
+                    <MenuItem Header="{l:Resource Settings}" Click="ShowWattPilotSettings" Icon="{vi:ChargingTrafficSignSettings}" Visibility="{Binding WattPilotService.WattPilot, Converter={co:NullToVisibility}, FallbackValue=Collapsed}" />
+                    <MenuItem Header="{l:Resource OpenChargingLog}" Icon="{vi:EventLogIcon}" Command="{Binding DownloadChargeLogCommand}" Visibility="{Binding DataCollectionService.HomeAutomationSystem.WattPilot.DownloadLink, FallbackValue=Collapsed, Converter={co:NullToVisibility}}" />
+                    <MenuItem Header="{l:Resource Reboot}" Icon="{vi:RebootIcon}" Visibility="{Binding WattPilotService.WattPilot, Converter={co:NullToVisibility}, FallbackValue=Collapsed}" Click="OnRebootWattPilotClicked" />
                 </MenuItem>
                 <MenuItem Header="Tools">
-                    <MenuItem Header="{x:Static p:Resources.ImportBayernwerk}" Command="{Binding ImportBayernwerkCommand}" Icon="{vi:BayernwerkLogo}" />
+                    <MenuItem Header="{l:Resource ImportBayernwerk}" Command="{Binding ImportBayernwerkCommand}" Icon="{vi:BayernwerkLogo}" />
                     <MenuItem Header="Garbage Collection" Command="{Binding GarbageCollectionCommand}" />
                 </MenuItem>
-                <MenuItem Header="{x:Static p:Resources.Help}">
-                    <MenuItem Header="{x:Static p:Resources.About}" Click="OnAboutClicked"/>
+                <MenuItem Header="{l:Resource Help}">
+                    <MenuItem Header="{l:Resource About}" Click="OnAboutClicked"/>
                 </MenuItem>
 
             </Menu>
@@ -72,15 +73,15 @@
             <StackPanel.Resources>
                 <Style TargetType="MenuItem" BasedOn="{StaticResource RibbonButton}" />
             </StackPanel.Resources>
-            <MenuItem Header="{x:Static p:Resources.Settings}" Click="ShowSettings" Icon="{vi:SettingsIcon}" />
-            <MenuItem Header="{x:Static p:Resources.Modbus}" Click="ShowModbusSettings" Icon="{vi:ModbusLogo}" Visibility="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors, FallbackValue=Collapsed, Converter={co:NullToVisibility}}" />
-            <MenuItem Header="{x:Static p:Resources.EnergyFlow}" Icon="{vi:EnergyFLow}" Click="ShowSelfConsumptionOptimization" Visibility="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors, FallbackValue=Collapsed, Converter={co:NullToVisibility}}" />
-            <MenuItem Visibility="{Binding Settings.HaveFritzBox, Converter={co:Bool2Visibility}}" Header="{x:Static p:Resources.ShowAvm}" IsChecked="{Binding Settings.ShowFritzBox, Mode=TwoWay}" IsCheckable="True" Icon="{vi:FritzLogo}" Checked="OnShowAvmChanged" Unchecked="OnShowAvmChanged" />
+            <MenuItem Header="{l:Resource Settings}" Click="ShowSettings" Icon="{vi:SettingsIcon}" />
+            <MenuItem Header="{l:Resource Modbus}" Click="ShowModbusSettings" Icon="{vi:ModbusLogo}" Visibility="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors, FallbackValue=Collapsed, Converter={co:NullToVisibility}}" />
+            <MenuItem Header="{l:Resource EnergyFlow}" Icon="{vi:EnergyFLow}" Click="ShowSelfConsumptionOptimization" Visibility="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors, FallbackValue=Collapsed, Converter={co:NullToVisibility}}" />
+            <MenuItem Visibility="{Binding Settings.HaveFritzBox, Converter={co:Bool2Visibility}}" Header="{l:Resource ShowAvm}" IsChecked="{Binding Settings.ShowFritzBox, Mode=TwoWay}" IsCheckable="True" Icon="{vi:FritzLogo}" Checked="OnShowAvmChanged" Unchecked="OnShowAvmChanged" />
             <MenuItem Header="Wattpilot" Click="ShowWattPilot" Icon="{vi:ChargingTrafficSign}" Visibility="{Binding Settings.HaveWattPilot, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}" IsCheckable="True" IsChecked="{Binding Settings.ShowWattPilot}" />
-            <MenuItem Header="{x:Static p:Resources.ToshibaAcHeader}" Icon="{vi:AcIcon}" IsCheckable="True" IsChecked="{Binding Settings.ShowToshibaAc, Mode=TwoWay}" Visibility="{Binding Settings.HaveToshibaAc, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}" Checked="SaveSettings" Unchecked="SaveSettings" />
-            <MenuItem Header="{x:Static p:Resources.Events}" Click="ShowEventLog" Icon="{vi:EventLogIcon}" Visibility="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors, FallbackValue=Collapsed, Converter={co:NullToVisibility}}" />
-            <MenuItem Header="{x:Static p:Resources.Settings}" Click="ShowWattPilotSettings" Icon="{vi:ChargingTrafficSignSettings}" Visibility="{Binding WattPilotService.WattPilot, Converter={co:NullToVisibility}, FallbackValue=Collapsed}" />
-            <MenuItem Header="{x:Static p:Resources.ElectricityPrice}" Click="ShowElectricityPrice" Icon="{vi:ElectricityPriceIcon Foreground=Crimson}"/>
+            <MenuItem Header="{l:Resource ToshibaAcHeader}" Icon="{vi:AcIcon}" IsCheckable="True" IsChecked="{Binding Settings.ShowToshibaAc, Mode=TwoWay}" Visibility="{Binding Settings.HaveToshibaAc, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}" Checked="SaveSettings" Unchecked="SaveSettings" />
+            <MenuItem Header="{l:Resource Events}" Click="ShowEventLog" Icon="{vi:EventLogIcon}" Visibility="{Binding DataCollectionService.HomeAutomationSystem.Gen24Sensors, FallbackValue=Collapsed, Converter={co:NullToVisibility}}" />
+            <MenuItem Header="{l:Resource Settings}" Click="ShowWattPilotSettings" Icon="{vi:ChargingTrafficSignSettings}" Visibility="{Binding WattPilotService.WattPilot, Converter={co:NullToVisibility}, FallbackValue=Collapsed}" />
+            <MenuItem Header="{l:Resource ElectricityPrice}" Click="ShowElectricityPrice" Icon="{vi:ElectricityPriceIcon Foreground=Crimson}"/>
         </StackPanel>
 
         <Viewbox Grid.Row="2" Margin="16">
@@ -160,7 +161,7 @@
                                           Angle="{Binding Settings.HaveTwoInverters, Converter={co:Bool2Double False=30, True=-30}, FallbackValue=30}">
                             <c:PowerFlowArrow.ContextMenu>
                                 <ContextMenu>
-                                    <MenuItem Header="{x:Static p:Resources.IncludeInverterPower}" IsChecked="{Binding IncludeInverterPower}" IsCheckable="True" />
+                                    <MenuItem Header="{l:Resource IncludeInverterPower}" IsChecked="{Binding IncludeInverterPower}" IsCheckable="True" />
                                 </ContextMenu>
                             </c:PowerFlowArrow.ContextMenu>
                         </c:PowerFlowArrow>

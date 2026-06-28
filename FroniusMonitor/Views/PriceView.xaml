@@ -7,13 +7,14 @@
                   xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
                   xmlns:vm="clr-namespace:De.Hochstaetter.FroniusMonitor.ViewModels"
                   xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+                  xmlns:l="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Localization"
                   xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
                   xmlns:gl="clr-namespace:System.Globalization;assembly=mscorlib"
                   xmlns:charging="clr-namespace:De.Hochstaetter.Fronius.Models.Charging;assembly=Fronius"
                   xmlns:vi="clr-namespace:De.Hochstaetter.FroniusMonitor.Assets.Images"
                   mc:Ignorable="d"
                   d:DataContext="{d:DesignInstance Type=vm:PriceViewModel}"
-                  Title="{x:Static p:Resources.ElectricityPrice}" Height="550" Width="1280"
+                  Title="{l:Resource ElectricityPrice}" Height="550" Width="1280"
                   MinWidth="300" MinHeight="200">
     <Grid>
         <Grid.LayoutTransform>
@@ -24,7 +25,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <oxy:Plot Grid.Row="0" Title="{x:Static p:Resources.ElectricityPrice}" Model="{Binding PlotModel}" />
+        <oxy:Plot Grid.Row="0" Title="{l:Resource ElectricityPrice}" Model="{Binding PlotModel}" />
         <Viewbox Grid.Row="0" Margin="50" Stretch="Uniform" StretchDirection="Both" MaxWidth="600">
             <ItemsControl ItemsSource="{Binding Errors}" VerticalAlignment="Center" >
                 <ItemsControl.ItemTemplate>
@@ -35,7 +36,7 @@
             </ItemsControl>
         </Viewbox>
 
-        <GroupBox BorderBrush="#60000000" Header="{x:Static p:Resources.Settings}" Grid.Row="1" Margin="8" HorizontalAlignment="Center" IsEnabled="{Binding IsBusy, Converter={co:BoolInverter}}">
+        <GroupBox BorderBrush="#60000000" Header="{l:Resource Settings}" Grid.Row="1" Margin="8" HorizontalAlignment="Center" IsEnabled="{Binding IsBusy, Converter={co:BoolInverter}}">
             <Grid Margin="10">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -57,15 +58,15 @@
                     </Style>
                 </Grid.Resources>
 
-                <RadioButton Grid.Row="0" Grid.Column="0" Content="{x:Static p:Resources.BuyingPrice}" Margin="0,2,0,0" GroupName="Price" Checked="OnConsumptionViewChecked" IsChecked="True" />
-                <RadioButton Grid.Row="1" Grid.Column="0" Content="{x:Static p:Resources.MarketPrice}" Margin="0,2,0,0" GroupName="Price" Checked="OnMarketViewChecked" />
+                <RadioButton Grid.Row="0" Grid.Column="0" Content="{l:Resource BuyingPrice}" Margin="0,2,0,0" GroupName="Price" Checked="OnConsumptionViewChecked" IsChecked="True" />
+                <RadioButton Grid.Row="1" Grid.Column="0" Content="{l:Resource MarketPrice}" Margin="0,2,0,0" GroupName="Price" Checked="OnMarketViewChecked" />
 
-                <RadioButton Grid.Row="0" Grid.Column="1" Content="{x:Static p:Resources.WithoutVat}" GroupName="Vat" IsChecked="{Binding UseVat, Converter={co:BoolInverter}}" />
-                <RadioButton Grid.Row="1" Grid.Column="1" Content="{x:Static p:Resources.WithVat}" GroupName="Vat" IsChecked="{Binding UseVat}" />
+                <RadioButton Grid.Row="0" Grid.Column="1" Content="{l:Resource WithoutVat}" GroupName="Vat" IsChecked="{Binding UseVat, Converter={co:BoolInverter}}" />
+                <RadioButton Grid.Row="1" Grid.Column="1" Content="{l:Resource WithVat}" GroupName="Vat" IsChecked="{Binding UseVat}" />
 
-                <RadioButton Grid.Row="0" Grid.Column="2" Content="{x:Static p:Resources.Today}" GroupName="Historic" IsChecked="{Binding ShowHistoricData, Converter={co:BoolInverter}}"
+                <RadioButton Grid.Row="0" Grid.Column="2" Content="{l:Resource Today}" GroupName="Historic" IsChecked="{Binding ShowHistoricData, Converter={co:BoolInverter}}"
                              Visibility="{Binding ElectricityPriceService.SupportsHistoricData, Converter={co:Bool2Visibility}}" />
-                <RadioButton Grid.Row="1" Grid.Column="2" Content="{x:Static p:Resources.Historic}" GroupName="Historic" IsChecked="{Binding ShowHistoricData}"
+                <RadioButton Grid.Row="1" Grid.Column="2" Content="{l:Resource Historic}" GroupName="Historic" IsChecked="{Binding ShowHistoricData}"
                              Visibility="{Binding ElectricityPriceService.SupportsHistoricData, Converter={co:Bool2Visibility}}" />
 
                 <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.RowSpan="2" Grid.Column="3" IsEnabled="{Binding ShowHistoricData}"
@@ -98,7 +99,7 @@
                     </Button>
                 </StackPanel>
                 
-                <Button Padding="8" Margin="4" Click="OnPriceComponentsClick" Grid.Column="4" Grid.Row="0" Grid.RowSpan="2" Content="{x:Static p:Resources.PriceComponents}"></Button>
+                <Button Padding="8" Margin="4" Click="OnPriceComponentsClick" Grid.Column="4" Grid.Row="0" Grid.RowSpan="2" Content="{l:Resource PriceComponents}"></Button>
             </Grid>
         </GroupBox>
     </Grid>

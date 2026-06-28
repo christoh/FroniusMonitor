@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using Microsoft.Extensions.Logging;
 
 namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
@@ -9,8 +10,9 @@ public class InverterSettingsViewModel(
     IGen24Service gen24Service,
     IGen24JsonService gen24JsonService,
     IFritzBoxService fritzBoxService,
-    IWattPilotService wattPilotService)
-    : SettingsViewModelBase(dataCollectionService, gen24Service, gen24JsonService, fritzBoxService, wattPilotService)
+    IWattPilotService wattPilotService,
+    ILogger<InverterSettingsViewModel> logger)
+    : SettingsViewModelBase(dataCollectionService, gen24Service, gen24JsonService, fritzBoxService, wattPilotService, logger)
 #pragma warning restore CS9107
 {
     private bool needsConnectedInverterUpdate;

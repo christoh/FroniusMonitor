@@ -51,13 +51,8 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
                 return httpClient;
             }
         }
-
-        set => httpClient = value;
     }
 
-    ~DigestAuthHttp() => Dispose();
-
-//#pragma warning disable CA1816
     public void Dispose()
     {
         if (isDisposed)
@@ -68,7 +63,6 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
         httpClient?.Dispose();
         httpClient = null;
         isDisposed = true;
-        GC.SuppressFinalize(this);
     }
 
     public async ValueTask DisposeAsync()

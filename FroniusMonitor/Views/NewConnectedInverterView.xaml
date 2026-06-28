@@ -12,7 +12,7 @@
         xmlns:v="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Validation"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance vm:NewConnectedInverterViewModel}"
-        Title="{x:Static p:Resources.AddInverter}" SizeToContent="Height" Width="600" ResizeMode="NoResize">
+        Title="{l:Resource AddInverter}" SizeToContent="Height" Width="600" ResizeMode="NoResize">
     <Grid Margin="16">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
@@ -42,9 +42,9 @@
         
         <TextBlock Grid.Row="0" Grid.Column="0" Text="{l:Ui 'SYSTEM_POWER_CONTROL.name'}"/>
         <TextBlock Grid.Row="0" Grid.Column="1" Text=":"/>
-        <TextBox Grid.Row="0" Grid.Column="2" Text="{co:ValidationBinding ConnectedInverter.DisplayName, Rule={v:RegExRule Pattern='^\\S.{0,29}$', Message={x:Static p:Resources.InvalidInverterName}}}" MaxLength="30"/>
+        <TextBox Grid.Row="0" Grid.Column="2" Text="{co:ValidationBinding ConnectedInverter.DisplayName, Rule={v:RegExRule Pattern='^\\S.{0,29}$', Message={l:Resource InvalidInverterName}}}" MaxLength="30"/>
         
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.HostnameOrIpv4Address}"/>
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="{l:Resource HostnameOrIpv4Address}"/>
         <TextBlock Grid.Row="1" Grid.Column="1" Text=":"/>
         <TextBox Grid.Row="1" Grid.Column="2" Text="{co:ValidationBinding HostnameOrIpAddress, Rule={v:Ipv4OrHostname}}"/>
         
@@ -59,8 +59,8 @@
                     <Setter Property="Margin" Value="8,0,0,0"/>
                 </Style>
             </StackPanel.Resources>
-            <Button IsCancel="True" Content="{x:Static p:Resources.Cancel}"/>
-            <Button IsDefault="True" Content="{x:Static p:Resources.Ok}" Click="OnOkClicked" IsEnabled="{Binding HasVisibleNotifiedValidationErrors, Converter={co:BoolInverter}}"/>
+            <Button IsCancel="True" Content="{l:Resource Cancel}"/>
+            <Button IsDefault="True" Content="{l:Resource Ok}" Click="OnOkClicked" IsEnabled="{Binding HasVisibleNotifiedValidationErrors, Converter={co:BoolInverter}}"/>
         </StackPanel>
     </Grid>
 </c:ValidationWindow>

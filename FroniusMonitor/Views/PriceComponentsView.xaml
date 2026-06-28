@@ -5,9 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:De.Hochstaetter.FroniusMonitor.Views"
         xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+        xmlns:l="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Localization"
         xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
         mc:Ignorable="d" DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="{x:Static p:Resources.PriceComponents}" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize">
+        Title="{l:Resource PriceComponents}" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize">
     <Grid>
         <Grid.LayoutTransform>
             <ScaleTransform x:Name="WindowScaler"/>
@@ -34,19 +35,19 @@
 
             </DataGrid.Resources>
             <DataGrid.Columns>
-                <DataGridTextColumn CanUserReorder="False" CanUserResize="False" Binding="{Binding Description}" Header="{x:Static p:Resources.Component}" HeaderStyle="{StaticResource Es}"/>
-                <DataGridTextColumn CanUserReorder="False" CanUserResize="False" ElementStyle="{StaticResource RightAlign}" Binding="{Binding Price, StringFormat=N4}" Header="{x:Static p:Resources.Net}" HeaderStyle="{StaticResource Es}"/>
-                <DataGridTextColumn CanUserReorder="False" CanUserResize="False" ElementStyle="{StaticResource RightAlign}" Binding="{Binding TaxRate, StringFormat=P1}" Header="{x:Static p:Resources.Vat}" HeaderStyle="{StaticResource Es}"/>
-                <DataGridTextColumn CanUserReorder="False" CanUserResize="False" ElementStyle="{StaticResource RightAlign}" Binding="{Binding GrossPrice, StringFormat=N4}" Header="{x:Static p:Resources.Gross}"/>
-                <DataGridTextColumn CanUserReorder="False" CanUserResize="False" ElementStyle="{StaticResource LeftAlign}" Binding="{Binding PriceUnit, StringFormat=N2}" Header="{x:Static p:Resources.Unit}"/>
+                <DataGridTextColumn CanUserReorder="False" CanUserResize="False" Binding="{Binding Description}" Header="{l:Resource Component}" HeaderStyle="{StaticResource Es}"/>
+                <DataGridTextColumn CanUserReorder="False" CanUserResize="False" ElementStyle="{StaticResource RightAlign}" Binding="{Binding Price, StringFormat=N4}" Header="{l:Resource Net}" HeaderStyle="{StaticResource Es}"/>
+                <DataGridTextColumn CanUserReorder="False" CanUserResize="False" ElementStyle="{StaticResource RightAlign}" Binding="{Binding TaxRate, StringFormat=P1}" Header="{l:Resource Vat}" HeaderStyle="{StaticResource Es}"/>
+                <DataGridTextColumn CanUserReorder="False" CanUserResize="False" ElementStyle="{StaticResource RightAlign}" Binding="{Binding GrossPrice, StringFormat=N4}" Header="{l:Resource Gross}"/>
+                <DataGridTextColumn CanUserReorder="False" CanUserResize="False" ElementStyle="{StaticResource LeftAlign}" Binding="{Binding PriceUnit, StringFormat=N2}" Header="{l:Resource Unit}"/>
             </DataGrid.Columns>
         </DataGrid>
         <TextBlock Grid.Row="1" Margin="8,8,0,0" FontSize="14" FontWeight="Bold">
-            <Run Text="{x:Static p:Resources.Sum}"/><Run Text=":"/>
+            <Run Text="{l:Resource Sum}"/><Run Text=":"/>
             <Run Text="{Binding NetSum, Mode=OneWay, StringFormat=N4}"/>
-            <Run Text="{x:Static p:Resources.Net}"/>
+            <Run Text="{l:Resource Net}"/>
             <Run Text="("/><Run Text="{Binding GrossSum, Mode=OneWay, StringFormat=N4}"/>
-            <Run Text="{x:Static p:Resources.Gross}"/><Run Text=")"/>
+            <Run Text="{l:Resource Gross}"/><Run Text=")"/>
         </TextBlock>
     </Grid>
 </c:ScalableWindow>

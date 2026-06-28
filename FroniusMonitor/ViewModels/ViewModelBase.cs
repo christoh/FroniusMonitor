@@ -9,7 +9,7 @@ public abstract class ViewModelBase : BindableBase
 
     public Dispatcher Dispatcher { get; set; } = null!;
 
-    private readonly ObservableCollection<ValidationError> notifiedValidationErrors = new();
+    private readonly ObservableCollection<ValidationError> notifiedValidationErrors = [];
 
     public ReadOnlyObservableCollection<ValidationError> NotifiedValidationErrors { get; }
 

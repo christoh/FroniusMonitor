@@ -1,18 +1,23 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
+﻿using Microsoft.Extensions.Logging;
+
+namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
 public abstract class SettingsViewModelBase : ViewModelBase
 {
     protected readonly IGen24JsonService Gen24JsonService;
     protected readonly IWattPilotService WattPilotService;
+    
+    private readonly ILogger logger;
 
     protected SettingsViewModelBase(IDataCollectionService dataCollectionService, IGen24Service gen24Service,
-        IGen24JsonService gen24JsonService, IFritzBoxService fritzBoxService, IWattPilotService wattPilotService)
+        IGen24JsonService gen24JsonService, IFritzBoxService fritzBoxService, IWattPilotService wattPilotService, ILogger logger)
     {
         Gen24Service = gen24Service;
         Gen24JsonService = gen24JsonService;
         FritzBoxService = fritzBoxService;
         WattPilotService = wattPilotService;
         DataCollectionService = dataCollectionService;
+        this.logger = logger;
     }
 
     public IDataCollectionService DataCollectionService

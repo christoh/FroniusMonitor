@@ -27,11 +27,11 @@
                 </Style>
             </DataGrid.Resources>
             <DataGrid.Columns>
-                <DataGridTextColumn ElementStyle="{StaticResource Es}" Header="{x:Static p:Resources.Start}" Binding="{Binding EventTime, Converter={co:DateConverter}}" CanUserSort="True" CanUserResize="True" CanUserReorder="True"/>
-                <DataGridTextColumn ElementStyle="{StaticResource Es}" Header="{x:Static p:Resources.End}" Binding="{Binding ActiveUntil, Converter={co:DateConverter}}" CanUserSort="True" CanUserResize="True" CanUserReorder="True"/>
+                <DataGridTextColumn ElementStyle="{StaticResource Es}" Header="{l:Resource Start}" Binding="{Binding EventTime, Converter={co:DateConverter}}" CanUserSort="True" CanUserResize="True" CanUserReorder="True"/>
+                <DataGridTextColumn ElementStyle="{StaticResource Es}" Header="{l:Resource End}" Binding="{Binding ActiveUntil, Converter={co:DateConverter}}" CanUserSort="True" CanUserResize="True" CanUserReorder="True"/>
                 <DataGridTextColumn ElementStyle="{StaticResource Es}" Header="{l:Ui 'EVENTLOG.CODE' }" Binding="{Binding Code, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" CanUserSort="True" CanUserResize="True" CanUserReorder="True"/>
-                <DataGridTextColumn ElementStyle="{StaticResource Es}" Header="{x:Static p:Resources.Name}" Binding="{Binding Label}" CanUserSort="True" CanUserResize="True" CanUserReorder="True"/>
-                <DataGridTemplateColumn Header="{x:Static p:Resources.Severity}" SortMemberPath="Severity" CanUserSort="True" CanUserReorder="True" CanUserResize="True">
+                <DataGridTextColumn ElementStyle="{StaticResource Es}" Header="{l:Resource Name}" Binding="{Binding Label}" CanUserSort="True" CanUserResize="True" CanUserReorder="True"/>
+                <DataGridTemplateColumn Header="{l:Resource Severity}" SortMemberPath="Severity" CanUserSort="True" CanUserReorder="True" CanUserResize="True">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="{x:Type gen24:Gen24Event}">
                             <vi:SeverityIcon Severity="{Binding Severity}" Height="16" Width="16"></vi:SeverityIcon>

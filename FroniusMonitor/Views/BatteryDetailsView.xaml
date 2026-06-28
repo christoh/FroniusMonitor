@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModels="clr-namespace:De.Hochstaetter.FroniusMonitor.ViewModels"
         xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+        xmlns:l="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Localization"
         xmlns:c="clr-namespace:De.Hochstaetter.FroniusMonitor.Controls"
         xmlns:m="clr-namespace:De.Hochstaetter.FroniusMonitor.Models"
         xmlns:co="clr-namespace:De.Hochstaetter.FroniusMonitor.Wpf.Converters"
@@ -23,7 +24,7 @@
 
         <TextBlock Grid.Row="1" Text="{Binding Header}" TextAlignment="Center" FontSize="18" FontWeight="Medium" Margin="10,10,10,16" TextWrapping="Wrap" />
 
-        <!--<TextBlock Grid.Row="2" Text="{x:Static p:Resources.CheckAtLeastOneView}" TextAlignment="Center" FontSize="14" Margin="10,10,10,16" TextWrapping="Wrap" Visibility="{Binding IsNoneSelected, Converter={co:Bool2Visibility}}" />-->
+        <!--<TextBlock Grid.Row="2" Text="{l:Resource CheckAtLeastOneView}" TextAlignment="Center" FontSize="14" Margin="10,10,10,16" TextWrapping="Wrap" Visibility="{Binding IsNoneSelected, Converter={co:Bool2Visibility}}" />-->
 
         <ScrollViewer Grid.Row="3" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
             <!-- ReSharper disable Xaml.PossibleNullReferenceException -->
@@ -57,23 +58,23 @@
                     </Style>
                 </WrapPanel.Resources>
 
-                <GroupBox Header="{x:Static p:Resources.SoC}">
+                <GroupBox Header="{l:Resource SoC}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource PercentageGauge}" />
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Battery.StateOfCharge, Converter={co:Multiply Factor=100}}" Label="{x:Static p:Resources.Gross}" />
+                                <c:Gauge Value="{m:GaugeBinding Battery.StateOfCharge, Converter={co:Multiply Factor=100}}" Label="{l:Resource Gross}" />
                             </ContentControl>
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding HomeAutomationSystem.NetStateOfChange, Converter={co:Multiply Factor=100}}" Label="{x:Static p:Resources.Net}" />
+                                <c:Gauge Value="{m:GaugeBinding HomeAutomationSystem.NetStateOfChange, Converter={co:Multiply Factor=100}}" Label="{l:Resource Net}" />
                             </ContentControl>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.SoH}">
+                <GroupBox Header="{l:Resource SoH}">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <ContentControl>
@@ -85,7 +86,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.Capacity}">
+                <GroupBox Header="{l:Resource Capacity}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -97,18 +98,18 @@
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Battery.AvailableCapacity}" Label="{x:Static p:Resources.Gross}" />
+                                <c:Gauge Value="{m:GaugeBinding Battery.AvailableCapacity}" Label="{l:Resource Gross}" />
                             </ContentControl>
 
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding HomeAutomationSystem.StorageNetCapacity}" Label="{x:Static p:Resources.Net}"
+                                <c:Gauge Value="{m:GaugeBinding HomeAutomationSystem.StorageNetCapacity}" Label="{l:Resource Net}"
                                          Maximum="{Binding HomeAutomationSystem.MaxStorageNetCapacity, FallbackValue=54500}" />
                             </ContentControl>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.Voltage}">
+                <GroupBox Header="{l:Resource Voltage}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -121,17 +122,17 @@
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Battery.VoltageInternal}" Label="{x:Static p:Resources.Inner}" />
+                                <c:Gauge Value="{m:GaugeBinding Battery.VoltageInternal}" Label="{l:Resource Inner}" />
                             </ContentControl>
 
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Battery.VoltageOuter}" Label="{x:Static p:Resources.Outer}" />
+                                <c:Gauge Value="{m:GaugeBinding Battery.VoltageOuter}" Label="{l:Resource Outer}" />
                             </ContentControl>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.Current}">
+                <GroupBox Header="{l:Resource Current}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -145,17 +146,17 @@
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Battery.CurrentInternal}" Label="{x:Static p:Resources.Inner}" />
+                                <c:Gauge Value="{m:GaugeBinding Battery.CurrentInternal}" Label="{l:Resource Inner}" />
                             </ContentControl>
 
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Battery.Current}" Label="{x:Static p:Resources.Outer}" />
+                                <c:Gauge Value="{m:GaugeBinding Battery.Current}" Label="{l:Resource Outer}" />
                             </ContentControl>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.Power}">
+                <GroupBox Header="{l:Resource Power}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -169,17 +170,17 @@
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Battery.PowerInternal}" Label="{x:Static p:Resources.Inner}" />
+                                <c:Gauge Value="{m:GaugeBinding Battery.PowerInternal}" Label="{l:Resource Inner}" />
                             </ContentControl>
 
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Battery.Power}" Label="{x:Static p:Resources.Outer}" />
+                                <c:Gauge Value="{m:GaugeBinding Battery.Power}" Label="{l:Resource Outer}" />
                             </ContentControl>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="{x:Static p:Resources.Temperatures}">
+                <GroupBox Header="{l:Resource Temperatures}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
@@ -192,19 +193,19 @@
                         </StackPanel.Resources>
                         <StackPanel Orientation="Horizontal">
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Battery.AmbientTemperature}" Label="{x:Static p:Resources.Ambient}" />
+                                <c:Gauge Value="{m:GaugeBinding Battery.AmbientTemperature}" Label="{l:Resource Ambient}" />
                             </ContentControl>
 
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Battery.CellTemperatureMin}" Label="{x:Static p:Resources.CellMin}" />
+                                <c:Gauge Value="{m:GaugeBinding Battery.CellTemperatureMin}" Label="{l:Resource CellMin}" />
                             </ContentControl>
 
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Battery.CellTemperatureAverage}" Label="{x:Static p:Resources.CellAverage}" />
+                                <c:Gauge Value="{m:GaugeBinding Battery.CellTemperatureAverage}" Label="{l:Resource CellAverage}" />
                             </ContentControl>
 
                             <ContentControl>
-                                <c:Gauge Value="{m:GaugeBinding Battery.CellTemperatureMax}" Label="{x:Static p:Resources.CellMax}" />
+                                <c:Gauge Value="{m:GaugeBinding Battery.CellTemperatureMax}" Label="{l:Resource CellMax}" />
                             </ContentControl>
                         </StackPanel>
                     </StackPanel>
