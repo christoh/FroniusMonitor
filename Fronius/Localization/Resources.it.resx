@@ -1674,4 +1674,10 @@
   <data name="GaugeColorMode" xml:space="preserve">
     <value>Colora tutto / Colora fino al valore</value>
   </data>
+  <data name="Note" xml:space="preserve">
+    <value>Nota</value>
+  </data>
+  <data name="LanguageChangeWarning" xml:space="preserve">
+    <value>Alcuni testi sono stati generati in '{0}' all'avvio di {1}. Continueranno a essere visualizzati nella lingua originale finché non si riavvia l'app.</value>
+  </data>
 </root>

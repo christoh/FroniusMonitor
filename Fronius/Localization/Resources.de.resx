@@ -1668,4 +1668,10 @@
   <data name="GaugeColorMode" xml:space="preserve">
     <value>Alle färben / Bis zum Wert färben</value>
   </data>
+  <data name="Note" xml:space="preserve">
+	  <value>Hinweis</value>
+  </data>
+  <data name="LanguageChangeWarning" xml:space="preserve">
+    <value>Einige Texte wurden in '{0}' generiert, als {1} gestartet wurde. Sie werden weiterhin in der ursprünglichen Sprache angezeigt, bis Sie die App neu starten.</value>
+  </data>
 </root>

@@ -15,7 +15,7 @@ public partial class App
     public static Timer? SolarSystemQueryTimer { get; set; }
 
     // Captured before we ever override the culture, so "match Windows language" (null) can be restored at runtime.
-    private static readonly CultureInfo osUiCulture = CultureInfo.CurrentUICulture;
+    public static CultureInfo OsUiCulture { get; } = CultureInfo.CurrentUICulture;
 
     static App()
     {
@@ -43,16 +43,12 @@ public partial class App
 
     public static Settings Settings { get; set; } = null!;
 
-    /// <summary>
-    /// Applies the UI language at runtime. Windows opened afterwards use the new language;
-    /// already-open windows keep their text. A null/empty <paramref name="language"/> restores
-    /// the operating system display language ("match Windows language").
-    /// </summary>
     public static void ApplyLanguage(string? language)
     {
-        var culture = string.IsNullOrWhiteSpace(language) ? osUiCulture : new CultureInfo(language);
+        var culture = string.IsNullOrWhiteSpace(language) ? OsUiCulture : new CultureInfo(language);
+        Loc.Culture = culture;
         CultureInfo.DefaultThreadCurrentUICulture = culture;
-        CultureInfo.CurrentUICulture=culture;
+        CultureInfo.CurrentUICulture = culture;
         Thread.CurrentThread.CurrentUICulture = culture;
         Wpf.Localization.LocalizationSource.Instance.Culture = culture;
         CultureNotifier.NotifyCultureChanged();

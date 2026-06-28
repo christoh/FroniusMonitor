@@ -1674,4 +1674,10 @@
   <data name="GaugeColorMode" xml:space="preserve">
     <value>Alli iifärbe / Bis zum Wärt iifärbe</value>
   </data>
+  <data name="Note" xml:space="preserve">
+    <value>Hiiwiis</value>
+  </data>
+  <data name="LanguageChangeWarning" xml:space="preserve">
+    <value>E paar Täxt sind in '{0}' generiert worde, wo {1} gstartet isch. Si wärdet wiiterhin i dr ursprüngliche Sprooch aazeigt, bis du d App neu startisch.</value>
+  </data>
 </root>

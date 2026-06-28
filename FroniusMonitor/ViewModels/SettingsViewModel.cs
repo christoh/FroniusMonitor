@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.Input;
 using De.Hochstaetter.Fronius.Models.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Serilog.Core;
 
 namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
@@ -23,7 +22,7 @@ public partial class SettingsViewModel(
     [field: AllowNull, MaybeNull]
     public ICommand DeletePanelLayoutFileCommand => field ??= new NoParameterCommand(() => Settings.CustomSolarPanelLayout = null);
 
-    public IEnumerable<ListItemModel<Protocol>> AzureProtocols { get; }= 
+    public IEnumerable<ListItemModel<Protocol>> AzureProtocols { get; } =
     [
         new EnumListItemModel<Protocol> { Value = Protocol.Amqp },
         new EnumListItemModel<Protocol> { Value = Protocol.Mqtt },
@@ -91,7 +90,7 @@ public partial class SettingsViewModel(
     [ObservableProperty]
     public partial IElectricityPriceService PriceService { get; set; } = IoC.TryGet<IElectricityPriceService>()!;
 
-    [ObservableProperty,NotifyPropertyChangedFor(nameof(SelectedPriceRegion))]
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(SelectedPriceRegion))]
     public partial IEnumerable<ListItemModel<AwattarCountry>> PriceRegions { get; set; } = [];
 
     public IEnumerable<string> Gen24UserNames { get; } = ["customer", "technician", "support"];
@@ -157,7 +156,7 @@ public partial class SettingsViewModel(
             OverwritePrompt = false,
             ValidateNames = true,
             Title = Loc.SelectDriftsFile,
-            Filter = "Extensible Markup Language (*.xml)|*.xml" + Loc.FilterAllFiles
+            Filter = "Extensible Markup Language (*.xml)|*.xml" + Loc.FilterAllFiles,
         };
 
         var result = dialog.ShowDialog();
@@ -180,7 +179,7 @@ public partial class SettingsViewModel(
             InitialDirectory = string.IsNullOrWhiteSpace(Settings.EnergyHistoryFileName) ? null : Path.GetDirectoryName(Settings.EnergyHistoryFileName),
             ValidateNames = true,
             Title = Loc.SelectEnergyHistoryFile,
-            Filter = "Log files (*.log)|*.log" + Loc.FilterAllFiles
+            Filter = "Log files (*.log)|*.log" + Loc.FilterAllFiles,
         };
 
         var result = dialog.ShowDialog();
@@ -258,10 +257,10 @@ public partial class SettingsViewModel(
             if (Settings.Language?.ToUpperInvariant() != SelectedCulture.Value?.ToUpperInvariant())
             {
                 Settings.Language = SelectedCulture.Value;
-
-                // Apply immediately: windows opened from now on use the new language.
-                // Already-open windows keep their current text (no restart required).
+                var oldCulture = CultureInfo.CurrentUICulture;
                 App.ApplyLanguage(SelectedCulture.Value);
+                var text = string.Format(Loc.ResourceManager.GetString(nameof(Loc.LanguageChangeWarning), CultureInfo.CurrentUICulture)!, oldCulture.DisplayName, App.AppName);
+                ShowBox(text, Loc.Note, MessageBoxButton.OK, MessageBoxImage.Information);
             }
 
             FritzBoxService.Connection = Settings is { HaveFritzBox: true, ShowFritzBox: true } ? Settings.FritzBoxConnection : null;
@@ -294,7 +293,6 @@ public partial class SettingsViewModel(
         }
         catch (Exception ex)
         {
-
             ShowBox(ex.Message, ex.GetType().Name, MessageBoxButton.OK, MessageBoxImage.Error);
         }
         finally

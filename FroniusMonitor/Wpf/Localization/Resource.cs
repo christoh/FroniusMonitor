@@ -43,9 +43,13 @@ public sealed class Resource(string key) : MarkupExtension
 
     public override object ProvideValue(IServiceProvider serviceProvider)
     {
-        // Bind when the target is a dependency property (live updates); otherwise (e.g. nested inside
-        // another markup extension such as a validation rule) return the current string literally.
-        if (serviceProvider.GetService(typeof(IProvideValueTarget)) is IProvideValueTarget { TargetObject: DependencyObject, TargetProperty: DependencyProperty })
+        // Bind when the target is a dependency property (live updates). Inside a template the
+        // TargetObject is a SharedDp placeholder rather than the real DependencyObject, so only the
+        // TargetProperty is checked -- otherwise templated strings would fall back to a static literal
+        // and never update on a language change. Binding.ProvideValue handles the template deferral
+        // (it returns the binding itself for shared targets, re-binding per instantiated element).
+        // Non-DP targets (e.g. nested inside another markup extension) still get the string literally.
+        if (serviceProvider.GetService(typeof(IProvideValueTarget)) is IProvideValueTarget { TargetProperty: DependencyProperty })
         {
             var binding = new Binding($"[{Key}]")
             {

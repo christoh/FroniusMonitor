@@ -1776,4 +1776,10 @@
   <data name="GaugeColorMode" xml:space="preserve">
     <value>Color all / Color up to value</value>
   </data>
+  <data name="LanguageChangeWarning" xml:space="preserve">
+	  <value>Some text has been generated in '{0}' when {1} started. It will still appear in the original language until you restart the app.</value>
+  </data>
+  <data name="Note" xml:space="preserve">
+	  <value>Note</value>
+  </data>
 </root>

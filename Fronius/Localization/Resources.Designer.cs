@@ -79,6 +79,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to AC.
+        /// </summary>
+        public static string Ac {
+            get {
+                return ResourceManager.GetString("Ac", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Access denied.
         /// </summary>
         public static string AccessDenied {
@@ -268,6 +277,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Auth.
+        /// </summary>
+        public static string Auth {
+            get {
+                return ResourceManager.GetString("Auth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Authenticate car.
         /// </summary>
         public static string AuthCurrentUser {
@@ -401,7 +419,6 @@ namespace De.Hochstaetter.Fronius.Localization {
                 return ResourceManager.GetString("AwattarCountry_France", resourceCulture);
             }
         }
-        
         
         /// <summary>
         ///   Looks up a localized string similar to Germany / Luxembourg.
@@ -1277,11 +1294,29 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Component.
+        /// </summary>
+        public static string Component {
+            get {
+                return ResourceManager.GetString("Component", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Connecting to Home Automation Server.
         /// </summary>
         public static string ConnectingToHas {
             get {
                 return ResourceManager.GetString("ConnectingToHas", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Consumption.
+        /// </summary>
+        public static string Consumption {
+            get {
+                return ResourceManager.GetString("Consumption", resourceCulture);
             }
         }
         
@@ -1336,6 +1371,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string DaysShort {
             get {
                 return ResourceManager.GetString("DaysShort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DC.
+        /// </summary>
+        public static string Dc {
+            get {
+                return ResourceManager.GetString("Dc", resourceCulture);
             }
         }
         
@@ -1410,7 +1454,6 @@ namespace De.Hochstaetter.Fronius.Localization {
                 return ResourceManager.GetString("Delays", resourceCulture);
             }
         }
-        
         
         /// <summary>
         ///   Looks up a localized string similar to Delete rule.
@@ -1701,6 +1744,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Encryption.
+        /// </summary>
+        public static string Encryption {
+            get {
+                return ResourceManager.GetString("Encryption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to End.
         /// </summary>
         public static string End {
@@ -1871,7 +1923,6 @@ namespace De.Hochstaetter.Fronius.Localization {
             }
         }
         
-        
         /// <summary>
         ///   Looks up a localized string similar to Firmware {0} has breaking changes. Upgrade this software..
         /// </summary>
@@ -1981,7 +2032,34 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Color all / Color up to value.
+        /// </summary>
+        public static string GaugeColorMode {
+            get {
+                return ResourceManager.GetString("GaugeColorMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to High is bad.
+        /// </summary>
+        public static string GaugeHighIsBad {
+            get {
+                return ResourceManager.GetString("GaugeHighIsBad", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mid is good.
+        /// </summary>
+        public static string GaugeMidIsGood {
+            get {
+                return ResourceManager.GetString("GaugeMidIsGood", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Any power source in your home.
         /// </summary>
         public static string Gen24ChargingSources_Home {
             get {
@@ -1990,7 +2068,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Any power source including public grid.
         /// </summary>
         public static string Gen24ChargingSources_HomeAndGrid {
             get {
@@ -1999,7 +2077,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Solar panels of this inverter only.
         /// </summary>
         public static string Gen24ChargingSources_InverterPv {
             get {
@@ -2098,6 +2176,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Half Circle Gauge.
+        /// </summary>
+        public static string HalfCircleGauge {
+            get {
+                return ResourceManager.GetString("HalfCircleGauge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to I have a second Fronius Gen24.
         /// </summary>
         public static string HaveTwoInverters {
@@ -2161,6 +2248,51 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to AUTO.
+        /// </summary>
+        public static string HvacAuto {
+            get {
+                return ResourceManager.GetString("HvacAuto", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ECO.
+        /// </summary>
+        public static string HvacEco {
+            get {
+                return ResourceManager.GetString("HvacEco", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hi Power.
+        /// </summary>
+        public static string HvacHiPower {
+            get {
+                return ResourceManager.GetString("HvacHiPower", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to LIMIT.
+        /// </summary>
+        public static string HvacLimit {
+            get {
+                return ResourceManager.GetString("HvacLimit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to POWER.
+        /// </summary>
+        public static string HvacMeritFeatureHeader {
+            get {
+                return ResourceManager.GetString("HvacMeritFeatureHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Automatically Cool or Heat.
         /// </summary>
         public static string HvacModeAuto {
@@ -2206,6 +2338,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Normal.
+        /// </summary>
+        public static string HvacNormal {
+            get {
+                return ResourceManager.GetString("HvacNormal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Import Bayernwerk imSys Excel File.
         /// </summary>
         public static string ImportBayernwerk {
@@ -2240,7 +2381,7 @@ namespace De.Hochstaetter.Fronius.Localization {
                 return ResourceManager.GetString("IncorrectData", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Incorrect OBIS code in cell C4 of Excel file.
         /// </summary>
@@ -2249,7 +2390,7 @@ namespace De.Hochstaetter.Fronius.Localization {
                 return ResourceManager.GetString("IncorrectObisCode", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Phase must be from 1 to 3.
         /// </summary>
@@ -2395,11 +2536,29 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Some text has been generated in &apos;{0}&apos; when {1} started. It will still appear in the original language until you restart the app..
+        /// </summary>
+        public static string LanguageChangeWarning {
+            get {
+                return ResourceManager.GetString("LanguageChangeWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Latency.
         /// </summary>
         public static string Latency {
             get {
                 return ResourceManager.GetString("Latency", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Linear Gauge.
+        /// </summary>
+        public static string LinearGauge {
+            get {
+                return ResourceManager.GetString("LinearGauge", resourceCulture);
             }
         }
         
@@ -2474,7 +2633,6 @@ namespace De.Hochstaetter.Fronius.Localization {
                 return ResourceManager.GetString("LoadBalancingSharedMaxCurrent", resourceCulture);
             }
         }
-        
         
         /// <summary>
         ///   Looks up a localized string similar to Load settings.
@@ -3341,6 +3499,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Note.
+        /// </summary>
+        public static string Note {
+            get {
+                return ResourceManager.GetString("Note", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Excel sheet has no valid rows.
         /// </summary>
         public static string NoValidCells {
@@ -3584,6 +3751,51 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Power Consumer.
+        /// </summary>
+        public static string PowerConsumer {
+            get {
+                return ResourceManager.GetString("PowerConsumer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Price components.
+        /// </summary>
+        public static string PriceComponents {
+            get {
+                return ResourceManager.GetString("PriceComponents", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Price offset consumption (cents).
+        /// </summary>
+        public static string PriceOffsetConsumption {
+            get {
+                return ResourceManager.GetString("PriceOffsetConsumption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Price service.
+        /// </summary>
+        public static string PriceService {
+            get {
+                return ResourceManager.GetString("PriceService", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Price surcharge consumption (%).
+        /// </summary>
+        public static string PriceSurchargeConsumption {
+            get {
+                return ResourceManager.GetString("PriceSurchargeConsumption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Priority.
         /// </summary>
         public static string Priority {
@@ -3762,7 +3974,6 @@ namespace De.Hochstaetter.Fronius.Localization {
                 return ResourceManager.GetString("ReactivePower", resourceCulture);
             }
         }
-        
         
         /// <summary>
         ///   Looks up a localized string similar to Reboot.
@@ -4107,6 +4318,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Smart Meter.
+        /// </summary>
+        public static string SmartMeter {
+            get {
+                return ResourceManager.GetString("SmartMeter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Smart Meter Details.
         /// </summary>
         public static string SmartMeterDetailsView {
@@ -4242,6 +4462,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Status.
+        /// </summary>
+        public static string Status {
+            get {
+                return ResourceManager.GetString("Status", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sum.
         /// </summary>
         public static string Sum {
@@ -4364,6 +4593,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Thursday_One {
             get {
                 return ResourceManager.GetString("Thursday_One", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Time zone.
+        /// </summary>
+        public static string TimeZone {
+            get {
+                return ResourceManager.GetString("TimeZone", resourceCulture);
             }
         }
         
@@ -4494,177 +4732,6 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Undo.
-        /// </summary>
-        public static string Undo {
-            get {
-                return ResourceManager.GetString("Undo", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Price service.
-        /// </summary>
-        public static string PriceService {
-            get {
-                return ResourceManager.GetString("PriceService", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Price surcharge consumption (%).
-        /// </summary>
-        public static string PriceSurchargeConsumption {
-            get {
-                return ResourceManager.GetString("PriceSurchargeConsumption", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Price offset consumption (cents).
-        /// </summary>
-        public static string PriceOffsetConsumption {
-            get {
-                return ResourceManager.GetString("PriceOffsetConsumption", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to V.A.T. rate (%).
-        /// </summary>
-        public static string VatRate {
-            get {
-                return ResourceManager.GetString("VatRate", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Price components.
-        /// </summary>
-        public static string PriceComponents {
-            get {
-                return ResourceManager.GetString("PriceComponents", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Component.
-        /// </summary>
-        public static string Component {
-            get {
-                return ResourceManager.GetString("Component", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Time zone.
-        /// </summary>
-        public static string TimeZone {
-            get {
-                return ResourceManager.GetString("TimeZone", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Encryption.
-        /// </summary>
-        public static string Encryption {
-            get {
-                return ResourceManager.GetString("Encryption", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Auth.
-        /// </summary>
-        public static string Auth {
-            get {
-                return ResourceManager.GetString("Auth", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Status.
-        /// </summary>
-        public static string Status {
-            get {
-                return ResourceManager.GetString("Status", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to POWER.
-        /// </summary>
-        public static string HvacMeritFeatureHeader {
-            get {
-                return ResourceManager.GetString("HvacMeritFeatureHeader", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to ECO.
-        /// </summary>
-        public static string HvacEco {
-            get {
-                return ResourceManager.GetString("HvacEco", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Normal.
-        /// </summary>
-        public static string HvacNormal {
-            get {
-                return ResourceManager.GetString("HvacNormal", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Hi Power.
-        /// </summary>
-        public static string HvacHiPower {
-            get {
-                return ResourceManager.GetString("HvacHiPower", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to LIMIT.
-        /// </summary>
-        public static string HvacLimit {
-            get {
-                return ResourceManager.GetString("HvacLimit", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to AUTO.
-        /// </summary>
-        public static string HvacAuto {
-            get {
-                return ResourceManager.GetString("HvacAuto", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to AC.
-        /// </summary>
-        public static string Ac {
-            get {
-                return ResourceManager.GetString("Ac", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to DC.
-        /// </summary>
-        public static string Dc {
-            get {
-                return ResourceManager.GetString("Dc", resourceCulture);
-            }
-        }
-
-        /// <summary>
         ///   Looks up a localized string similar to Home Automation Control Center UI Test.
         /// </summary>
         public static string UiTestTitle {
@@ -4672,76 +4739,13 @@ namespace De.Hochstaetter.Fronius.Localization {
                 return ResourceManager.GetString("UiTestTitle", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///   Looks up a localized string similar to Linear Gauge.
+        ///   Looks up a localized string similar to Undo.
         /// </summary>
-        public static string LinearGauge {
+        public static string Undo {
             get {
-                return ResourceManager.GetString("LinearGauge", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Half Circle Gauge.
-        /// </summary>
-        public static string HalfCircleGauge {
-            get {
-                return ResourceManager.GetString("HalfCircleGauge", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Consumption.
-        /// </summary>
-        public static string Consumption {
-            get {
-                return ResourceManager.GetString("Consumption", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Smart Meter.
-        /// </summary>
-        public static string SmartMeter {
-            get {
-                return ResourceManager.GetString("SmartMeter", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Power Consumer.
-        /// </summary>
-        public static string PowerConsumer {
-            get {
-                return ResourceManager.GetString("PowerConsumer", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to High is bad.
-        /// </summary>
-        public static string GaugeHighIsBad {
-            get {
-                return ResourceManager.GetString("GaugeHighIsBad", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Mid is good.
-        /// </summary>
-        public static string GaugeMidIsGood {
-            get {
-                return ResourceManager.GetString("GaugeMidIsGood", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Color all / Color up to value.
-        /// </summary>
-        public static string GaugeColorMode {
-            get {
-                return ResourceManager.GetString("GaugeColorMode", resourceCulture);
+                return ResourceManager.GetString("Undo", resourceCulture);
             }
         }
         
@@ -4850,6 +4854,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Vat {
             get {
                 return ResourceManager.GetString("Vat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to V.A.T. rate (%).
+        /// </summary>
+        public static string VatRate {
+            get {
+                return ResourceManager.GetString("VatRate", resourceCulture);
             }
         }
         
