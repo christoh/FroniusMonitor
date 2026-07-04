@@ -77,7 +77,9 @@ public partial class SettingsViewModel(
     [
         new() { DisplayName = Loc.MatchWindowsLanguage, Value = null },
         new() { DisplayName = GetCultureName("en"), Value = "en" },
+        new() { DisplayName = GetCultureName("fr"), Value = "fr" },
         new() { DisplayName = GetCultureName("it"), Value = "it" },
+        new() { DisplayName = GetCultureName("rm"), Value = "rm" },
         new() { DisplayName = GetCultureName("de"), Value = "de" },
         new() { DisplayName = GetCultureName("de-CH"), Value = "de-CH" },
         new() { DisplayName = GetCultureName("de-LI"), Value = "de-LI" },

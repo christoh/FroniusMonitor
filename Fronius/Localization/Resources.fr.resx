@@ -1,0 +1,1642 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Active" xml:space="preserve">
+    <value>Actif</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Erreur</value>
+  </data>
+  <data name="Inactive" xml:space="preserve">
+    <value>Inactif</value>
+  </data>
+  <data name="IncorrectData" xml:space="preserve">
+    <value>Réponse incorrecte du gestionnaire de données</value>
+  </data>
+  <data name="Inverter" xml:space="preserve">
+    <value>Onduleur</value>
+  </data>
+  <data name="NoSystemConnection" xml:space="preserve">
+    <value>Vous n'avez pas indiqué tous les paramètres de connexion de l'onduleur</value>
+  </data>
+  <data name="Sleeping" xml:space="preserve">
+    <value>En veille</value>
+  </data>
+  <data name="Standby" xml:space="preserve">
+    <value>Veille</value>
+  </data>
+  <data name="Starting" xml:space="preserve">
+    <value>Démarrage</value>
+  </data>
+  <data name="Unknown" xml:space="preserve">
+    <value>Inconnu</value>
+  </data>
+  <data name="Updating" xml:space="preserve">
+    <value>Mise à jour</value>
+  </data>
+  <data name="AppName" xml:space="preserve">
+    <value>Centre de contrôle domotique</value>
+  </data>
+  <data name="ProviderMeter" xml:space="preserve">
+    <value>Compteur fourni par votre gestionnaire de réseau de distribution</value>
+  </data>
+  <data name="Power" xml:space="preserve">
+    <value>Puissance</value>
+  </data>
+  <data name="Current" xml:space="preserve">
+    <value>Courant</value>
+  </data>
+  <data name="Voltage" xml:space="preserve">
+    <value>Tension</value>
+  </data>
+  <data name="More" xml:space="preserve">
+    <value>Plus</value>
+  </data>
+  <data name="ApparentPower" xml:space="preserve">
+    <value>Puissance apparente</value>
+  </data>
+  <data name="ActivePower" xml:space="preserve">
+    <value>Puissance active</value>
+  </data>
+  <data name="ReactivePower" xml:space="preserve">
+    <value>Puissance réactive</value>
+  </data>
+  <data name="PhaseVoltage" xml:space="preserve">
+    <value>Tension de phase</value>
+  </data>
+  <data name="LineVoltage" xml:space="preserve">
+    <value>Tension composée</value>
+  </data>
+  <data name="OutOfBalance" xml:space="preserve">
+    <value>Déséquilibre</value>
+  </data>
+  <data name="Energy" xml:space="preserve">
+    <value>Énergie</value>
+  </data>
+  <data name="AcCurrent" xml:space="preserve">
+    <value>Courant alternatif</value>
+  </data>
+  <data name="DcPower" xml:space="preserve">
+    <value>Puissance CC</value>
+  </data>
+  <data name="DcCurrent" xml:space="preserve">
+    <value>Courant continu</value>
+  </data>
+  <data name="DcVoltage" xml:space="preserve">
+    <value>Tension CC</value>
+  </data>
+  <data name="Efficiency" xml:space="preserve">
+    <value>Rendement</value>
+  </data>
+  <data name="On" xml:space="preserve">
+    <value>Marche</value>
+  </data>
+  <data name="Off" xml:space="preserve">
+    <value>Arrêt</value>
+  </data>
+  <data name="AccessDenied" xml:space="preserve">
+    <value>Accès refusé</value>
+  </data>
+  <data name="Temperature" xml:space="preserve">
+    <value>Température</value>
+  </data>
+  <data name="IncludeInverterPower" xml:space="preserve">
+    <value>Inclure la puissance de l'onduleur dans la consommation (mode Solar Web)</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Paramètres</value>
+  </data>
+  <data name="View" xml:space="preserve">
+    <value>_Affichage</value>
+  </data>
+  <data name="NoFritzBoxConnection" xml:space="preserve">
+    <value>Vous n'avez pas indiqué tous les paramètres de connexion Fritz!Box</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="Export" xml:space="preserve">
+    <value>Exporter</value>
+  </data>
+  <data name="SettingsFilter" xml:space="preserve">
+    <value>Fichiers de paramètres {0} (*.fms)|*.fms</value>
+  </data>
+  <data name="ExportSettings" xml:space="preserve">
+    <value>Exporter les paramètres</value>
+  </data>
+  <data name="Load" xml:space="preserve">
+    <value>Charger</value>
+  </data>
+  <data name="LoadSettings" xml:space="preserve">
+    <value>Charger les paramètres</value>
+  </data>
+  <data name="SolarPanels" xml:space="preserve">
+    <value>Panneaux solaires</value>
+  </data>
+  <data name="Temperatures" xml:space="preserve">
+    <value>Températures</value>
+  </data>
+  <data name="Misc" xml:space="preserve">
+    <value>Divers</value>
+  </data>
+  <data name="EventLog" xml:space="preserve">
+    <value>Journal des événements</value>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>Début</value>
+  </data>
+  <data name="End" xml:space="preserve">
+    <value>Fin</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Nom</value>
+  </data>
+  <data name="Severity" xml:space="preserve">
+    <value>Gravité</value>
+  </data>
+  <data name="GridPowerManagement" xml:space="preserve">
+    <value>Gestion de la puissance réseau</value>
+  </data>
+  <data name="BatteryChargingOptions" xml:space="preserve">
+    <value>Options de batterie</value>
+  </data>
+  <data name="Undo" xml:space="preserve">
+    <value>Défaire</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+    <value>Appliquer</value>
+  </data>
+  <data name="InverterCommError" xml:space="preserve">
+    <value>L'onduleur n'a pas accepté les paramètres : {0}</value>
+  </data>
+  <data name="InverterCommReadError" xml:space="preserve">
+    <value>Impossible de lire les données de l'onduleur : {0}</value>
+  </data>
+  <data name="Warning" xml:space="preserve">
+    <value>Avertissement</value>
+  </data>
+  <data name="NoSettingsChanged" xml:space="preserve">
+    <value>Aucun paramètre n'a été modifié</value>
+  </data>
+  <data name="EnableBattery" xml:space="preserve">
+    <value>Activer la batterie</value>
+  </data>
+  <data name="CalibrateBattery" xml:space="preserve">
+    <value>Calibrer la batterie</value>
+  </data>
+  <data name="MeterAddress" xml:space="preserve">
+    <value>Adresse du compteur</value>
+  </data>
+  <data name="MeterAddressError" xml:space="preserve">
+    <value>L'adresse du compteur doit être comprise entre 1 et 247</value>
+  </data>
+  <data name="SunspecAddressError" xml:space="preserve">
+    <value>L'adresse SunSpec doit être comprise entre 1 et 255</value>
+  </data>
+  <data name="ModbusSettings" xml:space="preserve">
+    <value>Paramètres Modbus</value>
+  </data>
+  <data name="ModbusInterfaceRole_Disabled" xml:space="preserve">
+    <value>Désactivé</value>
+  </data>
+  <data name="ModbusInterfaceRole_Master" xml:space="preserve">
+    <value>Maître</value>
+  </data>
+  <data name="ModbusInterfaceRole_Slave" xml:space="preserve">
+    <value>Esclave</value>
+  </data>
+  <data name="ModbusParity_Even" xml:space="preserve">
+    <value>Paire</value>
+  </data>
+  <data name="ModbusParity_Odd" xml:space="preserve">
+    <value>Impaire</value>
+  </data>
+  <data name="ModbusParity_None" xml:space="preserve">
+    <value>Aucune</value>
+  </data>
+  <data name="SunspecMode_Float" xml:space="preserve">
+    <value>Virgule flottante</value>
+  </data>
+  <data name="SunspecMode_Int" xml:space="preserve">
+    <value>Entier + facteur d'échelle</value>
+  </data>
+  <data name="RtuModes" xml:space="preserve">
+    <value>Modes d'interface RTU</value>
+  </data>
+  <data name="Rtu0Mode" xml:space="preserve">
+    <value>Mode RTU 0</value>
+  </data>
+  <data name="Rtu1Mode" xml:space="preserve">
+    <value>Mode RTU 1</value>
+  </data>
+  <data name="RtuSlaveSettings" xml:space="preserve">
+    <value>Paramètres RTU esclave Modbus</value>
+  </data>
+  <data name="BaudRate" xml:space="preserve">
+    <value>Débit en bauds</value>
+  </data>
+  <data name="Parity" xml:space="preserve">
+    <value>Parité</value>
+  </data>
+  <data name="ModbusTcpSettings" xml:space="preserve">
+    <value>Paramètres TCP esclave Modbus</value>
+  </data>
+  <data name="EnableModbusTcp" xml:space="preserve">
+    <value>Activer l'esclave Modbus via TCP</value>
+  </data>
+  <data name="AllowInverterControlOverModbusTcp" xml:space="preserve">
+    <value>Autoriser le contrôle de l'onduleur via TCP</value>
+  </data>
+  <data name="RestrictInverterControlOverModbusTcp" xml:space="preserve">
+    <value>Restreindre le contrôle de l'onduleur via TCP</value>
+  </data>
+  <data name="AllowIp" xml:space="preserve">
+    <value>Autoriser le contrôle uniquement depuis l'adresse IP</value>
+  </data>
+  <data name="TcpPort" xml:space="preserve">
+    <value>Port TCP</value>
+  </data>
+  <data name="CommonModbusSlaveSettings" xml:space="preserve">
+    <value>Paramètres communs de l'esclave Modbus</value>
+  </data>
+  <data name="SunspecMode" xml:space="preserve">
+    <value>Mode SunSpec</value>
+  </data>
+  <data name="PleaseCorrectErrors" xml:space="preserve">
+    <value>Veuillez corriger les erreurs suivantes</value>
+  </data>
+  <data name="MustBeIpv4Address" xml:space="preserve">
+    <value>L'adresse IP doit être une adresse IPv4 valide</value>
+  </data>
+  <data name="MustBePercent" xml:space="preserve">
+    <value>La valeur saisie doit être un pourcentage entier de 0 à 100</value>
+  </data>
+  <data name="MustBeBetween" xml:space="preserve">
+    <value>{0} doit être compris entre {1:N0} et {2:N0}</value>
+  </data>
+  <data name="BatteryIsAcCoupled" xml:space="preserve">
+    <value>La batterie est couplée en CA</value>
+  </data>
+  <data name="BackupConfiguration" xml:space="preserve">
+    <value>Configuration de secours</value>
+  </data>
+  <data name="Sunday_One" xml:space="preserve">
+    <value>D</value>
+  </data>
+  <data name="Monday_One" xml:space="preserve">
+    <value>L</value>
+  </data>
+  <data name="Tuesday_One" xml:space="preserve">
+    <value>M</value>
+  </data>
+  <data name="Wednesday_One" xml:space="preserve">
+    <value>M</value>
+  </data>
+  <data name="Thursday_One" xml:space="preserve">
+    <value>J</value>
+  </data>
+  <data name="Friday_One" xml:space="preserve">
+    <value>V</value>
+  </data>
+  <data name="Saturday_One" xml:space="preserve">
+    <value>S</value>
+  </data>
+  <data name="ChargingRuleType_MinimumCharge" xml:space="preserve">
+    <value>Puissance de charge min.</value>
+  </data>
+  <data name="ChargingRuleType_MaximumCharge" xml:space="preserve">
+    <value>Puissance de charge max.</value>
+  </data>
+  <data name="ChargingRuleType_MaximumDischarge" xml:space="preserve">
+    <value>Puissance de décharge max.</value>
+  </data>
+  <data name="ChargingRuleType_MinimumDischarge" xml:space="preserve">
+    <value>Puissance de décharge min.</value>
+  </data>
+  <data name="DeleteRule" xml:space="preserve">
+    <value>Supprimer la règle</value>
+  </data>
+  <data name="AddRule" xml:space="preserve">
+    <value>Ajouter une règle</value>
+  </data>
+  <data name="RuleTooltip" xml:space="preserve">
+    <value>Utilisez le bouton droit de la souris pour ajouter ou supprimer des règles.</value>
+  </data>
+  <data name="InvalidChargingRuleTime" xml:space="preserve">
+    <value>{0} ne correspond pas à une heure entre 00:00 et 24:00</value>
+  </data>
+  <data name="EndBeforeStart" xml:space="preserve">
+    <value>« {0} » : l'heure de début est postérieure à l'heure de fin</value>
+  </data>
+  <data name="ChargingRuleConflict" xml:space="preserve">
+    <value>La règle de charge « {0} » est en conflit avec « {1} »</value>
+  </data>
+  <data name="SettingsSavedToInverter" xml:space="preserve">
+    <value>Les paramètres ont été envoyés à l'onduleur.</value>
+  </data>
+  <data name="Gen24InverterHeader" xml:space="preserve">
+    <value>Onduleur Fronius Gen24</value>
+  </data>
+  <data name="Username" xml:space="preserve">
+    <value>Nom d'utilisateur</value>
+  </data>
+  <data name="Url" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Mot de passe</value>
+  </data>
+  <data name="EnableFritzBox" xml:space="preserve">
+    <value>Contrôler les appareils domotiques AVM Fritz!Box</value>
+  </data>
+  <data name="InvalidParameters" xml:space="preserve">
+    <value>Paramètres non valides</value>
+  </data>
+  <data name="MatchWindowsLanguage" xml:space="preserve">
+    <value>Utiliser la langue de Windows si possible</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Langue</value>
+  </data>
+  <data name="AppSettings" xml:space="preserve">
+    <value>Paramètres de l'application</value>
+  </data>
+  <data name="EnergyFlow" xml:space="preserve">
+    <value>Flux d'énergie</value>
+  </data>
+  <data name="Events" xml:space="preserve">
+    <value>Événements</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseNoChargeCtrlData" xml:space="preserve">
+    <value>Pause (données insuffisantes)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseTemperatureLimit" xml:space="preserve">
+    <value>Pause (limite de température dépassée)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseAccessControlWait" xml:space="preserve">
+    <value>Pause (non autorisé)</value>
+  </data>
+  <data name="ModelStatus_ChargingBecauseForceStateOn" xml:space="preserve">
+    <value>Charge (forcée)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseForceStateOff" xml:space="preserve">
+    <value>Pause (forcée)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseScheduler" xml:space="preserve">
+    <value>Pause (programmée)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseEnergyLimit" xml:space="preserve">
+    <value>Pause (limite d'énergie)</value>
+  </data>
+  <data name="ModelStatus_ChargingBecauseAwattarPriceLow" xml:space="preserve">
+    <value>Charge (prix de l'énergie bas)</value>
+  </data>
+  <data name="ModelStatus_ChargingBecauseAutomaticStopTestCharging" xml:space="preserve">
+    <value>Charge (test des capacités du véhicule)</value>
+  </data>
+  <data name="ModelStatus_ChargingBecauseAutomaticStopNotEnoughTime" xml:space="preserve">
+    <value>Charge (temps insuffisant avant le prochain trajet)</value>
+  </data>
+  <data name="ModelStatus_ChargingBecauseAutomaticStop" xml:space="preserve">
+    <value>Charge (prochain trajet)</value>
+  </data>
+  <data name="ModelStatus_ChargingBecauseAutomaticStopNoClock" xml:space="preserve">
+    <value>Charge (prochain trajet, sans horloge)</value>
+  </data>
+  <data name="ModelStatus_ChargingBecausePvSurplus" xml:space="preserve">
+    <value>Charge (surplus PV)</value>
+  </data>
+  <data name="ModelStatus_ChargingBecauseFallbackGoEDefault" xml:space="preserve">
+    <value>Charge (Go-E par défaut)</value>
+  </data>
+  <data name="ModelStatus_ChargingBecauseFallbackGoEScheduler" xml:space="preserve">
+    <value>Charge (programmateur Go-E)</value>
+  </data>
+  <data name="ModelStatus_ChargingBecauseFallbackDefault" xml:space="preserve">
+    <value>Charge (pleine puissance)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseFallbackGoEAwattar" xml:space="preserve">
+    <value>Pause (prix de l'énergie Go-E)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseFallbackAwattar" xml:space="preserve">
+    <value>Pause (Eco)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseFallbackAutomaticStop" xml:space="preserve">
+    <value>Pause (prochain trajet)</value>
+  </data>
+  <data name="ModelStatus_ChargingBecauseCarCompatibilityKeepAlive" xml:space="preserve">
+    <value>Charge (maintien de compatibilité du véhicule)</value>
+  </data>
+  <data name="ModelStatus_ChargingBecauseChargePauseNotAllowed" xml:space="preserve">
+    <value>Charge (pause non autorisée)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseSimulateUnplugging" xml:space="preserve">
+    <value>Pause (débranchement simulé)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecausePhaseSwitch" xml:space="preserve">
+    <value>Pause (commutation de phase)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseMinPauseDuration" xml:space="preserve">
+    <value>Pause (durée de pause minimale)</value>
+  </data>
+  <data name="OpenChargingLog" xml:space="preserve">
+    <value>Afficher le journal de charge</value>
+  </data>
+  <data name="NoWattPilot" xml:space="preserve">
+    <value>Aucun Wattpilot trouvé</value>
+  </data>
+  <data name="BaseSettings" xml:space="preserve">
+    <value>Paramètres de base</value>
+  </data>
+  <data name="WattPilotName" xml:space="preserve">
+    <value>Nom du Wattpilot</value>
+  </data>
+  <data name="MaximumChargingCurrent" xml:space="preserve">
+    <value>Courant de charge maximal</value>
+  </data>
+  <data name="RequireRfidAuth" xml:space="preserve">
+    <value>Exiger une carte RFID pour charger</value>
+  </data>
+  <data name="CableLockBehavior_Normal" xml:space="preserve">
+    <value>Par défaut</value>
+  </data>
+  <data name="CableLockBehavior_AutoUnlock" xml:space="preserve">
+    <value>Toujours déverrouiller hors charge</value>
+  </data>
+  <data name="CableLockBehavior_AlwaysLock" xml:space="preserve">
+    <value>Ne jamais déverrouiller</value>
+  </data>
+  <data name="CableLockBehavior" xml:space="preserve">
+    <value>Comportement de déverrouillage du câble</value>
+  </data>
+  <data name="UnlockCableOnPowerFailure" xml:space="preserve">
+    <value>Déverrouiller le câble en cas de coupure de courant</value>
+  </data>
+  <data name="EnableApiLink" xml:space="preserve">
+    <value>Activer l'API à</value>
+  </data>
+  <data name="ApiKey" xml:space="preserve">
+    <value>Clé API</value>
+  </data>
+  <data name="DisableProtectiveEarth" xml:space="preserve">
+    <value>Désactiver la vérification de la mise à la terre</value>
+  </data>
+  <data name="ChargingLogic_None" xml:space="preserve">
+    <value>Pleine puissance</value>
+  </data>
+  <data name="ChargingLogic_NextTrip" xml:space="preserve">
+    <value>Prochain trajet</value>
+  </data>
+  <data name="ChargingLogic" xml:space="preserve">
+    <value>Mode de charge</value>
+  </data>
+  <data name="EcoSettings" xml:space="preserve">
+    <value>Paramètres Eco</value>
+  </data>
+  <data name="PvSurplusEnabled" xml:space="preserve">
+    <value>Utiliser le surplus PV</value>
+  </data>
+  <data name="AwattarEnabled" xml:space="preserve">
+    <value>Utiliser le prix dynamique de l'énergie</value>
+  </data>
+  <data name="AwattarCountry_Austria" xml:space="preserve">
+    <value>Autriche</value>
+  </data>
+  <data name="AwattarCountry" xml:space="preserve">
+    <value>Région tarifaire</value>
+  </data>
+  <data name="MaxEnergyPrice" xml:space="preserve">
+    <value>Prix net maximal de l'énergie</value>
+  </data>
+  <data name="PvSurplusBatteryLevel" xml:space="preserve">
+    <value>SoC minimal pour la charge avec surplus PV</value>
+  </data>
+  <data name="OhmPilotTemperatureLimit" xml:space="preserve">
+    <value>Température minimale de l'Ohmpilot</value>
+  </data>
+  <data name="PvSurplusPowerThreshold" xml:space="preserve">
+    <value>Puissance de démarrage du surplus PV</value>
+  </data>
+  <data name="NoFeedIn" xml:space="preserve">
+    <value>Le PV n'injecte pas dans le réseau</value>
+  </data>
+  <data name="NoFeedIn_ToolTip" xml:space="preserve">
+    <value>Si votre installation PV n'injecte pas dans le réseau, activez ce paramètre.</value>
+  </data>
+  <data name="EcoRoundingMode" xml:space="preserve">
+    <value>Arrondi du surplus PV</value>
+  </data>
+  <data name="EcoRoundingMode_PreferFromGrid" xml:space="preserve">
+    <value>Préférer la consommation</value>
+  </data>
+  <data name="EcoRoundingMode_NoPreference" xml:space="preserve">
+    <value>Aucune préférence</value>
+  </data>
+  <data name="EcoRoundingMode_PreferToGrid" xml:space="preserve">
+    <value>Préférer l'injection</value>
+  </data>
+  <data name="CarSettings" xml:space="preserve">
+    <value>Paramètres du véhicule</value>
+  </data>
+  <data name="MinimumChargingCurrent" xml:space="preserve">
+    <value>Courant de charge minimal</value>
+  </data>
+  <data name="MinimumChargingCurrent_ToolTip" xml:space="preserve">
+    <value>La plupart des véhicules acceptent 6 A. Certains en nécessitent toutefois davantage. Réglez selon les spécifications techniques de votre véhicule.</value>
+  </data>
+  <data name="MinimumChargingInterval" xml:space="preserve">
+    <value>Intervalle de charge forcée</value>
+  </data>
+  <data name="Minutes" xml:space="preserve">
+    <value>minutes</value>
+  </data>
+  <data name="RequiresChargingInterval" xml:space="preserve">
+    <value>Le véhicule nécessite un intervalle de charge</value>
+  </data>
+  <data name="AllowChargingPause" xml:space="preserve">
+    <value>Autoriser la pause de charge</value>
+  </data>
+  <data name="SimulateUnplugging" xml:space="preserve">
+    <value>Simuler le débranchement</value>
+  </data>
+  <data name="MinimumPauseDuration" xml:space="preserve">
+    <value>Durée de pause minimale</value>
+  </data>
+  <data name="MinimumChargingTime" xml:space="preserve">
+    <value>Durée de charge minimale</value>
+  </data>
+  <data name="PhaseSwitchMode" xml:space="preserve">
+    <value>Mode de commutation de phase</value>
+  </data>
+  <data name="PhaseSwitchMode_Auto" xml:space="preserve">
+    <value>Automatique</value>
+  </data>
+  <data name="PhaseSwitchMode_Phase1" xml:space="preserve">
+    <value>Une seule phase</value>
+  </data>
+  <data name="PhaseSwitchMode_Phases3" xml:space="preserve">
+    <value>Trois phases uniquement</value>
+  </data>
+  <data name="PhaseSwitchPower" xml:space="preserve">
+    <value>Puissance de commutation de phase</value>
+  </data>
+  <data name="MinimumTimeBetweenPhaseSwitches" xml:space="preserve">
+    <value>Temps minimal entre les commutations de phase</value>
+  </data>
+  <data name="PhaseSwitchTriggerTime" xml:space="preserve">
+    <value>Latence de commutation de phase</value>
+  </data>
+  <data name="ForcedCharge" xml:space="preserve">
+    <value>Charge forcée</value>
+  </data>
+  <data name="ForcedCharge_Default" xml:space="preserve">
+    <value>Ne pas forcer</value>
+  </data>
+  <data name="ForcedCharge_ForcedOn" xml:space="preserve">
+    <value>Forcer la charge</value>
+  </data>
+  <data name="ForcedCharge_ForcedOff" xml:space="preserve">
+    <value>Forcer la pause</value>
+  </data>
+  <data name="ControlWattPilot" xml:space="preserve">
+    <value>Contrôler le Wattpilot connecté à l'onduleur</value>
+  </data>
+  <data name="Guest" xml:space="preserve">
+    <value>Invité</value>
+  </data>
+  <data name="NoRfidCard" xml:space="preserve">
+    <value>Aucune carte RFID</value>
+  </data>
+  <data name="AuthCurrentUser" xml:space="preserve">
+    <value>Authentifier le véhicule</value>
+  </data>
+  <data name="Reboot" xml:space="preserve">
+    <value>Redémarrer</value>
+  </data>
+  <data name="ButtonEnableCharging" xml:space="preserve">
+    <value>Autoriser la sélection du niveau de courant via le bouton physique</value>
+  </data>
+  <data name="ButtonEnableModeSwitch" xml:space="preserve">
+    <value>Activer le changement de mode via le bouton physique</value>
+  </data>
+  <data name="WattPilotTimeout" xml:space="preserve">
+    <value>Le Wattpilot n'a pas répondu dans les {0} secondes</value>
+  </data>
+  <data name="NotAMemberOf" xml:space="preserve">
+    <value>N'est pas membre de {0}</value>
+  </data>
+  <data name="SentToWattPilot" xml:space="preserve">
+    <value>Les paramètres ont été envoyés au Wattpilot.</value>
+  </data>
+  <data name="AbsoluteMaximumChargingCurrent" xml:space="preserve">
+    <value>Limite de courant de charge</value>
+  </data>
+  <data name="NextTripTime" xml:space="preserve">
+    <value>Heure du prochain trajet</value>
+  </data>
+  <data name="NextTripEnergyToCharge" xml:space="preserve">
+    <value>Énergie minimale pour le prochain trajet</value>
+  </data>
+  <data name="NextTripRemainInEcoMode" xml:space="preserve">
+    <value>Rester en mode Eco</value>
+  </data>
+  <data name="NoGen24Symo" xml:space="preserve">
+    <value>Impossible de vérifier que l'onduleur est un GEN24 Symo</value>
+  </data>
+  <data name="UtcBug" xml:space="preserve">
+    <value>En raison d'un bug du micrologiciel 1.19.7-1, l'heure des règles de charge de la batterie est en UTC. Envisagez une mise à niveau vers 1.21.6-1 ou supérieur.</value>
+  </data>
+  <data name="NeutralWire" xml:space="preserve">
+    <value>Fil neutre</value>
+  </data>
+  <data name="WifiSsid" xml:space="preserve">
+    <value>Nom du Wi-Fi</value>
+  </data>
+  <data name="WattPilotWifiPassword" xml:space="preserve">
+    <value>Mot de passe Wi-Fi</value>
+  </data>
+  <data name="IsWifiClientEnabled" xml:space="preserve">
+    <value>Activer le client Wi-Fi</value>
+  </data>
+  <data name="DefaultPropertyDisplayName" xml:space="preserve">
+    <value>Valeur</value>
+  </data>
+  <data name="MaximumChargingCurrentPhase1" xml:space="preserve">
+    <value>Limite de courant de charge sur une seule phase</value>
+  </data>
+  <data name="HiddenWifi" xml:space="preserve">
+    <value>(Wi-Fi masqué)</value>
+  </data>
+  <data name="Channel" xml:space="preserve">
+    <value>Canal</value>
+  </data>
+  <data name="CipherP" xml:space="preserve">
+    <value>Chiffre P</value>
+  </data>
+  <data name="CipherG" xml:space="preserve">
+    <value>Chiffre G</value>
+  </data>
+  <data name="ScannedWifis" xml:space="preserve">
+    <value>Wi-Fi</value>
+  </data>
+  <data name="UpdateRate" xml:space="preserve">
+    <value>Fréquence de mise à jour</value>
+  </data>
+  <data name="Second" xml:space="preserve">
+    <value>seconde</value>
+  </data>
+  <data name="Seconds" xml:space="preserve">
+    <value>secondes</value>
+  </data>
+  <data name="PhaseMap" xml:space="preserve">
+    <value>Affectation des phases</value>
+  </data>
+  <data name="IsInServiceMode" xml:space="preserve">
+    <value>Mode maintenance de la batterie</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>Utilisateur</value>
+  </data>
+  <data name="ToshibaAcHeader" xml:space="preserve">
+    <value>Climatiseurs Toshiba</value>
+  </data>
+  <data name="EnableToshibaAc" xml:space="preserve">
+    <value>Contrôler les systèmes de climatisation Toshiba</value>
+  </data>
+  <data name="ToshibaHvac" xml:space="preserve">
+    <value>CVC Toshiba</value>
+  </data>
+  <data name="ToshibaHvacUrlTooltip" xml:space="preserve">
+    <value>Vous ne devriez pas modifier l'URL sauf si Toshiba change le nom d'hôte</value>
+  </data>
+  <data name="Protocol_Amqp_ToolTip" xml:space="preserve">
+    <value>Recommandé pour un usage général. Contrairement à MQTT, il prend en charge le rejet et l'abandon des messages.</value>
+  </data>
+  <data name="Protocol_Mqtt_ToolTip" xml:space="preserve">
+    <value>MQTT est plus léger qu'AMQP mais possède moins de fonctionnalités. Toutefois, si votre connexion Internet est instable, vous risquez de perdre moins de messages.</value>
+  </data>
+  <data name="Protocol_Http1_ToolTip" xml:space="preserve">
+    <value>HTTP 1.1 peut être nécessaire si la connexion Internet a des règles de pare-feu très strictes.</value>
+  </data>
+  <data name="LiveUpdateProtocol" xml:space="preserve">
+    <value>Protocole de mise à jour en direct</value>
+  </data>
+  <data name="TunnelStrategy" xml:space="preserve">
+    <value>Stratégie de tunnel</value>
+  </data>
+  <data name="TunnelMode_NoTunnel" xml:space="preserve">
+    <value>Pas de tunnel</value>
+  </data>
+  <data name="TunnelMode_Auto_ToolTip" xml:space="preserve">
+    <value>Essayer d'abord le protocole natif. En cas d'échec, essayer le tunnel via HTTP et web sockets. Si la connexion Internet est restreinte, une connexion peut tout de même être établie.</value>
+  </data>
+  <data name="TunnelMode_Websocket_ToolTip" xml:space="preserve">
+    <value>Toujours utiliser un tunnel web via HTTP et web socket. Si vous savez que votre connexion Internet est restreinte et bloque le protocole natif, cela évite de perdre du temps à essayer le protocole natif.</value>
+  </data>
+  <data name="TunnelMode_NoTunnel_ToolTip" xml:space="preserve">
+    <value>Si le pare-feu bloque le protocole natif, vous n'obtiendrez pas de connexion avec ce paramètre.</value>
+  </data>
+  <data name="HvacModeAuto" xml:space="preserve">
+    <value>Refroidir ou chauffer automatiquement</value>
+  </data>
+  <data name="HvacModeCooling" xml:space="preserve">
+    <value>Refroidissement uniquement</value>
+  </data>
+  <data name="HvacModeDrying" xml:space="preserve">
+    <value>Déshumidification</value>
+  </data>
+  <data name="HvacModeHeating" xml:space="preserve">
+    <value>Chauffage uniquement</value>
+  </data>
+  <data name="HvacModeFanOnly" xml:space="preserve">
+    <value>Ventilation uniquement</value>
+  </data>
+  <data name="IsAlreadyRunning" xml:space="preserve">
+    <value>{0} est déjà en cours d'exécution.</value>
+  </data>
+  <data name="DriftsFile" xml:space="preserve">
+    <value>Fichier de dérive</value>
+  </data>
+  <data name="Change" xml:space="preserve">
+    <value>Modifier</value>
+  </data>
+  <data name="SelectDriftsFile" xml:space="preserve">
+    <value>Sélectionnez l'emplacement et le nom du fichier de dérive</value>
+  </data>
+  <data name="OpTime" xml:space="preserve">
+    <value>Durées de fonct.</value>
+  </data>
+  <data name="SiteType_ProduceOnly" xml:space="preserve">
+    <value>Aucun compteur</value>
+  </data>
+  <data name="SiteType_Meter" xml:space="preserve">
+    <value>Compteur au réseau</value>
+  </data>
+  <data name="SiteType_VagueMeter" xml:space="preserve">
+    <value>Compteur à la charge</value>
+  </data>
+  <data name="SiteType_BiDirectional" xml:space="preserve">
+    <value>Avec batterie CC</value>
+  </data>
+  <data name="SiteType_AcCoupled" xml:space="preserve">
+    <value>Avec batterie CA</value>
+  </data>
+  <data name="CouldNotChangeStandBy" xml:space="preserve">
+    <value>Impossible de modifier l'état de veille : {0}</value>
+  </data>
+  <data name="StandbyWarning" xml:space="preserve">
+    <value>Voulez-vous vraiment mettre cet onduleur en veille ?</value>
+  </data>
+  <data name="DcRelativePower" xml:space="preserve">
+    <value>Puissance CC %</value>
+  </data>
+  <data name="InverterSettings" xml:space="preserve">
+    <value>Paramètres de l'onduleur</value>
+  </data>
+  <data name="SynchronizeTime" xml:space="preserve">
+    <value>Utiliser la synchronisation de l'heure NTP</value>
+  </data>
+  <data name="HaveTwoInverters" xml:space="preserve">
+    <value>J'ai un deuxième Fronius Gen24</value>
+  </data>
+  <data name="InverterTimeout" xml:space="preserve">
+    <value>Délai de lecture de l'onduleur dépassé</value>
+  </data>
+  <data name="NetMask" xml:space="preserve">
+    <value>Masque de sous-réseau</value>
+  </data>
+  <data name="Gateway" xml:space="preserve">
+    <value>Passerelle</value>
+  </data>
+  <data name="Sum" xml:space="preserve">
+    <value>Somme</value>
+  </data>
+  <data name="Battery" xml:space="preserve">
+    <value>Batterie</value>
+  </data>
+  <data name="Loss" xml:space="preserve">
+    <value>Pertes</value>
+  </data>
+  <data name="Grid" xml:space="preserve">
+    <value>Réseau</value>
+  </data>
+  <data name="SelfConsumptionShort" xml:space="preserve">
+    <value>Cons.</value>
+  </data>
+  <data name="Latency" xml:space="preserve">
+    <value>Latence</value>
+  </data>
+  <data name="Ambient" xml:space="preserve">
+    <value>Ambiante</value>
+  </data>
+  <data name="AcModule" xml:space="preserve">
+    <value>Module CA</value>
+  </data>
+  <data name="DcModule" xml:space="preserve">
+    <value>Module CC</value>
+  </data>
+  <data name="BatteryModule" xml:space="preserve">
+    <value>Mod. batt.</value>
+  </data>
+  <data name="BackupOpTime" xml:space="preserve">
+    <value>Secours</value>
+  </data>
+  <data name="Rectifier" xml:space="preserve">
+    <value>Redresseur</value>
+  </data>
+  <data name="AverageShort" xml:space="preserve">
+    <value>Moyenne</value>
+  </data>
+  <data name="SelfSufficiencyShort" xml:space="preserve">
+    <value>Autosuf.</value>
+  </data>
+  <data name="DcLink" xml:space="preserve">
+    <value>Bus CC</value>
+  </data>
+  <data name="Visualization" xml:space="preserve">
+    <value>Visualisation</value>
+  </data>
+  <data name="Reset" xml:space="preserve">
+    <value>Réinitialiser</value>
+  </data>
+  <data name="Choose" xml:space="preserve">
+    <value>Choisir</value>
+  </data>
+  <data name="SolarPanelLayout" xml:space="preserve">
+    <value>Disposition des panneaux solaires</value>
+  </data>
+  <data name="ChoosePanelLayoutFile" xml:space="preserve">
+    <value>Sélectionner un fichier de disposition des panneaux solaires</value>
+  </data>
+  <data name="FilterAllFiles" xml:space="preserve">
+    <value>|Tous les fichiers (*.*)|*</value>
+  </data>
+  <data name="IncorrectPhaseNumber" xml:space="preserve">
+    <value>La phase doit être comprise entre 1 et 3</value>
+  </data>
+  <data name="ScAddress" xml:space="preserve">
+    <value>Adresse du string control (Tauro uniquement)</value>
+  </data>
+  <data name="FallbackCurrentError" xml:space="preserve">
+    <value>{0} doit être compris entre 6 et 32 ou 0</value>
+  </data>
+  <data name="LoadBalancingPriority_Low" xml:space="preserve">
+    <value>Faible</value>
+  </data>
+  <data name="LoadBalancingPriority_Medium" xml:space="preserve">
+    <value>Moyenne</value>
+  </data>
+  <data name="LoadBalancingPriority_High" xml:space="preserve">
+    <value>Élevée</value>
+  </data>
+  <data name="EnableLoadBalancing" xml:space="preserve">
+    <value>Activer l'équilibrage de charge</value>
+  </data>
+  <data name="LoadBalancing" xml:space="preserve">
+    <value>Équilibrage de charge</value>
+  </data>
+  <data name="Priority" xml:space="preserve">
+    <value>Priorité</value>
+  </data>
+  <data name="LoadBalancingSharedMaxCurrent" xml:space="preserve">
+    <value>Courant de charge maximal pour tous les Wattpilots</value>
+  </data>
+  <data name="MaximumCurrentDnoLine" xml:space="preserve">
+    <value>Courant maximal pour la ligne GRD</value>
+  </data>
+  <data name="MaximumFallbackCurrent" xml:space="preserve">
+    <value>Courant de charge maximal en cas de coupure de courant ou de réseau</value>
+  </data>
+  <data name="AwattarCountry_GermanyLuxembourg" xml:space="preserve">
+    <value>Allemagne / Luxembourg</value>
+  </data>
+  <data name="AwattarCountry_Switzerland" xml:space="preserve">
+    <value>Suisse / Liechtenstein</value>
+  </data>
+  <data name="AwattarCountry_Belgium" xml:space="preserve">
+    <value>Belgique</value>
+  </data>
+  <data name="AwattarCountry_Denmark1" xml:space="preserve">
+    <value>Danemark zone 1</value>
+  </data>
+  <data name="AwattarCountry_Denmark2" xml:space="preserve">
+    <value>Danemark zone 2</value>
+  </data>
+  <data name="AwattarCountry_DenmarkTibber1" xml:space="preserve">
+    <value>Danemark zone 1 Tibber</value>
+  </data>
+  <data name="AwattarCountry_DenmarkTibber2" xml:space="preserve">
+    <value>Danemark zone 2 Tibber</value>
+  </data>
+  <data name="AwattarCountry_Estonia" xml:space="preserve">
+    <value>Estonie</value>
+  </data>
+  <data name="AwattarCountry_Finland" xml:space="preserve">
+    <value>Finlande</value>
+  </data>
+  <data name="AwattarCountry_FinlandTibber" xml:space="preserve">
+    <value>Finlande Tibber</value>
+  </data>
+  <data name="AwattarCountry_Greece" xml:space="preserve">
+    <value>Grèce</value>
+  </data>
+  <data name="NewFirmwareAvailable" xml:space="preserve">
+    <value>Le nouveau micrologiciel {0} est disponible. Votre micrologiciel actuel est {1}.</value>
+  </data>
+  <data name="AwattarCountry_Croatia" xml:space="preserve">
+    <value>Croatie</value>
+  </data>
+  <data name="AwattarCountry_Latvia" xml:space="preserve">
+    <value>Lettonie</value>
+  </data>
+  <data name="AwattarCountry_Lithuania" xml:space="preserve">
+    <value>Lituanie</value>
+  </data>
+  <data name="AwattarCountry_Netherlands" xml:space="preserve">
+    <value>Pays-Bas</value>
+  </data>
+  <data name="AwattarCountry_Poland" xml:space="preserve">
+    <value>Pologne</value>
+  </data>
+  <data name="AwattarCountry_Romania" xml:space="preserve">
+    <value>Roumanie</value>
+  </data>
+  <data name="AwattarCountry_Serbia" xml:space="preserve">
+    <value>Serbie</value>
+  </data>
+  <data name="AwattarCountry_Slovakia" xml:space="preserve">
+    <value>Slovaquie</value>
+  </data>
+  <data name="AwattarCountry_Slovenia" xml:space="preserve">
+    <value>Slovénie</value>
+  </data>
+  <data name="AwattarCountry_Spain" xml:space="preserve">
+    <value>Espagne</value>
+  </data>
+  <data name="AwattarCountry_Czechia" xml:space="preserve">
+    <value>Tchéquie</value>
+  </data>
+  <data name="AwattarCountry_Hungary" xml:space="preserve">
+    <value>Hongrie</value>
+  </data>
+  <data name="AwattarCountry_ItalyCalabria" xml:space="preserve">
+    <value>Italie (Calabre)</value>
+  </data>
+  <data name="AwattarCountry_ItalyCenterNorth" xml:space="preserve">
+    <value>Italie (Centre-Nord)</value>
+  </data>
+  <data name="AwattarCountry_ItalyCenterSouth" xml:space="preserve">
+    <value>Italie (Centre-Sud)</value>
+  </data>
+  <data name="AwattarCountry_ItalyNorth" xml:space="preserve">
+    <value>Italie (Nord)</value>
+  </data>
+  <data name="AwattarCountry_ItalySacoAc" xml:space="preserve">
+    <value>Italie (SACO AC)</value>
+  </data>
+  <data name="AwattarCountry_ItalySacoDc" xml:space="preserve">
+    <value>Italie (SACO DC)</value>
+  </data>
+  <data name="AwattarCountry_ItalySardinia" xml:space="preserve">
+    <value>Italie (Sardaigne)</value>
+  </data>
+  <data name="AwattarCountry_ItalySicily" xml:space="preserve">
+    <value>Italie (Sicile)</value>
+  </data>
+  <data name="AwattarCountry_ItalySouth" xml:space="preserve">
+    <value>Italie (Sud)</value>
+  </data>
+  <data name="AwattarCountry_Sweden1" xml:space="preserve">
+    <value>Suède Elspot 1</value>
+  </data>
+  <data name="AwattarCountry_Sweden2" xml:space="preserve">
+    <value>Suède Elspot 2</value>
+  </data>
+  <data name="AwattarCountry_Sweden3" xml:space="preserve">
+    <value>Suède Elspot 3</value>
+  </data>
+  <data name="AwattarCountry_Sweden4" xml:space="preserve">
+    <value>Suède Elspot 4</value>
+  </data>
+  <data name="AwattarCountry_Sweden1Tibber" xml:space="preserve">
+    <value>Suède Elspot 1 Tibber</value>
+  </data>
+  <data name="AwattarCountry_Sweden2Tibber" xml:space="preserve">
+    <value>Suède Elspot 2 Tibber</value>
+  </data>
+  <data name="AwattarCountry_Sweden3Tibber" xml:space="preserve">
+    <value>Suède Elspot 3 Tibber</value>
+  </data>
+  <data name="AwattarCountry_Sweden4Tibber" xml:space="preserve">
+    <value>Suède Elspot 4 Tibber</value>
+  </data>
+  <data name="GrossShort" xml:space="preserve">
+    <value>b</value>
+  </data>
+  <data name="AwattarCountry_Norway1" xml:space="preserve">
+    <value>Norvège Elspot 1</value>
+  </data>
+  <data name="AwattarCountry_Norway2" xml:space="preserve">
+    <value>Norvège Elspot 2</value>
+  </data>
+  <data name="AwattarCountry_Norway3" xml:space="preserve">
+    <value>Norvège Elspot 3</value>
+  </data>
+  <data name="AwattarCountry_Norway4" xml:space="preserve">
+    <value>Norvège Elspot 4</value>
+  </data>
+  <data name="AwattarCountry_Norway5" xml:space="preserve">
+    <value>Norvège Elspot 5</value>
+  </data>
+  <data name="AwattarCountry_Norway1Tibber" xml:space="preserve">
+    <value>Norvège Elspot 1 Tibber</value>
+  </data>
+  <data name="AwattarCountry_Norway2Tibber" xml:space="preserve">
+    <value>Norvège Elspot 2 Tibber</value>
+  </data>
+  <data name="AwattarCountry_Norway3Tibber" xml:space="preserve">
+    <value>Norvège Elspot 3 Tibber</value>
+  </data>
+  <data name="AwattarCountry_Norway4Tibber" xml:space="preserve">
+    <value>Norvège Elspot 4 Tibber</value>
+  </data>
+  <data name="AwattarCountry_Norway5Tibber" xml:space="preserve">
+    <value>Norvège Elspot 5 Tibber</value>
+  </data>
+  <data name="AwattarCountry_NorwayVirtualNo2Nsl" xml:space="preserve">
+    <value>Zone d'enchères virtuelle Norvège NO2NSL</value>
+  </data>
+  <data name="GridHealth" xml:space="preserve">
+    <value>État du réseau</value>
+  </data>
+  <data name="Fan1" xml:space="preserve">
+    <value>Ventilateur 1</value>
+  </data>
+  <data name="Fan2" xml:space="preserve">
+    <value>Ventilateur 2</value>
+  </data>
+  <data name="Frequency" xml:space="preserve">
+    <value>Fréquence</value>
+  </data>
+  <data name="Charged" xml:space="preserve">
+    <value>Entrée</value>
+  </data>
+  <data name="Discharged" xml:space="preserve">
+    <value>Sortie</value>
+  </data>
+  <data name="DaysShort" xml:space="preserve">
+    <value>Jours</value>
+  </data>
+  <data name="ColorAllGaugeTicks" xml:space="preserve">
+    <value>Toujours colorer entièrement les jauges</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>Détails</value>
+  </data>
+  <data name="SumPv" xml:space="preserve">
+    <value>Somme PV</value>
+  </data>
+  <data name="AcPhaseVoltageFeedIn" xml:space="preserve">
+    <value>Tension de phase CA réseau</value>
+  </data>
+  <data name="ΔAcPhaseVoltageFeedIn" xml:space="preserve">
+    <value>Δ Tension de phase CA onduleur</value>
+  </data>
+  <data name="AcLineVoltageFeedIn" xml:space="preserve">
+    <value>Tension composée CA réseau</value>
+  </data>
+  <data name="ΔAcLineVoltageFeedIn" xml:space="preserve">
+    <value>Δ Tension composée CA onduleur</value>
+  </data>
+  <data name="ΔFrequency" xml:space="preserve">
+    <value>Δ Fréquence</value>
+  </data>
+  <data name="Fans" xml:space="preserve">
+    <value>Ventilateurs</value>
+  </data>
+  <data name="ShowAll" xml:space="preserve">
+    <value>Tout afficher</value>
+  </data>
+  <data name="CheckAtLeastOneView" xml:space="preserve">
+    <value>Allez dans « Affichage » et cochez au moins un élément.</value>
+  </data>
+  <data name="InverterDetailsView" xml:space="preserve">
+    <value>Détails de l'onduleur</value>
+  </data>
+  <data name="BatteryDetailsView" xml:space="preserve">
+    <value>Détails de la batterie</value>
+  </data>
+  <data name="SoC" xml:space="preserve">
+    <value>État de charge</value>
+  </data>
+  <data name="Gross" xml:space="preserve">
+    <value>Brut</value>
+  </data>
+  <data name="SoH" xml:space="preserve">
+    <value>État de santé</value>
+  </data>
+  <data name="Capacity" xml:space="preserve">
+    <value>Capacité</value>
+  </data>
+  <data name="Inner" xml:space="preserve">
+    <value>Interne</value>
+  </data>
+  <data name="Outer" xml:space="preserve">
+    <value>Externe</value>
+  </data>
+  <data name="CellMin" xml:space="preserve">
+    <value>Cellules min.</value>
+  </data>
+  <data name="CellMax" xml:space="preserve">
+    <value>Cellules max.</value>
+  </data>
+  <data name="CellAverage" xml:space="preserve">
+    <value>Cellules moy.</value>
+  </data>
+  <data name="AcPhaseVoltageInverter" xml:space="preserve">
+    <value>Tension de phase CA onduleur</value>
+  </data>
+  <data name="AcLineVoltageInverter" xml:space="preserve">
+    <value>Tension composée CA onduleur</value>
+  </data>
+  <data name="WattPilotDetails" xml:space="preserve">
+    <value>Détails du Wattpilot</value>
+  </data>
+  <data name="WifiSignal" xml:space="preserve">
+    <value>Signal Wi-Fi</value>
+  </data>
+  <data name="SmartMeterDetailsView" xml:space="preserve">
+    <value>Détails du compteur intelligent</value>
+  </data>
+  <data name="Plug" xml:space="preserve">
+    <value>Prise</value>
+  </data>
+  <data name="Board" xml:space="preserve">
+    <value>Carte</value>
+  </data>
+  <data name="NoWattPilotConnection" xml:space="preserve">
+    <value>Non connecté au Wattpilot</value>
+  </data>
+  <data name="NoChargingLogFromWattPilot" xml:space="preserve">
+    <value>Aucun lien de journal de charge disponible depuis le Wattpilot</value>
+  </data>
+  <data name="Inverters" xml:space="preserve">
+    <value>Onduleurs</value>
+  </data>
+  <data name="FirmwareTooOld" xml:space="preserve">
+    <value>Le micrologiciel {0} est trop ancien. Mettez à niveau vers au moins {1}.</value>
+  </data>
+  <data name="FirmwareTooNew" xml:space="preserve">
+    <value>Le micrologiciel {0} comporte des changements incompatibles. Mettez à niveau ce logiciel.</value>
+  </data>
+  <data name="AddInverter" xml:space="preserve">
+    <value>Ajouter un onduleur</value>
+  </data>
+  <data name="HostnameOrIpv4Address" xml:space="preserve">
+    <value>Nom d'hôte ou adresse IPv4</value>
+  </data>
+  <data name="NoHostnameOrIpv4Address" xml:space="preserve">
+    <value>Doit être un nom d'hôte ou une adresse IPv4 valide</value>
+  </data>
+  <data name="NewInverter" xml:space="preserve">
+    <value>Nouvel onduleur</value>
+  </data>
+  <data name="Refresh" xml:space="preserve">
+    <value>Actualiser</value>
+  </data>
+  <data name="InvalidInverterName" xml:space="preserve">
+    <value>Le nom de l'onduleur doit comporter entre 1 et 30 caractères.</value>
+  </data>
+  <data name="ModelStatus_ChargingBecauseEnoughBattery" xml:space="preserve">
+    <value>Charge (batterie)</value>
+  </data>
+  <data name="AllowChargingFromBattery" xml:space="preserve">
+    <value>Autoriser la charge depuis la batterie domestique</value>
+  </data>
+  <data name="PvSurplusBatteryLevelStopCharge" xml:space="preserve">
+    <value>SoC minimal pour la charge depuis la batterie domestique</value>
+  </data>
+  <data name="FromBatteryOnlyFrom" xml:space="preserve">
+    <value>Depuis la batterie uniquement à partir de</value>
+  </data>
+  <data name="To" xml:space="preserve">
+    <value>à</value>
+  </data>
+  <data name="EnableOutOfBalanceControl" xml:space="preserve">
+    <value>Limiter le courant de déséquilibre</value>
+  </data>
+  <data name="MaximumOutOfBalanceCurrent" xml:space="preserve">
+    <value>Courant de déséquilibre maximal</value>
+  </data>
+  <data name="OpenConfigPdf" xml:space="preserve">
+    <value>Ouvrir le document de configuration</value>
+  </data>
+  <data name="DnoRequirements" xml:space="preserve">
+    <value>Exigences du réseau</value>
+  </data>
+  <data name="EnableBatteryBoost" xml:space="preserve">
+    <value>Activer la charge unique depuis la batterie domestique (boost)</value>
+  </data>
+  <data name="BoostUntilCarDisconnects" xml:space="preserve">
+    <value>Autoriser le boost jusqu'à la déconnexion du véhicule</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseError" xml:space="preserve">
+    <value>Erreur !</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseLoadManagement" xml:space="preserve">
+    <value>Pause (gestion de charge)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseOcpp" xml:space="preserve">
+    <value>Pause (OCPP)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseReconnectDelay" xml:space="preserve">
+    <value>Pause (délai de reconnexion réseau)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseAdapterBlocking" xml:space="preserve">
+    <value>Erreur (câble bloqué)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseUnderFrequencyControl" xml:space="preserve">
+    <value>Erreur (sous-fréquence)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseGridMonitoring" xml:space="preserve">
+    <value>Erreur (limites réseau)</value>
+  </data>
+  <data name="ModelStatus_NotChargingBecauseOcppFallback" xml:space="preserve">
+    <value>Pause (repli OCPP)</value>
+  </data>
+  <data name="MinimumSocInBoost" xml:space="preserve">
+    <value>SoC maximal en mode boost</value>
+  </data>
+  <data name="RandomDelayPowerFailure" xml:space="preserve">
+    <value>Délai aléatoire à la connexion réseau</value>
+  </data>
+  <data name="RandomDelayAwattarStart" xml:space="preserve">
+    <value>Délai aléatoire au démarrage de la charge basée sur les coûts</value>
+  </data>
+  <data name="RandomDelayAwattarStop" xml:space="preserve">
+    <value>Délai aléatoire à l'arrêt de la charge basée sur les coûts</value>
+  </data>
+  <data name="RandomDelayTimerStart" xml:space="preserve">
+    <value>Délai aléatoire au démarrage de la charge programmée</value>
+  </data>
+  <data name="RandomDelayTimerStop" xml:space="preserve">
+    <value>Délai aléatoire à l'arrêt de la charge programmée</value>
+  </data>
+  <data name="RandomDelayCarConnect" xml:space="preserve">
+    <value>Délai aléatoire à la connexion du véhicule</value>
+  </data>
+  <data name="Delays" xml:space="preserve">
+    <value>Délais</value>
+  </data>
+  <data name="GridMonitoring" xml:space="preserve">
+    <value>Surveillance du réseau</value>
+  </data>
+  <data name="EnableGridMonitoringOnStartUp" xml:space="preserve">
+    <value>Activer la surveillance du réseau</value>
+  </data>
+  <data name="StartUpMonitoringMinimumVoltage" xml:space="preserve">
+    <value>Tension minimale à la connexion réseau</value>
+  </data>
+  <data name="StartUpMonitoringMaximumVoltage" xml:space="preserve">
+    <value>Tension maximale à la connexion réseau</value>
+  </data>
+  <data name="StartUpMonitoringMinimumFrequency" xml:space="preserve">
+    <value>Fréquence minimale à la connexion réseau</value>
+  </data>
+  <data name="StartUpMonitoringMaximumFrequency" xml:space="preserve">
+    <value>Fréquence maximale à la connexion réseau</value>
+  </data>
+  <data name="GridMonitoringTimeOnStartUp" xml:space="preserve">
+    <value>Durée de surveillance à la connexion réseau</value>
+  </data>
+  <data name="StartUpRampUpRate" xml:space="preserve">
+    <value>Taux de montée du courant à la connexion réseau</value>
+  </data>
+  <data name="NoEnergyHistoryFile" xml:space="preserve">
+    <value>Aucun fichier d'historique d'énergie configuré</value>
+  </data>
+  <data name="NoDriftFile" xml:space="preserve">
+    <value>Aucun fichier de dérive configuré</value>
+  </data>
+  <data name="FileHasNoEnergyHistory" xml:space="preserve">
+    <value>Le fichier {0} ne contient aucun historique d'énergie</value>
+  </data>
+  <data name="NoEnergyHistoryMatch" xml:space="preserve">
+    <value>Aucune entrée commune trouvée dans la feuille Excel et l'historique d'énergie</value>
+  </data>
+  <data name="ExcelFileAlreadyImported" xml:space="preserve">
+    <value>Fichier Excel déjà importé ou calibrage manuel plus récent présent</value>
+  </data>
+  <data name="FilterExcelFile" xml:space="preserve">
+    <value>Fichiers Excel (*.xlsx)|*.xlsx</value>
+  </data>
+  <data name="ImportBayernwerk" xml:space="preserve">
+    <value>Importer un fichier Excel Bayernwerk imSys</value>
+  </data>
+  <data name="SelectEnergyHistoryFile" xml:space="preserve">
+    <value>Sélectionnez l'emplacement et le nom du fichier d'historique d'énergie</value>
+  </data>
+  <data name="EnergyHistoryFile" xml:space="preserve">
+    <value>Fichier d'historique d'énergie</value>
+  </data>
+  <data name="NoValidCells" xml:space="preserve">
+    <value>La feuille Excel ne comporte aucune ligne valide</value>
+  </data>
+  <data name="IncorrectObisCode" xml:space="preserve">
+    <value>Code OBIS incorrect dans la cellule C4 du fichier Excel</value>
+  </data>
+  <data name="CableLockStatus_LockFailed" xml:space="preserve">
+    <value>Échec du verrouillage</value>
+  </data>
+  <data name="CableLockStatus_LockUnlockPowerOut" xml:space="preserve">
+    <value>Coupure de courant au verrouillage/déverrouillage</value>
+  </data>
+  <data name="CableLockStatus_Locked" xml:space="preserve">
+    <value>Verrouillé</value>
+  </data>
+  <data name="CableLockStatus_Unlocked" xml:space="preserve">
+    <value>Déverrouillé</value>
+  </data>
+  <data name="CableLockStatus_UnlockFailed" xml:space="preserve">
+    <value>Échec du déverrouillage</value>
+  </data>
+  <data name="SendRfidSerialToCloud" xml:space="preserve">
+    <value>Autoriser les identifiants de carte RFID dans les API (y compris le cloud)</value>
+  </data>
+  <data name="SendRfidSerialToCloud_ToolTip" xml:space="preserve">
+    <value>Si les identifiants de carte RFID sont envoyés au cloud, go-E et le fournisseur cloud (Hetzner) peuvent les lire et cloner la carte. Si vous activez ceci, n'utilisez pas de carte de recharge publique pour votre Wattpilot.</value>
+  </data>
+  <data name="CloudWebSocketEnabled" xml:space="preserve">
+    <value>Activer l'accès Websocket dans le cloud</value>
+  </data>
+  <data name="UnsupportedPriceZone" xml:space="preserve">
+    <value>Zone tarifaire non prise en charge</value>
+  </data>
+  <data name="ElectricityPrice" xml:space="preserve">
+    <value>Prix de l'électricité</value>
+  </data>
+  <data name="BuyingPrice" xml:space="preserve">
+    <value>Prix d'achat</value>
+  </data>
+  <data name="MarketPrice" xml:space="preserve">
+    <value>Prix du marché</value>
+  </data>
+  <data name="WithoutVat" xml:space="preserve">
+    <value>Net (hors TVA)</value>
+  </data>
+  <data name="WithVat" xml:space="preserve">
+    <value>Brut (TVA comprise)</value>
+  </data>
+  <data name="Today" xml:space="preserve">
+    <value>Aujourd'hui</value>
+  </data>
+  <data name="Historic" xml:space="preserve">
+    <value>Historique</value>
+  </data>
+  <data name="NoValidData" xml:space="preserve">
+    <value>Aucune donnée valide reçue</value>
+  </data>
+  <data name="WindSolar" xml:space="preserve">
+    <value>Production éolienne et solaire</value>
+  </data>
+  <data name="SolarProduction" xml:space="preserve">
+    <value>Production solaire</value>
+  </data>
+  <data name="WindProduction" xml:space="preserve">
+    <value>Production éolienne</value>
+  </data>
+  <data name="ElectricityPriceNegative" xml:space="preserve">
+    <value>Prix de l'électricité (négatif)</value>
+  </data>
+  <data name="SupportOhmPilotSoc" xml:space="preserve">
+    <value>Support de la batterie pour Smart Ohmpilot</value>
+  </data>
+  <data name="EnergyHysteresis" xml:space="preserve">
+    <value>Hystérésis d'énergie</value>
+  </data>
+  <data name="SupportSocHysteresisMinimum" xml:space="preserve">
+    <value>SoC minimal pour l'hystérésis</value>
+  </data>
+  <data name="Help" xml:space="preserve">
+    <value>Aide</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>À propos</value>
+  </data>
+  <data name="MustBeExcelFileName" xml:space="preserve">
+    <value>{0} doit être une chaîne contenant un nom de fichier Excel</value>
+  </data>
+  <data name="Vat" xml:space="preserve">
+    <value>TVA</value>
+  </data>
+  <data name="Unit" xml:space="preserve">
+    <value>Unité</value>
+  </data>
+  <data name="PvPower" xml:space="preserve">
+    <value>Puissance PV</value>
+  </data>
+  <data name="PleaseLogin" xml:space="preserve">
+    <value>Veuillez vous connecter avec votre nom d'utilisateur et votre mot de passe</value>
+  </data>
+  <data name="BusyLoggingIn" xml:space="preserve">
+    <value>Connexion en cours</value>
+  </data>
+  <data name="LoginNoun" xml:space="preserve">
+    <value>Connexion</value>
+  </data>
+  <data name="HttpError" xml:space="preserve">
+    <value>Erreur HTTP</value>
+  </data>
+  <data name="ConnectingToHas" xml:space="preserve">
+    <value>Connexion au serveur domotique</value>
+  </data>
+  <data name="CannotLogin" xml:space="preserve">
+    <value>Impossible de connecter l'utilisateur</value>
+  </data>
+  <data name="LoginIncorrect" xml:space="preserve">
+    <value>Nom d'utilisateur et/ou mot de passe incorrect</value>
+  </data>
+  <data name="DeviceNotFound" xml:space="preserve">
+    <value>L'appareil « {0} » est introuvable.</value>
+  </data>
+  <data name="GetInverterLocalization" xml:space="preserve">
+    <value>Récupération des fichiers de localisation de l'onduleur</value>
+  </data>
+  <data name="CryptoInit" xml:space="preserve">
+    <value>Échange des clés cryptographiques</value>
+  </data>
+  <data name="UnknownDevice" xml:space="preserve">
+    <value>Appareil inconnu</value>
+  </data>
+  <data name="CanOnlyTurnOnOrOff" xml:space="preserve">
+    <value>Ne peut que passer sur « on » ou « off »</value>
+  </data>
+  <data name="DeviceNotSwitchable" xml:space="preserve">
+    <value>L'appareil « {0} » n'est pas commutable.</value>
+  </data>
+  <data name="DeviceSwitchingDisabled" xml:space="preserve">
+    <value>La commutation est désactivée pour l'appareil « {0} ».</value>
+  </data>
+  <data name="HttpForbidden" xml:space="preserve">
+    <value>Vous n'êtes pas autorisé à effectuer cette action</value>
+  </data>
+  <data name="DeviceNotDimmable" xml:space="preserve">
+    <value>L'appareil « {0} » n'est pas variable.</value>
+  </data>
+  <data name="DeviceDimmingDisabled" xml:space="preserve">
+    <value>La variation est désactivée pour l'appareil « {0} ».</value>
+  </data>
+  <data name="DeviceNotColorable" xml:space="preserve">
+    <value>L'appareil « {0} » ne prend pas en charge la couleur.</value>
+  </data>
+  <data name="DeviceColoringDisabled" xml:space="preserve">
+    <value>La coloration est désactivée pour l'appareil « {0} ».</value>
+  </data>
+  <data name="DeviceHasNoColorTemperature" xml:space="preserve">
+    <value>L'appareil « {0} » ne prend pas en charge la température de couleur.</value>
+  </data>
+  <data name="DeviceColorTemperatureDisabled" xml:space="preserve">
+    <value>La prise en charge de la température de couleur est désactivée sur l'appareil « {0} ».</value>
+  </data>
+  <data name="BatteryChargingSources" xml:space="preserve">
+    <value>Source de charge de la batterie</value>
+  </data>
+  <data name="Gen24ChargingSources_InverterPv" xml:space="preserve">
+    <value>Panneaux solaires de cet onduleur uniquement</value>
+  </data>
+  <data name="Gen24ChargingSources_Home" xml:space="preserve">
+    <value>Toute source d'énergie de votre domicile</value>
+  </data>
+  <data name="Gen24ChargingSources_HomeAndGrid" xml:space="preserve">
+    <value>Toute source d'énergie, y compris le réseau public</value>
+  </data>
+  <data name="PriceService" xml:space="preserve">
+    <value>Service de prix</value>
+  </data>
+  <data name="PriceSurchargeConsumption" xml:space="preserve">
+    <value>Majoration du prix consommation (%)</value>
+  </data>
+  <data name="PriceOffsetConsumption" xml:space="preserve">
+    <value>Décalage du prix consommation (centimes)</value>
+  </data>
+  <data name="VatRate" xml:space="preserve">
+    <value>Taux de TVA (%)</value>
+  </data>
+  <data name="PriceComponents" xml:space="preserve">
+    <value>Composantes du prix</value>
+  </data>
+  <data name="Component" xml:space="preserve">
+    <value>Composante</value>
+  </data>
+  <data name="TimeZone" xml:space="preserve">
+    <value>Fuseau horaire</value>
+  </data>
+  <data name="Encryption" xml:space="preserve">
+    <value>Chiffrement</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Statut</value>
+  </data>
+  <data name="HvacMeritFeatureHeader" xml:space="preserve">
+    <value>PUISSANCE</value>
+  </data>
+  <data name="HvacLimit" xml:space="preserve">
+    <value>LIMITE</value>
+  </data>
+  <data name="Ac" xml:space="preserve">
+    <value>CA</value>
+  </data>
+  <data name="Dc" xml:space="preserve">
+    <value>CC</value>
+  </data>
+  <data name="UiTestTitle" xml:space="preserve">
+    <value>Test de l'interface du Centre de contrôle domotique</value>
+  </data>
+  <data name="LinearGauge" xml:space="preserve">
+    <value>Jauge linéaire</value>
+  </data>
+  <data name="HalfCircleGauge" xml:space="preserve">
+    <value>Jauge en demi-cercle</value>
+  </data>
+  <data name="Consumption" xml:space="preserve">
+    <value>Consommation</value>
+  </data>
+  <data name="SmartMeter" xml:space="preserve">
+    <value>Compteur intelligent</value>
+  </data>
+  <data name="PowerConsumer" xml:space="preserve">
+    <value>Consommateur</value>
+  </data>
+  <data name="GaugeHighIsBad" xml:space="preserve">
+    <value>Élevé = mauvais</value>
+  </data>
+  <data name="GaugeMidIsGood" xml:space="preserve">
+    <value>Moyen = bon</value>
+  </data>
+  <data name="GaugeColorMode" xml:space="preserve">
+    <value>Tout colorer / Colorer jusqu'à la valeur</value>
+  </data>
+  <data name="LanguageChangeWarning" xml:space="preserve">
+    <value>Certains textes ont été générés en « {0} » au démarrage de {1}. Ils resteront affichés dans la langue d'origine jusqu'au redémarrage de l'application.</value>
+  </data>
+  <data name="Note" xml:space="preserve">
+    <value>Remarque</value>
+  </data>
+</root>
