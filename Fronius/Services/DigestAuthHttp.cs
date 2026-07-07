@@ -98,7 +98,7 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
     public async ValueTask<HttpResponseMessage> GetResponse(string url, string? stringContent, IEnumerable<HttpStatusCode>? allowedStatusCodesEnumerable = null, CancellationToken token = default)
     {
         allowedStatusCodesEnumerable ??= [HttpStatusCode.OK];
-        var allowedStatusCodes = allowedStatusCodesEnumerable as IReadOnlyList<HttpStatusCode> ?? allowedStatusCodesEnumerable.ToList();
+        var allowedStatusCodes = allowedStatusCodesEnumerable as IReadOnlyList<HttpStatusCode> ?? [.. allowedStatusCodesEnumerable];
 
         if (url.Length == 0 || url[0] != '/')
         {

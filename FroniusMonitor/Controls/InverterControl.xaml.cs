@@ -161,18 +161,12 @@ public partial class InverterControl
 
         Loaded += (_, _) =>
         {
-            if (dataCollectionService != null)
-            {
-                dataCollectionService.NewDataReceived += NewDataReceived;
-            }
+            dataCollectionService?.NewDataReceived += NewDataReceived;
         };
 
         Unloaded += (_, _) =>
         {
-            if (dataCollectionService != null)
-            {
-                dataCollectionService.NewDataReceived -= NewDataReceived;
-            }
+            dataCollectionService?.NewDataReceived -= NewDataReceived;
         };
     }
 

@@ -206,7 +206,7 @@ public class InverterSettingsViewModel(
             {
                 //ConnectedInverters = new ConcurrentDictionary<Guid, Gen24ConnectedInverter>(await gen24Service.GetConnectedDevices(true));
                 //oldConnectedInverters = new ConcurrentDictionary<Guid, Gen24ConnectedInverter>(ConnectedInverters.Values.Select(i => i.Copy()).ToDictionary(i => i.Id));
-                await RefreshConnectedInverters().ConfigureAwait(false);
+                //await RefreshConnectedInverters().ConfigureAwait(false);
             }
 
             PowerModes =
