@@ -1,11 +1,12 @@
 ﻿using System.Collections.Concurrent;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 
 namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 #pragma warning disable CS9107
-public class InverterSettingsViewModel(
+public partial class InverterSettingsViewModel(
     IDataCollectionService dataCollectionService,
     IGen24Service gen24Service,
     IGen24JsonService gen24JsonService,
@@ -19,21 +20,6 @@ public class InverterSettingsViewModel(
     private IReadOnlyDictionary<Guid, Gen24ConnectedInverter>? oldConnectedInverters;
     private Gen24InverterSettings oldSettings = null!;
 
-    [field: AllowNull, MaybeNull]
-    public ICommand UndoCommand => field ??= new NoParameterCommand(Undo);
-
-    [field: AllowNull, MaybeNull]
-    public ICommand ApplyCommand => field ??= new NoParameterCommand(Apply);
-
-    [field: AllowNull, MaybeNull]
-    public ICommand DeleteConnectedInverterCommand => field ??= new Command<Gen24ConnectedInverter>(DeleteConnectedInverter);
-
-    [field: AllowNull, MaybeNull]
-    public ICommand AddConnectedInverterCommand => field ??= new NoParameterCommand(AddConnectedInverter);
-
-    [field: AllowNull, MaybeNull]
-    public ICommand RefreshConnectedInvertersCommand => field ??= new NoParameterCommand(() => _ = RefreshConnectedInverters());
-
     public IEnumerable<ListItemModel<MpptPowerMode>> PowerModes
     {
         get;
@@ -45,10 +31,7 @@ public class InverterSettingsViewModel(
         get;
         set => Set(ref field, value, () =>
         {
-            if (Settings.Mppt?.Mppt1 != null)
-            {
-                Settings.Mppt.Mppt1.PowerMode = value?.Value;
-            }
+            Settings.Mppt?.Mppt1?.PowerMode = value?.Value;
         });
     }
 
@@ -57,10 +40,7 @@ public class InverterSettingsViewModel(
         get;
         set => Set(ref field, value, () =>
         {
-            if (Settings.Mppt?.Mppt2 != null)
-            {
-                Settings.Mppt.Mppt2.PowerMode = value?.Value;
-            }
+            Settings.Mppt?.Mppt2?.PowerMode = value?.Value;
         });
     }
 
@@ -75,10 +55,7 @@ public class InverterSettingsViewModel(
         get;
         set => Set(ref field, value, () =>
         {
-            if (Settings.Mppt?.Mppt1 != null)
-            {
-                Settings.Mppt.Mppt1.DynamicPeakManager = value?.Value;
-            }
+            Settings.Mppt?.Mppt1?.DynamicPeakManager = value?.Value;
         });
     }
 
@@ -87,10 +64,7 @@ public class InverterSettingsViewModel(
         get;
         set => Set(ref field, value, () =>
         {
-            if (Settings.Mppt?.Mppt2 != null)
-            {
-                Settings.Mppt.Mppt2.DynamicPeakManager = value?.Value;
-            }
+            Settings.Mppt?.Mppt2?.DynamicPeakManager = value?.Value;
         });
     }
 
@@ -206,27 +180,27 @@ public class InverterSettingsViewModel(
             {
                 //ConnectedInverters = new ConcurrentDictionary<Guid, Gen24ConnectedInverter>(await gen24Service.GetConnectedDevices(true));
                 //oldConnectedInverters = new ConcurrentDictionary<Guid, Gen24ConnectedInverter>(ConnectedInverters.Values.Select(i => i.Copy()).ToDictionary(i => i.Id));
-                await RefreshConnectedInverters().ConfigureAwait(false);
+                //await RefreshConnectedInverters().ConfigureAwait(false);
             }
 
             PowerModes =
             [
                 new ListItemModel<MpptPowerMode> { Value = MpptPowerMode.Off, DisplayName = await Gen24Service.GetFroniusName(MpptPowerMode.Off).ConfigureAwait(false) },
                 new ListItemModel<MpptPowerMode> { Value = MpptPowerMode.Auto, DisplayName = await Gen24Service.GetFroniusName(MpptPowerMode.Auto).ConfigureAwait(false) },
-                new ListItemModel<MpptPowerMode> { Value = MpptPowerMode.Fix, DisplayName = await Gen24Service.GetFroniusName(MpptPowerMode.Fix).ConfigureAwait(false) }
+                new ListItemModel<MpptPowerMode> { Value = MpptPowerMode.Fix, DisplayName = await Gen24Service.GetFroniusName(MpptPowerMode.Fix).ConfigureAwait(false) },
             ];
 
             DynamicPeakManagerModes =
             [
                 new ListItemModel<MpptOnOff> { Value = MpptOnOff.Off, DisplayName = await Gen24Service.GetFroniusName(MpptOnOff.Off).ConfigureAwait(false) },
                 new ListItemModel<MpptOnOff> { Value = MpptOnOff.On, DisplayName = await Gen24Service.GetFroniusName(MpptOnOff.On).ConfigureAwait(false) },
-                new ListItemModel<MpptOnOff> { Value = MpptOnOff.OnMlsd, DisplayName = await Gen24Service.GetFroniusName(MpptOnOff.OnMlsd).ConfigureAwait(false) }
+                new ListItemModel<MpptOnOff> { Value = MpptOnOff.OnMlsd, DisplayName = await Gen24Service.GetFroniusName(MpptOnOff.OnMlsd).ConfigureAwait(false) },
             ];
 
             PhaseModes =
             [
                 new ListItemModel<PhaseMode> { Value = PhaseMode.PhaseSum, DisplayName = await Gen24Service.GetConfigString("EXPORTLIMIT.WLIM_MAX_W").ConfigureAwait(false) },
-                new ListItemModel<PhaseMode> { Value = PhaseMode.WeakestPhase, DisplayName = await Gen24Service.GetConfigString("EXPORTLIMIT.WLIM_MAX_FEEDIN_PER_PHASE").ConfigureAwait(false) }
+                new ListItemModel<PhaseMode> { Value = PhaseMode.WeakestPhase, DisplayName = await Gen24Service.GetConfigString("EXPORTLIMIT.WLIM_MAX_FEEDIN_PER_PHASE").ConfigureAwait(false) },
             ];
 
             Undo();
@@ -237,8 +211,9 @@ public class InverterSettingsViewModel(
         }
     }
 
+    [RelayCommand]
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    private async void Apply() // Bug: Does not work with firmware 1.30.7-1
+    private async Task Apply() // Bug: Does not work with firmware 1.30.7-1
     {
         IsInUpdate = true;
 
@@ -321,7 +296,7 @@ public class InverterSettingsViewModel(
             var limitsToken = new JObject
             {
                 { "visualization", visualizationToken },
-                { "exportLimits", exportLimitsToken }
+                { "exportLimits", exportLimitsToken },
             };
 
             if (new[] { visualizationToken, hardLimitToken, softLimitToken, activePowerToken, exportLimitsToken, limitsToken }
@@ -429,6 +404,7 @@ public class InverterSettingsViewModel(
         return Gen24InverterSettings.Parse(commonToken, mpptToken, powerLimitToken["powerLimits"], systemToken);
     }
 
+    [RelayCommand]
     private void Undo()
     {
         needsConnectedInverterUpdate = false;
@@ -499,6 +475,7 @@ public class InverterSettingsViewModel(
         UpdateWattPeakMppt2();
     }
 
+    [RelayCommand]
     private void DeleteConnectedInverter(Gen24ConnectedInverter? connectedInverter)
     {
         if (connectedInverter == null || ConnectedInverters == null)
@@ -511,6 +488,7 @@ public class InverterSettingsViewModel(
         needsConnectedInverterUpdate = true;
     }
 
+    [RelayCommand]
     private void AddConnectedInverter()
     {
         var newConnectedInverterView = IoC.Get<NewConnectedInverterView>();
@@ -529,6 +507,7 @@ public class InverterSettingsViewModel(
     }
 
 
+    [RelayCommand]
     private async Task RefreshConnectedInverters()
     {
         var wasInUpdate = IsInUpdate;
@@ -539,13 +518,13 @@ public class InverterSettingsViewModel(
             var savedStaticInverters = ConnectedInverters?.Values.Where(i => !i.IsAutoDetected);
             ConnectedInverters = new ConcurrentDictionary<Guid, Gen24ConnectedInverter>(await gen24Service.GetConnectedDevices(true).ConfigureAwait(false));
             oldConnectedInverters = new ConcurrentDictionary<Guid, Gen24ConnectedInverter>(ConnectedInverters.Values.Select(i => i.Copy()).ToDictionary(i => i.Id));
-            
+
             savedStaticInverters?.Where(i => !i.IsAutoDetected && !ConnectedInverters.ContainsKey(i.Id)).Apply(i =>
             {
                 ConnectedInverters[i.Id] = i;
                 needsConnectedInverterUpdate = true;
             });
-            
+
             NotifyOfPropertyChange(nameof(ConnectedInverters));
         }
         finally

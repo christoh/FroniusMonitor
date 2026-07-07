@@ -322,7 +322,7 @@
                                     Visibility="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit.IsEnabled, Converter={co:Bool2Visibility}, FallbackValue=Collapsed}" />
                         </StackPanel>
                     </Grid>
-                    <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,16,0,0" Visibility="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.IsNetworkModeEnabled, FallbackValue=Collapsed, Converter={co:Bool2Visibility}}">
+<!--                    <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,16,0,0" Visibility="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.IsNetworkModeEnabled, FallbackValue=Collapsed, Converter={co:Bool2Visibility}}">
 
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
                             <StackPanel.Resources>
@@ -451,7 +451,7 @@
 
                         </DataGrid>
                     </StackPanel>
-                </Grid>
+-->                </Grid>
             </GroupBox>
 
             <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,8,0,0">

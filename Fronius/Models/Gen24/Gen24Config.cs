@@ -2,10 +2,10 @@
 
 public partial class Gen24Config : BindableBase, ICloneable
 {
-    private static readonly Version minimumCommandApi = new(9, 0, 0);
-    private static readonly Version minimumConfigApi = new(10, 2, 0);
+    private static readonly Version minimumCommandApi = new(10, 1, 0);
+    private static readonly Version minimumConfigApi = new(10, 3, 0);
     private static readonly Version minimumComponentsApi = new(1, 1, 0);
-    private static readonly Version minimumStatusApi = new(6, 1, 0);
+    private static readonly Version minimumStatusApi = new(6, 2, 0);
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(VersionWarning))]
@@ -44,7 +44,7 @@ public partial class Gen24Config : BindableBase, ICloneable
                 Versions.StatusApi < minimumStatusApi
             )
             {
-                return string.Format(Resources.FirmwareTooOld, firmwareVersionString, "1.40.8-1");
+                return string.Format(Resources.FirmwareTooOld, firmwareVersionString, "1.41.10-1");
             }
 
             if

@@ -120,7 +120,7 @@ public partial class App
                     {
                         ElectricityPriceService.WattPilot => typeof(WattPilotElectricityService),
                         ElectricityPriceService.Awattar => typeof(AwattarService),
-                        _ => throw new NotSupportedException($"Unknown electricity price service. Must be any of {string.Join(", ", Enum.GetNames(typeof(ElectricityPriceService)))}"),
+                        _ => throw new NotSupportedException($"Unknown electricity price service. Must be any of {string.Join(", ", Enum.GetNames<ElectricityPriceService>())}"),
                     };
 
                     if (electricityPriceService is IDisposable disposable && electricityPriceService.GetType() != newType)

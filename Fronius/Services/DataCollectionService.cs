@@ -28,7 +28,7 @@ public partial class DataCollectionService : BindableBase, IDataCollectionServic
         Gen24Service = gen24Service;
         FritzBoxService = fritzBoxService;
         Container2 = IoC.Injector!.CreateScope().ServiceProvider;
-        SwitchableDevices = new(context);
+        SwitchableDevices = [with(context)];
         HvacService = hvacService;
         this.settings = settings;
         this.wattPilotService = wattPilotService;
