@@ -1,164 +1,105 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Settings;
 
-public abstract class SettingsBase : BindableBase, ICloneable
+public abstract partial class SettingsBase : BindableBase, ICloneable
 {
     public event EventHandler<EventArgs>? SettingsChanged;
 
-    [XmlElement]
-    public ElectricityPriceSettings ElectricityPrice
+    protected SettingsBase()
     {
-        get;
-        set => Set(ref field, value);
-    } = new();
+        ElectricityPrice = new();
+        FritzBoxConnection = new() { BaseUrl = "http://192.168.178.1", UserName = string.Empty, Password = string.Empty };
+        FroniusUpdateRate = 5;
+        FroniusConnection = new() { BaseUrl = "http://192.168.178.XXX", UserName = string.Empty, Password = string.Empty };
+        FroniusConnection2 = new() { BaseUrl = "http://192.168.178.XXX", UserName = string.Empty, Password = string.Empty };
+        MaximumDnoLineCurrentPerPhase = 35;
+        WattPilotConnection = new() { BaseUrl = "ws://192.168.178.YYY", Password = string.Empty };
+        ToshibaHvacSessionTime = DateTime.MinValue;
 
-    [XmlElement, DefaultValue(null)]
-    public WebConnection FritzBoxConnection
-    {
-        get;
-        set => Set(ref field, value);
-    } = new() { BaseUrl = "http://192.168.178.1", UserName = string.Empty, Password = string.Empty };
+        ToshibaAcConnection = new()
+        {
+            BaseUrl = "https://mobileapi.toshibahomeaccontrols.com",
+            UserName = string.Empty,
+            Password = string.Empty,
+            Protocol = Protocol.Amqp,
+            TunnelMode = TunnelMode.Auto,
+        };
 
-    [DefaultValue((byte)5)]
-    public byte FroniusUpdateRate
-    {
-        get;
-        set => Set(ref field, value);
-    } = 5;
-
-    [DefaultValue(null)]
-    public string? DriftFileName
-    {
-        get;
-        set => Set(ref field, value);
+        AzureDeviceId = Guid.NewGuid();
     }
 
-    [DefaultValue(null)]
-    public string? EnergyHistoryFileName
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [XmlElement, DefaultValue(null), ObservableProperty]
+    public partial ToshibaHvacSession? ToshibaHvacSession { get; set; }
 
-    [DefaultValue(null)]
-    public AwattarParameters? Awattar
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [XmlAttribute, ObservableProperty, DefaultValue(typeof(DateTime),default)]
+    public partial DateTime ToshibaHvacSessionTime { get; set; }
 
-    [XmlElement, DefaultValue(null)]
-    public WebConnection FroniusConnection
-    {
-        get;
-        set => Set(ref field, value);
-    } = new() { BaseUrl = "http://192.168.178.XXX", UserName = string.Empty, Password = string.Empty };
+    //[XmlElement, DefaultValue(null), ObservableProperty]
+    //public partial ToshibaHvacAzureCredentials? ToshibaHvacAzureCredentials { get; set; }
 
-    [XmlElement, DefaultValue(null)]
-    public WebConnection FroniusConnection2
-    {
-        get;
-        set => Set(ref field, value);
-    } = new() { BaseUrl = "http://192.168.178.XXX", UserName = string.Empty, Password = string.Empty };
+    [XmlElement, ObservableProperty]
+    public partial ElectricityPriceSettings ElectricityPrice { get; set; }
 
-    [XmlAttribute, DefaultValue(35d)]
-    public double MaximumDnoLineCurrentPerPhase
-    {
-        get;
-        set => Set(ref field, value, () => NotifyOfPropertyChange(nameof(MaximumDnoLineCurrentTotal)));
-    } = 35;
+    [XmlElement, DefaultValue(null), ObservableProperty]
+    public partial WebConnection FritzBoxConnection { get; set; }
 
-    [XmlAttribute, DefaultValue(false)]
-    public bool ColorAllGaugeTicks
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [DefaultValue((byte)5), ObservableProperty]
+    public partial byte FroniusUpdateRate { get; set; }
+
+    [DefaultValue(null), ObservableProperty]
+    public partial string? DriftFileName { get; set; }
+
+    [DefaultValue(null), ObservableProperty]
+    public partial string? EnergyHistoryFileName { get; set; }
+
+    [DefaultValue(null), ObservableProperty]
+    public partial AwattarParameters? Awattar { get; set; }
+
+    [XmlElement, DefaultValue(null), ObservableProperty]
+    public partial WebConnection FroniusConnection { get; set; }
+
+    [XmlElement, DefaultValue(null), ObservableProperty]
+    public partial WebConnection FroniusConnection2 { get; set; }
+
+    [XmlAttribute, DefaultValue(35d), ObservableProperty, NotifyPropertyChangedFor(nameof(MaximumDnoLineCurrentTotal))]
+    public partial double MaximumDnoLineCurrentPerPhase { get; set; }
+
+    [XmlAttribute, DefaultValue(false), ObservableProperty]
+    public partial bool ColorAllGaugeTicks { get; set; }
 
     [XmlIgnore] public double MaximumDnoLineCurrentTotal => MaximumDnoLineCurrentPerPhase * 3;
 
-    [XmlElement, DefaultValue(null)]
-    public WebConnection WattPilotConnection
-    {
-        get;
-        set => Set(ref field, value);
-    } = new() { BaseUrl = "ws://192.168.178.YYY", Password = string.Empty };
+    [XmlElement, DefaultValue(null), ObservableProperty]
+    public partial WebConnection WattPilotConnection { get; set; }
 
-    [XmlAttribute, DefaultValue(null)]
-    public string? Language
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [XmlAttribute, DefaultValue(null), ObservableProperty]
+    public partial string? Language { get; set; }
 
-    [XmlAttribute]
-    public bool ShowFritzBox
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [XmlAttribute, ObservableProperty]
+    public partial bool ShowFritzBox { get; set; }
 
-    [XmlAttribute]
-    public bool HaveWattPilot
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [XmlAttribute, ObservableProperty]
+    public partial bool HaveWattPilot { get; set; }
 
-    [XmlAttribute]
-    public bool HaveTwoInverters
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [XmlAttribute, ObservableProperty]
+    public partial bool HaveTwoInverters { get; set; }
 
-    [XmlAttribute]
-    public bool ShowWattPilot
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [XmlAttribute, ObservableProperty]
+    public partial bool ShowWattPilot { get; set; }
 
-    [XmlAttribute]
-    public bool HaveFritzBox
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [XmlAttribute, ObservableProperty]
+    public partial bool HaveFritzBox { get; set; }
 
-    [XmlAttribute]
-    public bool HaveToshibaAc
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [XmlAttribute, ObservableProperty]
+    public partial bool HaveToshibaAc { get; set; }
 
-    [XmlAttribute]
-    public bool ShowToshibaAc
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [XmlAttribute, ObservableProperty]
+    public partial bool ShowToshibaAc { get; set; }
 
-    [XmlElement]
-    public AzureConnection ToshibaAcConnection
-    {
-        get;
-        set => Set(ref field, value);
-    } = new()
-    {
-        BaseUrl = "https://mobileapi.toshibahomeaccontrols.com",
-        UserName = string.Empty,
-        Password = string.Empty,
-        Protocol = Protocol.Amqp,
-        TunnelMode = TunnelMode.Auto
-    };
+    [XmlElement, ObservableProperty]
+    public partial AzureConnection ToshibaAcConnection { get; set; }
 
-    [XmlIgnore]
-    public Guid AzureDeviceId
-    {
-        get;
-        set => Set(ref field, value);
-    } = Guid.NewGuid();
+    [XmlIgnore, ObservableProperty]
+    public partial Guid AzureDeviceId { get; set; }
 
     [XmlElement(nameof(AzureDeviceId))]
     public string AzureDeviceIdString
@@ -167,12 +108,10 @@ public abstract class SettingsBase : BindableBase, ICloneable
         set => AzureDeviceId = Guid.Parse(value, CultureInfo.InvariantCulture);
     }
 
-    [XmlElement, DefaultValue(false)]
-    public bool AddInverterPowerToConsumption
-    {
-        get;
-        set => Set(ref field, value);
-    }
+    [XmlElement, DefaultValue(false), ObservableProperty]
+    public partial bool AddInverterPowerToConsumption { get; set; }
+
+    public abstract Task Save();
 
     protected static void UpdateChecksum(params WebConnection?[] connections)
     {
@@ -183,7 +122,7 @@ public abstract class SettingsBase : BindableBase, ICloneable
     {
         connections.Where(connection => connection != null && connection.PasswordChecksum != connection.CalculatedChecksum).Apply(connection => connection!.Password = string.Empty);
     }
-
+    
     public object Clone()
     {
         var clone = (SettingsBase)MemberwiseClone();

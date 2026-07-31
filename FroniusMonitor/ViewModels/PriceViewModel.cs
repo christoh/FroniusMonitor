@@ -216,7 +216,7 @@ public class PriceViewModel(
                         ShowHistoricData ? Date.AddDays(1) : Prices.Any() ? Prices[^1].EndTime : null
                     ).ConfigureAwait(false)).Energies;
 
-                    await Settings.Save().ConfigureAwait(false);
+                    await settings.Save().ConfigureAwait(false);
                 }
                 catch (JsonException)
                 {

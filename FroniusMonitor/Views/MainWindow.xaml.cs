@@ -67,7 +67,7 @@ public partial class MainWindow
             if (IsLoaded)
             {
                 App.Settings.MainWindowSize = e.NewSize;
-                Settings.Save();
+                App.Settings.Save();
             }
         };
 
@@ -81,7 +81,7 @@ public partial class MainWindow
         if (IsLoaded && e.HeightChanged && double.IsInfinity(PowerConsumerRow.MaxHeight))
         {
             App.Settings.ControllerGridRowHeight = PowerConsumerRow.ActualHeight;
-            Settings.Save();
+            App.Settings.Save();
         }
     }
 
@@ -227,7 +227,7 @@ public partial class MainWindow
 
         Chevron?.BeginAnimation(Chevron.AngleProperty, rotateAnimation);
         RibbonTransform?.BeginAnimation(ScaleTransform.ScaleYProperty, scaleAnimation);
-        Settings.Save();
+        App.Settings.Save();
     }
 
     private void OnShowAvmChanged(object sender, RoutedEventArgs e)
@@ -248,7 +248,7 @@ public partial class MainWindow
 
     private void SaveSettings(object sender, RoutedEventArgs e)
     {
-        Settings.Save();
+        App.Settings.Save();
     }
 
     private async void OnRebootWattPilotClicked(object sender, RoutedEventArgs e)

@@ -1,5 +1,5 @@
-﻿using System.Text.Json;
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
+using System.Text.Json;
 using De.Hochstaetter.Fronius.Models.JsonConverters;
 using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Client.Exceptions;
@@ -12,11 +12,10 @@ public partial class ToshibaHvacService(SynchronizationContext context, Settings
 
     private string? azureDeviceId;
     private AzureConnection? azureConnection;
-    private bool isStopping;
+    private readonly SemaphoreSlim lifecycleSemaphore = new(1, 1);
     private ToshibaHvacSession? session;
     private DeviceClient? azureClient;
-    private ulong messageId;// = BitConverter.ToUInt64(RandomNumberGenerator.GetBytes(8));
-    private bool isStarting;
+    private ulong messageId; // = BitConverter.ToUInt64(RandomNumberGenerator.GetBytes(8));
 
     public event EventHandler<ToshibaHvacAzureSmMobileCommand>? LiveDataReceived;
 
@@ -51,51 +50,57 @@ public partial class ToshibaHvacService(SynchronizationContext context, Settings
 
     public async ValueTask Stop()
     {
-        if (isStopping)
-        {
-            return;
-        }
+        await lifecycleSemaphore.WaitAsync(CancellationToken.None).ConfigureAwait(false);
 
         try
         {
-            isStopping = true;
+            await StopCore().ConfigureAwait(false);
+        }
+        finally
+        {
+            lifecycleSemaphore.Release();
+        }
+    }
 
+    private async ValueTask StopCore()
+    {
+        try
+        {
             if (TokenSource != null)
             {
                 await TokenSource.CancelAsync();
-                TokenSource = null;
             }
 
             if (azureClient != null)
             {
                 await azureClient.DisposeAsync().ConfigureAwait(false);
             }
-
-            AllDevices?.Clear();
-            session = null;
-            azureClient = null;
         }
         finally
         {
-            isStopping = false;
+            AllDevices?.Clear();
+            session = null;
+            azureClient = null;
+            TokenSource?.Dispose();
+            TokenSource = null;
         }
     }
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public async ValueTask Start(AzureConnection? connection, string deviceId)
     {
-        if (isStarting || connection == null)
+        if (connection == null)
         {
             return;
         }
 
-        azureDeviceId = deviceId;
-        azureConnection = connection;
+        await lifecycleSemaphore.WaitAsync(CancellationToken.None).ConfigureAwait(false);
 
         try
         {
-            isStarting = true;
-            await Stop().ConfigureAwait(false);
+            await StopCore().ConfigureAwait(false);
+            azureDeviceId = deviceId;
+            azureConnection = connection;
 
             try
             {
@@ -117,10 +122,7 @@ public partial class ToshibaHvacService(SynchronizationContext context, Settings
 #if DEBUG
 
                 // ReSharper disable once UnusedParameter.Local
-                await azureClient.SetReceiveMessageHandlerAsync(async (message, userContext) =>
-                {
-                    await azureClient.CompleteAsync(message, Token).ConfigureAwait(false);
-                }, null, Token);
+                await azureClient.SetReceiveMessageHandlerAsync(async (message, userContext) => { await azureClient.CompleteAsync(message, Token).ConfigureAwait(false); }, null, Token);
 
                 await azureClient.SetMethodDefaultHandlerAsync(HandleOtherMethods, null, Token).ConfigureAwait(false);
 
@@ -131,39 +133,80 @@ public partial class ToshibaHvacService(SynchronizationContext context, Settings
             }
             catch
             {
-                await Stop().ConfigureAwait(false);
+                await StopCore().ConfigureAwait(false);
             }
         }
         finally
         {
-            isStarting = false;
+            lifecycleSemaphore.Release();
         }
     }
 
     private async ValueTask<ToshibaHvacAzureCredentials> RefreshAll()
     {
-        var postData = new Dictionary<string, string>
+        session = settings.ToshibaHvacSession;
+        var username = azureConnection?.UserName ?? string.Empty;
+        ToshibaHvacAzureCredentials? azureCredentials = null;
+        var triedLogin = false;
+
+        if (session == null)
         {
-            { "Username", azureConnection!.UserName },
-            { "Password", azureConnection.Password }
-        };
+            await GetBearer().ConfigureAwait(false);
+        }
 
-        session = await Deserialize<ToshibaHvacSession>("/api/Consumer/Login", postData).ConfigureAwait(false)
-                  ?? throw new WebException("No session data received", WebExceptionStatus.ReceiveFailure);
-
-        postData = new Dictionary<string, string>
+        while (azureCredentials == null)
         {
-            { "DeviceID", azureConnection.UserName.ToLower() + "_" + azureDeviceId },
-            { "DeviceType", "1" },
-            { "Username", azureConnection.UserName },
-        };
+            try
+            {
+                var postData = new Dictionary<string, string>
+                {
+                    { "DeviceID", username.ToLowerInvariant() + "_" + azureDeviceId },
+                    { "DeviceType", "1" },
+                    { "Username", username },
+                };
 
-        var azureCredentials = await Deserialize<ToshibaHvacAzureCredentials>("/api/Consumer/RegisterMobileDevice", postData).ConfigureAwait(false);
+                azureCredentials = await Deserialize<ToshibaHvacAzureCredentials>("/api/Consumer/RegisterMobileDevice", postData).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Failed to register mobile device");
+
+                if (triedLogin)
+                {
+                    throw;
+                }
+                
+                await GetBearer().ConfigureAwait(false);
+            }
+        }
+
+        if (session == null)
+        {
+            throw new UnauthorizedAccessException("Could not get Azure credentials");
+        }
 
         var devices = await Deserialize<List<ToshibaHvacMapping>>($"/api/AC/GetConsumerACMapping?consumerId={session.ConsumerId}").ConfigureAwait(false);
-        AllDevices = new BindableCollection<ToshibaHvacMapping>(devices, context);
+        AllDevices = [with(devices, context)];
         // var test = await Deserialize<ToshibaHvacStatusDevice>($"/api/AC/GetCurrentACState?ACId={AllDevices[0].Devices[0].AcId}").ConfigureAwait(false);
         return azureCredentials;
+
+        async ValueTask GetBearer()
+        {
+            triedLogin = true;
+            
+            var getBearerPostData = new Dictionary<string, string>
+            {
+                { "Username", username },
+                { "Password", azureConnection?.Password ?? string.Empty },
+            };
+
+            session = await Deserialize<ToshibaHvacSession>("/api/Consumer/Login", getBearerPostData).ConfigureAwait(false)
+                      ?? throw new WebException("No session data received", WebExceptionStatus.ReceiveFailure);
+
+            settings.ToshibaHvacSession = session;
+            settings.ToshibaHvacSessionTime = DateTime.UtcNow;
+            await settings.Save().ConfigureAwait(false);
+        }
     }
 
     public async ValueTask<string> SendDeviceCommand(ToshibaHvacStateData state, params string[] targetIdStrings)
@@ -173,11 +216,13 @@ public partial class ToshibaHvacService(SynchronizationContext context, Settings
             throw new IotHubCommunicationException("Not connected");
         }
 
+        var currentMessageId = Interlocked.Increment(ref messageId);
+
         var command = new ToshibaHvacAzureSmMobileCommand
         {
             CommandName = "CMD_FCU_TO_AC",
-            DeviceUniqueId = settings.ToshibaAcConnection.UserName.ToLower() + "_" + azureDeviceId!,
-            MessageId = $"MB_{azureDeviceId![..Math.Min(15, azureDeviceId!.Length)].ToUpperInvariant()}-{++messageId % 10000000:D8}",
+            DeviceUniqueId = settings.ToshibaAcConnection.UserName.ToLowerInvariant() + "_" + azureDeviceId!,
+            MessageId = $"MB_{azureDeviceId![..Math.Min(15, azureDeviceId!.Length)].ToUpperInvariant()}-{currentMessageId % 100000000:D8}",
             TargetIds = targetIdStrings,
             TimeStamp = DateTime.UtcNow.TimeOfDay.ToString(),
             PayLoad = JsonDocument.Parse($"{{ \"data\":\"{state}\"}}").RootElement,
@@ -293,8 +338,8 @@ public partial class ToshibaHvacService(SynchronizationContext context, Settings
         var result = await response.Content.ReadFromJsonAsync<ToshibaHvacResponse<T>>(jsonOptions, Token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
 #endif
 
-        return !result.IsSuccess 
-            ? throw new InvalidDataException(result.Message) 
+        return !result.IsSuccess
+            ? throw new InvalidDataException(result.Message)
             : result.Data;
     }
 }

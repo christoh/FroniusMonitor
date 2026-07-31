@@ -34,13 +34,15 @@ public class Settings : SettingsBase
         set => Set(ref field, value);
     }
 
-    public static Task Save() => Save(App.SettingsFileName);
+    public override Task Save() => Save(this, App.SettingsFileName);
 
-    public static Task Save(string fileName) => Task.Run(() =>
+    public static Task Save(string fileName) => Save(App.Settings, fileName);
+
+    private static Task Save(Settings settings, string fileName) => Task.Run(() =>
     {
         lock (settingsLock)
         {
-            UpdateChecksum(App.Settings.WattPilotConnection, App.Settings.FritzBoxConnection, App.Settings.FroniusConnection, App.Settings.FroniusConnection2, App.Settings.ToshibaAcConnection);
+            UpdateChecksum(settings.WattPilotConnection, settings.FritzBoxConnection, settings.FroniusConnection, settings.FroniusConnection2, settings.ToshibaAcConnection);
             var serializer = new XmlSerializer(typeof(Settings));
             Directory.CreateDirectory(App.PerUserDataDir);
             using var stream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None);
@@ -53,7 +55,7 @@ public class Settings : SettingsBase
                 NewLineChars = Environment.NewLine,
             });
 
-            serializer.Serialize(writer, App.Settings);
+            serializer.Serialize(writer, settings);
         }
     });
 
@@ -66,7 +68,17 @@ public class Settings : SettingsBase
                 App.SolarSystemQueryTimer = new(_ => { Environment.Exit(0); }, null, 10000, -1);
                 var serializer = new XmlSerializer(typeof(Settings));
                 using var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-                App.Settings = serializer.Deserialize(stream) as Settings ?? new Settings();
+                var loaded = serializer.Deserialize(stream) as Settings ?? new Settings();
+
+                if (App.Settings is null)
+                {
+                    App.Settings = loaded;
+                }
+                else
+                {
+                    App.Settings.CopyFrom(loaded);
+                }
+
                 ClearIncorrectPasswords(App.Settings.WattPilotConnection, App.Settings.FritzBoxConnection, App.Settings.FroniusConnection);
             }
             finally
