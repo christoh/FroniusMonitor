@@ -55,7 +55,7 @@ public partial class WattPilotService : BindableBase, IWattPilotService
         try
         {
             tokenSource?.Dispose();
-            tokenSource = new CancellationTokenSource(10000);
+            tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
             Connection = connection;
 
             // The PBKDF2 hash is salted with the device serial number, so it must be recomputed for
@@ -132,7 +132,8 @@ public partial class WattPilotService : BindableBase, IWattPilotService
             tokenSource = new CancellationTokenSource();
             readerTask = Task.Run(Reader, CancellationToken.None);
 
-            if (WattPilot?.Version is not null && WattPilot?.LatestVersion is not null && WattPilot.LatestVersion > WattPilot.Version)
+            //TODO: Fix new firmware detection (use ocu)
+            if (WattPilot?.Version is not null && WattPilot?.LatestVersion is not null && false)
             {
                 NewFirmwareAvailable?.Invoke(this, new NewWattPilotFirmwareEventArgs
                 (

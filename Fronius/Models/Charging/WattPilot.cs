@@ -24,7 +24,7 @@ public partial class WattPilot : BindableBase, IHaveDisplayName, IHaveUniqueId, 
             }
 
             wattPilotElectricityPriceService.PriceRegion = EnergyPriceCountry;
-            wattPilotElectricityPriceService.RawValues = ElectricityPrices;
+            wattPilotElectricityPriceService.UpdateData(ElectricityPrices);
         });
     }
 
@@ -98,11 +98,11 @@ public partial class WattPilot : BindableBase, IHaveDisplayName, IHaveUniqueId, 
     [ObservableProperty]
     [FroniusProprietaryImport("version", FroniusDataType.Root)]
     [WattPilot("fwv")]
-    public partial Version? Version { get; set; }
+    public partial string? Version { get; set; }
 
     [ObservableProperty]
     [WattPilot("onv")]
-    public partial Version? LatestVersion { get; set; }
+    public partial string? LatestVersion { get; set; }
 
     [ObservableProperty]
     [WattPilot("cci")]
@@ -678,7 +678,7 @@ public partial class WattPilot : BindableBase, IHaveDisplayName, IHaveUniqueId, 
     public partial IList<WattPilotCard>? Cards { get; set; }
 
     [WattPilot("awpl")]
-    public IList<WattPilotElectricityPrice>? ElectricityPrices
+    public WattPilotElectricityPrice? ElectricityPrices
     {
         get;
         set => Set(ref field, value, () =>
@@ -692,7 +692,7 @@ public partial class WattPilot : BindableBase, IHaveDisplayName, IHaveUniqueId, 
 
             if (value != null)
             {
-                wattPilotElectricityPriceService.RawValues = value;
+                wattPilotElectricityPriceService.UpdateData(value);
             }
         });
     }

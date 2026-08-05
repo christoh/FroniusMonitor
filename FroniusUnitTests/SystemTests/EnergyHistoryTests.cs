@@ -7,7 +7,13 @@ using De.Hochstaetter.Fronius.Services;
 
 namespace FroniusUnitTests.SystemTests;
 
-public class Settings : SettingsBase;
+public class Settings : SettingsBase
+{
+    public override Task Save()
+    {
+        throw new NotImplementedException();
+    }
+}
 
 [TestFixture]
 [SuppressMessage("ReSharper", "StringLiteralTypo")]

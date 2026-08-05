@@ -3,12 +3,12 @@
 namespace De.Hochstaetter.Fronius.Models.Charging;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
-public partial class WattPilotElectricityPrice : BindableBase, IElectricityPrice
+public partial class WattPilotElectricityPrice : BindableBase
 {
     [ObservableProperty]
     [JsonProperty("marketprice")]
     [WattPilot("marketprice")]
-    public partial decimal CentsPerKiloWattHour { get; set; }
+    public partial decimal[] CentsPerKiloWattHour { get; set; } = [];
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(StartTime))]
@@ -25,18 +25,14 @@ public partial class WattPilotElectricityPrice : BindableBase, IElectricityPrice
     }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(EndTime))]
-    [JsonProperty("end")]
-    [WattPilot("end")]
-    public partial long EndSeconds { get; set; }
+    [JsonProperty("interval")]
+    [WattPilot("interval")]
+    [NotifyPropertyChangedFor(nameof(Interval))]
+    public partial int IntervalSeconds { get; set; }
 
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
-    public DateTime EndTime
-    {
-        get => DateTime.UnixEpoch.AddSeconds(EndSeconds);
-        set => EndSeconds = (long)Math.Round((value - DateTime.UnixEpoch).TotalSeconds, MidpointRounding.AwayFromZero);
-    }
+    public TimeSpan Interval => TimeSpan.FromSeconds(IntervalSeconds);
 
     public object Clone() => MemberwiseClone();
         
