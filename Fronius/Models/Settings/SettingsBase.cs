@@ -24,13 +24,13 @@ public abstract partial class SettingsBase : BindableBase, ICloneable
             TunnelMode = TunnelMode.Auto,
         };
 
-        AzureDeviceId = Guid.NewGuid();
+        AzureDeviceId = unchecked((uint)RandomNumberGenerator.GetInt32(0, 1000000));
     }
 
     [XmlElement, DefaultValue(null), ObservableProperty]
     public partial ToshibaHvacSession? ToshibaHvacSession { get; set; }
 
-    [XmlAttribute, ObservableProperty, DefaultValue(typeof(DateTime),default)]
+    [XmlAttribute, ObservableProperty, DefaultValue(typeof(DateTime), default)]
     public partial DateTime ToshibaHvacSessionTime { get; set; }
 
     //[XmlElement, DefaultValue(null), ObservableProperty]
@@ -99,13 +99,25 @@ public abstract partial class SettingsBase : BindableBase, ICloneable
     public partial AzureConnection ToshibaAcConnection { get; set; }
 
     [XmlIgnore, ObservableProperty]
-    public partial Guid AzureDeviceId { get; set; }
+    public partial uint AzureDeviceId { get; set; }
 
     [XmlElement(nameof(AzureDeviceId))]
     public string AzureDeviceIdString
     {
-        get => AzureDeviceId.ToString("D");
-        set => AzureDeviceId = Guid.Parse(value, CultureInfo.InvariantCulture);
+        get => AzureDeviceId.ToString("D6", CultureInfo.InvariantCulture);
+        set
+        {
+            if (!uint.TryParse(value, CultureInfo.InvariantCulture, out var result))
+            {
+                var logger = IoC.TryGetRegistered<ILogger<SettingsBase>>();
+                AzureDeviceId = unchecked((uint)RandomNumberGenerator.GetInt32(0, 1000000));
+                logger?.LogWarning("Invalid AzureDeviceId value: {value}. Generated a new random value: {randomValue:D6}", value, AzureDeviceId);
+            }
+            else
+            {
+                AzureDeviceId = result;
+            }
+        }
     }
 
     [XmlElement, DefaultValue(false), ObservableProperty]
@@ -122,7 +134,7 @@ public abstract partial class SettingsBase : BindableBase, ICloneable
     {
         connections.Where(connection => connection != null && connection.PasswordChecksum != connection.CalculatedChecksum).Apply(connection => connection!.Password = string.Empty);
     }
-    
+
     public object Clone()
     {
         var clone = (SettingsBase)MemberwiseClone();

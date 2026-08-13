@@ -164,7 +164,8 @@ public partial class ToshibaHvacService(SynchronizationContext context, Settings
                     { "DeviceType", "1" },
                     { "Username", username },
                 };
-
+                
+                logger.LogDebug("Registering Toshiba HVAC mobile device with DeviceID: {DeviceID}", postData["DeviceID"]);
                 azureCredentials = await Deserialize<ToshibaHvacAzureCredentials>("/api/Consumer/RegisterMobileDevice", postData).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -200,8 +201,16 @@ public partial class ToshibaHvacService(SynchronizationContext context, Settings
                 { "Password", azureConnection?.Password ?? string.Empty },
             };
 
-            session = await Deserialize<ToshibaHvacSession>("/api/Consumer/Login", getBearerPostData).ConfigureAwait(false)
-                      ?? throw new WebException("No session data received", WebExceptionStatus.ReceiveFailure);
+            try
+            {
+                session = await Deserialize<ToshibaHvacSession>("/api/Consumer/Login", getBearerPostData).ConfigureAwait(false)
+                          ?? throw new WebException("No session data received", WebExceptionStatus.ReceiveFailure);
+            }
+            catch(Exception ex)
+            {
+                logger.LogError(ex, "Failed to get Toshiba AC bearer token");
+                throw;
+            }
 
             settings.ToshibaHvacSession = session;
             settings.ToshibaHvacSessionTime = DateTime.UtcNow;
