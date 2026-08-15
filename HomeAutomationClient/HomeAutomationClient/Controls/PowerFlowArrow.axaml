@@ -1,0 +1,27 @@
+<ContentControl xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:local="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+                xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+                mc:Ignorable="d" d:DesignWidth="80" d:DesignHeight="30"
+                x:Class="De.Hochstaetter.HomeAutomationClient.Controls.PowerFlowArrow">
+    <Viewbox UseLayoutRounding="False" DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PowerFlowArrow}}}">
+        <Grid Width="80" Height="30" Background="Transparent">
+            <Grid Background="Transparent">
+                <Grid.RenderTransform>
+                    <RotateTransform Angle="{Binding DirectionAngle}"/>
+                </Grid.RenderTransform>
+                <Path x:Name="Triangle" Data="M 80,15 65,0 65,30 Z" StrokeThickness="0" Fill="LightGray"/>
+                <Rectangle x:Name="Rectangle" StrokeThickness="0" Width="71" VerticalAlignment="Center" HorizontalAlignment="Left" Height="16" Fill="LightGray"/>
+            </Grid>
+            <StackPanel x:Name="ValueStackPanel" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Transparent">
+                <TextBlock VerticalAlignment="Center" FontWeight="Bold" FontSize="8.5" Margin="0,.5,0,0">
+                    <Run x:Name="ValueRun"/>
+                    <Run Text="{Binding UnitName}"/>
+                </TextBlock>
+                <TextBlock x:Name="AcDc" Text="{x:Static p:Resources.Ac}" FontSize="5" FontWeight="Bold" VerticalAlignment="Center" Margin="0,6,0,0"/>
+            </StackPanel>
+        </Grid>
+    </Viewbox>
+</ContentControl>
