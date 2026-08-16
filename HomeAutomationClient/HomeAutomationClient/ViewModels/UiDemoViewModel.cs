@@ -2,10 +2,13 @@
 using System.Collections.ObjectModel;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Avalonia.Media.Immutable;
 using De.Hochstaetter.Fronius.Extensions;
 using De.Hochstaetter.Fronius.Models;
 using De.Hochstaetter.Fronius.Models.Charging;
+using De.Hochstaetter.HomeAutomationClient.Extensions;
 using Microsoft.AspNetCore.SignalR.Client;
+
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 
@@ -53,6 +56,9 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
     [ObservableProperty]
     public partial double SitePvPeakPower { get; set; }
 
+    [ObservableProperty]
+    public partial ISolidColorBrush LoadPowerBrush { get; set; } = new ImmutableSolidColorBrush(Color.FromUInt32(0xff807000));
+
     public bool ShowInverters => Inverters.Count > 0;
 
     public bool ShowWattPilots => WattPilots.Count > 0;
@@ -70,21 +76,21 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
             if (wattPilotResult.Payload is { } wattPilots)
             {
-                WattPilots = new ObservableCollection<KeyedDevice<WattPilot>>(wattPilots.Select(wp => new KeyedDevice<WattPilot> { Device = wp.Value, Key = wp.Key }));
+                WattPilots = [.. wattPilots.Select(wp => new KeyedDevice<WattPilot> { Device = wp.Value, Key = wp.Key })];
             }
 
             var gen24Result = await webClient.GetGen24Devices();
 
             if (gen24Result.Payload is { } gen24Systems)
             {
-                Inverters = new ObservableCollection<KeyedDevice<Gen24System>>(gen24Systems.Select(i => new KeyedDevice<Gen24System> { Device = i.Value, Key = i.Key }));
+                Inverters = [.. gen24Systems.Select(i => new KeyedDevice<Gen24System> { Device = i.Value, Key = i.Key })];
             }
 
             var fritzBoxResult = await webClient.GetFritzBoxDevices();
 
             if (fritzBoxResult.Payload is { } fritzBoxDevices)
             {
-                FritzBoxDevices = new ObservableCollection<KeyedDevice<FritzBoxDevice>>(fritzBoxDevices.Where(fb=>fb.Value.CanSwitch).Select(fb => new KeyedDevice<FritzBoxDevice> { Device = fb.Value, Key = fb.Key }));
+                FritzBoxDevices = [.. fritzBoxDevices.Where(fb => fb.Value.CanSwitch).Select(fb => new KeyedDevice<FritzBoxDevice> { Device = fb.Value, Key = fb.Key })];
             }
 
             NotifyOfPropertyChange(nameof(ShowPowerConsumers));
@@ -163,7 +169,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
                 if (pilots is { Status: HttpStatusCode.OK, Payload: { } wattPilots })
                 {
-                    WattPilots = new ObservableCollection<KeyedDevice<WattPilot>>(wattPilots.Select(wp => new KeyedDevice<WattPilot> { Device = wp.Value, Key = wp.Key }));
+                    WattPilots = [.. wattPilots.Select(wp => new KeyedDevice<WattPilot> { Device = wp.Value, Key = wp.Key })];
                 }
 
                 NotifyOfPropertyChange(nameof(ShowWattPilots));
@@ -224,7 +230,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
                 Dispatcher.UIThread.Invoke(() =>
                 {
-                    Inverters = new(Inverters.Append(inverter).OrderBy(i => i.Device.Config?.InverterSettings?.SystemName));
+                    Inverters = [.. Inverters.Append(inverter).OrderBy(i => i.Device.Config?.InverterSettings?.SystemName)];
                     NotifyOfPropertyChange(nameof(ShowInverters));
                 });
             }
@@ -247,6 +253,36 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
             SitePowerFlow.LoadPower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.LoadPower ?? 0);
             SitePowerFlow.InverterAcPower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.InverterAcPower ?? 0);
             SitePvPeakPower = Inverters.Sum(i => i.Device.Config?.InverterSettings?.Mppt?.Mppt1?.WattPeak + i.Device.Config?.InverterSettings?.Mppt?.Mppt2?.WattPeak ?? 0);
+
+            Dispatcher.UIThread.Invoke(() =>
+            {
+                ISolidColorBrush gridPowerBrush = Application.Current!.GetSolidColorBrush("PowerFlowGrid")!;
+                ISolidColorBrush solarPowerBrush = Application.Current!.GetSolidColorBrush("PowerFlowSolar")!;
+                ISolidColorBrush storagePowerBrush = Application.Current!.GetSolidColorBrush("PowerFlowBattery")!;
+                
+                var incomingSolarPower = double.Max(0, SitePowerFlow.SolarPower);
+                var incomingGridPower = double.Max(0, SitePowerFlow.GridPowerCorrected);
+                var incomingStoragePower = double.Max(0, SitePowerFlow.StoragePower);
+                var totalIncomingPower = incomingStoragePower + incomingGridPower + incomingSolarPower;
+
+                double r = 0, g = 0, b = 0;
+
+                if (totalIncomingPower > 0)
+                {
+                    r = (incomingSolarPower / totalIncomingPower) * solarPowerBrush.Color.R + (incomingStoragePower / totalIncomingPower) * storagePowerBrush.Color.R + (incomingGridPower / totalIncomingPower) * gridPowerBrush.Color.R;
+                    g = (incomingSolarPower / totalIncomingPower) * solarPowerBrush.Color.G + (incomingStoragePower / totalIncomingPower) * storagePowerBrush.Color.G + (incomingGridPower / totalIncomingPower) * gridPowerBrush.Color.G;
+                    b = (incomingSolarPower / totalIncomingPower) * solarPowerBrush.Color.B + (incomingStoragePower / totalIncomingPower) * storagePowerBrush.Color.B + (incomingGridPower / totalIncomingPower) * gridPowerBrush.Color.B;
+                }
+
+                LoadPowerBrush = new ImmutableSolidColorBrush(Color.FromRgb(Round(r), Round(g), Round(b)));
+            });
+
+            return;
+
+            static byte Round(double value)
+            {
+                return (byte)Math.Round(value, MidpointRounding.ToZero);
+            }
         }
         catch
         {

@@ -282,3 +282,11 @@ public class SensorData : ConverterBase
         return $"{value}{unitString}";
     }
 }
+
+public class InverterStatus2Bool : ConverterBase
+{
+    public override object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is byte and 1;
+    }
+}

@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Diagnostics;
 
 namespace De.Hochstaetter.HomeAutomationClient.Converters;
 
@@ -30,7 +31,6 @@ public class Null2ColorMap : Null2AnythingBase<IReadOnlyList<ColorThreshold>>;
 
 public class Null2Double : Null2AnythingBase<double>;
 
-
 public class Null2Bool : Null2AnythingBase<bool>
 {
     public Null2Bool()
@@ -47,7 +47,7 @@ public abstract class Any2AnythingBase<T> : ConverterBase
 
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        return value is ICollection { Count: > 1, } ? Any : Empty;
+        return value is ICollection { Count: > 1 } ? Any : Empty;
     }
 }
 
@@ -60,10 +60,10 @@ public abstract class Bool2AnythingBase<T> : ConverterBase
     public T? True { get; set; }
     public T? False { get; set; }
     public T? Null { get; set; }
-    
+
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        return value is bool b ? (b ? True : False) : Null;
+        return value is bool b ? b ? True : False : Null;
     }
 }
 
@@ -74,6 +74,37 @@ public class Bool2Char : Bool2AnythingBase<char>
         True = '\0';
         False = '•';
         Null = '•';
+    }
+}
+
+public class Bool2Bool : Bool2AnythingBase<bool>
+{
+    public Bool2Bool()
+    {
+        True = false;
+        False = true;
+        Null = true;
+    }
+
+    public override object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is bool b ? b == True ? False : True : Null;
+    }
+}
+
+public class Bool2Opacity : Bool2AnythingBase<double>
+{
+    public Bool2Opacity()
+    {
+        True = 1.0;
+        False = 0.5;
+        Null = 0.5;
+    }
+
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        Debug.Print(value?.ToString());
+        return base.Convert(value, targetType, parameter, culture);
     }
 }
 
@@ -89,10 +120,10 @@ public class DateConverter : ConverterBase
 
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        return value is not DateTime date 
-            ? null 
-            : (UseUtc 
-                ? date.ToUniversalTime() 
+        return value is not DateTime date
+            ? null
+            : (UseUtc
+                ? date.ToUniversalTime()
                 : date.ToLocalTime()).ToString(StringFormat, UseCurrentCulture ? CultureInfo.CurrentCulture : culture);
     }
 
@@ -124,10 +155,8 @@ public class NullToAnything<T> : ConverterBase
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value is null ? Null : NotNull;
 }
 
-
 public class NullToBool : NullToAnything<bool>
 {
     public override bool NotNull { get; set; } = true;
     public override bool Null { get; set; } = false;
 }
-

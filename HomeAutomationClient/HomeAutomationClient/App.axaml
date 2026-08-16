@@ -24,6 +24,7 @@
                 <ResourceDictionary x:Key='Light'>
                     <SolidColorBrush x:Key="PowerFlowBattery">LightGreen</SolidColorBrush>
                     <SolidColorBrush x:Key="PowerFlowSolar">#ffd000</SolidColorBrush>
+                    <SolidColorBrush x:Key="PowerFlowGrid">LightGray</SolidColorBrush>
                     
                     <SolidColorBrush x:Key='BackgroundBrush'>White</SolidColorBrush>
 					<SolidColorBrush x:Key='ForegroundBrush'>Black</SolidColorBrush>
@@ -74,6 +75,7 @@
                 <ResourceDictionary x:Key='Dark'>
                     <SolidColorBrush x:Key="PowerFlowBattery">DarkGreen</SolidColorBrush>
                     <SolidColorBrush x:Key="PowerFlowSolar">#807000</SolidColorBrush>
+                    <SolidColorBrush x:Key="PowerFlowGrid">#ff404040</SolidColorBrush>
                    
                     <SolidColorBrush x:Key='BackgroundBrush'>Black</SolidColorBrush>
 					<SolidColorBrush x:Key='ForegroundBrush'>#e8e8e8</SolidColorBrush>

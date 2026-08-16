@@ -1,7 +1,26 @@
+using Avalonia.Layout;
+using DocumentFormat.OpenXml;
+
 namespace De.Hochstaetter.HomeAutomationClient.Controls
 {
     public partial class PowerFlowArrow : Viewbox
     {
+        public static readonly StyledProperty<bool> IsVerticalProperty= AvaloniaProperty.Register<PowerFlowArrow, bool>(nameof(IsVertical));
+
+        public bool IsVertical
+        {
+            get => GetValue(IsVerticalProperty);
+            set => SetValue(IsVerticalProperty, value);
+        }
+        
+        public static readonly StyledProperty<double> RotationDegreesProperty = AvaloniaProperty.Register<PowerFlowArrow, double>(nameof(RotationDegrees));
+        
+        public double RotationDegrees
+        {
+            get => GetValue(RotationDegreesProperty);
+            set => SetValue(RotationDegreesProperty, value);
+        }
+
         public static readonly StyledProperty<IBrush?> FillProperty = AvaloniaProperty.Register<PowerFlowArrow, IBrush?>(nameof(Fill), Brushes.LightGray);
 
         public IBrush? Fill
@@ -26,9 +45,9 @@ namespace De.Hochstaetter.HomeAutomationClient.Controls
             set => SetValue(IsDcProperty, value);
         }
 
-        public static readonly StyledProperty<bool> IsLeftProperty = AvaloniaProperty.Register<PowerFlowArrow, bool>(nameof(IsLeft));
+        public static readonly StyledProperty<bool> IsLeftProperty = AvaloniaProperty.Register<PowerFlowArrow, bool>(nameof(InvertArrow));
 
-        public bool IsLeft
+        public bool InvertArrow
         {
             get => GetValue(IsLeftProperty);
             set => SetValue(IsLeftProperty, value);
@@ -53,6 +72,8 @@ namespace De.Hochstaetter.HomeAutomationClient.Controls
         public PowerFlowArrow()
         {
             InitializeComponent();
+            SetIsVertical();
+            SetText();
         }
 
         public static readonly DirectProperty<PowerFlowArrow, double> DirectionAngleProperty = AvaloniaProperty.RegisterDirect<PowerFlowArrow, double>(nameof(DirectionAngle), o => o.DirectionAngle);
@@ -70,7 +91,7 @@ namespace De.Hochstaetter.HomeAutomationClient.Controls
             switch (e.Property.Name)
             {
                 case nameof(Fill):
-                    Triangle.Fill = Rectangle.Fill = Fill;
+                    Arrow.Fill = Fill;
                     break;
 
                 case nameof(Value):
@@ -78,19 +99,32 @@ namespace De.Hochstaetter.HomeAutomationClient.Controls
                     SetText();
                     break;
 
-                case nameof(IsLeft):
+                case nameof(InvertArrow):
                     SetAngle();
                     break;
 
                 case nameof(IsDc):
                     AcDc.Text = IsDc ? Loc.Dc : Loc.Ac;
                     break;
+                
+                case nameof(IsVertical):
+                    SetIsVertical();
+                    break;
             }
+        }
+
+        private void SetIsVertical()
+        {
+            RootElement.Width = IsVertical ? 85 : 70;
+            RootElement.Height = IsVertical ? 50 : 30;
+            ValueStackPanel.HorizontalAlignment = IsVertical?HorizontalAlignment.Left:HorizontalAlignment.Center;
+            TextBlock.Margin = IsVertical?new Thickness(30, 0, 0, 0):new Thickness(0, 0, 0, 0);
+            SetAngle();
         }
 
         private void SetAngle()
         {
-            var isInverted = IsLeft;
+            var isInverted = InvertArrow;
 
             if (Value >= 0)
             {
@@ -98,7 +132,7 @@ namespace De.Hochstaetter.HomeAutomationClient.Controls
             }
 
             DirectionAngle = isInverted ? 180 : 0;
-            ValueStackPanel.Margin = isInverted ? new Thickness(5, 0, 0, 0) : new Thickness(0, 0, 0, 0);
+            ValueStackPanel.Margin = isInverted&&!IsVertical ? new Thickness(5, 0, 0, 0) : new Thickness(0, 0, 0, 0);
 
         }
 

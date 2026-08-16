@@ -2,7 +2,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:views="clr-namespace:De.Hochstaetter.HomeAutomationClient.Views"
              xmlns:vm="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels"
              xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
@@ -29,68 +28,15 @@
                 <Grid.Resources>
                     <system:Double x:Key="ControlWidth">180</system:Double>
                 </Grid.Resources>
-                    <StackPanel Orientation="Vertical" ClipToBounds="True">
-                        <StackPanel.Styles>
-                            <Style Selector="HeaderedContentControl">
-                                <Setter Property="Margin" Value="4" />
-                            </Style>
-                        </StackPanel.Styles>
-                        <Viewbox StretchDirection="DownOnly">
-                            <ItemsControl HorizontalAlignment="Left" ItemsSource="{Binding Inverters}" IsVisible="{Binding ShowInverters}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Horizontal" />
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto" Margin="0,0,32,0">
-                                            <Grid.Styles>
-                                                <Style Selector="c|PowerFlowArrow">
-                                                    <Setter Property="Margin" Value="0,0,5,0"/>
-                                                    <Setter Property="Width" Value="140"/>
-                                                </Style>
-                                                <Style Selector="c|SunPower">
-                                                    <Setter Property="Width" Value="100"/>
-                                                    <Setter Property="Margin" Value="8"/>
-                                                </Style>
-                                            </Grid.Styles>
-                                            <c:InverterControl Grid.Row="0" Grid.Column="2" Grid.RowSpan="3" ColorAllTicks="{Binding Path=((vm:UiDemoViewModel)DataContext).ColorAllTicks, FallbackValue={x:False}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
-                                                               Width="300" VerticalAlignment="Top"
-                                                               Inverter="{Binding Device}"
-                                                               DeviceKey="{Binding Key}"
-                                                               Margin="8" />
-
-                                            <c:PowerFlowArrow Grid.Row="0" Grid.Column="3" IsDc="True" Value="{Binding Device.Sensors.Inverter.Solar1Power, FallbackValue=0}"
-                                                              Fill="{DynamicResource PowerFlowSolar}"/>
-
-                                            <c:SunPower Grid.Row="0" Grid.Column="4" PeakPower="{Binding Device.Config.InverterSettings.Mppt.Mppt1.WattPeak, FallbackValue=0}"/>
-
-                                            <c:PowerFlowArrow Grid.Row="1" Grid.Column="3" IsDc="True" Value="{Binding Device.Sensors.Inverter.Solar2Power, FallbackValue=0}"
-                                                              Fill="{DynamicResource PowerFlowSolar}"/>
-
-                                            <c:SunPower Grid.Row="1" Grid.Column="4" PeakPower="{Binding Device.Config.InverterSettings.Mppt.Mppt2.WattPeak, FallbackValue=0}"/>
-
-                                            <c:EnergyStorageControl Grid.Row="0" Grid.RowSpan="3" Grid.Column="0" Height="250" VerticalAlignment="Center" HorizontalAlignment="Left"
-                                                                    Gen24System="{Binding Device, FallbackValue={x:Null}}"
-                                                                    IsVisible="{Binding Device.Sensors.Storage, FallbackValue={x:False}, Converter={co:Null2Bool}}"/>
-
-                                            <c:PowerFlowArrow IsLeft="True" Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" Margin="5,0,0,0" IsDc="True" Value="{Binding Device.Sensors.Inverter.StoragePower, FallbackValue=0}"
-                                                              IsVisible="{Binding Device.Sensors.Storage, FallbackValue={x:False}, Converter={co:Null2Bool}}" VerticalAlignment="Center"
-                                                              Fill="{DynamicResource PowerFlowBattery}"/>
-
-                                        </Grid>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </Viewbox>
-                        <Rectangle Height="20" HorizontalAlignment="Stretch" Fill="DarkGray"></Rectangle>
-                        <c:SmartMeterControl Width="{StaticResource ControlWidth}" VerticalAlignment="Top" Margin="8"
-                                             MeterStatus="{Binding MeterStatus}" HorizontalAlignment="Left"
-                                             SmartMeter="{Binding SmartMeter}"
-                                             Gen24Config="{Binding Gen24Config}"
-                                             ColorAllTicks="{Binding ColorAllTicks}" />
-                        <ItemsControl ItemsSource="{Binding WattPilots}" HorizontalAlignment="Left">
+                <StackPanel Orientation="Vertical" ClipToBounds="True">
+                    <StackPanel.Styles>
+                        <Style Selector="HeaderedContentControl">
+                            <Setter Property="Margin" Value="4" />
+                        </Style>
+                    </StackPanel.Styles>
+                    <Viewbox StretchDirection="DownOnly">
+                        <StackPanel Orientation="Horizontal">
+                        <ItemsControl HorizontalAlignment="Left" ItemsSource="{Binding Inverters}" IsVisible="{Binding ShowInverters}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <StackPanel Orientation="Horizontal" />
@@ -98,35 +44,97 @@
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <c:WattPilotControl ColorAllTicks="{Binding Path=((vm:UiDemoViewModel)DataContext).ColorAllTicks, FallbackValue={x:False}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
-                                                        Width="{StaticResource ControlWidth}"
-                                                        WattPilot="{Binding Device}"
-                                                        DeviceKey="{Binding Key}"
-                                                        Margin="8" />
+                                    <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto" Margin="0,0,32,0">
+                                        <Grid.Styles>
+                                            <Style Selector="c|PowerFlowArrow">
+                                                <Setter Property="Margin" Value="0,0,5,0"/>
+                                                <Setter Property="Width" Value="140"/>
+                                            </Style>
+                                            <Style Selector="c|SunPower">
+                                                <Setter Property="Width" Value="100"/>
+                                                <Setter Property="Margin" Value="8"/>
+                                            </Style>
+                                        </Grid.Styles>
+                                        <StackPanel Grid.Row="0" Grid.Column="2" Grid.RowSpan="3">
+                                            <c:InverterControl x:Name="InverterControl"
+                                                               ColorAllTicks="{Binding Path=((vm:UiDemoViewModel)DataContext).ColorAllTicks, FallbackValue={x:False}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+                                                               Width="300" VerticalAlignment="Top"
+                                                               Inverter="{Binding Device}" LoadPowerBrush="{Binding Path=((vm:UiDemoViewModel)DataContext).LoadPowerBrush, FallbackValue={x:False}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+                                                               DeviceKey="{Binding Key}"
+                                                               Margin="8" />
+                                            <c:PowerFlowArrow Fill="{Binding ElementName=InverterControl, Path=AcProducedPowerBrush}"
+                                                              InvertArrow="True" Value="{Binding Device.Sensors.Inverter.PowerActiveSum, FallbackValue=0}" RotationDegrees="35"
+                                                              IsEnabled="{Binding Device.Sensors.InverterStatus.Status, FallbackValue=False, TargetNullValue=False, Converter={co:InverterStatus2Bool}}"/>
+                                        </StackPanel>
+
+                                        <c:PowerFlowArrow Grid.Row="0" Grid.Column="3" IsDc="True" Value="{Binding Device.Sensors.Inverter.Solar1Power, FallbackValue=0}"
+                                                          Fill="{DynamicResource PowerFlowSolar}"/>
+
+                                        <c:SunPower Grid.Row="0" Grid.Column="4" PeakPower="{Binding Device.Config.InverterSettings.Mppt.Mppt1.WattPeak, FallbackValue=0}"/>
+
+                                        <c:PowerFlowArrow Grid.Row="1" Grid.Column="3" IsDc="True" Value="{Binding Device.Sensors.Inverter.Solar2Power, FallbackValue=0}"
+                                                          Fill="{DynamicResource PowerFlowSolar}"/>
+
+                                        <c:SunPower Grid.Row="1" Grid.Column="4" PeakPower="{Binding Device.Config.InverterSettings.Mppt.Mppt2.WattPeak, FallbackValue=0}"/>
+
+                                        <c:EnergyStorageControl Grid.Row="0" Grid.RowSpan="3" Grid.Column="0" Height="250" VerticalAlignment="Center" HorizontalAlignment="Left"
+                                                                Gen24System="{Binding Device, FallbackValue={x:Null}}"
+                                                                IsVisible="{Binding Device.Sensors.Storage, FallbackValue={x:False}, Converter={co:Null2Bool}}"/>
+
+                                        <c:PowerFlowArrow InvertArrow="True" Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" Margin="5,0,0,0" IsDc="True" Value="{Binding Device.Sensors.Inverter.StoragePower, FallbackValue=0}"
+                                                          IsVisible="{Binding Device.Sensors.Storage, FallbackValue={x:False}, Converter={co:Null2Bool}}" VerticalAlignment="Center"
+                                                          Fill="{DynamicResource PowerFlowBattery}"/>
+
+                                    </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
-                        <ItemsControl ItemsSource="{Binding FritzBoxDevices}" x:Name="PowerConsumerItemsControl" HorizontalAlignment="Left">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Vertical" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <c:PowerConsumer Width="{StaticResource ControlWidth}"
-                                                     Device="{Binding Device}"
-                                                     Margin="8"
-                                                     DeviceKey="{Binding Key}"
-                                                     SwitchCommand="{Binding ((vm:UiDemoViewModel)DataContext).SwitchDeviceCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
-                                                     SetColorTemperatureCommand="{Binding ((vm:UiDemoViewModel)DataContext).SetColorTemperatureCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
-                                                     SetHueCommand="{Binding ((vm:UiDemoViewModel)DataContext).SetHueCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
-                                                     SetSaturationCommand="{Binding ((vm:UiDemoViewModel)DataContext).SetSaturationCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
-                                                     SetBrightnessCommand="{Binding ((vm:UiDemoViewModel)DataContext).SetBrightnessCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
+                            <c:SmartMeterControl Width="300" VerticalAlignment="Top" Margin="8"
+                                                 MeterStatus="{Binding MeterStatus}" HorizontalAlignment="Left"
+                                                 SmartMeter="{Binding SmartMeter}"
+                                                 Gen24Config="{Binding Gen24Config}"
+                                                 ColorAllTicks="{Binding ColorAllTicks}" />
+                            
+                        </StackPanel>
+                    </Viewbox>
+                    <Rectangle Height="20" HorizontalAlignment="Stretch" Fill="DarkGray"></Rectangle>
+                    <ItemsControl ItemsSource="{Binding WattPilots}" HorizontalAlignment="Left">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <c:WattPilotControl ColorAllTicks="{Binding Path=((vm:UiDemoViewModel)DataContext).ColorAllTicks, FallbackValue={x:False}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+                                                    Width="{StaticResource ControlWidth}"
+                                                    WattPilot="{Binding Device}"
+                                                    DeviceKey="{Binding Key}"
+                                                    Margin="8" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <ItemsControl ItemsSource="{Binding FritzBoxDevices}" x:Name="PowerConsumerItemsControl" HorizontalAlignment="Left">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Vertical" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <c:PowerConsumer Width="{StaticResource ControlWidth}"
+                                                 Device="{Binding Device}"
+                                                 Margin="8"
+                                                 DeviceKey="{Binding Key}"
+                                                 SwitchCommand="{Binding ((vm:UiDemoViewModel)DataContext).SwitchDeviceCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+                                                 SetColorTemperatureCommand="{Binding ((vm:UiDemoViewModel)DataContext).SetColorTemperatureCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+                                                 SetHueCommand="{Binding ((vm:UiDemoViewModel)DataContext).SetHueCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+                                                 SetSaturationCommand="{Binding ((vm:UiDemoViewModel)DataContext).SetSaturationCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+                                                 SetBrightnessCommand="{Binding ((vm:UiDemoViewModel)DataContext).SetBrightnessCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
             </Grid>
             <StackPanel Grid.Row="2" Margin="16" Orientation="Horizontal">
                 <TextBlock Text="{x:Static p:Resources.ColorAllGaugeTicks}" Margin="0,0,8,0" />

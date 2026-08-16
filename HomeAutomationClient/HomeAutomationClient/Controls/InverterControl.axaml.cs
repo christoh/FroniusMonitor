@@ -1,4 +1,6 @@
 using Avalonia.Controls.Primitives;
+using Avalonia.Media.Immutable;
+using De.Hochstaetter.HomeAutomationClient.Extensions;
 
 namespace De.Hochstaetter.HomeAutomationClient.Controls;
 
@@ -87,6 +89,22 @@ public partial class InverterControl : DeviceControlBase
         set => SetValue(InverterProperty, value);
     }
 
+    public static readonly DirectProperty<InverterControl, IBrush?> AcProducedPowerBrushProperty = AvaloniaProperty.RegisterDirect<InverterControl, IBrush?>(nameof(AcProducedPowerBrush), o => o.AcProducedPowerBrush);
+
+    public IBrush? AcProducedPowerBrush
+    {
+        get;
+        set => SetAndRaise(AcProducedPowerBrushProperty, ref field, value);
+    }
+
+    public static readonly StyledProperty<IBrush> LoadPowerBrushProperty = AvaloniaProperty.Register<InverterControl, IBrush>(nameof(LoadPowerBrush), new ImmutableSolidColorBrush(Color.FromUInt32(0xff807000)));
+
+    public IBrush LoadPowerBrush
+    {
+        get => GetValue(LoadPowerBrushProperty);
+        set => SetValue(LoadPowerBrushProperty, value);
+    }
+
     public static readonly StyledProperty<bool> ColorAllTicksProperty = AvaloniaProperty.Register<InverterControl, bool>(nameof(ColorAllTicks));
 
     public bool ColorAllTicks
@@ -106,6 +124,10 @@ public partial class InverterControl : DeviceControlBase
     public InverterControl()
     {
         InitializeComponent();
+
+        AcProducedPowerBrush = Application.Current!.TryGetResource("PowerFlowSolar", Application.Current.ActualThemeVariant, out var value) && value is IBrush brush
+            ? brush
+            : new ImmutableSolidColorBrush(Color.FromUInt32(0xff807000));
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs e)
@@ -123,8 +145,18 @@ public partial class InverterControl : DeviceControlBase
                 if (e.NewValue is INotifyPropertyChanged newDevice)
                 {
                     newDevice.PropertyChanged += OnInverterPropertyChanged;
+                    SetAcPowerBrushColor();
                     OnInverterPropertyChanged(Inverter, new PropertyChangedEventArgs(string.Empty));
                 }
+
+                break;
+            
+            case nameof(LoadPowerBrush):
+                if ((Inverter?.Sensors?.Inverter?.StoragePower ?? 0)+(Inverter?.Sensors?.Inverter?.SolarPowerSum ?? 0) < 0)
+                {
+                   AcProducedPowerBrush = LoadPowerBrush;
+                }
+
                 break;
         }
     }
@@ -163,6 +195,35 @@ public partial class InverterControl : DeviceControlBase
             "STATE_STARTUP" => InnerStartup,
             _ => InnerOther,
         };
+    }
+
+    private void SetAcPowerBrushColor()
+    {
+        var storagePower = Inverter?.Sensors?.Inverter?.StoragePower ?? 0;
+        var solarPower = Inverter?.Sensors?.Inverter?.SolarPowerSum ?? 0;
+        var powerSum = storagePower + solarPower;
+        ISolidColorBrush gridPowerBrush = Application.Current!.GetSolidColorBrush("PowerFlowGrid")!;
+
+        if (Inverter?.Sensors?.InverterStatus?.Status != 1 || powerSum == 0)
+        {
+            AcProducedPowerBrush = new ImmutableSolidColorBrush(gridPowerBrush);
+            return;
+        }
+
+        if (powerSum > 0)
+        {
+            ISolidColorBrush solarPowerBrush = Application.Current!.GetSolidColorBrush("PowerFlowSolar")!;
+            ISolidColorBrush storagePowerBrush = Application.Current!.GetSolidColorBrush("PowerFlowBattery")!;
+            var solarWeight = (float)(solarPower / powerSum);
+            AcProducedPowerBrush = new ImmutableSolidColorBrush(storagePowerBrush.Color.MixWith(solarPowerBrush.Color, solarWeight));
+        }
+        
+        return;
+
+        static byte Round(double value)
+        {
+            return (byte)Math.Round(value, MidpointRounding.ToZero);
+        }
     }
 
     private void CycleMode(IReadOnlyList<InverterDisplayMode> modeList, ref int index)

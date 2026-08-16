@@ -1,5 +1,4 @@
 using Avalonia.Media.Immutable;
-using System.Text.RegularExpressions;
 using De.Hochstaetter.Fronius.Models;
 using De.Hochstaetter.HomeAutomationClient.Extensions;
 
