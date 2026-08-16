@@ -1,7 +1,4 @@
-using System.Diagnostics;
-using Avalonia.Controls;
 using Avalonia.Media.Immutable;
-using De.Hochstaetter.HomeAutomationClient.Extensions;
 
 namespace De.Hochstaetter.HomeAutomationClient.Controls;
 
@@ -42,6 +39,11 @@ public partial class LinearGauge : Gauge
             case nameof(Origin):
                 OnAnimatedValueChanged();
                 break;
+
+            case nameof(ShowPercent):
+            case nameof(UnitName):
+                SetUnitName();
+                break;
             
             case nameof(StringFormat):
                 SetValue(true);
@@ -60,6 +62,11 @@ public partial class LinearGauge : Gauge
         {
             base.SetValue(sKipAnimation);
         }
+    }
+
+    private void SetUnitName()
+    {
+        UnitTextBlock.Text = ShowPercent?"%":UnitName;
     }
 
     private void OnAnimatedValueChanged()
@@ -85,11 +92,11 @@ public partial class LinearGauge : Gauge
         var upperValue = Math.Max(Origin, AnimatedValue);
 
         var gradientStops = GaugeColors
-            .Where(g => g.RelativeValue < upperValue && g.RelativeValue > lowerValue)
-            .Select(g => new ImmutableGradientStop((g.RelativeValue - lowerValue) / (upperValue - lowerValue), g.Color))
-            .Prepend(new ImmutableGradientStop(0, GetColorForRelativeValue(lowerValue)))
-            .Append(new ImmutableGradientStop(1, GetColorForRelativeValue(upperValue)))
-            .ToList()
+                .Where(g => g.RelativeValue < upperValue && g.RelativeValue > lowerValue)
+                .Select(g => new ImmutableGradientStop((g.RelativeValue - lowerValue) / (upperValue - lowerValue), g.Color))
+                .Prepend(new ImmutableGradientStop(0, GetColorForRelativeValue(lowerValue)))
+                .Append(new ImmutableGradientStop(1, GetColorForRelativeValue(upperValue)))
+                .ToList()
             ;
 
         var brush = new ImmutableLinearGradientBrush(gradientStops);

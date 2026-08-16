@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.HomeAutomationClient.Assets.Images;
 
-public class InfoIcon : ContentControl;
+public partial class InfoIcon : ContentControl;
 
 public class InfoIconExtension : MarkupExtension
 {

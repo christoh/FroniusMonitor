@@ -45,7 +45,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
     public partial Gen24Status? MeterStatus { get; set; }
 
     [ObservableProperty]
-    public partial Gen24Config? Gen24Config { get; set; }
+    public partial Gen24Config? PrimaryGen24Config { get; set; }
 
     [ObservableProperty]
     public partial Gen24System? BatteryGen24System { get; set; }
@@ -58,6 +58,18 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
     [ObservableProperty]
     public partial ISolidColorBrush LoadPowerBrush { get; set; } = new ImmutableSolidColorBrush(Color.FromUInt32(0xff807000));
+
+    [ObservableProperty]
+    public partial ISolidColorBrush GridPowerBrush { get; set; } = new ImmutableSolidColorBrush(Colors.LightGray);
+
+    [ObservableProperty]
+    public partial ISolidColorBrush GridPowerBrushL1 { get; set; } = new ImmutableSolidColorBrush(Colors.LightGray);
+
+    [ObservableProperty]
+    public partial ISolidColorBrush GridPowerBrushL2 { get; set; } = new ImmutableSolidColorBrush(Colors.LightGray);
+
+    [ObservableProperty]
+    public partial ISolidColorBrush GridPowerBrushL3 { get; set; } = new ImmutableSolidColorBrush(Colors.LightGray);
 
     public bool ShowInverters => Inverters.Count > 0;
 
@@ -84,6 +96,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
             if (gen24Result.Payload is { } gen24Systems)
             {
                 Inverters = [.. gen24Systems.Select(i => new KeyedDevice<Gen24System> { Device = i.Value, Key = i.Key })];
+                Inverters.Apply(OnNewInverterReceived);
             }
 
             var fritzBoxResult = await webClient.GetFritzBoxDevices();
@@ -115,10 +128,45 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
             hubConnection.On<string, FritzBoxDevice>(nameof(FritzBoxDevice), OnFritzBoxUpdate);
             hubConnection.On<string, WattPilot>(nameof(WattPilot), OnWattPilotUpdate);
             hubConnection.On<string, WattPilotUpdate>(nameof(WattPilotUpdate), OnWattPilotUpdateMessage);
+            Application.Current!.ActualThemeVariantChanged += OnThemeChanged;
         }
         finally
         {
             BusyText = null;
+        }
+    }
+
+    private void OnThemeChanged(object? sender = null, EventArgs? e = null)
+    {
+        ISolidColorBrush gridPowerBrush = Application.Current!.GetSolidColorBrush("PowerFlowGrid")!;
+        ISolidColorBrush solarPowerBrush = Application.Current!.GetSolidColorBrush("PowerFlowSolar")!;
+        ISolidColorBrush storagePowerBrush = Application.Current!.GetSolidColorBrush("PowerFlowBattery")!;
+
+        var incomingSolarPower = double.Max(0, SitePowerFlow.SolarPower);
+        var incomingGridPower = double.Max(0, SitePowerFlow.GridPowerCorrected);
+        var incomingStoragePower = double.Max(0, SitePowerFlow.StoragePower);
+        var totalIncomingPower = incomingStoragePower + incomingGridPower + incomingSolarPower;
+
+        double r = 0, g = 0, b = 0;
+
+        if (totalIncomingPower > 0)
+        {
+            r = (incomingSolarPower / totalIncomingPower) * solarPowerBrush.Color.R + (incomingStoragePower / totalIncomingPower) * storagePowerBrush.Color.R + (incomingGridPower / totalIncomingPower) * gridPowerBrush.Color.R;
+            g = (incomingSolarPower / totalIncomingPower) * solarPowerBrush.Color.G + (incomingStoragePower / totalIncomingPower) * storagePowerBrush.Color.G + (incomingGridPower / totalIncomingPower) * gridPowerBrush.Color.G;
+            b = (incomingSolarPower / totalIncomingPower) * solarPowerBrush.Color.B + (incomingStoragePower / totalIncomingPower) * storagePowerBrush.Color.B + (incomingGridPower / totalIncomingPower) * gridPowerBrush.Color.B;
+        }
+
+        LoadPowerBrush = new ImmutableSolidColorBrush(Color.FromRgb(Round(r), Round(g), Round(b)));
+        GridPowerBrush = SitePowerFlow.GridPowerCorrected < 0 ? LoadPowerBrush : gridPowerBrush;
+        GridPowerBrushL1 = SmartMeter?.ActivePowerL1 < 0 ? LoadPowerBrush : gridPowerBrush;
+        GridPowerBrushL2 = SmartMeter?.ActivePowerL2 < 0 ? LoadPowerBrush : gridPowerBrush;
+        GridPowerBrushL3 = SmartMeter?.ActivePowerL3 < 0 ? LoadPowerBrush : gridPowerBrush;
+
+        return;
+
+        static byte Round(double value)
+        {
+            return (byte)Math.Round(value, MidpointRounding.ToZero);
         }
     }
 
@@ -239,55 +287,36 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
                 inverter.Device.CopyFrom(gen24System);
             }
 
-            if (inverter.Device.Sensors is { Storage: not null, PrimaryPowerMeter: not null })
-            {
-                Gen24Config = inverter.Device.Config;
-                MeterStatus = inverter.Device.Sensors.MeterStatus;
-                SmartMeter = inverter.Device.Sensors.PrimaryPowerMeter;
-                BatteryGen24System = inverter.Device;
-            }
-
-            SitePowerFlow.SolarPower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.SolarPower ?? 0);
-            SitePowerFlow.GridPower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.GridPower ?? 0);
-            SitePowerFlow.StoragePower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.StoragePower ?? 0);
-            SitePowerFlow.LoadPower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.LoadPower ?? 0);
-            SitePowerFlow.InverterAcPower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.InverterAcPower ?? 0);
-            SitePvPeakPower = Inverters.Sum(i => i.Device.Config?.InverterSettings?.Mppt?.Mppt1?.WattPeak + i.Device.Config?.InverterSettings?.Mppt?.Mppt2?.WattPeak ?? 0);
-
-            Dispatcher.UIThread.Invoke(() =>
-            {
-                ISolidColorBrush gridPowerBrush = Application.Current!.GetSolidColorBrush("PowerFlowGrid")!;
-                ISolidColorBrush solarPowerBrush = Application.Current!.GetSolidColorBrush("PowerFlowSolar")!;
-                ISolidColorBrush storagePowerBrush = Application.Current!.GetSolidColorBrush("PowerFlowBattery")!;
-                
-                var incomingSolarPower = double.Max(0, SitePowerFlow.SolarPower);
-                var incomingGridPower = double.Max(0, SitePowerFlow.GridPowerCorrected);
-                var incomingStoragePower = double.Max(0, SitePowerFlow.StoragePower);
-                var totalIncomingPower = incomingStoragePower + incomingGridPower + incomingSolarPower;
-
-                double r = 0, g = 0, b = 0;
-
-                if (totalIncomingPower > 0)
-                {
-                    r = (incomingSolarPower / totalIncomingPower) * solarPowerBrush.Color.R + (incomingStoragePower / totalIncomingPower) * storagePowerBrush.Color.R + (incomingGridPower / totalIncomingPower) * gridPowerBrush.Color.R;
-                    g = (incomingSolarPower / totalIncomingPower) * solarPowerBrush.Color.G + (incomingStoragePower / totalIncomingPower) * storagePowerBrush.Color.G + (incomingGridPower / totalIncomingPower) * gridPowerBrush.Color.G;
-                    b = (incomingSolarPower / totalIncomingPower) * solarPowerBrush.Color.B + (incomingStoragePower / totalIncomingPower) * storagePowerBrush.Color.B + (incomingGridPower / totalIncomingPower) * gridPowerBrush.Color.B;
-                }
-
-                LoadPowerBrush = new ImmutableSolidColorBrush(Color.FromRgb(Round(r), Round(g), Round(b)));
-            });
-
-            return;
-
-            static byte Round(double value)
-            {
-                return (byte)Math.Round(value, MidpointRounding.ToZero);
-            }
+            OnNewInverterReceived(inverter);
         }
         catch
         {
             // Ignore errors
         }
+    }
+
+    private void OnNewInverterReceived(KeyedDevice<Gen24System> inverter)
+    {
+        if (inverter.Device.Sensors is { PrimaryPowerMeter: not null })
+        {
+            PrimaryGen24Config = inverter.Device.Config;
+            MeterStatus = inverter.Device.Sensors.MeterStatus;
+            SmartMeter = inverter.Device.Sensors.PrimaryPowerMeter;
+        }
+
+        if (inverter.Device.Sensors is { Storage: not null })
+        {
+            BatteryGen24System = inverter.Device;
+        }
+
+        SitePowerFlow.SolarPower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.SolarPower ?? 0);
+        SitePowerFlow.GridPower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.GridPower ?? 0);
+        SitePowerFlow.StoragePower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.StoragePower ?? 0);
+        SitePowerFlow.LoadPower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.LoadPower ?? 0);
+        SitePowerFlow.InverterAcPower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.InverterAcPower ?? 0);
+        SitePvPeakPower = Inverters.Sum(i => i.Device.Config?.InverterSettings?.Mppt?.Mppt1?.WattPeak + i.Device.Config?.InverterSettings?.Mppt?.Mppt2?.WattPeak ?? 0);
+
+        Dispatcher.UIThread.Invoke(() => OnThemeChanged());
     }
 
     private void OnFritzBoxUpdate(string id, FritzBoxDevice fritzBoxDevice)

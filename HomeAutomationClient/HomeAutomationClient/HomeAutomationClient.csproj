@@ -10,23 +10,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<AvaloniaResource Include="Assets\**" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<AvaloniaResource Remove="Assets\Images\ErrorIcon.axaml.cs" />
-		<AvaloniaResource Remove="Assets\Images\InfoIcon.axaml.cs" />
-		<AvaloniaResource Remove="Assets\Images\VisibilityIcon.axaml.cs" />
-		<AvaloniaResource Remove="Assets\Images\WarningIcon.axaml.cs" />
-		<AvaloniaResource Remove="Assets\LoadingIndicators.Avalonia\LoadingIndicator.cs" />
-		<AvaloniaResource Remove="Assets\LoadingIndicators.Avalonia\LoadingIndicatorMode.cs" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<AvaloniaXaml Remove="Assets\Images\ErrorIcon.axaml" />
-		<AvaloniaXaml Remove="Assets\Images\InfoIcon.axaml" />
-		<AvaloniaXaml Remove="Assets\Images\VisibilityIcon.axaml" />
-		<AvaloniaXaml Remove="Assets\Images\WarningIcon.axaml" />
+		<AvaloniaResource Include="Assets\Images\sun.ico" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -50,18 +34,4 @@
 		<ProjectReference Include="..\..\Fronius\Fronius.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<AvaloniaResource Update="Assets\Images\ErrorIcon.axaml">
-			<SubType>Designer</SubType>
-		</AvaloniaResource>
-		<AvaloniaResource Update="Assets\Images\InfoIcon.axaml">
-			<SubType>Designer</SubType>
-		</AvaloniaResource>
-		<AvaloniaResource Update="Assets\Images\VisibilityIcon.axaml">
-			<SubType>Designer</SubType>
-		</AvaloniaResource>
-		<AvaloniaResource Update="Assets\Images\WarningIcon.axaml">
-			<SubType>Designer</SubType>
-		</AvaloniaResource>
-	</ItemGroup>
 </Project>

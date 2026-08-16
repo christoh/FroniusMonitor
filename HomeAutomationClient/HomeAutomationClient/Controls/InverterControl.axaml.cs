@@ -128,6 +128,21 @@ public partial class InverterControl : DeviceControlBase
         AcProducedPowerBrush = Application.Current!.TryGetResource("PowerFlowSolar", Application.Current.ActualThemeVariant, out var value) && value is IBrush brush
             ? brush
             : new ImmutableSolidColorBrush(Color.FromUInt32(0xff807000));
+
+        Loaded += (_, _) =>
+        {
+            Application.Current.ActualThemeVariantChanged += OnThemeChanged;
+        };
+
+        Unloaded += (_, _) =>
+        {
+            Application.Current.ActualThemeVariantChanged -= OnThemeChanged;
+        };
+    }
+
+    private void OnThemeChanged(object? sender, EventArgs e)
+    {
+        SetAcPowerBrushColor();
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs e)
@@ -145,16 +160,15 @@ public partial class InverterControl : DeviceControlBase
                 if (e.NewValue is INotifyPropertyChanged newDevice)
                 {
                     newDevice.PropertyChanged += OnInverterPropertyChanged;
-                    SetAcPowerBrushColor();
                     OnInverterPropertyChanged(Inverter, new PropertyChangedEventArgs(string.Empty));
                 }
 
                 break;
-            
+
             case nameof(LoadPowerBrush):
-                if ((Inverter?.Sensors?.Inverter?.StoragePower ?? 0)+(Inverter?.Sensors?.Inverter?.SolarPowerSum ?? 0) < 0)
+                if ((Inverter?.Sensors?.Inverter?.StoragePower ?? 0) + (Inverter?.Sensors?.Inverter?.SolarPowerSum ?? 0) < 0)
                 {
-                   AcProducedPowerBrush = LoadPowerBrush;
+                    AcProducedPowerBrush = LoadPowerBrush;
                 }
 
                 break;
@@ -163,13 +177,17 @@ public partial class InverterControl : DeviceControlBase
 
     private void OnInverterPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == string.Empty)
+        switch (e.PropertyName)
         {
-            Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                ChangeOuter();
-                ChangeInner();
-            });
+            case "":
+                Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    SetAcPowerBrushColor();
+                    ChangeOuter();
+                    ChangeInner();
+                });
+
+                break;
         }
     }
 
@@ -199,8 +217,8 @@ public partial class InverterControl : DeviceControlBase
 
     private void SetAcPowerBrushColor()
     {
-        var storagePower = Inverter?.Sensors?.Inverter?.StoragePower ?? 0;
-        var solarPower = Inverter?.Sensors?.Inverter?.SolarPowerSum ?? 0;
+        var storagePower = double.Max(0, Inverter?.Sensors?.Inverter?.StoragePower ?? 0);
+        var solarPower = double.Max(0, Inverter?.Sensors?.Inverter?.SolarPowerSum ?? 0);
         var powerSum = storagePower + solarPower;
         ISolidColorBrush gridPowerBrush = Application.Current!.GetSolidColorBrush("PowerFlowGrid")!;
 
@@ -216,13 +234,6 @@ public partial class InverterControl : DeviceControlBase
             ISolidColorBrush storagePowerBrush = Application.Current!.GetSolidColorBrush("PowerFlowBattery")!;
             var solarWeight = (float)(solarPower / powerSum);
             AcProducedPowerBrush = new ImmutableSolidColorBrush(storagePowerBrush.Color.MixWith(solarPowerBrush.Color, solarWeight));
-        }
-        
-        return;
-
-        static byte Round(double value)
-        {
-            return (byte)Math.Round(value, MidpointRounding.ToZero);
         }
     }
 

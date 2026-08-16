@@ -1,3 +1,3 @@
 namespace De.Hochstaetter.HomeAutomationClient.Assets.Images;
 
-public class WarningIcon : ContentControl;
+public partial class WarningIcon : ContentControl;

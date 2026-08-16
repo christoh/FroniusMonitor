@@ -92,7 +92,7 @@ public class Bool2Bool : Bool2AnythingBase<bool>
     }
 }
 
-public class Bool2Opacity : Bool2AnythingBase<double>
+public class Bool2Opacity : Bool2Double
 {
     public Bool2Opacity()
     {

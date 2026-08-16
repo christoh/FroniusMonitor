@@ -505,11 +505,11 @@
                                                Maximum="300" ShowPercent="False" GaugeColors="{x:Static m:GaugeColors.HighIsBad}"
                                                Value="{Binding Inverter.Sensors.PowerFlow.PowerLoss, FallbackValue=0, TargetNullValue=0}" />
                                 <c:LinearGauge Classes="AcPowerLinearGaugeStyle Local" Label="{x:Static p:Resources.Efficiency}" x:Name="MoreEfficiencyEfficiency"
-                                               GaugeColors="{x:Static m:GaugeColors.LowIsBad}" UnitName="%" ShowPercent="True" Maximum="1" Minimum="0"
+                                               GaugeColors="{x:Static m:GaugeColors.LowIsBad}" ShowPercent="True" Maximum="1" Minimum="0"
                                                Value="{Binding Inverter.Sensors.PowerFlow.Efficiency, FallbackValue='0', TargetNullValue='0'}" />
-                                <!--<c:LinearGauge Classes="AcPowerLinearGaugeStyle Local" Label="{x:Static p:Resources.SelfConsumptionShort}" x:Name="MoreEfficiencySelfConsumption" />
-                                <c:LinearGauge Classes="AcPowerLinearGaugeStyle Local" Label="{x:Static p:Resources.SelfSufficiencyShort}" x:Name="MoreEfficiencySelfSufficiency" />-->
-                            </StackPanel>
+<!--                                <c:LinearGauge Classes="AcPowerLinearGaugeStyle Local" Label="{x:Static p:Resources.SelfConsumptionShort}" x:Name="MoreEfficiencySelfConsumption" />
+                                <c:LinearGauge Classes="AcPowerLinearGaugeStyle Local" Label="{x:Static p:Resources.SelfSufficiencyShort}" x:Name="MoreEfficiencySelfSufficiency" />
+-->                            </StackPanel>
                         </Grid>
 
                         <Grid x:Name="More" IsVisible="{Binding Mode, Converter={co:InverterDisplayMode2Bool More}}" RowDefinitions="Auto,Auto,*">
