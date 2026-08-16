@@ -5,6 +5,11 @@ namespace De.Hochstaetter.HomeAutomationClient.Assets.Images;
 /// </summary>
 public partial class VisibilityIcon:ContentControl
 {
+    public VisibilityIcon()
+    {
+        InitializeComponent();
+    }
+
     public static readonly StyledProperty<bool> VisibleProperty = AvaloniaProperty.Register<VisibilityIcon,bool>(nameof(Visible));
 
     public bool Visible

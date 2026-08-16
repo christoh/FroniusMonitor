@@ -13,7 +13,7 @@ public class StrictestLimitConverter : ConverterBase
     {
         double result = 24150;
 
-        if (value is Gen24PowerLimits { ActivePower: { } activePower } && activePower.IsEnabled)
+        if (value is Gen24PowerLimits { ActivePower: { IsEnabled: true } activePower })
         {
             if (activePower.HardLimit.IsEnabled)
             {
@@ -118,7 +118,7 @@ public class Gauge2Text : MultiConverterBase
             return null;
         }
 
-        return gauge.Value.ToString(gauge.StringFormat, CultureInfo.CurrentCulture) + " " + gauge.UnitName;
+        return gauge.Value.HasValue ? gauge.Value.Value.ToString(gauge.StringFormat, CultureInfo.CurrentCulture) + " " + gauge.UnitName : "---";
     }
 }
 
@@ -235,19 +235,19 @@ public class PowerMeterStatusLocalizeExtension : ConverterBase
     }
 }
 
-public class StorageValueConverterBase:ConverterBase
+public class StorageValueConverterBase : ConverterBase
 {
     public string? PropertyName { get; set; }
     public double FallBackValue { get; set; }
-    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public override object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         switch (value)
         {
-            case Gen24Storage storage when PropertyName!=null:
-            {
-                var pi = typeof(Gen24Storage).GetProperty(PropertyName);
-                return pi?.GetValue(storage)??FallBackValue;
-            }
+            case Gen24Storage storage when PropertyName != null:
+                {
+                    var pi = typeof(Gen24Storage).GetProperty(PropertyName);
+                    return pi?.GetValue(storage) ?? FallBackValue;
+                }
 
             default:
                 return FallBackValue;

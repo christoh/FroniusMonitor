@@ -4,8 +4,8 @@
                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                 mc:Ignorable="d" d:DesignWidth="100" d:DesignHeight="100"
                 x:Class="De.Hochstaetter.HomeAutomationClient.Assets.Images.ErrorIcon">
-	<Viewbox>
-		<Canvas Width="100" Height="100">
+    <Viewbox>
+    <Canvas Width="100" Height="100">
 			<Canvas.Styles>
 				<Style Selector="Rectangle">
 					<Setter Property="Height" Value="15" />
@@ -27,5 +27,5 @@
 				</Rectangle.RenderTransform>
 			</Rectangle>
 		</Canvas>
-	</Viewbox>
+    </Viewbox>
 </ContentControl>

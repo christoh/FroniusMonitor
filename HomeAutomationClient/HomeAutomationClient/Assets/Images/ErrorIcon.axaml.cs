@@ -1,6 +1,12 @@
 namespace De.Hochstaetter.HomeAutomationClient.Assets.Images;
 
-public partial class ErrorIcon : ContentControl;
+public partial class ErrorIcon : ContentControl
+{
+    public ErrorIcon()
+    {
+        InitializeComponent();
+    }
+}
 
 public class ErrorIconExtension : MarkupExtension
 {

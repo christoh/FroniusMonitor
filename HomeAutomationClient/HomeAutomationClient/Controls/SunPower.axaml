@@ -3,7 +3,6 @@
                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                 xmlns:local="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
-                xmlns:gl="clr-namespace:System.Globalization;assembly=System.Runtime"
                 xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
                 mc:Ignorable="d" d:DesignWidth="512" d:DesignHeight="511.72"
                 x:Class="De.Hochstaetter.HomeAutomationClient.Controls.SunPower">
@@ -18,7 +17,7 @@
                         <Setter Property="Foreground" Value="Black"/>
                     </Style>
                 </StackPanel.Styles>
-                <TextBlock FontSize="70" Text="{Binding PeakPower, Mode=OneWay, StringFormat='{}{0:N0}', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}" HorizontalAlignment="Center"/>
+                <TextBlock FontSize="70" Text="{Binding PeakPower, Mode=OneWay, StringFormat='{}{0:N0}', TargetNullValue='---'}" HorizontalAlignment="Center"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <TextBlock FontSize="50" Text="W"/>                    
                 

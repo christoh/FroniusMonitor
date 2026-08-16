@@ -55,7 +55,7 @@ public partial class LinearGauge : Gauge
     {
         try
         {
-            var value = ShowPercent ? (Value - Math.Max(0, Minimum)) / (Maximum - Math.Max(0, Minimum)) * 100 : Value;
+            var value = ShowPercent ? (Value??NullValue - Math.Max(0, Minimum)) / (Maximum - Math.Max(0, Minimum)) * 100 : Value??NullValue;
             ValueTextBlock.Text = !double.IsFinite(value) ? "---" : value.ToString(StringFormat, CultureInfo.CurrentCulture);
         }
         finally

@@ -14,29 +14,19 @@ namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 
 public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewModelBase, IAsyncDisposable, IDisposable
 {
-    public class KeyedDevice<T>
-    {
-        public required string Key { get; init; }
-        public required T Device { get; init; }
-        public override string ToString() => Device?.ToString() ?? Key;
-    }
-
     private HubConnection? hubConnection;
 
     [ObservableProperty]
     public partial bool ColorAllTicks { get; set; } = true;
 
     [ObservableProperty, NotifyPropertyChangedFor(nameof(ShowInverters))]
-    public partial ObservableCollection<KeyedDevice<Gen24System>> Inverters { get; set; } = [];
+    public partial ObservableCollection<KeyedGen24System> Inverters { get; set; } = [];
 
     [ObservableProperty, NotifyPropertyChangedFor(nameof(ShowPowerConsumers))]
-    public partial ObservableCollection<KeyedDevice<FritzBoxDevice>> FritzBoxDevices { get; set; } = [];
-
-    [ObservableProperty, NotifyPropertyChangedFor(nameof(ShowWattPilots))]
-    public partial ObservableCollection<KeyedDevice<WattPilot>> WattPilots { get; set; } = [];
+    public partial ObservableCollection<IKeyedDevice> AllPowerConsumers { get; set; } = [];
 
     [ObservableProperty]
-    public partial List<KeyedDevice<ConcurrentQueue<WattPilotUpdate>>> WattPilotUpdates { get; set; } = [];
+    public partial List<KeyedWattPilotUpdate> WattPilotUpdates { get; set; } = [];
 
     [ObservableProperty]
     public partial Gen24PowerMeter3P? SmartMeter { get; set; }
@@ -73,9 +63,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
     public bool ShowInverters => Inverters.Count > 0;
 
-    public bool ShowWattPilots => WattPilots.Count > 0;
-
-    public bool ShowPowerConsumers => FritzBoxDevices.Count > 0;
+    public bool ShowPowerConsumers => AllPowerConsumers.Count > 0;
 
     public override async Task Initialize()
     {
@@ -88,14 +76,14 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
             if (wattPilotResult.Payload is { } wattPilots)
             {
-                WattPilots = [.. wattPilots.Select(wp => new KeyedDevice<WattPilot> { Device = wp.Value, Key = wp.Key })];
+                wattPilots.Select(wp => new KeyedWattPilot { Device = wp.Value, Key = wp.Key }).Apply(w=> AllPowerConsumers.Add(w));
             }
 
             var gen24Result = await webClient.GetGen24Devices();
 
             if (gen24Result.Payload is { } gen24Systems)
             {
-                Inverters = [.. gen24Systems.Select(i => new KeyedDevice<Gen24System> { Device = i.Value, Key = i.Key })];
+                Inverters = [.. gen24Systems.Select(i => new KeyedGen24System { Device = i.Value, Key = i.Key })];
                 Inverters.Apply(OnNewInverterReceived);
             }
 
@@ -103,7 +91,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
             if (fritzBoxResult.Payload is { } fritzBoxDevices)
             {
-                FritzBoxDevices = [.. fritzBoxDevices.Where(fb => fb.Value.CanSwitch).Select(fb => new KeyedDevice<FritzBoxDevice> { Device = fb.Value, Key = fb.Key })];
+                fritzBoxDevices.Where(fb => fb.Value.CanSwitch).Select(fb => new KeyedFritzBoxDevice { Device = fb.Value, Key = fb.Key }).Apply(f=> AllPowerConsumers.Add(f));
             }
 
             NotifyOfPropertyChange(nameof(ShowPowerConsumers));
@@ -203,13 +191,13 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
             if (keyedQueue == null)
             {
-                keyedQueue = new KeyedDevice<ConcurrentQueue<WattPilotUpdate>> { Key = id, Device = new ConcurrentQueue<WattPilotUpdate>() };
+                keyedQueue = new KeyedWattPilotUpdate { Key = id, Device = new ConcurrentQueue<WattPilotUpdate>() };
                 WattPilotUpdates.Add(keyedQueue);
             }
 
             keyedQueue.Device.Enqueue(update);
 
-            var existingDevice = WattPilots.FirstOrDefault(i => i.Device.SerialNumber == update.SerialNumber);
+            var existingDevice = AllPowerConsumers.OfType<KeyedWattPilot>().FirstOrDefault(i => i.Device.SerialNumber == update.SerialNumber);
 
             if (existingDevice == null)
             {
@@ -217,10 +205,12 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
                 if (pilots is { Status: HttpStatusCode.OK, Payload: { } wattPilots })
                 {
-                    WattPilots = [.. wattPilots.Select(wp => new KeyedDevice<WattPilot> { Device = wp.Value, Key = wp.Key })];
+                    var currentWattPilots = AllPowerConsumers.OfType<KeyedFritzBoxDevice>().ToArray();
+                    currentWattPilots.Apply(w => AllPowerConsumers.Remove(w));
+                    wattPilots.Select(wp => new KeyedWattPilot { Device = wp.Value, Key = wp.Key }).Apply(w => AllPowerConsumers.Add(w));
                 }
 
-                NotifyOfPropertyChange(nameof(ShowWattPilots));
+                NotifyOfPropertyChange(nameof(ShowPowerConsumers));
                 return;
             }
 
@@ -246,12 +236,12 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
     {
         try
         {
-            var existingDevice = WattPilots.FirstOrDefault(i => i.Key == id);
+            var existingDevice = AllPowerConsumers.OfType<KeyedWattPilot>().FirstOrDefault(i => i.Key == id);
 
             if (existingDevice == null)
             {
-                Dispatcher.UIThread.Invoke(() => { WattPilots.Add(new KeyedDevice<WattPilot> { Device = wattPilot, Key = id }); });
-                NotifyOfPropertyChange(nameof(ShowWattPilots));
+                Dispatcher.UIThread.Invoke(() => { AllPowerConsumers.Add(new KeyedWattPilot { Device = wattPilot, Key = id }); });
+                NotifyOfPropertyChange(nameof(ShowPowerConsumers));
             }
             else
             {
@@ -274,7 +264,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
 
             if (inverter == null)
             {
-                inverter = new KeyedDevice<Gen24System> { Key = id, Device = gen24System };
+                inverter = new KeyedGen24System { Key = id, Device = gen24System };
 
                 Dispatcher.UIThread.Invoke(() =>
                 {
@@ -326,13 +316,13 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
             return;
         }
 
-        var updateDevice = FritzBoxDevices.FirstOrDefault(f => f.Key == id);
+        var updateDevice = AllPowerConsumers.OfType<KeyedFritzBoxDevice>().FirstOrDefault(f => f.Key == id);
 
         if (updateDevice == null)
         {
             _ = Dispatcher.UIThread.InvokeAsync(() =>
             {
-                FritzBoxDevices.Add(new KeyedDevice<FritzBoxDevice> { Key = id, Device = fritzBoxDevice });
+                AllPowerConsumers.Add(new KeyedFritzBoxDevice { Key = id, Device = fritzBoxDevice });
                 NotifyOfPropertyChange(nameof(ShowPowerConsumers));
             });
         }
@@ -351,7 +341,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
         }
 
         BusyText = string.Empty;
-        var keyedDevice = FritzBoxDevices.First(d => d.Key == key);
+        var keyedDevice = AllPowerConsumers.OfType<KeyedFritzBoxDevice>().First(d => d.Key == key);
         var result = await webClient.SetDeviceBrightness(key, change.NewValue);
 
         if (result.Status is not HttpStatusCode.OK)
@@ -372,7 +362,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
     private Task SwitchDevice(string key) => TaskExceptionHandler(async () =>
     {
         BusyText = string.Empty;
-        var keyedDevice = FritzBoxDevices.First(d => d.Key == key);
+        var keyedDevice = AllPowerConsumers.OfType<KeyedFritzBoxDevice>().First(d => d.Key == key);
         ISwitchable device = keyedDevice.Device;
         var isTurnedOn = device.IsTurnedOn;
         var result = await webClient.SwitchDevice(key, device.IsTurnedOn is not true);
@@ -400,7 +390,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
         }
 
         BusyText = string.Empty;
-        var keyedDevice = FritzBoxDevices.First(d => d.Key == key);
+        var keyedDevice = AllPowerConsumers.OfType<KeyedFritzBoxDevice>().First(d => d.Key == key);
         var result = await webClient.SetColorTemperature(key, change.NewValue);
 
         if (result.Status is not HttpStatusCode.OK)
@@ -426,7 +416,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
         }
 
         BusyText = string.Empty;
-        var keyedDevice = FritzBoxDevices.First(d => d.Key == key);
+        var keyedDevice = AllPowerConsumers.OfType<KeyedFritzBoxDevice>().First(d => d.Key == key);
         var result = await webClient.SetHsv(key, hueDegrees: change.NewValue);
 
         if (result.Status is not HttpStatusCode.OK)
@@ -452,7 +442,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
         }
 
         BusyText = string.Empty;
-        var keyedDevice = FritzBoxDevices.First(d => d.Key == key);
+        var keyedDevice = AllPowerConsumers.OfType<KeyedFritzBoxDevice>().First(d => d.Key == key);
         var result = await webClient.SetHsv(key, saturation: change.NewValue);
 
         if (result.Status is not HttpStatusCode.OK)

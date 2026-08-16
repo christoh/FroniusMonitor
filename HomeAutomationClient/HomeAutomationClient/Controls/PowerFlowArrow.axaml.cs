@@ -28,9 +28,9 @@ namespace De.Hochstaetter.HomeAutomationClient.Controls
             set => SetValue(FillProperty, value);
         }
 
-        public static readonly StyledProperty<double> ValueProperty = AvaloniaProperty.Register<PowerFlowArrow, double>(nameof(Value));
+        public static readonly StyledProperty<double?> ValueProperty = AvaloniaProperty.Register<PowerFlowArrow, double?>(nameof(Value));
 
-        public double Value
+        public double? Value
         {
             get => GetValue(ValueProperty);
             set => SetValue(ValueProperty, value);
@@ -150,8 +150,8 @@ namespace De.Hochstaetter.HomeAutomationClient.Controls
         {
             ValueRun.Text = Value switch
             {
-                > -.01 and < .01 => "---",
-                _ => double.Abs(Value).ToString(StringFormat, CultureInfo.CurrentCulture),
+                null or > -.01 and < .01 => "---",
+                _ => double.Abs(Value.Value).ToString(StringFormat, CultureInfo.CurrentCulture),
             };
         }
     }

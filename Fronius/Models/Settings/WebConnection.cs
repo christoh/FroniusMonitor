@@ -1,4 +1,6 @@
-﻿namespace De.Hochstaetter.Fronius.Models.Settings;
+﻿using Newtonsoft.Json;
+
+namespace De.Hochstaetter.Fronius.Models.Settings;
 
 public partial class WebConnection : BindableBase, ICloneable, IHaveDisplayName
 {
@@ -23,7 +25,7 @@ public partial class WebConnection : BindableBase, ICloneable, IHaveDisplayName
         Aes.Key = IoC.Injector == null ? new byte[16] : IoC.Get<IAesKeyProvider>().GetAesKey();
     }
 
-    [JsonIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
     public string DisplayName => BaseUrl;
 
     [ObservableProperty, NotifyPropertyChangedFor(nameof(DisplayName)), DefaultValue(""), XmlAttribute]
@@ -32,7 +34,7 @@ public partial class WebConnection : BindableBase, ICloneable, IHaveDisplayName
     [ObservableProperty, DefaultValue(""), XmlAttribute]
     public partial string UserName { get; set; } = string.Empty;
 
-    [XmlIgnore, JsonIgnore]
+    [XmlIgnore, System.Text.Json.Serialization.JsonIgnore]
     public string Password
     {
         get;
@@ -97,7 +99,7 @@ public partial class WebConnection : BindableBase, ICloneable, IHaveDisplayName
 
     private string? calculatedChecksum;
 
-    [XmlIgnore, JsonIgnore]
+    [XmlIgnore, System.Text.Json.Serialization.JsonIgnore]
     public string CalculatedChecksum
     {
         get

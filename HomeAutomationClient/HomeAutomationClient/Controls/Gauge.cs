@@ -23,12 +23,20 @@ public abstract class Gauge : ContentControl
         set => SetValue(MaximumProperty, value);
     }
 
-    public static readonly StyledProperty<double> ValueProperty = AvaloniaProperty.Register<Gauge, double>(nameof(Value));
+    public static readonly StyledProperty<double?> ValueProperty = AvaloniaProperty.Register<Gauge, double?>(nameof(Value));
 
-    public double Value
+    public double? Value
     {
         get => GetValue(ValueProperty);
         set => SetValue(ValueProperty, value);
+    }
+
+    public static readonly StyledProperty<double> NullValueProperty = AvaloniaProperty.Register<Gauge, double>(nameof(NullValue));
+
+    public double NullValue
+    {
+        get => GetValue(NullValueProperty);
+        set => SetValue(NullValueProperty, value);
     }
 
     public static readonly StyledProperty<Easing> AnimationEasingProperty = AvaloniaProperty.Register<Gauge, Easing>(nameof(AnimationEasing), new CubicEaseOut());
@@ -39,12 +47,12 @@ public abstract class Gauge : ContentControl
         set => SetValue(AnimationEasingProperty, value);
     }
 
-    public static readonly StyledProperty<double> AnimatedValueProperty = AvaloniaProperty.Register<Gauge, double>(nameof(AnimatedValue));
+    public static readonly DirectProperty<Gauge, double> AnimatedValueProperty = AvaloniaProperty.RegisterDirect<Gauge, double>(nameof(AnimatedValue), o => o.AnimatedValue, (o, v) => o.AnimatedValue = v);
 
     public double AnimatedValue
     {
-        get => GetValue(AnimatedValueProperty);
-        set => SetValue(AnimatedValueProperty, value);
+        get;
+        set => SetAndRaise(AnimatedValueProperty, ref field, value);
     }
 
     public static readonly StyledProperty<IEnumerable<ColorThreshold>?> GaugeColorsProperty = AvaloniaProperty.Register<Gauge, IEnumerable<ColorThreshold>?>(nameof(GaugeColors), Misc.GaugeColors.HighIsBad);
@@ -134,7 +142,7 @@ public abstract class Gauge : ContentControl
     // ReSharper disable once AsyncVoidMethod
     protected virtual async void SetValue(bool sKipAnimation = false)
     {
-        var relativeValue = (Math.Max(Math.Min(Maximum, double.IsNaN(Value) ? 0 : Value), Minimum) - Minimum) / (Maximum - Minimum);
+        var relativeValue = (Math.Max(Math.Min(Maximum, double.IsNaN(Value ?? NullValue) ? 0 : Value ?? NullValue), Minimum) - Minimum) / (Maximum - Minimum);
         relativeValue = double.IsFinite(relativeValue) ? relativeValue : Math.Min(Math.Max(Origin, 0), 1);
 
         try

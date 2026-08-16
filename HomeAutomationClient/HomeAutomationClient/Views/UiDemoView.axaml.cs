@@ -1,7 +1,3 @@
-using System.Security.Cryptography;
-using Avalonia.Controls.Primitives;
-using Avalonia.Styling;
-
 namespace De.Hochstaetter.HomeAutomationClient.Views;
 
 public partial class UiDemoView : UserControl

@@ -13,6 +13,11 @@ public class Cache : ICache
 {
     private static readonly string cacheDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Hochstätter", "HomeAutomationClient");
     private static readonly string cacheFilePath = Path.Combine(cacheDirectory, "cache.json");
+    
+    private static readonly JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions
+    {
+        DefaultIgnoreCondition= System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
+    };
 
     public Cache()
     {
@@ -27,14 +32,14 @@ public class Cache : ICache
     public void AddOrUpdate(string key, object value)
     {
         var cacheData = LoadCache();
-        cacheData[key] = JsonSerializer.Serialize(value);
+        cacheData[key] = JsonSerializer.Serialize(value, jsonSerializerOptions);
         SaveCache(cacheData);
     }
 
     public async Task AddOrUpdateAsync(string key, object value, CancellationToken token = default)
     {
         var cacheData = await LoadCacheAsync(token).ConfigureAwait(false);
-        await Task.Run(() => cacheData[key] = JsonSerializer.Serialize(value), token).ConfigureAwait(false);
+        cacheData[key] = JsonSerializer.Serialize(value, jsonSerializerOptions);
         await SaveCacheAsync(cacheData, token).ConfigureAwait(false);
     }
 
