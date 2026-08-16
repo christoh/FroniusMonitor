@@ -9,7 +9,6 @@ RUN apt-get install -y --no-install-recommends python3
 RUN dotnet workload install wasm-tools
 
 COPY . .
-RUN ls -laF .
 WORKDIR ./HomeAutomationClient/HomeAutomationClient.Browser
 RUN rm -fr app bin obj
 RUN mkdir -p /build/root/app
@@ -152,8 +151,7 @@ FROM alpine:latest
 RUN apk --no-cache update && \
     apk --no-cache upgrade
 
-RUN apk --no-cache add nginx nginx-mod-http-brotli
-RUN apk --no-cache add fastfetch curl
+RUN apk --no-cache add nginx nginx-mod-http-brotli fastfetch curl
 
 WORKDIR /
 COPY --from=builder /build/root /
