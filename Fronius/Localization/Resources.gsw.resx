@@ -1677,6 +1677,9 @@
   <data name="Note" xml:space="preserve">
     <value>Hiiwiis</value>
   </data>
+  <data name="Dashboard" xml:space="preserve">
+    <value>Übersicht</value>
+  </data>
   <data name="LanguageChangeWarning" xml:space="preserve">
     <value>E paar Täxt sind in '{0}' generiert worde, wo {1} gstartet isch. Si wärdet wiiterhin i dr ursprüngliche Sprooch aazeigt, bis du d App neu startisch.</value>
   </data>

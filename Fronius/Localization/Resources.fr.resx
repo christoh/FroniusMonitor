@@ -1639,4 +1639,7 @@
   <data name="Note" xml:space="preserve">
     <value>Remarque</value>
   </data>
+  <data name="Dashboard" xml:space="preserve">
+    <value>Tableau de bord</value>
+  </data>
 </root>

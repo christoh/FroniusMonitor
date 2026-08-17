@@ -1677,6 +1677,9 @@
   <data name="Note" xml:space="preserve">
     <value>Nota</value>
   </data>
+  <data name="Dashboard" xml:space="preserve">
+    <value>Panoramica</value>
+  </data>
   <data name="LanguageChangeWarning" xml:space="preserve">
     <value>Alcuni testi sono stati generati in '{0}' all'avvio di {1}. Continueranno a essere visualizzati nella lingua originale finché non si riavvia l'app.</value>
   </data>

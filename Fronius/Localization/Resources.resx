@@ -1782,4 +1782,7 @@
   <data name="Note" xml:space="preserve">
 	  <value>Note</value>
   </data>
+  <data name="Dashboard" xml:space="preserve">
+    <value>Dashboard</value>
+  </data>
 </root>

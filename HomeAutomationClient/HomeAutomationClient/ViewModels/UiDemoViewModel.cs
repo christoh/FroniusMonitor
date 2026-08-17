@@ -27,18 +27,9 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient, IUpdate
 
     public override async Task Initialize()
     {
-        try
-        {
-            BusyText = Loc.ConnectingToHas;
-            await base.Initialize();
-            await UpdateService.StartAsync();
-            UpdateService.SitePowerFlowUpdated += OnSitePowerFlowUpdated;
-            Application.Current!.ActualThemeVariantChanged += OnThemeChanged;
-        }
-        finally
-        {
-            BusyText = null;
-        }
+        await base.Initialize();
+        UpdateService.SitePowerFlowUpdated += OnSitePowerFlowUpdated;
+        Application.Current!.ActualThemeVariantChanged += OnThemeChanged;
     }
 
     private void OnSitePowerFlowUpdated(object? sender, SitePowerFlowUpdatedEventArgs e) => _ = Dispatcher.UIThread.InvokeAsync(() => OnThemeChanged());

@@ -1,18 +1,21 @@
-﻿using System.Collections.Concurrent;
+﻿using De.Hochstaetter.HomeAutomationClient.Services;
+using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 
 public sealed partial class MainViewModel : ViewModelBase
 {
-    private readonly ICache? cache = IoC.TryGetRegistered<ICache>();
     private readonly IGen24LocalizationService gen24Loc;
+    
+    private readonly IUpdateService updateService;
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    public MainViewModel(IWebClientService webClient, IGen24LocalizationService gen24Loc)
+    public MainViewModel(IWebClientService webClient, IGen24LocalizationService gen24Loc, IUpdateService updateService)
     {
         this.gen24Loc = gen24Loc;
-        ApiUri = cache?.Get<string>(CacheKeys.ApiUri) ?? "https://home-automation.example.com";
+        this.updateService = updateService;
+        ApiUri = IoC.TryGetRegistered<ICache>()?.Get<string>(CacheKeys.ApiUri) ?? "https://home-automation.example.com";
         webClient.Initialize(ApiUri, "hacc", "0.5.0.0");
     }
 
@@ -23,6 +26,9 @@ public sealed partial class MainViewModel : ViewModelBase
 
     public bool IsDialogBusy => DialogBusyText != null && IsDialogVisible;
 
+    [ObservableProperty]
+    public partial bool IsReady { get; set; }
+    
     [ObservableProperty]
     public partial object? MainViewContent { get; set; }
 
@@ -64,7 +70,9 @@ public sealed partial class MainViewModel : ViewModelBase
             await loginViewModel.ShowDialogAsync().ConfigureAwait(false);
             BusyText = Loc.GetInverterLocalization;
             await gen24Loc.Initialize().ConfigureAwait(false);
-            
+            BusyText = Loc.ConnectingToHas;
+            await updateService.StartAsync().ConfigureAwait(false);
+            IsReady = true;
             await Dispatcher.UIThread.InvokeAsync(() => MainViewContent = new UiDemoView());
         }
         catch (Exception ex)

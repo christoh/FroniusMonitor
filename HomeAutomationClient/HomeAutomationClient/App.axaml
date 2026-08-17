@@ -22,16 +22,19 @@
 			<ResourceDictionary.ThemeDictionaries>
                 
                 <ResourceDictionary x:Key='Light'>
-                    <SolidColorBrush x:Key="PowerFlowBattery">LightGreen</SolidColorBrush>
-                    <SolidColorBrush x:Key="PowerFlowSolar">#ffd000</SolidColorBrush>
-                    <SolidColorBrush x:Key="PowerFlowGrid">LightGray</SolidColorBrush>
-                    
-                    <SolidColorBrush x:Key="PowerGridIcon">#808080</SolidColorBrush>
-                    
                     <SolidColorBrush x:Key='BackgroundBrush'>White</SolidColorBrush>
 					<SolidColorBrush x:Key='ForegroundBrush'>Black</SolidColorBrush>
                     <SolidColorBrush x:Key='DisableBrush'>#80000000</SolidColorBrush>
 
+                    <!-- Power Flow -->
+                    <SolidColorBrush x:Key="PowerFlowBattery">LightGreen</SolidColorBrush>
+                    <SolidColorBrush x:Key="PowerFlowSolar">#ffd000</SolidColorBrush>
+                    <SolidColorBrush x:Key="PowerFlowGrid">LightGray</SolidColorBrush>
+                    <SolidColorBrush x:Key="PowerGridIcon">#808080</SolidColorBrush>
+                    
+                    <!--Menus-->
+                    <SolidColorBrush x:Key='MenuBackground'>LightGray</SolidColorBrush>
+                    
                     <!-- Device Control -->
                     <SolidColorBrush x:Key='DeviceButtonBackground'>BurlyWood</SolidColorBrush>
                     <SolidColorBrush x:Key='DeviceButtonSelectedBackground'>LightSalmon</SolidColorBrush>
@@ -75,16 +78,18 @@
                 </ResourceDictionary>
 
                 <ResourceDictionary x:Key='Dark'>
-                    <SolidColorBrush x:Key="PowerFlowBattery">DarkGreen</SolidColorBrush>
-                    <SolidColorBrush x:Key="PowerFlowSolar">#D8AE06</SolidColorBrush>
-                    <SolidColorBrush x:Key="PowerFlowGrid">#ff404040</SolidColorBrush>
-                    
-                    <SolidColorBrush x:Key="PowerGridIcon">#808080</SolidColorBrush>
-                    
-                   
                     <SolidColorBrush x:Key='BackgroundBrush'>Black</SolidColorBrush>
 					<SolidColorBrush x:Key='ForegroundBrush'>#e8e8e8</SolidColorBrush>
 					<SolidColorBrush x:Key='DisableBrush'>#40FFFFFF</SolidColorBrush>
+
+                    <!-- Power Flow -->
+                    <SolidColorBrush x:Key="PowerFlowBattery">DarkGreen</SolidColorBrush>
+                    <SolidColorBrush x:Key="PowerFlowSolar">#D8AE06</SolidColorBrush>
+                    <SolidColorBrush x:Key="PowerFlowGrid">#ff404040</SolidColorBrush>
+                    <SolidColorBrush x:Key="PowerGridIcon">#808080</SolidColorBrush>
+                    
+                    <!--Menus-->
+                    <SolidColorBrush x:Key='MenuBackground'>#303030</SolidColorBrush>
 
                     <!-- Device Control -->
                     <SolidColorBrush x:Key='DeviceButtonBackground'>#005080</SolidColorBrush>

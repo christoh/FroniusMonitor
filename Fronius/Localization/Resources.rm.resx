@@ -1648,4 +1648,7 @@
   <data name="Note" xml:space="preserve">
     <value>Nota</value>
   </data>
+  <data name="Dashboard" xml:space="preserve">
+    <value>Survista</value>
+  </data>
 </root>
