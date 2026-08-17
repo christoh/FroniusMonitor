@@ -2,11 +2,10 @@ namespace De.Hochstaetter.HomeAutomationClient.Views;
 
 public partial class MainView : UserControl
 {
-    public MainView()
+    public MainView(MainViewModel mainViewModel)
     {
-        MainViewModel mainViewModel;
         InitializeComponent();
-        DataContext = mainViewModel = IoC.GetRegistered<MainViewModel>();
+        DataContext = mainViewModel;
         _ = mainViewModel.Initialize();
     }
 }

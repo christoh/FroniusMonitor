@@ -8,5 +8,4 @@
         x:Class="De.Hochstaetter.HomeAutomationClient.Views.MainWindow"
         Icon="/Assets/Images/sun.ico"
         Title="{x:Static p:Resources.AppName}">
-    <local:MainView />
 </Window>

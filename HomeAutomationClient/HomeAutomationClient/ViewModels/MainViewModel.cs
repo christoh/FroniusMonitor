@@ -64,6 +64,7 @@ public sealed partial class MainViewModel : ViewModelBase
             await loginViewModel.ShowDialogAsync().ConfigureAwait(false);
             BusyText = Loc.GetInverterLocalization;
             await gen24Loc.Initialize().ConfigureAwait(false);
+            
             await Dispatcher.UIThread.InvokeAsync(() => MainViewContent = new UiDemoView());
         }
         catch (Exception ex)

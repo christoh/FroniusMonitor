@@ -93,14 +93,14 @@ public sealed class WebClientService : IWebClientService
     }
 
     #endregion
-    
+
     #region WattPilot
     public async Task<ApiResult<Dictionary<string, WattPilot>>> GetWattPilots(CancellationToken token = default)
     {
         var result = await GetResult<Dictionary<string, WattPilot>>("WattPilot", token);
         return result;
     }
-    
+
     #endregion
 
     #region Gen24

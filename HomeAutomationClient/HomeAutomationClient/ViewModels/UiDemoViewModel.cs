@@ -1,50 +1,14 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.ObjectModel;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using Avalonia.Media.Immutable;
-using De.Hochstaetter.Fronius.Extensions;
-using De.Hochstaetter.Fronius.Models;
-using De.Hochstaetter.Fronius.Models.Charging;
+﻿using Avalonia.Media.Immutable;
 using De.Hochstaetter.HomeAutomationClient.Extensions;
-using Microsoft.AspNetCore.SignalR.Client;
-
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 
-public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewModelBase, IAsyncDisposable, IDisposable
+public sealed partial class UiDemoViewModel(IWebClientService webClient, IUpdateService updateService) : ViewModelBase
 {
-    private HubConnection? hubConnection;
+    public IUpdateService UpdateService => updateService;
 
     [ObservableProperty]
     public partial bool ColorAllTicks { get; set; } = true;
-
-    [ObservableProperty, NotifyPropertyChangedFor(nameof(ShowInverters))]
-    public partial ObservableCollection<KeyedGen24System> Inverters { get; set; } = [];
-
-    [ObservableProperty, NotifyPropertyChangedFor(nameof(ShowPowerConsumers))]
-    public partial ObservableCollection<IKeyedDevice> AllPowerConsumers { get; set; } = [];
-
-    [ObservableProperty]
-    public partial List<KeyedWattPilotUpdate> WattPilotUpdates { get; set; } = [];
-
-    [ObservableProperty]
-    public partial Gen24PowerMeter3P? SmartMeter { get; set; }
-
-    [ObservableProperty]
-    public partial Gen24Status? MeterStatus { get; set; }
-
-    [ObservableProperty]
-    public partial Gen24Config? PrimaryGen24Config { get; set; }
-
-    [ObservableProperty]
-    public partial Gen24System? BatteryGen24System { get; set; }
-
-    [ObservableProperty]
-    public partial Gen24PowerFlow SitePowerFlow { get; set; } = new();
-
-    [ObservableProperty]
-    public partial double SitePvPeakPower { get; set; }
 
     [ObservableProperty]
     public partial ISolidColorBrush LoadPowerBrush { get; set; } = new ImmutableSolidColorBrush(Color.FromUInt32(0xff807000));
@@ -61,61 +25,14 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
     [ObservableProperty]
     public partial ISolidColorBrush GridPowerBrushL3 { get; set; } = new ImmutableSolidColorBrush(Colors.LightGray);
 
-    public bool ShowInverters => Inverters.Count > 0;
-
-    public bool ShowPowerConsumers => AllPowerConsumers.Count > 0;
-
     public override async Task Initialize()
     {
         try
         {
             BusyText = Loc.ConnectingToHas;
             await base.Initialize();
-
-            var wattPilotResult = await webClient.GetWattPilots();
-
-            if (wattPilotResult.Payload is { } wattPilots)
-            {
-                wattPilots.Select(wp => new KeyedWattPilot { Device = wp.Value, Key = wp.Key }).Apply(w=> AllPowerConsumers.Add(w));
-            }
-
-            var gen24Result = await webClient.GetGen24Devices();
-
-            if (gen24Result.Payload is { } gen24Systems)
-            {
-                Inverters = [.. gen24Systems.Select(i => new KeyedGen24System { Device = i.Value, Key = i.Key })];
-                Inverters.Apply(OnNewInverterReceived);
-            }
-
-            var fritzBoxResult = await webClient.GetFritzBoxDevices();
-
-            if (fritzBoxResult.Payload is { } fritzBoxDevices)
-            {
-                fritzBoxDevices.Where(fb => fb.Value.CanSwitch).Select(fb => new KeyedFritzBoxDevice { Device = fb.Value, Key = fb.Key }).Apply(f=> AllPowerConsumers.Add(f));
-            }
-
-            NotifyOfPropertyChange(nameof(ShowPowerConsumers));
-
-            var hubUri = IoC.TryGetRegistered<ICache>()?.Get<string>(CacheKeys.HubUri) ?? "http://www.example.com/hub";
-
-            hubConnection = new HubConnectionBuilder()
-                .WithUrl(hubUri)
-                .WithAutomaticReconnect()
-                .AddJsonProtocol(o =>
-                {
-                    o.PayloadSerializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals;
-                    o.PayloadSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-                    o.PayloadSerializerOptions.IgnoreReadOnlyProperties = true;
-                    o.PayloadSerializerOptions.IgnoreReadOnlyFields = true;
-                    o.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
-                })
-                .Build();
-
-            await hubConnection.StartAsync().ConfigureAwait(false);
-            hubConnection.On<string, Gen24System>(nameof(Gen24System), OnGen24Update);
-            hubConnection.On<string, FritzBoxDevice>(nameof(FritzBoxDevice), OnFritzBoxUpdate);
-            hubConnection.On<string, WattPilot>(nameof(WattPilot), OnWattPilotUpdate);
-            hubConnection.On<string, WattPilotUpdate>(nameof(WattPilotUpdate), OnWattPilotUpdateMessage);
+            await UpdateService.StartAsync();
+            UpdateService.SitePowerFlowUpdated += OnSitePowerFlowUpdated;
             Application.Current!.ActualThemeVariantChanged += OnThemeChanged;
         }
         finally
@@ -124,15 +41,17 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
         }
     }
 
+    private void OnSitePowerFlowUpdated(object? sender, SitePowerFlowUpdatedEventArgs e) => _ = Dispatcher.UIThread.InvokeAsync(() => OnThemeChanged());
+
     private void OnThemeChanged(object? sender = null, EventArgs? e = null)
     {
-        ISolidColorBrush gridPowerBrush = Application.Current!.GetSolidColorBrush("PowerFlowGrid")!;
-        ISolidColorBrush solarPowerBrush = Application.Current!.GetSolidColorBrush("PowerFlowSolar")!;
-        ISolidColorBrush storagePowerBrush = Application.Current!.GetSolidColorBrush("PowerFlowBattery")!;
+        var gridPowerBrush = Application.Current!.GetSolidColorBrush("PowerFlowGrid")!;
+        var solarPowerBrush = Application.Current!.GetSolidColorBrush("PowerFlowSolar")!;
+        var storagePowerBrush = Application.Current!.GetSolidColorBrush("PowerFlowBattery")!;
 
-        var incomingSolarPower = double.Max(0, SitePowerFlow.SolarPower);
-        var incomingGridPower = double.Max(0, SitePowerFlow.GridPowerCorrected);
-        var incomingStoragePower = double.Max(0, SitePowerFlow.StoragePower);
+        var incomingSolarPower = double.Max(0, UpdateService.SitePowerFlow.SolarPower);
+        var incomingGridPower = double.Max(0, UpdateService.SitePowerFlow.GridPowerCorrected);
+        var incomingStoragePower = double.Max(0, UpdateService.SitePowerFlow.StoragePower);
         var totalIncomingPower = incomingStoragePower + incomingGridPower + incomingSolarPower;
 
         double r = 0, g = 0, b = 0;
@@ -145,190 +64,16 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
         }
 
         LoadPowerBrush = new ImmutableSolidColorBrush(Color.FromRgb(Round(r), Round(g), Round(b)));
-        GridPowerBrush = SitePowerFlow.GridPowerCorrected < 0 ? LoadPowerBrush : gridPowerBrush;
-        GridPowerBrushL1 = SmartMeter?.ActivePowerL1 < 0 ? LoadPowerBrush : gridPowerBrush;
-        GridPowerBrushL2 = SmartMeter?.ActivePowerL2 < 0 ? LoadPowerBrush : gridPowerBrush;
-        GridPowerBrushL3 = SmartMeter?.ActivePowerL3 < 0 ? LoadPowerBrush : gridPowerBrush;
+        GridPowerBrush = UpdateService.SitePowerFlow.GridPowerCorrected < 0 ? LoadPowerBrush : gridPowerBrush;
+        GridPowerBrushL1 = UpdateService.SmartMeter?.ActivePowerL1 < 0 ? LoadPowerBrush : gridPowerBrush;
+        GridPowerBrushL2 = UpdateService.SmartMeter?.ActivePowerL2 < 0 ? LoadPowerBrush : gridPowerBrush;
+        GridPowerBrushL3 = UpdateService.SmartMeter?.ActivePowerL3 < 0 ? LoadPowerBrush : gridPowerBrush;
 
         return;
 
         static byte Round(double value)
         {
             return (byte)Math.Round(value, MidpointRounding.ToZero);
-        }
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        if (hubConnection != null)
-        {
-            await hubConnection.DisposeAsync();
-        }
-
-        GC.SuppressFinalize(this);
-    }
-
-    public void Dispose()
-    {
-        _ = Task.Run(async () =>
-        {
-            if (hubConnection != null)
-            {
-                await hubConnection.DisposeAsync();
-            }
-        });
-
-        GC.SuppressFinalize(this);
-    }
-
-    ~UiDemoViewModel() => Dispose();
-
-    private async void OnWattPilotUpdateMessage(string id, WattPilotUpdate update)
-    {
-        try
-        {
-            var keyedQueue = WattPilotUpdates.FirstOrDefault(q => q.Key == id);
-
-            if (keyedQueue == null)
-            {
-                keyedQueue = new KeyedWattPilotUpdate { Key = id, Device = new ConcurrentQueue<WattPilotUpdate>() };
-                WattPilotUpdates.Add(keyedQueue);
-            }
-
-            keyedQueue.Device.Enqueue(update);
-
-            var existingDevice = AllPowerConsumers.OfType<KeyedWattPilot>().FirstOrDefault(i => i.Device.SerialNumber == update.SerialNumber);
-
-            if (existingDevice == null)
-            {
-                var pilots = await webClient.GetWattPilots().ConfigureAwait(false);
-
-                if (pilots is { Status: HttpStatusCode.OK, Payload: { } wattPilots })
-                {
-                    var currentWattPilots = AllPowerConsumers.OfType<KeyedFritzBoxDevice>().ToArray();
-                    currentWattPilots.Apply(w => AllPowerConsumers.Remove(w));
-                    wattPilots.Select(wp => new KeyedWattPilot { Device = wp.Value, Key = wp.Key }).Apply(w => AllPowerConsumers.Add(w));
-                }
-
-                NotifyOfPropertyChange(nameof(ShowPowerConsumers));
-                return;
-            }
-
-            while (!keyedQueue.Device.IsEmpty)
-            {
-                if (keyedQueue.Device.TryDequeue(out var result))
-                {
-                    existingDevice.Device.UpdateFromJson(result.JsonMessage);
-                }
-                else
-                {
-                    throw new InvalidOperationException("Cannot read update queue");
-                }
-            }
-        }
-        catch
-        {
-            // Ignore errors
-        }
-    }
-
-    private void OnWattPilotUpdate(string id, WattPilot wattPilot)
-    {
-        try
-        {
-            var existingDevice = AllPowerConsumers.OfType<KeyedWattPilot>().FirstOrDefault(i => i.Key == id);
-
-            if (existingDevice == null)
-            {
-                Dispatcher.UIThread.Invoke(() => { AllPowerConsumers.Add(new KeyedWattPilot { Device = wattPilot, Key = id }); });
-                NotifyOfPropertyChange(nameof(ShowPowerConsumers));
-            }
-            else
-            {
-                existingDevice.Device.CopyFrom(wattPilot);
-            }
-        }
-        catch
-        {
-            // Ignore errors
-        }
-    }
-
-    private void OnGen24Update(string id, Gen24System gen24System)
-    {
-        try
-        {
-            gen24System.Sensors?.GeneratePowerFlow();
-
-            var inverter = Inverters.FirstOrDefault(i => i.Key == id);
-
-            if (inverter == null)
-            {
-                inverter = new KeyedGen24System { Key = id, Device = gen24System };
-
-                Dispatcher.UIThread.Invoke(() =>
-                {
-                    Inverters = [.. Inverters.Append(inverter).OrderBy(i => i.Device.Config?.InverterSettings?.SystemName)];
-                    NotifyOfPropertyChange(nameof(ShowInverters));
-                });
-            }
-            else
-            {
-                inverter.Device.CopyFrom(gen24System);
-            }
-
-            OnNewInverterReceived(inverter);
-        }
-        catch
-        {
-            // Ignore errors
-        }
-    }
-
-    private void OnNewInverterReceived(KeyedDevice<Gen24System> inverter)
-    {
-        if (inverter.Device.Sensors is { PrimaryPowerMeter: not null })
-        {
-            PrimaryGen24Config = inverter.Device.Config;
-            MeterStatus = inverter.Device.Sensors.MeterStatus;
-            SmartMeter = inverter.Device.Sensors.PrimaryPowerMeter;
-        }
-
-        if (inverter.Device.Sensors is { Storage: not null })
-        {
-            BatteryGen24System = inverter.Device;
-        }
-
-        SitePowerFlow.SolarPower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.SolarPower ?? 0);
-        SitePowerFlow.GridPower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.GridPower ?? 0);
-        SitePowerFlow.StoragePower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.StoragePower ?? 0);
-        SitePowerFlow.LoadPower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.LoadPower ?? 0);
-        SitePowerFlow.InverterAcPower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.InverterAcPower ?? 0);
-        SitePvPeakPower = Inverters.Sum(i => i.Device.Config?.InverterSettings?.Mppt?.Mppt1?.WattPeak + i.Device.Config?.InverterSettings?.Mppt?.Mppt2?.WattPeak ?? 0);
-
-        Dispatcher.UIThread.Invoke(() => OnThemeChanged());
-    }
-
-    private void OnFritzBoxUpdate(string id, FritzBoxDevice fritzBoxDevice)
-    {
-        if (!fritzBoxDevice.CanSwitch)
-        {
-            return;
-        }
-
-        var updateDevice = AllPowerConsumers.OfType<KeyedFritzBoxDevice>().FirstOrDefault(f => f.Key == id);
-
-        if (updateDevice == null)
-        {
-            _ = Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                AllPowerConsumers.Add(new KeyedFritzBoxDevice { Key = id, Device = fritzBoxDevice });
-                NotifyOfPropertyChange(nameof(ShowPowerConsumers));
-            });
-        }
-        else
-        {
-            updateDevice.Device.CopyFrom(fritzBoxDevice);
         }
     }
 
@@ -341,7 +86,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
         }
 
         BusyText = string.Empty;
-        var keyedDevice = AllPowerConsumers.OfType<KeyedFritzBoxDevice>().First(d => d.Key == key);
+        var keyedDevice = UpdateService.AllPowerConsumers.OfType<KeyedFritzBoxDevice>().First(d => d.Key == key);
         var result = await webClient.SetDeviceBrightness(key, change.NewValue);
 
         if (result.Status is not HttpStatusCode.OK)
@@ -362,7 +107,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
     private Task SwitchDevice(string key) => TaskExceptionHandler(async () =>
     {
         BusyText = string.Empty;
-        var keyedDevice = AllPowerConsumers.OfType<KeyedFritzBoxDevice>().First(d => d.Key == key);
+        var keyedDevice = UpdateService.AllPowerConsumers.OfType<KeyedFritzBoxDevice>().First(d => d.Key == key);
         ISwitchable device = keyedDevice.Device;
         var isTurnedOn = device.IsTurnedOn;
         var result = await webClient.SwitchDevice(key, device.IsTurnedOn is not true);
@@ -390,7 +135,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
         }
 
         BusyText = string.Empty;
-        var keyedDevice = AllPowerConsumers.OfType<KeyedFritzBoxDevice>().First(d => d.Key == key);
+        var keyedDevice = UpdateService.AllPowerConsumers.OfType<KeyedFritzBoxDevice>().First(d => d.Key == key);
         var result = await webClient.SetColorTemperature(key, change.NewValue);
 
         if (result.Status is not HttpStatusCode.OK)
@@ -416,7 +161,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
         }
 
         BusyText = string.Empty;
-        var keyedDevice = AllPowerConsumers.OfType<KeyedFritzBoxDevice>().First(d => d.Key == key);
+        var keyedDevice = UpdateService.AllPowerConsumers.OfType<KeyedFritzBoxDevice>().First(d => d.Key == key);
         var result = await webClient.SetHsv(key, hueDegrees: change.NewValue);
 
         if (result.Status is not HttpStatusCode.OK)
@@ -442,7 +187,7 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
         }
 
         BusyText = string.Empty;
-        var keyedDevice = AllPowerConsumers.OfType<KeyedFritzBoxDevice>().First(d => d.Key == key);
+        var keyedDevice = UpdateService.AllPowerConsumers.OfType<KeyedFritzBoxDevice>().First(d => d.Key == key);
         var result = await webClient.SetHsv(key, saturation: change.NewValue);
 
         if (result.Status is not HttpStatusCode.OK)
@@ -458,69 +203,4 @@ public sealed partial class UiDemoViewModel(IWebClientService webClient) : ViewM
             await ShowHttpError(result);
         }
     });
-
-    //[RelayCommand]
-    //private Task Standby(string key) => TaskExceptionHandler(async () =>
-    //{
-    //    var inverter = Inverters.First(i => i.Key == key).Inverter;
-
-    //    if (inverter.Sensors?.StandByStatus is not null)
-    //    {
-    //        var oldStatus=inverter.Sensors.StandByStatus;
-    //        var result = await webClient.RequestGen24StandBy(key, !inverter.Sensors.StandByStatus.IsStandBy);
-
-    //        if (result.Status is not HttpStatusCode.OK)
-    //        {
-    //            inverter.Sensors.StandByStatus.IsStandBy = oldStatus.IsStandBy;
-    //            await ShowHttpError(result);
-    //            return;
-    //        }
-
-    //        inverter.Sensors.StandByStatus.IsStandBy = !oldStatus.IsStandBy;
-    //    }
-    //});
-
-    [RelayCommand]
-    private async Task ShowComplexDialog()
-    {
-        try
-        {
-            await new MessageBox
-            {
-                Title = "Test Dialog",
-                Buttons = [Loc.Ok, Loc.Cancel],
-                Text = "Hello, World! This is a test for a MessageBox that has some longer text items and everything still needs to look good and the text must properly wrap. Please also have a look at the following items.",
-                ItemList =
-                [
-                    "Always prefer composition over inheritance",
-                    "If you create an async method, you must ensure that you properly await it. Carefully choose between Task<T> and ValueTask<T> and don't forget to set ConfigureAwait() properly.",
-                    "This is an additional bullet item.",
-                ],
-                TextBelowItemList = $"Did you understand everything? If not, press '{Loc.Cancel}'.",
-                Icon = new WarningIcon(),
-            }.Show();
-        }
-        catch
-        {
-            // ignore
-        }
-    }
-
-    [RelayCommand]
-    private async Task ShowSimpleDialog()
-    {
-        try
-        {
-            await new MessageBox
-            {
-                Title = Loc.Error,
-                Text = string.Format(Loc.InverterCommReadError, "Atomkraftwerk 1"),
-                Icon = new ErrorIcon(),
-            }.Show();
-        }
-        catch
-        {
-            // async void must be caught to avoid unhandled exceptions
-        }
-    }
 }

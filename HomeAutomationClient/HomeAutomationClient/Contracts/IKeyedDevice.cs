@@ -7,5 +7,5 @@ namespace De.Hochstaetter.HomeAutomationClient.Contracts;
 public interface IKeyedDevice
 {
     string Key { get; }
-    object Blob { get; }
+    object Device { get; }
 }

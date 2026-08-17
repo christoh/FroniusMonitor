@@ -71,7 +71,7 @@
 									<Setter Property="Margin" Value="8" />
 								</Style>
 							</StackPanel.Styles>
-							<ItemsControl HorizontalAlignment="Left" ItemsSource="{Binding Inverters}" IsVisible="{Binding ShowInverters}">
+							<ItemsControl HorizontalAlignment="Left" ItemsSource="{Binding UpdateService.Inverters}" IsVisible="{Binding UpdateService.ShowInverters}">
 								<ItemsControl.ItemsPanel>
 									<ItemsPanelTemplate>
 										<StackPanel Orientation="Horizontal" />
@@ -118,12 +118,12 @@
 								</ItemsControl.ItemTemplate>
 							</ItemsControl>
 
-							<StackPanel Orientation="Vertical" IsVisible="{Binding SmartMeter, Converter={co:Null2Bool}}">
+							<StackPanel Orientation="Vertical" IsVisible="{Binding UpdateService.SmartMeter, Converter={co:Null2Bool}}">
 								<StackPanel Orientation="Horizontal">
 									<c:SmartMeterControl Width="300" VerticalAlignment="Top" Margin="8"
-														 MeterStatus="{Binding MeterStatus}" HorizontalAlignment="Left"
-														 SmartMeter="{Binding SmartMeter}"
-														 Gen24Config="{Binding PrimaryGen24Config}"
+														 MeterStatus="{Binding UpdateService.MeterStatus}" HorizontalAlignment="Left"
+														 SmartMeter="{Binding UpdateService.SmartMeter}"
+														 Gen24Config="{Binding UpdateService.PrimaryGen24Config}"
 														 ColorAllTicks="{Binding ColorAllTicks}" />
 									<StackPanel Orientation="Vertical" VerticalAlignment="Center">
 										<StackPanel.Styles>
@@ -132,15 +132,15 @@
 												<Setter Property="Margin" Value="0,5"></Setter>
 											</Style>
 										</StackPanel.Styles>
-										<c:PowerFlowArrow Fill="{Binding GridPowerBrushL1}" Value="{Binding SmartMeter.ActivePowerL1, FallbackValue=0}"/>
-										<c:PowerFlowArrow Fill="{Binding GridPowerBrushL2}" Value="{Binding SmartMeter.ActivePowerL2, FallbackValue=0}"/>
-										<c:PowerFlowArrow Fill="{Binding GridPowerBrushL3}" Value="{Binding SmartMeter.ActivePowerL3, FallbackValue=0}"/>
+										<c:PowerFlowArrow Fill="{Binding GridPowerBrushL1}" Value="{Binding UpdateService.SmartMeter.ActivePowerL1, FallbackValue=0}"/>
+										<c:PowerFlowArrow Fill="{Binding GridPowerBrushL2}" Value="{Binding UpdateService.SmartMeter.ActivePowerL2, FallbackValue=0}"/>
+										<c:PowerFlowArrow Fill="{Binding GridPowerBrushL3}" Value="{Binding UpdateService.SmartMeter.ActivePowerL3, FallbackValue=0}"/>
 									</StackPanel>
 									<i:GridIcon Width="140" Margin="8,0"/>
 								</StackPanel>
 
 								<c:PowerFlowArrow Fill="{Binding GridPowerBrush}" VerticalAlignment="Center" RotationDegrees="35"
-												  Value="{Binding SitePowerFlow.GridPowerCorrected, FallbackValue=0}"
+												  Value="{Binding UpdateService.SitePowerFlow.GridPowerCorrected, FallbackValue=0}"
 												  InvertArrow="True"/>
 							</StackPanel>
 						</StackPanel>
@@ -151,7 +151,7 @@
 			<ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto"
 						  VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"
 						  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AllowAutoHide="False" >
-				<ItemsControl ItemsSource="{Binding AllPowerConsumers}" x:Name="PowerConsumerItemsControl" HorizontalAlignment="Left">
+				<ItemsControl ItemsSource="{Binding UpdateService.AllPowerConsumers}" x:Name="PowerConsumerItemsControl" HorizontalAlignment="Left">
 					<ItemsControl.ItemsPanel>
 						<ItemsPanelTemplate>
 							<WrapPanel Orientation="Vertical" />

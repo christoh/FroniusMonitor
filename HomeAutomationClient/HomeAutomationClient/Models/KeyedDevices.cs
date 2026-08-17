@@ -1,13 +1,13 @@
-﻿using De.Hochstaetter.Fronius.Models;
+﻿using System.Collections.Concurrent;
+using De.Hochstaetter.Fronius.Models;
 using De.Hochstaetter.Fronius.Models.Charging;
-using System.Collections.Concurrent;
 
 namespace De.Hochstaetter.HomeAutomationClient.Models;
 
 public class KeyedDevice<T> : IKeyedDevice
 {
     public required string Key { get; init; }
-    object IKeyedDevice.Blob => Device!;
+    object IKeyedDevice.Device => Device!;
     public required T Device { get; init; }
     public override string ToString() => Device?.ToString() ?? Key;
 }

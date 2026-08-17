@@ -1,3 +1,5 @@
+using De.Hochstaetter.HomeAutomationClient.Services;
+
 namespace De.Hochstaetter.HomeAutomationClient;
 
 public partial class App : Application
@@ -29,6 +31,7 @@ public partial class App : Application
             .AddSingleton<IAesKeyProvider, IAesKeyProvider>(provider => IoC.GetRegistered<IServerBasedAesKeyProvider>())
             .AddSingleton<IWebClientService, WebClientService>()
             .AddSingleton<IGen24LocalizationService, Gen24LocalizationService>()
+            .AddSingleton<IUpdateService, UpdateService>()
             ;
 
         var serviceProvider = ServiceCollection.BuildServiceProvider();
