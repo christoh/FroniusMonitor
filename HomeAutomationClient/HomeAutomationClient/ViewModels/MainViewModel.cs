@@ -73,7 +73,7 @@ public sealed partial class MainViewModel : ViewModelBase
             BusyText = Loc.ConnectingToHas;
             await updateService.StartAsync().ConfigureAwait(false);
             IsReady = true;
-            await Dispatcher.UIThread.InvokeAsync(() => MainViewContent = new UiDemoView());
+            await Dispatcher.UIThread.InvokeAsync(() => MainViewContent = new DashboardView());
         }
         catch (Exception ex)
         {

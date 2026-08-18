@@ -22,8 +22,8 @@ public partial class App : Application
             .AddTransient<GaugeTestViewModel>()
             .AddTransient<LinearGaugeTestView>()
             .AddTransient<LinearGaugeTestViewModel>()
-            .AddTransient<UiDemoView>()
-            .AddTransient<UiDemoViewModel>()
+            .AddTransient<DashboardView>()
+            .AddTransient<DashboardViewModel>()
 
             .AddTransient<HomeAutomationServerConnection>()
 

@@ -10,8 +10,8 @@
 			 xmlns:i="clr-namespace:De.Hochstaetter.HomeAutomationClient.Assets.Images"
 			 xmlns:m="clr-namespace:De.Hochstaetter.HomeAutomationClient.Models"
 			 mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="1200"
-			 x:Class="De.Hochstaetter.HomeAutomationClient.Views.UiDemoView"
-			 x:DataType="vm:UiDemoViewModel">
+			 x:Class="De.Hochstaetter.HomeAutomationClient.Views.DashboardView"
+			 x:DataType="vm:DashboardViewModel">
 	<UserControl.Resources>
         <system:Double x:Key="ControlWidth">210</system:Double>
         <Thickness x:Key="ControlMargin">4</Thickness>
@@ -19,7 +19,7 @@
 	<UserControl.DataTemplates>
 		<!-- WattPilot -->
         <DataTemplate DataType="{x:Type m:KeyedWattPilot}">
-            <c:WattPilotControl ColorAllTicks="{Binding Path=((vm:UiDemoViewModel)DataContext).ColorAllTicks, FallbackValue={x:False}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+            <c:WattPilotControl ColorAllTicks="{Binding Path=((vm:DashboardViewModel)DataContext).ColorAllTicks, FallbackValue={x:False}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
                                 Width="{StaticResource ControlWidth}"
                                 WattPilot="{Binding Device}"
                                 DeviceKey="{Binding Key}"
@@ -32,11 +32,11 @@
 							 Device="{Binding Device}"
 							 Margin="{StaticResource ControlMargin}"
 							 DeviceKey="{Binding Key}"
-							 SwitchCommand="{Binding ((vm:UiDemoViewModel)DataContext).SwitchDeviceCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
-							 SetColorTemperatureCommand="{Binding ((vm:UiDemoViewModel)DataContext).SetColorTemperatureCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
-							 SetHueCommand="{Binding ((vm:UiDemoViewModel)DataContext).SetHueCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
-							 SetSaturationCommand="{Binding ((vm:UiDemoViewModel)DataContext).SetSaturationCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
-							 SetBrightnessCommand="{Binding ((vm:UiDemoViewModel)DataContext).SetBrightnessCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}" />
+							 SwitchCommand="{Binding ((vm:DashboardViewModel)DataContext).SwitchDeviceCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+							 SetColorTemperatureCommand="{Binding ((vm:DashboardViewModel)DataContext).SetColorTemperatureCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+							 SetHueCommand="{Binding ((vm:DashboardViewModel)DataContext).SetHueCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+							 SetSaturationCommand="{Binding ((vm:DashboardViewModel)DataContext).SetSaturationCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+							 SetBrightnessCommand="{Binding ((vm:DashboardViewModel)DataContext).SetBrightnessCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}" />
 		</DataTemplate>
 	</UserControl.DataTemplates>
 	<Grid RowDefinitions="*" x:Name="RootElement">
@@ -82,9 +82,9 @@
 										<Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto" Margin="0,0,32,0">
 											<StackPanel Grid.Row="0" Grid.Column="2" Grid.RowSpan="3">
 												<c:InverterControl x:Name="InverterControl"
-																   ColorAllTicks="{Binding Path=((vm:UiDemoViewModel)DataContext).ColorAllTicks, FallbackValue={x:False}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+																   ColorAllTicks="{Binding Path=((vm:DashboardViewModel)DataContext).ColorAllTicks, FallbackValue={x:False}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
 																   Width="300" VerticalAlignment="Top"
-																   Inverter="{Binding Device}" LoadPowerBrush="{Binding Path=((vm:UiDemoViewModel)DataContext).LoadPowerBrush, FallbackValue={x:False}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+																   Inverter="{Binding Device}" LoadPowerBrush="{Binding Path=((vm:DashboardViewModel)DataContext).LoadPowerBrush, FallbackValue={x:False}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
 																   DeviceKey="{Binding Key}"
 																   Margin="8" />
 												<c:PowerFlowArrow Fill="{Binding ElementName=InverterControl, Path=AcProducedPowerBrush}"

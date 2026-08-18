@@ -235,14 +235,22 @@ internal partial class UpdateService(IWebClientService webClient) : BindableBase
             BatteryGen24System = inverter.Device;
         }
 
-        SitePowerFlow.SolarPower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.SolarPower ?? 0);
-        SitePowerFlow.GridPower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.GridPower ?? 0);
-        SitePowerFlow.StoragePower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.StoragePower ?? 0);
-        SitePowerFlow.LoadPower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.LoadPower ?? 0);
-        SitePowerFlow.InverterAcPower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.InverterAcPower ?? 0);
-        SitePvPeakPower = Inverters.Sum(i => i.Device.Config?.InverterSettings?.Mppt?.Mppt1?.WattPeak + i.Device.Config?.InverterSettings?.Mppt?.Mppt2?.WattPeak ?? 0);
-        
-        SitePowerFlowUpdated?.Invoke(this,new SitePowerFlowUpdatedEventArgs(inverter, SitePowerFlow));
+        try
+        {
+            SitePowerFlow.IsNotifying = false;
+            SitePowerFlow.SolarPower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.SolarPower ?? 0);
+            SitePowerFlow.GridPower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.GridPower ?? 0);
+            SitePowerFlow.StoragePower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.StoragePower ?? 0);
+            SitePowerFlow.LoadPower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.LoadPower ?? 0);
+            SitePowerFlow.InverterAcPower = Inverters.Sum(i => i.Device.Sensors?.PowerFlow?.InverterAcPower ?? 0);
+            SitePvPeakPower = Inverters.Sum(i => i.Device.Config?.InverterSettings?.Mppt?.Mppt1?.WattPeak + i.Device.Config?.InverterSettings?.Mppt?.Mppt2?.WattPeak ?? 0);
+        }
+        finally
+        {
+            SitePowerFlow.Refresh();
+        }
+
+        SitePowerFlowUpdated?.Invoke(this, new SitePowerFlowUpdatedEventArgs(inverter, SitePowerFlow));
     }
 
     private void OnFritzBoxUpdate(string id, FritzBoxDevice fritzBoxDevice)

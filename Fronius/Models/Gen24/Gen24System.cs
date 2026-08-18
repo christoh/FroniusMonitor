@@ -32,9 +32,17 @@
         public void CopyFrom(Gen24System other)
         {
             ArgumentNullException.ThrowIfNull(other, nameof(other));
-            Config = other.Config;
-            Sensors = other.Sensors;
-            Refresh();
+
+            try
+            {
+                IsNotifying = false;
+                Config = other.Config;
+                Sensors = other.Sensors;
+            }
+            finally
+            {
+                Refresh();
+            }
         }
 
         private double GetSocMin()

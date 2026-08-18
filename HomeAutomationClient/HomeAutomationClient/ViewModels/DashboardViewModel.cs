@@ -3,7 +3,7 @@ using De.Hochstaetter.HomeAutomationClient.Extensions;
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 
-public sealed partial class UiDemoViewModel(IWebClientService webClient, IUpdateService updateService) : ViewModelBase
+public sealed partial class DashboardViewModel(IWebClientService webClient, IUpdateService updateService) : ViewModelBase
 {
     public IUpdateService UpdateService => updateService;
 
