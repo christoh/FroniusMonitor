@@ -44,23 +44,30 @@ public partial class FritzBoxDevice : BindableBase, IPowerConsumer1P
 {
     public void CopyFrom(FritzBoxDevice other)
     {
-        Id = other.Id;
-        wasSwitched = false;
-        FunctionMask = other.FunctionMask;
-        Ain = other.Ain;
-        FirmwareVersionString = other.FirmwareVersionString;
-        Manufacturer = other.Manufacturer;
-        Model = other.Model;
-        DisplayName = other.DisplayName;
-        IsBusy = other.IsBusy;
-        IsPresent = other.IsPresent;
-        Switch = other.Switch;
-        LevelControl = other.LevelControl;
-        SimpleSwitch = other.SimpleSwitch;
-        PowerMeter = other.PowerMeter;
-        TemperatureSensor = other.TemperatureSensor;
-        Color = other.Color;
-        Refresh();
+        try
+        {
+            IsNotifying = false;
+            Id = other.Id;
+            wasSwitched = false;
+            FunctionMask = other.FunctionMask;
+            Ain = other.Ain;
+            FirmwareVersionString = other.FirmwareVersionString;
+            Manufacturer = other.Manufacturer;
+            Model = other.Model;
+            DisplayName = other.DisplayName;
+            IsBusy = other.IsBusy;
+            IsPresent = other.IsPresent;
+            Switch = other.Switch;
+            LevelControl = other.LevelControl;
+            SimpleSwitch = other.SimpleSwitch;
+            PowerMeter = other.PowerMeter;
+            TemperatureSensor = other.TemperatureSensor;
+            Color = other.Color;
+        }
+        finally
+        {
+            Refresh(true);
+        }
     }
 
     private bool wasSwitched;

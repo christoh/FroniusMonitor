@@ -247,7 +247,7 @@ internal partial class UpdateService(IWebClientService webClient) : BindableBase
         }
         finally
         {
-            SitePowerFlow.Refresh();
+            SitePowerFlow.Refresh(true);
         }
 
         SitePowerFlowUpdated?.Invoke(this, new SitePowerFlowUpdatedEventArgs(inverter, SitePowerFlow));

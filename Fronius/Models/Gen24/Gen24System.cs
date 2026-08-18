@@ -41,7 +41,7 @@
             }
             finally
             {
-                Refresh();
+                Refresh(true);
             }
         }
 
