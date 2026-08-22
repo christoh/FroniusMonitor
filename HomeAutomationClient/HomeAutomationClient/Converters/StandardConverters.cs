@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Diagnostics;
+using Avalonia.Media.Immutable;
 
 namespace De.Hochstaetter.HomeAutomationClient.Converters;
 
@@ -159,4 +160,32 @@ public class NullToBool : NullToAnything<bool>
 {
     public override bool NotNull { get; set; } = true;
     public override bool Null { get; set; } = false;
+}
+
+public class ColorConverter : ConverterBase
+{
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        var targetColor = value is Fronius.Models.Color color ? Color.FromUInt32(color) : Colors.Transparent;
+
+        return true switch
+        {
+            _ when targetType.IsAssignableFrom(typeof(Color)) => targetColor,
+            _ when targetType.IsAssignableFrom(typeof(ISolidColorBrush)) => new ImmutableSolidColorBrush(targetColor),
+            _ when targetType.IsAssignableFrom(typeof(IImmutableSolidColorBrush)) => new ImmutableSolidColorBrush(targetColor),
+            _ when targetType.IsAssignableFrom(typeof(ImmutableSolidColorBrush)) => new ImmutableSolidColorBrush(targetColor),
+            _ when targetType.IsAssignableFrom(typeof(SolidColorBrush)) => new SolidColorBrush(targetColor),
+            _ => throw new InvalidCastException($"Cannot convert {typeof(Fronius.Models.Color)} to {targetType.Name}"),
+        };
+    }
+
+    public override object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value switch
+        {
+            Color c => c,
+            ISolidColorBrush b => b.Color,
+            _ => throw new InvalidCastException($"Cannot convert {value?.GetType().Name} to {typeof(Fronius.Models.Color)}"),
+        };
+    }
 }
