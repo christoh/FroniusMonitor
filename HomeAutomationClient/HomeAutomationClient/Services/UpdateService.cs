@@ -59,7 +59,7 @@ internal partial class UpdateService(IWebClientService webClient) : BindableBase
 
         if (gen24Result.Payload is { } gen24Systems)
         {
-            Inverters = [.. gen24Systems.Select(i => new KeyedGen24System { Device = i.Value, Key = i.Key })];
+            Inverters = [.. gen24Systems.Select(i => new KeyedGen24System { Device = i.Value, Key = i.Key }).OrderBy(i => i.Device.Config?.InverterSettings?.SystemName??Loc.Unknown)];
             Inverters.Apply(OnInverterUpdateReceived);
         }
 

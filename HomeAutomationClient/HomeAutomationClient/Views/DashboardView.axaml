@@ -84,7 +84,7 @@
 												<c:InverterControl x:Name="InverterControl"
 																   ColorAllTicks="{Binding Path=((vm:DashboardViewModel)DataContext).ColorAllTicks, FallbackValue={x:False}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
 																   Width="300" VerticalAlignment="Top"
-																   Inverter="{Binding Device}" LoadPowerBrush="{Binding Path=((vm:DashboardViewModel)DataContext).LoadPowerBrush, FallbackValue={x:False}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+																   Inverter="{Binding Device}" LoadPowerBrush="{Binding Path=((vm:DashboardViewModel)DataContext)?.LoadPowerColor, Converter={co:ColorConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
 																   DeviceKey="{Binding Key}"
 																   Margin="8" />
 												<c:PowerFlowArrow Fill="{Binding ElementName=InverterControl, Path=AcProducedPowerBrush}"
@@ -112,7 +112,7 @@
 
 											<c:PowerFlowArrow InvertArrow="True" Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" Margin="5,0,0,0" IsDc="True" Value="{Binding Device.Sensors?.Inverter?.StoragePower}"
 															  IsVisible="{Binding Device.Sensors.Storage, FallbackValue={x:False}, Converter={co:Null2Bool}}" VerticalAlignment="Center"
-															  Fill="{DynamicResource PowerFlowBattery}" />
+															  Fill="{Binding Path=((vm:DashboardViewModel)DataContext)?.StorageColor, Converter={co:ColorConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}" />
 										</Grid>
 									</DataTemplate>
 								</ItemsControl.ItemTemplate>
@@ -132,14 +132,14 @@
 												<Setter Property="Margin" Value="0,5"></Setter>
 											</Style>
 										</StackPanel.Styles>
-										<c:PowerFlowArrow Fill="{Binding GridPowerBrushL1}" Value="{Binding UpdateService.SmartMeter.ActivePowerL1, FallbackValue=0}"/>
-										<c:PowerFlowArrow Fill="{Binding GridPowerBrushL2}" Value="{Binding UpdateService.SmartMeter.ActivePowerL2, FallbackValue=0}"/>
-										<c:PowerFlowArrow Fill="{Binding GridPowerBrushL3}" Value="{Binding UpdateService.SmartMeter.ActivePowerL3, FallbackValue=0}"/>
+										<c:PowerFlowArrow Fill="{Binding GridPowerColorL1, Converter={co:ColorConverter}}" Value="{Binding UpdateService.SmartMeter.ActivePowerL1, FallbackValue=0}"/>
+										<c:PowerFlowArrow Fill="{Binding GridPowerColorL2, Converter={co:ColorConverter}}" Value="{Binding UpdateService.SmartMeter.ActivePowerL2, FallbackValue=0}"/>
+										<c:PowerFlowArrow Fill="{Binding GridPowerColorL3, Converter={co:ColorConverter}}" Value="{Binding UpdateService.SmartMeter.ActivePowerL3, FallbackValue=0}"/>
 									</StackPanel>
 									<i:GridIcon Width="140" Margin="8,0"/>
 								</StackPanel>
 
-								<c:PowerFlowArrow Fill="{Binding GridPowerBrush}" VerticalAlignment="Center" RotationDegrees="35"
+								<c:PowerFlowArrow Fill="{Binding GridPowerColor, Converter={co:ColorConverter}}" VerticalAlignment="Center" RotationDegrees="35"
 												  Value="{Binding UpdateService.SitePowerFlow.GridPowerCorrected, FallbackValue=0}"
 												  InvertArrow="True"/>
 							</StackPanel>

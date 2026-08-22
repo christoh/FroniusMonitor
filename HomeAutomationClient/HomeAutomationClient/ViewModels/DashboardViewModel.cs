@@ -1,5 +1,4 @@
-﻿using Avalonia.Media.Immutable;
-using De.Hochstaetter.HomeAutomationClient.Extensions;
+﻿using De.Hochstaetter.Fronius.Models;
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 
@@ -11,35 +10,35 @@ public sealed partial class DashboardViewModel(IWebClientService webClient, IUpd
     public partial bool ColorAllTicks { get; set; } = true;
 
     [ObservableProperty]
-    public partial ISolidColorBrush LoadPowerBrush { get; set; } = new ImmutableSolidColorBrush(Color.FromUInt32(0xff807000));
+    public partial HaColor LoadPowerColor { get; set; } = 0xff807000;
 
     [ObservableProperty]
-    public partial ISolidColorBrush GridPowerBrush { get; set; } = new ImmutableSolidColorBrush(Colors.LightGray);
+    public partial HaColor GridPowerColor { get; set; } = HaColors.LightGray;
 
     [ObservableProperty]
-    public partial ISolidColorBrush GridPowerBrushL1 { get; set; } = new ImmutableSolidColorBrush(Colors.LightGray);
+    public partial HaColor GridPowerColorL1 { get; set; } = HaColors.LightGray;
 
     [ObservableProperty]
-    public partial ISolidColorBrush GridPowerBrushL2 { get; set; } = new ImmutableSolidColorBrush(Colors.LightGray);
+    public partial HaColor GridPowerColorL2 { get; set; } = HaColors.LightGray;
 
     [ObservableProperty]
-    public partial ISolidColorBrush GridPowerBrushL3 { get; set; } = new ImmutableSolidColorBrush(Colors.LightGray);
+    public partial HaColor GridPowerColorL3 { get; set; } = HaColors.LightGray;
 
-    public override async Task Initialize()
+    [ObservableProperty]
+    public partial HaColor StorageColor { get; set; } = HaColors.LightGray;
+
+    /// <summary>
+    /// Recalculates the power flow colors from the current <see cref="IUpdateService.SitePowerFlow"/> and the theme colors passed in.
+    /// </summary>
+    /// <remarks>
+    /// The theme colors are supplied by the view, because looking them up requires the UI framework.
+    /// The view must also call this method whenever the theme or the site power flow changes.
+    /// </remarks>
+    /// <param name="gridColor">The color representing power coming from or going to the grid.</param>
+    /// <param name="solarColor">The color representing power produced by the solar panels.</param>
+    /// <param name="storageColor">The color representing power coming from or going to the battery.</param>
+    public void UpdatePowerFlowColors(HaColor gridColor, HaColor solarColor, HaColor storageColor)
     {
-        await base.Initialize();
-        UpdateService.SitePowerFlowUpdated += OnSitePowerFlowUpdated;
-        Application.Current!.ActualThemeVariantChanged += OnThemeChanged;
-    }
-
-    private void OnSitePowerFlowUpdated(object? sender, SitePowerFlowUpdatedEventArgs e) => _ = Dispatcher.UIThread.InvokeAsync(() => OnThemeChanged());
-
-    private void OnThemeChanged(object? sender = null, EventArgs? e = null)
-    {
-        var gridPowerBrush = Application.Current!.GetSolidColorBrush("PowerFlowGrid")!;
-        var solarPowerBrush = Application.Current!.GetSolidColorBrush("PowerFlowSolar")!;
-        var storagePowerBrush = Application.Current!.GetSolidColorBrush("PowerFlowBattery")!;
-
         var incomingSolarPower = double.Max(0, UpdateService.SitePowerFlow.SolarPower);
         var incomingGridPower = double.Max(0, UpdateService.SitePowerFlow.GridPowerCorrected);
         var incomingStoragePower = double.Max(0, UpdateService.SitePowerFlow.StoragePower);
@@ -49,16 +48,17 @@ public sealed partial class DashboardViewModel(IWebClientService webClient, IUpd
 
         if (totalIncomingPower > 0)
         {
-            r = (incomingSolarPower / totalIncomingPower) * solarPowerBrush.Color.R + (incomingStoragePower / totalIncomingPower) * storagePowerBrush.Color.R + (incomingGridPower / totalIncomingPower) * gridPowerBrush.Color.R;
-            g = (incomingSolarPower / totalIncomingPower) * solarPowerBrush.Color.G + (incomingStoragePower / totalIncomingPower) * storagePowerBrush.Color.G + (incomingGridPower / totalIncomingPower) * gridPowerBrush.Color.G;
-            b = (incomingSolarPower / totalIncomingPower) * solarPowerBrush.Color.B + (incomingStoragePower / totalIncomingPower) * storagePowerBrush.Color.B + (incomingGridPower / totalIncomingPower) * gridPowerBrush.Color.B;
+            r = (incomingSolarPower / totalIncomingPower) * solarColor.R + (incomingStoragePower / totalIncomingPower) * storageColor.R + (incomingGridPower / totalIncomingPower) * gridColor.R;
+            g = (incomingSolarPower / totalIncomingPower) * solarColor.G + (incomingStoragePower / totalIncomingPower) * storageColor.G + (incomingGridPower / totalIncomingPower) * gridColor.G;
+            b = (incomingSolarPower / totalIncomingPower) * solarColor.B + (incomingStoragePower / totalIncomingPower) * storageColor.B + (incomingGridPower / totalIncomingPower) * gridColor.B;
         }
 
-        LoadPowerBrush = new ImmutableSolidColorBrush(Color.FromRgb(Round(r), Round(g), Round(b)));
-        GridPowerBrush = UpdateService.SitePowerFlow.GridPowerCorrected < 0 ? LoadPowerBrush : gridPowerBrush;
-        GridPowerBrushL1 = UpdateService.SmartMeter?.ActivePowerL1 < 0 ? LoadPowerBrush : gridPowerBrush;
-        GridPowerBrushL2 = UpdateService.SmartMeter?.ActivePowerL2 < 0 ? LoadPowerBrush : gridPowerBrush;
-        GridPowerBrushL3 = UpdateService.SmartMeter?.ActivePowerL3 < 0 ? LoadPowerBrush : gridPowerBrush;
+        LoadPowerColor = HaColor.FromRgb(Round(r), Round(g), Round(b));
+        GridPowerColor = UpdateService.SitePowerFlow.GridPowerCorrected < 0 ? LoadPowerColor : gridColor;
+        GridPowerColorL1 = UpdateService.SmartMeter?.ActivePowerL1 < 0 ? LoadPowerColor : gridColor;
+        GridPowerColorL2 = UpdateService.SmartMeter?.ActivePowerL2 < 0 ? LoadPowerColor : gridColor;
+        GridPowerColorL3 = UpdateService.SmartMeter?.ActivePowerL3 < 0 ? LoadPowerColor : gridColor;
+        StorageColor = UpdateService.SitePowerFlow.StoragePower < 0 ? LoadPowerColor : storageColor;
 
         return;
 

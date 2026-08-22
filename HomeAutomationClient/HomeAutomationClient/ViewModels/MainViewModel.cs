@@ -1,5 +1,4 @@
-﻿using De.Hochstaetter.HomeAutomationClient.Services;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
@@ -7,14 +6,14 @@ namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 public sealed partial class MainViewModel : ViewModelBase
 {
     private readonly IGen24LocalizationService gen24Loc;
-    
-    private readonly IUpdateService updateService;
+
+    public IUpdateService UpdateService { get; }
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public MainViewModel(IWebClientService webClient, IGen24LocalizationService gen24Loc, IUpdateService updateService)
     {
         this.gen24Loc = gen24Loc;
-        this.updateService = updateService;
+        UpdateService = updateService;
         ApiUri = IoC.TryGetRegistered<ICache>()?.Get<string>(CacheKeys.ApiUri) ?? "https://home-automation.example.com";
         webClient.Initialize(ApiUri, "hacc", "0.5.0.0");
     }
@@ -28,7 +27,7 @@ public sealed partial class MainViewModel : ViewModelBase
 
     [ObservableProperty]
     public partial bool IsReady { get; set; }
-    
+
     [ObservableProperty]
     public partial object? MainViewContent { get; set; }
 
@@ -71,7 +70,7 @@ public sealed partial class MainViewModel : ViewModelBase
             BusyText = Loc.GetInverterLocalization;
             await gen24Loc.Initialize().ConfigureAwait(false);
             BusyText = Loc.ConnectingToHas;
-            await updateService.StartAsync().ConfigureAwait(false);
+            await UpdateService.StartAsync().ConfigureAwait(false);
             IsReady = true;
             await Dispatcher.UIThread.InvokeAsync(() => MainViewContent = new DashboardView());
         }
@@ -84,5 +83,11 @@ public sealed partial class MainViewModel : ViewModelBase
         {
             BusyText = null;
         }
+    }
+
+    [RelayCommand]
+    private async Task ShowDetails(KeyedGen24System gen24System)
+    {
+        return;
     }
 }

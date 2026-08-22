@@ -1,55 +1,38 @@
 ﻿using System.Numerics;
-using System.Runtime.Intrinsics;
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 namespace De.Hochstaetter.Fronius.Models;
 
 // Most likely INotifyPropertyChanged is not needed. Verification required.
-public struct Color(uint value) : IEquatable<Color>, IEquatable<uint>, IParsable<Color>, INotifyPropertyChanged
+public struct HaColor(uint value) : IEquatable<HaColor>, IEquatable<uint>, IParsable<HaColor>, INotifyPropertyChanged
 {
-    public Color() : this((uint)Colors.Black) { }
+    public HaColor() : this((uint)HaColors.Black) { }
 
-    private static readonly Colors[] AllColors = Enum.GetValues<Colors>();
+    private static HaColors[]? allColors;
 
+    private static HaColors[] AllColors => allColors ??= Enum.GetValues<HaColors>();
+    
     private uint uintColor = value;
 
-    public static implicit operator uint(Color color) => color.uintColor;
+    public static implicit operator uint(HaColor color) => color.uintColor;
 
-    public static implicit operator Color(uint value) => new(value);
+    public static implicit operator HaColor(uint value) => new(value);
 
-    public static implicit operator Color(Colors color) => new((uint)color);
-
-    [Obsolete("Change your code to use Hx.Mustang.Platform.Models.Colors.Color")]
-    public static implicit operator Color(System.Drawing.Color color) => new(unchecked((uint)color.ToArgb()));
+    public static implicit operator HaColor(HaColors haColor) => new((uint)haColor);
 
     [Obsolete("Change your code to use Hx.Mustang.Platform.Models.Colors.Color")]
-    public static implicit operator System.Drawing.Color(Color color) => System.Drawing.Color.FromArgb(unchecked((int)color.uintColor));
+    public static implicit operator HaColor(System.Drawing.Color color) => new(unchecked((uint)color.ToArgb()));
+
+    [Obsolete("Change your code to use Hx.Mustang.Platform.Models.Colors.Color")]
+    public static implicit operator System.Drawing.Color(HaColor color) => System.Drawing.Color.FromArgb(unchecked((int)color.uintColor));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Color FromRgb(byte r, byte g, byte b) => FromArgb(255, r, g, b);
+    public static HaColor FromRgb(byte r, byte g, byte b) => FromArgb(255, r, g, b);
 
-    public static Color FromArgb(byte a, byte r, byte g, byte b) => new(unchecked((uint)((a << 24) | (r << 16) | (g << 8) | b)));
+    public static HaColor FromArgb(byte a, byte r, byte g, byte b) => new(unchecked((uint)((a << 24) | (r << 16) | (g << 8) | b)));
 
     public (byte A, byte R, byte G, byte B) ToArgb() => (A, R, G, B);
-
-    public (float A, float R, float G, float B) ToArgbFloat()
-    {
-        var simdVector = Vector128.ConvertToSingle(Vector128.Create(A, R, G, B)) * (1f / 255f);
-        return (simdVector[0], simdVector[1], simdVector[2], simdVector[3]);
-    }
-
-    /// <summary>
-    /// Gets the color as an array of floats in the order [R, G, B, A], where each component is between 0 and 1. This is the way and order mMap wants it.
-    /// </summary>
-    /// <remarks>Note the lane order: unlike <see cref="ToArgbFloat"/>, alpha comes last.</remarks>
-    /// <returns>A four-element array [R, G, B, A], each component normalized to 0..1.</returns>
-    public float[] ToRgbaFloatArray()
-    {
-        //TODO: Write a JsonConverter for Color that can serialize Color directly to mMap.
-        var simdVector = Vector128.ConvertToSingle(Vector128.Create(R, G, B, A)) * (1f / 255f);
-        return [simdVector[0], simdVector[1], simdVector[2], simdVector[3]];
-    }
 
     public byte A
     {
@@ -76,15 +59,15 @@ public struct Color(uint value) : IEquatable<Color>, IEquatable<uint>, IParsable
     }
 
     /// <summary>
-    ///     Returns a new <see cref="Color" /> that is mixed with another <see cref="Color" />
+    ///     Returns a new <see cref="HaColor" /> that is mixed with another <see cref="HaColor" />
     /// </summary>
-    /// <param name="otherColor">The other <see cref="Color" /> that you want to mix with the current color</param>
-    /// <param name="amount">An <see cref="IFloatingPoint{TSelf}"/> that contains a weight (between 0 and 1) the other <see cref="Color" /> should get in the new <see cref="Color" />.
+    /// <param name="otherColor">The other <see cref="HaColor" /> that you want to mix with the current color</param>
+    /// <param name="amount">An <see cref="IFloatingPoint{TSelf}"/> that contains a weight (between 0 and 1) the other <see cref="HaColor" /> should get in the new <see cref="HaColor" />.
     /// The default is .5 (mix both colors with equal weight)</param>
     /// <typeparam name="T">The concrete floating point type (<see langword="double"/>, <see langword="float"/>, ...)</typeparam>
     /// <returns>A new color that is mixed with <paramref name="otherColor" /></returns>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="amount" /> is not between 0 and 1</exception>
-    public Color MixWith<T>(Color otherColor, T amount) where T : IFloatingPoint<T>
+    public HaColor MixWith<T>(HaColor otherColor, T amount) where T : IFloatingPoint<T>
     {
         if (!(amount >= T.Zero && amount <= T.One))
         {
@@ -102,19 +85,19 @@ public struct Color(uint value) : IEquatable<Color>, IEquatable<uint>, IParsable
 
 
     /// <summary>
-    ///     Returns a new <see cref="Color" /> that is mixed with another <see cref="Color" />
+    ///     Returns a new <see cref="HaColor" /> that is mixed with another <see cref="HaColor" />
     /// </summary>
-    /// <param name="otherColor">The other <see cref="Color" /> that you want to mix with the current color</param>
+    /// <param name="otherColor">The other <see cref="HaColor" /> that you want to mix with the current color</param>
     /// <returns>A new color that is mixed with <paramref name="otherColor" /></returns>
-    public Color MixWith(Color otherColor) => MixWith(otherColor, .5f);
+    public HaColor MixWith(HaColor otherColor) => MixWith(otherColor, .5f);
 
-    public bool Equals(Color other) => uintColor == other.uintColor;
+    public bool Equals(HaColor other) => uintColor == other.uintColor;
 
     public bool Equals(uint other) => uintColor == other;
 
     public override bool Equals(object? obj) => obj switch
     {
-        Color other => Equals(other),
+        HaColor other => Equals(other),
         uint other => Equals(other),
         int other => Equals(unchecked((uint)other)),
         long other => Equals((uint)other),
@@ -126,17 +109,17 @@ public struct Color(uint value) : IEquatable<Color>, IEquatable<uint>, IParsable
 
     public override int GetHashCode() => uintColor.GetHashCode();
 
-    public static bool operator==(Color left, Color right) => left.Equals(right);
+    public static bool operator==(HaColor left, HaColor right) => left.Equals(right);
 
-    public static bool operator!=(Color left, Color right) => !(left == right);
+    public static bool operator!=(HaColor left, HaColor right) => !(left == right);
 
-    public static bool operator==(Color left, uint right) => left.Equals(right);
+    public static bool operator==(HaColor left, uint right) => left.Equals(right);
 
-    public static bool operator!=(Color left, uint right) => !(left == right);
+    public static bool operator!=(HaColor left, uint right) => !(left == right);
 
-    public static bool operator==(uint left, Color right) => right.Equals(left);
+    public static bool operator==(uint left, HaColor right) => right.Equals(left);
 
-    public static bool operator!=(uint left, Color right) => !(left == right);
+    public static bool operator!=(uint left, HaColor right) => !(left == right);
 
     // ReSharper disable once CommentTypo
     /// <summary>
@@ -146,13 +129,13 @@ public struct Color(uint value) : IEquatable<Color>, IEquatable<uint>, IParsable
     {
         var localColor = this;
 
-        if (localColor.uintColor == (uint)Colors.Transparent)
+        if (localColor.uintColor == (uint)HaColors.Transparent)
         {
-            return nameof(Colors.Transparent);
+            return nameof(HaColors.Transparent);
         }
 
         var knownColor = AllColors.FirstOrDefault(c => (uint)c == localColor.uintColor);
-        return (uint)knownColor != (uint)Colors.Transparent ? knownColor.ToString() : $"#{uintColor:X8}";
+        return (uint)knownColor != (uint)HaColors.Transparent ? knownColor.ToString() : $"#{uintColor:X8}";
     }
 
     /// <summary>
@@ -163,19 +146,19 @@ public struct Color(uint value) : IEquatable<Color>, IEquatable<uint>, IParsable
     /// ff0000 (red no transparency)<br/>
     /// 800000ff (blue 50% transparency)<br/>
     /// #f0f (purple no transparency)<br/>
-    /// DodgerBlue (a case-insensitive known color name from the <see cref="Colors"/> enum)<br/>
+    /// DodgerBlue (a case-insensitive known color name from the <see cref="HaColors"/> enum)<br/>
     /// </para>
     /// </summary>
     /// <remarks>
     /// <para>The hashtag character (#) forces hex parsing. You only need it if a known color name consists of only hex letters (A to F) to indicate that you want to parse as hex.</para>
-    /// <para>Instead of using <see cref="Parse"/>, you can also say '<see cref="Color"/> myColor = 0xffff0000U' but always use 8 digits (6 digits always gives a 100% transparent color). This is much faster.<br/>
+    /// <para>Instead of using <see cref="Parse"/>, you can also say '<see cref="HaColor"/> myColor = 0xffff0000U' but always use 8 digits (6 digits always gives a 100% transparent color). This is much faster.<br/>
     /// <see cref="Parse"/> is mainly here for deserialization from JSON or XML.</para>
     /// </remarks>
     /// <param name="colorString"></param>
     /// <param name="unused">The <see cref="IFormatProvider"/> is unused. It only exists to implement <see cref="IParsable{T}"/></param>
-    /// <returns>A <see cref="Color"/> according to the string.</returns>
+    /// <returns>A <see cref="HaColor"/> according to the string.</returns>
     /// <exception cref="FormatException">The color string is not valid.</exception>
-    public static Color Parse(string colorString, IFormatProvider? unused = null)
+    public static HaColor Parse(string colorString, IFormatProvider? unused = null)
     {
         if (string.IsNullOrWhiteSpace(colorString))
         {
@@ -199,14 +182,14 @@ public struct Color(uint value) : IEquatable<Color>, IEquatable<uint>, IParsable
     /// </summary>
     /// <remarks>
     /// <para>The hashtag character (#) at the beginning is optional.</para>
-    /// <para>Instead of using <see cref="Parse"/>, you can also say '<see cref="Color"/> myColor = 0xffff0000U' but always use 8 digits (6 digits always gives a 100% transparent color). This is much faster.<br/>
+    /// <para>Instead of using <see cref="Parse"/>, you can also say '<see cref="HaColor"/> myColor = 0xffff0000U' but always use 8 digits (6 digits always gives a 100% transparent color). This is much faster.<br/>
     /// <see cref="Parse"/> is mainly here for deserialization from JSON or XML.</para>
     /// </remarks>
     /// <param name="s">The string to parse</param>
     /// <param name="providerUnused">The <see cref="IFormatProvider"/> is unused. It only exists to implement <see cref="IParsable{TSelf}"/></param>
     /// <param name="result">The parsed color</param>
     /// <returns><see langword="true"/> if the string was parsed successfully. If <see langword="false"/> is returned, <see langword="out"/> <paramref name="result"/> is undefined.</returns>
-    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? providerUnused, out Color result)
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? providerUnused, out HaColor result)
     {
         if (string.IsNullOrWhiteSpace(s))
         {
@@ -222,9 +205,9 @@ public struct Color(uint value) : IEquatable<Color>, IEquatable<uint>, IParsable
     /// <see cref="TryParse"/> does not have to pay for exception handling on invalid input.
     /// </summary>
     /// <param name="colorString">A non-empty color string.</param>
-    /// <param name="result">The parsed color, or <see cref="Colors.Transparent"/> if parsing failed.</param>
+    /// <param name="result">The parsed color, or <see cref="HaColors.Transparent"/> if parsing failed.</param>
     /// <returns><see langword="true"/> if <paramref name="colorString"/> was parsed successfully.</returns>
-    private static bool TryParseCore(string colorString, out Color result)
+    private static bool TryParseCore(string colorString, out HaColor result)
     {
         result = 0U;
 
@@ -242,7 +225,7 @@ public struct Color(uint value) : IEquatable<Color>, IEquatable<uint>, IParsable
         if
         (
             !hasHash && char.IsLetter(parseString[0]) && !parseString.Contains(',') &&
-            Enum.TryParse<Colors>(parseString, true, out var colorEnum) && Enum.IsDefined(colorEnum)
+            Enum.TryParse<HaColors>(parseString, true, out var colorEnum) && Enum.IsDefined(colorEnum)
         )
         {
             result = colorEnum;
@@ -315,7 +298,7 @@ public struct Color(uint value) : IEquatable<Color>, IEquatable<uint>, IParsable
 #pragma warning disable CA1069
 [SuppressMessage("ReSharper", "IdentifierTypo")]
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
-public enum Colors : uint
+public enum HaColors : uint
 {
     Transparent = 0, // 0x00000000
     Black = 4278190080, // 0xFF000000

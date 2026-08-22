@@ -7,6 +7,9 @@
              xmlns:li="clr-namespace:De.Hochstaetter.HomeAutomationClient.Assets.LoadingIndicators.Avalonia"
              xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             xmlns:services="clr-namespace:De.Hochstaetter.HomeAutomationClient.Services"
+             xmlns:models="clr-namespace:De.Hochstaetter.HomeAutomationClient.Models"
+             xmlns:views="clr-namespace:De.Hochstaetter.HomeAutomationClient.Views"
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="650"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.MainView"
              x:DataType="vm:MainViewModel">
@@ -25,7 +28,19 @@
                     </Style>
                 </StackPanel.Styles>
                 <TextBlock Text="{x:Static p:Resources.Dashboard}"/>
-                <TextBlock Text="{x:Static p:Resources.Details}"/>
+                <Button Content="{x:Static p:Resources.Details}">
+                    <Button.Flyout>
+                        <MenuFlyout ItemsSource="{Binding UpdateService.Inverters}">
+                            <MenuFlyout.ItemContainerTheme>
+                                <ControlTheme TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}" x:DataType="{x:Type models:KeyedGen24System}">
+                                    <Setter Property="Header" Value="{Binding Device.Config?.InverterSettings?.SystemName, TargetNullValue={x:Static p:Resources.Unknown}}"/>
+                                    <Setter Property="Command" Value="{Binding ((vm:MainViewModel)DataContext)?.ShowDetailsCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type views:MainView}}}"/>
+                                    <Setter Property="CommandParameter" Value="{Binding}"/>
+                                </ControlTheme>
+                            </MenuFlyout.ItemContainerTheme>
+                        </MenuFlyout>
+                    </Button.Flyout>
+                </Button>
                 <TextBlock Text="{x:Static p:Resources.Settings}"/>
             </StackPanel>
         </Grid>
