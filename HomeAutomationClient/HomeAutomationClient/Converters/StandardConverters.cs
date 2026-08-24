@@ -4,6 +4,16 @@ using Avalonia.Media.Immutable;
 
 namespace De.Hochstaetter.HomeAutomationClient.Converters;
 
+#if DEBUG
+public class DoNothingConverter : ConverterBase
+{
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value;
+    }
+}
+#endif
+
 public class BoolInverter : ConverterBase
 {
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)

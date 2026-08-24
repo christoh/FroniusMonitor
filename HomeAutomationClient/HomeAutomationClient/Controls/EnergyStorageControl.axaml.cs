@@ -93,6 +93,25 @@ public partial class EnergyStorageControl : UserControl
     public EnergyStorageControl()
     {
         InitializeComponent();
+        Loaded += OnLoaded;
+        Unloaded += OnUnloaded;
+    }
+    private void OnLoaded(object? sender, RoutedEventArgs e)
+    {
+        StateOfChargeTextBlock.PropertyChanged += OnStateOfChargeChanged;
+    }
+    
+    private void OnUnloaded(object? sender, RoutedEventArgs e)
+    {
+        StateOfChargeTextBlock.PropertyChanged -= OnStateOfChargeChanged;
+    }
+
+    private void OnStateOfChargeChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (e.Property.Name == nameof(StateOfChargeTextBlock.Text))
+        {
+            SetBatteryColor();
+        }
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
@@ -101,7 +120,6 @@ public partial class EnergyStorageControl : UserControl
 
         switch (change.Property.Name)
         {
-            case nameof(Gen24System):
             case nameof(Soc0):
             case nameof(Soc1):
             case nameof(Soc2):

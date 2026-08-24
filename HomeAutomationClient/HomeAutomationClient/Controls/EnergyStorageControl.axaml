@@ -16,7 +16,7 @@
             <Rectangle Width="580" Height="800" x:Name="BackgroundRectangle" Fill="{DynamicResource DeviceInnerBackgroundRunning}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,60"/>
             <Rectangle Width="580" x:Name="SocRectangle" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,60"/>
 
-            <TextBlock Margin="0,120,0,0" FontWeight="Bold" HorizontalAlignment="Center" FontSize="150"
+            <TextBlock x:Name="StateOfChargeTextBlock" Margin="0,120,0,0" FontWeight="Bold" HorizontalAlignment="Center" FontSize="150"
                        Text="{Binding Gen24System.Sensors.Storage.StateOfCharge, StringFormat=P1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, FallbackValue=--- %}" />
 
             <TextBlock Margin="0,290,0,0" HorizontalAlignment="Center" FontSize="80" FontWeight="Bold">

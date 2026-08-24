@@ -86,7 +86,7 @@ public sealed partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task ShowDetails(KeyedGen24System gen24System)
+    private void ShowDetails(IKeyedDevice device)
     {
         return;
     }

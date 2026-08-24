@@ -25,6 +25,8 @@ public interface IUpdateService : IDisposable, IAsyncDisposable
 
     public double SitePvPeakPower { get; }
 
+    public IEnumerable<IKeyedDevice> DetailDevices { get; }
+
     public bool ShowInverters { get; }
 
     public bool ShowPowerConsumers { get; }

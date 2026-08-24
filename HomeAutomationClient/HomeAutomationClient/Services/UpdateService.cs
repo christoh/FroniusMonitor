@@ -15,16 +15,16 @@ internal partial class UpdateService(IWebClientService webClient) : BindableBase
 
     public event EventHandler<SitePowerFlowUpdatedEventArgs>? SitePowerFlowUpdated;
 
-    [ObservableProperty, NotifyPropertyChangedFor(nameof(ShowInverters))]
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(ShowInverters), nameof(DetailDevices))]
     public partial ObservableCollection<KeyedGen24System> Inverters { get; set; } = [];
 
-    [ObservableProperty, NotifyPropertyChangedFor(nameof(ShowPowerConsumers))]
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(ShowPowerConsumers), nameof(DetailDevices))]
     public partial ObservableCollection<IKeyedDevice> AllPowerConsumers { get; set; } = [];
 
     [ObservableProperty]
     public partial List<KeyedWattPilotUpdate> WattPilotUpdates { get; set; } = [];
 
-    [ObservableProperty]
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(DetailDevices))]
     public partial Gen24PowerMeter3P? SmartMeter { get; set; }
 
     [ObservableProperty]
@@ -41,6 +41,24 @@ internal partial class UpdateService(IWebClientService webClient) : BindableBase
 
     [ObservableProperty]
     public partial double SitePvPeakPower { get; set; }
+
+    public IEnumerable<IKeyedDevice> DetailDevices
+    {
+        get
+        {
+            var result = Inverters.Cast<IKeyedDevice>();
+
+            result = Inverters.Where(i => i.Device.Sensors?.PrimaryPowerMeter != null)
+                .Aggregate(result, (current, keyedInverter) => current.Append(new KeyedDevice<Gen24PowerMeter3P> { Device = keyedInverter.Device.Sensors!.PrimaryPowerMeter!, Key = "SmartMeter" }));
+
+            result = Inverters.Where(i => i.Device.Sensors?.Storage != null)
+                .Aggregate(result, (current, keyedInverter) => current.Append(new KeyedDevice<Gen24Storage> { Device = keyedInverter.Device.Sensors!.Storage!, Key = Loc.Battery }));
+
+            result = result.Concat(AllPowerConsumers.Where(c => c is KeyedWattPilot));
+
+            return result;
+        }
+    }
 
     public bool ShowInverters => Inverters.Count > 0;
 
@@ -59,7 +77,7 @@ internal partial class UpdateService(IWebClientService webClient) : BindableBase
 
         if (gen24Result.Payload is { } gen24Systems)
         {
-            Inverters = [.. gen24Systems.Select(i => new KeyedGen24System { Device = i.Value, Key = i.Key }).OrderBy(i => i.Device.Config?.InverterSettings?.SystemName??Loc.Unknown)];
+            Inverters = [.. gen24Systems.Select(i => new KeyedGen24System { Device = i.Value, Key = i.Key }).OrderBy(i => i.Device.Config?.InverterSettings?.SystemName ?? Loc.Unknown)];
             Inverters.Apply(OnInverterUpdateReceived);
         }
 
