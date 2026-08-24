@@ -10,7 +10,7 @@
              mc:Ignorable="d" d:DesignWidth="110" d:DesignHeight="127"
              x:Class="De.Hochstaetter.HomeAutomationClient.Controls.InverterControl">
     <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:InverterControl}}">
-        <Border BorderBrush="DimGray" BorderThickness="1" Width="110">
+        <Border BorderBrush="DimGray" BorderThickness="1" Width="110" UseLayoutRounding="False">
             <Grid x:Name="BackgroundProvider" RowDefinitions="Auto,Auto,Auto,Auto">
                 <Grid.Styles>
                     <Style Selector="Viewbox">

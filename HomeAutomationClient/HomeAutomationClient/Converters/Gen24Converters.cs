@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using De.Hochstaetter.Fronius.Extensions;
+using De.Hochstaetter.HomeAutomationClient.Extensions;
 using De.Hochstaetter.HomeAutomationClient.Models.Gen24;
 
 namespace De.Hochstaetter.HomeAutomationClient.Converters;
@@ -109,6 +110,49 @@ public class MpptComparison : MultiConverterBase
     }
 }
 
+public class InverterBackgroundColor : MultiConverterBase
+{
+    public override object? Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
+    {
+        var innerOther = Application.Current!.GetSolidColorBrush("DeviceInnerBackgroundOther");
+
+        if (values.Count > 0 && values[0] is string statusString)
+        {
+            var innerRunning = Application.Current!.GetSolidColorBrush("DeviceOuterBackgroundRunning");
+            var innerFault = Application.Current!.GetSolidColorBrush("DeviceOuterBackgroundFault");
+            var innerWarning = Application.Current!.GetSolidColorBrush("DeviceOuterBackgroundWarning");
+            var innerStartup = Application.Current!.GetSolidColorBrush("DeviceOuterBackgroundStartup");
+            return statusString switch
+            {
+                "STATE_ERROR" => innerFault,
+                "STATE_RUNNING" => innerRunning,
+                "STATE_WARNING" => innerWarning,
+                "STATE_STARTUP" => innerStartup,
+                _ when values.Count > 2 && values[2] is true && values[1] is double d /*&& double.Abs(d) > 1e-9*/ => innerRunning,
+                _ => innerOther,
+            };
+        }
+
+        return innerOther;
+    }
+}
+
+public class InverterMinimumAc : ConverterBase
+{
+    public double Factor { get; set; } = 1d / 3d;
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is Gen24Config config)
+        {
+            IList<string>? storageGroup = null;
+            var success = config.Components?.Groups.TryGetValue("Storage", out storageGroup);
+            return success is true && storageGroup?.Count > 0 ? -(config.MaxAcPower ?? 0) * Factor : 0d;
+        }
+
+        return 0d;
+    }
+}
+
 public class Gauge2Text : MultiConverterBase
 {
     public override object? Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
@@ -118,7 +162,7 @@ public class Gauge2Text : MultiConverterBase
             return null;
         }
 
-        return gauge.Value.HasValue ? gauge.Value.Value.ToString(gauge.StringFormat, CultureInfo.CurrentCulture) + " " + gauge.UnitName : "---";
+        return gauge.Value.HasValue ? gauge.Value.Value.ToString(gauge.ValueStringFormat, CultureInfo.CurrentCulture) + " " + gauge.UnitName : "---";
     }
 }
 

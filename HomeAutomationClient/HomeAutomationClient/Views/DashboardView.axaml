@@ -1,4 +1,4 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+<ContentPage xmlns="https://github.com/avaloniaui"
 			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -12,11 +12,11 @@
 			 mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="1200"
 			 x:Class="De.Hochstaetter.HomeAutomationClient.Views.DashboardView"
 			 x:DataType="vm:DashboardViewModel">
-	<UserControl.Resources>
+	<ContentPage.Resources>
         <system:Double x:Key="ControlWidth">210</system:Double>
         <Thickness x:Key="ControlMargin">4</Thickness>
-	</UserControl.Resources>
-	<UserControl.DataTemplates>
+	</ContentPage.Resources>
+	<ContentPage.DataTemplates>
 		<!-- WattPilot -->
         <DataTemplate DataType="{x:Type m:KeyedWattPilot}">
             <c:WattPilotControl ColorAllTicks="{Binding Path=((vm:DashboardViewModel)DataContext).ColorAllTicks, FallbackValue={x:False}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
@@ -38,7 +38,7 @@
 							 SetSaturationCommand="{Binding ((vm:DashboardViewModel)DataContext).SetSaturationCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
 							 SetBrightnessCommand="{Binding ((vm:DashboardViewModel)DataContext).SetBrightnessCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}" />
 		</DataTemplate>
-	</UserControl.DataTemplates>
+	</ContentPage.DataTemplates>
 	<Grid RowDefinitions="*" x:Name="RootElement">
 		<Grid RowDefinitions="Auto,Auto,*,Auto" Grid.Row="0">
 
@@ -167,4 +167,4 @@
 		</Grid>
 		<c:BusyAnimation BusyText="{Binding BusyText}" Grid.Row="0" />
 	</Grid>
-</UserControl>
+</ContentPage>

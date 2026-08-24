@@ -3,7 +3,7 @@ using De.Hochstaetter.HomeAutomationClient.Extensions;
 
 namespace De.Hochstaetter.HomeAutomationClient.Views;
 
-public partial class DashboardView : UserControl
+public partial class DashboardView : ContentPage
 {
     private readonly DashboardViewModel viewModel;
 

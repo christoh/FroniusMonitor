@@ -1,0 +1,105 @@
+<ContentPage xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="De.Hochstaetter.HomeAutomationClient.Views.InverterDetailsView"
+             xmlns:vm="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels"
+             xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             xmlns:i="clr-namespace:De.Hochstaetter.HomeAutomationClient.Assets.Images"
+             xmlns:m="clr-namespace:De.Hochstaetter.HomeAutomationClient.Misc"
+             xmlns:v="clr-namespace:De.Hochstaetter.HomeAutomationClient.Views"
+             x:DataType="{x:Type vm:InverterDetailsViewModel}"
+             >
+    <ContentPage.Resources>
+        <!--
+        Surrounds a HalfCircleGauge with its own caption and value read-out. The dial is the gauge's Content
+        (see HalfCircleGauge.axaml), so the ContentPresenter is where the dial ends up; everything placed
+        around it in this template becomes part of the gauge.
+        -->
+        <ControlTemplate x:Key="InverterGauge" TargetType="c:HalfCircleGauge">
+            <Border BorderBrush="DimGray" BorderThickness="1" UseLayoutRounding="False" Padding="4">
+                <Border.Background>
+                    <MultiBinding Converter="{co:InverterBackgroundColor}">
+                        <Binding Path="((vm:InverterDetailsViewModel)DataContext)?.Gen24System?.Sensors?.InverterStatus?.StatusCode" RelativeSource="{RelativeSource TemplatedParent}"/>
+                        <Binding Path="Value" RelativeSource="{RelativeSource TemplatedParent}"/>
+                        <Binding Path="(v:InverterDetailsView.UseRunningBackground)" RelativeSource="{RelativeSource TemplatedParent}" />
+                    </MultiBinding>
+                </Border.Background>
+                <Grid RowDefinitions="Auto,Auto,Auto">
+                    <TextBlock Grid.Row="0" FontSize="18" FontWeight="Normal" TextAlignment="Center"
+                               Text="{TemplateBinding Label}"
+                               IsVisible="{Binding Label, RelativeSource={RelativeSource TemplatedParent}, Converter={co:Null2Bool}}" />
+
+                    <TextBlock Grid.Row="1" FontSize="18" FontWeight="Medium" TextAlignment="Center" Margin="0,0,0,2">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{co:Gauge2Text}">
+                                <Binding RelativeSource="{RelativeSource TemplatedParent}" />
+                                <Binding Path="Value" RelativeSource="{RelativeSource TemplatedParent}" />
+                                <Binding Path="StringFormat" RelativeSource="{RelativeSource TemplatedParent}" />
+                                <Binding Path="UnitName" RelativeSource="{RelativeSource TemplatedParent}" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+
+                    <ContentPresenter Grid.Row="2" x:Name="PART_ContentPresenter"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      Padding="{TemplateBinding Padding}"
+                                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                </Grid>
+            </Border>
+        </ControlTemplate>
+
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*" ColumnDefinitions="Auto,*">
+        <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding Gen24System.DisplayName}" TextAlignment="Center" FontSize="18" FontWeight="Medium" Margin="10,10,10,16" TextWrapping="Wrap" />
+
+        <ScrollViewer Grid.Row="1" Grid.Column="0">
+            <StackPanel Margin="8">
+                <StackPanel Margin="8" Grid.IsSharedSizeScope="True">
+                    <StackPanel.Styles>
+                        <Style Selector="ToggleButton">
+                            <Setter Property="HorizontalAlignment" Value="Left"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                        </Style>
+                    </StackPanel.Styles>
+                    <ToggleButton x:Name="ActivePowerSwitch"  IsChecked="True" Content="{x:Static p:Resources.ActivePower}" Classes="OnOff Labeled"/>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+        <ScrollViewer Grid.Column="1" Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <!-- ReSharper disable Xaml.PossibleNullReferenceException -->
+            <WrapPanel Orientation="Horizontal" Margin="10,0,4,0">
+                <WrapPanel.Styles>
+                    <Style Selector="c|HalfCircleGauge">
+                        <Setter Property="Width" Value="150" />
+                        <Setter Property="TickFill" Value="{DynamicResource TickFill}" />
+                        <Setter Property="HandFill" Value="{DynamicResource HandFill}" />
+                        <Setter Property="v:InverterDetailsView.UseRunningBackground" Value="False"/>
+                        <Setter Property="Template" Value="{StaticResource InverterGauge}" />
+                        <Setter Property="ColorAllTicks" Value="{Binding ColorAllTicks}"></Setter>
+                    </Style>
+                </WrapPanel.Styles>
+                <HeaderedContentControl IsVisible="{Binding ElementName=ActivePowerSwitch, Path=IsChecked}" Classes="GroupBox" Header="{x:Static p:Resources.ActivePower}">
+                    <StackPanel Orientation="Horizontal">
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Sum}"
+                                           UnitName="W"
+                                           Minimum="{Binding Gen24System.Config, Converter={co:InverterMinimumAc Factor=1}}"
+                                           GaugeColors="{Binding Gen24System.Sensors?.Storage, TargetNullValue={x:Static m:GaugeColors.HighIsBad}, Converter={co:Null2ColorMap Null={x:Static m:GaugeColors.HighIsBad}, NotNull={x:Static m:GaugeColors.MidIsGood}}}"
+                                           Origin="{Binding Gen24System.Sensors?.Storage, TargetNullValue='0', Converter={co:Null2Double Null='0', NotNull='.5'}}"
+                                           Maximum="{Binding Gen24System.Config?.MaxAcPower, TargetNullValue='10000'}"
+                                           Value="{Binding Gen24System.Sensors.Inverter?.PowerActiveSum, TargetNullValue=0}"
+                                           v:InverterDetailsView.UseRunningBackground="False">
+                        </c:HalfCircleGauge>
+                    </StackPanel>
+                </HeaderedContentControl>
+            </WrapPanel>
+        </ScrollViewer>
+    </Grid>
+</ContentPage>

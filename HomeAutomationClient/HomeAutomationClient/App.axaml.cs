@@ -1,4 +1,5 @@
 using De.Hochstaetter.HomeAutomationClient.Services;
+using InverterDetailsView = De.Hochstaetter.HomeAutomationClient.Views.InverterDetailsView;
 
 namespace De.Hochstaetter.HomeAutomationClient;
 
@@ -22,8 +23,10 @@ public partial class App : Application
             .AddTransient<GaugeTestViewModel>()
             .AddTransient<LinearGaugeTestView>()
             .AddTransient<LinearGaugeTestViewModel>()
-            .AddTransient<DashboardView>()
-            .AddTransient<DashboardViewModel>()
+            .AddSingleton<DashboardView>()
+            .AddSingleton<DashboardViewModel>()
+            .AddSingleton<InverterDetailsView>()
+            .AddSingleton<InverterDetailsViewModel>()
 
             .AddTransient<HomeAutomationServerConnection>()
 

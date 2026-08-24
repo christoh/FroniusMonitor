@@ -32,7 +32,7 @@
                         <Setter Property="Background" Value="{DynamicResource MenuFlyoutItemBackgroundPointerOver}"/>
                     </Style>
                 </StackPanel.Styles>
-                <Button Content="{x:Static p:Resources.Dashboard}" Theme="{StaticResource MenuButtonStyle}"/>
+                <Button Content="{x:Static p:Resources.Dashboard}" Theme="{StaticResource MenuButtonStyle}" Command="{Binding ShowDashboardCommand}"/>
                 <Button Content="{x:Static p:Resources.Details}" x:Name="DetailsButton" Theme="{StaticResource MenuButtonStyle}">
                     <Button.Flyout>
                         <MenuFlyout ItemsSource="{Binding UpdateService.DetailDevices}">

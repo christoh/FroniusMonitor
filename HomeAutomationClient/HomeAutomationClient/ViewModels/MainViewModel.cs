@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
+using InverterDetailsView = De.Hochstaetter.HomeAutomationClient.Views.InverterDetailsView;
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 
@@ -72,7 +73,7 @@ public sealed partial class MainViewModel : ViewModelBase
             BusyText = Loc.ConnectingToHas;
             await UpdateService.StartAsync().ConfigureAwait(false);
             IsReady = true;
-            await Dispatcher.UIThread.InvokeAsync(() => MainViewContent = new DashboardView());
+            await Dispatcher.UIThread.InvokeAsync(() => MainViewContent = IoC.Get<DashboardView>());
         }
         catch (Exception ex)
         {
@@ -86,8 +87,42 @@ public sealed partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void ShowDetails(IKeyedDevice device)
+    private async Task ShowDetails(IKeyedDevice device)
     {
-        return;
+        switch (device.Device)
+        {
+            case Gen24System gen24System:
+                var detailsView = IoC.Get<InverterDetailsView>();
+                detailsView.ViewModel.Gen24System = gen24System;
+                MainViewContent = detailsView;
+                break;
+
+            default:
+                await new MessageBox
+                {
+                    Text = $"Details view for device type {device.Device.GetType().Name} is not implemented.",
+                    Title = "NotImplemented",
+                    Icon = new ErrorIcon(),
+                }.Show().ConfigureAwait(false);
+
+                break;
+        }
+    }
+
+    [RelayCommand]
+    private async Task ShowDashboard()
+    {
+        try
+        {
+            BusyText = "Loading dashboard";
+            await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
+            var dashboardView = IoC.Get<DashboardView>();
+            await Task.Delay(100).ConfigureAwait(false);
+            MainViewContent = dashboardView;
+        }
+        finally
+        {
+            BusyText = null;
+        }
     }
 }

@@ -23,6 +23,15 @@ public abstract class Gauge : ContentControl
         set => SetValue(MaximumProperty, value);
     }
 
+    // Used for the minimum and maximum labels.
+    public static readonly StyledProperty<string> StringFormatProperty = AvaloniaProperty.Register<Gauge, string>(nameof(StringFormat), "N0");
+
+    public string StringFormat
+    {
+        get => GetValue(StringFormatProperty);
+        set => SetValue(StringFormatProperty, value);
+    }
+
     public static readonly StyledProperty<double?> ValueProperty = AvaloniaProperty.Register<Gauge, double?>(nameof(Value));
 
     public double? Value
@@ -31,6 +40,14 @@ public abstract class Gauge : ContentControl
         set => SetValue(ValueProperty, value);
     }
 
+    // Used for Value display.
+    public static readonly StyledProperty<string> ValueStringFormatProperty = AvaloniaProperty.Register<Gauge, string>(nameof(ValueStringFormat), "N1");
+
+    public string ValueStringFormat
+    {
+        get => GetValue(ValueStringFormatProperty);
+        set => SetValue(ValueStringFormatProperty, value);
+    }
     public static readonly StyledProperty<double> NullValueProperty = AvaloniaProperty.Register<Gauge, double>(nameof(NullValue));
 
     public double NullValue
@@ -77,14 +94,6 @@ public abstract class Gauge : ContentControl
     {
         get => (string?)GetValue(LabelProperty);
         set => SetValue(LabelProperty, value ?? string.Empty);
-    }
-
-    public static readonly StyledProperty<string> StringFormatProperty = AvaloniaProperty.Register<Gauge, string>(nameof(StringFormat), "N0");
-
-    public string StringFormat
-    {
-        get => GetValue(StringFormatProperty);
-        set => SetValue(StringFormatProperty, value);
     }
 
     public static readonly StyledProperty<string> UnitNameProperty = AvaloniaProperty.Register<Gauge, string>(nameof(UnitName), string.Empty);

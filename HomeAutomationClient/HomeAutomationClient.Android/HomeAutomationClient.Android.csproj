@@ -21,6 +21,16 @@
 	<ItemGroup>
 		<PackageReference Include="Avalonia.Android" Version="$(AvaloniaVersion)" />
 		<PackageReference Include="Xamarin.AndroidX.Core.SplashScreen" Version="1.2.0.3" />
+
+		<!--
+		Avalonia.Android pulls the Xamarin.AndroidX.Lifecycle family in at two different minor versions:
+		2.10.0.2 via AppCompat -> Activity, and 2.11.0.1 for Lifecycle.Common/Runtime via Window -> Core.
+		The 2.10.0.2 packages lock their siblings to [2.10.0.2, 2.10.1), so the unified 2.11.0.1 violates
+		that range (NU1608). Pinning the packages that nothing else lifts keeps the whole family on 2.11.0.1.
+		-->
+		<PackageReference Include="Xamarin.AndroidX.Lifecycle.ViewModelSavedState" Version="2.11.0.1" />
+		<PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData.Core" Version="2.11.0.1" />
+		<PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" Version="2.11.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>

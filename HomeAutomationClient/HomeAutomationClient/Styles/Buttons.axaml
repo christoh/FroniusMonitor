@@ -8,11 +8,13 @@
 				<WrapPanel Orientation="Horizontal">
 					<RadioButton Content="AC" Classes="DeviceButton"/>
 					<ToggleButton Height="8" Classes="OnOff"/>
+					<ToggleButton Classes="OnOff Labeled" Content="Active power"/>
 				</WrapPanel>
 				<ThemeVariantScope RequestedThemeVariant="Dark">
 					<WrapPanel Orientation="Horizontal" Background="{DynamicResource BackgroundBrush}">
 						<RadioButton Content="AC" Classes="DeviceButton"/>
 						<ToggleButton Height="8" Classes="OnOff"/>
+						<ToggleButton Classes="OnOff Labeled" Content="Active power"/>
 					</WrapPanel>
 				</ThemeVariantScope>
 			</StackPanel>
@@ -24,40 +26,64 @@
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate TargetType="ToggleButton">
-					<Viewbox>
-						<Grid Width="100" Height="30">
-							<Border Background="{TemplateBinding Background}"
-									CornerRadius="15"
-									BorderBrush="{TemplateBinding BorderBrush}"
-									HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-									BorderThickness="2">
-								<Grid ColumnDefinitions="*,*">
-									<Grid.Styles>
-										<Style Selector="Border">
-											<Setter Property="Background" Value="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=ToggleButton}}" />
-											<Setter Property="Width" Value="47" />
-											<Setter Property="Height" Value="24" />
-											<Setter Property="HorizontalAlignment" Value="Center" />
-											<Setter Property="VerticalAlignment" Value="Center" />
-											<Setter Property="CornerRadius" Value="15" />
-										</Style>
-										<Style Selector="TextBlock">
-											<Setter Property="FontSize" Value="18" />
-											<Setter Property="HorizontalAlignment" Value="Center" />
-											<Setter Property="Foreground" Value="{Binding BorderBrush, RelativeSource={RelativeSource FindAncestor, AncestorType=ToggleButton}}" />
-										</Style>
-									</Grid.Styles>
-									<Viewbox Grid.Column="0" StretchDirection="DownOnly">
-										<TextBlock Text="{x:Static p:Resources.On}" />
-									</Viewbox>
-									<Viewbox Grid.Column="1" StretchDirection="DownOnly">
-										<TextBlock Text="{x:Static p:Resources.Off}" />
-									</Viewbox>
-									<Border Margin="1,0,0,0" Classes="Thumb" x:Name="Thumb" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left"/>
-								</Grid>
-							</Border>
+					<Grid Background="Transparent">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto" SharedSizeGroup="OnOffCaption" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+
+						<!-- The caption is only shown for ToggleButton.OnOff.Labeled (see below), because plain OnOff
+						     buttons already carry a Content that they never displayed. Give the button a ContentTemplate
+						     to render the caption as something other than plain text.
+						     Background, BorderThickness and Foreground must stay set here: a ContentPresenter that leaves
+						     them unset takes them from the templated parent, which would paint the caption with the
+						     switch's SliderBackground and give it the button's border.
+						     The presenter must NOT be called PART_ContentPresenter: the Fluent ToggleButton theme carries
+						     :checked/:pointerover/:pressed triggers for that name which paint it with the accent brush, and
+						     a pseudo class trigger outranks a value set inside a ControlTemplate. -->
+						<ContentPresenter x:Name="CaptionPresenter" Grid.Column="0" IsVisible="False"
+										  VerticalAlignment="Center"
+										  Foreground="{DynamicResource ForegroundBrush}"
+										  Background="Transparent"
+										  BorderThickness="0"
+										  Content="{TemplateBinding Content}"
+										  ContentTemplate="{TemplateBinding ContentTemplate}" />
+
+						<Viewbox x:Name="PART_Switch" Grid.Column="1">
+							<Grid Width="100" Height="30">
+								<Border Background="{TemplateBinding Background}"
+										CornerRadius="15"
+										BorderBrush="{TemplateBinding BorderBrush}"
+										HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+										BorderThickness="2">
+									<Grid ColumnDefinitions="*,*">
+										<Grid.Styles>
+											<Style Selector="Border">
+												<Setter Property="Background" Value="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=ToggleButton}}" />
+												<Setter Property="Width" Value="47" />
+												<Setter Property="Height" Value="24" />
+												<Setter Property="HorizontalAlignment" Value="Center" />
+												<Setter Property="VerticalAlignment" Value="Center" />
+												<Setter Property="CornerRadius" Value="15" />
+											</Style>
+											<Style Selector="TextBlock">
+												<Setter Property="FontSize" Value="18" />
+												<Setter Property="HorizontalAlignment" Value="Center" />
+												<Setter Property="Foreground" Value="{Binding BorderBrush, RelativeSource={RelativeSource FindAncestor, AncestorType=ToggleButton}}" />
+											</Style>
+										</Grid.Styles>
+										<Viewbox Grid.Column="0" StretchDirection="DownOnly">
+											<TextBlock Text="{x:Static p:Resources.On}" />
+										</Viewbox>
+										<Viewbox Grid.Column="1" StretchDirection="DownOnly">
+											<TextBlock Text="{x:Static p:Resources.Off}" />
+										</Viewbox>
+										<Border Margin="1,0,0,0" Classes="Thumb" x:Name="Thumb" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left"/>
+									</Grid>
+								</Border>
+							</Grid>
+						</Viewbox>
 						</Grid>
-					</Viewbox>
 				</ControlTemplate>
 
 			</Setter.Value>
@@ -67,6 +93,16 @@
 		<Setter Property="BorderBrush" Value="{DynamicResource ForegroundBrush}" />
 		<Style Selector="^:disabled">
 			<Setter Property="Opacity" Value=".3"></Setter>
+		</Style>
+
+		<!-- Adding the Labeled class puts the Content in front of the switch. Such a button takes its height from the
+		     caption, so the switch is sized from the font size instead of from the button's Height. -->
+		<Style Selector="^.Labeled /template/ ContentPresenter#CaptionPresenter">
+			<Setter Property="IsVisible" Value="True" />
+		</Style>
+		<Style Selector="^.Labeled /template/ Viewbox#PART_Switch">
+			<Setter Property="Height" Value="{Binding FontSize, RelativeSource={RelativeSource FindAncestor, AncestorType=ToggleButton}}" />
+			<Setter Property="Margin" Value="8,0,0,0" />
 		</Style>
         <Style Selector="^:checked /template/ Border.Thumb">
             <Style.Animations>
