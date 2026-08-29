@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git checkout *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git merge *)",
+      "Bash(git branch *)",
+      "Bash(git -C \"F:/FroniusMonitor\" add Fronius/Localization/Resources.it.resx FroniusMonitor/ViewModels/SettingsViewModel.cs HomeAutomationClient/HomeAutomationClient.Browser/Program.cs)",
+      "Bash(git -C F:/FroniusMonitor commit -m ' *)",
+      "Bash(git -C \"F:/FroniusMonitor\" push origin master)",
+      "Bash(git -C \"F:/FroniusMonitor\" log --oneline -3)",
+      "PowerShell(dotnet build *)",
+      "Bash(grep -nA8 'enum ModbusParity\\\\|enum SunspecMode' Settings/Gen24ModbusSettings.cs)",
+      "Bash(grep -nA8 'enum ChargingRuleType' Settings/Gen24ChargingRule.cs)",
+      "Bash(grep -nA10 'enum SiteType' Gen24PowerFlow.cs)",
+      "PowerShell(Get-ChildItem -Path F:\\\\FroniusMonitor\\\\FroniusMonitor\\\\bin\\\\Debug -Recurse -Directory -Include fr,rm,it,gsw -ErrorAction SilentlyContinue | Where-Object { Test-Path \\(Join-Path $_.FullName 'FroniusMonitor.resources.dll'\\) } | Select-Object -ExpandProperty FullName)",
+      "Bash(grep -Ev \"^\\\\s*$\")"
+    ]
+  }
+}

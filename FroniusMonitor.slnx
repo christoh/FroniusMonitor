@@ -1,9 +1,14 @@
 <Solution>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
+    <File Path="AGENTS.md" />
+    <File Path="CLAUDE.md" />
     <File Path="Directory.Build.props" />
     <File Path="docker-compose.yml" />
     <File Path="tounix.sh" />
+  </Folder>
+  <Folder Name="/Solution Items/Rules/">
+    <File Path=".claude/rules/PortingFroniusMonitor.md" />
   </Folder>
   <Project Path="Fronius/Fronius.csproj" />
   <Project Path="FroniusMonitor/FroniusMonitor.csproj" />
