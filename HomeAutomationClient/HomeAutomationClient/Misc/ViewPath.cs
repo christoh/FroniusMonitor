@@ -13,7 +13,7 @@ namespace De.Hochstaetter.HomeAutomationClient.Misc;
 /// identify one device of an installation.
 /// </para>
 /// <para>
-/// The two values are percent escaped with <see cref="Uri.EscapeDataString"/>, which is what a browser expects:
+/// The two values are percent escaped with <see cref="Uri.EscapeDataString(string)"/>, which is what a browser expects:
 /// a space becomes %20 and stays a space, it is never turned into an underscore. Do not use
 /// <see cref="De.Hochstaetter.Fronius.Contracts.IHaveUniqueId.Id"/> for an address - that one does replace
 /// spaces and slashes, which makes it unusable for a round trip.
@@ -63,7 +63,7 @@ public static class ViewPath
 
     /// <summary>
     /// The three parts of a path, unescaped, or <see langword="null"/> where it has a different shape. Comparing
-    /// the unescaped values rather than the escaped ones keeps a hand written link working, no matter whether the
+    /// the unescaped values rather than the escaped ones keeps a handwritten link working, no matter whether the
     /// browser wrote %C3%A4 or %c3%a4.
     /// </summary>
     private static (string View, string Manufacturer, string SerialNumber)? Parse(string? path)
