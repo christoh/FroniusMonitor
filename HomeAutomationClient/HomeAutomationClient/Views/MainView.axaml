@@ -64,7 +64,7 @@
         <Grid Grid.Row="1" Background="{DynamicResource DisableBrush}" IsVisible="{Binding IsModalDialogVisible}"/>
         <Grid Grid.Row="1" x:Name="DialogOverlay" IsVisible="{Binding IsDialogVisible}">
             <Grid x:Name="DialogFrame" RowDefinitions="Auto,*" Background="{DynamicResource DialogBackground}" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Grid ZIndex="2" ColumnDefinitions="Auto,*,Auto" Background="{DynamicResource SystemControlBackgroundAccentBrush}"
+                <Grid ZIndex="2" ColumnDefinitions="Auto,*,Auto" Background="{DynamicResource AppAccentBrush}"
                       c:DragMove.Target="{Binding #DialogFrame}"
                       c:DragMove.ResetTrigger="{Binding CurrentDialog}"
                       c:DragMove.IsEnabled="{Binding CurrentDialog.IsMoveable, FallbackValue=False}">
@@ -76,7 +76,7 @@
                                 <SolidColorBrush x:Key="ButtonForegroundPointerOver">White</SolidColorBrush>
                                 <!-- ReSharper restore Xaml.RedundantResource -->
                             </Style.Resources>
-                            <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundAccentBrush}" />
+                            <Setter Property="Background" Value="{DynamicResource AppAccentBrush}" />
                             <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundChromeWhiteBrush}"/>
                             <Setter Property="Content" Value="X" />
                             <Setter Property="Command" Value="{Binding DialogClosedCommand}"/>

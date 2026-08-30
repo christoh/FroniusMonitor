@@ -12,8 +12,35 @@ public partial class App : Application
         AvaloniaXamlLoader.Load(this);
     }
 
+    /// <summary>
+    /// The platform heads detect the accent color of the operating system before Avalonia starts, because most of
+    /// them need APIs that Avalonia does not expose. Where a head found none, the SystemAccentColor of the Fluent
+    /// theme applies, which is the accent color of the OS on Windows and a fixed blue everywhere else.
+    /// </summary>
+    private void SetAccentColor()
+    {
+        Color? accentColor = null;
+
+        if (PlatformStartup.AccentColor is { } platformColor)
+        {
+            accentColor = Color.FromArgb(platformColor.A, platformColor.R, platformColor.G, platformColor.B);
+        }
+        else if (this.TryFindResource("SystemAccentColor", ActualThemeVariant, out var systemAccent) && systemAccent is Color systemAccentColor)
+        {
+            accentColor = systemAccentColor;
+        }
+
+        if (accentColor is { } color)
+        {
+            Resources["AppAccentColor"] = color;
+            Resources["AppAccentBrush"] = new SolidColorBrush(color);
+        }
+    }
+
     public override void OnFrameworkInitializationCompleted()
     {
+        SetAccentColor();
+
         ServiceCollection ??= new ServiceCollection();
 
         ServiceCollection

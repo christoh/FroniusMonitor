@@ -8,8 +8,8 @@
              x:Class="De.Hochstaetter.HomeAutomationClient.Controls.BusyAnimation">
     <Grid Background="{DynamicResource AnimationBackground}" IsVisible="{Binding IsBusy}" DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:BusyAnimation}}">
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-            <avalonia:LoadingIndicator IsActive="True" Mode="Arcs" Foreground="{DynamicResource SystemControlBackgroundAccentBrush}" SpeedRatio="0.5" Height="210" Margin="0,0,0,-30" />
-            <TextBlock HorizontalAlignment="Center" FontSize="24" Foreground="{DynamicResource SystemControlBackgroundAccentBrush}">
+            <avalonia:LoadingIndicator IsActive="True" Mode="Arcs" Foreground="{DynamicResource AppAccentBrush}" SpeedRatio="0.5" Height="210" Margin="0,0,0,-30" />
+            <TextBlock HorizontalAlignment="Center" FontSize="24" Foreground="{DynamicResource AppAccentBrush}">
                 <Run Text="{Binding BusyText}" />
             </TextBlock>
         </StackPanel>
