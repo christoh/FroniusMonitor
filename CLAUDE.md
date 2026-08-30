@@ -28,6 +28,14 @@ text to English.
 ## Logging
 * Guard logging with `if (Logger.IsEnabled(LogLevel.Debug))` or the appropriate log level. This is important to avoid unnecessary string formatting and performance overhead when the log level is not enabled.
 
+# Building
+* Every project sets `<Configuration>Release</Configuration>`, so a plain `dotnet build` or `dotnet run` builds
+  Release, which is noticeably slower. Add `-c Debug` whenever the build output itself does not have to be a
+  Release one: compile and XAML checks, running the app locally, debugging.
+* Stay with the default Release configuration when the result matters as such: publishing, measuring performance,
+  or checking behavior that differs between the configurations (the Avalonia diagnostics package, for instance, is
+  only in the Debug build).
+
 # Unit tests
 * In unit test entry points do not use `.ConfigureAwait(false)`. This could violate the test framework rules for not executing certain tests in parallel. `.ConfigureAwait(false)` is allowed and encouraged elsewhere in unit tests regardless, whether a method is public, private or internal. Besided from unit tests, `.ConfigureAwait(false)` is always allowed and encouraged where appropriate.
 * .First(), FirstAsync(), etc. in IEnumerable and IQueryable as a replacement for .Single(), SingleAsync() etc. can speed up things and you are encouraged do to so if appropriate. In unit tests, we always use "Single" when we mean it because it can detect problems.

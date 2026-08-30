@@ -17,6 +17,10 @@ internal sealed class Program
         App.ServiceCollection = new ServiceCollection();
         App.ServiceCollection.AddSingleton<ICache>(cache);
 
+        // PlatformStartup.AccentColor deliberately stays null on all three desktop systems, so that the
+        // SystemAccentColor of the Fluent theme applies. On Windows that already is the accent color of the OS,
+        // because Avalonia reads it itself. macOS keeps its accent color in NSColor.controlAccentColor, which a
+        // plain .NET desktop app cannot reach, and Linux has none that all desktop environments agree on.
         BuildAvaloniaApp()
             .StartWithClassicDesktopLifetime(args);
     }
