@@ -20,9 +20,16 @@
 
 	<Application.Resources>
 		<ResourceDictionary>
+            <!-- AppAccentColor is the accent color of the app, for every platform whose OS has none to offer:
+                 iOS, the browser, macOS and Linux. Windows and Android bring their own, and there it is not read
+                 at all - see App.SetAccentColor, which also derives the six Fluent shades from it and repeats
+                 that whenever the theme variant changes. One value per theme, and this is the only place either
+                 of them is written down. -->
 			<ResourceDictionary.ThemeDictionaries>
                 
                 <ResourceDictionary x:Key='Light'>
+                    <Color x:Key="AppAccentColor">#FFDA3B01</Color>
+
                     <SolidColorBrush x:Key='BackgroundBrush'>White</SolidColorBrush>
 					<SolidColorBrush x:Key='ForegroundBrush'>Black</SolidColorBrush>
                     <SolidColorBrush x:Key='DisableBrush'>#80000000</SolidColorBrush>
@@ -80,6 +87,8 @@
                 </ResourceDictionary>
 
                 <ResourceDictionary x:Key='Dark'>
+                    <Color x:Key="AppAccentColor">#FFFF6D3D</Color>
+
                     <SolidColorBrush x:Key='BackgroundBrush'>Black</SolidColorBrush>
 					<SolidColorBrush x:Key='ForegroundBrush'>#e8e8e8</SolidColorBrush>
 					<SolidColorBrush x:Key='DisableBrush'>#40FFFFFF</SolidColorBrush>

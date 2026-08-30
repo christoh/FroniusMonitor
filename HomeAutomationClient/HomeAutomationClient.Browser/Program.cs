@@ -44,11 +44,11 @@ internal sealed partial class Program
         App.ServiceCollection.AddSingleton<ICache>(cache);
         App.ServiceCollection.AddSingleton<IUriService>(await UriService.CreateAsync());
 
-        // PlatformStartup.AccentColor stays null here, so the app keeps the accent color of the Fluent theme,
-        // which is what Avalonia gives the browser anyway. A browser never hands the accent color of the OS to a
-        // page: Chromium answers the CSS system color AccentColor with its built-in #0075FF, and paints even its
-        // own form controls with it, whatever the browser is themed with. Firefox and Safari do answer with the
-        // real one, but an accent color that only some browsers follow is not worth the moving parts.
+        // PlatformStartup.AccentColor stays null here, so the app paints its accents with the AppAccentColor of
+        // App.axaml. A browser never hands the accent color of the OS to a page: Chromium answers the CSS system
+        // color AccentColor with its built-in #0075FF, and paints even its own form controls with it, whatever
+        // the browser is themed with. Firefox and Safari do answer with the real one, but an accent color that
+        // only some browsers follow is not worth the moving parts.
 
         await LoadSatelliteAssembliesForBrowserLanguageAsync();
         await BuildAvaloniaApp().WithInterFont().StartBrowserAppAsync("out");

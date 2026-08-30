@@ -24,8 +24,9 @@ public partial class AppDelegate : AvaloniaAppDelegate<App>
         App.ServiceCollection.AddSingleton<ICache>(new Cache());
 
         // iOS has no accent color of the operating system: what looks like one is the tint color of the app
-        // itself. PlatformStartup.AccentColor therefore stays null and the SystemAccentColor of the Fluent theme
-        // applies. Set it here if this app ever gets a tint color of its own.
+        // itself. PlatformStartup.AccentColor therefore stays null and the app paints its accents with the
+        // AppAccentColor of App.axaml. Set it here only if this head ever gets a tint color that iOS itself
+        // decides - a color of our own belongs in App.axaml, where every platform without one reads it.
         return base.CustomizeAppBuilder(builder)
             .WithInterFont();
     }

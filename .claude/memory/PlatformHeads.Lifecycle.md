@@ -91,13 +91,31 @@ we derive them in HSV, with factors read off the Windows palette (see `accentSha
 reproduce it to about one step of 255, and they scale rather than subtract, so a dark accent color does not run
 into black.
 
-**Where a head detected nothing, nothing is touched.** That is deliberate: on Windows Avalonia fills the palette
-from the OS and keeps it up to date while the app runs, so an override would freeze the accent color at what it
-was when the app started.
+**Where a head detected nothing, the app uses its own color**: `AppAccentColor`, one `Color` per theme in the
+`Light` and `Dark` dictionaries of `App.axaml` (`#FFDA3B01` and `#FFFF6D3D`). Those two are the only place the
+color is written down, and they reach iOS, the browser, macOS and Linux at once - none of which has an accent
+color to read. Do not add a third copy to a head, a manifest or an asset catalog.
 
-- **Desktop** supplies nothing. On Windows the fallback already is the accent color of the OS, because Avalonia
-  reads it. macOS keeps its in `NSColor.controlAccentColor`, out of reach for a plain .NET app, and Linux has
-  none that all desktop environments agree on.
+**The palette is built again on every theme change.** `SetAccentColor` writes plain colors into
+`Application.Resources`, which are not theme scoped and would otherwise shadow both variants with whichever one
+was current at startup - so `App.Initialize` subscribes to `ActualThemeVariantChanged` and rebuilds. Anything
+else added to the palette later has to go through `SetAccentColor` for the same reason.
+
+**On Windows nothing is touched at all,** which is what `PlatformStartup.AccentColorFollowsOs` says: Avalonia
+fills the palette from the OS there and keeps it up to date while the app runs, so any override - the head's
+color or `AppAccentColor` - would freeze the accent at what it was when the app started. Only the desktop head
+sets the flag, and only on Windows.
+
+| Head | Accent color |
+|---|---|
+| Desktop on Windows | the OS, live, through Avalonia - `AccentColorFollowsOs` is true and we write nothing |
+| Desktop on macOS and Linux | `AppAccentColor` |
+| Android | the wallpaper (Material You) or the app theme |
+| iOS, Browser | `AppAccentColor` |
+
+- **Desktop** detects nothing anywhere. macOS keeps its accent color in `NSColor.controlAccentColor`, out of
+  reach for a plain .NET app, and Linux has none that all desktop environments agree on - hence the app color for
+  both. Windows needs no detection at all, see the flag above.
 - **Browser** supplies nothing, and there is no point in trying. **Do not add the detection back.** A browser
   never hands the accent color of the OS to a page. Chromium answers the CSS system color `AccentColor` with a
   built-in `rgb(0, 117, 255)` and paints even its own form controls with `accent-color: auto` in that blue,
@@ -107,7 +125,10 @@ was when the app started.
   through `[JSImport]` from a `wwwroot/accent.js`; both are gone.
 - **Android** takes the Material You color `system_accent1_500` on API 31 and later, and the `colorAccent` of
   the app theme before that. Compile verified only.
-- **iOS** supplies nothing: iOS has no accent color of the OS, what looks like one is the tint color of the app.
+- **iOS** supplies nothing, and there is nothing to supply: iOS has no accent color of the operating system, what
+  looks like one is the tint color of the app itself. Set `PlatformStartup.AccentColor` in `AppDelegate` only for
+  a color iOS itself decides; a color of ours belongs in `AppAccentColor`, where every platform without one
+  already reads it.
 
 ## What the browser head must do alone: the translations
 
@@ -170,8 +191,12 @@ inverter is the authority on its own vocabulary. Consequences to keep in mind:
 ## Verified, so you do not have to measure again
 
 - Windows fills the palette with the real accent color (`#ffda3b01` on the machine where this was written) and
-  Avalonia derives the six shades from it, so a head that supplies nothing is right, not lazy.
+  Avalonia derives the six shades from it, so leaving Windows alone is right, not lazy.
 - Overriding `SystemAccentColor` at application level re-resolves the accent brushes of the theme at once.
+- `AppAccentColor` is found where `App.SetAccentColor` looks for it, per theme, and the rebuild on a theme change
+  works. Measured with the desktop head, `AccentColorFollowsOs` forced to false and the variant driven from the
+  code: started in `Dark` with `#ffff6d3d`, switched to `Light` and got `#ffda3b01`, switched back and got
+  `#ffff6d3d` again.
 - Chromium gives a page a constant instead of the accent color of the OS; see the browser entry above. The
   `[JSImport]` route itself worked - it delivered `#ff0075ff` from the browser into a parsed `HaColor` - so if a
   head ever needs a color from JavaScript, that path is proven.

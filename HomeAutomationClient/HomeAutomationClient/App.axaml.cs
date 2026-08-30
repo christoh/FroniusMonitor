@@ -11,6 +11,11 @@ public partial class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+
+        // AppAccentColor has one value per theme, and what SetAccentColor writes into the palette are plain
+        // colors that apply to both. Nothing would pick the other value up on its own, so the palette is built
+        // again whenever the user switches between light and dark.
+        ActualThemeVariantChanged += (_, _) => SetAccentColor();
     }
 
     /// <summary>
@@ -35,29 +40,48 @@ public partial class App : Application
     ];
 
     /// <summary>
-    /// Replaces the accent palette of the Fluent theme with the accent color of the OS, where the platform head
-    /// could detect one. It is the whole palette and not a brush of our own, because the theme paints far more
-    /// with it than our dialog title bar: the thumb of a slider, a check box, a focus rectangle, a progress bar.
+    /// Fills the accent palette of the Fluent theme: with the accent color of the OS where the platform head
+    /// detected one, and with the AppAccentColor of App.axaml everywhere else. It is the whole palette and not a
+    /// brush of our own, because the theme paints far more with it than our dialog title bar: the thumb of a
+    /// slider, a check box, a focus rectangle, a progress bar.
     /// </summary>
     /// <remarks>
-    /// Where a head detected nothing, we deliberately touch nothing. On Windows Avalonia fills the palette from
-    /// the OS itself, including the six shades, and keeps it up to date while the app runs - an override here
-    /// would freeze the accent color at the value it had when the app started.
+    /// On Windows nothing is touched at all - see <see cref="PlatformStartup.AccentColorFollowsOs"/>. The
+    /// AppAccentColor is therefore the accent color of iOS, the browser, macOS and Linux, which have none of
+    /// their own, while Windows follows its OS and Android its wallpaper.
     /// </remarks>
     private void SetAccentColor()
     {
-        if (PlatformStartup.AccentColor is not { } platformColor)
+        if (PlatformStartup.AccentColorFollowsOs)
         {
             return;
         }
 
-        var accentColor = Color.FromArgb(platformColor.A, platformColor.R, platformColor.G, platformColor.B);
+        if (GetAccentColor() is not { } accentColor)
+        {
+            return;
+        }
+
         Resources["SystemAccentColor"] = accentColor;
 
         foreach (var (key, valueFactor, saturationFactor) in accentShades)
         {
             Resources[key] = Shade(accentColor, valueFactor, saturationFactor);
         }
+    }
+
+    /// <summary>
+    /// What the head detected, or the AppAccentColor of App.axaml. Null only where that resource is missing or is
+    /// not a color, in which case the SystemAccentColor of the Fluent theme stays as it is.
+    /// </summary>
+    private Color? GetAccentColor()
+    {
+        if (PlatformStartup.AccentColor is { } platformColor)
+        {
+            return Color.FromArgb(platformColor.A, platformColor.R, platformColor.G, platformColor.B);
+        }
+
+        return Resources.TryGetResource("AppAccentColor", ActualThemeVariant, out var resource) && resource is Color appColor ? appColor : null;
     }
 
     private static Color Shade(Color accentColor, double valueFactor, double saturationFactor)
