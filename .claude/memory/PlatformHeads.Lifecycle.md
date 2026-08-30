@@ -26,8 +26,10 @@ answer travels.
    (`AndroidApp`) and iOS (`AppDelegate`). Here the head
    - creates `App.ServiceCollection` and registers its `ICache`,
    - optionally sets `PlatformStartup.AccentColor`,
-   - the browser head additionally seeds `CacheKeys.ApiUri` and `CacheKeys.HubUri`, and downloads the satellite
-     assemblies for the language of the user - both before Avalonia starts.
+   - optionally registers an `IUriService` of its own - see `Navigation.Lifecycle.md`,
+   - the browser head additionally seeds `CacheKeys.ApiUri` and `CacheKeys.HubUri` from the base address it is
+     handed in `args[0]`, and downloads the satellite assemblies for the language of the user - both before
+     Avalonia starts.
 2. **`AppBuilder`** with the head's font and platform options.
 3. **`App.Initialize`** loads `App.axaml`.
 4. **`App.OnFrameworkInitializationCompleted`** calls `SetAccentColor()`, builds the service provider, hands it to
@@ -37,6 +39,11 @@ answer travels.
 **The rule for step 1: no Avalonia types.** Nothing is initialized yet, and on Android and iOS this code runs
 while the platform is still building the activity. That is why a color arrives as
 `De.Hochstaetter.Fronius.Models.HaColor` and not as an Avalonia `Color`.
+
+**Not in this document: the address of a view.** Which view the app shows, how it is written into the address bar
+of the browser, and what the other heads do instead, is `Navigation.Lifecycle.md`. Only two things here belong to
+a head: registering the `IUriService` in step 1, and the base address the browser head is handed in `args[0]`,
+which is `document.baseURI` **for a reason the navigation document gives**. Do not go back to `location.href`.
 
 ## What every head must provide
 
