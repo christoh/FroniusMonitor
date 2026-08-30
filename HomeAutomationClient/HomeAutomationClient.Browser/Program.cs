@@ -1,9 +1,7 @@
-﻿using System;
-using System.Runtime.InteropServices.JavaScript;
+﻿using System.Runtime.InteropServices.JavaScript;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Browser;
-using De.Hochstaetter.Fronius.Models;
 using De.Hochstaetter.HomeAutomationClient.Browser.Platform;
 using De.Hochstaetter.HomeAutomationClient.Misc;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,9 +12,6 @@ internal sealed partial class Program
 {
     [JSImport("INTERNAL.loadSatelliteAssemblies")]
     public static partial Task LoadSatelliteAssemblies(string[] culturesToLoad);
-
-    [JSImport("getAccentColor", "accent")]
-    private static partial string? GetAccentColor();
 
     private static async Task Main(string[] args)
     {
@@ -30,29 +25,15 @@ internal sealed partial class Program
         #endif
         App.ServiceCollection = new ServiceCollection();
         App.ServiceCollection.AddSingleton<ICache>(cache);
-        PlatformStartup.AccentColor = await GetOsAccentColorAsync();
+
+        // PlatformStartup.AccentColor stays null here, so the app keeps the accent color of the Fluent theme,
+        // which is what Avalonia gives the browser anyway. A browser never hands the accent color of the OS to a
+        // page: Chromium answers the CSS system color AccentColor with its built-in #0075FF, and paints even its
+        // own form controls with it, whatever the browser is themed with. Firefox and Safari do answer with the
+        // real one, but an accent color that only some browsers follow is not worth the moving parts.
 
         await LoadSatelliteAssemblies(["de", "de-CH", "de-LI", "it", "gsw", "fr", "rm"]);
         await BuildAvaloniaApp().WithInterFont().StartBrowserAppAsync("out");
-    }
-
-    /// <summary>
-    /// Asks the browser for the accent color of the operating system. Only some browsers know it, so a
-    /// <see langword="null"/> result is the normal case rather than an error; see accent.js for the details.
-    /// </summary>
-    private static async Task<HaColor?> GetOsAccentColorAsync()
-    {
-        try
-        {
-            // The module URL is resolved relative to the .NET runtime in _framework, not to the document.
-            await JSHost.ImportAsync("accent", "../accent.js");
-            return GetAccentColor() is { } accentColor && HaColor.TryParse(accentColor, null, out var color) ? color : null;
-        }
-        catch (Exception exception)
-        {
-            Console.WriteLine("Could not detect the accent color of the OS: " + exception.Message);
-            return null;
-        }
     }
 
     public static AppBuilder BuildAvaloniaApp()

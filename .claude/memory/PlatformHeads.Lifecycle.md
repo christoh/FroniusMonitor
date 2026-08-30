@@ -87,21 +87,25 @@ was when the app started.
 - **Desktop** supplies nothing. On Windows the fallback already is the accent color of the OS, because Avalonia
   reads it. macOS keeps its in `NSColor.controlAccentColor`, out of reach for a plain .NET app, and Linux has
   none that all desktop environments agree on.
-- **Browser** reads the CSS system color `AccentColor` in `wwwroot/accent.js` through `[JSImport]`. Firefox and
-  Safari answer with the real value. **Chrome knows the keyword but returns a constant `rgb(0, 117, 255)`**, not
-  the accent of the OS - measured against `#CA5010` on a Windows machine, where every other CSS system color is
-  hard coded as well.
+- **Browser** supplies nothing, and there is no point in trying. **Do not add the detection back.** A browser
+  never hands the accent color of the OS to a page. Chromium answers the CSS system color `AccentColor` with a
+  built-in `rgb(0, 117, 255)` and paints even its own form controls with `accent-color: auto` in that blue,
+  whatever the browser itself is themed with - measured in Chrome 151 against a Windows accent of `#DA3B01`,
+  with the native check box as the counter-check. Firefox and Safari do answer truthfully, but an accent color
+  that only some browsers follow was judged not worth the moving parts. An earlier version read the keyword
+  through `[JSImport]` from a `wwwroot/accent.js`; both are gone.
 - **Android** takes the Material You color `system_accent1_500` on API 31 and later, and the `colorAccent` of
   the app theme before that. Compile verified only.
 - **iOS** supplies nothing: iOS has no accent color of the OS, what looks like one is the tint color of the app.
 
-The JavaScript module is imported as `JSHost.ImportAsync("accent", "../accent.js")`. The path is relative to the
-.NET runtime in `_framework`, not to the document - `./accent.js` does not resolve.
-
 ## Verified, so you do not have to measure again
 
-- Windows fallback resolves to the real accent color (`#ffca5010` on the machine where this was written).
-- `/accent.js` is served and imports; the .NET side logs to the browser console when it cannot.
+- Windows fills the palette with the real accent color (`#ffda3b01` on the machine where this was written) and
+  Avalonia derives the six shades from it, so a head that supplies nothing is right, not lazy.
+- Overriding `SystemAccentColor` at application level re-resolves the accent brushes of the theme at once.
+- Chromium gives a page a constant instead of the accent color of the OS; see the browser entry above. The
+  `[JSImport]` route itself worked - it delivered `#ff0075ff` from the browser into a parsed `HaColor` - so if a
+  head ever needs a color from JavaScript, that path is proven.
 - Desktop, Browser, Android and iOS all compile in Debug and Release. iOS compiles on Windows, but has never been
   linked for a device and never been run.
 
