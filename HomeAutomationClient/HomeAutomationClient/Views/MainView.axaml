@@ -50,18 +50,24 @@
                 <Button Content="{x:Static p:Resources.Settings}" Theme="{StaticResource MenuButtonStyle}"/>
             </StackPanel>
         </Grid>
-        <UserControl Grid.Row="1" Content="{Binding MainViewContent}" IsEnabled="{Binding IsDialogVisible, Converter={co:BoolInverter}}"/>
+        <UserControl Grid.Row="1" Content="{Binding MainViewContent}" IsEnabled="{Binding IsModalDialogVisible, Converter={co:BoolInverter}}"/>
 
         <!-- Applies to the gauges of every view, so it lives here and not in one of them. -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="16,8" IsVisible="{Binding IsReady}"
-                    IsEnabled="{Binding IsDialogVisible, Converter={co:BoolInverter}}">
+                    IsEnabled="{Binding IsModalDialogVisible, Converter={co:BoolInverter}}">
             <TextBlock Text="{x:Static p:Resources.ColorAllGaugeTicks}" Margin="0,0,8,0" VerticalAlignment="Center" />
             <ToggleButton Classes="OnOff" Height="16" VerticalAlignment="Center" IsChecked="{Binding ColorAllTicks}" />
         </StackPanel>
         <c:BusyAnimation BusyText="{Binding BusyText}" Grid.Row="1"/>
-        <Grid Grid.Row="1" Background="{DynamicResource DisableBrush}" x:Name="DialogOverlay" IsVisible="{Binding IsDialogVisible}">
-            <Grid RowDefinitions="Auto,*" Background="White" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Grid ZIndex="2" ColumnDefinitions="Auto,*,Auto" Background="{DynamicResource SystemControlBackgroundAccentBrush}">
+        <!-- Dims the views behind a modal dialog and swallows their pointer input. A non-modal dialog leaves it out,
+             so that clicks reach the view behind: a panel without a background does not take part in hit testing. -->
+        <Grid Grid.Row="1" Background="{DynamicResource DisableBrush}" IsVisible="{Binding IsModalDialogVisible}"/>
+        <Grid Grid.Row="1" x:Name="DialogOverlay" IsVisible="{Binding IsDialogVisible}">
+            <Grid x:Name="DialogFrame" RowDefinitions="Auto,*" Background="{DynamicResource DialogBackground}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Grid ZIndex="2" ColumnDefinitions="Auto,*,Auto" Background="{DynamicResource SystemControlBackgroundAccentBrush}"
+                      c:DragMove.Target="{Binding #DialogFrame}"
+                      c:DragMove.ResetTrigger="{Binding CurrentDialog}"
+                      c:DragMove.IsEnabled="{Binding CurrentDialog.IsMoveable, FallbackValue=False}">
                     <Grid.Styles>
                         <Style Selector="Button.CloseButton">
                             <Style.Resources>
@@ -80,8 +86,9 @@
                     <TextBlock x:Name="TitleTextBlock" Grid.Row="0" Grid.Column="1" Padding="5" Text="{Binding CurrentDialog.Title, FallbackValue=''}" Foreground="{DynamicResource SystemControlForegroundChromeWhiteBrush}" />
                     <Button Classes="TransparentButton CloseButton" Grid.Row="0" Grid.Column="2" IsTabStop="False" IsVisible="{Binding CurrentDialog.ShowCloseBox, FallbackValue=True}"/>
                 </Grid>
-                <UserControl Grid.Row="1" ZIndex="2" MinWidth="100" Background="{DynamicResource BackgroundBrush}" Foreground="{DynamicResource ForegroundBrush}" x:Name="DialogHost" Content="{Binding CurrentDialog.Body, FallbackValue={x:Null}}"/>
-                <c:BusyAnimation ZIndex="3" Grid.Row="1" BusyText="{Binding DialogBusyText}"/>
+                <UserControl Grid.Row="1" ZIndex="2" MinWidth="100" Background="{DynamicResource DialogBackground}" Foreground="{DynamicResource ForegroundBrush}" x:Name="DialogHost" Content="{Binding CurrentDialog.Body, FallbackValue={x:Null}}"/>
+                <!-- A non-modal dialog must stay operable, so it never gets the blocking busy overlay. -->
+                <c:BusyAnimation ZIndex="3" Grid.Row="1" BusyText="{Binding DialogBusyText}" IsVisible="{Binding IsModalDialogVisible}"/>
             </Grid>
         </Grid>
     </Grid>

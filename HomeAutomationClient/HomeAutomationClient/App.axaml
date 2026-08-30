@@ -26,6 +26,7 @@
                     <SolidColorBrush x:Key='BackgroundBrush'>White</SolidColorBrush>
 					<SolidColorBrush x:Key='ForegroundBrush'>Black</SolidColorBrush>
                     <SolidColorBrush x:Key='DisableBrush'>#80000000</SolidColorBrush>
+                    <SolidColorBrush x:Key="DialogBackground">#e8e8e8</SolidColorBrush>
 
                     <!-- Power Flow -->
                     <SolidColorBrush x:Key="PowerFlowBattery">LightGreen</SolidColorBrush>
@@ -34,7 +35,7 @@
                     <SolidColorBrush x:Key="PowerGridIcon">#808080</SolidColorBrush>
                     
                     <!--Menus-->
-                    <SolidColorBrush x:Key='MenuBackground'>LightGray</SolidColorBrush>
+                    <SolidColorBrush x:Key='MenuBackground'>#f0f0f0</SolidColorBrush>
                     
                     <!-- Device Control -->
                     <SolidColorBrush x:Key='DeviceButtonBackground'>BurlyWood</SolidColorBrush>
@@ -82,6 +83,7 @@
                     <SolidColorBrush x:Key='BackgroundBrush'>Black</SolidColorBrush>
 					<SolidColorBrush x:Key='ForegroundBrush'>#e8e8e8</SolidColorBrush>
 					<SolidColorBrush x:Key='DisableBrush'>#40FFFFFF</SolidColorBrush>
+                    <SolidColorBrush x:Key="DialogBackground">#002040</SolidColorBrush>
 
                     <!-- Power Flow -->
                     <SolidColorBrush x:Key="PowerFlowBattery">DarkGreen</SolidColorBrush>

@@ -45,7 +45,12 @@ public sealed partial class MainViewModel : ViewModelBase
 
     public bool IsDialogVisible => CurrentDialog != null;
 
-    [ObservableProperty, NotifyPropertyChangedFor(nameof(IsDialogVisible), nameof(IsDialogBusy))]
+    /// <summary>
+    /// True while a dialog blocks the rest of the UI. A non-modal dialog is visible without disabling anything.
+    /// </summary>
+    public bool IsModalDialogVisible => CurrentDialog is { IsModal: true };
+
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(IsDialogVisible), nameof(IsDialogBusy), nameof(IsModalDialogVisible))]
     public partial DialogQueueItem? CurrentDialog { get; set; }
 
     public ConcurrentStack<DialogQueueItem?> DialogQueue { get; } = new();
@@ -76,6 +81,7 @@ public sealed partial class MainViewModel : ViewModelBase
             {
                 Title = $"{AppConstants.AppName} - {Loc.LoginNoun}",
                 ShowCloseBox = false,
+                IsModal = false,
             });
 
             await loginViewModel.ShowDialogAsync().ConfigureAwait(false);

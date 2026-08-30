@@ -33,7 +33,7 @@ public abstract partial class DialogBase<TParameters, TResult, TBody>(TParameter
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 TokenSource = new();
-                var dialogItem = new DialogQueueItem(Parameters.Title, new TBody { DataContext = this, }, Parameters.ShowCloseBox, BusyText);
+                var dialogItem = new DialogQueueItem(Parameters.Title, new TBody { DataContext = this, }, Parameters.ShowCloseBox, Parameters.IsMoveable, Parameters.IsModal, BusyText);
                 BusyText = null;
                 mainViewModel.CurrentDialog = dialogItem;
             });
