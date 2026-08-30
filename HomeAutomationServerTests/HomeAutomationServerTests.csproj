@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<LangVersion>preview</LangVersion>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<!-- xUnit v3 test projects are executables. -->
+		<OutputType>Exe</OutputType>
+		<IsPackable>false</IsPackable>
+		<RootNamespace>De.Hochstaetter.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+		<NoWarn>1701;1702;IDE0079;NU1803;CS7035;NU1900</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- The tests host a real Kestrel + SignalR server in process. -->
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.11" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
+		<PackageReference Include="xunit.v3" Version="3.2.2" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="coverlet.collector" Version="10.0.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\HomeAutomationServer\HomeAutomationServer.csproj" />
+	</ItemGroup>
+
+</Project>

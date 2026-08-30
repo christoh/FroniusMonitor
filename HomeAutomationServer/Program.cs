@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.AspNetCore.SignalR;
 using Serilog.Sinks.SystemConsole.Themes;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
@@ -170,15 +171,7 @@ internal class Program
 
         builder.Services.AddOpenApi();
         builder.Services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, AuthenticationService>("Basic", null);
-        builder.Services.AddSignalR()
-            .AddJsonProtocol(o =>
-            {
-                o.PayloadSerializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals;
-                o.PayloadSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-                o.PayloadSerializerOptions.IgnoreReadOnlyProperties = true;
-                o.PayloadSerializerOptions.IgnoreReadOnlyFields = true;
-                o.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)) ;
-            });
+        builder.Services.AddHomeAutomationSignalR();
 
         //builder.Services.AddAuthentication()
         //    .AddScheme<UserList, MyAuthenticationHandler>("MyAuthenticationSchemeName", options => {});
