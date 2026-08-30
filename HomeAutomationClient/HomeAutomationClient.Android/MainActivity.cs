@@ -7,6 +7,8 @@ using Avalonia.Android;
 using De.Hochstaetter.Fronius.Models;
 using De.Hochstaetter.HomeAutomationClient;
 using De.Hochstaetter.HomeAutomationClient.Misc;
+using HomeAutomationClient.Android.Platform;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace HomeAutomationClient.Android;
 
@@ -29,6 +31,8 @@ public class AndroidApp : AvaloniaAndroidApplication<App>
 
     protected override AppBuilder CustomizeAppBuilder(AppBuilder builder)
     {
+        App.ServiceCollection = new ServiceCollection();
+        App.ServiceCollection.AddSingleton<ICache>(new Cache());
         PlatformStartup.AccentColor = GetOsAccentColor();
 
         return base.CustomizeAppBuilder(builder)
