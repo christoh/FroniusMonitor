@@ -11,6 +11,7 @@
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
              xmlns:i="clr-namespace:De.Hochstaetter.HomeAutomationClient.Assets.Images"
              xmlns:m="clr-namespace:De.Hochstaetter.HomeAutomationClient.Misc"
+             xmlns:l="clr-namespace:De.Hochstaetter.HomeAutomationClient.Extensions"
              xmlns:v="clr-namespace:De.Hochstaetter.HomeAutomationClient.Views"
              x:DataType="{x:Type vm:InverterDetailsViewModel}"
              >
@@ -39,7 +40,7 @@
                             <MultiBinding Converter="{co:Gauge2Text}">
                                 <Binding RelativeSource="{RelativeSource TemplatedParent}" />
                                 <Binding Path="Value" RelativeSource="{RelativeSource TemplatedParent}" />
-                                <Binding Path="StringFormat" RelativeSource="{RelativeSource TemplatedParent}" />
+                                <Binding Path="ValueStringFormat" RelativeSource="{RelativeSource TemplatedParent}" />
                                 <Binding Path="UnitName" RelativeSource="{RelativeSource TemplatedParent}" />
                             </MultiBinding>
                         </TextBlock.Text>
@@ -60,19 +61,51 @@
     <Grid RowDefinitions="Auto,*" ColumnDefinitions="Auto,*">
         <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding Gen24System.DisplayName}" TextAlignment="Center" FontSize="18" FontWeight="Medium" Margin="10,10,10,16" TextWrapping="Wrap" />
 
+        <!-- Replaces the 'View' menu of the WPF version: one switch per gauge group, plus the ShowAll master switch.
+             All switch state and the ShowAll logic live in the view model. -->
+        <!-- TODO: Margins must be tuned by human developer. -->
         <ScrollViewer Grid.Row="1" Grid.Column="0">
-            <StackPanel Margin="8">
-                <StackPanel Margin="8" Grid.IsSharedSizeScope="True">
-                    <StackPanel.Styles>
-                        <Style Selector="ToggleButton">
-                            <Setter Property="HorizontalAlignment" Value="Left"/>
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                        </Style>
-                    </StackPanel.Styles>
-                    <ToggleButton x:Name="ActivePowerSwitch"  IsChecked="True" Content="{x:Static p:Resources.ActivePower}" Classes="OnOff Labeled"/>
+            <StackPanel Margin="8" Grid.IsSharedSizeScope="True">
+                <StackPanel.Styles>
+                    <Style Selector="ToggleButton">
+                        <Setter Property="HorizontalAlignment" Value="Left"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="Margin" Value="0,2"/>
+                    </Style>
+                </StackPanel.Styles>
+
+                <ToggleButton IsChecked="{Binding ShowAll, Mode=TwoWay}" Content="{x:Static p:Resources.ShowAll}" Classes="OnOff Labeled"/>
+
+                <!-- TODO: Style for the reset button required. -->
+                <Button Command="{Binding ResetToDefaultCommand}" Content="{x:Static p:Resources.Reset}"
+                        HorizontalAlignment="Left" Margin="0,6,0,0" />
+
+                <Border Height="1" Margin="0,6" Background="{DynamicResource ForegroundBrush}" Opacity=".3" />
+
+                <StackPanel>
+                    <ToggleButton IsChecked="{Binding DcPower, Mode=TwoWay}" Content="{x:Static p:Resources.DcPower}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding DcVoltage, Mode=TwoWay}" Content="{x:Static p:Resources.DcVoltage}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding DcCurrent, Mode=TwoWay}" Content="{x:Static p:Resources.DcCurrent}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding Temperatures, Mode=TwoWay}" Content="{x:Static p:Resources.Temperatures}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding Fans, Mode=TwoWay}" Content="{x:Static p:Resources.Fans}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding AcPhaseVoltageFeedIn, Mode=TwoWay}" Content="{x:Static p:Resources.AcPhaseVoltageFeedIn}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding AcPhaseVoltageInverter, Mode=TwoWay}" Content="{x:Static p:Resources.AcPhaseVoltageInverter}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding DeltaAcPhaseVoltageFeedIn, Mode=TwoWay}" Content="{x:Static p:Resources.ΔAcPhaseVoltageFeedIn}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding AcLineVoltageFeedIn, Mode=TwoWay}" Content="{x:Static p:Resources.AcLineVoltageFeedIn}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding AcLineVoltageInverter, Mode=TwoWay}" Content="{x:Static p:Resources.AcLineVoltageInverter}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding DeltaAcLineVoltageFeedIn, Mode=TwoWay}" Content="{x:Static p:Resources.ΔAcLineVoltageFeedIn}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding Frequency, Mode=TwoWay}" Content="{x:Static p:Resources.Frequency}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding ActivePower, Mode=TwoWay}" Content="{x:Static p:Resources.ActivePower}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding ApparentPower, Mode=TwoWay}" Content="{x:Static p:Resources.ApparentPower}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding ReactivePower, Mode=TwoWay}" Content="{x:Static p:Resources.ReactivePower}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding PowerFactor, Mode=TwoWay}" Content="cos(ϕ)" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding Efficiency, Mode=TwoWay}" Content="{x:Static p:Resources.Efficiency}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding AcCurrent, Mode=TwoWay}" Content="{x:Static p:Resources.AcCurrent}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding OutOfBalance, Mode=TwoWay}" Content="{x:Static p:Resources.OutOfBalance}" Classes="OnOff Labeled"/>
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>
+
         <ScrollViewer Grid.Column="1" Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
             <!-- ReSharper disable Xaml.PossibleNullReferenceException -->
             <WrapPanel Orientation="Horizontal" Margin="10,0,4,0">
@@ -86,19 +119,501 @@
                         <Setter Property="ColorAllTicks" Value="{Binding ColorAllTicks}"></Setter>
                     </Style>
                 </WrapPanel.Styles>
-                <HeaderedContentControl IsVisible="{Binding ElementName=ActivePowerSwitch, Path=IsChecked}" Classes="GroupBox" Header="{x:Static p:Resources.ActivePower}">
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.DcPower}"
+                                        IsVisible="{Binding DcPower}">
                     <StackPanel Orientation="Horizontal">
-                        <c:HalfCircleGauge Label="{x:Static p:Resources.Sum}"
-                                           UnitName="W"
-                                           Minimum="{Binding Gen24System.Config, Converter={co:InverterMinimumAc Factor=1}}"
-                                           GaugeColors="{Binding Gen24System.Sensors?.Storage, TargetNullValue={x:Static m:GaugeColors.HighIsBad}, Converter={co:Null2ColorMap Null={x:Static m:GaugeColors.HighIsBad}, NotNull={x:Static m:GaugeColors.MidIsGood}}}"
-                                           Origin="{Binding Gen24System.Sensors?.Storage, TargetNullValue='0', Converter={co:Null2Double Null='0', NotNull='.5'}}"
-                                           Maximum="{Binding Gen24System.Config?.MaxAcPower, TargetNullValue='10000'}"
-                                           Value="{Binding Gen24System.Sensors.Inverter?.PowerActiveSum, TargetNullValue=0}"
-                                           v:InverterDetailsView.UseRunningBackground="False">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="UnitName" Value="W" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.HighIsBad}" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="{l:Channel 'MPPT1'}"
+                                           Maximum="{Binding Gen24System.Config?.InverterSettings?.Mppt?.Mppt1?.WattPeak, TargetNullValue=5000, FallbackValue=5000}"
+                                           Value="{Binding Gen24System.Sensors?.Inverter?.Solar1Power}" />
+
+                        <c:HalfCircleGauge Label="{l:Channel 'MPPT2'}"
+                                           Maximum="{Binding Gen24System.Config?.InverterSettings?.Mppt?.Mppt2?.WattPeak, TargetNullValue=5000, FallbackValue=5000}"
+                                           Value="{Binding Gen24System.Sensors?.Inverter?.Solar2Power}" />
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.SumPv}"
+                                           Maximum="{Binding Gen24System.Config?.InverterSettings?.Mppt?.WattPeakTotal, TargetNullValue=10000, FallbackValue=10000}"
+                                           Value="{Binding Gen24System.Sensors?.Inverter?.SolarPowerSum}" />
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Battery}" Origin=".5"
+                                           IsVisible="{Binding Gen24System.Sensors?.Storage, Converter={co:Null2Bool}}"
+                                           Minimum="{Binding Gen24System.Sensors?.Storage?.VoltageOuter, Converter={co:Multiply Factor=-22}, TargetNullValue=-8184, FallbackValue=-8184}"
+                                           Maximum="{Binding Gen24System.Sensors?.Storage?.VoltageOuter, Converter={co:Multiply Factor=22}, TargetNullValue=8184, FallbackValue=8184}"
+                                           Value="{Binding Gen24System.Sensors?.Inverter?.StoragePower}" />
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.MpptComparison}" Minimum="50" Maximum="150" UnitName="%"
+                                           GaugeColors="{x:Static m:GaugeColors.ExtremeIsBad}">
+                            <c:HalfCircleGauge.Value>
+                                <MultiBinding Converter="{co:MpptComparison}">
+                                    <Binding Path="Gen24System.Sensors.Inverter.Solar1Power" FallbackValue="0" TargetNullValue="0" />
+                                    <Binding Path="Gen24System.Sensors.Inverter.Solar2Power" FallbackValue="0" TargetNullValue="0" />
+                                    <Binding Path="Gen24System.Config.InverterSettings.Mppt.Mppt1.WattPeak" FallbackValue="0" TargetNullValue="0" />
+                                    <Binding Path="Gen24System.Config.InverterSettings.Mppt.Mppt2.WattPeak" FallbackValue="0" TargetNullValue="0" />
+                                </MultiBinding>
+                            </c:HalfCircleGauge.Value>
                         </c:HalfCircleGauge>
                     </StackPanel>
                 </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.DcVoltage}"
+                                        IsVisible="{Binding DcVoltage}">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="UnitName" Value="V" />
+                                <Setter Property="Minimum" Value="80" />
+                                <Setter Property="Maximum" Value="800" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.HighIsBad}" />
+                                <Setter Property="v:InverterDetailsView.UseRunningBackground" Value="True" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="{l:Channel 'MPPT1'}" Value="{Binding Gen24System.Sensors?.Inverter?.Solar1Voltage}" />
+
+                        <c:HalfCircleGauge Label="{l:Channel 'MPPT2'}" Value="{Binding Gen24System.Sensors?.Inverter?.Solar2Voltage}" />
+
+                        <c:HalfCircleGauge Label="Link" Minimum="400" Maximum="800"
+                                           GaugeColors="{x:Static m:GaugeColors.LowIsBad}"
+                                           Value="{Binding Gen24System.Sensors?.Inverter?.DcLinkVoltage}" />
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Battery}"
+                                           GaugeColors="{x:Static m:GaugeColors.ExtremeIsBad}"
+                                           Minimum="{Binding Gen24System.Sensors?.Storage?.MinVoltage, TargetNullValue=160, FallbackValue=160}"
+                                           Maximum="{Binding Gen24System.Sensors?.Storage?.MaxVoltage, TargetNullValue=531, FallbackValue=531}"
+                                           Value="{Binding Gen24System.Sensors?.Inverter?.StorageVoltageOuter}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.DcCurrent}"
+                                        IsVisible="{Binding DcCurrent}">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="UnitName" Value="A" />
+                                <Setter Property="ValueStringFormat" Value="N3" />
+                                <Setter Property="StringFormat" Value="N1" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.HighIsBad}" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="{l:Channel 'MPPT1'}" Maximum="25" Value="{Binding Gen24System.Sensors?.Inverter?.Solar1Current}" />
+
+                        <c:HalfCircleGauge Label="{l:Channel 'MPPT2'}" Maximum="12.5" Value="{Binding Gen24System.Sensors?.Inverter?.Solar2Current}" />
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.SumPv}" Maximum="37.5" Value="{Binding Gen24System.Sensors?.Inverter?.SolarCurrentSum}" />
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Battery}" Minimum="-22" Maximum="22" Origin=".5"
+                                           IsVisible="{Binding Gen24System.Sensors?.Storage, Converter={co:Null2Bool}}"
+                                           Value="{Binding Gen24System.Sensors?.Inverter?.StorageCurrent}" />
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.MpptComparison}" Minimum="50" Maximum="150" UnitName="%"
+                                           GaugeColors="{x:Static m:GaugeColors.ExtremeIsBad}">
+                            <c:HalfCircleGauge.Value>
+                                <MultiBinding Converter="{co:MpptComparison}">
+                                    <Binding Path="Gen24System.Sensors.Inverter.Solar1Current" FallbackValue="0" TargetNullValue="0" />
+                                    <Binding Path="Gen24System.Sensors.Inverter.Solar2Current" FallbackValue="0" TargetNullValue="0" />
+                                </MultiBinding>
+                            </c:HalfCircleGauge.Value>
+                        </c:HalfCircleGauge>
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.Temperatures}"
+                                        IsVisible="{Binding Temperatures}">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="UnitName" Value="°C" />
+                                <Setter Property="Minimum" Value="0" />
+                                <Setter Property="Maximum" Value="100" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.HighIsBad}" />
+                                <Setter Property="v:InverterDetailsView.UseRunningBackground" Value="True" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Ambient}" Value="{Binding Gen24System.Sensors?.Inverter?.AmbientTemperature}" />
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.AcModule}" Value="{Binding Gen24System.Sensors?.Inverter?.TemperatureInverterAcModule}" />
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.DcModule}" Value="{Binding Gen24System.Sensors?.Inverter?.TemperatureInverterDcModule}" />
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.BatteryModule}" Value="{Binding Gen24System.Sensors?.Inverter?.TemperatureInverterBatteryModule}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.Fans}"
+                                        IsVisible="{Binding Fans}">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="UnitName" Value="%" />
+                                <Setter Property="Minimum" Value="0" />
+                                <Setter Property="Maximum" Value="100" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.HighIsBad}" />
+                                <Setter Property="v:InverterDetailsView.UseRunningBackground" Value="True" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Fan1}"
+                                           Value="{Binding Gen24System.Sensors?.Inverter?.Fan1RelativeRpm, Converter={co:Multiply Factor=100}}" />
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Fan2}"
+                                           Value="{Binding Gen24System.Sensors?.Inverter?.Fan2RelativeRpm, Converter={co:Multiply Factor=100}}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.AcPhaseVoltageFeedIn}"
+                                        IsVisible="{Binding AcPhaseVoltageFeedIn}">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="UnitName" Value="V" />
+                                <Setter Property="Minimum" Value="207" />
+                                <Setter Property="Maximum" Value="253" />
+                                <Setter Property="Origin" Value=".5" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.MidIsGood}" />
+                                <Setter Property="v:InverterDetailsView.UseRunningBackground" Value="True" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="L1" Value="{Binding Gen24System.Sensors?.Inverter?.FeedInPointPhaseVoltageL1}" />
+                        <c:HalfCircleGauge Label="L2" Value="{Binding Gen24System.Sensors?.Inverter?.FeedInPointPhaseVoltageL2}" />
+                        <c:HalfCircleGauge Label="L3" Value="{Binding Gen24System.Sensors?.Inverter?.FeedInPointPhaseVoltageL3}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.AcPhaseVoltageInverter}"
+                                        IsVisible="{Binding AcPhaseVoltageInverter}">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="UnitName" Value="V" />
+                                <Setter Property="Minimum" Value="207" />
+                                <Setter Property="Maximum" Value="253" />
+                                <Setter Property="Origin" Value=".5" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.MidIsGood}" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="L1" Value="{Binding Gen24System.Sensors?.Inverter?.AcVoltageL1}" />
+                        <c:HalfCircleGauge Label="L2" Value="{Binding Gen24System.Sensors?.Inverter?.AcVoltageL2}" />
+                        <c:HalfCircleGauge Label="L3" Value="{Binding Gen24System.Sensors?.Inverter?.AcVoltageL3}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.ΔAcPhaseVoltageFeedIn}"
+                                        IsVisible="{Binding DeltaAcPhaseVoltageFeedIn}">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="UnitName" Value="V" />
+                                <Setter Property="ValueStringFormat" Value="N2" />
+                                <Setter Property="StringFormat" Value="N1" />
+                                <Setter Property="Minimum" Value="-0.7" />
+                                <Setter Property="Maximum" Value="0.7" />
+                                <Setter Property="Origin" Value=".5" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.MidIsGood}" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="L1">
+                            <c:HalfCircleGauge.Value>
+                                <MultiBinding Converter="{co:DeltaConverter}">
+                                    <Binding Path="Gen24System.Sensors.Inverter.AcVoltageL1" />
+                                    <Binding Path="Gen24System.Sensors.Inverter.FeedInPointPhaseVoltageL1" />
+                                </MultiBinding>
+                            </c:HalfCircleGauge.Value>
+                        </c:HalfCircleGauge>
+
+                        <c:HalfCircleGauge Label="L2">
+                            <c:HalfCircleGauge.Value>
+                                <MultiBinding Converter="{co:DeltaConverter}">
+                                    <Binding Path="Gen24System.Sensors.Inverter.AcVoltageL2" />
+                                    <Binding Path="Gen24System.Sensors.Inverter.FeedInPointPhaseVoltageL2" />
+                                </MultiBinding>
+                            </c:HalfCircleGauge.Value>
+                        </c:HalfCircleGauge>
+
+                        <c:HalfCircleGauge Label="L3">
+                            <c:HalfCircleGauge.Value>
+                                <MultiBinding Converter="{co:DeltaConverter}">
+                                    <Binding Path="Gen24System.Sensors.Inverter.AcVoltageL3" />
+                                    <Binding Path="Gen24System.Sensors.Inverter.FeedInPointPhaseVoltageL3" />
+                                </MultiBinding>
+                            </c:HalfCircleGauge.Value>
+                        </c:HalfCircleGauge>
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.AcLineVoltageFeedIn}"
+                                        IsVisible="{Binding AcLineVoltageFeedIn}">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="UnitName" Value="V" />
+                                <Setter Property="Minimum" Value="358.5345171668" />
+                                <Setter Property="Maximum" Value="438.2088543149" />
+                                <Setter Property="Origin" Value=".5" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.MidIsGood}" />
+                                <Setter Property="v:InverterDetailsView.UseRunningBackground" Value="True" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="L12" Value="{Binding Gen24System.Sensors?.Inverter?.FeedInPointLineVoltageL12}" />
+                        <c:HalfCircleGauge Label="L23" Value="{Binding Gen24System.Sensors?.Inverter?.FeedInPointLineVoltageL23}" />
+                        <c:HalfCircleGauge Label="L31" Value="{Binding Gen24System.Sensors?.Inverter?.FeedInPointLineVoltageL31}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.AcLineVoltageInverter}"
+                                        IsVisible="{Binding AcLineVoltageInverter}">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="UnitName" Value="V" />
+                                <Setter Property="Minimum" Value="358.5345171668" />
+                                <Setter Property="Maximum" Value="438.2088543149" />
+                                <Setter Property="Origin" Value=".5" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.MidIsGood}" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="L12" Value="{Binding Gen24System.Sensors?.Inverter?.AcVoltageL12}" />
+                        <c:HalfCircleGauge Label="L23" Value="{Binding Gen24System.Sensors?.Inverter?.AcVoltageL23}" />
+                        <c:HalfCircleGauge Label="L31" Value="{Binding Gen24System.Sensors?.Inverter?.AcVoltageL31}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.ΔAcLineVoltageFeedIn}"
+                                        IsVisible="{Binding DeltaAcLineVoltageFeedIn}">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="UnitName" Value="V" />
+                                <Setter Property="ValueStringFormat" Value="N2" />
+                                <Setter Property="Minimum" Value="-1" />
+                                <Setter Property="Maximum" Value="1" />
+                                <Setter Property="Origin" Value=".5" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.MidIsGood}" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="L12">
+                            <c:HalfCircleGauge.Value>
+                                <MultiBinding Converter="{co:DeltaConverter}">
+                                    <Binding Path="Gen24System.Sensors.Inverter.AcVoltageL12" />
+                                    <Binding Path="Gen24System.Sensors.Inverter.FeedInPointLineVoltageL12" />
+                                </MultiBinding>
+                            </c:HalfCircleGauge.Value>
+                        </c:HalfCircleGauge>
+
+                        <c:HalfCircleGauge Label="L23">
+                            <c:HalfCircleGauge.Value>
+                                <MultiBinding Converter="{co:DeltaConverter}">
+                                    <Binding Path="Gen24System.Sensors.Inverter.AcVoltageL23" />
+                                    <Binding Path="Gen24System.Sensors.Inverter.FeedInPointLineVoltageL23" />
+                                </MultiBinding>
+                            </c:HalfCircleGauge.Value>
+                        </c:HalfCircleGauge>
+
+                        <c:HalfCircleGauge Label="L31">
+                            <c:HalfCircleGauge.Value>
+                                <MultiBinding Converter="{co:DeltaConverter}">
+                                    <Binding Path="Gen24System.Sensors.Inverter.AcVoltageL31" />
+                                    <Binding Path="Gen24System.Sensors.Inverter.FeedInPointLineVoltageL31" />
+                                </MultiBinding>
+                            </c:HalfCircleGauge.Value>
+                        </c:HalfCircleGauge>
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.Frequency}"
+                                        IsVisible="{Binding Frequency}">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="UnitName" Value="Hz" />
+                                <Setter Property="ValueStringFormat" Value="N3" />
+                                <Setter Property="Minimum" Value="49.8" />
+                                <Setter Property="Maximum" Value="50.2" />
+                                <Setter Property="Origin" Value=".5" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.MidIsGood}" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Grid}" StringFormat="N1"
+                                           v:InverterDetailsView.UseRunningBackground="True"
+                                           Value="{Binding Gen24System.Sensors?.Inverter?.FeedInPointFrequency}" />
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Inverter}" StringFormat="N1"
+                                           Value="{Binding Gen24System.Sensors?.Inverter?.InverterFrequency}" />
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.ΔFrequency}" Minimum="-5" Maximum="5" UnitName="mHz">
+                            <c:HalfCircleGauge.Value>
+                                <MultiBinding Converter="{co:DeltaConverter}">
+                                    <Binding Path="Gen24System.Sensors.Inverter.InverterFrequency" Converter="{co:Multiply Factor=1000}" />
+                                    <Binding Path="Gen24System.Sensors.Inverter.FeedInPointFrequency" Converter="{co:Multiply Factor=1000}" />
+                                </MultiBinding>
+                            </c:HalfCircleGauge.Value>
+                        </c:HalfCircleGauge>
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.ActivePower}"
+                                        IsVisible="{Binding ActivePower}">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="UnitName" Value="W" />
+                                <Setter Property="Minimum" Value="{Binding Gen24System.Config, Converter={co:InverterMinimumAc}}" />
+                                <Setter Property="Maximum" Value="{Binding Gen24System.Config?.MaxAcPower, Converter={co:Multiply Factor=0.3333333333333333}, TargetNullValue=3333.3333333333, FallbackValue=3333.3333333333}" />
+                                <Setter Property="GaugeColors" Value="{Binding Gen24System.Sensors?.Storage, TargetNullValue={x:Static m:GaugeColors.HighIsBad}, Converter={co:Null2ColorMap Null={x:Static m:GaugeColors.HighIsBad}, NotNull={x:Static m:GaugeColors.MidIsGood}}}" />
+                                <Setter Property="Origin" Value="{Binding Gen24System.Sensors?.Storage, TargetNullValue='0', Converter={co:Null2Double Null='0', NotNull='.5'}}" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="L1" Value="{Binding Gen24System.Sensors?.Inverter?.ActivePowerL1}" />
+                        <c:HalfCircleGauge Label="L2" Value="{Binding Gen24System.Sensors?.Inverter?.ActivePowerL2}" />
+                        <c:HalfCircleGauge Label="L3" Value="{Binding Gen24System.Sensors?.Inverter?.ActivePowerL3}" />
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Sum}"
+                                           Minimum="{Binding Gen24System.Config, Converter={co:InverterMinimumAc Factor=1}}"
+                                           Maximum="{Binding Gen24System.Config?.MaxAcPower, TargetNullValue=10000, FallbackValue=10000}"
+                                           Value="{Binding Gen24System.Sensors?.Inverter?.PowerActiveSum}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.ApparentPower}"
+                                        IsVisible="{Binding ApparentPower}">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="UnitName" Value="VA" />
+                                <Setter Property="Minimum" Value="0" />
+                                <Setter Property="Origin" Value="0" />
+                                <Setter Property="Maximum" Value="{Binding Gen24System.Config?.MaxAcPower, Converter={co:Multiply Factor=0.3333333333333333}, TargetNullValue=3333.3333333333, FallbackValue=3333.3333333333}" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.HighIsBad}" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="L1" Value="{Binding Gen24System.Sensors?.Inverter?.ApparentPowerL1}" />
+                        <c:HalfCircleGauge Label="L2" Value="{Binding Gen24System.Sensors?.Inverter?.ApparentPowerL2}" />
+                        <c:HalfCircleGauge Label="L3" Value="{Binding Gen24System.Sensors?.Inverter?.ApparentPowerL3}" />
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Sum}"
+                                           Maximum="{Binding Gen24System.Config?.MaxAcPower, TargetNullValue=10000, FallbackValue=10000}"
+                                           Value="{Binding Gen24System.Sensors?.Inverter?.PowerApparentSum}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.ReactivePower}"
+                                        IsVisible="{Binding ReactivePower}">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="UnitName" Value="VA(r)" />
+                                <Setter Property="Origin" Value=".5" />
+                                <Setter Property="Minimum" Value="{Binding Gen24System.Config?.MaxAcPower, Converter={co:Multiply Factor=-0.3333333333333333}, TargetNullValue=-3333.3333333333, FallbackValue=-3333.3333333333}" />
+                                <Setter Property="Maximum" Value="{Binding Gen24System.Config?.MaxAcPower, Converter={co:Multiply Factor=0.3333333333333333}, TargetNullValue=3333.3333333333, FallbackValue=3333.3333333333}" />
+                                <Setter Property="GaugeColors" Value="{Binding Gen24System.Sensors?.Storage, TargetNullValue={x:Static m:GaugeColors.HighIsBad}, Converter={co:Null2ColorMap Null={x:Static m:GaugeColors.HighIsBad}, NotNull={x:Static m:GaugeColors.MidIsGood}}}" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="L1" Value="{Binding Gen24System.Sensors?.Inverter?.ReactivePowerL1}" />
+                        <c:HalfCircleGauge Label="L2" Value="{Binding Gen24System.Sensors?.Inverter?.ReactivePowerL2}" />
+                        <c:HalfCircleGauge Label="L3" Value="{Binding Gen24System.Sensors?.Inverter?.ReactivePowerL3}" />
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Sum}"
+                                           Minimum="{Binding Gen24System.Config?.MaxAcPower, Converter={co:Multiply Factor=-1}, TargetNullValue=-10000, FallbackValue=-10000}"
+                                           Maximum="{Binding Gen24System.Config?.MaxAcPower, TargetNullValue=10000, FallbackValue=10000}"
+                                           Value="{Binding Gen24System.Sensors?.Inverter?.PowerReactiveSum}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="cos(ϕ)"
+                                        IsVisible="{Binding PowerFactor}">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="Minimum" Value="-1" />
+                                <Setter Property="Maximum" Value="1" />
+                                <Setter Property="Origin" Value=".5" />
+                                <Setter Property="ValueStringFormat" Value="N5" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.MidIsBad}" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="L1" Value="{Binding Gen24System.Sensors?.Inverter?.PowerFactorL1}" />
+                        <c:HalfCircleGauge Label="L2" Value="{Binding Gen24System.Sensors?.Inverter?.PowerFactorL2}" />
+                        <c:HalfCircleGauge Label="L3" Value="{Binding Gen24System.Sensors?.Inverter?.PowerFactorL3}" />
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Total}" Value="{Binding Gen24System.Sensors?.Inverter?.PowerFactorAverage}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.Efficiency}"
+                                        IsVisible="{Binding Efficiency}">
+                    <StackPanel Orientation="Horizontal">
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Loss}" UnitName="W" Minimum="0" Maximum="500"
+                                           GaugeColors="{x:Static m:GaugeColors.HighIsBad}"
+                                           Value="{Binding Gen24System.Sensors?.PowerFlow?.PowerLoss}" />
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Efficiency}" UnitName="%" Minimum="0" Maximum="100"
+                                           GaugeColors="{x:Static m:GaugeColors.LowIsBad}"
+                                           Value="{Binding Gen24System.Sensors?.PowerFlow?.Efficiency, Converter={co:Multiply Factor=100}}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.AcCurrent}"
+                                        IsVisible="{Binding AcCurrent}">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="UnitName" Value="A" />
+                                <Setter Property="ValueStringFormat" Value="N3" />
+                                <Setter Property="StringFormat" Value="N1" />
+                                <Setter Property="Maximum" Value="{Binding Gen24System.Config?.MaxAcPower, Converter={co:Multiply Factor=0.00144928}, TargetNullValue=14.4928, FallbackValue=14.4928}" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.HighIsBad}" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="L1" Value="{Binding Gen24System.Sensors?.Inverter?.CurrentL1}" />
+                        <c:HalfCircleGauge Label="L2" Value="{Binding Gen24System.Sensors?.Inverter?.CurrentL2}" />
+                        <c:HalfCircleGauge Label="L3" Value="{Binding Gen24System.Sensors?.Inverter?.CurrentL3}" />
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Sum}"
+                                           Maximum="{Binding Gen24System.Config?.MaxAcPower, Converter={co:Multiply Factor=0.00434784}, TargetNullValue=43.4784, FallbackValue=43.4784}"
+                                           Value="{Binding Gen24System.Sensors?.Inverter?.CurrentSum}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.OutOfBalance}"
+                                        IsVisible="{Binding OutOfBalance}">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="UnitName" Value="A" />
+                                <Setter Property="ValueStringFormat" Value="N3" />
+                                <Setter Property="StringFormat" Value="N1" />
+                                <Setter Property="Minimum" Value="0" />
+                                <Setter Property="Origin" Value="0" />
+                                <Setter Property="Maximum" Value="{Binding Gen24System.Config?.MaxAcPower, Converter={co:Multiply Factor=0.00144928}, TargetNullValue=14.4928, FallbackValue=14.4928}" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.HighIsBad}" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="L12" Value="{Binding Gen24System.Sensors?.Inverter?.OutOfBalanceCurrentL12}" />
+                        <c:HalfCircleGauge Label="L23" Value="{Binding Gen24System.Sensors?.Inverter?.OutOfBalanceCurrentL23}" />
+                        <c:HalfCircleGauge Label="L31" Value="{Binding Gen24System.Sensors?.Inverter?.OutOfBalanceCurrentL31}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+                <!-- ReSharper restore Xaml.PossibleNullReferenceException -->
             </WrapPanel>
         </ScrollViewer>
     </Grid>

@@ -7,8 +7,13 @@
     <File Path="docker-compose.yml" />
     <File Path="tounix.sh" />
   </Folder>
+  <Folder Name="/Solution Items/Memory/">
+    <File Path=".claude/memory/InverterDetailsView.Lifecycle.md" />
+    <File Path=".claude/memory/ViewModelBase.Features.md" />
+  </Folder>
   <Folder Name="/Solution Items/Rules/">
     <File Path=".claude/rules/PortingFroniusMonitor.md" />
+    <File Path=".claude/rules/ViewModelsForInteractionLogic.md" />
   </Folder>
   <Project Path="Fronius/Fronius.csproj" />
   <Project Path="FroniusMonitor/FroniusMonitor.csproj" />

@@ -1,6 +1,13 @@
+---
+paths:
+  - FroniusMonitor/**
+  - HomeAutomationClient/**
+  - HomeAutomationServer/**
+---
+
 # Porting FroniusMonitor.csproj
 
-This applies to anything that has covers porting FroniusMonitor.csproj to the new Avalonia architecture.
+This applies to anything that covers porting FroniusMonitor.csproj to the new Avalonia architecture.
 
 ## Goals
 - We want to port FroniusMonitor.csproj to a new project.

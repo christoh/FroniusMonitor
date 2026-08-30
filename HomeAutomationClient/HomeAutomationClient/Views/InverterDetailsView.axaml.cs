@@ -20,15 +20,15 @@ public partial class InverterDetailsView : ContentPage
     {
         InitializeComponent();
         DataContext = viewModel;
-        
+
         Loaded += (_, _) =>
         {
-            Application.Current!.ActualThemeVariantChanged += OnThemeChanged; ;
+            Application.Current!.ActualThemeVariantChanged += OnThemeChanged; 
         };
 
         Unloaded += (_, _) =>
         {
-            Application.Current!.ActualThemeVariantChanged -= OnThemeChanged; ;
+            Application.Current!.ActualThemeVariantChanged -= OnThemeChanged;
         };
     }
 

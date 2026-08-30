@@ -1,5 +1,16 @@
 # General Rules
 - If you create a memory, lifecycle contract or similar, create a virtual directory in "Solution Items" (only one for all files)
+- Every memory, lifecycle contract or similar must start with a YAML header naming the repo-relative files it applies to:
+  ```yaml
+  ---
+  paths:
+    - HomeAutomationClient/HomeAutomationClient/Views/InverterDetailsView.axaml
+    - HomeAutomationClient/HomeAutomationClient/ViewModels/InverterDetailsViewModel.cs
+  ---
+  ```
+  Use full repo-relative paths (a trailing `/**` for a whole folder is fine), and list only the files whose editing
+  actually requires the document. Read a document when your task touches one of its `paths:`, otherwise skip it, so
+  that knowledge irrelevant to the current task is never loaded.
 ## Undo
 * Make sure, that you can undo exactly your changes, especially if the git repo was dirty before you started editing. If you are unsure, please ask me before editing.
 
