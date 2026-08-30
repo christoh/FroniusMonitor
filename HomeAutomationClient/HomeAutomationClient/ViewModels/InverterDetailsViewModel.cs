@@ -37,7 +37,7 @@ public partial class InverterDetailsViewModel : ViewModelBase
         new(viewModel => viewModel.OutOfBalance, (viewModel, isOn) => viewModel.OutOfBalance = isOn),
     ];
 
-    private readonly DashboardViewModel dashboardViewModel;
+    private readonly MainViewModel mainViewModel;
 
     /// <summary>
     /// The default state of every gauge group, in the order of <see cref="GroupSwitches"/>. Taken from the property
@@ -45,9 +45,9 @@ public partial class InverterDetailsViewModel : ViewModelBase
     /// </summary>
     private readonly ImmutableArray<bool> defaultGroupValues;
 
-    public InverterDetailsViewModel(DashboardViewModel dashboardViewModel)
+    public InverterDetailsViewModel(MainViewModel mainViewModel)
     {
-        this.dashboardViewModel = dashboardViewModel;
+        this.mainViewModel = mainViewModel;
 
         // The constructor body runs after all property initializers, so this captures exactly what they declared.
         defaultGroupValues = [..GroupSwitches.Select(groupSwitch => groupSwitch.Get(this))];
@@ -56,7 +56,10 @@ public partial class InverterDetailsViewModel : ViewModelBase
     [ObservableProperty]
     public partial Gen24System Gen24System { get; set; } = null!;
 
-    public bool ColorAllTicks=>dashboardViewModel.ColorAllTicks; //BUG: Move to MainViewModel or settings
+    /// <summary>
+    /// The gauge settings live on the singleton main view model, next to the switch in the main view.
+    /// </summary>
+    public MainViewModel MainViewModel => mainViewModel;
 
     /// <summary>
     /// Turns all gauge groups on or off, and is on itself while every single group is on. There is no

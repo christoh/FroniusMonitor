@@ -112,9 +112,12 @@ multitasking. Therefore:
 - **`ResetToDefaultCommand`** puts the groups back to the values declared in their property initializers, batched
   the same way. The view model's constructor snapshots those values (it runs after all property initializers), so
   the defaults exist only once — do not repeat them in the reset.
-- **`InverterGauge` control template.** The dial is the gauge's `Content`, so the template must keep a
+- **`DetailsGauge` control template** lives in `Styles/Gauges.axaml` and is shared by all four detail views
+  (inverter, battery, smart meter, WattPilot). The dial is the gauge's `Content`, so the template must keep a
   `ContentPresenter` named `PART_ContentPresenter`; the value line is produced by the `Gauge2Text` multi-converter
-  from `(gauge, Value, ValueStringFormat, UnitName)`.
+  from `(gauge, Value, ValueStringFormat, UnitName)`. The template paints `{TemplateBinding Background}`, and each
+  view decides the running state by setting the gauge's `Background` in its own `WrapPanel` style — that setter is
+  the only part that differs between the four views, so do not paint the border in the template.
 - **`UseRunningBackground`** is an attached property owned by this view and read by `InverterBackgroundColor` as
   its third value. It only has meaning inside this view.
 - **Format split:** `Gauge.ValueStringFormat` formats the value read-out, `Gauge.StringFormat` the minimum/maximum

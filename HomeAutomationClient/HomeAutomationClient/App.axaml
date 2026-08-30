@@ -15,6 +15,7 @@
 		<StyleInclude Source="Styles/Buttons.axaml"/>
 		<StyleInclude Source="Styles/HeaderedContentControls.axaml"/>
         <StyleInclude Source="Styles/Controls.axaml"/>
+        <StyleInclude Source="Styles/DetailViews.axaml"/>
 	</Application.Styles>
 
 	<Application.Resources>
@@ -136,6 +137,7 @@
 
 			<ResourceDictionary.MergedDictionaries>
 				<MergeResourceInclude Source="Assets/LoadingIndicators.Avalonia/LoadingIndicators.axaml"/>
+				<MergeResourceInclude Source="Styles/Gauges.axaml"/>
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 	</Application.Resources>

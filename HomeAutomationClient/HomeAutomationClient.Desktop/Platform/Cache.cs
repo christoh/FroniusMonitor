@@ -13,10 +13,10 @@ public class Cache : ICache
 {
     private static readonly string cacheDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Hochstätter", "HomeAutomationClient");
     private static readonly string cacheFilePath = Path.Combine(cacheDirectory, "cache.json");
-    
+
     private static readonly JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions
     {
-        DefaultIgnoreCondition= System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
+        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
     };
 
     public Cache()

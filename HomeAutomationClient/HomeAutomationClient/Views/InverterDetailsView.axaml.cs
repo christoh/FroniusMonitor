@@ -16,10 +16,13 @@ public partial class InverterDetailsView : ContentPage
 
     public InverterDetailsViewModel ViewModel =>(InverterDetailsViewModel)DataContext!;
 
-    public InverterDetailsView(InverterDetailsViewModel viewModel)
+    public InverterDetailsView()
     {
         InitializeComponent();
-        DataContext = viewModel;
+
+        // Parameterless, so the XAML runtime loader and the previewer can create the view (AVLN3001). The container
+        // hands out the same singleton view model it would have injected; Try..., because the designer has no container.
+        DataContext = IoC.TryGetRegistered<InverterDetailsViewModel>();
 
         Loaded += (_, _) =>
         {

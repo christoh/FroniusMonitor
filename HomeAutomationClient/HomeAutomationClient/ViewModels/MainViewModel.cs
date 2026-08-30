@@ -1,6 +1,10 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
+using De.Hochstaetter.Fronius.Models.Charging;
+using BatteryDetailsView = De.Hochstaetter.HomeAutomationClient.Views.BatteryDetailsView;
 using InverterDetailsView = De.Hochstaetter.HomeAutomationClient.Views.InverterDetailsView;
+using SmartMeterDetailsView = De.Hochstaetter.HomeAutomationClient.Views.SmartMeterDetailsView;
+using WattPilotDetailsView = De.Hochstaetter.HomeAutomationClient.Views.WattPilotDetailsView;
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 
@@ -28,6 +32,13 @@ public sealed partial class MainViewModel : ViewModelBase
 
     [ObservableProperty]
     public partial bool IsReady { get; set; }
+
+    /// <summary>
+    /// Colors all ticks of every gauge, not just those up to the current value. Lives here because the switch for
+    /// it sits in the main view and applies to all views; the other view models reach it through this singleton.
+    /// </summary>
+    [ObservableProperty]
+    public partial bool ColorAllTicks { get; set; } = true;
 
     [ObservableProperty]
     public partial object? MainViewContent { get; set; }
@@ -95,6 +106,27 @@ public sealed partial class MainViewModel : ViewModelBase
                 var detailsView = IoC.Get<InverterDetailsView>();
                 detailsView.ViewModel.Gen24System = gen24System;
                 MainViewContent = detailsView;
+                break;
+
+            // The battery view needs the inverter, because the net state of charge and the net capacity live there.
+            // It must not be looked up from the Gen24Storage of the menu entry: Gen24System.CopyFrom replaces
+            // Sensors on every update, so that object is a stale snapshot by the time the entry is clicked.
+            case Gen24Storage when UpdateService.BatteryGen24System is { } batteryInverter:
+                var batteryView = IoC.Get<BatteryDetailsView>();
+                batteryView.ViewModel.Gen24System = batteryInverter;
+                MainViewContent = batteryView;
+                break;
+
+            // Same here: the meter of the menu entry is replaced on every update, so the view binds the live
+            // UpdateService.SmartMeter instead of the object handed in.
+            case Gen24PowerMeter3P:
+                MainViewContent = IoC.Get<SmartMeterDetailsView>();
+                break;
+
+            case WattPilot wattPilot:
+                var wattPilotView = IoC.Get<WattPilotDetailsView>();
+                wattPilotView.ViewModel.WattPilot = wattPilot;
+                MainViewContent = wattPilotView;
                 break;
 
             default:

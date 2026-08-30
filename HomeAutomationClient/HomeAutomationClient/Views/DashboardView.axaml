@@ -19,7 +19,7 @@
 	<ContentPage.DataTemplates>
 		<!-- WattPilot -->
         <DataTemplate DataType="{x:Type m:KeyedWattPilot}">
-            <c:WattPilotControl ColorAllTicks="{Binding Path=((vm:DashboardViewModel)DataContext).ColorAllTicks, FallbackValue={x:False}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+            <c:WattPilotControl ColorAllTicks="{Binding Path=((vm:DashboardViewModel)DataContext).MainViewModel.ColorAllTicks, FallbackValue={x:False}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
                                 Width="{StaticResource ControlWidth}"
                                 WattPilot="{Binding Device}"
                                 DeviceKey="{Binding Key}"
@@ -40,7 +40,7 @@
 		</DataTemplate>
 	</ContentPage.DataTemplates>
 	<Grid RowDefinitions="*" x:Name="RootElement">
-		<Grid RowDefinitions="Auto,Auto,*,Auto" Grid.Row="0">
+		<Grid RowDefinitions="Auto,Auto,*" Grid.Row="0">
 
 			<StackPanel x:Name="MainContentElement" Orientation="Vertical" Margin="16" Grid.Row="0" VerticalAlignment="Top">
 				<TextBlock Text="{x:Static p:Resources.UiTestTitle}" FontSize="24" TextAlignment="Center" FontWeight="Bold" TextWrapping="Wrap" HorizontalAlignment="Center" />
@@ -82,7 +82,7 @@
 										<Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto" Margin="0,0,32,0">
 											<StackPanel Grid.Row="0" Grid.Column="2" Grid.RowSpan="3">
 												<c:InverterControl x:Name="InverterControl"
-																   ColorAllTicks="{Binding Path=((vm:DashboardViewModel)DataContext).ColorAllTicks, FallbackValue={x:False}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+																   ColorAllTicks="{Binding Path=((vm:DashboardViewModel)DataContext).MainViewModel.ColorAllTicks, FallbackValue={x:False}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
 																   Width="300" VerticalAlignment="Top"
 																   Inverter="{Binding Device}" LoadPowerBrush="{Binding Path=((vm:DashboardViewModel)DataContext)?.LoadPowerColor, Converter={co:ColorConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
 																   DeviceKey="{Binding Key}"
@@ -124,7 +124,7 @@
 														 MeterStatus="{Binding UpdateService.MeterStatus}" HorizontalAlignment="Left"
 														 SmartMeter="{Binding UpdateService.SmartMeter}"
 														 Gen24Config="{Binding UpdateService.PrimaryGen24Config}"
-														 ColorAllTicks="{Binding ColorAllTicks}" />
+														 ColorAllTicks="{Binding MainViewModel.ColorAllTicks}" />
 									<StackPanel Orientation="Vertical" VerticalAlignment="Center">
 										<StackPanel.Styles>
 											<Style Selector="c|PowerFlowArrow">
@@ -159,11 +159,6 @@
 					</ItemsControl.ItemsPanel>
 				</ItemsControl>
 			</ScrollViewer>
-			<StackPanel Grid.Row="3" Margin="16" Orientation="Horizontal">
-				<TextBlock Text="{x:Static p:Resources.ColorAllGaugeTicks}" Margin="0,0,8,0" />
-				<ToggleButton Classes="OnOff" Height="16"
-							  IsChecked="{Binding ColorAllTicks}" />
-			</StackPanel>
 		</Grid>
 		<c:BusyAnimation BusyText="{Binding BusyText}" Grid.Row="0" />
 	</Grid>

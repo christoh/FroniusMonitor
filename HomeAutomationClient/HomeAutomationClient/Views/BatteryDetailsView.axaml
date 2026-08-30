@@ -1,0 +1,146 @@
+<ContentPage xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="De.Hochstaetter.HomeAutomationClient.Views.BatteryDetailsView"
+             xmlns:vm="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels"
+             xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
+             xmlns:m="clr-namespace:De.Hochstaetter.HomeAutomationClient.Misc"
+             x:DataType="{x:Type vm:BatteryDetailsViewModel}"
+             >
+    <Grid RowDefinitions="Auto,*">
+        <TextBlock Grid.Row="0" Text="{Binding Gen24System.Sensors?.Storage?.Model}" TextAlignment="Center" FontSize="18" FontWeight="Medium" Margin="10,10,10,16" TextWrapping="Wrap" />
+
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <!-- ReSharper disable Xaml.PossibleNullReferenceException -->
+            <WrapPanel Orientation="Horizontal" Margin="10,0,4,0" Classes="GaugeGroups">
+                <WrapPanel.Styles>
+                    <Style Selector="c|HalfCircleGauge">
+                        <!-- The shared DetailsGauge template paints the gauge Background, so the awake state is decided here. -->
+                        <Setter Property="Background" Value="{Binding Gen24System.Sensors?.Storage?.IsAwake, Converter={co:DeviceBackgroundColor}}" />
+                    </Style>
+                </WrapPanel.Styles>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.SoC}">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="UnitName" Value="%" />
+                                <Setter Property="Minimum" Value="0" />
+                                <Setter Property="Maximum" Value="100" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.LowIsBad}" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Gross}"
+                                           Value="{Binding Gen24System.Sensors?.Storage?.StateOfCharge, Converter={co:Multiply Factor=100}}" />
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Net}"
+                                           Value="{Binding Gen24System.NetStateOfChange, Converter={co:Multiply Factor=100}}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.SoH}">
+                    <StackPanel Orientation="Horizontal">
+                        <c:HalfCircleGauge Label="SoH" UnitName="%" Minimum="0" Maximum="100"
+                                           GaugeColors="{x:Static m:GaugeColors.VeryHighIsGood}"
+                                           Value="{Binding Gen24System.Sensors?.Storage?.StateOfHealth, Converter={co:Multiply Factor=100}}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.Capacity}">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="UnitName" Value="Wh" />
+                                <Setter Property="ValueStringFormat" Value="N0" />
+                                <Setter Property="Maximum" Value="{Binding Gen24System.Sensors?.Storage?.MaxCapacity, TargetNullValue=58000, FallbackValue=58000}" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.LowIsBad}" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Gross}"
+                                           Value="{Binding Gen24System.Sensors?.Storage?.AvailableCapacity}" />
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Net}"
+                                           Maximum="{Binding Gen24System.MaxStorageNetCapacity, TargetNullValue=54500, FallbackValue=54500}"
+                                           Value="{Binding Gen24System.StorageNetCapacity}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.Voltage}">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="UnitName" Value="V" />
+                                <Setter Property="Minimum" Value="{Binding Gen24System.Sensors?.Storage?.MinVoltage, TargetNullValue=280, FallbackValue=280}" />
+                                <Setter Property="Maximum" Value="{Binding Gen24System.Sensors?.Storage?.MaxVoltage, TargetNullValue=408, FallbackValue=408}" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.MidIsGood}" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Inner}" Value="{Binding Gen24System.Sensors?.Storage?.VoltageInternal}" />
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Outer}" Value="{Binding Gen24System.Sensors?.Storage?.VoltageOuter}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.Current}">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="UnitName" Value="A" />
+                                <Setter Property="ValueStringFormat" Value="N3" />
+                                <Setter Property="Minimum" Value="-22" />
+                                <Setter Property="Maximum" Value="22" />
+                                <Setter Property="Origin" Value=".5" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.MidIsGood}" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Inner}" Value="{Binding Gen24System.Sensors?.Storage?.CurrentInternal}" />
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Outer}" Value="{Binding Gen24System.Sensors?.Storage?.Current}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.Power}">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="UnitName" Value="W" />
+                                <Setter Property="Origin" Value=".5" />
+                                <Setter Property="Minimum" Value="{Binding Gen24System.Sensors?.Storage?.VoltageOuter, Converter={co:Multiply Factor=-22}, TargetNullValue=-8000, FallbackValue=-8000}" />
+                                <Setter Property="Maximum" Value="{Binding Gen24System.Sensors?.Storage?.VoltageOuter, Converter={co:Multiply Factor=22}, TargetNullValue=8000, FallbackValue=8000}" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.MidIsGood}" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Inner}" Value="{Binding Gen24System.Sensors?.Storage?.PowerInternal}" />
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Outer}" Value="{Binding Gen24System.Sensors?.Storage?.Power}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.Temperatures}">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="UnitName" Value="°C" />
+                                <Setter Property="Minimum" Value="0" />
+                                <Setter Property="Maximum" Value="50" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.MidIsGood}" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Ambient}" Value="{Binding Gen24System.Sensors?.Storage?.AmbientTemperature}" />
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.CellMin}" Value="{Binding Gen24System.Sensors?.Storage?.CellTemperatureMin}" />
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.CellAverage}" Value="{Binding Gen24System.Sensors?.Storage?.CellTemperatureAverage}" />
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.CellMax}" Value="{Binding Gen24System.Sensors?.Storage?.CellTemperatureMax}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+                <!-- ReSharper restore Xaml.PossibleNullReferenceException -->
+            </WrapPanel>
+        </ScrollViewer>
+    </Grid>
+</ContentPage>

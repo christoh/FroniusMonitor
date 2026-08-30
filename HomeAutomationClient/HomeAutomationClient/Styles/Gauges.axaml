@@ -1,0 +1,42 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+                    xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters">
+
+    <!--
+    The gauge of the detail views (inverter, battery, smart meter, WattPilot): a caption and a value read-out
+    around the dial. The dial is the gauge's Content (see HalfCircleGauge.axaml), so the ContentPresenter is where
+    it ends up.
+
+    What tells the four views apart is only the background, which says whether the device is running. Each view
+    therefore binds the gauge's Background in its own style; do not paint the Border here.
+    -->
+    <ControlTemplate x:Key="DetailsGauge" TargetType="c:HalfCircleGauge">
+        <Border BorderBrush="DimGray" BorderThickness="1" UseLayoutRounding="False" Padding="4"
+                Background="{TemplateBinding Background}">
+            <Grid RowDefinitions="Auto,Auto,Auto">
+                <TextBlock Grid.Row="0" FontSize="18" FontWeight="Normal" TextAlignment="Center"
+                           Text="{TemplateBinding Label}"
+                           IsVisible="{Binding Label, RelativeSource={RelativeSource TemplatedParent}, Converter={co:Null2Bool}}" />
+
+                <TextBlock Grid.Row="1" FontSize="18" FontWeight="Medium" TextAlignment="Center" Margin="0,0,0,2">
+                    <TextBlock.Text>
+                        <MultiBinding Converter="{co:Gauge2Text}">
+                            <Binding RelativeSource="{RelativeSource TemplatedParent}" />
+                            <Binding Path="Value" RelativeSource="{RelativeSource TemplatedParent}" />
+                            <Binding Path="ValueStringFormat" RelativeSource="{RelativeSource TemplatedParent}" />
+                            <Binding Path="UnitName" RelativeSource="{RelativeSource TemplatedParent}" />
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+
+                <ContentPresenter Grid.Row="2" x:Name="PART_ContentPresenter"
+                                  Content="{TemplateBinding Content}"
+                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                  Padding="{TemplateBinding Padding}"
+                                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+            </Grid>
+        </Border>
+    </ControlTemplate>
+</ResourceDictionary>

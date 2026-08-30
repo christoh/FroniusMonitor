@@ -15,49 +15,6 @@
              xmlns:v="clr-namespace:De.Hochstaetter.HomeAutomationClient.Views"
              x:DataType="{x:Type vm:InverterDetailsViewModel}"
              >
-    <ContentPage.Resources>
-        <!--
-        Surrounds a HalfCircleGauge with its own caption and value read-out. The dial is the gauge's Content
-        (see HalfCircleGauge.axaml), so the ContentPresenter is where the dial ends up; everything placed
-        around it in this template becomes part of the gauge.
-        -->
-        <ControlTemplate x:Key="InverterGauge" TargetType="c:HalfCircleGauge">
-            <Border BorderBrush="DimGray" BorderThickness="1" UseLayoutRounding="False" Padding="4">
-                <Border.Background>
-                    <MultiBinding Converter="{co:InverterBackgroundColor}">
-                        <Binding Path="((vm:InverterDetailsViewModel)DataContext)?.Gen24System?.Sensors?.InverterStatus?.StatusCode" RelativeSource="{RelativeSource TemplatedParent}"/>
-                        <Binding Path="Value" RelativeSource="{RelativeSource TemplatedParent}"/>
-                        <Binding Path="(v:InverterDetailsView.UseRunningBackground)" RelativeSource="{RelativeSource TemplatedParent}" />
-                    </MultiBinding>
-                </Border.Background>
-                <Grid RowDefinitions="Auto,Auto,Auto">
-                    <TextBlock Grid.Row="0" FontSize="18" FontWeight="Normal" TextAlignment="Center"
-                               Text="{TemplateBinding Label}"
-                               IsVisible="{Binding Label, RelativeSource={RelativeSource TemplatedParent}, Converter={co:Null2Bool}}" />
-
-                    <TextBlock Grid.Row="1" FontSize="18" FontWeight="Medium" TextAlignment="Center" Margin="0,0,0,2">
-                        <TextBlock.Text>
-                            <MultiBinding Converter="{co:Gauge2Text}">
-                                <Binding RelativeSource="{RelativeSource TemplatedParent}" />
-                                <Binding Path="Value" RelativeSource="{RelativeSource TemplatedParent}" />
-                                <Binding Path="ValueStringFormat" RelativeSource="{RelativeSource TemplatedParent}" />
-                                <Binding Path="UnitName" RelativeSource="{RelativeSource TemplatedParent}" />
-                            </MultiBinding>
-                        </TextBlock.Text>
-                    </TextBlock>
-
-                    <ContentPresenter Grid.Row="2" x:Name="PART_ContentPresenter"
-                                      Content="{TemplateBinding Content}"
-                                      ContentTemplate="{TemplateBinding ContentTemplate}"
-                                      Padding="{TemplateBinding Padding}"
-                                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                      VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
-                </Grid>
-            </Border>
-        </ControlTemplate>
-
-    </ContentPage.Resources>
-
     <Grid RowDefinitions="Auto,*" ColumnDefinitions="Auto,*">
         <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding Gen24System.DisplayName}" TextAlignment="Center" FontSize="18" FontWeight="Medium" Margin="10,10,10,16" TextWrapping="Wrap" />
 
@@ -74,7 +31,7 @@
                     </Style>
                 </StackPanel.Styles>
 
-                <ToggleButton IsChecked="{Binding ShowAll, Mode=TwoWay}" Content="{x:Static p:Resources.ShowAll}" Classes="OnOff Labeled"/>
+                <ToggleButton IsChecked="{Binding ShowAll}" Content="{x:Static p:Resources.ShowAll}" Classes="OnOff Labeled"/>
 
                 <!-- TODO: Style for the reset button required. -->
                 <Button Command="{Binding ResetToDefaultCommand}" Content="{x:Static p:Resources.Reset}"
@@ -83,40 +40,47 @@
                 <Border Height="1" Margin="0,6" Background="{DynamicResource ForegroundBrush}" Opacity=".3" />
 
                 <StackPanel>
-                    <ToggleButton IsChecked="{Binding DcPower, Mode=TwoWay}" Content="{x:Static p:Resources.DcPower}" Classes="OnOff Labeled"/>
-                    <ToggleButton IsChecked="{Binding DcVoltage, Mode=TwoWay}" Content="{x:Static p:Resources.DcVoltage}" Classes="OnOff Labeled"/>
-                    <ToggleButton IsChecked="{Binding DcCurrent, Mode=TwoWay}" Content="{x:Static p:Resources.DcCurrent}" Classes="OnOff Labeled"/>
-                    <ToggleButton IsChecked="{Binding Temperatures, Mode=TwoWay}" Content="{x:Static p:Resources.Temperatures}" Classes="OnOff Labeled"/>
-                    <ToggleButton IsChecked="{Binding Fans, Mode=TwoWay}" Content="{x:Static p:Resources.Fans}" Classes="OnOff Labeled"/>
-                    <ToggleButton IsChecked="{Binding AcPhaseVoltageFeedIn, Mode=TwoWay}" Content="{x:Static p:Resources.AcPhaseVoltageFeedIn}" Classes="OnOff Labeled"/>
-                    <ToggleButton IsChecked="{Binding AcPhaseVoltageInverter, Mode=TwoWay}" Content="{x:Static p:Resources.AcPhaseVoltageInverter}" Classes="OnOff Labeled"/>
-                    <ToggleButton IsChecked="{Binding DeltaAcPhaseVoltageFeedIn, Mode=TwoWay}" Content="{x:Static p:Resources.ΔAcPhaseVoltageFeedIn}" Classes="OnOff Labeled"/>
-                    <ToggleButton IsChecked="{Binding AcLineVoltageFeedIn, Mode=TwoWay}" Content="{x:Static p:Resources.AcLineVoltageFeedIn}" Classes="OnOff Labeled"/>
-                    <ToggleButton IsChecked="{Binding AcLineVoltageInverter, Mode=TwoWay}" Content="{x:Static p:Resources.AcLineVoltageInverter}" Classes="OnOff Labeled"/>
-                    <ToggleButton IsChecked="{Binding DeltaAcLineVoltageFeedIn, Mode=TwoWay}" Content="{x:Static p:Resources.ΔAcLineVoltageFeedIn}" Classes="OnOff Labeled"/>
-                    <ToggleButton IsChecked="{Binding Frequency, Mode=TwoWay}" Content="{x:Static p:Resources.Frequency}" Classes="OnOff Labeled"/>
-                    <ToggleButton IsChecked="{Binding ActivePower, Mode=TwoWay}" Content="{x:Static p:Resources.ActivePower}" Classes="OnOff Labeled"/>
-                    <ToggleButton IsChecked="{Binding ApparentPower, Mode=TwoWay}" Content="{x:Static p:Resources.ApparentPower}" Classes="OnOff Labeled"/>
-                    <ToggleButton IsChecked="{Binding ReactivePower, Mode=TwoWay}" Content="{x:Static p:Resources.ReactivePower}" Classes="OnOff Labeled"/>
-                    <ToggleButton IsChecked="{Binding PowerFactor, Mode=TwoWay}" Content="cos(ϕ)" Classes="OnOff Labeled"/>
-                    <ToggleButton IsChecked="{Binding Efficiency, Mode=TwoWay}" Content="{x:Static p:Resources.Efficiency}" Classes="OnOff Labeled"/>
-                    <ToggleButton IsChecked="{Binding AcCurrent, Mode=TwoWay}" Content="{x:Static p:Resources.AcCurrent}" Classes="OnOff Labeled"/>
-                    <ToggleButton IsChecked="{Binding OutOfBalance, Mode=TwoWay}" Content="{x:Static p:Resources.OutOfBalance}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding DcPower}" Content="{x:Static p:Resources.DcPower}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding DcVoltage}" Content="{x:Static p:Resources.DcVoltage}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding DcCurrent}" Content="{x:Static p:Resources.DcCurrent}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding Temperatures}" Content="{x:Static p:Resources.Temperatures}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding Fans}" Content="{x:Static p:Resources.Fans}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding AcPhaseVoltageFeedIn}" Content="{x:Static p:Resources.AcPhaseVoltageFeedIn}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding AcPhaseVoltageInverter}" Content="{x:Static p:Resources.AcPhaseVoltageInverter}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding DeltaAcPhaseVoltageFeedIn}" Content="{x:Static p:Resources.ΔAcPhaseVoltageFeedIn}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding AcLineVoltageFeedIn}" Content="{x:Static p:Resources.AcLineVoltageFeedIn}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding AcLineVoltageInverter}" Content="{x:Static p:Resources.AcLineVoltageInverter}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding DeltaAcLineVoltageFeedIn}" Content="{x:Static p:Resources.ΔAcLineVoltageFeedIn}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding Frequency}" Content="{x:Static p:Resources.Frequency}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding ActivePower}" Content="{x:Static p:Resources.ActivePower}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding ApparentPower}" Content="{x:Static p:Resources.ApparentPower}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding ReactivePower}" Content="{x:Static p:Resources.ReactivePower}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding PowerFactor}" Content="cos(ϕ)" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding Efficiency}" Content="{x:Static p:Resources.Efficiency}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding AcCurrent}" Content="{x:Static p:Resources.AcCurrent}" Classes="OnOff Labeled"/>
+                    <ToggleButton IsChecked="{Binding OutOfBalance}" Content="{x:Static p:Resources.OutOfBalance}" Classes="OnOff Labeled"/>
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>
 
         <ScrollViewer Grid.Column="1" Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
             <!-- ReSharper disable Xaml.PossibleNullReferenceException -->
-            <WrapPanel Orientation="Horizontal" Margin="10,0,4,0">
+            <WrapPanel Orientation="Horizontal" Margin="10,0,4,0" Classes="GaugeGroups">
                 <WrapPanel.Styles>
                     <Style Selector="c|HalfCircleGauge">
-                        <Setter Property="Width" Value="150" />
-                        <Setter Property="TickFill" Value="{DynamicResource TickFill}" />
-                        <Setter Property="HandFill" Value="{DynamicResource HandFill}" />
                         <Setter Property="v:InverterDetailsView.UseRunningBackground" Value="False"/>
-                        <Setter Property="Template" Value="{StaticResource InverterGauge}" />
-                        <Setter Property="ColorAllTicks" Value="{Binding ColorAllTicks}"></Setter>
+
+                        <!-- The shared DetailsGauge template paints the gauge's Background, so the running state is
+                             decided here instead of inside the template. -->
+                        <Setter Property="Background">
+                            <Setter.Value>
+                                <MultiBinding Converter="{co:InverterBackgroundColor}">
+                                    <Binding Path="Gen24System?.Sensors?.InverterStatus?.StatusCode" />
+                                    <Binding Path="Value" RelativeSource="{RelativeSource Self}" />
+                                    <Binding Path="(v:InverterDetailsView.UseRunningBackground)" RelativeSource="{RelativeSource Self}" />
+                                </MultiBinding>
+                            </Setter.Value>
+                        </Setter>
                     </Style>
                 </WrapPanel.Styles>
 

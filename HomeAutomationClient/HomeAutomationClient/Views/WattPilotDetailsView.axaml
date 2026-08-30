@@ -1,0 +1,157 @@
+<ContentPage xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="De.Hochstaetter.HomeAutomationClient.Views.WattPilotDetailsView"
+             xmlns:vm="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels"
+             xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
+             xmlns:m="clr-namespace:De.Hochstaetter.HomeAutomationClient.Misc"
+             x:DataType="{x:Type vm:WattPilotDetailsViewModel}"
+             >
+    <Grid RowDefinitions="Auto,*">
+        <TextBlock Grid.Row="0" Text="{Binding WattPilot.DisplayName}" TextAlignment="Center" FontSize="18" FontWeight="Medium" Margin="10,10,10,16" TextWrapping="Wrap" />
+
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <!-- ReSharper disable Xaml.PossibleNullReferenceException -->
+            <WrapPanel Orientation="Horizontal" Margin="10,0,4,0" Classes="GaugeGroups">
+                <WrapPanel.Styles>
+                    <Style Selector="c|HalfCircleGauge">
+                        <!-- The shared DetailsGauge template paints the gauge Background, so presence is decided here. -->
+                        <Setter Property="Background" Value="{Binding WattPilot, Converter={co:DeviceBackgroundColor}}" />
+                    </Style>
+                </WrapPanel.Styles>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.Power}">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="UnitName" Value="kW" />
+                                <Setter Property="StringFormat" Value="N3" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.LowIsBad}" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="N" UnitName="W" Maximum="5" StringFormat="N0"
+                                           GaugeColors="{x:Static m:GaugeColors.HighIsBad}"
+                                           Value="{Binding WattPilot.PowerL0}" />
+
+                        <c:HalfCircleGauge Label="L1"
+                                           Maximum="{Binding WattPilot.MaximumChargingPowerPossibleL1, Converter={co:Multiply Factor=.001}, TargetNullValue=7.36, FallbackValue=7.36}"
+                                           Value="{Binding WattPilot.PowerL1KiloWatts}" />
+
+                        <c:HalfCircleGauge Label="L2"
+                                           Maximum="{Binding WattPilot.MaximumChargingPowerPossibleL2, Converter={co:Multiply Factor=.001}, TargetNullValue=7.36, FallbackValue=7.36}"
+                                           Value="{Binding WattPilot.PowerL2KiloWatts}" />
+
+                        <c:HalfCircleGauge Label="L3"
+                                           Maximum="{Binding WattPilot.MaximumChargingPowerPossibleL3, Converter={co:Multiply Factor=.001}, TargetNullValue=7.36, FallbackValue=7.36}"
+                                           Value="{Binding WattPilot.PowerL3KiloWatts}" />
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Sum}"
+                                           Maximum="{Binding WattPilot.MaximumChargingPowerPossibleSum, Converter={co:Multiply Factor=.001}, TargetNullValue=22.08, FallbackValue=22.08}"
+                                           Value="{Binding WattPilot.PowerSumKiloWatts}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.Voltage}">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="UnitName" Value="V" />
+                                <Setter Property="ValueStringFormat" Value="N0" />
+                                <Setter Property="Minimum" Value="207" />
+                                <Setter Property="Maximum" Value="253" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.MidIsGood}" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="N" Minimum="0" Maximum="5"
+                                           GaugeColors="{x:Static m:GaugeColors.HighIsBad}"
+                                           Value="{Binding WattPilot.VoltageL0}" />
+
+                        <c:HalfCircleGauge Label="L1" Value="{Binding WattPilot.VoltageL1}" />
+                        <c:HalfCircleGauge Label="L2" Value="{Binding WattPilot.VoltageL2}" />
+                        <c:HalfCircleGauge Label="L3" Value="{Binding WattPilot.VoltageL3}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.Temperatures}">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="UnitName" Value="°C" />
+                                <Setter Property="Minimum" Value="0" />
+                                <Setter Property="Maximum" Value="90" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.HighIsBad}" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Plug}" Value="{Binding WattPilot.TemperatureConnector}" />
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Board}" Value="{Binding WattPilot.TemperatureBoard}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.Current}">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="UnitName" Value="A" />
+                                <Setter Property="Minimum" Value="0" />
+                                <Setter Property="Maximum" Value="{Binding WattPilot.MaximumChargingCurrentPossiblePerPhase, TargetNullValue=32, FallbackValue=32}" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.LowIsBad}" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="L1" Value="{Binding WattPilot.CurrentL1}" />
+                        <c:HalfCircleGauge Label="L2" Value="{Binding WattPilot.CurrentL2}" />
+                        <c:HalfCircleGauge Label="L3" Value="{Binding WattPilot.CurrentL3}" />
+
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Sum}" Minimum="0"
+                                           Maximum="{Binding WattPilot.MaximumChargingCurrentPossible, TargetNullValue=96, FallbackValue=96}"
+                                           Value="{Binding WattPilot.CurrentSum}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.Wifi}">
+                    <StackPanel Orientation="Horizontal">
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.WifiSignal}" UnitName="dBm"
+                                           ValueStringFormat="N0" Minimum="-90" Maximum="-30"
+                                           GaugeColors="{x:Static m:GaugeColors.LowIsBad}"
+                                           Value="{Binding WattPilot.WifiSignal}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="cos(ϕ)">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Styles>
+                            <Style Selector="c|HalfCircleGauge">
+                                <Setter Property="ValueStringFormat" Value="N2" />
+                                <Setter Property="Minimum" Value="0" />
+                                <Setter Property="Maximum" Value="1" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.LowIsBad}" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <c:HalfCircleGauge Label="N" Value="{Binding WattPilot.PowerFactorL0}" />
+                        <c:HalfCircleGauge Label="L1" Value="{Binding WattPilot.PowerFactorL1}" />
+                        <c:HalfCircleGauge Label="L2" Value="{Binding WattPilot.PowerFactorL2}" />
+                        <c:HalfCircleGauge Label="L3" Value="{Binding WattPilot.PowerFactorL3}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.Frequency}">
+                    <StackPanel Orientation="Horizontal">
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.Grid}" UnitName="Hz"
+                                           ValueStringFormat="N3" Minimum="47" Maximum="53" Origin=".5"
+                                           GaugeColors="{x:Static m:GaugeColors.MidIsGood}"
+                                           Value="{Binding WattPilot.Frequency}" />
+                    </StackPanel>
+                </HeaderedContentControl>
+                <!-- ReSharper restore Xaml.PossibleNullReferenceException -->
+            </WrapPanel>
+        </ScrollViewer>
+    </Grid>
+</ContentPage>

@@ -110,6 +110,23 @@ public class MpptComparison : MultiConverterBase
     }
 }
 
+/// <summary>
+/// Background of a details gauge for devices that have no Gen24 status: the running color while the device is
+/// awake or present, the neutral one while it is asleep or absent. Feed it a <see langword="bool"/> (the battery's
+/// IsAwake) or the device itself (null means absent).
+/// </summary>
+/// <remarks>
+/// The brushes are resolved here instead of via DynamicResource, so the view has to nudge the binding when the
+/// theme changes. See <c>BatteryDetailsView.OnThemeChanged</c>.
+/// </remarks>
+public class DeviceBackgroundColor : ConverterBase
+{
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return Application.Current!.GetSolidColorBrush(value is not (null or false) ? "DeviceOuterBackgroundRunning" : "DeviceInnerBackgroundOther");
+    }
+}
+
 public class InverterBackgroundColor : MultiConverterBase
 {
     public override object? Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)

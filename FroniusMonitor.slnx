@@ -8,8 +8,12 @@
     <File Path="tounix.sh" />
   </Folder>
   <Folder Name="/Solution Items/Memory/">
+    <File Path=".claude/memory/BatteryDetailsView.Lifecycle.md" />
+    <File Path=".claude/memory/HomeAutomationClient.CodeBehindInjection.md" />
     <File Path=".claude/memory/InverterDetailsView.Lifecycle.md" />
+    <File Path=".claude/memory/SmartMeterDetailsView.Lifecycle.md" />
     <File Path=".claude/memory/ViewModelBase.Features.md" />
+    <File Path=".claude/memory/WattPilotDetailsView.Lifecycle.md" />
   </Folder>
   <Folder Name="/Solution Items/Rules/">
     <File Path=".claude/rules/PortingFroniusMonitor.md" />

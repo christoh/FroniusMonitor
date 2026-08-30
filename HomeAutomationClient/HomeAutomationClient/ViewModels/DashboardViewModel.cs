@@ -2,12 +2,14 @@
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 
-public sealed partial class DashboardViewModel(IWebClientService webClient, IUpdateService updateService) : ViewModelBase
+public sealed partial class DashboardViewModel(IWebClientService webClient, IUpdateService updateService, MainViewModel mainViewModel) : ViewModelBase
 {
     public IUpdateService UpdateService => updateService;
 
-    [ObservableProperty]
-    public partial bool ColorAllTicks { get; set; } = true;
+    /// <summary>
+    /// The gauge settings live on the singleton main view model, next to the switch in the main view.
+    /// </summary>
+    public MainViewModel MainViewModel => mainViewModel;
 
     [ObservableProperty]
     public partial HaColor LoadPowerColor { get; set; } = 0xff807000;

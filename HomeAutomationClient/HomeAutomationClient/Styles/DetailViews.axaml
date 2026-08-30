@@ -1,0 +1,31 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+        xmlns:v="clr-namespace:De.Hochstaetter.HomeAutomationClient.Views"
+        xmlns:vm="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels">
+
+    <!--
+    Styles for the gauge area of the detail views (inverter, battery, smart meter, WattPilot). A view opts in by
+    putting Classes="GaugeGroups" on the WrapPanel that holds its groups, so nothing here leaks into other views
+    and the values are defined once instead of in every detail view.
+    -->
+    <Style Selector="WrapPanel.GaugeGroups > HeaderedContentControl">
+        <Setter Property="Margin" Value="4,2" />
+    </Style>
+
+    <!--
+    Everything the gauges of all four detail views have in common. What is left per view is the Background, which
+    says whether the device is running and is the only thing the DetailsGauge template does not know by itself.
+    ColorAllTicks belongs to the singleton MainViewModel, because its switch sits in the main view. The gauges read
+    it from there directly, which keeps this a compiled binding and spares every detail view model a copy of it.
+    The `?.` is only there to satisfy ReSharper, which sees DataContext as nullable. MainView always has its view
+    model, and a binding whose source is null would simply not produce a value, so nothing depends on it.
+    -->
+    <Style Selector="WrapPanel.GaugeGroups c|HalfCircleGauge">
+        <Setter Property="Width" Value="150" />
+        <Setter Property="TickFill" Value="{DynamicResource TickFill}" />
+        <Setter Property="HandFill" Value="{DynamicResource HandFill}" />
+        <Setter Property="Template" Value="{DynamicResource DetailsGauge}" />
+        <Setter Property="ColorAllTicks" Value="{Binding $parent[v:MainView].((vm:MainViewModel)DataContext)?.ColorAllTicks}" />
+    </Style>
+</Styles>

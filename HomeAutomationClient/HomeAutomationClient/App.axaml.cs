@@ -27,6 +27,12 @@ public partial class App : Application
             .AddSingleton<DashboardViewModel>()
             .AddSingleton<InverterDetailsView>()
             .AddSingleton<InverterDetailsViewModel>()
+            .AddSingleton<BatteryDetailsView>()
+            .AddSingleton<BatteryDetailsViewModel>()
+            .AddSingleton<SmartMeterDetailsView>()
+            .AddSingleton<SmartMeterDetailsViewModel>()
+            .AddSingleton<WattPilotDetailsView>()
+            .AddSingleton<WattPilotDetailsViewModel>()
 
             .AddTransient<HomeAutomationServerConnection>()
 

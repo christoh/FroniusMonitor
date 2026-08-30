@@ -15,7 +15,7 @@
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="650"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.MainView"
              x:DataType="vm:MainViewModel">
-    <Grid RowDefinitions="Auto,*">
+    <Grid RowDefinitions="Auto,*,Auto">
         <Grid Grid.Row="0" Background="{DynamicResource MenuBackground}" IsVisible="{Binding IsReady}">
             <StackPanel Orientation="Horizontal">
                 <StackPanel.Resources>
@@ -51,6 +51,13 @@
             </StackPanel>
         </Grid>
         <UserControl Grid.Row="1" Content="{Binding MainViewContent}" IsEnabled="{Binding IsDialogVisible, Converter={co:BoolInverter}}"/>
+
+        <!-- Applies to the gauges of every view, so it lives here and not in one of them. -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="16,8" IsVisible="{Binding IsReady}"
+                    IsEnabled="{Binding IsDialogVisible, Converter={co:BoolInverter}}">
+            <TextBlock Text="{x:Static p:Resources.ColorAllGaugeTicks}" Margin="0,0,8,0" VerticalAlignment="Center" />
+            <ToggleButton Classes="OnOff" Height="16" VerticalAlignment="Center" IsChecked="{Binding ColorAllTicks}" />
+        </StackPanel>
         <c:BusyAnimation BusyText="{Binding BusyText}" Grid.Row="1"/>
         <Grid Grid.Row="1" Background="{DynamicResource DisableBrush}" x:Name="DialogOverlay" IsVisible="{Binding IsDialogVisible}">
             <Grid RowDefinitions="Auto,*" Background="White" HorizontalAlignment="Center" VerticalAlignment="Center">
