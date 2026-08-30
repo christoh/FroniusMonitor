@@ -13,28 +13,56 @@ public partial class App : Application
     }
 
     /// <summary>
-    /// The platform heads detect the accent color of the operating system before Avalonia starts, because most of
-    /// them need APIs that Avalonia does not expose. Where a head found none, the SystemAccentColor of the Fluent
-    /// theme applies, which is the accent color of the OS on Windows and a fixed blue everywhere else.
+    /// The six shades that Fluent paints the pointer-over, pressed and disabled states of every accented control
+    /// with. Windows delivers them together with the accent color and Avalonia passes them on; where we bring our
+    /// own accent color, we have to build them.
     /// </summary>
+    /// <remarks>
+    /// The factors are the ones Windows itself applies, read off its palette for the accent color #FFDA3B01:
+    /// a lighter shade raises the value to its maximum and takes the saturation down, a darker one scales the
+    /// value down and keeps the saturation. They reproduce that palette to about one step of 255. Scaling rather
+    /// than subtracting matters: a dark accent color would run into black otherwise.
+    /// </remarks>
+    private static readonly (string Key, double ValueFactor, double SaturationFactor)[] accentShades =
+    [
+        ("SystemAccentColorLight1", 1.165, 0.835),
+        ("SystemAccentColorLight2", 1.165, 0.589),
+        ("SystemAccentColorLight3", 1.165, 0.335),
+        ("SystemAccentColorDark1", 0.7385, 1),
+        ("SystemAccentColorDark2", 0.5505, 1),
+        ("SystemAccentColorDark3", 0.3211, 1),
+    ];
+
+    /// <summary>
+    /// Replaces the accent palette of the Fluent theme with the accent color of the OS, where the platform head
+    /// could detect one. It is the whole palette and not a brush of our own, because the theme paints far more
+    /// with it than our dialog title bar: the thumb of a slider, a check box, a focus rectangle, a progress bar.
+    /// </summary>
+    /// <remarks>
+    /// Where a head detected nothing, we deliberately touch nothing. On Windows Avalonia fills the palette from
+    /// the OS itself, including the six shades, and keeps it up to date while the app runs - an override here
+    /// would freeze the accent color at the value it had when the app started.
+    /// </remarks>
     private void SetAccentColor()
     {
-        Color? accentColor = null;
-
-        if (PlatformStartup.AccentColor is { } platformColor)
+        if (PlatformStartup.AccentColor is not { } platformColor)
         {
-            accentColor = Color.FromArgb(platformColor.A, platformColor.R, platformColor.G, platformColor.B);
-        }
-        else if (this.TryFindResource("SystemAccentColor", ActualThemeVariant, out var systemAccent) && systemAccent is Color systemAccentColor)
-        {
-            accentColor = systemAccentColor;
+            return;
         }
 
-        if (accentColor is { } color)
+        var accentColor = Color.FromArgb(platformColor.A, platformColor.R, platformColor.G, platformColor.B);
+        Resources["SystemAccentColor"] = accentColor;
+
+        foreach (var (key, valueFactor, saturationFactor) in accentShades)
         {
-            Resources["AppAccentColor"] = color;
-            Resources["AppAccentBrush"] = new SolidColorBrush(color);
+            Resources[key] = Shade(accentColor, valueFactor, saturationFactor);
         }
+    }
+
+    private static Color Shade(Color accentColor, double valueFactor, double saturationFactor)
+    {
+        var hsv = accentColor.ToHsv();
+        return new HsvColor(hsv.A, hsv.H, Math.Clamp(hsv.S * saturationFactor, 0, 1), Math.Clamp(hsv.V * valueFactor, 0, 1)).ToRgb();
     }
 
     public override void OnFrameworkInitializationCompleted()

@@ -137,12 +137,6 @@
                 </ResourceDictionary>
 			</ResourceDictionary.ThemeDictionaries>
 
-			<!-- The accent color of the operating system. App replaces it with the color that the platform head
-			     detected, and falls back to the SystemAccentColor of the Fluent theme where there is none. What
-			     stands here only applies if both are unavailable, for instance in the XAML designer. -->
-			<Color x:Key="AppAccentColor">#FF0078D4</Color>
-			<SolidColorBrush x:Key="AppAccentBrush" Color="{DynamicResource AppAccentColor}"/>
-
 			<ResourceDictionary.MergedDictionaries>
 				<MergeResourceInclude Source="Assets/LoadingIndicators.Avalonia/LoadingIndicators.axaml"/>
 				<MergeResourceInclude Source="Styles/Gauges.axaml"/>

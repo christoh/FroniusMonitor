@@ -129,4 +129,4 @@ initializer inside `ShowDialogAsync`, `Initialize` starts before the dialog is o
 - No keyboard handling in the host: no Escape to abort. `LoginView` handles `Enter` in its own code behind and is
   the only dialog that reacts to a key at all.
 - Nothing takes focus when a dialog opens.
-- The title bar always uses `AppAccentBrush` and the dialog `DialogBackground`; a dialog cannot theme itself.
+- The title bar always uses `SystemControlBackgroundAccentBrush` and the dialog `DialogBackground`; a dialog cannot theme itself.

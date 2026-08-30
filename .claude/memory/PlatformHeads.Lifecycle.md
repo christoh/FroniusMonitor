@@ -68,10 +68,21 @@ because the trim analyzer does not look into a referenced project.
 
 ## What a head may provide: the accent color
 
-`PlatformStartup.AccentColor` is a nullable `HaColor`. `App.SetAccentColor()` turns it into two resources,
-`AppAccentColor` and `AppAccentBrush`, which the dialog title bar and the busy animation use. Null is normal, not
-an error: the fallback is the `SystemAccentColor` of the Fluent theme, looked up with `TryFindResource` against
-`ActualThemeVariant`. `App.axaml` declares a literal for both keys as a last resort for the designer.
+`PlatformStartup.AccentColor` is a nullable `HaColor`. Where a head detected one, `App.SetAccentColor()` writes
+it into the accent palette of the Fluent theme: `SystemAccentColor` plus the six shades `SystemAccentColorLight1`
+to `Light3` and `Dark1` to `Dark3`. It is the palette and not a brush of our own, because the theme paints far
+more with it than the dialog title bar - the thumb of a slider, a check box, a focus rectangle. Verified: an
+app level override of those keys re-resolves `SystemControlBackgroundAccentBrush` and
+`SystemControlHighlightAccentBrush` immediately.
+
+Windows delivers the six shades with the accent color and Avalonia passes them on; where we bring our own color
+we derive them in HSV, with factors read off the Windows palette (see `accentShades` in `App.axaml.cs`). They
+reproduce it to about one step of 255, and they scale rather than subtract, so a dark accent color does not run
+into black.
+
+**Where a head detected nothing, nothing is touched.** That is deliberate: on Windows Avalonia fills the palette
+from the OS and keeps it up to date while the app runs, so an override would freeze the accent color at what it
+was when the app started.
 
 - **Desktop** supplies nothing. On Windows the fallback already is the accent color of the OS, because Avalonia
   reads it. macOS keeps its in `NSColor.controlAccentColor`, out of reach for a plain .NET app, and Linux has
