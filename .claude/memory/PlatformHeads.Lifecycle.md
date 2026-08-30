@@ -9,6 +9,9 @@ paths:
   - HomeAutomationClient/HomeAutomationClient.Browser/**
   - HomeAutomationClient/HomeAutomationClient.Android/**
   - HomeAutomationClient/HomeAutomationClient.iOS/**
+  - Fronius/Localization/**
+  - HomeAutomationServer/Program.cs
+  - FroniusMonitor/ViewModels/SettingsViewModel.cs
 ---
 
 # Lifecycle contract: the platform heads
@@ -23,7 +26,8 @@ answer travels.
    (`AndroidApp`) and iOS (`AppDelegate`). Here the head
    - creates `App.ServiceCollection` and registers its `ICache`,
    - optionally sets `PlatformStartup.AccentColor`,
-   - the browser head additionally seeds `CacheKeys.ApiUri` and `CacheKeys.HubUri`.
+   - the browser head additionally seeds `CacheKeys.ApiUri` and `CacheKeys.HubUri`, and downloads the satellite
+     assemblies for the language of the user - both before Avalonia starts.
 2. **`AppBuilder`** with the head's font and platform options.
 3. **`App.Initialize`** loads `App.axaml`.
 4. **`App.OnFrameworkInitializationCompleted`** calls `SetAccentColor()`, builds the service provider, hands it to
@@ -98,6 +102,64 @@ was when the app started.
   the app theme before that. Compile verified only.
 - **iOS** supplies nothing: iOS has no accent color of the OS, what looks like one is the tint color of the app.
 
+## What the browser head must do alone: the translations
+
+Every other head carries its satellite assemblies in the app package. The browser downloads them, so it decides
+which ones a visitor pays for. `Program.LoadSatelliteAssembliesForBrowserLanguageAsync` asks `wwwroot/culture.js`
+for `navigator.languages` and hands the answer to `Program.GetSatelliteCultures`, which walks that list **in the
+order the user put it in** and stops at the first language we can serve:
+
+| The user asks for | We load | Because |
+|---|---|---|
+| a culture we have (`de-CH`) | that one **and its neutral** (`de-CH`, `de`) | .NET falls back `de-CH` → `de` → neutral, so a string only `de` translates would turn English |
+| a culture we only have neutral (`it-IT`) | the neutral one (`it`) | |
+| English in any form (`en-GB`) | nothing | English **is** the neutral culture, so the user is already served |
+| nothing we have (`xx`) | nothing, and the walk continues | the next language of the list gets its turn |
+| nothing at all | nothing | the user sees the neutral culture |
+
+**The cultures we can serve come from the build, not from a list in the code**, through
+`culture.js/getSupportedCultures`, which reads the keys of `resources.satelliteResources` from the runtime
+config. Two reasons, and the second one bites:
+
+- A hand-kept list drifts from the `.resx` files in `Fronius/Localization`.
+- **The loader of the runtime matches the cultures we pass with `===`**, and the build spells them exactly like
+  the `.resx` files - `Resources.de-ch.resx` becomes the culture `de-ch`, in lower case. A list of our own said
+  `de-CH`, so the loader dropped it without a word and the Swiss German translation was never downloaded, from
+  the first version of this code until it was measured. Passing the keys of the build back to the loader cannot
+  get that wrong. **Do not "tidy" the casing of a culture anywhere in this path.**
+
+Matching a browser language against those keys stays case-insensitive - the browser says `de-CH`, the build says
+`de-ch`, and what we hand to the loader is always the spelling of the build.
+
+**`CurrentUICulture` is set to the culture we loaded.** The runtime derives it from the *first* language of the
+browser, so for `["pt-BR", "de-DE"]` it would be `pt-BR`, the resource lookup would land on the neutral culture
+and the German we just downloaded would never be read. `CurrentCulture` stays untouched: numbers and dates follow
+the region of the user, not our choice of translation.
+
+The module is imported as `JSHost.ImportAsync("culture", "../culture.js")`. **The path is relative to the .NET
+runtime in `_framework`, not to the document** - `./culture.js` does not resolve. Failure is caught and logged to
+the browser console; the user then gets the neutral culture instead of a broken start.
+
+The same inventory serves the other projects, through `SupportedCultures` in `Fronius/Localization`: it reports
+the satellite assemblies next to `Fronius.dll` and their neutral culture. `HomeAutomationServer` builds its
+request localization from it and `FroniusMonitor` its language chooser, so a new `.resx` reaches all of them
+without an edit. Only the browser cannot use it - a satellite in WebAssembly is a download, not a file next to an
+assembly - which is why it asks the runtime config instead. Both answer the same question from what the build
+produced, neither from a list somebody has to remember.
+
+### Not every German word comes from our .resx files
+
+Some of what the user reads is the wording of the **inverter**, not ours. `Gen24Service` downloads the language
+files of the Gen24 (`<inverter>/…/<language>.json`) and localizes channel, status and configuration names with
+them, deliberately: a setting has to read the same in our app as in the web interface of the inverter, and the
+inverter is the authority on its own vocabulary. Consequences to keep in mind:
+
+- The inverter decides which languages exist there, not us. `Gen24Service` maps our culture onto one of them -
+  `gsw` asks for `de`, and `en` means "take the invariant file" rather than a localized one.
+- A language we add to `Fronius/Localization` does **not** localize those names. If the inverter has no file for
+  it, the mapping in `Gen24Service` needs a decision: which of the inverter's languages comes closest.
+- Wording of a channel that looks wrong is a question for the inverter's language file first, not for our `.resx`.
+
 ## Verified, so you do not have to measure again
 
 - Windows fills the palette with the real accent color (`#ffda3b01` on the machine where this was written) and
@@ -106,6 +168,18 @@ was when the app started.
 - Chromium gives a page a constant instead of the accent color of the OS; see the browser entry above. The
   `[JSImport]` route itself worked - it delivered `#ff0075ff` from the browser into a parsed `HaColor` - so if a
   head ever needs a color from JavaScript, that path is proven.
+- The culture selection, measured in a browser: `de-CH, de-DE, en-US, en` gives `de-ch` and `de`; `it-IT` gives
+  `it`; `de-DE, de` gives `de`; `pt-BR, de-DE` gives `de`; `gsw-CH` gives `gsw`; `DE-ch` gives `de-ch` and `de`;
+  `en-US, en` and `xx` give nothing.
+- The loader takes what it is given case-sensitively: asked for `["de-CH", "de-li", "fr"]` it loaded `de-li` and
+  `fr` and ignored `de-CH`. Asked with the spelling of the build it loads `de-ch` and `de` together.
+- The satellite the app downloads is the right one: with the browser asking for `it-CH`, exactly one
+  `Fronius.resources.*.wasm` was fetched, and `resources.satelliteResources` maps that file to the culture `it`.
+  The user confirmed the app then displays Italian.
+- Measuring which files were fetched with `performance.getEntriesByType("resource")` is unreliable here: the
+  buffer holds 250 entries and this app loads more. Read the state of the entries in
+  `resources.satelliteResources` instead - the loader stamps `behavior: "resource"` and the culture on the ones
+  it took.
 - Desktop, Browser, Android and iOS all compile in Debug and Release. iOS compiles on Windows, but has never been
   linked for a device and never been run.
 

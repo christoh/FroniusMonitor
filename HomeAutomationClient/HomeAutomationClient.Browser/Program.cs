@@ -6,6 +6,7 @@ using System.Runtime.InteropServices.JavaScript;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Browser;
+using De.Hochstaetter.Fronius.Localization;
 using De.Hochstaetter.HomeAutomationClient.Browser.Platform;
 using De.Hochstaetter.HomeAutomationClient.Misc;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,24 +15,16 @@ namespace De.Hochstaetter.HomeAutomationClient.Browser;
 
 internal sealed partial class Program
 {
-    /// <summary>
-    /// The cultures we ship a satellite assembly for. Add a culture here when Fronius gets its .resx files, or
-    /// its translation is downloaded by nobody.
-    /// </summary>
-    private static readonly string[] supportedCultures = ["de", "de-CH", "de-LI", "gsw", "fr", "it", "rm"];
-
-    /// <summary>
-    /// The language of the neutral culture. A user who asks for it is served without a satellite assembly, so we
-    /// must not hand them a later language of their list instead.
-    /// </summary>
-    private const string NeutralLanguage = "en";
-
     [JSImport("INTERNAL.loadSatelliteAssemblies")]
     public static partial Task LoadSatelliteAssemblies(string[] culturesToLoad);
 
     [JSImport("getUserLanguages", "culture")]
     [return: JSMarshalAs<JSType.Array<JSType.String>>]
     private static partial string[] GetUserLanguages();
+
+    [JSImport("getSupportedCultures", "culture")]
+    [return: JSMarshalAs<JSType.Array<JSType.String>>]
+    private static partial string[] GetSupportedCultures();
 
     private static async Task Main(string[] args)
     {
@@ -68,7 +61,7 @@ internal sealed partial class Program
         {
             // The module URL is resolved relative to the .NET runtime in _framework, not to the document.
             await JSHost.ImportAsync("culture", "../culture.js");
-            cultures = GetSatelliteCultures(GetUserLanguages());
+            cultures = GetSatelliteCultures(GetUserLanguages(), GetSupportedCultures());
         }
         catch (Exception exception)
         {
@@ -97,7 +90,7 @@ internal sealed partial class Program
     /// specific form falls back to the neutral one ("it-IT" gets "it"). Where we have nothing to offer at all,
     /// the result is empty and the user sees the neutral culture rather than a language nobody asked for.
     /// </summary>
-    internal static string[] GetSatelliteCultures(IEnumerable<string> browserLanguages)
+    internal static string[] GetSatelliteCultures(IEnumerable<string> browserLanguages, IReadOnlyCollection<string> supportedCultures)
     {
         foreach (var language in browserLanguages)
         {
@@ -106,14 +99,14 @@ internal sealed partial class Program
                 return [];
             }
 
-            if (Supported(language) is { } culture)
+            if (Supported(language, supportedCultures) is { } culture)
             {
                 // A specific culture needs its neutral one as well: .NET falls back from de-CH to de and only
                 // then to the neutral culture, so a string that de-CH does not translate would turn English.
-                return NeutralOf(culture) is { } parent && Supported(parent) is { } neutral ? [culture, neutral] : [culture];
+                return NeutralOf(culture) is { } parent && Supported(parent, supportedCultures) is { } neutral ? [culture, neutral] : [culture];
             }
 
-            if (NeutralOf(language) is { } languageParent && Supported(languageParent) is { } neutralCulture)
+            if (NeutralOf(language) is { } languageParent && Supported(languageParent, supportedCultures) is { } neutralCulture)
             {
                 return [neutralCulture];
             }
@@ -122,9 +115,13 @@ internal sealed partial class Program
         return [];
     }
 
-    private static bool IsNeutral(string language) => string.Equals(language, NeutralLanguage, StringComparison.OrdinalIgnoreCase) || string.Equals(NeutralOf(language), NeutralLanguage, StringComparison.OrdinalIgnoreCase);
+    private static bool IsNeutral(string language) => string.Equals(language, SupportedCultures.NeutralLanguage, StringComparison.OrdinalIgnoreCase) || string.Equals(NeutralOf(language), SupportedCultures.NeutralLanguage, StringComparison.OrdinalIgnoreCase);
 
-    private static string? Supported(string culture) => supportedCultures.FirstOrDefault(supported => string.Equals(supported, culture, StringComparison.OrdinalIgnoreCase));
+    /// <summary>
+    /// The culture as the build spells it, or null where it ships no translation for it. The spelling matters:
+    /// the loader of the runtime matches its argument against the cultures of the build with ===.
+    /// </summary>
+    private static string? Supported(string culture, IReadOnlyCollection<string> supportedCultures) => supportedCultures.FirstOrDefault(supported => string.Equals(supported, culture, StringComparison.OrdinalIgnoreCase));
 
     private static string? NeutralOf(string culture) => culture.IndexOf('-') is var dash and > 0 ? culture[..dash] : null;
 

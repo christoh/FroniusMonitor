@@ -73,17 +73,14 @@ public partial class SettingsViewModel(
     [ObservableProperty]
     public partial Settings Settings { get; set; } = null!;
 
+    /// <summary>
+    /// Windows first, then every language the build has a translation for. The list comes from the satellite
+    /// assemblies of Fronius, so a new Resources.&lt;culture&gt;.resx shows up here without anybody adding it.
+    /// </summary>
     public IEnumerable<ListItemModel<string?>> Cultures { get; } =
     [
         new() { DisplayName = Loc.MatchWindowsLanguage, Value = null },
-        new() { DisplayName = GetCultureName("en"), Value = "en" },
-        new() { DisplayName = GetCultureName("fr"), Value = "fr" },
-        new() { DisplayName = GetCultureName("it"), Value = "it" },
-        new() { DisplayName = GetCultureName("rm"), Value = "rm" },
-        new() { DisplayName = GetCultureName("de"), Value = "de" },
-        new() { DisplayName = GetCultureName("de-CH"), Value = "de-CH" },
-        new() { DisplayName = GetCultureName("de-LI"), Value = "de-LI" },
-        new() { DisplayName = GetCultureName("gsw"), Value = "gsw" },
+        ..SupportedCultures.All.Select(culture => new ListItemModel<string?> { DisplayName = GetCultureName(culture), Value = culture.Name }),
     ];
 
     [ObservableProperty]
@@ -230,10 +227,8 @@ public partial class SettingsViewModel(
         Settings.CustomSolarPanelLayout = dialog.FileName;
     }
 
-    private static string GetCultureName(string id)
+    private static string GetCultureName(CultureInfo culture)
     {
-        var culture = new CultureInfo(id);
-
         var set = new HashSet<string>
         {
             culture.NativeName,

@@ -107,10 +107,8 @@ internal class Program
             })
             ;
 
-        var supportedCultures = new List<CultureInfo>
-        {
-            CultureInfo.InvariantCulture, new("de"), new("de-CH"), new("de-LI"),
-        };
+        // The satellite assemblies of Fronius are the list of languages; nothing is enumerated by hand here.
+        List<CultureInfo> supportedCultures = [CultureInfo.InvariantCulture, ..SupportedCultures.Satellites];
 
         if (settings != null)
         {
