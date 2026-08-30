@@ -9,8 +9,10 @@
   </Folder>
   <Folder Name="/Solution Items/Memory/">
     <File Path=".claude/memory/BatteryDetailsView.Lifecycle.md" />
+    <File Path=".claude/memory/DialogSystem.Lifecycle.md" />
     <File Path=".claude/memory/HomeAutomationClient.CodeBehindInjection.md" />
     <File Path=".claude/memory/InverterDetailsView.Lifecycle.md" />
+    <File Path=".claude/memory/PlatformHeads.Lifecycle.md" />
     <File Path=".claude/memory/SmartMeterDetailsView.Lifecycle.md" />
     <File Path=".claude/memory/ViewModelBase.Features.md" />
     <File Path=".claude/memory/WattPilotDetailsView.Lifecycle.md" />
