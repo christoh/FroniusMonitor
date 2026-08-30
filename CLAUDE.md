@@ -28,6 +28,16 @@ text to English.
 ## Logging
 * Guard logging with `if (Logger.IsEnabled(LogLevel.Debug))` or the appropriate log level. This is important to avoid unnecessary string formatting and performance overhead when the log level is not enabled.
 
+## Copy & paste
+* Copy & paste is an anti pattern. Before you duplicate something, spend the effort to put the common part in one
+  place: a base class, a method, a generic type, an extension method, a converter.
+* The same applies to XAML. Repeated markup belongs in a `Style`, a `ControlTheme`, a `ControlTemplate`, a
+  `DataTemplate` or a control of its own, never in a second copy.
+* This also applies to code you did not write. If you come across duplicates while reviewing or editing, say so
+  and offer to merge them, even when the duplication was there long before your change.
+* The exception is code that only looks alike and is expected to evolve apart. Merging that couples two things
+  that have nothing to do with each other. Say why when you leave such a duplicate in place.
+
 # Building
 * Every project sets `<Configuration>Release</Configuration>`, so a plain `dotnet build` or `dotnet run` builds
   Release, which is noticeably slower. Add `-c Debug` whenever the build output itself does not have to be a
