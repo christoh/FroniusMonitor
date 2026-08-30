@@ -1,4 +1,5 @@
 using De.Hochstaetter.HomeAutomationClient.Services;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using InverterDetailsView = De.Hochstaetter.HomeAutomationClient.Views.InverterDetailsView;
 
 namespace De.Hochstaetter.HomeAutomationClient;
@@ -70,6 +71,9 @@ public partial class App : Application
         SetAccentColor();
 
         ServiceCollection ??= new ServiceCollection();
+
+        // Only the browser head brings an address bar of its own; everywhere else the addresses are collected.
+        ServiceCollection.TryAddSingleton<IUriService, FakeUriService>();
 
         ServiceCollection
             .AddSingleton<MainView>()

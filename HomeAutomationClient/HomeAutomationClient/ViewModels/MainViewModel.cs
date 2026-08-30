@@ -11,13 +11,15 @@ namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 public sealed partial class MainViewModel : ViewModelBase
 {
     private readonly IGen24LocalizationService gen24Loc;
+    private readonly IUriService uriService;
 
     public IUpdateService UpdateService { get; }
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    public MainViewModel(IWebClientService webClient, IGen24LocalizationService gen24Loc, IUpdateService updateService)
+    public MainViewModel(IWebClientService webClient, IGen24LocalizationService gen24Loc, IUpdateService updateService, IUriService uriService)
     {
         this.gen24Loc = gen24Loc;
+        this.uriService = uriService;
         UpdateService = updateService;
         ApiUri = IoC.TryGetRegistered<ICache>()?.Get<string>(CacheKeys.ApiUri) ?? "https://home-automation.example.com";
         webClient.Initialize(ApiUri, "hacc", "0.5.0.0");
@@ -90,7 +92,19 @@ public sealed partial class MainViewModel : ViewModelBase
             BusyText = Loc.ConnectingToHas;
             await UpdateService.StartAsync().ConfigureAwait(false);
             IsReady = true;
-            await Dispatcher.UIThread.InvokeAsync(() => MainViewContent = IoC.Get<DashboardView>());
+
+            await Dispatcher.UIThread.InvokeAsync(async () =>
+            {
+                // A link into a detail view survives the login: the address the app was started with is only
+                // resolved now, because the devices of the installation are known only now.
+                if (ViewPath.Find(UpdateService.DetailDevices, uriService.StartupPath) is { } device)
+                {
+                    await ShowDetails(device).ConfigureAwait(true);
+                    return;
+                }
+
+                ShowDashboardView();
+            });
         }
         catch (Exception ex)
         {
@@ -106,6 +120,8 @@ public sealed partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private async Task ShowDetails(IKeyedDevice device)
     {
+        var isShown = true;
+
         switch (device.Device)
         {
             case Gen24System gen24System:
@@ -136,6 +152,8 @@ public sealed partial class MainViewModel : ViewModelBase
                 break;
 
             default:
+                isShown = false;
+
                 await new MessageBox
                 {
                     Text = $"Details view for device type {device.Device.GetType().Name} is not implemented.",
@@ -145,6 +163,21 @@ public sealed partial class MainViewModel : ViewModelBase
 
                 break;
         }
+
+        if (isShown)
+        {
+            uriService.SetPath(ViewPath.For(device.Device));
+        }
+    }
+
+    /// <summary>
+    /// Shows the dashboard and makes it the address of the app. The dashboard is the root, so this is where a
+    /// link without a path leads.
+    /// </summary>
+    private void ShowDashboardView()
+    {
+        MainViewContent = IoC.Get<DashboardView>();
+        uriService.SetPath(ViewPath.Dashboard);
     }
 
     [RelayCommand]
@@ -154,9 +187,8 @@ public sealed partial class MainViewModel : ViewModelBase
         {
             BusyText = "Loading dashboard";
             await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
-            var dashboardView = IoC.Get<DashboardView>();
             await Task.Delay(100).ConfigureAwait(false);
-            MainViewContent = dashboardView;
+            ShowDashboardView();
         }
         finally
         {

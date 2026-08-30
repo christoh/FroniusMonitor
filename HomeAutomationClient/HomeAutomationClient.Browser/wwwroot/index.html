@@ -3,6 +3,9 @@
 
 <head>
     <title>Home Automation Control Center</title>
+    <!-- Every asset is loaded relative to the root: the app has addresses like /inverterdetails/Fronius/1234,
+         and without this a link to one of them would look for main.js and _framework next to that path. -->
+    <base href="/" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./app.css" />

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Browser;
 using De.Hochstaetter.Fronius.Localization;
+using De.Hochstaetter.HomeAutomationClient.Contracts;
 using De.Hochstaetter.HomeAutomationClient.Browser.Platform;
 using De.Hochstaetter.HomeAutomationClient.Misc;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,6 +39,7 @@ internal sealed partial class Program
         #endif
         App.ServiceCollection = new ServiceCollection();
         App.ServiceCollection.AddSingleton<ICache>(cache);
+        App.ServiceCollection.AddSingleton<IUriService>(await UriService.CreateAsync());
 
         // PlatformStartup.AccentColor stays null here, so the app keeps the accent color of the Fluent theme,
         // which is what Avalonia gives the browser anyway. A browser never hands the accent color of the OS to a
