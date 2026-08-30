@@ -17,7 +17,21 @@ public sealed partial class UriService : IUriService
     [JSImport("pushPath", "uri")]
     private static partial void PushPath(string path);
 
-    private UriService(string startupPath) => StartupPath = startupPath;
+    [JSImport("onPathChanged", "uri")]
+    private static partial void OnPathChanged([JSMarshalAs<JSType.Function<JSType.String>>] Action<string> handler);
+
+    /// <summary>
+    /// Held for as long as this service lives: it is the delegate the browser calls on back and forward.
+    /// </summary>
+    private readonly Action<string> pathChangedHandler;
+
+    private UriService(string startupPath)
+    {
+        StartupPath = startupPath;
+        pathChangedHandler = path => PathChanged?.Invoke(this, path);
+    }
+
+    public event EventHandler<string>? PathChanged;
 
     public string StartupPath { get; }
 
@@ -31,7 +45,9 @@ public sealed partial class UriService : IUriService
         {
             // The module URL is resolved relative to the .NET runtime in _framework, not to the document.
             await JSHost.ImportAsync("uri", "../uri.js");
-            return new UriService(GetPath());
+            var uriService = new UriService(GetPath());
+            OnPathChanged(uriService.pathChangedHandler);
+            return uriService;
         }
         catch (Exception exception)
         {

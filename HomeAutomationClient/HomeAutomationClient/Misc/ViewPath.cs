@@ -1,4 +1,4 @@
-using De.Hochstaetter.Fronius.Models.Charging;
+﻿using De.Hochstaetter.Fronius.Models.Charging;
 
 namespace De.Hochstaetter.HomeAutomationClient.Misc;
 

@@ -12,3 +12,10 @@ export function getPath() {
 export function pushPath(path) {
     globalThis.history.pushState(null, '', path);
 }
+
+// Calls handler with the new path whenever the user presses back or forward within the app. Only entries of
+// this document arrive here: leaving for another site is a real navigation, the browser handles it alone and
+// this page is gone.
+export function onPathChanged(handler) {
+    globalThis.addEventListener('popstate', () => handler(globalThis.location.pathname));
+}

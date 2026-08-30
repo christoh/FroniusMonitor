@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 
 namespace De.Hochstaetter.HomeAutomationClient.Services;
 
@@ -14,6 +14,16 @@ public sealed class FakeUriService : IUriService
     /// "/inverterdetails/Fronius/12345678". The current one is the last entry.
     /// </summary>
     public ObservableCollection<string> Uris { get; } = [];
+
+    /// <summary>
+    /// Never raised: these heads have no back button of a browser, so a subscription is dropped on purpose
+    /// rather than kept for an event that will not come. Give it a body once they get a back button.
+    /// </summary>
+    public event EventHandler<string>? PathChanged
+    {
+        add { }
+        remove { }
+    }
 
     /// <summary>
     /// There is no address to start from outside the browser, so the app opens where it always did.

@@ -34,8 +34,11 @@ internal sealed partial class Program
         await cache.AddOrUpdateAsync(CacheKeys.ApiUri, "https://home.hochstaetter.de/api/");
         await cache.AddOrUpdateAsync(CacheKeys.HubUri, "https://home.hochstaetter.de/hub");
         #else
-        await cache.AddOrUpdateAsync(CacheKeys.ApiUri, args[0] + (args[0].EndsWith('/') ? string.Empty : "/") + "api/");
-        await cache.AddOrUpdateAsync(CacheKeys.HubUri, args[0] + (args[0].EndsWith('/') ? string.Empty : "/") + "hub");
+        // args[0] is the base address of the app, and document.baseURI always ends with a slash. Anything else
+        // would make Uri resolve api/ and hub against the parent of the last segment.
+        var appRoot = new Uri(args[0].EndsWith('/') ? args[0] : args[0] + "/");
+        await cache.AddOrUpdateAsync(CacheKeys.ApiUri, new Uri(appRoot, "api/").ToString());
+        await cache.AddOrUpdateAsync(CacheKeys.HubUri, new Uri(appRoot, "hub").ToString());
         #endif
         App.ServiceCollection = new ServiceCollection();
         App.ServiceCollection.AddSingleton<ICache>(cache);

@@ -20,6 +20,7 @@ public sealed partial class MainViewModel : ViewModelBase
     {
         this.gen24Loc = gen24Loc;
         this.uriService = uriService;
+        uriService.PathChanged += OnPathChanged;
         UpdateService = updateService;
         ApiUri = IoC.TryGetRegistered<ICache>()?.Get<string>(CacheKeys.ApiUri) ?? "https://home-automation.example.com";
         webClient.Initialize(ApiUri, "hacc", "0.5.0.0");
@@ -118,7 +119,13 @@ public sealed partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task ShowDetails(IKeyedDevice device)
+    private Task ShowDetails(IKeyedDevice device) => ShowDetails(device, updatesAddress: true);
+
+    /// <param name="updatesAddress">
+    /// False while following the back or forward button: the address is already the one we are navigating to,
+    /// and writing it again would push a second history entry the user can never get past.
+    /// </param>
+    private async Task ShowDetails(IKeyedDevice device, bool updatesAddress)
     {
         var isShown = true;
 
@@ -164,20 +171,50 @@ public sealed partial class MainViewModel : ViewModelBase
                 break;
         }
 
-        if (isShown)
+        if (isShown && updatesAddress)
         {
             uriService.SetPath(ViewPath.For(device.Device));
         }
     }
 
     /// <summary>
+    /// The user pressed back or forward in the browser. The address has already changed, so only the view has to
+    /// follow: no login, no reload, and nothing written back into the history - SetPath sees the address it is
+    /// asked for is the address already and stays quiet. An address whose device this installation does not
+    /// have leads to the dashboard, exactly like a link to it.
+    /// </summary>
+    /// <remarks>
+    /// This view model lives as long as the app, so the event is never unsubscribed.
+    /// </remarks>
+    private void OnPathChanged(object? sender, string path) => Dispatcher.UIThread.Post(() =>
+    {
+        if (!IsReady)
+        {
+            // Still at the login: MainViewModel.Initialize resolves the address once the devices are known.
+            return;
+        }
+
+        if (ViewPath.Find(UpdateService.DetailDevices, path) is { } device)
+        {
+            _ = ShowDetails(device, updatesAddress: false);
+            return;
+        }
+
+        ShowDashboardView(updatesAddress: false);
+    });
+
+    /// <summary>
     /// Shows the dashboard and makes it the address of the app. The dashboard is the root, so this is where a
     /// link without a path leads.
     /// </summary>
-    private void ShowDashboardView()
+    private void ShowDashboardView(bool updatesAddress = true)
     {
         MainViewContent = IoC.Get<DashboardView>();
-        uriService.SetPath(ViewPath.Dashboard);
+
+        if (updatesAddress)
+        {
+            uriService.SetPath(ViewPath.Dashboard);
+        }
     }
 
     [RelayCommand]
