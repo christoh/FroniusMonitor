@@ -104,7 +104,7 @@ public sealed partial class MainViewModel : ViewModelBase
                     return;
                 }
 
-                ShowDashboardView();
+                _ = ShowDashboardView();
             });
         }
         catch (Exception ex)
@@ -200,16 +200,26 @@ public sealed partial class MainViewModel : ViewModelBase
             return;
         }
 
-        ShowDashboardView(updatesAddress: false);
+        _ = ShowDashboardView(updatesAddress: false);
     });
 
     /// <summary>
     /// Shows the dashboard and makes it the address of the app. The dashboard is the root, so this is where a
     /// link without a path leads.
     /// </summary>
-    private void ShowDashboardView(bool updatesAddress = true)
+    private async Task ShowDashboardView(bool updatesAddress = true)
     {
-        MainViewContent = IoC.Get<DashboardView>();
+        try
+        {
+            BusyText = "Loading dashboard";
+            await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
+            await Task.Delay(100).ConfigureAwait(false);
+            MainViewContent = IoC.Get<DashboardView>();
+        }
+        finally
+        {
+            BusyText = null;
+        }
 
         if (updatesAddress)
         {
@@ -218,18 +228,5 @@ public sealed partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task ShowDashboard()
-    {
-        try
-        {
-            BusyText = "Loading dashboard";
-            await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
-            await Task.Delay(100).ConfigureAwait(false);
-            ShowDashboardView();
-        }
-        finally
-        {
-            BusyText = null;
-        }
-    }
+    private void ShowDashboard() => _ = ShowDashboardView();
 }
