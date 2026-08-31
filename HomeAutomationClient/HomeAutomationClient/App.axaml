@@ -87,7 +87,7 @@
                 </ResourceDictionary>
 
                 <ResourceDictionary x:Key='Dark'>
-                    <Color x:Key="AppAccentColor">#FFFF6D3D</Color>
+                    <Color x:Key="AppAccentColor">#C4480C</Color>
 
                     <SolidColorBrush x:Key='BackgroundBrush'>Black</SolidColorBrush>
 					<SolidColorBrush x:Key='ForegroundBrush'>#e8e8e8</SolidColorBrush>

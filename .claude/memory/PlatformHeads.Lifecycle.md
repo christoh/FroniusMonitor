@@ -92,7 +92,7 @@ reproduce it to about one step of 255, and they scale rather than subtract, so a
 into black.
 
 **Where a head detected nothing, the app uses its own color**: `AppAccentColor`, one `Color` per theme in the
-`Light` and `Dark` dictionaries of `App.axaml` (`#FFDA3B01` and `#FFFF6D3D`). Those two are the only place the
+`Light` and `Dark` dictionaries of `App.axaml` (`#FFDA3B01` and `#C4480C`). Those two are the only place the
 color is written down, and they reach iOS, the browser, macOS and Linux at once - none of which has an accent
 color to read. Do not add a third copy to a head, a manifest or an asset catalog.
 
@@ -194,9 +194,9 @@ inverter is the authority on its own vocabulary. Consequences to keep in mind:
   Avalonia derives the six shades from it, so leaving Windows alone is right, not lazy.
 - Overriding `SystemAccentColor` at application level re-resolves the accent brushes of the theme at once.
 - `AppAccentColor` is found where `App.SetAccentColor` looks for it, per theme, and the rebuild on a theme change
-  works. Measured with the desktop head, `AccentColorFollowsOs` forced to false and the variant driven from the
-  code: started in `Dark` with `#ffff6d3d`, switched to `Light` and got `#ffda3b01`, switched back and got
-  `#ffff6d3d` again.
+  works. This resolution behavior was measured with the desktop head, `AccentColorFollowsOs` forced to false and
+  the variant driven from code, using the colors current at the time: started in `Dark` with `#ffff6d3d`, switched
+  to `Light` and got `#ffda3b01`, switched back and got `#ffff6d3d` again.
 - Chromium gives a page a constant instead of the accent color of the OS; see the browser entry above. The
   `[JSImport]` route itself worked - it delivered `#ff0075ff` from the browser into a parsed `HaColor` - so if a
   head ever needs a color from JavaScript, that path is proven.
