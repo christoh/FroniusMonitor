@@ -74,49 +74,37 @@ public sealed partial class MainViewModel : ViewModelBase
         }
     }
 
-    public override async Task Initialize()
+    public override Task Initialize() => TaskExceptionHandler(async () =>
     {
-        try
-        {
-            await base.Initialize().ConfigureAwait(false);
+        await base.Initialize().ConfigureAwait(false);
 
-            var loginViewModel = new LoginViewModel(new DialogParameters
+        var loginViewModel = new LoginViewModel(new DialogParameters
+        {
+            Title = $"{AppConstants.AppName} - {Loc.LoginNoun}",
+            ShowCloseBox = false,
+            IsModal = false,
+        });
+
+        await loginViewModel.ShowDialogAsync().ConfigureAwait(false);
+        BusyText = Loc.GetInverterLocalization;
+        await gen24Loc.Initialize().ConfigureAwait(false);
+        BusyText = Loc.ConnectingToHas;
+        await UpdateService.StartAsync().ConfigureAwait(false);
+        IsReady = true;
+
+        await Dispatcher.UIThread.InvokeAsync(async () =>
+        {
+            // A link into a detail view survives the login: the address the app was started with is only
+            // resolved now, because the devices of the installation are known only now.
+            if (ViewPath.Find(UpdateService.DetailDevices, uriService.StartupPath) is { } device)
             {
-                Title = $"{AppConstants.AppName} - {Loc.LoginNoun}",
-                ShowCloseBox = false,
-                IsModal = false,
-            });
+                await ShowDetails(device).ConfigureAwait(true);
+                return;
+            }
 
-            await loginViewModel.ShowDialogAsync().ConfigureAwait(false);
-            BusyText = Loc.GetInverterLocalization;
-            await gen24Loc.Initialize().ConfigureAwait(false);
-            BusyText = Loc.ConnectingToHas;
-            await UpdateService.StartAsync().ConfigureAwait(false);
-            IsReady = true;
-
-            await Dispatcher.UIThread.InvokeAsync(async () =>
-            {
-                // A link into a detail view survives the login: the address the app was started with is only
-                // resolved now, because the devices of the installation are known only now.
-                if (ViewPath.Find(UpdateService.DetailDevices, uriService.StartupPath) is { } device)
-                {
-                    await ShowDetails(device).ConfigureAwait(true);
-                    return;
-                }
-
-                _ = ShowDashboardView();
-            });
-        }
-        catch (Exception ex)
-        {
-            BusyText = null;
-            await ex.Show().ConfigureAwait(false);
-        }
-        finally
-        {
-            BusyText = null;
-        }
-    }
+            await ShowDashboardView().ConfigureAwait(true);
+        });
+    });
 
     [RelayCommand]
     private Task ShowDetails(IKeyedDevice device) => ShowDetails(device, updatesAddress: true);
@@ -125,7 +113,11 @@ public sealed partial class MainViewModel : ViewModelBase
     /// False while following the back or forward button: the address is already the one we are navigating to,
     /// and writing it again would push a second history entry the user can never get past.
     /// </param>
-    private async Task ShowDetails(IKeyedDevice device, bool updatesAddress)
+    /// <remarks>
+    /// Reports its own failures for the same reason as <see cref="ShowDashboardView"/>: the caller in
+    /// <see cref="OnPathChanged"/> is a plain action posted to the UI thread and cannot await this.
+    /// </remarks>
+    private Task ShowDetails(IKeyedDevice device, bool updatesAddress) => TaskExceptionHandler(async () =>
     {
         var isShown = true;
 
@@ -175,7 +167,7 @@ public sealed partial class MainViewModel : ViewModelBase
         {
             uriService.SetPath(ViewPath.For(device.Device));
         }
-    }
+    });
 
     /// <summary>
     /// The user pressed back or forward in the browser. The address has already changed, so only the view has to
@@ -207,26 +199,25 @@ public sealed partial class MainViewModel : ViewModelBase
     /// Shows the dashboard and makes it the address of the app. The dashboard is the root, so this is where a
     /// link without a path leads.
     /// </summary>
-    private async Task ShowDashboardView(bool updatesAddress = true)
+    /// <remarks>
+    /// Goes through <see cref="ViewModelBase.TaskExceptionHandler"/>, so it reports its own failures instead of
+    /// throwing: <see cref="OnPathChanged"/> posts a plain action to the UI thread and has no way to await this,
+    /// so an exception out of here would belong to nobody and end up as an unobserved task exception. Setting the
+    /// address is part of the guarded body, so a dashboard that did not come up is never advertised as one.
+    /// </remarks>
+    private Task ShowDashboardView(bool updatesAddress = true) => TaskExceptionHandler(async () =>
     {
-        try
-        {
-            BusyText = "Loading dashboard";
-            await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
-            await Task.Delay(100).ConfigureAwait(false);
-            MainViewContent = IoC.Get<DashboardView>();
-        }
-        finally
-        {
-            BusyText = null;
-        }
+        BusyText = "Loading dashboard";
+        await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
+        await Task.Delay(100).ConfigureAwait(false);
+        MainViewContent = IoC.Get<DashboardView>();
 
         if (updatesAddress)
         {
             uriService.SetPath(ViewPath.Dashboard);
         }
-    }
+    });
 
     [RelayCommand]
-    private void ShowDashboard() => _ = ShowDashboardView();
+    private Task ShowDashboard() => ShowDashboardView();
 }

@@ -28,6 +28,25 @@ text to English.
 ## Logging
 * Guard logging with `if (Logger.IsEnabled(LogLevel.Debug))` or the appropriate log level. This is important to avoid unnecessary string formatting and performance overhead when the log level is not enabled.
 
+## Error handling in the Avalonia client
+* Avalonia has **no unhandled exception hook that works on every platform**. `AppDomain.CurrentDomain.UnhandledException`
+  is a notification only - it cannot mark an exception handled and cannot keep the process alive - and it does not
+  reach you in the browser head at all. `TaskScheduler.UnobservedTaskException` only turns up if and when the faulted
+  task happens to be collected, which is far too late to tell the user anything. There is no portable equivalent of
+  WPF's `Dispatcher.UnhandledException` with its `e.Handled = true`. The hooks that do exist are per platform and
+  live in the head projects (Android and iOS each have their own), so they are no help in shared code.
+* Consequence: **an exception that escapes takes the whole app down.** Everything the user can trigger has to be
+  guarded at the point where it is started.
+* `ViewModelBase.TaskExceptionHandler(Func<Task>)` is that guard for async work. It shows the exception and clears
+  `BusyText`. Use it instead of a hand written `try`/`catch`/`finally`, so one place decides how a failure is
+  reported. `MainViewModel.Initialize`, `ShowDetails` and `ShowDashboardView` are the pattern to copy.
+* Never put `_ =` in front of a call that can throw. A fire and forget task that fails has nobody to report to, so
+  the error is either lost silently or ends the app. If the caller cannot await - an event handler, a
+  `Dispatcher.UIThread.Post` callback - the method being called is the thing that has to be guarded.
+* `TaskExceptionHandler` only covers `Func<Task>`. When something of another shape needs guarding - a `void` or
+  `Action<T>` event handler, a `Func<T>`, a `Func<Task<T>>` that has to return a value - **add the matching overload
+  next to it in `ViewModelBase`** rather than writing the `try`/`catch` at the call site.
+
 ## Copy & paste
 * Copy & paste is an anti pattern. Before you duplicate something, spend the effort to put the common part in one
   place: a base class, a method, a generic type, an extension method, a converter.
