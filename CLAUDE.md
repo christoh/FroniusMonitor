@@ -51,3 +51,11 @@ text to English.
 * .First(), FirstAsync(), etc. in IEnumerable and IQueryable as a replacement for .Single(), SingleAsync() etc. can speed up things and you are encouraged do to so if appropriate. In unit tests, we always use "Single" when we mean it because it can detect problems.
 * There are unit tests projects using NUnit. These are legacy. We use xUnit for new unit tests. If you find a unit test project using NUnit, please create a new xUnit project and port the tests to xUnit. If you are unsure how to do this, please ask me before editing. Setup logging in any new unit test project. So that the logging abstractions used in the code, log to the test output.
 * When performing unit tests, only do it for tests in the UnitTests subdirectory. All other tests require a specific communication environment setup and are likely to fail. This is normal.
+
+# Commits
+- Commit under your own authorship, never under the human developer's: `git commit --author="<name> <email>"`. The e-mail always stays as in .git/config. Only the name changes.
+- The author name must name the AI you are **and** the model you are running on, including its version. For
+  example `Claude Code (Opus 5)`, `GitHub Copilot (GPT Terra)`. The tool name on its own is not enough - which model wrote the change is part of the record.
+- If the working tree also holds changes made by the human developer, split the commit: commit your own changes under your AI authorship and leave theirs to them. Never sign a human's work with your name, or your own work  with theirs.
+- Committer should never be touched.
+
