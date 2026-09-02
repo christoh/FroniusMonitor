@@ -53,9 +53,11 @@ text to English.
 * When performing unit tests, only do it for tests in the UnitTests subdirectory. All other tests require a specific communication environment setup and are likely to fail. This is normal.
 
 # Commits
+- Always suggest commit and push. Never commit alone.
+- Force pushes are **never** allowed by AI.
 - Commit under your own authorship, never under the human developer's: `git commit --author="<name> <email>"`. The e-mail always stays as in .git/config. Only the name changes.
-- The author name must name the AI you are **and** the model you are running on, including its version. For
+  - The author name must name the AI you are **and** the model you are running on, including its version. For
   example `Claude Code (Opus 5)`, `GitHub Copilot (GPT Terra)`. The tool name on its own is not enough - which model wrote the change is part of the record.
-- If the working tree also holds changes made by the human developer, split the commit: commit your own changes under your AI authorship and leave theirs to them. Never sign a human's work with your name, or your own work  with theirs.
-- Committer should never be touched.
+  - If the working tree also holds changes made by the human developer, split the commit: commit your own changes under your AI authorship and leave theirs to them. Never sign a human's work with your name, or your own work  with theirs.
+  - Committer should never be touched.
 
