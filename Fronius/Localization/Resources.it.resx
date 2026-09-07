@@ -1683,4 +1683,16 @@
   <data name="LanguageChangeWarning" xml:space="preserve">
     <value>Alcuni testi sono stati generati in '{0}' all'avvio di {1}. Continueranno a essere visualizzati nella lingua originale finché non si riavvia l'app.</value>
   </data>
+  <data name="Charged" xml:space="preserve">
+    <value>Entrata</value>
+  </data>
+  <data name="Discharged" xml:space="preserve">
+    <value>Uscita</value>
+  </data>
+  <data name="ReadingInverterSettings" xml:space="preserve">
+    <value>Lettura delle impostazioni dell'inverter in corso</value>
+  </data>
+  <data name="SavingSettings" xml:space="preserve">
+    <value>Salvataggio delle impostazioni {0} in corso</value>
+  </data>
 </root>

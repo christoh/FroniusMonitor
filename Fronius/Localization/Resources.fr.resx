@@ -1642,4 +1642,13 @@
   <data name="Dashboard" xml:space="preserve">
     <value>Tableau de bord</value>
   </data>
+  <data name="CableLockStatus_Unknown" xml:space="preserve">
+    <value>Inconnu</value>
+  </data>
+  <data name="ReadingInverterSettings" xml:space="preserve">
+    <value>Lecture des paramètres de l'onduleur en cours</value>
+  </data>
+  <data name="SavingSettings" xml:space="preserve">
+    <value>Enregistrement des paramètres {0} en cours</value>
+  </data>
 </root>

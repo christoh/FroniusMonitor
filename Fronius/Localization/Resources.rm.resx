@@ -1651,4 +1651,13 @@
   <data name="Dashboard" xml:space="preserve">
     <value>Survista</value>
   </data>
+  <data name="CableLockStatus_Unknown" xml:space="preserve">
+    <value>Nunenconuschent</value>
+  </data>
+  <data name="ReadingInverterSettings" xml:space="preserve">
+    <value>Leger ils parameters da l'inverter</value>
+  </data>
+  <data name="SavingSettings" xml:space="preserve">
+    <value>Memorisar ils parameters {0}</value>
+  </data>
 </root>

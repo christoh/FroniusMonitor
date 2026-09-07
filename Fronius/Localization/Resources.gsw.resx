@@ -1683,4 +1683,10 @@
   <data name="LanguageChangeWarning" xml:space="preserve">
     <value>E paar Täxt sind in '{0}' generiert worde, wo {1} gstartet isch. Si wärdet wiiterhin i dr ursprüngliche Sprooch aazeigt, bis du d App neu startisch.</value>
   </data>
+  <data name="ReadingInverterSettings" xml:space="preserve">
+    <value>D Iistellige vom Wächselrichter läse</value>
+  </data>
+  <data name="SavingSettings" xml:space="preserve">
+    <value>{0}-Iistellige speichere</value>
+  </data>
 </root>

@@ -182,5 +182,5 @@ a UI thread.
   it. It does not matter for the fields ported so far - whole numbers and an IP string - but it will for anything
   with a decimal separator.
 - **The role lockout** above.
-- New resource strings (`ReadingInverterSettings`, `SavingSettings`) exist in the neutral and German resx only;
-  `fr`, `it`, `rm` and `gsw` fall back to English until somebody translates them.
+- The busy texts of this dialog are translated into every language the app has; `rm` and `gsw` are worth a native
+  reading. See [[Localization]] for how the resource files are kept.
