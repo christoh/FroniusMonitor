@@ -51,29 +51,29 @@ public partial class Gen24Versions : BindableBase
     [ObservableProperty]
     public partial IDictionary<string, Version> SwVersions { get; set; } = new Dictionary<string, Version>();
 
-    public static Gen24Versions Parse(JToken token)
+    public static Gen24Versions Parse(JsonNode token)
     {
         var gen24Service = IoC.Get<IGen24JsonService>();
         var result = gen24Service.ReadFroniusData<Gen24Versions>(token);
 
-        var swRevisions = token["swrevisions"];
-
-        if (swRevisions != null)
+        // An object of name to version string. Enumerating a JsonObject gives those pairs directly, where a
+        // Newtonsoft JObject had to be asked for its JProperty children first.
+        if (token["swrevisions"] is JsonObject swRevisions)
         {
-            foreach (var swToken in swRevisions.OfType<JProperty>())
+            foreach (var (name, value) in swRevisions)
             {
                 Version version;
 
                 try
                 {
-                    version = new Version(swToken.Value.ToString().Replace("-", "."));
+                    version = new Version((value.AsString() ?? string.Empty).Replace("-", "."));
                 }
                 catch
                 {
                     continue;
                 }
 
-                result.SwVersions[swToken.Name] = version;
+                result.SwVersions[name] = version;
             }
         }
 

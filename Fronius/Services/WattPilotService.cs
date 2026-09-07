@@ -70,14 +70,14 @@ public partial class WattPilotService : BindableBase, IWattPilotService
 
             var hello = await ReceiveTextMessage(Token).ConfigureAwait(false);
             Token.ThrowIfCancellationRequested();
-            var token = JObject.Parse(hello);
-            var type = token["type"]?.Value<string>();
+            var token = ParseObject(hello);
+            var type = token["type"].AsString();
 
             if (type == "deltaStatus" && savedWattPilot != null)
             {
                 WattPilot = savedWattPilot;
                 WattPilot.IsUpdating = true;
-                UpdateWattPilot(WattPilot, token["status"] as JObject);
+                UpdateWattPilot(WattPilot, token["status"] as JsonObject);
             }
             else
             {
@@ -93,8 +93,8 @@ public partial class WattPilotService : BindableBase, IWattPilotService
 
                 var messageJson = await ReceiveTextMessage(Token).ConfigureAwait(false);
                 Token.ThrowIfCancellationRequested();
-                token = JObject.Parse(messageJson);
-                type = token["type"]?.Value<string>();
+                token = ParseObject(messageJson);
+                type = token["type"].AsString();
                 var haveData = true;
 
                 if (type == "authRequired")
@@ -111,15 +111,15 @@ public partial class WattPilotService : BindableBase, IWattPilotService
                     }
 
                     Token.ThrowIfCancellationRequested();
-                    var dataToken = JObject.Parse(messageJson);
-                    var dataType = dataToken["type"]?.Value<string>();
+                    var dataToken = ParseObject(messageJson);
+                    var dataType = dataToken["type"].AsString();
 
                     if (dataType is "fullStatus" or "deltaStatus")
                     {
-                        UpdateWattPilot(WattPilot!, dataToken["status"] as JObject);
+                        UpdateWattPilot(WattPilot!, dataToken["status"] as JsonObject);
                     }
 
-                    if (dataType == "fullStatus" && dataToken["partial"]?.Value<bool>() != true)
+                    if (dataType == "fullStatus" && dataToken["partial"].AsBoolean() != true)
                     {
                         break;
                     }
@@ -257,10 +257,10 @@ public partial class WattPilotService : BindableBase, IWattPilotService
         Process.Start(new ProcessStartInfo { FileName = link, UseShellExecute = true });
     }
 
-    private async Task Authenticate(JObject token)
+    private async Task Authenticate(JsonObject token)
     {
-        var token1 = token["token1"]?.Value<string>();
-        var token2 = token["token2"]?.Value<string>();
+        var token1 = token["token1"].AsString();
+        var token2 = token["token2"].AsString();
         var token3 = RandomNumberGenerator.GetHexString(32, true);
 
         var localHashedPassword = await GetHashedPassword().ConfigureAwait(false);
@@ -273,12 +273,12 @@ public partial class WattPilotService : BindableBase, IWattPilotService
 
         Token.ThrowIfCancellationRequested();
 
-        var authMessage = new JObject
+        var authMessage = new JsonObject
         {
             { "type", "auth" },
             { "token3", token3 },
             { "hash", hash },
-        }.ToString();
+        }.ToJsonString();
 
         if (clientWebSocket == null)
         {
@@ -287,14 +287,14 @@ public partial class WattPilotService : BindableBase, IWattPilotService
 
         await clientWebSocket.SendAsync(Encoding.UTF8.GetBytes(authMessage), WebSocketMessageType.Text, WebSocketMessageFlags.DisableCompression | WebSocketMessageFlags.EndOfMessage, Token).ConfigureAwait(false);
         Token.ThrowIfCancellationRequested();
-        var authResponse = JObject.Parse(await ReceiveTextMessage(Token).ConfigureAwait(false));
+        var authResponse = ParseObject(await ReceiveTextMessage(Token).ConfigureAwait(false));
 
-        if (authResponse["type"]?.Value<string>() == "authError")
+        if (authResponse["type"].AsString() == "authError")
         {
-            throw new UnauthorizedAccessException(authResponse["message"]?.Value<string>());
+            throw new UnauthorizedAccessException(authResponse["message"].AsString());
         }
 
-        if (authResponse["type"]?.Value<string>() != "authSuccess")
+        if (authResponse["type"].AsString() != "authSuccess")
         {
             throw new InvalidDataException("The WattPilot did not respond properly on authentication");
         }
@@ -396,30 +396,13 @@ public partial class WattPilotService : BindableBase, IWattPilotService
 
         var id = Interlocked.Increment(ref requestId);
 
-        // ReSharper disable once ReplaceConditionalExpressionWithNullCoalescing
-        var data = new JObject
+        var data = new JsonObject
         {
             { "type", "setValue" },
             { "requestId", id },
             { "key", key },
-            {
-                "value",
-                value == null ? null :
-                value is bool boolValue ? boolValue :
-                value is byte byteValue ? byteValue :
-                value is uint uintValue ? uintValue :
-                value is long longValue ? longValue :
-                value is Enum enumValue ? (int)Convert.ChangeType(enumValue, TypeCode.Int32) :
-                value is int intValue ? intValue :
-                value is string stringValue ? stringValue :
-                value is double doubleValue ? doubleValue :
-                value is float floatValue ? floatValue :
-                value is IEnumerable<byte> bytes ? JArray.FromObject(bytes.Select(b => (int)b)) :
-                value is IEnumerable<int> integers ? JArray.FromObject(integers) :
-                attribute.Type != null && attribute.Type.IsInstanceOfType(value) ? JToken.FromObject(value) :
-                throw new NotSupportedException("Unsupported Type")
-            },
-        }.ToString();
+            { "value", WattPilotExtensions.ToWattPilotJson(value, attribute) },
+        }.ToJsonString();
 
         if (instance.IsSecured.HasValue && instance.IsSecured.Value)
         {
@@ -429,7 +412,7 @@ public partial class WattPilotService : BindableBase, IWattPilotService
                 Encoding.UTF8.GetBytes(data)
             ).ToHexString();
 
-            var message = new JObject
+            var message = new JsonObject
             {
                 { "type", "securedMsg" },
                 { "data", data },
@@ -437,7 +420,7 @@ public partial class WattPilotService : BindableBase, IWattPilotService
                 { "hmac", hash },
             };
 
-            data = message.ToString();
+            data = message.ToJsonString();
         }
 
         if (clientWebSocket == null)
@@ -453,7 +436,10 @@ public partial class WattPilotService : BindableBase, IWattPilotService
         }
     }
 
-    private void UpdateWattPilot(WattPilot instance, JObject? jObject)
+    /// <summary>The body of a WattPilot message, or an empty object where it is not one.</summary>
+    private static JsonObject ParseObject(string json) => JsonNode.Parse(json)?.AsObject() ?? [];
+
+    private void UpdateWattPilot(WattPilot instance, JsonObject? jObject)
     {
         if (jObject == null)
         {
@@ -517,17 +503,17 @@ public partial class WattPilotService : BindableBase, IWattPilotService
         {
             while (tokenSource != null && !Token.IsCancellationRequested && clientWebSocket != null)
             {
-                var dataToken = JObject.Parse(await ReceiveTextMessage(Token).ConfigureAwait(false));
+                var dataToken = ParseObject(await ReceiveTextMessage(Token).ConfigureAwait(false));
                 Token.ThrowIfCancellationRequested();
 
-                if (dataToken["type"]?.Value<string>() == "deltaStatus")
+                if (dataToken["type"].AsString() == "deltaStatus")
                 {
-                    UpdateWattPilot(WattPilot!, dataToken["status"] as JObject);
+                    UpdateWattPilot(WattPilot!, dataToken["status"] as JsonObject);
                 }
 
-                else if (dataToken["type"]?.Value<string>() == "response")
+                else if (dataToken["type"].AsString() == "response")
                 {
-                    JObject? status = null;
+                    JsonObject? status = null;
 
                     // Match the acknowledge, mark it confirmed and signal its waiter atomically while
                     // holding the lock. The IsDisposed guard (set under the same lock by WaitSendValues
@@ -536,12 +522,12 @@ public partial class WattPilotService : BindableBase, IWattPilotService
                     // reports it via UnsuccessfulWrites.
                     lock (outstandingAcknowledges)
                     {
-                        var ack = outstandingAcknowledges.SingleOrDefault(a => a.RequestId == dataToken["requestId"]?.Value<uint>());
+                        var ack = outstandingAcknowledges.SingleOrDefault(a => a.RequestId == dataToken["requestId"].AsUInt32());
 
-                        if (ack != null && dataToken["success"]?.Value<bool>() is true)
+                        if (ack != null && dataToken["success"].AsBoolean() is true)
                         {
                             ack.IsConfirmed = true;
-                            status = dataToken["status"] as JObject;
+                            status = dataToken["status"] as JsonObject;
 
                             if (!ack.IsDisposed)
                             {

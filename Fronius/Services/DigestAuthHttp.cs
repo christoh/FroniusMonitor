@@ -71,19 +71,17 @@ public sealed class DigestAuthHttp(WebConnection connection, TimeSpan cnonceDura
         Dispose();
     }
 
-    public async ValueTask<(JToken, HttpStatusCode)> GetJsonToken(string url, JToken? jToken, IEnumerable<HttpStatusCode>? allowedStatusCodes = null, CancellationToken token = default)
+    public async ValueTask<(JsonNode, HttpStatusCode)> GetJsonToken(string url, JsonNode? jToken, IEnumerable<HttpStatusCode>? allowedStatusCodes = null, CancellationToken token = default)
     {
         await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
-        string? stringContent = null;
-
-        if (jToken != null)
-        {
-            stringContent = jToken.ToString();
-        }
+        var stringContent = jToken?.ToJsonString();
 
         var (stringResult, httpStatusCode) = await GetString(url, stringContent, allowedStatusCodes, token).ConfigureAwait(false);
-        JToken resultToken = new JObject();
-        await Task.Run(() => { resultToken = JToken.Parse(stringResult); }, token).ConfigureAwait(false);
+        JsonNode resultToken = new JsonObject();
+
+        // Off the caller's thread, as before: parsing the config of an inverter is not a small piece of work.
+        // JsonNode.Parse answers null for a body of literally "null", which is nothing to hand on.
+        await Task.Run(() => { resultToken = JsonNode.Parse(stringResult) ?? new JsonObject(); }, token).ConfigureAwait(false);
 
         return (resultToken, httpStatusCode);
     }

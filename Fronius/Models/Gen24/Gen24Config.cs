@@ -63,14 +63,14 @@ public partial class Gen24Config : BindableBase, ICloneable
     }
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    public static Gen24Config Parse(JToken versionsToken, JToken componentsToken, JToken configToken)
+    public static Gen24Config Parse(JsonNode versionsToken, JsonNode componentsToken, JsonNode configToken)
     {
         var gen24Config = new Gen24Config
         {
             Versions = Gen24Versions.Parse(versionsToken),
             Components = Gen24Components.Parse(componentsToken),
             InverterSettings = Gen24InverterSettings.Parse(configToken),
-            MaxAcPower = configToken["powerunit"]?["powerunit"]?["system"]?.Value<double>("DEVICE_POWERACTIVE_NOMINAL_F32"),
+            MaxAcPower = configToken["powerunit"]?["powerunit"]?["system"]?["DEVICE_POWERACTIVE_NOMINAL_F32"].AsDouble(),
             BatterySettings = Gen24BatterySettings.Parse(configToken["batteries"]?["batteries"]),
         };
 

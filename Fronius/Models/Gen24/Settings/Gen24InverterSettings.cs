@@ -38,7 +38,7 @@ public partial class Gen24InverterSettings : Gen24ParsingBase
         return clone;
     }
 
-    public static Gen24InverterSettings Parse(JToken? uiToken, JToken? mpptToken, JToken? powerLimitToken, JToken? systemToken)
+    public static Gen24InverterSettings Parse(JsonNode? uiToken, JsonNode? mpptToken, JsonNode? powerLimitToken, JsonNode? systemToken)
     {
         var inverterSettings = Gen24JsonService.ReadFroniusData<Gen24InverterSettings>(uiToken);
         inverterSettings.Mppt = Gen24Mppt.Parse(mpptToken);
@@ -47,14 +47,14 @@ public partial class Gen24InverterSettings : Gen24ParsingBase
         return inverterSettings;
     }
 
-    public static Gen24InverterSettings Parse(JToken? configToken)
+    public static Gen24InverterSettings Parse(JsonNode? configToken)
     {
         return Parse
         (
-            configToken?["common"]?["ui"]?.Value<JToken>() ?? new JObject(),
-            configToken?["powerunit"]?["powerunit"]?["mppt"]?.Value<JToken>() ?? new JObject(),
-            configToken?["limit_settings"]?["powerLimits"]?.Value<JToken>() ?? new JObject(),
-            configToken?["powerunit"]?["powerunit"]?["system"]?.Value<JToken>() ?? new JObject()
+            configToken?["common"]?["ui"] ?? new JsonObject(),
+            configToken?["powerunit"]?["powerunit"]?["mppt"] ?? new JsonObject(),
+            configToken?["limit_settings"]?["powerLimits"] ?? new JsonObject(),
+            configToken?["powerunit"]?["powerunit"]?["system"] ?? new JsonObject()
         );
     }
 

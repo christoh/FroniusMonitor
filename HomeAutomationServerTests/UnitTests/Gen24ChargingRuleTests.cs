@@ -1,7 +1,7 @@
 using De.Hochstaetter.Fronius;
 using De.Hochstaetter.Fronius.Models.Gen24.Settings;
 using De.Hochstaetter.Fronius.Services;
-using Newtonsoft.Json.Linq;
+
 
 namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests;
 
@@ -47,7 +47,7 @@ public class Gen24ChargingRuleTests
     {
         Assert.Null(SynchronizationContext.Current);
 
-        var rules = Gen24ChargingRule.ParseList(JToken.Parse(TwoRules));
+        var rules = Gen24ChargingRule.ParseList(JsonNode.Parse(TwoRules));
 
         Assert.Equal(2, rules.Count);
         Assert.Equal("01:30", rules[0].StartTime);
@@ -66,7 +66,7 @@ public class Gen24ChargingRuleTests
     [InlineData("""{ }""")]
     public void A_config_without_rules_reads_as_an_empty_list(string json)
     {
-        Assert.Empty(Gen24ChargingRule.ParseList(JToken.Parse(json)));
+        Assert.Empty(Gen24ChargingRule.ParseList(JsonNode.Parse(json)));
     }
 
     [Fact]

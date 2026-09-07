@@ -10,7 +10,7 @@ public partial class Gen24PowerLimitDefinition : Gen24ParsingBase
     [FroniusProprietaryImport("powerLimit", FroniusDataType.Root)]
     public partial double PowerLimit { get; set; }
 
-    public static Gen24PowerLimitDefinition Parse(JToken? token)
+    public static Gen24PowerLimitDefinition Parse(JsonNode? token)
     {
         return Gen24JsonService.ReadFroniusData<Gen24PowerLimitDefinition>(token);
     }

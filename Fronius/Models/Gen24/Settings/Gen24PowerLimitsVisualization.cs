@@ -6,7 +6,7 @@ public partial class Gen24PowerLimitsVisualization : Gen24ParsingBase
     [FroniusProprietaryImport("wattPeakReferenceValue", FroniusDataType.Root)]
     public partial double WattPeakReferenceValue { get; set; }
 
-    public static Gen24PowerLimitsVisualization Parse(JToken? token)
+    public static Gen24PowerLimitsVisualization Parse(JsonNode? token)
     {
         return Gen24JsonService.ReadFroniusData<Gen24PowerLimitsVisualization>(token);
     }

@@ -24,6 +24,7 @@ global using Avalonia.Threading;
 global using CommunityToolkit.Mvvm.ComponentModel;
 global using CommunityToolkit.Mvvm.Input;
 global using De.Hochstaetter.Fronius;
+global using De.Hochstaetter.Fronius.Extensions;
 global using De.Hochstaetter.Fronius.Contracts;
 global using De.Hochstaetter.Fronius.Contracts.HomeAutomationClient;
 global using De.Hochstaetter.Fronius.Localization;

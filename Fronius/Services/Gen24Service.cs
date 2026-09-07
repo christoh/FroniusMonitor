@@ -9,10 +9,10 @@ public class Gen24Service : BindableBase, IGen24Service
 
     private DigestAuthHttp? froniusHttpClient;
     private DateTime lastSolarApiCall = DateTime.UtcNow.AddSeconds(-4);
-    private JObject? invariantConfigToken, localizedConfigToken;
-    private JObject? localizedUiToken, invariantUiToken;
-    private JObject? localizedEventToken, invariantEventToken;
-    private JObject? localizedChannelToken, invariantChannelToken;
+    private JsonObject? invariantConfigToken, localizedConfigToken;
+    private JsonObject? localizedUiToken, invariantUiToken;
+    private JsonObject? localizedEventToken, invariantEventToken;
+    private JsonObject? localizedChannelToken, invariantChannelToken;
 
     public Gen24Service(IGen24JsonService gen24JsonService, ILogger<Gen24Service> logger)
     {
@@ -110,7 +110,7 @@ public class Gen24Service : BindableBase, IGen24Service
 
         Parallel.ForEach
         (
-            (await GetFroniusJsonResponse("api/status/events", token: token).ConfigureAwait(false)).Token,
+            (await GetFroniusJsonResponse("api/status/events", token: token).ConfigureAwait(false)).Token.AsArray(),
             eventToken => { eventList.Add(gen24JsonService.ReadFroniusData<Gen24Event>(eventToken)); }
         );
 
@@ -122,7 +122,7 @@ public class Gen24Service : BindableBase, IGen24Service
         var uriString = $"api/commands/SystemPowerControl/GetDeviceStatus?doScan={(doScan ? "true" : "false")}";
         var (token, _) = await GetFroniusJsonResponse(uriString).ConfigureAwait(false);
 
-        if (token["success"]?.Value<bool>() is not true)
+        if (token["success"].AsBoolean() is not true)
         {
             throw new Gen24Exception(0, "Could not get connected inverters", "success is not true", uriString);
         }
@@ -131,25 +131,27 @@ public class Gen24Service : BindableBase, IGen24Service
 
         var devices = new List<Gen24ConnectedInverter>();
 
-        if (resultToken["autodetectedControlledDevices"] is JObject autoDetectedControlledDevicesToken)
+        if (resultToken["autodetectedControlledDevices"] is JsonObject autoDetectedControlledDevicesToken)
         {
             GetControlledDevices(autoDetectedControlledDevicesToken, true);
         }
 
-        if (resultToken["staticControlledDevices"] is JObject staticControlledDevices)
+        if (resultToken["staticControlledDevices"] is JsonObject staticControlledDevices)
         {
             GetControlledDevices(staticControlledDevices, false);
         }
 
         return devices.ToImmutableDictionary(d => d.Id);
 
-        void GetControlledDevices(JObject devicesToken, bool isAutoDetected)
+        void GetControlledDevices(JsonObject devicesToken, bool isAutoDetected)
         {
-            foreach (var propertyToken in devicesToken.Children<JProperty>())
+            // Enumerating a JsonObject gives the name and the value together, where a JObject had to be asked
+            // for its JProperty children first.
+            foreach (var (id, deviceToken) in devicesToken)
             {
-                var inverter = gen24JsonService.ReadFroniusData<Gen24ConnectedInverter>(propertyToken.Value);
+                var inverter = gen24JsonService.ReadFroniusData<Gen24ConnectedInverter>(deviceToken);
                 inverter.IsAutoDetected = isAutoDetected;
-                inverter.Id = Guid.Parse(propertyToken.Name);
+                inverter.Id = Guid.Parse(id);
                 devices.Add(inverter);
             }
         }
@@ -168,10 +170,10 @@ public class Gen24Service : BindableBase, IGen24Service
         {
             var storageGroupId = storages.FirstOrDefault() ?? "16580608";
             var storageToken = dataToken[storageGroupId];
-            var nameplate = JObject.Parse(storageToken?["attributes"]?["nameplate"]?.Value<string>() ?? "{}");
+            var nameplate = JsonNode.Parse(storageToken?["attributes"]?["nameplate"].AsString() ?? "{}") ?? new JsonObject();
             gen24Sensors.Storage = gen24JsonService.ReadFroniusData<Gen24Storage>(storageToken);
-            gen24Sensors.Storage.MinimumStateOfCharge = (nameplate["min_soc"]?.Value<int>() ?? 0) / 100d;
-            gen24Sensors.Storage.MaximumStateOfCharge = (nameplate["max_soc"]?.Value<int>() ?? 100) / 100d;
+            gen24Sensors.Storage.MinimumStateOfCharge = (nameplate["min_soc"].AsInt32() ?? 0) / 100d;
+            gen24Sensors.Storage.MaximumStateOfCharge = (nameplate["max_soc"].AsInt32() ?? 100) / 100d;
             gen24Sensors.Storage.GroupId = storageGroupId;
         }
 
@@ -188,7 +190,7 @@ public class Gen24Service : BindableBase, IGen24Service
 
         var (jToken, _) = await GetFroniusJsonResponse("api/status/devices", token: token).ConfigureAwait(false);
 
-        foreach (var statusToken in (JArray)jToken)
+        foreach (var statusToken in (JsonArray)jToken)
         {
             var status = gen24JsonService.ReadFroniusData<Gen24Status>(statusToken);
 
@@ -249,7 +251,7 @@ public class Gen24Service : BindableBase, IGen24Service
         return GetLocalizedString(localizedEventToken, invariantEventToken, "StateCodes." + code);
     }
 
-    private static string GetLocalizedString(JObject? localToken, JObject? invariantToken, string path)
+    private static string GetLocalizedString(JsonObject? localToken, JsonObject? invariantToken, string path)
     {
         var keys = path.Split('.');
 
@@ -266,7 +268,7 @@ public class Gen24Service : BindableBase, IGen24Service
         return GetStringFromKeys(invariantToken, keys) ?? path;
     }
 
-    private static string? GetStringFromKeys(JObject? token, string[] keys)
+    private static string? GetStringFromKeys(JsonObject? token, string[] keys)
     {
         while (true)
         {
@@ -277,15 +279,15 @@ public class Gen24Service : BindableBase, IGen24Service
 
             if (keys.Length == 1)
             {
-                return token[keys[0]]?.Value<string>();
+                return token[keys[0]].AsString();
             }
 
-            token = token[keys[0]]?.Value<JObject>();
+            token = token[keys[0]] as JsonObject;
             keys = keys[1..];
         }
     }
 
-    private async ValueTask<(JObject?, JObject?)> EnsureText(string baseUrl, JObject? localized, JObject? invariant, CancellationToken token = default)
+    private async ValueTask<(JsonObject?, JsonObject?)> EnsureText(string baseUrl, JsonObject? localized, JsonObject? invariant, CancellationToken token = default)
     {
         while (Connection?.BaseUrl == null)
         {
@@ -298,14 +300,14 @@ public class Gen24Service : BindableBase, IGen24Service
             {
                 await Task.Run(async () =>
                 {
-                    invariant = JObject.Parse((await GetFroniusStringResponse($"{baseUrl}/en.json", token: token)
-                        .ConfigureAwait(false)).JsonString);
+                    invariant = JsonNode.Parse((await GetFroniusStringResponse($"{baseUrl}/en.json", token: token)
+                        .ConfigureAwait(false)).JsonString)?.AsObject();
                 }, token).ConfigureAwait(false);
             }
         }
         catch
         {
-            //invariant ??= new JObject();
+            //invariant ??= new JsonObject();
         }
 
         var letterCode = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName switch
@@ -326,13 +328,13 @@ public class Gen24Service : BindableBase, IGen24Service
                 {
                     await Task.Run(async () =>
                     {
-                        localized = JObject.Parse((await GetFroniusStringResponse($"{baseUrl}/{letterCode}.json", token: token).ConfigureAwait(false)).JsonString);
+                        localized = JsonNode.Parse((await GetFroniusStringResponse($"{baseUrl}/{letterCode}.json", token: token).ConfigureAwait(false)).JsonString)?.AsObject();
                     }, token).ConfigureAwait(false);
                 }
             }
             catch
             {
-                //localized = new JObject();
+                //localized = new JsonObject();
             }
         }
 
@@ -342,7 +344,7 @@ public class Gen24Service : BindableBase, IGen24Service
     public async ValueTask<(string JsonString, HttpStatusCode StatusCode)> GetFroniusStringResponse
     (
         string request,
-        JToken? jToken = null,
+        JsonNode? jToken = null,
         IEnumerable<HttpStatusCode>? allowedStatusCodes = null,
         CancellationToken token = default
     )
@@ -353,10 +355,10 @@ public class Gen24Service : BindableBase, IGen24Service
         return result;
     }
 
-    public async ValueTask<(JToken Token, HttpStatusCode StatusCode)> GetFroniusJsonResponse
+    public async ValueTask<(JsonNode Token, HttpStatusCode StatusCode)> GetFroniusJsonResponse
     (
         string request,
-        JToken? jToken = null,
+        JsonNode? jToken = null,
         IEnumerable<HttpStatusCode>? allowedStatusCodes = null,
         CancellationToken token = default
     )
@@ -367,18 +369,18 @@ public class Gen24Service : BindableBase, IGen24Service
         return result;
     }
 
-    public async ValueTask<T?> SendFroniusCommand<T>(string request, JToken? jToken = null, CancellationToken token = default) where T : Gen24NoResultCommand, new()
+    public async ValueTask<T?> SendFroniusCommand<T>(string request, JsonNode? jToken = null, CancellationToken token = default) where T : Gen24NoResultCommand, new()
     {
         var client = await GetFroniusHttpClient(token);
         var (result, statusCode) = await client.GetJsonToken(request, jToken, [HttpStatusCode.OK, HttpStatusCode.BadRequest], token).ConfigureAwait(false);
 
         if (statusCode == HttpStatusCode.BadRequest)
         {
-            var message = result["failure"]?.Value<string>() ?? "Unknown bad request";
+            var message = result["failure"].AsString() ?? "Unknown bad request";
             throw new HttpRequestException(message, null, statusCode);
         }
 
-        var success = result["success"]?.Value<bool>() ?? false;
+        var success = result["success"].AsBoolean() ?? false;
 
         if (!success)
         {
@@ -387,7 +389,7 @@ public class Gen24Service : BindableBase, IGen24Service
 
         var resultData = result["resultData"];
 
-        return resultData is { HasValues: true } ? gen24JsonService.ReadFroniusData<T>(resultData) : null;
+        return resultData.HasValues() ? gen24JsonService.ReadFroniusData<T>(resultData) : null;
     }
 
     public ValueTask<Gen24StandByStatus?> GetInverterStandByStatus(CancellationToken token = default) => SendFroniusCommand<Gen24StandByStatus>("api/commands/StandbyState", null, token);
@@ -396,7 +398,7 @@ public class Gen24Service : BindableBase, IGen24Service
 
     public async ValueTask RequestInverterStandBy(bool isStandBy, CancellationToken token = default)
     {
-        var jToken = JObject.Parse($"{{\"requestState\": {(isStandBy ? "0" : "1")}}}");
+        var jToken = JsonNode.Parse($"{{\"requestState\": {(isStandBy ? "0" : "1")}}}");
         await SendFroniusCommand<Gen24NoResultCommand>("api/commands/StandbyRequestState", jToken, token).ConfigureAwait(false);
     }
 
@@ -424,7 +426,7 @@ public class Gen24Service : BindableBase, IGen24Service
         return client;
     }
 
-    private async Task<(T, JToken)> GetJsonResponse<T>(string request, bool useUnofficialApi = false, CancellationToken token = default) where T : BaseResponse, new()
+    private async Task<(T, JsonNode)> GetJsonResponse<T>(string request, bool useUnofficialApi = false, CancellationToken token = default) where T : BaseResponse, new()
     {
         var requestString = $"{(useUnofficialApi ? string.Empty : "solar_api/v1/")}{request}";
         var (jsonString, status) = await GetFroniusStringResponse(requestString, token: token);
@@ -436,15 +438,15 @@ public class Gen24Service : BindableBase, IGen24Service
 
         return await Task.Run(() =>
         {
-            var headToken = JObject.Parse(jsonString)["Head"] ?? throw new InvalidDataException(Resources.IncorrectData);
+            var headToken = JsonNode.Parse(jsonString)?["Head"] ?? throw new InvalidDataException(Resources.IncorrectData);
             var statusToken = headToken["Status"] ?? throw new InvalidDataException(Resources.IncorrectData);
 
             var result = new T
             {
-                StatusCode = statusToken["Code"]?.Value<int>() ?? throw new InvalidDataException(Resources.IncorrectData),
-                Timestamp = (headToken["Timestamp"]?.Value<DateTime>() ?? DateTime.UnixEpoch).ToUniversalTime(),
-                Reason = statusToken["Reason"]?.Value<string>() ?? string.Empty,
-                UserMessage = statusToken["UserMessage"]?.Value<string>() ?? string.Empty,
+                StatusCode = statusToken["Code"].AsInt32() ?? throw new InvalidDataException(Resources.IncorrectData),
+                Timestamp = (DateTime.TryParse(headToken["Timestamp"].AsString(), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var timestamp) ? timestamp : DateTime.UnixEpoch).ToUniversalTime(),
+                Reason = statusToken["Reason"].AsString() ?? string.Empty,
+                UserMessage = statusToken["UserMessage"].AsString() ?? string.Empty,
             };
 
             if (result.StatusCode != 0)
@@ -452,7 +454,7 @@ public class Gen24Service : BindableBase, IGen24Service
                 throw new Gen24Exception(result.StatusCode, result.Reason, result.UserMessage, requestString);
             }
 
-            var data = JObject.Parse(jsonString)["Body"]?["Data"] ?? throw new InvalidDataException(Resources.IncorrectData);
+            var data = JsonNode.Parse(jsonString)?["Body"]?["Data"] ?? throw new InvalidDataException(Resources.IncorrectData);
             return (result, data);
         }, token).ConfigureAwait(false);
     }

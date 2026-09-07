@@ -2,7 +2,7 @@
 
 public class Gen24JsonService : IGen24JsonService
 {
-    public T ReadFroniusData<T>(JToken? token) where T : new()
+    public T ReadFroniusData<T>(JsonNode? token) where T : new()
     {
         var channels = token?["channels"];
         var attributes = token?["attributes"];
@@ -18,7 +18,12 @@ public class Gen24JsonService : IGen24JsonService
         return result;
     }
 
-    private dynamic? ReadSingleProperty<T>(JToken? token, PropertyInfo propertyInfo, JToken? attributes = null, JToken? channels = null) where T : new()
+    /// <remarks>
+    /// Returns <see cref="object"/> and not <c>dynamic</c>: dynamic dispatch does not exist on iOS. The only
+    /// thing it was used for here was the scaling arithmetic at the end, which now says which type it is working
+    /// in.
+    /// </remarks>
+    private object? ReadSingleProperty<T>(JsonNode? token, PropertyInfo propertyInfo, JsonNode? attributes = null, JsonNode? channels = null) where T : new()
     {
         var nonNullablePropertyType = Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? propertyInfo.PropertyType;
         var attribute = (FroniusProprietaryImportAttribute)propertyInfo.GetCustomAttributes(typeof(FroniusProprietaryImportAttribute), true).Single();
@@ -36,8 +41,10 @@ public class Gen24JsonService : IGen24JsonService
             _ => channels?[attribute.Name],
         };
 
-        var stringValue = parsedToken?.Value<string>()?.Trim();
-        dynamic? value = null;
+        // Everything is read as text and converted from there, because the inverter is not consistent about
+        // whether it writes a number as a number or as a string. See JsonExtensions.AsString.
+        var stringValue = parsedToken.AsString()?.Trim();
+        object? value = null;
 
         if (stringValue != null)
         {
@@ -80,14 +87,13 @@ public class Gen24JsonService : IGen24JsonService
                 value = string.IsNullOrEmpty(stringValue) ? null : Convert.ChangeType(stringValue, nonNullablePropertyType, CultureInfo.InvariantCulture);
             }
 
-            if (propertyInfo.PropertyType.IsAssignableFrom(typeof(double)) || propertyInfo.PropertyType.IsAssignableFrom(typeof(float)))
+            // Joule to watt hours and percent to a fraction. Only for the two floating point types, and only for
+            // those two units, so anything else keeps the value exactly as it was converted above.
+            if (value is not null && attribute.Unit is Unit.Joule or Unit.Percent &&
+                (propertyInfo.PropertyType.IsAssignableFrom(typeof(double)) || propertyInfo.PropertyType.IsAssignableFrom(typeof(float))))
             {
-                value = attribute.Unit switch
-                {
-                    Unit.Joule => value / 3600,
-                    Unit.Percent => value / 100,
-                    _ => value,
-                };
+                var scaled = Convert.ToDouble(value, CultureInfo.InvariantCulture) / (attribute.Unit == Unit.Joule ? 3600d : 100d);
+                value = nonNullablePropertyType == typeof(float) ? (float)scaled : scaled;
             }
         }
 
@@ -121,12 +127,12 @@ public class Gen24JsonService : IGen24JsonService
     }
 
     [SuppressMessage("ReSharper", "PreferConcreteValueOverDefault")]
-    public JObject GetUpdateToken<T>(T newEntity, T? oldEntity = default) where T : BindableBase => GetUpdateToken(typeof(T), newEntity, oldEntity);
+    public JsonObject GetUpdateToken<T>(T newEntity, T? oldEntity = default) where T : BindableBase => GetUpdateToken(typeof(T), newEntity, oldEntity);
 
     [SuppressMessage("ReSharper", "PreferConcreteValueOverDefault")]
-    public JObject GetUpdateToken(Type type, BindableBase newEntity, BindableBase? oldEntity = default)
+    public JsonObject GetUpdateToken(Type type, BindableBase newEntity, BindableBase? oldEntity = default)
     {
-        var jObject = new JObject();
+        var jObject = new JsonObject();
 
         foreach (var propertyInfo in type.GetProperties().Where(p => p.GetCustomAttribute<FroniusProprietaryImportAttribute>() != null))
         {
@@ -148,25 +154,51 @@ public class Gen24JsonService : IGen24JsonService
                 }
             }
 
+            var jsonNode = ToJsonValue(jsonValueNew, propertyInfo);
+
             if (attribute.DataType != FroniusDataType.Custom || attribute.PropertyName == null)
             {
-                jObject.Add(attribute.Name, new JValue(jsonValueNew));
+                jObject.Add(attribute.Name, jsonNode);
+            }
+            else if (!jObject.TryGetPropertyValue(attribute.PropertyName, out var token))
+            {
+                jObject.Add(attribute.PropertyName, new JsonObject { [attribute.Name] = jsonNode });
             }
             else
             {
-                if (!jObject.TryGetValue(attribute.PropertyName, out var token))
-                {
-                    jObject.Add(attribute.PropertyName, new JObject { { attribute.Name, new JValue(jsonValueNew) } });
-                }
-                else
-                {
-                    token[attribute.Name] = new JValue(jsonValueNew);
-                }
+                token![attribute.Name] = jsonNode;
             }
         }
 
         return jObject;
     }
+
+    /// <summary>
+    /// One value on its way to the inverter.
+    /// </summary>
+    /// <remarks>
+    /// Written out by type rather than through <c>JsonValue.Create&lt;object&gt;</c>, which would serialize the
+    /// runtime type by reflection - trimmed away on iOS, and silently wrong for anything it does not recognise.
+    /// A type nobody has thought about throws instead, so a property added later says so on the first write and
+    /// not through an inverter refusing a payload nobody can explain.
+    /// </remarks>
+    private static JsonNode ToJsonValue(object value, PropertyInfo propertyInfo) => value switch
+    {
+        string text => JsonValue.Create(text),
+        bool flag => JsonValue.Create(flag),
+        byte number => JsonValue.Create(number),
+        sbyte number => JsonValue.Create(number),
+        short number => JsonValue.Create(number),
+        ushort number => JsonValue.Create(number),
+        int number => JsonValue.Create(number),
+        uint number => JsonValue.Create(number),
+        long number => JsonValue.Create(number),
+        ulong number => JsonValue.Create(number),
+        float number => JsonValue.Create(number),
+        double number => JsonValue.Create(number),
+        decimal number => JsonValue.Create(number),
+        _ => throw new NotSupportedException($"{propertyInfo.DeclaringType?.Name}.{propertyInfo.Name} is a {value.GetType().Name}, which cannot be written to an inverter"),
+    };
 
     private static object? GetFroniusJsonValue(PropertyInfo propertyInfo, object instance, FroniusProprietaryImportAttribute attribute)
     {

@@ -141,7 +141,7 @@ public partial class SelfConsumptionOptimizationViewModel(
             using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
             IDictionary<string, Version> softwareVersions;
-            JToken configToken;
+            JsonNode configToken;
 
             try
             {
@@ -360,10 +360,10 @@ public partial class SelfConsumptionOptimizationViewModel(
 
             var rulesChanged = !ChargingRules.SequenceEqual(oldChargingRules);
             var updateToken = Gen24JsonService.GetUpdateToken(Settings, oldSettings);
-            var nonRulesChanged = updateToken.Children().Any();
+            var nonRulesChanged = updateToken.HasValues();
             var rulesToken = Gen24ChargingRule.GetToken(ChargingRules);
 
-            if (!updateToken.Children().Any() && !rulesChanged)
+            if (!updateToken.HasValues() && !rulesChanged)
             {
                 ShowNoSettingsChanged();
                 return;

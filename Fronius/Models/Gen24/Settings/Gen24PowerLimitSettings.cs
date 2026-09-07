@@ -8,13 +8,13 @@ public partial class Gen24PowerLimitSettings : BindableBase, ICloneable
     [ObservableProperty]
     public partial Gen24PowerLimitsVisualization Visualization { get; set; } = new();
 
-    public static Gen24PowerLimitSettings ParseFromConfig(JToken? configToken)
+    public static Gen24PowerLimitSettings ParseFromConfig(JsonNode? configToken)
     {
-        var token = configToken?["powerLimits"]?.Value<JToken>();
+        var token = configToken?["powerLimits"];
         return Parse(token);
     }
 
-    public static Gen24PowerLimitSettings Parse(JToken? token)
+    public static Gen24PowerLimitSettings Parse(JsonNode? token)
     {
         var gen24PowerLimitSettings = new Gen24PowerLimitSettings
         {

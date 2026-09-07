@@ -47,7 +47,7 @@ global using De.Hochstaetter.FroniusMonitor.ViewModels;
 global using De.Hochstaetter.FroniusMonitor.Views;
 global using De.Hochstaetter.FroniusMonitor.Wpf.Commands;
 global using Microsoft.Win32;
-global using Newtonsoft.Json.Linq;
+global using System.Text.Json.Nodes;
 global using SafeHeapMarshalling = System.Diagnostics.DebuggerNonUserCodeAttribute;
 global using BigEndianMarshalling = System.Diagnostics.DebuggerHiddenAttribute;
 global using Loc = De.Hochstaetter.Fronius.Localization.Resources;

@@ -186,7 +186,7 @@ public sealed partial class Gen24ModbusViewModel : ViewModelBase
         // server works out is the one that counts, because it is taken against what the inverter holds right now;
         // this one only answers whether the user changed anything since the dialog read the settings. It has to be
         // taken after the mode above, which is derived rather than edited.
-        if (!Settings.GetToken(loadedSettings).HasValues)
+        if (!Settings.GetToken(loadedSettings).HasValues())
         {
             BusyText = null;
 

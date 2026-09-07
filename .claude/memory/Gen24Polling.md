@@ -12,7 +12,8 @@ paths:
 
 `Gen24DataCollector` is the only thing that talks to a Gen24 inverter on a schedule, and everything the clients
 know about one comes from it: it writes into `IDataControlService`, which raises `DeviceUpdate`, which
-`SignalRDispatcher` sends on. Nothing else reads an inverter periodically.
+`SignalRDispatcher` sends on. Nothing else reads an inverter periodically. What the JSON it reads is parsed
+with, and where that differs from the Newtonsoft it used to be, is [[DeviceJson]].
 
 ## Two loops, one service, one inverter
 

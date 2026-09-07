@@ -18,16 +18,16 @@ public partial class Gen24PowerLimits : Gen24ParsingBase
     //    set => Set(ref reactivePower, value);
     //}
 
-    public static Gen24PowerLimits ParseFromConfig(JToken? configToken)
+    public static Gen24PowerLimits ParseFromConfig(JsonNode? configToken)
     {
-        var token = configToken?["limit_settings"]?["powerLimits"]?["exportLimits"]?.Value<JToken>();
+        var token = configToken?["limit_settings"]?["powerLimits"]?["exportLimits"];
         return Parse(token);
     }
 
-    public static Gen24PowerLimits Parse(JToken? token)
+    public static Gen24PowerLimits Parse(JsonNode? token)
     {
-        var gen24PowerLimitSettings = Gen24JsonService.ReadFroniusData<Gen24PowerLimits>(token?.Value<JToken>());
-        gen24PowerLimitSettings.ActivePower = Gen24PowerLimit.Parse(token?["activePower"]?.Value<JToken>());
+        var gen24PowerLimitSettings = Gen24JsonService.ReadFroniusData<Gen24PowerLimits>(token);
+        gen24PowerLimitSettings.ActivePower = Gen24PowerLimit.Parse(token?["activePower"]);
         return gen24PowerLimitSettings;
     }
 

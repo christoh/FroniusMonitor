@@ -3,7 +3,7 @@ using De.Hochstaetter.Fronius.Models.Gen24.Commands;
 using De.Hochstaetter.Fronius.Models.Gen24.Settings;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 using System.ComponentModel.DataAnnotations;
 
 namespace De.Hochstaetter.HomeAutomationServer.Controllers;
@@ -149,7 +149,7 @@ public class Gen24SystemController
                 ChargingRules = Gen24ChargingRule.ParseList(configToken["timeofuse"]),
                 ModbusSettings = Gen24ModbusSettings.Parse(configToken["modbus"]?["modbus"]),
                 SoftwareVersions = Gen24Versions.Parse(versionToken).SwVersions,
-                MaxAcPower = configToken["powerunit"]?["powerunit"]?["system"]?.Value<double>("DEVICE_POWERACTIVE_NOMINAL_F32"),
+                MaxAcPower = configToken["powerunit"]?["powerunit"]?["system"]?["DEVICE_POWERACTIVE_NOMINAL_F32"].AsDouble(),
             });
         }
         catch (Exception ex)
@@ -225,7 +225,7 @@ public class Gen24SystemController
     (
         id, "api/config/timeofuse", rules,
         configToken => Gen24ChargingRule.ParseList(configToken["timeofuse"]),
-        (wanted, current) => wanted.SequenceEqual(current) ? new JObject() : Gen24ChargingRule.GetToken(wanted)
+        (wanted, current) => wanted.SequenceEqual(current) ? new JsonObject() : Gen24ChargingRule.GetToken(wanted)
     );
 
     /// <summary>
@@ -243,8 +243,8 @@ public class Gen24SystemController
         string id,
         string inverterPath,
         T wanted,
-        Func<JToken, T> parseCurrent,
-        Func<T, T, JToken> buildDelta
+        Func<JsonNode, T> parseCurrent,
+        Func<T, T, JsonNode> buildDelta
     )
     {
         var (errorResponse, gen24Service) = GetManagedGen24System(id);
@@ -254,7 +254,7 @@ public class Gen24SystemController
             return errorResponse;
         }
 
-        JToken updateToken;
+        JsonNode updateToken;
 
         try
         {
@@ -265,7 +265,7 @@ public class Gen24SystemController
             return InverterFailed(id, "read the settings of", ex);
         }
 
-        if (!updateToken.HasValues)
+        if (!updateToken.HasValues())
         {
             if (logger.IsEnabled(LogLevel.Information))
             {
@@ -283,7 +283,7 @@ public class Gen24SystemController
 
             if (status != HttpStatusCode.OK)
             {
-                logger.LogWarning("Inverter {Id} refused the settings for {Path}: {Token}", id, inverterPath, updateToken.ToString(Newtonsoft.Json.Formatting.None));
+                logger.LogWarning("Inverter {Id} refused the settings for {Path}: {Token}", id, inverterPath, updateToken.ToJsonString());
                 return UnprocessableEntity(Helpers.GetProblemDetails(Loc.Error, $"The inverter refused the settings for {inverterPath}."));
             }
 
@@ -305,7 +305,7 @@ public class Gen24SystemController
         }
     }
 
-    private async Task<JToken> ReadConfig(IGen24Service gen24Service) =>
+    private async Task<JsonNode> ReadConfig(IGen24Service gen24Service) =>
         (await gen24Service.GetFroniusJsonResponse("api/config/", token: HttpContext.RequestAborted).ConfigureAwait(false)).Token;
 
     private IActionResult InverterFailed(string id, string what, Exception ex)

@@ -41,9 +41,9 @@ public abstract class SettingsViewModelBase : ViewModelBase
         set => Set(ref field, value);
     }
 
-    protected async Task<bool> UpdateInverter(string uri, JToken token)
+    protected async Task<bool> UpdateInverter(string uri, JsonNode token)
     {
-        (JToken Token, HttpStatusCode Status) result;
+        (JsonNode Token, HttpStatusCode Status) result;
 
         try
         {

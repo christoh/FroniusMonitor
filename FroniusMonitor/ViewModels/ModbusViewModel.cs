@@ -231,7 +231,7 @@ public class ModbusViewModel(
 
             var updateToken = Settings.GetToken(oldSettings);
 
-            if (!updateToken.Children().Any())
+            if (!updateToken.HasValues())
             {
                 ShowNoSettingsChanged();
                 return;

@@ -29,7 +29,8 @@ request that wants an answer, so it goes over https through `IWebClientService`.
 ## The server does the read-modify-write
 
 The client PUTs the **whole typed settings object**. The server then reads `api/config/` from the inverter, works
-out the delta with the `GetToken` / `GetUpdateToken` the models already carry, and posts only that.
+out the delta with the `GetToken` / `GetUpdateToken` the models already carry, and posts only that. How
+that JSON is read and written is [[DeviceJson]].
 
 ```
 client  PUT api/Gen24System/{id}/settings/modbus   { typed Gen24ModbusSettings }
@@ -139,7 +140,7 @@ time. Do not try to refine it from `Initialize`.
 
 Ported from the WPF dialogs deliberately, so the two apps behave alike:
 
-- **Nothing changed:** the tab compares locally, `Settings.GetToken(loadedSettings).HasValues`, and where nothing
+- **Nothing changed:** the tab compares locally, `Settings.GetToken(loadedSettings).HasValues()`, and where nothing
   differs it puts up a **message box** (`Loc.NoSettingsChanged`, `Loc.Warning`, `WarningIcon`) and sends nothing.
   This is why the client registers `IGen24JsonService`: the models reach for it through `IoC` when they build a
   token. The check has to come **after** any derived value - the Modbus `Mode` and `InverterAddress` follow from

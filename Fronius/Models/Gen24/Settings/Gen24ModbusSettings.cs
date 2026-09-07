@@ -109,7 +109,7 @@ public partial class Gen24ModbusSettings : Gen24ParsingBase, ICloneable
     [Ipv4(AllowMask = true, AllowList = true)]
     public partial string? IpAddress { get; set; }
 
-    public static Gen24ModbusSettings Parse(JToken? token)
+    public static Gen24ModbusSettings Parse(JsonNode? token)
     {
         if (token == null)
         {
@@ -124,19 +124,21 @@ public partial class Gen24ModbusSettings : Gen24ParsingBase, ICloneable
         SetInterfaces(slaveInterfaces, ModbusInterfaceRole.Slave);
         SetInterfaces(masterInterfaces, ModbusInterfaceRole.Master);
 
-        var ctrToken = token.SelectToken("slave.ctr");
+        var ctrToken = token["slave"]?["ctr"];
         var restrictToken = ctrToken?["restriction"];
 
-        result.AllowControl = ctrToken?["on"]?.Value<bool>();
-        result.RestrictControl = restrictToken?["on"]?.Value<bool>();
-        result.IpAddress = restrictToken?["ip"]?.Value<string>();
+        result.AllowControl = ctrToken?["on"].AsBoolean();
+        result.RestrictControl = restrictToken?["on"].AsBoolean();
+        result.IpAddress = restrictToken?["ip"].AsString();
 
         return result;
 
-        IEnumerable<string> GetInterfaces(string prefix)
-        {
-            return token.SelectTokens($"{prefix}.rtuif[*].if").Select(t => t.Value<string>() ?? string.Empty);
-        }
+        // Was the JSONPath "<prefix>.rtuif[*].if". System.Text.Json has no path queries, and the walk says the
+        // same thing in the same number of lines.
+        IEnumerable<string> GetInterfaces(string prefix) =>
+            token[prefix]?["rtuif"] is not JsonArray interfaces
+                ? []
+                : interfaces.Select(entry => entry?["if"].AsString() ?? string.Empty);
 
         void SetInterfaces(IEnumerable<string> interfaces, ModbusInterfaceRole role)
         {
@@ -148,22 +150,22 @@ public partial class Gen24ModbusSettings : Gen24ParsingBase, ICloneable
         }
     }
 
-    public JToken GetToken(Gen24ModbusSettings? oldModbusSettings = null)
+    public JsonNode GetToken(Gen24ModbusSettings? oldModbusSettings = null)
     {
         var gen24Service = IoC.Get<IGen24JsonService>();
         var slaveToken = gen24Service.GetUpdateToken(this, oldModbusSettings);
-        var token = new JObject();
+        var token = new JsonObject();
 
         if (oldModbusSettings == null || oldModbusSettings.Rtu0 != Rtu0 || oldModbusSettings.Rtu1 != Rtu1)
         {
-            var ifToken = new JArray();
+            var ifToken = new JsonArray();
             slaveToken.Add("rtuif", ifToken);
 
             Add(Rtu0, ModbusInterfaceRole.Slave, "rtu0");
             Add(Rtu1, ModbusInterfaceRole.Slave, "rtu1");
 
-            ifToken = new JArray();
-            var masterToken = new JObject { { "rtuif", ifToken } };
+            ifToken = new JsonArray();
+            var masterToken = new JsonObject { ["rtuif"] = ifToken };
             token.Add("master", masterToken);
 
             Add(Rtu0, ModbusInterfaceRole.Master, "rtu0");
@@ -173,14 +175,14 @@ public partial class Gen24ModbusSettings : Gen24ParsingBase, ICloneable
             {
                 if (value == arrayType)
                 {
-                    ifToken.Add(new JObject { { "if", jsonName } });
+                    ifToken.Add(new JsonObject { ["if"] = jsonName });
                 }
             }
         }
 
         if (oldModbusSettings == null || oldModbusSettings.AllowControl != AllowControl || oldModbusSettings.RestrictControl != RestrictControl || oldModbusSettings.IpAddress != IpAddress)
         {
-            var ctrToken = new JObject();
+            var ctrToken = new JsonObject();
 
             if ((oldModbusSettings == null || oldModbusSettings.AllowControl != AllowControl) && AllowControl.HasValue)
             {
@@ -189,7 +191,7 @@ public partial class Gen24ModbusSettings : Gen24ParsingBase, ICloneable
 
             if (oldModbusSettings == null || oldModbusSettings.RestrictControl != RestrictControl || oldModbusSettings.IpAddress != IpAddress)
             {
-                var restrictionToken = new JObject();
+                var restrictionToken = new JsonObject();
                 ctrToken.Add("restriction", restrictionToken);
 
                 if (RestrictControl.HasValue && (oldModbusSettings == null || oldModbusSettings.RestrictControl != RestrictControl))
@@ -206,7 +208,7 @@ public partial class Gen24ModbusSettings : Gen24ParsingBase, ICloneable
             slaveToken.Add("ctr", ctrToken);
         }
 
-        if (oldModbusSettings == null || slaveToken.Children().Any())
+        if (oldModbusSettings == null || slaveToken.Count > 0)
         {
             token.Add("slave", slaveToken);
         }

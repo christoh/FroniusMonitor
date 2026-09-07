@@ -100,7 +100,7 @@ public class Gen24PowerLimit : BindableBase, ICloneable
         });
     } = PowerLimitMode.Off;
 
-    public static Gen24PowerLimit Parse(JToken? token)
+    public static Gen24PowerLimit Parse(JsonNode? token)
     {
         var gen24PowerLimit = gen24JsonService.ReadFroniusData<Gen24PowerLimit>(token);
         gen24PowerLimit.SoftLimit = Gen24PowerLimitDefinition.Parse(token?["softLimit"]);

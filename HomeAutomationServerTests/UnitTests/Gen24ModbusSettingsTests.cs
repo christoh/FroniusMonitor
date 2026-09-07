@@ -108,7 +108,7 @@ public class Gen24ModbusSettingsTests
         edited.SunSpecAddress = null;
 
         Assert.False(edited.HasErrors);
-        Assert.False(edited.GetToken(loaded).HasValues);
+        Assert.False(edited.GetToken(loaded).HasValues());
     }
 
     [Fact]
@@ -120,7 +120,7 @@ public class Gen24ModbusSettingsTests
 
         // The delta the server would write is the strictest check there is: it walks every field that goes to the
         // inverter, so a field the hand written Clone forgot shows up here.
-        Assert.False(clone.GetToken(original).HasValues);
+        Assert.False(clone.GetToken(original).HasValues());
         Assert.Equal(original.Rtu0, clone.Rtu0);
         Assert.Equal(original.Rtu1, clone.Rtu1);
         Assert.Equal(original.IpAddress, clone.IpAddress);

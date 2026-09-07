@@ -23,5 +23,5 @@ public partial class Gen24AcSystemSettings : Gen24ParsingBase
     [FroniusProprietaryImport("DEVICE_POWERAPPARENT_NOMINAL_F32", FroniusDataType.Root)]
     public partial double? PowerApparentNominal { get; set; }
 
-    public static Gen24AcSystemSettings Parse(JToken? token) => Gen24JsonService.ReadFroniusData<Gen24AcSystemSettings>(token);
+    public static Gen24AcSystemSettings Parse(JsonNode? token) => Gen24JsonService.ReadFroniusData<Gen24AcSystemSettings>(token);
 }

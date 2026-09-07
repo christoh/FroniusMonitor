@@ -1,6 +1,4 @@
-﻿using Formatting = Newtonsoft.Json.Formatting;
-
-namespace De.Hochstaetter.Fronius.Services.DataCollectors;
+﻿namespace De.Hochstaetter.Fronius.Services.DataCollectors;
 
 public sealed class WattPilotDataCollector(
     ILogger<WattPilotDataCollector> logger,
@@ -71,7 +69,7 @@ public sealed class WattPilotDataCollector(
 
         try
         {
-            var jsonMessage = e.JObject.ToString(Formatting.None);
+            var jsonMessage = e.JsonObject.ToJsonString();
             logger.LogDebug("Wattpilot '{WattPilot}': {Token}", e.WattPilot.DisplayName, jsonMessage);
             services[service].LastMessageReceived = DateTime.UtcNow;
             var updateMessage = new WattPilotUpdate(e.WattPilot.SerialNumber ?? string.Empty, jsonMessage);

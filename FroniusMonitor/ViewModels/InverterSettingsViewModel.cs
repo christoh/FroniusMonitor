@@ -237,13 +237,13 @@ public partial class InverterSettingsViewModel(
             var mppt1Token = Settings.Mppt?.Mppt1 is { } mppt1 && oldSettings.Mppt?.Mppt1 is { } oldMppt1 ? Gen24JsonService.GetUpdateToken(mppt1, oldMppt1) : null;
             var mppt2Token = Settings.Mppt?.Mppt2 is { } mppt2 && oldSettings.Mppt?.Mppt2 is { } oldMppt2 ? Gen24JsonService.GetUpdateToken(mppt2, oldMppt2) : null;
 
-            var hasMppt1Updates = mppt1Token is not null && mppt1Token.HasValues;
-            var hasMppt2Updates = mppt2Token is not null && mppt2Token.HasValues;
+            var hasMppt1Updates = mppt1Token is not null && mppt1Token.HasValues();
+            var hasMppt2Updates = mppt2Token is not null && mppt2Token.HasValues();
             var hasMpptUpdates = hasMppt1Updates || hasMppt2Updates;
 
             if (hasMpptUpdates)
             {
-                var trackerToken = new JObject();
+                var trackerToken = new JsonObject();
 
                 if (hasMppt1Updates)
                 {
@@ -255,7 +255,7 @@ public partial class InverterSettingsViewModel(
                     trackerToken.Add("mppt2", mppt2Token);
                 }
 
-                var mpptToken = new JObject { { "mppt", trackerToken } };
+                var mpptToken = new JsonObject { { "mppt", trackerToken } };
                 await UpdateInverter("api/config/powerunit", mpptToken);
             }
 
@@ -281,7 +281,7 @@ public partial class InverterSettingsViewModel(
 
             var hasPowerLimitUpdates = false;
             var visualizationToken = Gen24JsonService.GetUpdateToken(Settings.PowerLimitSettings.Visualization, oldSettings.PowerLimitSettings.Visualization);
-            visualizationToken.Add("exportLimits", new JObject { { "activePower", new JObject { { "displayModeSoftLimit", "absolute" } } } });
+            visualizationToken.Add("exportLimits", new JsonObject { { "activePower", new JsonObject { { "displayModeSoftLimit", "absolute" } } } });
 
             var hardLimitToken = Gen24JsonService.GetUpdateToken(Settings.PowerLimitSettings.ExportLimits.ActivePower.HardLimit, oldSettings.PowerLimitSettings.ExportLimits.ActivePower.HardLimit);
             var softLimitToken = Gen24JsonService.GetUpdateToken(Settings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit, oldSettings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit);
@@ -293,28 +293,28 @@ public partial class InverterSettingsViewModel(
             var exportLimitsToken = Gen24JsonService.GetUpdateToken(Settings.PowerLimitSettings.ExportLimits, oldSettings.PowerLimitSettings.ExportLimits);
             exportLimitsToken.Add("activePower", activePowerToken);
 
-            var limitsToken = new JObject
+            var limitsToken = new JsonObject
             {
                 { "visualization", visualizationToken },
                 { "exportLimits", exportLimitsToken },
             };
 
             if (new[] { visualizationToken, hardLimitToken, softLimitToken, activePowerToken, exportLimitsToken, limitsToken }
-                .Any(t => t.Children().Any(c => c is JProperty p && p.Value.Children().Any(v => v.Children().Any(child => child is JValue)))))
+                .Any(candidate => candidate.HasAnyValue()))
             {
                 hasPowerLimitUpdates = true;
             }
 
             if (needsConnectedInverterUpdate && ConnectedInverters != null)
             {
-                var staticToken = new JObject();
-                var detectedToken = new JObject();
+                var staticToken = new JsonObject();
+                var detectedToken = new JsonObject();
 
                 if (Settings.PowerLimitSettings.ExportLimits.ActivePower.IsNetworkModeEnabled)
                 {
                     foreach (var connectedInverter in ConnectedInverters.Values.Where(i => !i.IsAutoDetected))
                     {
-                        staticToken.Add(connectedInverter.Id.ToString("D"), new JObject
+                        staticToken.Add(connectedInverter.Id.ToString("D"), new JsonObject
                         {
                             { "name", connectedInverter.DisplayName },
                             { "hostname", connectedInverter.Hostname },
@@ -325,7 +325,7 @@ public partial class InverterSettingsViewModel(
 
                     foreach (var connectedInverter in ConnectedInverters.Values.Where(i => i is { IsAutoDetected: true, UseDevice: true }))
                     {
-                        detectedToken.Add(connectedInverter.Id.ToString("D"), new JObject
+                        detectedToken.Add(connectedInverter.Id.ToString("D"), new JsonObject
                         {
                             { "dataSourceId", connectedInverter.DataSourceId },
                             { "serial", connectedInverter.SerialNumber },
@@ -374,7 +374,7 @@ public partial class InverterSettingsViewModel(
                 {
                     var updateToken = Gen24JsonService.GetUpdateToken(newValues, oldValues);
 
-                    if (updateToken.HasValues)
+                    if (updateToken.HasValues())
                     {
                         // ReSharper disable once VariableHidesOuterVariable
                         var success = await UpdateInverter(uri, updateToken).ConfigureAwait(false);

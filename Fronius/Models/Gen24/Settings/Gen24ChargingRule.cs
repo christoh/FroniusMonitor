@@ -77,19 +77,19 @@ public partial class Gen24ChargingRule : BindableBase, ICloneable
     /// without one, and a request thread of the server has none.
     /// </remarks>
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    public static List<Gen24ChargingRule> ParseList(JToken? token)
+    public static List<Gen24ChargingRule> ParseList(JsonNode? token)
     {
-        if (token?["timeofuse"] is not JArray array)
+        if (token?["timeofuse"] is not JsonArray array)
         {
             return [];
         }
 
         var gen24Service = IoC.Get<IGen24JsonService>();
-        return [.. array.Select(gen24Service.ReadFroniusData<Gen24ChargingRule>)];
+        return [.. array.Select(rule => gen24Service.ReadFroniusData<Gen24ChargingRule>(rule))];
     }
 
     /// <summary>The same rules in a collection a view can bind to. Needs a context; see <see cref="ParseList"/>.</summary>
-    public static BindableCollection<Gen24ChargingRule> Parse(JToken? token, SynchronizationContext? ctx)
+    public static BindableCollection<Gen24ChargingRule> Parse(JsonNode? token, SynchronizationContext? ctx)
     {
         var result = new BindableCollection<Gen24ChargingRule>(ctx);
         result.AddRange(ParseList(token));
@@ -97,12 +97,12 @@ public partial class Gen24ChargingRule : BindableBase, ICloneable
     }
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    public static JObject GetToken(IEnumerable<Gen24ChargingRule> rules)
+    public static JsonObject GetToken(IEnumerable<Gen24ChargingRule> rules)
     {
         var gen24Service = IoC.Get<IGen24JsonService>();
-        var array = new JArray();
+        var array = new JsonArray();
         rules.Apply(rule => array.Add(gen24Service.GetUpdateToken(rule)));
-        return new JObject { { "timeofuse", array } };
+        return new JsonObject { { "timeofuse", array } };
     }
 
     public bool ConflictsWith(Gen24ChargingRule other)

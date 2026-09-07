@@ -938,7 +938,7 @@ public partial class WattPilot : BindableBase, IHaveDisplayName, IHaveUniqueId, 
         }
     }
 
-    public static WattPilot Parse(JToken token)
+    public static WattPilot Parse(JsonNode token)
     {
         return IoC.Get<IGen24JsonService>().ReadFroniusData<WattPilot>(token);
     }

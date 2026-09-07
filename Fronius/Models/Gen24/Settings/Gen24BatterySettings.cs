@@ -127,7 +127,7 @@ public partial class Gen24BatterySettings : Gen24ParsingBase
     [FroniusProprietaryImport("BAT_SERVICE_ON", FroniusDataType.Root)]
     public partial bool IsInServiceMode { get; set; }
 
-    public static Gen24BatterySettings Parse(JToken? token) => Gen24JsonService.ReadFroniusData<Gen24BatterySettings>(token);
+    public static Gen24BatterySettings Parse(JsonNode? token) => Gen24JsonService.ReadFroniusData<Gen24BatterySettings>(token);
 
     public override object Clone() => MemberwiseClone();
 }

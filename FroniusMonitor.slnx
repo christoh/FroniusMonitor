@@ -9,6 +9,7 @@
   </Folder>
   <Folder Name="/Solution Items/Memory/">
     <File Path=".claude/memory/BatteryDetailsView.Lifecycle.md" />
+    <File Path=".claude/memory/DeviceJson.md" />
     <File Path=".claude/memory/DialogSystem.Lifecycle.md" />
     <File Path=".claude/memory/Gen24Polling.md" />
     <File Path=".claude/memory/HomeAutomationClient.CodeBehindInjection.md" />

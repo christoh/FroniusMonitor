@@ -48,7 +48,7 @@ public partial class Gen24Mppt : BindableBase, ICloneable
         };
     }
 
-    public static Gen24Mppt Parse(JToken? token)
+    public static Gen24Mppt Parse(JsonNode? token)
     {
         var result = gen24JsonService.ReadFroniusData<Gen24Mppt>(token);
         result.Mppt1 = gen24JsonService.ReadFroniusData<Gen24Mppt1>(token?["mppt1"]);
