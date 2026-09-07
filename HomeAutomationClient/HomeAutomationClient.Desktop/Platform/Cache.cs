@@ -8,5 +8,9 @@ namespace De.Hochstaetter.HomeAutomationClient.Desktop.Platform;
 /// </summary>
 public class Cache() : FileCache(DataDirectory)
 {
-    private static string DataDirectory => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Hochstätter", "HomeAutomationClient");
+    /// <summary>
+    /// Internal rather than private because the log file of this head belongs next to the cache, and the path is
+    /// worth having in one place. It is the same convention FroniusMonitor uses for its own per user data.
+    /// </summary>
+    internal static string DataDirectory => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Hochstätter", "HomeAutomationClient");
 }

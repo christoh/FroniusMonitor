@@ -1,5 +1,6 @@
 using De.Hochstaetter.HomeAutomationClient.Services;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using InverterDetailsView = De.Hochstaetter.HomeAutomationClient.Views.InverterDetailsView;
 
 namespace De.Hochstaetter.HomeAutomationClient;
@@ -98,6 +99,21 @@ public partial class App : Application
 
         // Only the browser head brings an address bar of its own; everywhere else the addresses are collected.
         ServiceCollection.TryAddSingleton<IUriService, FakeUriService>();
+
+        // Without AddLogging there is no ILoggerFactory, so any constructor asking for an ILogger<T> cannot be
+        // resolved and activating the service throws. Fronius has used ILogger throughout for a long time; this
+        // head simply never registered a factory for it. Where the records go is up to the head - see
+        // PlatformStartup.ConfigureLogging.
+        ServiceCollection.AddLogging(builder =>
+        {
+            if (PlatformStartup.ConfigureLogging is { } configureLogging)
+            {
+                configureLogging(builder);
+                return;
+            }
+
+            builder.AddDebug();
+        });
 
         ServiceCollection
             .AddSingleton<MainView>()

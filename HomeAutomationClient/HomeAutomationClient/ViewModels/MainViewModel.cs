@@ -208,14 +208,26 @@ public sealed partial class MainViewModel : ViewModelBase
     private Task ShowDashboardView(bool updatesAddress = true) => TaskExceptionHandler(async () =>
     {
         BusyText = "Loading dashboard";
+
+        // Off the UI thread on purpose, so the busy text reaches the screen before the dashboard is built.
         await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
         await Task.Delay(100).ConfigureAwait(false);
-        MainViewContent = IoC.Get<DashboardView>();
 
-        if (updatesAddress)
+        // And back onto the UI thread to build the view. Not because MainViewContent is bound - the binding system
+        // marshals a bound write by itself - but because IoC.Get constructs the DashboardView singleton on its
+        // first use, and constructing a control is what needs the UI thread. Neither await above keeps it:
+        // ForceYielding without ContinueOnCapturedContext drops the context, and ConfigureAwait(false) does not ask
+        // for it back, so on a desktop head we are on the thread pool by here. WebAssembly has a single thread,
+        // which is why only the desktop heads ever crashed.
+        await Dispatcher.UIThread.InvokeAsync(() =>
         {
-            uriService.SetPath(ViewPath.Dashboard);
-        }
+            MainViewContent = IoC.Get<DashboardView>();
+
+            if (updatesAddress)
+            {
+                uriService.SetPath(ViewPath.Dashboard);
+            }
+        });
     });
 
     [RelayCommand]

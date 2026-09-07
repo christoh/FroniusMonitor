@@ -109,6 +109,10 @@ internal partial class UpdateService(IWebClientService webClient) : BindableBase
             .Build();
 
         await hubConnection.StartAsync().ConfigureAwait(false);
+
+        // The handlers run on the thread SignalR delivers on. They may write the device properties from there -
+        // the binding system marshals a bound write by itself - but every change to a bound collection is
+        // dispatched, which is what the Dispatcher.UIThread.Invoke calls in them are for.
         hubConnection.On<string, Gen24System>(nameof(Gen24System), OnGen24Update);
         hubConnection.On<string, FritzBoxDevice>(nameof(FritzBoxDevice), OnFritzBoxUpdate);
         hubConnection.On<string, WattPilot>(nameof(WattPilot), OnWattPilotUpdate);
@@ -140,7 +144,7 @@ internal partial class UpdateService(IWebClientService webClient) : BindableBase
 
     ~UpdateService() => Dispose();
 
-    private async void OnWattPilotUpdateMessage(string id, WattPilotUpdate update)
+    private async Task OnWattPilotUpdateMessage(string id, WattPilotUpdate update)
     {
         try
         {
