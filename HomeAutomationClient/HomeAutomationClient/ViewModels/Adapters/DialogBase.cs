@@ -33,8 +33,16 @@ public abstract partial class DialogBase<TParameters, TResult, TBody>(TParameter
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 TokenSource = new();
-                var dialogItem = new DialogQueueItem(Parameters.Title, new TBody { DataContext = this, }, Parameters.ShowCloseBox, Parameters.IsMoveable, Parameters.IsModal, BusyText);
+
+                // Take the busy text of whatever was on screen and clear it *before* the body is created. Creating
+                // the body assigns its DataContext, which starts Initialize, and a dialog that sets a busy text
+                // there is on the UI thread and gets that far synchronously. With the two lines the other way
+                // round the argument list read that new busy text into the item and the clear then wiped it, so
+                // the dialog came up with no busy animation and the item held the wrong text to restore.
+                var busyTextBelow = BusyText;
                 BusyText = null;
+
+                var dialogItem = new DialogQueueItem(Parameters.Title, new TBody { DataContext = this, }, Parameters.ShowCloseBox, Parameters.IsMoveable, Parameters.IsModal, busyTextBelow);
                 mainViewModel.CurrentDialog = dialogItem;
             });
 

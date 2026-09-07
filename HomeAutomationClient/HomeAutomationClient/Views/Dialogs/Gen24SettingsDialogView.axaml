@@ -9,9 +9,11 @@
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.Gen24SettingsDialogView"
              x:DataType="dialogs:Gen24SettingsDialogViewModel"
              MinWidth="480" MaxWidth="760" MaxHeight="800">
-	<Grid RowDefinitions="*,Auto" IsVisible="{Binding IsLoaded}">
+	<!-- Not gated on IsLoaded: the tabs are there from the start, so the dialog does not open as a bare title bar
+	     and the busy animation of the frame has a body of a sensible size to sit over while the settings are read. -->
+	<Grid RowDefinitions="*,Auto">
 
-		<TabControl Grid.Row="0">
+		<TabControl Grid.Row="0" MinHeight="360">
 			<!-- The three tabs still to be ported carry their heading already, so the shape of the dialog is
 			     settled and adding one is a matter of dropping its view into the tab. -->
 			<TabItem Header="{x:Static p:Resources.EnergyFlow}">
@@ -26,10 +28,9 @@
 				<TextBlock Margin="24" TextWrapping="Wrap" Text="Not ported yet." />
 			</TabItem>
 
-			<!-- Hidden where the inverter reports no Modbus configuration at all: the tab would have nothing to
-			     show, and every binding in it would come up empty. -->
-			<TabItem Header="{x:Static p:Resources.Modbus}"
-			         IsVisible="{Binding Modbus, Converter={x:Static ObjectConverters.IsNotNull}}">
+			<!-- ShowModbus keeps the tab in place while the settings are read and drops it afterwards only where
+			     the inverter has no Modbus configuration at all - the tab would have nothing to show then. -->
+			<TabItem Header="{x:Static p:Resources.Modbus}" IsVisible="{Binding ShowModbus}">
 				<ScrollViewer>
 					<v:Gen24ModbusView DataContext="{Binding Modbus}" />
 				</ScrollViewer>

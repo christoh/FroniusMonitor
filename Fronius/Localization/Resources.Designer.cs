@@ -4084,6 +4084,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reading the settings of the inverter.
+        /// </summary>
+        public static string ReadingInverterSettings {
+            get {
+                return ResourceManager.GetString("ReadingInverterSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Saving {0} settings.
+        /// </summary>
+        public static string SavingSettings {
+            get {
+                return ResourceManager.GetString("SavingSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Use the right mouse button to add or delete rules..
         /// </summary>
         public static string RuleTooltip {

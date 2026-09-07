@@ -1,0 +1,29 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<Design.PreviewWith>
+		<Border Padding="20">
+			<StackPanel Spacing="8" Width="200">
+				<TextBox Text="ordinary" />
+				<TextBox Text="focused" IsFocused="True" />
+			</StackPanel>
+		</Border>
+	</Design.PreviewWith>
+
+	<!-- Fluent paints the border of a focused text box with the accent colour, and the accent colour of this app
+	     is a red, so a field being edited looked like a field that had been refused. Both states get a colour of
+	     their own here, per theme variant - see the ThemeDictionaries in App.axaml. -->
+	<Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+		<Setter Property="BorderBrush" Value="{DynamicResource TextBoxFocusedBorder}" />
+	</Style>
+
+	<Style Selector="TextBox:focus-within /template/ Border#PART_BorderElement">
+		<Setter Property="BorderBrush" Value="{DynamicResource TextBoxFocusedBorder}" />
+	</Style>
+
+	<!-- After the focus rules on purpose. A value is refused while the user is typing it, so the field is focused
+	     and in error at the same time, and of the two it is the error that has to show. Styles of equal
+	     specificity are applied in order, so the last one wins. -->
+	<Style Selector="TextBox:error /template/ Border#PART_BorderElement">
+		<Setter Property="BorderBrush" Value="{DynamicResource ValidationErrorBrush}" />
+	</Style>
+</Styles>

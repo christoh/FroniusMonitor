@@ -16,6 +16,7 @@
 		<StyleInclude Source="Styles/HeaderedContentControls.axaml"/>
         <StyleInclude Source="Styles/Controls.axaml"/>
         <StyleInclude Source="Styles/DetailViews.axaml"/>
+        <StyleInclude Source="Styles/TextBoxes.axaml"/>
 	</Application.Styles>
 
 	<Application.Resources>
@@ -83,6 +84,16 @@
                     <SolidColorBrush x:Key="BatteryBorderRunning">DarkGreen</SolidColorBrush>
                     <SolidColorBrush x:Key="BatteryBorderFault">Red</SolidColorBrush>
                     <SolidColorBrush x:Key="BatteryBorderWarning">Gold</SolidColorBrush>
+
+                    <!-- Toast: the same in both variants, white on green reads well either way -->
+                    <SolidColorBrush x:Key="ToastBackground">Green</SolidColorBrush>
+                    <SolidColorBrush x:Key="ToastForeground">White</SolidColorBrush>
+
+                    <!-- Text boxes. The focused border deliberately does not use the accent colour: the accent of
+                         this app is a red and a focused field would read as a field in error. The error colour is
+                         a red of its own, and Styles/TextBoxes.axaml lets it win while a field is both. -->
+                    <SolidColorBrush x:Key="TextBoxFocusedBorder">#005FB8</SolidColorBrush>
+                    <SolidColorBrush x:Key="ValidationErrorBrush">#C42B1C</SolidColorBrush>
                     
                 </ResourceDictionary>
 
@@ -142,6 +153,14 @@
                     <SolidColorBrush x:Key="BatteryBorderRunning">#ff006080</SolidColorBrush>
                     <SolidColorBrush x:Key="BatteryBorderFault">DarkRed</SolidColorBrush>
                     <SolidColorBrush x:Key="BatteryBorderWarning">Goldenrod</SolidColorBrush>
+
+                    <!-- Toast: the same in both variants, white on green reads well either way -->
+                    <SolidColorBrush x:Key="ToastBackground">Green</SolidColorBrush>
+                    <SolidColorBrush x:Key="ToastForeground">White</SolidColorBrush>
+
+                    <!-- Text boxes: see the light variant. Both are lightened for a dark ground. -->
+                    <SolidColorBrush x:Key="TextBoxFocusedBorder">#4CC2FF</SolidColorBrush>
+                    <SolidColorBrush x:Key="ValidationErrorBrush">#FF5C5C</SolidColorBrush>
                     
                 </ResourceDictionary>
 			</ResourceDictionary.ThemeDictionaries>

@@ -22,17 +22,37 @@ namespace De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs;
 public sealed partial class Gen24ModbusViewModel : ViewModelBase
 {
     private readonly IWebClientService webClient = IoC.GetRegistered<IWebClientService>();
+    private readonly Gen24SettingsDialogViewModel owner;
     private readonly string deviceId;
     private Gen24ModbusSettings loadedSettings;
 
-    public Gen24ModbusViewModel(string deviceId, Gen24ModbusSettings settings)
+    public Gen24ModbusViewModel(Gen24SettingsDialogViewModel owner, string deviceId, Gen24ModbusSettings settings)
     {
+        this.owner = owner;
         this.deviceId = deviceId;
         loadedSettings = settings;
         Settings = (Gen24ModbusSettings)settings.Clone();
         AttachTo(Settings);
         EnableTcp = Settings.Mode is ModbusSlaveMode.Tcp or ModbusSlaveMode.Both;
     }
+
+    /// <summary>
+    /// A tab has no busy indicator of its own - the dialog around it has one. Proxying it means the guard in
+    /// <see cref="ViewModelBase.TaskExceptionHandler"/> clears the indicator the user is actually looking at,
+    /// rather than a property nothing is bound to.
+    /// </summary>
+    public override string? BusyText
+    {
+        get => owner.BusyText;
+        set => owner.BusyText = value;
+    }
+
+    /// <summary>
+    /// What the user has typed that the settings refused, one message per field, and only for fields that are on
+    /// screen. The view fills this in: which controls exist and which of them are visible is not something a view
+    /// model can know, and it is the controls that hold the rejected text.
+    /// </summary>
+    public Func<IReadOnlyList<string>>? GetInvalidFields { get; set; }
 
     public IReadOnlyList<EnumListItemModel<ModbusInterfaceRole>> InterfaceRoles { get; } =
         [.. Enum.GetValues<ModbusInterfaceRole>().Select(r => new EnumListItemModel<ModbusInterfaceRole> { Value = r })];
@@ -55,9 +75,9 @@ public sealed partial class Gen24ModbusViewModel : ViewModelBase
     [ObservableProperty, NotifyPropertyChangedFor(nameof(ShowAllowControl), nameof(ShowRestrictControl), nameof(ShowAllowedIp), nameof(ShowCommonSlaveSettings))]
     public partial bool EnableTcp { get; set; }
 
-    /// <summary>Empty unless the last Apply had something to say. Cleared as soon as anything is edited again.</summary>
+    /// <summary>What the toast says after an Apply. The toast clears it again once it has faded.</summary>
     [ObservableProperty]
-    public partial string? ResultText { get; set; }
+    public partial string? ToastText { get; set; }
 
     public bool IsRtuSlave => Settings.Rtu0 == ModbusInterfaceRole.Slave || Settings.Rtu1 == ModbusInterfaceRole.Slave;
 
@@ -77,15 +97,33 @@ public sealed partial class Gen24ModbusViewModel : ViewModelBase
         Settings = (Gen24ModbusSettings)loadedSettings.Clone();
         AttachTo(Settings);
         EnableTcp = Settings.Mode is ModbusSlaveMode.Tcp or ModbusSlaveMode.Both;
-        ResultText = null;
+        ToastText = null;
         NotifyAllVisibilities();
     }
 
     [RelayCommand]
     private Task Apply() => TaskExceptionHandler(async () =>
     {
-        BusyText = Loc.Modbus;
-        ResultText = null;
+        ToastText = null;
+
+        // A setter of the settings throws on a value it will not take, so the binding keeps the text in the box,
+        // marks it, and leaves the model as it was. Nothing is therefore wrong with the model at this point - the
+        // fields are the only place that knows, which is why the view has to be asked.
+        if (GetInvalidFields?.Invoke() is { Count: > 0 } invalidFields)
+        {
+            await new MessageBox
+            {
+                Text = $"{Loc.PleaseCorrectErrors}:",
+                ItemList = [.. invalidFields],
+                Title = Loc.Error,
+                Buttons = [Loc.Ok],
+                Icon = new ErrorIcon(),
+            }.Show().ConfigureAwait(true);
+
+            return;
+        }
+
+        BusyText = string.Format(CultureInfo.CurrentCulture, Loc.SavingSettings, Loc.Modbus);
 
         // The same rules FroniusMonitor applies before it writes: the mode follows from what the user enabled, and
         // an inverter that is not a slave anywhere has no address on the bus.
@@ -100,6 +138,25 @@ public sealed partial class Gen24ModbusViewModel : ViewModelBase
             _ => ModbusSlaveMode.Off,
         };
 
+        // Nothing to send, so nothing is sent - the same thing the dialog of FroniusMonitor does. The delta the
+        // server works out is the one that counts, because it is taken against what the inverter holds right now;
+        // this one only answers whether the user changed anything since the dialog read the settings. It has to be
+        // taken after the mode above, which is derived rather than edited.
+        if (!Settings.GetToken(loadedSettings).HasValues)
+        {
+            BusyText = null;
+
+            await new MessageBox
+            {
+                Text = Loc.NoSettingsChanged,
+                Title = Loc.Warning,
+                Buttons = [Loc.Ok],
+                Icon = new WarningIcon(),
+            }.Show().ConfigureAwait(true);
+
+            return;
+        }
+
         var result = await webClient.SetGen24ModbusSettings(deviceId, Settings).ConfigureAwait(true);
 
         if (result.Status != HttpStatusCode.OK)
@@ -109,7 +166,7 @@ public sealed partial class Gen24ModbusViewModel : ViewModelBase
         }
 
         // False means the server found no difference to what the inverter already had.
-        ResultText = result.Payload is true ? Loc.SettingsSavedToInverter : Loc.NoSettingsChanged;
+        ToastText = result.Payload is true ? Loc.SettingsSavedToInverter : Loc.NoSettingsChanged;
         loadedSettings = (Gen24ModbusSettings)Settings.Clone();
     });
 
@@ -123,7 +180,7 @@ public sealed partial class Gen24ModbusViewModel : ViewModelBase
     /// </summary>
     private void OnSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        ResultText = null;
+        ToastText = null;
 
         switch (e.PropertyName)
         {

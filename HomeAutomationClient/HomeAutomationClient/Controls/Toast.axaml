@@ -1,0 +1,19 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+             x:Class="De.Hochstaetter.HomeAutomationClient.Controls.Toast"
+             x:DataType="c:Toast" x:CompileBindings="True"
+             IsHitTestVisible="False" Opacity="0"
+             CornerRadius="10" Padding="10,3" MinWidth="80"
+             Background="{DynamicResource ToastBackground}" Foreground="{DynamicResource ToastForeground}">
+	<UserControl.Transitions>
+		<Transitions>
+			<DoubleTransition Property="Opacity" Duration="0:0:1" />
+		</Transitions>
+	</UserControl.Transitions>
+
+	<!-- No Border of its own: a ContentControl already paints Background with CornerRadius and Padding, so one
+	     here would put a square of the same colour behind the rounded one. Foreground inherits into the text. -->
+	<TextBlock Text="{Binding $parent[c:Toast].Text}" TextWrapping="Wrap"
+	           HorizontalAlignment="Center" VerticalAlignment="Center" />
+</UserControl>

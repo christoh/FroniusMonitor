@@ -21,23 +21,43 @@ public sealed partial class Gen24SettingsDialogViewModel(DialogParameters parame
     : DialogBase<DialogParameters, bool, Gen24SettingsDialogView>(parameters)
 {
     private readonly IWebClientService webClient = IoC.GetRegistered<IWebClientService>();
+    private bool isInitialized;
 
     /// <summary>The key of the inverter, as <see cref="IUpdateService.DevicesWithSettings"/> knows it.</summary>
     public required string DeviceId { get; init; }
 
-    [ObservableProperty]
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(ShowModbus))]
     public partial Gen24ModbusViewModel? Modbus { get; set; }
 
-    /// <summary>
-    /// True once the snapshot has arrived. The tabs have no content to bind to before that.
-    /// </summary>
-    [ObservableProperty]
+    /// <summary>True once the snapshot has arrived.</summary>
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(ShowModbus))]
     public partial bool IsLoaded { get; set; }
 
+    /// <summary>
+    /// The tab stays in place while the settings are still being read, so the set of tabs does not change under
+    /// the user a second after the dialog opened. Once they have arrived it is only there if the inverter has a
+    /// Modbus configuration at all.
+    /// </summary>
+    public bool ShowModbus => !IsLoaded || Modbus is not null;
+
+    /// <summary>
+    /// Reads the snapshot, once. The view calls this from <c>OnDataContextChanged</c>, and that fires again every
+    /// time this dialog is re-attached - which happens whenever a message box has opened and closed over it, an
+    /// error from one of the tabs for instance. Without the guard the inverter would be read again at that point
+    /// and the busy overlay would come back up over a dialog the user is working in.
+    /// </summary>
     public override Task Initialize() => TaskExceptionHandler(async () =>
     {
+        if (isInitialized)
+        {
+            return;
+        }
+
+        // Set before the first await, so a second call cannot get past the guard while the first is still running.
+        isInitialized = true;
+
         await base.Initialize().ConfigureAwait(true);
-        BusyText = Loc.GetInverterLocalization;
+        BusyText = Loc.ReadingInverterSettings;
 
         var result = await webClient.GetGen24Settings(DeviceId).ConfigureAwait(true);
 
@@ -52,7 +72,7 @@ public sealed partial class Gen24SettingsDialogViewModel(DialogParameters parame
         // being put up, which is before this has run. MainViewModel.Settings therefore supplies it.
 
         // Only the Modbus tab is ported so far. The other three get their view models here as they arrive.
-        Modbus = snapshot.ModbusSettings is { } modbusSettings ? new Gen24ModbusViewModel(DeviceId, modbusSettings) : null;
+        Modbus = snapshot.ModbusSettings is { } modbusSettings ? new Gen24ModbusViewModel(this, DeviceId, modbusSettings) : null;
         IsLoaded = true;
     });
 
@@ -64,11 +84,16 @@ public sealed partial class Gen24SettingsDialogViewModel(DialogParameters parame
     }
 
     /// <summary>
-    /// Nothing to unwind: every tab writes to the inverter when the user applies it, never on the way out.
+    /// The close box of the dialog frame ends up here, and it does exactly what the Cancel button does. Nothing
+    /// has to be unwound either way: a tab writes to the inverter when the user applies it, never on the way out.
     /// </summary>
+    /// <remarks>
+    /// <see cref="Close"/> has to be called from here. Setting only <see cref="DialogBase{T,TResult,TBody}.Result"/>
+    /// leaves the dialog on screen and <c>ShowDialogAsync</c> waiting, so the close box would do nothing at all.
+    /// </remarks>
     public override Task AbortAsync()
     {
-        Result = false;
+        CloseDialog();
         return Task.CompletedTask;
     }
 }

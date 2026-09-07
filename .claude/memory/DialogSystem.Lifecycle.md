@@ -75,6 +75,13 @@ animation over the dialog body binds to. `ShowDialogAsync` copies the current bu
 then clears it, and `Close()` restores the busy text of the item underneath. That is why the busy overlay of a
 nested dialog does not leak into the dialog below it.
 
+**Both happen before the body is created, and the order matters.** Creating the body assigns its `DataContext`,
+which starts `Initialize` on the UI thread, and a dialog that sets a busy text there gets that far synchronously -
+`await` on an already completed task does not yield. So a dialog **can** set its busy text in `Initialize` and have
+it show. It could not while the copy and the clear came after the body: the argument list picked up the new busy
+text and the clear then wiped it, so such a dialog opened with no busy animation at all and the queue item held the
+wrong text to restore later.
+
 ## Modality
 
 `IsModal` (default `true`) becomes `MainViewModel.IsModalDialogVisible`, and that drives three things in
@@ -110,6 +117,10 @@ change. Pointer capture makes touch and pen work like the mouse. The close butto
   `AbortAsync` on the view model behind `CurrentDialog.Body`. Every dialog view model must implement it and decide
   what "aborted" means for its result (`MessageBoxViewModel` returns an empty `MessageBoxResult`).
 - The view model itself closes by calling `Close()` after setting `Result`.
+- **`AbortAsync` has to call `Close()` as well.** Nothing else does it for you: setting only `Result` and returning
+  leaves the dialog on screen and `ShowDialogAsync` waiting on its token, so the close box appears to do nothing at
+  all. Where a dialog has a Cancel button of its own, let both go through one method rather than writing the two
+  paths separately - they are the same thing and drift apart otherwise.
 
 ## What a dialog view model looks like
 
@@ -121,6 +132,14 @@ public class MessageBoxViewModel(MessageBox parameters)
 The body's `OnDataContextChanged` starts `ViewModel.Initialize()` (fire and forget) - that is where a dialog loads
 what it needs, as `LoginViewModel` does with the cached connection. Since `DataContext` is assigned in the object
 initializer inside `ShowDialogAsync`, `Initialize` starts before the dialog is on screen.
+
+**`Initialize` fires again whenever the body is re-attached.** `MainView` presents `CurrentDialog.Body` through one
+host, so a nested dialog opening and closing over a dialog takes its body out of the tree and puts it back, and
+`OnDataContextChanged` comes round a second time. A dialog that is shown once and closed never notices - the login
+and the message boxes do not. One that **stays open** while it shows a message box does, and has to guard
+`Initialize` against running twice, with the flag set before the first `await`. Otherwise it loads everything again
+and puts its busy overlay back up over a dialog the user is working in.
+`Gen24SettingsDialogViewModel` is the worked example; see [[SettingsDialogs.Lifecycle]].
 
 ## Known gaps
 

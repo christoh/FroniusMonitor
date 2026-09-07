@@ -1,6 +1,7 @@
 using De.Hochstaetter.HomeAutomationClient.Services;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using Gen24JsonService = De.Hochstaetter.Fronius.Services.Gen24JsonService;
 using InverterDetailsView = De.Hochstaetter.HomeAutomationClient.Views.InverterDetailsView;
 
 namespace De.Hochstaetter.HomeAutomationClient;
@@ -138,6 +139,10 @@ public partial class App : Application
             .AddSingleton<IServerBasedAesKeyProvider, AesKeyProvider>()
             .AddSingleton<IAesKeyProvider, IAesKeyProvider>(provider => IoC.GetRegistered<IServerBasedAesKeyProvider>())
             .AddSingleton<IWebClientService, WebClientService>()
+
+            // The settings models reach for this through IoC when they build an update token. The client only needs
+            // it to tell whether anything was changed at all; what actually gets written is worked out server side.
+            .AddSingleton<IGen24JsonService, Gen24JsonService>()
             .AddSingleton<IGen24LocalizationService, Gen24LocalizationService>()
             .AddSingleton<IUpdateService, UpdateService>()
             ;

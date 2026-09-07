@@ -336,6 +336,12 @@
   <data name="RtuSlaveSettings" xml:space="preserve">
 	  <value>Modbus-RTU-Slave-Einstellungen</value>
   </data>
+  <data name="ReadingInverterSettings" xml:space="preserve">
+	  <value>Lese die Einstellungen des Wechselrichters</value>
+  </data>
+  <data name="SavingSettings" xml:space="preserve">
+	  <value>Speichere {0}-Einstellungen</value>
+  </data>
   <data name="BaudRate" xml:space="preserve">
 	  <value>Baudrate</value>
   </data>
