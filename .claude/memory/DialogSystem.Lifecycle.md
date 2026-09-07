@@ -111,6 +111,11 @@ target cannot leave its container - also when the container is resized, which it
 change. Pointer capture makes touch and pen work like the mouse. The close button keeps its own clicks because a
 `Button` marks `PointerPressed` as handled before the drag handler sees it.
 
+**The handle carries a `SizeAll` cursor, and `Cursor` is inherited.** So anything inside the title bar that is not
+there to be dragged has to set a cursor of its own, or it offers to move the dialog: the close box sets
+`Cursor="Arrow"` in its style for exactly that reason. The icon and the title text inherit it on purpose - the
+dialog can be dragged by both.
+
 ## Closing
 
 - The close box is visible when `ShowCloseBox` is true and runs `MainViewModel.DialogClosedCommand`, which calls

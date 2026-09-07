@@ -93,6 +93,9 @@
                             <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundChromeWhiteBrush}"/>
                             <Setter Property="Content" Value="X" />
                             <Setter Property="Command" Value="{Binding DialogClosedCommand}"/>
+                            <!-- Cursor is inherited, and the title bar is a drag handle, so without this the close
+                                 box offers to move the dialog instead of to close it. -->
+                            <Setter Property="Cursor" Value="Arrow" />
                         </Style>
                     </Grid.Styles>
                     <Image Margin="4,0,0,0" Source="/Assets/Images/sun.ico" Width="16"/>

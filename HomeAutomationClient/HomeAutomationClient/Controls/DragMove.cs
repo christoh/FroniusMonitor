@@ -8,9 +8,18 @@ namespace De.Hochstaetter.HomeAutomationClient.Controls;
 /// moving that a window manager would otherwise provide.
 /// </summary>
 /// <remarks>
+/// <para>
 /// Pointer capture and render transforms are pure framework concerns, so this lives in the view layer and not in a
 /// view model. The moved element keeps its layout position; only its <see cref="Visual.RenderTransform"/> changes,
 /// and the offset is clamped so that the element can never be dragged out of its container.
+/// </para>
+/// <para>
+/// While moving is enabled the handle carries a <see cref="StandardCursorType.SizeAll"/> cursor. <c>Cursor</c> is
+/// an inherited property, so **anything inside the handle that is not there to be dragged has to set a cursor of
+/// its own** - a button, for instance, which keeps its own clicks anyway because it marks
+/// <c>PointerPressed</c> handled before the drag handler sees it. The close box of the dialog header is the one
+/// that does this today.
+/// </para>
 /// </remarks>
 public sealed class DragMove : AvaloniaObject
 {
