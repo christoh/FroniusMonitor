@@ -88,6 +88,9 @@ internal class Program
             .AddSingleton<SunSpecDataCollector>()
             .AddSingleton<FritzBoxDataCollector>()
             .AddSingleton<Gen24DataCollector>()
+            // The same instance under its contract, so a controller that writes a setting can have it read back
+            // at once instead of waiting out the polling interval.
+            .AddSingleton<IGen24ConfigRefresher>(services => services.GetRequiredService<Gen24DataCollector>())
             .AddSingleton<SignalRDispatcher>()
             .AddSingleton<WattPilotDataCollector>()
             .AddTransient<ISunSpecClient, SunSpecClient>()

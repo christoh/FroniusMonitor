@@ -37,7 +37,13 @@ server  read api/config/ -> current settings
         delta = wanted.GetToken(current)
         post api/config/modbus <- delta only
         200 true  = written        200 false = inverter already held it
+        IGen24ConfigRefresher.ReadConfigNow(id)
 ```
+
+**A write that succeeded ends with `ReadConfigNow`.** `Gen24DataCollector` polls the configuration every five
+minutes, and everything the clients know about an inverter comes from that poll. Without the call, a setting just
+written would not reach any client until the next one, and a dialog reopened in the meantime would show what the
+inverter held *before* the change. How that interrupts the poll is [[Gen24Polling]].
 
 Why this way round:
 

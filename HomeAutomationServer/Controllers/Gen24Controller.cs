@@ -10,7 +10,13 @@ namespace De.Hochstaetter.HomeAutomationServer.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class Gen24SystemController(IDataControlService controlService, IGen24JsonService jsonService, ILogger<Gen24SystemController> logger) : DeviceControllerBase(controlService, logger)
+public class Gen24SystemController
+(
+    IDataControlService controlService,
+    IGen24JsonService jsonService,
+    IGen24ConfigRefresher configRefresher,
+    ILogger<Gen24SystemController> logger
+) : DeviceControllerBase(controlService, logger)
 {
     [HttpGet]
     [BasicAuthorize(Roles = "User")]
@@ -285,6 +291,11 @@ public class Gen24SystemController(IDataControlService controlService, IGen24Jso
             {
                 logger.LogInformation("{Username} changed {Path} on inverter {Id}", HttpContext.User.Identity?.Name, inverterPath, id);
             }
+
+            // The collector polls the configuration every few minutes, so without this the change we have just
+            // made would not reach any client until then - and a dialog that reopens in the meantime would show
+            // what the inverter held before it.
+            configRefresher.ReadConfigNow(id);
 
             return Ok(true);
         }

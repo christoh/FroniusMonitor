@@ -4,9 +4,21 @@ public sealed class Gen24DataCollector(
     ILogger<Gen24DataCollector> logger,
     IOptionsMonitor<Gen24DataCollectorParameters> options,
     IDataControlService dataControlService
-) : IHomeAutomationRunner, IAsyncDisposable
+) : IHomeAutomationRunner, IGen24ConfigRefresher, IAsyncDisposable
 {
     private readonly ConcurrentDictionary<WebConnection, Task> runningSensorTasks = new(), runningConfigTasks = new();
+
+    /// <summary>
+    /// One per inverter, so that a setting just written can be read back without waiting out
+    /// <see cref="Gen24DataCollectorParameters.ConfigRefreshRate"/> - five minutes by default.
+    /// </summary>
+    /// <remarks>
+    /// Keyed by the <see cref="Gen24System"/> and not by its <see cref="WebConnection"/>. The connection is
+    /// replaced by a clone on every round of <see cref="Update"/> and <see cref="WebConnection"/> does not
+    /// compare by value, so it is not the same key twice; the inverter is created once in
+    /// <see cref="StartAsync"/> and lives as long as the collector runs.
+    /// </remarks>
+    private readonly ConcurrentDictionary<Gen24System, ReadNowRequest> configReadRequests = new();
 
     private CancellationTokenSource? tokenSource;
     private DateTime lastLogTime = DateTime.MinValue;
@@ -49,10 +61,29 @@ public sealed class Gen24DataCollector(
             gen24Service.Connection = connection;
             var gen24System = new Gen24System { Service = gen24Service };
             var semaphore = new SemaphoreSlim(1, 1);
+            configReadRequests[gen24System] = new ReadNowRequest();
             logger.LogInformation("Adding Gen24 inverter {WebConnection}", connection);
             runningSensorTasks[connection] = Update(gen24System, semaphore);
             runningConfigTasks[connection] = UpdateConfig(gen24System, semaphore);
         }
+    }
+
+    /// <inheritdoc />
+    public void ReadConfigNow(string deviceId)
+    {
+        // The id is built from what the configuration itself says, so an inverter that has not been read yet has
+        // none. That is the one case where there is nothing to ask for: the first read is already on its way.
+        // Through the interface, because Id is a default implementation on it and not a member of the inverter.
+        var inverter = configReadRequests.Keys.FirstOrDefault(candidate => ((IHaveUniqueId)candidate).Id == deviceId);
+
+        if (inverter is null || !configReadRequests.TryGetValue(inverter, out var request))
+        {
+            logger.LogDebug("Asked to read the config of {DeviceId} now, which this collector does not poll", deviceId);
+            return;
+        }
+
+        logger.LogInformation("Reading the config of {Entity} now: something was just written to it", inverter.DisplayName);
+        request.Request();
     }
 
     public async Task StopAsync(CancellationToken token = default)
@@ -64,6 +95,12 @@ public sealed class Gen24DataCollector(
             await Task.WhenAll(runningConfigTasks.Values.Concat(runningSensorTasks.Values)).ConfigureAwait(false);
         }
 
+        foreach (var request in configReadRequests.Values)
+        {
+            request.Dispose();
+        }
+
+        configReadRequests.Clear();
         tokenSource = null;
     }
 
@@ -187,7 +224,11 @@ public sealed class Gen24DataCollector(
         }
 
         var token = tokenSource?.Token ?? throw new TaskCanceledException();
-        await Task.Delay(Parameters.ConfigRefreshRate, token).ConfigureAwait(false);
+
+        // Not a plain delay: whoever writes a setting to this inverter asks for the next read through
+        // ReadConfigNow, and that has to cut the wait short - see ReadNowRequest.
+        var request = configReadRequests.GetOrAdd(gen24System, _ => new ReadNowRequest());
+        var wasAskedFor = await request.WaitAsync(Parameters.ConfigRefreshRate, token).ConfigureAwait(false);
         var startTime = DateTime.UtcNow;
 
         try
@@ -197,7 +238,9 @@ public sealed class Gen24DataCollector(
             if (gen24System.Config?.Versions?.SerialNumber != null)
             {
                 dataControlService.AddOrUpdate(new ManagedDevice(gen24System, gen24System.Service.Connection, typeof(IGen24Service)));
-                logger.LogInformation("{Entity} config updated in {Duration:N0} ms", gen24System.DisplayName, (DateTime.UtcNow - startTime).TotalMilliseconds);
+
+                logger.LogInformation("{Entity} config updated in {Duration:N0} ms{OnRequest}", gen24System.DisplayName,
+                    (DateTime.UtcNow - startTime).TotalMilliseconds, wasAskedFor ? " on request" : string.Empty);
             }
         }
         catch (Exception ex)
