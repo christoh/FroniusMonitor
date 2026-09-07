@@ -11,6 +11,14 @@
   Use full repo-relative paths (a trailing `/**` for a whole folder is fine), and list only the files whose editing
   actually requires the document. Read a document when your task touches one of its `paths:`, otherwise skip it, so
   that knowledge irrelevant to the current task is never loaded.
+- **`.claude/memory` is yours to maintain, without being asked.** Whenever you change something a document there
+  covers - a file in its `paths:`, or a statement in it that your change makes wrong - update the document in the
+  same piece of work as the code. Do not wait to be told, and do not leave a document saying something is missing
+  once you have built it. A memory that has to be corrected by hand afterwards was worse than no memory at all,
+  because it was believed in the meantime.
+- **`.claude/rules` is mine.** Follow everything in it, and change it only when I ask you to. Where you think a
+  rule is wrong or is getting in the way, say so and let me decide - do not edit it and do not work around it
+  quietly.
 ## Undo
 * Make sure, that you can undo exactly your changes, especially if the git repo was dirty before you started editing. If you are unsure, please ask me before editing.
 
