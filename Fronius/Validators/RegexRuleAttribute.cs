@@ -18,7 +18,7 @@ public sealed class RegexRuleAttribute(string pattern) : ValidationRuleAttribute
 
     public RegexOptions Options { get; set; } = RegexOptions.None;
 
-    protected override string Complaint => Message ?? $"No message was given for the pattern {pattern} of {DisplayName}";
+    protected override string Complain(object? value) => Message ?? $"No message was given for the pattern {pattern} of {DisplayName}";
 
     protected override bool IsAcceptable(object? value) => Regex.IsMatch(value?.ToString() ?? string.Empty, pattern, Options);
 }

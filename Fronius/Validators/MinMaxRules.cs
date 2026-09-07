@@ -14,7 +14,7 @@ public sealed class MinMaxIntAttribute(long minimum, long maximum) : ValidationR
 
     public long Maximum => maximum;
 
-    protected override string Complaint => string.Format(CultureInfo.CurrentCulture, Resources.MustBeBetween, DisplayName, minimum, maximum);
+    protected override string Complain(object? value) => string.Format(CultureInfo.CurrentCulture, Resources.MustBeBetween, DisplayName, minimum, maximum);
 
     protected override bool IsAcceptable(object? value) =>
         NumericText.TryParseInteger(value?.ToString(), out var number) && number >= minimum && number <= maximum;
@@ -30,7 +30,7 @@ public sealed class MinMaxDoubleAttribute(double minimum, double maximum) : Vali
 
     public double Maximum => maximum;
 
-    protected override string Complaint => string.Format(CultureInfo.CurrentCulture, Resources.MustBeBetween, DisplayName, minimum, maximum);
+    protected override string Complain(object? value) => string.Format(CultureInfo.CurrentCulture, Resources.MustBeBetween, DisplayName, minimum, maximum);
 
     protected override bool IsAcceptable(object? value) =>
         NumericText.TryParseNumber(value?.ToString(), out var number) && number >= minimum && number <= maximum;

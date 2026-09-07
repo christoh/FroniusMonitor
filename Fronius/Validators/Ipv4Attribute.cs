@@ -17,7 +17,7 @@ public sealed class Ipv4Attribute : ValidationRuleAttribute
     /// <summary>Take several entries separated by commas, each of which has to hold on its own.</summary>
     public bool AllowList { get; set; }
 
-    protected override string Complaint => AllowHostname ? Resources.NoHostnameOrIpv4Address : Resources.MustBeIpv4Address;
+    protected override string Complain(object? value) => AllowHostname ? Resources.NoHostnameOrIpv4Address : Resources.MustBeIpv4Address;
 
     protected override bool IsAcceptable(object? value)
     {

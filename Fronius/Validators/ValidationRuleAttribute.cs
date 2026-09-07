@@ -48,8 +48,12 @@ public abstract class ValidationRuleAttribute : ValidationAttribute
 
     protected string DisplayName => PropertyDisplayName ?? Localize(PropertyDisplayNameResourceKey) ?? Resources.DefaultPropertyDisplayName;
 
-    /// <summary>What is wrong with the value, in the words of this rule. Only asked for when a value is refused.</summary>
-    protected abstract string Complaint { get; }
+    /// <summary>
+    /// What is wrong with <paramref name="value"/>, in the words of this rule. Only asked for when a value is
+    /// refused, and given the value so that a rule can quote it without keeping any state of its own - an
+    /// attribute instance is shared by everything that reads it.
+    /// </summary>
+    protected abstract string Complain(object? value);
 
     /// <summary>Whether the value - never null and never blank - is one this rule accepts.</summary>
     protected abstract bool IsAcceptable(object? value);
@@ -58,14 +62,16 @@ public abstract class ValidationRuleAttribute : ValidationAttribute
     {
         var isEmpty = value is null || (value is string text && string.IsNullOrWhiteSpace(text));
 
-        return isEmpty ? AllowEmpty ? ValidationResult.Success : Refuse() : IsAcceptable(value) ? ValidationResult.Success : Refuse();
+        return isEmpty
+            ? AllowEmpty ? ValidationResult.Success : Refuse(value)
+            : IsAcceptable(value) ? ValidationResult.Success : Refuse(value);
     }
 
     /// <summary>
-    /// Refuse the value. <see cref="Complaint"/> is only asked for when <see cref="MessageResourceKey"/> does not
-    /// name a message, so a rule can compose one without checking first.
+    /// Refuse the value. <see cref="Complain"/> is only asked when <see cref="MessageResourceKey"/> does not name
+    /// a message, so a rule can compose one without checking first.
     /// </summary>
-    private ValidationResult Refuse() => new(Localize(MessageResourceKey) ?? Complaint);
+    private ValidationResult Refuse(object? value) => new(Localize(MessageResourceKey) ?? Complain(value));
 
     protected static string? Localize(string? resourceKey) => resourceKey is null ? null : Resources.ResourceManager.GetString(resourceKey, Resources.Culture);
 }

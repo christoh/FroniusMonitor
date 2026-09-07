@@ -153,13 +153,28 @@ the properties, one by one; `Gen24ModbusSettingsTests` checks the copy against `
 that goes to the inverter and so catches one the hand written copy forgot. **Any other settings type that gains a
 rule has to give up `MemberwiseClone` in the same way.**
 
+## The WPF app gives its rules to a binding, and they are wrappers
+
+`FroniusMonitor/Wpf/Validation/ValidationRules.cs` makes every rule available to XAML at the binding site, the way
+WPF wants it: `Text="{co:ValidationBinding Path, Rule={v:MinMaxIntRule Minimum=0, Maximum=100}}"`. **None of those
+extensions decides anything.** Each is three lines that build the matching attribute from `Fronius/Validators` and
+hand the value to it, so both apps and the server refuse the same values with the same words. Adding a rule means
+adding an attribute, and then a wrapper here only if WPF needs it at a binding.
+
+- `ValidationRuleExtension` carries `MessageResourceKey`, `PropertyDisplayName`,
+  `PropertyDisplayNameResourceKey` and `AllowEmpty`, and copies them onto the attribute it builds. It builds a new
+  one per call, because a markup extension is given its properties after it has been constructed and XAML may hand
+  the same extension to more than one binding.
+- **`AllowEmpty` defaults to `false` there**, where the attributes default to `true`. Every field in the WPF app
+  that carries a rule is one that has to be filled in, and that is what those rules did before they became
+  wrappers. Set it in the markup where a field may be left empty.
+- The message goes back through `StringResult`, which asks the rule again every time it is read, so one already on
+  screen when the language changes answers in the new language.
+- `ChargingRuleDate` used to say "Must bind to String" for a value that was not one; it now says the same as for
+  any other unreadable time. That message was for a developer, and it is the only behaviour the move changed.
+
 ## Still open
 
-- **The overlap with the WPF rules.** `FroniusMonitor/Wpf/Validation/ValidationRules.cs` declares the same kinds
-  of rule as `MarkupExtension`s, to be given to a binding rather than to a property, and `Ipv4OrHostname`,
-  `ChargingRuleDate` and `WattPilotFallbackCurrentRule` exist only there. The two sets should be one: the WPF
-  markup extensions can become thin wrappers over the attributes. Until then a rule changed in one place has to be
-  changed in the other.
 - **`NotEmptyAttribute`** in `Fronius/Validators` is an empty `ValidationAttribute`, so it passes everything it is
   given. Nothing uses it - `AllowEmpty = false` is what says a field is needed. It needs an `IsValid` and a
   message of its own, or it needs to go.

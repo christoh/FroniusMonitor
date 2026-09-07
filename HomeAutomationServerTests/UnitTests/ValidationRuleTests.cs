@@ -239,6 +239,59 @@ public class ValidationRuleTests
     }
 
     [Theory]
+    [InlineData("00:00")]
+    [InlineData("0:0")]
+    [InlineData("07:30")]
+    [InlineData("23:59")]
+    [InlineData("24:00")]
+    public void TimeOfDay_takes_a_time_from_midnight_to_the_end_of_the_day(string value)
+    {
+        Assert.Null(Validate(new TimeOfDayAttribute(), value));
+    }
+
+    [Theory]
+    [InlineData("24:30")]
+    [InlineData("25:00")]
+    [InlineData("12:60")]
+    [InlineData("12")]
+    [InlineData("12:30:00")]
+    [InlineData("noon")]
+    public void TimeOfDay_refuses_anything_that_is_not_one(string value)
+    {
+        Assert.NotNull(Validate(new TimeOfDayAttribute(), value));
+    }
+
+    [Fact]
+    public void TimeOfDay_quotes_what_it_was_given()
+    {
+        // Which is why a rule is told the value when it complains rather than keeping it in a field: one attribute
+        // instance answers for every field that carries it.
+        Assert.Equal(string.Format(CultureInfo.CurrentCulture, Resources.InvalidChargingRuleTime, "25:00"), Validate(new TimeOfDayAttribute(), "25:00"));
+        Assert.Equal(string.Format(CultureInfo.CurrentCulture, Resources.InvalidChargingRuleTime, "noon"), Validate(new TimeOfDayAttribute(), "noon"));
+    }
+
+    [Theory]
+    [InlineData("0")]
+    [InlineData("6")]
+    [InlineData("16")]
+    [InlineData("32")]
+    public void The_fallback_current_of_a_WattPilot_is_6_to_32_amps_or_none(string value)
+    {
+        Assert.Null(Validate(new WattPilotFallbackCurrentAttribute(), value));
+    }
+
+    [Theory]
+    [InlineData("1")]
+    [InlineData("5")]
+    [InlineData("33")]
+    [InlineData("-1")]
+    public void A_fallback_current_in_the_hole_of_the_range_is_refused(string value)
+    {
+        // 1 to 5 A would be taken by the box and then ignored by the charger, which is the point of the rule.
+        Assert.NotNull(Validate(new WattPilotFallbackCurrentAttribute(), value));
+    }
+
+    [Theory]
     [InlineData("200", 200L)]
     [InlineData("0200", 200L)]
     [InlineData(" -12 ", -12L)]
