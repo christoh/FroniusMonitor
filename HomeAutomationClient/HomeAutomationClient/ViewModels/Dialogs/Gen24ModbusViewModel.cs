@@ -95,17 +95,16 @@ public sealed partial class Gen24ModbusViewModel : ViewModelBase
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [MinMaxInt(Gen24ModbusSettings.MinMeterAddress, Gen24ModbusSettings.MaxMeterAddress,
-        MessageResourceKey = nameof(Loc.MeterAddressError), AllowEmpty = false)]
+        MessageResourceKey = nameof(Loc.MeterAddressError))]
     public partial string? MeterAddressText { get; set; }
 
     /// <summary>
     /// The string control address, as the text box holds it. See <see cref="MeterAddressText"/>.
     /// </summary>
     /// <remarks>
-    /// It may be left empty, which is why <c>AllowEmpty</c> stays at its default here: only a Tauro has string
-    /// controllers, so an inverter with none has nothing to put in the box. An empty field is then left out of
-    /// the delta the server works out, so it never overwrites what the inverter holds - it means "not mine to
-    /// say", not "clear it".
+    /// It may be left empty: only a Tauro has string controllers, so an inverter with none has nothing to put in
+    /// the box. Neither address is required, in fact - an empty field becomes null, and the server leaves a null
+    /// out of the delta altogether, so it means "not mine to say" and never overwrites what the inverter holds.
     /// </remarks>
     [ObservableProperty]
     [NotifyDataErrorInfo]
@@ -240,6 +239,10 @@ public sealed partial class Gen24ModbusViewModel : ViewModelBase
         SunSpecAddressText = NumericText.Of(Settings.SunSpecAddress);
         EnableTcp = Settings.Mode is ModbusSlaveMode.Tcp or ModbusSlaveMode.Both;
         NotifyAllVisibilities();
+
+        // Explicitly, because a setter validates only what it actually stores: writing the same value twice - null
+        // over null, at load or after Undo - changes nothing and so would leave whatever error was there standing.
+        ValidateAllProperties();
     }
 
     /// <summary>

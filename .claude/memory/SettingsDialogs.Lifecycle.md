@@ -133,11 +133,12 @@ What a settings tab adds:
 - **A number is edited as text.** The tab keeps a `string` property per numeric field, because a text box never
   binds to a number - the rule and the reasons are in [[Validation.Lifecycle]]. `CopyFromSettings` fills them,
   `CopyToSettings` writes them back at the top of Apply, once the rules have passed.
-- **Whether a field may be left empty is a question about the inverter, not about the rule.** The Modbus meter
-  address is part of the slave configuration this tab edits, so it is required (`AllowEmpty = false`); the string
-  control address belongs to a Tauro and an inverter without string controllers has nothing to put in the box, so
-  it is not. An empty field ends up as null, and `GetUpdateToken` leaves a null out of the delta altogether - so
-  emptying a box never clears the value on the inverter, it only stops the dialog having an opinion about it.
+- **An empty address is not an error.** Neither Modbus address is required: an inverter that is not a Tauro has no
+  string controllers, and one can report no meter address either. An empty field ends up as null, and
+  `GetUpdateToken` leaves a null out of the delta altogether - so emptying a box never clears the value on the
+  inverter, it only stops the dialog having an opinion about it. A field that really were required would need
+  `AllowEmpty = false` **and** the `ValidateAllProperties()` that ends the reset; see [[Validation.Lifecycle]] for
+  why the setter alone is not enough.
 - **Apply asks the settings and the tab.** `Settings.GetErrors()` covers what the check boxes and combo boxes
   wrote, `GetErrors()` on the tab itself covers the text of the boxes; both validate through the same rules, and
   together they fill the `ItemList` of a `PleaseCorrectErrors` message box. Nothing is sent. No visual tree walk,

@@ -42,8 +42,20 @@ guess: getting there means a rule and a caller disagree, which is a defect and n
 [ObservableProperty]
 [NotifyDataErrorInfo]
 [MinMaxInt(Gen24ModbusSettings.MinMeterAddress, Gen24ModbusSettings.MaxMeterAddress,
-    MessageResourceKey = nameof(Loc.MeterAddressError), AllowEmpty = false)]
+    MessageResourceKey = nameof(Loc.MeterAddressError))]
 public partial string? MeterAddressText { get; set; }
+```
+
+The WPF app has no source generator for the toolkit - `CommunityToolkit.Mvvm` is not one of its package references, so
+the analyzers never run there. Its properties are written by hand and call `ValidateProperty` themselves:
+
+```csharp
+[MinMaxInt(...)]
+public string? MeterAddressText
+{
+    get;
+    set => Set(ref field, value, postAction: () => ValidateProperty(value, nameof(MeterAddressText)));
+}
 ```
 
 - **`Fronius/Validators`** holds the rules: `MinMaxIntAttribute`, `MinMaxDoubleAttribute`, `RegexRuleAttribute`,
@@ -53,9 +65,17 @@ public partial string? MeterAddressText { get; set; }
   sentence of its own. It is put together **while the rule runs**, never in the constructor, so it follows the
   current language.
 - **A blank value passes unless `AllowEmpty = false`.** Not having typed anything is not the same as having typed
-  something wrong. A number box that has to hold a value says so with `AllowEmpty = false`, and then an emptied
-  box is refused by the field's own message - which is right: "must be between 1 and 247" says everything there is
-  to say about an empty box, and about "abc" as well.
+  something wrong. Where a value really is required, `AllowEmpty = false` refuses a blank with the field's own
+  message - "must be between 1 and 247" says everything there is to say about an empty box, and about "abc" as
+  well.
+  **But a required field has to be validated after every load, not only when a setter runs.** `SetProperty` and
+  the generated setters validate what they *store*, and storing the same value twice - null over null, at load or
+  after Undo - stores nothing, so nothing is validated. A field whose loaded value is null therefore shows no
+  error until the user touches it, and Undo back to null leaves the error from the last thing they typed standing.
+  That is why the reset of a tab ends with `ValidateAllProperties()`: the validation state then always describes
+  what is on screen rather than what happened to change. Neither Modbus address is required in the end - an empty
+  one becomes null, and `GetUpdateToken` leaves a null out of the delta, so it means "not mine to say" and can
+  never overwrite what the inverter holds.
 - **Every rule reads the value from its text**, because that is what a text box gives it. So the rule, and not a
   converter, is what decides whether what was typed is a number at all.
 - **`[NotifyDataErrorInfo]` is what makes it work.** `BindableBase` is an `ObservableValidator`, so the generated
@@ -140,8 +160,6 @@ rule has to give up `MemberwiseClone` in the same way.**
   `ChargingRuleDate` and `WattPilotFallbackCurrentRule` exist only there. The two sets should be one: the WPF
   markup extensions can become thin wrappers over the attributes. Until then a rule changed in one place has to be
   changed in the other.
-- **The WPF Modbus dialog still binds its two address boxes to `byte?`**, so the rule about text input is broken
-  there and its Undo cannot fix such a box. It was left alone because the port is the thing being worked on.
 - **`NotEmptyAttribute`** in `Fronius/Validators` is an empty `ValidationAttribute`, so it passes everything it is
   given. Nothing uses it - `AllowEmpty = false` is what says a field is needed. It needs an `IsValid` and a
   message of its own, or it needs to go.
