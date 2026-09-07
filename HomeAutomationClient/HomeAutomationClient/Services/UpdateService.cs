@@ -6,10 +6,11 @@ using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Logging;
 
 namespace De.Hochstaetter.HomeAutomationClient.Services;
 
-internal partial class UpdateService(IWebClientService webClient) : BindableBase, IUpdateService
+internal partial class UpdateService(IWebClientService webClient, ILogger<UpdateService> logger) : BindableBase, IUpdateService
 {
     private HubConnection? hubConnection;
 
@@ -187,9 +188,9 @@ internal partial class UpdateService(IWebClientService webClient) : BindableBase
                 }
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // Ignore errors
+            logger.LogError(ex, "Updating Wattpilot failed.");
         }
     }
 
