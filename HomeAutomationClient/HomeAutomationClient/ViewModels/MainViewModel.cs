@@ -114,7 +114,7 @@ public sealed partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private Task Settings(IKeyedDevice device) => TaskExceptionHandler(async () =>
     {
-        if (device.Device is not Gen24System)
+        if (device.Device is not Gen24System gen24System)
         {
             await new MessageBox
             {
@@ -126,9 +126,9 @@ public sealed partial class MainViewModel : ViewModelBase
             return;
         }
 
-        var name = device.Device is IHaveDisplayName { DisplayName: { } displayName } ? $" - {displayName}" : string.Empty;
+        var name = gen24System.Config?.InverterSettings?.SystemName ?? gen24System.Manufacturer + ' ' + gen24System.SerialNumber;
 
-        var dialog = new Gen24SettingsDialogViewModel(new DialogParameters { Title = $"{Loc.InverterSettings}{name}" })
+        var dialog = new Gen24SettingsDialogViewModel(new DialogParameters { Title = $"{Loc.InverterSettings}: {name}" })
         {
             DeviceId = device.Key,
         };
