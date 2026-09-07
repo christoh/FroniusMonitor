@@ -2,6 +2,7 @@
 paths:
   - Fronius/Services/DataCollectors/Gen24DataCollector.cs
   - Fronius/Services/DataCollectors/ReadNowRequest.cs
+  - Fronius/Services/DataCollectors/RepeatedFailure.cs
   - Fronius/Services/Gen24Service.cs
   - Fronius/Services/DigestAuthHttp.cs
   - Fronius/Contracts/IGen24ConfigRefresher.cs
@@ -90,7 +91,27 @@ to sit *outside* the `try`, which faulted the task and made `StopAsync` throw wh
 inside now, and cancellation is caught as `OperationCanceledException` rather than `TaskCanceledException`: a
 delay throws the latter but a semaphore throws the former, and `catch (TaskCanceledException)` does not see it.
 
+## An inverter that is switched off says so once
+
+Both loops fail on every round while an inverter is off, and both used to write a stack trace for it - one per
+`RefreshRate` from the sensors and one per `ConfigRefreshRate` from the config, which is a few hundred identical
+traces overnight. They go through `Report` now, which asks a `RepeatedFailure`:
+
+| | |
+|---|---|
+| the first failure of its kind | `LogError` with the exception |
+| the same thing again | `LogDebug`, so it is there if you ask for it |
+| the same thing an hour later | `LogWarning`, once, with the count |
+| the inverter answering again | `LogInformation` with how many attempts it took and how long |
+
+"The same thing" is the type and the message of the exception, so a *different* fault is news and gets its own
+line whatever has been failing so far. One `RepeatedFailure` per loop, handed down through the rounds the way the
+semaphore is - no fourth dictionary.
+
+The two loops used to log the same sentence, `Could not read config`, for three different things; the sensor loop
+now says what it was actually doing.
+
 ## Still open
 
-- `UpdateConfig` logs an error and reschedules for anything else. An inverter that is off overnight therefore
-  fills the log with one stack trace per interval.
+- `lastLogTime`, which throttles the energy history file, is a field of the collector rather than of an inverter.
+  With more than one inverter they share it, so one can keep the other out of its own history file.

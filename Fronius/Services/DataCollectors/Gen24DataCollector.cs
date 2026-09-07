@@ -31,6 +31,11 @@ public sealed class Gen24DataCollector(
     /// </remarks>
     private readonly ConcurrentDictionary<Gen24System, ReadNowRequest> configReadRequests = new();
 
+    /// <summary>
+    /// How long an inverter that keeps failing the same way stays out of the log before it is mentioned again.
+    /// </summary>
+    private static readonly TimeSpan reminderInterval = TimeSpan.FromHours(1);
+
     private CancellationTokenSource? tokenSource;
     private DateTime lastLogTime = DateTime.MinValue;
     private Gen24DataCollectorParameters Parameters => options.CurrentValue;
@@ -74,8 +79,11 @@ public sealed class Gen24DataCollector(
             var semaphore = new SemaphoreSlim(1, 1);
             configReadRequests[gen24System] = new ReadNowRequest();
             logger.LogInformation("Adding Gen24 inverter {WebConnection}", connection);
-            runningSensorTasks[gen24System] = Update(gen24System, semaphore);
-            runningConfigTasks[gen24System] = UpdateConfig(gen24System, semaphore);
+
+            // One per loop, handed down through the rounds the way the semaphore is, so that an inverter which is
+            // simply switched off does not write the same stack trace on every one of them.
+            runningSensorTasks[gen24System] = Update(gen24System, semaphore, new RepeatedFailure(reminderInterval));
+            runningConfigTasks[gen24System] = UpdateConfig(gen24System, semaphore, new RepeatedFailure(reminderInterval));
         }
     }
 
@@ -119,7 +127,42 @@ public sealed class Gen24DataCollector(
         tokenSource = null;
     }
 
-    private async Task Update(Gen24System gen24System, SemaphoreSlim semaphore)
+    /// <summary>
+    /// Writes about a failure as much as it is worth: the first one in full, then nothing until an hour has
+    /// passed, and the recovery when the inverter answers again.
+    /// </summary>
+    private void Report(RepeatedFailure failures, Exception exception, Gen24System gen24System, string what)
+    {
+        switch (failures.Record(exception))
+        {
+            case FailureReport.First:
+                logger.LogError(exception, "Could not {What} of GEN24 inverter {BaseUri}", what, gen24System.Service.Connection);
+                break;
+
+            case FailureReport.StillFailing:
+                logger.LogWarning("Still cannot {What} of GEN24 inverter {BaseUri} after {Attempts} attempts: {Failure}",
+                    what, gen24System.Service.Connection, failures.Attempts, exception.Message);
+                break;
+
+            default:
+                logger.LogDebug(exception, "Could not {What} of GEN24 inverter {BaseUri}, as before", what, gen24System.Service.Connection);
+                break;
+        }
+    }
+
+    /// <summary>Says so once, if the inverter had stopped answering.</summary>
+    private void ReportRecovery(RepeatedFailure failures, Gen24System gen24System, string what)
+    {
+        if (failures.Recover() is not { } outage)
+        {
+            return;
+        }
+
+        logger.LogInformation("Can {What} of GEN24 inverter {BaseUri} again, after {Attempts} attempts over {Duration:g}",
+            what, gen24System.Service.Connection, outage.Attempts, outage.Duration);
+    }
+
+    private async Task Update(Gen24System gen24System, SemaphoreSlim semaphore, RepeatedFailure failures)
     {
         var start = DateTime.UtcNow;
 
@@ -142,7 +185,7 @@ public sealed class Gen24DataCollector(
                     }
                     catch (Exception ex) when (ex is not TaskCanceledException)
                     {
-                        logger.LogError(ex, "Could not read config for GEN24 inverter {BaseUri}", gen24System.Service.Connection);
+                        Report(failures, ex, gen24System, "read the config");
                         return;
                     }
                 }
@@ -158,6 +201,7 @@ public sealed class Gen24DataCollector(
 
                         dataControlService.AddOrUpdate(new ManagedDevice(gen24System, gen24System.Service.Connection, typeof(IGen24Service)));
 
+                        ReportRecovery(failures, gen24System, "read the sensors");
                         logger.LogDebug("{Entity} sensors updated in {Duration:N0} ms", gen24System.DisplayName, (DateTime.UtcNow - start).TotalMilliseconds);
 
                         if (gen24System.Sensors?.PrimaryPowerMeter?.DataTime != null)
@@ -210,7 +254,8 @@ public sealed class Gen24DataCollector(
                 }
                 catch (Exception ex) when (ex is not TaskCanceledException)
                 {
-                    logger.LogError(ex, "Could not read config for GEN24 inverter {BaseUri}", gen24System.Service.Connection);
+                    // It said "read the config" here too, which it was not: the config is read above.
+                    Report(failures, ex, gen24System, "read the sensors");
                 }
             }
             finally
@@ -221,7 +266,7 @@ public sealed class Gen24DataCollector(
                 token.ThrowIfCancellationRequested();
                 var connection = gen24System.Service.Connection;
                 gen24System.Service.Connection = (connection?.Clone()) as WebConnection;
-                runningSensorTasks[gen24System] = Update(gen24System, semaphore);
+                runningSensorTasks[gen24System] = Update(gen24System, semaphore, failures);
             }
         }
         catch (TaskCanceledException ex)
@@ -231,7 +276,7 @@ public sealed class Gen24DataCollector(
         }
     }
 
-    private async Task UpdateConfig(Gen24System gen24System, SemaphoreSlim semaphore)
+    private async Task UpdateConfig(Gen24System gen24System, SemaphoreSlim semaphore, RepeatedFailure failures)
     {
         if (tokenSource == null)
         {
@@ -258,6 +303,8 @@ public sealed class Gen24DataCollector(
             {
                 dataControlService.AddOrUpdate(new ManagedDevice(gen24System, gen24System.Service.Connection, typeof(IGen24Service)));
 
+                ReportRecovery(failures, gen24System, "read the config");
+
                 logger.LogInformation("{Entity} config updated in {Duration:N0} ms{OnRequest}", gen24System.DisplayName,
                     (DateTime.UtcNow - startTime).TotalMilliseconds, wasAskedFor ? " on request" : string.Empty);
             }
@@ -270,13 +317,13 @@ public sealed class Gen24DataCollector(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Could not read config for GEN24 inverter {BaseUri}", gen24System.Service.Connection);
+            Report(failures, ex, gen24System, "read the config");
         }
         finally
         {
             if (!token.IsCancellationRequested)
             {
-                runningConfigTasks[gen24System] = UpdateConfig(gen24System, semaphore);
+                runningConfigTasks[gen24System] = UpdateConfig(gen24System, semaphore, failures);
             }
         }
     }
