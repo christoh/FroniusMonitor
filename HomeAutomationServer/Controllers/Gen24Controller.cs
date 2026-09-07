@@ -1,14 +1,16 @@
 ﻿using De.Hochstaetter.Fronius.Models.Gen24;
 using De.Hochstaetter.Fronius.Models.Gen24.Commands;
+using De.Hochstaetter.Fronius.Models.Gen24.Settings;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
 
 namespace De.Hochstaetter.HomeAutomationServer.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class Gen24SystemController(IDataControlService controlService, ILogger<Gen24SystemController> logger) : DeviceControllerBase(controlService, logger)
+public class Gen24SystemController(IDataControlService controlService, IGen24JsonService jsonService, ILogger<Gen24SystemController> logger) : DeviceControllerBase(controlService, logger)
 {
     [HttpGet]
     [BasicAuthorize(Roles = "User")]
@@ -108,6 +110,197 @@ public class Gen24SystemController(IDataControlService controlService, ILogger<G
         {
             return UnprocessableEntity(Helpers.GetProblemDetails(ex.GetType().Name, $"The localization file {httpClient.BaseAddress.AbsoluteUri}/{name}/{iso2LanguageCode}.json could not be downloaded from the inverter: {ex.Message}"));
         }
+    }
+
+    /// <summary>
+    /// Everything the settings dialog of a client needs, read from the inverter in one go. Call this before showing
+    /// the dialog; the write endpoints below read the inverter again themselves, so this may go stale.
+    /// </summary>
+    [HttpGet("{id}/settings")]
+    [BasicAuthorize(Roles = "User")]
+    [ProducesResponseType<Gen24SettingsSnapshot>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> GetSettings([FromRoute] string id)
+    {
+        var (errorResponse, gen24Service) = GetManagedGen24System(id);
+
+        if (errorResponse != null)
+        {
+            return errorResponse;
+        }
+
+        try
+        {
+            var configToken = await ReadConfig(gen24Service!).ConfigureAwait(false);
+            var versionToken = (await gen24Service!.GetFroniusJsonResponse("api/status/version", token: HttpContext.RequestAborted).ConfigureAwait(false)).Token;
+
+            return Ok(new Gen24SettingsSnapshot
+            {
+                InverterSettings = Gen24InverterSettings.Parse(configToken),
+                BatterySettings = Gen24BatterySettings.Parse(configToken["batteries"]?["batteries"]),
+                ChargingRules = [.. Gen24ChargingRule.Parse(configToken["timeofuse"], null)],
+                ModbusSettings = Gen24ModbusSettings.Parse(configToken["modbus"]?["modbus"]),
+                SoftwareVersions = Gen24Versions.Parse(versionToken).SwVersions,
+                MaxAcPower = configToken["powerunit"]?["powerunit"]?["system"]?.Value<double>("DEVICE_POWERACTIVE_NOMINAL_F32"),
+            });
+        }
+        catch (Exception ex)
+        {
+            return InverterFailed(id, "read the settings of", ex);
+        }
+    }
+
+    /// <summary>The event log of the inverter, newest first, for the event log tab of the settings dialog.</summary>
+    [HttpGet("{id}/events")]
+    [BasicAuthorize(Roles = "User")]
+    [ProducesResponseType<IEnumerable<Gen24Event>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> GetEvents([FromRoute] string id)
+    {
+        var (errorResponse, gen24Service) = GetManagedGen24System(id);
+
+        if (errorResponse != null)
+        {
+            return errorResponse;
+        }
+
+        try
+        {
+            var events = await gen24Service!.GetFroniusEvents(HttpContext.RequestAborted).ConfigureAwait(false);
+            return Ok(events.ToList());
+        }
+        catch (Exception ex)
+        {
+            return InverterFailed(id, "read the event log of", ex);
+        }
+    }
+
+    [HttpPut("{id}/settings/modbus")]
+    [BasicAuthorize(Roles = "Operator")]
+    [ProducesResponseType<bool>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
+    public Task<IActionResult> SetModbusSettings([FromRoute] string id, [FromBody] Gen24ModbusSettings settings) => WriteSettings
+    (
+        id, "api/config/modbus", settings,
+        configToken => Gen24ModbusSettings.Parse(configToken["modbus"]?["modbus"]),
+        (wanted, current) => wanted.GetToken(current)
+    );
+
+    [HttpPut("{id}/settings/batteries")]
+    [BasicAuthorize(Roles = "Operator")]
+    [ProducesResponseType<bool>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
+    public Task<IActionResult> SetBatterySettings([FromRoute] string id, [FromBody] Gen24BatterySettings settings) => WriteSettings
+    (
+        id, "api/config/batteries", settings,
+        configToken => Gen24BatterySettings.Parse(configToken["batteries"]?["batteries"]),
+        (wanted, current) => jsonService.GetUpdateToken(wanted, current)
+    );
+
+    /// <summary>
+    /// The time of use rules. Unlike the other groups these are not written as a delta: the inverter takes the whole
+    /// list or nothing, so either everything goes or - when the list is unchanged - nothing does.
+    /// </summary>
+    [HttpPut("{id}/settings/timeOfUse")]
+    [BasicAuthorize(Roles = "Operator")]
+    [ProducesResponseType<bool>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
+    public Task<IActionResult> SetTimeOfUse([FromRoute] string id, [FromBody] List<Gen24ChargingRule> rules) => WriteSettings
+    (
+        id, "api/config/timeofuse", rules,
+        configToken => [.. Gen24ChargingRule.Parse(configToken["timeofuse"], null)],
+        (wanted, current) => wanted.SequenceEqual(current) ? new JObject() : Gen24ChargingRule.GetToken(wanted)
+    );
+
+    /// <summary>
+    /// Writes one group of settings to the inverter, and only what actually differs.
+    /// </summary>
+    /// <remarks>
+    /// The current settings are read from the inverter here rather than taken from the caller. A client dialog may
+    /// have been open for a while, and a delta against what it saw back then would quietly undo whatever changed
+    /// since. This also keeps raw JSON out of the API: the caller sends the settings as an object and never a path
+    /// and a payload of its own choosing.
+    /// </remarks>
+    /// <returns>True where something was written, false where the inverter already held what was asked for.</returns>
+    private async Task<IActionResult> WriteSettings<T>
+    (
+        string id,
+        string inverterPath,
+        T wanted,
+        Func<JToken, T> parseCurrent,
+        Func<T, T, JToken> buildDelta
+    )
+    {
+        var (errorResponse, gen24Service) = GetManagedGen24System(id);
+
+        if (errorResponse != null)
+        {
+            return errorResponse;
+        }
+
+        JToken updateToken;
+
+        try
+        {
+            updateToken = buildDelta(wanted, parseCurrent(await ReadConfig(gen24Service!).ConfigureAwait(false)));
+        }
+        catch (Exception ex)
+        {
+            return InverterFailed(id, "read the settings of", ex);
+        }
+
+        if (!updateToken.HasValues)
+        {
+            if (logger.IsEnabled(LogLevel.Information))
+            {
+                logger.LogInformation("Inverter {Id} already holds the settings that {Username} asked for at {Path}", id, HttpContext.User.Identity?.Name, inverterPath);
+            }
+
+            return Ok(false);
+        }
+
+        try
+        {
+            var (_, status) = await gen24Service!
+                .GetFroniusJsonResponse(inverterPath, updateToken, [HttpStatusCode.OK, HttpStatusCode.BadRequest], HttpContext.RequestAborted)
+                .ConfigureAwait(false);
+
+            if (status != HttpStatusCode.OK)
+            {
+                logger.LogWarning("Inverter {Id} refused the settings for {Path}: {Token}", id, inverterPath, updateToken.ToString(Newtonsoft.Json.Formatting.None));
+                return UnprocessableEntity(Helpers.GetProblemDetails(Loc.Error, $"The inverter refused the settings for {inverterPath}."));
+            }
+
+            if (logger.IsEnabled(LogLevel.Information))
+            {
+                logger.LogInformation("{Username} changed {Path} on inverter {Id}", HttpContext.User.Identity?.Name, inverterPath, id);
+            }
+
+            return Ok(true);
+        }
+        catch (Exception ex)
+        {
+            return InverterFailed(id, "write the settings of", ex);
+        }
+    }
+
+    private async Task<JToken> ReadConfig(IGen24Service gen24Service) =>
+        (await gen24Service.GetFroniusJsonResponse("api/config/", token: HttpContext.RequestAborted).ConfigureAwait(false)).Token;
+
+    private IActionResult InverterFailed(string id, string what, Exception ex)
+    {
+        logger.LogError(ex, "Could not {What} inverter {Id}", what, id);
+        return UnprocessableEntity(Helpers.GetProblemDetails(ex.GetType().Name, $"Could not {what} inverter {id}: {ex.Message}"));
     }
 
     private (IActionResult? ErrorResponse, IGen24Service? Gen24Service) GetManagedGen24System(string id)

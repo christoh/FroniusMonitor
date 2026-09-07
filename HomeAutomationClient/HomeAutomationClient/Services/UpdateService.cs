@@ -113,9 +113,8 @@ internal partial class UpdateService(IWebClientService webClient, ILogger<Update
 
         await hubConnection.StartAsync().ConfigureAwait(false);
 
-        // The handlers run on the thread SignalR delivers on. They may write the device properties from there -
-        // the binding system marshals a bound write by itself - but every change to a bound collection is
-        // dispatched, which is what the Dispatcher.UIThread.Invoke calls in them are for.
+        // The handlers run on the thread SignalR delivers on and write straight through from there. The binding
+        // system marshals for us, a bound collection as much as a bound property, so none of them dispatches.
         hubConnection.On<string, Gen24System>(nameof(Gen24System), OnGen24Update);
         hubConnection.On<string, FritzBoxDevice>(nameof(FritzBoxDevice), OnFritzBoxUpdate);
         hubConnection.On<string, WattPilot>(nameof(WattPilot), OnWattPilotUpdate);
@@ -204,7 +203,7 @@ internal partial class UpdateService(IWebClientService webClient, ILogger<Update
 
             if (existingDevice == null)
             {
-                Dispatcher.UIThread.Invoke(() => { AllPowerConsumers.Add(new KeyedWattPilot { Device = wattPilot, Key = id }); });
+                AllPowerConsumers.Add(new KeyedWattPilot { Device = wattPilot, Key = id });
                 NotifyOfPropertyChange(nameof(ShowPowerConsumers));
             }
             else
@@ -230,11 +229,8 @@ internal partial class UpdateService(IWebClientService webClient, ILogger<Update
             {
                 inverter = new KeyedGen24System { Key = id, Device = gen24System };
 
-                Dispatcher.UIThread.Invoke(() =>
-                {
-                    Inverters = [.. Inverters.Append(inverter).OrderBy(i => i.Device.Config?.InverterSettings?.SystemName)];
-                    NotifyOfPropertyChange(nameof(ShowInverters));
-                });
+                Inverters = [.. Inverters.Append(inverter).OrderBy(i => i.Device.Config?.InverterSettings?.SystemName)];
+                NotifyOfPropertyChange(nameof(ShowInverters));
             }
             else
             {
@@ -292,11 +288,8 @@ internal partial class UpdateService(IWebClientService webClient, ILogger<Update
 
         if (updateDevice == null)
         {
-            _ = Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                AllPowerConsumers.Add(new KeyedFritzBoxDevice { Key = id, Device = fritzBoxDevice });
-                NotifyOfPropertyChange(nameof(ShowPowerConsumers));
-            });
+            AllPowerConsumers.Add(new KeyedFritzBoxDevice { Key = id, Device = fritzBoxDevice });
+            NotifyOfPropertyChange(nameof(ShowPowerConsumers));
         }
         else
         {

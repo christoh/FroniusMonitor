@@ -1,0 +1,115 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
+             mc:Ignorable="d" d:DesignWidth="520" d:DesignHeight="600"
+             x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.Gen24ModbusView"
+             x:DataType="dialogs:Gen24ModbusViewModel">
+	<UserControl.Styles>
+		<Style Selector="TextBlock.Caption">
+			<Setter Property="VerticalAlignment" Value="Center" />
+			<Setter Property="HorizontalAlignment" Value="Right" />
+			<Setter Property="Margin" Value="0,4,8,4" />
+		</Style>
+		<Style Selector="HeaderedContentControl.GroupBox">
+			<Setter Property="Margin" Value="0,0,0,12" />
+		</Style>
+		<Style Selector="ComboBox">
+			<Setter Property="MinWidth" Value="140" />
+			<Setter Property="Margin" Value="0,4" />
+		</Style>
+		<Style Selector="TextBox">
+			<Setter Property="Width" Value="140" />
+			<Setter Property="Margin" Value="0,4" />
+			<Setter Property="HorizontalAlignment" Value="Left" />
+		</Style>
+		<Style Selector="CheckBox">
+			<Setter Property="Margin" Value="0,0,0,4" />
+		</Style>
+	</UserControl.Styles>
+
+	<StackPanel Margin="16">
+
+		<HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.RtuModes}">
+			<Grid Margin="16" RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,Auto" IsEnabled="{Binding EnableDanger}">
+				<TextBlock Grid.Row="0" Grid.Column="0" Classes="Caption" Text="{x:Static p:Resources.Rtu0Mode}" />
+				<ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding InterfaceRoles}"
+				          SelectedValueBinding="{Binding Value}" SelectedValue="{Binding Settings.Rtu0}"
+				          DisplayMemberBinding="{Binding DisplayName}" />
+
+				<TextBlock Grid.Row="1" Grid.Column="0" Classes="Caption" Text="{x:Static p:Resources.Rtu1Mode}" />
+				<ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding InterfaceRoles}"
+				          SelectedValueBinding="{Binding Value}" SelectedValue="{Binding Settings.Rtu1}"
+				          DisplayMemberBinding="{Binding DisplayName}" />
+			</Grid>
+		</HeaderedContentControl>
+
+		<HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.RtuSlaveSettings}" IsVisible="{Binding IsRtuSlave}">
+			<Grid Margin="16" RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,Auto">
+				<TextBlock Grid.Row="0" Grid.Column="0" Classes="Caption" Text="{x:Static p:Resources.BaudRate}" />
+				<ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding Settings.BaudRates}" SelectedItem="{Binding Settings.BaudRate}" />
+
+				<TextBlock Grid.Row="1" Grid.Column="0" Classes="Caption" Text="{x:Static p:Resources.Parity}" />
+				<ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Parities}"
+				          SelectedValueBinding="{Binding Value}" SelectedValue="{Binding Settings.Parity}"
+				          DisplayMemberBinding="{Binding DisplayName}" />
+			</Grid>
+		</HeaderedContentControl>
+
+		<HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.ModbusTcpSettings}">
+			<StackPanel Margin="16">
+				<CheckBox Content="{x:Static p:Resources.EnableModbusTcp}" IsChecked="{Binding EnableTcp}" />
+
+				<CheckBox Content="{x:Static p:Resources.AllowInverterControlOverModbusTcp}"
+				          IsChecked="{Binding Settings.AllowControl}" IsVisible="{Binding ShowAllowControl}" />
+
+				<CheckBox Margin="0,0,0,8" Content="{x:Static p:Resources.RestrictInverterControlOverModbusTcp}"
+				          IsChecked="{Binding Settings.RestrictControl}" IsVisible="{Binding ShowRestrictControl}" />
+
+				<Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,Auto">
+					<TextBlock Grid.Row="0" Grid.Column="0" Classes="Caption" Text="{x:Static p:Resources.AllowIp}"
+					           IsVisible="{Binding ShowAllowedIp}" />
+					<TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Settings.IpAddress}"
+					         IsVisible="{Binding ShowAllowedIp}" />
+
+					<TextBlock Grid.Row="1" Grid.Column="0" Classes="Caption" Text="{x:Static p:Resources.TcpPort}"
+					           IsVisible="{Binding EnableTcp}" />
+					<ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Settings.TcpPorts}"
+					          SelectedItem="{Binding Settings.TcpPort}" IsVisible="{Binding EnableTcp}" />
+				</Grid>
+			</StackPanel>
+		</HeaderedContentControl>
+
+		<HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.CommonModbusSlaveSettings}"
+		                        IsVisible="{Binding ShowCommonSlaveSettings}">
+			<Grid Margin="16" RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto,Auto">
+				<TextBlock Grid.Row="0" Grid.Column="0" Classes="Caption" Text="{x:Static p:Resources.MeterAddress}" />
+				<TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Settings.MeterAddress}" />
+
+				<TextBlock Grid.Row="1" Grid.Column="0" Classes="Caption" Text="{x:Static p:Resources.ScAddress}" />
+				<TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Settings.SunSpecAddress}" />
+
+				<TextBlock Grid.Row="2" Grid.Column="0" Classes="Caption" Text="{x:Static p:Resources.SunspecMode}" />
+				<ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding SunspecModes}"
+				          SelectedValueBinding="{Binding Value}" SelectedValue="{Binding Settings.SunspecMode}"
+				          DisplayMemberBinding="{Binding DisplayName}" />
+			</Grid>
+		</HeaderedContentControl>
+
+		<Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" Margin="0,8,0,0">
+			<TextBlock Grid.Column="0" Classes="Caption" Text="{x:Static p:Resources.Danger}" />
+			<ToggleSwitch Grid.Column="1" VerticalAlignment="Center" IsChecked="{Binding EnableDanger}"
+			              OnContent="" OffContent="" />
+
+			<TextBlock Grid.Column="2" VerticalAlignment="Center" Margin="12,0" TextWrapping="Wrap"
+			           Text="{Binding ResultText}" IsVisible="{Binding ResultText, Converter={x:Static ObjectConverters.IsNotNull}}" />
+
+			<Button Grid.Column="3" MinWidth="80" Margin="8,0,0,0" HorizontalContentAlignment="Center"
+			        Content="{x:Static p:Resources.Undo}" Command="{Binding UndoCommand}" />
+			<Button Grid.Column="4" MinWidth="80" Margin="8,0,0,0" HorizontalContentAlignment="Center"
+			        Content="{x:Static p:Resources.Apply}" Command="{Binding ApplyCommand}" />
+		</Grid>
+	</StackPanel>
+</UserControl>

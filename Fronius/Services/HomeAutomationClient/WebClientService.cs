@@ -147,6 +147,31 @@ public sealed class WebClientService : IWebClientService
         return GetResult<Gen24StandByStatus>(FormattableString.Invariant($"gen24system/{deviceId}/GetStandbyStatus"), token);
     }
 
+    public Task<ApiResult<Gen24SettingsSnapshot>> GetGen24Settings(string deviceId, CancellationToken token = default)
+    {
+        return GetResult<Gen24SettingsSnapshot>(FormattableString.Invariant($"gen24system/{deviceId}/settings"), token);
+    }
+
+    public Task<ApiResult<List<Gen24Event>>> GetGen24Events(string deviceId, CancellationToken token = default)
+    {
+        return GetResult<List<Gen24Event>>(FormattableString.Invariant($"gen24system/{deviceId}/events"), token);
+    }
+
+    public Task<ApiResult<bool>> SetGen24ModbusSettings(string deviceId, Gen24ModbusSettings settings, CancellationToken token = default)
+    {
+        return PutResult<bool, Gen24ModbusSettings>(FormattableString.Invariant($"gen24system/{deviceId}/settings/modbus"), settings, token);
+    }
+
+    public Task<ApiResult<bool>> SetGen24BatterySettings(string deviceId, Gen24BatterySettings settings, CancellationToken token = default)
+    {
+        return PutResult<bool, Gen24BatterySettings>(FormattableString.Invariant($"gen24system/{deviceId}/settings/batteries"), settings, token);
+    }
+
+    public Task<ApiResult<bool>> SetGen24TimeOfUse(string deviceId, IEnumerable<Gen24ChargingRule> rules, CancellationToken token = default)
+    {
+        return PutResult<bool, List<Gen24ChargingRule>>(FormattableString.Invariant($"gen24system/{deviceId}/settings/timeOfUse"), [.. rules], token);
+    }
+
     #endregion
 
     #region Fritzbox
@@ -207,6 +232,42 @@ public sealed class WebClientService : IWebClientService
         catch (Exception ex)
         {
             return ApiResult<T>.FromProblemDetails(new ProblemDetails
+            {
+                Title = ex.GetType().Name,
+                Detail = ex.Message,
+                Status = responseMessage?.StatusCode,
+                Errors = new Dictionary<string, List<string>> { { "Errors", [ex.Message] } },
+            }, responseMessage?.StatusCode, ex);
+        }
+        finally
+        {
+            responseMessage?.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// The counterpart of <see cref="GetResult{T}"/> for the endpoints that change something. The body goes out as
+    /// JSON with the same options the rest of the API uses, so the server sees the very shape these models have.
+    /// </summary>
+    private async Task<ApiResult<TResult>> PutResult<TResult, TBody>(string queryString, TBody body, CancellationToken token = default)
+    {
+        HttpResponseMessage? responseMessage = null;
+
+        try
+        {
+            responseMessage = await httpClient.PutAsJsonAsync(queryString, body, jsonOptions, token).ConfigureAwait(false);
+
+            return responseMessage.StatusCode != HttpStatusCode.OK
+                ? ApiResult<TResult>.FromProblemDetails(await GetErrors(responseMessage, token).ConfigureAwait(false), responseMessage.StatusCode)
+                : new ApiResult<TResult>
+                {
+                    Payload = await responseMessage.Content.ReadFromJsonAsync<TResult>(jsonOptions, token).ConfigureAwait(false),
+                    Status = responseMessage.StatusCode,
+                };
+        }
+        catch (Exception ex)
+        {
+            return ApiResult<TResult>.FromProblemDetails(new ProblemDetails
             {
                 Title = ex.GetType().Name,
                 Detail = ex.Message,

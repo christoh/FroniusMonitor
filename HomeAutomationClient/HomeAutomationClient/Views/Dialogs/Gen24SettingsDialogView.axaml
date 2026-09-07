@@ -1,0 +1,42 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
+             xmlns:v="clr-namespace:De.Hochstaetter.HomeAutomationClient.Views.Dialogs"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="700"
+             x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.Gen24SettingsDialogView"
+             x:DataType="dialogs:Gen24SettingsDialogViewModel"
+             MinWidth="480" MaxWidth="760" MaxHeight="800">
+	<Grid RowDefinitions="*,Auto" IsVisible="{Binding IsLoaded}">
+
+		<TabControl Grid.Row="0">
+			<!-- The three tabs still to be ported carry their heading already, so the shape of the dialog is
+			     settled and adding one is a matter of dropping its view into the tab. -->
+			<TabItem Header="{x:Static p:Resources.EnergyFlow}">
+				<TextBlock Margin="24" TextWrapping="Wrap" Text="Not ported yet." />
+			</TabItem>
+
+			<TabItem Header="{x:Static p:Resources.InverterSettings}">
+				<TextBlock Margin="24" TextWrapping="Wrap" Text="Not ported yet." />
+			</TabItem>
+
+			<TabItem Header="{x:Static p:Resources.EventLog}">
+				<TextBlock Margin="24" TextWrapping="Wrap" Text="Not ported yet." />
+			</TabItem>
+
+			<!-- Hidden where the inverter reports no Modbus configuration at all: the tab would have nothing to
+			     show, and every binding in it would come up empty. -->
+			<TabItem Header="{x:Static p:Resources.Modbus}"
+			         IsVisible="{Binding Modbus, Converter={x:Static ObjectConverters.IsNotNull}}">
+				<ScrollViewer>
+					<v:Gen24ModbusView DataContext="{Binding Modbus}" />
+				</ScrollViewer>
+			</TabItem>
+		</TabControl>
+
+		<Button Grid.Row="1" HorizontalAlignment="Right" Margin="16" MinWidth="80" HorizontalContentAlignment="Center"
+		        Content="{x:Static p:Resources.Cancel}" Command="{Binding CloseDialogCommand}" />
+	</Grid>
+</UserControl>

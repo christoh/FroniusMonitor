@@ -106,9 +106,34 @@ public sealed partial class MainViewModel : ViewModelBase
         });
     });
 
+    /// <summary>
+    /// Opens the settings dialog of one device. The title has to be settled before the dialog goes up, because the
+    /// frame reads it once when it is created, so it comes from the device rather than from what the inverter
+    /// reports about itself a moment later.
+    /// </summary>
     [RelayCommand]
     private Task Settings(IKeyedDevice device) => TaskExceptionHandler(async () =>
     {
+        if (device.Device is not Gen24System)
+        {
+            await new MessageBox
+            {
+                Text = $"Settings for device type {device.Device.GetType().Name} are not implemented.",
+                Title = "NotImplemented",
+                Icon = new ErrorIcon(),
+            }.Show().ConfigureAwait(false);
+
+            return;
+        }
+
+        var name = device.Device is IHaveDisplayName { DisplayName: { } displayName } ? $" - {displayName}" : string.Empty;
+
+        var dialog = new Gen24SettingsDialogViewModel(new DialogParameters { Title = $"{Loc.InverterSettings}{name}" })
+        {
+            DeviceId = device.Key,
+        };
+
+        await dialog.ShowDialogAsync().ConfigureAwait(true);
     });
 
     [RelayCommand]

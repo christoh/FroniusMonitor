@@ -46,7 +46,34 @@ public interface IWebClientService : IDisposable
     Task<ApiResult<bool>> RequestGen24StandBy(string deviceId, bool isStandBy, CancellationToken token = default);
 
     Task<ApiResult<Gen24StandByStatus>> GetGen24StandbyStatus(string deviceId, CancellationToken token = default);
-    
+
+    /// <summary>
+    /// Everything the settings dialog of one inverter needs, in one round trip. Fetch this before showing the
+    /// dialog. It may go stale while the dialog is open: the server reads the inverter again before it writes, so
+    /// what ends up being changed is a delta against the inverter and not against this.
+    /// </summary>
+    Task<ApiResult<Gen24SettingsSnapshot>> GetGen24Settings(string deviceId, CancellationToken token = default);
+
+    /// <summary>The event log of the inverter, for the event log tab.</summary>
+    Task<ApiResult<List<Gen24Event>>> GetGen24Events(string deviceId, CancellationToken token = default);
+
+    /// <summary>
+    /// Writes the Modbus settings. The whole object goes over; the server works out what differs from what the
+    /// inverter currently holds and sends only that.
+    /// </summary>
+    /// <returns>True where something was written, false where the inverter already held these settings.</returns>
+    Task<ApiResult<bool>> SetGen24ModbusSettings(string deviceId, Gen24ModbusSettings settings, CancellationToken token = default);
+
+    /// <inheritdoc cref="SetGen24ModbusSettings"/>
+    Task<ApiResult<bool>> SetGen24BatterySettings(string deviceId, Gen24BatterySettings settings, CancellationToken token = default);
+
+    /// <summary>
+    /// Writes the time of use rules. These are not a delta: the inverter takes the whole list or nothing, so
+    /// either all of them go or - when nothing changed - none.
+    /// </summary>
+    /// <returns>True where something was written, false where the inverter already held these rules.</returns>
+    Task<ApiResult<bool>> SetGen24TimeOfUse(string deviceId, IEnumerable<Gen24ChargingRule> rules, CancellationToken token = default);
+
     #endregion
 
     #region WattPilot
