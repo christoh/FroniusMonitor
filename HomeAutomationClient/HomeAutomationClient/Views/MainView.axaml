@@ -47,7 +47,20 @@
                         </MenuFlyout>
                     </Button.Flyout>
                 </Button>
-                <Button Content="{x:Static p:Resources.Settings}" Theme="{StaticResource MenuButtonStyle}"/>
+                <Button Content="{x:Static p:Resources.Settings}" Theme="{StaticResource MenuButtonStyle}">
+                    <Button.Flyout>
+                        <MenuFlyout ItemsSource="{Binding UpdateService.DevicesWithSettings}">
+                            <MenuFlyout.ItemContainerTheme>
+                                <ControlTheme TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}" x:DataType="{x:Type contracts:IKeyedDevice}">
+                                    <Setter Property="Header" Value="{Binding TargetNullValue={x:Static p:Resources.Unknown}}"/>
+                                    <Setter Property="Command" Value="{ReflectionBinding ((vm:MainViewModel)DataContext)?.SettingsCommand, ElementName=DetailsButton}"/>
+                                    <Setter Property="CommandParameter" Value="{Binding}"/>
+                                    <Setter Property="Padding" Value="8,12"/>
+                                </ControlTheme>
+                            </MenuFlyout.ItemContainerTheme>
+                        </MenuFlyout>
+                    </Button.Flyout>
+                </Button>
             </StackPanel>
         </Grid>
         <UserControl Grid.Row="1" Content="{Binding MainViewContent}" IsEnabled="{Binding IsModalDialogVisible, Converter={co:BoolInverter}}"/>
@@ -60,7 +73,7 @@
         </StackPanel>
         <c:BusyAnimation BusyText="{Binding BusyText}" Grid.Row="1"/>
         <!-- Dims the views behind a modal dialog and swallows their pointer input. A non-modal dialog leaves it out,
-             so that clicks reach the view behind: a panel without a background does not take part in hit testing. -->
+        so that clicks reach the view behind: a panel without a background does not take part in hit testing. -->
         <Grid Grid.Row="1" Background="{DynamicResource DisableBrush}" IsVisible="{Binding IsModalDialogVisible}"/>
         <Grid Grid.Row="1" x:Name="DialogOverlay" IsVisible="{Binding IsDialogVisible}">
             <Grid x:Name="DialogFrame" RowDefinitions="Auto,*" Background="{DynamicResource DialogBackground}" HorizontalAlignment="Center" VerticalAlignment="Center">

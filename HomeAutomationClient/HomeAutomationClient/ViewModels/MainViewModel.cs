@@ -107,6 +107,11 @@ public sealed partial class MainViewModel : ViewModelBase
     });
 
     [RelayCommand]
+    private Task Settings(IKeyedDevice device) => TaskExceptionHandler(async () =>
+    {
+    });
+
+    [RelayCommand]
     private Task ShowDetails(IKeyedDevice device) => ShowDetails(device, updatesAddress: true);
 
     /// <param name="updatesAddress">

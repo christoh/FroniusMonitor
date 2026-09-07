@@ -27,6 +27,8 @@ public interface IUpdateService : IDisposable, IAsyncDisposable
 
     public IEnumerable<IKeyedDevice> DetailDevices { get; }
 
+    IEnumerable<IKeyedDevice> DevicesWithSettings { get; }
+
     public bool ShowInverters { get; }
 
     public bool ShowPowerConsumers { get; }

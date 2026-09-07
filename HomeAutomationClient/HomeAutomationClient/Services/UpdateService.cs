@@ -16,10 +16,10 @@ internal partial class UpdateService(IWebClientService webClient, ILogger<Update
 
     public event EventHandler<SitePowerFlowUpdatedEventArgs>? SitePowerFlowUpdated;
 
-    [ObservableProperty, NotifyPropertyChangedFor(nameof(ShowInverters), nameof(DetailDevices))]
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(ShowInverters), nameof(DetailDevices), nameof(DevicesWithSettings))]
     public partial ObservableCollection<KeyedGen24System> Inverters { get; set; } = [];
 
-    [ObservableProperty, NotifyPropertyChangedFor(nameof(ShowPowerConsumers), nameof(DetailDevices))]
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(ShowPowerConsumers), nameof(DetailDevices), nameof(DevicesWithSettings))]
     public partial ObservableCollection<IKeyedDevice> AllPowerConsumers { get; set; } = [];
 
     [ObservableProperty]
@@ -60,6 +60,8 @@ internal partial class UpdateService(IWebClientService webClient, ILogger<Update
             return result;
         }
     }
+
+    public IEnumerable<IKeyedDevice> DevicesWithSettings => Inverters.Concat(AllPowerConsumers.Where(c => c is KeyedWattPilot));
 
     public bool ShowInverters => Inverters.Count > 0;
 
