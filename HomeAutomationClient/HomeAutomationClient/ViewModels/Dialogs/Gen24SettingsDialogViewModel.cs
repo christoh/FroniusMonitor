@@ -34,6 +34,15 @@ public sealed partial class Gen24SettingsDialogViewModel(DialogParameters parame
     public partial bool IsLoaded { get; set; }
 
     /// <summary>
+    /// What the toast says. It belongs to the dialog rather than to a tab, the same way
+    /// <see cref="DialogBase{TParameters,TResult,TBody}.BusyText"/> does: the room for it is in the button row of
+    /// the dialog, next to Cancel, and a tab squeezed into its own row has hardly any. A tab writes to it through
+    /// <c>Gen24ModbusViewModel.ToastText</c>, and the <c>Toast</c> control clears it again once it has faded.
+    /// </summary>
+    [ObservableProperty]
+    public partial string? ToastText { get; set; }
+
+    /// <summary>
     /// The tab stays in place while the settings are still being read, so the set of tabs does not change under
     /// the user a second after the dialog opened. Once they have arrived it is only there if the inverter has a
     /// Modbus configuration at all.

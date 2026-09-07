@@ -76,9 +76,15 @@ public sealed partial class Gen24ModbusViewModel : ViewModelBase
     [ObservableProperty, NotifyPropertyChangedFor(nameof(ShowAllowControl), nameof(ShowRestrictControl), nameof(ShowAllowedIp), nameof(ShowCommonSlaveSettings))]
     public partial bool EnableTcp { get; set; }
 
-    /// <summary>What the toast says after an Apply. The toast clears it again once it has faded.</summary>
-    [ObservableProperty]
-    public partial string? ToastText { get; set; }
+    /// <summary>
+    /// What the toast says after an Apply. Proxied to the dialog, like <see cref="BusyText"/>: the toast is in the
+    /// button row of the dialog, where there is room for it. The <c>Toast</c> control clears it once it has faded.
+    /// </summary>
+    public string? ToastText
+    {
+        get => owner.ToastText;
+        set => owner.ToastText = value;
+    }
 
     /// <summary>
     /// The Modbus address of the smart meter, as the text box holds it. A string, not the <c>byte?</c> of the

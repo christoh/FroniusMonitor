@@ -5,6 +5,7 @@
              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
              xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
              xmlns:v="clr-namespace:De.Hochstaetter.HomeAutomationClient.Views.Dialogs"
+             xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="700"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.Gen24SettingsDialogView"
              x:DataType="dialogs:Gen24SettingsDialogViewModel"
@@ -37,7 +38,14 @@
 			</TabItem>
 		</TabControl>
 
-		<Button Grid.Row="1" HorizontalAlignment="Right" Margin="16" MinWidth="80" HorizontalContentAlignment="Center"
-		        Content="{x:Static p:Resources.Cancel}" Command="{Binding CloseDialogCommand}" />
+		<!-- The toast lives here rather than in a tab: this row is the widest free space the dialog has, below
+		     whatever the tab ends with and left of Cancel. A tab writes to ToastText through its own proxy. -->
+		<Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="16">
+			<c:Toast Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,12,0"
+			         Text="{Binding ToastText, Mode=TwoWay}" />
+
+			<Button Grid.Column="1" MinWidth="80" HorizontalContentAlignment="Center"
+			        Content="{x:Static p:Resources.Cancel}" Command="{Binding CloseDialogCommand}" />
+		</Grid>
 	</Grid>
 </UserControl>

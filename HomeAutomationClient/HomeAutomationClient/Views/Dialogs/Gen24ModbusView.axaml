@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
              xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
-             xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
              mc:Ignorable="d" d:DesignWidth="520" d:DesignHeight="600"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.Gen24ModbusView"
              x:DataType="dialogs:Gen24ModbusViewModel">
@@ -103,13 +102,12 @@
 			</Grid>
 		</HeaderedContentControl>
 
+		<!-- The toast is not here but in the button row of the dialog, where there is room for it: this row has
+		     only the gap between the switch and Undo to offer. See Gen24SettingsDialogView. -->
 		<Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" Margin="0,8,0,0">
 			<TextBlock Grid.Column="0" Classes="Caption" Text="{x:Static p:Resources.Danger}" />
 			<ToggleButton Grid.Column="1" Classes="OnOff" Height="16" VerticalAlignment="Center"
 			              IsChecked="{Binding EnableDanger}" />
-
-			<c:Toast Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="12,0"
-			         Text="{Binding ToastText, Mode=TwoWay}" />
 
 			<Button Grid.Column="3" MinWidth="80" Margin="8,0,0,0" HorizontalContentAlignment="Center"
 			        Content="{x:Static p:Resources.Undo}" Command="{Binding UndoCommand}" />

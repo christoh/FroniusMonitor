@@ -68,11 +68,15 @@ should accept `User,Operator` is still open; see the note at the end.
 `Gen24SettingsDialogViewModel` is the `DialogBase`. Each tab is a plain `ViewModelBase` that the shell creates from
 the snapshot and exposes as a property, and the view puts one `UserControl` per tab into a `TabControl`.
 
-Two things a tab has to do:
+Three things a tab has to do:
 
 - **Proxy `BusyText` to the shell.** A tab has no busy indicator of its own; the dialog does, through
   `MainViewModel.DialogBusyText`. Overriding `BusyText` to forward to the shell also means the guard in
   `TaskExceptionHandler` clears the indicator the user is actually looking at rather than a property nothing binds.
+- **Proxy `ToastText` to the shell** as well, for the same reason: the toast is in the button row of the dialog,
+  next to Cancel, because that is the only place with room for a sentence. A tab that keeps its own would have to
+  squeeze it into the gap between its switches and its buttons, where the text wraps to four lines and drags the
+  row open - measured at 124 px against 334 px.
 - **Own its visibility rules.** Every `MultiBinding` to `Visibility` in the WPF views becomes a bindable property
   here - `IsRtuSlave`, `ShowAllowControl`, `ShowRestrictControl`, `ShowAllowedIp`, `ShowCommonSlaveSettings`.
   Avalonia has no `Visibility`, and [[ViewModelsForInteractionLogic]] wants the rule in the view model anyway.
@@ -104,10 +108,11 @@ Ported from the WPF dialogs deliberately, so the two apps behave alike:
 - **Busy while saving:** `string.Format(Loc.SavingSettings, <group>)` - "Saving Modbus settings". A format, because
   every tab wants its own name in it.
 - **Saved:** `Loc.SettingsSavedToInverter` in a `Toast` (`Controls/Toast.axaml`), five seconds then a one second
-  fade. `Toast.Text` binds two way and the control clears it when it has faded, so the same message shown twice
-  appears twice. A `DispatcherTimer` rather than the `async void` + `Task.Delay` of the WPF original. Its colours
-  are `ToastBackground` and `ToastForeground` from both theme dictionaries, not literals - the app is used in
-  light and dark.
+  fade, in the button row of `Gen24SettingsDialogView` rather than in the tab. `Toast.Text` binds two way and the
+  control clears it when it has faded, so the same message shown twice appears twice - which is also what clears
+  the shell's `ToastText` again. A `DispatcherTimer` rather than the `async void` + `Task.Delay` of the WPF
+  original. Its colours are `ToastBackground` and `ToastForeground` from both theme dictionaries, not literals -
+  the app is used in light and dark.
 
 The switch for the dangerous group is `ToggleButton Classes="OnOff"`, the switch of this app, not a `ToggleSwitch`.
 `Classes="OnOff Labeled"` is the same switch with its `Content` as a caption in front of it. The plain check boxes
