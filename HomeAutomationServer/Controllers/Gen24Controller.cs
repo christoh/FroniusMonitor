@@ -140,7 +140,7 @@ public class Gen24SystemController(IDataControlService controlService, IGen24Jso
             {
                 InverterSettings = Gen24InverterSettings.Parse(configToken),
                 BatterySettings = Gen24BatterySettings.Parse(configToken["batteries"]?["batteries"]),
-                ChargingRules = [.. Gen24ChargingRule.Parse(configToken["timeofuse"], null)],
+                ChargingRules = Gen24ChargingRule.ParseList(configToken["timeofuse"]),
                 ModbusSettings = Gen24ModbusSettings.Parse(configToken["modbus"]?["modbus"]),
                 SoftwareVersions = Gen24Versions.Parse(versionToken).SwVersions,
                 MaxAcPower = configToken["powerunit"]?["powerunit"]?["system"]?.Value<double>("DEVICE_POWERACTIVE_NOMINAL_F32"),
@@ -218,7 +218,7 @@ public class Gen24SystemController(IDataControlService controlService, IGen24Jso
     public Task<IActionResult> SetTimeOfUse([FromRoute] string id, [FromBody] List<Gen24ChargingRule> rules) => WriteSettings
     (
         id, "api/config/timeofuse", rules,
-        configToken => [.. Gen24ChargingRule.Parse(configToken["timeofuse"], null)],
+        configToken => Gen24ChargingRule.ParseList(configToken["timeofuse"]),
         (wanted, current) => wanted.SequenceEqual(current) ? new JObject() : Gen24ChargingRule.GetToken(wanted)
     );
 

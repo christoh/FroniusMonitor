@@ -68,18 +68,31 @@ public partial class Gen24ChargingRule : BindableBase, ICloneable
     [FroniusProprietaryImport("ScheduleType", FroniusDataType.Root)]
     public partial ChargingRuleType? RuleType { get; set; }
 
+    /// <summary>
+    /// The rules of a config token as a plain list, in the order the inverter reports them.
+    /// </summary>
+    /// <remarks>
+    /// Anything that is not a UI reads the rules through here. <see cref="BindableCollection{T}"/> insists on a
+    /// <see cref="SynchronizationContext"/> and throws a <see cref="ThreadStateException"/> rather than doing
+    /// without one, and a request thread of the server has none.
+    /// </remarks>
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    public static BindableCollection<Gen24ChargingRule> Parse(JToken? token, SynchronizationContext? ctx)
+    public static List<Gen24ChargingRule> ParseList(JToken? token)
     {
-        var result = new BindableCollection<Gen24ChargingRule>(ctx);
-
         if (token?["timeofuse"] is not JArray array)
         {
-            return result;
+            return [];
         }
 
         var gen24Service = IoC.Get<IGen24JsonService>();
-        result.AddRange(array.Select(gen24Service.ReadFroniusData<Gen24ChargingRule>));
+        return [.. array.Select(gen24Service.ReadFroniusData<Gen24ChargingRule>)];
+    }
+
+    /// <summary>The same rules in a collection a view can bind to. Needs a context; see <see cref="ParseList"/>.</summary>
+    public static BindableCollection<Gen24ChargingRule> Parse(JToken? token, SynchronizationContext? ctx)
+    {
+        var result = new BindableCollection<Gen24ChargingRule>(ctx);
+        result.AddRange(ParseList(token));
         return result;
     }
 
