@@ -60,12 +60,16 @@ public partial class Gen24ModbusSettings : Gen24ParsingBase, ICloneable
     {
         get;
 
-        set => Set(ref field, value, () =>
+        // preFunc, not postAction: postAction runs after the backing field has been written, so a refused value
+        // would be stored anyway and the change would go unnotified. See BindableBase.SetProperty.
+        set => Set(ref field, value, preFunc: () =>
         {
             if (value is < 1 or > 247)
             {
                 throw new ArgumentOutOfRangeException(Resources.MeterAddressError, null as Exception);
             }
+
+            return value;
         });
     }
 
@@ -85,12 +89,14 @@ public partial class Gen24ModbusSettings : Gen24ParsingBase, ICloneable
     public byte? SunSpecAddress
     {
         get;
-        set => Set(ref field, value, () =>
+        set => Set(ref field, value, preFunc: () =>
         {
             if (value is 0)
             {
                 throw new ArgumentOutOfRangeException(Resources.SunspecAddressError, null as Exception);
             }
+
+            return value;
         });
     }
 
@@ -111,12 +117,14 @@ public partial class Gen24ModbusSettings : Gen24ParsingBase, ICloneable
     public string? IpAddress
     {
         get;
-        set => Set(ref field, value, () =>
+        set => Set(ref field, value, preFunc: () =>
         {
             if (!string.IsNullOrEmpty(value) && !value.Split(',').All(IsValidIpOrIpWithMask))
             {
                 throw new ArgumentException(Resources.MustBeIpv4Address);
             }
+
+            return value;
         });
     }
 

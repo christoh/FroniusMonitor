@@ -139,8 +139,16 @@ Three things are needed to make that work, and each of them was silently missing
   applies them. **The `:error` rule comes after the focus rules on purpose** - a value is refused while it is being
   typed, so the field is focused and in error at once, and equal-specificity styles apply in order.
 
-**The model is not what is invalid.** A throwing setter never wrote, so the model still holds the value the dialog
-read and looks perfectly valid at Apply. Only the controls know, so the view collects them: the code behind walks
+**A validating setter has to use `preFunc`, not `postAction`.** `BindableBase.SetProperty` writes the backing
+field, *then* runs `postAction`, *then* raises `PropertyChanged`. A validator passed as `postAction` - which is the
+third parameter and therefore the one you get by writing `Set(ref field, value, () => …)` - throws after the
+refused value has already been stored, and before anything was notified. The value is kept, silently, and Undo has
+nothing to restore from as far as the view is concerned. `preFunc` runs before the assignment and returns the value
+to store, so a throw there leaves the model untouched. `MeterAddress`, `SunSpecAddress` and `IpAddress` of
+`Gen24ModbusSettings` are the examples.
+
+**The model is therefore not what is invalid.** The refused value never reaches it, so it still holds what the
+dialog read and looks perfectly valid at Apply. Only the controls know, so the view collects them: the code behind walks
 its own `TextBox`es, keeps the `IsEffectivelyVisible` ones, and hands the view model plain strings through
 `Gen24ModbusViewModel.GetInvalidFields`, the way `DashboardView` hands plain colors over. `Apply` puts them up as
 the `ItemList` of a `PleaseCorrectErrors` message box and sends nothing.
