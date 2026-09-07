@@ -25,6 +25,41 @@ public class ModbusViewModel(
 
     public IReadOnlyList<SunspecMode> SunspecModes => Enum.GetValues<SunspecMode>();
 
+    /// <summary>
+    /// The Modbus address of the smart meter, as the text box holds it.
+    /// </summary>
+    /// <remarks>
+    /// A string, not the <c>byte?</c> of the settings, because a text input element never binds to a numeric
+    /// property - see the rule about text input in <c>.claude/rules/ViewModelsForInteractionLogic.md</c>. Bound
+    /// straight to a <c>byte?</c>, a letter or an emptied box is refused by the binding itself: the property never
+    /// changes, nothing notifies, and Undo has nothing to push back into the box.
+    /// The rule is on this property, and the settings carry the same one for the sake of the server; both take
+    /// their limits from <see cref="Gen24ModbusSettings"/> so that they cannot drift apart.
+    /// </remarks>
+    [MinMaxInt(Gen24ModbusSettings.MinMeterAddress, Gen24ModbusSettings.MaxMeterAddress,
+        MessageResourceKey = nameof(Loc.MeterAddressError))]
+    public string? MeterAddressText
+    {
+        get;
+        set => Set(ref field, value, postAction: () => ValidateProperty(value, nameof(MeterAddressText)));
+    }
+
+    /// <summary>
+    /// The string control address, as the text box holds it. See <see cref="MeterAddressText"/>.
+    /// </summary>
+    /// <remarks>
+    /// It may be left empty: only a Tauro has string controllers, so an inverter with none has nothing to put in
+    /// the box. Neither address is required, in fact - an empty field becomes null, and a null is left out of the
+    /// update token altogether, so it means "not mine to say" and never overwrites what the inverter holds.
+    /// </remarks>
+    [MinMaxInt(Gen24ModbusSettings.MinSunSpecAddress, Gen24ModbusSettings.MaxSunSpecAddress,
+        MessageResourceKey = nameof(Loc.SunspecAddressError))]
+    public string? SunSpecAddressText
+    {
+        get;
+        set => Set(ref field, value, postAction: () => ValidateProperty(value, nameof(SunSpecAddressText)));
+    }
+
     public string Title
     {
         get;
@@ -100,10 +135,20 @@ public class ModbusViewModel(
         }
     }
 
+    /// <summary>
+    /// Unconditionally back to the settings this dialog started from. Every field, whatever it holds: the text
+    /// properties are filled again as well, which is what reaches a box holding something the settings never took.
+    /// </summary>
     private void Undo()
     {
         Settings = (Gen24ModbusSettings)oldSettings.Clone();
+        MeterAddressText = NumericText.Of(Settings.MeterAddress);
+        SunSpecAddressText = NumericText.Of(Settings.SunSpecAddress);
         EnableTcp = Settings.Mode is ModbusSlaveMode.Tcp or ModbusSlaveMode.Both;
+
+        // Explicitly, because a setter validates only what it actually stores: writing the same value twice - null
+        // over null, at load or after Undo - changes nothing and so would leave whatever error was there standing.
+        ValidateAllProperties();
     }
 
     public async void Apply()
@@ -116,16 +161,29 @@ public class ModbusViewModel(
 
             foreach (var error in errors)
             {
-                if (error.BindingInError is BindingExpression { Target: FrameworkElement { IsVisible: false } } expression)
+                if (error.BindingInError is not BindingExpression { Target: FrameworkElement { IsVisible: false } } expression)
                 {
-                    var type = oldSettings.GetType();
-                    var property = type.GetProperty(expression.ResolvedSourcePropertyName);
+                    continue;
+                }
 
-                    if (property != null)
-                    {
-                        var value = property.GetValue(oldSettings);
-                        property.SetValue(Settings, value);
-                    }
+                var name = expression.ResolvedSourcePropertyName;
+                var property = oldSettings.GetType().GetProperty(name);
+
+                if (property != null)
+                {
+                    property.SetValue(Settings, property.GetValue(oldSettings));
+                    continue;
+                }
+
+                // The two addresses are edited as text on this view model, so they are not found above. Same
+                // intent: a field the user cannot see must not stop them saving.
+                if (name == nameof(MeterAddressText))
+                {
+                    MeterAddressText = NumericText.Of(oldSettings.MeterAddress);
+                }
+                else if (name == nameof(SunSpecAddressText))
+                {
+                    SunSpecAddressText = NumericText.Of(oldSettings.SunSpecAddress);
                 }
             }
 
@@ -143,6 +201,11 @@ public class ModbusViewModel(
 
                 return;
             }
+
+            // The rules have passed, so the text of the two addresses is known to be a number in range - or empty,
+            // which a string control address may be and which ends up as null.
+            Settings.MeterAddress = (byte?)NumericText.ToInteger(MeterAddressText);
+            Settings.SunSpecAddress = (byte?)NumericText.ToInteger(SunSpecAddressText);
 
             var isModbusRtu = Settings.Rtu0 == ModbusInterfaceRole.Slave || Settings.Rtu1 == ModbusInterfaceRole.Slave;
             var isAnyModbus = isModbusRtu || EnableTcp;

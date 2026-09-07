@@ -207,13 +207,13 @@
                     <Run Text=":" />
                 </TextBlock>
 
-                <TextBox Grid.Row="0" Grid.Column="1" Text="{co:ValidationBinding Settings.MeterAddress}" />
+                <TextBox Grid.Row="0" Grid.Column="1" Text="{co:ValidationBinding MeterAddressText}" />
 
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="{l:Resource ScAddress}">
                     <Run Text=":" />
                 </TextBlock>
 
-                <TextBox Grid.Row="1" Grid.Column="1" Text="{co:ValidationBinding Settings.SunSpecAddress}" />
+                <TextBox Grid.Row="1" Grid.Column="1" Text="{co:ValidationBinding SunSpecAddressText}" />
 
                 <TextBlock Grid.Row="2" Grid.Column="0" Text="{l:Resource SunspecMode}">
                     <Run Text=":" />
