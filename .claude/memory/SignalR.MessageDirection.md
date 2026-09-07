@@ -87,8 +87,35 @@ case and the broadcast test.
 `ProbeClient` also registers a working handler for the client-result call, so "the invocation never arrived" cannot
 be confused with "the client had no handler".
 
-## Still open
+## Who may connect at all
 
-The hub is **unauthenticated**: `Program.cs` maps it as
-`app.MapHub<HomeAutomationHub>("/hub");//.RequireAuthorization(r=>r.RequireRole("User"))`. Anyone who can reach the
-endpoint gets the full device stream. The direction rule above is about routing only and does not address that.
+The direction rule above is about routing. Getting onto the hub in the first place is a separate gate:
+`app.MapHub<HomeAutomationHub>("/hub").RequireAuthorization(policy => policy.RequireHubTicket())`.
+
+`HubAuthentication` holds both halves of that decision - `AddHubTicketAuthentication` for the scheme,
+`RequireHubTicket` for the policy (ticket scheme plus `Roles.User`) - so `Program.cs` and the tests cannot drift
+apart. Never write the scheme name or the role at a call site.
+
+**The hub does not take the Basic credentials the rest of the API uses.** A browser cannot set an `Authorization`
+header on a WebSocket handshake, so SignalR passes the credential as the `access_token` query parameter, and query
+strings land in the access log of every server and proxy on the way. Instead `GET api/Identity/hubTicket` (Basic
+authenticated) hands out a short lived ticket, and the client feeds it to `AccessTokenProvider`:
+
+- `HubTicketService` signs `v1.<user>.<expiry>` with a key derived from `IAesKeyProvider`, and folds the user's
+  password hash and salt into the signature without putting them in the ticket. So a password change invalidates
+  every outstanding ticket, and a ticket recovered from a log is worthless within `HubTicketService.Lifetime`.
+- The signature is checked **before** the expiry: the claimed expiry of a ticket nobody signed means nothing.
+- `HubTicketAuthenticationService` reads the ticket from `access_token` (WebSockets) or from a `Bearer` header
+  (negotiate and long polling), and hands back the same principal the Basic handler builds -
+  `AuthorizationExtensions.CreateAuthenticationTicket` is the one place that turns a `User` into role claims.
+- The client fetches a ticket per connection attempt rather than keeping one; SignalR asks `AccessTokenProvider`
+  again on every reconnect.
+
+`Roles` is a `[Flags]` enum and `RequireHubTicket` asks for `Roles.User` specifically, so a user who holds only
+`Administrator` or only `Guest` cannot connect. That is deliberate, but it means the User bit has to be set on
+anyone who should see the device stream.
+
+Tests: `UnitTests/HubTicketServiceTests` covers forging, tampering, expiry, an unknown user and a changed password
+(including flipping every single bit of the signature); `UnitTests/Hosted/HubAuthenticationTests` proves over a real
+connection that no ticket, a foreign ticket, an expired ticket and a user without the role are all turned away,
+while a valid ticket gets in. Weakening `RequireHubTicket` fails exactly those four.

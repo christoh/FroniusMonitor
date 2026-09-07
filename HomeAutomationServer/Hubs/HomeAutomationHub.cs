@@ -7,7 +7,11 @@ public class HomeAutomationHub(IDataControlService controlService, ILogger<HomeA
     public override async Task OnConnectedAsync()
     {
         await base.OnConnectedAsync().ConfigureAwait(false);
-        logger.LogInformation("Client connected");
+
+        if (logger.IsEnabled(LogLevel.Information))
+        {
+            logger.LogInformation("Client of {Username} connected on {ConnectionId}", Context.User?.Identity?.Name, Context.ConnectionId);
+        }
 
         foreach (var e in controlService.Entities)
         {

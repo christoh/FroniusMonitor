@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using System.Text;
+﻿using System.Text;
 using System.Text.Encodings.Web;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using Microsoft.AspNetCore.Authentication;
@@ -54,21 +53,12 @@ public class AuthenticationService(IOptionsMonitor<UserList> options, ILoggerFac
             return Task.FromResult(AuthenticateResult.Fail("Access denied"));
         }
 
-        Logger.LogDebug("User {Username} was authenticated. Roles: {Roles}", username, user.Roles);
+        if (Logger.IsEnabled(LogLevel.Debug))
+        {
+            Logger.LogDebug("User {Username} was authenticated. Roles: {Roles}", username, user.Roles);
+        }
 
-        var identity = new Identity { IsAuthenticated = true, Name = username };
-        var claims = new List<Claim>();
-
-        claims.AddRange
-        (
-            Enum.GetValues<Roles>()
-                .Except([Roles.All, Roles.None])
-                .Where(role => (user.Roles & role) != Roles.None)
-                .Select(role => new Claim(ClaimTypes.Role, role.ToString()))
-        );
-
-        var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(identity, claims));
-        return Task.FromResult(AuthenticateResult.Success(new AuthenticationTicket(claimsPrincipal, identity.AuthenticationType)));
+        return Task.FromResult(AuthenticateResult.Success(user.CreateAuthenticationTicket(Scheme.Name)));
     }
 
     private void SetAuthHeader()

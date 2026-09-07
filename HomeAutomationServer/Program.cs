@@ -171,6 +171,7 @@ internal class Program
 
         builder.Services.AddOpenApi();
         builder.Services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, AuthenticationService>("Basic", null);
+        builder.Services.AddHubTicketAuthentication();
         builder.Services.AddHomeAutomationSignalR();
 
         //builder.Services.AddAuthentication()
@@ -189,7 +190,10 @@ internal class Program
 
         app.MapControllers();
         app.UseCors();
-        app.MapHub<HomeAutomationHub>("/hub");//.RequireAuthorization(r=>r.RequireRole("User"));
+        // The hub has a scheme of its own: a browser cannot set an Authorization header on a WebSocket handshake,
+        // so the connection authenticates with a short lived ticket instead. See HubTicketService.
+        app.MapHub<HomeAutomationHub>("/hub").RequireAuthorization(policy => policy.RequireHubTicket());
+
         IoC.Update(app.Services);
 
         logger = IoC.Get<ILogger<Program>>();

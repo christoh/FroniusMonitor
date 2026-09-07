@@ -93,7 +93,10 @@ internal partial class UpdateService(IWebClientService webClient) : BindableBase
         var hubUri = IoC.TryGetRegistered<ICache>()?.Get<string>(CacheKeys.HubUri) ?? "http://www.example.com/hub";
 
         hubConnection = new HubConnectionBuilder()
-            .WithUrl(hubUri)
+            // The ticket, not the password: on the WebSocket transport SignalR can only pass this in the query
+            // string, where it would land in every access log on the way. AccessTokenProvider is asked again on
+            // every reconnect, so a fresh ticket is fetched each time rather than kept around.
+            .WithUrl(hubUri, options => options.AccessTokenProvider = () => webClient.GetHubTicket())
             .WithAutomaticReconnect()
             .AddJsonProtocol(o =>
             {

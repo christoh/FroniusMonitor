@@ -1,6 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
+using HubTicketService = De.Hochstaetter.HomeAutomationServer.Services.HubTicketService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
@@ -57,6 +58,29 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
 
         Response.Cookies.Delete("auth", cookieOptions);
         return Ok();
+    }
+
+    /// <summary>
+    /// Hands out a short lived ticket the client authenticates its SignalR connection with. Basic credentials get
+    /// this far, but must not go any further: see <see cref="HubTicketService"/>.
+    /// </summary>
+    [HttpGet("hubTicket")]
+    [BasicAuthorize]
+    [ProducesResponseType<string>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    public IActionResult HubTicket([FromServices] HubTicketService hubTickets)
+    {
+        var userName = HttpContext.User.Identity?.Name;
+        var dbUser = userDb.CurrentValue.Users.SingleOrDefault(u => string.Equals(userName, u.Username, StringComparison.Ordinal));
+
+        if (dbUser == null)
+        {
+            logger.LogWarning("No hub ticket for {Username}: authenticated, but not in the user list", userName);
+            return Unauthorized(Helpers.GetProblemDetails(Loc.CannotLogin, Loc.LoginIncorrect));
+        }
+
+        // Content, not Ok: the ticket is an opaque string and the client reads it as one, without JSON quoting.
+        return Content(hubTickets.Issue(dbUser));
     }
 
     [HttpGet("adduser")]

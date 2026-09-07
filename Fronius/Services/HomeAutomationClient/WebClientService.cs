@@ -42,6 +42,13 @@ public sealed class WebClientService : IWebClientService
         return await Get($"Identity/login?user={userName}&password={password}", token).ConfigureAwait(false);
     }
 
+    public async Task<string?> GetHubTicket(CancellationToken token = default)
+    {
+        using var response = await httpClient.GetAsync("Identity/hubTicket", token).ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadAsStringAsync(token).ConfigureAwait(false);
+    }
+
     #endregion
 
     #region Devices

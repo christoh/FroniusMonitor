@@ -14,6 +14,13 @@ public interface IWebClientService : IDisposable
 
     Task<ProblemDetails?> Login(string userName, string password, CancellationToken token = default);
 
+    /// <summary>
+    /// A short lived ticket that authenticates a SignalR connection. Requires a successful <see cref="Login"/>
+    /// first. Fetch one per connection attempt rather than keeping it: it expires within minutes, and the hub asks
+    /// for a fresh one on every reconnect anyway.
+    /// </summary>
+    Task<string?> GetHubTicket(CancellationToken token = default);
+
     Task<ApiResult<IDictionary<string, DeviceInfo>>> ListDevices(CancellationToken token = default);
 
     #endregion
