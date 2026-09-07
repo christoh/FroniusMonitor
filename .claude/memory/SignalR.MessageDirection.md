@@ -111,9 +111,11 @@ authenticated) hands out a short lived ticket, and the client feeds it to `Acces
 - The client fetches a ticket per connection attempt rather than keeping one; SignalR asks `AccessTokenProvider`
   again on every reconnect.
 
-`Roles` is a `[Flags]` enum and `RequireHubTicket` asks for `Roles.User` specifically, so a user who holds only
-`Administrator` or only `Guest` cannot connect. That is deliberate, but it means the User bit has to be set on
-anyone who should see the device stream.
+`Roles` is a `[Flags]` enum, so holding one role says nothing about the others - an administrator does not carry
+the User bit unless somebody set it. `RequireHubTicket` therefore names both `Roles.User` and
+`Roles.Administrator`, and `RequireRole` lets **any** of the roles it is given through, never all of them. Guest,
+PowerUser, Operator and Developer still do not get a connection on their own; add the role to that list rather than
+setting the User bit on such a user by hand.
 
 Tests: `UnitTests/HubTicketServiceTests` covers forging, tampering, expiry, an unknown user and a changed password
 (including flipping every single bit of the signature); `UnitTests/Hosted/HubAuthenticationTests` proves over a real

@@ -20,6 +20,7 @@ public sealed class HubAuthenticationTests : IAsyncLifetime
     private static readonly DateTimeOffset Now = new(2026, 8, 31, 12, 0, 0, TimeSpan.Zero);
 
     private readonly User member = TestUsers.Create("bob", Roles.User);
+    private readonly User administrator = TestUsers.Create("root", Roles.Administrator);
     private readonly User guest = TestUsers.Create("eve", Roles.Guest);
     private readonly SettableTimeProvider clock = new(Now);
 
@@ -34,7 +35,7 @@ public sealed class HubAuthenticationTests : IAsyncLifetime
         builder.WebHost.UseUrls("http://127.0.0.1:0");
 
         builder.Services.AddSingleton<IAesKeyProvider>(new TestAesKeyProvider());
-        builder.Services.Configure<UserList>(list => list.Users = [member, guest]);
+        builder.Services.Configure<UserList>(list => list.Users = [member, administrator, guest]);
 
         // Registered before AddHubTicketAuthentication, which only adds TimeProvider.System if nobody else has.
         builder.Services.AddSingleton<TimeProvider>(clock);
@@ -63,6 +64,19 @@ public sealed class HubAuthenticationTests : IAsyncLifetime
     public async Task A_valid_ticket_gets_onto_the_hub()
     {
         await using var connection = Build(tickets.Issue(member));
+
+        await connection.StartAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal(HubConnectionState.Connected, connection.State);
+    }
+
+    [Fact]
+    public async Task An_administrator_gets_on_without_holding_the_User_role()
+    {
+        // The point of the test: Roles is a flags enum, and this administrator genuinely has no User bit.
+        Assert.False(administrator.Roles.HasFlag(Roles.User));
+
+        await using var connection = Build(tickets.Issue(administrator));
 
         await connection.StartAsync(TestContext.Current.CancellationToken);
 
@@ -100,7 +114,7 @@ public sealed class HubAuthenticationTests : IAsyncLifetime
     [Fact]
     public async Task A_user_without_the_required_role_is_not_accepted()
     {
-        // The ticket itself is perfectly valid - eve simply is not a User, and the policy on the hub asks for that.
+        // The ticket itself is perfectly valid - eve is only a Guest, which is neither of the roles that get in.
         await using var connection = Build(tickets.Issue(guest));
 
         Assert.Equal(HttpStatusCode.Forbidden, await Refused(connection));
