@@ -1,0 +1,55 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters">
+	<!-- How a refused value looks, everywhere in the app: a red frame on the field, and the reason when the pointer
+	     rests on it. Nothing is written next to the field, because that reflows the layout on every keystroke; the
+	     reasons are told all at once when the user presses Apply. The rules themselves are validation attributes on
+	     the edited property - see Fronius/Validators. -->
+
+	<Design.PreviewWith>
+		<Border Padding="20">
+			<StackPanel Spacing="8" Width="220">
+				<TextBox Text="ordinary" />
+				<TextBox Text="refused" DataValidationErrors.Error="Value must be between 1 and 247" />
+			</StackPanel>
+		</Border>
+	</Design.PreviewWith>
+
+	<Styles.Resources>
+		<!-- The default theme of DataValidationErrors writes the message beside the field. This one renders the
+		     field and nothing else. Setting DataValidationErrors.ErrorTemplate does not do it: the template that
+		     draws the message belongs to the control, not to the attached property. -->
+		<ControlTheme x:Key="FrameOnlyValidationErrors" TargetType="DataValidationErrors">
+			<Setter Property="Template">
+				<ControlTemplate TargetType="DataValidationErrors">
+					<ContentPresenter Name="PART_ContentPresenter"
+					                  Background="{TemplateBinding Background}"
+					                  BorderBrush="{TemplateBinding BorderBrush}"
+					                  BorderThickness="{TemplateBinding BorderThickness}"
+					                  CornerRadius="{TemplateBinding CornerRadius}"
+					                  Content="{TemplateBinding Content}"
+					                  ContentTemplate="{TemplateBinding ContentTemplate}"
+					                  Padding="{TemplateBinding Padding}" />
+				</ControlTemplate>
+			</Setter>
+		</ControlTheme>
+	</Styles.Resources>
+
+	<Style Selector="DataValidationErrors">
+		<Setter Property="Theme" Value="{StaticResource FrameOnlyValidationErrors}" />
+	</Style>
+
+	<!-- Only where there is something to say: the converter returns null for an empty list, and Avalonia shows no
+	     tooltip for a null Tip. A text box that sets a Tip of its own keeps it, because a local value beats a
+	     style setter. -->
+	<Style Selector="TextBox">
+		<Setter Property="ToolTip.Tip" Value="{Binding $self.(DataValidationErrors.Errors), Converter={co:ValidationErrors}}" />
+	</Style>
+
+	<!-- After the focus rules of Styles/TextBoxes.axaml on purpose, which is why this file is included after it in
+	     App.axaml. A value is refused while the user is typing it, so the field is focused and in error at the same
+	     time, and of the two it is the error that has to show. Styles of equal specificity apply in order. -->
+	<Style Selector="TextBox:error /template/ Border#PART_BorderElement">
+		<Setter Property="BorderBrush" Value="{DynamicResource ValidationErrorBrush}" />
+	</Style>
+</Styles>

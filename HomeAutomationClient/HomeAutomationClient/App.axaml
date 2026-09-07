@@ -17,6 +17,8 @@
         <StyleInclude Source="Styles/Controls.axaml"/>
         <StyleInclude Source="Styles/DetailViews.axaml"/>
         <StyleInclude Source="Styles/TextBoxes.axaml"/>
+        <!-- After TextBoxes.axaml: the error border has to win over the focused one. -->
+        <StyleInclude Source="Styles/Validation.axaml"/>
 	</Application.Styles>
 
 	<Application.Resources>

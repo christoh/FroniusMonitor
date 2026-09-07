@@ -31,6 +31,7 @@ global using De.Hochstaetter.Fronius.Models.Gen24;
 global using De.Hochstaetter.Fronius.Models.Gen24.Settings;
 global using De.Hochstaetter.Fronius.Models.Settings;
 global using De.Hochstaetter.Fronius.Services.HomeAutomationClient;
+global using De.Hochstaetter.Fronius.Validators;
 global using De.Hochstaetter.HomeAutomationClient;
 global using De.Hochstaetter.HomeAutomationClient.ViewModels.Adapters;
 global using De.Hochstaetter.HomeAutomationClient.Assets.Images;

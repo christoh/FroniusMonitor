@@ -33,6 +33,13 @@ public enum SunspecMode
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public partial class Gen24ModbusSettings : Gen24ParsingBase, ICloneable
 {
+    /// <summary>
+    /// The limits of the two bus addresses. Named because two things declare them: the rule on the property here,
+    /// which is what the server validates a request body against, and the rule on the string a dialog binds its
+    /// text box to. Both have to say the same numbers.
+    /// </summary>
+    public const int MinMeterAddress = 1, MaxMeterAddress = 247, MinSunSpecAddress = 1, MaxSunSpecAddress = 255;
+
     private static readonly IReadOnlyList<int> baudRates = [9600, 19200];
 
     private static readonly IReadOnlyList<ushort> tcpPorts = [502, 1502];
@@ -55,23 +62,11 @@ public partial class Gen24ModbusSettings : Gen24ParsingBase, ICloneable
     [FroniusProprietaryImport("demo", FroniusDataType.Root)]
     public partial bool? IsDemoMode { get; set; }
 
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [MinMaxInt(MinMeterAddress, MaxMeterAddress, MessageResourceKey = nameof(Resources.MeterAddressError))]
     [FroniusProprietaryImport("meterAddress", FroniusDataType.Root)]
-    public byte? MeterAddress
-    {
-        get;
-
-        // preFunc, not postAction: postAction runs after the backing field has been written, so a refused value
-        // would be stored anyway and the change would go unnotified. See BindableBase.SetProperty.
-        set => Set(ref field, value, preFunc: () =>
-        {
-            if (value is < 1 or > 247)
-            {
-                throw new ArgumentOutOfRangeException(Resources.MeterAddressError, null as Exception);
-            }
-
-            return value;
-        });
-    }
+    public partial byte? MeterAddress { get; set; }
 
     [ObservableProperty]
     [FroniusProprietaryImport("mode", FroniusDataType.Root)]
@@ -85,20 +80,11 @@ public partial class Gen24ModbusSettings : Gen24ParsingBase, ICloneable
     [FroniusProprietaryImport("port", FroniusDataType.Root)]
     public partial ushort? TcpPort { get; set; }
 
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [MinMaxInt(MinSunSpecAddress, MaxSunSpecAddress, MessageResourceKey = nameof(Resources.SunspecAddressError))]
     [FroniusProprietaryImport("scAddress", FroniusDataType.Root)]
-    public byte? SunSpecAddress
-    {
-        get;
-        set => Set(ref field, value, preFunc: () =>
-        {
-            if (value is 0)
-            {
-                throw new ArgumentOutOfRangeException(Resources.SunspecAddressError, null as Exception);
-            }
-
-            return value;
-        });
-    }
+    public partial byte? SunSpecAddress { get; set; }
 
     [ObservableProperty]
     [FroniusProprietaryImport("rtu_inverter_slave_id", FroniusDataType.Root)]
@@ -114,35 +100,14 @@ public partial class Gen24ModbusSettings : Gen24ParsingBase, ICloneable
     [ObservableProperty]
     public partial bool? RestrictControl { get; set; }
 
-    public string? IpAddress
-    {
-        get;
-        set => Set(ref field, value, preFunc: () =>
-        {
-            if (!string.IsNullOrEmpty(value) && !value.Split(',').All(IsValidIpOrIpWithMask))
-            {
-                throw new ArgumentException(Resources.MustBeIpv4Address);
-            }
-
-            return value;
-        });
-    }
-
-    private static bool IsValidIpOrIpWithMask(string value)
-    {
-        var parts = value.Split('/');
-        var isValidIp = parts[0].Split('.').Length == 4 // 4 octets
-            && parts[0].Split('.').All(octet => byte.TryParse(octet, out _)); // and each is valid
-
-        return parts.Length switch
-        {
-            // like 192.168.178.1
-            1 => isValidIp,
-            // with mask, like 192.168.178.1/16 (mask range needs to be within 0 and 32)
-            2 when int.TryParse(parts[1], out int mask) && mask is > 0 and <= 32 => isValidIp,
-            _ => false
-        };
-    }
+    /// <summary>
+    /// The addresses that may control the inverter over Modbus TCP: one or more IPv4 addresses, each with an
+    /// optional prefix length, separated by commas.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Ipv4(AllowMask = true, AllowList = true)]
+    public partial string? IpAddress { get; set; }
 
     public static Gen24ModbusSettings Parse(JToken? token)
     {
@@ -250,5 +215,32 @@ public partial class Gen24ModbusSettings : Gen24ParsingBase, ICloneable
 
     }
 
-    public override object Clone() => MemberwiseClone();
+    /// <summary>
+    /// A copy that shares nothing with the original.
+    /// </summary>
+    /// <remarks>
+    /// Deliberately not <c>MemberwiseClone</c>. <see cref="BindableBase"/> is an <c>ObservableValidator</c>, whose
+    /// error store is a dictionary held in a field: a shallow copy would hand the copy the *same* dictionary while
+    /// giving it an error count of its own, so the two would report validation states that contradict each other
+    /// and Undo would restore an object that still carries the errors of the one it replaces. It would also copy
+    /// the <see cref="INotifyPropertyChanged.PropertyChanged"/> subscribers of the original.
+    /// Assigning through the properties gives the copy its own state and validates it on the way in.
+    /// </remarks>
+    public override object Clone() => new Gen24ModbusSettings
+    {
+        Rtu0 = Rtu0,
+        Rtu1 = Rtu1,
+        BaudRate = BaudRate,
+        IsDemoMode = IsDemoMode,
+        MeterAddress = MeterAddress,
+        Mode = Mode,
+        Parity = Parity,
+        TcpPort = TcpPort,
+        SunSpecAddress = SunSpecAddress,
+        InverterAddress = InverterAddress,
+        SunspecMode = SunspecMode,
+        AllowControl = AllowControl,
+        RestrictControl = RestrictControl,
+        IpAddress = IpAddress,
+    };
 }

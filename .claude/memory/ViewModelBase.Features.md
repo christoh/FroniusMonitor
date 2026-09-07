@@ -37,12 +37,16 @@ ViewModelBase          HomeAutomationClient/ViewModels/ViewModelBase.cs   (abstr
   - **`Refresh()` without the argument would leave notifications off**: it restores the *previous* `IsNotifying`,
     which is `false` inside the batch. Always `Refresh(true)` when you turned notifications off yourself.
   - `Refresh` raises `PropertyChanged` with an empty property name, which the binding engine reads as "everything
-    changed". It works regardless of `IsNotifying`.
+    changed". It works regardless of `IsNotifying`. It does **not** force a value onto a control that has drifted
+    away from it: Avalonia re-reads and compares, and pushes only what has actually changed. So `Refresh` is no way
+    to put a text box right that holds something the model refused - see [[Validation.Lifecycle]].
 - **`IsNotifyingBeforeChanging`** - off by default; turn it on to also get `PropertyChanging`.
 - **`SetProperty(ref field, value, postAction, preFunc, propertyName, notifyAlways, comparer)`** - for properties
-  that `[ObservableProperty]` cannot generate. `preFunc` coerces or validates the incoming value, `postAction` runs
-  after the change (for example to notify dependent properties), `notifyAlways` notifies even when the value did
-  not change.
+  that `[ObservableProperty]` cannot generate. `preFunc` coerces the incoming value and returns what to store,
+  `postAction` runs after the change (for example to notify dependent properties), `notifyAlways` notifies even
+  when the value did not change. Coerce with `preFunc`, but do not **validate** with it: a setter that refuses a
+  value leaves the control holding it with nothing to replace it. Rules are attributes on the property; see
+  [[Validation.Lifecycle]].
 - **`Set(...)`** and **`NotifyOfPropertyChange(...)`** - Caliburn.Micro compatible aliases of `SetProperty` and
   `OnPropertyChanged`.
 

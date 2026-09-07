@@ -119,43 +119,33 @@ default is the surface of the app, which is the wrong colour inside a dialog.
 
 ## Validation
 
-The settings models validate by **throwing from their setters** - `MeterAddress` outside 1 to 247,
-`SunSpecAddress` of 0, an `IpAddress` that is not IPv4 with an optional mask. Avalonia's
-`ExceptionValidationPlugin` turns that into a validation error on the binding, which is why
-`DisableAvaloniaDataAnnotationValidation` in `App.axaml.cs` must stay commented out.
+The mechanism is [[Validation.Lifecycle]] - rules are attributes on the edited property, the settings report what
+is wrong with them through `INotifyDataErrorInfo`, and `Styles/Validation.axaml` paints the frame and the tooltip.
+`DisableAvaloniaDataAnnotationValidation` in `App.axaml.cs` must stay commented out for any of it to arrive.
 
-Three things are needed to make that work, and each of them was silently missing at first:
+What a settings tab adds:
 
-- **`UpdateSourceTrigger=PropertyChanged` on every validated field.** Avalonia writes `TextBox.Text` back on
-  `LostFocus` by default, so without it the setter is never called while the user types and nothing appears to
-  validate at all. This is what the `ValidationBinding` of the WPF app did, along with `ValidatesOnExceptions`,
-  which Avalonia does not need because the plugin is unconditional.
-- **A `DataValidationErrors` `ControlTheme` that renders only its content.** The default writes the message beside
-  the field and reflows the group on every keystroke. Setting `DataValidationErrors.ErrorTemplate` does *not* do
-  this: the template that draws the message belongs to the control, not to the attached property.
-- **Colours of their own for focus and error.** Fluent paints a focused border with the accent brush, and the
-  accent of this app is a red-orange, so a field being edited read as a field that had been refused.
-  `TextBoxFocusedBorder` and `ValidationErrorBrush` live in both theme dictionaries and `Styles/TextBoxes.axaml`
-  applies them. **The `:error` rule comes after the focus rules on purpose** - a value is refused while it is being
-  typed, so the field is focused and in error at once, and equal-specificity styles apply in order.
-
-**A validating setter has to use `preFunc`, not `postAction`.** `BindableBase.SetProperty` writes the backing
-field, *then* runs `postAction`, *then* raises `PropertyChanged`. A validator passed as `postAction` - which is the
-third parameter and therefore the one you get by writing `Set(ref field, value, () => …)` - throws after the
-refused value has already been stored, and before anything was notified. The value is kept, silently, and Undo has
-nothing to restore from as far as the view is concerned. `preFunc` runs before the assignment and returns the value
-to store, so a throw there leaves the model untouched. `MeterAddress`, `SunSpecAddress` and `IpAddress` of
-`Gen24ModbusSettings` are the examples.
-
-**The model is therefore not what is invalid.** The refused value never reaches it, so it still holds what the
-dialog read and looks perfectly valid at Apply. Only the controls know, so the view collects them: the code behind walks
-its own `TextBox`es, keeps the `IsEffectivelyVisible` ones, and hands the view model plain strings through
-`Gen24ModbusViewModel.GetInvalidFields`, the way `DashboardView` hands plain colors over. `Apply` puts them up as
-the `ItemList` of a `PleaseCorrectErrors` message box and sends nothing.
-
-Invisible fields are left out deliberately. Their setter threw, so the model holds the value it was read with, and
-an error the user cannot see must not stop them saving. The WPF dialog reached the same end by writing the old
-value back by hand.
+- **A number is edited as text.** The tab keeps a `string` property per numeric field, because a text box never
+  binds to a number - the rule and the reasons are in [[Validation.Lifecycle]]. `CopyFromSettings` fills them,
+  `CopyToSettings` writes them back at the top of Apply, once the rules have passed.
+- **Whether a field may be left empty is a question about the inverter, not about the rule.** The Modbus meter
+  address is part of the slave configuration this tab edits, so it is required (`AllowEmpty = false`); the string
+  control address belongs to a Tauro and an inverter without string controllers has nothing to put in the box, so
+  it is not. An empty field ends up as null, and `GetUpdateToken` leaves a null out of the delta altogether - so
+  emptying a box never clears the value on the inverter, it only stops the dialog having an opinion about it.
+- **Apply asks the settings and the tab.** `Settings.GetErrors()` covers what the check boxes and combo boxes
+  wrote, `GetErrors()` on the tab itself covers the text of the boxes; both validate through the same rules, and
+  together they fill the `ItemList` of a `PleaseCorrectErrors` message box. Nothing is sent. No visual tree walk,
+  nothing handed over from the code behind.
+- **A refused field the user cannot see must not stop them saving.** `RestoreRefusedFieldsThatAreHidden` puts such
+  a field back to what the dialog read from the inverter, using the same visibility properties the view binds to -
+  `ShowAllowedIp` for the IP address, `ShowCommonSlaveSettings` for the two addresses. Add to it when a tab gains a
+  field that can both be refused and be hidden. The WPF dialog reached the same end by walking the visual tree and
+  reflecting over the binding to find the property behind the box.
+- **Undo is `Reset`**: a fresh clone of the settings the dialog started from, and every text property re-filled
+  from it. Unconditional, whatever the boxes hold. A successful Apply runs the same `Reset` after moving
+  `loadedSettings` on, so Undo afterwards goes back to what was written - and a `0200` the user typed reads `200`
+  once it has been saved.
 
 ## While the settings are still being read
 
@@ -182,13 +172,9 @@ a UI thread.
   `autodetectedControlledDevices` lists built from `ConnectedInverters` - so they belong with that tab rather than
   being ported blind. Note that the WPF `Apply` declares `hasCommonUpdates` and never sets it true; check that
   before copying the logic across.
-- **A value that does not even convert** is reported by Avalonia, not by us: `MeterAddress` and `SunSpecAddress`
-  are `byte?`, so 300 fails the conversion rather than the setter and the message is Avalonia's wording instead of
-  `MeterAddressError`. `ValidationBinding` also set `ConverterCulture`, which Avalonia's `Binding` has no
-  counterpart for; it does not matter for these fields, which hold plain integers and an IP string, but it would
-  for anything with a decimal separator.
-- **A bad request body** still becomes a plain 400 on the server. The throwing setters run during model binding
-  there too, and nothing turns that into a useful `ProblemDetails`.
+- **`ConverterCulture`** has no counterpart in Avalonia's `Binding`, and `ValidationBinding` of the WPF app sets
+  it. It does not matter for the fields ported so far - whole numbers and an IP string - but it will for anything
+  with a decimal separator.
 - **The role lockout** above.
 - New resource strings (`ReadingInverterSettings`, `SavingSettings`) exist in the neutral and German resx only;
   `fr`, `it`, `rm` and `gsw` fall back to English until somebody translates them.

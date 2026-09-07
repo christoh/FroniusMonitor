@@ -20,10 +20,6 @@
 		<Setter Property="BorderBrush" Value="{DynamicResource TextBoxFocusedBorder}" />
 	</Style>
 
-	<!-- After the focus rules on purpose. A value is refused while the user is typing it, so the field is focused
-	     and in error at the same time, and of the two it is the error that has to show. Styles of equal
-	     specificity are applied in order, so the last one wins. -->
-	<Style Selector="TextBox:error /template/ Border#PART_BorderElement">
-		<Setter Property="BorderBrush" Value="{DynamicResource ValidationErrorBrush}" />
-	</Style>
+	<!-- The rule for a refused value is in Styles/Validation.axaml, which App.axaml includes after this file so
+	     that a field which is focused and in error at once shows the error. -->
 </Styles>

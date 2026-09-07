@@ -18,6 +18,14 @@ namespace De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs;
 /// currently holds. So this view model never has to keep the old settings for the sake of the write - it keeps
 /// them only so that Undo works.
 /// </para>
+/// <para>
+/// The two bus addresses are numbers, so the text boxes bind to <see cref="MeterAddressText"/> and
+/// <see cref="SunSpecAddressText"/> rather than to the settings, and <see cref="Apply"/> copies them back. That is
+/// the rule for text input in <c>.claude/rules/ViewModelsForInteractionLogic.md</c>, and everything else here
+/// follows from it: whatever the user types is stored, so it validates, it raises a change, and Undo reaches the
+/// box. Bound straight to a <c>byte?</c>, a letter or an emptied box is refused by the binding itself - the value
+/// never changes, nothing notifies, and there is nothing for Undo to push.
+/// </para>
 /// </remarks>
 public sealed partial class Gen24ModbusViewModel : ViewModelBase
 {
@@ -33,7 +41,7 @@ public sealed partial class Gen24ModbusViewModel : ViewModelBase
         loadedSettings = settings;
         Settings = (Gen24ModbusSettings)settings.Clone();
         AttachTo(Settings);
-        EnableTcp = Settings.Mode is ModbusSlaveMode.Tcp or ModbusSlaveMode.Both;
+        CopyFromSettings();
     }
 
     /// <summary>
@@ -46,13 +54,6 @@ public sealed partial class Gen24ModbusViewModel : ViewModelBase
         get => owner.BusyText;
         set => owner.BusyText = value;
     }
-
-    /// <summary>
-    /// What the user has typed that the settings refused, one message per field, and only for fields that are on
-    /// screen. The view fills this in: which controls exist and which of them are visible is not something a view
-    /// model can know, and it is the controls that hold the rejected text.
-    /// </summary>
-    public Func<IReadOnlyList<string>>? GetInvalidFields { get; set; }
 
     public IReadOnlyList<EnumListItemModel<ModbusInterfaceRole>> InterfaceRoles { get; } =
         [.. Enum.GetValues<ModbusInterfaceRole>().Select(r => new EnumListItemModel<ModbusInterfaceRole> { Value = r })];
@@ -79,6 +80,33 @@ public sealed partial class Gen24ModbusViewModel : ViewModelBase
     [ObservableProperty]
     public partial string? ToastText { get; set; }
 
+    /// <summary>
+    /// The Modbus address of the smart meter, as the text box holds it. A string, not the <c>byte?</c> of the
+    /// settings - see the remarks on this class. The rule is here rather than on the settings property because
+    /// this is what the user edits; the settings carry the same one for the sake of the server, and both take
+    /// their limits from <see cref="Gen24ModbusSettings"/> so that they cannot drift apart.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [MinMaxInt(Gen24ModbusSettings.MinMeterAddress, Gen24ModbusSettings.MaxMeterAddress,
+        MessageResourceKey = nameof(Loc.MeterAddressError), AllowEmpty = false)]
+    public partial string? MeterAddressText { get; set; }
+
+    /// <summary>
+    /// The string control address, as the text box holds it. See <see cref="MeterAddressText"/>.
+    /// </summary>
+    /// <remarks>
+    /// It may be left empty, which is why <c>AllowEmpty</c> stays at its default here: only a Tauro has string
+    /// controllers, so an inverter with none has nothing to put in the box. An empty field is then left out of
+    /// the delta the server works out, so it never overwrites what the inverter holds - it means "not mine to
+    /// say", not "clear it".
+    /// </remarks>
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [MinMaxInt(Gen24ModbusSettings.MinSunSpecAddress, Gen24ModbusSettings.MaxSunSpecAddress,
+        MessageResourceKey = nameof(Loc.SunspecAddressError))]
+    public partial string? SunSpecAddressText { get; set; }
+
     public bool IsRtuSlave => Settings.Rtu0 == ModbusInterfaceRole.Slave || Settings.Rtu1 == ModbusInterfaceRole.Slave;
 
     public bool ShowAllowControl => EnableTcp;
@@ -90,31 +118,41 @@ public sealed partial class Gen24ModbusViewModel : ViewModelBase
     /// <summary>Meter address, SunSpec address and SunSpec mode only matter while the inverter is a slave at all.</summary>
     public bool ShowCommonSlaveSettings => IsRtuSlave || EnableTcp;
 
+    /// <summary>
+    /// Unconditionally back to the settings the dialog started from - what it read from the inverter, or what the
+    /// last successful Apply wrote there. Every field, whatever it currently holds.
+    /// </summary>
     [RelayCommand]
     private void Undo()
     {
-        DetachFrom(Settings);
-        Settings = (Gen24ModbusSettings)loadedSettings.Clone();
-        AttachTo(Settings);
-        EnableTcp = Settings.Mode is ModbusSlaveMode.Tcp or ModbusSlaveMode.Both;
         ToastText = null;
-        NotifyAllVisibilities();
+        Reset();
     }
 
     [RelayCommand]
     private Task Apply() => TaskExceptionHandler(async () =>
     {
         ToastText = null;
+        RestoreRefusedFieldsThatAreHidden();
 
-        // A setter of the settings throws on a value it will not take, so the binding keeps the text in the box,
-        // marks it, and leaves the model as it was. Nothing is therefore wrong with the model at this point - the
-        // fields are the only place that knows, which is why the view has to be asked.
-        if (GetInvalidFields?.Invoke() is { Count: > 0 } invalidFields)
+        // Everything the user can have got wrong is in one of these two: the settings hold what the check boxes
+        // and the combo boxes wrote, and this view model holds the text of the boxes the user types into. Both
+        // validate through the same rules - see Fronius/Validators - so both are asked the same way.
+        IReadOnlyList<string> errors =
+        [
+            .. Settings.GetErrors().Concat(GetErrors())
+                .Select(error => error.ErrorMessage)
+                .Where(message => !string.IsNullOrWhiteSpace(message))
+                .Select(message => message!)
+                .Distinct(),
+        ];
+
+        if (errors.Count > 0)
         {
             await new MessageBox
             {
                 Text = $"{Loc.PleaseCorrectErrors}:",
-                ItemList = [.. invalidFields],
+                ItemList = [.. errors],
                 Title = Loc.Error,
                 Buttons = [Loc.Ok],
                 Icon = new ErrorIcon(),
@@ -124,6 +162,7 @@ public sealed partial class Gen24ModbusViewModel : ViewModelBase
         }
 
         BusyText = string.Format(CultureInfo.CurrentCulture, Loc.SavingSettings, Loc.Modbus);
+        CopyToSettings();
 
         // The same rules FroniusMonitor applies before it writes: the mode follows from what the user enabled, and
         // an inverter that is not a slave anywhere has no address on the bus.
@@ -165,10 +204,75 @@ public sealed partial class Gen24ModbusViewModel : ViewModelBase
             return;
         }
 
+        // What was just written is what Undo goes back to from now on. Resetting from it also puts the boxes in
+        // order, so a "0200" the user typed reads "200" once it has been saved.
+        loadedSettings = (Gen24ModbusSettings)Settings.Clone();
+        Reset();
+
+        // After the reset: it clears the toast of the settings it replaces.
         // False means the server found no difference to what the inverter already had.
         ToastText = result.Payload is true ? Loc.SettingsSavedToInverter : Loc.NoSettingsChanged;
-        loadedSettings = (Gen24ModbusSettings)Settings.Clone();
     });
+
+    /// <summary>
+    /// Everything back to <c>loadedSettings</c>: the settings object, the text of every box, and the state the
+    /// visibility rules read. A fresh settings object also brings a fresh validation state, so the red frames go
+    /// with it.
+    /// </summary>
+    private void Reset()
+    {
+        DetachFrom(Settings);
+        Settings = (Gen24ModbusSettings)loadedSettings.Clone();
+        AttachTo(Settings);
+        CopyFromSettings();
+    }
+
+    /// <summary>The numbers of the settings into the strings the boxes are bound to.</summary>
+    private void CopyFromSettings()
+    {
+        MeterAddressText = NumericText.Of(Settings.MeterAddress);
+        SunSpecAddressText = NumericText.Of(Settings.SunSpecAddress);
+        EnableTcp = Settings.Mode is ModbusSlaveMode.Tcp or ModbusSlaveMode.Both;
+        NotifyAllVisibilities();
+    }
+
+    /// <summary>
+    /// And back again, on the way to the inverter. Only ever called once the rules have passed, so the text is
+    /// known to be a number in range.
+    /// </summary>
+    private void CopyToSettings()
+    {
+        Settings.MeterAddress = (byte?)NumericText.ToInteger(MeterAddressText);
+        Settings.SunSpecAddress = (byte?)NumericText.ToInteger(SunSpecAddressText);
+    }
+
+    /// <summary>
+    /// A field the user cannot see must not stop them saving, so anything that is both refused and off screen goes
+    /// back to the value the dialog read from the inverter. The dialog of FroniusMonitor took the same view; it
+    /// just had to find the fields by walking the visual tree and reflecting over the binding to get there.
+    /// </summary>
+    private void RestoreRefusedFieldsThatAreHidden()
+    {
+        if (!ShowAllowedIp && Settings.GetErrors(nameof(Gen24ModbusSettings.IpAddress)).Any())
+        {
+            Settings.IpAddress = loadedSettings.IpAddress;
+        }
+
+        if (ShowCommonSlaveSettings)
+        {
+            return;
+        }
+
+        if (GetErrors(nameof(MeterAddressText)).Any())
+        {
+            MeterAddressText = NumericText.Of(loadedSettings.MeterAddress);
+        }
+
+        if (GetErrors(nameof(SunSpecAddressText)).Any())
+        {
+            SunSpecAddressText = NumericText.Of(loadedSettings.SunSpecAddress);
+        }
+    }
 
     private void AttachTo(Gen24ModbusSettings settings) => settings.PropertyChanged += OnSettingsPropertyChanged;
 

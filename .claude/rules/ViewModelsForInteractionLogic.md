@@ -35,6 +35,28 @@ If you judge that code behind makes more sense than a view model implementation,
 - Views stay declarative, so the same view model survives a change of the view - which is exactly what the port
   from WPF to Avalonia keeps needing.
 
+## Text input always binds to a string
+
+**Never bind a text input element to a numeric property.** Where the user types a number, the view model keeps a
+`string` property of its own, filled from the value when the dialog loads and whenever Undo runs, and written back
+to the value on Apply. The validation rule goes on that string property.
+
+The reason is that a binding to a numeric property cannot report what the user typed. As soon as the text does not
+convert - a letter, an empty box, a value too large for the type - the binding refuses the write itself, so the
+property never changes and **there is no property changed event**. From there everything else goes wrong:
+
+- the rule on the property never sees the value, so the message the user gets is the converter's and not ours,
+- the view model cannot tell that the field is wrong, so Apply saves everything else and quietly ignores it,
+- and Undo cannot put the box right, because the value it restores is the one the binding already read and a
+  binding only pushes what has changed.
+
+A string property has none of those problems: whatever the user types is stored, so it validates, it notifies, and
+restoring it always reaches the control.
+
+The same holds for anything else a text box would have to convert - a date, a time, a `TimeSpan`. Controls that
+cannot be typed into, a `ComboBox` or a `CheckBox`, may bind to the value directly; they can only ever produce a
+value the property accepts.
+
 ## What may stay in the code behind
 
 Only work that genuinely needs the UI framework, and it should hand its result to the view model rather than act on

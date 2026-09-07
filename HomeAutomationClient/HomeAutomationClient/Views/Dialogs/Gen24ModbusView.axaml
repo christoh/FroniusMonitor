@@ -8,33 +8,7 @@
              mc:Ignorable="d" d:DesignWidth="520" d:DesignHeight="600"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.Gen24ModbusView"
              x:DataType="dialogs:Gen24ModbusViewModel">
-	<UserControl.Resources>
-		<!-- The default theme of DataValidationErrors writes the message next to the field, which reflows the
-		     group on every keystroke. This one renders the field and nothing else, so a rejected value shows up
-		     as no more than the red frame the TextBox gets from its own :error state. The reasons are told all at
-		     once when Apply is pressed. Setting DataValidationErrors.ErrorTemplate does not do this - the template
-		     that draws the message belongs to the control, not to the attached property. -->
-		<ControlTheme x:Key="FrameOnlyValidationErrors" TargetType="DataValidationErrors">
-			<Setter Property="Template">
-				<ControlTemplate TargetType="DataValidationErrors">
-					<ContentPresenter Name="PART_ContentPresenter"
-					                  Background="{TemplateBinding Background}"
-					                  BorderBrush="{TemplateBinding BorderBrush}"
-					                  BorderThickness="{TemplateBinding BorderThickness}"
-					                  CornerRadius="{TemplateBinding CornerRadius}"
-					                  Content="{TemplateBinding Content}"
-					                  ContentTemplate="{TemplateBinding ContentTemplate}"
-					                  Padding="{TemplateBinding Padding}" />
-				</ControlTemplate>
-			</Setter>
-		</ControlTheme>
-	</UserControl.Resources>
-
 	<UserControl.Styles>
-		<Style Selector="DataValidationErrors">
-			<Setter Property="Theme" Value="{StaticResource FrameOnlyValidationErrors}" />
-		</Style>
-
 		<Style Selector="TextBlock.Caption">
 			<Setter Property="VerticalAlignment" Value="Center" />
 			<Setter Property="HorizontalAlignment" Value="Right" />
@@ -114,11 +88,13 @@
 		<HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.CommonModbusSlaveSettings}"
 		                        IsVisible="{Binding ShowCommonSlaveSettings}">
 			<Grid Margin="16" RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto,Auto">
+				<!-- Bound to strings of the view model, not to the byte? of the settings: a text box always binds
+				     to a string. See the remarks on Gen24ModbusViewModel. -->
 				<TextBlock Grid.Row="0" Grid.Column="0" Classes="Caption" Text="{x:Static p:Resources.MeterAddress}" />
-				<TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Settings.MeterAddress, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+				<TextBox Grid.Row="0" Grid.Column="1" Text="{Binding MeterAddressText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
 				<TextBlock Grid.Row="1" Grid.Column="0" Classes="Caption" Text="{x:Static p:Resources.ScAddress}" />
-				<TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Settings.SunSpecAddress, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+				<TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SunSpecAddressText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
 				<TextBlock Grid.Row="2" Grid.Column="0" Classes="Caption" Text="{x:Static p:Resources.SunspecMode}" />
 				<ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding SunspecModes}"
