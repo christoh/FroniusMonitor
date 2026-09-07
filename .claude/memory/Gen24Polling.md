@@ -71,11 +71,26 @@ that has to find an inverter again must key on something else - the `Gen24System
 `StartAsync` and lives as long as the collector, or the `Id` from `IHaveUniqueId` (which is a default interface
 member, so it needs a cast, and is empty until the first config read has happened).
 
+**All three dictionaries of the collector learned this the hard way.** `runningSensorTasks` and
+`runningConfigTasks` were keyed by the connection while `Update` puts a fresh clone in as the key on every round,
+so no round ever replaced the entry of the one before it: each left another entry behind holding a task that had
+already finished, for as long as the server ran, and `StopAsync` then waited on every one of them.
+`StopAsync` also clears all three, or a restart - which builds new inverters, and therefore new keys - would leave
+the entries of the previous run behind for good.
+
+`Gen24DataCollectorTests` starts a real collector for a second to show it, because there is no round without one.
+It points the connection at `http://` - not a URL an `HttpClient` can be built for - so every read fails at once,
+offline and without a socket. A closed port does not work for that: connecting to one takes the full 30 second
+timeout of the client and then a retry, so the first round never finishes.
+
+## A stop is not a failure
+
+`UpdateConfig` spends nearly all its time in that wait, so nearly every stop arrives during it - and the wait used
+to sit *outside* the `try`, which faulted the task and made `StopAsync` throw while waiting for it. The wait is
+inside now, and cancellation is caught as `OperationCanceledException` rather than `TaskCanceledException`: a
+delay throws the latter but a semaphore throws the former, and `catch (TaskCanceledException)` does not see it.
+
 ## Still open
 
-- **`runningSensorTasks` and `runningConfigTasks` grow without bound.** They are keyed by `WebConnection`, and
-  `Update` puts a fresh clone in as the key on every round, so each round leaves a dictionary entry holding a
-  completed `Task` behind it - for as long as the server runs. `StopAsync` then awaits every one of them. The
-  clone itself came in with "Fixed Modbus stuff" and its reason is not recorded; `DigestAuthHttp` does not need it.
-- `UpdateConfig` catches `Exception` and logs it, then reschedules. An inverter that is off overnight therefore
+- `UpdateConfig` logs an error and reschedules for anything else. An inverter that is off overnight therefore
   fills the log with one stack trace per interval.

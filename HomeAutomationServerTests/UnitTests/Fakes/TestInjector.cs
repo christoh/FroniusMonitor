@@ -30,8 +30,11 @@ internal static class TestInjector
     internal static void Initialize() => IoC.Update
     (
         new ServiceCollection()
+            .AddLogging()
             .AddSingleton<IGen24JsonService, Gen24JsonService>()
             .AddSingleton<IAesKeyProvider, TestAesKeyProvider>()
+            // Gen24DataCollector asks the injector for one of these per inverter it polls.
+            .AddTransient<IGen24Service, Gen24Service>()
             .BuildServiceProvider()
     );
 }

@@ -6,7 +6,18 @@ public sealed class Gen24DataCollector(
     IDataControlService dataControlService
 ) : IHomeAutomationRunner, IGen24ConfigRefresher, IAsyncDisposable
 {
-    private readonly ConcurrentDictionary<WebConnection, Task> runningSensorTasks = new(), runningConfigTasks = new();
+    /// <summary>
+    /// The round of each loop that is currently in flight, one entry per inverter, so that
+    /// <see cref="StopAsync"/> can wait for them.
+    /// </summary>
+    /// <remarks>
+    /// Keyed by the <see cref="Gen24System"/> for the same reason as <see cref="configReadRequests"/>, and this
+    /// is where it went wrong before: they were keyed by <see cref="WebConnection"/>, which does not compare by
+    /// value, while <see cref="Update"/> puts a fresh clone of it in as the key on every round. So no round ever
+    /// replaced the entry of the one before it - each one left another entry behind, holding a task that had
+    /// finished, for as long as the server ran, and <see cref="StopAsync"/> then waited on all of them.
+    /// </remarks>
+    private readonly ConcurrentDictionary<Gen24System, Task> runningSensorTasks = new(), runningConfigTasks = new();
 
     /// <summary>
     /// One per inverter, so that a setting just written can be read back without waiting out
@@ -63,8 +74,8 @@ public sealed class Gen24DataCollector(
             var semaphore = new SemaphoreSlim(1, 1);
             configReadRequests[gen24System] = new ReadNowRequest();
             logger.LogInformation("Adding Gen24 inverter {WebConnection}", connection);
-            runningSensorTasks[connection] = Update(gen24System, semaphore);
-            runningConfigTasks[connection] = UpdateConfig(gen24System, semaphore);
+            runningSensorTasks[gen24System] = Update(gen24System, semaphore);
+            runningConfigTasks[gen24System] = UpdateConfig(gen24System, semaphore);
         }
     }
 
@@ -100,7 +111,11 @@ public sealed class Gen24DataCollector(
             request.Dispose();
         }
 
+        // All three are keyed by the inverters of the run that has just stopped, and StartAsync builds new ones.
+        // Without this, every restart would leave the entries of the previous run behind for good.
         configReadRequests.Clear();
+        runningSensorTasks.Clear();
+        runningConfigTasks.Clear();
         tokenSource = null;
     }
 
@@ -206,7 +221,7 @@ public sealed class Gen24DataCollector(
                 token.ThrowIfCancellationRequested();
                 var connection = gen24System.Service.Connection;
                 gen24System.Service.Connection = (connection?.Clone()) as WebConnection;
-                runningSensorTasks[gen24System.Service.Connection!] = Update(gen24System, semaphore);
+                runningSensorTasks[gen24System] = Update(gen24System, semaphore);
             }
         }
         catch (TaskCanceledException ex)
@@ -225,14 +240,18 @@ public sealed class Gen24DataCollector(
 
         var token = tokenSource?.Token ?? throw new TaskCanceledException();
 
-        // Not a plain delay: whoever writes a setting to this inverter asks for the next read through
-        // ReadConfigNow, and that has to cut the wait short - see ReadNowRequest.
-        var request = configReadRequests.GetOrAdd(gen24System, _ => new ReadNowRequest());
-        var wasAskedFor = await request.WaitAsync(Parameters.ConfigRefreshRate, token).ConfigureAwait(false);
         var startTime = DateTime.UtcNow;
 
         try
         {
+            // Not a plain delay: whoever writes a setting to this inverter asks for the next read through
+            // ReadConfigNow, and that has to cut the wait short - see ReadNowRequest. Inside the try, because
+            // this is where the collector spends nearly all of its time and so where a stop nearly always
+            // arrives; outside it, a stop faulted the task and StopAsync threw while waiting for it.
+            var request = configReadRequests.GetOrAdd(gen24System, _ => new ReadNowRequest());
+            var wasAskedFor = await request.WaitAsync(Parameters.ConfigRefreshRate, token).ConfigureAwait(false);
+            startTime = DateTime.UtcNow;
+
             gen24System.Config = await ReadGen24Config(gen24System, semaphore, token).ConfigureAwait(false);
 
             if (gen24System.Config?.Versions?.SerialNumber != null)
@@ -243,23 +262,21 @@ public sealed class Gen24DataCollector(
                     (DateTime.UtcNow - startTime).TotalMilliseconds, wasAskedFor ? " on request" : string.Empty);
             }
         }
+        catch (OperationCanceledException ex) when (token.IsCancellationRequested)
+        {
+            // A stop, not a failure. TaskCanceledException from a delay and OperationCanceledException from a
+            // semaphore both land here, which the old check for TaskCanceledException alone did not.
+            logger.LogInformation(ex, "Updating {WebConnection} config stopped", gen24System.Service.Connection);
+        }
         catch (Exception ex)
         {
             logger.LogError(ex, "Could not read config for GEN24 inverter {BaseUri}", gen24System.Service.Connection);
-
-            if (ex is TaskCanceledException)
-            {
-                if (token.IsCancellationRequested)
-                {
-                    logger.LogInformation(ex, "Updating {WebConnection} config stopped", gen24System.Service.Connection);
-                }
-            }
         }
         finally
         {
             if (!token.IsCancellationRequested)
             {
-                runningConfigTasks[gen24System.Service.Connection!] = UpdateConfig(gen24System, semaphore);
+                runningConfigTasks[gen24System] = UpdateConfig(gen24System, semaphore);
             }
         }
     }
