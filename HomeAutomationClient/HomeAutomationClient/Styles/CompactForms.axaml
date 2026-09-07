@@ -1,0 +1,77 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!-- Density for a settings dialog. Fluent sizes its controls for a finger: a 32 pixel high combo box and a 48
+	     pixel tab header. The settings views of FroniusMonitor are dense forms of thirty or forty fields, and the
+	     ones still to be ported are the big ones, so a dialog that shows them needs the size WPF gives them.
+
+	     Included by the control that wants it, never in App.axaml: the rest of the app is a touch surface and is
+	     meant to keep the Fluent sizes. Everything here is a MinHeight and a Padding, so a control that needs more
+	     room than the text in it - a wrapping caption, a taller font - still gets it. -->
+	<Design.PreviewWith>
+		<Border Padding="20" Background="{DynamicResource DialogBackground}">
+			<StackPanel Width="260" Spacing="4">
+				<TextBox Text="a text box" />
+				<ComboBox SelectedIndex="0">
+					<ComboBoxItem>a combo box</ComboBoxItem>
+				</ComboBox>
+				<CheckBox Content="a check box" />
+				<Button Content="a button" />
+			</StackPanel>
+		</Border>
+	</Design.PreviewWith>
+
+	<!-- Fluent gives a tab header 24 point type and 48 pixels of height, which is a pivot on a phone rather than a
+	     tab in a dialog. 16 is what the dialog itself asked for before this file existed. -->
+	<Style Selector="TabItem">
+		<Setter Property="FontSize" Value="16" />
+		<Setter Property="MinHeight" Value="28" />
+		<Setter Property="Padding" Value="10,2" />
+	</Style>
+
+	<Style Selector="TextBox">
+		<Setter Property="MinHeight" Value="22" />
+		<Setter Property="Padding" Value="6,1" />
+	</Style>
+
+	<Style Selector="ComboBox">
+		<Setter Property="MinHeight" Value="22" />
+		<Setter Property="Padding" Value="8,1" />
+	</Style>
+
+	<!-- The item template of a combo box is not below the combo box in the tree, so it needs a rule of its own. -->
+	<Style Selector="ComboBoxItem">
+		<Setter Property="MinHeight" Value="22" />
+		<Setter Property="Padding" Value="8,2" />
+	</Style>
+
+	<!-- Buttons keep the height FroniusMonitor gives them, 30 - they are the one thing in a dialog that is aimed
+	     at rather than read, so they are not squeezed with the fields.
+
+	     The height comes from the padding and not from a MinHeight, which is not a detail: a MinHeight leaves the
+	     content presenter stretched over the spare room, and the caption then draws at the top of it rather than
+	     in the middle of the button. Measured, with 12 point type: MinHeight 30 with 2 of padding gives a 24 high
+	     text block sitting 3 from the top, 7 of padding gives a 14 high one with 8 above and 8 below. It also
+	     means the button follows the type: a bigger font or a caption that wraps still centres. -->
+	<Style Selector="Button">
+		<Setter Property="MinHeight" Value="0" />
+		<Setter Property="Padding" Value="10,7" />
+	</Style>
+
+	<!-- A check box cannot be told to be shorter: the Fluent template puts Height="32" on a grid inside itself,
+	     bound to nothing the control exposes, and a style setter loses to a value set in a template. So it is
+	     scaled instead - `<Viewbox Classes="CheckBox"><CheckBox ... /></Viewbox>` in the view.
+
+	     A Viewbox scales everything in it, the caption included, so the check box is given a font big enough to
+	     land back at the size of the form once it has been scaled down. The two numbers below belong together:
+	     change one and the caption no longer matches the rest of the dialog. They were measured, not calculated -
+	     the natural height of a check box is not its box but whichever of the box and the caption is taller. -->
+	<Style Selector="Viewbox.CheckBox">
+		<Setter Property="Height" Value="22" />
+		<Setter Property="StretchDirection" Value="DownOnly" />
+		<Setter Property="HorizontalAlignment" Value="Left" />
+	</Style>
+
+	<Style Selector="Viewbox.CheckBox > CheckBox">
+		<Setter Property="FontSize" Value="17.5" />
+	</Style>
+</Styles>

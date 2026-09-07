@@ -9,7 +9,15 @@
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="700"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.Gen24SettingsDialogView"
              x:DataType="dialogs:Gen24SettingsDialogViewModel"
-             MinWidth="480" MaxWidth="760" MaxHeight="800">
+             MinWidth="320" MaxWidth="760" MaxHeight="800" FontSize="12">
+	<!-- The settings views of FroniusMonitor are dense forms, and the three still to be ported are the big ones,
+	     so this dialog asks for the sizes that app uses: 12 point type, and the compact controls of
+	     Styles/CompactForms.axaml instead of the finger sized ones Fluent gives everything else. FontSize is
+	     inherited, so it reaches every tab, including the ones that are not there yet. -->
+	<UserControl.Styles>
+		<StyleInclude Source="avares://HomeAutomationClient/Styles/CompactForms.axaml" />
+	</UserControl.Styles>
+
 	<!-- Not gated on IsLoaded: the tabs are there from the start, so the dialog does not open as a bare title bar
 	     and the busy animation of the frame has a body of a sensible size to sit over while the settings are read. -->
 	<Grid RowDefinitions="*,Auto">
@@ -40,11 +48,11 @@
 
 		<!-- The toast lives here rather than in a tab: this row is the widest free space the dialog has, below
 		     whatever the tab ends with and left of Cancel. A tab writes to ToastText through its own proxy. -->
-		<Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="16">
-			<c:Toast Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,12,0"
+		<Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="8">
+			<c:Toast Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,8,0"
 			         Text="{Binding ToastText, Mode=TwoWay}" />
 
-			<Button Grid.Column="1" MinWidth="80" HorizontalContentAlignment="Center"
+			<Button Grid.Column="1" MinWidth="70" HorizontalContentAlignment="Center"
 			        Content="{x:Static p:Resources.Cancel}" Command="{Binding CloseDialogCommand}" />
 		</Grid>
 	</Grid>

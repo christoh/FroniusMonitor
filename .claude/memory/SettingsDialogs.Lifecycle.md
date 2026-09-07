@@ -5,6 +5,7 @@ paths:
   - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/Gen24SettingsDialogView.axaml
   - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/Gen24ModbusView.axaml
   - HomeAutomationClient/HomeAutomationClient/Controls/Toast.axaml
+  - HomeAutomationClient/HomeAutomationClient/Styles/CompactForms.axaml
   - HomeAutomationServer/Controllers/Gen24Controller.cs
   - Fronius/Models/Gen24/Settings/**
   - Fronius/Contracts/HomeAutomationClient/IWebClientService.cs
@@ -62,6 +63,38 @@ Reading a setting needs `User`, writing one needs `Operator` - the role `request
 **`Roles` is a `[Flags]` enum with no hierarchy.** A user who holds only `Operator` can write settings and gets 403
 on the read that has to happen first, so they cannot open the dialog they are allowed to change. Whether the reads
 should accept `User,Operator` is still open; see the note at the end.
+
+## It is a dense form, not a touch surface
+
+`Gen24SettingsDialogView` sets `FontSize="12"` and includes `Styles/CompactForms.axaml`, and that is where the
+density of every tab comes from - `FontSize` is inherited and the styles reach the whole subtree, so a tab added
+later needs nothing. Fluent sizes its controls for a finger: a 32 pixel combo box, a 48 pixel tab header with 24
+point type. The settings views of FroniusMonitor are forms of thirty or forty fields, and the three still to be
+ported are the big ones. Measured on a Modbus shaped form, the two together take it from 702 pixels tall to 499.
+
+- **`CompactForms.axaml` is included by the control that wants it, never in `App.axaml`.** The rest of the app is
+  meant to keep the Fluent sizes.
+- Fields are a `MinHeight` and a `Padding`, so one that needs more room than its text - a wrapping caption, a
+  bigger font - still gets it. **Buttons are the exception and keep the 30 pixels WPF gives them**: they are the
+  one thing in a dialog that is aimed at rather than read.
+- **A button gets its height from its `Padding`, never from a `MinHeight`.** A `MinHeight` leaves the content
+  presenter stretched over the spare room and the caption then draws at the top of it, which looks like a button
+  whose text is not centred - and is. Measured at 12 point: `MinHeight="30"` with `Padding="10,2"` gives a 24 high
+  text block 3 from the top; `Padding="10,7"` alone gives a 14 high one with 8 above and 8 below, and the same 30
+  pixels. Padding also lets the button follow the type, so a bigger font or a caption that wraps still centres.
+- **A check box goes in a `Viewbox Classes="CheckBox"`.** It cannot be told to be shorter - the Fluent template
+  puts `Height="32"` on a grid inside itself, bound to nothing the control exposes, and a style setter loses to a
+  value set in a template - so it is scaled instead, from 32 to 22. Two things follow, and both are easy to get
+  wrong:
+  - **`IsVisible` and `Margin` go on the `Viewbox`.** On the check box, `IsVisible` leaves the Viewbox holding the
+    empty row, and a margin is scaled with everything else *and* changes the natural height the scale is worked
+    out from.
+  - **The check box inside gets `FontSize` 17.5**, which is 12 back again once scaled by 22/32. The two numbers in
+    `CompactForms.axaml` belong together; change one and the caption stops matching the rest of the dialog.
+
+  Clicking works on the box and on the caption after scaling - that was checked, not assumed.
+- A tab's own margins are its own: 8 around the view, 8 inside a group box, 2 above and below a field. The numbers
+  come from the WPF views.
 
 ## The shell and its tabs
 
