@@ -24,10 +24,16 @@ namespace De.Hochstaetter.HomeAutomationServer.Services;
 public sealed class HubTicketService(IAesKeyProvider aesKeyProvider, IOptionsMonitor<UserList> users, TimeProvider clock, ILogger<HubTicketService> logger)
 {
     /// <summary>
-    /// How long a ticket stays usable. A client fetches one immediately before it connects and SignalR asks for a
-    /// fresh one on every reconnect, so this only has to cover a single handshake.
+    /// How long a ticket stays usable.
     /// </summary>
-    public static readonly TimeSpan Lifetime = TimeSpan.FromMinutes(2);
+    /// <remarks>
+    /// It was two minutes on the assumption that a ticket only has to survive one handshake, because the client
+    /// fetches one immediately before it connects and SignalR asks <c>AccessTokenProvider</c> again whenever it
+    /// reconnects. That turned out not to hold: the ticket goes on being presented while a connection lives -
+    /// every long polling request carries it - so a connection that outlived the ticket lost its authentication
+    /// rather than its network.
+    /// </remarks>
+    public static readonly TimeSpan Lifetime = TimeSpan.FromMinutes(10);
 
     private const string Version = "v1";
 

@@ -109,7 +109,12 @@ authenticated) hands out a short lived ticket, and the client feeds it to `Acces
   (negotiate and long polling), and hands back the same principal the Basic handler builds -
   `AuthorizationExtensions.CreateAuthenticationTicket` is the one place that turns a `User` into role claims.
 - The client fetches a ticket per connection attempt rather than keeping one; SignalR asks `AccessTokenProvider`
-  again on every reconnect.
+  again on every reconnect, so the renewal costs nothing to arrange.
+- **`Lifetime` has to outlast a connection, not a handshake.** It was two minutes on the assumption that a ticket
+  is only needed while connecting; in fact it goes on being presented for as long as the connection lives - every
+  long polling request carries it - so a connection that outlived its ticket lost its authentication rather than
+  its network. Ten minutes now. Shortening it again means making the client renew on a timer, not just on
+  reconnect.
 
 `Roles` is a `[Flags]` enum, so holding one role says nothing about the others - an administrator does not carry
 the User bit unless somebody set it. `RequireHubTicket` therefore names both `Roles.User` and
