@@ -1,6 +1,8 @@
-﻿using De.Hochstaetter.Fronius.Crypto;
+﻿using System.IO.Compression;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using De.Hochstaetter.Fronius.Crypto;
 using De.Hochstaetter.HomeAutomationServer.Hubs;
-using De.Hochstaetter.HomeAutomationServer.Models;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using De.Hochstaetter.HomeAutomationServer.Services;
 using Microsoft.AspNetCore.Authentication;
@@ -8,12 +10,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.ResponseCompression;
-using Microsoft.AspNetCore.SignalR;
 using Serilog.Sinks.SystemConsole.Themes;
-using System.IO.Compression;
-using System.Runtime.InteropServices;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using AuthenticationService = De.Hochstaetter.HomeAutomationServer.Services.AuthenticationService;
 
 namespace De.Hochstaetter.HomeAutomationServer;
@@ -31,11 +28,11 @@ internal class Program
 
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel
-#if DEBUG
+            #if DEBUG
             .Debug()
-#else
+            #else
             .Information()
-#endif
+            #endif
             .Enrich.WithComputed("SourceContextName", "Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)")
             .WriteTo.Console
             (
@@ -109,7 +106,7 @@ internal class Program
             ;
 
         // The satellite assemblies of Fronius are the list of languages; nothing is enumerated by hand here.
-        List<CultureInfo> supportedCultures = [CultureInfo.InvariantCulture, ..SupportedCultures.Satellites];
+        List<CultureInfo> supportedCultures = [CultureInfo.InvariantCulture, .. SupportedCultures.Satellites];
 
         if (settings != null)
         {
@@ -133,7 +130,7 @@ internal class Program
                 .Configure<FritzBoxDataCollectorParameters>(f =>
                 {
                     f.Connections = settings.FritzBoxConnections;
-                    f.RefreshRate = TimeSpan.FromSeconds(3);
+                    f.RefreshRate = TimeSpan.FromSeconds(2);
                 })
                 .Configure<ModbusServerServiceParameters>(m =>
                 {
@@ -149,13 +146,10 @@ internal class Program
                 .Configure<Gen24DataCollectorParameters>(g =>
                 {
                     g.Connections = settings.Gen24Connections;
-                    g.RefreshRate = TimeSpan.FromSeconds(5);
+                    g.RefreshRate = TimeSpan.FromSeconds(2);
                     g.ConfigRefreshRate = TimeSpan.FromMinutes(5.1);
                 })
-                .Configure<WattPilotParameters>(w =>
-                {
-                    w.Connections= settings.WattPilotConnections;
-                })
+                .Configure<WattPilotParameters>(w => { w.Connections = settings.WattPilotConnections; })
                 .Configure<UserList>(u => { u.Users = settings.Users; });
         }
 
@@ -166,7 +160,7 @@ internal class Program
                 o.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                 o.JsonSerializerOptions.IgnoreReadOnlyProperties = true;
                 o.JsonSerializerOptions.IgnoreReadOnlyFields = true;
-                o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)) ;
+                o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
             });
 
         builder.Services.AddOpenApi();
