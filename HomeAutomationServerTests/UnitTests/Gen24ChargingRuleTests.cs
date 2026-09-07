@@ -39,12 +39,8 @@ public class Gen24ChargingRuleTests
         }
         """;
 
-    public Gen24ChargingRuleTests()
-    {
-        // ParseList reaches for IGen24JsonService through the static IoC, the way the models do throughout. The
-        // injector is global, so this is only safe as long as no other test in this assembly wants a different one.
-        IoC.Update(new ServiceCollection().AddSingleton<IGen24JsonService, Gen24JsonService>().BuildServiceProvider());
-    }
+    // ParseList reaches for IGen24JsonService through the static IoC, the way the models do throughout. That
+    // injector is set up once for the whole assembly by TestInjector, because it is one per process.
 
     [Fact]
     public void The_rules_are_read_without_a_synchronization_context()

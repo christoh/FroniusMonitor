@@ -16,11 +16,8 @@ namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests;
 /// </remarks>
 public class Gen24ModbusSettingsTests
 {
-    public Gen24ModbusSettingsTests()
-    {
-        // GetToken reaches for IGen24JsonService through the static IoC, the way the models do throughout.
-        IoC.Update(new ServiceCollection().AddSingleton<IGen24JsonService, Gen24JsonService>().BuildServiceProvider());
-    }
+    // GetToken reaches for IGen24JsonService through the static IoC, the way the models do throughout. That
+    // injector is set up once for the whole assembly by TestInjector, because it is one per process.
 
     private static Gen24ModbusSettings AllFieldsSet() => new()
     {

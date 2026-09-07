@@ -43,18 +43,60 @@ public class Gen24Service : BindableBase, IGen24Service
         }
     }
 
+    /// <summary>
+    /// Which inverter this service talks to. Setting it to a different one throws the HTTP client away, because
+    /// that client is bound to an address and a set of credentials.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Setting it to the *same* inverter again does not, and that matters: this property is assigned far more
+    /// often than the inverter changes. <c>Gen24DataCollector</c> assigns a fresh clone of the same connection on
+    /// every round of its sensor loop, and a controller assigns the connection it just looked up on every request.
+    /// Disposing then pulls <see cref="DigestAuthHttp"/> out from under whatever call is in flight on the same
+    /// service - the config read of the collector, which runs beside the sensor loop - and that call fails with
+    /// <see cref="ObjectDisposedException"/> from inside the HTTP client.
+    /// </para>
+    /// <para>
+    /// It is also wasteful: a new client means the digest handshake starts again, so the inverter was being asked
+    /// to authenticate every few seconds for nothing. <see cref="DigestAuthHttp"/> renews a stale session itself,
+    /// on a 401, and replaces its own socket after a timeout, so it does not need to be thrown away to stay
+    /// healthy.
+    /// </para>
+    /// <para>
+    /// A real change of address still disposes a client that is in use. That is left as it is: a call on its way
+    /// to an inverter we no longer talk to has nowhere to arrive.
+    /// </para>
+    /// </remarks>
     public WebConnection? Connection
     {
         get;
-        set => Set(ref field, value, () =>
+        set
         {
-            lock (froniusHttpClientLockObject)
+            // Before the assignment, while the field is still the old connection.
+            var isSameInverter = IsSameEndpoint(field, value);
+
+            Set(ref field, value, () =>
             {
-                froniusHttpClient?.Dispose();
-                froniusHttpClient = null;
-            }
-        });
+                if (isSameInverter)
+                {
+                    return;
+                }
+
+                lock (froniusHttpClientLockObject)
+                {
+                    froniusHttpClient?.Dispose();
+                    froniusHttpClient = null;
+                }
+            });
+        }
     }
+
+    /// <summary>Whether a client built for <paramref name="left"/> can go on serving <paramref name="right"/>.</summary>
+    private static bool IsSameEndpoint(WebConnection? left, WebConnection? right) =>
+        left is not null && right is not null &&
+        string.Equals(left.BaseUrl, right.BaseUrl, StringComparison.OrdinalIgnoreCase) &&
+        left.UserName == right.UserName &&
+        left.Password == right.Password;
 
     public async ValueTask<T> ReadGen24Entity<T>(string request, CancellationToken token = default) where T : new()
     {
