@@ -55,8 +55,10 @@ what each culture carries of its own. It checks the two things that can go wrong
 
 It deliberately does *not* check that every key exists in every language, because that is not the rule.
 
-## Still open
+## Writing a translation
 
-- `rm` and `gsw` were written without a native speaker. The vocabulary follows what those files already use -
-  `Parameters da l'inverter`, `Nunenconuschent`, `Iistellige`, `Wächselrichter` - but the phrasing of anything
-  added since should be read by somebody who speaks them.
+Follow the vocabulary the file already uses rather than translating the English afresh: `Parameters da
+l'inverter`, `Nunenconuschent`, `Iistellige`, `Wächselrichter`. Look up how the same word was handled elsewhere in
+that file first - the `Unknown` that was already there is what `CableLockStatus_Unknown` had to say, and the
+register of a busy text is the one `BusyLoggingIn` set. `rm` and `gsw` are held to the same standard as the rest
+and do not need a second pair of eyes.
