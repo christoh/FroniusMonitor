@@ -42,7 +42,7 @@ public abstract partial class DialogBase<TParameters, TResult, TBody>(TParameter
                 var busyTextBelow = BusyText;
                 BusyText = null;
 
-                var dialogItem = new DialogQueueItem(Parameters.Title, new TBody { DataContext = this, }, Parameters.ShowCloseBox, Parameters.IsMoveable, Parameters.IsModal, busyTextBelow);
+                var dialogItem = new DialogQueueItem(Parameters.Title, new TBody { DataContext = this, }, Parameters, busyTextBelow);
                 mainViewModel.CurrentDialog = dialogItem;
             });
 

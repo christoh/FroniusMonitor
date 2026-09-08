@@ -8,6 +8,7 @@ paths:
   - Fronius/Services/DigestAuthHttp.cs
   - Fronius/Models/Charging/**
   - Fronius/Models/Gen24/**
+  - FroniusMonitor/ViewModels/EventLogViewModel.cs
 ---
 
 # Reading and writing device JSON
@@ -86,6 +87,20 @@ none. Both are wrong for the charger, and neither the charger nor the serializer
 
 `HomeAutomationServerTests/UnitTests/WattPilotJsonTests.cs` pins all of that, including that a written object
 reads back through the reader unchanged. If you touch either side, that round trip is the test that matters.
+
+## A model may not reach for the device it came from
+
+`Gen24Event.Message` was a getter that looked its own description up through `IGen24Service` out of the static
+injector, and blocked on the async call. That only works in FroniusMonitor, whose injector holds the one service
+bound to the inverter on screen. The server registers that service **per request** and hands out one with no
+connection at all, whose `EnsureText` sits in `while (Connection?.BaseUrl == null) await Task.Delay(100)` for
+good - and the getter was read while the response was being serialized, so `GET {id}/events` never answered. On a
+client, where nothing implements the interface, constructing an event threw.
+
+So it is plain data now, `[JsonIgnore]`d, filled by whoever displays the event, in that end's own language. The
+rule it stands for: **a model that travels between the apps must be readable without the device it describes.**
+Anything that needs a live service to answer belongs where that service is - a view model, or a parse method that
+is handed one.
 
 ## Writing to an inverter
 

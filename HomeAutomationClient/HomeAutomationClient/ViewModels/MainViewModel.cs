@@ -51,7 +51,7 @@ public sealed partial class MainViewModel : ViewModelBase
     /// <summary>
     /// True while a dialog blocks the rest of the UI. A non-modal dialog is visible without disabling anything.
     /// </summary>
-    public bool IsModalDialogVisible => CurrentDialog is { IsModal: true };
+    public bool IsModalDialogVisible => CurrentDialog is { Parameters.IsModal: true };
 
     [ObservableProperty, NotifyPropertyChangedFor(nameof(IsDialogVisible), nameof(IsDialogBusy), nameof(IsModalDialogVisible))]
     public partial DialogQueueItem? CurrentDialog { get; set; }

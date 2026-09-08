@@ -1692,6 +1692,12 @@
   <data name="ReadingInverterSettings" xml:space="preserve">
     <value>Lettura delle impostazioni dell'inverter in corso</value>
   </data>
+  <data name="ReadingEventLog" xml:space="preserve">
+	  <value>Lettura del registro eventi in corso</value>
+  </data>
+  <data name="NoEvents" xml:space="preserve">
+	  <value>Il registro eventi è vuoto</value>
+  </data>
   <data name="SavingSettings" xml:space="preserve">
     <value>Salvataggio delle impostazioni {0} in corso</value>
   </data>

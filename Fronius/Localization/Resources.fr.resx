@@ -1648,6 +1648,12 @@
   <data name="ReadingInverterSettings" xml:space="preserve">
     <value>Lecture des paramètres de l'onduleur en cours</value>
   </data>
+  <data name="ReadingEventLog" xml:space="preserve">
+    <value>Lecture du journal des événements en cours</value>
+  </data>
+  <data name="NoEvents" xml:space="preserve">
+    <value>Le journal des événements est vide</value>
+  </data>
   <data name="SavingSettings" xml:space="preserve">
     <value>Enregistrement des paramètres {0} en cours</value>
   </data>

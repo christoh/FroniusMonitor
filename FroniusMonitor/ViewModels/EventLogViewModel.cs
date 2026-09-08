@@ -28,7 +28,17 @@ public class EventLogViewModel(IGen24Service gen24Service) : ViewModelBase
                 Title += $" - {inverterBaseSettings.SystemName}";
             }
 
-            Events = await gen24Service.GetFroniusEvents().ConfigureAwait(false);
+            var events = await gen24Service.GetFroniusEvents().ConfigureAwait(false);
+
+            // The description of an event comes from a translation file the inverter serves, so it is read here
+            // rather than by the model: this view model holds the service bound to the inverter being looked at,
+            // and it can await the download instead of blocking the render thread on it once per visible row.
+            foreach (var froniusEvent in events)
+            {
+                froniusEvent.Message = await gen24Service.GetEventDescription(froniusEvent.Code).ConfigureAwait(false);
+            }
+
+            Events = events;
         }
         catch (Exception ex)
         {

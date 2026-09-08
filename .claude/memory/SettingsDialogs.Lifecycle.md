@@ -2,10 +2,14 @@
 paths:
   - HomeAutomationClient/HomeAutomationClient/ViewModels/Dialogs/Gen24SettingsDialogViewModel.cs
   - HomeAutomationClient/HomeAutomationClient/ViewModels/Dialogs/Gen24ModbusViewModel.cs
+  - HomeAutomationClient/HomeAutomationClient/ViewModels/Dialogs/Gen24EventLogViewModel.cs
   - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/Gen24SettingsDialogView.axaml
   - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/Gen24ModbusView.axaml
+  - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/Gen24EventLogView.axaml
+  - HomeAutomationClient/HomeAutomationClient/Controls/CompactTextColumn.cs
   - HomeAutomationClient/HomeAutomationClient/Controls/Toast.axaml
   - HomeAutomationClient/HomeAutomationClient/Styles/CompactForms.axaml
+  - HomeAutomationClient/HomeAutomationClient/App.axaml
   - HomeAutomationServer/Controllers/Gen24Controller.cs
   - Fronius/Models/Gen24/Settings/**
   - Fronius/Contracts/HomeAutomationClient/IWebClientService.cs
@@ -61,7 +65,8 @@ Why this way round:
 The dialog reads it **once** and hands it to the tabs, so the inverter is asked once rather than four times and all
 tabs show the same moment in time. It going stale costs nothing, because of the read-modify-write above.
 
-`GET {id}/events` is separate; the event log is not part of the snapshot.
+`GET {id}/events` is separate; the event log is not part of the snapshot, and not read when the dialog opens
+either - see the event log tab below.
 
 ## Roles
 
@@ -201,6 +206,53 @@ reason. A tab whose content depends on the snapshot stays in place while it is r
 where the inverter has nothing for it: that is what `ShowModbus` is, `!IsLoaded || Modbus is not null`. Gating such
 a tab on the payload alone makes it appear a second or two after the dialog opened.
 
+## The event log tab reads itself, when it is looked at
+
+The event log is the one tab that does not come out of the snapshot. `Gen24EventLogViewModel` fetches it through
+`GET {id}/events` the first time the tab is actually on screen - `TabItem.IsSelected` is two way bound to
+`IsSelected`, and the read fires from its setter - and keeps it from then on. A log of a few hundred entries is its
+own request to the inverter, and most visits to this dialog are to change a setting rather than to read it. The
+fetch runs through `TaskExceptionHandler`, because nothing awaits it: an escaping exception would take the app
+down.
+
+**What an event code means is localized on the client, never by the server.** The description lives in a
+translation file on the inverter, so the server would answer in whatever language it happens to run in. The client
+has already downloaded those files in its own language, and `IGen24LocalizationService.GetEventDisplayName` is the
+lookup; the tab writes the result into `Gen24Event.Message`, which is `[JsonIgnore]`d for exactly this reason.
+FroniusMonitor fills the same property from its own `IGen24Service.GetEventDescription`. See [[DeviceJson]] for
+what that property used to do and why `GET {id}/events` could never answer while it did it.
+
+`Code` and `Description` are captioned by the inverter's own `EVENTLOG.*` strings through the `{l:Ui '...'}`
+markup extension, the way FroniusMonitor captions them; the other four column headings are in the resx.
+
+This is the only view in the client that uses `Avalonia.Controls.DataGrid`. It is a separate package, and its
+theme is not part of `FluentTheme`, so `App.axaml` includes
+`avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml` as well. Four things about it are worth keeping, all of
+them measured in a headless probe rather than guessed:
+
+- **No `ScrollViewer` around it.** It scrolls and virtualizes itself; wrapped in one it gets unlimited height and
+  lays out every row it has. It shows its own scrollbars instead, `Auto` in both directions.
+- **`FontSize` has to be said, not inherited.** The DataGrid theme sets it on `DataGridCell`, and a theme value
+  beats what the dialog hands down: the cells came out at 15 while the headers, which do inherit, were at 12. The
+  `DataGridCell` rule in `Styles/CompactForms.axaml` is where that is fixed, together with the row height - 18
+  pixels against the 32 Fluent draws. The grid's density lives there and not in the view, because it is the
+  density of the dialog and nothing about it is specific to the event log.
+- **The padding of the cell is the whole inset, and `CompactTextColumn` is what makes that true.**
+  `DataGridTextColumn` puts `Margin="12,0"` on the `TextBlock` it generates, *inside* the cell padding: measured,
+  the text began 20 pixels in while the severity column, whose content the column does not generate, began at 8.
+  A style cannot undo it - the margin is a local value on the instance and beats a setter, the same reason the
+  check boxes are scaled in a `Viewbox` - so the column type clears it in `GenerateElement`. The severity icon is
+  14 wide for the same reason: it is the height of a line of 12 point type, so a row with an icon is no taller
+  than one without.
+- **There is no `AlternatingRowBackground`** the way the WPF grid had. A `DataGridRow:nth-child(2n)` style does it,
+  against a faint `AlternatingRowBackground` brush that is in both theme dictionaries.
+- **Every column sizes to its content, and not one of them is a star.** `ColumnWidth="Auto"`, no `Width` on any
+  column. A star column absorbs whatever width is left over, so the row always comes to exactly the width of the
+  grid and the horizontal scrollbar can never appear however long the descriptions are - which is why the
+  description column is not one. With all of them on `Auto` a wide log is wider than the dialog and scrolls, at
+  `MaxWidth` (1024) as much as below it. The cost is a ragged right edge on a log of short entries, which is what
+  the WPF grid did too.
+
 ## Never a BindableCollection on the server
 
 `BindableCollection` demands a `SynchronizationContext` and throws `ThreadStateException` without one, and a
@@ -210,8 +262,8 @@ a UI thread.
 
 ## Still open
 
-- **Three tabs are not ported.** Self consumption, inverter settings and the event log carry their heading in the
-  `TabControl` and say so; adding one is a matter of dropping its view in.
+- **Two tabs are not ported.** Self consumption and inverter settings carry their heading in the `TabControl`
+  and say so; adding one is a matter of dropping its view in.
 - **Three write endpoints are missing** for the same reason: `api/config/common`, `api/config/powerunit` and
   `api/config/limit_settings/powerLimits`. Their token building is entangled with state of the WPF inverter
   settings dialog - `needsConnectedInverterUpdate`, the `staticControlledDevices` and

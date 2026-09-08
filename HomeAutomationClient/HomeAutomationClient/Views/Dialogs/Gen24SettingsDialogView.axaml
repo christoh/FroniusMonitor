@@ -9,7 +9,7 @@
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="700"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.Gen24SettingsDialogView"
              x:DataType="dialogs:Gen24SettingsDialogViewModel"
-             MinWidth="320" MaxWidth="760" MaxHeight="800" FontSize="12">
+             MinWidth="320" MaxWidth="1024" MaxHeight="800" FontSize="12">
 	<!-- The settings views of FroniusMonitor are dense forms, and the three still to be ported are the big ones,
 	     so this dialog asks for the sizes that app uses: 12 point type, and the compact controls of
 	     Styles/CompactForms.axaml instead of the finger sized ones Fluent gives everything else. FontSize is
@@ -23,7 +23,7 @@
 	<Grid RowDefinitions="*,Auto">
 
 		<TabControl Grid.Row="0" MinHeight="360">
-			<!-- The three tabs still to be ported carry their heading already, so the shape of the dialog is
+			<!-- The two tabs still to be ported carry their heading already, so the shape of the dialog is
 			     settled and adding one is a matter of dropping its view into the tab. -->
 			<TabItem Header="{x:Static p:Resources.EnergyFlow}">
 				<TextBlock Margin="24" TextWrapping="Wrap" Text="Not ported yet." />
@@ -33,8 +33,10 @@
 				<TextBlock Margin="24" TextWrapping="Wrap" Text="Not ported yet." />
 			</TabItem>
 
-			<TabItem Header="{x:Static p:Resources.EventLog}">
-				<TextBlock Margin="24" TextWrapping="Wrap" Text="Not ported yet." />
+			<!-- IsSelected is two way bound because looking at this tab is what makes it read the log: it is not
+			     part of the settings snapshot and most visits to this dialog are to change a setting. -->
+			<TabItem Header="{x:Static p:Resources.EventLog}" IsSelected="{Binding EventLog.IsSelected, Mode=TwoWay}">
+				<v:Gen24EventLogView DataContext="{Binding EventLog}" />
 			</TabItem>
 
 			<!-- ShowModbus keeps the tab in place while the settings are read and drops it afterwards only where

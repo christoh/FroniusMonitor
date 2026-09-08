@@ -80,7 +80,7 @@
                 <Grid ZIndex="2" ColumnDefinitions="Auto,*,Auto" Background="{DynamicResource SystemControlBackgroundAccentBrush}"
                       c:DragMove.Target="{Binding #DialogFrame}"
                       c:DragMove.ResetTrigger="{Binding CurrentDialog}"
-                      c:DragMove.IsEnabled="{Binding CurrentDialog.IsMoveable, FallbackValue=False}">
+                      c:DragMove.IsEnabled="{Binding CurrentDialog.Parameters.IsMoveable, FallbackValue=False}">
                     <Grid.Styles>
                         <Style Selector="Button.CloseButton">
                             <Style.Resources>
@@ -100,9 +100,29 @@
                     </Grid.Styles>
                     <Image Margin="4,0,0,0" Source="/Assets/Images/sun.ico" Width="16"/>
                     <TextBlock x:Name="TitleTextBlock" Grid.Row="0" Grid.Column="1" Padding="5" Text="{Binding CurrentDialog.Title, FallbackValue=''}" Foreground="{DynamicResource SystemControlForegroundChromeWhiteBrush}" />
-                    <Button Classes="TransparentButton CloseButton" Grid.Row="0" Grid.Column="2" IsTabStop="False" IsVisible="{Binding CurrentDialog.ShowCloseBox, FallbackValue=True}"/>
+                    <Button Classes="TransparentButton CloseButton" Grid.Row="0" Grid.Column="2" IsTabStop="False" IsVisible="{Binding CurrentDialog.Parameters.ShowCloseBox, FallbackValue=True}"/>
                 </Grid>
                 <UserControl Grid.Row="1" ZIndex="2" MinWidth="100" Background="{DynamicResource DialogBackground}" Foreground="{DynamicResource ForegroundBrush}" x:Name="DialogHost" Content="{Binding CurrentDialog.Body, FallbackValue={x:Null}}"/>
+
+                <!-- The resize grip, for a dialog that asks for one. It resizes the body rather than this frame,
+                     because the body is what decides how big the dialog is - see DragResize. ZIndex above the
+                     body, or whatever the dialog puts in its bottom right corner would take the drag.
+
+                     The drag is on the panel and not on the lines drawn in it: a stroked Path is hit only along
+                     its stroke, so the grip would have to be grabbed by a one pixel diagonal. A transparent
+                     background takes part in hit testing where no background at all does not, so the panel gives
+                     the whole corner to the pointer. -->
+                <Panel Grid.Row="1" ZIndex="4" Width="18" Height="18" Background="Transparent" x:Name="ResizeGrip"
+                       HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                       IsVisible="{Binding CurrentDialog.Parameters.IsResizeable, FallbackValue=False}"
+                       c:DragResize.Target="{Binding #DialogHost.Content}"
+                       c:DragResize.Anchor="{Binding #DialogFrame}"
+                       c:DragResize.ResetTrigger="{Binding CurrentDialog}"
+                       c:DragResize.IsEnabled="{Binding CurrentDialog.Parameters.IsResizeable, FallbackValue=False}">
+                    <Path Width="12" Height="12" Margin="0,0,3,3" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                          Stroke="{DynamicResource ForegroundBrush}" StrokeThickness="1" Opacity="0.5"
+                          Data="M 11,1 L 1,11 M 11,5 L 5,11 M 11,9 L 9,11" />
+                </Panel>
                 <!-- A non-modal dialog must stay operable, so it never gets the blocking busy overlay. -->
                 <c:BusyAnimation ZIndex="3" Grid.Row="1" BusyText="{Binding DialogBusyText}" IsVisible="{Binding IsModalDialogVisible}"/>
             </Grid>

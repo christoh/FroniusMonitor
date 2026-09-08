@@ -4093,6 +4093,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reading the event log.
+        /// </summary>
+        public static string ReadingEventLog {
+            get {
+                return ResourceManager.GetString("ReadingEventLog", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The event log is empty.
+        /// </summary>
+        public static string NoEvents {
+            get {
+                return ResourceManager.GetString("NoEvents", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Saving {0} settings.
         /// </summary>
         public static string SavingSettings {

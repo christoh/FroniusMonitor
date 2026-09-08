@@ -1,0 +1,73 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             xmlns:gen24="clr-namespace:De.Hochstaetter.Fronius.Models.Gen24;assembly=Fronius"
+             xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
+             xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
+             xmlns:l="clr-namespace:De.Hochstaetter.HomeAutomationClient.Extensions"
+             xmlns:i="clr-namespace:De.Hochstaetter.HomeAutomationClient.Assets.Images"
+             xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+             mc:Ignorable="d" d:DesignWidth="740" d:DesignHeight="400"
+             x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.Gen24EventLogView"
+             x:DataType="dialogs:Gen24EventLogViewModel">
+	<!-- The density of the grid - 12 point type, a row as tall as its text, the alternating background - is in
+	     Styles/CompactForms.axaml with the rest of the dialog's, and reaches here through the include the dialog
+	     already has. Nothing about it is specific to this view. -->
+
+	<Panel>
+		<!-- No ScrollViewer around it: the DataGrid scrolls and virtualizes itself, and one wrapped around it
+		     would give it unlimited height and make it lay out every row it has. -->
+		<!-- Every column is sized to what is in it, and the log scrolls sideways when that comes to more than
+		     there is room for. Left to itself the grid divides the width between the columns instead, and the
+		     first two take all of it: measured at 326, 326, 28, 20, 20, 20 pixels, so everything from the code
+		     onwards was clipped to nothing. -->
+		<DataGrid ItemsSource="{Binding Events}" IsReadOnly="True" AutoGenerateColumns="False"
+		          GridLinesVisibility="Vertical" BorderThickness="0" IsVisible="{Binding !IsEmpty}"
+		          ColumnWidth="Auto" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+		          CanUserSortColumns="True" CanUserResizeColumns="True" CanUserReorderColumns="True">
+			<DataGrid.Columns>
+				<!-- A bound column sorts by what it binds to rather than by what the converter wrote, so these
+				     two sort as the timestamps they are and not as their text. -->
+				<c:CompactTextColumn Header="{x:Static p:Resources.Start}"
+				                    Binding="{Binding EventTime, Converter={co:DateConverter}}" />
+
+				<c:CompactTextColumn Header="{x:Static p:Resources.End}"
+				                    Binding="{Binding ActiveUntil, Converter={co:DateConverter}}" />
+
+				<!-- Code and Description are captioned by the inverter's own translations, the way FroniusMonitor
+				     captions them, so they read as they do in the web interface of the device. -->
+				<c:CompactTextColumn Header="{l:Ui 'EVENTLOG.CODE'}" Binding="{Binding Code}" />
+
+				<c:CompactTextColumn Header="{x:Static p:Resources.Name}" Binding="{Binding Label}" />
+
+				<DataGridTemplateColumn Header="{x:Static p:Resources.Severity}" SortMemberPath="Severity">
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate x:DataType="gen24:Gen24Event">
+							<!-- The three icons the app already has, one per severity, and the converter picks
+							     which one is shown - as the SeverityIcon of FroniusMonitor does.
+
+							     14 is the height of a line of 12 point type here, measured, so a row with an
+							     icon in it is exactly as tall as one without. -->
+							<Panel Width="14" Height="14" HorizontalAlignment="Left">
+								<i:ErrorIcon IsVisible="{Binding Severity, Converter={co:Severity2Bool Error}}" />
+								<i:WarningIcon IsVisible="{Binding Severity, Converter={co:Severity2Bool Warning}}" />
+								<i:InfoIcon IsVisible="{Binding Severity, Converter={co:Severity2Bool Information}}" />
+							</Panel>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+
+				<!-- Sized to its content like the rest, deliberately not to the remaining width: a star column
+				     absorbs whatever is left over, so the row would always come to exactly the width of the grid
+				     and the horizontal scrollbar would never appear however long the descriptions are. -->
+				<c:CompactTextColumn Header="{l:Ui 'EVENTLOG.DESCRIPTION'}" Binding="{Binding Message}" />
+			</DataGrid.Columns>
+		</DataGrid>
+
+		<!-- An inverter that has never faulted has an empty log, which is the good case and not an error. -->
+		<TextBlock Text="{x:Static p:Resources.NoEvents}" IsVisible="{Binding IsEmpty}" Margin="24"
+		           HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap" />
+	</Panel>
+</UserControl>

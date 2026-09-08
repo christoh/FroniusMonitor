@@ -1657,6 +1657,12 @@
   <data name="ReadingInverterSettings" xml:space="preserve">
     <value>Leger ils parameters da l'inverter</value>
   </data>
+  <data name="ReadingEventLog" xml:space="preserve">
+    <value>Leger il protocol dals eveniments</value>
+  </data>
+  <data name="NoEvents" xml:space="preserve">
+    <value>Il protocol dals eveniments è vid</value>
+  </data>
   <data name="SavingSettings" xml:space="preserve">
     <value>Memorisar ils parameters {0}</value>
   </data>

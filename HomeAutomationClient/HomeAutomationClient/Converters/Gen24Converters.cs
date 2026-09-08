@@ -243,6 +243,19 @@ public class Gen24Status2Brush : ConverterBase
     }
 }
 
+/// <summary>
+/// Whether an event has the severity named in the markup, so that the right one of the three icons is the one
+/// shown. FroniusMonitor draws its severity icon the same way.
+/// </summary>
+public class Severity2Bool : EqualityConverterBase<Severity, bool>
+{
+    public Severity2Bool(Severity value) : base(value)
+    {
+        Equal = true;
+        NotEqual = false;
+    }
+}
+
 public class InverterDisplayMode2Bool : EqualityConverterBase<InverterDisplayMode, bool>
 {
     public InverterDisplayMode2Bool(InverterDisplayMode value) : base(value)

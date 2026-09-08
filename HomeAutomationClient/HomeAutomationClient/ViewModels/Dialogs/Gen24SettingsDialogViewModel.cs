@@ -29,6 +29,13 @@ public sealed partial class Gen24SettingsDialogViewModel(DialogParameters parame
     [ObservableProperty, NotifyPropertyChangedFor(nameof(ShowModbus))]
     public partial Gen24ModbusViewModel? Modbus { get; set; }
 
+    /// <summary>
+    /// The event log tab. Unlike the others it does not come out of the snapshot - the log is its own request,
+    /// which the tab makes the first time the user looks at it - so this is here from the start.
+    /// </summary>
+    [ObservableProperty]
+    public partial Gen24EventLogViewModel? EventLog { get; set; }
+
     /// <summary>True once the snapshot has arrived.</summary>
     [ObservableProperty, NotifyPropertyChangedFor(nameof(ShowModbus))]
     public partial bool IsLoaded { get; set; }
@@ -65,6 +72,9 @@ public sealed partial class Gen24SettingsDialogViewModel(DialogParameters parame
         // Set before the first await, so a second call cannot get past the guard while the first is still running.
         isInitialized = true;
 
+        // The event log needs nothing from the snapshot, so its tab is live before the inverter has answered.
+        EventLog = new Gen24EventLogViewModel(this, DeviceId);
+
         await base.Initialize().ConfigureAwait(true);
         BusyText = Loc.ReadingInverterSettings;
 
@@ -80,7 +90,8 @@ public sealed partial class Gen24SettingsDialogViewModel(DialogParameters parame
         // The title is not set here on purpose: the dialog frame reads Parameters.Title once, while the dialog is
         // being put up, which is before this has run. MainViewModel.Settings therefore supplies it.
 
-        // Only the Modbus tab is ported so far. The other three get their view models here as they arrive.
+        // Self consumption and inverter settings are not ported yet; they get their view models here as they
+        // arrive. The event log is set up above, because it does not read from the snapshot.
         Modbus = snapshot.ModbusSettings is { } modbusSettings ? new Gen24ModbusViewModel(this, DeviceId, modbusSettings) : null;
         IsLoaded = true;
     });

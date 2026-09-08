@@ -74,4 +74,30 @@
 	<Style Selector="Viewbox.CheckBox > CheckBox">
 		<Setter Property="FontSize" Value="17.5" />
 	</Style>
+
+	<!-- The event log grid. A row of it is a line of a log, so it gets the type and the height of the rest of the
+	     dialog rather than the 32 pixel row Fluent draws.
+
+	     FontSize has to be said here: the DataGrid theme sets it on the cell, and a value from a theme beats the
+	     one the dialog would have handed down - measured at 15 against the 12 everything else in the dialog uses,
+	     the headers included, which is where the mismatch showed. -->
+	<!-- This padding is the whole horizontal inset of a cell, which is what CompactTextColumn is for: the text
+	     column of the DataGrid would otherwise add a margin of its own inside it. -->
+	<Style Selector="DataGridCell">
+		<Setter Property="FontSize" Value="12" />
+		<Setter Property="MinHeight" Value="0" />
+		<Setter Property="Padding" Value="6,2" />
+	</Style>
+
+	<Style Selector="DataGridColumnHeader">
+		<Setter Property="MinHeight" Value="0" />
+		<Setter Property="Padding" Value="8,4" />
+	</Style>
+
+	<!-- Every other row, which the DataGrid of Avalonia has no property for the way the WPF one did. Faint on
+	     purpose: it separates the lines without colouring them, which is what the AntiqueWhite of the WPF grid
+	     ended up doing. -->
+	<Style Selector="DataGridRow:nth-child(2n)">
+		<Setter Property="Background" Value="{DynamicResource AlternatingRowBackground}" />
+	</Style>
 </Styles>

@@ -1686,6 +1686,12 @@
   <data name="ReadingInverterSettings" xml:space="preserve">
     <value>D Iistellige vom Wächselrichter läse</value>
   </data>
+  <data name="ReadingEventLog" xml:space="preserve">
+	  <value>S Ereignisprotokoll läse</value>
+  </data>
+  <data name="NoEvents" xml:space="preserve">
+	  <value>S Ereignisprotokoll isch läär</value>
+  </data>
   <data name="SavingSettings" xml:space="preserve">
     <value>{0}-Iistellige speichere</value>
   </data>

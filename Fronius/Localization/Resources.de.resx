@@ -339,6 +339,12 @@
   <data name="ReadingInverterSettings" xml:space="preserve">
 	  <value>Lese die Einstellungen des Wechselrichters</value>
   </data>
+  <data name="ReadingEventLog" xml:space="preserve">
+	  <value>Lese das Ereignisprotokoll</value>
+  </data>
+  <data name="NoEvents" xml:space="preserve">
+	  <value>Das Ereignisprotokoll ist leer</value>
+  </data>
   <data name="SavingSettings" xml:space="preserve">
 	  <value>Speichere {0}-Einstellungen</value>
   </data>

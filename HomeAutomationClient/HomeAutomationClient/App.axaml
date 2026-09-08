@@ -12,6 +12,9 @@
 
 	<Application.Styles>
 		<FluentTheme />
+		<!-- The DataGrid brings its own theme, and it is not part of FluentTheme. The event log is the only
+		     view that uses the control. -->
+		<StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
 		<StyleInclude Source="Styles/Buttons.axaml"/>
 		<StyleInclude Source="Styles/HeaderedContentControls.axaml"/>
         <StyleInclude Source="Styles/Controls.axaml"/>
@@ -37,6 +40,10 @@
 					<SolidColorBrush x:Key='ForegroundBrush'>Black</SolidColorBrush>
                     <SolidColorBrush x:Key='DisableBrush'>#80000000</SolidColorBrush>
                     <SolidColorBrush x:Key="DialogBackground">#e8e8e8</SolidColorBrush>
+
+                    <!-- Every other row of the event log. Faint on purpose: it separates the lines without
+                         colouring them, which is what the AntiqueWhite of the WPF grid ended up doing. -->
+                    <SolidColorBrush x:Key="AlternatingRowBackground">#14000000</SolidColorBrush>
 
                     <!-- Power Flow -->
                     <SolidColorBrush x:Key="PowerFlowBattery">LightGreen</SolidColorBrush>
@@ -106,6 +113,7 @@
 					<SolidColorBrush x:Key='ForegroundBrush'>#e8e8e8</SolidColorBrush>
 					<SolidColorBrush x:Key='DisableBrush'>#40FFFFFF</SolidColorBrush>
                     <SolidColorBrush x:Key="DialogBackground">#002040</SolidColorBrush>
+                    <SolidColorBrush x:Key="AlternatingRowBackground">#18ffffff</SolidColorBrush>
 
                     <!-- Power Flow -->
                     <SolidColorBrush x:Key="PowerFlowBattery">DarkGreen</SolidColorBrush>

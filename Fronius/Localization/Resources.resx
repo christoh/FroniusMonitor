@@ -354,6 +354,12 @@
   <data name="ReadingInverterSettings" xml:space="preserve">
 	  <value>Reading the settings of the inverter</value>
   </data>
+  <data name="ReadingEventLog" xml:space="preserve">
+	  <value>Reading the event log</value>
+  </data>
+  <data name="NoEvents" xml:space="preserve">
+	  <value>The event log is empty</value>
+  </data>
   <data name="SavingSettings" xml:space="preserve">
 	  <value>Saving {0} settings</value>
   </data>
