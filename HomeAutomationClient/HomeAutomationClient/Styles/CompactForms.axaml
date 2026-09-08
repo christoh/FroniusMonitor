@@ -1,5 +1,23 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!-- The metrics the Fluent slider template reads. A slider is the one control here that cannot be scaled or
+	     styled shorter - see the Slider rule below - but it does look these up, so this is where a slider of the
+	     size a dense form wants comes from: a 12 pixel high control with a hairline track and a small upright
+	     thumb, instead of 50 pixels with a 20 pixel disc. -->
+	<Styles.Resources>
+		<x:Double x:Key="SliderHorizontalHeight">18</x:Double>
+
+		<!-- Round, so the two are the same number. 14 is the size the dot of a radio button ends up at once its
+		     Viewbox has scaled it - 20 at 22 of 32 - which is what makes a slider and a radio button look like
+		     they belong to the same form. -->
+		<x:Double x:Key="SliderHorizontalThumbWidth">14</x:Double>
+		<x:Double x:Key="SliderHorizontalThumbHeight">14</x:Double>
+
+		<x:Double x:Key="SliderTrackThemeHeight">2</x:Double>
+		<GridLength x:Key="SliderPreContentMargin">0</GridLength>
+		<GridLength x:Key="SliderPostContentMargin">0</GridLength>
+	</Styles.Resources>
+
 	<!-- Density for a settings dialog. Fluent sizes its controls for a finger: a 32 pixel high combo box and a 48
 	     pixel tab header. The settings views of FroniusMonitor are dense forms of thirty or forty fields, and the
 	     ones still to be ported are the big ones, so a dialog that shows them needs the size WPF gives them.
@@ -28,9 +46,14 @@
 		<Setter Property="Padding" Value="10,2" />
 	</Style>
 
+	<!-- The padding is horizontal only and the content is centred, so that the number in a box lines up with the
+	     caption beside it. Measured: with a padding of 6,1 the text of the box sat 2 pixels above the text of the
+	     caption, because the box gives its text a line box of its own inside the padding rather than centring
+	     it. -->
 	<Style Selector="TextBox">
 		<Setter Property="MinHeight" Value="22" />
-		<Setter Property="Padding" Value="6,1" />
+		<Setter Property="Padding" Value="6,0" />
+		<Setter Property="VerticalContentAlignment" Value="Center" />
 	</Style>
 
 	<Style Selector="ComboBox">
@@ -73,6 +96,43 @@
 
 	<Style Selector="Viewbox.CheckBox > CheckBox">
 		<Setter Property="FontSize" Value="17.5" />
+	</Style>
+
+	<!-- A check box with nothing beside it, in a column of its own under a heading. Fluent lays one out 28 wide
+	     whether or not it has any content - a box of 20 and a content presenter 8 to its right - so centring the
+	     control leaves the box 4 to the left of centre. The 8 is not a resource, unlike the metrics of a slider:
+	     it is a margin inside the template, which nothing can style. Taking it off the layout instead leaves the
+	     control alone and tells the layout what the box actually occupies, and the box then centres exactly. -->
+	<Style Selector="CheckBox.NoContent">
+		<Setter Property="Margin" Value="0,0,-8,0" />
+	</Style>
+
+	<!-- A radio button cannot be told to be shorter either, and for the same reason as the check box: the Fluent
+	     template puts a fixed height on a grid inside itself. Measured at 32 against the 22 of a check box, so it
+	     is scaled the same way and with the same numbers, which is what makes the two match. -->
+	<Style Selector="Viewbox.RadioButton">
+		<Setter Property="Height" Value="22" />
+		<Setter Property="StretchDirection" Value="DownOnly" />
+		<Setter Property="HorizontalAlignment" Value="Left" />
+	</Style>
+
+	<Style Selector="Viewbox.RadioButton > RadioButton">
+		<Setter Property="FontSize" Value="17.5" />
+	</Style>
+
+	<!-- A Fluent slider is 50 pixels tall and only about 20 of them are the slider: the rest is slack above and
+	     below the track. It does not take styling - the sizes are set inside the template, where a local value
+	     beats a setter - and a Viewbox cannot help the way it helps a check box, because a Viewbox measures its
+	     child unconstrained and a slider asked for its natural width answers 20 pixels, which the box would then
+	     stretch twentyfold.
+
+	     What the template does read are these resources, so they are what to set. Given here rather than in the
+	     view, because they are the density of the dialog like everything else in this file, and they reach the
+	     sliders through the resource chain of the styles that carry them. The horizontal ones only: no view in
+	     this app has a vertical slider. -->
+	<Style Selector="Slider">
+		<Setter Property="MinHeight" Value="0" />
+		<Setter Property="Margin" Value="0,2,0,3" />
 	</Style>
 
 	<!-- The event log grid. A row of it is a line of a log, so it gets the type and the height of the rest of the

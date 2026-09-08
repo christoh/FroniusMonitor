@@ -18,7 +18,7 @@ namespace De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs;
 /// </para>
 /// </remarks>
 public sealed partial class Gen24SettingsDialogViewModel(DialogParameters parameters)
-    : DialogBase<DialogParameters, bool, Gen24SettingsDialogView>(parameters)
+    : DialogBase<DialogParameters, bool, Gen24SettingsDialogView>(parameters), ITabHost
 {
     private readonly IWebClientService webClient = IoC.GetRegistered<IWebClientService>();
     private bool isInitialized;
@@ -35,6 +35,12 @@ public sealed partial class Gen24SettingsDialogViewModel(DialogParameters parame
     /// </summary>
     [ObservableProperty]
     public partial Gen24EventLogViewModel? EventLog { get; set; }
+
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(ShowSelfConsumption))]
+    public partial Gen24SelfConsumptionViewModel? SelfConsumption { get; set; }
+
+    /// <inheritdoc cref="ShowModbus"/>
+    public bool ShowSelfConsumption => !IsLoaded || SelfConsumption is not null;
 
     /// <summary>True once the snapshot has arrived.</summary>
     [ObservableProperty, NotifyPropertyChangedFor(nameof(ShowModbus))]
@@ -90,9 +96,18 @@ public sealed partial class Gen24SettingsDialogViewModel(DialogParameters parame
         // The title is not set here on purpose: the dialog frame reads Parameters.Title once, while the dialog is
         // being put up, which is before this has run. MainViewModel.Settings therefore supplies it.
 
-        // Self consumption and inverter settings are not ported yet; they get their view models here as they
-        // arrive. The event log is set up above, because it does not read from the snapshot.
+        // Inverter settings is not ported yet; it gets its view model here as it arrives. The event log is set up
+        // above, because it does not read from the snapshot.
         Modbus = snapshot.ModbusSettings is { } modbusSettings ? new Gen24ModbusViewModel(this, DeviceId, modbusSettings) : null;
+
+        SelfConsumption = snapshot.BatterySettings is { } batterySettings
+            ? new Gen24SelfConsumptionViewModel(this, DeviceId, batterySettings, snapshot.ChargingRules)
+            : null;
+
+        // The limits of the state of charge sliders come from the live battery rather than from the snapshot, so
+        // they are read after the tab exists and are simply the whole range where there is no battery to ask.
+        SelfConsumption?.ReadBatteryLimits();
+
         IsLoaded = true;
     });
 

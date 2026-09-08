@@ -3,9 +3,13 @@ paths:
   - HomeAutomationClient/HomeAutomationClient/ViewModels/Dialogs/Gen24SettingsDialogViewModel.cs
   - HomeAutomationClient/HomeAutomationClient/ViewModels/Dialogs/Gen24ModbusViewModel.cs
   - HomeAutomationClient/HomeAutomationClient/ViewModels/Dialogs/Gen24EventLogViewModel.cs
+  - HomeAutomationClient/HomeAutomationClient/ViewModels/Dialogs/Gen24SelfConsumptionViewModel.cs
+  - HomeAutomationClient/HomeAutomationClient/ViewModels/Dialogs/Gen24ChargingRuleViewModel.cs
+  - HomeAutomationClient/HomeAutomationClient/Contracts/ITabHost.cs
   - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/Gen24SettingsDialogView.axaml
   - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/Gen24ModbusView.axaml
   - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/Gen24EventLogView.axaml
+  - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/Gen24SelfConsumptionView.axaml
   - HomeAutomationClient/HomeAutomationClient/Controls/CompactTextColumn.cs
   - HomeAutomationClient/HomeAutomationClient/Controls/Toast.axaml
   - HomeAutomationClient/HomeAutomationClient/Styles/CompactForms.axaml
@@ -107,6 +111,15 @@ ported are the big ones. Measured on a Modbus shaped form, the two together take
   Clicking works on the box and on the caption after scaling - that was checked, not assumed.
 - A tab's own margins are its own: 8 around the view, 8 inside a group box, 2 above and below a field. The numbers
   come from the WPF views.
+- **Cancel lines up with Apply, and does not move from tab to tab.** Apply belongs to a tab and Cancel to the
+  dialog, so the button row of the dialog has to repeat whatever insets the content of a tab. Two things do: the
+  padding the tab control puts around what is in it, which the row takes from the tab control itself
+  (`Padding="{Binding #SettingsTabs.Padding}"`) rather than writing 12 out a second time, and the margin of 8 a
+  tab view carries, which is the 8 the row already had. Measured at 700 wide: Apply and Cancel both end 20.0 from
+  the right on the energy flow and Modbus tabs, and Cancel stays at 20.0 on the event log and the unported tab,
+  neither of which has an Apply. The scroll bar of a full tab does not come into it - `AllowAutoHide` floats it
+  over the content instead of giving it room, so Apply ends 8.0 from the right of its scroller at one rule and at
+  forty alike.
 
 ## The shell and its tabs
 
@@ -206,6 +219,128 @@ reason. A tab whose content depends on the snapshot stays in place while it is r
 where the inverter has nothing for it: that is what `ShowModbus` is, `!IsLoaded || Modbus is not null`. Gating such
 a tab on the payload alone makes it appear a second or two after the dialog opened.
 
+## The energy flow tab writes two things, separately
+
+`Gen24SelfConsumptionViewModel` is the port of `SelfConsumptionOptimizationViewModel`. Two things go from it to
+the inverter, and they go one at a time because the inverter takes them that way: the battery settings as a delta
+(`PUT {id}/settings/batteries`) and the time of use rules as a whole list (`PUT {id}/settings/timeOfUse`). Either
+can be the only one that changed. The settings go first - they are a delta, so a failure there leaves the inverter
+as it was, and stopping before the rules keeps the two from being half applied in the other order.
+
+**Every box is paired with a slider, and that pair is the whole difficulty of this tab.** The box is a `string`
+with the rule on it, because the user types into it; the slider is a `double`, because a slider cannot produce a
+value out of range. They are two views of one number, so:
+
+- One `Guard` stops them chasing each other. Whichever is written first does the writing, and the change it
+  causes in the other is ignored.
+- Text a rule refuses moves nothing. A half typed number is not a position, and a slider jumping about while a
+  box is being filled in would be worse than one that waits.
+- **A load writes both halves explicitly** rather than leaving it to the change handlers. That was the bug the
+  tests found first: `CopyFromSettings` set the sliders, the handlers saw the guard closed, and every box came up
+  empty - so the whole tab reported "must not be empty" the moment it opened.
+- The state of charge pair may not cross, so moving one takes the other along; and because that happens inside
+  the guard, the other one's box has to be written by hand there.
+
+Two sign conventions come from the inverter and are worth stating once: it keeps **one signed number** for grid
+power (negative means feeding in, which the tab shows as a switch and a positive number), and it keeps the
+charging power from the house as a **negative** number, because to the battery that is power flowing the other
+way. `CopyToSettings` is where both are put back.
+
+The charging sources are one combo box standing for two flags, because only three of their four combinations mean
+anything - the grid without the house is not something the inverter offers. A battery that may be charged from
+the grid is charged from the house as well, and the inverter does not always say so, so that is fixed up on the
+way in.
+
+The tab is **two columns with the schedule across the foot of them**, which is how the WPF window is laid
+out: the groups are short and wide, and stacking all six made the dialog a tall thin ribbon. Measured against
+the WPF window at 1050 by 1000, this comes to 1060 by 1000 with the same groups in the same places.
+
+Three things about the density of this tab were measured rather than guessed, and two of them are in
+`Styles/CompactForms.axaml` because they are true of any dense form:
+
+- **A text box does not centre its text**, it gives it a line box of its own inside the padding: with a padding
+  of `6,1` the number in the box sat 2 pixels above the caption beside it. `Padding="6,0"` with
+  `VerticalContentAlignment="Center"` puts them on the same line - measured at exactly the same offset.
+- **A radio button cannot be told to be shorter**, for the same reason as a check box: the Fluent template puts a
+  fixed height on a grid inside itself, and a value set in a template beats a style setter. Measured at 32
+  against the 22 of a check box, so it is scaled in a `Viewbox` with the same numbers - which is what makes the
+  two match.
+- **A slider is sized by resources, not by styles or a Viewbox.** A Fluent slider comes out 50 pixels tall with a
+  20 pixel disc for a thumb, and neither figure takes styling, because both are set inside the template where a
+  local value beats a setter. A `Viewbox` is no help either, though it is what saves the check boxes: it measures
+  its child unconstrained, and a slider asked for its natural width answers 20 pixels, which the box would then
+  stretch twentyfold. What the template does read is a handful of resources, and those can simply be given
+  different values - `SliderHorizontalHeight`, `SliderHorizontalThumbWidth`, `SliderHorizontalThumbHeight`,
+  `SliderTrackThemeHeight`, `SliderPreContentMargin` and `SliderPostContentMargin`, in `Styles.Resources` of
+  `CompactForms.axaml`. Measured: 18 pixels tall with a round 14 pixel thumb, against 50 with a 20 pixel one, and
+  the track now starts 3 pixels below the box whose number it sets rather than 19 - a top margin of 2 plus
+  the pixel of slack the template leaves. **The thumb is round because
+  the two thumb resources are the same number**, and 14 is what the dot of a radio button comes to once its
+  `Viewbox` has scaled it, so a slider and a radio button look like they belong to the same form.
+
+The rest, in the order it matters:
+The rules are **a row of controls each, not an editable grid**. Every time and every power is a text box with a
+rule on it, and a grid cell that has to be clicked into before it becomes one hides both the value and the error
+until then. `Gen24ChargingRuleViewModel` is one row. What no single field can see - a rule that ends before it
+starts, two rules that contradict each other - is in `Problems()` alongside the field errors, which is what Apply
+asks and what the tests ask. The header of the schedule and the rows under it are separate grids, so their
+columns are tied together with `SharedSizeGroup` inside a `Grid.IsSharedSizeScope` rather than by giving both the
+same numbers and hoping.
+
+Each heading stands over its column the way the column sits under it, and all of it was measured to within 0.1 of
+a pixel. Two of them were measured against the wrong thing first, and both are worth knowing:
+
+- **A combo box shows its text 8 pixels in**, which is its padding, and the heading needs the same indent to
+  start where the words do. A combo box also has an *empty* text block in its template for the placeholder, at
+  the very left edge; lining the heading up against that one says everything is perfect while it plainly is not.
+  The visible text is the one with something in it.
+- **A check box with no content is still laid out as though it had some.** Fluent gives one a box of 20 and a
+  content presenter 8 to the right of it, whatever it is showing, so centring the control leaves the box 4 to the
+  left of centre - which is what made the day boxes look wrong under their letters. That 8 is not a resource, the
+  way the metrics of a slider are: it is a margin inside the template and nothing styles it. The `NoContent`
+  class in `CompactForms.axaml` takes it off the layout with a negative margin instead, which leaves the control
+  alone and tells the layout what the box actually occupies. It also took the days column from 140 pixels to 98.
+
+**The days are named once, in the heading**, and the boxes under them carry no letters: seven headings over seven
+boxes says the same thing in a fraction of the width - the column measures 126 pixels, 18 to a day, where a box
+with its own letter beside it needed a gap inside the pair and a wider one between the pairs to read correctly at
+all. Both the heading and the row are a `UniformGrid` of seven, so a letter stands over its box without the two
+having to agree on any measurement: measured at 0.1 of a pixel across all seven. Each box keeps the name of its
+day as a tool tip, because a box on its own says nothing once the heading has scrolled out of sight - and that
+name comes from `CultureInfo.CurrentCulture` through `Misc/WeekdayNames`, not from the resource files: a weekday
+is not a term of this application that anybody has to translate, and .NET knows all of them. Measured with no
+resource entry anywhere: Montag, glindesdi, and Määntig for `gsw-CH`.
+
+**The culture, not the UI culture.** This one was got wrong once and corrected by the developer, so it is worth
+the paragraph. The UI culture is what the resource files follow, and a day name is a word on the screen like any
+other, which is the argument that lost: the method that answers it, `GetDayName`, lives on `DateTimeFormat`, next
+to the date and number formats, and those follow the region. This repo is worked on a machine that reports a
+culture of `gsw-CH` and a UI culture of `en-US`; taking the names from the UI culture there produced English days,
+and the report was "I get the weekda in english. I expected gsw." Somebody who has set their region to
+Switzerland is asking for Swiss days, whatever language their Windows menus are in. Measured through the view with
+the two set apart: region `gsw-CH` with display language `en-US` gives *Määntig, Ziischtig, Mittwuch, Dunschtig,
+Friitig, Samschtig, Sunntig*, and region `rm-CH` with display language `de-DE` gives *glindesdi, mardi, mesemna,
+gievgia, venderdi, sonda, dumengia*.
+
+The single letters of the heading stay in the resource files, and the framework itself is the argument: its short
+names give `D` to `Ziischtig`, which begins with a Z, and `G` to both `glindesdi` and `gievgia`. Which letter to
+use when two days collide is a matter of judgement, and the resource files make it deliberately.
+
+The row itself carries **no** tool tip. It used to carry `RuleTooltip`, which says to use the right mouse button
+to add and delete rules - true of the WPF grid and its context menu, and nonsense here, where there is an Add
+button under the schedule and a cross at the end of every row. The resource stays, because two views of
+FroniusMonitor still use it.
+
+Two pixels either side of every day, in the heading and in the rows alike, keeps each one centred and puts 4
+between neighbours - measured at 4.2, the fifth of a pixel being what the Viewbox scaling leaves.
+
+**`ITabHost` is why this tab can be tested.** A tab needs the dialog only for its busy text and its toast; taking
+an interface for that instead of `Gen24SettingsDialogViewModel` means a test can build one without `DialogBase`
+reaching into the static injector for `MainViewModel` and the whole client behind it.
+`HomeAutomationServerTests` references the client project for exactly this, and starts no Avalonia application: a
+view model is a plain object and nothing there creates a control. The Modbus tab still takes the dialog itself and
+could move over the same way.
+
 ## The event log tab reads itself, when it is looked at
 
 The event log is the one tab that does not come out of the snapshot. `Gen24EventLogViewModel` fetches it through
@@ -262,8 +397,8 @@ a UI thread.
 
 ## Still open
 
-- **Two tabs are not ported.** Self consumption and inverter settings carry their heading in the `TabControl`
-  and say so; adding one is a matter of dropping its view in.
+- **One tab is not ported.** Inverter settings carries its heading in the `TabControl` and says so; adding it
+  is a matter of dropping its view in.
 - **Three write endpoints are missing** for the same reason: `api/config/common`, `api/config/powerunit` and
   `api/config/limit_settings/powerLimits`. Their token building is entangled with state of the WPF inverter
   settings dialog - `needsConnectedInverterUpdate`, the `staticControlledDevices` and

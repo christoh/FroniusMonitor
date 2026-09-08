@@ -1,7 +1,9 @@
 using System.Runtime.CompilerServices;
 using De.Hochstaetter.Fronius;
 using De.Hochstaetter.Fronius.Contracts;
+using De.Hochstaetter.Fronius.Contracts.HomeAutomationClient;
 using De.Hochstaetter.Fronius.Services;
+using De.Hochstaetter.Fronius.Services.HomeAutomationClient;
 
 namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests.Fakes;
 
@@ -35,6 +37,9 @@ internal static class TestInjector
             .AddSingleton<IAesKeyProvider, TestAesKeyProvider>()
             // Gen24DataCollector asks the injector for one of these per inverter it polls.
             .AddTransient<IGen24Service, Gen24Service>()
+            // A settings tab of the client holds one of these to write with. Nothing here writes, but the field
+            // is initialized when the tab is built, so it has to resolve.
+            .AddSingleton<IWebClientService, WebClientService>()
             .BuildServiceProvider()
     );
 }

@@ -1,0 +1,356 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             xmlns:m="clr-namespace:De.Hochstaetter.Fronius.Models.Gen24.Settings;assembly=Fronius"
+             xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
+             xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
+             xmlns:l="clr-namespace:De.Hochstaetter.HomeAutomationClient.Extensions"
+             xmlns:misc="clr-namespace:De.Hochstaetter.HomeAutomationClient.Misc"
+             mc:Ignorable="d" d:DesignWidth="620" d:DesignHeight="760"
+             x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.Gen24SelfConsumptionView"
+             x:DataType="dialogs:Gen24SelfConsumptionViewModel">
+	<UserControl.Styles>
+		<Style Selector="HeaderedContentControl.GroupBox">
+			<Setter Property="Margin" Value="0,0,0,6" />
+			<!-- These group boxes are in a dialog, so the caption has to cover the line in the dialog's colour. -->
+			<Setter Property="Background" Value="{DynamicResource DialogBackground}" />
+		</Style>
+		<!-- The gap to whatever the caption names sits on its right. -->
+		<Style Selector="TextBlock.Caption">
+			<Setter Property="VerticalAlignment" Value="Center" />
+			<Setter Property="Margin" Value="0,0,2,0" />
+		</Style>
+
+		<!-- A heading of the schedule stands over its column rather than beside something, so it is centred and
+		     has no margin to one side. -->
+		<Style Selector="TextBlock.Heading">
+			<Setter Property="HorizontalAlignment" Value="Center" />
+			<Setter Property="Margin" Value="0" />
+		</Style>
+
+		<!-- A number and its unit either side of the box that holds it, on one line above the slider. -->
+		<Style Selector="StackPanel.Reading">
+			<Setter Property="Orientation" Value="Horizontal" />
+			<Setter Property="HorizontalAlignment" Value="Center" />
+			<Setter Property="Margin" Value="0,4,0,0" />
+		</Style>
+		<Style Selector="StackPanel.Reading > TextBox">
+			<Setter Property="Width" Value="56" />
+			<Setter Property="TextAlignment" Value="Center" />
+		</Style>
+
+		<!-- The unit after the box - W, %, Wh - and only that: a selector for every TextBlock in the row would
+		     match the caption as well and hand it this left margin in place of the right one it wants, which is
+		     what left the caption sitting against its box with no gap at all. -->
+		<Style Selector="StackPanel.Reading > TextBlock.Unit">
+			<Setter Property="VerticalAlignment" Value="Center" />
+			<Setter Property="Margin" Value="4,0,0,0" />
+		</Style>
+	</UserControl.Styles>
+
+	<!-- Two columns with the schedule across the foot of them, which is how the WPF window is laid out:
+	     the groups are short and wide, and stacking all seven made the dialog a tall thin ribbon. -->
+	<Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" Margin="8">
+
+		<StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,4,0">
+			<!-- Grid power management -->
+			<HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.GridPowerManagement}">
+				<StackPanel Margin="8,4">
+					<StackPanel Orientation="Horizontal">
+						<Viewbox Classes="RadioButton" Margin="0,0,12,0">
+							<RadioButton GroupName="Mode" Content="{l:Config 'BATTERIES.AUTO'}"
+							             IsChecked="{Binding Settings.Mode, Mode=TwoWay, Converter={co:OptimizationMode2Bool Automatic}}" />
+						</Viewbox>
+						<Viewbox Classes="RadioButton" Margin="0,0,12,0">
+							<RadioButton GroupName="Mode" Content="{l:Config 'BATTERIES.MANUAL'}"
+							             IsChecked="{Binding Settings.Mode, Mode=TwoWay, Converter={co:OptimizationMode2Bool Manual}}" />
+						</Viewbox>
+
+						<StackPanel Orientation="Horizontal" IsVisible="{Binding IsManualMode}">
+							<Viewbox Classes="RadioButton" Margin="0,0,12,0">
+								<RadioButton GroupName="Direction" Content="{l:Ui 'BATTERIES.FEED_IN'}"
+								             IsChecked="{Binding IsFeedIn, Mode=TwoWay}" />
+							</Viewbox>
+							<Viewbox Classes="RadioButton">
+								<RadioButton GroupName="Direction" Content="{l:Ui 'BATTERIES.CONSUMPTION'}"
+								             IsChecked="{Binding !IsFeedIn, Mode=TwoWay}" />
+							</Viewbox>
+						</StackPanel>
+					</StackPanel>
+
+					<StackPanel IsVisible="{Binding IsManualMode}">
+						<StackPanel Classes="Reading">
+							<TextBlock Classes="Caption" Text="{l:Config 'BATTERIES.HYB_EM_POWER', ':'}" />
+							<TextBox Text="{Binding RequestedGridPowerText, Mode=TwoWay}" />
+							<TextBlock Classes="Unit" Text="W" />
+						</StackPanel>
+						<Slider Value="{Binding LogGridPower, Mode=TwoWay}" Minimum="-.305" Maximum="4.6989700043360188" />
+					</StackPanel>
+				</StackPanel>
+			</HeaderedContentControl>
+
+			<!-- State of charge -->
+			<HeaderedContentControl Classes="GroupBox" Header="{l:Config 'BATTERIES.BAT_M0_SOC_MODE'}">
+				<StackPanel Margin="8,4">
+					<StackPanel Orientation="Horizontal">
+						<Viewbox Classes="RadioButton" Margin="0,0,12,0">
+							<RadioButton GroupName="SocMode" Content="{l:Config 'BATTERIES.SOC_MODE_AUTO'}"
+							             IsChecked="{Binding Settings.Limits, Mode=TwoWay, Converter={co:SocLimits2Bool UseManufacturerDefault}}" />
+						</Viewbox>
+						<Viewbox Classes="RadioButton">
+							<RadioButton GroupName="SocMode" Content="{l:Config 'BATTERIES.SOC_MODE_MANUAL'}"
+							             IsChecked="{Binding Settings.Limits, Mode=TwoWay, Converter={co:SocLimits2Bool Override}}" />
+						</Viewbox>
+					</StackPanel>
+
+					<StackPanel IsVisible="{Binding ShowSocLimits}">
+						<StackPanel Classes="Reading">
+							<TextBlock Classes="Caption" Text="{l:Config 'BATTERIES.BAT_M0_SOC_MIN', ':'}" />
+							<TextBox Text="{Binding SocMinText, Mode=TwoWay}" />
+							<TextBlock Classes="Unit" Text="%" />
+						</StackPanel>
+						<Slider Value="{Binding SocMin, Mode=TwoWay}" Minimum="{Binding SocMinimum}" Maximum="{Binding SocMaximum}" />
+
+						<StackPanel Classes="Reading">
+							<TextBlock Classes="Caption" Text="{l:Config 'BATTERIES.BAT_M0_SOC_MAX', ':'}" />
+							<TextBox Text="{Binding SocMaxText, Mode=TwoWay}" />
+							<TextBlock Classes="Unit" Text="%" />
+						</StackPanel>
+						<Slider Value="{Binding SocMax, Mode=TwoWay}" Minimum="{Binding SocMinimum}" Maximum="{Binding SocMaximum}" />
+					</StackPanel>
+				</StackPanel>
+			</HeaderedContentControl>
+
+			<!-- Support the OhmPilot -->
+			<HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.SupportOhmPilotSoc}">
+				<StackPanel Margin="8,4">
+					<Viewbox Classes="CheckBox">
+						<CheckBox Content="{l:Config 'BATTERIES.supportSocActive'}" IsChecked="{Binding Settings.EnableSupportSoc, Mode=TwoWay}" />
+					</Viewbox>
+
+					<StackPanel IsVisible="{Binding ShowSupportSoc}">
+						<StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+							<TextBlock Classes="Caption" Text="{l:Config 'BATTERIES.supportSocMode'}" />
+							<Viewbox Classes="RadioButton" Margin="8,0,12,0">
+								<RadioButton GroupName="SupportSocMode" Content="{l:Config 'BATTERIES.supportSocMode_auto'}"
+								             IsChecked="{Binding Settings.SupportSocMode, Mode=TwoWay, Converter={co:SocLimits2Bool UseManufacturerDefault}}" />
+							</Viewbox>
+							<Viewbox Classes="RadioButton">
+								<RadioButton GroupName="SupportSocMode" Content="{l:Config 'BATTERIES.supportSocMode_manual'}"
+								             IsChecked="{Binding Settings.SupportSocMode, Mode=TwoWay, Converter={co:SocLimits2Bool Override}}" />
+							</Viewbox>
+						</StackPanel>
+
+						<StackPanel IsVisible="{Binding ShowSupportSocPercent}">
+							<StackPanel Classes="Reading">
+								<TextBlock Classes="Caption" Text="{l:Config 'BATTERIES.supportSoc', ':'}" />
+								<TextBox Text="{Binding SupportSocPercentText, Mode=TwoWay}" />
+								<TextBlock Classes="Unit" Text="%" />
+							</StackPanel>
+							<Slider Value="{Binding SupportSocPercent, Mode=TwoWay}" Minimum="{Binding SocMinimum}" Maximum="{Binding SocMaximum}" />
+
+							<!-- Behind the danger switch: the hysteresis decides how hard the battery is worked. -->
+							<StackPanel IsEnabled="{Binding EnableDanger}">
+								<StackPanel Classes="Reading">
+									<TextBlock Classes="Caption" Text="{x:Static p:Resources.EnergyHysteresis}" />
+									<TextBox Text="{Binding SupportSocHysteresisText, Mode=TwoWay}" />
+									<TextBlock Classes="Unit" Text="Wh" />
+								</StackPanel>
+								<Slider Value="{Binding SupportSocHysteresis, Mode=TwoWay}" Minimum="0" Maximum="5000"
+								        TickFrequency="1" IsSnapToTickEnabled="True" />
+
+								<StackPanel Classes="Reading">
+									<TextBlock Classes="Caption" Text="{x:Static p:Resources.SupportSocHysteresisMinimum}" />
+									<TextBox Text="{Binding SupportSocHysteresisMinimumText, Mode=TwoWay}" />
+									<TextBlock Classes="Unit" Text="%" />
+								</StackPanel>
+								<Slider Value="{Binding SupportSocHysteresisMinimum, Mode=TwoWay}" Minimum="{Binding SocMinimum}" Maximum="{Binding SocMaximum}" />
+							</StackPanel>
+						</StackPanel>
+					</StackPanel>
+				</StackPanel>
+			</HeaderedContentControl>
+		</StackPanel>
+
+		<StackPanel Grid.Row="0" Grid.Column="1" Margin="4,0,0,0">
+			<!-- Battery charging options -->
+			<HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.BatteryChargingOptions}">
+				<StackPanel Margin="8,4">
+					<TextBlock Classes="Caption" HorizontalAlignment="Left" Text="{x:Static p:Resources.BatteryChargingSources}" />
+					<ComboBox HorizontalAlignment="Stretch" Margin="0,2,0,6"
+					          ItemsSource="{Binding ChargingSources}" DisplayMemberBinding="{Binding DisplayName}"
+					          SelectedValue="{Binding SelectedChargingSources, Mode=TwoWay}" SelectedValueBinding="{Binding Value}" />
+
+					<!-- Every one of these can stop a battery working, so they are behind the danger switch. -->
+					<StackPanel IsEnabled="{Binding EnableDanger}">
+						<Viewbox Classes="CheckBox">
+							<CheckBox Content="{x:Static p:Resources.EnableBattery}" IsChecked="{Binding Settings.IsEnabled, Mode=TwoWay}" />
+						</Viewbox>
+						<Viewbox Classes="CheckBox">
+							<CheckBox Content="{x:Static p:Resources.CalibrateBattery}" IsChecked="{Binding Settings.IsInCalibration, Mode=TwoWay}" />
+						</Viewbox>
+						<Viewbox Classes="CheckBox">
+							<CheckBox Content="{x:Static p:Resources.IsInServiceMode}" IsChecked="{Binding Settings.IsInServiceMode, Mode=TwoWay}" />
+						</Viewbox>
+						<Viewbox Classes="CheckBox">
+							<CheckBox Content="{x:Static p:Resources.BatteryIsAcCoupled}" IsChecked="{Binding Settings.IsAcCoupled, Mode=TwoWay}" />
+						</Viewbox>
+					</StackPanel>
+
+					<StackPanel IsVisible="{Binding ShowAcChargingPower}">
+						<StackPanel Classes="Reading">
+							<TextBlock Classes="Caption" Text="{l:Config 'BATTERIES.HYB_BM_PACMIN', ':'}" />
+							<TextBox Text="{Binding BatteryAcChargingMaxPowerText, Mode=TwoWay}" />
+							<TextBlock Classes="Unit" Text="W" />
+						</StackPanel>
+						<Slider Value="{Binding LogHomePower, Mode=TwoWay}" Minimum="-.305" Maximum="4.6989700043360188" />
+					</StackPanel>
+				</StackPanel>
+			</HeaderedContentControl>
+
+			<!-- Backup -->
+			<HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.BackupConfiguration}">
+				<StackPanel Margin="8,4">
+					<StackPanel Classes="Reading">
+						<TextBlock Classes="Caption" Text="{l:Config 'BATTERIES.HYB_BACKUP_CRITICALSOC', ':'}" />
+						<TextBox Text="{Binding BackupCriticalSocText, Mode=TwoWay}" />
+						<TextBlock Classes="Unit" Text="%" />
+					</StackPanel>
+					<Slider Value="{Binding BackupCriticalSoc, Mode=TwoWay}" Minimum="{Binding SocMinimum}" Maximum="{Binding SocMaximum}" />
+
+					<StackPanel Classes="Reading">
+						<TextBlock Classes="Caption" Text="{l:Config 'BATTERIES.HYB_BACKUP_RESERVED', ':'}" />
+						<TextBox Text="{Binding BackupReserveText, Mode=TwoWay}" />
+						<TextBlock Classes="Unit" Text="%" />
+					</StackPanel>
+					<Slider Value="{Binding BackupReserve, Mode=TwoWay}" Minimum="{Binding SocMinimum}" Maximum="{Binding SocMaximum}" />
+
+					<Viewbox Classes="CheckBox" Margin="0,6,0,0">
+						<CheckBox Content="{l:Config 'BATTERIES.HYB_BACKUP_SYSTEMDEADLOCKPREVENTION'}"
+						          IsChecked="{Binding Settings.EnableSystemDeadlockPrevention, Mode=TwoWay}" />
+					</Viewbox>
+				</StackPanel>
+			</HeaderedContentControl>
+		</StackPanel>
+
+		<!-- The time of use schedule, across both columns: it is a table and needs the width. -->
+		<HeaderedContentControl Grid.Row="1" Grid.ColumnSpan="2" Classes="GroupBox" Header="{l:Ui 'BATTERY_CONTROL_SCHEDULE.ADD_CONTAINER_TITLE'}">
+			<StackPanel Margin="8,4" Grid.IsSharedSizeScope="True">
+				<!-- A row of controls per rule rather than an editable grid: every time and every power is a text
+				     box with a rule on it, and a grid cell that has to be clicked into to become one hides both
+				     the value and the error until then. -->
+				<Grid Margin="0,0,0,2" IsVisible="{Binding ChargingRules.Count}">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto" SharedSizeGroup="Active" />
+						<ColumnDefinition Width="Auto" SharedSizeGroup="From" />
+						<ColumnDefinition Width="Auto" SharedSizeGroup="Until" />
+						<ColumnDefinition Width="*" SharedSizeGroup="Regulation" />
+						<ColumnDefinition Width="Auto" SharedSizeGroup="Power" />
+						<ColumnDefinition Width="Auto" SharedSizeGroup="Days" />
+						<ColumnDefinition Width="Auto" SharedSizeGroup="Delete" />
+					</Grid.ColumnDefinitions>
+					<!-- Each heading sits over its column the way the column sits under it: centred over a box
+					     whose text is centred, and left aligned over the combo box, indented by the padding the
+					     combo box puts in front of its own text so that the two words start at the same place. -->
+					<TextBlock Grid.Column="0" Classes="Caption Heading" Text="{x:Static p:Resources.Active}" />
+					<TextBlock Grid.Column="1" Classes="Caption Heading" Text="{l:Ui 'BATTERY_CONTROL_SCHEDULE.TIME_FROM'}" />
+					<TextBlock Grid.Column="2" Classes="Caption Heading" Text="{l:Ui 'BATTERY_CONTROL_SCHEDULE.TIME_UNTIL'}" />
+					<TextBlock Grid.Column="3" Classes="Caption" HorizontalAlignment="Left" Margin="8,0,2,0"
+					           Text="{l:Ui 'BATTERY_CONTROL_SCHEDULE.REGULATION'}" />
+					<TextBlock Grid.Column="4" Classes="Caption Heading" Text="{l:Ui 'BATTERY_CONTROL_SCHEDULE.POWER'}" />
+					<!-- The days are named once, here, and the boxes under them carry no letters of their own: a
+					     column of seven headings over a column of seven boxes says the same thing in a third of
+					     the width. Both are a UniformGrid of seven, so a letter always stands over its own box
+					     without the two having to agree on any measurement. -->
+					<UniformGrid Grid.Column="5" Columns="7">
+						<TextBlock Classes="Caption Heading" Margin="2,0" Text="{x:Static p:Resources.Monday_One}" />
+						<TextBlock Classes="Caption Heading" Margin="2,0" Text="{x:Static p:Resources.Tuesday_One}" />
+						<TextBlock Classes="Caption Heading" Margin="2,0" Text="{x:Static p:Resources.Wednesday_One}" />
+						<TextBlock Classes="Caption Heading" Margin="2,0" Text="{x:Static p:Resources.Thursday_One}" />
+						<TextBlock Classes="Caption Heading" Margin="2,0" Text="{x:Static p:Resources.Friday_One}" />
+						<TextBlock Classes="Caption Heading" Margin="2,0" Text="{x:Static p:Resources.Saturday_One}" />
+						<TextBlock Classes="Caption Heading" Margin="2,0" Text="{x:Static p:Resources.Sunday_One}" />
+					</UniformGrid>
+				</Grid>
+
+				<ItemsControl ItemsSource="{Binding ChargingRules}">
+					<ItemsControl.ItemTemplate>
+						<DataTemplate x:DataType="dialogs:Gen24ChargingRuleViewModel">
+							<Grid Margin="0,1">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="Auto" SharedSizeGroup="Active" />
+									<ColumnDefinition Width="Auto" SharedSizeGroup="From" />
+									<ColumnDefinition Width="Auto" SharedSizeGroup="Until" />
+									<ColumnDefinition Width="*" SharedSizeGroup="Regulation" />
+									<ColumnDefinition Width="Auto" SharedSizeGroup="Power" />
+									<ColumnDefinition Width="Auto" SharedSizeGroup="Days" />
+									<ColumnDefinition Width="Auto" SharedSizeGroup="Delete" />
+								</Grid.ColumnDefinitions>
+								<!-- Centred under its heading. The style of a scaled check box aligns it left,
+								     which is right for a caption beside it and wrong for one above it. -->
+								<Viewbox Grid.Column="0" Classes="CheckBox" HorizontalAlignment="Center" Margin="2,0">
+									<CheckBox Classes="NoContent" IsChecked="{Binding Rule.IsActive, Mode=TwoWay}" />
+								</Viewbox>
+
+								<TextBox Grid.Column="1" Width="56" TextAlignment="Center" Text="{Binding StartTimeText, Mode=TwoWay}" />
+								<TextBox Grid.Column="2" Width="56" TextAlignment="Center" Margin="2,0" Text="{Binding EndTimeText, Mode=TwoWay}" />
+
+								<ComboBox Grid.Column="3" MinWidth="120" HorizontalAlignment="Stretch"
+								          ItemsSource="{Binding RuleTypes}" DisplayMemberBinding="{Binding DisplayName}"
+								          SelectedValue="{Binding Rule.RuleType, Mode=TwoWay}" SelectedValueBinding="{Binding Value}" />
+
+								<TextBox Grid.Column="4" Width="64" TextAlignment="Center" Margin="2,0" Text="{Binding PowerText, Mode=TwoWay}" />
+
+								<!-- Seven boxes under the seven letters of the heading, and no letters of their
+								     own. Each keeps the name of its day as a tool tip, because a box on its own
+								     says nothing once the heading has scrolled out of sight. -->
+								<UniformGrid Grid.Column="5" Columns="7" VerticalAlignment="Center">
+									<Viewbox Classes="CheckBox" HorizontalAlignment="Center" Margin="2,0" ToolTip.Tip="{x:Static misc:WeekdayNames.Monday}">
+										<CheckBox Classes="NoContent" IsChecked="{Binding Rule.Monday, Mode=TwoWay}" />
+									</Viewbox>
+									<Viewbox Classes="CheckBox" HorizontalAlignment="Center" Margin="2,0" ToolTip.Tip="{x:Static misc:WeekdayNames.Tuesday}">
+										<CheckBox Classes="NoContent" IsChecked="{Binding Rule.Tuesday, Mode=TwoWay}" />
+									</Viewbox>
+									<Viewbox Classes="CheckBox" HorizontalAlignment="Center" Margin="2,0" ToolTip.Tip="{x:Static misc:WeekdayNames.Wednesday}">
+										<CheckBox Classes="NoContent" IsChecked="{Binding Rule.Wednesday, Mode=TwoWay}" />
+									</Viewbox>
+									<Viewbox Classes="CheckBox" HorizontalAlignment="Center" Margin="2,0" ToolTip.Tip="{x:Static misc:WeekdayNames.Thursday}">
+										<CheckBox Classes="NoContent" IsChecked="{Binding Rule.Thursday, Mode=TwoWay}" />
+									</Viewbox>
+									<Viewbox Classes="CheckBox" HorizontalAlignment="Center" Margin="2,0" ToolTip.Tip="{x:Static misc:WeekdayNames.Friday}">
+										<CheckBox Classes="NoContent" IsChecked="{Binding Rule.Friday, Mode=TwoWay}" />
+									</Viewbox>
+									<Viewbox Classes="CheckBox" HorizontalAlignment="Center" Margin="2,0" ToolTip.Tip="{x:Static misc:WeekdayNames.Saturday}">
+										<CheckBox Classes="NoContent" IsChecked="{Binding Rule.Saturday, Mode=TwoWay}" />
+									</Viewbox>
+									<Viewbox Classes="CheckBox" HorizontalAlignment="Center" Margin="2,0" ToolTip.Tip="{x:Static misc:WeekdayNames.Sunday}">
+										<CheckBox Classes="NoContent" IsChecked="{Binding Rule.Sunday, Mode=TwoWay}" />
+									</Viewbox>
+								</UniformGrid>
+
+								<Button Grid.Column="6" Margin="6,0,0,0" Padding="8,2" Content="✕"
+								        ToolTip.Tip="{x:Static p:Resources.DeleteRule}" Command="{Binding DeleteCommand}" />
+							</Grid>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+
+				<Button HorizontalAlignment="Left" Margin="0,6,0,0" Content="{x:Static p:Resources.AddRule}"
+				        Command="{Binding AddChargingRuleCommand}" />
+			</StackPanel>
+		</HeaderedContentControl>
+
+		<!-- The danger switch, and what it guards. Same shape as the Modbus tab. -->
+		<Grid Grid.Row="2" Grid.ColumnSpan="2" ColumnDefinitions="Auto,Auto,*,Auto,Auto" Margin="0,6,0,0">
+			<TextBlock Grid.Column="0" Classes="Caption" Text="{x:Static p:Resources.Danger}" />
+			<ToggleButton Grid.Column="1" Classes="OnOff" Height="16" VerticalAlignment="Center"
+			              IsChecked="{Binding EnableDanger, Mode=TwoWay}" />
+			<Button Grid.Column="3" MinWidth="70" Margin="0,0,6,0" HorizontalContentAlignment="Center"
+			        Content="{x:Static p:Resources.Undo}" Command="{Binding UndoCommand}" />
+			<Button Grid.Column="4" MinWidth="70" HorizontalContentAlignment="Center"
+			        Content="{x:Static p:Resources.Apply}" Command="{Binding ApplyCommand}" />
+		</Grid>
+	</Grid>
+</UserControl>

@@ -33,6 +33,10 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\HomeAutomationServer\HomeAutomationServer.csproj" />
+		<!-- The view models of the client hold real logic now - the interlocks and the validation of a settings
+		     tab - and this is what lets it be tested. No Avalonia application is started: a view model is a plain
+		     object, and nothing here creates a control. -->
+		<ProjectReference Include="..\HomeAutomationClient\HomeAutomationClient\HomeAutomationClient.csproj" />
 	</ItemGroup>
 
 </Project>

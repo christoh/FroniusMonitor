@@ -159,7 +159,9 @@ The rest, in the order it matters:
   full overlay reachable without the user having to move the dialog first, while keeping the position for as long
   as keeping it costs nothing. Measured from four starting positions - unmoved, moved left, moved right, moved
   hard left - each reaching 1400x836 of a 1400x836 overlay, short by nothing.
-- **The dragged size replaces the maximum the dialog declares**, which is what lets a drag pass 1024 by 800.
+- **The dragged size replaces the maximum the dialog declares**, which is what lets a drag pass the 1024 the
+  settings dialog asks for. It declares no maximum height at all: the dialog is as tall as what is on the tab,
+  and the energy flow tab grows with every rule added to its schedule.
 - **The size is given up when resizing is switched off; the place is not.** For the settings dialog that is the
   moment the user leaves the event log tab, and it has to happen: a size is a size whichever tab is showing, so
   one left behind by a table of a few hundred rows would stop the forms on the other tabs sizing themselves to

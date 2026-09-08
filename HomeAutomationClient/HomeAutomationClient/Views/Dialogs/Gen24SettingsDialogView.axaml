@@ -9,9 +9,14 @@
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="700"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.Gen24SettingsDialogView"
              x:DataType="dialogs:Gen24SettingsDialogViewModel"
-             MinWidth="320" MaxWidth="1024" MaxHeight="800" FontSize="12">
-	<!-- The settings views of FroniusMonitor are dense forms, and the three still to be ported are the big ones,
-	     so this dialog asks for the sizes that app uses: 12 point type, and the compact controls of
+             MinWidth="320" MaxWidth="1024" FontSize="12">
+	<!-- No MaxHeight. The dialog is as tall as what is on the tab, and the energy flow tab grows with every rule
+	     the user adds: a fixed maximum stopped it at that height and left the tab scrolling inside a dialog with
+	     room to spare. Measured, with the schedule filling up: 782 pixels at nine rules, 1046 at twenty, and from
+	     thirty - where it has filled the overlay it sits in - the tab scrolls instead. Nothing is clipped at any
+	     count, because the frame is centred and centring clamps it to the overlay. -->
+	<!-- The settings views of FroniusMonitor are dense forms of thirty or forty fields, so this dialog asks for
+	     the sizes that app uses: 12 point type, and the compact controls of
 	     Styles/CompactForms.axaml instead of the finger sized ones Fluent gives everything else. FontSize is
 	     inherited, so it reaches every tab, including the ones that are not there yet. -->
 	<UserControl.Styles>
@@ -22,11 +27,15 @@
 	     and the busy animation of the frame has a body of a sensible size to sit over while the settings are read. -->
 	<Grid RowDefinitions="*,Auto">
 
-		<TabControl Grid.Row="0" MinHeight="360">
-			<!-- The two tabs still to be ported carry their heading already, so the shape of the dialog is
-			     settled and adding one is a matter of dropping its view into the tab. -->
-			<TabItem Header="{x:Static p:Resources.EnergyFlow}">
-				<TextBlock Margin="24" TextWrapping="Wrap" Text="Not ported yet." />
+		<TabControl Grid.Row="0" x:Name="SettingsTabs" MinHeight="360">
+			<!-- The one tab still to be ported carries its heading already, so the shape of the dialog is settled
+			     and adding it is a matter of dropping its view into the tab. -->
+			<!-- ShowSelfConsumption keeps the tab in place while the settings are read and drops it afterwards
+			     only where the inverter has no battery configuration at all. -->
+			<TabItem Header="{x:Static p:Resources.EnergyFlow}" IsVisible="{Binding ShowSelfConsumption}">
+				<ScrollViewer>
+					<v:Gen24SelfConsumptionView DataContext="{Binding SelfConsumption}" />
+				</ScrollViewer>
 			</TabItem>
 
 			<TabItem Header="{x:Static p:Resources.InverterSettings}">
@@ -50,12 +59,23 @@
 
 		<!-- The toast lives here rather than in a tab: this row is the widest free space the dialog has, below
 		     whatever the tab ends with and left of Cancel. A tab writes to ToastText through its own proxy. -->
-		<Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="8">
-			<c:Toast Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,8,0"
-			         Text="{Binding ToastText, Mode=TwoWay}" />
+		<!-- Cancel ends where the Apply of a tab ends, on every tab, including the event log which has no Apply of
+		     its own: it is one button for the whole dialog, so it may not move as the user changes tab. Two things
+		     inset the content of a tab from the edge of the dialog, and this row repeats both. The first is the
+		     padding the tab control puts around whatever is in it, taken from the tab control itself rather than
+		     written out again, so a theme that pads differently keeps the two edges together. The second is the
+		     margin of 8 that a tab view carries, which is the same 8 as this row's. Measured at 700 wide: Apply
+		     and Cancel both end 20.0 from the right on the energy flow and Modbus tabs, and Cancel stays there on
+		     the other two. The scroll bar of a full tab does not come into it - it floats over the content
+		     instead of taking room, so Apply ends 8.0 from the right of its scroller at one rule and at forty. -->
+		<Border Grid.Row="1" Padding="{Binding #SettingsTabs.Padding}">
+			<Grid ColumnDefinitions="*,Auto" Margin="8">
+				<c:Toast Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,8,0"
+				         Text="{Binding ToastText, Mode=TwoWay}" />
 
-			<Button Grid.Column="1" MinWidth="70" HorizontalContentAlignment="Center"
-			        Content="{x:Static p:Resources.Cancel}" Command="{Binding CloseDialogCommand}" />
-		</Grid>
+				<Button Grid.Column="1" MinWidth="70" HorizontalContentAlignment="Center"
+				        Content="{x:Static p:Resources.Cancel}" Command="{Binding CloseDialogCommand}" />
+			</Grid>
+		</Border>
 	</Grid>
 </UserControl>

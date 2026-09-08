@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Avalonia.Data;
 using De.Hochstaetter.Fronius.Extensions;
 using De.Hochstaetter.HomeAutomationClient.Extensions;
 using De.Hochstaetter.HomeAutomationClient.Models.Gen24;
@@ -242,6 +243,34 @@ public class Gen24Status2Brush : ConverterBase
         return value is Gen24Status status ? status.ToBrush() : Brushes.Gainsboro;
     }
 }
+
+/// <summary>
+/// Whether a property holds the enum value named in the markup, for a radio button in a group where each button
+/// stands for one value of an enum.
+/// </summary>
+/// <remarks>
+/// Two way, which is what makes it a radio button rather than a light: checking one writes its value to the
+/// property. Unchecking writes nothing at all - the button that was checked instead is what writes - because a
+/// radio group unchecks the old button before it checks the new one, and a converter that answered that with a
+/// value would put the property into whatever state the unchecked button stands for on the way past.
+/// </remarks>
+public abstract class EnumRadioConverterBase<T>(T value) : ConverterBase where T : struct, Enum
+{
+    public T Value { get; set; } = value;
+
+    public override object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value is T v && v.Equals(Value);
+
+    public override object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
+        value is true ? Value : BindingOperations.DoNothing;
+}
+
+/// <summary>Whether the inverter manages the grid power itself or is told what to do. See the base class.</summary>
+public class OptimizationMode2Bool(OptimizationMode value) : EnumRadioConverterBase<OptimizationMode>(value);
+
+/// <summary>
+/// Whether a state of charge limit is the one the battery asks for or one the user has set. See the base class.
+/// </summary>
+public class SocLimits2Bool(SocLimits value) : EnumRadioConverterBase<SocLimits>(value);
 
 /// <summary>
 /// Whether an event has the severity named in the markup, so that the right one of the three icons is the one
