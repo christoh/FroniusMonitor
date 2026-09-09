@@ -248,32 +248,36 @@
 
 				<Grid IsVisible="{Binding Path=Device.CanMeasurePower, FallbackValue={x:True}}" Grid.Row="4" Background="{DynamicResource Lcd}" Margin="4,2,4,4" RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="Auto,*,Auto">
 					<Grid.Styles>
-						<Style Selector="TextBlock">
+                        <Style Selector="TextBlock.Fixed">
+                            <Setter Property="FontFeatures" Value="+tnum" />
+                        </Style>
+                        
+                        <Style Selector="TextBlock">
 							<Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}" />
 							<Setter Property="FontSize" Value="8" />
 						</Style>
 					</Grid.Styles>
 
 					<TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static p:Resources.Power}" />
-					<TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right">
+					<TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Classes="Fixed">
 						<Run Text="{Binding Path=Device.ActivePower, StringFormat=N1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, TargetNullValue=---, Mode=OneWay, FallbackValue=---}" />
 					</TextBlock>
 					<TextBlock Grid.Row="0" Grid.Column="2" Text=" W" />
 
 					<TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static p:Resources.Voltage}" />
-					<TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right">
+					<TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" Classes="Fixed">
 						<Run Text="{Binding Path=Device.Voltage, StringFormat=N1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, TargetNullValue=---, Mode=OneWay, FallbackValue=---}" />
 					</TextBlock>
 					<TextBlock Grid.Row="1" Grid.Column="2" Text=" V" />
 
 					<TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static p:Resources.Energy}" />
-					<TextBlock Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right">
+					<TextBlock Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right" Classes="Fixed">
 						<Run Text="{Binding Path=Device.EnergyConsumed, Converter={co:Multiply Factor=.001}, StringFormat=N1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, Mode=OneWay,TargetNullValue=---, FallbackValue=---}" />
 					</TextBlock>
 					<TextBlock Grid.Row="2" Grid.Column="2" Text=" kWh" />
 
 					<TextBlock Grid.Row="3" Grid.Column="0" Text="{x:Static p:Resources.Temperature}" />
-					<TextBlock Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right">
+					<TextBlock Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right" Classes="Fixed">
 						<Run Text="{Binding Path=Device.TemperatureCelsius, StringFormat=N1, ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}, Mode=OneWay,TargetNullValue=---, FallbackValue=---}" />
 					</TextBlock>
 					<TextBlock Grid.Row="3" Grid.Column="2" Text=" °C" />

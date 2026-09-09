@@ -23,12 +23,14 @@
 						<Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.MidIsGood}" />
 						<Setter Property="Origin" Value=".5" />
 						<Setter Property="Margin" Value="4,0,4,2" />
+                        <Setter Property="FontFeatures" Value="+tnum" />
 					</ControlTheme>
 
 					<ControlTheme TargetType="c:LinearGauge" x:Key="VoltageLinearGaugeStyle" BasedOn="{StaticResource PowerLinearGaugeStyle}">
 						<Setter Property="Minimum" Value="207" />
 						<Setter Property="Maximum" Value="253" />
 						<Setter Property="UnitName" Value="V" />
+                        <Setter Property="FontFeatures" Value="+tnum" />
 					</ControlTheme>
 
 					<ControlTheme TargetType="c:LinearGauge" x:Key="CurrentLinearGaugeStyle" BasedOn="{StaticResource VoltageLinearGaugeStyle}">
@@ -36,6 +38,7 @@
 						<Setter Property="Maximum" Value="35" />
 						<Setter Property="StringFormat" Value="N3" />
 						<Setter Property="UnitName" Value="A" />
+                        <Setter Property="FontFeatures" Value="+tnum" />
 					</ControlTheme>
 				</Grid.Resources>
 

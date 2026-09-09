@@ -43,6 +43,7 @@
                         <Setter Property="Margin" Value="4,0,4,1" />
                         <Setter Property="StringFormat" Value="N1" />
                         <Setter Property="FontSize" Value="9" />
+                        <Setter Property="FontFeatures" Value="+tnum" />
                     </Style>
 
                     <Style Selector="c|LinearGauge.LinearEnergyGaugeStyle">
@@ -54,6 +55,7 @@
                         <Setter Property="TickFill" Value="{DynamicResource TickFill}" />
                         <Setter Property="UnitName" Value="kWh" />
                         <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.LowIsBad}" />
+                        <Setter Property="FontFeatures" Value="+tnum" />
                     </Style>
 
                     <Style Selector="c|LinearGauge.AcVoltageLinearGaugeStyle">
@@ -65,6 +67,7 @@
                         <Setter Property="Maximum" Value="253" />
                         <Setter Property="Origin" Value=".5" />
                         <Setter Property="UnitName" Value="V" />
+                        <Setter Property="FontFeatures" Value="+tnum" />
                     </Style>
                 </Grid.Styles>
 

@@ -43,6 +43,7 @@
 								<Setter Property="StringFormat" Value="N1" />
 								<Setter Property="FontSize" Value="9"></Setter>
 								<Setter Property="AnimationDuration" Value="00:00:01.0" />
+                                    <Setter Property="FontFeatures" Value="+tnum" />
 							</Style>
 
 						</Grid.Styles>
