@@ -196,6 +196,47 @@ them is what happens to a character Inter does not have: desktop, Android and iO
 find something that does, and **the browser head has nothing to fall back to** - a WebAssembly app sees no system
 fonts - so it draws an empty box.
 
+**Nothing sets `FontFamily`, anywhere.** `WithInterFont()` only registers the font; the default family stays the
+platform's. So the heads do not render in the same font as each other: measured on Windows, `FontFamily.Default`
+resolves to Segoe UI (fingerprint `M 898, 0 539` per 1000 em, where the packaged Inter is `M 889, 0 625`), while
+the browser head has only the registered collection and therefore renders in Inter. That is worth knowing before
+reading any measurement in these documents as gospel: a text width measured on the desktop was measured in Segoe
+UI. Setting one family in `App.axaml` would make the four heads agree and cost the desktop its native font -
+open, and the developer's to decide.
+
+**Tabular figures are on where the numbers are, not application wide.** Inter gives every digit a width of its
+own, which is what the desktop never showed: measured through the real shaper at 12 point, ten ones came to 55.7
+pixels against 77.1 for ten fours, so a column of numbers did not line up and a value that changed shifted the
+text beside it. Inter offers `tnum` and Avalonia 12.1.2 honours it: `FontFeatures="+tnum"` puts every digit at
+77.7, verified end to end against the real `App.axaml` with Skia - 78.00 for ones, zeros and fours alike, and
+inside a `TextBox`'s template as well.
+
+It sits on the readouts themselves, put there by the developer after an application wide setter was tried and
+rejected: the gauge styles of `InverterControl`, `SmartMeterControl` and `WattPilotControl`, a `TextBlock.Fixed`
+class for the numbers of the LCD panel in `PowerConsumer`, and the two timestamp columns of the event log through
+`CompactTextColumn.FontFeatures` (see [[SettingsDialogs.Lifecycle]]). **The setter belongs where a number
+is, and not on words.** Tabular figures are what a reading wants - a live value that changes must not move the
+text beside it - and proportional figures are what a sentence wants. An application wide setter cannot tell the
+two apart, and the app is mostly words with numbers in known places.
+
+**The half circle gauges of the detail views are deliberately left out**, decided when they were offered the
+setter: each of those shows one reading under a dial of its own, so there is no column for it to line up with.
+Not an oversight - do not add it to `WrapPanel.GaugeGroups c|HalfCircleGauge` in `Styles/DetailViews.axaml`.
+
+Worth knowing when adding one: `FontFeatures` is an **inherited** property, so it can be set on a container
+rather than on each `TextBlock` inside it, and a `ControlTheme` for a gauge carries it to the numbers the gauge
+draws. Measured for reach: a setter on `:is(TopLevel)` arrives at a plain `TextBlock`, at the presenter inside a
+`TextBox` and at a tool tip - a native popup root is a `TopLevel` of its own, and a managed popup, which is what
+the browser uses, lives in the overlay layer of the window. `:is(TemplatedControl)` reaches nothing further and
+puts a setter on every control in the application to do it.
+
+Fonts that were measured while choosing, in case the family is ever set: digits are one width in Noto Sans (572),
+Source Sans 3 (472), Lato (580), Open Sans (572), IBM Plex Sans (600) and Segoe UI (539), and a width each in
+Inter, Fira Sans and Public Sans. Open Sans, IBM Plex Sans and Public Sans are out whatever their digits do -
+none of them has `ϕ` (U+03D5), which three detail views write as `cos(ϕ)` while three others write `cos(φ)`
+with U+03C6. **That inconsistency is worth fixing on its own**: on one of the two characters it is invisible, on
+the other it would be an empty box.
+
 So a shared view may not depend on a glyph. The rule is: text that is words is fine, and anything that is really
 a picture - a cross, an arrow, a chevron - is drawn as a shape and lives in `Assets/Images`. `CrossIcon` is that,
 and it exists because the delete button of a charging rule was `Content="✕"` (U+2715), which is not in Inter:

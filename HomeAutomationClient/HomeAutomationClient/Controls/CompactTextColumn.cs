@@ -22,10 +22,36 @@ namespace De.Hochstaetter.HomeAutomationClient.Controls;
 /// </remarks>
 public class CompactTextColumn : DataGridTextColumn
 {
+    /// <summary>
+    /// The OpenType features of the text of a cell, <c>+tnum</c> for tabular figures above all. The base class
+    /// hands on <see cref="DataGridTextColumn.FontFamily"/>, <see cref="DataGridTextColumn.FontSize"/> and the
+    /// two weight and style properties, but not this one, so a column that holds a timestamp or a number has no
+    /// way of its own to ask for digits of one width.
+    /// </summary>
+    /// <remarks>
+    /// Set on the generated <see cref="TextBlock"/> and only where a value was given, so a column that says
+    /// nothing keeps whatever the grid around it inherits.
+    /// </remarks>
+    public static readonly StyledProperty<FontFeatureCollection?> FontFeaturesProperty =
+        AvaloniaProperty.Register<CompactTextColumn, FontFeatureCollection?>(nameof(FontFeatures));
+
+    /// <inheritdoc cref="FontFeaturesProperty"/>
+    public FontFeatureCollection? FontFeatures
+    {
+        get => GetValue(FontFeaturesProperty);
+        set => SetValue(FontFeaturesProperty, value);
+    }
+
     protected override Control GenerateElement(DataGridCell cell, object dataItem)
     {
         var element = base.GenerateElement(cell, dataItem);
         element.Margin = new Thickness(0);
+
+        if (FontFeatures is { } features && element is TextBlock text)
+        {
+            text.FontFeatures = features;
+        }
+
         return element;
     }
 }

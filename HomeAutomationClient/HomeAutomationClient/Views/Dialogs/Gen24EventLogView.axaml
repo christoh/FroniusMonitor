@@ -30,10 +30,13 @@
 			<DataGrid.Columns>
 				<!-- A bound column sorts by what it binds to rather than by what the converter wrote, so these
 				     two sort as the timestamps they are and not as their text. -->
-				<c:CompactTextColumn Header="{x:Static p:Resources.Start}"
+				<!-- Tabular figures for the two timestamps, and for nothing else in the grid: these are the only
+				     columns where digits stand one under another, and Inter gives every digit a width of its own
+				     unless asked otherwise, so the times of two rows do not line up. -->
+				<c:CompactTextColumn Header="{x:Static p:Resources.Start}" FontFeatures="+tnum"
 				                    Binding="{Binding EventTime, Converter={co:DateConverter}}" />
 
-				<c:CompactTextColumn Header="{x:Static p:Resources.End}"
+				<c:CompactTextColumn Header="{x:Static p:Resources.End}" FontFeatures="+tnum"
 				                    Binding="{Binding ActiveUntil, Converter={co:DateConverter}}" />
 
 				<!-- Code and Description are captioned by the inverter's own translations, the way FroniusMonitor

@@ -381,7 +381,13 @@ them measured in a headless probe rather than guessed:
   `DataGridTextColumn` puts `Margin="12,0"` on the `TextBlock` it generates, *inside* the cell padding: measured,
   the text began 20 pixels in while the severity column, whose content the column does not generate, began at 8.
   A style cannot undo it - the margin is a local value on the instance and beats a setter, the same reason the
-  check boxes are scaled in a `Viewbox` - so the column type clears it in `GenerateElement`. The severity icon is
+  check boxes are scaled in a `Viewbox` - so the column type clears it in `GenerateElement`. It carries a
+  `FontFeatures` property for the same reason: the base class hands a column's `FontFamily`, `FontSize`, weight
+  and style to the text it generates but not the features, and **the two timestamp columns ask for `+tnum`** -
+  they are the only place in the grid where digits stand one under another. Measured in Inter at 12 point:
+  `11:11:11` measured 51.0 against 65.0 for `00:00:00` in the same column, and with the feature both measure
+  67.0. Nothing else in the grid asks for it; see [[PlatformHeads.Lifecycle]] for why it goes on numbers rather
+  than on the application. The severity icon is
   14 wide for the same reason: it is the height of a line of 12 point type, so a row with an icon is no taller
   than one without.
 - **There is no `AlternatingRowBackground`** the way the WPF grid had. A `DataGridRow:nth-child(2n)` style does it,
