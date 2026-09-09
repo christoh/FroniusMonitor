@@ -141,6 +141,21 @@ it from 702 pixels tall to 499.
   Clicking works on the box and on the caption after scaling - that was checked, not assumed.
 - A tab's own margins are its own: 8 around the view, 8 inside a group box, 2 above and below a field. The numbers
   come from the WPF views.
+- **The bar under the selected tab is positioned by the tab's height and vertical padding, and by nothing else.**
+  `PART_SelectedPipe` is bottom anchored inside the template with its own margin and height, so a style setter
+  cannot move it - and it sits *inside* the padding, so bottom padding lifts the bar twice as far as it lifts the
+  caption and makes an overlap worse rather than better. That was tried, and measured going backwards. What holds
+  is `clearance = (height - vertical padding - line height) / 2 - 4`: at 16 point the line height is 18, so the
+  original 28 pixels with a padding of 2 gave **-1** - the caption's line box ran to 23 and the bar began at 22,
+  which is what cut the descenders of "Energy flow" - and 30 pixels with no vertical padding gives 2.
+- **On a `Slider`, write `Minimum` and `Maximum` before `Value`.** A slider clips whatever it is given to the
+  range it has at that moment, and the range it comes with is 0 to 100 - so with `Value` first, the number is
+  clipped before the real range arrives and the two way binding then writes the clipped number back over the
+  real one. It is silent, and it looks like the settings were read wrongly. Measured on the inverter settings
+  tab: a peak power of 19760 W and a soft limit of 19760 W both reached the view model again as **100**, and a
+  fixed tracker voltage of 600 V as 100. With the range first, all three survive. This is not only about bound
+  ranges - a literal `Maximum="5000"` written after `Value` is set after it too - so the order is the rule for
+  every slider, and no slider in these views has `Value` as its first attribute any more.
 - **Cancel lines up with Apply, and does not move from tab to tab.** Apply belongs to a tab and Cancel to the
   dialog, so the button row of the dialog has to repeat whatever insets the content of a tab. Two things do: the
   padding the tab control puts around what is in it, which the row takes from the tab control itself

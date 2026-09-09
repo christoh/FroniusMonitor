@@ -40,10 +40,21 @@
 
 	<!-- Fluent gives a tab header 24 point type and 48 pixels of height, which is a pivot on a phone rather than a
 	     tab in a dialog. 16 is what the dialog itself asked for before this file existed. -->
+	<!-- The height and the horizontal-only padding are what keep the bar of the selected tab off the caption.
+	     The bar is bottom anchored inside the template, with a margin and a height of its own that a style setter
+	     cannot change - a value set in a template wins, the same rule as the check box height below - and it sits
+	     inside the padding, so padding at the bottom lifts the bar twice as far as it lifts the text and makes
+	     matters worse. Only the two together decide it, and measured they decide it like this:
+
+	         clearance = (height - vertical padding - line height) / 2 - 4
+
+	     At 16 point the line height is 18, so 28 pixels with a padding of 2 gave -1: the line box of
+	     "Energy flow" ran from 5 to 23 while the bar began at 22, which is what put it through the g and the y.
+	     30 pixels with no vertical padding gives 2. -->
 	<Style Selector="TabItem">
 		<Setter Property="FontSize" Value="16" />
-		<Setter Property="MinHeight" Value="28" />
-		<Setter Property="Padding" Value="10,2" />
+		<Setter Property="MinHeight" Value="30" />
+		<Setter Property="Padding" Value="10,0" />
 	</Style>
 
 	<!-- The padding is horizontal only and the content is centred, so that the number in a box lines up with the

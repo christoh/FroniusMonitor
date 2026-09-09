@@ -27,6 +27,12 @@
 			<Setter Property="Margin" Value="2,0,0,0" />
 		</Style>
 
+		<!-- What the danger switch guards. A class rather than an IsEnabled on a panel around them, because they
+		     share a grid with a field that is always editable. -->
+		<Style Selector=":is(Control).Danger">
+			<Setter Property="IsEnabled" Value="{Binding EnableDanger}" />
+		</Style>
+
 		<!-- A caption, a box and a unit in a row, with the box taking whatever is left. -->
 		<Style Selector="StackPanel.Reading">
 			<Setter Property="Orientation" Value="Horizontal" />
@@ -39,35 +45,11 @@
 		</Style>
 	</UserControl.Styles>
 
-	<!-- Two columns, as the WPF window has: what the system is called and its trackers on the left, the export
-	     limits - the tallest group by far - on the right. -->
+	<!-- Two columns, as the WPF window has: the string trackers on the left, and on the right what the system is
+	     called above the export limits, which are the tallest group by far. -->
 	<Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" Margin="8">
 
 		<StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,4,0">
-			<HeaderedContentControl Classes="GroupBox" Header="{l:Ui 'COMMON.TITLE'}">
-				<StackPanel Margin="8,4">
-					<StackPanel Classes="Reading">
-						<TextBlock Classes="Caption" Text="{l:Config 'COMMON.systemName', ':'}" />
-						<!-- Straight to the settings: a name is text in its own right, so there is nothing for a
-						     binding to convert and nothing it can refuse. -->
-						<TextBox MaxLength="30" Text="{Binding Settings.SystemName, Mode=TwoWay}" />
-					</StackPanel>
-
-					<!-- The clock of the inverter is what times the charging rules of the energy flow tab, so
-					     both of these are behind the danger switch, exactly as in the WPF dialog. -->
-					<StackPanel IsEnabled="{Binding EnableDanger}">
-						<StackPanel Classes="Reading" Margin="0,2,0,0">
-							<TextBlock Classes="Caption" Text="{x:Static p:Resources.TimeZone}" />
-							<TextBox MaxLength="30" Text="{Binding Settings.TimeZoneName, Mode=TwoWay}" />
-						</StackPanel>
-
-						<Viewbox Classes="CheckBox" Margin="0,4,0,0">
-							<CheckBox Content="{x:Static p:Resources.SynchronizeTime}" IsChecked="{Binding Settings.TimeSync, Mode=TwoWay}" />
-						</Viewbox>
-					</StackPanel>
-				</StackPanel>
-			</HeaderedContentControl>
-
 			<!-- One view per tracker, through the ViewLocator, and neither is there where the inverter reports no
 			     such tracker or where the server may not change one. A ContentControl rather than the view
 			     itself, so that the visibility is a property of this tab and not of a tracker that may not
@@ -77,8 +59,38 @@
 			<ContentControl Content="{Binding Mppt2}" IsVisible="{Binding ShowMppt2}" />
 		</StackPanel>
 
-		<StackPanel Grid.Row="0" Grid.Column="1" Margin="4,0,0,0" IsVisible="{Binding ShowExportLimits}">
-			<HeaderedContentControl Classes="GroupBox" Header="{l:Config 'EXPORTLIMIT.TITEL'}">
+		<!-- The visibility of the export limits sits on that group box and not on this column, because the
+		     general settings are above it and everybody may see those. -->
+		<StackPanel Grid.Row="0" Grid.Column="1" Margin="4,0,0,0">
+			<HeaderedContentControl Classes="GroupBox" Header="{l:Ui 'COMMON.TITLE'}">
+				<!-- One grid for both fields, so the captions form a column and the boxes take everything that is
+				     left of it. A horizontal StackPanel could not do the second part: it gives every child the
+				     width that child asks for, and a text box asks for the width of its text.
+
+				     The gap between the rows is the grid's RowSpacing and not a top margin on every second child:
+				     one number, in one place, that cannot be given to one row and forgotten on the next. -->
+				<Grid Margin="8,4" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="2">
+					<TextBlock Grid.Row="0" Grid.Column="0" Classes="Caption" Text="{l:Config 'COMMON.systemName', ':'}" />
+					<!-- Straight to the settings: a name is text in its own right, so there is nothing for a
+					     binding to convert and nothing it can refuse. -->
+					<TextBox Grid.Row="0" Grid.Column="1" MaxLength="30" Text="{Binding Settings.SystemName, Mode=TwoWay}" />
+
+					<!-- The clock of the inverter is what times the charging rules of the energy flow tab, so
+					     these three are behind the danger switch, exactly as in the WPF dialog. The switch used
+					     to be one IsEnabled on a panel around them; in one grid with the name above, which may
+					     always be edited, it is a class on each of the three instead. -->
+					<TextBlock Grid.Row="1" Grid.Column="0" Classes="Caption Danger" Text="{x:Static p:Resources.TimeZone}" />
+					<TextBox Grid.Row="1" Grid.Column="1" Classes="Danger" MaxLength="30"
+					         Text="{Binding Settings.TimeZoneName, Mode=TwoWay}" />
+
+					<Viewbox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Classes="CheckBox Danger"
+					         HorizontalAlignment="Left">
+						<CheckBox Content="{x:Static p:Resources.SynchronizeTime}" IsChecked="{Binding Settings.TimeSync, Mode=TwoWay}" />
+					</Viewbox>
+				</Grid>
+			</HeaderedContentControl>
+
+			<HeaderedContentControl Classes="GroupBox" Header="{l:Config 'EXPORTLIMIT.TITEL'}" IsVisible="{Binding ShowExportLimits}">
 				<StackPanel Margin="8,4">
 					<Viewbox Classes="CheckBox">
 						<CheckBox Content="{l:Config 'EXPORTLIMIT.activated'}"
@@ -121,7 +133,7 @@
 							<TextBox Text="{Binding WattPeakReferenceText, Mode=TwoWay}" />
 							<TextBlock Classes="Unit" Text="W" />
 						</StackPanel>
-						<Slider Value="{Binding WattPeakReference, Mode=TwoWay}" Minimum="0" Maximum="{Binding PowerSliderMaximum}" />
+						<Slider Minimum="0" Maximum="{Binding PowerSliderMaximum}" Value="{Binding WattPeakReference, Mode=TwoWay}" />
 
 						<StackPanel IsVisible="{Binding ShowHardLimit}">
 							<StackPanel Classes="Reading">
@@ -129,7 +141,7 @@
 								<TextBox Text="{Binding HardLimitText, Mode=TwoWay}" />
 								<TextBlock Classes="Unit" Text="W" />
 							</StackPanel>
-							<Slider Value="{Binding HardLimit, Mode=TwoWay}" Minimum="0" Maximum="{Binding PowerSliderMaximum}" />
+							<Slider Minimum="0" Maximum="{Binding PowerSliderMaximum}" Value="{Binding HardLimit, Mode=TwoWay}" />
 						</StackPanel>
 
 						<StackPanel IsVisible="{Binding ShowSoftLimit}">
@@ -138,7 +150,7 @@
 								<TextBox Text="{Binding SoftLimitText, Mode=TwoWay}" />
 								<TextBlock Classes="Unit" Text="W" />
 							</StackPanel>
-							<Slider Value="{Binding SoftLimit, Mode=TwoWay}" Minimum="0" Maximum="{Binding PowerSliderMaximum}" />
+							<Slider Minimum="0" Maximum="{Binding PowerSliderMaximum}" Value="{Binding SoftLimit, Mode=TwoWay}" />
 						</StackPanel>
 					</StackPanel>
 				</StackPanel>

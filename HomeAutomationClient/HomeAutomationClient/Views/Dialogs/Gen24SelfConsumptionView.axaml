@@ -87,7 +87,7 @@
 							<TextBox Text="{Binding RequestedGridPowerText, Mode=TwoWay}" />
 							<TextBlock Classes="Unit" Text="W" />
 						</StackPanel>
-						<Slider Value="{Binding LogGridPower, Mode=TwoWay}" Minimum="-.305" Maximum="4.6989700043360188" />
+						<Slider Minimum="-.305" Maximum="4.6989700043360188" Value="{Binding LogGridPower, Mode=TwoWay}" />
 					</StackPanel>
 				</StackPanel>
 			</HeaderedContentControl>
@@ -112,14 +112,14 @@
 							<TextBox Text="{Binding SocMinText, Mode=TwoWay}" />
 							<TextBlock Classes="Unit" Text="%" />
 						</StackPanel>
-						<Slider Value="{Binding SocMin, Mode=TwoWay}" Minimum="{Binding SocMinimum}" Maximum="{Binding SocMaximum}" />
+						<Slider Minimum="{Binding SocMinimum}" Maximum="{Binding SocMaximum}" Value="{Binding SocMin, Mode=TwoWay}" />
 
 						<StackPanel Classes="Reading">
 							<TextBlock Classes="Caption" Text="{l:Config 'BATTERIES.BAT_M0_SOC_MAX', ':'}" />
 							<TextBox Text="{Binding SocMaxText, Mode=TwoWay}" />
 							<TextBlock Classes="Unit" Text="%" />
 						</StackPanel>
-						<Slider Value="{Binding SocMax, Mode=TwoWay}" Minimum="{Binding SocMinimum}" Maximum="{Binding SocMaximum}" />
+						<Slider Minimum="{Binding SocMinimum}" Maximum="{Binding SocMaximum}" Value="{Binding SocMax, Mode=TwoWay}" />
 					</StackPanel>
 				</StackPanel>
 			</HeaderedContentControl>
@@ -150,7 +150,7 @@
 								<TextBox Text="{Binding SupportSocPercentText, Mode=TwoWay}" />
 								<TextBlock Classes="Unit" Text="%" />
 							</StackPanel>
-							<Slider Value="{Binding SupportSocPercent, Mode=TwoWay}" Minimum="{Binding SocMinimum}" Maximum="{Binding SocMaximum}" />
+							<Slider Minimum="{Binding SocMinimum}" Maximum="{Binding SocMaximum}" Value="{Binding SupportSocPercent, Mode=TwoWay}" />
 
 							<!-- Behind the danger switch: the hysteresis decides how hard the battery is worked. -->
 							<StackPanel IsEnabled="{Binding EnableDanger}">
@@ -159,15 +159,15 @@
 									<TextBox Text="{Binding SupportSocHysteresisText, Mode=TwoWay}" />
 									<TextBlock Classes="Unit" Text="Wh" />
 								</StackPanel>
-								<Slider Value="{Binding SupportSocHysteresis, Mode=TwoWay}" Minimum="0" Maximum="5000"
-								        TickFrequency="1" IsSnapToTickEnabled="True" />
+								<Slider Minimum="0" Maximum="5000" TickFrequency="1" IsSnapToTickEnabled="True"
+								        Value="{Binding SupportSocHysteresis, Mode=TwoWay}" />
 
 								<StackPanel Classes="Reading">
 									<TextBlock Classes="Caption" Text="{x:Static p:Resources.SupportSocHysteresisMinimum}" />
 									<TextBox Text="{Binding SupportSocHysteresisMinimumText, Mode=TwoWay}" />
 									<TextBlock Classes="Unit" Text="%" />
 								</StackPanel>
-								<Slider Value="{Binding SupportSocHysteresisMinimum, Mode=TwoWay}" Minimum="{Binding SocMinimum}" Maximum="{Binding SocMaximum}" />
+								<Slider Minimum="{Binding SocMinimum}" Maximum="{Binding SocMaximum}" Value="{Binding SupportSocHysteresisMinimum, Mode=TwoWay}" />
 							</StackPanel>
 						</StackPanel>
 					</StackPanel>
@@ -206,7 +206,7 @@
 							<TextBox Text="{Binding BatteryAcChargingMaxPowerText, Mode=TwoWay}" />
 							<TextBlock Classes="Unit" Text="W" />
 						</StackPanel>
-						<Slider Value="{Binding LogHomePower, Mode=TwoWay}" Minimum="-.305" Maximum="4.6989700043360188" />
+						<Slider Minimum="-.305" Maximum="4.6989700043360188" Value="{Binding LogHomePower, Mode=TwoWay}" />
 					</StackPanel>
 				</StackPanel>
 			</HeaderedContentControl>
@@ -219,14 +219,14 @@
 						<TextBox Text="{Binding BackupCriticalSocText, Mode=TwoWay}" />
 						<TextBlock Classes="Unit" Text="%" />
 					</StackPanel>
-					<Slider Value="{Binding BackupCriticalSoc, Mode=TwoWay}" Minimum="{Binding SocMinimum}" Maximum="{Binding SocMaximum}" />
+					<Slider Minimum="{Binding SocMinimum}" Maximum="{Binding SocMaximum}" Value="{Binding BackupCriticalSoc, Mode=TwoWay}" />
 
 					<StackPanel Classes="Reading">
 						<TextBlock Classes="Caption" Text="{l:Config 'BATTERIES.HYB_BACKUP_RESERVED', ':'}" />
 						<TextBox Text="{Binding BackupReserveText, Mode=TwoWay}" />
 						<TextBlock Classes="Unit" Text="%" />
 					</StackPanel>
-					<Slider Value="{Binding BackupReserve, Mode=TwoWay}" Minimum="{Binding SocMinimum}" Maximum="{Binding SocMaximum}" />
+					<Slider Minimum="{Binding SocMinimum}" Maximum="{Binding SocMaximum}" Value="{Binding BackupReserve, Mode=TwoWay}" />
 
 					<Viewbox Classes="CheckBox" Margin="0,6,0,0">
 						<CheckBox Content="{l:Config 'BATTERIES.HYB_BACKUP_SYSTEMDEADLOCKPREVENTION'}"

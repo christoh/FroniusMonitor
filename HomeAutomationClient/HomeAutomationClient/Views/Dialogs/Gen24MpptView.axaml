@@ -31,8 +31,11 @@
 				<TextBox Text="{Binding WattPeakText, Mode=TwoWay}" />
 				<TextBlock Classes="Unit" Text="W" />
 			</StackPanel>
-			<Slider Value="{Binding LogWattPeak, Mode=TwoWay}"
-			        Minimum="{Binding WattPeakSliderMinimum}" Maximum="{Binding WattPeakSliderMaximum}" />
+			<!-- The range before the value, always: a slider clips whatever it is given to the range it has at
+			     the time, and until these two bindings have arrived that range is the 0 to 100 it comes with.
+			     With Value first, a peak power of 19760 W reached the view model again as 100. -->
+			<Slider Minimum="{Binding WattPeakSliderMinimum}" Maximum="{Binding WattPeakSliderMaximum}"
+			        Value="{Binding LogWattPeak, Mode=TwoWay}" />
 
 			<!-- And only one that does not needs a voltage to hold. -->
 			<StackPanel IsVisible="{Binding ShowFixedVoltage}">
@@ -41,8 +44,8 @@
 					<TextBox Text="{Binding DcFixedVoltageText, Mode=TwoWay}" />
 					<TextBlock Classes="Unit" Text="V" />
 				</StackPanel>
-				<Slider Value="{Binding DcFixedVoltage, Mode=TwoWay}"
-				        Minimum="{Binding FixedVoltageMinimum}" Maximum="{Binding FixedVoltageMaximum}" />
+				<Slider Minimum="{Binding FixedVoltageMinimum}" Maximum="{Binding FixedVoltageMaximum}"
+				        Value="{Binding DcFixedVoltage, Mode=TwoWay}" />
 			</StackPanel>
 		</StackPanel>
 	</HeaderedContentControl>
