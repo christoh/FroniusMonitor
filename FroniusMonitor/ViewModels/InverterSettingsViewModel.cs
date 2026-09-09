@@ -176,13 +176,6 @@ public partial class InverterSettingsViewModel(
             await base.OnInitialize().ConfigureAwait(false);
             oldSettings = await ReadDataFromInverter().ConfigureAwait(false);
 
-            if (oldSettings.PowerLimitSettings.ExportLimits.ActivePower.IsNetworkModeEnabled)
-            {
-                //ConnectedInverters = new ConcurrentDictionary<Guid, Gen24ConnectedInverter>(await gen24Service.GetConnectedDevices(true));
-                //oldConnectedInverters = new ConcurrentDictionary<Guid, Gen24ConnectedInverter>(ConnectedInverters.Values.Select(i => i.Copy()).ToDictionary(i => i.Id));
-                //await RefreshConnectedInverters().ConfigureAwait(false);
-            }
-
             PowerModes =
             [
                 new ListItemModel<MpptPowerMode> { Value = MpptPowerMode.Off, DisplayName = await Gen24Service.GetFroniusName(MpptPowerMode.Off).ConfigureAwait(false) },
