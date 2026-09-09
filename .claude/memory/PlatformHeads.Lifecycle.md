@@ -5,6 +5,7 @@ paths:
   - HomeAutomationClient/HomeAutomationClient/ICache.cs
   - HomeAutomationClient/HomeAutomationClient/App.axaml.cs
   - HomeAutomationClient/HomeAutomationClient/App.axaml
+  - HomeAutomationClient/HomeAutomationClient/Assets/Images/**
   - HomeAutomationClient/HomeAutomationClient.Desktop/**
   - HomeAutomationClient/HomeAutomationClient.Browser/**
   - HomeAutomationClient/HomeAutomationClient.Android/**
@@ -187,6 +188,29 @@ inverter is the authority on its own vocabulary. Consequences to keep in mind:
 - A language we add to `Fronius/Localization` does **not** localize those names. If the inverter has no file for
   it, the mapping in `Gen24Service` needs a decision: which of the inverter's languages comes closest.
 - Wording of a channel that looks wrong is a question for the inverter's language file first, not for our `.resx`.
+
+## The one font, and what a shared view may put on the screen
+
+All four heads build with `WithInterFont()`, and that is the whole font stock of the application. What separates
+them is what happens to a character Inter does not have: desktop, Android and iOS ask the operating system and
+find something that does, and **the browser head has nothing to fall back to** - a WebAssembly app sees no system
+fonts - so it draws an empty box.
+
+So a shared view may not depend on a glyph. The rule is: text that is words is fine, and anything that is really
+a picture - a cross, an arrow, a chevron - is drawn as a shape and lives in `Assets/Images`. `CrossIcon` is that,
+and it exists because the delete button of a charging rule was `Content="✕"` (U+2715), which is not in Inter:
+correct on the desktop and an empty box in the browser, reported from a screenshot of the two side by side.
+
+An icon of that kind takes its colour from `Foreground`, which is inherited, so the shape follows the button it
+sits in through pointer-over and disabled without being told. That is why `CrossIcon` is a `ContentControl` and
+not a `Viewbox` like `GridIcon`: only a templated control has a `Foreground` to inherit into. Measured: the path
+resolves to the button's own foreground brush rather than to `null`, which is what a mistyped `RelativeSource`
+gives and which draws nothing at all - a worse failure than the box it replaces, because nobody reports a button
+that looks empty on purpose.
+
+The other non-ASCII characters in the shared views - `°`, `•`, `Δ`, `cos(φ)` - are Latin, Greek and punctuation
+that Inter does carry, and every one of them is on the dashboard or in a message box that the browser head has
+been showing all along. They are proven by use; the cross was the one that had never been looked at in a browser.
 
 ## Verified, so you do not have to measure again
 

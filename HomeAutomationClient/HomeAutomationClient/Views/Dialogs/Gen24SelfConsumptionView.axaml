@@ -8,6 +8,7 @@
              xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
              xmlns:l="clr-namespace:De.Hochstaetter.HomeAutomationClient.Extensions"
              xmlns:misc="clr-namespace:De.Hochstaetter.HomeAutomationClient.Misc"
+             xmlns:i="clr-namespace:De.Hochstaetter.HomeAutomationClient.Assets.Images"
              mc:Ignorable="d" d:DesignWidth="620" d:DesignHeight="760"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.Gen24SelfConsumptionView"
              x:DataType="dialogs:Gen24SelfConsumptionViewModel">
@@ -330,8 +331,11 @@
 									</Viewbox>
 								</UniformGrid>
 
-								<Button Grid.Column="6" Margin="6,0,0,0" Padding="8,2" Content="✕"
-								        ToolTip.Tip="{x:Static p:Resources.DeleteRule}" Command="{Binding DeleteCommand}" />
+								<!-- A drawn cross rather than the character for one: see CrossIcon. -->
+								<Button Grid.Column="6" Margin="6,0,0,0" Padding="8,2" VerticalAlignment="Center"
+								        ToolTip.Tip="{x:Static p:Resources.DeleteRule}" Command="{Binding DeleteCommand}">
+									<i:CrossIcon Width="10" Height="10" />
+								</Button>
 							</Grid>
 						</DataTemplate>
 					</ItemsControl.ItemTemplate>

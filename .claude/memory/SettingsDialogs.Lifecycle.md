@@ -331,6 +331,11 @@ to add and delete rules - true of the WPF grid and its context menu, and nonsens
 button under the schedule and a cross at the end of every row. The resource stays, because two views of
 FroniusMonitor still use it.
 
+That cross at the end of a row is `i:CrossIcon`, a drawn shape, and not the character `✕`. The character was what
+the row had first, and it is not in Inter: right on the desktop, an empty box in the browser, which is the only
+head with no system font to fall back to. [[PlatformHeads.Lifecycle]] has the rule and the reasoning. Measured
+after the change: the button is 28x16 in a row still 32 tall, the same height as the text boxes beside it.
+
 Two pixels either side of every day, in the heading and in the rows alike, keeps each one centred and puts 4
 between neighbours - measured at 4.2, the fifth of a pixel being what the Viewbox scaling leaves.
 
