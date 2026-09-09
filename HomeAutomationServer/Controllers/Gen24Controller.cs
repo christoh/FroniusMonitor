@@ -18,6 +18,12 @@ public class Gen24SystemController
     ILogger<Gen24SystemController> logger
 ) : DeviceControllerBase(controlService, logger)
 {
+    /// <summary>
+    /// The user name the inverter gives its owner. Everything the inverter reserves for a technician - the string
+    /// trackers, the export limits - is refused under this login, so a client is told not to offer it.
+    /// </summary>
+    private const string CustomerLogin = "customer";
+
     [HttpGet]
     [BasicAuthorize(Roles = "User")]
     [ProducesResponseType<IDictionary<string, Gen24System>>(StatusCodes.Status200OK)]
@@ -150,6 +156,7 @@ public class Gen24SystemController
                 ModbusSettings = Gen24ModbusSettings.Parse(configToken["modbus"]?["modbus"]),
                 SoftwareVersions = Gen24Versions.Parse(versionToken).SwVersions,
                 MaxAcPower = configToken["powerunit"]?["powerunit"]?["system"]?["DEVICE_POWERACTIVE_NOMINAL_F32"].AsDouble(),
+                IsInverterTechnician = !string.Equals(gen24Service.Connection?.UserName, CustomerLogin, StringComparison.OrdinalIgnoreCase),
             });
         }
         catch (Exception ex)
@@ -226,6 +233,53 @@ public class Gen24SystemController
         id, "api/config/timeofuse", rules,
         configToken => Gen24ChargingRule.ParseList(configToken["timeofuse"]),
         (wanted, current) => wanted.SequenceEqual(current) ? new JsonObject() : Gen24ChargingRule.GetToken(wanted)
+    );
+
+    /// <summary>
+    /// The name of the system, its time zone and its clock. Everything else the settings object carries has an
+    /// endpoint of its own, and the delta of this one only ever covers what lives at <c>api/config/common</c>:
+    /// the string trackers and the power limits hang off properties that carry no channel name, so
+    /// <see cref="IGen24JsonService.GetUpdateToken{T}"/> does not look at them.
+    /// </summary>
+    [HttpPut("{id}/settings/common")]
+    [BasicAuthorize(Roles = "Operator")]
+    [ProducesResponseType<bool>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
+    public Task<IActionResult> SetCommonSettings([FromRoute] string id, [FromBody] Gen24InverterSettings settings) => WriteSettings
+    (
+        id, "api/config/common", settings,
+        Gen24InverterSettings.Parse,
+        (wanted, current) => jsonService.GetUpdateToken(wanted, current)
+    );
+
+    /// <summary>The string trackers, at <c>api/config/powerunit</c>.</summary>
+    [HttpPut("{id}/settings/mppt")]
+    [BasicAuthorize(Roles = "Operator")]
+    [ProducesResponseType<bool>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
+    public Task<IActionResult> SetMpptSettings([FromRoute] string id, [FromBody] Gen24Mppt mppt) => WriteSettings
+    (
+        id, "api/config/powerunit", mppt,
+        configToken => Gen24Mppt.Parse(configToken["powerunit"]?["powerunit"]?["mppt"]),
+        (wanted, current) => wanted.GetToken(current)
+    );
+
+    /// <summary>The export limits, at <c>api/config/limit_settings/powerLimits</c>.</summary>
+    [HttpPut("{id}/settings/powerLimits")]
+    [BasicAuthorize(Roles = "Operator")]
+    [ProducesResponseType<bool>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
+    public Task<IActionResult> SetPowerLimits([FromRoute] string id, [FromBody] Gen24PowerLimitSettings powerLimits) => WriteSettings
+    (
+        id, "api/config/limit_settings/powerLimits", powerLimits,
+        configToken => Gen24PowerLimitSettings.Parse(configToken["limit_settings"]?["powerLimits"]),
+        (wanted, current) => wanted.GetToken(current)
     );
 
     /// <summary>

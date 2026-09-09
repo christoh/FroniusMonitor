@@ -40,6 +40,9 @@ internal static class TestInjector
             // A settings tab of the client holds one of these to write with. Nothing here writes, but the field
             // is initialized when the tab is built, so it has to resolve.
             .AddSingleton<IWebClientService, WebClientService>()
+            // The inverter settings tab asks this for the inverter's own words. With nothing loaded it answers
+            // with the key it was given, which is what a test without an inverter wants anyway.
+            .AddSingleton<IGen24LocalizationService, Gen24LocalizationService>()
             .BuildServiceProvider()
     );
 }

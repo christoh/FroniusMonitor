@@ -38,8 +38,12 @@
 				</ScrollViewer>
 			</TabItem>
 
-			<TabItem Header="{x:Static p:Resources.InverterSettings}">
-				<TextBlock Margin="24" TextWrapping="Wrap" Text="Not ported yet." />
+			<!-- ShowInverterSettings keeps the tab in place while the settings are read and drops it afterwards
+			     only where the inverter answered with none at all. -->
+			<TabItem Header="{x:Static p:Resources.InverterSettings}" IsVisible="{Binding ShowInverterSettings}">
+				<ScrollViewer>
+					<v:Gen24InverterSettingsView DataContext="{Binding InverterSettings}" />
+				</ScrollViewer>
 			</TabItem>
 
 			<!-- IsSelected is two way bound because looking at this tab is what makes it read the log: it is not

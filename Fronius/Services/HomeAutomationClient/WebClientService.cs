@@ -172,6 +172,21 @@ public sealed class WebClientService : IWebClientService
         return PutResult<bool, List<Gen24ChargingRule>>(FormattableString.Invariant($"gen24system/{deviceId}/settings/timeOfUse"), [.. rules], token);
     }
 
+    public Task<ApiResult<bool>> SetGen24CommonSettings(string deviceId, Gen24InverterSettings settings, CancellationToken token = default)
+    {
+        return PutResult<bool, Gen24InverterSettings>(FormattableString.Invariant($"gen24system/{deviceId}/settings/common"), settings, token);
+    }
+
+    public Task<ApiResult<bool>> SetGen24MpptSettings(string deviceId, Gen24Mppt mppt, CancellationToken token = default)
+    {
+        return PutResult<bool, Gen24Mppt>(FormattableString.Invariant($"gen24system/{deviceId}/settings/mppt"), mppt, token);
+    }
+
+    public Task<ApiResult<bool>> SetGen24PowerLimits(string deviceId, Gen24PowerLimitSettings powerLimits, CancellationToken token = default)
+    {
+        return PutResult<bool, Gen24PowerLimitSettings>(FormattableString.Invariant($"gen24system/{deviceId}/settings/powerLimits"), powerLimits, token);
+    }
+
     #endregion
 
     #region Fritzbox

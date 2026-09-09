@@ -39,11 +39,25 @@ public sealed partial class Gen24SettingsDialogViewModel(DialogParameters parame
     [ObservableProperty, NotifyPropertyChangedFor(nameof(ShowSelfConsumption))]
     public partial Gen24SelfConsumptionViewModel? SelfConsumption { get; set; }
 
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(ShowInverterSettings))]
+    public partial Gen24InverterSettingsViewModel? InverterSettings { get; set; }
+
     /// <inheritdoc cref="ShowModbus"/>
     public bool ShowSelfConsumption => !IsLoaded || SelfConsumption is not null;
 
+    /// <inheritdoc cref="ShowModbus"/>
+    public bool ShowInverterSettings => !IsLoaded || InverterSettings is not null;
+
     /// <summary>True once the snapshot has arrived.</summary>
-    [ObservableProperty, NotifyPropertyChangedFor(nameof(ShowModbus))]
+    /// <remarks>
+    /// It has to notify all three tabs that come out of the snapshot, and not only the one it was written for:
+    /// each of them is there while the settings are being read and afterwards only if the inverter has that
+    /// group at all, so the moment this turns true is the moment a tab with nothing behind it has to go.
+    /// </remarks>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowModbus))]
+    [NotifyPropertyChangedFor(nameof(ShowSelfConsumption))]
+    [NotifyPropertyChangedFor(nameof(ShowInverterSettings))]
     public partial bool IsLoaded { get; set; }
 
     /// <summary>
@@ -96,9 +110,12 @@ public sealed partial class Gen24SettingsDialogViewModel(DialogParameters parame
         // The title is not set here on purpose: the dialog frame reads Parameters.Title once, while the dialog is
         // being put up, which is before this has run. MainViewModel.Settings therefore supplies it.
 
-        // Inverter settings is not ported yet; it gets its view model here as it arrives. The event log is set up
-        // above, because it does not read from the snapshot.
+        // The event log is set up above, because it does not read from the snapshot.
         Modbus = snapshot.ModbusSettings is { } modbusSettings ? new Gen24ModbusViewModel(this, DeviceId, modbusSettings) : null;
+
+        InverterSettings = snapshot.InverterSettings is { } inverterSettings
+            ? new Gen24InverterSettingsViewModel(this, DeviceId, inverterSettings, snapshot.IsInverterTechnician)
+            : null;
 
         SelfConsumption = snapshot.BatterySettings is { } batterySettings
             ? new Gen24SelfConsumptionViewModel(this, DeviceId, batterySettings, snapshot.ChargingRules)

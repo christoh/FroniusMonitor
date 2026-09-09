@@ -1,0 +1,159 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
+             xmlns:l="clr-namespace:De.Hochstaetter.HomeAutomationClient.Extensions"
+             mc:Ignorable="d" d:DesignWidth="620" d:DesignHeight="620"
+             x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.Gen24InverterSettingsView"
+             x:DataType="dialogs:Gen24InverterSettingsViewModel">
+	<UserControl.Styles>
+		<Style Selector="HeaderedContentControl.GroupBox">
+			<Setter Property="Margin" Value="0,0,0,6" />
+			<!-- These group boxes are in a dialog, so the caption has to cover the line in the dialog's colour. -->
+			<Setter Property="Background" Value="{DynamicResource DialogBackground}" />
+		</Style>
+
+		<!-- The gap to whatever the caption names sits on its right. -->
+		<Style Selector="TextBlock.Caption">
+			<Setter Property="VerticalAlignment" Value="Center" />
+			<Setter Property="Margin" Value="0,0,2,0" />
+		</Style>
+
+		<!-- A number and its unit read as one thing, so the gap goes on the left of the unit. -->
+		<Style Selector="TextBlock.Unit">
+			<Setter Property="VerticalAlignment" Value="Center" />
+			<Setter Property="Margin" Value="2,0,0,0" />
+		</Style>
+
+		<!-- A caption, a box and a unit in a row, with the box taking whatever is left. -->
+		<Style Selector="StackPanel.Reading">
+			<Setter Property="Orientation" Value="Horizontal" />
+			<Setter Property="HorizontalAlignment" Value="Stretch" />
+		</Style>
+
+		<Style Selector="StackPanel.Reading > TextBox">
+			<Setter Property="HorizontalAlignment" Value="Stretch" />
+			<Setter Property="TextAlignment" Value="Center" />
+		</Style>
+	</UserControl.Styles>
+
+	<!-- Two columns, as the WPF window has: what the system is called and its trackers on the left, the export
+	     limits - the tallest group by far - on the right. -->
+	<Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" Margin="8">
+
+		<StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,4,0">
+			<HeaderedContentControl Classes="GroupBox" Header="{l:Ui 'COMMON.TITLE'}">
+				<StackPanel Margin="8,4">
+					<StackPanel Classes="Reading">
+						<TextBlock Classes="Caption" Text="{l:Config 'COMMON.systemName', ':'}" />
+						<!-- Straight to the settings: a name is text in its own right, so there is nothing for a
+						     binding to convert and nothing it can refuse. -->
+						<TextBox MaxLength="30" Text="{Binding Settings.SystemName, Mode=TwoWay}" />
+					</StackPanel>
+
+					<!-- The clock of the inverter is what times the charging rules of the energy flow tab, so
+					     both of these are behind the danger switch, exactly as in the WPF dialog. -->
+					<StackPanel IsEnabled="{Binding EnableDanger}">
+						<StackPanel Classes="Reading" Margin="0,2,0,0">
+							<TextBlock Classes="Caption" Text="{x:Static p:Resources.TimeZone}" />
+							<TextBox MaxLength="30" Text="{Binding Settings.TimeZoneName, Mode=TwoWay}" />
+						</StackPanel>
+
+						<Viewbox Classes="CheckBox" Margin="0,4,0,0">
+							<CheckBox Content="{x:Static p:Resources.SynchronizeTime}" IsChecked="{Binding Settings.TimeSync, Mode=TwoWay}" />
+						</Viewbox>
+					</StackPanel>
+				</StackPanel>
+			</HeaderedContentControl>
+
+			<!-- One view per tracker, through the ViewLocator, and neither is there where the inverter reports no
+			     such tracker or where the server may not change one. A ContentControl rather than the view
+			     itself, so that the visibility is a property of this tab and not of a tracker that may not
+			     exist: with the view in place and its DataContext null, a missing tracker would leave an empty
+			     group box behind. -->
+			<ContentControl Content="{Binding Mppt1}" IsVisible="{Binding ShowMppt1}" />
+			<ContentControl Content="{Binding Mppt2}" IsVisible="{Binding ShowMppt2}" />
+		</StackPanel>
+
+		<StackPanel Grid.Row="0" Grid.Column="1" Margin="4,0,0,0" IsVisible="{Binding ShowExportLimits}">
+			<HeaderedContentControl Classes="GroupBox" Header="{l:Config 'EXPORTLIMIT.TITEL'}">
+				<StackPanel Margin="8,4">
+					<Viewbox Classes="CheckBox">
+						<CheckBox Content="{l:Config 'EXPORTLIMIT.activated'}"
+						          IsChecked="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.IsEnabled, Mode=TwoWay}" />
+					</Viewbox>
+
+					<!-- Nothing below has any meaning while there is no limit at all. -->
+					<StackPanel IsVisible="{Binding ShowExportLimitDetails}">
+						<Viewbox Classes="CheckBox" Margin="0,4,0,0">
+							<CheckBox Content="{l:Config 'EXPORTLIMIT.NETWORK_MODE.clusterModeActivated'}"
+							          IsChecked="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.IsNetworkModeEnabled, Mode=TwoWay}" />
+						</Viewbox>
+
+						<TextBlock Classes="Caption" HorizontalAlignment="Left" Margin="0,4,0,0" Text="{l:Config 'EXPORTLIMIT.PHASE_MODE.phaseMode'}" />
+						<ComboBox HorizontalAlignment="Stretch" Margin="0,2,0,6"
+						          ItemsSource="{Binding PhaseModes}" DisplayMemberBinding="{Binding DisplayName}"
+						          SelectedValue="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.PhaseMode, Mode=TwoWay}"
+						          SelectedValueBinding="{Binding Value}" />
+
+						<Viewbox Classes="CheckBox">
+							<CheckBox Content="{l:Config 'EXPORTLIMIT.failSafeModeEnabled'}"
+							          IsChecked="{Binding Settings.PowerLimitSettings.ExportLimits.EnableFailSafeMode, Mode=TwoWay}" />
+						</Viewbox>
+
+						<Viewbox Classes="CheckBox" Margin="0,4,0,0">
+							<CheckBox Content="{l:Config 'EXPORTLIMIT.HARDLIMIT.enabled'}"
+							          IsChecked="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.HardLimit.IsEnabled, Mode=TwoWay}" />
+						</Viewbox>
+
+						<Viewbox Classes="CheckBox" Margin="0,4,0,0">
+							<CheckBox Content="{l:Config 'EXPORTLIMIT.SOFTLIMIT.enabled'}"
+							          IsChecked="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit.IsEnabled, Mode=TwoWay}" />
+						</Viewbox>
+
+						<!-- The peak power everything here is read against, and the two limits themselves. The
+						     three keep an order - the soft limit at or below the hard one, the hard one at or
+						     below the peak - and moving any of them takes the others with it where it has to. -->
+						<StackPanel Classes="Reading" Margin="0,6,0,0">
+							<TextBlock Classes="Caption" Text="{l:Config 'EXPORTLIMIT.WPEAK', ':'}" />
+							<TextBox Text="{Binding WattPeakReferenceText, Mode=TwoWay}" />
+							<TextBlock Classes="Unit" Text="W" />
+						</StackPanel>
+						<Slider Value="{Binding WattPeakReference, Mode=TwoWay}" Minimum="0" Maximum="{Binding PowerSliderMaximum}" />
+
+						<StackPanel IsVisible="{Binding ShowHardLimit}">
+							<StackPanel Classes="Reading">
+								<TextBlock Classes="Caption" Text="{l:Config 'EXPORTLIMIT.HARDLIMIT.enabled', ':'}" />
+								<TextBox Text="{Binding HardLimitText, Mode=TwoWay}" />
+								<TextBlock Classes="Unit" Text="W" />
+							</StackPanel>
+							<Slider Value="{Binding HardLimit, Mode=TwoWay}" Minimum="0" Maximum="{Binding PowerSliderMaximum}" />
+						</StackPanel>
+
+						<StackPanel IsVisible="{Binding ShowSoftLimit}">
+							<StackPanel Classes="Reading">
+								<TextBlock Classes="Caption" Text="{l:Config 'EXPORTLIMIT.SOFTLIMIT.enabled', ':'}" />
+								<TextBox Text="{Binding SoftLimitText, Mode=TwoWay}" />
+								<TextBlock Classes="Unit" Text="W" />
+							</StackPanel>
+							<Slider Value="{Binding SoftLimit, Mode=TwoWay}" Minimum="0" Maximum="{Binding PowerSliderMaximum}" />
+						</StackPanel>
+					</StackPanel>
+				</StackPanel>
+			</HeaderedContentControl>
+		</StackPanel>
+
+		<!-- The danger switch, and what it guards. Same shape as the other two tabs. -->
+		<Grid Grid.Row="1" Grid.ColumnSpan="2" ColumnDefinitions="Auto,Auto,*,Auto,Auto" Margin="0,6,0,0">
+			<TextBlock Grid.Column="0" Classes="Caption" Text="{x:Static p:Resources.Danger}" />
+			<ToggleButton Grid.Column="1" Classes="OnOff" Height="16" VerticalAlignment="Center"
+			              IsChecked="{Binding EnableDanger, Mode=TwoWay}" />
+			<Button Grid.Column="3" MinWidth="70" Margin="0,0,6,0" HorizontalContentAlignment="Center"
+			        Content="{x:Static p:Resources.Undo}" Command="{Binding UndoCommand}" />
+			<Button Grid.Column="4" MinWidth="70" HorizontalContentAlignment="Center"
+			        Content="{x:Static p:Resources.Apply}" Command="{Binding ApplyCommand}" />
+		</Grid>
+	</Grid>
+</UserControl>

@@ -38,4 +38,16 @@ public class Gen24SettingsSnapshot
 
     /// <summary>The nominal AC power of the inverter, which the self consumption tab needs for its limits.</summary>
     public double? MaxAcPower { get; set; }
+
+    /// <summary>
+    /// Whether the server is logged in to the inverter as something more than its owner, and may therefore change
+    /// the settings the inverter only shows a technician: the string trackers and the export limits.
+    /// </summary>
+    /// <remarks>
+    /// The WPF app asked its own inverter connection for this and hid those groups when the user name was
+    /// <c>customer</c>. A client here never logs in to the inverter - it logs in to this server - so the server
+    /// answers for it. Without this the groups would be offered to everybody and the inverter would refuse the
+    /// write, which is a worse way to find out.
+    /// </remarks>
+    public bool IsInverterTechnician { get; set; }
 }

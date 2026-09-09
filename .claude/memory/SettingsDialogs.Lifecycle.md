@@ -5,11 +5,15 @@ paths:
   - HomeAutomationClient/HomeAutomationClient/ViewModels/Dialogs/Gen24EventLogViewModel.cs
   - HomeAutomationClient/HomeAutomationClient/ViewModels/Dialogs/Gen24SelfConsumptionViewModel.cs
   - HomeAutomationClient/HomeAutomationClient/ViewModels/Dialogs/Gen24ChargingRuleViewModel.cs
+  - HomeAutomationClient/HomeAutomationClient/ViewModels/Dialogs/Gen24InverterSettingsViewModel.cs
+  - HomeAutomationClient/HomeAutomationClient/ViewModels/Dialogs/Gen24MpptViewModel.cs
   - HomeAutomationClient/HomeAutomationClient/Contracts/ITabHost.cs
   - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/Gen24SettingsDialogView.axaml
   - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/Gen24ModbusView.axaml
   - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/Gen24EventLogView.axaml
   - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/Gen24SelfConsumptionView.axaml
+  - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/Gen24InverterSettingsView.axaml
+  - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/Gen24MpptView.axaml
   - HomeAutomationClient/HomeAutomationClient/Controls/CompactTextColumn.cs
   - HomeAutomationClient/HomeAutomationClient/Controls/Toast.axaml
   - HomeAutomationClient/HomeAutomationClient/Styles/CompactForms.axaml
@@ -62,6 +66,31 @@ Why this way round:
 - `WriteSettings<T>` in `Gen24SystemController` is the one place that does this. A new settings group is a call to
   it with a parse function and a delta function, not a new copy of the procedure.
 
+**The six write endpoints, and the path each of them writes:**
+
+| endpoint | body | inverter path | delta |
+|---|---|---|---|
+| `settings/modbus` | `Gen24ModbusSettings` | `api/config/modbus` | `wanted.GetToken(current)` |
+| `settings/batteries` | `Gen24BatterySettings` | `api/config/batteries` | `GetUpdateToken` |
+| `settings/timeOfUse` | `List<Gen24ChargingRule>` | `api/config/timeofuse` | the whole list, or nothing |
+| `settings/common` | `Gen24InverterSettings` | `api/config/common` | `GetUpdateToken` |
+| `settings/mppt` | `Gen24Mppt` | `api/config/powerunit` | `wanted.GetToken(current)` |
+| `settings/powerLimits` | `Gen24PowerLimitSettings` | `api/config/limit_settings/powerLimits` | `wanted.GetToken(current)` |
+
+The last three are what the inverter settings tab writes, and it is one tab writing three endpoints because the
+inverter keeps those three groups in three places. Two things about them are worth knowing:
+
+- **`settings/common` takes the whole `Gen24InverterSettings` and writes three fields of it.** The trackers and
+  the power limits hang off properties that carry no `FroniusProprietaryImport`, so `GetUpdateToken` does not
+  look at them at all - measured: a delta with everything changed has exactly `systemName`, `timezone` and
+  `timesync` in it. It takes the whole object rather than three arguments because that is what the client has.
+- **`Gen24Mppt.GetToken` and `Gen24PowerLimitSettings.GetToken` build nested deltas** and leave out any object
+  where nothing changed, which is what keeps an unchanged page from writing anything: a tree of empty objects
+  would pass `HasValues` and ask the inverter to change nothing. A tracker the inverter does not report is left
+  out rather than written from our defaults. The one thing in there that is not a delta is
+  `displayModeSoftLimit`, which says whether the soft limit means watts or a percentage - it travels with the
+  soft limit whenever the soft limit travels, because a number read in the wrong unit is not a small mistake.
+
 ## Reading: one snapshot for the whole dialog
 
 `GET {id}/settings` returns a `Gen24SettingsSnapshot` - inverter settings (with `Mppt`, `PowerLimitSettings` and
@@ -85,8 +114,9 @@ should accept `User,Operator` is still open; see the note at the end.
 `Gen24SettingsDialogView` sets `FontSize="12"` and includes `Styles/CompactForms.axaml`, and that is where the
 density of every tab comes from - `FontSize` is inherited and the styles reach the whole subtree, so a tab added
 later needs nothing. Fluent sizes its controls for a finger: a 32 pixel combo box, a 48 pixel tab header with 24
-point type. The settings views of FroniusMonitor are forms of thirty or forty fields, and the three still to be
-ported are the big ones. Measured on a Modbus shaped form, the two together take it from 702 pixels tall to 499.
+point type. The settings views of FroniusMonitor are forms of thirty or forty fields, and the two biggest of them
+- the energy flow and the inverter settings - are ported. Measured on a Modbus shaped form, the two together take
+it from 702 pixels tall to 499.
 
 - **`CompactForms.axaml` is included by the control that wants it, never in `App.axaml`.** The rest of the app is
   meant to keep the Fluent sizes.
@@ -116,8 +146,8 @@ ported are the big ones. Measured on a Modbus shaped form, the two together take
   padding the tab control puts around what is in it, which the row takes from the tab control itself
   (`Padding="{Binding #SettingsTabs.Padding}"`) rather than writing 12 out a second time, and the margin of 8 a
   tab view carries, which is the 8 the row already had. Measured at 700 wide: Apply and Cancel both end 20.0 from
-  the right on the energy flow and Modbus tabs, and Cancel stays at 20.0 on the event log and the unported tab,
-  neither of which has an Apply. The scroll bar of a full tab does not come into it - `AllowAutoHide` floats it
+  the right on the energy flow, inverter settings and Modbus tabs, and Cancel stays at 20.0 on the event log,
+  which has no Apply. The scroll bar of a full tab does not come into it - `AllowAutoHide` floats it
   over the content instead of giving it room, so Apply ends 8.0 from the right of its scroller at one rule and at
   forty alike.
 
@@ -346,6 +376,53 @@ reaching into the static injector for `MainViewModel` and the whole client behin
 view model is a plain object and nothing there creates a control. The Modbus tab still takes the dialog itself and
 could move over the same way.
 
+## The inverter settings tab writes three things, separately
+
+`Gen24InverterSettingsViewModel`, ported from `InverterSettingsViewModel` of the WPF app. Three groups, and each
+of them is its own endpoint: what the system is called and how it keeps time, the string trackers, and the export
+limits. `Apply` works out the three deltas with the same functions the server will use again, and sends only the
+groups that actually changed - so a changed system name does not rewrite the trackers. It stops at the first
+failure, which leaves the groups before it written and nothing half applied inside a group.
+
+**A tracker is a child view model**, `Gen24MpptViewModel`, one per tracker, with one view used twice. An inverter
+has one or two of them and both are edited identically; the only difference is that every value is a channel of
+its own - `PV_MODE_MPP_01_U16` against `PV_MODE_MPP_02_U16` - so the captions are built from the index and come
+from the view model rather than from the localization markup extensions the rest of the tab uses. Those
+extensions take a constant, and these keys are not.
+
+- **The captions of a tracker that stand beside a box carry their own colon**, because they cannot go through
+  `{l:Config 'key', ':'}`. The ones that label a combo box do not.
+- `ShowDynamicPeakManager` and `ShowFixedVoltage` follow the power mode: a tracker that finds its own working
+  point has a peak manager, one that is told where to sit has a voltage, and one that is off has neither.
+  Measured through the view: two combo boxes and one box in `Auto`, one and two in `Fix`, one and one in `Off`.
+- The tracker views are hosted in a `ContentControl` and found by the `ViewLocator`, not written into the view.
+  With the view in place and a `DataContext` of null, an inverter with one string would show an empty group box;
+  as a `ContentControl` the visibility is a property of the tab, which knows whether the tracker exists.
+
+**The three export limits are one order** - the soft limit at or below the hard one, the hard one at or below the
+peak power both are read against - and moving any of them takes whichever of the others is in its way with it.
+Refusing the drag would be a worse way to say so. Only what is in the way moves: a limit raised to 7800 under a
+peak of 8000 leaves the peak alone.
+
+**What only a technician may change is not shown at all.** The trackers and the export limits are refused by the
+inverter under its `customer` login, and the WPF app asked its own connection about that. A client here never
+logs in to the inverter, so the server answers for it: `Gen24SettingsSnapshot.IsInverterTechnician`. Offering the
+fields and letting the inverter refuse the write is a worse way to find out.
+
+**Two deliberate differences from the WPF dialog**, both in `CopyToSettings`:
+
+- A limit that is switched off is sent as a zero, and switching export limiting off switches both limits off -
+  that part is the same. But **the peak power reference survives it**, where WPF replaces the whole
+  `Gen24PowerLimitSettings` with a new one and takes the reference to zero with it. The reference is what the
+  inverter's display reads a limit against, not a limit itself, so switching limiting off is no reason to forget
+  the size of the system.
+- The WPF `Apply` adds `displayModeSoftLimit` to the visualization token unconditionally, which makes its delta
+  never empty and so writes the power limits on every Apply. Here it travels with the soft limit only - see the
+  delta table above - so an unchanged page writes nothing and the endpoint can answer "already held it".
+
+The time zone and the clock are behind the danger switch and are put back when it is switched off again, the same
+rule as the energy flow tab: an inverter whose clock is wrong times the charging rules of that tab wrong.
+
 ## The event log tab reads itself, when it is looked at
 
 The event log is the one tab that does not come out of the snapshot. `Gen24EventLogViewModel` fetches it through
@@ -408,14 +485,12 @@ a UI thread.
 
 ## Still open
 
-- **One tab is not ported.** Inverter settings carries its heading in the `TabControl` and says so; adding it
-  is a matter of dropping its view in.
-- **Three write endpoints are missing** for the same reason: `api/config/common`, `api/config/powerunit` and
-  `api/config/limit_settings/powerLimits`. Their token building is entangled with state of the WPF inverter
-  settings dialog - `needsConnectedInverterUpdate`, the `staticControlledDevices` and
-  `autodetectedControlledDevices` lists built from `ConnectedInverters` - so they belong with that tab rather than
-  being ported blind. Note that the WPF `Apply` declares `hasCommonUpdates` and never sets it true; check that
-  before copying the logic across.
+- **All four tabs are ported.** What is *not* here from the WPF window is the multiple inverter setup - the list
+  of connected inverters, its Add and Refresh, and the `staticControlledDevices` and
+  `autodetectedControlledDevices` those wrote. The developer removed it from the WPF view first (commit
+  `0d021a8`), so the port never had it. `Gen24ConnectedInverter`, `IGen24Service.GetConnectedDevices` and the
+  cluster mode check box that turns the feature on are all still there, so it can come back as a piece of work of
+  its own rather than being reconstructed from a deleted view.
 - **`ConverterCulture`** has no counterpart in Avalonia's `Binding`, and `ValidationBinding` of the WPF app sets
   it. It does not matter for the fields ported so far - whole numbers and an IP string - but it will for anything
   with a decimal separator.

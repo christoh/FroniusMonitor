@@ -1,0 +1,49 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
+             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="200"
+             x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.Gen24MpptView"
+             x:DataType="dialogs:Gen24MpptViewModel">
+	<!-- One string tracker. An inverter has one or two of them and they are edited identically, so this view is
+	     used once per tracker rather than written out twice - the captions come from the view model because their
+	     channel names carry the number of the tracker. -->
+	<HeaderedContentControl Classes="GroupBox" Header="{Binding Header}">
+		<StackPanel Margin="8,4">
+			<TextBlock Classes="Caption" HorizontalAlignment="Left" Text="{Binding PowerModeCaption}" />
+			<!-- Straight to the tracker: a combo box can only produce a value the property accepts, so it needs
+			     no string of its own the way the boxes below do. -->
+			<ComboBox HorizontalAlignment="Stretch" Margin="0,2,0,6"
+			          ItemsSource="{Binding PowerModes}" DisplayMemberBinding="{Binding DisplayName}"
+			          SelectedValue="{Binding Tracker.PowerMode, Mode=TwoWay}" SelectedValueBinding="{Binding Value}" />
+
+			<!-- Only a tracker that looks for its own working point has a peak manager to set. -->
+			<StackPanel IsVisible="{Binding ShowDynamicPeakManager}">
+				<TextBlock Classes="Caption" HorizontalAlignment="Left" Text="{Binding DynamicPeakManagerCaption}" />
+				<ComboBox HorizontalAlignment="Stretch" Margin="0,2,0,6"
+				          ItemsSource="{Binding DynamicPeakManagerModes}" DisplayMemberBinding="{Binding DisplayName}"
+				          SelectedValue="{Binding Tracker.DynamicPeakManager, Mode=TwoWay}" SelectedValueBinding="{Binding Value}" />
+			</StackPanel>
+
+			<StackPanel Classes="Reading">
+				<TextBlock Classes="Caption" Text="{Binding WattPeakCaption}" />
+				<TextBox Text="{Binding WattPeakText, Mode=TwoWay}" />
+				<TextBlock Classes="Unit" Text="W" />
+			</StackPanel>
+			<Slider Value="{Binding LogWattPeak, Mode=TwoWay}"
+			        Minimum="{Binding WattPeakSliderMinimum}" Maximum="{Binding WattPeakSliderMaximum}" />
+
+			<!-- And only one that does not needs a voltage to hold. -->
+			<StackPanel IsVisible="{Binding ShowFixedVoltage}">
+				<StackPanel Classes="Reading">
+					<TextBlock Classes="Caption" Text="{Binding FixedVoltageCaption}" />
+					<TextBox Text="{Binding DcFixedVoltageText, Mode=TwoWay}" />
+					<TextBlock Classes="Unit" Text="V" />
+				</StackPanel>
+				<Slider Value="{Binding DcFixedVoltage, Mode=TwoWay}"
+				        Minimum="{Binding FixedVoltageMinimum}" Maximum="{Binding FixedVoltageMaximum}" />
+			</StackPanel>
+		</StackPanel>
+	</HeaderedContentControl>
+</UserControl>

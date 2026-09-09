@@ -74,6 +74,25 @@ public interface IWebClientService : IDisposable
     /// <returns>True where something was written, false where the inverter already held these rules.</returns>
     Task<ApiResult<bool>> SetGen24TimeOfUse(string deviceId, IEnumerable<Gen24ChargingRule> rules, CancellationToken token = default);
 
+    /// <summary>
+    /// Writes the name of the system, its time zone and whether it keeps its clock in step. The whole
+    /// <see cref="Gen24InverterSettings"/> goes over and only these three are looked at: they are what lives at
+    /// <c>api/config/common</c>, and the string trackers and export limits it carries have endpoints of their own.
+    /// </summary>
+    /// <inheritdoc cref="SetGen24ModbusSettings" path="/returns"/>
+    Task<ApiResult<bool>> SetGen24CommonSettings(string deviceId, Gen24InverterSettings settings, CancellationToken token = default);
+
+    /// <summary>
+    /// Writes the settings of the string trackers - power mode, dynamic peak manager, peak power and the fixed
+    /// voltage. A tracker the inverter does not have is not invented.
+    /// </summary>
+    /// <inheritdoc cref="SetGen24ModbusSettings" path="/returns"/>
+    Task<ApiResult<bool>> SetGen24MpptSettings(string deviceId, Gen24Mppt mppt, CancellationToken token = default);
+
+    /// <summary>Writes the export limits, and the peak power the visualization refers them to.</summary>
+    /// <inheritdoc cref="SetGen24ModbusSettings" path="/returns"/>
+    Task<ApiResult<bool>> SetGen24PowerLimits(string deviceId, Gen24PowerLimitSettings powerLimits, CancellationToken token = default);
+
     #endregion
 
     #region WattPilot

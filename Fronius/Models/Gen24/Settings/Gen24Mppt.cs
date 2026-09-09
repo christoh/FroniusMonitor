@@ -55,4 +55,44 @@ public partial class Gen24Mppt : BindableBase, ICloneable
         result.Mppt2 = gen24JsonService.ReadFroniusData<Gen24Mppt2>(token?["mppt2"]);
         return result;
     }
+
+    /// <summary>
+    /// What has to go to <c>api/config/powerunit</c> to turn <paramref name="oldMppt"/> into this, and an empty
+    /// object where the two say the same thing.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The two trackers are their own types with their own channel names - <c>PV_MODE_MPP_01_U16</c> against
+    /// <c>PV_MODE_MPP_02_U16</c> - so each is asked for its own delta and the result is nested the way the
+    /// inverter wants it: <c>{ "mppt": { "mppt1": …, "mppt2": … } }</c>.
+    /// </para>
+    /// <para>
+    /// A tracker the other side does not have at all is left out rather than written whole. An inverter with one
+    /// string reports one tracker, and inventing a second from our defaults is not an improvement on saying
+    /// nothing. <see cref="StringCombination"/> is left out for the same reason: nothing edits it, so there is
+    /// never anything to say about it.
+    /// </para>
+    /// </remarks>
+    public JsonNode GetToken(Gen24Mppt? oldMppt = null)
+    {
+        var trackers = new JsonObject();
+        Add("mppt1", Mppt1, oldMppt?.Mppt1);
+        Add("mppt2", Mppt2, oldMppt?.Mppt2);
+        return trackers.Count > 0 ? new JsonObject { { "mppt", trackers } } : new JsonObject();
+
+        void Add(string name, Gen24MpptBase? wanted, Gen24MpptBase? current)
+        {
+            if (wanted is null || current is null || current.GetType() != wanted.GetType())
+            {
+                return;
+            }
+
+            var token = gen24JsonService.GetUpdateToken(wanted.GetType(), wanted, current);
+
+            if (token.HasAnyValue())
+            {
+                trackers.Add(name, token);
+            }
+        }
+    }
 }
