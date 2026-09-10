@@ -1797,4 +1797,13 @@
   <data name="Dashboard" xml:space="preserve">
     <value>Dashboard</value>
   </data>
+  <data name="SettingsNotWritten" xml:space="preserve">
+    <value>The following settings were not written to the Wattpilot:</value>
+  </data>
+  <data name="SettingsNotConfirmed" xml:space="preserve">
+    <value>The following settings were not confirmed by the Wattpilot:</value>
+  </data>
+  <data name="ConfirmReboot" xml:space="preserve">
+    <value>Reboot the Wattpilot now?</value>
+  </data>
 </root>

@@ -147,6 +147,7 @@ public partial class App : Application
             .AddSingleton<IGen24JsonService, Gen24JsonService>()
             .AddSingleton<IGen24LocalizationService, Gen24LocalizationService>()
             .AddSingleton<IUpdateService, UpdateService>()
+            .AddSingleton<IUriLauncher, UriLauncher>()
             ;
 
         var serviceProvider = ServiceCollection.BuildServiceProvider();

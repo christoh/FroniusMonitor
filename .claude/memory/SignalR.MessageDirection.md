@@ -59,6 +59,17 @@ return a value. Never reach for `Clients.All` or a group - it will silently do n
 `HomeAutomationHub.SendGen24Message` is the pattern: it used to relay to `Clients.All`, which let any client push
 arbitrary data to every other client, and now only hands the message to the server.
 
+**A hub method that changes a device needs its own role.** The ticket that opened the connection proves `User`
+(or `Administrator`) and nothing more, and every write to a device in this system asks for `Operator`. So
+`SetWattPilotSettings` and `RebootWattPilot` carry
+`[Authorize(AuthenticationSchemes = HubTicketAuthenticationService.SchemeName, Roles = nameof(Roles.Operator))]`
+- the scheme named, as in `RequireHubTicket`, so the policy does not fall back to Basic. The ticket principal
+carries the same role claims Basic authentication builds (`CreateAuthenticationTicket`), so it works; a caller
+without the role gets a `HubException`. `UnitTests/Hosted/HubWattPilotSettingsTests` proves it over a real
+connection against the **real** `HomeAutomationHub` - it needs only `IDataControlService` and an
+`IWattPilotServices`, both easily faked - and is the place to add the next one. What the method does with the
+settings is in [[WattPilot]].
+
 To fan something out *in response* to a client's message, do it from the server side - raise the state change that
 `SignalRDispatcher` already listens to, or take `IHubContext<HomeAutomationHub>` and send from there. That is a
 deliberate server decision rather than a client relay, so it is allowed; make sure the payload is the server's own

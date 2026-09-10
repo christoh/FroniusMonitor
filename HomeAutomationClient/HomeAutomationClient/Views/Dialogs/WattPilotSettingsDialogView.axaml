@@ -1,0 +1,40 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
+             xmlns:v="clr-namespace:De.Hochstaetter.HomeAutomationClient.Views.Dialogs"
+             xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="640"
+             x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.WattPilotSettingsDialogView"
+             x:DataType="dialogs:WattPilotSettingsDialogViewModel"
+             MinWidth="320" MaxWidth="1024" FontSize="12">
+	<!-- The same density as the inverter settings dialog, for the same reason: it is a form of sixty fields. -->
+	<UserControl.Styles>
+		<StyleInclude Source="avares://HomeAutomationClient/Styles/CompactForms.axaml" />
+	</UserControl.Styles>
+
+	<Grid RowDefinitions="*,Auto">
+		<v:WattPilotSettingsView Grid.Row="0" x:Name="SettingsTabs" DataContext="{Binding Settings}" />
+
+		<!-- One row for the whole dialog, as the WPF window has it: the danger switch, the toast, Undo and Apply -
+		     the charger takes its settings one key at a time, so there is no group for a tab to apply on its own -
+		     and Cancel, which belongs to the dialog. -->
+		<Grid Grid.Row="1" ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto" Margin="20,8,20,12">
+			<TextBlock Grid.Column="0" VerticalAlignment="Center" Margin="0,0,6,0" Text="{x:Static p:Resources.Danger}" />
+			<ToggleButton Grid.Column="1" Classes="OnOff" Height="16" VerticalAlignment="Center"
+			              IsChecked="{Binding Settings.EnableDanger}" />
+
+			<c:Toast Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="8,0"
+			         Text="{Binding ToastText, Mode=TwoWay}" />
+
+			<Button Grid.Column="3" MinWidth="70" Margin="6,0,0,0" HorizontalContentAlignment="Center"
+			        Content="{x:Static p:Resources.Undo}" Command="{Binding Settings.UndoCommand}" />
+			<Button Grid.Column="4" MinWidth="70" Margin="6,0,0,0" HorizontalContentAlignment="Center"
+			        Content="{x:Static p:Resources.Apply}" Command="{Binding Settings.ApplyCommand}" />
+			<Button Grid.Column="5" MinWidth="70" Margin="6,0,0,0" HorizontalContentAlignment="Center"
+			        Content="{x:Static p:Resources.Cancel}" Command="{Binding CloseDialogCommand}" />
+		</Grid>
+	</Grid>
+</UserControl>

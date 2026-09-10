@@ -4237,6 +4237,33 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The following settings were not written to the Wattpilot:.
+        /// </summary>
+        public static string SettingsNotWritten {
+            get {
+                return ResourceManager.GetString("SettingsNotWritten", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The following settings were not confirmed by the Wattpilot:.
+        /// </summary>
+        public static string SettingsNotConfirmed {
+            get {
+                return ResourceManager.GetString("SettingsNotConfirmed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reboot the Wattpilot now?.
+        /// </summary>
+        public static string ConfirmReboot {
+            get {
+                return ResourceManager.GetString("ConfirmReboot", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Settings.
         /// </summary>
         public static string Settings {

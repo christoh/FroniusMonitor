@@ -13,6 +13,13 @@ paths:
   - HomeAutomationServer/Controllers/WattPilotController.cs
   - HomeAutomationServer/Services/SignalRDispatcher.cs
   - HomeAutomationClient/HomeAutomationClient/Services/UpdateService.cs
+  - HomeAutomationClient/HomeAutomationClient/Services/UriLauncher.cs
+  - HomeAutomationClient/HomeAutomationClient/Contracts/IUpdateService.cs
+  - HomeAutomationClient/HomeAutomationClient/Contracts/IUriLauncher.cs
+  - HomeAutomationClient/HomeAutomationClient/ViewModels/Dialogs/WattPilotSettingsDialogViewModel.cs
+  - HomeAutomationClient/HomeAutomationClient/ViewModels/Dialogs/WattPilotSettingsViewModel.cs
+  - HomeAutomationServer/Hubs/HomeAutomationHub.cs
+  - HomeAutomationServerTests/UnitTests/Hosted/HubWattPilotSettingsTests.cs
   - HomeAutomationClient/HomeAutomationClient/Controls/WattPilotControl.axaml
   - HomeAutomationClient/HomeAutomationClient/Controls/WattPilotControl.axaml.cs
   - FroniusMonitor/Controls/WattPilotControl.xaml
@@ -132,7 +139,37 @@ list's lock, because the reader may be setting an event the waiter is about to d
 
 `OpenChargingLog` / `OpenConfigPdf` open `dll` (the charger's download link, `export` swapped for `documentation`
 plus the UI language for the PDF) with `Process.Start(UseShellExecute)`. That is a desktop thing and only the
-WPF app calls it; the Avalonia client has not ported the menu (see its lifecycle document).
+WPF app calls it; the Avalonia client builds the same two links in `WattPilotSettingsViewModel` and opens them
+through `IUriLauncher` - Avalonia's `ILauncher` behind the `TopLevel` - which is what works in the browser and on
+the phones.
+
+## Writing settings from the Avalonia client goes over the hub
+
+Not over a controller, unlike every Gen24 setting, because of the shape of the write described above: a
+conversation on the socket the server holds, each `setValue` answered later, the resulting status reaching every
+client as a `WattPilotUpdate` delta anyway. What the push channel does not carry is the answer to the one who
+asked - which writes failed, which went unconfirmed - and that is what the hub method returns.
+
+- **`HomeAutomationHub.SetWattPilotSettings(id, wanted, loaded)`** finds the service through `IWattPilotServices`
+  (`WattPilotDataCollector` implements it: the service whose `WattPilot` has that `IHaveUniqueId.Id`), runs
+  `BeginSendValues` → `Send(wanted, loaded)` → `WaitSendValues`, and answers a `WattPilotWriteResult`: `Errors`
+  (could not be sent) and `Unconfirmed` (the charger never acknowledged, from `UnsuccessfulWrites`). An unknown id
+  is a `HubException` with `Resources.NoWattPilotConnection` - the one exception type whose message reaches the
+  caller. `RebootWattPilot(id)` beside it.
+- **The difference is taken against `loaded`, the state the client's dialog started from**, not against the live
+  device: `WattPilot.ChangedSettings(other)` over `WattPilot.WritableSettings`, which `Send` itself now uses. A
+  value the charger changed on its own while the dialog was open - a load balancing current the master adjusts,
+  `dyn` - is not something the user asked to change and must not be written back to what it was. The WPF dialog
+  has always compared against its own clone for the same reason; sending both copies is what lets the server do
+  the comparing.
+- **Role `Operator` on the method**, as on every Gen24 write endpoint; the hub gate only proves `User`. See
+  [[SignalR.MessageDirection]] for the attribute and the test that pins it.
+- **Client side:** `IUpdateService.SetWattPilotSettings` / `RebootWattPilot` are `HubConnection.InvokeAsync` on
+  the connection `UpdateService` already holds - nothing new is connected, and nothing blocks: the browser head
+  has no synchronization objects to wait on, only `await`.
+- **The dialog** (`WattPilotSettingsDialogViewModel`, `WattPilotSettingsViewModel`, `NumberField`,
+  `NumberSlider`) is described in [[SettingsDialogs.Lifecycle]]: one Apply for six tabs, a clone of the live
+  charger the client already holds, every number a box-and-slider `NumberField` with its rule as an instance.
 
 ## The wire format is stated by `WattPilotAttribute`, and nowhere else
 
@@ -305,6 +342,6 @@ the URL.
 ## Known gaps and bugs, as of 2026-09-10
 
 - The firmware-update check is switched off (`&& false`), see above.
-- The Avalonia client has no Wattpilot settings dialog and no reboot / charging log / config PDF; `DevicesWithSettings`
-  lists the charger anyway.
+- The scanned WiFi tab of the Avalonia dialog is a plain grid: no signal strength icon, no row tooltip.
+- A `HubException` from the server carries a message in the server's language, like a `ProblemDetails` does.
 - `WattPilotDisplayMode` and the cycling logic exist twice, once per app.

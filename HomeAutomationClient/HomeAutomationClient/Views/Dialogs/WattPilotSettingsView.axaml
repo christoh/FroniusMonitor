@@ -1,0 +1,255 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
+             xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="600"
+             x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.WattPilotSettingsView"
+             x:DataType="dialogs:WattPilotSettingsViewModel">
+	<UserControl.Styles>
+		<Style Selector="TextBlock.Caption">
+			<Setter Property="VerticalAlignment" Value="Center" />
+			<Setter Property="Margin" Value="0,2,6,2" />
+		</Style>
+		<Style Selector="HeaderedContentControl.GroupBox">
+			<Setter Property="Margin" Value="0,0,0,6" />
+			<!-- These group boxes are in a dialog, so the caption has to cover the line in the dialog's colour. -->
+			<Setter Property="Background" Value="{DynamicResource DialogBackground}" />
+		</Style>
+		<Style Selector="Grid.Form > ComboBox">
+			<Setter Property="MinWidth" Value="250" />
+			<Setter Property="Margin" Value="0,2" />
+			<Setter Property="HorizontalAlignment" Value="Left" />
+		</Style>
+		<Style Selector="Grid.Form > TextBox">
+			<Setter Property="MinWidth" Value="250" />
+			<Setter Property="Margin" Value="0,2" />
+			<Setter Property="HorizontalAlignment" Value="Left" />
+		</Style>
+		<Style Selector="CheckBox.Wrap">
+			<Setter Property="Margin" Value="0,2,0,0" />
+		</Style>
+		<!-- What the danger switch guards. A class rather than an IsEnabled on a panel, because most of them share a
+		     panel with something that is always editable. -->
+		<Style Selector=":is(Control).Danger">
+			<Setter Property="IsEnabled" Value="{Binding EnableDanger}" />
+		</Style>
+	</UserControl.Styles>
+
+	<TabControl MinHeight="360">
+		<TabItem Header="{x:Static p:Resources.BaseSettings}">
+			<ScrollViewer>
+				<StackPanel Margin="8">
+					<Grid Classes="Form" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+						<TextBlock Grid.Row="0" Grid.Column="0" Classes="Caption"><Run Text="{x:Static p:Resources.WattPilotName}" /><Run Text=":" /></TextBlock>
+						<!-- Straight to the device: a name is text in its own right, nothing for a binding to refuse. -->
+						<TextBox Grid.Row="0" Grid.Column="1" MaxLength="32" Text="{Binding WattPilot.DeviceName, Mode=TwoWay}" />
+
+						<TextBlock Grid.Row="1" Grid.Column="0" Classes="Caption"><Run Text="{x:Static p:Resources.WifiSsid}" /><Run Text=":" /></TextBlock>
+						<TextBox Grid.Row="1" Grid.Column="1" MaxLength="32" Text="{Binding WattPilot.WattPilotSsid, Mode=TwoWay}" />
+
+						<TextBlock Grid.Row="2" Grid.Column="0" Classes="Caption"><Run Text="{x:Static p:Resources.WattPilotWifiPassword}" /><Run Text=":" /></TextBlock>
+						<TextBox Grid.Row="2" Grid.Column="1" MaxLength="32" PasswordChar="●" Text="{Binding WifiPassword, Mode=TwoWay}" />
+
+						<TextBlock Grid.Row="3" Grid.Column="0" Classes="Caption"><Run Text="{x:Static p:Resources.CableLockBehavior}" /><Run Text=":" /></TextBlock>
+						<ComboBox Grid.Row="3" Grid.Column="1" ItemsSource="{Binding CableLockBehaviors}" DisplayMemberBinding="{Binding DisplayName}"
+						          SelectedValueBinding="{Binding Value}" SelectedValue="{Binding WattPilot.CableLockBehavior, Mode=TwoWay}" />
+
+						<TextBlock Grid.Row="4" Grid.Column="0" Classes="Caption"><Run Text="{x:Static p:Resources.ChargingLogic}" /><Run Text=":" /></TextBlock>
+						<ComboBox Grid.Row="4" Grid.Column="1" ItemsSource="{Binding ChargingLogics}" DisplayMemberBinding="{Binding DisplayName}"
+						          SelectedValueBinding="{Binding Value}" SelectedValue="{Binding WattPilot.ChargingLogic, Mode=TwoWay}" />
+
+						<TextBlock Grid.Row="5" Grid.Column="0" Classes="Caption"><Run Text="{x:Static p:Resources.ForcedCharge}" /><Run Text=":" /></TextBlock>
+						<ComboBox Grid.Row="5" Grid.Column="1" ItemsSource="{Binding ForcedCharges}" DisplayMemberBinding="{Binding DisplayName}"
+						          SelectedValueBinding="{Binding Value}" SelectedValue="{Binding WattPilot.ForcedCharge, Mode=TwoWay}" />
+
+						<TextBlock Grid.Row="6" Grid.Column="0" Classes="Caption Danger"><Run Text="{x:Static p:Resources.ApiKey}" /><Run Text=":" /></TextBlock>
+						<TextBox Grid.Row="6" Grid.Column="1" Classes="Danger" PasswordChar="●" Text="{Binding WattPilot.CloudAccessKey, Mode=TwoWay}" />
+					</Grid>
+
+					<Grid ColumnDefinitions="*,*" Margin="0,8,0,0">
+						<StackPanel Grid.Column="0" Margin="0,0,4,0">
+							<CheckBox Classes="Wrap Danger" Content="{x:Static p:Resources.IsWifiClientEnabled}" IsChecked="{Binding WattPilot.IsWifiClientEnabled, Mode=TwoWay}" />
+							<CheckBox Classes="Wrap" Content="{x:Static p:Resources.UnlockCableOnPowerFailure}" IsChecked="{Binding WattPilot.UnlockCableOnPowerFailure, Mode=TwoWay}" />
+							<CheckBox Classes="Wrap Danger" Content="{x:Static p:Resources.EnableLoadBalancing}" IsChecked="{Binding WattPilot.LoadBalancingEnabled, Mode=TwoWay}" />
+							<CheckBox Classes="Wrap" Content="{x:Static p:Resources.RequireRfidAuth}" IsChecked="{Binding RequireRfidAuth, Mode=TwoWay}" />
+							<CheckBox Classes="Wrap" Content="{x:Static p:Resources.AuthCurrentUser}" IsChecked="{Binding IsUserAuthenticated, Mode=TwoWay}" />
+							<CheckBox Classes="Wrap" Content="{x:Static p:Resources.EnableApiLink}" IsChecked="{Binding WattPilot.CloudAccessEnabled, Mode=TwoWay}" />
+							<!-- The link the WPF check box carried inside its caption; a button of its own here, because a
+							     caption is not a place to click in Avalonia. -->
+							<Button Margin="24,2,0,2" Padding="6,2" Content="{Binding ApiLink}" Command="{Binding NavigateToApiCommand}" />
+							<CheckBox Classes="Wrap Danger" Content="{x:Static p:Resources.CloudWebSocketEnabled}" IsChecked="{Binding WattPilot.CloudWebSocketEnabled, Mode=TwoWay}" />
+						</StackPanel>
+
+						<StackPanel Grid.Column="1" Margin="4,0,0,0">
+							<CheckBox Classes="Wrap" Content="{x:Static p:Resources.SendRfidSerialToCloud}" ToolTip.Tip="{x:Static p:Resources.SendRfidSerialToCloud_ToolTip}"
+							          IsChecked="{Binding WattPilot.SendRfidSerialToCloud, Mode=TwoWay}" />
+							<CheckBox Classes="Wrap Danger" Content="{x:Static p:Resources.DisableProtectiveEarth}" IsChecked="{Binding WattPilot.DisableProtectiveEarth, Mode=TwoWay}" />
+							<CheckBox Classes="Wrap" Content="{x:Static p:Resources.ButtonEnableCharging}" IsChecked="{Binding WattPilot.ButtonEnableCurrentSelection, Mode=TwoWay}" />
+							<CheckBox Classes="Wrap" Content="{x:Static p:Resources.ButtonEnableModeSwitch}" IsChecked="{Binding WattPilot.ButtonEnableModeSwitch, Mode=TwoWay}" />
+							<CheckBox Classes="Wrap" Content="{x:Static p:Resources.EnableBatteryBoost}" IsChecked="{Binding WattPilot.EnableBatteryBoost, Mode=TwoWay}" />
+							<CheckBox Classes="Wrap" Content="{x:Static p:Resources.BoostUntilCarDisconnects}" IsVisible="{Binding ShowBoost}"
+							          IsChecked="{Binding BoostUntilCarDisconnects, Mode=TwoWay}" />
+						</StackPanel>
+					</Grid>
+
+					<c:NumberSlider Caption="{x:Static p:Resources.MaximumChargingCurrent}" Unit="A" Field="{Binding MaximumChargingCurrent}" />
+					<c:NumberSlider Caption="{x:Static p:Resources.MinimumSocInBoost}" Unit="%" Field="{Binding MinimumSocInBoost}" IsVisible="{Binding ShowBoost}" />
+
+					<!-- What the WPF main window offers in its menu: the charger's own charging log and configuration
+					     document, and a reboot. Links open wherever the app runs - the browser included. -->
+					<StackPanel Orientation="Horizontal" Margin="0,16,0,0" HorizontalAlignment="Center" Spacing="8">
+						<Button Content="{x:Static p:Resources.OpenChargingLog}" Command="{Binding OpenChargingLogCommand}" IsEnabled="{Binding HasDownloadLink}" />
+						<Button Content="{x:Static p:Resources.OpenConfigPdf}" Command="{Binding OpenConfigPdfCommand}" IsEnabled="{Binding HasDownloadLink}" />
+						<Button Classes="Danger" Content="{x:Static p:Resources.Reboot}" Command="{Binding RebootCommand}" />
+					</StackPanel>
+				</StackPanel>
+			</ScrollViewer>
+		</TabItem>
+
+		<TabItem Header="{x:Static p:Resources.EcoSettings}">
+			<ScrollViewer>
+				<StackPanel Margin="8">
+					<CheckBox Classes="Wrap" Content="{x:Static p:Resources.PvSurplusEnabled}" IsChecked="{Binding WattPilot.PvSurplusEnabled, Mode=TwoWay}" />
+					<CheckBox Classes="Wrap" Content="{x:Static p:Resources.AwattarEnabled}" IsChecked="{Binding WattPilot.AwattarEnabled, Mode=TwoWay}" />
+					<CheckBox Classes="Wrap" Content="{x:Static p:Resources.NoFeedIn}" ToolTip.Tip="{x:Static p:Resources.NoFeedIn_ToolTip}" IsVisible="{Binding ShowPvSurplus}"
+					          IsChecked="{Binding WattPilot.NoFeedIn, Mode=TwoWay}" />
+					<CheckBox Classes="Wrap" Content="{x:Static p:Resources.AllowChargingFromBattery}" IsVisible="{Binding ShowPvSurplus}"
+					          IsChecked="{Binding WattPilot.AllowChargingFromBattery, Mode=TwoWay}" />
+
+					<StackPanel Orientation="Horizontal" Margin="0,4,0,0" IsVisible="{Binding ShowBatteryOptions}">
+						<CheckBox Classes="Wrap" Margin="0,0,8,0" Content="{x:Static p:Resources.FromBatteryOnlyFrom}" IsChecked="{Binding WattPilot.RestrictChargingFromBattery, Mode=TwoWay}" />
+						<TextBox Width="50" TextAlignment="Center" Text="{Binding BatteryFromText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+						<TextBlock Classes="Caption" Margin="6,0" Text="{x:Static p:Resources.To}" />
+						<TextBox Width="50" TextAlignment="Center" Text="{Binding BatteryToText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+					</StackPanel>
+
+					<Grid Classes="Form" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" Margin="0,8,0,0">
+						<TextBlock Grid.Row="0" Grid.Column="0" Classes="Caption"><Run Text="{x:Static p:Resources.AwattarCountry}" /><Run Text=":" /></TextBlock>
+						<ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding EnergyPriceCountries}" DisplayMemberBinding="{Binding DisplayName}"
+						          SelectedValueBinding="{Binding Value}" SelectedValue="{Binding WattPilot.EnergyPriceCountry, Mode=TwoWay}" />
+
+						<TextBlock Grid.Row="1" Grid.Column="0" Classes="Caption" IsVisible="{Binding ShowPvSurplus}"><Run Text="{x:Static p:Resources.EcoRoundingMode}" /><Run Text=":" /></TextBlock>
+						<ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding EcoRoundingModes}" DisplayMemberBinding="{Binding DisplayName}" IsVisible="{Binding ShowPvSurplus}"
+						          SelectedValueBinding="{Binding Value}" SelectedValue="{Binding WattPilot.RoundingMode, Mode=TwoWay}" />
+					</Grid>
+
+					<c:NumberSlider Caption="{x:Static p:Resources.MaxEnergyPrice}" Unit="ct/kWh" BoxWidth="60" Field="{Binding MaxEnergyPrice}" IsVisible="{Binding ShowAwattar}" />
+					<c:NumberSlider Caption="{x:Static p:Resources.PvSurplusBatteryLevel}" Unit="%" Field="{Binding PvSurplusBatteryLevelStartCharge}" IsVisible="{Binding ShowPvSurplus}" />
+					<c:NumberSlider Caption="{x:Static p:Resources.PvSurplusBatteryLevelStopCharge}" Unit="%" Field="{Binding PvSurplusBatteryLevelStopCharge}" IsVisible="{Binding ShowBatteryOptions}" />
+					<c:NumberSlider Caption="{x:Static p:Resources.OhmPilotTemperatureLimit}" Unit="°C" Field="{Binding OhmPilotTemperatureLimit}" IsVisible="{Binding ShowPvSurplus}" />
+					<c:NumberSlider Caption="{x:Static p:Resources.PvSurplusPowerThreshold}" Unit="W" BoxWidth="60" Field="{Binding PvSurplusPowerThreshold}" IsVisible="{Binding ShowPvSurplus}" />
+
+					<StackPanel Margin="0,16,0,0">
+						<Grid Classes="Form" ColumnDefinitions="Auto,*">
+							<TextBlock Grid.Column="0" Classes="Caption"><Run Text="{x:Static p:Resources.NextTripTime}" /><Run Text=":" /></TextBlock>
+							<TextBox Grid.Column="1" MinWidth="0" Width="60" TextAlignment="Center" Text="{Binding NextTripTimeText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+						</Grid>
+						<CheckBox Classes="Wrap" Content="{x:Static p:Resources.NextTripRemainInEcoMode}" IsChecked="{Binding WattPilot.NextTripRemainInEcoMode, Mode=TwoWay}" />
+						<c:NumberSlider Caption="{x:Static p:Resources.NextTripEnergyToCharge}" Unit="kWh" BoxWidth="60" Field="{Binding NextTripEnergyToCharge}" IsVisible="{Binding ShowPvSurplus}" />
+					</StackPanel>
+				</StackPanel>
+			</ScrollViewer>
+		</TabItem>
+
+		<TabItem Header="{x:Static p:Resources.LoadBalancing}" IsVisible="{Binding ShowLoadBalancing}">
+			<ScrollViewer>
+				<StackPanel Margin="8">
+					<Grid Classes="Form" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+						<TextBlock Grid.Row="0" Grid.Column="0" Classes="Caption"><Run Text="{x:Static p:Resources.Priority}" /><Run Text=":" /></TextBlock>
+						<ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding LoadBalancingPriorities}" DisplayMemberBinding="{Binding DisplayName}"
+						          SelectedValueBinding="{Binding Value}" SelectedValue="{Binding WattPilot.LoadBalancingPriority, Mode=TwoWay}" />
+
+						<TextBlock Grid.Row="1" Grid.Column="0" Classes="Caption Danger"><Run Text="{x:Static p:Resources.PhaseMap}" /><Run Text=":" /></TextBlock>
+						<ComboBox Grid.Row="1" Grid.Column="1" Classes="Danger" ItemsSource="{Binding PhaseMaps}" SelectedItem="{Binding WattPilot.PhaseMap, Mode=TwoWay}" />
+					</Grid>
+
+					<c:NumberSlider Classes="Danger" Caption="{x:Static p:Resources.LoadBalancingSharedMaxCurrent}" Unit="A" Field="{Binding DynamicMaximumCurrent}" />
+					<c:NumberSlider Classes="Danger" Caption="{x:Static p:Resources.MaximumCurrentDnoLine}" Unit="A" Field="{Binding MaximumCurrentDnoLine}" />
+					<c:NumberSlider Classes="Danger" Caption="{x:Static p:Resources.MaximumFallbackCurrent}" Unit="A" Field="{Binding LoadBalancingFallbackCurrent}" />
+				</StackPanel>
+			</ScrollViewer>
+		</TabItem>
+
+		<TabItem Header="{x:Static p:Resources.CarSettings}">
+			<ScrollViewer>
+				<StackPanel Margin="8">
+					<CheckBox Classes="Wrap" Content="{x:Static p:Resources.RequiresChargingInterval}" IsChecked="{Binding RequiresChargingInterval, Mode=TwoWay}" />
+					<CheckBox Classes="Wrap" Content="{x:Static p:Resources.AllowChargingPause}" IsChecked="{Binding WattPilot.AllowChargingPause, Mode=TwoWay}" />
+					<CheckBox Classes="Wrap" Content="{x:Static p:Resources.SimulateUnplugging}" IsVisible="{Binding ShowChargingPause}"
+					          IsChecked="{Binding WattPilot.SimulateUnplugging, Mode=TwoWay}" />
+
+					<Grid Classes="Form" ColumnDefinitions="Auto,*" Margin="0,8,0,0" IsVisible="{Binding ShowChargingPause}">
+						<TextBlock Grid.Column="0" Classes="Caption"><Run Text="{x:Static p:Resources.PhaseSwitchMode}" /><Run Text=":" /></TextBlock>
+						<ComboBox Grid.Column="1" ItemsSource="{Binding PhaseSwitchModes}" DisplayMemberBinding="{Binding DisplayName}"
+						          SelectedValueBinding="{Binding Value}" SelectedValue="{Binding WattPilot.PhaseSwitchMode, Mode=TwoWay}" />
+					</Grid>
+
+					<c:NumberSlider Caption="{x:Static p:Resources.MinimumChargingCurrent}" Unit="A" Field="{Binding MinimumChargingCurrent}"
+					                ToolTip.Tip="{x:Static p:Resources.MinimumChargingCurrent_ToolTip}" />
+					<c:NumberSlider Caption="{x:Static p:Resources.MinimumChargingInterval}" Unit="{x:Static p:Resources.Minutes}" BoxWidth="60" Field="{Binding MinimumChargingInterval}" IsVisible="{Binding ShowChargingInterval}" />
+					<c:NumberSlider Caption="{x:Static p:Resources.MinimumPauseDuration}" Unit="{x:Static p:Resources.Minutes}" BoxWidth="60" Field="{Binding MinimumPauseDuration}" IsVisible="{Binding ShowChargingPause}" />
+					<c:NumberSlider Caption="{x:Static p:Resources.MinimumChargingTime}" Unit="{x:Static p:Resources.Minutes}" BoxWidth="60" Field="{Binding MinimumChargingTime}" IsVisible="{Binding ShowChargingPause}" />
+					<c:NumberSlider Caption="{x:Static p:Resources.PhaseSwitchPower}" Unit="W" BoxWidth="60" Field="{Binding PhaseSwitchPower}" IsVisible="{Binding ShowPhaseSwitch}" />
+					<c:NumberSlider Caption="{x:Static p:Resources.PhaseSwitchTriggerTime}" Unit="{x:Static p:Resources.Minutes}" BoxWidth="60" Field="{Binding PhaseSwitchTriggerTime}" IsVisible="{Binding ShowPhaseSwitch}" />
+					<c:NumberSlider Caption="{x:Static p:Resources.MinimumTimeBetweenPhaseSwitches}" Unit="{x:Static p:Resources.Minutes}" BoxWidth="60" Field="{Binding MinimumTimeBetweenPhaseSwitches}" IsVisible="{Binding ShowPhaseSwitch}" />
+				</StackPanel>
+			</ScrollViewer>
+		</TabItem>
+
+		<TabItem Header="{x:Static p:Resources.DnoRequirements}">
+			<ScrollViewer>
+				<!-- Three columns, as the WPF window has them: the groups are short and the dialog is wide. -->
+				<Grid ColumnDefinitions="*,*,*" Margin="8">
+					<HeaderedContentControl Grid.Column="0" Classes="GroupBox" Margin="0,0,4,0" Header="{x:Static p:Resources.BaseSettings}">
+						<StackPanel Margin="8,4">
+							<CheckBox Classes="Wrap Danger" Content="{x:Static p:Resources.EnableOutOfBalanceControl}" IsChecked="{Binding WattPilot.EnableOutOfBalanceControl, Mode=TwoWay}" />
+							<CheckBox Classes="Wrap Danger" Content="{x:Static p:Resources.EnableGridMonitoringOnStartUp}" IsChecked="{Binding WattPilot.EnableGridMonitoringOnStartUp, Mode=TwoWay}" />
+
+							<c:NumberSlider Classes="Danger" Caption="{x:Static p:Resources.MaximumOutOfBalanceCurrent}" Unit="A" Field="{Binding MaximumOutOfBalanceCurrent}" IsVisible="{Binding ShowOutOfBalance}" />
+							<c:NumberSlider Classes="Danger" Caption="{x:Static p:Resources.AbsoluteMaximumChargingCurrent}" Unit="A" Field="{Binding AbsoluteMaximumChargingCurrent}" />
+							<c:NumberSlider Classes="Danger" Caption="{x:Static p:Resources.MaximumChargingCurrentPhase1}" Unit="A" Field="{Binding MaximumChargingCurrentPhase1}" />
+						</StackPanel>
+					</HeaderedContentControl>
+
+					<HeaderedContentControl Grid.Column="1" Classes="GroupBox" Margin="4,0" Header="{x:Static p:Resources.Delays}">
+						<StackPanel Margin="8,4">
+							<c:NumberSlider Classes="Danger" Caption="{x:Static p:Resources.RandomDelayPowerFailure}" Unit="s" BoxWidth="60" Field="{Binding RandomDelayPowerFailure}" />
+							<c:NumberSlider Classes="Danger" Caption="{x:Static p:Resources.RandomDelayAwattarStart}" Unit="s" BoxWidth="60" Field="{Binding RandomDelayAwattarStart}" />
+							<c:NumberSlider Classes="Danger" Caption="{x:Static p:Resources.RandomDelayAwattarStop}" Unit="s" BoxWidth="60" Field="{Binding RandomDelayAwattarStop}" />
+							<c:NumberSlider Classes="Danger" Caption="{x:Static p:Resources.RandomDelayTimerStart}" Unit="s" BoxWidth="60" Field="{Binding RandomDelayTimerStart}" />
+							<c:NumberSlider Classes="Danger" Caption="{x:Static p:Resources.RandomDelayTimerStop}" Unit="s" BoxWidth="60" Field="{Binding RandomDelayTimerStop}" />
+							<c:NumberSlider Classes="Danger" Caption="{x:Static p:Resources.RandomDelayCarConnect}" Unit="s" BoxWidth="60" Field="{Binding RandomDelayCarConnect}" />
+						</StackPanel>
+					</HeaderedContentControl>
+
+					<HeaderedContentControl Grid.Column="2" Classes="GroupBox" Margin="4,0,0,0" Header="{x:Static p:Resources.GridMonitoring}" IsVisible="{Binding ShowGridMonitoring}">
+						<StackPanel Margin="8,4">
+							<c:NumberSlider Classes="Danger" Caption="{x:Static p:Resources.GridMonitoringTimeOnStartUp}" Unit="s" BoxWidth="60" Field="{Binding GridMonitoringTimeOnStartUp}" />
+							<c:NumberSlider Classes="Danger" Caption="{x:Static p:Resources.StartUpMonitoringMinimumVoltage}" Unit="V" BoxWidth="60" Field="{Binding StartUpMonitoringMinimumVoltage}" />
+							<c:NumberSlider Classes="Danger" Caption="{x:Static p:Resources.StartUpMonitoringMaximumVoltage}" Unit="V" BoxWidth="60" Field="{Binding StartUpMonitoringMaximumVoltage}" />
+							<c:NumberSlider Classes="Danger" Caption="{x:Static p:Resources.StartUpMonitoringMinimumFrequency}" Unit="Hz" BoxWidth="60" Field="{Binding StartUpMonitoringMinimumFrequency}" />
+							<c:NumberSlider Classes="Danger" Caption="{x:Static p:Resources.StartUpMonitoringMaximumFrequency}" Unit="Hz" BoxWidth="60" Field="{Binding StartUpMonitoringMaximumFrequency}" />
+							<c:NumberSlider Classes="Danger" Caption="{x:Static p:Resources.StartUpRampUpRate}" Unit="%/s" BoxWidth="60" Field="{Binding StartUpRampUpRate}" />
+						</StackPanel>
+					</HeaderedContentControl>
+				</Grid>
+			</ScrollViewer>
+		</TabItem>
+
+		<TabItem Header="{x:Static p:Resources.ScannedWifis}">
+			<!-- No ScrollViewer around a DataGrid: it scrolls itself, and wrapped in one it lays out every row. -->
+			<DataGrid Margin="8" IsReadOnly="True" AutoGenerateColumns="False" ColumnWidth="Auto" GridLinesVisibility="None"
+			          HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" ItemsSource="{Binding WattPilot.ScannedWifis}">
+				<DataGrid.Columns>
+					<DataGridTextColumn Header="{x:Static p:Resources.Signal}" Binding="{Binding WifiSignal}" />
+					<DataGridTextColumn Header="{x:Static p:Resources.WifiSsid}" Binding="{Binding Ssid}" />
+					<DataGridTextColumn Header="{x:Static p:Resources.Encryption}" Binding="{Binding Encryption}" />
+					<DataGridTextColumn Header="{x:Static p:Resources.Channel}" Binding="{Binding Channel}" />
+				</DataGrid.Columns>
+			</DataGrid>
+		</TabItem>
+	</TabControl>
+</UserControl>

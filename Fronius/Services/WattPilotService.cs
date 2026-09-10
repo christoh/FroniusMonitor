@@ -181,31 +181,21 @@ public partial class WattPilotService : BindableBase, IWattPilotService
         }
     }
 
+    /// <summary>
+    ///     Writes what differs between <paramref name="localWattPilot" /> and <paramref name="oldWattPilot" /> - see
+    ///     <see cref="WattPilot.ChangedSettings" /> - one setValue per property, or every writable property where
+    ///     there is nothing to compare against. A nested object such as the load balancing currents is one property
+    ///     and goes as one message, all of its values at once.
+    /// </summary>
     public async ValueTask<List<string>> Send(WattPilot? localWattPilot = null, WattPilot? oldWattPilot = null)
     {
         localWattPilot ??= WattPilot ?? throw new WebException("Not connected to Wattpilot", WebExceptionStatus.ConnectionClosed);
         var sentSomething = false;
         var errors = new List<string>();
+        var properties = oldWattPilot is null ? WattPilot.WritableSettings : localWattPilot.ChangedSettings(oldWattPilot);
 
-        foreach (var propertyInfo in typeof(WattPilot).GetProperties().Where(p => p.GetCustomAttributes<WattPilotAttribute>().Count() == 1))
+        foreach (var propertyInfo in properties)
         {
-            var oldValue = oldWattPilot == null ? null : propertyInfo.GetValue(oldWattPilot);
-            var newValue = propertyInfo.GetValue(localWattPilot);
-
-            if
-            (
-                oldWattPilot != null &&
-                (
-                    ReferenceEquals(oldValue, newValue) ||
-                    oldValue is not null && oldValue.Equals(newValue) ||
-                    newValue is not null && newValue.Equals(oldValue) ||
-                    propertyInfo.GetCustomAttribute<WattPilotAttribute>()!.IsReadOnly
-                )
-            )
-            {
-                continue;
-            }
-
             try
             {
                 sentSomething = true;

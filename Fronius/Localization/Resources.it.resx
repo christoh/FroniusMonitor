@@ -1701,4 +1701,13 @@
   <data name="SavingSettings" xml:space="preserve">
     <value>Salvataggio delle impostazioni {0} in corso</value>
   </data>
+  <data name="SettingsNotWritten" xml:space="preserve">
+    <value>Le seguenti impostazioni non sono state scritte sul Wattpilot:</value>
+  </data>
+  <data name="SettingsNotConfirmed" xml:space="preserve">
+    <value>Le seguenti impostazioni non sono state confermate dal Wattpilot:</value>
+  </data>
+  <data name="ConfirmReboot" xml:space="preserve">
+    <value>Riavviare il Wattpilot adesso?</value>
+  </data>
 </root>

@@ -4,7 +4,7 @@ public sealed class WattPilotDataCollector(
     ILogger<WattPilotDataCollector> logger,
     IOptionsMonitor<WattPilotParameters> options,
     IDataControlService dataControlService
-) : IHomeAutomationRunner, IAsyncDisposable
+) : IHomeAutomationRunner, IWattPilotServices, IAsyncDisposable
 {
     private record ServiceState(WebConnection Connection)
     {
@@ -43,6 +43,13 @@ public sealed class WattPilotDataCollector(
             await StartServiceAsync(service).ConfigureAwait(false);
         }
     }
+
+    /// <summary>
+    ///     The service whose charger is published under <paramref name="deviceId" /> - the id a client knows it by,
+    ///     which is the <see cref="IHaveUniqueId.Id" /> of the <see cref="WattPilot" /> itself.
+    /// </summary>
+    public IWattPilotService? Find(string deviceId) =>
+        services.Keys.FirstOrDefault(service => service.WattPilot is IHaveUniqueId wattPilot && wattPilot.Id == deviceId);
 
     public async Task StopAsync(CancellationToken token = default)
     {

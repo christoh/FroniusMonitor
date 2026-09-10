@@ -1657,4 +1657,13 @@
   <data name="SavingSettings" xml:space="preserve">
     <value>Enregistrement des paramètres {0} en cours</value>
   </data>
+  <data name="SettingsNotWritten" xml:space="preserve">
+    <value>Les paramètres suivants n'ont pas été écrits sur le Wattpilot :</value>
+  </data>
+  <data name="SettingsNotConfirmed" xml:space="preserve">
+    <value>Les paramètres suivants n'ont pas été confirmés par le Wattpilot :</value>
+  </data>
+  <data name="ConfirmReboot" xml:space="preserve">
+    <value>Redémarrer le Wattpilot maintenant ?</value>
+  </data>
 </root>

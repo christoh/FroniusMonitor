@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using De.Hochstaetter.Fronius.Models;
+using De.Hochstaetter.Fronius.Models.Charging;
 
 namespace De.Hochstaetter.HomeAutomationClient.Contracts;
 
@@ -34,4 +35,14 @@ public interface IUpdateService : IDisposable, IAsyncDisposable
     public bool ShowPowerConsumers { get; }
 
     public Task StartAsync();
+
+    /// <summary>
+    /// Writes a Wattpilot's settings through the server: whatever differs between <paramref name="wanted"/> and
+    /// <paramref name="loaded"/> goes to the charger, and the answer says which writes failed or went unconfirmed.
+    /// Over the hub, because a Wattpilot write is a conversation on the connection the server holds to it - see
+    /// <c>WattPilot.md</c>. Needs the Operator role.
+    /// </summary>
+    Task<WattPilotWriteResult> SetWattPilotSettings(string deviceId, WattPilot wanted, WattPilot loaded);
+
+    Task RebootWattPilot(string deviceId);
 }

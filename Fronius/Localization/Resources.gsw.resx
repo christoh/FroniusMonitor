@@ -1695,4 +1695,13 @@
   <data name="SavingSettings" xml:space="preserve">
     <value>{0}-Iistellige speichere</value>
   </data>
+  <data name="SettingsNotWritten" xml:space="preserve">
+    <value>Die folgende Iistellige sind nöd a de Wattpilot gschickt worde:</value>
+  </data>
+  <data name="SettingsNotConfirmed" xml:space="preserve">
+    <value>Die folgende Iistellige hät de Wattpilot nöd bestätigt:</value>
+  </data>
+  <data name="ConfirmReboot" xml:space="preserve">
+    <value>De Wattpilot jetzt neu starte?</value>
+  </data>
 </root>

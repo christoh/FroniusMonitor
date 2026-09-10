@@ -121,6 +121,17 @@ internal partial class UpdateService(IWebClientService webClient, ILogger<Update
         hubConnection.On<string, WattPilotUpdate>(nameof(WattPilotUpdate), OnWattPilotUpdateMessage);
     }
 
+    public Task<WattPilotWriteResult> SetWattPilotSettings(string deviceId, WattPilot wanted, WattPilot loaded) =>
+        Hub.InvokeAsync<WattPilotWriteResult>(nameof(SetWattPilotSettings), deviceId, wanted, loaded);
+
+    public Task RebootWattPilot(string deviceId) => Hub.InvokeAsync(nameof(RebootWattPilot), deviceId);
+
+    /// <summary>
+    /// The connection a client-to-server call goes over. It is only ever null before <see cref="StartAsync"/>, and
+    /// the settings dialogs that call this are opened from a device list that connection delivered.
+    /// </summary>
+    private HubConnection Hub => hubConnection ?? throw new InvalidOperationException(Loc.NoSystemConnection);
+
     public async ValueTask DisposeAsync()
     {
         if (hubConnection != null)

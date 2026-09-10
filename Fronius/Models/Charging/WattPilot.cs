@@ -927,9 +927,41 @@ public partial class WattPilot : BindableBase, IHaveDisplayName, IHaveUniqueId, 
 
     public override string ToString() => DisplayName;
 
+    /// <summary>
+    ///     The properties a settings dialog may write: exactly one <see cref="WattPilotAttribute" />, and not
+    ///     read-only. A property fed from one slot of an array the charger sends carries an index and is read-only
+    ///     anyway, so it never gets here.
+    /// </summary>
+    public static IReadOnlyList<PropertyInfo> WritableSettings { get; } =
+    [
+        .. typeof(WattPilot).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Where(p => p.GetCustomAttributes<WattPilotAttribute>().Count() == 1 && !p.GetCustomAttribute<WattPilotAttribute>()!.IsReadOnly),
+    ];
+
+    /// <summary>
+    ///     Which of the <see cref="WritableSettings" /> differ from <paramref name="other" /> - what a settings dialog
+    ///     has to send when <paramref name="other" /> is what it started from. Compared against that and not against
+    ///     what the charger holds right now, so that a value the charger changed itself in the meantime - a load
+    ///     balancing current the master adjusts - is not written back to what it was when the dialog opened.
+    /// </summary>
+    public IReadOnlyList<PropertyInfo> ChangedSettings(WattPilot other) =>
+    [
+        .. WritableSettings.Where(p => (p.GetValue(this), p.GetValue(other)) switch
+        {
+            (byte[] mine, byte[] theirs) => !mine.SequenceEqual(theirs),
+            var (mine, theirs) => !Equals(mine, theirs),
+        }),
+    ];
+
+    /// <summary>
+    ///     A copy with nothing shared: its own event subscribers, its own cards and its own load balancing currents.
+    ///     Built by assignment rather than MemberwiseClone, which copies the PropertyChanged delegate - every binding
+    ///     on the live device would then be told about edits to the copy.
+    /// </summary>
     public object Clone()
     {
-        var result = (WattPilot)MemberwiseClone();
+        var result = new WattPilot();
+        result.CopyFrom(this);
         result.IsUpdating = false;
 
         if (Cards != null)
@@ -952,9 +984,16 @@ public partial class WattPilot : BindableBase, IHaveDisplayName, IHaveUniqueId, 
         return result;
     }
 
+    /// <summary>
+    ///     Every writable property of <paramref name="other" />, by assignment. A property marked [JsonIgnore] is a
+    ///     view of another one - the phase map of the map, a time as text of its seconds - and is left alone: its
+    ///     source is copied anyway, and its setter cannot always take what its own getter answers for a missing
+    ///     value (the time of a null is ":", which parses as nothing).
+    /// </summary>
     public void CopyFrom(WattPilot other)
     {
-        foreach (var property in typeof(WattPilot).GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.CanWrite /*&& p.GetCustomAttribute<ObservablePropertyAttribute>() != null*/))
+        foreach (var property in typeof(WattPilot).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                     .Where(p => p.CanWrite && p.GetCustomAttribute<System.Text.Json.Serialization.JsonIgnoreAttribute>() is null))
         {
             property.SetValue(this, property.GetValue(other));
         }

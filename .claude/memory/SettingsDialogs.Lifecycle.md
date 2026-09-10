@@ -14,6 +14,13 @@ paths:
   - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/Gen24SelfConsumptionView.axaml
   - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/Gen24InverterSettingsView.axaml
   - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/Gen24MpptView.axaml
+  - HomeAutomationClient/HomeAutomationClient/ViewModels/Dialogs/WattPilotSettingsDialogViewModel.cs
+  - HomeAutomationClient/HomeAutomationClient/ViewModels/Dialogs/WattPilotSettingsViewModel.cs
+  - HomeAutomationClient/HomeAutomationClient/ViewModels/Dialogs/NumberField.cs
+  - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/WattPilotSettingsDialogView.axaml
+  - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/WattPilotSettingsView.axaml
+  - HomeAutomationClient/HomeAutomationClient/Controls/NumberSlider.axaml
+  - HomeAutomationClient/HomeAutomationClient/Controls/NumberSlider.axaml.cs
   - HomeAutomationClient/HomeAutomationClient/Controls/CompactTextColumn.cs
   - HomeAutomationClient/HomeAutomationClient/Controls/Toast.axaml
   - HomeAutomationClient/HomeAutomationClient/Styles/CompactForms.axaml
@@ -32,11 +39,15 @@ hub are [[SignalR.MessageDirection]].
 These dialogs are ports of the settings views of `FroniusMonitor` (WPF). That app talks to the inverter directly;
 here the inverter is only reachable from the server, which changes where the work happens.
 
-## Settings never go over the hub
+## Inverter settings go over https, Wattpilot settings over the hub
 
-The hub carries the live device stream, server to client, and a client may not send over it at all. A setting is a
-request that wants an answer, so it goes over https through `IWebClientService`. Nothing about settings belongs in
-`UpdateService` or in a hub method.
+A Gen24 setting is a PUT the inverter answers synchronously, so it goes over https through `IWebClientService` and
+the controller does the read-modify-write below. A **Wattpilot** setting is a different shape: a conversation on
+the WebSocket the server holds open to the charger, one `setValue` per changed key, each answered later by a
+response that also reaches every client as a delta. That one goes over the hub - `IUpdateService.SetWattPilotSettings`
+to `HomeAutomationHub.SetWattPilotSettings`, role `Operator` on the method - and the whole of it is in
+[[WattPilot]]. The direction rule of [[SignalR.MessageDirection]] allows exactly this: a client invokes, the server
+answers the caller. Nothing about *inverter* settings belongs in `UpdateService` or in a hub method.
 
 ## The server does the read-modify-write
 
@@ -637,6 +648,43 @@ them measured in a headless probe rather than guessed:
   description column is not one. With all of them on `Auto` a wide log is wider than the dialog and scrolls, at
   `MaxWidth` (1024) as much as below it. The cost is a ragged right edge on a log of short entries, which is what
   the WPF grid did too.
+
+## The Wattpilot dialog is one Apply, and its numbers are `NumberField`s
+
+`WattPilotSettingsDialogViewModel` is the frame, `WattPilotSettingsViewModel` is every tab at once - the port of
+the WPF `WattPilotSettingsView`, six tabs, some sixty fields. It differs from the inverter dialog in three ways
+that follow from the device (the rest - `ITabHost`, the toast, the density, `Classes="Wrap"`, `Danger` as a class -
+is the same):
+
+- **One Apply for all tabs**, in the button row of the *dialog* beside Cancel, with Undo and the danger switch: the
+  charger takes settings one key at a time and there is no group for a tab to write on its own. The tab view
+  holds only fields.
+- **Nothing is read when it opens.** The client already holds the live charger, kept current by the deltas the
+  server pushes; the dialog clones it twice, `loaded` and the edited `WattPilot`, and Apply sends **both** over
+  the hub so the server writes what differs between them - against what the dialog started from, not against the
+  live device, so a value the charger changed by itself meanwhile is not written back. "Nothing changed" is
+  `WattPilot.ChangedSettings(loaded).Count == 0`, the same comparison the server makes again.
+- **Every number is a `NumberField`**, a class of its own: a box (`Text`, a string with the rule on it) and a
+  slider (`Slider`, a double) kept in step by one guard, the pattern the energy flow tab spells out per pair,
+  which this dialog could not carry thirty times. The rule is an *instance* of one of the `Fronius/Validators`
+  attributes handed to the constructor - the limits differ per field, and an attribute cannot be parameterized
+  per instance - so `NumberField` reports through `INotifyDataErrorInfo` itself rather than through
+  `ObservableValidator`, whose validation only knows attributes on properties. Same rules, same words; see the
+  note in [[Validation.Lifecycle]]. `Controls/NumberSlider.axaml` is the matching control - caption, box, unit and
+  slider - and takes the field through a `Field` property rather than as its `DataContext`, so `IsVisible` and
+  `IsEnabled` on it still bind against the view model that owns the field. A valid number outside the slider's
+  own range (the rule may allow more than the slider offers) pins the slider at its end **and is clamped before
+  it is written**, or the slider would coerce and write the clamped value back over what the user typed.
+  Ranges that follow another field - the maximum current follows the absolute maximum of the DNO tab, the way the
+  WPF sliders were bound to the device's limits - are `Minimum`/`Maximum` set from `FollowLimits`.
+
+Hidden refused fields are restored from a table (`FieldBinding`: the field, how to read it from a `WattPilot`,
+when it is visible) that also does the loading, so the list of what is on which tab exists once. The links -
+charging log, configuration PDF, the cloud API - go through `IUriLauncher` (Avalonia's `ILauncher` behind
+`TopLevel`), never `Process.Start`: the browser head has no process to start and iOS opens links its own way.
+
+Not ported from the scanned WiFi tab: the signal strength icon (`WifiControl`) and the row tooltip; it is a plain
+four column grid.
 
 ## Never a BindableCollection on the server
 

@@ -88,6 +88,18 @@ public string? MeterAddressText
   the property of the model, which is what the server checks a request body against - name it once and have both
   attributes use it: `Gen24ModbusSettings.MinMeterAddress` and the three beside it.
 
+## A rule as an instance, where the limits are not known at compile time
+
+`NumberField` (`HomeAutomationClient/ViewModels/Dialogs`) is one box-and-slider number of the Wattpilot dialog,
+and there are thirty of them with thirty different ranges. An attribute cannot be parameterized per instance, so
+the field takes **an instance of the rule** in its constructor - `new MinMaxIntAttribute(6, 32) { PropertyDisplayNameResourceKey = ... }`
+- and asks it through `GetValidationResult` itself, reporting through `INotifyDataErrorInfo` of its own rather
+than through `ObservableValidator`, whose validation only knows attributes on properties. It is the same rule with
+the same words, instantiated at runtime exactly the way the WPF wrappers instantiate theirs. Avalonia's
+`IndeiValidationPlugin` does not care which object reports, so the red frame and the tooltip work unchanged.
+Everything else here still holds for it: the text is stored whatever it is, the slider is only moved by a value
+the rule has passed, and a load validates explicitly because a setter only validates what it stores.
+
 ## A refused value is stored, on purpose
 
 **A setter must not refuse to store what it was given.** One that throws the value away leaves the control holding

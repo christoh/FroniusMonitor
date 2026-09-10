@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+             xmlns:vm="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
+             x:Class="De.Hochstaetter.HomeAutomationClient.Controls.NumberSlider">
+	<!-- A caption, a box and a unit centred in a row, and a slider under them the width of the form: the shape every
+	     number in the Wattpilot dialog has, and the WPF dialog wrote out thirty times. The field is a NumberField,
+	     handed in through Field rather than as the DataContext, so that IsVisible and IsEnabled on this control still
+	     bind against the view model that owns the field. -->
+	<StackPanel DataContext="{Binding $parent[c:NumberSlider].Field}" x:DataType="vm:NumberField" Margin="0,8,0,0">
+		<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+			<TextBlock VerticalAlignment="Center" Margin="0,0,4,0">
+				<Run Text="{Binding $parent[c:NumberSlider].Caption}" /><Run Text=":" />
+			</TextBlock>
+			<TextBox Width="{Binding $parent[c:NumberSlider].BoxWidth}" TextAlignment="Center"
+			         Text="{Binding Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+			<TextBlock VerticalAlignment="Center" Margin="4,0,0,0" Text="{Binding $parent[c:NumberSlider].Unit}" />
+		</StackPanel>
+
+		<!-- Minimum and Maximum before Value: a slider clips what it is given to the range it has at that moment,
+		     and the range it comes with is 0 to 100. -->
+		<Slider HorizontalAlignment="Stretch" Minimum="{Binding Minimum}" Maximum="{Binding Maximum}"
+		        TickFrequency="{Binding TickFrequency}" IsSnapToTickEnabled="True" Value="{Binding Slider, Mode=TwoWay}" />
+	</StackPanel>
+</UserControl>

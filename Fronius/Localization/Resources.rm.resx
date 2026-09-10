@@ -1666,4 +1666,13 @@
   <data name="SavingSettings" xml:space="preserve">
     <value>Memorisar ils parameters {0}</value>
   </data>
+  <data name="SettingsNotWritten" xml:space="preserve">
+    <value>Ils suandants parameters n'èn betg vegnids scrits sin il Wattpilot:</value>
+  </data>
+  <data name="SettingsNotConfirmed" xml:space="preserve">
+    <value>Ils suandants parameters n'èn betg vegnids confermads dal Wattpilot:</value>
+  </data>
+  <data name="ConfirmReboot" xml:space="preserve">
+    <value>Reaviar il Wattpilot ussa?</value>
+  </data>
 </root>

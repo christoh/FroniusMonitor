@@ -93,6 +93,9 @@ internal class Program
             .AddSingleton<IGen24ConfigRefresher>(services => services.GetRequiredService<Gen24DataCollector>())
             .AddSingleton<SignalRDispatcher>()
             .AddSingleton<WattPilotDataCollector>()
+            // The same instance under its contract, so the hub can hand a client's settings to the service that
+            // holds the connection to that charger.
+            .AddSingleton<IWattPilotServices>(services => services.GetRequiredService<WattPilotDataCollector>())
             .AddTransient<ISunSpecClient, SunSpecClient>()
             .AddLogging(b => b.AddSerilog())
             .AddCors(o => o.AddDefaultPolicy(p => p.SetIsOriginAllowed(_ => true)

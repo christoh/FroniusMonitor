@@ -114,6 +114,15 @@ public sealed partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private Task Settings(IKeyedDevice device) => TaskExceptionHandler(async () =>
     {
+        if (device.Device is WattPilot wattPilot)
+        {
+            // Nothing is read first: the client holds the live charger, kept current by the deltas the server
+            // pushes, and the dialog starts from a copy of it.
+            var wattPilotDialog = new WattPilotSettingsDialogViewModel(new DialogParameters { Title = $"{Loc.Settings}: {wattPilot.DisplayName}" }, device.Key, wattPilot);
+            await wattPilotDialog.ShowDialogAsync().ConfigureAwait(true);
+            return;
+        }
+
         if (device.Device is not Gen24System gen24System)
         {
             await new MessageBox
