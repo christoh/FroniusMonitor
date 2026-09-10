@@ -175,6 +175,58 @@ public class WattPilotJsonTests
     }
 
     [Fact]
+    public void A_card_is_also_read_from_one_key_per_property()
+    {
+        // Newer firmware no longer sends the cards as one array but every property of every card as a key of
+        // its own - the prefix, the index of the card, one letter for the property. The list has to come into
+        // being from those keys alone, including a card in the middle nothing has been said about yet.
+        var wattPilot = new WattPilot();
+
+        wattPilot.UpdateFromJson("""{ "c0n": "BMW 530e CH", "c0e": 69154, "c0i": true, "c2n": "EQC 400 CH", "c2i": false }""");
+
+        Assert.Equal(3, wattPilot.Cards?.Count);
+        Assert.Equal("BMW 530e CH", wattPilot.Cards?[0].Name);
+        Assert.Equal(69154, wattPilot.Cards?[0].Energy);
+        Assert.True(wattPilot.Cards?[0].HaveCardId);
+        Assert.Null(wattPilot.Cards?[1].Name);
+        Assert.Null(wattPilot.Cards?[1].Energy);
+        Assert.Equal("EQC 400 CH", wattPilot.Cards?[2].Name);
+        Assert.False(wattPilot.Cards?[2].HaveCardId);
+    }
+
+    [Fact]
+    public void One_key_of_a_card_changes_that_card_in_place()
+    {
+        // A card charging is one "c1e" after another. The card must change under the bindings that show it,
+        // not be replaced along with the whole list every time.
+        var wattPilot = new WattPilot();
+        wattPilot.UpdateFromJson("""{ "cards": [ { "name": "Christoph", "energy": 12.5, "cardId": true }, { "name": "guest", "energy": 0, "cardId": false } ] }""");
+        var cards = wattPilot.Cards;
+
+        wattPilot.UpdateFromJson("""{ "c1e": 99 }""");
+
+        Assert.Same(cards, wattPilot.Cards);
+        Assert.Equal(2, wattPilot.Cards?.Count);
+        Assert.Equal(99, wattPilot.Cards?[1].Energy);
+        Assert.Equal("guest", wattPilot.Cards?[1].Name);
+        Assert.Equal(12.5, wattPilot.Cards?[0].Energy);
+    }
+
+    [Theory]
+    [InlineData("""{ "c0p": "{}" }""")]
+    [InlineData("""{ "cae": true, "cco": 30, "c": 1, "c0": 1 }""")]
+    public void A_key_that_only_looks_like_a_card_key_is_ignored(string json)
+    {
+        // "c0p" is a card key for a property the card has no use for, the others start with the prefix and are
+        // not card keys at all. None of them may conjure up a card.
+        var wattPilot = new WattPilot();
+
+        wattPilot.UpdateFromJson(json);
+
+        Assert.Null(wattPilot.Cards);
+    }
+
+    [Fact]
     public void A_scanned_wifi_list_is_read_through_its_own_names()
     {
         var wattPilot = new WattPilot();

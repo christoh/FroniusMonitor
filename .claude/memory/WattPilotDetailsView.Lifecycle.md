@@ -8,6 +8,7 @@ paths:
 # Lifecycle contract: WattPilotDetailsView (Avalonia)
 
 Port of the WPF `FroniusMonitor/Views/WattPilotDetailsView.xaml`. 7 gauge groups, 21 gauges, no group switches.
+The device itself - its protocol, its model, how updates reach this view - is described in `WattPilot.md`.
 
 ## Ownership and lifetimes
 

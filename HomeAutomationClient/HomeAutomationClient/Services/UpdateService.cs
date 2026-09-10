@@ -168,7 +168,7 @@ internal partial class UpdateService(IWebClientService webClient, ILogger<Update
 
                 if (pilots is { Status: HttpStatusCode.OK, Payload: { } wattPilots })
                 {
-                    var currentWattPilots = AllPowerConsumers.OfType<KeyedFritzBoxDevice>().ToArray();
+                    var currentWattPilots = AllPowerConsumers.OfType<KeyedWattPilot>().ToArray();
                     currentWattPilots.Apply(w => AllPowerConsumers.Remove(w));
                     wattPilots.Select(wp => new KeyedWattPilot { Device = wp.Value, Key = wp.Key }).Apply(w => AllPowerConsumers.Add(w));
                 }

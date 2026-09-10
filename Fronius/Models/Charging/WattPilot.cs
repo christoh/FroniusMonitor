@@ -673,8 +673,16 @@ public partial class WattPilot : BindableBase, IHaveDisplayName, IHaveUniqueId, 
     [WattPilot("fzf", false)]
     public partial bool? NoFeedIn { get; set; }
 
+    /// <summary>
+    ///     The RFID cards. Older firmware sends the whole list as <c>cards</c>; newer firmware sends every property
+    ///     of every card as a key of its own, <c>c0n</c> for the name of card 0, <c>c1e</c> for the energy of card
+    ///     1 - which is what the indexed attribute reads. Both are accepted, and the cloud status endpoint sends
+    ///     both at once.
+    /// </summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CurrentUser))]
     [WattPilot("cards")]
+    [WattPilotIndexed("c")]
     public partial IList<WattPilotCard>? Cards { get; set; }
 
     [WattPilot("awpl")]

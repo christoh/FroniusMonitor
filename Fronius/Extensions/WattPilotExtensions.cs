@@ -99,6 +99,7 @@ public static class WattPilotExtensions
             switch (propertyInfos.Length)
             {
                 case 0:
+                    TrySetIndexedValue(instance, token.Key, token.Value);
                     continue;
 
                 case 1:
@@ -119,6 +120,74 @@ public static class WattPilotExtensions
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// A key that names one property of one entry of a list - <c>c0n</c>, the name of card 0 - read into that
+    /// entry, which is created first if the list does not reach that far yet.
+    /// </summary>
+    /// <remarks>
+    /// The charger used to send the cards only as one <c>cards</c> array and now sends them property by property
+    /// as well, so a card changing arrives as a single key. The list grows by replacement, so a binding to it sees
+    /// a new card; a card that is already there is changed in place, and being a <see cref="BindableBase"/> it
+    /// tells its own bindings. A suffix the entry has no property for - <c>c0p</c> - is ignored like any other
+    /// key nobody has claimed.
+    /// </remarks>
+    private static bool TrySetIndexedValue(object instance, string key, JsonNode? token)
+    {
+        foreach (var propertyInfo in instance.GetType().GetProperties())
+        {
+            if (propertyInfo.GetCustomAttribute<WattPilotIndexedAttribute>() is not { } attribute || !key.StartsWith(attribute.Prefix, StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            var rest = key.AsSpan(attribute.Prefix.Length);
+            var digits = 0;
+
+            while (digits < rest.Length && char.IsAsciiDigit(rest[digits]))
+            {
+                digits++;
+            }
+
+            if (digits == 0 || digits == rest.Length || !int.TryParse(rest[..digits], NumberStyles.None, CultureInfo.InvariantCulture, out var index) || ElementTypeOf(propertyInfo.PropertyType) is not { } elementType)
+            {
+                continue;
+            }
+
+            var name = rest[digits..].ToString();
+            var elementProperty = elementType.GetProperties().SingleOrDefault(p => p.GetCustomAttributes<WattPilotAttribute>().Any(a => a.TokenName == name));
+
+            if (elementProperty is null)
+            {
+                continue;
+            }
+
+            var list = propertyInfo.GetValue(instance) as IList;
+
+            if (list is null || list.Count <= index)
+            {
+                var grown = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType))!;
+                list?.Cast<object?>().Apply(entry => grown.Add(entry));
+
+                while (grown.Count <= index)
+                {
+                    grown.Add(Activator.CreateInstance(elementType));
+                }
+
+                propertyInfo.SetValue(instance, grown);
+                list = grown;
+            }
+
+            if (list[index] is { } element)
+            {
+                SetWattPilotValue(element, elementProperty, token);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     private static void SetWattPilotValue(object instance, PropertyInfo propertyInfo, JsonNode? token)

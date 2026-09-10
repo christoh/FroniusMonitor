@@ -6,7 +6,6 @@ paths:
   - Fronius/Services/Gen24Service.cs
   - Fronius/Services/WattPilotService.cs
   - Fronius/Services/DigestAuthHttp.cs
-  - Fronius/Models/Charging/**
   - Fronius/Models/Gen24/**
   - FroniusMonitor/ViewModels/EventLogViewModel.cs
 ---
@@ -57,36 +56,13 @@ honest way to claim the conversion changed nothing - keep it that way while the 
   the fix is to sanitise the text before parsing; there is no option to switch on.
 - `JToken.ToString()` was indented, `ToJsonString()` is compact. Only the size of a PUT body.
 
-## The WattPilot wire format is stated by `WattPilotAttribute`, and nowhere else
+## The WattPilot is not an inverter
 
-This is the part that broke twice during the conversion, both times without an error message.
-
-The charging models carry **two** sets of names on purpose:
-
-| attribute | for | example on `WattPilotWifiInfo.IpV4AddressString` |
-|---|---|---|
-| `[WattPilot("ip")]` | the WebSocket protocol of the charger | `ip` |
-| `[JsonPropertyName("ipV4Address")]` | the server-to-client channel | `ipV4Address` |
-| `[JsonProperty("ip")]` (Newtonsoft) | **dead** - was the charger protocol | `ip` |
-
-So a `JsonSerializer` call on one of these models produces the *client* names, or the C# names where there are
-none. Both are wrong for the charger, and neither the charger nor the serializer complains:
-
-- **Writing.** `WattPilotExtensions.ToWattPilotJson` writes a value, and `ToWattPilotObject` writes a nested one
-  from the `WattPilotAttribute`s - never through `JsonSerializer`. An attribute with an `Index` names one slot of
-  an array the charger *sends* (the `f` capabilities array), so it is not something to write back and is skipped.
-- **Reading.** `SetWattPilotValue` handles a `JsonObject`, and a list of them, through the same attributes before
-  it ever offers the value to `JsonSerializer.Deserialize`. Left to the serializer, a `{ "amp": 16, ... }` is
-  taken happily and answers an object with **every property at its default** - the charger appears to report
-  zeroes, and there is no exception anywhere.
-- **A `byte[]` is base 64 to System.Text.Json**, in both directions. The charger writes the phase map as an array
-  of numbers, so `SetWattPilotValue` reads that shape itself and `ToWattPilotJson` writes it.
-- The **text fallback** at the end of `SetWattPilotValue` is not optional: `Deserialize` refuses a JSON string
-  where a number is wanted, and a number where a flag is wanted. A flag goes through `AsBoolean` because
-  `Convert.ToBoolean` refuses `"1"`.
-
-`HomeAutomationServerTests/UnitTests/WattPilotJsonTests.cs` pins all of that, including that a written object
-reads back through the reader unchanged. If you touch either side, that round trip is the test that matters.
+Everything about the charger's own protocol - the WebSocket, the `WattPilotAttribute` names that state its wire
+format, why its models must never go through `JsonSerializer`, the RFID cards that arrive in two shapes - is in
+`WattPilot.md`. What applies to it from *this* document is only the generic reading of device JSON above:
+`WattPilotExtensions` reads through `AsString` / `AsBoolean` and needs the text fallback for the same reason
+`Gen24JsonService` does.
 
 ## A model may not reach for the device it came from
 
