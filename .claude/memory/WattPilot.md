@@ -223,9 +223,18 @@ to it for a key **no property has claimed**: prefix, then digits, then the rest 
 - **`MinimumChargingInterval`** (`mci`) is 0 for "off"; the dialog's `RequiresChargingInterval` switch turns it
   into at least 300 000 ms (5 minutes) when on and back to 0 when off. `NextTripTime` (`ftt`) is seconds from
   midnight, capped at 86 399; `NextTripEnergyToCharge` (`fte`) is Wh, the dialog edits kWh.
-- **`LoadBalancingCurrents`** (`lot`) is a nested object with value equality (`Equals`/`==` overridden) so that
-  `Send` can tell whether it changed - and when it did, the dialog stamps `TimeStamp` with `UtcNow` first,
-  because the charger wants a fresh `ts` with every change.
+- **`LoadBalancingCurrents`** (`lot`) is a nested object written **as a whole**, all four values in one
+  `setValue`, never one at a time - `Send` only knows the properties of `WattPilot`, and `ToWattPilotObject`
+  renders the object. It has value equality (`Equals`/`==` overridden) so that `Send` can tell whether it changed
+  - and when it did, the dialog stamps `TimeStamp` with `UtcNow` first, because the charger wants a fresh `ts`
+  with every change. **That value equality bit back once, and the property on `WattPilot` is hand-written
+  because of it:** an `[ObservableProperty]` setter drops a value that is `Equals` to the one it has, so
+  `Clone()` handing it `LoadBalancingCurrents.Copy()` kept the *original* instance in the clone, the dialog then
+  edited the original through the clone, `Send` found old and new identical and threw "no settings changed" -
+  the currents could never be written (found 2026-09-11 against a fake charger). The setter compares by
+  reference (`SetProperty(ref field, value, ReferenceEqualityComparer.Instance)`), so a copy is always taken;
+  `WattPilotModelTests` pins it. Any other value-equal type that gets cloned into an `[ObservableProperty]`
+  will do the same thing.
 - **`Clone()`** is a `MemberwiseClone` plus deep copies of `Cards` (as an array) and `LoadBalancingCurrents`;
   `IsUpdating` is reset to `false` on the copy. **`CopyFrom`** assigns every writable public property by
   reflection - including `IsUpdating`, `Cards` by reference, and `LoadBalancingCurrents` by reference.

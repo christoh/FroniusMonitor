@@ -871,9 +871,23 @@ public partial class WattPilot : BindableBase, IHaveDisplayName, IHaveUniqueId, 
     [WattPilot("ula", false)]
     public partial byte? MaximumOutOfBalanceCurrent { get; set; }
 
-    [ObservableProperty]
+    /// <summary>
+    ///     The load balancing currents. Written to the charger as one <c>lot</c> object, all four values at once,
+    ///     never one at a time - see <see cref="WattPilotService.Send" />.
+    /// </summary>
+    /// <remarks>
+    ///     Not an [ObservableProperty]: the generated setter drops a value that is Equals to the one it has, and
+    ///     <see cref="WattPilotLoadBalancingCurrents" /> compares by value so that a change can be detected at all.
+    ///     <see cref="Clone" /> then handed the copy to a setter that kept the original, the dialog edited that
+    ///     original through the clone, and Send found old and new identical - the currents could never be written.
+    ///     Compared by reference here, so a copy is always taken.
+    /// </remarks>
     [WattPilot("lot", false, typeof(WattPilotLoadBalancingCurrents))]
-    public partial WattPilotLoadBalancingCurrents? LoadBalancingCurrents { get; set; }
+    public WattPilotLoadBalancingCurrents? LoadBalancingCurrents
+    {
+        get;
+        set => SetProperty(ref field, value, ReferenceEqualityComparer.Instance);
+    }
 
     [ObservableProperty]
     [WattPilot("lof", false)]
