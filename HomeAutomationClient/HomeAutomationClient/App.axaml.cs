@@ -95,6 +95,8 @@ public partial class App : Application
     public override void OnFrameworkInitializationCompleted()
     {
         SetAccentColor();
+        //// Temporary: to change the culture in non-WebAssembly heads.
+        //Thread.CurrentThread.CurrentUICulture = new CultureInfo("de-CH");
 
         ServiceCollection ??= new ServiceCollection();
 
