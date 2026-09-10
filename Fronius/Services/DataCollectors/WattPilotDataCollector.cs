@@ -122,31 +122,21 @@ public sealed class WattPilotDataCollector(
 
     /// <summary>
     /// The watchdog: a WebSocket that has gone half open delivers nothing and raises nothing, so a charger that
-    /// has said nothing for 15 seconds is taken to be gone.
+    /// has said nothing for 15 seconds is taken to be gone and connected again. StartAsync ends a connection it
+    /// still has without raising OnLostConnection, so this is one restart and not two.
     /// </summary>
-    /// <remarks>
-    /// A service that still holds a connection is only stopped here, never started. WattPilotService.StartAsync
-    /// does not close a socket it already has - it opens a second one and leaves the old reader running against
-    /// it - so starting over a live connection races two readers on one socket. Stopping ends the reader, which
-    /// raises OnLostConnection, which is the one place a lost connection is re-established from. Only a service
-    /// with no connection at all - the charger was unreachable when it was last tried - is started directly,
-    /// because nothing else will.
-    /// </remarks>
     private async void TimerElapsed(object? state)
     {
         try
         {
             foreach (var service in services.Where(s => DateTime.UtcNow - s.Value.LastMessageReceived > TimeSpan.FromSeconds(15)).Select(s => s.Key))
             {
-                if (service.Connection is null)
-                {
-                    await StartServiceAsync(service).ConfigureAwait(false);
-                }
-                else
+                if (service.Connection is not null)
                 {
                     logger.LogWarning("No message from WattPilot '{WattPilot}' for 15 seconds, reconnecting", service.WattPilot?.DisplayName);
-                    await service.StopAsync().ConfigureAwait(false);
                 }
+
+                await StartServiceAsync(service).ConfigureAwait(false);
             }
         }
         catch (Exception ex)

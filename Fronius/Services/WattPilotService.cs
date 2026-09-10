@@ -4,6 +4,11 @@ public partial class WattPilotService : BindableBase, IWattPilotService
 {
     private readonly List<WattPilotAcknowledge> outstandingAcknowledges = [];
     private readonly byte[] buffer = new byte[8192];
+    private readonly SemaphoreSlim startLock = new(1, 1);
+
+    // False only while StartAsync replaces a connection of its own: the reader it ends then must not report a lost
+    // connection, or the owner would start a second time from the event while this start is still under way.
+    private bool raiseLostConnection = true;
 
     private uint requestId;
     private CancellationTokenSource? tokenSource;
@@ -49,8 +54,30 @@ public partial class WattPilotService : BindableBase, IWattPilotService
     [ObservableProperty]
     public partial WattPilot? WattPilot { get; set; }
 
-    [SuppressMessage("ReSharper", "ParameterHidesMember")]
+    /// <summary>
+    /// Connects to a charger, ending whatever connection this service already has first. Safe to call on a running
+    /// service: the old reader is stopped and <see cref="OnLostConnection"/> is not raised for it, because a
+    /// connection that is replaced on purpose has not been lost.
+    /// </summary>
     public async ValueTask StartAsync(WebConnection connection)
+    {
+        // Two starts at once would each open a socket and each tear the other's fields down in their catch. The
+        // second waits for the first to finish - or fail - and then replaces it like any other running connection.
+        await startLock.WaitAsync().ConfigureAwait(false);
+
+        try
+        {
+            await CloseAsync(false).ConfigureAwait(false);
+            await ConnectAsync(connection).ConfigureAwait(false);
+        }
+        finally
+        {
+            startLock.Release();
+        }
+    }
+
+    [SuppressMessage("ReSharper", "ParameterHidesMember")]
+    private async ValueTask ConnectAsync(WebConnection connection)
     {
         try
         {
@@ -146,23 +173,7 @@ public partial class WattPilotService : BindableBase, IWattPilotService
         }
         catch
         {
-            tokenSource?.Dispose();
-            tokenSource = null;
-
-            if (clientWebSocket != null)
-            {
-                try
-                {
-                    await clientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Good bye", CancellationToken.None).ConfigureAwait(false);
-                }
-                catch
-                {
-                    //
-                }
-            }
-
-            clientWebSocket?.Dispose();
-            clientWebSocket = null;
+            await CloseSocketAsync().ConfigureAwait(false);
             WattPilot?.IsUpdating = false;
             WattPilot = null;
             Connection = null;
@@ -314,21 +325,41 @@ public partial class WattPilotService : BindableBase, IWattPilotService
         ).ToBase64();
     }
 
-    public async ValueTask StopAsync()
+    public ValueTask StopAsync() => CloseAsync(true);
+
+    private async ValueTask CloseAsync(bool notifyLostConnection)
     {
-        if (tokenSource != null)
+        // tokenSource is the "something is running" flag: created first thing by ConnectAsync, nulled when the
+        // handshake fails and when the reader ends. Nothing to cancel means nothing to wait for either.
+        var source = tokenSource;
+
+        if (source is null)
         {
-            await tokenSource.CancelAsync().ConfigureAwait(false);
+            return;
         }
 
-        // Reader never faults (it catches everything and tears down in its finally), so awaiting it
-        // simply blocks until the connection is fully closed — no unbounded polling of Connection.
+        raiseLostConnection = notifyLostConnection;
+
+        try
+        {
+            await source.CancelAsync().ConfigureAwait(false);
+        }
+        catch (ObjectDisposedException)
+        {
+            // The handshake or the reader tore down between the check and the cancel.
+        }
+
+        // Reader never faults (it catches everything and tears down in its finally), so awaiting it simply blocks
+        // until the connection is fully closed - and until its finally has decided whether to raise the event,
+        // which is why the flag is only restored afterwards.
         var task = readerTask;
 
         if (task != null)
         {
             await task.ConfigureAwait(false);
         }
+
+        raiseLostConnection = true;
     }
 
     public void BeginSendValues()
@@ -434,6 +465,34 @@ public partial class WattPilotService : BindableBase, IWattPilotService
         {
             outstandingAcknowledges.Add(new WattPilotAcknowledge(id, propertyInfo, value));
         }
+    }
+
+    /// <summary>
+    /// Ends the token source and the socket. The close handshake is bounded to two seconds: a charger that has
+    /// gone half open - the case the owner's watchdog reconnects for - takes the close frame and never answers
+    /// it, and an unbounded CloseAsync would then hang the reader's tear-down, and with it every StopAsync and
+    /// StartAsync waiting for the reader, for good. Dispose aborts whatever the handshake left.
+    /// </summary>
+    private async ValueTask CloseSocketAsync()
+    {
+        tokenSource?.Dispose();
+        tokenSource = null;
+
+        if (clientWebSocket != null)
+        {
+            try
+            {
+                using var closeTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+                await clientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Good bye", closeTimeout.Token).ConfigureAwait(false);
+            }
+            catch
+            {
+                // Not answered in time, or already gone either way.
+            }
+        }
+
+        clientWebSocket?.Dispose();
+        clientWebSocket = null;
     }
 
     /// <summary>The body of a WattPilot message, or an empty object where it is not one.</summary>
@@ -549,23 +608,7 @@ public partial class WattPilotService : BindableBase, IWattPilotService
         }
         finally
         {
-            tokenSource?.Dispose();
-            tokenSource = null;
-
-            if (clientWebSocket != null)
-            {
-                try
-                {
-                    await clientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Good bye", CancellationToken.None).ConfigureAwait(false);
-                }
-                catch
-                {
-                    //
-                }
-            }
-
-            clientWebSocket?.Dispose();
-            clientWebSocket = null;
+            await CloseSocketAsync().ConfigureAwait(false);
             savedWattPilot = WattPilot;
             WattPilot?.IsUpdating = false;
 
@@ -573,7 +616,7 @@ public partial class WattPilotService : BindableBase, IWattPilotService
             var connection = Connection?.Clone() as WebConnection;
             Connection = null;
 
-            if (OnLostConnection != null)
+            if (raiseLostConnection && OnLostConnection != null)
             {
                 _ = Task.Run(() => OnLostConnection(this, new WattPilotServiceStoppedEventArgs(savedWattPilot, connection)), CancellationToken.None);
             }
