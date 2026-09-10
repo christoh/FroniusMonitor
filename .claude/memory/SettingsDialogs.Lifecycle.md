@@ -139,6 +139,153 @@ it from 702 pixels tall to 499.
     `CompactForms.axaml` belong together; change one and the caption stops matching the rest of the dialog.
 
   Clicking works on the box and on the caption after scaling - that was checked, not assumed.
+- **A check box with a caption gets `Classes="Wrap"` instead of the Viewbox** - the default for every one of them
+  now, not only `EXPORTLIMIT.NETWORK_MODE.clusterModeActivated` in the inverter settings tab, which is where this
+  started; see further down for why it did not stay narrow. Two things were tried and measured wrong before this:
+  - **Removing the Viewbox for every check box in the app**, on the theory that a real `CheckBoxMinHeight`
+    resource (it exists, and does work - `20` is the smallest that does not clip the glyph, `22` is what this
+    file uses) could replace the Viewbox outright. It cannot: the glyph itself is a fixed 20x20 that no resource
+    reaches, so a check box without the Viewbox renders that glyph at its native size, not the roughly 14x14 the
+    Viewbox scales it to - every check box and radio button in the dialog looked visibly larger, which is what
+    the developer caught and asked to be reverted.
+  - **Keeping the Viewbox and giving the check box inside it a `MaxWidth`** pre-scaled by 32/22, so it would wrap
+    at the right width once scaled down. Measured, and it made things worse than the original bug: a Viewbox
+    scales both dimensions from *one* target, so a wrapped, multi-line child - now much taller than the 32 a
+    single line is - forces a much smaller scale to still hit `Height="22"`, shrinking the glyph itself to a few
+    pixels instead of the caption.
+
+  `CheckBox.Wrap` in `CompactForms.axaml` keeps the two apart instead of trying to make one Viewbox do both jobs.
+  Its `Template` is a `Grid` of two columns: the glyph is still the *same* small `Viewbox.CheckBox`, untouched,
+  around a second, undisplayed check box that exists only to draw it, so it is exactly the size it always is
+  regardless of how long the caption is or how many lines it wraps to. The caption is a plain `ContentPresenter`
+  beside it with `TextBlock.TextWrapping="Wrap"`, which the Viewbox never touches. The outer element is still the
+  real `CheckBox` the view binds to - only its `Template` differs - so `Command`, `IsThreeState` and every native
+  behaviour keep working; the inner glyph check box and the `ContentPresenter` are `IsHitTestVisible="False"` and
+  the inner one is also `Focusable="False"`, so a click or a Tab always lands on the real, outer check box,
+  wherever in the row it falls - the `Grid`'s own `Background="Transparent"` is what makes the space under a
+  wrapped caption's second line count as "in the row" for hit testing rather than falling through it. Measured
+  with the exact caption from the screenshot at the dialog's own column width: the glyph stays 22 high whether the
+  caption is one line or wraps to two, and clicking the far corner of the wrapped row, well past the glyph, still
+  toggles it.
+
+  A plain `Style Setter` for `MinHeight` on `CheckBox.Wrap` does nothing on its own by itself elsewhere in this
+  file, but here it matters for a different reason than the glyph: Fluent's own `MinHeight` of 32 is a property of
+  the control and not of its default template, so it survives swapping the `Template` out entirely and still
+  floors the row at 32 unless `CheckBox.Wrap` sets `MinHeight="0"` itself - measured, without it the row stayed 32
+  even with this custom `Template` in place, whose own content only asks for 22.
+
+  The glyph needs `VerticalAlignment="Top"` on its `Viewbox` as well, and it is easy to think the default is fine
+  because a single line check box never shows the problem. `Viewbox.CheckBox` sets an explicit `Height`, so
+  `Stretch` cannot size it to a taller row and Avalonia centres it there instead - invisible for one line, because
+  there is only the one line to centre against, but for a caption wrapped to two or three the glyph floated
+  between them rather than sitting beside the first, which is the second thing the developer's own screenshot
+  caught. Measured before the fix: in a row wrapped to three lines the glyph's own centre sat 25 pixels below the
+  centre of the first line; with `VerticalAlignment="Top"` on the `Viewbox` it comes down to 3, the same small
+  offset a single line check box already had at the time between its 22 pixel glyph and a shorter line of text.
+
+  **That single line offset was its own, separate bug, reported afterwards with a screenshot: "Text too high for
+  both Checkboxes and RadioButtons."** The caption `ContentPresenter` had also been given `VerticalAlignment="Top"`
+  along with the glyph, on the assumption that it "was already filling the whole row and changed nothing visible" -
+  true only for a caption that actually filled the row; for the far more common single line caption it left the
+  text sitting against the top of a 22 pixel row instead of centred in it.
+
+  The first attempt changed the `ContentPresenter` from `Top` to `Center`, measured against an isolated
+  `CheckBox.Wrap` and a short caption - `Top` put the caption's centre 7.1 pixels above the glyph's, `Center`
+  brought it to 3.1 - and confirmed against the real `Gen24SelfConsumptionView`, where 12 of its 14 real `Wrap`
+  controls came out exactly 0 pixels off. **This was still wrong, caught by the developer a second time from the
+  same screenshot's own wrapped caption ("Mehrere Wechselrichter limitieren..."): "Text still slightly too high
+  if it is multi line. Perfect for single line."** `Center` only looks right for a single line caption by
+  accident - it centres the caption's *whole* height against the row, which is the same as centring its one line
+  when there is only one, but for a caption wrapped to several lines it centres the whole block, pulling the
+  *first* line - the one actually beside the glyph - up above where it belongs, and worse the more lines there
+  are. Measured on the four-line caption from the screenshot with `Center` still in place: the first line's own
+  centre sat 4.25 pixels above the glyph's.
+
+  The actual fix is `VerticalAlignment="Top"` again, this time with a fixed top margin, because a margin does not
+  care how many lines follow - it anchors the first line a constant distance below the row's own top, which is
+  also where the glyph starts, so one number lines the first line up with the glyph for a caption of any length.
+  The margin is 4.5: the glyph's centre is at 11 (a 22 high Viewbox), a 12 point line is 13 high, so 4.5 puts the
+  first line's centre at 4.5 + 6.5 = 11 exactly. Found by testing candidates against the real
+  `Gen24SelfConsumptionView` (not an isolated test control - see the warning below), with the two-line case
+  measured with `TextLayout.TextLines[0].Height` - the *first* line only, not the whole (possibly multi-line) text
+  block's own centre, which is what let `Center`'s failure through undetected the first time.
+
+  **The half pixel is deliberate.** 4.5 is exactly where `Center` had put a single line caption - (22 - 13) / 2 -
+  and that placement is the one the developer had called "perfect for single line", so it is the known good
+  reference, now applied to the first line of any caption. 5 was tried first, because the headless probe at 100%
+  reports 4.5 as half a pixel high and 5 as half a pixel low and 5 read as the rounder number; a third screenshot
+  ("Now, the text is slightly too low.") settled it the other way. The probe cannot do better than ±0.5 at 100%,
+  where the caption's top has to be a whole pixel and a 13 high line cannot centre on 11; on a high DPI screen the
+  layout rounds to a fraction of a pixel and 4.5 lands where the arithmetic says. A probe at 100% reporting -0.5
+  for every caption is therefore the expected result, not something to tune away.
+
+  **An isolated test control is fine for comparing two settings against each other, but not for the one number
+  that decides where a pixel actually lands.** The first attempt at tuning the margin used a `CheckBox.Wrap` built
+  by hand outside any real view, the same way the `Top` vs `Center` choice above had been - it suggested 8 pixels
+  of margin was the right amount, and 8 was wrong: it measured its own glyph's centre 3.5 pixels lower than the
+  same glyph reads inside the real dialog, for a reason not tracked down, which put every real caption 3.5 pixels
+  too low once actually checked in `Gen24SelfConsumptionView`. Redone against the real view directly, 4.5 pixels
+  is what lines up. `BatteryIsAcCoupled` and `HYB_BACKUP_SYSTEMDEADLOCKPREVENTION` are still the two captions in
+  that view long enough to genuinely wrap to two lines at the dialog's own column width, and with the margin fix
+  both measure exactly the same as every single line caption in it - no longer a separate, worse case.
+
+  **Judging which caption is "short" by its resource key name is not reliable, which is why this stopped being
+  judged caption by caption at all.** `EXPORTLIMIT.failSafeModeEnabled` reads short and was left on the Viewbox
+  on that basis at first; what it actually resolves to on the inverter - "Wechselrichterleistung auf 0%
+  reduzieren, wenn die Verbindung zum Smart Meter getrennt ist." - is exactly as long as `clusterModeActivated`
+  and needed the same `Classes="Wrap"` once that was seen. The key name is not the caption; only the localized
+  text the inverter actually sends is, and a probe without a live inverter falls back to the key itself, which is
+  shorter and hides this. `HARDLIMIT.enabled` and `SOFTLIMIT.enabled` were checked against the same screenshot and
+  do fit on one line - and are `Classes="Wrap"` anyway, along with every other captioned check box and radio
+  button in these three views, for the reason given below rather than caption by caption.
+
+  **Neither the glyph nor the font size can vary, by construction and not only by the two captions tried so far** -
+  asked for explicitly, and worth being exact about. Measured across five captions - empty, one word, the real
+  sentence, an absurd one several times its length, and a single 300 character token with no space in it at all,
+  which `TextWrapping="Wrap"` cannot break at a word boundary - crossed with two column widths, a comfortable 340
+  and a punishing 80: the glyph `Viewbox` was 22 high and its glyph border 20 wide in all ten, and the caption's
+  font size read 12 in all ten, the one size `CheckBox.Wrap` inherits from the dialog because nothing in the
+  `Template` sets `FontSize` anywhere. The unbreakable token does not overflow the column or shrink either: with
+  no word break available, the text layout breaks it mid-word instead, which is what turned an 80 pixel column
+  into a row 785 pixels tall rather than one wider than its column or one with smaller type - proof that nothing
+  in this path degrades to shrinking type as a fallback, which is what `Classes="Wrap"` exists to rule out.
+
+  One artifact of measuring this worth knowing so it does not look like a second bug: the glyph check box inside
+  `CheckBox.Wrap`'s `Template` is itself a `CheckBox` directly inside a `Viewbox.CheckBox`, so the *unrelated*
+  `Viewbox.CheckBox > CheckBox` style - written for the old, still-current single-line technique - matches it too
+  and gives it a `FontSize` of 17.5. Harmless, because that check box's `Content` is always null and nothing ever
+  renders through it, but a walk of the tree finds *two* `ContentPresenter`s under `CheckBox.Wrap` - that dead one
+  inside the glyph, and the caption's own - and asking the wrong one for its `FontSize` reads 17.5 and looks like
+  the bug this paragraph rules out. The caption's own `ContentPresenter` is the one with no `Viewbox` among its
+  ancestors, and it is the one that answers 12.
+
+  **`Classes="Wrap"` is now the default for every check box and radio button that carries a caption, not an
+  opt-in for the ones already known to be long.** It started narrower than that - only `clusterModeActivated` and
+  then `failSafeModeEnabled`, once each was individually seen to be too long - but almost every caption in these
+  three views is `{l:Config '...'}` or `{l:Ui '...'}`, read from the inverter's own translation at runtime. The
+  app does not control that text and cannot assume it stays short: `failSafeModeEnabled` looked short by its
+  resource key and was not, and there is no way to know which of the others will do the same in some other
+  language or firmware. So every check box and radio button with a caption in `Gen24InverterSettingsView`,
+  `Gen24ModbusView` and `Gen24SelfConsumptionView` is `Classes="Wrap"`; only the eight content-less schedule
+  glyphs in the last of those - the seven days of a charging rule and the "Active" column beside them, which have
+  no caption to get wrong - still use `Viewbox.CheckBox` directly.
+
+  `RadioButton.Wrap` is `CheckBox.Wrap`'s exact counterpart: the same `Template` shape, wrapping the same
+  unchanged `Viewbox.RadioButton`, needing the same two fixes - `MinHeight="0"` because Fluent's own default
+  survives the `Template` being replaced, and `VerticalAlignment="Top"` on the glyph because it otherwise centres
+  against a wrapped block instead of the first line.
+
+  A radio button is more often laid out several to a row than a check box is - `AUTO`/`MANUAL`,
+  `SOC_MODE_AUTO`/`SOC_MODE_MANUAL` and the others all sit in a `StackPanel Orientation="Horizontal"` - and that
+  is a genuinely different context worth having checked rather than assumed: along its own orientation, a
+  horizontal `StackPanel` measures each child with *unbounded* width, because it does not yet know how much room
+  one child needs before laying the rest out beside it. A `Grid` with a `"*"` column, which is what
+  `RadioButton.Wrap`'s `Template` is, has no obvious meaning against an unbounded constraint. Measured rather than
+  guessed: it does not collapse and it does not explode - a `Grid` with a star column, measured with infinite
+  width, resolves the star column to its content's own natural single line size, which is exactly the pre-Wrap
+  behaviour. So a short caption in one of these rows renders identically to before, side by side with the next
+  one at its natural width, and the *only* thing that changes is that it would also wrap correctly if that same
+  radio button ever ended up somewhere its width was actually constrained.
 - A tab's own margins are its own: 8 around the view, 8 inside a group box, 2 above and below a field. The numbers
   come from the WPF views.
 - **The bar under the selected tab is positioned by the tab's height and vertical padding, and by nothing else.**

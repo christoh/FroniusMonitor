@@ -83,26 +83,21 @@
 					<TextBox Grid.Row="1" Grid.Column="1" Classes="Danger" MaxLength="30"
 					         Text="{Binding Settings.TimeZoneName, Mode=TwoWay}" />
 
-					<Viewbox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Classes="CheckBox Danger"
-					         HorizontalAlignment="Left">
-						<CheckBox Content="{x:Static p:Resources.SynchronizeTime}" IsChecked="{Binding Settings.TimeSync, Mode=TwoWay}" />
-					</Viewbox>
+					<CheckBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Classes="Wrap Danger"
+					          Content="{x:Static p:Resources.SynchronizeTime}" IsChecked="{Binding Settings.TimeSync, Mode=TwoWay}" />
 				</Grid>
 			</HeaderedContentControl>
 
 			<HeaderedContentControl Classes="GroupBox" Header="{l:Config 'EXPORTLIMIT.TITEL'}" IsVisible="{Binding ShowExportLimits}">
 				<StackPanel Margin="8,4">
-					<Viewbox Classes="CheckBox">
-						<CheckBox Content="{l:Config 'EXPORTLIMIT.activated'}"
-						          IsChecked="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.IsEnabled, Mode=TwoWay}" />
-					</Viewbox>
+					<CheckBox Classes="Wrap" Content="{l:Config 'EXPORTLIMIT.activated'}"
+					          IsChecked="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.IsEnabled, Mode=TwoWay}" />
 
 					<!-- Nothing below has any meaning while there is no limit at all. -->
 					<StackPanel IsVisible="{Binding ShowExportLimitDetails}">
-						<Viewbox Classes="CheckBox" Margin="0,4,0,0">
-							<CheckBox Content="{l:Config 'EXPORTLIMIT.NETWORK_MODE.clusterModeActivated'}"
-							          IsChecked="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.IsNetworkModeEnabled, Mode=TwoWay}" />
-						</Viewbox>
+						<CheckBox Classes="Wrap" Margin="0,4,0,0"
+						          Content="{l:Config 'EXPORTLIMIT.NETWORK_MODE.clusterModeActivated'}"
+						          IsChecked="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.IsNetworkModeEnabled, Mode=TwoWay}" />
 
 						<TextBlock Classes="Caption" HorizontalAlignment="Left" Margin="0,4,0,0" Text="{l:Config 'EXPORTLIMIT.PHASE_MODE.phaseMode'}" />
 						<ComboBox HorizontalAlignment="Stretch" Margin="0,2,0,6"
@@ -110,20 +105,21 @@
 						          SelectedValue="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.PhaseMode, Mode=TwoWay}"
 						          SelectedValueBinding="{Binding Value}" />
 
-						<Viewbox Classes="CheckBox">
-							<CheckBox Content="{l:Config 'EXPORTLIMIT.failSafeModeEnabled'}"
-							          IsChecked="{Binding Settings.PowerLimitSettings.ExportLimits.EnableFailSafeMode, Mode=TwoWay}" />
-						</Viewbox>
+						<!-- Its key name reads short, but "Wechselrichterleistung auf 0% reduzieren, wenn die
+						     Verbindung zum Smart Meter getrennt ist." is what it actually resolves to on the
+						     inverter - Classes="Wrap" is the default for exactly this reason, see
+						     Styles/CompactForms.axaml. -->
+						<CheckBox Classes="Wrap"
+						          Content="{l:Config 'EXPORTLIMIT.failSafeModeEnabled'}"
+						          IsChecked="{Binding Settings.PowerLimitSettings.ExportLimits.EnableFailSafeMode, Mode=TwoWay}" />
 
-						<Viewbox Classes="CheckBox" Margin="0,4,0,0">
-							<CheckBox Content="{l:Config 'EXPORTLIMIT.HARDLIMIT.enabled'}"
-							          IsChecked="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.HardLimit.IsEnabled, Mode=TwoWay}" />
-						</Viewbox>
+						<CheckBox Classes="Wrap" Margin="0,4,0,0"
+						          Content="{l:Config 'EXPORTLIMIT.HARDLIMIT.enabled'}"
+						          IsChecked="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.HardLimit.IsEnabled, Mode=TwoWay}" />
 
-						<Viewbox Classes="CheckBox" Margin="0,4,0,0">
-							<CheckBox Content="{l:Config 'EXPORTLIMIT.SOFTLIMIT.enabled'}"
-							          IsChecked="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit.IsEnabled, Mode=TwoWay}" />
-						</Viewbox>
+						<CheckBox Classes="Wrap" Margin="0,4,0,0"
+						          Content="{l:Config 'EXPORTLIMIT.SOFTLIMIT.enabled'}"
+						          IsChecked="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit.IsEnabled, Mode=TwoWay}" />
 
 						<!-- The peak power everything here is read against, and the two limits themselves. The
 						     three keep an order - the soft limit at or below the hard one, the hard one at or

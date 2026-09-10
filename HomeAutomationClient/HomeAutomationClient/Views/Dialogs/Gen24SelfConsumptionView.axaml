@@ -60,24 +60,16 @@
 			<HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.GridPowerManagement}">
 				<StackPanel Margin="8,4">
 					<StackPanel Orientation="Horizontal">
-						<Viewbox Classes="RadioButton" Margin="0,0,12,0">
-							<RadioButton GroupName="Mode" Content="{l:Config 'BATTERIES.AUTO'}"
-							             IsChecked="{Binding Settings.Mode, Mode=TwoWay, Converter={co:OptimizationMode2Bool Automatic}}" />
-						</Viewbox>
-						<Viewbox Classes="RadioButton" Margin="0,0,12,0">
-							<RadioButton GroupName="Mode" Content="{l:Config 'BATTERIES.MANUAL'}"
-							             IsChecked="{Binding Settings.Mode, Mode=TwoWay, Converter={co:OptimizationMode2Bool Manual}}" />
-						</Viewbox>
+						<RadioButton Classes="Wrap" GroupName="Mode" Content="{l:Config 'BATTERIES.AUTO'}" Margin="0,0,12,0"
+						             IsChecked="{Binding Settings.Mode, Mode=TwoWay, Converter={co:OptimizationMode2Bool Automatic}}" />
+						<RadioButton Classes="Wrap" GroupName="Mode" Content="{l:Config 'BATTERIES.MANUAL'}" Margin="0,0,12,0"
+						             IsChecked="{Binding Settings.Mode, Mode=TwoWay, Converter={co:OptimizationMode2Bool Manual}}" />
 
 						<StackPanel Orientation="Horizontal" IsVisible="{Binding IsManualMode}">
-							<Viewbox Classes="RadioButton" Margin="0,0,12,0">
-								<RadioButton GroupName="Direction" Content="{l:Ui 'BATTERIES.FEED_IN'}"
-								             IsChecked="{Binding IsFeedIn, Mode=TwoWay}" />
-							</Viewbox>
-							<Viewbox Classes="RadioButton">
-								<RadioButton GroupName="Direction" Content="{l:Ui 'BATTERIES.CONSUMPTION'}"
-								             IsChecked="{Binding !IsFeedIn, Mode=TwoWay}" />
-							</Viewbox>
+							<RadioButton Classes="Wrap" GroupName="Direction" Content="{l:Ui 'BATTERIES.FEED_IN'}" Margin="0,0,12,0"
+							             IsChecked="{Binding IsFeedIn, Mode=TwoWay}" />
+							<RadioButton Classes="Wrap" GroupName="Direction" Content="{l:Ui 'BATTERIES.CONSUMPTION'}"
+							             IsChecked="{Binding !IsFeedIn, Mode=TwoWay}" />
 						</StackPanel>
 					</StackPanel>
 
@@ -96,14 +88,10 @@
 			<HeaderedContentControl Classes="GroupBox" Header="{l:Config 'BATTERIES.BAT_M0_SOC_MODE'}">
 				<StackPanel Margin="8,4">
 					<StackPanel Orientation="Horizontal">
-						<Viewbox Classes="RadioButton" Margin="0,0,12,0">
-							<RadioButton GroupName="SocMode" Content="{l:Config 'BATTERIES.SOC_MODE_AUTO'}"
-							             IsChecked="{Binding Settings.Limits, Mode=TwoWay, Converter={co:SocLimits2Bool UseManufacturerDefault}}" />
-						</Viewbox>
-						<Viewbox Classes="RadioButton">
-							<RadioButton GroupName="SocMode" Content="{l:Config 'BATTERIES.SOC_MODE_MANUAL'}"
-							             IsChecked="{Binding Settings.Limits, Mode=TwoWay, Converter={co:SocLimits2Bool Override}}" />
-						</Viewbox>
+						<RadioButton Classes="Wrap" GroupName="SocMode" Content="{l:Config 'BATTERIES.SOC_MODE_AUTO'}" Margin="0,0,12,0"
+						             IsChecked="{Binding Settings.Limits, Mode=TwoWay, Converter={co:SocLimits2Bool UseManufacturerDefault}}" />
+						<RadioButton Classes="Wrap" GroupName="SocMode" Content="{l:Config 'BATTERIES.SOC_MODE_MANUAL'}"
+						             IsChecked="{Binding Settings.Limits, Mode=TwoWay, Converter={co:SocLimits2Bool Override}}" />
 					</StackPanel>
 
 					<StackPanel IsVisible="{Binding ShowSocLimits}">
@@ -127,21 +115,15 @@
 			<!-- Support the OhmPilot -->
 			<HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.SupportOhmPilotSoc}">
 				<StackPanel Margin="8,4">
-					<Viewbox Classes="CheckBox">
-						<CheckBox Content="{l:Config 'BATTERIES.supportSocActive'}" IsChecked="{Binding Settings.EnableSupportSoc, Mode=TwoWay}" />
-					</Viewbox>
+					<CheckBox Classes="Wrap" Content="{l:Config 'BATTERIES.supportSocActive'}" IsChecked="{Binding Settings.EnableSupportSoc, Mode=TwoWay}" />
 
 					<StackPanel IsVisible="{Binding ShowSupportSoc}">
 						<StackPanel Orientation="Horizontal" Margin="0,4,0,0">
 							<TextBlock Classes="Caption" Text="{l:Config 'BATTERIES.supportSocMode'}" />
-							<Viewbox Classes="RadioButton" Margin="8,0,12,0">
-								<RadioButton GroupName="SupportSocMode" Content="{l:Config 'BATTERIES.supportSocMode_auto'}"
-								             IsChecked="{Binding Settings.SupportSocMode, Mode=TwoWay, Converter={co:SocLimits2Bool UseManufacturerDefault}}" />
-							</Viewbox>
-							<Viewbox Classes="RadioButton">
-								<RadioButton GroupName="SupportSocMode" Content="{l:Config 'BATTERIES.supportSocMode_manual'}"
-								             IsChecked="{Binding Settings.SupportSocMode, Mode=TwoWay, Converter={co:SocLimits2Bool Override}}" />
-							</Viewbox>
+							<RadioButton Classes="Wrap" GroupName="SupportSocMode" Content="{l:Config 'BATTERIES.supportSocMode_auto'}" Margin="8,0,12,0"
+							             IsChecked="{Binding Settings.SupportSocMode, Mode=TwoWay, Converter={co:SocLimits2Bool UseManufacturerDefault}}" />
+							<RadioButton Classes="Wrap" GroupName="SupportSocMode" Content="{l:Config 'BATTERIES.supportSocMode_manual'}"
+							             IsChecked="{Binding Settings.SupportSocMode, Mode=TwoWay, Converter={co:SocLimits2Bool Override}}" />
 						</StackPanel>
 
 						<StackPanel IsVisible="{Binding ShowSupportSocPercent}">
@@ -186,18 +168,10 @@
 
 					<!-- Every one of these can stop a battery working, so they are behind the danger switch. -->
 					<StackPanel IsEnabled="{Binding EnableDanger}">
-						<Viewbox Classes="CheckBox">
-							<CheckBox Content="{x:Static p:Resources.EnableBattery}" IsChecked="{Binding Settings.IsEnabled, Mode=TwoWay}" />
-						</Viewbox>
-						<Viewbox Classes="CheckBox">
-							<CheckBox Content="{x:Static p:Resources.CalibrateBattery}" IsChecked="{Binding Settings.IsInCalibration, Mode=TwoWay}" />
-						</Viewbox>
-						<Viewbox Classes="CheckBox">
-							<CheckBox Content="{x:Static p:Resources.IsInServiceMode}" IsChecked="{Binding Settings.IsInServiceMode, Mode=TwoWay}" />
-						</Viewbox>
-						<Viewbox Classes="CheckBox">
-							<CheckBox Content="{x:Static p:Resources.BatteryIsAcCoupled}" IsChecked="{Binding Settings.IsAcCoupled, Mode=TwoWay}" />
-						</Viewbox>
+						<CheckBox Classes="Wrap" Content="{x:Static p:Resources.EnableBattery}" IsChecked="{Binding Settings.IsEnabled, Mode=TwoWay}" />
+						<CheckBox Classes="Wrap" Content="{x:Static p:Resources.CalibrateBattery}" IsChecked="{Binding Settings.IsInCalibration, Mode=TwoWay}" />
+						<CheckBox Classes="Wrap" Content="{x:Static p:Resources.IsInServiceMode}" IsChecked="{Binding Settings.IsInServiceMode, Mode=TwoWay}" />
+						<CheckBox Classes="Wrap" Content="{x:Static p:Resources.BatteryIsAcCoupled}" IsChecked="{Binding Settings.IsAcCoupled, Mode=TwoWay}" />
 					</StackPanel>
 
 					<StackPanel IsVisible="{Binding ShowAcChargingPower}">
@@ -228,10 +202,9 @@
 					</StackPanel>
 					<Slider Minimum="{Binding SocMinimum}" Maximum="{Binding SocMaximum}" Value="{Binding BackupReserve, Mode=TwoWay}" />
 
-					<Viewbox Classes="CheckBox" Margin="0,6,0,0">
-						<CheckBox Content="{l:Config 'BATTERIES.HYB_BACKUP_SYSTEMDEADLOCKPREVENTION'}"
-						          IsChecked="{Binding Settings.EnableSystemDeadlockPrevention, Mode=TwoWay}" />
-					</Viewbox>
+					<CheckBox Classes="Wrap" Margin="0,6,0,0"
+					          Content="{l:Config 'BATTERIES.HYB_BACKUP_SYSTEMDEADLOCKPREVENTION'}"
+					          IsChecked="{Binding Settings.EnableSystemDeadlockPrevention, Mode=TwoWay}" />
 				</StackPanel>
 			</HeaderedContentControl>
 		</StackPanel>
@@ -290,7 +263,12 @@
 									<ColumnDefinition Width="Auto" SharedSizeGroup="Delete" />
 								</Grid.ColumnDefinitions>
 								<!-- Centred under its heading. The style of a scaled check box aligns it left,
-								     which is right for a caption beside it and wrong for one above it. -->
+								     which is right for a caption beside it and wrong for one above it.
+
+								     Not Classes="Wrap": it has no caption at all to protect, only a Viewbox to
+								     scale, and Wrap's ContentPresenter carries a Margin="4,0,0,0" that applies
+								     whether or not there is anything in it - measured, it widened this column
+								     from 126 to 154 pixels for no benefit. -->
 								<Viewbox Grid.Column="0" Classes="CheckBox" HorizontalAlignment="Center" Margin="2,0">
 									<CheckBox Classes="NoContent" IsChecked="{Binding Rule.IsActive, Mode=TwoWay}" />
 								</Viewbox>
@@ -306,7 +284,9 @@
 
 								<!-- Seven boxes under the seven letters of the heading, and no letters of their
 								     own. Each keeps the name of its day as a tool tip, because a box on its own
-								     says nothing once the heading has scrolled out of sight. -->
+								     says nothing once the heading has scrolled out of sight. Not Classes="Wrap",
+								     for the same reason as the Active box above: nothing here can grow long, and
+								     Wrap's own margin would have widened the column regardless. -->
 								<UniformGrid Grid.Column="5" Columns="7" VerticalAlignment="Center">
 									<Viewbox Classes="CheckBox" HorizontalAlignment="Center" Margin="2,0" ToolTip.Tip="{x:Static misc:WeekdayNames.Monday}">
 										<CheckBox Classes="NoContent" IsChecked="{Binding Rule.Monday, Mode=TwoWay}" />

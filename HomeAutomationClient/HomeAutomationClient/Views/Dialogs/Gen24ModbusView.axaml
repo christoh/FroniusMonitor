@@ -27,9 +27,7 @@
 			<Setter Property="Margin" Value="0,2" />
 			<Setter Property="HorizontalAlignment" Value="Left" />
 		</Style>
-		<!-- The margin belongs to the Viewbox a check box sits in, not to the check box: anything inside the
-		     Viewbox is scaled with it, and it would change the natural height the scale is worked out from. -->
-		<Style Selector="Viewbox.CheckBox">
+		<Style Selector="CheckBox.Wrap">
 			<Setter Property="Margin" Value="0,0,0,2" />
 		</Style>
 	</UserControl.Styles>
@@ -64,22 +62,16 @@
 
 		<HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.ModbusTcpSettings}">
 			<StackPanel Margin="8">
-				<!-- Every check box is scaled by the Viewbox it sits in - see Styles/CompactForms.axaml for why
-				     that is the only way to make one shorter. IsVisible goes on the Viewbox: on the check box it
-				     would leave the Viewbox holding the empty row. -->
-				<Viewbox Classes="CheckBox">
-					<CheckBox Content="{x:Static p:Resources.EnableModbusTcp}" IsChecked="{Binding EnableTcp}" />
-				</Viewbox>
+				<!-- Classes="Wrap" is the default for a check box with a caption - see Styles/CompactForms.axaml.
+				     IsVisible goes on the check box itself now, not on a Viewbox around it: there is no Viewbox
+				     any more to leave holding an empty row. -->
+				<CheckBox Classes="Wrap" Content="{x:Static p:Resources.EnableModbusTcp}" IsChecked="{Binding EnableTcp}" />
 
-				<Viewbox Classes="CheckBox" IsVisible="{Binding ShowAllowControl}">
-					<CheckBox Content="{x:Static p:Resources.AllowInverterControlOverModbusTcp}"
-					          IsChecked="{Binding Settings.AllowControl}" />
-				</Viewbox>
+				<CheckBox Classes="Wrap" Content="{x:Static p:Resources.AllowInverterControlOverModbusTcp}"
+				          IsVisible="{Binding ShowAllowControl}" IsChecked="{Binding Settings.AllowControl}" />
 
-				<Viewbox Classes="CheckBox" Margin="0,0,0,4" IsVisible="{Binding ShowRestrictControl}">
-					<CheckBox Content="{x:Static p:Resources.RestrictInverterControlOverModbusTcp}"
-					          IsChecked="{Binding Settings.RestrictControl}" />
-				</Viewbox>
+				<CheckBox Classes="Wrap" Margin="0,0,0,4" Content="{x:Static p:Resources.RestrictInverterControlOverModbusTcp}"
+				          IsVisible="{Binding ShowRestrictControl}" IsChecked="{Binding Settings.RestrictControl}" />
 
 				<Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,Auto">
 					<TextBlock Grid.Row="0" Grid.Column="0" Classes="Caption" Text="{x:Static p:Resources.AllowIp}"

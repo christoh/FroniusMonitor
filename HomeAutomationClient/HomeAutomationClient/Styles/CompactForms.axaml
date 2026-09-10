@@ -93,7 +93,13 @@
 
 	<!-- A check box cannot be told to be shorter: the Fluent template puts Height="32" on a grid inside itself,
 	     bound to nothing the control exposes, and a style setter loses to a value set in a template. So it is
-	     scaled instead - `<Viewbox Classes="CheckBox"><CheckBox ... /></Viewbox>` in the view.
+	     scaled instead - `<Viewbox Classes="CheckBox"><CheckBox ... /></Viewbox>`.
+
+	     Used directly in a view only for a check box with no caption at all - the seven days of a charging rule's
+	     schedule and the "Active" column beside them, in Gen24SelfConsumptionView, seven fixed glyphs with
+	     nothing to wrap, where shrinking the whole thing uniformly is exactly what a column 126 pixels wide
+	     wants. Every check box with a caption uses CheckBox.Wrap below instead, which still scales its glyph
+	     with this exact same Viewbox - only nested inside its own Template, rather than around the caption too.
 
 	     A Viewbox scales everything in it, the caption included, so the check box is given a font big enough to
 	     land back at the size of the form once it has been scaled down. The two numbers below belong together:
@@ -118,9 +124,101 @@
 		<Setter Property="Margin" Value="0,0,-8,0" />
 	</Style>
 
+	<!-- Every check box that carries a caption uses Classes="Wrap" - the default for one with a caption, not an
+	     exception for the long ones. Most captions here are read from the inverter's own translation
+	     (`{l:Config '...'}`), which the app does not control and cannot assume stays short: what looked like a
+	     short key name still turned out to be a long German sentence once actually shown - see
+	     EXPORTLIMIT.failSafeModeEnabled below - and there is no way to tell which of the rest will do the same in
+	     some other language or some other firmware. `Viewbox.CheckBox` above is kept only for the seven
+	     content-less schedule glyphs, which have no caption to get wrong.
+
+	     A Viewbox cannot be rescued for this: it measures its child unconstrained, so a caption inside one never
+	     wraps no matter how little width the Viewbox is finally given - it just reports one long line and the
+	     Viewbox scales the WHOLE thing, box and caption together, down until that line fits, which is what
+	     shrank a caption to a few illegible points instead of letting it wrap. Forcing the wrap with a narrower
+	     MaxWidth on the check box inside does not fix it either - measured - because a wrapped, multi-line child
+	     is much taller, which changes the aspect ratio the Viewbox scales by, so the SAME Height="22" then
+	     shrinks the glyph itself down to a few pixels instead of the caption.
+
+	     So this Template keeps the box and the caption apart instead. The glyph is the SAME small Viewbox as
+	     every other check box - untouched, so it is exactly the same size regardless of how the caption wraps -
+	     around a second, undisplayed check box that exists only to draw it. The caption is a plain, wrapping
+	     ContentPresenter beside it that the Viewbox never touches. The outer element is still the real CheckBox
+	     the view binds to and only its Template differs, so every bit of its native behaviour - click, Tab,
+	     Space, Command - keeps working. The inner check box and the caption are IsHitTestVisible="False" and the
+	     inner one is besides Focusable="False", so a click or a Tab always reaches the real, outer check box
+	     wherever in the row it lands, including under a wrapped caption's second line - the Grid's own
+	     Background is what makes that empty looking space still count as "in the row". Measured against both a
+	     short and a very long caption: the glyph stays 22 high either way, and clicking far from it, or
+	     Tab-focusing the row and pressing Space, both still work. -->
+	<Style Selector="CheckBox.Wrap">
+		<!-- Fluent gives CheckBox a MinHeight of its own, independent of what its Template actually needs - a
+		     plain Style Setter cannot shrink the default template below it, and it does not go away just because
+		     this one supplies its own Template instead: measured, the row still came out 32 without this. -->
+		<Setter Property="MinHeight" Value="0" />
+		<Setter Property="Template">
+			<ControlTemplate>
+				<Grid ColumnDefinitions="Auto,*" Background="Transparent">
+					<!-- VerticalAlignment="Top" on the glyph, not the default it would otherwise fall back to:
+					     Viewbox.CheckBox has an explicit Height, so Stretch cannot size it to the row and Avalonia
+					     centres it instead - fine for a single line, but for a caption that wraps to two or three
+					     it left the glyph floating between them rather than beside the first one. Measured before
+					     this: in a row wrapped to three lines, the glyph's own centre sat 25 pixels below the
+					     centre of the first line; with Top it lines up with it, the same as a single line check
+					     box already does by having nothing else to centre against. -->
+					<Viewbox Grid.Column="0" Classes="CheckBox" VerticalAlignment="Top" IsHitTestVisible="False">
+						<CheckBox Classes="NoContent" IsChecked="{TemplateBinding IsChecked}"
+						          IsHitTestVisible="False" Focusable="False" />
+					</Viewbox>
+					<!-- Top, with a fixed top margin, not Center: Center was tried first and fixed a single line
+					     caption (measured 0 pixels off, against 7.1 too high with plain Top) but only by
+					     accident - it centres the caption's own whole height against the row, which is the same
+					     thing as centring its one line for a single line caption, but for a caption that wraps to
+					     two or more lines it centres the WHOLE block instead of just the first line, which is the
+					     one actually beside the glyph. Measured on a wrapped caption with Center: the first line's
+					     own centre sat 4.25 pixels above the glyph's, because the second and later lines pull the
+					     centre of the whole block down past where the first line alone would put it - visibly too
+					     high again, just a smaller version of the original bug, and the more lines it wraps to the
+					     worse it gets, not better.
+
+					     A fixed top margin fixes both at once, because it does not care how many lines follow:
+					     Top anchors the caption's first line at a constant distance below the row's own top,
+					     which is also where the glyph starts, so the same margin lines the first line up with
+					     the glyph's centre whether that first line is the only one or not. Measured against both
+					     a single line caption and one wrapped to two lines: the glyph's centre is at 11 (a 22
+					     high Viewbox), a 12 point line is 13 high, so 4.5 of margin puts the first line's centre
+					     at 4.5 + 6.5 = 11 exactly, for either one.
+
+					     4.5 and not a whole number, because 4.5 is exactly where Center had put a single line
+					     caption - (22 - 13) / 2 - and that was the one placement the developer had called
+					     perfect. 5 was tried first and was visibly too low on the developer's screen. A headless
+					     probe at 100% reports 4.5 as half a pixel high and 5 as half a pixel low, because at that
+					     scale the caption's top has to be a whole pixel and a 13 high line cannot centre on 11;
+					     on a high DPI screen the layout rounds to a fraction of a pixel and 4.5 lands where the
+					     arithmetic says. Do not "fix" the probe's -0.5 by going back to 5.
+
+					     4.5, not the 8 an isolated test control first suggested: an isolated CheckBox.Wrap, built
+					     outside any real view to try candidate margins quickly, measured its own glyph's centre
+					     3.5 pixels lower than the same glyph reads inside the real dialog, for a reason not
+					     tracked down - so 8 looked right in isolation and put every caption in the real dialog
+					     3.5 pixels too low once actually checked there. The lesson: a synthetic probe is fine for
+					     comparing two settings against each other, but the one number that decides where a pixel
+					     actually lands has to be measured in the real view, not an approximation of it. -->
+					<ContentPresenter Grid.Column="1" Content="{TemplateBinding Content}" Margin="4,4.5,0,0"
+					                  VerticalAlignment="Top" TextBlock.TextWrapping="Wrap" IsHitTestVisible="False" />
+				</Grid>
+			</ControlTemplate>
+		</Setter>
+	</Style>
+
 	<!-- A radio button cannot be told to be shorter either, and for the same reason as the check box: the Fluent
 	     template puts a fixed height on a grid inside itself. Measured at 32 against the 22 of a check box, so it
-	     is scaled the same way and with the same numbers, which is what makes the two match. -->
+	     is scaled the same way and with the same numbers, which is what makes the two match.
+
+	     Every radio button in this app has a caption, so nothing uses this directly in a view any more - it is
+	     used only from inside RadioButton.Wrap's own Template below, the same way CheckBox.Wrap uses
+	     Viewbox.CheckBox. Kept rather than folded into that Template inline, so the two controls keep reading
+	     from the one place if the numbers ever need to change. -->
 	<Style Selector="Viewbox.RadioButton">
 		<Setter Property="Height" Value="22" />
 		<Setter Property="StretchDirection" Value="DownOnly" />
@@ -129,6 +227,28 @@
 
 	<Style Selector="Viewbox.RadioButton > RadioButton">
 		<Setter Property="FontSize" Value="17.5" />
+	</Style>
+
+	<!-- The RadioButton counterpart of CheckBox.Wrap above - same reasoning, same Template shape, same two
+	     measured facts: Fluent's own MinHeight survives swapping the Template out and has to be zeroed, and the
+	     glyph needs VerticalAlignment="Top" or it centres against the whole wrapped block instead of the first
+	     line. The dot is the same small Viewbox.RadioButton every other radio button uses, untouched. -->
+	<Style Selector="RadioButton.Wrap">
+		<Setter Property="MinHeight" Value="0" />
+		<Setter Property="Template">
+			<ControlTemplate>
+				<Grid ColumnDefinitions="Auto,*" Background="Transparent">
+					<Viewbox Grid.Column="0" Classes="RadioButton" VerticalAlignment="Top" IsHitTestVisible="False">
+						<RadioButton IsChecked="{TemplateBinding IsChecked}"
+						             IsHitTestVisible="False" Focusable="False" />
+					</Viewbox>
+					<!-- Top with a 4.5 pixel top margin on the caption, not Center - see the identical note on
+					     CheckBox.Wrap above; this one needed the same correction for the same measured reason. -->
+					<ContentPresenter Grid.Column="1" Content="{TemplateBinding Content}" Margin="4,4.5,0,0"
+					                  VerticalAlignment="Top" TextBlock.TextWrapping="Wrap" IsHitTestVisible="False" />
+				</Grid>
+			</ControlTemplate>
+		</Setter>
 	</Style>
 
 	<!-- A Fluent slider is 50 pixels tall and only about 20 of them are the slider: the rest is slack above and
