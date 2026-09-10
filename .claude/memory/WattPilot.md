@@ -228,9 +228,20 @@ settings chooses `WattPilotElectricityService` as the app's price source.
 
 **Server (`HomeAutomationServer`)** registers `IWattPilotService` as **transient** and `WattPilotDataCollector`
 as the singleton that owns one service per configured `WebConnection` (`Settings.WattPilotConnections` →
-`WattPilotParameters.Connections`). It reconnects in two ways: `OnLostConnection` restarts the service that lost
-its socket, and a 15 second timer restarts every service that has not received a message for 15 seconds. Every
-`OnUpdate` publishes **two** managed devices to `IDataControlService`:
+`WattPilotParameters.Connections`). **Re-establishing a lost connection happens in exactly one place,
+`OnLostConnection`**, which fires when the reader ends for any reason. The 15 second watchdog timer does not
+start anything that is still connected: a service with a `Connection` that has been silent for 15 seconds (a
+half-open socket delivers nothing and raises nothing) is **stopped**, and the reader's tear-down then raises
+`OnLostConnection` like any other loss. Only a service with **no** `Connection` at all - the charger was
+unreachable at the last attempt, so there is no reader to end - is started by the timer directly. The reason for
+the split is `WattPilotService.StartAsync` itself: it does not close a socket it already has, it opens a second
+one and leaves the old reader running against the field it just replaced, so starting over a live connection
+races two `ReceiveAsync` calls on one socket and tears the new connection down within seconds. The WPF app
+guards the same way - `DataCollectionService.TryStartWattPilot` only calls `StartAsync` when `Connection` is
+`null`. `Connection` is therefore the connected flag: set first thing in `StartAsync`, nulled when the handshake
+fails and when the reader ends. A start attempt also stamps `LastMessageReceived`, so the watchdog does not stop a
+handshake that is still within its own ten second timeout. Every `OnUpdate` publishes **two** managed devices to
+`IDataControlService`:
 
 - the `WattPilot` itself, with `SupportsPushMessages: true` - which is precisely what makes `SignalRDispatcher`
   **not** broadcast it. A full `WattPilot` per delta would be the whole model, several times a second.
@@ -278,6 +289,7 @@ the URL.
 - The firmware-update check is switched off (`&& false`), see above.
 - The Avalonia client has no Wattpilot settings dialog and no reboot / charging log / config PDF; `DevicesWithSettings`
   lists the charger anyway.
-- `WattPilotDataCollector.TimerElapsed` calls `StartAsync` on a service whose socket may still be open;
-  `StartAsync` does not stop a running connection first. Whether that leaks the old reader has not been checked.
+- `WattPilotService.StartAsync` still does not stop a running connection itself; both owners work around it by
+  never calling it while `Connection` is set (see above). Making `StartAsync` idempotent would have to keep the
+  tear-down from raising `OnLostConnection`, or the owner would start a second time from the event.
 - `WattPilotDisplayMode` and the cycling logic exist twice, once per app.

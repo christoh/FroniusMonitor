@@ -88,9 +88,12 @@ public sealed class WattPilotDataCollector(
         {
             var start = DateTime.UtcNow;
             var connection = services[service].Connection;
-            await service.StartAsync(connection).ConfigureAwait(false);
+
+            // The attempt itself counts as activity: the handshake may take up to its own ten second timeout, and
+            // the watchdog must not take a connection that is still being set up for one that has gone quiet.
             services[service] = new(connection);
-            logger.LogInformation("Connection to WattPilot '{WattPilot}' established in {Duration:N0} ms", service.WattPilot?.DisplayName, (DateTime.UtcNow - start).Milliseconds);
+            await service.StartAsync(connection).ConfigureAwait(false);
+            logger.LogInformation("Connection to WattPilot '{WattPilot}' established in {Duration:N0} ms", service.WattPilot?.DisplayName, (DateTime.UtcNow - start).TotalMilliseconds);
         }
         catch (Exception ex)
         {
@@ -109,12 +112,6 @@ public sealed class WattPilotDataCollector(
                 throw new InvalidCastException($"{nameof(sender)} must be {nameof(IWattPilotService)}");
             }
 
-            var serviceState = new ServiceState(services[service].Connection)
-            {
-                LastMessageReceived = services[service].LastMessageReceived,
-            };
-
-            services[service] = serviceState;
             await StartServiceAsync(service);
         }
         catch (Exception ex)
@@ -123,13 +120,33 @@ public sealed class WattPilotDataCollector(
         }
     }
 
+    /// <summary>
+    /// The watchdog: a WebSocket that has gone half open delivers nothing and raises nothing, so a charger that
+    /// has said nothing for 15 seconds is taken to be gone.
+    /// </summary>
+    /// <remarks>
+    /// A service that still holds a connection is only stopped here, never started. WattPilotService.StartAsync
+    /// does not close a socket it already has - it opens a second one and leaves the old reader running against
+    /// it - so starting over a live connection races two readers on one socket. Stopping ends the reader, which
+    /// raises OnLostConnection, which is the one place a lost connection is re-established from. Only a service
+    /// with no connection at all - the charger was unreachable when it was last tried - is started directly,
+    /// because nothing else will.
+    /// </remarks>
     private async void TimerElapsed(object? state)
     {
         try
         {
-            foreach (var keyValuePair in services.Where(s => DateTime.UtcNow - s.Value.LastMessageReceived > TimeSpan.FromSeconds(15)))
+            foreach (var service in services.Where(s => DateTime.UtcNow - s.Value.LastMessageReceived > TimeSpan.FromSeconds(15)).Select(s => s.Key))
             {
-                await StartServiceAsync(keyValuePair.Key).ConfigureAwait(false);
+                if (service.Connection is null)
+                {
+                    await StartServiceAsync(service).ConfigureAwait(false);
+                }
+                else
+                {
+                    logger.LogWarning("No message from WattPilot '{WattPilot}' for 15 seconds, reconnecting", service.WattPilot?.DisplayName);
+                    await service.StopAsync().ConfigureAwait(false);
+                }
             }
         }
         catch (Exception ex)
