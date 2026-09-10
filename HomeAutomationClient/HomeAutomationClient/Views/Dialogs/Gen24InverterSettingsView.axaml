@@ -79,11 +79,13 @@
 					     these three are behind the danger switch, exactly as in the WPF dialog. The switch used
 					     to be one IsEnabled on a panel around them; in one grid with the name above, which may
 					     always be edited, it is a class on each of the three instead. -->
-					<TextBlock Grid.Row="1" Grid.Column="0" Classes="Caption Danger" Text="{x:Static p:Resources.TimeZone}" />
+					<TextBlock Grid.Row="1" Grid.Column="0" Classes="Caption Danger">
+                        <Run Text="{x:Static p:Resources.TimeZone}"/><Run Text=":"/>
+                    </TextBlock>
 					<TextBox Grid.Row="1" Grid.Column="1" Classes="Danger" MaxLength="30"
 					         Text="{Binding Settings.TimeZoneName, Mode=TwoWay}" />
 
-					<CheckBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Classes="Wrap Danger"
+					<CheckBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Classes="Wrap Danger" Margin="0,2,0,0"
 					          Content="{x:Static p:Resources.SynchronizeTime}" IsChecked="{Binding Settings.TimeSync, Mode=TwoWay}" />
 				</Grid>
 			</HeaderedContentControl>
@@ -99,7 +101,7 @@
 						          Content="{l:Config 'EXPORTLIMIT.NETWORK_MODE.clusterModeActivated'}"
 						          IsChecked="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.IsNetworkModeEnabled, Mode=TwoWay}" />
 
-						<TextBlock Classes="Caption" HorizontalAlignment="Left" Margin="0,4,0,0" Text="{l:Config 'EXPORTLIMIT.PHASE_MODE.phaseMode'}" />
+						<TextBlock Classes="Caption" HorizontalAlignment="Left" Margin="0,8,0,0" Text="{l:Config 'EXPORTLIMIT.PHASE_MODE.phaseMode'}" />
 						<ComboBox HorizontalAlignment="Stretch" Margin="0,2,0,6"
 						          ItemsSource="{Binding PhaseModes}" DisplayMemberBinding="{Binding DisplayName}"
 						          SelectedValue="{Binding Settings.PowerLimitSettings.ExportLimits.ActivePower.PhaseMode, Mode=TwoWay}"

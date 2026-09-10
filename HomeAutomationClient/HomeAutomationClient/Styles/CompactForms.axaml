@@ -63,7 +63,7 @@
 	     it. -->
 	<Style Selector="TextBox">
 		<Setter Property="MinHeight" Value="22" />
-		<Setter Property="Padding" Value="6,0" />
+		<Setter Property="Padding" Value="3,0" />
 		<Setter Property="VerticalContentAlignment" Value="Center" />
 	</Style>
 

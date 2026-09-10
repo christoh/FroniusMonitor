@@ -19,14 +19,14 @@
 			          SelectedValue="{Binding Tracker.PowerMode, Mode=TwoWay}" SelectedValueBinding="{Binding Value}" />
 
 			<!-- Only a tracker that looks for its own working point has a peak manager to set. -->
-			<StackPanel IsVisible="{Binding ShowDynamicPeakManager}">
+			<StackPanel IsVisible="{Binding ShowDynamicPeakManager}" Margin="0,4,0,0">
 				<TextBlock Classes="Caption" HorizontalAlignment="Left" Text="{Binding DynamicPeakManagerCaption}" />
 				<ComboBox HorizontalAlignment="Stretch" Margin="0,2,0,6"
 				          ItemsSource="{Binding DynamicPeakManagerModes}" DisplayMemberBinding="{Binding DisplayName}"
 				          SelectedValue="{Binding Tracker.DynamicPeakManager, Mode=TwoWay}" SelectedValueBinding="{Binding Value}" />
 			</StackPanel>
 
-			<StackPanel Classes="Reading">
+			<StackPanel Classes="Reading" Margin="0,4,0,0">
 				<TextBlock Classes="Caption" Text="{Binding WattPeakCaption}" />
 				<TextBox Text="{Binding WattPeakText, Mode=TwoWay}" />
 				<TextBlock Classes="Unit" Text="W" />
@@ -39,7 +39,7 @@
 
 			<!-- And only one that does not needs a voltage to hold. -->
 			<StackPanel IsVisible="{Binding ShowFixedVoltage}">
-				<StackPanel Classes="Reading">
+				<StackPanel Classes="Reading" Margin="0,4,0,0">
 					<TextBlock Classes="Caption" Text="{Binding FixedVoltageCaption}" />
 					<TextBox Text="{Binding DcFixedVoltageText, Mode=TwoWay}" />
 					<TextBlock Classes="Unit" Text="V" />

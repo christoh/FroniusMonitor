@@ -46,12 +46,6 @@
 				</ScrollViewer>
 			</TabItem>
 
-			<!-- IsSelected is two way bound because looking at this tab is what makes it read the log: it is not
-			     part of the settings snapshot and most visits to this dialog are to change a setting. -->
-			<TabItem Header="{x:Static p:Resources.EventLog}" IsSelected="{Binding EventLog.IsSelected, Mode=TwoWay}">
-				<v:Gen24EventLogView DataContext="{Binding EventLog}" />
-			</TabItem>
-
 			<!-- ShowModbus keeps the tab in place while the settings are read and drops it afterwards only where
 			     the inverter has no Modbus configuration at all - the tab would have nothing to show then. -->
 			<TabItem Header="{x:Static p:Resources.Modbus}" IsVisible="{Binding ShowModbus}">
@@ -59,6 +53,12 @@
 					<v:Gen24ModbusView DataContext="{Binding Modbus}" />
 				</ScrollViewer>
 			</TabItem>
+
+            <!-- IsSelected is two way bound because looking at this tab is what makes it read the log: it is not
+			     part of the settings snapshot and most visits to this dialog are to change a setting. -->
+            <TabItem Header="{x:Static p:Resources.EventLog}" IsSelected="{Binding EventLog.IsSelected, Mode=TwoWay}">
+                <v:Gen24EventLogView DataContext="{Binding EventLog}" />
+            </TabItem>
 		</TabControl>
 
 		<!-- The toast lives here rather than in a tab: this row is the widest free space the dialog has, below
