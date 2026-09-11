@@ -51,6 +51,7 @@ public sealed class HubWattPilotSettingsTests : IAsyncLifetime
         // What the real hub needs: an empty device list to greet a connection with, and the way to the charger.
         builder.Services.AddSingleton<IDataControlService, DataControlService>();
         builder.Services.AddSingleton<IWattPilotServices>(new FakeWattPilotServices(ChargerId, charger));
+        builder.Services.AddSingleton<IToshibaHvacService>(new FakeToshibaHvacService());
 
         app = builder.Build();
         app.MapHub<HomeAutomationHub>("/hub").RequireAuthorization(policy => policy.RequireHubTicket());

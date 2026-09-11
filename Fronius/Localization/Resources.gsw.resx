@@ -1281,6 +1281,9 @@
   <data name="NoWattPilotConnection" xml:space="preserve">
 	  <value>Kei Verbindig mit em Wattpilot</value>
   </data>
+  <data name="NoToshibaHvacConnection" xml:space="preserve">
+	  <value>Kei Verbindig mit em Toshiba-HVAC-Dienscht</value>
+  </data>
   <data name="NoChargingLogFromWattPilot" xml:space="preserve">
 	  <value>Kei Link für de Ladelog verfüegbar</value>
   </data>

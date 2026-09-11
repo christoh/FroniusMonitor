@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System.ComponentModel;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
@@ -30,6 +31,10 @@ public class Settings
     
     public WebServerSettings WebServerSettings = new WebServerSettings();
 
+    /// <summary>The Toshiba account, or <see langword="null" /> when the server has no air conditioners to collect.</summary>
+    [XmlElement, DefaultValue(null)]
+    public ToshibaHvacSettings? ToshibaHvac { get; set; }
+
     [XmlIgnore] public static string SettingsFileName { get; set; } = Path.Combine(AppContext.BaseDirectory, "Settings.xml");
 
     public static Task<Settings> LoadAsync(string? fileName = null, CancellationToken token = default) => Task.Run(() => Load(fileName), token);
@@ -52,7 +57,7 @@ public class Settings
         lock (settingLock)
         {
             fileName ??= SettingsFileName;
-            UpdateChecksum([.. FritzBoxConnections]);
+            UpdateChecksum([.. FritzBoxConnections, ToshibaHvac]);
             var serializer = new XmlSerializer(typeof(Settings));
             using var stream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None);
 

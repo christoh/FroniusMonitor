@@ -112,6 +112,7 @@ public partial class App
                 .AddSingleton<IGen24JsonService, Gen24JsonService>()
                 .AddSingleton<IWattPilotService, WattPilotService>()
                 .AddSingleton<IToshibaHvacService, ToshibaHvacService>()
+                .AddSingleton<IToshibaHvacSessionStore>(Settings)
                 .AddSingleton<ISmartMeterImportService, BayernWerkImportService>()
                 .AddSingleton<SettingsBase>(Settings)
                 .AddTransient<IElectricityPriceService>(_ =>

@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.Settings;
 
-public abstract partial class SettingsBase : BindableBase, ICloneable
+public abstract partial class SettingsBase : BindableBase, ICloneable, IToshibaHvacSessionStore
 {
     public event EventHandler<EventArgs>? SettingsChanged;
 
@@ -24,7 +24,7 @@ public abstract partial class SettingsBase : BindableBase, ICloneable
             TunnelMode = TunnelMode.Auto,
         };
 
-        AzureDeviceId = unchecked((uint)RandomNumberGenerator.GetInt32(0, 1000000));
+        AzureDeviceId = ToshibaHvacAzureDeviceId.CreateRandom();
     }
 
     [XmlElement, DefaultValue(null), ObservableProperty]
@@ -32,6 +32,15 @@ public abstract partial class SettingsBase : BindableBase, ICloneable
 
     [XmlAttribute, ObservableProperty, DefaultValue(typeof(DateTime), default)]
     public partial DateTime ToshibaHvacSessionTime { get; set; }
+
+    ToshibaHvacSession? IToshibaHvacSessionStore.Session => ToshibaHvacSession;
+
+    Task IToshibaHvacSessionStore.SaveSessionAsync(ToshibaHvacSession session)
+    {
+        ToshibaHvacSession = session;
+        ToshibaHvacSessionTime = DateTime.UtcNow;
+        return Save();
+    }
 
     //[XmlElement, DefaultValue(null), ObservableProperty]
     //public partial ToshibaHvacAzureCredentials? ToshibaHvacAzureCredentials { get; set; }
@@ -104,20 +113,8 @@ public abstract partial class SettingsBase : BindableBase, ICloneable
     [XmlElement(nameof(AzureDeviceId))]
     public string AzureDeviceIdString
     {
-        get => AzureDeviceId.ToString("D6", CultureInfo.InvariantCulture);
-        set
-        {
-            if (!uint.TryParse(value, CultureInfo.InvariantCulture, out var result))
-            {
-                var logger = IoC.TryGetRegistered<ILogger<SettingsBase>>();
-                AzureDeviceId = unchecked((uint)RandomNumberGenerator.GetInt32(0, 1000000));
-                logger?.LogWarning("Invalid AzureDeviceId value: {value}. Generated a new random value: {randomValue:D6}", value, AzureDeviceId);
-            }
-            else
-            {
-                AzureDeviceId = result;
-            }
-        }
+        get => ToshibaHvacAzureDeviceId.ToString(AzureDeviceId);
+        set => AzureDeviceId = ToshibaHvacAzureDeviceId.Parse(value, IoC.TryGetRegistered<ILogger<SettingsBase>>());
     }
 
     [XmlElement, DefaultValue(false), ObservableProperty]

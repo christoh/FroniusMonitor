@@ -1290,6 +1290,9 @@
   <data name="NoWattPilotConnection" xml:space="preserve">
 	  <value>Keine Verbindung mit dem WattPilot</value>
   </data>
+  <data name="NoToshibaHvacConnection" xml:space="preserve">
+	  <value>Keine Verbindung mit dem Toshiba-HVAC-Dienst</value>
+  </data>
   <data name="NoChargingLogFromWattPilot" xml:space="preserve">
 	  <value>Kein Link für den Ladelog verfügbar</value>
   </data>

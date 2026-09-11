@@ -1368,6 +1368,9 @@
   <data name="NoWattPilotConnection" xml:space="preserve">
 	  <value>Not connected to Wattpilot</value>
   </data>
+  <data name="NoToshibaHvacConnection" xml:space="preserve">
+	  <value>Not connected to the Toshiba HVAC service</value>
+  </data>
   <data name="NoChargingLogFromWattPilot" xml:space="preserve">
 	  <value>No charging log link available from Wattpilot</value>
   </data>

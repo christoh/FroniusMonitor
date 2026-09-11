@@ -67,6 +67,8 @@ internal class Program
             });
 
             settings.ModbusMappings.Add(new ModbusMapping());
+            // Shows the shape of the Toshiba section; with an empty user name nothing is collected.
+            settings.ToshibaHvac = new ToshibaHvacSettings();
             await settings.SaveAsync().ConfigureAwait(false);
             settingsLoadException = ex;
         }
@@ -96,6 +98,11 @@ internal class Program
             // The same instance under its contract, so the hub can hand a client's settings to the service that
             // holds the connection to that charger.
             .AddSingleton<IWattPilotServices>(services => services.GetRequiredService<WattPilotDataCollector>())
+            // One Toshiba account per server, so the service is the singleton the collector runs and the hub sends
+            // commands through; the store puts the bearer token into Settings.xml.
+            .AddSingleton<IToshibaHvacSessionStore, ToshibaHvacSessionStore>()
+            .AddSingleton<IToshibaHvacService, ToshibaHvacService>()
+            .AddSingleton<ToshibaHvacDataCollector>()
             .AddTransient<ISunSpecClient, SunSpecClient>()
             .AddLogging(b => b.AddSerilog())
             .AddCors(o => o.AddDefaultPolicy(p => p.SetIsOriginAllowed(_ => true)
@@ -156,6 +163,12 @@ internal class Program
                     g.ConfigRefreshRate = TimeSpan.FromMinutes(5.1);
                 })
                 .Configure<WattPilotParameters>(w => { w.Connections = settings.WattPilotConnections; })
+                .Configure<ToshibaHvacDataCollectorParameters>(t =>
+                {
+                    t.Connection = settings.ToshibaHvac;
+                    t.AzureDeviceId = settings.ToshibaHvac?.AzureDeviceIdString ?? string.Empty;
+                    t.MappingRefreshRate = TimeSpan.FromMinutes(Math.Max(1, settings.ToshibaHvac?.MappingRefreshMinutes ?? 30));
+                })
                 .Configure<UserList>(u => { u.Users = settings.Users; });
         }
 
@@ -239,6 +252,7 @@ internal class Program
         await IoC.Get<Gen24DataCollector>().StartAsync().ConfigureAwait(false);
         await IoC.Get<SignalRDispatcher>().StartAsync().ConfigureAwait(false);
         await IoC.Get<WattPilotDataCollector>().StartAsync().ConfigureAwait(false);
+        await IoC.Get<ToshibaHvacDataCollector>().StartAsync().ConfigureAwait(false);
         //await Task.Delay(TimeSpan.FromSeconds(30));
         //await IoC.Get<SunSpecDataCollector>().StopAsync().ConfigureAwait(false);
         //await IoC.Get<Gen24DataCollector>().StopAsync().ConfigureAwait(false);

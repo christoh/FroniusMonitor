@@ -1,6 +1,6 @@
 ﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc;
 
-public abstract partial class ToshibaHvacDeviceBase : BindableBase, ISwitchable
+public abstract partial class ToshibaHvacDeviceBase : BindableBase, ISwitchable, IHaveUniqueId, IHaveDisplayName
 {
     [ObservableProperty, NotifyPropertyChangedFor(nameof(IsTurnedOn)), JsonPropertyName("ACStateData")]
     public partial ToshibaHvacStateData State { get; set; } = new();
@@ -36,4 +36,20 @@ public abstract partial class ToshibaHvacDeviceBase : BindableBase, ISwitchable
 
     [JsonIgnore]
     public string SerialNumber => DeviceUniqueId.ToString("N");
+
+    [JsonIgnore]
+    public virtual string DisplayName => SerialNumber;
+
+    /// <summary>
+    ///     Takes the values of a freshly read copy of the same device, so that the instance everybody holds stays the
+    ///     instance and only its values move. The state is replaced as a whole: what the mapping reports is the full
+    ///     state, not a delta.
+    /// </summary>
+    protected void CopyFrom(ToshibaHvacDeviceBase other)
+    {
+        State.StateData = other.State.StateData;
+        FirmwareVersion = other.FirmwareVersion;
+        MeritFeature = other.MeritFeature;
+        Modes = other.Modes;
+    }
 }

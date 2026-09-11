@@ -14,3 +14,5 @@ public record NewWattPilotFirmwareEventArgs(string CurrentFirmware, string NewFi
 public record WattPilotServiceStoppedEventArgs(WattPilot? WattPilot, WebConnection? WebConnection);
 
 public record WattPilotUpdateEventArgs(WattPilot WattPilot, JsonObject JsonObject);
+/// <summary>One air conditioner has new state - a live update or a heartbeat - and here is the message that brought it.</summary>
+public record ToshibaHvacDeviceUpdatedEventArgs(ToshibaHvacMappingDevice Device, ToshibaHvacAzureSmMobileCommand Command);

@@ -8,4 +8,7 @@
    </ModbusMappings>
    <ServerIpAddress>0.0.0.0</ServerIpAddress>
    <ServerPort>1502</ServerPort>
+   <!-- Optional. AzureDeviceId is drawn at random and written here on the first start; do not change it afterwards.
+        Session is the bearer token of the last login and is filled in by the server. -->
+   <ToshibaHvac BaseUrl="https://mobileapi.toshibahomeaccontrols.com" UserName="you@example.com" ClearTextPassword="your password, replaced by an encrypted Password on the first save" Protocol="Amqp" TunnelMode="Auto" AzureDeviceId="123456" MappingRefreshMinutes="30" />
 </Settings>

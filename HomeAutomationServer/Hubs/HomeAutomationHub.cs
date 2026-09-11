@@ -1,4 +1,5 @@
 using De.Hochstaetter.Fronius.Models.Charging;
+using De.Hochstaetter.Fronius.Models.ToshibaAc;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using De.Hochstaetter.HomeAutomationServer.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -6,8 +7,14 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace De.Hochstaetter.HomeAutomationServer.Hubs;
 
-public class HomeAutomationHub(IDataControlService controlService, IWattPilotServices wattPilots, ILogger<HomeAutomationHub> logger) : Hub
+public class HomeAutomationHub(IDataControlService controlService, IWattPilotServices wattPilots, IToshibaHvacService toshibaHvac, ILogger<HomeAutomationHub> logger) : Hub
 {
+    /// <summary>
+    /// How long an air conditioner is given to echo a command. The WPF app waited the same ten seconds before it
+    /// gave a button back to the user.
+    /// </summary>
+    public static readonly TimeSpan ToshibaHvacEchoTimeout = TimeSpan.FromSeconds(10);
+
     public override async Task OnConnectedAsync()
     {
         await base.OnConnectedAsync().ConfigureAwait(false);
@@ -111,6 +118,59 @@ public class HomeAutomationHub(IDataControlService controlService, IWattPilotSer
 
         await service.RebootWattPilot().ConfigureAwait(false);
     }
+
+    /// <summary>
+    /// Sends one command - the state bytes that are set, everything else 0xff - to the air conditioners named by
+    /// <paramref name="ids"/>, and waits for each of them to echo it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Over the hub because the answer is a conversation, not a request: the command goes out through the IoT Hub
+    /// and the air conditioner answers, some time later, with a <c>CMD_FCU_FROM_AC</c> carrying the same message
+    /// id. The new state reaches every client as a <c>ToshibaHvacMappingDevice</c> message anyway; what only the
+    /// caller needs to know is which targets did not answer within <see cref="ToshibaHvacEchoTimeout"/>, so that it
+    /// can show an error. Message queuing loses messages now and then, so a silent target may well have taken the
+    /// command - the client is told, it is not told that the command failed.
+    /// </para>
+    /// <para>
+    /// <see cref="Roles.PowerUser"/> and not <see cref="Roles.Operator"/>: switching an air conditioner is the
+    /// same kind of thing as switching a Fritz!Box outlet, which <c>DevicesController</c> gives to power users, and
+    /// nothing like changing an inverter's or a charger's configuration. <see cref="Roles"/> are flags, so an
+    /// operator without the PowerUser bit is refused here.
+    /// </para>
+    /// </remarks>
+    [Authorize(AuthenticationSchemes = HubTicketAuthenticationService.SchemeName, Roles = nameof(Roles.PowerUser))]
+    public async Task<ToshibaHvacCommandResult> SendToshibaHvacCommand(string[] ids, ToshibaHvacStateData state)
+    {
+        if (ids.Length == 0)
+        {
+            throw new HubException(string.Format(Resources.DeviceNotFound, string.Empty));
+        }
+
+        if (!toshibaHvac.IsRunning)
+        {
+            throw new HubException(Resources.NoToshibaHvacConnection);
+        }
+
+        // The client names a device by the id the control service publishes it under; the Toshiba service wants
+        // the device unique id of the air conditioner. The result goes back in the client's ids.
+        var devices = ids.ToDictionary(id => id, FindToshibaHvacDevice);
+        var targets = devices.ToDictionary(pair => pair.Value.DeviceUniqueId.ToString("D"), pair => pair.Key);
+
+        if (logger.IsEnabled(LogLevel.Information))
+        {
+            logger.LogInformation("{Username} sends {State} to Toshiba HVAC {Devices}", Context.User?.Identity?.Name, state, string.Join(", ", devices.Values.Select(d => d.DisplayName)));
+        }
+
+        var result = await toshibaHvac.SendDeviceCommandAndWait(state, ToshibaHvacEchoTimeout, [.. targets.Keys]).ConfigureAwait(false);
+        result.Unconfirmed = [.. result.Unconfirmed.Select(target => targets.GetValueOrDefault(target, target))];
+        return result;
+    }
+
+    private ToshibaHvacMappingDevice FindToshibaHvacDevice(string id) =>
+        controlService.Entities.TryGetValue(id, out var managed) && managed.Device is ToshibaHvacMappingDevice device
+            ? device
+            : throw new HubException(string.Format(Resources.DeviceNotFound, id));
 
     /// <summary>
     /// A <see cref="HubException"/> is the one exception whose message reaches the caller; anything else arrives

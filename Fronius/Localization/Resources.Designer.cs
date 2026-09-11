@@ -3553,6 +3553,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Not connected to the Toshiba HVAC service.
+        /// </summary>
+        public static string NoToshibaHvacConnection {
+            get {
+                return ResourceManager.GetString("NoToshibaHvacConnection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Off.
         /// </summary>
         public static string Off {

@@ -70,6 +70,13 @@ connection against the **real** `HomeAutomationHub` - it needs only `IDataContro
 `IWattPilotServices`, both easily faked - and is the place to add the next one. What the method does with the
 settings is in [[WattPilot]].
 
+**The role is the device's, not a fixed one.** `SendToshibaHvacCommand` carries `Roles = nameof(Roles.PowerUser)`
+- switching an air conditioner is what `DevicesController` lets power users do with a Fritz!Box outlet, not a
+configuration change - and because `Roles` are flags, an operator *without* the PowerUser bit is refused there
+while a power user is refused on the Wattpilot methods. `UnitTests/Hosted/HubToshibaHvacTests` pins both refusals
+the same way. The hub constructor now also takes the `IToshibaHvacService` singleton, so every host that maps the
+real hub registers one (`FakeToshibaHvacService` in the tests). What the command does is in [[ToshibaHvac]].
+
 To fan something out *in response* to a client's message, do it from the server side - raise the state change that
 `SignalRDispatcher` already listens to, or take `IHubContext<HomeAutomationHub>` and send from there. That is a
 deliberate server decision rather than a client relay, so it is allowed; make sure the payload is the server's own

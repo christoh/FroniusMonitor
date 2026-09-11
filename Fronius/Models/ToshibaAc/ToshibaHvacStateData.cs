@@ -1,5 +1,13 @@
-﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc;
+﻿using De.Hochstaetter.Fronius.Models.JsonConverters;
 
+namespace De.Hochstaetter.Fronius.Models.ToshibaAc;
+
+/// <summary>
+///     The 19 state bytes of an air conditioner, as the wire format has them. In JSON this is always the hex string
+///     Toshiba uses (<c>ACStateData</c>, the <c>data</c> of a command), on every channel - including the hub and the
+///     REST API of the server - so that the client and the server read and write the same thing.
+/// </summary>
+[JsonConverter(typeof(ToshibaStateDataConverter))]
 public class ToshibaHvacStateData : BindableBase
 {
     private static readonly IReadOnlyDictionary<byte, string> stateDataMap = new Dictionary<byte, string>

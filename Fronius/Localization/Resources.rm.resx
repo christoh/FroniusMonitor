@@ -1246,6 +1246,9 @@
   <data name="NoWattPilotConnection" xml:space="preserve">
     <value>Betg connectà al Wattpilot</value>
   </data>
+  <data name="NoToshibaHvacConnection" xml:space="preserve">
+    <value>Betg connectà al servetsch Toshiba HVAC</value>
+  </data>
   <data name="NoChargingLogFromWattPilot" xml:space="preserve">
     <value>Nagin link dal protocol da chargiada disponibel dal Wattpilot</value>
   </data>

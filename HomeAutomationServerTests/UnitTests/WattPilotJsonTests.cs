@@ -37,8 +37,8 @@ public class WattPilotJsonTests
         var written = WattPilotExtensions.ToWattPilotJson(currents, AttributeOf(nameof(WattPilot.LoadBalancingCurrents)))!.AsObject();
 
         Assert.Equal(16, written["amp"].AsInt32());
-        Assert.Equal(10, written["dyn"].AsInt32());
-        Assert.Equal(32, written["sta"].AsInt32());
+        Assert.Equal(32, written["dyn"].AsInt32());
+        Assert.Equal(10, written["sta"].AsInt32());
         Assert.Equal(1_700_000_000, written["ts"].AsInt32());
 
         // TimeStamp is the epoch seconds read as a date. Sending it as well would be sending the same thing twice
