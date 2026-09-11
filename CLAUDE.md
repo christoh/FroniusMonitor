@@ -34,7 +34,7 @@ text to English.
 * If you need to use dynamic, please add a comment explaining why it is necessary.
 
 ## Logging
-* Guard logging with `if (Logger.IsEnabled(LogLevel.Debug))` or the appropriate log level. This is important to avoid unnecessary string formatting and performance overhead when the log level is not enabled.
+* Always guard logging with `if (Logger.IsEnabled(LogLevel.<WhatEverLevel>))`. This is important to avoid unnecessary string formatting and performance overhead when the log level is not enabled.
 
 ## Error handling in the Avalonia client
 * Avalonia has **no unhandled exception hook that works on every platform**. `AppDomain.CurrentDomain.UnhandledException`
@@ -81,6 +81,7 @@ text to English.
 
 # Commits
 - Always suggest commit and push. Never commit alone.
+- Do not commit without asking the human developer first.
 - Force pushes are **never** allowed by AI.
 - Commit under your own authorship, never under the human developer's: `git commit --author="<name> <email>"`. The e-mail always stays as in .git/config. Only the name changes.
   - The author name must name the AI you are **and** the model you are running on, including its version. For
