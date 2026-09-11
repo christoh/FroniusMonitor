@@ -147,11 +147,11 @@ public partial class ToshibaHvacService(IToshibaHvacSessionStore sessionStore, I
                 await azureClient.OpenAsync(Token).ConfigureAwait(false);
                 await azureClient.SetMethodHandlerAsync("smmobile", HandleSmMobileMethod, null, Token).ConfigureAwait(false);
 
-#if DEBUG
+//#if DEBUG
                 // ReSharper disable once UnusedParameter.Local
                 await azureClient.SetReceiveMessageHandlerAsync(async (message, userContext) => { await azureClient.CompleteAsync(message, Token).ConfigureAwait(false); }, null, Token).ConfigureAwait(false);
                 await azureClient.SetMethodDefaultHandlerAsync(HandleOtherMethods, null, Token).ConfigureAwait(false);
-#endif
+//#endif
 
                 TokenSource?.Dispose();
                 TokenSource = new CancellationTokenSource();
@@ -215,9 +215,9 @@ public partial class ToshibaHvacService(IToshibaHvacSessionStore sessionStore, I
                 { "Username", azureConnection?.UserName ?? string.Empty },
             };
 
-            if (logger.IsEnabled(LogLevel.Debug))
+            if (logger.IsEnabled(LogLevel.Information))
             {
-                logger.LogDebug("Registering Toshiba HVAC mobile device with DeviceID: {DeviceID}", postData["DeviceID"]);
+                logger.LogInformation("Registering Toshiba HVAC mobile device with DeviceID: {DeviceID}", postData["DeviceID"]);
             }
 
             return await Deserialize<ToshibaHvacAzureCredentials>("/api/Consumer/RegisterMobileDevice", postData).ConfigureAwait(false);
@@ -324,9 +324,9 @@ public partial class ToshibaHvacService(IToshibaHvacSessionStore sessionStore, I
 
         var devices = AllDevices.SelectMany(m => m.Devices).ToList();
 
-        if (logger.IsEnabled(LogLevel.Debug))
+        if (logger.IsEnabled(LogLevel.Information))
         {
-            logger.LogDebug("Toshiba account {UserName} has {Count} air conditioner(s): {Devices}", azureConnection?.UserName, devices.Count, string.Join(", ", devices.Select(d => d.Name)));
+            logger.LogInformation("Toshiba account {UserName} has {Count} air conditioner(s): {Devices}", azureConnection?.UserName, devices.Count, string.Join(", ", devices.Select(d => d.Name)));
         }
 
         return devices;
@@ -370,9 +370,9 @@ public partial class ToshibaHvacService(IToshibaHvacSessionStore sessionStore, I
         await JsonSerializer.SerializeAsync(memoryStream, command, jsonOptions, Token).ConfigureAwait(false);
         memoryStream.Position = 0;
 
-        if (logger.IsEnabled(LogLevel.Debug))
+        if (logger.IsEnabled(LogLevel.Information))
         {
-            logger.LogDebug("Sending Toshiba command: {Command}", Encoding.UTF8.GetString(memoryStream.ToArray()));
+            logger.LogInformation("Sending Toshiba command: {Command}", Encoding.UTF8.GetString(memoryStream.ToArray()));
         }
 
         using var message = new Message(memoryStream);
@@ -446,9 +446,9 @@ public partial class ToshibaHvacService(IToshibaHvacSessionStore sessionStore, I
 
     private Task<MethodResponse> HandleSmMobileMethod(MethodRequest request, object _) => Task.Run(() =>
     {
-        if (logger.IsEnabled(LogLevel.Debug))
+        if (logger.IsEnabled(LogLevel.Information))
         {
-            logger.LogDebug("Received Toshiba method {MethodName}: {Data}", request.Name, request.DataAsJson);
+            logger.LogInformation("Received Toshiba method {MethodName}: {Data}", request.Name, request.DataAsJson);
         }
 
         try
@@ -522,19 +522,19 @@ public partial class ToshibaHvacService(IToshibaHvacSessionStore sessionStore, I
         return new MethodResponse(0);
     }, Token);
 
-#if DEBUG
+//#if DEBUG
 
     private Task<MethodResponse> HandleOtherMethods(MethodRequest request, object _) => Task.Run(() =>
     {
-        if (logger.IsEnabled(LogLevel.Debug))
+        if (logger.IsEnabled(LogLevel.Information))
         {
-            logger.LogDebug("Received Toshiba method {MethodName}: {Data}", request.Name, request.DataAsJson);
+            logger.LogInformation("Received Toshiba method {MethodName}: {Data}", request.Name, request.DataAsJson);
         }
 
         return new MethodResponse(0);
     }, Token);
 
-#endif
+//#endif
 
     /// <summary>
     ///     One call to the Toshiba HTTPS API. HTTP 401 and 403 become <see cref="ToshibaHvacUnauthorizedException" />,
@@ -572,12 +572,12 @@ public partial class ToshibaHvacService(IToshibaHvacSessionStore sessionStore, I
 
         response.EnsureSuccessStatusCode();
 
-#if DEBUG // This allows you to see the raw JSON string
+#if !DEBUG // This allows you to see the raw JSON string
         var jsonText = await response.Content.ReadAsStringAsync(Token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
 
-        if (logger.IsEnabled(LogLevel.Debug))
+        if (logger.IsEnabled(LogLevel.Information))
         {
-            logger.LogDebug("Toshiba response from {Uri}: {Json}", uri, jsonText);
+            logger.LogInformation("Toshiba response from {Uri}: {Json}", uri, jsonText);
         }
 
         var result = JsonSerializer.Deserialize<ToshibaHvacResponse<T>>(jsonText, jsonOptions) ?? throw new InvalidDataException("No data");
