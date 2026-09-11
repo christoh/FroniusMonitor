@@ -1,5 +1,6 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:images="clr-namespace:De.Hochstaetter.HomeAutomationClient.Assets.Images">
 	<!-- The metrics the Fluent slider template reads. A slider is the one control here that cannot be scaled or
 	     styled shorter - see the Slider rule below - but it does look these up, so this is where a slider of the
 	     size a dense form wants comes from: a 12 pixel high control with a hairline track and a small upright
@@ -65,6 +66,20 @@
 		<Setter Property="MinHeight" Value="22" />
 		<Setter Property="Padding" Value="3,0" />
 		<Setter Property="VerticalContentAlignment" Value="Center" />
+	</Style>
+
+	<!-- The eye of a PasswordBox (Controls/PasswordBox.cs), which is a TextBox and so already has the 22 above.
+	     What it does not have is a button that fits inside 22: Fluent gives a button a MinHeight of 32 and a
+	     padding for a finger, either of which would push the box open and leave it taller than the plain text
+	     box beside it. So the button loses both, and the icon is the height of a line of 12 point type. -->
+	<Style Selector="TextBox Button.RevealPassword">
+		<Setter Property="MinHeight" Value="0" />
+		<Setter Property="MinWidth" Value="0" />
+		<Setter Property="Padding" Value="4,0" />
+	</Style>
+
+	<Style Selector="TextBox Button.RevealPassword images|VisibilityIcon">
+		<Setter Property="Height" Value="14" />
 	</Style>
 
 	<Style Selector="ComboBox">

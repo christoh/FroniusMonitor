@@ -78,16 +78,6 @@ public abstract class Bool2AnythingBase<T> : ConverterBase
     }
 }
 
-public class Bool2Char : Bool2AnythingBase<char>
-{
-    public Bool2Char()
-    {
-        True = '\0';
-        False = '•';
-        Null = '•';
-    }
-}
-
 public class Bool2Bool : Bool2AnythingBase<bool>
 {
     public Bool2Bool()

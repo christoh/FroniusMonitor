@@ -13,9 +13,6 @@ public partial class LoginViewModel(DialogParameters parameters) : DialogBase<Di
     [ObservableProperty, Required(AllowEmptyStrings = false)]
     public partial string Password { get; set; } = string.Empty;
 
-    [ObservableProperty]
-    private bool isPasswordVisible;
-
     public override async Task Initialize()
     {
         await base.Initialize();
@@ -73,12 +70,6 @@ public partial class LoginViewModel(DialogParameters parameters) : DialogBase<Di
         return Task.CompletedTask;
     }
 
-    [RelayCommand]
-    public void PasswordVisible()
-    {
-        IsPasswordVisible = !IsPasswordVisible;
-    }
-    
     [RelayCommand]
     private async Task Login()
     {

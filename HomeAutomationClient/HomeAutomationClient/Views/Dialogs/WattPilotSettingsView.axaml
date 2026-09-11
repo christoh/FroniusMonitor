@@ -5,6 +5,7 @@
              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
              xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
              xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+             xmlns:charging="clr-namespace:De.Hochstaetter.Fronius.Models.Charging;assembly=Fronius"
              mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="600"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.WattPilotSettingsView"
              x:DataType="dialogs:WattPilotSettingsViewModel">
@@ -51,7 +52,7 @@
 						<TextBox Grid.Row="1" Grid.Column="1" MaxLength="32" Text="{Binding WattPilot.WattPilotSsid, Mode=TwoWay}" />
 
 						<TextBlock Grid.Row="2" Grid.Column="0" Classes="Caption"><Run Text="{x:Static p:Resources.WattPilotWifiPassword}" /><Run Text=":" /></TextBlock>
-						<TextBox Grid.Row="2" Grid.Column="1" MaxLength="32" PasswordChar="●" Text="{Binding WifiPassword, Mode=TwoWay}" />
+						<c:PasswordBox Grid.Row="2" Grid.Column="1" MaxLength="32" Text="{Binding WifiPassword, Mode=TwoWay}" />
 
 						<TextBlock Grid.Row="3" Grid.Column="0" Classes="Caption"><Run Text="{x:Static p:Resources.CableLockBehavior}" /><Run Text=":" /></TextBlock>
 						<ComboBox Grid.Row="3" Grid.Column="1" ItemsSource="{Binding CableLockBehaviors}" DisplayMemberBinding="{Binding DisplayName}"
@@ -66,7 +67,10 @@
 						          SelectedValueBinding="{Binding Value}" SelectedValue="{Binding WattPilot.ForcedCharge, Mode=TwoWay}" />
 
 						<TextBlock Grid.Row="6" Grid.Column="0" Classes="Caption Danger"><Run Text="{x:Static p:Resources.ApiKey}" /><Run Text=":" /></TextBlock>
-						<TextBox Grid.Row="6" Grid.Column="1" Classes="Danger" PasswordChar="●" Text="{Binding WattPilot.CloudAccessKey, Mode=TwoWay}" />
+						<!-- Disabled under the danger switch like the rest, so that it looks locked and not only is. The WPF
+						     dialog made it read-only instead; tried here and taken back, because a read-only box is
+						     indistinguishable from an editable one. -->
+						<c:PasswordBox Grid.Row="6" Grid.Column="1" Classes="Danger" Text="{Binding WattPilot.CloudAccessKey, Mode=TwoWay}" />
 					</Grid>
 
 					<Grid ColumnDefinitions="*,*" Margin="0,8,0,0">
@@ -201,9 +205,12 @@
 
 		<TabItem Header="{x:Static p:Resources.DnoRequirements}">
 			<ScrollViewer>
-				<!-- Three columns, as the WPF window has them: the groups are short and the dialog is wide. -->
-				<Grid ColumnDefinitions="*,*,*" Margin="8">
-					<HeaderedContentControl Grid.Column="0" Classes="GroupBox" Margin="0,0,4,0" Header="{x:Static p:Resources.BaseSettings}">
+				<!-- Three groups side by side, as the WPF window has them - but each as wide as its own content,
+				     not a third of the dialog: the delays carry the longest captions of the whole dialog, and in an
+				     equal third of 1024 they were cut off mid-word. A WrapPanel gives every group what it asks for
+				     and puts the third one on a row of its own where the three do not fit. -->
+				<WrapPanel Orientation="Horizontal" Margin="8">
+					<HeaderedContentControl Classes="GroupBox" VerticalAlignment="Top" Margin="0,0,8,0" Header="{x:Static p:Resources.BaseSettings}">
 						<StackPanel Margin="8,4">
 							<CheckBox Classes="Wrap Danger" Content="{x:Static p:Resources.EnableOutOfBalanceControl}" IsChecked="{Binding WattPilot.EnableOutOfBalanceControl, Mode=TwoWay}" />
 							<CheckBox Classes="Wrap Danger" Content="{x:Static p:Resources.EnableGridMonitoringOnStartUp}" IsChecked="{Binding WattPilot.EnableGridMonitoringOnStartUp, Mode=TwoWay}" />
@@ -214,7 +221,7 @@
 						</StackPanel>
 					</HeaderedContentControl>
 
-					<HeaderedContentControl Grid.Column="1" Classes="GroupBox" Margin="4,0" Header="{x:Static p:Resources.Delays}">
+					<HeaderedContentControl Classes="GroupBox" VerticalAlignment="Top" Margin="0,0,8,0" Header="{x:Static p:Resources.Delays}">
 						<StackPanel Margin="8,4">
 							<c:NumberSlider Classes="Danger" Caption="{x:Static p:Resources.RandomDelayPowerFailure}" Unit="s" BoxWidth="60" Field="{Binding RandomDelayPowerFailure}" />
 							<c:NumberSlider Classes="Danger" Caption="{x:Static p:Resources.RandomDelayAwattarStart}" Unit="s" BoxWidth="60" Field="{Binding RandomDelayAwattarStart}" />
@@ -225,7 +232,7 @@
 						</StackPanel>
 					</HeaderedContentControl>
 
-					<HeaderedContentControl Grid.Column="2" Classes="GroupBox" Margin="4,0,0,0" Header="{x:Static p:Resources.GridMonitoring}" IsVisible="{Binding ShowGridMonitoring}">
+					<HeaderedContentControl Classes="GroupBox" VerticalAlignment="Top" Header="{x:Static p:Resources.GridMonitoring}" IsVisible="{Binding ShowGridMonitoring}">
 						<StackPanel Margin="8,4">
 							<c:NumberSlider Classes="Danger" Caption="{x:Static p:Resources.GridMonitoringTimeOnStartUp}" Unit="s" BoxWidth="60" Field="{Binding GridMonitoringTimeOnStartUp}" />
 							<c:NumberSlider Classes="Danger" Caption="{x:Static p:Resources.StartUpMonitoringMinimumVoltage}" Unit="V" BoxWidth="60" Field="{Binding StartUpMonitoringMinimumVoltage}" />
@@ -235,19 +242,32 @@
 							<c:NumberSlider Classes="Danger" Caption="{x:Static p:Resources.StartUpRampUpRate}" Unit="%/s" BoxWidth="60" Field="{Binding StartUpRampUpRate}" />
 						</StackPanel>
 					</HeaderedContentControl>
-				</Grid>
+				</WrapPanel>
 			</ScrollViewer>
 		</TabItem>
 
 		<TabItem Header="{x:Static p:Resources.ScannedWifis}">
 			<!-- No ScrollViewer around a DataGrid: it scrolls itself, and wrapped in one it lays out every row. -->
 			<DataGrid Margin="8" IsReadOnly="True" AutoGenerateColumns="False" ColumnWidth="Auto" GridLinesVisibility="None"
-			          HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" ItemsSource="{Binding WattPilot.ScannedWifis}">
+			          HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanUserSortColumns="True"
+			          ItemsSource="{Binding WattPilot.ScannedWifis}">
 				<DataGrid.Columns>
-					<DataGridTextColumn Header="{x:Static p:Resources.Signal}" Binding="{Binding WifiSignal}" />
-					<DataGridTextColumn Header="{x:Static p:Resources.WifiSsid}" Binding="{Binding Ssid}" />
-					<DataGridTextColumn Header="{x:Static p:Resources.Encryption}" Binding="{Binding Encryption}" />
-					<DataGridTextColumn Header="{x:Static p:Resources.Channel}" Binding="{Binding Channel}" />
+					<!-- The signal as the bars the dashboard draws for the charger's own connection, not as a number
+					     - the same WifiControl, with the dBm as its tooltip. Sorting goes by the number underneath.
+					     14 is the height of a line of 12 point type, so a row with the icon is no taller than one
+					     without; the 16 is the icon's own aspect ratio at that height. -->
+					<DataGridTemplateColumn Header="{x:Static p:Resources.Signal}" SortMemberPath="WifiSignal">
+						<DataGridTemplateColumn.CellTemplate>
+							<DataTemplate x:DataType="charging:WattPilotWifiInfo">
+								<c:WifiControl Width="16" Height="14" HorizontalAlignment="Left" VerticalAlignment="Center"
+								               Fill="{DynamicResource ForegroundBrush}" SignalStrength="{Binding WifiSignal, FallbackValue=-200}"
+								               ToolTip.Tip="{Binding WifiSignal, StringFormat='{}{0} dBm'}" />
+							</DataTemplate>
+						</DataGridTemplateColumn.CellTemplate>
+					</DataGridTemplateColumn>
+					<c:CompactTextColumn Header="{x:Static p:Resources.WifiSsid}" Binding="{Binding Ssid}" />
+					<c:CompactTextColumn Header="{x:Static p:Resources.Encryption}" Binding="{Binding Encryption}" />
+					<c:CompactTextColumn Header="{x:Static p:Resources.Channel}" Binding="{Binding Channel}" FontFeatures="+tnum" />
 				</DataGrid.Columns>
 			</DataGrid>
 		</TabItem>

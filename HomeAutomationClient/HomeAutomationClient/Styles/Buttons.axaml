@@ -138,6 +138,14 @@
 		<Setter Property="VerticalAlignment" Value="Stretch" />
 	</Style>
 
+	<!-- Transparent when disabled as well. Fluent paints a disabled button's ContentPresenter with
+	     ButtonBackgroundDisabled through a template selector, which the setter above does not reach - so the eye
+	     of a disabled PasswordBox sat on a grey square that read as a second icon behind it. -->
+	<Style Selector="Button.TransparentButton:disabled /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="Transparent" />
+		<Setter Property="BorderBrush" Value="Transparent" />
+	</Style>
+
 	<Style Selector="RadioButton.DeviceButton">
 		<Setter Property="ClickMode" Value="Press" />
 		<Style Selector="^:checked /template/ Border">

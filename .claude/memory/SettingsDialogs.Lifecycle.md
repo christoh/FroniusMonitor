@@ -297,6 +297,21 @@ it from 702 pixels tall to 499.
   behaviour. So a short caption in one of these rows renders identically to before, side by side with the next
   one at its natural width, and the *only* thing that changes is that it would also wrap correctly if that same
   radio button ever ended up somewhere its width was actually constrained.
+- **A secret goes in a `c:PasswordBox`** (`Controls/PasswordBox.cs`): the Wattpilot's WiFi password and its cloud
+  API key, and the password of the login dialog, which used to spell the box out inline with a flag and a command
+  on its view model. It *is* a `TextBox` with the `TextBox` style key, so everything above about text boxes - the
+  22 pixels, the padding, the validation frame and tooltip, `Grid.Form > TextBox` - applies to it unchanged; the
+  eye at its right end toggles `TextBox.RevealPassword`, which is state of the control and not of any view model.
+  What `CompactForms.axaml` adds is only what keeps the eye inside 22 pixels: a Fluent button has a `MinHeight` of
+  32 and a finger's padding, and either would push the box open and leave it taller than the plain box beside it.
+  Measured: plain box and password box the same height with and without the compact styles. Two things learnt
+  from the first screenshot of it: a **disabled** Fluent button paints `ButtonBackgroundDisabled` on its content
+  presenter through a template selector that `Button.TransparentButton`'s own `Background` setter never reaches,
+  so the eye of a disabled box sat on a grey square that read as a second icon - `Buttons.axaml` now clears that
+  state too (rendered headless with Skia to confirm, before and after). The API key stays **disabled** under the
+  danger switch like every other guarded field - the WPF dialog makes it read-only instead, and that was tried
+  here and taken back on the developer's screenshot: a read-only box has no dim overlay and is indistinguishable
+  from an editable one, so it did not look locked.
 - A tab's own margins are its own: 8 around the view, 8 inside a group box, 2 above and below a field. The numbers
   come from the WPF views.
 - **The bar under the selected tab is positioned by the tab's height and vertical padding, and by nothing else.**
@@ -683,8 +698,16 @@ when it is visible) that also does the loading, so the list of what is on which 
 charging log, configuration PDF, the cloud API - go through `IUriLauncher` (Avalonia's `ILauncher` behind
 `TopLevel`), never `Process.Start`: the browser head has no process to start and iOS opens links its own way.
 
-Not ported from the scanned WiFi tab: the signal strength icon (`WifiControl`) and the row tooltip; it is a plain
-four column grid.
+**The DNO tab's three groups sit in a `WrapPanel`, not in three star columns.** Its delays carry the longest
+captions of the whole dialog, and in an equal third of 1024 they were cut off mid-word (the developer's screenshot).
+In a `WrapPanel` every group is exactly as wide as its widest row - measured: a group's desired width is its widest
+`NumberSlider` plus the group's padding, and no caption is clipped - and the third group moves to a row of its own
+where the three do not fit. The headless probe measures text at roughly twice its real width, so at 1000 pixels it
+shows all three stacked; at real metrics they come to about 900 and sit side by side.
+
+The scanned WiFi tab shows the signal as the same `WifiControl` bars the dashboard draws for the charger's own
+connection - a `DataGridTemplateColumn` with `SortMemberPath="WifiSignal"`, the dBm as the icon's tooltip, 16x14 so
+the row stays 18 pixels - and `CompactTextColumn`s for the rest. Not ported: the WPF row tooltip with the ciphers.
 
 ## Never a BindableCollection on the server
 

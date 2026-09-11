@@ -342,6 +342,6 @@ the URL.
 ## Known gaps and bugs, as of 2026-09-10
 
 - The firmware-update check is switched off (`&& false`), see above.
-- The scanned WiFi tab of the Avalonia dialog is a plain grid: no signal strength icon, no row tooltip.
+- The scanned WiFi tab of the Avalonia dialog has no row tooltip with the ciphers, as the WPF grid has.
 - A `HubException` from the server carries a message in the server's language, like a `ProblemDetails` does.
 - `WattPilotDisplayMode` and the cycling logic exist twice, once per app.

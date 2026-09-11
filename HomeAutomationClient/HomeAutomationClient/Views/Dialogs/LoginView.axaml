@@ -4,8 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
              xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
-             xmlns:images="clr-namespace:De.Hochstaetter.HomeAutomationClient.Assets.Images"
-             xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
+             xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
              mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="300"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.LoginView"
              x:DataType="dialogs:LoginViewModel" MaxWidth="400" MinWidth="200">
@@ -25,13 +24,7 @@
 
 		<StackPanel Classes="InputBlock">
 			<TextBlock Text="{x:Static p:Resources.Password}" />
-			<TextBox PasswordChar="{Binding IsPasswordVisible, Converter={co:Bool2Char}}" Text="{Binding Password, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-				<TextBox.InnerRightContent>
-					<Button Classes="TransparentButton" Command="{Binding PasswordVisible}">
-						<images:VisibilityIcon Visible="{Binding IsPasswordVisible}"/>
-					</Button>
-				</TextBox.InnerRightContent>
-			</TextBox>
+			<c:PasswordBox Text="{Binding Password, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 		</StackPanel>
 
 		<StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
