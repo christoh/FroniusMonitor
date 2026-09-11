@@ -10,13 +10,13 @@ public partial class WattPilotLoadBalancingCurrents : BindableBase, ICloneable
     public partial int LocalMaximumCurrent { get; set; }
 
     [ObservableProperty]
-    [JsonProperty("dyn")]
-    [WattPilot("dyn", false)]
+    [JsonProperty("sta")]
+    [WattPilot("sta", false)]
     public partial int DynamicMaximumCurrent { get; set; }
 
     [ObservableProperty]
-    [JsonProperty("sta")]
-    [WattPilot("sta", false)]
+    [JsonProperty("dyn")]
+    [WattPilot("dyn", false)]
     public partial int MaximumCurrentDnoLine { get; set; }
 
     [ObservableProperty]

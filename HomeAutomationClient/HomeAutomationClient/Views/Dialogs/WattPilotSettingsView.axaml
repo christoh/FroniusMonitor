@@ -22,12 +22,12 @@
 		<Style Selector="Grid.Form > ComboBox">
 			<Setter Property="MinWidth" Value="250" />
 			<Setter Property="Margin" Value="0,2" />
-			<Setter Property="HorizontalAlignment" Value="Left" />
+			<Setter Property="HorizontalAlignment" Value="Stretch" />
 		</Style>
 		<Style Selector="Grid.Form > TextBox">
 			<Setter Property="MinWidth" Value="250" />
 			<Setter Property="Margin" Value="0,2" />
-			<Setter Property="HorizontalAlignment" Value="Left" />
+			<Setter Property="HorizontalAlignment" Value="Stretch" />
 		</Style>
 		<Style Selector="CheckBox.Wrap">
 			<Setter Property="Margin" Value="0,2,0,0" />

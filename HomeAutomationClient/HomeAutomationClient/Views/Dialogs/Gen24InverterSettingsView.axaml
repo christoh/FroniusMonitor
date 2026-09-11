@@ -55,8 +55,8 @@
 			     itself, so that the visibility is a property of this tab and not of a tracker that may not
 			     exist: with the view in place and its DataContext null, a missing tracker would leave an empty
 			     group box behind. -->
-			<ContentControl Content="{Binding Mppt1}" IsVisible="{Binding ShowMppt1}" />
-			<ContentControl Content="{Binding Mppt2}" IsVisible="{Binding ShowMppt2}" />
+			<ContentControl Content="{Binding Mppt1}" IsVisible="{Binding ShowMppt1}" MinWidth="300"/>
+			<ContentControl Content="{Binding Mppt2}" IsVisible="{Binding ShowMppt2}" MinWidth="300"/>
 		</StackPanel>
 
 		<!-- The visibility of the export limits sits on that group box and not on this column, because the
