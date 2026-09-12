@@ -1,5 +1,4 @@
 ﻿using System.Net.Http.Json;
-using System.Net.WebSockets;
 using De.Hochstaetter.Fronius.Models.JsonConverters;
 
 namespace De.Hochstaetter.Fronius.Services;
@@ -59,9 +58,9 @@ public partial class ToshibaHvacService(IToshibaHvacSessionStore sessionStore, I
         jsonOptions.Converters.Add(new ToshibaHexConverter<ToshibaHvacOperatingMode>());
         jsonOptions.Converters.Add(new ToshibaHexConverter<ToshibaHvacFanSpeed>());
         jsonOptions.Converters.Add(new ToshibaHexConverter<ToshibaHvacPowerState>());
-#if DEBUG
+        #if DEBUG
         jsonOptions.WriteIndented = true;
-#endif
+        #endif
     }
 
     [ObservableProperty, NotifyPropertyChangedFor(nameof(Token), nameof(IsRunning))]
@@ -127,6 +126,8 @@ public partial class ToshibaHvacService(IToshibaHvacSessionStore sessionStore, I
         }
     }
 
+    [SuppressMessage("ReSharper", "ParameterHidesMember")]
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
     public async ValueTask Start(WebConnection? connection, string azureDeviceId)
     {
         if (connection == null)
@@ -697,7 +698,7 @@ public partial class ToshibaHvacService(IToshibaHvacSessionStore sessionStore, I
     public async ValueTask<ToshibaHvacCommandResult> SendDeviceCommandAndWait(ToshibaHvacStateData state, TimeSpan timeout, params string[] targetIdStrings)
     {
         // The echo carries the message id of the command, so the record is keyed by that - and it is registered
-        // before the send, because the answer can be on the socket before the HTTPS call has returned.
+        // before sending, because the answer can be on the socket before the HTTPS call has returned.
         var command = CreateCommand(state, targetIdStrings);
         var sentMessageId = command.MessageId;
         var pending = new PendingEcho([.. targetIdStrings.Select(id => id.ToLowerInvariant())], new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously));
@@ -779,18 +780,18 @@ public partial class ToshibaHvacService(IToshibaHvacSessionStore sessionStore, I
 
         response.EnsureSuccessStatusCode();
 
-#if !DEBUG // This allows you to see the raw JSON string
-        var jsonText = await response.Content.ReadAsStringAsync(token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
+        ToshibaHvacResponse<T> result;
 
         if (logger.IsEnabled(LogLevel.Information))
         {
+            var jsonText = await response.Content.ReadAsStringAsync(token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
             logger.LogInformation("Toshiba response from {Uri}: {Json}", uri, jsonText);
+            result = JsonSerializer.Deserialize<ToshibaHvacResponse<T>>(jsonText, jsonOptions) ?? throw new InvalidDataException("No data");
         }
-
-        var result = JsonSerializer.Deserialize<ToshibaHvacResponse<T>>(jsonText, jsonOptions) ?? throw new InvalidDataException("No data");
-#else
-        var result = await response.Content.ReadFromJsonAsync<ToshibaHvacResponse<T>>(jsonOptions, token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
-#endif
+        else
+        {
+            result = await response.Content.ReadFromJsonAsync<ToshibaHvacResponse<T>>(jsonOptions, token).ConfigureAwait(false) ?? throw new InvalidDataException("No data");
+        }
 
         return !result.IsSuccess
             ? throw new InvalidDataException(result.Message)
