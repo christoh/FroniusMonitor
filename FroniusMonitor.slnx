@@ -32,9 +32,6 @@
   </Folder>
   <Project Path="Fronius/Fronius.csproj" />
   <Project Path="FroniusMonitor/FroniusMonitor.csproj" />
-  <Project Path="FroniusPhone/FroniusPhone.csproj">
-    <Deploy />
-  </Project>
   <Project Path="FroniusUnitTests/FroniusUnitTests.csproj" />
   <Project Path="HomeAutomationClient/HomeAutomationClient.Android/HomeAutomationClient.Android.csproj">
     <Deploy />
