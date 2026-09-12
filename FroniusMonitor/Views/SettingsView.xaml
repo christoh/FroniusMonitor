@@ -293,8 +293,6 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
                         <Grid.ColumnDefinitions>
@@ -318,20 +316,6 @@
 
                         <c:PasswordBox Grid.Row="2" Grid.Column="2" Template="{StaticResource PasswordBoxTemplate}"
                                    Password="{Binding Settings.ToshibaAcConnection.Password, FallbackValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-
-                        <TextBlock Grid.Row="3" Grid.Column="0" Text="{l:Resource LiveUpdateProtocol}" Margin="0,8,0,0" />
-                        <TextBlock Grid.Row="3" Grid.Column="1" Text=":" Margin="4,8,4,0" />
-
-                        <ComboBox Grid.Row="3" Grid.Column="2" SelectedItem="{Binding SelectedProtocol, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                              ToolTip="{Binding SelectedProtocol.ToolTip}"
-                              ItemsSource="{Binding AzureProtocols}" ItemTemplate="{StaticResource ComboBoxTemplateToolTip}" />
-
-                        <TextBlock Grid.Row="4" Grid.Column="0" Text="{l:Resource TunnelStrategy}" Margin="0,8,0,0" />
-                        <TextBlock Grid.Row="4" Grid.Column="1" Text=":" Margin="4,8,4,0" />
-
-                        <ComboBox Grid.Row="4" Grid.Column="2" SelectedItem="{Binding SelectedTunnelMode, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, FallbackValue='---'}"
-                              ToolTip="{Binding SelectedTunnelMode.ToolTip, FallbackValue='---'}" IsEnabled="{Binding CanUseTunnel}"
-                              ItemsSource="{Binding TunnelModes}" ItemTemplate="{StaticResource ComboBoxTemplateToolTip}" />
                     </Grid>
                 </Grid>
             </GroupBox>

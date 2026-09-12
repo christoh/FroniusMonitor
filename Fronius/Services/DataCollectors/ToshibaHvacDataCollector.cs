@@ -2,8 +2,8 @@ namespace De.Hochstaetter.Fronius.Services.DataCollectors;
 
 /// <summary>
 ///     Runs the one <see cref="IToshibaHvacService" /> of the server and publishes every air conditioner of the
-///     account to <see cref="IDataControlService" />: once when the connection comes up, again whenever the IoT Hub
-///     delivers new state for a device, and once more for all of them on every read of the device list.
+///     account to <see cref="IDataControlService" />: once when the connection comes up, again whenever the realtime
+///     channel delivers new state for a device, and once more for all of them on every read of the device list.
 /// </summary>
 /// <remarks>
 ///     <para>
@@ -13,8 +13,8 @@ namespace De.Hochstaetter.Fronius.Services.DataCollectors;
 ///     </para>
 ///     <para>
 ///         One timer does two jobs: it reads the device list again at <see cref="ToshibaHvacDataCollectorParameters.MappingRefreshRate" />,
-///         because message queuing loses the odd message and the HTTPS side has the full state; and it is the retry
-///         for a connection that failed to come up or that the IoT Hub client gave up on, at a much shorter interval.
+///         because the realtime channel loses the odd message and the HTTPS side has the full state; and it is the retry
+///         for a connection that failed to come up or that the service could not reopen, at a much shorter interval.
 ///     </para>
 /// </remarks>
 public sealed class ToshibaHvacDataCollector(
@@ -178,7 +178,7 @@ public sealed class ToshibaHvacDataCollector(
         {
             if (logger.IsEnabled(LogLevel.Warning))
             {
-                logger.LogWarning("The Toshiba IoT Hub connection was lost, reconnecting");
+                logger.LogWarning("The Toshiba realtime connection was lost, reconnecting");
             }
 
             ScheduleNext(TimeSpan.Zero);
@@ -225,7 +225,7 @@ public sealed class ToshibaHvacDataCollector(
             {
                 if (logger.IsEnabled(LogLevel.Information))
                 {
-                    logger.LogInformation("The Toshiba HVAC service is {State}, connecting again", service.IsRunning ? "running without an IoT Hub connection" : "not running");
+                    logger.LogInformation("The Toshiba HVAC service is {State}, connecting again", service.IsRunning ? "running without a realtime connection" : "not running");
                 }
 
                 await ConnectAsync().ConfigureAwait(false);

@@ -111,7 +111,7 @@ public sealed class ToshibaHvacDataCollectorTests : IAsyncDisposable
             .AddOptions()
             .Configure<ToshibaHvacDataCollectorParameters>(p =>
             {
-                p.Connection = new AzureConnection { BaseUrl = "https://example.com", UserName = userName, Password = "secret" };
+                p.Connection = new WebConnection { BaseUrl = "https://example.com", UserName = userName, Password = "secret" };
                 p.AzureDeviceId = "004711";
                 p.MappingRefreshRate = TimeSpan.FromHours(1);
             })

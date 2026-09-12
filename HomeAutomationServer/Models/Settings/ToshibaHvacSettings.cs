@@ -10,26 +10,24 @@ namespace De.Hochstaetter.HomeAutomationServer.Models.Settings;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         The element <em>is</em> the connection: an <see cref="AzureConnection" /> (a <see cref="WebConnection" />
-///         with the IoT Hub transport), so <c>BaseUrl</c>, <c>UserName</c> and the password are its attributes, and
+///         The element <em>is</em> the connection: a <see cref="WebConnection" />, so <c>BaseUrl</c>, <c>UserName</c>
+///         and the password are its attributes, and
 ///         the usual password handling applies - write <c>ClearTextPassword="..."</c> once, and the server's save
 ///         replaces it with the encrypted <c>Password</c> and its checksum.
 ///     </para>
 ///     <para>
 ///         <see cref="AzureDeviceId" /> is drawn at random when the element has none and is written back by the
-///         server's save at start-up; from then on it stays, because the Toshiba service knows this installation by
-///         it. <see cref="Session" /> is the bearer token of the last login. It lasts for months and is used as long
+///         server's save at start-up; from then on it stays, because it names this installation in the commands it
+///         sends, and a stable id per installation is the one shape that cannot pile up on Toshiba's side. <see cref="Session" /> is the bearer token of the last login. It lasts for months and is used as long
 ///         as the service accepts it, so that the account is not logged into again and again - the service does not
 ///         like that. It is stored in clear text for now.
 ///     </para>
 /// </remarks>
-public class ToshibaHvacSettings : AzureConnection
+public class ToshibaHvacSettings : WebConnection
 {
     public ToshibaHvacSettings()
     {
         BaseUrl = "https://mobileapi.toshibahomeaccontrols.com";
-        Protocol = Protocol.Amqp;
-        TunnelMode = TunnelMode.Auto;
     }
 
     [XmlIgnore]
@@ -42,7 +40,7 @@ public class ToshibaHvacSettings : AzureConnection
         set => AzureDeviceId = ToshibaHvacAzureDeviceId.Parse(value, IoC.TryGetRegistered<ILogger<ToshibaHvacSettings>>());
     }
 
-    /// <summary>How often the device list is read over HTTPS, to make good what message queuing lost.</summary>
+    /// <summary>How often the device list is read over HTTPS, to make good what the realtime channel lost.</summary>
     [XmlAttribute, DefaultValue(30)]
     public int MappingRefreshMinutes { get; set; } = 30;
 

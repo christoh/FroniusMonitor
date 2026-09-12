@@ -83,4 +83,41 @@ public sealed class ToshibaHvacJsonTests
         Assert.InRange(replaced, 0u, 999999u);
         Assert.Equal(6, ToshibaHvacAzureDeviceId.ToString(replaced).Length);
     }
+    [Fact]
+    public void A_realtime_frame_carries_the_command_the_hub_used_to_deliver()
+    {
+        // Captured from the Web PubSub socket: the group is the air conditioner, the data has no target list, and
+        // the state came with 22 bytes where the IoT Hub used to deliver 19.
+        const string frame = """{"type":"message","from":"group","fromUserId":null,"group":"993b1afd-3cab-410e-8e01-582b96ebf329","dataType":"json","data":{"sourceId":"993b1afd-3cab-410e-8e01-582b96ebf329","messageId":"0000000650","cmd":"CMD_FCU_FROM_AC","timeStamp":"006aa59516","payload":{"data":"3142184131640010177ffe0bffff100200ffffffffff"}}}""";
+        var web = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+
+        var envelope = JsonSerializer.Deserialize<ToshibaHvacRealtimeEnvelope>(frame, web)!;
+        var command = envelope.Data!.Value.Deserialize<ToshibaHvacAzureSmMobileCommand>(web)!;
+        var state = command.PayLoad.GetProperty("data").Deserialize<ToshibaHvacStateData>(web)!;
+
+        Assert.Equal("message", envelope.Type);
+        Assert.Equal("993b1afd-3cab-410e-8e01-582b96ebf329", envelope.Group);
+        Assert.Equal("CMD_FCU_FROM_AC", command.CommandName);
+        Assert.Equal(envelope.Group, command.DeviceUniqueId);
+        Assert.Equal("0000000650", command.MessageId);
+        Assert.Empty(command.TargetIds);
+        Assert.Equal(22, state.StateData.Count);
+        Assert.Equal(0x31, state.StateData[0]);
+    }
+
+    [Fact]
+    public void The_realtime_token_and_the_delivery_result_read_back_from_the_service_shape()
+    {
+        var web = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+        var token = JsonSerializer.Deserialize<ToshibaHvacResponse<ToshibaHvacRealtimeToken>>("""{"ResObj":{"Url":"wss://x.webpubsub.azure.com/client/hubs/h?access_token=t","ExpiresAt":"2026-09-12T16:23:29.6717883+00:00","Groups":["a","b"]},"IsSuccess":true,"Message":"Success","StatusCode":"Success"}""", web)!;
+        var delivery = JsonSerializer.Deserialize<ToshibaHvacResponse<ToshibaHvacCommandDelivery>>("""{"ResObj":{"Status":"Success","FailedTargetIds":[],"UnauthorizedTargetIds":["c"]},"IsSuccess":true,"Message":"Success","StatusCode":"Success"}""", web)!;
+
+        Assert.True(token.IsSuccess);
+        Assert.StartsWith("wss://", token.Data.Url);
+        Assert.Equal(new DateTimeOffset(2026, 9, 12, 16, 23, 29, TimeSpan.Zero).AddTicks(6717883), token.Data.ExpiresAt);
+        Assert.Equal(["a", "b"], token.Data.Groups);
+        Assert.Equal("Success", delivery.Data.Status);
+        Assert.Empty(delivery.Data.FailedTargetIds);
+        Assert.Equal(["c"], delivery.Data.UnauthorizedTargetIds);
+    }
 }

@@ -7,7 +7,7 @@ namespace De.Hochstaetter.Fronius.Models.Settings;
 public class ToshibaHvacDataCollectorParameters
 {
     /// <summary>The account; <see langword="null" /> or an empty user name means no Toshiba devices are collected.</summary>
-    public AzureConnection? Connection { get; set; }
+    public WebConnection? Connection { get; set; }
 
     /// <summary>The six digit id from the settings - see <see cref="ToshibaHvacAzureDeviceId" />.</summary>
     public string AzureDeviceId { get; set; } = string.Empty;

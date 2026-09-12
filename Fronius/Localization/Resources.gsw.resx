@@ -807,36 +807,6 @@
   <data name="ToshibaHvacUrlTooltip" xml:space="preserve">
 	  <value>Du settsch d URL nöd ändere, solang Toshiba si nöd änderet.</value>
   </data>
-  <data name="Protocol_Amqp_ToolTip" xml:space="preserve">
-	  <value>Im Allgemeine di bescht Wahl. Anders als MQTT unterstützt's s Zruggwiise vo Nachrichte.</value>
-  </data>
-  <data name="Protocol_Mqtt_ToolTip" xml:space="preserve">
-	  <value>MQTT isch eifacher als AMQP, es fähled aber es paar Features. Wänn d Internetverbindig instabil isch, gönd aber weniger Nachrichte verlore.</value>
-  </data>
-  <data name="Protocol_Http1_ToolTip" xml:space="preserve">
-	  <value>HTTP 1.1 isch weniger geeignet, cha aber nötig wärde, wänn d Internetverbindig e paranoidi Firewall het.</value>
-  </data>
-  <data name="LiveUpdateProtocol" xml:space="preserve">
-	  <value>Liveupdate-Protokoll</value>
-  </data>
-  <data name="TunnelStrategy" xml:space="preserve">
-	  <value>Tunnelstrategie</value>
-  </data>
-  <data name="TunnelMode_Websocket" xml:space="preserve">
-	  <value>Websocket</value>
-  </data>
-  <data name="TunnelMode_NoTunnel" xml:space="preserve">
-	  <value>Kei Tunnelig</value>
-  </data>
-  <data name="TunnelMode_Auto_ToolTip" xml:space="preserve">
-	  <value>Zerscht s nativ Protokoll probiere. Wänn das fählschlaht, versueche, en Tunnel über HTTP und Websocket ufzbaue. Wänn d Internetverbindig über e Firewall lauft, überchunnt mer so wahrschiinlich e Verbindig.</value>
-  </data>
-  <data name="TunnelMode_Websocket_ToolTip" xml:space="preserve">
-	  <value>Immer en Tunnel über HTTP und Websocket bruuche. Wänn du weisch, dass dini Internetverbindig über e Firewall lauft, wo s nativ Protokoll blockt, chasch d Ziit spare, es über s nativ Protokoll z'probiere.</value>
-  </data>
-  <data name="TunnelMode_NoTunnel_ToolTip" xml:space="preserve">
-	  <value>Wänn d Firewall s nativ Protokoll blockt, überchunsch mit dere Iistellig kei Verbindig.</value>
-  </data>
   <data name="HvacModeAuto" xml:space="preserve">
 	  <value>Automatisch chüele oder heize</value>
   </data>

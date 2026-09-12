@@ -1,24 +1,26 @@
 ﻿namespace De.Hochstaetter.Fronius.Contracts;
 
 /// <summary>
-///     The connection to one Toshiba account: the HTTPS side for login, registration and the device list, and the
-///     Azure IoT Hub side for live state and commands. One instance serves every air conditioner of the account.
+///     The connection to one Toshiba account, made the way the official app makes it: HTTPS for the login, the device
+///     list and the commands, an Azure Web PubSub socket for the live state. One instance serves every air
+///     conditioner of the account, and any number of instances may share an account.
 /// </summary>
 public interface IToshibaHvacService
 {
     /// <summary>
-    ///     Ends a running connection, then registers with the Toshiba service under <paramref name="azureDeviceId" />,
-    ///     loads the device list and opens the IoT Hub connection. Failures are logged and leave
-    ///     <see cref="IsRunning" /> false; nothing is thrown.
+    ///     Ends a running connection, then logs in if there is no stored session, loads the device list and opens the
+    ///     realtime socket. <paramref name="azureDeviceId" /> is this installation's client id, which only names the
+    ///     sender in the message ids of its commands. Failures are logged and leave <see cref="IsRunning" /> false;
+    ///     nothing is thrown.
     /// </summary>
-    ValueTask Start(AzureConnection? azureConnection, string azureDeviceId);
+    ValueTask Start(WebConnection? connection, string azureDeviceId);
 
     ValueTask Stop();
 
-    /// <summary>The service holds a session and an IoT Hub client; see <see cref="IsConnected" /> for the hub's own state.</summary>
+    /// <summary>The service has been started and holds a session; see <see cref="IsConnected" /> for the socket.</summary>
     bool IsRunning { get; }
 
-    /// <summary>What the IoT Hub client last reported about its connection.</summary>
+    /// <summary>The realtime socket is open. It is briefly false while the token is renewed every ten minutes.</summary>
     bool IsConnected { get; }
 
     BindableCollection<ToshibaHvacMapping>? AllDevices { get; }
@@ -42,15 +44,15 @@ public interface IToshibaHvacService
 
     ValueTask<string> SendDeviceCommand(ToshibaHvacStateData state, params ToshibaHvacMappingDevice[] device) => SendDeviceCommand(state, device.Select(d => d.DeviceUniqueId.ToString("D")).ToArray());
 
-    /// <summary>Every message the IoT Hub delivered, after it has been applied to the device it came from.</summary>
+    /// <summary>Every message the realtime socket delivered, after it has been applied to the device it came from.</summary>
     event EventHandler<ToshibaHvacAzureSmMobileCommand>? LiveDataReceived;
 
     /// <summary>One device has new state, from a live update or a heartbeat.</summary>
     event EventHandler<ToshibaHvacDeviceUpdatedEventArgs>? DeviceUpdated;
 
     /// <summary>
-    ///     The IoT Hub client gave up: its own retries are exhausted and it will not come back on its own. The service
-    ///     is still <see cref="IsRunning" /> but delivers nothing until it is started again.
+    ///     The realtime socket closed and could not be reopened. The service is still <see cref="IsRunning" /> but
+    ///     delivers nothing until it is started again.
     /// </summary>
     event EventHandler? ConnectionLost;
 }

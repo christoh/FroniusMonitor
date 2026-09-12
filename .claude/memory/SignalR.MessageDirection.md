@@ -75,7 +75,7 @@ settings is in [[WattPilot]].
 configuration change - and because `Roles` are flags, an operator *without* the PowerUser bit is refused there
 while a power user is refused on the Wattpilot methods. `UnitTests/Hosted/HubToshibaHvacTests` pins both refusals
 the same way. The hub constructor now also takes the `IToshibaHvacService` singleton, so every host that maps the
-real hub registers one (`FakeToshibaHvacService` in the tests). What the command does is in [[ToshibaHvac]].
+real hub registers one (`FakeToshibaHvacService` in the tests). What the command does is in the Toshiba HVAC memory, which lives in the AI's session memory, not in the repo.
 
 To fan something out *in response* to a client's message, do it from the server side - raise the state change that
 `SignalRDispatcher` already listens to, or take `IHubContext<HomeAutomationHub>` and send from there. That is a

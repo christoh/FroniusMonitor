@@ -23,7 +23,7 @@ internal sealed class FakeToshibaHvacService : IToshibaHvacService
     public int StartCalls { get; private set; }
     public int StopCalls { get; private set; }
     public int RefreshCalls { get; private set; }
-    public AzureConnection? StartedWith { get; private set; }
+    public WebConnection? StartedWith { get; private set; }
     public string? StartedWithDeviceId { get; private set; }
     public ToshibaHvacStateData? SentState { get; private set; }
     public string[]? SentTargets { get; private set; }
@@ -37,10 +37,10 @@ internal sealed class FakeToshibaHvacService : IToshibaHvacService
     public event EventHandler<ToshibaHvacDeviceUpdatedEventArgs>? DeviceUpdated;
     public event EventHandler? ConnectionLost;
 
-    public ValueTask Start(AzureConnection? azureConnection, string azureDeviceId)
+    public ValueTask Start(WebConnection? connection, string azureDeviceId)
     {
         StartCalls++;
-        StartedWith = azureConnection;
+        StartedWith = connection;
         StartedWithDeviceId = azureDeviceId;
         IsRunning = IsConnected = StartSucceeds;
 

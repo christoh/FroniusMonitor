@@ -22,41 +22,7 @@ public partial class SettingsViewModel(
     [field: AllowNull, MaybeNull]
     public ICommand DeletePanelLayoutFileCommand => field ??= new NoParameterCommand(() => Settings.CustomSolarPanelLayout = null);
 
-    public IEnumerable<ListItemModel<Protocol>> AzureProtocols { get; } =
-    [
-        new EnumListItemModel<Protocol> { Value = Protocol.Amqp },
-        new EnumListItemModel<Protocol> { Value = Protocol.Mqtt },
-    ];
-
-    public IEnumerable<ListItemModel<TunnelMode>> TunnelModes { get; } =
-    [
-        new EnumListItemModel<TunnelMode> { Value = TunnelMode.Auto },
-        new EnumListItemModel<TunnelMode> { Value = TunnelMode.Websocket },
-        new EnumListItemModel<TunnelMode> { Value = TunnelMode.NoTunnel },
-    ];
-
     public IEnumerable<ElectricityPriceService> PriceServices { get; } = Enum.GetValues<ElectricityPriceService>();
-
-    public ListItemModel<Protocol> SelectedProtocol
-    {
-        get => AzureProtocols.FirstOrDefault(p => p.Value == Settings.ToshibaAcConnection.Protocol, new ListItemModel<Protocol>());
-        set
-        {
-            Settings.ToshibaAcConnection.Protocol = value.Value;
-            NotifyOfPropertyChange();
-            NotifyOfPropertyChange(nameof(CanUseTunnel));
-        }
-    }
-
-    public ListItemModel<TunnelMode> SelectedTunnelMode
-    {
-        get => TunnelModes.FirstOrDefault(p => p.Value == Settings.ToshibaAcConnection.TunnelMode, new ListItemModel<TunnelMode>());
-        set
-        {
-            Settings.ToshibaAcConnection.TunnelMode = value.Value;
-            NotifyOfPropertyChange();
-        }
-    }
 
     public ListItemModel<AwattarCountry> SelectedPriceRegion
     {
@@ -67,8 +33,6 @@ public partial class SettingsViewModel(
             NotifyOfPropertyChange();
         }
     }
-
-    public bool CanUseTunnel => Settings.ToshibaAcConnection.CanUseTunnel;
 
     [ObservableProperty]
     public partial Settings Settings { get; set; } = null!;
@@ -103,7 +67,6 @@ public partial class SettingsViewModel(
         await base.OnInitialize().ConfigureAwait(false);
         Settings = (Settings)App.Settings.Clone();
         SelectedCulture = Cultures.SingleOrDefault(c => c.Value?.ToUpperInvariant() == Settings.Language?.ToUpperInvariant()) ?? Cultures.First();
-        NotifyOfPropertyChange(nameof(SelectedProtocol));
         OnElectricityPriceServiceChanged(null, default);
     }
 

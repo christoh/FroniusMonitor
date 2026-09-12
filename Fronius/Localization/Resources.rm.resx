@@ -772,33 +772,6 @@
   <data name="ToshibaHvacUrlTooltip" xml:space="preserve">
     <value>Vus na duessas betg midar l'URL, nun che Toshiba mida il num dal host</value>
   </data>
-  <data name="Protocol_Amqp_ToolTip" xml:space="preserve">
-    <value>Recumandà per l'adiever general. Cuntrari a MQTT sustegn el il refusament ed il bandunar da messadis.</value>
-  </data>
-  <data name="Protocol_Mqtt_ToolTip" xml:space="preserve">
-    <value>MQTT è pli lev che AMQP ma ha main funcziuns. Cun ina connexiun a internet instabla pudessas dentant perder main messadis.</value>
-  </data>
-  <data name="Protocol_Http1_ToolTip" xml:space="preserve">
-    <value>HTTP 1.1 po esser necessari sche la connexiun a internet ha parameters da firewall fitg strens.</value>
-  </data>
-  <data name="LiveUpdateProtocol" xml:space="preserve">
-    <value>Protocol d'actualisaziun en direct</value>
-  </data>
-  <data name="TunnelStrategy" xml:space="preserve">
-    <value>Strategia da tunnel</value>
-  </data>
-  <data name="TunnelMode_NoTunnel" xml:space="preserve">
-    <value>Nagin tunnel</value>
-  </data>
-  <data name="TunnelMode_Auto_ToolTip" xml:space="preserve">
-    <value>Empruvar l'emprim il protocol nativ. Sch'i na funcziunescha betg, empruvar il tunnel via HTTP e web sockets. Sche la connexiun a internet è restrenschida, po ina connexiun tuttina vegnir stabilida.</value>
-  </data>
-  <data name="TunnelMode_Websocket_ToolTip" xml:space="preserve">
-    <value>Adina duvrar in tunnel web via HTTP e web socket. Sche vus savais che vossa connexiun a internet è restrenschida e bloccescha il protocol nativ, na perdais vus betg temp cun empruvar il protocol nativ.</value>
-  </data>
-  <data name="TunnelMode_NoTunnel_ToolTip" xml:space="preserve">
-    <value>Sche il firewall bloccescha il protocol nativ, na survegnis vus nagina connexiun cun quest parameter.</value>
-  </data>
   <data name="HvacModeAuto" xml:space="preserve">
     <value>Refredar u stgaudar automaticamain</value>
   </data>

@@ -6,8 +6,8 @@ namespace De.Hochstaetter.Fronius.Models.ToshibaAc;
 /// </summary>
 /// <remarks>
 ///     An air conditioner that has taken a command answers with a <c>CMD_FCU_FROM_AC</c> carrying the same message
-///     id as the command. Message queuing loses messages now and then, so a target that stays silent may have taken
-///     the command all the same; the caller is told and decides what to show.
+///     id as the command. The realtime channel loses a message now and then, so a target that stays silent may have
+///     taken the command all the same; the caller is told and decides what to show.
 /// </remarks>
 public class ToshibaHvacCommandResult
 {

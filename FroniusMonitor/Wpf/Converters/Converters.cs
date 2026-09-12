@@ -2,7 +2,6 @@
 using System.Reflection;
 using De.Hochstaetter.Fronius.Attributes;
 using De.Hochstaetter.Fronius.Models.Settings;
-using Microsoft.Azure.Amqp.Framing;
 
 namespace De.Hochstaetter.FroniusMonitor.Wpf.Converters;
 

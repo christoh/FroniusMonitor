@@ -20,8 +20,6 @@ public abstract partial class SettingsBase : BindableBase, ICloneable, IToshibaH
             BaseUrl = "https://mobileapi.toshibahomeaccontrols.com",
             UserName = string.Empty,
             Password = string.Empty,
-            Protocol = Protocol.Amqp,
-            TunnelMode = TunnelMode.Auto,
         };
 
         AzureDeviceId = ToshibaHvacAzureDeviceId.CreateRandom();
@@ -41,9 +39,6 @@ public abstract partial class SettingsBase : BindableBase, ICloneable, IToshibaH
         ToshibaHvacSessionTime = DateTime.UtcNow;
         return Save();
     }
-
-    //[XmlElement, DefaultValue(null), ObservableProperty]
-    //public partial ToshibaHvacAzureCredentials? ToshibaHvacAzureCredentials { get; set; }
 
     [XmlElement, ObservableProperty]
     public partial ElectricityPriceSettings ElectricityPrice { get; set; }
@@ -105,7 +100,7 @@ public abstract partial class SettingsBase : BindableBase, ICloneable, IToshibaH
     public partial bool ShowToshibaAc { get; set; }
 
     [XmlElement, ObservableProperty]
-    public partial AzureConnection ToshibaAcConnection { get; set; }
+    public partial WebConnection ToshibaAcConnection { get; set; }
 
     [XmlIgnore, ObservableProperty]
     public partial uint AzureDeviceId { get; set; }

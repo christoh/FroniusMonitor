@@ -2581,15 +2581,6 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Live update protocol.
-        /// </summary>
-        public static string LiveUpdateProtocol {
-            get {
-                return ResourceManager.GetString("LiveUpdateProtocol", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Load.
         /// </summary>
         public static string Load {
@@ -3832,60 +3823,6 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to AMQP (Advanced Message Queuing Protocol).
-        /// </summary>
-        public static string Protocol_Amqp {
-            get {
-                return ResourceManager.GetString("Protocol_Amqp", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Best for general use. Unlike MQTT it supports message rejection and abandoning..
-        /// </summary>
-        public static string Protocol_Amqp_ToolTip {
-            get {
-                return ResourceManager.GetString("Protocol_Amqp_ToolTip", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to HTTP 1.1 (Hypertext Transfer Protocol).
-        /// </summary>
-        public static string Protocol_Http1 {
-            get {
-                return ResourceManager.GetString("Protocol_Http1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to HTTP 1.1 may be necessary if the internet connection has very strict firewall settings..
-        /// </summary>
-        public static string Protocol_Http1_ToolTip {
-            get {
-                return ResourceManager.GetString("Protocol_Http1_ToolTip", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to MQTT (Message Queuing Telemetry Transport).
-        /// </summary>
-        public static string Protocol_Mqtt {
-            get {
-                return ResourceManager.GetString("Protocol_Mqtt", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to MQTT is more lightweight than AMQP but lacks some features. However, if you have an unstable internet connection, you might loose less messages..
-        /// </summary>
-        public static string Protocol_Mqtt_ToolTip {
-            get {
-                return ResourceManager.GetString("Protocol_Mqtt_ToolTip", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Meter supplied by your distribution network operator.
         /// </summary>
         public static string ProviderMeter {
@@ -4755,69 +4692,6 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string Tuesday_One {
             get {
                 return ResourceManager.GetString("Tuesday_One", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Auto.
-        /// </summary>
-        public static string TunnelMode_Auto {
-            get {
-                return ResourceManager.GetString("TunnelMode_Auto", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Try the native protocol first. If that fails, try tunneling through HTTP and web sockets. If the internet connection is restricted, you may still be able to establish a connection..
-        /// </summary>
-        public static string TunnelMode_Auto_ToolTip {
-            get {
-                return ResourceManager.GetString("TunnelMode_Auto_ToolTip", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to No tunneling.
-        /// </summary>
-        public static string TunnelMode_NoTunnel {
-            get {
-                return ResourceManager.GetString("TunnelMode_NoTunnel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to If the firewall blocks the native protocol, you do not get a connection with this setting..
-        /// </summary>
-        public static string TunnelMode_NoTunnel_ToolTip {
-            get {
-                return ResourceManager.GetString("TunnelMode_NoTunnel_ToolTip", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Web socket.
-        /// </summary>
-        public static string TunnelMode_Websocket {
-            get {
-                return ResourceManager.GetString("TunnelMode_Websocket", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Always use a web tunnel via HTTP and web socket. If you know that your internet connection is restricted and blocks the native protocol, there is no waste of time by trying the native protocol..
-        /// </summary>
-        public static string TunnelMode_Websocket_ToolTip {
-            get {
-                return ResourceManager.GetString("TunnelMode_Websocket_ToolTip", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Tunnel strategy.
-        /// </summary>
-        public static string TunnelStrategy {
-            get {
-                return ResourceManager.GetString("TunnelStrategy", resourceCulture);
             }
         }
         

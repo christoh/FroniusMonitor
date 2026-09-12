@@ -766,33 +766,6 @@
   <data name="ToshibaHvacUrlTooltip" xml:space="preserve">
     <value>Vous ne devriez pas modifier l'URL sauf si Toshiba change le nom d'hôte</value>
   </data>
-  <data name="Protocol_Amqp_ToolTip" xml:space="preserve">
-    <value>Recommandé pour un usage général. Contrairement à MQTT, il prend en charge le rejet et l'abandon des messages.</value>
-  </data>
-  <data name="Protocol_Mqtt_ToolTip" xml:space="preserve">
-    <value>MQTT est plus léger qu'AMQP mais possède moins de fonctionnalités. Toutefois, si votre connexion Internet est instable, vous risquez de perdre moins de messages.</value>
-  </data>
-  <data name="Protocol_Http1_ToolTip" xml:space="preserve">
-    <value>HTTP 1.1 peut être nécessaire si la connexion Internet a des règles de pare-feu très strictes.</value>
-  </data>
-  <data name="LiveUpdateProtocol" xml:space="preserve">
-    <value>Protocole de mise à jour en direct</value>
-  </data>
-  <data name="TunnelStrategy" xml:space="preserve">
-    <value>Stratégie de tunnel</value>
-  </data>
-  <data name="TunnelMode_NoTunnel" xml:space="preserve">
-    <value>Pas de tunnel</value>
-  </data>
-  <data name="TunnelMode_Auto_ToolTip" xml:space="preserve">
-    <value>Essayer d'abord le protocole natif. En cas d'échec, essayer le tunnel via HTTP et web sockets. Si la connexion Internet est restreinte, une connexion peut tout de même être établie.</value>
-  </data>
-  <data name="TunnelMode_Websocket_ToolTip" xml:space="preserve">
-    <value>Toujours utiliser un tunnel web via HTTP et web socket. Si vous savez que votre connexion Internet est restreinte et bloque le protocole natif, cela évite de perdre du temps à essayer le protocole natif.</value>
-  </data>
-  <data name="TunnelMode_NoTunnel_ToolTip" xml:space="preserve">
-    <value>Si le pare-feu bloque le protocole natif, vous n'obtiendrez pas de connexion avec ce paramètre.</value>
-  </data>
   <data name="HvacModeAuto" xml:space="preserve">
     <value>Refroidir ou chauffer automatiquement</value>
   </data>
