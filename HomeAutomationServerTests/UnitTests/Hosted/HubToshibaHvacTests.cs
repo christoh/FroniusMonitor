@@ -91,6 +91,7 @@ public sealed class HubToshibaHvacTests : IAsyncLifetime
         // The state travels as the hex string of the wire format and arrives byte for byte; the target is the air
         // conditioner's own unique id, not the id the client knows the device by.
         Assert.Equal(state.ToString(), toshiba.SentState.ToString());
+        Assert.NotNull(toshiba.SentTargets);
         Assert.Equal([livingRoomUniqueId.ToString("D")], toshiba.SentTargets);
         Assert.Equal(HomeAutomationHub.ToshibaHvacEchoTimeout, toshiba.SentTimeout);
     }
