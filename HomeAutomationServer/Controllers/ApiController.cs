@@ -1,4 +1,3 @@
-﻿using De.Hochstaetter.Fronius.Models.WebApi;
 using De.Hochstaetter.HomeAutomationServer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;

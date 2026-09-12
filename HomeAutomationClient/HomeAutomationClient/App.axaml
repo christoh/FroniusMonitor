@@ -138,7 +138,7 @@
                     <SolidColorBrush x:Key='DeviceButtonSelectedBackground'>DarkCyan</SolidColorBrush>
                     <SolidColorBrush x:Key='DeviceButtonMouseOver'>CadetBlue</SolidColorBrush>
                     
-                    <SolidColorBrush x:Key='DeviceOuterBackgroundRunning'>#ff005070</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceOuterBackgroundRunning'>#ff003050</SolidColorBrush>
                     <SolidColorBrush x:Key='DeviceOuterBackgroundFault'>DarkRed</SolidColorBrush>
                     <SolidColorBrush x:Key='DeviceOuterBackgroundWarning'>DarkGoldenrod</SolidColorBrush>
                     <SolidColorBrush x:Key='DeviceOuterBackgroundStartUp'>SaddleBrown</SolidColorBrush>

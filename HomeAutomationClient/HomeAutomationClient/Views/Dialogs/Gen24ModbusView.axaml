@@ -107,14 +107,14 @@
 
 		<!-- The toast is not here but in the button row of the dialog, where there is room for it: this row has
 		     only the gap between the switch and Undo to offer. See Gen24SettingsDialogView. -->
-		<Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" Margin="0,6,0,0">
-			<TextBlock Grid.Column="0" Classes="Caption" Text="{x:Static p:Resources.Danger}" />
-			<ToggleButton Grid.Column="1" Classes="OnOff" Height="16" VerticalAlignment="Center"
+		<Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,6,0,0">
+			<ToggleButton Grid.Column="0" Classes="OnOff Labeled" Height="16" VerticalAlignment="Center"
+			              Content="{x:Static p:Resources.Danger}"
 			              IsChecked="{Binding EnableDanger}" />
 
-			<Button Grid.Column="3" MinWidth="70" Margin="6,0,0,0" HorizontalContentAlignment="Center"
+			<Button Grid.Column="2" MinWidth="70" Margin="6,0,0,0" HorizontalContentAlignment="Center"
 			        Content="{x:Static p:Resources.Undo}" Command="{Binding UndoCommand}" />
-			<Button Grid.Column="4" MinWidth="70" Margin="6,0,0,0" HorizontalContentAlignment="Center"
+			<Button Grid.Column="3" MinWidth="70" Margin="6,0,0,0" HorizontalContentAlignment="Center"
 			        Content="{x:Static p:Resources.Apply}" Command="{Binding ApplyCommand}" />
 		</Grid>
 	</StackPanel>

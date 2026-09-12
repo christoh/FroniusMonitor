@@ -12,7 +12,12 @@ public interface IWebClientService : IDisposable
 
     void Initialize(string baseUri, string productName, string version);
 
-    Task<ProblemDetails?> Login(string userName, string password, CancellationToken token = default);
+    /// <summary>
+    /// Logs in with Basic credentials, which every later call then carries. The answer says who the server thinks
+    /// logged in and which <see cref="Roles"/> they hold; the client shows both and does nothing else with them,
+    /// because the server checks the roles on every call anyway.
+    /// </summary>
+    Task<ApiResult<UserInfo>> Login(string userName, string password, CancellationToken token = default);
 
     /// <summary>
     /// A short lived ticket that authenticates a SignalR connection. Requires a successful <see cref="Login"/>

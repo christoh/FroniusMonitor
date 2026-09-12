@@ -116,6 +116,10 @@ either - see the event log tab below.
 
 Reading a setting needs `User`, writing one needs `Operator` - the role `requestStandBy` already asked for.
 
+`Roles` lives in `Fronius/Models/WebApi`, shared by both sides: the server grants them, and the client learns which
+it holds from the answer to `IWebClientService.Login`, a `UserInfo` with the name and the roles, which the menu bar
+shows. The client only shows them; every call is checked by the server regardless.
+
 **`Roles` is a `[Flags]` enum with no hierarchy.** A user who holds only `Operator` can write settings and gets 403
 on the read that has to happen first, so they cannot open the dialog they are allowed to change. Whether the reads
 should accept `User,Operator` is still open; see the note at the end.
@@ -390,9 +394,12 @@ Ported from the WPF dialogs deliberately, so the two apps behave alike:
   original. Its colours are `ToastBackground` and `ToastForeground` from both theme dictionaries, not literals -
   the app is used in light and dark.
 
-The switch for the dangerous group is `ToggleButton Classes="OnOff"`, the switch of this app, not a `ToggleSwitch`.
-`Classes="OnOff Labeled"` is the same switch with its `Content` as a caption in front of it. The plain check boxes
-of the WPF dialog stay check boxes.
+The switch for the dangerous group is `ToggleButton Classes="OnOff Labeled"`, with `Resources.Danger` as its
+`Content`, so the caption is clickable too. The dedicated style in `Styles/CompactForms.axaml` keeps
+`PART_Switch` 16 pixels high with the original 6-pixel caption gap. Setting the button's `Height` alone does not
+size this part: the shared labeled template normally sizes it from `FontSize`. Keep these dialog metrics in
+`CompactForms.axaml`, not in individual views or the shared `Buttons.axaml`; the latter is used elsewhere.
+The plain check boxes of the WPF dialog stay check boxes.
 
 A group box in a dialog has to set `Background="{DynamicResource DialogBackground}"`. The header of
 `HeaderedContentControl.GroupBox` covers the piece of border line behind its caption with that brush, and the

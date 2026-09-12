@@ -10,6 +10,7 @@ global using De.Hochstaetter.Fronius.Extensions;
 global using De.Hochstaetter.Fronius.Localization;
 global using De.Hochstaetter.Fronius.Models;
 global using De.Hochstaetter.Fronius.Models.Settings;
+global using De.Hochstaetter.Fronius.Models.WebApi;
 global using De.Hochstaetter.Fronius.Services;
 global using De.Hochstaetter.Fronius.Services.DataCollectors;
 global using De.Hochstaetter.Fronius.Services.Modbus;

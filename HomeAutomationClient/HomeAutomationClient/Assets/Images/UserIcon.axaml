@@ -1,0 +1,24 @@
+<ContentControl xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:i="clr-namespace:De.Hochstaetter.HomeAutomationClient.Assets.Images"
+                mc:Ignorable="d" d:DesignWidth="16" d:DesignHeight="16"
+                x:Class="De.Hochstaetter.HomeAutomationClient.Assets.Images.UserIcon">
+	<!-- A person in a circle, drawn rather than typed, for the same reason as CrossIcon: a shape asks no font for
+	     anything, so it looks the same on all four heads. Stroke and fill follow Foreground, which is inherited,
+	     so the icon takes the colour of the text it sits next to. -->
+	<Viewbox>
+		<Canvas Width="24" Height="24">
+			<!-- The ring. -->
+			<Ellipse Canvas.Left="1.5" Canvas.Top="1.5" Width="21" Height="21" StrokeThickness="1.5"
+			         Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=i:UserIcon}}" />
+			<!-- The head. -->
+			<Ellipse Canvas.Left="8.25" Canvas.Top="5.5" Width="7.5" Height="7.5"
+			         Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=i:UserIcon}}" />
+			<!-- The shoulders: a dome whose lower edge is an arc of the ring, so it ends where the ring does. -->
+			<Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=i:UserIcon}}"
+			      Data="M 4.65,19.5 C 4.65,15.3 7.9,13.9 12,13.9 C 16.1,13.9 19.35,15.3 19.35,19.5 A 10.5,10.5 0 0 1 4.65,19.5 Z" />
+		</Canvas>
+	</Viewbox>
+</ContentControl>

@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using De.Hochstaetter.Fronius.Models.WebApi;
+using System.ComponentModel.DataAnnotations;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using Microsoft.AspNetCore.Http;
 

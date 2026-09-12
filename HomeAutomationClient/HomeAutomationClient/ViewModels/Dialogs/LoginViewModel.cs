@@ -13,6 +13,9 @@ public partial class LoginViewModel(DialogParameters parameters) : DialogBase<Di
     [ObservableProperty, Required(AllowEmptyStrings = false)]
     public partial string Password { get; set; } = string.Empty;
 
+    /// <summary>Who the server says logged in, with their roles. Null until a login succeeded.</summary>
+    public UserInfo? User { get; private set; }
+
     public override async Task Initialize()
     {
         await base.Initialize();
@@ -84,14 +87,15 @@ public partial class LoginViewModel(DialogParameters parameters) : DialogBase<Di
 
             BusyText = Resources.BusyLoggingIn;
 
-            var problemDetails = await webClient.Login(UserName, Password);
+            var result = await webClient.Login(UserName, Password);
 
-            if (problemDetails != null)
+            if (result.Status != HttpStatusCode.OK || result.Payload is not { } user)
             {
-                await problemDetails.Show();
+                await result.Show();
                 return;
             }
 
+            User = user;
             await keyProvider.SetKeyFromUserName(UserName);
             connection = IoC.GetRegistered<HomeAutomationServerConnection>();
             WebConnection.InvalidateKey();

@@ -106,6 +106,12 @@
 		<Setter Property="Padding" Value="10,7" />
 	</Style>
 
+	<!-- Keep the Danger switch's original size and caption gap without changing the shared OnOff template. -->
+	<Style Selector="ToggleButton.OnOff.Labeled /template/ Viewbox#PART_Switch">
+		<Setter Property="Height" Value="16" />
+		<Setter Property="Margin" Value="6,0,0,0" />
+	</Style>
+
 	<!-- A check box cannot be told to be shorter: the Fluent template puts Height="32" on a grid inside itself,
 	     bound to nothing the control exposes, and a style setter loses to a value set in a template. So it is
 	     scaled instead - `<Viewbox Classes="CheckBox"><CheckBox ... /></Viewbox>`.

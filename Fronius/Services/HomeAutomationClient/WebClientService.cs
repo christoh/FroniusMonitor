@@ -36,10 +36,10 @@ public sealed class WebClientService : IWebClientService
         return Convert.FromBase64String(keyString);
     }
 
-    public async Task<ProblemDetails?> Login(string userName, string password, CancellationToken token = default)
+    public Task<ApiResult<UserInfo>> Login(string userName, string password, CancellationToken token = default)
     {
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{userName}:{password}")));
-        return await Get($"Identity/login?user={userName}&password={password}", token).ConfigureAwait(false);
+        return GetResult<UserInfo>($"Identity/login?user={userName}&password={password}", token);
     }
 
     public async Task<string?> GetHubTicket(CancellationToken token = default)
@@ -204,36 +204,6 @@ public sealed class WebClientService : IWebClientService
     }
 
     #endregion
-
-    private async ValueTask<ProblemDetails?> Get(string queryString, CancellationToken token = default)
-    {
-        HttpResponseMessage? responseMessage = null;
-
-        try
-        {
-            responseMessage = await httpClient.GetAsync(queryString, token).ConfigureAwait(false);
-
-            if (responseMessage.StatusCode != HttpStatusCode.OK)
-            {
-                return await GetErrors(responseMessage, token);
-            }
-
-            return null;
-        }
-        catch (Exception ex)
-        {
-            return new ProblemDetails
-            {
-                Title = ex.GetType().Name,
-                Detail = ex.Message,
-                Status = responseMessage?.StatusCode,
-            };
-        }
-        finally
-        {
-            responseMessage?.Dispose();
-        }
-    }
 
     private async Task<ApiResult<T>> GetResult<T>(string queryString, CancellationToken token = default)
     {

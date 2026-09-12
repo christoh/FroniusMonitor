@@ -327,13 +327,13 @@
 		</HeaderedContentControl>
 
 		<!-- The danger switch, and what it guards. Same shape as the Modbus tab. -->
-		<Grid Grid.Row="2" Grid.ColumnSpan="2" ColumnDefinitions="Auto,Auto,*,Auto,Auto" Margin="0,6,0,0">
-			<TextBlock Grid.Column="0" Classes="Caption" Text="{x:Static p:Resources.Danger}" />
-			<ToggleButton Grid.Column="1" Classes="OnOff" Height="16" VerticalAlignment="Center"
+		<Grid Grid.Row="2" Grid.ColumnSpan="2" ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,6,0,0">
+			<ToggleButton Grid.Column="0" Classes="OnOff Labeled" Height="16" VerticalAlignment="Center"
+			              Content="{x:Static p:Resources.Danger}"
 			              IsChecked="{Binding EnableDanger, Mode=TwoWay}" />
-			<Button Grid.Column="3" MinWidth="70" Margin="0,0,6,0" HorizontalContentAlignment="Center"
+			<Button Grid.Column="2" MinWidth="70" Margin="0,0,6,0" HorizontalContentAlignment="Center"
 			        Content="{x:Static p:Resources.Undo}" Command="{Binding UndoCommand}" />
-			<Button Grid.Column="4" MinWidth="70" HorizontalContentAlignment="Center"
+			<Button Grid.Column="3" MinWidth="70" HorizontalContentAlignment="Center"
 			        Content="{x:Static p:Resources.Apply}" Command="{Binding ApplyCommand}" />
 		</Grid>
 	</Grid>

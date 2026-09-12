@@ -26,8 +26,12 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
         return Ok(hashCode);
     }
 
+    /// <summary>
+    /// Answers with the user's name and roles, so the client can show who is logged in and what they may do
+    /// without a second round trip.
+    /// </summary>
     [HttpGet("login")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<UserInfo>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     public IActionResult Login([FromQuery] string user, [FromQuery] string password)
@@ -44,7 +48,7 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
         Response.Cookies.Delete("auth", cookieOptions);
         Response.Cookies.Append("auth", "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes($"{user}:{password}")), cookieOptions);
         logger.LogInformation("{Username} logged in successfully from {Ip}", user, HttpContext.Connection.RemoteIpAddress);
-        return Ok();
+        return Ok(new UserInfo { UserName = dbUser.Username, Roles = dbUser.Roles });
     }
 
     [HttpGet("logout")]

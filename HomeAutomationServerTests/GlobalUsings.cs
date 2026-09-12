@@ -3,6 +3,7 @@
 global using System.Buffers.Text;
 global using De.Hochstaetter.Fronius.Contracts;
 global using De.Hochstaetter.Fronius.Extensions;
+global using De.Hochstaetter.Fronius.Models.WebApi;
 global using System.Text.Json.Nodes;
 global using De.Hochstaetter.HomeAutomationServer.Hubs;
 global using De.Hochstaetter.HomeAutomationServerTests.Logging;

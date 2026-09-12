@@ -37,6 +37,15 @@ public sealed partial class MainViewModel : ViewModelBase
     public partial bool IsReady { get; set; }
 
     /// <summary>
+    /// Who is logged in, as the server reported it at the login, for the menu bar. The roles are the enum names as
+    /// they are, not localized: they are what the server's user list says, and what an administrator would type.
+    /// </summary>
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(UserText))]
+    public partial UserInfo? User { get; set; }
+
+    public string? UserText => User is { } user ? $"{user.UserName} ({user.Roles})" : null;
+
+    /// <summary>
     /// Colors all ticks of every gauge, not just those up to the current value. Lives here because the switch for
     /// it sits in the main view and applies to all views; the other view models reach it through this singleton.
     /// </summary>
@@ -86,6 +95,7 @@ public sealed partial class MainViewModel : ViewModelBase
         });
 
         await loginViewModel.ShowDialogAsync().ConfigureAwait(false);
+        User = loginViewModel.User;
         BusyText = Loc.GetInverterLocalization;
         await gen24Loc.Initialize().ConfigureAwait(false);
         BusyText = Loc.ConnectingToHas;
