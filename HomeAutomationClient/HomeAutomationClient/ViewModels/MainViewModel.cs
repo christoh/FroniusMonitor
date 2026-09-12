@@ -40,10 +40,18 @@ public sealed partial class MainViewModel : ViewModelBase
     /// Who is logged in, as the server reported it at the login, for the menu bar. The roles are the enum names as
     /// they are, not localized: they are what the server's user list says, and what an administrator would type.
     /// </summary>
-    [ObservableProperty, NotifyPropertyChangedFor(nameof(UserText))]
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(UserText), nameof(SettingsItems))]
     public partial UserInfo? User { get; set; }
 
     public string? UserText => User is { } user ? $"{user.UserName} ({user.Roles})" : null;
+
+    /// <summary>
+    /// What the Settings menu offers: the devices with settings and, for an administrator, the user management.
+    /// The server checks the role on every call anyway, so leaving the entry out is only a courtesy.
+    /// </summary>
+    public IEnumerable<object> SettingsItems => User is { Roles: var roles } && roles.HasFlag(Roles.Administrator)
+        ? UpdateService.DevicesWithSettings.Append<object>(UserManagementEntry.Instance)
+        : UpdateService.DevicesWithSettings;
 
     /// <summary>
     /// Colors all ticks of every gauge, not just those up to the current value. Lives here because the switch for
@@ -117,13 +125,24 @@ public sealed partial class MainViewModel : ViewModelBase
     });
 
     /// <summary>
-    /// Opens the settings dialog of one device. The title has to be settled before the dialog goes up, because the
-    /// frame reads it once when it is created, so it comes from the device rather than from what the inverter
-    /// reports about itself a moment later.
+    /// Opens the settings dialog of one entry of the Settings menu: a device, or the user management. The title
+    /// has to be settled before the dialog goes up, because the frame reads it once when it is created, so it
+    /// comes from the device rather than from what the inverter reports about itself a moment later.
     /// </summary>
     [RelayCommand]
-    private Task Settings(IKeyedDevice device) => TaskExceptionHandler(async () =>
+    private Task Settings(object parameter) => TaskExceptionHandler(async () =>
     {
+        if (parameter is UserManagementEntry)
+        {
+            await new UserManagementViewModel(new DialogParameters { Title = Loc.UserManagement }).ShowDialogAsync().ConfigureAwait(false);
+            return;
+        }
+
+        if (parameter is not IKeyedDevice device)
+        {
+            throw new ArgumentException($"No settings for {parameter.GetType().Name}", nameof(parameter));
+        }
+
         if (device.Device is WattPilot wattPilot)
         {
             // Nothing is read first: the client holds the live charger, kept current by the deltas the server

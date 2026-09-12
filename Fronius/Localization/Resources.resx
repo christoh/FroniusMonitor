@@ -1770,4 +1770,70 @@
   <data name="ConfirmReboot" xml:space="preserve">
     <value>Reboot the Wattpilot now?</value>
   </data>
+  <data name="UserManagement" xml:space="preserve">
+    <value>User management</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="AddUser" xml:space="preserve">
+    <value>Add user</value>
+  </data>
+  <data name="EditUser" xml:space="preserve">
+    <value>Edit user</value>
+  </data>
+  <data name="DeleteUser" xml:space="preserve">
+    <value>Delete user</value>
+  </data>
+  <data name="ConfirmDeleteUser" xml:space="preserve">
+    <value>Delete user &apos;{0}&apos;?</value>
+  </data>
+  <data name="Roles" xml:space="preserve">
+    <value>Roles</value>
+  </data>
+  <data name="RepeatPassword" xml:space="preserve">
+    <value>Repeat password</value>
+  </data>
+  <data name="PasswordsDoNotMatch" xml:space="preserve">
+    <value>The passwords do not match</value>
+  </data>
+  <data name="FieldRequired" xml:space="preserve">
+    <value>This field is required</value>
+  </data>
+  <data name="KeepPasswordHint" xml:space="preserve">
+    <value>Leave empty to keep the current password</value>
+  </data>
+  <data name="BusyLoadingUsers" xml:space="preserve">
+    <value>Loading users</value>
+  </data>
+  <data name="CannotAddUser" xml:space="preserve">
+    <value>Cannot add user</value>
+  </data>
+  <data name="CannotUpdateUser" xml:space="preserve">
+    <value>Cannot update user</value>
+  </data>
+  <data name="CannotDeleteUser" xml:space="preserve">
+    <value>Cannot delete user</value>
+  </data>
+  <data name="UserAlreadyExists" xml:space="preserve">
+    <value>User &apos;{0}&apos; already exists</value>
+  </data>
+  <data name="UserNotFound" xml:space="preserve">
+    <value>User &apos;{0}&apos; does not exist</value>
+  </data>
+  <data name="LastAdministrator" xml:space="preserve">
+    <value>The last administrator cannot be deleted or demoted</value>
+  </data>
+  <data name="PasswordRequired" xml:space="preserve">
+    <value>A new user needs a password</value>
+  </data>
 </root>

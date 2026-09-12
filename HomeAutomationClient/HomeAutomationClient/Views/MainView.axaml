@@ -50,9 +50,9 @@
                 </Button>
                 <Button Content="{x:Static p:Resources.Settings}" Theme="{StaticResource MenuButtonStyle}">
                     <Button.Flyout>
-                        <MenuFlyout ItemsSource="{Binding UpdateService.DevicesWithSettings}">
+                        <MenuFlyout ItemsSource="{Binding SettingsItems}">
                             <MenuFlyout.ItemContainerTheme>
-                                <ControlTheme TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}" x:DataType="{x:Type contracts:IKeyedDevice}">
+                                <ControlTheme TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}" x:DataType="{x:Type x:Object}">
                                     <Setter Property="Header" Value="{Binding TargetNullValue={x:Static p:Resources.Unknown}}"/>
                                     <Setter Property="Command" Value="{ReflectionBinding ((vm:MainViewModel)DataContext)?.SettingsCommand, ElementName=DetailsButton}"/>
                                     <Setter Property="CommandParameter" Value="{Binding}"/>

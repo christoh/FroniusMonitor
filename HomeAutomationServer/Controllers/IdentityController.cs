@@ -87,41 +87,130 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
         return Content(hubTickets.Issue(dbUser));
     }
 
-    [HttpGet("adduser")]
+    [HttpGet("users")]
     [BasicAuthorize(Roles = nameof(Roles.Administrator))]
-    [ProducesResponseType<User>(StatusCodes.Status200OK)]
-    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> AddUser([FromQuery] string user, [FromQuery] string password, [FromQuery] string roles)
+    [ProducesResponseType<IEnumerable<UserInfo>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    public IActionResult GetUsers()
     {
-        logger.LogInformation("User {NewUsername} will be added by {Username} from {Ip}", user, HttpContext.User.Identity!.Name, HttpContext.Connection.RemoteIpAddress);
+        return Ok(userDb.CurrentValue.Users.OrderBy(u => u.Username, StringComparer.OrdinalIgnoreCase).Select(ToUserInfo));
+    }
 
-        if (userDb.CurrentValue.Users.Select(u => u.Username).Contains(user))
+    [HttpPost("users")]
+    [BasicAuthorize(Roles = nameof(Roles.Administrator))]
+    [ProducesResponseType<UserInfo>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> AddUser([FromBody] UserAccount account)
+    {
+        if (logger.IsEnabled(LogLevel.Information))
         {
-            logger.LogError("User {NewUsername} already exists", user);
-            return UnprocessableEntity(Helpers.GetProblemDetails("Cannot add user", $"User {user} already exists"));
+            logger.LogInformation("User {NewUsername} will be added by {Username} from {Ip}", account.UserName, HttpContext.User.Identity!.Name, HttpContext.Connection.RemoteIpAddress);
         }
 
-        var split = roles.Split(',');
-        var eRoles = Roles.None;
-
-        foreach (var roleString in split)
+        if (string.IsNullOrEmpty(account.Password))
         {
-            if (Enum.TryParse(typeof(Roles), roleString, true, out var result) && result is Roles r)
-            {
-                eRoles |= r;
-            }
-            else
-            {
-                logger.LogError("Unknown role '{Role}'", roleString);
-                return UnprocessableEntity(Helpers.GetProblemDetails("Cannot add user", $"Unknown role '{roleString}'"));
-            }
+            return UnprocessableEntity(Helpers.GetProblemDetails(Loc.CannotAddUser, Loc.PasswordRequired));
         }
 
-        var dbUser = new User { Username = user, Roles = eRoles };
-        dbUser.SetPassword(password);
+        if (FindUser(account.UserName) != null)
+        {
+            if (logger.IsEnabled(LogLevel.Error))
+            {
+                logger.LogError("User {NewUsername} already exists", account.UserName);
+            }
+
+            return UnprocessableEntity(Helpers.GetProblemDetails(Loc.CannotAddUser, string.Format(Loc.UserAlreadyExists, account.UserName)));
+        }
+
+        var dbUser = new User { Username = account.UserName, Roles = account.Roles };
+        dbUser.SetPassword(account.Password);
         userDb.CurrentValue.Users.Add(dbUser);
         await settings.SaveAsync().ConfigureAwait(false);
-        return Ok(dbUser);
+        return Ok(ToUserInfo(dbUser));
     }
+
+    /// <summary>
+    /// Changes roles and, if <see cref="UserAccount.Password"/> is not empty, the password. The name in the route
+    /// is the key; a user cannot be renamed because the credentials cookie of every session they own carries it.
+    /// </summary>
+    [HttpPut("users/{userName}")]
+    [BasicAuthorize(Roles = nameof(Roles.Administrator))]
+    [ProducesResponseType<UserInfo>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> UpdateUser(string userName, [FromBody] UserAccount account)
+    {
+        if (logger.IsEnabled(LogLevel.Information))
+        {
+            logger.LogInformation("User {ChangedUsername} will be changed by {Username} from {Ip}", userName, HttpContext.User.Identity!.Name, HttpContext.Connection.RemoteIpAddress);
+        }
+
+        if (FindUser(userName) is not { } dbUser)
+        {
+            return NotFound(Helpers.GetProblemDetails(Loc.CannotUpdateUser, string.Format(Loc.UserNotFound, userName)));
+        }
+
+        if (!account.Roles.HasFlag(Roles.Administrator) && IsLastAdministrator(dbUser))
+        {
+            return UnprocessableEntity(Helpers.GetProblemDetails(Loc.CannotUpdateUser, Loc.LastAdministrator));
+        }
+
+        dbUser.Roles = account.Roles;
+
+        if (!string.IsNullOrEmpty(account.Password))
+        {
+            dbUser.SetPassword(account.Password);
+        }
+
+        await settings.SaveAsync().ConfigureAwait(false);
+        return Ok(ToUserInfo(dbUser));
+    }
+
+    [HttpDelete("users/{userName}")]
+    [BasicAuthorize(Roles = nameof(Roles.Administrator))]
+    [ProducesResponseType<bool>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> DeleteUser(string userName)
+    {
+        if (logger.IsEnabled(LogLevel.Information))
+        {
+            logger.LogInformation("User {DeletedUsername} will be deleted by {Username} from {Ip}", userName, HttpContext.User.Identity!.Name, HttpContext.Connection.RemoteIpAddress);
+        }
+
+        if (FindUser(userName) is not { } dbUser)
+        {
+            return NotFound(Helpers.GetProblemDetails(Loc.CannotDeleteUser, string.Format(Loc.UserNotFound, userName)));
+        }
+
+        if (IsLastAdministrator(dbUser))
+        {
+            return UnprocessableEntity(Helpers.GetProblemDetails(Loc.CannotDeleteUser, Loc.LastAdministrator));
+        }
+
+        userDb.CurrentValue.Users.Remove(dbUser);
+        await settings.SaveAsync().ConfigureAwait(false);
+        return Ok(true);
+    }
+
+    private User? FindUser(string userName)
+    {
+        return userDb.CurrentValue.Users.SingleOrDefault(u => string.Equals(userName, u.Username, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private bool IsLastAdministrator(User user)
+    {
+        return user.Roles.HasFlag(Roles.Administrator) && !userDb.CurrentValue.Users.Any(u => u != user && u.Roles.HasFlag(Roles.Administrator));
+    }
+
+    private static UserInfo ToUserInfo(User user) => new() { UserName = user.Username, Roles = user.Roles };
 }

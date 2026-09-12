@@ -30,6 +30,25 @@ public interface IWebClientService : IDisposable
 
     #endregion
 
+    #region Users
+
+    /// <summary>Every user the server has, for the user management dialog. Needs the Administrator role.</summary>
+    Task<ApiResult<List<UserInfo>>> GetUsers(CancellationToken token = default);
+
+    /// <summary>Creates a user. The password is mandatory here. Needs the Administrator role.</summary>
+    Task<ApiResult<UserInfo>> AddUser(UserAccount account, CancellationToken token = default);
+
+    /// <summary>
+    /// Changes the roles of an existing user and, when <see cref="UserAccount.Password"/> is not empty, the
+    /// password. A user cannot be renamed. Needs the Administrator role.
+    /// </summary>
+    Task<ApiResult<UserInfo>> UpdateUser(UserAccount account, CancellationToken token = default);
+
+    /// <summary>Removes a user. The server refuses the last administrator. Needs the Administrator role.</summary>
+    Task<ApiResult<bool>> DeleteUser(string userName, CancellationToken token = default);
+
+    #endregion
+
     #region IPowerConsumer
     Task<ApiResult<bool>> SwitchDevice(string deviceId, bool turnOn, CancellationToken token = default);
 

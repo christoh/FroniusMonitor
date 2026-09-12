@@ -1,0 +1,43 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
+             xmlns:webApi="clr-namespace:De.Hochstaetter.Fronius.Models.WebApi;assembly=Fronius"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="400"
+             x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.UserManagementView"
+             x:DataType="dialogs:UserManagementViewModel" MinWidth="400">
+	<Grid Margin="16" RowDefinitions="*,Auto" ColumnDefinitions="*,Auto">
+		<Grid.Styles>
+			<Style Selector="StackPanel.Commands > Button">
+				<Setter Property="HorizontalAlignment" Value="Stretch" />
+				<Setter Property="HorizontalContentAlignment" Value="Center" />
+				<Setter Property="MinWidth" Value="100" />
+			</Style>
+		</Grid.Styles>
+
+		<ListBox Grid.Row="0" Grid.Column="0" ItemsSource="{Binding Users}" SelectedItem="{Binding SelectedUser, Mode=TwoWay}"
+		         MinHeight="200" MaxHeight="400" DoubleTapped="OnUserDoubleTapped">
+			<ListBox.ItemTemplate>
+				<DataTemplate x:DataType="webApi:UserInfo">
+					<StackPanel Margin="0,4">
+						<TextBlock Text="{Binding UserName}" FontWeight="SemiBold" />
+						<!-- The roles are the server's enum names on purpose, not translated: see MainView. -->
+						<TextBlock Text="{Binding Roles}" Opacity="0.75" />
+					</StackPanel>
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+		</ListBox>
+
+		<StackPanel Grid.Row="0" Grid.Column="1" Classes="Commands" Margin="16,0,0,0" Spacing="8">
+			<Button Content="{x:Static p:Resources.Add}" Command="{Binding AddCommand}" />
+			<Button Content="{x:Static p:Resources.Edit}" Command="{Binding EditCommand}" />
+			<Button Content="{x:Static p:Resources.Delete}" Command="{Binding DeleteCommand}" />
+		</StackPanel>
+
+		<StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Classes="Commands" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+			<Button Content="{x:Static p:Resources.Close}" Command="{Binding CloseDialogCommand}" IsCancel="True" />
+		</StackPanel>
+	</Grid>
+</UserControl>

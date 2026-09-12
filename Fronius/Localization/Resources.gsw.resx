@@ -1680,4 +1680,70 @@
   <data name="ConfirmReboot" xml:space="preserve">
     <value>De Wattpilot jetzt neu starte?</value>
   </data>
+  <data name="UserManagement" xml:space="preserve">
+    <value>Benützerverwaltig</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Hinzuefüege</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Bearbeite</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Lösche</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Schlüsse</value>
+  </data>
+  <data name="AddUser" xml:space="preserve">
+    <value>Benützer hinzuefüege</value>
+  </data>
+  <data name="EditUser" xml:space="preserve">
+    <value>Benützer bearbeite</value>
+  </data>
+  <data name="DeleteUser" xml:space="preserve">
+    <value>Benützer lösche</value>
+  </data>
+  <data name="ConfirmDeleteUser" xml:space="preserve">
+    <value>Benützer &apos;{0}&apos; lösche?</value>
+  </data>
+  <data name="Roles" xml:space="preserve">
+    <value>Rolle</value>
+  </data>
+  <data name="RepeatPassword" xml:space="preserve">
+    <value>Chännwort wiederhole</value>
+  </data>
+  <data name="PasswordsDoNotMatch" xml:space="preserve">
+    <value>Die Chännwörter stimmed nöd überii</value>
+  </data>
+  <data name="FieldRequired" xml:space="preserve">
+    <value>Das Fäld isch erforderlich</value>
+  </data>
+  <data name="KeepPasswordHint" xml:space="preserve">
+    <value>Leer lah, zum s aktuelle Chännwort z bhalte</value>
+  </data>
+  <data name="BusyLoadingUsers" xml:space="preserve">
+    <value>Lade Benützer</value>
+  </data>
+  <data name="CannotAddUser" xml:space="preserve">
+    <value>Cha de Benützer nöd hinzuefüege</value>
+  </data>
+  <data name="CannotUpdateUser" xml:space="preserve">
+    <value>Cha de Benützer nöd ändere</value>
+  </data>
+  <data name="CannotDeleteUser" xml:space="preserve">
+    <value>Cha de Benützer nöd lösche</value>
+  </data>
+  <data name="UserAlreadyExists" xml:space="preserve">
+    <value>De Benützer &apos;{0}&apos; existiert scho</value>
+  </data>
+  <data name="UserNotFound" xml:space="preserve">
+    <value>De Benützer &apos;{0}&apos; existiert nöd</value>
+  </data>
+  <data name="LastAdministrator" xml:space="preserve">
+    <value>De letscht Administrator cha nöd glöscht oder abgstueft werde</value>
+  </data>
+  <data name="PasswordRequired" xml:space="preserve">
+    <value>En neue Benützer bruucht es Chännwort</value>
+  </data>
 </root>

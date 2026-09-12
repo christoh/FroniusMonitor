@@ -1645,4 +1645,70 @@
   <data name="ConfirmReboot" xml:space="preserve">
     <value>Redémarrer le Wattpilot maintenant ?</value>
   </data>
+  <data name="UserManagement" xml:space="preserve">
+    <value>Gestion des utilisateurs</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Ajouter</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Modifier</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Fermer</value>
+  </data>
+  <data name="AddUser" xml:space="preserve">
+    <value>Ajouter un utilisateur</value>
+  </data>
+  <data name="EditUser" xml:space="preserve">
+    <value>Modifier l&apos;utilisateur</value>
+  </data>
+  <data name="DeleteUser" xml:space="preserve">
+    <value>Supprimer l&apos;utilisateur</value>
+  </data>
+  <data name="ConfirmDeleteUser" xml:space="preserve">
+    <value>Supprimer l&apos;utilisateur &apos;{0}&apos; ?</value>
+  </data>
+  <data name="Roles" xml:space="preserve">
+    <value>Rôles</value>
+  </data>
+  <data name="RepeatPassword" xml:space="preserve">
+    <value>Répéter le mot de passe</value>
+  </data>
+  <data name="PasswordsDoNotMatch" xml:space="preserve">
+    <value>Les mots de passe ne correspondent pas</value>
+  </data>
+  <data name="FieldRequired" xml:space="preserve">
+    <value>Ce champ est obligatoire</value>
+  </data>
+  <data name="KeepPasswordHint" xml:space="preserve">
+    <value>Laisser vide pour conserver le mot de passe actuel</value>
+  </data>
+  <data name="BusyLoadingUsers" xml:space="preserve">
+    <value>Chargement des utilisateurs</value>
+  </data>
+  <data name="CannotAddUser" xml:space="preserve">
+    <value>Impossible d&apos;ajouter l&apos;utilisateur</value>
+  </data>
+  <data name="CannotUpdateUser" xml:space="preserve">
+    <value>Impossible de modifier l&apos;utilisateur</value>
+  </data>
+  <data name="CannotDeleteUser" xml:space="preserve">
+    <value>Impossible de supprimer l&apos;utilisateur</value>
+  </data>
+  <data name="UserAlreadyExists" xml:space="preserve">
+    <value>L&apos;utilisateur &apos;{0}&apos; existe déjà</value>
+  </data>
+  <data name="UserNotFound" xml:space="preserve">
+    <value>L&apos;utilisateur &apos;{0}&apos; n&apos;existe pas</value>
+  </data>
+  <data name="LastAdministrator" xml:space="preserve">
+    <value>Le dernier administrateur ne peut pas être supprimé ni rétrogradé</value>
+  </data>
+  <data name="PasswordRequired" xml:space="preserve">
+    <value>Un nouvel utilisateur a besoin d&apos;un mot de passe</value>
+  </data>
 </root>

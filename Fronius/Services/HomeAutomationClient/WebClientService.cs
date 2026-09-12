@@ -49,6 +49,26 @@ public sealed class WebClientService : IWebClientService
         return await response.Content.ReadAsStringAsync(token).ConfigureAwait(false);
     }
 
+    public Task<ApiResult<List<UserInfo>>> GetUsers(CancellationToken token = default)
+    {
+        return GetResult<List<UserInfo>>("Identity/users", token);
+    }
+
+    public Task<ApiResult<UserInfo>> AddUser(UserAccount account, CancellationToken token = default)
+    {
+        return PostResult<UserInfo, UserAccount>("Identity/users", account, token);
+    }
+
+    public Task<ApiResult<UserInfo>> UpdateUser(UserAccount account, CancellationToken token = default)
+    {
+        return PutResult<UserInfo, UserAccount>($"Identity/users/{Uri.EscapeDataString(account.UserName)}", account, token);
+    }
+
+    public Task<ApiResult<bool>> DeleteUser(string userName, CancellationToken token = default)
+    {
+        return DeleteResult<bool>($"Identity/users/{Uri.EscapeDataString(userName)}", token);
+    }
+
     #endregion
 
     #region Devices
@@ -205,13 +225,38 @@ public sealed class WebClientService : IWebClientService
 
     #endregion
 
-    private async Task<ApiResult<T>> GetResult<T>(string queryString, CancellationToken token = default)
+    private Task<ApiResult<T>> GetResult<T>(string queryString, CancellationToken token = default)
+    {
+        return SendResult<T>(t => httpClient.GetAsync(queryString, t), token);
+    }
+
+    /// <summary>
+    /// The counterpart of <see cref="GetResult{T}"/> for the endpoints that change something. The body goes out as
+    /// JSON with the same options the rest of the API uses, so the server sees the very shape these models have.
+    /// </summary>
+    private Task<ApiResult<TResult>> PutResult<TResult, TBody>(string queryString, TBody body, CancellationToken token = default)
+    {
+        return SendResult<TResult>(t => httpClient.PutAsJsonAsync(queryString, body, jsonOptions, t), token);
+    }
+
+    /// <inheritdoc cref="PutResult{TResult,TBody}"/>
+    private Task<ApiResult<TResult>> PostResult<TResult, TBody>(string queryString, TBody body, CancellationToken token = default)
+    {
+        return SendResult<TResult>(t => httpClient.PostAsJsonAsync(queryString, body, jsonOptions, t), token);
+    }
+
+    private Task<ApiResult<T>> DeleteResult<T>(string queryString, CancellationToken token = default)
+    {
+        return SendResult<T>(t => httpClient.DeleteAsync(queryString, t), token);
+    }
+
+    private async Task<ApiResult<T>> SendResult<T>(Func<CancellationToken, Task<HttpResponseMessage>> send, CancellationToken token)
     {
         HttpResponseMessage? responseMessage = null;
 
         try
         {
-            responseMessage = await httpClient.GetAsync(queryString, token).ConfigureAwait(false);
+            responseMessage = await send(token).ConfigureAwait(false);
 
             return responseMessage.StatusCode != HttpStatusCode.OK
                 ? ApiResult<T>.FromProblemDetails(await GetErrors(responseMessage, token).ConfigureAwait(false), responseMessage.StatusCode)
@@ -224,42 +269,6 @@ public sealed class WebClientService : IWebClientService
         catch (Exception ex)
         {
             return ApiResult<T>.FromProblemDetails(new ProblemDetails
-            {
-                Title = ex.GetType().Name,
-                Detail = ex.Message,
-                Status = responseMessage?.StatusCode,
-                Errors = new Dictionary<string, List<string>> { { "Errors", [ex.Message] } },
-            }, responseMessage?.StatusCode, ex);
-        }
-        finally
-        {
-            responseMessage?.Dispose();
-        }
-    }
-
-    /// <summary>
-    /// The counterpart of <see cref="GetResult{T}"/> for the endpoints that change something. The body goes out as
-    /// JSON with the same options the rest of the API uses, so the server sees the very shape these models have.
-    /// </summary>
-    private async Task<ApiResult<TResult>> PutResult<TResult, TBody>(string queryString, TBody body, CancellationToken token = default)
-    {
-        HttpResponseMessage? responseMessage = null;
-
-        try
-        {
-            responseMessage = await httpClient.PutAsJsonAsync(queryString, body, jsonOptions, token).ConfigureAwait(false);
-
-            return responseMessage.StatusCode != HttpStatusCode.OK
-                ? ApiResult<TResult>.FromProblemDetails(await GetErrors(responseMessage, token).ConfigureAwait(false), responseMessage.StatusCode)
-                : new ApiResult<TResult>
-                {
-                    Payload = await responseMessage.Content.ReadFromJsonAsync<TResult>(jsonOptions, token).ConfigureAwait(false),
-                    Status = responseMessage.StatusCode,
-                };
-        }
-        catch (Exception ex)
-        {
-            return ApiResult<TResult>.FromProblemDetails(new ProblemDetails
             {
                 Title = ex.GetType().Name,
                 Detail = ex.Message,

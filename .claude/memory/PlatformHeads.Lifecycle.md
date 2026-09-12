@@ -48,7 +48,7 @@ which is `document.baseURI` **for a reason the navigation document gives**. Do n
 
 ## What every head must provide
 
-**An `ICache`.** `MainViewModel`, `UpdateService` and `LoginViewModel` read it through
+**An `ICache`.** `MainViewModel`, `UpdateService`, `LoginViewModel` and `Misc/StoredConnection` read it through
 `IoC.TryGetRegistered<ICache>()`. A head without one gets a client that fails shortly after startup - which is
 exactly what Android and iOS did before they got theirs.
 

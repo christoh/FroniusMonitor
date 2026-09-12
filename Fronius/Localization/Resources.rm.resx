@@ -1654,4 +1654,70 @@
   <data name="ConfirmReboot" xml:space="preserve">
     <value>Reaviar il Wattpilot ussa?</value>
   </data>
+  <data name="UserManagement" xml:space="preserve">
+    <value>Administraziun dals utilisaders</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Agiuntar</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Modifitgar</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Stizzar</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Serrar</value>
+  </data>
+  <data name="AddUser" xml:space="preserve">
+    <value>Agiuntar in utilisader</value>
+  </data>
+  <data name="EditUser" xml:space="preserve">
+    <value>Modifitgar l&apos;utilisader</value>
+  </data>
+  <data name="DeleteUser" xml:space="preserve">
+    <value>Stizzar l&apos;utilisader</value>
+  </data>
+  <data name="ConfirmDeleteUser" xml:space="preserve">
+    <value>Stizzar l&apos;utilisader &apos;{0}&apos;?</value>
+  </data>
+  <data name="Roles" xml:space="preserve">
+    <value>Rollas</value>
+  </data>
+  <data name="RepeatPassword" xml:space="preserve">
+    <value>Repeter il pled-clav</value>
+  </data>
+  <data name="PasswordsDoNotMatch" xml:space="preserve">
+    <value>Ils pleds-clav na correspundan betg</value>
+  </data>
+  <data name="FieldRequired" xml:space="preserve">
+    <value>Quest champ è obligatoric</value>
+  </data>
+  <data name="KeepPasswordHint" xml:space="preserve">
+    <value>Laschar vid per mantegnair il pled-clav actual</value>
+  </data>
+  <data name="BusyLoadingUsers" xml:space="preserve">
+    <value>Chargiar ils utilisaders</value>
+  </data>
+  <data name="CannotAddUser" xml:space="preserve">
+    <value>Impussibel d&apos;agiuntar l&apos;utilisader</value>
+  </data>
+  <data name="CannotUpdateUser" xml:space="preserve">
+    <value>Impussibel da modifitgar l&apos;utilisader</value>
+  </data>
+  <data name="CannotDeleteUser" xml:space="preserve">
+    <value>Impussibel da stizzar l&apos;utilisader</value>
+  </data>
+  <data name="UserAlreadyExists" xml:space="preserve">
+    <value>L&apos;utilisader &apos;{0}&apos; exista gia</value>
+  </data>
+  <data name="UserNotFound" xml:space="preserve">
+    <value>L&apos;utilisader &apos;{0}&apos; n&apos;exista betg</value>
+  </data>
+  <data name="LastAdministrator" xml:space="preserve">
+    <value>L&apos;ultim administratur na po betg vegnir stizzà u degradà</value>
+  </data>
+  <data name="PasswordRequired" xml:space="preserve">
+    <value>In nov utilisader dovra in pled-clav</value>
+  </data>
 </root>

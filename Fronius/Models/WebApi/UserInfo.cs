@@ -1,8 +1,11 @@
-﻿namespace De.Hochstaetter.Fronius.Models.WebApi;
+﻿using System.ComponentModel.DataAnnotations;
 
-/// <summary>What a successful login tells the client about the user who logged in.</summary>
+namespace De.Hochstaetter.Fronius.Models.WebApi;
+
+/// <summary>A user of the home automation server as the server describes them: the name and the roles.</summary>
 public class UserInfo
 {
+    [Required(AllowEmptyStrings = false)]
     public string UserName { get; set; } = string.Empty;
 
     public Roles Roles { get; set; }

@@ -5,7 +5,6 @@ public partial class LoginViewModel(DialogParameters parameters) : DialogBase<Di
     private static readonly ICache cache = IoC.GetRegistered<ICache>();
     private readonly IWebClientService webClient = IoC.GetRegistered<IWebClientService>();
     private readonly IServerBasedAesKeyProvider keyProvider = IoC.GetRegistered<IServerBasedAesKeyProvider>();
-    private HomeAutomationServerConnection? connection;
 
     [ObservableProperty, Required(AllowEmptyStrings = false)]
     public partial string UserName { get; set; } = string.Empty;
@@ -96,14 +95,7 @@ public partial class LoginViewModel(DialogParameters parameters) : DialogBase<Di
             }
 
             User = user;
-            await keyProvider.SetKeyFromUserName(UserName);
-            connection = IoC.GetRegistered<HomeAutomationServerConnection>();
-            WebConnection.InvalidateKey();
-            connection.UserName = UserName;
-            connection.Password = Password;
-            connection.BaseUrl = IoC.Get<MainViewModel>().ApiUri;
-            await connection.UpdateChecksumAsync();
-            await cache.AddOrUpdateAsync(CacheKeys.Connection, connection);
+            await StoredConnection.SaveAsync(UserName, Password);
 
             Result = true;
             Close();
