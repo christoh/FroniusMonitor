@@ -206,10 +206,6 @@ arrange pass wins was wrong five times in a row; measuring was right every time.
   leaves the dialog on screen and `ShowDialogAsync` waiting on its token, so the close box appears to do nothing at
   all. Where a dialog has a Cancel button of its own, let both go through one method rather than writing the two
   paths separately - they are the same thing and drift apart otherwise.
-- `Result` is one value. A dialog that has more to report exposes it as a property the caller reads after
-  `ShowDialogAsync` returns: `LoginViewModel.User` is the `UserInfo` the server answered the login with, and
-  `MainViewModel.Initialize` copies it to `MainViewModel.User` for the menu bar, which shows it as
-  `name (Role, Role)` through `UserText`. The roles are the enum names on purpose and are not localized.
 
 ## What a dialog view model looks like
 

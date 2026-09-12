@@ -78,12 +78,6 @@ alone - verified for iOS with `dotnet msbuild -p:RuntimeIdentifier=ios-arm64 -ge
 reports `partial`. Give `FileCache` a `JsonSerializerContext` before that changes; the compiler will not warn,
 because the trim analyzer does not look into a referenced project.
 
-## Dashboard device backgrounds
-
-The dark `DeviceOuterBackgroundRunning` brush in `App.axaml` matches the SmartMeter's `StatusColor.RunningOuter`
-(`#003050`). The shared `DeviceControlBase` style supplies it to the inverter, Wattpilot and power consumers.
-The light-theme brush and the fault, warning, startup and inactive colors are unchanged.
-
 ## What a head may provide: the accent color
 
 `PlatformStartup.AccentColor` is a nullable `HaColor`. Where a head detected one, `App.SetAccentColor()` writes
@@ -247,7 +241,6 @@ So a shared view may not depend on a glyph. The rule is: text that is words is f
 a picture - a cross, an arrow, a chevron - is drawn as a shape and lives in `Assets/Images`. `CrossIcon` is that,
 and it exists because the delete button of a charging rule was `Content="✕"` (U+2715), which is not in Inter:
 correct on the desktop and an empty box in the browser, reported from a screenshot of the two side by side.
-`UserIcon`, the person in a circle beside the user's name in the menu bar, is built the same way.
 
 An icon of that kind takes its colour from `Foreground`, which is inherited, so the shape follows the button it
 sits in through pointer-over and disabled without being told. That is why `CrossIcon` is a `ContentControl` and
