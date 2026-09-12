@@ -43,7 +43,7 @@ public sealed class ToshibaHvacViewModelTests
     private readonly FakeCommander commander = new();
     private readonly TestableViewModel viewModel;
 
-    /// <summary>Model 3 with horizontal swing, the silent modes and the fixed louver positions - "Büro Christoph" on the live server.</summary>
+    /// <summary>Model 3 with horizontal swing, the silent modes and the fixed louver positions.</summary>
     private readonly ToshibaHvacMappingDevice device = new()
     {
         Name = "Living room",

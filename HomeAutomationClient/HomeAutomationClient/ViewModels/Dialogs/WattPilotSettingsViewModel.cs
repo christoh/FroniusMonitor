@@ -3,6 +3,7 @@ using De.Hochstaetter.Fronius.Models;
 using De.Hochstaetter.Fronius.Models.Charging;
 using De.Hochstaetter.Fronius.Models.Gen24.Settings;
 using De.Hochstaetter.Fronius.Validators;
+using Microsoft.AspNetCore.SignalR;
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs;
 
@@ -299,7 +300,19 @@ public sealed partial class WattPilotSettingsViewModel : ViewModelBase
         }
 
         BusyText = string.Format(CultureInfo.CurrentCulture, Loc.SavingSettings, Loc.WattPilotHeader);
-        var result = await updateService.SetWattPilotSettings(deviceId, WattPilot, loaded).ConfigureAwait(true);
+        WattPilotWriteResult result;
+
+        try
+        {
+            result = await updateService.SetWattPilotSettings(deviceId, WattPilot, loaded).ConfigureAwait(true);
+        }
+        catch (HubException ex)
+        {
+            BusyText = null;
+            await ex.ShowHubError().ConfigureAwait(true);
+            return;
+        }
+
         BusyText = null;
 
         // What was sent is what Undo goes back to from now on, whatever the charger made of it: the ones it took are
@@ -341,7 +354,16 @@ public sealed partial class WattPilotSettingsViewModel : ViewModelBase
         }
 
         BusyText = Loc.Reboot;
-        await updateService.RebootWattPilot(deviceId).ConfigureAwait(true);
+
+        try
+        {
+            await updateService.RebootWattPilot(deviceId).ConfigureAwait(true);
+        }
+        catch (HubException ex)
+        {
+            BusyText = null;
+            await ex.ShowHubError().ConfigureAwait(true);
+        }
     });
 
     [RelayCommand]

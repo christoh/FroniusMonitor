@@ -52,6 +52,12 @@ var result = await new MessageBox { Text = "…", Icon = new ErrorIcon() }.Show(
 `MessageBox.Show()`, `Exception.Show()` and `ProblemDetails.Show()` (all in `MessageBoxes/ErrorBoxes.cs`) are the
 front door for message boxes; `Exception.Show()` marshals to the UI thread itself.
 
+`Exception.Show()` is the **unhandled fallback**, not a place to classify hub failures. ViewModel methods that
+invoke the hub catch `HubException` by type and call `ex.ShowHubError()`, an extension in `ErrorBoxes`.
+It logs the exception at guarded Warning level and shows `Resources.Error` as the caption and `ex.Message`
+as the text, without a stack trace or an invented HTTP status. The message is displayed, never inspected to
+decide how to handle the error.
+
 ## The queue item holds the live parameters
 
 `DialogQueueItem` is a positional record of `Title`, `Body`, `Parameters` and `BusyText`. The parameters are the

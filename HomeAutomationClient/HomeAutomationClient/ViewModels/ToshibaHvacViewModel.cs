@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using De.Hochstaetter.Fronius.Models.ToshibaAc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 
@@ -289,8 +290,8 @@ public partial class ToshibaHvacViewModel(IToshibaHvacCommander commander) : Vie
     #endregion
 
     /// <summary>
-    /// Builds the delta from <paramref name="change"/>, sends it and waits for the server's verdict. Every
-    /// exception - no connection, the server's refusal, a hub error - is shown by <see cref="ViewModelBase.TaskExceptionHandler"/>.
+    /// Builds the delta from <paramref name="change"/>, sends it and waits for the server's verdict. Hub failures
+    /// get a user-facing message; other exceptions reach <see cref="ViewModelBase.TaskExceptionHandler"/>.
     /// </summary>
     private Task Send(Action<ToshibaHvacStateData> change) => TaskExceptionHandler(async () =>
     {
@@ -307,7 +308,19 @@ public partial class ToshibaHvacViewModel(IToshibaHvacCommander commander) : Vie
         // that from any thread but the UI thread. The continuation has to come back to where the click came from.
         try
         {
-            var result = await commander.SendToshibaHvacCommand([DeviceKey], state);
+            ToshibaHvacCommandResult result;
+
+            try
+            {
+                result = await commander.SendToshibaHvacCommand([DeviceKey], state);
+            }
+            catch (HubException ex)
+            {
+                IsSending = false;
+                BusyText = null;
+                await ex.ShowHubError();
+                return;
+            }
 
             if (!result.IsSuccess)
             {
