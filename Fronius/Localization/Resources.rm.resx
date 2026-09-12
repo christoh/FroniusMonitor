@@ -1249,6 +1249,9 @@
   <data name="NoToshibaHvacConnection" xml:space="preserve">
     <value>Betg connectà al servetsch Toshiba HVAC</value>
   </data>
+  <data name="ToshibaHvacCommandNotConfirmed" xml:space="preserve">
+    <value>'{0}' n'ha betg confermà il cumond. El po tuttina esser vegnì exequì; l'indicaziun mussa il davos stadi annunzià dal climatisader.</value>
+  </data>
   <data name="NoChargingLogFromWattPilot" xml:space="preserve">
     <value>Nagin link dal protocol da chargiada disponibel dal Wattpilot</value>
   </data>

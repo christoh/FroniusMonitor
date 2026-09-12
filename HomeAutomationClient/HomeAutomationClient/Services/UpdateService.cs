@@ -1,6 +1,7 @@
 ﻿using De.Hochstaetter.Fronius.Extensions;
 using De.Hochstaetter.Fronius.Models;
 using De.Hochstaetter.Fronius.Models.Charging;
+using De.Hochstaetter.Fronius.Models.ToshibaAc;
 using Microsoft.AspNetCore.SignalR.Client;
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
@@ -91,6 +92,13 @@ internal partial class UpdateService(IWebClientService webClient, ILogger<Update
             fritzBoxDevices.Where(fb => fb.Value.CanSwitch).Select(fb => new KeyedFritzBoxDevice { Device = fb.Value, Key = fb.Key }).Apply(f => AllPowerConsumers.Add(f));
         }
 
+        var toshibaResult = await webClient.GetToshibaHvacDevices();
+
+        if (toshibaResult.Payload is { } toshibaDevices)
+        {
+            toshibaDevices.Select(t => new KeyedToshibaHvac { Device = t.Value, Key = t.Key }).Apply(t => AllPowerConsumers.Add(t));
+        }
+
         NotifyOfPropertyChange(nameof(ShowPowerConsumers));
 
         var hubUri = IoC.TryGetRegistered<ICache>()?.Get<string>(CacheKeys.HubUri) ?? "http://www.example.com/hub";
@@ -119,12 +127,16 @@ internal partial class UpdateService(IWebClientService webClient, ILogger<Update
         hubConnection.On<string, FritzBoxDevice>(nameof(FritzBoxDevice), OnFritzBoxUpdate);
         hubConnection.On<string, WattPilot>(nameof(WattPilot), OnWattPilotUpdate);
         hubConnection.On<string, WattPilotUpdate>(nameof(WattPilotUpdate), OnWattPilotUpdateMessage);
+        hubConnection.On<string, ToshibaHvacMappingDevice>(nameof(ToshibaHvacMappingDevice), OnToshibaHvacUpdate);
     }
 
     public Task<WattPilotWriteResult> SetWattPilotSettings(string deviceId, WattPilot wanted, WattPilot loaded) =>
         Hub.InvokeAsync<WattPilotWriteResult>(nameof(SetWattPilotSettings), deviceId, wanted, loaded);
 
     public Task RebootWattPilot(string deviceId) => Hub.InvokeAsync(nameof(RebootWattPilot), deviceId);
+
+    public Task<ToshibaHvacCommandResult> SendToshibaHvacCommand(string[] ids, ToshibaHvacStateData state) =>
+        Hub.InvokeAsync<ToshibaHvacCommandResult>(nameof(SendToshibaHvacCommand), ids, state);
 
     /// <summary>
     /// The connection a client-to-server call goes over. It is only ever null before <see cref="StartAsync"/>, and
@@ -286,6 +298,33 @@ internal partial class UpdateService(IWebClientService webClient, ILogger<Update
         }
 
         SitePowerFlowUpdated?.Invoke(this, new SitePowerFlowUpdatedEventArgs(inverter, SitePowerFlow));
+    }
+
+    /// <summary>
+    /// The server sends the whole device on every change (there is no delta message as for the Wattpilot; the
+    /// device is small). An instance the dashboard already shows takes the values in place, so the control bound
+    /// to it and the view model subscribed to its state keep their object.
+    /// </summary>
+    private void OnToshibaHvacUpdate(string id, ToshibaHvacMappingDevice device)
+    {
+        try
+        {
+            var existing = AllPowerConsumers.OfType<KeyedToshibaHvac>().FirstOrDefault(d => d.Key == id);
+
+            if (existing == null)
+            {
+                AllPowerConsumers.Add(new KeyedToshibaHvac { Key = id, Device = device });
+                NotifyOfPropertyChange(nameof(ShowPowerConsumers));
+            }
+            else
+            {
+                existing.Device.CopyFrom(device);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Updating Toshiba HVAC {Id} failed.", id);
+        }
     }
 
     private void OnFritzBoxUpdate(string id, FritzBoxDevice fritzBoxDevice)

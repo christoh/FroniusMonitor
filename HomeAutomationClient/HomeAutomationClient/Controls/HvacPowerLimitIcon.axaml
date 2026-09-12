@@ -1,0 +1,30 @@
+<Viewbox xmlns="https://github.com/avaloniaui"
+         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+         xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+         xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+         mc:Ignorable="d" d:DesignWidth="40" d:DesignHeight="30"
+         x:Class="De.Hochstaetter.HomeAutomationClient.Controls.HvacPowerLimitIcon">
+	<!-- The power limit after the WPF HvacPowerLimitButton: "LIMIT" over three blocks, the first always lit, the
+	     others for 75 % and 100 %. -->
+	<Grid RowDefinitions="Auto,Auto" Background="Transparent" x:DataType="c:HvacPowerLimitIcon" DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:HvacPowerLimitIcon}}">
+		<Grid.Styles>
+			<Style Selector="Border.Block">
+				<Setter Property="BorderThickness" Value=".7" />
+				<Setter Property="BorderBrush" Value="{Binding Fill}" />
+				<Setter Property="Height" Value="10" />
+				<Setter Property="Width" Value="8" />
+				<Setter Property="Margin" Value="1,8,1,0" />
+			</Style>
+		</Grid.Styles>
+
+		<TextBlock Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="10" FontWeight="DemiBold" Margin="1,-2,1,1" Foreground="{Binding Fill}" Text="{x:Static p:Resources.HvacLimit}" />
+
+		<Grid Grid.Row="1" ColumnDefinitions="2*,*,*">
+			<Border Grid.Column="0" Classes="Block" Width="16" Background="{Binding PowerBrush}" />
+			<Border Grid.Column="1" Classes="Block" x:Name="P75" />
+			<Border Grid.Column="2" Classes="Block" x:Name="P100" />
+		</Grid>
+	</Grid>
+</Viewbox>

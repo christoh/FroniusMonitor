@@ -23,6 +23,21 @@ paths:
   - HomeAutomationServerTests/UnitTests/Hosted/HubToshibaHvacTests.cs
   - HomeAutomationServerTests/UnitTests/ToshibaHvacJsonTests.cs
   - HomeAutomationServerTests/UnitTests/ToshibaHvacDataCollectorTests.cs
+  - HomeAutomationServerTests/UnitTests/ToshibaHvacSettingsTests.cs
+  - HomeAutomationServerTests/UnitTests/ToshibaHvacViewModelTests.cs
+  - HomeAutomationClient/HomeAutomationClient/Contracts/IToshibaHvacCommander.cs
+  - HomeAutomationClient/HomeAutomationClient/Contracts/IUpdateService.cs
+  - HomeAutomationClient/HomeAutomationClient/Services/UpdateService.cs
+  - HomeAutomationClient/HomeAutomationClient/Models/KeyedDevices.cs
+  - HomeAutomationClient/HomeAutomationClient/Models/HvacOptions.cs
+  - HomeAutomationClient/HomeAutomationClient/ViewModels/ToshibaHvacViewModel.cs
+  - HomeAutomationClient/HomeAutomationClient/Controls/ToshibaHvacControl.axaml
+  - HomeAutomationClient/HomeAutomationClient/Controls/ToshibaHvacControl.axaml.cs
+  - HomeAutomationClient/HomeAutomationClient/Controls/Hvac*Icon.axaml
+  - HomeAutomationClient/HomeAutomationClient/Controls/Hvac*Icon.axaml.cs
+  - HomeAutomationClient/HomeAutomationClient/Assets/Images/QuietIcon.axaml
+  - HomeAutomationClient/HomeAutomationClient/Assets/Images/SpeakerIcon.axaml
+  - HomeAutomationClient/HomeAutomationClient/Views/DashboardView.axaml
   - FroniusMonitor/Controls/ToshibaHvacControl.xaml
   - FroniusMonitor/Controls/ToshibaHvacControl.xaml.cs
   - FroniusMonitor/Controls/HvacButton.cs
@@ -205,6 +220,82 @@ in the JSON a client receives; the client gets the id as the message key.
   watcher refused, unknown id by name, silent targets, service down), `UnitTests/ToshibaHvacDataCollectorTests`,
   `UnitTests/ToshibaHvacJsonTests`; `FakeToshibaHvacService` in `Fakes` is the stand-in.
 
+## The Avalonia client
+
+The air conditioners sit on the dashboard next to the Wattpilot and the Fritz!Box devices, in `AllPowerConsumers`
+as **`KeyedToshibaHvac`** (`KeyedDevice<ToshibaHvacMappingDevice>`): `UpdateService.StartAsync` loads them once
+with `IWebClientService.GetToshibaHvacDevices` (`GET api/ToshibaHvac`), and the hub handler for the SignalR method
+**`ToshibaHvacMappingDevice`** copies each push into the existing instance (`CopyFrom`) or adds a new one. Because
+the instance and its `State` object stay the same, everything bound to or subscribed to them keeps working.
+
+**The control follows the rule that the view model owns the interaction** ([[ViewModelsForInteractionLogic]]),
+which the WPF control did not: everything its code behind did - cycling the fan speed, clamping the temperature,
+building the per-model menus, disabling itself until the echo - is in **`ToshibaHvacViewModel`**, one per device.
+
+- `DashboardView` has a `DataTemplate` for `KeyedToshibaHvac` that creates a **`ToshibaHvacControl`** (a
+  `DeviceControlBase`) with `Device` and `DeviceKey` from the item. The control resolves a *transient*
+  `ToshibaHvacViewModel` from `IoC` and makes it the data context of its inner `Root` element - **not of the
+  control itself**, because the control's own data context is the dashboard item that the template's
+  `Device="{Binding Device}"` is resolved against. It hands `Device` and `DeviceKey` on to the view model and
+  keeps only the background for itself (`ChangeOuter`: cleaning → `CleaningBackground`, on → `OuterRunning`,
+  off → `OuterOther`, the Fritz!Box colours - the WPF `PowerStatus2Brush` also had "not connected" → OrangeRed,
+  which the client cannot know).
+- The view model takes **`IToshibaHvacCommander`**, a one-method contract that `IUpdateService` extends and
+  `UpdateService` fulfils with `Hub.InvokeAsync("SendToshibaHvacCommand", ids, state)`. It exists so that
+  `ToshibaHvacViewModelTests` can fake it: `IUpdateService` has an `internal` event and cannot be implemented from
+  the test project. `App.axaml.cs` registers the update service instance under it as well.
+- Every command builds a **delta** `ToshibaHvacStateData` (all 0xff but the bytes it sets), sends it with the
+  device's key, sets `IsSending` (which disables every command through `CanSend`) until the server answers -
+  the server waits up to ten seconds for the echo - and shows `Resources.ToshibaHvacCommandNotConfirmed` as a
+  warning box for every target in `Unconfirmed`. Exceptions (`HubException` for no connection or unknown device,
+  no hub) go through `TaskExceptionHandler`. `ShowUnconfirmed` is virtual so the test overrides it.
+- **Left click cycles, right click (long press on touch) chooses**: the icon buttons carry a `MenuFlyout` whose
+  `ItemsSource` is a list of **`HvacOption`s** (`FanSpeedOption`, `PowerLimitOption`, `MeritFeatureOption`,
+  `SwingModeOption`, `TemperatureOption` - one concrete class per kind because a `DataTemplate` cannot name a
+  generic type). `HvacOption.SelectCommand` applies the value, `IsSelected` is the check mark and is rewritten from
+  the state on every change. The `MenuItem` theme `HvacOptionItem` in the control's resources binds those two with
+  `ReflectionBinding`, since a `ControlTheme` has no data type. The merit and swing lists depend on
+  `AcModelId` and the `MeritFeature` bits exactly as in the WPF control (`AvailableMeritFeatures`,
+  `AvailableSwingModes`, both static and tested).
+- The visuals are one `Viewbox` control per state, each a port of a WPF button: `HvacModeIcon` (ring, filled with
+  `HvacModeSelected` for the current mode), `HvacFanSpeedIcon` (fan, five bars or AUTO or the quiet icon),
+  `HvacPowerLimitIcon`, `HvacMeritFeatureIcon` (8°C, ECO, Normal, Hi Power, Floor, or quiet icon + `SpeakerIcon`
+  for the two silent modes - Floor is new, WPF left the button blank), `HvacSwingModeIcon`, `HvacWifiLedIcon`;
+  `QuietIcon` and `SpeakerIcon` in `Assets/Images`. They switch their parts in code behind from the state
+  property, like `WifiControl`; the brushes come in as styled properties and the control's styles set them from
+  the theme: `ForegroundBrush` for the glyphs, and six new theme brushes `HvacModeSelected` (Aquamarine /
+  DarkCyan), `HvacActive` (LimeGreen / #006400 - the developer's choice for every green in the dark variant),
+  `HvacInactive` (DarkGray / #A0A0A0 - lighter than the dark "off" card it is painted on), `HvacOffMark` (Red /
+  #FF5C5C), `HvacHoverFill` and `HvacHoverStroke` (the WPF hover frame).
+  `Button.HvacHover` and `Button.HvacMode` in `Styles/Buttons.axaml` are the WPF HoverButton and the mode
+  button: transparent, hover frame and pressed nudge addressed at the template's `PART_ContentPresenter`.
+- **Porting WPF paths with a `RenderTransform`**: an Avalonia `Path` keeps the geometry's absolute coordinates
+  and sizes itself to `Bounds.Right × Bounds.Bottom`, as WPF does, so a pure `TranslateTransform` ports as it is.
+  A group with a `ScaleTransform` does not: WPF scales about the top left, Avalonia about the centre
+  (`RenderTransformOrigin` defaults to 50 %, 50 %), so such a path needs `RenderTransformOrigin="0,0"` - the fan of
+  `HvacFanSpeedIcon` was a quarter of its size and in the wrong place without it. Font metrics differ too, and
+  **a headless probe only shows that when it registers Inter (`WithInterFont()`), as the heads do** - without it
+  the probe renders with Segoe UI, the WPF font, and looks right while the app does not. Measured with Inter: the
+  "A" of the auto mode icon needs no top margin (WPF had 8) to sit centred on its ring, and the set temperature
+  (`TextAlignment="Center"` on a stretched `TextBlock`) is centred on the arrows only when neither it nor the
+  arrows carry a margin (WPF had 2,-3 and 2 - the developer took the last one off himself) and the arrows stretch
+  to the text's width, because Inter sets "24°C" wider than the 66 unit triangle. The mode buttons keep WPF's
+  hover: `Button.HvacMode:pointerover` sets `HvacModeIcon.IsHovered` through a style, and an unselected ring is
+  then filled with `HvacHoverFill`.
+  Glyphs drawn as filled outlines (the house, the tree) need a hairline `Stroke` in the same brush to survive
+  14 px, and each sits in a `Canvas` cut to its own bounds (the house path begins 28 units below its origin, the
+  tree at 4,2) - in a box the size of `Bounds.Right × Bounds.Bottom` the glyph hangs at the bottom and the text
+  beside it looks too high, which is what WPF's `-24` and `-4,-2` offsets corrected. Inter's digits themselves
+  are exactly centred in their line box (ascent 0.969, descent 0.241, cap height 0.727 em), so a text with no
+  descenders needs no vertical correction. All of this was found by rendering, not by reading - the last two
+  points with a *headed* probe on the developer's own screen (see the auto memory on render verification).
+- The control is laid out at the WPF width of 150 and scaled by its `Viewbox` to the dashboard's 210, so the
+  font sizes are the WPF ones. Verified by a Skia headless render in both variants (see
+  [[avalonia-render-verification]] in the auto memory): three devices, on / off / silent-fixed-louver, next to
+  the WPF original.
+- No details page and no settings dialog for an air conditioner: `DetailDevices` and `DevicesWithSettings` do
+  not include it, and `MainViewModel.Settings` is never called with one.
+
 ## The WPF app
 
 `FroniusMonitor` registers `IToshibaHvacService` as a singleton with its UI `SynchronizationContext` (the service
@@ -219,10 +310,18 @@ model 3).
 
 ## Known gaps, as of 2026-09-12
 
-- No Avalonia client side yet: no `KeyedToshibaHvac`, no hub handler for `ToshibaHvacMappingDevice`, no control.
+- The client control cannot show "not connected" (the WPF control painted the card OrangeRed when the IoT Hub
+  connection was down): the server does not publish the service's `IsConnected`. A stale device keeps its last
+  state until the next mapping read or push.
 - The bearer token is in clear text in both `Settings.xml` files.
 - 401/403 as "token rejected" is not yet confirmed against the live service (see above).
 - `IsConnected` is the SDK's word; a hub that is connected but delivers nothing is only caught by the mapping
   read.
 - `ToshibaHvacDeviceBase.TurnOnOff` throws, so `DevicesController`'s generic switch endpoint refuses these devices
   (`IsSwitchingEnabled` false); switching is the hub command.
+- **Logging is temporarily loud**, commit `ca0d28c` ("Temporarily set logging to Information here ..."): seven
+  `ToshibaHvacService` messages that belong at Debug (registration, device list, every sent command, every
+  received method, every raw HTTPS answer) are at Information with their `IsEnabled` guards raised to match, the
+  `#if DEBUG` around the extra IoT Hub handlers is commented out, and the raw JSON branch of `Deserialize` is
+  `#if !DEBUG`. It is one commit so that `git revert ca0d28c` takes all of it back once the live behaviour is
+  understood; do not "fix" any of it piecemeal, and keep guard and call level in step if you touch one.

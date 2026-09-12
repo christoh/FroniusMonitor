@@ -147,6 +147,11 @@ public partial class App : Application
             .AddSingleton<IGen24JsonService, Gen24JsonService>()
             .AddSingleton<IGen24LocalizationService, Gen24LocalizationService>()
             .AddSingleton<IUpdateService, UpdateService>()
+            // The same instance under the narrow contract the Toshiba view model takes, so a test can fake that
+            // contract while the app sends over the one hub connection.
+            .AddSingleton<IToshibaHvacCommander>(provider => provider.GetRequiredService<IUpdateService>())
+            // One per air conditioner on the dashboard; ToshibaHvacControl resolves it and hands it the device.
+            .AddTransient<ToshibaHvacViewModel>()
             .AddSingleton<IUriLauncher, UriLauncher>()
             ;
 

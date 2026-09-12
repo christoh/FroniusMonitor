@@ -1,0 +1,255 @@
+<c:DeviceControlBase xmlns="https://github.com/avaloniaui"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                     xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+                     xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
+                     xmlns:vm="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels"
+                     xmlns:m="clr-namespace:De.Hochstaetter.HomeAutomationClient.Models"
+                     xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+                     xmlns:t="clr-namespace:De.Hochstaetter.Fronius.Models.ToshibaAc;assembly=Fronius"
+                     mc:Ignorable="d" d:DesignWidth="150" d:DesignHeight="200"
+                     x:Class="De.Hochstaetter.HomeAutomationClient.Controls.ToshibaHvacControl">
+
+	<!-- The WPF ToshibaHvacControl, laid out at its 150 px and scaled by the Viewbox to whatever the dashboard
+	     gives it. The Device and DeviceKey properties come from the dashboard's data template; the code behind
+	     hands them to a ToshibaHvacViewModel of this control's own, which is the data context of everything below
+	     the root and owns what every button does. Left click on an icon button steps through its values, right
+	     click (long press on touch) opens the menu with all of them. -->
+
+	<c:DeviceControlBase.Resources>
+		<!-- One entry of a choice menu: the option's SelectCommand, a check mark from its IsSelected. Reflection
+		     bindings because the item type differs per menu and a ControlTheme has no data type of its own. -->
+		<ControlTheme x:Key="HvacOptionItem" TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+			<Setter Property="Command" Value="{ReflectionBinding SelectCommand}" />
+			<Setter Property="ToggleType" Value="CheckBox" />
+			<Setter Property="IsChecked" Value="{ReflectionBinding IsSelected}" />
+		</ControlTheme>
+	</c:DeviceControlBase.Resources>
+
+	<c:DeviceControlBase.Styles>
+		<Style Selector="TextBlock.TemperatureSmall">
+			<Setter Property="Margin" Value="2,0,2,0" />
+			<Setter Property="FontSize" Value="16" />
+			<Setter Property="VerticalAlignment" Value="Center" />
+			<Setter Property="HorizontalAlignment" Value="Right" />
+		</Style>
+
+		<!-- The arrows stretch to the width of the temperature below them, so they stay centred on it whatever
+		     the font: Inter sets "24°C" wider than the Segoe UI the WPF control's 66 unit triangle was drawn for. -->
+		<Style Selector="Button.HvacArrow">
+			<Setter Property="Padding" Value="0" />
+			<Setter Property="MinWidth" Value="0" />
+			<Setter Property="MinHeight" Value="0" />
+			<Setter Property="HorizontalAlignment" Value="Stretch" />
+			<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+			<Setter Property="VerticalAlignment" Value="Center" />
+			<!-- No left margin (WPF had 2): the arrow must cover exactly the text's width to be centred on it. -->
+			<Setter Property="Margin" Value="0" />
+		</Style>
+		<Style Selector="Button.HvacArrow Polygon">
+			<Setter Property="Stretch" Value="Fill" />
+			<Setter Property="Height" Value="10" />
+			<Setter Property="Fill" Value="{DynamicResource ForegroundBrush}" />
+		</Style>
+
+		<!-- The house and the tree are drawn as filled outlines whose walls are a third of a pixel at 14 px, so a
+		     hairline stroke in the same brush keeps them visible. -->
+		<Style Selector="Path.Pictogram">
+			<Setter Property="Fill" Value="{DynamicResource ForegroundBrush}" />
+			<Setter Property="Stroke" Value="{DynamicResource ForegroundBrush}" />
+		</Style>
+
+		<Style Selector="c|HvacModeIcon">
+			<Setter Property="Fill" Value="{DynamicResource ForegroundBrush}" />
+			<Setter Property="SelectedFill" Value="{DynamicResource HvacModeSelected}" />
+			<Setter Property="HoverFill" Value="{DynamicResource HvacHoverFill}" />
+		</Style>
+		<!-- The WPF template filled an unselected ring on IsMouseOver; here the button's pointer state is handed to
+		     the icon through a property, so the icon needs no pointer handling of its own. -->
+		<Style Selector="Button.HvacMode:pointerover c|HvacModeIcon">
+			<Setter Property="IsHovered" Value="True" />
+		</Style>
+		<Style Selector="c|HvacFanSpeedIcon">
+			<Setter Property="Fill" Value="{DynamicResource ForegroundBrush}" />
+			<Setter Property="FanBrush" Value="{DynamicResource HvacActive}" />
+			<Setter Property="OffMark" Value="{DynamicResource HvacOffMark}" />
+		</Style>
+		<Style Selector="c|HvacPowerLimitIcon">
+			<Setter Property="Fill" Value="{DynamicResource ForegroundBrush}" />
+			<Setter Property="PowerBrush" Value="{DynamicResource HvacActive}" />
+		</Style>
+		<Style Selector="c|HvacMeritFeatureIcon">
+			<Setter Property="Fill" Value="{DynamicResource ForegroundBrush}" />
+			<Setter Property="OffMark" Value="{DynamicResource HvacOffMark}" />
+		</Style>
+		<Style Selector="c|HvacSwingModeIcon">
+			<Setter Property="Fill" Value="{DynamicResource ForegroundBrush}" />
+			<Setter Property="InactiveFill" Value="{DynamicResource HvacInactive}" />
+			<Setter Property="OffMark" Value="{DynamicResource HvacOffMark}" />
+		</Style>
+		<Style Selector="c|HvacWifiLedIcon">
+			<Setter Property="Fill" Value="{DynamicResource ForegroundBrush}" />
+			<Setter Property="OnBrush" Value="{DynamicResource HvacActive}" />
+			<Setter Property="OffBrush" Value="{DynamicResource HvacInactive}" />
+		</Style>
+
+		<!-- The icons inside the choice menus, a little smaller than in the buttons -->
+		<Style Selector="MenuItem c|HvacFanSpeedIcon, MenuItem c|HvacMeritFeatureIcon, MenuItem c|HvacSwingModeIcon">
+			<Setter Property="Height" Value="25" />
+			<Setter Property="Margin" Value="0,4" />
+		</Style>
+	</c:DeviceControlBase.Styles>
+
+	<Viewbox x:Name="Root" x:DataType="vm:ToshibaHvacViewModel">
+		<Border BorderBrush="DimGray" BorderThickness="1" Width="150">
+			<Grid x:Name="BackgroundProvider" Margin="2" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+
+				<Viewbox Grid.Row="0" StretchDirection="DownOnly">
+					<TextBlock FontSize="12" TextAlignment="Center" Text="{x:Static p:Resources.ToshibaHvac}" />
+				</Viewbox>
+
+				<Viewbox Grid.Row="1" StretchDirection="DownOnly">
+					<TextBlock FontSize="12" TextAlignment="Center" Text="{Binding Device.Name, FallbackValue=---, TargetNullValue=---}" />
+				</Viewbox>
+
+				<ToggleButton Grid.Row="2" Classes="OnOff" Height="11" Margin="0,3,0,0" HorizontalAlignment="Center"
+				              IsChecked="{Binding Device.State.IsTurnedOn, Mode=OneWay, FallbackValue={x:False}}"
+				              Command="{Binding TogglePowerCommand}" />
+
+				<!-- The operating modes: the ring of the current one is filled -->
+				<Grid Grid.Row="3" Margin="0,3,0,0" ColumnDefinitions="*,*,*,*,*">
+					<Button Grid.Column="0" Classes="HvacMode" ToolTip.Tip="{x:Static p:Resources.HvacModeAuto}"
+					        Command="{Binding SetModeCommand}" CommandParameter="{x:Static t:ToshibaHvacOperatingMode.Auto}">
+						<c:HvacModeIcon Mode="Auto" IsSelected="{Binding Device.State.Mode, Converter={co:IsEqual}, ConverterParameter={x:Static t:ToshibaHvacOperatingMode.Auto}, FallbackValue={x:False}}" />
+					</Button>
+					<Button Grid.Column="1" Classes="HvacMode" ToolTip.Tip="{x:Static p:Resources.HvacModeCooling}"
+					        Command="{Binding SetModeCommand}" CommandParameter="{x:Static t:ToshibaHvacOperatingMode.Cooling}">
+						<c:HvacModeIcon Mode="Cooling" IsSelected="{Binding Device.State.Mode, Converter={co:IsEqual}, ConverterParameter={x:Static t:ToshibaHvacOperatingMode.Cooling}, FallbackValue={x:False}}" />
+					</Button>
+					<Button Grid.Column="2" Classes="HvacMode" ToolTip.Tip="{x:Static p:Resources.HvacModeDrying}"
+					        Command="{Binding SetModeCommand}" CommandParameter="{x:Static t:ToshibaHvacOperatingMode.Drying}">
+						<c:HvacModeIcon Mode="Drying" IsSelected="{Binding Device.State.Mode, Converter={co:IsEqual}, ConverterParameter={x:Static t:ToshibaHvacOperatingMode.Drying}, FallbackValue={x:False}}" />
+					</Button>
+					<Button Grid.Column="3" Classes="HvacMode" ToolTip.Tip="{x:Static p:Resources.HvacModeHeating}"
+					        Command="{Binding SetModeCommand}" CommandParameter="{x:Static t:ToshibaHvacOperatingMode.Heating}">
+						<c:HvacModeIcon Mode="Heating" IsSelected="{Binding Device.State.Mode, Converter={co:IsEqual}, ConverterParameter={x:Static t:ToshibaHvacOperatingMode.Heating}, FallbackValue={x:False}}" />
+					</Button>
+					<Button Grid.Column="4" Classes="HvacMode" ToolTip.Tip="{x:Static p:Resources.HvacModeFanOnly}"
+					        Command="{Binding SetModeCommand}" CommandParameter="{x:Static t:ToshibaHvacOperatingMode.FanOnly}">
+						<c:HvacModeIcon Mode="FanOnly" IsSelected="{Binding Device.State.Mode, Converter={co:IsEqual}, ConverterParameter={x:Static t:ToshibaHvacOperatingMode.FanOnly}, FallbackValue={x:False}}" />
+					</Button>
+				</Grid>
+
+				<!-- The display: set temperature with its arrows, indoor and outdoor temperature -->
+				<Border Grid.Row="4" x:Name="LcdProvider" Margin="2">
+					<Grid Margin="0,4" ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto,Auto">
+						<Button Grid.Row="0" Grid.Column="0" Classes="TransparentButton HvacArrow" Command="{Binding TemperatureUpCommand}">
+							<Polygon Points="0,10 66,10 33.5,0" />
+						</Button>
+
+						<!-- No margin at all (WPF had 2,-3): the column is exactly the text, and the arrows above and below
+						     stretch to it, so the number is centred on them in any font. -->
+						<TextBlock Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" HorizontalAlignment="Stretch" TextAlignment="Center" FontSize="28" FontWeight="DemiBold"
+						           Text="{Binding TargetTemperatureText, FallbackValue=-- °C}">
+							<TextBlock.ContextFlyout>
+								<MenuFlyout ItemsSource="{Binding Temperatures}" ItemContainerTheme="{StaticResource HvacOptionItem}">
+									<MenuFlyout.ItemTemplate>
+										<DataTemplate x:DataType="m:TemperatureOption">
+											<TextBlock Text="{Binding Text}" />
+										</DataTemplate>
+									</MenuFlyout.ItemTemplate>
+								</MenuFlyout>
+							</TextBlock.ContextFlyout>
+						</TextBlock>
+
+						<Button Grid.Row="3" Grid.Column="0" Classes="TransparentButton HvacArrow" Command="{Binding TemperatureDownCommand}">
+							<Polygon Points="0,0 66,0 33.5,10" />
+						</Button>
+
+						<!-- A house for indoors, a tree for outdoors - the WPF control's own two icons. Each sits in a canvas cut
+						     to the glyph's own bounds (the house path starts 28 units below its origin, the tree at 4,2),
+						     otherwise the glyph hangs at the bottom of a taller box and the text beside it looks too high.
+						     WPF did the same with a -24 and a -4,-2 offset. -->
+						<Viewbox Grid.Row="0" Grid.RowSpan="2" Grid.Column="2" Height="14" Margin="2,0,2,0" VerticalAlignment="Center">
+							<Canvas Width="343.3" Height="293.5">
+							<Path Classes="Pictogram" StrokeThickness="10" Canvas.Left="-1.5" Canvas.Top="-27.9" Data="M343.288,159.838L181.905,27.941c-5.242-4.283-12.77-4.283-18.009,0l-41.336,33.79V44.193c0-3.788-3.066-6.848-6.854-6.848H75.928c-3.788,0-6.854,3.063-6.854,6.848v61.251L2.516,159.838c-2.933,2.391-3.36,6.711-0.97,9.641 c1.357,1.654,3.33,2.523,5.32,2.523c1.524,0,3.053-0.511,4.328-1.545l34.55-28.245v172.011c0,3.785,3.066,6.852,6.846,6.852 h240.626c3.781,0,6.854-3.066,6.854-6.852V142.216l34.55,28.245c1.273,1.037,2.807,1.545,4.326,1.545 c1.984,0,3.956-0.87,5.314-2.524C346.648,166.549,346.221,162.235,343.288,159.838z M82.779,51.041h26.071v21.888l-26.071,21.31V51.041z M286.367,307.369H59.44V131.015l107.596-87.939c3.414-2.791,8.316-2.791,11.731,0l107.6,87.939V307.369z" />
+							</Canvas>
+						</Viewbox>
+						<Viewbox Grid.Row="2" Grid.RowSpan="2" Grid.Column="2" Height="14" Margin="2,0,2,0" VerticalAlignment="Center">
+							<Canvas Width="44" Height="46">
+							<Path Classes="Pictogram" StrokeThickness="1.2" Canvas.Left="-4" Canvas.Top="-2" Data="M 15 2 C 9.3446058 2 4 6.4917344 4 13 A 1.0001 1.0001 0 0 0 5.7285156 13.685547 C 5.7285156 13.685547 9.2809764 10 14 10 C 15.534007 10 17.009513 10.50921 18.279297 11.072266 C 15.764075 11.23169 13.225771 11.682602 10.986328 12.896484 C 7.5879392 14.738569 5 18.099259 5 23 C 5 30.049165 8.1835938 34.576172 8.1835938 34.576172 A 1.0001 1.0001 0 0 0 9.9921875 34.125 C 9.9921875 34.125 10.512034 30.051379 12.693359 25.730469 C 14.618788 21.916456 17.763773 18.028603 22.976562 16.492188 C 22.721535 29.420815 18.394953 36.721458 14.123047 40.861328 C 9.719786 45.128493 5.4316406 46.021484 5.4316406 46.021484 A 1.0001777 1.0001777 0 1 0 5.8457031 47.978516 C 5.8457031 47.978516 10.738386 46.928413 15.515625 42.298828 C 20.208105 37.751383 24.821742 29.704712 24.984375 16.033203 C 24.997734 16.031055 25.010055 16.02751 25.023438 16.025391 C 25.436356 16.065396 25.835806 16.126618 26.224609 16.201172 C 32.315617 32.605028 19.941406 46.292969 19.941406 46.292969 A 1.0529575 1.0529575 0 1 0 21.501953 47.707031 C 21.501953 47.707031 33.99776 33.910697 28.712891 16.970703 C 32.617276 18.653385 35.049421 22.211839 36.599609 25.833984 C 38.603186 30.515506 39.003906 35.085938 39.003906 35.085938 A 1.0001 1.0001 0 0 0 40.773438 35.634766 C 40.773438 35.634766 45 30.503059 45 23 C 45 18.392369 43.127358 15.176195 39.910156 13.361328 C 37.555009 12.032758 34.386285 11.519889 30.876953 11.267578 C 32.570647 10.61682 34.707945 10 37 10 C 42.246164 10 46.232422 14.640625 46.232422 14.640625 A 1.0001 1.0001 0 0 0 47.980469 13.804688 C 47.980469 13.804688 47.414708 10.923893 45.802734 8.015625 C 44.190761 5.1073572 41.372724 2 37 2 C 30.335595 2 26.045701 5.8053816 25.064453 6.71875 C 24.182943 5.7066058 20.754602 2 15 2 z M 15 4 C 20.444444 4 24.21875 8.625 24.21875 8.625 A 1.0001 1.0001 0 0 0 25.707031 8.7070312 C 25.707031 8.7070314 30.47619 4 37 4 C 40.433276 4 42.616208 6.3926428 44.052734 8.984375 C 44.391897 9.5962806 44.528416 10.093702 44.771484 10.673828 C 42.879117 9.3361712 40.191219 8 37 8 C 31.279889 8 26.458984 11.160156 26.458984 11.160156 A 1.0001 1.0001 0 0 0 27 13 C 32.151067 13 36.254983 13.596882 38.925781 15.103516 C 41.596579 16.610149 43 18.893631 43 23 C 43 27.359626 41.678984 30.220698 40.564453 32.130859 C 40.21094 30.255603 39.606515 27.778377 38.4375 25.046875 C 36.528876 20.587217 33.121037 15.848722 27.380859 14.398438 A 1.0521052 1.0521052 0 0 0 27.367188 14.394531 A 1.0521052 1.0521052 0 0 0 27.226562 14.363281 C 26.544296 14.199022 25.836864 14.069553 25.087891 14.003906 A 1.0001 1.0001 0 0 0 24.851562 14.011719 C 17.53257 15.109106 13.260378 20.168785 10.908203 24.828125 C 9.7464599 27.129381 9.0382229 29.350898 8.6054688 31.023438 C 7.8184297 29.234711 7 26.680343 7 23 C 7 18.773741 9.0293422 16.231712 11.939453 14.654297 C 14.849564 13.076882 18.68199 12.611362 21.882812 12.992188 A 1.0001 1.0001 0 0 0 22.617188 11.212891 C 22.617187 11.212891 18.648731 8 14 8 C 10.62428 8 8.214856 9.3078227 6.5058594 10.537109 C 7.6297284 6.5723476 11.161397 4 15 4 z" />
+							</Canvas>
+						</Viewbox>
+
+						<TextBlock Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Classes="TemperatureSmall" Text="{Binding IndoorTemperatureText, FallbackValue=-- °C}" />
+						<TextBlock Grid.Row="2" Grid.RowSpan="2" Grid.Column="1" Classes="TemperatureSmall" Text="{Binding OutdoorTemperatureText, FallbackValue=-- °C}" />
+					</Grid>
+				</Border>
+
+				<!-- Fan speed, power limit and merit feature; below them the Wi-Fi LED and the louver -->
+				<Grid Grid.Row="5" Margin="0,4,0,0" RowDefinitions="Auto,Auto">
+					<Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,Auto">
+						<Button Grid.Column="0" Classes="HvacHover" Margin="0" Command="{Binding CycleFanSpeedCommand}">
+							<c:HvacFanSpeedIcon FanSpeed="{Binding Device.State.FanSpeed}" />
+							<Button.ContextFlyout>
+								<MenuFlyout ItemsSource="{Binding FanSpeeds}" ItemContainerTheme="{StaticResource HvacOptionItem}">
+									<MenuFlyout.ItemTemplate>
+										<DataTemplate x:DataType="m:FanSpeedOption">
+											<c:HvacFanSpeedIcon FanSpeed="{Binding Value}" />
+										</DataTemplate>
+									</MenuFlyout.ItemTemplate>
+								</MenuFlyout>
+							</Button.ContextFlyout>
+						</Button>
+
+						<Button Grid.Column="1" Classes="HvacHover" Command="{Binding CyclePowerLimitCommand}">
+							<c:HvacPowerLimitIcon PowerLimit="{Binding Device.State.PowerLimit}" />
+							<Button.ContextFlyout>
+								<MenuFlyout ItemsSource="{Binding PowerLimits}" ItemContainerTheme="{StaticResource HvacOptionItem}">
+									<MenuFlyout.ItemTemplate>
+										<DataTemplate x:DataType="m:PowerLimitOption">
+											<TextBlock Text="{Binding Text}" />
+										</DataTemplate>
+									</MenuFlyout.ItemTemplate>
+								</MenuFlyout>
+							</Button.ContextFlyout>
+						</Button>
+
+						<Button Grid.Column="2" Classes="HvacHover" Command="{Binding CycleMeritFeatureCommand}">
+							<c:HvacMeritFeatureIcon MeritFeaturesA="{Binding Device.State.MeritFeaturesA}" />
+							<Button.ContextFlyout>
+								<MenuFlyout ItemsSource="{Binding MeritFeatures}" ItemContainerTheme="{StaticResource HvacOptionItem}">
+									<MenuFlyout.ItemTemplate>
+										<DataTemplate x:DataType="m:MeritFeatureOption">
+											<c:HvacMeritFeatureIcon MeritFeaturesA="{Binding Value}" />
+										</DataTemplate>
+									</MenuFlyout.ItemTemplate>
+								</MenuFlyout>
+							</Button.ContextFlyout>
+						</Button>
+					</Grid>
+
+					<Grid Grid.Row="1" Margin="0,2,0,0" ColumnDefinitions="Auto,Auto">
+						<Button Grid.Column="0" Classes="HvacHover" Command="{Binding ToggleWifiLedCommand}">
+							<c:HvacWifiLedIcon LedStatus="{Binding Device.State.WifiLedStatus}" />
+						</Button>
+
+						<Button Grid.Column="1" Classes="HvacHover" Command="{Binding CycleSwingModeCommand}">
+							<c:HvacSwingModeIcon SwingMode="{Binding Device.State.SwingMode}" />
+							<Button.ContextFlyout>
+								<MenuFlyout ItemsSource="{Binding SwingModes}" ItemContainerTheme="{StaticResource HvacOptionItem}">
+									<MenuFlyout.ItemTemplate>
+										<DataTemplate x:DataType="m:SwingModeOption">
+											<c:HvacSwingModeIcon SwingMode="{Binding Value}" />
+										</DataTemplate>
+									</MenuFlyout.ItemTemplate>
+								</MenuFlyout>
+							</Button.ContextFlyout>
+						</Button>
+					</Grid>
+				</Grid>
+			</Grid>
+		</Border>
+	</Viewbox>
+</c:DeviceControlBase>

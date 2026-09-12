@@ -1,0 +1,59 @@
+<Viewbox xmlns="https://github.com/avaloniaui"
+         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+         xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+         xmlns:i="clr-namespace:De.Hochstaetter.HomeAutomationClient.Assets.Images"
+         xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+         mc:Ignorable="d" d:DesignWidth="60" d:DesignHeight="40"
+         x:Class="De.Hochstaetter.HomeAutomationClient.Controls.HvacMeritFeatureIcon">
+	<!-- The "merit feature" after the WPF HvacMeritFeatureAButton: "POWER" over the one that is set - 8 °C, ECO,
+	     Normal, Hi Power, or the quiet icon with a speaker for the two silent modes. The code behind chooses. -->
+	<Grid RowDefinitions="Auto,Auto" Background="Transparent" x:DataType="c:HvacMeritFeatureIcon" DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:HvacMeritFeatureIcon}}">
+		<Grid.Styles>
+			<Style Selector="TextBlock.Value">
+				<Setter Property="FontSize" Value="20" />
+				<Setter Property="FontWeight" Value="Bold" />
+				<Setter Property="HorizontalAlignment" Value="Center" />
+				<Setter Property="Foreground" Value="{Binding Fill}" />
+			</Style>
+		</Grid.Styles>
+
+		<TextBlock Grid.Row="0" FontSize="14" FontWeight="DemiBold" Margin="1,-2,1,1" Foreground="{Binding Fill}" Text="{x:Static p:Resources.HvacMeritFeatureHeader}" />
+
+		<Grid Grid.Row="1">
+			<TextBlock x:Name="Heating8C" Classes="Value" Text="8°C" />
+			<TextBlock x:Name="Eco" Classes="Value" Text="{x:Static p:Resources.HvacEco}" />
+
+			<LayoutTransformControl x:Name="Normal" HorizontalAlignment="Center">
+				<LayoutTransformControl.LayoutTransform>
+					<ScaleTransform ScaleX=".7" ScaleY="1" />
+				</LayoutTransformControl.LayoutTransform>
+				<TextBlock Classes="Value" Text="{x:Static p:Resources.HvacNormal}" />
+			</LayoutTransformControl>
+
+			<LayoutTransformControl x:Name="HighPower" HorizontalAlignment="Center">
+				<LayoutTransformControl.LayoutTransform>
+					<ScaleTransform ScaleX=".7" ScaleY="1" />
+				</LayoutTransformControl.LayoutTransform>
+				<TextBlock Classes="Value" Text="{x:Static p:Resources.HvacHiPower}" />
+			</LayoutTransformControl>
+
+			<!-- Not in the WPF control, which left the button blank for these two; a word is better than nothing. -->
+			<LayoutTransformControl x:Name="Floor" HorizontalAlignment="Center">
+				<LayoutTransformControl.LayoutTransform>
+					<ScaleTransform ScaleX=".7" ScaleY="1" />
+				</LayoutTransformControl.LayoutTransform>
+				<TextBlock Classes="Value" Text="Floor" />
+			</LayoutTransformControl>
+
+			<!-- As in WPF: the red ring is an ellipse over the quiet icon's cell only, and the icon's own ring is not
+			     drawn (WPF left its brush unset). -->
+			<Grid x:Name="Silent" Height="25" HorizontalAlignment="Center" ColumnDefinitions="Auto,Auto">
+				<Ellipse Grid.Column="0" Stroke="{Binding OffMark}" StrokeThickness="2" />
+				<i:QuietIcon Grid.Column="0" Fill="{Binding Fill}" Ring="Transparent" />
+				<i:SpeakerIcon Grid.Column="1" x:Name="Speaker" Fill="{Binding Fill}" Margin="2,4,0,4" />
+			</Grid>
+		</Grid>
+	</Grid>
+</Viewbox>

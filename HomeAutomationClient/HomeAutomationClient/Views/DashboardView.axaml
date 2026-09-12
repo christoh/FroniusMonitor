@@ -26,6 +26,15 @@
                                 Margin="{StaticResource ControlMargin}"/>
         </DataTemplate>
 
+		<!-- Toshiba HVAC. The control brings its own view model (one per device) and takes the device and its key;
+		     the commands go through it, not through this page's view model. -->
+		<DataTemplate DataType="{x:Type m:KeyedToshibaHvac}">
+			<c:ToshibaHvacControl Width="{StaticResource ControlWidth}"
+			                      Device="{Binding Device}"
+			                      DeviceKey="{Binding Key}"
+			                      Margin="{StaticResource ControlMargin}" />
+		</DataTemplate>
+
 		<!-- FritzBox -->
 		<DataTemplate DataType="{x:Type m:KeyedFritzBoxDevice}">
 			<c:PowerConsumer Width="{StaticResource ControlWidth}"

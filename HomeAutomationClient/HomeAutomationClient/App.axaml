@@ -73,6 +73,15 @@
                     <SolidColorBrush x:Key="Lcd">#B3DBC6</SolidColorBrush>
                     <SolidColorBrush x:Key="DeviceCleaning">Azure</SolidColorBrush>
                     
+                    <!-- Toshiba HVAC control: the WPF colours. The hover frame is the same in both variants; the
+                         active green, the selected mode and the inactive grey are darkened for the dark one. -->
+                    <SolidColorBrush x:Key="HvacModeSelected">Aquamarine</SolidColorBrush>
+                    <SolidColorBrush x:Key="HvacActive">LimeGreen</SolidColorBrush>
+                    <SolidColorBrush x:Key="HvacInactive">DarkGray</SolidColorBrush>
+                    <SolidColorBrush x:Key="HvacOffMark">Red</SolidColorBrush>
+                    <SolidColorBrush x:Key="HvacHoverFill">#4000c0ff</SolidColorBrush>
+                    <SolidColorBrush x:Key="HvacHoverStroke">#ff00c0ff</SolidColorBrush>
+
                     <!-- Gauge -->
                     <SolidColorBrush x:Key='UnitForeground'>Blue</SolidColorBrush>
                     <SolidColorBrush x:Key='HandFill'>DarkSlateGray</SolidColorBrush>
@@ -142,6 +151,15 @@
                     <SolidColorBrush x:Key='DeviceInnerBackgroundOther'>#282828</SolidColorBrush>
                     <SolidColorBrush x:Key="Lcd">#335B46</SolidColorBrush>
                     <SolidColorBrush x:Key="DeviceCleaning">Blue</SolidColorBrush>
+
+                    <!-- Toshiba HVAC control, see the light variant -->
+                    <SolidColorBrush x:Key="HvacModeSelected">DarkCyan</SolidColorBrush>
+                    <SolidColorBrush x:Key="HvacActive">#006400</SolidColorBrush>
+                    <!-- Lighter than DeviceOuterBackgroundOther (#606060), on which a switched-off device paints it. -->
+                    <SolidColorBrush x:Key="HvacInactive">#A0A0A0</SolidColorBrush>
+                    <SolidColorBrush x:Key="HvacOffMark">#FF5C5C</SolidColorBrush>
+                    <SolidColorBrush x:Key="HvacHoverFill">#4000c0ff</SolidColorBrush>
+                    <SolidColorBrush x:Key="HvacHoverStroke">#ff00c0ff</SolidColorBrush>
 
                     <!-- Gauge -->
                     <SolidColorBrush x:Key='UnitForeground'>Cyan</SolidColorBrush>

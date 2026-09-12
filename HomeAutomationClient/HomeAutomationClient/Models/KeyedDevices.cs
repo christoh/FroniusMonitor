@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using De.Hochstaetter.Fronius.Models;
 using De.Hochstaetter.Fronius.Models.Charging;
+using De.Hochstaetter.Fronius.Models.ToshibaAc;
 
 namespace De.Hochstaetter.HomeAutomationClient.Models;
 
@@ -17,6 +18,7 @@ public class KeyedDevice<T> : IKeyedDevice
             Gen24System gen24System => gen24System.Config?.InverterSettings?.SystemName ?? gen24System.Model ?? gen24System.Manufacturer + " " + gen24System.SerialNumber,
             Gen24Storage storage => storage.Model ?? $"{Loc.Battery}: {storage.Model}",
             WattPilot wattPilot => wattPilot.DeviceName,
+            ToshibaHvacMappingDevice hvac => hvac.Name,
             _ => Device?.ToString() ?? Key,
         }) ?? Loc.Unknown;
     }
@@ -29,3 +31,5 @@ public class KeyedGen24System : KeyedDevice<Gen24System>;
 public class KeyedWattPilot : KeyedDevice<WattPilot>;
 
 public class KeyedWattPilotUpdate : KeyedDevice<ConcurrentQueue<WattPilotUpdate>>;
+
+public class KeyedToshibaHvac : KeyedDevice<ToshibaHvacMappingDevice>;

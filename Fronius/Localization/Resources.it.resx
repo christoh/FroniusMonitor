@@ -1266,6 +1266,9 @@
   <data name="NoToshibaHvacConnection" xml:space="preserve">
 	  <value>Non connesso al servizio Toshiba HVAC</value>
   </data>
+  <data name="ToshibaHvacCommandNotConfirmed" xml:space="preserve">
+	  <value>'{0}' non ha confermato il comando. Potrebbe comunque essere stato eseguito; il display mostra l'ultimo stato segnalato dal climatizzatore.</value>
+  </data>
   <data name="NoChargingLogFromWattPilot" xml:space="preserve">
 	  <value>Nessun collegamento al registro di carica disponibile dal Wattpilot</value>
   </data>

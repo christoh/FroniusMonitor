@@ -1293,6 +1293,9 @@
   <data name="NoToshibaHvacConnection" xml:space="preserve">
 	  <value>Keine Verbindung mit dem Toshiba-HVAC-Dienst</value>
   </data>
+  <data name="ToshibaHvacCommandNotConfirmed" xml:space="preserve">
+	  <value>'{0}' hat den Befehl nicht bestätigt. Er kann trotzdem ausgeführt worden sein; die Anzeige zeigt den zuletzt gemeldeten Zustand.</value>
+  </data>
   <data name="NoChargingLogFromWattPilot" xml:space="preserve">
 	  <value>Kein Link für den Ladelog verfügbar</value>
   </data>

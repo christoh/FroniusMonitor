@@ -100,4 +100,11 @@ public interface IWebClientService : IDisposable
     Task<ApiResult<Dictionary<string, WattPilot>>> GetWattPilots(CancellationToken token = default);
 
     #endregion
+
+    #region ToshibaHvac
+
+    /// <summary>The air conditioners the server holds, by the id the hub publishes them under.</summary>
+    Task<ApiResult<Dictionary<string, ToshibaHvacMappingDevice>>> GetToshibaHvacDevices(CancellationToken token = default);
+
+    #endregion
 }

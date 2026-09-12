@@ -110,6 +110,13 @@ public sealed class WebClientService : IWebClientService
 
     #endregion
 
+    #region ToshibaHvac
+
+    public Task<ApiResult<Dictionary<string, ToshibaHvacMappingDevice>>> GetToshibaHvacDevices(CancellationToken token = default) =>
+        GetResult<Dictionary<string, ToshibaHvacMappingDevice>>("ToshibaHvac", token);
+
+    #endregion
+
     #region Gen24
 
     public async Task<ApiResult<Dictionary<string, Gen24System>>> GetGen24Devices(CancellationToken token = default)

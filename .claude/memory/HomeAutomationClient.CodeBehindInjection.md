@@ -76,6 +76,16 @@ compiles, but the delegating constructor is still a service locator, `GetRegiste
 and it leaves two ways to build the same view. See [[ViewModelsForInteractionLogic]] for what belongs in the code
 behind at all.
 
+## A control used from a data template keeps its own data context
+
+`ToshibaHvacControl` is created by a `DataTemplate` on the dashboard, which binds the control's `Device` from the
+item it is templating - so the control's `DataContext` *is* that item and must stay so. Its view model
+(`ToshibaHvacViewModel`, transient) therefore becomes the data context of the control's inner root element
+(`Root.DataContext = IoC.TryGetRegistered<ToshibaHvacViewModel>()`), with `x:DataType` on that element for the
+compiled bindings below it, and the code behind forwards `Device` and `DeviceKey` to it when they change. Setting
+the view model on the control itself would point the template's binding at the view model and leave `Device`
+empty. The same applies to any control a template instantiates.
+
 ## Why the static service locator is safe here
 
 Resolving from a static accessor normally hides dependencies and bypasses scopes. In `HomeAutomationClient` the

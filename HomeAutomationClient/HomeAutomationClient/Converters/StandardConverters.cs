@@ -144,6 +144,16 @@ public class DateConverter : ConverterBase
     }
 }
 
+/// <summary>
+/// True when the value equals the converter parameter - <c>IsSelected="{Binding Mode, Converter={co:IsEqual},
+/// ConverterParameter={x:Static t:SomeEnum.Member}}"</c> - so an enum state can drive one control per member
+/// without a converter class per enum.
+/// </summary>
+public class IsEqual : ConverterBase
+{
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value != null && value.Equals(parameter);
+}
+
 public class ToUpper : ConverterBase
 {
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value?.ToString()?.ToUpper(CultureInfo.CurrentCulture);

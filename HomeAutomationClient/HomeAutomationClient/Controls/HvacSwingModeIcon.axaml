@@ -1,0 +1,27 @@
+<Viewbox xmlns="https://github.com/avaloniaui"
+         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+         xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+         mc:Ignorable="d" d:DesignWidth="25" d:DesignHeight="25"
+         x:Class="De.Hochstaetter.HomeAutomationClient.Controls.HvacSwingModeIcon">
+	<!-- The louver after the WPF ToshibaHvacSwingModeButton: a hinge and five positions. While the louver swings
+	     every position is drawn; a fixed position draws only its own line in full. Off is struck through in red. -->
+	<Canvas Width="25" Height="25" Background="Transparent" x:DataType="c:HvacSwingModeIcon" DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:HvacSwingModeIcon}}">
+		<Canvas.Styles>
+			<Style Selector="Line.Louver">
+				<Setter Property="StrokeThickness" Value="1.7" />
+			</Style>
+		</Canvas.Styles>
+
+		<Border Width="8" Height="8" CornerRadius="0,0,3,0" Background="{Binding Fill}" />
+		<Line x:Name="Fixed5" Classes="Louver" StartPoint="3,10" EndPoint="3,25" />
+		<Line x:Name="Fixed4" Classes="Louver" StartPoint="6,9.5" EndPoint="10,24" />
+		<Line x:Name="Fixed3" Classes="Louver" StartPoint="9,8" EndPoint="18,21" />
+		<Line x:Name="Fixed2" Classes="Louver" StartPoint="11,5" EndPoint="24,13" />
+		<Line x:Name="Fixed1" Classes="Louver" StartPoint="11,2" EndPoint="25,2" />
+
+		<Ellipse x:Name="OffRing" Canvas.Bottom="0" Canvas.Right="0" Width="18" Height="18" Fill="Transparent" Stroke="{Binding OffMark}" StrokeThickness="2" />
+		<Line x:Name="OffStroke" StartPoint="10,21" EndPoint="22,11" Stroke="{Binding OffMark}" StrokeThickness="2" />
+	</Canvas>
+</Viewbox>

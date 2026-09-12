@@ -3562,6 +3562,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to '{0}' did not confirm the command.
+        /// </summary>
+        public static string ToshibaHvacCommandNotConfirmed {
+            get {
+                return ResourceManager.GetString("ToshibaHvacCommandNotConfirmed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Off.
         /// </summary>
         public static string Off {

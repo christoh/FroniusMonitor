@@ -4,7 +4,7 @@ using De.Hochstaetter.Fronius.Models.Charging;
 
 namespace De.Hochstaetter.HomeAutomationClient.Contracts;
 
-public interface IUpdateService : IDisposable, IAsyncDisposable
+public interface IUpdateService : IDisposable, IAsyncDisposable, IToshibaHvacCommander
 {
     internal event EventHandler<SitePowerFlowUpdatedEventArgs>? SitePowerFlowUpdated;
     

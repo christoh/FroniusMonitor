@@ -146,6 +146,61 @@
 		<Setter Property="BorderBrush" Value="Transparent" />
 	</Style>
 
+	<!-- The icon buttons of the Toshiba control, after the WPF HoverButton: see-through, a frame that lights up
+	     under the pointer, a nudge upwards while pressed, half opacity while disabled. Fluent paints the button
+	     through the ContentPresenter of its template, so hover and pressed are addressed there. -->
+	<Style Selector="Button.HvacHover">
+		<Setter Property="Background" Value="Transparent" />
+		<Setter Property="BorderBrush" Value="Transparent" />
+		<Setter Property="BorderThickness" Value="1" />
+		<Setter Property="CornerRadius" Value="0" />
+		<Setter Property="Padding" Value="0" />
+		<Setter Property="MinWidth" Value="0" />
+		<Setter Property="MinHeight" Value="0" />
+		<Setter Property="Height" Value="30" />
+		<Setter Property="Margin" Value="4,0,0,0" />
+		<Setter Property="HorizontalContentAlignment" Value="Center" />
+		<Setter Property="VerticalContentAlignment" Value="Center" />
+	</Style>
+	<Style Selector="Button.HvacHover /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="Transparent" />
+		<Setter Property="BorderBrush" Value="Transparent" />
+	</Style>
+	<Style Selector="Button.HvacHover:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource HvacHoverFill}" />
+		<Setter Property="BorderBrush" Value="{DynamicResource HvacHoverStroke}" />
+	</Style>
+	<Style Selector="Button.HvacHover:pressed /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource HvacHoverFill}" />
+		<Setter Property="BorderBrush" Value="{DynamicResource HvacHoverStroke}" />
+		<Setter Property="RenderTransform" Value="translateY(-2px)" />
+	</Style>
+	<Style Selector="Button.HvacHover:disabled">
+		<Setter Property="Opacity" Value="0.5" />
+	</Style>
+
+	<!-- The five operating mode buttons of the Toshiba control: the icon itself is the whole button, no chrome. -->
+	<Style Selector="Button.HvacMode">
+		<Setter Property="Background" Value="Transparent" />
+		<Setter Property="BorderThickness" Value="0" />
+		<Setter Property="Padding" Value="0" />
+		<Setter Property="MinWidth" Value="0" />
+		<Setter Property="MinHeight" Value="0" />
+		<Setter Property="Margin" Value="2" />
+		<Setter Property="HorizontalAlignment" Value="Stretch" />
+		<Setter Property="VerticalAlignment" Value="Stretch" />
+	</Style>
+	<Style Selector="Button.HvacMode /template/ ContentPresenter#PART_ContentPresenter, Button.HvacMode:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button.HvacMode:pressed /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="Transparent" />
+		<Setter Property="BorderBrush" Value="Transparent" />
+	</Style>
+	<Style Selector="Button.HvacMode:pressed /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="RenderTransform" Value="translateY(-2px)" />
+	</Style>
+	<Style Selector="Button.HvacMode:disabled">
+		<Setter Property="Opacity" Value="0.5" />
+	</Style>
+
 	<Style Selector="RadioButton.DeviceButton">
 		<Setter Property="ClickMode" Value="Press" />
 		<Style Selector="^:checked /template/ Border">

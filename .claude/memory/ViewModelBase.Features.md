@@ -28,6 +28,13 @@ ViewModelBase          HomeAutomationClient/ViewModels/ViewModelBase.cs   (abstr
   `DashboardViewModel`.
 - **`static ShowHttpError<T>(ApiResult<T> result)`** - the standard message box for a failed server call, with a
   special text for `403`. Being static, controls call it too (`InverterControl.axaml.cs`).
+- **No `ConfigureAwait(false)` in a view model before it touches command state.** A property that a
+  `[RelayCommand]`'s `CanExecute` depends on raises `CanExecuteChanged` straight into the bound buttons, and
+  Avalonia throws `The calling thread cannot access this object` when that happens off the UI thread. A command
+  body that awaits with `ConfigureAwait(false)` and then sets such a property (the `IsSending` of
+  `ToshibaHvacViewModel` did) continues on a pool thread and crashes exactly there. Bindings marshal for you;
+  `NotifyCanExecuteChanged` does not. Leave the awaits plain so the continuation returns to the UI thread the
+  click came from.
 
 ## BindableBase
 

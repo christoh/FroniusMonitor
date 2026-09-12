@@ -1,0 +1,14 @@
+<Viewbox xmlns="https://github.com/avaloniaui"
+         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+         xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+         mc:Ignorable="d" d:DesignWidth="28" d:DesignHeight="25"
+         x:Class="De.Hochstaetter.HomeAutomationClient.Controls.HvacWifiLedIcon">
+	<!-- The Wi-Fi LED of the air conditioner after the WPF HvacWifiLedButton: full Wi-Fi bars and the LED itself in
+	     the corner, green while it is on. -->
+	<Canvas Width="28" Height="25" Background="Transparent" x:DataType="c:HvacWifiLedIcon" DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:HvacWifiLedIcon}}">
+		<c:WifiControl Height="20" Canvas.Top="2" Fill="{Binding Fill}" SignalStrength="20" />
+		<Ellipse x:Name="Led" Canvas.Bottom="0" Canvas.Right="0" Width="10" Height="10" Stroke="{Binding Fill}" StrokeThickness="1" />
+	</Canvas>
+</Viewbox>
