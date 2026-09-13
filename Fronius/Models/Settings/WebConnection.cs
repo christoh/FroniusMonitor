@@ -20,7 +20,12 @@ public partial class WebConnection : BindableBase, ICloneable, IHaveDisplayName
     {
         Aes = Aes.Create();
         Aes.KeySize = 128;
-        Aes.Mode = CipherMode.ECB;
+
+        // ECB is not part of the Web Crypto API, so the browser's AES implementation cannot carry it out at all.
+        // CBC with a fixed, all-zero IV behaves identically to ECB for the single-block passwords this encrypts,
+        // chains correctly should one ever be longer, and - unlike ECB - is a mode the browser actually supports.
+        Aes.Mode = CipherMode.CBC;
+        Aes.IV = new byte[16];
         Aes.Padding = PaddingMode.PKCS7;
         Aes.Key = IoC.Injector == null ? new byte[16] : IoC.Get<IAesKeyProvider>().GetAesKey();
     }
