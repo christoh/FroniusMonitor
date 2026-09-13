@@ -83,7 +83,7 @@ to say so in the title.
 - Measurements: `weather_reports/poi/{id}-BEOB.csv` - semicolon separated, decimal comma, `---` missing, first
   row names, second row units, `dd.MM.yy;HH:mm` UTC, newest first, about a day. `DwdObservationParser` finds the
   columns **by name** and converts the wind from km/h. Not every MOSMIX station measures; a 404 is an empty list,
-  not an error. The station id is the MOSMIX catalogue id (`10870` = München-Flughafen) and is used for both
+  not an error. The station id is the MOSMIX catalogue id (`10863` = Weihenstephan, which measures radiation; `10870` = München-Flughafen does not) and is used for both
   files.
 - The netCDF grid files of `opendata.dwd.de/weather/satellite/radiation/` (what the `dwd_global_rad_hass`
   integration the task named uses) are 16-27 MB every ten minutes and need an HDF5 reader - deliberately not

@@ -49,7 +49,7 @@ public partial class EnergyDataSettings : BindableBase
     /// <summary>
     ///     The DWD station whose forecast and measurements are shown, by the id of the MOSMIX station catalogue
     ///     (<c>https://www.dwd.de/DE/leistungen/met_verfahren_mosmix/mosmix_stationskatalog.cfg</c>). Empty means no
-    ///     weather is collected. 10870 is München-Flughafen.
+    ///     weather is collected. 10863 is Weihenstephan, which measures global radiation as well; not every station does.
     /// </summary>
     [ObservableProperty, XmlAttribute, DefaultValue("")]
     public partial string DwdStationId { get; set; } = string.Empty;

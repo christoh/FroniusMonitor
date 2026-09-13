@@ -18,8 +18,8 @@
         GridOperatorId is the 13 digit id of your grid operator (Netzbetreiber), PostalCode selects the tariff.
         SurchargeCentsPerKiloWattHour is Awattar's own service fee, which is not in their answer.
         DwdStationId is a station of the MOSMIX catalogue (https://www.dwd.de/DE/leistungen/met_verfahren_mosmix/mosmix_stationskatalog.cfg);
-        10870 is München-Flughafen. TimeZoneId says which local time the polling windows and the days are meant in;
+        10863 is Weihenstephan, which measures global radiation as well; 10870 (München-Flughafen) forecasts but does not measure it. TimeZoneId says which local time the polling windows and the days are meant in;
         a container runs in UTC unless it is set here or through TZ. The history goes to history/PriceAndWeatherHistory.db
         next to the executable; mount that folder to keep it. -->
-   <EnergyData Bearer="your Awattar bearer token" PostalCode="85375" GridOperatorId="9901068000001" SurchargeCentsPerKiloWattHour="1.5" VatRatePercent="19" PriceRegion="GermanyLuxembourg" DwdStationId="10870" TimeZoneId="Europe/Berlin" />
+   <EnergyData Bearer="your Awattar bearer token" PostalCode="85375" GridOperatorId="9901068000001" SurchargeCentsPerKiloWattHour="1.5" VatRatePercent="19" PriceRegion="GermanyLuxembourg" DwdStationId="10863" TimeZoneId="Europe/Berlin" />
 </Settings>
