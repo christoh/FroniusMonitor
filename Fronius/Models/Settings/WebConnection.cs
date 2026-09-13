@@ -121,18 +121,8 @@ public partial class WebConnection : BindableBase, ICloneable, IHaveDisplayName
             return XorWithKeystream(Pad(clearText));
         }
 
-        var result = Array.Empty<byte>();
-
-        try
-        {
-            using var encryptor = Aes.CreateEncryptor();
-            result = encryptor.TransformFinalBlock(clearText, 0, clearText.Length);
-        }
-        catch (PlatformNotSupportedException)
-        {
-            // Thrown after the result was handed back - see ProbeAes. Keeping what we already have is the point.
-        }
-
+        using var encryptor = Aes.CreateEncryptor();
+        var result = encryptor.TransformFinalBlock(clearText, 0, clearText.Length);
         return result;
     }
 
@@ -143,17 +133,8 @@ public partial class WebConnection : BindableBase, ICloneable, IHaveDisplayName
             return Unpad(XorWithKeystream(cipherText));
         }
 
-        var result = Array.Empty<byte>();
-
-        try
-        {
-            using var decryptor = Aes.CreateDecryptor();
-            result = decryptor.TransformFinalBlock(cipherText, 0, cipherText.Length);
-        }
-        catch (PlatformNotSupportedException)
-        {
-            // As in Encrypt: the transform is already done by the time this arrives.
-        }
+        using var decryptor = Aes.CreateDecryptor();
+        var result = decryptor.TransformFinalBlock(cipherText, 0, cipherText.Length);
 
         return result;
     }
