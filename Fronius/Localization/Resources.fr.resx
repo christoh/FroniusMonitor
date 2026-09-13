@@ -1246,6 +1246,21 @@
   <data name="RememberPassword" xml:space="preserve">
     <value>Mémoriser le mot de passe</value>
   </data>
+  <data name="ChooseServer" xml:space="preserve">
+    <value>Choisir le serveur</value>
+  </data>
+  <data name="PleaseChooseServer" xml:space="preserve">
+    <value>Veuillez saisir l'adresse de votre serveur domotique</value>
+  </data>
+  <data name="CannotReachServer" xml:space="preserve">
+    <value>Serveur injoignable</value>
+  </data>
+  <data name="CannotReachServerDetails" xml:space="preserve">
+    <value>Aucune réponse de {0}. Veuillez vérifier l'adresse, votre connexion réseau et que le serveur fonctionne.</value>
+  </data>
+  <data name="MustBeValidUrl" xml:space="preserve">
+    <value>Doit être une adresse complète, par exemple https://home.example.com</value>
+  </data>
   <data name="InvalidInverterName" xml:space="preserve">
     <value>Le nom de l'onduleur doit comporter entre 1 et 30 caractères.</value>
   </data>

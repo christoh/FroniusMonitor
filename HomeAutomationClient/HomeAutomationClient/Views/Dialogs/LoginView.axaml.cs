@@ -21,8 +21,9 @@ public partial class LoginView : UserControl, IDialogControl
         switch (e.Key)
         {
             case Key.Enter:
+                // One Ok for both modes, so Enter needs to know nothing about which of them is showing.
                 OkButton.Focus();
-                ViewModel?.LoginCommand.Execute(null);
+                ViewModel?.OkCommand.Execute(null);
                 break;
         }
     }

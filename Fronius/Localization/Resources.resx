@@ -1365,6 +1365,21 @@
   <data name="RememberPassword" xml:space="preserve">
 	<value>Remember password</value>
   </data>
+  <data name="ChooseServer" xml:space="preserve">
+	<value>Choose server</value>
+  </data>
+  <data name="PleaseChooseServer" xml:space="preserve">
+	<value>Please enter the address of your home automation server</value>
+  </data>
+  <data name="CannotReachServer" xml:space="preserve">
+	<value>Cannot reach the server</value>
+  </data>
+  <data name="CannotReachServerDetails" xml:space="preserve">
+	<value>There was no answer from {0}. Please check the address, your network connection, and that the server is running.</value>
+  </data>
+  <data name="MustBeValidUrl" xml:space="preserve">
+	<value>Must be a complete address, for example https://home.example.com</value>
+  </data>
   <data name="InvalidInverterName" xml:space="preserve">
 	  <value>Inverter name must be between 1 and 30 characters.</value>
   </data>

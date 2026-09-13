@@ -1275,6 +1275,21 @@
   <data name="RememberPassword" xml:space="preserve">
 	  <value>Ricorda la password</value>
   </data>
+  <data name="ChooseServer" xml:space="preserve">
+	  <value>Scegli il server</value>
+  </data>
+  <data name="PleaseChooseServer" xml:space="preserve">
+	  <value>Inserisci l'indirizzo del tuo server di domotica</value>
+  </data>
+  <data name="CannotReachServer" xml:space="preserve">
+	  <value>Server non raggiungibile</value>
+  </data>
+  <data name="CannotReachServerDetails" xml:space="preserve">
+	  <value>Nessuna risposta da {0}. Controlla l'indirizzo, la connessione di rete e che il server sia in funzione.</value>
+  </data>
+  <data name="MustBeValidUrl" xml:space="preserve">
+	  <value>Deve essere un indirizzo completo, ad esempio https://home.example.com</value>
+  </data>
   <data name="InvalidInverterName" xml:space="preserve">
 	  <value>Il nome dell'inverter deve avere da 1 a 30 caratteri.</value>
   </data>

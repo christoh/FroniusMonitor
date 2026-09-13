@@ -5,7 +5,7 @@
              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
              xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
              xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
-             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="300"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="450"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.LoginView"
              x:DataType="dialogs:LoginViewModel" MaxWidth="400" MinWidth="200">
     <StackPanel Margin="16" HorizontalAlignment="Stretch">
@@ -15,21 +15,38 @@
 			</Style>
 		</StackPanel.Styles>
 
-		<TextBlock Text="{x:Static p:Resources.PleaseLogin}" TextWrapping="Wrap" FontSize="16" Margin="0,0,0,32" />
+		<TextBlock Text="{x:Static p:Resources.PleaseLogin}" IsVisible="{Binding IsLoggingIn}" TextWrapping="Wrap" FontSize="16" Margin="0,0,0,32" />
+		<TextBlock Text="{x:Static p:Resources.PleaseChooseServer}" IsVisible="{Binding IsChoosingServer}" TextWrapping="Wrap" FontSize="16" Margin="0,0,0,32" />
 
-		<StackPanel Classes="InputBlock">
-			<TextBlock Text="{x:Static p:Resources.Username}" />
-			<TextBox Text="{Binding UserName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+		<StackPanel IsVisible="{Binding IsLoggingIn}">
+			<StackPanel Classes="InputBlock">
+				<TextBlock Text="{x:Static p:Resources.Username}" />
+				<TextBox Text="{Binding UserName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+			</StackPanel>
+
+			<StackPanel Classes="InputBlock">
+				<TextBlock Text="{x:Static p:Resources.Password}" />
+				<c:PasswordBox Text="{Binding Password, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+			</StackPanel>
+
+			<CheckBox IsChecked="{Binding RememberPassword, Mode=TwoWay}"
+					  Content="{x:Static p:Resources.RememberPassword}"
+					  Margin="0,0,0,12" />
 		</StackPanel>
 
-		<StackPanel Classes="InputBlock">
-			<TextBlock Text="{x:Static p:Resources.Password}" />
-			<c:PasswordBox Text="{Binding Password, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+		<StackPanel Classes="InputBlock" IsVisible="{Binding IsChoosingServer}">
+			<TextBlock Text="{x:Static p:Resources.Url}" />
+			<TextBox Text="{Binding BaseUri, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" PlaceholderText="https://home.example.com" />
 		</StackPanel>
 
-		<StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-			<Button x:Name="OkButton" IsDefault="True" MinWidth="50" HorizontalContentAlignment="Center" Content="{x:Static p:Resources.Ok}" Command="{Binding LoginCommand}" />
-		</StackPanel>
+		<Grid ColumnDefinitions="Auto,*,Auto">
+			<Button Grid.Column="0" HorizontalAlignment="Left" HorizontalContentAlignment="Center"
+					IsVisible="{Binding CanChooseServer}"
+					Content="{x:Static p:Resources.ChooseServer}" Command="{Binding ChooseServerCommand}" />
+			<Button Grid.Column="2" x:Name="OkButton" IsDefault="True" MinWidth="50" HorizontalAlignment="Right"
+					HorizontalContentAlignment="Center"
+					Content="{x:Static p:Resources.Ok}" Command="{Binding OkCommand}" />
+		</Grid>
 
 	</StackPanel>
 </UserControl>

@@ -52,6 +52,11 @@ then logs back in with whichever is the new identity (name and/or password) once
 via `StoredConnection.SaveAsync` - the Basic Auth header the client was using stops working the instant the server
 saves the change, so this has to happen before any further call.
 
+`SaveAsync` asks the server for the AES key belonging to the (possibly new) user name, and answers with a
+`ProblemDetails` where that failed. It then writes **nothing**: a connection encrypted with the old key and read
+back with the new one is a cached password that silently decrypts to empty. Every caller has to show that problem
+with `ErrorBoxes.ShowServerProblem` and stop, rather than carry on believing the credentials are stored.
+
 The username `TextBox` in `UserEditorView.axaml` must therefore carry **no `IsEnabled="{Binding IsNew}"`**. It did
 once, and the result was a rename that failed in complete silence: in edit mode `IsNew` is false, so the box was
 disabled, nothing the user typed reached `UserEditorViewModel.UserName`, and `Ok()` built a `UserAccount` holding
@@ -122,6 +127,28 @@ path: if `Settings.xml` ever contains `ClearTextPassword="..."` (e.g. a hand-edi
 hashes it into `PasswordHash`/`Salt` on load, and because the getter always returns `null` combined with
 `[DefaultValue(null)]`, `XmlSerializer` never writes a cleartext password back out on save. There is no code path
 that persists a plaintext password.
+
+### Somebody must be able to administer the server, or it does not start
+
+`Program.EnsureAdministratorExists` runs at startup, after the settings are loaded and before anything is served,
+and tells the two empty-handed states apart:
+
+- **No users at all** is a fresh installation, and gets a user `admin` with the password `password` and
+  `Roles.Administrator`, logged as a **warning that names both**. The point of the warning is that whoever reads
+  the console can log in, so it has to be readable - and `admin`/`password` are hard-coded English, never
+  localized, because they are typed into a login box whatever language the server runs in. The user is created
+  with `SetPassword`, so only the hash reaches the file like any other.
+- **Users, but none with `Roles.Administrator`**, is a mistake, and the server logs an **error and exits with
+  code 2**. It cannot be repaired from a client: every endpoint that could grant the role is itself behind
+  `[BasicAuthorize(Roles = nameof(Roles.Administrator))]`, so the only way out is a text editor and
+  `Settings.xml`. Do **not** "helpfully" create the default administrator here as well - that would hand a login
+  to anyone who can read the log, on a server that already has real accounts on it.
+
+The created user is added to `settings.Users`, which is the very `HashSet<User>` that
+`.Configure<UserList>(u => u.Users = settings.Users)` gave the authentication scheme, so it is live at once; the
+`settings.SaveAsync()` at the end of `Main` is what makes it survive the restart. `StartupAdministratorTests`
+covers both branches, including that the default administrator is never smuggled into a non-empty user list.
+`HomeAutomationServer` has an `InternalsVisibleTo` for the test project so `Program` can stay internal.
 
 ### `UserList` is a live view of `Settings.Users`, not a copy
 

@@ -110,7 +110,11 @@ public sealed partial class UserManagementViewModel(DialogParameters parameters)
                     return;
                 }
 
-                await StoredConnection.SaveAsync(updated.UserName, password).ConfigureAwait(true);
+                if (await StoredConnection.SaveAsync(updated.UserName, password).ConfigureAwait(true) is { } problem)
+                {
+                    await problem.ShowServerProblem(mainViewModel.ApiUri).ConfigureAwait(true);
+                    return;
+                }
             }
         }
 

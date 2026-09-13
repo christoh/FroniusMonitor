@@ -7,9 +7,16 @@
 /// </summary>
 internal static class StoredConnection
 {
-    public static async Task SaveAsync(string userName, string password)
+    /// <returns><see langword="null"/> where the credentials are stored, and what went wrong otherwise.</returns>
+    public static async Task<ProblemDetails?> SaveAsync(string userName, string password)
     {
-        await IoC.GetRegistered<IServerBasedAesKeyProvider>().SetKeyFromUserName(userName);
+        // Without the key of this server the password would be encrypted with whatever key happens to be current,
+        // and would come back as noise on the next start. Nothing is written in that case.
+        if (await IoC.GetRegistered<IServerBasedAesKeyProvider>().SetKeyFromUserName(userName) is { } problem)
+        {
+            return problem;
+        }
+
         var connection = IoC.GetRegistered<HomeAutomationServerConnection>();
         WebConnection.InvalidateKey();
         connection.UserName = userName;
@@ -17,5 +24,6 @@ internal static class StoredConnection
         connection.BaseUrl = IoC.Get<MainViewModel>().ApiUri;
         await connection.UpdateChecksumAsync();
         await IoC.GetRegistered<ICache>().AddOrUpdateAsync(CacheKeys.Connection, connection);
+        return null;
     }
 }

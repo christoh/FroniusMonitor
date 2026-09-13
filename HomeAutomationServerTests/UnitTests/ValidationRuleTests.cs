@@ -1,5 +1,6 @@
 using De.Hochstaetter.Fronius.Localization;
 using De.Hochstaetter.Fronius.Validators;
+using De.Hochstaetter.HomeAutomationClient.Misc;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 
@@ -325,5 +326,86 @@ public class ValidationRuleTests
     {
         Assert.Equal("200", NumericText.Of(200L));
         Assert.Null(NumericText.Of(null as long?));
+    }
+
+    [Theory]
+    [InlineData("https://home.example.com")]
+    [InlineData("https://home.example.com/")]
+    [InlineData("http://192.168.1.10:5000")]
+    [InlineData("https://home.example.com/automation")]
+    [InlineData("  https://home.example.com  ")]
+    public void AbsoluteUri_takes_an_address_a_server_can_be_reached_at(string text)
+    {
+        Assert.Null(Validate(new AbsoluteUriAttribute(), text));
+        Assert.NotNull(AbsoluteUriAttribute.Parse(text));
+    }
+
+    [Theory]
+    [InlineData("home.example.com")]
+    [InlineData("/api")]
+    [InlineData("https://")]
+    [InlineData("ftp://home.example.com")]
+    [InlineData("not an address")]
+    public void AbsoluteUri_refuses_anything_that_is_not_one(string text)
+    {
+        // Without a scheme, without a host, or with a scheme we do not speak, there is nothing to talk to.
+        Assert.NotNull(Validate(new AbsoluteUriAttribute(), text));
+        Assert.Null(AbsoluteUriAttribute.Parse(text));
+    }
+
+    [Fact]
+    public void AbsoluteUri_takes_the_schemes_it_was_given()
+    {
+        var rule = new AbsoluteUriAttribute { Schemes = ["ws", "wss"] };
+        Assert.Null(Validate(rule, "wss://home.example.com/hub"));
+        Assert.NotNull(Validate(rule, "https://home.example.com"));
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void AbsoluteUri_lets_an_empty_value_through_unless_the_field_needs_one(object? value)
+    {
+        Assert.Null(Validate(new AbsoluteUriAttribute(), value));
+        Assert.NotNull(Validate(new AbsoluteUriAttribute { AllowEmpty = false }, value));
+    }
+
+    [Theory]
+    [InlineData("https://home.example.com", "https://home.example.com/api/", "https://home.example.com/hub")]
+    [InlineData("https://home.example.com/", "https://home.example.com/api/", "https://home.example.com/hub")]
+    [InlineData("https://example.com/home", "https://example.com/home/api/", "https://example.com/home/hub")]
+    [InlineData("https://example.com/home/", "https://example.com/home/api/", "https://example.com/home/hub")]
+    public void ServerUris_puts_the_api_and_the_hub_below_the_root(string root, string expectedApi, string expectedHub)
+    {
+        // A root without its trailing slash would otherwise resolve the segments against the parent of its last
+        // one, so https://example.com/home would be served by https://example.com/api/.
+        var uris = ServerUris.From(root);
+        Assert.NotNull(uris);
+        Assert.Equal(expectedApi, uris.Value.ApiUri);
+        Assert.Equal(expectedHub, uris.Value.HubUri);
+    }
+
+    [Theory]
+    [InlineData("https://home.example.com")]
+    [InlineData("https://example.com/home")]
+    public void ServerUris_finds_the_root_an_api_address_came_from(string root)
+    {
+        // What the login dialog puts back into the box has to be what the user typed into it.
+        var uris = ServerUris.From(root);
+        Assert.NotNull(uris);
+        Assert.Equal(root, ServerUris.RootOf(uris.Value.ApiUri));
+    }
+
+    [Theory]
+    [InlineData("not an address")]
+    [InlineData(null)]
+    public void ServerUris_says_so_where_there_is_no_usable_address(string? root)
+    {
+        // A phone that has never been told where the server is, or a leftover from one that has moved.
+        Assert.Null(ServerUris.From(root));
+        Assert.Null(ServerUris.RootOf(root));
+        Assert.False(ServerUris.AreUsable(root, "https://home.example.com/hub"));
+        Assert.False(ServerUris.AreUsable("https://home.example.com/api/", root));
     }
 }

@@ -30,6 +30,7 @@ global using De.Hochstaetter.Fronius.Contracts.HomeAutomationClient;
 global using De.Hochstaetter.Fronius.Localization;
 global using De.Hochstaetter.Fronius.Models.Gen24;
 global using De.Hochstaetter.Fronius.Models.Gen24.Settings;
+global using De.Hochstaetter.Fronius.Models.HomeAutomationClient;
 global using De.Hochstaetter.Fronius.Models.Settings;
 global using De.Hochstaetter.Fronius.Models.WebApi;
 global using De.Hochstaetter.Fronius.Services.HomeAutomationClient;

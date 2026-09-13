@@ -11,6 +11,9 @@ namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 
 public sealed partial class MainViewModel : ViewModelBase
 {
+    private const string ProductName = "hacc";
+    private const string ProductVersion = "0.5.0.0";
+
     private readonly IGen24LocalizationService gen24Loc;
     private readonly IUriService uriService;
     private readonly IWebClientService webClient;
@@ -25,11 +28,24 @@ public sealed partial class MainViewModel : ViewModelBase
         this.uriService = uriService;
         uriService.PathChanged += OnPathChanged;
         UpdateService = updateService;
-        ApiUri = IoC.TryGetRegistered<ICache>()?.Get<string>(CacheKeys.ApiUri) ?? "https://home-automation.example.com";
-        webClient.Initialize(ApiUri, "hacc", "0.5.0.0");
+        SetApiUri(IoC.TryGetRegistered<ICache>()?.Get<string>(CacheKeys.ApiUri) ?? "https://home-automation.example.com");
     }
 
-    public string ApiUri { get; }
+    /// <summary>
+    /// Where the server's web api is. Set through <see cref="SetApiUri"/> only, so that the address this says and
+    /// the address the requests go to are never two different things.
+    /// </summary>
+    public string ApiUri { get; private set; }
+
+    /// <summary>
+    /// Points the client at another server. The login dialog calls this when the user changes the connection.
+    /// </summary>
+    [MemberNotNull(nameof(ApiUri))]
+    public void SetApiUri(string apiUri)
+    {
+        ApiUri = apiUri;
+        webClient.Initialize(apiUri, ProductName, ProductVersion);
+    }
 
     [ObservableProperty, NotifyPropertyChangedFor(nameof(IsDialogBusy))]
     public partial string? DialogBusyText { get; set; }
@@ -241,7 +257,12 @@ public sealed partial class MainViewModel : ViewModelBase
                 return;
             }
 
-            await StoredConnection.SaveAsync(me.UserName, request.NewPassword).ConfigureAwait(true);
+            if (await StoredConnection.SaveAsync(me.UserName, request.NewPassword).ConfigureAwait(true) is { } problem)
+            {
+                // The password did change; only remembering it for the next start did not.
+                await problem.ShowServerProblem(ApiUri).ConfigureAwait(true);
+                return;
+            }
         }
 
         await new MessageBox

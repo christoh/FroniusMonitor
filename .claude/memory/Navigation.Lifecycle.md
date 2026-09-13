@@ -114,8 +114,9 @@ Two things, both about a **deep link**, and both easy to break again:
 - **`main.js` hands the app `document.baseURI`, not `location.href`.** `Program.Main` derives `CacheKeys.ApiUri`
   and `CacheKeys.HubUri` from `args[0]`, so with `location.href` the api and the hub of the server were looked
   for below the path of the *view* - the app started at a deep link, then failed to talk to the server.
-  `document.baseURI` is the `/` of the base element and always ends with a slash, which is what
-  `new Uri(appRoot, "api/")` needs.
+  `document.baseURI` is the `/` of the base element, which is the root the server answers at - and that, not a
+  path inside the app, is what `ServerUris.From` (the one place that puts those two addresses together) has to be
+  given.
 
 **The web server must serve `index.html` for an unknown path** (SPA fallback), otherwise a deep link is a 404
 before any of this runs. Verified on the live site: `https://home.hochstaetter.de/inverterdetails/...` answers

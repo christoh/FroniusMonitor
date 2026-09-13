@@ -220,17 +220,20 @@ initializer inside `ShowDialogAsync`, `Initialize` starts before the dialog is o
 
 **`Initialize` fires again whenever the body is re-attached.** `MainView` presents `CurrentDialog.Body` through one
 host, so a nested dialog opening and closing over a dialog takes its body out of the tree and puts it back, and
-`OnDataContextChanged` comes round a second time. A dialog that is shown once and closed never notices - the login
-and the message boxes do not. One that **stays open** while it shows a message box does, and has to guard
-`Initialize` against running twice, with the flag set before the first `await`. Otherwise it loads everything again
-and puts its busy overlay back up over a dialog the user is working in.
-`Gen24SettingsDialogViewModel` is the worked example; see [[SettingsDialogs.Lifecycle]].
+`OnDataContextChanged` comes round a second time. A message box is shown once and closed and never notices. Any
+dialog that **stays open** while it shows a message box does, and has to guard `Initialize` against running twice,
+with the flag set before the first `await`. Otherwise it loads everything again and puts its busy overlay back up
+over a dialog the user is working in. `Gen24SettingsDialogViewModel` is the worked example; see
+[[SettingsDialogs.Lifecycle]]. `LoginViewModel` belongs in that group too: a refused login, an unreachable server
+or a mistyped address all put a message box over it, and re-running `Initialize` would throw away what the user
+had typed.
 
 ## Known gaps
 
 - `IDialogBase` is `IDisposable` and nobody disposes it. The `CancellationTokenSource` of every dialog is left to
   the finalizer, and `ShowDialogAsync` creates a fresh one in its `finally` without disposing the old one.
 - No keyboard handling in the host: no Escape to abort. `LoginView` handles `Enter` in its own code behind and is
-  the only dialog that reacts to a key at all.
+  the only dialog that reacts to a key at all. It gets away with knowing nothing about what the dialog is
+  currently showing, because the two modes of that dialog share one `OkCommand`.
 - Nothing takes focus when a dialog opens.
 - The title bar always uses `SystemControlBackgroundAccentBrush` and the dialog `DialogBackground`; a dialog cannot theme itself.

@@ -3299,7 +3299,16 @@ namespace De.Hochstaetter.Fronius.Localization {
                 return ResourceManager.GetString("MustBePercent", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Must be a complete address, for example https://home.example.com.
+        /// </summary>
+        public static string MustBeValidUrl {
+            get {
+                return ResourceManager.GetString("MustBeValidUrl", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Name.
         /// </summary>
@@ -3983,7 +3992,7 @@ namespace De.Hochstaetter.Fronius.Localization {
                 return ResourceManager.GetString("RememberPassword", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Require RFID card to charge.
         /// </summary>
@@ -5224,6 +5233,42 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string CannotDeleteSelf {
             get {
                 return ResourceManager.GetString("CannotDeleteSelf", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot reach the server.
+        /// </summary>
+        public static string CannotReachServer {
+            get {
+                return ResourceManager.GetString("CannotReachServer", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to There was no answer from {0}. Please check the address, your network connection, and that the server is running.
+        /// </summary>
+        public static string CannotReachServerDetails {
+            get {
+                return ResourceManager.GetString("CannotReachServerDetails", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Choose server.
+        /// </summary>
+        public static string ChooseServer {
+            get {
+                return ResourceManager.GetString("ChooseServer", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Please enter the address of your home automation server.
+        /// </summary>
+        public static string PleaseChooseServer {
+            get {
+                return ResourceManager.GetString("PleaseChooseServer", resourceCulture);
             }
         }
 

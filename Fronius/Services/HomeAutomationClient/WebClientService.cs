@@ -18,11 +18,28 @@ public sealed class WebClientService : IWebClientService
         IncludeFields = false,
     };
 
-    private readonly HttpClient httpClient = new() { Timeout = TimeSpan.FromSeconds(7) };
+    private HttpClient httpClient = NewHttpClient();
 
+    private static HttpClient NewHttpClient() => new() { Timeout = TimeSpan.FromSeconds(7) };
+
+    /// <summary>
+    /// Points the client at <paramref name="baseUri"/>. May be called again when the user changes the connection.
+    /// </summary>
+    /// <remarks>
+    /// An <see cref="HttpClient"/> refuses a new <see cref="HttpClient.BaseAddress"/> once it has sent its first
+    /// request, so a second call gets a new one. Dropping the old one drops its authorization header with it,
+    /// which is what we want: credentials for the previous server are worth nothing to the new one.
+    /// </remarks>
     public void Initialize(string baseUri, string productName, string version)
     {
         var address = new Uri(baseUri);
+
+        if (httpClient.BaseAddress != null)
+        {
+            httpClient.Dispose();
+            httpClient = NewHttpClient();
+        }
+
         httpClient.BaseAddress = address;
         httpClient.DefaultRequestHeaders.UserAgent.Clear();
         httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(productName, version));
@@ -30,10 +47,11 @@ public sealed class WebClientService : IWebClientService
 
     #region Identity
 
-    public async Task<byte[]> GetKeyForUserName(string userName, CancellationToken token = default)
+    public async Task<ApiResult<byte[]>> GetKeyForUserName(string userName, CancellationToken token = default)
     {
-        var keyString = await httpClient.GetStringAsync($"Identity/requestKey?user={userName}", token).ConfigureAwait(false);
-        return Convert.FromBase64String(keyString);
+        // Not SendResult: the endpoint answers with the key as text/plain, not as JSON.
+        return await ReadResult(t => httpClient.GetAsync($"Identity/requestKey?user={Uri.EscapeDataString(userName)}", t),
+            async (content, t) => Convert.FromBase64String(await content.ReadAsStringAsync(t).ConfigureAwait(false)), token).ConfigureAwait(false);
     }
 
     public Task<ApiResult<UserInfo>> Login(string userName, string password, CancellationToken token = default)
@@ -255,7 +273,21 @@ public sealed class WebClientService : IWebClientService
         return SendResult<T>(t => httpClient.DeleteAsync(queryString, t), token);
     }
 
-    private async Task<ApiResult<T>> SendResult<T>(Func<CancellationToken, Task<HttpResponseMessage>> send, CancellationToken token)
+    private Task<ApiResult<T>> SendResult<T>(Func<CancellationToken, Task<HttpResponseMessage>> send, CancellationToken token)
+    {
+        return ReadResult(send, (content, t) => content.ReadFromJsonAsync<T>(jsonOptions, t), token);
+    }
+
+    /// <summary>
+    /// Sends a request and turns everything that can come back into an <see cref="ApiResult{T}"/>: the payload
+    /// where the server answered 200, the server's own <c>ProblemDetails</c> where it answered anything else, and
+    /// one built from the exception where nothing answered at all - a wrong address, no network, a server that is
+    /// not running. Nothing here throws, so a caller never has to turn a socket error into words of its own.
+    /// </summary>
+    /// <param name="readPayload">
+    /// How to read a successful body. Most endpoints answer with JSON, but not all of them do.
+    /// </param>
+    private async Task<ApiResult<T>> ReadResult<T>(Func<CancellationToken, Task<HttpResponseMessage>> send, Func<HttpContent, CancellationToken, Task<T?>> readPayload, CancellationToken token)
     {
         HttpResponseMessage? responseMessage = null;
 
@@ -267,7 +299,7 @@ public sealed class WebClientService : IWebClientService
                 ? ApiResult<T>.FromProblemDetails(await GetErrors(responseMessage, token).ConfigureAwait(false), responseMessage.StatusCode)
                 : new ApiResult<T>
                 {
-                    Payload = await responseMessage.Content.ReadFromJsonAsync<T>(jsonOptions, token).ConfigureAwait(false),
+                    Payload = await readPayload(responseMessage.Content, token).ConfigureAwait(false),
                     Status = responseMessage.StatusCode,
                 };
         }
@@ -287,9 +319,21 @@ public sealed class WebClientService : IWebClientService
         }
     }
 
+    /// <summary>
+    /// The <c>ProblemDetails</c> of a refused request, or <see langword="null"/> where the body held none. Not
+    /// every error comes from our server: a reverse proxy or a wrong address answers with an HTML page, and that
+    /// must not turn into a <c>JsonException</c> in front of the user.
+    /// </summary>
     private static async ValueTask<ProblemDetails?> GetErrors(HttpResponseMessage message, CancellationToken token)
     {
-        return await message.Content.ReadFromJsonAsync<ProblemDetails?>(jsonOptions, token).ConfigureAwait(false);
+        try
+        {
+            return await message.Content.ReadFromJsonAsync<ProblemDetails?>(jsonOptions, token).ConfigureAwait(false);
+        }
+        catch (Exception ex) when (ex is JsonException or NotSupportedException)
+        {
+            return null;
+        }
     }
 
     public void Dispose()

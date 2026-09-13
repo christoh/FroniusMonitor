@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using System.Runtime.InteropServices.JavaScript;
+﻿using System.Runtime.InteropServices.JavaScript;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,7 +15,7 @@ public partial class Cache: ICache
 
     public void AddOrUpdate(string key, object value)
     {
-        SetItem(key, JsonConvert.SerializeObject(value));
+        SetItem(key, JsonSerializer.Serialize(value, CacheJson.Options));
     }
 
     public Task AddOrUpdateAsync(string key, object value, CancellationToken token = default)
@@ -32,6 +32,6 @@ public partial class Cache: ICache
     public T? Get<T>(string key)
     {
         var jsonValue = GetItem(key);
-        return string.IsNullOrEmpty(jsonValue) ? default : JsonConvert.DeserializeObject<T>(jsonValue);
+        return string.IsNullOrEmpty(jsonValue) ? default : JsonSerializer.Deserialize<T>(jsonValue, CacheJson.Options);
     }
 }

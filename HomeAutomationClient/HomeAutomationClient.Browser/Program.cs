@@ -31,15 +31,15 @@ internal sealed partial class Program
     {
         var cache = new Cache();
         #if DEBUG
-        await cache.AddOrUpdateAsync(CacheKeys.ApiUri, "https://home.hochstaetter.de/api/");
-        await cache.AddOrUpdateAsync(CacheKeys.HubUri, "https://home.hochstaetter.de/hub");
+        var (apiUri, hubUri) = ServerUris.From(new Uri("https://home.hochstaetter.de"));
         #else
-        // args[0] is the base address of the app, and document.baseURI always ends with a slash. Anything else
-        // would make Uri resolve api/ and hub against the parent of the last segment.
-        var appRoot = new Uri(args[0].EndsWith('/') ? args[0] : args[0] + "/");
-        await cache.AddOrUpdateAsync(CacheKeys.ApiUri, new Uri(appRoot, "api/").ToString());
-        await cache.AddOrUpdateAsync(CacheKeys.HubUri, new Uri(appRoot, "hub").ToString());
+        // args[0] is the base address of the app.
+        var (apiUri, hubUri) = ServerUris.From(new Uri(args[0]));
         #endif
+        // A browser serves the client from the same place as the server, so the addresses are known and the
+        // "Change connection" expander of the login dialog stays hidden here.
+        await cache.AddOrUpdateAsync(CacheKeys.ApiUri, apiUri);
+        await cache.AddOrUpdateAsync(CacheKeys.HubUri, hubUri);
         App.ServiceCollection = new ServiceCollection();
         App.ServiceCollection.AddSingleton<ICache>(cache);
         App.ServiceCollection.AddSingleton<IUriService>(await UriService.CreateAsync());

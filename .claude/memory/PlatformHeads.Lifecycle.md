@@ -1,7 +1,10 @@
 ---
 paths:
   - HomeAutomationClient/HomeAutomationClient/Misc/PlatformStartup.cs
+  - HomeAutomationClient/HomeAutomationClient/Misc/ServerUris.cs
+  - HomeAutomationClient/HomeAutomationClient/ViewModels/Dialogs/LoginViewModel.cs
   - HomeAutomationClient/HomeAutomationClient/FileCache.cs
+  - HomeAutomationClient/HomeAutomationClient/CacheJson.cs
   - HomeAutomationClient/HomeAutomationClient/ICache.cs
   - HomeAutomationClient/HomeAutomationClient/App.axaml.cs
   - HomeAutomationClient/HomeAutomationClient/App.axaml
@@ -29,8 +32,8 @@ answer travels.
    - optionally sets `PlatformStartup.AccentColor`,
    - optionally registers an `IUriService` of its own - see `Navigation.Lifecycle.md`,
    - the browser head additionally seeds `CacheKeys.ApiUri` and `CacheKeys.HubUri` from the base address it is
-     handed in `args[0]`, and downloads the satellite assemblies for the language of the user - both before
-     Avalonia starts.
+     handed in `args[0]` - through `ServerUris.From`, see below - and downloads the satellite assemblies for the
+     language of the user, both before Avalonia starts.
 2. **`AppBuilder`** with the head's font and platform options.
 3. **`App.Initialize`** loads `App.axaml`.
 4. **`App.OnFrameworkInitializationCompleted`** calls `SetAccentColor()`, builds the service provider, hands it to
@@ -72,11 +75,30 @@ public class Cache() : FileCache(DataDirectory)
 **Never the cache directory,** although `ICache` sounds like it: Android and iOS delete it whenever they need
 space, and the connection to the server has to survive that.
 
-`FileCache` serializes with reflection, so the types of cached values (`HomeAutomationServerConnection`, not only
+**Every head serializes through `CacheJson.Options`**, the file based ones and the browser alike. They hold the
+same values under the same keys, so an implementation that words them differently is a bug waiting to be found by
+someone moving between heads - and one such bug was worse than that. The browser cache used Newtonsoft, which
+honors neither `System.Text.Json.Serialization.JsonIgnore` nor `XmlIgnore`, and so wrote `WebConnection.Password`
+into `localStorage` **in clear text**, beside the encrypted copy that is the only one meant to be stored.
+`IsNotifying` and `IsNotifyingBeforeChanging` escaped only because they also carry `[IgnoreDataMember]`, which
+Newtonsoft does respect. If a model must be invisible to both serializers, `[IgnoreDataMember]` is the attribute
+that says so - but the cache is System.Text.Json throughout now, and should stay that way.
+
+Two things about those options that are easy to get wrong:
+
+- **The same object has to be given to the reader and to the writer.** Half of what is set there only applies on
+  the way in. For a while only `Serialize` was given them, so `AllowTrailingCommas`, `ReadCommentHandling` and
+  `PropertyNameCaseInsensitive` did nothing at all, and `AllowNamedFloatingPointLiterals` was actively dangerous:
+  a `NaN` was written happily and threw on the next read. `CacheSerializationTests` holds that symmetry.
+- **`IgnoreReadOnlyProperties` is on to keep `ObservableValidator.HasErrors` out**, which every cached
+  `BindableBase` carries. It drops every get-only property to do it, so a cached type that keeps state in one
+  loses it silently.
+
+The caches serialize with reflection, so the types of cached values (`HomeAutomationServerConnection`, not only
 strings) must survive the trimmer. All heads currently build with a trim mode that leaves our own assemblies
 alone - verified for iOS with `dotnet msbuild -p:RuntimeIdentifier=ios-arm64 -getProperty:TrimMode`, which
-reports `partial`. Give `FileCache` a `JsonSerializerContext` before that changes; the compiler will not warn,
-because the trim analyzer does not look into a referenced project.
+reports `partial`. Give `CacheJson.Options` a `JsonSerializerContext` before that changes; the compiler will not
+warn, because the trim analyzer does not look into a referenced project.
 
 ## What a head may provide: the accent color
 
@@ -280,11 +302,47 @@ been showing all along. They are proven by use; the cross was the one that had n
 - Desktop, Browser, Android and iOS all compile in Debug and Release. iOS compiles on Windows, but has never been
   linked for a device and never been run.
 
+## Where the server address comes from
+
+The client talks to two addresses - `CacheKeys.ApiUri` and `CacheKeys.HubUri` - and both are derived from the one
+address a user knows: the root the server answers at. `Misc/ServerUris` is the only place that derives them
+(`api/` and `hub` below the root, `RootOf` back the other way), so no head does that arithmetic itself.
+
+Only the **browser** head can know the address without asking: it is served by the server it talks to, so
+`Program.Main` seeds both cache keys from `args[0]` before Avalonia starts. Everything else asks the user, and the
+login dialog is where it asks.
+
+**The login dialog has two modes and one Ok button.** It either asks for credentials or for the server address,
+never for both at once, and `LoginViewModel.IsChoosingServer` says which - so `Ok` means "log in" or "use this
+server" depending on it. A **"Choose server"** button sits at the left of the Ok row and switches into the second
+mode; it is hidden where `CanChangeConnection` is false, which is exactly the browser. Confirming an address
+validates it with `AbsoluteUriAttribute`, writes both cache keys, points `IWebClientService` at the new server
+through `MainViewModel.SetApiUri`, and fetches that server's AES key.
+
+Four consequences worth knowing:
+
+- **An `HttpClient` refuses a new `BaseAddress` once it has sent a request**, so `WebClientService.Initialize`
+  throws away its client and makes a new one when it is called a second time. That drops the authorization header
+  of the previous server with it, which is what we want.
+- **The cached password does not survive a change of server.** It is encrypted with the key the *server* hands
+  out for the user name, so after the switch it cannot be decrypted and comes back empty - the documented
+  graceful degradation of `WebConnection.EncryptedPassword`. The user types it once and it is cached again.
+- **What the user has typed is never taken away from them.** `LoginViewModel.LoadCachedCredentialsAsync` runs
+  again after a change of server, and only fills a box that is *empty*. By then the user may well have typed the
+  credentials for the new server already, and replacing those with a cached password of the old one would be the
+  last thing they asked for.
+- **Asking a server for a key is the first thing the client ever does with an address**, so that is where a wrong
+  or unreachable one shows up. `IServerBasedAesKeyProvider.SetKeyFromUserName` therefore answers with a
+  `ProblemDetails` instead of throwing, and the dialog shows it with `ErrorBoxes.ShowServerProblem` - the server's
+  own message where it answered, and a "cannot reach the server" sentence where nothing did. A socket exception
+  is not something an end user can act on.
+
+Where the cached addresses are unusable - a phone that has never been told, or a leftover from a server that has
+moved - `LoginViewModel.Initialize` starts in the address mode without contacting anything, and shows no error:
+not knowing the address yet is not the user having got something wrong.
+
 ## Known gaps
 
-- **Android and iOS have no server address.** Unlike the browser head they do not seed `CacheKeys.ApiUri`, so
-  they fall back to the `https://home-automation.example.com` placeholder in `MainViewModel` and the login fails.
-  Either seed them like the browser head does under `#if DEBUG`, or build the settings dialog.
 - Neither mobile head has ever run on a device or emulator. Everything about them here is compile time knowledge.
 - `dotnet run` on the browser head serves an app whose SkiaSharp fails to initialize, because neither
   `WasmBuildNative` nor `RunAOTCompilation` is on. The page loads and the .NET side runs - useful for checking

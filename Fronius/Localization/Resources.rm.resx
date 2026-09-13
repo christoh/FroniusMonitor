@@ -1258,6 +1258,21 @@
   <data name="RememberPassword" xml:space="preserve">
     <value>Memorisar il pled-clav</value>
   </data>
+  <data name="ChooseServer" xml:space="preserve">
+    <value>Tscherner il server</value>
+  </data>
+  <data name="PleaseChooseServer" xml:space="preserve">
+    <value>Endatai per plaschair l'adressa da voss server d'automatisaziun da chasa</value>
+  </data>
+  <data name="CannotReachServer" xml:space="preserve">
+    <value>Il server n'è betg cuntanschibel</value>
+  </data>
+  <data name="CannotReachServerDetails" xml:space="preserve">
+    <value>Nagina resposta da {0}. Controllai l'adressa, Vossa connexiun da rait e sche il server funcziuna.</value>
+  </data>
+  <data name="MustBeValidUrl" xml:space="preserve">
+    <value>Sto esser ina adressa cumpletta, per exempel https://home.example.com</value>
+  </data>
   <data name="InvalidInverterName" xml:space="preserve">
     <value>Il num da l'inverter sto avair tranter 1 e 30 caracters.</value>
   </data>

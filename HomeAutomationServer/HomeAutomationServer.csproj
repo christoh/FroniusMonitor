@@ -34,4 +34,10 @@
 		<ProjectReference Include="..\Fronius\Fronius.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<!-- Program and its startup checks are internal; the tests exercise them where they are, rather than the
+			 code being made public for their sake. -->
+		<InternalsVisibleTo Include="HomeAutomationServerTests" />
+	</ItemGroup>
+
 </Project>

@@ -17,6 +17,24 @@ internal sealed class SettableTimeProvider(DateTimeOffset now) : TimeProvider
     public override DateTimeOffset GetUtcNow() => Now;
 }
 
+/// <summary>
+/// Keeps what was logged, for the cases where the log entry is the feature rather than a side effect - a warning
+/// that tells the administrator the credentials they have just been given, for instance.
+/// </summary>
+internal sealed class RecordingLogger : ILogger
+{
+    public List<(LogLevel Level, string Message)> Entries { get; } = [];
+
+    public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+
+    public bool IsEnabled(LogLevel logLevel) => logLevel != LogLevel.None;
+
+    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+    {
+        Entries.Add((logLevel, formatter(state, exception)));
+    }
+}
+
 internal static class TestUsers
 {
     public const string Password = "correct horse battery staple";

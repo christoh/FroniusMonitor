@@ -8,7 +8,12 @@ public interface IWebClientService : IDisposable
 {
     #region Identity
 
-    Task<byte[]> GetKeyForUserName(string userName, CancellationToken token = default);
+    /// <summary>
+    /// The AES key this server hands out for a user name; the cached password is encrypted with it. Answers with a
+    /// <c>ProblemDetails</c> rather than throwing, because this is the first call the client ever makes to a
+    /// server and a wrong address has to reach the user as a sentence, not as a socket exception.
+    /// </summary>
+    Task<ApiResult<byte[]>> GetKeyForUserName(string userName, CancellationToken token = default);
 
     void Initialize(string baseUri, string productName, string version);
 

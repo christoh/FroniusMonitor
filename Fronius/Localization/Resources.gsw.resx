@@ -1290,6 +1290,21 @@
   <data name="RememberPassword" xml:space="preserve">
 	  <value>Passwort merke</value>
   </data>
+  <data name="ChooseServer" xml:space="preserve">
+	  <value>Server uuswähle</value>
+  </data>
+  <data name="PleaseChooseServer" xml:space="preserve">
+	  <value>Bitte gäbed Si d'Adrässe vo Ihrem Huusautomationsserver ii</value>
+  </data>
+  <data name="CannotReachServer" xml:space="preserve">
+	  <value>Server isch nid erreichbar</value>
+  </data>
+  <data name="CannotReachServerDetails" xml:space="preserve">
+	  <value>Vo {0} isch kei Antwort cho. Bitte prüefed Si d'Adrässe, Ihri Netzwärkverbindig und ob de Server läuft.</value>
+  </data>
+  <data name="MustBeValidUrl" xml:space="preserve">
+	  <value>Mues e vollständigi Adrässe si, zum Bischpil https://home.example.com</value>
+  </data>
   <data name="InvalidInverterName" xml:space="preserve">
 	  <value>De Wächselrichtername mues zwüsche 1 und 30 Zeiche ha.</value>
   </data>

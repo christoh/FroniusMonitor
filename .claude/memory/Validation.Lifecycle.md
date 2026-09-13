@@ -59,11 +59,17 @@ public string? MeterAddressText
 ```
 
 - **`Fronius/Validators`** holds the rules: `MinMaxIntAttribute`, `MinMaxDoubleAttribute`, `RegexRuleAttribute`,
-  `Ipv4Attribute`. Each one is a `Complaint` and an `IsAcceptable`; `ValidationRuleAttribute` does the rest -
+  `Ipv4Attribute`, `AbsoluteUriAttribute`. Each one is a `Complaint` and an `IsAcceptable`;
+  `ValidationRuleAttribute` does the rest -
   empties, and the message. The message is either composed around `PropertyDisplayName` /
   `PropertyDisplayNameResourceKey`, or named outright by `MessageResourceKey` where the field already has a
   sentence of its own. It is put together **while the rule runs**, never in the constructor, so it follows the
   current language.
+- **Where a caller needs the parsed value too, the rule exposes the parsing, not a copy of it.**
+  `AbsoluteUriAttribute.Parse` is public and static, and `IsAcceptable` is nothing but a null check on it. The
+  login dialog and `Misc/ServerUris` in the Avalonia client build the api and hub addresses out of what it
+  returns, so what the rule lets through and what the code then uses cannot drift apart. A rule whose verdict is
+  the whole answer - `Ipv4Attribute` - needs none of this.
 - **A blank value passes unless `AllowEmpty = false`.** Not having typed anything is not the same as having typed
   something wrong. Where a value really is required, `AllowEmpty = false` refuses a blank with the field's own
   message - "must be between 1 and 247" says everything there is to say about an empty box, and about "abc" as
@@ -76,6 +82,12 @@ public string? MeterAddressText
   what is on screen rather than what happened to change. Neither Modbus address is required in the end - an empty
   one becomes null, and `GetUpdateToken` leaves a null out of the delta, so it means "not mine to say" and can
   never overwrite what the inverter holds.
+- **Validate what is on screen, not what exists.** Where a view model shows one half of itself at a time - the
+  login dialog asks for credentials or for a server address, never both - `ValidateAllProperties()` marks the
+  hidden half as well, and those errors are waiting in red when that half comes back, complaining about a box the
+  user was never given the chance to fill in. `LoginViewModel.IsVisibleInputValid` validates only the properties
+  the current mode shows, and only those may hold its Ok button up. An error nobody can see is an error nobody
+  can correct.
 - **Every rule reads the value from its text**, because that is what a text box gives it. So the rule, and not a
   converter, is what decides whether what was typed is a number at all.
 - **`[NotifyDataErrorInfo]` is what makes it work.** `BindableBase` is an `ObservableValidator`, so the generated

@@ -17,6 +17,19 @@ namespace De.Hochstaetter.HomeAutomationServer;
 
 internal class Program
 {
+    /// <summary>
+    /// The administrator a server with no users at all is given, so that somebody can log in and create the real
+    /// ones. Deliberately not localized: it is typed into a login box, and it has to read the same whatever
+    /// language the server happens to run in.
+    /// </summary>
+    internal const string DefaultAdministratorName = "admin";
+
+    /// <inheritdoc cref="DefaultAdministratorName"/>
+    internal const string DefaultAdministratorPassword = "password";
+
+    /// <summary>The exit code where the settings leave nobody able to administer this server.</summary>
+    internal const int NoAdministratorExitCode = 2;
+
     private static ModbusServerService? server;
 
     private static ILogger? logger;
@@ -245,6 +258,11 @@ internal class Program
             return 1;
         }
 
+        if (EnsureAdministratorExists(settings, logger) is { } noAdministratorExitCode)
+        {
+            return noAdministratorExitCode;
+        }
+
         await server.StartAsync().ConfigureAwait(false);
         var fritzBoxDataCollector = IoC.Get<FritzBoxDataCollector>();
         await fritzBoxDataCollector.StartAsync().ConfigureAwait(false);
@@ -261,5 +279,63 @@ internal class Program
         await settings.SaveAsync().ConfigureAwait(false);
         await app.RunAsync().ConfigureAwait(false);
         return 0;
+    }
+
+    /// <summary>
+    /// Makes sure somebody can log in and administer this server.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Every way of creating or repairing a user goes through <c>IdentityController</c>, and each of those
+    /// endpoints asks for <see cref="Roles.Administrator"/>. A list of users with nobody in that role can
+    /// therefore never be put right from a client, so saying so and stopping is more use than serving something
+    /// nobody can manage - the fix is a text editor and <see cref="Settings.SettingsFileName"/>.
+    /// </para>
+    /// <para>
+    /// No users at all is a different thing: that is a fresh installation rather than a mistake, and it gets the
+    /// default administrator that makes the first login possible.
+    /// </para>
+    /// </remarks>
+    /// <returns>
+    /// The exit code where the server must not start, or <see langword="null"/> where it may. A created
+    /// administrator is added to <paramref name="settings"/>, whose set of users is the very one the
+    /// <c>UserList</c> options hand to the authentication scheme, and <see cref="Main"/> writes it back before
+    /// the server runs.
+    /// </returns>
+    internal static int? EnsureAdministratorExists(Settings settings, ILogger logger)
+    {
+        if (settings.Users.Count == 0)
+        {
+            var administrator = new User { Username = DefaultAdministratorName, Roles = Roles.Administrator };
+            administrator.SetPassword(DefaultAdministratorPassword);
+            settings.Users.Add(administrator);
+
+            if (logger.IsEnabled(LogLevel.Warning))
+            {
+                logger.LogWarning
+                (
+                    "No users are defined in {FileName}, so a default administrator has been created: user name \"{UserName}\", password \"{Password}\". Change that password.",
+                    Settings.SettingsFileName, DefaultAdministratorName, DefaultAdministratorPassword
+                );
+            }
+
+            return null;
+        }
+
+        if (settings.Users.Any(user => user.Roles.HasFlag(Roles.Administrator)))
+        {
+            return null;
+        }
+
+        if (logger.IsEnabled(LogLevel.Error))
+        {
+            logger.LogError
+            (
+                "None of the {UserCount} users in {FileName} has the {Role} role, so nobody could ever manage this server. Give one of them that role, or remove them all to have a default administrator created on the next start. Must exit.",
+                settings.Users.Count, Settings.SettingsFileName, nameof(Roles.Administrator)
+            );
+        }
+
+        return NoAdministratorExitCode;
     }
 }

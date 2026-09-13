@@ -1296,6 +1296,21 @@
   <data name="RememberPassword" xml:space="preserve">
 	  <value>Passwort merken</value>
   </data>
+  <data name="ChooseServer" xml:space="preserve">
+	  <value>Server auswählen</value>
+  </data>
+  <data name="PleaseChooseServer" xml:space="preserve">
+	  <value>Bitte geben Sie die Adresse Ihres Hausautomationsservers ein</value>
+  </data>
+  <data name="CannotReachServer" xml:space="preserve">
+	  <value>Server nicht erreichbar</value>
+  </data>
+  <data name="CannotReachServerDetails" xml:space="preserve">
+	  <value>Von {0} kam keine Antwort. Bitte prüfen Sie die Adresse, Ihre Netzwerkverbindung und ob der Server läuft.</value>
+  </data>
+  <data name="MustBeValidUrl" xml:space="preserve">
+	  <value>Muss eine vollständige Adresse sein, zum Beispiel https://home.example.com</value>
+  </data>
   <data name="InvalidInverterName" xml:space="preserve">
 	  <value>Der Wechselrichtername muss zwischen 1 und 30 Zeichen beinhalten.</value>
   </data>
