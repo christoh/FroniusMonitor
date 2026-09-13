@@ -1711,4 +1711,22 @@
   <data name="PasswordRequired" xml:space="preserve">
     <value>Un nouvel utilisateur a besoin d&apos;un mot de passe</value>
   </data>
+  <data name="ChangePassword" xml:space="preserve">
+    <value>Changer le mot de passe</value>
+  </data>
+  <data name="CurrentPassword" xml:space="preserve">
+    <value>Mot de passe actuel</value>
+  </data>
+  <data name="NewPassword" xml:space="preserve">
+    <value>Nouveau mot de passe</value>
+  </data>
+  <data name="CannotChangePassword" xml:space="preserve">
+    <value>Impossible de changer le mot de passe</value>
+  </data>
+  <data name="CurrentPasswordIncorrect" xml:space="preserve">
+    <value>Le mot de passe actuel est incorrect</value>
+  </data>
+  <data name="PasswordChanged" xml:space="preserve">
+    <value>Ton mot de passe a été changé</value>
+  </data>
 </root>

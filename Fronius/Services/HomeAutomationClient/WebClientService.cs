@@ -69,6 +69,11 @@ public sealed class WebClientService : IWebClientService
         return DeleteResult<bool>($"Identity/users/{Uri.EscapeDataString(userName)}", token);
     }
 
+    public Task<ApiResult<bool>> ChangePassword(ChangePasswordRequest request, CancellationToken token = default)
+    {
+        return PutResult<bool, ChangePasswordRequest>("Identity/password", request, token);
+    }
+
     #endregion
 
     #region Devices

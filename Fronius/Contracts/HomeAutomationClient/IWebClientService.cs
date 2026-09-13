@@ -49,6 +49,13 @@ public interface IWebClientService : IDisposable
     /// <summary>Removes a user. The server refuses the last administrator. Needs the Administrator role.</summary>
     Task<ApiResult<bool>> DeleteUser(string userName, CancellationToken token = default);
 
+    /// <summary>
+    /// Changes the password of whoever is currently logged in. Needs no role beyond being logged in, unlike
+    /// <see cref="UpdateUser"/> - the server checks the current password instead of a role, so a hijacked
+    /// session alone cannot lock the real user out.
+    /// </summary>
+    Task<ApiResult<bool>> ChangePassword(ChangePasswordRequest request, CancellationToken token = default);
+
     #endregion
 
     #region IPowerConsumer

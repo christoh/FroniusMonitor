@@ -187,6 +187,36 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
         return Ok(ToUserInfo(dbUser));
     }
 
+    /// <summary>
+    /// Lets the logged in user change their own password, without the Administrator role <see cref="UpdateUser"/>
+    /// needs. The current password must be given and match, so a hijacked session alone cannot lock the real
+    /// user out; there is no username in the route because it is always the caller's own account.
+    /// </summary>
+    [HttpPut("password")]
+    [BasicAuthorize]
+    [ProducesResponseType<bool>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+    {
+        var userName = HttpContext.User.Identity!.Name!;
+
+        if (logger.IsEnabled(LogLevel.Information))
+        {
+            logger.LogInformation("{Username} is changing their own password from {Ip}", userName, HttpContext.Connection.RemoteIpAddress);
+        }
+
+        if (FindUser(userName) is not { } dbUser || !dbUser.Authenticate(request.CurrentPassword))
+        {
+            return UnprocessableEntity(Helpers.GetProblemDetails(Loc.CannotChangePassword, Loc.CurrentPasswordIncorrect));
+        }
+
+        dbUser.SetPassword(request.NewPassword);
+        await settings.SaveAsync().ConfigureAwait(false);
+        return Ok(true);
+    }
+
     [HttpDelete("users/{userName}")]
     [BasicAuthorize(Roles = nameof(Roles.Administrator))]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]

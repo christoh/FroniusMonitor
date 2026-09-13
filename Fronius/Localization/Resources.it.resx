@@ -1755,4 +1755,22 @@
   <data name="PasswordRequired" xml:space="preserve">
     <value>Un nuovo utente ha bisogno di una password</value>
   </data>
+  <data name="ChangePassword" xml:space="preserve">
+    <value>Cambia password</value>
+  </data>
+  <data name="CurrentPassword" xml:space="preserve">
+    <value>Password attuale</value>
+  </data>
+  <data name="NewPassword" xml:space="preserve">
+    <value>Nuova password</value>
+  </data>
+  <data name="CannotChangePassword" xml:space="preserve">
+    <value>Impossibile cambiare la password</value>
+  </data>
+  <data name="CurrentPasswordIncorrect" xml:space="preserve">
+    <value>La password attuale non è corretta</value>
+  </data>
+  <data name="PasswordChanged" xml:space="preserve">
+    <value>La tua password è stata cambiata</value>
+  </data>
 </root>

@@ -13,12 +13,14 @@ public sealed partial class MainViewModel : ViewModelBase
 {
     private readonly IGen24LocalizationService gen24Loc;
     private readonly IUriService uriService;
+    private readonly IWebClientService webClient;
 
     public IUpdateService UpdateService { get; }
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public MainViewModel(IWebClientService webClient, IGen24LocalizationService gen24Loc, IUpdateService updateService, IUriService uriService)
     {
+        this.webClient = webClient;
         this.gen24Loc = gen24Loc;
         this.uriService = uriService;
         uriService.PathChanged += OnPathChanged;
@@ -56,7 +58,7 @@ public sealed partial class MainViewModel : ViewModelBase
     /// when <see cref="User"/> is set - which is before the devices are known - and so again once
     /// <see cref="Initialize"/> has started the <see cref="UpdateService"/>.
     /// </remarks>
-    public IReadOnlyList<object> SettingsItems => [.. UpdateService.DevicesWithSettings, UserManagementEntry.Instance];
+    public IReadOnlyList<object> SettingsItems => [.. UpdateService.DevicesWithSettings, UserManagementEntry.Instance, ChangePasswordEntry.Instance];
 
     /// <summary>
     /// Colors all ticks of every gauge, not just those up to the current value. Lives here because the switch for
@@ -160,6 +162,12 @@ public sealed partial class MainViewModel : ViewModelBase
             return;
         }
 
+        if (parameter is ChangePasswordEntry)
+        {
+            await ChangeMyPassword().ConfigureAwait(true);
+            return;
+        }
+
         if (parameter is not IKeyedDevice device)
         {
             throw new ArgumentException($"No settings for {parameter.GetType().Name}", nameof(parameter));
@@ -194,6 +202,55 @@ public sealed partial class MainViewModel : ViewModelBase
         };
 
         await dialog.ShowDialogAsync().ConfigureAwait(true);
+    });
+
+    /// <summary>
+    /// Lets the logged in user change their own password. Unlike an administrator editing someone else's account
+    /// in <see cref="UserManagementViewModel"/>, the server needs the current password rather than a role - see
+    /// <c>IdentityController.ChangePassword</c> - and there is no user list entry to refresh afterwards.
+    /// </summary>
+    private Task ChangeMyPassword() => TaskExceptionHandler(async () =>
+    {
+        var editor = new ChangePasswordViewModel(new DialogParameters { Title = Loc.ChangePassword });
+
+        if (await editor.ShowDialogAsync().ConfigureAwait(true) is not { } request)
+        {
+            return;
+        }
+
+        BusyText = Loc.ChangePassword;
+        var result = await webClient.ChangePassword(request).ConfigureAwait(true);
+
+        if (result.Status != HttpStatusCode.OK)
+        {
+            await ShowHttpError(result).ConfigureAwait(true);
+            return;
+        }
+
+        if (User is { } me)
+        {
+            // The server checks Basic Auth credentials on every call, and the header the client still sends
+            // carries the old password - which stopped being valid the moment the change was saved. Re-login and
+            // persist the new one, the same way UserManagementViewModel.Edit does when an administrator changes
+            // their own account.
+            var login = await webClient.Login(me.UserName, request.NewPassword).ConfigureAwait(true);
+
+            if (login.Status != HttpStatusCode.OK)
+            {
+                await ShowHttpError(login).ConfigureAwait(true);
+                return;
+            }
+
+            await StoredConnection.SaveAsync(me.UserName, request.NewPassword).ConfigureAwait(true);
+        }
+
+        await new MessageBox
+        {
+            Text = Loc.PasswordChanged,
+            Title = Loc.ChangePassword,
+            Buttons = [Loc.Ok],
+            Icon = new InfoIcon(),
+        }.Show().ConfigureAwait(true);
     });
 
     [RelayCommand]

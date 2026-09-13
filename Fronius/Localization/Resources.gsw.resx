@@ -1744,6 +1744,24 @@
     <value>Du chasch dis eigete Benutzerkonto nöd lösche</value>
   </data>
   <data name="PasswordRequired" xml:space="preserve">
-    <value>En neue Benützer bruucht es Chännwort</value>
+      <value>En neue Benützer bruucht es Chännwort</value>
+  </data>
+  <data name="ChangePassword" xml:space="preserve">
+    <value>Chännwort ändere</value>
+  </data>
+  <data name="CurrentPassword" xml:space="preserve">
+    <value>Aktuells Chännwort</value>
+  </data>
+  <data name="NewPassword" xml:space="preserve">
+    <value>Neus Chännwort</value>
+  </data>
+  <data name="CannotChangePassword" xml:space="preserve">
+    <value>Cha s Chännwort nöd ändere</value>
+  </data>
+  <data name="CurrentPasswordIncorrect" xml:space="preserve">
+    <value>S aktuelle Chännwort isch falsch</value>
+  </data>
+  <data name="PasswordChanged" xml:space="preserve">
+    <value>Dis Chännwort isch gänderet worde</value>
   </data>
 </root>

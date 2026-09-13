@@ -1720,4 +1720,22 @@
   <data name="PasswordRequired" xml:space="preserve">
     <value>In nov utilisader dovra in pled-clav</value>
   </data>
+  <data name="ChangePassword" xml:space="preserve">
+    <value>Midar il pled-clav</value>
+  </data>
+  <data name="CurrentPassword" xml:space="preserve">
+    <value>Pled-clav actual</value>
+  </data>
+  <data name="NewPassword" xml:space="preserve">
+    <value>Nov pled-clav</value>
+  </data>
+  <data name="CannotChangePassword" xml:space="preserve">
+    <value>Impussibel da midar il pled-clav</value>
+  </data>
+  <data name="CurrentPasswordIncorrect" xml:space="preserve">
+    <value>Il pled-clav actual è nuncorrect</value>
+  </data>
+  <data name="PasswordChanged" xml:space="preserve">
+    <value>Tes pled-clav è vegnì midà</value>
+  </data>
 </root>

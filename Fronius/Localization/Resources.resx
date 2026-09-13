@@ -1836,4 +1836,22 @@
   <data name="CannotDeleteSelf" xml:space="preserve">
     <value>You cannot delete your own user account</value>
   </data>
+  <data name="ChangePassword" xml:space="preserve">
+    <value>Change password</value>
+  </data>
+  <data name="CurrentPassword" xml:space="preserve">
+    <value>Current password</value>
+  </data>
+  <data name="NewPassword" xml:space="preserve">
+    <value>New password</value>
+  </data>
+  <data name="CannotChangePassword" xml:space="preserve">
+    <value>Cannot change password</value>
+  </data>
+  <data name="CurrentPasswordIncorrect" xml:space="preserve">
+    <value>The current password is incorrect</value>
+  </data>
+  <data name="PasswordChanged" xml:space="preserve">
+    <value>Your password has been changed</value>
+  </data>
 </root>
