@@ -83,15 +83,9 @@ text to English.
 - Always suggest commit and push. Never commit alone.
 - Do not commit without asking the human developer first.
 - Force pushes are **never** allowed by AI.
+- History rewrites need confirmation by a human developer.
 - Commit under your own authorship, never under the human developer's: `git commit --author="<name> <email>"`. The e-mail always stays as in .git/config. Only the name changes.
-  - The author name must name the AI you are **and** the model you are running on, including its version. For
-  example `Claude Code (Opus 5)`, `GitHub Copilot (GPT Terra)`. The tool name on its own is not enough - which model wrote the change is part of the record.
-  - If the working tree also holds changes made by the human developer, split the commit: commit your own changes under your AI authorship and leave theirs to them. Never sign a human's work with your name, or your own work  with theirs.
-  - Committer should never be touched.
-  - If a session used more than one model (a model switch mid-session, or several sessions being committed together)
-    and it is technically possible to tell which model made which change - e.g. from session/event logs recording
-    the active model per edit - split the commit per model instead of signing everything with whichever model is
-    current when `git commit` runs. Each model's changes get their own commit under that model's own authorship
-    (`GitHub Copilot (<Model>)`), same as splitting AI from human changes above. If it is not possible to tell
-    which model made which change, say so and commit as usual under the current model.
-
+  - The author name must name the AI you are **and** the model that made a change, including its version. For
+  example `Claude Code (Opus 5)`, `GitHub Copilot (GPT 5.6 Terra)`. The tool name on its own is not enough - which model wrote the change is part of the record.
+  - If a human developer also made changes, commit under his authorship. Split each commit by authorship. That includes splitting by AI model and splitting by human and AI. You know that in advance so make sure to keep a history of authorships that you can use later.
+  - If you cannot find out which AI model made a change, ask me. Do not guess without asking.
