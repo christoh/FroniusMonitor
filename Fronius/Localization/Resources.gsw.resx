@@ -1287,6 +1287,9 @@
   <data name="Refresh" xml:space="preserve">
 	  <value>Aktualisiere</value>
   </data>
+  <data name="RememberPassword" xml:space="preserve">
+	  <value>Passwort merke</value>
+  </data>
   <data name="InvalidInverterName" xml:space="preserve">
 	  <value>De Wächselrichtername mues zwüsche 1 und 30 Zeiche ha.</value>
   </data>

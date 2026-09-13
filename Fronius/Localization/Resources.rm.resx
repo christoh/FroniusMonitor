@@ -1255,6 +1255,9 @@
   <data name="Refresh" xml:space="preserve">
     <value>Actualisar</value>
   </data>
+  <data name="RememberPassword" xml:space="preserve">
+    <value>Memorisar il pled-clav</value>
+  </data>
   <data name="InvalidInverterName" xml:space="preserve">
     <value>Il num da l'inverter sto avair tranter 1 e 30 caracters.</value>
   </data>

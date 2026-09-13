@@ -1243,6 +1243,9 @@
   <data name="Refresh" xml:space="preserve">
     <value>Actualiser</value>
   </data>
+  <data name="RememberPassword" xml:space="preserve">
+    <value>Mémoriser le mot de passe</value>
+  </data>
   <data name="InvalidInverterName" xml:space="preserve">
     <value>Le nom de l'onduleur doit comporter entre 1 et 30 caractères.</value>
   </data>

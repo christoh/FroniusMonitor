@@ -1293,6 +1293,9 @@
   <data name="Refresh" xml:space="preserve">
 	  <value>Aktualisieren</value>
   </data>
+  <data name="RememberPassword" xml:space="preserve">
+	  <value>Passwort merken</value>
+  </data>
   <data name="InvalidInverterName" xml:space="preserve">
 	  <value>Der Wechselrichtername muss zwischen 1 und 30 Zeichen beinhalten.</value>
   </data>

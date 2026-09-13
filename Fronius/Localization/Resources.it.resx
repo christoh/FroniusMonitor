@@ -1272,6 +1272,9 @@
   <data name="Refresh" xml:space="preserve">
 	  <value>Aggiorna</value>
   </data>
+  <data name="RememberPassword" xml:space="preserve">
+	  <value>Ricorda la password</value>
+  </data>
   <data name="InvalidInverterName" xml:space="preserve">
 	  <value>Il nome dell'inverter deve avere da 1 a 30 caratteri.</value>
   </data>

@@ -3974,6 +3974,15 @@ namespace De.Hochstaetter.Fronius.Localization {
                 return ResourceManager.GetString("Refresh", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Remember password.
+        /// </summary>
+        public static string RememberPassword {
+            get {
+                return ResourceManager.GetString("RememberPassword", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to Require RFID card to charge.
