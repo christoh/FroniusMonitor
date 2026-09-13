@@ -15,7 +15,6 @@
     <File Path=".claude/memory/Gen24Polling.md" />
     <File Path=".claude/memory/HomeAutomationClient.CodeBehindInjection.md" />
     <File Path=".claude/memory/InverterDetailsView.Lifecycle.md" />
-    <File Path=".claude/memory/Localization.md" />
     <File Path=".claude/memory/Navigation.Lifecycle.md" />
     <File Path=".claude/memory/PlatformHeads.Lifecycle.md" />
     <File Path=".claude/memory/SettingsDialogs.Lifecycle.md" />
@@ -26,10 +25,12 @@
     <File Path=".claude/memory/ViewModelBase.Features.md" />
     <File Path=".claude/memory/WattPilot.md" />
     <File Path=".claude/memory/WattPilotDetailsView.Lifecycle.md" />
+    <File Path=".claude/memory/ServerExitCodes.LifeCycle.md" />
   </Folder>
   <Folder Name="/Solution Items/Rules/">
     <File Path=".claude/rules/PortingFroniusMonitor.md" />
     <File Path=".claude/rules/ViewModelsForInteractionLogic.md" />
+    <File Path=".claude/rules/Localization.md" />
   </Folder>
   <Project Path="Fronius/Fronius.csproj" />
   <Project Path="FroniusMonitor/FroniusMonitor.csproj" />
