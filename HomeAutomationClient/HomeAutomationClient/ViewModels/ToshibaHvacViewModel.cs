@@ -300,6 +300,7 @@ public partial class ToshibaHvacViewModel(IToshibaHvacCommander commander) : Vie
             return;
         }
 
+        var previousState = Device.State != null ? new ToshibaHvacStateData { StateData = [.. Device.State.StateData] } : null;
         var state = new ToshibaHvacStateData();
         change(state);
         IsSending = true;
@@ -316,10 +317,16 @@ public partial class ToshibaHvacViewModel(IToshibaHvacCommander commander) : Vie
             }
             catch (HubException ex)
             {
+                RestoreState(previousState);
                 IsSending = false;
                 BusyText = null;
                 await ex.ShowHubError();
                 return;
+            }
+            catch
+            {
+                RestoreState(previousState);
+                throw;
             }
 
             if (!result.IsSuccess)
@@ -332,6 +339,14 @@ public partial class ToshibaHvacViewModel(IToshibaHvacCommander commander) : Vie
             IsSending = false;
         }
     });
+
+    private void RestoreState(ToshibaHvacStateData? previousState)
+    {
+        if (Device != null && previousState != null)
+        {
+            Device.State.StateData = [.. previousState.StateData];
+        }
+    }
 
     /// <summary>The message for a command that was sent but not echoed. Virtual so a test can catch it instead of a dialog.</summary>
     protected virtual Task ShowUnconfirmed(ToshibaHvacCommandResult result) => new MessageBox

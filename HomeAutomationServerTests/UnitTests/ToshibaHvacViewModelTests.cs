@@ -112,6 +112,19 @@ public sealed class ToshibaHvacViewModelTests
     }
 
     [Fact]
+    public void RestoreState_reverts_the_power_toggle_to_the_last_known_value()
+    {
+        var previousState = new ToshibaHvacStateData { StateData = [.. device.State.StateData] };
+        device.State.IsTurnedOn = false;
+
+        var restore = typeof(ToshibaHvacViewModel).GetMethod("RestoreState", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        Assert.NotNull(restore);
+        restore.Invoke(viewModel, [previousState]);
+
+        Assert.True(device.State.IsTurnedOn);
+    }
+
+    [Fact]
     public async Task The_temperature_is_stepped_and_clamped_and_the_same_value_is_not_sent()
     {
         await viewModel.TemperatureUpCommand.ExecuteAsync(null);
