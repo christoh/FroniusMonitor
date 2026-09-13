@@ -82,6 +82,9 @@ internal class Program
             settings.ModbusMappings.Add(new ModbusMapping());
             // Shows the shape of the Toshiba section; with an empty user name nothing is collected.
             settings.ToshibaHvac = new ToshibaHvacSettings();
+            // Shows the shape of the price chart section. Without a postal code and a bearer only the market
+            // prices are collected, which need no account at all.
+            settings.EnergyData = new EnergyDataSettings();
             await settings.SaveAsync().ConfigureAwait(false);
             settingsLoadException = ex;
         }
@@ -116,6 +119,14 @@ internal class Program
             .AddSingleton<IToshibaHvacSessionStore, ToshibaHvacSessionStore>()
             .AddSingleton<IToshibaHvacService, ToshibaHvacService>()
             .AddSingleton<ToshibaHvacDataCollector>()
+            // The price chart: Awattar and the DWD are read by the collector, the history is one SQLite file, and
+            // the controller reads the collector under its contract - the same instance, so the current data the
+            // hub pushed is the data the controller answers.
+            .AddSingleton<IAwattarClient, AwattarClient>()
+            .AddSingleton<IDwdWeatherClient, DwdWeatherClient>()
+            .AddSingleton<IEnergyHistoryStore, EnergyHistoryStore>()
+            .AddSingleton<EnergyDataCollector>()
+            .AddSingleton<IEnergyDataService>(services => services.GetRequiredService<EnergyDataCollector>())
             .AddTransient<ISunSpecClient, SunSpecClient>()
             .AddLogging(b => b.AddSerilog())
             .AddCors(o => o.AddDefaultPolicy(p => p.SetIsOriginAllowed(_ => true)
@@ -182,6 +193,7 @@ internal class Program
                     t.AzureDeviceId = settings.ToshibaHvac?.AzureDeviceIdString ?? string.Empty;
                     t.MappingRefreshRate = TimeSpan.FromMinutes(Math.Max(1, settings.ToshibaHvac?.MappingRefreshMinutes ?? 30));
                 })
+                .Configure<EnergyDataCollectorParameters>(e => { e.Settings = settings.EnergyData; })
                 .Configure<UserList>(u => { u.Users = settings.Users; });
         }
 
@@ -271,6 +283,7 @@ internal class Program
         await IoC.Get<SignalRDispatcher>().StartAsync().ConfigureAwait(false);
         await IoC.Get<WattPilotDataCollector>().StartAsync().ConfigureAwait(false);
         await IoC.Get<ToshibaHvacDataCollector>().StartAsync().ConfigureAwait(false);
+        await IoC.Get<EnergyDataCollector>().StartAsync().ConfigureAwait(false);
         //await Task.Delay(TimeSpan.FromSeconds(30));
         //await IoC.Get<SunSpecDataCollector>().StopAsync().ConfigureAwait(false);
         //await IoC.Get<Gen24DataCollector>().StopAsync().ConfigureAwait(false);

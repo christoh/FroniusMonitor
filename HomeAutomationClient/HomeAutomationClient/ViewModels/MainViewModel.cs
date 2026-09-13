@@ -274,6 +274,16 @@ public sealed partial class MainViewModel : ViewModelBase
         }.Show().ConfigureAwait(true);
     });
 
+    /// <summary>
+    /// The price chart. Not a device and not a setting, so it has a button of its own in the menu bar, shown once
+    /// the server has sent price data - a server that collects none has nothing to show.
+    /// </summary>
+    [RelayCommand]
+    private Task ShowEnergyChart() => TaskExceptionHandler(async () =>
+    {
+        await new EnergyChartViewModel(new DialogParameters { Title = Loc.ElectricityPrice, IsResizeable = true }).ShowDialogAsync().ConfigureAwait(true);
+    });
+
     [RelayCommand]
     private Task ShowDetails(IKeyedDevice device) => ShowDetails(device, updatesAddress: true);
 

@@ -13,6 +13,8 @@ RUN apk --no-cache update && \
     #dotnet workload update && \
     rm -fr /build/Fronius/bin /build/Fronius/obj bin obj && \
     mkdir -p /runner/app && \
+    # The price and weather history; mount this folder to keep it across containers (see docker-compose.yml).
+    mkdir -p /runner/app/history && \
     mkdir -p /runner/root && \
     mkdir -p /runner/home/app
 
@@ -141,12 +143,13 @@ COPY --from=builder /runner/ /
 
 RUN apk --no-cache update &&\
     apk --no-cache upgrade &&\
-    apk --no-cache add doas fastfetch alpine-release icu-libs curl &&\
+    # tzdata: the EnergyData section of Settings.xml names a time zone such as Europe/Berlin, which needs the zone files.
+    apk --no-cache add doas fastfetch alpine-release icu-libs curl tzdata &&\
     unset DOTNET_SYSTEM_GLOBALIZATION_INVARIANT &&\
     ln -s /root/.ashrc /home/app/.ashrc &&\
     ln -s /root/.profile /home/app/.profile &&\
     chmod 755 /root /startup.sh /root/.ashrc /root/.profile &&\
-    chown -R app:app /home/app
+    chown -R app:app /home/app /app/history
 
 WORKDIR /home/app
 USER app

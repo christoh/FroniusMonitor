@@ -44,6 +44,13 @@ internal partial class UpdateService(IWebClientService webClient, ILogger<Update
     [ObservableProperty]
     public partial double SitePvPeakPower { get; set; }
 
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(HasEnergyData))]
+    public partial EnergyChartData? EnergyChartData { get; set; }
+
+    public bool HasEnergyData => EnergyChartData != null;
+
+    public event EventHandler<EnergyChartData>? EnergyChartDataChanged;
+
     public IEnumerable<IKeyedDevice> DetailDevices
     {
         get
@@ -101,7 +108,15 @@ internal partial class UpdateService(IWebClientService webClient, ILogger<Update
 
         NotifyOfPropertyChange(nameof(ShowPowerConsumers));
 
-        var hubUri = IoC.TryGetRegistered<ICache>()?.Get<string>(CacheKeys.HubUri) ?? "http://www.example.com/hub";
+        // 404 where the server collects no energy data, which is not an error: the menu then has no chart.
+        var energyResult = await webClient.GetEnergyData();
+
+        if (energyResult is { Status: HttpStatusCode.OK, Payload: { } energyData })
+        {
+            EnergyChartData = energyData;
+        }
+
+        var hubUri =IoC.TryGetRegistered<ICache>()?.Get<string>(CacheKeys.HubUri) ?? "http://www.example.com/hub";
 
         hubConnection = new HubConnectionBuilder()
             // The ticket, not the password: on the WebSocket transport SignalR can only pass this in the query
@@ -128,6 +143,24 @@ internal partial class UpdateService(IWebClientService webClient, ILogger<Update
         hubConnection.On<string, WattPilot>(nameof(WattPilot), OnWattPilotUpdate);
         hubConnection.On<string, WattPilotUpdate>(nameof(WattPilotUpdate), OnWattPilotUpdateMessage);
         hubConnection.On<string, ToshibaHvacMappingDevice>(nameof(ToshibaHvacMappingDevice), OnToshibaHvacUpdate);
+        hubConnection.On<string, EnergyChartData>(nameof(EnergyChartData), OnEnergyChartData);
+    }
+
+    /// <summary>
+    /// The server sends the whole chart data on every change - a few kilobytes a few times a day. Replaced as one
+    /// object rather than copied into place: nothing binds to the parts, the chart is rebuilt from the whole.
+    /// </summary>
+    private void OnEnergyChartData(string id, EnergyChartData data)
+    {
+        try
+        {
+            EnergyChartData = data;
+            EnergyChartDataChanged?.Invoke(this, data);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Updating the energy data failed.");
+        }
     }
 
     public Task<WattPilotWriteResult> SetWattPilotSettings(string deviceId, WattPilot wanted, WattPilot loaded) =>

@@ -62,6 +62,9 @@
                         </MenuFlyout>
                     </Button.Flyout>
                 </Button>
+                <!-- The price chart, once the server has sent price data; see MainViewModel.ShowEnergyChart. -->
+                <Button Content="{x:Static p:Resources.ElectricityPrice}" Theme="{StaticResource MenuButtonStyle}"
+                        Command="{Binding ShowEnergyChartCommand}" IsVisible="{Binding UpdateService.HasEnergyData}" />
             </StackPanel>
             <!-- Who is logged in, and as what. The roles are the server's enum names on purpose, not translated. -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="8,0" Spacing="6">

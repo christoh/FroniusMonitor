@@ -145,4 +145,17 @@ public interface IWebClientService : IDisposable
     Task<ApiResult<Dictionary<string, ToshibaHvacMappingDevice>>> GetToshibaHvacDevices(CancellationToken token = default);
 
     #endregion
+
+    #region EnergyData
+
+    /// <summary>
+    /// The price chart data of today and tomorrow, to load once; changes arrive over the hub as
+    /// <c>EnergyChartData</c> messages. 404 where the server collects no energy data.
+    /// </summary>
+    Task<ApiResult<EnergyChartData>> GetEnergyData(CancellationToken token = default);
+
+    /// <summary>One day of the server's local time, yesterday or older from the server's history.</summary>
+    Task<ApiResult<EnergyChartData>> GetEnergyData(DateOnly day, CancellationToken token = default);
+
+    #endregion
 }

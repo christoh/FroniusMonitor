@@ -5324,6 +5324,123 @@ namespace De.Hochstaetter.Fronius.Localization {
             get {
                 return ResourceManager.GetString("PasswordChanged", resourceCulture);
             }
+        }        
+        /// <summary>
+        ///   Looks up a localized string similar to Service fee aWATTar.
+        /// </summary>
+        public static string AwattarServiceFee {
+            get {
+                return ResourceManager.GetString("AwattarServiceFee", resourceCulture);
+            }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tomorrow.
+        /// </summary>
+        public static string Tomorrow {
+            get {
+                return ResourceManager.GetString("Tomorrow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Weather (DWD).
+        /// </summary>
+        public static string WeatherDwd {
+            get {
+                return ResourceManager.GetString("WeatherDwd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Global radiation.
+        /// </summary>
+        public static string GlobalRadiation {
+            get {
+                return ResourceManager.GetString("GlobalRadiation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wind speed.
+        /// </summary>
+        public static string WindSpeed {
+            get {
+                return ResourceManager.GetString("WindSpeed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Forecast.
+        /// </summary>
+        public static string Forecast {
+            get {
+                return ResourceManager.GetString("Forecast", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Measured.
+        /// </summary>
+        public static string Measured {
+            get {
+                return ResourceManager.GetString("Measured", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading prices and weather.
+        /// </summary>
+        public static string LoadingEnergyData {
+            get {
+                return ResourceManager.GetString("LoadingEnergyData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No price data available for this day.
+        /// </summary>
+        public static string NoEnergyData {
+            get {
+                return ResourceManager.GetString("NoEnergyData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Prices from the Wattpilot.
+        /// </summary>
+        public static string PricesFromWattPilot {
+            get {
+                return ResourceManager.GetString("PricesFromWattPilot", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No weather data.
+        /// </summary>
+        public static string NoWeatherData {
+            get {
+                return ResourceManager.GetString("NoWeatherData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No wind and solar production data.
+        /// </summary>
+        public static string NoProductionData {
+            get {
+                return ResourceManager.GetString("NoProductionData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The price components are not available.
+        /// </summary>
+        public static string NoPriceComponents {
+            get {
+                return ResourceManager.GetString("NoPriceComponents", resourceCulture);
+            }
+        }
+
     }
 }

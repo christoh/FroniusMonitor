@@ -29,6 +29,9 @@
 			<IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
 			<PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
 		</PackageReference>
+		<!-- The price chart. OxyPlot, which the WPF app draws it with, has no Avalonia package worth the name;
+		     ScottPlot renders through the Skia Avalonia already uses, on every head. -->
+		<PackageReference Include="ScottPlot.Avalonia" Version="5.1.59" />
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.12" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
 		<!-- The default log provider for every head that has nowhere better to write; the desktop head uses Serilog. -->

@@ -34,6 +34,18 @@ public interface IUpdateService : IDisposable, IAsyncDisposable, IToshibaHvacCom
 
     public bool ShowPowerConsumers { get; }
 
+    /// <summary>
+    /// The price chart data of today and tomorrow as the server last pushed it, or <see langword="null"/> where
+    /// the server collects none. Replaced as a whole on every push; <see cref="EnergyChartDataChanged"/> says when.
+    /// </summary>
+    public EnergyChartData? EnergyChartData { get; }
+
+    /// <summary>True as soon as the server has sent price chart data, which is what makes the menu offer the chart.</summary>
+    public bool HasEnergyData { get; }
+
+    /// <summary>Raised on the thread the hub delivers on whenever <see cref="EnergyChartData"/> is replaced.</summary>
+    event EventHandler<EnergyChartData>? EnergyChartDataChanged;
+
     public Task StartAsync();
 
     /// <summary>

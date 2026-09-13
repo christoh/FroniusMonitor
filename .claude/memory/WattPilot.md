@@ -331,6 +331,10 @@ app; the Avalonia one takes the `WattPilot` as a styled property where the WPF o
 the registered `IElectricityPriceService`, expanded into one `ElectricityPrice` per interval. The service does
 not support history or choosing a zone (`CanSetPriceRegion => false`); the zone is whatever `awc` says.
 
+That is the WPF app's path. On the server the same `awpl` is read off the published `WattPilot` by
+`EnergyDataCollector`, which prefers Awattar and uses the charger's prices only for the slots Awattar has not
+answered - see [[EnergyData]]. Nothing on the server uses `WattPilotElectricityService`.
+
 ## The cloud API, for looking at a live charger
 
 `https://<serial>.api.v3.go-e.io/api/status?token=<cak>` answers the **whole status as one JSON document with

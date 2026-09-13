@@ -35,6 +35,10 @@ public class Settings
     [XmlElement, DefaultValue(null)]
     public ToshibaHvacSettings? ToshibaHvac { get; set; }
 
+    /// <summary>The sources of the price chart, or <see langword="null" /> when the server collects no prices and no weather.</summary>
+    [XmlElement, DefaultValue(null)]
+    public EnergyDataSettings? EnergyData { get; set; }
+
     [XmlIgnore] public static string SettingsFileName { get; set; } = Path.Combine(AppContext.BaseDirectory, "Settings.xml");
 
     public static Task<Settings> LoadAsync(string? fileName = null, CancellationToken token = default) => Task.Run(() => Load(fileName), token);

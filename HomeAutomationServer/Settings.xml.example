@@ -11,4 +11,15 @@
    <!-- Optional. AzureDeviceId is drawn at random and written here on the first start; do not change it afterwards.
         Session is the bearer token of the last login and is filled in by the server. -->
    <ToshibaHvac BaseUrl="https://mobileapi.toshibahomeaccontrols.com" UserName="you@example.com" ClearTextPassword="your password, replaced by an encrypted Password on the first save" AzureDeviceId="123456" MappingRefreshMinutes="30" />
+   <!-- Optional. The price chart: market prices, sun and wind production and the tariff from Awattar (tado° Energy),
+        the weather from the German weather service (DWD). Leave the element out to collect none of it.
+        Bearer is Awattar's fixed token for the tariff query; without it (and PostalCode and GridOperatorId) the
+        market prices are still collected, only the price components stay empty. It is stored in clear text.
+        GridOperatorId is the 13 digit id of your grid operator (Netzbetreiber), PostalCode selects the tariff.
+        SurchargeCentsPerKiloWattHour is Awattar's own service fee, which is not in their answer.
+        DwdStationId is a station of the MOSMIX catalogue (https://www.dwd.de/DE/leistungen/met_verfahren_mosmix/mosmix_stationskatalog.cfg);
+        10870 is München-Flughafen. TimeZoneId says which local time the polling windows and the days are meant in;
+        a container runs in UTC unless it is set here or through TZ. The history goes to history/PriceAndWeatherHistory.db
+        next to the executable; mount that folder to keep it. -->
+   <EnergyData Bearer="your Awattar bearer token" PostalCode="85375" GridOperatorId="9901068000001" SurchargeCentsPerKiloWattHour="1.5" VatRatePercent="19" PriceRegion="GermanyLuxembourg" DwdStationId="10870" TimeZoneId="Europe/Berlin" />
 </Settings>

@@ -1,0 +1,45 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
+             xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+             mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="320"
+             x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.PriceComponentsView"
+             x:DataType="dialogs:PriceComponentsViewModel"
+             MinWidth="320" MaxWidth="900" FontSize="12">
+	<!-- The same density as the event log: a table of a dozen rows read, not touched. -->
+	<UserControl.Styles>
+		<StyleInclude Source="avares://HomeAutomationClient/Styles/CompactForms.axaml" />
+	</UserControl.Styles>
+
+	<Grid RowDefinitions="Auto,Auto,Auto" Margin="0,0,0,8">
+		<!-- Sized to its content, as the WPF window was: a fixed dozen rows need no scrolling and no virtualization. -->
+		<DataGrid Grid.Row="0" ItemsSource="{Binding Components}" IsReadOnly="True" AutoGenerateColumns="False"
+		          GridLinesVisibility="Vertical" BorderThickness="0" ColumnWidth="Auto"
+		          CanUserSortColumns="False" CanUserResizeColumns="False" CanUserReorderColumns="False">
+			<DataGrid.Columns>
+				<c:CompactTextColumn Header="{x:Static p:Resources.Component}" Binding="{Binding Description}" />
+				<!-- Tabular figures, so the decimals of the rows stand one under another. -->
+				<c:CompactTextColumn Header="{x:Static p:Resources.Net}" FontFeatures="+tnum" Binding="{Binding NetPrice, StringFormat=N4}" />
+				<c:CompactTextColumn Header="{x:Static p:Resources.Vat}" FontFeatures="+tnum" Binding="{Binding TaxRate, StringFormat=P1}" />
+				<c:CompactTextColumn Header="{x:Static p:Resources.Gross}" FontFeatures="+tnum" Binding="{Binding GrossPrice, StringFormat=N4}" />
+				<c:CompactTextColumn Header="{x:Static p:Resources.Unit}" Binding="{Binding Unit}" />
+			</DataGrid.Columns>
+		</DataGrid>
+
+		<TextBlock Grid.Row="1" Margin="12,10,12,0" FontSize="14" FontWeight="Bold">
+			<Run Text="{x:Static p:Resources.Sum}" /><Run Text=":" />
+			<Run Text="{Binding NetSum, Mode=OneWay, StringFormat=N4}" />
+			<Run Text="{Binding Unit, Mode=OneWay}" />
+			<Run Text="{x:Static p:Resources.Net}" />
+			<Run Text="(" /><Run Text="{Binding GrossSum, Mode=OneWay, StringFormat=N4}" />
+			<Run Text="{Binding Unit, Mode=OneWay}" />
+			<Run Text="{x:Static p:Resources.Gross}" /><Run Text=")" />
+		</TextBlock>
+
+		<Button Grid.Row="2" MinWidth="70" Margin="12,10,12,0" HorizontalAlignment="Right" HorizontalContentAlignment="Center"
+		        Content="{x:Static p:Resources.Ok}" Command="{Binding CloseDialogCommand}" />
+	</Grid>
+</UserControl>

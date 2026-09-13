@@ -1747,4 +1747,43 @@
   <data name="PasswordChanged" xml:space="preserve">
     <value>Ton mot de passe a été changé</value>
   </data>
+  <data name="AwattarServiceFee" xml:space="preserve">
+    <value>Frais de service aWATTar</value>
+  </data>
+  <data name="Tomorrow" xml:space="preserve">
+    <value>Demain</value>
+  </data>
+  <data name="WeatherDwd" xml:space="preserve">
+    <value>MÃ©tÃ©o (DWD)</value>
+  </data>
+  <data name="GlobalRadiation" xml:space="preserve">
+    <value>Rayonnement global</value>
+  </data>
+  <data name="WindSpeed" xml:space="preserve">
+    <value>Vitesse du vent</value>
+  </data>
+  <data name="Forecast" xml:space="preserve">
+    <value>PrÃ©vision</value>
+  </data>
+  <data name="Measured" xml:space="preserve">
+    <value>MesurÃ©</value>
+  </data>
+  <data name="LoadingEnergyData" xml:space="preserve">
+    <value>Chargement des prix et de la mÃ©tÃ©o</value>
+  </data>
+  <data name="NoEnergyData" xml:space="preserve">
+    <value>Aucune donnÃ©e de prix disponible pour ce jour</value>
+  </data>
+  <data name="PricesFromWattPilot" xml:space="preserve">
+    <value>Prix du Wattpilot</value>
+  </data>
+  <data name="NoWeatherData" xml:space="preserve">
+    <value>Aucune donnÃ©e mÃ©tÃ©o</value>
+  </data>
+  <data name="NoProductionData" xml:space="preserve">
+    <value>Aucune donnÃ©e de production Ã©olienne et solaire</value>
+  </data>
+  <data name="NoPriceComponents" xml:space="preserve">
+    <value>Les composantes du prix ne sont pas disponibles</value>
+  </data>
 </root>

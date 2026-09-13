@@ -1756,4 +1756,43 @@
   <data name="PasswordChanged" xml:space="preserve">
     <value>Tes pled-clav è vegnì midà</value>
   </data>
+  <data name="AwattarServiceFee" xml:space="preserve">
+    <value>Taxa da servetsch aWATTar</value>
+  </data>
+  <data name="Tomorrow" xml:space="preserve">
+    <value>Damaun</value>
+  </data>
+  <data name="WeatherDwd" xml:space="preserve">
+    <value>Aura (DWD)</value>
+  </data>
+  <data name="GlobalRadiation" xml:space="preserve">
+    <value>Radiaziun globala</value>
+  </data>
+  <data name="WindSpeed" xml:space="preserve">
+    <value>Sveltezza dal vent</value>
+  </data>
+  <data name="Forecast" xml:space="preserve">
+    <value>Prognosa</value>
+  </data>
+  <data name="Measured" xml:space="preserve">
+    <value>MesirÃ </value>
+  </data>
+  <data name="LoadingEnergyData" xml:space="preserve">
+    <value>Chargiar pretschs ed aura</value>
+  </data>
+  <data name="NoEnergyData" xml:space="preserve">
+    <value>Naginas datas da pretsch disponiblas per quest di</value>
+  </data>
+  <data name="PricesFromWattPilot" xml:space="preserve">
+    <value>Pretschs dal Wattpilot</value>
+  </data>
+  <data name="NoWeatherData" xml:space="preserve">
+    <value>Naginas datas da l'aura</value>
+  </data>
+  <data name="NoProductionData" xml:space="preserve">
+    <value>Naginas datas da la producziun da vent e solara</value>
+  </data>
+  <data name="NoPriceComponents" xml:space="preserve">
+    <value>Las cumponentas dal pretsch n'Ã¨n betg disponiblas</value>
+  </data>
 </root>

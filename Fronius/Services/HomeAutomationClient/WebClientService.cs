@@ -160,6 +160,15 @@ public sealed class WebClientService : IWebClientService
 
     #endregion
 
+    #region EnergyData
+
+    public Task<ApiResult<EnergyChartData>> GetEnergyData(CancellationToken token = default) => GetResult<EnergyChartData>("EnergyData", token);
+
+    public Task<ApiResult<EnergyChartData>> GetEnergyData(DateOnly day, CancellationToken token = default) =>
+        GetResult<EnergyChartData>(FormattableString.Invariant($"EnergyData/{day:yyyy-MM-dd}"), token);
+
+    #endregion
+
     #region Gen24
 
     public async Task<ApiResult<Dictionary<string, Gen24System>>> GetGen24Devices(CancellationToken token = default)

@@ -1791,4 +1791,43 @@
   <data name="PasswordChanged" xml:space="preserve">
     <value>La tua password è stata cambiata</value>
   </data>
+  <data name="AwattarServiceFee" xml:space="preserve">
+    <value>Commissione di servizio aWATTar</value>
+  </data>
+  <data name="Tomorrow" xml:space="preserve">
+    <value>Domani</value>
+  </data>
+  <data name="WeatherDwd" xml:space="preserve">
+    <value>Meteo (DWD)</value>
+  </data>
+  <data name="GlobalRadiation" xml:space="preserve">
+    <value>Radiazione globale</value>
+  </data>
+  <data name="WindSpeed" xml:space="preserve">
+    <value>VelocitÃ  del vento</value>
+  </data>
+  <data name="Forecast" xml:space="preserve">
+    <value>Previsione</value>
+  </data>
+  <data name="Measured" xml:space="preserve">
+    <value>Misurato</value>
+  </data>
+  <data name="LoadingEnergyData" xml:space="preserve">
+    <value>Caricamento di prezzi e meteo</value>
+  </data>
+  <data name="NoEnergyData" xml:space="preserve">
+    <value>Nessun dato sui prezzi disponibile per questo giorno</value>
+  </data>
+  <data name="PricesFromWattPilot" xml:space="preserve">
+    <value>Prezzi dal Wattpilot</value>
+  </data>
+  <data name="NoWeatherData" xml:space="preserve">
+    <value>Nessun dato meteo</value>
+  </data>
+  <data name="NoProductionData" xml:space="preserve">
+    <value>Nessun dato sulla produzione eolica e solare</value>
+  </data>
+  <data name="NoPriceComponents" xml:space="preserve">
+    <value>Le componenti del prezzo non sono disponibili</value>
+  </data>
 </root>

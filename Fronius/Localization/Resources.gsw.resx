@@ -1782,4 +1782,43 @@
   <data name="PasswordChanged" xml:space="preserve">
     <value>Dis Chännwort isch gänderet worde</value>
   </data>
+  <data name="AwattarServiceFee" xml:space="preserve">
+    <value>ServicegebÃ¼hr aWATTar</value>
+  </data>
+  <data name="Tomorrow" xml:space="preserve">
+    <value>Morn</value>
+  </data>
+  <data name="WeatherDwd" xml:space="preserve">
+    <value>WÃ¤tter (DWD)</value>
+  </data>
+  <data name="GlobalRadiation" xml:space="preserve">
+    <value>Globalstrahlig</value>
+  </data>
+  <data name="WindSpeed" xml:space="preserve">
+    <value>Windgschwindigkeit</value>
+  </data>
+  <data name="Forecast" xml:space="preserve">
+    <value>Prognose</value>
+  </data>
+  <data name="Measured" xml:space="preserve">
+    <value>GmÃ¤sse</value>
+  </data>
+  <data name="LoadingEnergyData" xml:space="preserve">
+    <value>Priis und WÃ¤tter wÃ¤rde glade</value>
+  </data>
+  <data name="NoEnergyData" xml:space="preserve">
+    <value>FÃ¼r dÃ¤ Tag sind kei Priisdate verfÃ¼egbar</value>
+  </data>
+  <data name="PricesFromWattPilot" xml:space="preserve">
+    <value>Priis vom Wattpilot</value>
+  </data>
+  <data name="NoWeatherData" xml:space="preserve">
+    <value>Kei WÃ¤tterdate</value>
+  </data>
+  <data name="NoProductionData" xml:space="preserve">
+    <value>Kei Date zur Wind- und Solarproduktion</value>
+  </data>
+  <data name="NoPriceComponents" xml:space="preserve">
+    <value>Die Priisbestandteil sind nid verfÃ¼egbar</value>
+  </data>
 </root>

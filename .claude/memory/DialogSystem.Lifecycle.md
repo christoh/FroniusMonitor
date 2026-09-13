@@ -130,8 +130,9 @@ dialog can be dragged by both.
 Off unless a dialog asks for it (`IsResizeable`), because a dialog is as big as what it has to show and a form
 dragged wider only grows its whitespace. `Controls/DragResize.cs` is the counterpart of `DragMove`, an attached
 behavior on the grip in the bottom right corner of the frame, wired the same way and dropped by the same trigger.
-The only dialog that asks for it today is the settings dialog, and only while its event log tab is on screen -
-that tab is a table of a few hundred rows and the user is the one who knows how much room to give it.
+Two dialogs ask for it today: the settings dialog, only while its event log tab is on screen - that tab is a table
+of a few hundred rows and the user is the one who knows how much room to give it - and the price chart
+(`EnergyChartViewModel`, see [[EnergyData]]), from the start, because a chart gets better with every pixel.
 
 **What it promises: a dialog can be dragged to fill the whole overlay, from wherever it happens to sit, and
 nothing is ever clipped.** Getting there took five attempts and every one of them failed in the same two ways -

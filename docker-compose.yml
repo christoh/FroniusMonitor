@@ -11,6 +11,7 @@ services:
 #    volumes:
 #      - /d/Docker/HomeAutomationServer/Settings.xml:/app/Settings.xml # Map to the Settings.xml file on the Docker host
 #      - /d/Docker/HomeAutomationServer/EnergyHistory-2456552877.log:/var/log/EnergyHistory-2456552877.log # Map to log on your Docker host
+#      - /d/Docker/HomeAutomationServer/history:/app/history # The price and weather history (SQLite); mount it or it is lost with the container
     user: app
     build:
       tags:
@@ -23,6 +24,7 @@ services:
         - linux/arm/v7
 #    environment:
 #      - HOME_AUTOMATION_SECRET=Djd./.ed$0|ks.c!eii\e6 # Choose your very own and unique secret. Use the same secret on your computer where you set the passwords for the Settings.xml file
+#      - TZ=Europe/Berlin # The local time of the price chart's polling windows, unless TimeZoneId is set in Settings.xml
 
   home-automation-client:
     image: ghcr.io/christoh/home-automation-client:latest
