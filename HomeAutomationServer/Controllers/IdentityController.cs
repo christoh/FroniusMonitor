@@ -149,9 +149,15 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
     public async Task<IActionResult> UpdateUser(string userName, [FromBody] UserAccount account)
     {
+        // The new name is logged next to the old one: a rename that silently does nothing looks exactly like a
+        // rename that was never asked for, and only the request body tells the two apart.
         if (logger.IsEnabled(LogLevel.Information))
         {
-            logger.LogInformation("User {ChangedUsername} will be changed by {Username} from {Ip}", userName, HttpContext.User.Identity!.Name, HttpContext.Connection.RemoteIpAddress);
+            logger.LogInformation
+            (
+                "User {ChangedUsername} will be changed to name {NewUsername} and roles {NewRoles} by {Username} from {Ip}",
+                userName, account.UserName, account.Roles, HttpContext.User.Identity!.Name, HttpContext.Connection.RemoteIpAddress
+            );
         }
 
         if (FindUser(userName) is not { } dbUser)

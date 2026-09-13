@@ -212,6 +212,46 @@ public sealed class UserManagementTests : IAsyncLifetime
         Assert.Equal(HttpStatusCode.Unauthorized, (await bob.Login(MemberName, TestUsers.Password)).Status);
     }
 
+    /// <summary>
+    /// Adding, editing and deleting must all reach <c>Settings.xml</c>, not just the in-memory user list - a
+    /// change that is only in memory is lost on the next restart. The file is read back with the real
+    /// <see cref="Settings.Load"/> rather than by searching the text, so an entry that is written but cannot be
+    /// deserialized again counts as a failure too.
+    /// </summary>
+    [Fact]
+    public async Task Adding_editing_and_deleting_are_all_written_to_the_settings_file()
+    {
+        Assert.Equal(HttpStatusCode.OK, (await admin.AddUser(new UserAccount { UserName = "alice", Password = "wonderland", Roles = Roles.User })).Status);
+        Assert.Contains(UsersOnDisk(), u => u.Username == "alice");
+
+        // A rename is the edit that is easiest to lose: the name is the key the user is found by, and it is not
+        // part of the password hash, so nothing else in the file changes with it.
+        Assert.Equal(HttpStatusCode.OK, (await admin.UpdateUser("alice", new UserAccount { UserName = "alicia", Roles = Roles.Operator })).Status);
+        var edited = Assert.Single(UsersOnDisk(), u => u.Username == "alicia");
+        Assert.Equal(Roles.Operator, edited.Roles);
+        Assert.DoesNotContain(UsersOnDisk(), u => u.Username == "alice");
+
+        Assert.Equal(HttpStatusCode.OK, (await admin.DeleteUser("alicia")).Status);
+        Assert.DoesNotContain(UsersOnDisk(), u => u.Username == "alicia");
+    }
+
+    /// <summary>
+    /// The same, for an administrator renaming themselves - the request is authenticated with the very credentials
+    /// the rename invalidates, so it is worth proving the change still lands in the file.
+    /// </summary>
+    [Fact]
+    public async Task An_administrator_renaming_themselves_is_written_to_the_settings_file()
+    {
+        var renamed = await admin.UpdateUser(AdminName, new UserAccount { UserName = "superroot", Roles = Roles.Administrator });
+
+        Assert.Equal(HttpStatusCode.OK, renamed.Status);
+        Assert.Equal("superroot", renamed.Payload?.UserName);
+        Assert.Contains(UsersOnDisk(), u => u.Username == "superroot");
+        Assert.DoesNotContain(UsersOnDisk(), u => u.Username == AdminName);
+    }
+
+    private HashSet<User> UsersOnDisk() => Settings.Load(settingsFile).Users;
+
     private async Task<IWebClientService> LoggedIn(string userName, string password)
     {
         var client = new WebClientService();

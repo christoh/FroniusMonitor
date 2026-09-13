@@ -52,6 +52,16 @@ then logs back in with whichever is the new identity (name and/or password) once
 via `StoredConnection.SaveAsync` - the Basic Auth header the client was using stops working the instant the server
 saves the change, so this has to happen before any further call.
 
+The username `TextBox` in `UserEditorView.axaml` must therefore carry **no `IsEnabled="{Binding IsNew}"`**. It did
+once, and the result was a rename that failed in complete silence: in edit mode `IsNew` is false, so the box was
+disabled, nothing the user typed reached `UserEditorViewModel.UserName`, and `Ok()` built a `UserAccount` holding
+the name the user already had. The client then sent a PUT that asked the server to rename the user to their own
+name, so every layer behaved perfectly and reported success - `200 OK`, a saved `Settings.xml` whose bytes happened
+not to change, and a reloaded list still showing the old name. Roles and password kept working throughout, which
+made it look like a server-side persistence bug rather than a disabled control. If a rename ever appears to do
+nothing again, read the request body in the server log (`UpdateUser` logs the requested new name) before suspecting
+`SaveAsync`.
+
 ## A user cannot delete themselves
 
 `IdentityController.DeleteUser` rejects `userName` equal (ordinal, case-insensitive) to `HttpContext.User.Identity.Name`
@@ -84,6 +94,21 @@ change the in-memory graph, write the whole file back", not a per-user record up
 random bytes (`RandomNumberGenerator.GetBytes(8)`), generated once per user in the field initializer and replaced
 every time `SetPassword` is called. The username plays no part in the hash (see "Renaming a user" above) - only
 `Salt` does, so two users who happen to pick the same password still get different hashes.
+
+### Every change must reach `Settings.xml`, and a test says so
+
+Add, edit and delete each end in `await settings.SaveAsync()`, and that is the whole persistence mechanism - there
+is nothing that flushes later, so an endpoint that forgets the call leaves a change that exists only until the next
+restart. `UserManagementTests.Adding_editing_and_deleting_are_all_written_to_the_settings_file` and
+`An_administrator_renaming_themselves_is_written_to_the_settings_file` pin this down by reading the file back with
+the real `Settings.Load` instead of searching the text, so an entry that is written but no longer deserializes
+fails too. A rename is the case worth testing on its own: the name is only the key the user is found by and is not
+part of the password hash, so nothing else in the file changes with it, and a lost rename looks identical to a
+rename that was never requested.
+
+`UpdateUser` logs the requested *new* name and roles alongside the old name for the same reason - when a rename
+appears to do nothing, the request body is the only thing that distinguishes "the server ignored it" from "the
+client never sent it", and that has to be readable from the server log without a debugger attached.
 
 `User.Authenticate` first checks an in-memory `passwordCache` (the plaintext password from the last successful
 authentication on this `User` instance) before falling back to recomputing the SHA3-512 hash. This is a deliberate
