@@ -22,9 +22,11 @@
 			<ListBox.ItemTemplate>
 				<DataTemplate x:DataType="webApi:UserInfo">
 					<StackPanel Margin="0,4">
-						<TextBlock Text="{Binding UserName}" FontWeight="SemiBold" />
-						<!-- The roles are the server's enum names on purpose, not translated: see MainView. -->
-						<TextBlock Text="{Binding Roles}" Opacity="0.75" />
+                        <!-- The roles are the server's enum names on purpose, not translated: see MainView. -->
+						<TextBlock Text="" FontWeight="SemiBold">
+                            <Run Text="{Binding UserName}"/>
+                            <Run Text="("/><Run Text="{Binding Roles}"/><Run Text=")"/>
+                        </TextBlock>
 					</StackPanel>
 				</DataTemplate>
 			</ListBox.ItemTemplate>
