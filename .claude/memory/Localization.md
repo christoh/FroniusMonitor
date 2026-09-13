@@ -8,6 +8,17 @@ paths:
 `Fronius/Localization/Resources.resx` is the neutral one and its language is English. Beside it: `de`, `fr`, `it`,
 `rm` (Rumantsch Grischun), `gsw` (Swiss German), and `de-ch` / `de-li` on top of `de`.
 
+## Language specific matters
+- it
+  - **`Inverter` in Italian.** Fronius's own Italian documentation uses `inverter`, not a translated word, so `it`
+  has no entry for it and correctly falls back to the neutral file.
+- de
+  - "Standby" stays "Standby" in German, so `de` has no entry for it and correctly falls back to the neutral file."
+  - When using pronouns for 2nd person, we always use Uppercase, e.g. "Es stimmt, Du kannst Dein Benutzerkonto nicht löschen". German allows upper and lowercase but we always use uppercase. In 3rd person, e.g. "Es stimmt, sie (die andere Benutzerin) kann ihr Benutzerkonto nicht löschen".
+
+## Style
+- We are on first name basis with our end users. "Tu" in italian and french, "Du" in German, etc. is used in all translations. Do not use "Lei" in Italian, "Vous" in French, "Sie" in German. This applies to all languages.
+
 ## A culture file holds only what differs
 
 **Do not "complete" a culture file.** An entry is there because its translation differs from the English one, and
