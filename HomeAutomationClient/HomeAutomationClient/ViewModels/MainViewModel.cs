@@ -49,9 +49,14 @@ public sealed partial class MainViewModel : ViewModelBase
     /// What the Settings menu offers: the devices with settings and, for an administrator, the user management.
     /// The server checks the role on every call anyway, so leaving the entry out is only a courtesy.
     /// </summary>
-    public IEnumerable<object> SettingsItems => User is { Roles: var roles } && roles.HasFlag(Roles.Administrator)
-        ? UpdateService.DevicesWithSettings.Append<object>(UserManagementEntry.Instance)
-        : UpdateService.DevicesWithSettings;
+    /// <remarks>
+    /// A list, not a lazy query: the menu copies whatever it is handed the moment the binding reads it. It is read
+    /// when <see cref="User"/> is set - which is before the devices are known - and so again once
+    /// <see cref="Initialize"/> has started the <see cref="UpdateService"/>.
+    /// </remarks>
+    public IReadOnlyList<object> SettingsItems => User is { Roles: var roles } && roles.HasFlag(Roles.Administrator)
+        ? [.. UpdateService.DevicesWithSettings, UserManagementEntry.Instance]
+        : [.. UpdateService.DevicesWithSettings];
 
     /// <summary>
     /// Colors all ticks of every gauge, not just those up to the current value. Lives here because the switch for
@@ -108,6 +113,7 @@ public sealed partial class MainViewModel : ViewModelBase
         await gen24Loc.Initialize().ConfigureAwait(false);
         BusyText = Loc.ConnectingToHas;
         await UpdateService.StartAsync().ConfigureAwait(false);
+        OnPropertyChanged(nameof(SettingsItems));
         IsReady = true;
 
         await Dispatcher.UIThread.InvokeAsync(async () =>
