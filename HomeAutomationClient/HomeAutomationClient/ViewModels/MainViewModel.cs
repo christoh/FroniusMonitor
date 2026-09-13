@@ -46,17 +46,16 @@ public sealed partial class MainViewModel : ViewModelBase
     public string? UserText => User is { } user ? $"{user.UserName} ({user.Roles})" : null;
 
     /// <summary>
-    /// What the Settings menu offers: the devices with settings and, for an administrator, the user management.
-    /// The server checks the role on every call anyway, so leaving the entry out is only a courtesy.
+    /// What the Settings menu offers: the devices with settings and the user management. Shown to every user
+    /// regardless of role, on purpose - the server's <c>IdentityController</c> is the one place that enforces who
+    /// may actually add, edit or delete a user, and hiding the entry here would only get in the way of testing that.
     /// </summary>
     /// <remarks>
     /// A list, not a lazy query: the menu copies whatever it is handed the moment the binding reads it. It is read
     /// when <see cref="User"/> is set - which is before the devices are known - and so again once
     /// <see cref="Initialize"/> has started the <see cref="UpdateService"/>.
     /// </remarks>
-    public IReadOnlyList<object> SettingsItems => User is { Roles: var roles } && roles.HasFlag(Roles.Administrator)
-        ? [.. UpdateService.DevicesWithSettings, UserManagementEntry.Instance]
-        : [.. UpdateService.DevicesWithSettings];
+    public IReadOnlyList<object> SettingsItems => [.. UpdateService.DevicesWithSettings, UserManagementEntry.Instance];
 
     /// <summary>
     /// Colors all ticks of every gauge, not just those up to the current value. Lives here because the switch for

@@ -1800,12 +1800,6 @@
   <data name="Roles" xml:space="preserve">
     <value>Roles</value>
   </data>
-  <data name="RepeatPassword" xml:space="preserve">
-    <value>Repeat password</value>
-  </data>
-  <data name="PasswordsDoNotMatch" xml:space="preserve">
-    <value>The passwords do not match</value>
-  </data>
   <data name="FieldRequired" xml:space="preserve">
     <value>This field is required</value>
   </data>
@@ -1835,5 +1829,8 @@
   </data>
   <data name="PasswordRequired" xml:space="preserve">
     <value>A new user needs a password</value>
+  </data>
+  <data name="CannotDeleteSelf" xml:space="preserve">
+    <value>You cannot delete your own user account</value>
   </data>
 </root>

@@ -17,18 +17,13 @@
 
 		<StackPanel Classes="InputBlock">
 			<TextBlock Text="{x:Static p:Resources.Username}" />
-			<TextBox Text="{Binding UserName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="{Binding IsNew}" />
+			<TextBox Text="{Binding UserName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 		</StackPanel>
 
 		<StackPanel Classes="InputBlock">
 			<TextBlock Text="{x:Static p:Resources.Password}" />
 			<c:PasswordBox Text="{Binding Password, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 			<TextBlock Text="{x:Static p:Resources.KeepPasswordHint}" Opacity="0.75" FontSize="12" IsVisible="{Binding !IsNew}" />
-		</StackPanel>
-
-		<StackPanel Classes="InputBlock">
-			<TextBlock Text="{x:Static p:Resources.RepeatPassword}" />
-			<c:PasswordBox Text="{Binding RepeatPassword, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 		</StackPanel>
 
 		<TextBlock Text="{x:Static p:Resources.Roles}" />

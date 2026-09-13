@@ -1710,12 +1710,6 @@
   <data name="Roles" xml:space="preserve">
     <value>Rolle</value>
   </data>
-  <data name="RepeatPassword" xml:space="preserve">
-    <value>Chännwort wiederhole</value>
-  </data>
-  <data name="PasswordsDoNotMatch" xml:space="preserve">
-    <value>Die Chännwörter stimmed nöd überii</value>
-  </data>
   <data name="FieldRequired" xml:space="preserve">
     <value>Das Fäld isch erforderlich</value>
   </data>
@@ -1742,6 +1736,9 @@
   </data>
   <data name="LastAdministrator" xml:space="preserve">
     <value>De letscht Administrator cha nöd glöscht oder abgstueft werde</value>
+  </data>
+  <data name="CannotDeleteSelf" xml:space="preserve">
+    <value>Sie chönd Ihres eigete Benutzerkonto nöd lösche</value>
   </data>
   <data name="PasswordRequired" xml:space="preserve">
     <value>En neue Benützer bruucht es Chännwort</value>

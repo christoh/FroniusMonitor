@@ -1684,12 +1684,6 @@
   <data name="Roles" xml:space="preserve">
     <value>Rollas</value>
   </data>
-  <data name="RepeatPassword" xml:space="preserve">
-    <value>Repeter il pled-clav</value>
-  </data>
-  <data name="PasswordsDoNotMatch" xml:space="preserve">
-    <value>Ils pleds-clav na correspundan betg</value>
-  </data>
   <data name="FieldRequired" xml:space="preserve">
     <value>Quest champ è obligatoric</value>
   </data>
@@ -1716,6 +1710,9 @@
   </data>
   <data name="LastAdministrator" xml:space="preserve">
     <value>L&apos;ultim administratur na po betg vegnir stizzà u degradà</value>
+  </data>
+  <data name="CannotDeleteSelf" xml:space="preserve">
+    <value>Vus na pudais betg stizzar voss agen conto d&apos;utilisader</value>
   </data>
   <data name="PasswordRequired" xml:space="preserve">
     <value>In nov utilisader dovra in pled-clav</value>

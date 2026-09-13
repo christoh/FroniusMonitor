@@ -72,6 +72,7 @@ public sealed partial class UserManagementViewModel(DialogParameters parameters)
             return;
         }
 
+        var originalUserName = user.UserName;
         var editor = new UserEditorViewModel(new DialogParameters { Title = $"{Loc.EditUser}: {user.UserName}" }, user);
 
         if (await editor.ShowDialogAsync().ConfigureAwait(true) is not { } account)
@@ -80,7 +81,7 @@ public sealed partial class UserManagementViewModel(DialogParameters parameters)
         }
 
         BusyText = Loc.EditUser;
-        var result = await webClient.UpdateUser(account).ConfigureAwait(true);
+        var result = await webClient.UpdateUser(originalUserName, account).ConfigureAwait(true);
 
         if (result.Status != HttpStatusCode.OK || result.Payload is not { } updated)
         {
@@ -89,15 +90,18 @@ public sealed partial class UserManagementViewModel(DialogParameters parameters)
             return;
         }
 
-        if (mainViewModel.User is { } me && string.Equals(me.UserName, updated.UserName, StringComparison.OrdinalIgnoreCase))
+        if (mainViewModel.User is { } me && string.Equals(me.UserName, originalUserName, StringComparison.OrdinalIgnoreCase))
         {
-            // The administrator changed their own account. The menu bar shows the new roles, and a new password
-            // has to be logged in with right away: the server checks the credentials on every call, so the ones
-            // the client still carries stopped working the moment the change was saved.
+            // The administrator changed their own account. The menu bar shows the new name and roles right away.
+            // A new name or password, though, has to be logged in with at once: the server checks the credentials
+            // on every call, and the Basic Auth header the client still sends is the one for the old account,
+            // which stopped being valid the moment the change was saved.
             mainViewModel.User = updated;
 
-            if (account.Password is { } password)
+            if (account.Password is { } newPassword || !string.Equals(originalUserName, updated.UserName, StringComparison.OrdinalIgnoreCase))
             {
+                var connection = IoC.GetRegistered<HomeAutomationServerConnection>();
+                var password = account.Password ?? connection.Password;
                 var login = await webClient.Login(updated.UserName, password).ConfigureAwait(true);
 
                 if (login.Status != HttpStatusCode.OK)

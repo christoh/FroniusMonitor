@@ -5110,24 +5110,6 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Repeat password.
-        /// </summary>
-        public static string RepeatPassword {
-            get {
-                return ResourceManager.GetString("RepeatPassword", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The passwords do not match.
-        /// </summary>
-        public static string PasswordsDoNotMatch {
-            get {
-                return ResourceManager.GetString("PasswordsDoNotMatch", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to This field is required.
         /// </summary>
         public static string FieldRequired {
@@ -5214,6 +5196,15 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string PasswordRequired {
             get {
                 return ResourceManager.GetString("PasswordRequired", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to You cannot delete your own user account.
+        /// </summary>
+        public static string CannotDeleteSelf {
+            get {
+                return ResourceManager.GetString("CannotDeleteSelf", resourceCulture);
             }
         }
     }

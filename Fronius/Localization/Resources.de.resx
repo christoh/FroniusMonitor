@@ -1704,12 +1704,6 @@
   <data name="Roles" xml:space="preserve">
     <value>Rollen</value>
   </data>
-  <data name="RepeatPassword" xml:space="preserve">
-    <value>Kennwort wiederholen</value>
-  </data>
-  <data name="PasswordsDoNotMatch" xml:space="preserve">
-    <value>Die Kennwörter stimmen nicht überein</value>
-  </data>
   <data name="FieldRequired" xml:space="preserve">
     <value>Dieses Feld ist erforderlich</value>
   </data>
@@ -1736,6 +1730,9 @@
   </data>
   <data name="LastAdministrator" xml:space="preserve">
     <value>Der letzte Administrator kann nicht gelöscht oder herabgestuft werden</value>
+  </data>
+  <data name="CannotDeleteSelf" xml:space="preserve">
+    <value>Sie können Ihr eigenes Benutzerkonto nicht löschen</value>
   </data>
   <data name="PasswordRequired" xml:space="preserve">
     <value>Ein neuer Benutzer benötigt ein Kennwort</value>

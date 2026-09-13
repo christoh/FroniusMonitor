@@ -15,8 +15,9 @@ public sealed partial class UserEditorViewModel : DialogBase<DialogParameters, U
     }
 
     /// <summary>
-    /// Adding, as opposed to editing. The name is only typed for a new user: an existing one cannot be renamed
-    /// (see <c>IWebClientService.UpdateUser</c>), and only a new one has to be given a password.
+    /// Adding, as opposed to editing. Only a new user has to be given a password; an existing one keeps the one
+    /// they have unless a new one is typed. The name can be changed either way - the server accepts a rename,
+    /// keyed by the name the user had when the dialog opened (see <c>IWebClientService.UpdateUser</c>).
     /// </summary>
     public bool IsNew { get; }
 
@@ -30,27 +31,10 @@ public sealed partial class UserEditorViewModel : DialogBase<DialogParameters, U
     [CustomValidation(typeof(UserEditorViewModel), nameof(ValidatePassword))]
     public partial string Password { get; set; } = string.Empty;
 
-    [ObservableProperty, NotifyDataErrorInfo]
-    [CustomValidation(typeof(UserEditorViewModel), nameof(ValidateRepeatPassword))]
-    public partial string RepeatPassword { get; set; } = string.Empty;
-
-    // ReSharper disable once UnusedParameterInPartialMethod
-    partial void OnPasswordChanged(string value)
-    {
-        // The repeat box is right or wrong depending on the other box, so typing there re-checks it too.
-        ValidateProperty(RepeatPassword, nameof(RepeatPassword));
-    }
-
     public static ValidationResult? ValidatePassword(string? value, ValidationContext context)
     {
         var self = (UserEditorViewModel)context.ObjectInstance;
         return self.IsNew && string.IsNullOrEmpty(value) ? new ValidationResult(Loc.FieldRequired) : ValidationResult.Success;
-    }
-
-    public static ValidationResult? ValidateRepeatPassword(string? value, ValidationContext context)
-    {
-        var self = (UserEditorViewModel)context.ObjectInstance;
-        return string.Equals(value ?? string.Empty, self.Password, StringComparison.Ordinal) ? ValidationResult.Success : new ValidationResult(Loc.PasswordsDoNotMatch);
     }
 
     public override Task AbortAsync()

@@ -1719,12 +1719,6 @@
   <data name="Roles" xml:space="preserve">
     <value>Ruoli</value>
   </data>
-  <data name="RepeatPassword" xml:space="preserve">
-    <value>Ripeti la password</value>
-  </data>
-  <data name="PasswordsDoNotMatch" xml:space="preserve">
-    <value>Le password non corrispondono</value>
-  </data>
   <data name="FieldRequired" xml:space="preserve">
     <value>Questo campo è obbligatorio</value>
   </data>
@@ -1751,6 +1745,9 @@
   </data>
   <data name="LastAdministrator" xml:space="preserve">
     <value>L&apos;ultimo amministratore non può essere eliminato o retrocesso</value>
+  </data>
+  <data name="CannotDeleteSelf" xml:space="preserve">
+    <value>Non è possibile eliminare il proprio account utente</value>
   </data>
   <data name="PasswordRequired" xml:space="preserve">
     <value>Un nuovo utente ha bisogno di una password</value>

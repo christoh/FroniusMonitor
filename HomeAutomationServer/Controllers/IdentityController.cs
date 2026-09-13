@@ -134,8 +134,10 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
     }
 
     /// <summary>
-    /// Changes roles and, if <see cref="UserAccount.Password"/> is not empty, the password. The name in the route
-    /// is the key; a user cannot be renamed because the credentials cookie of every session they own carries it.
+    /// Changes the name, roles and, if <see cref="UserAccount.Password"/> is not empty, the password. The name in
+    /// the route is only the key that finds the user to change - it plays no part in the password hash, which is
+    /// salted on its own - so <see cref="UserAccount.UserName"/> may name a different, unused user name to rename
+    /// them to it.
     /// </summary>
     [HttpPut("users/{userName}")]
     [BasicAuthorize(Roles = nameof(Roles.Administrator))]
@@ -162,6 +164,12 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
             return UnprocessableEntity(Helpers.GetProblemDetails(Loc.CannotUpdateUser, Loc.LastAdministrator));
         }
 
+        if (!string.Equals(userName, account.UserName, StringComparison.OrdinalIgnoreCase) && FindUser(account.UserName) != null)
+        {
+            return UnprocessableEntity(Helpers.GetProblemDetails(Loc.CannotUpdateUser, string.Format(Loc.UserAlreadyExists, account.UserName)));
+        }
+
+        dbUser.Username = account.UserName;
         dbUser.Roles = account.Roles;
 
         if (!string.IsNullOrEmpty(account.Password))
@@ -192,9 +200,9 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
             return NotFound(Helpers.GetProblemDetails(Loc.CannotDeleteUser, string.Format(Loc.UserNotFound, userName)));
         }
 
-        if (IsLastAdministrator(dbUser))
+        if (string.Equals(userName, HttpContext.User.Identity?.Name, StringComparison.OrdinalIgnoreCase))
         {
-            return UnprocessableEntity(Helpers.GetProblemDetails(Loc.CannotDeleteUser, Loc.LastAdministrator));
+            return UnprocessableEntity(Helpers.GetProblemDetails(Loc.CannotDeleteUser, Loc.CannotDeleteSelf));
         }
 
         userDb.CurrentValue.Users.Remove(dbUser);

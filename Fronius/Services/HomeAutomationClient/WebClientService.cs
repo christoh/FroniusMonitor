@@ -59,9 +59,9 @@ public sealed class WebClientService : IWebClientService
         return PostResult<UserInfo, UserAccount>("Identity/users", account, token);
     }
 
-    public Task<ApiResult<UserInfo>> UpdateUser(UserAccount account, CancellationToken token = default)
+    public Task<ApiResult<UserInfo>> UpdateUser(string userName, UserAccount account, CancellationToken token = default)
     {
-        return PutResult<UserInfo, UserAccount>($"Identity/users/{Uri.EscapeDataString(account.UserName)}", account, token);
+        return PutResult<UserInfo, UserAccount>($"Identity/users/{Uri.EscapeDataString(userName)}", account, token);
     }
 
     public Task<ApiResult<bool>> DeleteUser(string userName, CancellationToken token = default)

@@ -87,7 +87,7 @@ public sealed class UserManagementTests : IAsyncLifetime
 
         Assert.Equal(HttpStatusCode.Forbidden, (await member.GetUsers()).Status);
         Assert.Equal(HttpStatusCode.Forbidden, (await member.AddUser(new UserAccount { UserName = "mallory", Password = "x", Roles = Roles.Administrator })).Status);
-        Assert.Equal(HttpStatusCode.Forbidden, (await member.UpdateUser(new UserAccount { UserName = MemberName, Roles = Roles.Administrator })).Status);
+        Assert.Equal(HttpStatusCode.Forbidden, (await member.UpdateUser(MemberName, new UserAccount { UserName = MemberName, Roles = Roles.Administrator })).Status);
         Assert.Equal(HttpStatusCode.Forbidden, (await member.DeleteUser(AdminName)).Status);
         Assert.Equal(Roles.User, settings.Users.Single(u => u.Username == MemberName).Roles);
     }
@@ -122,7 +122,7 @@ public sealed class UserManagementTests : IAsyncLifetime
     [Fact]
     public async Task Editing_changes_the_roles_and_only_a_given_password()
     {
-        var rolesOnly = await admin.UpdateUser(new UserAccount { UserName = MemberName, Roles = Roles.PowerUser });
+        var rolesOnly = await admin.UpdateUser(MemberName, new UserAccount { UserName = MemberName, Roles = Roles.PowerUser });
         Assert.Equal(HttpStatusCode.OK, rolesOnly.Status);
         Assert.Equal(Roles.PowerUser, rolesOnly.Payload?.Roles);
 
@@ -130,7 +130,7 @@ public sealed class UserManagementTests : IAsyncLifetime
         bob.Initialize(apiUri, "test", "1.0");
         Assert.Equal(HttpStatusCode.OK, (await bob.Login(MemberName, TestUsers.Password)).Status);
 
-        var withPassword = await admin.UpdateUser(new UserAccount { UserName = MemberName, Password = "new secret", Roles = Roles.PowerUser });
+        var withPassword = await admin.UpdateUser(MemberName, new UserAccount { UserName = MemberName, Password = "new secret", Roles = Roles.PowerUser });
         Assert.Equal(HttpStatusCode.OK, withPassword.Status);
 
         Assert.Equal(HttpStatusCode.Unauthorized, (await bob.Login(MemberName, TestUsers.Password)).Status);
@@ -138,22 +138,63 @@ public sealed class UserManagementTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task Editing_can_rename_a_user_and_the_new_name_is_what_logs_in()
+    {
+        var renamed = await admin.UpdateUser(MemberName, new UserAccount { UserName = "robert", Roles = Roles.User });
+        Assert.Equal(HttpStatusCode.OK, renamed.Status);
+        Assert.Equal("robert", renamed.Payload?.UserName);
+
+        using var bob = new WebClientService();
+        bob.Initialize(apiUri, "test", "1.0");
+        Assert.Equal(HttpStatusCode.Unauthorized, (await bob.Login(MemberName, TestUsers.Password)).Status);
+        Assert.Equal(HttpStatusCode.OK, (await bob.Login("robert", TestUsers.Password)).Status);
+    }
+
+    [Fact]
+    public async Task A_user_cannot_be_renamed_to_a_name_already_in_use()
+    {
+        var result = await admin.UpdateUser(MemberName, new UserAccount { UserName = AdminName, Roles = Roles.User });
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, result.Status);
+        Assert.Equal(MemberName, settings.Users.Single(u => u.Roles == Roles.User).Username);
+    }
+
+    [Fact]
     public async Task An_unknown_user_cannot_be_edited_or_deleted()
     {
-        Assert.Equal(HttpStatusCode.NotFound, (await admin.UpdateUser(new UserAccount { UserName = "nobody", Roles = Roles.User })).Status);
+        Assert.Equal(HttpStatusCode.NotFound, (await admin.UpdateUser("nobody", new UserAccount { UserName = "nobody", Roles = Roles.User })).Status);
         Assert.Equal(HttpStatusCode.NotFound, (await admin.DeleteUser("nobody")).Status);
     }
 
     [Fact]
-    public async Task The_last_administrator_is_neither_demoted_nor_deleted()
+    public async Task The_last_administrator_cannot_be_demoted()
     {
-        Assert.Equal(HttpStatusCode.UnprocessableEntity, (await admin.UpdateUser(new UserAccount { UserName = AdminName, Roles = Roles.User })).Status);
-        Assert.Equal(HttpStatusCode.UnprocessableEntity, (await admin.DeleteUser(AdminName)).Status);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, (await admin.UpdateUser(AdminName, new UserAccount { UserName = AdminName, Roles = Roles.User })).Status);
         Assert.Equal(Roles.Administrator, settings.Users.Single(u => u.Username == AdminName).Roles);
 
-        // With a second administrator in place the first one may go.
-        Assert.Equal(HttpStatusCode.OK, (await admin.UpdateUser(new UserAccount { UserName = MemberName, Roles = Roles.Administrator })).Status);
-        Assert.Equal(HttpStatusCode.OK, (await admin.DeleteUser(AdminName)).Status);
+        // With a second administrator in place, the first one may be demoted.
+        Assert.Equal(HttpStatusCode.OK, (await admin.UpdateUser(MemberName, new UserAccount { UserName = MemberName, Roles = Roles.Administrator })).Status);
+        Assert.Equal(HttpStatusCode.OK, (await admin.UpdateUser(AdminName, new UserAccount { UserName = AdminName, Roles = Roles.User })).Status);
+        Assert.Equal(Roles.User, settings.Users.Single(u => u.Username == AdminName).Roles);
+    }
+
+    [Fact]
+    public async Task An_administrator_cannot_delete_their_own_account()
+    {
+        // A second administrator exists, so this is not the last-administrator rule kicking in - only self-delete is.
+        Assert.Equal(HttpStatusCode.OK, (await admin.UpdateUser(MemberName, new UserAccount { UserName = MemberName, Roles = Roles.Administrator })).Status);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, (await admin.DeleteUser(AdminName)).Status);
+        Assert.Contains(settings.Users, u => u.Username == AdminName);
+    }
+
+    [Fact]
+    public async Task A_different_administrator_can_delete_an_administrator_who_could_not_delete_themselves()
+    {
+        // There is no "last administrator" rule for deletion any more: since only administrators can delete users
+        // at all, and nobody may delete their own account, the only way the last administrator could ever be
+        // deleted would require a second administrator to still exist to do the deleting - so one always remains.
+        Assert.Equal(HttpStatusCode.OK, (await admin.UpdateUser(MemberName, new UserAccount { UserName = MemberName, Roles = Roles.Administrator })).Status);
+        using var bob = await LoggedIn(MemberName, TestUsers.Password);
+        Assert.Equal(HttpStatusCode.OK, (await bob.DeleteUser(AdminName)).Status);
         Assert.DoesNotContain(settings.Users, u => u.Username == AdminName);
     }
 

@@ -40,9 +40,11 @@ public interface IWebClientService : IDisposable
 
     /// <summary>
     /// Changes the roles of an existing user and, when <see cref="UserAccount.Password"/> is not empty, the
-    /// password. A user cannot be renamed. Needs the Administrator role.
+    /// password. <paramref name="userName"/> is the user as they are now; <see cref="UserAccount.UserName"/> may
+    /// name them anew - the server accepts a rename since the password hash does not depend on the name. Needs
+    /// the Administrator role.
     /// </summary>
-    Task<ApiResult<UserInfo>> UpdateUser(UserAccount account, CancellationToken token = default);
+    Task<ApiResult<UserInfo>> UpdateUser(string userName, UserAccount account, CancellationToken token = default);
 
     /// <summary>Removes a user. The server refuses the last administrator. Needs the Administrator role.</summary>
     Task<ApiResult<bool>> DeleteUser(string userName, CancellationToken token = default);
