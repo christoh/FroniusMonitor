@@ -144,3 +144,23 @@ Tests: `UnitTests/HubTicketServiceTests` covers forging, tampering, expiry, an u
 (including flipping every single bit of the signature); `UnitTests/Hosted/HubAuthenticationTests` proves over a real
 connection that no ticket, a foreign ticket, an expired ticket and a user without the role are all turned away,
 while a valid ticket gets in. Weakening `RequireHubTicket` fails exactly those four.
+
+### CORS has to be let through before authorization, or the hub is unreachable from a foreign origin
+
+A client served from somewhere other than the server - the browser head run from a development server against a
+real one, any future client on another host - sends a **preflight** before the negotiate, and a preflight carries
+no credentials by design. SignalR maps its negotiate endpoint with `acceptCorsPreflight: true`, so that `OPTIONS`
+**matches the endpoint** and picks up its `RequireAuthorization` metadata, unlike the controllers, whose endpoints
+carry no authorization metadata at all and whose preflight therefore sails past.
+
+So the order of the middleware decides whether a browser can reach the hub: with the authorization middleware
+ahead of CORS, the preflight is answered with a bare 401 that has no `Access-Control-*` headers, and a browser
+reports that as **`TypeError: Failed to fetch`** - a message that names neither authorization nor CORS, and looks
+like the server is down. The symptom is unmistakable once seen: every REST call works and only
+`HubConnection.StartAsync` fails.
+
+**`WebApplication` puts `UseAuthentication` and `UseAuthorization` in front of every middleware `Main` registers**
+when it adds them itself, so `app.UseCors()` alone can never be early enough. Naming all three explicitly, in the
+order `UseCors` → `UseAuthentication` → `UseAuthorization`, suppresses the automatic ones and is the only thing
+that fixes it. It does not weaken the gate: the negotiate itself is still refused without a valid ticket, it now
+merely carries the CORS headers that let the client see the 401 for what it is.

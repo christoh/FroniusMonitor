@@ -217,6 +217,19 @@ internal class Program
 
         var app = builder.Build();
         app.UseResponseCompression();
+
+        // CORS has to run before authorization, and naming the two here is the only way to get that order:
+        // WebApplication adds UseAuthentication and UseAuthorization by itself once the services are there, and it
+        // adds them ahead of every middleware this method registers. A preflight carries no credentials, so the
+        // authorization middleware answered the OPTIONS of everything RequireAuthorization covers - the hub,
+        // OpenApi - with a bare 401 before UseCors was ever reached, and a 401 without CORS headers reaches a
+        // browser as nothing more than "TypeError: Failed to fetch". That is why a client on a foreign origin
+        // could talk to the controllers, whose endpoints carry no authorization metadata, and only failed on the
+        // hub. Naming them suppresses the automatic ones.
+        app.UseCors();
+        app.UseAuthentication();
+        app.UseAuthorization();
+
         app.MapOpenApi().RequireAuthorization(r => r.RequireRole("Developer"));
 
         app.UseRequestLocalization(options =>
@@ -227,7 +240,6 @@ internal class Program
         });
 
         app.MapControllers();
-        app.UseCors();
         // The hub has a scheme of its own: a browser cannot set an Authorization header on a WebSocket handshake,
         // so the connection authenticates with a short lived ticket instead. See HubTicketService.
         app.MapHub<HomeAutomationHub>("/hub").RequireAuthorization(policy => policy.RequireHubTicket());
