@@ -20,14 +20,43 @@ public partial class WebConnection : BindableBase, ICloneable, IHaveDisplayName
     {
         Aes = Aes.Create();
         Aes.KeySize = 128;
-
-        // ECB is not part of the Web Crypto API, so the browser's AES implementation cannot carry it out at all.
-        // CBC with a fixed, all-zero IV behaves identically to ECB for the single-block passwords this encrypts,
-        // chains correctly should one ever be longer, and - unlike ECB - is a mode the browser actually supports.
-        Aes.Mode = CipherMode.CBC;
-        Aes.IV = new byte[16];
+        Aes.Mode = CipherMode.ECB;
         Aes.Padding = PaddingMode.PKCS7;
         Aes.Key = IoC.Injector == null ? new byte[16] : IoC.Get<IAesKeyProvider>().GetAesKey();
+    }
+
+    private const int AesBlockLength = 16;
+    private const int KeystreamBlockLength = 32;
+
+    private static bool? hasAes;
+
+    /// <summary>
+    /// Whether this platform can carry out AES at all. A browser cannot: the Web Crypto API is asynchronous, so
+    /// .NET exposes no symmetric cipher there, while the hash based primitives it compiles into the runtime are
+    /// present - which is why the checksum works on a head where the encrypted password stayed empty.
+    /// </summary>
+    /// <remarks>
+    /// Answered by trying it rather than by asking which platform this is: what matters is what works. The
+    /// result is remembered, because on the platform that says no the answer costs an exception.
+    /// </remarks>
+    private static bool HasAes => hasAes ??= ProbeAes();
+
+    private static bool ProbeAes()
+    {
+        var works = false;
+
+        try
+        {
+            using var encryptor = Aes.CreateEncryptor();
+            works = encryptor.TransformFinalBlock(new byte[AesBlockLength], 0, AesBlockLength).Length > 0;
+        }
+        catch (PlatformNotSupportedException)
+        {
+            // Deliberately not set from inside the try: some platforms throw this *after* the transform has
+            // handed back its result, and those do have AES. Only a platform that never gets that far says no.
+        }
+
+        return works;
     }
 
     [System.Text.Json.Serialization.JsonIgnore]
@@ -68,18 +97,9 @@ public partial class WebConnection : BindableBase, ICloneable, IHaveDisplayName
     {
         get
         {
-            var result = string.Empty;
-
             try
             {
-                using var encrypt = Aes.CreateEncryptor();
-                var bytes = Encoding.UTF8.GetBytes(Password);
-                result = encrypt.TransformFinalBlock(bytes, 0, bytes.Length).ToBase64();
-                return result;
-            }
-            catch (PlatformNotSupportedException)
-            {
-                return result;
+                return Encrypt(Encoding.UTF8.GetBytes(Password)).ToBase64();
             }
             catch
             {
@@ -90,16 +110,116 @@ public partial class WebConnection : BindableBase, ICloneable, IHaveDisplayName
         {
             try
             {
-                using var decrypt = Aes.CreateDecryptor();
-                var bytes = Convert.FromBase64String(value);
-                Password = Encoding.UTF8.GetString(decrypt.TransformFinalBlock(bytes, 0, bytes.Length));
+                Password = Encoding.UTF8.GetString(Decrypt(Convert.FromBase64String(value)));
             }
-            catch (PlatformNotSupportedException) { }
-            catch (Exception)
+            catch
             {
                 Password = string.Empty;
             }
         }
+    }
+
+    private static byte[] Encrypt(byte[] clearText)
+    {
+        if (!HasAes)
+        {
+            return XorWithKeystream(Pad(clearText));
+        }
+
+        var result = Array.Empty<byte>();
+
+        try
+        {
+            using var encryptor = Aes.CreateEncryptor();
+            result = encryptor.TransformFinalBlock(clearText, 0, clearText.Length);
+        }
+        catch (PlatformNotSupportedException)
+        {
+            // Thrown after the result was handed back - see ProbeAes. Keeping what we already have is the point.
+        }
+
+        return result;
+    }
+
+    private static byte[] Decrypt(byte[] cipherText)
+    {
+        if (!HasAes)
+        {
+            return Unpad(XorWithKeystream(cipherText));
+        }
+
+        var result = Array.Empty<byte>();
+
+        try
+        {
+            using var decryptor = Aes.CreateDecryptor();
+            result = decryptor.TransformFinalBlock(cipherText, 0, cipherText.Length);
+        }
+        catch (PlatformNotSupportedException)
+        {
+            // As in Encrypt: the transform is already done by the time this arrives.
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Stands in for AES where the platform has none. The keystream is HMAC-SHA256 over a block counter, keyed
+    /// with the key AES would have used, so every key gives a different stream and no block of it repeats.
+    /// </summary>
+    /// <remarks>
+    /// Encrypts and decrypts alike - XOR is its own inverse. This is reached on a browser only: everywhere else
+    /// AES stays in charge, so the passwords in existing settings files keep reading as they always did.
+    /// </remarks>
+    private static byte[] XorWithKeystream(byte[] data)
+    {
+        var result = new byte[data.Length];
+
+        for (var offset = 0; offset < data.Length; offset += KeystreamBlockLength)
+        {
+            var keystream = HMACSHA256.HashData(Aes.Key, BitConverter.GetBytes(offset / KeystreamBlockLength));
+
+            for (var i = 0; i < keystream.Length && offset + i < data.Length; i++)
+            {
+                result[offset + i] = (byte)(data[offset + i] ^ keystream[i]);
+            }
+        }
+
+        return result;
+    }
+
+    private static byte[] Pad(byte[] clearText)
+    {
+        // Never zero: a full block of padding is added rather than none, so there is always something to strip.
+        var padding = AesBlockLength - clearText.Length % AesBlockLength;
+        var result = new byte[clearText.Length + padding];
+        clearText.CopyTo(result, 0);
+        Array.Fill(result, (byte)padding, clearText.Length, padding);
+        return result;
+    }
+
+    /// <remarks>
+    /// The throw is what makes a wrong key forget the password instead of putting noise into the box: padding
+    /// that another key produced hardly ever reads as valid, which is the same way AES fails here.
+    /// </remarks>
+    private static byte[] Unpad(byte[] padded)
+    {
+        var padding = padded.Length > 0 ? padded[^1] : 0;
+
+        if (padding is < 1 or > AesBlockLength || padding > padded.Length)
+        {
+            throw new CryptographicException("Invalid padding");
+        }
+
+        for (var i = padded.Length - padding; i < padded.Length; i++)
+        {
+            if (padded[i] != padding)
+            {
+                throw new CryptographicException("Invalid padding");
+            }
+        }
+
+        return padded[..^padding];
     }
 
     private string? calculatedChecksum;
