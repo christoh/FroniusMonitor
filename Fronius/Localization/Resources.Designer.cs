@@ -4415,7 +4415,8 @@ namespace De.Hochstaetter.Fronius.Localization {
                 return ResourceManager.GetString("Standby", resourceCulture);
             }
         }
-        
+
+
         /// <summary>
         ///   Looks up a localized string similar to Are you sure you want to set this inverter to standby?.
         /// </summary>

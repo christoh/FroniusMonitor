@@ -74,7 +74,7 @@
     <value>Onduleur</value>
   </data>
   <data name="NoSystemConnection" xml:space="preserve">
-    <value>Vous n'avez pas indiqué tous les paramètres de connexion de l'onduleur</value>
+    <value>Tu n'as pas indiqué tous les paramètres de connexion de l'onduleur</value>
   </data>
   <data name="Sleeping" xml:space="preserve">
     <value>En veille</value>
@@ -95,7 +95,7 @@
     <value>Centre de contrôle domotique</value>
   </data>
   <data name="ProviderMeter" xml:space="preserve">
-    <value>Compteur fourni par votre gestionnaire de réseau de distribution</value>
+    <value>Compteur fourni par ton gestionnaire de réseau de distribution</value>
   </data>
   <data name="Power" xml:space="preserve">
     <value>Puissance</value>
@@ -167,7 +167,7 @@
     <value>_Affichage</value>
   </data>
   <data name="NoFritzBoxConnection" xml:space="preserve">
-    <value>Vous n'avez pas indiqué tous les paramètres de connexion Fritz!Box</value>
+    <value>Tu n'as pas indiqué tous les paramètres de connexion Fritz!Box</value>
   </data>
   <data name="Cancel" xml:space="preserve">
     <value>Annuler</value>
@@ -578,7 +578,7 @@
     <value>Le PV n'injecte pas dans le réseau</value>
   </data>
   <data name="NoFeedIn_ToolTip" xml:space="preserve">
-    <value>Si votre installation PV n'injecte pas dans le réseau, activez ce paramètre.</value>
+    <value>Si ton installation PV n'injecte pas dans le réseau, active ce paramètre.</value>
   </data>
   <data name="EcoRoundingMode" xml:space="preserve">
     <value>Arrondi du surplus PV</value>
@@ -599,7 +599,7 @@
     <value>Courant de charge minimal</value>
   </data>
   <data name="MinimumChargingCurrent_ToolTip" xml:space="preserve">
-    <value>La plupart des véhicules acceptent 6 A. Certains en nécessitent toutefois davantage. Réglez selon les spécifications techniques de votre véhicule.</value>
+    <value>La plupart des véhicules acceptent 6 A. Certains en nécessitent toutefois davantage. Règle selon les spécifications techniques de ton véhicule.</value>
   </data>
   <data name="MinimumChargingInterval" xml:space="preserve">
     <value>Intervalle de charge forcée</value>
@@ -764,7 +764,7 @@
     <value>CVC Toshiba</value>
   </data>
   <data name="ToshibaHvacUrlTooltip" xml:space="preserve">
-    <value>Vous ne devriez pas modifier l'URL sauf si Toshiba change le nom d'hôte</value>
+    <value>Tu ne devrais pas modifier l'URL sauf si Toshiba change le nom d'hôte</value>
   </data>
   <data name="HvacModeAuto" xml:space="preserve">
     <value>Refroidir ou chauffer automatiquement</value>
@@ -815,7 +815,7 @@
     <value>Impossible de modifier l'état de veille : {0}</value>
   </data>
   <data name="StandbyWarning" xml:space="preserve">
-    <value>Voulez-vous vraiment mettre cet onduleur en veille ?</value>
+    <value>Veux-tu vraiment mettre cet onduleur en veille ?</value>
   </data>
   <data name="DcRelativePower" xml:space="preserve">
     <value>Puissance CC %</value>
@@ -1400,7 +1400,7 @@
     <value>Autoriser les identifiants de carte RFID dans les API (y compris le cloud)</value>
   </data>
   <data name="SendRfidSerialToCloud_ToolTip" xml:space="preserve">
-    <value>Si les identifiants de carte RFID sont envoyés au cloud, go-E et le fournisseur cloud (Hetzner) peuvent les lire et cloner la carte. Si vous activez ceci, n'utilisez pas de carte de recharge publique pour votre Wattpilot.</value>
+    <value>Si les identifiants de carte RFID sont envoyés au cloud, go-E et le fournisseur cloud (Hetzner) peuvent les lire et cloner la carte. Si tu actives ceci, n'utilise pas de carte de recharge publique pour ton Wattpilot.</value>
   </data>
   <data name="CloudWebSocketEnabled" xml:space="preserve">
     <value>Activer l'accès Websocket dans le cloud</value>
@@ -1472,7 +1472,7 @@
     <value>Puissance PV</value>
   </data>
   <data name="PleaseLogin" xml:space="preserve">
-    <value>Veuillez vous connecter avec votre nom d'utilisateur et votre mot de passe</value>
+    <value>Connecte-toi avec ton nom d'utilisateur et ton mot de passe</value>
   </data>
   <data name="BusyLoggingIn" xml:space="preserve">
     <value>Connexion en cours</value>
@@ -1514,7 +1514,7 @@
     <value>La commutation est désactivée pour l'appareil « {0} ».</value>
   </data>
   <data name="HttpForbidden" xml:space="preserve">
-    <value>Vous n'êtes pas autorisé à effectuer cette action</value>
+    <value>Tu n'es pas autorisé à effectuer cette action</value>
   </data>
   <data name="DeviceNotDimmable" xml:space="preserve">
     <value>L'appareil « {0} » n'est pas variable.</value>
@@ -1541,7 +1541,7 @@
     <value>Panneaux solaires de cet onduleur uniquement</value>
   </data>
   <data name="Gen24ChargingSources_Home" xml:space="preserve">
-    <value>Toute source d'énergie de votre domicile</value>
+    <value>Toute source d'énergie de ton domicile</value>
   </data>
   <data name="Gen24ChargingSources_HomeAndGrid" xml:space="preserve">
     <value>Toute source d'énergie, y compris le réseau public</value>
@@ -1703,7 +1703,7 @@
     <value>Le dernier administrateur ne peut pas être supprimé ni rétrogradé</value>
   </data>
   <data name="CannotDeleteSelf" xml:space="preserve">
-    <value>Vous ne pouvez pas supprimer votre propre compte utilisateur</value>
+    <value>Tu ne peux pas supprimer ton propre compte utilisateur</value>
   </data>
   <data name="PasswordRequired" xml:space="preserve">
     <value>Un nouvel utilisateur a besoin d&apos;un mot de passe</value>

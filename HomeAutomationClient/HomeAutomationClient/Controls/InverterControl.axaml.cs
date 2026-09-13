@@ -260,7 +260,26 @@ public partial class InverterControl : DeviceControlBase
                 return;
             }
 
-            var result = await webClient.RequestGen24StandBy(deviceKey, !button.IsChecked.Value);
+            var wantsStandBy = !button.IsChecked.Value;
+
+            if (wantsStandBy)
+            {
+                var answer = await new MessageBox
+                {
+                    Title = Loc.Warning,
+                    Text = Loc.StandbyWarning,
+                    Buttons = [Loc.Standby, Loc.Cancel],
+                    Icon = new WarningIcon(),
+                }.Show();
+
+                if (answer?.Index != 0)
+                {
+                    button.IsChecked = true;
+                    return;
+                }
+            }
+
+            var result = await webClient.RequestGen24StandBy(deviceKey, wantsStandBy);
 
             if (result.Status != HttpStatusCode.OK)
             {

@@ -1660,7 +1660,7 @@
     <value>Panoramica</value>
   </data>
   <data name="LanguageChangeWarning" xml:space="preserve">
-    <value>Alcuni testi sono stati generati in '{0}' all'avvio di {1}. Continueranno a essere visualizzati nella lingua originale finché non si riavvia l'app.</value>
+    <value>Alcuni testi sono stati generati in '{0}' all'avvio di {1}. Continueranno a essere visualizzati nella lingua originale finché non riavvii l'app.</value>
   </data>
   <data name="Charged" xml:space="preserve">
     <value>Entrata</value>
@@ -1747,7 +1747,7 @@
     <value>L&apos;ultimo amministratore non può essere eliminato o retrocesso</value>
   </data>
   <data name="CannotDeleteSelf" xml:space="preserve">
-    <value>Non è possibile eliminare il proprio account utente</value>
+    <value>Non puoi eliminare il tuo account utente</value>
   </data>
   <data name="PasswordRequired" xml:space="preserve">
     <value>Un nuovo utente ha bisogno di una password</value>

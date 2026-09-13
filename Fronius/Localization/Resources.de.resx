@@ -138,9 +138,6 @@
   <data name="Sleeping" xml:space="preserve">
     <value>Schlafmodus</value>
   </data>
-  <data name="Standby" xml:space="preserve">
-    <value>Auf Abruf</value>
-  </data>
   <data name="Starting" xml:space="preserve">
     <value>Starten</value>
   </data>
@@ -1663,7 +1660,7 @@
     <value>Übersicht</value>
   </data>
   <data name="LanguageChangeWarning" xml:space="preserve">
-    <value>Einige Texte wurden in '{0}' generiert, als {1} gestartet wurde. Sie werden weiterhin in der ursprünglichen Sprache angezeigt, bis Sie die App neu starten.</value>
+    <value>Einige Texte wurden in '{0}' generiert, als {1} gestartet wurde. Sie werden weiterhin in der ursprünglichen Sprache angezeigt, bis Du die App neu startest.</value>
   </data>
   <data name="SettingsNotWritten" xml:space="preserve">
     <value>Die folgenden Einstellungen wurden nicht an den Wattpiloten geschrieben:</value>
@@ -1732,7 +1729,7 @@
     <value>Der letzte Administrator kann nicht gelöscht oder herabgestuft werden</value>
   </data>
   <data name="CannotDeleteSelf" xml:space="preserve">
-    <value>Sie können Ihr eigenes Benutzerkonto nicht löschen</value>
+    <value>Du kannst Dein eigenes Benutzerkonto nicht löschen</value>
   </data>
   <data name="PasswordRequired" xml:space="preserve">
     <value>Ein neuer Benutzer benötigt ein Kennwort</value>

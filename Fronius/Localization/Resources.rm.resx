@@ -74,7 +74,7 @@
     <value>Inverter</value>
   </data>
   <data name="NoSystemConnection" xml:space="preserve">
-    <value>Vus n'avais betg inditgà tut ils parameters da connexiun da l'inverter</value>
+    <value>Ti n'has betg inditgà tut ils parameters da connexiun da l'inverter</value>
   </data>
   <data name="Sleeping" xml:space="preserve">
     <value>En dorma</value>
@@ -95,7 +95,7 @@
     <value>Center da controlla da la domotica</value>
   </data>
   <data name="ProviderMeter" xml:space="preserve">
-    <value>Contatur furnì da voss gestiunari da la rait da distribuziun</value>
+    <value>Contatur furnì da tes gestiunari da la rait da distribuziun</value>
   </data>
   <data name="Power" xml:space="preserve">
     <value>Potenza</value>
@@ -167,7 +167,7 @@
     <value>_Vista</value>
   </data>
   <data name="NoFritzBoxConnection" xml:space="preserve">
-    <value>Vus n'avais betg inditgà tut ils parameters da connexiun Fritz!Box</value>
+    <value>Ti n'has betg inditgà tut ils parameters da connexiun Fritz!Box</value>
   </data>
   <data name="Cancel" xml:space="preserve">
     <value>Interrumper</value>
@@ -581,7 +581,7 @@
     <value>Il PV n'injectescha betg en la rait</value>
   </data>
   <data name="NoFeedIn_ToolTip" xml:space="preserve">
-    <value>Sche vossa installaziun PV n'injectescha betg en la rait, activai quest parameter.</value>
+    <value>Sche tia installaziun PV n'injectescha betg en la rait, activescha quest parameter.</value>
   </data>
   <data name="EcoRoundingMode" xml:space="preserve">
     <value>Arrotundaziun dal surpli PV</value>
@@ -602,7 +602,7 @@
     <value>Current da chargiada minimal</value>
   </data>
   <data name="MinimumChargingCurrent_ToolTip" xml:space="preserve">
-    <value>La gronda part dals autos accepta 6 A. TScherts dovran dentant dapli. Reglai tenor las specificaziuns tecnicas da voss auto.</value>
+    <value>La gronda part dals autos accepta 6 A. TScherts dovran dentant dapli. Reglescha tenor las specificaziuns tecnicas da tes auto.</value>
   </data>
   <data name="MinimumChargingInterval" xml:space="preserve">
     <value>Interval da chargiada sfurzada</value>
@@ -770,7 +770,7 @@
     <value>HVAC Toshiba</value>
   </data>
   <data name="ToshibaHvacUrlTooltip" xml:space="preserve">
-    <value>Vus na duessas betg midar l'URL, nun che Toshiba mida il num dal host</value>
+    <value>Na mida betg l'URL, nun che Toshiba mida il num dal host</value>
   </data>
   <data name="HvacModeAuto" xml:space="preserve">
     <value>Refredar u stgaudar automaticamain</value>
@@ -821,7 +821,7 @@
     <value>Impussibel da midar il stadi da spetga: {0}</value>
   </data>
   <data name="StandbyWarning" xml:space="preserve">
-    <value>Vulais vus propi metter quest inverter en spetga?</value>
+    <value>Vuls ti propi metter quest inverter en spetga?</value>
   </data>
   <data name="DcRelativePower" xml:space="preserve">
     <value>Potenza DC %</value>
@@ -1412,7 +1412,7 @@
     <value>Permetter ids da cartas RFID en las API (inclus il cloud)</value>
   </data>
   <data name="SendRfidSerialToCloud_ToolTip" xml:space="preserve">
-    <value>Sche ids da cartas RFID vegnan tramess al cloud, pon go-E ed il purschider dal cloud (Hetzner) leger els e cluar la carta. Sche vus activais quai, na duvrai betg ina carta da chargiada publica per voss Wattpilot.</value>
+    <value>Sche ids da cartas RFID vegnan tramess al cloud, pon go-E ed il purschider dal cloud (Hetzner) leger els e cluar la carta. Sche ti activeschas quai, na duvra betg ina carta da chargiada publica per tes Wattpilot.</value>
   </data>
   <data name="CloudWebSocketEnabled" xml:space="preserve">
     <value>Activar l'access Websocket en il cloud</value>
@@ -1529,7 +1529,7 @@
     <value>La midada è deactivada per l'apparat «{0}».</value>
   </data>
   <data name="HttpForbidden" xml:space="preserve">
-    <value>Vus n'avais betg il dretg d'exequir questa acziun</value>
+    <value>Ti n'has betg il dretg d'exequir questa acziun</value>
   </data>
   <data name="DeviceNotDimmable" xml:space="preserve">
     <value>L'apparat «{0}» na sa betg vegnir smorzà.</value>
@@ -1556,7 +1556,7 @@
     <value>Mo ils panels solars da quest inverter</value>
   </data>
   <data name="Gen24ChargingSources_Home" xml:space="preserve">
-    <value>Mintga funtauna d'energia en vossa chasa</value>
+    <value>Mintga funtauna d'energia en tia chasa</value>
   </data>
   <data name="Gen24ChargingSources_HomeAndGrid" xml:space="preserve">
     <value>Mintga funtauna d'energia, inclus la rait publica</value>
@@ -1622,7 +1622,7 @@
     <value>Colurar tut / Colurar fin al value</value>
   </data>
   <data name="LanguageChangeWarning" xml:space="preserve">
-    <value>In pèr texts èn vegnids generads en «{0}» cur che {1} è vegnì avià. Els vegnan anc adina mussads en la lingua originala fin che vus reavias l'applicaziun.</value>
+    <value>In pèr texts èn vegnids generads en «{0}» cur che {1} è vegnì avià. Els vegnan anc adina mussads en la lingua originala fin che ti reavias l'applicaziun.</value>
   </data>
   <data name="Note" xml:space="preserve">
     <value>Nota</value>
@@ -1712,7 +1712,7 @@
     <value>L&apos;ultim administratur na po betg vegnir stizzà u degradà</value>
   </data>
   <data name="CannotDeleteSelf" xml:space="preserve">
-    <value>Vus na pudais betg stizzar voss agen conto d&apos;utilisader</value>
+    <value>Ti na pos betg stizzar tes agen conto d&apos;utilisader</value>
   </data>
   <data name="PasswordRequired" xml:space="preserve">
     <value>In nov utilisader dovra in pled-clav</value>

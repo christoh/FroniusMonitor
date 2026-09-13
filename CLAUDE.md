@@ -88,4 +88,10 @@ text to English.
   example `Claude Code (Opus 5)`, `GitHub Copilot (GPT Terra)`. The tool name on its own is not enough - which model wrote the change is part of the record.
   - If the working tree also holds changes made by the human developer, split the commit: commit your own changes under your AI authorship and leave theirs to them. Never sign a human's work with your name, or your own work  with theirs.
   - Committer should never be touched.
+  - If a session used more than one model (a model switch mid-session, or several sessions being committed together)
+    and it is technically possible to tell which model made which change - e.g. from session/event logs recording
+    the active model per edit - split the commit per model instead of signing everything with whichever model is
+    current when `git commit` runs. Each model's changes get their own commit under that model's own authorship
+    (`GitHub Copilot (<Model>)`), same as splitting AI from human changes above. If it is not possible to tell
+    which model made which change, say so and commit as usual under the current model.
 
