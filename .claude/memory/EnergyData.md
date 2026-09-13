@@ -152,7 +152,18 @@ exempt from VAT stays as it is, and a negative market price gets negative VAT, w
   `EnergyChartRenderer` into the `AvaPlot`, redraws on `ActualThemeVariantChanged`, and marshals a model set from
   the hub's thread with `Dispatcher.UIThread.Post`. It calls `Plot.Reset()` before every drawing because the
   weather adds right axes that `Clear()` would leave standing. Interaction is off (`UserInputProcessor.IsEnabled`),
-  as zoom and pan were off in WPF. Theme colors reach the renderer as `HaColor`.
+  as zoom and pan were off in WPF. Theme colors reach the renderer as `HaColor`. **Color the axes after
+  `DateTimeTicksBottom()`**: that call replaces the bottom axis, and one colored before it came up black on the
+  dark theme.
+- **Value labels sit at a fixed offset in a fixed 11 point font, like OxyPlot's.** They overlap when the dialog is
+  narrow, and the developer wants that rather than what was tried on 2026-09-13: staggering by bar index (bars
+  of different heights put neighbours at the same height anyway) and collision detection in pixel space with a
+  smaller font and dropped labels ("a mess"). Do not bring either back; make the dialog wider instead.
+- The settings row is one `Grid` of `Auto` columns and never wraps, by decision: the switches and the components
+  button stand right of the date picker. The `DatePicker` is given `MinWidth="0" Width="230"` because Fluent makes
+  it 300 wide, which squeezed a star column to nothing; the dialog's `MinWidth` is what the row needs in German.
+  The picker binds `MinYear`/`MaxYear` - the only bounds it has, a year not a day - and the view model clamps the
+  day. Nothing is written over the chart when weather, productions or components are missing.
 - The shape is the WPF chart's: price bars (LightSeaGreen, negatives Coral) with their value written on them,
   productions in GW hanging from the top of a right axis whose range is minus three times the largest total
   (so they take the top third; the price axis is stretched 60 % at the top for them), legend. New: DWD global

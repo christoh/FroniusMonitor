@@ -80,15 +80,18 @@ public sealed partial class EnergyChartViewModel(DialogParameters parameters) : 
     /// <summary>Yesterday: today and tomorrow have their own buttons and come from the live data.</summary>
     public DateTime MaximumDate => DateTime.Today.AddDays(-1);
 
+    /// <summary>
+    /// The years the picker offers. A <c>DatePicker</c> bounds only the year, not the day - it has MinYear and
+    /// MaxYear where the WPF picker had a first and a last date - so the changed handler of <see cref="HistoricDate"/>
+    /// keeps the day itself inside <see cref="MinimumDate"/> and <see cref="MaximumDate"/>.
+    /// </summary>
+    public DateTimeOffset MinimumYear => new(minimumDate);
+
+    public DateTimeOffset MaximumYear => new(MaximumDate);
+
     /// <summary>What the view draws, or <see langword="null"/> while there is nothing to draw.</summary>
     [ObservableProperty]
     public partial EnergyChartModel? ChartModel { get; set; }
-
-    /// <summary>What is missing from the chart on screen, in words, over the chart.</summary>
-    [ObservableProperty, NotifyPropertyChangedFor(nameof(HasWarnings))]
-    public partial IReadOnlyList<string> Warnings { get; set; } = [];
-
-    public bool HasWarnings => Warnings.Count > 0;
 
     /// <summary>The tariff components of the day shown, for the components dialog.</summary>
     [ObservableProperty, NotifyPropertyChangedFor(nameof(HasPriceComponents)), NotifyCanExecuteChangedFor(nameof(ShowPriceComponentsCommand))]
@@ -267,35 +270,12 @@ public sealed partial class EnergyChartViewModel(DialogParameters parameters) : 
         {
             PriceComponents = [];
             ChartModel = null;
-            Warnings = [Loc.NoEnergyData];
             return;
         }
 
-        var model = EnergyChartModel.Build(data, dayStart, dayEnd, IsBuyingPrice ? EnergyPriceDisplay.Buy : EnergyPriceDisplay.Market, IsGross, ShowProductions, ShowWeather);
-        var errors = new List<string>();
-
-        if (!model.HasPrices)
-        {
-            errors.Add(Loc.NoEnergyData);
-        }
-
-        if (IsBuyingPrice && data.PriceComponents.Count == 0)
-        {
-            errors.Add(Loc.NoPriceComponents);
-        }
-
-        if (ShowProductions && !model.HasProductions)
-        {
-            errors.Add(Loc.NoProductionData);
-        }
-
-        if (ShowWeather && !model.HasWeather && data.WeatherStationName != null)
-        {
-            errors.Add(Loc.NoWeatherData);
-        }
-
+        // What is missing - no weather for a historic day, no components without the tariff query - is not
+        // announced: the chart shows what there is, and an empty axis says enough.
         PriceComponents = data.PriceComponents;
-        ChartModel = model;
-        Warnings = errors;
+        ChartModel = EnergyChartModel.Build(data, dayStart, dayEnd, IsBuyingPrice ? EnergyPriceDisplay.Buy : EnergyPriceDisplay.Market, IsGross, ShowProductions, ShowWeather);
     }
 }

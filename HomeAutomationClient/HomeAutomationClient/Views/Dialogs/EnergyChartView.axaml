@@ -6,13 +6,14 @@
              xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
              xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
              xmlns:sp="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
-             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="520"
+             mc:Ignorable="d" d:DesignWidth="1160" d:DesignHeight="520"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.EnergyChartView"
              x:DataType="dialogs:EnergyChartViewModel"
-             Width="1000" Height="520" MinWidth="520" MinHeight="320" FontSize="12">
+             Width="1160" Height="520" MinWidth="1160" MinHeight="320" FontSize="12">
 	<!-- The size is stated here, as the dialog system wants it, and the dialog is resizeable: a chart is the one
 	     thing that gets better with every pixel the user gives it, so the grip is on from the start. The WPF window
-	     opened at 1280 by 550; 1000 fits a laptop beside the dialog frame. -->
+	     opened at 1280 by 550. The minimum width is what the settings row needs on one line in German, which is
+	     the longest of the languages; the row does not wrap, by decision. -->
 	<UserControl.Styles>
 		<StyleInclude Source="avares://HomeAutomationClient/Styles/CompactForms.axaml" />
 		<Style Selector="RadioButton.Wrap">
@@ -26,38 +27,29 @@
 	</UserControl.Styles>
 
 	<Grid RowDefinitions="*,Auto">
-		<Panel Grid.Row="0">
-			<!-- The chart itself. It has no bindings: the code behind draws ChartModel into it, because drawing is
-			     the one thing here that needs the charting library, and reacts to the theme the same way. -->
-			<sp:AvaPlot x:Name="Plot" />
-
-			<!-- What is missing, in the top left corner over the chart, the way the WPF window wrote its errors over
-			     the plot. Red at 60 %, so that it reads as a note and not as a failure of the whole dialog. -->
-			<ItemsControl ItemsSource="{Binding Warnings}" IsVisible="{Binding HasWarnings}" Margin="70,40,0,0"
-			              HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False">
-				<ItemsControl.ItemTemplate>
-					<DataTemplate x:DataType="x:String">
-						<TextBlock Text="{Binding}" Foreground="#A0FF0000" FontSize="13" TextWrapping="Wrap" />
-					</DataTemplate>
-				</ItemsControl.ItemTemplate>
-			</ItemsControl>
-		</Panel>
+		<!-- The chart itself. It has no bindings: the code behind draws ChartModel into it, because drawing is the
+		     one thing here that needs the charting library, and reacts to the theme the same way. What is missing
+		     from a day is not announced over the chart; an empty axis says enough. -->
+		<sp:AvaPlot Grid.Row="0" x:Name="Plot" />
 
 		<!-- The settings row of the WPF window: which price, with or without VAT, which day, and the two things the
-		     WPF chart did not have - the weather and a way to leave the productions out - as switches. -->
-		<Grid Grid.Row="1" ColumnDefinitions="Auto,Auto,Auto,Auto,*,Auto" Margin="16,6,16,10"
+		     WPF chart did not have - the weather and a way to leave the productions out - as switches, right of the
+		     date picker together with the components button. Every column is as wide as what is in it and none
+		     takes the rest: a star column was squeezed to nothing by the picker, which Fluent makes 300 pixels wide
+		     unless told otherwise. -->
+		<Grid Grid.Row="1" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" Margin="16,6,16,10"
 		      IsEnabled="{Binding IsBusy, Converter={co:BoolInverter}}">
-			<StackPanel Grid.Column="0" Margin="0,0,16,0">
+			<StackPanel Grid.Column="0" Margin="0,0,14,0">
 				<RadioButton Classes="Wrap" GroupName="Price" Content="{x:Static p:Resources.BuyingPrice}" IsChecked="{Binding IsBuyingPrice, Mode=TwoWay}" />
 				<RadioButton Classes="Wrap" GroupName="Price" Content="{x:Static p:Resources.MarketPrice}" IsChecked="{Binding IsMarketPrice, Mode=TwoWay}" />
 			</StackPanel>
 
-			<StackPanel Grid.Column="1" Margin="0,0,16,0">
+			<StackPanel Grid.Column="1" Margin="0,0,14,0">
 				<RadioButton Classes="Wrap" GroupName="Vat" Content="{x:Static p:Resources.WithoutVat}" IsChecked="{Binding IsNet, Mode=TwoWay}" />
 				<RadioButton Classes="Wrap" GroupName="Vat" Content="{x:Static p:Resources.WithVat}" IsChecked="{Binding IsGross, Mode=TwoWay}" />
 			</StackPanel>
 
-			<StackPanel Grid.Column="2" Margin="0,0,16,0">
+			<StackPanel Grid.Column="2" Margin="0,0,14,0">
 				<RadioButton Classes="Wrap" GroupName="Day" Content="{x:Static p:Resources.Today}" IsChecked="{Binding IsToday, Mode=TwoWay}" />
 				<RadioButton Classes="Wrap" GroupName="Day" Content="{x:Static p:Resources.Tomorrow}" IsChecked="{Binding IsTomorrow, Mode=TwoWay}" />
 				<RadioButton Classes="Wrap" GroupName="Day" Content="{x:Static p:Resources.Historic}" IsChecked="{Binding IsHistoric, Mode=TwoWay}" />
@@ -66,15 +58,18 @@
 			<!-- The day of the history: a picker and a step to either side, enabled only while Historic is the day
 			     shown, as the WPF window has it. A DatePicker and not a CalendarDatePicker on purpose: the latter
 			     has a text box the user can type into, and the interaction rule wants a typed date bound to a
-			     string of the view model's. This one is spun, never typed, so it may bind the date itself. -->
-			<StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center" Margin="0,0,16,0"
+			     string of the view model's. This one is spun, never typed, so it may bind the date itself.
+			     MinYear and MaxYear are all the bounds it has - the WPF picker bounded the day - so the view model
+			     clamps the day; see EnergyChartViewModel.MinimumYear. 230 pixels hold day, month and year. -->
+			<StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center" Margin="0,0,14,0"
 			            IsEnabled="{Binding IsHistoric}">
 				<Button Classes="Step" Content="&lt;" Command="{Binding PreviousDayCommand}" />
-				<DatePicker SelectedDate="{Binding HistoricDate, Mode=TwoWay}" MinHeight="22" VerticalAlignment="Center" />
+				<DatePicker SelectedDate="{Binding HistoricDate, Mode=TwoWay}" MinYear="{Binding MinimumYear}" MaxYear="{Binding MaximumYear}"
+				            MinWidth="0" Width="230" MinHeight="22" VerticalAlignment="Center" />
 				<Button Classes="Step" Content="&gt;" Command="{Binding NextDayCommand}" />
 			</StackPanel>
 
-			<StackPanel Grid.Column="4" Spacing="6" VerticalAlignment="Center">
+			<StackPanel Grid.Column="4" Spacing="6" VerticalAlignment="Center" Margin="0,0,14,0">
 				<ToggleButton Classes="OnOff Labeled" Height="16" HorizontalAlignment="Left" Content="{x:Static p:Resources.WindSolar}" IsChecked="{Binding ShowProductions}" />
 				<ToggleButton Classes="OnOff Labeled" Height="16" HorizontalAlignment="Left" Content="{x:Static p:Resources.WeatherDwd}" IsChecked="{Binding ShowWeather}" />
 			</StackPanel>

@@ -30,7 +30,6 @@ public static class EnergyChartRenderer
 
         plot.FigureBackground.Color = background;
         plot.DataBackground.Color = background;
-        plot.Axes.Color(foreground);
         plot.Grid.MajorLineColor = foreground.WithAlpha(0.15);
         plot.Grid.MinorLineColor = foreground.WithAlpha(0.06);
         plot.Legend.BackgroundColor = background;
@@ -47,6 +46,9 @@ public static class EnergyChartRenderer
         // tick left no room for the hours.
         var timeAxis = plot.Axes.DateTimeTicksBottom();
         timeAxis.TickGenerator = new ScottPlot.TickGenerators.DateTimeAutomatic { LabelFormatter = time => time.ToString("HH:mm", CultureInfo.CurrentCulture) };
+        // DateTimeTicksBottom replaces the bottom axis, so the axes are colored only now: colored before it, the new
+        // axis came up black on the dark theme.
+        plot.Axes.Color(foreground);
         Caption(plot.Axes.Left, "ct/kWh", foreground);
 
         AddBars(plot, model.PositivePrices, pricePositive, foreground, plot.Axes.Left, model.PriceLegend);
