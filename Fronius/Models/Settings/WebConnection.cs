@@ -43,20 +43,15 @@ public partial class WebConnection : BindableBase, ICloneable, IHaveDisplayName
 
     private static bool ProbeAes()
     {
-        var works = false;
-
         try
         {
             using var encryptor = Aes.CreateEncryptor();
-            works = encryptor.TransformFinalBlock(new byte[AesBlockLength], 0, AesBlockLength).Length > 0;
+            return encryptor.TransformFinalBlock(new byte[AesBlockLength], 0, AesBlockLength).Length > 0;
         }
         catch (PlatformNotSupportedException)
         {
-            // Deliberately not set from inside the try: some platforms throw this *after* the transform has
-            // handed back its result, and those do have AES. Only a platform that never gets that far says no.
+            return false;
         }
-
-        return works;
     }
 
     [System.Text.Json.Serialization.JsonIgnore]

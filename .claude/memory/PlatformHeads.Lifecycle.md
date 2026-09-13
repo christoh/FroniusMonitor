@@ -14,6 +14,7 @@ paths:
   - HomeAutomationClient/HomeAutomationClient.Android/**
   - HomeAutomationClient/HomeAutomationClient.iOS/**
   - Fronius/Localization/**
+  - Fronius/Models/Settings/WebConnection.cs
   - HomeAutomationServer/Program.cs
   - FroniusMonitor/ViewModels/SettingsViewModel.cs
 ---
@@ -84,6 +85,11 @@ into `localStorage` **in clear text**, beside the encrypted copy that is the onl
 Newtonsoft does respect. If a model must be invisible to both serializers, `[IgnoreDataMember]` is the attribute
 that says so - but the cache is System.Text.Json throughout now, and should stay that way.
 
+That leak had been holding something else up, which is worth knowing before the next bug report reads like a
+regression. On the browser there **was** no encrypted copy - see the next section - so the clear text one was the
+only reason a remembered password ever came back there. Closing the leak was right and is not to be undone; it
+merely stopped hiding a fault that had been there all along.
+
 Two things about those options that are easy to get wrong:
 
 - **The same object has to be given to the reader and to the writer.** Half of what is set there only applies on
@@ -99,6 +105,33 @@ strings) must survive the trimmer. All heads currently build with a trim mode th
 alone - verified for iOS with `dotnet msbuild -p:RuntimeIdentifier=ios-arm64 -getProperty:TrimMode`, which
 reports `partial`. Give `CacheJson.Options` a `JsonSerializerContext` before that changes; the compiler will not
 warn, because the trim analyzer does not look into a referenced project.
+
+## What a browser cannot do at all: encrypt
+
+**There is no symmetric cipher in a browser.** The Web Crypto API is asynchronous throughout, so .NET offers none
+of it to synchronous code, and `Aes.CreateEncryptor` / `TransformFinalBlock` throw `PlatformNotSupportedException`
+there. **No cipher mode escapes this** - ECB and CBC are equally unavailable, so reaching for another mode is not
+a fix, and changing the mode the other heads use only endangers the passwords already written in their settings
+files.
+
+What *is* available is everything hash based - SHA, HMAC, PBKDF2 - because those are compiled into the runtime
+rather than borrowed from the browser. That asymmetry is the signature of this fault, and it is visible from the
+outside: a stored connection with `PasswordChecksum` filled in and `EncryptedPassword` empty beside it has hit
+exactly this.
+
+`WebConnection` therefore decides **by capability, not by platform**: `ProbeAes` tries the cipher once and
+`HasAes` remembers the answer. Where AES works nothing changed, so every settings file keeps the ECB written
+password it always had. Where it does not, `XorWithKeystream` puts an HMAC-SHA256 keystream over a block counter,
+keyed with the same key, in its place, with PKCS7 style padding so that a wrong key fails to unpad and forgets
+the password instead of putting noise into the box - the same graceful degradation as everywhere else.
+
+Two things to keep:
+
+- **Probe, do not ask `OperatingSystem.IsBrowser()`.** What matters is whether the cipher works, and a capability
+  test keeps saying the right thing if a future runtime gains one.
+- **The fallback is not interchangeable with AES.** A password written by one cannot be read by the other, which
+  costs nothing while no head switches between them - but it does mean the browser and the desktop cannot read
+  each other's stored password, unlike every other value in the cache.
 
 ## What a head may provide: the accent color
 
