@@ -101,8 +101,9 @@ public sealed class EnergyChartModel
             ? data.Productions.Where(p => InDay(p.StartTime)).OrderBy(p => p.StartTime).ToList()
             : [];
 
+        // The whole span, not only the day: the hours around the day's edges give the lines their end points.
         var weather = showWeather
-            ? data.Weather.Where(w => InDay(w.Time)).OrderBy(w => w.Time).ToList()
+            ? data.Weather.OrderBy(w => w.Time).ToList()
             : [];
 
         var priceMin = prices.Count == 0 ? 0 : Math.Min(prices.Min(p => p.Value), 0);
@@ -113,8 +114,11 @@ public sealed class EnergyChartModel
         var totals = productions.Select(p => (p.SolarMegaWatt + p.WindMegaWatt) / 1000).ToList();
         var productionMax = totals.Count == 0 ? 1 : Math.Max(totals.Max(), 0.001);
 
-        var radiation = weather.Where(w => w.GlobalRadiationWattsPerSquareMeter is not null).ToList();
-        var windSpeed = weather.Where(w => w.WindSpeedMetersPerSecond is not null).ToList();
+        // Radiation is the mean of an hour and drawn at its middle; wind is the state at the start of an hour.
+        var (radiationMeasured, radiationForecast) = WeatherLines(weather, w => w.GlobalRadiationWattsPerSquareMeter, TimeSpan.FromMinutes(30), dayStart, dayEnd);
+        var (windMeasured, windForecast) = WeatherLines(weather, w => w.WindSpeedMetersPerSecond, TimeSpan.Zero, dayStart, dayEnd);
+        var radiationMax = radiationMeasured.Concat(radiationForecast).Select(p => p.Value).DefaultIfEmpty(0).Max();
+        var windMax = windMeasured.Concat(windForecast).Select(p => p.Value).DefaultIfEmpty(0).Max();
 
         var title = $"{Loc.ElectricityPrice} ({data.PriceRegion.ToDisplayName()})";
 
@@ -135,12 +139,12 @@ public sealed class EnergyChartModel
             Solar = [.. productions.Select(p => new ChartBar(Local(p.StartTime), Local(p.EndTime), 0, -p.SolarMegaWatt / 1000, null))],
             Wind = [.. productions.Select(p => new ChartBar(Local(p.StartTime), Local(p.EndTime), -p.SolarMegaWatt / 1000, -(p.SolarMegaWatt + p.WindMegaWatt) / 1000, ((p.SolarMegaWatt + p.WindMegaWatt) / 1000).ToString("0.0", CultureInfo.CurrentCulture)))],
             ProductionAxisMinimum = -productionMax * 3,
-            RadiationMeasured = [.. radiation.Where(w => !w.IsForecast).Select(w => new ChartPoint(Local(w.Time).AddMinutes(30), w.GlobalRadiationWattsPerSquareMeter!.Value))],
-            RadiationForecast = [.. radiation.Where(w => w.IsForecast).Select(w => new ChartPoint(Local(w.Time).AddMinutes(30), w.GlobalRadiationWattsPerSquareMeter!.Value))],
-            RadiationAxisMaximum = Math.Max(100, (radiation.Count == 0 ? 0 : radiation.Max(w => w.GlobalRadiationWattsPerSquareMeter!.Value)) * 1.15),
-            WindSpeedMeasured = [.. windSpeed.Where(w => !w.IsForecast).Select(w => new ChartPoint(Local(w.Time), w.WindSpeedMetersPerSecond!.Value))],
-            WindSpeedForecast = [.. windSpeed.Where(w => w.IsForecast).Select(w => new ChartPoint(Local(w.Time), w.WindSpeedMetersPerSecond!.Value))],
-            WindSpeedAxisMaximum = Math.Max(5, (windSpeed.Count == 0 ? 0 : windSpeed.Max(w => w.WindSpeedMetersPerSecond!.Value)) * 1.15),
+            RadiationMeasured = radiationMeasured,
+            RadiationForecast = radiationForecast,
+            RadiationAxisMaximum = Math.Max(100, radiationMax * 1.15),
+            WindSpeedMeasured = windMeasured,
+            WindSpeedForecast = windForecast,
+            WindSpeedAxisMaximum = Math.Max(5, windMax * 1.15),
             PriceLegend = display == EnergyPriceDisplay.Buy ? Loc.BuyingPrice : Loc.MarketPrice,
             NegativePriceLegend = Loc.ElectricityPriceNegative,
             SolarLegend = Loc.SolarProduction,
@@ -155,7 +159,74 @@ public sealed class EnergyChartModel
             var local = Local(utc);
             return local >= dayStart && local < dayEnd;
         }
-
-        static DateTime Local(DateTime utc) => DateTime.SpecifyKind(utc, DateTimeKind.Utc).ToLocalTime();
     }
+
+    /// <summary>
+    /// One weather quantity as the two lines the chart draws, measured and forecast, reaching from one edge of the
+    /// day to the other without a break between them.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Two gaps were visible before this: the solid line ended at the last measured hour and the dashed one began
+    /// an hour later, and both stopped an hour short of midnight because the last hour of the day has no point at
+    /// its end. So the forecast line starts at the last measured point, and where the first or last point does not
+    /// sit on the edge of the day, a point on the edge is added: interpolated between the neighbouring hours where
+    /// the hour beyond the edge is known - the live data has tomorrow's first hour - and the edge value repeated
+    /// where it is not.
+    /// </para>
+    /// <para>
+    /// <paramref name="offset"/> is where in its hour a value is drawn: the middle for a mean over the hour, the
+    /// start for a state at a moment.
+    /// </para>
+    /// </remarks>
+    public static (IReadOnlyList<ChartPoint> Measured, IReadOnlyList<ChartPoint> Forecast) WeatherLines(IReadOnlyList<WeatherPoint> weather, Func<WeatherPoint, double?> value, TimeSpan offset, DateTime dayStart, DateTime dayEnd)
+    {
+        var points = weather
+            .Where(w => value(w) is not null)
+            .Select(w => (Time: Local(w.Time) + offset, Value: value(w)!.Value, w.IsForecast))
+            .OrderBy(p => p.Time)
+            .ToList();
+
+        var inside = points.Where(p => p.Time >= dayStart && p.Time <= dayEnd).ToList();
+
+        if (inside.Count == 0)
+        {
+            return ([], []);
+        }
+
+        if (inside[0].Time > dayStart)
+        {
+            inside.Insert(0, Edge(dayStart, inside[0], points.LastOrDefault(p => p.Time < dayStart)));
+        }
+
+        if (inside[^1].Time < dayEnd)
+        {
+            inside.Add(Edge(dayEnd, inside[^1], points.FirstOrDefault(p => p.Time > dayEnd)));
+        }
+
+        var measured = inside.Where(p => !p.IsForecast).Select(p => new ChartPoint(p.Time, p.Value)).ToList();
+        var forecast = inside.Where(p => p.IsForecast).Select(p => new ChartPoint(p.Time, p.Value)).ToList();
+
+        if (measured.Count > 0 && forecast.Count > 0 && forecast[0].Time > measured[^1].Time)
+        {
+            forecast.Insert(0, measured[^1]);
+        }
+
+        return (measured, forecast);
+
+        // The point on the edge of the day: between the nearest point inside and the nearest outside where the
+        // outside one is the neighbouring hour, otherwise the inside value carried to the edge.
+        static (DateTime Time, double Value, bool IsForecast) Edge(DateTime edge, (DateTime Time, double Value, bool IsForecast) inside, (DateTime Time, double Value, bool IsForecast) outside)
+        {
+            if (outside.Time == default || (outside.Time - inside.Time).Duration() > TimeSpan.FromMinutes(90))
+            {
+                return (edge, inside.Value, inside.IsForecast);
+            }
+
+            var fraction = (edge - inside.Time).TotalMinutes / (outside.Time - inside.Time).TotalMinutes;
+            return (edge, inside.Value + (outside.Value - inside.Value) * fraction, inside.IsForecast);
+        }
+    }
+
+    private static DateTime Local(DateTime utc) => DateTime.SpecifyKind(utc, DateTimeKind.Utc).ToLocalTime();
 }

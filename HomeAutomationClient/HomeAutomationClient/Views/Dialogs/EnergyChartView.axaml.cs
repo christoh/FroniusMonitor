@@ -13,6 +13,9 @@ public partial class EnergyChartView : UserControl, IDialogControl
 
     public EnergyChartView()
     {
+        // Before the AvaPlot is built: a plot takes its font at construction, and it has to be the app's Inter,
+        // not whatever Skia finds on the platform - see InterFontResolver.
+        InterFontResolver.Register();
         InitializeComponent();
 
         // The WPF chart had zoom and pan switched off on both axes: a day is a day, and dragging it about only

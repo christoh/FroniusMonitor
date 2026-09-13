@@ -164,6 +164,19 @@ exempt from VAT stays as it is, and a negative market price gets negative VAT, w
   it 300 wide, which squeezed a star column to nothing; the dialog's `MinWidth` is what the row needs in German.
   The picker binds `MinYear`/`MaxYear` - the only bounds it has, a year not a day - and the view model clamps the
   day. Nothing is written over the chart when weather, productions or components are missing.
+- **The chart's font is Inter, registered by hand** (`InterFontResolver`). ScottPlot resolves font names through
+  Skia's system font manager, which the browser does not have, so the chart's face changed from one container
+  start to the next (monospace one time, proportional the next). The resolver reads `Inter-Regular.ttf` and
+  `Inter-Bold.ttf` out of the `Avalonia.Fonts.Inter` assets, is put first in `ScottPlot.Fonts.FontResolvers`,
+  and makes `Fonts.Default` "Inter" - **before the `AvaPlot` is built**, in the view's constructor, because a
+  plot takes its font at construction. `plot.Font.Set(...)` is deliberately not called: it pins one typeface on
+  every label and the title stops being bold.
+- **Weather lines run from edge to edge without a break** (`EnergyChartModel.WeatherLines`). Radiation is a mean
+  and drawn at the middle of its hour, wind is a state and drawn at the start, so both lines used to stop an hour
+  short of midnight and the dashed forecast began an hour after the solid measurement ended. Now the forecast
+  line starts at the last measured point, and a point is added on each edge of the day: interpolated between the
+  neighbouring hours where the hour beyond the edge is known (the live span has tomorrow's first hour), the edge
+  value repeated where it is not. `Build` therefore looks at the whole span's weather, not only the day's.
 - The shape is the WPF chart's: price bars (LightSeaGreen, negatives Coral) with their value written on them,
   productions in GW hanging from the top of a right axis whose range is minus three times the largest total
   (so they take the top third; the price axis is stretched 60 % at the top for them), legend. New: DWD global

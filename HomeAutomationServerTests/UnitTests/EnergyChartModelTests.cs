@@ -89,14 +89,46 @@ public sealed class EnergyChartModelTests
         var model = EnergyChartModel.Build(data, dayStart, dayStart.AddDays(1), EnergyPriceDisplay.Market, gross: false, showProductions: false, showWeather: true);
 
         Assert.True(model.HasWeather);
-        Assert.Equal(300, Assert.Single(model.RadiationMeasured).Value);
-        Assert.Equal(dayStart.AddMinutes(30), model.RadiationMeasured[0].Time);
-        Assert.Equal(600, Assert.Single(model.RadiationForecast).Value);
-        Assert.Equal(2, Assert.Single(model.WindSpeedMeasured).Value);
+
+        // The measured hour sits at its middle, and the line is carried to the start of the day; the forecast
+        // starts where the measured line ends and is carried to the end of the day - the point two days later is
+        // too far away to interpolate towards.
+        Assert.Equal([(dayStart, 300.0), (dayStart.AddMinutes(30), 300.0)], model.RadiationMeasured.Select(p => (p.Time, p.Value)));
+        Assert.Equal([(dayStart.AddMinutes(30), 300.0), (dayStart.AddMinutes(90), 600.0), (dayStart.AddDays(1), 600.0)], model.RadiationForecast.Select(p => (p.Time, p.Value)));
+
+        // Wind is the state at the start of the hour, so the first point is on the edge already.
+        Assert.Equal([(dayStart, 2.0), (dayStart.AddDays(1), 2.0)], model.WindSpeedMeasured.Select(p => (p.Time, p.Value)));
         Assert.Empty(model.WindSpeedForecast);
         Assert.Equal(600 * 1.15, model.RadiationAxisMaximum, 6);
         Assert.Equal(5, model.WindSpeedAxisMaximum);
         Assert.Contains("TESTSTATION", model.RadiationLegend);
+    }
+
+    [Fact]
+    public void Weather_lines_end_on_the_edge_of_the_day_interpolated_from_the_neighbouring_hour()
+    {
+        var start = dayStart.ToUniversalTime();
+        List<WeatherPoint> weather =
+        [
+            new() { Time = start.AddHours(-1), IsForecast = false, GlobalRadiationWattsPerSquareMeter = 100, WindSpeedMetersPerSecond = 1 },
+            new() { Time = start, IsForecast = false, GlobalRadiationWattsPerSquareMeter = 200, WindSpeedMetersPerSecond = 2 },
+            new() { Time = start.AddHours(23), IsForecast = true, GlobalRadiationWattsPerSquareMeter = 400, WindSpeedMetersPerSecond = 4 },
+            new() { Time = start.AddHours(24), IsForecast = true, GlobalRadiationWattsPerSquareMeter = 600, WindSpeedMetersPerSecond = 6 },
+        ];
+
+        var (radiationMeasured, radiationForecast) = EnergyChartModel.WeatherLines(weather, w => w.GlobalRadiationWattsPerSquareMeter, TimeSpan.FromMinutes(30), dayStart, dayStart.AddDays(1));
+        var (windMeasured, windForecast) = EnergyChartModel.WeatherLines(weather, w => w.WindSpeedMetersPerSecond, TimeSpan.Zero, dayStart, dayStart.AddDays(1));
+
+        // Midnight lies half way between the means of 23:00 and of 00:00 the next day, and between yesterday's
+        // 23:00 and today's 00:00.
+        Assert.Equal([(dayStart, 150.0), (dayStart.AddMinutes(30), 200.0)], radiationMeasured.Select(p => (p.Time, p.Value)));
+        Assert.Equal([(dayStart.AddMinutes(30), 200.0), (dayStart.AddHours(23.5), 400.0), (dayStart.AddDays(1), 500.0)], radiationForecast.Select(p => (p.Time, p.Value)));
+
+        // The wind at midnight is a point of the day itself, on both edges, so nothing is interpolated.
+        Assert.Equal([(dayStart, 2.0)], windMeasured.Select(p => (p.Time, p.Value)));
+        Assert.Equal([(dayStart, 2.0), (dayStart.AddHours(23), 4.0), (dayStart.AddDays(1), 6.0)], windForecast.Select(p => (p.Time, p.Value)));
+
+        Assert.Empty(EnergyChartModel.WeatherLines(weather, w => w.TemperatureCelsius, TimeSpan.Zero, dayStart, dayStart.AddDays(1)).Measured);
     }
 
     [Fact]
