@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
+using Avalonia.Styling;
 using De.Hochstaetter.Fronius.Models.Charging;
 using BatteryDetailsView = De.Hochstaetter.HomeAutomationClient.Views.BatteryDetailsView;
 using InverterDetailsView = De.Hochstaetter.HomeAutomationClient.Views.InverterDetailsView;
@@ -63,6 +64,22 @@ public sealed partial class MainViewModel : ViewModelBase
     /// </summary>
     [ObservableProperty]
     public partial bool ColorAllTicks { get; set; } = true;
+
+    /// <summary>
+    /// Overrides whatever light or dark variant the OS, the browser or Avalonia's own default reported, so a user
+    /// can force the app into either one. Starts out reflecting whatever is in effect when the app comes up, not
+    /// forcing dark or light before the user has touched the switch.
+    /// </summary>
+    [ObservableProperty]
+    public partial bool IsDarkMode { get; set; } = Application.Current?.ActualThemeVariant == ThemeVariant.Dark;
+
+    partial void OnIsDarkModeChanged(bool value)
+    {
+        if (Application.Current is { } app)
+        {
+            app.RequestedThemeVariant = value ? ThemeVariant.Dark : ThemeVariant.Light;
+        }
+    }
 
     [ObservableProperty]
     public partial object? MainViewContent { get; set; }

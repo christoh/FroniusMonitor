@@ -1143,6 +1143,9 @@
   <data name="ColorAllGaugeTicks" xml:space="preserve">
 	  <value>Colora sempre completamente gli indicatori</value>
   </data>
+  <data name="DarkMode" xml:space="preserve">
+	  <value>Modalità scura</value>
+  </data>
   <data name="MpptComparison" xml:space="preserve">
 	  <value>Stringa 2/1</value>
   </data>

@@ -1120,6 +1120,9 @@
   <data name="ColorAllGaugeTicks" xml:space="preserve">
     <value>Toujours colorer entièrement les jauges</value>
   </data>
+  <data name="DarkMode" xml:space="preserve">
+    <value>Mode sombre</value>
+  </data>
   <data name="Details" xml:space="preserve">
     <value>Détails</value>
   </data>

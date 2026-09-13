@@ -1129,6 +1129,9 @@
   <data name="ColorAllGaugeTicks" xml:space="preserve">
     <value>Adina colurar entiramain ils indicaturs</value>
   </data>
+  <data name="DarkMode" xml:space="preserve">
+    <value>Modus stgir</value>
+  </data>
   <data name="Details" xml:space="preserve">
     <value>Detagls</value>
   </data>

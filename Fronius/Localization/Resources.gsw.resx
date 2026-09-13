@@ -1161,6 +1161,9 @@
   <data name="ColorAllGaugeTicks" xml:space="preserve">
 	  <value>Aazeigeinschtrumänt immer komplett iifärbe</value>
   </data>
+  <data name="DarkMode" xml:space="preserve">
+	  <value>Dunkli Modus</value>
+  </data>
   <data name="SumPv" xml:space="preserve">
 	  <value>Summe PV</value>
   </data>

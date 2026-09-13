@@ -72,10 +72,13 @@
         <UserControl Grid.Row="1" Content="{Binding MainViewContent}" IsEnabled="{Binding IsModalDialogVisible, Converter={co:BoolInverter}}"/>
 
         <!-- Applies to the gauges of every view, so it lives here and not in one of them. -->
-        <StackPanel Grid.Row="2" Margin="16,8" IsVisible="{Binding IsReady}"
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="24" Margin="16,8" IsVisible="{Binding IsReady}"
                     IsEnabled="{Binding IsModalDialogVisible, Converter={co:BoolInverter}}">
             <ToggleButton Classes="OnOff Labeled" Height="16" VerticalAlignment="Center" IsChecked="{Binding ColorAllTicks}"
                           Content="{x:Static p:Resources.ColorAllGaugeTicks}" />
+            <!-- Overrides the light/dark variant the OS or browser reported; see MainViewModel.IsDarkMode. -->
+            <ToggleButton Classes="OnOff Labeled" Height="16" VerticalAlignment="Center" IsChecked="{Binding IsDarkMode}"
+                          Content="{x:Static p:Resources.DarkMode}" />
         </StackPanel>
         <c:BusyAnimation BusyText="{Binding BusyText}" Grid.Row="1"/>
         <!-- Dims the views behind a modal dialog and swallows their pointer input. A non-modal dialog leaves it out,
