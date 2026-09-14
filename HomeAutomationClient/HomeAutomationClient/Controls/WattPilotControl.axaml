@@ -187,6 +187,29 @@
 							</StackPanel>
 						</Grid>
 
+						<!-- The car and the socket of the WPF main window, as one page: the car pulses with the charging status and
+						     carries the session's energy and the card holder's name, the socket shows which phases the cable and the
+						     charger switch. The socket, the cable's rating and the padlock only appear while a cable is plugged in. -->
+						<Grid x:Name="MoreCar" IsVisible="{Binding Mode, Converter={co:WattPilotDisplayMode2Bool MoreCar}}" RowDefinitions="Auto,*,Auto,Auto" Margin="2,0">
+							<TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.Car}" TextAlignment="Center" />
+
+							<c:CarControl Grid.Row="1" Margin="4,2" VerticalAlignment="Center"
+							              Status="{Binding WattPilot.CarStatus}"
+							              EnergyWattHours="{Binding WattPilot.EnergyCurrentSession}"
+							              CurrentUser="{Binding WattPilot.CurrentUser}" />
+
+							<StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" IsVisible="{Binding WattPilot.CableCurrentMaximum, Converter={co:NullToBool}, FallbackValue=False}">
+								<TextBlock FontSize="8" FontWeight="Medium" VerticalAlignment="Center">
+									<Run Text="{Binding WattPilot.CableCurrentMaximum, StringFormat=N0}" />
+									<Run Text="A" />
+								</TextBlock>
+								<c:CableLockControl Height="9" Margin="3,0,0,0" VerticalAlignment="Center" CableLockStatus="{Binding WattPilot.CableLockStatus}" />
+							</StackPanel>
+
+							<c:Typ2Control Grid.Row="3" Height="34" Margin="0,1,0,2" WattPilot="{Binding WattPilot}"
+							               IsVisible="{Binding WattPilot.CableCurrentMaximum, Converter={co:NullToBool}, FallbackValue=False}" />
+						</Grid>
+
 						<Grid x:Name="MoreFrequency" IsVisible="{Binding Mode, Converter={co:WattPilotDisplayMode2Bool MoreFrequency}}" RowDefinitions="Auto,Auto,*">
 
 							<TextBlock Grid.Row="0" FontSize="10" Text="{Binding WattPilot.SerialNumber}" TextAlignment="Center" />

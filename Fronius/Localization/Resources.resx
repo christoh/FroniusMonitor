@@ -1926,4 +1926,7 @@
   <data name="SelfConsumption" xml:space="preserve">
     <value>Own consumption</value>
   </data>
+  <data name="Car" xml:space="preserve">
+    <value>Car</value>
+  </data>
 </root>

@@ -5487,5 +5487,14 @@ namespace De.Hochstaetter.Fronius.Localization {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to Car.
+        /// </summary>
+        public static string Car {
+            get {
+                return ResourceManager.GetString("Car", resourceCulture);
+            }
+        }
+        
     }
 }

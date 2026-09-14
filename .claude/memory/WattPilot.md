@@ -22,6 +22,17 @@ paths:
   - HomeAutomationServerTests/UnitTests/Hosted/HubWattPilotSettingsTests.cs
   - HomeAutomationClient/HomeAutomationClient/Controls/WattPilotControl.axaml
   - HomeAutomationClient/HomeAutomationClient/Controls/WattPilotControl.axaml.cs
+  - HomeAutomationClient/HomeAutomationClient/Controls/CarControl.axaml
+  - HomeAutomationClient/HomeAutomationClient/Controls/CarControl.axaml.cs
+  - HomeAutomationClient/HomeAutomationClient/Controls/Typ2Control.axaml
+  - HomeAutomationClient/HomeAutomationClient/Controls/Typ2Control.axaml.cs
+  - HomeAutomationClient/HomeAutomationClient/Controls/CableLockControl.axaml
+  - HomeAutomationClient/HomeAutomationClient/Controls/CableLockControl.axaml.cs
+  - FroniusMonitor/Controls/WattPilotPadLock.xaml
+  - HomeAutomationClient/HomeAutomationClient/Models/WattPilotPhases.cs
+  - HomeAutomationClient/HomeAutomationClient/Converters/WattPilotConverters.cs
+  - FroniusMonitor/Assets/Images/Car.xaml
+  - FroniusMonitor/Assets/Images/Typ2.xaml
   - FroniusMonitor/Controls/WattPilotControl.xaml
   - FroniusMonitor/Controls/WattPilotControl.xaml.cs
   - FroniusMonitor/ViewModels/WattPilotSettingsViewModel.cs
@@ -322,6 +333,24 @@ Both apps have a `WattPilotControl` for the dashboard with the same `WattPilotDi
 click-to-cycle logic (power → power factor, voltage, current, and a "more" cycle of frequency, neutral wire,
 temperatures, RFID card energies, WiFi). The two are copy and paste of each other, one in `Controls/` of each
 app; the Avalonia one takes the `WattPilot` as a styled property where the WPF one takes the service.
+
+**The car page (Avalonia, 2026-09-15).** The WPF main window draws a `Car` and a `Typ2` socket next to the
+charger (`FroniusMonitor/Assets/Images`); the Avalonia card has them as the first page of its More cycle,
+`WattPilotDisplayMode.MoreCar`: `Controls/CarControl` (status, session energy in Wh, card holder) above the
+cable's rating in A with the padlock `Controls/CableLockControl` (the WPF `WattPilotPadLock`: shackle closed
+for Locked and LockFailed, body green when the lock did as asked, orange red on a failure, dark orange without
+power, gray unknown; tooltip via `EnumDisplayName`), and `Controls/Typ2Control` - all three only while
+`CableCurrentMaximum` is not null.
+The car's colours and pulsing are styles keyed on pseudo classes the code behind sets from `CarStatus`
+(`:idle` for Idle *and* null - crossed out - `:charging`, `:waitcar`, `:complete`, `:error`); the car is an
+outline, so its text sits on the card background and takes `ForegroundBrush`, never black (the developer's
+dark mode screenshot showed black on black) and never dimmed;
+the WPF `ColorAnimation` became `Style.Animations` on `Path#CarShape`. The socket's L1..L3 are filled by
+`WattPilotPhaseBrush` from (cable enabled, charger enabled, current), N and PE by `WattPilotNeutralBrush` from
+all nine; the rule is the pure `Models/WattPilotPhases` (green charging above 1 A, salmon ready, white charger
+only, yellow cable only, hollow unknown; N/PE go green as soon as one phase is ready or charging), tested in
+`WattPilotPhasesTests`. The geometry of all three is the WPF drawing unchanged, translations included, so a
+comparison between the apps is number for number; only the padlock's strokes follow the theme instead of black.
 
 ## Electricity prices from the charger
 

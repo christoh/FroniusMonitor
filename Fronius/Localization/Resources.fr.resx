@@ -1801,4 +1801,7 @@
   <data name="SelfConsumption" xml:space="preserve">
     <value>Autoconsommation</value>
   </data>
+  <data name="Car" xml:space="preserve">
+    <value>Voiture</value>
+  </data>
 </root>

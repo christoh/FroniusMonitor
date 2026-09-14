@@ -1827,4 +1827,7 @@
   <data name="SelfConsumption" xml:space="preserve">
     <value>Eigenverbrauch</value>
   </data>
+  <data name="Car" xml:space="preserve">
+    <value>Auto</value>
+  </data>
 </root>
