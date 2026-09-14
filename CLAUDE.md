@@ -82,7 +82,7 @@ text to English.
 # Commits
 - Always suggest commit and push. Never commit alone.
 - Do not commit without asking the human developer first.
-- Force pushes are **never** allowed by AI.
+- Force pushes are **never** allowed by AI, with one exception: when running in the cloud, AI may force push a branch that it created itself (`--force-with-lease`, never a bare `--force`). Branches created by a human developer stay off limits.
 - History rewrites need confirmation by a human developer.
 - Commit under your own authorship, never under the human developer's: `git commit --author="<name> <email>"`. The author e-mail is always `christoph@hochstaetter.de`, whatever `.git/config` says - in the cloud that config carries the AI's own address. Only the name changes.
   - The committer is never touched: it is whoever runs git. On the developer's machine that is the human developer, in the cloud it is the AI identity the environment configures.
