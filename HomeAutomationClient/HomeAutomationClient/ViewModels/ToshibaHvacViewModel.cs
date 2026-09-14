@@ -64,12 +64,14 @@ public partial class ToshibaHvacViewModel(IToshibaHvacCommander commander) : Vie
     public ObservableCollection<TemperatureOption> Temperatures { get; } = [];
 
     /// <summary>
-    /// The set temperature as the device means it: in the 8 °C heating mode the byte carries the temperature plus
-    /// 16, so 24 reads as 8 °C, which is how Toshiba's own app shows it.
+    /// What the device adds to the temperature it means: in the 8 °C heating mode the byte carries the temperature
+    /// plus 16, so 24 reads as 8 °C, which is how Toshiba's own app shows it. The set temperature display and the
+    /// texts of <see cref="Temperatures"/> both subtract it.
     /// </summary>
-    public sbyte? DisplayTargetTemperature => Device?.State.TargetTemperatureCelsius is { } target
-        ? Device.State.MeritFeaturesA == ToshibaHvacMeritFeaturesA.Heating8C ? (sbyte)(target - 16) : target
-        : null;
+    private sbyte TemperatureDisplayOffset => Device?.State.MeritFeaturesA == ToshibaHvacMeritFeaturesA.Heating8C ? (sbyte)16 : (sbyte)0;
+
+    /// <summary>The set temperature as the device means it, see <see cref="TemperatureDisplayOffset"/>.</summary>
+    public sbyte? DisplayTargetTemperature => Device?.State.TargetTemperatureCelsius is { } target ? (sbyte)(target - TemperatureDisplayOffset) : null;
 
     public string TargetTemperatureText => Format(DisplayTargetTemperature);
     public string IndoorTemperatureText => Format(Device?.State.CurrentIndoorTemperatureCelsius);
@@ -181,9 +183,12 @@ public partial class ToshibaHvacViewModel(IToshibaHvacCommander commander) : Vie
         }
     }
 
-    /// <summary>Re-announces what the view shows of the state and moves the check marks of the menus.</summary>
+    /// <summary>Re-announces what the view shows of the state, relabels the temperatures for the current mode and moves the check marks of the menus.</summary>
     private void RefreshState()
     {
+        var offset = TemperatureDisplayOffset;
+        Temperatures.Apply(option => option.DisplayOffset = offset);
+
         NotifyOfPropertyChange(nameof(DisplayTargetTemperature));
         NotifyOfPropertyChange(nameof(TargetTemperatureText));
         NotifyOfPropertyChange(nameof(IndoorTemperatureText));

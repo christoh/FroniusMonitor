@@ -81,6 +81,10 @@
                     <SolidColorBrush x:Key="HvacOffMark">Red</SolidColorBrush>
                     <SolidColorBrush x:Key="HvacHoverFill">#4000c0ff</SolidColorBrush>
                     <SolidColorBrush x:Key="HvacHoverStroke">#ff00c0ff</SolidColorBrush>
+                    <!-- Everything drawn on the Lcd background: text, arrows, house and tree. -->
+                    <SolidColorBrush x:Key="HvacLcdForeground">Black</SolidColorBrush>
+                    <!-- The Wi-Fi LED keeps this green in the dark variant too, unlike HvacActive. -->
+                    <SolidColorBrush x:Key="HvacWifiLedOn">LimeGreen</SolidColorBrush>
 
                     <!-- Gauge -->
                     <SolidColorBrush x:Key='UnitForeground'>Blue</SolidColorBrush>
@@ -160,6 +164,9 @@
                     <SolidColorBrush x:Key="HvacOffMark">#FF5C5C</SolidColorBrush>
                     <SolidColorBrush x:Key="HvacHoverFill">#4000c0ff</SolidColorBrush>
                     <SolidColorBrush x:Key="HvacHoverStroke">#ff00c0ff</SolidColorBrush>
+                    <!-- Not the near-white ForegroundBrush: on the dark green Lcd the developer wants LightGray. -->
+                    <SolidColorBrush x:Key="HvacLcdForeground">LightGray</SolidColorBrush>
+                    <SolidColorBrush x:Key="HvacWifiLedOn">LimeGreen</SolidColorBrush>
 
                     <!-- Gauge -->
                     <SolidColorBrush x:Key='UnitForeground'>Cyan</SolidColorBrush>

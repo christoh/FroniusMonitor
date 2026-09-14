@@ -33,6 +33,7 @@
 			<Setter Property="FontSize" Value="16" />
 			<Setter Property="VerticalAlignment" Value="Center" />
 			<Setter Property="HorizontalAlignment" Value="Right" />
+			<Setter Property="FontFeatures" Value="+tnum" />
 		</Style>
 
 		<!-- The arrows stretch to the width of the temperature below them, so they stay centred on it whatever
@@ -50,14 +51,23 @@
 		<Style Selector="Button.HvacArrow Polygon">
 			<Setter Property="Stretch" Value="Fill" />
 			<Setter Property="Height" Value="10" />
-			<Setter Property="Fill" Value="{DynamicResource ForegroundBrush}" />
+			<Setter Property="Fill" Value="{DynamicResource HvacLcdForeground}" />
+		</Style>
+		<!-- Under the pointer only the triangle lights up, not the button around it: Fluent paints the hover through
+		     the template's ContentPresenter, which is kept see-through here, and the polygon takes the hover colour. -->
+		<Style Selector="Button.HvacArrow:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button.HvacArrow:pressed /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Background" Value="Transparent" />
+			<Setter Property="BorderBrush" Value="Transparent" />
+		</Style>
+		<Style Selector="Button.HvacArrow:pointerover Polygon">
+			<Setter Property="Fill" Value="{DynamicResource HvacHoverStroke}" />
 		</Style>
 
 		<!-- The house and the tree are drawn as filled outlines whose walls are a third of a pixel at 14 px, so a
 		     hairline stroke in the same brush keeps them visible. -->
 		<Style Selector="Path.Pictogram">
-			<Setter Property="Fill" Value="{DynamicResource ForegroundBrush}" />
-			<Setter Property="Stroke" Value="{DynamicResource ForegroundBrush}" />
+			<Setter Property="Fill" Value="{DynamicResource HvacLcdForeground}" />
+			<Setter Property="Stroke" Value="{DynamicResource HvacLcdForeground}" />
 		</Style>
 
 		<Style Selector="c|HvacModeIcon">
@@ -90,7 +100,7 @@
 		</Style>
 		<Style Selector="c|HvacWifiLedIcon">
 			<Setter Property="Fill" Value="{DynamicResource ForegroundBrush}" />
-			<Setter Property="OnBrush" Value="{DynamicResource HvacActive}" />
+			<Setter Property="OnBrush" Value="{DynamicResource HvacWifiLedOn}" />
 			<Setter Property="OffBrush" Value="{DynamicResource HvacInactive}" />
 		</Style>
 
@@ -141,8 +151,9 @@
 					</Button>
 				</Grid>
 
-				<!-- The display: set temperature with its arrows, indoor and outdoor temperature -->
-				<Border Grid.Row="4" x:Name="LcdProvider" Margin="2">
+				<!-- The display: set temperature with its arrows, indoor and outdoor temperature. The text colour is
+				     inherited from here, the arrows and pictograms take the same brush through their styles. -->
+				<Border Grid.Row="4" x:Name="LcdProvider" Margin="2" TextElement.Foreground="{DynamicResource HvacLcdForeground}">
 					<Grid Margin="0,4" ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto,Auto">
 						<Button Grid.Row="0" Grid.Column="0" Classes="TransparentButton HvacArrow" Command="{Binding TemperatureUpCommand}">
 							<Polygon Points="0,10 66,10 33.5,0" />
