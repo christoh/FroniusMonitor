@@ -70,13 +70,19 @@
 												<Setter Property="FontSize" Value="18" />
 												<Setter Property="HorizontalAlignment" Value="Center" />
 												<Setter Property="Foreground" Value="{Binding BorderBrush, RelativeSource={RelativeSource FindAncestor, AncestorType=ToggleButton}}" />
+												<!-- Fades in step with the sliding thumb, see the label styles below. -->
+												<Setter Property="Transitions">
+													<Transitions>
+														<DoubleTransition Property="Opacity" Duration="0:0:0.15" />
+													</Transitions>
+												</Setter>
 											</Style>
 										</Grid.Styles>
 										<Viewbox Grid.Column="0" StretchDirection="DownOnly">
-											<TextBlock Text="{x:Static p:Resources.On}" />
+											<TextBlock x:Name="OnLabel" Text="{x:Static p:Resources.On}" />
 										</Viewbox>
 										<Viewbox Grid.Column="1" StretchDirection="DownOnly">
-											<TextBlock Text="{x:Static p:Resources.Off}" />
+											<TextBlock x:Name="OffLabel" Text="{x:Static p:Resources.Off}" />
 										</Viewbox>
 										<Border Margin="1,0,0,0" Classes="Thumb" x:Name="Thumb" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left"/>
 									</Grid>
@@ -127,6 +133,15 @@
                     </KeyFrame>
                 </Animation>
             </Style.Animations>
+        </Style>
+        <!-- The label under the thumb is not just covered but hidden. Opacity in Avalonia is applied to every
+             element on its own, so a disabled switch (Opacity .3 above, which every switch on the dashboard
+             becomes while a modal dialog is open) would otherwise show both labels through the thumb. -->
+        <Style Selector="^:checked /template/ TextBlock#OffLabel">
+            <Setter Property="Opacity" Value="0" />
+        </Style>
+        <Style Selector="^:unchecked /template/ TextBlock#OnLabel">
+            <Setter Property="Opacity" Value="0" />
         </Style>
 	</Style>
 
