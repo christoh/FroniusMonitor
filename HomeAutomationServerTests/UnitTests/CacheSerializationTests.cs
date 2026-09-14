@@ -3,6 +3,7 @@ using System.Text.Json.Nodes;
 using De.Hochstaetter.HomeAutomationClient;
 using De.Hochstaetter.HomeAutomationClient.Misc;
 using De.Hochstaetter.HomeAutomationClient.Models;
+using De.Hochstaetter.HomeAutomationServerTests.UnitTests.Fakes;
 
 namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests;
 
@@ -25,28 +26,14 @@ namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests;
 /// </remarks>
 public sealed class CacheSerializationTests : IDisposable
 {
-    private sealed class TempFileCache(string dataDirectory) : FileCache(dataDirectory);
-
     private sealed class Measurement
     {
         public double Value { get; set; }
     }
 
-    private readonly string directory = Path.Combine(Path.GetTempPath(), $"FroniusMonitorCacheTests-{Guid.NewGuid():N}");
-    private readonly TempFileCache cache;
+    private readonly TempFileCache cache = new();
 
-    public CacheSerializationTests()
-    {
-        cache = new TempFileCache(directory);
-    }
-
-    public void Dispose()
-    {
-        if (Directory.Exists(directory))
-        {
-            Directory.Delete(directory, true);
-        }
-    }
+    public void Dispose() => cache.Dispose();
 
     [Fact]
     public void ConnectionIsWrittenWithoutSecretsOrFramework()
@@ -113,7 +100,7 @@ public sealed class CacheSerializationTests : IDisposable
     public void ReadingIsCaseInsensitive()
     {
         // Not for our own output, which always matches - for a cache file that was edited by hand.
-        File.WriteAllText(Path.Combine(directory, "cache.json"), """measurement={"value": 42}""" + Environment.NewLine);
+        File.WriteAllText(Path.Combine(cache.Directory, "cache.json"), """measurement={"value": 42}""" + Environment.NewLine);
 
         Assert.Equal(42d, cache.Get<Measurement>("measurement")!.Value);
     }
