@@ -44,7 +44,17 @@ public sealed class MeritFeatureOption(ToshibaHvacMeritFeaturesA value, Func<Tos
 
 public sealed class SwingModeOption(ToshibaHvacSwingMode value, Func<ToshibaHvacSwingMode, Task> apply) : HvacOption<ToshibaHvacSwingMode>(value, apply);
 
-public sealed class TemperatureOption(sbyte value, Func<sbyte, Task> apply) : HvacOption<sbyte>(value, apply)
+/// <summary>
+/// <see cref="HvacOption{T}.Value"/> is the byte the device takes; <see cref="DisplayOffset"/> is what the device
+/// adds to the temperature it means - 16 in the 8 °C heating mode, 0 otherwise - so <see cref="Text"/> shows the
+/// temperature as the set temperature display does. The view model rewrites the offset in place, like
+/// <see cref="HvacOption.IsSelected"/>; the list itself is never rebuilt for a mode change, because it is bound to a
+/// menu and the state changes arrive on the hub's thread.
+/// </summary>
+public sealed partial class TemperatureOption(sbyte value, Func<sbyte, Task> apply) : HvacOption<sbyte>(value, apply)
 {
-    public string Text => $"{Value:00} °C";
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(Text))]
+    public partial sbyte DisplayOffset { get; set; }
+
+    public string Text => $"{Value - DisplayOffset:00} °C";
 }

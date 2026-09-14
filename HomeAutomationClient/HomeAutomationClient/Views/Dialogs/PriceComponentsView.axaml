@@ -15,10 +15,12 @@
 	</UserControl.Styles>
 
 	<Grid RowDefinitions="Auto,Auto,Auto" Margin="0,0,0,8">
-		<!-- Sized to its content, as the WPF window was: a fixed dozen rows need no scrolling and no virtualization. -->
+		<!-- Sized to its content, as the WPF window was: a fixed dozen rows need no scrolling and no virtualization.
+		     A click on a header sorts, as in the event log; a bound column sorts by the value it binds to, so the
+		     prices sort as numbers and not as their formatted text. -->
 		<DataGrid Grid.Row="0" ItemsSource="{Binding Components}" IsReadOnly="True" AutoGenerateColumns="False"
 		          GridLinesVisibility="Vertical" BorderThickness="0" ColumnWidth="Auto"
-		          CanUserSortColumns="False" CanUserResizeColumns="False" CanUserReorderColumns="False">
+		          CanUserSortColumns="True" CanUserResizeColumns="False" CanUserReorderColumns="False">
 			<DataGrid.Columns>
 				<c:CompactTextColumn Header="{x:Static p:Resources.Component}" Binding="{Binding Description}" />
 				<!-- Tabular figures, so the decimals of the rows stand one under another. -->

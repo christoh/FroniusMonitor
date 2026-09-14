@@ -147,6 +147,32 @@ internal partial class UpdateService(IWebClientService webClient, ILogger<Update
     }
 
     /// <summary>
+    /// The counterpart of <see cref="StartAsync"/>: closes the hub connection first, so nothing it might still
+    /// deliver races the clearing below, and then forgets every device. A second <see cref="StartAsync"/> - after
+    /// logging back in, possibly as somebody else - therefore starts from nothing rather than from what the last
+    /// session left behind.
+    /// </summary>
+    public async Task StopAsync()
+    {
+        if (hubConnection != null)
+        {
+            await hubConnection.DisposeAsync().ConfigureAwait(false);
+            hubConnection = null;
+        }
+
+        Inverters = [];
+        AllPowerConsumers = [];
+        WattPilotUpdates = [];
+        SmartMeter = null;
+        MeterStatus = null;
+        PrimaryGen24Config = null;
+        BatteryGen24System = null;
+        SitePowerFlow = new();
+        SitePvPeakPower = 0;
+        EnergyChartData = null;
+    }
+
+    /// <summary>
     /// The server sends the whole chart data on every change - a few kilobytes a few times a day. Replaced as one
     /// object rather than copied into place: nothing binds to the parts, the chart is rebuilt from the whole.
     /// </summary>

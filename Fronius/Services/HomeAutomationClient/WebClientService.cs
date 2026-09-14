@@ -67,6 +67,15 @@ public sealed class WebClientService : IWebClientService
         return await response.Content.ReadAsStringAsync(token).ConfigureAwait(false);
     }
 
+    public async Task<ApiResult<bool>> Logout(CancellationToken token = default)
+    {
+        var result = await GetResult<bool>("Identity/logout", token).ConfigureAwait(false);
+        // Dropped regardless of what the server answered: a server that could not be reached is not a reason to
+        // go on sending a password that the caller has just decided to forget.
+        httpClient.DefaultRequestHeaders.Authorization = null;
+        return result;
+    }
+
     public Task<ApiResult<List<UserInfo>>> GetUsers(CancellationToken token = default)
     {
         return GetResult<List<UserInfo>>("Identity/users", token);

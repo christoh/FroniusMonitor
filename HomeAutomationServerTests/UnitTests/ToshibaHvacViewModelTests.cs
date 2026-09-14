@@ -148,6 +148,17 @@ public sealed class ToshibaHvacViewModelTests
 
         Assert.Equal<sbyte?>(8, viewModel.DisplayTargetTemperature);
         Assert.Equal("08°C", viewModel.TargetTemperatureText);
+
+        // The menu labels its entries the same way, while the value it sends stays the device's byte.
+        var selected = Assert.Single(viewModel.Temperatures, o => o.IsSelected);
+        Assert.Equal<sbyte>(24, selected.Value);
+        Assert.Equal("08 °C", selected.Text);
+        Assert.Equal("14 °C", viewModel.Temperatures.First().Text);
+
+        device.State.MeritFeaturesA = ToshibaHvacMeritFeaturesA.None;
+
+        Assert.Equal("24 °C", Assert.Single(viewModel.Temperatures, o => o.IsSelected).Text);
+        Assert.Equal("24°C", viewModel.TargetTemperatureText);
     }
 
     [Fact]

@@ -33,6 +33,13 @@ public interface IWebClientService : IDisposable
 
     Task<ApiResult<IDictionary<string, DeviceInfo>>> ListDevices(CancellationToken token = default);
 
+    /// <summary>
+    /// Ends the session: drops the credentials this client carries, so the next call goes out unauthenticated,
+    /// and asks the server to drop its cookie counterpart of them - the one a browser resends on its own. Needs no
+    /// role; a client that is no longer sure it is logged in must still be able to call this.
+    /// </summary>
+    Task<ApiResult<bool>> Logout(CancellationToken token = default);
+
     #endregion
 
     #region Users

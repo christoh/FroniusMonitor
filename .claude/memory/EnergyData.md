@@ -182,7 +182,9 @@ exempt from VAT stays as it is, and a negative market price gets negative VAT, w
   (so they take the top third; the price axis is stretched 60 % at the top for them), legend. New: DWD global
   radiation (W/m²) and wind speed (m/s) as lines on two more right axes, measured solid, forecast dashed.
 - `PriceComponentsViewModel` / `PriceComponentsView`: the WPF components table (per kWh components only, net,
-  VAT, gross, sums) as a dialog over the chart.
+  VAT, gross, sums) as a dialog over the chart. Its columns sort on a header click (`CanUserSortColumns`, since
+  2026-09-14 at the developer's request); the grid sorts the plain `IReadOnlyList` through its own collection
+  view, like the event log, and a bound column sorts by the bound value, so no `SortMemberPath` is needed.
 - **ScottPlot.Avalonia 5.1.59** needs Avalonia ≥ 12; the browser head is expected to work through Avalonia's Skia
   but has not been run with it yet.
 

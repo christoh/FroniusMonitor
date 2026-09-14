@@ -5441,6 +5441,24 @@ namespace De.Hochstaetter.Fronius.Localization {
                 return ResourceManager.GetString("NoPriceComponents", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Log out.
+        /// </summary>
+        public static string LogOut {
+            get {
+                return ResourceManager.GetString("LogOut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to log out?.
+        /// </summary>
+        public static string ConfirmLogout {
+            get {
+                return ResourceManager.GetString("ConfirmLogout", resourceCulture);
+            }
+        }
 
     }
 }

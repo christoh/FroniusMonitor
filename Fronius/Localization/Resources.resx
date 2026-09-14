@@ -1911,4 +1911,10 @@
   <data name="NoPriceComponents" xml:space="preserve">
     <value>The price components are not available</value>
   </data>
+  <data name="LogOut" xml:space="preserve">
+    <value>Log out</value>
+  </data>
+  <data name="ConfirmLogout" xml:space="preserve">
+    <value>Are you sure you want to log out?</value>
+  </data>
 </root>
