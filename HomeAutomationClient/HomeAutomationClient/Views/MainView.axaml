@@ -18,21 +18,26 @@
              x:DataType="vm:MainViewModel">
     <Grid RowDefinitions="Auto,*,Auto">
         <Grid Grid.Row="0" Background="{DynamicResource MenuBackground}" IsVisible="{Binding IsReady}">
+            <!-- On the Grid, not on the left StackPanel: the user button at the right is a sibling of that
+                 StackPanel, not a descendant, and a StaticResource lookup only walks up the tree, never across to
+                 a sibling. Defined here, both sides of the bar can reach it. Measured headless: with the resources
+                 still on the StackPanel the user button silently fell back to Fluent's own pill-shaped Button
+                 chrome - StaticResource that cannot be found is not a compile error, only a runtime one. -->
+            <Grid.Resources>
+                <ControlTemplate TargetType="Button" x:Key="MenuButtonTemplate">
+                    <ContentPresenter Padding="8" Background="{TemplateBinding Background}" Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center" Content="{TemplateBinding Content}"/>
+                </ControlTemplate>
+                <ControlTheme TargetType="Button" x:Key="MenuButtonStyle">
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="Template" Value="{StaticResource MenuButtonTemplate}"/>
+                </ControlTheme>
+            </Grid.Resources>
+            <Grid.Styles>
+                <Style Selector="Button:pointerover">
+                    <Setter Property="Background" Value="{DynamicResource MenuFlyoutItemBackgroundPointerOver}"/>
+                </Style>
+            </Grid.Styles>
             <StackPanel Orientation="Horizontal">
-                <StackPanel.Resources>
-                    <ControlTemplate TargetType="Button" x:Key="MenuButtonTemplate">
-                        <ContentPresenter Padding="8" Background="{TemplateBinding Background}" Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center" Content="{TemplateBinding Content}"/>
-                    </ControlTemplate>
-                    <ControlTheme TargetType="Button" x:Key="MenuButtonStyle">
-                        <Setter Property="Background" Value="Transparent"/>
-                        <Setter Property="Template" Value="{StaticResource MenuButtonTemplate}"/>
-                    </ControlTheme>
-                </StackPanel.Resources>
-                <StackPanel.Styles>
-                    <Style Selector="Button:pointerover">
-                        <Setter Property="Background" Value="{DynamicResource MenuFlyoutItemBackgroundPointerOver}"/>
-                    </Style>
-                </StackPanel.Styles>
                 <Button Content="{x:Static p:Resources.Dashboard}" Theme="{StaticResource MenuButtonStyle}" Command="{Binding ShowDashboardCommand}"/>
                 <Button Content="{x:Static p:Resources.Details}" x:Name="DetailsButton" Theme="{StaticResource MenuButtonStyle}">
                     <Button.Flyout>
@@ -66,11 +71,23 @@
                 <Button Content="{x:Static p:Resources.ElectricityPrice}" Theme="{StaticResource MenuButtonStyle}"
                         Command="{Binding ShowEnergyChartCommand}" IsVisible="{Binding UpdateService.HasEnergyData}" />
             </StackPanel>
-            <!-- Who is logged in, and as what. The roles are the server's enum names on purpose, not translated. -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="8,0" Spacing="6">
-                <i:UserIcon Height="16" VerticalAlignment="Center"/>
-                <TextBlock Text="{Binding UserText}" VerticalAlignment="Center"/>
-            </StackPanel>
+            <!-- Who is logged in, and as what - the roles are the server's enum names on purpose, not translated -
+                 and, behind it, the two things that are about that account rather than about a device: changing
+                 its password and logging out. Not in the Settings menu for that reason; see MainViewModel.SettingsItems. -->
+            <Button Theme="{StaticResource MenuButtonStyle}" HorizontalAlignment="Right" Margin="8,0">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <i:UserIcon Height="16" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding UserText}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button.Content>
+                <Button.Flyout>
+                    <MenuFlyout Placement="BottomEdgeAlignedRight">
+                        <MenuItem Header="{x:Static p:Resources.ChangePassword}" Command="{Binding ChangePasswordCommand}"/>
+                        <MenuItem Header="{x:Static p:Resources.LogOut}" Command="{Binding LogoutCommand}"/>
+                    </MenuFlyout>
+                </Button.Flyout>
+            </Button>
         </Grid>
         <UserControl Grid.Row="1" Content="{Binding MainViewContent}" IsEnabled="{Binding IsModalDialogVisible, Converter={co:BoolInverter}}"/>
 

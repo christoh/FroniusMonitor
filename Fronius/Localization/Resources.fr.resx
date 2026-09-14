@@ -1786,4 +1786,10 @@
   <data name="NoPriceComponents" xml:space="preserve">
     <value>Les composantes du prix ne sont pas disponibles</value>
   </data>
+  <data name="LogOut" xml:space="preserve">
+    <value>Se dÃ©connecter</value>
+  </data>
+  <data name="ConfirmLogout" xml:space="preserve">
+    <value>Veux-tu vraiment te dÃ©connecter ?</value>
+  </data>
 </root>

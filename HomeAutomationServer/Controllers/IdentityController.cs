@@ -52,7 +52,7 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
     }
 
     [HttpGet("logout")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     public IActionResult Logout()
     {
         if (HttpContext.User.Identity?.Name is { } userName)
@@ -61,7 +61,7 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
         }
 
         Response.Cookies.Delete("auth", cookieOptions);
-        return Ok();
+        return Ok(true);
     }
 
     /// <summary>

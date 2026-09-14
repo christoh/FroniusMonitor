@@ -1795,4 +1795,10 @@
   <data name="NoPriceComponents" xml:space="preserve">
     <value>Las cumponentas dal pretsch n'Ã¨n betg disponiblas</value>
   </data>
+  <data name="LogOut" xml:space="preserve">
+    <value>Sortir</value>
+  </data>
+  <data name="ConfirmLogout" xml:space="preserve">
+    <value>Vuls ti propi sortir?</value>
+  </data>
 </root>

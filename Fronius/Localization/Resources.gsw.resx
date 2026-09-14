@@ -1821,4 +1821,10 @@
   <data name="NoPriceComponents" xml:space="preserve">
     <value>Die Priisbestandteil sind nid verfÃ¼egbar</value>
   </data>
+  <data name="LogOut" xml:space="preserve">
+    <value>AbmÃ¤lde</value>
+  </data>
+  <data name="ConfirmLogout" xml:space="preserve">
+    <value>Bisch sicher, dass Du Di wottsch abmÃ¤lde?</value>
+  </data>
 </root>

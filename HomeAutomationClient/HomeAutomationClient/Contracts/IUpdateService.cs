@@ -49,6 +49,13 @@ public interface IUpdateService : IDisposable, IAsyncDisposable, IToshibaHvacCom
     public Task StartAsync();
 
     /// <summary>
+    /// The counterpart of <see cref="StartAsync"/>: closes the hub connection and forgets every device, so a
+    /// second <see cref="StartAsync"/> - after logging back in, possibly as somebody else - starts from nothing
+    /// rather than from what the last session left behind.
+    /// </summary>
+    public Task StopAsync();
+
+    /// <summary>
     /// Writes a Wattpilot's settings through the server: whatever differs between <paramref name="wanted"/> and
     /// <paramref name="loaded"/> goes to the charger, and the answer says which writes failed or went unconfirmed.
     /// Over the hub, because a Wattpilot write is a conversation on the connection the server holds to it - see

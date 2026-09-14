@@ -1830,4 +1830,10 @@
   <data name="NoPriceComponents" xml:space="preserve">
     <value>Le componenti del prezzo non sono disponibili</value>
   </data>
+  <data name="LogOut" xml:space="preserve">
+    <value>Esci</value>
+  </data>
+  <data name="ConfirmLogout" xml:space="preserve">
+    <value>Sei sicuro di voler uscire?</value>
+  </data>
 </root>

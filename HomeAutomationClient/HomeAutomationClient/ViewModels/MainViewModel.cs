@@ -68,13 +68,16 @@ public sealed partial class MainViewModel : ViewModelBase
     /// What the Settings menu offers: the devices with settings and the user management. Shown to every user
     /// regardless of role, on purpose - the server's <c>IdentityController</c> is the one place that enforces who
     /// may actually add, edit or delete a user, and hiding the entry here would only get in the way of testing that.
+    /// Changing your own password and logging out are not here - they are about the account that is logged in
+    /// rather than a thing to configure, so they sit behind the user's own name at the right of the menu bar; see
+    /// <see cref="ChangePassword"/> and <see cref="Logout"/>.
     /// </summary>
     /// <remarks>
     /// A list, not a lazy query: the menu copies whatever it is handed the moment the binding reads it. It is read
     /// when <see cref="User"/> is set - which is before the devices are known - and so again once
     /// <see cref="Initialize"/> has started the <see cref="UpdateService"/>.
     /// </remarks>
-    public IReadOnlyList<object> SettingsItems => [.. UpdateService.DevicesWithSettings, UserManagementEntry.Instance, ChangePasswordEntry.Instance];
+    public IReadOnlyList<object> SettingsItems => [.. UpdateService.DevicesWithSettings, UserManagementEntry.Instance];
 
     /// <summary>
     /// Colors all ticks of every gauge, not just those up to the current value. Lives here because the switch for
@@ -133,7 +136,21 @@ public sealed partial class MainViewModel : ViewModelBase
     public override Task Initialize() => TaskExceptionHandler(async () =>
     {
         await base.Initialize().ConfigureAwait(false);
+        await LoginAndStartAsync(followStartupPath: true).ConfigureAwait(false);
+    });
 
+    /// <summary>
+    /// Shows the login dialog and, once it succeeds, starts <see cref="UpdateService"/> and shows a view. Called
+    /// once by <see cref="Initialize"/> at startup and again by <see cref="Logout"/> once it has torn the previous
+    /// session down - nothing here assumes it is the first time.
+    /// </summary>
+    /// <param name="followStartupPath">
+    /// Whether a link the app was started with should be resolved once the devices are known, as only
+    /// <see cref="Initialize"/> wants: after <see cref="Logout"/> the address has already been reset to the
+    /// dashboard, and there is no startup link to follow a second time.
+    /// </param>
+    private async Task LoginAndStartAsync(bool followStartupPath)
+    {
         var loginViewModel = new LoginViewModel(new DialogParameters
         {
             Title = $"{AppConstants.AppName} - {Loc.LoginNoun}",
@@ -154,7 +171,7 @@ public sealed partial class MainViewModel : ViewModelBase
         {
             // A link into a detail view survives the login: the address the app was started with is only
             // resolved now, because the devices of the installation are known only now.
-            if (ViewPath.Find(UpdateService.DetailDevices, uriService.StartupPath) is { } device)
+            if (followStartupPath && ViewPath.Find(UpdateService.DetailDevices, uriService.StartupPath) is { } device)
             {
                 await ShowDetails(device).ConfigureAwait(true);
                 return;
@@ -162,7 +179,7 @@ public sealed partial class MainViewModel : ViewModelBase
 
             await ShowDashboardView().ConfigureAwait(true);
         });
-    });
+    }
 
     /// <summary>
     /// Opens the settings dialog of one entry of the Settings menu: a device, or the user management. The title
@@ -175,12 +192,6 @@ public sealed partial class MainViewModel : ViewModelBase
         if (parameter is UserManagementEntry)
         {
             await new UserManagementViewModel(new DialogParameters { Title = Loc.UserManagement }).ShowDialogAsync().ConfigureAwait(false);
-            return;
-        }
-
-        if (parameter is ChangePasswordEntry)
-        {
-            await ChangeMyPassword().ConfigureAwait(true);
             return;
         }
 
@@ -223,9 +234,12 @@ public sealed partial class MainViewModel : ViewModelBase
     /// <summary>
     /// Lets the logged in user change their own password. Unlike an administrator editing someone else's account
     /// in <see cref="UserManagementViewModel"/>, the server needs the current password rather than a role - see
-    /// <c>IdentityController.ChangePassword</c> - and there is no user list entry to refresh afterwards.
+    /// <c>IdentityController.ChangePassword</c> - and there is no user list entry to refresh afterwards. Reached
+    /// from the flyout behind the user's own name in the menu bar, not from the Settings menu: it is about the
+    /// account that is logged in, not a thing to configure.
     /// </summary>
-    private Task ChangeMyPassword() => TaskExceptionHandler(async () =>
+    [RelayCommand]
+    private Task ChangePassword() => TaskExceptionHandler(async () =>
     {
         var editor = new ChangePasswordViewModel(new DialogParameters { Title = Loc.ChangePassword });
 
@@ -272,6 +286,40 @@ public sealed partial class MainViewModel : ViewModelBase
             Buttons = [Loc.Ok],
             Icon = new InfoIcon(),
         }.Show().ConfigureAwait(true);
+    });
+
+    /// <summary>
+    /// Ends the session and shows the login dialog again, exactly the way <see cref="Initialize"/> starts the app:
+    /// hides the menu bar and whatever view was on screen, tears <see cref="UpdateService"/> down so a stale
+    /// dashboard cannot go on calling a server this client no longer has credentials for, and tells the server to
+    /// drop its own copy of them. What <see cref="StoredConnection"/> remembers is left alone, so logging back in
+    /// - as the same user or another one who shares this device - is one login, not a re-typed password.
+    /// </summary>
+    [RelayCommand]
+    private Task Logout() => TaskExceptionHandler(async () =>
+    {
+        var answer = await new MessageBox
+        {
+            Text = Loc.ConfirmLogout,
+            Title = Loc.LogOut,
+            Buttons = [Loc.LogOut, Loc.Cancel],
+            Icon = new WarningIcon(),
+        }.Show().ConfigureAwait(true);
+
+        if (answer?.Index != 0)
+        {
+            return;
+        }
+
+        IsReady = false;
+        MainViewContent = null;
+        User = null;
+
+        BusyText = Loc.LogOut;
+        await UpdateService.StopAsync().ConfigureAwait(true);
+        await webClient.Logout().ConfigureAwait(true);
+
+        await LoginAndStartAsync(followStartupPath: false).ConfigureAwait(true);
     });
 
     /// <summary>

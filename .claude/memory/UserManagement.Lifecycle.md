@@ -6,6 +6,9 @@ paths:
   - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/UserManagementView.axaml
   - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/UserEditorView.axaml
   - HomeAutomationClient/HomeAutomationClient/Models/UserManagementEntry.cs
+  - HomeAutomationClient/HomeAutomationClient/Views/MainView.axaml
+  - HomeAutomationClient/HomeAutomationClient/Contracts/IUpdateService.cs
+  - HomeAutomationClient/HomeAutomationClient/Services/UpdateService.cs
   - HomeAutomationServer/Controllers/IdentityController.cs
   - Fronius/Models/WebApi/UserAccount.cs
   - Fronius/Models/WebApi/UserInfo.cs
@@ -25,6 +28,44 @@ paths:
 Add/edit/delete users, reachable from the Settings menu next to the devices. `UserManagementEntry.Instance` is the
 marker `MainViewModel.SettingsItems` appends; `MainViewModel.Settings(object)` recognises it and opens
 `UserManagementViewModel` instead of a device's settings dialog.
+
+## Change password and Log out live behind the user's own name, not in Settings
+
+`MainView.axaml` turns the "who is logged in" text at the right of the menu bar into a `Button` (same
+`MenuButtonStyle` as Dashboard/Details/Settings) whose `Flyout` offers `Loc.ChangePassword` and `Loc.LogOut`,
+bound to `MainViewModel.ChangePasswordCommand` and `LogoutCommand`. Neither is in `SettingsItems` any more (the
+`ChangePasswordEntry` marker class is gone, `SettingsItems` is only devices plus `UserManagementEntry`) - the
+account you are logged in as is not a thing to configure, so it sits with your name rather than with the devices.
+
+**A `StaticResource` on a sibling cannot see a `Resources` dictionary declared on another sibling** - only on
+itself or an ancestor. `MenuButtonTemplate`/`MenuButtonStyle` used to live in `<StackPanel.Resources>` on the left
+button row; the user button is a sibling of that `StackPanel` (both children of the row's `Grid`, overlapping
+because the `Grid` has one cell and the right button is `HorizontalAlignment="Right"`), so once it also needed
+`Theme="{StaticResource MenuButtonStyle}"` the lookup failed. Nothing errors when that happens - `StaticResource`
+resolution is a runtime concern, not a compile-time one, unlike a compiled `{Binding}` - so the button silently
+fell back to Fluent's default pill-shaped chrome instead of the flat menu look, and it was invisible except as a
+grey capsule where the login row should have blended in. Caught by rendering headless with Skia - the developer's
+endorsed method for any visual defect, see the session memory - and fixed by moving both `.Resources` and
+`.Styles` from the `StackPanel` up to the row's own `Grid`, which both siblings can reach. If another sibling
+needs `MenuButtonStyle` later, it already can; if the resources ever have to be scoped to only one side of the
+bar, they need their own dictionary on that side, not a shared one moved back down.
+
+## Logging out
+
+`MainViewModel.Logout` confirms (`Buttons = [Loc.LogOut, Loc.Cancel]`, the same `Index != 0` pattern as
+`UserManagementViewModel.Delete`), then hides the bar and whatever view was on screen exactly the way the app
+looks before the first login (`IsReady = false`, `MainViewContent = null`), tears the session down, and shows the
+login dialog again through `LoginAndStartAsync` - the private method `Initialize()` now calls too, so there is
+one login flow, not two. Order matters: `IUpdateService.StopAsync` closes the hub connection **before** it clears
+`Inverters`/`AllPowerConsumers`/etc., so nothing the hub might still deliver races the clearing and repopulates a
+collection the login screen is about to hide anyway. `IWebClientService.Logout` clears the `Authorization` header
+the `HttpClient` carries (regardless of whether the server could be reached) and calls `GET Identity/logout`,
+which now answers `Ok(true)` - it used to answer `Ok()` with no body, harmless while nothing called it, but a typed
+`ApiResult<bool>` needs something to deserialize. What `StoredConnection`/the cache remember is **not** touched by
+logging out - only a changed password rewrites it - so logging back in, as the same user or a different one who
+shares the device, is one login rather than a retyped password. `LoginAndStartAsync(followStartupPath: false)` is
+what `Logout` passes: a startup deep link has already been resolved once and there is nothing left to follow the
+second time, so it always lands on the dashboard.
 
 ## The client shows the entry to everyone, on purpose
 
