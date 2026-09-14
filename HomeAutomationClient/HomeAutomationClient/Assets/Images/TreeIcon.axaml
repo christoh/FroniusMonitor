@@ -1,0 +1,18 @@
+<ContentControl xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:i="clr-namespace:De.Hochstaetter.HomeAutomationClient.Assets.Images"
+                mc:Ignorable="d" d:DesignWidth="24" d:DesignHeight="24"
+                x:Class="De.Hochstaetter.HomeAutomationClient.Assets.Images.TreeIcon">
+	<!-- A tree as a line drawing on the same 24 unit grid and with the same stroke as HouseIcon, so the two sit
+	     together as a pair: a crown of five arcs on a straight base and a trunk below it. Only the stroke is
+	     visible; round joins and caps keep it soft at 14 px. The stroke follows the inherited Foreground. -->
+	<Viewbox>
+		<Canvas Width="24" Height="24">
+			<Path StrokeThickness="1.4" StrokeJoin="Round" StrokeLineCap="Round"
+			      Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=i:TreeIcon}}"
+			      Data="M8,18 A4,4 0 0 1 5.8,10.7 A3.6,3.6 0 0 1 8.9,5.4 A3.1,3.1 0 1 1 15.1,5.4 A3.6,3.6 0 0 1 18.2,10.7 A4,4 0 0 1 16,18 Z M12,18 V22.5" />
+		</Canvas>
+	</Viewbox>
+</ContentControl>
