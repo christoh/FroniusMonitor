@@ -79,6 +79,23 @@ text to English.
 * There are unit tests projects using NUnit. These are legacy. We use xUnit for new unit tests. If you find a unit test project using NUnit, please create a new xUnit project and port the tests to xUnit. If you are unsure how to do this, please ask me before editing. Setup logging in any new unit test project. So that the logging abstractions used in the code, log to the test output.
 * When performing unit tests, only do it for tests in the UnitTests subdirectory. All other tests require a specific communication environment setup and are likely to fail. This is normal.
 
+## Running the tests
+* `dotnet test` runs on the Microsoft Testing Platform; `global.json` selects that runner. The old VSTest syntax
+  (`--filter`, a project as a bare argument) does not work any more. Options for the test itself go after `--`.
+* Everything in the UnitTests folder:
+  ```
+  dotnet test --project HomeAutomationServerTests/HomeAutomationServerTests.csproj -c Debug
+  ```
+* One test class or one method, wildcards allowed:
+  ```
+  dotnet test --project HomeAutomationServerTests/HomeAutomationServerTests.csproj -c Debug -- --filter-class "*Gen24SelfConsumptionViewModelTests"
+  dotnet test --project HomeAutomationServerTests/HomeAutomationServerTests.csproj -c Debug -- --filter-method "*Gen24SelfConsumptionViewModelTests.A_battery_charged_from_the_grid_is_charged_from_the_house_as_well"
+  ```
+* The legacy NUnit project runs the same way (`--project FroniusUnitTests/FroniusUnitTests.csproj`); most of its
+  tests need the device network and fail without it, which is normal.
+* A bare `dotnet test` at the repository root builds the whole solution, including the Android, Browser and iOS heads.
+  That needs their SDK workloads, which Claude Code on the web does not have. Use `--project` there.
+
 # Commits
 - Always suggest commit and push. Never commit alone.
 - Do not commit without asking the human developer first.
