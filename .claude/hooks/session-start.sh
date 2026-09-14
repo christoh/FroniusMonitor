@@ -53,5 +53,6 @@ fi
 cd "${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
 dotnet restore HomeAutomationClient/HomeAutomationClient/HomeAutomationClient.csproj >/dev/null
 dotnet restore HomeAutomationServerTests/HomeAutomationServerTests.csproj >/dev/null
+dotnet restore FroniusUnitTests/FroniusUnitTests.csproj >/dev/null
 
 echo "session-start: $(dotnet --version) ready"

@@ -3,6 +3,10 @@
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
 		<Nullable>enable</Nullable>
+		<!-- dotnet test runs on the Microsoft Testing Platform (global.json), which needs an executable and the
+		     NUnit runner for it; without both the project is refused. -->
+		<OutputType>Exe</OutputType>
+		<EnableNUnitRunner>true</EnableNUnitRunner>
 
 		<IsPackable>false</IsPackable>
 		<NoWarn>1701;1702;IDE0079;NU1803;CS7035;NU1900</NoWarn>
