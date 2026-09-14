@@ -53,11 +53,18 @@
 			<Setter Property="Fill" Value="{DynamicResource ForegroundBrush}" />
 		</Style>
 
-		<!-- The house and the tree are drawn as filled outlines whose walls are a third of a pixel at 14 px, so a
-		     hairline stroke in the same brush keeps them visible. -->
+		<!-- The tree is drawn as a filled outline whose lines are a third of a pixel at 14 px, so a hairline stroke
+		     in the same brush keeps it visible. -->
 		<Style Selector="Path.Pictogram">
 			<Setter Property="Fill" Value="{DynamicResource ForegroundBrush}" />
 			<Setter Property="Stroke" Value="{DynamicResource ForegroundBrush}" />
+		</Style>
+		<!-- A line drawing: only the stroke is visible. Round joins and caps keep the corners soft at 14 px. -->
+		<Style Selector="Path.LineIcon">
+			<Setter Property="Fill" Value="{x:Null}" />
+			<Setter Property="Stroke" Value="{DynamicResource ForegroundBrush}" />
+			<Setter Property="StrokeJoin" Value="Round" />
+			<Setter Property="StrokeLineCap" Value="Round" />
 		</Style>
 
 		<Style Selector="c|HvacModeIcon">
@@ -167,13 +174,15 @@
 							<Polygon Points="0,0 66,0 33.5,10" />
 						</Button>
 
-						<!-- A house for indoors, a tree for outdoors - the WPF control's own two icons. Each sits in a canvas cut
-						     to the glyph's own bounds (the house path starts 28 units below its origin, the tree at 4,2),
-						     otherwise the glyph hangs at the bottom of a taller box and the text beside it looks too high.
-						     WPF did the same with a -24 and a -4,-2 offset. -->
+						<!-- A house for indoors, a tree for outdoors. The house is a line drawing on a 24 unit grid: a roof band
+						     with a chimney on the right, walls that end under the eaves, a door and a two pane window. Its
+						     canvas holds the stroke, which reaches 0.7 units beyond the geometry. The tree is the WPF
+						     control's own icon; its canvas is cut to the glyph's bounds (the path starts at 4,2), otherwise
+						     the glyph hangs at the bottom of a taller box and the text beside it looks too high. WPF did the
+						     same with a -4,-2 offset. -->
 						<Viewbox Grid.Row="0" Grid.RowSpan="2" Grid.Column="2" Height="14" Margin="2,0,2,0" VerticalAlignment="Center">
-							<Canvas Width="343.3" Height="293.5">
-							<Path Classes="Pictogram" StrokeThickness="10" Canvas.Left="-1.5" Canvas.Top="-27.9" Data="M343.288,159.838L181.905,27.941c-5.242-4.283-12.77-4.283-18.009,0l-41.336,33.79V44.193c0-3.788-3.066-6.848-6.854-6.848H75.928c-3.788,0-6.854,3.063-6.854,6.848v61.251L2.516,159.838c-2.933,2.391-3.36,6.711-0.97,9.641 c1.357,1.654,3.33,2.523,5.32,2.523c1.524,0,3.053-0.511,4.328-1.545l34.55-28.245v172.011c0,3.785,3.066,6.852,6.846,6.852 h240.626c3.781,0,6.854-3.066,6.854-6.852V142.216l34.55,28.245c1.273,1.037,2.807,1.545,4.326,1.545 c1.984,0,3.956-0.87,5.314-2.524C346.648,166.549,346.221,162.235,343.288,159.838z M82.779,51.041h26.071v21.888l-26.071,21.31V51.041z M286.367,307.369H59.44V131.015l107.596-87.939c3.414-2.791,8.316-2.791,11.731,0l107.6,87.939V307.369z" />
+							<Canvas Width="24" Height="24">
+							<Path Classes="LineIcon" StrokeThickness="1.4" Data="M1.5,11.5 L12,2.5 L22.5,11.5 L21.2,13 L12,5.3 L2.8,13 Z M4.2,11.8 V22.5 H19.8 V11.8 M16.6,6.4 V4.6 H19 V8.5 M6.6,22.5 V15.5 H9.9 V22.5 M12.4,13.6 H17.8 V17.8 H12.4 Z M15.1,13.6 V17.8" />
 							</Canvas>
 						</Viewbox>
 						<Viewbox Grid.Row="2" Grid.RowSpan="2" Grid.Column="2" Height="14" Margin="2,0,2,0" VerticalAlignment="Center">
