@@ -1746,9 +1746,6 @@
   <data name="Dc" xml:space="preserve">
     <value>DC</value>
   </data>
-  <data name="UiTestTitle" xml:space="preserve">
-    <value>Home Automation Control Center UI Test</value>
-  </data>
   <data name="LinearGauge" xml:space="preserve">
     <value>Linear Gauge</value>
   </data>

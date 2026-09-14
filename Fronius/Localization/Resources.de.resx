@@ -1647,9 +1647,6 @@
   <data name="HvacHiPower" xml:space="preserve">
     <value>Hochleistung</value>
   </data>
-  <data name="UiTestTitle" xml:space="preserve">
-    <value>Home Automation Control Center UI-Test</value>
-  </data>
   <data name="LinearGauge" xml:space="preserve">
     <value>Lineare Anzeige</value>
   </data>

@@ -4724,15 +4724,6 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Home Automation Control Center UI Test.
-        /// </summary>
-        public static string UiTestTitle {
-            get {
-                return ResourceManager.GetString("UiTestTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Undo.
         /// </summary>
         public static string Undo {

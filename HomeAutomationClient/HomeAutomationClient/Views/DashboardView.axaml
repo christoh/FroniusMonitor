@@ -52,7 +52,7 @@
 		<Grid RowDefinitions="Auto,Auto,*" Grid.Row="0">
 
 			<StackPanel x:Name="MainContentElement" Orientation="Vertical" Margin="16" Grid.Row="0" VerticalAlignment="Top">
-				<TextBlock Text="{x:Static p:Resources.UiTestTitle}" FontSize="24" TextAlignment="Center" FontWeight="Bold" TextWrapping="Wrap" HorizontalAlignment="Center" />
+				<TextBlock Text="{x:Static p:Resources.AppName}" FontSize="24" TextAlignment="Center" FontWeight="Bold" TextWrapping="Wrap" HorizontalAlignment="Center" />
 				<!--<TextBlock Text="{Binding ApiUri, TargetNullValue='http://www.hochstaetter.de/api'}" HorizontalAlignment="Center" />
 				<TextBlock HorizontalAlignment="Center" Margin="0,0,0,20">
 				<Run Text="Culture:" />

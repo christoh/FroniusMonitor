@@ -1606,9 +1606,6 @@
   <data name="Dc" xml:space="preserve">
     <value>CC</value>
   </data>
-  <data name="UiTestTitle" xml:space="preserve">
-    <value>Test de l'interface du Centre de contrôle domotique</value>
-  </data>
   <data name="LinearGauge" xml:space="preserve">
     <value>Jauge linéaire</value>
   </data>

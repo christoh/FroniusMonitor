@@ -1650,9 +1650,6 @@
   <data name="Dc" xml:space="preserve">
     <value>CC</value>
   </data>
-  <data name="UiTestTitle" xml:space="preserve">
-    <value>Test UI Home Automation Control Center</value>
-  </data>
   <data name="LinearGauge" xml:space="preserve">
     <value>Indicatore lineare</value>
   </data>

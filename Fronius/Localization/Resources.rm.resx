@@ -1615,9 +1615,6 @@
   <data name="HvacLimit" xml:space="preserve">
     <value>LIMITA</value>
   </data>
-  <data name="UiTestTitle" xml:space="preserve">
-    <value>Test da l'interfatscha dal Center da controlla da la domotica</value>
-  </data>
   <data name="LinearGauge" xml:space="preserve">
     <value>Indicatur linear</value>
   </data>
