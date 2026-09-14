@@ -1827,4 +1827,16 @@
   <data name="ConfirmLogout" xml:space="preserve">
     <value>Bisch sicher, dass Du Di wottsch abmÃ¤lde?</value>
   </data>
+  <data name="HouseConsumption" xml:space="preserve">
+    <value>Huus</value>
+  </data>
+  <data name="CarCharging" xml:space="preserve">
+    <value>Autos</value>
+  </data>
+  <data name="SelfSufficiency" xml:space="preserve">
+    <value>Autarkie</value>
+  </data>
+  <data name="SelfConsumption" xml:space="preserve">
+    <value>Eigeverbruuch</value>
+  </data>
 </root>

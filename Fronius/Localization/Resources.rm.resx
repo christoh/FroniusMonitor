@@ -1801,4 +1801,16 @@
   <data name="ConfirmLogout" xml:space="preserve">
     <value>Vuls ti propi sortir?</value>
   </data>
+  <data name="HouseConsumption" xml:space="preserve">
+    <value>Chasa</value>
+  </data>
+  <data name="CarCharging" xml:space="preserve">
+    <value>Autos</value>
+  </data>
+  <data name="SelfSufficiency" xml:space="preserve">
+    <value>Autosuffizienza</value>
+  </data>
+  <data name="SelfConsumption" xml:space="preserve">
+    <value>Consum agen</value>
+  </data>
 </root>

@@ -92,7 +92,7 @@
 											<StackPanel Grid.Row="0" Grid.Column="2" Grid.RowSpan="3">
 												<c:InverterControl x:Name="InverterControl"
 																   ColorAllTicks="{Binding Path=((vm:DashboardViewModel)DataContext).MainViewModel.ColorAllTicks, FallbackValue={x:False}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
-																   Width="300" VerticalAlignment="Top"
+																   Height="320" VerticalAlignment="Top"
 																   Inverter="{Binding Device}" LoadPowerBrush="{Binding Path=((vm:DashboardViewModel)DataContext)?.LoadPowerColor, Converter={co:ColorConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
 																   DeviceKey="{Binding Key}"
 																   Margin="8" />
@@ -129,7 +129,7 @@
 
 							<StackPanel Orientation="Vertical" IsVisible="{Binding UpdateService.SmartMeter, Converter={co:Null2Bool}}">
 								<StackPanel Orientation="Horizontal">
-									<c:SmartMeterControl Width="300" VerticalAlignment="Top" Margin="8"
+									<c:SmartMeterControl Height="320" VerticalAlignment="Top" Margin="8"
 														 MeterStatus="{Binding UpdateService.MeterStatus}" HorizontalAlignment="Left"
 														 SmartMeter="{Binding UpdateService.SmartMeter}"
 														 Gen24Config="{Binding UpdateService.PrimaryGen24Config}"
@@ -154,7 +154,11 @@
 							</StackPanel>
 						</StackPanel>
 					</Viewbox>
-					<Rectangle Height="20" HorizontalAlignment="Stretch" Fill="DarkGray"></Rectangle>
+					<!-- The house as a whole - consumption, cars, loss, self-sufficiency, own consumption - across the full
+					     width. The control is laid out at a fixed width; the Viewbox scales it to whatever the window gives. -->
+					<Viewbox Stretch="Uniform" Margin="8,4">
+						<c:HouseControl />
+					</Viewbox>
 				</StackPanel>
 			</Grid>
 			<ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto"

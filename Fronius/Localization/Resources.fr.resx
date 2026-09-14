@@ -1792,4 +1792,16 @@
   <data name="ConfirmLogout" xml:space="preserve">
     <value>Veux-tu vraiment te dÃ©connecter ?</value>
   </data>
+  <data name="HouseConsumption" xml:space="preserve">
+    <value>Maison</value>
+  </data>
+  <data name="CarCharging" xml:space="preserve">
+    <value>Voitures</value>
+  </data>
+  <data name="SelfSufficiency" xml:space="preserve">
+    <value>Autosuffisance</value>
+  </data>
+  <data name="SelfConsumption" xml:space="preserve">
+    <value>Autoconsommation</value>
+  </data>
 </root>

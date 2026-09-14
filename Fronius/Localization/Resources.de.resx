@@ -1818,4 +1818,16 @@
   <data name="ConfirmLogout" xml:space="preserve">
     <value>Bist Du sicher, dass Du Dich abmelden willst?</value>
   </data>
+  <data name="HouseConsumption" xml:space="preserve">
+    <value>Haus</value>
+  </data>
+  <data name="CarCharging" xml:space="preserve">
+    <value>Autos</value>
+  </data>
+  <data name="SelfSufficiency" xml:space="preserve">
+    <value>Autarkie</value>
+  </data>
+  <data name="SelfConsumption" xml:space="preserve">
+    <value>Eigenverbrauch</value>
+  </data>
 </root>

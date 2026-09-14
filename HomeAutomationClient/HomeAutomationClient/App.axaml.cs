@@ -127,6 +127,8 @@ public partial class App : Application
             .AddTransient<LinearGaugeTestViewModel>()
             .AddSingleton<DashboardView>()
             .AddSingleton<DashboardViewModel>()
+            // One for the app: the house block on the dashboard follows the update service for as long as the app runs.
+            .AddSingleton<HouseViewModel>()
             .AddSingleton<InverterDetailsView>()
             .AddSingleton<InverterDetailsViewModel>()
             .AddSingleton<BatteryDetailsView>()

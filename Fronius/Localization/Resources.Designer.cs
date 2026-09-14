@@ -5460,5 +5460,41 @@ namespace De.Hochstaetter.Fronius.Localization {
             }
         }
 
+        /// <summary>
+        ///   Looks up a localized string similar to House.
+        /// </summary>
+        public static string HouseConsumption {
+            get {
+                return ResourceManager.GetString("HouseConsumption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cars.
+        /// </summary>
+        public static string CarCharging {
+            get {
+                return ResourceManager.GetString("CarCharging", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Self-sufficiency.
+        /// </summary>
+        public static string SelfSufficiency {
+            get {
+                return ResourceManager.GetString("SelfSufficiency", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Own consumption.
+        /// </summary>
+        public static string SelfConsumption {
+            get {
+                return ResourceManager.GetString("SelfConsumption", resourceCulture);
+            }
+        }
+        
     }
 }

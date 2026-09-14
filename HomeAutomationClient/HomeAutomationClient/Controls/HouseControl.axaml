@@ -1,0 +1,78 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels"
+             xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+             xmlns:m="clr-namespace:De.Hochstaetter.HomeAutomationClient.Misc"
+             xmlns:i="clr-namespace:De.Hochstaetter.HomeAutomationClient.Assets.Images"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="60"
+             x:Class="De.Hochstaetter.HomeAutomationClient.Controls.HouseControl"
+             x:DataType="vm:HouseViewModel"
+             Width="1000">
+	<!-- The house as a whole: what it draws, what the cars draw, what the inverters lose, and how much of it all
+	     is its own. Laid out at a fixed width of 1000 and scaled by the Viewbox the dashboard puts it in, so the
+	     block always spans the dashboard and grows with the window. Two columns of gauges keep it flat. -->
+	<Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,40,Auto,*,Auto,Auto" RowDefinitions="Auto,Auto,Auto">
+		<Grid.Styles>
+			<Style Selector="TextBlock">
+				<Setter Property="FontSize" Value="12" />
+				<Setter Property="VerticalAlignment" Value="Center" />
+			</Style>
+			<Style Selector="TextBlock.Value">
+				<Setter Property="TextAlignment" Value="Right" />
+				<Setter Property="MinWidth" Value="56" />
+				<Setter Property="Margin" Value="8,0,0,0" />
+				<!-- Tabular figures, so the three rows of a column line up. -->
+				<Setter Property="FontFeatures" Value="+tnum" />
+			</Style>
+			<Style Selector="TextBlock.Unit">
+				<Setter Property="Margin" Value="4,0,0,0" />
+				<Setter Property="Foreground" Value="{DynamicResource UnitForeground}" />
+			</Style>
+			<Style Selector="c|LinearRectangleGauge">
+				<Setter Property="Height" Value="12" />
+				<Setter Property="Margin" Value="8,3,0,3" />
+				<Setter Property="VerticalAlignment" Value="Center" />
+				<Setter Property="TickFill" Value="{DynamicResource TickFill}" />
+			</Style>
+			<!-- The whole cars' row comes and goes with the Wattpilots; a Grid row cannot be hidden as one. -->
+			<Style Selector=":is(Control).Cars">
+				<Setter Property="IsVisible" Value="{Binding HasCars}" />
+			</Style>
+		</Grid.Styles>
+
+		<i:HouseIcon Grid.Row="0" Grid.RowSpan="3" Grid.Column="0" Height="42" Margin="0,0,16,0" VerticalAlignment="Center" />
+
+		<TextBlock Grid.Row="0" Grid.Column="1" Text="{x:Static p:Resources.PvPower}" />
+		<c:LinearRectangleGauge Grid.Row="0" Grid.Column="2" Value="{Binding Power.SolarPower}" Maximum="{Binding SolarMaximum}" GaugeColors="{x:Static m:GaugeColors.LowIsBad}" />
+		<TextBlock Grid.Row="0" Grid.Column="3" Classes="Value" Text="{Binding Power.SolarPower, StringFormat=N1, TargetNullValue='---'}" />
+		<TextBlock Grid.Row="0" Grid.Column="4" Classes="Unit" Text="W" />
+
+		<TextBlock Grid.Row="1" Grid.Column="1" Text="{x:Static p:Resources.HouseConsumption}" />
+		<c:LinearRectangleGauge Grid.Row="1" Grid.Column="2" Value="{Binding Power.HouseConsumption}" Maximum="{Binding PowerMaximum}" GaugeColors="{x:Static m:GaugeColors.HighIsBad}" />
+		<TextBlock Grid.Row="1" Grid.Column="3" Classes="Value" Text="{Binding Power.HouseConsumption, StringFormat=N1, TargetNullValue='---'}" />
+		<TextBlock Grid.Row="1" Grid.Column="4" Classes="Unit" Text="W" />
+
+		<TextBlock Grid.Row="2" Grid.Column="1" Classes="Cars" Text="{x:Static p:Resources.CarCharging}" />
+		<c:LinearRectangleGauge Grid.Row="2" Grid.Column="2" Classes="Cars" Value="{Binding Power.CarPower}" Maximum="{Binding CarPowerMaximum}" GaugeColors="{x:Static m:GaugeColors.AllIsGood}" />
+		<TextBlock Grid.Row="2" Grid.Column="3" Classes="Value Cars" Text="{Binding Power.CarPower, StringFormat=N1, TargetNullValue='---'}" />
+		<TextBlock Grid.Row="2" Grid.Column="4" Classes="Unit Cars" Text="W" />
+
+		<TextBlock Grid.Row="0" Grid.Column="6" Text="{x:Static p:Resources.SelfSufficiency}" />
+		<c:LinearRectangleGauge Grid.Row="0" Grid.Column="7" Value="{Binding Power.SelfSufficiency}" Maximum="100" GaugeColors="{x:Static m:GaugeColors.LowIsBad}" />
+		<TextBlock Grid.Row="0" Grid.Column="8" Classes="Value" Text="{Binding Power.SelfSufficiency, StringFormat=N1, TargetNullValue='---'}" />
+		<TextBlock Grid.Row="0" Grid.Column="9" Classes="Unit" Text="%" />
+
+		<TextBlock Grid.Row="1" Grid.Column="6" Text="{x:Static p:Resources.SelfConsumption}" />
+		<c:LinearRectangleGauge Grid.Row="1" Grid.Column="7" Value="{Binding Power.SelfConsumption}" Maximum="100" GaugeColors="{x:Static m:GaugeColors.LowIsBad}" />
+		<TextBlock Grid.Row="1" Grid.Column="8" Classes="Value" Text="{Binding Power.SelfConsumption, StringFormat=N1, TargetNullValue='---'}" />
+		<TextBlock Grid.Row="1" Grid.Column="9" Classes="Unit" Text="%" />
+
+		<TextBlock Grid.Row="2" Grid.Column="6" Text="{x:Static p:Resources.Loss}" />
+		<c:LinearRectangleGauge Grid.Row="2" Grid.Column="7" Value="{Binding Power.PowerLoss}" Maximum="{Binding LossMaximum}" GaugeColors="{x:Static m:GaugeColors.HighIsBad}" />
+		<TextBlock Grid.Row="2" Grid.Column="8" Classes="Value" Text="{Binding Power.PowerLoss, StringFormat=N1, TargetNullValue='---'}" />
+		<TextBlock Grid.Row="2" Grid.Column="9" Classes="Unit" Text="W" />
+	</Grid>
+</UserControl>
