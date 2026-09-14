@@ -8,7 +8,8 @@ namespace De.Hochstaetter.Fronius.Services.EnergyData;
 /// </summary>
 public sealed class AwattarClient(ILogger<AwattarClient> logger) : IAwattarClient, IDisposable
 {
-    private static readonly JsonSerializerOptions jsonOptions = new(JsonSerializerDefaults.Web);
+    /// <summary>How Awattar's answers are read; public so a test can read a recorded answer the same way.</summary>
+    public static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
     private readonly HttpClient client = CreateClient();
 
@@ -40,18 +41,24 @@ public sealed class AwattarClient(ILogger<AwattarClient> logger) : IAwattarClien
     {
         var uri = $"{BaseUri(region)}/v1/power/productions{SpanQuery(fromUtc, toUtc)}";
         var list = await GetAsync<AwattarEnergyList>(uri, null, token).ConfigureAwait(false);
-
-        return list.Energies
-            .Select(e => new GridProductionPoint
-            {
-                StartTime = e.StartTime,
-                EndTime = e.EndTime,
-                SolarMegaWatt = e.SolarProductionMegaWatt,
-                WindMegaWatt = e.WindProductionMegaWatt,
-            })
-            .OrderBy(p => p.StartTime)
-            .ToList();
+        return ToProductions(list);
     }
+
+    /// <summary>
+    /// The hours that carry a forecast, in order. The hours beyond Awattar's horizon come back with null values
+    /// (see <see cref="AwattarEnergy"/>) and are left out: a forecast that does not exist is not zero megawatts.
+    /// </summary>
+    public static IReadOnlyList<GridProductionPoint> ToProductions(AwattarEnergyList list) => list.Energies
+        .Where(e => e.HasValues)
+        .Select(e => new GridProductionPoint
+        {
+            StartTime = e.StartTime,
+            EndTime = e.EndTime,
+            SolarMegaWatt = e.SolarProductionMegaWatt!.Value,
+            WindMegaWatt = e.WindProductionMegaWatt!.Value,
+        })
+        .OrderBy(p => p.StartTime)
+        .ToList();
 
     public async Task<IReadOnlyList<EnergyPriceComponent>> GetPriceComponentsAsync(EnergyDataSettings settings, DateOnly day, CancellationToken token = default)
     {
@@ -96,7 +103,7 @@ public sealed class AwattarClient(ILogger<AwattarClient> logger) : IAwattarClien
 
         using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<T>(jsonOptions, token).ConfigureAwait(false) ?? throw new InvalidDataException($"Awattar answered {uri} with no data");
+        return await response.Content.ReadFromJsonAsync<T>(JsonOptions, token).ConfigureAwait(false) ?? throw new InvalidDataException($"Awattar answered {uri} with no data");
     }
 
     private static string BaseUri(AwattarCountry region) => region switch

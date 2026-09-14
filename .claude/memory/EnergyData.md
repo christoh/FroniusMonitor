@@ -57,6 +57,11 @@ to say so in the title.
 - `GET api.awattar.{de|at}/v1/marketdata?start=&end=` (ms since the epoch, end exclusive) - no token. Answers
   `marketprice` in Eur/MWh; `EnergyPricePoint.CentsPerKiloWattHour` is that over ten, **net, market only**.
 - `GET /v1/power/productions?start=&end=` - no token, `solar` and `wind` in MW per slot (`GridProductionPoint`).
+- `GET /v1/power/productions?start=&end=` - no token. **Answers every hour of the span, and the hours beyond its
+  forecast horizon (one day ahead, checked 2026-09-15 against the live service) carry `"solar": null, "wind":
+  null`.** `AwattarEnergy` is therefore nullable and `AwattarClient.ToProductions` drops such hours
+  (`HasValues`); a plain `double` rejected the whole two-day answer and the chart had no production bars at all.
+  The WPF `PriceViewModel` filters the same way. `AwattarProductionsTests` reads a recorded answer with the gap.
 - `GET /v1/prices?zipcode=&consumption=1800&gridoperator=&tariff=hourly-2&domain=awattar&date=yyyy-MM-dd` with
   `Authorization: Bearer` - the tariff components (`EnergyPriceComponent`): name, description, net price, tax
   rate, unit. Not all are per kWh (`Grundpreis Netz` is Euro/Jahr), so the unit travels and only
