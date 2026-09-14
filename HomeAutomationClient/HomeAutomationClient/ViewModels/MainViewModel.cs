@@ -59,10 +59,17 @@ public sealed partial class MainViewModel : ViewModelBase
     /// Who is logged in, as the server reported it at the login, for the menu bar. The roles are the enum names as
     /// they are, not localized: they are what the server's user list says, and what an administrator would type.
     /// </summary>
-    [ObservableProperty, NotifyPropertyChangedFor(nameof(UserText), nameof(SettingsItems))]
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(UserText), nameof(SettingsItems), nameof(ShowSettingsMenu))]
     public partial UserInfo? User { get; set; }
 
     public string? UserText => User is { } user ? $"{user.UserName} ({user.Roles})" : null;
+
+    /// <summary>
+    /// The Settings menu is for users, not guests: a guest may change nothing, so every entry in it would only
+    /// earn a 403. Hidden as a whole for a guest - unlike <see cref="UserManagementEntry"/> inside it, which stays
+    /// visible to every user on purpose; see <see cref="SettingsItems"/>.
+    /// </summary>
+    public bool ShowSettingsMenu => User?.Roles.SeesAllDevices() ?? false;
 
     /// <summary>
     /// What the Settings menu offers: the devices with settings and the user management. Shown to every user
@@ -163,7 +170,7 @@ public sealed partial class MainViewModel : ViewModelBase
         BusyText = Loc.GetInverterLocalization;
         await gen24Loc.Initialize().ConfigureAwait(false);
         BusyText = Loc.ConnectingToHas;
-        await UpdateService.StartAsync().ConfigureAwait(false);
+        await UpdateService.StartAsync(User?.Roles ?? Roles.None).ConfigureAwait(false);
         OnPropertyChanged(nameof(SettingsItems));
         IsReady = true;
 

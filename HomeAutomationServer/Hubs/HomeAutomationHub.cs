@@ -24,7 +24,16 @@ public class HomeAutomationHub(IDataControlService controlService, IWattPilotSer
             logger.LogInformation("Client of {Username} connected on {ConnectionId}", Context.User?.Identity?.Name, Context.ConnectionId);
         }
 
-        foreach (var e in controlService.Entities)
+        // A user's connection joins the group the dispatcher pushes everything to; a guest's stays outside it and is
+        // greeted, here, with the devices a guest may see - the same list on both occasions.
+        var seesAll = Context.User?.SeesAllDevices() ?? false;
+
+        if (seesAll)
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, HubAuthentication.AllDevicesGroup).ConfigureAwait(false);
+        }
+
+        foreach (var e in controlService.Entities.Where(e => seesAll || DeviceVisibility.IsVisibleToGuests(e.Value.Device)))
         {
             await Clients.Caller.SendAsync(e.Value.Device.GetType().Name, e.Key, e.Value.Device).ConfigureAwait(false);
         }

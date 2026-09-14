@@ -80,6 +80,13 @@ Do not reintroduce a role check around the entry in `SettingsItems` to "clean up
 wants the entry hidden from non-administrators again, that is a deliberate UX change to ask for, not a bug fix -
 and the server-side `[BasicAuthorize]` must stay regardless.
 
+**Guests are the one exception, and it is a different thing.** Since 2026-09-14 `MainView.axaml` binds the whole
+Settings button to `MainViewModel.ShowSettingsMenu`, which is `User.Roles.SeesAllDevices()` - false for a login that
+holds `Roles.Guest` and nothing more. That was asked for ("guests cannot change settings"), it hides the menu
+for a guest rather than an entry for a non-administrator, and the server enforces it regardless: no guest holds
+Operator or Administrator, so every settings endpoint refuses them anyway. What else a guest does and does not
+see is in `SignalR.MessageDirection.md`, section "What a guest sees".
+
 ## Renaming a user
 
 The password hash (`User.GetHash` in `HomeAutomationServer/Models/Authorization/User.cs`) is `Salt` + password

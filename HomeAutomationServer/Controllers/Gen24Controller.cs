@@ -25,13 +25,15 @@ public class Gen24SystemController
     private const string CustomerLogin = "customer";
 
     [HttpGet]
-    [BasicAuthorize(Roles = "User")]
+    // "User,Guest": a guest may look at the inverters - and at the smart meter and the battery a Gen24 carries -
+    // but at nothing that is switched, charged or configured. The hub says the same in DeviceVisibility.
+    [BasicAuthorize(Roles = "User,Guest")]
     [ProducesResponseType<IDictionary<string, Gen24System>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public IActionResult GetInverters() => GetDevices<Gen24System>();
 
     [HttpGet("{id}")]
-    [BasicAuthorize(Roles = "User")]
+    [BasicAuthorize(Roles = "User,Guest")]
     [ProducesResponseType<IDictionary<string, Gen24System>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -63,7 +65,7 @@ public class Gen24SystemController
     }
 
     [HttpGet("{id}/getStandByStatus")]
-    [BasicAuthorize(Roles = "User")]
+    [BasicAuthorize(Roles = "User,Guest")]
     [ProducesResponseType<Gen24StandByStatus>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -89,7 +91,7 @@ public class Gen24SystemController
 
 
     [HttpGet("{id}/i18n/{iso2LanguageCode}/{name}")]
-    [BasicAuthorize(Roles = "User")]
+    [BasicAuthorize(Roles = "User,Guest")]
     [ProducesResponseType<IDictionary<string, object>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
