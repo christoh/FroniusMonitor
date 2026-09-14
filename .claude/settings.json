@@ -17,5 +17,17 @@
       "PowerShell(Get-ChildItem -Path F:\\\\FroniusMonitor\\\\FroniusMonitor\\\\bin\\\\Debug -Recurse -Directory -Include fr,rm,it,gsw -ErrorAction SilentlyContinue | Where-Object { Test-Path \\(Join-Path $_.FullName 'FroniusMonitor.resources.dll'\\) } | Select-Object -ExpandProperty FullName)",
       "Bash(grep -Ev \"^\\\\s*$\")"
     ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh"
+          }
+        ]
+      }
+    ]
   }
 }
