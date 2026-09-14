@@ -48,7 +48,7 @@
 							 SetBrightnessCommand="{Binding ((vm:DashboardViewModel)DataContext).SetBrightnessCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}" />
 		</DataTemplate>
 	</ContentPage.DataTemplates>
-	<Grid RowDefinitions="*" x:Name="RootElement">
+	<Grid RowDefinitions="*" x:Name="RootElement" Margin="8">
 		<Grid RowDefinitions="Auto,Auto,*" Grid.Row="0">
 
 			<StackPanel x:Name="MainContentElement" Orientation="Vertical" Margin="16" Grid.Row="0" VerticalAlignment="Top">
@@ -156,7 +156,7 @@
 					</Viewbox>
 					<!-- The house as a whole - consumption, cars, loss, self-sufficiency, own consumption - across the full
 					     width. The control is laid out at a fixed width; the Viewbox scales it to whatever the window gives. -->
-					<Viewbox Stretch="Uniform" Margin="8,4">
+					<Viewbox Stretch="Uniform" Margin="8,0,8,12">
 						<c:HouseControl />
 					</Viewbox>
 				</StackPanel>

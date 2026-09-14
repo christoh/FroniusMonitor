@@ -34,6 +34,8 @@
 			<Style Selector="c|LinearRectangleGauge">
 				<Setter Property="Height" Value="12" />
 				<Setter Property="Margin" Value="8,3,0,3" />
+                <Setter Property="NumberOfTicks" Value="40"/>
+                <Setter Property="RelativeTickWidth" Value="0.6"/>
 				<Setter Property="VerticalAlignment" Value="Center" />
 				<Setter Property="TickFill" Value="{DynamicResource TickFill}" />
 			</Style>
