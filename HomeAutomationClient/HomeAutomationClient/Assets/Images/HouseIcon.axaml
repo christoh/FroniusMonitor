@@ -1,0 +1,19 @@
+<ContentControl xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:i="clr-namespace:De.Hochstaetter.HomeAutomationClient.Assets.Images"
+                mc:Ignorable="d" d:DesignWidth="24" d:DesignHeight="24"
+                x:Class="De.Hochstaetter.HomeAutomationClient.Assets.Images.HouseIcon">
+	<!-- A house as a line drawing on a 24 unit grid: a roof band with overhanging eaves, a chimney on the right
+	     slope, walls that end under the eaves, a door and a two pane window. Only the stroke is visible; round
+	     joins and caps keep the corners soft when the icon is 14 px high. The stroke follows Foreground, which is
+	     inherited, so the icon takes the colour of the text it sits next to, like UserIcon. -->
+	<Viewbox>
+		<Canvas Width="24" Height="24">
+			<Path StrokeThickness="1.4" StrokeJoin="Round" StrokeLineCap="Round"
+			      Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=i:HouseIcon}}"
+			      Data="M1.5,11.5 L12,2.5 L22.5,11.5 L21.2,13 L12,5.3 L2.8,13 Z M4.2,11.8 V22.5 H19.8 V11.8 M16.6,6.4 V4.6 H19 V8.5 M6.6,22.5 V15.5 H9.9 V22.5 M12.4,13.6 H17.8 V17.8 H12.4 Z M15.1,13.6 V17.8" />
+		</Canvas>
+	</Viewbox>
+</ContentControl>
