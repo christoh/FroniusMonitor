@@ -84,7 +84,8 @@ text to English.
 - Do not commit without asking the human developer first.
 - Force pushes are **never** allowed by AI.
 - History rewrites need confirmation by a human developer.
-- Commit under your own authorship, never under the human developer's: `git commit --author="<name> <email>"`. The e-mail always stays as in .git/config. Only the name changes.
+- Commit under your own authorship, never under the human developer's: `git commit --author="<name> <email>"`. The author e-mail is always `christoph@hochstaetter.de`, whatever `.git/config` says - in the cloud that config carries the AI's own address. Only the name changes.
+  - The committer is never touched: it is whoever runs git. On the developer's machine that is the human developer, in the cloud it is the AI identity the environment configures.
   - The author name must name the AI you are **and** the model that made a change, including its version. For
   example `Claude Code (Opus 5)`, `GitHub Copilot (GPT 5.6 Terra)`. The tool name on its own is not enough - which model wrote the change is part of the record.
   - If a human developer also made changes, commit under his authorship. Split each commit by authorship. That includes splitting by AI model and splitting by human and AI. You know that in advance so make sure to keep a history of authorships that you can use later.
