@@ -95,14 +95,22 @@ public partial class Gen24PowerFlow : Gen24DeviceBase
     [JsonIgnore]
     public double PowerLoss => StoragePower - InverterAcPower + SolarPower;
 
+    /// <summary>Below this much input the efficiency is noise and stays <see langword="null"/>.</summary>
+    public const double MinimumInputForEfficiency = 10;
+
+    /// <summary>
+    /// What leaves the inverter over what comes in. Solar only ever comes in; the battery and the AC side go both
+    /// ways, the AC side being an input while the battery is charged from the grid or from another inverter. Every
+    /// path through the inverter converts - AC to DC, DC to AC, DC to DC - so every input and every output counts.
+    /// </summary>
     [JsonIgnore]
     public double? Efficiency
     {
         get
         {
-            var dcInputPower = SolarPower + (StoragePower > 0 ? StoragePower : 0);
-            var dcOutputPower= StoragePower < 0 ? StoragePower : 0;
-            return dcInputPower < 0.000001 ? null : (InverterAcPower - dcOutputPower) / dcInputPower;
+            var input = SolarPower + Math.Max(StoragePower, 0) + Math.Max(-InverterAcPower, 0);
+            var output = Math.Max(-StoragePower, 0) + Math.Max(InverterAcPower, 0);
+            return input < MinimumInputForEfficiency ? null : output / input;
         }
     }
 
