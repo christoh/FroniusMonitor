@@ -75,13 +75,20 @@ internal partial class UpdateService(IWebClientService webClient, ILogger<Update
 
     public bool ShowPowerConsumers => AllPowerConsumers.Count > 0;
 
-    public async Task StartAsync()
+    public async Task StartAsync(Roles roles)
     {
-        var wattPilotResult = await webClient.GetWattPilots();
+        // A guest sees the inverters only. The server would answer every other request with 403 and push nothing
+        // else over the hub either; not asking spares the round trips and the error handling.
+        var seesAll = roles.SeesAllDevices();
 
-        if (wattPilotResult.Payload is { } wattPilots)
+        if (seesAll)
         {
-            wattPilots.Select(wp => new KeyedWattPilot { Device = wp.Value, Key = wp.Key }).Apply(w => AllPowerConsumers.Add(w));
+            var wattPilotResult = await webClient.GetWattPilots();
+
+            if (wattPilotResult.Payload is { } wattPilots)
+            {
+                wattPilots.Select(wp => new KeyedWattPilot { Device = wp.Value, Key = wp.Key }).Apply(w => AllPowerConsumers.Add(w));
+            }
         }
 
         var gen24Result = await webClient.GetGen24Devices();
@@ -92,28 +99,31 @@ internal partial class UpdateService(IWebClientService webClient, ILogger<Update
             Inverters.Apply(OnInverterUpdateReceived);
         }
 
-        var fritzBoxResult = await webClient.GetFritzBoxDevices();
-
-        if (fritzBoxResult.Payload is { } fritzBoxDevices)
+        if (seesAll)
         {
-            fritzBoxDevices.Where(fb => fb.Value.CanSwitch).Select(fb => new KeyedFritzBoxDevice { Device = fb.Value, Key = fb.Key }).Apply(f => AllPowerConsumers.Add(f));
-        }
+            var fritzBoxResult = await webClient.GetFritzBoxDevices();
 
-        var toshibaResult = await webClient.GetToshibaHvacDevices();
+            if (fritzBoxResult.Payload is { } fritzBoxDevices)
+            {
+                fritzBoxDevices.Where(fb => fb.Value.CanSwitch).Select(fb => new KeyedFritzBoxDevice { Device = fb.Value, Key = fb.Key }).Apply(f => AllPowerConsumers.Add(f));
+            }
 
-        if (toshibaResult.Payload is { } toshibaDevices)
-        {
-            toshibaDevices.Select(t => new KeyedToshibaHvac { Device = t.Value, Key = t.Key }).Apply(t => AllPowerConsumers.Add(t));
-        }
+            var toshibaResult = await webClient.GetToshibaHvacDevices();
 
-        NotifyOfPropertyChange(nameof(ShowPowerConsumers));
+            if (toshibaResult.Payload is { } toshibaDevices)
+            {
+                toshibaDevices.Select(t => new KeyedToshibaHvac { Device = t.Value, Key = t.Key }).Apply(t => AllPowerConsumers.Add(t));
+            }
 
-        // 404 where the server collects no energy data, which is not an error: the menu then has no chart.
-        var energyResult = await webClient.GetEnergyData();
+            NotifyOfPropertyChange(nameof(ShowPowerConsumers));
 
-        if (energyResult is { Status: HttpStatusCode.OK, Payload: { } energyData })
-        {
-            EnergyChartData = energyData;
+            // 404 where the server collects no energy data, which is not an error: the menu then has no chart.
+            var energyResult = await webClient.GetEnergyData();
+
+            if (energyResult is { Status: HttpStatusCode.OK, Payload: { } energyData })
+            {
+                EnergyChartData = energyData;
+            }
         }
 
         var hubUri =IoC.TryGetRegistered<ICache>()?.Get<string>(CacheKeys.HubUri) ?? "http://www.example.com/hub";

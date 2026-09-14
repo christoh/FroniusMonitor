@@ -16,6 +16,7 @@ public enum WattPilotDisplayMode : byte
     NeutralWire,
     MoreWifi,
     MoreTemperatures,
+    MoreCar,
 }
 
 public partial class WattPilotControl : DeviceControlBase
@@ -41,6 +42,7 @@ public partial class WattPilotControl : DeviceControlBase
 
     private static readonly IReadOnlyList<WattPilotDisplayMode> moreModes =
     [
+        WattPilotDisplayMode.MoreCar,
         WattPilotDisplayMode.MoreFrequency,
         WattPilotDisplayMode.NeutralWire,
         WattPilotDisplayMode.MoreTemperatures,

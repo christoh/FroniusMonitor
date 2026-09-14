@@ -1644,9 +1644,6 @@
   <data name="HvacHiPower" xml:space="preserve">
     <value>Hochleistig</value>
   </data>
-  <data name="UiTestTitle" xml:space="preserve">
-    <value>Home Automation Control Center UI-Test</value>
-  </data>
   <data name="LinearGauge" xml:space="preserve">
     <value>Lineari Aazeig</value>
   </data>
@@ -1826,5 +1823,20 @@
   </data>
   <data name="ConfirmLogout" xml:space="preserve">
     <value>Bisch sicher, dass Du Di wottsch abmÃ¤lde?</value>
+  </data>
+  <data name="HouseConsumption" xml:space="preserve">
+    <value>Huus</value>
+  </data>
+  <data name="CarCharging" xml:space="preserve">
+    <value>Autos</value>
+  </data>
+  <data name="SelfSufficiency" xml:space="preserve">
+    <value>Autarkie</value>
+  </data>
+  <data name="SelfConsumption" xml:space="preserve">
+    <value>Eigeverbruuch</value>
+  </data>
+  <data name="Car" xml:space="preserve">
+    <value>Auto</value>
   </data>
 </root>

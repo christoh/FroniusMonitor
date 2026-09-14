@@ -1,0 +1,58 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+             xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
+             mc:Ignorable="d" d:DesignWidth="15.01" d:DesignHeight="20.53"
+             x:Class="De.Hochstaetter.HomeAutomationClient.Controls.CableLockControl">
+	<!-- The padlock of the WPF app's WattPilotPadLock: the shackle is closed while the cable is locked (or should
+	     be and is not), the body is green when the lock did what it was asked, orange red when it failed, dark orange
+	     when it has no power, dark gray when nothing is known. The status arrives as pseudo classes from the code
+	     behind; every colour is a style here. The strokes follow the theme, the WPF app drew them black. -->
+	<UserControl.Styles>
+		<Style Selector="c|CableLockControl Path">
+			<Setter Property="Stroke" Value="{DynamicResource ForegroundBrush}" />
+		</Style>
+		<Style Selector="c|CableLockControl Path.Shackle">
+			<Setter Property="StrokeThickness" Value="2" />
+			<Setter Property="StrokeLineCap" Value="Round" />
+			<Setter Property="StrokeJoin" Value="Round" />
+		</Style>
+		<Style Selector="c|CableLockControl Path#Locked">
+			<Setter Property="IsVisible" Value="False" />
+		</Style>
+		<Style Selector="c|CableLockControl:closed Path#Locked">
+			<Setter Property="IsVisible" Value="True" />
+		</Style>
+		<Style Selector="c|CableLockControl:closed Path#Unlocked">
+			<Setter Property="IsVisible" Value="False" />
+		</Style>
+		<Style Selector="c|CableLockControl Path#MainBody">
+			<Setter Property="Fill" Value="DarkGray" />
+			<Setter Property="StrokeThickness" Value="1" />
+		</Style>
+		<Style Selector="c|CableLockControl:ok Path#MainBody">
+			<Setter Property="Fill" Value="ForestGreen" />
+		</Style>
+		<Style Selector="c|CableLockControl:failed Path#MainBody">
+			<Setter Property="Fill" Value="OrangeRed" />
+		</Style>
+		<Style Selector="c|CableLockControl:powerout Path#MainBody">
+			<Setter Property="Fill" Value="DarkOrange" />
+		</Style>
+	</UserControl.Styles>
+
+	<Viewbox Stretch="Uniform">
+		<Canvas Width="15.01" Height="20.53" Background="Transparent" x:DataType="c:CableLockControl"
+		        DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:CableLockControl}}"
+		        ToolTip.Tip="{Binding CableLockStatus, Converter={co:EnumDisplayName}}">
+			<Canvas.RenderTransform>
+				<TranslateTransform X="-4.50005" Y="-1.99" />
+			</Canvas.RenderTransform>
+			<Path x:Name="Locked" Classes="Shackle" Data="M8.18164 10.7027C8.18164 10.7027 8.18168 8.13513 8.18164 6.59459C8.1816 4.74571 9.70861 3 11.9998 3C14.291 3 15.8179 4.74571 15.8179 6.59459C15.8179 8.13513 15.8179 10.7027 15.8179 10.7027" />
+			<Path x:Name="Unlocked" Classes="Shackle" Data="M8.18164 10.7027C8.18164 10.7027 8.18168 8.13513 8.18164 6.59459C8.1816 4.74571 9.70861 3 11.9998 3C14.291 3 15.8179 4.74571 15.8179 6.59459" />
+			<Path x:Name="MainBody" Data="M4.50005 11.3932C4.50001 13.1319 4.49995 16.764 4.50007 19.1988C4.5002 21.8911 8.66375 22.5 12.0001 22.5C15.3364 22.5 19.5 21.8911 19.5 19.1988L19.5 11.3932C19.5 10.8409 19.0523 10.3957 18.5 10.3957H5.50004C4.94777 10.3957 4.50006 10.8409 4.50005 11.3932ZM10.5 16.0028C10.5 16.4788 10.7069 16.9065 11.0357 17.2008V18.7529C11.0357 19.3051 11.4834 19.7529 12.0357 19.7529H12.1786C12.7309 19.7529 13.1786 19.3051 13.1786 18.7529V17.2008C13.5074 16.9065 13.7143 16.4788 13.7143 16.0028C13.7143 15.1152 12.9948 14.3957 12.1072 14.3957C11.2195 14.3957 10.5 15.1152 10.5 16.0028Z" />
+		</Canvas>
+	</Viewbox>
+</UserControl>

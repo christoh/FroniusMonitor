@@ -3,6 +3,11 @@ paths:
   - HomeAutomationServer/Hubs/**
   - HomeAutomationServer/Program.cs
   - HomeAutomationServer/Services/SignalRDispatcher.cs
+  - HomeAutomationServer/Models/Authorization/DeviceVisibility.cs
+  - HomeAutomationServer/Models/Authorization/AuthorizationExtensions.cs
+  - HomeAutomationServer/Controllers/Gen24Controller.cs
+  - Fronius/Models/WebApi/Roles.cs
+  - Fronius/Models/WebApi/RolesExtensions.cs
   - HomeAutomationServerTests/**
   - HomeAutomationClient/HomeAutomationClient/Services/UpdateService.cs
 ---
@@ -46,8 +51,9 @@ clients even if it tries.
 
 ## What the filter does *not* touch
 
-- **`IHubContext<HomeAutomationHub>`** - `SignalRDispatcher` pushes device updates through
-  `hubContext.Clients.All` and stays unrestricted. That is the server talking, not a client.
+- **`IHubContext<HomeAutomationHub>`** - `SignalRDispatcher` pushes device updates through `hubContext.Clients`
+  (`All` or the `AllDevicesGroup`, see "What a guest sees") and stays unrestricted. That is the server talking,
+  not a client.
 - **Hub lifetime methods.** The filter implements only `InvokeMethodAsync`, so `OnConnectedAsync` keeps the real
   `Clients` and can still replay the current device list to `Clients.Caller`.
 - **`Hub.Groups`.** Joining or leaving a group sends nothing to anybody, so group membership is not restricted.
@@ -111,8 +117,8 @@ The direction rule above is about routing. Getting onto the hub in the first pla
 `app.MapHub<HomeAutomationHub>("/hub").RequireAuthorization(policy => policy.RequireHubTicket())`.
 
 `HubAuthentication` holds both halves of that decision - `AddHubTicketAuthentication` for the scheme,
-`RequireHubTicket` for the policy (ticket scheme plus `Roles.User`) - so `Program.cs` and the tests cannot drift
-apart. Never write the scheme name or the role at a call site.
+`RequireHubTicket` for the policy (ticket scheme plus `Roles.User`, `Roles.Administrator` or `Roles.Guest`) - so
+`Program.cs` and the tests cannot drift apart. Never write the scheme name or the role at a call site.
 
 **The hub does not take the Basic credentials the rest of the API uses.** A browser cannot set an `Authorization`
 header on a WebSocket handshake, so SignalR passes the credential as the `access_token` query parameter, and query
@@ -135,15 +141,42 @@ authenticated) hands out a short lived ticket, and the client feeds it to `Acces
   reconnect.
 
 `Roles` is a `[Flags]` enum, so holding one role says nothing about the others - an administrator does not carry
-the User bit unless somebody set it. `RequireHubTicket` therefore names both `Roles.User` and
-`Roles.Administrator`, and `RequireRole` lets **any** of the roles it is given through, never all of them. Guest,
-PowerUser, Operator and Developer still do not get a connection on their own; add the role to that list rather than
-setting the User bit on such a user by hand.
+the User bit unless somebody set it. `RequireHubTicket` therefore names `Roles.User`, `Roles.Administrator` and
+`Roles.Guest`, and `RequireRole` lets **any** of the roles it is given through, never all of them. PowerUser,
+Operator and Developer still do not get a connection on their own; add the role to that list rather than setting
+the User bit on such a user by hand.
 
 Tests: `UnitTests/HubTicketServiceTests` covers forging, tampering, expiry, an unknown user and a changed password
 (including flipping every single bit of the signature); `UnitTests/Hosted/HubAuthenticationTests` proves over a real
 connection that no ticket, a foreign ticket, an expired ticket and a user without the role are all turned away,
-while a valid ticket gets in. Weakening `RequireHubTicket` fails exactly those four.
+while a valid ticket - a user's, an administrator's, a guest's - gets in. Weakening `RequireHubTicket` fails exactly
+those four.
+
+### What a guest sees
+
+Since 2026-09-14 a user with `Roles.Guest` and nothing more gets onto the hub and sees **the inverters, with the
+smart meter and the battery a Gen24 carries inside, and nothing else** - no Fritz!Box outlet, no air conditioner,
+no Wattpilot, no price data, no settings. The rule lives in two places that must agree:
+
+- **Who sees everything** is `RolesExtensions.SeesAllDevices` in `Fronius` (User or Administrator), shared with
+  the client. `AuthorizationExtensions.GetRoles` turns a `ClaimsPrincipal`'s role claims back into the flags so the
+  server can ask the same question of a connection.
+- **Which devices a guest sees** is `DeviceVisibility.IsVisibleToGuests` in the server - an allow list
+  (`Gen24System`, `SunSpecInverter`, `SunSpecMeter`), so a device type added later is hidden until listed.
+
+Enforcement is server side, in three places: `HomeAutomationHub.OnConnectedAsync` puts a user's connection into
+the group `HubAuthentication.AllDevicesGroup` and greets a guest only with the visible entities;
+`SignalRDispatcher` sends a visible device to `Clients.All` and everything else to that group alone; and the read
+endpoints of `Gen24Controller` (`GetInverters`, `GetInverter`, `GetStandbyStatus`, `GetInverterLocalization` - the
+last one the client needs at startup) carry `Roles = "User,Guest"`, while every other controller, the energy data
+included, stays with `User`. The client only spares itself the refused calls: `UpdateService.StartAsync(Roles)`
+skips the consumers and the price data for a guest, and `MainViewModel.ShowSettingsMenu` hides the Settings menu
+(see the user management memory for why that is not the forbidden "clean up" of `SettingsItems`).
+
+`UnitTests/Hosted/HubGuestVisibilityTests` proves the greeting and the pushes over real connections against the
+real hub and the real dispatcher; `UnitTests/RolesAndVisibilityTests` pins the two rules and the claims round trip.
+The negative assertions there are kept honest the same way as in the direction tests: by waiting for a later
+message the guest does receive.
 
 ### CORS has to be let through before authorization, or the hub is unreachable from a foreign origin
 

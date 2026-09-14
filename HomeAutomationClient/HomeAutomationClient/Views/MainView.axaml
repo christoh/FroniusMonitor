@@ -53,7 +53,8 @@
                         </MenuFlyout>
                     </Button.Flyout>
                 </Button>
-                <Button Content="{x:Static p:Resources.Settings}" Theme="{StaticResource MenuButtonStyle}">
+                <!-- Not for guests, who may change nothing; see MainViewModel.ShowSettingsMenu. -->
+                <Button Content="{x:Static p:Resources.Settings}" Theme="{StaticResource MenuButtonStyle}" IsVisible="{Binding ShowSettingsMenu}">
                     <Button.Flyout>
                         <MenuFlyout ItemsSource="{Binding SettingsItems}">
                             <MenuFlyout.ItemContainerTheme>

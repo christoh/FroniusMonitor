@@ -1615,9 +1615,6 @@
   <data name="HvacLimit" xml:space="preserve">
     <value>LIMITA</value>
   </data>
-  <data name="UiTestTitle" xml:space="preserve">
-    <value>Test da l'interfatscha dal Center da controlla da la domotica</value>
-  </data>
   <data name="LinearGauge" xml:space="preserve">
     <value>Indicatur linear</value>
   </data>
@@ -1800,5 +1797,20 @@
   </data>
   <data name="ConfirmLogout" xml:space="preserve">
     <value>Vuls ti propi sortir?</value>
+  </data>
+  <data name="HouseConsumption" xml:space="preserve">
+    <value>Chasa</value>
+  </data>
+  <data name="CarCharging" xml:space="preserve">
+    <value>Autos</value>
+  </data>
+  <data name="SelfSufficiency" xml:space="preserve">
+    <value>Autosuffizienza</value>
+  </data>
+  <data name="SelfConsumption" xml:space="preserve">
+    <value>Consum agen</value>
+  </data>
+  <data name="Car" xml:space="preserve">
+    <value>Auto</value>
   </data>
 </root>

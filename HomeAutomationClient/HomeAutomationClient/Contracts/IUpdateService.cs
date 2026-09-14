@@ -46,7 +46,12 @@ public interface IUpdateService : IDisposable, IAsyncDisposable, IToshibaHvacCom
     /// <summary>Raised on the thread the hub delivers on whenever <see cref="EnergyChartData"/> is replaced.</summary>
     event EventHandler<EnergyChartData>? EnergyChartDataChanged;
 
-    public Task StartAsync();
+    /// <summary>
+    /// Loads the devices and opens the hub connection. <paramref name="roles"/> are those of the user who just
+    /// logged in: a guest is not asked for the power consumers and the price data, which the server would refuse
+    /// anyway - see <see cref="RolesExtensions.SeesAllDevices"/>.
+    /// </summary>
+    public Task StartAsync(Roles roles);
 
     /// <summary>
     /// The counterpart of <see cref="StartAsync"/>: closes the hub connection and forgets every device, so a

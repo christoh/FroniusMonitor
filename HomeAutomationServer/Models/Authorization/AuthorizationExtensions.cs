@@ -25,4 +25,12 @@ public static class AuthorizationExtensions
 
         return new AuthenticationTicket(new ClaimsPrincipal(new ClaimsIdentity(identity, claims)), scheme);
     }
+
+    /// <summary>The roles back out of the claims <see cref="CreateAuthenticationTicket"/> put in, as the flags they were.</summary>
+    public static Roles GetRoles(this ClaimsPrincipal principal) => principal.FindAll(ClaimTypes.Role)
+        .Select(claim => Enum.TryParse<Roles>(claim.Value, out var role) ? role : Roles.None)
+        .Aggregate(Roles.None, (all, role) => all | role);
+
+    /// <inheritdoc cref="RolesExtensions.SeesAllDevices"/>
+    public static bool SeesAllDevices(this ClaimsPrincipal principal) => principal.GetRoles().SeesAllDevices();
 }

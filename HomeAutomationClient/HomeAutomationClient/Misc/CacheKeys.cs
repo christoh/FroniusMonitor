@@ -6,4 +6,5 @@ public static class CacheKeys
     public const string HubUri = "hubUri";
     public const string Connection = "Connection";
     public const string UserName = "UserName";
+    public const string WindowSize = "WindowSize";
 }

@@ -1650,9 +1650,6 @@
   <data name="Dc" xml:space="preserve">
     <value>CC</value>
   </data>
-  <data name="UiTestTitle" xml:space="preserve">
-    <value>Test UI Home Automation Control Center</value>
-  </data>
   <data name="LinearGauge" xml:space="preserve">
     <value>Indicatore lineare</value>
   </data>
@@ -1835,5 +1832,20 @@
   </data>
   <data name="ConfirmLogout" xml:space="preserve">
     <value>Sei sicuro di voler uscire?</value>
+  </data>
+  <data name="HouseConsumption" xml:space="preserve">
+    <value>Casa</value>
+  </data>
+  <data name="CarCharging" xml:space="preserve">
+    <value>Auto</value>
+  </data>
+  <data name="SelfSufficiency" xml:space="preserve">
+    <value>Autosufficienza</value>
+  </data>
+  <data name="SelfConsumption" xml:space="preserve">
+    <value>Autoconsumo</value>
+  </data>
+  <data name="Car" xml:space="preserve">
+    <value>Auto</value>
   </data>
 </root>

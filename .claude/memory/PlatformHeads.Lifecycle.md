@@ -8,6 +8,9 @@ paths:
   - HomeAutomationClient/HomeAutomationClient/ICache.cs
   - HomeAutomationClient/HomeAutomationClient/App.axaml.cs
   - HomeAutomationClient/HomeAutomationClient/App.axaml
+  - HomeAutomationClient/HomeAutomationClient/Views/MainWindow.axaml.cs
+  - HomeAutomationClient/HomeAutomationClient/Misc/StoredWindowSize.cs
+  - HomeAutomationClient/HomeAutomationClient/Models/WindowSize.cs
   - HomeAutomationClient/HomeAutomationClient/Assets/Images/**
   - HomeAutomationClient/HomeAutomationClient.Desktop/**
   - HomeAutomationClient/HomeAutomationClient.Browser/**
@@ -38,7 +41,8 @@ answer travels.
 2. **`AppBuilder`** with the head's font and platform options.
 3. **`App.Initialize`** loads `App.axaml`.
 4. **`App.OnFrameworkInitializationCompleted`** calls `SetAccentColor()`, builds the service provider, hands it to
-   `IoC`, and creates `MainWindow` (desktop lifetime) or `MainView` (single view lifetime).
+   `IoC`, and creates `MainWindow` (desktop lifetime) or `MainView` (single view lifetime). `MainWindow`'s
+   constructor opens the window as big as it was last closed - see "The desktop window's size" below.
 5. `MainView`'s constructor starts `MainViewModel.Initialize`, which shows the login dialog.
 
 **The rule for step 1: no Avalonia types.** Nothing is initialized yet, and on Android and iOS this code runs
@@ -49,6 +53,27 @@ while the platform is still building the activity. That is why a color arrives a
 of the browser, and what the other heads do instead, is `Navigation.Lifecycle.md`. Only two things here belong to
 a head: registering the `IUriService` in step 1, and the base address the browser head is handed in `args[0]`,
 which is `document.baseURI` **for a reason the navigation document gives**. Do not go back to `location.href`.
+
+## The desktop window's size
+
+Since 2026-09-14 the desktop window remembers its **size, not its position**, under `CacheKeys.WindowSize`
+(a `Models/WindowSize`: `Width`, `Height` in device independent pixels, `IsMaximized`). The developer asked for
+exactly that: the position is deliberately not kept, so the OS places the window and it never comes back on a
+monitor that is gone.
+
+- **Who does what.** `Misc/StoredWindowSize` is the decision part and has no Avalonia types, like
+  `StoredConnection`: `Load` throws away anything below 320 x 240, NaN or infinite (a hand edited cache file) and
+  cuts the size down to the working area it is handed; `Save` writes the client size, and for a window closed
+  while **maximized** keeps the size already stored and only sets `IsMaximized`, so the window comes back
+  maximized and leaving that state gives the old size rather than a screen sized window. Tested in
+  `StoredWindowSizeTests` with the test project's `Fakes/TempFileCache`.
+- `Views/MainWindow.axaml.cs` only touches the window's own properties: `RestoreSize` in the constructor (before
+  the window is shown) sets `Width`/`Height` and `WindowState`, with `Screens.Primary`'s `WorkingArea / Scaling`
+  as the limit; `Closing` calls `SaveSize` with `ClientSize`, skipping a minimized window. This is the "work that
+  genuinely needs the UI framework" the interaction logic rule allows in code behind; the decisions live in the
+  testable helper, not in a view model, because a view model may not know about windows at all.
+- Desktop only by construction: `MainWindow` exists only in the `IClassicDesktopStyleApplicationLifetime` branch
+  of `App.OnFrameworkInitializationCompleted`. The single view heads fill their screen and never touch the key.
 
 ## What every head must provide
 

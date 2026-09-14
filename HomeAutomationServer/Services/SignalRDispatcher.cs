@@ -2,6 +2,7 @@
 using De.Hochstaetter.Fronius.Models.Charging;
 using De.Hochstaetter.Fronius.Models.Events;
 using De.Hochstaetter.HomeAutomationServer.Hubs;
+using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace De.Hochstaetter.HomeAutomationServer.Services;
@@ -38,7 +39,10 @@ public sealed class SignalRDispatcher(
         {
             if (e.DeviceAction is DeviceAction.Add or DeviceAction.Change && !e.Device.SupportsPushMessages)
             {
-                await hubContext.Clients.All.SendAsync(e.Device.Device.GetType().Name, e.Id, e.Device.Device).ConfigureAwait(false);
+                // Every connection for what a guest may see, otherwise only the users' group - a guest's connection is not
+                // in it; see HomeAutomationHub.OnConnectedAsync.
+                var clients = DeviceVisibility.IsVisibleToGuests(e.Device.Device) ? hubContext.Clients.All : hubContext.Clients.Group(HubAuthentication.AllDevicesGroup);
+                await clients.SendAsync(e.Device.Device.GetType().Name, e.Id, e.Device.Device).ConfigureAwait(false);
             }
         }
         catch (Exception ex)

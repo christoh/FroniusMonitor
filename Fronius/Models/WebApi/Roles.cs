@@ -3,6 +3,8 @@
 /// <summary>
 /// The roles a user of the home automation server can hold. Flags without a hierarchy: holding one says nothing
 /// about the others. Shared between the server, which grants them, and the client, which shows them.
+/// <see cref="Guest"/> on its own sees the inverters with their smart meters and batteries, and nothing that is
+/// switched, charged, configured or paid for - see <see cref="RolesExtensions.SeesAllDevices"/>.
 /// </summary>
 [Flags]
 [JsonConverter(typeof(JsonStringEnumConverter))]

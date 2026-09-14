@@ -22,6 +22,7 @@ public sealed class HubAuthenticationTests : IAsyncLifetime
     private readonly User member = TestUsers.Create("bob", Roles.User);
     private readonly User administrator = TestUsers.Create("root", Roles.Administrator);
     private readonly User guest = TestUsers.Create("eve", Roles.Guest);
+    private readonly User bystander = TestUsers.Create("mallory", Roles.PowerUser | Roles.Operator);
     private readonly SettableTimeProvider clock = new(Now);
 
     private WebApplication app = null!;
@@ -35,7 +36,7 @@ public sealed class HubAuthenticationTests : IAsyncLifetime
         builder.WebHost.UseUrls("http://127.0.0.1:0");
 
         builder.Services.AddSingleton<IAesKeyProvider>(new TestAesKeyProvider());
-        builder.Services.Configure<UserList>(list => list.Users = [member, administrator, guest]);
+        builder.Services.Configure<UserList>(list => list.Users = [member, administrator, guest, bystander]);
 
         // Registered before AddHubTicketAuthentication, which only adds TimeProvider.System if nobody else has.
         builder.Services.AddSingleton<TimeProvider>(clock);
@@ -112,10 +113,21 @@ public sealed class HubAuthenticationTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task A_guest_gets_onto_the_hub()
+    {
+        // What a guest is then sent is HubGuestVisibilityTests' business; here they only have to get in.
+        await using var connection = Build(tickets.Issue(guest));
+
+        await connection.StartAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal(HubConnectionState.Connected, connection.State);
+    }
+
+    [Fact]
     public async Task A_user_without_the_required_role_is_not_accepted()
     {
-        // The ticket itself is perfectly valid - eve is only a Guest, which is neither of the roles that get in.
-        await using var connection = Build(tickets.Issue(guest));
+        // The ticket itself is perfectly valid - mallory holds PowerUser and Operator, and neither of those gets in.
+        await using var connection = Build(tickets.Issue(bystander));
 
         Assert.Equal(HttpStatusCode.Forbidden, await Refused(connection));
     }
