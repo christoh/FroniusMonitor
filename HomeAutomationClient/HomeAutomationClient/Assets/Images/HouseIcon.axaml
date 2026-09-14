@@ -13,7 +13,7 @@
 	     spans 1.5..22.5 by 2.5..22.5 and the stroke adds 0.7 on every side. -->
 	<Viewbox>
 		<Canvas Width="22.4" Height="21.4">
-			<Path Canvas.Left="-0.8" Canvas.Top="-1.8" StrokeThickness="1.4" StrokeJoin="Round" StrokeLineCap="Round"
+			<Path Canvas.Left="-0.8" Canvas.Top="-1.8" StrokeThickness="1" StrokeJoin="Round" StrokeLineCap="Round"
 			      Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=i:HouseIcon}}"
 			      Data="M1.5,11.5 L12,2.5 L22.5,11.5 L21.2,13 L12,5.3 L2.8,13 Z M4.2,11.8 V22.5 H19.8 V11.8 M16.6,6.4 V4.6 H19 V8.5 M6.6,22.5 V15.5 H9.9 V22.5 M12.4,13.6 H17.8 V17.8 H12.4 Z M15.1,13.6 V17.8" />
 		</Canvas>
