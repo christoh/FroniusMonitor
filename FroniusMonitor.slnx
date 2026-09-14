@@ -5,6 +5,7 @@
     <File Path="CLAUDE.md" />
     <File Path="Directory.Build.props" />
     <File Path="docker-compose.yml" />
+    <File Path="docker-bake.hcl" />
     <File Path="tounix.sh" />
   </Folder>
   <Folder Name="/Solution Items/Memory/">

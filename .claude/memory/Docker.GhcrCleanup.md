@@ -1,11 +1,26 @@
 ---
 paths:
   - docker-compose.yml
+  - docker-bake.hcl
   - HomeAutomationServer/Dockerfile
   - HomeAutomationClient/HomeAutomationClient.Browser/Dockerfile
 ---
 
 # GHCR dangling-image cleanup
+
+## OCI labels (added 2026-09-15)
+
+Both Dockerfiles carry the `org.opencontainers.image.*` labels in their **runner** stage - `source`, `url`,
+`documentation`, `title`, `description`, `licenses` (`AGPL-3.0-only`, the repo's LICENSE), `vendor`, `authors`,
+`base.name`. `source` is what GitHub uses to attach a package to the repository. **Multi-arch caveat:** a
+`LABEL` ends up on each platform manifest, while GitHub reads the *index* the tag points at. That is why the
+builds moved out of `docker-compose.yml` into **`docker-bake.hcl`** (same day): its two targets carry the
+platforms, the tags (`REGISTRY`/`TAG` variables, defaults `ghcr.io/christoh` and `latest`) and
+`annotations = index_annotations(title, description)`, a bake function that yields the `index:`-prefixed OCI
+annotations, so `docker buildx bake --push` annotates the index on every push without a flag to remember.
+Compose's `build:` has no `annotations` key and only runs the images now. `docker buildx bake --print`
+validates the file without building. The values exist twice on purpose - in the Dockerfiles for anyone who
+runs `docker build`, in the bake file for the index - because a Dockerfile cannot read the bake file.
 
 This repo publishes multi-arch Docker images to GitHub Container Registry
 (`ghcr.io/christoh/home-automation-server`, `ghcr.io/christoh/home-automation-client`, see
