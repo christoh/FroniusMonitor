@@ -1,4 +1,4 @@
-namespace De.Hochstaetter.Fronius.Contracts;
+namespace De.Hochstaetter.HomeAutomationServer.Contracts;
 
 /// <summary>
 ///     The three things Awattar (tado° Energy) answers: the day-ahead market prices, the sun and wind production

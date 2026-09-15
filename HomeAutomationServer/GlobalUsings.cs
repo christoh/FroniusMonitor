@@ -1,6 +1,7 @@
 // Global using directives
 
 global using System.Collections.Concurrent;
+global using System.ComponentModel;
 global using System.Diagnostics.CodeAnalysis;
 global using System.Globalization;
 global using System.Net;
@@ -25,7 +26,6 @@ global using De.Hochstaetter.Fronius.Models.Settings;
 global using De.Hochstaetter.Fronius.Models.ToshibaAc;
 global using De.Hochstaetter.Fronius.Models.WebApi;
 global using De.Hochstaetter.Fronius.Services;
-global using De.Hochstaetter.Fronius.Services.EnergyData;
 global using De.Hochstaetter.HomeAutomationServer.Attributes;
 global using De.Hochstaetter.HomeAutomationServer.Contracts;
 global using De.Hochstaetter.HomeAutomationServer.Contracts.Modbus;

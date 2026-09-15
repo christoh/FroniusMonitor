@@ -1,14 +1,14 @@
 ---
 paths:
   - Fronius/Models/EnergyData/**
-  - Fronius/Models/Settings/EnergyDataSettings.cs
+  - HomeAutomationServer/Models/Settings/EnergyDataSettings.cs
   - HomeAutomationServer/Models/Settings/EnergyDataCollectorParameters.cs
-  - Fronius/Contracts/EnergyData/**
+  - HomeAutomationServer/Contracts/IAwattarClient.cs
   - HomeAutomationServer/Contracts/IDwdWeatherClient.cs
   - HomeAutomationServer/Contracts/IEnergyDataService.cs
   - HomeAutomationServer/Contracts/IEnergyHistoryStore.cs
   - HomeAutomationServer/Models/EnergyData/DwdForecast.cs
-  - Fronius/Services/EnergyData/**
+  - Fronius/Models/AwattarEnergyList.cs
   - HomeAutomationServer/Services/EnergyData/**
   - HomeAutomationServer/Services/DataCollectors/EnergyDataCollector.cs
   - HomeAutomationClient/HomeAutomationClient/Contracts/IWebClientService.cs
@@ -213,3 +213,15 @@ stop), `EnergyChartModelTests` (bars, axes, weather, and the JSON round trip wit
 - No Android/iOS/browser run of the chart yet; ScottPlot's Skia rendering in WebAssembly is unverified.
 - The WPF app still has its own `AwattarService`, now in `FroniusMonitor/Services`; the two implementations
   share only the JSON models, which stayed in `Fronius`.
+
+## Who owns the Awattar code
+
+`IAwattarClient` and `AwattarClient` are `HomeAutomationServer`'s since 2026-09-16; nothing outside the server
+asks Awattar through them. What the WPF app needed from `AwattarClient` was one conversion, and that is
+`AwattarEnergyList.ToProductions()` now, in `Fronius/Models` beside `GridProductionPoint` - both heads that talk
+to Awattar themselves need it, and it has nothing to do with HTTP. `AwattarClient.JsonOptions` went to the server
+with the client; only `AwattarProductionsTests` reads it, and that project references the server.
+
+`EnergyDataSettings` followed, because `IAwattarClient` was the last thing outside the server that named it. It
+is the server's `Settings.xml` and nothing else. Moving it changes no XML: the element names come from the
+property and type names, not from the CLR namespace.

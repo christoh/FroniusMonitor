@@ -41,6 +41,7 @@ What moved, and where it went:
 | the collector parameter classes of `Models/Settings`, `SettingsChangeTracker`, `PolledWebConnectionParameterBase`, `Models/WebApi/WebApiInfo.cs` | `HomeAutomationServer/Models` |
 | `Contracts/IDataControlService.cs`, `IGen24ConfigRefresher.cs`, `IHomeAutomationRunner.cs`, `IWattPilotServices.cs`, `IDwdWeatherClient.cs`, `IEnergyDataService.cs`, `IEnergyHistoryStore.cs` | `HomeAutomationServer/Contracts` |
 | `Contracts/HomeAutomationClient/**`, `Services/HomeAutomationClient/**`, `Models/HaColor.cs`, `Models/HomeAutomationClient/ApiResult.cs`, `Validators/AbsoluteUriAttribute.cs` | `HomeAutomationClient/HomeAutomationClient` under `Contracts`, `Services`, `Models` and a new `Validators` |
+| `Contracts/EnergyData/IAwattarClient.cs`, `Services/EnergyData/AwattarClient.cs`, `Models/Settings/EnergyDataSettings.cs` | `HomeAutomationServer` - see [[EnergyData]] for the one method that had to come off the client first |
 
 Two things came with them. **`ClosedXML`** was in `Fronius` for `BayernWerkImportService` and nothing else, so its
 package reference left too - and its transitive `DocumentFormat.OpenXml` had meanwhile been picked up by two stray
@@ -114,18 +115,23 @@ edited and every head picks it up from there, wherever the attribute class happe
 `.claude/rules/ViewModelsForInteractionLogic.md` to name the new namespace and to say the paragraph does not
 apply to `FroniusMonitor`, which has no `HaColor` of its own.
 
-## Referencing the WPF app costs a build workaround
+## A build failure that is not your code
 
-**`<BuildInParallel>false</BuildInParallel>` is in three project files** - `FroniusMonitor.csproj` and both test
-projects - and all three are needed. WPF compiles XAML that uses a project's own types by building a temporary
-copy of the project into the *same* `obj` directory. Beside another project on a second MSBuild node the two
-race: the `.g.cs` files vanish mid compile and the build fails with a page of `CS2001` blamed on
-`FroniusMonitor.csproj` itself. A second build then succeeds, which is what makes it easy to write off as a
-fluke.
+Since the test projects reference `FroniusMonitor`, a build of one of them occasionally dies with a page of
+`CS2001: Source file 'FroniusMonitor\obj\Debug\net10.0-windows7.0\...\X.g.cs' could not be found`, blamed on
+`FroniusMonitor.csproj`. **Build again, or delete `FroniusMonitor/obj/Debug`.** It has never survived either.
+Nothing is wrong with the source.
 
-Measured on cold builds of `HomeAutomationServerTests`, which is the worse case because it builds the server, the
-client and the WPF app side by side: 3 of 3 failed with nothing set, 1 of 5 still failed with the property on
-`FroniusMonitor` alone, and 15 of 15 passed once the consumer serializes its project references as well.
-`FroniusUnitTests` never failed either way - it has only two references - but carries the property so that adding
-a third does not quietly bring the fault back. `dotnet build -m:1` is the same cure from the command line, for a
-build that goes wrong anyway.
+WPF compiles XAML that uses a project's own types by building a temporary copy of the project - the random
+`FroniusMonitor_xxxxxxxx_wpftmp.csproj` you see in the build output - into the *same* `obj` directory, and the two
+tread on each other's generated sources. One run gave `CS1504 ... Specified argument was out of the range of
+valid values (Parameter 'length')`, which is a file being read while it is written, so it is a concurrency
+problem and not a stale artefact.
+
+**What is not established is the cure.** `<BuildInParallel>false</BuildInParallel>` sits in `FroniusMonitor.csproj`
+and in both test projects. It was put there on the strength of fifteen clean cold builds - and the fault then
+turned up anyway, so that evidence did not mean what it looked like. Every repro tried afterwards came back clean
+once the code itself compiled: cold builds, a standalone build followed by a consumer, the two test projects
+alternating, `MSBUILDDISABLENODEREUSE=1`, and a failed build followed by a good one. It has been seen about six
+times in forty builds, always during a burst of builds and never from a quiet tree. Leave the property, do not
+trust it, and do not spend an afternoon on it as happened on 2026-09-16: build again and move on.

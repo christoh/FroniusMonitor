@@ -1,6 +1,6 @@
 using De.Hochstaetter.Fronius.Models.Charging;
 using De.Hochstaetter.Fronius.Models.EnergyData;
-using De.Hochstaetter.Fronius.Models.Settings;
+using De.Hochstaetter.HomeAutomationServer.Models.Settings;
 
 namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests.Fakes;
 

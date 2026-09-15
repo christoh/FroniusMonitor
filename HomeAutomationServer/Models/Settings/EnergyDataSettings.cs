@@ -1,4 +1,4 @@
-namespace De.Hochstaetter.Fronius.Models.Settings;
+namespace De.Hochstaetter.HomeAutomationServer.Models.Settings;
 
 /// <summary>
 ///     The sources of the price chart, as the server's <c>Settings.xml</c> holds them: the Awattar account of the

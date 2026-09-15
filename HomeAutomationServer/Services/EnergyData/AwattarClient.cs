@@ -1,6 +1,8 @@
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
 
-namespace De.Hochstaetter.Fronius.Services.EnergyData;
+namespace De.Hochstaetter.HomeAutomationServer.Services.EnergyData;
 
 /// <summary>
 ///     Talks to <c>api.awattar.de</c> and <c>api.awattar.at</c>. The three endpoints are the ones the official
@@ -41,24 +43,8 @@ public sealed class AwattarClient(ILogger<AwattarClient> logger) : IAwattarClien
     {
         var uri = $"{BaseUri(region)}/v1/power/productions{SpanQuery(fromUtc, toUtc)}";
         var list = await GetAsync<AwattarEnergyList>(uri, null, token).ConfigureAwait(false);
-        return ToProductions(list);
+        return list.ToProductions();
     }
-
-    /// <summary>
-    /// The hours that carry a forecast, in order. The hours beyond Awattar's horizon come back with null values
-    /// (see <see cref="AwattarEnergy"/>) and are left out: a forecast that does not exist is not zero megawatts.
-    /// </summary>
-    public static IReadOnlyList<GridProductionPoint> ToProductions(AwattarEnergyList list) => list.Energies
-        .Where(e => e.HasValues)
-        .Select(e => new GridProductionPoint
-        {
-            StartTime = e.StartTime,
-            EndTime = e.EndTime,
-            SolarMegaWatt = e.SolarProductionMegaWatt!.Value,
-            WindMegaWatt = e.WindProductionMegaWatt!.Value,
-        })
-        .OrderBy(p => p.StartTime)
-        .ToList();
 
     public async Task<IReadOnlyList<EnergyPriceComponent>> GetPriceComponentsAsync(EnergyDataSettings settings, DateOnly day, CancellationToken token = default)
     {

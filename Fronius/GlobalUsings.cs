@@ -41,7 +41,6 @@ global using De.Hochstaetter.Fronius.Models.Gen24.Settings;
 global using De.Hochstaetter.Fronius.Models.Settings;
 global using De.Hochstaetter.Fronius.Models.ToshibaAc;
 global using De.Hochstaetter.Fronius.Models.Wifi;
-global using De.Hochstaetter.Fronius.Services.EnergyData;
 global using De.Hochstaetter.Fronius.Validators;
 global using DeviceId;
 global using Microsoft.Extensions.DependencyInjection;
