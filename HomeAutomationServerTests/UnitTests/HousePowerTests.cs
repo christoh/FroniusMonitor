@@ -5,9 +5,16 @@ using De.Hochstaetter.HomeAutomationClient.Models;
 namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests;
 
 /// <summary>
-/// The figures of the dashboard's house block. The Gen24 reports the load as a negative number and the cars are
-/// part of it; these tests pin the signs, the two ratios and what has no value when.
+/// The figures of the dashboard's house block. The Gen24 reports the load as a negative number while the house
+/// draws, and the cars are part of it; these tests pin the signs and the two ratios.
 /// </summary>
+/// <remarks>
+/// The house consumption may be **negative**, and that is shown rather than clamped away: a power source this
+/// software knows nothing about feeds the house without being accounted for anywhere, and the cars can be read a
+/// moment later than the inverter. The two ratios always have a value once there is an inverter: a house that
+/// consumes nothing needs nothing from the grid, so it is fully self-sufficient, and where nothing is produced
+/// none of the production stays in the house, so own consumption is nought. Only the no-inverter case is null.
+/// </remarks>
 public sealed class HousePowerTests
 {
     private static Gen24PowerFlow Flow(double load, double inverterAc, double solar = 0, double storage = 0) => new()
@@ -28,11 +35,25 @@ public sealed class HousePowerTests
     }
 
     [Fact]
-    public void Cars_newer_than_the_inverter_do_not_make_the_house_negative()
+    public void The_house_goes_negative_when_the_cars_draw_more_than_the_load()
     {
+        // Not clamped at zero: a Wattpilot reading can be a moment newer than the inverter's, and what the house
+        // shows then is that the cars are drawing more than the load the inverter last reported.
         var power = HousePower.From(Flow(load: -1000, inverterAc: 0), carPower: 1500);
 
-        Assert.Equal(0, power.HouseConsumption);
+        Assert.Equal(-500, power.HouseConsumption);
+    }
+
+    [Fact]
+    public void A_source_this_software_cannot_see_shows_as_a_negative_house()
+    {
+        // A diesel generator with no data interface, or a second inverter that reports to nobody: what it feeds
+        // the house with is not accounted for anywhere, so it turns up as a positive load power.
+        var power = HousePower.From(Flow(load: 500, inverterAc: 2000), carPower: null);
+
+        Assert.Equal(-500, power.HouseConsumption);
+        Assert.Equal(100, power.SelfSufficiency);
+        Assert.Equal(0, power.SelfConsumption);
     }
 
     [Fact]
@@ -66,20 +87,20 @@ public sealed class HousePowerTests
     }
 
     [Fact]
-    public void At_night_nothing_is_produced_so_own_consumption_has_no_value()
+    public void At_night_nothing_is_produced_so_none_of_the_production_stays_in_the_house()
     {
         var power = HousePower.From(Flow(load: -500, inverterAc: 0), carPower: null);
 
         Assert.Equal(0, power.SelfSufficiency);
-        Assert.Null(power.SelfConsumption);
+        Assert.Equal(0, power.SelfConsumption);
     }
 
     [Fact]
-    public void Without_consumption_self_sufficiency_has_no_value()
+    public void A_house_that_consumes_nothing_is_fully_self_sufficient()
     {
         var power = HousePower.From(Flow(load: 0, inverterAc: 2000), carPower: null);
 
-        Assert.Null(power.SelfSufficiency);
+        Assert.Equal(100, power.SelfSufficiency);
         Assert.Equal(0, power.HouseConsumption);
     }
 

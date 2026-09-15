@@ -35,6 +35,10 @@
     <File Path=".claude/rules/ViewModelsForInteractionLogic.md" />
     <File Path=".claude/rules/Localization.md" />
   </Folder>
+  <Folder Name="/Solution Items/Skills/" />
+  <Folder Name="/Solution Items/Skills/create-plan/">
+    <File Path=".claude/skills/create-plan/SKILL.md" />
+  </Folder>
   <Project Path="Fronius/Fronius.csproj" />
   <Project Path="FroniusMonitor/FroniusMonitor.csproj" />
   <Project Path="FroniusUnitTests/FroniusUnitTests.csproj" />

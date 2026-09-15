@@ -10,6 +10,11 @@ end_of_line = lf
 [*.iss]
 charset = utf-8-bom
 
+# ReSharper writes the solution settings with a BOM every time it saves them, so this is what the file is rather
+# than what we would choose. Named here so the encoding of the repository and the encoding on disk agree.
+[*.DotSettings]
+charset = utf-8-bom
+
 [*.{cs,vb}]
 
 # IDE0009: Member access should be qualified.

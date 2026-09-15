@@ -366,11 +366,16 @@ dialog stays open across that, unlike the login and message boxes that came befo
 itself with a flag set before its first `await`. Without the guard the inverter is read again and the busy overlay
 comes back up over a dialog the user is working in.
 
+The guard stays needed where the dialog frame of `MainView` hosts the dialog, because one host presents whichever
+dialog is on top. In a window of its own the body is never taken out of the tree, so `Initialize` runs once there -
+the guard costs nothing and is what makes the two heads behave alike.
+
 ## The title comes from the caller
 
 `DialogQueueItem` copies `Parameters.Title` at show time, so a title worked out after the snapshot arrives never
 reaches the screen. `MainViewModel.Settings` builds it from the device's `DisplayName`, which is known at click
-time. Do not try to refine it from `Initialize`.
+time. Do not try to refine it from `Initialize`. (A window follows `Parameters.Title` afterwards, but the dialog
+frame does not, so the title still has to be right at show time.)
 
 ## What the user sees
 

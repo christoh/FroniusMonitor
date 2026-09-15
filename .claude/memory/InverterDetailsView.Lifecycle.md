@@ -8,60 +8,66 @@ paths:
 # Lifecycle contract: InverterDetailsView (Avalonia)
 
 This is the Avalonia port of the WPF `FroniusMonitor/Views/InverterDetailsView.xaml`, which was a separate
-`ScalableWindow`. The new architecture is single-window (see `Rules/PortingFroniusMonitor.md`), so the view is a
-page swapped into the main content instead.
+`ScalableWindow`. Where it appears is the head's business and the view knows nothing about it: a page swapped into
+the main content where there is one window - the browser, the phones - and since 2026-09-15 a window of its own per
+inverter on the desktop, which is what the WPF app did. See [[DialogSystem.Lifecycle]] for who decides.
 
 ## Ownership and lifetimes
 
 | Participant | Lifetime | Registered in |
 | --- | --- | --- |
-| `InverterDetailsView` | **Singleton** | `App.axaml.cs` → `AddSingleton<InverterDetailsView>()` |
-| `InverterDetailsViewModel` | **Singleton** | `App.axaml.cs` → `AddSingleton<InverterDetailsViewModel>()` |
+| `InverterDetailsView` | **Transient** | `App.axaml.cs` → `AddTransient<InverterDetailsView>()` |
+| `InverterDetailsViewModel` | **Transient** | `App.axaml.cs` → `AddTransient<InverterDetailsViewModel>()` |
 | `Gen24System` (the inverter) | Owned by `IUpdateService`, **not** by the view | assigned per navigation |
 
-One view instance and one view model instance exist for the whole application run. The view is never disposed and
-never re-created; it is attached to and detached from the visual tree repeatedly. Every rule below follows from that.
+How many instances there are is the presenter's business, not the container's: `MainViewPresenter` builds one page
+of this type and shows it again for every inverter, which is the single instance this view had until 2026-09-15;
+`WindowPresenter` builds one per inverter and gives each a window. Either way a page is not disposed and is shown
+again, so every rule below still holds.
 
 ## Construction (once per application run)
 
-1. The IoC container calls `InverterDetailsView(InverterDetailsViewModel viewModel)`.
-2. `InitializeComponent()` runs, then `DataContext = viewModel`.
+1. The container hands out the view; its parameterless constructor resolves the view model itself, as the code
+   behind injection rule asks (`IoC.TryGetRegistered`, so the designer gets a view with no view model instead of
+   an exception). Both are transient, so a page and its view model belong to each other.
+2. `InitializeComponent()` runs, then `DataContext` is assigned.
 3. `DataContext` is assigned exactly once and never changed. `ViewModel` is a cast of `DataContext` and relies on
    this; do not re-assign `DataContext` elsewhere.
 The constructor does nothing else: the gauge group switches and the `ShowAll` logic live in the view model
 (`Rules/ViewModelsForInteractionLogic.md`), so there is no wiring to do here.
 
-There is no public parameterless constructor, so the runtime XAML loader cannot instantiate this view — the build
-emits `AVLN3001` for it. That is expected: the view must always come from the container. Do not "fix" the warning by
-adding a parameterless constructor, because that would create an instance with no view model.
+The constructor is parameterless so that the XAML loader and the previewer can create the view (`AVLN3001`); the
+view model comes from the container inside it. See [[HomeAutomationClient.CodeBehindInjection]].
 
 ## Navigation (once per shown inverter)
 
 `MainViewModel.ShowDetails` is the only entry point:
 
 ```csharp
-var detailsView = IoC.Get<InverterDetailsView>();
-detailsView.ViewModel.Gen24System = gen24System;   // must happen BEFORE the view is shown
-MainViewContent = detailsView;
+pagePresenter.Show<InverterDetailsView>(device.Key, title, view => view.ViewModel.Gen24System = gen24System);
 ```
+
+The presenter runs that action **before** the page is shown, and runs it again on a page it is reusing. The device
+key is what decides whether this inverter has a page already: on the desktop each one gets a window of its own, and
+asking for the same inverter twice brings its window to the front.
 
 Contract for callers:
 
-- **`Gen24System` must be assigned before the view becomes `MainViewContent`.** The property is declared
+- **`Gen24System` must be assigned before the view is shown,** which is what the presenter's action is for. The property is declared
   `Gen24System { get; set; } = null!` and every binding in the view starts at `Gen24System.…`; a null would throw
   during the first render pass, not at assignment.
 - `Gen24System.Sensors`, `.Config` and everything below them **are** allowed to be null. All XAML paths use `?.`
   and the gauges display `---` for a null `Value`. Do not add non-null-safe paths.
-- Showing a different inverter means re-assigning `Gen24System` on the same view model instance. Because both view
-  and view model are singletons, **only one inverter can be displayed at a time**, and the 19 group switches keep
-  their state across inverters (they are plain XAML `ToggleButton`s, not view-model state).
+- Where one page is reused - the browser and the phones - showing another inverter re-assigns `Gen24System` on the
+  same view model, so **only one inverter is on screen at a time** and the 19 group switches keep their state across
+  inverters. On the desktop each inverter has a page of its own, so each window keeps its own switches.
 
 ## Attach and detach (once per navigation)
 
 `Loaded` subscribes and `Unloaded` unsubscribes `Application.Current.ActualThemeVariantChanged`.
 
-**This pairing is mandatory, not stylistic.** The view is a singleton, so a subscription that is not removed in
-`Unloaded` is re-added on every navigation and the handler runs N times per theme change, forever. Any future
+**This pairing is mandatory, not stylistic.** A page is kept and shown again, so a subscription that is not removed
+in `Unloaded` is re-added on every navigation and the handler runs N times per theme change, forever. Any future
 event subscription in this view must follow the same pattern: subscribe in `Loaded`, unsubscribe in `Unloaded`,
 never in the constructor.
 

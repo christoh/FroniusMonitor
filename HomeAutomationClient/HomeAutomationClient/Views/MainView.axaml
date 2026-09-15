@@ -38,7 +38,9 @@
                 </Style>
             </Grid.Styles>
             <StackPanel Orientation="Horizontal">
-                <Button Content="{x:Static p:Resources.Dashboard}" Theme="{StaticResource MenuButtonStyle}" Command="{Binding ShowDashboardCommand}"/>
+                <!-- Only where a detail page covers the dashboard; see MainViewModel.ShowDashboardMenu. -->
+                <Button Content="{x:Static p:Resources.Dashboard}" Theme="{StaticResource MenuButtonStyle}" Command="{Binding ShowDashboardCommand}"
+                        IsVisible="{Binding ShowDashboardMenu}"/>
                 <Button Content="{x:Static p:Resources.Details}" x:Name="DetailsButton" Theme="{StaticResource MenuButtonStyle}">
                     <Button.Flyout>
                         <MenuFlyout ItemsSource="{Binding UpdateService.DetailDevices}">

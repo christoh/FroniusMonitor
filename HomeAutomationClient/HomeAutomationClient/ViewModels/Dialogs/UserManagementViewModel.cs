@@ -43,7 +43,10 @@ public sealed partial class UserManagementViewModel(DialogParameters parameters)
     [RelayCommand]
     private Task CloseDialog() => AbortAsync();
 
-    [RelayCommand]
+    // Concurrently, because what this opens is a window on a head that has windows, and the command is pending
+    // for as long as that window is open. Without this the menu entry would be disabled while it is - so a second
+    // one could never be opened, and clicking the same one again could not even bring it to the front.
+    [RelayCommand(AllowConcurrentExecutions = true)]
     private Task Add() => TaskExceptionHandler(async () =>
     {
         var editor = new UserEditorViewModel(new DialogParameters { Title = Loc.AddUser }, null);
@@ -64,7 +67,10 @@ public sealed partial class UserManagementViewModel(DialogParameters parameters)
         await LoadUsers().ConfigureAwait(true);
     });
 
-    [RelayCommand(CanExecute = nameof(HasSelectedUser))]
+    // Concurrently, because what this opens is a window on a head that has windows, and the command is pending
+    // for as long as that window is open. Without this the menu entry would be disabled while it is - so a second
+    // one could never be opened, and clicking the same one again could not even bring it to the front.
+    [RelayCommand(CanExecute = nameof(HasSelectedUser), AllowConcurrentExecutions = true)]
     private Task Edit() => TaskExceptionHandler(async () =>
     {
         if (SelectedUser is not { } user)

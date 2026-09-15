@@ -26,15 +26,21 @@ tests (`HousePowerTests`). `flow` is `IUpdateService.SitePowerFlow`, the sum ove
 sum of `WattPilot.PowerTotal`, `null` where there is no Wattpilot.
 
 - **Signs are the Gen24's.** `LoadPower` is negative while the house consumes, `InverterAcPower` positive while
-  the inverters deliver. The load includes the cars, so house = `-LoadPowerCorrected - carPower`, cut at 0 because
-  a Wattpilot reading can be a moment newer than the inverter's.
+  the inverters deliver. The load includes the cars, so house = `-LoadPowerCorrected - carPower`. **It is not cut
+  at 0** (since 2026-09-15). The load is what is left once the grid and the inverters are accounted for, so it
+  turns positive whenever something feeds the house that this software cannot see - an old diesel generator with
+  no data interface, a second inverter that reports to nobody - and briefly when a Wattpilot reading is newer
+  than the inverter's and the cars appear to draw more than the whole load. A zero would hide both, and the
+  unmonitored source is worth seeing: a house that reads negative is being fed from somewhere else.
 - **Solar** is `Gen24PowerFlow.SolarPower`, the DC power of all panels.
 - **Loss** is `Gen24PowerFlow.PowerLoss` = `StoragePower - InverterAcPower + SolarPower` (DC in that did not
   come out as AC).
 - **Self-sufficiency** = `InverterAcPower / consumption`, **own consumption** = `consumption / InverterAcPower`,
   both clamped to 0..1 and given in percent. These are the formulas of the WPF `InverterControl`'s efficiency
-  tab. The battery counts as own: it comes out of the inverter as AC. A ratio whose denominator is zero is
-  `null` and shows `---`, not 100 %.
+  tab. The battery counts as own: it comes out of the inverter as AC. **Neither is ever null once there is an
+  inverter** (since 2026-09-15): a house that consumes nothing needs nothing from the grid, so self-sufficiency is
+  100 %, and where nothing is produced there is no production that could stay in the house, so own consumption is
+  0 %. Only `flow: null` leaves them null.
 - **No inverter yet** (`Inverters.Count == 0`): the view model passes `flow: null`, because the site power flow
   is all zeros until the first inverter reports and zeros would read as a house that consumes nothing.
 
