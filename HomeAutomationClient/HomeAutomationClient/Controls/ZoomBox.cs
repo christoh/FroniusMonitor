@@ -38,7 +38,7 @@ public class ZoomBox : LayoutTransformControl
         AvaloniaProperty.Register<ZoomBox, double>(nameof(WheelStep), DefaultStep, coerce: (_, step) => Step(step));
 
     public static readonly StyledProperty<double> KeyStepProperty =
-        AvaloniaProperty.Register<ZoomBox, double>(nameof(KeyStep), 1.25, coerce: (_, step) => Step(step));
+        AvaloniaProperty.Register<ZoomBox, double>(nameof(KeyStep), DefaultStep, coerce: (_, step) => Step(step));
 
     public static readonly StyledProperty<double> ScaleProperty =
         AvaloniaProperty.Register<ZoomBox, double>(nameof(Scale), DefaultScale, coerce: (box, scale) => ((ZoomBox)box).Limit(scale));
