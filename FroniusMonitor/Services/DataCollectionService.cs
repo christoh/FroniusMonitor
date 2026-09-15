@@ -1,4 +1,7 @@
-namespace De.Hochstaetter.Fronius.Services;
+using Microsoft.Extensions.DependencyInjection;
+using De.Hochstaetter.Fronius.Models.Settings;
+
+namespace De.Hochstaetter.FroniusMonitor.Services;
 
 public partial class DataCollectionService : BindableBase, IDataCollectionService
 {

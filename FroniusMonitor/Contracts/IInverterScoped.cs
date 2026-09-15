@@ -1,4 +1,4 @@
-namespace De.Hochstaetter.Fronius.Contracts;
+namespace De.Hochstaetter.FroniusMonitor.Contracts;
 
 public interface IInverterScoped
 {

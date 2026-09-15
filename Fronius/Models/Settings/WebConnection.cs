@@ -1,5 +1,3 @@
-using Newtonsoft.Json;
-
 namespace De.Hochstaetter.Fronius.Models.Settings;
 
 public partial class WebConnection : BindableBase, ICloneable, IHaveDisplayName

@@ -16,9 +16,12 @@ Everything a Gen24 inverter or a WattPilot says arrives as JSON and is read thro
 (`JsonNode` / `JsonObject` / `JsonArray`). This was Newtonsoft until 2026-09-08; the conversion is what most of
 this document is about, because the two libraries differ in ways that fail **silently** rather than loudly.
 
-`Newtonsoft.Json` is still a package reference of `Fronius`, so it is not gone from the repo: the WattPilot models
-still carry its `JsonProperty` attributes (dead, see below), `WebConnection` and the browser `Cache` use it, and
-`FroniusMonitor/Models/CarCharging/NativeFirmwareBootObject.cs` uses a `JObject` as a kernel parameter bag.
+`Newtonsoft.Json` left the shipping code on 2026-09-15. It is a package reference of
+`HomeAutomationServerTests` and of nothing else, for the one honest reason to keep it: it is the oracle the
+conversion is measured against. What went with it was 28 dead `JsonProperty` attributes on the WattPilot models,
+three `Newtonsoft.Json.JsonIgnore`, a `using` in `WebConnection` that named nothing, and the `JObject` that
+`FroniusMonitor/Models/CarCharging/NativeFirmwareBootObject.cs` used as a kernel parameter bag - a `JsonObject`
+now. No application assembly carries `Newtonsoft.Json.dll` any more.
 
 ## A device is not consistent about types, so everything is read as text
 
@@ -43,7 +46,8 @@ to send. `HasAnyValue()` is the recursive one, for a delta that is a tree of emp
 
 `HomeAutomationServerTests/UnitTests/JsonExtensionsTests.cs` feeds the same JSON to `JToken.Parse` and
 `JsonNode.Parse` and asserts the two answer the same text. Newtonsoft is the oracle there, which is the only
-honest way to claim the conversion changed nothing - keep it that way while the package is still referenced.
+honest way to claim the conversion changed nothing - and since 2026-09-15 it is the **only** thing in the
+repository that references the package. Drop that reference and these tests lose what they compare against.
 
 ## What System.Text.Json cannot do that Newtonsoft could
 

@@ -1,7 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net10.0</TargetFramework>
+		<!-- Windows only since 2026-09-15: the tests reach into FroniusMonitor, which is WPF. -->
+		<TargetFramework>net10.0-windows7.0</TargetFramework>
+		<EnableWindowsTargeting>true</EnableWindowsTargeting>
+		<!-- Serialize the project references: FroniusMonitor may not have its XAML compiled beside its siblings.
+		     See the same property in FroniusMonitor.csproj. -->
+		<BuildInParallel>false</BuildInParallel>
 		<Nullable>enable</Nullable>
 		<!-- dotnet test runs on the Microsoft Testing Platform (global.json), which needs an executable and the
 		     NUnit runner for it; without both the project is refused. -->
@@ -32,6 +37,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Fronius\Fronius.csproj" />
+		<ProjectReference Include="..\FroniusMonitor\FroniusMonitor.csproj" />
 	</ItemGroup>
 
 </Project>

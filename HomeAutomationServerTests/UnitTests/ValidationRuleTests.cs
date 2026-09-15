@@ -1,5 +1,6 @@
 using De.Hochstaetter.Fronius.Localization;
 using De.Hochstaetter.Fronius.Validators;
+using De.Hochstaetter.FroniusMonitor.Validators;
 using De.Hochstaetter.HomeAutomationClient.Misc;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;

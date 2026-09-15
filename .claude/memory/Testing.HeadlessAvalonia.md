@@ -52,6 +52,18 @@ public sealed class SomethingTests
   output at all. The same section must also never read a static of that class from the new thread while the
   initializer is running, or the two deadlock; everything the thread uses is a local.
 
+## The project is Windows only
+
+`HomeAutomationServerTests` targets `net10.0-windows7.0` and references `FroniusMonitor`, because
+`RegexRuleAttribute` moved into the WPF app when `Fronius` was cleared of what only the WPF app uses - see
+[[Fronius.SharedLibraryBoundary]]. Nothing else here needs Windows, so the day that one attribute comes back to
+`Fronius/Validators` the reference and the target framework can go with it.
+
+That reference brings a build trap of its own: **`<BuildInParallel>false</BuildInParallel>`**, here *and* in
+`FroniusMonitor.csproj`. Neither on its own is enough, and this is the project it bites, because it builds the
+server, the client and the WPF app side by side. See [[Fronius.SharedLibraryBoundary]] for what races and for
+the numbers.
+
 ## Internals
 
 `HomeAutomationClient.csproj` has `<InternalsVisibleTo Include="HomeAutomationServerTests" />`, which CLAUDE.md

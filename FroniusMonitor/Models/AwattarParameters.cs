@@ -1,4 +1,4 @@
-namespace De.Hochstaetter.Fronius.Models.Settings;
+namespace De.Hochstaetter.FroniusMonitor.Models;
 
 [XmlType("Awattar")]
 public partial class AwattarParameters : BindableBase

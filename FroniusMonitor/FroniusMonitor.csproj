@@ -17,6 +17,10 @@
 		<RootNamespace>De.Hochstaetter.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
 		<ApplicationIcon>Assets\Images\sun.ico</ApplicationIcon>
 		<NoWarn>1701;1702;IDE0079;CS7035;NU1900</NoWarn>
+		<!-- WPF builds a temporary copy of this project to compile XAML that uses its own types, into the same obj
+		     directory. On more than one MSBuild node the two races and the .g.cs files vanish mid compile (CS2001),
+		     which only shows once another project references this one. -->
+		<BuildInParallel>false</BuildInParallel>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -37,6 +41,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="ClosedXML" Version="0.105.1" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
 		<PackageReference Include="OxyPlot.Contrib.Wpf" Version="2.1.2" />
 		<PackageReference Include="OxyPlot.Wpf" Version="2.2.0" />

@@ -1,6 +1,7 @@
 ---
 paths:
   - Fronius/Validators/**
+  - FroniusMonitor/Validators/**
   - Fronius/Models/BindableBase.cs
   - Fronius/Models/Gen24/Settings/**
   - HomeAutomationClient/HomeAutomationClient/Styles/Validation.axaml
@@ -58,8 +59,8 @@ public string? MeterAddressText
 }
 ```
 
-- **`Fronius/Validators`** holds the rules: `MinMaxIntAttribute`, `MinMaxDoubleAttribute`, `RegexRuleAttribute`,
-  `Ipv4Attribute`, `AbsoluteUriAttribute`. Each one is a `Complaint` and an `IsAcceptable`;
+- **`Fronius/Validators`** holds the rules both heads use: `MinMaxIntAttribute`, `MinMaxDoubleAttribute`,
+  `Ipv4Attribute`, `TimeOfDayAttribute`, `AbsoluteUriAttribute`. Each one is a `Complaint` and an `IsAcceptable`;
   `ValidationRuleAttribute` does the rest -
   empties, and the message. The message is either composed around `PropertyDisplayName` /
   `PropertyDisplayNameResourceKey`, or named outright by `MessageResourceKey` where the field already has a
@@ -176,6 +177,14 @@ replaces. It also copies the `PropertyChanged` subscribers. `Gen24ModbusSettings
 the properties, one by one; `Gen24ModbusSettingsTests` checks the copy against `GetToken`, which walks every field
 that goes to the inverter and so catches one the hand written copy forgot. **Any other settings type that gains a
 rule has to give up `MemberwiseClone` in the same way.**
+
+## One rule lives in the WPF app
+
+`RegexRuleAttribute` is in `FroniusMonitor/Validators` and not with the others, because `RegExRule` of the WPF
+app is its only caller and `ValidationRuleTests` its only other user - see
+[[Fronius.SharedLibraryBoundary]]. It is the reason `HomeAutomationServerTests` references the WPF project and
+is therefore Windows only. Should the Avalonia client ever need a pattern rule, it moves back to
+`Fronius/Validators` and that reference goes with it.
 
 ## The WPF app gives its rules to a binding, and they are wrappers
 

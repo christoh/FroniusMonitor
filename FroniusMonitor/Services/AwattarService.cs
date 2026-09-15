@@ -1,6 +1,10 @@
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Reflection;
+using Microsoft.Extensions.Logging;
 using System.Net.Http.Json;
 
-namespace De.Hochstaetter.Fronius.Services;
+namespace De.Hochstaetter.FroniusMonitor.Services;
 
 public sealed partial class AwattarService : ElectricityPushPriceServiceBase, IElectricityPriceService, IDisposable
 {

@@ -186,13 +186,14 @@ asked - which writes failed, which went unconfirmed - and that is what the hub m
 
 This broke twice during the Newtonsoft → System.Text.Json conversion, both times without an error message.
 
-The charging models carry **two** sets of names on purpose:
+The charging models carry **two** sets of names on purpose. There used to be a third, the Newtonsoft
+`[JsonProperty]` of the charger protocol, which nothing had read since the conversion; it was deleted on
+2026-09-15 together with the package - see [[DeviceJson]]:
 
 | attribute | for | example on `WattPilotWifiInfo.IpV4AddressString` |
 |---|---|---|
 | `[WattPilot("ip")]` | the WebSocket protocol of the charger | `ip` |
 | `[JsonPropertyName("ipV4Address")]` | the server-to-client channel | `ipV4Address` |
-| `[JsonProperty("ip")]` (Newtonsoft) | **dead** - was the charger protocol | `ip` |
 
 So a `JsonSerializer` call on one of these models produces the *client* names, or the C# names where there are
 none. Both are wrong for the charger, and neither the charger nor the serializer complains:

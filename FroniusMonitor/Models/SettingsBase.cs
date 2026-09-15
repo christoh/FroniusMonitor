@@ -1,4 +1,8 @@
-namespace De.Hochstaetter.Fronius.Models.Settings;
+using System.Reflection;
+using De.Hochstaetter.Fronius.Models.Settings;
+using Microsoft.Extensions.Logging;
+
+namespace De.Hochstaetter.FroniusMonitor.Models;
 
 public abstract partial class SettingsBase : BindableBase, ICloneable, IToshibaHvacSessionStore
 {

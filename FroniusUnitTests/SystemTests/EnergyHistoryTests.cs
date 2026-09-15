@@ -3,6 +3,8 @@ using System.Threading;
 using De.Hochstaetter.Fronius;
 using De.Hochstaetter.Fronius.Contracts;
 using De.Hochstaetter.Fronius.Models.Settings;
+using De.Hochstaetter.FroniusMonitor.Models;
+using De.Hochstaetter.FroniusMonitor.Services;
 using De.Hochstaetter.Fronius.Services;
 
 namespace FroniusUnitTests.SystemTests;

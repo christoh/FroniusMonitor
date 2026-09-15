@@ -18,8 +18,8 @@ namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests;
 /// different from the old one is exactly the kind of change that shows up months later as a channel reading zero.
 /// </para>
 /// <para>
-/// So the old implementation is the oracle here: Newtonsoft is still referenced for the WattPilot protocol, which
-/// makes it possible to feed the same JSON to both and compare. These tests are the reason to believe the
+/// So the old implementation is the oracle here: this project references Newtonsoft for that and nothing else,
+/// which makes it possible to feed the same JSON to both and compare. These tests are the reason to believe the
 /// conversion did not change what the models end up holding.
 /// </para>
 /// </remarks>

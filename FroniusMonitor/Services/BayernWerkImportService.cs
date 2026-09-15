@@ -1,4 +1,7 @@
-namespace De.Hochstaetter.Fronius.Services;
+using ClosedXML.Excel;
+using De.Hochstaetter.Fronius.Models.Settings;
+
+namespace De.Hochstaetter.FroniusMonitor.Services;
 
 public class BayernWerkImportService(SettingsBase settings, IDataCollectionService dataCollectionService) : ISmartMeterImportService
 {

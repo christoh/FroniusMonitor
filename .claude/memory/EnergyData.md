@@ -36,7 +36,7 @@ paths:
 # Energy prices, productions and weather (the price chart)
 
 The port of FroniusMonitor's `PriceView` to the client-server architecture. The WPF app asks Awattar itself from
-`AwattarService` / `WattPilotElectricityService`; **the new code uses neither** - the server collects, keeps a
+`AwattarService` (in `FroniusMonitor/Services` since 2026-09-15) / `WattPilotElectricityService`; **the new code uses neither** - the server collects, keeps a
 history and pushes, the client only draws. The WPF app is untouched and still uses the old services.
 
 ## Sources, and which one wins
@@ -206,4 +206,5 @@ stop), `EnergyChartModelTests` (bars, axes, weather, and the JSON round trip wit
 - `WeatherStationName` is known only after the first DWD poll of a process; the store does not keep it.
 - Historic days show the weather only where the server was running that day.
 - No Android/iOS/browser run of the chart yet; ScottPlot's Skia rendering in WebAssembly is unverified.
-- The WPF app still has its own `AwattarService`; the two implementations share only the JSON models.
+- The WPF app still has its own `AwattarService`, now in `FroniusMonitor/Services`; the two implementations
+  share only the JSON models, which stayed in `Fronius`.

@@ -4,6 +4,7 @@ using System.Linq;
 using De.Hochstaetter.Fronius.Contracts;
 using De.Hochstaetter.Fronius.Models.Charging;
 using De.Hochstaetter.Fronius.Services;
+using De.Hochstaetter.FroniusMonitor.Services;
 
 namespace FroniusUnitTests.SystemTests;
 

@@ -1,31 +1,24 @@
-using Newtonsoft.Json;
-
 namespace De.Hochstaetter.Fronius.Models.Charging;
 
 public partial class WattPilotLoadBalancingCurrents : BindableBase, ICloneable
 {
     [ObservableProperty]
-    [JsonProperty("amp")]
     [WattPilot("amp", false)]
     public partial int LocalMaximumCurrent { get; set; }
 
     [ObservableProperty]
-    [JsonProperty("sta")]
     [WattPilot("sta", false)]
     public partial int DynamicMaximumCurrent { get; set; }
 
     [ObservableProperty]
-    [JsonProperty("dyn")]
     [WattPilot("dyn", false)]
     public partial int MaximumCurrentDnoLine { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(TimeStamp))]
-    [JsonProperty("ts")]
     [WattPilot("ts", false)]
     public partial long TimeStampEpoch { get; set; }
 
-    [Newtonsoft.Json.JsonIgnore]
     public DateTime TimeStamp
     {
         get => DateTime.UnixEpoch.AddSeconds(TimeStampEpoch);
