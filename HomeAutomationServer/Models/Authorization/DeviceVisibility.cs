@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using De.Hochstaetter.Fronius.Models.Gen24;
-using De.Hochstaetter.Fronius.Models.Modbus;
 
 namespace De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 

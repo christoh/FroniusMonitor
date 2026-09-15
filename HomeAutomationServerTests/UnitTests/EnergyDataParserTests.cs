@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Xml.Linq;
 using De.Hochstaetter.Fronius.Models.EnergyData;
-using De.Hochstaetter.Fronius.Services.EnergyData;
+using De.Hochstaetter.HomeAutomationServer.Services.EnergyData;
 
 namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests;
 

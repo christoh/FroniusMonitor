@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using De.Hochstaetter.Fronius.Services.DataCollectors;
+using De.Hochstaetter.HomeAutomationServer.Services.DataCollectors;
 
 namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests;
 

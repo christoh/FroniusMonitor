@@ -37,6 +37,8 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Fronius\Fronius.csproj" />
+		<!-- The SunSpec and Modbus tests: that stack lives in the server since 2026-09-15. -->
+		<ProjectReference Include="..\HomeAutomationServer\HomeAutomationServer.csproj" />
 		<ProjectReference Include="..\FroniusMonitor\FroniusMonitor.csproj" />
 	</ItemGroup>
 

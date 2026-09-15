@@ -2,10 +2,15 @@
 paths:
   - Fronius/Models/EnergyData/**
   - Fronius/Models/Settings/EnergyDataSettings.cs
-  - Fronius/Models/Settings/EnergyDataCollectorParameters.cs
+  - HomeAutomationServer/Models/Settings/EnergyDataCollectorParameters.cs
   - Fronius/Contracts/EnergyData/**
+  - HomeAutomationServer/Contracts/IDwdWeatherClient.cs
+  - HomeAutomationServer/Contracts/IEnergyDataService.cs
+  - HomeAutomationServer/Contracts/IEnergyHistoryStore.cs
+  - HomeAutomationServer/Models/EnergyData/DwdForecast.cs
   - Fronius/Services/EnergyData/**
-  - Fronius/Services/DataCollectors/EnergyDataCollector.cs
+  - HomeAutomationServer/Services/EnergyData/**
+  - HomeAutomationServer/Services/DataCollectors/EnergyDataCollector.cs
   - Fronius/Contracts/HomeAutomationClient/IWebClientService.cs
   - Fronius/Services/HomeAutomationClient/WebClientService.cs
   - HomeAutomationServer/Services/EnergyHistoryStore.cs

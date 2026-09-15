@@ -7,8 +7,8 @@ paths:
   - Fronius/Extensions/WattPilotExtensions.cs
   - Fronius/Services/WattPilotService.cs
   - Fronius/Services/WattPilotElectrictyService.cs
-  - Fronius/Services/DataCollectors/WattPilotDataCollector.cs
-  - Fronius/Models/Settings/WattPilotParameters.cs
+  - HomeAutomationServer/Services/DataCollectors/WattPilotDataCollector.cs
+  - HomeAutomationServer/Models/Settings/WattPilotParameters.cs
   - Fronius/Validators/WattPilotFallbackCurrentAttribute.cs
   - HomeAutomationServer/Controllers/WattPilotController.cs
   - HomeAutomationServer/Services/SignalRDispatcher.cs

@@ -1,6 +1,7 @@
 using System.Text.Json;
 using De.Hochstaetter.Fronius.Models;
 using De.Hochstaetter.Fronius.Services.EnergyData;
+using De.Hochstaetter.HomeAutomationServer.Services.EnergyData;
 
 namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests;
 

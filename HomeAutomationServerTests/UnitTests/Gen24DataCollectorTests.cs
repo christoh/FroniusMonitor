@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Reflection;
 using De.Hochstaetter.Fronius.Contracts;
-using De.Hochstaetter.Fronius.Models;
 using De.Hochstaetter.Fronius.Models.Events;
 using De.Hochstaetter.Fronius.Models.Settings;
-using De.Hochstaetter.Fronius.Services.DataCollectors;
+using De.Hochstaetter.Fronius.Models;
+using De.Hochstaetter.HomeAutomationServer.Models.Settings;
+using De.Hochstaetter.HomeAutomationServer.Services.DataCollectors;
 using De.Hochstaetter.HomeAutomationServerTests.Logging;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

@@ -1,4 +1,4 @@
-using De.Hochstaetter.Fronius.Services.DataCollectors;
+using De.Hochstaetter.HomeAutomationServer.Services.DataCollectors;
 using De.Hochstaetter.HomeAutomationServerTests.UnitTests.Fakes;
 
 namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests;
