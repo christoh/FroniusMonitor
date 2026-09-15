@@ -8,6 +8,7 @@
         x:Class="De.Hochstaetter.HomeAutomationClient.Views.ChildWindow"
         x:DataType="views:ChildWindow"
         Icon="/Assets/Images/sun.ico"
+        c:ZoomBox.IsScope="True"
         CanResize="False"
         SizeToContent="WidthAndHeight">
     <Window.Styles>

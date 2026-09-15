@@ -15,7 +15,8 @@
              xmlns:i="clr-namespace:De.Hochstaetter.HomeAutomationClient.Assets.Images"
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="650"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.MainView"
-             x:DataType="vm:MainViewModel">
+             x:DataType="vm:MainViewModel"
+             c:ZoomBox.IsScope="True">
     <Grid RowDefinitions="Auto,*,Auto">
         <Grid Grid.Row="0" Background="{DynamicResource MenuBackground}" IsVisible="{Binding IsReady}">
             <!-- On the Grid, not on the left StackPanel: the user button at the right is a sibling of that

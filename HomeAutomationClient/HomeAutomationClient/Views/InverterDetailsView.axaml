@@ -64,6 +64,9 @@
         </ScrollViewer>
 
         <ScrollViewer Grid.Column="1" Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <!-- Ctrl with the wheel, or with plus, minus and zero, scales the gauges. The gestures are taken on the
+                 window or the main view, not here; see ZoomBox. -->
+            <c:ZoomBox>
             <!-- ReSharper disable Xaml.PossibleNullReferenceException -->
             <WrapPanel Orientation="Horizontal" Margin="10,0,4,0" Classes="GaugeGroups">
                 <WrapPanel.Styles>
@@ -579,6 +582,7 @@
                 </HeaderedContentControl>
                 <!-- ReSharper restore Xaml.PossibleNullReferenceException -->
             </WrapPanel>
+            </c:ZoomBox>
         </ScrollViewer>
     </Grid>
 </ContentPage>
