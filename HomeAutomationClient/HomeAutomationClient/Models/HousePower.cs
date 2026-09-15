@@ -39,12 +39,12 @@ public sealed record HousePower(double? HouseConsumption, double? CarPower, doub
         (
             // Not below zero: a Wattpilot reading can be a moment newer than the inverter's, and then the cars
             // briefly draw more than the whole load.
-            HouseConsumption: Math.Max(0, consumption - (carPower ?? 0)),
+            HouseConsumption: consumption - (carPower ?? 0),
             CarPower: carPower,
             SolarPower: flow.SolarPower,
             PowerLoss: flow.PowerLoss,
-            SelfSufficiency: consumption > 0 ? Math.Clamp(production / consumption, 0, 1) * 100 : null,
-            SelfConsumption: production > 0 ? Math.Clamp(consumption / production, 0, 1) * 100 : null
+            SelfSufficiency: consumption > 0 ? Math.Clamp(production / consumption, 0, 1) * 100 : 100,
+            SelfConsumption: production > 0 ? Math.Clamp(consumption / production, 0, 1) * 100 : 0
         );
     }
 
