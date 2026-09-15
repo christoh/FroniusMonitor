@@ -189,7 +189,10 @@ public sealed partial class EnergyChartViewModel(DialogParameters parameters) : 
 
     private bool CanGoToNextDay() => HistoricDate is { } date && date.Date < MaximumDate;
 
-    [RelayCommand(CanExecute = nameof(HasPriceComponents))]
+    // Concurrently, because what this opens is a window on a head that has windows, and the command is pending
+    // for as long as that window is open. Without this the menu entry would be disabled while it is - so a second
+    // one could never be opened, and clicking the same one again could not even bring it to the front.
+    [RelayCommand(CanExecute = nameof(HasPriceComponents), AllowConcurrentExecutions = true)]
     private Task ShowPriceComponents() => TaskExceptionHandler(async () =>
     {
         await new PriceComponentsViewModel(new DialogParameters { Title = Loc.PriceComponents }, PriceComponents).ShowDialogAsync().ConfigureAwait(true);

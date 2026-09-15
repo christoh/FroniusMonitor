@@ -1,4 +1,5 @@
 using De.Hochstaetter.HomeAutomationClient.Services;
+using De.Hochstaetter.HomeAutomationClient.Services.Presentation;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Gen24JsonService = De.Hochstaetter.Fronius.Services.Gen24JsonService;
@@ -129,14 +130,17 @@ public partial class App : Application
             .AddSingleton<DashboardViewModel>()
             // One for the app: the house block on the dashboard follows the update service for as long as the app runs.
             .AddSingleton<HouseViewModel>()
-            .AddSingleton<InverterDetailsView>()
-            .AddSingleton<InverterDetailsViewModel>()
-            .AddSingleton<BatteryDetailsView>()
-            .AddSingleton<BatteryDetailsViewModel>()
-            .AddSingleton<SmartMeterDetailsView>()
-            .AddSingleton<SmartMeterDetailsViewModel>()
-            .AddSingleton<WattPilotDetailsView>()
-            .AddSingleton<WattPilotDetailsViewModel>()
+            // The detail views and their view models are transient, because the desktop head shows one window per
+            // device and each of those windows needs a page and a view model of its own. A head with one view at a
+            // time gets the single instance it had before from the presenter, which keeps one page per view type.
+            .AddTransient<InverterDetailsView>()
+            .AddTransient<InverterDetailsViewModel>()
+            .AddTransient<BatteryDetailsView>()
+            .AddTransient<BatteryDetailsViewModel>()
+            .AddTransient<SmartMeterDetailsView>()
+            .AddTransient<SmartMeterDetailsViewModel>()
+            .AddTransient<WattPilotDetailsView>()
+            .AddTransient<WattPilotDetailsViewModel>()
 
             .AddTransient<HomeAutomationServerConnection>()
 
@@ -157,16 +161,22 @@ public partial class App : Application
             .AddSingleton<IUriLauncher, UriLauncher>()
             ;
 
+        RegisterPresenters(ServiceCollection);
+
         var serviceProvider = ServiceCollection.BuildServiceProvider();
         IoC.Update(serviceProvider);
 
         switch (ApplicationLifetime)
         {
             case IClassicDesktopStyleApplicationLifetime desktop:
-                // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
+                // Avoid duplicate validations from both Avalonia and the CommunityToolkit.
                 // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
                 //DisableAvaloniaDataAnnotationValidation();
                 desktop.MainWindow = IoC.Get<MainWindow>();
+                // The detail pages and the dialogs are windows of their own here, and the default is to keep the
+                // app alive while any window is open. Closing the main window is what ends the app, so an open
+                // detail page cannot leave it running with nothing the user can see.
+                desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
                 break;
 
             case ISingleViewApplicationLifetime singleViewPlatform:
@@ -175,6 +185,33 @@ public partial class App : Application
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    /// <summary>
+    /// Where dialogs and detail pages appear. The desktop head gives each of them a window of its own; every other
+    /// head has one window and shows them inside the main view, which is the only thing a browser can do at all.
+    /// </summary>
+    /// <remarks>
+    /// The lifetime is what says which head this is, and it is set before this runs. Registered under both
+    /// contracts as one instance, because the two share the list of what is open: a logout closes all of it, and
+    /// the same key must not be handed a second window by the other half.
+    /// </remarks>
+    private void RegisterPresenters(IServiceCollection services)
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime)
+        {
+            services
+                .AddSingleton<WindowPresenter>()
+                .AddSingleton<IDialogPresenter>(provider => provider.GetRequiredService<WindowPresenter>())
+                .AddSingleton<IPagePresenter>(provider => provider.GetRequiredService<WindowPresenter>());
+
+            return;
+        }
+
+        services
+            .AddSingleton<MainViewPresenter>()
+            .AddSingleton<IDialogPresenter>(provider => provider.GetRequiredService<MainViewPresenter>())
+            .AddSingleton<IPagePresenter>(provider => provider.GetRequiredService<MainViewPresenter>());
     }
 
     //private static void DisableAvaloniaDataAnnotationValidation()

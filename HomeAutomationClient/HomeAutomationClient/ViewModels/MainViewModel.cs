@@ -17,15 +17,19 @@ public sealed partial class MainViewModel : ViewModelBase
     private readonly IGen24LocalizationService gen24Loc;
     private readonly IUriService uriService;
     private readonly IWebClientService webClient;
+    private readonly IPagePresenter pagePresenter;
+    private readonly IDialogPresenter dialogPresenter;
 
     public IUpdateService UpdateService { get; }
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    public MainViewModel(IWebClientService webClient, IGen24LocalizationService gen24Loc, IUpdateService updateService, IUriService uriService)
+    public MainViewModel(IWebClientService webClient, IGen24LocalizationService gen24Loc, IUpdateService updateService, IUriService uriService, IPagePresenter pagePresenter, IDialogPresenter dialogPresenter)
     {
         this.webClient = webClient;
         this.gen24Loc = gen24Loc;
         this.uriService = uriService;
+        this.pagePresenter = pagePresenter;
+        this.dialogPresenter = dialogPresenter;
         uriService.PathChanged += OnPathChanged;
         UpdateService = updateService;
         SetApiUri(IoC.TryGetRegistered<ICache>()?.Get<string>(CacheKeys.ApiUri) ?? "https://home-automation.example.com");
@@ -70,6 +74,25 @@ public sealed partial class MainViewModel : ViewModelBase
     /// visible to every user on purpose; see <see cref="SettingsItems"/>.
     /// </summary>
     public bool ShowSettingsMenu => User?.Roles.SeesAllDevices() ?? false;
+
+    /// <summary>
+    /// The Dashboard entry, which is there to bring the dashboard back once a detail page has taken its place.
+    /// Hidden where a detail page opens in a window of its own - the desktop - because the dashboard is never
+    /// covered there and the entry would do nothing at all.
+    /// </summary>
+    public bool ShowDashboardMenu => pagePresenter.ShowsPagesInMainView;
+
+    /// <summary>
+    /// Whether the menu bar may open a dialog. Where one frame shows one dialog at a time, it may not while a
+    /// dialog is up: a second one from the menu would cover the first, and the user would come back to it with no
+    /// idea it had been there. Where every dialog gets a window, there is nothing to cover and this is always true.
+    /// </summary>
+    /// <remarks>
+    /// The menu bar is the one thing a modal dialog does not disable, on purpose - switching to another device's
+    /// detail page while a dialog is open is allowed and stays allowed. Only what would open a second dialog is
+    /// held back, which is why this is on the four commands that do rather than on the bar.
+    /// </remarks>
+    public bool CanOpenDialog => !dialogPresenter.ShowsDialogsInMainView || !IsDialogVisible;
 
     /// <summary>
     /// What the Settings menu offers: the devices with settings and the user management. Shown to every user
@@ -119,7 +142,8 @@ public sealed partial class MainViewModel : ViewModelBase
     /// </summary>
     public bool IsModalDialogVisible => CurrentDialog is { Parameters.IsModal: true };
 
-    [ObservableProperty, NotifyPropertyChangedFor(nameof(IsDialogVisible), nameof(IsDialogBusy), nameof(IsModalDialogVisible))]
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(IsDialogVisible), nameof(IsDialogBusy), nameof(IsModalDialogVisible), nameof(CanOpenDialog))]
+    [NotifyCanExecuteChangedFor(nameof(SettingsCommand), nameof(ShowEnergyChartCommand), nameof(ChangePasswordCommand), nameof(LogoutCommand))]
     public partial DialogQueueItem? CurrentDialog { get; set; }
 
     public ConcurrentStack<DialogQueueItem?> DialogQueue { get; } = new();
@@ -163,6 +187,9 @@ public sealed partial class MainViewModel : ViewModelBase
             Title = $"{AppConstants.AppName} - {Loc.LoginNoun}",
             ShowCloseBox = false,
             IsModal = false,
+            // Even where every other dialog gets a window: this is what the app shows before there is anything to
+            // put a window beside, and nobody may get past it.
+            StaysInMainView = true,
         });
 
         await loginViewModel.ShowDialogAsync().ConfigureAwait(false);
@@ -193,7 +220,10 @@ public sealed partial class MainViewModel : ViewModelBase
     /// has to be settled before the dialog goes up, because the frame reads it once when it is created, so it
     /// comes from the device rather than from what the inverter reports about itself a moment later.
     /// </summary>
-    [RelayCommand]
+    // Concurrently, because what this opens is a window on a head that has windows, and the command is pending
+    // for as long as that window is open. Without this the menu entry would be disabled while it is - so a second
+    // one could never be opened, and clicking the same one again could not even bring it to the front.
+    [RelayCommand(AllowConcurrentExecutions = true, CanExecute = nameof(CanOpenDialog))]
     private Task Settings(object parameter) => TaskExceptionHandler(async () =>
     {
         if (parameter is UserManagementEntry)
@@ -211,7 +241,7 @@ public sealed partial class MainViewModel : ViewModelBase
         {
             // Nothing is read first: the client holds the live charger, kept current by the deltas the server
             // pushes, and the dialog starts from a copy of it.
-            var wattPilotDialog = new WattPilotSettingsDialogViewModel(new DialogParameters { Title = $"{Loc.Settings}: {wattPilot.DisplayName}" }, device.Key, wattPilot);
+            var wattPilotDialog = new WattPilotSettingsDialogViewModel(new DialogParameters { Title = $"{Loc.Settings}: {wattPilot.DisplayName}", WindowKey = device.Key }, device.Key, wattPilot);
             await wattPilotDialog.ShowDialogAsync().ConfigureAwait(true);
             return;
         }
@@ -230,7 +260,9 @@ public sealed partial class MainViewModel : ViewModelBase
 
         var name = gen24System.Config?.InverterSettings?.SystemName ?? gen24System.Manufacturer + ' ' + gen24System.SerialNumber;
 
-        var dialog = new Gen24SettingsDialogViewModel(new DialogParameters { Title = $"{Loc.InverterSettings}: {name}" })
+        // The key is the device, so a head with windows opens the settings of each inverter in a window of its own
+        // and never the same inverter twice.
+        var dialog = new Gen24SettingsDialogViewModel(new DialogParameters { Title = $"{Loc.InverterSettings}: {name}", WindowKey = device.Key })
         {
             DeviceId = device.Key,
         };
@@ -245,7 +277,10 @@ public sealed partial class MainViewModel : ViewModelBase
     /// from the flyout behind the user's own name in the menu bar, not from the Settings menu: it is about the
     /// account that is logged in, not a thing to configure.
     /// </summary>
-    [RelayCommand]
+    // Concurrently, because what this opens is a window on a head that has windows, and the command is pending
+    // for as long as that window is open. Without this the menu entry would be disabled while it is - so a second
+    // one could never be opened, and clicking the same one again could not even bring it to the front.
+    [RelayCommand(AllowConcurrentExecutions = true, CanExecute = nameof(CanOpenDialog))]
     private Task ChangePassword() => TaskExceptionHandler(async () =>
     {
         var editor = new ChangePasswordViewModel(new DialogParameters { Title = Loc.ChangePassword });
@@ -302,7 +337,10 @@ public sealed partial class MainViewModel : ViewModelBase
     /// drop its own copy of them. What <see cref="StoredConnection"/> remembers is left alone, so logging back in
     /// - as the same user or another one who shares this device - is one login, not a re-typed password.
     /// </summary>
-    [RelayCommand]
+    // Not concurrently: it shows a modal confirmation and then tears the session down. The gate is the same
+    // one the other three use - logging out with a settings dialog on the frame would leave that dialog queued
+    // underneath the login.
+    [RelayCommand(CanExecute = nameof(CanOpenDialog))]
     private Task Logout() => TaskExceptionHandler(async () =>
     {
         var answer = await new MessageBox
@@ -319,6 +357,12 @@ public sealed partial class MainViewModel : ViewModelBase
         }
 
         IsReady = false;
+
+        // Everything the session put on screen goes with it. On a head that gives pages and dialogs windows of
+        // their own, those would otherwise stay up showing the devices of a user who has just logged out.
+        pagePresenter.CloseAll();
+        dialogPresenter.CloseAll();
+
         MainViewContent = null;
         User = null;
 
@@ -333,7 +377,10 @@ public sealed partial class MainViewModel : ViewModelBase
     /// The price chart. Not a device and not a setting, so it has a button of its own in the menu bar, shown once
     /// the server has sent price data - a server that collects none has nothing to show.
     /// </summary>
-    [RelayCommand]
+    // Concurrently, because what this opens is a window on a head that has windows, and the command is pending
+    // for as long as that window is open. Without this the menu entry would be disabled while it is - so a second
+    // one could never be opened, and clicking the same one again could not even bring it to the front.
+    [RelayCommand(AllowConcurrentExecutions = true, CanExecute = nameof(CanOpenDialog))]
     private Task ShowEnergyChart() => TaskExceptionHandler(async () =>
     {
         await new EnergyChartViewModel(new DialogParameters { Title = Loc.ElectricityPrice, IsResizeable = true }).ShowDialogAsync().ConfigureAwait(true);
@@ -354,33 +401,31 @@ public sealed partial class MainViewModel : ViewModelBase
     {
         var isShown = true;
 
+        // What the menu entry of the device says, which is what the window of a head that gives pages windows is
+        // called. Inside the main view there is no title to show and it is ignored.
+        var title = device.ToString() ?? Loc.Unknown;
+
         switch (device.Device)
         {
             case Gen24System gen24System:
-                var detailsView = IoC.Get<InverterDetailsView>();
-                detailsView.ViewModel.Gen24System = gen24System;
-                MainViewContent = detailsView;
+                pagePresenter.Show<InverterDetailsView>(device.Key, title, view => view.ViewModel.Gen24System = gen24System);
                 break;
 
             // The battery view needs the inverter, because the net state of charge and the net capacity live there.
             // It must not be looked up from the Gen24Storage of the menu entry: Gen24System.CopyFrom replaces
             // Sensors on every update, so that object is a stale snapshot by the time the entry is clicked.
             case Gen24Storage when UpdateService.BatteryGen24System is { } batteryInverter:
-                var batteryView = IoC.Get<BatteryDetailsView>();
-                batteryView.ViewModel.Gen24System = batteryInverter;
-                MainViewContent = batteryView;
+                pagePresenter.Show<BatteryDetailsView>(device.Key, title, view => view.ViewModel.Gen24System = batteryInverter);
                 break;
 
             // Same here: the meter of the menu entry is replaced on every update, so the view binds the live
-            // UpdateService.SmartMeter instead of the object handed in.
+            // UpdateService.SmartMeter instead of the object handed in - there is nothing to hand it.
             case Gen24PowerMeter3P:
-                MainViewContent = IoC.Get<SmartMeterDetailsView>();
+                pagePresenter.Show<SmartMeterDetailsView>(device.Key, title, _ => { });
                 break;
 
             case WattPilot wattPilot:
-                var wattPilotView = IoC.Get<WattPilotDetailsView>();
-                wattPilotView.ViewModel.WattPilot = wattPilot;
-                MainViewContent = wattPilotView;
+                pagePresenter.Show<WattPilotDetailsView>(device.Key, title, view => view.ViewModel.WattPilot = wattPilot);
                 break;
 
             default:

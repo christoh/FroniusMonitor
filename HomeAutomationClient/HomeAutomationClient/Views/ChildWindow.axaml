@@ -1,0 +1,28 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+        xmlns:views="clr-namespace:De.Hochstaetter.HomeAutomationClient.Views"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="300"
+        x:Class="De.Hochstaetter.HomeAutomationClient.Views.ChildWindow"
+        x:DataType="views:ChildWindow"
+        Icon="/Assets/Images/sun.ico"
+        CanResize="False"
+        SizeToContent="WidthAndHeight">
+    <Window.Styles>
+        <!-- A dialog sits on DialogBackground, the shade the dialog frame of MainView paints behind one, so that a
+             dialog looks the same whether the head gave it a window or not. A page does not: it is on the surface
+             of the app and takes the window background of the theme, the way the dashboard does. -->
+        <Style Selector="Window.Dialog">
+            <Setter Property="Background" Value="{DynamicResource DialogBackground}" />
+            <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}" />
+        </Style>
+    </Window.Styles>
+    <Panel>
+        <ContentPresenter Content="{Binding HostedContent}" />
+        <!-- The busy animation of a dialog belongs in the dialog's own window; MainView has one of its own for the
+             dialogs it hosts itself. It shows nothing while BusyText is null. -->
+        <c:BusyAnimation BusyText="{Binding BusyText}" />
+    </Panel>
+</Window>

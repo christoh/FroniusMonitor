@@ -10,38 +10,113 @@ paths:
   - HomeAutomationClient/HomeAutomationClient/Controls/DragResize.cs
   - HomeAutomationClient/HomeAutomationClient/MessageBoxes/**
   - HomeAutomationClient/HomeAutomationClient/Views/MainView.axaml
+  - HomeAutomationClient/HomeAutomationClient/Views/ChildWindow.axaml
+  - HomeAutomationClient/HomeAutomationClient/Views/ChildWindow.axaml.cs
+  - HomeAutomationClient/HomeAutomationClient/Contracts/IDialogPresenter.cs
+  - HomeAutomationClient/HomeAutomationClient/Contracts/IPagePresenter.cs
+  - HomeAutomationClient/HomeAutomationClient/Services/Presentation/**
   - HomeAutomationClient/HomeAutomationClient/ViewModels/MainViewModel.cs
 ---
 
 # Lifecycle contract: the dialog system (Avalonia)
 
-The client also runs in the browser, where a second window does not exist, so a dialog is **not** a window. It is
-a control that `MainView` shows on top of the main content. Everything a window manager would normally provide -
-a title bar, a close box, moving, modality - is built here.
+The client also runs in the browser, where a second window does not exist, so a dialog **cannot depend on being**
+a window. It is a control, and where that control appears is decided by a presenter the head chooses: the dialog
+frame of `MainView`, which builds a title bar, a close box, moving and modality itself, or - since 2026-09-15, on
+the desktop - a window, where the operating system provides all four.
+
+**A dialog view model knows nothing about either.** It asks to be shown and is told when it is closed; everything
+below the line `presenter.Create(...)` is the presenter's.
 
 ## The parts
 
 | Part | Role |
 |---|---|
-| `DialogParameters` | What the caller asks for: `Title`, `ShowCloseBox`, `IsMoveable`, `IsModal`, `IsResizeable`. Derive for more (`MessageBox`). |
+| `DialogParameters` | What the caller asks for: `Title`, `ShowCloseBox`, `IsMoveable`, `IsModal`, `IsResizeable`, `StaysInMainView`, `WindowKey`, `IsModalWindow`. Derive for more (`MessageBox`). |
 | `DialogBase<TParameters, TResult, TBody>` | The base of every dialog view model. Owns showing, waiting, closing. |
 | `TBody` | The view: a `ContentControl` implementing `IDialogControl`, with a public parameterless constructor (`new()` constraint). |
-| `DialogQueueItem` | One shown dialog - its body and its live parameters - held by `MainViewModel.CurrentDialog`. |
-| `MainView.axaml` | The host: dimming layer, dialog frame, title bar, body, busy animation. |
+| `IDialogPresenter` / `IDialogPresentation` | Where a dialog appears, and the one that is on screen. |
+| `IPagePresenter` | The same for a detail page, which has the same two answers. |
+| `MainViewPresenter` | Both, inside `MainView`: the dialog frame and the one content host. Every head but the desktop. |
+| `WindowPresenter` | Both, as windows. The desktop only. |
+| `ChildWindow` | The window a dialog or a page goes in: chrome, a content host and a busy animation. |
+| `DialogQueueItem` | One shown dialog - its body and its live parameters - held by `MainViewModel.CurrentDialog`. Only `MainViewPresenter` uses it. |
+| `MainView.axaml` | The host of that presenter: dimming layer, dialog frame, title bar, body, busy animation. |
+
+## Where a dialog appears
+
+`App.OnFrameworkInitializationCompleted` registers one presenter under both contracts, chosen by the lifetime:
+`IClassicDesktopStyleApplicationLifetime` gets `WindowPresenter`, everything else `MainViewPresenter`. One
+instance for both contracts on purpose - a logout closes dialogs and pages together, and the two must not hand out
+two windows for one key.
+
+What the desktop does with each dialog:
+
+| | Window | Why |
+|---|---|---|
+| Message box, error box | **modal**, never reused | It answers a question the user has just been asked, and one over another is normal |
+| Everything else | non-modal, one per `WindowKey` | A window that may be left standing: the settings of one inverter beside those of another |
+| The login dialog | none - it stays in `MainView` | `StaysInMainView`: there is nothing to put a window beside before anyone is logged in |
+
+- **`IsModalWindow` is a virtual property, not a flag a caller sets.** `MessageBox` overrides it to true and
+  nothing else does, which is exactly "only message boxes and error boxes are modal". It is not `IsModal`: that
+  one drives the dimming layer of the dialog frame, which a window has no use for.
+- **`WindowKey` is the identity, not the device.** `MainViewModel.Settings` passes `device.Key`, so each inverter
+  gets a window of its own and asking for the same one again brings its window to the front - `Create` returns
+  null and `ShowDialogAsync` returns its default result at once, without building a body. Bringing it to the front
+  is `ChildWindow.Reactivate`, which restores a minimized window first: activating one the user cannot see would
+  look exactly like a click that did nothing.
+- **The window follows the live parameters** for the one thing it can: `IsResizeable`, which the event log tab of
+  the settings dialog turns on and off while the dialog is up. Turning it on also lifts the `MaxWidth` the body
+  declares, the way `DragResize` does in the frame, and turning it off puts it back.
+- **The close box of the chrome goes through `AbortAsync`.** `ChildWindow` cancels the close and lets the view
+  model do it, because a window closed from under a dialog would leave whoever awaits `ShowDialogAsync` waiting
+  for ever. A dialog with `ShowCloseBox = false` cannot be closed by its chrome either.
+- **A logout closes all of it** (`CloseAll` on both contracts, from `MainViewModel.Logout`), through the view
+  models, so every awaiting caller is released.
+- **The menu bar asks where pages go.** `IPagePresenter.ShowsPagesInMainView` is what hides the Dashboard entry on
+  the desktop (`MainViewModel.ShowDashboardMenu`): that entry is there to bring the dashboard back once a page has
+  taken its place, and where every page opens in a window the dashboard is never covered.
+
+**A `[RelayCommand]` that opens a dialog needs `AllowConcurrentExecutions = true` and a `CanExecute` of its own.**
+This is the trap of the whole change and it is invisible in the dialog code. The generated `AsyncRelayCommand` says `CanExecute` is false while
+its previous run is still pending, and a run that awaits `ShowDialogAsync` is pending for as long as the dialog is
+on screen - which used to be a modal moment and is now a window the user leaves standing. Without the flag the
+menu entry or button is **disabled** for exactly that time, so a second settings dialog could never be opened and
+clicking Electricity price while its window was up did nothing at all, not even bring it to the front. It carries
+Six commands need the flag today: `MainViewModel.Settings`, `ChangePassword` and `ShowEnergyChart`,
+`EnergyChartViewModel.ShowPriceComponents`, `UserManagementViewModel.Add` and `Edit`.
+
+**The flag on its own is too much, though.** The menu bar is the one thing a modal dialog does not disable - the
+dimming layer sits in the content row, not over the bar - so on a head with one dialog frame the disabled command
+was the only thing keeping a second settings dialog off the first. The four commands of the menu bar are therefore
+gated on `MainViewModel.CanOpenDialog`, which asks `IDialogPresenter.ShowsDialogsInMainView`: where one frame shows
+one dialog at a time nothing may be opened over it, and where every dialog gets a window everything may. `Logout`
+is gated the same way and is deliberately **not** concurrent - it shows a modal confirmation and then tears the
+session down, and logging out with a settings dialog on the frame would leave that dialog queued under the login.
+
+**Switching pages stays allowed while a dialog is up.** That is what the menu bar is left usable for, and only the
+commands that would open a second dialog are held back. The commands *inside* a dialog need no gate: `MainView`
+puts only the top dialog's body in the tree, so the buttons of the one underneath cannot be clicked at all.
 
 ## Showing and waiting
 
 `ShowDialogAsync` is the whole lifecycle:
 
-1. The dialog that is currently shown (possibly `null`) is pushed on `MainViewModel.DialogQueue`.
-2. On the UI thread: a fresh `CancellationTokenSource`, a new `TBody` whose `DataContext` is the view model, and a
-   `DialogQueueItem` built from the parameters. Then `MainViewModel.CurrentDialog` is set, which makes the overlay
-   visible through `IsDialogVisible`.
+1. On the UI thread: a fresh `CancellationTokenSource`, then `presenter.Create(this, Parameters)`. **Before the
+   body**, because creating the body assigns its `DataContext`, which starts `Initialize`, and a dialog that sets
+   a busy text there needs somewhere for it to go. A null presentation means an equivalent dialog was already up
+   and has been activated; the call returns its default result there and then.
+2. A new `TBody` whose `DataContext` is the view model goes to `SetBody`, then `Open` puts it on screen.
 3. `await Task.Delay(-1, token)` parks the call until `Close()` cancels the token. **This is how a dialog waits.**
    Never block the UI thread instead: on WebAssembly async is cooperative multitasking, and a blocking wait
    deadlocks the whole application.
-4. `Close()` pops the previous item back into `CurrentDialog`, restores its busy text and cancels the token. The
+4. `Close()` takes the dialog off screen through the presentation and cancels the token. The
    `OperationCanceledException` is swallowed and `Result` is returned to the caller.
+
+Inside `MainViewPresenter` steps 1, 2 and 4 are what `DialogBase` did itself before the presenters were split
+out: push the shown dialog on `MainViewModel.DialogQueue`, set `CurrentDialog` to a `DialogQueueItem` built from
+the parameters - which makes the overlay visible through `IsDialogVisible` - and pop it back on close.
 
 So the caller writes one line and gets the answer:
 
@@ -67,10 +142,14 @@ the others. `Title` is the exception - it is read once, when the dialog is put u
 before the body has run its `Initialize`.
 
 **When you add a parameter,** add it to `DialogParameters` and bind `CurrentDialog.Parameters.<Name>` in
-`MainView.axaml` with a `FallbackValue`, because `CurrentDialog` is null while no dialog is shown. Nothing else
-needs touching.
+`MainView.axaml` with a `FallbackValue`, because `CurrentDialog` is null while no dialog is shown. Then decide
+what a window does with it: `WindowDialogPresentation` follows `IsResizeable` and `Title` through
+`DialogParameters.PropertyChanged` and reads the rest once, when the dialog goes up.
 
 ## Nesting
+
+This is the dialog frame only. In windows nothing nests: every dialog is a top level window of its own, and a
+modal message box over one is the operating system blocking the rest.
 
 `DialogQueue` is a `ConcurrentStack`, so dialogs nest: a message box on top of the login dialog is normal. Only
 the top one is visible; closing it brings the one underneath back, in its own state, because the body control
@@ -79,19 +158,31 @@ the overlay.
 
 ## Busy text
 
-`DialogBase.BusyText` is not a property of its own, it proxies `MainViewModel.DialogBusyText`, which the busy
-animation over the dialog body binds to. `ShowDialogAsync` copies the current busy text into the queue item and
-then clears it, and `Close()` restores the busy text of the item underneath. That is why the busy overlay of a
-nested dialog does not leak into the dialog below it.
+`DialogBase.BusyText` is not a property of its own, it proxies the presentation, because the animation belongs to
+wherever the dialog is. `MainViewDialogPresentation` proxies `MainViewModel.DialogBusyText`, which the animation
+over the dialog frame binds to; `WindowDialogPresentation` proxies `ChildWindow.BusyText`, which is the animation
+in that dialog's own window. A dialog that writes a busy text needs neither to know which.
+
+In the frame, the presentation takes the busy text that was on screen and clears it when it is created, and puts
+it back when it closes, so the busy overlay of a nested dialog does not leak into the dialog below it.
 
 **Both happen before the body is created, and the order matters.** Creating the body assigns its `DataContext`,
 which starts `Initialize` on the UI thread, and a dialog that sets a busy text there gets that far synchronously -
 `await` on an already completed task does not yield. So a dialog **can** set its busy text in `Initialize` and have
 it show. It could not while the copy and the clear came after the body: the argument list picked up the new busy
 text and the clear then wiped it, so such a dialog opened with no busy animation at all and the queue item held the
-wrong text to restore later.
+wrong text to restore later. This is why the presentation is created **before** the body and not with it.
+
+**What is put back is the presentation's own `busyTextBelow`, not `CurrentDialog.BusyText`.** Reading it off the
+item that comes back - which is what `DialogBase.Close` did until 2026-09-15 - restores the busy text of the dialog
+*below* the one being uncovered, which is one dialog too far down: a dialog that was busy when a message box opened
+over it came back idle. Measured in the headless probe (a nested dialog over a busy one); fixed in
+`MainViewDialogPresentation.Close`.
 
 ## Modality
+
+In the dialog frame. A window is modal or not by `IsModalWindow` instead - see "Where a dialog appears" - and
+`IsModal` is not read there at all.
 
 `IsModal` (default `true`) becomes `MainViewModel.IsModalDialogVisible`, and that drives three things in
 `MainView.axaml`:
@@ -111,6 +202,8 @@ the blocking overlay back.
 
 ## Moving
 
+The dialog frame has to build this; a window is moved by its own title bar and none of it applies there.
+
 `Controls/DragMove.cs` is an attached behavior, not a control. The title bar grid carries
 `DragMove.IsEnabled` (bound to `CurrentDialog.Parameters.IsMoveable`), `DragMove.Target` (the `DialogFrame`) and
 `DragMove.ResetTrigger` (bound to `CurrentDialog`, so every new dialog starts centered).
@@ -126,6 +219,9 @@ there to be dragged has to set a cursor of its own, or it offers to move the dia
 dialog can be dragged by both.
 
 ## Resizing
+
+In the dialog frame. A window gets `CanResize` from the same parameter and the rest of this section does not
+apply to it; what the two have in common is that the maximum the body declares is lifted while it is resizable.
 
 Off unless a dialog asks for it (`IsResizeable`), because a dialog is as big as what it has to show and a form
 dragged wider only grows its whitespace. `Controls/DragResize.cs` is the counterpart of `DragMove`, an attached
@@ -200,7 +296,8 @@ arrange pass wins was wrong five times in a row; measuring was right every time.
 ## Closing
 
 - The close box is visible when `ShowCloseBox` is true and runs `MainViewModel.DialogClosedCommand`, which calls
-  `AbortAsync` on the view model behind `CurrentDialog.Body`. Every dialog view model must implement it and decide
+  `AbortAsync` on the view model behind `CurrentDialog.Body`. In a window the close box of the chrome does the
+  same thing: `ChildWindow` cancels the close and calls `AbortAsync`, so there is one way out and not two. Every dialog view model must implement it and decide
   what "aborted" means for its result (`MessageBoxViewModel` returns an empty `MessageBoxResult`).
 - The view model itself closes by calling `Close()` after setting `Result`.
 - **`AbortAsync` has to call `Close()` as well.** Nothing else does it for you: setting only `Result` and returning
@@ -219,7 +316,9 @@ The body's `OnDataContextChanged` starts `ViewModel.Initialize()` (fire and forg
 what it needs, as `LoginViewModel` does with the cached connection. Since `DataContext` is assigned in the object
 initializer inside `ShowDialogAsync`, `Initialize` starts before the dialog is on screen.
 
-**`Initialize` fires again whenever the body is re-attached.** `MainView` presents `CurrentDialog.Body` through one
+**`Initialize` fires again whenever the body is re-attached.** In a window of its own the body is never taken out
+of the tree, so there it runs once - but the guard is still needed, because the same dialog runs in the frame on
+every other head. `MainView` presents `CurrentDialog.Body` through one
 host, so a nested dialog opening and closing over a dialog takes its body out of the tree and puts it back, and
 `OnDataContextChanged` comes round a second time. A message box is shown once and closed and never notices. Any
 dialog that **stays open** while it shows a message box does, and has to guard `Initialize` against running twice,
@@ -233,8 +332,11 @@ had typed.
 
 - `IDialogBase` is `IDisposable` and nobody disposes it. The `CancellationTokenSource` of every dialog is left to
   the finalizer, and `ShowDialogAsync` creates a fresh one in its `finally` without disposing the old one.
-- No keyboard handling in the host: no Escape to abort. `LoginView` handles `Enter` in its own code behind and is
+- No keyboard handling in the host: no Escape to abort - in the dialog frame. A window gets Escape, Alt+F4 and the
+  rest from the operating system, so this gap is the frame's alone. `LoginView` handles `Enter` in its own code behind and is
   the only dialog that reacts to a key at all. It gets away with knowing nothing about what the dialog is
   currently showing, because the two modes of that dialog share one `OkCommand`.
-- Nothing takes focus when a dialog opens.
+- Nothing takes focus when a dialog opens; a window at least takes the focus of the window manager.
 - The title bar always uses `SystemControlBackgroundAccentBrush` and the dialog `DialogBackground`; a dialog cannot theme itself.
+- A dialog window remembers neither its size nor its place, unlike the main window ([[PlatformHeads.Lifecycle]]).
+  It opens centred on its owner, sized to its content, every time.

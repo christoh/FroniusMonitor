@@ -66,6 +66,11 @@ address, and can type one. They identify one device of an installation.
 | The user picks a device from the menu (`ShowDetailsCommand`) | `true` | This is a new place, it belongs in the history |
 | Back or forward (`OnPathChanged`) | `false` | The address is already the one being navigated to |
 
+**A head with a window per detail page has one address and several pages.** The desktop opens a window for each
+device (see [[DialogSystem.Lifecycle]]) and the address is still written on every one of them, so it names the page
+most recently opened rather than "the" page. Nothing shows it there - `FakeUriService` only collects - so this
+costs nothing today; a head that ever displays the address will have to decide what it means with five windows up.
+
 **Following the browser must not write the address back.** Without the flag, a hand written link with lower case
 escapes (`/x/%c3%a4`) would be resolved, then pushed again in its canonical spelling (`/x/%C3%84`) - a second
 history entry in front of the one the user pressed back to, which they can never get past. `SetPath` also

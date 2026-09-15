@@ -11,8 +11,12 @@ Port of the WPF `FroniusMonitor/Views/BatteryDetailsView.xaml`. 7 gauge groups, 
 
 ## Ownership and lifetimes
 
-View and view model are **singletons** (`App.axaml.cs`), like the other detail views: one instance for the whole
-application run, attached to and detached from the visual tree on every navigation. Everything below follows.
+View and view model are **transient** (`App.axaml.cs`), like the other detail views. How many there are is the
+presenter's business, not the container's: inside `MainView` one page per view type is built and reused, which is
+the single instance these views had until 2026-09-15, and on the desktop there is one page, one view model and one
+window per device. See [[DialogSystem.Lifecycle]].
+
+Everything below follows.
 
 ## The view model holds the inverter, not the battery
 
@@ -43,7 +47,7 @@ starts there. With more than one battery in the system this always shows the one
 ## Attach, detach and theme
 
 `Loaded` subscribes and `Unloaded` unsubscribes `Application.Current.ActualThemeVariantChanged`. Mandatory pairing:
-on a singleton view a missed unsubscribe re-adds the handler on every navigation. Subscribe in `Loaded`, never in
+on a page that is kept and shown again a missed unsubscribe re-adds the handler on every navigation. Subscribe in `Loaded`, never in
 the constructor.
 
 `OnThemeChanged` re-notifies `Gen24Storage.IsAwake` because the gauge background comes from the

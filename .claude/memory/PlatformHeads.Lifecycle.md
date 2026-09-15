@@ -75,6 +75,22 @@ monitor that is gone.
 - Desktop only by construction: `MainWindow` exists only in the `IClassicDesktopStyleApplicationLifetime` branch
   of `App.OnFrameworkInitializationCompleted`. The single view heads fill their screen and never touch the key.
 
+## The desktop is the head with more than one window
+
+Since 2026-09-15 the desktop shows every detail page and every dialog in a window of its own, while the dashboard
+and the login stay in `MainView`. The same branch of `App.OnFrameworkInitializationCompleted` decides it, by
+registering `WindowPresenter` where every other head gets `MainViewPresenter`; nothing in the head projects knows
+about it. See [[DialogSystem.Lifecycle]] for what that presenter does.
+
+Two consequences for this document:
+
+- **`ShutdownMode` is `OnMainWindowClose`, set in the same branch.** Avalonia's default keeps the application alive
+  while any window is open, so closing the main window with a detail page still up would leave the app running
+  with nothing the user connects it to. Closing the main window now ends it, and the pages go with it.
+- **Only `MainWindow` remembers a size.** A dialog window is as big as what is on it, and a page window opens
+  sized to its content, capped at 90% of the working area and offset from the last one. Nothing is stored for
+  them, so `CacheKeys.WindowSize` stays what it says: the main window.
+
 ## What every head must provide
 
 **An `ICache`.** `MainViewModel`, `UpdateService`, `LoginViewModel` and `Misc/StoredConnection` read it through
