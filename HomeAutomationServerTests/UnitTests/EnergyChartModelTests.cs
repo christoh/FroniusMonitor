@@ -52,7 +52,9 @@ public sealed class EnergyChartModelTests
         Assert.Equal((double)(10m * 1.19m + 5m * 1.19m), Assert.Single(gross.PositivePrices).Value, 6);
         Assert.Equal(15, Assert.Single(net.PositivePrices).Value, 6);
         Assert.Contains(Fronius.Localization.Resources.PricesFromWattPilot, gross.Title);
-        Assert.Contains(AwattarCountry.GermanyLuxembourg.ToDisplayName(), gross.Title);
+        var zone = AwattarCountry.GermanyLuxembourg.ToDisplayName();
+        Assert.NotNull(zone);
+        Assert.Contains(zone, gross.Title);
     }
 
     [Fact]

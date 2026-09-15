@@ -1,4 +1,6 @@
 using System.Text.Json;
+using De.Hochstaetter.Fronius.Models.EnergyData;
+using De.Hochstaetter.Fronius.Services.EnergyData;
 using De.Hochstaetter.Fronius.Models.Settings;
 using OxyPlot;
 using OxyPlot.Axes;
@@ -204,17 +206,17 @@ public class PriceViewModel(
                 Errors.Add($"{Loc.ElectricityPrice}: {ex.Message}");
             }
 
-            IReadOnlyList<AwattarEnergy> energies = [];
+            IReadOnlyList<GridProductionPoint> energies = [];
 
             if (ElectricityPriceService is AwattarService awattarService)
             {
                 try
                 {
-                    energies = (await awattarService.GetDataAsync
+                    energies = AwattarClient.ToProductions(await awattarService.GetDataAsync
                     (
                         ShowHistoricData ? Date : null,
                         ShowHistoricData ? Date.AddDays(1) : Prices.Any() ? Prices[^1].EndTime : null
-                    ).ConfigureAwait(false)).Energies.Where(e => e.HasValues).ToList(); // Awattar sends null beyond its forecast horizon
+                    ).ConfigureAwait(false)); // The hours beyond Awattar's forecast come back null and are dropped here
 
                     await settings.Save().ConfigureAwait(false);
                 }
@@ -350,7 +352,7 @@ public class PriceViewModel(
 
             if (ElectricityPriceService is AwattarService && energies.Count > 0)
             {
-                var energyMin = -energies.Max(e => (e.SolarProductionMegaWatt.Value + e.WindProductionMegaWatt.Value) / 1000);
+                var energyMin = -energies.Max(e => (e.SolarMegaWatt + e.WindMegaWatt) / 1000);
 
                 model.Axes.Add(new LinearAxis
                 {
@@ -387,7 +389,7 @@ public class PriceViewModel(
                             DateTimeAxis.ToDouble(s.StartTime.ToLocalTime()),
                             0,
                             DateTimeAxis.ToDouble(s.EndTime.ToLocalTime()),
-                            -s.SolarProductionMegaWatt.Value / 1000
+                            -s.SolarMegaWatt / 1000
                         )
                     )
                 );
@@ -408,9 +410,9 @@ public class PriceViewModel(
                         new RectangleBarItem
                         (
                             DateTimeAxis.ToDouble(s.StartTime.ToLocalTime()),
-                            -s.SolarProductionMegaWatt.Value / 1000,
+                            -s.SolarMegaWatt / 1000,
                             DateTimeAxis.ToDouble(s.EndTime.ToLocalTime()),
-                            -(s.WindProductionMegaWatt.Value + s.SolarProductionMegaWatt.Value) / 1000
+                            -(s.WindMegaWatt + s.SolarMegaWatt) / 1000
                         )
                     )
                 );
@@ -431,7 +433,7 @@ public class PriceViewModel(
                         p => new DataPoint
                         (
                             (DateTimeAxis.ToDouble(p.StartTime.ToLocalTime()) + DateTimeAxis.ToDouble(p.EndTime.ToLocalTime())) / 2,
-                            -(p.WindProductionMegaWatt.Value + p.SolarProductionMegaWatt.Value) / 1000)
+                            -(p.WindMegaWatt + p.SolarMegaWatt) / 1000)
                     )
                 );
 

@@ -43,10 +43,10 @@ spelling of what `de` already says - `ss` for `ß`, `Aussen`, `Zischtig`.
 A Swiss German user therefore sees English where German would have done. Worth remembering when adding a string
 that a German speaker would want translated: `de` and `gsw` both need it.
 
-## Line endings are not uniform
+## Line endings and encoding
 
-`fr` and `rm` are LF; the neutral file, `de`, `it` and `gsw` are CRLF. All are UTF-8 without a BOM. Keep each file
-as it is - rewriting one wholesale turns a three line addition into a diff of the whole file.
+Since 2026-09-15 every resource file is LF and UTF-8 without a BOM, like the rest of the repository; `.gitattributes`
+and `.editorconfig` enforce it, so a three line addition is a three line diff in any of them.
 
 ## The designer file is checked in and hand maintained
 
