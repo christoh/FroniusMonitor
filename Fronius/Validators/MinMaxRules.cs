@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Validators;
+namespace De.Hochstaetter.Fronius.Validators;
 
 /// <summary>
 /// A whole number within an inclusive range. The counterpart of <c>MinMaxIntRule</c> of the WPF app.

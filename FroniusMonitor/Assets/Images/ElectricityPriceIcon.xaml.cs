@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Assets.Images;
+namespace De.Hochstaetter.FroniusMonitor.Assets.Images;
 
 public partial class ElectricityPriceIcon
 {

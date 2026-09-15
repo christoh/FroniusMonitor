@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.HomeAutomationClient.Misc;
+namespace De.Hochstaetter.HomeAutomationClient.Misc;
 
 /// <summary>
 /// The two addresses the client talks to the server with, derived from the one address a user knows: the root the

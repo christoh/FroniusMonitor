@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Wpf.Converters;
+namespace De.Hochstaetter.FroniusMonitor.Wpf.Converters;
 
 public class ValidationBinding : Binding
 {

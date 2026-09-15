@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs;
+namespace De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs;
 
 /// <summary>
 /// Adds a user or edits one - the same dialog either way, the difference being whether a name can be typed and

@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Attributes;
+namespace De.Hochstaetter.Fronius.Attributes;
 
 public enum FroniusDataType : byte
 {

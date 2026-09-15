@@ -1,4 +1,4 @@
-﻿using Avalonia.VisualTree;
+using Avalonia.VisualTree;
 
 namespace De.Hochstaetter.HomeAutomationClient.Controls;
 

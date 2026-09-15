@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using De.Hochstaetter.HomeAutomationClient;
 
 namespace HomeAutomationClient.Android.Platform;

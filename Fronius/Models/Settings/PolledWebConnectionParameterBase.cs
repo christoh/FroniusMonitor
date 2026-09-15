@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Models.Settings;
+namespace De.Hochstaetter.Fronius.Models.Settings;
 
 public abstract class PolledWebConnectionParameterBase
 {

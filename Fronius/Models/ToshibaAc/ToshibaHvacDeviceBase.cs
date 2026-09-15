@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc;
+namespace De.Hochstaetter.Fronius.Models.ToshibaAc;
 
 public abstract partial class ToshibaHvacDeviceBase : BindableBase, ISwitchable, IHaveUniqueId, IHaveDisplayName
 {

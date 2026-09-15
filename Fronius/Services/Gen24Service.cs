@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Services;
+namespace De.Hochstaetter.Fronius.Services;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public class Gen24Service : BindableBase, IGen24Service

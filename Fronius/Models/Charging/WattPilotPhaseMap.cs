@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Models.Charging;
+namespace De.Hochstaetter.Fronius.Models.Charging;
 
 public record WattPilotPhaseMap(byte L1Map, byte L2Map, byte L3Map)
 {

@@ -148,6 +148,21 @@ EOF
 
 FROM alpine:latest
 
+# The OCI image labels GitHub reads: source attaches the package to this repository (and so inherits its
+# visibility and README), description and licenses show on the package page. In the runner stage on purpose -
+# a label in the builder stage never reaches the pushed image. For a multi-arch push these labels sit on each
+# platform's manifest; the index (manifest list) itself gets the same values from docker-bake.hcl, which is how
+# the images are built and pushed.
+LABEL org.opencontainers.image.title="Home Automation Control Center (browser client)" \
+      org.opencontainers.image.description="The browser client of the Home Automation Control Center, an Avalonia WebAssembly app served by nginx." \
+      org.opencontainers.image.source="https://github.com/christoh/FroniusMonitor" \
+      org.opencontainers.image.url="https://github.com/christoh/FroniusMonitor" \
+      org.opencontainers.image.documentation="https://github.com/christoh/FroniusMonitor/blob/master/README.md" \
+      org.opencontainers.image.licenses="AGPL-3.0-only" \
+      org.opencontainers.image.vendor="Christoph Hochstätter" \
+      org.opencontainers.image.authors="Christoph Hochstätter" \
+      org.opencontainers.image.base.name="docker.io/library/alpine:latest"
+
 RUN apk --no-cache update && \
     apk --no-cache upgrade
 

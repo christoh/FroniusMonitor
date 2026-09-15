@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Services;
+namespace De.Hochstaetter.Fronius.Services;
 
 public partial class WattPilotService : BindableBase, IWattPilotService
 {

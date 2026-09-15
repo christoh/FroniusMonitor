@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.HomeAutomationClient.Contracts;
+namespace De.Hochstaetter.HomeAutomationClient.Contracts;
 
 /// <summary>
 /// The address of the view that is currently shown. In the browser this is the address bar; the other heads have

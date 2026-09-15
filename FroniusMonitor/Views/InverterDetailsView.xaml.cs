@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Views;
+namespace De.Hochstaetter.FroniusMonitor.Views;
 
 public partial class InverterDetailsView : IInverterScoped
 {

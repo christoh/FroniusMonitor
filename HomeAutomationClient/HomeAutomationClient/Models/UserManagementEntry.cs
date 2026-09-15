@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.HomeAutomationClient.Models;
+namespace De.Hochstaetter.HomeAutomationClient.Models;
 
 /// <summary>
 /// The entry of the Settings menu that is not a device. The menu shows each entry through its

@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Validators;
+namespace De.Hochstaetter.Fronius.Validators;
 
 /// <summary>
 /// The current a WattPilot falls back to when it loses its load balancing: 6 to 32 A, or 0 for none at all.

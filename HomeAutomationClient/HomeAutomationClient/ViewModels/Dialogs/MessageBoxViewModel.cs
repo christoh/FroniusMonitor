@@ -1,4 +1,4 @@
-﻿using MessageBoxView = De.Hochstaetter.HomeAutomationClient.Views.Dialogs.MessageBoxView;
+using MessageBoxView = De.Hochstaetter.HomeAutomationClient.Views.Dialogs.MessageBoxView;
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs;
 

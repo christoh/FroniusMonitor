@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Services;
+namespace De.Hochstaetter.Fronius.Services;
 
 public class Gen24JsonService : IGen24JsonService
 {

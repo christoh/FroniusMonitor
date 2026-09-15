@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.HomeAutomationClient.Models.Dialogs;
+namespace De.Hochstaetter.HomeAutomationClient.Models.Dialogs;
 
 public class MessageBox : DialogParameters
 {

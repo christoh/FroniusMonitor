@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Json;
+using System.Net.Http.Json;
 using De.Hochstaetter.Fronius.Models.JsonConverters;
 
 namespace De.Hochstaetter.Fronius.Services;

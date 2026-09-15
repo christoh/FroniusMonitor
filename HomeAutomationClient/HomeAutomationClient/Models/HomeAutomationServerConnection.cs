@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.HomeAutomationClient.Models;
+namespace De.Hochstaetter.HomeAutomationClient.Models;
 
 public class HomeAutomationServerConnection : WebConnection
 {

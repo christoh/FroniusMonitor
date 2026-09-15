@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Services.DataCollectors;
+namespace De.Hochstaetter.Fronius.Services.DataCollectors;
 
 public sealed class SunSpecDataCollector
 (

@@ -1,4 +1,4 @@
-﻿using Avalonia.Markup.Xaml.MarkupExtensions;
+using Avalonia.Markup.Xaml.MarkupExtensions;
 
 namespace De.Hochstaetter.HomeAutomationClient.Models;
 

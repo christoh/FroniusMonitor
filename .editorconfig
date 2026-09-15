@@ -1,11 +1,23 @@
-﻿[*.{cs,vb}]
+root = true
+
+# Every file: LF and UTF-8 without BOM, matching .gitattributes. Visual Studio and Rider read this, so they
+# save new lines as LF and never ask about line endings.
+[*]
+charset = utf-8
+end_of_line = lf
+
+# Inno Setup reads a script as ANSI unless it starts with a UTF-8 BOM.
+[*.iss]
+charset = utf-8-bom
+
+[*.{cs,vb}]
 
 # IDE0009: Member access should be qualified.
 dotnet_style_qualification_for_event = false:warning
 dotnet_style_operator_placement_when_wrapping = beginning_of_line
 tab_width = 4
 indent_size = 4
-end_of_line = crlf
+end_of_line = lf
 dotnet_style_coalesce_expression = true:suggestion
 dotnet_style_null_propagation = true:suggestion
 dotnet_style_prefer_is_null_check_over_reference_equality_method = true:suggestion
@@ -94,7 +106,7 @@ resharper_xml_max_line_length = 9999
 resharper_xml_wrap_lines = false
 
 # Standard properties
-end_of_line = crlf
+end_of_line = lf
 
 # Microsoft .NET properties
 csharp_new_line_before_members_in_object_initializers = false

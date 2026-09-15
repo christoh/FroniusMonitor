@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Models.Gen24;
+namespace De.Hochstaetter.Fronius.Models.Gen24;
 
 public enum Gen24ConnectedInverterStatus : byte
 {

@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Models.Settings;
+namespace De.Hochstaetter.Fronius.Models.Settings;
 
 public abstract partial class SettingsBase : BindableBase, ICloneable, IToshibaHvacSessionStore
 {

@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Models.Gen24.Settings;
+namespace De.Hochstaetter.Fronius.Models.Gen24.Settings;
 
 public partial class Gen24SolarWebSettings : BindableBase, ICloneable
 {

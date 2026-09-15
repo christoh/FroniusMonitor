@@ -1,11 +1,26 @@
 ---
 paths:
   - docker-compose.yml
+  - docker-bake.hcl
   - HomeAutomationServer/Dockerfile
   - HomeAutomationClient/HomeAutomationClient.Browser/Dockerfile
 ---
 
 # GHCR dangling-image cleanup
+
+## OCI labels (added 2026-09-15)
+
+Both Dockerfiles carry the `org.opencontainers.image.*` labels in their **runner** stage - `source`, `url`,
+`documentation`, `title`, `description`, `licenses` (`AGPL-3.0-only`, the repo's LICENSE), `vendor`, `authors`,
+`base.name`. `source` is what GitHub uses to attach a package to the repository. **Multi-arch caveat:** a
+`LABEL` ends up on each platform manifest, while GitHub reads the *index* the tag points at. That is why the
+builds moved out of `docker-compose.yml` into **`docker-bake.hcl`** (same day): its two targets carry the
+platforms, the tags (`REGISTRY`/`TAG` variables, defaults `ghcr.io/christoh` and `latest`) and
+`annotations = index_annotations(title, description)`, a bake function that yields the `index:`-prefixed OCI
+annotations, so `docker buildx bake --push` annotates the index on every push without a flag to remember.
+Compose's `build:` has no `annotations` key and only runs the images now. `docker buildx bake --print`
+validates the file without building. The values exist twice on purpose - in the Dockerfiles for anyone who
+runs `docker build`, in the bake file for the index - because a Dockerfile cannot read the bake file.
 
 This repo publishes multi-arch Docker images to GitHub Container Registry
 (`ghcr.io/christoh/home-automation-server`, `ghcr.io/christoh/home-automation-client`, see
@@ -94,3 +109,10 @@ Note `setx` only writes the registry; it does not affect already-open processes,
   and is a worse failure mode than "still has old images."
 - After deleting, re-run `docker manifest inspect ghcr.io/<owner>/<package>:latest` to confirm the tag still
   resolves before considering the cleanup done.
+- Second cleanup, 2026-09-15, from Git Bash with `gh` (74 and 113 versions, 67 and 104 deleted, keep sets 7 and 9
+  again): `gh api` takes `--hostname github.com`, not `-h` (which is help). Three traps cost a round each: Git
+  Bash turns a leading `/` of the endpoint into `C:/Program Files/Git/...` on a DELETE (omit the slash or set
+  `MSYS_NO_PATHCONV=1`), `jq` output written to a file has CRLF so ids read back carry a `\r` (`tr -d '\r'`),
+  and `<(...)` process substitution does not work for `--slurpfile` (write a temp file). The token has to be
+  refreshed interactively by the developer (`gh auth refresh -h github.com -s read:packages,delete:packages`);
+  the automated shell saw the refreshed keyring token straight away this time, no registry detour needed.

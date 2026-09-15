@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
+namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 
 public partial class SmartMeterDetailsViewModel(IUpdateService updateService, MainViewModel mainViewModel) : ViewModelBase
 {

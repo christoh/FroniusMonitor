@@ -1,4 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Extensions;
+using De.Hochstaetter.Fronius.Extensions;
 using De.Hochstaetter.Fronius.Models;
 using De.Hochstaetter.Fronius.Models.Charging;
 using De.Hochstaetter.Fronius.Models.ToshibaAc;

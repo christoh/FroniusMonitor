@@ -1,4 +1,4 @@
-﻿using System.Security.Cryptography;
+using System.Security.Cryptography;
 using System.Text;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using HubTicketService = De.Hochstaetter.HomeAutomationServer.Services.HubTicketService;

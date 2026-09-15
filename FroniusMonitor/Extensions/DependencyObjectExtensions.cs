@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Extensions;
+namespace De.Hochstaetter.FroniusMonitor.Extensions;
 
 public static class DependencyObjectExtensions
 {

@@ -1,4 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Models.Settings;
+using De.Hochstaetter.Fronius.Models.Settings;
 using Assert = NUnit.Framework.Legacy.ClassicAssert;
 
 namespace FroniusUnitTests.UnitTests;

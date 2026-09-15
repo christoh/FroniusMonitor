@@ -1,4 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Services;
+using De.Hochstaetter.Fronius.Services;
 using Newtonsoft.Json;
 
 namespace De.Hochstaetter.Fronius.Models.Charging;

@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
+namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
 public class EventLogViewModel(IGen24Service gen24Service) : ViewModelBase
 {

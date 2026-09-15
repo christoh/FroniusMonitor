@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.HomeAutomationServer.Controllers;
+namespace De.Hochstaetter.HomeAutomationServer.Controllers;
 
 public abstract class DeviceControllerBase(IDataControlService controlService, ILogger logger) : ControllerBase
 {

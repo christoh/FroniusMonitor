@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
    <FritzBoxConnections>
       <WebConnection BaseUrl="http://192.168.178.xxx" UserName="SomeName" PasswordChecksum="9M3y/STH83c=" Password="6tgm7fD/arG3fPie1xgRGQ==" />

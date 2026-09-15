@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.HomeAutomationClient.Views.Dialogs;
+namespace De.Hochstaetter.HomeAutomationClient.Views.Dialogs;
 
 public partial class ChangePasswordView : UserControl, IDialogControl
 {

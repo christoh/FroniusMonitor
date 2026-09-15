@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.HomeAutomationServer.Models;
+namespace De.Hochstaetter.HomeAutomationServer.Models;
 
 internal static class GitInfo
 {

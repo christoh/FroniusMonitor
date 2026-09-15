@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.HomeAutomationClient.Assets.Images;
+namespace De.Hochstaetter.HomeAutomationClient.Assets.Images;
 
 public partial class InfoIcon : ContentControl
 {

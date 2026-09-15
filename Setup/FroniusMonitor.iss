@@ -1,4 +1,4 @@
-#define AppName "Fronius Monitor"
+Ôªø#define AppName "Fronius Monitor"
 #define AppExeFileName "FroniusMonitor"
 #define ApplicationVersion GetFileVersion('..\FroniusMonitor\bin\Release\net6.0-windows7.0\FroniusMonitor.exe')
 
@@ -6,13 +6,13 @@
 AppName={#AppName}
 AppVersion={#ApplicationVersion}
 AppVerName={#AppName} {#ApplicationVersion}
-AppCopyright=Copyright (c) 2021-2022, Christoph Hochst‰tter
-DefaultDirName={pf64}\Hochst‰tter\{#AppName}
+AppCopyright=Copyright (c) 2021-2022, Christoph Hochst√§tter
+DefaultDirName={pf64}\Hochst√§tter\{#AppName}
 UninstallDisplayIcon={app}\{#AppExeFileName}.exe
 Compression=lzma2
 SolidCompression=yes
 DefaultGroupName={#AppName}
-AppPublisher=Christoph Hochst‰tter
+AppPublisher=Christoph Hochst√§tter
 ;SetupIconFile=..\FroniusMonitor\Assets\Images\sun.ico
 OutputBaseFilename={#AppName}-Setup-v.{#ApplicationVersion}
 AppUpdatesURL=https://github.com/christoh/FroniusMonitor
@@ -36,7 +36,7 @@ SetupWindowTitle={#AppName} {#ApplicationVersion} Setup
 WindowsVersionNotSupported={#AppName} requires Windows 7 or a later version of Windows.
 
 [Icons]
-Name: "{commonprograms}\Hochst‰tter\{#AppName}\{#AppExeFileName}"; Filename: "{app}\{#AppExeFileName}.exe"
+Name: "{commonprograms}\Hochst√§tter\{#AppName}\{#AppExeFileName}"; Filename: "{app}\{#AppExeFileName}.exe"
 Name: "{userdesktop}\{#AppName}"; Filename: "{app}\{#AppExeFileName}.exe"; Tasks: desktopicon
 
 [Tasks]

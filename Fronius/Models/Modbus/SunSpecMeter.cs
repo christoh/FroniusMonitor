@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Models.Modbus;
+namespace De.Hochstaetter.Fronius.Models.Modbus;
 
 public class SunSpecMeter : SunSpecGroupBase, IPowerMeter3P, ISunSpecMeter
 {

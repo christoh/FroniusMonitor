@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Models;
+namespace De.Hochstaetter.Fronius.Models;
 
 [XmlType("rawTemperature")]
 public partial class FritzBoxTemperatureSensor : BindableBase

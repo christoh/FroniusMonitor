@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using De.Hochstaetter.Fronius.Models.HomeAutomationClient;
 using De.Hochstaetter.Fronius.Models.WebApi;
 

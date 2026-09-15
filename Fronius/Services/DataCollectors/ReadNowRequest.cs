@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Services.DataCollectors;
+namespace De.Hochstaetter.Fronius.Services.DataCollectors;
 
 /// <summary>
 /// The wait between two reads of a device, which ends either when the interval has passed or when somebody asks

@@ -1,4 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Models.HomeAutomationClient;
+using De.Hochstaetter.Fronius.Models.HomeAutomationClient;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 

@@ -1,1 +1,18 @@
-setup/windowsdesktop-runtime-6.0.7-win-x64.exe filter=lfs diff=lfs merge=lfs -text
+# Every text file is stored and checked out with LF, on every platform; no client-side CRLF translation.
+# Encoding is UTF-8 without BOM (see .editorconfig), except the Inno Setup script, which needs its BOM.
+* text=auto eol=lf
+
+# Binaries, so the heuristic never has to guess.
+*.png binary
+*.ico binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.exe binary
+*.dll binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+
+Setup/windowsdesktop-runtime-6.0.7-win-x64.exe filter=lfs diff=lfs merge=lfs -text

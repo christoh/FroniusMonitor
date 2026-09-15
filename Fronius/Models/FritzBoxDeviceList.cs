@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Models;
+namespace De.Hochstaetter.Fronius.Models;
 
 [XmlRoot("devicelist")]
 [SuppressMessage("ReSharper", "StringLiteralTypo")]

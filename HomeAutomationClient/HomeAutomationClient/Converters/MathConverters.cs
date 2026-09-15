@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.HomeAutomationClient.Converters;
+namespace De.Hochstaetter.HomeAutomationClient.Converters;
 
 public class Multiply : ConverterBase
 {

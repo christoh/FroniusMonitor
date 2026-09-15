@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.HomeAutomationClient.Extensions;
+namespace De.Hochstaetter.HomeAutomationClient.Extensions;
 
 public class Loc24Extension : MarkupExtension
 {

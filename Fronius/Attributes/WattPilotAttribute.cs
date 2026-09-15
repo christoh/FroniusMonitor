@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Attributes;
+namespace De.Hochstaetter.Fronius.Attributes;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 public class WattPilotAttribute(string tokenName, bool isReadOnly, int index, Type? type) : Attribute

@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Wpf.Commands;
+namespace De.Hochstaetter.FroniusMonitor.Wpf.Commands;
 
 public abstract class CommandBase : ICommand
 {

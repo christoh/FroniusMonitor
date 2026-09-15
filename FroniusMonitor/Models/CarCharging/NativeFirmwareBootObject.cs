@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using RelativeProcAddress = int;
 using InterruptDelayLimit = nint;

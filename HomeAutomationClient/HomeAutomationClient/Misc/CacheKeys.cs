@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.HomeAutomationClient.Misc;
+namespace De.Hochstaetter.HomeAutomationClient.Misc;
 
 public static class CacheKeys
 {

@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Models;
+namespace De.Hochstaetter.Fronius.Models;
 
 [Flags]
 [SuppressMessage("ReSharper", "UnusedMember.Global")]

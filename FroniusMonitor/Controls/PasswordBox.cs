@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Controls;
+namespace De.Hochstaetter.FroniusMonitor.Controls;
 
 public class PasswordBox : TextBox
 {

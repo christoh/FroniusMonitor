@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Services.Modbus;
+namespace De.Hochstaetter.Fronius.Services.Modbus;
 
 public class ModbusServerService(
     SettingsChangeTracker tracker,

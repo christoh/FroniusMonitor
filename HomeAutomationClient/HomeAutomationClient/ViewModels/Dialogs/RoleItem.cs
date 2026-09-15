@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs;
+namespace De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs;
 
 /// <summary>One check box of the role list in the user editor.</summary>
 public sealed partial class RoleItem(Roles role) : ObservableObject

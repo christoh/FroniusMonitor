@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Models.Settings;
+namespace De.Hochstaetter.Fronius.Models.Settings;
 
 public class Gen24DataCollectorParameters : PolledWebConnectionParameterBase
 {

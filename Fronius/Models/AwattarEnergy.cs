@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Models;
+namespace De.Hochstaetter.Fronius.Models;
 
 /// <summary>
 /// One hour of Awattar's <c>/v1/power/productions</c>. Nullable on purpose: the feed answers every hour of the span it

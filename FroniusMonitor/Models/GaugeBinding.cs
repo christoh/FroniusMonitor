@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Models;
+namespace De.Hochstaetter.FroniusMonitor.Models;
 
 internal class GaugeBinding : Binding
 {

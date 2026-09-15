@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Models.Wifi;
+namespace De.Hochstaetter.Fronius.Models.Wifi;
 
 [SuppressMessage("ReSharper", "IdentifierTypo")]
 public enum WifiEncryption

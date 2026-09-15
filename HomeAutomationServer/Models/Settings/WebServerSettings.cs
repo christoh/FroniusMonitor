@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Xml.Serialization;
 
 namespace De.Hochstaetter.HomeAutomationServer.Models.Settings;
