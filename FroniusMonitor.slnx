@@ -28,6 +28,7 @@
     <File Path=".claude/memory/ViewModelBase.Features.md" />
     <File Path=".claude/memory/WattPilot.md" />
     <File Path=".claude/memory/WattPilotDetailsView.Lifecycle.md" />
+    <File Path=".claude/memory/Zoom.md" />
     <File Path=".claude/memory/ServerExitCodes.LifeCycle.md" />
   </Folder>
   <Folder Name="/Solution Items/Rules/">

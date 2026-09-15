@@ -164,6 +164,9 @@
 			<ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto"
 						  VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"
 						  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AllowAutoHide="False" >
+				<!-- Ctrl with the wheel, or with plus, minus and zero, scales the power consumers; see ZoomBox. The
+				     gestures are taken on the main view, so they work anywhere in the window. -->
+				<c:ZoomBox HorizontalAlignment="Left">
 				<ItemsControl ItemsSource="{Binding UpdateService.AllPowerConsumers}" x:Name="PowerConsumerItemsControl" HorizontalAlignment="Left">
 					<ItemsControl.ItemsPanel>
 						<ItemsPanelTemplate>
@@ -171,6 +174,7 @@
 						</ItemsPanelTemplate>
 					</ItemsControl.ItemsPanel>
 				</ItemsControl>
+				</c:ZoomBox>
 			</ScrollViewer>
 		</Grid>
 		<c:BusyAnimation BusyText="{Binding BusyText}" Grid.Row="0" />
