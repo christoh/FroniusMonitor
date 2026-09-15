@@ -18,6 +18,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<!-- The client is an Avalonia application, and the tests of its presenters and controls drive real windows
+		     on the headless platform. See UnitTests/Avalonia/HeadlessAvalonia.cs. -->
+		<PackageReference Include="Avalonia.Headless" Version="$(AvaloniaVersion)" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.12" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.0" />
 		<PackageReference Include="xunit.v3" Version="4.0.0" />
@@ -33,9 +39,9 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\HomeAutomationServer\HomeAutomationServer.csproj" />
-		<!-- The view models of the client hold real logic now - the interlocks and the validation of a settings
-		     tab - and this is what lets it be tested. No Avalonia application is started: a view model is a plain
-		     object, and nothing here creates a control. -->
+		<!-- The view models of the client hold real logic - the interlocks and the validation of a settings tab -
+		     and so do its presenters and controls, which need an Avalonia application and real windows; the headless
+		     platform provides both. -->
 		<ProjectReference Include="..\HomeAutomationClient\HomeAutomationClient\HomeAutomationClient.csproj" />
 	</ItemGroup>
 

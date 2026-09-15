@@ -176,8 +176,8 @@ wrong text to restore later. This is why the presentation is created **before** 
 **What is put back is the presentation's own `busyTextBelow`, not `CurrentDialog.BusyText`.** Reading it off the
 item that comes back - which is what `DialogBase.Close` did until 2026-09-15 - restores the busy text of the dialog
 *below* the one being uncovered, which is one dialog too far down: a dialog that was busy when a message box opened
-over it came back idle. Measured in the headless probe (a nested dialog over a busy one); fixed in
-`MainViewDialogPresentation.Close`.
+over it came back idle. Fixed in `MainViewDialogPresentation.Close` and pinned by
+`MainViewPresenterTests.A_nested_dialog_covers_the_one_below_and_gives_it_back_with_its_busy_text`.
 
 ## Modality
 
@@ -327,6 +327,14 @@ over a dialog the user is working in. `Gen24SettingsDialogViewModel` is the work
 [[SettingsDialogs.Lifecycle]]. `LoginViewModel` belongs in that group too: a refused login, an unreachable server
 or a mistyped address all put a message box over it, and re-running `Initialize` would throw away what the user
 had typed.
+
+## Where this is tested
+
+`WindowPresenterTests` and `MainViewPresenterTests` drive both presenters with real windows on the headless
+platform - see [[Testing.HeadlessAvalonia]]. Between them they cover a window per dialog and per device page,
+reuse and activation, the close box through `AbortAsync`, a dialog with no close box, resizing switched while the
+dialog is up, the modal message box, a logout, and on the other side the dialog frame, nesting, the busy text
+handover, one page per view type and the menu bar gate.
 
 ## Known gaps
 
