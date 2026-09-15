@@ -13,7 +13,7 @@
 			 x:Class="De.Hochstaetter.HomeAutomationClient.Views.DashboardView"
 			 x:DataType="vm:DashboardViewModel">
 	<ContentPage.Resources>
-        <system:Double x:Key="ControlWidth">210</system:Double>
+        <system:Double x:Key="ControlWidth">180</system:Double>
         <Thickness x:Key="ControlMargin">4</Thickness>
 	</ContentPage.Resources>
 	<ContentPage.DataTemplates>
