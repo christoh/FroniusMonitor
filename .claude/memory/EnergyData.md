@@ -11,8 +11,8 @@ paths:
   - Fronius/Services/EnergyData/**
   - HomeAutomationServer/Services/EnergyData/**
   - HomeAutomationServer/Services/DataCollectors/EnergyDataCollector.cs
-  - Fronius/Contracts/HomeAutomationClient/IWebClientService.cs
-  - Fronius/Services/HomeAutomationClient/WebClientService.cs
+  - HomeAutomationClient/HomeAutomationClient/Contracts/IWebClientService.cs
+  - HomeAutomationClient/HomeAutomationClient/Services/WebClientService.cs
   - HomeAutomationServer/Services/EnergyHistoryStore.cs
   - HomeAutomationServer/Controllers/EnergyDataController.cs
   - HomeAutomationServer/Models/Settings/Settings.cs

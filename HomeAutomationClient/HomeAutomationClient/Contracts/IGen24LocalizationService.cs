@@ -1,4 +1,4 @@
-namespace De.Hochstaetter.Fronius.Contracts.HomeAutomationClient;
+namespace De.Hochstaetter.HomeAutomationClient.Contracts;
 
 public enum Gen24LocalizationSection:sbyte
 {

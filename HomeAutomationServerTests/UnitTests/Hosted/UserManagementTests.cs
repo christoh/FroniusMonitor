@@ -1,6 +1,6 @@
 using System.Net;
-using De.Hochstaetter.Fronius.Contracts.HomeAutomationClient;
-using De.Hochstaetter.Fronius.Services.HomeAutomationClient;
+using De.Hochstaetter.HomeAutomationClient.Contracts;
+using De.Hochstaetter.HomeAutomationClient.Services;
 using De.Hochstaetter.HomeAutomationServer.Controllers;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using De.Hochstaetter.HomeAutomationServer.Models.Settings;

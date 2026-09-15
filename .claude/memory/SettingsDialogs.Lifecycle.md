@@ -27,7 +27,7 @@ paths:
   - HomeAutomationClient/HomeAutomationClient/App.axaml
   - HomeAutomationServer/Controllers/Gen24Controller.cs
   - Fronius/Models/Gen24/Settings/**
-  - Fronius/Contracts/HomeAutomationClient/IWebClientService.cs
+  - HomeAutomationClient/HomeAutomationClient/Contracts/IWebClientService.cs
 ---
 
 # Lifecycle contract: the settings dialogs

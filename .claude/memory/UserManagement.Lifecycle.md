@@ -12,8 +12,8 @@ paths:
   - HomeAutomationServer/Controllers/IdentityController.cs
   - Fronius/Models/WebApi/UserAccount.cs
   - Fronius/Models/WebApi/UserInfo.cs
-  - Fronius/Contracts/HomeAutomationClient/IWebClientService.cs
-  - Fronius/Services/HomeAutomationClient/WebClientService.cs
+  - HomeAutomationClient/HomeAutomationClient/Contracts/IWebClientService.cs
+  - HomeAutomationClient/HomeAutomationClient/Services/WebClientService.cs
   - HomeAutomationServer/Models/Authorization/User.cs
   - HomeAutomationServer/Models/Authorization/UserList.cs
   - HomeAutomationServer/Models/Settings/Settings.cs

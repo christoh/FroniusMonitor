@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
-namespace De.Hochstaetter.Fronius.Models;
+namespace De.Hochstaetter.HomeAutomationClient.Models;
 
 // Most likely INotifyPropertyChanged is not needed. Verification required.
 public struct HaColor(uint value) : IEquatable<HaColor>, IEquatable<uint>, IParsable<HaColor>, INotifyPropertyChanged

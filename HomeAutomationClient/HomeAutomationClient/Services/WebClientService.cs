@@ -1,9 +1,16 @@
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using De.Hochstaetter.Fronius.Models;
+using De.Hochstaetter.Fronius.Models.Charging;
+using De.Hochstaetter.Fronius.Models.Gen24.Commands;
 using De.Hochstaetter.Fronius.Models.HomeAutomationClient;
+using De.Hochstaetter.Fronius.Models.ToshibaAc;
 using De.Hochstaetter.Fronius.Models.WebApi;
 
-namespace De.Hochstaetter.Fronius.Services.HomeAutomationClient;
+namespace De.Hochstaetter.HomeAutomationClient.Services;
 
 public sealed class WebClientService : IWebClientService
 {

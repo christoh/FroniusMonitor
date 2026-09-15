@@ -28,7 +28,6 @@ global using System.Xml.Serialization;
 global using CommunityToolkit.Mvvm.ComponentModel;
 global using De.Hochstaetter.Fronius.Attributes;
 global using De.Hochstaetter.Fronius.Contracts;
-global using De.Hochstaetter.Fronius.Contracts.HomeAutomationClient;
 global using De.Hochstaetter.Fronius.Exceptions;
 global using De.Hochstaetter.Fronius.Extensions;
 global using De.Hochstaetter.Fronius.Localization;

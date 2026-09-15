@@ -2,6 +2,7 @@
 paths:
   - Fronius/Validators/**
   - FroniusMonitor/Validators/**
+  - HomeAutomationClient/HomeAutomationClient/Validators/**
   - Fronius/Models/BindableBase.cs
   - Fronius/Models/Gen24/Settings/**
   - HomeAutomationClient/HomeAutomationClient/Styles/Validation.axaml
@@ -60,7 +61,7 @@ public string? MeterAddressText
 ```
 
 - **`Fronius/Validators`** holds the rules both heads use: `MinMaxIntAttribute`, `MinMaxDoubleAttribute`,
-  `Ipv4Attribute`, `TimeOfDayAttribute`, `AbsoluteUriAttribute`. Each one is a `Complaint` and an `IsAcceptable`;
+  `Ipv4Attribute`, `TimeOfDayAttribute`. Each one is a `Complaint` and an `IsAcceptable`;
   `ValidationRuleAttribute` does the rest -
   empties, and the message. The message is either composed around `PropertyDisplayName` /
   `PropertyDisplayNameResourceKey`, or named outright by `MessageResourceKey` where the field already has a
@@ -178,13 +179,20 @@ the properties, one by one; `Gen24ModbusSettingsTests` checks the copy against `
 that goes to the inverter and so catches one the hand written copy forgot. **Any other settings type that gains a
 rule has to give up `MemberwiseClone` in the same way.**
 
-## One rule lives in the WPF app
+## Two rules live with their one head
 
-`RegexRuleAttribute` is in `FroniusMonitor/Validators` and not with the others, because `RegExRule` of the WPF
-app is its only caller and `ValidationRuleTests` its only other user - see
-[[Fronius.SharedLibraryBoundary]]. It is the reason `HomeAutomationServerTests` references the WPF project and
-is therefore Windows only. Should the Avalonia client ever need a pattern rule, it moves back to
-`Fronius/Validators` and that reference goes with it.
+`Fronius/Validators` keeps only what both heads use. The two that do not went to their user, on the rule in
+[[Fronius.SharedLibraryBoundary]]:
+
+- **`RegexRuleAttribute`** is in `FroniusMonitor/Validators`, because `RegExRule` of the WPF app is its only
+  caller. It is the reason `HomeAutomationServerTests` references the WPF project and is therefore Windows only.
+- **`AbsoluteUriAttribute`** is in `HomeAutomationClient/.../Validators`, because only the client validates a
+  server address. Its `Parse` is public and static on purpose - `Misc/ServerUris` builds the api and hub
+  addresses out of it - so it is the one rule whose parsing is part of its contract.
+
+Either moves back to `Fronius/Validators` the day the other head needs it. Nothing about the mechanism changes
+with the move: a rule is declared on the property that is edited, and the head reads it from there wherever the
+attribute class lives.
 
 ## The WPF app gives its rules to a binding, and they are wrappers
 

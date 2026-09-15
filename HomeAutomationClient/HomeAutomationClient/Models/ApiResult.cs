@@ -1,4 +1,4 @@
-namespace De.Hochstaetter.Fronius.Models.HomeAutomationClient;
+namespace De.Hochstaetter.HomeAutomationClient.Models;
 
 public class ApiResult<T> : ProblemDetails
 {

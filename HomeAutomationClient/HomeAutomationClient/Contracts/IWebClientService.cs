@@ -1,8 +1,12 @@
 using System.Text.Json;
+using De.Hochstaetter.Fronius.Models;
+using De.Hochstaetter.Fronius.Models.Charging;
+using De.Hochstaetter.Fronius.Models.Gen24.Commands;
 using De.Hochstaetter.Fronius.Models.HomeAutomationClient;
+using De.Hochstaetter.Fronius.Models.ToshibaAc;
 using De.Hochstaetter.Fronius.Models.WebApi;
 
-namespace De.Hochstaetter.Fronius.Contracts.HomeAutomationClient;
+namespace De.Hochstaetter.HomeAutomationClient.Contracts;
 
 public interface IWebClientService : IDisposable
 {

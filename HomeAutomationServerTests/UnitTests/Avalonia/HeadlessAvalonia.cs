@@ -6,7 +6,7 @@ using Avalonia.Headless;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Themes.Fluent;
 using De.Hochstaetter.Fronius;
-using De.Hochstaetter.Fronius.Services.HomeAutomationClient;
+using De.Hochstaetter.HomeAutomationClient.Services;
 using De.Hochstaetter.HomeAutomationClient.Contracts;
 using De.Hochstaetter.HomeAutomationClient.Services;
 using De.Hochstaetter.HomeAutomationClient.ViewModels;

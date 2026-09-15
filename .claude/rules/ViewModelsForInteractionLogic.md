@@ -67,8 +67,10 @@ its own:
 - Attached properties, control templates, focus handling, animations.
 - Marshalling to the UI thread (`Dispatcher.UIThread`), because the view model must stay free of UI framework types.
 
-A view model must not reference Avalonia or WPF types. Colors go in as `De.Hochstaetter.Fronius.Models.HaColor`,
-never as `IBrush` or `Color`.
+A view model must not reference Avalonia or WPF types. In `HomeAutomationClient`, colors go in as
+`De.Hochstaetter.HomeAutomationClient.Models.HaColor`, never as `IBrush` or `Color`. This paragraph does not
+apply to `FroniusMonitor`: `HaColor` moved out of `Fronius` and into the Avalonia client on 2026-09-16, because
+nothing else used it, and the WPF app has no `HaColor` of its own.
 
 ## Example
 

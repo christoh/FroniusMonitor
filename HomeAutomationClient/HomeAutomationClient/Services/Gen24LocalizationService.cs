@@ -1,6 +1,7 @@
+using System.Collections.Concurrent;
 using System.Text.Json;
 
-namespace De.Hochstaetter.Fronius.Services.HomeAutomationClient;
+namespace De.Hochstaetter.HomeAutomationClient.Services;
 
 public class Gen24LocalizationService(IWebClientService webClient) : IGen24LocalizationService
 {

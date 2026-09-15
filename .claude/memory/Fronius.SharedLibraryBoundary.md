@@ -5,17 +5,19 @@ paths:
   - FroniusMonitor/Contracts/**
   - FroniusMonitor/Services/**
   - FroniusMonitor/Validators/**
+  - HomeAutomationClient/HomeAutomationClient/Contracts/**
+  - HomeAutomationClient/HomeAutomationClient/Validators/**
   - FroniusUnitTests/FroniusUnitTests.csproj
   - HomeAutomationServerTests/HomeAutomationServerTests.csproj
 ---
 
 # What belongs in `Fronius` and what does not
 
-`Fronius` is the library the two production heads share: `HomeAutomationServer` and `HomeAutomationClient`. On
-2026-09-15 it was cleared out twice - first of everything only `FroniusMonitor` and the tests used, then of
-everything only `HomeAutomationServer` used - so the rule below is the state of the code and not an aspiration.
-What is left is what **both** heads need: the device models and their JSON, the localization, the validation
-rules, the web API contract and the services the client and the server share.
+`Fronius` is the library the two production heads share: `HomeAutomationServer` and `HomeAutomationClient`. It
+was cleared out three times, once per head - of what only `FroniusMonitor` used and of what only the server used
+on 2026-09-15, of what only the client used on 2026-09-16 - so the rule below is the state of the code and not an
+aspiration. What is left is what **both** heads need: the device models and their JSON, the localization, the
+validation rules both use, and the web API contract.
 
 ## The rule
 
@@ -25,8 +27,6 @@ the server, and what only the WPF app uses belongs to the WPF app. A test projec
 keep it either - both test projects reference `FroniusMonitor` and `HomeAutomationServer` and target
 `net10.0-windows7.0`, so they can reach a type wherever it lives. That is the developer's decision of 2026-09-15
 and the reason the test projects are Windows only.
-
-(`HomeAutomationClient` has not been cleared out this way yet: a type only it uses is still in `Fronius`.)
 
 What moved, and where it went:
 
@@ -40,6 +40,7 @@ What moved, and where it went:
 | `Services/DataCollectors/**`, `Services/DataControlService.cs`, the DWD half of `Services/EnergyData` and `Models/EnergyData/DwdForecast.cs` | `HomeAutomationServer/Services`, `HomeAutomationServer/Models/EnergyData` |
 | the collector parameter classes of `Models/Settings`, `SettingsChangeTracker`, `PolledWebConnectionParameterBase`, `Models/WebApi/WebApiInfo.cs` | `HomeAutomationServer/Models` |
 | `Contracts/IDataControlService.cs`, `IGen24ConfigRefresher.cs`, `IHomeAutomationRunner.cs`, `IWattPilotServices.cs`, `IDwdWeatherClient.cs`, `IEnergyDataService.cs`, `IEnergyHistoryStore.cs` | `HomeAutomationServer/Contracts` |
+| `Contracts/HomeAutomationClient/**`, `Services/HomeAutomationClient/**`, `Models/HaColor.cs`, `Models/HomeAutomationClient/ApiResult.cs`, `Validators/AbsoluteUriAttribute.cs` | `HomeAutomationClient/HomeAutomationClient` under `Contracts`, `Services`, `Models` and a new `Validators` |
 
 Two things came with them. **`ClosedXML`** was in `Fronius` for `BayernWerkImportService` and nothing else, so its
 package reference left too - and its transitive `DocumentFormat.OpenXml` had meanwhile been picked up by two stray
@@ -70,6 +71,7 @@ Do not move these without reading why they are here; each is pinned by something
 | `IPowerMeter1P`, `ITemperatureSensor` | `IPowerConsumer1P`, `FritzBoxDevice`, `ModbusServerService` |
 | `Gen24Sensors`, `Gen24ConnectedInverter` | `IGen24Service` and `Gen24Service` |
 | `Ipv4Attribute`, `TimeOfDayAttribute` | the Avalonia client, as `[Ipv4(…)]` and `[TimeOfDay(…)]` - see below |
+| `ProblemDetails` | it sits in `Models/HomeAutomationClient` and looks like the client's, but `ValidationRuleAttribute` and the server's controllers use it. The folder name is the misleading part, not the type. |
 
 ## How to find out, rather than guess
 
@@ -98,6 +100,19 @@ directly, not to it) and `NotEmptyAttribute`; `Gen24SolarWebSettings` and `Toshi
 only through `Clone`, `Read` and `Write`, which are too common a name for a search to settle. Nothing was
 deleted, because deleting is a separate decision the developer has not been asked for - and reflection and JSON
 deserialization would have to be checked first in any case.
+
+## Where `Fronius/Validators` ended up
+
+The family is split three ways, and each piece went to its only user. `Fronius/Validators` keeps
+`ValidationRuleAttribute`, `MinMaxRules`, `NumericText`, `Ipv4Attribute`, `TimeOfDayAttribute`,
+`WattPilotFallbackCurrentAttribute` and the unreferenced `NotEmptyAttribute`; `RegexRuleAttribute` is in
+`FroniusMonitor/Validators` and `AbsoluteUriAttribute` in `HomeAutomationClient/.../Validators`. The mechanism
+itself is unchanged and is described in [[Validation.Lifecycle]]: a rule is declared on the property that is
+edited and every head picks it up from there, wherever the attribute class happens to live.
+
+`HaColor` went with them, into `De.Hochstaetter.HomeAutomationClient.Models`. The developer changed
+`.claude/rules/ViewModelsForInteractionLogic.md` to name the new namespace and to say the paragraph does not
+apply to `FroniusMonitor`, which has no `HaColor` of its own.
 
 ## Referencing the WPF app costs a build workaround
 
