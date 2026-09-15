@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 

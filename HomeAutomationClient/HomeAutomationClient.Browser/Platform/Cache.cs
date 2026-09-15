@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices.JavaScript;
+using System.Runtime.InteropServices.JavaScript;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;

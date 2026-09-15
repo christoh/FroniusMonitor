@@ -1,4 +1,4 @@
-﻿using Avalonia.Markup.Xaml.MarkupExtensions;
+using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media.Immutable;
 
 namespace De.Hochstaetter.HomeAutomationClient.Models.Gen24;

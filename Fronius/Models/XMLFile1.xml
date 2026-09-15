@@ -1,4 +1,4 @@
-﻿<devicelist version="1" fwversion="7.29">
+<devicelist version="1" fwversion="7.29">
   <device identifier="08761 0004279" id="16" functionbitmask="33664" fwversion="04.16" manufacturer="AVM" productname="FRITZ!DECT 200">
     <present>0</present>
     <txbusy>0</txbusy>

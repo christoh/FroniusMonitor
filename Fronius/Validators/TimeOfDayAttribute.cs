@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Validators;
+namespace De.Hochstaetter.Fronius.Validators;
 
 /// <summary>
 /// A time of day from <c>00:00</c> to <c>24:00</c>, as the charging rules of an inverter and the trip times of a

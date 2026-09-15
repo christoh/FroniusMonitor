@@ -1,4 +1,4 @@
-﻿using Makaretu.Dns;
+using Makaretu.Dns;
 using NUnit.Framework.Constraints;
 using System.Linq;
 using System.Net;

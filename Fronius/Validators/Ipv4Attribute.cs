@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Validators;
+namespace De.Hochstaetter.Fronius.Validators;
 
 /// <summary>
 /// An IPv4 address, and whatever of a mask, a host name and a list of them is switched on. Covers both IP rules of

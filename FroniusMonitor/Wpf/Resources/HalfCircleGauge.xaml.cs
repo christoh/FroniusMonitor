@@ -1,4 +1,4 @@
-﻿using System.Windows.Shapes;
+using System.Windows.Shapes;
 
 namespace De.Hochstaetter.FroniusMonitor.Wpf.Resources;
 

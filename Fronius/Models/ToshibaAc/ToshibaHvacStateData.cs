@@ -1,4 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Models.JsonConverters;
+using De.Hochstaetter.Fronius.Models.JsonConverters;
 
 namespace De.Hochstaetter.Fronius.Models.ToshibaAc;
 

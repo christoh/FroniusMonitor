@@ -1,4 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Models;
+using De.Hochstaetter.Fronius.Models;
 using Microsoft.Extensions.Logging;
 
 namespace De.Hochstaetter.HomeAutomationClient.Misc;

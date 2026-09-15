@@ -1,4 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Models.Gen24;
+using De.Hochstaetter.Fronius.Models.Gen24;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using Microsoft.AspNetCore.Http;
 

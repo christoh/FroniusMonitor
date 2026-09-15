@@ -1,4 +1,4 @@
-﻿// Aliased rather than imported: ValidationResult here is the WPF one, and importing the data annotations
+// Aliased rather than imported: ValidationResult here is the WPF one, and importing the data annotations
 // namespace would make that name ambiguous throughout the file.
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 

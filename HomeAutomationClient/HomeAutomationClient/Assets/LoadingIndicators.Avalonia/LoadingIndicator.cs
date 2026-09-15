@@ -1,4 +1,4 @@
-﻿using Avalonia.Controls.Metadata;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Styling;
 

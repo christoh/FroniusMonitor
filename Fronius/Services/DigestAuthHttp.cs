@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Services;
+namespace De.Hochstaetter.Fronius.Services;
 
 // Algorithm must be SHA256 (bug in 1.38.6-1), SHA-256 or MD5
 // qop must be auth (auth-int and none are not supported)

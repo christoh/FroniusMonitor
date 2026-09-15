@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc;
+namespace De.Hochstaetter.Fronius.Models.ToshibaAc;
 
 public enum ToshibaHvacMeritFeaturesA : byte // Nibble (half byte): Can only be from 0 to 15
 {

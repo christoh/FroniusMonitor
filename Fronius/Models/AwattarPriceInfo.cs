@@ -1,4 +1,4 @@
-﻿using De.Hochstaetter.Fronius.JsonConverters;
+using De.Hochstaetter.Fronius.JsonConverters;
 
 namespace De.Hochstaetter.Fronius.Models;
 

@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Attributes;
+namespace De.Hochstaetter.Fronius.Attributes;
 
 [AttributeUsage(AttributeTargets.Property)]
 public class ModbusAttribute(ushort start, ushort length, bool isReadOnly = true) : Attribute

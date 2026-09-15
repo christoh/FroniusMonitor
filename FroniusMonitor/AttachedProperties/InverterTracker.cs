@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.AttachedProperties;
+namespace De.Hochstaetter.FroniusMonitor.AttachedProperties;
 
 public enum Tracker : sbyte
 {

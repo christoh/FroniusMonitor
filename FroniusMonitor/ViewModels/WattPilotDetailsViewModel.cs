@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.ViewModels;
+namespace De.Hochstaetter.FroniusMonitor.ViewModels;
 
 public class WattPilotDetailsViewModel(IDataCollectionService dataCollectionService, IWattPilotService wattPilotService) : ViewModelBase
 {

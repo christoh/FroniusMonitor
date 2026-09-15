@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Models.Modbus;
+namespace De.Hochstaetter.Fronius.Models.Modbus;
 
 public class SunSpecStorageBaseSettings(ReadOnlyMemory<byte> data, ushort modelNumber, ushort absoluteRegister) : SunSpecModelBase(data, modelNumber, absoluteRegister)
 {

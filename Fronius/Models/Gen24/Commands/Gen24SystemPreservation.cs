@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Models.Gen24.Commands;
+namespace De.Hochstaetter.Fronius.Models.Gen24.Commands;
 
 public partial class Gen24SystemPreservation : Gen24NoResultCommand
 {

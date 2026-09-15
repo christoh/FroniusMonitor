@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using De.Hochstaetter.Fronius;
 using De.Hochstaetter.Fronius.Contracts;

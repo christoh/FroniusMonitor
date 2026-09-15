@@ -1,4 +1,4 @@
-﻿<!-- ReSharper disable MarkupAttributeTypo -->
+<!-- ReSharper disable MarkupAttributeTypo -->
 <c:ValidationWindow x:Class="De.Hochstaetter.FroniusMonitor.Views.SelfConsumptionOptimizationView"
                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"

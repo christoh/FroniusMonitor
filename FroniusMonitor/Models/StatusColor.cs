@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Models;
+namespace De.Hochstaetter.FroniusMonitor.Models;
 
 public static class StatusColor
 {

@@ -112,7 +112,7 @@ Note `setx` only writes the registry; it does not affect already-open processes,
 - Second cleanup, 2026-09-15, from Git Bash with `gh` (74 and 113 versions, 67 and 104 deleted, keep sets 7 and 9
   again): `gh api` takes `--hostname github.com`, not `-h` (which is help). Three traps cost a round each: Git
   Bash turns a leading `/` of the endpoint into `C:/Program Files/Git/...` on a DELETE (omit the slash or set
-  `MSYS_NO_PATHCONV=1`), `jq` output written to a file has CRLF so ids read back carry a `` (`tr -d ''`),
+  `MSYS_NO_PATHCONV=1`), `jq` output written to a file has CRLF so ids read back carry a `\r` (`tr -d '\r'`),
   and `<(...)` process substitution does not work for `--slurpfile` (write a temp file). The token has to be
   refreshed interactively by the developer (`gh auth refresh -h github.com -s read:packages,delete:packages`);
   the automated shell saw the refreshed keyring token straight away this time, no registry detour needed.

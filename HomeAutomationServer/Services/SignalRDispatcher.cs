@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using De.Hochstaetter.Fronius.Models.Charging;
 using De.Hochstaetter.Fronius.Models.Events;
 using De.Hochstaetter.HomeAutomationServer.Hubs;

@@ -1,4 +1,4 @@
-﻿using Avalonia.Animation;
+using Avalonia.Animation;
 using Avalonia.Animation.Easings;
 using Avalonia.Styling;
 using De.Hochstaetter.HomeAutomationClient.Extensions;

@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 
 namespace De.Hochstaetter.FroniusMonitor.Wpf.Markups;
 

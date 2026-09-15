@@ -1,4 +1,4 @@
-﻿using De.Hochstaetter.HomeAutomationClient.Extensions;
+using De.Hochstaetter.HomeAutomationClient.Extensions;
 
 namespace De.Hochstaetter.HomeAutomationClient.Assets.Images;
 

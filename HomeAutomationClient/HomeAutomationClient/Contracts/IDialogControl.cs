@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.HomeAutomationClient.Contracts;
+namespace De.Hochstaetter.HomeAutomationClient.Contracts;
 
 public interface IDialogControl
 {

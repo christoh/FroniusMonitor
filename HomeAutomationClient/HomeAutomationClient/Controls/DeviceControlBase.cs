@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.HomeAutomationClient.Controls;
+namespace De.Hochstaetter.HomeAutomationClient.Controls;
 
 public abstract class DeviceControlBase : UserControl
 {

@@ -1,4 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Extensions;
+using De.Hochstaetter.Fronius.Extensions;
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 

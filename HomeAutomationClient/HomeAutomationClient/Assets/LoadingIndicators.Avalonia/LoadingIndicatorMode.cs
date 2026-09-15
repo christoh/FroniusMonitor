@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.HomeAutomationClient.Assets.LoadingIndicators.Avalonia;
+namespace De.Hochstaetter.HomeAutomationClient.Assets.LoadingIndicators.Avalonia;
 
 public enum LoadingIndicatorMode
 {

@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs;
+namespace De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs;
 
 public partial class LoginViewModel(DialogParameters parameters) : DialogBase<DialogParameters, bool, LoginView>(parameters)
 {

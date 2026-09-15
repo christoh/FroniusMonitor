@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Validators;
+namespace De.Hochstaetter.Fronius.Validators;
 
 /// <summary>
 /// A complete address, as a user would type it into the address bar of a browser:

@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Models.Events;
+namespace De.Hochstaetter.Fronius.Models.Events;
 
 public enum DeviceAction : byte
 {

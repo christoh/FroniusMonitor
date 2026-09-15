@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Models.Charging;
+namespace De.Hochstaetter.Fronius.Models.Charging;
 
 public class WattPilotUpdate(string serialNumber, string jsonMessage) : IHaveUniqueId
 {

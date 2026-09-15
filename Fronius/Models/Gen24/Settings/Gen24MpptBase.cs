@@ -1,4 +1,4 @@
-﻿// ReSharper disable StringLiteralTypo
+// ReSharper disable StringLiteralTypo
 namespace De.Hochstaetter.Fronius.Models.Gen24.Settings;
 
 [SuppressMessage("ReSharper", "IdentifierTypo")]

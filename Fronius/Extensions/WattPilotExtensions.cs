@@ -1,4 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Services;
+using De.Hochstaetter.Fronius.Services;
 
 namespace De.Hochstaetter.Fronius.Extensions;
 

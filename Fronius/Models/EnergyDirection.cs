@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Models;
+namespace De.Hochstaetter.Fronius.Models;
 
 public enum EnergyDirection : sbyte
 {

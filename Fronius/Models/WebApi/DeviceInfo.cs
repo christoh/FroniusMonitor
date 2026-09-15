@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Models.WebApi;
+namespace De.Hochstaetter.Fronius.Models.WebApi;
 
 public class DeviceInfo
 {

@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Contracts;
+namespace De.Hochstaetter.Fronius.Contracts;
 
 /// <summary>
 /// Implemented by whatever polls the configuration of the inverters, so that code which has just changed a setting

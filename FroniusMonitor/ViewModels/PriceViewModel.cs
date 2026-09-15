@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using De.Hochstaetter.Fronius.Models.Settings;
 using OxyPlot;
 using OxyPlot.Axes;

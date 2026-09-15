@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Exceptions;
+namespace De.Hochstaetter.Fronius.Exceptions;
 
 public class Gen24Exception(int status, string message, string userMessage, string urlString)
     : Exception(message)

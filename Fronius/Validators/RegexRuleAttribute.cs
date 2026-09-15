@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Validators;
+namespace De.Hochstaetter.Fronius.Validators;
 
 /// <summary>
 /// Text that has to match a pattern. The counterpart of <c>RegExRule</c> of the WPF app.

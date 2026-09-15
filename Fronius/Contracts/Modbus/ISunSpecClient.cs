@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Contracts.Modbus;
+namespace De.Hochstaetter.Fronius.Contracts.Modbus;
 
 public interface ISunSpecClient : IDisposable
 {

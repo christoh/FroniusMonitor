@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Localization;
+namespace De.Hochstaetter.Fronius.Localization;
 
 /// <summary>
 /// The languages this build has a translation for. Nobody keeps a list: the satellite assemblies next to

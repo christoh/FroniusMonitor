@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Models.Gen24;
+namespace De.Hochstaetter.Fronius.Models.Gen24;
 
 public partial class Gen24Config : BindableBase, ICloneable
 {

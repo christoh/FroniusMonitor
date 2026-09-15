@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Services.DataCollectors;
+namespace De.Hochstaetter.Fronius.Services.DataCollectors;
 
 /// <summary>What a failure that has just happened is worth in the log.</summary>
 public enum FailureReport

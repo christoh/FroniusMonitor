@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace De.Hochstaetter.Fronius.Models.Settings;
 

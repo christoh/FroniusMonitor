@@ -1,4 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Models.Gen24;
+using De.Hochstaetter.Fronius.Models.Gen24;
 using De.Hochstaetter.Fronius.Models.Gen24.Commands;
 using De.Hochstaetter.Fronius.Models.Gen24.Settings;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;

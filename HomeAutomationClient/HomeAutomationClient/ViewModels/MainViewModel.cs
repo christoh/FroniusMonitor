@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using Avalonia.Styling;
 using De.Hochstaetter.Fronius.Models.Charging;

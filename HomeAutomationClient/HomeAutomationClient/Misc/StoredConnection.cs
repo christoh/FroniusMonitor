@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.HomeAutomationClient.Misc;
+namespace De.Hochstaetter.HomeAutomationClient.Misc;
 
 /// <summary>
 /// The credentials the server last accepted, kept so the next start can pre-fill the login. Written after a

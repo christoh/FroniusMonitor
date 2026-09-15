@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.HomeAutomationClient.ViewModels.Adapters;
+namespace De.Hochstaetter.HomeAutomationClient.ViewModels.Adapters;
 
 public abstract partial class DialogBase<TParameters, TResult, TBody>(TParameters parameters) : ViewModelBase, IDialogBase
     where TBody : ContentControl, IDialogControl, new()

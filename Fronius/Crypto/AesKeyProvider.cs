@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Crypto;
+namespace De.Hochstaetter.Fronius.Crypto;
 
 public class AesKeyProvider : IAesKeyProvider
 {

@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Models.WebApi;
+namespace De.Hochstaetter.Fronius.Models.WebApi;
 
 /// <summary>
 /// The roles a user of the home automation server can hold. Flags without a hierarchy: holding one says nothing

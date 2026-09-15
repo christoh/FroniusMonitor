@@ -1,4 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Models.Settings;
+using De.Hochstaetter.Fronius.Models.Settings;
 
 namespace De.Hochstaetter.FroniusMonitor.Models;
 

@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc;
+namespace De.Hochstaetter.Fronius.Models.ToshibaAc;
 
 public partial class ToshibaHvacMappingDevice : ToshibaHvacDeviceBase
 {

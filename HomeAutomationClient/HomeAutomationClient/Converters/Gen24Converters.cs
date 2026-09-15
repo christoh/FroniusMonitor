@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using Avalonia.Data;
 using De.Hochstaetter.Fronius.Extensions;
 using De.Hochstaetter.HomeAutomationClient.Extensions;

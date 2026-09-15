@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.HomeAutomationServer.Misc;
+namespace De.Hochstaetter.HomeAutomationServer.Misc;
 
 internal static class Helpers
 {

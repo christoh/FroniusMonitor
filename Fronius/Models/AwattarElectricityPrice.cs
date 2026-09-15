@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Models;
+namespace De.Hochstaetter.Fronius.Models;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public partial class AwattarElectricityPrice : AwattarBase, IElectricityPrice

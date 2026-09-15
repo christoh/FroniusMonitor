@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+using System.Numerics;
 using System.Reflection;
 using De.Hochstaetter.Fronius.Attributes;
 using De.Hochstaetter.Fronius.Models.Settings;

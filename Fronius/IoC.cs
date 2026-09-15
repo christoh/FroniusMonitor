@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius;
+namespace De.Hochstaetter.Fronius;
 
 public class IoC : IServiceProvider
 {

@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Attributes;
+namespace De.Hochstaetter.Fronius.Attributes;
 
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = true, Inherited = true)]
 public class EnumParseAttribute : Attribute

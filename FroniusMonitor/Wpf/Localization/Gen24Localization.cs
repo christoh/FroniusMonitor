@@ -1,4 +1,4 @@
-﻿using De.Hochstaetter.FroniusMonitor.Wpf.Markups;
+using De.Hochstaetter.FroniusMonitor.Wpf.Markups;
 
 namespace De.Hochstaetter.FroniusMonitor.Wpf.Localization;
 

@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.FroniusMonitor.Wpf.Resources;
+namespace De.Hochstaetter.FroniusMonitor.Wpf.Resources;
 
 public partial class LinearGauge
 {

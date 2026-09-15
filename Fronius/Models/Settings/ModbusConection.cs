@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Models.Settings;
+namespace De.Hochstaetter.Fronius.Models.Settings;
 
 [SuppressMessage("ReSharper", "CommentTypo")]
 public partial class ModbusConnection : BindableBase, IHaveDisplayName

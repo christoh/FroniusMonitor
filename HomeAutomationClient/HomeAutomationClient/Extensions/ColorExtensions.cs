@@ -1,4 +1,4 @@
-﻿using DocumentFormat.OpenXml.Office.PowerPoint.Y2022.M08.Main;
+using DocumentFormat.OpenXml.Office.PowerPoint.Y2022.M08.Main;
 
 namespace De.Hochstaetter.HomeAutomationClient.Extensions;
 

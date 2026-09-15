@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Extensions;
+namespace De.Hochstaetter.Fronius.Extensions;
 
 internal static class SunSpecExtensions
 {

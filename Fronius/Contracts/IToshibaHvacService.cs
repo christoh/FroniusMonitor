@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Contracts;
+namespace De.Hochstaetter.Fronius.Contracts;
 
 /// <summary>
 ///     The connection to one Toshiba account, made the way the official app makes it: HTTPS for the login, the device

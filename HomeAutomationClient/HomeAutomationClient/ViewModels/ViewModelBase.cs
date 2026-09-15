@@ -1,4 +1,4 @@
-﻿using De.Hochstaetter.Fronius.Models;
+using De.Hochstaetter.Fronius.Models;
 using De.Hochstaetter.Fronius.Models.HomeAutomationClient;
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels;

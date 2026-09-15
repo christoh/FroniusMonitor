@@ -1,4 +1,4 @@
-﻿namespace De.Hochstaetter.Fronius.Models.ToshibaAc;
+namespace De.Hochstaetter.Fronius.Models.ToshibaAc;
 
 public enum ToshibaHvacPowerSetting : byte
 {
