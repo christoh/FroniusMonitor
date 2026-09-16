@@ -44,7 +44,9 @@ public class AuthenticationService(IOptionsMonitor<UserList> options, ILoggerFac
 
         var (username, password) = (split[0], split[1]);
 
-        var user = x.FirstOrDefault(u => u.Username == username);
+        var user = string.Equals(username, Models.Authorization.User.Guest.Username, StringComparison.OrdinalIgnoreCase)
+            ? Models.Authorization.User.Guest
+            : x.FirstOrDefault(u => string.Equals(u.Username, username, StringComparison.OrdinalIgnoreCase));
 
         if (user == null || !user.Authenticate(password))
         {

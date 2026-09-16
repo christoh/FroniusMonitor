@@ -8,6 +8,9 @@ namespace De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 
 public class User
 {
+    public static User Guest { get; } = new() { Username = "guest", Roles = Roles.Guest };
+    static User() => Guest.SetPassword("guest");
+
     private string? passwordCache;
 
     [XmlAttribute]

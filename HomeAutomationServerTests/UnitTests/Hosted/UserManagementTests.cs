@@ -18,11 +18,7 @@ using Microsoft.AspNetCore.Hosting.Server.Features;
 
 namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests.Hosted;
 
-/// <summary>
-/// The user endpoints of <see cref="IdentityController"/>, end to end: a Kestrel host with the real Basic
-/// authentication, and the client's own <see cref="WebClientService"/> talking to it, so the JSON shapes of both
-/// sides are proven against each other and not against a test's idea of them.
-/// </summary>
+[Collection("Settings")]
 public sealed class UserManagementTests : IAsyncLifetime
 {
     private const string AdminName = "root";

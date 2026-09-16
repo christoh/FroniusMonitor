@@ -36,7 +36,7 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     public IActionResult Login([FromQuery] string user, [FromQuery] string password)
     {
-        var dbUser = userDb.CurrentValue.Users.SingleOrDefault(u => string.Equals(user, u.Username, StringComparison.OrdinalIgnoreCase));
+        var dbUser = FindUser(user);
 
         if (dbUser == null || !dbUser.Authenticate(password))
         {
@@ -75,7 +75,7 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
     public IActionResult HubTicket([FromServices] HubTicketService hubTickets)
     {
         var userName = HttpContext.User.Identity?.Name;
-        var dbUser = userDb.CurrentValue.Users.SingleOrDefault(u => string.Equals(userName, u.Username, StringComparison.Ordinal));
+        var dbUser = userName is null ? null : FindUser(userName);
 
         if (dbUser == null)
         {
@@ -160,6 +160,11 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
             );
         }
 
+        if (string.Equals(userName, Models.Authorization.User.Guest.Username, StringComparison.OrdinalIgnoreCase))
+        {
+            return UnprocessableEntity(Helpers.GetProblemDetails(Loc.CannotUpdateUser, "The built-in guest user cannot be modified."));
+        }
+
         if (FindUser(userName) is not { } dbUser)
         {
             return NotFound(Helpers.GetProblemDetails(Loc.CannotUpdateUser, string.Format(Loc.UserNotFound, userName)));
@@ -231,6 +236,11 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
             logger.LogInformation("User {DeletedUsername} will be deleted by {Username} from {Ip}", userName, HttpContext.User.Identity!.Name, HttpContext.Connection.RemoteIpAddress);
         }
 
+        if (string.Equals(userName, Models.Authorization.User.Guest.Username, StringComparison.OrdinalIgnoreCase))
+        {
+            return UnprocessableEntity(Helpers.GetProblemDetails(Loc.CannotDeleteUser, "The built-in guest user cannot be deleted."));
+        }
+
         if (FindUser(userName) is not { } dbUser)
         {
             return NotFound(Helpers.GetProblemDetails(Loc.CannotDeleteUser, string.Format(Loc.UserNotFound, userName)));
@@ -248,6 +258,11 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
 
     private User? FindUser(string userName)
     {
+        if (string.Equals(userName, Models.Authorization.User.Guest.Username, StringComparison.OrdinalIgnoreCase))
+        {
+            return Models.Authorization.User.Guest;
+        }
+
         return userDb.CurrentValue.Users.SingleOrDefault(u => string.Equals(userName, u.Username, StringComparison.OrdinalIgnoreCase));
     }
 
