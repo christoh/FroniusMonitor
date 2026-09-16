@@ -115,6 +115,12 @@ public sealed class WindowPresenter : IDialogPresenter, IPagePresenter
         };
 
         window.LimitToScreen(MaximumFractionOfScreen);
+
+        // What the page asks for in its own XAML, if it asks at all; NaN for either dimension leaves that one to
+        // the content. Read here and not in the window, because a window has no idea that what is on it is a
+        // page - it is the presenter that puts the two together. After LimitToScreen, which is the cap it obeys.
+        window.SetInitialSize(InitialWindowSize.GetWidth(page), InitialWindowSize.GetHeight(page));
+
         window.Closed += (_, _) => pages.Remove(key);
         Cascade(window, pages.Count);
         pages[key] = window;

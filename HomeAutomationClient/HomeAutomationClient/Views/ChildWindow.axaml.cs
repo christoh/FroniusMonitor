@@ -20,6 +20,8 @@ public partial class ChildWindow : Window
 
     private double contentMaximumWidth = double.PositiveInfinity;
     private double contentMaximumHeight = double.PositiveInfinity;
+    private double initialWidth = double.NaN;
+    private double initialHeight = double.NaN;
     private bool isOpened;
 
     /// <summary>What the window shows: a dialog body or a detail page.</summary>
@@ -105,10 +107,54 @@ public partial class ChildWindow : Window
     }
 
     /// <summary>
+    /// Gives the window a size to open at instead of the size of what is on it. <see cref="double.NaN"/> for a
+    /// dimension leaves that one to the content, which is what every window did before this existed; the two are
+    /// independent, so a fixed width with a content driven height is a valid combination.
+    /// </summary>
+    /// <remarks>
+    /// Call it after <see cref="LimitToScreen"/> and before the window is shown: the requested size is cut down
+    /// to the same maximum, because a view that asks for more than the screen has would otherwise open with its
+    /// bottom and its right edge past the edge of it. What the user does with the window afterwards is untouched.
+    /// </remarks>
+    public void SetInitialSize(double width, double height)
+    {
+        initialWidth = Requested(width, MaxWidth);
+        initialHeight = Requested(height, MaxHeight);
+
+        if (!double.IsNaN(initialWidth))
+        {
+            Width = initialWidth;
+        }
+
+        if (!double.IsNaN(initialHeight))
+        {
+            Height = initialHeight;
+        }
+
+        ApplySizeToContent();
+
+        // Zero, a negative number and an infinity are not sizes. They count as "not asked for" rather than as an
+        // error: this is one number in the XAML of a view, and there is nobody to report it to from here.
+        static double Requested(double requested, double maximum) => double.IsFinite(requested) && requested > 0 ? Math.Min(requested, maximum) : double.NaN;
+    }
+
+    /// <summary>
     /// A window that is not up yet has no size of its own, so the content is what has to give it one - also when
     /// it is going to be resizable. <see cref="OnOpened"/> hands the size over to the user afterwards.
     /// </summary>
-    private void ApplySizeToContent() => SizeToContent = IsUserResizable && isOpened ? SizeToContent.Manual : SizeToContent.WidthAndHeight;
+    /// <remarks>
+    /// A dimension that <see cref="SetInitialSize"/> fixed is not sized to its content at all. Doing both would
+    /// have the content win, and the number the view asked for would silently do nothing.
+    /// </remarks>
+    private void ApplySizeToContent() => SizeToContent = IsUserResizable && isOpened
+        ? SizeToContent.Manual
+        : (double.IsNaN(initialWidth), double.IsNaN(initialHeight)) switch
+        {
+            (true, true) => SizeToContent.WidthAndHeight,
+            (true, false) => SizeToContent.Width,
+            (false, true) => SizeToContent.Height,
+            (false, false) => SizeToContent.Manual,
+        };
 
     protected override void OnOpened(EventArgs e)
     {

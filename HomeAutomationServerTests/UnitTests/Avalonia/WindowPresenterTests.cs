@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using De.Hochstaetter.Fronius;
 using De.Hochstaetter.HomeAutomationClient.Contracts;
+using De.Hochstaetter.HomeAutomationClient.Controls;
 using De.Hochstaetter.HomeAutomationClient.Models.Dialogs;
 using De.Hochstaetter.HomeAutomationClient.Services.Presentation;
 using De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs;
@@ -16,6 +17,11 @@ namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests;
 [Collection(AvaloniaCollection.Name)]
 public sealed class WindowPresenterTests
 {
+    /// <summary>A size for the test page to have, so that a window sized by its content has a number to be.</summary>
+    private const double ContentWidth = 360;
+
+    private const double ContentHeight = 240;
+
     private static async Task<(WindowPresenter Presenter, Window MainWindow)> StartAsync()
     {
         var presenter = new WindowPresenter();
@@ -276,6 +282,96 @@ public sealed class WindowPresenterTests
         pagePresenter.Show<TestPage>("device-a", "Inverter A", page => page.DeviceKey = "device-a");
         await HeadlessAvalonia.SettleAsync();
         Assert.Equal(3, WindowCount);
+    });
+
+    [Fact]
+    public Task A_page_window_opens_at_the_size_the_page_asks_for() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        var (presenter, _) = await StartAsync();
+
+        ((IPagePresenter)presenter).Show<TestPage>("device-a", "Sized", page =>
+        {
+            InitialWindowSize.SetWidth(page, 640);
+            InitialWindowSize.SetHeight(page, 480);
+        });
+
+        await HeadlessAvalonia.SettleAsync();
+
+        var window = WindowOf("Sized");
+        Assert.Equal(640, window.Width);
+        Assert.Equal(480, window.Height);
+
+        // Initial, not fixed: the window is still the user's to resize.
+        Assert.True(window.CanResize);
+    });
+
+    [Fact]
+    public Task A_page_window_that_fixes_one_dimension_leaves_the_other_to_its_content() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        var (presenter, _) = await StartAsync();
+
+        ((IPagePresenter)presenter).Show<TestPage>("device-a", "Half sized", page =>
+        {
+            page.Height = ContentHeight;
+            InitialWindowSize.SetWidth(page, 640);
+        });
+
+        await HeadlessAvalonia.SettleAsync();
+
+        var window = WindowOf("Half sized");
+        Assert.Equal(640, window.Width);
+        Assert.Equal(ContentHeight, window.Height);
+    });
+
+    /// <summary>
+    /// A page that says nothing is sized by its content, which is what every page window did before there was
+    /// anything to say. This is the other half of <see cref="A_page_window_opens_at_the_size_the_page_asks_for"/>.
+    /// </summary>
+    [Fact]
+    public Task A_page_window_that_asks_for_nothing_is_sized_by_its_content() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        var (presenter, _) = await StartAsync();
+
+        ((IPagePresenter)presenter).Show<TestPage>("device-a", "Content sized", page =>
+        {
+            page.Width = ContentWidth;
+            page.Height = ContentHeight;
+        });
+
+        await HeadlessAvalonia.SettleAsync();
+
+        var window = WindowOf("Content sized");
+        Assert.Equal(ContentWidth, window.Width);
+        Assert.Equal(ContentHeight, window.Height);
+    });
+
+    /// <summary>
+    /// The cap of <c>ChildWindow.LimitToScreen</c> binds an asked-for size as well: a view is allowed to want
+    /// more room than the screen has, and the window still has to open on it.
+    /// </summary>
+    /// <remarks>
+    /// Strictly smaller than the screen, not merely no bigger: the presenter caps a page window at a fraction of
+    /// the working area, so an assertion of "fits" would also hold if nothing capped it and the platform had
+    /// simply refused to make a window larger than the display.
+    /// </remarks>
+    [Fact]
+    public Task A_page_window_is_capped_to_the_screen_however_much_the_page_asks_for() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        var (presenter, _) = await StartAsync();
+
+        ((IPagePresenter)presenter).Show<TestPage>("device-a", "Oversized", page =>
+        {
+            InitialWindowSize.SetWidth(page, 100_000);
+            InitialWindowSize.SetHeight(page, 100_000);
+        });
+
+        await HeadlessAvalonia.SettleAsync();
+
+        var window = WindowOf("Oversized");
+        var screen = window.Screens.ScreenFromWindow(window) ?? window.Screens.Primary ?? window.Screens.All.Single();
+
+        Assert.True(window.Width < screen.WorkingArea.Width / screen.Scaling, $"{window.Width} not capped below the screen width");
+        Assert.True(window.Height < screen.WorkingArea.Height / screen.Scaling, $"{window.Height} not capped below the screen height");
     });
 
     [Fact]
