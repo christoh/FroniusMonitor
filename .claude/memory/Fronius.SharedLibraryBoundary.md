@@ -7,7 +7,6 @@ paths:
   - FroniusMonitor/Validators/**
   - HomeAutomationClient/HomeAutomationClient/Contracts/**
   - HomeAutomationClient/HomeAutomationClient/Validators/**
-  - FroniusUnitTests/FroniusUnitTests.csproj
   - HomeAutomationServerTests/HomeAutomationServerTests.csproj
 ---
 
@@ -24,9 +23,9 @@ validation rules both use, and the web API contract.
 **`HomeAutomationClient` *and* `HomeAutomationServer` use it, or it does not belong in `Fronius`.** One head on
 its own is not enough: what only the client uses would belong to the client, what only the server uses belongs to
 the server, and what only the WPF app uses belongs to the WPF app. A test project using something is no reason to
-keep it either - both test projects reference `FroniusMonitor` and `HomeAutomationServer` and target
-`net10.0-windows7.0`, so they can reach a type wherever it lives. That is the developer's decision of 2026-09-15
-and the reason the test projects are Windows only.
+keep it either - `HomeAutomationServerTests`, the only test project since the NUnit one was folded into it on
+2026-09-16, references all three heads and targets `net10.0-windows7.0`, so it can reach a type wherever it lives.
+That is the developer's decision of 2026-09-15 and the reason the tests are Windows only.
 
 What moved, and where it went:
 
@@ -77,7 +76,7 @@ Do not move these without reading why they are here; each is pinned by something
 ## How to find out, rather than guess
 
 Whether something is shared is a question about the whole repository, and grep for the type name over
-`FroniusMonitor HomeAutomationClient HomeAutomationServer FroniusUnitTests HomeAutomationServerTests Fronius`
+`FroniusMonitor HomeAutomationClient HomeAutomationServer HomeAutomationServerTests Fronius`
 answers it. Four things will mislead you, and three of them did:
 
 - **An attribute is written without its `Attribute` suffix.** `Ipv4Attribute` and `TimeOfDayAttribute` looked
@@ -96,7 +95,7 @@ answers it. Four things will mislead you, and three of them did:
 **On unreferenced files, trust nothing that was not checked member by member.** An earlier version of this
 document called seventeen files dead, and most of `Fronius/Extensions` was on that list purely because the search
 had been for type names. The ones with no member referenced anywhere are `ColorControlModes`,
-`ToshibaHvacPowerSetting`, `ToshibaHvacStatusDevice`, `MDnsService` (the NUnit `MDnsTests` talks to Makaretu
+`ToshibaHvacPowerSetting`, `ToshibaHvacStatusDevice`, `MDnsService` (the system test `MDnsTests` talks to Makaretu
 directly, not to it) and `NotEmptyAttribute`; `Gen24SolarWebSettings` and `ToshibaDateTimeConverter` are reached
 only through `Clone`, `Read` and `Write`, which are too common a name for a search to settle. Nothing was
 deleted, because deleting is a separate decision the developer has not been asked for - and reflection and JSON
@@ -117,10 +116,16 @@ apply to `FroniusMonitor`, which has no `HaColor` of its own.
 
 ## A build failure that is not your code
 
-Since the test projects reference `FroniusMonitor`, a build of one of them occasionally dies with a page of
+Since `HomeAutomationServerTests` references `FroniusMonitor`, a build of it sometimes dies with a page of
 `CS2001: Source file 'FroniusMonitor\obj\Debug\net10.0-windows7.0\...\X.g.cs' could not be found`, blamed on
-`FroniusMonitor.csproj`. **Build again, or delete `FroniusMonitor/obj/Debug`.** It has never survived either.
+`FroniusMonitor.csproj`, or with the same thing one step earlier as
+`BG1002: File '...\X.baml' cannot be found` from the markup compiler. **Delete `FroniusMonitor/obj/Debug`.**
 Nothing is wrong with the source.
+
+Building again is not reliably enough, whatever an earlier version of this paragraph said: on 2026-09-16 it failed
+on three consecutive builds of the same unchanged tree and only the deletion cleared it - after which the very
+same command was green every time. So the state in `obj` is at least part of it, even though what puts it there
+is a race.
 
 WPF compiles XAML that uses a project's own types by building a temporary copy of the project - the random
 `FroniusMonitor_xxxxxxxx_wpftmp.csproj` you see in the build output - into the *same* `obj` directory, and the two
@@ -129,9 +134,8 @@ valid values (Parameter 'length')`, which is a file being read while it is writt
 problem and not a stale artefact.
 
 **What is not established is the cure.** `<BuildInParallel>false</BuildInParallel>` sits in `FroniusMonitor.csproj`
-and in both test projects. It was put there on the strength of fifteen clean cold builds - and the fault then
-turned up anyway, so that evidence did not mean what it looked like. Every repro tried afterwards came back clean
-once the code itself compiled: cold builds, a standalone build followed by a consumer, the two test projects
-alternating, `MSBUILDDISABLENODEREUSE=1`, and a failed build followed by a good one. It has been seen about six
-times in forty builds, always during a burst of builds and never from a quiet tree. Leave the property, do not
-trust it, and do not spend an afternoon on it as happened on 2026-09-16: build again and move on.
+and in `HomeAutomationServerTests.csproj`. It was put there on the strength of fifteen clean cold builds - and the
+fault then turned up anyway, so that evidence did not mean what it looked like. Every repro tried afterwards came
+back clean once the code itself compiled: cold builds, a standalone build followed by a consumer, two test
+projects alternating, `MSBUILDDISABLENODEREUSE=1`, and a failed build followed by a good one. Leave the property,
+do not trust it, and do not spend an afternoon on it as happened on 2026-09-16: delete `obj/Debug` and move on.

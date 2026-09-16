@@ -1,3 +1,4 @@
+using De.Hochstaetter.FroniusMonitor.Models;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using Microsoft.Extensions.Options;
 
@@ -55,4 +56,13 @@ internal static class TestUsers
         .Configure<UserList>(list => list.Users = [.. users])
         .BuildServiceProvider()
         .GetRequiredService<IOptionsMonitor<UserList>>();
+}
+
+/// <summary>
+/// The WPF app's settings, with nowhere to save to. <c>AwattarService</c> asks the injector for a
+/// <see cref="SettingsBase"/> in its constructor, so one has to be there before anything builds it.
+/// </summary>
+internal sealed class TestSettings : SettingsBase
+{
+    public override Task Save() => Task.CompletedTask;
 }

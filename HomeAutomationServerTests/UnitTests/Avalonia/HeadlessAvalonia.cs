@@ -1,16 +1,14 @@
 using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Threading;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Headless;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Themes.Fluent;
+using Avalonia.Threading;
 using De.Hochstaetter.Fronius;
-using De.Hochstaetter.HomeAutomationClient.Services;
 using De.Hochstaetter.HomeAutomationClient.Contracts;
 using De.Hochstaetter.HomeAutomationClient.Services;
 using De.Hochstaetter.HomeAutomationClient.ViewModels;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests;
 
