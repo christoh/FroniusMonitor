@@ -52,12 +52,23 @@ public sealed class SomethingTests
   output at all. The same section must also never read a static of that class from the new thread while the
   initializer is running, or the two deadlock; everything the thread uses is a local.
 
-## The project is Windows only
+## The project runs everywhere, and these tests run in the cloud
 
-`HomeAutomationServerTests` targets `net10.0-windows7.0` and references `FroniusMonitor`, because
-`RegexRuleAttribute` moved into the WPF app when `Fronius` was cleared of what only the WPF app uses - see
-[[Fronius.SharedLibraryBoundary]]. Nothing else here needs Windows, so the day that one attribute comes back to
-`Fronius/Validators` the reference and the target framework can go with it.
+`HomeAutomationServerTests` targets plain `net10.0` and references no WPF, so the whole suite - these headless
+Avalonia tests included - runs on Linux and in Claude Code on the web. They do: 559 passing in about nine
+seconds there on 2026-09-16, with no display and nothing installed beyond the SDK.
+
+It was not so until that day. The project targeted `net10.0-windows7.0` and referenced `FroniusMonitor`, so
+`dotnet test` in the cloud ended in `No frameworks were found` and `Zero tests ran` - and that reads exactly like
+a project whose tests cannot be discovered, which is the trap `CLAUDE.md` warns about for a different cause.
+`Microsoft.WindowsDesktop.App` exists for Windows only; no package and no egress rule can change it. What fixed
+it was moving `SettingsBase` and `RegexRuleAttribute` back to `Fronius` and putting the two system tests that
+drive the WPF app's own services into `FroniusMonitorTests` - see [[Fronius.SharedLibraryBoundary]].
+
+**`FroniusMonitorTests` is the Windows-only one**, and it refuses to build off Windows with error `FMT001`
+rather than failing obscurely later. `-p:VerifyOnLinux=true` compiles it anyway, without running anything, which
+is worth doing from the cloud after moving a type out of `Fronius`: that check caught a missing `global using`
+the day the project was written.
 
 That reference brings a build trap of its own: **`<BuildInParallel>false</BuildInParallel>`**, here *and* in
 `FroniusMonitor.csproj`. Neither on its own is enough, and this is the project it bites, because it builds the

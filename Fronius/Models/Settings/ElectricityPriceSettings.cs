@@ -1,4 +1,4 @@
-namespace De.Hochstaetter.FroniusMonitor.Models;
+namespace De.Hochstaetter.Fronius.Models.Settings;
 
 public partial class ElectricityPriceSettings : BindableBase
 {

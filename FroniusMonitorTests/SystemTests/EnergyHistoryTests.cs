@@ -1,11 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
 using De.Hochstaetter.Fronius;
+using De.Hochstaetter.Fronius.Contracts;
+using De.Hochstaetter.Fronius.Models.Settings;
 using De.Hochstaetter.Fronius.Services;
-using De.Hochstaetter.FroniusMonitor.Models;
 using De.Hochstaetter.FroniusMonitor.Services;
 using De.Hochstaetter.HomeAutomationServerTests.UnitTests.Fakes;
 
-namespace De.Hochstaetter.HomeAutomationServerTests.SystemTests;
+namespace De.Hochstaetter.FroniusMonitorTests.SystemTests;
 
 /// <summary>
 /// Reads a real smart meter calibration history back off the developer's machine. The two file names below are

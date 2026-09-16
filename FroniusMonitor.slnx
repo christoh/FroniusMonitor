@@ -54,5 +54,6 @@
   </Project>
   <Project Path="HomeAutomationClient/HomeAutomationClient/HomeAutomationClient.csproj" />
   <Project Path="HomeAutomationServer/HomeAutomationServer.csproj" />
+  <Project Path="FroniusMonitorTests/FroniusMonitorTests.csproj" />
   <Project Path="HomeAutomationServerTests/HomeAutomationServerTests.csproj" />
 </Solution>

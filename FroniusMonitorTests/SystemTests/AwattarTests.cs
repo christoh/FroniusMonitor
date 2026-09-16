@@ -1,7 +1,7 @@
 using De.Hochstaetter.Fronius.Models.Charging;
 using De.Hochstaetter.FroniusMonitor.Services;
 
-namespace De.Hochstaetter.HomeAutomationServerTests.SystemTests;
+namespace De.Hochstaetter.FroniusMonitorTests.SystemTests;
 
 /// <summary>
 /// Awattar's live price feed, asked the way the WPF app asks it.

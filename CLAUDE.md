@@ -77,6 +77,10 @@ text to English.
 * In unit test entry points do not use `.ConfigureAwait(false)`. This could violate the test framework rules for not executing certain tests in parallel. `.ConfigureAwait(false)` is allowed and encouraged elsewhere in unit tests regardless, whether a method is public, private or internal. Besided from unit tests, `.ConfigureAwait(false)` is always allowed and encouraged where appropriate.
 * .First(), FirstAsync(), etc. in IEnumerable and IQueryable as a replacement for .Single(), SingleAsync() etc. can speed up things and you are encouraged do to so if appropriate. In unit tests, we always use "Single" when we mean it because it can detect problems.
 * There are unit tests projects using NUnit. These are legacy. We use xUnit for new unit tests. If you find a unit test project using NUnit, please create a new xUnit project and port the tests to xUnit. If you are unsure how to do this, please ask me before editing. Setup logging in any new unit test project. So that the logging abstractions used in the code, log to the test output. `FroniusUnitTests`, the last NUnit project, was ported into `HomeAutomationServerTests` and deleted on 2026-09-16, so there is none left at the moment.
+* There are two test projects. `HomeAutomationServerTests` targets `net10.0`, needs no WPF and runs everywhere,
+including Claude Code on the web. `FroniusMonitorTests` targets `net10.0-windows7.0` and holds the system tests
+that drive the WPF app's own services; it builds and runs on Windows only and refuses elsewhere with `FMT001`.
+**In the cloud, build and run `HomeAutomationServerTests` only.**
 * When performing unit tests, only do it for tests in the UnitTests subdirectory. All other tests require a specific communication environment setup and are likely to fail. This is normal. The tests in `SystemTests` are the ones that need it, and they carry `[SystemFact]` rather than `[Fact]`, which makes them explicit: a plain run leaves them alone, so the rule is enforced rather than remembered.
 * If useful, you may add InternalsVisibleTo so that a test project may see internals from any other .csproj
 
@@ -105,6 +109,13 @@ text to English.
   drive the test executable directly
   (`HomeAutomationServerTests/bin/Debug/net10.0-windows7.0/HomeAutomationServerTests.exe --list-tests`) before
   believing it: that way it prints its own options, its discovery and the real count.
+* The WPF system tests, on Windows:
+  ```
+  dotnet test --project FroniusMonitorTests/FroniusMonitorTests.csproj -c Debug -- --explicit only
+  ```
+  Off Windows this stops at `FMT001`: WPF cannot run there, because `Microsoft.WindowsDesktop.App` is built for
+  Windows only and there is nothing to install that changes it. To compile-check that project from the cloud
+  without running it, add `-p:VerifyOnLinux=true` to a `dotnet build`.
 * A bare `dotnet test` at the repository root builds the whole solution, including the Android, Browser and iOS heads.
   That needs their SDK workloads, which Claude Code on the web does not have. Use `--project` there.
 
