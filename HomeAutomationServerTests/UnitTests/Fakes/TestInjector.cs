@@ -1,8 +1,9 @@
 using System.Runtime.CompilerServices;
 using De.Hochstaetter.Fronius;
 using De.Hochstaetter.Fronius.Contracts;
-using De.Hochstaetter.HomeAutomationClient.Contracts;
 using De.Hochstaetter.Fronius.Services;
+using De.Hochstaetter.FroniusMonitor.Models;
+using De.Hochstaetter.HomeAutomationClient.Contracts;
 using De.Hochstaetter.HomeAutomationClient.Services;
 
 namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests.Fakes;
@@ -29,20 +30,26 @@ namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests.Fakes;
 internal static class TestInjector
 {
     [ModuleInitializer]
-    internal static void Initialize() => IoC.Update
-    (
-        new ServiceCollection()
-            .AddLogging()
-            .AddSingleton<IGen24JsonService, Gen24JsonService>()
-            .AddSingleton<IAesKeyProvider, TestAesKeyProvider>()
-            // Gen24DataCollector asks the injector for one of these per inverter it polls.
-            .AddTransient<IGen24Service, Gen24Service>()
-            // A settings tab of the client holds one of these to write with. Nothing here writes, but the field
-            // is initialized when the tab is built, so it has to resolve.
-            .AddSingleton<IWebClientService, WebClientService>()
-            // The inverter settings tab asks this for the inverter's own words. With nothing loaded it answers
-            // with the key it was given, which is what a test without an inverter wants anyway.
-            .AddSingleton<IGen24LocalizationService, Gen24LocalizationService>()
-            .BuildServiceProvider()
-    );
+    internal static void Initialize() => IoC.Update(CreateServices().BuildServiceProvider());
+
+    /// <summary>
+    /// The registrations every test in the assembly runs with. A system test that needs more than these adds to
+    /// what comes back from here instead of starting from an empty collection, so that everything the other
+    /// classes resolve is still there afterwards.
+    /// </summary>
+    internal static IServiceCollection CreateServices() => new ServiceCollection()
+        .AddLogging()
+        .AddSingleton<IGen24JsonService, Gen24JsonService>()
+        .AddSingleton<IAesKeyProvider, TestAesKeyProvider>()
+        // Gen24DataCollector asks the injector for one of these per inverter it polls.
+        .AddTransient<IGen24Service, Gen24Service>()
+        // A settings tab of the client holds one of these to write with. Nothing here writes, but the field
+        // is initialized when the tab is built, so it has to resolve.
+        .AddSingleton<IWebClientService, WebClientService>()
+        // The inverter settings tab asks this for the inverter's own words. With nothing loaded it answers
+        // with the key it was given, which is what a test without an inverter wants anyway.
+        .AddSingleton<IGen24LocalizationService, Gen24LocalizationService>()
+        // AwattarService resolves this in its own constructor, so the system test that builds one cannot put it
+        // in place itself. Nothing else in the solution asks the injector for the WPF app's settings.
+        .AddSingleton<SettingsBase, TestSettings>();
 }

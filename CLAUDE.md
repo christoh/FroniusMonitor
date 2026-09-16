@@ -76,8 +76,8 @@ text to English.
 # Unit tests
 * In unit test entry points do not use `.ConfigureAwait(false)`. This could violate the test framework rules for not executing certain tests in parallel. `.ConfigureAwait(false)` is allowed and encouraged elsewhere in unit tests regardless, whether a method is public, private or internal. Besided from unit tests, `.ConfigureAwait(false)` is always allowed and encouraged where appropriate.
 * .First(), FirstAsync(), etc. in IEnumerable and IQueryable as a replacement for .Single(), SingleAsync() etc. can speed up things and you are encouraged do to so if appropriate. In unit tests, we always use "Single" when we mean it because it can detect problems.
-* There are unit tests projects using NUnit. These are legacy. We use xUnit for new unit tests. If you find a unit test project using NUnit, please create a new xUnit project and port the tests to xUnit. If you are unsure how to do this, please ask me before editing. Setup logging in any new unit test project. So that the logging abstractions used in the code, log to the test output.
-* When performing unit tests, only do it for tests in the UnitTests subdirectory. All other tests require a specific communication environment setup and are likely to fail. This is normal.
+* There are unit tests projects using NUnit. These are legacy. We use xUnit for new unit tests. If you find a unit test project using NUnit, please create a new xUnit project and port the tests to xUnit. If you are unsure how to do this, please ask me before editing. Setup logging in any new unit test project. So that the logging abstractions used in the code, log to the test output. `FroniusUnitTests`, the last NUnit project, was ported into `HomeAutomationServerTests` and deleted on 2026-09-16, so there is none left at the moment.
+* When performing unit tests, only do it for tests in the UnitTests subdirectory. All other tests require a specific communication environment setup and are likely to fail. This is normal. The tests in `SystemTests` are the ones that need it, and they carry `[SystemFact]` rather than `[Fact]`, which makes them explicit: a plain run leaves them alone, so the rule is enforced rather than remembered.
 * If useful, you may add InternalsVisibleTo so that a test project may see internals from any other .csproj
 
 ## Running the tests
@@ -92,8 +92,19 @@ text to English.
   dotnet test --project HomeAutomationServerTests/HomeAutomationServerTests.csproj -c Debug -- --filter-class "*Gen24SelfConsumptionViewModelTests"
   dotnet test --project HomeAutomationServerTests/HomeAutomationServerTests.csproj -c Debug -- --filter-method "*Gen24SelfConsumptionViewModelTests.A_battery_charged_from_the_grid_is_charged_from_the_house_as_well"
   ```
-* The legacy NUnit project runs the same way (`--project FroniusUnitTests/FroniusUnitTests.csproj`); most of its
-  tests need the device network and fail without it, which is normal.
+* The `SystemTests` folder, which a plain run skips because those tests are explicit:
+  ```
+  dotnet test --project HomeAutomationServerTests/HomeAutomationServerTests.csproj -c Debug -- --explicit only
+  ```
+  `--explicit on` runs them alongside everything else. They want the inverter and the smart meter on the LAN,
+  Awattar, the deployed server and multicast DNS, and they fail without them - that is the environment, not the
+  code, and it is normal.
+* **An option the runner does not know is never reported as unknown.** The run ends in `Zero tests ran` with
+  exit code 5, which reads exactly like a project whose tests cannot be found - and on 2026-09-16 that was
+  believed, and `FroniusUnitTests` was wrongly called empty on the strength of it. When a run reports zero tests,
+  drive the test executable directly
+  (`HomeAutomationServerTests/bin/Debug/net10.0-windows7.0/HomeAutomationServerTests.exe --list-tests`) before
+  believing it: that way it prints its own options, its discovery and the real count.
 * A bare `dotnet test` at the repository root builds the whole solution, including the Android, Browser and iOS heads.
   That needs their SDK workloads, which Claude Code on the web does not have. Use `--project` there.
 

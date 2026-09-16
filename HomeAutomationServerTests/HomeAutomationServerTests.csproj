@@ -29,6 +29,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<!-- MDnsTests asks the LAN what Fronius and FritzBox devices announce over multicast DNS. -->
+		<PackageReference Include="Makaretu.Dns.Multicast.New" Version="0.38.0" />
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.12" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.0" />
 		<!-- The oracle of JsonExtensionsTests: the same JSON goes through Newtonsoft and System.Text.Json and the
