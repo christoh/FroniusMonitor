@@ -4,8 +4,8 @@ namespace De.Hochstaetter.HomeAutomationClient.Contracts;
 
 /// <summary>
 /// Sends a command to one or more Toshiba air conditioners through the server. Split off <see cref="IUpdateService"/>
-/// so that <see cref="ToshibaHvacViewModel"/> depends on this alone and a test can stand in for it - the update
-/// service's interface has an internal member and cannot be implemented outside the client.
+/// so that <see cref="ToshibaHvacViewModel"/> depends on this alone and a test can stand in for it with a couple of
+/// lines rather than with the whole update service.
 /// </summary>
 public interface IToshibaHvacCommander
 {

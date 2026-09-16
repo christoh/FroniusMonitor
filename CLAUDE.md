@@ -78,6 +78,7 @@ text to English.
 * .First(), FirstAsync(), etc. in IEnumerable and IQueryable as a replacement for .Single(), SingleAsync() etc. can speed up things and you are encouraged do to so if appropriate. In unit tests, we always use "Single" when we mean it because it can detect problems.
 * There are unit tests projects using NUnit. These are legacy. We use xUnit for new unit tests. If you find a unit test project using NUnit, please create a new xUnit project and port the tests to xUnit. If you are unsure how to do this, please ask me before editing. Setup logging in any new unit test project. So that the logging abstractions used in the code, log to the test output.
 * When performing unit tests, only do it for tests in the UnitTests subdirectory. All other tests require a specific communication environment setup and are likely to fail. This is normal.
+* If useful, you may add InternalsVisibleTo so that a test project may see internals from any other .csproj
 
 ## Running the tests
 * `dotnet test` runs on the Microsoft Testing Platform; `global.json` selects that runner. The old VSTest syntax

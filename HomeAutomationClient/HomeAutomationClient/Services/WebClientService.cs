@@ -1,0 +1,368 @@
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using De.Hochstaetter.Fronius.Models;
+using De.Hochstaetter.Fronius.Models.Charging;
+using De.Hochstaetter.Fronius.Models.Gen24.Commands;
+using De.Hochstaetter.Fronius.Models.HomeAutomationClient;
+using De.Hochstaetter.Fronius.Models.ToshibaAc;
+using De.Hochstaetter.Fronius.Models.WebApi;
+
+namespace De.Hochstaetter.HomeAutomationClient.Services;
+
+public sealed class WebClientService : IWebClientService
+{
+    private static readonly JsonSerializerOptions jsonOptions = new()
+    {
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        IgnoreReadOnlyProperties = true,
+        IgnoreReadOnlyFields = true,
+        IncludeFields = false,
+    };
+
+    private HttpClient httpClient = NewHttpClient();
+
+    private static HttpClient NewHttpClient() => new() { Timeout = TimeSpan.FromSeconds(7) };
+
+    /// <summary>
+    /// Points the client at <paramref name="baseUri"/>. May be called again when the user changes the connection.
+    /// </summary>
+    /// <remarks>
+    /// An <see cref="HttpClient"/> refuses a new <see cref="HttpClient.BaseAddress"/> once it has sent its first
+    /// request, so a second call gets a new one. Dropping the old one drops its authorization header with it,
+    /// which is what we want: credentials for the previous server are worth nothing to the new one.
+    /// </remarks>
+    public void Initialize(string baseUri, string productName, string version)
+    {
+        var address = new Uri(baseUri);
+
+        if (httpClient.BaseAddress != null)
+        {
+            httpClient.Dispose();
+            httpClient = NewHttpClient();
+        }
+
+        httpClient.BaseAddress = address;
+        httpClient.DefaultRequestHeaders.UserAgent.Clear();
+        httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(productName, version));
+    }
+
+    #region Identity
+
+    public async Task<ApiResult<byte[]>> GetKeyForUserName(string userName, CancellationToken token = default)
+    {
+        // Not SendResult: the endpoint answers with the key as text/plain, not as JSON.
+        return await ReadResult(t => httpClient.GetAsync($"Identity/requestKey?user={Uri.EscapeDataString(userName)}", t),
+            async (content, t) => Convert.FromBase64String(await content.ReadAsStringAsync(t).ConfigureAwait(false)), token).ConfigureAwait(false);
+    }
+
+    public Task<ApiResult<UserInfo>> Login(string userName, string password, CancellationToken token = default)
+    {
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{userName}:{password}")));
+        return GetResult<UserInfo>($"Identity/login?user={userName}&password={password}", token);
+    }
+
+    public async Task<string?> GetHubTicket(CancellationToken token = default)
+    {
+        using var response = await httpClient.GetAsync("Identity/hubTicket", token).ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadAsStringAsync(token).ConfigureAwait(false);
+    }
+
+    public async Task<ApiResult<bool>> Logout(CancellationToken token = default)
+    {
+        var result = await GetResult<bool>("Identity/logout", token).ConfigureAwait(false);
+        // Dropped regardless of what the server answered: a server that could not be reached is not a reason to
+        // go on sending a password that the caller has just decided to forget.
+        httpClient.DefaultRequestHeaders.Authorization = null;
+        return result;
+    }
+
+    public Task<ApiResult<List<UserInfo>>> GetUsers(CancellationToken token = default)
+    {
+        return GetResult<List<UserInfo>>("Identity/users", token);
+    }
+
+    public Task<ApiResult<UserInfo>> AddUser(UserAccount account, CancellationToken token = default)
+    {
+        return PostResult<UserInfo, UserAccount>("Identity/users", account, token);
+    }
+
+    public Task<ApiResult<UserInfo>> UpdateUser(string userName, UserAccount account, CancellationToken token = default)
+    {
+        return PutResult<UserInfo, UserAccount>($"Identity/users/{Uri.EscapeDataString(userName)}", account, token);
+    }
+
+    public Task<ApiResult<bool>> DeleteUser(string userName, CancellationToken token = default)
+    {
+        return DeleteResult<bool>($"Identity/users/{Uri.EscapeDataString(userName)}", token);
+    }
+
+    public Task<ApiResult<bool>> ChangePassword(ChangePasswordRequest request, CancellationToken token = default)
+    {
+        return PutResult<bool, ChangePasswordRequest>("Identity/password", request, token);
+    }
+
+    #endregion
+
+    #region Devices
+
+    public Task<ApiResult<IDictionary<string, DeviceInfo>>> ListDevices(CancellationToken token = default)
+    {
+        return GetResult<IDictionary<string, DeviceInfo>>("Devices", token);
+    }
+
+    public Task<ApiResult<bool>> SwitchDevice(string deviceId, bool turnOn, CancellationToken token = default)
+    {
+        return GetResult<bool>($"Devices/{deviceId}/switch/{(turnOn ? "on" : "off")}", token);
+    }
+
+    public Task<ApiResult<bool>> SetDeviceBrightness(string deviceId, double amount, CancellationToken token = default)
+    {
+        return GetResult<bool>($"Devices/{deviceId}/setBrightness?amount={amount.ToString(CultureInfo.InvariantCulture)}", token);
+    }
+
+    public Task<ApiResult<bool>> SetColorTemperature(string deviceId, double temperatureKelvin, CancellationToken token = default)
+    {
+        return GetResult<bool>($"Devices/{deviceId}/setColorTemperature?temperatureKelvin={temperatureKelvin.ToString(CultureInfo.InvariantCulture)}", token);
+    }
+
+    public Task<ApiResult<bool>> SetHsv(string deviceId, double? hueDegrees = null, double? saturation = null, double? value = null, CancellationToken token = default)
+    {
+        var builder = new StringBuilder($"Devices/{deviceId}/setHsv?");
+
+        if (hueDegrees.HasValue)
+        {
+            builder.Append($"hueDegrees={hueDegrees.Value.ToString(CultureInfo.InvariantCulture)}&");
+        }
+
+        if (saturation.HasValue)
+        {
+            builder.Append($"saturation={saturation.Value.ToString(CultureInfo.InvariantCulture)}&");
+        }
+
+        if (value.HasValue)
+        {
+            builder.Append($"value={value.Value.ToString(CultureInfo.InvariantCulture)}&");
+        }
+
+        builder.Remove(builder.Length - 1, 1);
+
+        var query = builder.ToString();
+
+        return GetResult<bool>(query, token);
+    }
+
+    #endregion
+
+    #region WattPilot
+    public async Task<ApiResult<Dictionary<string, WattPilot>>> GetWattPilots(CancellationToken token = default)
+    {
+        var result = await GetResult<Dictionary<string, WattPilot>>("WattPilot", token);
+        return result;
+    }
+
+    #endregion
+
+    #region ToshibaHvac
+
+    public Task<ApiResult<Dictionary<string, ToshibaHvacMappingDevice>>> GetToshibaHvacDevices(CancellationToken token = default) =>
+        GetResult<Dictionary<string, ToshibaHvacMappingDevice>>("ToshibaHvac", token);
+
+    #endregion
+
+    #region EnergyData
+
+    public Task<ApiResult<EnergyChartData>> GetEnergyData(CancellationToken token = default) => GetResult<EnergyChartData>("EnergyData", token);
+
+    public Task<ApiResult<EnergyChartData>> GetEnergyData(DateOnly day, CancellationToken token = default) =>
+        GetResult<EnergyChartData>(FormattableString.Invariant($"EnergyData/{day:yyyy-MM-dd}"), token);
+
+    #endregion
+
+    #region Gen24
+
+    public async Task<ApiResult<Dictionary<string, Gen24System>>> GetGen24Devices(CancellationToken token = default)
+    {
+        var result = await GetResult<Dictionary<string, Gen24System>>("Gen24System", token);
+
+        if (result is { Status: HttpStatusCode.OK, Payload: not null })
+        {
+            result.Payload.Values.Apply(inverter =>
+            {
+                if (inverter.Sensors is null)
+                {
+                    return;
+                }
+
+                inverter.Sensors.GeneratePowerFlow();
+            });
+        }
+
+        return result;
+    }
+
+    public Task<ApiResult<JsonElement>> GetGen24Localization(string deviceId, string iso2LanguageCode, string name, CancellationToken token = default)
+    {
+        return GetResult<JsonElement>(FormattableString.Invariant($"gen24system/{deviceId}/i18n/{iso2LanguageCode}/{name}"), token);
+    }
+
+    public Task<ApiResult<bool>> RequestGen24StandBy(string deviceId, bool isStandBy, CancellationToken token = default)
+    {
+        return GetResult<bool>(FormattableString.Invariant($"gen24system/{deviceId}/requestStandBy?isStandBy={isStandBy}"), token);
+    }
+
+    public Task<ApiResult<Gen24StandByStatus>> GetGen24StandbyStatus(string deviceId, CancellationToken token = default)
+    {
+        return GetResult<Gen24StandByStatus>(FormattableString.Invariant($"gen24system/{deviceId}/GetStandbyStatus"), token);
+    }
+
+    public Task<ApiResult<Gen24SettingsSnapshot>> GetGen24Settings(string deviceId, CancellationToken token = default)
+    {
+        return GetResult<Gen24SettingsSnapshot>(FormattableString.Invariant($"gen24system/{deviceId}/settings"), token);
+    }
+
+    public Task<ApiResult<List<Gen24Event>>> GetGen24Events(string deviceId, CancellationToken token = default)
+    {
+        return GetResult<List<Gen24Event>>(FormattableString.Invariant($"gen24system/{deviceId}/events"), token);
+    }
+
+    public Task<ApiResult<bool>> SetGen24ModbusSettings(string deviceId, Gen24ModbusSettings settings, CancellationToken token = default)
+    {
+        return PutResult<bool, Gen24ModbusSettings>(FormattableString.Invariant($"gen24system/{deviceId}/settings/modbus"), settings, token);
+    }
+
+    public Task<ApiResult<bool>> SetGen24BatterySettings(string deviceId, Gen24BatterySettings settings, CancellationToken token = default)
+    {
+        return PutResult<bool, Gen24BatterySettings>(FormattableString.Invariant($"gen24system/{deviceId}/settings/batteries"), settings, token);
+    }
+
+    public Task<ApiResult<bool>> SetGen24TimeOfUse(string deviceId, IEnumerable<Gen24ChargingRule> rules, CancellationToken token = default)
+    {
+        return PutResult<bool, List<Gen24ChargingRule>>(FormattableString.Invariant($"gen24system/{deviceId}/settings/timeOfUse"), [.. rules], token);
+    }
+
+    public Task<ApiResult<bool>> SetGen24CommonSettings(string deviceId, Gen24InverterSettings settings, CancellationToken token = default)
+    {
+        return PutResult<bool, Gen24InverterSettings>(FormattableString.Invariant($"gen24system/{deviceId}/settings/common"), settings, token);
+    }
+
+    public Task<ApiResult<bool>> SetGen24MpptSettings(string deviceId, Gen24Mppt mppt, CancellationToken token = default)
+    {
+        return PutResult<bool, Gen24Mppt>(FormattableString.Invariant($"gen24system/{deviceId}/settings/mppt"), mppt, token);
+    }
+
+    public Task<ApiResult<bool>> SetGen24PowerLimits(string deviceId, Gen24PowerLimitSettings powerLimits, CancellationToken token = default)
+    {
+        return PutResult<bool, Gen24PowerLimitSettings>(FormattableString.Invariant($"gen24system/{deviceId}/settings/powerLimits"), powerLimits, token);
+    }
+
+    #endregion
+
+    #region Fritzbox
+
+    public Task<ApiResult<IDictionary<string, FritzBoxDevice>>> GetFritzBoxDevices(CancellationToken token = default)
+    {
+        return GetResult<IDictionary<string, FritzBoxDevice>>("FritzBoxDevice", token);
+    }
+
+    #endregion
+
+    private Task<ApiResult<T>> GetResult<T>(string queryString, CancellationToken token = default)
+    {
+        return SendResult<T>(t => httpClient.GetAsync(queryString, t), token);
+    }
+
+    /// <summary>
+    /// The counterpart of <see cref="GetResult{T}"/> for the endpoints that change something. The body goes out as
+    /// JSON with the same options the rest of the API uses, so the server sees the very shape these models have.
+    /// </summary>
+    private Task<ApiResult<TResult>> PutResult<TResult, TBody>(string queryString, TBody body, CancellationToken token = default)
+    {
+        return SendResult<TResult>(t => httpClient.PutAsJsonAsync(queryString, body, jsonOptions, t), token);
+    }
+
+    /// <inheritdoc cref="PutResult{TResult,TBody}"/>
+    private Task<ApiResult<TResult>> PostResult<TResult, TBody>(string queryString, TBody body, CancellationToken token = default)
+    {
+        return SendResult<TResult>(t => httpClient.PostAsJsonAsync(queryString, body, jsonOptions, t), token);
+    }
+
+    private Task<ApiResult<T>> DeleteResult<T>(string queryString, CancellationToken token = default)
+    {
+        return SendResult<T>(t => httpClient.DeleteAsync(queryString, t), token);
+    }
+
+    private Task<ApiResult<T>> SendResult<T>(Func<CancellationToken, Task<HttpResponseMessage>> send, CancellationToken token)
+    {
+        return ReadResult(send, (content, t) => content.ReadFromJsonAsync<T>(jsonOptions, t), token);
+    }
+
+    /// <summary>
+    /// Sends a request and turns everything that can come back into an <see cref="ApiResult{T}"/>: the payload
+    /// where the server answered 200, the server's own <c>ProblemDetails</c> where it answered anything else, and
+    /// one built from the exception where nothing answered at all - a wrong address, no network, a server that is
+    /// not running. Nothing here throws, so a caller never has to turn a socket error into words of its own.
+    /// </summary>
+    /// <param name="readPayload">
+    /// How to read a successful body. Most endpoints answer with JSON, but not all of them do.
+    /// </param>
+    private async Task<ApiResult<T>> ReadResult<T>(Func<CancellationToken, Task<HttpResponseMessage>> send, Func<HttpContent, CancellationToken, Task<T?>> readPayload, CancellationToken token)
+    {
+        HttpResponseMessage? responseMessage = null;
+
+        try
+        {
+            responseMessage = await send(token).ConfigureAwait(false);
+
+            return responseMessage.StatusCode != HttpStatusCode.OK
+                ? ApiResult<T>.FromProblemDetails(await GetErrors(responseMessage, token).ConfigureAwait(false), responseMessage.StatusCode)
+                : new ApiResult<T>
+                {
+                    Payload = await readPayload(responseMessage.Content, token).ConfigureAwait(false),
+                    Status = responseMessage.StatusCode,
+                };
+        }
+        catch (Exception ex)
+        {
+            return ApiResult<T>.FromProblemDetails(new ProblemDetails
+            {
+                Title = ex.GetType().Name,
+                Detail = ex.Message,
+                Status = responseMessage?.StatusCode,
+                Errors = new Dictionary<string, List<string>> { { "Errors", [ex.Message] } },
+            }, responseMessage?.StatusCode, ex);
+        }
+        finally
+        {
+            responseMessage?.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// The <c>ProblemDetails</c> of a refused request, or <see langword="null"/> where the body held none. Not
+    /// every error comes from our server: a reverse proxy or a wrong address answers with an HTML page, and that
+    /// must not turn into a <c>JsonException</c> in front of the user.
+    /// </summary>
+    private static async ValueTask<ProblemDetails?> GetErrors(HttpResponseMessage message, CancellationToken token)
+    {
+        try
+        {
+            return await message.Content.ReadFromJsonAsync<ProblemDetails?>(jsonOptions, token).ConfigureAwait(false);
+        }
+        catch (Exception ex) when (ex is JsonException or NotSupportedException)
+        {
+            return null;
+        }
+    }
+
+    public void Dispose()
+    {
+        httpClient.Dispose();
+    }
+}

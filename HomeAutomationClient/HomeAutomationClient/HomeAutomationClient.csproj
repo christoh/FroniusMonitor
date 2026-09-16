@@ -43,6 +43,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<!-- IUpdateService declares an internal member, so only an assembly that sees the internals can write a
+		     fake of it, and the presenters and controls are tested with real windows. CLAUDE.md allows this for a
+		     test project. -->
+		<InternalsVisibleTo Include="HomeAutomationServerTests" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <Compile Update="Views\DashboardView.axaml.cs">
 	    <DependentUpon>DashboardView.axaml</DependentUpon>
 	  </Compile>

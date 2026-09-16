@@ -47,7 +47,7 @@ answer travels.
 
 **The rule for step 1: no Avalonia types.** Nothing is initialized yet, and on Android and iOS this code runs
 while the platform is still building the activity. That is why a color arrives as
-`De.Hochstaetter.Fronius.Models.HaColor` and not as an Avalonia `Color`.
+`De.Hochstaetter.HomeAutomationClient.Models.HaColor` and not as an Avalonia `Color`.
 
 **Not in this document: the address of a view.** Which view the app shows, how it is written into the address bar
 of the browser, and what the other heads do instead, is `Navigation.Lifecycle.md`. Only two things here belong to

@@ -1,13 +1,18 @@
 ---
 paths:
   - Fronius/Models/EnergyData/**
-  - Fronius/Models/Settings/EnergyDataSettings.cs
-  - Fronius/Models/Settings/EnergyDataCollectorParameters.cs
-  - Fronius/Contracts/EnergyData/**
-  - Fronius/Services/EnergyData/**
-  - Fronius/Services/DataCollectors/EnergyDataCollector.cs
-  - Fronius/Contracts/HomeAutomationClient/IWebClientService.cs
-  - Fronius/Services/HomeAutomationClient/WebClientService.cs
+  - HomeAutomationServer/Models/Settings/EnergyDataSettings.cs
+  - HomeAutomationServer/Models/Settings/EnergyDataCollectorParameters.cs
+  - HomeAutomationServer/Contracts/IAwattarClient.cs
+  - HomeAutomationServer/Contracts/IDwdWeatherClient.cs
+  - HomeAutomationServer/Contracts/IEnergyDataService.cs
+  - HomeAutomationServer/Contracts/IEnergyHistoryStore.cs
+  - HomeAutomationServer/Models/EnergyData/DwdForecast.cs
+  - Fronius/Models/AwattarEnergyList.cs
+  - HomeAutomationServer/Services/EnergyData/**
+  - HomeAutomationServer/Services/DataCollectors/EnergyDataCollector.cs
+  - HomeAutomationClient/HomeAutomationClient/Contracts/IWebClientService.cs
+  - HomeAutomationClient/HomeAutomationClient/Services/WebClientService.cs
   - HomeAutomationServer/Services/EnergyHistoryStore.cs
   - HomeAutomationServer/Controllers/EnergyDataController.cs
   - HomeAutomationServer/Models/Settings/Settings.cs
@@ -36,7 +41,7 @@ paths:
 # Energy prices, productions and weather (the price chart)
 
 The port of FroniusMonitor's `PriceView` to the client-server architecture. The WPF app asks Awattar itself from
-`AwattarService` / `WattPilotElectricityService`; **the new code uses neither** - the server collects, keeps a
+`AwattarService` (in `FroniusMonitor/Services` since 2026-09-15) / `WattPilotElectricityService`; **the new code uses neither** - the server collects, keeps a
 history and pushes, the client only draws. The WPF app is untouched and still uses the old services.
 
 ## Sources, and which one wins
@@ -206,4 +211,17 @@ stop), `EnergyChartModelTests` (bars, axes, weather, and the JSON round trip wit
 - `WeatherStationName` is known only after the first DWD poll of a process; the store does not keep it.
 - Historic days show the weather only where the server was running that day.
 - No Android/iOS/browser run of the chart yet; ScottPlot's Skia rendering in WebAssembly is unverified.
-- The WPF app still has its own `AwattarService`; the two implementations share only the JSON models.
+- The WPF app still has its own `AwattarService`, now in `FroniusMonitor/Services`; the two implementations
+  share only the JSON models, which stayed in `Fronius`.
+
+## Who owns the Awattar code
+
+`IAwattarClient` and `AwattarClient` are `HomeAutomationServer`'s since 2026-09-16; nothing outside the server
+asks Awattar through them. What the WPF app needed from `AwattarClient` was one conversion, and that is
+`AwattarEnergyList.ToProductions()` now, in `Fronius/Models` beside `GridProductionPoint` - both heads that talk
+to Awattar themselves need it, and it has nothing to do with HTTP. `AwattarClient.JsonOptions` went to the server
+with the client; only `AwattarProductionsTests` reads it, and that project references the server.
+
+`EnergyDataSettings` followed, because `IAwattarClient` was the last thing outside the server that named it. It
+is the server's `Settings.xml` and nothing else. Moving it changes no XML: the element names come from the
+property and type names, not from the CLR namespace.

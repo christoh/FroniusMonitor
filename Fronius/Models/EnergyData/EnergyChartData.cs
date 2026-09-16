@@ -7,7 +7,7 @@ namespace De.Hochstaetter.Fronius.Models.EnergyData;
 /// <remarks>
 ///     <para>
 ///         It is an <see cref="IHaveUniqueId" /> although it is no device, on purpose: the server publishes the
-///         current span - today and tomorrow - to <see cref="IDataControlService" /> under <see cref="DeviceId" />,
+///         current span - today and tomorrow - to <c>IDataControlService</c> under <see cref="DeviceId" />,
 ///         and everything that already exists for a device then happens for it too. <c>SignalRDispatcher</c>
 ///         broadcasts it as an <c>EnergyChartData</c> hub message on every change, <c>HomeAutomationHub.OnConnectedAsync</c>
 ///         replays it to a client that connects, and the controller serves it over HTTP.
@@ -18,7 +18,7 @@ namespace De.Hochstaetter.Fronius.Models.EnergyData;
 /// </remarks>
 public sealed class EnergyChartData : IHaveUniqueId
 {
-    /// <summary>The id the current span is published under in <see cref="IDataControlService" />.</summary>
+    /// <summary>The id the current span is published under in <c>IDataControlService</c>.</summary>
     public const string DeviceId = "EnergyChartData";
 
     /// <summary>Start of the span, UTC.</summary>

@@ -99,7 +99,8 @@ the gauges would overlap their neighbours and the bottom of the group would be u
 
 ## Verified, so you do not have to measure again
 
-A headless probe drives real windows with `MouseWheel` and `KeyPress`:
+`ZoomBoxTests` and `ZoomPinchTests` drive real windows with `MouseWheel` and `KeyPress` on the headless
+platform - see [[Testing.HeadlessAvalonia]]:
 
 - Ctrl and the wheel with the pointer **over another control entirely** zoom the box, and the wheel without Ctrl
   does not.
@@ -113,13 +114,14 @@ A headless probe drives real windows with `MouseWheel` and `KeyPress`:
 - Two boxes in one scope stay in step.
 - A scope with no box still scrolls.
 
-The pinch checks synthesize the routed events, because the headless platform has no two-finger input: the
+The pinch tests synthesize the routed events, because the headless platform has no two-finger input: the
 baseline, the arithmetic, the limits and the restriction are measured, the recognizer below them is not.
+
+**Confirmed in the running desktop app** by the developer on 2026-09-15: the wheel and the keyboard zoom the real
+views, with the boxes where they sit today.
 
 **Not measured:**
 
-- How the real views look at a given scale. Where the box sits in each view is a judgement call that the developer
-  checks by running the app.
 - Whether real fingers reach the recognizer through the scroll viewer around the gauges, which wants them for
   panning. Only a touch screen can answer that; nothing here can.
 - The trackpad. A precision touchpad pinch is usually delivered as Ctrl and the wheel, which already works, and

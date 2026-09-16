@@ -1,5 +1,3 @@
-using Newtonsoft.Json;
-
 namespace De.Hochstaetter.Fronius.Models.Charging;
 
 /// <summary>
@@ -13,21 +11,18 @@ public partial class WattPilotCard : BindableBase, IHaveDisplayName
     [NotifyPropertyChangedFor(nameof(DisplayName))]
     [WattPilot("name")]
     [WattPilot("n")]
-    [JsonProperty("name")]
     public partial string? Name { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(DisplayName))]
     [WattPilot("energy")]
     [WattPilot("e")]
-    [JsonProperty("energy")]
     public partial double? Energy { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(DisplayName))]
     [WattPilot("cardId")]
     [WattPilot("i")]
-    [JsonProperty("cardId")]
     public partial bool? HaveCardId { get; set; }
 
     [System.Text.Json.Serialization.JsonIgnore]

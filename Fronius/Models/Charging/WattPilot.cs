@@ -1,5 +1,4 @@
 using De.Hochstaetter.Fronius.Services;
-using Newtonsoft.Json;
 
 namespace De.Hochstaetter.Fronius.Models.Charging;
 
@@ -109,7 +108,6 @@ public partial class WattPilot : BindableBase, IHaveDisplayName, IHaveUniqueId, 
     public partial WattPilotInverter? Inverter { get; set; }
 
     [ObservableProperty]
-    [JsonProperty("map")]
     [NotifyPropertyChangedFor(nameof(PhaseMap))]
     [WattPilot("map", false, typeof(byte[]))]
     public partial byte[]? Map { get; set; }

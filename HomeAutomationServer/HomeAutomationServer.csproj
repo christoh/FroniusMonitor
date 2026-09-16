@@ -17,6 +17,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+		<PackageReference Include="FluentModbus" Version="5.3.2" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.12" />
 		<!-- The history of prices and weather is one SQLite file in the history folder; see Services/EnergyHistoryStore. -->
 		<PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.12" />

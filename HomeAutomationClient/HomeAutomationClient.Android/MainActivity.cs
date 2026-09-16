@@ -4,9 +4,9 @@ using Android.Content.PM;
 using Android.Runtime;
 using Avalonia;
 using Avalonia.Android;
-using De.Hochstaetter.Fronius.Models;
 using De.Hochstaetter.HomeAutomationClient;
 using De.Hochstaetter.HomeAutomationClient.Misc;
+using De.Hochstaetter.HomeAutomationClient.Models;
 using HomeAutomationClient.Android.Platform;
 using Microsoft.Extensions.DependencyInjection;
 

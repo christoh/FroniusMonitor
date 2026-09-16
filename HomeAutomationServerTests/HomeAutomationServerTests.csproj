@@ -1,7 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net10.0</TargetFramework>
+		<!-- Windows only since 2026-09-15: the validation tests reach into FroniusMonitor, which is WPF. -->
+		<TargetFramework>net10.0-windows7.0</TargetFramework>
+		<EnableWindowsTargeting>true</EnableWindowsTargeting>
+		<!-- Serialize the project references: FroniusMonitor may not have its XAML compiled beside its siblings.
+		     See the same property in FroniusMonitor.csproj. -->
+		<BuildInParallel>false</BuildInParallel>
 		<LangVersion>preview</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
@@ -18,8 +23,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<!-- The client is an Avalonia application, and the tests of its presenters and controls drive real windows
+		     on the headless platform. See UnitTests/Avalonia/HeadlessAvalonia.cs. -->
+		<PackageReference Include="Avalonia.Headless" Version="$(AvaloniaVersion)" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.12" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.0" />
+		<!-- The oracle of JsonExtensionsTests: the same JSON goes through Newtonsoft and System.Text.Json and the
+		     two answers are compared. It is the only thing left in the repository that uses Newtonsoft. -->
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 		<PackageReference Include="xunit.v3" Version="4.0.0" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
 			<PrivateAssets>all</PrivateAssets>
@@ -33,10 +47,13 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\HomeAutomationServer\HomeAutomationServer.csproj" />
-		<!-- The view models of the client hold real logic now - the interlocks and the validation of a settings
-		     tab - and this is what lets it be tested. No Avalonia application is started: a view model is a plain
-		     object, and nothing here creates a control. -->
+		<!-- The view models of the client hold real logic - the interlocks and the validation of a settings tab -
+		     and so do its presenters and controls, which need an Avalonia application and real windows; the headless
+		     platform provides both. -->
 		<ProjectReference Include="..\HomeAutomationClient\HomeAutomationClient\HomeAutomationClient.csproj" />
+		<!-- RegexRuleAttribute lives in the WPF app, because nothing but it and these tests uses it. That is what
+		     makes this project Windows only. -->
+		<ProjectReference Include="..\FroniusMonitor\FroniusMonitor.csproj" />
 	</ItemGroup>
 
 </Project>

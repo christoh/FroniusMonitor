@@ -176,7 +176,7 @@ public class ColorConverter : ConverterBase
 {
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        var targetColor = value is Fronius.Models.HaColor color ? Color.FromUInt32(color) : Colors.Transparent;
+        var targetColor = value is HaColor color ? Color.FromUInt32(color) : Colors.Transparent;
 
         return true switch
         {
@@ -185,7 +185,7 @@ public class ColorConverter : ConverterBase
             _ when targetType.IsAssignableFrom(typeof(IImmutableSolidColorBrush)) => new ImmutableSolidColorBrush(targetColor),
             _ when targetType.IsAssignableFrom(typeof(ImmutableSolidColorBrush)) => new ImmutableSolidColorBrush(targetColor),
             _ when targetType.IsAssignableFrom(typeof(SolidColorBrush)) => new SolidColorBrush(targetColor),
-            _ => throw new InvalidCastException($"Cannot convert {typeof(Fronius.Models.HaColor)} to {targetType.Name}"),
+            _ => throw new InvalidCastException($"Cannot convert {typeof(HaColor)} to {targetType.Name}"),
         };
     }
 
@@ -193,10 +193,10 @@ public class ColorConverter : ConverterBase
     {
         return value switch
         {
-            Fronius.Models.HaColor c => c,
-            Color c => (Fronius.Models.HaColor)c.ToUInt32(),
-            ISolidColorBrush b => (Fronius.Models.HaColor)b.Color.ToUInt32(),
-            _ => throw new InvalidCastException($"Cannot convert {value?.GetType().Name} to {typeof(Fronius.Models.HaColor)}"),
+            HaColor c => c,
+            Color c => (HaColor)c.ToUInt32(),
+            ISolidColorBrush b => (HaColor)b.Color.ToUInt32(),
+            _ => throw new InvalidCastException($"Cannot convert {value?.GetType().Name} to {typeof(HaColor)}"),
         };
     }
 }

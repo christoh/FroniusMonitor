@@ -1,6 +1,6 @@
 using System.Text.Json;
 using De.Hochstaetter.Fronius.Models;
-using De.Hochstaetter.Fronius.Services.EnergyData;
+using De.Hochstaetter.HomeAutomationServer.Services.EnergyData;
 
 namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests;
 
@@ -32,7 +32,7 @@ public sealed class AwattarProductionsTests
         Assert.Equal(3, list.Energies.Count);
         Assert.False(list.Energies[2].HasValues);
 
-        var productions = AwattarClient.ToProductions(list);
+        var productions = list.ToProductions();
 
         Assert.Equal(2, productions.Count);
         Assert.Equal(new DateTime(2026, 9, 15, 22, 0, 0, DateTimeKind.Utc), productions[0].StartTime);

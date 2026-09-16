@@ -1,11 +1,11 @@
 ---
 paths:
-  - Fronius/Services/DataCollectors/Gen24DataCollector.cs
-  - Fronius/Services/DataCollectors/ReadNowRequest.cs
-  - Fronius/Services/DataCollectors/RepeatedFailure.cs
+  - HomeAutomationServer/Services/DataCollectors/Gen24DataCollector.cs
+  - HomeAutomationServer/Services/DataCollectors/ReadNowRequest.cs
+  - HomeAutomationServer/Services/DataCollectors/RepeatedFailure.cs
   - Fronius/Services/Gen24Service.cs
   - Fronius/Services/DigestAuthHttp.cs
-  - Fronius/Contracts/IGen24ConfigRefresher.cs
+  - HomeAutomationServer/Contracts/IGen24ConfigRefresher.cs
 ---
 
 # How an inverter is polled

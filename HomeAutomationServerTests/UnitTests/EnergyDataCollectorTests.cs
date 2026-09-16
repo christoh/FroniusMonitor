@@ -4,7 +4,9 @@ using De.Hochstaetter.Fronius.Models.EnergyData;
 using De.Hochstaetter.Fronius.Models.Events;
 using De.Hochstaetter.Fronius.Models.Settings;
 using De.Hochstaetter.Fronius.Services;
-using De.Hochstaetter.Fronius.Services.DataCollectors;
+using De.Hochstaetter.HomeAutomationServer.Models.Settings;
+using De.Hochstaetter.HomeAutomationServer.Services;
+using De.Hochstaetter.HomeAutomationServer.Services.DataCollectors;
 using De.Hochstaetter.HomeAutomationServerTests.UnitTests.Fakes;
 using Microsoft.Extensions.Options;
 

@@ -1,6 +1,5 @@
 using System.Text.Json;
 using De.Hochstaetter.Fronius.Models.EnergyData;
-using De.Hochstaetter.Fronius.Services.EnergyData;
 using De.Hochstaetter.Fronius.Models.Settings;
 using OxyPlot;
 using OxyPlot.Axes;
@@ -212,11 +211,11 @@ public class PriceViewModel(
             {
                 try
                 {
-                    energies = AwattarClient.ToProductions(await awattarService.GetDataAsync
+                    energies = (await awattarService.GetDataAsync
                     (
                         ShowHistoricData ? Date : null,
                         ShowHistoricData ? Date.AddDays(1) : Prices.Any() ? Prices[^1].EndTime : null
-                    ).ConfigureAwait(false)); // The hours beyond Awattar's forecast come back null and are dropped here
+                    ).ConfigureAwait(false)).ToProductions(); // The hours beyond Awattar's forecast come back null and are dropped here
 
                     await settings.Save().ConfigureAwait(false);
                 }
