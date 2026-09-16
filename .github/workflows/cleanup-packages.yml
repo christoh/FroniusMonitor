@@ -19,8 +19,11 @@ on:
         type: boolean
         default: true
 
+# Shares the "ghcr-packages" group with the other GHCR workflow so a publish and a cleanup can never
+# overlap: the cleanup decides what to keep by reading the tags, and an index published after that read
+# would look like a leftover and be deleted.
 concurrency:
-  group: cleanup-packages
+  group: ghcr-packages
   cancel-in-progress: false
 
 jobs:

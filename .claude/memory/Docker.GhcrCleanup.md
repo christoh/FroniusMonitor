@@ -89,6 +89,13 @@ over. It never deletes on "untagged". It refuses to delete anything if no tagged
 registry hiccup cannot empty a package, and it re-reads every tag afterwards to prove the cleanup did not
 break what it was protecting.
 
+**The two workflows share the concurrency group `ghcr-packages`, and must keep sharing it.** The cleanup
+decides what to keep by reading what the tags resolve to; an index published between that read and the
+deletes is in neither the keep set nor a tag the cleanup knows about, so it would be deleted as a leftover
+minutes after being published, breaking `:latest`. The window is small and the schedules rarely collide,
+which is exactly what makes it the kind of fault that turns up once, in production, and is never reproduced.
+It was noticed on 2026-09-16 because the first dry run happened to overlap a publish.
+
 Checked against the live packages on 2026-09-16: the keep sets it computes are 7 for the server and 9 for the
 client, the same numbers both manual cleanups arrived at. The delete path was exercised against a stubbed API
 with fabricated leftovers mixed into the real keep set; only the leftovers went.
