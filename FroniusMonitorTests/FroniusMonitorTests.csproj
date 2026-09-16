@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<!-- WPF, so Windows only. Everything that does not need the WPF app lives in HomeAutomationServerTests,
+		     which is plain net10.0 and runs anywhere - see the Refuse target below. -->
+		<TargetFramework>net10.0-windows7.0</TargetFramework>
+		<!-- Only for the compile check described at RefuseNonWindows; Windows does not need it. -->
+		<EnableWindowsTargeting Condition="'$(VerifyOnLinux)' == 'true'">true</EnableWindowsTargeting>
+		<!-- Serialize the project references: FroniusMonitor may not have its XAML compiled beside its siblings.
+		     See the same property in FroniusMonitor.csproj. -->
+		<BuildInParallel>false</BuildInParallel>
+		<LangVersion>preview</LangVersion>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<!-- xUnit v3 test projects are executables. -->
+		<OutputType>Exe</OutputType>
+		<IsPackable>false</IsPackable>
+		<RootNamespace>De.Hochstaetter.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+		<NoWarn>1701;1702;IDE0079;NU1803;CS7035;NU1900</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.0" />
+		<PackageReference Include="xunit.v3" Version="4.0.0" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\FroniusMonitor\FroniusMonitor.csproj" />
+		<!-- SystemFactAttribute, the fakes and the assembly-wide injector come from there rather than being
+		     copied. It is an Exe, like every xUnit v3 project; referencing one is ordinary. -->
+		<ProjectReference Include="..\HomeAutomationServerTests\HomeAutomationServerTests.csproj" />
+	</ItemGroup>
+
+	<!--
+	  Claude Code on the web runs on Linux, where WPF cannot run: Microsoft.WindowsDesktop.App is built for
+	  Windows only, so there is nothing to install that would make these tests work there. Fail with that
+	  sentence rather than with a page of WPF errors, or none at all until the test host cannot start.
+
+	  A compile check is still worth having there, because this project is easy to break from a machine that
+	  cannot build it - moving a type out of Fronius, say. "-p:VerifyOnLinux=true" builds it without running
+	  anything, and found a missing global using the day the project was written. It never runs the tests.
+	-->
+	<Target Name="RefuseNonWindows" BeforeTargets="Build;Restore" Condition="'$(VerifyOnLinux)' != 'true' And !$([MSBuild]::IsOSPlatform('Windows'))">
+		<Error Code="FMT001" Text="FroniusMonitorTests tests the WPF app and builds on Windows only. In the cloud, build and test HomeAutomationServerTests instead: dotnet test --project HomeAutomationServerTests/HomeAutomationServerTests.csproj -c Debug" />
+	</Target>
+
+</Project>

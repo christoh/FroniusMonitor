@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 using De.Hochstaetter.Fronius;
 using De.Hochstaetter.Fronius.Contracts;
 using De.Hochstaetter.Fronius.Services;
-using De.Hochstaetter.FroniusMonitor.Models;
+using De.Hochstaetter.Fronius.Models.Settings;
 using De.Hochstaetter.HomeAutomationClient.Contracts;
 using De.Hochstaetter.HomeAutomationClient.Services;
 

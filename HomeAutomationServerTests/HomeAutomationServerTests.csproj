@@ -1,12 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<!-- Windows only since 2026-09-15: the validation tests reach into FroniusMonitor, which is WPF. -->
-		<TargetFramework>net10.0-windows7.0</TargetFramework>
-		<EnableWindowsTargeting>true</EnableWindowsTargeting>
-		<!-- Serialize the project references: FroniusMonitor may not have its XAML compiled beside its siblings.
-		     See the same property in FroniusMonitor.csproj. -->
-		<BuildInParallel>false</BuildInParallel>
+		<TargetFramework>net10.0</TargetFramework>
 		<LangVersion>preview</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
@@ -16,6 +11,12 @@
 		<RootNamespace>De.Hochstaetter.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
 		<NoWarn>1701;1702;IDE0079;NU1803;CS7035;NU1900</NoWarn>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- FroniusMonitorTests drives the WPF app's services and reuses the fakes and the assembly-wide
+		     injector from here rather than keeping a second copy of them. -->
+		<InternalsVisibleTo Include="FroniusMonitorTests" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<!-- The tests host a real Kestrel + SignalR server in process. -->
@@ -53,9 +54,6 @@
 		     and so do its presenters and controls, which need an Avalonia application and real windows; the headless
 		     platform provides both. -->
 		<ProjectReference Include="..\HomeAutomationClient\HomeAutomationClient\HomeAutomationClient.csproj" />
-		<!-- RegexRuleAttribute lives in the WPF app, because nothing but it and these tests uses it. That is what
-		     makes this project Windows only. -->
-		<ProjectReference Include="..\FroniusMonitor\FroniusMonitor.csproj" />
 	</ItemGroup>
 
 </Project>

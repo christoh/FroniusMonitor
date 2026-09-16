@@ -2,9 +2,11 @@
 paths:
   - Fronius/Fronius.csproj
   - Fronius/GlobalUsings.cs
+  - Fronius/Models/Settings/**
+  - Fronius/Validators/**
   - FroniusMonitor/Contracts/**
   - FroniusMonitor/Services/**
-  - FroniusMonitor/Validators/**
+  - FroniusMonitorTests/FroniusMonitorTests.csproj
   - HomeAutomationClient/HomeAutomationClient/Contracts/**
   - HomeAutomationClient/HomeAutomationClient/Validators/**
   - HomeAutomationServerTests/HomeAutomationServerTests.csproj
@@ -23,18 +25,30 @@ validation rules both use, and the web API contract.
 **`HomeAutomationClient` *and* `HomeAutomationServer` use it, or it does not belong in `Fronius`.** One head on
 its own is not enough: what only the client uses would belong to the client, what only the server uses belongs to
 the server, and what only the WPF app uses belongs to the WPF app. A test project using something is no reason to
-keep it either - `HomeAutomationServerTests`, the only test project since the NUnit one was folded into it on
-2026-09-16, references all three heads and targets `net10.0-windows7.0`, so it can reach a type wherever it lives.
-That is the developer's decision of 2026-09-15 and the reason the tests are Windows only.
+keep it either.
+
+### The one exception, and why it exists
+
+`SettingsBase` and `RegexRuleAttribute` are the WPF app's alone by that rule, and they live in `Fronius` all the
+same. Until 2026-09-16 they were in `FroniusMonitor`, which forced `HomeAutomationServerTests` to reference the
+WPF app and target `net10.0-windows7.0` - and a Windows target cannot **run** in Claude Code on the web at all:
+`Microsoft.WindowsDesktop.App` is built for Windows only, `dotnet-install.sh` refuses it outright, and no egress
+rule changes that. It is not a missing package, it is the operating system. That cost the whole suite - 559 tests
+- in every cloud session, for two types. The developer decided on 2026-09-16 that keeping the tests runnable
+outweighs the rule here, so both came back, with the three types `SettingsBase` needs in order to compile:
+`ElectricityPriceSettings`, `AwattarParameters` and `SettingsEnums`.
+
+This is a named exception, not a softening of the rule. Nothing else moves on this argument.
 
 What moved, and where it went:
 
 | From | To |
 |---|---|
 | `Contracts/IScoped.cs`, `Contracts/ISmartMeterImportService.cs` | `FroniusMonitor/Contracts` |
-| `Models/EnergyDirection.cs`, `Models/Settings/SettingsBase.cs`, `SettingsEnums.cs`, `ElectricityPriceSettings.cs`, `AwattarParameters.cs` | `FroniusMonitor/Models` |
+| `Models/EnergyDirection.cs` | `FroniusMonitor/Models` |
+| `Models/Settings/SettingsBase.cs`, `SettingsEnums.cs`, `ElectricityPriceSettings.cs`, `AwattarParameters.cs` | `FroniusMonitor/Models` on 2026-09-15, **and back to `Fronius/Models/Settings` on 2026-09-16** - see the exception above |
 | `Services/BayernWerkImportService.cs`, `AwattarService.cs`, `DataCollectionService.cs` | `FroniusMonitor/Services` |
-| `Validators/RegexRuleAttribute.cs` | `FroniusMonitor/Validators` |
+| `Validators/RegexRuleAttribute.cs` | `FroniusMonitor/Validators` on 2026-09-15, **and back to `Fronius/Validators` on 2026-09-16**. `FroniusMonitor/Validators` is gone with it: it held nothing else, and its `global using` in `FroniusMonitor/GlobalUsings.cs` had to go too, or the WPF app stops compiling |
 | the whole SunSpec and Modbus stack: `Models/Modbus/**`, `Contracts/Modbus/**`, `Services/Modbus/**`, `Attributes/ModbusAttribute.cs`, `Extensions/ModbusExtensions.cs`, `Extensions/SunSpecExtensions.cs`, `Models/ModbusMapping.cs`, `Models/Settings/Modbus*.cs`, `SunSpecClientParameters.cs` | the same folders under `HomeAutomationServer` |
 | `Services/DataCollectors/**`, `Services/DataControlService.cs`, the DWD half of `Services/EnergyData` and `Models/EnergyData/DwdForecast.cs` | `HomeAutomationServer/Services`, `HomeAutomationServer/Models/EnergyData` |
 | the collector parameter classes of `Models/Settings`, `SettingsChangeTracker`, `PolledWebConnectionParameterBase`, `Models/WebApi/WebApiInfo.cs` | `HomeAutomationServer/Models` |
@@ -76,7 +90,7 @@ Do not move these without reading why they are here; each is pinned by something
 ## How to find out, rather than guess
 
 Whether something is shared is a question about the whole repository, and grep for the type name over
-`FroniusMonitor HomeAutomationClient HomeAutomationServer HomeAutomationServerTests Fronius`
+`FroniusMonitor HomeAutomationClient HomeAutomationServer HomeAutomationServerTests FroniusMonitorTests Fronius`
 answers it. Four things will mislead you, and three of them did:
 
 - **An attribute is written without its `Attribute` suffix.** `Ipv4Attribute` and `TimeOfDayAttribute` looked
@@ -103,10 +117,10 @@ deserialization would have to be checked first in any case.
 
 ## Where `Fronius/Validators` ended up
 
-The family is split three ways, and each piece went to its only user. `Fronius/Validators` keeps
+The family is split two ways since `RegexRuleAttribute` came back on 2026-09-16. `Fronius/Validators` keeps
 `ValidationRuleAttribute`, `MinMaxRules`, `NumericText`, `Ipv4Attribute`, `TimeOfDayAttribute`,
-`WattPilotFallbackCurrentAttribute` and the unreferenced `NotEmptyAttribute`; `RegexRuleAttribute` is in
-`FroniusMonitor/Validators` and `AbsoluteUriAttribute` in `HomeAutomationClient/.../Validators`. The mechanism
+`WattPilotFallbackCurrentAttribute`, `RegexRuleAttribute` and the unreferenced `NotEmptyAttribute`;
+`AbsoluteUriAttribute` is in `HomeAutomationClient/.../Validators`. The mechanism
 itself is unchanged and is described in [[Validation.Lifecycle]]: a rule is declared on the property that is
 edited and every head picks it up from there, wherever the attribute class happens to live.
 
@@ -116,7 +130,7 @@ apply to `FroniusMonitor`, which has no `HaColor` of its own.
 
 ## A build failure that is not your code
 
-Since `HomeAutomationServerTests` references `FroniusMonitor`, a build of it sometimes dies with a page of
+Since `FroniusMonitorTests` references `FroniusMonitor` - `HomeAutomationServerTests` no longer does - a build of it sometimes dies with a page of
 `CS2001: Source file 'FroniusMonitor\obj\Debug\net10.0-windows7.0\...\X.g.cs' could not be found`, blamed on
 `FroniusMonitor.csproj`, or with the same thing one step earlier as
 `BG1002: File '...\X.baml' cannot be found` from the markup compiler. **Delete `FroniusMonitor/obj/Debug`.**

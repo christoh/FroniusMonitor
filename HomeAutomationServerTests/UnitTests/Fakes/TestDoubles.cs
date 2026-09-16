@@ -1,4 +1,4 @@
-using De.Hochstaetter.FroniusMonitor.Models;
+using De.Hochstaetter.Fronius.Models.Settings;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using Microsoft.Extensions.Options;
 
