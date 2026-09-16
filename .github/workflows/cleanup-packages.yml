@@ -1,0 +1,59 @@
+# Deletes the GHCR container versions no tag points at any more.
+#
+# Runs on GITHUB_TOKEN, because the repository has the Admin role on both packages. No personal access token.
+#
+# Every publish leaves the previous build's index and all of its children behind, untagged, so this grows on
+# every push to master. See .claude/memory/Docker.GhcrCleanup.md for why "untagged" is NOT the same as
+# "deletable": a multi-arch index references its platform manifests and attestations by digest and they are
+# untagged, so deleting on that basis breaks :latest. The script works out what the tags actually reference.
+name: Clean up old package versions
+
+on:
+  schedule:
+    # Sundays, early. Nothing depends on the timing; it only has to happen now and then.
+    - cron: '17 4 * * 0'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'List what would be deleted without deleting it'
+        type: boolean
+        default: true
+
+concurrency:
+  group: cleanup-packages
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    # Deleting a version needs admin on the package, which the FroniusMonitor repository was given on both
+    # packages on 2026-09-16 (Package settings -> Manage Actions access -> Role: Admin). That is what lets
+    # GITHUB_TOKEN do this and keeps a personal access token out of the repository.
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v5
+
+      - name: Clean up
+        env:
+          # GHCR_CLEANUP_TOKEN is only a fallback, for the day the package roles are tightened again or a
+          # package this repository has no admin on has to be cleaned. It wants read:packages and
+          # delete:packages. Unset is the normal case.
+          GH_TOKEN: ${{ secrets.GHCR_CLEANUP_TOKEN || secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          PACKAGES: home-automation-server,home-automation-client
+          # A scheduled run does the work; a manual one only reports unless told otherwise.
+          DRY_RUN: ${{ github.event_name == 'schedule' && 'false' || inputs.dry_run }}
+        run: |
+          # Neither token can be empty in practice, but an empty one would fail as a wall of 403s rather
+          # than as one sentence. The secrets context is not available in a step-level if:, so this is here.
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::error::No token: GITHUB_TOKEN is missing and GHCR_CLEANUP_TOKEN is not set."
+            exit 1
+          fi
+          python3 .github/scripts/ghcr_cleanup.py
