@@ -1,0 +1,51 @@
+# Deletes the GHCR container versions no tag points at any more.
+#
+# Every publish leaves the previous build's index and all of its children behind, untagged, so this grows on
+# every push to master. See .claude/memory/Docker.GhcrCleanup.md for why "untagged" is NOT the same as
+# "deletable": a multi-arch index references its platform manifests and attestations by digest and they are
+# untagged, so deleting on that basis breaks :latest. The script works out what the tags actually reference.
+name: Clean up old package versions
+
+on:
+  schedule:
+    # Sundays, early. Nothing depends on the timing; it only has to happen now and then.
+    - cron: '17 4 * * 0'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'List what would be deleted without deleting it'
+        type: boolean
+        default: true
+
+concurrency:
+  group: cleanup-packages
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    # Nothing here uses GITHUB_TOKEN: it can publish a package but cannot delete a version, whatever
+    # permissions it is given. That is what GHCR_CLEANUP_TOKEN is for.
+    permissions: {}
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v5
+
+      - name: Clean up
+        env:
+          GH_TOKEN: ${{ secrets.GHCR_CLEANUP_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          PACKAGES: home-automation-server,home-automation-client
+          # A scheduled run does the work; a manual one only reports unless told otherwise.
+          DRY_RUN: ${{ github.event_name == 'schedule' && 'false' || inputs.dry_run }}
+        run: |
+          # Say why rather than let the API answer with a wall of 403s. The secrets context is not available
+          # in a step-level if:, so the check belongs here.
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::error::GHCR_CLEANUP_TOKEN is not set. It needs a classic PAT with read:packages and delete:packages - GITHUB_TOKEN cannot delete package versions."
+            exit 1
+          fi
+          python3 .github/scripts/ghcr_cleanup.py

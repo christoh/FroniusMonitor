@@ -1,5 +1,7 @@
 ---
 paths:
+  - .github/scripts/ghcr_cleanup.py
+  - .github/workflows/cleanup-packages.yml
   - .github/workflows/publish-images.yml
   - docker-compose.yml
   - docker-bake.hcl
@@ -68,6 +70,24 @@ index, and the previous build's index and all its children become untagged immed
 litter the rest of this document is about. Nothing prunes them automatically. Deleting still has to happen
 against the GitHub Packages API, and still needs a token with packages scopes, because `GITHUB_TOKEN` is
 scoped to publishing and not to deletion.
+
+### The cleanup runs itself now
+
+`.github/workflows/cleanup-packages.yml` runs `.github/scripts/ghcr_cleanup.py` every Sunday, and on demand
+from the Actions tab - a manual run reports without deleting unless `dry_run` is unticked, a scheduled one
+deletes. It needs the secret **`GHCR_CLEANUP_TOKEN`**, a classic PAT with `read:packages` and
+`delete:packages`; the workflow says so and stops rather than letting the API answer with 403s. This is the
+one place a PAT is unavoidable - see the publish workflow, which needs none.
+
+The script implements the rule this document states rather than the tempting shortcut. It asks the registry
+what each **tag** resolves to, keeps that index and every digest it references, and deletes only what is left
+over. It never deletes on "untagged". It refuses to delete anything if no tagged version resolved, so a
+registry hiccup cannot empty a package, and it re-reads every tag afterwards to prove the cleanup did not
+break what it was protecting.
+
+Checked against the live packages on 2026-09-16: the keep sets it computes are 7 for the server and 9 for the
+client, the same numbers both manual cleanups arrived at. The delete path was exercised against a stubbed API
+with fabricated leftovers mixed into the real keep set; only the leftovers went.
 
 ## Why "dangling" is not "untagged"
 
