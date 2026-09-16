@@ -4,6 +4,7 @@
     <File Path="AGENTS.md" />
     <File Path="CLAUDE.md" />
     <File Path="Directory.Build.props" />
+    <File Path=".github/workflows/publish-images.yml" />
     <File Path="docker-compose.yml" />
     <File Path="docker-bake.hcl" />
     <File Path="tounix.sh" />
