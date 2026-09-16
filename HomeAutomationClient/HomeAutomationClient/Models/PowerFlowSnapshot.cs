@@ -114,20 +114,27 @@ public sealed record PowerFlowInverter(PowerFlowNode Inverter, IReadOnlyList<Pow
 /// </summary>
 /// <param name="Grid">The grid, or <see langword="null"/> before the first inverter has reported.</param>
 /// <param name="SelfSufficiency">In percent, as <see cref="HousePower.SelfSufficiency"/> has it.</param>
+/// <param name="SelfConsumption">In percent, as <see cref="HousePower.SelfConsumption"/> has it.</param>
 /// <param name="Consumers">Every metered consumer plus, last, the rest of the house.</param>
-public sealed record PowerFlowSnapshot(PowerFlowNode? Grid, IReadOnlyList<PowerFlowInverter> Inverters, PowerFlowNode House, double? SelfSufficiency, IReadOnlyList<PowerFlowNode> Consumers)
+public sealed record PowerFlowSnapshot(PowerFlowNode? Grid, IReadOnlyList<PowerFlowInverter> Inverters, PowerFlowNode House, double? SelfSufficiency, double? SelfConsumption, IReadOnlyList<PowerFlowNode> Consumers)
 {
     public const string GridKey = "grid";
     public const string HouseKey = "house";
     public const string RestOfHouseKey = "rest-of-house";
 
-    public static PowerFlowSnapshot Empty { get; } = new(null, [], new PowerFlowNode(HouseKey, PowerFlowNodeKind.House, string.Empty, null), null, []);
+    public static PowerFlowSnapshot Empty { get; } = new(null, [], new PowerFlowNode(HouseKey, PowerFlowNodeKind.House, string.Empty, null), null, null, []);
 
     /// <param name="inverters">The update service's inverters.</param>
     /// <param name="site">The site power flow, the sum over all inverters, or <see langword="null"/> while no inverter has reported - the sum is all zeros then and would read as a house that consumes nothing.</param>
     /// <param name="consumers">The update service's power consumers. Only those that measure their power take part; an air conditioner that cannot is left out rather than shown as nought.</param>
-    public static PowerFlowSnapshot From(IReadOnlyList<KeyedGen24System> inverters, Gen24PowerFlow? site, IReadOnlyList<IKeyedDevice> consumers)
+    /// <param name="trackerName">
+    /// The name of a tracker from its number, the inverter's own words where they are known - the caller has the
+    /// inverter's localization, this record does not. "MPPT 1" where nothing is passed.
+    /// </param>
+    public static PowerFlowSnapshot From(IReadOnlyList<KeyedGen24System> inverters, Gen24PowerFlow? site, IReadOnlyList<IKeyedDevice> consumers, Func<int, string>? trackerName = null)
     {
+        trackerName ??= number => $"MPPT {number}";
+
         // The house figures are the dashboard's: the whole load, cars included, and the same self-sufficiency.
         var house = HousePower.From(site, carPower: null);
         var houseNode = new PowerFlowNode(HouseKey, PowerFlowNodeKind.House, string.Empty, house.HouseConsumption);
@@ -142,7 +149,7 @@ public sealed record PowerFlowSnapshot(PowerFlowNode? Grid, IReadOnlyList<PowerF
             // One card per tracker the inverter reports. Where it reports none one by one, its panels as a whole,
             // so that the picture never lacks the sun.
             var trackers = Trackers(sensors?.Inverter)
-                .Select(tracker => new PowerFlowNode($"{keyed.Key}/mppt{tracker.Number}", PowerFlowNodeKind.Solar, $"MPPT {tracker.Number}", tracker.Power))
+                .Select(tracker => new PowerFlowNode($"{keyed.Key}/mppt{tracker.Number}", PowerFlowNodeKind.Solar, trackerName(tracker.Number), tracker.Power))
                 .ToList();
 
             if (trackers.Count == 0)
@@ -174,7 +181,7 @@ public sealed record PowerFlowSnapshot(PowerFlowNode? Grid, IReadOnlyList<PowerF
             metered.Add(new PowerFlowNode(RestOfHouseKey, PowerFlowNodeKind.RestOfHouse, string.Empty, consumption - metered.Sum(node => node.Power ?? 0)));
         }
 
-        return new PowerFlowSnapshot(grid, inverterNodes, houseNode, house.SelfSufficiency, metered);
+        return new PowerFlowSnapshot(grid, inverterNodes, houseNode, house.SelfSufficiency, house.SelfConsumption, metered);
     }
 
     /// <summary>

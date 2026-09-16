@@ -26,7 +26,7 @@ namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 /// snapshot - the marshalling is the view's, as the interaction rule wants, the folding is this class's.
 /// </para>
 /// </remarks>
-public sealed partial class PowerFlowViewModel(IUpdateService updateService) : ViewModelBase
+public sealed partial class PowerFlowViewModel(IUpdateService updateService, IGen24LocalizationService gen24Loc) : ViewModelBase
 {
     private readonly List<INotifyPropertyChanged> followedDevices = [];
     private readonly Lock followLock = new();
@@ -146,6 +146,8 @@ public sealed partial class PowerFlowViewModel(IUpdateService updateService) : V
     {
         // Copies, because the collections are the service's and it adds to them on the same thread this runs on.
         // The site flow is all zeros until the first inverter reports; passed as null it reads as "nothing yet".
-        Snapshot = PowerFlowSnapshot.From([.. updateService.Inverters], updateService.Inverters.Count > 0 ? flow : null, [.. updateService.AllPowerConsumers]);
+        // The trackers are named in the inverter's own words - "MPPT1", "MPPT2" in the Channels section of its
+        // localization - the way the detail views name them.
+        Snapshot = PowerFlowSnapshot.From([.. updateService.Inverters], updateService.Inverters.Count > 0 ? flow : null, [.. updateService.AllPowerConsumers], number => gen24Loc.GetLocalizedString(Gen24LocalizationSection.Channels, $"MPPT{number}"));
     }
 }

@@ -64,6 +64,15 @@ public sealed class PowerFlowSnapshotTests
         Assert.Equal(5100, snapshot.House.Power);
         Assert.Equal(5100 - 620 - 3700 - 95, snapshot.Consumers[^1].Power);
         Assert.Equal(100, snapshot.SelfSufficiency);
+        Assert.Equal(5100d / 5550 * 100, snapshot.SelfConsumption!.Value, 6);
+    }
+
+    [Fact]
+    public void A_tracker_is_named_in_the_inverters_words_when_the_caller_has_them()
+    {
+        var snapshot = PowerFlowSnapshot.From([Inverter("inv", 100, 200, 300)], Site(), [], number => $"Tracker {number}");
+
+        Assert.Equal(["Tracker 1", "Tracker 2"], snapshot.Inverters.Single().Solar.Select(node => node.Name));
     }
 
     [Fact]

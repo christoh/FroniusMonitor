@@ -74,6 +74,15 @@ public class PowerFlowStateText : ConverterBase
     }
 }
 
+/// <summary>
+/// Whether a card is on the AC side of the sources - the grid or an inverter - which are the cards that carry a
+/// device name and are drawn a little wider for it.
+/// </summary>
+public class PowerFlowIsAcSource : ConverterBase
+{
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value is PowerFlowNodeKind.Grid or PowerFlowNodeKind.Inverter;
+}
+
 /// <summary>Whether a node has a state line at all.</summary>
 public class PowerFlowHasState : ConverterBase
 {

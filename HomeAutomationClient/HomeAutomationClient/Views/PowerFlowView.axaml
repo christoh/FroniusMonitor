@@ -7,6 +7,7 @@
              xmlns:m="clr-namespace:De.Hochstaetter.HomeAutomationClient.Models"
              xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
              xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
+             xmlns:i="clr-namespace:De.Hochstaetter.HomeAutomationClient.Assets.Images"
              mc:Ignorable="d" d:DesignWidth="1500" d:DesignHeight="860"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.PowerFlowView"
              x:DataType="vm:PowerFlowViewModel"
@@ -23,7 +24,7 @@
 		<!-- A source: an inverter, one of its trackers, its battery, the grid. Name where it has one, then the kind,
 		     the figure, and a line that says what it is doing; a battery also shows how full it is. -->
 		<DataTemplate x:Key="SourceCard" DataType="m:PowerFlowNodeItem">
-			<Border Classes="Card" Classes.Active="{Binding !Node.IsIdle}">
+			<Border Classes="Card" Classes.Active="{Binding !Node.IsIdle}" Classes.Wide="{Binding Node.Kind, Converter={co:PowerFlowIsAcSource}}">
 				<StackPanel Spacing="2">
 					<Path Classes="Icon" Data="{Binding Node.Kind, Converter={co:PowerFlowIcon}}" />
 					<TextBlock Classes="Name" Text="{Binding Node.Name}" IsVisible="{Binding Node.Name, Converter={co:NotEmpty}}" />
@@ -61,18 +62,19 @@
 		<DataTemplate x:Key="HouseCard" DataType="m:PowerFlowNodeItem">
 			<Border Classes="Card House" Classes.Active="{Binding !Node.IsIdle}">
 				<StackPanel Spacing="2">
-					<Path Classes="Icon" Data="{Binding Node.Kind, Converter={co:PowerFlowIcon}}" />
+					<!-- The app's own house, the one the dashboard's house block carries, drawn with the card's text colour. -->
+					<i:HouseIcon Height="22" Margin="0,0,0,4" HorizontalAlignment="Center" Foreground="{DynamicResource FlowText}" />
 					<TextBlock Classes="Label" Text="{Binding Node, Converter={co:PowerFlowTitle}}" />
 					<TextBlock Classes="Value" Classes.Idle="{Binding Node.IsIdle}" Text="{Binding Node.Power, Converter={co:PowerText}}" />
+					<!-- The two ratios of the dashboard's house block. Not the grid figure: the grid card says that already. -->
 					<Grid ColumnDefinitions="*,*" Margin="0,8,0,0">
 						<StackPanel Grid.Column="0" Spacing="1">
 							<TextBlock Classes="Key" Text="{x:Static p:Resources.SelfSufficiency}" />
 							<TextBlock Classes="Figure" Text="{Binding $parent[ContentPage].((vm:PowerFlowViewModel)DataContext).Items.SelfSufficiency, StringFormat='{}{0:N0} %', TargetNullValue=---, FallbackValue=---}" />
 						</StackPanel>
 						<StackPanel Grid.Column="1" Spacing="1">
-							<TextBlock Classes="Key" Text="{x:Static p:Resources.Grid}" />
-							<!-- Signed: a minus is the house exporting. -->
-							<TextBlock Classes="Figure" Text="{Binding $parent[ContentPage].((vm:PowerFlowViewModel)DataContext).Items.Grid.Node.Power, Converter={co:PowerText Signed=True}, FallbackValue=---}" />
+							<TextBlock Classes="Key" Text="{x:Static p:Resources.SelfConsumption}" />
+							<TextBlock Classes="Figure" Text="{Binding $parent[ContentPage].((vm:PowerFlowViewModel)DataContext).Items.SelfConsumption, StringFormat='{}{0:N0} %', TargetNullValue=---, FallbackValue=---}" />
 						</StackPanel>
 					</Grid>
 				</StackPanel>
@@ -107,6 +109,10 @@
 		</Style>
 		<Style Selector="Border.Card.Active">
 			<Setter Property="BorderBrush" Value="{DynamicResource FlowCardBorderActive}" />
+		</Style>
+		<Style Selector="Border.Card.Wide">
+			<!-- The grid and the inverters carry a device name; ten pixels more and "Atomkraftwerk Block 2" fits. -->
+			<Setter Property="Width" Value="160" />
 		</Style>
 		<Style Selector="Border.Card.Consumer">
 			<!-- Room above for the rail the card hangs off and the stub down from it, and to the right of the next one. -->
@@ -197,25 +203,34 @@
 			<Setter Property="Background" Value="{DynamicResource FlowBattery}" />
 		</Style>
 
-		<!-- The header: the title at the left, the legend at the right. -->
+		<!-- The header: the title, centred, and the legend in a box of its own under it. -->
 		<Style Selector="TextBlock.Title">
 			<Setter Property="FontSize" Value="18" />
 			<Setter Property="FontWeight" Value="SemiBold" />
 			<Setter Property="Foreground" Value="{DynamicResource FlowText}" />
-			<Setter Property="VerticalAlignment" Value="Center" />
+			<Setter Property="HorizontalAlignment" Value="Center" />
 		</Style>
-		<Style Selector="StackPanel.Legend > StackPanel">
+		<Style Selector="Border.Legend">
+			<Setter Property="Background" Value="{DynamicResource FlowCardBackground}" />
+			<Setter Property="BorderBrush" Value="{DynamicResource FlowCardBorder}" />
+			<Setter Property="BorderThickness" Value="1" />
+			<Setter Property="CornerRadius" Value="10" />
+			<Setter Property="Padding" Value="14,6" />
+			<Setter Property="HorizontalAlignment" Value="Center" />
+			<Setter Property="Margin" Value="0,8,0,0" />
+		</Style>
+		<Style Selector="Border.Legend StackPanel > StackPanel">
 			<Setter Property="Orientation" Value="Horizontal" />
 			<Setter Property="Spacing" Value="6" />
 			<Setter Property="VerticalAlignment" Value="Center" />
 		</Style>
-		<Style Selector="StackPanel.Legend Border">
+		<Style Selector="Border.Legend Border">
 			<Setter Property="Width" Value="18" />
 			<Setter Property="Height" Value="3" />
 			<Setter Property="CornerRadius" Value="2" />
 			<Setter Property="VerticalAlignment" Value="Center" />
 		</Style>
-		<Style Selector="StackPanel.Legend TextBlock">
+		<Style Selector="Border.Legend TextBlock">
 			<Setter Property="FontSize" Value="11" />
 			<Setter Property="Foreground" Value="{DynamicResource FlowLabel}" />
 			<Setter Property="VerticalAlignment" Value="Center" />
@@ -223,32 +238,34 @@
 	</ContentPage.Styles>
 
 	<Grid RowDefinitions="Auto,*">
-		<Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="20,14,20,0">
-			<TextBlock Grid.Column="0" Classes="Title" Text="{x:Static p:Resources.PowerFlow}" />
+		<StackPanel Grid.Row="0" Margin="20,14,20,0">
+			<TextBlock Classes="Title" Text="{x:Static p:Resources.PowerFlow}" />
 			<!-- What the colours of the wires mean. The kind of power, never the device or the direction. -->
-			<StackPanel Grid.Column="1" Classes="Legend" Orientation="Horizontal" Spacing="14">
-				<StackPanel>
-					<Border Background="{DynamicResource FlowSolar}" />
-					<TextBlock Text="{x:Static p:Resources.Solar}" />
+			<Border Classes="Legend">
+				<StackPanel Orientation="Horizontal" Spacing="16">
+					<StackPanel>
+						<Border Background="{DynamicResource FlowSolar}" />
+						<TextBlock Text="{x:Static p:Resources.Solar}" />
+					</StackPanel>
+					<StackPanel>
+						<Border Background="{DynamicResource FlowBattery}" />
+						<TextBlock Text="{x:Static p:Resources.Battery}" />
+					</StackPanel>
+					<StackPanel>
+						<Border Background="{DynamicResource FlowGrid}" />
+						<TextBlock Text="{x:Static p:Resources.Grid}" />
+					</StackPanel>
+					<StackPanel>
+						<Border Background="{DynamicResource FlowHouse}" />
+						<TextBlock Text="{x:Static p:Resources.House}" />
+					</StackPanel>
+					<StackPanel>
+						<Border Background="{DynamicResource FlowIdle}" />
+						<TextBlock Text="{x:Static p:Resources.Idle}" />
+					</StackPanel>
 				</StackPanel>
-				<StackPanel>
-					<Border Background="{DynamicResource FlowBattery}" />
-					<TextBlock Text="{x:Static p:Resources.Battery}" />
-				</StackPanel>
-				<StackPanel>
-					<Border Background="{DynamicResource FlowGrid}" />
-					<TextBlock Text="{x:Static p:Resources.Grid}" />
-				</StackPanel>
-				<StackPanel>
-					<Border Background="{DynamicResource FlowHouse}" />
-					<TextBlock Text="{x:Static p:Resources.House}" />
-				</StackPanel>
-				<StackPanel>
-					<Border Background="{DynamicResource FlowIdle}" />
-					<TextBlock Text="{x:Static p:Resources.Idle}" />
-				</StackPanel>
-			</StackPanel>
-		</Grid>
+			</Border>
+		</StackPanel>
 
 		<ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
 			<!-- Ctrl with the wheel scales the whole picture; see ZoomBox. The scope is on the page's root. -->

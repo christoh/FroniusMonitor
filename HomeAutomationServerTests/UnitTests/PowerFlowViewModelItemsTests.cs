@@ -18,7 +18,7 @@ public sealed class PowerFlowViewModelItemsTests
     );
 
     private static PowerFlowSnapshot Snapshot(PowerFlowNode? grid, IReadOnlyList<PowerFlowInverter> inverters, params PowerFlowNode[] consumers) =>
-        new(grid, inverters, Node(PowerFlowSnapshot.HouseKey, 5000, PowerFlowNodeKind.House), 100, consumers);
+        new(grid, inverters, Node(PowerFlowSnapshot.HouseKey, 5000, PowerFlowNodeKind.House), 100, 90, consumers);
 
     [Fact]
     public void A_new_reading_replaces_the_figures_and_keeps_the_items()
@@ -110,5 +110,6 @@ public sealed class PowerFlowViewModelItemsTests
         Assert.Same(house, items.House);
         Assert.Equal(5000, house.Node.Power);
         Assert.Equal(100, items.SelfSufficiency);
+        Assert.Equal(90, items.SelfConsumption);
     }
 }

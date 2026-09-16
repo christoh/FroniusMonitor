@@ -64,6 +64,9 @@ public sealed partial class PowerFlowViewModelItems : BindableBase
     [ObservableProperty]
     public partial double? SelfSufficiency { get; private set; }
 
+    [ObservableProperty]
+    public partial double? SelfConsumption { get; private set; }
+
     public ObservableCollection<PowerFlowInverterItem> Inverters { get; } = [];
 
     public ObservableCollection<PowerFlowNodeItem> Consumers { get; } = [];
@@ -98,6 +101,7 @@ public sealed partial class PowerFlowViewModelItems : BindableBase
 
         House.Node = snapshot.House;
         SelfSufficiency = snapshot.SelfSufficiency;
+        SelfConsumption = snapshot.SelfConsumption;
 
         structureChanged |= Sync(Inverters, snapshot.Inverters, item => item.Key, cluster => cluster.Inverter.Key, (item, cluster) => item.Update(cluster), cluster => new PowerFlowInverterItem(cluster));
         structureChanged |= Sync(Consumers, snapshot.Consumers, item => item.Key, node => node.Key, (item, node) => { item.Node = node; return false; }, node => new PowerFlowNodeItem(node));

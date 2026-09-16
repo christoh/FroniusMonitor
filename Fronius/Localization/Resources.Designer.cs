@@ -5516,7 +5516,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         
             
         /// <summary>
-        ///   Looks up a localized string similar to Power flow.
+        ///   Looks up a localized string similar to Power Flow.
         /// </summary>
         public static string PowerFlow {
             get {

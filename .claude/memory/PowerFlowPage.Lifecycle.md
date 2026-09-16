@@ -40,7 +40,7 @@ legend. Left to right, because it is for the desktop and the desktop is wide:
 |---|---|---|
 | Sources | The grid; then one **cluster** per inverter - its DC side stacked on the left (**one card per tracker**, then the battery), the inverter to their right | Each DC card into its own tap on the inverter's left edge, the taps 14 px apart around the middle; inverter and grid right into the **trunk** |
 | Trunk | a vertical bus between the sources and the house | one tap per source, a dot at each |
-| House | one wide card: consumption, self-sufficiency, grid | trunk into its left edge; its right edge into the **spine** |
+| House | one wide card: consumption, self-sufficiency, own consumption | trunk into its left edge; its right edge into the **spine** |
 | Consumers | every consumer that measures its power, wrapping to the width there is, and last **the rest of the house** | a spine down the left, one **rail** above each row, one **stub** down to each card |
 
 **Topology, not a star.** Every line goes to a bus. With twenty consumers that is twenty short stubs and no
@@ -73,8 +73,17 @@ battery or the grid is doing - and a battery a bar for its state of charge: a `B
 `Border.SocFill` whose width is the track's times the charge (`Fraction` multi converter). Not a `ProgressBar`:
 Fluent's, at four pixels high with `Maximum="1"`, drew full whatever the value.
 
-**The inverter card carries the name the user gave the inverter** ("Roof south"), the tracker cards
-"MPPT 1", "MPPT 2" (a label printed on the hardware, so not localized) under the caption Solar.
+**The inverter card carries the name the user gave the inverter** ("Roof south"); it and the grid card are ten
+pixels wider than the rest (`Border.Card.Wide`, 160) so that such a name fits on two lines. The tracker cards are
+named **in the inverter's own words**: the view model passes
+`gen24Loc.GetLocalizedString(Gen24LocalizationSection.Channels, "MPPT1")` into `PowerFlowSnapshot.From`, which
+takes a `Func<int, string>` for exactly that and falls back to "MPPT 1" when given none - the record has no
+localization service and does not want one.
+
+**The header** is the title, centred (`Resources.PowerFlow`, "Power Flow" as a headline in English), and under it
+the legend in a box with the cards' corner rounding. **The house card** carries the app's own `HouseIcon` and,
+under its figure, the two ratios of the dashboard's house block - self-sufficiency and own consumption; not the
+grid figure, which the grid card says already.
 
 ## Where the figures come from
 
@@ -156,7 +165,7 @@ them again. So:
    (each inverter's `Gen24System`, each consumer, the site flow, the two collections). It is cheap; nothing
    filters property names.
 2. **`PowerFlowViewModel.Items`** (`PowerFlowViewModelItems`) is what the controls bind to: `Grid`, `House`,
-   `SelfSufficiency`, `Inverters` - each a `PowerFlowInverterItem` with its inverter and a `DcSources`
+   `SelfSufficiency`, `SelfConsumption`, `Inverters` - each a `PowerFlowInverterItem` with its inverter and a `DcSources`
    collection of trackers and battery - and `Consumers`, as stable `PowerFlowNodeItem`s whose `Node` is
    replaced in place. `Apply()` folds the latest snapshot in and returns **true only when a card came or went**
    - a device, a tracker, a battery, the grid. Same keys in the same order update in place; anything else
