@@ -9,6 +9,7 @@
              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
              xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
              xmlns:m="clr-namespace:De.Hochstaetter.HomeAutomationClient.Misc"
+             c:InitialWindowSize.Width="980" c:InitialWindowSize.Height="780"
              x:DataType="{x:Type vm:WattPilotDetailsViewModel}"
              >
     <Grid RowDefinitions="Auto,*">
