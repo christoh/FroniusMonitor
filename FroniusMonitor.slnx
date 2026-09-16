@@ -11,6 +11,16 @@
     <File Path="docker-bake.hcl" />
     <File Path="tounix.sh" />
   </Folder>
+  <Folder Name="/Solution Items/.gitgub/">
+    <File Path=".github/copilot-instructions.md" />
+  </Folder>
+  <Folder Name="/Solution Items/.gitgub/scripts/">
+    <File Path=".github/scripts/ghcr_cleanup.py" />
+  </Folder>
+  <Folder Name="/Solution Items/.gitgub/workflows/">
+    <File Path=".github/workflows/cleanup-packages.yml" />
+    <File Path=".github/workflows/publish-images.yml" />
+  </Folder>
   <Folder Name="/Solution Items/Memory/">
     <File Path=".claude/memory/BatteryDetailsView.Lifecycle.md" />
     <File Path=".claude/memory/DeviceJson.md" />
