@@ -86,8 +86,9 @@ its previous run is still pending, and a run that awaits `ShowDialogAsync` is pe
 on screen - which used to be a modal moment and is now a window the user leaves standing. Without the flag the
 menu entry or button is **disabled** for exactly that time, so a second settings dialog could never be opened and
 clicking Electricity price while its window was up did nothing at all, not even bring it to the front. It carries
-Seven commands need the flag today: `MainViewModel.Settings`, `ChangePassword`, `ShowEnergyChart` and
-`ShowPowerFlow`, `EnergyChartViewModel.ShowPriceComponents`, `UserManagementViewModel.Add` and `Edit`.
+Six commands need the flag today: `MainViewModel.Settings`, `ChangePassword` and `ShowEnergyChart`,
+`EnergyChartViewModel.ShowPriceComponents`, `UserManagementViewModel.Add` and `Edit`. (`ShowPowerFlow` opens a
+page, not a dialog, and needs neither the flag nor the gate.)
 
 **The flag on its own is too much, though.** The menu bar is the one thing a modal dialog does not disable - the
 dimming layer sits in the content row, not over the bar - so on a head with one dialog frame the disabled command
@@ -327,8 +328,9 @@ attached properties on the page's own root, set in its XAML:
   silently do nothing.
 
 **A dialog body may say the same** (since 2026-09-16): `WindowDialogPresentation.Open` reads the two properties
-off `HostedContent` after `LimitToScreen(1)`, so a body with no size of its own - the power flow page, see
-[[PowerFlowPage.Lifecycle]] - opens at the size it declares and is then the user's to resize. A body that says
+off `HostedContent` after `LimitToScreen(1)`, so a body with no size of its own opens at the size it declares and
+is then the user's to resize. No dialog uses it today - the power flow page was one for an afternoon, see
+[[PowerFlowPage.Lifecycle]], and is a page now - but `SizedTestDialog` pins that it works. A body that says
 nothing, which is every form, stays as big as what is on it, as before. It is on the body and not in
 `DialogParameters` because it is the view's knowledge, not the caller's: the same view says the same thing on
 every head, and inside the dialog frame it is simply not read.

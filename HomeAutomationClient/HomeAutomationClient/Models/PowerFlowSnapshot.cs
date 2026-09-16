@@ -2,10 +2,12 @@ using De.Hochstaetter.Fronius.Models.Charging;
 
 namespace De.Hochstaetter.HomeAutomationClient.Models;
 
-/// <summary>What a node of the power flow page is, which decides its icon, its caption and the colour of its wire.</summary>
+/// <summary>What a node of the power flow page is, which decides its icon, its caption, its idle threshold and the colour of its wire.</summary>
 public enum PowerFlowNodeKind
 {
     Grid,
+
+    /// <summary>One tracker of an inverter - a Gen24 has two - or, where the inverter does not report them one by one, its panels as a whole.</summary>
     Solar,
     Inverter,
     Battery,
@@ -22,16 +24,19 @@ public enum PowerFlowNodeKind
 }
 
 /// <summary>
-/// The kind of power on a wire, which is what its colour says. Never the device: a battery's wire is battery
-/// coloured whether it charges or discharges, and the grid's turns from AC drawn to AC exported with the sign.
+/// The kind of power on a wire, which is what its colour says. Never the device, and never the direction: a
+/// battery's wire is battery coloured whether it charges or discharges, the grid's whether the house imports or
+/// exports - the moving dashes say which way.
 /// </summary>
 public enum PowerFlowKind
 {
     Idle,
     Solar,
     Battery,
-    Ac,
-    Export,
+    Grid,
+
+    /// <summary>AC inside the house: from the inverters to the house, and from the house to its consumers.</summary>
+    House,
 }
 
 /// <summary>The one line under a source's figure that says what it is doing. <see cref="None"/> for a node that has nothing to say.</summary>
@@ -50,7 +55,7 @@ public enum PowerFlowState
 /// One card of the power flow page and the wire that leads to it.
 /// </summary>
 /// <param name="Key">What tells this node from every other across snapshots - the device key, or a fixed name for the grid and the house.</param>
-/// <param name="Name">The device's own name where it has one: the inverter's system name, the battery's model, the plug's name. Empty for the grid and the house.</param>
+/// <param name="Name">The device's own name where it has one: the inverter's system name, "MPPT 1" for a tracker, the battery's model, the plug's name. Empty for the grid and the house.</param>
 /// <param name="Power">
 /// In watts, with the Gen24's signs: a battery is positive while it discharges and negative while it charges, the
 /// grid is positive while the house imports and negative while it exports. Everything else is positive while it does
@@ -59,17 +64,23 @@ public enum PowerFlowState
 /// <param name="StateOfCharge">0 to 1, batteries only.</param>
 public sealed record PowerFlowNode(string Key, PowerFlowNodeKind Kind, string Name, double? Power, double? StateOfCharge = null)
 {
-    /// <summary>Below this many watts a wire stands still and a figure is dimmed: a plug's standby draw is not a flow worth animating.</summary>
-    public const double IdleThreshold = 5;
+    /// <summary>Below this many watts a producer - and the house - is idle: an inverter at night still reports a few watts of its own.</summary>
+    public const double ProducerIdleThreshold = 10;
 
+    /// <summary>Below this many watts a consumer is idle. Tighter than the producers, because a plug that draws half a watt is switched on and worth seeing.</summary>
+    public const double ConsumerIdleThreshold = 0.2;
+
+    public double IdleThreshold => Kind is PowerFlowNodeKind.Consumer or PowerFlowNodeKind.Car or PowerFlowNodeKind.RestOfHouse ? ConsumerIdleThreshold : ProducerIdleThreshold;
+
+    /// <summary>Whether the wire stands still and the figure is dimmed. A node that has not reported is idle.</summary>
     public bool IsIdle => !(Math.Abs(Power ?? 0) >= IdleThreshold);
 
     public PowerFlowKind FlowKind => IsIdle ? PowerFlowKind.Idle : Kind switch
     {
         PowerFlowNodeKind.Solar => PowerFlowKind.Solar,
         PowerFlowNodeKind.Battery => PowerFlowKind.Battery,
-        PowerFlowNodeKind.Grid when Power < 0 => PowerFlowKind.Export,
-        _ => PowerFlowKind.Ac,
+        PowerFlowNodeKind.Grid => PowerFlowKind.Grid,
+        _ => PowerFlowKind.House,
     };
 
     /// <summary>
@@ -89,8 +100,12 @@ public sealed record PowerFlowNode(string Key, PowerFlowNodeKind Kind, string Na
     };
 }
 
-/// <summary>One inverter with what hangs off its DC side: its panels, and its battery where it has one.</summary>
-public sealed record PowerFlowInverter(PowerFlowNode Inverter, PowerFlowNode Solar, PowerFlowNode? Battery);
+/// <summary>One inverter with what hangs off its DC side: its trackers, and its battery where it has one.</summary>
+public sealed record PowerFlowInverter(PowerFlowNode Inverter, IReadOnlyList<PowerFlowNode> Solar, PowerFlowNode? Battery)
+{
+    /// <summary>The DC side in the order the cards are stacked: the trackers from the top, the battery last.</summary>
+    public IEnumerable<PowerFlowNode> DcSources => Battery is { } battery ? Solar.Append(battery) : Solar;
+}
 
 /// <summary>
 /// Everything the power flow page shows at one moment, worked out from what the update service holds. Immutable
@@ -120,14 +135,26 @@ public sealed record PowerFlowSnapshot(PowerFlowNode? Grid, IReadOnlyList<PowerF
 
         var inverterNodes = inverters.Select(keyed =>
         {
-            var flow = keyed.Device.Sensors?.PowerFlow;
-            var storage = keyed.Device.Sensors?.Storage;
+            var sensors = keyed.Device.Sensors;
+            var flow = sensors?.PowerFlow;
+            var storage = sensors?.Storage;
+
+            // One card per tracker the inverter reports. Where it reports none one by one, its panels as a whole,
+            // so that the picture never lacks the sun.
+            var trackers = Trackers(sensors?.Inverter)
+                .Select(tracker => new PowerFlowNode($"{keyed.Key}/mppt{tracker.Number}", PowerFlowNodeKind.Solar, $"MPPT {tracker.Number}", tracker.Power))
+                .ToList();
+
+            if (trackers.Count == 0)
+            {
+                trackers.Add(new PowerFlowNode($"{keyed.Key}/solar", PowerFlowNodeKind.Solar, string.Empty, flow?.SolarPower));
+            }
 
             return new PowerFlowInverter
             (
-                new PowerFlowNode(keyed.Key, PowerFlowNodeKind.Inverter, keyed.Device.Model ?? string.Empty, flow?.InverterAcPower),
-                // The panels carry the inverter's name: "Roof south" is what the user calls the roof, not the box under it.
-                new PowerFlowNode($"{keyed.Key}/solar", PowerFlowNodeKind.Solar, keyed.ToString() ?? string.Empty, flow?.SolarPower),
+                // The inverter carries the name the user gave it - "Roof south" - not the model on its type plate.
+                new PowerFlowNode(keyed.Key, PowerFlowNodeKind.Inverter, keyed.ToString() ?? string.Empty, flow?.InverterAcPower),
+                trackers,
                 storage is null ? null : new PowerFlowNode($"{keyed.Key}/battery", PowerFlowNodeKind.Battery, storage.Model ?? string.Empty, flow?.StoragePower, storage.StateOfCharge)
             );
         }).ToList();
@@ -148,5 +175,28 @@ public sealed record PowerFlowSnapshot(PowerFlowNode? Grid, IReadOnlyList<PowerF
         }
 
         return new PowerFlowSnapshot(grid, inverterNodes, houseNode, house.SelfSufficiency, metered);
+    }
+
+    /// <summary>
+    /// The trackers an inverter reports, numbered as on its type plate. This is the one place that knows which
+    /// sensor is which tracker: a Gen24 has two, and an inverter with four gets two more lines here and nothing
+    /// anywhere else. A tracker whose sensor is missing is not there; one that reports nought is.
+    /// </summary>
+    private static IEnumerable<(int Number, double? Power)> Trackers(Gen24Inverter? inverter)
+    {
+        if (inverter is null)
+        {
+            yield break;
+        }
+
+        if (inverter.Solar1Power is { } first)
+        {
+            yield return (1, first);
+        }
+
+        if (inverter.Solar2Power is { } second)
+        {
+            yield return (2, second);
+        }
     }
 }

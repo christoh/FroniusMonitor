@@ -15,49 +15,30 @@ public sealed partial class PowerFlowNodeItem(PowerFlowNode node) : BindableBase
     public partial PowerFlowNode Node { get; set; } = node;
 }
 
-/// <summary>One inverter cluster: three cards that move together, the battery one coming and going with the battery.</summary>
-public sealed partial class PowerFlowInverterItem : BindableBase
+/// <summary>
+/// One inverter cluster: the inverter's card and, stacked beside it, its DC side - one card per tracker, then the
+/// battery where there is one. Trackers and batteries come and go with the device, so the DC side is a collection.
+/// </summary>
+public sealed class PowerFlowInverterItem : BindableBase
 {
     public PowerFlowInverterItem(PowerFlowInverter cluster)
     {
         Key = cluster.Inverter.Key;
         Inverter = new PowerFlowNodeItem(cluster.Inverter);
-        Solar = new PowerFlowNodeItem(cluster.Solar);
-        Battery = cluster.Battery is { } battery ? new PowerFlowNodeItem(battery) : null;
+        Update(cluster);
     }
 
     public string Key { get; }
 
     public PowerFlowNodeItem Inverter { get; }
 
-    public PowerFlowNodeItem Solar { get; }
+    public ObservableCollection<PowerFlowNodeItem> DcSources { get; } = [];
 
-    [ObservableProperty]
-    public partial PowerFlowNodeItem? Battery { get; private set; }
-
-    /// <summary>Takes the new figures; true when a battery appeared or went, which is a new card and a new wire.</summary>
+    /// <summary>Takes the new figures; true when a tracker or the battery appeared or went, which is a new card and a new wire.</summary>
     public bool Update(PowerFlowInverter cluster)
     {
         Inverter.Node = cluster.Inverter;
-        Solar.Node = cluster.Solar;
-
-        switch (Battery, cluster.Battery)
-        {
-            case (null, null):
-                return false;
-
-            case ({ } item, { } battery):
-                item.Node = battery;
-                return false;
-
-            case (_, { } battery):
-                Battery = new PowerFlowNodeItem(battery);
-                return true;
-
-            default:
-                Battery = null;
-                return true;
-        }
+        return PowerFlowViewModelItems.Sync(DcSources, cluster.DcSources.ToList(), item => item.Key, node => node.Key, (item, node) => { item.Node = node; return false; }, node => new PowerFlowNodeItem(node));
     }
 }
 
@@ -90,7 +71,7 @@ public sealed partial class PowerFlowViewModelItems : BindableBase
     /// <summary>
     /// Folds a snapshot in. Call it on the thread the collections are bound on.
     /// </summary>
-    /// <returns>True when a card came or went - a device, a battery, the grid - so whoever draws the wires knows to draw them anew.</returns>
+    /// <returns>True when a card came or went - a device, a tracker, a battery, the grid - so whoever draws the wires knows to draw them anew.</returns>
     public bool Apply(PowerFlowSnapshot snapshot)
     {
         var structureChanged = false;
@@ -128,7 +109,8 @@ public sealed partial class PowerFlowViewModelItems : BindableBase
     /// changes when something is plugged in or a session starts, not with every reading, so the simple rule
     /// costs nothing and never leaves a card showing a device that has gone.
     /// </summary>
-    private static bool Sync<TItem, TSource>(ObservableCollection<TItem> items, IReadOnlyList<TSource> sources, Func<TItem, string> itemKey, Func<TSource, string> sourceKey, Func<TItem, TSource, bool> update, Func<TSource, TItem> create)
+    /// <returns>True when the collection was rebuilt, or an update said its own structure changed.</returns>
+    internal static bool Sync<TItem, TSource>(ObservableCollection<TItem> items, IReadOnlyList<TSource> sources, Func<TItem, string> itemKey, Func<TSource, string> sourceKey, Func<TItem, TSource, bool> update, Func<TSource, TItem> create)
     {
         if (items.Count == sources.Count && items.Select(itemKey).SequenceEqual(sources.Select(sourceKey), StringComparer.Ordinal))
         {

@@ -86,6 +86,23 @@ public class NotEmpty : ConverterBase
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => !string.IsNullOrWhiteSpace(value as string);
 }
 
+/// <summary>
+/// A length times a share of it, for a bar that fills part of a track: the track's width and a value from 0 to 1.
+/// Nought where either is missing, so a battery that has not reported shows an empty bar and not a stripe.
+/// </summary>
+public class Fraction : MultiConverterBase
+{
+    public override object? Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (values.Count < 2 || values[0] is not double length || values[1] is not double share || !double.IsFinite(length) || !double.IsFinite(share))
+        {
+            return 0d;
+        }
+
+        return Math.Clamp(share, 0, 1) * length;
+    }
+}
+
 /// <summary>Upper case, for the small letter-spaced captions of the cards. A converter, because a text has no CSS.</summary>
 public class UpperCase : ConverterBase
 {

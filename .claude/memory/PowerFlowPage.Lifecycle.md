@@ -2,9 +2,11 @@
 paths:
   - HomeAutomationClient/HomeAutomationClient/Models/PowerFlowSnapshot.cs
   - HomeAutomationClient/HomeAutomationClient/Models/PowerFlowViewModelItems.cs
-  - HomeAutomationClient/HomeAutomationClient/ViewModels/Dialogs/PowerFlowViewModel.cs
-  - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/PowerFlowView.axaml
-  - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/PowerFlowView.axaml.cs
+  - HomeAutomationClient/HomeAutomationClient/ViewModels/PowerFlowViewModel.cs
+  - HomeAutomationClient/HomeAutomationClient/Views/PowerFlowView.axaml
+  - HomeAutomationClient/HomeAutomationClient/Views/PowerFlowView.axaml.cs
+  - HomeAutomationClient/HomeAutomationClient/App.axaml.cs
+  - HomeAutomationClient/HomeAutomationClient/ViewModels/MainViewModel.cs
   - HomeAutomationClient/HomeAutomationClient/Converters/PowerFlowConverters.cs
   - HomeAutomationClient/HomeAutomationClient/App.axaml
   - HomeAutomationClient/HomeAutomationClient/Views/MainView.axaml
@@ -31,12 +33,12 @@ theirs and is not edited here; what was decided in building it is written down b
 
 ## What it shows
 
-Where the power of the house comes from and where it goes, as cards with wires between them. Left to right,
-because it is for the desktop and the desktop is wide:
+Where the power of the house comes from and where it goes, as cards with wires between them, under a title and a
+legend. Left to right, because it is for the desktop and the desktop is wide:
 
 | Column | Cards | Wire |
 |---|---|---|
-| Sources | The grid; then one **cluster** per inverter - its panels above, its battery below, the inverter to their right | Panels and battery into the inverter's left edge (two DC taps, 12 px above and below the middle); inverter and grid right into the **trunk** |
+| Sources | The grid; then one **cluster** per inverter - its DC side stacked on the left (**one card per tracker**, then the battery), the inverter to their right | Each DC card into its own tap on the inverter's left edge, the taps 14 px apart around the middle; inverter and grid right into the **trunk** |
 | Trunk | a vertical bus between the sources and the house | one tap per source, a dot at each |
 | House | one wide card: consumption, self-sufficiency, grid | trunk into its left edge; its right edge into the **spine** |
 | Consumers | every consumer that measures its power, wrapping to the width there is, and last **the rest of the house** | a spine down the left, one **rail** above each row, one **stub** down to each card |
@@ -48,18 +50,31 @@ around a drawing - see "The wires follow the cards".
 
 **Motion carries the number.** An active wire is a dashed line over a faint trace, and the dashes move at a speed
 that follows the watts on a log scale: `seconds per dash period = max(0.45, 3.2 − 0.72·log10(W))`, so 20 W
-crawls, 7 kW is brisk, and neither blurs or stands still. Below `PowerFlowNode.IdleThreshold` (5 W) a wire is a
-solid faint trace and the figure is dimmed. **Direction follows the sign:** a wire is drawn the way power usually
-goes - battery into inverter, grid into house - and `PowerFlowNode.IsReversed` (power < 0) runs the dashes back
-the other way. So a charging battery and an exporting house are the two wires that run backwards.
+crawls, 7 kW is brisk, and neither blurs or stands still. **Direction follows the sign:** a wire is drawn the way
+power usually goes - battery into inverter, grid into house - and `PowerFlowNode.IsReversed` (power < 0) runs
+the dashes back the other way. So a charging battery and an exporting house are the two wires that run backwards.
 
-**Colour is the kind of power, never the device** (`PowerFlowKind`): solar DC green, battery DC blue-green, AC
-drawn orange, AC exported blue, idle a trace of the ground. The grid's wire turns from orange to blue with the
-sign. Brushes are `Flow*` in `App.axaml`, both variants; the page sits on `DialogBackground`, which in the dark
-variant is the deep navy the design was drawn on.
+**Idle is per kind** (`PowerFlowNode.IdleThreshold`): a producer - grid, tracker, inverter, battery - and the
+house below **10 W**, an inverter at night still reporting a few watts of its own; a consumer below **0.2 W**,
+because a plug that draws half a watt is switched on and worth seeing. An idle wire is a solid trace in the idle
+colour with its junction dot, never nothing: **every card has a connector**, on or off. The figure is dimmed.
+
+**Colour is the kind of power, never the device and never the direction** (`PowerFlowKind`, the developer's
+choice): **solar yellow, battery green, grid grey, everything inside the house blue** - from the inverters to the
+house and from the house to its consumers. The grid's wire is grey whether the house imports or exports; the
+dashes say which way. The legend at the top right lists the four and idle. Brushes are `Flow*` in `App.axaml`,
+both variants. **The dark variant is the design's, not the app's**: ground `#0A1018`, cards `#131C2B`, on
+purpose one step deeper than the rest of the app, and the page paints its own `FlowPageBackground` because as a
+page it would otherwise sit on the window background. The light variant is the dialog's `#E8E8E8` ground, where
+the developer approved the light look.
 
 **Only name and figure on a consumer**, as the plan asks. A source has a state line under its figure - what a
-battery or the grid is doing, with the state of charge for the battery - and nothing else.
+battery or the grid is doing - and a battery a bar for its state of charge: a `Border.SocTrack` with a
+`Border.SocFill` whose width is the track's times the charge (`Fraction` multi converter). Not a `ProgressBar`:
+Fluent's, at four pixels high with `Maximum="1"`, drew full whatever the value.
+
+**The inverter card carries the name the user gave the inverter** ("Roof south"), the tracker cards
+"MPPT 1", "MPPT 2" (a label printed on the hardware, so not localized) under the caption Solar.
 
 ## Where the figures come from
 
@@ -69,9 +84,13 @@ battery or the grid is doing, with the state of charge for the battery - and not
 - **The house is `HousePower.From(site, carPower: null)`**: the whole load, cars included, and the same
   self-sufficiency. The signs are the Gen24's (see [[House]]): a battery is positive while it discharges, the
   grid positive while the house imports, `LoadPower` negative while the house draws.
-- **Per inverter** the nodes read `Sensors.PowerFlow` - `SolarPower`, `InverterAcPower`, `StoragePower` - and
-  the battery card `Sensors.Storage.StateOfCharge` (0..1, so `P0` prints it). The panels carry the inverter's
-  name (`KeyedGen24System.ToString()`, the system name), the inverter card its model.
+- **Per inverter** the inverter card reads `Sensors.PowerFlow.InverterAcPower` and is named
+  `KeyedGen24System.ToString()`, the system name. **The trackers are `PowerFlowSnapshot.Trackers`**, the one
+  place that knows which sensor is which tracker: `Sensors.Inverter.Solar1Power` and `Solar2Power` today, two
+  more lines there for an inverter with four and nothing anywhere else. A tracker whose sensor is null is not
+  there; one that reports nought is, idle. An inverter without tracker sensors gets one Solar card with
+  `PowerFlow.SolarPower`, so the picture never lacks the sun. The battery card reads `PowerFlow.StoragePower`
+  and `Sensors.Storage.StateOfCharge` (0..1, so `P0` prints it) and is named after the storage's model.
 - **A consumer takes part exactly when it is an `IPowerMeter1P` with `CanMeasurePower`.** Its name is the
   device's own `DisplayName`, not the keyed device's text, which for a Fritz!DECT is
   "AVM FRITZ!DECT 200: Heat pump". A Wattpilot is drawn as a car; an air conditioner, which measures nothing, is
@@ -107,6 +126,26 @@ currents.
   the truth on the bus, so `case IPowerConsumer3P: break;` stands before that case. Nothing serves three phase
   consumers over Modbus yet; the TODO above the switch says so.
 
+## A page, not a dialog
+
+`MainViewModel.ShowPowerFlow` calls `pagePresenter.Show<PowerFlowView>(PowerFlowView.PageKey, …)`: a window of
+its own on the desktop, the main view on the browser and the phones, exactly like a detail page and unlike the
+price chart beside it in the **View** menu (`Resources.View`, the WPF menu's `_View` / `_Ansicht`; the menu
+button template got `RecognizesAccessKey` so the underscore is a mnemonic and not a character). The plan said
+"Settings", but a Settings menu already exists for the devices. One page, so the key is fixed. The page declares
+`c:InitialWindowSize.Width="1500" Height="860"` and `c:ZoomBox.IsScope="True"` on its root, has no size of its
+own, and reflows to whatever width it is given.
+
+`PowerFlowView` and `PowerFlowViewModel` are transient in `App.axaml.cs`; the view resolves its view model in its
+constructor, as the injection rule wants - **after** hooking `DataContextChanged`, or it never hears about it,
+which is exactly the bug the headless tests caught first. The view model follows the devices from the view's
+`Loaded` (`Initialize`, idempotent) to its `Unloaded` (`Stop`): on the browser that is every trip to the
+dashboard and back, and the same page comes back with the same cards, because `MainViewPresenter` keeps one page
+per type.
+
+The page has no address of its own in the browser (see [[Navigation.Lifecycle]]); the Dashboard menu entry is
+the way back, as for a detail page.
+
 ## Two halves, for two threads
 
 The update service raises on the hub's thread, and a charging Wattpilot raises several times a second. Bound to
@@ -117,15 +156,14 @@ them again. So:
    (each inverter's `Gen24System`, each consumer, the site flow, the two collections). It is cheap; nothing
    filters property names.
 2. **`PowerFlowViewModel.Items`** (`PowerFlowViewModelItems`) is what the controls bind to: `Grid`, `House`,
-   `SelfSufficiency`, `Inverters`, `Consumers` as stable `PowerFlowNodeItem`s whose `Node` is replaced in
-   place. `Apply()` folds the latest snapshot in and returns **true only when a card came or went** - a device, a
-   battery, the grid. Same keys in the same order update in place; anything else rebuilds the collection.
+   `SelfSufficiency`, `Inverters` - each a `PowerFlowInverterItem` with its inverter and a `DcSources`
+   collection of trackers and battery - and `Consumers`, as stable `PowerFlowNodeItem`s whose `Node` is
+   replaced in place. `Apply()` folds the latest snapshot in and returns **true only when a card came or went**
+   - a device, a tracker, a battery, the grid. Same keys in the same order update in place; anything else
+   rebuilds that collection.
 3. **The view marshals** (`PowerFlowView.RequestRefresh`, one `Dispatcher.UIThread.Post` per burst) and calls
    `Apply` on the UI thread, as the interaction rule wants: the folding is the view model's, the thread is the
    view's. `PowerFlowViewModelItemsTests` covers the folding without a view.
-
-`AbortAsync` unsubscribes from everything before it closes, and `PowerFlowViewTests.Closing_the_page_lets_go_of_the_devices`
-checks that a device reporting afterwards changes nothing.
 
 ## The wires follow the cards
 
@@ -137,9 +175,11 @@ card style leaves; the spine is 34 px right of the house, in the consumers' left
 
 **It writes to a wire only what changed** - the path string, the dot positions, the label text, the thickness
 and kind - because setting a path's geometry invalidates layout, and an unconditional write on every layout pass
-would loop for ever. Wires are keyed (`solar:<inverter>`, `ac:<inverter>`, `grid`, `trunk`, `house`, `spine`,
+would loop for ever. Wires are keyed (`dc:<node>`, `ac:<inverter>`, `grid`, `trunk`, `house`, `spine`,
 `rail:<row>`, `stub:<consumer>`); after `Apply` says the structure changed, all of them are thrown away and
-routed anew, otherwise they are updated in place.
+routed anew, otherwise they are updated in place. **A wire's kind starts out as null**, so that the first update
+styles it whatever it is: with `Idle` as the initial value an idle-from-birth wire was never given a stroke or a
+thickness, and the first screenshot had connectors on some idle devices and none on others.
 
 **One animation frame callback** (`TopLevel.RequestAnimationFrame`) advances every moving wire's
 `StrokeDashOffset`; there is no timer per wire. Dash lengths are 10 px on, 14 px off, stated in multiples of the
@@ -150,25 +190,14 @@ towards the end of the path. The loop starts when the view is attached and ends 
 The whole stage is in a `ScrollViewer` (vertical only) inside a `ZoomBox`, so a site with more inverters than
 fit scrolls, and Ctrl with the wheel scales the picture.
 
-## How it opens
-
-From the **Energy** menu of the menu bar, beside the price chart, which moved there from a button of its own -
-the plan said "Settings", but a Settings menu already existed for the devices and would have made two. Like the
-price chart it is a resizable dialog, so a window of its own on the desktop and the dialog frame elsewhere
-(`MainViewModel.ShowPowerFlow`, concurrent and gated like the others; see [[DialogSystem.Lifecycle]]).
-
-The body declares **`c:InitialWindowSize.Width="1500" Height="860"`** and has no size of its own, so the window
-opens at that size and the consumers wrap to whatever width the user then gives it. That property was a page's
-until this day; `WindowDialogPresentation.Open` now reads it off a dialog body too. Inside the dialog frame the
-`MaxWidth` of 1600 does the wrapping job.
-
 ## Where this is tested
 
 - `PowerFlowSnapshotTests` - the arithmetic, the signs, who takes part, idle, the rest of the house.
 - `PowerFlowViewModelItemsTests` - the folding: figures in place, structure changes and only those.
-- `PowerFlowViewTests` (headless, in the Avalonia collection) - the window at its declared size, a card per node
-  and the wires between, a reading that updates a card **without rebuilding it** (same `Border`, same item),
-  a consumer that appears and gets a card and a stub, and a closed page that lets go of its devices.
+- `PowerFlowViewTests` (headless, in the Avalonia collection) - the page in its window at the declared size, a
+  card per node - trackers and battery included - and a wire with a stroke to every one of them, idle ones too;
+  a reading that updates a card **without rebuilding it** (same `Border`, same item); a consumer that appears and
+  gets a card and a stub; a closed page that lets go of its devices.
 - `WattPilotModelTests` - the charger as a consumer, and the JSON it does not leak into.
 
 **Not tested, and not testable here:** how it looks, and that the dashes run the right way. The headless platform
@@ -177,8 +206,10 @@ formula; if the Avalonia page ever looks wrong, that is the reference.
 
 ## Known gaps
 
-- No legend. Colour is the kind of power and the mockup had a legend for it; the page relies on the state lines.
+- No address of its own in the browser, so a reload lands on the dashboard; the menu is the way back.
 - A Toshiba air conditioner does not measure its power and so is not on the page at all, not even as idle.
+- A tracker that reports nought is a card - an unused second MPPT shows as an idle "MPPT 2". Hiding it would
+  need the configured peak power, and a peak of nought is as likely an unconfigured one as an unused tracker.
 - The rails are one per row of cards, so the row height is whatever the tallest card in it is; a very long
   consumer name wraps and pushes its row's rail up with it.
 - `PowerFlowNode.Name` of an inverter without a `Config` is "Fronius " with a trailing space, which is what

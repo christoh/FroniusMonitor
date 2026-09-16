@@ -4,16 +4,16 @@ namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests;
 
 /// <summary>
 /// The stable side of the power flow page: a snapshot folded into items that live on, so that the cards are never
-/// rebuilt for a reading and are rebuilt exactly when a device comes or goes.
+/// rebuilt for a reading and are rebuilt exactly when a device, a tracker or a battery comes or goes.
 /// </summary>
 public sealed class PowerFlowViewModelItemsTests
 {
     private static PowerFlowNode Node(string key, double? power, PowerFlowNodeKind kind = PowerFlowNodeKind.Consumer) => new(key, kind, key, power);
 
-    private static PowerFlowInverter Cluster(string key, double ac, double? battery = null) => new
+    private static PowerFlowInverter Cluster(string key, double ac, double? battery = null, int trackers = 2) => new
     (
         Node(key, ac, PowerFlowNodeKind.Inverter),
-        Node($"{key}/solar", 1000, PowerFlowNodeKind.Solar),
+        Enumerable.Range(1, trackers).Select(n => Node($"{key}/mppt{n}", 1000, PowerFlowNodeKind.Solar)).ToList(),
         battery is { } power ? Node($"{key}/battery", power, PowerFlowNodeKind.Battery) : null
     );
 
@@ -28,7 +28,7 @@ public sealed class PowerFlowViewModelItemsTests
 
         var grid = items.Grid;
         var inverter = items.Inverters.Single();
-        var battery = inverter.Battery;
+        var dcSources = inverter.DcSources.ToList();
         var consumers = items.Consumers.ToList();
 
         var changed = items.Apply(Snapshot(Node("grid", -300, PowerFlowNodeKind.Grid), [Cluster("inv", 2500, 400)], Node("a", 11), Node("b", 0)));
@@ -36,12 +36,12 @@ public sealed class PowerFlowViewModelItemsTests
         Assert.False(changed);
         Assert.Same(grid, items.Grid);
         Assert.Same(inverter, items.Inverters.Single());
-        Assert.Same(battery, items.Inverters.Single().Battery);
+        Assert.Equal(dcSources, inverter.DcSources);
         Assert.Equal(consumers, items.Consumers);
 
         Assert.Equal(-300, items.Grid!.Node.Power);
         Assert.Equal(2500, inverter.Inverter.Node.Power);
-        Assert.Equal(400, battery!.Node.Power);
+        Assert.Equal(400, inverter.DcSources[^1].Node.Power);
         Assert.Equal(11, items.Consumers[0].Node.Power);
         Assert.True(items.Consumers[1].Node.IsIdle);
     }
@@ -62,21 +62,28 @@ public sealed class PowerFlowViewModelItemsTests
     }
 
     [Fact]
-    public void A_battery_that_appears_or_disappears_is_a_change_of_structure()
+    public void The_dc_side_is_the_trackers_then_the_battery_and_changes_with_them()
     {
         var items = new PowerFlowViewModelItems();
         items.Apply(Snapshot(null, [Cluster("inv", 2000)]));
         var inverter = items.Inverters.Single();
-        Assert.Null(inverter.Battery);
+        Assert.Equal(["inv/mppt1", "inv/mppt2"], inverter.DcSources.Select(item => item.Key));
 
+        // A battery appears: one card more, at the end.
         Assert.True(items.Apply(Snapshot(null, [Cluster("inv", 2000, -500)])));
         Assert.Same(inverter, items.Inverters.Single());
-        Assert.NotNull(inverter.Battery);
+        Assert.Equal(["inv/mppt1", "inv/mppt2", "inv/battery"], inverter.DcSources.Select(item => item.Key));
 
+        // A reading changes nothing structural.
         Assert.False(items.Apply(Snapshot(null, [Cluster("inv", 2100, -600)])));
 
-        Assert.True(items.Apply(Snapshot(null, [Cluster("inv", 2000)])));
-        Assert.Null(inverter.Battery);
+        // A tracker goes.
+        Assert.True(items.Apply(Snapshot(null, [Cluster("inv", 2000, -600, trackers: 1)])));
+        Assert.Equal(["inv/mppt1", "inv/battery"], inverter.DcSources.Select(item => item.Key));
+
+        // And the battery.
+        Assert.True(items.Apply(Snapshot(null, [Cluster("inv", 2000, trackers: 1)])));
+        Assert.Equal(["inv/mppt1"], inverter.DcSources.Select(item => item.Key));
     }
 
     [Fact]

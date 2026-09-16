@@ -2,11 +2,11 @@ using Avalonia.Controls.Shapes;
 using Avalonia.VisualTree;
 using De.Hochstaetter.HomeAutomationClient.Converters;
 
-namespace De.Hochstaetter.HomeAutomationClient.Views.Dialogs;
+namespace De.Hochstaetter.HomeAutomationClient.Views;
 
 /// <summary>
-/// The body of the power flow dialog. The cards are XAML and bindings; what is here is the wiring between them,
-/// which needs the framework twice over: it is geometry read off the laid out cards, and it moves.
+/// The power flow page. The cards are XAML and bindings; what is here is the wiring between them, which needs the
+/// framework twice over: it is geometry read off the laid out cards, and it moves.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -28,19 +28,27 @@ namespace De.Hochstaetter.HomeAutomationClient.Views.Dialogs;
 /// <see cref="Route"/> runs on every layout pass but writes to a wire only what changed, because writing a path's
 /// geometry invalidates layout and an unconditional write would loop.
 /// </para>
+/// <para>
+/// A page, shown by the <c>IPagePresenter</c> like a detail page. The view model follows the devices while the
+/// page is loaded and lets go of them when it is unloaded - on a head with one view at a time that is every trip
+/// back to the dashboard, and the same page comes back with the same cards.
+/// </para>
 /// </remarks>
-public partial class PowerFlowView : UserControl, IDialogControl
+public partial class PowerFlowView : ContentPage
 {
+    /// <summary>What the page presenter tells this page by; there is one of it, not one per device.</summary>
+    public const string PageKey = "power-flow";
+
     private const double StrokeThickness = 3;
     private const double ThickStrokeThickness = 4;
     private const double DashLength = 10;
     private const double GapLength = 14;
 
-    /// <summary>The two DC taps sit this far above and below the middle of the inverter's left edge.</summary>
-    private const double TapOffset = 12;
+    /// <summary>The DC taps on the inverter's left edge are this far apart, centred on its middle.</summary>
+    private const double TapSpacing = 14;
 
     /// <summary>A rail runs this far above the top of the consumer cards of its row; the cards leave a margin for it.</summary>
-    private const double RailOffset = 14;
+    private const double RailOffset = 20;
 
     /// <summary>The spine stands this far right of the house; the consumers' left margin leaves room for it.</summary>
     private const double SpineOffset = 34;
@@ -58,10 +66,27 @@ public partial class PowerFlowView : UserControl, IDialogControl
     {
         InitializeComponent();
         DataContextChanged += OnDataContextChanged;
+
+        // Parameterless, so the XAML runtime loader and the previewer can create the view (AVLN3001). The container
+        // hands out the view model it would have injected; Try..., because the designer has no container. After the
+        // handler is on, or the view would never hear about the view model it was just given.
+        DataContext = IoC.TryGetRegistered<PowerFlowViewModel>();
+
         Stage.LayoutUpdated += (_, _) => Route();
         ActualThemeVariantChanged += (_, _) => Recolor();
-        AttachedToVisualTree += (_, _) => StartFrames();
-        DetachedFromVisualTree += (_, _) => isRunning = false;
+
+        Loaded += (_, _) =>
+        {
+            _ = viewModel?.Initialize();
+            RequestRefresh();
+            StartFrames();
+        };
+
+        Unloaded += (_, _) =>
+        {
+            isRunning = false;
+            viewModel?.Stop();
+        };
     }
 
     private void OnDataContextChanged(object? sender, EventArgs e)
@@ -79,9 +104,6 @@ public partial class PowerFlowView : UserControl, IDialogControl
         }
 
         viewModel.PropertyChanged += OnViewModelPropertyChanged;
-
-        // Fire and forget, as every dialog body does; Initialize guards itself against running twice.
-        _ = viewModel.Initialize();
         RequestRefresh();
     }
 
@@ -137,7 +159,7 @@ public partial class PowerFlowView : UserControl, IDialogControl
         TopLevel.GetTopLevel(this)?.RequestAnimationFrame(OnFrame);
     }
 
-    /// <summary>One step of every moving wire. Re-requests itself for as long as the view is on screen.</summary>
+    /// <summary>One step of every moving wire. Re-requests itself for as long as the page is on screen.</summary>
     private void OnFrame(TimeSpan time)
     {
         if (!isRunning)
@@ -204,14 +226,16 @@ public partial class PowerFlowView : UserControl, IDialogControl
             sourcesRight = Math.Max(sourcesRight, inverter.Rect.Right);
             trunkTaps.Add(inverter.Rect.Center.Y);
 
-            if (cards.TryGetValue(cluster.Solar.Key, out var solar))
-            {
-                Set(needed, $"solar:{cluster.Key}", solar.Item.Node, DcRoute(solar.Rect, inverter.Rect, -TapOffset), labelAt: new Point(solar.Rect.Right + (inverter.Rect.Left - solar.Rect.Right) / 2, solar.Rect.Center.Y - 12), signed: false);
-            }
+            // The DC cards, each into its own tap on the inverter's left edge; the taps are spread around the middle.
+            var dcSources = cluster.DcSources.Select(item => cards.TryGetValue(item.Key, out var card) ? card : default).Where(card => card.Item is { }).ToList();
 
-            if (cluster.Battery is { } battery && cards.TryGetValue(battery.Key, out var batteryCard))
+            for (var i = 0; i < dcSources.Count; i++)
             {
-                Set(needed, $"battery:{cluster.Key}", batteryCard.Item.Node, DcRoute(batteryCard.Rect, inverter.Rect, TapOffset), labelAt: new Point(batteryCard.Rect.Right + (inverter.Rect.Left - batteryCard.Rect.Right) / 2, batteryCard.Rect.Center.Y + 12), signed: true);
+                var (item, rect) = dcSources[i];
+                var tapY = inverter.Rect.Center.Y + (i - (dcSources.Count - 1) / 2.0) * TapSpacing;
+                var midX = rect.Right + (inverter.Rect.Left - rect.Right) / 2;
+                var path = Path(new Point(rect.Right, rect.Center.Y), new Point(midX, rect.Center.Y), new Point(midX, tapY), new Point(inverter.Rect.Left, tapY));
+                Set(needed, $"dc:{item.Key}", item.Node, path, labelAt: new Point(midX, rect.Center.Y - 12), signed: item.Node.Kind == PowerFlowNodeKind.Battery);
             }
         }
 
@@ -286,16 +310,9 @@ public partial class PowerFlowView : UserControl, IDialogControl
             foreach (var card in row)
             {
                 var x = card.Rect.Center.X;
-                Set(needed, $"stub:{card.Item.Key}", card.Item.Node, Path(new Point(x, railY), new Point(x, card.Rect.Top)), labelAt: null, signed: false, dots: card.Item.Node.IsIdle ? [] : [new Point(x, railY)]);
+                Set(needed, $"stub:{card.Item.Key}", card.Item.Node, Path(new Point(x, railY), new Point(x, card.Rect.Top)), labelAt: null, signed: false, dots: [new Point(x, railY)]);
             }
         }
-    }
-
-    /// <summary>From a DC card's right edge into the inverter's left edge, with the bend halfway and the tap above or below the middle.</summary>
-    private static string DcRoute(Rect from, Rect inverter, double tapOffset)
-    {
-        var midX = from.Right + (inverter.Left - from.Right) / 2;
-        return Path(new Point(from.Right, from.Center.Y), new Point(midX, from.Center.Y), new Point(midX, inverter.Center.Y + tapOffset), new Point(inverter.Left, inverter.Center.Y + tapOffset));
     }
 
     private static string Path(params Point[] points) => string.Join(' ', points.Select((point, i) => $"{(i == 0 ? 'M' : 'L')}{point.X.ToString("F1", CultureInfo.InvariantCulture)},{point.Y.ToString("F1", CultureInfo.InvariantCulture)}"));
@@ -350,7 +367,10 @@ public partial class PowerFlowView : UserControl, IDialogControl
 
         private string? path;
         private string? dotsAt;
-        private PowerFlowKind kind = PowerFlowKind.Idle;
+
+        /// <summary>Null until the first update, so that the first update styles the wire whatever it is - an idle one included.</summary>
+        private PowerFlowKind? kind;
+
         private bool thick;
         private double speed;
         private double period;
@@ -407,7 +427,7 @@ public partial class PowerFlowView : UserControl, IDialogControl
 
             // Log scale: 20 W crawls, 7 kW is brisk, and neither is a blur or a standstill.
             var absolute = Math.Abs(power);
-            var secondsPerPeriod = absolute < PowerFlowNode.IdleThreshold ? 0 : Math.Max(0.45, 3.2 - Math.Log10(absolute) * 0.72);
+            var secondsPerPeriod = node.IsIdle ? 0 : Math.Max(0.45, 3.2 - Math.Log10(Math.Max(absolute, 1)) * 0.72);
             speed = secondsPerPeriod > 0 ? period / secondsPerPeriod : 0;
             reversed = node.IsReversed;
 
@@ -451,16 +471,16 @@ public partial class PowerFlowView : UserControl, IDialogControl
             flow.Stroke = view.Brush(kind switch
             {
                 PowerFlowKind.Solar => "FlowSolar",
-                PowerFlowKind.Battery => "FlowBatteryDc",
-                PowerFlowKind.Export => "FlowExport",
-                _ => "FlowAc",
+                PowerFlowKind.Battery => "FlowBattery",
+                PowerFlowKind.Grid => "FlowGrid",
+                _ => "FlowHouse",
             });
 
             dots.ForEach(dot => dot.Fill = view.Brush("FlowJunction"));
 
             if (label is { } pill && labelText is { } text)
             {
-                pill.Background = view.Brush("DialogBackground");
+                pill.Background = view.Brush("FlowPageBackground");
                 text.Foreground = view.Brush("FlowLabel");
             }
         }

@@ -143,7 +143,7 @@ public sealed partial class MainViewModel : ViewModelBase
     public bool IsModalDialogVisible => CurrentDialog is { Parameters.IsModal: true };
 
     [ObservableProperty, NotifyPropertyChangedFor(nameof(IsDialogVisible), nameof(IsDialogBusy), nameof(IsModalDialogVisible), nameof(CanOpenDialog))]
-    [NotifyCanExecuteChangedFor(nameof(SettingsCommand), nameof(ShowEnergyChartCommand), nameof(ShowPowerFlowCommand), nameof(ChangePasswordCommand), nameof(LogoutCommand))]
+    [NotifyCanExecuteChangedFor(nameof(SettingsCommand), nameof(ShowEnergyChartCommand), nameof(ChangePasswordCommand), nameof(LogoutCommand))]
     public partial DialogQueueItem? CurrentDialog { get; set; }
 
     public ConcurrentStack<DialogQueueItem?> DialogQueue { get; } = new();
@@ -388,12 +388,14 @@ public sealed partial class MainViewModel : ViewModelBase
 
     /// <summary>
     /// The power flow page: the sources, the house and every metered consumer, with the power moving between
-    /// them. Beside the price chart in the Energy menu; the same window rules apply, see there.
+    /// them. A page like a detail view, not a dialog like the price chart beside it in the View menu: inside the
+    /// main view on the browser and the phones, a window of its own on the desktop. One of it, so the key is fixed.
     /// </summary>
-    [RelayCommand(AllowConcurrentExecutions = true, CanExecute = nameof(CanOpenDialog))]
-    private Task ShowPowerFlow() => TaskExceptionHandler(async () =>
+    [RelayCommand]
+    private Task ShowPowerFlow() => TaskExceptionHandler(() =>
     {
-        await new PowerFlowViewModel(new DialogParameters { Title = Loc.PowerFlow, IsResizeable = true }).ShowDialogAsync().ConfigureAwait(true);
+        pagePresenter.Show<PowerFlowView>(PowerFlowView.PageKey, Loc.PowerFlow, _ => { });
+        return Task.CompletedTask;
     });
 
     [RelayCommand]

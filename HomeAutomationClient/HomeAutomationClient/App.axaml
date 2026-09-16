@@ -51,20 +51,23 @@
                     <SolidColorBrush x:Key="PowerFlowGrid">LightGray</SolidColorBrush>
                     <SolidColorBrush x:Key="PowerGridIcon">#808080</SolidColorBrush>
 
-                    <!-- Power flow page. Colour is the kind of power, never the device: what the house draws is
-                         orange, what the sun gives is green, a battery's DC is blue-green and AC leaving the house
-                         is blue. Idle is a trace of the ground. -->
+                    <!-- Power flow page. Colour is the kind of power, never the device or the direction: solar
+                         yellow, battery green, grid grey, everything inside the house blue. Idle is a trace of the
+                         ground. The page paints its own ground, the shade a dialog has, which is where the developer
+                         approved the light look. -->
+                    <SolidColorBrush x:Key="FlowPageBackground">#E8E8E8</SolidColorBrush>
                     <SolidColorBrush x:Key="FlowCardBackground">White</SolidColorBrush>
                     <SolidColorBrush x:Key="FlowCardBorder">#CBD3DF</SolidColorBrush>
                     <SolidColorBrush x:Key="FlowCardBorderActive">#9FB0C8</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowText">Black</SolidColorBrush>
                     <SolidColorBrush x:Key="FlowLabel">#5B6B84</SolidColorBrush>
                     <SolidColorBrush x:Key="FlowMuted">#8C99AE</SolidColorBrush>
-                    <SolidColorBrush x:Key="FlowAc">#E07B1A</SolidColorBrush>
-                    <SolidColorBrush x:Key="FlowSolar">#1FA864</SolidColorBrush>
-                    <SolidColorBrush x:Key="FlowBatteryDc">#1A97B8</SolidColorBrush>
-                    <SolidColorBrush x:Key="FlowExport">#3B7FE0</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowSolar">#D4A106</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowBattery">#1FA864</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowGrid">#7D8A9F</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowHouse">#3B7FE0</SolidColorBrush>
                     <SolidColorBrush x:Key="FlowIdle">#C9D1DE</SolidColorBrush>
-                    <SolidColorBrush x:Key="FlowJunction">#B86A12</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowJunction">#6B7A92</SolidColorBrush>
                     
                     <!--Menus-->
                     <SolidColorBrush x:Key='MenuBackground'>#f0f0f0</SolidColorBrush>
@@ -149,19 +152,21 @@
                     <SolidColorBrush x:Key="PowerFlowGrid">#ff404040</SolidColorBrush>
                     <SolidColorBrush x:Key="PowerGridIcon">#808080</SolidColorBrush>
 
-                    <!-- Power flow page, see the light variant. The page sits on DialogBackground, which is the
-                         deep navy the design was drawn on; the cards are one step lighter than it. -->
-                    <SolidColorBrush x:Key="FlowCardBackground">#0C2B4E</SolidColorBrush>
-                    <SolidColorBrush x:Key="FlowCardBorder">#1E4570</SolidColorBrush>
-                    <SolidColorBrush x:Key="FlowCardBorderActive">#2E5F95</SolidColorBrush>
-                    <SolidColorBrush x:Key="FlowLabel">#8FA3BF</SolidColorBrush>
-                    <SolidColorBrush x:Key="FlowMuted">#5D7594</SolidColorBrush>
-                    <SolidColorBrush x:Key="FlowAc">#F0872B</SolidColorBrush>
-                    <SolidColorBrush x:Key="FlowSolar">#3ECF8E</SolidColorBrush>
-                    <SolidColorBrush x:Key="FlowBatteryDc">#3FB9D8</SolidColorBrush>
-                    <SolidColorBrush x:Key="FlowExport">#6EA8FF</SolidColorBrush>
-                    <SolidColorBrush x:Key="FlowIdle">#1F4368</SolidColorBrush>
-                    <SolidColorBrush x:Key="FlowJunction">#F7C58F</SolidColorBrush>
+                    <!-- Power flow page, see the light variant. These are the colours of the design the page was drawn
+                         from - a deeper ground than the rest of the app, on purpose and by the developer's choice. -->
+                    <SolidColorBrush x:Key="FlowPageBackground">#0A1018</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowCardBackground">#131C2B</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowCardBorder">#23304A</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowCardBorderActive">#2D3D5C</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowText">#E7EDF7</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowLabel">#8B98AE</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowMuted">#5D6B84</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowSolar">#F5C518</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowBattery">#3ECF8E</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowGrid">#8B98AE</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowHouse">#5B9DFF</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowIdle">#2B3752</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowJunction">#AEBBD0</SolidColorBrush>
                     
                     <!--Menus-->
                     <SolidColorBrush x:Key='MenuBackground'>#303030</SolidColorBrush>
