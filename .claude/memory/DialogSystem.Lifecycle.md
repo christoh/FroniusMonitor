@@ -8,6 +8,7 @@ paths:
   - HomeAutomationClient/HomeAutomationClient/Contracts/IDialogControl.cs
   - HomeAutomationClient/HomeAutomationClient/Controls/DragMove.cs
   - HomeAutomationClient/HomeAutomationClient/Controls/DragResize.cs
+  - HomeAutomationClient/HomeAutomationClient/Controls/InitialWindowSize.cs
   - HomeAutomationClient/HomeAutomationClient/MessageBoxes/**
   - HomeAutomationClient/HomeAutomationClient/Views/MainView.axaml
   - HomeAutomationClient/HomeAutomationClient/Views/ChildWindow.axaml
@@ -40,6 +41,7 @@ below the line `presenter.Create(...)` is the presenter's.
 | `MainViewPresenter` | Both, inside `MainView`: the dialog frame and the one content host. Every head but the desktop. |
 | `WindowPresenter` | Both, as windows. The desktop only. |
 | `ChildWindow` | The window a dialog or a page goes in: chrome, a content host and a busy animation. |
+| `InitialWindowSize` | Two optional attached properties a detail page sets on its own root to say how big its window opens. |
 | `DialogQueueItem` | One shown dialog - its body and its live parameters - held by `MainViewModel.CurrentDialog`. Only `MainViewPresenter` uses it. |
 | `MainView.axaml` | The host of that presenter: dimming layer, dialog frame, title bar, body, busy animation. |
 
@@ -293,6 +295,38 @@ things: that a long drag fills the overlay from any starting position, and that 
 that probe first.** Reasoning about which of `Width`, `MaxWidth`, the alignment, the render transform and the
 arrange pass wins was wrong five times in a row; measuring was right every time.
 
+## How big a page window opens
+
+Sized by its content, unless the page says otherwise. `Controls/InitialWindowSize.cs` is how it says so - two
+attached properties on the page's own root, set in its XAML:
+
+```xml
+<ContentPage c:InitialWindowSize.Width="1400" c:InitialWindowSize.Height="900" …>
+```
+
+- **Optional and per view.** The default of both is `NaN`, which means "the content decides", so a page that says
+  nothing behaves exactly as every page window did before this existed. No page sets either today.
+- **The two are independent.** Fixing only the width gives a window that wide and as tall as what is on it, which
+  is the useful combination for a wall of gauges: the width is what decides how many fit in a row, the height is
+  however many rows that makes.
+- **Initial, not fixed.** The window is resizable from the moment it is up and nothing is written back or
+  remembered, so the next window for that page opens at the declared size again.
+- **It is read by the presenter, not by the window.** `ChildWindow` has no idea that what is on it is a page;
+  `WindowPresenter.Show` reads the properties off the page and calls `ChildWindow.SetInitialSize`. Inside
+  `MainView` the properties are simply not read - a page fills the view it is put in - and that is not an error:
+  the same view runs on every head.
+- **The screen cap still binds it.** `SetInitialSize` is called after `LimitToScreen` and clamps to the same
+  maximum, so a view may ask for more room than the screen has and its window still opens on the screen. A zero,
+  a negative number or an infinity counts as "not asked for": it is one number in a view's XAML, and there is
+  nobody for the window to report it to.
+- **A fixed dimension is not sized to its content at all.** `ChildWindow.ApplySizeToContent` picks
+  `SizeToContent.Width`, `.Height`, `.WidthAndHeight` or `.Manual` from which of the two were given. Setting both
+  a size and `SizeToContent` for the same dimension has the content win, and the number the view asked for would
+  silently do nothing.
+
+Dialog windows have no equivalent: a dialog is as big as the form on it, and `DialogParameters` says nothing
+about size. If one ever needs to, that is a parameter - see "The queue item holds the live parameters".
+
 ## Closing
 
 - The close box is visible when `ShowCloseBox` is true and runs `MainViewModel.DialogClosedCommand`, which calls
@@ -336,6 +370,10 @@ reuse and activation, the close box through `AbortAsync`, a dialog with no close
 dialog is up, the modal message box, a logout, and on the other side the dialog frame, nesting, the busy text
 handover, one page per view type and the menu bar gate.
 
+The four `A_page_window_…` facts in `WindowPresenterTests` cover the initial size: both dimensions asked for, one
+of the two, neither, and a page asking for more than the screen has. The last one reads the screen back off the
+window and so fails rather than passing vacuously if the cap ever stops being applied.
+
 ## Known gaps
 
 - `IDialogBase` is `IDisposable` and nobody disposes it. The `CancellationTokenSource` of every dialog is left to
@@ -346,5 +384,7 @@ handover, one page per view type and the menu bar gate.
   currently showing, because the two modes of that dialog share one `OkCommand`.
 - Nothing takes focus when a dialog opens; a window at least takes the focus of the window manager.
 - The title bar always uses `SystemControlBackgroundAccentBrush` and the dialog `DialogBackground`; a dialog cannot theme itself.
-- A dialog window remembers neither its size nor its place, unlike the main window ([[PlatformHeads.Lifecycle]]).
-  It opens centred on its owner, sized to its content, every time.
+- Neither a dialog window nor a page window remembers its size or its place, unlike the main window
+  ([[PlatformHeads.Lifecycle]]). A dialog opens centred on its owner, sized to its content, every time; a page
+  opens centred on the screen, at whatever `InitialWindowSize` its view declares, every time. What the user
+  dragged either to is lost when it closes.
