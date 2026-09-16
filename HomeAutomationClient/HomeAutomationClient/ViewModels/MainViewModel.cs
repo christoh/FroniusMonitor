@@ -143,7 +143,7 @@ public sealed partial class MainViewModel : ViewModelBase
     public bool IsModalDialogVisible => CurrentDialog is { Parameters.IsModal: true };
 
     [ObservableProperty, NotifyPropertyChangedFor(nameof(IsDialogVisible), nameof(IsDialogBusy), nameof(IsModalDialogVisible), nameof(CanOpenDialog))]
-    [NotifyCanExecuteChangedFor(nameof(SettingsCommand), nameof(ShowEnergyChartCommand), nameof(ChangePasswordCommand), nameof(LogoutCommand))]
+    [NotifyCanExecuteChangedFor(nameof(SettingsCommand), nameof(ShowEnergyChartCommand), nameof(ShowPowerFlowCommand), nameof(ChangePasswordCommand), nameof(LogoutCommand))]
     public partial DialogQueueItem? CurrentDialog { get; set; }
 
     public ConcurrentStack<DialogQueueItem?> DialogQueue { get; } = new();
@@ -384,6 +384,16 @@ public sealed partial class MainViewModel : ViewModelBase
     private Task ShowEnergyChart() => TaskExceptionHandler(async () =>
     {
         await new EnergyChartViewModel(new DialogParameters { Title = Loc.ElectricityPrice, IsResizeable = true }).ShowDialogAsync().ConfigureAwait(true);
+    });
+
+    /// <summary>
+    /// The power flow page: the sources, the house and every metered consumer, with the power moving between
+    /// them. Beside the price chart in the Energy menu; the same window rules apply, see there.
+    /// </summary>
+    [RelayCommand(AllowConcurrentExecutions = true, CanExecute = nameof(CanOpenDialog))]
+    private Task ShowPowerFlow() => TaskExceptionHandler(async () =>
+    {
+        await new PowerFlowViewModel(new DialogParameters { Title = Loc.PowerFlow, IsResizeable = true }).ShowDialogAsync().ConfigureAwait(true);
     });
 
     [RelayCommand]

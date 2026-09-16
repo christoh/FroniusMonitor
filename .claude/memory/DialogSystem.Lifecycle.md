@@ -41,7 +41,7 @@ below the line `presenter.Create(...)` is the presenter's.
 | `MainViewPresenter` | Both, inside `MainView`: the dialog frame and the one content host. Every head but the desktop. |
 | `WindowPresenter` | Both, as windows. The desktop only. |
 | `ChildWindow` | The window a dialog or a page goes in: chrome, a content host and a busy animation. |
-| `InitialWindowSize` | Two optional attached properties a detail page sets on its own root to say how big its window opens. |
+| `InitialWindowSize` | Two optional attached properties a detail page - or, since 2026-09-16, a dialog body - sets on its own root to say how big its window opens. |
 | `DialogQueueItem` | One shown dialog - its body and its live parameters - held by `MainViewModel.CurrentDialog`. Only `MainViewPresenter` uses it. |
 | `MainView.axaml` | The host of that presenter: dimming layer, dialog frame, title bar, body, busy animation. |
 
@@ -86,8 +86,8 @@ its previous run is still pending, and a run that awaits `ShowDialogAsync` is pe
 on screen - which used to be a modal moment and is now a window the user leaves standing. Without the flag the
 menu entry or button is **disabled** for exactly that time, so a second settings dialog could never be opened and
 clicking Electricity price while its window was up did nothing at all, not even bring it to the front. It carries
-Six commands need the flag today: `MainViewModel.Settings`, `ChangePassword` and `ShowEnergyChart`,
-`EnergyChartViewModel.ShowPriceComponents`, `UserManagementViewModel.Add` and `Edit`.
+Seven commands need the flag today: `MainViewModel.Settings`, `ChangePassword`, `ShowEnergyChart` and
+`ShowPowerFlow`, `EnergyChartViewModel.ShowPriceComponents`, `UserManagementViewModel.Add` and `Edit`.
 
 **The flag on its own is too much, though.** The menu bar is the one thing a modal dialog does not disable - the
 dimming layer sits in the content row, not over the bar - so on a head with one dialog frame the disabled command
@@ -326,8 +326,12 @@ attached properties on the page's own root, set in its XAML:
   a size and `SizeToContent` for the same dimension has the content win, and the number the view asked for would
   silently do nothing.
 
-Dialog windows have no equivalent: a dialog is as big as the form on it, and `DialogParameters` says nothing
-about size. If one ever needs to, that is a parameter - see "The queue item holds the live parameters".
+**A dialog body may say the same** (since 2026-09-16): `WindowDialogPresentation.Open` reads the two properties
+off `HostedContent` after `LimitToScreen(1)`, so a body with no size of its own - the power flow page, see
+[[PowerFlowPage.Lifecycle]] - opens at the size it declares and is then the user's to resize. A body that says
+nothing, which is every form, stays as big as what is on it, as before. It is on the body and not in
+`DialogParameters` because it is the view's knowledge, not the caller's: the same view says the same thing on
+every head, and inside the dialog frame it is simply not read.
 
 ## Closing
 
@@ -385,7 +389,8 @@ dialog window goes with it and its caller is released - the shutdown itself cann
 the headless session is one lifetime for the whole run.
 
 The four `A_page_window_…` facts in `WindowPresenterTests` cover the initial size: both dimensions asked for, one
-of the two, neither, and a page asking for more than the screen has. The last one reads the screen back off the
+of the two, neither, and a page asking for more than the screen has; `A_dialog_body_may_declare_the_size_its_window_opens_at`
+covers the dialog side with `SizedTestDialog`. The last one reads the screen back off the
 window and so fails rather than passing vacuously if the cap ever stops being applied.
 
 ## Known gaps

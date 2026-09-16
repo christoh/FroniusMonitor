@@ -1,0 +1,217 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
+             xmlns:m="clr-namespace:De.Hochstaetter.HomeAutomationClient.Models"
+             xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+             xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
+             mc:Ignorable="d" d:DesignWidth="1500" d:DesignHeight="860"
+             x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.PowerFlowView"
+             x:DataType="dialogs:PowerFlowViewModel"
+             MinWidth="980" MinHeight="560" MaxWidth="1600"
+             c:InitialWindowSize.Width="1500" c:InitialWindowSize.Height="860"
+             FontSize="12">
+	<!-- Landscape, for the desktop: the sources on the left, the house in the middle, the consumers on the right.
+	     No fixed size of its own, unlike the price chart: the window opens at the InitialWindowSize above and the
+	     consumers wrap to whatever width the user then gives it, and inside the dialog frame of MainView the
+	     maximum width does the same job. The wires are drawn by the code behind into the canvas below, from where
+	     the cards ended up; see PowerFlowView.axaml.cs. -->
+	<UserControl.Resources>
+		<!-- A source: an inverter, its panels, its battery, the grid. Name where it has one, then the kind, the figure,
+		     and a line that says what it is doing. -->
+		<DataTemplate x:Key="SourceCard" DataType="m:PowerFlowNodeItem">
+			<Border Classes="Card" Classes.Active="{Binding !Node.IsIdle}">
+				<StackPanel Spacing="2">
+					<Path Classes="Icon" Data="{Binding Node.Kind, Converter={co:PowerFlowIcon}}" />
+					<TextBlock Classes="Name" Text="{Binding Node.Name}" IsVisible="{Binding Node.Name, Converter={co:NotEmpty}}" />
+					<TextBlock Classes="Label" Text="{Binding Node, Converter={co:PowerFlowTitle}}" />
+					<TextBlock Classes="Value" Classes.Idle="{Binding Node.IsIdle}" Text="{Binding Node.Power, Converter={co:PowerText}}" />
+					<TextBlock Classes="State" Text="{Binding Node, Converter={co:PowerFlowStateText}}" IsVisible="{Binding Node, Converter={co:PowerFlowHasState}}" />
+					<ProgressBar Classes="Soc" Minimum="0" Maximum="1" Value="{Binding Node.StateOfCharge, FallbackValue=0, TargetNullValue=0}"
+					             IsVisible="{Binding Node.StateOfCharge, Converter={co:Null2Bool}}" />
+				</StackPanel>
+			</Border>
+		</DataTemplate>
+
+		<!-- A consumer: its name and its figure, and nothing else, as the plan asks. -->
+		<DataTemplate x:Key="ConsumerCard" DataType="m:PowerFlowNodeItem">
+			<Border Classes="Card Consumer" Classes.Active="{Binding !Node.IsIdle}">
+				<StackPanel Spacing="2">
+					<Path Classes="Icon" Data="{Binding Node.Kind, Converter={co:PowerFlowIcon}}" />
+					<TextBlock Classes="Label" Text="{Binding Node, Converter={co:PowerFlowTitle}}" />
+					<TextBlock Classes="Value" Classes.Idle="{Binding Node.IsIdle}" Text="{Binding Node.Power, Converter={co:PowerText}}" />
+				</StackPanel>
+			</Border>
+		</DataTemplate>
+
+		<!-- The house: what it draws, and the two figures that say where from. Those two are the page's, not the
+		     node's, so they reach up to the view model. -->
+		<DataTemplate x:Key="HouseCard" DataType="m:PowerFlowNodeItem">
+			<Border Classes="Card House" Classes.Active="{Binding !Node.IsIdle}">
+				<StackPanel Spacing="2">
+					<Path Classes="Icon" Data="{Binding Node.Kind, Converter={co:PowerFlowIcon}}" />
+					<TextBlock Classes="Label" Text="{Binding Node, Converter={co:PowerFlowTitle}}" />
+					<TextBlock Classes="Value" Classes.Idle="{Binding Node.IsIdle}" Text="{Binding Node.Power, Converter={co:PowerText}}" />
+					<Grid ColumnDefinitions="*,*" Margin="0,8,0,0">
+						<StackPanel Grid.Column="0" Spacing="1">
+							<TextBlock Classes="Key" Text="{x:Static p:Resources.SelfSufficiency}" />
+							<TextBlock Classes="Figure" Text="{Binding $parent[UserControl].((dialogs:PowerFlowViewModel)DataContext).Items.SelfSufficiency, StringFormat='{}{0:N0} %', TargetNullValue=---, FallbackValue=---}" />
+						</StackPanel>
+						<StackPanel Grid.Column="1" Spacing="1">
+							<TextBlock Classes="Key" Text="{x:Static p:Resources.Grid}" />
+							<!-- Signed: a minus is the house exporting. -->
+							<TextBlock Classes="Figure" Text="{Binding $parent[UserControl].((dialogs:PowerFlowViewModel)DataContext).Items.Grid.Node.Power, Converter={co:PowerText Signed=True}, FallbackValue=---}" />
+						</StackPanel>
+					</Grid>
+				</StackPanel>
+			</Border>
+		</DataTemplate>
+	</UserControl.Resources>
+
+	<UserControl.Styles>
+		<Style Selector="Border.Card">
+			<Setter Property="Background" Value="{DynamicResource FlowCardBackground}" />
+			<Setter Property="BorderBrush" Value="{DynamicResource FlowCardBorder}" />
+			<Setter Property="BorderThickness" Value="1" />
+			<Setter Property="CornerRadius" Value="10" />
+			<Setter Property="Padding" Value="12,10,12,10" />
+			<Setter Property="Width" Value="150" />
+			<Setter Property="VerticalAlignment" Value="Top" />
+		</Style>
+		<Style Selector="Border.Card.Active">
+			<Setter Property="BorderBrush" Value="{DynamicResource FlowCardBorderActive}" />
+		</Style>
+		<Style Selector="Border.Card.Consumer">
+			<!-- Room above for the rail the card hangs off, and to the right of the next one. -->
+			<Setter Property="Margin" Value="0,26,18,0" />
+			<Setter Property="Padding" Value="10,9,10,8" />
+		</Style>
+		<Style Selector="Border.Card.House">
+			<Setter Property="Width" Value="270" />
+			<Setter Property="Padding" Value="20,14,20,12" />
+		</Style>
+
+		<Style Selector="Border.Card Path.Icon">
+			<Setter Property="Stroke" Value="{DynamicResource ForegroundBrush}" />
+			<Setter Property="StrokeThickness" Value="1.7" />
+			<Setter Property="StrokeLineCap" Value="Round" />
+			<Setter Property="StrokeJoin" Value="Round" />
+			<Setter Property="Fill" Value="Transparent" />
+			<Setter Property="Stretch" Value="Uniform" />
+			<Setter Property="Width" Value="22" />
+			<Setter Property="Height" Value="22" />
+			<Setter Property="Margin" Value="0,0,0,4" />
+			<Setter Property="HorizontalAlignment" Value="Center" />
+		</Style>
+		<Style Selector="Border.Card.Consumer Path.Icon">
+			<Setter Property="Stroke" Value="{DynamicResource FlowLabel}" />
+			<Setter Property="Width" Value="18" />
+			<Setter Property="Height" Value="18" />
+			<Setter Property="Margin" Value="0,0,0,2" />
+		</Style>
+		<Style Selector="Border.Card.Consumer.Active Path.Icon">
+			<Setter Property="Stroke" Value="{DynamicResource FlowAc}" />
+		</Style>
+
+		<Style Selector="Border.Card TextBlock">
+			<Setter Property="TextAlignment" Value="Center" />
+			<Setter Property="TextWrapping" Value="Wrap" />
+			<Setter Property="HorizontalAlignment" Value="Center" />
+		</Style>
+		<Style Selector="Border.Card TextBlock.Name">
+			<Setter Property="FontWeight" Value="Medium" />
+		</Style>
+		<Style Selector="Border.Card TextBlock.Label">
+			<Setter Property="FontSize" Value="10" />
+			<Setter Property="LetterSpacing" Value="1.2" />
+			<Setter Property="FontWeight" Value="Medium" />
+			<Setter Property="Foreground" Value="{DynamicResource FlowLabel}" />
+		</Style>
+		<Style Selector="Border.Card TextBlock.Value">
+			<Setter Property="FontSize" Value="19" />
+			<Setter Property="FontWeight" Value="Bold" />
+			<!-- Tabular figures, so a value that ticks over does not make the card breathe. -->
+			<Setter Property="FontFeatures" Value="+tnum" />
+		</Style>
+		<Style Selector="Border.Card.Consumer TextBlock.Value">
+			<Setter Property="FontSize" Value="16" />
+		</Style>
+		<Style Selector="Border.Card.House TextBlock.Value">
+			<Setter Property="FontSize" Value="26" />
+		</Style>
+		<Style Selector="Border.Card TextBlock.Value.Idle">
+			<Setter Property="Foreground" Value="{DynamicResource FlowMuted}" />
+		</Style>
+		<Style Selector="Border.Card TextBlock.State">
+			<Setter Property="FontSize" Value="11" />
+			<Setter Property="Foreground" Value="{DynamicResource FlowLabel}" />
+		</Style>
+		<Style Selector="Border.Card TextBlock.Key">
+			<Setter Property="FontSize" Value="9.5" />
+			<Setter Property="LetterSpacing" Value="1" />
+			<Setter Property="Foreground" Value="{DynamicResource FlowMuted}" />
+		</Style>
+		<Style Selector="Border.Card TextBlock.Figure">
+			<Setter Property="FontSize" Value="13" />
+			<Setter Property="FontWeight" Value="SemiBold" />
+			<Setter Property="FontFeatures" Value="+tnum" />
+		</Style>
+		<Style Selector="Border.Card ProgressBar.Soc">
+			<Setter Property="Height" Value="4" />
+			<Setter Property="MinHeight" Value="4" />
+			<Setter Property="Margin" Value="0,6,0,0" />
+			<Setter Property="Foreground" Value="{DynamicResource FlowBatteryDc}" />
+			<Setter Property="Background" Value="{DynamicResource FlowIdle}" />
+		</Style>
+	</UserControl.Styles>
+
+	<ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+		<!-- Ctrl with the wheel scales the whole picture; see ZoomBox. The scope is the window or the main view. -->
+		<c:ZoomBox>
+			<Grid x:Name="Stage" ColumnDefinitions="Auto,72,Auto,72,*" Margin="20,24" VerticalAlignment="Center">
+				<!-- First, so that it is under the cards. -->
+				<Canvas x:Name="Wires" Grid.ColumnSpan="5" ClipToBounds="False" IsHitTestVisible="False" />
+
+				<!-- Sources: the grid, then one cluster per inverter - its panels above, its battery below, the inverter
+				     to their right - all with their right edges on one line, which is where the trunk takes them. -->
+				<StackPanel Grid.Column="0" x:Name="Sources" Spacing="24" VerticalAlignment="Center" HorizontalAlignment="Right">
+					<ContentControl Content="{Binding Items.Grid}" ContentTemplate="{StaticResource SourceCard}" HorizontalAlignment="Right"
+					                IsVisible="{Binding Items.Grid, Converter={co:Null2Bool}}" />
+					<ItemsControl ItemsSource="{Binding Items.Inverters}" HorizontalAlignment="Right">
+						<ItemsControl.ItemsPanel>
+							<ItemsPanelTemplate>
+								<StackPanel Spacing="24" />
+							</ItemsPanelTemplate>
+						</ItemsControl.ItemsPanel>
+						<ItemsControl.ItemTemplate>
+							<DataTemplate DataType="m:PowerFlowInverterItem">
+								<Grid ColumnDefinitions="Auto,56,Auto" RowDefinitions="Auto,20,Auto">
+									<ContentControl Grid.Row="0" Grid.Column="0" Content="{Binding Solar}" ContentTemplate="{StaticResource SourceCard}" />
+									<ContentControl Grid.Row="2" Grid.Column="0" Content="{Binding Battery}" ContentTemplate="{StaticResource SourceCard}"
+									                IsVisible="{Binding Battery, Converter={co:Null2Bool}}" />
+									<ContentControl Grid.Row="0" Grid.RowSpan="3" Grid.Column="2" VerticalAlignment="Center" Content="{Binding Inverter}"
+									                ContentTemplate="{StaticResource SourceCard}" />
+								</Grid>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+				</StackPanel>
+
+				<!-- The house: what it draws, and the two figures that say where from. -->
+				<ContentControl Grid.Column="2" Content="{Binding Items.House}" ContentTemplate="{StaticResource HouseCard}" VerticalAlignment="Center" />
+
+				<!-- Consumers, wrapping to the width there is. The left margin is the spine's. -->
+				<ItemsControl Grid.Column="4" x:Name="ConsumerItems" ItemsSource="{Binding Items.Consumers}" Margin="60,0,0,0" VerticalAlignment="Center"
+				              ItemTemplate="{StaticResource ConsumerCard}">
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate>
+							<WrapPanel Orientation="Horizontal" />
+						</ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
+				</ItemsControl>
+			</Grid>
+		</c:ZoomBox>
+	</ScrollViewer>
+</UserControl>

@@ -35,6 +35,14 @@ public sealed class SomethingTests
 - **`Reset` at the start of a test.** The session is one for the whole run, so windows outlive the test that
   opened them; `Reset` closes them and puts a fresh container behind `IoC`. A test that forgets it sees the
   windows of whatever ran before - which is exactly how the smoke test failed once the suite grew.
+- **That container is built on `TestInjector.CreateServices()`, never from an empty collection.** `IoC` is one
+  for the process and the hosted server tests run beside these. `IdentityController` reads
+  `IoC.Get<IAesKeyProvider>()` into a static field the first time a login arrives, and a container without one,
+  in place at that moment, leaves every login of the run answering 500. That is how adding the power flow page's
+  tests - one second more of Avalonia tests - made fifteen user management tests fail on 2026-09-16, though each
+  passed alone and all passed on `dev`. Since the fix the whole suite also passes with `--parallel none`, which
+  had 123 failures before: the same container swap had been breaking the Gen24 tests whenever the Avalonia
+  collection happened to run first.
 - **Every such test belongs to `AvaloniaCollection`**, which is defined with `DisableParallelization`. Windows,
   the focus and the container are global to the session; two tests at once would see each other's.
 
@@ -56,7 +64,7 @@ public sealed class SomethingTests
 
 `HomeAutomationServerTests` targets plain `net10.0` and references no WPF, so the whole suite - these headless
 Avalonia tests included - runs on Linux and in Claude Code on the web. They do: 559 passing in about nine
-seconds there on 2026-09-16, with no display and nothing installed beyond the SDK.
+seconds there on 2026-09-16, with no display and nothing installed beyond the SDK; 607 by the end of that day.
 
 It was not so until that day. The project targeted `net10.0-windows7.0` and referenced `FroniusMonitor`, so
 `dotnet test` in the cloud ended in `No frameworks were found` and `Zero tests ran` - and that reads exactly like
@@ -90,6 +98,7 @@ reason, which is worth knowing before trying one.
 | `MainViewPresenterTests` | Every other head: the dialog frame, nesting, the busy text handover, one page per view type, the menu bar gate |
 | `ZoomBoxTests` | Ctrl with the wheel and the keys, the limits, the steps, the scope on a view inside the window, the focused text box |
 | `ZoomPinchTests` | Pinch, with its events synthesized |
+| `PowerFlowViewTests` | The power flow page: its window at the declared size, a card per node and wires between them, a reading that updates a card without rebuilding it, a consumer that appears, a closed page that lets go - see [[PowerFlowPage.Lifecycle]] |
 | `HeadlessSmokeTest` | That the session is up at all - look here first when the whole collection fails |
 
 **Not covered, and not coverable here:** real touch input, so the pinch recognizer itself is untested; and how any

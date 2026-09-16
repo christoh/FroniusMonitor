@@ -206,6 +206,15 @@ internal sealed class WindowDialogPresentation : IDialogPresentation
     public void Open()
     {
         window.LimitToScreen(1);
+
+        // A dialog body may say how big it opens, the way a page does - the power flow page does, because it has
+        // no size of its own to be content sized by. A body that says nothing, which is every form, stays as big
+        // as what is on it.
+        if (window.HostedContent is Control body)
+        {
+            window.SetInitialSize(InitialWindowSize.GetWidth(body), InitialWindowSize.GetHeight(body));
+        }
+
         var owner = WindowPresenter.ActiveWindow;
 
         if (!parameters.IsModalWindow || owner is null)

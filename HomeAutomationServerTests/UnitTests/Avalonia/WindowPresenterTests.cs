@@ -278,6 +278,28 @@ public sealed class WindowPresenterTests
         await shown;
     });
 
+    /// <summary>
+    /// A dialog body may declare the size its window opens at, the way a page does; a body that says nothing
+    /// - every other test dialog here - is content sized, which the tests above rely on.
+    /// </summary>
+    [Fact]
+    public Task A_dialog_body_may_declare_the_size_its_window_opens_at() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        await StartAsync();
+
+        var dialog = new SizedTestDialog(new DialogParameters { Title = "Sized dialog", WindowKey = "device-a", IsResizeable = true });
+        var shown = dialog.ShowDialogAsync();
+        await HeadlessAvalonia.SettleAsync();
+
+        var window = WindowOf("Sized dialog");
+        Assert.Equal(SizedTestDialogView.Width, window.Width);
+        Assert.Equal(SizedTestDialogView.Height, window.Height);
+        Assert.True(window.CanResize);
+
+        await dialog.AbortAsync();
+        await shown;
+    });
+
     [Fact]
     public Task A_message_box_is_modal_and_is_never_folded_into_another_one() => HeadlessAvalonia.RunAsync(async () =>
     {

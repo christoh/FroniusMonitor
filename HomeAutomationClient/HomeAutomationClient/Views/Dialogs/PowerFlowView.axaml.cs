@@ -1,0 +1,480 @@
+using Avalonia.Controls.Shapes;
+using Avalonia.VisualTree;
+using De.Hochstaetter.HomeAutomationClient.Converters;
+
+namespace De.Hochstaetter.HomeAutomationClient.Views.Dialogs;
+
+/// <summary>
+/// The body of the power flow dialog. The cards are XAML and bindings; what is here is the wiring between them,
+/// which needs the framework twice over: it is geometry read off the laid out cards, and it moves.
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>The wires follow the cards, not the other way round.</b> Every card is laid out by ordinary panels, and
+/// after each layout pass <see cref="Route"/> reads where each one ended up and draws the wires to fit: a trunk
+/// between the sources and the house, a spine with one rail per row of consumers, and a stub down to each card.
+/// That is what makes twenty consumers twenty short stubs instead of twenty lines across the picture, and what
+/// lets the same code serve two inverters or five without a layout of its own.
+/// </para>
+/// <para>
+/// <b>Motion carries the number.</b> An active wire is a dashed line over a faint trace, and its dashes move at
+/// a speed that follows the watts on a log scale, so that a fridge visibly crawls and a charging car does not blur.
+/// The direction follows the sign: a battery's dashes run into the inverter while it discharges and out of it
+/// while it charges. One animation frame callback advances every wire; there is no timer per wire.
+/// </para>
+/// <para>
+/// <b>Two things are diffed, on purpose.</b> A new snapshot arrives with every reading and is folded into stable
+/// items on the UI thread (<see cref="PowerFlowViewModel.Apply"/>), so the cards are never rebuilt. And
+/// <see cref="Route"/> runs on every layout pass but writes to a wire only what changed, because writing a path's
+/// geometry invalidates layout and an unconditional write would loop.
+/// </para>
+/// </remarks>
+public partial class PowerFlowView : UserControl, IDialogControl
+{
+    private const double StrokeThickness = 3;
+    private const double ThickStrokeThickness = 4;
+    private const double DashLength = 10;
+    private const double GapLength = 14;
+
+    /// <summary>The two DC taps sit this far above and below the middle of the inverter's left edge.</summary>
+    private const double TapOffset = 12;
+
+    /// <summary>A rail runs this far above the top of the consumer cards of its row; the cards leave a margin for it.</summary>
+    private const double RailOffset = 14;
+
+    /// <summary>The spine stands this far right of the house; the consumers' left margin leaves room for it.</summary>
+    private const double SpineOffset = 34;
+
+    /// <summary>Beyond this many watts a wire is drawn thicker: the trunk, the house, an inverter at full tilt.</summary>
+    private const double ThickThreshold = 2000;
+
+    private readonly Dictionary<string, Wire> wires = [];
+    private PowerFlowViewModel? viewModel;
+    private bool isRunning;
+    private int isRefreshPending;
+    private TimeSpan? lastFrame;
+
+    public PowerFlowView()
+    {
+        InitializeComponent();
+        DataContextChanged += OnDataContextChanged;
+        Stage.LayoutUpdated += (_, _) => Route();
+        ActualThemeVariantChanged += (_, _) => Recolor();
+        AttachedToVisualTree += (_, _) => StartFrames();
+        DetachedFromVisualTree += (_, _) => isRunning = false;
+    }
+
+    private void OnDataContextChanged(object? sender, EventArgs e)
+    {
+        if (viewModel != null)
+        {
+            viewModel.PropertyChanged -= OnViewModelPropertyChanged;
+        }
+
+        viewModel = DataContext as PowerFlowViewModel;
+
+        if (viewModel == null)
+        {
+            return;
+        }
+
+        viewModel.PropertyChanged += OnViewModelPropertyChanged;
+
+        // Fire and forget, as every dialog body does; Initialize guards itself against running twice.
+        _ = viewModel.Initialize();
+        RequestRefresh();
+    }
+
+    /// <summary>A snapshot may arrive from the hub's thread; the items are folded on the UI thread, once per burst.</summary>
+    private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(PowerFlowViewModel.Snapshot))
+        {
+            RequestRefresh();
+        }
+    }
+
+    private void RequestRefresh()
+    {
+        if (Interlocked.Exchange(ref isRefreshPending, 1) == 0)
+        {
+            Dispatcher.UIThread.Post(Refresh);
+        }
+    }
+
+    private void Refresh()
+    {
+        isRefreshPending = 0;
+
+        if (viewModel?.Apply() ?? false)
+        {
+            // A card came or went: the layout that follows brings the new geometry, Route only has to know that
+            // the wires it has may no longer be the wires it needs.
+            wires.Values.ToList().ForEach(wire => wire.Detach(Wires));
+            wires.Clear();
+        }
+
+        Route();
+    }
+
+    private void Recolor()
+    {
+        foreach (var wire in wires.Values)
+        {
+            wire.Recolor(this);
+        }
+    }
+
+    private void StartFrames()
+    {
+        if (isRunning)
+        {
+            return;
+        }
+
+        isRunning = true;
+        lastFrame = null;
+        TopLevel.GetTopLevel(this)?.RequestAnimationFrame(OnFrame);
+    }
+
+    /// <summary>One step of every moving wire. Re-requests itself for as long as the view is on screen.</summary>
+    private void OnFrame(TimeSpan time)
+    {
+        if (!isRunning)
+        {
+            return;
+        }
+
+        // Capped: a frame after the window was hidden for a while would otherwise jump the dashes a long way.
+        var seconds = lastFrame is { } last ? Math.Min((time - last).TotalSeconds, 0.1) : 0;
+        lastFrame = time;
+
+        foreach (var wire in wires.Values)
+        {
+            wire.Advance(seconds);
+        }
+
+        TopLevel.GetTopLevel(this)?.RequestAnimationFrame(OnFrame);
+    }
+
+    /// <summary>
+    /// Draws every wire to where the cards are now. Called after every layout pass, so it changes a wire only
+    /// where its geometry, its figure or its colour actually differ - see the class remarks.
+    /// </summary>
+    private void Route()
+    {
+        if (viewModel is not { } model)
+        {
+            return;
+        }
+
+        var cards = Stage.GetVisualDescendants()
+            .OfType<Border>()
+            .Where(border => border.Classes.Contains("Card") && border.DataContext is PowerFlowNodeItem)
+            .Select(border => (Item: (PowerFlowNodeItem)border.DataContext!, Rect: RectOf(border)))
+            .Where(card => card.Rect is { })
+            .GroupBy(card => card.Item.Key)
+            .ToDictionary(group => group.Key, group => (group.First().Item, Rect: group.First().Rect!.Value));
+
+        if (!cards.TryGetValue(PowerFlowSnapshot.HouseKey, out var house))
+        {
+            return;
+        }
+
+        var needed = new HashSet<string>();
+        var items = model.Items;
+
+        // ----- Sources onto the trunk -----
+        var trunkTaps = new List<double>();
+        var sourcesRight = double.NegativeInfinity;
+
+        if (items.Grid is { } grid && cards.TryGetValue(grid.Key, out var gridCard))
+        {
+            trunkTaps.Add(gridCard.Rect.Center.Y);
+            sourcesRight = Math.Max(sourcesRight, gridCard.Rect.Right);
+        }
+
+        foreach (var cluster in items.Inverters)
+        {
+            if (!cards.TryGetValue(cluster.Inverter.Key, out var inverter))
+            {
+                continue;
+            }
+
+            sourcesRight = Math.Max(sourcesRight, inverter.Rect.Right);
+            trunkTaps.Add(inverter.Rect.Center.Y);
+
+            if (cards.TryGetValue(cluster.Solar.Key, out var solar))
+            {
+                Set(needed, $"solar:{cluster.Key}", solar.Item.Node, DcRoute(solar.Rect, inverter.Rect, -TapOffset), labelAt: new Point(solar.Rect.Right + (inverter.Rect.Left - solar.Rect.Right) / 2, solar.Rect.Center.Y - 12), signed: false);
+            }
+
+            if (cluster.Battery is { } battery && cards.TryGetValue(battery.Key, out var batteryCard))
+            {
+                Set(needed, $"battery:{cluster.Key}", batteryCard.Item.Node, DcRoute(batteryCard.Rect, inverter.Rect, TapOffset), labelAt: new Point(batteryCard.Rect.Right + (inverter.Rect.Left - batteryCard.Rect.Right) / 2, batteryCard.Rect.Center.Y + 12), signed: true);
+            }
+        }
+
+        if (double.IsNegativeInfinity(sourcesRight))
+        {
+            // No source yet. Only the house and its consumers then; the trunk waits for the first inverter.
+            RouteConsumers(needed, items, cards, house);
+            Prune(needed);
+            return;
+        }
+
+        var trunkX = sourcesRight + (house.Rect.Left - sourcesRight) / 2;
+
+        if (items.Grid is { } gridNode && cards.TryGetValue(gridNode.Key, out var gridRect))
+        {
+            var y = gridRect.Rect.Center.Y;
+            Set(needed, "grid", gridRect.Item.Node, Path(new Point(gridRect.Rect.Right, y), new Point(trunkX, y)), labelAt: new Point(gridRect.Rect.Right + (trunkX - gridRect.Rect.Right) / 2, y - 12), signed: true, dots: [new Point(trunkX, y)]);
+        }
+
+        foreach (var cluster in items.Inverters)
+        {
+            if (!cards.TryGetValue(cluster.Inverter.Key, out var inverter))
+            {
+                continue;
+            }
+
+            var y = inverter.Rect.Center.Y;
+            Set(needed, $"ac:{cluster.Key}", inverter.Item.Node, Path(new Point(inverter.Rect.Right, y), new Point(trunkX, y)), labelAt: new Point(inverter.Rect.Right + (trunkX - inverter.Rect.Right) / 2, y - 12), signed: false, dots: [new Point(trunkX, y)]);
+        }
+
+        // The trunk itself, and the last step into the house. Both carry what the house draws.
+        var houseY = house.Rect.Center.Y;
+        trunkTaps.Add(houseY);
+        Set(needed, "trunk", house.Item.Node, Path(new Point(trunkX, trunkTaps.Min()), new Point(trunkX, trunkTaps.Max())), labelAt: null, signed: false);
+        Set(needed, "house", house.Item.Node, Path(new Point(trunkX, houseY), new Point(house.Rect.Left, houseY)), labelAt: null, signed: false);
+
+        RouteConsumers(needed, items, cards, house);
+        Prune(needed);
+    }
+
+    /// <summary>The spine right of the house, a rail above every row of consumer cards, and a stub down to each card.</summary>
+    private void RouteConsumers(HashSet<string> needed, PowerFlowViewModelItems items, Dictionary<string, (PowerFlowNodeItem Item, Rect Rect)> cards, (PowerFlowNodeItem Item, Rect Rect) house)
+    {
+        var consumers = items.Consumers
+            .Select(item => cards.TryGetValue(item.Key, out var card) ? card : default)
+            .Where(card => card.Item is { })
+            .ToList();
+
+        if (consumers.Count == 0)
+        {
+            return;
+        }
+
+        var houseY = house.Rect.Center.Y;
+        var spineX = house.Rect.Right + SpineOffset;
+
+        // A row is every card whose top is the same, within the rounding a layout pass leaves.
+        var rows = consumers.GroupBy(card => Math.Round(card.Rect.Top)).OrderBy(group => group.Key).ToList();
+        var railYs = rows.Select(row => row.Key - RailOffset).ToList();
+        var spineTop = Math.Min(houseY, railYs.Min());
+        var spineBottom = Math.Max(houseY, railYs.Max());
+
+        Set(needed, "spine", house.Item.Node, Path(new Point(house.Rect.Right, houseY), new Point(spineX, houseY), new Point(spineX, spineTop), new Point(spineX, spineBottom)), labelAt: null, signed: false, dots: [new Point(spineX, houseY)]);
+
+        for (var i = 0; i < rows.Count; i++)
+        {
+            var row = rows[i].ToList();
+            var railY = railYs[i];
+            var rowNode = new PowerFlowNode($"rail:{i}", PowerFlowNodeKind.House, string.Empty, row.Sum(card => card.Item.Node.Power ?? 0));
+            Set(needed, $"rail:{i}", rowNode, Path(new Point(spineX, railY), new Point(row.Max(card => card.Rect.Center.X), railY)), labelAt: null, signed: false, dots: [new Point(spineX, railY)]);
+
+            foreach (var card in row)
+            {
+                var x = card.Rect.Center.X;
+                Set(needed, $"stub:{card.Item.Key}", card.Item.Node, Path(new Point(x, railY), new Point(x, card.Rect.Top)), labelAt: null, signed: false, dots: card.Item.Node.IsIdle ? [] : [new Point(x, railY)]);
+            }
+        }
+    }
+
+    /// <summary>From a DC card's right edge into the inverter's left edge, with the bend halfway and the tap above or below the middle.</summary>
+    private static string DcRoute(Rect from, Rect inverter, double tapOffset)
+    {
+        var midX = from.Right + (inverter.Left - from.Right) / 2;
+        return Path(new Point(from.Right, from.Center.Y), new Point(midX, from.Center.Y), new Point(midX, inverter.Center.Y + tapOffset), new Point(inverter.Left, inverter.Center.Y + tapOffset));
+    }
+
+    private static string Path(params Point[] points) => string.Join(' ', points.Select((point, i) => $"{(i == 0 ? 'M' : 'L')}{point.X.ToString("F1", CultureInfo.InvariantCulture)},{point.Y.ToString("F1", CultureInfo.InvariantCulture)}"));
+
+    private void Set(HashSet<string> needed, string key, PowerFlowNode node, string path, Point? labelAt, bool signed, IReadOnlyList<Point>? dots = null)
+    {
+        needed.Add(key);
+
+        if (!wires.TryGetValue(key, out var wire))
+        {
+            wire = new Wire(labelAt is { });
+            wire.Attach(Wires);
+            wires[key] = wire;
+        }
+
+        wire.Update(this, node, path, labelAt, signed, dots ?? []);
+    }
+
+    private void Prune(HashSet<string> needed)
+    {
+        foreach (var (key, wire) in wires.Where(pair => !needed.Contains(pair.Key)).ToList())
+        {
+            wire.Detach(Wires);
+            wires.Remove(key);
+        }
+    }
+
+    /// <summary>Where a card is in the stage's coordinates, or null while it has not been laid out.</summary>
+    private Rect? RectOf(Control card)
+    {
+        if (card.Bounds.Width <= 0 || card.Bounds.Height <= 0 || card.TranslatePoint(new Point(0, 0), Stage) is not { } origin)
+        {
+            return null;
+        }
+
+        return new Rect(origin, card.Bounds.Size);
+    }
+
+    private IBrush Brush(string key) => this.TryFindResource(key, ActualThemeVariant, out var resource) && resource is IBrush brush ? brush : Brushes.Gray;
+
+    /// <summary>
+    /// One connection: a faint trace, the moving dashes over it while power flows, the junction dots where it
+    /// meets a bus, and for the sources a label with the figure.
+    /// </summary>
+    private sealed class Wire(bool hasLabel)
+    {
+        private readonly Path trace = new() { StrokeLineCap = PenLineCap.Round, StrokeJoin = PenLineJoin.Round };
+        private readonly Path flow = new() { StrokeLineCap = PenLineCap.Round, StrokeJoin = PenLineJoin.Round };
+        private readonly List<Ellipse> dots = [];
+        private readonly Border? label = hasLabel ? new Border { CornerRadius = new CornerRadius(4), Padding = new Thickness(5, 1) } : null;
+        private readonly TextBlock? labelText = hasLabel ? new TextBlock { FontSize = 10.5, FontWeight = FontWeight.SemiBold } : null;
+
+        private string? path;
+        private string? dotsAt;
+        private PowerFlowKind kind = PowerFlowKind.Idle;
+        private bool thick;
+        private double speed;
+        private double period;
+        private bool reversed;
+
+        public void Attach(Canvas canvas)
+        {
+            canvas.Children.Add(trace);
+            canvas.Children.Add(flow);
+
+            if (label is { } pill)
+            {
+                pill.Child = labelText;
+                canvas.Children.Add(pill);
+            }
+        }
+
+        public void Detach(Canvas canvas)
+        {
+            canvas.Children.Remove(trace);
+            canvas.Children.Remove(flow);
+            dots.ForEach(dot => canvas.Children.Remove(dot));
+
+            if (label is { } pill)
+            {
+                canvas.Children.Remove(pill);
+            }
+        }
+
+        public void Update(PowerFlowView view, PowerFlowNode node, string newPath, Point? labelAt, bool signed, IReadOnlyList<Point> dotsAt)
+        {
+            var power = node.Power ?? 0;
+            var newThick = Math.Abs(power) >= ThickThreshold;
+            var newKind = node.FlowKind;
+
+            if (newPath != path)
+            {
+                path = newPath;
+                trace.Data = flow.Data = Geometry.Parse(newPath);
+            }
+
+            if (newThick != thick || newKind != kind)
+            {
+                thick = newThick;
+                kind = newKind;
+                var thickness = thick ? ThickStrokeThickness : StrokeThickness;
+                trace.StrokeThickness = flow.StrokeThickness = thickness;
+                // In multiples of the stroke thickness, which is how a dash array is measured.
+                flow.StrokeDashArray = [DashLength / thickness, GapLength / thickness];
+                period = (DashLength + GapLength) / thickness;
+                flow.IsVisible = kind != PowerFlowKind.Idle;
+                Recolor(view);
+            }
+
+            // Log scale: 20 W crawls, 7 kW is brisk, and neither is a blur or a standstill.
+            var absolute = Math.Abs(power);
+            var secondsPerPeriod = absolute < PowerFlowNode.IdleThreshold ? 0 : Math.Max(0.45, 3.2 - Math.Log10(absolute) * 0.72);
+            speed = secondsPerPeriod > 0 ? period / secondsPerPeriod : 0;
+            reversed = node.IsReversed;
+
+            var newDots = string.Join(';', dotsAt.Select(point => $"{point.X:F1},{point.Y:F1}"));
+
+            if (newDots != this.dotsAt)
+            {
+                this.dotsAt = newDots;
+                var canvas = (Canvas)trace.Parent!;
+                dots.ForEach(dot => canvas.Children.Remove(dot));
+                dots.Clear();
+
+                foreach (var point in dotsAt)
+                {
+                    var dot = new Ellipse { Width = 7, Height = 7, Fill = view.Brush("FlowJunction") };
+                    Canvas.SetLeft(dot, point.X - 3.5);
+                    Canvas.SetTop(dot, point.Y - 3.5);
+                    canvas.Children.Add(dot);
+                    dots.Add(dot);
+                }
+            }
+
+            if (label is { } pill && labelText is { } text && labelAt is { } at)
+            {
+                var newText = PowerText.Format(node.Power, signed, CultureInfo.CurrentCulture);
+
+                if (text.Text != newText)
+                {
+                    text.Text = newText;
+                }
+
+                pill.Measure(Size.Infinity);
+                Canvas.SetLeft(pill, at.X - pill.DesiredSize.Width / 2);
+                Canvas.SetTop(pill, at.Y - pill.DesiredSize.Height / 2);
+            }
+        }
+
+        public void Recolor(PowerFlowView view)
+        {
+            trace.Stroke = view.Brush("FlowIdle");
+            flow.Stroke = view.Brush(kind switch
+            {
+                PowerFlowKind.Solar => "FlowSolar",
+                PowerFlowKind.Battery => "FlowBatteryDc",
+                PowerFlowKind.Export => "FlowExport",
+                _ => "FlowAc",
+            });
+
+            dots.ForEach(dot => dot.Fill = view.Brush("FlowJunction"));
+
+            if (label is { } pill && labelText is { } text)
+            {
+                pill.Background = view.Brush("DialogBackground");
+                text.Foreground = view.Brush("FlowLabel");
+            }
+        }
+
+        /// <summary>Moves the dashes on: a smaller offset shifts the pattern towards the end of the path, which is the way the wire is drawn.</summary>
+        public void Advance(double seconds)
+        {
+            if (speed <= 0 || period <= 0)
+            {
+                return;
+            }
+
+            var offset = flow.StrokeDashOffset + (reversed ? speed : -speed) * seconds;
+            flow.StrokeDashOffset = ((offset % period) + period) % period;
+        }
+    }
+}

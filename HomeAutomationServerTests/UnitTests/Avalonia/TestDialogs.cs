@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using De.Hochstaetter.HomeAutomationClient.Contracts;
+using De.Hochstaetter.HomeAutomationClient.Controls;
 using De.Hochstaetter.HomeAutomationClient.Models.Dialogs;
 using De.Hochstaetter.HomeAutomationClient.ViewModels.Adapters;
 
@@ -41,6 +42,30 @@ public sealed class TestDialog(DialogParameters parameters) : DialogBase<DialogP
     public void SetBusyText(string? text) => BusyText = text;
 
     public string? ReadBusyText() => BusyText;
+}
+
+/// <summary>A body that says how big its window opens, the way the power flow page does.</summary>
+public sealed class SizedTestDialogView : ContentControl, IDialogControl
+{
+    public const double Width = 700;
+    public const double Height = 500;
+
+    public SizedTestDialogView()
+    {
+        InitialWindowSize.SetWidth(this, Width);
+        InitialWindowSize.SetHeight(this, Height);
+    }
+}
+
+/// <summary><see cref="TestDialog"/> with a <see cref="SizedTestDialogView"/> for a body.</summary>
+public sealed class SizedTestDialog(DialogParameters parameters) : DialogBase<DialogParameters, bool, SizedTestDialogView>(parameters)
+{
+    public override Task AbortAsync()
+    {
+        Result = false;
+        Close();
+        return Task.CompletedTask;
+    }
 }
 
 /// <summary>A detail page that knows which device it was given.</summary>

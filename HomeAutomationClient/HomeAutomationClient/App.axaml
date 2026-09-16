@@ -50,6 +50,21 @@
                     <SolidColorBrush x:Key="PowerFlowSolar">#ffd000</SolidColorBrush>
                     <SolidColorBrush x:Key="PowerFlowGrid">LightGray</SolidColorBrush>
                     <SolidColorBrush x:Key="PowerGridIcon">#808080</SolidColorBrush>
+
+                    <!-- Power flow page. Colour is the kind of power, never the device: what the house draws is
+                         orange, what the sun gives is green, a battery's DC is blue-green and AC leaving the house
+                         is blue. Idle is a trace of the ground. -->
+                    <SolidColorBrush x:Key="FlowCardBackground">White</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowCardBorder">#CBD3DF</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowCardBorderActive">#9FB0C8</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowLabel">#5B6B84</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowMuted">#8C99AE</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowAc">#E07B1A</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowSolar">#1FA864</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowBatteryDc">#1A97B8</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowExport">#3B7FE0</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowIdle">#C9D1DE</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowJunction">#B86A12</SolidColorBrush>
                     
                     <!--Menus-->
                     <SolidColorBrush x:Key='MenuBackground'>#f0f0f0</SolidColorBrush>
@@ -133,6 +148,20 @@
                     <SolidColorBrush x:Key="PowerFlowSolar">#D8AE06</SolidColorBrush>
                     <SolidColorBrush x:Key="PowerFlowGrid">#ff404040</SolidColorBrush>
                     <SolidColorBrush x:Key="PowerGridIcon">#808080</SolidColorBrush>
+
+                    <!-- Power flow page, see the light variant. The page sits on DialogBackground, which is the
+                         deep navy the design was drawn on; the cards are one step lighter than it. -->
+                    <SolidColorBrush x:Key="FlowCardBackground">#0C2B4E</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowCardBorder">#1E4570</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowCardBorderActive">#2E5F95</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowLabel">#8FA3BF</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowMuted">#5D7594</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowAc">#F0872B</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowSolar">#3ECF8E</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowBatteryDc">#3FB9D8</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowExport">#6EA8FF</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowIdle">#1F4368</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowJunction">#F7C58F</SolidColorBrush>
                     
                     <!--Menus-->
                     <SolidColorBrush x:Key='MenuBackground'>#303030</SolidColorBrush>

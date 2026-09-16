@@ -71,9 +71,17 @@
                         </MenuFlyout>
                     </Button.Flyout>
                 </Button>
-                <!-- The price chart, once the server has sent price data; see MainViewModel.ShowEnergyChart. -->
-                <Button Content="{x:Static p:Resources.ElectricityPrice}" Theme="{StaticResource MenuButtonStyle}"
-                        Command="{Binding ShowEnergyChartCommand}" IsVisible="{Binding UpdateService.HasEnergyData}" />
+                <!-- What the site does with its energy: the power flow, and the price chart once the server has sent
+                     price data. See MainViewModel.ShowPowerFlow and ShowEnergyChart. -->
+                <Button Content="{x:Static p:Resources.Energy}" Theme="{StaticResource MenuButtonStyle}">
+                    <Button.Flyout>
+                        <MenuFlyout>
+                            <MenuItem Header="{x:Static p:Resources.PowerFlow}" Command="{Binding ShowPowerFlowCommand}" Padding="8,12"/>
+                            <MenuItem Header="{x:Static p:Resources.ElectricityPrice}" Command="{Binding ShowEnergyChartCommand}" Padding="8,12"
+                                      IsVisible="{Binding UpdateService.HasEnergyData}"/>
+                        </MenuFlyout>
+                    </Button.Flyout>
+                </Button>
             </StackPanel>
             <!-- Who is logged in, and as what - the roles are the server's enum names on purpose, not translated -
                  and, behind it, the two things that are about that account rather than about a device: changing

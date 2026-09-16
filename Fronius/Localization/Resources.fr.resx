@@ -1810,4 +1810,31 @@
   <data name="Car" xml:space="preserve">
     <value>Voiture</value>
   </data>
+  <data name="PowerFlow" xml:space="preserve">
+    <value>Flux d'énergie</value>
+  </data>
+  <data name="Solar" xml:space="preserve">
+    <value>Solaire</value>
+  </data>
+  <data name="House" xml:space="preserve">
+    <value>Maison</value>
+  </data>
+  <data name="RestOfHouse" xml:space="preserve">
+    <value>Reste de la maison</value>
+  </data>
+  <data name="Charging" xml:space="preserve">
+    <value>Charge</value>
+  </data>
+  <data name="Discharging" xml:space="preserve">
+    <value>Décharge</value>
+  </data>
+  <data name="FeedIn" xml:space="preserve">
+    <value>Injection</value>
+  </data>
+  <data name="GridImport" xml:space="preserve">
+    <value>Soutirage</value>
+  </data>
+  <data name="Idle" xml:space="preserve">
+    <value>Inactif</value>
+  </data>
 </root>
