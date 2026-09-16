@@ -46,6 +46,9 @@
     <File Path=".claude/memory/Zoom.md" />
     <File Path=".claude/memory/ServerExitCodes.LifeCycle.md" />
   </Folder>
+  <Folder Name="/Solution Items/Plans/">
+    <File Path="Plans/PowerflowPage-plan.md" />
+  </Folder>
   <Folder Name="/Solution Items/Rules/">
     <File Path=".claude/rules/PortingFroniusMonitor.md" />
     <File Path=".claude/rules/ViewModelsForInteractionLogic.md" />
