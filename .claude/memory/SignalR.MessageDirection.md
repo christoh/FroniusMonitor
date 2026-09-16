@@ -154,9 +154,10 @@ those four.
 
 ### What a guest sees
 
-Since 2026-09-14 a user with `Roles.Guest` and nothing more gets onto the hub and sees **the inverters, with the
+Since 2026-09-16 a user with `Roles.Guest` and nothing more gets onto the hub and sees **the inverters, with the
 smart meter and the battery a Gen24 carries inside, and nothing else** - no Fritz!Box outlet, no air conditioner,
-no Wattpilot, no price data, no settings. The rule lives in two places that must agree:
+no Wattpilot, no price data, no settings. This is now handled by a built-in virtual guest account (see
+`UserManagement.Lifecycle.md`). The rule lives in two places that must agree:
 
 - **Who sees everything** is `RolesExtensions.SeesAllDevices` in `Fronius` (User or Administrator), shared with
   the client. `AuthorizationExtensions.GetRoles` turns a `ClaimsPrincipal`'s role claims back into the flags so the

@@ -198,6 +198,21 @@ The created user is added to `settings.Users`, which is the very `HashSet<User>`
 covers both branches, including that the default administrator is never smuggled into a non-empty user list.
 `HomeAutomationServer` has an `InternalsVisibleTo` for the test project so `Program` can stay internal.
 
+### The virtual guest user always exists
+
+Since 2026-09-16, the server provides a built-in user `guest` with the password `guest` and `Roles.Guest`.
+This user is **virtual**: it is not stored in `Settings.xml`, cannot be deleted, and cannot be modified.
+
+- `User.Guest` is a static instance initialized with the hard-coded credentials.
+- `AuthenticationService` and `IdentityController` are hard-coded to recognize this user by name (case-insensitive)
+  and use the static instance instead of searching `Settings.Users`.
+- `IdentityController.UpdateUser` and `DeleteUser` explicitly reject operations on the `guest` username with
+  `422 Unprocessable Entity`.
+- `GuestUserTests` covers the login, persistence (ensuring it's NOT persisted), and protection against modification/deletion.
+
+This ensures that a guest login is always available without cluttering the settings or risking accidental lockout of
+the guest role.
+
 ### `UserList` is a live view of `Settings.Users`, not a copy
 
 `UserList : AuthenticationSchemeOptions` exists only so ASP.NET's options system (`IOptionsMonitor<UserList>`) can
