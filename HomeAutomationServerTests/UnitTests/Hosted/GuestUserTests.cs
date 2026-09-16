@@ -20,9 +20,6 @@ using Microsoft.AspNetCore.Hosting.Server.Features;
 
 namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests.Hosted;
 
-[CollectionDefinition("Settings", DisableParallelization = true)]
-public class SettingsCollection;
-
 [Collection("Settings")]
 public sealed class GuestUserTests : IAsyncLifetime
 {
@@ -88,13 +85,11 @@ public sealed class GuestUserTests : IAsyncLifetime
         guest.Initialize(apiUri, "test", "1.0");
         await guest.Login("guest", "guest");
 
-        Assert.DoesNotContain(settings.Users, u => u.Username == "guest");
-        
-        if (File.Exists(settingsFile))
-        {
-             var loadedSettings = Settings.Load(settingsFile);
-             Assert.DoesNotContain(loadedSettings.Users, u => u.Username == "guest");
-        }
+        Assert.DoesNotContain(settings.Users, u => User.IsGuest(u.Username));
+
+        // Nothing was written at all, which says more than reading the file back would: a login that saved the
+        // settings could only have saved the guest into them.
+        Assert.False(File.Exists(settingsFile));
     }
 
     [Fact]
