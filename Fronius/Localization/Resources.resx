@@ -1851,6 +1851,12 @@
   <data name="CannotDeleteSelf" xml:space="preserve">
     <value>You cannot delete your own user account</value>
   </data>
+  <data name="GuestCannotBeChanged" xml:space="preserve">
+    <value>The built-in guest user cannot be changed</value>
+  </data>
+  <data name="GuestCannotBeDeleted" xml:space="preserve">
+    <value>The built-in guest user cannot be deleted</value>
+  </data>
   <data name="ChangePassword" xml:space="preserve">
     <value>Change password</value>
   </data>

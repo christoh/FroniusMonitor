@@ -1732,6 +1732,12 @@
   <data name="CannotDeleteSelf" xml:space="preserve">
     <value>Ti na pos betg stizzar tes agen conto d&apos;utilisader</value>
   </data>
+  <data name="GuestCannotBeChanged" xml:space="preserve">
+    <value>L&apos;utilisader giast integrà na po betg vegnir modifitgà</value>
+  </data>
+  <data name="GuestCannotBeDeleted" xml:space="preserve">
+    <value>L&apos;utilisader giast integrà na po betg vegnir stizzà</value>
+  </data>
   <data name="PasswordRequired" xml:space="preserve">
     <value>In nov utilisader dovra in pled-clav</value>
   </data>

@@ -1723,6 +1723,12 @@
   <data name="CannotDeleteSelf" xml:space="preserve">
     <value>Tu ne peux pas supprimer ton propre compte utilisateur</value>
   </data>
+  <data name="GuestCannotBeChanged" xml:space="preserve">
+    <value>L&apos;utilisateur invité intégré ne peut pas être modifié</value>
+  </data>
+  <data name="GuestCannotBeDeleted" xml:space="preserve">
+    <value>L&apos;utilisateur invité intégré ne peut pas être supprimé</value>
+  </data>
   <data name="PasswordRequired" xml:space="preserve">
     <value>Un nouvel utilisateur a besoin d&apos;un mot de passe</value>
   </data>

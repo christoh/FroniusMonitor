@@ -77,6 +77,19 @@ public class HubTicketServiceTests
         Assert.Null(afterRemoval.Validate(ticket));
     }
 
+    /// <summary>
+    /// The built-in guest is in no user list, so a ticket for it is the one case where the name in the ticket
+    /// cannot be found by searching that list - and a ticket that cannot be validated leaves a guest connected to
+    /// nothing.
+    /// </summary>
+    [Fact]
+    public void A_ticket_for_the_built_in_guest_is_accepted_although_no_user_list_holds_it()
+    {
+        var (service, _) = Create(TestUsers.Create("bob", Roles.User));
+
+        Assert.Same(User.Guest, service.Validate(service.Issue(User.Guest)));
+    }
+
     [Fact]
     public void A_ticket_signed_with_another_servers_secret_is_refused()
     {

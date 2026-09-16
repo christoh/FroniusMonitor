@@ -1749,6 +1749,12 @@
   <data name="CannotDeleteSelf" xml:space="preserve">
     <value>Du kannst Dein eigenes Benutzerkonto nicht löschen</value>
   </data>
+  <data name="GuestCannotBeChanged" xml:space="preserve">
+    <value>Der eingebaute Gastbenutzer kann nicht geändert werden</value>
+  </data>
+  <data name="GuestCannotBeDeleted" xml:space="preserve">
+    <value>Der eingebaute Gastbenutzer kann nicht gelöscht werden</value>
+  </data>
   <data name="PasswordRequired" xml:space="preserve">
       <value>Ein neuer Benutzer benötigt ein Kennwort</value>
   </data>

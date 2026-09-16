@@ -19,7 +19,7 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
     [ProducesResponseType<string>(StatusCodes.Status200OK)]
     public IActionResult RequestKey([FromQuery] string user)
     {
-        var dbUser = userDb.CurrentValue.Users.SingleOrDefault(u => string.Equals(user, u.Username, StringComparison.OrdinalIgnoreCase));
+        var dbUser = FindUser(user);
         var salt = aesKey.Xor(dbUser?.SaltBytes ?? []).Xor((long)(DateTime.UtcNow - DateTime.UnixEpoch).TotalDays / 10);
         var derived = Rfc2898DeriveBytes.Pbkdf2(user, salt, 32768, HashAlgorithmName.SHA256,16);
         var hashCode = Convert.ToBase64String(derived);
@@ -75,7 +75,7 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
     public IActionResult HubTicket([FromServices] HubTicketService hubTickets)
     {
         var userName = HttpContext.User.Identity?.Name;
-        var dbUser = userName is null ? null : FindUser(userName);
+        var dbUser = FindUser(userName);
 
         if (dbUser == null)
         {
@@ -160,9 +160,9 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
             );
         }
 
-        if (string.Equals(userName, Models.Authorization.User.Guest.Username, StringComparison.OrdinalIgnoreCase))
+        if (userDb.CurrentValue.IsBuiltInGuest(userName))
         {
-            return UnprocessableEntity(Helpers.GetProblemDetails(Loc.CannotUpdateUser, "The built-in guest user cannot be modified."));
+            return UnprocessableEntity(Helpers.GetProblemDetails(Loc.CannotUpdateUser, Loc.GuestCannotBeChanged));
         }
 
         if (FindUser(userName) is not { } dbUser)
@@ -212,6 +212,11 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
             logger.LogInformation("{Username} is changing their own password from {Ip}", userName, HttpContext.Connection.RemoteIpAddress);
         }
 
+        if (userDb.CurrentValue.IsBuiltInGuest(userName))
+        {
+            return UnprocessableEntity(Helpers.GetProblemDetails(Loc.CannotChangePassword, Loc.GuestCannotBeChanged));
+        }
+
         if (FindUser(userName) is not { } dbUser || !dbUser.Authenticate(request.CurrentPassword))
         {
             return UnprocessableEntity(Helpers.GetProblemDetails(Loc.CannotChangePassword, Loc.CurrentPasswordIncorrect));
@@ -236,9 +241,9 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
             logger.LogInformation("User {DeletedUsername} will be deleted by {Username} from {Ip}", userName, HttpContext.User.Identity!.Name, HttpContext.Connection.RemoteIpAddress);
         }
 
-        if (string.Equals(userName, Models.Authorization.User.Guest.Username, StringComparison.OrdinalIgnoreCase))
+        if (userDb.CurrentValue.IsBuiltInGuest(userName))
         {
-            return UnprocessableEntity(Helpers.GetProblemDetails(Loc.CannotDeleteUser, "The built-in guest user cannot be deleted."));
+            return UnprocessableEntity(Helpers.GetProblemDetails(Loc.CannotDeleteUser, Loc.GuestCannotBeDeleted));
         }
 
         if (FindUser(userName) is not { } dbUser)
@@ -256,15 +261,7 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
         return Ok(true);
     }
 
-    private User? FindUser(string userName)
-    {
-        if (string.Equals(userName, Models.Authorization.User.Guest.Username, StringComparison.OrdinalIgnoreCase))
-        {
-            return Models.Authorization.User.Guest;
-        }
-
-        return userDb.CurrentValue.Users.SingleOrDefault(u => string.Equals(userName, u.Username, StringComparison.OrdinalIgnoreCase));
-    }
+    private User? FindUser(string? userName) => userDb.CurrentValue.Find(userName);
 
     private bool IsLastAdministrator(User user)
     {

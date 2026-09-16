@@ -16,6 +16,7 @@ paths:
   - HomeAutomationClient/HomeAutomationClient/Services/WebClientService.cs
   - HomeAutomationServer/Models/Authorization/User.cs
   - HomeAutomationServer/Models/Authorization/UserList.cs
+  - HomeAutomationServer/Models/Authorization/AuthorizationExtensions.cs
   - HomeAutomationServer/Models/Settings/Settings.cs
   - HomeAutomationServer/Services/AuthenticationService.cs
   - HomeAutomationServer/Program.cs
@@ -209,6 +210,49 @@ hand the same user collection to the authentication handler (`AuthenticationServ
 `settings.SaveAsync()`: the mutation and the `Settings` instance being saved are the same object graph, there is no
 separate step to "write the change into settings" first. If you ever change `UserList.Users` to be reassigned or
 `IOptionsMonitor` reload were introduced, this shared-reference assumption would break silently.
+
+### The built-in guest is in no user list, so nothing may search the list alone
+
+Since 2026-09-16 `User.Guest` is a single static `User` named `guest`, with the password `guest` and
+`Roles.Guest` and nothing else. It is not in `Settings.Users`, is never written to `Settings.xml`, and `GetUsers`
+does not show it to an administrator - there is nothing to administer about it, because `AddUser`, `UpdateUser`,
+`DeleteUser` and `ChangePassword` all refuse it with 422 and `Loc.GuestCannotBeChanged` /
+`Loc.GuestCannotBeDeleted`.
+
+**`Settings.EnableGuestAccount` switches it off**, and it is written to `Settings.xml` whichever way it is set -
+no `[DefaultValue]` - so that a server's answer to "can anyone log in here" is in the file rather than implied by
+an element nobody knew to look for. It defaults to `true`, which is what a file written before the setting existed
+reads as, so an upgrade changes nothing. `Program.cs` copies it into `UserList.EnableGuestAccount` while it
+configures the options: unlike `Users` that is a copy and not a live reference, so switching the account takes a
+restart. `Program.LogGuestAccount` says at startup which way it went.
+
+While the account is on the name `guest` is **reserved**: `Find` answers with the built-in one, and a user of that
+name in `Settings.xml` is hidden and can never log in, which is what that startup warning is about. While it is
+off the name means nothing in particular and an administrator may add, rename and delete a `guest` like any other
+user. `AuthorizationExtensions.IsBuiltInGuest` is the one place that decides which of the two it is, and the
+guards in `IdentityController` ask it rather than `User.IsGuest`.
+
+`ChangePassword` is the guard that is easiest to forget and the one that matters most: it is the only one of the
+four that needs no Administrator role, so the guest can reach it itself - and there is exactly one `User.Guest` in
+the process, so a password change there would change it for every other guest until the next restart, saved
+nowhere and repairable by nobody.
+
+**Resolve a user name with `AuthorizationExtensions.Find(this UserList, string?)`, never with
+`users.Users.FirstOrDefault(...)`.** Searching the list alone answers that the guest does not exist, and that is
+not a theory: `IdentityController` knew about the guest while `HubTicketService.Validate` did not, so a guest was
+issued a hub ticket that the hub then refused, and a guest who had logged in successfully saw nothing at all. The
+callers are `IdentityController.FindUser`, `IdentityController.RequestKey`,
+`AuthenticationService.HandleAuthenticateAsync` and `HubTicketService.Validate`. `Find` takes the first match, not
+the single one, because two users of one name is a hand edited `Settings.xml` and failing every authenticated
+request - including the ones needed to repair it - is the worse answer to that.
+
+`User.CreateGuest` gives the guest a fixed salt instead of the random one `SetPassword` makes, so that everything
+derived from it - the hub ticket signature, the key `RequestKey` hands the client - still means the same after a
+restart. A salt has nothing to protect when the password is a constant in the same file.
+
+`UnitTests/Hosted/GuestUserTests` covers the login, all four refusals and the hub ticket end to end;
+`UnitTests/GuestAccountTests` covers the setting, its round trip through Settings.xml and both meanings of the
+name; `UnitTests/HubTicketServiceTests` pins the lookup that broke.
 
 ### Login and the `auth` cookie carry the password in the clear (by design, over HTTPS)
 

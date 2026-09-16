@@ -1767,6 +1767,12 @@
   <data name="CannotDeleteSelf" xml:space="preserve">
     <value>Non puoi eliminare il tuo account utente</value>
   </data>
+  <data name="GuestCannotBeChanged" xml:space="preserve">
+    <value>L&apos;utente ospite integrato non può essere modificato</value>
+  </data>
+  <data name="GuestCannotBeDeleted" xml:space="preserve">
+    <value>L&apos;utente ospite integrato non può essere eliminato</value>
+  </data>
   <data name="PasswordRequired" xml:space="preserve">
     <value>Un nuovo utente ha bisogno di una password</value>
   </data>

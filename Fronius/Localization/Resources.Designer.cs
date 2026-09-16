@@ -2194,6 +2194,24 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The built-in guest user cannot be changed.
+        /// </summary>
+        public static string GuestCannotBeChanged {
+            get {
+                return ResourceManager.GetString("GuestCannotBeChanged", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The built-in guest user cannot be deleted.
+        /// </summary>
+        public static string GuestCannotBeDeleted {
+            get {
+                return ResourceManager.GetString("GuestCannotBeDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Half Circle Gauge.
         /// </summary>
         public static string HalfCircleGauge {

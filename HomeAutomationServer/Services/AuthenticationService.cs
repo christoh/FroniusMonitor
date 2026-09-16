@@ -11,7 +11,6 @@ public class AuthenticationService(IOptionsMonitor<UserList> options, ILoggerFac
 {
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        var x = options.CurrentValue.Users;
         string authHeader;
 
         if (Request.Headers.TryGetValue("Authorization", out var value))
@@ -44,9 +43,7 @@ public class AuthenticationService(IOptionsMonitor<UserList> options, ILoggerFac
 
         var (username, password) = (split[0], split[1]);
 
-        var user = string.Equals(username, Models.Authorization.User.Guest.Username, StringComparison.OrdinalIgnoreCase)
-            ? Models.Authorization.User.Guest
-            : x.FirstOrDefault(u => string.Equals(u.Username, username, StringComparison.OrdinalIgnoreCase));
+        var user = options.CurrentValue.Find(username);
 
         if (user == null || !user.Authenticate(password))
         {
