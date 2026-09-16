@@ -1,5 +1,6 @@
 ---
 paths:
+  - .github/workflows/publish-images.yml
   - docker-compose.yml
   - docker-bake.hcl
   - HomeAutomationServer/Dockerfile
@@ -25,9 +26,21 @@ runs `docker build`, in the bake file for the index - because a Dockerfile canno
 This repo publishes multi-arch Docker images to GitHub Container Registry
 (`ghcr.io/christoh/home-automation-server`, `ghcr.io/christoh/home-automation-client`, see
 `docker-compose.yml`). Only the `:latest` tag is ever pulled by users; every other version sitting in the
-package is left over from a previous build. There is no `.github/workflows` file in this repo - images are
-built and pushed by an external pipeline - so nothing here creates or names these versions on our side, and
-cleanup has to happen against the GitHub Packages API directly.
+package is left over from a previous build.
+
+**Since 2026-09-16 the push happens here**, in `.github/workflows/publish-images.yml`: a push to `master` runs
+`docker buildx bake --push` on `ubuntu-latest`, authenticating to ghcr.io with the workflow's own
+`GITHUB_TOKEN` and `packages: write`, so no personal access token is involved in publishing. The workflow
+deliberately restates none of the platforms, tags or annotations - it runs the command `docker-bake.hcl`
+documents, and that file stays the only place they are written down. `linux/arm64` and `linux/arm/v7` are
+emulated through QEMU there, because GitHub has no native runner for them in this setup; `linux/386` runs on
+the amd64 host unaided.
+
+**That makes this cleanup a recurring chore rather than a one-off.** Every run of the workflow publishes a new
+index, and the previous build's index and all its children become untagged immediately - which is exactly the
+litter the rest of this document is about. Nothing prunes them automatically. Deleting still has to happen
+against the GitHub Packages API, and still needs a token with packages scopes, because `GITHUB_TOKEN` is
+scoped to publishing and not to deletion.
 
 ## Why "dangling" is not "untagged"
 

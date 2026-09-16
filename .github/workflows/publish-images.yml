@@ -1,0 +1,67 @@
+# Builds the two images and pushes them to ghcr.io.
+#
+# Only master publishes. docker-bake.hcl pushes the :latest tag, and :latest is the one docker-compose.yml
+# pulls, so a run of this workflow is what users get - see .claude/memory/Docker.GhcrCleanup.md.
+#
+# The job runs the very command the bake file documents, `docker buildx bake --push`, rather than restating
+# the platforms, tags and index annotations here. They belong in docker-bake.hcl and nowhere else.
+name: Publish container images
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      # Nothing that cannot change an image. A multi-arch build of both images is expensive, and arm/v7 is
+      # emulated, so a documentation commit should not start one.
+      - '**/*.md'
+      - '.claude/**'
+      - 'LICENSE'
+  # Publish on demand as well - from master, the branch picker is what decides.
+  workflow_dispatch:
+
+# One publish at a time. Not cancel-in-progress: a run that is already uploading layers should finish rather
+# than leave a half-pushed index behind.
+concurrency:
+  group: publish-images
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    permissions:
+      # GITHUB_TOKEN is all the registry needs; no personal access token is involved.
+      contents: read
+      packages: write
+
+    env:
+      # Both the login and the image names come from the repository owner, so a fork publishes to its own
+      # namespace instead of failing against this one. GHCR requires it lowercase, which an owner name is.
+      REGISTRY: ghcr.io/${{ github.repository_owner }}
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v5
+
+      # linux/arm64 and linux/arm/v7 have no native runner here, so they are emulated. linux/386 runs on the
+      # amd64 host without help.
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check the bake file
+        run: docker buildx bake --print
+
+      - name: Build and push
+        run: docker buildx bake --push
