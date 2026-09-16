@@ -119,6 +119,13 @@ that drive the WPF app's own services; it builds and runs on Windows only and re
 * A bare `dotnet test` at the repository root builds the whole solution, including the Android, Browser and iOS heads.
   That needs their SDK workloads, which Claude Code on the web does not have. Use `--project` there.
 
+# Branches
+- Always branch away from `dev`, and merge back into `dev`. That is where work integrates.
+- `master` is the released state. `dev` is merged into it when I say so. Do not branch from `master` and do
+  not merge into it unless I tell you to.
+- An instruction to use another branch covers that piece of work only. It does not move the default: the next
+  piece of work starts from `dev` again unless I say otherwise.
+
 # Commits
 - Always suggest commit and push. Never commit alone.
 - Do not commit without asking the human developer first.
