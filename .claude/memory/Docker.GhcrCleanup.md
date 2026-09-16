@@ -36,6 +36,33 @@ documents, and that file stays the only place they are written down. `linux/arm6
 emulated through QEMU there, because GitHub has no native runner for them in this setup; `linux/386` runs on
 the amd64 host unaided.
 
+### `permission_denied: write_package`, and the setting that fixes it
+
+A pre-existing GHCR package does **not** accept a push from a repository's `GITHUB_TOKEN`, however the workflow
+sets `permissions:`. Both packages here are user-owned (`/users/christoh/packages/...`) and predate the
+workflow, so the first two runs failed at the export step with
+
+```
+failed to push ghcr.io/christoh/home-automation-server:latest: denied: permission_denied: write_package
+```
+
+even though the `docker/login-action` step had succeeded - logging in proves authentication, not the right to
+write that package. `packages: write` grants the *token* a scope; the *package* still has to admit the
+repository. The `org.opencontainers.image.source` label does not do it either: that links the package to the
+repository for display and inherits its visibility, nothing more. Only a package created by a workflow gets
+that access automatically, which these were not.
+
+The fix is per package and only its owner can do it, in the UI - there is no API call and nothing in the
+repository that can express it:
+
+*`https://github.com/users/christoh/packages/container/<package>/settings` → Manage Actions access → Add
+Repository → `FroniusMonitor` → Role **Write**.*
+
+Done on 2026-09-16 for both packages; the run went green immediately afterwards. Watch out for the second one:
+the server was granted first and the next run pushed the server and then failed on the client, leaving the two
+images out of step until the client was granted too. **A new package needs this before its first push, or the
+build runs to completion and is thrown away at the last step.**
+
 **That makes this cleanup a recurring chore rather than a one-off.** Every run of the workflow publishes a new
 index, and the previous build's index and all its children become untagged immediately - which is exactly the
 litter the rest of this document is about. Nothing prunes them automatically. Deleting still has to happen
