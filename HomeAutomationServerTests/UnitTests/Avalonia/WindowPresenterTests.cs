@@ -186,6 +186,56 @@ public sealed class WindowPresenterTests
         await shown;
     });
 
+    /// <summary>
+    /// A dialog may refuse its own close box; it may not refuse the window it belongs to closing. That veto is
+    /// also a veto of the application shutdown it is part of - with <c>ShutdownMode.OnMainWindowClose</c> one open
+    /// dialog left the process running after its last window had gone.
+    /// </summary>
+    [Fact]
+    public Task Closing_the_owner_window_takes_a_dialog_with_it_and_releases_its_caller() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        var (_, mainWindow) = await StartAsync();
+
+        var dialog = new TestDialog(new DialogParameters { Title = "Standing", WindowKey = "device-a" });
+        var shown = dialog.ShowDialogAsync();
+        await HeadlessAvalonia.SettleAsync();
+        var window = WindowOf("Standing");
+
+        mainWindow.Close();
+        await HeadlessAvalonia.SettleAsync();
+
+        Assert.DoesNotContain(mainWindow, HeadlessAvalonia.Windows);
+        Assert.DoesNotContain(window, HeadlessAvalonia.Windows);
+
+        // Through the view model, so whoever awaits ShowDialogAsync is not left waiting for ever.
+        Assert.Equal(1, dialog.AbortCount);
+        Assert.True(shown.IsCompleted);
+        Assert.False(await shown);
+    });
+
+    /// <summary>
+    /// And the same for a dialog whose chrome has no close box: it cannot be dismissed by the user, which is not
+    /// the same as being allowed to keep its owner - and the application - alive.
+    /// </summary>
+    [Fact]
+    public Task Closing_the_owner_window_takes_a_dialog_without_a_close_box_too() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        var (_, mainWindow) = await StartAsync();
+
+        var dialog = new TestDialog(new DialogParameters { Title = "Unclosable", ShowCloseBox = false, WindowKey = "device-a" });
+        var shown = dialog.ShowDialogAsync();
+        await HeadlessAvalonia.SettleAsync();
+        var window = WindowOf("Unclosable");
+
+        mainWindow.Close();
+        await HeadlessAvalonia.SettleAsync();
+
+        Assert.DoesNotContain(mainWindow, HeadlessAvalonia.Windows);
+        Assert.DoesNotContain(window, HeadlessAvalonia.Windows);
+        Assert.True(shown.IsCompleted);
+        await shown;
+    });
+
     [Fact]
     public Task Turning_resizing_on_frees_the_maximum_the_body_declares() => HeadlessAvalonia.RunAsync(async () =>
     {
