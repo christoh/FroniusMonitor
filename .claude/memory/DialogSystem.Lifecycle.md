@@ -305,7 +305,9 @@ attached properties on the page's own root, set in its XAML:
 ```
 
 - **Optional and per view.** The default of both is `NaN`, which means "the content decides", so a page that says
-  nothing behaves exactly as every page window did before this existed. No page sets either today.
+  nothing behaves exactly as every page window did before this existed. All four detail views set both today -
+  inverter 1055x952, smart meter 1280x775, WattPilot 980x780, battery 680x780 - measured on the real app rather
+  than derived from anything, so change them by looking, not by reasoning.
 - **The two are independent.** Fixing only the width gives a window that wide and as tall as what is on it, which
   is the useful combination for a wall of gauges: the width is what decides how many fit in a row, the height is
   however many rows that makes.
@@ -329,6 +331,13 @@ about size. If one ever needs to, that is a parameter - see "The queue item hold
 
 ## Closing
 
+- **A dialog window may refuse its own close box and nothing else.** `WindowDialogPresentation.OnClosing` cancels
+  the close only for `WindowCloseReason.WindowClosing` (and `Undefined`, which is a platform that did not say and
+  so is treated as the user). `ApplicationShutdown`, `OSShutdown` and `OwnerWindowClosing` take the dialog down
+  through its view model instead and let the window go. **Cancelling those is cancelling the shutdown itself**: a
+  close that any window vetoes is a close that does not happen, so with `ShutdownMode.OnMainWindowClose` a single
+  open dialog closed the main window, then closed itself, and left the process running with nothing on screen and
+  no way back to it. Pages never had this - they cancel nothing.
 - The close box is visible when `ShowCloseBox` is true and runs `MainViewModel.DialogClosedCommand`, which calls
   `AbortAsync` on the view model behind `CurrentDialog.Body`. In a window the close box of the chrome does the
   same thing: `ChildWindow` cancels the close and calls `AbortAsync`, so there is one way out and not two. Every dialog view model must implement it and decide
@@ -369,6 +378,11 @@ platform - see [[Testing.HeadlessAvalonia]]. Between them they cover a window pe
 reuse and activation, the close box through `AbortAsync`, a dialog with no close box, resizing switched while the
 dialog is up, the modal message box, a logout, and on the other side the dialog frame, nesting, the busy text
 handover, one page per view type and the menu bar gate.
+
+`Closing_the_owner_window_takes_a_dialog_with_it_and_releases_its_caller` and `…_without_a_close_box_too` pin the
+veto rule. They close the test's main window, which is the owner of every dialog window, and assert that the
+dialog window goes with it and its caller is released - the shutdown itself cannot be driven from a test, because
+the headless session is one lifetime for the whole run.
 
 The four `A_page_window_…` facts in `WindowPresenterTests` cover the initial size: both dimensions asked for, one
 of the two, neither, and a page asking for more than the screen has. The last one reads the screen back off the
