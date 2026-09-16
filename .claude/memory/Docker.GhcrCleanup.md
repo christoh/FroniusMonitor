@@ -89,6 +89,12 @@ over. It never deletes on "untagged". It refuses to delete anything if no tagged
 registry hiccup cannot empty a package, and it re-reads every tag afterwards to prove the cleanup did not
 break what it was protecting.
 
+The publish workflow ignores `.github/scripts/**` and `cleanup-packages.yml` in its `paths-ignore`, so
+changing the cleanup no longer rebuilds and republishes both images - which it did twice on 2026-09-16 before
+the entries were added, each time leaving another 16 versions for the cleanup to collect. `paths-ignore` is
+evaluated per push and not per file, so a push that touches one of these *and* anything else still publishes,
+which is what you want.
+
 **The two workflows share the concurrency group `ghcr-packages`, and must keep sharing it.** The cleanup
 decides what to keep by reading what the tags resolve to; an index published between that read and the
 deletes is in neither the keep set nor a tag the cleanup knows about, so it would be deleted as a leftover

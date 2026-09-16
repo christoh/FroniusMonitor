@@ -13,10 +13,14 @@ on:
       - master
     paths-ignore:
       # Nothing that cannot change an image. A multi-arch build of both images is expensive, and arm/v7 is
-      # emulated, so a documentation commit should not start one.
+      # emulated, so a documentation commit should not start one. The cleanup workflow and its script are
+      # here for the same reason: they only delete versions no tag points at and cannot affect what is built.
+      # Note this list is per push, not per file - a push that also touches anything else still publishes.
       - '**/*.md'
       - '.claude/**'
       - 'LICENSE'
+      - '.github/scripts/**'
+      - '.github/workflows/cleanup-packages.yml'
   # Publish on demand as well - from master, the branch picker is what decides.
   workflow_dispatch:
 
