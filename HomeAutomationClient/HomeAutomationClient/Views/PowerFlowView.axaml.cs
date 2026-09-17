@@ -1,6 +1,5 @@
 using Avalonia.Controls.Shapes;
 using Avalonia.VisualTree;
-using De.Hochstaetter.HomeAutomationClient.Converters;
 
 namespace De.Hochstaetter.HomeAutomationClient.Views;
 
@@ -268,7 +267,7 @@ public partial class PowerFlowView : ContentPage
                 var tapY = inverter.Rect.Center.Y + (i - (dcSources.Count - 1) / 2.0) * TapSpacing;
                 var midX = rect.Right + (inverter.Rect.Left - rect.Right) / 2;
                 var path = Path(new Point(rect.Right, rect.Center.Y), new Point(midX, rect.Center.Y), new Point(midX, tapY), new Point(inverter.Rect.Left, tapY));
-                Set(needed, $"dc:{item.Key}", item.Node, path, labelAt: new Point(midX, rect.Center.Y - 12), signed: item.Node.Kind == PowerFlowNodeKind.Battery);
+                Set(needed, $"dc:{item.Key}", item.Node, path);
             }
         }
 
@@ -285,7 +284,7 @@ public partial class PowerFlowView : ContentPage
         if (items.Grid is { } gridNode && cards.TryGetValue(gridNode.Key, out var gridRect))
         {
             var y = gridRect.Rect.Center.Y;
-            Set(needed, "grid", gridRect.Item.Node, Path(new Point(gridRect.Rect.Right, y), new Point(trunkX, y)), labelAt: new Point(gridRect.Rect.Right + (trunkX - gridRect.Rect.Right) / 2, y - 12), signed: true, dots: [new Point(trunkX, y)]);
+            Set(needed, "grid", gridRect.Item.Node, Path(new Point(gridRect.Rect.Right, y), new Point(trunkX, y)), dots: [new Point(trunkX, y)]);
         }
 
         foreach (var cluster in items.Inverters)
@@ -296,7 +295,7 @@ public partial class PowerFlowView : ContentPage
             }
 
             var y = inverter.Rect.Center.Y;
-            Set(needed, $"ac:{cluster.Key}", inverter.Item.Node, Path(new Point(inverter.Rect.Right, y), new Point(trunkX, y)), labelAt: new Point(inverter.Rect.Right + (trunkX - inverter.Rect.Right) / 2, y - 12), signed: false, dots: [new Point(trunkX, y)]);
+            Set(needed, $"ac:{cluster.Key}", inverter.Item.Node, Path(new Point(inverter.Rect.Right, y), new Point(trunkX, y)), dots: [new Point(trunkX, y)]);
         }
 
         // The trunk, one segment per gap between two taps, each carrying the net of everything above it: drawn
@@ -311,11 +310,11 @@ public partial class PowerFlowView : ContentPage
         for (var i = 0; i < taps.Count - 1; i++)
         {
             crossing += taps[i].Injection;
-            Set(needed, $"trunk:{i}", new PowerFlowNode($"trunk:{i}", PowerFlowNodeKind.House, string.Empty, crossing), Path(new Point(trunkX, taps[i].Y), new Point(trunkX, taps[i + 1].Y)), labelAt: null, signed: false);
+            Set(needed, $"trunk:{i}", new PowerFlowNode($"trunk:{i}", PowerFlowNodeKind.House, string.Empty, crossing), Path(new Point(trunkX, taps[i].Y), new Point(trunkX, taps[i + 1].Y)));
         }
 
         // The last step into the house carries what the house draws, with its dot on the trunk like every tap.
-        Set(needed, "house", house.Item.Node, Path(new Point(trunkX, houseY), new Point(house.Rect.Left, houseY)), labelAt: null, signed: false, dots: [new Point(trunkX, houseY)]);
+        Set(needed, "house", house.Item.Node, Path(new Point(trunkX, houseY), new Point(house.Rect.Left, houseY)), dots: [new Point(trunkX, houseY)]);
 
         RouteConsumers(needed, items, cards, house);
         Prune(needed);
@@ -349,18 +348,18 @@ public partial class PowerFlowView : ContentPage
         // starting at the junction, so that the dashes run away from it on both. One path that went up and came back
         // down passed the upper part twice, with the two runs of dashes crossing over each other. The spine carries
         // what the rails carry, under the consumers' idle rule like them.
-        Set(needed, "spine", SpineNode("spine", rows), Path(new Point(house.Rect.Right, houseY), new Point(spineX, houseY)), labelAt: null, signed: false, dots: [new Point(spineX, houseY)]);
+        Set(needed, "spine", SpineNode("spine", rows), Path(new Point(house.Rect.Right, houseY), new Point(spineX, houseY)), dots: [new Point(spineX, houseY)]);
         SetSpineRun(needed, "spine:up", spineX, houseY, rows.Where(row => row.RailY < houseY).ToList(), Math.Min);
         SetSpineRun(needed, "spine:down", spineX, houseY, rows.Where(row => row.RailY > houseY).ToList(), Math.Max);
 
         foreach (var (row, railY, rowNode) in rows)
         {
-            Set(needed, rowNode.Key, rowNode, Path(new Point(spineX, railY), new Point(row.Max(card => card.Rect.Center.X), railY)), labelAt: null, signed: false, dots: [new Point(spineX, railY)]);
+            Set(needed, rowNode.Key, rowNode, Path(new Point(spineX, railY), new Point(row.Max(card => card.Rect.Center.X), railY)), dots: [new Point(spineX, railY)]);
 
             foreach (var card in row)
             {
                 var x = card.Rect.Center.X;
-                Set(needed, $"stub:{card.Item.Key}", card.Item.Node, Path(new Point(x, railY), new Point(x, card.Rect.Top)), labelAt: null, signed: false, dots: [new Point(x, railY)]);
+                Set(needed, $"stub:{card.Item.Key}", card.Item.Node, Path(new Point(x, railY), new Point(x, card.Rect.Top)), dots: [new Point(x, railY)]);
             }
         }
     }
@@ -373,7 +372,7 @@ public partial class PowerFlowView : ContentPage
             return;
         }
 
-        Set(needed, key, SpineNode(key, rows), Path(new Point(spineX, houseY), new Point(spineX, rows.Select(row => row.RailY).Aggregate(farthest))), labelAt: null, signed: false);
+        Set(needed, key, SpineNode(key, rows), Path(new Point(spineX, houseY), new Point(spineX, rows.Select(row => row.RailY).Aggregate(farthest))));
     }
 
     private static PowerFlowNode SpineNode(string key, IReadOnlyList<ConsumerRow> rows) => new(key, PowerFlowNodeKind.Consumer, string.Empty, rows.Sum(row => row.Node.Power ?? 0));
@@ -383,18 +382,18 @@ public partial class PowerFlowView : ContentPage
 
     private static string Path(params Point[] points) => string.Join(' ', points.Select((point, i) => $"{(i == 0 ? 'M' : 'L')}{point.X.ToString("F1", CultureInfo.InvariantCulture)},{point.Y.ToString("F1", CultureInfo.InvariantCulture)}"));
 
-    private void Set(HashSet<string> needed, string key, PowerFlowNode node, string path, Point? labelAt, bool signed, IReadOnlyList<Point>? dots = null)
+    private void Set(HashSet<string> needed, string key, PowerFlowNode node, string path, IReadOnlyList<Point>? dots = null)
     {
         needed.Add(key);
 
         if (!wires.TryGetValue(key, out var wire))
         {
-            wire = new Wire(labelAt is { });
+            wire = new Wire();
             wire.Attach(Wires);
             wires[key] = wire;
         }
 
-        wire.Update(this, node, path, labelAt, signed, dots ?? []);
+        wire.Update(this, node, path, dots ?? []);
     }
 
     private void Prune(HashSet<string> needed)
@@ -420,16 +419,15 @@ public partial class PowerFlowView : ContentPage
     private IBrush Brush(string key) => this.TryFindResource(key, ActualThemeVariant, out var resource) && resource is IBrush brush ? brush : Brushes.Gray;
 
     /// <summary>
-    /// One connection: a faint trace, the moving dashes over it while power flows, the junction dots where it
-    /// meets a bus, and for the sources a label with the figure.
+    /// One connection: a faint trace, the moving dashes over it while power flows, and the junction dots where it
+    /// meets a bus. No figure of its own - the card at its end already shows it, and a wire that repeated it put
+    /// the same number twice within a centimetre.
     /// </summary>
-    private sealed class Wire(bool hasLabel)
+    private sealed class Wire
     {
         private readonly Path trace = new() { StrokeLineCap = PenLineCap.Round, StrokeJoin = PenLineJoin.Round };
         private readonly Path flow = new() { StrokeLineCap = PenLineCap.Round, StrokeJoin = PenLineJoin.Round };
         private readonly List<Ellipse> dots = [];
-        private readonly Border? label = hasLabel ? new Border { CornerRadius = new CornerRadius(4), Padding = new Thickness(5, 1), ZIndex = LabelZIndex } : null;
-        private readonly TextBlock? labelText = hasLabel ? new TextBlock { FontSize = 10.5, FontWeight = FontWeight.SemiBold } : null;
 
         private string? path;
         private string? dotsAt;
@@ -439,8 +437,6 @@ public partial class PowerFlowView : ContentPage
         /// without this the trunk, routed after the taps on it, painted over their dots, and the spine over the rails'.
         /// </summary>
         private const int DotZIndex = 1;
-
-        private const int LabelZIndex = 2;
 
         /// <summary>Null until the first update, so that the first update styles the wire whatever it is - an idle one included.</summary>
         private PowerFlowKind? kind;
@@ -460,12 +456,6 @@ public partial class PowerFlowView : ContentPage
         {
             canvas.Children.Add(trace);
             canvas.Children.Add(flow);
-
-            if (label is { } pill)
-            {
-                pill.Child = labelText;
-                canvas.Children.Add(pill);
-            }
         }
 
         public void Detach(Canvas canvas)
@@ -473,14 +463,9 @@ public partial class PowerFlowView : ContentPage
             canvas.Children.Remove(trace);
             canvas.Children.Remove(flow);
             dots.ForEach(dot => canvas.Children.Remove(dot));
-
-            if (label is { } pill)
-            {
-                canvas.Children.Remove(pill);
-            }
         }
 
-        public void Update(PowerFlowView view, PowerFlowNode node, string newPath, Point? labelAt, bool signed, IReadOnlyList<Point> dotsAt)
+        public void Update(PowerFlowView view, PowerFlowNode node, string newPath, IReadOnlyList<Point> dotsAt)
         {
             var power = node.Power ?? 0;
             var newThick = Math.Abs(power) >= ThickThreshold;
@@ -529,20 +514,6 @@ public partial class PowerFlowView : ContentPage
                     dots.Add(dot);
                 }
             }
-
-            if (label is { } pill && labelText is { } text && labelAt is { } at)
-            {
-                var newText = PowerText.Format(node.Power, signed, CultureInfo.CurrentCulture);
-
-                if (text.Text != newText)
-                {
-                    text.Text = newText;
-                }
-
-                pill.Measure(Size.Infinity);
-                Canvas.SetLeft(pill, at.X - pill.DesiredSize.Width / 2);
-                Canvas.SetTop(pill, at.Y - pill.DesiredSize.Height / 2);
-            }
         }
 
         public void Recolor(PowerFlowView view)
@@ -557,12 +528,6 @@ public partial class PowerFlowView : ContentPage
             });
 
             dots.ForEach(dot => dot.Fill = view.Brush("FlowJunction"));
-
-            if (label is { } pill && labelText is { } text)
-            {
-                pill.Background = view.Brush("FlowPageBackground");
-                text.Foreground = view.Brush("FlowLabel");
-            }
         }
 
         /// <summary>Moves the dashes on: a smaller offset shifts the pattern towards the end of the path, which is the way the wire is drawn.</summary>

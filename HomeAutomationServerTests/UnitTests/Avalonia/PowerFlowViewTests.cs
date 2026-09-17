@@ -146,7 +146,10 @@ public sealed class PowerFlowViewTests
 
         // A dot is drawn as its wire is routed; the wires routed after it must not paint over it.
         Assert.All(dots, dot => Assert.True(dot.ZIndex > paths.Max(path => path.ZIndex), "a dot under the wires"));
-        Assert.All(children.OfType<Border>(), label => Assert.True(label.ZIndex > dots.Max(dot => dot.ZIndex), "a label under the dots"));
+
+        // Nothing but traces, flows and dots: a wire carries no figure of its own, because the card at its end
+        // already shows it and the two sat within a centimetre of each other.
+        Assert.Empty(children.OfType<Border>());
 
         // The house's inlet meets the trunk at a dot like every tap does; the point is where the inlet starts.
         var junction = Wires["house"].Path.Split(' ')[0][1..].Split(',').Select(v => double.Parse(v, CultureInfo.InvariantCulture)).ToList();

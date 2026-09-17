@@ -205,10 +205,17 @@ to it run towards it; its own wire runs back into it through `IsReversed` as it 
 house's figure the trunk ran downwards from the top tap to the bottom one, past the house. `PowerFlowViewTests.The_trunk_carries_the_net_between_its_taps` holds it to this,
 through `WireStates`, which also tells whether a wire runs reversed.
 
-**Dots lie over wires, labels over dots** (`ZIndex` 1 and 2 on the canvas children, paths at 0). A wire's paths
+**Dots lie over wires** (`ZIndex` 1 on the canvas children, paths at 0). A wire's paths
 and dots are added to the canvas as it is routed, so without this the trunk segments, routed after the taps on
 them, painted over the taps' dots and the spine runs over the rails'. Every tap on the trunk has a dot, the
 house's inlet included; the trunk segments and the spine runs have none of their own, the wires meeting them do.
+
+**A wire carries no figure.** The DC stubs, the grid wire and the AC wires used to show their watts on a pill over
+the wire, which put the same number twice within a centimetre: the card at the end of the wire says it already,
+larger and in its own right. The pill, its text, the `signed` flag that formatted it and the `labelAt` point that
+placed it are all gone, and `PowerFlowViewTests.Every_junction_has_a_dot_and_the_dots_lie_over_the_wires` holds the
+wire canvas to traces, flows and dots alone. What a wire tells is direction and speed (see "Motion carries the
+number"); the reading is the card's job.
 
 **No wire passes a point twice.** The spine is a stub from the house to the junction (`spine`) and then a run
 from the junction up to the highest rail (`spine:up`) and one down to the lowest (`spine:down`), each drawn
@@ -218,9 +225,9 @@ twice and the two runs of dashes crossed over each other there. `PowerFlowViewTe
 holds every wire to this. `PowerFlowView.WireStates` is internal for exactly these tests: the path and whether the
 dashes move, per key.
 
-**It writes to a wire only what changed** - the path string, the dot positions, the label text, the thickness
+**It writes to a wire only what changed** - the path string, the dot positions, the thickness
 and kind - because setting a path's geometry invalidates layout, and an unconditional write on every layout pass
-would loop for ever. Wires are keyed (`dc:<node>`, `ac:<inverter>`, `grid`, `trunk:<gap>`, `house`, `spine`,
+would loop for ever.
 `spine:up`, `spine:down`, `rail:<row>`, `stub:<consumer>`); after `Apply` says the structure changed, all of them are thrown away and
 routed anew, otherwise they are updated in place. **A wire's kind starts out as null**, so that the first update
 styles it whatever it is: with `Idle` as the initial value an idle-from-birth wire was never given a stroke or a

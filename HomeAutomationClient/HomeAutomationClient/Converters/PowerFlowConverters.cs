@@ -2,8 +2,9 @@ namespace De.Hochstaetter.HomeAutomationClient.Converters;
 
 /// <summary>
 /// A power in watts as the power flow page prints it: whole watts below a kilowatt, two decimals above, and
-/// "---" for nothing. Absolute by default, because the card's state line says which way the power goes; the
-/// wire labels of the battery and the grid ask for the sign.
+/// "---" for nothing. Absolute unless <see cref="Signed"/> asks otherwise, because the card's state line says
+/// which way the power goes. Nothing sets <see cref="Signed"/> today - the wire labels of the battery and the
+/// grid did, and they are gone.
 /// </summary>
 public class PowerText : ConverterBase
 {
