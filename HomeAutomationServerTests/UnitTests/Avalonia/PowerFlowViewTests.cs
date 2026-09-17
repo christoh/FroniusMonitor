@@ -7,6 +7,7 @@ using De.Hochstaetter.Fronius.Models.Charging;
 using De.Hochstaetter.Fronius.Models.Gen24;
 using De.Hochstaetter.HomeAutomationClient.Contracts;
 using De.Hochstaetter.HomeAutomationClient.Models;
+using De.Hochstaetter.HomeAutomationClient.Services;
 using De.Hochstaetter.HomeAutomationClient.Services.Presentation;
 using De.Hochstaetter.HomeAutomationClient.ViewModels;
 using De.Hochstaetter.HomeAutomationClient.Views;
@@ -32,6 +33,8 @@ public sealed class PowerFlowViewTests
             .AddSingleton<IUpdateService>(service)
             .AddSingleton<IDialogPresenter>(presenter)
             .AddSingleton<IPagePresenter>(presenter)
+            // So the page knows whether its window can be seen, as it does in the app.
+            .AddSingleton<VisibilityService>()
             .AddTransient<PowerFlowView>()
             .AddTransient<PowerFlowViewModel>());
 
@@ -306,5 +309,29 @@ public sealed class PowerFlowViewTests
         await HeadlessAvalonia.SettleAsync();
 
         Assert.Same(snapshot, viewModel.Snapshot);
+    });
+
+    [Fact]
+    public Task A_minimized_page_leaves_the_devices_alone_and_catches_up_when_it_is_restored() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        var service = await StartAsync();
+        Assert.True(ViewModel.IsShown);
+
+        Window.WindowState = WindowState.Minimized;
+        await HeadlessAvalonia.SettleAsync();
+        Assert.False(ViewModel.IsShown);
+
+        // A report while nobody looks: no snapshot is built for it.
+        var before = ViewModel.Snapshot;
+        ((KeyedFritzBoxDevice)service.AllPowerConsumers[0]).Device.PowerMeter = new FritzBoxPowerMeter { PowerWatts = 800 };
+        await HeadlessAvalonia.SettleAsync();
+        Assert.Same(before, ViewModel.Snapshot);
+
+        // Back in sight: one snapshot, with the figure the report brought.
+        Window.WindowState = WindowState.Normal;
+        await HeadlessAvalonia.SettleAsync();
+        Assert.True(ViewModel.IsShown);
+        Assert.NotSame(before, ViewModel.Snapshot);
+        Assert.Equal(800, ((PowerFlowNodeItem)CardOf("hp").DataContext!).Node.Power);
     });
 }

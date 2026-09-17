@@ -28,6 +28,11 @@ ViewModelBase          HomeAutomationClient/ViewModels/ViewModelBase.cs   (abstr
 - **`TaskExceptionHandler(Func<Task> task)`** - wrap the body of a `[RelayCommand]` in it: it awaits the task,
   shows any exception in a message box and always clears `BusyText` afterwards. See the commands in
   `DashboardViewModel`.
+- **`IsShown` / `WhenShown(Action work)`** - whether the user can see the view this model drives, set by the view
+  through `ViewVisibility.Follow(this)` (minimized window, hidden tab, page navigated away from: not shown). True
+  until a view says otherwise. A reaction to an update from the service goes through `WhenShown`: it runs now while
+  shown, else once when shown again, and only the last piece of work asked for is kept - right for work that reads
+  the current state, wrong for anything that must not be lost. See [[UpdateVisibility.Lifecycle]].
 - **`static ShowHttpError<T>(ApiResult<T> result)`** - the standard message box for a failed server call, with a
   special text for `403`. Being static, controls call it too (`InverterControl.axaml.cs`).
 - **No `ConfigureAwait(false)` in a view model before it touches command state.** A property that a

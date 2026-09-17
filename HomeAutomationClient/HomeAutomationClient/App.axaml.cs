@@ -156,6 +156,10 @@ public partial class App : Application
             // it to tell whether anything was changed at all; what actually gets written is worked out server side.
             .AddSingleton<IGen24JsonService, Gen24JsonService>()
             .AddSingleton<IGen24LocalizationService, Gen24LocalizationService>()
+            // Whether the user can see the app. The concrete type for the views, which ask about their own window;
+            // the contract for the update service, which only asks whether anybody looks at all.
+            .AddSingleton<VisibilityService>()
+            .AddSingleton<IVisibilityService>(provider => provider.GetRequiredService<VisibilityService>())
             .AddSingleton<IUpdateService, UpdateService>()
             // The same instance under the narrow contract the Toshiba view model takes, so a test can fake that
             // contract while the app sends over the one hub connection.

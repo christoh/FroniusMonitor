@@ -24,6 +24,9 @@ public partial class EnergyChartView : UserControl, IDialogControl
 
         DataContextChanged += OnDataContextChanged;
         ActualThemeVariantChanged += (_, _) => Render();
+
+        // The view model leaves a push alone while the chart cannot be seen and rebuilds once it can.
+        ViewVisibility.Follow(this);
     }
 
     private void OnDataContextChanged(object? sender, EventArgs e)

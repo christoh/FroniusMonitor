@@ -415,6 +415,14 @@ Where the cached addresses are unusable - a phone that has never been told, or a
 moved - `LoginViewModel.Initialize` starts in the address mode without contacting anything, and shows no error:
 not knowing the address yet is not the user having got something wrong.
 
+## What a head does not have to do: say when it cannot be seen
+
+Whether the user can see the app is worked out in the shared project, see [[UpdateVisibility.Lifecycle]]. The
+heads contribute nothing: the browser, the phones and macOS raise `ActivationKind.Background` through Avalonia's
+own `IActivatableLifetime` (the browser's from `document.visibilitychange`, which is the one signal a browser has
+for a hidden tab or a minimized window), and the desktop is judged by its windows. Do not add a visibility script
+to `wwwroot`; there was nothing for it to report that Avalonia does not already.
+
 ## Known gaps
 
 - Neither mobile head has ever run on a device or emulator. Everything about them here is compile time knowledge.

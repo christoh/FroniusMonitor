@@ -221,7 +221,8 @@ public sealed partial class EnergyChartViewModel(DialogParameters parameters) : 
     {
         if (!IsHistoric)
         {
-            Rebuild();
+            // A chart nobody can see is not redrawn for a push; the live data is read when it is looked at again.
+            WhenShown(Rebuild);
         }
     }
 

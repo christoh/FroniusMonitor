@@ -158,7 +158,9 @@ constructor, as the injection rule wants - **after** hooking `DataContextChanged
 which is exactly the bug the headless tests caught first. The view model follows the devices from the view's
 `Loaded` (`Initialize`, idempotent) to its `Unloaded` (`Stop`): on the browser that is every trip to the
 dashboard and back, and the same page comes back with the same cards, because `MainViewPresenter` keeps one page
-per type.
+per type. Between the two, while the page's window is minimized or the app is in the background, `Rebuild` goes
+through `WhenShown` and builds nothing; one snapshot is built when the page is back - see
+[[UpdateVisibility.Lifecycle]].
 
 The page has no address of its own in the browser (see [[Navigation.Lifecycle]]); the Dashboard menu entry is
 the way back, as for a detail page.
@@ -225,7 +227,8 @@ thickness, and the first screenshot had connectors on some idle devices and none
 `StrokeDashOffset`; there is no timer per wire. Dash lengths are 10 px on, 14 px off, stated in multiples of the
 stroke thickness as `StrokeDashArray` wants, so the period changes with the thickness (3 px, 4 px above 2 kW).
 The offset is kept in `0..period` and decreases for a forward flow - a smaller dash offset shifts the pattern
-towards the end of the path. The loop starts when the view is attached and ends when it is detached.
+towards the end of the path. The loop starts when the view is attached and ends when it is detached, and it also
+stops while the view model's `IsShown` is false - a minimized window - and starts again when it turns true.
 
 The whole stage is in a `ScrollViewer` (vertical only) inside a `ZoomBox`, so a site with more inverters than
 fit scrolls, and Ctrl with the wheel scales the picture.
