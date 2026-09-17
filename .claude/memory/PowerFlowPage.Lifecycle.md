@@ -195,6 +195,11 @@ to it run towards it; its own wire runs back into it through `IsReversed` as it 
 house's figure the trunk ran downwards from the top tap to the bottom one, past the house. `PowerFlowViewTests.The_trunk_carries_the_net_between_its_taps` holds it to this,
 through `WireStates`, which also tells whether a wire runs reversed.
 
+**Dots lie over wires, labels over dots** (`ZIndex` 1 and 2 on the canvas children, paths at 0). A wire's paths
+and dots are added to the canvas as it is routed, so without this the trunk segments, routed after the taps on
+them, painted over the taps' dots and the spine runs over the rails'. Every tap on the trunk has a dot, the
+house's inlet included; the trunk segments and the spine runs have none of their own, the wires meeting them do.
+
 **No wire passes a point twice.** The spine is a stub from the house to the junction (`spine`) and then a run
 from the junction up to the highest rail (`spine:up`) and one down to the lowest (`spine:down`), each drawn
 starting at the junction so that its dashes run away from the house, and each left out when there is no rail on

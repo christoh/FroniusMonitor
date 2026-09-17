@@ -1,4 +1,6 @@
 using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
+using System.Globalization;
 using Avalonia.VisualTree;
 using De.Hochstaetter.Fronius.Models;
 using De.Hochstaetter.Fronius.Models.Charging;
@@ -120,6 +122,27 @@ public sealed class PowerFlowViewTests
             Assert.NotNull(path.Stroke);
             Assert.True(path.StrokeThickness > 0, "a wire without a thickness");
         });
+
+        Window.Close();
+    });
+
+    [Fact]
+    public Task Every_junction_has_a_dot_and_the_dots_lie_over_the_wires() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        await StartAsync();
+
+        var children = Body.Wires.Children;
+        var dots = children.OfType<Ellipse>().ToList();
+        var paths = children.OfType<Avalonia.Controls.Shapes.Path>().ToList();
+        Assert.NotEmpty(dots);
+
+        // A dot is drawn as its wire is routed; the wires routed after it must not paint over it.
+        Assert.All(dots, dot => Assert.True(dot.ZIndex > paths.Max(path => path.ZIndex), "a dot under the wires"));
+        Assert.All(children.OfType<Border>(), label => Assert.True(label.ZIndex > dots.Max(dot => dot.ZIndex), "a label under the dots"));
+
+        // The house's inlet meets the trunk at a dot like every tap does; the point is where the inlet starts.
+        var junction = Wires["house"].Path.Split(' ')[0][1..].Split(',').Select(v => double.Parse(v, CultureInfo.InvariantCulture)).ToList();
+        Assert.Contains(dots, dot => Math.Abs(Canvas.GetLeft(dot) + dot.Width / 2 - junction[0]) < 0.6 && Math.Abs(Canvas.GetTop(dot) + dot.Height / 2 - junction[1]) < 0.6);
 
         Window.Close();
     });

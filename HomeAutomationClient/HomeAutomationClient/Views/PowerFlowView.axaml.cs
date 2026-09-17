@@ -287,8 +287,8 @@ public partial class PowerFlowView : ContentPage
             Set(needed, $"trunk:{i}", new PowerFlowNode($"trunk:{i}", PowerFlowNodeKind.House, string.Empty, crossing), Path(new Point(trunkX, taps[i].Y), new Point(trunkX, taps[i + 1].Y)), labelAt: null, signed: false);
         }
 
-        // The last step into the house carries what the house draws.
-        Set(needed, "house", house.Item.Node, Path(new Point(trunkX, houseY), new Point(house.Rect.Left, houseY)), labelAt: null, signed: false);
+        // The last step into the house carries what the house draws, with its dot on the trunk like every tap.
+        Set(needed, "house", house.Item.Node, Path(new Point(trunkX, houseY), new Point(house.Rect.Left, houseY)), labelAt: null, signed: false, dots: [new Point(trunkX, houseY)]);
 
         RouteConsumers(needed, items, cards, house);
         Prune(needed);
@@ -401,11 +401,19 @@ public partial class PowerFlowView : ContentPage
         private readonly Path trace = new() { StrokeLineCap = PenLineCap.Round, StrokeJoin = PenLineJoin.Round };
         private readonly Path flow = new() { StrokeLineCap = PenLineCap.Round, StrokeJoin = PenLineJoin.Round };
         private readonly List<Ellipse> dots = [];
-        private readonly Border? label = hasLabel ? new Border { CornerRadius = new CornerRadius(4), Padding = new Thickness(5, 1) } : null;
+        private readonly Border? label = hasLabel ? new Border { CornerRadius = new CornerRadius(4), Padding = new Thickness(5, 1), ZIndex = LabelZIndex } : null;
         private readonly TextBlock? labelText = hasLabel ? new TextBlock { FontSize = 10.5, FontWeight = FontWeight.SemiBold } : null;
 
         private string? path;
         private string? dotsAt;
+
+        /// <summary>
+        /// Above every wire, whichever was drawn last: the canvas adds a wire's paths and dots as it is routed, so
+        /// without this the trunk, routed after the taps on it, painted over their dots, and the spine over the rails'.
+        /// </summary>
+        private const int DotZIndex = 1;
+
+        private const int LabelZIndex = 2;
 
         /// <summary>Null until the first update, so that the first update styles the wire whatever it is - an idle one included.</summary>
         private PowerFlowKind? kind;
@@ -487,7 +495,7 @@ public partial class PowerFlowView : ContentPage
 
                 foreach (var point in dotsAt)
                 {
-                    var dot = new Ellipse { Width = 7, Height = 7, Fill = view.Brush("FlowJunction") };
+                    var dot = new Ellipse { Width = 7, Height = 7, Fill = view.Brush("FlowJunction"), ZIndex = DotZIndex };
                     Canvas.SetLeft(dot, point.X - 3.5);
                     Canvas.SetTop(dot, point.Y - 3.5);
                     canvas.Children.Add(dot);
