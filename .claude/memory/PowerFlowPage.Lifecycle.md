@@ -176,7 +176,12 @@ them again. So:
 
 1. **`PowerFlowViewModel.Snapshot`** is rebuilt on the hub's thread for every report of every followed device
    (each inverter's `Gen24System`, each consumer, the site flow, the two collections). It is cheap; nothing
-   filters property names.
+   filters property names on the devices. On the service itself only `SitePowerFlow`, `Inverters` and
+   `AllPowerConsumers` are heard - the service replaces all three, at logout and `Inverters` whenever an inverter
+   appears, and the handlers move with them through `Misc/CollectionFollowing` (since 2026-09-17; before, the
+   `CollectionChanged` handlers stayed on the collections of the first login). What else the service announces on
+   every inverter report - `SmartMeter`, `MeterStatus`, `PrimaryGen24Config`, `BatteryGen24System` - is heard from
+   the inverter's own `Refresh` and not a second time.
 2. **`PowerFlowViewModel.Items`** (`PowerFlowViewModelItems`) is what the controls bind to: `Grid`, `House`,
    `SelfSufficiency`, `SelfConsumption`, `Inverters` - each a `PowerFlowInverterItem` with its inverter and a `DcSources`
    collection of trackers and battery - and `Consumers`, as stable `PowerFlowNodeItem`s whose `Node` is

@@ -88,6 +88,46 @@ public sealed class ToshibaHvacViewModelTests
         Assert.Equal(ToshibaHvacFanSpeed.Auto, Assert.Single(viewModel.FanSpeeds, o => o.IsSelected).Value);
     }
 
+    /// <summary>
+    /// The server pushes the whole device, and the catch-up after a lost connection fetches it whole as well. The
+    /// state that arrives is copied into the one the control is bound to - with one notification, not one per
+    /// mapped property, and with none where nothing has changed.
+    /// </summary>
+    [Fact]
+    public void A_device_that_arrives_whole_changes_the_state_with_one_notification_and_an_unchanged_one_with_none()
+    {
+        var names = new List<string?>();
+        device.State.PropertyChanged += (_, e) => names.Add(e.PropertyName);
+
+        var arrived = Arrived();
+        arrived.State.FanSpeed = ToshibaHvacFanSpeed.Auto;
+        arrived.State.TargetTemperatureCelsius = 25;
+
+        device.CopyFrom(arrived);
+
+        Assert.Equal([string.Empty], names);
+        Assert.Equal(ToshibaHvacFanSpeed.Auto, Assert.Single(viewModel.FanSpeeds, o => o.IsSelected).Value);
+        Assert.Equal<sbyte>(25, Assert.Single(viewModel.Temperatures, o => o.IsSelected).Value);
+        Assert.True(device.State.IsNotifying);
+
+        names.Clear();
+        device.CopyFrom(Arrived());
+
+        Assert.Empty(names);
+        return;
+
+        // The same air conditioner as the server would send it: the same model, the same features, its state as
+        // it is now, but its own objects the way a deserialized one has them.
+        ToshibaHvacMappingDevice Arrived() => new()
+        {
+            Name = device.Name,
+            DeviceUniqueId = device.DeviceUniqueId,
+            AcModelId = device.AcModelId,
+            MeritFeature = device.MeritFeature,
+            State = new ToshibaHvacStateData { StateData = [.. device.State.StateData] },
+        };
+    }
+
     [Fact]
     public async Task A_click_on_the_fan_sends_the_next_speed_as_a_delta_to_the_device_by_its_key()
     {

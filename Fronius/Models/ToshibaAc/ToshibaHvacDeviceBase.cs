@@ -43,11 +43,11 @@ public abstract partial class ToshibaHvacDeviceBase : BindableBase, ISwitchable,
     /// <summary>
     ///     Takes the values of a freshly read copy of the same device, so that the instance everybody holds stays the
     ///     instance and only its values move. The state is replaced as a whole: what the mapping reports is the full
-    ///     state, not a delta.
+    ///     state, not a delta - see <see cref="ToshibaHvacStateData.CopyFrom"/> for how it is announced.
     /// </summary>
     protected void CopyFrom(ToshibaHvacDeviceBase other)
     {
-        State.StateData = other.State.StateData;
+        State.CopyFrom(other.State);
         FirmwareVersion = other.FirmwareVersion;
         MeritFeature = other.MeritFeature;
         Modes = other.Modes;

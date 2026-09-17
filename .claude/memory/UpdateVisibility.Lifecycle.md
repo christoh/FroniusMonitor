@@ -19,6 +19,8 @@ paths:
   - HomeAutomationServerTests/UnitTests/ViewModelVisibilityTests.cs
   - HomeAutomationServerTests/UnitTests/Avalonia/VisibilityServiceTests.cs
   - HomeAutomationServerTests/UnitTests/Fakes/FakeVisibilityService.cs
+  - Fronius/Models/ToshibaAc/ToshibaHvacStateData.cs
+  - Fronius/Models/ToshibaAc/ToshibaHvacDeviceBase.cs
 ---
 
 # Lifecycle contract: updates only where somebody looks
@@ -112,6 +114,18 @@ The fetched objects go through **the same handlers a push goes through** (`OnWat
 `OnToshibaHvacUpdate`, `OnEnergyChartData`), so the instances the controls are bound to keep their identity and
 take the values in place. A guest fetches nothing: the server answers 403 for all three and a guest sees the
 inverters only. The same catch-up runs after SignalR's own `Reconnected`.
+
+**Taking the values in place announces once, not per property.** A whole device that arrives is written into
+the instance with `IsNotifying = false` and one `Refresh(true)` at the end, the way `Gen24System.CopyFrom` and
+`FritzBoxDevice.CopyFrom` do; every listener on the dashboard handles the empty name that raises. The Toshiba
+state got the same on 2026-09-17 (`ToshibaHvacStateData.CopyFrom`): assigning `StateData` announces every mapped
+property one by one - right for a control changing one of them, but a device arriving whole raised a dozen, and
+each one had `ToshibaHvacViewModel.RefreshState` re-mark five menus and relabel the temperatures. It also
+compares the bytes first, so a catch-up that fetched an unchanged air conditioner announces nothing at all; the
+setter compares the reference, and a deserialized copy always has a new array. `WattPilot.CopyFrom` is the
+exception and sets property by property: it is reached only when a connection is greeted, through the catch-up
+and from `Clone`, and with several hundred properties of which a handful changed, the equality checks of the
+individual setters notify less than a `Refresh` would.
 
 ## The views: `ViewVisibility.Follow` and `ViewModelBase.IsShown`
 

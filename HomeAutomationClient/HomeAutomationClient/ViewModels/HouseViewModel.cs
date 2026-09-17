@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using De.Hochstaetter.Fronius.Models.Charging;
 
@@ -7,7 +8,8 @@ namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 /// What the house block on the dashboard shows - see <see cref="HousePower"/> for the figures and
 /// <c>Controls/HouseControl</c> for the view. Follows the <see cref="IUpdateService"/>: the site power flow,
 /// which the service replaces at logout, the Wattpilots as they come and go, and the peak power that scales the
-/// gauges. A singleton that lives as long as the app, so nothing here is ever unsubscribed.
+/// gauges. A singleton that lives as long as the app, so nothing here is ever unsubscribed - but the collections
+/// it follows are re-followed whenever the service replaces them, see <see cref="CollectionFollowing"/>.
 /// </summary>
 /// <remarks>
 /// The events arrive on the hub's thread and the properties are set there. That is fine for bindings, which the
@@ -23,6 +25,8 @@ public sealed partial class HouseViewModel : ViewModelBase
 
     private readonly IUpdateService updateService;
     private readonly List<WattPilot> wattPilots = [];
+    private ObservableCollection<KeyedGen24System>? inverters;
+    private ObservableCollection<IKeyedDevice>? consumers;
     private Gen24PowerFlow? flow;
 
     public HouseViewModel(IUpdateService updateService)
@@ -34,10 +38,7 @@ public sealed partial class HouseViewModel : ViewModelBase
             notifying.PropertyChanged += OnUpdateServiceChanged;
         }
 
-        updateService.Inverters.CollectionChanged += (_, _) => Update();
-        updateService.AllPowerConsumers.CollectionChanged += OnPowerConsumersChanged;
-        FollowFlow();
-        FollowWattPilots();
+        FollowEverything();
     }
 
     [ObservableProperty, NotifyPropertyChangedFor(nameof(HasCars))]
@@ -63,14 +64,45 @@ public sealed partial class HouseViewModel : ViewModelBase
     [ObservableProperty]
     public partial double CarPowerMaximum { get; private set; } = DefaultCarPowerMaximum;
 
+    /// <summary>
+    /// Only what <see cref="UpdateNow"/> reads. The service announces a good deal more on every report of an
+    /// inverter - the meter, its status, the primary config, the battery inverter, each a new object - and none
+    /// of it changes a figure of this block, so none of it is worked out again here.
+    /// </summary>
     private void OnUpdateServiceChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(IUpdateService.SitePowerFlow) or null or "")
+        switch (e.PropertyName)
         {
-            FollowFlow();
-            return;
-        }
+            case nameof(IUpdateService.SitePowerFlow):
+                FollowFlow();
+                Update();
+                break;
 
+            case nameof(IUpdateService.Inverters):
+                FollowInverters();
+                Update();
+                break;
+
+            case nameof(IUpdateService.AllPowerConsumers):
+                FollowWattPilots();
+                Update();
+                break;
+
+            case nameof(IUpdateService.SitePvPeakPower):
+                Update();
+                break;
+
+            case null or "":
+                FollowEverything();
+                break;
+        }
+    }
+
+    private void FollowEverything()
+    {
+        FollowFlow();
+        FollowInverters();
+        FollowWattPilots();
         Update();
     }
 
@@ -83,24 +115,30 @@ public sealed partial class HouseViewModel : ViewModelBase
 
         flow = updateService.SitePowerFlow;
         flow.PropertyChanged += OnFlowChanged;
-        Update();
     }
 
     private void OnFlowChanged(object? sender, PropertyChangedEventArgs e) => Update();
 
-    private void OnPowerConsumersChanged(object? sender, NotifyCollectionChangedEventArgs e) => FollowWattPilots();
+    private void FollowInverters() => CollectionFollowing.Follow(ref inverters, updateService.Inverters, OnInvertersChanged);
+
+    private void OnInvertersChanged(object? sender, NotifyCollectionChangedEventArgs e) => Update();
+
+    private void OnPowerConsumersChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        FollowWattPilots();
+        Update();
+    }
 
     private void FollowWattPilots()
     {
         lock (wattPilots)
         {
+            CollectionFollowing.Follow(ref consumers, updateService.AllPowerConsumers, OnPowerConsumersChanged);
             wattPilots.ForEach(w => w.PropertyChanged -= OnWattPilotChanged);
             wattPilots.Clear();
             wattPilots.AddRange(updateService.AllPowerConsumers.OfType<KeyedWattPilot>().Select(k => k.Device));
             wattPilots.ForEach(w => w.PropertyChanged += OnWattPilotChanged);
         }
-
-        Update();
     }
 
     private void OnWattPilotChanged(object? sender, PropertyChangedEventArgs e)

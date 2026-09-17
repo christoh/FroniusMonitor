@@ -105,6 +105,37 @@ public class ToshibaHvacStateData : BindableBase
 
     public override string ToString() => StateData.Aggregate(new StringBuilder(StateData.Count << 1), (c, n) => c.Append($"{n:x2}")).ToString();
 
+    /// <summary>
+    ///     Takes the whole state of <paramref name="other"/> - a freshly read copy of the same air conditioner - with a
+    ///     single notification for everything, and with none at all when the bytes are the same.
+    /// </summary>
+    /// <remarks>
+    ///     The setter of <see cref="StateData"/> announces every mapped property one by one, which is right for a
+    ///     control that changes one of them. A device that arrives whole would raise a dozen through it, and each of
+    ///     them has the dashboard's view model re-mark its menus and relabel its temperatures. The setter also compares
+    ///     the reference, and a copy always has a new array, so a catch-up that fetched an unchanged device would still
+    ///     go through all of that.
+    /// </remarks>
+    public void CopyFrom(ToshibaHvacStateData other)
+    {
+        ArgumentNullException.ThrowIfNull(other);
+
+        if (StateData.SequenceEqual(other.StateData))
+        {
+            return;
+        }
+
+        try
+        {
+            IsNotifying = false;
+            StateData = other.StateData;
+        }
+        finally
+        {
+            Refresh(true);
+        }
+    }
+
     internal void UpdateStateData(ToshibaHvacStateData update)
     {
         for (byte i = 0; i < new[] { update.StateData.Count, StateData.Count, 19 }.Min(); i++)

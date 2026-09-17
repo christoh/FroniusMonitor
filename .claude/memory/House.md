@@ -5,6 +5,9 @@ paths:
   - HomeAutomationClient/HomeAutomationClient/ViewModels/HouseViewModel.cs
   - HomeAutomationClient/HomeAutomationClient/Models/HousePower.cs
   - HomeAutomationClient/HomeAutomationClient/Views/DashboardView.axaml
+  - HomeAutomationClient/HomeAutomationClient/Misc/CollectionFollowing.cs
+  - HomeAutomationServerTests/UnitTests/HouseViewModelTests.cs
+  - HomeAutomationServerTests/UnitTests/Fakes/FakeUpdateService.cs
 ---
 
 # The house block on the dashboard
@@ -54,11 +57,24 @@ twentieth of that, the solar gauge to 70 % of it (a clear summer day), the cars'
 ## How it follows the data
 
 `HouseViewModel` is a singleton (`App.axaml.cs`) resolved by `HouseControl`'s code behind, as the injection rule
-wants. It subscribes to the update service's `PropertyChanged` (re-hooks when `SitePowerFlow` is replaced at
-logout), to `SitePowerFlow.PropertyChanged` (`Refresh(true)` raises an empty name), to `Inverters` and
-`AllPowerConsumers` `CollectionChanged`, and to every Wattpilot's `PropertyChanged`. All of that arrives on the
-hub's thread and the view model sets plain properties there, which bindings tolerate; it never touches a view
-collection - see the duplicate-menu incident noted in the Toshiba memory for why.
+wants. It subscribes to the update service's `PropertyChanged`, to `SitePowerFlow.PropertyChanged`
+(`Refresh(true)` raises an empty name), to `Inverters` and `AllPowerConsumers` `CollectionChanged`, and to every
+Wattpilot's `PropertyChanged`. All of that arrives on the hub's thread and the view model sets plain properties
+there, which bindings tolerate; it never touches a view collection - see the duplicate-menu incident noted in the
+Toshiba memory for why.
+
+**Of the service it hears only what `UpdateNow` reads** (since 2026-09-17): `SitePowerFlow`, `Inverters`,
+`AllPowerConsumers` and `SitePvPeakPower`. Every report of an inverter also has the service announce `SmartMeter`,
+`MeterStatus` and `PrimaryGen24Config` - each a new object, because `Gen24System.CopyFrom` replaces the sensors -
+and the catch-all `Update()` that used to answer them worked the house out four times per report for one change
+of the flow. None of those is a figure of this block.
+
+**The service replaces its collections**, both at logout and `Inverters` whenever an inverter appears, and this
+singleton outlives all of that. So the collection it has a handler on is kept in a field and re-followed through
+`Misc/CollectionFollowing.Follow` whenever the service announces the property - a no-op while it is the same
+instance. Before that, the handlers stayed on the collections of the first login: after logging out and back in
+the car row kept the Wattpilots of the session before and heard none of the new ones. `HouseViewModelTests` pins
+the following; the fake service (`FakeUpdateService`) replaces its collections the way the real one does.
 
 The `Power` property is one `HousePower` record replaced as a whole, so every binding under `Power.` updates
 together. `HasCars` hides the cars' row: the four elements of that row carry `Classes="Cars"` and a style

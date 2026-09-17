@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
@@ -30,6 +31,8 @@ public sealed partial class PowerFlowViewModel(IUpdateService updateService, IGe
 {
     private readonly List<INotifyPropertyChanged> followedDevices = [];
     private readonly Lock followLock = new();
+    private ObservableCollection<KeyedGen24System>? inverters;
+    private ObservableCollection<IKeyedDevice>? consumers;
     private Gen24PowerFlow? flow;
     private bool isFollowing;
 
@@ -55,8 +58,6 @@ public sealed partial class PowerFlowViewModel(IUpdateService updateService, IGe
             notifying.PropertyChanged += OnUpdateServiceChanged;
         }
 
-        updateService.Inverters.CollectionChanged += OnDevicesChanged;
-        updateService.AllPowerConsumers.CollectionChanged += OnDevicesChanged;
         FollowFlow();
         FollowDevices();
         return Task.CompletedTask;
@@ -77,9 +78,6 @@ public sealed partial class PowerFlowViewModel(IUpdateService updateService, IGe
             notifying.PropertyChanged -= OnUpdateServiceChanged;
         }
 
-        updateService.Inverters.CollectionChanged -= OnDevicesChanged;
-        updateService.AllPowerConsumers.CollectionChanged -= OnDevicesChanged;
-
         if (flow != null)
         {
             flow.PropertyChanged -= OnDeviceChanged;
@@ -88,6 +86,8 @@ public sealed partial class PowerFlowViewModel(IUpdateService updateService, IGe
 
         lock (followLock)
         {
+            CollectionFollowing.Unfollow(ref inverters, OnDevicesChanged);
+            CollectionFollowing.Unfollow(ref consumers, OnDevicesChanged);
             followedDevices.ForEach(device => device.PropertyChanged -= OnDeviceChanged);
             followedDevices.Clear();
         }
@@ -101,10 +101,23 @@ public sealed partial class PowerFlowViewModel(IUpdateService updateService, IGe
 
     private void OnUpdateServiceChanged(object? sender, PropertyChangedEventArgs e)
     {
-        // The service replaces its site power flow at logout; everything else it announces is a device change.
-        if (e.PropertyName is nameof(IUpdateService.SitePowerFlow) or null or "")
+        // The service replaces its site power flow at logout and its collections at logout and when an inverter
+        // appears; the handlers move with them. Everything else it announces - the meter, the config, the battery
+        // inverter, each a new object on every report - is heard from the devices themselves.
+        switch (e.PropertyName)
         {
-            FollowFlow();
+            case nameof(IUpdateService.SitePowerFlow):
+                FollowFlow();
+                break;
+
+            case nameof(IUpdateService.Inverters) or nameof(IUpdateService.AllPowerConsumers):
+                FollowDevices();
+                break;
+
+            case null or "":
+                FollowFlow();
+                FollowDevices();
+                break;
         }
     }
 
@@ -131,6 +144,8 @@ public sealed partial class PowerFlowViewModel(IUpdateService updateService, IGe
     {
         lock (followLock)
         {
+            CollectionFollowing.Follow(ref inverters, updateService.Inverters, OnDevicesChanged);
+            CollectionFollowing.Follow(ref consumers, updateService.AllPowerConsumers, OnDevicesChanged);
             followedDevices.ForEach(device => device.PropertyChanged -= OnDeviceChanged);
             followedDevices.Clear();
             followedDevices.AddRange(updateService.Inverters.Select(inverter => (object)inverter.Device).Concat(updateService.AllPowerConsumers.Select(consumer => consumer.Device)).OfType<INotifyPropertyChanged>());
