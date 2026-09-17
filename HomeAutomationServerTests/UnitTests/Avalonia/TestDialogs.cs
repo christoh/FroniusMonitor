@@ -47,13 +47,13 @@ public sealed class TestDialog(DialogParameters parameters) : DialogBase<DialogP
 /// <summary>A body that says how big its window opens, the way the power flow page does.</summary>
 public sealed class SizedTestDialogView : ContentControl, IDialogControl
 {
-    public const double Width = 700;
-    public const double Height = 500;
+    public const double InitialWidth = 700;
+    public const double InitialHeight = 500;
 
     public SizedTestDialogView()
     {
-        InitialWindowSize.SetWidth(this, Width);
-        InitialWindowSize.SetHeight(this, Height);
+        InitialWindowSize.SetWidth(this, InitialWidth);
+        InitialWindowSize.SetHeight(this, InitialHeight);
     }
 }
 

@@ -292,8 +292,8 @@ public sealed class WindowPresenterTests
         await HeadlessAvalonia.SettleAsync();
 
         var window = WindowOf("Sized dialog");
-        Assert.Equal(SizedTestDialogView.Width, window.Width);
-        Assert.Equal(SizedTestDialogView.Height, window.Height);
+        Assert.Equal(SizedTestDialogView.InitialWidth, window.Width);
+        Assert.Equal(SizedTestDialogView.InitialHeight, window.Height);
         Assert.True(window.CanResize);
 
         await dialog.AbortAsync();
