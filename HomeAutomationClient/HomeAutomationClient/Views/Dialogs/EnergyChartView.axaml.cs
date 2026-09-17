@@ -43,9 +43,9 @@ public partial class EnergyChartView : UserControl, IDialogControl
         viewModel.PropertyChanged += OnViewModelPropertyChanged;
         Render();
 
-        // Fire and forget, as every dialog body does; Initialize guards itself against running twice and reports
-        // its own failures through TaskExceptionHandler.
-        _ = viewModel.Initialize();
+        // Nobody can await it here; Initialize guards itself against running twice and reports its own failures
+        // through TaskExceptionHandler, and HandleTaskExceptions catches whatever escapes that all the same.
+        ViewModelBase.HandleTaskExceptions(viewModel.Initialize);
     }
 
     /// <summary>
