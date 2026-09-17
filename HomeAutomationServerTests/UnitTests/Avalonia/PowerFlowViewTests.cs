@@ -21,7 +21,7 @@ public sealed class PowerFlowViewTests
 {
     private const string Title = "Power flow";
 
-    private static async Task<FakeUpdateService> StartAsync()
+    private static async Task<FakeUpdateService> StartAsync(Action<FakeUpdateService>? configure = null)
     {
         var service = new FakeUpdateService();
         var presenter = new WindowPresenter();
@@ -48,6 +48,7 @@ public sealed class PowerFlowViewTests
         service.AllPowerConsumers.Add(Plug("hp", "Heat pump", 620));
         service.AllPowerConsumers.Add(Plug("fridge", "Fridge", 0));
         service.AllPowerConsumers.Add(new KeyedWattPilot { Key = "wp", Device = new WattPilot { DeviceName = "Zoe", PowerTotal = 3700 } });
+        configure?.Invoke(service);
 
         ((IPagePresenter)presenter).Show<PowerFlowView>(PowerFlowView.PageKey, Title, _ => { });
         await HeadlessAvalonia.SettleAsync();
@@ -86,6 +87,8 @@ public sealed class PowerFlowViewTests
 
     private static IReadOnlyList<Avalonia.Controls.Shapes.Path> WirePaths => Body.Wires.Children.OfType<Avalonia.Controls.Shapes.Path>().ToList();
 
+    private static IReadOnlyDictionary<string, (string Path, bool Moves)> Wires => Body.WireStates;
+
     [Fact]
     public Task The_page_opens_at_its_declared_size_with_a_card_per_node_and_a_wire_to_every_one() => HeadlessAvalonia.RunAsync(async () =>
     {
@@ -117,6 +120,53 @@ public sealed class PowerFlowViewTests
             Assert.NotNull(path.Stroke);
             Assert.True(path.StrokeThickness > 0, "a wire without a thickness");
         });
+
+        Window.Close();
+    });
+
+    [Fact]
+    public Task No_wire_passes_a_point_twice() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        await StartAsync();
+
+        // The spine once went from the house up to the first rail and back down past the house to the last one, so
+        // its dashes ran over each other on the upper part. Now it is a stub from the house and a run to each side.
+        var wires = Wires;
+        var junction = wires["spine"].Path.Split(' ')[^1][1..];
+        var runs = wires.Where(wire => wire.Key.StartsWith("spine:", StringComparison.Ordinal)).ToList();
+        Assert.NotEmpty(runs);
+        Assert.All(runs, run => Assert.Equal(junction, run.Value.Path.Split(' ')[0][1..]));
+
+        Assert.All(wires, wire =>
+        {
+            var points = wire.Value.Path.Split(' ');
+            Assert.Equal(points.Length, points.Select(point => point[1..]).Distinct().Count());
+        });
+
+        Window.Close();
+    });
+
+    [Fact]
+    public Task A_rail_to_lamps_of_a_few_watts_carries_flow() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        // Two lamps at 5 W and 6 W, nothing else: on by the consumers' rule, and so are the rail and the spine to
+        // them. Once the rail was judged like a producer, idle below 10 W, and stood still above two lit lamps.
+        await StartAsync(service =>
+        {
+            ((KeyedFritzBoxDevice)service.AllPowerConsumers[0]).Device.PowerMeter!.PowerWatts = 5;
+            ((KeyedFritzBoxDevice)service.AllPowerConsumers[1]).Device.PowerMeter!.PowerWatts = 6;
+            ((KeyedWattPilot)service.AllPowerConsumers[2]).Device.PowerTotal = 0;
+            service.SitePowerFlow.LoadPower = -11;
+        });
+
+        var wires = Wires;
+        Assert.True(wires["stub:hp"].Moves);
+        Assert.True(wires["stub:fridge"].Moves);
+        Assert.False(wires["stub:wp"].Moves);
+        Assert.False(wires[$"stub:{PowerFlowSnapshot.RestOfHouseKey}"].Moves);
+        Assert.True(wires["rail:0"].Moves);
+        Assert.True(wires["spine:up"].Moves);
+        Assert.True(wires["spine"].Moves);
 
         Window.Close();
     });
