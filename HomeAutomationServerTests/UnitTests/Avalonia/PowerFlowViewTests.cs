@@ -100,6 +100,11 @@ public sealed class PowerFlowViewTests
         Assert.InRange(window.Width, 1000, 1500);
         Assert.True(window.CanResize);
 
+        // As tall as the page once the cards are there, not as tall as the title and the legend were before the
+        // view model had heard from the devices: two rows of consumers under the header are well over this.
+        Assert.True(window.Height >= 600, $"window only {window.Height} tall");
+        Assert.Equal(Body.Bounds.Height, window.ClientSize.Height, 1.0);
+
         // Grid, house, inverter A with two trackers and a battery, inverter B with two trackers, three consumers,
         // the rest of the house.
         Assert.Equal(1 + 1 + 4 + 3 + 3 + 1, Cards.Count);

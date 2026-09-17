@@ -147,9 +147,11 @@ button template got `RecognizesAccessKey` so the underscore is a mnemonic and no
 "Settings", but a Settings menu already exists for the devices. One page, so the key is fixed. The page declares
 `c:InitialWindowSize.Width="1500"`, `c:InitialWindowSize.LimitHeightToScreen="False"` and
 `c:ZoomBox.IsScope="True"` on its root, has no size of its own, and reflows to whatever width it is given. On the
-desktop its window is therefore 1500 wide and **as tall as its content**, up to the height of the screen, which
-Avalonia and Windows enforce on their own (see `DialogSystem.Lifecycle`): with a fixed height of 860 it opened
-with the lowest cards cut off.
+desktop its window is therefore 1500 wide and **as tall as its content, following it**: the cards arrive after
+`Loaded`, so the window grows when they do and when a consumer is added, and shrinks when one goes, until the
+user drags its height (see `DialogSystem.Lifecycle`, "keeps following it"). The screen bounds it, which Avalonia
+and Windows enforce on their own. With a fixed height of 860 it opened with the lowest cards cut off, and
+measured once on opening it was the height of its title and legend.
 
 `PowerFlowView` and `PowerFlowViewModel` are transient in `App.axaml.cs`; the view resolves its view model in its
 constructor, as the injection rule wants - **after** hooking `DataContextChanged`, or it never hears about it,

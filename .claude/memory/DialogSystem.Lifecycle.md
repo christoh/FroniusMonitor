@@ -314,6 +314,13 @@ attached properties on the page's own root, set in its XAML:
   however many rows that makes.
 - **Initial, not fixed.** The window is resizable from the moment it is up and nothing is written back or
   remembered, so the next window for that page opens at the declared size again.
+- **A dimension left to the content keeps following it** after the window is up (since 2026-09-17; before,
+  `OnOpened` switched a resizable window to `SizeToContent.Manual`). The power flow page has no cards until its
+  view model has heard from the devices, which is after `Loaded`, so measured once on opening its window was the
+  height of its title and legend. Handing a dimension over to the user is Avalonia's own doing:
+  `Window.HandleResized` drops the auto-sizing of the dimension the user drags, that one only, so a window the
+  user made narrower still grows in height as the consumers wrap into more rows.
+  `A_content_sized_page_window_follows_content_that_arrives_after_opening` pins it.
 - **It is read by the presenter, not by the window.** `ChildWindow` has no idea that what is on it is a page;
   `WindowPresenter.Show` reads the properties off the page and calls `ChildWindow.SetInitialSize`. Inside
   `MainView` the properties are simply not read - a page fills the view it is put in - and that is not an error:

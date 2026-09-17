@@ -447,6 +447,31 @@ public sealed class WindowPresenterTests
     });
 
     /// <summary>
+    /// A content-sized dimension keeps following the content after the window is up. The power flow page has no
+    /// cards until its view model has heard from the devices, which is after Loaded; measured once, on opening, its
+    /// window was the height of its title and legend and nothing else. Handing a dimension over to the user is
+    /// Avalonia's, when they drag that edge, and a headless window has nobody to drag it.
+    /// </summary>
+    [Fact]
+    public Task A_content_sized_page_window_follows_content_that_arrives_after_opening() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        var (presenter, _) = await StartAsync();
+        var body = new Border { Width = ContentWidth, Height = ContentHeight };
+
+        ((IPagePresenter)presenter).Show<TestPage>("device-a", "Late", page => page.Content = body);
+        await HeadlessAvalonia.SettleAsync();
+
+        var window = WindowOf("Late");
+        Assert.Equal(ContentHeight, window.Height);
+
+        body.Height = ContentHeight * 2;
+        await HeadlessAvalonia.SettleAsync();
+
+        Assert.Equal(ContentHeight * 2, window.Height);
+        Assert.Equal(ContentWidth, window.Width);
+    });
+
+    /// <summary>
     /// A page may lift the presenter's cap on its height: the power flow page is as tall as its cards and opened
     /// with the lowest row cut off under the cap. The width stays capped.
     /// </summary>
