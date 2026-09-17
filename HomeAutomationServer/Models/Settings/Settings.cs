@@ -28,6 +28,14 @@ public class Settings
     public List<WebConnection> Gen24Connections = [];
 
     public HashSet<User> Users = [];
+
+    /// <summary>
+    /// Whether anyone may log in as the built-in <see cref="User.Guest"/> with the password <c>guest</c> and see
+    /// what a <see cref="Roles.Guest"/> sees. No <c>[DefaultValue]</c> on purpose: the element is written to
+    /// <c>Settings.xml</c> whatever it says, so that a server's answer to this is in the file rather than implied
+    /// by its absence.
+    /// </summary>
+    public bool EnableGuestAccount { get; set; } = true;
     
     public WebServerSettings WebServerSettings = new WebServerSettings();
 

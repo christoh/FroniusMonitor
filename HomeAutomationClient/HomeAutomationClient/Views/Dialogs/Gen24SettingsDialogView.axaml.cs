@@ -11,6 +11,10 @@ public partial class Gen24SettingsDialogView : UserControl, IDialogControl
         base.OnDataContextChanged(e);
 
         // Initialize reads the settings snapshot. It reports its own failures, so there is nobody to await it.
-        _ = ViewModel?.Initialize();
+
+        if (ViewModel is { } viewModel)
+        {
+            ViewModelBase.HandleTaskExceptions(viewModel.Initialize);
+        }
     }
 }

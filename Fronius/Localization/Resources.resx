@@ -1851,6 +1851,12 @@
   <data name="CannotDeleteSelf" xml:space="preserve">
     <value>You cannot delete your own user account</value>
   </data>
+  <data name="GuestCannotBeChanged" xml:space="preserve">
+    <value>The built-in guest user cannot be changed</value>
+  </data>
+  <data name="GuestCannotBeDeleted" xml:space="preserve">
+    <value>The built-in guest user cannot be deleted</value>
+  </data>
   <data name="ChangePassword" xml:space="preserve">
     <value>Change password</value>
   </data>
@@ -1928,5 +1934,32 @@
   </data>
   <data name="Car" xml:space="preserve">
     <value>Car</value>
+  </data>
+  <data name="PowerFlow" xml:space="preserve">
+    <value>Power Flow</value>
+  </data>
+  <data name="Solar" xml:space="preserve">
+    <value>Solar</value>
+  </data>
+  <data name="House" xml:space="preserve">
+    <value>House</value>
+  </data>
+  <data name="RestOfHouse" xml:space="preserve">
+    <value>Rest of house</value>
+  </data>
+  <data name="Charging" xml:space="preserve">
+    <value>Charging</value>
+  </data>
+  <data name="Discharging" xml:space="preserve">
+    <value>Discharging</value>
+  </data>
+  <data name="FeedIn" xml:space="preserve">
+    <value>Feed-in</value>
+  </data>
+  <data name="GridImport" xml:space="preserve">
+    <value>Grid import</value>
+  </data>
+  <data name="Idle" xml:space="preserve">
+    <value>Idle</value>
   </data>
 </root>

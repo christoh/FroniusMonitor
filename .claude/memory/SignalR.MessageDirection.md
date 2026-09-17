@@ -173,6 +173,10 @@ included, stays with `User`. The client only spares itself the refused calls: `U
 skips the consumers and the price data for a guest, and `MainViewModel.ShowSettingsMenu` hides the Settings menu
 (see the user management memory for why that is not the forbidden "clean up" of `SettingsItems`).
 
+Since 2026-09-16 the role also has a built-in account behind it: `User.Guest`, named `guest`, which is in no user
+list at all. Anything that resolves a user name must go through `AuthorizationExtensions.Find` or it will not find
+it - see "The built-in guest is in no user list" in the user management memory.
+
 `UnitTests/Hosted/HubGuestVisibilityTests` proves the greeting and the pushes over real connections against the
 real hub and the real dispatcher; `UnitTests/RolesAndVisibilityTests` pins the two rules and the claims round trip.
 The negative assertions there are kept honest the same way as in the direction tests: by waiting for a later

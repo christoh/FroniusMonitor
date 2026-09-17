@@ -194,7 +194,11 @@ internal class Program
                     t.MappingRefreshRate = TimeSpan.FromMinutes(Math.Max(1, settings.ToshibaHvac?.MappingRefreshMinutes ?? 30));
                 })
                 .Configure<EnergyDataCollectorParameters>(e => { e.Settings = settings.EnergyData; })
-                .Configure<UserList>(u => { u.Users = settings.Users; });
+                .Configure<UserList>(u =>
+                {
+                    u.Users = settings.Users;
+                    u.EnableGuestAccount = settings.EnableGuestAccount;
+                });
         }
 
         builder.Services.AddControllers()
@@ -287,6 +291,8 @@ internal class Program
             return noAdministratorExitCode;
         }
 
+        LogGuestAccount(settings, logger);
+
         await server.StartAsync().ConfigureAwait(false);
         var fritzBoxDataCollector = IoC.Get<FritzBoxDataCollector>();
         await fritzBoxDataCollector.StartAsync().ConfigureAwait(false);
@@ -304,6 +310,42 @@ internal class Program
         await settings.SaveAsync().ConfigureAwait(false);
         await app.RunAsync().ConfigureAwait(false);
         return 0;
+    }
+
+    /// <summary>
+    /// Says in the log what <see cref="Settings.EnableGuestAccount"/> decided, because an account anyone can log
+    /// in to is not something to find out by accident - and warns where the user list has a user of that name,
+    /// who cannot log in while the built-in guest reserves it and would otherwise be refused without a reason.
+    /// </summary>
+    internal static void LogGuestAccount(Settings settings, ILogger logger)
+    {
+        if (!settings.EnableGuestAccount)
+        {
+            if (logger.IsEnabled(LogLevel.Information))
+            {
+                logger.LogInformation("The built-in guest account is switched off in {FileName}", Settings.SettingsFileName);
+            }
+
+            return;
+        }
+
+        if (logger.IsEnabled(LogLevel.Information))
+        {
+            logger.LogInformation
+            (
+                "The built-in guest account is on: anybody may log in as \"{UserName}\" and see the inverters. Set EnableGuestAccount to false in {FileName} to switch it off.",
+                User.Guest.Username, Settings.SettingsFileName
+            );
+        }
+
+        if (settings.Users.Any(user => User.IsGuest(user.Username)) && logger.IsEnabled(LogLevel.Warning))
+        {
+            logger.LogWarning
+            (
+                "{FileName} has a user named \"{UserName}\", which the built-in guest account hides: that user cannot log in while EnableGuestAccount is true. Rename the user, or switch the account off.",
+                Settings.SettingsFileName, User.Guest.Username
+            );
+        }
     }
 
     /// <summary>

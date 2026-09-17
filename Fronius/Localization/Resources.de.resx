@@ -1749,6 +1749,12 @@
   <data name="CannotDeleteSelf" xml:space="preserve">
     <value>Du kannst Dein eigenes Benutzerkonto nicht löschen</value>
   </data>
+  <data name="GuestCannotBeChanged" xml:space="preserve">
+    <value>Der eingebaute Gastbenutzer kann nicht geändert werden</value>
+  </data>
+  <data name="GuestCannotBeDeleted" xml:space="preserve">
+    <value>Der eingebaute Gastbenutzer kann nicht gelöscht werden</value>
+  </data>
   <data name="PasswordRequired" xml:space="preserve">
       <value>Ein neuer Benutzer benötigt ein Kennwort</value>
   </data>
@@ -1829,5 +1835,29 @@
   </data>
   <data name="Car" xml:space="preserve">
     <value>Auto</value>
+  </data>
+  <data name="PowerFlow" xml:space="preserve">
+    <value>Energiefluss</value>
+  </data>
+  <data name="House" xml:space="preserve">
+    <value>Haus</value>
+  </data>
+  <data name="RestOfHouse" xml:space="preserve">
+    <value>Übriges Haus</value>
+  </data>
+  <data name="Charging" xml:space="preserve">
+    <value>Laden</value>
+  </data>
+  <data name="Discharging" xml:space="preserve">
+    <value>Entladen</value>
+  </data>
+  <data name="FeedIn" xml:space="preserve">
+    <value>Einspeisung</value>
+  </data>
+  <data name="GridImport" xml:space="preserve">
+    <value>Netzbezug</value>
+  </data>
+  <data name="Idle" xml:space="preserve">
+    <value>Inaktiv</value>
   </data>
 </root>

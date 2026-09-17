@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
@@ -33,11 +33,11 @@
 		<!-- MDnsTests asks the LAN what Fronius and FritzBox devices announce over multicast DNS. -->
 		<PackageReference Include="Makaretu.Dns.Multicast.New" Version="0.38.0" />
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.12" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
 		<!-- The oracle of JsonExtensionsTests: the same JSON goes through Newtonsoft and System.Text.Json and the
 		     two answers are compared. It is the only thing left in the repository that uses Newtonsoft. -->
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-		<PackageReference Include="xunit.v3" Version="4.0.0" />
+		<PackageReference Include="xunit.v3" Version="4.0.1" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

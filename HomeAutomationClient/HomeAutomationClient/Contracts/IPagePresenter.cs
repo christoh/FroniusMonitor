@@ -29,6 +29,11 @@ public interface IPagePresenter
     /// Hands the page its device, before it is shown. Runs on a page that is being reused as well, so a page that
     /// is brought to the front is looking at the device it was asked for.
     /// </param>
+    /// <remarks>
+    /// How big the page opens is the page's own to say, with the two optional
+    /// <see cref="Controls.InitialWindowSize"/> properties on its root; a page that says nothing is sized by its
+    /// content. Only a head that gives pages windows can honor it - inside <c>MainView</c> a page fills the view.
+    /// </remarks>
     void Show<TPage>(string deviceKey, string title, Action<TPage> configure) where TPage : Control;
 
     /// <summary>

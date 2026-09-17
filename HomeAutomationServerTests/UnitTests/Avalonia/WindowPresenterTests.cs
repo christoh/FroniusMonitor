@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using De.Hochstaetter.Fronius;
 using De.Hochstaetter.HomeAutomationClient.Contracts;
+using De.Hochstaetter.HomeAutomationClient.Controls;
 using De.Hochstaetter.HomeAutomationClient.Models.Dialogs;
 using De.Hochstaetter.HomeAutomationClient.Services.Presentation;
 using De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs;
@@ -16,6 +17,11 @@ namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests;
 [Collection(AvaloniaCollection.Name)]
 public sealed class WindowPresenterTests
 {
+    /// <summary>A size for the test page to have, so that a window sized by its content has a number to be.</summary>
+    private const double ContentWidth = 360;
+
+    private const double ContentHeight = 240;
+
     private static async Task<(WindowPresenter Presenter, Window MainWindow)> StartAsync()
     {
         var presenter = new WindowPresenter();
@@ -180,6 +186,56 @@ public sealed class WindowPresenterTests
         await shown;
     });
 
+    /// <summary>
+    /// A dialog may refuse its own close box; it may not refuse the window it belongs to closing. That veto is
+    /// also a veto of the application shutdown it is part of - with <c>ShutdownMode.OnMainWindowClose</c> one open
+    /// dialog left the process running after its last window had gone.
+    /// </summary>
+    [Fact]
+    public Task Closing_the_owner_window_takes_a_dialog_with_it_and_releases_its_caller() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        var (_, mainWindow) = await StartAsync();
+
+        var dialog = new TestDialog(new DialogParameters { Title = "Standing", WindowKey = "device-a" });
+        var shown = dialog.ShowDialogAsync();
+        await HeadlessAvalonia.SettleAsync();
+        var window = WindowOf("Standing");
+
+        mainWindow.Close();
+        await HeadlessAvalonia.SettleAsync();
+
+        Assert.DoesNotContain(mainWindow, HeadlessAvalonia.Windows);
+        Assert.DoesNotContain(window, HeadlessAvalonia.Windows);
+
+        // Through the view model, so whoever awaits ShowDialogAsync is not left waiting for ever.
+        Assert.Equal(1, dialog.AbortCount);
+        Assert.True(shown.IsCompleted);
+        Assert.False(await shown);
+    });
+
+    /// <summary>
+    /// And the same for a dialog whose chrome has no close box: it cannot be dismissed by the user, which is not
+    /// the same as being allowed to keep its owner - and the application - alive.
+    /// </summary>
+    [Fact]
+    public Task Closing_the_owner_window_takes_a_dialog_without_a_close_box_too() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        var (_, mainWindow) = await StartAsync();
+
+        var dialog = new TestDialog(new DialogParameters { Title = "Unclosable", ShowCloseBox = false, WindowKey = "device-a" });
+        var shown = dialog.ShowDialogAsync();
+        await HeadlessAvalonia.SettleAsync();
+        var window = WindowOf("Unclosable");
+
+        mainWindow.Close();
+        await HeadlessAvalonia.SettleAsync();
+
+        Assert.DoesNotContain(mainWindow, HeadlessAvalonia.Windows);
+        Assert.DoesNotContain(window, HeadlessAvalonia.Windows);
+        Assert.True(shown.IsCompleted);
+        await shown;
+    });
+
     [Fact]
     public Task Turning_resizing_on_frees_the_maximum_the_body_declares() => HeadlessAvalonia.RunAsync(async () =>
     {
@@ -219,6 +275,28 @@ public sealed class WindowPresenterTests
         Assert.True(double.IsPositiveInfinity(((TestDialogView)window.HostedContent!).MaxWidth));
 
         dialog.Accept();
+        await shown;
+    });
+
+    /// <summary>
+    /// A dialog body may declare the size its window opens at, the way a page does; a body that says nothing
+    /// - every other test dialog here - is content sized, which the tests above rely on.
+    /// </summary>
+    [Fact]
+    public Task A_dialog_body_may_declare_the_size_its_window_opens_at() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        await StartAsync();
+
+        var dialog = new SizedTestDialog(new DialogParameters { Title = "Sized dialog", WindowKey = "device-a", IsResizeable = true });
+        var shown = dialog.ShowDialogAsync();
+        await HeadlessAvalonia.SettleAsync();
+
+        var window = WindowOf("Sized dialog");
+        Assert.Equal(SizedTestDialogView.InitialWidth, window.Width);
+        Assert.Equal(SizedTestDialogView.InitialHeight, window.Height);
+        Assert.True(window.CanResize);
+
+        await dialog.AbortAsync();
         await shown;
     });
 
@@ -276,6 +354,152 @@ public sealed class WindowPresenterTests
         pagePresenter.Show<TestPage>("device-a", "Inverter A", page => page.DeviceKey = "device-a");
         await HeadlessAvalonia.SettleAsync();
         Assert.Equal(3, WindowCount);
+    });
+
+    [Fact]
+    public Task A_page_window_opens_at_the_size_the_page_asks_for() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        var (presenter, _) = await StartAsync();
+
+        ((IPagePresenter)presenter).Show<TestPage>("device-a", "Sized", page =>
+        {
+            InitialWindowSize.SetWidth(page, 640);
+            InitialWindowSize.SetHeight(page, 480);
+        });
+
+        await HeadlessAvalonia.SettleAsync();
+
+        var window = WindowOf("Sized");
+        Assert.Equal(640, window.Width);
+        Assert.Equal(480, window.Height);
+
+        // Initial, not fixed: the window is still the user's to resize.
+        Assert.True(window.CanResize);
+    });
+
+    [Fact]
+    public Task A_page_window_that_fixes_one_dimension_leaves_the_other_to_its_content() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        var (presenter, _) = await StartAsync();
+
+        ((IPagePresenter)presenter).Show<TestPage>("device-a", "Half sized", page =>
+        {
+            page.Height = ContentHeight;
+            InitialWindowSize.SetWidth(page, 640);
+        });
+
+        await HeadlessAvalonia.SettleAsync();
+
+        var window = WindowOf("Half sized");
+        Assert.Equal(640, window.Width);
+        Assert.Equal(ContentHeight, window.Height);
+    });
+
+    /// <summary>
+    /// A page that says nothing is sized by its content, which is what every page window did before there was
+    /// anything to say. This is the other half of <see cref="A_page_window_opens_at_the_size_the_page_asks_for"/>.
+    /// </summary>
+    [Fact]
+    public Task A_page_window_that_asks_for_nothing_is_sized_by_its_content() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        var (presenter, _) = await StartAsync();
+
+        ((IPagePresenter)presenter).Show<TestPage>("device-a", "Content sized", page =>
+        {
+            page.Width = ContentWidth;
+            page.Height = ContentHeight;
+        });
+
+        await HeadlessAvalonia.SettleAsync();
+
+        var window = WindowOf("Content sized");
+        Assert.Equal(ContentWidth, window.Width);
+        Assert.Equal(ContentHeight, window.Height);
+    });
+
+    /// <summary>
+    /// The cap of <c>ChildWindow.LimitToScreen</c> binds an asked-for size as well: a view is allowed to want
+    /// more room than the screen has, and the window still has to open on it.
+    /// </summary>
+    /// <remarks>
+    /// Strictly smaller than the screen, not merely no bigger: the presenter caps a page window at a fraction of
+    /// the working area, so an assertion of "fits" would also hold if nothing capped it and the platform had
+    /// simply refused to make a window larger than the display.
+    /// </remarks>
+    [Fact]
+    public Task A_page_window_is_capped_to_the_screen_however_much_the_page_asks_for() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        var (presenter, _) = await StartAsync();
+
+        ((IPagePresenter)presenter).Show<TestPage>("device-a", "Oversized", page =>
+        {
+            InitialWindowSize.SetWidth(page, 100_000);
+            InitialWindowSize.SetHeight(page, 100_000);
+        });
+
+        await HeadlessAvalonia.SettleAsync();
+
+        var window = WindowOf("Oversized");
+        var screen = window.Screens.ScreenFromWindow(window) ?? window.Screens.Primary ?? window.Screens.All.Single();
+
+        Assert.True(window.Width < screen.WorkingArea.Width / screen.Scaling, $"{window.Width} not capped below the screen width");
+        Assert.True(window.Height < screen.WorkingArea.Height / screen.Scaling, $"{window.Height} not capped below the screen height");
+    });
+
+    /// <summary>
+    /// A content-sized dimension keeps following the content after the window is up. The power flow page has no
+    /// cards until its view model has heard from the devices, which is after Loaded; measured once, on opening, its
+    /// window was the height of its title and legend and nothing else. Handing a dimension over to the user is
+    /// Avalonia's, when they drag that edge, and a headless window has nobody to drag it.
+    /// </summary>
+    [Fact]
+    public Task A_content_sized_page_window_follows_content_that_arrives_after_opening() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        var (presenter, _) = await StartAsync();
+        var body = new Border { Width = ContentWidth, Height = ContentHeight };
+
+        ((IPagePresenter)presenter).Show<TestPage>("device-a", "Late", page => page.Content = body);
+        await HeadlessAvalonia.SettleAsync();
+
+        var window = WindowOf("Late");
+        Assert.Equal(ContentHeight, window.Height);
+
+        body.Height = ContentHeight * 2;
+        await HeadlessAvalonia.SettleAsync();
+
+        Assert.Equal(ContentHeight * 2, window.Height);
+        Assert.Equal(ContentWidth, window.Width);
+    });
+
+    /// <summary>
+    /// A page may lift the presenter's cap on its height: the power flow page is as tall as its cards and opened
+    /// with the lowest row cut off under the cap. The width stays capped.
+    /// </summary>
+    /// <remarks>
+    /// Asked for as a number, not left to the content: the headless platform, like Windows, measures a
+    /// content-sized window against the screen, and here that limit lies below the presenter's share of the
+    /// working area, so a content-sized window could not show the cap gone. An explicit height Avalonia does not
+    /// clamp, so it shows exactly what the presenter left in place.
+    /// </remarks>
+    [Fact]
+    public Task A_page_may_be_taller_than_the_presenter_allows_when_it_says_so() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        var (presenter, _) = await StartAsync();
+
+        ((IPagePresenter)presenter).Show<TestPage>("device-a", "Tall", page =>
+        {
+            InitialWindowSize.SetWidth(page, 100_000);
+            InitialWindowSize.SetHeight(page, 100_000);
+            InitialWindowSize.SetLimitHeightToScreen(page, false);
+        });
+
+        await HeadlessAvalonia.SettleAsync();
+
+        var window = WindowOf("Tall");
+        var screen = window.Screens.ScreenFromWindow(window) ?? window.Screens.Primary ?? window.Screens.All.Single();
+
+        Assert.True(window.Width < screen.WorkingArea.Width / screen.Scaling, $"{window.Width} not capped below the screen width");
+        Assert.Equal(100_000, window.Height);
     });
 
     [Fact]

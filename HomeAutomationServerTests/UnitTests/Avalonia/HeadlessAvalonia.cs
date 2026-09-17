@@ -9,6 +9,7 @@ using De.Hochstaetter.Fronius;
 using De.Hochstaetter.HomeAutomationClient.Contracts;
 using De.Hochstaetter.HomeAutomationClient.Services;
 using De.Hochstaetter.HomeAutomationClient.ViewModels;
+using De.Hochstaetter.HomeAutomationServerTests.UnitTests.Fakes;
 
 namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests;
 
@@ -136,6 +137,13 @@ public static class HeadlessAvalonia
     /// Puts a container behind <see cref="IoC"/> with the presenters and whatever else the test needs, and takes
     /// the windows of the previous test down.
     /// </summary>
+    /// <remarks>
+    /// On top of <see cref="TestInjector.CreateServices"/>, never from an empty collection: the injector is one
+    /// for the process, and the hosted server tests run beside these. <c>IdentityController</c> reaches for the
+    /// <c>IAesKeyProvider</c> through it in a static field, and a container without one, in place at the moment
+    /// that field is first read, left every login of the run answering 500 - which is how the power flow page's
+    /// tests, by taking a second longer, made fifteen user management tests fail on 2026-09-16.
+    /// </remarks>
     public static void Reset(Action<IServiceCollection>? register = null)
     {
         foreach (var window in Windows.ToList())
@@ -143,7 +151,7 @@ public static class HeadlessAvalonia
             window.Close();
         }
 
-        var services = new ServiceCollection();
+        var services = TestInjector.CreateServices();
         register?.Invoke(services);
         IoC.Update(services.BuildServiceProvider());
     }

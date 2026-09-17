@@ -141,6 +141,10 @@ public partial class App : Application
             .AddTransient<SmartMeterDetailsViewModel>()
             .AddTransient<WattPilotDetailsView>()
             .AddTransient<WattPilotDetailsViewModel>()
+            // The power flow page is a page like the detail views - a window of its own on the desktop, the main
+            // view elsewhere - and follows the update service only while it is loaded.
+            .AddTransient<PowerFlowView>()
+            .AddTransient<PowerFlowViewModel>()
 
             .AddTransient<HomeAutomationServerConnection>()
 

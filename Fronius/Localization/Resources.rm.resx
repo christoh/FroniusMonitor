@@ -1732,6 +1732,12 @@
   <data name="CannotDeleteSelf" xml:space="preserve">
     <value>Ti na pos betg stizzar tes agen conto d&apos;utilisader</value>
   </data>
+  <data name="GuestCannotBeChanged" xml:space="preserve">
+    <value>L&apos;utilisader giast integrà na po betg vegnir modifitgà</value>
+  </data>
+  <data name="GuestCannotBeDeleted" xml:space="preserve">
+    <value>L&apos;utilisader giast integrà na po betg vegnir stizzà</value>
+  </data>
   <data name="PasswordRequired" xml:space="preserve">
     <value>In nov utilisader dovra in pled-clav</value>
   </data>
@@ -1812,5 +1818,29 @@
   </data>
   <data name="Car" xml:space="preserve">
     <value>Auto</value>
+  </data>
+  <data name="PowerFlow" xml:space="preserve">
+    <value>Flux d'energia</value>
+  </data>
+  <data name="House" xml:space="preserve">
+    <value>Chasa</value>
+  </data>
+  <data name="RestOfHouse" xml:space="preserve">
+    <value>Rest da la chasa</value>
+  </data>
+  <data name="Charging" xml:space="preserve">
+    <value>Chargiada</value>
+  </data>
+  <data name="Discharging" xml:space="preserve">
+    <value>Dischargiada</value>
+  </data>
+  <data name="FeedIn" xml:space="preserve">
+    <value>Alimentaziun da la rait</value>
+  </data>
+  <data name="GridImport" xml:space="preserve">
+    <value>Retratga da la rait</value>
+  </data>
+  <data name="Idle" xml:space="preserve">
+    <value>Inactiv</value>
   </data>
 </root>

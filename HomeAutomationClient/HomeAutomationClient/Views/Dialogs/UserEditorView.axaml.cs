@@ -12,6 +12,10 @@ public partial class UserEditorView : UserControl, IDialogControl
     protected override void OnDataContextChanged(EventArgs e)
     {
         base.OnDataContextChanged(e);
-        _ = ViewModel?.Initialize();
+
+        if (ViewModel is { } viewModel)
+        {
+            ViewModelBase.HandleTaskExceptions(viewModel.Initialize);
+        }
     }
 }

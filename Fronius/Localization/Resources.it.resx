@@ -1767,6 +1767,12 @@
   <data name="CannotDeleteSelf" xml:space="preserve">
     <value>Non puoi eliminare il tuo account utente</value>
   </data>
+  <data name="GuestCannotBeChanged" xml:space="preserve">
+    <value>L&apos;utente ospite integrato non può essere modificato</value>
+  </data>
+  <data name="GuestCannotBeDeleted" xml:space="preserve">
+    <value>L&apos;utente ospite integrato non può essere eliminato</value>
+  </data>
   <data name="PasswordRequired" xml:space="preserve">
     <value>Un nuovo utente ha bisogno di una password</value>
   </data>
@@ -1847,5 +1853,32 @@
   </data>
   <data name="Car" xml:space="preserve">
     <value>Auto</value>
+  </data>
+  <data name="PowerFlow" xml:space="preserve">
+    <value>Flusso di energia</value>
+  </data>
+  <data name="Solar" xml:space="preserve">
+    <value>Solare</value>
+  </data>
+  <data name="House" xml:space="preserve">
+    <value>Casa</value>
+  </data>
+  <data name="RestOfHouse" xml:space="preserve">
+    <value>Resto della casa</value>
+  </data>
+  <data name="Charging" xml:space="preserve">
+    <value>In carica</value>
+  </data>
+  <data name="Discharging" xml:space="preserve">
+    <value>In scarica</value>
+  </data>
+  <data name="FeedIn" xml:space="preserve">
+    <value>Immissione</value>
+  </data>
+  <data name="GridImport" xml:space="preserve">
+    <value>Prelievo</value>
+  </data>
+  <data name="Idle" xml:space="preserve">
+    <value>Inattivo</value>
   </data>
 </root>

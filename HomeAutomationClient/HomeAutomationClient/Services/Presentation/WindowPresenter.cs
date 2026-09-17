@@ -114,7 +114,14 @@ public sealed class WindowPresenter : IDialogPresenter, IPagePresenter
             WindowStartupLocation = WindowStartupLocation.CenterScreen,
         };
 
-        window.LimitToScreen(MaximumFractionOfScreen);
+        // The screen caps the window, unless the page would rather be as tall as its content whatever the screen.
+        window.LimitToScreen(MaximumFractionOfScreen, InitialWindowSize.GetLimitHeightToScreen(page));
+
+        // What the page asks for in its own XAML, if it asks at all; NaN for either dimension leaves that one to
+        // the content. Read here and not in the window, because a window has no idea that what is on it is a
+        // page - it is the presenter that puts the two together. After LimitToScreen, which is the cap it obeys.
+        window.SetInitialSize(InitialWindowSize.GetWidth(page), InitialWindowSize.GetHeight(page));
+
         window.Closed += (_, _) => pages.Remove(key);
         Cascade(window, pages.Count);
         pages[key] = window;
@@ -200,6 +207,15 @@ internal sealed class WindowDialogPresentation : IDialogPresentation
     public void Open()
     {
         window.LimitToScreen(1);
+
+        // A dialog body may say how big it opens, the way a page does - the power flow page does, because it has
+        // no size of its own to be content sized by. A body that says nothing, which is every form, stays as big
+        // as what is on it.
+        if (window.HostedContent is Control body)
+        {
+            window.SetInitialSize(InitialWindowSize.GetWidth(body), InitialWindowSize.GetHeight(body));
+        }
+
         var owner = WindowPresenter.ActiveWindow;
 
         if (!parameters.IsModalWindow || owner is null)
@@ -223,9 +239,22 @@ internal sealed class WindowDialogPresentation : IDialogPresentation
 
     public void Close()
     {
+        if (Detach())
+        {
+            window.Close();
+        }
+    }
+
+    /// <summary>
+    /// Takes this presentation out of the presenter and off its parameters, and says whether it was still there.
+    /// Both ways out do exactly this - <see cref="Close"/>, and a window closing for a reason the dialog is not
+    /// allowed to refuse - and only the first of the two also has to close the window.
+    /// </summary>
+    private bool Detach()
+    {
         if (isClosing)
         {
-            return;
+            return false;
         }
 
         isClosing = true;
@@ -236,7 +265,7 @@ internal sealed class WindowDialogPresentation : IDialogPresentation
             presenter.Forget(key);
         }
 
-        window.Close();
+        return true;
     }
 
     public void Activate() => window.Reactivate();
@@ -270,11 +299,29 @@ internal sealed class WindowDialogPresentation : IDialogPresentation
     /// view model to abort, and that is what sets a result and closes. The close itself is cancelled and left to
     /// the view model, because a window closed from under a dialog would leave whoever awaits it waiting forever.
     /// </summary>
+    /// <remarks>
+    /// <b>Only the user closing this one window may be refused.</b> A dialog is not entitled to veto the
+    /// application shutting down, the operating system going, or the window it belongs to closing - and cancelling
+    /// here vetoes exactly that, because a close any window cancels is a close that does not happen. That is what
+    /// kept the app running with nothing on screen: closing the main window shuts the app down
+    /// (<c>ShutdownMode.OnMainWindowClose</c>), one open dialog cancelled it, and the process was left alive after
+    /// its last window had gone. So for those reasons the dialog is taken down instead of being asked, through the
+    /// view model as everywhere else, and the window is left to close.
+    /// </remarks>
     private void OnClosing(object? sender, WindowClosingEventArgs e)
     {
         if (isClosing)
         {
             // Close() is doing it, so the view model has already said its piece.
+            return;
+        }
+
+        // Undefined is deliberately not in this list: a platform that does not say why is the user closing the
+        // window as far as anything here can tell, and that is the case the dialog does get a say in.
+        if (e.CloseReason is WindowCloseReason.ApplicationShutdown or WindowCloseReason.OSShutdown or WindowCloseReason.OwnerWindowClosing)
+        {
+            Detach();
+            Abort();
             return;
         }
 

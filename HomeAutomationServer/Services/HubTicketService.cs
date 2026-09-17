@@ -96,7 +96,7 @@ public sealed class HubTicketService(IAesKeyProvider aesKeyProvider, IOptionsMon
             return null;
         }
 
-        var user = users.CurrentValue.Users.FirstOrDefault(u => u.Username == userName);
+        var user = users.CurrentValue.Find(userName);
 
         if (user == null)
         {

@@ -11,6 +11,16 @@
     <File Path="docker-bake.hcl" />
     <File Path="tounix.sh" />
   </Folder>
+  <Folder Name="/Solution Items/.gitgub/">
+    <File Path=".github/copilot-instructions.md" />
+  </Folder>
+  <Folder Name="/Solution Items/.gitgub/scripts/">
+    <File Path=".github/scripts/ghcr_cleanup.py" />
+  </Folder>
+  <Folder Name="/Solution Items/.gitgub/workflows/">
+    <File Path=".github/workflows/cleanup-packages.yml" />
+    <File Path=".github/workflows/publish-images.yml" />
+  </Folder>
   <Folder Name="/Solution Items/Memory/">
     <File Path=".claude/memory/BatteryDetailsView.Lifecycle.md" />
     <File Path=".claude/memory/DeviceJson.md" />
@@ -24,6 +34,7 @@
     <File Path=".claude/memory/InverterDetailsView.Lifecycle.md" />
     <File Path=".claude/memory/Navigation.Lifecycle.md" />
     <File Path=".claude/memory/PlatformHeads.Lifecycle.md" />
+    <File Path=".claude/memory/PowerFlowPage.Lifecycle.md" />
     <File Path=".claude/memory/SettingsDialogs.Lifecycle.md" />
     <File Path=".claude/memory/SignalR.MessageDirection.md" />
     <File Path=".claude/memory/SmartMeterDetailsView.Lifecycle.md" />
@@ -35,6 +46,9 @@
     <File Path=".claude/memory/WattPilotDetailsView.Lifecycle.md" />
     <File Path=".claude/memory/Zoom.md" />
     <File Path=".claude/memory/ServerExitCodes.LifeCycle.md" />
+  </Folder>
+  <Folder Name="/Solution Items/Plans/">
+    <File Path="Plans/PowerflowPage-plan.md" />
   </Folder>
   <Folder Name="/Solution Items/Rules/">
     <File Path=".claude/rules/PortingFroniusMonitor.md" />

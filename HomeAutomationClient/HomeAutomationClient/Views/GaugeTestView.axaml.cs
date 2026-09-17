@@ -8,6 +8,6 @@ public partial class GaugeTestView : UserControl
     {
         InitializeComponent();
         DataContext = viewModel;
-        _ = viewModel.Initialize();
+        ViewModelBase.HandleTaskExceptions(viewModel.Initialize);
     }
 }

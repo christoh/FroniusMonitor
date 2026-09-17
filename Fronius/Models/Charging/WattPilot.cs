@@ -4,7 +4,7 @@ namespace De.Hochstaetter.Fronius.Models.Charging;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
-public partial class WattPilot : BindableBase, IHaveDisplayName, IHaveUniqueId, ICloneable
+public partial class WattPilot : BindableBase, IHaveDisplayName, IHaveUniqueId, ICloneable, IPowerConsumer3P
 {
     public bool IsUpdating
     {
@@ -924,6 +924,62 @@ public partial class WattPilot : BindableBase, IHaveDisplayName, IHaveUniqueId, 
     public string DisplayName => $"{DeviceName ?? HostName ?? SerialNumber ?? Resources.Unknown}";
 
     public override string ToString() => DisplayName;
+
+    #region The charger as a power consumer
+
+    // Explicit on purpose, all of them: the server serializes this object to its clients with System.Text.Json,
+    // which sees public properties only, and a consumer view of the charger is not something the charger sent.
+    // What already exists under the contract's name - Model, Frequency, CurrentL1 to L3 - is implemented by
+    // those properties as they are.
+
+    /// <summary>The total over the phases, in watts. What the house block and the power flow page sum up.</summary>
+    double? IPowerMeter1P.ActivePower => PowerTotal;
+
+    /// <summary>A three phase device has no one voltage; the average is the single phase view of it.</summary>
+    double? IPowerMeter1P.Voltage => VoltageAverage;
+
+    /// <summary>And no one current either; the sum is what the cable carries in all.</summary>
+    double? IPowerMeter1P.Current => CurrentSum;
+
+    /// <summary>Everything the charger ever delivered, in watt hours, the way a Fritz!DECT counts.</summary>
+    double? IPowerMeter1P.EnergyConsumed => TotalEnergy;
+
+    bool IPowerMeter1P.CanMeasurePower => true;
+
+    string? IPowerMeter1P.DeviceVersion => Version;
+
+    double? IPowerConsumer3P.ActivePowerL1 => PowerL1;
+
+    double? IPowerConsumer3P.ActivePowerL2 => PowerL2;
+
+    double? IPowerConsumer3P.ActivePowerL3 => PowerL3;
+
+    double? IPowerConsumer3P.PhaseVoltageL1 => VoltageL1;
+
+    double? IPowerConsumer3P.PhaseVoltageL2 => VoltageL2;
+
+    double? IPowerConsumer3P.PhaseVoltageL3 => VoltageL3;
+
+    /// <summary>
+    /// The charger is not a switch: whether it charges is decided by its mode, its rules and the car, and a
+    /// <c>TurnOnOff</c> would have to pick one of several things to mean. So it cannot be switched here, and
+    /// "on" is what the charger itself reports as allowed to charge.
+    /// </summary>
+    bool ISwitchable.CanSwitch => false;
+
+    bool ISwitchable.IsSwitchingEnabled => false;
+
+    bool? ISwitchable.IsTurnedOn => IsChargingAllowed;
+
+    Task ISwitchable.TurnOnOff(bool turnOn) => throw new NotSupportedException("A Wattpilot is not switched on and off; set its charging mode instead");
+
+    /// <summary>The temperature of the board, which is the device's own; the connector's is about the cable.</summary>
+    double? ITemperatureSensor.TemperatureCelsius => TemperatureBoard;
+
+    /// <summary>No hue; implemented because the two hue properties fall back on each other - see <see cref="IHsvColorControl"/>.</summary>
+    double? IHsvColorControl.HueDegrees => null;
+
+    #endregion
 
     /// <summary>
     ///     The properties a settings dialog may write: exactly one <see cref="WattPilotAttribute" />, and not

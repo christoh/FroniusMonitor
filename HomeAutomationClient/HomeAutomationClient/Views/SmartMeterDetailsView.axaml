@@ -10,6 +10,7 @@
              xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
              xmlns:m="clr-namespace:De.Hochstaetter.HomeAutomationClient.Misc"
              x:DataType="{x:Type vm:SmartMeterDetailsViewModel}"
+             c:InitialWindowSize.Width="1280" c:InitialWindowSize.Height="775"
              >
     <Grid RowDefinitions="Auto,*">
         <TextBlock Grid.Row="0" Text="{Binding UpdateService.SmartMeter?.Model}" TextAlignment="Center" FontSize="18" FontWeight="Medium" Margin="10,10,10,16" TextWrapping="Wrap" />

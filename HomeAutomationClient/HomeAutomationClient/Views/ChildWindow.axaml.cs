@@ -20,7 +20,8 @@ public partial class ChildWindow : Window
 
     private double contentMaximumWidth = double.PositiveInfinity;
     private double contentMaximumHeight = double.PositiveInfinity;
-    private bool isOpened;
+    private double initialWidth = double.NaN;
+    private double initialHeight = double.NaN;
 
     /// <summary>What the window shows: a dialog body or a detail page.</summary>
     public object? HostedContent
@@ -43,9 +44,9 @@ public partial class ChildWindow : Window
     }
 
     /// <summary>
-    /// Whether the user may resize the window. It also decides where the size comes from: a fixed window is
-    /// exactly as big as what is on it and follows it when that changes, a resizable one starts there and is the
-    /// user's from then on.
+    /// Whether the user may resize the window. A fixed window is exactly as big as what is on it and follows it
+    /// when that changes; a resizable one does the same until the user drags an edge, and from then on that
+    /// dimension is the user's.
     /// </summary>
     /// <remarks>
     /// This is <see cref="Models.Dialogs.DialogParameters.IsResizeable"/> and may be switched while the window is
@@ -105,16 +106,60 @@ public partial class ChildWindow : Window
     }
 
     /// <summary>
-    /// A window that is not up yet has no size of its own, so the content is what has to give it one - also when
-    /// it is going to be resizable. <see cref="OnOpened"/> hands the size over to the user afterwards.
+    /// Gives the window a size to open at instead of the size of what is on it. <see cref="double.NaN"/> for a
+    /// dimension leaves that one to the content, which is what every window did before this existed; the two are
+    /// independent, so a fixed width with a content driven height is a valid combination.
     /// </summary>
-    private void ApplySizeToContent() => SizeToContent = IsUserResizable && isOpened ? SizeToContent.Manual : SizeToContent.WidthAndHeight;
+    /// <remarks>
+    /// Call it after <see cref="LimitToScreen"/> and before the window is shown: the requested size is cut down
+    /// to the same maximum, because a view that asks for more than the screen has would otherwise open with its
+    /// bottom and its right edge past the edge of it. What the user does with the window afterwards is untouched.
+    /// </remarks>
+    public void SetInitialSize(double width, double height)
+    {
+        initialWidth = Requested(width, MaxWidth);
+        initialHeight = Requested(height, MaxHeight);
+
+        if (!double.IsNaN(initialWidth))
+        {
+            Width = initialWidth;
+        }
+
+        if (!double.IsNaN(initialHeight))
+        {
+            Height = initialHeight;
+        }
+
+        ApplySizeToContent();
+
+        // Zero, a negative number and an infinity are not sizes. They count as "not asked for" rather than as an
+        // error: this is one number in the XAML of a view, and there is nobody to report it to from here.
+        static double Requested(double requested, double maximum) => double.IsFinite(requested) && requested > 0 ? Math.Min(requested, maximum) : double.NaN;
+    }
+
+    /// <summary>
+    /// A dimension the view did not fix follows the content, and keeps following it after the window is up: a page
+    /// that fills itself once it is loaded - the power flow page has no cards until its view model has heard from
+    /// the devices - would otherwise be measured empty and stay that small. Handing the size over to the user is
+    /// Avalonia's: <c>Window.HandleResized</c> drops the auto-sizing of the dimension the user drags, that one
+    /// only, so a window the user made wider still grows and shrinks with its content in height.
+    /// </summary>
+    /// <remarks>
+    /// A dimension that <see cref="SetInitialSize"/> fixed is not sized to its content at all. Doing both would
+    /// have the content win, and the number the view asked for would silently do nothing.
+    /// </remarks>
+    private void ApplySizeToContent() => SizeToContent =
+        (double.IsNaN(initialWidth), double.IsNaN(initialHeight)) switch
+        {
+            (true, true) => SizeToContent.WidthAndHeight,
+            (true, false) => SizeToContent.Width,
+            (false, true) => SizeToContent.Height,
+            (false, false) => SizeToContent.Manual,
+        };
 
     protected override void OnOpened(EventArgs e)
     {
         base.OnOpened(e);
-        isOpened = true;
-        ApplySizeToContent();
 
         // Lifted once the window is up: it was only there to keep the window from opening bigger than the screen,
         // and left in place it would stop the user maximizing it.
@@ -142,7 +187,11 @@ public partial class ChildWindow : Window
     /// of gauges and asks for more room than there is; it scrolls, so the cap costs nothing.
     /// </summary>
     /// <param name="fractionOfScreen">How much of the working area the window may take at most.</param>
-    public void LimitToScreen(double fractionOfScreen)
+    /// <param name="limitHeight">
+    /// <c>false</c> leaves the height alone, for a page that is sized by its content and would rather take the
+    /// whole screen than have that content cut off. The width is capped either way.
+    /// </param>
+    public void LimitToScreen(double fractionOfScreen, bool limitHeight = true)
     {
         if ((Screens.ScreenFromWindow(this) ?? Screens.Primary ?? Screens.All.FirstOrDefault()) is not { } screen)
         {
@@ -151,6 +200,10 @@ public partial class ChildWindow : Window
 
         // The working area is in physical pixels; Width and Height are device independent.
         MaxWidth = screen.WorkingArea.Width / screen.Scaling * fractionOfScreen;
-        MaxHeight = screen.WorkingArea.Height / screen.Scaling * fractionOfScreen;
+
+        if (limitHeight)
+        {
+            MaxHeight = screen.WorkingArea.Height / screen.Scaling * fractionOfScreen;
+        }
     }
 }

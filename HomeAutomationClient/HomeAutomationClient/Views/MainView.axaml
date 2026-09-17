@@ -26,7 +26,9 @@
                  chrome - StaticResource that cannot be found is not a compile error, only a runtime one. -->
             <Grid.Resources>
                 <ControlTemplate TargetType="Button" x:Key="MenuButtonTemplate">
-                    <ContentPresenter Padding="8" Background="{TemplateBinding Background}" Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center" Content="{TemplateBinding Content}"/>
+                    <!-- RecognizesAccessKey, because the View caption is the WPF menu's "_View" with its mnemonic;
+                         a plain presenter would print the underscore. -->
+                    <ContentPresenter Padding="8" Background="{TemplateBinding Background}" Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center" Content="{TemplateBinding Content}" RecognizesAccessKey="True"/>
                 </ControlTemplate>
                 <ControlTheme TargetType="Button" x:Key="MenuButtonStyle">
                     <Setter Property="Background" Value="Transparent"/>
@@ -71,9 +73,17 @@
                         </MenuFlyout>
                     </Button.Flyout>
                 </Button>
-                <!-- The price chart, once the server has sent price data; see MainViewModel.ShowEnergyChart. -->
-                <Button Content="{x:Static p:Resources.ElectricityPrice}" Theme="{StaticResource MenuButtonStyle}"
-                        Command="{Binding ShowEnergyChartCommand}" IsVisible="{Binding UpdateService.HasEnergyData}" />
+                <!-- The views that are not a device: the power flow page, and the price chart once the server has
+                     sent price data. See MainViewModel.ShowPowerFlow and ShowEnergyChart. -->
+                <Button Content="{x:Static p:Resources.View}" Theme="{StaticResource MenuButtonStyle}">
+                    <Button.Flyout>
+                        <MenuFlyout>
+                            <MenuItem Header="{x:Static p:Resources.PowerFlow}" Command="{Binding ShowPowerFlowCommand}" Padding="8,12"/>
+                            <MenuItem Header="{x:Static p:Resources.ElectricityPrice}" Command="{Binding ShowEnergyChartCommand}" Padding="8,12"
+                                      IsVisible="{Binding UpdateService.HasEnergyData}"/>
+                        </MenuFlyout>
+                    </Button.Flyout>
+                </Button>
             </StackPanel>
             <!-- Who is logged in, and as what - the roles are the server's enum names on purpose, not translated -
                  and, behind it, the two things that are about that account rather than about a device: changing

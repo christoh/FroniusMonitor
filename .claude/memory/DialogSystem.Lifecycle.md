@@ -8,6 +8,7 @@ paths:
   - HomeAutomationClient/HomeAutomationClient/Contracts/IDialogControl.cs
   - HomeAutomationClient/HomeAutomationClient/Controls/DragMove.cs
   - HomeAutomationClient/HomeAutomationClient/Controls/DragResize.cs
+  - HomeAutomationClient/HomeAutomationClient/Controls/InitialWindowSize.cs
   - HomeAutomationClient/HomeAutomationClient/MessageBoxes/**
   - HomeAutomationClient/HomeAutomationClient/Views/MainView.axaml
   - HomeAutomationClient/HomeAutomationClient/Views/ChildWindow.axaml
@@ -40,6 +41,7 @@ below the line `presenter.Create(...)` is the presenter's.
 | `MainViewPresenter` | Both, inside `MainView`: the dialog frame and the one content host. Every head but the desktop. |
 | `WindowPresenter` | Both, as windows. The desktop only. |
 | `ChildWindow` | The window a dialog or a page goes in: chrome, a content host and a busy animation. |
+| `InitialWindowSize` | Two optional attached properties a detail page - or, since 2026-09-16, a dialog body - sets on its own root to say how big its window opens. |
 | `DialogQueueItem` | One shown dialog - its body and its live parameters - held by `MainViewModel.CurrentDialog`. Only `MainViewPresenter` uses it. |
 | `MainView.axaml` | The host of that presenter: dimming layer, dialog frame, title bar, body, busy animation. |
 
@@ -85,7 +87,8 @@ on screen - which used to be a modal moment and is now a window the user leaves 
 menu entry or button is **disabled** for exactly that time, so a second settings dialog could never be opened and
 clicking Electricity price while its window was up did nothing at all, not even bring it to the front. It carries
 Six commands need the flag today: `MainViewModel.Settings`, `ChangePassword` and `ShowEnergyChart`,
-`EnergyChartViewModel.ShowPriceComponents`, `UserManagementViewModel.Add` and `Edit`.
+`EnergyChartViewModel.ShowPriceComponents`, `UserManagementViewModel.Add` and `Edit`. (`ShowPowerFlow` opens a
+page, not a dialog, and needs neither the flag nor the gate.)
 
 **The flag on its own is too much, though.** The menu bar is the one thing a modal dialog does not disable - the
 dimming layer sits in the content row, not over the bar - so on a head with one dialog frame the disabled command
@@ -293,8 +296,69 @@ things: that a long drag fills the overlay from any starting position, and that 
 that probe first.** Reasoning about which of `Width`, `MaxWidth`, the alignment, the render transform and the
 arrange pass wins was wrong five times in a row; measuring was right every time.
 
+## How big a page window opens
+
+Sized by its content, unless the page says otherwise. `Controls/InitialWindowSize.cs` is how it says so - two
+attached properties on the page's own root, set in its XAML:
+
+```xml
+<ContentPage c:InitialWindowSize.Width="1400" c:InitialWindowSize.Height="900" …>
+```
+
+- **Optional and per view.** The default of both is `NaN`, which means "the content decides", so a page that says
+  nothing behaves exactly as every page window did before this existed. All four detail views set both today -
+  inverter 1055x952, smart meter 1280x775, WattPilot 980x780, battery 680x780 - measured on the real app rather
+  than derived from anything, so change them by looking, not by reasoning.
+- **The two are independent.** Fixing only the width gives a window that wide and as tall as what is on it, which
+  is the useful combination for a wall of gauges: the width is what decides how many fit in a row, the height is
+  however many rows that makes.
+- **Initial, not fixed.** The window is resizable from the moment it is up and nothing is written back or
+  remembered, so the next window for that page opens at the declared size again.
+- **A dimension left to the content keeps following it** after the window is up (since 2026-09-17; before,
+  `OnOpened` switched a resizable window to `SizeToContent.Manual`). The power flow page has no cards until its
+  view model has heard from the devices, which is after `Loaded`, so measured once on opening its window was the
+  height of its title and legend. Handing a dimension over to the user is Avalonia's own doing:
+  `Window.HandleResized` drops the auto-sizing of the dimension the user drags, that one only, so a window the
+  user made narrower still grows in height as the consumers wrap into more rows.
+  `A_content_sized_page_window_follows_content_that_arrives_after_opening` pins it.
+- **It is read by the presenter, not by the window.** `ChildWindow` has no idea that what is on it is a page;
+  `WindowPresenter.Show` reads the properties off the page and calls `ChildWindow.SetInitialSize`. Inside
+  `MainView` the properties are simply not read - a page fills the view it is put in - and that is not an error:
+  the same view runs on every head.
+- **The screen cap still binds it.** `SetInitialSize` is called after `LimitToScreen` and clamps to the same
+  maximum, so a view may ask for more room than the screen has and its window still opens on the screen. A zero,
+  a negative number or an infinity counts as "not asked for": it is one number in a view's XAML, and there is
+  nobody for the window to report it to.
+- **Unless the page lifts the cap on its height.** `c:InitialWindowSize.LimitHeightToScreen="False"` (since
+  2026-09-17) makes the presenter call `LimitToScreen` for the width only, so a content-sized height may take the
+  whole screen instead of the presenter's 90 % of it. The power flow page does this: it fixes its width at 1500
+  and is as tall as its cards, however many rows of consumers there are. **The screen itself still bounds it**,
+  and not by our doing: `Window.MeasureOverride` measures a content-sized window against the platform's
+  `MaxAutoSizeHint`, the working area, and Windows refuses a resizable window taller than the virtual screen
+  (`WM_GETMINMAXINFO`, which Avalonia only widens for a finite `MaxHeight`). A headless window asked for 100 000
+  came out exactly the screen's height. The width is capped either way.
+- **A fixed dimension is not sized to its content at all.** `ChildWindow.ApplySizeToContent` picks
+  `SizeToContent.Width`, `.Height`, `.WidthAndHeight` or `.Manual` from which of the two were given. Setting both
+  a size and `SizeToContent` for the same dimension has the content win, and the number the view asked for would
+  silently do nothing.
+
+**A dialog body may say the same** (since 2026-09-16): `WindowDialogPresentation.Open` reads the two properties
+off `HostedContent` after `LimitToScreen(1)`, so a body with no size of its own opens at the size it declares and
+is then the user's to resize. No dialog uses it today - the power flow page was one for an afternoon, see
+[[PowerFlowPage.Lifecycle]], and is a page now - but `SizedTestDialog` pins that it works. A body that says
+nothing, which is every form, stays as big as what is on it, as before. It is on the body and not in
+`DialogParameters` because it is the view's knowledge, not the caller's: the same view says the same thing on
+every head, and inside the dialog frame it is simply not read.
+
 ## Closing
 
+- **A dialog window may refuse its own close box and nothing else.** `WindowDialogPresentation.OnClosing` cancels
+  the close only for `WindowCloseReason.WindowClosing` (and `Undefined`, which is a platform that did not say and
+  so is treated as the user). `ApplicationShutdown`, `OSShutdown` and `OwnerWindowClosing` take the dialog down
+  through its view model instead and let the window go. **Cancelling those is cancelling the shutdown itself**: a
+  close that any window vetoes is a close that does not happen, so with `ShutdownMode.OnMainWindowClose` a single
+  open dialog closed the main window, then closed itself, and left the process running with nothing on screen and
+  no way back to it. Pages never had this - they cancel nothing.
 - The close box is visible when `ShowCloseBox` is true and runs `MainViewModel.DialogClosedCommand`, which calls
   `AbortAsync` on the view model behind `CurrentDialog.Body`. In a window the close box of the chrome does the
   same thing: `ChildWindow` cancels the close and calls `AbortAsync`, so there is one way out and not two. Every dialog view model must implement it and decide
@@ -336,6 +400,16 @@ reuse and activation, the close box through `AbortAsync`, a dialog with no close
 dialog is up, the modal message box, a logout, and on the other side the dialog frame, nesting, the busy text
 handover, one page per view type and the menu bar gate.
 
+`Closing_the_owner_window_takes_a_dialog_with_it_and_releases_its_caller` and `…_without_a_close_box_too` pin the
+veto rule. They close the test's main window, which is the owner of every dialog window, and assert that the
+dialog window goes with it and its caller is released - the shutdown itself cannot be driven from a test, because
+the headless session is one lifetime for the whole run.
+
+The four `A_page_window_…` facts in `WindowPresenterTests` cover the initial size: both dimensions asked for, one
+of the two, neither, and a page asking for more than the screen has; `A_dialog_body_may_declare_the_size_its_window_opens_at`
+covers the dialog side with `SizedTestDialog`. The last one reads the screen back off the
+window and so fails rather than passing vacuously if the cap ever stops being applied.
+
 ## Known gaps
 
 - `IDialogBase` is `IDisposable` and nobody disposes it. The `CancellationTokenSource` of every dialog is left to
@@ -346,5 +420,7 @@ handover, one page per view type and the menu bar gate.
   currently showing, because the two modes of that dialog share one `OkCommand`.
 - Nothing takes focus when a dialog opens; a window at least takes the focus of the window manager.
 - The title bar always uses `SystemControlBackgroundAccentBrush` and the dialog `DialogBackground`; a dialog cannot theme itself.
-- A dialog window remembers neither its size nor its place, unlike the main window ([[PlatformHeads.Lifecycle]]).
-  It opens centred on its owner, sized to its content, every time.
+- Neither a dialog window nor a page window remembers its size or its place, unlike the main window
+  ([[PlatformHeads.Lifecycle]]). A dialog opens centred on its owner, sized to its content, every time; a page
+  opens centred on the screen, at whatever `InitialWindowSize` its view declares, every time. What the user
+  dragged either to is lost when it closes.

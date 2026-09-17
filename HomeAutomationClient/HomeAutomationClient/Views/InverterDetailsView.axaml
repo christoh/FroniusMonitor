@@ -14,7 +14,7 @@
              xmlns:l="clr-namespace:De.Hochstaetter.HomeAutomationClient.Extensions"
              xmlns:v="clr-namespace:De.Hochstaetter.HomeAutomationClient.Views"
              x:DataType="{x:Type vm:InverterDetailsViewModel}"
-             >
+             c:InitialWindowSize.Width="1055" c:InitialWindowSize.Height="952">
     <Grid RowDefinitions="Auto,*" ColumnDefinitions="Auto,*">
         <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding Gen24System.DisplayName}" TextAlignment="Center" FontSize="18" FontWeight="Medium" Margin="10,10,10,16" TextWrapping="Wrap" />
 

@@ -23,6 +23,7 @@ namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests.Hosted;
 /// authentication, and the client's own <see cref="WebClientService"/> talking to it, so the JSON shapes of both
 /// sides are proven against each other and not against a test's idea of them.
 /// </summary>
+[Collection("Settings")]
 public sealed class UserManagementTests : IAsyncLifetime
 {
     private const string AdminName = "root";
@@ -37,9 +38,9 @@ public sealed class UserManagementTests : IAsyncLifetime
 
     public async ValueTask InitializeAsync()
     {
-        // SaveAsync without a name writes to this static, so it is pointed at a temp file. Nothing else in the test
-        // assembly reads the static - the other settings tests pass their file names explicitly - which is what
-        // makes this safe with xUnit running the classes in parallel.
+        // SaveAsync without a name writes to this static, so it is pointed at a temp file. GuestUserTests points
+        // it at one of its own, which is what the "Settings" collection is for: without it xUnit runs the two
+        // classes in parallel and whichever starts second decides where the other one saves.
         Settings.SettingsFileName = settingsFile;
 
         var builder = WebApplication.CreateBuilder();
