@@ -183,7 +183,7 @@ internal class Program
                 .Configure<Gen24DataCollectorParameters>(g =>
                 {
                     g.Connections = settings.Gen24Connections;
-                    g.RefreshRate = TimeSpan.FromSeconds(2);
+                    g.RefreshRate = TimeSpan.FromSeconds(5);
                     g.ConfigRefreshRate = TimeSpan.FromMinutes(5.1);
                 })
                 .Configure<WattPilotParameters>(w => { w.Connections = settings.WattPilotConnections; })
