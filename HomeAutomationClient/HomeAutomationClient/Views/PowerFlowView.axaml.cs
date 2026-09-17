@@ -57,6 +57,9 @@ public partial class PowerFlowView : ContentPage
     private const double ThickThreshold = 2000;
 
     private readonly Dictionary<string, Wire> wires = [];
+
+    /// <summary>For the tests: the wires by key, each as its path, whether its dashes move and whether they run against the way it is drawn.</summary>
+    internal IReadOnlyDictionary<string, (string Path, bool Moves, bool Reversed)> WireStates => wires.ToDictionary(pair => pair.Key, pair => (pair.Value.PathData, pair.Value.Moves, pair.Value.Reversed));
     private PowerFlowViewModel? viewModel;
     private bool isRunning;
     private int isRefreshPending;
@@ -207,12 +210,15 @@ public partial class PowerFlowView : ContentPage
         var items = model.Items;
 
         // ----- Sources onto the trunk -----
-        var trunkTaps = new List<double>();
+        // A tap is where a wire meets the trunk, with what it feeds in there: the grid's import, an inverter's AC
+        // output, and the house's draw as a negative. What crosses the trunk between two taps is the sum of the
+        // taps on one side.
+        var trunkTaps = new List<(double Y, double Injection)>();
         var sourcesRight = double.NegativeInfinity;
 
         if (items.Grid is { } grid && cards.TryGetValue(grid.Key, out var gridCard))
         {
-            trunkTaps.Add(gridCard.Rect.Center.Y);
+            trunkTaps.Add((gridCard.Rect.Center.Y, grid.Node.Power ?? 0));
             sourcesRight = Math.Max(sourcesRight, gridCard.Rect.Right);
         }
 
@@ -224,7 +230,7 @@ public partial class PowerFlowView : ContentPage
             }
 
             sourcesRight = Math.Max(sourcesRight, inverter.Rect.Right);
-            trunkTaps.Add(inverter.Rect.Center.Y);
+            trunkTaps.Add((inverter.Rect.Center.Y, inverter.Item.Node.Power ?? 0));
 
             // The DC cards, each into its own tap on the inverter's left edge; the taps are spread around the middle.
             var dcSources = cluster.DcSources.Select(item => cards.TryGetValue(item.Key, out var card) ? card : default).Where(card => card.Item is { }).ToList();
@@ -266,10 +272,22 @@ public partial class PowerFlowView : ContentPage
             Set(needed, $"ac:{cluster.Key}", inverter.Item.Node, Path(new Point(inverter.Rect.Right, y), new Point(trunkX, y)), labelAt: new Point(inverter.Rect.Right + (trunkX - inverter.Rect.Right) / 2, y - 12), signed: false, dots: [new Point(trunkX, y)]);
         }
 
-        // The trunk itself, and the last step into the house. Both carry what the house draws.
+        // The trunk, one segment per gap between two taps, each carrying the net of everything above it: drawn
+        // downwards, so a negative net runs upwards. With one inverter producing, the grid above it and the house
+        // below, that is a few watts up to the grid and the rest down to the house, and nothing below the house. As
+        // one wire with the house's figure it ran from the top tap to the bottom one, past the house.
         var houseY = house.Rect.Center.Y;
-        trunkTaps.Add(houseY);
-        Set(needed, "trunk", house.Item.Node, Path(new Point(trunkX, trunkTaps.Min()), new Point(trunkX, trunkTaps.Max())), labelAt: null, signed: false);
+        trunkTaps.Add((houseY, -(house.Item.Node.Power ?? 0)));
+        var taps = trunkTaps.OrderBy(tap => tap.Y).ToList();
+        var crossing = 0d;
+
+        for (var i = 0; i < taps.Count - 1; i++)
+        {
+            crossing += taps[i].Injection;
+            Set(needed, $"trunk:{i}", new PowerFlowNode($"trunk:{i}", PowerFlowNodeKind.House, string.Empty, crossing), Path(new Point(trunkX, taps[i].Y), new Point(trunkX, taps[i + 1].Y)), labelAt: null, signed: false);
+        }
+
+        // The last step into the house carries what the house draws.
         Set(needed, "house", house.Item.Node, Path(new Point(trunkX, houseY), new Point(house.Rect.Left, houseY)), labelAt: null, signed: false);
 
         RouteConsumers(needed, items, cards, house);
@@ -292,20 +310,25 @@ public partial class PowerFlowView : ContentPage
         var houseY = house.Rect.Center.Y;
         var spineX = house.Rect.Right + SpineOffset;
 
-        // A row is every card whose top is the same, within the rounding a layout pass leaves.
-        var rows = consumers.GroupBy(card => Math.Round(card.Rect.Top)).OrderBy(group => group.Key).ToList();
-        var railYs = rows.Select(row => row.Key - RailOffset).ToList();
-        var spineTop = Math.Min(houseY, railYs.Min());
-        var spineBottom = Math.Max(houseY, railYs.Max());
+        // A row is every card whose top is the same, within the rounding a layout pass leaves. A rail carries what
+        // its row draws and is a consumer for the idle rule: two lamps at 5 W are on, and so is the rail to them.
+        var rows = consumers
+            .GroupBy(card => Math.Round(card.Rect.Top))
+            .OrderBy(group => group.Key)
+            .Select((group, i) => new ConsumerRow(group.ToList(), group.Key - RailOffset, new PowerFlowNode($"rail:{i}", PowerFlowNodeKind.Consumer, string.Empty, group.Sum(card => card.Item.Node.Power ?? 0))))
+            .ToList();
 
-        Set(needed, "spine", house.Item.Node, Path(new Point(house.Rect.Right, houseY), new Point(spineX, houseY), new Point(spineX, spineTop), new Point(spineX, spineBottom)), labelAt: null, signed: false, dots: [new Point(spineX, houseY)]);
+        // The house feeds the spine at the junction; from there the spine runs up and down as two wires, each
+        // starting at the junction, so that the dashes run away from it on both. One path that went up and came back
+        // down passed the upper part twice, with the two runs of dashes crossing over each other. The spine carries
+        // what the rails carry, under the consumers' idle rule like them.
+        Set(needed, "spine", SpineNode("spine", rows), Path(new Point(house.Rect.Right, houseY), new Point(spineX, houseY)), labelAt: null, signed: false, dots: [new Point(spineX, houseY)]);
+        SetSpineRun(needed, "spine:up", spineX, houseY, rows.Where(row => row.RailY < houseY).ToList(), Math.Min);
+        SetSpineRun(needed, "spine:down", spineX, houseY, rows.Where(row => row.RailY > houseY).ToList(), Math.Max);
 
-        for (var i = 0; i < rows.Count; i++)
+        foreach (var (row, railY, rowNode) in rows)
         {
-            var row = rows[i].ToList();
-            var railY = railYs[i];
-            var rowNode = new PowerFlowNode($"rail:{i}", PowerFlowNodeKind.House, string.Empty, row.Sum(card => card.Item.Node.Power ?? 0));
-            Set(needed, $"rail:{i}", rowNode, Path(new Point(spineX, railY), new Point(row.Max(card => card.Rect.Center.X), railY)), labelAt: null, signed: false, dots: [new Point(spineX, railY)]);
+            Set(needed, rowNode.Key, rowNode, Path(new Point(spineX, railY), new Point(row.Max(card => card.Rect.Center.X), railY)), labelAt: null, signed: false, dots: [new Point(spineX, railY)]);
 
             foreach (var card in row)
             {
@@ -314,6 +337,22 @@ public partial class PowerFlowView : ContentPage
             }
         }
     }
+
+    /// <summary>One run of the spine, from the junction with the house to the farthest rail on that side, carrying what those rails draw. No rails there, no run.</summary>
+    private void SetSpineRun(HashSet<string> needed, string key, double spineX, double houseY, IReadOnlyList<ConsumerRow> rows, Func<double, double, double> farthest)
+    {
+        if (rows.Count == 0)
+        {
+            return;
+        }
+
+        Set(needed, key, SpineNode(key, rows), Path(new Point(spineX, houseY), new Point(spineX, rows.Select(row => row.RailY).Aggregate(farthest))), labelAt: null, signed: false);
+    }
+
+    private static PowerFlowNode SpineNode(string key, IReadOnlyList<ConsumerRow> rows) => new(key, PowerFlowNodeKind.Consumer, string.Empty, rows.Sum(row => row.Node.Power ?? 0));
+
+    /// <summary>A row of consumer cards, the rail above it and the node that rail carries.</summary>
+    private sealed record ConsumerRow(List<(PowerFlowNodeItem Item, Rect Rect)> Cards, double RailY, PowerFlowNode Node);
 
     private static string Path(params Point[] points) => string.Join(' ', points.Select((point, i) => $"{(i == 0 ? 'M' : 'L')}{point.X.ToString("F1", CultureInfo.InvariantCulture)},{point.Y.ToString("F1", CultureInfo.InvariantCulture)}"));
 
@@ -373,6 +412,12 @@ public partial class PowerFlowView : ContentPage
 
         private bool thick;
         private double speed;
+
+        public string PathData => path ?? string.Empty;
+
+        public bool Moves => speed > 0;
+
+        public bool Reversed => reversed;
         private double period;
         private bool reversed;
 

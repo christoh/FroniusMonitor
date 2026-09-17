@@ -21,7 +21,7 @@ public sealed class PowerFlowViewTests
 {
     private const string Title = "Power flow";
 
-    private static async Task<FakeUpdateService> StartAsync()
+    private static async Task<FakeUpdateService> StartAsync(Action<FakeUpdateService>? configure = null)
     {
         var service = new FakeUpdateService();
         var presenter = new WindowPresenter();
@@ -48,6 +48,7 @@ public sealed class PowerFlowViewTests
         service.AllPowerConsumers.Add(Plug("hp", "Heat pump", 620));
         service.AllPowerConsumers.Add(Plug("fridge", "Fridge", 0));
         service.AllPowerConsumers.Add(new KeyedWattPilot { Key = "wp", Device = new WattPilot { DeviceName = "Zoe", PowerTotal = 3700 } });
+        configure?.Invoke(service);
 
         ((IPagePresenter)presenter).Show<PowerFlowView>(PowerFlowView.PageKey, Title, _ => { });
         await HeadlessAvalonia.SettleAsync();
@@ -86,6 +87,8 @@ public sealed class PowerFlowViewTests
 
     private static IReadOnlyList<Avalonia.Controls.Shapes.Path> WirePaths => Body.Wires.Children.OfType<Avalonia.Controls.Shapes.Path>().ToList();
 
+    private static IReadOnlyDictionary<string, (string Path, bool Moves, bool Reversed)> Wires => Body.WireStates;
+
     [Fact]
     public Task The_page_opens_at_its_declared_size_with_a_card_per_node_and_a_wire_to_every_one() => HeadlessAvalonia.RunAsync(async () =>
     {
@@ -117,6 +120,100 @@ public sealed class PowerFlowViewTests
             Assert.NotNull(path.Stroke);
             Assert.True(path.StrokeThickness > 0, "a wire without a thickness");
         });
+
+        Window.Close();
+    });
+
+    [Fact]
+    public Task No_wire_passes_a_point_twice() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        await StartAsync();
+
+        // The spine once went from the house up to the first rail and back down past the house to the last one, so
+        // its dashes ran over each other on the upper part. Now it is a stub from the house and a run to each side.
+        var wires = Wires;
+        var junction = wires["spine"].Path.Split(' ')[^1][1..];
+        var runs = wires.Where(wire => wire.Key.StartsWith("spine:", StringComparison.Ordinal)).ToList();
+        Assert.NotEmpty(runs);
+        Assert.All(runs, run => Assert.Equal(junction, run.Value.Path.Split(' ')[0][1..]));
+
+        Assert.All(wires, wire =>
+        {
+            var points = wire.Value.Path.Split(' ');
+            Assert.Equal(points.Length, points.Select(point => point[1..]).Distinct().Count());
+        });
+
+        Window.Close();
+    });
+
+    [Fact]
+    public Task The_trunk_carries_the_net_between_its_taps() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        // Top to bottom: the grid at -50 W (feed-in), inverter A at 4200 W, the house at 5100 W, inverter B at
+        // 950 W. Between the grid and inverter A run 50 W upwards; between inverter A and the house 4150 W down;
+        // between the house and inverter B 950 W upwards. As one wire the trunk ran downwards from end to end.
+        await StartAsync();
+
+        var trunk = Wires.Where(wire => wire.Key.StartsWith("trunk:", StringComparison.Ordinal)).OrderBy(wire => wire.Key).Select(wire => wire.Value).ToList();
+        Assert.Equal(3, trunk.Count);
+        Assert.All(trunk, segment => Assert.True(segment.Moves, "a trunk segment stands still"));
+        Assert.Equal([true, false, true], trunk.Select(segment => segment.Reversed));
+
+        // The segments join end to end, top down.
+        Assert.Equal(trunk[0].Path.Split(' ')[^1][1..], trunk[1].Path.Split(' ')[0][1..]);
+        Assert.Equal(trunk[1].Path.Split(' ')[^1][1..], trunk[2].Path.Split(' ')[0][1..]);
+
+        Window.Close();
+    });
+
+    [Fact]
+    public Task An_inverter_charging_its_battery_from_the_bus_draws_from_the_trunk() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        // Inverter B takes 300 W from the AC side to charge its battery, the grid imports 1200 W, inverter A makes
+        // 4200 W and the house draws 5100 W. Every trunk segment now runs downwards: 1200 W from the grid, 5400 W
+        // past inverter A, and 300 W below the house into inverter B, whose own wire runs back into it.
+        await StartAsync(service =>
+        {
+            service.Inverters[1].Device.Sensors!.PowerFlow!.InverterAcPower = -300;
+            service.SitePowerFlow.GridPower = 1200;
+            service.SitePowerFlow.InverterAcPower = 3900;
+        });
+
+        var wires = Wires;
+        var trunk = wires.Where(wire => wire.Key.StartsWith("trunk:", StringComparison.Ordinal)).OrderBy(wire => wire.Key).Select(wire => wire.Value).ToList();
+        Assert.Equal(3, trunk.Count);
+        Assert.All(trunk, segment => Assert.True(segment.Moves && !segment.Reversed, "a trunk segment stands still or runs upwards"));
+        Assert.True(wires["ac:inv-b"] is { Moves: true, Reversed: true }, "the charging inverter's wire does not run into it");
+        Assert.True(wires["ac:inv-a"] is { Moves: true, Reversed: false });
+        Assert.True(wires["grid"] is { Moves: true, Reversed: false });
+
+        Window.Close();
+    });
+
+    [Fact]
+    public Task A_rail_to_lamps_of_a_few_watts_carries_flow() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        // A lamp at 5 W and one at half a watt, nothing else: on by the consumers' rule, and so are the rail and
+        // the spine to them, at 6 W all told. Once the rail was judged like a producer, idle below 10 W, and stood
+        // still above a lit lamp, which then drew its power from nowhere.
+        await StartAsync(service =>
+        {
+            ((KeyedFritzBoxDevice)service.AllPowerConsumers[0]).Device.PowerMeter!.PowerWatts = 5;
+            ((KeyedFritzBoxDevice)service.AllPowerConsumers[1]).Device.PowerMeter!.PowerWatts = 0.5;
+            ((KeyedWattPilot)service.AllPowerConsumers[2]).Device.PowerTotal = 0;
+            service.SitePowerFlow.LoadPower = -6;
+        });
+
+        var wires = Wires;
+        Assert.True(wires["stub:hp"].Moves);
+        Assert.True(wires["stub:fridge"].Moves);
+        Assert.False(wires["stub:wp"].Moves);
+        Assert.True(wires[$"stub:{PowerFlowSnapshot.RestOfHouseKey}"].Moves);
+        // Every rail, however the cards wrap: each row here draws under 10 W and over 0.2 W.
+        var rails = wires.Where(wire => wire.Key.StartsWith("rail:", StringComparison.Ordinal)).ToList();
+        Assert.NotEmpty(rails);
+        Assert.All(rails, rail => Assert.True(rail.Value.Moves, $"{rail.Key} stands still"));
+        Assert.All(wires.Where(wire => wire.Key.StartsWith("spine", StringComparison.Ordinal)), run => Assert.True(run.Value.Moves, $"{run.Key} stands still"));
 
         Window.Close();
     });
