@@ -149,24 +149,27 @@ public sealed class PowerFlowViewTests
     [Fact]
     public Task A_rail_to_lamps_of_a_few_watts_carries_flow() => HeadlessAvalonia.RunAsync(async () =>
     {
-        // Two lamps at 5 W and 6 W, nothing else: on by the consumers' rule, and so are the rail and the spine to
-        // them. Once the rail was judged like a producer, idle below 10 W, and stood still above two lit lamps.
+        // A lamp at 5 W and one at half a watt, nothing else: on by the consumers' rule, and so are the rail and
+        // the spine to them, at 6 W all told. Once the rail was judged like a producer, idle below 10 W, and stood
+        // still above a lit lamp, which then drew its power from nowhere.
         await StartAsync(service =>
         {
             ((KeyedFritzBoxDevice)service.AllPowerConsumers[0]).Device.PowerMeter!.PowerWatts = 5;
-            ((KeyedFritzBoxDevice)service.AllPowerConsumers[1]).Device.PowerMeter!.PowerWatts = 6;
+            ((KeyedFritzBoxDevice)service.AllPowerConsumers[1]).Device.PowerMeter!.PowerWatts = 0.5;
             ((KeyedWattPilot)service.AllPowerConsumers[2]).Device.PowerTotal = 0;
-            service.SitePowerFlow.LoadPower = -11;
+            service.SitePowerFlow.LoadPower = -6;
         });
 
         var wires = Wires;
         Assert.True(wires["stub:hp"].Moves);
         Assert.True(wires["stub:fridge"].Moves);
         Assert.False(wires["stub:wp"].Moves);
-        Assert.False(wires[$"stub:{PowerFlowSnapshot.RestOfHouseKey}"].Moves);
-        Assert.True(wires["rail:0"].Moves);
-        Assert.True(wires["spine:up"].Moves);
-        Assert.True(wires["spine"].Moves);
+        Assert.True(wires[$"stub:{PowerFlowSnapshot.RestOfHouseKey}"].Moves);
+        // Every rail, however the cards wrap: each row here draws under 10 W and over 0.2 W.
+        var rails = wires.Where(wire => wire.Key.StartsWith("rail:", StringComparison.Ordinal)).ToList();
+        Assert.NotEmpty(rails);
+        Assert.All(rails, rail => Assert.True(rail.Value.Moves, $"{rail.Key} stands still"));
+        Assert.All(wires.Where(wire => wire.Key.StartsWith("spine", StringComparison.Ordinal)), run => Assert.True(run.Value.Moves, $"{run.Key} stands still"));
 
         Window.Close();
     });
