@@ -145,8 +145,13 @@ its own on the desktop, the main view on the browser and the phones, exactly lik
 price chart beside it in the **View** menu (`Resources.View`, the WPF menu's `_View` / `_Ansicht`; the menu
 button template got `RecognizesAccessKey` so the underscore is a mnemonic and not a character). The plan said
 "Settings", but a Settings menu already exists for the devices. One page, so the key is fixed. The page declares
-`c:InitialWindowSize.Width="1500" Height="860"` and `c:ZoomBox.IsScope="True"` on its root, has no size of its
-own, and reflows to whatever width it is given.
+`c:InitialWindowSize.Width="1500"`, `c:InitialWindowSize.LimitHeightToScreen="False"` and
+`c:ZoomBox.IsScope="True"` on its root, has no size of its own, and reflows to whatever width it is given. On the
+desktop its window is therefore 1500 wide and **as tall as its content, following it**: the cards arrive after
+`Loaded`, so the window grows when they do and when a consumer is added, and shrinks when one goes, until the
+user drags its height (see `DialogSystem.Lifecycle`, "keeps following it"). The screen bounds it, which Avalonia
+and Windows enforce on their own. With a fixed height of 860 it opened with the lowest cards cut off, and
+measured once on opening it was the height of its title and legend.
 
 `PowerFlowView` and `PowerFlowViewModel` are transient in `App.axaml.cs`; the view resolves its view model in its
 constructor, as the injection rule wants - **after** hooking `DataContextChanged`, or it never hears about it,
@@ -194,6 +199,11 @@ from the grid or from another inverter - has a negative AC power, takes from the
 to it run towards it; its own wire runs back into it through `IsReversed` as it always did. As one wire with the
 house's figure the trunk ran downwards from the top tap to the bottom one, past the house. `PowerFlowViewTests.The_trunk_carries_the_net_between_its_taps` holds it to this,
 through `WireStates`, which also tells whether a wire runs reversed.
+
+**Dots lie over wires, labels over dots** (`ZIndex` 1 and 2 on the canvas children, paths at 0). A wire's paths
+and dots are added to the canvas as it is routed, so without this the trunk segments, routed after the taps on
+them, painted over the taps' dots and the spine runs over the rails'. Every tap on the trunk has a dot, the
+house's inlet included; the trunk segments and the spine runs have none of their own, the wires meeting them do.
 
 **No wire passes a point twice.** The spine is a stub from the house to the junction (`spine`) and then a run
 from the junction up to the highest rail (`spine:up`) and one down to the lowest (`spine:down`), each drawn

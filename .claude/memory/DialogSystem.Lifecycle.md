@@ -314,6 +314,13 @@ attached properties on the page's own root, set in its XAML:
   however many rows that makes.
 - **Initial, not fixed.** The window is resizable from the moment it is up and nothing is written back or
   remembered, so the next window for that page opens at the declared size again.
+- **A dimension left to the content keeps following it** after the window is up (since 2026-09-17; before,
+  `OnOpened` switched a resizable window to `SizeToContent.Manual`). The power flow page has no cards until its
+  view model has heard from the devices, which is after `Loaded`, so measured once on opening its window was the
+  height of its title and legend. Handing a dimension over to the user is Avalonia's own doing:
+  `Window.HandleResized` drops the auto-sizing of the dimension the user drags, that one only, so a window the
+  user made narrower still grows in height as the consumers wrap into more rows.
+  `A_content_sized_page_window_follows_content_that_arrives_after_opening` pins it.
 - **It is read by the presenter, not by the window.** `ChildWindow` has no idea that what is on it is a page;
   `WindowPresenter.Show` reads the properties off the page and calls `ChildWindow.SetInitialSize`. Inside
   `MainView` the properties are simply not read - a page fills the view it is put in - and that is not an error:
@@ -322,6 +329,14 @@ attached properties on the page's own root, set in its XAML:
   maximum, so a view may ask for more room than the screen has and its window still opens on the screen. A zero,
   a negative number or an infinity counts as "not asked for": it is one number in a view's XAML, and there is
   nobody for the window to report it to.
+- **Unless the page lifts the cap on its height.** `c:InitialWindowSize.LimitHeightToScreen="False"` (since
+  2026-09-17) makes the presenter call `LimitToScreen` for the width only, so a content-sized height may take the
+  whole screen instead of the presenter's 90 % of it. The power flow page does this: it fixes its width at 1500
+  and is as tall as its cards, however many rows of consumers there are. **The screen itself still bounds it**,
+  and not by our doing: `Window.MeasureOverride` measures a content-sized window against the platform's
+  `MaxAutoSizeHint`, the working area, and Windows refuses a resizable window taller than the virtual screen
+  (`WM_GETMINMAXINFO`, which Avalonia only widens for a finite `MaxHeight`). A headless window asked for 100 000
+  came out exactly the screen's height. The width is capped either way.
 - **A fixed dimension is not sized to its content at all.** `ChildWindow.ApplySizeToContent` picks
   `SizeToContent.Width`, `.Height`, `.WidthAndHeight` or `.Manual` from which of the two were given. Setting both
   a size and `SizeToContent` for the same dimension has the content win, and the number the view asked for would

@@ -446,6 +446,62 @@ public sealed class WindowPresenterTests
         Assert.True(window.Height < screen.WorkingArea.Height / screen.Scaling, $"{window.Height} not capped below the screen height");
     });
 
+    /// <summary>
+    /// A content-sized dimension keeps following the content after the window is up. The power flow page has no
+    /// cards until its view model has heard from the devices, which is after Loaded; measured once, on opening, its
+    /// window was the height of its title and legend and nothing else. Handing a dimension over to the user is
+    /// Avalonia's, when they drag that edge, and a headless window has nobody to drag it.
+    /// </summary>
+    [Fact]
+    public Task A_content_sized_page_window_follows_content_that_arrives_after_opening() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        var (presenter, _) = await StartAsync();
+        var body = new Border { Width = ContentWidth, Height = ContentHeight };
+
+        ((IPagePresenter)presenter).Show<TestPage>("device-a", "Late", page => page.Content = body);
+        await HeadlessAvalonia.SettleAsync();
+
+        var window = WindowOf("Late");
+        Assert.Equal(ContentHeight, window.Height);
+
+        body.Height = ContentHeight * 2;
+        await HeadlessAvalonia.SettleAsync();
+
+        Assert.Equal(ContentHeight * 2, window.Height);
+        Assert.Equal(ContentWidth, window.Width);
+    });
+
+    /// <summary>
+    /// A page may lift the presenter's cap on its height: the power flow page is as tall as its cards and opened
+    /// with the lowest row cut off under the cap. The width stays capped.
+    /// </summary>
+    /// <remarks>
+    /// Asked for as a number, not left to the content: the headless platform, like Windows, measures a
+    /// content-sized window against the screen, and here that limit lies below the presenter's share of the
+    /// working area, so a content-sized window could not show the cap gone. An explicit height Avalonia does not
+    /// clamp, so it shows exactly what the presenter left in place.
+    /// </remarks>
+    [Fact]
+    public Task A_page_may_be_taller_than_the_presenter_allows_when_it_says_so() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        var (presenter, _) = await StartAsync();
+
+        ((IPagePresenter)presenter).Show<TestPage>("device-a", "Tall", page =>
+        {
+            InitialWindowSize.SetWidth(page, 100_000);
+            InitialWindowSize.SetHeight(page, 100_000);
+            InitialWindowSize.SetLimitHeightToScreen(page, false);
+        });
+
+        await HeadlessAvalonia.SettleAsync();
+
+        var window = WindowOf("Tall");
+        var screen = window.Screens.ScreenFromWindow(window) ?? window.Screens.Primary ?? window.Screens.All.Single();
+
+        Assert.True(window.Width < screen.WorkingArea.Width / screen.Scaling, $"{window.Width} not capped below the screen width");
+        Assert.Equal(100_000, window.Height);
+    });
+
     [Fact]
     public Task The_dashboard_entry_is_hidden_where_pages_open_in_windows() => HeadlessAvalonia.RunAsync(async () =>
     {
