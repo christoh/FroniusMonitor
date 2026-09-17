@@ -188,7 +188,11 @@ public partial class ChildWindow : Window
     /// of gauges and asks for more room than there is; it scrolls, so the cap costs nothing.
     /// </summary>
     /// <param name="fractionOfScreen">How much of the working area the window may take at most.</param>
-    public void LimitToScreen(double fractionOfScreen)
+    /// <param name="limitHeight">
+    /// <c>false</c> leaves the height alone, for a page that is sized by its content and would rather take the
+    /// whole screen than have that content cut off. The width is capped either way.
+    /// </param>
+    public void LimitToScreen(double fractionOfScreen, bool limitHeight = true)
     {
         if ((Screens.ScreenFromWindow(this) ?? Screens.Primary ?? Screens.All.FirstOrDefault()) is not { } screen)
         {
@@ -197,6 +201,10 @@ public partial class ChildWindow : Window
 
         // The working area is in physical pixels; Width and Height are device independent.
         MaxWidth = screen.WorkingArea.Width / screen.Scaling * fractionOfScreen;
-        MaxHeight = screen.WorkingArea.Height / screen.Scaling * fractionOfScreen;
+
+        if (limitHeight)
+        {
+            MaxHeight = screen.WorkingArea.Height / screen.Scaling * fractionOfScreen;
+        }
     }
 }

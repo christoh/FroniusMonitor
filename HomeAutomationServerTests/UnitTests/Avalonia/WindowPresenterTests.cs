@@ -446,6 +446,37 @@ public sealed class WindowPresenterTests
         Assert.True(window.Height < screen.WorkingArea.Height / screen.Scaling, $"{window.Height} not capped below the screen height");
     });
 
+    /// <summary>
+    /// A page may lift the presenter's cap on its height: the power flow page is as tall as its cards and opened
+    /// with the lowest row cut off under the cap. The width stays capped.
+    /// </summary>
+    /// <remarks>
+    /// Asked for as a number, not left to the content: the headless platform, like Windows, measures a
+    /// content-sized window against the screen, and here that limit lies below the presenter's share of the
+    /// working area, so a content-sized window could not show the cap gone. An explicit height Avalonia does not
+    /// clamp, so it shows exactly what the presenter left in place.
+    /// </remarks>
+    [Fact]
+    public Task A_page_may_be_taller_than_the_presenter_allows_when_it_says_so() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        var (presenter, _) = await StartAsync();
+
+        ((IPagePresenter)presenter).Show<TestPage>("device-a", "Tall", page =>
+        {
+            InitialWindowSize.SetWidth(page, 100_000);
+            InitialWindowSize.SetHeight(page, 100_000);
+            InitialWindowSize.SetLimitHeightToScreen(page, false);
+        });
+
+        await HeadlessAvalonia.SettleAsync();
+
+        var window = WindowOf("Tall");
+        var screen = window.Screens.ScreenFromWindow(window) ?? window.Screens.Primary ?? window.Screens.All.Single();
+
+        Assert.True(window.Width < screen.WorkingArea.Width / screen.Scaling, $"{window.Width} not capped below the screen width");
+        Assert.Equal(100_000, window.Height);
+    });
+
     [Fact]
     public Task The_dashboard_entry_is_hidden_where_pages_open_in_windows() => HeadlessAvalonia.RunAsync(async () =>
     {

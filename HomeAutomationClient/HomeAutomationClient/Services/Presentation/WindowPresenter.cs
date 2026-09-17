@@ -114,7 +114,8 @@ public sealed class WindowPresenter : IDialogPresenter, IPagePresenter
             WindowStartupLocation = WindowStartupLocation.CenterScreen,
         };
 
-        window.LimitToScreen(MaximumFractionOfScreen);
+        // The screen caps the window, unless the page would rather be as tall as its content whatever the screen.
+        window.LimitToScreen(MaximumFractionOfScreen, InitialWindowSize.GetLimitHeightToScreen(page));
 
         // What the page asks for in its own XAML, if it asks at all; NaN for either dimension leaves that one to
         // the content. Read here and not in the window, because a window has no idea that what is on it is a

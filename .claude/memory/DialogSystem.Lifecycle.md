@@ -322,6 +322,14 @@ attached properties on the page's own root, set in its XAML:
   maximum, so a view may ask for more room than the screen has and its window still opens on the screen. A zero,
   a negative number or an infinity counts as "not asked for": it is one number in a view's XAML, and there is
   nobody for the window to report it to.
+- **Unless the page lifts the cap on its height.** `c:InitialWindowSize.LimitHeightToScreen="False"` (since
+  2026-09-17) makes the presenter call `LimitToScreen` for the width only, so a content-sized height may take the
+  whole screen instead of the presenter's 90 % of it. The power flow page does this: it fixes its width at 1500
+  and is as tall as its cards, however many rows of consumers there are. **The screen itself still bounds it**,
+  and not by our doing: `Window.MeasureOverride` measures a content-sized window against the platform's
+  `MaxAutoSizeHint`, the working area, and Windows refuses a resizable window taller than the virtual screen
+  (`WM_GETMINMAXINFO`, which Avalonia only widens for a finite `MaxHeight`). A headless window asked for 100 000
+  came out exactly the screen's height. The width is capped either way.
 - **A fixed dimension is not sized to its content at all.** `ChildWindow.ApplySizeToContent` picks
   `SizeToContent.Width`, `.Height`, `.WidthAndHeight` or `.Manual` from which of the two were given. Setting both
   a size and `SizeToContent` for the same dimension has the content win, and the number the view asked for would

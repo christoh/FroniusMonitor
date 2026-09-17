@@ -11,13 +11,14 @@
              mc:Ignorable="d" d:DesignWidth="1500" d:DesignHeight="860"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.PowerFlowView"
              x:DataType="vm:PowerFlowViewModel"
-             c:InitialWindowSize.Width="1500" c:InitialWindowSize.Height="860"
+             c:InitialWindowSize.Width="1500" c:InitialWindowSize.LimitHeightToScreen="False"
              c:ZoomBox.IsScope="True"
              Background="{DynamicResource FlowPageBackground}"
              FontSize="12">
 	<!-- Landscape, for the desktop: the sources on the left, the house in the middle, the consumers on the right.
-	     A page, so the desktop gives it a window that opens at the InitialWindowSize above and the browser puts it
-	     where the dashboard was; either way the consumers wrap to the width there is. The page paints its own
+	     A page, so the desktop gives it a window as wide as the InitialWindowSize above and as tall as what is on
+	     it, up to the screen and not the presenter's share of it, and the browser puts it where the dashboard was;
+	     either way the consumers wrap to the width there is. The page paints its own
 	     ground, because the dark look is the one the design was drawn on and not the app's. The wires are drawn by
 	     the code behind into the canvas below, from where the cards ended up; see PowerFlowView.axaml.cs. -->
 	<ContentPage.Resources>

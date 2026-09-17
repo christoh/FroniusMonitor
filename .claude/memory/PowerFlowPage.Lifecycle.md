@@ -145,8 +145,11 @@ its own on the desktop, the main view on the browser and the phones, exactly lik
 price chart beside it in the **View** menu (`Resources.View`, the WPF menu's `_View` / `_Ansicht`; the menu
 button template got `RecognizesAccessKey` so the underscore is a mnemonic and not a character). The plan said
 "Settings", but a Settings menu already exists for the devices. One page, so the key is fixed. The page declares
-`c:InitialWindowSize.Width="1500" Height="860"` and `c:ZoomBox.IsScope="True"` on its root, has no size of its
-own, and reflows to whatever width it is given.
+`c:InitialWindowSize.Width="1500"`, `c:InitialWindowSize.LimitHeightToScreen="False"` and
+`c:ZoomBox.IsScope="True"` on its root, has no size of its own, and reflows to whatever width it is given. On the
+desktop its window is therefore 1500 wide and **as tall as its content**, up to the height of the screen, which
+Avalonia and Windows enforce on their own (see `DialogSystem.Lifecycle`): with a fixed height of 860 it opened
+with the lowest cards cut off.
 
 `PowerFlowView` and `PowerFlowViewModel` are transient in `App.axaml.cs`; the view resolves its view model in its
 constructor, as the injection rule wants - **after** hooking `DataContextChanged`, or it never hears about it,
