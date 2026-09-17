@@ -203,15 +203,9 @@ public sealed partial class MainViewModel : ViewModelBase
 
         await Dispatcher.UIThread.InvokeAsync(async () =>
         {
-            // A link into a detail view survives the login: the address the app was started with is only
-            // resolved now, because the devices of the installation are known only now.
-            if (followStartupPath && ViewPath.Find(UpdateService.DetailDevices, uriService.StartupPath) is { } device)
-            {
-                await ShowDetails(device).ConfigureAwait(true);
-                return;
-            }
-
-            await ShowDashboardView().ConfigureAwait(true);
+            // A link into a page survives the login: the address the app was started with is only resolved now,
+            // because the devices of the installation are known only now.
+            await ShowPath(followStartupPath ? uriService.StartupPath : ViewPath.Dashboard, updatesAddress: true).ConfigureAwait(true);
         });
     }
 
@@ -392,11 +386,33 @@ public sealed partial class MainViewModel : ViewModelBase
     /// main view on the browser and the phones, a window of its own on the desktop. One of it, so the key is fixed.
     /// </summary>
     [RelayCommand]
-    private Task ShowPowerFlow() => TaskExceptionHandler(() =>
+    private Task ShowPowerFlow() => ShowPowerFlowView(updatesAddress: true);
+
+    /// <param name="updatesAddress">
+    /// As in <see cref="ShowDetails(IKeyedDevice, bool)"/>: false while following the back or forward button.
+    /// </param>
+    private Task ShowPowerFlowView(bool updatesAddress) => TaskExceptionHandler(() =>
     {
         pagePresenter.Show<PowerFlowView>(PowerFlowView.PageKey, Loc.PowerFlow, _ => { });
+
+        if (updatesAddress)
+        {
+            uriService.SetPath(ViewPath.PowerFlow);
+        }
+
         return Task.CompletedTask;
     });
+
+    /// <summary>
+    /// Shows whatever <paramref name="path"/> names: the power flow page, the detail view of a device of this
+    /// installation, or the dashboard where it names neither. The one place that turns an address into a view, so
+    /// that a startup link and the back button cannot come to disagree about what an address means.
+    /// </summary>
+    private Task ShowPath(string? path, bool updatesAddress) => ViewPath.IsPowerFlow(path)
+        ? ShowPowerFlowView(updatesAddress)
+        : ViewPath.Find(UpdateService.DetailDevices, path) is { } device
+            ? ShowDetails(device, updatesAddress)
+            : ShowDashboardView(updatesAddress);
 
     [RelayCommand]
     private Task ShowDetails(IKeyedDevice device) => ShowDetails(device, updatesAddress: true);
@@ -476,13 +492,7 @@ public sealed partial class MainViewModel : ViewModelBase
             return;
         }
 
-        if (ViewPath.Find(UpdateService.DetailDevices, path) is { } device)
-        {
-            _ = ShowDetails(device, updatesAddress: false);
-            return;
-        }
-
-        _ = ShowDashboardView(updatesAddress: false);
+        _ = ShowPath(path, updatesAddress: false);
     });
 
     /// <summary>

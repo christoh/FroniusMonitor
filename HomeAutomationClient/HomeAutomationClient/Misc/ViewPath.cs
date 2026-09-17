@@ -3,14 +3,19 @@ using De.Hochstaetter.Fronius.Models.Charging;
 namespace De.Hochstaetter.HomeAutomationClient.Misc;
 
 /// <summary>
-/// Translates between a device and the address that shows it, in both directions: the app writes the address when
+/// Translates between a view and the address that shows it, in both directions: the app writes the address when
 /// the user navigates, and reads it when somebody arrives with a link.
 /// </summary>
 /// <remarks>
 /// <para>
-/// A path is <c>/&lt;view&gt;/&lt;manufacturer&gt;/&lt;serial number&gt;</c>. Manufacturer and serial number are
-/// what the user sees on the device and on its type plate, so a link can be typed by hand, and together they
-/// identify one device of an installation.
+/// The address of a device is <c>/&lt;view&gt;/&lt;manufacturer&gt;/&lt;serial number&gt;</c>. Manufacturer and
+/// serial number are what the user sees on the device and on its type plate, so a link can be typed by hand, and
+/// together they identify one device of an installation.
+/// </para>
+/// <para>
+/// A page that shows the installation as a whole has no device to name, so its address is the single segment of
+/// its own: <see cref="PowerFlow"/>. There is one of each, which is why a constant is enough where a device needs
+/// <see cref="For"/> and <see cref="Find"/>.
 /// </para>
 /// <para>
 /// The two values are percent escaped with <see cref="Uri.EscapeDataString(string)"/>, which is what a browser expects:
@@ -23,6 +28,14 @@ public static class ViewPath
 {
     /// <summary>The dashboard is the root of the app.</summary>
     public const string Dashboard = "/";
+
+    /// <summary>
+    /// The power flow page. Unlike a detail view it belongs to no device, so it is one address rather than a
+    /// family of them.
+    /// </summary>
+    public const string PowerFlow = "/" + PowerFlowPage;
+
+    private const string PowerFlowPage = "powerflow";
 
     private const string InverterView = "inverterdetails";
     private const string BatteryView = "batterydetails";
@@ -41,6 +54,12 @@ public static class ViewPath
 
         return $"/{identity.View}/{Uri.EscapeDataString(identity.Manufacturer ?? string.Empty)}/{Uri.EscapeDataString(identity.SerialNumber ?? string.Empty)}";
     }
+
+    /// <summary>
+    /// Whether <paramref name="path"/> is the address of the power flow page. Case-insensitive, like every other
+    /// address here, so a handwritten link works.
+    /// </summary>
+    public static bool IsPowerFlow(string? path) => Segments(path) is [var page] && string.Equals(page, PowerFlowPage, StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
     /// The device of <paramref name="devices"/> that <paramref name="path"/> points at, or <see langword="null"/>
@@ -68,12 +87,13 @@ public static class ViewPath
     /// </summary>
     private static (string View, string Manufacturer, string SerialNumber)? Parse(string? path)
     {
-        var segments = (path ?? string.Empty).Split('/', StringSplitOptions.RemoveEmptyEntries);
-
-        return segments.Length == 3
-            ? (segments[0], Uri.UnescapeDataString(segments[1]), Uri.UnescapeDataString(segments[2]))
+        return Segments(path) is [var view, var manufacturer, var serialNumber]
+            ? (view, Uri.UnescapeDataString(manufacturer), Uri.UnescapeDataString(serialNumber))
             : null;
     }
+
+    /// <summary>The parts of a path, without the empty ones a leading or trailing slash produces.</summary>
+    private static string[] Segments(string? path) => (path ?? string.Empty).Split('/', StringSplitOptions.RemoveEmptyEntries);
 
     /// <summary>
     /// The view of a device and the two values that identify it. Add a device type here and it has an address in

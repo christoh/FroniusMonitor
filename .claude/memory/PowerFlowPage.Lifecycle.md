@@ -140,7 +140,8 @@ currents.
 
 ## A page, not a dialog
 
-`MainViewModel.ShowPowerFlow` calls `pagePresenter.Show<PowerFlowView>(PowerFlowView.PageKey, …)`: a window of
+`MainViewModel.ShowPowerFlow` calls `ShowPowerFlowView`, which calls
+`pagePresenter.Show<PowerFlowView>(PowerFlowView.PageKey, …)`: a window of
 its own on the desktop, the main view on the browser and the phones, exactly like a detail page and unlike the
 price chart beside it in the **View** menu (`Resources.View`, the WPF menu's `_View` / `_Ansicht`; the menu
 button template got `RecognizesAccessKey` so the underscore is a mnemonic and not a character). The plan said
@@ -162,8 +163,10 @@ per type. Between the two, while the page's window is minimized or the app is in
 through `WhenShown` and builds nothing; one snapshot is built when the page is back - see
 [[UpdateVisibility.Lifecycle]].
 
-The page has no address of its own in the browser (see [[Navigation.Lifecycle]]); the Dashboard menu entry is
-the way back, as for a detail page.
+The page has an address of its own, `/powerflow` (see [[Navigation.Lifecycle]]), so it survives a reload and can
+be bookmarked or linked. It belongs to no device, so it is one constant rather than the
+`/<view>/<manufacturer>/<serial>` of a detail page. The Dashboard menu entry is still the way back, as for a
+detail page.
 
 ## Two halves, for two threads
 
@@ -249,7 +252,6 @@ formula; if the Avalonia page ever looks wrong, that is the reference.
 
 ## Known gaps
 
-- No address of its own in the browser, so a reload lands on the dashboard; the menu is the way back.
 - A Toshiba air conditioner does not measure its power and so is not on the page at all, not even as idle.
 - A tracker that reports nought is a card - an unused second MPPT shows as an idle "MPPT 2". Hiding it would
   need the configured peak power, and a peak of nought is as likely an unconfigured one as an unused tracker.

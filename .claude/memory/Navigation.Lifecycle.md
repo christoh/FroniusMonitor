@@ -4,6 +4,7 @@ paths:
   - HomeAutomationClient/HomeAutomationClient/Services/FakeUriService.cs
   - HomeAutomationClient/HomeAutomationClient/Misc/ViewPath.cs
   - HomeAutomationClient/HomeAutomationClient/ViewModels/MainViewModel.cs
+  - HomeAutomationClient/HomeAutomationClient/Views/PowerFlowView.axaml.cs
   - HomeAutomationClient/HomeAutomationClient/App.axaml.cs
   - HomeAutomationClient/HomeAutomationClient.Browser/Platform/UriService.cs
   - HomeAutomationClient/HomeAutomationClient.Browser/Program.cs
@@ -34,11 +35,13 @@ it first and wins - which is exactly what the browser head does in `Program.Main
 
 ## The shape of an address
 
-`/<view>/<manufacturer>/<serial number>`, or `/` for the dashboard.
+`/<view>/<manufacturer>/<serial number>` for a device, `/<page>` for a page that belongs to none, or `/` for the
+dashboard.
 
 ```
 /inverterdetails/Fronius/12345678
 /batterydetails/BYD%20Battery-Box/P03T%2012%2F34
+/powerflow
 ```
 
 Manufacturer and serial number, because they are printed on the device and on its type plate: a user can read an
@@ -56,15 +59,26 @@ address, and can type one. They identify one device of an installation.
 - An address whose device this installation does not have is not an error: `ViewPath.Find` returns null and the
   user gets the dashboard.
 
+**A page without a device is a constant, not a family.** The power flow page shows the installation as a whole, so
+there is nothing to name in its address and exactly one of it: `ViewPath.PowerFlow` is the address, and
+`ViewPath.IsPowerFlow` recognises it. It needs no `For` and no `Find`, and both it and `Parse` count segments
+through the same `ViewPath.Segments`, so a leading or trailing slash means the same thing to all of them.
+
 ## Who writes the address, and when
 
-`MainViewModel` is the only place that calls `SetPath`, from `ShowDetails` and `ShowDashboardView`. Both take an
-`updatesAddress` flag:
+`MainViewModel` is the only place that calls `SetPath`, from `ShowDetails`, `ShowPowerFlowView` and
+`ShowDashboardView`. All three take an `updatesAddress` flag:
 
 | Trigger | `updatesAddress` | Why |
 |---|---|---|
 | The user picks a device from the menu (`ShowDetailsCommand`) | `true` | This is a new place, it belongs in the history |
+| The user picks the power flow page from the View menu (`ShowPowerFlowCommand`) | `true` | Likewise |
 | Back or forward (`OnPathChanged`) | `false` | The address is already the one being navigated to |
+
+**`MainViewModel.ShowPath` is the one place that turns an address into a view** - power flow page, detail view of
+a device, or the dashboard where it is neither. Startup and the back button both go through it, so they cannot
+come to disagree about what an address means; they differ in the `updatesAddress` flag alone. A new addressable
+view is added there and nowhere else.
 
 **A head with a window per detail page has one address and several pages.** The desktop opens a window for each
 device (see [[DialogSystem.Lifecycle]]) and the address is still written on every one of them, so it names the page
@@ -81,11 +95,14 @@ cover the spelling case.
 
 1. The head builds the `IUriService`; the browser one reads `location.pathname` **once**, into `StartupPath`.
 2. `MainViewModel.Initialize` shows the login dialog and starts `UpdateService`.
-3. Only **after** `IsReady` does it resolve `StartupPath` with `ViewPath.Find` - the devices of the installation
-   are known only now - and show that view, or the dashboard.
+3. Only **after** `IsReady` does it hand `StartupPath` to `ShowPath` - the devices of the installation are known
+   only now - and show that view, or the dashboard.
 
 `OnPathChanged` does nothing while `!IsReady` for the same reason: pressing back during the login has nothing to
 resolve against yet, and step 3 does it afterwards anyway.
+
+After a `Logout` the same code runs again with the dashboard in place of `StartupPath`: the address was reset when
+the session was torn down, and a startup link must not be followed a second time.
 
 ## Back and forward
 
@@ -149,8 +166,9 @@ start from.
 
 ## Known gaps
 
-- **Nothing but the four detail views has an address.** The settings dialog, the login and every other dialog are
-  not addressable, and a dialog does not appear in the history.
+- **Nothing but the four detail views and the power flow page has an address.** The settings dialog, the login and
+  every other dialog are not addressable, and a dialog does not appear in the history. The price chart is a dialog
+  rather than a page, so it has none either, although it sits beside the power flow page in the View menu.
 - **A dialog is not part of the history.** Opening the settings or the login does not change the address, and
   back does not close one.
 - The non-browser heads collect addresses nobody reads yet.
