@@ -87,7 +87,7 @@ public sealed class PowerFlowViewTests
 
     private static IReadOnlyList<Avalonia.Controls.Shapes.Path> WirePaths => Body.Wires.Children.OfType<Avalonia.Controls.Shapes.Path>().ToList();
 
-    private static IReadOnlyDictionary<string, (string Path, bool Moves)> Wires => Body.WireStates;
+    private static IReadOnlyDictionary<string, (string Path, bool Moves, bool Reversed)> Wires => Body.WireStates;
 
     [Fact]
     public Task The_page_opens_at_its_declared_size_with_a_card_per_node_and_a_wire_to_every_one() => HeadlessAvalonia.RunAsync(async () =>
@@ -142,6 +142,50 @@ public sealed class PowerFlowViewTests
             var points = wire.Value.Path.Split(' ');
             Assert.Equal(points.Length, points.Select(point => point[1..]).Distinct().Count());
         });
+
+        Window.Close();
+    });
+
+    [Fact]
+    public Task The_trunk_carries_the_net_between_its_taps() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        // Top to bottom: the grid at -50 W (feed-in), inverter A at 4200 W, the house at 5100 W, inverter B at
+        // 950 W. Between the grid and inverter A run 50 W upwards; between inverter A and the house 4150 W down;
+        // between the house and inverter B 950 W upwards. As one wire the trunk ran downwards from end to end.
+        await StartAsync();
+
+        var trunk = Wires.Where(wire => wire.Key.StartsWith("trunk:", StringComparison.Ordinal)).OrderBy(wire => wire.Key).Select(wire => wire.Value).ToList();
+        Assert.Equal(3, trunk.Count);
+        Assert.All(trunk, segment => Assert.True(segment.Moves, "a trunk segment stands still"));
+        Assert.Equal([true, false, true], trunk.Select(segment => segment.Reversed));
+
+        // The segments join end to end, top down.
+        Assert.Equal(trunk[0].Path.Split(' ')[^1][1..], trunk[1].Path.Split(' ')[0][1..]);
+        Assert.Equal(trunk[1].Path.Split(' ')[^1][1..], trunk[2].Path.Split(' ')[0][1..]);
+
+        Window.Close();
+    });
+
+    [Fact]
+    public Task An_inverter_charging_its_battery_from_the_bus_draws_from_the_trunk() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        // Inverter B takes 300 W from the AC side to charge its battery, the grid imports 1200 W, inverter A makes
+        // 4200 W and the house draws 5100 W. Every trunk segment now runs downwards: 1200 W from the grid, 5400 W
+        // past inverter A, and 300 W below the house into inverter B, whose own wire runs back into it.
+        await StartAsync(service =>
+        {
+            service.Inverters[1].Device.Sensors!.PowerFlow!.InverterAcPower = -300;
+            service.SitePowerFlow.GridPower = 1200;
+            service.SitePowerFlow.InverterAcPower = 3900;
+        });
+
+        var wires = Wires;
+        var trunk = wires.Where(wire => wire.Key.StartsWith("trunk:", StringComparison.Ordinal)).OrderBy(wire => wire.Key).Select(wire => wire.Value).ToList();
+        Assert.Equal(3, trunk.Count);
+        Assert.All(trunk, segment => Assert.True(segment.Moves && !segment.Reversed, "a trunk segment stands still or runs upwards"));
+        Assert.True(wires["ac:inv-b"] is { Moves: true, Reversed: true }, "the charging inverter's wire does not run into it");
+        Assert.True(wires["ac:inv-a"] is { Moves: true, Reversed: false });
+        Assert.True(wires["grid"] is { Moves: true, Reversed: false });
 
         Window.Close();
     });

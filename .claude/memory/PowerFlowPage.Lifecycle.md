@@ -39,7 +39,7 @@ legend. Left to right, because it is for the desktop and the desktop is wide:
 | Column | Cards | Wire |
 |---|---|---|
 | Sources | The grid; then one **cluster** per inverter - its DC side stacked on the left (**one card per tracker**, then the battery), the inverter to their right | Each DC card into its own tap on the inverter's left edge, the taps 14 px apart around the middle; inverter and grid right into the **trunk** |
-| Trunk | a vertical bus between the sources and the house | one tap per source, a dot at each |
+| Trunk | a vertical bus between the sources and the house | one tap per source and one for the house, a dot at each; **one wire per gap between two taps**, carrying the net of every tap above it, drawn downwards so that a negative net runs upwards |
 | House | one wide card: consumption, self-sufficiency, own consumption | trunk into its left edge; its right edge into the **spine** junction |
 | Consumers | every consumer that measures its power, wrapping to the width there is, and last **the rest of the house** | a spine down the left in two runs from the junction, one up and one down; one **rail** above each row, one **stub** down to each card |
 
@@ -185,6 +185,16 @@ the wires listed above into the `Wires` canvas, which is the first child of the 
 Rows of consumers are cards with the same rounded top; a rail is 14 px above them, in the margin the consumer
 card style leaves; the spine is 34 px right of the house, in the consumers' left margin.
 
+**The trunk is a bus, not a pipe from the house.** Each tap on it feeds something in: the grid its import, an
+inverter its AC output, the house its draw as a negative. The segment between two neighbouring taps carries the
+sum of the taps above it (`trunk:<gap>`, a `House` node made by the view), so with the grid on top, then a
+producing inverter, then the house, then an idle inverter, a few watts run up to the grid, the rest down to the
+house, and nothing below it. The taps are signed, so **an inverter that charges its battery from the AC side** -
+from the grid or from another inverter - has a negative AC power, takes from the bus, and the segments on the way
+to it run towards it; its own wire runs back into it through `IsReversed` as it always did. As one wire with the
+house's figure the trunk ran downwards from the top tap to the bottom one, past the house. `PowerFlowViewTests.The_trunk_carries_the_net_between_its_taps` holds it to this,
+through `WireStates`, which also tells whether a wire runs reversed.
+
 **No wire passes a point twice.** The spine is a stub from the house to the junction (`spine`) and then a run
 from the junction up to the highest rail (`spine:up`) and one down to the lowest (`spine:down`), each drawn
 starting at the junction so that its dashes run away from the house, and each left out when there is no rail on
@@ -195,7 +205,7 @@ dashes move, per key.
 
 **It writes to a wire only what changed** - the path string, the dot positions, the label text, the thickness
 and kind - because setting a path's geometry invalidates layout, and an unconditional write on every layout pass
-would loop for ever. Wires are keyed (`dc:<node>`, `ac:<inverter>`, `grid`, `trunk`, `house`, `spine`,
+would loop for ever. Wires are keyed (`dc:<node>`, `ac:<inverter>`, `grid`, `trunk:<gap>`, `house`, `spine`,
 `spine:up`, `spine:down`, `rail:<row>`, `stub:<consumer>`); after `Apply` says the structure changed, all of them are thrown away and
 routed anew, otherwise they are updated in place. **A wire's kind starts out as null**, so that the first update
 styles it whatever it is: with `Idle` as the initial value an idle-from-birth wire was never given a stroke or a

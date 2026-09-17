@@ -58,8 +58,8 @@ public partial class PowerFlowView : ContentPage
 
     private readonly Dictionary<string, Wire> wires = [];
 
-    /// <summary>For the tests: the wires by key, each as its path and whether its dashes move.</summary>
-    internal IReadOnlyDictionary<string, (string Path, bool Moves)> WireStates => wires.ToDictionary(pair => pair.Key, pair => (pair.Value.PathData, pair.Value.Moves));
+    /// <summary>For the tests: the wires by key, each as its path, whether its dashes move and whether they run against the way it is drawn.</summary>
+    internal IReadOnlyDictionary<string, (string Path, bool Moves, bool Reversed)> WireStates => wires.ToDictionary(pair => pair.Key, pair => (pair.Value.PathData, pair.Value.Moves, pair.Value.Reversed));
     private PowerFlowViewModel? viewModel;
     private bool isRunning;
     private int isRefreshPending;
@@ -210,12 +210,15 @@ public partial class PowerFlowView : ContentPage
         var items = model.Items;
 
         // ----- Sources onto the trunk -----
-        var trunkTaps = new List<double>();
+        // A tap is where a wire meets the trunk, with what it feeds in there: the grid's import, an inverter's AC
+        // output, and the house's draw as a negative. What crosses the trunk between two taps is the sum of the
+        // taps on one side.
+        var trunkTaps = new List<(double Y, double Injection)>();
         var sourcesRight = double.NegativeInfinity;
 
         if (items.Grid is { } grid && cards.TryGetValue(grid.Key, out var gridCard))
         {
-            trunkTaps.Add(gridCard.Rect.Center.Y);
+            trunkTaps.Add((gridCard.Rect.Center.Y, grid.Node.Power ?? 0));
             sourcesRight = Math.Max(sourcesRight, gridCard.Rect.Right);
         }
 
@@ -227,7 +230,7 @@ public partial class PowerFlowView : ContentPage
             }
 
             sourcesRight = Math.Max(sourcesRight, inverter.Rect.Right);
-            trunkTaps.Add(inverter.Rect.Center.Y);
+            trunkTaps.Add((inverter.Rect.Center.Y, inverter.Item.Node.Power ?? 0));
 
             // The DC cards, each into its own tap on the inverter's left edge; the taps are spread around the middle.
             var dcSources = cluster.DcSources.Select(item => cards.TryGetValue(item.Key, out var card) ? card : default).Where(card => card.Item is { }).ToList();
@@ -269,10 +272,22 @@ public partial class PowerFlowView : ContentPage
             Set(needed, $"ac:{cluster.Key}", inverter.Item.Node, Path(new Point(inverter.Rect.Right, y), new Point(trunkX, y)), labelAt: new Point(inverter.Rect.Right + (trunkX - inverter.Rect.Right) / 2, y - 12), signed: false, dots: [new Point(trunkX, y)]);
         }
 
-        // The trunk itself, and the last step into the house. Both carry what the house draws.
+        // The trunk, one segment per gap between two taps, each carrying the net of everything above it: drawn
+        // downwards, so a negative net runs upwards. With one inverter producing, the grid above it and the house
+        // below, that is a few watts up to the grid and the rest down to the house, and nothing below the house. As
+        // one wire with the house's figure it ran from the top tap to the bottom one, past the house.
         var houseY = house.Rect.Center.Y;
-        trunkTaps.Add(houseY);
-        Set(needed, "trunk", house.Item.Node, Path(new Point(trunkX, trunkTaps.Min()), new Point(trunkX, trunkTaps.Max())), labelAt: null, signed: false);
+        trunkTaps.Add((houseY, -(house.Item.Node.Power ?? 0)));
+        var taps = trunkTaps.OrderBy(tap => tap.Y).ToList();
+        var crossing = 0d;
+
+        for (var i = 0; i < taps.Count - 1; i++)
+        {
+            crossing += taps[i].Injection;
+            Set(needed, $"trunk:{i}", new PowerFlowNode($"trunk:{i}", PowerFlowNodeKind.House, string.Empty, crossing), Path(new Point(trunkX, taps[i].Y), new Point(trunkX, taps[i + 1].Y)), labelAt: null, signed: false);
+        }
+
+        // The last step into the house carries what the house draws.
         Set(needed, "house", house.Item.Node, Path(new Point(trunkX, houseY), new Point(house.Rect.Left, houseY)), labelAt: null, signed: false);
 
         RouteConsumers(needed, items, cards, house);
@@ -401,6 +416,8 @@ public partial class PowerFlowView : ContentPage
         public string PathData => path ?? string.Empty;
 
         public bool Moves => speed > 0;
+
+        public bool Reversed => reversed;
         private double period;
         private bool reversed;
 
