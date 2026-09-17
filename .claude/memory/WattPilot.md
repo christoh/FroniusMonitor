@@ -69,6 +69,15 @@ status, kept current by applying every delta to it. That shapes everything:
   the model, `WattPilot.cs`, and the fastest way to see what a live charger actually sends is its cloud API - see
   the end of this document.
 
+## The charger is a power consumer (since 2026-09-16)
+
+`WattPilot : IPowerConsumer3P`, a contract that is an `IPowerConsumer1P` with the three phases added, so the
+power flow page lists the cars beside the plugs. Every member is implemented **explicitly**, at the end of the
+class, so that none of it turns up in the JSON the server pushes - `PowerTotal` is what is sent, `ActivePower`
+is a view of it on this side. `CanSwitch` is false and `TurnOnOff` throws: charging is a mode, not a switch. The
+Modbus server has a `case IPowerConsumer3P: break;` so that the charger is not auto-mapped as a single phase
+meter. The details, the defaults the capability contracts got and the tests are in [[PowerFlowPage.Lifecycle]].
+
 ## The connection, step by step (`WattPilotService.StartAsync`)
 
 **`StartAsync` may be called on a running service.** It ends the connection it has first - cancel, await the

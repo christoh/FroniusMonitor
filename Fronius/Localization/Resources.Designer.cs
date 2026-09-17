@@ -5514,5 +5514,86 @@ namespace De.Hochstaetter.Fronius.Localization {
             }
         }
         
+            
+        /// <summary>
+        ///   Looks up a localized string similar to Power Flow.
+        /// </summary>
+        public static string PowerFlow {
+            get {
+                return ResourceManager.GetString("PowerFlow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Solar.
+        /// </summary>
+        public static string Solar {
+            get {
+                return ResourceManager.GetString("Solar", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to House.
+        /// </summary>
+        public static string House {
+            get {
+                return ResourceManager.GetString("House", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rest of house.
+        /// </summary>
+        public static string RestOfHouse {
+            get {
+                return ResourceManager.GetString("RestOfHouse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Charging.
+        /// </summary>
+        public static string Charging {
+            get {
+                return ResourceManager.GetString("Charging", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Discharging.
+        /// </summary>
+        public static string Discharging {
+            get {
+                return ResourceManager.GetString("Discharging", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Feed-in.
+        /// </summary>
+        public static string FeedIn {
+            get {
+                return ResourceManager.GetString("FeedIn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Grid import.
+        /// </summary>
+        public static string GridImport {
+            get {
+                return ResourceManager.GetString("GridImport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Idle.
+        /// </summary>
+        public static string Idle {
+            get {
+                return ResourceManager.GetString("Idle", resourceCulture);
+            }
+        }
     }
 }

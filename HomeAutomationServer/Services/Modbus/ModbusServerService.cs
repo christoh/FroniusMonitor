@@ -74,6 +74,12 @@ public class ModbusServerService(
     {
         switch (e.Device.Device)
         {
+            // Before the single phase case, which it would otherwise match: a three phase consumer is an
+            // IPowerMeter1P too, and served as a single phase meter it would put a third of the truth on the
+            // bus. Nothing serves three phase consumers yet - see the TODO above - so a Wattpilot goes nowhere.
+            case IPowerConsumer3P:
+                break;
+
             case IPowerMeter1P { CanMeasurePower: true, EnergyConsumed: > 0 } meter:
             {
                 var mapping = Parameters.Mappings.SingleOrDefault(m => string.Equals(m.SerialNumber, meter.SerialNumber, StringComparison.Ordinal));

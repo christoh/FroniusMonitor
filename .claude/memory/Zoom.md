@@ -8,6 +8,7 @@ paths:
   - HomeAutomationClient/HomeAutomationClient/Views/WattPilotDetailsView.axaml
   - HomeAutomationClient/HomeAutomationClient/Views/MainView.axaml
   - HomeAutomationClient/HomeAutomationClient/Views/ChildWindow.axaml
+  - HomeAutomationClient/HomeAutomationClient/Views/PowerFlowView.axaml
 ---
 
 # Zooming a view (Avalonia)
@@ -46,6 +47,10 @@ That is the whole job. Where the scopes are today:
 - **`ChildWindow`**, so each detail page the desktop opens in a window of its own is covered by that window. It
   carries dialogs as well; they contain no `ZoomBox`, and a scope that finds none leaves the event alone, so their
   scroll viewers still scroll.
+
+- **`PowerFlowView`** carries a scope of its own as well, at the developer's request. Harmless beside the two
+  above: every scope puts its handlers on the same top level, and the first one to handle the wheel marks it
+  handled, so nothing zooms twice.
 
 Several boxes in one scope move **together** for the wheel and the keyboard, which is what "everything in the wrap
 panel" means: the four detail views each have one around the wrap panel of gauge group boxes, the dashboard one

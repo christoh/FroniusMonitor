@@ -386,6 +386,18 @@ public sealed partial class MainViewModel : ViewModelBase
         await new EnergyChartViewModel(new DialogParameters { Title = Loc.ElectricityPrice, IsResizeable = true }).ShowDialogAsync().ConfigureAwait(true);
     });
 
+    /// <summary>
+    /// The power flow page: the sources, the house and every metered consumer, with the power moving between
+    /// them. A page like a detail view, not a dialog like the price chart beside it in the View menu: inside the
+    /// main view on the browser and the phones, a window of its own on the desktop. One of it, so the key is fixed.
+    /// </summary>
+    [RelayCommand]
+    private Task ShowPowerFlow() => TaskExceptionHandler(() =>
+    {
+        pagePresenter.Show<PowerFlowView>(PowerFlowView.PageKey, Loc.PowerFlow, _ => { });
+        return Task.CompletedTask;
+    });
+
     [RelayCommand]
     private Task ShowDetails(IKeyedDevice device) => ShowDetails(device, updatesAddress: true);
 
