@@ -137,3 +137,7 @@ that drive the WPF app's own services; it builds and runs on Windows only and re
   example `Claude Code (Opus 5)`, `GitHub Copilot (GPT 5.6 Terra)`. The tool name on its own is not enough - which model wrote the change is part of the record.
   - If a human developer also made changes, commit under his authorship. Split each commit by authorship. That includes splitting by AI model and splitting by human and AI. You know that in advance so make sure to keep a history of authorships that you can use later.
   - If you cannot find out which AI model made a change, ask me. Do not guess without asking.
+- **Merge commits are commits.** Everything above applies to them: the AI authorship, a body that says what the
+  merged branch brings, and the same footer lines. `git merge` has no `--author`, so merge with
+  `git merge --no-ff --no-commit <branch>` and then `git commit --author="<name> <email>"` with the full message.
+  A bare `Merge branch 'x'` under the default identity is wrong, even though git offers it.
