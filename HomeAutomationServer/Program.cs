@@ -1,10 +1,8 @@
 using System.IO.Compression;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using De.Hochstaetter.Fronius.Crypto;
 using De.Hochstaetter.HomeAutomationServer.Hubs;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
-using De.Hochstaetter.HomeAutomationServer.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -80,7 +78,7 @@ internal class Program
             });
 
             settings.ModbusMappings.Add(new ModbusMapping());
-            // Shows the shape of the Toshiba section; with an empty user name nothing is collected.
+            // Shows the shape of the Toshiba section; with an empty username nothing is collected.
             settings.ToshibaHvac = new ToshibaHvacSettings();
             // Shows the shape of the price chart section. Without a postal code and a bearer only the market
             // prices are collected, which need no account at all.
@@ -245,7 +243,7 @@ internal class Program
 
         app.MapControllers();
         // The hub has a scheme of its own: a browser cannot set an Authorization header on a WebSocket handshake,
-        // so the connection authenticates with a short lived ticket instead. See HubTicketService.
+        // so the connection authenticates with a short-lived ticket instead. See HubTicketService.
         app.MapHub<HomeAutomationHub>("/hub").RequireAuthorization(policy => policy.RequireHubTicket());
 
         IoC.Update(app.Services);

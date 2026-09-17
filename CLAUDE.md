@@ -33,6 +33,10 @@ text to English.
 * If you edit a C# file and find dynamic, refactor the code to use reflection (or any other appropriate coding that is no problem on iOS).
 * If you need to use dynamic, please add a comment explaining why it is necessary.
 
+## Unused usings
+* When editing a .cs files, check for unused usings and remove them. They might create a project dependency.
+* Do not remove unused xmlns in XAML.
+
 ## Logging
 * Always guard logging with `if (Logger.IsEnabled(LogLevel.<WhatEverLevel>))`. This is important to avoid unnecessary string formatting and performance overhead when the log level is not enabled.
 
