@@ -142,7 +142,13 @@ public sealed partial class PowerFlowViewModel(IUpdateService updateService, IGe
 
     private void OnDeviceChanged(object? sender, PropertyChangedEventArgs e) => Rebuild();
 
-    private void Rebuild()
+    /// <summary>
+    /// While nobody can see the page - its window minimized, the app in the background - there is no snapshot to
+    /// build; the one built when it comes back reads the devices as they are then.
+    /// </summary>
+    private void Rebuild() => WhenShown(RebuildNow);
+
+    private void RebuildNow()
     {
         // Copies, because the collections are the service's and it adds to them on the same thread this runs on.
         // The site flow is all zeros until the first inverter reports; passed as null it reads as "nothing yet".

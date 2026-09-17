@@ -11,9 +11,15 @@ using Microsoft.Extensions.Logging;
 
 namespace De.Hochstaetter.HomeAutomationClient.Services;
 
-internal partial class UpdateService(IWebClientService webClient, ILogger<UpdateService> logger) : BindableBase, IUpdateService
+internal partial class UpdateService(IWebClientService webClient, IVisibilityService visibility, ILogger<UpdateService> logger) : BindableBase, IUpdateService
 {
     private HubConnection? hubConnection;
+
+    /// <summary>Opens the hub connection while somebody can see a window and drops it while nobody can; see <see cref="ConnectionGate"/>.</summary>
+    private ConnectionGate? gate;
+
+    /// <summary>Whether the user who logged in sees more than the inverters, which is what decides what <see cref="CatchUpAsync"/> asks for.</summary>
+    private bool seesAll;
 
     public event EventHandler<SitePowerFlowUpdatedEventArgs>? SitePowerFlowUpdated;
 
@@ -79,7 +85,7 @@ internal partial class UpdateService(IWebClientService webClient, ILogger<Update
     {
         // A guest sees the inverters only. The server would answer every other request with 403 and push nothing
         // else over the hub either; not asking spares the round trips and the error handling.
-        var seesAll = roles.SeesAllDevices();
+        seesAll = roles.SeesAllDevices();
 
         if (seesAll)
         {
@@ -144,16 +150,105 @@ internal partial class UpdateService(IWebClientService webClient, ILogger<Update
             })
             .Build();
 
-        await hubConnection.StartAsync().ConfigureAwait(false);
-
         // The handlers run on the thread SignalR delivers on and write straight through from there. The binding
         // system marshals for us, a bound collection as much as a bound property, so none of them dispatches.
+        // Registered before the connection is opened: the server greets a new connection with every device it has,
+        // and a message for a method nobody has registered yet is dropped.
         hubConnection.On<string, Gen24System>(nameof(Gen24System), OnGen24Update);
         hubConnection.On<string, FritzBoxDevice>(nameof(FritzBoxDevice), OnFritzBoxUpdate);
         hubConnection.On<string, WattPilot>(nameof(WattPilot), OnWattPilotUpdate);
         hubConnection.On<string, WattPilotUpdate>(nameof(WattPilotUpdate), OnWattPilotUpdateMessage);
         hubConnection.On<string, ToshibaHvacMappingDevice>(nameof(ToshibaHvacMappingDevice), OnToshibaHvacUpdate);
         hubConnection.On<string, EnergyChartData>(nameof(EnergyChartData), OnEnergyChartData);
+
+        // An automatic reconnect has a gap before it like any other, and the devices below were updated in it.
+        hubConnection.Reconnected += OnReconnected;
+        hubConnection.Closed += OnClosed;
+
+        // The gate opens the connection now - the first connect fails here, into the caller's error handling, the
+        // way it always did - and from then on closes and reopens it as the windows go out of sight and come back.
+        var connection = hubConnection;
+        gate = new ConnectionGate(visibility, connection.StartAsync, () => connection.StopAsync(), CatchUpAsync, logger);
+        await gate.StartAsync().ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Fetches what a dropped connection did not deliver. Two kinds of device push their state in different ways,
+    /// and only one of them needs this:
+    /// <list type="bullet">
+    /// <item>The Gen24 inverters and the Fritz!Box devices are pushed whole on every poll, and the server greets a
+    /// new connection with the whole of every device it has. Reconnecting is enough for them.</item>
+    /// <item>The Wattpilots, the Toshiba air conditioners and the price data are pushed when something changes -
+    /// the Wattpilot even as a delta of the properties that did. A change that fell into the gap is gone from the
+    /// hub, so they are fetched over HTTP and put in place through the same handlers a push goes through.</item>
+    /// </list>
+    /// A guest is not asked for any of it: the server would answer 403, and a guest sees the inverters only.
+    /// </summary>
+    private async Task CatchUpAsync()
+    {
+        if (!seesAll)
+        {
+            return;
+        }
+
+        if (logger.IsEnabled(LogLevel.Information))
+        {
+            logger.LogInformation("Fetching the devices whose changes the hub does not repeat.");
+        }
+
+        var wattPilots = await webClient.GetWattPilots().ConfigureAwait(false);
+
+        if (wattPilots is { Status: HttpStatusCode.OK, Payload: { } pilots })
+        {
+            pilots.Apply(pair => OnWattPilotUpdate(pair.Key, pair.Value));
+        }
+
+        var toshibaDevices = await webClient.GetToshibaHvacDevices().ConfigureAwait(false);
+
+        if (toshibaDevices is { Status: HttpStatusCode.OK, Payload: { } hvacDevices })
+        {
+            hvacDevices.Apply(pair => OnToshibaHvacUpdate(pair.Key, pair.Value));
+        }
+
+        // 404 where the server collects no energy data, which is not an error; the chart then stays as it was.
+        var energyData = await webClient.GetEnergyData().ConfigureAwait(false);
+
+        if (energyData is { Status: HttpStatusCode.OK, Payload: { } data })
+        {
+            OnEnergyChartData(EnergyChartData.DeviceId, data);
+        }
+    }
+
+    private async Task OnReconnected(string? connectionId)
+    {
+        try
+        {
+            await CatchUpAsync().ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Catching up after the automatic reconnect failed.");
+        }
+    }
+
+    /// <summary>
+    /// A connection the automatic reconnect has given up on - the server was gone for longer than its retries
+    /// last - would stay closed for good otherwise. The gate is told, and opens it again with its own patience as
+    /// long as somebody looks. A close without an error is one the gate asked for itself.
+    /// </summary>
+    private Task OnClosed(Exception? error)
+    {
+        if (error != null)
+        {
+            if (logger.IsEnabled(LogLevel.Warning))
+            {
+                logger.LogWarning(error, "The hub connection was lost.");
+            }
+
+            gate?.NotifyDisconnected();
+        }
+
+        return Task.CompletedTask;
     }
 
     /// <summary>
@@ -164,8 +259,16 @@ internal partial class UpdateService(IWebClientService webClient, ILogger<Update
     /// </summary>
     public async Task StopAsync()
     {
+        if (gate != null)
+        {
+            await gate.StopAsync().ConfigureAwait(false);
+            gate = null;
+        }
+
         if (hubConnection != null)
         {
+            hubConnection.Reconnected -= OnReconnected;
+            hubConnection.Closed -= OnClosed;
             await hubConnection.DisposeAsync().ConfigureAwait(false);
             hubConnection = null;
         }

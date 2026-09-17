@@ -78,6 +78,9 @@ public partial class PowerFlowView : ContentPage
         Stage.LayoutUpdated += (_, _) => Route();
         ActualThemeVariantChanged += (_, _) => Recolor();
 
+        // The view model skips its snapshots while the page cannot be seen, and the frames stop with it.
+        ViewVisibility.Follow(this);
+
         Loaded += (_, _) =>
         {
             if (viewModel is { } model)
@@ -86,7 +89,11 @@ public partial class PowerFlowView : ContentPage
             }
 
             RequestRefresh();
-            StartFrames();
+
+            if (viewModel is not { IsShown: false })
+            {
+                StartFrames();
+            }
         };
 
         Unloaded += (_, _) =>
@@ -117,9 +124,25 @@ public partial class PowerFlowView : ContentPage
     /// <summary>A snapshot may arrive from the hub's thread; the items are folded on the UI thread, once per burst.</summary>
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(PowerFlowViewModel.Snapshot))
+        switch (e.PropertyName)
         {
-            RequestRefresh();
+            case nameof(PowerFlowViewModel.Snapshot):
+                RequestRefresh();
+                break;
+
+            case nameof(PowerFlowViewModel.IsShown):
+                // No frames for a page nobody sees: they would advance dashes that are never drawn. Set on the UI
+                // thread by ViewVisibility, so the frame request is made where it has to be made.
+                if (viewModel is { IsShown: true })
+                {
+                    StartFrames();
+                }
+                else
+                {
+                    isRunning = false;
+                }
+
+                break;
         }
     }
 

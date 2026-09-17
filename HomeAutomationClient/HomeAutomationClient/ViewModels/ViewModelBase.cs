@@ -10,6 +10,52 @@ public abstract partial class ViewModelBase : BindableBase
 
     public bool IsBusy => BusyText != null;
 
+    /// <summary>
+    /// Whether the user can see the view this model drives: it is in a window that is shown and not minimized,
+    /// and the app is not in the background. The view sets it, through <c>ViewVisibility.Follow</c>; a view model
+    /// only reads it, and mostly through <see cref="WhenShown"/>. True until a view says otherwise, so a model
+    /// without such a view behaves as it always did.
+    /// </summary>
+    [ObservableProperty]
+    public partial bool IsShown { get; set; } = true;
+
+    /// <summary>What <see cref="WhenShown"/> was asked to do while the view could not be seen, to be done once it can.</summary>
+    private Action? whenShown;
+
+    /// <summary>
+    /// Does <paramref name="work"/> now if the view is shown, or once, when it is shown again, if it is not. For
+    /// the reaction to an update from the service: a page nobody can see has no reason to rebuild itself on every
+    /// report, and one rebuild when it comes back brings it up to date. Only the last piece of work asked for is
+    /// kept, which is right for work that reads the current state and wrong for anything that must not be lost.
+    /// </summary>
+    /// <remarks>
+    /// The work may be asked for on the hub's thread while <see cref="IsShown"/> flips on the UI thread. Neither
+    /// order loses it: if the view is shown by the time the work is stored, the second look runs it.
+    /// </remarks>
+    protected void WhenShown(Action work)
+    {
+        if (IsShown)
+        {
+            work();
+            return;
+        }
+
+        whenShown = work;
+
+        if (IsShown && Interlocked.Exchange(ref whenShown, null) is { } pending)
+        {
+            pending();
+        }
+    }
+
+    partial void OnIsShownChanged(bool value)
+    {
+        if (value && Interlocked.Exchange(ref whenShown, null) is { } pending)
+        {
+            pending();
+        }
+    }
+
     public virtual Task Initialize()
     {
         return Task.CompletedTask;

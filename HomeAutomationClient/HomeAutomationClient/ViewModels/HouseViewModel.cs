@@ -111,7 +111,14 @@ public sealed partial class HouseViewModel : ViewModelBase
         }
     }
 
-    private void Update()
+    /// <summary>
+    /// While nobody can see the dashboard - the main window minimized, the browser tab hidden, a detail page over
+    /// it on a phone - the figures are not worked out; once it is back, they are worked out from the devices as
+    /// they are then.
+    /// </summary>
+    private void Update() => WhenShown(UpdateNow);
+
+    private void UpdateNow()
     {
         double? carPower;
         double carPowerMaximum;
