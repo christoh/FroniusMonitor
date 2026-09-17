@@ -21,8 +21,10 @@ ViewModelBase          HomeAutomationClient/ViewModels/ViewModelBase.cs   (abstr
 - **`BusyText` / `IsBusy`** - the busy overlay (`c:BusyAnimation`) binds to them. `IsBusy` is `BusyText != null`,
   so `BusyText = string.Empty` means "busy, but show no caption" and `BusyText = null` means "not busy". The
   property is `virtual`, so a view model may override it to route the busy state somewhere else.
-- **`Task Initialize()`** - virtual, does nothing by default. Views call it after setting the `DataContext`
-  (`_ = viewModel.Initialize();`), so it is the place for async start-up work.
+- **`Task Initialize()`** - virtual, does nothing by default. Views call it after setting the `DataContext`, so
+  it is the place for async start-up work - through `ViewModelBase.HandleTaskExceptions(viewModel.Initialize)`,
+  never `_ = viewModel.Initialize();`: a start-up that throws would otherwise be lost or end the app (the
+  page and main views since 2026-09-17; the dialog views in `Views/Dialogs` still discard the task).
 - **`TaskExceptionHandler(Func<Task> task)`** - wrap the body of a `[RelayCommand]` in it: it awaits the task,
   shows any exception in a message box and always clears `BusyText` afterwards. See the commands in
   `DashboardViewModel`.

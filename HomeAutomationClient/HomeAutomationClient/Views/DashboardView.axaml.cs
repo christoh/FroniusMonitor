@@ -11,7 +11,7 @@ public partial class DashboardView : ContentPage
     {
         InitializeComponent();
         DataContext = viewModel = IoC.GetRegistered<DashboardViewModel>();
-        _ = viewModel.Initialize();
+        ViewModelBase.HandleTaskExceptions(viewModel.Initialize);
 
         Loaded += (_, _) =>
         {

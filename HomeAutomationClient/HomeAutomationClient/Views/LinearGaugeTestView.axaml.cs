@@ -6,9 +6,8 @@ public partial class LinearGaugeTestView : UserControl
 
     public LinearGaugeTestView()
     {
-        ;
         InitializeComponent();
         DataContext = viewModel;
-        _ = viewModel.Initialize();
+        ViewModelBase.HandleTaskExceptions(viewModel.Initialize);
     }
 }
