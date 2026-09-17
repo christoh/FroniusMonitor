@@ -7,6 +7,10 @@ public partial class MainView : UserControl
         MainViewModel? mainViewModel = IoC.TryGetRegistered<MainViewModel>();
         InitializeComponent();
         DataContext = mainViewModel;
-        _ = mainViewModel?.Initialize();
+
+        if (mainViewModel is { })
+        {
+            ViewModelBase.HandleTaskExceptions(mainViewModel.Initialize);
+        }
     }
 }

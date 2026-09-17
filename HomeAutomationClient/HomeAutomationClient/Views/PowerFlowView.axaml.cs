@@ -80,7 +80,11 @@ public partial class PowerFlowView : ContentPage
 
         Loaded += (_, _) =>
         {
-            _ = viewModel?.Initialize();
+            if (viewModel is { } model)
+            {
+                ViewModelBase.HandleTaskExceptions(model.Initialize);
+            }
+
             RequestRefresh();
             StartFrames();
         };
