@@ -275,8 +275,17 @@
                     </StackPanel>
                 </HeaderedContentControl>
 
-                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.ΔAcPhaseVoltageFeedIn}"
-                                        IsVisible="{Binding DeltaAcPhaseVoltageFeedIn}">
+                <!-- Two reasons to be away: the user switched the group off, or the inverter is not
+                     synchronized to the grid - below 10 Hz it is off, starting up or in standby, and every
+                     difference in here is then the grid's own voltage rather than a difference. Same limit as
+                     the ΔFrequency gauge further down. -->
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.ΔAcPhaseVoltageFeedIn}">
+                    <HeaderedContentControl.IsVisible>
+                        <MultiBinding Converter="{co:AllTrue}">
+                            <Binding Path="DeltaAcPhaseVoltageFeedIn" />
+                            <Binding Path="Gen24System.Sensors?.Inverter?.InverterFrequency" Converter="{co:IsInRange Minimum=10}" />
+                        </MultiBinding>
+                    </HeaderedContentControl.IsVisible>
                     <StackPanel Orientation="Horizontal">
                         <StackPanel.Styles>
                             <Style Selector="c|HalfCircleGauge">
@@ -358,8 +367,17 @@
                     </StackPanel>
                 </HeaderedContentControl>
 
-                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.ΔAcLineVoltageFeedIn}"
-                                        IsVisible="{Binding DeltaAcLineVoltageFeedIn}">
+                <!-- Two reasons to be away: the user switched the group off, or the inverter is not
+                     synchronized to the grid - below 10 Hz it is off, starting up or in standby, and every
+                     difference in here is then the grid's own voltage rather than a difference. Same limit as
+                     the ΔFrequency gauge further down. -->
+                <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.ΔAcLineVoltageFeedIn}">
+                    <HeaderedContentControl.IsVisible>
+                        <MultiBinding Converter="{co:AllTrue}">
+                            <Binding Path="DeltaAcLineVoltageFeedIn" />
+                            <Binding Path="Gen24System.Sensors?.Inverter?.InverterFrequency" Converter="{co:IsInRange Minimum=10}" />
+                        </MultiBinding>
+                    </HeaderedContentControl.IsVisible>
                     <StackPanel Orientation="Horizontal">
                         <StackPanel.Styles>
                             <Style Selector="c|HalfCircleGauge">
