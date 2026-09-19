@@ -51,5 +51,8 @@ internal static class TestInjector
         .AddSingleton<IGen24LocalizationService, Gen24LocalizationService>()
         // AwattarService resolves this in its own constructor, so the system test that builds one cannot put it
         // in place itself. Nothing else in the solution asks the injector for the WPF app's settings.
-        .AddSingleton<SettingsBase, TestSettings>();
+        .AddSingleton<SettingsBase, TestSettings>()
+        // The Solar Web switch, which the house block and the power flow page take. The app's is the main view
+        // model; a test that wants to throw it registers its own instance over this one and holds on to it.
+        .AddSingleton<IPowerDisplayOptions, FakePowerDisplayOptions>();
 }

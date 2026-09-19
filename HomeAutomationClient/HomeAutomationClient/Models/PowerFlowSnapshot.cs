@@ -131,12 +131,17 @@ public sealed record PowerFlowSnapshot(PowerFlowNode? Grid, IReadOnlyList<PowerF
     /// The name of a tracker from its number, the inverter's own words where they are known - the caller has the
     /// inverter's localization, this record does not. "MPPT 1" where nothing is passed.
     /// </param>
-    public static PowerFlowSnapshot From(IReadOnlyList<KeyedGen24System> inverters, Gen24PowerFlow? site, IReadOnlyList<IKeyedDevice> consumers, Func<int, string>? trackerName = null)
+    /// <param name="includeInverterPower">
+    /// "Solar Web" mode, see <see cref="IPowerDisplayOptions.IncludeInverterPower"/>. The house counts the
+    /// inverters' loss as its own consumption, and since the loss is nothing a plug can measure, what is left of
+    /// it after the metered consumers lands in the rest of the house - which is where everything unmetered goes.
+    /// </param>
+    public static PowerFlowSnapshot From(IReadOnlyList<KeyedGen24System> inverters, Gen24PowerFlow? site, IReadOnlyList<IKeyedDevice> consumers, Func<int, string>? trackerName = null, bool includeInverterPower = false)
     {
         trackerName ??= number => $"MPPT {number}";
 
         // The house figures are the dashboard's: the whole load, cars included, and the same self-sufficiency.
-        var house = HousePower.From(site, carPower: null);
+        var house = HousePower.From(site, carPower: null, includeInverterPower);
         var houseNode = new PowerFlowNode(HouseKey, PowerFlowNodeKind.House, string.Empty, house.HouseConsumption);
         var grid = site is null ? null : new PowerFlowNode(GridKey, PowerFlowNodeKind.Grid, string.Empty, site.GridPowerCorrected);
 

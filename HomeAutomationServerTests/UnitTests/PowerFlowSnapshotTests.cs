@@ -67,6 +67,26 @@ public sealed class PowerFlowSnapshotTests
         Assert.Equal(5100d / 5550 * 100, snapshot.SelfConsumption!.Value, 6);
     }
 
+    /// <summary>
+    /// "Solar Web" mode: the inverters' loss is part of what the house consumes. Nothing measures it, so it ends
+    /// up in the rest of the house together with everything else that has no plug of its own.
+    /// </summary>
+    [Fact]
+    public void Solar_web_mode_puts_the_inverter_loss_into_the_house_and_the_rest_of_it()
+    {
+        // The site of Site(): 6910 W off the roof, 1120 W into the battery, 5550 W out as AC - 240 W lost.
+        Assert.Equal(240, Site().PowerLoss);
+
+        var snapshot = PowerFlowSnapshot.From([Inverter("inv", 3620, 3290, 5550)], Site(), [Plug("hp", "Heat pump", 620)], includeInverterPower: true);
+
+        Assert.Equal(5340, snapshot.House.Power);
+        Assert.Equal(5340 - 620, snapshot.Consumers[^1].Power);
+
+        // The metered consumer is what it measures, and the grid is what the meter says, switch or no switch.
+        Assert.Equal(620, snapshot.Consumers[0].Power);
+        Assert.Equal(-450, snapshot.Grid!.Power);
+    }
+
     [Fact]
     public void A_tracker_is_named_in_the_inverters_words_when_the_caller_has_them()
     {

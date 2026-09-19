@@ -7,6 +7,7 @@ paths:
   - HomeAutomationClient/HomeAutomationClient/Views/PowerFlowView.axaml.cs
   - HomeAutomationClient/HomeAutomationClient/App.axaml.cs
   - HomeAutomationClient/HomeAutomationClient/ViewModels/MainViewModel.cs
+  - HomeAutomationClient/HomeAutomationClient/Contracts/IPowerDisplayOptions.cs
   - HomeAutomationClient/HomeAutomationClient/Converters/PowerFlowConverters.cs
   - HomeAutomationClient/HomeAutomationClient/App.axaml
   - HomeAutomationClient/HomeAutomationClient/Views/MainView.axaml
@@ -93,9 +94,16 @@ grid figure, which the grid card says already.
 `PowerFlowSnapshot.From(inverters, site, consumers)` is the arithmetic, a pure function with its tests in
 `PowerFlowSnapshotTests`. Nothing is computed that the dashboard does not have already:
 
-- **The house is `HousePower.From(site, carPower: null)`**: the whole load, cars included, and the same
-  self-sufficiency. The signs are the Gen24's (see [[House]]): a battery is positive while it discharges, the
-  grid positive while the house imports, `LoadPower` negative while the house draws.
+- **The house is `HousePower.From(site, carPower: null, includeInverterPower)`**: the whole load, cars included,
+  and the same self-sufficiency. The signs are the Gen24's (see [[House]]): a battery is positive while it
+  discharges, the grid positive while the house imports, `LoadPower` negative while the house draws.
+- **"Solar Web" mode** (2026-09-19) is that last argument: the inverters' loss counts as consumption of the
+  house. Nothing measures a loss, so what is left of it after the metered consumers lands in the rest of the
+  house, which is where everything without a plug of its own goes. The grid card, the inverter cards and the
+  trackers are untouched, and so are the two ratios - [[House]] has the whole rule and the reasons. The switch
+  arrives as `IPowerDisplayOptions`, which `MainViewModel` implements; `PowerFlowViewModel` follows its
+  `PropertyChanged` **between `Initialize` and `Stop`**, like everything else it follows, and rebuilds the
+  snapshot when it fires, because no device announces a switch.
 - **Per inverter** the inverter card reads `Sensors.PowerFlow.InverterAcPower` and is named
   `KeyedGen24System.ToString()`, the system name. **The trackers are `PowerFlowSnapshot.Trackers`**, the one
   place that knows which sensor is which tracker: `Sensors.Inverter.Solar1Power` and `Solar2Power` today, two
@@ -252,6 +260,8 @@ fit scrolls, and Ctrl with the wheel scales the picture.
 
 - `PowerFlowSnapshotTests` - the arithmetic, the signs, who takes part, idle, the rest of the house.
 - `PowerFlowViewModelItemsTests` - the folding: figures in place, structure changes and only those.
+- `PowerFlowViewModelTests` - the Solar Web switch: a new snapshot when it is thrown, and nothing heard after
+  `Stop`.
 - `PowerFlowViewTests` (headless, in the Avalonia collection) - the page in its window at the declared size, a
   card per node - trackers and battery included - and a wire with a stroke to every one of them, idle ones too;
   a reading that updates a card **without rebuilding it** (same `Border`, same item); a consumer that appears and
