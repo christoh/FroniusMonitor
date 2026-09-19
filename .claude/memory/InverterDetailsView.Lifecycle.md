@@ -167,6 +167,10 @@ multitasking. Therefore:
   has not produced its first value cannot take a group away; the frequency is a `false` of its own through
   `IsInRange`'s `Unknown=False`, which is a decision about the reading and not about the binding. The ΔFrequency gauge is gated alone rather than by its group, because the two
   gauges beside it in that group are readings and not differences.
+  **This is the Avalonia client only.** The WPF window keeps both groups on screen whatever the frequency, and
+  that is the developer's decision of 2026-09-19, not an oversight: its menu has a switch per group and the user
+  turns them off there. Do not carry the rule over - the ΔFrequency gauge is the only one of the three that the
+  WPF app hides by itself, because it has no switch of its own to be turned off with.
 
 ## Known gaps
 

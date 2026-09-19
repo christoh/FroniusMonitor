@@ -39,6 +39,13 @@ Everything that shows cos(phi) carries it: in the Avalonia client the groups of 
 **The read-out never sees it.** It is built from the value: `Gauge2Text` in both apps for the half circle, and
 `SetValueTextBlock` for the WPF linear gauge, which reads `gauge.Value` unless `ShowPercent` is on.
 
+## The two apps are alike, but not the same app
+
+Where they differ, it is a decision and not a gap. The delta frequency gauge hides itself in both, but **the two
+Δ voltage groups of the inverter window hide themselves in the Avalonia client only** (2026-09-19): the WPF menu
+has a switch per group, so the user turns those off there, while the delta frequency gauge has no switch of its
+own in either app. See [[InverterDetailsView.Lifecycle]].
+
 ## One place works out where the needle stands
 
 Both apps compute the fraction of the scale **once**, and both templates ask for it:
