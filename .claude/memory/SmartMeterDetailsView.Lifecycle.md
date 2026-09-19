@@ -62,9 +62,21 @@ status codes, which is what this view wants.
 The frequency gauge uses `ValueStringFormat="N1"`, unlike the inverter's `N3`: the smart meter reports the
 frequency with less precision.
 
+**`ColorAllTicks` comes from neither this view nor its view model.** The `WrapPanel.GaugeGroups` style in
+`Styles/DetailViews.axaml` sets it from the application resource `MainViewModel.ColorAllTicksResourceKey`, which
+the main view's switch writes. A resource and not a binding up the tree, because on the desktop this page stands
+in a window that has no `MainView` above it - see [[DialogSystem.Lifecycle]].
+
+**The cos(phi) gauges read the amount, not the value.** `DialShowsAbsoluteValue` (on `Gauge`, set in the group's
+style) puts the needle at `|cos phi|` while the read-out under it keeps the sign, asked for by the developer on
+2026-09-19: the sign says which way the reactive power flows, the dial is about how good the power factor is, and
+a needle crossing the whole scale when the sign flips reports a change that did not happen. It is read in
+`Gauge.SetValue`, where the fraction of the scale is worked out, so both kinds of gauge get it from one place;
+`Gauge2Text`, which builds the read-out, never sees it. The group's scale went from -1 to 1
+with `MidIsBad` to **0 to 1 with `LowIsBad`** in the same breath, and its `Origin` setter went with it: with the
+sign gone there is no lower half to show, and 1 is the good end of the dial rather than both ends being good.
+
 ## Known gaps
 
-- `ColorAllTicks` forwards to `DashboardViewModel` and carries the same `//BUG:` note as the other detail view
-  models; it should move to `MainViewModel` or to settings.
 - The view has no public parameterless constructor, so the build reports `AVLN3001` for it. Expected: the view is
   only ever resolved from the container. Do not add one.

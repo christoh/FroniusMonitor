@@ -55,13 +55,25 @@ Two details carried over from the WPF view: the neutral conductor gauges (`N`) d
 range and color map than the phases in the same group, and the power group mixes `W` for `N` with `kW` for the
 phases.
 
+**`ColorAllTicks` comes from neither this view nor its view model.** The `WrapPanel.GaugeGroups` style in
+`Styles/DetailViews.axaml` sets it from the application resource `MainViewModel.ColorAllTicksResourceKey`, which
+the main view's switch writes. A resource and not a binding up the tree, because on the desktop this page stands
+in a window that has no `MainView` above it - see [[DialogSystem.Lifecycle]].
+
+**The cos(phi) gauges read the amount, not the value.** `DialShowsAbsoluteValue` (on `Gauge`, set in the group's
+style) puts the needle at `|cos phi|` while the read-out under it keeps the sign, asked for by the developer on
+2026-09-19: the sign says which way the reactive power flows, the dial is about how good the power factor is, and
+a needle crossing the whole scale when the sign flips reports a change that did not happen. It is read in
+`Gauge.SetValue`, where the fraction of the scale is worked out, so both kinds of gauge get it from one place;
+`Gauge2Text`, which builds the read-out, never sees it. This group needed nothing else: its scale was already 0
+to 1 with `LowIsBad`, which is what the inverter's and the smart meter's were changed to at the same time. What
+did change here is a negative reading, which used to sit pinned at the left end and now reads as what it is.
+
 ## Known gaps
 
 - The current gauges fall back to 32 A per phase and 96 A in total when
   `MaximumChargingCurrentPossiblePerPhase` / `MaximumChargingCurrentPossible` are null. **These fallbacks are
   invented** - the WPF view had none. Replace them if the real device limits are known.
-- `ColorAllTicks` forwards to `DashboardViewModel` and carries the same `//BUG:` note as the other detail view
-  models; it should move to `MainViewModel` or to settings.
 - The WPF view's menu (settings, reboot, charging log, config PDF) and its multi-part title are not ported.
 - The view has no public parameterless constructor, so the build reports `AVLN3001` for it. Expected: the view is
   only ever resolved from the container. Do not add one.

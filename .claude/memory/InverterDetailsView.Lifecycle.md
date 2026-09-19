@@ -128,10 +128,44 @@ multitasking. Therefore:
   its third value. It only has meaning inside this view.
 - **Format split:** `Gauge.ValueStringFormat` formats the value read-out, `Gauge.StringFormat` the minimum/maximum
   labels. The WPF original used `StringFormat` plus the attached `MinimumMaximumStringFormat`.
+- **`ColorAllTicks` comes from neither this view nor its view model.** The `WrapPanel.GaugeGroups` style in
+  `Styles/DetailViews.axaml` sets it from the application resource `MainViewModel.ColorAllTicksResourceKey`, which
+  the main view's switch writes. A resource and not a binding up the tree, because on the desktop this page stands
+  in a window that has no `MainView` above it - see [[DialogSystem.Lifecycle]].
+- **The cos(phi) gauges read the amount, not the value.** `DialShowsAbsoluteValue` (on `Gauge`, set in that
+  group's style) puts the needle at `|cos phi|` while the read-out under it keeps the sign, asked for by the
+  developer on 2026-09-19: the sign says which way the reactive power flows, the dial is about how good the power
+  factor is, and a needle crossing the whole scale when the sign flips reports a change that did not happen. It is
+  read in `Gauge.SetValue`, where the fraction of the scale is worked out, so both kinds of gauge get it from one
+  place; `Gauge2Text`, which builds the read-out, never sees it. The group's scale went from -1 to 1 with
+  `MidIsBad` to **0 to 1 with `LowIsBad`** in the same breath, and its `Origin` setter went with it: with the sign
+  gone there is no lower half to show, and 1 is the good end of the dial rather than both ends being good. The
+  dashboard's `InverterControl` and `SmartMeterControl` carry the same setters on their cos(phi) linear gauges,
+  where the bar is the amount and the number printed beside it is the value; in `SmartMeterControl` the `Origin`
+  of the base `ControlTheme` has to be set back to 0, because that theme is a bipolar power gauge.
+- **The ΔFrequency gauge hides itself below 10 Hz** (`IsVisible` through `co:IsInRange Minimum=10` on
+  `Sensors?.Inverter?.InverterFrequency`, asked for by the developer on 2026-09-19). An inverter that is off,
+  starting up or in standby is not synchronized to the grid and reports next to no frequency, and the difference
+  to the grid's 50 Hz is then tens of thousands of mHz - a reading that says nothing and pins the needle. The two
+  frequency gauges beside it stay: that the inverter reports 0 Hz is worth seeing. A frequency that was never
+  reported at all counts as not synchronized too - the call sites pass `Unknown=False`, against that converter's
+  own default - because nothing then says the inverter *is* synchronized. The developer chose that on
+  2026-09-19 over the other reading, which was to keep a difference until one is proved meaningless.
+  The rule sits in a converter and not in the view model on purpose: the live readings reach the page through
+  `Gen24System.Sensors.…` bindings, and the view model is handed the `Gen24System` once per navigation and hears
+  nothing afterwards, so a view model property would need `PropertyChanged` subscriptions on two model levels -
+  exactly what "Attach and detach" above warns against. The same pattern is used for value driven visibility on the
+  dashboard (`IsVisible="{Binding Device.Sensors.Storage, Converter={co:Null2Bool}}"`).
+- **The two Δ voltage groups go the same way, whole** (added 2026-09-19, same limit, same converter): every gauge
+  in `ΔAcPhaseVoltageFeedIn` and `ΔAcLineVoltageFeedIn` is a difference between the inverter and the grid, so
+  below 10 Hz, and with no frequency reported at all, there is nothing left in them worth a frame. They therefore
+  have **two** reasons to be away - the user's switch and the reading - and their `IsVisible` is a `MultiBinding`
+  over both through `co:AllTrue`. That converter counts anything that is not `false` as true, so a binding which
+  has not produced its first value cannot take a group away; the frequency is a `false` of its own through
+  `IsInRange`'s `Unknown=False`, which is a decision about the reading and not about the binding. The ΔFrequency gauge is gated alone rather than by its group, because the two
+  gauges beside it in that group are readings and not differences.
 
 ## Known gaps
 
-- `InverterDetailsViewModel.ColorAllTicks` forwards to `DashboardViewModel` and carries a `//BUG:` note — it should
-  move to `MainViewModel` or to settings. Until then this view depends on `DashboardViewModel` being resolvable.
 - The WPF view's `CheckAtLeastOneView` hint bound to `IsNoneSelected`, and the `Inverter` menu
   (Settings / EnergyFlow / Modbus / EventLog) are not ported yet.

@@ -113,6 +113,10 @@
             <!-- Overrides the light/dark variant the OS or browser reported; see MainViewModel.IsDarkMode. -->
             <ToggleButton Classes="OnOff Labeled" Height="16" VerticalAlignment="Center" IsChecked="{Binding IsDarkMode}"
                           Content="{x:Static p:Resources.DarkMode}" />
+            <!-- "Solar Web" mode: the inverter's own loss counts as house consumption, on the dashboard and on
+                 the power flow page. See MainViewModel.IncludeInverterPower and IPowerDisplayOptions. -->
+            <ToggleButton Classes="OnOff Labeled" Height="16" VerticalAlignment="Center" IsChecked="{Binding IncludeInverterPower}"
+                          Content="{x:Static p:Resources.IncludeInverterPower}" />
         </StackPanel>
         <c:BusyAnimation BusyText="{Binding BusyText}" Grid.Row="1"/>
         <!-- Dims the views behind a modal dialog and swallows their pointer input. A non-modal dialog leaves it out,

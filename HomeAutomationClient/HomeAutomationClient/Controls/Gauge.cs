@@ -88,6 +88,20 @@ public abstract class Gauge : ContentControl
         set => SetValue(OriginProperty, value);
     }
 
+    /// <summary>
+    /// Puts the needle at the amount and lets the read-out keep the sign. For cos(phi), where the sign says which
+    /// way the reactive power flows while the dial is about how good the power factor is: -0.998 and +0.998 are
+    /// the same quality, and a needle that crosses the whole scale when the sign flips reports a change that did
+    /// not happen. The text below the dial is built from <see cref="Value"/> and is not touched by this.
+    /// </summary>
+    public static readonly StyledProperty<bool> DialShowsAbsoluteValueProperty = AvaloniaProperty.Register<Gauge, bool>(nameof(DialShowsAbsoluteValue));
+
+    public bool DialShowsAbsoluteValue
+    {
+        get => GetValue(DialShowsAbsoluteValueProperty);
+        set => SetValue(DialShowsAbsoluteValueProperty, value);
+    }
+
     public static readonly StyledProperty<string> LabelProperty = AvaloniaProperty.Register<Gauge, string>(nameof(Label), string.Empty);
 
     public string? Label
@@ -148,10 +162,26 @@ public abstract class Gauge : ContentControl
     private CancellationTokenSource? animationTokenSource;
     private Task? animationTask;
 
+    /// <summary>
+    /// What <see cref="DialShowsAbsoluteValue"/> changes, and the only place it is read: the subclasses draw from
+    /// <see cref="AnimatedValue"/>, which is what this produces, so both kinds of gauge get it from here.
+    /// </summary>
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+
+        if (change.Property == DialShowsAbsoluteValueProperty)
+        {
+            // Without the animation: this is a setter of the view, not a reading that moved.
+            SetValue(true);
+        }
+    }
+
     // ReSharper disable once AsyncVoidMethod
     protected virtual async void SetValue(bool sKipAnimation = false)
     {
-        var relativeValue = (Math.Max(Math.Min(Maximum, double.IsNaN(Value ?? NullValue) ? 0 : Value ?? NullValue), Minimum) - Minimum) / (Maximum - Minimum);
+        var value = double.IsNaN(Value ?? NullValue) ? 0 : Value ?? NullValue;
+        var relativeValue = (Math.Max(Math.Min(Maximum, DialShowsAbsoluteValue ? Math.Abs(value) : value), Minimum) - Minimum) / (Maximum - Minimum);
         relativeValue = double.IsFinite(relativeValue) ? relativeValue : Math.Min(Math.Max(Origin, 0), 1);
 
         try

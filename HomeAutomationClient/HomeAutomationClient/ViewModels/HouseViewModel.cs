@@ -24,21 +24,35 @@ public sealed partial class HouseViewModel : ViewModelBase
     private const double DefaultCarPowerMaximum = 11_000;
 
     private readonly IUpdateService updateService;
+    private readonly IPowerDisplayOptions options;
     private readonly List<WattPilot> wattPilots = [];
     private ObservableCollection<KeyedGen24System>? inverters;
     private ObservableCollection<IKeyedDevice>? consumers;
     private Gen24PowerFlow? flow;
 
-    public HouseViewModel(IUpdateService updateService)
+    public HouseViewModel(IUpdateService updateService, IPowerDisplayOptions options)
     {
         this.updateService = updateService;
+        this.options = options;
 
         if (updateService is INotifyPropertyChanged notifying)
         {
             notifying.PropertyChanged += OnUpdateServiceChanged;
         }
 
+        // The Solar Web switch changes what the consumption means, not what any device reports, so the figures
+        // are worked out again from the readings that are already there.
+        options.PropertyChanged += OnOptionsChanged;
+
         FollowEverything();
+    }
+
+    private void OnOptionsChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(IPowerDisplayOptions.IncludeInverterPower) or null or "")
+        {
+            Update();
+        }
     }
 
     [ObservableProperty, NotifyPropertyChangedFor(nameof(HasCars))]
@@ -169,7 +183,7 @@ public sealed partial class HouseViewModel : ViewModelBase
 
         // The site power flow is all zeros until the first inverter has reported; zeros would read as a house
         // that consumes nothing.
-        Power = HousePower.From(updateService.Inverters.Count > 0 ? flow : null, carPower);
+        Power = HousePower.From(updateService.Inverters.Count > 0 ? flow : null, carPower, options.IncludeInverterPower);
         PowerMaximum = updateService.SitePvPeakPower > 0 ? updateService.SitePvPeakPower : DefaultPowerMaximum;
         CarPowerMaximum = carPowerMaximum;
     }

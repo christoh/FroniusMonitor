@@ -27,7 +27,13 @@ public sealed record HousePower(double? HouseConsumption, double? CarPower, doub
 
     /// <param name="flow">The sum over all inverters, or <see langword="null"/> while there is no inverter, in which case only the cars are known.</param>
     /// <param name="carPower">What all Wattpilots draw together, or <see langword="null"/> where there is no Wattpilot.</param>
-    public static HousePower From(Gen24PowerFlow? flow, double? carPower)
+    /// <param name="includeInverterPower">
+    /// "Solar Web" mode, see <see cref="IPowerDisplayOptions.IncludeInverterPower"/>: the inverters' own loss
+    /// counts as consumption of the house. It is added to <see cref="HouseConsumption"/> and to nothing else -
+    /// <see cref="PowerLoss"/> still says what the loss is, and the two ratios below stay on the consumption the
+    /// house really has, so that throwing the switch does not make the house look less self-sufficient than it is.
+    /// </param>
+    public static HousePower From(Gen24PowerFlow? flow, double? carPower, bool includeInverterPower = false)
     {
         if (flow == null)
         {
@@ -36,6 +42,7 @@ public sealed record HousePower(double? HouseConsumption, double? CarPower, doub
 
         var consumption = -flow.LoadPowerCorrected;
         var production = flow.InverterAcPower;
+        var shownConsumption = consumption + (includeInverterPower ? flow.PowerLoss : 0);
 
         return new HousePower
         (
@@ -45,7 +52,7 @@ public sealed record HousePower(double? HouseConsumption, double? CarPower, doub
             // second inverter that reports to nobody - and briefly when a Wattpilot reading is newer than the
             // inverter's, so the cars appear to draw more than the whole load. Clamping at zero would hide all
             // three, and the first of them is worth seeing: it says the house is being fed from somewhere else.
-            HouseConsumption: consumption - (carPower ?? 0),
+            HouseConsumption: shownConsumption - (carPower ?? 0),
             CarPower: carPower,
             SolarPower: flow.SolarPower,
             PowerLoss: flow.PowerLoss,

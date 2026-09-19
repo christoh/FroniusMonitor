@@ -16,16 +16,17 @@
     <!--
     Everything the gauges of all four detail views have in common. What is left per view is the Background, which
     says whether the device is running and is the only thing the DetailsGauge template does not know by itself.
-    ColorAllTicks belongs to the singleton MainViewModel, because its switch sits in the main view. The gauges read
-    it from there directly, which keeps this a compiled binding and spares every detail view model a copy of it.
-    The `?.` is only there to satisfy ReSharper, which sees DataContext as nullable. MainView always has its view
-    model, and a binding whose source is null would simply not produce a value, so nothing depends on it.
+    ColorAllTicks belongs to the singleton MainViewModel, because its switch sits in the main view, and it arrives
+    here as an application resource that MainViewModel.PublishColorAllTicks writes - not as a binding up the tree.
+    A detail page has MainView above it in the browser and on the phones, but not on the desktop, where it stands
+    in a window of its own: a binding through the tree worked on the web and silently did nothing there. An
+    application resource is the one thing every window shares, and DynamicResource follows every later change.
     -->
     <Style Selector="WrapPanel.GaugeGroups c|HalfCircleGauge">
         <Setter Property="Width" Value="150" />
         <Setter Property="TickFill" Value="{DynamicResource TickFill}" />
         <Setter Property="HandFill" Value="{DynamicResource HandFill}" />
         <Setter Property="Template" Value="{DynamicResource DetailsGauge}" />
-        <Setter Property="ColorAllTicks" Value="{Binding $parent[v:MainView].((vm:MainViewModel)DataContext)?.ColorAllTicks}" />
+        <Setter Property="ColorAllTicks" Value="{DynamicResource ColorAllGaugeTicks}" />
     </Style>
 </Styles>
