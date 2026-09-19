@@ -107,11 +107,15 @@
                     <StackPanel Orientation="Horizontal">
                         <StackPanel.Styles>
                             <Style Selector="c|HalfCircleGauge">
-                                <Setter Property="Minimum" Value="-1" />
+                                <!-- The needle reads the amount and the text keeps the sign: the sign of
+                                     cos(phi) says which way the reactive power flows, and only the amount is
+                                     what the dial is about. Hence a scale from 0 to 1 rather than -1 to 1, with
+                                     the whole of it in use, and a color map that has 1 at the good end. -->
+                                <Setter Property="DialShowsAbsoluteValue" Value="True" />
+                                <Setter Property="Minimum" Value="0" />
                                 <Setter Property="Maximum" Value="1" />
-                                <Setter Property="Origin" Value=".5" />
                                 <Setter Property="ValueStringFormat" Value="N3" />
-                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.MidIsBad}" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.LowIsBad}" />
                             </Style>
                         </StackPanel.Styles>
 

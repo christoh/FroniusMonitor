@@ -17,6 +17,7 @@ paths:
   - HomeAutomationClient/HomeAutomationClient/Contracts/IPagePresenter.cs
   - HomeAutomationClient/HomeAutomationClient/Services/Presentation/**
   - HomeAutomationClient/HomeAutomationClient/ViewModels/MainViewModel.cs
+  - HomeAutomationClient/HomeAutomationClient/Styles/DetailViews.axaml
 ---
 
 # Lifecycle contract: the dialog system (Avalonia)
@@ -79,6 +80,21 @@ What the desktop does with each dialog:
 - **The menu bar asks where pages go.** `IPagePresenter.ShowsPagesInMainView` is what hides the Dashboard entry on
   the desktop (`MainViewModel.ShowDashboardMenu`): that entry is there to bring the dashboard back once a page has
   taken its place, and where every page opens in a window the dashboard is never covered.
+
+**Nothing above a page window is the app.** A page inside `MainView` can reach the singleton `MainViewModel`
+through the tree - `$parent[v:MainView]` and `$parent[Window]` both arrive - while a page in a window of its own
+has neither above it: the window is a root, and its tree ends at the page. A binding that walks upwards for
+application state therefore works on the browser and the phones and silently produces **nothing** on the desktop,
+where it leaves the property at its default and looks like a switch that does not work. That is exactly what
+happened to "Always fully color gauges" between 2026-09-15, when the detail pages were given windows, and
+2026-09-19.
+
+Application state that the detail pages read travels as an **application resource** instead, which every window
+shares whoever opened it: `MainViewModel.PublishColorAllTicks` writes `ColorAllTicks` under
+`MainViewModel.ColorAllTicksResourceKey` from the constructor and on every change, and the
+`WrapPanel.GaugeGroups c|HalfCircleGauge` style in `Styles/DetailViews.axaml` reads it with `DynamicResource`,
+which follows each later write. Do not put a `$parent[v:MainView]` binding back; the dashboard may use one,
+because the dashboard is `MainView` content on every head.
 
 **A `[RelayCommand]` that opens a dialog needs `AllowConcurrentExecutions = true` and a `CanExecute` of its own.**
 This is the trap of the whole change and it is invisible in the dialog code. The generated `AsyncRelayCommand` says `CanExecute` is false while
@@ -404,6 +420,10 @@ handover, one page per view type and the menu bar gate.
 veto rule. They close the test's main window, which is the owner of every dialog window, and assert that the
 dialog window goes with it and its caller is released - the shutdown itself cannot be driven from a test, because
 the headless session is one lifetime for the whole run.
+
+`GaugeColoringTests` pins the paragraph above: a gauge in a `GaugeGroups` panel in a window with no `MainView`
+anywhere follows the switch, a window opened later starts the way the switch stands, and the resource carries the
+value. The first of the three fails on the old `$parent[v:MainView]` binding, which is what it is for.
 
 The four `A_page_window_…` facts in `WindowPresenterTests` cover the initial size: both dimensions asked for, one
 of the two, neither, and a page asking for more than the screen has; `A_dialog_body_may_declare_the_size_its_window_opens_at`

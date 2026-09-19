@@ -6,6 +6,8 @@ using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Themes.Fluent;
 using Avalonia.Threading;
 using De.Hochstaetter.Fronius;
+using De.Hochstaetter.Fronius.Extensions;
+using De.Hochstaetter.HomeAutomationClient;
 using De.Hochstaetter.HomeAutomationClient.Contracts;
 using De.Hochstaetter.HomeAutomationClient.Services;
 using De.Hochstaetter.HomeAutomationClient.ViewModels;
@@ -14,8 +16,9 @@ using De.Hochstaetter.HomeAutomationServerTests.UnitTests.Fakes;
 namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests;
 
 /// <summary>
-/// The application these tests run in: the Fluent theme, because the controls under test use its resources, and
-/// the client's own loading indicators, because the busy animation of a dialog window is built from them.
+/// The application these tests run in: the Fluent theme, because the controls under test use its resources, the
+/// client's own loading indicators, because the busy animation of a dialog window is built from them, and the
+/// style of the detail view gauges, because what that one does is under test itself.
 /// </summary>
 /// <remarks>
 /// Not the client's <c>App</c>. That one builds the whole container and puts the main window up, which needs a
@@ -26,6 +29,31 @@ public sealed class HeadlessTestApplication : Application
     public override void Initialize()
     {
         Styles.Add(new FluentTheme());
+
+        // The real style, so that a test reads what the app does and not a copy of it. Its other setters reach
+        // for resources this application does not have; a DynamicResource that resolves to nothing simply leaves
+        // the property alone, which is what the gauges of these tests want anyway.
+        Styles.Add(new StyleInclude(new Uri("avares://HomeAutomationClient/"))
+        {
+            Source = new Uri("avares://HomeAutomationClient/Styles/DetailViews.axaml"),
+        });
+
+        // The client's own palette, taken from the real App.axaml rather than listed again here. A view that
+        // colors itself from code - every detail view does, through InverterBackgroundColor and its like - reads
+        // Application.Current.Resources.ThemeDictionaries[variant][key] directly, so the entries have to be on
+        // this application's own dictionary and not merely reachable through a merged one. Loading the client's
+        // App fills its Resources and touches nothing else: its theme handler never fires, because it never
+        // becomes Application.Current.
+        var client = new App();
+        client.Initialize();
+
+        foreach (var (variant, palette) in client.Resources.ThemeDictionaries)
+        {
+            // Entry by entry: a ResourceDictionary belongs to one owner, and that one is the client's App.
+            var copy = new ResourceDictionary();
+            ((ResourceDictionary)palette).Apply(entry => copy.Add(entry.Key, entry.Value));
+            Resources.ThemeDictionaries[variant] = copy;
+        }
 
         Resources.MergedDictionaries.Add(new ResourceInclude(new Uri("avares://HomeAutomationClient/"))
         {

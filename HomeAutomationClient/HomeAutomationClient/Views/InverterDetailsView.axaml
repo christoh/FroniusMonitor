@@ -422,7 +422,11 @@
                         <c:HalfCircleGauge Label="{x:Static p:Resources.Inverter}" StringFormat="N1"
                                            Value="{Binding Gen24System.Sensors?.Inverter?.InverterFrequency}" />
 
-                        <c:HalfCircleGauge Label="{x:Static p:Resources.ΔFrequency}" Minimum="-5" Maximum="5" UnitName="mHz">
+                        <!-- Below 10 Hz the inverter is not synchronized to the grid at all - it is off, starting
+                             up or in standby and reports next to nothing - so the difference to the grid is a
+                             reading of tens of thousands of mHz that means nothing. Gone rather than wrong. -->
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.ΔFrequency}" Minimum="-5" Maximum="5" UnitName="mHz"
+                                           IsVisible="{Binding Gen24System.Sensors?.Inverter?.InverterFrequency, Converter={co:IsInRange Minimum=10}}">
                             <c:HalfCircleGauge.Value>
                                 <MultiBinding Converter="{co:DeltaConverter}">
                                     <Binding Path="Gen24System.Sensors.Inverter.InverterFrequency" Converter="{co:Multiply Factor=1000}" />
@@ -509,11 +513,15 @@
                     <StackPanel Orientation="Horizontal">
                         <StackPanel.Styles>
                             <Style Selector="c|HalfCircleGauge">
-                                <Setter Property="Minimum" Value="-1" />
+                                <!-- The needle reads the amount and the text keeps the sign: the sign of
+                                     cos(phi) says which way the reactive power flows, and only the amount is
+                                     what the dial is about. Hence a scale from 0 to 1 rather than -1 to 1, with
+                                     the whole of it in use, and a color map that has 1 at the good end. -->
+                                <Setter Property="DialShowsAbsoluteValue" Value="True" />
+                                <Setter Property="Minimum" Value="0" />
                                 <Setter Property="Maximum" Value="1" />
-                                <Setter Property="Origin" Value=".5" />
                                 <Setter Property="ValueStringFormat" Value="N5" />
-                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.MidIsBad}" />
+                                <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.LowIsBad}" />
                             </Style>
                         </StackPanel.Styles>
 
