@@ -160,12 +160,18 @@
 
 						<Grid x:Name="PowerFactor" IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool PowerFactor}}" RowDefinitions="Auto,*">
 							<Grid.Resources>
+								<!-- Like the cos(phi) group of the detail views: the bar reads the amount, the number
+								     beside it keeps the sign. The sign says which way the reactive power flows, the bar
+								     is about how good the power factor is, so the scale runs from 0 to 1 with 1 at the
+								     good end, and the Origin of the base theme goes with the lower half it belonged to. -->
 								<ControlTheme x:Key="Local" TargetType="c:LinearGauge" BasedOn="{StaticResource PowerLinearGaugeStyle}">
+									<Setter Property="DialShowsAbsoluteValue" Value="True" />
 									<Setter Property="Maximum" Value="1" />
-									<Setter Property="Minimum" Value="-1" />
+									<Setter Property="Minimum" Value="0" />
+									<Setter Property="Origin" Value="0" />
 									<Setter Property="UnitName" Value="" />
 									<Setter Property="StringFormat" Value="N3" />
-									<Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.MidIsBad}" />
+									<Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.LowIsBad}" />
 								</ControlTheme>
 							</Grid.Resources>
 

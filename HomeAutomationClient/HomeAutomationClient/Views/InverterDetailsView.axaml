@@ -276,14 +276,14 @@
                 </HeaderedContentControl>
 
                 <!-- Two reasons to be away: the user switched the group off, or the inverter is not
-                     synchronized to the grid - below 10 Hz it is off, starting up or in standby, and every
-                     difference in here is then the grid's own voltage rather than a difference. Same limit as
-                     the ΔFrequency gauge further down. -->
+                     synchronized to the grid - below 10 Hz, or no frequency reported at all, it is off, starting
+                     up or in standby, and every difference in here is then the grid's own voltage rather than a
+                     difference. Same rule as the ΔFrequency gauge further down. -->
                 <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.ΔAcPhaseVoltageFeedIn}">
                     <HeaderedContentControl.IsVisible>
                         <MultiBinding Converter="{co:AllTrue}">
                             <Binding Path="DeltaAcPhaseVoltageFeedIn" />
-                            <Binding Path="Gen24System.Sensors?.Inverter?.InverterFrequency" Converter="{co:IsInRange Minimum=10}" />
+                            <Binding Path="Gen24System.Sensors?.Inverter?.InverterFrequency" Converter="{co:IsInRange Minimum=10, Unknown=False}" />
                         </MultiBinding>
                     </HeaderedContentControl.IsVisible>
                     <StackPanel Orientation="Horizontal">
@@ -368,14 +368,14 @@
                 </HeaderedContentControl>
 
                 <!-- Two reasons to be away: the user switched the group off, or the inverter is not
-                     synchronized to the grid - below 10 Hz it is off, starting up or in standby, and every
-                     difference in here is then the grid's own voltage rather than a difference. Same limit as
-                     the ΔFrequency gauge further down. -->
+                     synchronized to the grid - below 10 Hz, or no frequency reported at all, it is off, starting
+                     up or in standby, and every difference in here is then the grid's own voltage rather than a
+                     difference. Same rule as the ΔFrequency gauge further down. -->
                 <HeaderedContentControl Classes="GroupBox" Header="{x:Static p:Resources.ΔAcLineVoltageFeedIn}">
                     <HeaderedContentControl.IsVisible>
                         <MultiBinding Converter="{co:AllTrue}">
                             <Binding Path="DeltaAcLineVoltageFeedIn" />
-                            <Binding Path="Gen24System.Sensors?.Inverter?.InverterFrequency" Converter="{co:IsInRange Minimum=10}" />
+                            <Binding Path="Gen24System.Sensors?.Inverter?.InverterFrequency" Converter="{co:IsInRange Minimum=10, Unknown=False}" />
                         </MultiBinding>
                     </HeaderedContentControl.IsVisible>
                     <StackPanel Orientation="Horizontal">
@@ -442,9 +442,10 @@
 
                         <!-- Below 10 Hz the inverter is not synchronized to the grid at all - it is off, starting
                              up or in standby and reports next to nothing - so the difference to the grid is a
-                             reading of tens of thousands of mHz that means nothing. Gone rather than wrong. -->
+                             reading of tens of thousands of mHz that means nothing. Gone rather than wrong, and
+                             gone as well when no frequency was reported: what is not known is not synchronized. -->
                         <c:HalfCircleGauge Label="{x:Static p:Resources.ΔFrequency}" Minimum="-5" Maximum="5" UnitName="mHz"
-                                           IsVisible="{Binding Gen24System.Sensors?.Inverter?.InverterFrequency, Converter={co:IsInRange Minimum=10}}">
+                                           IsVisible="{Binding Gen24System.Sensors?.Inverter?.InverterFrequency, Converter={co:IsInRange Minimum=10, Unknown=False}}">
                             <c:HalfCircleGauge.Value>
                                 <MultiBinding Converter="{co:DeltaConverter}">
                                     <Binding Path="Gen24System.Sensors.Inverter.InverterFrequency" Converter="{co:Multiply Factor=1000}" />
