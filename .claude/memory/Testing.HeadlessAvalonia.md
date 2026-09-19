@@ -45,11 +45,16 @@ public sealed class SomethingTests
   collection happened to run first.
 - **Every such test belongs to `AvaloniaCollection`**, which is defined with `DisableParallelization`. Windows,
   the focus and the container are global to the session; two tests at once would see each other's.
-- **`HeadlessTestApplication` is not the client's `App`, but it does include the client's `Styles/DetailViews.axaml`.**
-  What that style does - where the gauges of a detail view get `ColorAllTicks` from - is under test, so the test
-  application includes the real file rather than a copy. Its other setters reach for resources this application
-  does not have, and a `DynamicResource` that resolves to nothing leaves the property alone. Add a style here only
-  for the same reason; everything else the tests need belongs in the test itself.
+- **`HeadlessTestApplication` is not the client's `App`, but it borrows two things from it.** The style
+  `Styles/DetailViews.axaml`, because what that one does - where the gauges of a detail view get `ColorAllTicks`
+  from - is under test, so the real file is included rather than a copy. And the **palette**: `Initialize` loads
+  the client's `App` purely to copy its `Resources.ThemeDictionaries` across, entry by entry into a dictionary of
+  its own, because a `ResourceDictionary` belongs to one owner. Without it every detail view throws
+  `KeyNotFoundException` on the variant, since `ApplicationExtensions.GetResource` reads
+  `Application.Current.Resources.ThemeDictionaries[variant][key]` **directly** - a merged dictionary would not be
+  seen, and that is also why the palette cannot simply be moved out of `App.axaml` into a file both could include.
+  Loading that `App` runs its XAML and nothing else: it never becomes `Application.Current`, so its theme handler
+  never fires and it builds no container.
 
 ## The two traps, both of which cost a round
 
@@ -104,6 +109,7 @@ reason, which is worth knowing before trying one.
 | `ZoomBoxTests` | Ctrl with the wheel and the keys, the limits, the steps, the scope on a view inside the window, the focused text box |
 | `ZoomPinchTests` | Pinch, with its events synthesized |
 | `PowerFlowViewTests` | The power flow page: its window at the declared size, a card per node and wires between them, a reading that updates a card without rebuilding it, a consumer that appears, a closed page that lets go - see [[PowerFlowPage.Lifecycle]] |
+| `InverterDetailsViewTests` | The inverter page with real gauges: the ΔFrequency gauge gone while the inverter is not synchronized, and back when it is - see [[InverterDetailsView.Lifecycle]] |
 | `GaugeColoringTests` | "Always fully color gauges" reaching a gauge in a window with no `MainView` above it, which is where the desktop puts a detail page - see [[DialogSystem.Lifecycle]] |
 | `HeadlessSmokeTest` | That the session is up at all - look here first when the whole collection fails |
 

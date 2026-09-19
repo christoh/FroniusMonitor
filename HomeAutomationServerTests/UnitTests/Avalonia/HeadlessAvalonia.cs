@@ -6,6 +6,8 @@ using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Themes.Fluent;
 using Avalonia.Threading;
 using De.Hochstaetter.Fronius;
+using De.Hochstaetter.Fronius.Extensions;
+using De.Hochstaetter.HomeAutomationClient;
 using De.Hochstaetter.HomeAutomationClient.Contracts;
 using De.Hochstaetter.HomeAutomationClient.Services;
 using De.Hochstaetter.HomeAutomationClient.ViewModels;
@@ -35,6 +37,23 @@ public sealed class HeadlessTestApplication : Application
         {
             Source = new Uri("avares://HomeAutomationClient/Styles/DetailViews.axaml"),
         });
+
+        // The client's own palette, taken from the real App.axaml rather than listed again here. A view that
+        // colors itself from code - every detail view does, through InverterBackgroundColor and its like - reads
+        // Application.Current.Resources.ThemeDictionaries[variant][key] directly, so the entries have to be on
+        // this application's own dictionary and not merely reachable through a merged one. Loading the client's
+        // App fills its Resources and touches nothing else: its theme handler never fires, because it never
+        // becomes Application.Current.
+        var client = new App();
+        client.Initialize();
+
+        foreach (var (variant, palette) in client.Resources.ThemeDictionaries)
+        {
+            // Entry by entry: a ResourceDictionary belongs to one owner, and that one is the client's App.
+            var copy = new ResourceDictionary();
+            ((ResourceDictionary)palette).Apply(entry => copy.Add(entry.Key, entry.Value));
+            Resources.ThemeDictionaries[variant] = copy;
+        }
 
         Resources.MergedDictionaries.Add(new ResourceInclude(new Uri("avares://HomeAutomationClient/"))
         {

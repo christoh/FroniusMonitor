@@ -132,6 +132,18 @@ multitasking. Therefore:
   `Styles/DetailViews.axaml` sets it from the application resource `MainViewModel.ColorAllTicksResourceKey`, which
   the main view's switch writes. A resource and not a binding up the tree, because on the desktop this page stands
   in a window that has no `MainView` above it - see [[DialogSystem.Lifecycle]].
+- **The ΔFrequency gauge hides itself below 10 Hz** (`IsVisible` through `co:IsInRange Minimum=10` on
+  `Sensors?.Inverter?.InverterFrequency`, asked for by the developer on 2026-09-19). An inverter that is off,
+  starting up or in standby is not synchronized to the grid and reports next to no frequency, and the difference
+  to the grid's 50 Hz is then tens of thousands of mHz - a reading that says nothing and pins the needle. The two
+  frequency gauges beside it stay: that the inverter reports 0 Hz is worth seeing. A frequency that was never
+  reported at all (null) is **not** treated as below the limit; `IsInRange.Unknown` is true, so the gauge stays
+  where it is and shows its own dashes rather than appearing and disappearing while the first update is on its way.
+  The rule sits in a converter and not in the view model on purpose: the live readings reach the page through
+  `Gen24System.Sensors.…` bindings, and the view model is handed the `Gen24System` once per navigation and hears
+  nothing afterwards, so a view model property would need `PropertyChanged` subscriptions on two model levels -
+  exactly what "Attach and detach" above warns against. The same pattern is used for value driven visibility on the
+  dashboard (`IsVisible="{Binding Device.Sensors.Storage, Converter={co:Null2Bool}}"`).
 
 ## Known gaps
 

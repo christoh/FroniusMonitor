@@ -422,7 +422,11 @@
                         <c:HalfCircleGauge Label="{x:Static p:Resources.Inverter}" StringFormat="N1"
                                            Value="{Binding Gen24System.Sensors?.Inverter?.InverterFrequency}" />
 
-                        <c:HalfCircleGauge Label="{x:Static p:Resources.ΔFrequency}" Minimum="-5" Maximum="5" UnitName="mHz">
+                        <!-- Below 10 Hz the inverter is not synchronized to the grid at all - it is off, starting
+                             up or in standby and reports next to nothing - so the difference to the grid is a
+                             reading of tens of thousands of mHz that means nothing. Gone rather than wrong. -->
+                        <c:HalfCircleGauge Label="{x:Static p:Resources.ΔFrequency}" Minimum="-5" Maximum="5" UnitName="mHz"
+                                           IsVisible="{Binding Gen24System.Sensors?.Inverter?.InverterFrequency, Converter={co:IsInRange Minimum=10}}">
                             <c:HalfCircleGauge.Value>
                                 <MultiBinding Converter="{co:DeltaConverter}">
                                     <Binding Path="Gen24System.Sensors.Inverter.InverterFrequency" Converter="{co:Multiply Factor=1000}" />
