@@ -27,7 +27,7 @@ namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 /// snapshot - the marshalling is the view's, as the interaction rule wants, the folding is this class's.
 /// </para>
 /// </remarks>
-public sealed partial class PowerFlowViewModel(IUpdateService updateService, IGen24LocalizationService gen24Loc) : ViewModelBase
+public sealed partial class PowerFlowViewModel(IUpdateService updateService, IGen24LocalizationService gen24Loc, IPowerDisplayOptions options) : ViewModelBase
 {
     private readonly List<INotifyPropertyChanged> followedDevices = [];
     private readonly Lock followLock = new();
@@ -58,6 +58,9 @@ public sealed partial class PowerFlowViewModel(IUpdateService updateService, IGe
             notifying.PropertyChanged += OnUpdateServiceChanged;
         }
 
+        // The Solar Web switch changes what the house consumes without any device saying anything.
+        options.PropertyChanged += OnOptionsChanged;
+
         FollowFlow();
         FollowDevices();
         return Task.CompletedTask;
@@ -77,6 +80,8 @@ public sealed partial class PowerFlowViewModel(IUpdateService updateService, IGe
         {
             notifying.PropertyChanged -= OnUpdateServiceChanged;
         }
+
+        options.PropertyChanged -= OnOptionsChanged;
 
         if (flow != null)
         {
@@ -98,6 +103,14 @@ public sealed partial class PowerFlowViewModel(IUpdateService updateService, IGe
     /// </summary>
     /// <returns>True when a card came or went, so the wires have to be drawn anew.</returns>
     public bool Apply() => Items.Apply(Snapshot);
+
+    private void OnOptionsChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(IPowerDisplayOptions.IncludeInverterPower) or null or "")
+        {
+            Rebuild();
+        }
+    }
 
     private void OnUpdateServiceChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -169,6 +182,6 @@ public sealed partial class PowerFlowViewModel(IUpdateService updateService, IGe
         // The site flow is all zeros until the first inverter reports; passed as null it reads as "nothing yet".
         // The trackers are named in the inverter's own words - "MPPT1", "MPPT2" in the Channels section of its
         // localization - the way the detail views name them.
-        Snapshot = PowerFlowSnapshot.From([.. updateService.Inverters], updateService.Inverters.Count > 0 ? flow : null, [.. updateService.AllPowerConsumers], number => gen24Loc.GetLocalizedString(Gen24LocalizationSection.Channels, $"MPPT{number}"));
+        Snapshot = PowerFlowSnapshot.From([.. updateService.Inverters], updateService.Inverters.Count > 0 ? flow : null, [.. updateService.AllPowerConsumers], number => gen24Loc.GetLocalizedString(Gen24LocalizationSection.Channels, $"MPPT{number}"), options.IncludeInverterPower);
     }
 }

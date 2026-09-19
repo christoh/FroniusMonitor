@@ -9,7 +9,7 @@ using WattPilotDetailsView = De.Hochstaetter.HomeAutomationClient.Views.WattPilo
 
 namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 
-public sealed partial class MainViewModel : ViewModelBase
+public sealed partial class MainViewModel : ViewModelBase, IPowerDisplayOptions
 {
     private const string ProductName = "hacc";
     private const string ProductVersion = "0.5.0.0";
@@ -144,6 +144,14 @@ public sealed partial class MainViewModel : ViewModelBase
             app.Resources[ColorAllTicksResourceKey] = ColorAllTicks;
         }
     }
+
+    /// <summary>
+    /// "Solar Web" mode - see <see cref="IPowerDisplayOptions.IncludeInverterPower"/>, which is the contract the
+    /// house block and the power flow page take this through rather than the whole main view model. Here because
+    /// its switch sits in the main view beside the other two and applies to every view that shows a consumption.
+    /// </summary>
+    [ObservableProperty]
+    public partial bool IncludeInverterPower { get; set; }
 
     /// <summary>
     /// Overrides whatever light or dark variant the OS, the browser or Avalonia's own default reported, so a user

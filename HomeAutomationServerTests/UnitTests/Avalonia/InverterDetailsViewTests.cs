@@ -159,15 +159,21 @@ public sealed class InverterDetailsViewTests
     private static IReadOnlyList<string?> CosPhiLabels => Gauges.Where(gauge => gauge.DialShowsAbsoluteValue).Select(gauge => gauge.Label).ToList();
 
     /// <summary>
-    /// A reading that has not arrived yet is not a reading below 10 Hz. The gauge shows its own dashes for it,
-    /// and the group does not jump about while the first update is on its way.
+    /// A frequency that was never reported is not a frequency of 50 Hz either: nothing says the inverter is
+    /// synchronized, so nothing that is a difference to the grid is shown - asked for by the developer on
+    /// 2026-09-19, over the other reading of it, which was to show a difference until one is proved meaningless.
     /// </summary>
     [Fact]
-    public Task A_frequency_that_was_never_reported_leaves_the_delta_where_it_is() => HeadlessAvalonia.RunAsync(async () =>
+    public Task A_frequency_that_was_never_reported_counts_as_not_synchronized() => HeadlessAvalonia.RunAsync(async () =>
     {
         Start(inverterFrequency: null, gridFrequency: null);
         await HeadlessAvalonia.SettleAsync();
 
-        Assert.True(GaugeOf(Resources.ΔFrequency).IsVisible);
+        Assert.False(GaugeOf(Resources.ΔFrequency).IsVisible);
+        Assert.False(GroupOf(Resources.ΔAcPhaseVoltageFeedIn).IsVisible);
+        Assert.False(GroupOf(Resources.ΔAcLineVoltageFeedIn).IsVisible);
+
+        // The readings themselves are still on the page, showing the dashes of a gauge with no value.
+        Assert.True(GaugeOf(Resources.Inverter).IsVisible);
     });
 }

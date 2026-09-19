@@ -2,6 +2,7 @@ using De.Hochstaetter.Fronius.Models.Charging;
 using De.Hochstaetter.Fronius.Models.Gen24;
 using De.Hochstaetter.HomeAutomationClient.Models;
 using De.Hochstaetter.HomeAutomationClient.ViewModels;
+using De.Hochstaetter.HomeAutomationServerTests.UnitTests.Fakes;
 
 namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests;
 
@@ -14,9 +15,32 @@ namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests;
 public sealed class HouseViewModelTests
 {
     private readonly FakeUpdateService service = new();
+    private readonly FakePowerDisplayOptions options = new();
     private readonly HouseViewModel house;
 
-    public HouseViewModelTests() => house = new HouseViewModel(service);
+    public HouseViewModelTests() => house = new HouseViewModel(service, options);
+
+    /// <summary>
+    /// The Solar Web switch is not a device and says nothing through the update service, so the block has to hear
+    /// it from the options themselves and work the figures out again from the readings it already has.
+    /// </summary>
+    [Fact]
+    public void Throwing_the_solar_web_switch_works_the_figures_out_again()
+    {
+        service.Inverters.Add(new KeyedGen24System { Key = "inv", Device = new Gen24System() });
+        service.SitePowerFlow.LoadPower = -3000;
+        service.SitePowerFlow.SolarPower = 6000;
+        service.SitePowerFlow.InverterAcPower = 5700;
+
+        Assert.Equal(3000, house.Power.HouseConsumption);
+
+        options.IncludeInverterPower = true;
+        Assert.Equal(3300, house.Power.HouseConsumption);
+        Assert.Equal(300, house.Power.PowerLoss);
+
+        options.IncludeInverterPower = false;
+        Assert.Equal(3000, house.Power.HouseConsumption);
+    }
 
     [Fact]
     public void The_cars_are_followed_in_the_collection_the_service_answers_now()

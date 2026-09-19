@@ -5,6 +5,7 @@ paths:
   - HomeAutomationClient/HomeAutomationClient/ViewModels/HouseViewModel.cs
   - HomeAutomationClient/HomeAutomationClient/Models/HousePower.cs
   - HomeAutomationClient/HomeAutomationClient/Views/DashboardView.axaml
+  - HomeAutomationClient/HomeAutomationClient/Contracts/IPowerDisplayOptions.cs
   - HomeAutomationClient/HomeAutomationClient/Misc/CollectionFollowing.cs
   - HomeAutomationServerTests/UnitTests/HouseViewModelTests.cs
   - HomeAutomationServerTests/UnitTests/Fakes/FakeUpdateService.cs
@@ -24,7 +25,8 @@ value and a unit, in two columns so the block stays flat:
 
 ## Where the numbers come from
 
-`Models/HousePower.From(Gen24PowerFlow? flow, double? carPower)` is the arithmetic, a pure function with its own
+`Models/HousePower.From(Gen24PowerFlow? flow, double? carPower, bool includeInverterPower = false)` is the
+arithmetic, a pure function with its own
 tests (`HousePowerTests`). `flow` is `IUpdateService.SitePowerFlow`, the sum over all inverters; `carPower` is the
 sum of `WattPilot.PowerTotal`, `null` where there is no Wattpilot.
 
@@ -46,6 +48,37 @@ sum of `WattPilot.PowerTotal`, `null` where there is no Wattpilot.
   0 %. Only `flow: null` leaves them null.
 - **No inverter yet** (`Inverters.Count == 0`): the view model passes `flow: null`, because the site power flow
   is all zeros until the first inverter reports and zeros would read as a house that consumes nothing.
+
+## "Solar Web" mode
+
+Added 2026-09-19, the WPF app's `AddInverterPowerToConsumption` under the name the developer uses for it. **The
+inverters' loss counts as consumption of the house**, the way Fronius' own portal reports it: `HousePower.From`
+adds `flow.PowerLoss` to the consumption when `includeInverterPower` is true, and the same switch reaches the
+power flow page (see [[PowerFlowPage.Lifecycle]]). The WPF app puts the same arithmetic in
+`MainWindow.OnPowerFlowChanged`, where it is spelled out as `LoadPowerCorrected + SolarPower + GridPowerCorrected
++ StoragePower` - that sum *is* `PowerLoss`, because the load is what the grid and the inverters deliver.
+
+What it does **not** touch, each on purpose:
+
+- **The loss itself stays on the block.** The developer asked for that explicitly: the loss row goes on showing
+  `PowerLoss`, so the figure that was added to the consumption is still there to be read.
+- **Self-sufficiency and own consumption stay on the real consumption.** Otherwise throwing the switch would make
+  the house look less self-sufficient than it is, which is an artefact of the display and not a change in the
+  house. The WPF app does not move them either.
+- **The cars** are what they draw, and the grid is what the meter says.
+
+On the power flow page one more thing follows from it: **each inverter card carries its own loss** there, because
+that page draws wires from a running sum and would otherwise show the site's loss as power coming out of an
+inverter that is switched off. See [[PowerFlowPage.Lifecycle]]. The dashboard has no such sum - its inverter
+controls show what the device reports, as they always have.
+
+The switch is `MainViewModel.IncludeInverterPower`, the third `ToggleButton` at the bottom of `MainView`, beside
+the gauge colouring and the dark mode. The block does not take the whole main view model for it: `MainViewModel`
+implements **`Contracts/IPowerDisplayOptions`**, a contract of that one property, registered in `App.axaml.cs`
+as the same singleton and faked in the tests by `FakePowerDisplayOptions`. It is an `INotifyPropertyChanged`, and
+`HouseViewModel` works the figures out again when it fires - a switch is not a device and says nothing through
+the update service. Like the other two switches, it is **not saved**: it is on for as long as the app runs. (The
+WPF app saves its copy with the settings.)
 
 ## Scales of the gauges
 

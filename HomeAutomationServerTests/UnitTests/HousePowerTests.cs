@@ -34,6 +34,33 @@ public sealed class HousePowerTests
         Assert.Equal(1200, power.CarPower);
     }
 
+    /// <summary>
+    /// "Solar Web" mode: what the inverter loses between the panels and its AC side counts as consumption of the
+    /// house, the way Fronius' own portal reports it.
+    /// </summary>
+    [Fact]
+    public void Solar_web_mode_adds_the_inverter_loss_to_the_house()
+    {
+        // 6000 W off the roof, 5700 W out of the inverter: 300 W lost on the way.
+        var flow = Flow(load: -3000, inverterAc: 5700, solar: 6000);
+        Assert.Equal(300, flow.PowerLoss);
+
+        var plain = HousePower.From(flow, carPower: 1200);
+        var solarWeb = HousePower.From(flow, carPower: 1200, includeInverterPower: true);
+
+        Assert.Equal(1800, plain.HouseConsumption);
+        Assert.Equal(2100, solarWeb.HouseConsumption);
+
+        // The cars are what they draw either way, and the loss is still shown as the loss it is.
+        Assert.Equal(1200, solarWeb.CarPower);
+        Assert.Equal(300, solarWeb.PowerLoss);
+
+        // The two ratios stay on the consumption the house really has, so that they do not move when the switch
+        // is thrown: the loss is the price of producing, not something the house asked for.
+        Assert.Equal(plain.SelfSufficiency, solarWeb.SelfSufficiency);
+        Assert.Equal(plain.SelfConsumption, solarWeb.SelfConsumption);
+    }
+
     [Fact]
     public void The_house_goes_negative_when_the_cars_draw_more_than_the_load()
     {
