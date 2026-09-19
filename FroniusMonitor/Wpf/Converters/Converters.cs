@@ -269,6 +269,46 @@ public class SocToColor : ConverterBase
     }
 }
 
+/// <summary>
+/// Whether a reading lies between <see cref="Minimum"/> and <see cref="Maximum"/>, both ends included and either
+/// of them optional. For hiding what a reading outside that range would turn into nonsense - the delta frequency
+/// of an inverter that is not synchronized to the grid, for instance.
+/// </summary>
+public abstract class RangeToAnything<T> : ConverterBase
+{
+    public double Minimum { get; set; } = double.NegativeInfinity;
+
+    public double Maximum { get; set; } = double.PositiveInfinity;
+
+    public T? InRange { get; set; }
+
+    public T? OutOfRange { get; set; }
+
+    /// <summary>What a value that is no number at all is worth, a null among them.</summary>
+    public T? Unknown { get; set; }
+
+    public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not IConvertible convertible || convertible.GetTypeCode() is < TypeCode.SByte or > TypeCode.Decimal)
+        {
+            return Unknown;
+        }
+
+        var number = convertible.ToDouble(culture);
+        return number >= Minimum && number <= Maximum ? InRange : OutOfRange;
+    }
+}
+
+/// <summary>A reading that has never arrived counts as out of range: nothing says it is inside.</summary>
+public class Range2Visibility : RangeToAnything<Visibility>
+{
+    public Range2Visibility()
+    {
+        InRange = Visibility.Visible;
+        OutOfRange = Unknown = Visibility.Collapsed;
+    }
+}
+
 public abstract class BoolToAnything<T> : ConverterBase
 {
     public T? True { get; set; }

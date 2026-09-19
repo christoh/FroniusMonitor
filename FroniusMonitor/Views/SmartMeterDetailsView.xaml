@@ -165,10 +165,12 @@
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style TargetType="c:Gauge" BasedOn="{StaticResource HalfCircleGauge}">
+                                <!-- See the cos(phi) group of InverterDetailsView: the needle reads the amount,
+                                     the text keeps the sign, so the scale runs from 0 to 1. -->
+                                <Setter Property="DialShowsAbsoluteValue" Value="True"/>
                                 <Setter Property="UnitName" Value=""/>
-                                <Setter Property="Origin" Value=".5"/>
-                                <Setter Property="GaugeColors" Value="{x:Static c:Gauge.MidIsBad}"/>
-                                <Setter Property="Minimum" Value="-1"/>
+                                <Setter Property="GaugeColors" Value="{x:Static c:Gauge.LowIsBad}"/>
+                                <Setter Property="Minimum" Value="0"/>
                                 <Setter Property="Maximum" Value="1"/>
                                 <Setter Property="StringFormat" Value="N3"/>
                             </Style>
