@@ -518,6 +518,10 @@
                                 <Setter Property="Origin" Value=".5" />
                                 <Setter Property="ValueStringFormat" Value="N5" />
                                 <Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.MidIsBad}" />
+                                <!-- The needle reads the amount, the text keeps the sign: the sign of cos(phi)
+                                     says which way the reactive power flows, and only the amount is what the
+                                     dial is about. -->
+                                <Setter Property="DialShowsAbsoluteValue" Value="True" />
                             </Style>
                         </StackPanel.Styles>
 

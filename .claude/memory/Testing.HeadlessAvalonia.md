@@ -109,7 +109,8 @@ reason, which is worth knowing before trying one.
 | `ZoomBoxTests` | Ctrl with the wheel and the keys, the limits, the steps, the scope on a view inside the window, the focused text box |
 | `ZoomPinchTests` | Pinch, with its events synthesized |
 | `PowerFlowViewTests` | The power flow page: its window at the declared size, a card per node and wires between them, a reading that updates a card without rebuilding it, a consumer that appears, a closed page that lets go - see [[PowerFlowPage.Lifecycle]] |
-| `InverterDetailsViewTests` | The inverter page with real gauges: the ΔFrequency gauge gone while the inverter is not synchronized, and back when it is - see [[InverterDetailsView.Lifecycle]] |
+| `InverterDetailsViewTests` | The inverter page with real gauges: the ΔFrequency gauge gone while the inverter is not synchronized, and the cos(phi) group's `DialShowsAbsoluteValue` - see [[InverterDetailsView.Lifecycle]] |
+| `GaugeDialTests` | `Gauge.DialShowsAbsoluteValue`: the needle at the amount, the value with its sign left alone. Setting the switch recomputes without the animation, which is what makes the needle readable in a test at all |
 | `GaugeColoringTests` | "Always fully color gauges" reaching a gauge in a window with no `MainView` above it, which is where the desktop puts a detail page - see [[DialogSystem.Lifecycle]] |
 | `HeadlessSmokeTest` | That the session is up at all - look here first when the whole collection fails |
 

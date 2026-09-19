@@ -46,20 +46,22 @@ public sealed class InverterDetailsViewTests
         {
             view.ViewModel.Gen24System = gen24System;
 
-            // The frequency group is one of the switches that start out off, and a group that is off is not in
-            // the tree at all. This test is about the gauge inside it, so it is switched on the way a user would.
+            // Both groups start out off, and a group that is off is not in the tree at all. These tests are
+            // about gauges inside them, so they are switched on the way a user would.
             view.ViewModel.Frequency = true;
+            view.ViewModel.PowerFactor = true;
         });
         return gen24System;
     }
 
     private static ChildWindow Window => HeadlessAvalonia.Windows.OfType<ChildWindow>().Single(window => window.Title == Title);
 
-    /// <summary>The gauge by the label the user reads, so the test breaks if the page stops showing that one.</summary>
-    private static HalfCircleGauge GaugeOf(string label) => Window
-        .GetVisualDescendants()
-        .OfType<HalfCircleGauge>()
-        .Single(gauge => gauge.Label == label);
+    /// <summary>
+    /// The gauge by the label the user reads, so the test breaks if the page stops showing that one. Single, not
+    /// First: the labels used here appear once across the groups these tests switch on, and a second one would
+    /// mean the test is no longer looking at what it thinks it is.
+    /// </summary>
+    private static HalfCircleGauge GaugeOf(string label) => Gauges.Single(gauge => gauge.Label == label);
 
     [Fact]
     public Task The_delta_frequency_is_gone_while_the_inverter_is_not_synchronized() => HeadlessAvalonia.RunAsync(async () =>
@@ -81,6 +83,26 @@ public sealed class InverterDetailsViewTests
         await HeadlessAvalonia.SettleAsync();
         Assert.False(GaugeOf(Resources.ΔFrequency).IsVisible);
     });
+
+    /// <summary>
+    /// The cos(phi) gauges read the amount and leave the sign to the read-out; see <see cref="GaugeDialTests"/>
+    /// for what that does to the needle. Here it is the style of the group that is under test: all four gauges,
+    /// and none of the others on the page.
+    /// </summary>
+    [Fact]
+    public Task Only_the_cos_phi_gauges_read_the_amount_instead_of_the_value() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        Start(inverterFrequency: 50);
+        await HeadlessAvalonia.SettleAsync();
+
+        Assert.Equal(4, Gauges.Count(gauge => gauge.DialShowsAbsoluteValue));
+        Assert.All(new[] { "L1", "L2", "L3", Resources.Total }, label => Assert.Contains(label, CosPhiLabels));
+        Assert.False(GaugeOf(Resources.ΔFrequency).DialShowsAbsoluteValue);
+    });
+
+    private static IReadOnlyList<HalfCircleGauge> Gauges => Window.GetVisualDescendants().OfType<HalfCircleGauge>().ToList();
+
+    private static IReadOnlyList<string?> CosPhiLabels => Gauges.Where(gauge => gauge.DialShowsAbsoluteValue).Select(gauge => gauge.Label).ToList();
 
     /// <summary>
     /// A reading that has not arrived yet is not a reading below 10 Hz. The gauge shows its own dashes for it,
