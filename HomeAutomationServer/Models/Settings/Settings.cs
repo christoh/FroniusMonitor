@@ -27,6 +27,14 @@ public class Settings
 
     public List<WebConnection> Gen24Connections = [];
 
+    /// <summary>
+    /// How <see cref="Services.DataCollectors.Gen24DataCollector"/> polls every inverter in <see cref="Gen24Connections"/>:
+    /// <see cref="Gen24DataCollectorParameters.RefreshRate"/>, <see cref="Gen24DataCollectorParameters.ConfigRefreshRate"/>
+    /// and <see cref="Gen24DataCollectorParameters.LogDirectory"/>. <see cref="Gen24DataCollectorParameters.Connections"/>
+    /// is not part of this element - it comes from <see cref="Gen24Connections"/> instead.
+    /// </summary>
+    public Gen24DataCollectorParameters Gen24DataCollector = new();
+
     public HashSet<User> Users = [];
 
     /// <summary>

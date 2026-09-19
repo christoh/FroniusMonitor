@@ -181,8 +181,9 @@ internal class Program
                 .Configure<Gen24DataCollectorParameters>(g =>
                 {
                     g.Connections = settings.Gen24Connections;
-                    g.RefreshRate = TimeSpan.FromSeconds(5);
-                    g.ConfigRefreshRate = TimeSpan.FromMinutes(5.1);
+                    g.RefreshRate = settings.Gen24DataCollector.RefreshRate;
+                    g.ConfigRefreshRate = settings.Gen24DataCollector.ConfigRefreshRate;
+                    g.LogDirectory = settings.Gen24DataCollector.LogDirectory;
                 })
                 .Configure<WattPilotParameters>(w => { w.Connections = settings.WattPilotConnections; })
                 .Configure<ToshibaHvacDataCollectorParameters>(t =>

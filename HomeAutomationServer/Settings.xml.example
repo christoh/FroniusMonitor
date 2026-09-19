@@ -8,6 +8,11 @@
    </ModbusMappings>
    <ServerIpAddress>0.0.0.0</ServerIpAddress>
    <ServerPort>1502</ServerPort>
+   <!-- Optional. How often the GEN24 inverters in Gen24Connections are polled (RefreshRate, every 5 seconds by
+        default) and how often each inverter's own configuration is re-read (ConfigRefreshRate, every 5 minutes by
+        default), and where the energy history log file per inverter is written (LogDirectory, /var/log by default).
+        RefreshRate and ConfigRefreshRate are XML duration attributes, e.g. "PT5S" (5 seconds) or "PT5M" (5 minutes). -->
+   <Gen24DataCollector RefreshRate="PT5S" ConfigRefreshRate="PT5M" LogDirectory="/var/log" />
    <!-- Optional. AzureDeviceId is drawn at random and written here on the first start; do not change it afterwards.
         Session is the bearer token of the last login and is filled in by the server. -->
    <ToshibaHvac BaseUrl="https://mobileapi.toshibahomeaccontrols.com" UserName="you@example.com" ClearTextPassword="your password, replaced by an encrypted Password on the first save" AzureDeviceId="123456" MappingRefreshMinutes="30" />
