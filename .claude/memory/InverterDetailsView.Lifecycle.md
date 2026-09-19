@@ -137,8 +137,9 @@ multitasking. Therefore:
   developer on 2026-09-19: the sign says which way the reactive power flows, the dial is about how good the power
   factor is, and a needle crossing the whole scale when the sign flips reports a change that did not happen. It is
   read in `Gauge.SetValue`, where the fraction of the scale is worked out, so both kinds of gauge get it from one
-  place; `Gauge2Text`, which builds the read-out, never sees it. The group's scale is still -1 to 1, so the needle
-  now uses its upper half only - offered to the developer as 0 to 1 with `LowIsBad` and left as it is for now.
+  place; `Gauge2Text`, which builds the read-out, never sees it. The group's scale went from -1 to 1 with
+  `MidIsBad` to **0 to 1 with `LowIsBad`** in the same breath, and its `Origin` setter went with it: with the sign
+  gone there is no lower half to show, and 1 is the good end of the dial rather than both ends being good.
 - **The ΔFrequency gauge hides itself below 10 Hz** (`IsVisible` through `co:IsInRange Minimum=10` on
   `Sensors?.Inverter?.InverterFrequency`, asked for by the developer on 2026-09-19). An inverter that is off,
   starting up or in standby is not synchronized to the grid and reports next to no frequency, and the difference

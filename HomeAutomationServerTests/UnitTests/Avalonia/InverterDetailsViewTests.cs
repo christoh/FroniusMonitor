@@ -98,6 +98,13 @@ public sealed class InverterDetailsViewTests
         Assert.Equal(4, Gauges.Count(gauge => gauge.DialShowsAbsoluteValue));
         Assert.All(new[] { "L1", "L2", "L3", Resources.Total }, label => Assert.Contains(label, CosPhiLabels));
         Assert.False(GaugeOf(Resources.ΔFrequency).DialShowsAbsoluteValue);
+
+        // And their scale runs 0 to 1, because with the sign gone there is no lower half to show.
+        Assert.All(Gauges.Where(gauge => gauge.DialShowsAbsoluteValue), gauge =>
+        {
+            Assert.Equal(0, gauge.Minimum);
+            Assert.Equal(1, gauge.Maximum);
+        });
     });
 
     private static IReadOnlyList<HalfCircleGauge> Gauges => Window.GetVisualDescendants().OfType<HalfCircleGauge>().ToList();

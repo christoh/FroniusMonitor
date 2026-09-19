@@ -65,7 +65,9 @@ style) puts the needle at `|cos phi|` while the read-out under it keeps the sign
 2026-09-19: the sign says which way the reactive power flows, the dial is about how good the power factor is, and
 a needle crossing the whole scale when the sign flips reports a change that did not happen. It is read in
 `Gauge.SetValue`, where the fraction of the scale is worked out, so both kinds of gauge get it from one place;
-`Gauge2Text`, which builds the read-out, never sees it.
+`Gauge2Text`, which builds the read-out, never sees it. This group needed nothing else: its scale was already 0
+to 1 with `LowIsBad`, which is what the inverter's and the smart meter's were changed to at the same time. What
+did change here is a negative reading, which used to sit pinned at the left end and now reads as what it is.
 
 ## Known gaps
 
