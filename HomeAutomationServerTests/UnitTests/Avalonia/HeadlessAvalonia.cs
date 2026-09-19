@@ -14,8 +14,9 @@ using De.Hochstaetter.HomeAutomationServerTests.UnitTests.Fakes;
 namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests;
 
 /// <summary>
-/// The application these tests run in: the Fluent theme, because the controls under test use its resources, and
-/// the client's own loading indicators, because the busy animation of a dialog window is built from them.
+/// The application these tests run in: the Fluent theme, because the controls under test use its resources, the
+/// client's own loading indicators, because the busy animation of a dialog window is built from them, and the
+/// style of the detail view gauges, because what that one does is under test itself.
 /// </summary>
 /// <remarks>
 /// Not the client's <c>App</c>. That one builds the whole container and puts the main window up, which needs a
@@ -26,6 +27,14 @@ public sealed class HeadlessTestApplication : Application
     public override void Initialize()
     {
         Styles.Add(new FluentTheme());
+
+        // The real style, so that a test reads what the app does and not a copy of it. Its other setters reach
+        // for resources this application does not have; a DynamicResource that resolves to nothing simply leaves
+        // the property alone, which is what the gauges of these tests want anyway.
+        Styles.Add(new StyleInclude(new Uri("avares://HomeAutomationClient/"))
+        {
+            Source = new Uri("avares://HomeAutomationClient/Styles/DetailViews.axaml"),
+        });
 
         Resources.MergedDictionaries.Add(new ResourceInclude(new Uri("avares://HomeAutomationClient/"))
         {

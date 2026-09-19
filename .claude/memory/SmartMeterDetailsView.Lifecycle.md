@@ -62,9 +62,12 @@ status codes, which is what this view wants.
 The frequency gauge uses `ValueStringFormat="N1"`, unlike the inverter's `N3`: the smart meter reports the
 frequency with less precision.
 
+**`ColorAllTicks` comes from neither this view nor its view model.** The `WrapPanel.GaugeGroups` style in
+`Styles/DetailViews.axaml` sets it from the application resource `MainViewModel.ColorAllTicksResourceKey`, which
+the main view's switch writes. A resource and not a binding up the tree, because on the desktop this page stands
+in a window that has no `MainView` above it - see [[DialogSystem.Lifecycle]].
+
 ## Known gaps
 
-- `ColorAllTicks` forwards to `DashboardViewModel` and carries the same `//BUG:` note as the other detail view
-  models; it should move to `MainViewModel` or to settings.
 - The view has no public parameterless constructor, so the build reports `AVLN3001` for it. Expected: the view is
   only ever resolved from the container. Do not add one.

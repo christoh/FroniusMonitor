@@ -33,6 +33,7 @@ public sealed partial class MainViewModel : ViewModelBase
         uriService.PathChanged += OnPathChanged;
         UpdateService = updateService;
         SetApiUri(IoC.TryGetRegistered<ICache>()?.Get<string>(CacheKeys.ApiUri) ?? "https://home-automation.example.com");
+        PublishColorAllTicks();
     }
 
     /// <summary>
@@ -110,11 +111,39 @@ public sealed partial class MainViewModel : ViewModelBase
     public IReadOnlyList<object> SettingsItems => [.. UpdateService.DevicesWithSettings, UserManagementEntry.Instance];
 
     /// <summary>
+    /// The application resource the gauges of the detail views read <see cref="ColorAllTicks"/> from; see
+    /// <see cref="PublishColorAllTicks"/> and the <c>WrapPanel.GaugeGroups</c> style in
+    /// <c>Styles/DetailViews.axaml</c>.
+    /// </summary>
+    public const string ColorAllTicksResourceKey = "ColorAllGaugeTicks";
+
+    /// <summary>
     /// Colors all ticks of every gauge, not just those up to the current value. Lives here because the switch for
     /// it sits in the main view and applies to all views; the other view models reach it through this singleton.
     /// </summary>
     [ObservableProperty]
     public partial bool ColorAllTicks { get; set; } = true;
+
+    partial void OnColorAllTicksChanged(bool value) => PublishColorAllTicks();
+
+    /// <summary>
+    /// Publishes <see cref="ColorAllTicks"/> as an application resource, which is the one thing every window of
+    /// the app shares.
+    /// </summary>
+    /// <remarks>
+    /// A detail page is inside the main view in the browser and on the phones, so a binding up the tree finds
+    /// this view model there - but on the desktop the page stands in a window of its own, where there is no
+    /// <c>MainView</c> above it and such a binding finds nothing at all. That is why the switch appeared to work
+    /// on the web and to do nothing on the desktop until 2026-09-19. Application resources do not care which
+    /// window asks, and a <c>DynamicResource</c> follows every later change of this one.
+    /// </remarks>
+    private void PublishColorAllTicks()
+    {
+        if (Application.Current is { } app)
+        {
+            app.Resources[ColorAllTicksResourceKey] = ColorAllTicks;
+        }
+    }
 
     /// <summary>
     /// Overrides whatever light or dark variant the OS, the browser or Avalonia's own default reported, so a user

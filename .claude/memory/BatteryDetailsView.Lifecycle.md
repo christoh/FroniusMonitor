@@ -62,9 +62,12 @@ Uses the shared `DetailsGauge` template from `Styles/Gauges.axaml`. The template
 `Sensors?.Storage?.IsAwake` via `DeviceBackgroundColor` — awake gets the running brush, asleep the neutral one.
 That setter is the only part that differs from the other three detail views.
 
+**`ColorAllTicks` comes from neither this view nor its view model.** The `WrapPanel.GaugeGroups` style in
+`Styles/DetailViews.axaml` sets it from the application resource `MainViewModel.ColorAllTicksResourceKey`, which
+the main view's switch writes. A resource and not a binding up the tree, because on the desktop this page stands
+in a window that has no `MainView` above it - see [[DialogSystem.Lifecycle]].
+
 ## Known gaps
 
-- `ColorAllTicks` forwards to `DashboardViewModel` and carries the same `//BUG:` note as the other detail view
-  models; it should move to `MainViewModel` or to settings.
 - The view has no public parameterless constructor, so the build reports `AVLN3001` for it. Expected: the view is
   only ever resolved from the container. Do not add one.

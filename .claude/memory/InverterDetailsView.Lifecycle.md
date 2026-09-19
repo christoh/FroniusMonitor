@@ -128,10 +128,12 @@ multitasking. Therefore:
   its third value. It only has meaning inside this view.
 - **Format split:** `Gauge.ValueStringFormat` formats the value read-out, `Gauge.StringFormat` the minimum/maximum
   labels. The WPF original used `StringFormat` plus the attached `MinimumMaximumStringFormat`.
+- **`ColorAllTicks` comes from neither this view nor its view model.** The `WrapPanel.GaugeGroups` style in
+  `Styles/DetailViews.axaml` sets it from the application resource `MainViewModel.ColorAllTicksResourceKey`, which
+  the main view's switch writes. A resource and not a binding up the tree, because on the desktop this page stands
+  in a window that has no `MainView` above it - see [[DialogSystem.Lifecycle]].
 
 ## Known gaps
 
-- `InverterDetailsViewModel.ColorAllTicks` forwards to `DashboardViewModel` and carries a `//BUG:` note — it should
-  move to `MainViewModel` or to settings. Until then this view depends on `DashboardViewModel` being resolvable.
 - The WPF view's `CheckAtLeastOneView` hint bound to `IsNoneSelected`, and the `Inverter` menu
   (Settings / EnergyFlow / Modbus / EventLog) are not ported yet.

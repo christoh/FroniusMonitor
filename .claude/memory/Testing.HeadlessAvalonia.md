@@ -45,6 +45,11 @@ public sealed class SomethingTests
   collection happened to run first.
 - **Every such test belongs to `AvaloniaCollection`**, which is defined with `DisableParallelization`. Windows,
   the focus and the container are global to the session; two tests at once would see each other's.
+- **`HeadlessTestApplication` is not the client's `App`, but it does include the client's `Styles/DetailViews.axaml`.**
+  What that style does - where the gauges of a detail view get `ColorAllTicks` from - is under test, so the test
+  application includes the real file rather than a copy. Its other setters reach for resources this application
+  does not have, and a `DynamicResource` that resolves to nothing leaves the property alone. Add a style here only
+  for the same reason; everything else the tests need belongs in the test itself.
 
 ## The two traps, both of which cost a round
 
@@ -99,6 +104,7 @@ reason, which is worth knowing before trying one.
 | `ZoomBoxTests` | Ctrl with the wheel and the keys, the limits, the steps, the scope on a view inside the window, the focused text box |
 | `ZoomPinchTests` | Pinch, with its events synthesized |
 | `PowerFlowViewTests` | The power flow page: its window at the declared size, a card per node and wires between them, a reading that updates a card without rebuilding it, a consumer that appears, a closed page that lets go - see [[PowerFlowPage.Lifecycle]] |
+| `GaugeColoringTests` | "Always fully color gauges" reaching a gauge in a window with no `MainView` above it, which is where the desktop puts a detail page - see [[DialogSystem.Lifecycle]] |
 | `HeadlessSmokeTest` | That the session is up at all - look here first when the whole collection fails |
 
 **Not covered, and not coverable here:** real touch input, so the pinch recognizer itself is untested; and how any

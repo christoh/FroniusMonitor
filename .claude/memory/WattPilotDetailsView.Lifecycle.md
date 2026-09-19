@@ -55,13 +55,16 @@ Two details carried over from the WPF view: the neutral conductor gauges (`N`) d
 range and color map than the phases in the same group, and the power group mixes `W` for `N` with `kW` for the
 phases.
 
+**`ColorAllTicks` comes from neither this view nor its view model.** The `WrapPanel.GaugeGroups` style in
+`Styles/DetailViews.axaml` sets it from the application resource `MainViewModel.ColorAllTicksResourceKey`, which
+the main view's switch writes. A resource and not a binding up the tree, because on the desktop this page stands
+in a window that has no `MainView` above it - see [[DialogSystem.Lifecycle]].
+
 ## Known gaps
 
 - The current gauges fall back to 32 A per phase and 96 A in total when
   `MaximumChargingCurrentPossiblePerPhase` / `MaximumChargingCurrentPossible` are null. **These fallbacks are
   invented** - the WPF view had none. Replace them if the real device limits are known.
-- `ColorAllTicks` forwards to `DashboardViewModel` and carries the same `//BUG:` note as the other detail view
-  models; it should move to `MainViewModel` or to settings.
 - The WPF view's menu (settings, reboot, charging log, config PDF) and its multi-part title are not ported.
 - The view has no public parameterless constructor, so the build reports `AVLN3001` for it. Expected: the view is
   only ever resolved from the container. Do not add one.
