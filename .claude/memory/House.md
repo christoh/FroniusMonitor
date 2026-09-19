@@ -67,6 +67,11 @@ What it does **not** touch, each on purpose:
   house. The WPF app does not move them either.
 - **The cars** are what they draw, and the grid is what the meter says.
 
+On the power flow page one more thing follows from it: **each inverter card carries its own loss** there, because
+that page draws wires from a running sum and would otherwise show the site's loss as power coming out of an
+inverter that is switched off. See [[PowerFlowPage.Lifecycle]]. The dashboard has no such sum - its inverter
+controls show what the device reports, as they always have.
+
 The switch is `MainViewModel.IncludeInverterPower`, the third `ToggleButton` at the bottom of `MainView`, beside
 the gauge colouring and the dark mode. The block does not take the whole main view model for it: `MainViewModel`
 implements **`Contracts/IPowerDisplayOptions`**, a contract of that one property, registered in `App.axaml.cs`

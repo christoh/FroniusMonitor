@@ -135,6 +135,9 @@ public sealed record PowerFlowSnapshot(PowerFlowNode? Grid, IReadOnlyList<PowerF
     /// "Solar Web" mode, see <see cref="IPowerDisplayOptions.IncludeInverterPower"/>. The house counts the
     /// inverters' loss as its own consumption, and since the loss is nothing a plug can measure, what is left of
     /// it after the metered consumers lands in the rest of the house - which is where everything unmetered goes.
+    /// Each inverter carries its own loss on the way out, so that what the sources deliver is still exactly what
+    /// the grid and the house take: the page draws its wires from that balance, and a house that took more than
+    /// the sources gave would show the difference as power out of an inverter that is switched off.
     /// </param>
     public static PowerFlowSnapshot From(IReadOnlyList<KeyedGen24System> inverters, Gen24PowerFlow? site, IReadOnlyList<IKeyedDevice> consumers, Func<int, string>? trackerName = null, bool includeInverterPower = false)
     {
@@ -162,10 +165,18 @@ public sealed record PowerFlowSnapshot(PowerFlowNode? Grid, IReadOnlyList<PowerF
                 trackers.Add(new PowerFlowNode($"{keyed.Key}/solar", PowerFlowNodeKind.Solar, string.Empty, flow?.SolarPower));
             }
 
+            // In Solar Web mode the inverter hands its whole DC input to the house: what leaves it as AC, plus
+            // what it kept for itself and the house is now counting as consumption. **Per inverter, from its own
+            // PowerFlow.** The site's loss added to the house alone leaves exactly that many watts running down
+            // the trunk past the house to whatever tap is below it - on 2026-09-19 the picture showed 41 W coming
+            // out of an inverter that was switched off. With every inverter carrying its own loss the sum closes
+            // again, and one that produces nothing loses nothing and injects nothing.
+            var acPower = flow is null ? (double?)null : includeInverterPower ? flow.InverterAcPower + flow.PowerLoss : flow.InverterAcPower;
+
             return new PowerFlowInverter
             (
                 // The inverter carries the name the user gave it - "Roof south" - not the model on its type plate.
-                new PowerFlowNode(keyed.Key, PowerFlowNodeKind.Inverter, keyed.ToString() ?? string.Empty, flow?.InverterAcPower),
+                new PowerFlowNode(keyed.Key, PowerFlowNodeKind.Inverter, keyed.ToString() ?? string.Empty, acPower),
                 trackers,
                 storage is null ? null : new PowerFlowNode($"{keyed.Key}/battery", PowerFlowNodeKind.Battery, storage.Model ?? string.Empty, flow?.StoragePower, storage.StateOfCharge)
             );

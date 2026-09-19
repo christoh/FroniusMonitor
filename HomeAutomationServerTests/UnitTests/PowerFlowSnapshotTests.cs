@@ -87,6 +87,48 @@ public sealed class PowerFlowSnapshotTests
         Assert.Equal(-450, snapshot.Grid!.Power);
     }
 
+    /// <summary>
+    /// The picture has to add up: what the sources put on the trunk is what the grid and the house take off it,
+    /// or the page draws the difference as a wire below the house - and on 2026-09-19 it drew 41 W as coming out
+    /// of an inverter that was switched off. In Solar Web mode each inverter therefore carries **its own** loss,
+    /// which is nothing at all for one that produces nothing.
+    /// </summary>
+    [Fact]
+    public void Solar_web_mode_gives_every_inverter_its_own_loss_and_the_sum_still_closes()
+    {
+        // Two inverters, as on the developer's roof: one on the battery and one switched off. 351 W of DC into
+        // the first, 309 W of AC out of it, so 42 W is its own; the second neither produces nor loses anything.
+        var working = Inverter("block1", 1, 1, 309, storage: 349, soc: 0.75);
+        var off = Inverter("block2", 0, 0, 0);
+        Assert.Equal(42, working.Device.Sensors!.PowerFlow!.PowerLoss);
+        Assert.Equal(0, off.Device.Sensors!.PowerFlow!.PowerLoss);
+
+        // The site is the sum of the two, which is how the update service builds it, and it feeds 41 W back.
+        var site = Site(load: -268, inverterAc: 309, grid: -41, solar: 2, storage: 349);
+        Assert.Equal(42, site.PowerLoss);
+
+        var snapshot = PowerFlowSnapshot.From([working, off], site, [], includeInverterPower: true);
+
+        Assert.Equal(309 + 42, snapshot.Inverters[0].Inverter.Power);
+        Assert.Equal(0, snapshot.Inverters[1].Inverter.Power);
+        Assert.True(snapshot.Inverters[1].Inverter.IsIdle, "the inverter that is off must stay idle");
+        Assert.Equal(268 + 42, snapshot.House.Power);
+
+        // What the trunk carries below the last tap, which is what the view draws: nothing left over.
+        var leftOver = snapshot.Grid!.Power + snapshot.Inverters.Sum(inverter => inverter.Inverter.Power) - snapshot.House.Power;
+        Assert.Equal(0, leftOver);
+    }
+
+    /// <summary>And with the switch off the inverter is its AC power, loss or no loss.</summary>
+    [Fact]
+    public void An_inverter_is_its_ac_power_while_solar_web_mode_is_off()
+    {
+        var snapshot = PowerFlowSnapshot.From([Inverter("block1", 1, 1, 309, storage: 349, soc: 0.75)], Site(load: -268, inverterAc: 309, grid: -41, solar: 2, storage: 349), []);
+
+        Assert.Equal(309, snapshot.Inverters.Single().Inverter.Power);
+        Assert.Equal(268, snapshot.House.Power);
+    }
+
     [Fact]
     public void A_tracker_is_named_in_the_inverters_words_when_the_caller_has_them()
     {

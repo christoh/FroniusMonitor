@@ -99,11 +99,19 @@ grid figure, which the grid card says already.
   discharges, the grid positive while the house imports, `LoadPower` negative while the house draws.
 - **"Solar Web" mode** (2026-09-19) is that last argument: the inverters' loss counts as consumption of the
   house. Nothing measures a loss, so what is left of it after the metered consumers lands in the rest of the
-  house, which is where everything without a plug of its own goes. The grid card, the inverter cards and the
-  trackers are untouched, and so are the two ratios - [[House]] has the whole rule and the reasons. The switch
-  arrives as `IPowerDisplayOptions`, which `MainViewModel` implements; `PowerFlowViewModel` follows its
-  `PropertyChanged` **between `Initialize` and `Stop`**, like everything else it follows, and rebuilds the
-  snapshot when it fires, because no device announces a switch.
+  house, which is where everything without a plug of its own goes. The grid card, the trackers and the two ratios
+  are untouched - [[House]] has the whole rule and the reasons. The switch arrives as `IPowerDisplayOptions`,
+  which `MainViewModel` implements; `PowerFlowViewModel` follows its `PropertyChanged` **between `Initialize` and
+  `Stop`**, like everything else it follows, and rebuilds the snapshot when it fires, because no device announces
+  a switch.
+- **In that mode every inverter card carries its own loss**: `InverterAcPower + PowerFlow.PowerLoss` of *that*
+  inverter, which is its whole DC input - what leaves it as AC plus what it kept and the house is now counting.
+  **This is not decoration, the picture depends on it.** The trunk is a running sum (see below), so what the
+  sources put on it has to be exactly what the grid and the house take off it. Adding the site's loss to the
+  house alone breaks that by the loss, and the leftover is drawn as a wire below the house: on 2026-09-19 the
+  page showed 41 W coming out of an inverter that was switched off, because that is where the trunk's last
+  segment ended. Per inverter it closes again, and an inverter that produces nothing loses nothing and injects
+  nothing. The DC side adds up too, since AC plus loss is what the trackers and the battery deliver.
 - **Per inverter** the inverter card reads `Sensors.PowerFlow.InverterAcPower` and is named
   `KeyedGen24System.ToString()`, the system name. **The trackers are `PowerFlowSnapshot.Trackers`**, the one
   place that knows which sensor is which tracker: `Sensors.Inverter.Solar1Power` and `Solar2Power` today, two
