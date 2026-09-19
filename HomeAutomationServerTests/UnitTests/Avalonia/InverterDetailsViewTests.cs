@@ -1,4 +1,4 @@
-using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.VisualTree;
 using De.Hochstaetter.Fronius;
 using De.Hochstaetter.Fronius.Localization;
@@ -50,6 +50,8 @@ public sealed class InverterDetailsViewTests
             // about gauges inside them, so they are switched on the way a user would.
             view.ViewModel.Frequency = true;
             view.ViewModel.PowerFactor = true;
+            view.ViewModel.DeltaAcPhaseVoltageFeedIn = true;
+            view.ViewModel.DeltaAcLineVoltageFeedIn = true;
         });
         return gen24System;
     }
@@ -85,6 +87,43 @@ public sealed class InverterDetailsViewTests
     });
 
     /// <summary>
+    /// The two groups that hold a difference between the inverter and the grid go with the ΔFrequency gauge:
+    /// below 10 Hz the inverter is not synchronized, so what is in them is the grid's own voltage rather than a
+    /// difference. Whole groups here, not single gauges, because every gauge in them is such a difference.
+    /// </summary>
+    [Fact]
+    public Task The_delta_voltage_groups_go_while_the_inverter_is_not_synchronized() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        var gen24System = Start(inverterFrequency: 0);
+        await HeadlessAvalonia.SettleAsync();
+
+        Assert.False(GroupOf(Resources.ΔAcPhaseVoltageFeedIn).IsVisible);
+        Assert.False(GroupOf(Resources.ΔAcLineVoltageFeedIn).IsVisible);
+
+        // The frequency group stays - only the one gauge inside it that is a difference goes away.
+        Assert.True(GroupOf(Resources.Frequency).IsVisible);
+        Assert.True(GaugeOf(Resources.Grid).IsVisible);
+
+        gen24System.Sensors!.Inverter!.InverterFrequency = 50;
+        await HeadlessAvalonia.SettleAsync();
+        Assert.True(GroupOf(Resources.ΔAcPhaseVoltageFeedIn).IsVisible);
+        Assert.True(GroupOf(Resources.ΔAcLineVoltageFeedIn).IsVisible);
+    });
+
+    /// <summary>The user's switch still has the last word, at any frequency.</summary>
+    [Fact]
+    public Task A_delta_voltage_group_the_user_switched_off_stays_off() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        Start(inverterFrequency: 50);
+        await HeadlessAvalonia.SettleAsync();
+        Assert.True(GroupOf(Resources.ΔAcPhaseVoltageFeedIn).IsVisible);
+
+        ViewModel.DeltaAcPhaseVoltageFeedIn = false;
+        await HeadlessAvalonia.SettleAsync();
+        Assert.False(GroupOf(Resources.ΔAcPhaseVoltageFeedIn).IsVisible);
+    });
+
+    /// <summary>
     /// The cos(phi) gauges read the amount and leave the sign to the read-out; see <see cref="GaugeDialTests"/>
     /// for what that does to the needle. Here it is the style of the group that is under test: all four gauges,
     /// and none of the others on the page.
@@ -108,6 +147,14 @@ public sealed class InverterDetailsViewTests
     });
 
     private static IReadOnlyList<HalfCircleGauge> Gauges => Window.GetVisualDescendants().OfType<HalfCircleGauge>().ToList();
+
+    private static InverterDetailsViewModel ViewModel => Assert.IsType<InverterDetailsView>(Window.HostedContent).ViewModel;
+
+    /// <summary>A gauge group by its header, which is the caption the user reads above it.</summary>
+    private static HeaderedContentControl GroupOf(string header) => Window
+        .GetVisualDescendants()
+        .OfType<HeaderedContentControl>()
+        .Single(group => Equals(group.Header, header));
 
     private static IReadOnlyList<string?> CosPhiLabels => Gauges.Where(gauge => gauge.DialShowsAbsoluteValue).Select(gauge => gauge.Label).ToList();
 

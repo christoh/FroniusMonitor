@@ -154,6 +154,21 @@ public class IsEqual : ConverterBase
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value != null && value.Equals(parameter);
 }
 
+/// <summary>
+/// True while nothing says otherwise, for an <c>IsVisible</c> with more than one reason to be false: a group the
+/// user switched off, and a reading that makes everything in it meaningless. Each value arrives as a bool, from
+/// the property itself or from a converter on the binding that produces it.
+/// </summary>
+/// <remarks>
+/// Not <c>All(value is true)</c>: a binding that has not produced anything yet hands in
+/// <see cref="AvaloniaProperty.UnsetValue"/>, and a value that is not there is not a no. Only a real
+/// <c>false</c> hides anything, so a group is never taken away while the first update is on its way.
+/// </remarks>
+public class AllTrue : MultiConverterBase
+{
+    public override object Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture) => values.All(value => value is not false);
+}
+
 public class ToUpper : ConverterBase
 {
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value?.ToString()?.ToUpper(CultureInfo.CurrentCulture);

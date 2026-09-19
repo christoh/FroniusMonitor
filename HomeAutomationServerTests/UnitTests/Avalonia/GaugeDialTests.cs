@@ -1,3 +1,4 @@
+using System.Globalization;
 using Avalonia.Controls;
 using De.Hochstaetter.HomeAutomationClient.Controls;
 
@@ -35,6 +36,27 @@ public sealed class GaugeDialTests
         gauge.DialShowsAbsoluteValue = false;
         await HeadlessAvalonia.SettleAsync();
         Assert.Equal(0.05, gauge.AnimatedValue, 6);
+    });
+
+    /// <summary>
+    /// The linear gauge of the dashboard gets it from the same place - the base class - and shows both halves of
+    /// the split at once: the bar is the amount, the number printed beside it is the value.
+    /// </summary>
+    [Fact]
+    public Task The_bar_of_a_linear_gauge_reads_the_amount_and_its_number_the_value() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        HeadlessAvalonia.Reset();
+
+        var gauge = new LinearGauge { Minimum = 0, Maximum = 1, StringFormat = "N3", Value = -0.9 };
+        new Window { Content = gauge }.Show();
+        await HeadlessAvalonia.SettleAsync();
+
+        gauge.DialShowsAbsoluteValue = true;
+        await HeadlessAvalonia.SettleAsync();
+
+        // Without this the bar would be empty: -0.9 is below the scale and clamps to its start.
+        Assert.Equal(0.9, gauge.AnimatedValue, 6);
+        Assert.Equal((-0.9).ToString("N3", CultureInfo.CurrentCulture), gauge.ValueTextBlock.Text);
     });
 
     /// <summary>A value with no sign to drop is left exactly where it was.</summary>

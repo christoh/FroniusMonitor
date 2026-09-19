@@ -139,7 +139,9 @@ multitasking. Therefore:
   read in `Gauge.SetValue`, where the fraction of the scale is worked out, so both kinds of gauge get it from one
   place; `Gauge2Text`, which builds the read-out, never sees it. The group's scale went from -1 to 1 with
   `MidIsBad` to **0 to 1 with `LowIsBad`** in the same breath, and its `Origin` setter went with it: with the sign
-  gone there is no lower half to show, and 1 is the good end of the dial rather than both ends being good.
+  gone there is no lower half to show, and 1 is the good end of the dial rather than both ends being good. The
+  dashboard's `InverterControl` carries the same three setters on its `LinearGauge.PowerFactor` style, where the
+  bar is the amount and the number printed beside it is the value.
 - **The ΔFrequency gauge hides itself below 10 Hz** (`IsVisible` through `co:IsInRange Minimum=10` on
   `Sensors?.Inverter?.InverterFrequency`, asked for by the developer on 2026-09-19). An inverter that is off,
   starting up or in standby is not synchronized to the grid and reports next to no frequency, and the difference
@@ -152,6 +154,13 @@ multitasking. Therefore:
   nothing afterwards, so a view model property would need `PropertyChanged` subscriptions on two model levels -
   exactly what "Attach and detach" above warns against. The same pattern is used for value driven visibility on the
   dashboard (`IsVisible="{Binding Device.Sensors.Storage, Converter={co:Null2Bool}}"`).
+- **The two Δ voltage groups go the same way, whole** (added 2026-09-19, same limit, same converter): every gauge
+  in `ΔAcPhaseVoltageFeedIn` and `ΔAcLineVoltageFeedIn` is a difference between the inverter and the grid, so
+  below 10 Hz there is nothing left in them worth a frame. They therefore have **two** reasons to be away - the
+  user's switch and the reading - and their `IsVisible` is a `MultiBinding` over both through `co:AllTrue`, whose
+  "anything that is not `false` counts as true" is what keeps a group from being taken away while a binding has
+  not produced its first value. The ΔFrequency gauge is gated alone rather than by its group, because the two
+  gauges beside it in that group are readings and not differences.
 
 ## Known gaps
 
