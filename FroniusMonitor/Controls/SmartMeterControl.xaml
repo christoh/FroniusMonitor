@@ -176,12 +176,16 @@
 
                         <Grid x:Name="PowerFactor" Visibility="Collapsed">
                             <Grid.Resources>
+                                <!-- See InverterControl: the bar reads the amount, the number keeps the sign. The
+                                     Origin of the base style goes with the lower half it belonged to. -->
                                 <Style TargetType="c:Gauge" BasedOn="{StaticResource PowerLinearGaugeStyle}">
+                                    <Setter Property="DialShowsAbsoluteValue" Value="True" />
                                     <Setter Property="Maximum" Value="1" />
-                                    <Setter Property="Minimum" Value="-1" />
+                                    <Setter Property="Minimum" Value="0" />
+                                    <Setter Property="Origin" Value="0" />
                                     <Setter Property="UnitName" Value="" />
                                     <Setter Property="StringFormat" Value="N3" />
-                                    <Setter Property="GaugeColors" Value="{x:Static c:Gauge.MidIsBad}" />
+                                    <Setter Property="GaugeColors" Value="{x:Static c:Gauge.LowIsBad}" />
                                 </Style>
                             </Grid.Resources>
                             <Grid.RowDefinitions>

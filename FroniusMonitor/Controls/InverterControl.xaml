@@ -343,13 +343,17 @@
 
                         <Grid x:Name="AcPowerFactor" Visibility="Collapsed">
                             <Grid.Resources>
+                                <!-- Like the cos(phi) group of the detail views: the bar reads the amount, the
+                                     number beside it keeps the sign, so the scale runs from 0 to 1 with 1 at the
+                                     good end and no midpoint to grow out of. -->
                                 <Style TargetType="c:Gauge" BasedOn="{StaticResource AcPowerLinearGaugeStyle}">
-                                    <Setter Property="Minimum" Value="-1" />
+                                    <Setter Property="DialShowsAbsoluteValue" Value="True" />
+                                    <Setter Property="Minimum" Value="0" />
                                     <Setter Property="Maximum" Value="1" />
                                     <Setter Property="UnitName" Value="" />
-                                    <Setter Property="GaugeColors" Value="{x:Static c:Gauge.MidIsBad}" />
+                                    <Setter Property="GaugeColors" Value="{x:Static c:Gauge.LowIsBad}" />
                                     <Setter Property="StringFormat" Value="N3" />
-                                    <Setter Property="Origin" Value="0.5" />
+                                    <Setter Property="Origin" Value="0" />
                                 </Style>
                             </Grid.Resources>
                             <Grid.RowDefinitions>

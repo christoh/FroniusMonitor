@@ -124,7 +124,7 @@ public partial class LinearGauge
 
     private static double SetValueTextBlock(Gauge gauge, TextBlock valueTextBlock)
     {
-        var relativeValue = (Math.Max(Math.Min(gauge.Maximum, gauge.Value), gauge.Minimum) - gauge.Minimum) / (gauge.Maximum - gauge.Minimum);
+        var relativeValue = gauge.RelativeValue;
 
         if (!double.IsFinite(relativeValue))
         {
