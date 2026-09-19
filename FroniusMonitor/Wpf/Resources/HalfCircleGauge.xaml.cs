@@ -139,7 +139,7 @@ public partial class HalfCircleGauge
 
     private static double SetValue(Gauge gauge, bool skipAnimation = false)
     {
-        var relativeValue = (Math.Max(Math.Min(gauge.Maximum, gauge.Value), gauge.Minimum) - gauge.Minimum) / (gauge.Maximum - gauge.Minimum);
+        var relativeValue = gauge.RelativeValue;
 
         var animation = skipAnimation
             ? null

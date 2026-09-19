@@ -113,6 +113,42 @@ public class Gauge : ProgressBar
         set => SetValue(TickFillProperty, value);
     }
 
+    /// <summary>
+    /// Puts the needle - or the bar - at the amount and lets the read-out keep the sign. For cos(phi), where the
+    /// sign says which way the reactive power flows while the dial is about how good the power factor is:
+    /// -0.998 and +0.998 are the same quality, and a needle that crosses the whole scale when the sign flips
+    /// reports a change that did not happen. The text is built from <see cref="RangeBase.Value"/> and is not
+    /// touched by this. The Avalonia client has the same property on its own gauge.
+    /// </summary>
+    /// <remarks>
+    /// Set by a style and never at runtime, unlike <see cref="ColorAllTicks"/>, which the menu toggles - so
+    /// neither gauge template watches it; both read it when they work the value out.
+    /// </remarks>
+    public static readonly DependencyProperty DialShowsAbsoluteValueProperty = DependencyProperty.Register
+    (
+        nameof(DialShowsAbsoluteValue), typeof(bool), typeof(Gauge)
+    );
+
+    public bool DialShowsAbsoluteValue
+    {
+        get => (bool)GetValue(DialShowsAbsoluteValueProperty);
+        set => SetValue(DialShowsAbsoluteValueProperty, value);
+    }
+
+    /// <summary>
+    /// Where the needle stands and how far the bar is filled: the value as a fraction of the scale, cut to it.
+    /// Both gauge templates ask here, so that the scale is worked out in one place and
+    /// <see cref="DialShowsAbsoluteValue"/> reaches both of them.
+    /// </summary>
+    public double RelativeValue
+    {
+        get
+        {
+            var value = DialShowsAbsoluteValue ? Math.Abs(Value) : Value;
+            return (Math.Max(Math.Min(Maximum, value), Minimum) - Minimum) / (Maximum - Minimum);
+        }
+    }
+
     public static readonly DependencyProperty ColorAllTicksProperty = DependencyProperty.Register
     (
         nameof(ColorAllTicks), typeof(bool), typeof(Gauge)

@@ -142,7 +142,8 @@ multitasking. Therefore:
   gone there is no lower half to show, and 1 is the good end of the dial rather than both ends being good. The
   dashboard's `InverterControl` and `SmartMeterControl` carry the same setters on their cos(phi) linear gauges,
   where the bar is the amount and the number printed beside it is the value; in `SmartMeterControl` the `Origin`
-  of the base `ControlTheme` has to be set back to 0, because that theme is a bipolar power gauge.
+  of the base `ControlTheme` has to be set back to 0, because that theme is a bipolar power gauge. **The WPF app
+  has all five of those places too, and they were changed with it** - [[Gauges]] holds what the two apps share.
 - **The ΔFrequency gauge hides itself below 10 Hz** (`IsVisible` through `co:IsInRange Minimum=10` on
   `Sensors?.Inverter?.InverterFrequency`, asked for by the developer on 2026-09-19). An inverter that is off,
   starting up or in standby is not synchronized to the grid and reports next to no frequency, and the difference
@@ -151,6 +152,8 @@ multitasking. Therefore:
   reported at all counts as not synchronized too - the call sites pass `Unknown=False`, against that converter's
   own default - because nothing then says the inverter *is* synchronized. The developer chose that on
   2026-09-19 over the other reading, which was to keep a difference until one is proved meaningless.
+  The WPF original does the same since 2026-09-19, through `co:Range2Visibility` on the `ContentControl` around
+  that gauge - see [[Gauges]].
   The rule sits in a converter and not in the view model on purpose: the live readings reach the page through
   `Gen24System.Sensors.…` bindings, and the view model is handed the `Gen24System` once per navigation and hears
   nothing afterwards, so a view model property would need `PropertyChanged` subscriptions on two model levels -
