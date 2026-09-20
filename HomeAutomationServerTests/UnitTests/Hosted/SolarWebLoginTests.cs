@@ -91,6 +91,16 @@ public sealed class SolarWebLoginTests : IAsyncLifetime
             return Results.Content(ChartJson, "application/json; charset=utf-8");
         });
 
+        app.MapGet("/Firmware/GetComponentUpdateInfos", (HttpContext context) =>
+        {
+            if (context.Request.Cookies["SolarWebSession"] != "yes")
+            {
+                return Results.Redirect($"/Account/ExternalLogin?ReturnUrl={Uri.EscapeDataString(context.Request.Path + context.Request.QueryString)}");
+            }
+
+            return Results.Content(SolarWebFirmwareTests.Answer, "application/json; charset=utf-8");
+        });
+
         app.MapGet("/Account/ExternalLogin", (HttpContext context) =>
         {
             // The real one keeps the return url in the encrypted state; a cookie does here.
@@ -265,9 +275,23 @@ public sealed class SolarWebLoginTests : IAsyncLifetime
     }
 
     [Fact]
-    public void The_chart_address_is_the_one_the_chart_page_requests()
+    public async Task The_firmware_status_logs_in_the_same_way_and_comes_back_parsed()
     {
-        var uri = SolarWebClient.ChartUri(new SolarWebSettings { PvSystemId = PvSystemId }, SolarWebInterval.Year, SolarWebView.ReturnOfInvestment, new DateOnly(2026, 9, 20));
+        var status = await client.GetFirmwareStatusAsync(settings, TestContext.Current.CancellationToken);
+
+        Assert.Equal(1, loginPosts);
+        Assert.Equal(PvSystemId, status.PvSystemId);
+        Assert.Equal(3, status.Components.Count);
+        Assert.True(status.HasOutdatedFirmware);
+        Assert.Equal(new Version(1, 41, 11, 1), status.Components[1].InstalledVersion);
+    }
+
+    [Fact]
+    public void The_addresses_are_the_ones_the_solar_web_pages_request()
+    {
+        var settings = new SolarWebSettings { PvSystemId = PvSystemId };
+        var uri = SolarWebClient.ChartUri(settings, SolarWebInterval.Year, SolarWebView.ReturnOfInvestment, new DateOnly(2026, 9, 20));
         Assert.Equal($"https://www.solarweb.com/Chart/GetChartNew?pvSystemId={PvSystemId}&year=2026&month=9&day=20&interval=year&view=returnofinvestment", uri.ToString());
+        Assert.Equal($"https://www.solarweb.com/Firmware/GetComponentUpdateInfos?pvSystemId={PvSystemId}", SolarWebClient.FirmwareUri(settings).ToString());
     }
 }

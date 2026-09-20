@@ -18,6 +18,7 @@ paths:
   - HomeAutomationServerTests/UnitTests/SolarWebSettingsTests.cs
   - HomeAutomationServerTests/UnitTests/SolarWebChartParserTests.cs
   - HomeAutomationServerTests/UnitTests/SolarWebHistoryStoreTests.cs
+  - HomeAutomationServerTests/UnitTests/SolarWebFirmwareTests.cs
   - HomeAutomationServerTests/UnitTests/SolarWebServiceTests.cs
   - HomeAutomationServerTests/UnitTests/HtmlFormTests.cs
   - HomeAutomationServerTests/UnitTests/Hosted/SolarWebLoginTests.cs
@@ -150,6 +151,32 @@ ago in the system's zone; the whole history never is.
 
 `SolarWebServiceTests` pins all of this with a settable clock, a fake client and an in-memory store;
 `SolarWebHistoryStoreTests` uses a real SQLite file in the temp folder.
+
+## The firmware status (added 2026-09-20)
+
+`GET /Firmware/GetComponentUpdateInfos?pvSystemId=<guid>` is what Solar.web's firmware page loads: `data.UpdateInfos[]`,
+Pascal case, one entry per component and data source - a Gen24 that reports through two data loggers is listed
+twice. Each has `AvailableUpdate` (`InstalledVersion`, `UpdateVersion`, `ChangelogUrl` - a PDF -,
+`NewerVersionAvailable`, `IsUpdateAllowed`, `LastUpdate`), `InfoDescription`, `IsOnline`, `UpdateRecommendationInfo`
+(`LatestVersionInstalled`, `Empty`, ...) and `UpdateStatus`. **Not every component has firmware Solar.web manages**:
+older inverters and third-party batteries come with both versions `null` and `UpdateRecommendationInfo` `Empty`;
+`SolarWebFirmwareComponent.IsManagedBySolarWeb` is false for them and they can never be `IsOutdated`.
+
+**Versions are `System.Version`.** Solar.web writes `1.41.11-1`: major, minor, build, and the revision after a dash
+(the developer's instruction of 2026-09-20). `SolarWebVersion.Parse` turns the dash into the fourth dot, so the JSON
+to the client carries `1.41.11.1` (System.Text.Json's own `Version` form) and `ToSolarWebString` puts the dash back
+for display. A version that does not parse is an `InvalidDataException` - the format is fixed, and a change to it
+should be seen, not swallowed.
+
+`SolarWebFirmwareStatus : IHaveUniqueId` travels like `EnergyChartData`: `SolarWebService` publishes it to
+`IDataControlService` under `SolarWebFirmwareStatus.DeviceId` **whenever it differs from the one before**
+(`SameAs`: the components by value, the time stamp does not count) - so the clients get a `SolarWebFirmwareStatus`
+hub message when a firmware becomes outdated and again when it has been installed, a connecting client gets the
+current one replayed, and `GET api/SolarWeb/firmware` answers it on request (read again where older than
+`RefreshRate`). The service polls it every `RefreshRate` (`TickAsync`, a timer whose first tick is one interval
+after start, so a slow login never holds up the server; the first status comes with the first client that asks).
+The firmware requests go through the same gate and back-off as the charts (`AskAsync`). Users only, like the price
+data: `DeviceVisibility` does not list it for guests.
 
 ## Not done yet
 

@@ -16,4 +16,7 @@ public interface ISolarWebClient
     ///     <paramref name="date" />: the day itself, or the month, the year or the whole history that contains it.
     /// </summary>
     Task<SolarWebChart> GetChartAsync(SolarWebSettings settings, SolarWebInterval interval, SolarWebView view, DateOnly date, CancellationToken token = default);
+
+    /// <summary>The firmware of every component of the system, as Solar.web's firmware page shows it.</summary>
+    Task<SolarWebFirmwareStatus> GetFirmwareStatusAsync(SolarWebSettings settings, CancellationToken token = default);
 }

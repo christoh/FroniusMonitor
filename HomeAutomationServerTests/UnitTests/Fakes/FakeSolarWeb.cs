@@ -6,12 +6,30 @@ namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests.Fakes;
 /// <summary>Solar.web as a test wants it: answers a chart for whatever is asked, counts what it was asked, and can refuse in every way the real one does.</summary>
 internal sealed class FakeSolarWebClient(TimeProvider clock) : ISolarWebClient
 {
+    /// <summary>How many charts were asked for.</summary>
     public int Requests { get; private set; }
+
+    public int FirmwareRequests { get; private set; }
 
     public List<(SolarWebInterval Interval, SolarWebView View, DateOnly Date)> Asked { get; } = [];
 
+    /// <summary>What the firmware answer lists.</summary>
+    public List<SolarWebFirmwareComponent> Firmware { get; } = [];
+
     /// <summary>What the next requests throw, or <see langword="null" /> to answer.</summary>
     public Exception? Refusal { get; set; }
+
+    public Task<SolarWebFirmwareStatus> GetFirmwareStatusAsync(SolarWebSettings settings, CancellationToken token = default)
+    {
+        FirmwareRequests++;
+
+        if (Refusal != null)
+        {
+            throw Refusal;
+        }
+
+        return Task.FromResult(new SolarWebFirmwareStatus { PvSystemId = settings.PvSystemId, Timestamp = clock.GetUtcNow().UtcDateTime, Components = [.. Firmware] });
+    }
 
     public Task<SolarWebChart> GetChartAsync(SolarWebSettings settings, SolarWebInterval interval, SolarWebView view, DateOnly date, CancellationToken token = default)
     {

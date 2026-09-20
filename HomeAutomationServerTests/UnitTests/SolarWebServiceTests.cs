@@ -1,5 +1,7 @@
+using De.Hochstaetter.Fronius.Models.Events;
 using De.Hochstaetter.HomeAutomationServer.Models.Settings;
 using De.Hochstaetter.HomeAutomationServer.Models.SolarWeb;
+using De.Hochstaetter.HomeAutomationServer.Services;
 using De.Hochstaetter.HomeAutomationServer.Services.DataCollectors;
 using De.Hochstaetter.HomeAutomationServerTests.UnitTests.Fakes;
 using Microsoft.Extensions.Options;
@@ -25,11 +27,14 @@ public sealed class SolarWebServiceTests : IDisposable
     private readonly InMemorySolarWebHistoryStore store = new();
     private readonly FakeSolarWebClient client;
     private readonly SolarWebParameters parameters;
+    private readonly IDataControlService controlService = new DataControlService(NullLogger<DataControlService>.Instance);
+    private readonly List<DeviceUpdateEventArgs> updates = [];
     private readonly SolarWebService service;
 
     public SolarWebServiceTests()
     {
         client = new FakeSolarWebClient(clock);
+        controlService.DeviceUpdate += (_, e) => updates.Add(e);
 
         parameters = new SolarWebParameters
         {
@@ -38,8 +43,10 @@ public sealed class SolarWebServiceTests : IDisposable
             MinimumRequestInterval = TimeSpan.Zero,
         };
 
-        service = new SolarWebService(NullLogger<SolarWebService>.Instance, Options(parameters), client, store, clock);
+        service = Create(parameters, store);
     }
+
+    private SolarWebService Create(SolarWebParameters p, InMemorySolarWebHistoryStore s) => new(NullLogger<SolarWebService>.Instance, Options(p), client, s, controlService, clock);
 
     public void Dispose() => service.Dispose();
 
@@ -51,15 +58,106 @@ public sealed class SolarWebServiceTests : IDisposable
         Assert.Equal(1, store.Initializations);
         Assert.Equal(today, service.Today);
 
-        var disabled = new SolarWebService(NullLogger<SolarWebService>.Instance, Options(new SolarWebParameters()), client, new InMemorySolarWebHistoryStore(), clock);
+        using var disabled = Create(new SolarWebParameters(), new InMemorySolarWebHistoryStore());
         await disabled.StartAsync(TestContext.Current.CancellationToken);
         Assert.False(disabled.IsEnabled);
         await Assert.ThrowsAsync<InvalidOperationException>(() => disabled.GetChartAsync(SolarWebInterval.Day, SolarWebView.Production, today, TestContext.Current.CancellationToken));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => disabled.GetFirmwareStatusAsync(TestContext.Current.CancellationToken));
+        await disabled.TickAsync(TestContext.Current.CancellationToken);
 
-        var noSystem = new SolarWebService(NullLogger<SolarWebService>.Instance, Options(new SolarWebParameters { Settings = new SolarWebSettings { UserName = "x" } }), client, new InMemorySolarWebHistoryStore(), clock);
+        using var noSystem = Create(new SolarWebParameters { Settings = new SolarWebSettings { UserName = "x" } }, new InMemorySolarWebHistoryStore());
         Assert.False(noSystem.IsEnabled);
         Assert.Equal(0, client.Requests);
+        Assert.Equal(0, client.FirmwareRequests);
     }
+
+    [Fact]
+    public async Task The_firmware_status_is_read_on_request_kept_for_the_refresh_rate_and_pushed_only_when_it_changes()
+    {
+        client.Firmware.Add(Component("Battery", null, null, false));
+        client.Firmware.Add(Component("Gen24Main", "1.41.11-1", "1.41.11-1", false));
+        await service.StartAsync(TestContext.Current.CancellationToken);
+        Assert.Null(service.FirmwareStatus);
+        Assert.Empty(updates);
+
+        // The first read is published: a client that connects later gets it replayed.
+        var first = await service.GetFirmwareStatusAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(1, client.FirmwareRequests);
+        Assert.Same(first, service.FirmwareStatus);
+        Assert.False(first.HasOutdatedFirmware);
+        Assert.Same(first, Assert.IsType<SolarWebFirmwareStatus>(controlService.Entities[SolarWebFirmwareStatus.DeviceId].Device));
+        var update = Assert.Single(updates);
+        Assert.Equal(SolarWebFirmwareStatus.DeviceId, update.Id);
+
+        // Within the refresh rate the same status is served; after it Solar.web is asked again, and nothing changed, so nothing is pushed.
+        clock.Now = noon.AddMinutes(14);
+        Assert.Same(first, await service.GetFirmwareStatusAsync(TestContext.Current.CancellationToken));
+        Assert.Equal(1, client.FirmwareRequests);
+        clock.Now = noon.AddMinutes(15);
+        var second = await service.GetFirmwareStatusAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(2, client.FirmwareRequests);
+        Assert.NotSame(first, second);
+        Assert.Equal(clock.Now.UtcDateTime, second.Timestamp);
+        Assert.Single(updates);
+
+        // A newer firmware turns up: the tick reads it regardless of age and the clients are told.
+        client.Firmware[1] = Component("Gen24Main", "1.41.11-1", "1.42.3-2", true);
+        clock.Now = noon.AddMinutes(20);
+        await service.TickAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(3, client.FirmwareRequests);
+        Assert.Equal(2, updates.Count);
+        var pushed = Assert.IsType<SolarWebFirmwareStatus>(updates[1].Device.Device);
+        Assert.True(pushed.HasOutdatedFirmware);
+        Assert.Equal(new Version(1, 42, 3, 2), pushed.Components[1].UpdateVersion);
+        Assert.Same(pushed, service.FirmwareStatus);
+
+        // The update was installed: told once more, so the client can take its notice down.
+        client.Firmware[1] = Component("Gen24Main", "1.42.3-2", "1.42.3-2", false);
+        await service.TickAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(3, updates.Count);
+        Assert.False(Assert.IsType<SolarWebFirmwareStatus>(updates[2].Device.Device).HasOutdatedFirmware);
+
+        // Stopping takes the status off the hub.
+        await service.StopAsync(TestContext.Current.CancellationToken);
+        Assert.False(controlService.Entities.ContainsKey(SolarWebFirmwareStatus.DeviceId));
+        Assert.Null(service.FirmwareStatus);
+    }
+
+    [Fact]
+    public async Task A_firmware_read_that_fails_keeps_the_last_status_and_the_tick_swallows_the_failure()
+    {
+        client.Firmware.Add(Component("Gen24Main", "1.41.11-1", "1.41.11-1", false));
+        await service.StartAsync(TestContext.Current.CancellationToken);
+        var first = await service.GetFirmwareStatusAsync(TestContext.Current.CancellationToken);
+
+        clock.Now = noon.AddMinutes(20);
+        client.Refusal = new SolarWebUnavailableException(null, "Maintenance Work");
+        await service.TickAsync(TestContext.Current.CancellationToken);
+        Assert.Same(first, service.FirmwareStatus);
+        Assert.Same(first, await service.GetFirmwareStatusAsync(TestContext.Current.CancellationToken));
+        Assert.Equal(2, client.FirmwareRequests);
+        Assert.NotNull(service.UnavailableUntil);
+
+        // The charts share the back-off: a chart not in the cache is refused without a request.
+        await Assert.ThrowsAsync<SolarWebUnavailableException>(() => service.GetChartAsync(SolarWebInterval.Month, SolarWebView.Production, today, TestContext.Current.CancellationToken));
+        Assert.Equal(0, client.Requests);
+        Assert.Single(updates);
+    }
+
+    private static SolarWebFirmwareComponent Component(string family, string? installed, string? available, bool newer) => new()
+    {
+        DataSourceId = "pilot-0.6e-796954429721009271_1663595310",
+        ComponentId = family == "Battery" ? 16580609 : 262144,
+        UpdateFamily = family,
+        IsOnline = true,
+        InstalledVersion = SolarWebVersion.Parse(installed),
+        UpdateVersion = SolarWebVersion.Parse(available),
+        ChangelogUrl = available == null ? null : $"https://firmware-download.fronius.com/releaseGroup/Gen24-imxs6/common/{available}/changelog.pdf",
+        NewerVersionAvailable = newer,
+        IsUpdateAllowed = true,
+        UpdateRecommendationInfo = installed == null ? "Empty" : newer ? "NewerVersionAvailable" : "LatestVersionInstalled",
+        UpdateStatus = installed == null ? "None" : "Success",
+    };
 
     [Fact]
     public async Task A_period_that_is_over_is_read_once_and_then_served_from_the_cache_for_good()

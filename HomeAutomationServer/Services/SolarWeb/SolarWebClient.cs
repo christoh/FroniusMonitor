@@ -65,24 +65,35 @@ public sealed class SolarWebClient : ISolarWebClient, IDisposable
 
     public async Task<SolarWebChart> GetChartAsync(SolarWebSettings settings, SolarWebInterval interval, SolarWebView view, DateOnly date, CancellationToken token = default)
     {
-        var uri = ChartUri(settings, interval, view, date);
+        var json = await GetJsonAsync(settings, ChartUri(settings, interval, view, date), token).ConfigureAwait(false);
+        return SolarWebChartParser.Parse(json, settings.PvSystemId, interval, view, SolarWebPeriod.Normalize(interval, date), clock.GetUtcNow().UtcDateTime);
+    }
 
+    public async Task<SolarWebFirmwareStatus> GetFirmwareStatusAsync(SolarWebSettings settings, CancellationToken token = default)
+    {
+        var json = await GetJsonAsync(settings, FirmwareUri(settings), token).ConfigureAwait(false);
+        return SolarWebFirmwareParser.Parse(json, settings.PvSystemId, clock.GetUtcNow().UtcDateTime);
+    }
+
+    public static Uri ChartUri(SolarWebSettings settings, SolarWebInterval interval, SolarWebView view, DateOnly date)
+    {
+        return new Uri(BaseUri(settings), FormattableString.Invariant(
+            $"Chart/GetChartNew?pvSystemId={Uri.EscapeDataString(settings.PvSystemId)}&year={date.Year}&month={date.Month}&day={date.Day}&interval={interval.ToQueryValue()}&view={view.ToQueryValue()}"));
+    }
+
+    public static Uri FirmwareUri(SolarWebSettings settings) => new(BaseUri(settings), $"Firmware/GetComponentUpdateInfos?pvSystemId={Uri.EscapeDataString(settings.PvSystemId)}");
+
+    private static Uri BaseUri(SolarWebSettings settings) => new(settings.BaseUrl.TrimEnd('/') + "/", UriKind.Absolute);
+
+    private async Task<string> GetJsonAsync(SolarWebSettings settings, Uri uri, CancellationToken token)
+    {
         if (logger.IsEnabled(LogLevel.Debug))
         {
             logger.LogDebug("Solar.web request: {Uri}", uri);
         }
 
         using var response = await FetchJsonAsync(settings, uri, token).ConfigureAwait(false);
-        var json = await response.Content.ReadAsStringAsync(token).ConfigureAwait(false);
-        return SolarWebChartParser.Parse(json, settings.PvSystemId, interval, view, SolarWebPeriod.Normalize(interval, date), clock.GetUtcNow().UtcDateTime);
-    }
-
-    public static Uri ChartUri(SolarWebSettings settings, SolarWebInterval interval, SolarWebView view, DateOnly date)
-    {
-        var baseUri = new Uri(settings.BaseUrl.TrimEnd('/') + "/", UriKind.Absolute);
-
-        return new Uri(baseUri, FormattableString.Invariant(
-            $"Chart/GetChartNew?pvSystemId={Uri.EscapeDataString(settings.PvSystemId)}&year={date.Year}&month={date.Month}&day={date.Day}&interval={interval.ToQueryValue()}&view={view.ToQueryValue()}"));
+        return await response.Content.ReadAsStringAsync(token).ConfigureAwait(false);
     }
 
     /// <summary>

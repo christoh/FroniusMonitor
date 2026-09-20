@@ -16,6 +16,18 @@ public interface ISolarWebService
     /// <summary>Until when Solar.web is left alone after a 429, a 503 or its maintenance page, or <see langword="null" /> where it is not.</summary>
     DateTimeOffset? UnavailableUntil { get; }
 
+    /// <summary>The firmware status as last read, or <see langword="null" /> before the first read. It is what the hub last pushed.</summary>
+    SolarWebFirmwareStatus? FirmwareStatus { get; }
+
+    /// <summary>
+    ///     The firmware status, read from Solar.web where the last one is older than the refresh interval. A client
+    ///     asks this at start; afterwards the hub pushes every change as a <c>SolarWebFirmwareStatus</c> message.
+    /// </summary>
+    /// <exception cref="SolarWebUnavailableException">See <see cref="GetChartAsync" />.</exception>
+    /// <exception cref="SolarWebLoginException">See <see cref="GetChartAsync" />.</exception>
+    /// <exception cref="HttpRequestException">See <see cref="GetChartAsync" />.</exception>
+    Task<SolarWebFirmwareStatus> GetFirmwareStatusAsync(CancellationToken token = default);
+
     /// <summary>
     ///     The chart of <paramref name="view" /> over the <paramref name="interval" /> that contains
     ///     <paramref name="date" />. A period that is over comes from the cache once it is there; a running period

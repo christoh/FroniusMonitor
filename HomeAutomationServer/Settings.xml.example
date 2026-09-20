@@ -34,6 +34,7 @@
         next to the executable (mount that folder to keep it); charts of single days are kept for 30 days, months,
         years and the overall chart for good. A running period is read again after RefreshMinutes. Solar.web limits
         the request rate (429), so keep RefreshMinutes at 5 or more. TimeZoneId is the PV system's; it decides
-        when a day is over. -->
+        when a day is over. The firmware status of the system's components (GET api/SolarWeb/firmware) is checked
+        every RefreshMinutes as well, and every change is pushed to the clients over the hub. -->
    <SolarWeb BaseUrl="https://www.solarweb.com" UserName="you@example.com" ClearTextPassword="your password, replaced by an encrypted Password on the first save" PvSystemId="00000000-0000-0000-0000-000000000000" RefreshMinutes="15" TimeZoneId="Europe/Berlin" />
 </Settings>
