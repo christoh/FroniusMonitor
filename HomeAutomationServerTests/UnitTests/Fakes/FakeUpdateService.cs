@@ -70,6 +70,16 @@ public sealed partial class FakeUpdateService : BindableBase, IUpdateService
 
     public bool HasEnergyData => false;
 
+    public SolarWebFirmwareStatus? SolarWebFirmwareStatus => null;
+
+    public bool HasSolarWeb => false;
+
+    public event EventHandler<SolarWebFirmwareStatus>? SolarWebFirmwareStatusChanged
+    {
+        add { }
+        remove { }
+    }
+
     public Task StartAsync(Roles roles) => Task.CompletedTask;
 
     public Task StopAsync() => Task.CompletedTask;

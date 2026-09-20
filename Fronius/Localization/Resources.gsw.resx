@@ -1869,4 +1869,37 @@
   <data name="Idle" xml:space="preserve">
     <value>Inaktiv</value>
   </data>
+  <data name="Production" xml:space="preserve">
+    <value>Produktion</value>
+  </data>
+  <data name="Profitability" xml:space="preserve">
+    <value>Rentabilität</value>
+  </data>
+  <data name="Costs" xml:space="preserve">
+    <value>Köschte</value>
+  </data>
+  <data name="Day" xml:space="preserve">
+    <value>Tag</value>
+  </data>
+  <data name="Month" xml:space="preserve">
+    <value>Monet</value>
+  </data>
+  <data name="Year" xml:space="preserve">
+    <value>Jahr</value>
+  </data>
+  <data name="LoadingSolarWebData" xml:space="preserve">
+    <value>Solar.web-Date wärded glade</value>
+  </data>
+  <data name="SolarWebPremiumHint" xml:space="preserve">
+    <value>Die Aasicht bruucht es Solar.web-Premium-Abo.</value>
+  </data>
+  <data name="FirmwareUpdateAvailable" xml:space="preserve">
+    <value>Firmware-Update verfüegbar</value>
+  </data>
+  <data name="FirmwareUpdateAvailableText" xml:space="preserve">
+    <value>Solar.web bütet nöieri Firmware für die Komponänte aa. Du chasch s Update uf Solar.web starte.</value>
+  </data>
+  <data name="ShowChangelog" xml:space="preserve">
+    <value>Änderige aazeige</value>
+  </data>
 </root>

@@ -32,6 +32,12 @@ public abstract partial class DialogBase<TParameters, TResult, TBody>(TParameter
             {
                 shown.BusyText = value;
             }
+
+            // The generated setter this overrides would announce both; a binding to IsBusy - the row of controls a
+            // dialog disables while it loads - otherwise keeps whatever it read first. Found 2026-09-20 with the
+            // Solar.web chart, whose Initialize sets the busy text before the first binding is read.
+            OnPropertyChanged(nameof(BusyText));
+            OnPropertyChanged(nameof(IsBusy));
         }
     }
 

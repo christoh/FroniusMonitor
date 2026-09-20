@@ -5595,5 +5595,113 @@ namespace De.Hochstaetter.Fronius.Localization {
                 return ResourceManager.GetString("Idle", resourceCulture);
             }
         }
+        /// <summary>
+        ///   Looks up a localized string similar to Solar.web.
+        /// </summary>
+        public static string SolarWeb {
+            get {
+                return ResourceManager.GetString("SolarWeb", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Production.
+        /// </summary>
+        public static string Production {
+            get {
+                return ResourceManager.GetString("Production", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Profitability.
+        /// </summary>
+        public static string Profitability {
+            get {
+                return ResourceManager.GetString("Profitability", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Costs.
+        /// </summary>
+        public static string Costs {
+            get {
+                return ResourceManager.GetString("Costs", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Day.
+        /// </summary>
+        public static string Day {
+            get {
+                return ResourceManager.GetString("Day", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Month.
+        /// </summary>
+        public static string Month {
+            get {
+                return ResourceManager.GetString("Month", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Year.
+        /// </summary>
+        public static string Year {
+            get {
+                return ResourceManager.GetString("Year", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Loading Solar.web data.
+        /// </summary>
+        public static string LoadingSolarWebData {
+            get {
+                return ResourceManager.GetString("LoadingSolarWebData", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to This view needs a Solar.web Premium subscription..
+        /// </summary>
+        public static string SolarWebPremiumHint {
+            get {
+                return ResourceManager.GetString("SolarWebPremiumHint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Firmware update available.
+        /// </summary>
+        public static string FirmwareUpdateAvailable {
+            get {
+                return ResourceManager.GetString("FirmwareUpdateAvailable", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Solar.web offers newer firmware for these components. You can start the update on Solar.web..
+        /// </summary>
+        public static string FirmwareUpdateAvailableText {
+            get {
+                return ResourceManager.GetString("FirmwareUpdateAvailableText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Show changelog.
+        /// </summary>
+        public static string ShowChangelog {
+            get {
+                return ResourceManager.GetString("ShowChangelog", resourceCulture);
+            }
+        }
+
     }
 }

@@ -81,6 +81,8 @@
                             <MenuItem Header="{x:Static p:Resources.PowerFlow}" Command="{Binding ShowPowerFlowCommand}" Padding="8,12"/>
                             <MenuItem Header="{x:Static p:Resources.ElectricityPrice}" Command="{Binding ShowEnergyChartCommand}" Padding="8,12"
                                       IsVisible="{Binding UpdateService.HasEnergyData}"/>
+                            <MenuItem Header="{x:Static p:Resources.SolarWeb}" Command="{Binding ShowSolarWebChartCommand}" Padding="8,12"
+                                      IsVisible="{Binding UpdateService.HasSolarWeb}"/>
                         </MenuFlyout>
                     </Button.Flyout>
                 </Button>

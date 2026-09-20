@@ -83,6 +83,8 @@ internal class Program
             // Shows the shape of the price chart section. Without a postal code and a bearer only the market
             // prices are collected, which need no account at all.
             settings.EnergyData = new EnergyDataSettings();
+            // Shows the shape of the Solar.web section; with an empty user name or PvSystemId nothing is read.
+            settings.SolarWeb = new SolarWebSettings();
             await settings.SaveAsync().ConfigureAwait(false);
             settingsLoadException = ex;
         }
@@ -125,6 +127,13 @@ internal class Program
             .AddSingleton<IEnergyHistoryStore, EnergyHistoryStore>()
             .AddSingleton<EnergyDataCollector>()
             .AddSingleton<IEnergyDataService>(services => services.GetRequiredService<EnergyDataCollector>())
+            // Solar.web: one account, one cookie jar, so the client is a singleton; the charts are cached in a
+            // second SQLite file and the controller reads the service under its contract - the same instance,
+            // so the 429 back-off it keeps is the one every request sees.
+            .AddSingleton<ISolarWebClient, SolarWebClient>()
+            .AddSingleton<ISolarWebHistoryStore, SolarWebHistoryStore>()
+            .AddSingleton<SolarWebService>()
+            .AddSingleton<ISolarWebService>(services => services.GetRequiredService<SolarWebService>())
             .AddTransient<ISunSpecClient, SunSpecClient>()
             .AddLogging(b => b.AddSerilog())
             .AddCors(o => o.AddDefaultPolicy(p => p.SetIsOriginAllowed(_ => true)
@@ -193,6 +202,11 @@ internal class Program
                     t.MappingRefreshRate = TimeSpan.FromMinutes(Math.Max(1, settings.ToshibaHvac?.MappingRefreshMinutes ?? 30));
                 })
                 .Configure<EnergyDataCollectorParameters>(e => { e.Settings = settings.EnergyData; })
+                .Configure<SolarWebParameters>(s =>
+                {
+                    s.Settings = settings.SolarWeb;
+                    s.RefreshRate = TimeSpan.FromMinutes(Math.Max(1, settings.SolarWeb?.RefreshMinutes ?? 15));
+                })
                 .Configure<UserList>(u =>
                 {
                     u.Users = settings.Users;
@@ -301,6 +315,7 @@ internal class Program
         await IoC.Get<WattPilotDataCollector>().StartAsync().ConfigureAwait(false);
         await IoC.Get<ToshibaHvacDataCollector>().StartAsync().ConfigureAwait(false);
         await IoC.Get<EnergyDataCollector>().StartAsync().ConfigureAwait(false);
+        await IoC.Get<SolarWebService>().StartAsync().ConfigureAwait(false);
         //await Task.Delay(TimeSpan.FromSeconds(30));
         //await IoC.Get<SunSpecDataCollector>().StopAsync().ConfigureAwait(false);
         //await IoC.Get<Gen24DataCollector>().StopAsync().ConfigureAwait(false);

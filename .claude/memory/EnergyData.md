@@ -14,6 +14,8 @@ paths:
   - HomeAutomationClient/HomeAutomationClient/Contracts/IWebClientService.cs
   - HomeAutomationClient/HomeAutomationClient/Services/WebClientService.cs
   - HomeAutomationServer/Services/EnergyHistoryStore.cs
+  - HomeAutomationServer/Services/SqliteStoreBase.cs
+  - HomeAutomationServer/Misc/TimeZones.cs
   - HomeAutomationServer/Controllers/EnergyDataController.cs
   - HomeAutomationServer/Models/Settings/Settings.cs
   - HomeAutomationServer/Settings.xml.example
@@ -26,6 +28,7 @@ paths:
   - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/EnergyChartView.axaml.cs
   - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/PriceComponentsView.axaml
   - HomeAutomationClient/HomeAutomationClient/Controls/EnergyChartRenderer.cs
+  - HomeAutomationClient/HomeAutomationClient/Controls/ChartTheme.cs
   - HomeAutomationClient/HomeAutomationClient/Services/UpdateService.cs
   - HomeAutomationClient/HomeAutomationClient/Contracts/IUpdateService.cs
   - HomeAutomationServerTests/UnitTests/EnergyDataCollectorTests.cs
@@ -112,7 +115,10 @@ a changed forecast is expanded (`ExpandWattPilotPrices`), stored under `Source =
 ## The history: `history/PriceAndWeatherHistory.db`
 
 `EnergyHistoryStore` in the server, SQLite via `Microsoft.Data.Sqlite`, the contract `IEnergyHistoryStore` in
-Fronius so the collector and the tests do not know SQLite. **The file is next to the executable in `history/`**,
+the server too, so the collector and the tests do not know SQLite. Since 2026-09-20 the plumbing - connection
+string, the `user_version` upgrade steps, one writer at a time, `WriteAsync`, `WriteInTransactionAsync`,
+`ReadAsync` - is `SqliteStoreBase`, shared with the Solar.web chart cache ([[SolarWeb]]); the store itself is
+the schema and the queries. **The file is next to the executable in `history/`**,
 which the Dockerfile creates and `chown`s to `app`; `docker-compose.yml` shows the mount. Yesterday and older is
 final: `GetDayAsync` serves it from the store and asks Awattar only for what the store lacks, once.
 
@@ -125,7 +131,7 @@ Tables (`user_version` 1), every key carrying the source so a second provider fi
 | `GridProduction` | `Region, StartUtc` | |
 | `Weather` | `Source, StationId, TimeUtc, IsForecast` | nullable columns; an upsert never overwrites a value with NULL (`COALESCE`) |
 
-Times are Unix seconds UTC. Schema changes go into `InitializeAsync` as `if (version < n)` steps.
+Times are Unix seconds UTC. Schema changes go into `UpgradeAsync` as `if (version < n)` steps.
 
 ## Publishing: the chart data is a "device"
 
@@ -135,7 +141,8 @@ was built for the push**: `SignalRDispatcher` broadcasts it as the hub message `
 `AddOrUpdate`, `HomeAutomationHub.OnConnectedAsync` replays it to a connecting client, `StopAsync` removes it. It
 covers **today and tomorrow of the server's local day** (`EnergyDataSettings.TimeZoneId`, or the machine's zone -
 a container is UTC unless `TZ` is set; the image has `tzdata`). `From`/`To` are UTC and a day is 23 or 25 hours
-when the clocks change (`DayBounds` converts local midnight, it does not add 24 h).
+when the clocks change (`DayBounds` converts local midnight, it does not add 24 h). `EnergyDataSettings.ResolveTimeZone` is `Misc/TimeZones.Resolve`, the one
+resolver of a `TimeZoneId`, shared with `SolarWebSettings` since 2026-09-20.
 
 `GET api/EnergyData` answers `IEnergyDataService.Current`, `GET api/EnergyData/{yyyy-MM-dd}` one local day of the
 server; 404 with a `ProblemDetails` where the server has no `EnergyData` element. The collector implements
@@ -165,6 +172,10 @@ exempt from VAT stays as it is, and a negative market price gets negative VAT, w
   as zoom and pan were off in WPF. Theme colors reach the renderer as `HaColor`. **Color the axes after
   `DateTimeTicksBottom()`**: that call replaces the bottom axis, and one colored before it came up black on the
   dark theme.
+  Since 2026-09-20 the theme handling every chart of the client shares - the two palette colours
+  (`EnergyChartPalette`, now in `Controls/ChartTheme.cs`), the figure, grid and legend colours, axis captions, right
+  axes, the legend below, and reading the palette off a control (`ChartTheme.PaletteOf`) - is `ChartTheme`, used by
+  this renderer and by `SolarWebChartRenderer` ([[SolarWeb]]).
 - **Value labels sit at a fixed offset in a fixed 11 point font, like OxyPlot's.** They overlap when the dialog is
   narrow, and the developer wants that rather than what was tried on 2026-09-13: staggering by bar index (bars
   of different heights put neighbours at the same height anyway) and collision detection in pixel space with a

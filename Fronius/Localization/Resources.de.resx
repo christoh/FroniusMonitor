@@ -1860,4 +1860,37 @@
   <data name="Idle" xml:space="preserve">
     <value>Inaktiv</value>
   </data>
+  <data name="Production" xml:space="preserve">
+    <value>Produktion</value>
+  </data>
+  <data name="Profitability" xml:space="preserve">
+    <value>Rentabilität</value>
+  </data>
+  <data name="Costs" xml:space="preserve">
+    <value>Kosten</value>
+  </data>
+  <data name="Day" xml:space="preserve">
+    <value>Tag</value>
+  </data>
+  <data name="Month" xml:space="preserve">
+    <value>Monat</value>
+  </data>
+  <data name="Year" xml:space="preserve">
+    <value>Jahr</value>
+  </data>
+  <data name="LoadingSolarWebData" xml:space="preserve">
+    <value>Solar.web-Daten werden geladen</value>
+  </data>
+  <data name="SolarWebPremiumHint" xml:space="preserve">
+    <value>Diese Ansicht braucht ein Solar.web-Premium-Abo.</value>
+  </data>
+  <data name="FirmwareUpdateAvailable" xml:space="preserve">
+    <value>Firmware-Update verfügbar</value>
+  </data>
+  <data name="FirmwareUpdateAvailableText" xml:space="preserve">
+    <value>Solar.web bietet neuere Firmware für diese Komponenten an. Du kannst das Update auf Solar.web starten.</value>
+  </data>
+  <data name="ShowChangelog" xml:space="preserve">
+    <value>Änderungen anzeigen</value>
+  </data>
 </root>

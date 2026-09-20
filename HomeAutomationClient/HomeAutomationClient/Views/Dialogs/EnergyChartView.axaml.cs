@@ -1,5 +1,3 @@
-using De.Hochstaetter.Fronius.Models;
-
 namespace De.Hochstaetter.HomeAutomationClient.Views.Dialogs;
 
 /// <summary>
@@ -70,17 +68,9 @@ public partial class EnergyChartView : UserControl, IDialogControl
 
         if (viewModel?.ChartModel is { } model)
         {
-            EnergyChartRenderer.Render(Plot.Plot, model, new EnergyChartPalette(ThemeColor("ForegroundBrush", HaColors.Black), ThemeColor("DialogBackground", HaColors.White)));
+            EnergyChartRenderer.Render(Plot.Plot, model, ChartTheme.PaletteOf(this));
         }
 
         Plot.Refresh();
-    }
-
-    /// <summary>A brush of the theme as a plain color, so the renderer never sees an Avalonia type.</summary>
-    private HaColor ThemeColor(string key, HaColor fallback)
-    {
-        return this.TryFindResource(key, ActualThemeVariant, out var resource) && resource is ISolidColorBrush brush
-            ? HaColor.FromArgb(brush.Color.A, brush.Color.R, brush.Color.G, brush.Color.B)
-            : fallback;
     }
 }

@@ -1,0 +1,69 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
+             xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
+             xmlns:sp="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="1160" d:DesignHeight="520"
+             x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.SolarWebChartView"
+             x:DataType="dialogs:SolarWebChartViewModel"
+             Width="1160" Height="520" MinWidth="900" MinHeight="320" FontSize="12">
+	<!-- The same shape as the price chart: the plot above, one row of choices below, and the dialog resizeable from
+	     the start because a chart gets better with every pixel. The row does not wrap; the minimum width is what it
+	     needs on one line in German. -->
+	<UserControl.Styles>
+		<StyleInclude Source="avares://HomeAutomationClient/Styles/CompactForms.axaml" />
+		<Style Selector="RadioButton.Wrap">
+			<Setter Property="Margin" Value="0,2,0,0" />
+		</Style>
+		<Style Selector="Button.Step">
+			<Setter Property="Padding" Value="8,2" />
+			<Setter Property="FontSize" Value="16" />
+			<Setter Property="VerticalAlignment" Value="Center" />
+		</Style>
+	</UserControl.Styles>
+
+	<Grid RowDefinitions="*,Auto">
+		<!-- The chart itself. It has no bindings: the code behind draws ChartModel into it, because drawing is the
+		     one thing here that needs the charting library, and reacts to the theme the same way. -->
+		<sp:AvaPlot Grid.Row="0" x:Name="Plot" />
+
+		<Grid Grid.Row="1" ColumnDefinitions="Auto,Auto,Auto,*" Margin="16,6,16,10"
+		      IsEnabled="{Binding IsBusy, Converter={co:BoolInverter}}">
+			<!-- The four tabs at the top of Solar.web's chart page. The two Premium ones have no day chart there,
+			     so they are disabled while the day is shown; the view model switches back to production then. -->
+			<StackPanel Grid.Column="0" Margin="0,0,14,0">
+				<RadioButton Classes="Wrap" GroupName="View" Content="{x:Static p:Resources.Production}" IsChecked="{Binding IsProduction, Mode=TwoWay}" />
+				<RadioButton Classes="Wrap" GroupName="View" Content="{x:Static p:Resources.Consumption}" IsChecked="{Binding IsConsumption, Mode=TwoWay}" />
+				<RadioButton Classes="Wrap" GroupName="View" Content="{x:Static p:Resources.Profitability}" IsChecked="{Binding IsReturnOfInvestment, Mode=TwoWay}" IsEnabled="{Binding CanChoosePremium}" />
+				<RadioButton Classes="Wrap" GroupName="View" Content="{x:Static p:Resources.Costs}" IsChecked="{Binding IsExpense, Mode=TwoWay}" IsEnabled="{Binding CanChoosePremium}" />
+			</StackPanel>
+
+			<!-- The four buttons at the bottom of that page. -->
+			<StackPanel Grid.Column="1" Margin="0,0,14,0">
+				<RadioButton Classes="Wrap" GroupName="Interval" Content="{x:Static p:Resources.Day}" IsChecked="{Binding IsDay, Mode=TwoWay}" />
+				<RadioButton Classes="Wrap" GroupName="Interval" Content="{x:Static p:Resources.Month}" IsChecked="{Binding IsMonth, Mode=TwoWay}" />
+				<RadioButton Classes="Wrap" GroupName="Interval" Content="{x:Static p:Resources.Year}" IsChecked="{Binding IsYear, Mode=TwoWay}" />
+				<RadioButton Classes="Wrap" GroupName="Interval" Content="{x:Static p:Resources.Total}" IsChecked="{Binding IsAll, Mode=TwoWay}" />
+			</StackPanel>
+
+			<!-- The date, and a step to either side by a day, a month or a year, as the arrows beside the date on
+			     Solar.web's page. A DatePicker and not a CalendarDatePicker, as in the price chart: this one is spun,
+			     never typed, so it may bind the date itself; the view model clamps the day. Nothing to pick for the
+			     whole history. -->
+			<StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center" Margin="0,0,14,0"
+			            IsEnabled="{Binding HasDate}">
+				<Button Classes="Step" Content="&lt;" Command="{Binding PreviousCommand}" />
+				<DatePicker SelectedDate="{Binding Date, Mode=TwoWay}" MinYear="{Binding MinimumYear}" MaxYear="{Binding MaximumYear}"
+				            MinWidth="0" Width="230" MinHeight="22" VerticalAlignment="Center" />
+				<Button Classes="Step" Content="&gt;" Command="{Binding NextCommand}" />
+			</StackPanel>
+
+			<!-- Solar.web's word where the account has no Premium subscription for the view shown. -->
+			<TextBlock Grid.Column="3" VerticalAlignment="Center" TextWrapping="Wrap" Opacity="0.8"
+			           Text="{x:Static p:Resources.SolarWebPremiumHint}" IsVisible="{Binding IsPremiumFeature}" />
+		</Grid>
+	</Grid>
+</UserControl>

@@ -46,3 +46,4 @@ global using DeviceId;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;
 global using Microsoft.Extensions.Options;
+global using De.Hochstaetter.Fronius.Models.SolarWeb;

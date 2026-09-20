@@ -44,7 +44,7 @@ public class Settings
     /// by its absence.
     /// </summary>
     public bool EnableGuestAccount { get; set; } = true;
-    
+
     public WebServerSettings WebServerSettings = new WebServerSettings();
 
     /// <summary>The Toshiba account, or <see langword="null" /> when the server has no air conditioners to collect.</summary>
@@ -54,6 +54,10 @@ public class Settings
     /// <summary>The sources of the price chart, or <see langword="null" /> when the server collects no prices and no weather.</summary>
     [XmlElement, DefaultValue(null)]
     public EnergyDataSettings? EnergyData { get; set; }
+
+    /// <summary>The Fronius Solar.web account and PV system, or <see langword="null" /> when the server serves no Solar.web charts.</summary>
+    [XmlElement, DefaultValue(null)]
+    public SolarWebSettings? SolarWeb { get; set; }
 
     [XmlIgnore] public static string SettingsFileName { get; set; } = Path.Combine(AppContext.BaseDirectory, "Settings.xml");
 
@@ -77,7 +81,7 @@ public class Settings
         lock (settingLock)
         {
             fileName ??= SettingsFileName;
-            UpdateChecksum([.. FritzBoxConnections, ToshibaHvac]);
+            UpdateChecksum([.. FritzBoxConnections, ToshibaHvac, SolarWeb]);
             var serializer = new XmlSerializer(typeof(Settings));
             using var stream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None);
 

@@ -110,7 +110,7 @@ its previous run is still pending, and a run that awaits `ShowDialogAsync` is pe
 on screen - which used to be a modal moment and is now a window the user leaves standing. Without the flag the
 menu entry or button is **disabled** for exactly that time, so a second settings dialog could never be opened and
 clicking Electricity price while its window was up did nothing at all, not even bring it to the front. It carries
-Six commands need the flag today: `MainViewModel.Settings`, `ChangePassword` and `ShowEnergyChart`,
+Seven commands need the flag today: `MainViewModel.Settings`, `ChangePassword`, `ShowEnergyChart` and `ShowSolarWebChart`,
 `EnergyChartViewModel.ShowPriceComponents`, `UserManagementViewModel.Add` and `Edit`. (`ShowPowerFlow` opens a
 page, not a dialog, and needs neither the flag nor the gate.)
 
@@ -186,7 +186,10 @@ the overlay.
 ## Busy text
 
 `DialogBase.BusyText` is not a property of its own, it proxies the presentation, because the animation belongs to
-wherever the dialog is. `MainViewDialogPresentation` proxies `MainViewModel.DialogBusyText`, which the animation
+wherever the dialog is. **The override announces `BusyText` and `IsBusy` itself** (since 2026-09-20): the
+generated setter it replaces would have, and without it a binding to `IsBusy` - the row of controls a dialog
+disables while it loads - kept whatever it read first. The Solar.web chart, whose `Initialize` sets the busy text
+before the first binding is read, came up with every button disabled for good. `MainViewDialogPresentation` proxies `MainViewModel.DialogBusyText`, which the animation
 over the dialog frame binds to; `WindowDialogPresentation` proxies `ChildWindow.BusyText`, which is the animation
 in that dialog's own window. A dialog that writes a busy text needs neither to know which.
 
@@ -249,6 +252,12 @@ dialog can be dragged by both.
 
 In the dialog frame. A window gets `CanResize` from the same parameter and the rest of this section does not
 apply to it; what the two have in common is that the maximum the body declares is lifted while it is resizable.
+**A window also lifts an explicit `Width` and `Height` off the body** (since 2026-09-20): the two chart dialogs
+state their size that way, because that is what the frame's `DragResize` needs, and in a window an explicit size
+stays what it is - the body sat at 1160 in the middle of a window dragged to 1600. `ChildWindow.ApplyContentLimits`
+sets them to `NaN`, hands the body's `MinWidth`/`MinHeight` to the window, and the lifted size is what the window
+opens at where `InitialWindowSize` says nothing (`ApplyInitialSize`); switching resizing off puts it all back.
+`A_resizable_window_lifts_the_explicit_size_off_its_body_and_opens_at_it` pins it.
 
 Off unless a dialog asks for it (`IsResizeable`), because a dialog is as big as what it has to show and a form
 dragged wider only grows its whitespace. `Controls/DragResize.cs` is the counterpart of `DragMove`, an attached
@@ -372,7 +381,8 @@ is then the user's to resize. No dialog uses it today - the power flow page was 
 [[PowerFlowPage.Lifecycle]], and is a page now - but `SizedTestDialog` pins that it works. A body that says
 nothing, which is every form, stays as big as what is on it, as before. It is on the body and not in
 `DialogParameters` because it is the view's knowledge, not the caller's: the same view says the same thing on
-every head, and inside the dialog frame it is simply not read.
+every head, and inside the dialog frame it is simply not read. A resizable dialog body with a plain `Width` and
+`Height` - the chart dialogs - gets the same treatment without saying anything: see "Resizing" above.
 
 ## Closing
 

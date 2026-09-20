@@ -74,6 +74,35 @@ public sealed class SizedTestDialog(DialogParameters parameters) : DialogBase<Di
     }
 }
 
+/// <summary>
+/// A body with an explicit size and a minimum, the way the two chart dialogs state theirs for the dialog frame of
+/// <c>MainView</c>: a <c>Width</c> and a <c>Height</c>, not <see cref="InitialWindowSize"/>.
+/// </summary>
+public sealed class FixedSizeTestDialogView : ContentControl, IDialogControl
+{
+    public const double DeclaredWidth = 640;
+    public const double DeclaredHeight = 400;
+    public const double DeclaredMinimumWidth = 300;
+
+    public FixedSizeTestDialogView()
+    {
+        Width = DeclaredWidth;
+        Height = DeclaredHeight;
+        MinWidth = DeclaredMinimumWidth;
+    }
+}
+
+/// <summary><see cref="TestDialog"/> with a <see cref="FixedSizeTestDialogView"/> for a body.</summary>
+public sealed class FixedSizeTestDialog(DialogParameters parameters) : DialogBase<DialogParameters, bool, FixedSizeTestDialogView>(parameters)
+{
+    public override Task AbortAsync()
+    {
+        Result = false;
+        Close();
+        return Task.CompletedTask;
+    }
+}
+
 /// <summary>A detail page that knows which device it was given.</summary>
 public sealed class TestPage : ContentControl
 {

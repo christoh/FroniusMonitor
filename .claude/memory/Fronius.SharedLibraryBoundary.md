@@ -73,6 +73,14 @@ added there** for the same reason as in the WPF app. `DeviceId` stays: `Crypto/A
 key provider, which is a `JsonObject` now. The package is a reference of `HomeAutomationServerTests` and of
 nothing else, because `JsonExtensionsTests` measures the conversion against it - see [[DeviceJson]].
 
+## What moved in the other direction
+
+The rule cuts both ways. `Fronius/Models/SolarWeb` (`SolarWebChart`, its series and points, the two enums, the firmware
+status and `SolarWebVersion`) started in `HomeAutomationServer/Models/SolarWeb` on 2026-09-20 while only the server
+used them, and moved into `Fronius` the same day when the Avalonia client began to draw them - the JSON did not
+change, the namespace did. `SolarWebPeriod` and the Solar.web exceptions stayed the server's: nothing else needs
+them. See [[SolarWeb]].
+
 ## What stays although the WPF app is its only real user
 
 Do not move these without reading why they are here; each is pinned by something that is easy to miss.

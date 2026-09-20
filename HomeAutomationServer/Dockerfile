@@ -13,7 +13,7 @@ RUN apk --no-cache update && \
     #dotnet workload update && \
     rm -fr /build/Fronius/bin /build/Fronius/obj bin obj && \
     mkdir -p /runner/app && \
-    # The price and weather history; mount this folder to keep it across containers (see docker-compose.yml).
+    # The price and weather history and the Solar.web chart cache; mount this folder to keep them across containers (see docker-compose.yml).
     mkdir -p /runner/app/history && \
     mkdir -p /runner/root && \
     mkdir -p /runner/home/app

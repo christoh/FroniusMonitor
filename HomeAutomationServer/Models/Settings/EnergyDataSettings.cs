@@ -69,27 +69,6 @@ public partial class EnergyDataSettings : BindableBase
     [XmlIgnore]
     public bool HasTariffQuery => Bearer.Length > 0 && PostalCode.Length > 0 && GridOperatorId.Length > 0;
 
-    /// <summary>
-    ///     The time zone <see cref="TimeZoneId" /> names, or the local one where it is empty or unknown. Never throws:
-    ///     a misspelt zone must not stop the server, and the log says what happened.
-    /// </summary>
-    public TimeZoneInfo ResolveTimeZone(ILogger? logger = null)
-    {
-        if (TimeZoneId.Length == 0)
-        {
-            return TimeZoneInfo.Local;
-        }
-
-        if (TimeZoneInfo.TryFindSystemTimeZoneById(TimeZoneId, out var zone))
-        {
-            return zone;
-        }
-
-        if (logger?.IsEnabled(LogLevel.Warning) == true)
-        {
-            logger.LogWarning("The time zone '{TimeZoneId}' is unknown, using {Local} instead", TimeZoneId, TimeZoneInfo.Local.Id);
-        }
-
-        return TimeZoneInfo.Local;
-    }
+    /// <inheritdoc cref="TimeZones.Resolve" />
+    public TimeZoneInfo ResolveTimeZone(ILogger? logger = null) => TimeZones.Resolve(TimeZoneId, logger);
 }

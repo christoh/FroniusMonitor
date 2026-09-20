@@ -1962,4 +1962,40 @@
   <data name="Idle" xml:space="preserve">
     <value>Idle</value>
   </data>
+  <data name="SolarWeb" xml:space="preserve">
+    <value>Solar.web</value>
+  </data>
+  <data name="Production" xml:space="preserve">
+    <value>Production</value>
+  </data>
+  <data name="Profitability" xml:space="preserve">
+    <value>Profitability</value>
+  </data>
+  <data name="Costs" xml:space="preserve">
+    <value>Costs</value>
+  </data>
+  <data name="Day" xml:space="preserve">
+    <value>Day</value>
+  </data>
+  <data name="Month" xml:space="preserve">
+    <value>Month</value>
+  </data>
+  <data name="Year" xml:space="preserve">
+    <value>Year</value>
+  </data>
+  <data name="LoadingSolarWebData" xml:space="preserve">
+    <value>Loading Solar.web data</value>
+  </data>
+  <data name="SolarWebPremiumHint" xml:space="preserve">
+    <value>This view needs a Solar.web Premium subscription.</value>
+  </data>
+  <data name="FirmwareUpdateAvailable" xml:space="preserve">
+    <value>Firmware update available</value>
+  </data>
+  <data name="FirmwareUpdateAvailableText" xml:space="preserve">
+    <value>Solar.web offers newer firmware for these components. You can start the update on Solar.web.</value>
+  </data>
+  <data name="ShowChangelog" xml:space="preserve">
+    <value>Show changelog</value>
+  </data>
 </root>

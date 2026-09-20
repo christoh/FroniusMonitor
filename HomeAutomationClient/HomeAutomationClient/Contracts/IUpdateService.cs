@@ -47,6 +47,19 @@ public interface IUpdateService : IDisposable, IAsyncDisposable, IToshibaHvacCom
     event EventHandler<EnergyChartData>? EnergyChartDataChanged;
 
     /// <summary>
+    /// The firmware of the PV system's components as Solar.web last reported it, or <see langword="null"/> where
+    /// the server has no Solar.web account or has not answered yet. Replaced as a whole on every push;
+    /// <see cref="SolarWebFirmwareStatusChanged"/> says when.
+    /// </summary>
+    public SolarWebFirmwareStatus? SolarWebFirmwareStatus { get; }
+
+    /// <summary>True as soon as the server has answered a Solar.web request, which is what makes the menu offer the Solar.web chart.</summary>
+    public bool HasSolarWeb { get; }
+
+    /// <summary>Raised on the thread the hub delivers on whenever <see cref="SolarWebFirmwareStatus"/> is replaced.</summary>
+    event EventHandler<SolarWebFirmwareStatus>? SolarWebFirmwareStatusChanged;
+
+    /// <summary>
     /// Loads the devices and opens the hub connection. <paramref name="roles"/> are those of the user who just
     /// logged in: a guest is not asked for the power consumers and the price data, which the server would refuse
     /// anyway - see <see cref="RolesExtensions.SeesAllDevices"/>.
