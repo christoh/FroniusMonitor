@@ -1,4 +1,4 @@
-namespace De.Hochstaetter.HomeAutomationServer.Services;
+namespace De.Hochstaetter.HomeAutomationServer.Services.DataCollectors;
 
 /// <summary>
 ///     Serves Solar.web's charts out of <see cref="ISolarWebHistoryStore" /> and asks Solar.web only for what the

@@ -8,7 +8,7 @@ paths:
   - HomeAutomationServer/Contracts/ISolarWebService.cs
   - HomeAutomationServer/Services/SolarWeb/**
   - HomeAutomationServer/Services/SolarWebHistoryStore.cs
-  - HomeAutomationServer/Services/SolarWebService.cs
+  - HomeAutomationServer/Services/DataCollectors/SolarWebService.cs
   - HomeAutomationServer/Services/SqliteStoreBase.cs
   - HomeAutomationServer/Misc/TimeZones.cs
   - HomeAutomationServer/Controllers/SolarWebController.cs

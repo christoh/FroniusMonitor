@@ -1,7 +1,7 @@
 namespace De.Hochstaetter.HomeAutomationServer.Models.Settings;
 
 /// <summary>
-///     What <see cref="Services.SolarWebService" /> is configured with: the account and the system from
+///     What <see cref="Services.DataCollectors.SolarWebService" /> is configured with: the account and the system from
 ///     <c>Settings.xml</c>, and how the cache and the requests are paced.
 /// </summary>
 /// <remarks>

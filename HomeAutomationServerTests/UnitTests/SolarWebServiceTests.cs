@@ -1,6 +1,6 @@
 using De.Hochstaetter.HomeAutomationServer.Models.Settings;
 using De.Hochstaetter.HomeAutomationServer.Models.SolarWeb;
-using De.Hochstaetter.HomeAutomationServer.Services;
+using De.Hochstaetter.HomeAutomationServer.Services.DataCollectors;
 using De.Hochstaetter.HomeAutomationServerTests.UnitTests.Fakes;
 using Microsoft.Extensions.Options;
 
