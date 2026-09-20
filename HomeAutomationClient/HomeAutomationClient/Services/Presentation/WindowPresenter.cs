@@ -34,8 +34,9 @@ public sealed class WindowPresenter : IDialogPresenter, IPagePresenter
     private readonly Dictionary<object, ChildWindow> pages = [];
 
     /// <summary>
-    /// The window a new one should belong to and open in front of: whichever is active, or the main window. A
-    /// message box opened from the settings dialog belongs to that dialog's window, not to the main one.
+    /// The window a modal one belongs to and opens in front of: whichever is active, or the main window. A
+    /// message box opened from the settings dialog belongs to that dialog's window, not to the main one. Nothing
+    /// else has an owner: a dialog or a page that is left standing is a window of the app in its own right.
     /// </summary>
     internal static Window? ActiveWindow => Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
         ? desktop.Windows.FirstOrDefault(window => window.IsActive) ?? desktop.MainWindow
@@ -187,7 +188,8 @@ internal sealed class WindowDialogPresentation : IDialogPresentation
 
         window.Title = parameters.Title;
         window.Classes.Add("Dialog");
-        window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+        // Only a modal window has an owner to be centered on; CenterOwner without one places the window nowhere.
+        window.WindowStartupLocation = parameters.IsModalWindow ? WindowStartupLocation.CenterOwner : WindowStartupLocation.CenterScreen;
         window.Closing += OnClosing;
         parameters.PropertyChanged += OnParametersChanged;
     }
@@ -216,19 +218,14 @@ internal sealed class WindowDialogPresentation : IDialogPresentation
             window.SetInitialSize(InitialWindowSize.GetWidth(body), InitialWindowSize.GetHeight(body));
         }
 
-        var owner = WindowPresenter.ActiveWindow;
+        // No owner for a window that is left standing, the same as a page window: an owned window sits in front of
+        // its owner for good and is minimized with it, and the settings of an inverter are not a satellite of the
+        // dashboard. The main window still takes it down when it goes, through ApplicationShutdown - see OnClosing.
+        var owner = parameters.IsModalWindow ? WindowPresenter.ActiveWindow : null;
 
-        if (!parameters.IsModalWindow || owner is null)
+        if (owner is null)
         {
-            if (owner is null)
-            {
-                window.Show();
-            }
-            else
-            {
-                window.Show(owner);
-            }
-
+            window.Show();
             return;
         }
 

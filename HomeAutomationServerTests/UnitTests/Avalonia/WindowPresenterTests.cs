@@ -187,12 +187,12 @@ public sealed class WindowPresenterTests
     });
 
     /// <summary>
-    /// A dialog may refuse its own close box; it may not refuse the window it belongs to closing. That veto is
-    /// also a veto of the application shutdown it is part of - with <c>ShutdownMode.OnMainWindowClose</c> one open
-    /// dialog left the process running after its last window had gone.
+    /// A dialog that is left standing is a window of the app in its own right, like a page window: not owned by
+    /// the window it was opened from, so it neither sits in front of it for good nor goes when that one goes.
+    /// Only the application shutting down takes it down, and that cannot be driven from a headless test.
     /// </summary>
     [Fact]
-    public Task Closing_the_owner_window_takes_a_dialog_with_it_and_releases_its_caller() => HeadlessAvalonia.RunAsync(async () =>
+    public Task A_non_modal_dialog_is_not_owned_by_the_window_it_was_opened_from() => HeadlessAvalonia.RunAsync(async () =>
     {
         var (_, mainWindow) = await StartAsync();
 
@@ -200,6 +200,37 @@ public sealed class WindowPresenterTests
         var shown = dialog.ShowDialogAsync();
         await HeadlessAvalonia.SettleAsync();
         var window = WindowOf("Standing");
+
+        Assert.Null(window.Owner);
+        Assert.Equal(WindowStartupLocation.CenterScreen, window.WindowStartupLocation);
+
+        mainWindow.Close();
+        await HeadlessAvalonia.SettleAsync();
+
+        Assert.DoesNotContain(mainWindow, HeadlessAvalonia.Windows);
+        Assert.Contains(window, HeadlessAvalonia.Windows);
+        Assert.Equal(0, dialog.AbortCount);
+        Assert.False(shown.IsCompleted);
+
+        dialog.Accept();
+        await shown;
+    });
+
+    /// <summary>
+    /// A modal dialog belongs to the window it was opened from. It may refuse its own close box; it may not refuse
+    /// that window closing. That veto is also a veto of the application shutdown it is part of - with
+    /// <c>ShutdownMode.OnMainWindowClose</c> one open dialog left the process running after its last window had gone.
+    /// </summary>
+    [Fact]
+    public Task Closing_the_owner_window_takes_a_modal_dialog_with_it_and_releases_its_caller() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        var (_, mainWindow) = await StartAsync();
+
+        var dialog = new TestDialog(new ModalTestDialogParameters { Title = "Owned" });
+        var shown = dialog.ShowDialogAsync();
+        await HeadlessAvalonia.SettleAsync();
+        var window = WindowOf("Owned");
+        Assert.Same(mainWindow, window.Owner);
 
         mainWindow.Close();
         await HeadlessAvalonia.SettleAsync();
@@ -214,15 +245,15 @@ public sealed class WindowPresenterTests
     });
 
     /// <summary>
-    /// And the same for a dialog whose chrome has no close box: it cannot be dismissed by the user, which is not
-    /// the same as being allowed to keep its owner - and the application - alive.
+    /// And the same for a modal dialog whose chrome has no close box: it cannot be dismissed by the user, which is
+    /// not the same as being allowed to keep its owner - and the application - alive.
     /// </summary>
     [Fact]
-    public Task Closing_the_owner_window_takes_a_dialog_without_a_close_box_too() => HeadlessAvalonia.RunAsync(async () =>
+    public Task Closing_the_owner_window_takes_a_modal_dialog_without_a_close_box_too() => HeadlessAvalonia.RunAsync(async () =>
     {
         var (_, mainWindow) = await StartAsync();
 
-        var dialog = new TestDialog(new DialogParameters { Title = "Unclosable", ShowCloseBox = false, WindowKey = "device-a" });
+        var dialog = new TestDialog(new ModalTestDialogParameters { Title = "Unclosable", ShowCloseBox = false });
         var shown = dialog.ShowDialogAsync();
         await HeadlessAvalonia.SettleAsync();
         var window = WindowOf("Unclosable");

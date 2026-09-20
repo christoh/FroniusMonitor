@@ -57,9 +57,17 @@ What the desktop does with each dialog:
 
 | | Window | Why |
 |---|---|---|
-| Message box, error box | **modal**, never reused | It answers a question the user has just been asked, and one over another is normal |
-| Everything else | non-modal, one per `WindowKey` | A window that may be left standing: the settings of one inverter beside those of another |
+| Message box, error box | **modal**, owned by the active window, centred on it, never reused | It answers a question the user has just been asked, and one over another is normal |
+| Everything else | non-modal, **no owner**, centred on the screen, one per `WindowKey` | A window that may be left standing: the settings of one inverter beside those of another |
 | The login dialog | none - it stays in `MainView` | `StaysInMainView`: there is nothing to put a window beside before anyone is logged in |
+
+- **A non-modal dialog window has no owner, like a page window** (since 2026-09-20; before, it was shown with
+  `Show(owner)`). An owned window sits in front of its owner for good and is minimized and restored with it, and
+  the settings of an inverter are not a satellite of the dashboard. `WindowPresenter.ActiveWindow` is therefore
+  read for a modal window only; `CenterOwner` goes with it, because without an owner it places the window nowhere,
+  so a non-modal dialog opens `CenterScreen`. What closes such a window with the main one is the shutdown itself
+  (`ShutdownMode.OnMainWindowClose` closes every window with `ApplicationShutdown`, which `OnClosing` lets
+  through), not an owner relationship; `OwnerWindowClosing` now only ever reaches a message box.
 
 - **`IsModalWindow` is a virtual property, not a flag a caller sets.** `MessageBox` overrides it to true and
   nothing else does, which is exactly "only message boxes and error boxes are modal". It is not `IsModal`: that
@@ -416,10 +424,13 @@ reuse and activation, the close box through `AbortAsync`, a dialog with no close
 dialog is up, the modal message box, a logout, and on the other side the dialog frame, nesting, the busy text
 handover, one page per view type and the menu bar gate.
 
-`Closing_the_owner_window_takes_a_dialog_with_it_and_releases_its_caller` and `…_without_a_close_box_too` pin the
-veto rule. They close the test's main window, which is the owner of every dialog window, and assert that the
-dialog window goes with it and its caller is released - the shutdown itself cannot be driven from a test, because
-the headless session is one lifetime for the whole run.
+`Closing_the_owner_window_takes_a_modal_dialog_with_it_and_releases_its_caller` and `…_without_a_close_box_too`
+pin the veto rule. They open a `TestDialog` with `ModalTestDialogParameters` - a `DialogParameters` whose
+`IsModalWindow` is true, the way `MessageBox` is - close the test's main window, which is its owner, and assert
+that the dialog window goes with it and its caller is released. The shutdown itself cannot be driven from a test,
+because the headless session is one lifetime for the whole run.
+`A_non_modal_dialog_is_not_owned_by_the_window_it_was_opened_from` is the other half: no `Owner`, `CenterScreen`,
+and the dialog window still standing with its caller still waiting after the main window has closed.
 
 `GaugeColoringTests` pins the paragraph above: a gauge in a `GaugeGroups` panel in a window with no `MainView`
 anywhere follows the switch, a window opened later starts the way the switch stands, and the resource carries the
@@ -441,6 +452,6 @@ window and so fails rather than passing vacuously if the cap ever stops being ap
 - Nothing takes focus when a dialog opens; a window at least takes the focus of the window manager.
 - The title bar always uses `SystemControlBackgroundAccentBrush` and the dialog `DialogBackground`; a dialog cannot theme itself.
 - Neither a dialog window nor a page window remembers its size or its place, unlike the main window
-  ([[PlatformHeads.Lifecycle]]). A dialog opens centred on its owner, sized to its content, every time; a page
-  opens centred on the screen, at whatever `InitialWindowSize` its view declares, every time. What the user
-  dragged either to is lost when it closes.
+  ([[PlatformHeads.Lifecycle]]). A message box opens centred on its owner and every other dialog centred on the
+  screen, sized to its content, every time; a page opens centred on the screen, at whatever `InitialWindowSize`
+  its view declares, every time. What the user dragged either to is lost when it closes.
