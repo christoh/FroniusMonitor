@@ -27,4 +27,13 @@
         a container runs in UTC unless it is set here or through TZ. The history goes to history/PriceAndWeatherHistory.db
         next to the executable; mount that folder to keep it. -->
    <EnergyData Bearer="your Awattar bearer token" PostalCode="85375" GridOperatorId="9901068000001" SurchargeCentsPerKiloWattHour="1.5" VatRatePercent="19" PriceRegion="GermanyLuxembourg" DwdStationId="10863" TimeZoneId="Europe/Berlin" />
+   <!-- Optional. The history charts of Fronius Solar.web (production, consumption, and with Solar.web Premium
+        earnings and costs; per day, month, year and overall), served over GET api/SolarWeb/{day|month|year|all}/{production|consumption|returnofinvestment|expense}/{yyyy-MM-dd}.
+        UserName and password are the Fronius login (the e-mail address); PvSystemId is the GUID in the address of
+        the system's Solar.web pages. A period that is over is read once and cached in history/SolarWebHistory.db
+        next to the executable (mount that folder to keep it); charts of single days are kept for 30 days, months,
+        years and the overall chart for good. A running period is read again after RefreshMinutes. Solar.web limits
+        the request rate (429), so keep RefreshMinutes at 5 or more. TimeZoneId is the PV system's; it decides
+        when a day is over. -->
+   <SolarWeb BaseUrl="https://www.solarweb.com" UserName="you@example.com" ClearTextPassword="your password, replaced by an encrypted Password on the first save" PvSystemId="00000000-0000-0000-0000-000000000000" RefreshMinutes="15" TimeZoneId="Europe/Berlin" />
 </Settings>

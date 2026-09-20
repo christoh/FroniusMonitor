@@ -1,4 +1,3 @@
-using De.Hochstaetter.Fronius.Models.Charging;
 using Microsoft.Data.Sqlite;
 
 namespace De.Hochstaetter.HomeAutomationServer.Services;
@@ -16,48 +15,31 @@ namespace De.Hochstaetter.HomeAutomationServer.Services;
 ///         comes back as exactly that.
 ///     </para>
 ///     <para>
-///         The schema version is SQLite's <c>user_version</c>. <see cref="InitializeAsync" /> brings an older file up
-///         to date step by step; a new file gets the current schema at once.
+///         The schema version is SQLite's <c>user_version</c>. <see cref="UpgradeAsync" /> brings an older file up
+///         to date step by step; a new file gets the current schema at once. The plumbing is <see cref="SqliteStoreBase" />'s,
+///         shared with the Solar.web cache.
 ///     </para>
 /// </remarks>
-public sealed class EnergyHistoryStore : IEnergyHistoryStore
+public sealed class EnergyHistoryStore : SqliteStoreBase, IEnergyHistoryStore
 {
     public const string FileName = "PriceAndWeatherHistory.db";
 
-    private const int CurrentSchemaVersion = 1;
-
-    private readonly ILogger<EnergyHistoryStore> logger;
-    private readonly string filePath;
-    private readonly string connectionString;
-    private readonly SemaphoreSlim writeLock = new(1, 1);
-
-    public EnergyHistoryStore(ILogger<EnergyHistoryStore> logger) : this(logger, Path.Combine(AppContext.BaseDirectory, "history", FileName))
+    public EnergyHistoryStore(ILogger<EnergyHistoryStore> logger) : this(logger, DefaultPath(FileName))
     {
     }
 
     /// <summary>For a test that wants the file somewhere else.</summary>
-    public EnergyHistoryStore(ILogger<EnergyHistoryStore> logger, string filePath)
+    public EnergyHistoryStore(ILogger<EnergyHistoryStore> logger, string filePath) : base(logger, filePath, 1)
     {
-        this.logger = logger;
-        this.filePath = filePath;
-        connectionString = new SqliteConnectionStringBuilder { DataSource = filePath, Mode = SqliteOpenMode.ReadWriteCreate, Pooling = true }.ToString();
     }
 
-    public string FilePath => filePath;
+    protected override string Description => "Energy history";
 
-    public async Task InitializeAsync(CancellationToken token = default)
+    protected override async Task UpgradeAsync(SqliteConnection connection, int version, CancellationToken token)
     {
-        if (Path.GetDirectoryName(filePath) is { Length: > 0 } directory)
-        {
-            Directory.CreateDirectory(directory);
-        }
-
-        await using var connection = await OpenAsync(token).ConfigureAwait(false);
-        var version = Convert.ToInt32(await Scalar(connection, "PRAGMA user_version", token).ConfigureAwait(false), CultureInfo.InvariantCulture);
-
         if (version < 1)
         {
-            await Execute(connection, """
+            await ExecuteAsync(connection, """
                 CREATE TABLE IF NOT EXISTS MarketPrice (
                     Source TEXT NOT NULL,
                     StartUtc INTEGER NOT NULL,
@@ -101,11 +83,6 @@ public sealed class EnergyHistoryStore : IEnergyHistoryStore
                 PRAGMA user_version = 1;
                 """, token).ConfigureAwait(false);
         }
-
-        if (logger.IsEnabled(LogLevel.Information))
-        {
-            logger.LogInformation("Energy history is {File} (schema {Version})", filePath, CurrentSchemaVersion);
-        }
     }
 
     #region Prices
@@ -144,59 +121,42 @@ public sealed class EnergyHistoryStore : IEnergyHistoryStore
 
     #region Components
 
-    public async Task UpsertPriceComponentsAsync(DateOnly day, IEnumerable<EnergyPriceComponent> components, CancellationToken token = default)
+    public Task UpsertPriceComponentsAsync(DateOnly day, IEnumerable<EnergyPriceComponent> components, CancellationToken token = default)
     {
         var list = components.ToList();
 
         if (list.Count == 0)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         // The tariff of a day is replaced as a whole: a component that vanished from the answer would otherwise
         // stay in the sum for good.
-        await writeLock.WaitAsync(token).ConfigureAwait(false);
-
-        try
+        return WriteInTransactionAsync(async (connection, transaction, t) =>
         {
-            await using var connection = await OpenAsync(token).ConfigureAwait(false);
-            await using var transaction = await connection.BeginTransactionAsync(token).ConfigureAwait(false);
-
-            await using (var delete = connection.CreateCommand())
+            await using (var delete = CreateCommand(connection, transaction, "DELETE FROM PriceComponent WHERE Day = $day"))
             {
-                delete.Transaction = (SqliteTransaction)transaction;
-                delete.CommandText = "DELETE FROM PriceComponent WHERE Day = $day";
                 delete.Parameters.AddWithValue("$day", Day(day));
-                await delete.ExecuteNonQueryAsync(token).ConfigureAwait(false);
+                await delete.ExecuteNonQueryAsync(t).ConfigureAwait(false);
             }
 
-            await using (var insert = connection.CreateCommand())
+            // Ordinal keeps the order Awattar answers in, which is the order the invoice lists the components
+            // in; a table without a rowid has no order of its own.
+            await using var insert = CreateCommand(connection, transaction, "INSERT OR REPLACE INTO PriceComponent (Day, Name, Ordinal, Description, NetPrice, TaxRate, Unit) VALUES ($day, $name, $ordinal, $description, $net, $tax, $unit)");
+
+            foreach (var (component, ordinal) in list.Select((c, i) => (c, i)))
             {
-                insert.Transaction = (SqliteTransaction)transaction;
-                // Ordinal keeps the order Awattar answers in, which is the order the invoice lists the components
-                // in; a table without a rowid has no order of its own.
-                insert.CommandText = "INSERT OR REPLACE INTO PriceComponent (Day, Name, Ordinal, Description, NetPrice, TaxRate, Unit) VALUES ($day, $name, $ordinal, $description, $net, $tax, $unit)";
-
-                foreach (var (component, ordinal) in list.Select((c, i) => (c, i)))
-                {
-                    insert.Parameters.Clear();
-                    insert.Parameters.AddWithValue("$day", Day(day));
-                    insert.Parameters.AddWithValue("$name", component.Name);
-                    insert.Parameters.AddWithValue("$ordinal", ordinal);
-                    insert.Parameters.AddWithValue("$description", component.Description);
-                    insert.Parameters.AddWithValue("$net", component.NetPrice.ToString(CultureInfo.InvariantCulture));
-                    insert.Parameters.AddWithValue("$tax", component.TaxRate.ToString(CultureInfo.InvariantCulture));
-                    insert.Parameters.AddWithValue("$unit", component.Unit);
-                    await insert.ExecuteNonQueryAsync(token).ConfigureAwait(false);
-                }
+                insert.Parameters.Clear();
+                insert.Parameters.AddWithValue("$day", Day(day));
+                insert.Parameters.AddWithValue("$name", component.Name);
+                insert.Parameters.AddWithValue("$ordinal", ordinal);
+                insert.Parameters.AddWithValue("$description", component.Description);
+                insert.Parameters.AddWithValue("$net", component.NetPrice.ToString(CultureInfo.InvariantCulture));
+                insert.Parameters.AddWithValue("$tax", component.TaxRate.ToString(CultureInfo.InvariantCulture));
+                insert.Parameters.AddWithValue("$unit", component.Unit);
+                await insert.ExecuteNonQueryAsync(t).ConfigureAwait(false);
             }
-
-            await transaction.CommitAsync(token).ConfigureAwait(false);
-        }
-        finally
-        {
-            writeLock.Release();
-        }
+        }, token);
     }
 
     public Task<IReadOnlyList<EnergyPriceComponent>> GetPriceComponentsAsync(DateOnly day, CancellationToken token = default)
@@ -296,89 +256,6 @@ public sealed class EnergyHistoryStore : IEnergyHistoryStore
             CloudCoverPercent = reader.IsDBNull(5) ? null : reader.GetDouble(5),
         }, token);
     }
-
-    #endregion
-
-    #region Plumbing
-
-    private async Task<SqliteConnection> OpenAsync(CancellationToken token)
-    {
-        var connection = new SqliteConnection(connectionString);
-        await connection.OpenAsync(token).ConfigureAwait(false);
-        return connection;
-    }
-
-    /// <summary>One statement per row inside one transaction; the command is prepared once and its parameters rebound.</summary>
-    private async Task WriteAsync<T>(string sql, IEnumerable<T> rows, Action<SqliteCommand, T> bind, CancellationToken token)
-    {
-        var list = rows as IReadOnlyCollection<T> ?? rows.ToList();
-
-        if (list.Count == 0)
-        {
-            return;
-        }
-
-        await writeLock.WaitAsync(token).ConfigureAwait(false);
-
-        try
-        {
-            await using var connection = await OpenAsync(token).ConfigureAwait(false);
-            await using var transaction = await connection.BeginTransactionAsync(token).ConfigureAwait(false);
-            await using var command = connection.CreateCommand();
-            command.Transaction = (SqliteTransaction)transaction;
-            command.CommandText = sql;
-
-            foreach (var row in list)
-            {
-                command.Parameters.Clear();
-                bind(command, row);
-                await command.ExecuteNonQueryAsync(token).ConfigureAwait(false);
-            }
-
-            await transaction.CommitAsync(token).ConfigureAwait(false);
-        }
-        finally
-        {
-            writeLock.Release();
-        }
-    }
-
-    private async Task<IReadOnlyList<T>> ReadAsync<T>(string sql, Action<SqliteCommand> bind, Func<SqliteDataReader, T> map, CancellationToken token)
-    {
-        await using var connection = await OpenAsync(token).ConfigureAwait(false);
-        await using var command = connection.CreateCommand();
-        command.CommandText = sql;
-        bind(command);
-        var result = new List<T>();
-        await using var reader = await command.ExecuteReaderAsync(token).ConfigureAwait(false);
-
-        while (await reader.ReadAsync(token).ConfigureAwait(false))
-        {
-            result.Add(map(reader));
-        }
-
-        return result;
-    }
-
-    private static async Task Execute(SqliteConnection connection, string sql, CancellationToken token)
-    {
-        await using var command = connection.CreateCommand();
-        command.CommandText = sql;
-        await command.ExecuteNonQueryAsync(token).ConfigureAwait(false);
-    }
-
-    private static async Task<object?> Scalar(SqliteConnection connection, string sql, CancellationToken token)
-    {
-        await using var command = connection.CreateCommand();
-        command.CommandText = sql;
-        return await command.ExecuteScalarAsync(token).ConfigureAwait(false);
-    }
-
-    private static long ToUnix(DateTime utc) => new DateTimeOffset(DateTime.SpecifyKind(utc, DateTimeKind.Utc)).ToUnixTimeSeconds();
-
-    private static DateTime FromUnix(long seconds) => DateTimeOffset.FromUnixTimeSeconds(seconds).UtcDateTime;
-
-    private static string Day(DateOnly day) => day.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 
     #endregion
 }
