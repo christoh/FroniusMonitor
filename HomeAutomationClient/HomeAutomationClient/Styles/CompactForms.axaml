@@ -272,6 +272,15 @@
 		</Setter>
 	</Style>
 
+	<!-- The two Templates above are the whole look of their controls, so Fluent's disabled look - a grey foreground
+	     set inside its own template - went with them: the dot or the tick in the inner Viewbox still greys, the
+	     caption beside it stayed as dark as an enabled one, and a disabled radio button read as enabled (the two
+	     Premium views of the Solar.web chart while a day is shown, 2026-09-20). Half opacity on the whole control
+	     instead, which greys the caption and the glyph alike. -->
+	<Style Selector="RadioButton.Wrap:disabled, CheckBox.Wrap:disabled">
+		<Setter Property="Opacity" Value="0.5" />
+	</Style>
+
 	<!-- A Fluent slider is 50 pixels tall and only about 20 of them are the slider: the rest is slack above and
 	     below the track. It does not take styling - the sizes are set inside the template, where a local value
 	     beats a setter - and a Viewbox cannot help the way it helps a check box, because a Viewbox measures its

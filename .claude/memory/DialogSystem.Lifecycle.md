@@ -244,6 +244,12 @@ dialog can be dragged by both.
 
 In the dialog frame. A window gets `CanResize` from the same parameter and the rest of this section does not
 apply to it; what the two have in common is that the maximum the body declares is lifted while it is resizable.
+**A window also lifts an explicit `Width` and `Height` off the body** (since 2026-09-20): the two chart dialogs
+state their size that way, because that is what the frame's `DragResize` needs, and in a window an explicit size
+stays what it is - the body sat at 1160 in the middle of a window dragged to 1600. `ChildWindow.ApplyContentLimits`
+sets them to `NaN`, hands the body's `MinWidth`/`MinHeight` to the window, and the lifted size is what the window
+opens at where `InitialWindowSize` says nothing (`ApplyInitialSize`); switching resizing off puts it all back.
+`A_resizable_window_lifts_the_explicit_size_off_its_body_and_opens_at_it` pins it.
 
 Off unless a dialog asks for it (`IsResizeable`), because a dialog is as big as what it has to show and a form
 dragged wider only grows its whitespace. `Controls/DragResize.cs` is the counterpart of `DragMove`, an attached
@@ -367,7 +373,8 @@ is then the user's to resize. No dialog uses it today - the power flow page was 
 [[PowerFlowPage.Lifecycle]], and is a page now - but `SizedTestDialog` pins that it works. A body that says
 nothing, which is every form, stays as big as what is on it, as before. It is on the body and not in
 `DialogParameters` because it is the view's knowledge, not the caller's: the same view says the same thing on
-every head, and inside the dialog frame it is simply not read.
+every head, and inside the dialog frame it is simply not read. A resizable dialog body with a plain `Width` and
+`Height` - the chart dialogs - gets the same treatment without saying anything: see "Resizing" above.
 
 ## Closing
 

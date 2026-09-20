@@ -20,6 +20,15 @@ public partial class ChildWindow : Window
 
     private double contentMaximumWidth = double.PositiveInfinity;
     private double contentMaximumHeight = double.PositiveInfinity;
+
+    /// <summary>The explicit size the body declares, while it is lifted off the body - see <see cref="ApplyContentLimits"/>.</summary>
+    private double contentWidth = double.NaN;
+    private double contentHeight = double.NaN;
+
+    /// <summary>What <see cref="SetInitialSize"/> was asked for, before the body's own size fills in what it left open.</summary>
+    private double requestedWidth = double.NaN;
+    private double requestedHeight = double.NaN;
+
     private double initialWidth = double.NaN;
     private double initialHeight = double.NaN;
 
@@ -51,9 +60,11 @@ public partial class ChildWindow : Window
     /// <remarks>
     /// This is <see cref="Models.Dialogs.DialogParameters.IsResizeable"/> and may be switched while the window is
     /// open, which is what the inverter settings dialog does for its event log tab. Turning it on also lifts the
-    /// maximum width and height the body declares - a dialog states those for the size it wants to have, not for
-    /// the size the user may drag it to - and turning it off puts them back, so the window shrinks to its content
-    /// again.
+    /// maximum width and height the body declares, and an explicit width and height as well - a dialog states
+    /// those for the size it wants to have, not for the size the user may drag it to, and a body with an explicit
+    /// size would keep it while the window around it grew. The explicit size becomes the size the window opens at
+    /// where <see cref="SetInitialSize"/> asked for nothing, and the body's minimum becomes the window's. Turning
+    /// it off puts everything back, so the window shrinks to its content again.
     /// </remarks>
     public bool IsUserResizable
     {
@@ -69,15 +80,25 @@ public partial class ChildWindow : Window
             field = value;
             ApplyContentLimits(HostedContent as Layoutable, value);
             CanResize = value;
-            ApplySizeToContent();
+            ApplyInitialSize();
         }
     }
 
     /// <summary>
-    /// Lifts the maximum width and height the content declares while the window is resizable, and puts them back
-    /// when it is not. Also run when the content arrives, because it can arrive after the flag: a dialog may ask
-    /// for resizing from its <c>Initialize</c>, which runs while its body is being created.
+    /// Lifts the maximum width and height the content declares while the window is resizable, and its explicit
+    /// width and height with them, and puts them back when it is not. Also run when the content arrives, because
+    /// it can arrive after the flag: a dialog may ask for resizing from its <c>Initialize</c>, which runs while
+    /// its body is being created.
     /// </summary>
+    /// <remarks>
+    /// The explicit size has to go for the same reason the maximum does, only more so: a body 1160 wide stays
+    /// 1160 wide in a window the user has dragged to 1600, centred, with empty space at both sides - which is
+    /// what the two chart dialogs did on the desktop (2026-09-20), because they state their size the way the
+    /// dialog frame in <c>MainView</c> wants it, as a <c>Width</c> and a <c>Height</c>. Lifted, the body fills
+    /// the window, and the size it declared is what the window opens at (<see cref="ApplyInitialSize"/>). The
+    /// body's minimum becomes the window's while it lasts, so the user cannot drag the window smaller than what
+    /// the body can lay out.
+    /// </remarks>
     private void ApplyContentLimits(Layoutable? content, bool isResizable)
     {
         if (content is null)
@@ -89,10 +110,16 @@ public partial class ChildWindow : Window
         {
             (contentMaximumWidth, contentMaximumHeight) = (content.MaxWidth, content.MaxHeight);
             (content.MaxWidth, content.MaxHeight) = (double.PositiveInfinity, double.PositiveInfinity);
+            (contentWidth, contentHeight) = (content.Width, content.Height);
+            (content.Width, content.Height) = (double.NaN, double.NaN);
+            (MinWidth, MinHeight) = (content.MinWidth, content.MinHeight);
             return;
         }
 
         (content.MaxWidth, content.MaxHeight) = (contentMaximumWidth, contentMaximumHeight);
+        (content.Width, content.Height) = (contentWidth, contentHeight);
+        (contentWidth, contentHeight) = (double.NaN, double.NaN);
+        (MinWidth, MinHeight) = (0, 0);
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
@@ -102,13 +129,15 @@ public partial class ChildWindow : Window
         if (change.Property == HostedContentProperty && IsUserResizable)
         {
             ApplyContentLimits(change.NewValue as Layoutable, true);
+            ApplyInitialSize();
         }
     }
 
     /// <summary>
     /// Gives the window a size to open at instead of the size of what is on it. <see cref="double.NaN"/> for a
-    /// dimension leaves that one to the content, which is what every window did before this existed; the two are
-    /// independent, so a fixed width with a content driven height is a valid combination.
+    /// dimension leaves that one to the content - or to the explicit size the body declares, while the window is
+    /// resizable and that size is lifted off the body - which is what every window did before this existed; the
+    /// two are independent, so a fixed width with a content driven height is a valid combination.
     /// </summary>
     /// <remarks>
     /// Call it after <see cref="LimitToScreen"/> and before the window is shown: the requested size is cut down
@@ -117,8 +146,20 @@ public partial class ChildWindow : Window
     /// </remarks>
     public void SetInitialSize(double width, double height)
     {
-        initialWidth = Requested(width, MaxWidth);
-        initialHeight = Requested(height, MaxHeight);
+        (requestedWidth, requestedHeight) = (width, height);
+        ApplyInitialSize();
+    }
+
+    /// <summary>
+    /// Works the size the window opens at out of what was asked for and what the body declares, and applies it.
+    /// Run again whenever either changes: the body's size is lifted when resizing is switched on, which may be
+    /// before <see cref="SetInitialSize"/> and its screen limit, and is put back when it is switched off, when
+    /// the window goes back to the size of its content.
+    /// </summary>
+    private void ApplyInitialSize()
+    {
+        initialWidth = Requested(double.IsNaN(requestedWidth) ? contentWidth : requestedWidth, MaxWidth);
+        initialHeight = Requested(double.IsNaN(requestedHeight) ? contentHeight : requestedHeight, MaxHeight);
 
         if (!double.IsNaN(initialWidth))
         {

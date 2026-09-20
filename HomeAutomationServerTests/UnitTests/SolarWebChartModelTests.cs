@@ -46,10 +46,10 @@ public sealed class SolarWebChartModelTests
         Assert.Equal([57.89, 70.05, null], model.Series[1].Values);
         Assert.Equal([null, null, 32.69], model.Series[2].Values);
 
-        // The known ids have their colours whatever Solar.web sent: grey for the grid, and the forecast in Solar.web's
-        // yellow although it came with a pattern.
+        // The known ids have their colours whatever Solar.web sent: grey for the grid, and the forecast light blue
+        // although it came with a yellow pattern.
         Assert.Equal(HaColor.FromArgb(255, 0x99, 0x99, 0x99), model.Series[1].Color);
-        Assert.Equal(HaColor.FromArgb(255, 0xF7, 0xC0, 0x02), model.Series[2].Color);
+        Assert.Equal(HaColor.FromArgb(255, 0x70, 0xAF, 0xCD), model.Series[2].Color);
         Assert.True(model.Series[2].IsForecast);
         Assert.False(model.Series[1].IsForecast);
 

@@ -223,9 +223,12 @@ data: `DeviceVisibility` does not list it for guests.
   Solar.web stamps them at midnight UTC and they are read as dates, never converted. Bubbles (`BattOperatingState`)
   are not drawn. **Colours**: a fixed palette **by series id** wins (`SolarWebChartModel.knownColors`: the two
   battery series green, `FromGenToConsumer` yellow, `ToConsumer` **orange** although Solar.web draws it light
-  blue - the developer's choice of 2026-09-20; the rest Solar.web's own), then Solar.web's colour where it sent
-  one (the parser takes the stroke of the forecast's hatch pattern too), then the first fallback colour no other
-  series uses. `IsForecast` (`PvForecast*`) is drawn translucent where Solar.web hatches.
+  blue, `PvForecastTruncated` **light blue** (#70AFCD, Solar.web's consumption blue) although Solar.web hatches
+  it yellow - the developer's choices of 2026-09-20; the rest Solar.web's own), then Solar.web's colour where it
+  sent one (the parser takes the stroke of the forecast's hatch pattern too), then the first fallback colour no
+  other series uses. `IsForecast` (`PvForecast*`) is drawn translucent where Solar.web hatches. Disabled radio
+  buttons (the Premium views on a day) are at half opacity through `RadioButton.Wrap:disabled` in
+  `Styles/CompactForms.axaml`, because the `Wrap` template lost Fluent's disabled look.
 - **`SolarWebChartRenderer`** draws it with ScottPlot: `Bars` with `ValueBase` for the stacks and `NumericManual`
   ticks for the categories, `FillY` between cumulative arrays for the areas, `Scatter` per stretch for the lines.
   **The ranges are locked with axis rules** (`LockedVertical`, `LockedHorizontal`), not only set: the second chart

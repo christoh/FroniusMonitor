@@ -300,6 +300,72 @@ public sealed class WindowPresenterTests
         await shown;
     });
 
+    /// <summary>
+    /// The chart dialogs state their size as a Width and a Height, which the dialog frame of MainView wants. In a
+    /// resizable window that size is lifted off the body - a body 1160 wide stayed 1160 wide in a window dragged
+    /// to 1600 (2026-09-20) - and becomes the size the window opens at, its minimum the window's; switched off, the
+    /// body has its size back and the window is content sized again.
+    /// </summary>
+    [Fact]
+    public Task A_resizable_window_lifts_the_explicit_size_off_its_body_and_opens_at_it() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        await StartAsync();
+
+        var dialog = new FixedSizeTestDialog(new DialogParameters { Title = "Fixed size", WindowKey = "device-a" });
+        var shown = dialog.ShowDialogAsync();
+        await HeadlessAvalonia.SettleAsync();
+        var window = WindowOf("Fixed size");
+        var body = (FixedSizeTestDialogView)window.HostedContent!;
+
+        // Not resizable: the body keeps its size and the window is as big as the body, as before.
+        Assert.Equal(FixedSizeTestDialogView.DeclaredWidth, body.Width);
+        Assert.Equal(SizeToContent.WidthAndHeight, window.SizeToContent);
+
+        dialog.Parameters.IsResizeable = true;
+        await HeadlessAvalonia.SettleAsync();
+        Assert.True(double.IsNaN(body.Width));
+        Assert.True(double.IsNaN(body.Height));
+        Assert.Equal(FixedSizeTestDialogView.DeclaredWidth, window.Width);
+        Assert.Equal(FixedSizeTestDialogView.DeclaredHeight, window.Height);
+        Assert.Equal(FixedSizeTestDialogView.DeclaredMinimumWidth, window.MinWidth);
+        Assert.Equal(SizeToContent.Manual, window.SizeToContent);
+
+        // The body follows the window now, which is the whole point.
+        window.Width = 900;
+        await HeadlessAvalonia.SettleAsync();
+        Assert.Equal(900, body.Bounds.Width);
+
+        dialog.Parameters.IsResizeable = false;
+        await HeadlessAvalonia.SettleAsync();
+        Assert.Equal(FixedSizeTestDialogView.DeclaredWidth, body.Width);
+        Assert.Equal(FixedSizeTestDialogView.DeclaredHeight, body.Height);
+        Assert.Equal(0, window.MinWidth);
+        Assert.Equal(SizeToContent.WidthAndHeight, window.SizeToContent);
+
+        await dialog.AbortAsync();
+        await shown;
+    });
+
+    /// <summary>The same for a dialog that is resizable from the start, which is what both chart dialogs are.</summary>
+    [Fact]
+    public Task A_dialog_resizable_from_the_start_opens_at_the_size_its_body_declares() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        await StartAsync();
+
+        var dialog = new FixedSizeTestDialog(new DialogParameters { Title = "Fixed size", WindowKey = "device-a", IsResizeable = true });
+        var shown = dialog.ShowDialogAsync();
+        await HeadlessAvalonia.SettleAsync();
+        var window = WindowOf("Fixed size");
+
+        Assert.Equal(FixedSizeTestDialogView.DeclaredWidth, window.Width);
+        Assert.Equal(FixedSizeTestDialogView.DeclaredHeight, window.Height);
+        Assert.Equal(FixedSizeTestDialogView.DeclaredWidth, ((FixedSizeTestDialogView)window.HostedContent!).Bounds.Width);
+        Assert.True(window.CanResize);
+
+        await dialog.AbortAsync();
+        await shown;
+    });
+
     [Fact]
     public Task A_message_box_is_modal_and_is_never_folded_into_another_one() => HeadlessAvalonia.RunAsync(async () =>
     {

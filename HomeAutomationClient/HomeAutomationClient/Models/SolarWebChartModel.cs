@@ -46,8 +46,9 @@ public sealed class SolarWebChartModel
 {
     /// <summary>
     /// The colours of the series Solar.web is known to send, by id, which win over what Solar.web sends: the developer
-    /// wants the two battery series green, direct consumption yellow and the consumption orange (Solar.web draws that
-    /// one light blue), decided 2026-09-20; the rest are Solar.web's own. The ids are the same in every language.
+    /// wants the two battery series green, direct consumption yellow, the consumption orange and the forecast light
+    /// blue (Solar.web draws the consumption in that light blue and hatches the forecast in the production yellow),
+    /// decided 2026-09-20; the rest are Solar.web's own. The ids are the same in every language.
     /// </summary>
     private static readonly Dictionary<string, HaColor> knownColors = new(StringComparer.Ordinal)
     {
@@ -60,7 +61,7 @@ public sealed class SolarWebChartModel
         ["FromGridToConsumer"] = HaColor.FromArgb(255, 0x99, 0x99, 0x99),
         ["FromGen"] = HaColor.FromArgb(255, 0xF7, 0xC0, 0x02),
         ["FromGenToSomewhere"] = HaColor.FromArgb(255, 0xF7, 0xC0, 0x02),
-        ["PvForecastTruncated"] = HaColor.FromArgb(255, 0xF7, 0xC0, 0x02),
+        ["PvForecastTruncated"] = HaColor.FromArgb(255, 0x70, 0xAF, 0xCD),
         ["FromGenToWattPilot"] = HaColor.FromArgb(255, 0xAF, 0x79, 0xB5),
         ["Saving"] = HaColor.FromArgb(255, 0x6C, 0xBE, 0x58),
         ["Income"] = HaColor.FromArgb(255, 0xFA, 0xD9, 0x67),
