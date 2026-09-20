@@ -24,6 +24,20 @@ public sealed record SolarWebChartSeries(string Id, string Name, HaColor Color, 
     public bool IsForecast => SolarWebSeries.IsForecastId(Id);
 }
 
+/// <summary>One line of the tooltip: a series' name with its colour and its value, or a total without a colour.</summary>
+public sealed record SolarWebTooltipRow(string Name, HaColor? Color, string Value);
+
+/// <summary>
+/// What the tooltip over the chart says, the way Solar.web's does: the time or the date as its title, one row per
+/// series that has a value there, top of the stack first, and for a column the totals under a line - the sum and,
+/// in the production view, the share of it that was not fed into the grid. Either <see cref="Category"/> or
+/// <see cref="Time"/> says where it belongs, so the view can put its crosshair there.
+/// </summary>
+public sealed record SolarWebChartTooltip(string Title, IReadOnlyList<SolarWebTooltipRow> Rows, IReadOnlyList<SolarWebTooltipRow> Totals, int? Category, DateTime? Time)
+{
+    public bool HasTotals => Totals.Count > 0;
+}
+
 /// <summary>
 /// A Solar.web chart as numbers and captions, worked out by the view model and drawn by the view. Nothing in here
 /// knows the charting library: every time is local, the colours are <see cref="HaColor"/>s, and what is stacked on
@@ -102,11 +116,21 @@ public sealed class SolarWebChartModel
 
     public bool IsPremiumFeature { get; init; }
 
+    public SolarWebInterval Interval { get; init; }
+
+    public SolarWebView View { get; init; }
+
     /// <summary>True for a month, a year and the whole history; false for a day, which is drawn over time.</summary>
     public bool IsCategorical { get; init; }
 
     /// <summary>The tick label of each category, in order: the day of the month, the abbreviated month, the year.</summary>
     public IReadOnlyList<string> CategoryLabels { get; init; } = [];
+
+    /// <summary>The date each category stands for, in the same order: the day, the first of the month, 1 January.</summary>
+    public IReadOnlyList<DateOnly> CategoryDates { get; init; } = [];
+
+    /// <summary>Every instant within the day any series has a point at, in order, local time - what the tooltip snaps to.</summary>
+    public IReadOnlyList<DateTime> TimePoints { get; init; } = [];
 
     /// <summary>The span of the time axis of a day chart, local time: the chart's day from midnight to midnight.</summary>
     public DateTime AxisStart { get; init; }
@@ -166,8 +190,11 @@ public sealed class SolarWebChartModel
             Title = chart.Title,
             SumValue = chart.SumValue,
             IsPremiumFeature = chart.IsPremiumFeature,
+            Interval = chart.Interval,
+            View = chart.View,
             IsCategorical = true,
             CategoryLabels = categories.Select(c => Label(chart.Interval, c)).ToList(),
+            CategoryDates = categories,
             Series = series,
             LeftAxisUnit = leftUnit,
             LeftAxisMaximum = Maximum(stackTops.Concat(lineTops)),
@@ -204,13 +231,133 @@ public sealed class SolarWebChartModel
             Title = chart.Title,
             SumValue = chart.SumValue,
             IsPremiumFeature = chart.IsPremiumFeature,
+            Interval = chart.Interval,
+            View = chart.View,
             IsCategorical = false,
             AxisStart = start,
             AxisEnd = end,
+            TimePoints = series.SelectMany(s => s.Points).Select(p => p.Time).Where(t => t >= start && t < end).Distinct().Order().ToList(),
             Series = series,
             LeftAxisUnit = leftUnit,
             LeftAxisMaximum = Maximum(stackTops.Concat(lineTops)),
         };
+    }
+
+    /// <summary>
+    /// The tooltip of the column at <paramref name="category"/>, or <see langword="null"/> off the columns. The rows are
+    /// the stacked series with a value other than zero there, top of the stack first, then the lines; under them the
+    /// total of the stack, named after the view, and in the production view the share of it not fed into the grid,
+    /// which is what Solar.web calls self-consumption.
+    /// </summary>
+    public SolarWebChartTooltip? TooltipForCategory(int category)
+    {
+        if (!IsCategorical || category < 0 || category >= CategoryDates.Count)
+        {
+            return null;
+        }
+
+        var rows = RowOrder()
+            .Select(s => (Series: s, Value: s.Values[category]))
+            .Where(x => x.Value is { } value && !double.IsNaN(value) && (x.Series.Kind != SolarWebSeriesKind.StackedColumn || value != 0))
+            .Select(x => (x.Series, Value: x.Value!.Value))
+            .ToList();
+
+        if (rows.Count == 0)
+        {
+            return null;
+        }
+
+        var stacked = rows.Where(x => x.Series.Kind == SolarWebSeriesKind.StackedColumn && !x.Series.OnRightAxis && !x.Series.IsForecast).ToList();
+        var total = stacked.Sum(x => x.Value);
+        var totals = new List<SolarWebTooltipRow>();
+
+        if (stacked.Count > 0 && total > 0)
+        {
+            totals.Add(new SolarWebTooltipRow(TotalName(), null, Format(total, LeftAxisUnit)));
+
+            if (View == SolarWebView.Production && stacked.FirstOrDefault(x => x.Series.Id == "FromGenToGrid") is { Series: not null } grid)
+            {
+                totals.Add(new SolarWebTooltipRow(Loc.SelfConsumption, null, Format((total - grid.Value) / total * 100, "%")));
+            }
+        }
+
+        var date = CategoryDates[category];
+
+        var title = Interval switch
+        {
+            SolarWebInterval.Month => date.ToString("d", CultureInfo.CurrentCulture),
+            SolarWebInterval.Year => date.ToString("Y", CultureInfo.CurrentCulture),
+            _ => date.Year.ToString(CultureInfo.CurrentCulture),
+        };
+
+        return new SolarWebChartTooltip(title, rows.Select(x => Row(x.Series, x.Value)).ToList(), totals, category, null);
+    }
+
+    /// <summary>
+    /// The tooltip at <paramref name="time"/> in a day chart, snapped to the nearest instant any series has a point
+    /// at, or <see langword="null"/> outside the day or where nothing has a value. One row per series with a value
+    /// there, top of the stack first, then the lines; no totals, as on Solar.web.
+    /// </summary>
+    public SolarWebChartTooltip? TooltipForTime(DateTime time)
+    {
+        if (IsCategorical || TimePoints.Count == 0 || time < AxisStart || time >= AxisEnd)
+        {
+            return null;
+        }
+
+        var snapped = Nearest(time);
+
+        var rows = RowOrder()
+            .Select(s => (Series: s, Point: s.Points.FirstOrDefault(p => p.Time == snapped)))
+            .Where(x => x.Point != null && !double.IsNaN(x.Point.Value))
+            .Select(x => Row(x.Series, x.Point!.Value))
+            .ToList();
+
+        return rows.Count == 0 ? null : new SolarWebChartTooltip(snapped.ToString("t", CultureInfo.CurrentCulture), rows, [], null, snapped);
+    }
+
+    /// <summary>A value with its unit the way Solar.web writes it: watts as kilowatts with two decimals, a percentage without any.</summary>
+    public static string Format(double value, string unit) => unit switch
+    {
+        "W" => $"{value / 1000:N2} kW",
+        "%" => $"{value:N0} %",
+        _ => $"{value:N2} {unit}",
+    };
+
+    private SolarWebTooltipRow Row(SolarWebChartSeries series, double value) => new(series.Name, series.Color, Format(value, series.OnRightAxis ? "%" : LeftAxisUnit));
+
+    /// <summary>Solar.web lists the stack from the top down, then the lines, the state of charge on its own axis last.</summary>
+    private IEnumerable<SolarWebChartSeries> RowOrder() => Series.Where(s => s.Kind != SolarWebSeriesKind.Line).Reverse().Concat(Series.Where(s => s.Kind == SolarWebSeriesKind.Line).OrderBy(s => s.OnRightAxis));
+
+    private string TotalName() => View switch
+    {
+        SolarWebView.Production => Loc.Production,
+        SolarWebView.Consumption => Loc.Consumption,
+        _ => Loc.Total,
+    };
+
+    /// <summary>The instant of <see cref="TimePoints"/> nearest to <paramref name="time"/>, by binary search: the first one not before it, or the one before that if nearer.</summary>
+    private DateTime Nearest(DateTime time)
+    {
+        int low = 0, high = TimePoints.Count;
+
+        while (low < high)
+        {
+            var middle = (low + high) / 2;
+
+            if (TimePoints[middle] < time)
+            {
+                low = middle + 1;
+            }
+            else
+            {
+                high = middle;
+            }
+        }
+
+        return low == 0 ? TimePoints[0]
+            : low == TimePoints.Count ? TimePoints[^1]
+            : time - TimePoints[low - 1] <= TimePoints[low] - time ? TimePoints[low - 1] : TimePoints[low];
     }
 
     /// <summary>What the series stacks by: its own index, else the one Solar.web is known to give the id, else nothing.</summary>

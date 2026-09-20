@@ -6,6 +6,7 @@
              xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
              xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
              xmlns:sp="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
+             xmlns:m="clr-namespace:De.Hochstaetter.HomeAutomationClient.Models"
              mc:Ignorable="d" d:DesignWidth="1160" d:DesignHeight="520"
              x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.SolarWebChartView"
              x:DataType="dialogs:SolarWebChartViewModel"
@@ -25,10 +26,46 @@
 		</Style>
 	</UserControl.Styles>
 
+	<UserControl.Resources>
+		<!-- One line of the tooltip, for the series rows and the totals alike: a swatch in the series' colour - none
+		     for a total, whose colour is null and converts to transparent - the name, and the value right aligned.
+		     Tabular figures (+tnum) on the rows, so that the values line up digit under digit as the pointer moves;
+		     the headline above keeps the proportional ones. -->
+		<DataTemplate x:Key="TooltipRow" x:DataType="m:SolarWebTooltipRow">
+			<Grid ColumnDefinitions="Auto,*,Auto" Margin="0,1">
+				<Border Grid.Column="0" Width="10" Height="10" CornerRadius="2" VerticalAlignment="Center" Background="{Binding Color, Converter={co:ColorConverter}}" />
+				<TextBlock Grid.Column="1" Text="{Binding Name}" Margin="6,0,16,0" VerticalAlignment="Center" FontFeatures="+tnum" />
+				<TextBlock Grid.Column="2" Text="{Binding Value}" FontWeight="Bold" VerticalAlignment="Center" FontFeatures="+tnum" />
+			</Grid>
+		</DataTemplate>
+	</UserControl.Resources>
+
 	<Grid RowDefinitions="*,Auto">
 		<!-- The chart itself. It has no bindings: the code behind draws ChartModel into it, because drawing is the
 		     one thing here that needs the charting library, and reacts to the theme the same way. -->
 		<sp:AvaPlot Grid.Row="0" x:Name="Plot" />
+
+		<!-- The tooltip over the chart, as Solar.web has it: the time or the date, one row per series with a value
+		     there, and for a column the totals under a line. What it says is the view model's Tooltip, which the
+		     code behind sets from the pointer position - only it can turn a pixel into an instant; where the box
+		     stands is the code behind's as well (the Margin), because that is where the pointer is and nothing else.
+		     Not hit-testable, so the plot under it keeps getting the pointer. -->
+		<ContentControl Grid.Row="0" x:Name="TooltipHost" Content="{Binding Tooltip}" IsVisible="{Binding Tooltip, Converter={co:NullToBool}}"
+		                HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False">
+			<ContentControl.ContentTemplate>
+				<DataTemplate x:DataType="m:SolarWebChartTooltip">
+					<Border Background="{DynamicResource FlowCardBackground}" BorderBrush="{DynamicResource FlowCardBorder}" BorderThickness="1"
+					        CornerRadius="4" Padding="10,6" Opacity="0.95">
+						<StackPanel>
+							<TextBlock Text="{Binding Title}" FontWeight="Bold" Margin="0,0,0,4" />
+							<ItemsControl ItemsSource="{Binding Rows}" ItemTemplate="{StaticResource TooltipRow}" />
+							<Border Height="1" Margin="0,4" Background="{DynamicResource FlowCardBorder}" IsVisible="{Binding HasTotals}" />
+							<ItemsControl ItemsSource="{Binding Totals}" ItemTemplate="{StaticResource TooltipRow}" IsVisible="{Binding HasTotals}" />
+						</StackPanel>
+					</Border>
+				</DataTemplate>
+			</ContentControl.ContentTemplate>
+		</ContentControl>
 
 		<Grid Grid.Row="1" ColumnDefinitions="Auto,Auto,Auto,*" Margin="16,6,16,10"
 		      IsEnabled="{Binding IsBusy, Converter={co:BoolInverter}}">

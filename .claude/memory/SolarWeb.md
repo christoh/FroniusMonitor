@@ -246,6 +246,18 @@ data: `DeviceVisibility` does not list it for guests.
   other series uses. `IsForecast` (`PvForecast*`) is drawn translucent where Solar.web hatches. Disabled radio
   buttons (the Premium views on a day) are at half opacity through `RadioButton.Wrap:disabled` in
   `Styles/CompactForms.axaml`, because the `Wrap` template lost Fluent's disabled look.
+- **The tooltip** (since 2026-09-20 evening, the developer wanted Solar.web's): the view's code-behind takes
+  `PointerMoved` on the `AvaPlot`, turns the position into a ScottPlot `Pixel` (times `DisplayScale`), checks it
+  against `RenderManager.LastRender.DataRect`, maps it with `Plot.GetCoordinates(pixel, Bottom, Left)` and asks
+  the model: `TooltipForCategory(round(x))` for the columns, `TooltipForTime(FromOADate(x))` for the day, which
+  snaps to the nearest instant of `TimePoints`. The model answers a `SolarWebChartTooltip` (title = date or
+  time, rows top of the stack first then the lines, zero columns left out, totals for a column: the view's name
+  with the stack's sum and, in production, `SelfConsumption` = 1 - grid/sum; watts written as kW with two
+  decimals, `%` without). The view model holds it (`Tooltip`, cleared with `ChartModel`), an Avalonia
+  `ContentControl` overlay in the same grid cell binds to it (`FlowCardBackground`/`FlowCardBorder`, not hit
+  testable; the rows in tabular figures, `FontFeatures="+tnum"`, the headline not - the developer's request),
+  and the code-behind sets its `Margin` beside the pointer, flipping left or up at the edges. A dotted
+  `VerticalLine` is the crosshair; `Plot.Reset()` drops it. No touch support yet, the developer's choice.
 - **`SolarWebChartRenderer`** draws it with ScottPlot: `Bars` with `ValueBase` for the stacks and `NumericManual`
   ticks for the categories, `FillY` between cumulative arrays for the areas, `Scatter` per stretch for the lines.
   **The ranges are locked with axis rules** (`LockedVertical`, `LockedHorizontal`), not only set: the second chart

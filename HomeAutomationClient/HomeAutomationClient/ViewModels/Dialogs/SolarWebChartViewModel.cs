@@ -81,6 +81,16 @@ public sealed partial class SolarWebChartViewModel(DialogParameters parameters) 
     [ObservableProperty]
     public partial bool IsPremiumFeature { get; set; }
 
+    /// <summary>
+    /// What the tooltip over the chart says, or <see langword="null"/> while the pointer is not over the chart. The
+    /// view sets it, because only the view can turn a pointer position into an instant or a column; what is shown
+    /// for that instant is the model's (<see cref="SolarWebChartModel.TooltipForTime"/>, <see cref="SolarWebChartModel.TooltipForCategory"/>).
+    /// </summary>
+    [ObservableProperty]
+    public partial SolarWebChartTooltip? Tooltip { get; set; }
+
+    partial void OnChartModelChanged(SolarWebChartModel? value) => Tooltip = null;
+
     public override Task Initialize()
     {
         if (isInitialized)

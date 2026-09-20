@@ -1,4 +1,5 @@
 using System.Globalization;
+using Loc = De.Hochstaetter.Fronius.Localization.Resources;
 using De.Hochstaetter.HomeAutomationClient.Models;
 
 namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests;
@@ -168,6 +169,106 @@ public sealed class SolarWebChartModelTests
         Assert.Equal(HaColor.FromArgb(255, 0xF7, 0xC0, 0x02), model.Series[3].Color);
         Assert.Equal(HaColor.FromArgb(255, 0x99, 0x99, 0x99), model.Series[4].Color);
         Assert.Equal(5, model.Series.Select(s => s.Color).Distinct().Count());
+    }
+
+    [Fact]
+    public void The_tooltip_of_a_column_lists_the_stack_from_the_top_with_the_total_and_the_self_consumption()
+    {
+        var sep8 = sep1.AddDays(7);
+
+        var chart = new SolarWebChart
+        {
+            Interval = SolarWebInterval.Month,
+            View = SolarWebView.Production,
+            Title = "September 2026",
+            Series =
+            [
+                Indexed(Series("FromGenToGrid", "column", "kWh", null, (sep1, 10), (sep8, 64.22)), 1),
+                Indexed(Series("FromGenToBatt", "column", "kWh", null, (sep1, 5), (sep8, 2.80)), 2),
+                Indexed(Series("FromGenToWattPilot", "column", "kWh", null, (sep1, 7), (sep8, 0)), 4),
+                Indexed(Series("FromGenToConsumer", "column", "kWh", null, (sep1, 3), (sep8, 3.76)), 6),
+            ],
+        };
+
+        var model = SolarWebChartModel.Build(chart);
+        var tooltip = model.TooltipForCategory(1);
+
+        Assert.NotNull(tooltip);
+        Assert.Equal(new DateOnly(2026, 9, 8).ToString("d", CultureInfo.CurrentCulture), tooltip.Title);
+        Assert.Equal(1, tooltip.Category);
+        Assert.Null(tooltip.Time);
+
+        // Top of the stack first, and a series with nothing in the column - the Wattpilot's zero - is left out.
+        Assert.Equal(["FromGenToGrid", "FromGenToBatt", "FromGenToConsumer"], tooltip.Rows.Select(r => r.Name));
+        Assert.Equal([$"{64.22:N2} kWh", $"{2.80:N2} kWh", $"{3.76:N2} kWh"], tooltip.Rows.Select(r => r.Value));
+        Assert.Equal(HaColor.FromArgb(255, 0x99, 0x99, 0x99), tooltip.Rows[0].Color);
+
+        // The totals: 70.78 kWh produced, of which 9 % - everything but the grid - was used at home.
+        Assert.True(tooltip.HasTotals);
+        Assert.Equal([Loc.Production, Loc.SelfConsumption], tooltip.Totals.Select(t => t.Name));
+        Assert.Equal([$"{70.78:N2} kWh", $"{9:N0} %"], tooltip.Totals.Select(t => t.Value));
+        Assert.All(tooltip.Totals, t => Assert.Null(t.Color));
+
+        // Off the columns there is nothing to say.
+        Assert.Null(model.TooltipForCategory(-1));
+        Assert.Null(model.TooltipForCategory(2));
+        Assert.Null(model.TooltipForTime(DateTime.Now));
+
+        // The consumption view totals the consumption and has no self-consumption share.
+        chart.View = SolarWebView.Consumption;
+        var consumption = SolarWebChartModel.Build(chart).TooltipForCategory(0);
+        Assert.NotNull(consumption);
+        Assert.Equal([Loc.Consumption], consumption.Totals.Select(t => t.Name));
+        Assert.Equal($"{25:N2} kWh", consumption.Totals[0].Value);
+    }
+
+    [Fact]
+    public void The_tooltip_of_a_day_chart_snaps_to_the_nearest_five_minutes_and_writes_watts_as_kilowatts()
+    {
+        var midnight = new DateTime(2026, 9, 18, 22, 0, 0, DateTimeKind.Utc);
+
+        var chart = new SolarWebChart
+        {
+            Interval = SolarWebInterval.Day,
+            View = SolarWebView.Production,
+            Period = new DateOnly(2026, 9, 19),
+            Title = "19.09.2026",
+            Series =
+            [
+                Series("FromGenToBatt", "areaspline", "W", null, (midnight, 0), (midnight.AddMinutes(5), 100)),
+                Series("FromGenToGrid", "areaspline", "W", null, (midnight, 50), (midnight.AddMinutes(5), 200)),
+                Series("ToConsumer", "spline", "W", null, (midnight, 320), (midnight.AddMinutes(5), null), (midnight.AddMinutes(10), 178)),
+                Series("StateOfCharge", "spline", "%", null, (midnight, 79), (midnight.AddMinutes(10), 73)),
+                Series("PvForecastTruncated", "areaspline", "W", null, (midnight.AddDays(1).AddHours(12), 99999)),
+            ],
+        };
+
+        var model = SolarWebChartModel.Build(chart);
+        var start = model.Series.Single(s => s.Id == "FromGenToGrid").Points[0].Time;
+
+        // Tomorrow's forecast point is outside the day and is not an instant to snap to.
+        Assert.Equal([start, start.AddMinutes(5), start.AddMinutes(10)], model.TimePoints);
+
+        // Two minutes past midnight snaps to midnight: the stack from the top, then the lines, in Solar.web's units.
+        var tooltip = model.TooltipForTime(start.AddMinutes(2));
+        Assert.NotNull(tooltip);
+        Assert.Equal(start.ToString("t", CultureInfo.CurrentCulture), tooltip.Title);
+        Assert.Equal(start, tooltip.Time);
+        Assert.Null(tooltip.Category);
+        Assert.False(tooltip.HasTotals);
+        Assert.Equal(["FromGenToGrid", "FromGenToBatt", "ToConsumer", "StateOfCharge"], tooltip.Rows.Select(r => r.Name));
+        Assert.Equal([$"{0.05:N2} kW", $"{0:N2} kW", $"{0.32:N2} kW", $"{79:N0} %"], tooltip.Rows.Select(r => r.Value));
+
+        // Three minutes past snaps to 00:05, where the consumption has a gap and the state of charge no point.
+        var next = model.TooltipForTime(start.AddMinutes(3));
+        Assert.NotNull(next);
+        Assert.Equal(start.AddMinutes(5), next.Time);
+        Assert.Equal(["FromGenToGrid", "FromGenToBatt"], next.Rows.Select(r => r.Name));
+
+        // Outside the day there is nothing.
+        Assert.Null(model.TooltipForTime(model.AxisEnd));
+        Assert.Null(model.TooltipForTime(model.AxisStart.AddMinutes(-1)));
+        Assert.Null(model.TooltipForCategory(0));
     }
 
     [Fact]
