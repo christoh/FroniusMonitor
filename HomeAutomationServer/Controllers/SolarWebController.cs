@@ -19,6 +19,7 @@ public class SolarWebController(ISolarWebService solarWeb, ILogger<SolarWebContr
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status502BadGateway)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status503ServiceUnavailable)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status504GatewayTimeout)]
     public async Task<IActionResult> GetChart([FromRoute] SolarWebInterval interval, [FromRoute] SolarWebView view, [FromRoute] DateOnly? day, CancellationToken token)
     {
         if (logger.IsEnabled(LogLevel.Debug))
@@ -39,14 +40,14 @@ public class SolarWebController(ISolarWebService solarWeb, ILogger<SolarWebContr
         {
             return BadRequest(Helpers.GetProblemDetails("No such chart", ex.Message));
         }
-        catch (SolarWebRateLimitException ex)
+        catch (SolarWebUnavailableException ex)
         {
             if (ex.RetryAfter is { } retryAfter)
             {
                 Response.Headers.RetryAfter = Math.Max(1, (long)Math.Ceiling(retryAfter.TotalSeconds)).ToString(CultureInfo.InvariantCulture);
             }
 
-            return StatusCode(StatusCodes.Status503ServiceUnavailable, Helpers.GetProblemDetails("Solar.web rate limit", ex.Message));
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, Helpers.GetProblemDetails(ex is SolarWebRateLimitException ? "Solar.web rate limit" : "Solar.web not available", ex.Message));
         }
         catch (SolarWebLoginException ex)
         {
@@ -55,6 +56,11 @@ public class SolarWebController(ISolarWebService solarWeb, ILogger<SolarWebContr
         catch (Exception ex) when (ex is HttpRequestException or InvalidDataException)
         {
             return StatusCode(StatusCodes.Status502BadGateway, Helpers.GetProblemDetails("Solar.web did not answer", ex.Message));
+        }
+        catch (OperationCanceledException ex) when (!token.IsCancellationRequested)
+        {
+            // The client's timeout, not the caller going away.
+            return StatusCode(StatusCodes.Status504GatewayTimeout, Helpers.GetProblemDetails("Solar.web did not answer in time", ex.Message));
         }
     }
 }

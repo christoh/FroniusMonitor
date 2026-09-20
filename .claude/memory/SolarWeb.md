@@ -131,11 +131,20 @@ ago in the system's zone; the whole history never is.
   `Today - 30 days` as the cutoff. Months, years and GESAMT are kept for good.
 - Requests go out **one at a time** (a semaphore, and the cache is checked again after waiting on it) and at least
   `MinimumRequestInterval` (2 s) apart.
-- **429**: the client throws `SolarWebRateLimitException(RetryAfter)`; the service blocks every request until
-  `now + RetryAfter` (or `DefaultRateLimitBackoff`, 15 min, without the header). While blocked, and on any other
-  failure (500, 503, timeout), a **cached chart is served however stale it is**; only without one does the failure
-  reach the caller. The controller answers 503 with `Retry-After` for the block, 502 for a login failure or a
+- **429, 503 and the maintenance page** make Solar.web "unavailable": the client throws
+  `SolarWebRateLimitException` (429, derived) or `SolarWebUnavailableException` (503, or a 200 HTML page whose text
+  says "Maintenance Work" / "Wartungsarbeiten" - Fronius' Sunday maintenance, seen 2026-09-20), each with the
+  `Retry-After` where there was one. The service blocks every request until `now + RetryAfter`, or
+  `DefaultRateLimitBackoff` (15 min) after a 429 and `UnavailableBackoff` (5 min) otherwise; `UnavailableUntil`
+  says until when. While blocked, and on any other failure (500, an unknown HTML page, a timeout), a **cached chart
+  is served however stale it is**; only without one does the failure reach the caller. The controller answers 503
+  with `Retry-After` for the block, 504 for the client's timeout (90 s), 502 for a login failure or any other
   refusal, 400 for a Premium day chart, 404 without the section.
+- **An HTML page that is neither the login form nor the code post-back is never a login failure.** It was, until
+  the production test of 2026-09-20 hit the maintenance page and the service refused everything until a restart.
+  Now such a page is logged as a warning with `HtmlForm.Summarize` (title plus the text without markup, 400
+  characters) and thrown as `InvalidDataException` (transient) or, for the maintenance page, as unavailable. Only
+  a rejected password (the login form coming back a second time) and a missing password are login failures.
 - `GET api/SolarWeb/{day|month|year|all}/{production|consumption|returnofinvestment|expense}/{yyyy-MM-dd?}`,
   role User. The date defaults to the system's today. Enums bind by name, case does not matter.
 
@@ -148,8 +157,10 @@ ago in the system's zone; the whole history never is.
   by the rule in [[Fronius.SharedLibraryBoundary]]; when the Avalonia client draws them they move to
   `Fronius/Models/SolarWeb` - the JSON does not change, the namespace does. Series `Name` is localized by
   Solar.web to the request's culture; a client should key its legend on `Id`.
-- The live login has been exercised in Chrome and against the Kestrel fake, **not yet from the server itself** -
-  that needs the account in the developer's `Settings.xml`.
+- The live login **works from the production server** (verified 2026-09-20 against `home.hochstaetter.de`: the
+  month chart came back with real data, the cached answer in 0.2 s). The same test showed a day chart taking over
+  30 s during Fronius' Sunday maintenance, hence the 90 s timeout. The maintenance page's markup and status code
+  were not captured - it was gone by the time it was looked for - so it is recognized by its two headings only.
 - Nothing warms the cache, so the first request for an old month goes to Solar.web while the client waits. A
   background fill of past months could come later, paced by the same gate.
 - Fronius sells a Solar.web Query API (`api.solarweb.com`, access key) - the fallback if the portal changes.

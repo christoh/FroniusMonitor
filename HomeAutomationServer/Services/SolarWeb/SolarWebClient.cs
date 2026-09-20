@@ -45,7 +45,9 @@ public sealed class SolarWebClient : ISolarWebClient, IDisposable
     {
         this.logger = logger;
         clock = timeProvider ?? TimeProvider.System;
-        client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(30) };
+        // Solar.web has been seen to take well over 30 seconds for a day chart from the production server on
+        // 2026-09-20; a timeout there costs the request and, with the request gate, delays the next one anyway.
+        client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(90) };
         client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("HomeAutomationServer", GitInfo.Version.ToString()));
         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/html", 0.9));
@@ -104,11 +106,31 @@ public sealed class SolarWebClient : ISolarWebClient, IDisposable
                 }
 
                 var pageUri = response.RequestMessage?.RequestUri ?? chartUri;
+                var status = response.StatusCode;
+                var contentType = response.Content.Headers.ContentType?.ToString() ?? "no content type";
                 var html = await response.Content.ReadAsStringAsync(token).ConfigureAwait(false);
                 response.Dispose();
 
-                var form = HtmlForm.Parse(html).FirstOrDefault(f => f.Has("sessionDataKey") || f.Has("code") || f.Has("error"))
-                           ?? throw new SolarWebLoginException($"Solar.web answered a page without a login form or an authorization code: {pageUri.GetLeftPart(UriPartial.Path)}");
+                var form = HtmlForm.Parse(html).FirstOrDefault(f => f.Has("sessionDataKey") || f.Has("code") || f.Has("error"));
+
+                if (form == null)
+                {
+                    // Not the login and not the code: the maintenance page, an error page, a web application
+                    // firewall's block page - whatever it is, it is not a wrong password, so it is not a login
+                    // failure that would stop every request until a restart. The maintenance page is known and
+                    // means "leave me alone for a while"; anything else is thrown as the transient failure it
+                    // most likely is. Either way the log says what the page was, because the next one may be
+                    // the same and somebody has to be able to see it.
+                    var summary = HtmlForm.Summarize(html, 400);
+                    var description = $"Solar.web answered {pageUri.GetLeftPart(UriPartial.Path)} with {(int)status} {contentType} instead of JSON: {summary}";
+
+                    if (logger.IsEnabled(LogLevel.Warning))
+                    {
+                        logger.LogWarning("{Description}", description);
+                    }
+
+                    throw IsMaintenancePage(summary) ? new SolarWebUnavailableException(null, description) : new InvalidDataException(description);
+                }
 
                 if (form.Has("sessionDataKey"))
                 {
@@ -171,19 +193,18 @@ public sealed class SolarWebClient : ISolarWebClient, IDisposable
         }
     }
 
-    /// <summary>Sends, and turns a 429 into its own exception before any other status is judged.</summary>
+    /// <summary>Sends, and turns a 429 and a 503 into their own exceptions before any other status is judged.</summary>
     private async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken token)
     {
         var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token).ConfigureAwait(false);
 
-        if (response.StatusCode == HttpStatusCode.TooManyRequests)
+        if (response.StatusCode is HttpStatusCode.TooManyRequests or HttpStatusCode.ServiceUnavailable)
         {
-            var retryAfter = response.Headers.RetryAfter is { } header
-                ? header.Delta ?? (header.Date is { } date ? date - clock.GetUtcNow() : null)
-                : null;
-
+            var status = response.StatusCode;
+            var retryAfter = RetryAfter(response);
+            var message = $"Solar.web answered {(int)status} {status} to {request.RequestUri?.GetLeftPart(UriPartial.Path)}";
             response.Dispose();
-            throw new SolarWebRateLimitException(retryAfter, $"Solar.web answered 429 Too Many Requests to {request.RequestUri?.GetLeftPart(UriPartial.Path)}");
+            throw status == HttpStatusCode.TooManyRequests ? new SolarWebRateLimitException(retryAfter, message) : new SolarWebUnavailableException(retryAfter, message);
         }
 
         if (!response.IsSuccessStatusCode)
@@ -196,6 +217,16 @@ public sealed class SolarWebClient : ISolarWebClient, IDisposable
 
         return response;
     }
+
+    private TimeSpan? RetryAfter(HttpResponseMessage response) => response.Headers.RetryAfter is { } header
+        ? header.Delta ?? (header.Date is { } date ? date - clock.GetUtcNow() : null)
+        : null;
+
+    /// <summary>
+    ///     Fronius' maintenance page, seen on Sunday 2026-09-20: a plain page headed "Maintenance Work" and
+    ///     "Wartungsarbeiten", "This page is therefore temporarily unavailable. We will be back online soon."
+    /// </summary>
+    public static bool IsMaintenancePage(string text) => text.Contains("Maintenance Work", StringComparison.OrdinalIgnoreCase) || text.Contains("Wartungsarbeiten", StringComparison.OrdinalIgnoreCase);
 
     private static bool IsJson(HttpResponseMessage response) => response.Content.Headers.ContentType?.MediaType?.Contains("json", StringComparison.OrdinalIgnoreCase) == true;
 

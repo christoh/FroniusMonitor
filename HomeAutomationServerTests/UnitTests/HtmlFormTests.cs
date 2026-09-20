@@ -102,6 +102,16 @@ public sealed class HtmlFormTests
     }
 
     [Fact]
+    public void A_summary_is_the_title_and_the_text_without_markup_scripts_and_styles_cut_to_length()
+    {
+        const string page = "<html><head><title> 500 - Internal server error. </title><style>p {margin: 0}</style></head><body><script>window.x = 1;</script><p>There is a problem with the resource you are looking for, &amp; it cannot be displayed.</p>\n\n  <p>Second   line</p></body></html>";
+
+        Assert.Equal("'500 - Internal server error.': There is a problem with the resource you are looking for, & it cannot be displayed. Second line", HtmlForm.Summarize(page, 400));
+        Assert.Equal("'500 - Internal server error.': There…", HtmlForm.Summarize(page, 38));
+        Assert.Equal("just text", HtmlForm.Summarize("just text", 400));
+    }
+
+    [Fact]
     public void A_page_without_a_form_yields_none_and_a_checked_box_without_a_value_sends_on()
     {
         Assert.Empty(HtmlForm.Parse("<html><body><p>500 - Internal server error.</p></body></html>"));

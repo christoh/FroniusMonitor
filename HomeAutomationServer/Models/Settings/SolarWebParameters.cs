@@ -33,4 +33,7 @@ public class SolarWebParameters
 
     /// <summary>How long a 429 without a <c>Retry-After</c> header stops the requests.</summary>
     public TimeSpan DefaultRateLimitBackoff { get; set; } = TimeSpan.FromMinutes(15);
+
+    /// <summary>How long a 503 or the maintenance page without a <c>Retry-After</c> stops the requests. Maintenance lasts a while; a stray 503 does not.</summary>
+    public TimeSpan UnavailableBackoff { get; set; } = TimeSpan.FromMinutes(5);
 }

@@ -71,6 +71,19 @@ public sealed partial class HtmlForm
         return new FormUrlEncodedContent(list);
     }
 
+    /// <summary>
+    ///     What a page says, for a log line: its title, then its text with the markup, the scripts and the styles
+    ///     taken out and the whitespace collapsed, cut to <paramref name="maxLength" /> characters.
+    /// </summary>
+    public static string Summarize(string html, int maxLength)
+    {
+        var title = TitleRegex().Match(html) is { Success: true } match ? WebUtility.HtmlDecode(match.Groups[1].Value).Trim() : null;
+        var body = ScriptAndStyleRegex().Replace(TitleRegex().Replace(html, " "), " ");
+        var text = WhitespaceRegex().Replace(WebUtility.HtmlDecode(TagRegex().Replace(body, " ")), " ").Trim();
+        var summary = title is { Length: > 0 } ? $"'{title}': {text}" : text;
+        return summary.Length <= maxLength ? summary : summary[..maxLength].TrimEnd() + "…";
+    }
+
     private static Dictionary<string, string> Attributes(string tag)
     {
         var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -89,6 +102,18 @@ public sealed partial class HtmlForm
 
     [GeneratedRegex(@"<input\b[^>]*>", RegexOptions.IgnoreCase)]
     private static partial Regex InputRegex();
+
+    [GeneratedRegex(@"<title\b[^>]*>(.*?)</title\s*>", RegexOptions.IgnoreCase | RegexOptions.Singleline)]
+    private static partial Regex TitleRegex();
+
+    [GeneratedRegex(@"<(script|style)\b[^>]*>.*?</\1\s*>", RegexOptions.IgnoreCase | RegexOptions.Singleline)]
+    private static partial Regex ScriptAndStyleRegex();
+
+    [GeneratedRegex(@"<[^>]+>")]
+    private static partial Regex TagRegex();
+
+    [GeneratedRegex(@"\s+")]
+    private static partial Regex WhitespaceRegex();
 
     // The opening tag itself is the first "attribute" this matches (form, input); it is harmless in the dictionary.
     [GeneratedRegex(@"(?<name>[\w:-]+)(?:\s*=\s*(?:""(?<dq>[^""]*)""|'(?<sq>[^']*)'|(?<bare>[^\s""'>]+)))?", RegexOptions.IgnoreCase)]

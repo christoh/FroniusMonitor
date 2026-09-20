@@ -134,15 +134,15 @@ public sealed class SolarWebServiceTests : IDisposable
         var stale = await service.GetChartAsync(SolarWebInterval.Day, SolarWebView.Production, today, TestContext.Current.CancellationToken);
         Assert.Equal(2, client.Requests);
         Assert.Equal(first.FetchedUtc, stale.FetchedUtc);
-        Assert.Equal(noon.AddMinutes(30), service.RateLimitedUntil);
+        Assert.Equal(noon.AddMinutes(30), service.UnavailableUntil);
 
         // Nothing cached for the month: the caller is told how long to wait, and Solar.web is not asked.
-        var refused = await Assert.ThrowsAsync<SolarWebRateLimitException>(() => service.GetChartAsync(SolarWebInterval.Month, SolarWebView.Production, today, TestContext.Current.CancellationToken));
+        var refused = await Assert.ThrowsAsync<SolarWebUnavailableException>(() => service.GetChartAsync(SolarWebInterval.Month, SolarWebView.Production, today, TestContext.Current.CancellationToken));
         Assert.Equal(TimeSpan.FromMinutes(10), refused.RetryAfter);
         Assert.Equal(2, client.Requests);
 
         clock.Now = noon.AddMinutes(29);
-        await Assert.ThrowsAsync<SolarWebRateLimitException>(() => service.GetChartAsync(SolarWebInterval.Month, SolarWebView.Production, today, TestContext.Current.CancellationToken));
+        await Assert.ThrowsAsync<SolarWebUnavailableException>(() => service.GetChartAsync(SolarWebInterval.Month, SolarWebView.Production, today, TestContext.Current.CancellationToken));
         Assert.Equal(2, client.Requests);
 
         // The time is up and Solar.web answers again.
@@ -150,13 +150,46 @@ public sealed class SolarWebServiceTests : IDisposable
         client.Refusal = null;
         await service.GetChartAsync(SolarWebInterval.Month, SolarWebView.Production, today, TestContext.Current.CancellationToken);
         Assert.Equal(3, client.Requests);
-        Assert.Null(service.RateLimitedUntil);
+        Assert.Null(service.UnavailableUntil);
 
-        // A 429 without a Retry-After takes the configured back-off.
+        // A 429 without a Retry-After takes the configured back-off, and stays a 429 for the caller.
         clock.Now = noon.AddMinutes(60);
         client.Refusal = new SolarWebRateLimitException(null);
         await Assert.ThrowsAsync<SolarWebRateLimitException>(() => service.GetChartAsync(SolarWebInterval.Year, SolarWebView.Production, today, TestContext.Current.CancellationToken));
-        Assert.Equal(noon.AddMinutes(60) + parameters.DefaultRateLimitBackoff, service.RateLimitedUntil);
+        Assert.Equal(noon.AddMinutes(60) + parameters.DefaultRateLimitBackoff, service.UnavailableUntil);
+    }
+
+    [Fact]
+    public async Task A_503_or_the_maintenance_page_stops_the_requests_for_the_shorter_back_off_and_serves_the_stale_chart()
+    {
+        await service.StartAsync(TestContext.Current.CancellationToken);
+        var first = await service.GetChartAsync(SolarWebInterval.Day, SolarWebView.Production, today, TestContext.Current.CancellationToken);
+
+        clock.Now = noon.AddMinutes(20);
+        client.Refusal = new SolarWebUnavailableException(null, "Maintenance Work");
+
+        var stale = await service.GetChartAsync(SolarWebInterval.Day, SolarWebView.Production, today, TestContext.Current.CancellationToken);
+        Assert.Equal(first.FetchedUtc, stale.FetchedUtc);
+        Assert.Equal(noon.AddMinutes(20) + parameters.UnavailableBackoff, service.UnavailableUntil);
+
+        var refused = await Assert.ThrowsAsync<SolarWebUnavailableException>(() => service.GetChartAsync(SolarWebInterval.Month, SolarWebView.Production, today, TestContext.Current.CancellationToken));
+        Assert.IsNotType<SolarWebRateLimitException>(refused);
+        Assert.Equal(parameters.UnavailableBackoff, refused.RetryAfter);
+        Assert.Equal(2, client.Requests);
+
+        // A Retry-After of its own is respected.
+        clock.Now = noon.AddMinutes(20) + parameters.UnavailableBackoff;
+        client.Refusal = new SolarWebUnavailableException(TimeSpan.FromMinutes(42));
+        await Assert.ThrowsAsync<SolarWebUnavailableException>(() => service.GetChartAsync(SolarWebInterval.Month, SolarWebView.Production, today, TestContext.Current.CancellationToken));
+        Assert.Equal(3, client.Requests);
+        Assert.Equal(clock.Now.AddMinutes(42), service.UnavailableUntil);
+
+        // Over, and the maintenance page is history.
+        clock.Now = clock.Now.AddMinutes(42);
+        client.Refusal = null;
+        await service.GetChartAsync(SolarWebInterval.Month, SolarWebView.Production, today, TestContext.Current.CancellationToken);
+        Assert.Equal(4, client.Requests);
+        Assert.Null(service.UnavailableUntil);
     }
 
     [Fact]
@@ -243,6 +276,7 @@ public sealed class SolarWebServiceTests : IDisposable
             p.FinalAfter = parameters.FinalAfter;
             p.MinimumRequestInterval = parameters.MinimumRequestInterval;
             p.DefaultRateLimitBackoff = parameters.DefaultRateLimitBackoff;
+            p.UnavailableBackoff = parameters.UnavailableBackoff;
         })
         .BuildServiceProvider()
         .GetRequiredService<IOptionsMonitor<SolarWebParameters>>();

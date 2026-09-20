@@ -37,6 +37,9 @@ public sealed class SolarWebLoginTests : IAsyncLifetime
     private int callbackPosts;
     private bool rateLimited;
     private bool broken;
+    private bool down;
+    private bool maintenance;
+    private bool blocked;
     private string? lastLoginBody;
 
     public async ValueTask InitializeAsync()
@@ -60,6 +63,24 @@ public sealed class SolarWebLoginTests : IAsyncLifetime
             if (broken)
             {
                 return Results.Content("<html><body>500 - Internal server error.</body></html>", "text/html", statusCode: StatusCodes.Status500InternalServerError);
+            }
+
+            if (down)
+            {
+                context.Response.Headers.RetryAfter = "120";
+                return Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
+            }
+
+            if (maintenance)
+            {
+                // Fronius' page of Sunday 2026-09-20, as a browser saw it: 200, HTML, no form.
+                return Results.Content("<html><head><title>Fronius</title><style>h1{font-size:3em}</style></head><body><img src=\"/logo.svg\"><h1>Maintenance Work</h1><p>We are currently optimizing our service for you so you can find what you need even faster in the future. This page is therefore temporarily unavailable. We will be back online soon. Thank you for your understanding!</p><h1>Wartungsarbeiten</h1><p>Wir optimieren gerade unseren Service für Sie.</p></body></html>", "text/html");
+            }
+
+            if (blocked)
+            {
+                // What a web application firewall's block page looks like: 200, HTML, no form.
+                return Results.Content("<html><head><title>Request Rejected</title><style>body{color:red}</style></head><body><script>var x=1;</script>The requested URL was rejected. Please consult with your administrator.<br><br>Your support ID is: 4711</body></html>", "text/html");
             }
 
             if (context.Request.Cookies["SolarWebSession"] != "yes")
@@ -212,6 +233,35 @@ public sealed class SolarWebLoginTests : IAsyncLifetime
         broken = true;
         var failed = await Assert.ThrowsAsync<HttpRequestException>(() => client.GetChartAsync(settings, SolarWebInterval.Month, SolarWebView.Production, new DateOnly(2026, 9, 20), TestContext.Current.CancellationToken));
         Assert.Equal(HttpStatusCode.InternalServerError, failed.StatusCode);
+    }
+
+    [Fact]
+    public async Task A_503_and_the_maintenance_page_mean_unavailable_and_any_other_html_page_is_a_transient_failure_that_says_what_the_page_was()
+    {
+        down = true;
+        var unavailable = await Assert.ThrowsAsync<SolarWebUnavailableException>(() => client.GetChartAsync(settings, SolarWebInterval.Month, SolarWebView.Production, new DateOnly(2026, 9, 20), TestContext.Current.CancellationToken));
+        Assert.Equal(TimeSpan.FromSeconds(120), unavailable.RetryAfter);
+        Assert.Contains("503", unavailable.Message);
+
+        down = false;
+        maintenance = true;
+        var maintained = await Assert.ThrowsAsync<SolarWebUnavailableException>(() => client.GetChartAsync(settings, SolarWebInterval.Month, SolarWebView.Production, new DateOnly(2026, 9, 20), TestContext.Current.CancellationToken));
+        Assert.Null(maintained.RetryAfter);
+        Assert.Contains("200 text/html", maintained.Message);
+        Assert.Contains("'Fronius': Maintenance Work We are currently optimizing our service", maintained.Message);
+        Assert.DoesNotContain("font-size", maintained.Message);
+
+        maintenance = false;
+        blocked = true;
+        var rejected = await Assert.ThrowsAsync<InvalidDataException>(() => client.GetChartAsync(settings, SolarWebInterval.Month, SolarWebView.Production, new DateOnly(2026, 9, 20), TestContext.Current.CancellationToken));
+        Assert.Contains("'Request Rejected': The requested URL was rejected. Please consult with your administrator. Your support ID is: 4711", rejected.Message);
+        Assert.DoesNotContain("var x", rejected.Message);
+        Assert.Equal(0, loginPosts);
+
+        // None of that was a login failure: the next request logs in as if nothing had happened.
+        blocked = false;
+        await client.GetChartAsync(settings, SolarWebInterval.Month, SolarWebView.Production, new DateOnly(2026, 9, 20), TestContext.Current.CancellationToken);
+        Assert.Equal(1, loginPosts);
     }
 
     [Fact]

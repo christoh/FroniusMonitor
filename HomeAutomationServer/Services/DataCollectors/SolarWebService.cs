@@ -12,12 +12,14 @@ namespace De.Hochstaetter.HomeAutomationServer.Services.DataCollectors;
 ///         <see cref="SolarWebParameters.DayRetention" /> are removed whenever a day chart is written.
 ///     </para>
 ///     <para>
-///         Solar.web answers <c>429</c> when asked too often. Requests go out one at a time and at least
-///         <see cref="SolarWebParameters.MinimumRequestInterval" /> apart, and a 429 stops all of them for the time its
-///         <c>Retry-After</c> names, or <see cref="SolarWebParameters.DefaultRateLimitBackoff" />. While that lasts, and
-///         whenever Solar.web fails for any other reason, a cached chart is served however old it is; only where
-///         there is none does the failure reach the caller. A rejected login is not tried again at all - see
-///         <see cref="SolarWebLoginException" /> - until the server is restarted with other credentials.
+///         Solar.web answers <c>429</c> when asked too often, <c>503</c> or its maintenance page when it is down.
+///         Requests go out one at a time and at least <see cref="SolarWebParameters.MinimumRequestInterval" /> apart,
+///         and any of those three stops all of them for the time a <c>Retry-After</c> names, or
+///         <see cref="SolarWebParameters.DefaultRateLimitBackoff" /> after a 429 and <see cref="SolarWebParameters.UnavailableBackoff" />
+///         otherwise. While that lasts, and whenever Solar.web fails for any other reason, a cached chart is served
+///         however old it is; only where there is none does the failure reach the caller. A rejected login is not
+///         tried again at all - see <see cref="SolarWebLoginException" /> - until the server is restarted with other
+///         credentials.
 ///     </para>
 /// </remarks>
 public sealed class SolarWebService(
@@ -41,7 +43,7 @@ public sealed class SolarWebService(
 
     public DateOnly Today => DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(clock.GetUtcNow(), zone).DateTime);
 
-    public DateTimeOffset? RateLimitedUntil => blockedUntil > clock.GetUtcNow() ? blockedUntil : null;
+    public DateTimeOffset? UnavailableUntil => blockedUntil > clock.GetUtcNow() ? blockedUntil : null;
 
     /// <summary>How many times Solar.web was asked since the start. For the log and the tests.</summary>
     public int Requests { get; private set; }
@@ -141,16 +143,22 @@ public sealed class SolarWebService(
 
                 return chart;
             }
-            catch (SolarWebRateLimitException ex)
+            catch (SolarWebUnavailableException ex)
             {
-                blockedUntil = clock.GetUtcNow() + (ex.RetryAfter ?? Parameters.DefaultRateLimitBackoff);
+                var now = clock.GetUtcNow();
+                blockedUntil = now + (ex.RetryAfter ?? (ex is SolarWebRateLimitException ? Parameters.DefaultRateLimitBackoff : Parameters.UnavailableBackoff));
 
                 if (logger.IsEnabled(LogLevel.Warning))
                 {
-                    logger.LogWarning("Solar.web asked to be left alone until {Until:u}: {Message}", blockedUntil, ex.Message);
+                    logger.LogWarning("Solar.web is left alone until {Until:u}: {Message}", blockedUntil, ex.Message);
                 }
 
-                return cached ?? throw new SolarWebRateLimitException(blockedUntil - clock.GetUtcNow(), ex.Message);
+                if (cached != null)
+                {
+                    return cached;
+                }
+
+                throw ex is SolarWebRateLimitException ? new SolarWebRateLimitException(blockedUntil - now, ex.Message) : new SolarWebUnavailableException(blockedUntil - now, ex.Message);
             }
             catch (SolarWebLoginException ex)
             {
@@ -209,7 +217,7 @@ public sealed class SolarWebService(
 
         if (blockedUntil > now)
         {
-            refusal = cached == null ? new SolarWebRateLimitException(blockedUntil - now, $"Solar.web asked to be left alone until {blockedUntil:u}") : null;
+            refusal = cached == null ? new SolarWebUnavailableException(blockedUntil - now, $"Solar.web is left alone until {blockedUntil:u} after a 429, a 503 or its maintenance page") : null;
             return cached != null;
         }
 

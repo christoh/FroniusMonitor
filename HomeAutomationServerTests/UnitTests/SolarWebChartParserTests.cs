@@ -141,6 +141,15 @@ public sealed class SolarWebChartParserTests
     }
 
     [Fact]
+    public void The_maintenance_page_is_known_by_its_two_headings()
+    {
+        Assert.True(SolarWebClient.IsMaintenancePage("'Fronius': Maintenance Work We are currently optimizing our service for you"));
+        Assert.True(SolarWebClient.IsMaintenancePage("Wartungsarbeiten Wir optimieren gerade unseren Service"));
+        Assert.False(SolarWebClient.IsMaintenancePage("'Request Rejected': The requested URL was rejected."));
+        Assert.False(SolarWebClient.IsMaintenancePage("'500 - Internal server error.': There is a problem with the resource you are looking for"));
+    }
+
+    [Fact]
     public void The_query_values_are_the_lower_case_names_and_the_premium_views_are_known()
     {
         Assert.Equal("day", SolarWebInterval.Day.ToQueryValue());
