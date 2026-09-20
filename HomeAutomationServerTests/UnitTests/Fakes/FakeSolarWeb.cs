@@ -19,6 +19,15 @@ internal sealed class FakeSolarWebClient(TimeProvider clock) : ISolarWebClient
     /// <summary>What the next requests throw, or <see langword="null" /> to answer.</summary>
     public Exception? Refusal { get; set; }
 
+    /// <summary>True where the account has no Premium: the two Premium views are answered with Solar.web's placeholder.</summary>
+    public bool IsPremiumLocked { get; set; }
+
+    /// <summary>
+    /// How far behind the inverter this Solar.web is: a day chart gets its last slot, 23:55 local, only once the
+    /// day has been over for this long. Zero by default, so a day is complete the moment it ends.
+    /// </summary>
+    public TimeSpan Lag { get; set; }
+
     public Task<SolarWebFirmwareStatus> GetFirmwareStatusAsync(SolarWebSettings settings, CancellationToken token = default)
     {
         FirmwareRequests++;
@@ -42,6 +51,13 @@ internal sealed class FakeSolarWebClient(TimeProvider clock) : ISolarWebClient
         }
 
         var period = SolarWebPeriod.Normalize(interval, date);
+        var now = clock.GetUtcNow().UtcDateTime;
+
+        // A day chart's last point: the day's last slot once the day is over and the lag has passed, else now - the
+        // way Solar.web's chart of today ends at the current five minutes.
+        var lastPoint = interval == SolarWebInterval.Day && SolarWebPeriod.EndUtc(interval, period, settings.ResolveTimeZone()) is { } end && now >= end + Lag
+            ? end.AddMinutes(-5)
+            : now;
 
         return Task.FromResult(new SolarWebChart
         {
@@ -49,10 +65,11 @@ internal sealed class FakeSolarWebClient(TimeProvider clock) : ISolarWebClient
             Interval = interval,
             View = view,
             Period = period,
-            FetchedUtc = clock.GetUtcNow().UtcDateTime,
+            FetchedUtc = now,
+            IsPremiumFeature = IsPremiumLocked && view.IsPremium(),
             Title = period.ToString("yyyy-MM-dd"),
             SumValue = $"{Requests} kWh",
-            Series = [new SolarWebSeries { Id = "FromGenToGrid", Name = "Energie ins Netz eingespeist", Unit = "kWh", ChartType = "column", Points = [new SolarWebPoint { TimeUtc = clock.GetUtcNow().UtcDateTime, Value = Requests }] }],
+            Series = [new SolarWebSeries { Id = "FromGenToGrid", Name = "Energie ins Netz eingespeist", Unit = "kWh", ChartType = "column", Points = [new SolarWebPoint { TimeUtc = lastPoint, Value = Requests }] }],
         });
     }
 }

@@ -138,15 +138,32 @@ tables' rows, insert again, one transaction) - no `ON DELETE CASCADE`, so it doe
 pragma. `View` and `Interval` are SQL keywords, hence `ChartView`, `ChartInterval`.
 
 **Period** is the cache key's date: the day, the first of the month, 1 January, `DateOnly.MinValue` for GESAMT
-(`SolarWebPeriod.Normalize`). `SolarWebPeriod.IsFinal` says whether a period ended more than `FinalAfter` (1 day)
-ago in the system's zone; the whole history never is.
+(`SolarWebPeriod.Normalize`). `SolarWebPeriod.EndUtc` is the instant a period was over in the system's zone
+(`null` for the whole history), `Previous` the period before it.
 
-## The policy (`SolarWebService`, decided 2026-09-20)
+## The policy (`SolarWebService`, decided 2026-09-20, polling since the evening of that day)
 
-- **Nothing is polled.** A chart is fetched when a client asks and then kept.
-- A **final** period is served from the cache for good and never asked again. A **running** period (today, this
-  month, this year, GESAMT) is asked again only when the cached chart is older than `RefreshRate`
-  (`RefreshMinutes`, default 15, floor 1).
+- **The running periods are polled.** Every `RefreshRate` (`RefreshMinutes`, default 15, floor 1) `TickAsync`
+  reads the firmware status, then today (production, consumption), this month, this year and GESAMT (all four
+  views), and **the periods that ended less than `FinalAfter` (2 days) ago while their charts are not complete**
+  (`PeriodsToRefresh`: yesterday and the day before, the previous month on the 1st and 2nd, the previous year on
+  1 and 2 January). **Complete** (`TickPredicateAsync`): a day once a measured series - not the forecast, not the
+  battery bubbles - has a value in the day's last five minutes, 23:55 local (`SolarWebPeriod.IsDayComplete`);
+  a month or a year once the production day chart of its **last day** is complete and the month's or year's
+  chart was fetched after that day chart (Solar.web builds the one from the other). The tick reads the days
+  before the months and the years for exactly that reason. Solar.web can be **hours behind** the inverter, so a
+  day read after midnight may still stop at 21:xx; it is read every tick until 23:55 is there. **What has not
+  arrived two days after the end never will** (the developer's rule, 2026-09-20 evening), so nothing older is
+  touched, complete or not. A Premium view the account is locked out of (`IsPremiumFeature`) is tried again only
+  every `LockedViewRetry` (1 day). The first tick comes one interval after start, not at start. A refusal (429,
+  503, maintenance, login) ends the tick: the rest would be refused the same way. The tick does not backfill:
+  last month, last year and older days are fetched only when a client asks.
+- **A client is served what is cached, however old** (`IsGoodEnoughForAClient`): a period that is over does not
+  change, a running one is as fresh as the last tick. Solar.web is asked only for a chart the cache does not
+  have - and for a **forecast day** (a period after today), which no tick refreshes, once the cached one is a
+  `RefreshRate` old. Before the polling (until 2026-09-20 afternoon) a running period was refetched on demand
+  after `RefreshRate` and a period counted as final a day after its end; the developer wanted neither.
+- Solar.web is asked **by the period's first day**, whichever day the client named (`FetchChartAsync`).
 - **Day charts are kept 30 days** (`DayRetention`): the purge runs at start and after every day chart written,
   `Today - 30 days` as the cutoff. Months, years and GESAMT are kept for good.
 - Requests go out **one at a time** (a semaphore, and the cache is checked again after waiting on it) and at least

@@ -1,8 +1,8 @@
 namespace De.Hochstaetter.HomeAutomationServer.Contracts;
 
 /// <summary>
-///     What a controller asks for: one Solar.web chart, from the cache where the cache is good enough and from
-///     Solar.web otherwise. The pacing towards Solar.web - the refresh interval, the request spacing, the 429
+///     What a controller asks for: one Solar.web chart, from the cache where the cache has it and from Solar.web
+///     otherwise. The pacing towards Solar.web - the refresh of the running periods, the request spacing, the 429
 ///     back-off - is the service's and is not visible here beyond the exceptions.
 /// </summary>
 public interface ISolarWebService
@@ -30,8 +30,9 @@ public interface ISolarWebService
 
     /// <summary>
     ///     The chart of <paramref name="view" /> over the <paramref name="interval" /> that contains
-    ///     <paramref name="date" />. A period that is over comes from the cache once it is there; a running period
-    ///     is read again when the cached chart is older than the refresh interval.
+    ///     <paramref name="date" />. What is cached is served as it is - the service itself reads the running
+    ///     periods again every refresh interval - and Solar.web is asked only for a chart the cache does not have,
+    ///     or for a day that has not begun yet and whose forecast is older than the refresh interval.
     /// </summary>
     /// <exception cref="ArgumentException">A Premium view was asked for a day, which Solar.web does not have.</exception>
     /// <exception cref="SolarWebUnavailableException">Solar.web is down, in maintenance or has asked to be left alone (a <see cref="SolarWebRateLimitException" />), and there is no cached chart to fall back on.</exception>

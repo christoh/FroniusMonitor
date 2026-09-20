@@ -31,17 +31,36 @@ public static class SolarWebPeriod
     };
 
     /// <summary>
-    ///     Whether the period was over at <paramref name="nowUtc" /> for at least <paramref name="finalAfter" />, so
-    ///     that its chart does not change any more. A day ends at local midnight of <paramref name="zone" />.
+    ///     The period before <paramref name="period" />: the day, the month or the year before it, or
+    ///     <see langword="null" /> for the whole history, which has none.
     /// </summary>
-    public static bool IsFinal(SolarWebInterval interval, DateOnly period, DateTimeOffset nowUtc, TimeZoneInfo zone, TimeSpan finalAfter)
+    public static DateOnly? Previous(SolarWebInterval interval, DateOnly period) => interval switch
     {
-        if (End(interval, period) is not { } end)
-        {
-            return false;
-        }
+        SolarWebInterval.Day => period.AddDays(-1),
+        SolarWebInterval.Month => period.AddMonths(-1),
+        SolarWebInterval.Year => period.AddYears(-1),
+        SolarWebInterval.All => null,
+        _ => throw new ArgumentOutOfRangeException(nameof(interval), interval, null),
+    };
 
-        var endUtc = TimeZoneInfo.ConvertTimeToUtc(end.ToDateTime(TimeOnly.MinValue, DateTimeKind.Unspecified), zone);
-        return nowUtc.UtcDateTime >= endUtc + finalAfter;
+    /// <summary>
+    ///     The instant the period was over, in UTC, or <see langword="null" /> for the whole history. A day ends at
+    ///     local midnight of <paramref name="zone" />.
+    /// </summary>
+    public static DateTime? EndUtc(SolarWebInterval interval, DateOnly period, TimeZoneInfo zone) =>
+        End(interval, period) is { } end ? TimeZoneInfo.ConvertTimeToUtc(end.ToDateTime(TimeOnly.MinValue, DateTimeKind.Unspecified), zone) : null;
+
+    /// <summary>
+    ///     Whether a day chart holds the whole day: Solar.web's day is 288 slots of five minutes, and the day is there
+    ///     once a measured series has a value in the last of them, 23:55 local. Solar.web can be hours behind the
+    ///     inverter, so a chart read after midnight may still stop short of that. The forecast does not count, its
+    ///     points are always there; nor do the battery state bubbles, which are events and not measurements.
+    /// </summary>
+    /// <param name="chart">A <see cref="SolarWebInterval.Day" /> chart.</param>
+    /// <param name="endUtc">The day's <see cref="EndUtc" />.</param>
+    public static bool IsDayComplete(SolarWebChart chart, DateTime endUtc)
+    {
+        var lastSlot = endUtc.AddMinutes(-5);
+        return chart.Series.Where(s => !s.IsForecast && !s.IsBubble).SelectMany(s => s.Points).Any(p => p.Value != null && p.TimeUtc >= lastSlot && p.TimeUtc < endUtc);
     }
 }

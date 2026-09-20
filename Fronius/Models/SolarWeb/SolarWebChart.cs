@@ -60,6 +60,20 @@ public sealed class SolarWebSeries
     public string ChartType { get; set; } = string.Empty;
 
     /// <summary>
+    ///     True for the forecast (<c>PvForecastTruncated</c>), the one series whose points lie in the future: Solar.web
+    ///     hatches it, a client draws it translucent, and the server does not take it as a sign that a day has data.
+    /// </summary>
+    [JsonIgnore]
+    public bool IsForecast => IsForecastId(Id);
+
+    /// <summary>Whether <paramref name="id" /> is the id of a forecast series - for a model that holds the id without the series.</summary>
+    public static bool IsForecastId(string id) => id.StartsWith("PvForecast", StringComparison.Ordinal);
+
+    /// <summary>The battery states (<c>BattOperatingState</c>): one bubble per event with a text, not a measurement.</summary>
+    [JsonIgnore]
+    public bool IsBubble => ChartType == "bubble";
+
+    /// <summary>
     ///     The colour Solar.web draws the series in, as <c>#RRGGBB</c>, or <see langword="null" /> where it draws a pattern
     ///     instead (the forecast) or named none. A client that keeps it shows the chart the way the portal does.
     /// </summary>

@@ -124,23 +124,20 @@ public sealed class SolarWebChartParserTests
     }
 
     [Fact]
-    public void A_period_is_final_a_day_after_its_local_end_and_the_whole_history_never_is()
+    public void A_period_ends_at_local_midnight_and_has_a_period_before_it_except_the_whole_history()
     {
         var berlin = TimeZoneInfo.FindSystemTimeZoneById("Europe/Berlin");
-        var day = new DateOnly(2026, 9, 19);
-        var grace = TimeSpan.FromDays(1);
 
-        // 2026-09-19 ends at 2026-09-20 00:00 Berlin = 2026-09-19 22:00 UTC; plus a day is 2026-09-20 22:00 UTC.
-        Assert.False(SolarWebPeriod.IsFinal(SolarWebInterval.Day, day, new DateTimeOffset(2026, 9, 20, 21, 59, 0, TimeSpan.Zero), berlin, grace));
-        Assert.True(SolarWebPeriod.IsFinal(SolarWebInterval.Day, day, new DateTimeOffset(2026, 9, 20, 22, 0, 0, TimeSpan.Zero), berlin, grace));
+        // 2026-09-19 ends at 2026-09-20 00:00 Berlin, which is 2026-09-19 22:00 UTC in summer time; December in winter time.
+        Assert.Equal(new DateTime(2026, 9, 19, 22, 0, 0, DateTimeKind.Utc), SolarWebPeriod.EndUtc(SolarWebInterval.Day, new DateOnly(2026, 9, 19), berlin));
+        Assert.Equal(new DateTime(2026, 9, 30, 22, 0, 0, DateTimeKind.Utc), SolarWebPeriod.EndUtc(SolarWebInterval.Month, new DateOnly(2026, 9, 1), berlin));
+        Assert.Equal(new DateTime(2026, 12, 31, 23, 0, 0, DateTimeKind.Utc), SolarWebPeriod.EndUtc(SolarWebInterval.Year, new DateOnly(2026, 1, 1), berlin));
+        Assert.Null(SolarWebPeriod.EndUtc(SolarWebInterval.All, DateOnly.MinValue, berlin));
 
-        // The month and the year the day is in are still running.
-        var now = new DateTimeOffset(2026, 9, 25, 12, 0, 0, TimeSpan.Zero);
-        Assert.False(SolarWebPeriod.IsFinal(SolarWebInterval.Month, new DateOnly(2026, 9, 1), now, berlin, grace));
-        Assert.True(SolarWebPeriod.IsFinal(SolarWebInterval.Month, new DateOnly(2026, 8, 1), now, berlin, grace));
-        Assert.False(SolarWebPeriod.IsFinal(SolarWebInterval.Year, new DateOnly(2026, 1, 1), now, berlin, grace));
-        Assert.True(SolarWebPeriod.IsFinal(SolarWebInterval.Year, new DateOnly(2025, 1, 1), now, berlin, grace));
-        Assert.False(SolarWebPeriod.IsFinal(SolarWebInterval.All, DateOnly.MinValue, now, berlin, grace));
+        Assert.Equal(new DateOnly(2026, 9, 18), SolarWebPeriod.Previous(SolarWebInterval.Day, new DateOnly(2026, 9, 19)));
+        Assert.Equal(new DateOnly(2026, 8, 1), SolarWebPeriod.Previous(SolarWebInterval.Month, new DateOnly(2026, 9, 1)));
+        Assert.Equal(new DateOnly(2025, 1, 1), SolarWebPeriod.Previous(SolarWebInterval.Year, new DateOnly(2026, 1, 1)));
+        Assert.Null(SolarWebPeriod.Previous(SolarWebInterval.All, DateOnly.MinValue));
     }
 
     [Fact]

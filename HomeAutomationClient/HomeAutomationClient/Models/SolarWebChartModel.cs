@@ -21,7 +21,7 @@ public enum SolarWebSeriesKind
 public sealed record SolarWebChartSeries(string Id, string Name, HaColor Color, SolarWebSeriesKind Kind, bool OnRightAxis, IReadOnlyList<double?> Values, IReadOnlyList<ChartPoint> Points)
 {
     /// <summary>Solar.web hatches its forecast where everything else is solid; the view draws it translucent for the same reason.</summary>
-    public bool IsForecast => Id.StartsWith("PvForecast", StringComparison.Ordinal);
+    public bool IsForecast => SolarWebSeries.IsForecastId(Id);
 }
 
 /// <summary>

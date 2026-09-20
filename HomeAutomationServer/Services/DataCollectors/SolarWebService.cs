@@ -6,14 +6,24 @@ namespace De.Hochstaetter.HomeAutomationServer.Services.DataCollectors;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         The charts are not polled. A chart is read when a client asks for it and is then kept: for good where its
-///         period is over (a day, a month or a year that ended more than <see cref="SolarWebParameters.FinalAfter" /> ago),
-///         for <see cref="SolarWebParameters.RefreshRate" /> where the period is still running. Day charts older than
-///         <see cref="SolarWebParameters.DayRetention" /> are removed whenever a day chart is written.
+///         The running periods are polled: every <see cref="SolarWebParameters.RefreshRate" /> the service reads
+///         today, this month, this year and the whole history in every view, and the periods that ended less than
+///         <see cref="SolarWebParameters.FinalAfter" /> ago as long as their charts are not complete, so that the
+///         cache holds a period whole once it is over. Solar.web can be hours behind the inverter: a day is complete
+///         once its chart has a value in the day's last five minutes (<see cref="SolarWebPeriod.IsDayComplete" />),
+///         a month or a year once the day chart of its last day is and the month's or the year's chart was read
+///         after that. What has not arrived <see cref="SolarWebParameters.FinalAfter" /> after the end never will.
+///         A client is served what is cached, whatever its age - a period that is over does not change, and a
+///         running one is as fresh as the last tick - and Solar.web is asked only for a chart the cache does not
+///         have. The one exception is a day that has not begun, a forecast: that is read again after
+///         <see cref="SolarWebParameters.RefreshRate" />, because nothing else keeps it fresh. A Premium view the
+///         account is locked out of is tried again only every <see cref="SolarWebParameters.LockedViewRetry" />.
+///         Day charts older than <see cref="SolarWebParameters.DayRetention" /> are removed whenever a day chart is
+///         written.
 ///     </para>
 ///     <para>
-///         The firmware status is polled, every <see cref="SolarWebParameters.RefreshRate" />, and read on request
-///         as well. It is published to <see cref="IDataControlService" /> under <see cref="SolarWebFirmwareStatus.DeviceId" />
+///         The firmware status is polled with the same tick, and read on request as well. It is published to
+///         <see cref="IDataControlService" /> under <see cref="SolarWebFirmwareStatus.DeviceId" />
 ///         whenever it differs from the one before - so the hub pushes a <c>SolarWebFirmwareStatus</c> message to
 ///         the clients when a firmware becomes outdated, and again when it has been updated.
 ///     </para>
@@ -102,8 +112,10 @@ public sealed class SolarWebService(
             logger.LogInformation("Serving Solar.web charts of PV system {PvSystemId} as {UserName} in time zone {Zone}, running periods and the firmware status refreshed every {Refresh}", settings.PvSystemId, settings.UserName, zone.Id, Parameters.RefreshRate);
         }
 
-        // The first firmware check comes with the first client that asks, or with the first tick - not at start,
-        // where a login that takes its time would hold up the server.
+        // The first tick comes after one interval, not at start: a client that asks before it is served from the
+        // cache or fetches the one chart it wants, while a tick is two dozen requests two seconds apart, which a
+        // server that has just come up - possibly restarted several times while being set up - had better not
+        // fire at Solar.web every time.
         timer = new Timer(TimerElapsed, null, Parameters.RefreshRate, Parameters.RefreshRate);
     }
 
@@ -134,11 +146,82 @@ public sealed class SolarWebService(
             throw new ArgumentException($"Solar.web has no day chart of {view}; that view exists for a month, a year and the whole history", nameof(view));
         }
 
-        var period = SolarWebPeriod.Normalize(interval, date);
+        return FetchChartAsync(settings, interval, view, SolarWebPeriod.Normalize(interval, date), IsGoodEnoughForAClient, token);
+    }
+
+    /// <summary>
+    ///     What is cached is served: a period that is over does not change, and a running one is kept fresh by the
+    ///     tick. Only a period that has not begun - a forecast day - is read again after the refresh rate, because
+    ///     the tick does not cover it.
+    /// </summary>
+    private bool IsGoodEnoughForAClient(SolarWebChart cached) => cached.Period <= Today || clock.GetUtcNow() - cached.FetchedUtc < Parameters.RefreshRate;
+
+    /// <summary>
+    ///     What the tick leaves alone for the charts of one period: a locked Premium view that was tried recently,
+    ///     and a complete chart - a day with a value in its last five minutes, a month or a year whose last day's
+    ///     chart is complete and that was read after that day's chart was. Everything else, every running period
+    ///     above all, is read again.
+    /// </summary>
+    /// <remarks>
+    ///     The witness of a month or a year is the production day chart of its last day, read here once for all
+    ///     four views. It is in the cache because the tick reads the days before the months and the years, so in
+    ///     the tick that finds the last day complete the month's chart is read after it, and is complete with it.
+    /// </remarks>
+    private async Task<Func<SolarWebChart, bool>> TickPredicateAsync(SolarWebSettings settings, SolarWebInterval interval, DateOnly period, CancellationToken token)
+    {
+        var endUtc = SolarWebPeriod.EndUtc(interval, period, zone);
+
+        var witness = interval is SolarWebInterval.Month or SolarWebInterval.Year
+            ? await store.GetChartAsync(settings.PvSystemId, SolarWebInterval.Day, SolarWebView.Production, SolarWebPeriod.End(interval, period)!.Value.AddDays(-1), token).ConfigureAwait(false)
+            : null;
+
+        return cached =>
+        {
+            if (cached.IsPremiumFeature && clock.GetUtcNow() - cached.FetchedUtc < Parameters.LockedViewRetry)
+            {
+                return true;
+            }
+
+            if (endUtc is not { } end)
+            {
+                // The whole history never ends.
+                return false;
+            }
+
+            return interval == SolarWebInterval.Day
+                ? SolarWebPeriod.IsDayComplete(cached, end)
+                : witness != null && SolarWebPeriod.IsDayComplete(witness, end) && cached.FetchedUtc >= witness.FetchedUtc;
+        };
+    }
+
+    /// <summary>
+    ///     The periods the tick reads: the current one, and every one before it that ended less than
+    ///     <see cref="SolarWebParameters.FinalAfter" /> ago - yesterday and the day before, the previous month on the
+    ///     first two days of a month, the previous year on 1 and 2 January. Whatever an older period is missing is
+    ///     never going to arrive, and it is left as it is.
+    /// </summary>
+    private IEnumerable<DateOnly> PeriodsToRefresh(SolarWebInterval interval)
+    {
+        var period = SolarWebPeriod.Normalize(interval, Today);
+        yield return period;
+
+        var horizon = clock.GetUtcNow().UtcDateTime - Parameters.FinalAfter;
+
+        while (SolarWebPeriod.Previous(interval, period) is { } previous && SolarWebPeriod.EndUtc(interval, previous, zone) is { } end && end > horizon)
+        {
+            yield return previous;
+            period = previous;
+        }
+    }
+
+    private Task<SolarWebChart> FetchChartAsync(SolarWebSettings settings, SolarWebInterval interval, SolarWebView view, DateOnly period, Func<SolarWebChart, bool> isGoodEnough, CancellationToken token)
+    {
+        // The whole history has no date; Solar.web ignores the one that is sent, and the cache key is MinValue.
+        var date = interval == SolarWebInterval.All ? Today : period;
 
         return AskAsync(
             t => store.GetChartAsync(settings.PvSystemId, interval, view, period, t),
-            IsGoodEnough,
+            isGoodEnough,
             t => client.GetChartAsync(settings, interval, view, date, t),
             async (chart, t) =>
             {
@@ -161,23 +244,56 @@ public sealed class SolarWebService(
     public Task<SolarWebFirmwareStatus> GetFirmwareStatusAsync(CancellationToken token = default) => GetFirmwareStatusAsync(false, token);
 
     /// <summary>
-    ///     One tick of the timer: reads the firmware status again, whatever its age, and publishes it where it changed.
-    ///     Public so that a test can drive it with a clock of its own.
+    ///     One tick of the timer: reads the firmware status again, whatever its age, and publishes it where it
+    ///     changed; then reads the running periods - today, this month, this year, the whole history, each in every
+    ///     view Solar.web has for it - and the periods that ended recently where the cache does not hold them
+    ///     complete yet (<see cref="PeriodsToRefresh" />, <see cref="TickPredicateAsync" />). Public so that a test
+    ///     can drive it with a clock of its own.
     /// </summary>
+    /// <remarks>
+    ///     Every request is one <see cref="AskAsync{T}" />, so a refusal is said in the log there and blocks the rest
+    ///     of the tick the way it blocks a client: once Solar.web has asked to be left alone, or the login has failed,
+    ///     the remaining charts are not tried, because every one of them would be refused the same way.
+    /// </remarks>
     public async Task TickAsync(CancellationToken token = default)
     {
-        if (!IsEnabled)
+        if (Parameters.Settings is not { IsConfigured: true } settings)
         {
             return;
         }
 
+        await TryAsync(t => GetFirmwareStatusAsync(true, t), token).ConfigureAwait(false);
+
+        // The days first: the day chart of the last day of a month or a year is what says that the month or the
+        // year is complete, so it has to be read before them.
+        foreach (var interval in new[] { SolarWebInterval.Day, SolarWebInterval.Month, SolarWebInterval.Year, SolarWebInterval.All })
+        {
+            foreach (var period in PeriodsToRefresh(interval))
+            {
+                var isGoodEnough = await TickPredicateAsync(settings, interval, period, token).ConfigureAwait(false);
+
+                foreach (var view in Enum.GetValues<SolarWebView>().Where(v => interval != SolarWebInterval.Day || !v.IsPremium()))
+                {
+                    if (token.IsCancellationRequested || UnavailableUntil != null || loginFailure != null)
+                    {
+                        return;
+                    }
+
+                    await TryAsync(t => FetchChartAsync(settings, interval, view, period, isGoodEnough, t), token).ConfigureAwait(false);
+                }
+            }
+        }
+    }
+
+    /// <summary>One request of the tick; a failure is said in the log by <see cref="AskAsync{T}" />, and there is nobody else to tell.</summary>
+    private static async Task TryAsync<T>(Func<CancellationToken, Task<T>> request, CancellationToken token)
+    {
         try
         {
-            await GetFirmwareStatusAsync(true, token).ConfigureAwait(false);
+            await request(token).ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is SolarWebUnavailableException or SolarWebLoginException or HttpRequestException or InvalidDataException || ex is OperationCanceledException && !token.IsCancellationRequested)
         {
-            // Said in the log by AskAsync; there is nobody else to tell.
         }
     }
 
@@ -344,16 +460,6 @@ public sealed class SolarWebService(
     }
 
     /// <summary>
-    ///     Whether the cached chart is served without asking Solar.web: always where its period is over, and where
-    ///     the period is running as long as the chart is younger than the refresh rate.
-    /// </summary>
-    private bool IsGoodEnough(SolarWebChart cached)
-    {
-        var now = clock.GetUtcNow();
-        return SolarWebPeriod.IsFinal(cached.Interval, cached.Period, now, zone, Parameters.FinalAfter) || now - cached.FetchedUtc < Parameters.RefreshRate;
-    }
-
-    /// <summary>
     ///     Whether Solar.web is not to be asked right now - a back-off is running or the login has failed - and
     ///     what to tell the caller where there is nothing cached to serve instead.
     /// </summary>
@@ -426,7 +532,7 @@ public sealed class SolarWebService(
         {
             if (logger.IsEnabled(LogLevel.Error))
             {
-                logger.LogError(ex, "Checking the Solar.web firmware status failed");
+                logger.LogError(ex, "The Solar.web refresh failed");
             }
         }
         finally
