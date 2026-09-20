@@ -1,30 +1,26 @@
 namespace De.Hochstaetter.HomeAutomationClient.Views.Dialogs;
 
 /// <summary>
-/// The body of the price chart dialog. What is in the code behind is exactly the two things the interaction rule
-/// leaves there: drawing the view model's <see cref="EnergyChartModel"/> with the charting library, and reading
-/// the theme's colors for it - both need the UI framework, and neither decides anything.
+/// The body of the Solar.web chart dialog. What is in the code behind is exactly the two things the interaction rule
+/// leaves there: drawing the view model's <see cref="SolarWebChartModel"/> with the charting library, and reading
+/// the theme's colours for it - both need the UI framework, and neither decides anything.
 /// </summary>
-public partial class EnergyChartView : UserControl, IDialogControl
+public partial class SolarWebChartView : UserControl, IDialogControl
 {
-    private EnergyChartViewModel? viewModel;
+    private SolarWebChartViewModel? viewModel;
 
-    public EnergyChartView()
+    public SolarWebChartView()
     {
         // Before the AvaPlot is built: a plot takes its font at construction, and it has to be the app's Inter,
         // not whatever Skia finds on the platform - see InterFontResolver.
         InterFontResolver.Register();
         InitializeComponent();
 
-        // The WPF chart had zoom and pan switched off on both axes: a day is a day, and dragging it about only
-        // loses the user the labels. The same here.
+        // Zoom and pan are off, as in the price chart: a day is a day, and dragging it about only loses the labels.
         Plot.UserInputProcessor.IsEnabled = false;
 
         DataContextChanged += OnDataContextChanged;
         ActualThemeVariantChanged += (_, _) => Render();
-
-        // The view model leaves a push alone while the chart cannot be seen and rebuilds once it can.
-        ViewVisibility.Follow(this);
     }
 
     private void OnDataContextChanged(object? sender, EventArgs e)
@@ -34,7 +30,7 @@ public partial class EnergyChartView : UserControl, IDialogControl
             viewModel.PropertyChanged -= OnViewModelPropertyChanged;
         }
 
-        viewModel = DataContext as EnergyChartViewModel;
+        viewModel = DataContext as SolarWebChartViewModel;
 
         if (viewModel == null)
         {
@@ -49,12 +45,10 @@ public partial class EnergyChartView : UserControl, IDialogControl
         ViewModelBase.HandleTaskExceptions(viewModel.Initialize);
     }
 
-    /// <summary>
-    /// A new model may be set from the hub's thread when the server pushes; a control is drawn on the UI thread.
-    /// </summary>
+    /// <summary>The model is set from the web client's continuation, which is the UI thread; the post keeps it so whatever the thread.</summary>
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(EnergyChartViewModel.ChartModel))
+        if (e.PropertyName == nameof(SolarWebChartViewModel.ChartModel))
         {
             Dispatcher.UIThread.Post(Render);
         }
@@ -62,13 +56,12 @@ public partial class EnergyChartView : UserControl, IDialogControl
 
     private void Render()
     {
-        // A fresh plot every time: the weather adds axes of its own, and clearing the plottables alone would
-        // leave the axes of the last drawing standing.
+        // A fresh plot every time: the right axis and the manual ticks would otherwise survive from the last drawing.
         Plot.Reset();
 
         if (viewModel?.ChartModel is { } model)
         {
-            EnergyChartRenderer.Render(Plot.Plot, model, ChartTheme.PaletteOf(this));
+            SolarWebChartRenderer.Render(Plot.Plot, model, ChartTheme.PaletteOf(this));
         }
 
         Plot.Refresh();

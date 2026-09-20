@@ -1,12 +1,8 @@
 using De.Hochstaetter.Fronius.Models;
 using ScottPlot;
 using Color = ScottPlot.Color;
-using ScottPlot.AxisPanels;
 
 namespace De.Hochstaetter.HomeAutomationClient.Controls;
-
-/// <summary>The two colors of the theme a chart has to follow; everything else in the chart has a color of its own.</summary>
-public sealed record EnergyChartPalette(HaColor Foreground, HaColor Background);
 
 /// <summary>
 /// Draws an <see cref="EnergyChartModel"/> with ScottPlot. The shape is the WPF chart's: price bars on the left
@@ -25,22 +21,8 @@ public static class EnergyChartRenderer
 
     public static void Render(Plot plot, EnergyChartModel model, EnergyChartPalette palette)
     {
-        var foreground = ToColor(palette.Foreground);
-        var background = ToColor(palette.Background);
-
-        plot.FigureBackground.Color = background;
-        plot.DataBackground.Color = background;
-        plot.Grid.MajorLineColor = foreground.WithAlpha(0.15);
-        plot.Grid.MinorLineColor = foreground.WithAlpha(0.06);
-        plot.Legend.BackgroundColor = background;
-        plot.Legend.FontColor = foreground;
-        plot.Legend.OutlineColor = foreground.WithAlpha(0.5);
-        plot.Legend.ShadowColor = ScottPlot.Colors.Transparent;
-
+        var (foreground, _) = ChartTheme.Apply(plot, palette);
         plot.Title(model.Title);
-        plot.Axes.Title.Label.ForeColor = foreground;
-        plot.Axes.Title.Label.FontSize = 18;
-        plot.Axes.Title.Label.Bold = true;
 
         // Hours only, as the WPF axis had it: the day is in the title bar of the dialog and the date on every
         // tick left no room for the hours.
@@ -49,7 +31,7 @@ public static class EnergyChartRenderer
         // DateTimeTicksBottom replaces the bottom axis, so the axes are colored only now: colored before it, the new
         // axis came up black on the dark theme.
         plot.Axes.Color(foreground);
-        Caption(plot.Axes.Left, "ct/kWh", foreground);
+        ChartTheme.Caption(plot.Axes.Left, "ct/kWh", foreground);
 
         AddBars(plot, model.PositivePrices, pricePositive, foreground, plot.Axes.Left, model.PriceLegend);
         AddBars(plot, model.NegativePrices, priceNegative, foreground, plot.Axes.Left, model.NegativePriceLegend);
@@ -60,7 +42,7 @@ public static class EnergyChartRenderer
         if (model.HasProductions)
         {
             var productionAxis = plot.Axes.Right;
-            Caption(productionAxis, "GW", foreground);
+            ChartTheme.Caption(productionAxis, "GW", foreground);
             productionAxis.TickLabelStyle.ForeColor = foreground;
             // The values hang from the top as negatives; the axis is captioned without the sign, as OxyPlot's
             // "#,0;#,0" format did.
@@ -78,7 +60,7 @@ public static class EnergyChartRenderer
         {
             if (model.RadiationMeasured.Count + model.RadiationForecast.Count > 0)
             {
-                var axis = AddRightAxis(plot, "W/m²", foreground);
+                var axis = ChartTheme.AddRightAxis(plot, "W/m²", foreground);
                 AddLine(plot, model.RadiationMeasured, radiation, axis, model.RadiationLegend, dashed: false);
                 AddLine(plot, model.RadiationForecast, radiation, axis, $"{model.RadiationLegend} - {model.ForecastLegend}", dashed: true);
                 plot.Axes.SetLimitsY(0, model.RadiationAxisMaximum, axis);
@@ -86,7 +68,7 @@ public static class EnergyChartRenderer
 
             if (model.WindSpeedMeasured.Count + model.WindSpeedForecast.Count > 0)
             {
-                var axis = AddRightAxis(plot, "m/s", foreground);
+                var axis = ChartTheme.AddRightAxis(plot, "m/s", foreground);
                 AddLine(plot, model.WindSpeedMeasured, windSpeed, axis, model.WindSpeedLegend, dashed: false);
                 AddLine(plot, model.WindSpeedForecast, windSpeed, axis, $"{model.WindSpeedLegend} - {model.ForecastLegend}", dashed: true);
                 plot.Axes.SetLimitsY(0, model.WindSpeedAxisMaximum, axis);
@@ -95,9 +77,7 @@ public static class EnergyChartRenderer
 
         // Outside the data area, as the WPF legend was: inside it covers the production bars, which hang exactly
         // where a legend would sit. Below rather than beside, because the right edge already carries three axes.
-        plot.Legend.FontSize = 11;
-        plot.Legend.Orientation = Orientation.Horizontal;
-        plot.ShowLegend(Edge.Bottom);
+        ChartTheme.LegendBelow(plot);
     }
 
     private static void AddBars(Plot plot, IReadOnlyList<ChartBar> bars, Color fill, Color foreground, IYAxis axis, string legend)
@@ -141,27 +121,4 @@ public static class EnergyChartRenderer
         scatter.LegendText = legend;
     }
 
-    private static RightAxis AddRightAxis(Plot plot, string label, Color foreground)
-    {
-        var axis = plot.Axes.AddRightAxis();
-        axis.LabelText = label;
-        axis.LabelFontColor = foreground;
-        axis.TickLabelStyle.ForeColor = foreground;
-        axis.FrameLineStyle.Color = foreground;
-        axis.MajorTickStyle.Color = foreground;
-        axis.MinorTickStyle.Color = foreground;
-        return axis;
-    }
-
-    /// <summary>The left and right axes come typed as their interfaces, which have no caption; every one of them is an AxisBase.</summary>
-    private static void Caption(IAxis axis, string text, Color color)
-    {
-        if (axis is AxisBase axisBase)
-        {
-            axisBase.LabelText = text;
-            axisBase.LabelFontColor = color;
-        }
-    }
-
-    private static Color ToColor(HaColor color) => new(color.R, color.G, color.B, color.A);
 }

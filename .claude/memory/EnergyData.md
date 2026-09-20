@@ -28,6 +28,7 @@ paths:
   - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/EnergyChartView.axaml.cs
   - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/PriceComponentsView.axaml
   - HomeAutomationClient/HomeAutomationClient/Controls/EnergyChartRenderer.cs
+  - HomeAutomationClient/HomeAutomationClient/Controls/ChartTheme.cs
   - HomeAutomationClient/HomeAutomationClient/Services/UpdateService.cs
   - HomeAutomationClient/HomeAutomationClient/Contracts/IUpdateService.cs
   - HomeAutomationServerTests/UnitTests/EnergyDataCollectorTests.cs
@@ -171,6 +172,10 @@ exempt from VAT stays as it is, and a negative market price gets negative VAT, w
   as zoom and pan were off in WPF. Theme colors reach the renderer as `HaColor`. **Color the axes after
   `DateTimeTicksBottom()`**: that call replaces the bottom axis, and one colored before it came up black on the
   dark theme.
+  Since 2026-09-20 the theme handling every chart of the client shares - the two palette colours
+  (`EnergyChartPalette`, now in `Controls/ChartTheme.cs`), the figure, grid and legend colours, axis captions, right
+  axes, the legend below, and reading the palette off a control (`ChartTheme.PaletteOf`) - is `ChartTheme`, used by
+  this renderer and by `SolarWebChartRenderer` ([[SolarWeb]]).
 - **Value labels sit at a fixed offset in a fixed 11 point font, like OxyPlot's.** They overlap when the dialog is
   narrow, and the developer wants that rather than what was tried on 2026-09-13: staggering by bar index (bars
   of different heights put neighbours at the same height anyway) and collision detection in pixel space with a

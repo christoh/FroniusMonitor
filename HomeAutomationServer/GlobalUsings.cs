@@ -23,6 +23,7 @@ global using De.Hochstaetter.Fronius.Models.EnergyData;
 global using De.Hochstaetter.Fronius.Models.Events;
 global using De.Hochstaetter.Fronius.Models.Gen24;
 global using De.Hochstaetter.Fronius.Models.Settings;
+global using De.Hochstaetter.Fronius.Models.SolarWeb;
 global using De.Hochstaetter.Fronius.Models.ToshibaAc;
 global using De.Hochstaetter.Fronius.Models.WebApi;
 global using De.Hochstaetter.Fronius.Services;

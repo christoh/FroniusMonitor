@@ -1837,4 +1837,34 @@
   <data name="Idle" xml:space="preserve">
     <value>Inactif</value>
   </data>
+  <data name="Profitability" xml:space="preserve">
+    <value>Rentabilité</value>
+  </data>
+  <data name="Costs" xml:space="preserve">
+    <value>Coûts</value>
+  </data>
+  <data name="Day" xml:space="preserve">
+    <value>Jour</value>
+  </data>
+  <data name="Month" xml:space="preserve">
+    <value>Mois</value>
+  </data>
+  <data name="Year" xml:space="preserve">
+    <value>Année</value>
+  </data>
+  <data name="LoadingSolarWebData" xml:space="preserve">
+    <value>Chargement des données Solar.web</value>
+  </data>
+  <data name="SolarWebPremiumHint" xml:space="preserve">
+    <value>Cette vue nécessite un abonnement Solar.web Premium.</value>
+  </data>
+  <data name="FirmwareUpdateAvailable" xml:space="preserve">
+    <value>Mise à jour du firmware disponible</value>
+  </data>
+  <data name="FirmwareUpdateAvailableText" xml:space="preserve">
+    <value>Solar.web propose un firmware plus récent pour ces composants. Tu peux lancer la mise à jour sur Solar.web.</value>
+  </data>
+  <data name="ShowChangelog" xml:space="preserve">
+    <value>Afficher les modifications</value>
+  </data>
 </root>

@@ -27,7 +27,19 @@ public sealed class WebClientService : IWebClientService
 
     private HttpClient httpClient = NewHttpClient();
 
-    private static HttpClient NewHttpClient() => new() { Timeout = TimeSpan.FromSeconds(7) };
+    /// <summary>How long a request may take unless the caller says otherwise. The server answers from its own memory or its devices within that.</summary>
+    public static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(15);
+
+    /// <summary>
+    /// How long a Solar.web request may take: the server may have to ask Solar.web, and log in to it first. The
+    /// developer's choice of 2026-09-20; the server itself waits longer, and a chart that takes longer than this is
+    /// served from the cache the next time it is asked for.
+    /// </summary>
+    public static readonly TimeSpan SolarWebTimeout = TimeSpan.FromSeconds(30);
+
+    // No timeout on the client itself: every request gets its own through ReadResult, so one slow endpoint does not
+    // decide the patience for all the others.
+    private static HttpClient NewHttpClient() => new() { Timeout = Timeout.InfiniteTimeSpan };
 
     /// <summary>
     /// Points the client at <paramref name="baseUri"/>. May be called again when the user changes the connection.
@@ -185,6 +197,15 @@ public sealed class WebClientService : IWebClientService
 
     #endregion
 
+    #region SolarWeb
+
+    public Task<ApiResult<SolarWebChart>> GetSolarWebChart(SolarWebInterval interval, SolarWebView view, DateOnly date, CancellationToken token = default) =>
+        GetResult<SolarWebChart>(FormattableString.Invariant($"SolarWeb/{interval.ToQueryValue()}/{view.ToQueryValue()}/{date:yyyy-MM-dd}"), token, SolarWebTimeout);
+
+    public Task<ApiResult<SolarWebFirmwareStatus>> GetSolarWebFirmwareStatus(CancellationToken token = default) => GetResult<SolarWebFirmwareStatus>("SolarWeb/firmware", token, SolarWebTimeout);
+
+    #endregion
+
     #region Gen24
 
     public async Task<ApiResult<Dictionary<string, Gen24System>>> GetGen24Devices(CancellationToken token = default)
@@ -273,9 +294,9 @@ public sealed class WebClientService : IWebClientService
 
     #endregion
 
-    private Task<ApiResult<T>> GetResult<T>(string queryString, CancellationToken token = default)
+    private Task<ApiResult<T>> GetResult<T>(string queryString, CancellationToken token = default, TimeSpan? timeout = null)
     {
-        return SendResult<T>(t => httpClient.GetAsync(queryString, t), token);
+        return SendResult<T>(t => httpClient.GetAsync(queryString, t), token, timeout);
     }
 
     /// <summary>
@@ -298,9 +319,9 @@ public sealed class WebClientService : IWebClientService
         return SendResult<T>(t => httpClient.DeleteAsync(queryString, t), token);
     }
 
-    private Task<ApiResult<T>> SendResult<T>(Func<CancellationToken, Task<HttpResponseMessage>> send, CancellationToken token)
+    private Task<ApiResult<T>> SendResult<T>(Func<CancellationToken, Task<HttpResponseMessage>> send, CancellationToken token, TimeSpan? timeout = null)
     {
-        return ReadResult(send, (content, t) => content.ReadFromJsonAsync<T>(jsonOptions, t), token);
+        return ReadResult(send, (content, t) => content.ReadFromJsonAsync<T>(jsonOptions, t), token, timeout);
     }
 
     /// <summary>
@@ -312,19 +333,24 @@ public sealed class WebClientService : IWebClientService
     /// <param name="readPayload">
     /// How to read a successful body. Most endpoints answer with JSON, but not all of them do.
     /// </param>
-    private async Task<ApiResult<T>> ReadResult<T>(Func<CancellationToken, Task<HttpResponseMessage>> send, Func<HttpContent, CancellationToken, Task<T?>> readPayload, CancellationToken token)
+    private async Task<ApiResult<T>> ReadResult<T>(Func<CancellationToken, Task<HttpResponseMessage>> send, Func<HttpContent, CancellationToken, Task<T?>> readPayload, CancellationToken token, TimeSpan? timeout = null)
     {
         HttpResponseMessage? responseMessage = null;
 
+        // The request's own timeout, on top of whatever the caller cancels: the client has none of its own.
+        using var timeoutSource = CancellationTokenSource.CreateLinkedTokenSource(token);
+        timeoutSource.CancelAfter(timeout ?? DefaultTimeout);
+        var t = timeoutSource.Token;
+
         try
         {
-            responseMessage = await send(token).ConfigureAwait(false);
+            responseMessage = await send(t).ConfigureAwait(false);
 
             return responseMessage.StatusCode != HttpStatusCode.OK
-                ? ApiResult<T>.FromProblemDetails(await GetErrors(responseMessage, token).ConfigureAwait(false), responseMessage.StatusCode)
+                ? ApiResult<T>.FromProblemDetails(await GetErrors(responseMessage, t).ConfigureAwait(false), responseMessage.StatusCode)
                 : new ApiResult<T>
                 {
-                    Payload = await readPayload(responseMessage.Content, token).ConfigureAwait(false),
+                    Payload = await readPayload(responseMessage.Content, t).ConfigureAwait(false),
                     Status = responseMessage.StatusCode,
                 };
         }

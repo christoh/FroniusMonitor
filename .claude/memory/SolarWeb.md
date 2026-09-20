@@ -3,6 +3,23 @@ paths:
   - HomeAutomationServer/Models/Settings/SolarWebSettings.cs
   - HomeAutomationServer/Models/Settings/SolarWebParameters.cs
   - HomeAutomationServer/Models/SolarWeb/**
+  - Fronius/Models/SolarWeb/**
+  - HomeAutomationClient/HomeAutomationClient/Models/SolarWebChartModel.cs
+  - HomeAutomationClient/HomeAutomationClient/Models/FirmwareUpdateNotice.cs
+  - HomeAutomationClient/HomeAutomationClient/Controls/SolarWebChartRenderer.cs
+  - HomeAutomationClient/HomeAutomationClient/Controls/ChartTheme.cs
+  - HomeAutomationClient/HomeAutomationClient/ViewModels/Dialogs/SolarWebChartViewModel.cs
+  - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/SolarWebChartView.axaml
+  - HomeAutomationClient/HomeAutomationClient/Views/Dialogs/SolarWebChartView.axaml.cs
+  - HomeAutomationClient/HomeAutomationClient/ViewModels/MainViewModel.cs
+  - HomeAutomationClient/HomeAutomationClient/Views/MainView.axaml
+  - HomeAutomationClient/HomeAutomationClient/Contracts/IUpdateService.cs
+  - HomeAutomationClient/HomeAutomationClient/Services/UpdateService.cs
+  - HomeAutomationClient/HomeAutomationClient/Contracts/IWebClientService.cs
+  - HomeAutomationClient/HomeAutomationClient/Services/WebClientService.cs
+  - HomeAutomationServerTests/UnitTests/SolarWebChartModelTests.cs
+  - HomeAutomationServerTests/UnitTests/FirmwareUpdateNoticeTests.cs
+  - HomeAutomationServerTests/UnitTests/Fakes/FakeUpdateService.cs
   - HomeAutomationServer/Contracts/ISolarWebClient.cs
   - HomeAutomationServer/Contracts/ISolarWebHistoryStore.cs
   - HomeAutomationServer/Contracts/ISolarWebService.cs
@@ -25,12 +42,14 @@ paths:
   - HomeAutomationServerTests/UnitTests/Fakes/FakeSolarWeb.cs
 ---
 
-# Fronius Solar.web: the history charts
+# Fronius Solar.web: the history charts and the firmware status
 
 Solar.web (`www.solarweb.com`) is Fronius' portal with the long-term history of an inverter. There is no free API;
-the server reads what the portal's own chart page reads, logged in as the user. Server side only as of
-2026-09-20; the client that draws the charts is not built yet. `HomeAutomationClient/Server only` - the WPF app
-is not touched.
+the server reads what the portal's own chart page reads, logged in as the user, caches it and serves it to the
+Avalonia client, which draws it (both since 2026-09-20). `HomeAutomationClient/Server only` - the WPF app is not
+touched. The models both heads share - `SolarWebChart`, `SolarWebSeries` (with Solar.web's `Color`), `SolarWebPoint`,
+`SolarWebInterval`, `SolarWebView`, `SolarWebFirmwareStatus`, `SolarWebFirmwareComponent`, `SolarWebVersion` - are
+`Fronius/Models/SolarWeb`; `SolarWebPeriod` and the exceptions stay the server's ([[Fronius.SharedLibraryBoundary]]).
 
 ## What the chart page does (found out with the browser on 2026-09-20)
 
@@ -137,7 +156,8 @@ ago in the system's zone; the whole history never is.
   says "Maintenance Work" / "Wartungsarbeiten" - Fronius' Sunday maintenance, seen 2026-09-20), each with the
   `Retry-After` where there was one. The service blocks every request until `now + RetryAfter`, or
   `DefaultRateLimitBackoff` (15 min) after a 429 and `UnavailableBackoff` (5 min) otherwise; `UnavailableUntil`
-  says until when. While blocked, and on any other failure (500, an unknown HTML page, a timeout), a **cached chart
+  says until when. The message and the log line name that time **in the PV system's zone** (`SolarWebService.Local`),
+  which is what the user reads in the client's error box. While blocked, and on any other failure (500, an unknown HTML page, a timeout), a **cached chart
   is served however stale it is**; only without one does the failure reach the caller. The controller answers 503
   with `Retry-After` for the block, 504 for the client's timeout (90 s), 502 for a login failure or any other
   refusal, 400 for a Premium day chart, 404 without the section.
@@ -178,12 +198,61 @@ after start, so a slow login never holds up the server; the first status comes w
 The firmware requests go through the same gate and back-off as the charts (`AskAsync`). Users only, like the price
 data: `DeviceVisibility` does not list it for guests.
 
+## The client (added 2026-09-20)
+
+- **The chart dialog**: `SolarWebChartViewModel` / `SolarWebChartView`, opened by `MainViewModel.ShowSolarWebChart`
+  from the View menu (entry visible while `IUpdateService.HasSolarWeb`), resizeable like the price chart, the same
+  row of choices below the plot: the four views as radio buttons (the two Premium ones disabled for a day, and a
+  Premium view switches back to production when the day is chosen), the four intervals, a `DatePicker` with a step
+  to either side by a day, a month or a year (disabled for GESAMT), and Solar.web's Premium hint where
+  `IsPremiumFeature`. The date runs from 2000 to **two days ahead**: Solar.web forecasts that far, and each of
+  those days is a day chart of its own (developer's decision 2026-09-20). Every choice is one `GET api/SolarWeb/...` through `IWebClientService.GetSolarWebChart`; a
+  load counter drops the answer to a choice the user has already left behind. The Solar.web calls get 30 s
+  (`WebClientService.SolarWebTimeout`) where every other request gets 15 s - the timeout is per request since
+  2026-09-20, the `HttpClient` itself has none.
+- **`SolarWebChartModel`** is the plain-numbers model (no charting type), built from a `SolarWebChart`: **two
+  shapes**. A day is drawn **over time** (**exactly the chart's day, local midnight to midnight**, whatever Solar.web
+  sent - today's answer carries two days of forecast, which are looked at by stepping, and points outside the day
+  neither show nor stretch the axis; local instants; **stacked bottom-up by Highcharts' `index` descending**, because Solar.web stacks
+  with `reversedStacks` - direct consumption (6) at the bottom, then the Wattpilot (4), the battery (2), the grid (1),
+  the forecast (0); the parser keeps the index (`SolarWebSeries.Index`, cache schema 3), a series without one - a
+  chart cached before that - takes the index Solar.web is known to give its id (`knownIndices`), and an unknown
+  id without one stays where Solar.web listed it; `areaspline` stacked as areas, `spline` as lines with
+  `NaN` gaps where Solar.web sent `null`, `%` on a right axis 0-100); month, year and GESAMT are **categorical**,
+  one column per date stacked in series order, the columns labelled by day of month, abbreviated month or year -
+  Solar.web stamps them at midnight UTC and they are read as dates, never converted. Bubbles (`BattOperatingState`)
+  are not drawn. **Colours**: a fixed palette **by series id** wins (`SolarWebChartModel.knownColors`: the two
+  battery series green, `FromGenToConsumer` yellow, `ToConsumer` **orange** although Solar.web draws it light
+  blue - the developer's choice of 2026-09-20; the rest Solar.web's own), then Solar.web's colour where it sent
+  one (the parser takes the stroke of the forecast's hatch pattern too), then the first fallback colour no other
+  series uses. `IsForecast` (`PvForecast*`) is drawn translucent where Solar.web hatches.
+- **`SolarWebChartRenderer`** draws it with ScottPlot: `Bars` with `ValueBase` for the stacks and `NumericManual`
+  ticks for the categories, `FillY` between cumulative arrays for the areas, `Scatter` per stretch for the lines.
+  **The ranges are locked with axis rules** (`LockedVertical`, `LockedHorizontal`), not only set: the second chart
+  of the dialog came up with -10..10 on the left axis on 2026-09-20 although the model's maximum was set, and the
+  cause could not be reproduced headless (three renders in a row into one control all kept 0..max, and the
+  plottables all sit on the new bottom axis). A rule is applied on every render, so whatever re-scales the live
+  control between two drawings loses; the probe shows an explicit `AutoScale()` and a manual -10..10 undone by the
+  next render. Interaction is off anyway. The time axis is created before the plottables, as the price chart does.
+  What every chart shares with the price chart is `ChartTheme` ([[EnergyData]]). Verified 2026-09-20 by rendering
+  headless with Skia (month, day, dark) - the probe is the scratchpad's, not the repo's.
+- **The firmware notice**: `UpdateService` reads `GET api/SolarWeb/firmware` at start (not awaited: the server may
+  have to log in to Solar.web first) and after every reconnect, and takes the `SolarWebFirmwareStatus` hub message;
+  `HasSolarWeb` is "the server answered a Solar.web request" and gates the menu entry. `MainViewModel` listens and
+  shows a `MessageBox` - title, text, one line per component (`FirmwareUpdateNotice.Describe`: family, installed
+  -> offered), buttons Show changelog / Close - **once per component and offered version** (`FirmwareUpdateNotice`,
+  reset on logout), whatever how often the same status arrives. Show changelog opens every distinct `ChangelogUrl`
+  through `IUriLauncher`.
+- Strings: `SolarWeb` (a name, neutral only), `Production`, `Profitability`, `Costs`, `Day`, `Month`, `Year`,
+  `LoadingSolarWebData`, `SolarWebPremiumHint`, `FirmwareUpdateAvailable(Text)`, `ShowChangelog`, in every culture
+  file where the word differs (`fr` has no `Production`). Series names come from Solar.web in the server's culture.
+
 ## Not done yet
 
-- **No client.** The models (`SolarWebChart`, `SolarWebSeries`, `SolarWebPoint`, the two enums) are the server's
-  by the rule in [[Fronius.SharedLibraryBoundary]]; when the Avalonia client draws them they move to
-  `Fronius/Models/SolarWeb` - the JSON does not change, the namespace does. Series `Name` is localized by
-  Solar.web to the request's culture; a client should key its legend on `Id`.
+- The dialog has been rendered headless, **not yet run against the production server from the client** - that
+  needs a redeploy of the server first.
+- The chart has no tooltips, so the battery state bubbles have nowhere to go; the day chart could show them as
+  markers with a hover text once ScottPlot's interaction is wanted.
 - The live login **works from the production server** (verified 2026-09-20 against `home.hochstaetter.de`: the
   month chart came back with real data, the cached answer in 0.2 s). The same test showed a day chart taking over
   30 s during Fronius' Sunday maintenance, hence the 90 s timeout. The maintenance page's markup and status code

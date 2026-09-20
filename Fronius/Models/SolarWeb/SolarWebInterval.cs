@@ -1,4 +1,4 @@
-namespace De.Hochstaetter.HomeAutomationServer.Models.SolarWeb;
+namespace De.Hochstaetter.Fronius.Models.SolarWeb;
 
 /// <summary>
 ///     The four buttons at the bottom of Solar.web's chart page - Tag, Monat, Jahr, Gesamt - and the value of the

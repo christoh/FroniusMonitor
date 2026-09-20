@@ -28,7 +28,7 @@ public sealed class SolarWebHistoryStore : SqliteStoreBase, ISolarWebHistoryStor
     }
 
     /// <summary>For a test that wants the file somewhere else.</summary>
-    public SolarWebHistoryStore(ILogger<SolarWebHistoryStore> logger, string filePath) : base(logger, filePath, 1)
+    public SolarWebHistoryStore(ILogger<SolarWebHistoryStore> logger, string filePath) : base(logger, filePath, 3)
     {
     }
 
@@ -74,6 +74,24 @@ public sealed class SolarWebHistoryStore : SqliteStoreBase, ISolarWebHistoryStor
                 PRAGMA user_version = 1;
                 """, token).ConfigureAwait(false);
         }
+
+        if (version < 2)
+        {
+            // The colour Solar.web draws a series in, kept since the client draws the charts (2026-09-20).
+            await ExecuteAsync(connection, """
+                ALTER TABLE SolarWebSeries ADD COLUMN Color TEXT NULL;
+                PRAGMA user_version = 2;
+                """, token).ConfigureAwait(false);
+        }
+
+        if (version < 3)
+        {
+            // Highcharts' index of a series, which decides the stacking order (2026-09-20).
+            await ExecuteAsync(connection, """
+                ALTER TABLE SolarWebSeries ADD COLUMN SeriesIndex INTEGER NULL;
+                PRAGMA user_version = 3;
+                """, token).ConfigureAwait(false);
+        }
     }
 
     public async Task<SolarWebChart?> GetChartAsync(string pvSystemId, SolarWebInterval interval, SolarWebView view, DateOnly period, CancellationToken token = default)
@@ -102,7 +120,7 @@ public sealed class SolarWebHistoryStore : SqliteStoreBase, ISolarWebHistoryStor
 
         var (id, chart) = charts[0];
 
-        var series = await ReadAsync(connection, "SELECT Ordinal, SeriesId, Name, Unit, ChartType FROM SolarWebSeries WHERE ChartId = $id ORDER BY Ordinal", command =>
+        var series = await ReadAsync(connection, "SELECT Ordinal, SeriesId, Name, Unit, ChartType, Color, SeriesIndex FROM SolarWebSeries WHERE ChartId = $id ORDER BY Ordinal", command =>
         {
             command.Parameters.AddWithValue("$id", id);
         }, reader => (Ordinal: reader.GetInt32(0), Series: new SolarWebSeries
@@ -111,6 +129,8 @@ public sealed class SolarWebHistoryStore : SqliteStoreBase, ISolarWebHistoryStor
             Name = reader.GetString(2),
             Unit = reader.GetString(3),
             ChartType = reader.GetString(4),
+            Color = reader.IsDBNull(5) ? null : reader.GetString(5),
+            Index = reader.IsDBNull(6) ? null : reader.GetInt32(6),
         }), token).ConfigureAwait(false);
 
         var byOrdinal = series.ToDictionary(s => s.Ordinal, s => s.Series);
@@ -159,7 +179,7 @@ public sealed class SolarWebHistoryStore : SqliteStoreBase, ISolarWebHistoryStor
                 id = Convert.ToInt64(await insert.ExecuteScalarAsync(t).ConfigureAwait(false), CultureInfo.InvariantCulture);
             }
 
-            await using var seriesInsert = CreateCommand(connection, transaction, "INSERT INTO SolarWebSeries (ChartId, Ordinal, SeriesId, Name, Unit, ChartType) VALUES ($id, $ordinal, $series, $name, $unit, $type)");
+            await using var seriesInsert = CreateCommand(connection, transaction, "INSERT INTO SolarWebSeries (ChartId, Ordinal, SeriesId, Name, Unit, ChartType, Color, SeriesIndex) VALUES ($id, $ordinal, $series, $name, $unit, $type, $color, $index)");
             // INSERT OR REPLACE: Solar.web has been seen to send the same time twice in one series; the later one wins.
             await using var pointInsert = CreateCommand(connection, transaction, "INSERT OR REPLACE INTO SolarWebPoint (ChartId, Ordinal, TimeMs, Value, Text) VALUES ($id, $ordinal, $time, $value, $text)");
 
@@ -172,6 +192,8 @@ public sealed class SolarWebHistoryStore : SqliteStoreBase, ISolarWebHistoryStor
                 seriesInsert.Parameters.AddWithValue("$name", series.Name);
                 seriesInsert.Parameters.AddWithValue("$unit", series.Unit);
                 seriesInsert.Parameters.AddWithValue("$type", series.ChartType);
+                seriesInsert.Parameters.AddWithValue("$color", (object?)series.Color ?? DBNull.Value);
+                seriesInsert.Parameters.AddWithValue("$index", (object?)series.Index ?? DBNull.Value);
                 await seriesInsert.ExecuteNonQueryAsync(t).ConfigureAwait(false);
 
                 foreach (var point in series.Points)

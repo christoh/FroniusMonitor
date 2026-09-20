@@ -1843,4 +1843,37 @@
   <data name="Idle" xml:space="preserve">
     <value>Inactiv</value>
   </data>
+  <data name="Production" xml:space="preserve">
+    <value>Producziun</value>
+  </data>
+  <data name="Profitability" xml:space="preserve">
+    <value>Rentabilitad</value>
+  </data>
+  <data name="Costs" xml:space="preserve">
+    <value>Custs</value>
+  </data>
+  <data name="Day" xml:space="preserve">
+    <value>Di</value>
+  </data>
+  <data name="Month" xml:space="preserve">
+    <value>Mais</value>
+  </data>
+  <data name="Year" xml:space="preserve">
+    <value>Onn</value>
+  </data>
+  <data name="LoadingSolarWebData" xml:space="preserve">
+    <value>Las datas da Solar.web vegnan chargiadas</value>
+  </data>
+  <data name="SolarWebPremiumHint" xml:space="preserve">
+    <value>Questa vista dovra in abunament Solar.web Premium.</value>
+  </data>
+  <data name="FirmwareUpdateAvailable" xml:space="preserve">
+    <value>Actualisaziun dal firmware disponibla</value>
+  </data>
+  <data name="FirmwareUpdateAvailableText" xml:space="preserve">
+    <value>Solar.web porscha in firmware pli nov per quests components. Ti pos lantschar l'actualisaziun sin Solar.web.</value>
+  </data>
+  <data name="ShowChangelog" xml:space="preserve">
+    <value>Mussar las midadas</value>
+  </data>
 </root>

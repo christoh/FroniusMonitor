@@ -296,7 +296,7 @@ public sealed class SolarWebService(
 
                 if (logger.IsEnabled(LogLevel.Warning))
                 {
-                    logger.LogWarning("Solar.web is left alone until {Until:u}: {Message}", blockedUntil, ex.Message);
+                    logger.LogWarning("Solar.web is left alone until {Until}: {Message}", Local(blockedUntil), ex.Message);
                 }
 
                 if (cached != null)
@@ -363,7 +363,7 @@ public sealed class SolarWebService(
 
         if (blockedUntil > now)
         {
-            refusal = cached == null ? new SolarWebUnavailableException(blockedUntil - now, $"Solar.web is left alone until {blockedUntil:u} after a 429, a 503 or its maintenance page") : null;
+            refusal = cached == null ? new SolarWebUnavailableException(blockedUntil - now, $"Solar.web is left alone until {Local(blockedUntil)} after a 429, a 503 or its maintenance page") : null;
             return cached != null;
         }
 
@@ -376,6 +376,9 @@ public sealed class SolarWebService(
         refusal = null;
         return false;
     }
+
+    /// <summary>A time as the user reads it: in the PV system's zone, which is the user's, with the zone named. The log and the message boxes show this.</summary>
+    private string Local(DateTimeOffset time) => $"{TimeZoneInfo.ConvertTime(time, zone):yyyy-MM-dd HH:mm:ss} ({zone.Id})";
 
     private async Task SpaceRequestsAsync(CancellationToken token)
     {

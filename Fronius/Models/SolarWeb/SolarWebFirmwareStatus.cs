@@ -1,4 +1,4 @@
-namespace De.Hochstaetter.HomeAutomationServer.Models.SolarWeb;
+namespace De.Hochstaetter.Fronius.Models.SolarWeb;
 
 /// <summary>
 ///     What Solar.web knows about the firmware of the components of one PV system, as

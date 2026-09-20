@@ -47,6 +47,9 @@ public sealed class SolarWebChartParserTests
         Assert.Equal(["FromGenToSomewhere", "FromGenToGrid", "PvForecastTruncated"], chart.Series.Select(s => s.Id));
         Assert.All(chart.Series, s => Assert.Equal("kWh", s.Unit));
         Assert.All(chart.Series, s => Assert.Equal("column", s.ChartType));
+        // The forecast comes with a hatch pattern instead of a colour; the stroke of the pattern is its colour.
+        Assert.Equal(["#F7C002", "#999999", "#f7c002"], chart.Series.Select(s => s.Color));
+        Assert.Equal([3, 1, 0], chart.Series.Select(s => s.Index));
 
         var grid = chart.Series[1];
         Assert.Equal("Energie ins Netz eingespeist", grid.Name);

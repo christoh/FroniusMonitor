@@ -1,4 +1,4 @@
-namespace De.Hochstaetter.HomeAutomationServer.Models.SolarWeb;
+namespace De.Hochstaetter.Fronius.Models.SolarWeb;
 
 /// <summary>
 ///     One chart as Solar.web's <c>GetChartNew</c> answers it, reduced to what a chart needs: the series with their
@@ -26,7 +26,7 @@ public sealed class SolarWebChart
 
     public SolarWebView View { get; set; }
 
-    /// <summary>The first day of the span, as <see cref="SolarWebPeriod.Normalize" /> names it.</summary>
+    /// <summary>The first day of the span, as the server's <c>SolarWebPeriod.Normalize</c> names it.</summary>
     public DateOnly Period { get; set; }
 
     /// <summary>When Solar.web answered this, UTC.</summary>
@@ -58,6 +58,20 @@ public sealed class SolarWebSeries
 
     /// <summary>Highcharts' series type: <c>column</c>, <c>areaspline</c>, <c>spline</c>, <c>bubble</c>.</summary>
     public string ChartType { get; set; } = string.Empty;
+
+    /// <summary>
+    ///     The colour Solar.web draws the series in, as <c>#RRGGBB</c>, or <see langword="null" /> where it draws a pattern
+    ///     instead (the forecast) or named none. A client that keeps it shows the chart the way the portal does.
+    /// </summary>
+    public string? Color { get; set; }
+
+    /// <summary>
+    ///     Highcharts' <c>index</c> of the series, or <see langword="null" /> where Solar.web sent none. Solar.web stacks
+    ///     with <c>reversedStacks</c>, so the series with the highest index is at the bottom of a stack: direct
+    ///     consumption (6) under the Wattpilot (4), the battery (2), the grid (1) and the forecast (0). A chart that
+    ///     stacks the series has to order them by this, descending, to look like the portal.
+    /// </summary>
+    public int? Index { get; set; }
 
     public List<SolarWebPoint> Points { get; set; } = [];
 }

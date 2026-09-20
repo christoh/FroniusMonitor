@@ -57,6 +57,13 @@ internal partial class UpdateService(IWebClientService webClient, IVisibilitySer
 
     public event EventHandler<EnergyChartData>? EnergyChartDataChanged;
 
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(HasSolarWeb))]
+    public partial SolarWebFirmwareStatus? SolarWebFirmwareStatus { get; set; }
+
+    public bool HasSolarWeb => SolarWebFirmwareStatus != null;
+
+    public event EventHandler<SolarWebFirmwareStatus>? SolarWebFirmwareStatusChanged;
+
     public IEnumerable<IKeyedDevice> DetailDevices
     {
         get
@@ -130,6 +137,10 @@ internal partial class UpdateService(IWebClientService webClient, IVisibilitySer
             {
                 EnergyChartData = energyData;
             }
+
+            // Not awaited: the server may have to log in to Solar.web first, which can take a minute, and the
+            // dashboard must not wait for that. The method reports its own failures, so nothing is lost.
+            _ = FetchSolarWebFirmwareStatusAsync();
         }
 
         var hubUri =IoC.TryGetRegistered<ICache>()?.Get<string>(CacheKeys.HubUri) ?? "http://www.example.com/hub";
@@ -160,6 +171,7 @@ internal partial class UpdateService(IWebClientService webClient, IVisibilitySer
         hubConnection.On<string, WattPilotUpdate>(nameof(WattPilotUpdate), OnWattPilotUpdateMessage);
         hubConnection.On<string, ToshibaHvacMappingDevice>(nameof(ToshibaHvacMappingDevice), OnToshibaHvacUpdate);
         hubConnection.On<string, EnergyChartData>(nameof(EnergyChartData), OnEnergyChartData);
+        hubConnection.On<string, SolarWebFirmwareStatus>(nameof(SolarWebFirmwareStatus), OnSolarWebFirmwareStatus);
 
         // An automatic reconnect has a gap before it like any other, and the devices below were updated in it.
         hubConnection.Reconnected += OnReconnected;
@@ -217,6 +229,9 @@ internal partial class UpdateService(IWebClientService webClient, IVisibilitySer
         {
             OnEnergyChartData(EnergyChartData.DeviceId, data);
         }
+
+        // The firmware status is pushed only when it changes, so a reconnect reads it once.
+        await FetchSolarWebFirmwareStatusAsync().ConfigureAwait(false);
     }
 
     private async Task OnReconnected(string? connectionId)
@@ -283,6 +298,7 @@ internal partial class UpdateService(IWebClientService webClient, IVisibilitySer
         SitePowerFlow = new();
         SitePvPeakPower = 0;
         EnergyChartData = null;
+        SolarWebFirmwareStatus = null;
     }
 
     /// <summary>
@@ -299,6 +315,46 @@ internal partial class UpdateService(IWebClientService webClient, IVisibilitySer
         catch (Exception ex)
         {
             logger.LogError(ex, "Updating the energy data failed.");
+        }
+    }
+
+    /// <summary>
+    /// Reads the firmware status over HTTP. 404 where the server has no Solar.web account, which is not an error: the
+    /// menu then has no Solar.web chart. Any other failure is logged and nothing else: the next push or catch-up
+    /// brings the status, and a Solar.web that is down must not take the client down with it.
+    /// </summary>
+    private async Task FetchSolarWebFirmwareStatusAsync()
+    {
+        try
+        {
+            var result = await webClient.GetSolarWebFirmwareStatus().ConfigureAwait(false);
+
+            if (result is { Status: HttpStatusCode.OK, Payload: { } status })
+            {
+                OnSolarWebFirmwareStatus(SolarWebFirmwareStatus.DeviceId, status);
+            }
+            else if (result.Status != HttpStatusCode.NotFound)
+            {
+                logger.LogWarning("The Solar.web firmware status could not be read: {Status} {Detail}", result.Status, result.Detail);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Reading the Solar.web firmware status failed.");
+        }
+    }
+
+    /// <summary>The server sends the whole status whenever a component's firmware changes. Replaced as one object; the notice is worked out from the whole.</summary>
+    private void OnSolarWebFirmwareStatus(string id, SolarWebFirmwareStatus status)
+    {
+        try
+        {
+            SolarWebFirmwareStatus = status;
+            SolarWebFirmwareStatusChanged?.Invoke(this, status);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Updating the Solar.web firmware status failed.");
         }
     }
 

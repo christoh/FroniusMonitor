@@ -102,7 +102,7 @@ its previous run is still pending, and a run that awaits `ShowDialogAsync` is pe
 on screen - which used to be a modal moment and is now a window the user leaves standing. Without the flag the
 menu entry or button is **disabled** for exactly that time, so a second settings dialog could never be opened and
 clicking Electricity price while its window was up did nothing at all, not even bring it to the front. It carries
-Six commands need the flag today: `MainViewModel.Settings`, `ChangePassword` and `ShowEnergyChart`,
+Seven commands need the flag today: `MainViewModel.Settings`, `ChangePassword`, `ShowEnergyChart` and `ShowSolarWebChart`,
 `EnergyChartViewModel.ShowPriceComponents`, `UserManagementViewModel.Add` and `Edit`. (`ShowPowerFlow` opens a
 page, not a dialog, and needs neither the flag nor the gate.)
 
@@ -178,7 +178,10 @@ the overlay.
 ## Busy text
 
 `DialogBase.BusyText` is not a property of its own, it proxies the presentation, because the animation belongs to
-wherever the dialog is. `MainViewDialogPresentation` proxies `MainViewModel.DialogBusyText`, which the animation
+wherever the dialog is. **The override announces `BusyText` and `IsBusy` itself** (since 2026-09-20): the
+generated setter it replaces would have, and without it a binding to `IsBusy` - the row of controls a dialog
+disables while it loads - kept whatever it read first. The Solar.web chart, whose `Initialize` sets the busy text
+before the first binding is read, came up with every button disabled for good. `MainViewDialogPresentation` proxies `MainViewModel.DialogBusyText`, which the animation
 over the dialog frame binds to; `WindowDialogPresentation` proxies `ChildWindow.BusyText`, which is the animation
 in that dialog's own window. A dialog that writes a busy text needs neither to know which.
 

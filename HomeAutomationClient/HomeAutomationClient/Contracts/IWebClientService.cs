@@ -169,4 +169,21 @@ public interface IWebClientService : IDisposable
     Task<ApiResult<EnergyChartData>> GetEnergyData(DateOnly day, CancellationToken token = default);
 
     #endregion
+
+    #region SolarWeb
+
+    /// <summary>
+    /// One chart of Fronius Solar.web: the <paramref name="view"/> over the <paramref name="interval"/> that contains
+    /// <paramref name="date"/>. The server serves it from its cache where it can. 404 where the server has no Solar.web
+    /// account, 400 for a Premium view of a day, 503 while Solar.web is not to be asked, 502 when it refused.
+    /// </summary>
+    Task<ApiResult<SolarWebChart>> GetSolarWebChart(SolarWebInterval interval, SolarWebView view, DateOnly date, CancellationToken token = default);
+
+    /// <summary>
+    /// The firmware of the PV system's components as Solar.web reports it, to load once at start; changes arrive
+    /// over the hub as <c>SolarWebFirmwareStatus</c> messages. 404 where the server has no Solar.web account.
+    /// </summary>
+    Task<ApiResult<SolarWebFirmwareStatus>> GetSolarWebFirmwareStatus(CancellationToken token = default);
+
+    #endregion
 }

@@ -42,6 +42,8 @@ public static class SolarWebChartParser
                     Name = node["name"]?.GetValue<string>() ?? string.Empty,
                     Unit = node["yAxis"]?.GetValue<string>() ?? string.Empty,
                     ChartType = node["type"]?.GetValue<string>() ?? string.Empty,
+                    Color = Color(node["color"]),
+                    Index = node["index"] is JsonValue index && index.GetValueKind() == JsonValueKind.Number ? index.GetValue<int>() : null,
                     Points = node["data"] is JsonArray data ? data.OfType<JsonArray>().Select(Point).ToList() : [],
                 });
             }
@@ -49,6 +51,14 @@ public static class SolarWebChartParser
 
         return chart;
     }
+
+    /// <summary>A string is a colour; the forecast's colour is an object describing a hatch pattern, whose stroke is the colour then.</summary>
+    private static string? Color(JsonNode? color) => color switch
+    {
+        JsonValue value when value.GetValueKind() == JsonValueKind.String => value.GetValue<string>(),
+        JsonObject pattern when pattern["pattern"]?["path"]?["stroke"] is JsonValue stroke && stroke.GetValueKind() == JsonValueKind.String => stroke.GetValue<string>(),
+        _ => null,
+    };
 
     private static SolarWebPoint Point(JsonArray point)
     {

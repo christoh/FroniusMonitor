@@ -20,6 +20,9 @@ public sealed partial class MainViewModel : ViewModelBase, IPowerDisplayOptions
     private readonly IPagePresenter pagePresenter;
     private readonly IDialogPresenter dialogPresenter;
 
+    /// <summary>Which outdated firmware the user has been told about, so the same status arriving again says nothing.</summary>
+    private readonly FirmwareUpdateNotice firmwareNotice = new();
+
     public IUpdateService UpdateService { get; }
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
@@ -32,6 +35,7 @@ public sealed partial class MainViewModel : ViewModelBase, IPowerDisplayOptions
         this.dialogPresenter = dialogPresenter;
         uriService.PathChanged += OnPathChanged;
         UpdateService = updateService;
+        updateService.SolarWebFirmwareStatusChanged += OnSolarWebFirmwareStatusChanged;
         SetApiUri(IoC.TryGetRegistered<ICache>()?.Get<string>(CacheKeys.ApiUri) ?? "https://home-automation.example.com");
         PublishColorAllTicks();
     }
@@ -393,6 +397,7 @@ public sealed partial class MainViewModel : ViewModelBase, IPowerDisplayOptions
         // their own, those would otherwise stay up showing the devices of a user who has just logged out.
         pagePresenter.CloseAll();
         dialogPresenter.CloseAll();
+        firmwareNotice.Reset();
 
         MainViewContent = null;
         User = null;
@@ -416,6 +421,57 @@ public sealed partial class MainViewModel : ViewModelBase, IPowerDisplayOptions
     {
         await new EnergyChartViewModel(new DialogParameters { Title = Loc.ElectricityPrice, IsResizeable = true }).ShowDialogAsync().ConfigureAwait(true);
     });
+
+    /// <summary>
+    /// The Solar.web chart: the history of the PV system as the portal shows it. Shown once the server has answered a
+    /// Solar.web request - a server without a Solar.web account has nothing to show.
+    /// </summary>
+    // Concurrently, for the same reason as ShowEnergyChart: the command is pending for as long as the window is open.
+    [RelayCommand(AllowConcurrentExecutions = true, CanExecute = nameof(CanOpenDialog))]
+    private Task ShowSolarWebChart() => TaskExceptionHandler(async () =>
+    {
+        await new SolarWebChartViewModel(new DialogParameters { Title = Loc.SolarWeb, IsResizeable = true }).ShowDialogAsync().ConfigureAwait(true);
+    });
+
+    /// <summary>
+    /// A firmware status from the server, on the hub's thread or from the catch-up. Where it names outdated firmware the
+    /// user has not been told about, a message box says so and offers the changelog; the same status again says nothing.
+    /// </summary>
+    private void OnSolarWebFirmwareStatusChanged(object? sender, SolarWebFirmwareStatus status)
+    {
+        var fresh = firmwareNotice.Take(status);
+
+        if (fresh.Count == 0)
+        {
+            return;
+        }
+
+        Dispatcher.UIThread.Post(() => ShowFirmwareNotice(fresh));
+    }
+
+    /// <summary>Reports its own failures: a posted callback has nobody else to report to.</summary>
+    private void ShowFirmwareNotice(IReadOnlyList<SolarWebFirmwareComponent> outdated) => HandleTaskExceptions(() => TaskExceptionHandler(async () =>
+    {
+        var answer = await new MessageBox
+        {
+            Title = Loc.FirmwareUpdateAvailable,
+            Text = Loc.FirmwareUpdateAvailableText,
+            ItemList = outdated.Select(FirmwareUpdateNotice.Describe).ToList(),
+            Buttons = [Loc.ShowChangelog, Loc.Close],
+            DefaultButtonIndex = 1,
+            Icon = new InfoIcon(),
+        }.Show().ConfigureAwait(true);
+
+        if (answer?.Index != 0 || IoC.TryGetRegistered<IUriLauncher>() is not { } launcher)
+        {
+            return;
+        }
+
+        foreach (var url in outdated.Select(c => c.ChangelogUrl).Where(u => u != null).Distinct())
+        {
+            await launcher.LaunchAsync(new Uri(url!)).ConfigureAwait(true);
+        }
+    }));
 
     /// <summary>
     /// The power flow page: the sources, the house and every metered consumer, with the power moving between

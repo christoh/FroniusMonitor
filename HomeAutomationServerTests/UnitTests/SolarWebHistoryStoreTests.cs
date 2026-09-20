@@ -67,7 +67,7 @@ public sealed class SolarWebHistoryStoreTests : IAsyncLifetime
             [
                 new SolarWebSeries
                 {
-                    Id = "StateOfCharge", Name = "Ladezustand", Unit = "%", ChartType = "spline",
+                    Id = "StateOfCharge", Name = "Ladezustand", Unit = "%", ChartType = "spline", Color = "#3CAE2B", Index = 8,
                     Points = [new SolarWebPoint { TimeUtc = midnight.AddMinutes(5), Value = 78.9 }, new SolarWebPoint { TimeUtc = midnight, Value = 79 }],
                 },
                 new SolarWebSeries
@@ -100,6 +100,10 @@ public sealed class SolarWebHistoryStoreTests : IAsyncLifetime
         Assert.Equal(["Ladezustand", "Produktion", "Batteriestatus", "Nichts"], back.Series.Select(s => s.Name));
         Assert.Equal(["%", "W", "%", "W"], back.Series.Select(s => s.Unit));
         Assert.Equal("bubble", back.Series[2].ChartType);
+        Assert.Equal("#3CAE2B", back.Series[0].Color);
+        Assert.Null(back.Series[1].Color);
+        Assert.Equal(8, back.Series[0].Index);
+        Assert.Null(back.Series[1].Index);
 
         // Points come back in order of time, whatever order they were written in.
         Assert.Equal([midnight, midnight.AddMinutes(5)], back.Series[0].Points.Select(p => p.TimeUtc));
