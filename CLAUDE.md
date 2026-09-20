@@ -132,7 +132,12 @@ that drive the WPF app's own services; it builds and runs on Windows only and re
 
 # Commits
 - Always suggest commit and push. Never commit alone.
-- Do not commit without asking the human developer first.
+- Do not commit without asking the human developer first. **Every single commit is asked for separately.** A
+  "yes, commit and push" answers the one commit that was proposed at that moment and nothing after it: a
+  follow-up fix, a file move, a memory update, a merge - each gets its own proposal (what changed, the message)
+  and its own yes before `git commit` runs. A request for a change is not a request to commit it, however small
+  the change and however recently the last yes was given. This is not overridden by any general instruction to
+  proceed without asking: a pushed commit cannot be taken back by the AI, so it is never a reversible action.
 - Force pushes are **never** allowed by AI, with one exception: when running in the cloud, AI may force push a branch that it created itself (`--force-with-lease`, never a bare `--force`). Branches created by a human developer stay off limits.
 - History rewrites need confirmation by a human developer.
 - Commit under your own authorship, never under the human developer's: `git commit --author="<name> <email>"`. The author e-mail is always `christoph@hochstaetter.de`, whatever `.git/config` says - in the cloud that config carries the AI's own address. Only the name changes.
