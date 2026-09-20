@@ -44,6 +44,12 @@ public sealed class TestDialog(DialogParameters parameters) : DialogBase<DialogP
     public string? ReadBusyText() => BusyText;
 }
 
+/// <summary>Parameters that ask for a modal window, the way a message box does, for a <see cref="TestDialog"/>.</summary>
+public sealed class ModalTestDialogParameters : DialogParameters
+{
+    public override bool IsModalWindow => true;
+}
+
 /// <summary>A body that says how big its window opens, the way the power flow page does.</summary>
 public sealed class SizedTestDialogView : ContentControl, IDialogControl
 {
