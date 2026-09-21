@@ -166,9 +166,11 @@ exempt from VAT stays as it is, and a negative market price gets negative VAT, w
   typed, which is what the interaction rule allows, and the changed handler clamps it to 2013-12-22 .. yesterday
   because the control has no bounds. `Initialize` is guarded against the second run the components dialog causes.
 - `EnergyChartView.axaml.cs` is the only place that knows ScottPlot: it draws `ChartModel` with
-  `EnergyChartRenderer` into the `AvaPlot`, redraws on `ActualThemeVariantChanged`, and marshals a model set from
+  `EnergyChartRenderer` into the `AvaPlot`, redraws on `ActualThemeVariantChanged` and on `Loaded`, and marshals a model set from
   the hub's thread with `Dispatcher.UIThread.Post`. It calls `Plot.Reset()` before every drawing because the
-  weather adds right axes that `Clear()` would leave standing. Interaction is off (`UserInputProcessor.IsEnabled`),
+  weather adds right axes that `Clear()` would leave standing. **An empty plot is themed too** (since 2026-09-21):
+  `ChartTheme.Apply` runs when `ChartModel` is still null, so a dark dialog does not sit on ScottPlot's white.
+  Interaction is off (`UserInputProcessor.IsEnabled`),
   as zoom and pan were off in WPF. Theme colors reach the renderer as `HaColor`. **Color the axes after
   `DateTimeTicksBottom()`**: that call replaces the bottom axis, and one colored before it came up black on the
   dark theme.

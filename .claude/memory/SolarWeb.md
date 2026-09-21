@@ -18,6 +18,7 @@ paths:
   - HomeAutomationClient/HomeAutomationClient/Contracts/IWebClientService.cs
   - HomeAutomationClient/HomeAutomationClient/Services/WebClientService.cs
   - HomeAutomationServerTests/UnitTests/SolarWebChartModelTests.cs
+  - HomeAutomationServerTests/UnitTests/Avalonia/SolarWebChartViewTests.cs
   - HomeAutomationServerTests/UnitTests/FirmwareUpdateNoticeTests.cs
   - HomeAutomationServerTests/UnitTests/Fakes/FakeUpdateService.cs
   - HomeAutomationServer/Contracts/ISolarWebClient.cs
@@ -266,7 +267,10 @@ data: `DeviceVisibility` does not list it for guests.
   plottables all sit on the new bottom axis). A rule is applied on every render, so whatever re-scales the live
   control between two drawings loses; the probe shows an explicit `AutoScale()` and a manual -10..10 undone by the
   next render. Interaction is off anyway. The time axis is created before the plottables, as the price chart does.
-  What every chart shares with the price chart is `ChartTheme` ([[EnergyData]]). Verified 2026-09-20 by rendering
+  What every chart shares with the price chart is `ChartTheme` ([[EnergyData]]). **An empty plot is themed too**
+  (since 2026-09-21): `SolarWebChartView.Render` calls `ChartTheme.Apply` when `ChartModel` is still null, and
+  again on `Loaded`, so a dark dialog does not sit on ScottPlot's white until the server answers.
+  `SolarWebChartViewTests` pins the empty figure to the dark `DialogBackground`. Verified 2026-09-20 by rendering
   headless with Skia (month, day, dark) - the probe is the scratchpad's, not the repo's.
 - **The firmware notice**: `UpdateService` reads `GET api/SolarWeb/firmware` at start (not awaited: the server may
   have to log in to Solar.web first) and after every reconnect, and takes the `SolarWebFirmwareStatus` hub message;

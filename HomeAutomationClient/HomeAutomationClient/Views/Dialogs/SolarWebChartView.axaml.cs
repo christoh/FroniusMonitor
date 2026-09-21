@@ -36,6 +36,9 @@ public partial class SolarWebChartView : UserControl, IDialogControl
 
         DataContextChanged += OnDataContextChanged;
         ActualThemeVariantChanged += (_, _) => Render();
+        // Colour the empty plot as soon as the control is in the tree with a real theme, which is before the
+        // server has answered and before DataContextChanged has anything to draw.
+        Loaded += (_, _) => Render();
     }
 
     private void OnPointerMoved(object? sender, PointerEventArgs e)
@@ -165,9 +168,17 @@ public partial class SolarWebChartView : UserControl, IDialogControl
         crosshair = null;
         Plot.Reset();
 
+        var palette = ChartTheme.PaletteOf(this);
+
         if (viewModel?.ChartModel is { } model)
         {
-            SolarWebChartRenderer.Render(Plot.Plot, model, ChartTheme.PaletteOf(this));
+            SolarWebChartRenderer.Render(Plot.Plot, model, palette);
+        }
+        else
+        {
+            // ScottPlot's default figure is white. Colour it from the theme even while there is nothing to draw,
+            // so a dark dialog does not flash white until the server answers.
+            ChartTheme.Apply(Plot.Plot, palette);
         }
 
         Plot.Refresh();

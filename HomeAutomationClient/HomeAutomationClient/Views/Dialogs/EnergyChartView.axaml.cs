@@ -22,6 +22,9 @@ public partial class EnergyChartView : UserControl, IDialogControl
 
         DataContextChanged += OnDataContextChanged;
         ActualThemeVariantChanged += (_, _) => Render();
+        // Colour the empty plot as soon as the control is in the tree with a real theme, which is before there
+        // is a model to draw.
+        Loaded += (_, _) => Render();
 
         // The view model leaves a push alone while the chart cannot be seen and rebuilds once it can.
         ViewVisibility.Follow(this);
@@ -66,9 +69,17 @@ public partial class EnergyChartView : UserControl, IDialogControl
         // leave the axes of the last drawing standing.
         Plot.Reset();
 
+        var palette = ChartTheme.PaletteOf(this);
+
         if (viewModel?.ChartModel is { } model)
         {
-            EnergyChartRenderer.Render(Plot.Plot, model, ChartTheme.PaletteOf(this));
+            EnergyChartRenderer.Render(Plot.Plot, model, palette);
+        }
+        else
+        {
+            // ScottPlot's default figure is white. Colour it from the theme even while there is nothing to draw,
+            // so a dark dialog does not flash white until the chart is ready.
+            ChartTheme.Apply(Plot.Plot, palette);
         }
 
         Plot.Refresh();
