@@ -43,7 +43,8 @@ answer travels.
 4. **`App.OnFrameworkInitializationCompleted`** calls `SetAccentColor()`, builds the service provider, hands it to
    `IoC`, and creates `MainWindow` (desktop lifetime) or `MainView` (single view lifetime). `MainWindow`'s
    constructor opens the window as big as it was last closed - see "The desktop window's size" below.
-5. `MainView`'s constructor starts `MainViewModel.Initialize`, which shows the login dialog.
+5. `MainView`'s constructor starts `MainViewModel.Initialize`, which tries to log in with the cached credentials
+   and shows the login dialog only when that does not get in.
 
 **The rule for step 1: no Avalonia types.** Nothing is initialized yet, and on Android and iOS this code runs
 while the platform is still building the activity. That is why a color arrives as
@@ -385,6 +386,15 @@ address a user knows: the root the server answers at. `Misc/ServerUris` is the o
 Only the **browser** head can know the address without asking: it is served by the server it talks to, so
 `Program.Main` seeds both cache keys from `args[0]` before Avalonia starts. Everything else asks the user, and the
 login dialog is where it asks.
+
+**The cached credentials are tried before the dialog is shown at all** (since 2026-09-21).
+`MainViewModel.LoginAndStartAsync` calls `LoginViewModel.TryLoginWithCachedCredentialsAsync` first: a usable
+server address, a cached user name and a remembered password go straight to `IWebClientService.Login`, and the
+dialog appears only when one of them is missing, the server cannot be reached or the login is refused - silently,
+because there is nothing the user could do with a "your remembered password is wrong" box that the login dialog
+itself does not say better. The attempt is made **at startup only, never after a logout**: there it would put the
+very user who has just logged out straight back in, and the pre-filled box is exactly what another user of the
+same device needs to get in at all.
 
 **The login dialog has two modes and one Ok button.** It either asks for credentials or for the server address,
 never for both at once, and `LoginViewModel.IsChoosingServer` says which - so `Ok` means "log in" or "use this

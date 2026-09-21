@@ -414,6 +414,12 @@ The body's `OnDataContextChanged` starts `ViewModel.Initialize()` (fire and forg
 what it needs, as `LoginViewModel` does with the cached connection. Since `DataContext` is assigned in the object
 initializer inside `ShowDialogAsync`, `Initialize` starts before the dialog is on screen.
 
+The login dialog is the one dialog that may never be shown: since 2026-09-21 `MainViewModel.LoginAndStartAsync`
+calls `LoginViewModel.TryLoginWithCachedCredentialsAsync` before `ShowDialogAsync`, and the box appears only when
+the cached credentials are incomplete or do not get in. The attempt therefore lives on the view model, not in
+`Initialize` - by the time `Initialize` runs, the dialog is already on screen, and the requirement is the other
+way round.
+
 **`Initialize` fires again whenever the body is re-attached.** In a window of its own the body is never taken out
 of the tree, so there it runs once - but the guard is still needed, because the same dialog runs in the frame on
 every other head. `MainView` presents `CurrentDialog.Body` through one

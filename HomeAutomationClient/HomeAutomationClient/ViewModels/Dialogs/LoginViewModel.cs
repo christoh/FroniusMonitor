@@ -143,6 +143,36 @@ public partial class LoginViewModel(DialogParameters parameters) : DialogBase<Di
     }
 
     /// <summary>
+    /// Tries to get in with what the cache remembers, before the dialog is shown at all. Only a complete cached
+    /// login is worth the attempt - a server the client can point at, a user name and a remembered password -
+    /// and every failure simply means the caller shows the dialog after all, with nothing said about why: the
+    /// user is asked when there is something to ask, and not before.
+    /// </summary>
+    /// <returns>Whether the cached credentials got in; <see cref="User"/> is set when they did.</returns>
+    public async Task<bool> TryLoginWithCachedCredentialsAsync()
+    {
+        if (!ServerUris.AreUsable(cache.Get<string>(CacheKeys.ApiUri), cache.Get<string>(CacheKeys.HubUri)))
+        {
+            return false;
+        }
+
+        if (await LoadCachedCredentialsAsync().ConfigureAwait(true) is not null || string.IsNullOrEmpty(UserName) || string.IsNullOrEmpty(Password))
+        {
+            return false;
+        }
+
+        var result = await webClient.Login(UserName, Password).ConfigureAwait(true);
+
+        if (result.Status != HttpStatusCode.OK || result.Payload is not { } user)
+        {
+            return false;
+        }
+
+        User = user;
+        return true;
+    }
+
+    /// <summary>
     /// Takes the address the user typed: stores it, points the client at that server and fetches its key, because
     /// the key of the previous one says nothing about this one.
     /// </summary>

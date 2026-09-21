@@ -94,7 +94,8 @@ cover the spelling case.
 ## Startup: a link into a detail view survives the login
 
 1. The head builds the `IUriService`; the browser one reads `location.pathname` **once**, into `StartupPath`.
-2. `MainViewModel.Initialize` shows the login dialog and starts `UpdateService`.
+2. `MainViewModel.Initialize` logs in - with the cached credentials where they are complete, through the login
+   dialog where they are not - and starts `UpdateService`.
 3. Only **after** `IsReady` does it hand `StartupPath` to `ShowPath` - the devices of the installation are known
    only now - and show that view, or the dashboard.
 

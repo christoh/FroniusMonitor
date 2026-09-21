@@ -208,11 +208,11 @@ public sealed partial class MainViewModel : ViewModelBase, IPowerDisplayOptions
     public override Task Initialize() => TaskExceptionHandler(async () =>
     {
         await base.Initialize().ConfigureAwait(false);
-        await LoginAndStartAsync(followStartupPath: true).ConfigureAwait(false);
+        await LoginAndStartAsync(followStartupPath: true, tryCachedLogin: true).ConfigureAwait(false);
     });
 
     /// <summary>
-    /// Shows the login dialog and, once it succeeds, starts <see cref="UpdateService"/> and shows a view. Called
+    /// Logs in and, once that succeeds, starts <see cref="UpdateService"/> and shows a view. Called
     /// once by <see cref="Initialize"/> at startup and again by <see cref="Logout"/> once it has torn the previous
     /// session down - nothing here assumes it is the first time.
     /// </summary>
@@ -221,7 +221,13 @@ public sealed partial class MainViewModel : ViewModelBase, IPowerDisplayOptions
     /// <see cref="Initialize"/> wants: after <see cref="Logout"/> the address has already been reset to the
     /// dashboard, and there is no startup link to follow a second time.
     /// </param>
-    private async Task LoginAndStartAsync(bool followStartupPath)
+    /// <param name="tryCachedLogin">
+    /// Whether the remembered credentials are tried before the login box is shown. True at startup, where a
+    /// remembered login gets straight in and the box appears only when that does not work. False after a logout:
+    /// the attempt would put the very user who has just logged out straight back in, and the pre-filled box is
+    /// exactly what another user of this device needs to get in at all.
+    /// </param>
+    private async Task LoginAndStartAsync(bool followStartupPath, bool tryCachedLogin)
     {
         var loginViewModel = new LoginViewModel(new DialogParameters
         {
@@ -233,7 +239,31 @@ public sealed partial class MainViewModel : ViewModelBase, IPowerDisplayOptions
             StaysInMainView = true,
         });
 
-        await loginViewModel.ShowDialogAsync().ConfigureAwait(false);
+        if (tryCachedLogin)
+        {
+            BusyText = Loc.BusyLoggingIn;
+
+            try
+            {
+                await loginViewModel.TryLoginWithCachedCredentialsAsync().ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                // A failed attempt must never keep the box from showing - without this, a corrupt cache would
+                // leave the app with no way to log in at all. Nothing is reported here on purpose: the dialog
+                // reads the very same cache in its Initialize and reports the failure there.
+            }
+            finally
+            {
+                BusyText = null;
+            }
+        }
+
+        if (loginViewModel.User is null)
+        {
+            await loginViewModel.ShowDialogAsync().ConfigureAwait(false);
+        }
+
         User = loginViewModel.User;
         BusyText = Loc.GetInverterLocalization;
         await gen24Loc.Initialize().ConfigureAwait(false);
@@ -406,7 +436,7 @@ public sealed partial class MainViewModel : ViewModelBase, IPowerDisplayOptions
         await UpdateService.StopAsync().ConfigureAwait(true);
         await webClient.Logout().ConfigureAwait(true);
 
-        await LoginAndStartAsync(followStartupPath: false).ConfigureAwait(true);
+        await LoginAndStartAsync(followStartupPath: false, tryCachedLogin: false).ConfigureAwait(true);
     });
 
     /// <summary>

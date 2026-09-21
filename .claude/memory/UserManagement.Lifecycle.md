@@ -64,9 +64,10 @@ the `HttpClient` carries (regardless of whether the server could be reached) and
 which now answers `Ok(true)` - it used to answer `Ok()` with no body, harmless while nothing called it, but a typed
 `ApiResult<bool>` needs something to deserialize. What `StoredConnection`/the cache remember is **not** touched by
 logging out - only a changed password rewrites it - so logging back in, as the same user or a different one who
-shares the device, is one login rather than a retyped password. `LoginAndStartAsync(followStartupPath: false)` is
+shares the device, is one login rather than a retyped password. `LoginAndStartAsync(followStartupPath: false, tryCachedLogin: false)` is
 what `Logout` passes: a startup deep link has already been resolved once and there is nothing left to follow the
-second time, so it always lands on the dashboard.
+second time, so it always lands on the dashboard, and the cached credentials are deliberately **not** tried -
+they would put the user who has just logged out straight back in and nobody else could ever reach the box.
 
 ## The client shows the entry to everyone, on purpose
 
