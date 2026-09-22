@@ -52,7 +52,7 @@ public sealed class SolarWebServiceTests : IDisposable
         service = Create(parameters, store);
     }
 
-    private SolarWebService Create(SolarWebParameters p, InMemorySolarWebHistoryStore s) => new(NullLogger<SolarWebService>.Instance, Options(p), client, s, controlService, clock);
+    private SolarWebService Create(SolarWebParameters p, InMemorySolarWebHistoryStore s, ILogger<SolarWebService>? logger = null) => new(logger ?? NullLogger<SolarWebService>.Instance, Options(p), client, s, controlService, clock);
 
     public void Dispose() => service.Dispose();
 
@@ -400,26 +400,110 @@ public sealed class SolarWebServiceTests : IDisposable
     }
 
     [Fact]
-    public void A_day_chart_is_complete_once_a_measured_series_has_a_value_in_its_last_five_minutes()
+    public void A_day_chart_is_complete_once_every_measured_series_with_values_has_one_in_its_last_five_minutes()
     {
         var end = new DateTime(2026, 9, 19, 22, 0, 0, DateTimeKind.Utc);
-        var chart = SolarWebHistoryStoreTests.Chart(SolarWebInterval.Day, SolarWebView.Production, new DateOnly(2026, 9, 19), end, "ToConsumer", "PvForecastTruncated", "BattOperatingState");
+        var chart = SolarWebHistoryStoreTests.Chart(SolarWebInterval.Day, SolarWebView.Production, new DateOnly(2026, 9, 19), end, "ToConsumer", "PvForecastTruncated", "BattOperatingState", "FromGenToGrid", "FromGenToWattPilot");
         var measured = chart.Series[0];
         var forecast = chart.Series[1];
         var bubble = chart.Series[2];
+        var production = chart.Series[3];
+        var wattPilot = chart.Series[4];
         bubble.ChartType = "bubble";
 
         // Points up to 23:50 are not enough, nor a null at 23:55, nor the forecast's or the bubbles' points there.
         measured.Points = [new SolarWebPoint { TimeUtc = end.AddMinutes(-10), Value = 178 }, new SolarWebPoint { TimeUtc = end.AddMinutes(-5) }];
         forecast.Points = [new SolarWebPoint { TimeUtc = end.AddMinutes(-5), Value = 0 }, new SolarWebPoint { TimeUtc = end.AddHours(12), Value = 3000 }];
         bubble.Points = [new SolarWebPoint { TimeUtc = end.AddMinutes(-3), Value = 73.1, Text = "Normalbetrieb" }];
+        // The production stands at zero until midnight - Solar.web knows the sun is down - and a series without a
+        // single value, the Wattpilot the system does not have, says nothing either way.
+        production.Points = [new SolarWebPoint { TimeUtc = end.AddMinutes(-10), Value = 0 }, new SolarWebPoint { TimeUtc = end.AddMinutes(-5), Value = 0 }];
+        wattPilot.Points = [new SolarWebPoint { TimeUtc = end.AddMinutes(-10) }, new SolarWebPoint { TimeUtc = end.AddMinutes(-5) }];
         Assert.False(SolarWebPeriod.IsDayComplete(chart, end));
+        Assert.Equal(end.AddMinutes(-10), SolarWebPeriod.LastValueUtc(chart, end));
 
-        // A value at 23:55 is; one at midnight belongs to the next day and is not.
+        // A value at 23:55 in the consumption too is; one at midnight belongs to the next day and is not.
         measured.Points[1].Value = 0;
         Assert.True(SolarWebPeriod.IsDayComplete(chart, end));
+        Assert.Equal(end.AddMinutes(-5), SolarWebPeriod.LastValueUtc(chart, end));
         measured.Points[1].TimeUtc = end;
         Assert.False(SolarWebPeriod.IsDayComplete(chart, end));
+
+        // A chart with no measured value at all is not complete: there is nothing in it that could be.
+        chart.Series = [forecast, bubble, wattPilot];
+        Assert.False(SolarWebPeriod.IsDayComplete(chart, end));
+        Assert.Null(SolarWebPeriod.LastValueUtc(chart, end));
+    }
+
+    [Fact]
+    public async Task One_chart_that_fails_for_a_reason_of_its_own_does_not_end_the_tick()
+    {
+        // Solar.web answers today's production chart with something the parser cannot read, every time.
+        client.FailWhen = (interval, view, date) => interval == SolarWebInterval.Day && view == SolarWebView.Production && date == today ? new InvalidOperationException("not a chart") : null;
+        await service.StartAsync(TestContext.Current.CancellationToken);
+
+        // The tick reads everything else, yesterday above all, and the failing chart is tried again next time.
+        await service.TickAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(18, client.Requests);
+        Assert.NotNull(await store.GetChartAsync(PvSystemId, SolarWebInterval.Day, SolarWebView.Consumption, today, TestContext.Current.CancellationToken));
+        Assert.NotNull(await store.GetChartAsync(PvSystemId, SolarWebInterval.Day, SolarWebView.Production, today.AddDays(-1), TestContext.Current.CancellationToken));
+        Assert.NotNull(await store.GetChartAsync(PvSystemId, SolarWebInterval.All, SolarWebView.Expense, DateOnly.MinValue, TestContext.Current.CancellationToken));
+        Assert.Null(await store.GetChartAsync(PvSystemId, SolarWebInterval.Day, SolarWebView.Production, today, TestContext.Current.CancellationToken));
+
+        clock.Now = noon.AddMinutes(15);
+        await service.TickAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(2, client.Asked.Count(a => a == (SolarWebInterval.Day, SolarWebView.Production, today)));
+
+        // A cancellation of the tick itself is not swallowed.
+        using var cancelled = new CancellationTokenSource();
+        await cancelled.CancelAsync();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => service.TickAsync(cancelled.Token));
+    }
+
+    [Fact]
+    public async Task The_next_tick_is_due_after_the_refresh_rate_or_as_soon_as_a_back_off_is_over()
+    {
+        await service.StartAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(parameters.RefreshRate, service.NextTickDelay());
+
+        // A 429 in the middle of a tick blocks Solar.web for ten minutes: the next tick comes right after that,
+        // not a full interval later, by which time the block would have swallowed it.
+        client.Refusal = new SolarWebRateLimitException(TimeSpan.FromMinutes(10));
+        await service.TickAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(noon.AddMinutes(10), service.UnavailableUntil);
+        Assert.Equal(TimeSpan.FromMinutes(10) + TimeSpan.FromSeconds(1), service.NextTickDelay());
+
+        clock.Now = noon.AddMinutes(4);
+        Assert.Equal(TimeSpan.FromMinutes(6) + TimeSpan.FromSeconds(1), service.NextTickDelay());
+
+        // A block longer than the interval does not push the tick out beyond the interval: it would find itself
+        // blocked and do nothing, which costs nothing, and be re-armed from there.
+        clock.Now = noon.AddMinutes(30);
+        client.Refusal = new SolarWebRateLimitException(TimeSpan.FromHours(2));
+        await service.TickAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(parameters.RefreshRate, service.NextTickDelay());
+    }
+
+    [Fact]
+    public async Task The_log_says_whether_a_day_that_is_over_came_back_complete_and_where_its_data_ends_if_not()
+    {
+        // Solar.web is three hours behind; the server starts five minutes after midnight in Berlin.
+        var logger = new RecordingLogger<SolarWebService>();
+        var logged = Create(parameters, store, logger);
+        client.Lag = TimeSpan.FromHours(3);
+        var midnight = new DateTimeOffset(2026, 9, 20, 22, 0, 0, TimeSpan.Zero);
+        clock.Now = midnight.AddMinutes(5);
+        await logged.StartAsync(TestContext.Current.CancellationToken);
+        await logged.TickAsync(TestContext.Current.CancellationToken);
+
+        // Yesterday's chart ends three hours short of midnight, the day before came back whole, and today's chart
+        // says nothing about being complete: it is running. The month does not say either, it is not a day.
+        var answered = logger.Entries.Where(e => e.Message.StartsWith("Solar.web answered the", StringComparison.Ordinal)).Select(e => e.Message).ToList();
+        Assert.Contains(answered, m => m.Contains("Day 2026-09-20", StringComparison.Ordinal) && m.Contains("not complete yet: the data ends at 2026-09-20 20:55:00 (Europe/Berlin)", StringComparison.Ordinal));
+        Assert.Contains(answered, m => m.Contains("Day 2026-09-19", StringComparison.Ordinal) && m.EndsWith(", complete", StringComparison.Ordinal));
+        Assert.Contains(answered, m => m.Contains("Day 2026-09-21", StringComparison.Ordinal) && !m.Contains("complete", StringComparison.Ordinal));
+        Assert.Contains(answered, m => m.Contains("Month 2026-09-01", StringComparison.Ordinal) && !m.Contains("complete", StringComparison.Ordinal));
+        logged.Dispose();
     }
 
     [Fact]

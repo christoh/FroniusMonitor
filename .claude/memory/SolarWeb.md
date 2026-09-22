@@ -148,17 +148,29 @@ pragma. `View` and `Interval` are SQL keywords, hence `ChartView`, `ChartInterva
   reads the firmware status, then today (production, consumption), this month, this year and GESAMT (all four
   views), and **the periods that ended less than `FinalAfter` (2 days) ago while their charts are not complete**
   (`PeriodsToRefresh`: yesterday and the day before, the previous month on the 1st and 2nd, the previous year on
-  1 and 2 January). **Complete** (`TickPredicateAsync`): a day once a measured series - not the forecast, not the
-  battery bubbles - has a value in the day's last five minutes, 23:55 local (`SolarWebPeriod.IsDayComplete`);
-  a month or a year once the production day chart of its **last day** is complete and the month's or year's
-  chart was fetched after that day chart (Solar.web builds the one from the other). The tick reads the days
-  before the months and the years for exactly that reason. Solar.web can be **hours behind** the inverter, so a
-  day read after midnight may still stop at 21:xx; it is read every tick until 23:55 is there. **What has not
-  arrived two days after the end never will** (the developer's rule, 2026-09-20 evening), so nothing older is
-  touched, complete or not. A Premium view the account is locked out of (`IsPremiumFeature`) is tried again only
-  every `LockedViewRetry` (1 day). The first tick comes one interval after start, not at start. A refusal (429,
-  503, maintenance, login) ends the tick: the rest would be refused the same way. The tick does not backfill:
-  last month, last year and older days are fetched only when a client asks.
+  1 and 2 January). **Complete** (`TickPredicateAsync`): a day once **every** measured series - not the forecast,
+  not the battery bubbles, not a series without a single value such as a Wattpilot the system does not have -
+  has a value in the day's last five minutes, 23:55 local (`SolarWebPeriod.IsDayComplete`; *every* since
+  2026-09-22, *any one* before: a chart whose consumption stopped at 23:10 while another series stood at zero
+  until midnight must not count as whole); a month or a year once the production day chart of its **last day**
+  is complete and the month's or year's chart was fetched after that day chart (Solar.web builds the one from
+  the other). The tick reads the days before the months and the years for exactly that reason. Solar.web can be
+  **hours behind** the inverter, so a day read after midnight may still stop at 21:xx; it is read every tick
+  until 23:55 is there, and the `Solar.web answered ...` log line of a day that is over ends in `, complete` or
+  `, not complete yet: the data ends at <local time>` (`DescribeCompleteness`, `SolarWebPeriod.LastValueUtc`),
+  so the log shows how far behind Solar.web is. **What has not arrived two days after the end never will** (the
+  developer's rule, 2026-09-20 evening, repeated 2026-09-22), so nothing older is touched, complete or not. A
+  Premium view the account is locked out of (`IsPremiumFeature`) is tried again only every `LockedViewRetry`
+  (1 day). The first tick comes one interval after start, not at start. A refusal (429, 503, maintenance, login)
+  ends the tick: the rest would be refused the same way. **Any other failure is that one chart's** (since
+  2026-09-22): `TryAsync` logs it with the chart's name and the tick goes on, where before an exception the tick
+  did not expect - a store that would not write, an answer the parser did not understand - ended the tick and,
+  recurring, left every chart after it in the list unread for good, the day that had just ended among them.
+  **The timer is re-armed from the end of each tick** (`NextTickDelay`, `RearmTimer`): after `RefreshRate`, or
+  as soon as a back-off is over where that is sooner - a 15-minute back-off from a 429 in the middle of a tick
+  used to reach past the next tick, which then started inside the block and did nothing, so one 429 cost two
+  intervals. The tick does not backfill: last month, last year and older days are fetched only when a client
+  asks.
 - **A client is served what is cached, however old** (`IsGoodEnoughForAClient`): a period that is over does not
   change, a running one is as fresh as the last tick. Solar.web is asked only for a chart the cache does not
   have - and for a **forecast day** (a period after today), which no tick refreshes, once the cached one is a
@@ -188,7 +200,21 @@ pragma. `View` and `Interval` are SQL keywords, hence `ChartView`, `ChartInterva
   role User. The date defaults to the system's today. Enums bind by name, case does not matter.
 
 `SolarWebServiceTests` pins all of this with a settable clock, a fake client and an in-memory store;
-`SolarWebHistoryStoreTests` uses a real SQLite file in the temp folder.
+`SolarWebHistoryStoreTests` uses a real SQLite file in the temp folder. `FakeSolarWebClient.Lag` is how far the
+fake is behind: a day chart's last point is the last slot once the day has been over for that long, otherwise
+`min(now, last slot) - Lag`, so a day that has just ended comes back stopping hours short of midnight the way the
+real one does; `FailWhen` makes one particular chart throw while every other one is answered.
+
+**2026-09-22, the day that stayed incomplete.** The client showed 21.09 ending at 23:10 on the morning after,
+though the policy above was in place. The code implements the rule against the fake (the tests prove it), and
+nothing in the repo shows what a real answer of a lagging day looks like, so the cause could not be pinned from
+here. The three changes of that day make the service robust against every way found in which a cached day could
+stay stale: a series padded to midnight (every series must be there), a chart that keeps failing (the tick goes
+on), a back-off that swallows the next tick (re-armed). What was not changed: a rejected login still blocks
+everything until a restart, by decision, and the cache is then served stale without an error - the log says
+`The Solar.web login failed and is not tried again until the server is restarted`. When a day stays incomplete
+again, read the server log for that line, for `Solar.web is left alone until`, and for the `, not complete yet`
+notes, before looking at the code.
 
 ## The firmware status (added 2026-09-20)
 
@@ -285,8 +311,8 @@ data: `DeviceVisibility` does not list it for guests.
 
 ## Not done yet
 
-- The dialog has been rendered headless, **not yet run against the production server from the client** - that
-  needs a redeploy of the server first.
+- The dialog runs against the production server from the client (the developer's screenshot of 2026-09-22 is
+  the 21.09 production day chart served from the cache).
 - The chart has no tooltips, so the battery state bubbles have nowhere to go; the day chart could show them as
   markers with a hover text once ScottPlot's interaction is wanted.
 - The live login **works from the production server** (verified 2026-09-20 against `home.hochstaetter.de`: the

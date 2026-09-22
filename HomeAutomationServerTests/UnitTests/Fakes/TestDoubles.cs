@@ -22,7 +22,7 @@ internal sealed class SettableTimeProvider(DateTimeOffset now) : TimeProvider
 /// Keeps what was logged, for the cases where the log entry is the feature rather than a side effect - a warning
 /// that tells the administrator the credentials they have just been given, for instance.
 /// </summary>
-internal sealed class RecordingLogger : ILogger
+internal class RecordingLogger : ILogger
 {
     public List<(LogLevel Level, string Message)> Entries { get; } = [];
 
@@ -35,6 +35,9 @@ internal sealed class RecordingLogger : ILogger
         Entries.Add((logLevel, formatter(state, exception)));
     }
 }
+
+/// <summary>The same, for a service that takes its logger typed.</summary>
+internal sealed class RecordingLogger<T> : RecordingLogger, ILogger<T>;
 
 internal static class TestUsers
 {

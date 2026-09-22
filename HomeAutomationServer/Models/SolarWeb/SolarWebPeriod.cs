@@ -52,15 +52,41 @@ public static class SolarWebPeriod
 
     /// <summary>
     ///     Whether a day chart holds the whole day: Solar.web's day is 288 slots of five minutes, and the day is there
-    ///     once a measured series has a value in the last of them, 23:55 local. Solar.web can be hours behind the
+    ///     once every measured series has a value in the last of them, 23:55 local. Solar.web can be hours behind the
     ///     inverter, so a chart read after midnight may still stop short of that. The forecast does not count, its
-    ///     points are always there; nor do the battery state bubbles, which are events and not measurements.
+    ///     points are always there; nor do the battery state bubbles, which are events and not measurements; nor a
+    ///     series without a single value in the whole day - a Wattpilot the system does not have.
     /// </summary>
+    /// <remarks>
+    ///     Every measured series, not any one of them: the series of a day are computed from the same data, but
+    ///     nothing says they are padded alike, and a day whose consumption stops at 23:10 while the production
+    ///     stands at zero until midnight is not over. The developer's rule (2026-09-22): the period is not complete
+    ///     until the 23:55 data has arrived, and it is read again until then.
+    /// </remarks>
     /// <param name="chart">A <see cref="SolarWebInterval.Day" /> chart.</param>
     /// <param name="endUtc">The day's <see cref="EndUtc" />.</param>
     public static bool IsDayComplete(SolarWebChart chart, DateTime endUtc)
     {
         var lastSlot = endUtc.AddMinutes(-5);
-        return chart.Series.Where(s => !s.IsForecast && !s.IsBubble).SelectMany(s => s.Points).Any(p => p.Value != null && p.TimeUtc >= lastSlot && p.TimeUtc < endUtc);
+        var measured = MeasuredSeriesWithValues(chart).ToList();
+        return measured.Count > 0 && measured.All(s => s.Points.Any(p => p.Value != null && p.TimeUtc >= lastSlot && p.TimeUtc < endUtc));
     }
+
+    /// <summary>
+    ///     The latest instant before <paramref name="endUtc" /> at which every measured series of a day chart has a
+    ///     value - where the day's data ends so far - or <see langword="null" /> where no series has any. For the
+    ///     log, so that somebody can see how far Solar.web is behind.
+    /// </summary>
+    public static DateTime? LastValueUtc(SolarWebChart chart, DateTime endUtc)
+    {
+        var lastPerSeries = MeasuredSeriesWithValues(chart)
+            .Select(s => s.Points.Where(p => p.Value != null && p.TimeUtc < endUtc).Select(p => (DateTime?)p.TimeUtc).Max())
+            .Where(last => last != null)
+            .ToList();
+
+        return lastPerSeries.Count == 0 ? null : lastPerSeries.Min();
+    }
+
+    private static IEnumerable<SolarWebSeries> MeasuredSeriesWithValues(SolarWebChart chart) =>
+        chart.Series.Where(s => !s.IsForecast && !s.IsBubble && s.Points.Any(p => p.Value != null));
 }

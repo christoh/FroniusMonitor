@@ -10,9 +10,12 @@ namespace De.Hochstaetter.HomeAutomationServer.Services.DataCollectors;
 ///         today, this month, this year and the whole history in every view, and the periods that ended less than
 ///         <see cref="SolarWebParameters.FinalAfter" /> ago as long as their charts are not complete, so that the
 ///         cache holds a period whole once it is over. Solar.web can be hours behind the inverter: a day is complete
-///         once its chart has a value in the day's last five minutes (<see cref="SolarWebPeriod.IsDayComplete" />),
-///         a month or a year once the day chart of its last day is and the month's or the year's chart was read
-///         after that. What has not arrived <see cref="SolarWebParameters.FinalAfter" /> after the end never will.
+///         once every measured series of its chart has a value in the day's last five minutes
+///         (<see cref="SolarWebPeriod.IsDayComplete" />), a month or a year once the day chart of its last day is and
+///         the month's or the year's chart was read after that. What has not arrived
+///         <see cref="SolarWebParameters.FinalAfter" /> after the end never will. One chart that cannot be read does
+///         not end the tick, and a tick that Solar.web refuses is repeated as soon as the back-off is over rather
+///         than skipped until the next interval.
 ///         A client is served what is cached, whatever its age - a period that is over does not change, and a
 ///         running one is as fresh as the last tick - and Solar.web is asked only for a chart the cache does not
 ///         have. The one exception is a day that has not begun, a forecast: that is read again after
@@ -158,9 +161,9 @@ public sealed class SolarWebService(
 
     /// <summary>
     ///     What the tick leaves alone for the charts of one period: a locked Premium view that was tried recently,
-    ///     and a complete chart - a day with a value in its last five minutes, a month or a year whose last day's
-    ///     chart is complete and that was read after that day's chart was. Everything else, every running period
-    ///     above all, is read again.
+    ///     and a complete chart - a day whose every measured series has a value in its last five minutes, a month or
+    ///     a year whose last day's chart is complete and that was read after that day's chart was. Everything else,
+    ///     every running period above all, is read again.
     /// </summary>
     /// <remarks>
     ///     The witness of a month or a year is the production day chart of its last day, read here once for all
@@ -229,7 +232,7 @@ public sealed class SolarWebService(
 
                 if (logger.IsEnabled(LogLevel.Information))
                 {
-                    logger.LogInformation("Solar.web answered the {View} chart of {Interval} {Period} with {Series} series, {Sum}", view, interval, chart.Title, chart.Series.Count, chart.SumValue);
+                    logger.LogInformation("Solar.web answered the {View} chart of {Interval} {Period} with {Series} series, {Sum}{Completeness}", view, interval, chart.Title, chart.Series.Count, chart.SumValue, DescribeCompleteness(chart));
                 }
 
                 if (interval == SolarWebInterval.Day)
@@ -237,8 +240,32 @@ public sealed class SolarWebService(
                     await PurgeAsync(settings, t).ConfigureAwait(false);
                 }
             },
-            $"the {view} chart of {interval} {period:yyyy-MM-dd}",
+            Describe(interval, view, period),
             token);
+    }
+
+    /// <summary>A chart as the log names it.</summary>
+    private static string Describe(SolarWebInterval interval, SolarWebView view, DateOnly period) => $"the {view} chart of {interval} {period:yyyy-MM-dd}";
+
+    /// <summary>
+    ///     For the log line of a day chart whose day is over: whether the day has arrived whole, and where its data
+    ///     ends if not - which is how far Solar.web is behind, and what somebody reading the log wants to know when a
+    ///     day is read again tick after tick. Empty for a running day and for the other intervals.
+    /// </summary>
+    private string DescribeCompleteness(SolarWebChart chart)
+    {
+        if (chart.Interval != SolarWebInterval.Day || SolarWebPeriod.EndUtc(chart.Interval, chart.Period, zone) is not { } end || end > clock.GetUtcNow().UtcDateTime)
+        {
+            return string.Empty;
+        }
+
+        if (SolarWebPeriod.IsDayComplete(chart, end))
+        {
+            return ", complete";
+        }
+
+        var last = SolarWebPeriod.LastValueUtc(chart, end);
+        return last is { } lastValue ? $", not complete yet: the data ends at {Local(new DateTimeOffset(lastValue, TimeSpan.Zero))}" : ", not complete yet: no data";
     }
 
     public Task<SolarWebFirmwareStatus> GetFirmwareStatusAsync(CancellationToken token = default) => GetFirmwareStatusAsync(false, token);
@@ -253,7 +280,9 @@ public sealed class SolarWebService(
     /// <remarks>
     ///     Every request is one <see cref="AskAsync{T}" />, so a refusal is said in the log there and blocks the rest
     ///     of the tick the way it blocks a client: once Solar.web has asked to be left alone, or the login has failed,
-    ///     the remaining charts are not tried, because every one of them would be refused the same way.
+    ///     the remaining charts are not tried, because every one of them would be refused the same way. Any other
+    ///     failure is that one chart's: it is logged and the tick goes on, so that a chart Solar.web keeps answering
+    ///     badly does not leave every chart after it in the list - the day that has just ended, say - unread for good.
     /// </remarks>
     public async Task TickAsync(CancellationToken token = default)
     {
@@ -262,7 +291,7 @@ public sealed class SolarWebService(
             return;
         }
 
-        await TryAsync(t => GetFirmwareStatusAsync(true, t), token).ConfigureAwait(false);
+        await TryAsync(t => GetFirmwareStatusAsync(true, t), "the firmware status", token).ConfigureAwait(false);
 
         // The days first: the day chart of the last day of a month or a year is what says that the month or the
         // year is complete, so it has to be read before them.
@@ -279,22 +308,57 @@ public sealed class SolarWebService(
                         return;
                     }
 
-                    await TryAsync(t => FetchChartAsync(settings, interval, view, period, isGoodEnough, t), token).ConfigureAwait(false);
+                    await TryAsync(t => FetchChartAsync(settings, interval, view, period, isGoodEnough, t), Describe(interval, view, period), token).ConfigureAwait(false);
                 }
             }
         }
     }
 
-    /// <summary>One request of the tick; a failure is said in the log by <see cref="AskAsync{T}" />, and there is nobody else to tell.</summary>
-    private static async Task TryAsync<T>(Func<CancellationToken, Task<T>> request, CancellationToken token)
+    /// <summary>
+    ///     One request of the tick. A refusal and a failure to answer are said in the log by <see cref="AskAsync{T}" />
+    ///     and there is nobody else to tell; anything else - a store that will not write, an answer the parser does
+    ///     not understand - is said here, with what was being read. Nothing but a cancellation of the tick itself gets
+    ///     out, because the tick has more to read.
+    /// </summary>
+    private async Task TryAsync<T>(Func<CancellationToken, Task<T>> request, string what, CancellationToken token)
     {
         try
         {
             await request(token).ConfigureAwait(false);
         }
-        catch (Exception ex) when (ex is SolarWebUnavailableException or SolarWebLoginException or HttpRequestException or InvalidDataException || ex is OperationCanceledException && !token.IsCancellationRequested)
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception ex) when (ex is SolarWebUnavailableException or SolarWebLoginException or HttpRequestException or InvalidDataException or OperationCanceledException)
         {
         }
+        catch (Exception ex)
+        {
+            if (logger.IsEnabled(LogLevel.Error))
+            {
+                logger.LogError(ex, "Reading {What} from Solar.web failed", what);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     When the next tick is due, from the end of one: after <see cref="SolarWebParameters.RefreshRate" /> as a
+    ///     rule, but where Solar.web has asked to be left alone, as soon as that is over. A back-off of the same
+    ///     length as the interval would otherwise swallow the next tick whole - it would start inside the block and
+    ///     do nothing - and the charts that were not reached would wait two intervals instead of one.
+    /// </summary>
+    internal TimeSpan NextTickDelay()
+    {
+        var delay = Parameters.RefreshRate;
+
+        if (UnavailableUntil is { } until)
+        {
+            var afterBlock = until - clock.GetUtcNow() + TimeSpan.FromSeconds(1);
+            delay = afterBlock < delay ? afterBlock : delay;
+        }
+
+        return delay;
     }
 
     private Task<SolarWebFirmwareStatus> GetFirmwareStatusAsync(bool force, CancellationToken token)
@@ -510,6 +574,26 @@ public sealed class SolarWebService(
     }
 
     /// <summary>
+    ///     The next tick is scheduled from the end of this one (<see cref="NextTickDelay" />), so that a back-off does
+    ///     not swallow it. The timer may be gone by then: <see cref="StopAsync" /> disposes it while a tick runs.
+    /// </summary>
+    private void RearmTimer()
+    {
+        if (!isStarted)
+        {
+            return;
+        }
+
+        try
+        {
+            timer?.Change(NextTickDelay(), Parameters.RefreshRate);
+        }
+        catch (ObjectDisposedException)
+        {
+        }
+    }
+
+    /// <summary>
     ///     The timer callback is an async void: everything, the semaphore wait included, is inside the try, and the
     ///     semaphore is released only if it was taken.
     /// </summary>
@@ -539,6 +623,7 @@ public sealed class SolarWebService(
         {
             if (acquired)
             {
+                RearmTimer();
                 tickSemaphore.Release();
             }
         }

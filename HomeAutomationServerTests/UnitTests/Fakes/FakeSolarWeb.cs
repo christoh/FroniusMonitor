@@ -19,6 +19,9 @@ internal sealed class FakeSolarWebClient(TimeProvider clock) : ISolarWebClient
     /// <summary>What the next requests throw, or <see langword="null" /> to answer.</summary>
     public Exception? Refusal { get; set; }
 
+    /// <summary>What one particular chart throws instead of an answer, or <see langword="null" />; every other chart is answered.</summary>
+    public Func<SolarWebInterval, SolarWebView, DateOnly, Exception?>? FailWhen { get; set; }
+
     /// <summary>True where the account has no Premium: the two Premium views are answered with Solar.web's placeholder.</summary>
     public bool IsPremiumLocked { get; set; }
 
@@ -50,14 +53,25 @@ internal sealed class FakeSolarWebClient(TimeProvider clock) : ISolarWebClient
             throw Refusal;
         }
 
+        if (FailWhen?.Invoke(interval, view, date) is { } failure)
+        {
+            throw failure;
+        }
+
         var period = SolarWebPeriod.Normalize(interval, date);
         var now = clock.GetUtcNow().UtcDateTime;
 
-        // A day chart's last point: the day's last slot once the day is over and the lag has passed, else now - the
-        // way Solar.web's chart of today ends at the current five minutes.
-        var lastPoint = interval == SolarWebInterval.Day && SolarWebPeriod.EndUtc(interval, period, settings.ResolveTimeZone()) is { } end && now >= end + Lag
-            ? end.AddMinutes(-5)
-            : now;
+        // A day chart's last point: the day's last slot once the day is over and the lag has passed; otherwise as
+        // far as this Solar.web has got, which is the lag behind now or behind the day's end - the way Solar.web's
+        // chart of today ends at the current five minutes, and the chart of a day that has just ended stops hours
+        // short of midnight while Solar.web catches up.
+        var lastPoint = now;
+
+        if (interval == SolarWebInterval.Day && SolarWebPeriod.EndUtc(interval, period, settings.ResolveTimeZone()) is { } end)
+        {
+            var lastSlot = end.AddMinutes(-5);
+            lastPoint = now >= end + Lag ? lastSlot : (now < end ? now : lastSlot) - Lag;
+        }
 
         return Task.FromResult(new SolarWebChart
         {
