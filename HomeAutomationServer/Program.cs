@@ -235,17 +235,6 @@ internal class Program
         var app = builder.Build();
         app.UseResponseCompression();
 
-        // The browser client (HomeAutomationClient.Browser, published into wwwroot - see the "Publish client"
-        // target in HomeAutomationServer.csproj and the Dockerfile) is served straight from here, ahead of every
-        // other middleware. Static file middleware is not endpoint routing: a request it can answer short-circuits
-        // the pipeline right here and never reaches UseAuthentication/UseAuthorization below, so downloading the
-        // client itself needs no login - which matters, because logging in is only possible once the client has
-        // been downloaded. MapFallbackToFile is added further down, after the real endpoints, so the client's own
-        // in-app routes (e.g. /inverterdetails/Fronius/1234) resolve to index.html on a full page load instead of
-        // a 404.
-        app.UseDefaultFiles();
-        app.UseStaticFiles();
-
         // CORS has to run before authorization, and naming the two here is the only way to get that order:
         // WebApplication adds UseAuthentication and UseAuthorization by itself once the services are there, and it
         // adds them ahead of every middleware this method registers. A preflight carries no credentials, so the
@@ -266,6 +255,20 @@ internal class Program
             options.SupportedCultures = supportedCultures;
             options.SupportedUICultures = supportedCultures;
         });
+
+        // The browser client (HomeAutomationClient.Browser, published into wwwroot alongside its
+        // .staticwebassets.endpoints.json manifest renamed to this assembly's - see the "Publish client" targets
+        // in HomeAutomationServer.csproj and the Dockerfile). MapStaticAssets, not UseStaticFiles: the Avalonia
+        // WebAssembly SDK ships every framework file (multi-megabyte assemblies, the Mono runtime, ICU data) both
+        // raw and precompressed as .br/.gz, and only MapStaticAssets reads that manifest to hand back the
+        // matching precompressed file for the request's Accept-Encoding - with the correct Content-Type and an
+        // immutable Cache-Control, since the file names are content-hashed. UseStaticFiles knows none of that: it
+        // would have served the ICU .dat files as 404s (unregistered extension) and left the multi-megabyte
+        // assemblies for UseResponseCompression to recompress from scratch, at max compression, on every single
+        // request - the runtime's own dotnet.native.wasm alone took 29 seconds to compress that way. Like the
+        // other endpoints below, this needs no RequireAuthorization, so the client can be downloaded before
+        // logging in - which matters, because logging in is only possible once the client has been downloaded.
+        app.MapStaticAssets();
 
         app.MapControllers();
         // The hub has a scheme of its own: a browser cannot set an Authorization header on a WebSocket handshake,
