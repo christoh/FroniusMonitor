@@ -1,0 +1,4 @@
+# The build context of the Dockerfile at the root. The bin and obj folders of a local build would otherwise be
+# copied in and taken for the image build's own, which they are not - wrong platform, stale, or Debug.
+**/bin/
+**/obj/

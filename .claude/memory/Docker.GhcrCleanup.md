@@ -5,24 +5,52 @@ paths:
   - .github/workflows/publish-images.yml
   - docker-compose.yml
   - docker-bake.hcl
-  - HomeAutomationServer/Dockerfile
-  - HomeAutomationClient/HomeAutomationClient.Browser/Dockerfile
+  - Dockerfile
+  - .dockerignore
 ---
 
 # GHCR dangling-image cleanup
 
+## One Dockerfile for both images (since 2026-09-22)
+
+The two Dockerfiles (`HomeAutomationServer/Dockerfile`, `HomeAutomationClient/HomeAutomationClient.Browser/Dockerfile`)
+were merged into **`Dockerfile` at the repository root**, because both published the browser client - the server
+image hosts it at `/` since it got `PublishClientApp`. Stages: `shell-files` (scratch; `.profile` and the fastfetch
+config both images share), `client-builder` (SDK + python3 + wasm-tools, publishes `HomeAutomationClient.Browser`
+to `/client`), `client` (nginx runner), `server-builder` (plain SDK, no workload; `dotnet build`, then
+`dotnet publish --no-build -p:PublishClientApp=true -p:ClientAppPrePublished=true -p:CopyClientWwwRoot=false
+-p:ClientPublishDir=/client/` with the client bind-mounted from `client-builder` - a `COPY` would store the client
+a second time in a layer of its own; that publish only copies the renamed manifest), `server` (last, so a bare
+`docker build .` still builds the server). The bake targets select them with `target = "server"` / `"client"`.
+
+**The client's wwwroot is one layer shared by both images:** both runners have the identical line
+`COPY --link --from=client-builder /client/wwwroot /app/wwwroot`. `--link` builds the layer on its own instead of on
+top of the image below, so its digest does not depend on the base image, the stage or the platform. That is why the
+server's publish passes `CopyClientWwwRoot=false` (the csproj otherwise copies wwwroot into the publish dir, which
+would put the files into the server image twice), and why the client image carries only wwwroot and no longer the
+rest of the client's publish output (`dotnet.js`, `web.config`, runtimeconfig, manifest), which nginx never served.
+The two lines must stay identical - a `--chmod`, a different path or a missing `--link` on one side makes two layers
+again.
+
+Built once only because BuildKit merges identical vertices across the targets of one bake run: `client-builder`
+is `--platform=$BUILDPLATFORM` and uses no `TARGET*` argument, so it is the same LLB for every platform and both
+images. An ARG in it that differs per platform or per target, or a differing context/build-arg between the two
+bake targets, silently brings back the double build. `.dockerignore` (`**/bin/`, `**/obj/`) replaced the
+`rm -fr bin obj` steps both Dockerfiles had. `.ashrc` and `/etc/motd` stay per image on purpose: they name the
+image, and the server's has the `doas`/`root` aliases for its non-root `app` user.
+
 ## OCI labels (added 2026-09-15)
 
-Both Dockerfiles carry the `org.opencontainers.image.*` labels in their **runner** stage - `source`, `url`,
-`documentation`, `title`, `description`, `licenses` (`AGPL-3.0-only`, the repo's LICENSE), `vendor`, `authors`,
-`base.name`. `source` is what GitHub uses to attach a package to the repository. **Multi-arch caveat:** a
-`LABEL` ends up on each platform manifest, while GitHub reads the *index* the tag points at. That is why the
+Both runner stages (`client`, `server`) of the Dockerfile carry the `org.opencontainers.image.*` labels -
+`source`, `url`, `documentation`, `title`, `description`, `licenses` (`AGPL-3.0-only`, the repo's LICENSE),
+`vendor`, `authors`, `base.name`. `source` is what GitHub uses to attach a package to the repository.
+**Multi-arch caveat:** a `LABEL` ends up on each platform manifest, while GitHub reads the *index* the tag points at. That is why the
 builds moved out of `docker-compose.yml` into **`docker-bake.hcl`** (same day): its two targets carry the
 platforms, the tags (`REGISTRY`/`TAG` variables, defaults `ghcr.io/christoh` and `latest`) and
 `annotations = index_annotations(title, description)`, a bake function that yields the `index:`-prefixed OCI
 annotations, so `docker buildx bake --push` annotates the index on every push without a flag to remember.
 Compose's `build:` has no `annotations` key and only runs the images now. `docker buildx bake --print`
-validates the file without building. The values exist twice on purpose - in the Dockerfiles for anyone who
+validates the file without building. The values exist twice on purpose - in the Dockerfile for anyone who
 runs `docker build`, in the bake file for the index - because a Dockerfile cannot read the bake file.
 
 This repo publishes multi-arch Docker images to GitHub Container Registry

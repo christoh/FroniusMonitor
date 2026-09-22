@@ -19,7 +19,7 @@ paths:
   - HomeAutomationServer/Controllers/EnergyDataController.cs
   - HomeAutomationServer/Models/Settings/Settings.cs
   - HomeAutomationServer/Settings.xml.example
-  - HomeAutomationServer/Dockerfile
+  - Dockerfile
   - HomeAutomationServer/Program.cs
   - HomeAutomationClient/HomeAutomationClient/Models/EnergyChartModel.cs
   - HomeAutomationClient/HomeAutomationClient/ViewModels/Dialogs/EnergyChartViewModel.cs

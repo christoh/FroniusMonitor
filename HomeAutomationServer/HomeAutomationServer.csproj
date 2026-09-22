@@ -48,17 +48,24 @@
 		Hosting the browser client (see Program.cs): the client is HomeAutomationClient.Browser, a separate
 		Avalonia WebAssembly app that needs the wasm-tools workload to build. That workload is not something a
 		plain build, `dotnet test`, or the cloud sandbox has any reason to require, so publishing it is opt-in
-		via PublishClientApp, set by HomeAutomationServer/Dockerfile (`-p:PublishClientApp=true`) when it builds
-		the combined image. With PublishClientApp unset or false, these targets do nothing and this project
+		via PublishClientApp. With PublishClientApp unset or false, these targets do nothing and this project
 		builds exactly as before.
+
+		The Dockerfile at the repository root sets it too, but it publishes the client in a stage of its own,
+		which the stand-alone client image uses as well, and hands the result in: ClientAppPrePublished=true with
+		ClientPublishDir pointing at it makes these targets take that output instead of publishing the client a
+		second time. It also sets CopyClientWwwRoot=false, because it adds the client's wwwroot to both images as
+		one and the same layer of its own; here only the manifest is copied then.
 	-->
 	<PropertyGroup>
 		<PublishClientApp Condition="'$(PublishClientApp)' == ''">false</PublishClientApp>
+		<ClientAppPrePublished Condition="'$(ClientAppPrePublished)' == ''">false</ClientAppPrePublished>
+		<CopyClientWwwRoot Condition="'$(CopyClientWwwRoot)' == ''">true</CopyClientWwwRoot>
 		<ClientBrowserProject>$(MSBuildThisFileDirectory)..\HomeAutomationClient\HomeAutomationClient.Browser\HomeAutomationClient.Browser.csproj</ClientBrowserProject>
-		<ClientPublishDir>$(MSBuildThisFileDirectory)obj\ClientPublish\</ClientPublishDir>
+		<ClientPublishDir Condition="'$(ClientPublishDir)' == ''">$(MSBuildThisFileDirectory)obj\ClientPublish\</ClientPublishDir>
 	</PropertyGroup>
 
-	<Target Name="PublishClientWebAssembly" BeforeTargets="Publish" Condition="'$(PublishClientApp)' == 'true'">
+	<Target Name="PublishClientWebAssembly" BeforeTargets="Publish" Condition="'$(PublishClientApp)' == 'true' And '$(ClientAppPrePublished)' != 'true'">
 		<Exec Command="dotnet publish &quot;$(ClientBrowserProject)&quot; -c $(Configuration) -o &quot;$(ClientPublishDir)&quot;" />
 	</Target>
 
@@ -68,7 +75,7 @@
 		<ItemGroup>
 			<ClientWwwRootFiles Include="$(ClientPublishDir)wwwroot\**" />
 		</ItemGroup>
-		<Copy SourceFiles="@(ClientWwwRootFiles)" DestinationFolder="$(PublishDir)wwwroot\%(RecursiveDir)" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="@(ClientWwwRootFiles)" DestinationFolder="$(PublishDir)wwwroot\%(RecursiveDir)" SkipUnchangedFiles="true" Condition="'$(CopyClientWwwRoot)' == 'true'" />
 
 		<!-- app.MapStaticAssets() (see Program.cs) reads "<entry assembly>.staticwebassets.endpoints.json" next
 			 to the running app's own dll. The Avalonia WebAssembly SDK wrote this manifest for its own assembly

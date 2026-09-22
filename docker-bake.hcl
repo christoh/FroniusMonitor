@@ -5,7 +5,11 @@
 #   docker buildx bake --print                what the above resolve to, without building anything
 #   REGISTRY=ghcr.io/me TAG=test docker buildx bake --push
 #
-# The Dockerfiles carry the same values as LABELs, which land on each platform's manifest. In a multi-arch push the
+# Both targets are stages of the one Dockerfile at the repository root. Both images need the published browser
+# client, and since its stage "client-builder" is the same in both, building them in one bake run publishes the
+# client only once. Keep the two targets' context and build arguments alike, or it is built twice again.
+#
+# The Dockerfile carries the same values as LABELs, which land on each platform's manifest. In a multi-arch push the
 # tag points at an index above those manifests, and it is the index GitHub reads for the package page (repository
 # link, description, README), so the very same values go onto the index here as annotations. Compose has no place
 # for that, which is why the builds live in this file.
@@ -39,7 +43,8 @@ function "index_annotations" {
 
 target "server" {
   context    = "."
-  dockerfile = "HomeAutomationServer/Dockerfile"
+  dockerfile = "Dockerfile"
+  target     = "server"
   tags       = ["${REGISTRY}/home-automation-server:${TAG}"]
   platforms  = ["linux/amd64", "linux/arm64", "linux/arm/v7"]
   annotations = index_annotations(
@@ -50,7 +55,8 @@ target "server" {
 
 target "client" {
   context    = "."
-  dockerfile = "HomeAutomationClient/HomeAutomationClient.Browser/Dockerfile"
+  dockerfile = "Dockerfile"
+  target     = "client"
   tags       = ["${REGISTRY}/home-automation-client:${TAG}"]
   platforms  = ["linux/amd64", "linux/arm64", "linux/arm/v7", "linux/386"]
   annotations = index_annotations(
