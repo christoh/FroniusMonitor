@@ -125,9 +125,18 @@ public abstract class SqliteStoreBase
         return await ReadAsync(connection, sql, bind, map, token).ConfigureAwait(false);
     }
 
-    protected static async Task<IReadOnlyList<T>> ReadAsync<T>(SqliteConnection connection, string sql, Action<SqliteCommand> bind, Func<SqliteDataReader, T> map, CancellationToken token)
+    protected static Task<IReadOnlyList<T>> ReadAsync<T>(SqliteConnection connection, string sql, Action<SqliteCommand> bind, Func<SqliteDataReader, T> map, CancellationToken token) =>
+        ReadAsync(connection, transaction: null, sql, bind, map, token);
+
+    /// <summary>
+    ///     Reads one statement on a connection, optionally as part of a transaction that gives several statements the
+    ///     same snapshot. A chart is three queries - its row, series and points - and must not see a replacement
+    ///     between them.
+    /// </summary>
+    protected static async Task<IReadOnlyList<T>> ReadAsync<T>(SqliteConnection connection, SqliteTransaction? transaction, string sql, Action<SqliteCommand> bind, Func<SqliteDataReader, T> map, CancellationToken token)
     {
         await using var command = connection.CreateCommand();
+        command.Transaction = transaction;
         command.CommandText = sql;
         bind(command);
         var result = new List<T>();

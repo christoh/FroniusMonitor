@@ -136,7 +136,10 @@ Period`, `FetchedUtc`, captions), `SolarWebSeries (ChartId, Ordinal)`, `SolarWeb
 with `Value REAL NULL, Text TEXT NULL`. Point times are **milliseconds** as Solar.web sends them (the battery
 states carry seconds), unlike the seconds of the price history. A chart is replaced as a whole (delete the three
 tables' rows, insert again, one transaction) - no `ON DELETE CASCADE`, so it does not depend on the foreign-key
-pragma. `View` and `Interval` are SQL keywords, hence `ChartView`, `ChartInterval`.
+pragma. A chart is also **read** in one SQLite transaction (since 2026-09-22): its row, series and points come
+from one snapshot, so a reader sees either the old chart or its replacement, never an old row without the child
+rows that the replacement has deleted. `View` and `Interval` are SQL keywords, hence `ChartView`,
+`ChartInterval`.
 
 **Period** is the cache key's date: the day, the first of the month, 1 January, `DateOnly.MinValue` for GESAMT
 (`SolarWebPeriod.Normalize`). `SolarWebPeriod.EndUtc` is the instant a period was over in the system's zone

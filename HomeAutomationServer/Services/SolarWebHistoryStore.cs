@@ -97,8 +97,11 @@ public sealed class SolarWebHistoryStore : SqliteStoreBase, ISolarWebHistoryStor
     public async Task<SolarWebChart?> GetChartAsync(string pvSystemId, SolarWebInterval interval, SolarWebView view, DateOnly period, CancellationToken token = default)
     {
         await using var connection = await OpenAsync(token).ConfigureAwait(false);
+        // The chart is replaced as one transaction. Its row, series and points have to come from one snapshot too:
+        // a reader that saw the old row and then the new transaction could otherwise find no children for its old ID.
+        await using var transaction = (SqliteTransaction)await connection.BeginTransactionAsync(token).ConfigureAwait(false);
 
-        var charts = await ReadAsync(connection, "SELECT Id, FetchedUtc, IsPremiumFeature, Title, SumValue FROM SolarWebChart WHERE PvSystemId = $system AND ChartInterval = $interval AND ChartView = $view AND Period = $period", command =>
+        var charts = await ReadAsync(connection, transaction, "SELECT Id, FetchedUtc, IsPremiumFeature, Title, SumValue FROM SolarWebChart WHERE PvSystemId = $system AND ChartInterval = $interval AND ChartView = $view AND Period = $period", command =>
         {
             BindKey(command, pvSystemId, interval, view, period);
         }, reader => (Id: reader.GetInt64(0), Chart: new SolarWebChart
@@ -120,7 +123,7 @@ public sealed class SolarWebHistoryStore : SqliteStoreBase, ISolarWebHistoryStor
 
         var (id, chart) = charts[0];
 
-        var series = await ReadAsync(connection, "SELECT Ordinal, SeriesId, Name, Unit, ChartType, Color, SeriesIndex FROM SolarWebSeries WHERE ChartId = $id ORDER BY Ordinal", command =>
+        var series = await ReadAsync(connection, transaction, "SELECT Ordinal, SeriesId, Name, Unit, ChartType, Color, SeriesIndex FROM SolarWebSeries WHERE ChartId = $id ORDER BY Ordinal", command =>
         {
             command.Parameters.AddWithValue("$id", id);
         }, reader => (Ordinal: reader.GetInt32(0), Series: new SolarWebSeries
@@ -135,7 +138,7 @@ public sealed class SolarWebHistoryStore : SqliteStoreBase, ISolarWebHistoryStor
 
         var byOrdinal = series.ToDictionary(s => s.Ordinal, s => s.Series);
 
-        var points = await ReadAsync(connection, "SELECT Ordinal, TimeMs, Value, Text FROM SolarWebPoint WHERE ChartId = $id ORDER BY Ordinal, TimeMs", command =>
+        var points = await ReadAsync(connection, transaction, "SELECT Ordinal, TimeMs, Value, Text FROM SolarWebPoint WHERE ChartId = $id ORDER BY Ordinal, TimeMs", command =>
         {
             command.Parameters.AddWithValue("$id", id);
         }, reader => (Ordinal: reader.GetInt32(0), Point: new SolarWebPoint
@@ -151,6 +154,7 @@ public sealed class SolarWebHistoryStore : SqliteStoreBase, ISolarWebHistoryStor
         }
 
         chart.Series = [.. series.Select(s => s.Series)];
+        await transaction.CommitAsync(token).ConfigureAwait(false);
         return chart;
     }
 
