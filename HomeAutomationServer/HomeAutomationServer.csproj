@@ -44,4 +44,31 @@
 		<InternalsVisibleTo Include="HomeAutomationServerTests" />
 	</ItemGroup>
 
+	<!--
+		Hosting the browser client (see Program.cs): the client is HomeAutomationClient.Browser, a separate
+		Avalonia WebAssembly app that needs the wasm-tools workload to build. That workload is not something a
+		plain build, `dotnet test`, or the cloud sandbox has any reason to require, so publishing it is opt-in
+		via PublishClientApp, set by HomeAutomationServer/Dockerfile (`-p:PublishClientApp=true`) when it builds
+		the combined image. With PublishClientApp unset or false, these targets do nothing and this project
+		builds exactly as before.
+	-->
+	<PropertyGroup>
+		<PublishClientApp Condition="'$(PublishClientApp)' == ''">false</PublishClientApp>
+		<ClientBrowserProject>$(MSBuildThisFileDirectory)..\HomeAutomationClient\HomeAutomationClient.Browser\HomeAutomationClient.Browser.csproj</ClientBrowserProject>
+		<ClientPublishDir>$(MSBuildThisFileDirectory)obj\ClientPublish\</ClientPublishDir>
+	</PropertyGroup>
+
+	<Target Name="PublishClientWebAssembly" BeforeTargets="Publish" Condition="'$(PublishClientApp)' == 'true'">
+		<Exec Command="dotnet publish &quot;$(ClientBrowserProject)&quot; -c $(Configuration) -o &quot;$(ClientPublishDir)&quot;" />
+	</Target>
+
+	<!-- AfterTargets, not a Content/CopyToPublishDirectory item: the client is published (see above), not
+		 restored, so its files do not exist yet when MSBuild builds the Content item list. -->
+	<Target Name="CopyClientWebAssemblyToPublishDir" AfterTargets="Publish" Condition="'$(PublishClientApp)' == 'true'">
+		<ItemGroup>
+			<ClientWwwRootFiles Include="$(ClientPublishDir)wwwroot\**" />
+		</ItemGroup>
+		<Copy SourceFiles="@(ClientWwwRootFiles)" DestinationFolder="$(PublishDir)wwwroot\%(RecursiveDir)" SkipUnchangedFiles="true" />
+	</Target>
+
 </Project>

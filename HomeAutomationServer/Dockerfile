@@ -1,24 +1,33 @@
 # ----- Builder -----
 
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS builder
+# Not Alpine here (unlike the runtime stage below): publishing the browser client needs the wasm-tools workload,
+# which wants python3 and does not target musl. --platform=$BUILDPLATFORM still makes this the build machine's
+# native platform regardless of the image being built, so this choice has no effect on the runtime stage's arch.
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0 AS builder
 
 WORKDIR /build
 
 COPY . .
 
+RUN apt-get update -y && \
+    apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends python3 && \
+    dotnet workload install wasm-tools
+
 WORKDIR /build/HomeAutomationServer
 
-RUN apk --no-cache update && \
-    apk --no-cache upgrade && \
-    #dotnet workload update && \
-    rm -fr /build/Fronius/bin /build/Fronius/obj bin obj && \
+RUN rm -fr /build/Fronius/bin /build/Fronius/obj bin obj \
+    /build/HomeAutomationClient/HomeAutomationClient.Browser/bin /build/HomeAutomationClient/HomeAutomationClient.Browser/obj \
+    /build/HomeAutomationClient/HomeAutomationClient/bin /build/HomeAutomationClient/HomeAutomationClient/obj && \
     mkdir -p /runner/app && \
     # The price and weather history and the Solar.web chart cache; mount this folder to keep them across containers (see docker-compose.yml).
     mkdir -p /runner/app/history && \
     mkdir -p /runner/root && \
     mkdir -p /runner/home/app
 
-RUN dotnet publish -c Release -v=m -o /runner/app
+# PublishClientApp=true also publishes HomeAutomationClient.Browser and copies its wwwroot in here, so Program.cs
+# can serve it at "/" - see the matching target in HomeAutomationServer.csproj.
+RUN dotnet publish -c Release -v=m -p:PublishClientApp=true -o /runner/app
 
 WORKDIR /runner
 
@@ -169,6 +178,9 @@ RUN apk --no-cache update &&\
 WORKDIR /home/app
 USER app
 EXPOSE 1502/tcp
+# The web UI/API, and now the browser client hosted alongside it (see Program.cs and docker-compose.yml). This is
+# the base image's own default Kestrel HTTP port (ASPNETCORE_HTTP_PORTS=8080), not something set here.
+EXPOSE 8080/tcp
 
 ENTRYPOINT [ "/bin/ash", "-c" ]
 CMD [ "/startup.sh" ]
