@@ -235,6 +235,17 @@ internal class Program
         var app = builder.Build();
         app.UseResponseCompression();
 
+        // The browser client (HomeAutomationClient.Browser, published into wwwroot - see the "Publish client"
+        // target in HomeAutomationServer.csproj and the Dockerfile) is served straight from here, ahead of every
+        // other middleware. Static file middleware is not endpoint routing: a request it can answer short-circuits
+        // the pipeline right here and never reaches UseAuthentication/UseAuthorization below, so downloading the
+        // client itself needs no login - which matters, because logging in is only possible once the client has
+        // been downloaded. MapFallbackToFile is added further down, after the real endpoints, so the client's own
+        // in-app routes (e.g. /inverterdetails/Fronius/1234) resolve to index.html on a full page load instead of
+        // a 404.
+        app.UseDefaultFiles();
+        app.UseStaticFiles();
+
         // CORS has to run before authorization, and naming the two here is the only way to get that order:
         // WebApplication adds UseAuthentication and UseAuthorization by itself once the services are there, and it
         // adds them ahead of every middleware this method registers. A preflight carries no credentials, so the
@@ -260,6 +271,11 @@ internal class Program
         // The hub has a scheme of its own: a browser cannot set an Authorization header on a WebSocket handshake,
         // so the connection authenticates with a short-lived ticket instead. See HubTicketService.
         app.MapHub<HomeAutomationHub>("/hub").RequireAuthorization(policy => policy.RequireHubTicket());
+
+        // Lowest-priority endpoint: only requests that matched none of the above (i.e. the client's own routes)
+        // land here, so a full page load or reload of e.g. /inverterdetails/Fronius/1234 still gets the client's
+        // index.html instead of a 404. No effect where wwwroot has no client published into it.
+        app.MapFallbackToFile("index.html");
 
         IoC.Update(app.Services);
 

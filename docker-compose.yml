@@ -10,6 +10,10 @@ services:
     ports:
       # instead of 502 you can use your own port. However, many inverters only work with 502. Don't change 1502. This is the unprivileged port in the container
       - "502:1502"
+      # The web UI and API (the browser client, downloadable with no login, is served from here too - see
+      # home-automation-client below). 8080 is the container's default Kestrel HTTP port; change the host side
+      # freely, and set WebServerSettings/Urls in Settings.xml if you need to change the container side too.
+      - "8080:8080"
     restart: always
 #    volumes:
 #      - /d/Docker/HomeAutomationServer/Settings.xml:/app/Settings.xml # Map to the Settings.xml file on the Docker host
@@ -20,5 +24,7 @@ services:
 #      - HOME_AUTOMATION_SECRET=Djd./.ed$0|ks.c!eii\e6 # Choose your very own and unique secret. Use the same secret on your computer where you set the passwords for the Settings.xml file
 #      - TZ=Europe/Berlin # The local time of the price chart's polling windows, unless TimeZoneId is set in Settings.xml
 
+  # Optional now that home-automation-server hosts the same browser client itself at "/": keep this only if you
+  # want the client served from its own container (e.g. behind a separate domain, or scaled independently).
   home-automation-client:
     image: ghcr.io/christoh/home-automation-client:latest
