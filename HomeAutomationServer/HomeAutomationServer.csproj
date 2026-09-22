@@ -69,6 +69,12 @@
 			<ClientWwwRootFiles Include="$(ClientPublishDir)wwwroot\**" />
 		</ItemGroup>
 		<Copy SourceFiles="@(ClientWwwRootFiles)" DestinationFolder="$(PublishDir)wwwroot\%(RecursiveDir)" SkipUnchangedFiles="true" />
+
+		<!-- app.MapStaticAssets() (see Program.cs) reads "<entry assembly>.staticwebassets.endpoints.json" next
+			 to the running app's own dll. The Avalonia WebAssembly SDK wrote this manifest for its own assembly
+			 name, so it is copied under this project's name instead of that one - the manifest itself does not
+			 care, its paths are already relative to wwwroot. -->
+		<Copy SourceFiles="$(ClientPublishDir)HomeAutomationClient.Browser.staticwebassets.endpoints.json" DestinationFiles="$(PublishDir)$(AssemblyName).staticwebassets.endpoints.json" />
 	</Target>
 
 </Project>
