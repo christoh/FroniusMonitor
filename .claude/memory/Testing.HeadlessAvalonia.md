@@ -113,7 +113,10 @@ reason, which is worth knowing before trying one.
 | `GaugeDialTests` | `Gauge.DialShowsAbsoluteValue` on both kinds of gauge: the needle and the bar at the amount, the value and the printed number with their sign left alone. Setting the switch recomputes without the animation, which is what makes either readable in a test at all |
 | `GaugeColoringTests` | "Always fully color gauges" reaching a gauge in a window with no `MainView` above it, which is where the desktop puts a detail page - see [[DialogSystem.Lifecycle]] |
 | `SolarWebChartViewTests` | The empty Solar.web plot in dark mode uses `DialogBackground` rather than ScottPlot's white, before a chart has arrived - see [[SolarWeb]] |
+| `ChartTextTests` | ScottPlot draws the translations' accented letters as written: the Inter it gets from `InterFontResolver` has a glyph for every non-ASCII character of every culture, and `é` renders unlike `e`, `è`, a missing glyph and the double encoded `Ã©`. Real pixels, although the headless platform draws nothing: ScottPlot renders through Skia itself, and the headless session is only there because the font is an `avares://` asset. Settles that the double encoded strings found on 2026-09-23 are not something the charts need |
 | `HeadlessSmokeTest` | That the session is up at all - look here first when the whole collection fails |
 
 **Not covered, and not coverable here:** real touch input, so the pinch recognizer itself is untested; and how any
-of it looks, which only running the app shows.
+of it looks, which only running the app shows - apart from what ScottPlot draws, which `ChartTextTests` compares
+pixel by pixel. A test string with a non-ASCII character goes into the source as a `\u` escape, never as the
+character itself: an invisible private use character written literally is indistinguishable from nothing.
