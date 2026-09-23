@@ -275,10 +275,8 @@ internal class Program
         // so the connection authenticates with a short-lived ticket instead. See HubTicketService.
         app.MapHub<HomeAutomationHub>("/hub").RequireAuthorization(policy => policy.RequireHubTicket());
 
-        // Lowest-priority endpoint: only requests that matched none of the above (i.e. the client's own routes)
-        // land here, so a full page load or reload of e.g. /inverterdetails/Fronius/1234 still gets the client's
-        // index.html instead of a 404. No effect where wwwroot has no client published into it.
-        app.MapFallbackToFile("index.html");
+        // Lowest priority: the client's index.html for a path of its own, never for one below /api or /hub.
+        app.MapBrowserClientFallback();
 
         IoC.Update(app.Services);
 

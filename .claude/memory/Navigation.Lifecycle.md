@@ -11,6 +11,8 @@ paths:
   - HomeAutomationClient/HomeAutomationClient.Browser/wwwroot/uri.js
   - HomeAutomationClient/HomeAutomationClient.Browser/wwwroot/main.js
   - HomeAutomationClient/HomeAutomationClient.Browser/wwwroot/index.html
+  - HomeAutomationServer/Misc/BrowserClientHosting.cs
+  - HomeAutomationServerTests/UnitTests/Hosted/BrowserClientFallbackTests.cs
 ---
 
 # Lifecycle contract: navigation and the address of a view
@@ -144,6 +146,23 @@ Two things, both about a **deep link**, and both easy to break again:
 **The web server must serve `index.html` for an unknown path** (SPA fallback), otherwise a deep link is a 404
 before any of this runs. Verified on the live site: `https://home.hochstaetter.de/inverterdetails/...` answers
 200 with the app.
+
+On the server that is `BrowserClientHosting.MapBrowserClientFallback`, which `Program.cs` maps last. **Except
+below `/api` and `/hub`** (`BrowserClientHosting.ServerSegments`): an unknown path there is a 404, not the client
+(asked for by the developer on 2026-09-23). Before, a mistyped API call answered 200 with `index.html`, which a
+caller expecting JSON only noticed when it failed to parse it. It is done with two more fallbacks,
+`/api/{**path}` and `/hub/{**path}`, answering `Results.NotFound()`: every real endpoint still wins over a
+fallback, and among the fallbacks the one with the literal segment wins over the client's catch-all. Two things
+that look like simpler ways and are not:
+
+- A regex constraint on the client's own fallback (`{*path:nonfile:regex(^(?!(api|hub)(/|$)))}`) stopped serving
+  `/` at all: a catch-all with no value fails a regex constraint, so the root of the app became a 404.
+- Neither way gives a 405 for a known endpoint called with the wrong method. The fallback takes any method, so
+  that routing never sees an endpoint left over to refuse the method; it is a 404, as it used to be the client.
+
+A client path that merely starts with the letters (`/apiary`) is still the client's; only the whole first
+segment counts, whatever its case. `BrowserClientFallbackTests` covers both sides over a real Kestrel host with a
+wwwroot of its own.
 
 ## The heads without an address bar
 
