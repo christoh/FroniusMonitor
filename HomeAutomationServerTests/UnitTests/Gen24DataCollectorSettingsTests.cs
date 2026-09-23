@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
-using System.Xml.Serialization;
 using De.Hochstaetter.Fronius.Models.Settings;
 using De.Hochstaetter.HomeAutomationServer.Models.Settings;
+using De.Hochstaetter.HomeAutomationServerTests.UnitTests.Fakes;
 
 namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests;
 
@@ -24,8 +24,8 @@ public sealed class Gen24DataCollectorSettingsTests
             },
         };
 
-        var xml = Serialize(settings);
-        var back = Deserialize(xml);
+        var xml = SettingsXml.Serialize(settings);
+        var back = SettingsXml.Deserialize(xml);
 
         Assert.Contains("<Gen24DataCollector ", xml);
         Assert.Contains("RefreshRate=\"PT30S\"", xml);
@@ -39,8 +39,8 @@ public sealed class Gen24DataCollectorSettingsTests
     [Fact]
     public void Defaults_are_left_out_and_come_back_as_defaults()
     {
-        var xml = Serialize(new Settings());
-        var back = Deserialize(xml);
+        var xml = SettingsXml.Serialize(new Settings());
+        var back = SettingsXml.Deserialize(xml);
 
         Assert.Contains("<Gen24DataCollector", xml);
         Assert.DoesNotContain("RefreshRate", xml);
@@ -54,22 +54,9 @@ public sealed class Gen24DataCollectorSettingsTests
     [Fact]
     public void Connections_are_not_part_of_the_element()
     {
-        var xml = Serialize(new Settings { Gen24Connections = [new WebConnection { BaseUrl = "http://192.168.1.1" }] });
+        var xml = SettingsXml.Serialize(new Settings { Gen24Connections = [new WebConnection { BaseUrl = "http://192.168.1.1" }] });
         var element = Regex.Match(xml, "<Gen24DataCollector[^>]*/?>").Value;
 
         Assert.DoesNotContain("Connections", element);
-    }
-
-    private static string Serialize(Settings settings)
-    {
-        using var writer = new StringWriter();
-        new XmlSerializer(typeof(Settings)).Serialize(writer, settings);
-        return writer.ToString();
-    }
-
-    private static Settings Deserialize(string xml)
-    {
-        using var reader = new StringReader(xml);
-        return (Settings)new XmlSerializer(typeof(Settings)).Deserialize(reader)!;
     }
 }

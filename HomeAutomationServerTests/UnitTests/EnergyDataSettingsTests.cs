@@ -1,7 +1,7 @@
-using System.Xml.Serialization;
 using De.Hochstaetter.Fronius.Models.Charging;
 using De.Hochstaetter.Fronius.Models.Settings;
 using De.Hochstaetter.HomeAutomationServer.Models.Settings;
+using De.Hochstaetter.HomeAutomationServerTests.UnitTests.Fakes;
 
 namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests;
 
@@ -29,8 +29,8 @@ public sealed class EnergyDataSettingsTests
             },
         };
 
-        var xml = Serialize(settings);
-        var back = Deserialize(xml);
+        var xml = SettingsXml.Serialize(settings);
+        var back = SettingsXml.Deserialize(xml);
 
         Assert.Contains("<EnergyData ", xml);
         Assert.Contains("Bearer=\"token\"", xml);
@@ -51,8 +51,8 @@ public sealed class EnergyDataSettingsTests
     [Fact]
     public void Defaults_are_left_out_and_come_back_as_defaults()
     {
-        var xml = Serialize(new Settings { EnergyData = new EnergyDataSettings() });
-        var back = Deserialize(xml);
+        var xml = SettingsXml.Serialize(new Settings { EnergyData = new EnergyDataSettings() });
+        var back = SettingsXml.Deserialize(xml);
 
         Assert.Contains("<EnergyData", xml);
         Assert.DoesNotContain("SurchargeCentsPerKiloWattHour", xml);
@@ -71,24 +71,11 @@ public sealed class EnergyDataSettingsTests
     [Fact]
     public void A_file_without_the_section_has_none_and_an_unknown_zone_falls_back_to_the_local_one()
     {
-        var back = Deserialize(Serialize(new Settings()));
+        var back = SettingsXml.Deserialize(SettingsXml.Serialize(new Settings()));
         Assert.Null(back.EnergyData);
 
         var settings = new EnergyDataSettings { TimeZoneId = "Mars/Olympus_Mons" };
         Assert.Equal(TimeZoneInfo.Local.Id, settings.ResolveTimeZone().Id);
         Assert.Equal("Europe/Berlin", new EnergyDataSettings { TimeZoneId = "Europe/Berlin" }.ResolveTimeZone().Id);
-    }
-
-    private static string Serialize(Settings settings)
-    {
-        using var writer = new StringWriter();
-        new XmlSerializer(typeof(Settings)).Serialize(writer, settings);
-        return writer.ToString();
-    }
-
-    private static Settings Deserialize(string xml)
-    {
-        using var reader = new StringReader(xml);
-        return (Settings)new XmlSerializer(typeof(Settings)).Deserialize(reader)!;
     }
 }

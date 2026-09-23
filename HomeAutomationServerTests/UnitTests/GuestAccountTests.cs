@@ -1,4 +1,3 @@
-using System.Xml.Serialization;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using De.Hochstaetter.HomeAutomationServer.Models.Settings;
 using De.Hochstaetter.HomeAutomationServerTests.UnitTests.Fakes;
@@ -16,18 +15,18 @@ public sealed class GuestAccountTests
     {
         // Written even when it holds its default, so that a server's answer to this is in Settings.xml and not
         // implied by the absence of an element nobody knew to look for.
-        Assert.Contains("<EnableGuestAccount>true</EnableGuestAccount>", Serialize(new Settings()));
-        Assert.Contains("<EnableGuestAccount>false</EnableGuestAccount>", Serialize(new Settings { EnableGuestAccount = false }));
+        Assert.Contains("<EnableGuestAccount>true</EnableGuestAccount>", SettingsXml.Serialize(new Settings()));
+        Assert.Contains("<EnableGuestAccount>false</EnableGuestAccount>", SettingsXml.Serialize(new Settings { EnableGuestAccount = false }));
     }
 
     [Fact]
     public void The_setting_round_trips_and_a_file_that_predates_it_keeps_the_account()
     {
-        Assert.False(Deserialize(Serialize(new Settings { EnableGuestAccount = false })).EnableGuestAccount);
-        Assert.True(Deserialize(Serialize(new Settings())).EnableGuestAccount);
+        Assert.False(SettingsXml.Deserialize(SettingsXml.Serialize(new Settings { EnableGuestAccount = false })).EnableGuestAccount);
+        Assert.True(SettingsXml.Deserialize(SettingsXml.Serialize(new Settings())).EnableGuestAccount);
 
         // A Settings.xml written before the element existed reads as the behaviour that file had.
-        Assert.True(Deserialize("<Settings><ServerPort>1502</ServerPort></Settings>").EnableGuestAccount);
+        Assert.True(SettingsXml.Deserialize("<Settings><ServerPort>1502</ServerPort></Settings>").EnableGuestAccount);
     }
 
     [Fact]
@@ -87,18 +86,5 @@ public sealed class GuestAccountTests
 
         Assert.Null(users.Find("mallory"));
         Assert.Null(users.Find(null));
-    }
-
-    private static string Serialize(Settings settings)
-    {
-        using var writer = new StringWriter();
-        new XmlSerializer(typeof(Settings)).Serialize(writer, settings);
-        return writer.ToString();
-    }
-
-    private static Settings Deserialize(string xml)
-    {
-        using var reader = new StringReader(xml);
-        return (Settings)new XmlSerializer(typeof(Settings)).Deserialize(reader)!;
     }
 }
