@@ -267,8 +267,11 @@ data: `DeviceVisibility` does not list it for guests.
   id without one stays where Solar.web listed it; `areaspline` stacked as areas, `spline` as lines with
   `NaN` gaps where Solar.web sent `null`, `%` on a right axis 0-100); month, year and GESAMT are **categorical**,
   one column per date stacked in series order, the columns labelled by day of month, abbreviated month or year -
-  Solar.web stamps them at midnight UTC and they are read as dates, never converted. Bubbles (`BattOperatingState`)
-  are not drawn. **Colours**: a fixed palette **by series id** wins (`SolarWebChartModel.knownColors`: the two
+  Solar.web stamps them at midnight UTC and they are read as dates, never converted. Because the day is the
+  **client's local** one, a test of a day chart derives its instants from the zone it runs in
+  (`SolarWebChartModelTests.sep19Midnight`): a written-down 22:00Z is midnight only in summer time in Central
+  Europe, and two tests failed in the UTC cloud container for that reason until 2026-09-23. Bubbles
+  (`BattOperatingState`) are not drawn. **Colours**: a fixed palette **by series id** wins (`SolarWebChartModel.knownColors`: the two
   battery series green, `FromGenToConsumer` yellow, `ToConsumer` **orange** although Solar.web draws it light
   blue, `PvForecastTruncated` **light blue** (#70AFCD, Solar.web's consumption blue) although Solar.web hatches
   it yellow - the developer's choices of 2026-09-20; the rest Solar.web's own), then Solar.web's colour where it

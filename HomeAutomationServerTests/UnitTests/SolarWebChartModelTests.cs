@@ -13,6 +13,14 @@ public sealed class SolarWebChartModelTests
 {
     private static readonly DateTime sep1 = new(2026, 9, 1, 0, 0, 0, DateTimeKind.Utc);
 
+    /// <summary>
+    /// The start of the day chart of 19 September as Solar.web sends it: local midnight, in UTC. Derived from the
+    /// time zone the tests run in rather than written down, because the model cuts the chart to the local day - a
+    /// fixed 22:00 UTC is midnight only in Central European Summer Time, and on a machine in UTC it put every point
+    /// on the evening before, outside the chart.
+    /// </summary>
+    private static readonly DateTime sep19Midnight = new DateTime(2026, 9, 19, 0, 0, 0, DateTimeKind.Local).ToUniversalTime();
+
     [Fact]
     public void A_month_chart_is_categorical_with_one_column_per_day_stacked_in_series_order()
     {
@@ -99,7 +107,7 @@ public sealed class SolarWebChartModelTests
     [Fact]
     public void A_day_chart_runs_over_local_time_with_areas_stacked_lines_gapped_and_the_state_of_charge_on_the_right()
     {
-        var midnight = new DateTime(2026, 9, 18, 22, 0, 0, DateTimeKind.Utc);
+        var midnight = sep19Midnight;
 
         var chart = new SolarWebChart
         {
@@ -225,7 +233,7 @@ public sealed class SolarWebChartModelTests
     [Fact]
     public void The_tooltip_of_a_day_chart_snaps_to_the_nearest_five_minutes_and_writes_watts_as_kilowatts()
     {
-        var midnight = new DateTime(2026, 9, 18, 22, 0, 0, DateTimeKind.Utc);
+        var midnight = sep19Midnight;
 
         var chart = new SolarWebChart
         {
