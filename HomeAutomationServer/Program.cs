@@ -3,13 +3,11 @@ using System.Text.Json;
 using De.Hochstaetter.Fronius.Crypto;
 using De.Hochstaetter.HomeAutomationServer.Hubs;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.ResponseCompression;
 using Serilog.Sinks.SystemConsole.Themes;
-using AuthenticationService = De.Hochstaetter.HomeAutomationServer.Services.AuthenticationService;
 
 namespace De.Hochstaetter.HomeAutomationServer;
 
@@ -211,6 +209,7 @@ internal class Program
                 {
                     u.Users = settings.Users;
                     u.EnableGuestAccount = settings.EnableGuestAccount;
+                    u.Authentication = settings.Authentication;
                 });
         }
 
@@ -225,7 +224,7 @@ internal class Program
             });
 
         builder.Services.AddOpenApi();
-        builder.Services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, AuthenticationService>("Basic", null);
+        builder.Services.AddApiAuthentication();
         builder.Services.AddHubTicketAuthentication();
         builder.Services.AddHomeAutomationSignalR();
 
@@ -247,7 +246,8 @@ internal class Program
         app.UseAuthentication();
         app.UseAuthorization();
 
-        app.MapOpenApi().RequireAuthorization(r => r.RequireRole("Developer"));
+        // The scheme is named because there is no default one to fall back on: two are registered, the API's and the hub's.
+        app.MapOpenApi().RequireAuthorization(r => r.AddAuthenticationSchemes(ApiAuthenticationService.SchemeName).RequireRole("Developer"));
 
         app.UseRequestLocalization(options =>
         {
@@ -324,6 +324,7 @@ internal class Program
         }
 
         LogGuestAccount(settings, logger);
+        LogAuthentication(settings.Authentication, logger);
 
         await server.StartAsync().ConfigureAwait(false);
         var fritzBoxDataCollector = IoC.Get<FritzBoxDataCollector>();
@@ -377,6 +378,36 @@ internal class Program
             (
                 "{FileName} has a user named \"{UserName}\", which the built-in guest account hides: that user cannot log in while EnableGuestAccount is true. Rename the user, or switch the account off.",
                 Settings.SettingsFileName, User.Guest.Username
+            );
+        }
+    }
+
+    /// <summary>
+    /// Says in the log how long a bearer token lives, and warns about each of the debugging schemes that is
+    /// switched on: they are meant to be switched off again, and a warning at every start is what reminds anybody.
+    /// </summary>
+    internal static void LogAuthentication(AuthenticationSettings settings, ILogger logger)
+    {
+        if (logger.IsEnabled(LogLevel.Information))
+        {
+            logger.LogInformation("Bearer tokens are valid for {Minutes} minutes", settings.BearerTokenLifetime.TotalMinutes);
+        }
+
+        if (settings.EnableBasicAuthentication && logger.IsEnabled(LogLevel.Warning))
+        {
+            logger.LogWarning
+            (
+                "Basic authentication is on: a request may carry the user name and password with it. It is meant for debugging; set EnableBasicAuthentication to false in {FileName} to switch it off.",
+                Settings.SettingsFileName
+            );
+        }
+
+        if (settings.EnableCookieAuthentication && logger.IsEnabled(LogLevel.Warning))
+        {
+            logger.LogWarning
+            (
+                "Cookie authentication is on: logging in also sets a cookie holding the bearer token. It is meant for debugging; set EnableCookieAuthentication to false in {FileName} to switch it off.",
+                Settings.SettingsFileName
             );
         }
     }

@@ -99,9 +99,9 @@ public sealed partial class UserManagementViewModel(DialogParameters parameters)
         if (mainViewModel.User is { } me && string.Equals(me.UserName, originalUserName, StringComparison.OrdinalIgnoreCase))
         {
             // The administrator changed their own account. The menu bar shows the new name and roles right away.
-            // A new name or password, though, has to be logged in with at once: the server checks the credentials
-            // on every call, and the Basic Auth header the client still sends is the one for the old account,
-            // which stopped being valid the moment the change was saved.
+            // A new name or password, though, has to be logged in with at once: a new password ends every session
+            // of the account on the server, and the credentials the client would log in again with after a
+            // restart of the server are the ones of the old account.
             mainViewModel.User = updated;
 
             if (account.Password is { } newPassword || !string.Equals(originalUserName, updated.UserName, StringComparison.OrdinalIgnoreCase))

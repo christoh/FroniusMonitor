@@ -15,4 +15,10 @@ public class UserList : AuthenticationSchemeOptions
     /// takes a restart of the server, which is what editing <c>Settings.xml</c> means anyway.
     /// </remarks>
     public bool EnableGuestAccount { get; set; } = true;
+
+    /// <summary>
+    /// <see cref="Settings.Authentication"/>, as the authentication code sees it: the very object the settings own,
+    /// like <see cref="Users"/>. Only a hand edited <c>Settings.xml</c> changes it, so a change takes a restart.
+    /// </summary>
+    public AuthenticationSettings Authentication { get; set; } = new();
 }

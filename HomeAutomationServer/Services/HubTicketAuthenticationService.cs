@@ -7,7 +7,7 @@ namespace De.Hochstaetter.HomeAutomationServer.Services;
 
 /// <summary>
 /// Authenticates a SignalR connection by the ticket it brings along. See <see cref="HubTicketService"/> for why the
-/// hub has a scheme of its own instead of taking the Basic credentials of the rest of the API.
+/// hub has a scheme of its own instead of taking the bearer token of the rest of the API.
 /// </summary>
 public sealed class HubTicketAuthenticationService(
     HubTicketService tickets,
@@ -22,7 +22,7 @@ public sealed class HubTicketAuthenticationService(
     {
         // WebSockets carry the ticket in the query string, because no header can be set on the handshake. Negotiate
         // and long polling are ordinary HTTP requests, where SignalR sends the same value as a bearer token.
-        var ticket = Request.Query["access_token"].FirstOrDefault() ?? BearerToken();
+        var ticket = Request.Query["access_token"].FirstOrDefault() ?? ApiAuthenticationService.GetCredentials(Request.Headers.Authorization.ToString(), "Bearer");
 
         if (string.IsNullOrEmpty(ticket))
         {
@@ -43,8 +43,4 @@ public sealed class HubTicketAuthenticationService(
 
         return Task.FromResult(AuthenticateResult.Success(user.CreateAuthenticationTicket(Scheme.Name)));
     }
-
-    private string? BearerToken() => Request.Headers.Authorization.ToString() is { } header && header.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)
-        ? header["Bearer ".Length..]
-        : null;
 }

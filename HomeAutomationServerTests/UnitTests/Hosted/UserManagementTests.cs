@@ -4,9 +4,8 @@ using De.Hochstaetter.HomeAutomationClient.Services;
 using De.Hochstaetter.HomeAutomationServer.Controllers;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using De.Hochstaetter.HomeAutomationServer.Models.Settings;
-using BasicAuthenticationService = De.Hochstaetter.HomeAutomationServer.Services.AuthenticationService;
+using De.Hochstaetter.HomeAutomationServer.Services;
 using De.Hochstaetter.HomeAutomationServerTests.UnitTests.Fakes;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
@@ -19,7 +18,7 @@ using Microsoft.AspNetCore.Hosting.Server.Features;
 namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests.Hosted;
 
 /// <summary>
-/// The user endpoints of <see cref="IdentityController"/>, end to end: a Kestrel host with the real Basic
+/// The user endpoints of <see cref="IdentityController"/>, end to end: a Kestrel host with the real API
 /// authentication, and the client's own <see cref="WebClientService"/> talking to it, so the JSON shapes of both
 /// sides are proven against each other and not against a test's idea of them.
 /// </summary>
@@ -51,7 +50,7 @@ public sealed class UserManagementTests : IAsyncLifetime
         builder.Services.AddSingleton(settings);
         builder.Services.Configure<UserList>(u => u.Users = settings.Users);
         builder.Services.AddControllers().AddApplicationPart(typeof(IdentityController).Assembly);
-        builder.Services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, BasicAuthenticationService>("Basic", null);
+        builder.Services.AddApiAuthentication();
 
         app = builder.Build();
         app.MapControllers();
@@ -237,8 +236,8 @@ public sealed class UserManagementTests : IAsyncLifetime
     }
 
     /// <summary>
-    /// The same, for an administrator renaming themselves - the request is authenticated with the very credentials
-    /// the rename invalidates, so it is worth proving the change still lands in the file.
+    /// The same, for an administrator renaming themselves - the request is authenticated as the very name the
+    /// rename takes away, so it is worth proving the change still lands in the file.
     /// </summary>
     [Fact]
     public async Task An_administrator_renaming_themselves_is_written_to_the_settings_file()

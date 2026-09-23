@@ -57,7 +57,9 @@ public sealed class EnergyDataSettingsTests
         Assert.Contains("<EnergyData", xml);
         Assert.DoesNotContain("SurchargeCentsPerKiloWattHour", xml);
         Assert.DoesNotContain("VatRatePercent", xml);
-        Assert.DoesNotContain("Bearer", xml);
+        // The attribute of EnergyData, not anything with the word in it: the Authentication element has a
+        // BearerTokenLifetimeMinutes of its own, which is always written.
+        Assert.DoesNotContain(" Bearer=", xml);
         Assert.NotNull(back.EnergyData);
         Assert.Equal(1.5m, back.EnergyData.SurchargeCentsPerKiloWattHour);
         Assert.Equal(0.19m, back.EnergyData.VatRate);

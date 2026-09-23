@@ -18,7 +18,7 @@ paths:
   - HomeAutomationServer/Models/Authorization/UserList.cs
   - HomeAutomationServer/Models/Authorization/AuthorizationExtensions.cs
   - HomeAutomationServer/Models/Settings/Settings.cs
-  - HomeAutomationServer/Services/AuthenticationService.cs
+  - HomeAutomationServer/Services/ApiAuthenticationService.cs
   - HomeAutomationServer/Program.cs
   - Fronius/Localization/Resources.resx
   - Fronius/Localization/Resources.Designer.cs
@@ -59,10 +59,10 @@ looks before the first login (`IsReady = false`, `MainViewContent = null`), tear
 login dialog again through `LoginAndStartAsync` - the private method `Initialize()` now calls too, so there is
 one login flow, not two. Order matters: `IUpdateService.StopAsync` closes the hub connection **before** it clears
 `Inverters`/`AllPowerConsumers`/etc., so nothing the hub might still deliver races the clearing and repopulates a
-collection the login screen is about to hide anyway. `IWebClientService.Logout` clears the `Authorization` header
-the `HttpClient` carries (regardless of whether the server could be reached) and calls `GET Identity/logout`,
-which now answers `Ok(true)` - it used to answer `Ok()` with no body, harmless while nothing called it, but a typed
-`ApiResult<bool>` needs something to deserialize. **Logging out forgets the stored credentials** (since
+collection the login screen is about to hide anyway. `IWebClientService.Logout` calls `GET Identity/logout`, which
+revokes the bearer token the request carries and answers `Ok(true)` - it used to answer `Ok()` with no body,
+harmless while nothing called it, but a typed `ApiResult<bool>` needs something to deserialize - and then drops the
+token and the password the client holds, regardless of whether the server could be reached. **Logging out forgets the stored credentials** (since
 2026-09-23, at the developer's request): `StoredConnection.ForgetAsync` removes `CacheKeys.Connection` - user name
 and encrypted password - through `ICache.RemoveAsync`, so the login box comes up empty and the next start does not
 log the previous user in. The server address (`CacheKeys.ApiUri`/`HubUri`) is **kept**: it is not a credential, and
@@ -79,14 +79,14 @@ the attempt would put the user who has just logged out straight back in.
 
 `SettingsItems` puts `UserManagementEntry.Instance` in the list unconditionally, not only for an administrator.
 This looks wrong and isn't: the client is not where user management is secured. Every endpoint in
-`IdentityController` carries `[BasicAuthorize(Roles = nameof(Roles.Administrator))]`, and that is the only check
+`IdentityController` carries `[ApiAuthorize(Roles = nameof(Roles.Administrator))]`, and that is the only check
 that has to hold. Showing the entry to a non-administrator just means they get a clean "403 Forbidden" message box
 (`ViewModelBase.ShowHttpError`) instead of the menu item quietly not being there - which is exactly what makes it
 possible to test the server-side enforcement from an ordinary account instead of having to demote an admin first.
 
 Do not reintroduce a role check around the entry in `SettingsItems` to "clean up" the menu. If the product one day
 wants the entry hidden from non-administrators again, that is a deliberate UX change to ask for, not a bug fix -
-and the server-side `[BasicAuthorize]` must stay regardless.
+and the server-side `[ApiAuthorize]` must stay regardless.
 
 **Guests are the one exception, and it is a different thing.** Since 2026-09-14 `MainView.axaml` binds the whole
 Settings button to `MainViewModel.ShowSettingsMenu`, which is `User.Roles.SeesAllDevices()` - false for a login that
@@ -105,8 +105,10 @@ to, which may be unchanged. `IdentityController.UpdateUser` rejects a new name a
 On the client, `UserEditorViewModel.UserName` is editable in both add and edit mode (no `IsNew` gate). If an
 administrator renames themselves, `UserManagementViewModel.Edit()` keeps the *original* name to key the PUT call,
 then logs back in with whichever is the new identity (name and/or password) once the server confirms the change,
-via `StoredConnection.SaveAsync` - the Basic Auth header the client was using stops working the instant the server
-saves the change, so this has to happen before any further call.
+via `StoredConnection.SaveAsync`. A new password ends every session of the account on the server the instant the
+change is saved, and after a rename the credentials `WebClientService` would log in again with after a server
+restart are those of the old name - so this has to happen before any further call. (A rename alone keeps the
+bearer token valid: see `Authentication.BearerTokens.md`.)
 
 `SaveAsync` asks the server for the AES key belonging to the (possibly new) user name, and answers with a
 `ProblemDetails` where that failed. It then writes **nothing**: a connection encrypted with the old key and read
@@ -127,7 +129,7 @@ nothing again, read the request body in the server log (`UpdateUser` logs the re
 
 `IdentityController.DeleteUser` rejects `userName` equal (ordinal, case-insensitive) to `HttpContext.User.Identity.Name`
 with `422 Unprocessable Entity`. This has replaced `IsLastAdministrator` as the guard against deleting away the last
-administrator: deletion is already restricted to administrators (`[BasicAuthorize(Roles = nameof(Roles.Administrator))]`),
+administrator: deletion is already restricted to administrators (`[ApiAuthorize(Roles = nameof(Roles.Administrator))]`),
 so the only way the sole remaining administrator could ever be deleted is by themselves - a second administrator
 would have to exist to delete the first one, and deleting *that* one still leaves the second. Blocking self-delete
 therefore makes it impossible to reach zero administrators through deletion, without needing to count administrators
@@ -173,8 +175,10 @@ client never sent it", and that has to be readable from the server log without a
 
 `User.Authenticate` first checks an in-memory `passwordCache` (the plaintext password from the last successful
 authentication on this `User` instance) before falling back to recomputing the SHA3-512 hash. This is a deliberate
-performance trade-off, not an oversight: Basic Auth resends credentials on every request, and the server would
-otherwise re-hash on every single API call from every logged-in client. Holding one cleartext password per `User`
+performance trade-off, not an oversight. It was made for Basic Auth, which resends credentials on every request;
+since the bearer tokens the password is only checked at login - and on every request only where
+`EnableBasicAuthentication` is switched on for debugging - so it matters much less now. It was left in place
+with the change to bearer tokens rather than removed as part of it. Holding one cleartext password per `User`
 object in server memory (never persisted, cleared whenever `PasswordHash` or `Salt` is set) is the accepted cost.
 Do not flag this as a credential-storage bug.
 
@@ -196,7 +200,7 @@ and tells the two empty-handed states apart:
   with `SetPassword`, so only the hash reaches the file like any other.
 - **Users, but none with `Roles.Administrator`**, is a mistake, and the server logs an **error and exits with
   code 2**. It cannot be repaired from a client: every endpoint that could grant the role is itself behind
-  `[BasicAuthorize(Roles = nameof(Roles.Administrator))]`, so the only way out is a text editor and
+  `[ApiAuthorize(Roles = nameof(Roles.Administrator))]`, so the only way out is a text editor and
   `Settings.xml`. Do **not** "helpfully" create the default administrator here as well - that would hand a login
   to anyone who can read the log, on a server that already has real accounts on it.
 
@@ -209,8 +213,9 @@ covers both branches, including that the default administrator is never smuggled
 ### `UserList` is a live view of `Settings.Users`, not a copy
 
 `UserList : AuthenticationSchemeOptions` exists only so ASP.NET's options system (`IOptionsMonitor<UserList>`) can
-hand the same user collection to the authentication handler (`AuthenticationService`), `HubTicketService`/
-`HubTicketAuthenticationService`, and `IdentityController`. `Program.cs` wires it up with
+hand the same user collection to the authentication handler (`ApiAuthenticationService`), `BearerTokenService`,
+`HubTicketService`/`HubTicketAuthenticationService`, and `IdentityController`. It carries
+`Settings.Authentication` the same way. `Program.cs` wires it up with
 `.Configure<UserList>(u => { u.Users = settings.Users; })` - this assigns the *same* `HashSet<User>` reference that
 `Settings` owns, it does not clone it. That is why `IdentityController.AddUser`/`UpdateUser`/`DeleteUser` mutate
 `userDb.CurrentValue.Users` directly (`.Add`, `.Remove`, or property setters on a `User` found in it) and then call
@@ -249,7 +254,7 @@ nowhere and repairable by nobody.
 not a theory: `IdentityController` knew about the guest while `HubTicketService.Validate` did not, so a guest was
 issued a hub ticket that the hub then refused, and a guest who had logged in successfully saw nothing at all. The
 callers are `IdentityController.FindUser`, `IdentityController.RequestKey`,
-`AuthenticationService.HandleAuthenticateAsync` and `HubTicketService.Validate`. `Find` takes the first match, not
+`ApiAuthenticationService.HandleAuthenticateAsync`, `BearerTokenService.Validate` and `HubTicketService.Validate`. `Find` takes the first match, not
 the single one, because two users of one name is a hand edited `Settings.xml` and failing every authenticated
 request - including the ones needed to repair it - is the worse answer to that.
 
@@ -261,16 +266,11 @@ restart. A salt has nothing to protect when the password is a constant in the sa
 `UnitTests/GuestAccountTests` covers the setting, its round trip through Settings.xml and both meanings of the
 name; `UnitTests/HubTicketServiceTests` pins the lookup that broke.
 
-### Login and the `auth` cookie carry the password in the clear (by design, over HTTPS)
+### Logging in: a bearer token, not the password on every request
 
-`IdentityController.Login` and `AuthenticationService.HandleAuthenticateAsync` both work with Basic Auth
-credentials (`user:password` base64-encoded), and `Login` stores that same Base64 string in a cookie so the browser
-resends it automatically. The server never stores or logs the plaintext password - it only ever computes
-`Authenticate(password)` against the hash - but the wire format is standard HTTP Basic Auth, which is why this
+Replaced on 2026-09-23. The client posts the password once to `POST Identity/login` and carries a bearer token
+from then on; Basic credentials on every request and the `auth` cookie are debugging aids that are off unless
+`Settings.xml` switches them on, and the cookie now holds the token rather than the password. The whole design -
+the in-memory token store, renewal, logging in again after a server restart - is in `Authentication.BearerTokens.md`.
+The server still never stores or logs a plaintext password, and the login still sends one, which is why this
 system is only appropriate behind TLS.
-
-Basic Auth itself is a temporary stand-in, kept specifically because it lets the API be exercised straight from a
-browser (Swagger/`requestKey`/manual URL testing) without building a login UI first. Do not read it as the intended
-long-term scheme - if/when it is replaced (e.g. with a token/cookie-only scheme that doesn't need credentials on
-every request), the cookie-carries-Basic-header approach in `Login`/`Logout` and the credential parsing in
-`AuthenticationService` are the parts to revisit together.

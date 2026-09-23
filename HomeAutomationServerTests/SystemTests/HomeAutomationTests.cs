@@ -1,5 +1,5 @@
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
+using System.Net;
+using De.Hochstaetter.HomeAutomationClient.Services;
 
 namespace De.Hochstaetter.HomeAutomationServerTests.SystemTests;
 
@@ -8,16 +8,22 @@ namespace De.Hochstaetter.HomeAutomationServerTests.SystemTests;
 /// </summary>
 public sealed class HomeAutomationTests
 {
+    /// <summary>
+    /// Logs in the way the client does, with a bearer token: Basic credentials are refused by a server that has
+    /// not switched them on for debugging.
+    /// </summary>
     [SystemFact]
     public async Task The_deployed_server_lists_its_devices()
     {
-        using var client = new HttpClient();
-        client.BaseAddress = new Uri("https://home.hochstaetter.de");
-        var authString = Convert.ToBase64String("TestUser:TestPassword"u8);
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authString);
+        using var client = new WebClientService();
+        client.Initialize("https://home.hochstaetter.de/api/", "test", "1.0");
 
-        var devices = await client.GetFromJsonAsync<IDictionary<string, DeviceInfo>>("/api/devices");
+        var login = await client.Login("TestUser", "TestPassword", TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.OK, login.Status);
 
-        Assert.NotNull(devices);
+        var devices = await client.ListDevices(TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, devices.Status);
+        Assert.NotNull(devices.Payload);
     }
 }

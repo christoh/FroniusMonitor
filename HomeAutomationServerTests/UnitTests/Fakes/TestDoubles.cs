@@ -19,6 +19,50 @@ internal sealed class SettableTimeProvider(DateTimeOffset now) : TimeProvider
 }
 
 /// <summary>
+/// A clock a test can move, whose timers never fire. Keeps every timer it created with the time it was due in, so
+/// that a test can check when something was scheduled for, and then do it itself instead of waiting for it.
+/// </summary>
+internal sealed class ManualTimeProvider(DateTimeOffset now) : TimeProvider
+{
+    public DateTimeOffset Now { get; set; } = now;
+
+    public List<ManualTimer> Timers { get; } = [];
+
+    public override DateTimeOffset GetUtcNow() => Now;
+
+    public override ITimer CreateTimer(TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)
+    {
+        var timer = new ManualTimer(dueTime);
+        Timers.Add(timer);
+        return timer;
+    }
+
+    /// <summary>The last timer created that has not been disposed since.</summary>
+    public ManualTimer Pending => Timers.Last(timer => !timer.IsDisposed);
+}
+
+internal sealed class ManualTimer(TimeSpan dueTime) : ITimer
+{
+    public TimeSpan DueTime { get; private set; } = dueTime;
+
+    public bool IsDisposed { get; private set; }
+
+    public bool Change(TimeSpan dueTime, TimeSpan period)
+    {
+        DueTime = dueTime;
+        return !IsDisposed;
+    }
+
+    public void Dispose() => IsDisposed = true;
+
+    public ValueTask DisposeAsync()
+    {
+        Dispose();
+        return ValueTask.CompletedTask;
+    }
+}
+
+/// <summary>
 /// Keeps what was logged, for the cases where the log entry is the feature rather than a side effect - a warning
 /// that tells the administrator the credentials they have just been given, for instance.
 /// </summary>

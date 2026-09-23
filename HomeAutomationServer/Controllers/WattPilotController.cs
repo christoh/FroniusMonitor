@@ -11,13 +11,13 @@ namespace De.Hochstaetter.HomeAutomationServer.Controllers;
 public class WattPilotController(IDataControlService controlService, ILogger<WattPilotController> logger) : DeviceControllerBase(controlService, logger)
 {
     [HttpGet]
-    [BasicAuthorize(Roles = "User")]
+    [ApiAuthorize(Roles = "User")]
     [ProducesResponseType<IDictionary<string, Gen24System>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public IActionResult GetWattPilotDevices() => GetDevices<WattPilot>();
 
     [HttpGet("{id}")]
-    [BasicAuthorize(Roles = "User")]
+    [ApiAuthorize(Roles = "User")]
     [ProducesResponseType<FritzBoxDevice>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

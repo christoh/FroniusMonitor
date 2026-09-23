@@ -10,13 +10,13 @@ namespace De.Hochstaetter.HomeAutomationServer.Controllers;
 public class FritzBoxDeviceController(IDataControlService controlService, ILogger<FritzBoxDeviceController> logger) : DeviceControllerBase(controlService, logger)
 {
     [HttpGet]
-    [BasicAuthorize(Roles = "User")]
+    [ApiAuthorize(Roles = "User")]
     [ProducesResponseType<IDictionary<string, Gen24System>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public IActionResult GetFritzBoxDevices() => GetDevices<FritzBoxDevice>();
 
     [HttpGet("{id}")]
-    [BasicAuthorize(Roles = "User")]
+    [ApiAuthorize(Roles = "User")]
     [ProducesResponseType<FritzBoxDevice>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

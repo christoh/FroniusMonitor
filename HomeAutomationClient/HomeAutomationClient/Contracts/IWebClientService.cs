@@ -22,10 +22,15 @@ public interface IWebClientService : IDisposable
     void Initialize(string baseUri, string productName, string version);
 
     /// <summary>
-    /// Logs in with Basic credentials, which every later call then carries. The answer says who the server thinks
-    /// logged in and which <see cref="Roles"/> they hold; the client shows both and does nothing else with them,
-    /// because the server checks the roles on every call anyway.
+    /// Logs in, in exchange for a bearer token that every later call then carries and that is renewed shortly
+    /// before it expires. Where the server refuses the token all the same - after a restart it has forgotten every
+    /// token it issued - the service logs in again with this password and repeats the call, so a caller never has
+    /// to. The answer says who the server thinks logged in and which <see cref="Roles"/> they hold; the client
+    /// shows both and does nothing else with them, because the server checks the roles on every call anyway.
     /// </summary>
+    /// <remarks>
+    /// A refused password ends the session there was. A server that cannot be reached leaves it as it was.
+    /// </remarks>
     Task<ApiResult<UserInfo>> Login(string userName, string password, CancellationToken token = default);
 
     /// <summary>
@@ -38,9 +43,9 @@ public interface IWebClientService : IDisposable
     Task<ApiResult<IDictionary<string, DeviceInfo>>> ListDevices(CancellationToken token = default);
 
     /// <summary>
-    /// Ends the session: drops the credentials this client carries, so the next call goes out unauthenticated,
-    /// and asks the server to drop its cookie counterpart of them - the one a browser resends on its own. Needs no
-    /// role; a client that is no longer sure it is logged in must still be able to call this.
+    /// Ends the session: asks the server to revoke the bearer token and to delete its cookie, if it set one, and
+    /// then drops the token and the password this client holds, so the next call goes out unauthenticated. Needs
+    /// no role; a client that is no longer sure it is logged in must still be able to call this.
     /// </summary>
     Task<ApiResult<bool>> Logout(CancellationToken token = default);
 

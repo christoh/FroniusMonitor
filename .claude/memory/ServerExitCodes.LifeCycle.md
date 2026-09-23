@@ -39,7 +39,7 @@ The created user is saved through the same `Settings` graph the server keeps in 
 `Program.EnsureAdministratorExists` also rejects a non-empty list with no `Administrator` role. This is a server
 misconfiguration, not a fresh-install case, so it logs an error and exits with **code 2**.
 
-This is intentional: every user-management endpoint is guarded by `[BasicAuthorize(Roles = nameof(Roles.Administrator))]`,
+This is intentional: every user-management endpoint is guarded by `[ApiAuthorize(Roles = nameof(Roles.Administrator))]`,
 so no client can repair a server state in which nobody has that role. The fix is a human editing the settings file or
 removing the user list to trigger the default-admin creation path on the next start.
 

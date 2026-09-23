@@ -69,8 +69,8 @@ arbitrary data to every other client, and now only hands the message to the serv
 (or `Administrator`) and nothing more, and every write to a device in this system asks for `Operator`. So
 `SetWattPilotSettings` and `RebootWattPilot` carry
 `[Authorize(AuthenticationSchemes = HubTicketAuthenticationService.SchemeName, Roles = nameof(Roles.Operator))]`
-- the scheme named, as in `RequireHubTicket`, so the policy does not fall back to Basic. The ticket principal
-carries the same role claims Basic authentication builds (`CreateAuthenticationTicket`), so it works; a caller
+- the scheme named, as in `RequireHubTicket`, so the policy does not fall back to another scheme. The ticket principal
+carries the same role claims the API's own authentication builds (`CreateAuthenticationTicket`), so it works; a caller
 without the role gets a `HubException`. `UnitTests/Hosted/HubWattPilotSettingsTests` proves it over a real
 connection against the **real** `HomeAutomationHub` - it needs only `IDataControlService` and an
 `IWattPilotServices`, both easily faked - and is the place to add the next one. What the method does with the
@@ -120,17 +120,20 @@ The direction rule above is about routing. Getting onto the hub in the first pla
 `RequireHubTicket` for the policy (ticket scheme plus `Roles.User`, `Roles.Administrator` or `Roles.Guest`) - so
 `Program.cs` and the tests cannot drift apart. Never write the scheme name or the role at a call site.
 
-**The hub does not take the Basic credentials the rest of the API uses.** A browser cannot set an `Authorization`
-header on a WebSocket handshake, so SignalR passes the credential as the `access_token` query parameter, and query
-strings land in the access log of every server and proxy on the way. Instead `GET api/Identity/hubTicket` (Basic
-authenticated) hands out a short lived ticket, and the client feeds it to `AccessTokenProvider`:
+**The hub does not take the credentials the rest of the API uses** - neither the bearer token nor, where it is
+switched on, Basic (see `Authentication.BearerTokens.md`). A browser cannot set an `Authorization` header on a
+WebSocket handshake, so SignalR passes the credential as the `access_token` query parameter, and query strings land
+in the access log of every server and proxy on the way; the API's token lives for half an hour and opens the whole
+API. Instead `GET api/Identity/hubTicket` (`[ApiAuthorize]`) hands out a short lived ticket, and the client feeds it
+to `AccessTokenProvider`:
 
 - `HubTicketService` signs `v1.<user>.<expiry>` with a key derived from `IAesKeyProvider`, and folds the user's
   password hash and salt into the signature without putting them in the ticket. So a password change invalidates
   every outstanding ticket, and a ticket recovered from a log is worthless within `HubTicketService.Lifetime`.
 - The signature is checked **before** the expiry: the claimed expiry of a ticket nobody signed means nothing.
 - `HubTicketAuthenticationService` reads the ticket from `access_token` (WebSockets) or from a `Bearer` header
-  (negotiate and long polling), and hands back the same principal the Basic handler builds -
+  (negotiate and long polling), parsed by `ApiAuthenticationService.GetCredentials`, and hands back the same
+  principal the API's handler builds -
   `AuthorizationExtensions.CreateAuthenticationTicket` is the one place that turns a `User` into role claims.
 - The client fetches a ticket per connection attempt rather than keeping one; SignalR asks `AccessTokenProvider`
   again on every reconnect, so the renewal costs nothing to arrange.

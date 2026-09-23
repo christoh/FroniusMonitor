@@ -14,13 +14,13 @@ namespace De.Hochstaetter.HomeAutomationServer.Controllers;
 public class ToshibaHvacController(IDataControlService controlService, ILogger<ToshibaHvacController> logger) : DeviceControllerBase(controlService, logger)
 {
     [HttpGet]
-    [BasicAuthorize(Roles = "User")]
+    [ApiAuthorize(Roles = "User")]
     [ProducesResponseType<IDictionary<string, ToshibaHvacMappingDevice>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public IActionResult GetToshibaHvacDevices() => GetDevices<ToshibaHvacMappingDevice>();
 
     [HttpGet("{id}")]
-    [BasicAuthorize(Roles = "User")]
+    [ApiAuthorize(Roles = "User")]
     [ProducesResponseType<ToshibaHvacMappingDevice>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

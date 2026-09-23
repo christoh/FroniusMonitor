@@ -45,6 +45,13 @@ public class Settings
     /// </summary>
     public bool EnableGuestAccount { get; set; } = true;
 
+    /// <summary>
+    /// The lifetime of a bearer token, and whether Basic and cookie authentication are accepted as well. A file
+    /// written before this existed has no such element and gets the defaults: tokens of 30 minutes, and neither of
+    /// the other two.
+    /// </summary>
+    public AuthenticationSettings Authentication { get; set; } = new();
+
     public WebServerSettings WebServerSettings = new WebServerSettings();
 
     /// <summary>The Toshiba account, or <see langword="null" /> when the server has no air conditioners to collect.</summary>

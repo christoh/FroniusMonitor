@@ -13,7 +13,7 @@ public class EnergyDataController(IEnergyDataService energyData, ILogger<EnergyD
 {
     /// <summary>Today and tomorrow, as the collector last assembled them.</summary>
     [HttpGet]
-    [BasicAuthorize(Roles = "User")]
+    [ApiAuthorize(Roles = "User")]
     [ProducesResponseType<EnergyChartData>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public IActionResult GetCurrent()
@@ -33,7 +33,7 @@ public class EnergyDataController(IEnergyDataService energyData, ILogger<EnergyD
 
     /// <summary>One local day of the server, <c>yyyy-MM-dd</c>. Yesterday and older come from the history.</summary>
     [HttpGet("{day}")]
-    [BasicAuthorize(Roles = "User")]
+    [ApiAuthorize(Roles = "User")]
     [ProducesResponseType<EnergyChartData>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

@@ -6,9 +6,7 @@ using De.Hochstaetter.HomeAutomationServer.Hubs;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using De.Hochstaetter.HomeAutomationServer.Models.Settings;
 using De.Hochstaetter.HomeAutomationServer.Services;
-using BasicAuthenticationService = De.Hochstaetter.HomeAutomationServer.Services.AuthenticationService;
 using De.Hochstaetter.HomeAutomationServerTests.UnitTests.Fakes;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
@@ -45,7 +43,7 @@ public sealed class GuestUserTests : IAsyncLifetime
             u.EnableGuestAccount = settings.EnableGuestAccount;
         });
         builder.Services.AddControllers().AddApplicationPart(typeof(IdentityController).Assembly);
-        builder.Services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, BasicAuthenticationService>("Basic", null);
+        builder.Services.AddApiAuthentication();
         builder.Services.AddHubTicketAuthentication();
 
         app = builder.Build();

@@ -1,9 +1,7 @@
 using System.Security.Cryptography;
-using System.Text;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using HubTicketService = De.Hochstaetter.HomeAutomationServer.Services.HubTicketService;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
 
 namespace De.Hochstaetter.HomeAutomationServer.Controllers;
 
@@ -11,7 +9,10 @@ namespace De.Hochstaetter.HomeAutomationServer.Controllers;
 [Route("api/[controller]")]
 public class IdentityController(Settings settings, ILogger<IdentityController> logger, IOptionsMonitor<UserList> userDb) : ControllerBase
 {
-    private static readonly CookieOptions cookieOptions = new() { Path = "/api", MaxAge = new TimeSpan(7, 0, 0, 0) };
+    // HttpOnly, because no script has any business reading a credential. SameSite=Strict, because the CORS policy
+    // lets every origin send requests with credentials: without it, any web page the logged-in browser opens could
+    // call the API as that user.
+    private static readonly CookieOptions cookieOptions = new() { Path = "/api", HttpOnly = true, SameSite = SameSiteMode.Strict };
     private static readonly byte[] aesKey = IoC.Get<IAesKeyProvider>().GetAesKey();
 
     [HttpGet("requestKey")]
@@ -27,49 +28,105 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
     }
 
     /// <summary>
-    /// Answers with the user's name and roles, so the client can show who is logged in and what they may do
-    /// without a second round trip.
+    /// Logs in and answers with the bearer token every later request carries, together with the user's name and
+    /// roles, so the client can show who is logged in and what they may do without a second round trip. This is
+    /// the login the client uses: the password is in the body, where no access log sees it.
     /// </summary>
-    [HttpGet("login")]
-    [ProducesResponseType<UserInfo>(StatusCodes.Status200OK)]
+    [HttpPost("login")]
+    [ProducesResponseType<LoginResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
-    public IActionResult Login([FromQuery] string user, [FromQuery] string password)
+    public IActionResult Login([FromBody] LoginRequest request, [FromServices] BearerTokenService tokens) => Login(request.UserName, request.Password, tokens);
+
+    /// <summary>
+    /// <see cref="Login(LoginRequest, BearerTokenService)"/> for a browser's address bar, which can only send a
+    /// GET. It puts the password into the query string, and so into every access log on the way; it is there for
+    /// debugging together with <see cref="AuthenticationSettings.EnableCookieAuthentication"/>.
+    /// </summary>
+    [HttpGet("login")]
+    [ProducesResponseType<LoginResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    public IActionResult Login([FromQuery] string user, [FromQuery] string password, [FromServices] BearerTokenService tokens)
     {
         var dbUser = FindUser(user);
 
         if (dbUser == null || !dbUser.Authenticate(password))
         {
-            Response.Cookies.Delete("auth", cookieOptions);
-            logger.LogWarning("Login failed for user {Username}", user);
+            Response.Cookies.Delete(ApiAuthenticationService.AuthCookie, cookieOptions);
+
+            if (logger.IsEnabled(LogLevel.Warning))
+            {
+                logger.LogWarning("Login failed for user {Username}", user);
+            }
+
             return Unauthorized(Helpers.GetProblemDetails(Loc.CannotLogin, Loc.LoginIncorrect));
         }
 
-        Response.Cookies.Delete("auth", cookieOptions);
-        Response.Cookies.Append("auth", "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes($"{user}:{password}")), cookieOptions);
-        logger.LogInformation("{Username} logged in successfully from {Ip}", user, HttpContext.Connection.RemoteIpAddress);
-        return Ok(new UserInfo { UserName = dbUser.Username, Roles = dbUser.Roles });
-    }
-
-    [HttpGet("logout")]
-    [ProducesResponseType<bool>(StatusCodes.Status200OK)]
-    public IActionResult Logout()
-    {
-        if (HttpContext.User.Identity?.Name is { } userName)
+        if (logger.IsEnabled(LogLevel.Information))
         {
-            logger.LogInformation("{Username} logged out", userName);
+            logger.LogInformation("{Username} logged in successfully from {Ip}", user, HttpContext.Connection.RemoteIpAddress);
         }
 
-        Response.Cookies.Delete("auth", cookieOptions);
+        return Ok(IssueToken(dbUser, tokens));
+    }
+
+    /// <summary>
+    /// A new bearer token for whoever the current one belongs to, which the client asks for shortly before the
+    /// current one expires. The current one stays valid until it runs out, so that a request already on its way
+    /// is not refused.
+    /// </summary>
+    [HttpPost("token")]
+    [ApiAuthorize]
+    [ProducesResponseType<LoginResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    public IActionResult RenewToken([FromServices] BearerTokenService tokens)
+    {
+        var userName = HttpContext.User.Identity?.Name;
+
+        if (FindUser(userName) is not { } dbUser)
+        {
+            if (logger.IsEnabled(LogLevel.Warning))
+            {
+                logger.LogWarning("No bearer token for {Username}: authenticated, but not in the user list", userName);
+            }
+
+            return Unauthorized(Helpers.GetProblemDetails(Loc.CannotLogin, Loc.LoginIncorrect));
+        }
+
+        return Ok(IssueToken(dbUser, tokens));
+    }
+
+    /// <summary>
+    /// Ends the session: the bearer token the request carries stops working at once, and the cookie is deleted.
+    /// Needs no authorization, so that a client which is not sure whether it is still logged in can call it.
+    /// </summary>
+    [HttpGet("logout")]
+    [ProducesResponseType<bool>(StatusCodes.Status200OK)]
+    public IActionResult Logout([FromServices] BearerTokenService tokens)
+    {
+        var header = Request.Headers.Authorization.ToString();
+
+        if (string.IsNullOrEmpty(header))
+        {
+            header = Request.Cookies[ApiAuthenticationService.AuthCookie] ?? string.Empty;
+        }
+
+        if (tokens.Revoke(ApiAuthenticationService.GetCredentials(header, "Bearer")) is { } user && logger.IsEnabled(LogLevel.Information))
+        {
+            logger.LogInformation("{Username} logged out", user.Username);
+        }
+
+        Response.Cookies.Delete(ApiAuthenticationService.AuthCookie, cookieOptions);
         return Ok(true);
     }
 
     /// <summary>
-    /// Hands out a short lived ticket the client authenticates its SignalR connection with. Basic credentials get
-    /// this far, but must not go any further: see <see cref="HubTicketService"/>.
+    /// Hands out a short lived ticket the client authenticates its SignalR connection with. The credentials of the
+    /// API get this far, but must not go any further: see <see cref="HubTicketService"/>.
     /// </summary>
     [HttpGet("hubTicket")]
-    [BasicAuthorize]
+    [ApiAuthorize]
     [ProducesResponseType<string>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
     public IActionResult HubTicket([FromServices] HubTicketService hubTickets)
@@ -79,7 +136,11 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
 
         if (dbUser == null)
         {
-            logger.LogWarning("No hub ticket for {Username}: authenticated, but not in the user list", userName);
+            if (logger.IsEnabled(LogLevel.Warning))
+            {
+                logger.LogWarning("No hub ticket for {Username}: authenticated, but not in the user list", userName);
+            }
+
             return Unauthorized(Helpers.GetProblemDetails(Loc.CannotLogin, Loc.LoginIncorrect));
         }
 
@@ -88,7 +149,7 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
     }
 
     [HttpGet("users")]
-    [BasicAuthorize(Roles = nameof(Roles.Administrator))]
+    [ApiAuthorize(Roles = nameof(Roles.Administrator))]
     [ProducesResponseType<IEnumerable<UserInfo>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
@@ -98,7 +159,7 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
     }
 
     [HttpPost("users")]
-    [BasicAuthorize(Roles = nameof(Roles.Administrator))]
+    [ApiAuthorize(Roles = nameof(Roles.Administrator))]
     [ProducesResponseType<UserInfo>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
@@ -140,7 +201,7 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
     /// them to it.
     /// </summary>
     [HttpPut("users/{userName}")]
-    [BasicAuthorize(Roles = nameof(Roles.Administrator))]
+    [ApiAuthorize(Roles = nameof(Roles.Administrator))]
     [ProducesResponseType<UserInfo>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
@@ -198,7 +259,7 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
     /// user out; there is no username in the route because it is always the caller's own account.
     /// </summary>
     [HttpPut("password")]
-    [BasicAuthorize]
+    [ApiAuthorize]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
@@ -228,7 +289,7 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
     }
 
     [HttpDelete("users/{userName}")]
-    [BasicAuthorize(Roles = nameof(Roles.Administrator))]
+    [ApiAuthorize(Roles = nameof(Roles.Administrator))]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
@@ -259,6 +320,29 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
         userDb.CurrentValue.Users.Remove(dbUser);
         await settings.SaveAsync().ConfigureAwait(false);
         return Ok(true);
+    }
+
+    /// <summary>
+    /// A new bearer token for <paramref name="user"/>, and - where cookie authentication is switched on - the same
+    /// token as the cookie a browser sends back on its own. The cookie lives exactly as long as the token.
+    /// </summary>
+    private LoginResponse IssueToken(User user, BearerTokenService tokens)
+    {
+        var token = tokens.Issue(user);
+        Response.Cookies.Delete(ApiAuthenticationService.AuthCookie, cookieOptions);
+
+        if (userDb.CurrentValue.Authentication.EnableCookieAuthentication)
+        {
+            Response.Cookies.Append(ApiAuthenticationService.AuthCookie, "Bearer " + token.Value, new CookieOptions(cookieOptions) { MaxAge = token.Lifetime });
+        }
+
+        return new LoginResponse
+        {
+            UserName = user.Username,
+            Roles = user.Roles,
+            AccessToken = token.Value,
+            ExpiresInSeconds = (int)token.Lifetime.TotalSeconds,
+        };
     }
 
     private User? FindUser(string? userName) => userDb.CurrentValue.Find(userName);

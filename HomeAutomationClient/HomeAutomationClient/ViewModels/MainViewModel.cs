@@ -366,10 +366,10 @@ public sealed partial class MainViewModel : ViewModelBase, IPowerDisplayOptions
 
         if (User is { } me)
         {
-            // The server checks Basic Auth credentials on every call, and the header the client still sends
-            // carries the old password - which stopped being valid the moment the change was saved. Re-login and
-            // persist the new one, the same way UserManagementViewModel.Edit does when an administrator changes
-            // their own account.
+            // Changing the password ends every session of the user on the server, the bearer token this client
+            // still carries included, and the password the client would log in again with is the old one. Log in
+            // with the new one and persist it, the same way UserManagementViewModel.Edit does when an
+            // administrator changes their own account.
             var login = await webClient.Login(me.UserName, request.NewPassword).ConfigureAwait(true);
 
             if (login.Status != HttpStatusCode.OK)

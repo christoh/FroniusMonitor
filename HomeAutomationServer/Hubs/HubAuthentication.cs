@@ -34,8 +34,9 @@ public static class HubAuthentication
     /// </summary>
     /// <remarks>
     /// <para>
-    /// The scheme has to be named explicitly. Without it the policy would fall back to the default scheme, which
-    /// is Basic, and Basic credentials are exactly what must not reach the hub.
+    /// The scheme has to be named explicitly. Without it the policy would fall back to the default scheme, and the
+    /// credentials of the API - a bearer token that lives for half an hour, or even Basic ones where they are
+    /// switched on - are exactly what must not reach the hub.
     /// </para>
     /// <para>
     /// <see cref="Roles"/> is a <see cref="FlagsAttribute"/> enum, so holding one role says nothing about the

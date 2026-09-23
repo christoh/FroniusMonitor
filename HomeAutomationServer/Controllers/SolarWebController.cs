@@ -15,7 +15,7 @@ namespace De.Hochstaetter.HomeAutomationServer.Controllers;
 public class SolarWebController(ISolarWebService solarWeb, ILogger<SolarWebController> logger) : ControllerBase
 {
     [HttpGet("{interval}/{view}/{day?}")]
-    [BasicAuthorize(Roles = "User")]
+    [ApiAuthorize(Roles = "User")]
     [ProducesResponseType<SolarWebChart>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -34,7 +34,7 @@ public class SolarWebController(ISolarWebService solarWeb, ILogger<SolarWebContr
 
     /// <summary>The firmware of every component as Solar.web last reported it, read again where the last report is older than the refresh interval.</summary>
     [HttpGet("firmware")]
-    [BasicAuthorize(Roles = "User")]
+    [ApiAuthorize(Roles = "User")]
     [ProducesResponseType<SolarWebFirmwareStatus>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status502BadGateway)]

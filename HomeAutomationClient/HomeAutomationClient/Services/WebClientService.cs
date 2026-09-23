@@ -6,14 +6,39 @@ using System.Text.Json.Serialization;
 using De.Hochstaetter.Fronius.Models;
 using De.Hochstaetter.Fronius.Models.Charging;
 using De.Hochstaetter.Fronius.Models.Gen24.Commands;
-using De.Hochstaetter.Fronius.Models.HomeAutomationClient;
 using De.Hochstaetter.Fronius.Models.ToshibaAc;
-using De.Hochstaetter.Fronius.Models.WebApi;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace De.Hochstaetter.HomeAutomationClient.Services;
 
+/// <summary>
+/// The client side of the web API.
+/// </summary>
+/// <remarks>
+/// <para>
+/// <see cref="Login"/> exchanges the user name and password for a bearer token, which every later request carries.
+/// The token is renewed <see cref="RenewalLead"/> before it expires. Where the server refuses it all the same - it
+/// was restarted and has forgotten every token, or renewing failed until the token ran out - the service logs in
+/// again with the password it was given and repeats the request, once. The callers never see a token.
+/// </para>
+/// <para>
+/// The password is therefore kept in memory for as long as the session lasts. It is what makes a restart of the
+/// server invisible to the user, and it is dropped by <see cref="Logout"/>, by a login the server refuses and by
+/// <see cref="Initialize"/>.
+/// </para>
+/// </remarks>
 public sealed class WebClientService : IWebClientService
 {
+    /// <summary>
+    /// How long before a bearer token expires a new one is asked for. A token that lives for less than twice this
+    /// is renewed when half of its life is over instead, so a short lifetime cannot turn into a busy loop.
+    /// </summary>
+    public static readonly TimeSpan RenewalLead = TimeSpan.FromMinutes(2);
+
+    /// <summary>How soon renewing a token is tried again after the server could not be reached.</summary>
+    public static readonly TimeSpan RenewalRetryInterval = TimeSpan.FromSeconds(30);
+
     private static readonly JsonSerializerOptions jsonOptions = new()
     {
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
@@ -25,7 +50,37 @@ public sealed class WebClientService : IWebClientService
         IncludeFields = false,
     };
 
-    private HttpClient httpClient = NewHttpClient();
+    private readonly ILogger<WebClientService> logger;
+    private readonly TimeProvider clock;
+
+    /// <summary>
+    /// Held while the session changes hands: a login, a renewal, a login again after a refusal. Requests that are
+    /// refused at the same time then wait for one login instead of each starting one of their own.
+    /// </summary>
+    private readonly SemaphoreSlim sessionLock = new(1, 1);
+
+    private HttpClient httpClient;
+
+    /// <summary>The bearer token every request carries, or <see langword="null"/> while nobody is logged in.</summary>
+    private volatile string? accessToken;
+
+    /// <summary>When <see cref="accessToken"/> runs out, by the clock of this device.</summary>
+    private DateTimeOffset accessTokenExpiry;
+
+    /// <summary>What <see cref="accessToken"/> was obtained with, to log in again where the server has forgotten it.</summary>
+    private LoginRequest? credentials;
+
+    private ITimer? renewalTimer;
+
+    /// <summary>The token requests go out with, for the tests to tell a renewed one from the one before.</summary>
+    internal string? AccessToken => accessToken;
+
+    public WebClientService(ILogger<WebClientService>? logger = null, TimeProvider? clock = null)
+    {
+        this.logger = logger ?? NullLogger<WebClientService>.Instance;
+        this.clock = clock ?? TimeProvider.System;
+        httpClient = NewHttpClient();
+    }
 
     /// <summary>How long a request may take unless the caller says otherwise. The server answers from its own memory or its devices within that.</summary>
     public static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(15);
@@ -39,19 +94,20 @@ public sealed class WebClientService : IWebClientService
 
     // No timeout on the client itself: every request gets its own through ReadResult, so one slow endpoint does not
     // decide the patience for all the others.
-    private static HttpClient NewHttpClient() => new() { Timeout = Timeout.InfiniteTimeSpan };
+    private HttpClient NewHttpClient() => new(new BearerTokenHandler(this)) { Timeout = Timeout.InfiniteTimeSpan };
 
     /// <summary>
     /// Points the client at <paramref name="baseUri"/>. May be called again when the user changes the connection.
     /// </summary>
     /// <remarks>
     /// An <see cref="HttpClient"/> refuses a new <see cref="HttpClient.BaseAddress"/> once it has sent its first
-    /// request, so a second call gets a new one. Dropping the old one drops its authorization header with it,
-    /// which is what we want: credentials for the previous server are worth nothing to the new one.
+    /// request, so a second call gets a new one. The session ends as well: credentials for the previous server are
+    /// worth nothing to the new one.
     /// </remarks>
     public void Initialize(string baseUri, string productName, string version)
     {
         var address = new Uri(baseUri);
+        EndSession();
 
         if (httpClient.BaseAddress != null)
         {
@@ -73,25 +129,45 @@ public sealed class WebClientService : IWebClientService
             async (content, t) => Convert.FromBase64String(await content.ReadAsStringAsync(t).ConfigureAwait(false)), token).ConfigureAwait(false);
     }
 
-    public Task<ApiResult<UserInfo>> Login(string userName, string password, CancellationToken token = default)
+    public async Task<ApiResult<UserInfo>> Login(string userName, string password, CancellationToken token = default)
     {
-        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{userName}:{password}")));
-        return GetResult<UserInfo>($"Identity/login?user={userName}&password={password}", token);
+        await sessionLock.WaitAsync(token).ConfigureAwait(false);
+
+        try
+        {
+            return await LoginCore(new LoginRequest { UserName = userName, Password = password }, token).ConfigureAwait(false);
+        }
+        finally
+        {
+            sessionLock.Release();
+        }
     }
 
     public async Task<string?> GetHubTicket(CancellationToken token = default)
     {
-        using var response = await httpClient.GetAsync("Identity/hubTicket", token).ConfigureAwait(false);
+        using var response = await SendAuthenticated(t => httpClient.GetAsync("Identity/hubTicket", t), token).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadAsStringAsync(token).ConfigureAwait(false);
     }
 
     public async Task<ApiResult<bool>> Logout(CancellationToken token = default)
     {
+        // Still with the token, which is what the server revokes.
         var result = await GetResult<bool>("Identity/logout", token).ConfigureAwait(false);
-        // Dropped regardless of what the server answered: a server that could not be reached is not a reason to
-        // go on sending a password that the caller has just decided to forget.
-        httpClient.DefaultRequestHeaders.Authorization = null;
+
+        // Ended regardless of what the server answered: a server that could not be reached is not a reason to go on
+        // holding a password that the caller has just decided to forget.
+        await sessionLock.WaitAsync(CancellationToken.None).ConfigureAwait(false);
+
+        try
+        {
+            EndSession();
+        }
+        finally
+        {
+            sessionLock.Release();
+        }
+
         return result;
     }
 
@@ -294,6 +370,229 @@ public sealed class WebClientService : IWebClientService
 
     #endregion
 
+    #region Session
+
+    /// <summary>
+    /// Logs in and, where the server agrees, makes the answer the session. Where the server refuses the password,
+    /// the session there was ends: a caller that has just failed to log in no longer knows who it is. Where the
+    /// server cannot be reached, it is left as it was, so that the password is still there to log in with once the
+    /// server is back. Only while holding <see cref="sessionLock"/>.
+    /// </summary>
+    private async Task<ApiResult<UserInfo>> LoginCore(LoginRequest request, CancellationToken token)
+    {
+        var result = await ReadResult<LoginResponse>
+        (
+            t => httpClient.PostAsJsonAsync("Identity/login", request, jsonOptions, t),
+            (content, t) => content.ReadFromJsonAsync<LoginResponse>(jsonOptions, t),
+            token
+        ).ConfigureAwait(false);
+
+        if (result is not { Status: HttpStatusCode.OK, Payload: { } response })
+        {
+            if (result.Status == HttpStatusCode.Unauthorized)
+            {
+                EndSession();
+            }
+
+            return ApiResult<UserInfo>.FromProblemDetails(result, result.Status, result.Exception);
+        }
+
+        StartSession(response, request);
+
+        // Only who logged in: the token is this service's business and nobody else's.
+        return new ApiResult<UserInfo>
+        {
+            Payload = new UserInfo { UserName = response.UserName, Roles = response.Roles },
+            Status = result.Status,
+        };
+    }
+
+    /// <summary>Takes the token of <paramref name="response"/> and arranges for its renewal. Only while holding <see cref="sessionLock"/>.</summary>
+    private void StartSession(LoginResponse response, LoginRequest request)
+    {
+        var lifetime = TimeSpan.FromSeconds(Math.Max(1, response.ExpiresInSeconds));
+        accessToken = response.AccessToken;
+        accessTokenExpiry = clock.GetUtcNow() + lifetime;
+        credentials = request;
+        ScheduleRenewal(lifetime > RenewalLead * 2 ? lifetime - RenewalLead : lifetime / 2);
+    }
+
+    /// <summary>Forgets the token and the password and stops renewing.</summary>
+    private void EndSession()
+    {
+        renewalTimer?.Dispose();
+        renewalTimer = null;
+        accessToken = null;
+        credentials = null;
+    }
+
+    private void ScheduleRenewal(TimeSpan dueIn)
+    {
+        renewalTimer?.Dispose();
+        // Not awaited, because a timer cannot await. RenewTokenAsync reports its own failures and never throws.
+        renewalTimer = clock.CreateTimer(_ => RenewTokenAsync(), null, dueIn, Timeout.InfiniteTimeSpan);
+    }
+
+    /// <summary>
+    /// Swaps the token for a new one before it runs out. Where the server has forgotten it, logs in again with the
+    /// password instead; where the server cannot be reached, tries again after <see cref="RenewalRetryInterval"/>
+    /// for as long as the token is still valid - after that, the next request logs in again by itself.
+    /// </summary>
+    /// <remarks>Never throws: it runs off a timer, where an exception would have nobody to go to.</remarks>
+    internal async Task RenewTokenAsync(CancellationToken token = default)
+    {
+        try
+        {
+            await sessionLock.WaitAsync(token).ConfigureAwait(false);
+
+            try
+            {
+                if (accessToken == null || credentials is not { } request)
+                {
+                    // Logged out while the timer was on its way.
+                    return;
+                }
+
+                var result = await ReadResult<LoginResponse>
+                (
+                    t => httpClient.PostAsync("Identity/token", null, t),
+                    (content, t) => content.ReadFromJsonAsync<LoginResponse>(jsonOptions, t),
+                    token
+                ).ConfigureAwait(false);
+
+                if (result is { Status: HttpStatusCode.OK, Payload: { } response })
+                {
+                    if (logger.IsEnabled(LogLevel.Debug))
+                    {
+                        logger.LogDebug("The bearer token was renewed, valid for {Seconds} seconds", response.ExpiresInSeconds);
+                    }
+
+                    StartSession(response, request);
+                    return;
+                }
+
+                if (result.Status == HttpStatusCode.Unauthorized)
+                {
+                    if (logger.IsEnabled(LogLevel.Information))
+                    {
+                        logger.LogInformation("The server refused to renew the bearer token; logging in again as {Username}", request.UserName);
+                    }
+
+                    var login = await LoginCore(request, token).ConfigureAwait(false);
+
+                    if (login.Status != HttpStatusCode.OK && logger.IsEnabled(LogLevel.Warning))
+                    {
+                        logger.LogWarning("Logging in again as {Username} failed with {Status}: {Detail}", request.UserName, login.Status, login.Detail);
+                    }
+
+                    return;
+                }
+
+                if (logger.IsEnabled(LogLevel.Warning))
+                {
+                    logger.LogWarning("The bearer token could not be renewed ({Status}: {Detail})", result.Status, result.Detail);
+                }
+
+                if (clock.GetUtcNow() + RenewalRetryInterval < accessTokenExpiry)
+                {
+                    ScheduleRenewal(RenewalRetryInterval);
+                }
+            }
+            finally
+            {
+                sessionLock.Release();
+            }
+        }
+        catch (Exception ex)
+        {
+            if (logger.IsEnabled(LogLevel.Error))
+            {
+                logger.LogError(ex, "Renewing the bearer token failed");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Sends a request with the bearer token and, where the server refuses it with 401, logs in again with the
+    /// password and sends it once more. That is how a restart of the server passes unnoticed: it forgets every
+    /// token it has issued.
+    /// </summary>
+    /// <param name="send">Called a second time for the repetition, so it has to build its request anew each time.</param>
+    private async Task<HttpResponseMessage> SendAuthenticated(Func<CancellationToken, Task<HttpResponseMessage>> send, CancellationToken token)
+    {
+        var tokenSent = accessToken;
+        var response = await send(token).ConfigureAwait(false);
+
+        if (response.StatusCode != HttpStatusCode.Unauthorized || tokenSent == null || !await LoginAgain(tokenSent, token).ConfigureAwait(false))
+        {
+            return response;
+        }
+
+        response.Dispose();
+        return await send(token).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Logs in again after <paramref name="refusedToken"/> was refused. Where another request has already done so
+    /// in the meantime, its token is taken instead of logging in a second time.
+    /// </summary>
+    /// <returns>Whether there is a new token worth repeating the request with.</returns>
+    private async Task<bool> LoginAgain(string refusedToken, CancellationToken token)
+    {
+        await sessionLock.WaitAsync(token).ConfigureAwait(false);
+
+        try
+        {
+            if (accessToken != refusedToken)
+            {
+                return accessToken != null;
+            }
+
+            if (credentials is not { } request)
+            {
+                return false;
+            }
+
+            if (logger.IsEnabled(LogLevel.Information))
+            {
+                logger.LogInformation("The server refused the bearer token, probably because it was restarted; logging in again as {Username}", request.UserName);
+            }
+
+            var login = await LoginCore(request, token).ConfigureAwait(false);
+
+            if (login.Status != HttpStatusCode.OK && logger.IsEnabled(LogLevel.Warning))
+            {
+                logger.LogWarning("Logging in again as {Username} failed with {Status}: {Detail}", request.UserName, login.Status, login.Detail);
+            }
+
+            return login.Status == HttpStatusCode.OK;
+        }
+        finally
+        {
+            sessionLock.Release();
+        }
+    }
+
+    /// <summary>
+    /// Puts the current bearer token on every request, at the moment it is sent. Not
+    /// <see cref="HttpClient.DefaultRequestHeaders"/>: those must not change while requests are going out, and the
+    /// token is renewed off a timer, in the middle of whatever else is happening.
+    /// </summary>
+    private sealed class BearerTokenHandler(WebClientService owner) : DelegatingHandler(new HttpClientHandler())
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            if (owner.accessToken is { } token)
+            {
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
+
+            return base.SendAsync(request, cancellationToken);
+        }
+    }
+
+    #endregion
+
     private Task<ApiResult<T>> GetResult<T>(string queryString, CancellationToken token = default, TimeSpan? timeout = null)
     {
         return SendResult<T>(t => httpClient.GetAsync(queryString, t), token, timeout);
@@ -321,7 +620,7 @@ public sealed class WebClientService : IWebClientService
 
     private Task<ApiResult<T>> SendResult<T>(Func<CancellationToken, Task<HttpResponseMessage>> send, CancellationToken token, TimeSpan? timeout = null)
     {
-        return ReadResult(send, (content, t) => content.ReadFromJsonAsync<T>(jsonOptions, t), token, timeout);
+        return ReadResult(t => SendAuthenticated(send, t), (content, t) => content.ReadFromJsonAsync<T>(jsonOptions, t), token, timeout);
     }
 
     /// <summary>
@@ -389,6 +688,8 @@ public sealed class WebClientService : IWebClientService
 
     public void Dispose()
     {
+        EndSession();
         httpClient.Dispose();
+        sessionLock.Dispose();
     }
 }

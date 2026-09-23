@@ -27,20 +27,20 @@ public class Gen24SystemController
     [HttpGet]
     // "User,Guest": a guest may look at the inverters - and at the smart meter and the battery a Gen24 carries -
     // but at nothing that is switched, charged or configured. The hub says the same in DeviceVisibility.
-    [BasicAuthorize(Roles = "User,Guest")]
+    [ApiAuthorize(Roles = "User,Guest")]
     [ProducesResponseType<IDictionary<string, Gen24System>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public IActionResult GetInverters() => GetDevices<Gen24System>();
 
     [HttpGet("{id}")]
-    [BasicAuthorize(Roles = "User,Guest")]
+    [ApiAuthorize(Roles = "User,Guest")]
     [ProducesResponseType<IDictionary<string, Gen24System>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public IActionResult GetInverter([FromRoute] string id) => GetDevice<Gen24System>(id);
 
     [HttpGet("{id}/requestStandBy")]
-    [BasicAuthorize(Roles = "Operator")]
+    [ApiAuthorize(Roles = "Operator")]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -65,7 +65,7 @@ public class Gen24SystemController
     }
 
     [HttpGet("{id}/getStandByStatus")]
-    [BasicAuthorize(Roles = "User,Guest")]
+    [ApiAuthorize(Roles = "User,Guest")]
     [ProducesResponseType<Gen24StandByStatus>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -91,7 +91,7 @@ public class Gen24SystemController
 
 
     [HttpGet("{id}/i18n/{iso2LanguageCode}/{name}")]
-    [BasicAuthorize(Roles = "User,Guest")]
+    [ApiAuthorize(Roles = "User,Guest")]
     [ProducesResponseType<IDictionary<string, object>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -131,7 +131,7 @@ public class Gen24SystemController
     /// the dialog; the write endpoints below read the inverter again themselves, so this may go stale.
     /// </summary>
     [HttpGet("{id}/settings")]
-    [BasicAuthorize(Roles = "User")]
+    [ApiAuthorize(Roles = "User")]
     [ProducesResponseType<Gen24SettingsSnapshot>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -169,7 +169,7 @@ public class Gen24SystemController
 
     /// <summary>The event log of the inverter, newest first, for the event log tab of the settings dialog.</summary>
     [HttpGet("{id}/events")]
-    [BasicAuthorize(Roles = "User")]
+    [ApiAuthorize(Roles = "User")]
     [ProducesResponseType<IEnumerable<Gen24Event>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -195,7 +195,7 @@ public class Gen24SystemController
     }
 
     [HttpPut("{id}/settings/modbus")]
-    [BasicAuthorize(Roles = "Operator")]
+    [ApiAuthorize(Roles = "Operator")]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -208,7 +208,7 @@ public class Gen24SystemController
     );
 
     [HttpPut("{id}/settings/batteries")]
-    [BasicAuthorize(Roles = "Operator")]
+    [ApiAuthorize(Roles = "Operator")]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -225,7 +225,7 @@ public class Gen24SystemController
     /// list or nothing, so either everything goes or - when the list is unchanged - nothing does.
     /// </summary>
     [HttpPut("{id}/settings/timeOfUse")]
-    [BasicAuthorize(Roles = "Operator")]
+    [ApiAuthorize(Roles = "Operator")]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -244,7 +244,7 @@ public class Gen24SystemController
     /// <see cref="IGen24JsonService.GetUpdateToken{T}"/> does not look at them.
     /// </summary>
     [HttpPut("{id}/settings/common")]
-    [BasicAuthorize(Roles = "Operator")]
+    [ApiAuthorize(Roles = "Operator")]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -258,7 +258,7 @@ public class Gen24SystemController
 
     /// <summary>The string trackers, at <c>api/config/powerunit</c>.</summary>
     [HttpPut("{id}/settings/mppt")]
-    [BasicAuthorize(Roles = "Operator")]
+    [ApiAuthorize(Roles = "Operator")]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -272,7 +272,7 @@ public class Gen24SystemController
 
     /// <summary>The export limits, at <c>api/config/limit_settings/powerLimits</c>.</summary>
     [HttpPut("{id}/settings/powerLimits")]
-    [BasicAuthorize(Roles = "Operator")]
+    [ApiAuthorize(Roles = "Operator")]
     [ProducesResponseType<bool>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

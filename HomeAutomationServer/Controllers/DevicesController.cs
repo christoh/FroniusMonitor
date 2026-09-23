@@ -9,7 +9,7 @@ namespace De.Hochstaetter.HomeAutomationServer.Controllers;
 public class DevicesController(IDataControlService controlService, ILogger<DevicesController> logger) : ControllerBase
 {
     [HttpGet]
-    [BasicAuthorize(Roles = "User")]
+    [ApiAuthorize(Roles = "User")]
     [ProducesResponseType<IDictionary<string, DeviceInfo>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public IActionResult ListDevices()
@@ -38,7 +38,7 @@ public class DevicesController(IDataControlService controlService, ILogger<Devic
     }
 
     [HttpGet("getTypes")]
-    [BasicAuthorize(Roles = "User")]
+    [ApiAuthorize(Roles = "User")]
     [ProducesResponseType<IEnumerable<string>>(StatusCodes.Status200OK)]
     public IActionResult GetTypes()
     {
@@ -47,7 +47,7 @@ public class DevicesController(IDataControlService controlService, ILogger<Devic
     }
 
     [HttpGet("{id}")]
-    [BasicAuthorize(Roles = "User")]
+    [ApiAuthorize(Roles = "User")]
     [ProducesResponseType<object>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -64,7 +64,7 @@ public class DevicesController(IDataControlService controlService, ILogger<Devic
     }
 
     [HttpGet("{id}/credentials")]
-    [BasicAuthorize(Roles = "Administrator")]
+    [ApiAuthorize(Roles = "Administrator")]
     [ProducesResponseType<object>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -81,7 +81,7 @@ public class DevicesController(IDataControlService controlService, ILogger<Devic
     }
 
     [HttpGet("{id}/setBrightness")]
-    [BasicAuthorize(Roles = "PowerUser")]
+    [ApiAuthorize(Roles = "PowerUser")]
     [ProducesResponseType<bool?>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
@@ -134,7 +134,7 @@ public class DevicesController(IDataControlService controlService, ILogger<Devic
     }
 
     [HttpGet("{id}/setColorTemperature")]
-    [BasicAuthorize(Roles = "PowerUser")]
+    [ApiAuthorize(Roles = "PowerUser")]
     [ProducesResponseType<bool?>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
@@ -187,7 +187,7 @@ public class DevicesController(IDataControlService controlService, ILogger<Devic
     }
 
     [HttpGet("{id}/setHsv")]
-    [BasicAuthorize(Roles = "PowerUser")]
+    [ApiAuthorize(Roles = "PowerUser")]
     [ProducesResponseType<bool?>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
@@ -257,7 +257,7 @@ public class DevicesController(IDataControlService controlService, ILogger<Devic
     }
 
     [HttpGet("{id}/switch/{state}")]
-    [BasicAuthorize(Roles = "PowerUser")]
+    [ApiAuthorize(Roles = "PowerUser")]
     [ProducesResponseType<bool?>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status422UnprocessableEntity)]

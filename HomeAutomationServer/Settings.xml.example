@@ -8,6 +8,21 @@
    </ModbusMappings>
    <ServerIpAddress>0.0.0.0</ServerIpAddress>
    <ServerPort>1502</ServerPort>
+   <!-- Optional. How clients log in. A client exchanges its user name and password for a bearer token
+        (POST api/Identity/login) and sends that token with every request; it renews the token shortly before it
+        expires. The tokens are kept in the server's memory only, so a restart ends every session and the clients
+        log in again by themselves. BearerTokenLifetimeMinutes is how long a token stays valid (30 by default,
+        at least 1).
+        EnableBasicAuthentication and EnableCookieAuthentication are for debugging and off by default.
+        Basic lets a request carry the user name and password itself (Authorization: Basic), e.g. from curl.
+        Cookie makes a login also set an "auth" cookie holding the token, so that after one
+        api/Identity/login?user=...&password=... in the address bar the API can be called from the same browser.
+        The server logs a warning at every start while either of them is on. Leave the element out for the defaults. -->
+   <Authentication>
+      <BearerTokenLifetimeMinutes>30</BearerTokenLifetimeMinutes>
+      <EnableBasicAuthentication>false</EnableBasicAuthentication>
+      <EnableCookieAuthentication>false</EnableCookieAuthentication>
+   </Authentication>
    <!-- Optional. How often the GEN24 inverters in Gen24Connections are polled (RefreshRate, every 5 seconds by
         default) and how often each inverter's own configuration is re-read (ConfigRefreshRate, every 5 minutes by
         default), and where the energy history log file per inverter is written (LogDirectory, /var/log by default).

@@ -75,8 +75,8 @@ public class HomeAutomationHub(IDataControlService controlService, IWattPilotSer
     /// </para>
     /// <para>
     /// The same role as every Gen24 write endpoint asks for. The ticket that opened the connection only proves the
-    /// User role, which is why this is said again here; the ticket principal carries the same role claims Basic
-    /// authentication would.
+    /// User role, which is why this is said again here; the ticket principal carries the same role claims the API's
+    /// own authentication would.
     /// </para>
     /// </remarks>
     [Authorize(AuthenticationSchemes = HubTicketAuthenticationService.SchemeName, Roles = nameof(Roles.Operator))]
