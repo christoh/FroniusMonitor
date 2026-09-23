@@ -56,12 +56,16 @@ A new string therefore needs its property added there by hand, or nothing compil
 ## What is tested
 
 `LocalizationTests` in `HomeAutomationServerTests` reads the compiled satellite assemblies, so it sees exactly
-what each culture carries of its own. It checks the two things that can go wrong unnoticed:
+what each culture carries of its own. It checks the three things that can go wrong unnoticed:
 
 - **A key that exists only in a translation is dead.** A typo in the name, or a string renamed in the neutral file
   and left behind in the others: nothing reads it and nothing complains.
 - **A translation that loses a `{0}`** silently drops whatever was to be put there, and one that invents a
   placeholder throws when `string.Format` is not given it.
+- **A translation that was double encoded** - UTF-8 read as Windows-1252 and saved again - shows `PrÃ©vision` for
+  `Prévision`, and nothing complains: Avalonia and ScottPlot draw it exactly as garbled as it reads. Twenty-two
+  strings in five languages were like that until 2026-09-23. None of our languages has an `Ã` or `Â` followed by
+  such a second character, so the test fails on that pair.
 
 It deliberately does *not* check that every key exists in every language, because that is not the rule.
 
