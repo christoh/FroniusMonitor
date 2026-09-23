@@ -442,8 +442,9 @@ public sealed class WebClientService : IWebClientService
     private void ScheduleRenewal(TimeSpan dueIn)
     {
         renewalTimer?.Dispose();
-        // Not awaited, because a timer cannot await. RenewTokenAsync reports its own failures and never throws.
-        renewalTimer = clock.CreateTimer(_ => RenewTokenAsync(), null, dueIn, Timeout.InfiniteTimeSpan);
+        // Discarded, because a timer cannot await. That is only allowed for a call that cannot throw, and
+        // RenewTokenAsync cannot: it catches and logs everything itself, there being nobody else to report to.
+        renewalTimer = clock.CreateTimer(_ => _ = RenewTokenAsync(), null, dueIn, Timeout.InfiniteTimeSpan);
     }
 
     /// <summary>

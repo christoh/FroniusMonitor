@@ -98,7 +98,9 @@ public sealed class ReverseProxyTests
         var xml = SettingsXml.Serialize(new Settings { WebServerSettings = new WebServerSettings { TrustedProxies = ["192.168.44.1", "10.0.0.0/8"] } });
 
         Assert.Contains("<Proxy>192.168.44.1</Proxy>", xml);
-        Assert.Equal(["192.168.44.1", "10.0.0.0/8"], SettingsXml.Deserialize(xml).WebServerSettings.TrustedProxies);
+        var read = SettingsXml.Deserialize(xml).WebServerSettings.TrustedProxies;
+        Assert.NotNull(read);
+        Assert.Equal(["192.168.44.1", "10.0.0.0/8"], read);
         Assert.DoesNotContain("TrustedProxies", SettingsXml.Serialize(new Settings()));
     }
 
