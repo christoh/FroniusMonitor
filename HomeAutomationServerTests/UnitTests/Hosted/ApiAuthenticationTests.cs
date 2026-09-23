@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using De.Hochstaetter.HomeAutomationClient.Services;
 using De.Hochstaetter.HomeAutomationServer.Controllers;
+using De.Hochstaetter.HomeAutomationServer.Misc;
 using De.Hochstaetter.HomeAutomationServer.Models.Authorization;
 using De.Hochstaetter.HomeAutomationServer.Models.Settings;
 using De.Hochstaetter.HomeAutomationServer.Services;
@@ -28,10 +29,12 @@ public sealed class ApiAuthenticationTests : IAsyncLifetime
 {
     private const string AdminName = "root";
     private const string OtherAdminName = "toor";
+    private const string DeveloperName = "dev";
+    private const string OpenApiDocument = "openapi/v1.json";
 
     private static readonly DateTimeOffset Now = new(2026, 9, 23, 12, 0, 0, TimeSpan.Zero);
 
-    private readonly Settings settings = new() { Users = [TestUsers.Create(AdminName, Roles.Administrator), TestUsers.Create(OtherAdminName, Roles.Administrator)] };
+    private readonly Settings settings = new() { Users = [TestUsers.Create(AdminName, Roles.Administrator), TestUsers.Create(OtherAdminName, Roles.Administrator), TestUsers.Create(DeveloperName, Roles.Developer)] };
     private readonly SettableTimeProvider serverClock = new(Now);
     private readonly ManualTimeProvider clientClock = new(Now);
     private readonly ILoggerFactory clientLogging = LoggerFactory.Create(builder => builder.AddTestOutput());
@@ -254,10 +257,116 @@ public sealed class ApiAuthenticationTests : IAsyncLifetime
         Assert.Equal(HttpStatusCode.Unauthorized, (await http.GetAsync("Identity/users")).StatusCode);
     }
 
-    private HttpClient Raw(CookieContainer? cookies = null) => new(new HttpClientHandler { CookieContainer = cookies ?? new CookieContainer() })
+    private HttpClient Raw(CookieContainer? cookies = null, bool followRedirects = true) => new(new HttpClientHandler { CookieContainer = cookies ?? new CookieContainer(), AllowAutoRedirect = followRedirects })
     {
         BaseAddress = new Uri(apiUri),
     };
+
+    [Fact]
+    public async Task A_browser_tab_swaps_its_ticket_for_a_cookie_and_loses_it_from_the_address()
+    {
+        var address = await TabAddress(DeveloperName);
+        Assert.Equal("/" + OpenApiDocument, address.AbsolutePath);
+        Assert.Contains($"{BrowserTabTicket.QueryParameter}=", address.Query);
+
+        using var http = Raw(followRedirects: false);
+        using var redirect = await http.GetAsync(address);
+
+        Assert.Equal(HttpStatusCode.Redirect, redirect.StatusCode);
+        Assert.Equal("/" + OpenApiDocument, redirect.Headers.Location?.OriginalString);
+
+        var setCookie = Assert.Single(redirect.Headers.GetValues("Set-Cookie"));
+        Assert.StartsWith(BrowserTabSessions.Cookie + "=", setCookie, StringComparison.Ordinal);
+        Assert.Contains("path=/openapi", setCookie, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("httponly", setCookie, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("samesite=strict", setCookie, StringComparison.OrdinalIgnoreCase);
+        // Although this host, like the real one behind its ingress, is reached over plain http.
+        Assert.Contains("secure", setCookie.Split(';').Select(part => part.Trim()), StringComparer.OrdinalIgnoreCase);
+
+        using var tab = await GetWithTabCookie(redirect.Headers.Location!.OriginalString, CookieValue(setCookie));
+        Assert.Equal(HttpStatusCode.OK, tab.StatusCode);
+        Assert.Equal("the document", await tab.Content.ReadAsStringAsync());
+    }
+
+    [Fact]
+    public async Task A_browser_tab_ticket_works_once()
+    {
+        var address = await TabAddress(DeveloperName);
+
+        Assert.NotNull(await OpenTab(address));
+        Assert.Null(await OpenTab(address));
+    }
+
+    [Fact]
+    public async Task A_browser_tab_ticket_expires_within_seconds()
+    {
+        var address = await TabAddress(DeveloperName);
+
+        serverClock.Now = Now + BearerTokenService.TabTicketLifetime;
+
+        Assert.Null(await OpenTab(address));
+    }
+
+    [Fact]
+    public async Task A_browser_tab_of_somebody_who_is_no_developer_is_refused_the_document()
+    {
+        var cookie = Assert.IsType<string>(await OpenTab(await TabAddress(AdminName)));
+
+        using var tab = await GetWithTabCookie("/" + OpenApiDocument, cookie);
+        Assert.Equal(HttpStatusCode.Forbidden, tab.StatusCode);
+    }
+
+    [Fact]
+    public async Task The_cookie_of_a_browser_tab_reaches_nothing_but_the_OpenAPI_document()
+    {
+        var cookie = Assert.IsType<string>(await OpenTab(await TabAddress(DeveloperName)));
+
+        // A browser would not send it outside /openapi at all; the server must not take it there either.
+        using var outside = await GetWithTabCookie("/api/Identity/hubTicket", cookie);
+        Assert.Equal(HttpStatusCode.Unauthorized, outside.StatusCode);
+    }
+
+    /// <summary>
+    /// Opens the tab the way a browser does - the address with the ticket - and answers the cookie it was given, or
+    /// <see langword="null"/> where it was given none. The redirect is not followed here: the cookie is
+    /// <c>Secure</c>, and a cookie jar, a browser's as much as .NET's, does not send it back over the plain http this
+    /// host is reached at. In production the browser speaks https to the ingress, so there it does.
+    /// </summary>
+    private async Task<string?> OpenTab(Uri address)
+    {
+        using var http = Raw(followRedirects: false);
+        using var redirect = await http.GetAsync(address);
+
+        Assert.Equal(HttpStatusCode.Redirect, redirect.StatusCode);
+
+        return redirect.Headers.TryGetValues("Set-Cookie", out var values)
+            ? values.Where(value => value.StartsWith(BrowserTabSessions.Cookie + "=", StringComparison.Ordinal)).Select(CookieValue).SingleOrDefault()
+            : null;
+    }
+
+    /// <summary>A request that carries the tab's cookie, as the browser sends it over https.</summary>
+    private async Task<HttpResponseMessage> GetWithTabCookie(string path, string cookie)
+    {
+        using var http = Raw();
+        using var request = new HttpRequestMessage(HttpMethod.Get, new Uri(new Uri(address), path));
+        request.Headers.Add("Cookie", $"{BrowserTabSessions.Cookie}={cookie}");
+        return await http.SendAsync(request);
+    }
+
+    private static string CookieValue(string setCookie) => setCookie.Split(';')[0][(BrowserTabSessions.Cookie.Length + 1)..];
+
+    /// <summary>The address of the OpenAPI document with a fresh ticket, as the menu item gets it.</summary>
+    private async Task<Uri> TabAddress(string userName)
+    {
+        using var user = new WebClientService(null, new ManualTimeProvider(Now));
+        user.Initialize(apiUri, "test", "1.0");
+        Assert.Equal(HttpStatusCode.OK, (await user.Login(userName, TestUsers.Password)).Status);
+
+        var result = await user.GetBrowserTabUri(OpenApiDocument);
+
+        Assert.Equal(HttpStatusCode.OK, result.Status);
+        return Assert.IsType<Uri>(result.Payload);
+    }
 
     /// <summary>
     /// Stops the server and starts a new one at the same address with the same users, the way a restart reads them
@@ -292,7 +401,17 @@ public sealed class ApiAuthenticationTests : IAsyncLifetime
         builder.Services.AddHubTicketAuthentication();
 
         var server = builder.Build();
+
+        // In the order Program.cs has them: the ticket is swapped before anything is authenticated.
+        server.UseBrowserTabSessions();
+        server.UseAuthentication();
+        server.UseAuthorization();
+
         server.MapControllers();
+
+        // A stand-in for MapOpenApi, under the policy Program.cs gives it.
+        server.MapGet("/" + OpenApiDocument, () => "the document")
+            .RequireAuthorization(policy => policy.AddAuthenticationSchemes(ApiAuthenticationService.SchemeName).RequireRole(nameof(Roles.Developer)));
         await server.StartAsync();
         return server;
     }

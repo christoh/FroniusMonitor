@@ -150,6 +150,19 @@ public sealed class WebClientService : IWebClientService
         return await response.Content.ReadAsStringAsync(token).ConfigureAwait(false);
     }
 
+    public Task<ApiResult<Uri>> GetBrowserTabUri(string path, CancellationToken token = default) => ReadResult
+    (
+        t => SendAuthenticated(t2 => httpClient.PostAsync("Identity/tabTicket", null, t2), t),
+        async (content, t) =>
+        {
+            var ticket = await content.ReadAsStringAsync(t).ConfigureAwait(false);
+            // "../" against .../api/ is the root of the server, which path is relative to.
+            var root = new Uri(httpClient.BaseAddress!, "../");
+            return new Uri(root, $"{path}?{BrowserTabTicket.QueryParameter}={Uri.EscapeDataString(ticket)}");
+        },
+        token
+    );
+
     public async Task<ApiResult<bool>> Logout(CancellationToken token = default)
     {
         // Still with the token, which is what the server revokes.

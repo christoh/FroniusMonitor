@@ -1867,4 +1867,7 @@
   <data name="ShowChangelog" xml:space="preserve">
     <value>Afficher les modifications</value>
   </data>
+  <data name="OpenApiDocument" xml:space="preserve">
+    <value>Document OpenAPI</value>
+  </data>
 </root>

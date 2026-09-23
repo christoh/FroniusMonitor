@@ -243,6 +243,8 @@ internal class Program
         // could talk to the controllers, whose endpoints carry no authorization metadata, and only failed on the
         // hub. Naming them suppresses the automatic ones.
         app.UseCors();
+        // Before the authentication: the request carrying a browser tab's ticket is only ever answered with a redirect.
+        app.UseBrowserTabSessions();
         app.UseAuthentication();
         app.UseAuthorization();
 

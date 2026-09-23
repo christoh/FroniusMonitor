@@ -43,6 +43,14 @@ public interface IWebClientService : IDisposable
     Task<ApiResult<IDictionary<string, DeviceInfo>>> ListDevices(CancellationToken token = default);
 
     /// <summary>
+    /// The address of <paramref name="path"/> on the server, relative to its root, with a one-time ticket that makes
+    /// a browser tab opened at it a session of whoever is logged in here: a tab cannot be opened with the bearer
+    /// token, so the server swaps the ticket for a cookie of the tab's own (see <c>BrowserTabTicket</c>). Ask for it
+    /// right before opening the tab: the ticket works once, and only for seconds.
+    /// </summary>
+    Task<ApiResult<Uri>> GetBrowserTabUri(string path, CancellationToken token = default);
+
+    /// <summary>
     /// Ends the session: asks the server to revoke the bearer token and to delete its cookie, if it set one, and
     /// then drops the token and the password this client holds, so the next call goes out unauthenticated. Needs
     /// no role; a client that is no longer sure it is logged in must still be able to call this.

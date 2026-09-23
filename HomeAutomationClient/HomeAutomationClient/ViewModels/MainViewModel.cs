@@ -68,7 +68,7 @@ public sealed partial class MainViewModel : ViewModelBase, IPowerDisplayOptions
     /// Who is logged in, as the server reported it at the login, for the menu bar. The roles are the enum names as
     /// they are, not localized: they are what the server's user list says, and what an administrator would type.
     /// </summary>
-    [ObservableProperty, NotifyPropertyChangedFor(nameof(UserText), nameof(SettingsItems), nameof(ShowSettingsMenu))]
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(UserText), nameof(SettingsItems), nameof(ShowSettingsMenu), nameof(ShowOpenApiDocumentMenu))]
     public partial UserInfo? User { get; set; }
 
     public string? UserText => User is { } user ? $"{user.UserName} ({user.Roles})" : null;
@@ -79,6 +79,12 @@ public sealed partial class MainViewModel : ViewModelBase, IPowerDisplayOptions
     /// visible to every user on purpose; see <see cref="SettingsItems"/>.
     /// </summary>
     public bool ShowSettingsMenu => User?.Roles.SeesAllDevices() ?? false;
+
+    /// <summary>
+    /// The OpenAPI document in the View menu, for developers only: the server answers anybody else with 403, so for
+    /// them the entry could lead nowhere but to an error.
+    /// </summary>
+    public bool ShowOpenApiDocumentMenu => User?.Roles.HasFlag(Roles.Developer) ?? false;
 
     /// <summary>
     /// The Dashboard entry, which is there to bring the dashboard back once a detail page has taken its place.
@@ -466,6 +472,30 @@ public sealed partial class MainViewModel : ViewModelBase, IPowerDisplayOptions
     {
         await new SolarWebChartViewModel(new DialogParameters { Title = Loc.SolarWeb, IsResizeable = true }).ShowDialogAsync().ConfigureAwait(true);
     });
+
+    /// <summary>
+    /// The server's OpenAPI document, in a browser tab of its own - a new tab in the browser head, the default
+    /// browser elsewhere. The tab cannot carry the bearer token, so its address carries a one-time ticket that the
+    /// server swaps for a cookie; see <see cref="IWebClientService.GetBrowserTabUri"/>.
+    /// </summary>
+    [RelayCommand]
+    private Task ShowOpenApiDocument() => TaskExceptionHandler(async () =>
+    {
+        var result = await webClient.GetBrowserTabUri(OpenApiDocumentPath).ConfigureAwait(true);
+
+        if (result is not { Status: HttpStatusCode.OK, Payload: { } uri })
+        {
+            await ShowHttpError(result).ConfigureAwait(true);
+            return;
+        }
+
+        // The ticket is worth nothing after a few seconds, so it is fetched on the click and not before; that is
+        // quick enough for the browser to still count the tab as opened by the user rather than as a pop-up.
+        await IoC.GetRegistered<IUriLauncher>().LaunchAsync(uri).ConfigureAwait(true);
+    });
+
+    /// <summary>Where <c>MapOpenApi</c> serves the document, relative to the root of the server.</summary>
+    private const string OpenApiDocumentPath = "openapi/v1.json";
 
     /// <summary>
     /// A firmware status from the server, on the hub's thread or from the catch-up. Where it names outdated firmware the

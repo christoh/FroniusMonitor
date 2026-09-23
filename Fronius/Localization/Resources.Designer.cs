@@ -5596,6 +5596,14 @@ namespace De.Hochstaetter.Fronius.Localization {
             }
         }
         /// <summary>
+        ///   Looks up a localized string similar to OpenAPI document.
+        /// </summary>
+        public static string OpenApiDocument {
+            get {
+                return ResourceManager.GetString("OpenApiDocument", resourceCulture);
+            }
+        }
+        /// <summary>
         ///   Looks up a localized string similar to Solar.web.
         /// </summary>
         public static string SolarWeb {

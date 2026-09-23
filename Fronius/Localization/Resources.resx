@@ -1998,4 +1998,7 @@
   <data name="ShowChangelog" xml:space="preserve">
     <value>Show changelog</value>
   </data>
+  <data name="OpenApiDocument" xml:space="preserve">
+    <value>OpenAPI document</value>
+  </data>
 </root>

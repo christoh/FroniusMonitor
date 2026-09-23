@@ -83,6 +83,8 @@
                                       IsVisible="{Binding UpdateService.HasEnergyData}"/>
                             <MenuItem Header="{x:Static p:Resources.SolarWeb}" Command="{Binding ShowSolarWebChartCommand}" Padding="8,12"
                                       IsVisible="{Binding UpdateService.HasSolarWeb}"/>
+                            <MenuItem Header="{x:Static p:Resources.OpenApiDocument}" Command="{Binding ShowOpenApiDocumentCommand}" Padding="8,12"
+                                      IsVisible="{Binding ShowOpenApiDocumentMenu}"/>
                         </MenuFlyout>
                     </Button.Flyout>
                 </Button>

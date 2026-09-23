@@ -14,6 +14,8 @@ paths:
   - HomeAutomationServer/Program.cs
   - Fronius/Models/WebApi/LoginRequest.cs
   - Fronius/Models/WebApi/LoginResponse.cs
+  - Fronius/Models/WebApi/BrowserTabTicket.cs
+  - HomeAutomationServer/Misc/BrowserTabSessions.cs
   - HomeAutomationClient/HomeAutomationClient/Contracts/IWebClientService.cs
   - HomeAutomationClient/HomeAutomationClient/Services/WebClientService.cs
   - HomeAutomationServerTests/UnitTests/BearerTokenServiceTests.cs
@@ -111,6 +113,51 @@ It used to hold the Basic header, i.e. the password, for seven days. Now `Identi
 matters: the CORS policy allows every origin with credentials, so without it any page the logged-in browser opens
 could call the API. A token that expires, or a server restart, means logging in again in the browser - acceptable
 for a debugging aid.
+
+## Browser tabs: a one-time ticket swapped for a cookie
+
+Asked for on 2026-09-23: the View menu has "OpenAPI document" (`MainViewModel.ShowOpenApiDocumentCommand`, visible
+only with `Roles.Developer` through `ShowOpenApiDocumentMenu`), which opens `/openapi/v1.json` in a browser tab. A
+tab cannot be opened with an `Authorization` header, so:
+
+1. `IWebClientService.GetBrowserTabUri(path)` posts `api/Identity/tabTicket` (`[ApiAuthorize]`) and builds
+   `<root>/<path>?tabTicket=<ticket>` (`BrowserTabTicket.QueryParameter`, shared in `Fronius`).
+2. `IUriLauncher` opens it: a new tab in the browser head, the default browser on the other heads - it works on
+   every head, not only in the browser.
+3. `BrowserTabSessions.UseBrowserTabSessions`, a middleware **before** `UseAuthentication`, sees the ticket below
+   `PathPrefix` (`/openapi`), redeems it (`BearerTokenService.RedeemTabTicket`), issues a normal bearer token and
+   sets it as the cookie `tab` - `Path=/openapi`, `HttpOnly`, `SameSite=Strict`, **always** `Secure`, `MaxAge` =
+   token lifetime - then redirects to the same address **without** the ticket, so it stays neither in the address
+   bar nor in the history. A ticket that does not hold up gets the same redirect and no cookie; the tab then shows
+   the endpoint's 401.
+4. `ApiAuthenticationService` takes the `tab` cookie (the bare token, no `Bearer` prefix) only when there is no
+   header and no debugging cookie, and **only below `/openapi`** (`BrowserTabSessions.Covers`) - checked on the
+   server, not just left to the cookie's path.
+
+The ticket goes into an address and so into access logs, which is why it is not the token: it lives
+`BearerTokenService.TabTicketLifetime` (30 s), works once, and obeys `IsCurrent` like a token (deleted user,
+changed password). It is kept in a dictionary of its own, so a ticket is never accepted as a bearer token.
+
+**Always `Secure`, not `Request.IsHttps`** (the developer's choice of 2026-09-23): the server never runs https
+itself. It runs http in a Docker container, and https comes from an ingress in front of it, so `IsHttps` is always
+false and the cookie would be sent over plain http too. The price: reached over plain http directly
+(`docker-compose.yml` publishes 8080), the browser drops the cookie and the tab gets 401; `http://localhost` is
+exempt in Chrome and Firefox. The server does not read `X-Forwarded-Proto`/`-For` - offered as a separate step
+(it would also put the real client IP instead of the ingress's into every "from {Ip}" log line), not done. The
+debugging cookie `auth` is deliberately not `Secure`: it is the one used over direct http.
+
+This cookie is independent of `EnableCookieAuthentication`: it reaches nothing but `/openapi` and is only set in
+exchange for a ticket a logged-in client asked for. It is not renewed and is not revoked by the app's logout; a tab
+that has outlived it is opened again from the menu. To give another path a tab, widen `PathPrefix` (it is both
+the cookie path and the server-side check) - there is only one prefix today.
+
+The ticket is fetched on the click, not in advance, because it expires; browsers count a tab opened within a few
+seconds of a click as opened by the user (transient activation), so the round trip does not make it a blocked
+pop-up. Not verified in a real browser yet.
+
+Tests: `ApiAuthenticationTests` (a stand-in `/openapi/v1.json` under the same policy as `Program.cs`, the middleware
+in `Program.cs`'s order): the redirect and cookie, once only, expiry, 403 for a non-developer, and the cookie refused
+outside `/openapi`. `BearerTokenServiceTests`: a ticket is no token, and a password change voids it.
 
 ## The client: `WebClientService`
 

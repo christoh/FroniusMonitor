@@ -34,6 +34,12 @@ public sealed class ApiAuthenticationService(BearerTokenService tokens, IOptions
             authHeader = Request.Cookies[AuthCookie];
         }
 
+        // The cookie of a browser tab holds the bare token, and counts only where the tab was opened for.
+        if (string.IsNullOrEmpty(authHeader) && BrowserTabSessions.Covers(Request.Path) && Request.Cookies[BrowserTabSessions.Cookie] is { Length: > 0 } tabToken)
+        {
+            authHeader = "Bearer " + tabToken;
+        }
+
         if (string.IsNullOrEmpty(authHeader))
         {
             if (Logger.IsEnabled(LogLevel.Debug))

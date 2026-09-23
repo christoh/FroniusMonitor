@@ -142,6 +142,26 @@ public sealed class BearerTokenServiceTests
     }
 
     [Fact]
+    public void A_browser_tab_ticket_is_redeemed_once_and_is_no_bearer_token()
+    {
+        var ticket = tokens.IssueTabTicket(bob);
+
+        Assert.Null(tokens.Validate(ticket));
+        Assert.Same(bob, tokens.RedeemTabTicket(ticket));
+        Assert.Null(tokens.RedeemTabTicket(ticket));
+    }
+
+    [Fact]
+    public void A_browser_tab_ticket_is_worthless_once_the_password_changed()
+    {
+        var ticket = tokens.IssueTabTicket(bob);
+
+        bob.SetPassword("something else");
+
+        Assert.Null(tokens.RedeemTabTicket(ticket));
+    }
+
+    [Fact]
     public void A_lifetime_below_one_minute_is_taken_as_one_minute()
     {
         userList.Authentication.BearerTokenLifetimeMinutes = 0;

@@ -80,22 +80,7 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
     [ApiAuthorize]
     [ProducesResponseType<LoginResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
-    public IActionResult RenewToken([FromServices] BearerTokenService tokens)
-    {
-        var userName = HttpContext.User.Identity?.Name;
-
-        if (FindUser(userName) is not { } dbUser)
-        {
-            if (logger.IsEnabled(LogLevel.Warning))
-            {
-                logger.LogWarning("No bearer token for {Username}: authenticated, but not in the user list", userName);
-            }
-
-            return Unauthorized(Helpers.GetProblemDetails(Loc.CannotLogin, Loc.LoginIncorrect));
-        }
-
-        return Ok(IssueToken(dbUser, tokens));
-    }
+    public IActionResult RenewToken([FromServices] BearerTokenService tokens) => ForCurrentUser("bearer token", user => Ok(IssueToken(user, tokens)));
 
     /// <summary>
     /// Ends the session: the bearer token the request carries stops working at once, and the cookie is deleted.
@@ -129,24 +114,19 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
     [ApiAuthorize]
     [ProducesResponseType<string>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
-    public IActionResult HubTicket([FromServices] HubTicketService hubTickets)
-    {
-        var userName = HttpContext.User.Identity?.Name;
-        var dbUser = FindUser(userName);
+    // Content, not Ok: the ticket is an opaque string and the client reads it as one, without JSON quoting.
+    public IActionResult HubTicket([FromServices] HubTicketService hubTickets) => ForCurrentUser("hub ticket", user => Content(hubTickets.Issue(user)));
 
-        if (dbUser == null)
-        {
-            if (logger.IsEnabled(LogLevel.Warning))
-            {
-                logger.LogWarning("No hub ticket for {Username}: authenticated, but not in the user list", userName);
-            }
-
-            return Unauthorized(Helpers.GetProblemDetails(Loc.CannotLogin, Loc.LoginIncorrect));
-        }
-
-        // Content, not Ok: the ticket is an opaque string and the client reads it as one, without JSON quoting.
-        return Content(hubTickets.Issue(dbUser));
-    }
+    /// <summary>
+    /// A ticket for a browser tab the client is about to open, which the tab swaps for a cookie of its own: see
+    /// <see cref="BrowserTabTicket"/>. Valid once, for <see cref="BearerTokenService.TabTicketLifetime"/>.
+    /// </summary>
+    [HttpPost("tabTicket")]
+    [ApiAuthorize]
+    [ProducesResponseType<string>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    // Content, not Ok, for the same reason as HubTicket.
+    public IActionResult TabTicket([FromServices] BearerTokenService tokens) => ForCurrentUser("browser tab ticket", user => Content(tokens.IssueTabTicket(user)));
 
     [HttpGet("users")]
     [ApiAuthorize(Roles = nameof(Roles.Administrator))]
@@ -343,6 +323,28 @@ public class IdentityController(Settings settings, ILogger<IdentityController> l
             AccessToken = token.Value,
             ExpiresInSeconds = (int)token.Lifetime.TotalSeconds,
         };
+    }
+
+    /// <summary>
+    /// <paramref name="answer"/> for the user the request was authenticated as, or 401 where they are authenticated
+    /// but no longer in the user list - deleted while their session was still valid.
+    /// </summary>
+    /// <param name="what">What they would have been given, for the log.</param>
+    private IActionResult ForCurrentUser(string what, Func<User, IActionResult> answer)
+    {
+        var userName = HttpContext.User.Identity?.Name;
+
+        if (FindUser(userName) is { } dbUser)
+        {
+            return answer(dbUser);
+        }
+
+        if (logger.IsEnabled(LogLevel.Warning))
+        {
+            logger.LogWarning("No {What} for {Username}: authenticated, but not in the user list", what, userName);
+        }
+
+        return Unauthorized(Helpers.GetProblemDetails(Loc.CannotLogin, Loc.LoginIncorrect));
     }
 
     private User? FindUser(string? userName) => userDb.CurrentValue.Find(userName);
