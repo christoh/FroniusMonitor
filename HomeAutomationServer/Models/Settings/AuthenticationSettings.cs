@@ -11,9 +11,9 @@ namespace De.Hochstaetter.HomeAutomationServer.Models.Settings;
 /// </para>
 /// <para>
 /// Basic and cookie authentication are for debugging - calling the API from a browser or a tool without a client -
-/// and are off unless switched on here. No <c>[DefaultValue]</c> on any of the three: every element is written to
-/// the file whatever it says, so that what a server accepts is readable from the file rather than implied by what
-/// is missing from it.
+/// and are off unless switched on here. All three are attributes of the element, and none has a
+/// <c>[DefaultValue]</c>: each is written to the file whatever it says, so that what a server accepts is readable
+/// from the file rather than implied by what is missing from it.
 /// </para>
 /// </remarks>
 public class AuthenticationSettings
@@ -26,6 +26,7 @@ public class AuthenticationSettings
     /// old one runs out, so this is how long a token read out of a log or a memory dump is worth anything, not how
     /// long a session may last. Anything below one minute is taken as one minute.
     /// </summary>
+    [XmlAttribute]
     public int BearerTokenLifetimeMinutes { get; set; } = DefaultBearerTokenLifetimeMinutes;
 
     /// <summary><see cref="BearerTokenLifetimeMinutes"/> as the <see cref="TimeSpan"/> the code works with.</summary>
@@ -36,6 +37,7 @@ public class AuthenticationSettings
     /// A debugging aid: it lets a browser or <c>curl</c> call the API without logging in first, and it sends the
     /// password with every single request.
     /// </summary>
+    [XmlAttribute]
     public bool EnableBasicAuthentication { get; set; }
 
     /// <summary>
@@ -43,5 +45,6 @@ public class AuthenticationSettings
     /// with every request on its own. A debugging aid: after one <c>api/Identity/login?user=...&amp;password=...</c>
     /// in the address bar, the rest of the API can be called from the same browser.
     /// </summary>
+    [XmlAttribute]
     public bool EnableCookieAuthentication { get; set; }
 }

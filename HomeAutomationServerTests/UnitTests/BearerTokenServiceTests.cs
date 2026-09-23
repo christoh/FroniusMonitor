@@ -155,10 +155,8 @@ public sealed class BearerTokenServiceTests
         var xml = SettingsXml.Serialize(new Settings());
 
         // Written even when they hold their defaults, so that what a server accepts is readable from Settings.xml.
-        Assert.Contains("<BearerTokenLifetimeMinutes>30</BearerTokenLifetimeMinutes>", xml);
-        Assert.Contains("<EnableBasicAuthentication>false</EnableBasicAuthentication>", xml);
-        Assert.Contains("<EnableCookieAuthentication>false</EnableCookieAuthentication>", xml);
-        Assert.DoesNotContain("<BearerTokenLifetime>", xml);
+        Assert.Contains("<Authentication BearerTokenLifetimeMinutes=\"30\" EnableBasicAuthentication=\"false\" EnableCookieAuthentication=\"false\" />", xml);
+        Assert.DoesNotContain("BearerTokenLifetime=", xml);
     }
 
     [Fact]

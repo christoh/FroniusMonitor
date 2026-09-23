@@ -63,10 +63,10 @@ Unknown tokens are logged at Information, not Warning: every client presents one
 ## Settings.xml: the `Authentication` element
 
 `AuthenticationSettings`, reached as `Settings.Authentication` and handed on as `UserList.Authentication` (the very
-object - `Program.cs` configures `UserList` with it, the way it does `Users`). All three elements are written
+object - `Program.cs` configures `UserList` with it, the way it does `Users`). All three are **attributes** of the element (the developer's choice of 2026-09-23) and are written
 whatever they hold, no `[DefaultValue]`, like `EnableGuestAccount`:
 
-| Element | Default | Meaning |
+| Attribute | Default | Meaning |
 |---|---|---|
 | `BearerTokenLifetimeMinutes` | 30 | Anything below 1 is taken as 1 (`BearerTokenLifetime`). |
 | `EnableBasicAuthentication` | false | `Authorization: Basic` accepted on every request. |
