@@ -60,7 +60,8 @@ public static class BrowserTabSessions
                 HttpOnly = true,
                 SameSite = SameSiteMode.Strict,
                 // Always, although Kestrel itself only ever sees http: in practice it runs in a container behind an
-                // ingress that does the https, so request.IsHttps is false even where the browser uses https. Without
+                // ingress that does the https, and request.IsHttps only says so where that ingress is listed in
+                // WebServerSettings/TrustedProxies (see ReverseProxies) - a setting to forget, not to rely on. Without
                 // it the browser would also send the token over plain http, e.g. on the request the ingress then
                 // redirects to https. Where the server is reached over plain http directly, the browser drops the
                 // cookie, and the tab gets a 401 - only http://localhost is exempt, as a secure context.

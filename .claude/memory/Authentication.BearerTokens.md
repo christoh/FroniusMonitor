@@ -142,8 +142,9 @@ changed password). It is kept in a dictionary of its own, so a ticket is never a
 itself. It runs http in a Docker container, and https comes from an ingress in front of it, so `IsHttps` is always
 false and the cookie would be sent over plain http too. The price: reached over plain http directly
 (`docker-compose.yml` publishes 8080), the browser drops the cookie and the tab gets 401; `http://localhost` is
-exempt in Chrome and Firefox. The server does not read `X-Forwarded-Proto`/`-For` - offered as a separate step
-(it would also put the real client IP instead of the ingress's into every "from {Ip}" log line), not done. The
+exempt in Chrome and Firefox. Since the same day the server reads `X-Forwarded-Proto`/`-For` from the proxies listed in
+`WebServerSettings/TrustedProxies` (see `ReverseProxy.md`), so `IsHttps` can be true behind nginx - but only once
+the proxy is listed, which is why the cookie does not depend on it. The
 debugging cookie `auth` is deliberately not `Secure`: it is the one used over direct http.
 
 This cookie is independent of `EnableCookieAuthentication`: it reaches nothing but `/openapi` and is only set in

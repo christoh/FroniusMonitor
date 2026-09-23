@@ -37,6 +37,7 @@
     <File Path=".claude/memory/Navigation.Lifecycle.md" />
     <File Path=".claude/memory/PlatformHeads.Lifecycle.md" />
     <File Path=".claude/memory/PowerFlowPage.Lifecycle.md" />
+    <File Path=".claude/memory/ReverseProxy.md" />
     <File Path=".claude/memory/SettingsDialogs.Lifecycle.md" />
     <File Path=".claude/memory/SignalR.MessageDirection.md" />
     <File Path=".claude/memory/SmartMeterDetailsView.Lifecycle.md" />

@@ -19,6 +19,16 @@
         api/Identity/login?user=...&password=... in the address bar the API can be called from the same browser.
         The server logs a warning at every start while either of them is on. Leave the element out for the defaults. -->
    <Authentication BearerTokenLifetimeMinutes="30" EnableBasicAuthentication="false" EnableCookieAuthentication="false" />
+   <!-- Optional. The reverse proxy in front of the server (nginx, an ingress) whose X-Forwarded-For and
+        X-Forwarded-Proto are believed, so that the log shows the client's address instead of the proxy's.
+        A Proxy is an IP address (192.168.44.1) or a network (192.168.44.0/24), as the server sees the proxy connect:
+        until it is listed here, that is the address every "from ..." in the log shows. Loopback is trusted anyway.
+        Do not list more than the proxy: whoever is trusted here can choose the address they are logged under. -->
+   <WebServerSettings>
+      <TrustedProxies>
+         <Proxy>192.168.44.1</Proxy>
+      </TrustedProxies>
+   </WebServerSettings>
    <!-- Optional. How often the GEN24 inverters in Gen24Connections are polled (RefreshRate, every 5 seconds by
         default) and how often each inverter's own configuration is re-read (ConfigRefreshRate, every 5 minutes by
         default), and where the energy history log file per inverter is written (LogDirectory, /var/log by default).

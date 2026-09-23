@@ -232,6 +232,10 @@ internal class Program
         //    .AddScheme<UserList, MyAuthenticationHandler>("MyAuthenticationSchemeName", options => {});
 
         var app = builder.Build();
+
+        // First of all, so that everything after it - above all every "from {Ip}" in the log - sees the client
+        // behind the reverse proxy instead of the proxy.
+        app.UseForwardedHeaders(ReverseProxies.CreateOptions(settings?.WebServerSettings.TrustedProxies, app.Services.GetRequiredService<ILogger<Program>>()));
         app.UseResponseCompression();
 
         // CORS has to run before authorization, and naming the two here is the only way to get that order:
