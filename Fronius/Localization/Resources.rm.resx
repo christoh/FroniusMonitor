@@ -1778,7 +1778,7 @@
     <value>Prognosa</value>
   </data>
   <data name="Measured" xml:space="preserve">
-    <value>MesirÃ </value>
+    <value>Mesirà</value>
   </data>
   <data name="LoadingEnergyData" xml:space="preserve">
     <value>Chargiar pretschs ed aura</value>
@@ -1796,7 +1796,7 @@
     <value>Naginas datas da la producziun da vent e solara</value>
   </data>
   <data name="NoPriceComponents" xml:space="preserve">
-    <value>Las cumponentas dal pretsch n'Ã¨n betg disponiblas</value>
+    <value>Las cumponentas dal pretsch n'èn betg disponiblas</value>
   </data>
   <data name="LogOut" xml:space="preserve">
     <value>Sortir</value>

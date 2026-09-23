@@ -79,6 +79,40 @@ public class LocalizationTests
         Assert.Empty(mismatches);
     }
 
+    /// <summary>
+    /// UTF-8 read as Windows-1252 and saved again: every accented letter becomes two characters, the first of them
+    /// <c>Ã</c> or <c>Â</c> - <c>PrÃ©vision</c> for <c>Prévision</c>. Twenty-two strings in five languages were like
+    /// that until 2026-09-23, all from one commit, and nothing complained: ScottPlot and Avalonia draw them exactly as
+    /// garbled as they read (see <c>ChartTextTests</c>). None of our languages has an <c>Ã</c> or <c>Â</c> followed by
+    /// such a second character.
+    /// </summary>
+    [Theory]
+    [InlineData("de")]
+    [InlineData("de-ch")]
+    [InlineData("de-li")]
+    [InlineData("fr")]
+    [InlineData("gsw")]
+    [InlineData("it")]
+    [InlineData("rm")]
+    public void A_translation_is_not_double_encoded(string culture)
+    {
+        var translated = Strings(CultureInfo.GetCultureInfo(culture), tryParents: false);
+
+        var garbled = translated
+            .Where(entry => doubleEncoded.IsMatch(entry.Value))
+            .Select(entry => $"{entry.Key}: '{entry.Value}'")
+            .OrderBy(message => message, StringComparer.Ordinal)
+            .ToList();
+
+        Assert.Empty(garbled);
+    }
+
+    /// <summary>
+    /// <c>Ã</c> or <c>Â</c> - the lead bytes C3 and C2 as Windows-1252 shows them - followed by what a continuation
+    /// byte 80-BF turns into there: U+00A0 to U+00BF, or one of the typographic characters 80-9F stand for.
+    /// </summary>
+    private static readonly Regex doubleEncoded = new("[\u00C2\u00C3][\u00A0-\u00BF\u0152\u0153\u0160\u0161\u0178\u017D\u017E\u0192\u02C6\u02DC\u2013\u2014\u2018-\u201E\u2020-\u2022\u2026\u2030\u2039\u203A\u20AC\u2122]");
+
     [Theory]
     [InlineData("de")]
     [InlineData("fr")]

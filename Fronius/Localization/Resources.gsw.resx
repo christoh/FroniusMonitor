@@ -1786,13 +1786,13 @@
     <value>Dis Chännwort isch gänderet worde</value>
   </data>
   <data name="AwattarServiceFee" xml:space="preserve">
-    <value>ServicegebÃ¼hr aWATTar</value>
+    <value>Servicegebühr aWATTar</value>
   </data>
   <data name="Tomorrow" xml:space="preserve">
     <value>Morn</value>
   </data>
   <data name="WeatherDwd" xml:space="preserve">
-    <value>WÃ¤tter (DWD)</value>
+    <value>Wätter (DWD)</value>
   </data>
   <data name="GlobalRadiation" xml:space="preserve">
     <value>Globalstrahlig</value>
@@ -1804,28 +1804,28 @@
     <value>Prognose</value>
   </data>
   <data name="Measured" xml:space="preserve">
-    <value>GmÃ¤sse</value>
+    <value>Gmässe</value>
   </data>
   <data name="LoadingEnergyData" xml:space="preserve">
-    <value>Priis und WÃ¤tter wÃ¤rde glade</value>
+    <value>Priis und Wätter wärde glade</value>
   </data>
   <data name="NoEnergyData" xml:space="preserve">
-    <value>FÃ¼r dÃ¤ Tag sind kei Priisdate verfÃ¼egbar</value>
+    <value>Für dä Tag sind kei Priisdate verfüegbar</value>
   </data>
   <data name="PricesFromWattPilot" xml:space="preserve">
     <value>Priis vom Wattpilot</value>
   </data>
   <data name="NoWeatherData" xml:space="preserve">
-    <value>Kei WÃ¤tterdate</value>
+    <value>Kei Wätterdate</value>
   </data>
   <data name="NoProductionData" xml:space="preserve">
     <value>Kei Date zur Wind- und Solarproduktion</value>
   </data>
   <data name="NoPriceComponents" xml:space="preserve">
-    <value>Die Priisbestandteil sind nid verfÃ¼egbar</value>
+    <value>Die Priisbestandteil sind nid verfüegbar</value>
   </data>
   <data name="LogOut" xml:space="preserve">
-    <value>AbmÃ¤lde</value>
+    <value>Abmälde</value>
   </data>
   <data name="ConfirmLogout" xml:space="preserve">
     <value>Bisch sicher, dass Du Di wottsch abmälde? Din gspeicherte Benützername und Dis Chännwort wärded vo däm Grät glöscht.</value>

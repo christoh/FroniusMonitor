@@ -1807,7 +1807,7 @@
     <value>Radiazione globale</value>
   </data>
   <data name="WindSpeed" xml:space="preserve">
-    <value>VelocitÃ  del vento</value>
+    <value>Velocità del vento</value>
   </data>
   <data name="Forecast" xml:space="preserve">
     <value>Previsione</value>
