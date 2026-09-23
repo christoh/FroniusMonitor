@@ -1793,7 +1793,7 @@
     <value>Se dÃ©connecter</value>
   </data>
   <data name="ConfirmLogout" xml:space="preserve">
-    <value>Veux-tu vraiment te dÃ©connecter ?</value>
+    <value>Veux-tu vraiment te déconnecter ? Ton nom d'utilisateur et ton mot de passe enregistrés seront supprimés de cet appareil.</value>
   </data>
   <data name="HouseConsumption" xml:space="preserve">
     <value>Maison</value>

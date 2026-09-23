@@ -68,7 +68,8 @@ and encrypted password - through `ICache.RemoveAsync`, so the login box comes up
 log the previous user in. The server address (`CacheKeys.ApiUri`/`HubUri`) is **kept**: it is not a credential, and
 without it the next user would first have to know where the server is. The call has its own
 `TaskExceptionHandler`, so a cache that cannot be written is reported but does not stop the logout before the login
-box is up. Before that date the cache was deliberately left alone so the box came up pre-filled; that is gone.
+box is up. `Loc.ConfirmLogout` tells the user so before they confirm. Before that date the cache was deliberately
+left alone so the box came up pre-filled; that is gone.
 `LoginAndStartAsync(followStartupPath: false, tryCachedLogin: false)` is what `Logout` passes: a startup deep link
 has already been resolved once and there is nothing left to follow the second time, so it always lands on the
 dashboard, and the cached credentials are **not** tried - there are none left, and where forgetting them failed,

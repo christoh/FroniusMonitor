@@ -1802,7 +1802,7 @@
     <value>Sortir</value>
   </data>
   <data name="ConfirmLogout" xml:space="preserve">
-    <value>Vuls ti propi sortir?</value>
+    <value>Vuls ti propi sortir? Tes num d'utilisader e tes pled-clav memorisads vegnan stizzads da quest apparat.</value>
   </data>
   <data name="HouseConsumption" xml:space="preserve">
     <value>Chasa</value>

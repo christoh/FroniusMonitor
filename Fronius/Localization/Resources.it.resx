@@ -1837,7 +1837,7 @@
     <value>Esci</value>
   </data>
   <data name="ConfirmLogout" xml:space="preserve">
-    <value>Sei sicuro di voler uscire?</value>
+    <value>Sei sicuro di voler uscire? Il nome utente e la password salvati verranno eliminati da questo dispositivo.</value>
   </data>
   <data name="HouseConsumption" xml:space="preserve">
     <value>Casa</value>

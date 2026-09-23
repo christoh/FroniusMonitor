@@ -1819,7 +1819,7 @@
     <value>Abmelden</value>
   </data>
   <data name="ConfirmLogout" xml:space="preserve">
-    <value>Bist Du sicher, dass Du Dich abmelden willst?</value>
+    <value>Bist Du sicher, dass Du Dich abmelden willst? Dein gespeicherter Benutzername und Dein Kennwort werden von diesem Gerät gelöscht.</value>
   </data>
   <data name="HouseConsumption" xml:space="preserve">
     <value>Haus</value>

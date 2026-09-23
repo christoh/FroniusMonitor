@@ -5461,7 +5461,7 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Are you sure you want to log out?.
+        ///   Looks up a localized string similar to Are you sure you want to log out? Your saved user name and password will be deleted from this device..
         /// </summary>
         public static string ConfirmLogout {
             get {

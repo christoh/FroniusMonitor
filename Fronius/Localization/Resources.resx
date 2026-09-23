@@ -1918,7 +1918,7 @@
     <value>Log out</value>
   </data>
   <data name="ConfirmLogout" xml:space="preserve">
-    <value>Are you sure you want to log out?</value>
+    <value>Are you sure you want to log out? Your saved user name and password will be deleted from this device.</value>
   </data>
   <data name="HouseConsumption" xml:space="preserve">
     <value>House</value>
