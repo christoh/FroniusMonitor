@@ -223,9 +223,9 @@ public sealed partial class MainViewModel : ViewModelBase, IPowerDisplayOptions
     /// </param>
     /// <param name="tryCachedLogin">
     /// Whether the remembered credentials are tried before the login box is shown. True at startup, where a
-    /// remembered login gets straight in and the box appears only when that does not work. False after a logout:
-    /// the attempt would put the very user who has just logged out straight back in, and the pre-filled box is
-    /// exactly what another user of this device needs to get in at all.
+    /// remembered login gets straight in and the box appears only when that does not work. False after a logout,
+    /// which has just forgotten the credentials - and where forgetting them failed, the attempt would put the very
+    /// user who has just logged out straight back in.
     /// </param>
     private async Task LoginAndStartAsync(bool followStartupPath, bool tryCachedLogin)
     {
@@ -399,8 +399,8 @@ public sealed partial class MainViewModel : ViewModelBase, IPowerDisplayOptions
     /// Ends the session and shows the login dialog again, exactly the way <see cref="Initialize"/> starts the app:
     /// hides the menu bar and whatever view was on screen, tears <see cref="UpdateService"/> down so a stale
     /// dashboard cannot go on calling a server this client no longer has credentials for, and tells the server to
-    /// drop its own copy of them. What <see cref="StoredConnection"/> remembers is left alone, so logging back in
-    /// - as the same user or another one who shares this device - is one login, not a re-typed password.
+    /// drop its own copy of them. What <see cref="StoredConnection"/> remembers is forgotten too: the user name
+    /// and the password leave the device with the user, and only the server address stays behind.
     /// </summary>
     // Not concurrently: it shows a modal confirmation and then tears the session down. The gate is the same
     // one the other three use - logging out with a settings dialog on the frame would leave that dialog queued
@@ -431,6 +431,10 @@ public sealed partial class MainViewModel : ViewModelBase, IPowerDisplayOptions
 
         MainViewContent = null;
         User = null;
+
+        // Guarded on its own: a cache that cannot be written must be reported, since the credentials are still
+        // on the device then, but it must not stop the logout halfway and leave the app without a login box.
+        await TaskExceptionHandler(StoredConnection.ForgetAsync).ConfigureAwait(true);
 
         BusyText = Loc.LogOut;
         await UpdateService.StopAsync().ConfigureAwait(true);

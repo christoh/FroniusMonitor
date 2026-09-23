@@ -62,12 +62,17 @@ one login flow, not two. Order matters: `IUpdateService.StopAsync` closes the hu
 collection the login screen is about to hide anyway. `IWebClientService.Logout` clears the `Authorization` header
 the `HttpClient` carries (regardless of whether the server could be reached) and calls `GET Identity/logout`,
 which now answers `Ok(true)` - it used to answer `Ok()` with no body, harmless while nothing called it, but a typed
-`ApiResult<bool>` needs something to deserialize. What `StoredConnection`/the cache remember is **not** touched by
-logging out - only a changed password rewrites it - so logging back in, as the same user or a different one who
-shares the device, is one login rather than a retyped password. `LoginAndStartAsync(followStartupPath: false, tryCachedLogin: false)` is
-what `Logout` passes: a startup deep link has already been resolved once and there is nothing left to follow the
-second time, so it always lands on the dashboard, and the cached credentials are deliberately **not** tried -
-they would put the user who has just logged out straight back in and nobody else could ever reach the box.
+`ApiResult<bool>` needs something to deserialize. **Logging out forgets the stored credentials** (since
+2026-09-23, at the developer's request): `StoredConnection.ForgetAsync` removes `CacheKeys.Connection` - user name
+and encrypted password - through `ICache.RemoveAsync`, so the login box comes up empty and the next start does not
+log the previous user in. The server address (`CacheKeys.ApiUri`/`HubUri`) is **kept**: it is not a credential, and
+without it the next user would first have to know where the server is. The call has its own
+`TaskExceptionHandler`, so a cache that cannot be written is reported but does not stop the logout before the login
+box is up. Before that date the cache was deliberately left alone so the box came up pre-filled; that is gone.
+`LoginAndStartAsync(followStartupPath: false, tryCachedLogin: false)` is what `Logout` passes: a startup deep link
+has already been resolved once and there is nothing left to follow the second time, so it always lands on the
+dashboard, and the cached credentials are **not** tried - there are none left, and where forgetting them failed,
+the attempt would put the user who has just logged out straight back in.
 
 ## The client shows the entry to everyone, on purpose
 

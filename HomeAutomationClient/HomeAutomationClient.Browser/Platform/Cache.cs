@@ -13,6 +13,9 @@ public partial class Cache: ICache
     [JSImport("globalThis.localStorage.getItem")]
     private static partial string GetItem(string key);
 
+    [JSImport("globalThis.localStorage.removeItem")]
+    private static partial void RemoveItem(string key);
+
     public void AddOrUpdate(string key, object value)
     {
         SetItem(key, JsonSerializer.Serialize(value, CacheJson.Options));
@@ -27,6 +30,12 @@ public partial class Cache: ICache
     public Task<T?> GetAsync<T>(string key, CancellationToken token = default)
     {
         return Task.FromResult(Get<T?>(key));
+    }
+
+    public Task RemoveAsync(string key, CancellationToken token = default)
+    {
+        RemoveItem(key);
+        return Task.CompletedTask;
     }
 
     public T? Get<T>(string key)

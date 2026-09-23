@@ -3,7 +3,7 @@ namespace De.Hochstaetter.HomeAutomationClient.Misc;
 /// <summary>
 /// The credentials the server last accepted, kept so the next start can pre-fill the login. Written after a
 /// login, and again when an administrator changes their own password: from then on the stored password is the
-/// only one the server takes.
+/// only one the server takes. Forgotten at a logout.
 /// </summary>
 internal static class StoredConnection
 {
@@ -26,4 +26,11 @@ internal static class StoredConnection
         await IoC.GetRegistered<ICache>().AddOrUpdateAsync(CacheKeys.Connection, connection);
         return null;
     }
+
+    /// <summary>
+    /// Forgets the user name and the password, for a logout: whoever uses this device next must not find them in
+    /// the login box, let alone be logged in with them at the next start. The server address is kept - it is not
+    /// a credential, and without it the next user would have to know it before they could type anything else.
+    /// </summary>
+    public static Task ForgetAsync() => IoC.GetRegistered<ICache>().RemoveAsync(CacheKeys.Connection);
 }

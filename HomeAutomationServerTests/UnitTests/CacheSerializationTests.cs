@@ -83,6 +83,31 @@ public sealed class CacheSerializationTests : IDisposable
         Assert.Equal("s3cret", loaded.Password);
     }
 
+    /// <summary>
+    /// What a logout does to the cache: the credentials go, and nothing else does - the server address in
+    /// particular has to be there for the next login.
+    /// </summary>
+    [Fact]
+    public async Task RemovingTheConnectionKeepsTheRest()
+    {
+        await cache.AddOrUpdateAsync(CacheKeys.ApiUri, "https://home.example.com/api/", TestContext.Current.CancellationToken);
+        await cache.AddOrUpdateAsync(CacheKeys.Connection, new HomeAutomationServerConnection { BaseUrl = "https://home.example.com/api/", UserName = "someone", Password = "s3cret" }, TestContext.Current.CancellationToken);
+
+        await cache.RemoveAsync(CacheKeys.Connection, TestContext.Current.CancellationToken);
+
+        Assert.Null(await cache.GetAsync<HomeAutomationServerConnection>(CacheKeys.Connection, TestContext.Current.CancellationToken));
+        Assert.Equal("https://home.example.com/api/", await cache.GetAsync<string>(CacheKeys.ApiUri, TestContext.Current.CancellationToken));
+        Assert.DoesNotContain("someone", await File.ReadAllTextAsync(Path.Combine(cache.Directory, "cache.json"), TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task RemovingAKeyThatIsNotThereIsNotAnError()
+    {
+        await cache.RemoveAsync(CacheKeys.Connection, TestContext.Current.CancellationToken);
+
+        Assert.Null(await cache.GetAsync<HomeAutomationServerConnection>(CacheKeys.Connection, TestContext.Current.CancellationToken));
+    }
+
     [Theory]
     [InlineData(double.NaN)]
     [InlineData(double.PositiveInfinity)]

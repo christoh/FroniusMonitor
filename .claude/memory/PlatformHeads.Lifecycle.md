@@ -95,7 +95,9 @@ Two consequences for this document:
 ## What every head must provide
 
 **An `ICache`.** `MainViewModel`, `UpdateService`, `LoginViewModel` and `Misc/StoredConnection` read it through
-`IoC.TryGetRegistered<ICache>()`. A head without one gets a client that fails shortly after startup - which is
+`IoC.TryGetRegistered<ICache>()`. Besides writing and reading it can `RemoveAsync` a key (a missing key is no
+error), which the logout uses to forget the credentials; `FileCache` rewrites its file, the browser calls
+`localStorage.removeItem`. A head without one gets a client that fails shortly after startup - which is
 exactly what Android and iOS did before they got theirs.
 
 Everything with a file system shares `FileCache` in `HomeAutomationClient`: one `key=json` pair per line, so any
@@ -392,9 +394,9 @@ login dialog is where it asks.
 server address, a cached user name and a remembered password go straight to `IWebClientService.Login`, and the
 dialog appears only when one of them is missing, the server cannot be reached or the login is refused - silently,
 because there is nothing the user could do with a "your remembered password is wrong" box that the login dialog
-itself does not say better. The attempt is made **at startup only, never after a logout**: there it would put the
-very user who has just logged out straight back in, and the pre-filled box is exactly what another user of the
-same device needs to get in at all.
+itself does not say better. The attempt is made **at startup only, never after a logout**: a logout forgets the
+cached credentials (`StoredConnection.ForgetAsync`, which keeps the server address), and should that have failed the
+attempt would put the very user who has just logged out straight back in.
 
 **The login dialog has two modes and one Ok button.** It either asks for credentials or for the server address,
 never for both at once, and `LoginViewModel.IsChoosingServer` says which - so `Ok` means "log in" or "use this

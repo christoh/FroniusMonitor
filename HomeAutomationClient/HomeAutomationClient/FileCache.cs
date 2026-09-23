@@ -56,6 +56,16 @@ public abstract class FileCache : ICache
         return await Task.Run(() => cacheData.TryGetValue(key, out var jsonValue) ? JsonSerializer.Deserialize<T>(jsonValue, CacheJson.Options) : default, token).ConfigureAwait(false);
     }
 
+    public async Task RemoveAsync(string key, CancellationToken token = default)
+    {
+        var cacheData = await LoadCacheAsync(token).ConfigureAwait(false);
+
+        if (cacheData.Remove(key))
+        {
+            await SaveCacheAsync(cacheData, token).ConfigureAwait(false);
+        }
+    }
+
     private Dictionary<string, string> LoadCache()
     {
         var lines = File.ReadAllLines(cacheFilePath, Encoding.UTF8);
