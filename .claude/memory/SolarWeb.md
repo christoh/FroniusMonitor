@@ -219,6 +219,17 @@ everything until a restart, by decision, and the cache is then served stale with
 again, read the server log for that line, for `Solar.web is left alone until`, and for the `, not complete yet`
 notes, before looking at the code.
 
+**2026-09-24, the running day that looked too low.** The client showed today's production peak below 2400 W while
+Solar.web showed about 3200 W. It was not the code: the cached chart had been read at about 15:30 and matched
+Solar.web up to 14:48. After that it had only `FromGenToSomewhere` ("Produktion (ohne Zähler)", production not yet
+split into grid, battery and consumption), consumption at 0, and values about half of what Solar.web showed later.
+**Solar.web consolidates the whole site - every inverter of the home - and the inverters report with different
+lags**, so the latest stretch of a running day is the sum of whichever inverters have reported so far, and grows
+as the others arrive. The next ticks fix it on their own; the developer wants nothing built for it. A single
+"as of" time on the chart was considered and rejected for the same reason: no one instant describes data whose
+parts come in at different times. When a running day looks too low at its end, compare it with Solar.web again
+after a tick or two before looking for a bug.
+
 ## The firmware status (added 2026-09-20)
 
 `GET /Firmware/GetComponentUpdateInfos?pvSystemId=<guid>` is what Solar.web's firmware page loads: `data.UpdateInfos[]`,
@@ -319,8 +330,9 @@ data: `DeviceVisibility` does not list it for guests.
 
 - The dialog runs against the production server from the client (the developer's screenshot of 2026-09-22 is
   the 21.09 production day chart served from the cache).
-- The chart has no tooltips, so the battery state bubbles have nowhere to go; the day chart could show them as
-  markers with a hover text once ScottPlot's interaction is wanted.
+- The battery state bubbles (`BattOperatingState`) are still not drawn. The tooltip exists since 2026-09-20 (see
+  *The tooltip* above) but only shows the series' values; the day chart could show the bubbles as markers whose
+  text joins the tooltip near them.
 - The live login **works from the production server** (verified 2026-09-20 against `home.hochstaetter.de`: the
   month chart came back with real data, the cached answer in 0.2 s). The same test showed a day chart taking over
   30 s during Fronius' Sunday maintenance, hence the 90 s timeout. The maintenance page's markup and status code
