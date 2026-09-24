@@ -38,8 +38,8 @@ Consequences that are easy to forget:
   browser drops there. The developer accepted that on 2026-09-23 ("OpenAPI is expendable when I use it from
   home") and declined `Secure = IsHttps || X-Forwarded-Proto present`, which would have made it work locally. Do not
   change the cookie for that again unless asked. A new server path needs a `location` in nginx as well, or it answers from the client container.
-- `docker-compose.yml` publishes 8080 on the Raspberry Pi, so the server is also reachable over plain http on the
-  home LAN, past nginx. That is why the forwarded headers are believed from listed proxies only (below), and why
+- The server is reachable over plain http on the home LAN, past nginx: on the Pi the container runs with
+  `network=host`, so 8080 is the Pi's own port (the `ports:` of `docker-compose.yml` do not apply there). That is why the forwarded headers are believed from listed proxies only (below), and why
   the `tab` cookie is always `Secure` (a browser drops it on a plain http page, `http://localhost` excepted).
 
 ## `X-Forwarded-For` / `X-Forwarded-Proto`: `ReverseProxies`
@@ -64,3 +64,31 @@ controllers, the authentication and `BrowserTabSessions` - is the client's, and 
 The address to list is the one the server logs for requests that came through nginx while nothing is listed.
 With nginx on AWS that is the address its requests arrive from at home - the tunnel's or VPN's end, not AWS's
 public address.
+
+**Observed on 2026-09-23, and what it turned out to mean:** with the proxy's `172.31.15.1` in `TrustedProxies`, the
+server logged `from 172.24.0.1`. The server container on the Pi runs with `network=host`, and the Pi receives the
+AWS server's connections from `172.31.15.1` (the developer checked `SSH_CONNECTION` from there). So the trust
+**worked**: an untrusted sender would have been logged as `172.31.15.1` itself, and `172.24.0.1` can only have come
+out of `X-Forwarded-For`. It is **nginx** that sees `172.24.0.1` as the client: nginx runs in a Docker container on
+AWS (compose service `nginx`, published `443`/`80`), attached to two compose networks, one shared with other,
+unrelated services (fixed `192.168.71.0/24`) and `home-automation` (no subnet given, so Docker's choice - evidently `172.24.0.0/16`, whose
+gateway `172.24.0.1` is). The internet reaches it through Docker's port publishing with that gateway as sender -
+IPv6 clients or Docker's userland proxy - which nginx then writes into `X-Forwarded-For` as `$remote_addr`.
+Nothing to change on the server or the Pi, and
+`172.24.0.1` must **not** be listed. The fix is on AWS, and **`network_mode: host` for nginx is ruled out** - it talks to
+many other containers over its Docker network (the developer, 2026-09-23). What was suggested instead: find out
+with `curl -4`/`curl -6` which clients nginx logs as `172.24.0.1`. IPv6 only (the likely case: Docker's default
+path keeps the IPv4 sender, but hands IPv6 to an IPv4-only container through `docker-proxy`) - `enable_ipv6` and a
+ULA subnet on **both** of nginx's compose networks (which of them carries the published ports is not visible from
+the compose file), `home-automation`'s IPv4 subnet pinned to `172.24.0.0/16` at the same time, `ip6tables` on
+(default since Docker 27), and `docker compose down` / `up -d` so the networks are recreated. IPv4 as well - `"userland-proxy": false`. Or drop the AAAA record.
+
+**What was done, and works** - the Pi's log shows the real client address for IPv4 and IPv6 clients alike, verified
+by the developer on 2026-09-24: `enable_ipv6` with a ULA subnet on both compose networks
+on AWS, `home-automation` pinned to `172.24.0.0/16`, the networks recreated with `docker compose down` / `up -d`.
+An unrelated MariaDB container on the other network authenticates by client address and must only
+ever see IPv4, so it got `sysctls: net.ipv6.conf.all.disable_ipv6=1` and `...default.disable_ipv6=1`: it has no
+IPv6 address then, Docker's DNS gives other containers only its IPv4 address, and the web container keeps
+connecting from its `192.168.71.x`. Anyone changing those networks again has to keep that in mind. (Two
+earlier readings - Docker rewriting on the Pi, then a tunnel address - were wrong and are withdrawn. Lesson: when
+the logged address is not the connecting proxy's, it came from the header, so look at what the proxy itself sees.)
