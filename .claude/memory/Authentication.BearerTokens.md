@@ -154,7 +154,10 @@ the cookie path and the server-side check) - there is only one prefix today.
 
 The ticket is fetched on the click, not in advance, because it expires; browsers count a tab opened within a few
 seconds of a click as opened by the user (transient activation), so the round trip does not make it a blocked
-pop-up. Not verified in a real browser yet.
+pop-up. **Verified from the desktop head** on 2026-09-24 (the developer): with the server address
+`https://home.hochstaetter.de` the default browser opens the document; with `http://192.168.44.50:8080` it gets 401,
+because the `Secure` cookie is dropped over plain http - accepted, see `ReverseProxy.md`. From the browser head,
+and whether its pop-up blocker lets the tab through, it has not been confirmed yet.
 
 Tests: `ApiAuthenticationTests` (a stand-in `/openapi/v1.json` under the same policy as `Program.cs`, the middleware
 in `Program.cs`'s order): the redirect and cookie, once only, expiry, 403 for a non-developer, and the cookie refused
