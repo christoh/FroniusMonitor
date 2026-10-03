@@ -13,7 +13,7 @@
         <Grid Height="1000" Width="700">
             <Border x:Name="Enclosure" CornerRadius="15" BorderThickness="30" Height="880" Width="660" VerticalAlignment="Top" Margin="0,100,0,0"/>
 
-            <Rectangle Width="580" Height="800" x:Name="BackgroundRectangle" Fill="{DynamicResource DeviceInnerBackgroundRunning}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,60"/>
+            <Rectangle Width="580" Height="800" x:Name="BackgroundRectangle" Fill="{DynamicResource BatteryBackground}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,60"/>
             <Rectangle Width="580" x:Name="SocRectangle" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,60"/>
 
             <TextBlock x:Name="StateOfChargeTextBlock" Margin="0,120,0,0" FontWeight="Bold" HorizontalAlignment="Center" FontSize="150"
