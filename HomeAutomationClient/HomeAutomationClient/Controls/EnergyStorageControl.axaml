@@ -9,9 +9,20 @@
              xmlns:m="clr-namespace:De.Hochstaetter.HomeAutomationClient.Misc"
              mc:Ignorable="d" d:DesignWidth="350" d:DesignHeight="500"
              x:Class="De.Hochstaetter.HomeAutomationClient.Controls.EnergyStorageControl">
+    <UserControl.Styles>
+        <!-- While the battery charges, the frame pulses towards BatteryBorderCharging, as in WPF. There is no 0% key
+             frame, so the pulse starts from the traffic light colour the code behind has set. -->
+        <Style Selector="Border#Enclosure.charging">
+            <Style.Animations>
+                <Animation Duration="0:0:1.5" IterationCount="INFINITE" PlaybackDirection="Alternate">
+                    <KeyFrame Cue="100%"><Setter Property="BorderBrush" Value="{DynamicResource BatteryBorderCharging}" /></KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+    </UserControl.Styles>
     <Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=controls:EnergyStorageControl}}">
         <Grid Height="1000" Width="700">
-            <Border x:Name="Enclosure" CornerRadius="15" BorderThickness="30" Height="880" Width="660" VerticalAlignment="Top" Margin="0,100,0,0"/>
+            <Border x:Name="Enclosure" Classes.charging="{Binding Gen24System.Sensors.Storage.Power, Converter={co:IsInRange Minimum=10, Unknown=False}, FallbackValue={x:False}}" CornerRadius="15" BorderThickness="30" Height="880" Width="660" VerticalAlignment="Top" Margin="0,100,0,0"/>
 
             <Rectangle Width="580" Height="800" x:Name="BackgroundRectangle" Fill="{DynamicResource BatteryBackground}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,60"/>
             <Rectangle Width="580" x:Name="SocRectangle" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,60"/>
@@ -58,7 +69,8 @@
                 <Run Text="SoH" />
             </TextBlock>
 
-            <Border x:Name="PlusPole" VerticalAlignment="Top" CornerRadius="30,30,0,0" Width="200" Height="110" />
+            <!-- The plus pole is always the colour of the frame, the charging pulse included -->
+            <Border x:Name="PlusPole" Background="{Binding #Enclosure.BorderBrush}" VerticalAlignment="Top" CornerRadius="30,30,0,0" Width="200" Height="110" />
         </Grid>
     </Viewbox>
 </UserControl>

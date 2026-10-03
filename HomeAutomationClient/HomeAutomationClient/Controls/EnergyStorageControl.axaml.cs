@@ -139,7 +139,8 @@ public partial class EnergyStorageControl : UserControl
         SocRectangle.Height = (Gen24System?.Sensors?.Storage?.StateOfCharge ?? 0) * BackgroundRectangle.Height;
         SocRectangle.Fill = new ImmutableSolidColorBrush(ComposeColor());
 
-        Enclosure.BorderBrush = PlusPole.Background = Gen24System?.Sensors?.Storage?.TrafficLight switch
+        // The plus pole follows the frame by binding, and the charging pulse is a style on the frame.
+        Enclosure.BorderBrush = Gen24System?.Sensors?.Storage?.TrafficLight switch
         {
             TrafficLight.Green => StatusGreen,
             TrafficLight.Red => StatusRed,
