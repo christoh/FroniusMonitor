@@ -70,6 +70,16 @@ public sealed class SomethingTests
   output at all. The same section must also never read a static of that class from the new thread while the
   initializer is running, or the two deadlock; everything the thread uses is a local.
 
+## Animations run on real time
+
+`AvaloniaHeadlessPlatform.ForceRenderTimerTick(n)` does **not** move an animation on by `n` frames. The animation
+clock reads the real time, and a forced tick only makes it look: 90 ticks in a row, meant as the whole 1.5 s of the
+battery's pulse, barely moved the colour: from Gold `#FFD700` to `#FED610` on its way to `#0088B2`. A test that
+wants an animation to have run lets real time pass between two ticks - `EnergyStorageControlTests` ticks, waits 300
+ms and ticks again - and then asserts a range (somewhere between the start and the end of the key frames), never an
+exact value, because how far the animation got depends on the machine. `GaugeDialTests` does not need any of this,
+because setting the switch recomputes without the animation.
+
 ## The project runs everywhere, and these tests run in the cloud
 
 `HomeAutomationServerTests` targets plain `net10.0` and references no WPF, so the whole suite - these headless
@@ -114,6 +124,7 @@ reason, which is worth knowing before trying one.
 | `GaugeColoringTests` | "Always fully color gauges" reaching a gauge in a window with no `MainView` above it, which is where the desktop puts a detail page - see [[DialogSystem.Lifecycle]] |
 | `SolarWebChartViewTests` | The empty Solar.web plot in dark mode uses `DialogBackground` rather than ScottPlot's white, before a chart has arrived - see [[SolarWeb]] |
 | `ChartTextTests` | ScottPlot draws the translations' accented letters as written: the Inter it gets from `InterFontResolver` has a glyph for every non-ASCII character of every culture, and `é` renders unlike `e`, `è`, a missing glyph and the double encoded `Ã©`. Real pixels, although the headless platform draws nothing: ScottPlot renders through Skia itself, and the headless session is only there because the font is an `avares://` asset. Settles that the double encoded strings found on 2026-09-23 are not something the charts need |
+| `EnergyStorageControlTests` | The dashboard battery while it charges: the `charging` class above 10 W only, the frame pulsing from the traffic light colour towards the theme's `BatteryBorderCharging` - which only gets there if the `DynamicResource` in the style's key frame is resolved - with the plus pole on the same brush, and both back on the traffic light once charging stops |
 | `HeadlessSmokeTest` | That the session is up at all - look here first when the whole collection fails |
 
 **Not covered, and not coverable here:** real touch input, so the pinch recognizer itself is untested; and how any
