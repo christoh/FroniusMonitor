@@ -124,6 +124,8 @@
                     <SolidColorBrush x:Key="BatteryBorderRunning">DarkGreen</SolidColorBrush>
                     <SolidColorBrush x:Key="BatteryBorderFault">Red</SolidColorBrush>
                     <SolidColorBrush x:Key="BatteryBorderWarning">Gold</SolidColorBrush>
+                    <!-- The empty part above the state of charge, LightGray as in WPF -->
+                    <SolidColorBrush x:Key="BatteryBackground">LightGray</SolidColorBrush>
 
                     <!-- Toast: the same in both variants, white on green reads well either way -->
                     <SolidColorBrush x:Key="ToastBackground">Green</SolidColorBrush>
@@ -222,6 +224,8 @@
                     <SolidColorBrush x:Key="BatteryBorderRunning">#ff006080</SolidColorBrush>
                     <SolidColorBrush x:Key="BatteryBorderFault">DarkRed</SolidColorBrush>
                     <SolidColorBrush x:Key="BatteryBorderWarning">Goldenrod</SolidColorBrush>
+                    <!-- Same as DeviceInnerBackgroundRunning, which the battery used before it got its own key -->
+                    <SolidColorBrush x:Key="BatteryBackground">#ff101010</SolidColorBrush>
 
                     <!-- Toast: the same in both variants, white on green reads well either way -->
                     <SolidColorBrush x:Key="ToastBackground">Green</SolidColorBrush>
