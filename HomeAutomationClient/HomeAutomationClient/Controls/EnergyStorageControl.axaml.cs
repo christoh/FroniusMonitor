@@ -8,7 +8,7 @@ public partial class EnergyStorageControl : UserControl
 {
     #region Avalonia Properties
 
-    public static readonly StyledProperty<Gen24System?> Gen24SystemProperty = AvaloniaProperty.Register<SmartMeterControl, Gen24System?>(nameof(Gen24System));
+    public static readonly StyledProperty<Gen24System?> Gen24SystemProperty = AvaloniaProperty.Register<EnergyStorageControl, Gen24System?>(nameof(Gen24System));
 
     public Gen24System? Gen24System
     {
@@ -16,7 +16,7 @@ public partial class EnergyStorageControl : UserControl
         set => SetValue(Gen24SystemProperty, value);
     }
 
-    public static readonly StyledProperty<Color> Soc0Property = AvaloniaProperty.Register<SmartMeterControl, Color>(nameof(Soc0));
+    public static readonly StyledProperty<Color> Soc0Property = AvaloniaProperty.Register<EnergyStorageControl, Color>(nameof(Soc0));
 
     public Color Soc0
     {
@@ -24,7 +24,7 @@ public partial class EnergyStorageControl : UserControl
         set => SetValue(Soc0Property, value);
     }
 
-    public static readonly StyledProperty<Color> Soc1Property = AvaloniaProperty.Register<SmartMeterControl, Color>(nameof(Soc1));
+    public static readonly StyledProperty<Color> Soc1Property = AvaloniaProperty.Register<EnergyStorageControl, Color>(nameof(Soc1));
 
     public Color Soc1
     {
@@ -32,7 +32,7 @@ public partial class EnergyStorageControl : UserControl
         set => SetValue(Soc1Property, value);
     }
 
-    public static readonly StyledProperty<Color> Soc2Property = AvaloniaProperty.Register<SmartMeterControl, Color>(nameof(Soc2));
+    public static readonly StyledProperty<Color> Soc2Property = AvaloniaProperty.Register<EnergyStorageControl, Color>(nameof(Soc2));
 
     public Color Soc2
     {
@@ -40,7 +40,7 @@ public partial class EnergyStorageControl : UserControl
         set => SetValue(Soc2Property, value);
     }
 
-    public static readonly StyledProperty<Color> Soc3Property = AvaloniaProperty.Register<SmartMeterControl, Color>(nameof(Soc3));
+    public static readonly StyledProperty<Color> Soc3Property = AvaloniaProperty.Register<EnergyStorageControl, Color>(nameof(Soc3));
 
     public Color Soc3
     {
@@ -48,7 +48,7 @@ public partial class EnergyStorageControl : UserControl
         set => SetValue(Soc3Property, value);
     }
 
-    public static readonly StyledProperty<Color> Soc4Property = AvaloniaProperty.Register<SmartMeterControl, Color>(nameof(Soc4));
+    public static readonly StyledProperty<Color> Soc4Property = AvaloniaProperty.Register<EnergyStorageControl, Color>(nameof(Soc4));
 
     public Color Soc4
     {
@@ -56,7 +56,7 @@ public partial class EnergyStorageControl : UserControl
         set => SetValue(Soc4Property, value);
     }
 
-    public static readonly StyledProperty<Color> Soc5Property = AvaloniaProperty.Register<SmartMeterControl, Color>(nameof(Soc5));
+    public static readonly StyledProperty<Color> Soc5Property = AvaloniaProperty.Register<EnergyStorageControl, Color>(nameof(Soc5));
 
     public Color Soc5
     {
@@ -64,7 +64,7 @@ public partial class EnergyStorageControl : UserControl
         set => SetValue(Soc5Property, value);
     }
 
-    public static readonly StyledProperty<IBrush?> StatusRedProperty = AvaloniaProperty.Register<SmartMeterControl, IBrush?>(nameof(StatusRed));
+    public static readonly StyledProperty<IBrush?> StatusRedProperty = AvaloniaProperty.Register<EnergyStorageControl, IBrush?>(nameof(StatusRed));
 
     public IBrush? StatusRed
     {
@@ -72,7 +72,7 @@ public partial class EnergyStorageControl : UserControl
         set => SetValue(StatusRedProperty, value);
     }
 
-    public static readonly StyledProperty<IBrush?> StatusGreenProperty = AvaloniaProperty.Register<SmartMeterControl, IBrush?>(nameof(StatusGreen));
+    public static readonly StyledProperty<IBrush?> StatusGreenProperty = AvaloniaProperty.Register<EnergyStorageControl, IBrush?>(nameof(StatusGreen));
 
     public IBrush? StatusGreen
     {
@@ -80,7 +80,7 @@ public partial class EnergyStorageControl : UserControl
         set => SetValue(StatusGreenProperty, value);
     }
 
-    public static readonly StyledProperty<IBrush?> StatusYellowProperty = AvaloniaProperty.Register<SmartMeterControl, IBrush?>(nameof(StatusYellow));
+    public static readonly StyledProperty<IBrush?> StatusYellowProperty = AvaloniaProperty.Register<EnergyStorageControl, IBrush?>(nameof(StatusYellow));
 
     public IBrush? StatusYellow
     {
