@@ -96,7 +96,7 @@
 				<TextBox Grid.Row="0" Grid.Column="1" Text="{Binding MeterAddressText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
 				<TextBlock Grid.Row="1" Grid.Column="0" Classes="Caption" Text="{x:Static p:Resources.ScAddress}" />
-				<TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SunSpecAddressText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+				<TextBox Grid.Row="1" Grid.Column="1" Text="{Binding StringControlAddressText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
 				<TextBlock Grid.Row="2" Grid.Column="0" Classes="Caption" Text="{x:Static p:Resources.SunspecMode}" />
 				<ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding SunspecModes}"

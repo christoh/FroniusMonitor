@@ -52,12 +52,12 @@ public class ModbusViewModel(
     /// the box. Neither address is required, in fact - an empty field becomes null, and a null is left out of the
     /// update token altogether, so it means "not mine to say" and never overwrites what the inverter holds.
     /// </remarks>
-    [MinMaxInt(Gen24ModbusSettings.MinSunSpecAddress, Gen24ModbusSettings.MaxSunSpecAddress,
-        MessageResourceKey = nameof(Loc.SunspecAddressError))]
-    public string? SunSpecAddressText
+    [MinMaxInt(Gen24ModbusSettings.MinStringControlAddress, Gen24ModbusSettings.MaxStringControlAddress,
+        MessageResourceKey = nameof(Loc.StringControlAddressError))]
+    public string? StringControlAddressText
     {
         get;
-        set => Set(ref field, value, postAction: () => ValidateProperty(value, nameof(SunSpecAddressText)));
+        set => Set(ref field, value, postAction: () => ValidateProperty(value, nameof(StringControlAddressText)));
     }
 
     public string Title
@@ -143,7 +143,7 @@ public class ModbusViewModel(
     {
         Settings = (Gen24ModbusSettings)oldSettings.Clone();
         MeterAddressText = NumericText.Of(Settings.MeterAddress);
-        SunSpecAddressText = NumericText.Of(Settings.SunSpecAddress);
+        StringControlAddressText = NumericText.Of(Settings.StringControlAddress);
         EnableTcp = Settings.Mode is ModbusSlaveMode.Tcp or ModbusSlaveMode.Both;
 
         // Explicitly, because a setter validates only what it actually stores: writing the same value twice - null
@@ -181,9 +181,9 @@ public class ModbusViewModel(
                 {
                     MeterAddressText = NumericText.Of(oldSettings.MeterAddress);
                 }
-                else if (name == nameof(SunSpecAddressText))
+                else if (name == nameof(StringControlAddressText))
                 {
-                    SunSpecAddressText = NumericText.Of(oldSettings.SunSpecAddress);
+                    StringControlAddressText = NumericText.Of(oldSettings.StringControlAddress);
                 }
             }
 
@@ -205,7 +205,7 @@ public class ModbusViewModel(
             // The rules have passed, so the text of the two addresses is known to be a number in range - or empty,
             // which a string control address may be and which ends up as null.
             Settings.MeterAddress = (byte?)NumericText.ToInteger(MeterAddressText);
-            Settings.SunSpecAddress = (byte?)NumericText.ToInteger(SunSpecAddressText);
+            Settings.StringControlAddress = (byte?)NumericText.ToInteger(StringControlAddressText);
 
             var isModbusRtu = Settings.Rtu0 == ModbusInterfaceRole.Slave || Settings.Rtu1 == ModbusInterfaceRole.Slave;
             var isAnyModbus = isModbusRtu || EnableTcp;

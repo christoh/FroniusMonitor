@@ -4571,11 +4571,11 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SunSpec address must be between 1 and 255.
+        ///   Looks up a localized string similar to String control address must be between 1 and 255.
         /// </summary>
-        public static string SunspecAddressError {
+        public static string StringControlAddressError {
             get {
-                return ResourceManager.GetString("SunspecAddressError", resourceCulture);
+                return ResourceManager.GetString("StringControlAddressError", resourceCulture);
             }
         }
         

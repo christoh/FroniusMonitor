@@ -303,8 +303,8 @@
   <data name="MeterAddressError" xml:space="preserve">
     <value>D Smartmeter-Adrässe mues zwüsche 1 und 247 si</value>
   </data>
-  <data name="SunspecAddressError" xml:space="preserve">
-	  <value>D SunSpec-Adrässe mues zwüsche 1 und 255 si</value>
+  <data name="StringControlAddressError" xml:space="preserve">
+	  <value>D Stringkontroll-Adrässe mues zwüsche 1 und 255 si</value>
   </data>
   <data name="ModbusSettings" xml:space="preserve">
 	  <value>Modbus-Iistellige</value>

@@ -297,8 +297,8 @@
   <data name="MeterAddressError" xml:space="preserve">
 	  <value>Die Smartmeter-Adresse muss zwischen 1 und 247 liegen</value>
   </data>
-  <data name="SunspecAddressError" xml:space="preserve">
-	  <value>SunSpec-Addresse muss zwischen 1 und 255 liegen</value>
+  <data name="StringControlAddressError" xml:space="preserve">
+	  <value>Stringkontroll-Adresse muss zwischen 1 und 255 liegen</value>
   </data>
   <data name="ModbusSettings" xml:space="preserve">
 	  <value>Modbus-Einstellungen</value>

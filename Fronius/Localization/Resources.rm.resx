@@ -247,8 +247,8 @@
   <data name="MeterAddressError" xml:space="preserve">
     <value>L'adressa dal contatur sto esser tranter 1 e 247</value>
   </data>
-  <data name="SunspecAddressError" xml:space="preserve">
-    <value>L'adressa SunSpec sto esser tranter 1 e 255</value>
+  <data name="StringControlAddressError" xml:space="preserve">
+    <value>L'adressa dal string control sto esser tranter 1 e 255</value>
   </data>
   <data name="ModbusSettings" xml:space="preserve">
     <value>Parameters Modbus</value>

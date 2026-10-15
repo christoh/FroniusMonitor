@@ -247,8 +247,8 @@
   <data name="MeterAddressError" xml:space="preserve">
     <value>L'adresse du compteur doit être comprise entre 1 et 247</value>
   </data>
-  <data name="SunspecAddressError" xml:space="preserve">
-    <value>L'adresse SunSpec doit être comprise entre 1 et 255</value>
+  <data name="StringControlAddressError" xml:space="preserve">
+    <value>L'adresse du string control doit être comprise entre 1 et 255</value>
   </data>
   <data name="ModbusSettings" xml:space="preserve">
     <value>Paramètres Modbus</value>

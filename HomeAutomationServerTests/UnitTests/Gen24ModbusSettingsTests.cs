@@ -29,7 +29,7 @@ public class Gen24ModbusSettingsTests
         Mode = ModbusSlaveMode.Both,
         Parity = ModbusParity.Even,
         TcpPort = 1502,
-        SunSpecAddress = 240,
+        StringControlAddress = 240,
         InverterAddress = 1,
         SunspecMode = Fronius.Models.Gen24.Settings.SunspecMode.Int,
         AllowControl = true,
@@ -56,10 +56,10 @@ public class Gen24ModbusSettingsTests
     {
         var settings = AllFieldsSet();
 
-        settings.SunSpecAddress = 0;
+        settings.StringControlAddress = 0;
 
         Assert.True(settings.HasErrors);
-        Assert.Equal(Resources.SunspecAddressError, settings.GetErrors(nameof(Gen24ModbusSettings.SunSpecAddress)).Single().ErrorMessage);
+        Assert.Equal(Resources.StringControlAddressError, settings.GetErrors(nameof(Gen24ModbusSettings.StringControlAddress)).Single().ErrorMessage);
     }
 
     [Fact]
@@ -91,7 +91,7 @@ public class Gen24ModbusSettingsTests
         var settings = AllFieldsSet();
 
         settings.MeterAddress = null;
-        settings.SunSpecAddress = null;
+        settings.StringControlAddress = null;
         settings.IpAddress = null;
 
         Assert.False(settings.HasErrors);
@@ -105,7 +105,7 @@ public class Gen24ModbusSettingsTests
         var loaded = AllFieldsSet();
         var edited = (Gen24ModbusSettings)loaded.Clone();
 
-        edited.SunSpecAddress = null;
+        edited.StringControlAddress = null;
 
         Assert.False(edited.HasErrors);
         Assert.False(edited.GetToken(loaded).HasValues());
@@ -125,7 +125,7 @@ public class Gen24ModbusSettingsTests
         Assert.Equal(original.Rtu1, clone.Rtu1);
         Assert.Equal(original.IpAddress, clone.IpAddress);
         Assert.Equal(original.MeterAddress, clone.MeterAddress);
-        Assert.Equal(original.SunSpecAddress, clone.SunSpecAddress);
+        Assert.Equal(original.StringControlAddress, clone.StringControlAddress);
     }
 
     [Fact]
