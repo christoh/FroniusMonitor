@@ -14,8 +14,8 @@ namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests;
 
 /// <summary>
 /// When <see cref="EnergyDataCollector"/> asks Awattar, what it publishes, and how the Wattpilot fills in. The
-/// clock is the test's, the sources are fakes, the store is in memory; nothing here waits for a timer - the test
-/// calls <see cref="EnergyDataCollector.TickAsync"/> itself.
+/// clock is the test's, the sources are fakes, the store is in memory; nothing here waits for a timer - the clock's
+/// timers never fire, and the test calls <see cref="EnergyDataCollector.TickAsync"/> itself.
 /// </summary>
 public sealed class EnergyDataCollectorTests : IAsyncDisposable
 {
@@ -27,7 +27,7 @@ public sealed class EnergyDataCollectorTests : IAsyncDisposable
     private readonly FakeAwattarClient awattar = new();
     private readonly FakeDwdWeatherClient dwd = new();
     private readonly InMemoryEnergyHistoryStore store = new();
-    private readonly SettableTimeProvider clock = new(morning);
+    private readonly ManualTimeProvider clock = new(morning);
     private readonly IDataControlService controlService = new DataControlService(NullLogger<DataControlService>.Instance);
     private readonly List<DeviceUpdateEventArgs> updates = [];
     private EnergyDataCollector? collector;
@@ -55,6 +55,9 @@ public sealed class EnergyDataCollectorTests : IAsyncDisposable
         collector = Create(Settings());
 
         await collector.StartAsync(TestContext.Current.CancellationToken);
+
+        // The first tick is due at once; the clock keeps it, and the test runs it.
+        Assert.Equal(TimeSpan.Zero, Assert.Single(clock.Timers).DueTime);
         await collector.TickAsync(TestContext.Current.CancellationToken);
 
         var span = Assert.Single(awattar.PriceSpans);
@@ -217,6 +220,7 @@ public sealed class EnergyDataCollectorTests : IAsyncDisposable
 
         Assert.DoesNotContain(EnergyChartData.DeviceId, controlService.Entities.Keys);
         Assert.Contains(updates, u => u.DeviceAction == DeviceAction.Delete && u.Id == EnergyChartData.DeviceId);
+        Assert.True(Assert.Single(clock.Timers).IsDisposed);
     }
 
     [Fact]
@@ -280,12 +284,7 @@ public sealed class EnergyDataCollectorTests : IAsyncDisposable
     {
         var options = new ServiceCollection()
             .AddOptions()
-            .Configure<EnergyDataCollectorParameters>(p =>
-            {
-                p.Settings = settings;
-                // Long, so that the timer never fires during a test; the tests tick by hand.
-                p.TickInterval = TimeSpan.FromHours(1);
-            })
+            .Configure<EnergyDataCollectorParameters>(p => p.Settings = settings)
             .BuildServiceProvider()
             .GetRequiredService<IOptionsMonitor<EnergyDataCollectorParameters>>();
 

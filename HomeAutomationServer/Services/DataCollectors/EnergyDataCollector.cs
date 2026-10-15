@@ -36,7 +36,7 @@ public sealed class EnergyDataCollector(
 
     private readonly TimeProvider clock = timeProvider ?? TimeProvider.System;
     private readonly SemaphoreSlim tickSemaphore = new(1, 1);
-    private Timer? timer;
+    private ITimer? timer;
     private bool isStarted;
     private bool startupFetched;
     private TimeZoneInfo zone = TimeZoneInfo.Local;
@@ -110,7 +110,8 @@ public sealed class EnergyDataCollector(
             logger.LogInformation("Collecting energy data for {Region} in time zone {Zone}, DWD station '{Station}', tariff query {Tariff}", settings.PriceRegion, zone.Id, settings.DwdStationId, settings.HasTariffQuery ? "configured" : "not configured");
         }
 
-        timer = new Timer(TimerElapsed, null, TimeSpan.Zero, Parameters.TickInterval);
+        // From the clock, so that a test's clock decides whether it ever fires.
+        timer = clock.CreateTimer(TimerElapsed, null, TimeSpan.Zero, Parameters.TickInterval);
     }
 
     public async Task StopAsync(CancellationToken token = default)
@@ -163,9 +164,25 @@ public sealed class EnergyDataCollector(
 
     /// <summary>
     ///     One look at the clock: fetches what is due and publishes when anything changed. Public so that a test can
-    ///     drive it with a clock of its own; the timer calls it every <see cref="EnergyDataCollectorParameters.TickInterval" />.
+    ///     drive it with a clock of its own; the timer does the same every <see cref="EnergyDataCollectorParameters.TickInterval" />.
+    ///     Waits for a tick that is already running, because two at once would each find the other's work half done.
     /// </summary>
     public async Task TickAsync(CancellationToken token = default)
+    {
+        await tickSemaphore.WaitAsync(token).ConfigureAwait(false);
+
+        try
+        {
+            await TickCoreAsync(token).ConfigureAwait(false);
+        }
+        finally
+        {
+            tickSemaphore.Release();
+        }
+    }
+
+    /// <summary>The tick itself. Whoever calls it holds <see cref="tickSemaphore" />.</summary>
+    private async Task TickCoreAsync(CancellationToken token)
     {
         if (Parameters.Settings is not { } settings)
         {
@@ -523,7 +540,8 @@ public sealed class EnergyDataCollector(
 
     /// <summary>
     ///     The timer callback is an async void: everything, the semaphore wait included, is inside the try, and the
-    ///     semaphore is released only if it was taken.
+    ///     semaphore is released only if it was taken. A tick that is still running makes this one skip rather than
+    ///     wait - the next one comes soon enough.
     /// </summary>
     private async void TimerElapsed(object? state)
     {
@@ -538,7 +556,7 @@ public sealed class EnergyDataCollector(
                 return;
             }
 
-            await TickAsync().ConfigureAwait(false);
+            await TickCoreAsync(CancellationToken.None).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
