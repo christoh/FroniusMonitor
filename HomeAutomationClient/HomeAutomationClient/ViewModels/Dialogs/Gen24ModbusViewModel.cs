@@ -20,7 +20,7 @@ namespace De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs;
 /// </para>
 /// <para>
 /// The two bus addresses are numbers, so the text boxes bind to <see cref="MeterAddressText"/> and
-/// <see cref="SunSpecAddressText"/> rather than to the settings, and <see cref="Apply"/> copies them back. That is
+/// <see cref="StringControlAddressText"/> rather than to the settings, and <see cref="Apply"/> copies them back. That is
 /// the rule for text input in <c>.claude/rules/ViewModelsForInteractionLogic.md</c>, and everything else here
 /// follows from it: whatever the user types is stored, so it validates, it raises a change, and Undo reaches the
 /// box. Bound straight to a <c>byte?</c>, a letter or an emptied box is refused by the binding itself - the value
@@ -108,9 +108,9 @@ public sealed partial class Gen24ModbusViewModel : ViewModelBase
     /// </remarks>
     [ObservableProperty]
     [NotifyDataErrorInfo]
-    [MinMaxInt(Gen24ModbusSettings.MinSunSpecAddress, Gen24ModbusSettings.MaxSunSpecAddress,
-        MessageResourceKey = nameof(Loc.SunspecAddressError))]
-    public partial string? SunSpecAddressText { get; set; }
+    [MinMaxInt(Gen24ModbusSettings.MinStringControlAddress, Gen24ModbusSettings.MaxStringControlAddress,
+        MessageResourceKey = nameof(Loc.StringControlAddressError))]
+    public partial string? StringControlAddressText { get; set; }
 
     public bool IsRtuSlave => Settings.Rtu0 == ModbusInterfaceRole.Slave || Settings.Rtu1 == ModbusInterfaceRole.Slave;
 
@@ -120,7 +120,7 @@ public sealed partial class Gen24ModbusViewModel : ViewModelBase
 
     public bool ShowAllowedIp => ShowRestrictControl && Settings.RestrictControl is true;
 
-    /// <summary>Meter address, SunSpec address and SunSpec mode only matter while the inverter is a slave at all.</summary>
+    /// <summary>Meter address, string control address and SunSpec mode only matter while the inverter is a slave at all.</summary>
     public bool ShowCommonSlaveSettings => IsRtuSlave || EnableTcp;
 
     /// <summary>
@@ -236,7 +236,7 @@ public sealed partial class Gen24ModbusViewModel : ViewModelBase
     private void CopyFromSettings()
     {
         MeterAddressText = NumericText.Of(Settings.MeterAddress);
-        SunSpecAddressText = NumericText.Of(Settings.SunSpecAddress);
+        StringControlAddressText = NumericText.Of(Settings.StringControlAddress);
         EnableTcp = Settings.Mode is ModbusSlaveMode.Tcp or ModbusSlaveMode.Both;
         NotifyAllVisibilities();
 
@@ -252,7 +252,7 @@ public sealed partial class Gen24ModbusViewModel : ViewModelBase
     private void CopyToSettings()
     {
         Settings.MeterAddress = (byte?)NumericText.ToInteger(MeterAddressText);
-        Settings.SunSpecAddress = (byte?)NumericText.ToInteger(SunSpecAddressText);
+        Settings.StringControlAddress = (byte?)NumericText.ToInteger(StringControlAddressText);
     }
 
     /// <summary>
@@ -277,9 +277,9 @@ public sealed partial class Gen24ModbusViewModel : ViewModelBase
             MeterAddressText = NumericText.Of(loadedSettings.MeterAddress);
         }
 
-        if (GetErrors(nameof(SunSpecAddressText)).Any())
+        if (GetErrors(nameof(StringControlAddressText)).Any())
         {
-            SunSpecAddressText = NumericText.Of(loadedSettings.SunSpecAddress);
+            StringControlAddressText = NumericText.Of(loadedSettings.StringControlAddress);
         }
     }
 

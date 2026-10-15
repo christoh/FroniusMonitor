@@ -30,7 +30,7 @@ view model cannot tell the field is wrong, and Undo has nothing to push, because
 changed.
 
 So a view model keeps a `string` of its own per numeric field, filled from the value when the dialog loads and
-whenever Undo runs, written back on Apply. `Gen24ModbusViewModel.MeterAddressText` and `SunSpecAddressText` are
+whenever Undo runs, written back on Apply. `Gen24ModbusViewModel.MeterAddressText` and `StringControlAddressText` are
 the worked example; `NumericText` in `Fronius/Validators` does the two conversions.
 
 **`NumericText` reads a number exactly the way `MinMaxIntAttribute` and `MinMaxDoubleAttribute` do**, on purpose.

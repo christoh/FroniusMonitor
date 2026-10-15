@@ -38,7 +38,7 @@ public partial class Gen24ModbusSettings : Gen24ParsingBase, ICloneable
     /// which is what the server validates a request body against, and the rule on the string a dialog binds its
     /// text box to. Both have to say the same numbers.
     /// </summary>
-    public const int MinMeterAddress = 1, MaxMeterAddress = 247, MinSunSpecAddress = 1, MaxSunSpecAddress = 255;
+    public const int MinMeterAddress = 1, MaxMeterAddress = 247, MinStringControlAddress = 1, MaxStringControlAddress = 255;
 
     private static readonly IReadOnlyList<int> baudRates = [9600, 19200];
 
@@ -82,9 +82,9 @@ public partial class Gen24ModbusSettings : Gen24ParsingBase, ICloneable
 
     [ObservableProperty]
     [NotifyDataErrorInfo]
-    [MinMaxInt(MinSunSpecAddress, MaxSunSpecAddress, MessageResourceKey = nameof(Resources.SunspecAddressError))]
+    [MinMaxInt(MinStringControlAddress, MaxStringControlAddress, MessageResourceKey = nameof(Resources.StringControlAddressError))]
     [FroniusProprietaryImport("scAddress", FroniusDataType.Root)]
-    public partial byte? SunSpecAddress { get; set; }
+    public partial byte? StringControlAddress { get; set; }
 
     [ObservableProperty]
     [FroniusProprietaryImport("rtu_inverter_slave_id", FroniusDataType.Root)]
@@ -238,7 +238,7 @@ public partial class Gen24ModbusSettings : Gen24ParsingBase, ICloneable
         Mode = Mode,
         Parity = Parity,
         TcpPort = TcpPort,
-        SunSpecAddress = SunSpecAddress,
+        StringControlAddress = StringControlAddress,
         InverterAddress = InverterAddress,
         SunspecMode = SunspecMode,
         AllowControl = AllowControl,

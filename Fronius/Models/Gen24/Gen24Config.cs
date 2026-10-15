@@ -7,6 +7,14 @@ public partial class Gen24Config : BindableBase, ICloneable
     private static readonly Version minimumComponentsApi = new(1, 1, 0);
     private static readonly Version minimumStatusApi = new(6, 2, 0);
 
+    // The newest major version of each API this software has been checked against. A major version above it may
+    // have breaking changes. configApi 11 came with firmware 1.42.9-1; everything this software reads from the
+    // config was still where it was, so it is accepted.
+    private const int MaximumCommandApiMajor = 10;
+    private const int MaximumConfigApiMajor = 11;
+    private const int MaximumComponentsApiMajor = 1;
+    private const int MaximumStatusApiMajor = 6;
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(VersionWarning))]
     public partial Gen24Versions? Versions { get; set; }
@@ -49,10 +57,10 @@ public partial class Gen24Config : BindableBase, ICloneable
 
             if
             (
-                Versions.CommandApi?.Major > minimumCommandApi.Major ||
-                Versions.ConfigApi?.Major > minimumConfigApi.Major ||
-                Versions.ComponentsApi?.Major > minimumComponentsApi.Major ||
-                Versions.StatusApi?.Major > minimumStatusApi.Major
+                Versions.CommandApi?.Major > MaximumCommandApiMajor ||
+                Versions.ConfigApi?.Major > MaximumConfigApiMajor ||
+                Versions.ComponentsApi?.Major > MaximumComponentsApiMajor ||
+                Versions.StatusApi?.Major > MaximumStatusApiMajor
             )
             {
                 return string.Format(Resources.FirmwareTooNew, firmwareVersionString);
