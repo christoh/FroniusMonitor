@@ -1,5 +1,9 @@
 <Project>
   <PropertyGroup>
     <AvaloniaVersion>12.1.4</AvaloniaVersion>
+    <!-- Since Avalonia 12 the DataGrid is released on its own and does not get every patch version Avalonia gets:
+         there is no 12.1.3 or 12.1.4 of it. 12.1.2 asks for Avalonia 12.1.0 or later, so it goes with any 12.1.x.
+         Check https://www.nuget.org/packages/Avalonia.Controls.DataGrid for a newer one when Avalonia is updated. -->
+    <AvaloniaDataGridVersion>12.1.2</AvaloniaDataGridVersion>
   </PropertyGroup>
 </Project>

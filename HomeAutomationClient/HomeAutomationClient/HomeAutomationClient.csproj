@@ -22,7 +22,7 @@
 		<PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
 		<!-- The event log of an inverter is a few hundred rows the user sorts by time, code or severity, which is
 		     what this control is for. It is the only place in the client that needs it. -->
-		<PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
+		<PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaDataGridVersion)" />
 		<PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
 		<!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
 		<PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.3">
@@ -32,10 +32,10 @@
 		<!-- The price chart. OxyPlot, which the WPF app draws it with, has no Avalonia package worth the name;
 		     ScottPlot renders through the Skia Avalonia already uses, on every head. -->
 		<PackageReference Include="ScottPlot.Avalonia" Version="5.1.59" />
-		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.12" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
+		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.13" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.13" />
 		<!-- The default log provider for every head that has nowhere better to write; the desktop head uses Serilog. -->
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.12" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.13" />
 	</ItemGroup>
 
 	<ItemGroup>
