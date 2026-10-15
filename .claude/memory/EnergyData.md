@@ -214,9 +214,16 @@ exempt from VAT stays as it is, and a negative market price gets negative VAT, w
 ## Tests (`HomeAutomationServerTests/UnitTests`)
 
 `EnergyDataParserTests` (both DWD files cut down, the calculator, `CoversSpan`), `EnergyHistoryStoreTests` (a
-real SQLite file in the temp folder), `EnergyDataCollectorTests` (fakes, a settable clock, `TickAsync` by hand:
-start, the window cadence, the Wattpilot fallback and hand-back, the store serving a past day, a refusing Awattar,
-stop), `EnergyChartModelTests` (bars, axes, weather, and the JSON round trip with the server's options).
+real SQLite file in the temp folder), `EnergyDataCollectorTests` (fakes, a `ManualTimeProvider`, `TickAsync` by
+hand: start, the window cadence, the Wattpilot fallback and hand-back, the store serving a past day, a refusing
+Awattar, stop), `EnergyChartModelTests` (bars, axes, weather, and the JSON round trip with the server's options).
+
+**The collector's timer comes from the injected `TimeProvider`** (`clock.CreateTimer`), and its first tick is due
+at once. Until 2026-10-15 it was a plain `new Timer`, which fired on a thread-pool thread right after `StartAsync`
+and ran a tick alongside the test's own: the test then found today's prices stored but not yet the productions and
+failed about one run in three. The test clock's timers never fire now, and `TickAsync` waits on `tickSemaphore`
+while the timer callback skips if a tick is running, so a manual tick and a timer tick never overlap in production
+either.
 
 ## Known gaps, as of 2026-09-13
 
