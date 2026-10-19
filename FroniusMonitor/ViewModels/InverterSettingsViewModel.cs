@@ -255,7 +255,7 @@ public partial class InverterSettingsViewModel(
 
             if (!Settings.PowerLimitSettings.ExportLimits.ActivePower.IsEnabled)
             {
-                Settings.PowerLimitSettings = new();
+                Settings.PowerLimitSettings = Settings.PowerLimitSettings.WithLimitingOff();
             }
             else
             {
@@ -268,35 +268,14 @@ public partial class InverterSettingsViewModel(
                     !Settings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit.IsEnabled
                 )
                 {
-                    Settings.PowerLimitSettings = new();
+                    Settings.PowerLimitSettings = Settings.PowerLimitSettings.WithLimitingOff();
                 }
             }
 
-            var hasPowerLimitUpdates = false;
-            var visualizationToken = Gen24JsonService.GetUpdateToken(Settings.PowerLimitSettings.Visualization, oldSettings.PowerLimitSettings.Visualization);
-            visualizationToken.Add("exportLimits", new JsonObject { { "activePower", new JsonObject { { "displayModeSoftLimit", "absolute" } } } });
-
-            var hardLimitToken = Gen24JsonService.GetUpdateToken(Settings.PowerLimitSettings.ExportLimits.ActivePower.HardLimit, oldSettings.PowerLimitSettings.ExportLimits.ActivePower.HardLimit);
-            var softLimitToken = Gen24JsonService.GetUpdateToken(Settings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit, oldSettings.PowerLimitSettings.ExportLimits.ActivePower.SoftLimit);
-
-            var activePowerToken = Gen24JsonService.GetUpdateToken(Settings.PowerLimitSettings.ExportLimits.ActivePower, oldSettings.PowerLimitSettings.ExportLimits.ActivePower);
-            activePowerToken.Add("hardLimit", hardLimitToken);
-            activePowerToken.Add("softLimit", softLimitToken);
-
-            var exportLimitsToken = Gen24JsonService.GetUpdateToken(Settings.PowerLimitSettings.ExportLimits, oldSettings.PowerLimitSettings.ExportLimits);
-            exportLimitsToken.Add("activePower", activePowerToken);
-
-            var limitsToken = new JsonObject
-            {
-                { "visualization", visualizationToken },
-                { "exportLimits", exportLimitsToken },
-            };
-
-            if (new[] { visualizationToken, hardLimitToken, softLimitToken, activePowerToken, exportLimitsToken, limitsToken }
-                .Any(candidate => candidate.HasAnyValue()))
-            {
-                hasPowerLimitUpdates = true;
-            }
+            // The same delta the server writes for the Avalonia client, which knows where the firmware of this
+            // inverter keeps the soft limit.
+            var limitsToken = Settings.PowerLimitSettings.GetToken(oldSettings.PowerLimitSettings).AsObject();
+            var hasPowerLimitUpdates = limitsToken.HasAnyValue();
 
             if (needsConnectedInverterUpdate && ConnectedInverters != null)
             {
@@ -326,6 +305,14 @@ public partial class InverterSettingsViewModel(
                     }
                 }
 
+                var exportLimitsToken = limitsToken["exportLimits"]?.AsObject();
+
+                if (exportLimitsToken == null)
+                {
+                    exportLimitsToken = new JsonObject();
+                    limitsToken.Add("exportLimits", exportLimitsToken);
+                }
+
                 exportLimitsToken.Add("autodetectedControlledDevices", detectedToken);
                 exportLimitsToken.Add("staticControlledDevices", staticToken);
             }
@@ -336,7 +323,11 @@ public partial class InverterSettingsViewModel(
                 return;
             }
 
-            await UpdateInverter("api/config/limit_settings/powerLimits", limitsToken).ConfigureAwait(false);
+            if (limitsToken.HasValues())
+            {
+                await UpdateInverter("api/config/limit_settings/powerLimits", limitsToken).ConfigureAwait(false);
+            }
+
             oldSettings = Settings;
             oldConnectedInverters = ConnectedInverters == null ? null : new ConcurrentDictionary<Guid, Gen24ConnectedInverter>(ConnectedInverters.Values.Select(i => new KeyValuePair<Guid, Gen24ConnectedInverter>(i.Id, i.Copy())));
 

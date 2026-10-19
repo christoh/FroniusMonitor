@@ -195,6 +195,146 @@ public class Gen24InverterSettingsTests
 
     #endregion
 
+    #region The soft limit of firmware 1.42.9-1
+
+    /// <summary>
+    /// <c>limit_settings/powerLimits</c> the way firmware 1.42.9-1 (config API 11) has it: the watts of the soft
+    /// limit in <c>activePower.exportLimit</c>, only <c>enabled</c> left in <c>softLimit</c>, and the PAV,E
+    /// protection limit next to it. Taken from what the inverter's own settings page reads and writes, with the
+    /// numbers of the inverter where the change turned up: 19760 W of panels, a soft limit of 16784 W.
+    /// </summary>
+    private static Gen24PowerLimitSettings Firmware1429(bool isProtectionLimitEnabled = false) => Gen24PowerLimitSettings.Parse(JsonNode.Parse
+    ($$"""
+      {
+        "visualization": {
+          "wattPeakReferenceValue": 19760,
+          "exportLimits": { "activePower": { "displayModeExportLimit": "absolute", "displayModeHardLimit": "absolute" } }
+        },
+        "exportLimits": {
+          "failSafeModeEnabled": false,
+          "activePower": {
+            "activated": true, "phaseMode": "phaseSum", "networkMode": "limitNetwork",
+            "exportLimit": 16784,
+            "softLimit": { "enabled": true },
+            "hardLimit": { "enabled": false, "powerLimit": 0 },
+            "protectionLimit": { "enabled": {{(isProtectionLimitEnabled ? "true" : "false")}}, "acPowerInstalled": 0 }
+          }
+        }
+      }
+      """));
+
+    [Fact]
+    public void TheSoftLimitIsReadFromExportLimit()
+    {
+        var activePower = Firmware1429().ExportLimits.ActivePower;
+
+        Assert.True(activePower.HasExportLimit);
+        Assert.True(activePower.SoftLimit.IsEnabled);
+        Assert.Equal(16784, activePower.SoftLimit.PowerLimit);
+        Assert.False(activePower.HardLimit.IsEnabled);
+        Assert.Equal(NetworkMode.Network, activePower.NetWorkMode);
+        Assert.False(activePower.IsProtectionLimitEnabled);
+        Assert.True(Firmware1429(isProtectionLimitEnabled: true).ExportLimits.ActivePower.IsProtectionLimitEnabled);
+    }
+
+    [Fact]
+    public void AnOlderFirmwareStillHasTheSoftLimitInSoftLimit()
+    {
+        var activePower = Gen24PowerLimit.Parse(JsonNode.Parse("""{ "activated": true, "softLimit": { "enabled": true, "powerLimit": 5000 } }"""));
+
+        Assert.False(activePower.HasExportLimit);
+        Assert.Equal(5000, activePower.SoftLimit.PowerLimit);
+    }
+
+    [Fact]
+    public void PowerLimitDeltaPutsTheWattsIntoExportLimitAndNamesTheirDisplayModeAccordingly()
+    {
+        var wanted = (Gen24PowerLimitSettings)Firmware1429().Clone();
+        wanted.ExportLimits.ActivePower.SoftLimit.PowerLimit = 12000;
+
+        var delta = wanted.GetToken(Firmware1429());
+        var activePower = delta["exportLimits"]?["activePower"];
+
+        Assert.Equal(12000, activePower?["exportLimit"]?.GetValue<double>());
+        Assert.Null(activePower?["softLimit"]);
+        Assert.Equal("absolute", delta["visualization"]?["exportLimits"]?["activePower"]?["displayModeExportLimit"]?.GetValue<string>());
+        Assert.Null(delta["visualization"]?["exportLimits"]?["activePower"]?["displayModeSoftLimit"]);
+    }
+
+    [Fact]
+    public void PowerLimitDeltaSendsNoPowerLimitInSoftLimitToFirmware1429()
+    {
+        var current = Firmware1429();
+        current.ExportLimits.ActivePower.SoftLimit.IsEnabled = false;
+        current.ExportLimits.ActivePower.SoftLimit.PowerLimit = 0;
+
+        var wanted = (Gen24PowerLimitSettings)current.Clone();
+        wanted.ExportLimits.ActivePower.SoftLimit.IsEnabled = true;
+        wanted.ExportLimits.ActivePower.SoftLimit.PowerLimit = 3000;
+
+        var activePower = wanted.GetToken(current)["exportLimits"]?["activePower"];
+
+        Assert.Equal(3000, activePower?["exportLimit"]?.GetValue<double>());
+        Assert.True(activePower?["softLimit"]?["enabled"]?.GetValue<bool>());
+        Assert.Single(activePower!["softLimit"]!.AsObject());
+    }
+
+    /// <summary>
+    /// Both apps send a soft limit that is switched off as zero watts. On 1.42.9-1 those watts are the limit of
+    /// the PAV,E protection as well, so while that is on, the zero must not reach the inverter.
+    /// </summary>
+    [Theory]
+    [InlineData(false, 0d)]
+    [InlineData(true, null)]
+    public void SwitchingTheSoftLimitOffZeroesExportLimitOnlyWhileTheProtectionLimitIsOff(bool isProtectionLimitEnabled, double? expectedExportLimit)
+    {
+        var wanted = (Gen24PowerLimitSettings)Firmware1429(isProtectionLimitEnabled).Clone();
+        wanted.ExportLimits.ActivePower.SoftLimit.IsEnabled = false;
+        wanted.ExportLimits.ActivePower.SoftLimit.PowerLimit = 0;
+
+        var activePower = wanted.GetToken(Firmware1429(isProtectionLimitEnabled))["exportLimits"]?["activePower"];
+
+        Assert.False(activePower?["softLimit"]?["enabled"]?.GetValue<bool>());
+        Assert.Equal(expectedExportLimit, activePower?["exportLimit"]?.GetValue<double>());
+    }
+
+    /// <summary>
+    /// The settings the server reads decide where the soft limit goes, not the ones the client sends back:
+    /// those were read a while ago and may come from a client that does not know about any of this.
+    /// </summary>
+    [Fact]
+    public void TheInverterThatIsWrittenDecidesWhereTheSoftLimitGoes()
+    {
+        var wanted = (Gen24PowerLimitSettings)Firmware1429().Clone();
+        wanted.ExportLimits.ActivePower.HasExportLimit = false;
+        wanted.ExportLimits.ActivePower.SoftLimit.PowerLimit = 12000;
+
+        Assert.Equal(12000, wanted.GetToken(Firmware1429())["exportLimits"]?["activePower"]?["exportLimit"]?.GetValue<double>());
+    }
+
+    [Fact]
+    public void PowerLimitDeltaOfFirmware1429IsEmptyWhereNothingChanged()
+    {
+        var returned = JsonSerializer.Deserialize<Gen24PowerLimitSettings>(JsonSerializer.Serialize(Firmware1429()))!;
+
+        Assert.True(returned.ExportLimits.ActivePower.HasExportLimit);
+        Assert.False(returned.GetToken(Firmware1429()).HasAnyValue());
+    }
+
+    [Fact]
+    public void LimitingOffKeepsWhereTheInverterHoldsItsLimits()
+    {
+        var off = Firmware1429(isProtectionLimitEnabled: true).WithLimitingOff();
+
+        Assert.False(off.ExportLimits.ActivePower.IsEnabled);
+        Assert.False(off.ExportLimits.ActivePower.SoftLimit.IsEnabled);
+        Assert.Equal(0, off.ExportLimits.ActivePower.SoftLimit.PowerLimit);
+        Assert.True(off.ExportLimits.ActivePower.HasExportLimit);
+        Assert.True(off.ExportLimits.ActivePower.IsProtectionLimitEnabled);
+    }
+
+    #endregion
+
     #region Over the wire
 
     /// <summary>

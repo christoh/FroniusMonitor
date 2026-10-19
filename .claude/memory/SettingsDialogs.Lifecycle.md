@@ -27,6 +27,7 @@ paths:
   - HomeAutomationClient/HomeAutomationClient/App.axaml
   - HomeAutomationServer/Controllers/Gen24Controller.cs
   - Fronius/Models/Gen24/Settings/**
+  - FroniusMonitor/ViewModels/InverterSettingsViewModel.cs
   - HomeAutomationClient/HomeAutomationClient/Contracts/IWebClientService.cs
 ---
 
@@ -98,9 +99,20 @@ inverter keeps those three groups in three places. Two things about them are wor
 - **`Gen24Mppt.GetToken` and `Gen24PowerLimitSettings.GetToken` build nested deltas** and leave out any object
   where nothing changed, which is what keeps an unchanged page from writing anything: a tree of empty objects
   would pass `HasValues` and ask the inverter to change nothing. A tracker the inverter does not report is left
-  out rather than written from our defaults. The one thing in there that is not a delta is
-  `displayModeSoftLimit`, which says whether the soft limit means watts or a percentage - it travels with the
-  soft limit whenever the soft limit travels, because a number read in the wrong unit is not a small mistake.
+  out rather than written from our defaults. The one thing in there that is not a delta is the display mode of
+  the soft limit, which says whether it means watts or a percentage - it travels with the soft limit whenever
+  the soft limit travels, because a number read in the wrong unit is not a small mistake.
+- **Firmware 1.42.9-1 (config API 11) moved the soft limit's watts** from `softLimit.powerLimit` to
+  `activePower.exportLimit`, left only `enabled` in `softLimit`, renamed the display mode from
+  `displayModeSoftLimit` to `displayModeExportLimit`, and added the PAV,E `protectionLimit`
+  (`enabled`, `acPowerInstalled`), which uses the same `exportLimit`. Found 2026-10-19 in the inverter's own web
+  app (`main.*.js`, `getPowerLimitCtrl` and the `softLimit` mapper), after both apps showed 0 W. `Gen24PowerLimit`
+  still carries the watts in `SoftLimit.PowerLimit` for every firmware; `Parse` takes them from `exportLimit`
+  where it exists and sets `HasExportLimit` and `IsProtectionLimitEnabled`, neither of which is ever sent.
+  `GetToken` picks the keys from the settings it is given as what the inverter holds (`oldSettings`), not from
+  what the client sends, and does not send a zeroed `exportLimit` for a switched off soft limit while the
+  protection limit is on - that zero would become the protection's limit. The new firmware also knows a phase
+  mode `asymmetricFeedIn`, kept in `ACBRIDGE_MODE_POWER_OUTPUT_U16` of the system config; neither app knows it.
 
 ## Reading: one snapshot for the whole dialog
 
@@ -602,16 +614,19 @@ inverter under its `customer` login, and the WPF app asked its own connection ab
 logs in to the inverter, so the server answers for it: `Gen24SettingsSnapshot.IsInverterTechnician`. Offering the
 fields and letting the inverter refuse the write is a worse way to find out.
 
-**Two deliberate differences from the WPF dialog**, both in `CopyToSettings`:
+**One deliberate difference from the WPF dialog**, in `CopyToSettings`:
 
 - A limit that is switched off is sent as a zero, and switching export limiting off switches both limits off -
   that part is the same. But **the peak power reference survives it**, where WPF replaces the whole
   `Gen24PowerLimitSettings` with a new one and takes the reference to zero with it. The reference is what the
   inverter's display reads a limit against, not a limit itself, so switching limiting off is no reason to forget
-  the size of the system.
-- The WPF `Apply` adds `displayModeSoftLimit` to the visualization token unconditionally, which makes its delta
-  never empty and so writes the power limits on every Apply. Here it travels with the soft limit only - see the
-  delta table above - so an unchanged page writes nothing and the endpoint can answer "already held it".
+  the size of the system. WPF does this through `Gen24PowerLimitSettings.WithLimitingOff()`, which keeps
+  `HasExportLimit` and `IsProtectionLimitEnabled`, so its next write still goes where the inverter wants it.
+
+Since 2026-10-19 the WPF `Apply` builds its power limit delta with `Gen24PowerLimitSettings.GetToken` as well, and
+only adds its connected inverters to `exportLimits`. Before that it built its own copy, which sent
+`displayModeSoftLimit` unconditionally - so it wrote the power limits on every Apply - and would have needed the
+1.42.9-1 keys a second time.
 
 The time zone and the clock are behind the danger switch and are put back when it is switched off again, the same
 rule as the energy flow tab: an inverter whose clock is wrong times the charging rules of that tab wrong.

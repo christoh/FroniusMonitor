@@ -100,11 +100,37 @@ public class Gen24PowerLimit : BindableBase, ICloneable
         });
     } = PowerLimitMode.Off;
 
+    /// <summary>
+    /// Whether the inverter keeps the watts of the soft limit in <c>activePower.exportLimit</c> rather than in
+    /// <c>softLimit.powerLimit</c>.
+    /// </summary>
+    /// <remarks>
+    /// Firmware 1.42.9-1 (config API 11) moved them there, because the PAV,E protection limit it brought uses the
+    /// same number, and left only <c>enabled</c> in <c>softLimit</c>. <see cref="SoftLimit"/> carries the watts
+    /// for both kinds of inverter, so only reading and writing have to know. Not one of the inverter's settings:
+    /// it says how the inverter that was read stores them, and nothing ever sends it.
+    /// </remarks>
+    public bool HasExportLimit { get; set; }
+
+    /// <summary>
+    /// Whether the PAV,E protection limit of an inverter with <see cref="HasExportLimit"/> is on. It shares its
+    /// number with the soft limit. Read only: neither app shows it or sends it.
+    /// </summary>
+    public bool IsProtectionLimitEnabled { get; set; }
+
     public static Gen24PowerLimit Parse(JsonNode? token)
     {
         var gen24PowerLimit = gen24JsonService.ReadFroniusData<Gen24PowerLimit>(token);
         gen24PowerLimit.SoftLimit = Gen24PowerLimitDefinition.Parse(token?["softLimit"]);
         gen24PowerLimit.HardLimit = Gen24PowerLimitDefinition.Parse(token?["hardLimit"]);
+
+        if (token?["exportLimit"] is JsonValue exportLimit && exportLimit.TryGetValue<double>(out var watts))
+        {
+            gen24PowerLimit.HasExportLimit = true;
+            gen24PowerLimit.SoftLimit.PowerLimit = watts;
+            gen24PowerLimit.IsProtectionLimitEnabled = token["protectionLimit"]?["enabled"] is JsonValue enabled && enabled.TryGetValue<bool>(out var isEnabled) && isEnabled;
+        }
+
         return gen24PowerLimit;
     }
 
@@ -117,6 +143,8 @@ public class Gen24PowerLimit : BindableBase, ICloneable
             NetWorkMode = NetWorkMode,
             HardLimit = (Gen24PowerLimitDefinition)HardLimit.Clone(),
             SoftLimit = (Gen24PowerLimitDefinition)SoftLimit.Clone(),
+            HasExportLimit = HasExportLimit,
+            IsProtectionLimitEnabled = IsProtectionLimitEnabled,
         };
 
         return gen24PowerLimit;
