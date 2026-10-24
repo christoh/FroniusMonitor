@@ -11,6 +11,7 @@ using MQTTnet.Server;
 using Usp;
 using Record = UspRecord.Record;
 using MQTTConnectRecord = UspRecord.MQTTConnectRecord;
+using DisconnectRecord = UspRecord.DisconnectRecord;
 
 namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests;
 
@@ -142,6 +143,20 @@ public sealed class FritzBoxUspControllerTests : IAsyncLifetime
         }
 
         loggers.Dispose();
+    }
+
+    [Fact]
+    public async Task A_disconnect_record_does_not_count_as_the_box_introducing_itself()
+    {
+        // FRITZ!OS sends one when the controller is switched off, before it reconnects and sends its Connect Record.
+        var disconnect = new Record { Version = "1.3", ToId = ControllerId, FromId = AgentId, Disconnect = new DisconnectRecord { Reason = "Controller disabled" } };
+        await PublishFromAgentAsync(disconnect.ToByteArray());
+
+        await Assert.ThrowsAsync<TimeoutException>(() => controller!.WaitForAgentAsync(TimeSpan.FromMilliseconds(500), TestContext.Current.CancellationToken));
+        Assert.Null(controller!.AgentTopic);
+
+        await IntroduceAgentAsync();
+        Assert.Equal(AgentTopic, controller.AgentTopic);
     }
 
     /// <summary>What a box does after connecting to the broker: it sends each controller an MQTT Connect Record.</summary>

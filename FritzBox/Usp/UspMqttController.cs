@@ -251,11 +251,15 @@ public sealed class UspMqttController : IAsyncDisposable
     }
 
     /// <summary>
-    /// Creates a subscription in <c>Device.LocalAgent.Subscription.</c> that notifies this controller when one of
-    /// <paramref name="paths"/> changes, and returns the path of the new instance.
+    /// Creates a subscription in <c>Device.LocalAgent.Subscription.</c> that notifies this controller when
+    /// <paramref name="path"/> changes, and returns the path of the new instance.
     /// </summary>
+    /// <remarks>
+    /// One path per subscription: FRITZ!OS 8.25 refuses a ReferenceList with more than one entry (7008), wildcards
+    /// (7008) and object paths (7807).
+    /// </remarks>
     /// <param name="persistent">Whether the subscription survives a reboot of the box.</param>
-    public async Task<string> SubscribeAsync(string id, string notificationType, IEnumerable<string> paths, bool persistent = false, CancellationToken token = default)
+    public async Task<string> SubscribeAsync(string id, string notificationType, string path, bool persistent = false, CancellationToken token = default)
     {
         var response = await AddAsync
         (
@@ -265,7 +269,7 @@ public sealed class UspMqttController : IAsyncDisposable
                 ["Enable"] = "true",
                 ["ID"] = id,
                 ["NotifType"] = notificationType,
-                ["ReferenceList"] = string.Join(',', paths),
+                ["ReferenceList"] = path,
                 ["Persistent"] = persistent ? "true" : "false",
             },
             token
@@ -342,6 +346,18 @@ public sealed class UspMqttController : IAsyncDisposable
         // With additional topic filters we also see what others send, our own requests included.
         if (record.FromId == options.EndpointId || record.ToId != options.EndpointId)
         {
+            return;
+        }
+
+        // The box sends a Disconnect Record when its connection goes down, for example while the controller is switched
+        // off and on. It must not count as the box having introduced itself, or the first request goes nowhere.
+        if (record.RecordTypeCase == Record.RecordTypeOneofCase.Disconnect)
+        {
+            if (logger.IsEnabled(LogLevel.Information))
+            {
+                logger.LogInformation("USP: {AgentId} disconnects: {Reason}", record.FromId, record.Disconnect.Reason);
+            }
+
             return;
         }
 

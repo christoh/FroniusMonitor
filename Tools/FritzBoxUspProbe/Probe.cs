@@ -227,7 +227,7 @@ internal sealed class Probe
         Write("set.json", response);
     }
 
-    public async Task SubscribeAsync(int seconds, IReadOnlyList<string> paths, CancellationToken token)
+    public async Task SubscribeAsync(string notificationType, int seconds, IReadOnlyList<string> paths, CancellationToken token)
     {
         command = "subscribe";
         await using var usp = await ConnectToBoxAsync(60, token).ConfigureAwait(false);
@@ -243,18 +243,39 @@ internal sealed class Probe
             Append("notifications.jsonl", new JsonObject { ["received"] = e.Received, ["notify"] = ToJson(notify) });
         };
 
-        var instance = await usp.SubscribeAsync($"usp-probe-{runId}", "ValueChange", paths, token: token).ConfigureAwait(false);
-        Console.WriteLine($"Subscribed as {instance}. Waiting {seconds} s for notifications ...");
+        // The box takes one path per subscription.
+        var instances = new List<string>();
 
         try
         {
+            foreach (var path in paths)
+            {
+                var instance = await usp.SubscribeAsync($"usp-probe-{runId}-{instances.Count + 1}", notificationType, path, token: token).ConfigureAwait(false);
+                instances.Add(instance);
+                Console.WriteLine($"Subscribed to {path} as {instance}");
+            }
+
+            Console.WriteLine($"{instances.Count} subscriptions. Waiting {seconds} s for notifications ...");
             await Task.Delay(TimeSpan.FromSeconds(seconds), token).ConfigureAwait(false);
         }
         finally
         {
-            await usp.DeleteAsync([instance], CancellationToken.None).ConfigureAwait(false);
-            Console.WriteLine($"{instance} deleted.");
+            if (instances.Count > 0)
+            {
+                await usp.DeleteAsync(instances, CancellationToken.None).ConfigureAwait(false);
+                Console.WriteLine($"{instances.Count} subscriptions deleted.");
+            }
         }
+    }
+
+    /// <summary>Deletes objects, for example subscriptions a run left behind.</summary>
+    public async Task DeleteAsync(IReadOnlyList<string> paths, CancellationToken token)
+    {
+        command = "delete";
+        await using var usp = await ConnectToBoxAsync(60, token).ConfigureAwait(false);
+        var response = await usp.DeleteAsync(paths, token).ConfigureAwait(false);
+        Console.WriteLine(ToJson(response).ToJsonString(indented));
+        Write("delete.json", response);
     }
 
     private async Task<Tr064Client> ConnectTr064Async(CancellationToken token)
@@ -308,6 +329,8 @@ internal sealed class Probe
                 UserName = settings.Broker.UserName,
                 Password = brokerPassword.Value,
                 EndpointId = controller.EndpointId,
+                // A client ID of its own per run: two runs with the same one would throw each other off the broker.
+                ClientId = $"usp-probe-{runId}-{Environment.ProcessId}",
                 ControllerTopic = controller.MqttControllerTopic,
                 AgentEndpointId = agent?["endpointId"]?.GetValue<string>(),
                 AgentTopic = agent?["topic"]?.GetValue<string>(),

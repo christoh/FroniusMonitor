@@ -10,8 +10,16 @@ paths:
 # The FritzBox library: TR-064 and USP
 
 `FritzBox/FritzBox.csproj` talks to a FRITZ!Box through TR-064 (SOAP) and as a USP controller (TR-369) over MQTT.
-It is the start of phase 1.1 of `.claude/plans/FritzBoxUsp-plan.md`. Only `Tools/FritzBoxUspProbe` and the tests
-use it so far. The HA server and the WPF app still go through AHA in `Fronius/Services/FritzBoxService.cs`.
+Only `Tools/FritzBoxUspProbe` and the tests use it so far. The HA server and the WPF app still go through AHA in
+`Fronius/Services/FritzBoxService.cs`.
+
+**USP is not the way for smart home** (`.claude/plans/FritzBoxUsp-plan.md`, D8):
+- It has no lamps.
+- It pushes power no faster than the box updates it, which is every two minutes.
+- It allows at most 32 subscriptions.
+
+Step 1 adds a REST client to this library instead. The USP part stays, together with the broker on amazon2 and the
+controller on the box, in case step 2 needs it for the Swiss box (D9).
 
 It is a project of its own, not part of `Fronius`, because its users will be the HA server and the WPF app and not
 the Avalonia client (see `Fronius.SharedLibraryBoundary.md`).
@@ -41,13 +49,57 @@ the Avalonia client (see `Fronius.SharedLibraryBoundary.md`).
     host, an empty client ID, `proto::` and `fqdn:` endpoint IDs, topics with "/".
   - All the `NewMinChars*` limits of `GetInfo` are 0, so `UspControllerRegistry.Validate` finds nothing there today.
     It is kept because the box gives no other hint which argument it rejects.
-- **Not known before the probe has run:**
-  - Which of `MQTTControllerTopic` and `MQTTResponseTopic` the box subscribes to. AVM's wording is ambiguous, so the
-    probe listens on `usp/#`.
-  - Whether the box sends an MQTT Connect Record.
-  - Which smart-home objects the box offers over USP, and whether it allows `ValueChange` subscriptions for them.
-- `.claude/plans/FritzBoxUsp-plan.md` phase 1.0 has the gate criteria. Replace this section with the findings once
-  `explore` has run.
+- **`.claude/plans/FritzBoxUsp-plan.md` phase 1.0 has the gate criteria.** The results are in the next section.
+
+## What the box offers over USP (probe run of 2026-10-24)
+
+**Connection:**
+- The box is the agent `os::00040E-<MAC>` (AVM's OUI). It speaks USP 1.3 and data model `Device:2` (TR-181), with
+  84 objects and 463 parameters.
+- AVM's `MQTTResponseTopic` is the topic the **box subscribes to** (`usp/agent/fritzbox-neufahrn`, QoS 0). It sends
+  to the controller on `MQTTControllerTopic`.
+- Its records carry the Content Type `application/vnd.bbf.usp.msg`.
+- After connecting it sends an MQTT Connect Record and a Notify without `send_resp`. When the controller is switched
+  off it sends a Disconnect Record first.
+- Switching a controller off and on with `SetUSPControllerEnableByIndex` needs no confirmation at the box.
+
+**Smart home** is TR-181's `Device.ProxiedDevice.{i}.`:
+- **The device:** `Name`, `Type` (`PowerStrip`, `Light`, empty for templates), `Online`, `ProxyProtocol` (`DECT`),
+  `Alias` (writable). `DeviceInfo.SerialNumber` is the AIN (`11630 0396659`), next to `ModelName`, `Manufacturer`
+  and `SoftwareVersion`.
+- **`IoTCapability.{i}.`:** `Name` (the AIN again), `Class`, and one of these:
+  - `BinaryControl.Value`: writable, plus a `Toggle()` command
+  - `LevelControl.Value`: writable
+  - `LevelSensor`: `Type`, `Value`, `Unit`, `X_AVM-DE_IsFeedin`
+  - `BinarySensor`: `Value`, `LastChange`
+- **FRITZ!Smart Energy 200 outlets** have capability 1 `BinaryControl` (Switch), 4 `LevelSensor` Temperature (degC),
+  5 Power (W) and 6 Energy (Wh). There is no voltage.
+- **FRITZ!Smart Light 500 lamps have no capabilities at all.** Over USP they cannot be read or controlled: no on/off,
+  no level, no color. They stay with AHA or the REST API.
+- **Templates and scenes** ("Licht an", "Haus aus") appear as proxied devices without capabilities. Their serial
+  number is `tmp<MAC>-<id>`.
+
+**Setting:** `Set` on `BinaryControl.Value` switches the outlet.
+
+**Subscriptions:**
+- `ValueChange` works and is event driven: a switch arrives within about a second.
+- Power arrives only every two minutes. That is how often the outlet reports to the box, and the FRITZ! app shows
+  the same delay.
+- FRITZ!OS 8.25 limits what a subscription may be:
+  - one path per `ReferenceList`: two give 7008
+  - no wildcards: 7008
+  - no object paths for `ValueChange`: 7807
+  - some parameters refuse `ValueChange`: 7808, for example `DeviceInfo.UpTime`
+  - **at most 32 subscriptions**: the 33rd gives 7004
+- `ObjectCreation` and `ObjectDeletion` on `Device.ProxiedDevice.` are accepted (`{i}.` is not). Whether they fire was
+  not seen, because no device was added or removed.
+- The box sets `Recipient` itself; it is read-only.
+
+**Gate of phase 1.0:**
+- G1 (the values are visible): partly. Outlets yes, lamps no.
+- G2 (AIN): yes.
+- G3 (push): yes.
+- G4 (switching over USP): yes.
 
 ## Where the broker runs
 
@@ -74,7 +126,8 @@ The controller is registered with the names the HA server is meant to keep (`fqd
   `SetUSPControllerEnableByIndex`. The box reconnects and introduces itself again. The probe then keeps the result
   in `probe-output/agent.json`.
 - **Fallback:** the controller also learns the box from the first Record that is addressed to it, taking the topic
-  from the MQTT 5 Response Topic or from the 3.1.1 `/reply-to=` suffix.
+  from the MQTT 5 Response Topic or from the 3.1.1 `/reply-to=` suffix. A Disconnect Record does not count: it comes
+  first when the controller is switched off, and a request sent then is lost.
 - **Not yet decided:** how the HA server will do this later.
 
 ## Rules the code follows, from TR-369
@@ -87,6 +140,8 @@ The controller is registered with the names the HA server is meant to keep (`fqd
 
 ## Things that will bite
 
+- **Every run of the probe connects with an MQTT client ID of its own.** With one shared ID each run threw the
+  previous one off the broker, and a running `subscribe` could no longer delete its subscriptions.
 - **`Record` clashes with `Xunit.Record` in the tests.** `FritzBoxUspControllerTests` aliases it
   (`using Record = UspRecord.Record;`).
 - **The in-process MQTTnet broker of the tests must not open an IPv6 listener.** Claude Code on the web has no

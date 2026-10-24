@@ -10,7 +10,10 @@ const string usage = """
       explore [<seconds>]            waits for the box (default 120 s), then reads its whole data model
       get <path>...                  for example: get Device.DeviceInfo.
       set <path> <value>             for example: set Device.SomeObject.1.Enable true
-      subscribe <seconds> <path>...  ValueChange subscription, prints the notifications, deletes it afterwards
+      subscribe [--type <type>] <seconds> <path>...
+                                     subscriptions, one per path, prints the notifications, deletes them afterwards;
+                                     type ValueChange (default), ObjectCreation, ObjectDeletion, Event
+      delete <path>...               deletes objects, for example: delete Device.LocalAgent.Subscription.1.
 
     Passwords come from FRITZBOX_PASSWORD, MQTT_PASSWORD and MQTT_BOX_PASSWORD, or are asked for.
     """;
@@ -18,6 +21,7 @@ const string usage = """
 var arguments = args.ToList();
 var configPath = TakeOption(arguments, "--config") ?? "probe.json";
 var verbose = arguments.Remove("--verbose");
+var notificationType = TakeOption(arguments, "--type") ?? "ValueChange";
 
 if (arguments.Count == 0)
 {
@@ -51,7 +55,8 @@ try
         "explore" => probe.ExploreAsync(rest.Count > 0 ? int.Parse(rest[0]) : 120, cancellation.Token),
         "get" when rest.Count > 0 => probe.GetAsync(rest, cancellation.Token),
         "set" when rest.Count == 2 => probe.SetAsync(rest[0], rest[1], cancellation.Token),
-        "subscribe" when rest.Count > 1 => probe.SubscribeAsync(int.Parse(rest[0]), rest.Skip(1).ToList(), cancellation.Token),
+        "subscribe" when rest.Count > 1 => probe.SubscribeAsync(notificationType, int.Parse(rest[0]), rest.Skip(1).ToList(), cancellation.Token),
+        "delete" when rest.Count > 0 => probe.DeleteAsync(rest, cancellation.Token),
         _ => throw new ArgumentException($"Unknown command or wrong arguments: {string.Join(' ', arguments)}{Environment.NewLine}{usage}"),
     });
 

@@ -41,11 +41,13 @@ On amazon2 (as root, for example through SSM):
 | 2 | `register` | Needs somebody at the box: it asks for a button or for a code dialed on a phone connected to the box, within 3 minutes. Then "Registered as controller n", and `docker logs mosquitto` shows `fritzbox-neufahrn` connecting. |
 | 3 | `listen 60` | Anything the box publishes |
 | 4 | `explore` | Switches the controller off and on, waits for the box to introduce itself, reads the whole data model |
-| 5 | `subscribe 120 <path>` | Switch an outlet by hand meanwhile. Each change should print a line. |
+| 5 | `subscribe 120 <path>...` | One subscription per path (the box takes one path each, without wildcards, 32 at most). `--type ObjectCreation` and the like for other kinds. Switch an outlet by hand meanwhile: each change prints a line. |
 | 6 | `get <path>`, `set <path> <value>` | Reading and switching one value |
-| 7 | `unregister` | Only to remove the controller: the HA server is meant to take it over |
+| 7 | `delete <path>...` | Removes objects, for example subscriptions a run left behind (`get Device.LocalAgent.Subscription.` lists them) |
+| 8 | `unregister` | Only to remove the controller: it stays for now (plan, D9) |
 
-The results go to `/opt/fritzbox-usp-probe/probe-output/<time>-<command>/`. `probe-output/agent.json` remembers the
+Every run connects with an MQTT client ID of its own, so runs can overlap. The results go to
+`/opt/fritzbox-usp-probe/probe-output/<time>-<command>/`. `probe-output/agent.json` remembers the
 box's Endpoint ID and topic for the later commands; delete it if the box changed them.
 
 ## Updating the probe on amazon2
