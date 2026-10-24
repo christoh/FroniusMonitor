@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Configuration>Release</Configuration>
+		<LangVersion>preview</LangVersion>
+		<RootNamespace>De.Hochstaetter.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+		<NoWarn>1701;1702;IDE0079;NU1803;CS7035;NU1900;CA1873</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\.editorconfig" Link=".editorconfig" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="HomeAutomationServerTests" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- The device models the smart home is mapped onto (FritzBoxDevice and its parts) and IFritzBoxService. -->
+		<ProjectReference Include="..\Fronius\Fronius.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Google.Protobuf" Version="3.36.2" />
+		<!-- Generates the USP types from the .proto files at build time. The Docker image builds on $BUILDPLATFORM, so
+		     protoc always runs on a platform Grpc.Tools ships it for. -->
+		<PackageReference Include="Grpc.Tools" Version="2.84.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.13" />
+		<PackageReference Include="MQTTnet" Version="5.2.0.1603" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- The USP Record and Message schemas of the Broadband Forum (TR-369 1.5), unchanged from
+		     https://github.com/BroadbandForum/usp/tree/master/specification. The generated types are in the namespaces
+		     Usp and UspRecord, after the proto packages. -->
+		<Protobuf Include="Usp\Proto\*.proto" GrpcServices="None" />
+	</ItemGroup>
+
+</Project>

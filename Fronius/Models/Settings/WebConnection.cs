@@ -61,6 +61,14 @@ public partial class WebConnection : BindableBase, ICloneable, IHaveDisplayName
     [ObservableProperty, DefaultValue(""), XmlAttribute]
     public partial string UserName { get; set; } = string.Empty;
 
+    /// <summary>
+    /// The SHA-256 fingerprint of the certificate the device has to present when the operating system does not trust
+    /// it, in hex, with or without colons. Empty: such a certificate is accepted, with a warning in the log that
+    /// names its fingerprint. Only the Fritz!Box client looks at it so far.
+    /// </summary>
+    [ObservableProperty, DefaultValue(null), XmlAttribute]
+    public partial string? CertificateFingerprint { get; set; }
+
     [XmlIgnore, System.Text.Json.Serialization.JsonIgnore]
     public string Password
     {

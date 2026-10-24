@@ -36,6 +36,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Fronius\Fronius.csproj" />
+		<ProjectReference Include="..\FritzBox\FritzBox.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

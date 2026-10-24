@@ -104,7 +104,7 @@ public partial class App
         var injector = ServiceCollection
                 .AddLogging(b => b.AddSerilog())
                 .AddScoped<IGen24Service, Gen24Service>()
-                .AddSingleton<IFritzBoxService, FritzBoxService>()
+                .AddSingleton<IFritzBoxService, FritzBoxSmartHomeService>()
                 .AddSingleton(context)
                 .AddSingleton<IDataCollectionService, DataCollectionService>()
                 .AddSingleton<MainWindow>()

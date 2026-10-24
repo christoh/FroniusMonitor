@@ -81,6 +81,16 @@ used them, and moved into `Fronius` the same day when the Avalonia client began 
 change, the namespace did. `SolarWebPeriod` and the Solar.web exceptions stayed the server's: nothing else needs
 them. See [[SolarWeb]].
 
+## Beside `Fronius`: the `FritzBox` project
+
+The FRITZ!Box client is `FritzBox/FritzBox.csproj`: TR-064, USP, the Smart Home REST API and AHA. The server and
+the WPF app use it. The Avalonia client does not, so by the rule above it is a project of its own and not part of
+`Fronius`. It references `Fronius` for `IFritzBoxService` and the device models (`FritzBoxDevice` and its parts),
+which stay in `Fronius` because the client shows the devices.
+
+The old AHA client `Fronius/Services/FritzBoxService.cs` was deleted on 2026-10-24, together with the two strings
+that only it used, `NoFritzBoxConnection` and `AccessDenied`. See [[FritzBox.SmartHome]].
+
 ## What stays although the WPF app is its only real user
 
 Do not move these without reading why they are here; each is pinned by something that is easy to miss.

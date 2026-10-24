@@ -1,0 +1,31 @@
+{
+  // Copy to probe.json. Passwords never go in here: FRITZBOX_PASSWORD, MQTT_PASSWORD and MQTT_BOX_PASSWORD, or
+  // the probe asks for them.
+  "Box": {
+    // The box's TR-064 root. Actions go over HTTPS to the port the box names.
+    "Url": "http://192.168.44.11:49000",
+    // A box user with the right "FRITZ!Box Einstellungen".
+    "UserName": ""
+  },
+  "Broker": {
+    // As the probe reaches it: it runs next to Mosquitto on amazon2.
+    "Host": "127.0.0.1",
+    "Port": 1883,
+    "UseTls": false,
+    "UserName": "usp-probe"
+  },
+  "Controller": {
+    "EndpointId": "fqdn:hochstaetter.de:home-automation",
+    // As the box reaches the broker. The box insists on TLS.
+    "BoxBrokerHost": "amazon2.hochstaetter.de",
+    "BoxBrokerPort": 8883,
+    "BoxBrokerUseTls": true,
+    "MqttControllerTopic": "usp/controller/home-automation",
+    "MqttResponseTopic": "usp/agent/fritzbox-neufahrn",
+    "MqttClientId": "fritzbox-neufahrn",
+    "BoxUserName": "fritzbox-neufahrn",
+    "AccessRights": "Smarthome, Internet",
+    "ListenFilter": "usp/#"
+  },
+  "OutputDirectory": "probe-output"
+}

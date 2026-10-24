@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using De.Hochstaetter.FritzBox.SmartHome;
 using De.Hochstaetter.Fronius;
 using De.Hochstaetter.Fronius.Contracts;
 using De.Hochstaetter.Fronius.Models.Settings;
@@ -25,7 +26,7 @@ public sealed class EnergyHistoryTests
     public EnergyHistoryTests() => IoC.Update
     (
         TestInjector.CreateServices()
-            .AddSingleton<IFritzBoxService, FritzBoxService>()
+            .AddSingleton<IFritzBoxService, FritzBoxSmartHomeService>()
             .AddSingleton<IWattPilotService, WattPilotService>()
             .AddSingleton<IToshibaHvacService, ToshibaHvacService>()
             .AddSingleton<IDataCollectionService, DataCollectionService>()

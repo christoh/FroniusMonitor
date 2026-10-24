@@ -16,6 +16,13 @@ public enum FritzBoxColorMode : uint
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public partial class FritzBoxColorControl : BindableBase
 {
+    /// <summary>
+    /// The saturation that is 100 %. Both interfaces of the box take 0..255, but over the REST API a
+    /// FRITZ!Smart Light 500 stores 255 as 254 (measured 2026-10-24), so 254 is the top of the scale here. A lamp
+    /// that was set to 255 another way, through AHA or the FRITZ!App, still reports 255; that counts as 100 % too.
+    /// </summary>
+    public const int MaxSaturation = 254;
+
     [XmlAttribute("supported_modes")]
     [JsonIgnore]
     public string? SupportedModesString
@@ -28,7 +35,7 @@ public partial class FritzBoxColorControl : BindableBase
     [JsonIgnore]
     public string? CurrentModeString
     {
-        get => FritzBoxDevice.GetStringValue((double?)SupportedModes,1);
+        get => FritzBoxDevice.GetStringValue((double?)CurrentMode, 1);
         set => CurrentMode = (FritzBoxColorMode?)FritzBoxDevice.GetUintValue(value);
     }
 
