@@ -97,10 +97,16 @@ says whether AHA and REST still agree.**
 - **A device the box no longer lists is withdrawn** (`DeviceAction.Delete`). Before 1.2, it stayed until the server
   restarted.
 - **Failures are logged once** through `RepeatedFailure.Log`, the same as for the inverters. The recovery is logged
-  once as well.
+  once as well. `RepeatedFailureTests` covers both with a capturing logger.
 - **A failed round ends that round only.** That includes a timeout of the box, which `HttpClient` reports as a
   `TaskCanceledException`. Only the collector's own token ends the loop. Catching "everything but
   `OperationCanceledException`" let a timeout end the loop of that box for good, without a word in the log.
+- **How it is tested:** `FritzBoxDataCollectorTests` runs the real collector against a real `DataControlService` and a
+  fake `IFritzBoxService` whose `GetDevices` takes the next round (devices or an exception) from a `Channel` the test
+  writes to. `RefreshRate` is zero, and a test goes on when the collector has *asked for round n+1*, which proves
+  that round n is published - so nothing sleeps, and every wait has a timeout. Reading the control service from the
+  test thread is safe at that point: the collector is blocked in `GetDevices`. The one real wait is the check that
+  two commands cause only one read, because a read that does not happen cannot be waited for.
 - **The device ids are `Manufacturer;Model;SerialNumber`** (`IHaveUniqueId.Id`). AHA left the model of one lamp unit
   empty, and REST fills it from the device. That lamp's id therefore changed once, with the switch to REST:
   `AVM;130770053217-1` became `AVM;FRITZ!Smart_Light_500;130770053217-1`. The AHA device entries of the lamps
