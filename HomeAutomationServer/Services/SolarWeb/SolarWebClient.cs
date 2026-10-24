@@ -48,7 +48,7 @@ public sealed class SolarWebClient : ISolarWebClient, IDisposable
         // Solar.web has been seen to take well over 30 seconds for a day chart from the production server on
         // 2026-09-20; a timeout there costs the request and, with the request gate, delays the next one anyway.
         client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(90) };
-        client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("HomeAutomationServer", GitInfo.Version.ToString()));
+        client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("HomeAutomationServer", FroniusGitInfo.Version.ToString()));
         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/html", 0.9));
         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*", 0.1));

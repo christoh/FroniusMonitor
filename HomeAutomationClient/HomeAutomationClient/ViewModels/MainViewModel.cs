@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using Avalonia.Styling;
+using De.Hochstaetter.Fronius.Models;
 using De.Hochstaetter.Fronius.Models.Charging;
 using BatteryDetailsView = De.Hochstaetter.HomeAutomationClient.Views.BatteryDetailsView;
 using InverterDetailsView = De.Hochstaetter.HomeAutomationClient.Views.InverterDetailsView;
@@ -12,7 +13,9 @@ namespace De.Hochstaetter.HomeAutomationClient.ViewModels;
 public sealed partial class MainViewModel : ViewModelBase, IPowerDisplayOptions
 {
     private const string ProductName = "hacc";
-    private const string ProductVersion = "0.5.0.0";
+
+    /// <summary>The version the User-Agent says: the one GitInfo gave this build, as the About dialog shows it.</summary>
+    private static readonly string ProductVersion = FroniusGitInfo.Version.ToString();
 
     private readonly IGen24LocalizationService gen24Loc;
     private readonly IUriService uriService;
