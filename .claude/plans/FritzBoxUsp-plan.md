@@ -6,11 +6,14 @@ paths:
   - HomeAutomationServer/Services/DataCollectors/FritzBoxDataCollector.cs
   - HomeAutomationServer/Models/Settings/FritzBoxDataCollectorParameters.cs
   - FroniusMonitor/Services/DataCollectionService.cs
+  - FritzBox/**
+  - Tools/FritzBoxUspProbe/**
 ---
 
 # Fritz!Box: push over USP/MQTT, IPv4 watchdog, extensions
 
-Status: draft of 2026-10-24. Nothing of it is implemented yet.
+Status of 2026-10-24: phase 1.0 is built (`FritzBox/FritzBox.csproj`, `Tools/FritzBoxUspProbe`) and waits for its
+run against the box in Neufahrn. Nothing else is implemented yet.
 
 ## Where we are
 
@@ -35,17 +38,17 @@ Status: draft of 2026-10-24. Nothing of it is implemented yet.
   yet which smart-home parameters the box exposes, or whether it accepts `ValueChange` for them. Phase 1.0
   answers this before anything else is built.
 
-## Decisions needed before work starts
+## Decisions
 
-| # | Question | Recommendation |
+| # | Question | Answer |
 |---|---|---|
-| D1 | FRITZ!OS version and box model? | MQTT needs at least 8.01, the REST API needs 8.20. |
-| D2 | Which MQTT broker? | A Mosquitto service in `docker-compose.yml`, with ACLs. The HA server and the WPF app are both just clients of it. The alternative, an embedded MQTTnet broker inside the HA server, would make the WPF app depend on the server. |
-| D3 | Where does the USP/TR-064 code live? | A new class library, for example `FritzBox/FritzBox.csproj`, referenced by `HomeAutomationServer` and `FroniusMonitor`. By `Fronius.SharedLibraryBoundary.md` it does not belong in `Fronius`, because the Avalonia client does not use it. Duplicating it would break the copy & paste rule. The device models (`FritzBoxDevice` and its parts) stay in `Fronius`. |
-| D4 | Does the box ask for a confirmation (button or phone) when IPv6 is switched off in the web UI? | If it does, step 2 cannot be automated as specified. Please check by hand once. |
-| D5 | Does the HA server reach the box over the LAN? | See step 2: if it does, the box's LAN IPv4 address does not depend on the provider's IPv4. One command channel is then enough, and the IPv6/IPv4 split is unnecessary. |
-| D6 | Is the probe of phase 1.0 committed? | As `Tools/FritzBoxUspProbe` on the feature branch. Delete it once its findings are in a memory document. |
-| D7 | Does the provider manage the box through TR-069 or USP? This is "Internet → Zugangsdaten → Anbieter-Dienste", if that tab is shown at all. | Only to know. Our controller does not touch the provider's. |
+| D1 | FRITZ!OS version and box model? | Open. `info` of the probe reads it. MQTT needs at least 8.01, the REST API needs 8.20. |
+| D2 | Which MQTT broker? | The Mosquitto container on the HA server (192.168.44.50, `network_mode: host`), as a service of its docker-compose.yml. The HA server and the WPF app are both clients of it. Configuration in `Tools/FritzBoxUspProbe/mosquitto`. |
+| D3 | Where does the USP/TR-064 code live? | `FritzBox/FritzBox.csproj`, as recommended. It is not part of `Fronius`, because the Avalonia client does not use it. The device models (`FritzBoxDevice` and its parts) stay in `Fronius`. |
+| D4 | Does the box ask for a confirmation (button or phone)? | No. The confirmation is switched off on the boxes. The code handles it all the same. |
+| D5 | How does the HA server reach the box of step 2? | It is a different box, in Switzerland. The HA server and the smart-home box (192.168.44.11) are in Neufahrn. Step 2 below is written for that. |
+| D6 | Is the probe of phase 1.0 committed? | `Tools/FritzBoxUspProbe` on `feature/fritzbox-usp`. Delete it once its findings are in `.claude/memory/FritzBox.Usp.md`. |
+| D7 | TR-069 on the box? | Switched off by Christoph. Not needed: the controller is added through TR-064. It may matter all the same if switching TR-069 off also switched off the box's USP agent. The probe will show that. |
 
 ## Step 1 - Push for everything that works today, in the HA server and the WPF app
 
@@ -55,7 +58,8 @@ A console tool, run by hand in the house LAN:
 
 1. TR-064 discovery: read `tr64desc.xml` on port 49000 and switch to HTTPS on 49443 with `GetSecurityPort`.
 2. Read `X_AVM-DE_USPController:GetInfo` and the existing controllers (`GetUSPControllerByIndex`).
-3. `AddUSPController` with MTP `mqtt` against the broker, rights `Smarthome` and `Internet`. Handle the second
+3. `AddUSPController` with MTP `mqtt` against the broker, rights `Smarthome` and `Internet` (the latter for what
+   step 3 might read about the internet connection). Handle the second
    factor: answers 866, 867 and 868, then `X_AVM-DE_Auth:SetConfig(start)`, and poll `GetState` until
    `authenticated`.
 4. Over MQTT:
@@ -64,8 +68,8 @@ A console tool, run by hand in the house LAN:
 5. A `ValueChange` subscription on one outlet's switch state and power, a lamp's level, and a temperature.
    Record when the notifications arrive and how often.
 6. A `Set` on an outlet's switch state, a lamp's level and color, and the color temperature.
-7. Find a writable IPv6 switch for step 2: `Device.IP.IPv6Enable`, `Device.IP.Interface.{i}.IPv6Enable`, or an
-   `X_AVM-DE_*` parameter. Read it only. Writing it is tried once by hand, with Christoph present.
+7. Note any writable IPv6 switch (`Device.IP.IPv6Enable`, `Device.IP.Interface.{i}.IPv6Enable`, `X_AVM-DE_*`).
+   Step 2 cannot use USP for the Swiss box (see there), so this is for the record only.
 8. Save every response as a dump. The dumps become the input for the memory document and, with AINs, MACs and
    host names replaced, the test fixtures.
 
@@ -80,7 +84,7 @@ A console tool, run by hand in the house LAN:
 - **G3:** `ValueChange` is allowed at least for the switch states.
 - **G4:** `Set` switches. If it does not, commands stay on HTTP and only the reading moves to USP.
 
-**If G1 to G3 fail:** USP is used for step 2 only. Step 1 becomes "polling, but better": the REST API if FRITZ!OS
+**If G1 to G3 fail:** USP is not used for now. Step 1 becomes "polling, but better": the REST API if FRITZ!OS
 is at least 8.20, otherwise AHA, plus the server pushing to clients only on change (phase 1.3, last point).
 
 ### Phase 1.1 - The `FritzBox` library (see D3)
@@ -104,7 +108,8 @@ is at least 8.20, otherwise AHA, plus the server pushing to clients only on chan
 
 - One controller per installation, each with its own `EndpointID`: `proto::ha-server-<id>` for the server,
   `proto::froniusmonitor-<machine>` for each WPF installation. Each gets its own MQTT topics.
-- Least privilege. The server gets `Smarthome` and, for step 2, `Internet`. The WPF app gets `Smarthome` only.
+- Least privilege. The server gets `Smarthome`, and `Internet` only once step 3 reads something with it. The WPF
+  app gets `Smarthome` only.
 - Registration is idempotent: look the controller up by `EndpointID` first, and add it only if it is missing.
 - Who presses the button:
   - **Server:** an administrator-only endpoint starts the registration. The Avalonia client shows "Press the button
@@ -180,41 +185,60 @@ Verify --(IPv4 works)--> Monitoring
 Verify --(IPv4 still down)--> Backoff --> DisableIpv6 (limited, see below)
 ```
 
+### The setting
+
+- **The HA server** is in Neufahrn (192.168.44.50). **The box with the IPv4 problem** is in Switzerland:
+  - LAN 192.168.3.1, reachable from Neufahrn through the site-to-site WireGuard tunnel of the two boxes. TR-064
+    answers through the tunnel (checked on 2026-10-24).
+  - Public IPv4 178.21.230.55 (fixed) and IPv6 2a01:aec0:8000:1::788d, the A and AAAA records of
+    `li9ldnoisizdei41.myfritz.net`.
+  - Also reachable as `https://fritzbox.hochstaetter.de/` through nginx on AWS (A 3.77.190.163, AAAA
+    2a05:d014:9eb:d01:1b::2), over HTTPS only.
+  - FRITZ! does not allow a port forwarding to the box itself.
+- **The tunnel probably goes down together with IPv4**, so it is no way in during an outage. Which address family
+  the WireGuard tunnel uses is still to be found out.
+
 ### Details and proposed additions (to be decided)
 
-- **Ping targets** are configurable IPv4 literals, at least two different hosts (for example `1.1.1.1` and
-  `9.9.9.9`), so that one host being down does not count as an outage. Pinging uses
-  `System.Net.NetworkInformation.Ping`.
-  - In the container as user `app`, this needs unprivileged ICMP sockets. Docker allows them by default
-    (`net.ipv4.ping_group_range`), but this has to be verified.
+- **Detection:** five pings to the box's fixed IPv4 178.21.230.55 every 30 s. Whether the box answers pings from
+  the internet is still to be checked. If it does not, connect to its HTTPS port over IPv4 instead.
+  `System.Net.NetworkInformation.Ping` works in the container, which runs as root with `network_mode: host`.
 - **Guards before acting:**
-  - The box answers on the LAN. Otherwise the problem is local and toggling does nothing.
-  - **IPv6 to the internet works** (a ping to `2606:4700:4700::1111`). This is the failure mode described ("IPv4
-    gone, IPv6 still there"). If both are down, the whole line is down and toggling is pointless.
+  - **Neufahrn's own IPv4 works** (a ping to, for example, `1.1.1.1` or `9.9.9.9`). Otherwise the problem is on
+    this side and toggling the Swiss box does nothing.
+  - **The Swiss box answers over IPv6.** That is the failure mode described ("IPv4 gone, IPv6 still there"). If
+    both are down, the line is down and toggling is pointless.
   - At most N recovery cycles per hour, then stop and report.
+- **Switching IPv6 off has to go over IPv6.** Two ways, to be chosen:
+  1. **Directly from the HA server** to `[2a01:aec0:8000:1::788d]`. This needs IPv6 internet at the HA server.
+     Christoph's laptop has it; the HA server is still to be checked (`ping -6` on the Pi).
+  2. **Through nginx on AWS**, with two names that each reach the box over one address family only (`resolver …
+     ipv4=off` or `ipv6=off`, upstream by the MyFRITZ name). This works without IPv6 in Neufahrn.
+- **Switching IPv6 on again goes over IPv4:** through the tunnel (192.168.3.1) once it is up again, otherwise to the
+  public IPv4 or through nginx.
+- **Command channel:** the request the box's web UI sends (`data.lua`), which Christoph captures once in the
+  browser's developer tools while switching.
+  - It goes over the box's remote HTTPS access, and needs a box user who may connect from the internet.
+  - It is fragile across FRITZ!OS versions.
+  - TR-064 can only read the IPv6 status, not switch it.
+  - USP is no option for this box: its broker connection runs to Neufahrn through the tunnel and is down exactly
+    when it would be needed.
 - **Never leave IPv6 switched off:**
   - Switch it back on in a `finally`.
   - Persist the state, so that a server restart in the middle of a cycle switches IPv6 back on at start.
-- **Option:** re-enable IPv6 after 30 s at the earliest, but only once IPv4 answers again, with an upper limit of
-  for example 120 s. The manual procedure works that way: "wait until the connection is back".
-- **Diagnostics** before and after each cycle: read `WANIPConnection` or `WANPPPConnection`
-  `GetInfo`/`GetStatusInfo` over TR-064. That gives `ConnectionStatus`, `X_AVM-DE_IPv6ConnectionStatus`, the
-  external IPv4 address and `LastConnectionError`, which are logged for the conversation with the provider.
-- **Command channel:** TR-064 has no action that switches IPv6 on or off. It can only read the status.
-  - **A:** USP `Set` on the parameter found in phase 1.0 step 7. Preferred.
-  - **B:** replay the request the web UI sends (`data.lua`). Christoph captures it once in the browser's developer
-    tools while switching. This is fragile across FRITZ!OS versions, so it is the fallback only.
-- **"Via IPv6 / via IPv4"** (see D5): the HA server sits in the LAN, so it talks to the box's LAN IPv4 address. That
-  address does not depend on the provider's IPv4, and the MQTT connection to the broker is LAN IPv4 too. So one
-  channel suffices for both switching off and switching on. If the server reaches the box from outside, the
-  specified split stays.
+- **Option:** switch IPv6 back on after 30 s at the earliest, but only once IPv4 answers again, with an upper limit
+  of for example 120 s. The manual procedure works that way: "wait until the connection is back".
+- **Diagnostics** before and after each cycle, through the tunnel whenever it is up: `WANIPConnection` or
+  `WANPPPConnection` `GetInfo`/`GetStatusInfo` over TR-064. That gives `ConnectionStatus`,
+  `X_AVM-DE_IPv6ConnectionStatus`, the external IPv4 address and `LastConnectionError`, which are logged for the
+  conversation with the provider.
 - **Outage log:** start, detection, every action, recovery, duration. Stored in SQLite under `history` (the same
   place as the price and weather history). The log entries are in English.
 - **Notification:** a SignalR message to administrators on detection, on recovery, and on giving up.
-- **Settings** in `Settings.xml`: on/off (off by default), targets, interval, ping count, the delays, and the cycle
-  limit.
+- **Settings** in `Settings.xml`: on/off (off by default), addresses, targets, interval, ping count, the delays, and
+  the cycle limit.
 - **Tests:** the state machine with a fake `TimeProvider`, a fake pinger and a fake box.
-- **Order:** with channel B, step 2 does not depend on step 1 and can be done first if the outages hurt more.
+- **Order:** step 2 does not depend on step 1 and can be done first if the outages hurt more.
 
 ## Step 3 - Additions we cannot do today
 

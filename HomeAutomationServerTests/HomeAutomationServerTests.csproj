@@ -33,6 +33,8 @@
 		<!-- MDnsTests asks the LAN what Fronius and FritzBox devices announce over multicast DNS. -->
 		<PackageReference Include="Makaretu.Dns.Multicast.New" Version="0.38.0" />
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.13" />
+		<!-- The USP controller of the FritzBox library is tested against an in-process broker. -->
+		<PackageReference Include="MQTTnet.Server" Version="5.2.0.1603" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
 		<!-- The oracle of JsonExtensionsTests: the same JSON goes through Newtonsoft and System.Text.Json and the
 		     two answers are compared. It is the only thing left in the repository that uses Newtonsoft. -->
@@ -49,6 +51,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\FritzBox\FritzBox.csproj" />
 		<ProjectReference Include="..\HomeAutomationServer\HomeAutomationServer.csproj" />
 		<!-- The view models of the client hold real logic - the interlocks and the validation of a settings tab -
 		     and so do its presenters and controls, which need an Avalonia application and real windows; the headless

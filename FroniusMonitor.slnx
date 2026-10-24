@@ -28,6 +28,7 @@
     <File Path=".claude/memory/DialogSystem.Lifecycle.md" />
     <File Path=".claude/memory/Docker.GhcrCleanup.md" />
     <File Path=".claude/memory/EnergyData.md" />
+    <File Path=".claude/memory/FritzBox.Usp.md" />
     <File Path=".claude/memory/Fronius.SharedLibraryBoundary.md" />
     <File Path=".claude/memory/Gauges.md" />
     <File Path=".claude/memory/Gen24Polling.md" />
@@ -64,7 +65,11 @@
   <Folder Name="/Solution Items/Skills/create-plan/">
     <File Path=".claude/skills/create-plan/SKILL.md" />
   </Folder>
+  <Folder Name="/Tools/">
+    <Project Path="Tools/FritzBoxUspProbe/FritzBoxUspProbe.csproj" />
+  </Folder>
   <Project Path="Fronius/Fronius.csproj" />
+  <Project Path="FritzBox/FritzBox.csproj" />
   <Project Path="FroniusMonitor/FroniusMonitor.csproj" />
   <Project Path="HomeAutomationClient/HomeAutomationClient.Android/HomeAutomationClient.Android.csproj">
     <Deploy />

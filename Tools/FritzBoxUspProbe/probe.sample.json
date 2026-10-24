@@ -1,0 +1,26 @@
+{
+  // Copy to probe.json. Passwords never go in here: FRITZBOX_PASSWORD, MQTT_PASSWORD and MQTT_BOX_PASSWORD, or
+  // the probe asks for them.
+  "Box": {
+    // The box's TR-064 root. Actions go over HTTPS to the port the box names.
+    "Url": "http://192.168.44.11:49000",
+    // A box user with the right "FRITZ!Box Einstellungen".
+    "UserName": ""
+  },
+  "Broker": {
+    // As both the probe and the box reach it.
+    "Host": "192.168.44.50",
+    "Port": 1883,
+    "UseTls": false,
+    "UserName": "usp-probe"
+  },
+  "Controller": {
+    "EndpointId": "proto::usp-probe",
+    "MqttControllerTopic": "usp/controller/usp-probe",
+    "MqttResponseTopic": "usp/agent/fritzbox-neufahrn",
+    "BoxUserName": "fritzbox-neufahrn",
+    "AccessRights": "Smarthome, Internet",
+    "ListenFilter": "usp/#"
+  },
+  "OutputDirectory": "probe-output"
+}
