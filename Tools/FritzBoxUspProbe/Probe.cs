@@ -1,6 +1,10 @@
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using De.Hochstaetter.FritzBox.SmartHome;
+using De.Hochstaetter.Fronius.Contracts;
+using De.Hochstaetter.Fronius.Models.Settings;
 
 namespace De.Hochstaetter.FritzBoxUspProbe;
 
@@ -267,6 +271,97 @@ internal sealed class Probe
             }
         }
     }
+
+    /// <summary>Writes the raw AHA answer to <c>aha.xml</c>.</summary>
+    public async Task AhaAsync(string query, CancellationToken token)
+    {
+        command = "aha";
+        using var client = CreateHttpClient();
+        var xml = await client.GetAhaAsync(query, token).ConfigureAwait(false);
+        Write("aha.xml", xml);
+        Console.WriteLine($"{xml.Length} characters in {Path.GetFullPath(RunDirectory)}/aha.xml");
+    }
+
+    /// <summary>Writes the raw REST answer to <c>rest.json</c>.</summary>
+    public async Task RestAsync(string path, CancellationToken token)
+    {
+        command = "rest";
+        using var client = CreateHttpClient();
+        var json = await client.GetRestAsync(path, token).ConfigureAwait(false);
+        Write("rest.json", JsonNode.Parse(json)!.ToJsonString(indented));
+        Console.WriteLine($"{json.Length} characters in {Path.GetFullPath(RunDirectory)}/rest.json");
+    }
+
+    /// <summary>
+    /// The devices through <see cref="FritzBoxSmartHomeService"/>, as the HA server will get them, in <c>devices.json</c>.
+    /// With an AIN and a command it sends that to the unit first, and reads 1.5 s later: the box needs about a second
+    /// before the overview shows a change.
+    /// </summary>
+    public async Task SmartHomeAsync(IReadOnlyList<string> arguments, CancellationToken token)
+    {
+        command = "smarthome";
+        using var service = new FritzBoxSmartHomeService(loggerFactory);
+        service.Connection = new WebConnection { BaseUrl = settings.Box.WebUrl, UserName = settings.Box.UserName, Password = boxPassword.Value };
+
+        ValueTask? sent = arguments switch
+        {
+            [] => null,
+            [var ain, "on" or "off"] => service.SwitchDevice(ain, arguments[1] == "on", token),
+            [var ain, "level", var percent] => service.SetLevel(ain, ParseNumber(percent) / 100, token),
+            [var ain, "kelvin", var kelvin] => service.SetColorTemperature(ain, ParseNumber(kelvin), token),
+            [var ain, "color", var hue, var percent] => service.SetColor(ain, ParseNumber(hue), ParseNumber(percent) / 100, token),
+            _ => throw new ArgumentException($"Unknown smarthome command: {string.Join(' ', arguments)}"),
+        };
+
+        if (sent is { } pending)
+        {
+            await pending.ConfigureAwait(false);
+            Console.WriteLine($"Sent: {string.Join(' ', arguments)}");
+            await Task.Delay(TimeSpan.FromSeconds(1.5), token).ConfigureAwait(false);
+        }
+
+        var devices = await service.GetDevices(token).ConfigureAwait(false);
+        Write("devices.json", JsonSerializer.Serialize(devices.Devices, indented));
+        Console.WriteLine($"FRITZ!OS {devices.FirmwareVersionString ?? "(from AHA: see devices.json)"}, {devices.Devices.Count} devices");
+
+        foreach (var device in devices.Devices)
+        {
+            var state = ((ISwitchable)device).IsTurnedOn switch { true => "on", false => "off", null => "-" };
+            var power = device.PowerMeter?.PowerWatts is { } watts ? $"{watts:N2} W" : string.Empty;
+            var light = device.LevelControl?.Level is { } level ? $"{level:P0}" : string.Empty;
+            light += device.Color?.TemperatureKelvin is { } kelvin ? $" {kelvin} K" : device.Color?.HueDegrees is { } hue ? $" hue {hue} sat {device.Color.SaturationAbsolute}" : string.Empty;
+            Console.WriteLine($"{device.Ain,-17} {device.DisplayName,-28} {(device.IsPresent ? "present" : "absent"),-8} {state,-4} {power,12} {light}");
+        }
+    }
+
+    /// <summary>Switches a routine of the box on or off and shows what the overview says about it afterwards.</summary>
+    public async Task RoutineAsync(string uid, bool enabled, CancellationToken token)
+    {
+        command = "routine";
+        using var client = CreateHttpClient();
+        var smartHome = new SmartHomeClient(client);
+        await smartHome.SetTriggerEnabledAsync(uid, enabled, token).ConfigureAwait(false);
+        await Task.Delay(TimeSpan.FromSeconds(1.5), token).ConfigureAwait(false);
+
+        foreach (var trigger in (await smartHome.GetOverviewAsync(token).ConfigureAwait(false)).Triggers)
+        {
+            Console.WriteLine($"{trigger.Uid,-22} {trigger.Name,-28} {(trigger.Enabled ? "on" : "off")}");
+        }
+    }
+
+    private static double ParseNumber(string text) => double.Parse(text, NumberStyles.Float, CultureInfo.InvariantCulture);
+
+    private FritzBoxHttpClient CreateHttpClient() => new
+    (
+        new FritzBoxHttpClientOptions
+        {
+            BaseUri = new Uri(settings.Box.WebUrl),
+            UserName = settings.Box.UserName,
+            Password = boxPassword.Value,
+            AcceptUntrustedCertificate = AcceptBoxCertificate,
+        },
+        loggerFactory.CreateLogger<FritzBoxHttpClient>()
+    );
 
     /// <summary>Deletes objects, for example subscriptions a run left behind.</summary>
     public async Task DeleteAsync(IReadOnlyList<string> paths, CancellationToken token)

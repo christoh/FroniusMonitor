@@ -15,7 +15,8 @@ paths:
 Status of 2026-10-24: phase 1.0 (the USP probe) is done. Push over USP works, but only for the outlets, and the
 lamps are missing from it entirely. **Step 1 therefore goes on without USP, over the Smart Home REST API.** The USP
 setup (Mosquitto on amazon2 and the controller on the box) stays for now, in case step 2 needs it for the Swiss
-box. Nothing of phases 1.1 to 1.5 is implemented yet.
+box. **Phase 1.1 (the REST client) is done and tested live in Neufahrn** (`.claude/memory/FritzBox.SmartHome.md`).
+Phases 1.2 to 1.5 are still to do.
 
 ## Where we are
 
@@ -64,7 +65,14 @@ The gate is in `.claude/memory/FritzBox.Usp.md`:
 - G3 (push): yes.
 - G4 (switching over USP): yes.
 
-### Phase 1.1 - REST client in the `FritzBox` library
+### Phase 1.1 - REST client in the `FritzBox` library (done)
+
+Built as `FritzBoxSmartHomeService` in `FritzBox/SmartHome`. What turned out differently from the points below, and
+what was measured, is in `.claude/memory/FritzBox.SmartHome.md`. In short:
+- The version comes from `jason_boxinfo.xml`.
+- AHA is the fallback inside the same service, over the same `FritzBoxHttpClient`.
+- The overview shows a command about a second later.
+- The REST API has no numeric `id`, so one is made from the UID.
 
 - **Login:** `login_sid.lua?version=2` with PBKDF2, then the SID in `Authorization: AVM-SID <sid>`. Log in again
   when the SID has expired. The user needs the right "Smart Home".
@@ -87,7 +95,10 @@ The gate is in `.claude/memory/FritzBox.Usp.md`:
 - `FritzBoxDataCollector` polls the overview, every 2 to 5 s (configurable, as now).
 - **The server pushes to clients on change only.** Today it pushes every device on every poll; this changes it to
   work the way the Toshiba devices already do. `UpdateVisibility.Lifecycle.md` gets updated in the same change.
-- **Commands** go over the REST API. A poll right after a command makes the result visible at once.
+- **Commands** go over the REST API. A poll about a second after a command makes the result visible; one at once
+  still shows the old state (measured 2026-10-24).
+- Register `FritzBoxSmartHomeService` instead of `Fronius/Services/FritzBoxService.cs`. Once the WPF app has switched
+  too (1.3), delete the old service: its AHA commands exist twice until then.
 - **Templates and routines** become available on the way, for step 3.
 
 ### Phase 1.3 - WPF app

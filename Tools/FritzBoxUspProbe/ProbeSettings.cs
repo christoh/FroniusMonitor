@@ -24,6 +24,9 @@ internal sealed class BoxSettings
     /// <summary>The box's TR-064 root.</summary>
     public string Url { get; set; } = "http://192.168.44.11:49000";
 
+    /// <summary>The box's web interface, for the AHA interface and the Smart Home REST API.</summary>
+    public string WebUrl { get; set; } = "http://192.168.44.11";
+
     /// <summary>A box user with the right "FRITZ!Box Einstellungen". Password: FRITZBOX_PASSWORD.</summary>
     public string UserName { get; set; } = string.Empty;
 }

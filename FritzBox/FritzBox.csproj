@@ -19,6 +19,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<!-- The device models the smart home is mapped onto (FritzBoxDevice and its parts) and IFritzBoxService. -->
+		<ProjectReference Include="..\Fronius\Fronius.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Google.Protobuf" Version="3.36.2" />
 		<!-- Generates the USP types from the .proto files at build time. The Docker image builds on $BUILDPLATFORM, so
 		     protoc always runs on a platform Grpc.Tools ships it for. -->

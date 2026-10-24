@@ -14,6 +14,11 @@ const string usage = """
                                      subscriptions, one per path, prints the notifications, deletes them afterwards;
                                      type ValueChange (default), ObjectCreation, ObjectDeletion, Event
       delete <path>...               deletes objects, for example: delete Device.LocalAgent.Subscription.1.
+      aha <query>                    the AHA answer, for example: aha switchcmd=getdevicelistinfos
+      rest <path>                    the REST answer, for example: rest smarthome/overview
+      smarthome [<ain> <command>]    the devices as the HA server gets them, REST or AHA by FRITZ!OS version;
+                                     with an AIN, first: on, off, level <percent>, kelvin <K>, color <hue> <percent>
+      routine <uid> on|off           switches a routine of the box on or off (REST API)
 
     Passwords come from FRITZBOX_PASSWORD, MQTT_PASSWORD and MQTT_BOX_PASSWORD, or are asked for.
     """;
@@ -57,6 +62,10 @@ try
         "set" when rest.Count == 2 => probe.SetAsync(rest[0], rest[1], cancellation.Token),
         "subscribe" when rest.Count > 1 => probe.SubscribeAsync(notificationType, int.Parse(rest[0]), rest.Skip(1).ToList(), cancellation.Token),
         "delete" when rest.Count > 0 => probe.DeleteAsync(rest, cancellation.Token),
+        "aha" when rest.Count == 1 => probe.AhaAsync(rest[0], cancellation.Token),
+        "rest" when rest.Count == 1 => probe.RestAsync(rest[0], cancellation.Token),
+        "smarthome" => probe.SmartHomeAsync(rest, cancellation.Token),
+        "routine" when rest is [_, "on" or "off"] => probe.RoutineAsync(rest[0], rest[1] == "on", cancellation.Token),
         _ => throw new ArgumentException($"Unknown command or wrong arguments: {string.Join(' ', arguments)}{Environment.NewLine}{usage}"),
     });
 

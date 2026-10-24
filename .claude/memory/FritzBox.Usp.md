@@ -1,6 +1,8 @@
 ---
 paths:
-  - FritzBox/**
+  - FritzBox/Tr064/**
+  - FritzBox/Usp/**
+  - FritzBox/FritzBox.csproj
   - Tools/FritzBoxUspProbe/**
   - HomeAutomationServerTests/UnitTests/FritzBoxTr064Tests.cs
   - HomeAutomationServerTests/UnitTests/FritzBoxUspCodecTests.cs
@@ -18,8 +20,8 @@ Only `Tools/FritzBoxUspProbe` and the tests use it so far. The HA server and the
 - It pushes power no faster than the box updates it, which is every two minutes.
 - It allows at most 32 subscriptions.
 
-Step 1 adds a REST client to this library instead. The USP part stays, together with the broker on amazon2 and the
-controller on the box, in case step 2 needs it for the Swiss box (D9).
+Step 1 uses the REST client of this library instead (`FritzBox.SmartHome.md`). The USP part stays, together with
+the broker on amazon2 and the controller on the box, in case step 2 needs it for the Swiss box (D9).
 
 It is a project of its own, not part of `Fronius`, because its users will be the HA server and the WPF app and not
 the Avalonia client (see `Fronius.SharedLibraryBoundary.md`).

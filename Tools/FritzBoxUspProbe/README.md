@@ -1,8 +1,9 @@
 # FritzBoxUspProbe
 
 Phase 1.0 of `.claude/plans/FritzBoxUsp-plan.md`: finds out what the FRITZ!Box offers over USP (TR-369), and
-whether it pushes changes of the smart-home devices. Delete this tool once its findings are in
-`.claude/memory/FritzBox.Usp.md`.
+whether it pushes changes of the smart-home devices. Since phase 1.1 it also tries the Smart Home REST API and AHA
+(`aha`, `rest`, `smarthome`, `routine`). Delete this tool once its findings are in `.claude/memory/FritzBox.Usp.md`
+and `.claude/memory/FritzBox.SmartHome.md` and nothing needs it any more.
 
 The probe registers a USP controller on the box (through TR-064) and then talks to the box over an MQTT broker.
 
@@ -45,6 +46,16 @@ On amazon2 (as root, for example through SSM):
 | 6 | `get <path>`, `set <path> <value>` | Reading and switching one value |
 | 7 | `delete <path>...` | Removes objects, for example subscriptions a run left behind (`get Device.LocalAgent.Subscription.` lists them) |
 | 8 | `unregister` | Only to remove the controller: it stays for now (plan, D9) |
+
+Commands that do not need the broker, only the box's web interface (`Box.WebUrl`, default `http://192.168.44.11`):
+
+| Command | What |
+|---|---|
+| `aha <query>` | The raw AHA answer, for example `aha switchcmd=getdevicelistinfos` |
+| `rest <path>` | The raw REST answer, for example `rest smarthome/overview` |
+| `smarthome` | The devices as `FritzBoxSmartHomeService` hands them to the HA server, also as `devices.json` |
+| `smarthome <ain> on\|off` | Switches a unit first. `level <percent>`, `kelvin <K>` and `color <hue> <percent>` work the same way. Setting level or color does not switch a lamp on. |
+| `routine <uid> on\|off` | Switches a routine of the box on or off |
 
 Every run connects with an MQTT client ID of its own, so runs can overlap. The results go to
 `/opt/fritzbox-usp-probe/probe-output/<time>-<command>/`. `probe-output/agent.json` remembers the
