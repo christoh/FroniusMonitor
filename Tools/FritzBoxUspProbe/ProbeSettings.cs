@@ -30,8 +30,8 @@ internal sealed class BoxSettings
 
 internal sealed class BrokerSettings
 {
-    /// <summary>The broker as both the probe and the box reach it.</summary>
-    public string Host { get; set; } = "192.168.44.50";
+    /// <summary>The broker as the probe reaches it. The box may reach it differently, see <see cref="ControllerSettings.BoxBrokerHost"/>.</summary>
+    public string Host { get; set; } = "127.0.0.1";
 
     public int Port { get; set; } = 1883;
 
@@ -43,13 +43,28 @@ internal sealed class BrokerSettings
 
 internal sealed class ControllerSettings
 {
-    public string EndpointId { get; set; } = "proto::usp-probe";
+    /// <summary>
+    /// The controller the probe registers. The HA server is meant to take the same entry over later, because every
+    /// new entry needs somebody to confirm it at the box.
+    /// </summary>
+    public string EndpointId { get; set; } = "fqdn:hochstaetter.de:home-automation";
+
+    /// <summary>The broker as the box reaches it.</summary>
+    public string BoxBrokerHost { get; set; } = "amazon2.hochstaetter.de";
+
+    public int BoxBrokerPort { get; set; } = 8883;
+
+    /// <summary>The box takes a controller only with TLS: without, AddUSPController fails with UPnP error 600.</summary>
+    public bool BoxBrokerUseTls { get; set; } = true;
 
     /// <summary>The box's <c>MQTTControllerTopic</c>. The probe listens there and gives it as its "reply to" topic.</summary>
-    public string MqttControllerTopic { get; set; } = "usp/controller/usp-probe";
+    public string MqttControllerTopic { get; set; } = "usp/controller/home-automation";
 
     /// <summary>The box's <c>MQTTResponseTopic</c>.</summary>
     public string MqttResponseTopic { get; set; } = "usp/agent/fritzbox-neufahrn";
+
+    /// <summary>The MQTT client ID the box connects with.</summary>
+    public string MqttClientId { get; set; } = "fritzbox-neufahrn";
 
     /// <summary>The broker user of the box. Password: MQTT_BOX_PASSWORD.</summary>
     public string BoxUserName { get; set; } = "fritzbox-neufahrn";

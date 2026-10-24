@@ -178,6 +178,58 @@ public sealed class FritzBoxTr064Tests
     }
 
     [Fact]
+    public async Task An_argument_that_breaks_the_limits_of_the_box_is_named_before_anything_is_sent()
+    {
+        var box = new FakeBox((action, _) => throw new InvalidOperationException(action))
+        {
+            Limits = new() { ["NewMinCharsPassword"] = "8", ["NewMaxCharsPassword"] = "256" },
+        };
+
+        using var client = box.CreateClient();
+        await client.ConnectAsync(TestContext.Current.CancellationToken);
+
+        var exception = await Assert.ThrowsAsync<ArgumentException>(() => new UspControllerRegistry(client).AddAsync
+        (
+            new UspControllerEntry { EndpointId = "proto::ha-server", Hostname = "192.168.44.50" },
+            "secret",
+            (_, _) => Task.CompletedTask,
+            TimeSpan.FromSeconds(1),
+            TestContext.Current.CancellationToken
+        ));
+
+        Assert.Empty(box.Calls);
+        Assert.Contains("NewPassword", exception.Message);
+    }
+
+    [Theory]
+    [InlineData("NewEndpointID", "proto::ha-server", "NewAllowedCharsEndpointID", "abcdefghijklmnopqrstuvwxyz-", "':'")]
+    [InlineData("NewPassword", "short", "NewMinCharsPassword", "8", "at least 8")]
+    [InlineData("NewHostname", "192.168.44.50", "NewMaxCharsHostname", "5", "at most 5")]
+    public void Validation_names_the_argument_and_the_limit_it_breaks(string name, string value, string limit, string limitValue, string expected)
+    {
+        var exception = Assert.Throws<ArgumentException>(() => UspControllerRegistry.Validate(new Dictionary<string, string> { [name] = value }, new Dictionary<string, string> { [limit] = limitValue }));
+
+        Assert.Contains(name, exception.Message);
+        Assert.Contains(expected, exception.Message);
+    }
+
+    [Fact]
+    public void Validation_lets_through_what_the_limits_allow_and_ignores_arguments_without_limits()
+    {
+        UspControllerRegistry.Validate
+        (
+            new Dictionary<string, string> { ["NewEndpointID"] = "proto::ha-server", ["NewPort"] = "1883", ["NewPath"] = string.Empty },
+            new Dictionary<string, string>
+            {
+                ["NewMinCharsEndpointID"] = "1",
+                ["NewMaxCharsEndpointID"] = "64",
+                ["NewAllowedCharsEndpointID"] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz:-._%",
+                ["NewMinCharsPath"] = "0",
+            }
+        );
+    }
+
+    [Fact]
     public async Task A_second_factor_that_gets_blocked_ends_the_action()
     {
         var box = new FakeBox((action, _) => action switch
@@ -227,6 +279,9 @@ public sealed class FritzBoxTr064Tests
 
         public bool WithoutMqtt { get; init; }
 
+        /// <summary>What <c>X_AVM-DE_USPController:GetInfo</c> answers. Not recorded in <see cref="Calls"/>.</summary>
+        public Dictionary<string, string> Limits { get; init; } = new() { ["NewMinCharsEndpointID"] = "1", ["NewMaxCharsEndpointID"] = "64" };
+
         public Tr064Client CreateClient(bool useTls = false) => new
         (
             new Tr064ClientOptions { BaseUri = new Uri("http://192.168.44.11:49000"), UseTls = useTls, SecondFactorPollInterval = TimeSpan.FromMilliseconds(1) },
@@ -259,6 +314,12 @@ public sealed class FritzBoxTr064Tests
 
             var action = request.Headers.GetValues("SOAPACTION").Single().Trim('"').Split('#')[1];
             var body = await request.Content!.ReadAsStringAsync(cancellationToken);
+
+            if (action == "GetInfo" && request.RequestUri!.AbsolutePath == "/upnp/control/x_uspcontroller")
+            {
+                return Ok(Response(action, Limits));
+            }
+
             Calls.Add((request.RequestUri!, action, body));
             var answer = respond(action, body);
 

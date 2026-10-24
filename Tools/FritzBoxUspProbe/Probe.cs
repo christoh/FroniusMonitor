@@ -75,6 +75,12 @@ internal sealed class Probe
         {
             var info = await tr064.InvokeAsync(UspControllerService, "GetInfo", [], token).ConfigureAwait(false);
             report["uspControllerInfo"] = JsonSerializer.SerializeToNode(info);
+            Console.WriteLine($"  GetInfo of {UspControllerService}:");
+
+            foreach (var (name, value) in info)
+            {
+                Console.WriteLine($"    {name} = {value}");
+            }
 
             var actions = await tr064.GetActionsAsync(UspControllerService, token).ConfigureAwait(false);
             report["uspControllerActions"] = JsonSerializer.SerializeToNode(actions);
@@ -111,11 +117,12 @@ internal sealed class Probe
         {
             EndpointId = controller.EndpointId,
             Mtp = "mqtt",
-            Hostname = settings.Broker.Host,
-            Port = settings.Broker.Port,
-            UseTls = settings.Broker.UseTls,
+            Hostname = controller.BoxBrokerHost,
+            Port = controller.BoxBrokerPort,
+            UseTls = controller.BoxBrokerUseTls,
             MqttControllerTopic = controller.MqttControllerTopic,
             MqttResponseTopic = controller.MqttResponseTopic,
+            MqttClientId = controller.MqttClientId,
             Username = controller.BoxUserName,
             AccessRights = controller.AccessRights
                 .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
@@ -123,6 +130,8 @@ internal sealed class Probe
         };
 
         var password = ReadSecret("MQTT_BOX_PASSWORD", $"Broker password of the box's user '{controller.BoxUserName}'");
+        Console.WriteLine($"Adding (client ID '{entry.MqttClientId}', password of {password.Length} characters):");
+        PrintControllers([entry]);
 
         var index = await registry.AddAsync
         (

@@ -12,8 +12,9 @@ paths:
 
 # Fritz!Box: push over USP/MQTT, IPv4 watchdog, extensions
 
-Status of 2026-10-24: phase 1.0 is built (`FritzBox/FritzBox.csproj`, `Tools/FritzBoxUspProbe`) and waits for its
-run against the box in Neufahrn. Nothing else is implemented yet.
+Status of 2026-10-24: phase 1.0 is built (`FritzBox/FritzBox.csproj`, `Tools/FritzBoxUspProbe`) and installed on
+amazon2 together with Mosquitto. `info` has run; `register` waits for somebody at the box in Neufahrn. Nothing else
+is implemented yet.
 
 ## Where we are
 
@@ -42,13 +43,13 @@ run against the box in Neufahrn. Nothing else is implemented yet.
 
 | # | Question | Answer |
 |---|---|---|
-| D1 | FRITZ!OS version and box model? | Open. `info` of the probe reads it. MQTT needs at least 8.01, the REST API needs 8.20. |
-| D2 | Which MQTT broker? | The Mosquitto container on the HA server (192.168.44.50, `network_mode: host`), as a service of its docker-compose.yml. The HA server and the WPF app are both clients of it. Configuration in `Tools/FritzBoxUspProbe/mosquitto`. |
+| D1 | FRITZ!OS version and box model? | FRITZ!Box 5690 Pro with FRITZ!OS 8.25 (`info`, 2026-10-24). MQTT for USP (8.01) and the REST API (8.20) are both there. |
+| D2 | Which MQTT broker? | Mosquitto on amazon2 (AWS), with TLS on port 8883 and the Let's Encrypt certificate of `amazon2.hochstaetter.de`, decided on 2026-10-24. The box insists on TLS, and amazon2 already has a renewed certificate. Push from the box depends on the internet and AWS; without them the HA server falls back to polling. The HA server and the WPF app are both clients of it. Files in `Tools/FritzBoxUspProbe/amazon2`. |
 | D3 | Where does the USP/TR-064 code live? | `FritzBox/FritzBox.csproj`, as recommended. It is not part of `Fronius`, because the Avalonia client does not use it. The device models (`FritzBoxDevice` and its parts) stay in `Fronius`. |
-| D4 | Does the box ask for a confirmation (button or phone)? | No. The confirmation is switched off on the boxes. The code handles it all the same. |
+| D4 | Does the box ask for a confirmation (button or phone)? | The box in Neufahrn has it **on** (`X_AVM-DE_Auth:GetInfo`, 2026-10-24). Adding a USP controller needs somebody at the box once: a button, or the code on a phone connected to it. The code handles it. Whether the Swiss box asks when IPv6 is switched in its web UI is still to be checked. |
 | D5 | How does the HA server reach the box of step 2? | It is a different box, in Switzerland. The HA server and the smart-home box (192.168.44.11) are in Neufahrn. Step 2 below is written for that. |
 | D6 | Is the probe of phase 1.0 committed? | `Tools/FritzBoxUspProbe` on `feature/fritzbox-usp`. Delete it once its findings are in `.claude/memory/FritzBox.Usp.md`. |
-| D7 | TR-069 on the box? | Switched off by Christoph. Not needed: the controller is added through TR-064. It may matter all the same if switching TR-069 off also switched off the box's USP agent. The probe will show that. |
+| D7 | TR-069 on the box? | Switched off by Christoph. Not needed: the controller is added through TR-064. The USP agent still runs: the box's MyFRITZ controller is enabled (`info`, 2026-10-24). |
 
 ## Step 1 - Push for everything that works today, in the HA server and the WPF app
 
@@ -221,8 +222,9 @@ Verify --(IPv4 still down)--> Backoff --> DisableIpv6 (limited, see below)
   - It goes over the box's remote HTTPS access, and needs a box user who may connect from the internet.
   - It is fragile across FRITZ!OS versions.
   - TR-064 can only read the IPv6 status, not switch it.
-  - USP is no option for this box: its broker connection runs to Neufahrn through the tunnel and is down exactly
-    when it would be needed.
+  - USP over the broker on amazon2 might work after all: the broker is reachable over IPv4 and IPv6, so the Swiss
+    box could keep its MQTT connection over IPv6 while IPv4 is down. Whether its MQTT client falls back to IPv6 is
+    to be tested before relying on it.
 - **Never leave IPv6 switched off:**
   - Switch it back on in a `finally`.
   - Persist the state, so that a server restart in the middle of a cycle switches IPv6 back on at start.

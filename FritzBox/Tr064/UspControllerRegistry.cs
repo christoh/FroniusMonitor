@@ -158,8 +158,38 @@ public sealed class UspControllerRegistry(Tr064Client client)
             }
         }
 
+        Validate(arguments, await client.InvokeAsync(Service, "GetInfo", [], token).ConfigureAwait(false));
         var result = await client.InvokeWithSecondFactorAsync(Service, AddAction, arguments, onConfirmationRequired, confirmationTimeout, token).ConfigureAwait(false);
         return int.Parse(result["NewIndex"], CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>
+    /// Checks the arguments of <c>AddUSPController</c> against the lengths and characters the box allows, as its
+    /// <c>GetInfo</c> names them (<c>NewMinCharsEndpointID</c>, <c>NewAllowedCharsEndpointID</c> and so on). The box
+    /// itself only answers 600 "Argument Value Invalid" without saying which argument.
+    /// </summary>
+    /// <exception cref="ArgumentException">An argument breaks one of the limits. The message names it.</exception>
+    internal static void Validate(IReadOnlyDictionary<string, string> arguments, IReadOnlyDictionary<string, string> limits)
+    {
+        foreach (var (name, value) in arguments)
+        {
+            var field = name["New".Length..];
+
+            if (limits.TryGetValue("NewMinChars" + field, out var text) && int.TryParse(text, CultureInfo.InvariantCulture, out var minimum) && value.Length < minimum)
+            {
+                throw new ArgumentException($"The box wants at least {minimum} characters for {name}, it got {value.Length}");
+            }
+
+            if (limits.TryGetValue("NewMaxChars" + field, out text) && int.TryParse(text, CultureInfo.InvariantCulture, out var maximum) && value.Length > maximum)
+            {
+                throw new ArgumentException($"The box allows at most {maximum} characters for {name}, it got {value.Length}");
+            }
+
+            if (limits.TryGetValue("NewAllowedChars" + field, out var allowed) && allowed.Length > 0 && value.FirstOrDefault(c => !allowed.Contains(c)) is var forbidden and not '\0')
+            {
+                throw new ArgumentException($"The box does not allow '{forbidden}' in {name}. Allowed: {allowed}");
+            }
+        }
     }
 
     public Task DeleteAsync(int index, CancellationToken token = default) =>

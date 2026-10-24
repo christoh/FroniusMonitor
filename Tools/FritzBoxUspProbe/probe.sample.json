@@ -8,16 +8,21 @@
     "UserName": ""
   },
   "Broker": {
-    // As both the probe and the box reach it.
-    "Host": "192.168.44.50",
+    // As the probe reaches it: it runs next to Mosquitto on amazon2.
+    "Host": "127.0.0.1",
     "Port": 1883,
     "UseTls": false,
     "UserName": "usp-probe"
   },
   "Controller": {
-    "EndpointId": "proto::usp-probe",
-    "MqttControllerTopic": "usp/controller/usp-probe",
+    "EndpointId": "fqdn:hochstaetter.de:home-automation",
+    // As the box reaches the broker. The box insists on TLS.
+    "BoxBrokerHost": "amazon2.hochstaetter.de",
+    "BoxBrokerPort": 8883,
+    "BoxBrokerUseTls": true,
+    "MqttControllerTopic": "usp/controller/home-automation",
     "MqttResponseTopic": "usp/agent/fritzbox-neufahrn",
+    "MqttClientId": "fritzbox-neufahrn",
     "BoxUserName": "fritzbox-neufahrn",
     "AccessRights": "Smarthome, Internet",
     "ListenFilter": "usp/#"
