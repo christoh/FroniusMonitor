@@ -12,15 +12,7 @@ public partial class SmartMeterDetailsView : ContentPage
 
         this.UseViewModel<SmartMeterDetailsViewModel>();
 
-        Loaded += (_, _) =>
-        {
-            Application.Current!.ActualThemeVariantChanged += OnThemeChanged;
-        };
-
-        Unloaded += (_, _) =>
-        {
-            Application.Current!.ActualThemeVariantChanged -= OnThemeChanged;
-        };
+        this.FollowApplicationTheme(OnThemeChanged);
     }
 
     /// <summary>

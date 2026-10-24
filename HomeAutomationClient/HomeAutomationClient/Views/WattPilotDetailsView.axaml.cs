@@ -12,15 +12,7 @@ public partial class WattPilotDetailsView : ContentPage
 
         this.UseViewModel<WattPilotDetailsViewModel>();
 
-        Loaded += (_, _) =>
-        {
-            Application.Current!.ActualThemeVariantChanged += OnThemeChanged;
-        };
-
-        Unloaded += (_, _) =>
-        {
-            Application.Current!.ActualThemeVariantChanged -= OnThemeChanged;
-        };
+        this.FollowApplicationTheme(OnThemeChanged);
     }
 
     /// <summary>
