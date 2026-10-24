@@ -1,6 +1,6 @@
 namespace De.Hochstaetter.HomeAutomationClient.Views.Dialogs;
 
-public partial class LoginView : UserControl, IDialogControl
+public partial class LoginView : DialogView
 {
     private LoginViewModel? ViewModel => DataContext as LoginViewModel;
 
@@ -8,16 +8,6 @@ public partial class LoginView : UserControl, IDialogControl
     {
         InitializeComponent();
         AddHandler(KeyDownEvent, OnPreviewKeyDown, RoutingStrategies.Tunnel);
-    }
-
-    protected override void OnDataContextChanged(EventArgs e)
-    {
-        base.OnDataContextChanged(e);
-
-        if (ViewModel is { } viewModel)
-        {
-            ViewModelBase.HandleTaskExceptions(viewModel.Initialize);
-        }
     }
 
     void OnPreviewKeyDown(object? sender, KeyEventArgs e)

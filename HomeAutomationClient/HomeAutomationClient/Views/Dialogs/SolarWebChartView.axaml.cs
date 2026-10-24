@@ -8,7 +8,7 @@ namespace De.Hochstaetter.HomeAutomationClient.Views.Dialogs;
 /// leaves there: drawing the view model's <see cref="SolarWebChartModel"/> with the charting library, and reading
 /// the theme's colours for it - both need the UI framework, and neither decides anything.
 /// </summary>
-public partial class SolarWebChartView : UserControl, IDialogControl
+public partial class SolarWebChartView : DialogView
 {
     /// <summary>How far the tooltip box stands off the pointer, so that the pointer never covers its first line.</summary>
     private const double TooltipOffset = 16;
@@ -147,9 +147,7 @@ public partial class SolarWebChartView : UserControl, IDialogControl
         viewModel.PropertyChanged += OnViewModelPropertyChanged;
         Render();
 
-        // Nobody can await it here; Initialize guards itself against running twice and reports its own failures
-        // through TaskExceptionHandler, and HandleTaskExceptions catches whatever escapes that all the same.
-        ViewModelBase.HandleTaskExceptions(viewModel.Initialize);
+        // DialogView starts Initialize once this has run, so the subscription above sees everything it loads.
     }
 
     /// <summary>The model is set from the web client's continuation, which is the UI thread; the post keeps it so whatever the thread.</summary>

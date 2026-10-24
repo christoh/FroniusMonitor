@@ -49,8 +49,13 @@ jobs:
       REGISTRY: ghcr.io/${{ github.repository_owner }}
 
     steps:
+      # The whole history with its tags, not the default single commit: GitInfo derives the version the images
+      # report - in the About dialog and at /api - from the last tag and the commits since, and a clone of depth 1
+      # without tags makes that 0.0.1 for every build.
       - name: Check out
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       # linux/arm64 and linux/arm/v7 have no native runner here, so they are emulated. linux/386 runs on the
       # amd64 host without help.

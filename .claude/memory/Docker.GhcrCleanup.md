@@ -68,6 +68,11 @@ documents, and that file stays the only place they are written down. `linux/arm6
 emulated through QEMU there, because GitHub has no native runner for them in this setup; `linux/386` runs on
 the amd64 host unaided.
 
+**The checkout fetches the whole history with its tags** (`fetch-depth: 0`, since 2026-10-24). GitInfo derives the
+version from the last tag and the commits since; `actions/checkout`'s default of one commit without tags made it
+`0.0.1` (base `0.0.0`, one commit) in every image the workflow had published until then - measured on a depth 1
+clone of `dev`, where a full clone gave `1.42.15`. It went unnoticed until the About dialog showed the version.
+
 ### `permission_denied: write_package`, and the setting that fixes it
 
 A pre-existing GHCR package does **not** accept a push from a repository's `GITHUB_TOKEN`, however the workflow

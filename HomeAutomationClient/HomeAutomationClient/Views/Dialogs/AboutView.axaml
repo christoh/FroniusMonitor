@@ -1,15 +1,16 @@
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
-             xmlns:webApi="clr-namespace:De.Hochstaetter.Fronius.Models.WebApi;assembly=Fronius"
-             xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
-             xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
-             mc:Ignorable="d" d:DesignWidth="420" d:DesignHeight="320"
-             x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.AboutView"
-             x:DataType="dialogs:AboutViewModel" MinWidth="300">
-    <UserControl.DataTemplates>
+<v:DialogView xmlns="https://github.com/avaloniaui"
+              xmlns:v="clr-namespace:De.Hochstaetter.HomeAutomationClient.Views.Dialogs"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+              xmlns:webApi="clr-namespace:De.Hochstaetter.Fronius.Models.WebApi;assembly=Fronius"
+              xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
+              xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
+              mc:Ignorable="d" d:DesignWidth="420" d:DesignHeight="320"
+              x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.AboutView"
+              x:DataType="dialogs:AboutViewModel" MinWidth="300">
+    <v:DialogView.DataTemplates>
         <!-- One build, the app's own or the server's: the lines of the About box of the WPF app. Version and build
              can be selected, so that they can be copied into a bug report. -->
         <DataTemplate DataType="webApi:WebApiInfo">
@@ -30,7 +31,7 @@
                 <SelectableTextBlock Text="{Binding BuildInfo}" />
             </StackPanel>
         </DataTemplate>
-    </UserControl.DataTemplates>
+    </v:DialogView.DataTemplates>
 
     <StackPanel Margin="16" Spacing="12">
         <ContentControl Content="{Binding Client}" />
@@ -44,4 +45,4 @@
         <Button MinWidth="70" HorizontalAlignment="Right" HorizontalContentAlignment="Center" IsDefault="True"
                 Content="{x:Static p:Resources.Ok}" Command="{Binding CloseDialogCommand}" />
     </StackPanel>
-</UserControl>
+</v:DialogView>

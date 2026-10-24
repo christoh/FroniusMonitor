@@ -1,20 +1,21 @@
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
-             xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
-             xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
-             xmlns:sp="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
-             mc:Ignorable="d" d:DesignWidth="1160" d:DesignHeight="520"
-             x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.EnergyChartView"
-             x:DataType="dialogs:EnergyChartViewModel"
-             Width="1160" Height="520" MinWidth="1160" MinHeight="320" FontSize="12">
+<v:DialogView xmlns="https://github.com/avaloniaui"
+              xmlns:v="clr-namespace:De.Hochstaetter.HomeAutomationClient.Views.Dialogs"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+              xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
+              xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
+              xmlns:sp="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
+              mc:Ignorable="d" d:DesignWidth="1160" d:DesignHeight="520"
+              x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.EnergyChartView"
+              x:DataType="dialogs:EnergyChartViewModel"
+              Width="1160" Height="520" MinWidth="1160" MinHeight="320" FontSize="12">
 	<!-- The size is stated here, as the dialog system wants it, and the dialog is resizeable: a chart is the one
 	     thing that gets better with every pixel the user gives it, so the grip is on from the start. The WPF window
 	     opened at 1280 by 550. The minimum width is what the settings row needs on one line in German, which is
 	     the longest of the languages; the row does not wrap, by decision. -->
-	<UserControl.Styles>
+	<v:DialogView.Styles>
 		<StyleInclude Source="avares://HomeAutomationClient/Styles/CompactForms.axaml" />
 		<Style Selector="RadioButton.Wrap">
 			<Setter Property="Margin" Value="0,2,0,0" />
@@ -24,7 +25,7 @@
 			<Setter Property="FontSize" Value="16" />
 			<Setter Property="VerticalAlignment" Value="Center" />
 		</Style>
-	</UserControl.Styles>
+	</v:DialogView.Styles>
 
 	<Grid RowDefinitions="*,Auto">
 		<!-- The chart itself. It has no bindings: the code behind draws ChartModel into it, because drawing is the
@@ -78,4 +79,4 @@
 			        Content="{x:Static p:Resources.PriceComponents}" Command="{Binding ShowPriceComponentsCommand}" />
 		</Grid>
 	</Grid>
-</UserControl>
+</v:DialogView>

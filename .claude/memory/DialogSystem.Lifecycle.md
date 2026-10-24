@@ -36,7 +36,8 @@ below the line `presenter.Create(...)` is the presenter's.
 |---|---|
 | `DialogParameters` | What the caller asks for: `Title`, `ShowCloseBox`, `IsMoveable`, `IsModal`, `IsResizeable`, `StaysInMainView`, `WindowKey`, `IsModalWindow`. Derive for more (`MessageBox`). |
 | `DialogBase<TParameters, TResult, TBody>` | The base of every dialog view model. Owns showing, waiting, closing. |
-| `TBody` | The view: a `ContentControl` implementing `IDialogControl`, with a public parameterless constructor (`new()` constraint). |
+| `TBody` | The view: a `ContentControl` implementing `IDialogControl`, with a public parameterless constructor (`new()` constraint). Every body of the client derives from `DialogView` for that. |
+| `DialogView` | `Views/Dialogs/DialogView.cs`, the base of every dialog body since 2026-10-24: a `UserControl` that implements `IDialogControl` and starts the view model's `Initialize` - see "What a dialog view model looks like". |
 | `IDialogPresenter` / `IDialogPresentation` | Where a dialog appears, and the one that is on screen. |
 | `IPagePresenter` | The same for a detail page, which has the same two answers. |
 | `MainViewPresenter` | Both, inside `MainView`: the dialog frame and the one content host. Every head but the desktop. |
@@ -421,6 +422,17 @@ public class MessageBoxViewModel(MessageBox parameters)
 The body's `OnDataContextChanged` starts `ViewModel.Initialize()` (fire and forget) - that is where a dialog loads
 what it needs, as `LoginViewModel` does with the cached connection. Since `DataContext` is assigned in the object
 initializer inside `ShowDialogAsync`, `Initialize` starts before the dialog is on screen.
+
+**That is `DialogView`'s `OnDataContextChanged`, which every body inherits** - a body has no `Initialize` call of
+its own, and a new one gets the start-up by deriving from it: root element `<v:DialogView>` with
+`xmlns:v="clr-namespace:De.Hochstaetter.HomeAutomationClient.Views.Dialogs"`, code behind `: DialogView`. Until
+2026-10-24 eight bodies each had the same lines for it. `DialogView` raises `DataContextChanged` first and starts
+`Initialize` after, so a body that subscribes to its view model in a handler of that event - `EnergyChartView` and
+`SolarWebChartView` - has done so before the view model starts loading. It calls `Initialize` for any
+`ViewModelBase`; a view model that loads nothing simply does not override it, which is the case for most of them.
+`DialogViewTests` pins that every `IDialogControl` of the client is a `DialogView`, the order, and that a body is
+still drawn with `UserControl`'s template although it is now two steps removed from `UserControl` - a theme that
+did not reach it would leave the dialog empty, and the test shows that it does rather than assuming it.
 
 The login dialog is the one dialog that may never be shown: since 2026-09-21 `MainViewModel.LoginAndStartAsync`
 calls `LoginViewModel.TryLoginWithCachedCredentialsAsync` before `ShowDialogAsync`, and the box appears only when
