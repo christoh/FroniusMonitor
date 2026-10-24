@@ -93,7 +93,8 @@ internal class Program
 
         builder.Services
             .AddOptions()
-            .AddTransient<IFritzBoxService, FritzBoxService>()
+            // One per box: FritzBoxDataCollector asks for one per connection.
+            .AddTransient<IFritzBoxService, FritzBoxSmartHomeService>()
             //.AddSingleton<HomeAutomationHub>()
             .AddTransient<IGen24Service, Gen24Service>()
             .AddSingleton<IGen24JsonService, Gen24JsonService>()

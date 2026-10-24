@@ -105,7 +105,8 @@ greets a new connection with every device it has, and a message for an unregiste
 
 | Device | How the server pushes | On reconnect |
 |---|---|---|
-| Gen24 inverters, Fritz!Box devices | the whole device on every poll, and the whole of every device as the greeting of a new connection | nothing to do |
+| Gen24 inverters | the whole device on every poll, and the whole of every device as the greeting of a new connection | nothing to do |
+| Fritz!Box devices | the whole device when it has changed (since 2026-10-24, see `FritzBox.SmartHome.md`), and the whole of every device as the greeting of a new connection | nothing to do: the greeting carries whatever changed while the connection was down |
 | Wattpilot | a `WattPilotUpdate` delta when a property changes | `GET` all Wattpilots |
 | Toshiba air conditioners | the whole device, but only when something changes | `GET` all Toshiba devices |
 | Price data (`EnergyChartData`) | the whole span, a few times a day when it changes | `GET` the live data |

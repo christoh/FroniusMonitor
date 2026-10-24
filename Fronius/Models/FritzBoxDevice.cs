@@ -169,7 +169,7 @@ public partial class FritzBoxDevice : BindableBase, IPowerConsumer1P
 
     bool IHsvColorControl.IsHsvEnabled => !wasSwitched && IsPresentAndUnlocked && ((IHsvColorControl)this).HasHsvColorControl;
     double? IHsvColorControl.HueDegrees => Color?.HueDegrees;
-    double? IHsvColorControl.Saturation => Color?.SaturationAbsolute / 255;
+    double? IHsvColorControl.Saturation => Color?.SaturationAbsolute is { } saturation ? Math.Min(saturation / FritzBoxColorControl.MaxSaturation, 1) : null;
     double? IHsvColorControl.Value => LevelControl?.Level;
 
     bool IColorTemperatureControl.HasColorTemperatureControl => (Features & FritzBoxFeatures.ColoredLight) != FritzBoxFeatures.None

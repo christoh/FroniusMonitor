@@ -187,9 +187,9 @@ public sealed partial class DashboardViewModel(IWebClientService webClient, IUpd
         {
             if (keyedDevice.Device.Color != null)
             {
-                keyedDevice.Device.Color.SaturationAbsolute = Math.Round(change.NewValue * 255, MidpointRounding.AwayFromZero);
+                keyedDevice.Device.Color.SaturationAbsolute = Math.Round(change.NewValue * FritzBoxColorControl.MaxSaturation, MidpointRounding.AwayFromZero);
                 keyedDevice.Device.Refresh();
-                keyedDevice.Device.Color.SaturationAbsolute = Math.Round(change.OldValue * 255, MidpointRounding.AwayFromZero);
+                keyedDevice.Device.Color.SaturationAbsolute = Math.Round(change.OldValue * FritzBoxColorControl.MaxSaturation, MidpointRounding.AwayFromZero);
                 keyedDevice.Device.Refresh();
             }
 

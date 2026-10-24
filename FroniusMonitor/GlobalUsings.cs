@@ -27,6 +27,7 @@ global using System.Windows.Threading;
 global using System.Xml;
 global using System.Xml.Serialization;
 global using CommunityToolkit.Mvvm.ComponentModel;
+global using De.Hochstaetter.FritzBox.SmartHome;
 global using De.Hochstaetter.Fronius;
 global using De.Hochstaetter.Fronius.Contracts;
 global using De.Hochstaetter.Fronius.Extensions;

@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<!-- A throwaway tool for phase 1.0 of .claude/plans/FritzBoxUsp-plan.md: it finds out what the box offers over USP.
+	     Delete it once its findings are in a memory document. -->
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Configuration>Release</Configuration>
+		<LangVersion>preview</LangVersion>
+		<RootNamespace>De.Hochstaetter.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+		<NoWarn>1701;1702;IDE0079;NU1803;CS7035;NU1900;CA1873</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\.editorconfig" Link=".editorconfig" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.13" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\FritzBox\FritzBox.csproj" />
+	</ItemGroup>
+
+</Project>

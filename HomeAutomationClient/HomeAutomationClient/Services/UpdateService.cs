@@ -188,8 +188,9 @@ internal partial class UpdateService(IWebClientService webClient, IVisibilitySer
     /// Fetches what a dropped connection did not deliver. Two kinds of device push their state in different ways,
     /// and only one of them needs this:
     /// <list type="bullet">
-    /// <item>The Gen24 inverters and the Fritz!Box devices are pushed whole on every poll, and the server greets a
-    /// new connection with the whole of every device it has. Reconnecting is enough for them.</item>
+    /// <item>The Gen24 inverters and the Fritz!Box devices are pushed whole - the inverters on every poll, the Fritz!Box
+    /// devices when one has changed - and the server greets a new connection with the whole of every device it has.
+    /// Reconnecting is enough for them.</item>
     /// <item>The Wattpilots, the Toshiba air conditioners and the price data are pushed when something changes -
     /// the Wattpilot even as a delta of the properties that did. A change that fell into the gap is gone from the
     /// hub, so they are fetched over HTTP and put in place through the same handlers a push goes through.</item>

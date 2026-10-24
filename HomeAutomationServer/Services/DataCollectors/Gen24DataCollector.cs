@@ -36,6 +36,9 @@ public sealed class Gen24DataCollector(
     /// </summary>
     private static readonly TimeSpan reminderInterval = TimeSpan.FromHours(1);
 
+    /// <summary>What the log calls an inverter.</summary>
+    private const string Gen24 = "GEN24 inverter";
+
     private CancellationTokenSource? tokenSource;
     private DateTime lastLogTime = DateTime.MinValue;
     private Gen24DataCollectorParameters Parameters => options.CurrentValue;
@@ -127,41 +130,6 @@ public sealed class Gen24DataCollector(
         tokenSource = null;
     }
 
-    /// <summary>
-    /// Writes about a failure as much as it is worth: the first one in full, then nothing until an hour has
-    /// passed, and the recovery when the inverter answers again.
-    /// </summary>
-    private void Report(RepeatedFailure failures, Exception exception, Gen24System gen24System, string what)
-    {
-        switch (failures.Record(exception))
-        {
-            case FailureReport.First:
-                logger.LogError(exception, "Could not {What} of GEN24 inverter {BaseUri}", what, gen24System.Service.Connection);
-                break;
-
-            case FailureReport.StillFailing:
-                logger.LogWarning("Still cannot {What} of GEN24 inverter {BaseUri} after {Attempts} attempts: {Failure}",
-                    what, gen24System.Service.Connection, failures.Attempts, exception.Message);
-                break;
-
-            default:
-                logger.LogDebug(exception, "Could not {What} of GEN24 inverter {BaseUri}, as before", what, gen24System.Service.Connection);
-                break;
-        }
-    }
-
-    /// <summary>Says so once, if the inverter had stopped answering.</summary>
-    private void ReportRecovery(RepeatedFailure failures, Gen24System gen24System, string what)
-    {
-        if (failures.Recover() is not { } outage)
-        {
-            return;
-        }
-
-        logger.LogInformation("Can {What} of GEN24 inverter {BaseUri} again, after {Attempts} attempts over {Duration:g}",
-            what, gen24System.Service.Connection, outage.Attempts, outage.Duration);
-    }
-
     private async Task Update(Gen24System gen24System, SemaphoreSlim semaphore, RepeatedFailure failures)
     {
         var start = DateTime.UtcNow;
@@ -185,7 +153,7 @@ public sealed class Gen24DataCollector(
                     }
                     catch (Exception ex) when (ex is not TaskCanceledException)
                     {
-                        Report(failures, ex, gen24System, "read the config");
+                        failures.Log(logger, ex, "read the config", Gen24, gen24System.Service.Connection);
                         return;
                     }
                 }
@@ -201,7 +169,7 @@ public sealed class Gen24DataCollector(
 
                         dataControlService.AddOrUpdate(new ManagedDevice(gen24System, gen24System.Service.Connection, typeof(IGen24Service)));
 
-                        ReportRecovery(failures, gen24System, "read the sensors");
+                        failures.LogRecovery(logger, "read the sensors", Gen24, gen24System.Service.Connection);
                         logger.LogDebug("{Entity} sensors updated in {Duration:N0} ms", gen24System.DisplayName, (DateTime.UtcNow - start).TotalMilliseconds);
 
                         if (gen24System.Sensors?.PrimaryPowerMeter?.DataTime != null)
@@ -255,7 +223,7 @@ public sealed class Gen24DataCollector(
                 catch (Exception ex) when (ex is not TaskCanceledException)
                 {
                     // It said "read the config" here too, which it was not: the config is read above.
-                    Report(failures, ex, gen24System, "read the sensors");
+                    failures.Log(logger, ex, "read the sensors", Gen24, gen24System.Service.Connection);
                 }
             }
             finally
@@ -303,7 +271,7 @@ public sealed class Gen24DataCollector(
             {
                 dataControlService.AddOrUpdate(new ManagedDevice(gen24System, gen24System.Service.Connection, typeof(IGen24Service)));
 
-                ReportRecovery(failures, gen24System, "read the config");
+                failures.LogRecovery(logger, "read the config", Gen24, gen24System.Service.Connection);
 
                 logger.LogInformation("{Entity} config updated in {Duration:N0} ms{OnRequest}", gen24System.DisplayName,
                     (DateTime.UtcNow - startTime).TotalMilliseconds, wasAskedFor ? " on request" : string.Empty);
@@ -317,7 +285,7 @@ public sealed class Gen24DataCollector(
         }
         catch (Exception ex)
         {
-            Report(failures, ex, gen24System, "read the config");
+            failures.Log(logger, ex, "read the config", Gen24, gen24System.Service.Connection);
         }
         finally
         {

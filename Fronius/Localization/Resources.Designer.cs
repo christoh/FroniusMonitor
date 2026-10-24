@@ -88,15 +88,6 @@ namespace De.Hochstaetter.Fronius.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Access denied.
-        /// </summary>
-        public static string AccessDenied {
-            get {
-                return ResourceManager.GetString("AccessDenied", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to AC current.
         /// </summary>
         public static string AcCurrent {
@@ -3468,15 +3459,6 @@ namespace De.Hochstaetter.Fronius.Localization {
         public static string NoFeedIn_ToolTip {
             get {
                 return ResourceManager.GetString("NoFeedIn_ToolTip", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to You did not specify complete Fritz!Box connection parameters.
-        /// </summary>
-        public static string NoFritzBoxConnection {
-            get {
-                return ResourceManager.GetString("NoFritzBoxConnection", resourceCulture);
             }
         }
         

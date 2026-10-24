@@ -96,7 +96,8 @@ delay throws the latter but a semaphore throws the former, and `catch (TaskCance
 
 Both loops fail on every round while an inverter is off, and both used to write a stack trace for it - one per
 `RefreshRate` from the sensors and one per `ConfigRefreshRate` from the config, which is a few hundred identical
-traces overnight. They go through `Report` now, which asks a `RepeatedFailure`:
+traces overnight. They go through `RepeatedFailure.Log` and `LogRecovery` now, which `FritzBoxDataCollector` uses
+for the boxes too:
 
 | | |
 |---|---|
