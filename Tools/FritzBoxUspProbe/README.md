@@ -26,7 +26,8 @@ Then uncomment the `mosquitto` service in the docker-compose.yml, `docker compos
 
 ## 2. The box
 
-- TR-064 on: Heimnetz → Netzwerk → Netzwerkeinstellungen → "Zugriff für Anwendungen zulassen".
+- TR-064 on: "Zugriff für Apps erlauben" in the network settings (older FRITZ!OS: "Zugriff für Anwendungen
+  zulassen").
 - A box user with the right "FRITZ!Box Einstellungen". The probe uses it for TR-064.
 
 ## 3. The probe
