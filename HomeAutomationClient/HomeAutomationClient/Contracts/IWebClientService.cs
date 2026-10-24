@@ -22,6 +22,12 @@ public interface IWebClientService : IDisposable
     void Initialize(string baseUri, string productName, string version);
 
     /// <summary>
+    /// What the server says about itself at <c>GET /api</c>: product, version, build and platform, for the About
+    /// dialog. Anonymous on the server, so it needs no <see cref="Login"/>.
+    /// </summary>
+    Task<ApiResult<WebApiInfo>> GetServerInfo(CancellationToken token = default);
+
+    /// <summary>
     /// Logs in, in exchange for a bearer token that every later call then carries and that is renewed shortly
     /// before it expires. Where the server refuses the token all the same - after a restart it has forgotten every
     /// token it issued - the service logs in again with this password and repeats the call, so a caller never has

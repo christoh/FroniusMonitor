@@ -120,6 +120,9 @@ public sealed class WebClientService : IWebClientService
         httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(productName, version));
     }
 
+    // The empty path is the base address itself, .../api/, which is where the server answers this.
+    public Task<ApiResult<WebApiInfo>> GetServerInfo(CancellationToken token = default) => GetResult<WebApiInfo>(string.Empty, token);
+
     #region Identity
 
     public async Task<ApiResult<byte[]>> GetKeyForUserName(string userName, CancellationToken token = default)

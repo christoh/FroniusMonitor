@@ -73,8 +73,9 @@
                         </MenuFlyout>
                     </Button.Flyout>
                 </Button>
-                <!-- The views that are not a device: the power flow page, and the price chart once the server has
-                     sent price data. See MainViewModel.ShowPowerFlow and ShowEnergyChart. -->
+                <!-- The views that are not a device: the power flow page, the price chart once the server has sent
+                     price data, and the About box - which the WPF app has in a Help menu of its own, and this menu bar
+                     has no Help menu. See MainViewModel.ShowPowerFlow, ShowEnergyChart and ShowAbout. -->
                 <Button Content="{x:Static p:Resources.View}" Theme="{StaticResource MenuButtonStyle}">
                     <Button.Flyout>
                         <MenuFlyout>
@@ -85,6 +86,7 @@
                                       IsVisible="{Binding UpdateService.HasSolarWeb}"/>
                             <MenuItem Header="{x:Static p:Resources.OpenApiDocument}" Command="{Binding ShowOpenApiDocumentCommand}" Padding="8,12"
                                       IsVisible="{Binding ShowOpenApiDocumentMenu}"/>
+                            <MenuItem Header="{x:Static p:Resources.About}" Command="{Binding ShowAboutCommand}" Padding="8,12"/>
                         </MenuFlyout>
                     </Button.Flyout>
                 </Button>

@@ -37,7 +37,6 @@ global using De.Hochstaetter.HomeAutomationServer.Models.EnergyData;
 global using De.Hochstaetter.HomeAutomationServer.Models.Modbus;
 global using De.Hochstaetter.HomeAutomationServer.Models.Settings;
 global using De.Hochstaetter.HomeAutomationServer.Models.SolarWeb;
-global using De.Hochstaetter.HomeAutomationServer.Models.WebApi;
 global using De.Hochstaetter.HomeAutomationServer.Services;
 global using De.Hochstaetter.HomeAutomationServer.Services.DataCollectors;
 global using De.Hochstaetter.HomeAutomationServer.Services.EnergyData;
