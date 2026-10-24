@@ -29,6 +29,8 @@ public sealed class FritzBoxSmartHomeService : IFritzBoxService, IDisposable
         this.createClient = createClient;
     }
 
+    public event EventHandler? CommandSent;
+
     /// <summary>The box. A change of its address, user or password takes effect with the next call.</summary>
     public WebConnection? Connection { get; set; }
 
@@ -121,6 +123,8 @@ public sealed class FritzBoxSmartHomeService : IFritzBoxService, IDisposable
         {
             await current.Http.GetAhaAsync($"ain={Uri.EscapeDataString(Box.Compact(ain))}&{ahaCommand}", token).ConfigureAwait(false);
         }
+
+        CommandSent?.Invoke(this, EventArgs.Empty);
     }
 
     private async ValueTask<bool> UsesRestApiAsync(Box current, CancellationToken token)

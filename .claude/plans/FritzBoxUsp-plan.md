@@ -15,16 +15,18 @@ paths:
 Status of 2026-10-24: phase 1.0 (the USP probe) is done. Push over USP works, but only for the outlets, and the
 lamps are missing from it entirely. **Step 1 therefore goes on without USP, over the Smart Home REST API.** The USP
 setup (Mosquitto on amazon2 and the controller on the box) stays for now, in case step 2 needs it for the Swiss
-box. **Phase 1.1 (the REST client) is done and tested live in Neufahrn** (`.claude/memory/FritzBox.SmartHome.md`).
-Phases 1.2 to 1.5 are still to do.
+box. **Phase 1.1 (the REST client) is done and tested live in Neufahrn, and phase 1.2 puts it into the HA server**
+(`.claude/memory/FritzBox.SmartHome.md`). Phases 1.3 to 1.5 are still to do.
 
 ## Where we are
 
-- Both heads poll the AHA-HTTP interface (`webservices/homeautoswitch.lua?switchcmd=getdevicelistinfos`) through
-  `FritzBoxService`. The server's `FritzBoxDataCollector` polls every `RefreshRate` (5 s by default). The WPF app's
-  `DataCollectionService` polls on every third cycle (`FritzBoxUpdateRate = 3`).
-- The server pushes every Fritz!Box device whole to every client on every poll, whether it changed or not (see
-  `UpdateVisibility.Lifecycle.md`).
+- Before step 1, both heads polled the AHA-HTTP interface (`webservices/homeautoswitch.lua?switchcmd=getdevicelistinfos`)
+  through `FritzBoxService`, and the server pushed every Fritz!Box device whole to every client on every poll.
+  - The server has used `FritzBoxSmartHomeService` since phase 1.2 (REST API, AHA before FRITZ!OS 8.20). Its
+    `FritzBoxDataCollector` polls every `RefreshRate`, which `Program.cs` sets to 2 s, and pushes a device only
+    when it has changed.
+  - The WPF app still polls AHA through `FritzBoxService`, on every third cycle (`FritzBoxUpdateRate = 3`), until
+    phase 1.3.
 - AVM has frozen the AHA interface: "will not be developed any further". Its successor is the Smart Home REST API
   (FRITZ!OS 8.20 and later, `https://<box>/api/v0`). It has no push either.
 - TR-064 has no push: every state variable is `sendEvents = no`. Its `X_AVM-DE_Homeauto` service can also do less
@@ -90,7 +92,14 @@ what was measured, is in `.claude/memory/FritzBox.SmartHome.md`. In short:
   from `tr64desc.xml` or `/jason_boxinfo.xml`.
 - All logging is in English and guarded by `Logger.IsEnabled`.
 
-### Phase 1.2 - HA server
+### Phase 1.2 - HA server (done)
+
+Built as described below. How the collector works is in `.claude/memory/FritzBox.SmartHome.md`. Beyond the plan:
+- It withdraws devices the box no longer has.
+- A device that did not change still takes the values of every poll, because that lifts the lock a command puts on
+  it.
+- The failure logging of the Gen24 collector moved into `RepeatedFailure`, so that both collectors share it.
+- Templates and routines are in the library (`SmartHomeClient`) but not exposed by the server yet; that is step 3.
 
 - `FritzBoxDataCollector` polls the overview, every 2 to 5 s (configurable, as now).
 - **The server pushes to clients on change only.** Today it pushes every device on every poll; this changes it to

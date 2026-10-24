@@ -13,6 +13,7 @@ global using System.Text.Json.Serialization;
 global using System.Text.RegularExpressions;
 global using System.Xml;
 global using System.Xml.Serialization;
+global using De.Hochstaetter.FritzBox.SmartHome;
 global using De.Hochstaetter.Fronius;
 global using De.Hochstaetter.Fronius.Contracts;
 global using De.Hochstaetter.Fronius.Extensions;

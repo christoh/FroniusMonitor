@@ -5,6 +5,8 @@ public partial class FritzBoxService : BindableBase, IFritzBoxService
 {
     private string? fritzBoxSid;
 
+    public event EventHandler? CommandSent;
+
     [ObservableProperty]
     public partial WebConnection? Connection { get; set; }
 
@@ -51,7 +53,7 @@ public partial class FritzBoxService : BindableBase, IFritzBoxService
     public async ValueTask SwitchDevice(string ain, bool turnOn, CancellationToken token = default)
     {
         ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
-        using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setswitcho{(turnOn ? "n" : "ff")}", token: token).ConfigureAwait(false);
+        await SendCommand($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setswitcho{(turnOn ? "n" : "ff")}", token).ConfigureAwait(false);
     }
 
 
@@ -59,7 +61,7 @@ public partial class FritzBoxService : BindableBase, IFritzBoxService
     {
         var byteLevel = Math.Max((byte)Math.Round(level * 255, MidpointRounding.AwayFromZero), (byte)2);
         ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
-        using var _ = await GetFritzBoxResponse($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setlevel&level={byteLevel}", token: token).ConfigureAwait(false);
+        await SendCommand($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setlevel&level={byteLevel}", token).ConfigureAwait(false);
     }
 
     public async ValueTask SetColorTemperature(string ain, double temperatureKelvin, CancellationToken token = default)
@@ -67,11 +69,7 @@ public partial class FritzBoxService : BindableBase, IFritzBoxService
         var intTemperature = (int)Math.Round(temperatureKelvin, MidpointRounding.AwayFromZero);
         ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
 
-        using var _ = await GetFritzBoxResponse
-        (
-            $"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setcolortemperature&temperature={intTemperature}&duration=0",
-            token: token
-        ).ConfigureAwait(false);
+        await SendCommand($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setcolortemperature&temperature={intTemperature}&duration=0", token).ConfigureAwait(false);
     }
 
     public async ValueTask SetColor(string ain, double hueDegrees, double saturation, CancellationToken token = default)
@@ -80,11 +78,13 @@ public partial class FritzBoxService : BindableBase, IFritzBoxService
         var intSaturation = Math.Min(Math.Max(0, (int)Math.Round(saturation * 255)), 255);
         ain = ain.Replace(" ", "", StringComparison.InvariantCulture);
 
-        using var _ = await GetFritzBoxResponse
-        (
-            $"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setunmappedcolor&hue={intHue}&saturation={intSaturation}&duration=0",
-            token: token
-        ).ConfigureAwait(false);
+        await SendCommand($"webservices/homeautoswitch.lua?ain={ain}&switchcmd=setunmappedcolor&hue={intHue}&saturation={intSaturation}&duration=0", token).ConfigureAwait(false);
+    }
+
+    private async ValueTask SendCommand(string request, CancellationToken token)
+    {
+        using var _ = await GetFritzBoxResponse(request, token: token).ConfigureAwait(false);
+        CommandSent?.Invoke(this, EventArgs.Empty);
     }
 
     private async ValueTask<HttpResponseMessage> GetFritzBoxResponse(string request, IEnumerable<KeyValuePair<string, string>>? postVariables = null, CancellationToken token = default)

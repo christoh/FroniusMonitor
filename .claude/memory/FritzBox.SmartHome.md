@@ -12,6 +12,8 @@ paths:
   - HomeAutomationServerTests/UnitTests/FritzBoxSmartHomeServiceTests.cs
   - HomeAutomationServerTests/UnitTests/Fakes/FritzBoxSmartHomeFixtures.cs
   - HomeAutomationServerTests/UnitTests/Fakes/FakeFritzBox.cs
+  - HomeAutomationServer/Services/DataCollectors/FritzBoxDataCollector.cs
+  - HomeAutomationServerTests/UnitTests/FritzBoxDataCollectorTests.cs
 ---
 
 # The FritzBox library: smart home over the REST API, AHA as the fallback
@@ -24,10 +26,10 @@ Phase 1.1 of `.claude/plans/FritzBoxUsp-plan.md`. `FritzBoxSmartHomeService` (in
 It hands out the same `FritzBoxDevice`s either way, so the server, its JSON and both clients need not know which
 interface is in use.
 
-**Nobody uses it yet** (2026-10-24). The HA server and the WPF app still register the old AHA service
-`Fronius/Services/FritzBoxService.cs`. Phases 1.2 (server) and 1.3 (WPF app) switch them over. The old service is
-deleted then. Until that happens, its four AHA command strings exist twice: once there and once as the fallback
-here.
+**The HA server uses it since phase 1.2** (2026-10-24): `Program.cs` registers it as `IFritzBoxService`, and
+`FritzBoxDataCollector` asks for one per configured box. The WPF app still registers the old AHA service
+`Fronius/Services/FritzBoxService.cs` until phase 1.3, and the old service is deleted then. Until that happens, its
+four AHA command strings exist twice: once there and once as the fallback here.
 
 ## The parts
 
@@ -75,6 +77,34 @@ other way. See `Fronius.SharedLibraryBoundary.md` for why the library is not par
 The fixture in `FritzBoxSmartHomeFixtures` is the same moment of the Neufahrn box in both interfaces, anonymized.
 `FritzBoxSmartHomeMappingTests` holds the mapping against AHA field by field. **When the mapping changes, that test
 says whether AHA and REST still agree.**
+
+## How the HA server polls: `FritzBoxDataCollector`
+
+- **One loop per box**, every `RefreshRate`, which `Program.cs` sets to 2 s.
+- **A device is published only when its JSON differs from what was last published.** The JSON is what a client
+  would see, so "changed" means changed for a client. `SignalRDispatcher` pushes what is published, so the clients
+  hear of changes only. A new connection is still greeted with every device (`HomeAutomationHub.OnConnectedAsync`),
+  which is why the clients need no catch-up for these devices (`UpdateVisibility.Lifecycle.md`).
+- **A device that has not changed still takes the fresh values** through `FritzBoxDevice.CopyFrom`, without a push.
+  - This matters because a command (`TurnOnOff` and the others) locks the device instance: `IsSwitchingEnabled`
+    and its siblings turn false, and `DevicesController` refuses the next command until the device has been read
+    again.
+  - When every poll replaced the instance, the lock went with it. Now a command that changes nothing (switching on
+    an outlet that is on) would have locked the device for good without the copy.
+- **A command reads the box again a second later.** `IFritzBoxService.CommandSent` fires after a command, and the
+  collector then reads after `CommandEchoDelay` (1 s) instead of at the end of the interval, through a
+  `ReadNowRequest` (`Gen24Polling.md`).
+- **A device the box no longer lists is withdrawn** (`DeviceAction.Delete`). Before 1.2, it stayed until the server
+  restarted.
+- **Failures are logged once** through `RepeatedFailure.Log`, the same as for the inverters. The recovery is logged
+  once as well.
+- **A failed round ends that round only.** That includes a timeout of the box, which `HttpClient` reports as a
+  `TaskCanceledException`. Only the collector's own token ends the loop. Catching "everything but
+  `OperationCanceledException`" let a timeout end the loop of that box for good, without a word in the log.
+- **The device ids are `Manufacturer;Model;SerialNumber`** (`IHaveUniqueId.Id`). AHA left the model of one lamp unit
+  empty, and REST fills it from the device. That lamp's id therefore changed once, with the switch to REST:
+  `AVM;130770053217-1` became `AVM;FRITZ!Smart_Light_500;130770053217-1`. The AHA device entries of the lamps
+  (`functionbitmask` 1, not switchable) are gone from the server.
 
 ## Measured on the box in Neufahrn (FRITZ!OS 8.25), 2026-10-24
 

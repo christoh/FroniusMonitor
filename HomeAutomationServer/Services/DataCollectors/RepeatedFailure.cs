@@ -79,4 +79,38 @@ public sealed class RepeatedFailure(TimeSpan reminderInterval, TimeProvider? clo
         Attempts = 0;
         return outage;
     }
+
+    /// <summary>
+    /// Records a failure and writes as much about it as it is worth: the first of its kind as an error with the
+    /// exception, the same again as debug, and once per reminder interval a warning with the count.
+    /// </summary>
+    /// <param name="what">What failed, as in <c>read the sensors</c>.</param>
+    /// <param name="device">What kind of device, as in <c>GEN24 inverter</c>.</param>
+    /// <param name="address">Which one.</param>
+    public void Log(ILogger logger, Exception exception, string what, string device, object? address)
+    {
+        switch (Record(exception))
+        {
+            case FailureReport.First when logger.IsEnabled(LogLevel.Error):
+                logger.LogError(exception, "Could not {What} of {Device} {BaseUri}", what, device, address);
+                break;
+
+            case FailureReport.StillFailing when logger.IsEnabled(LogLevel.Warning):
+                logger.LogWarning("Still cannot {What} of {Device} {BaseUri} after {Attempts} attempts: {Failure}", what, device, address, Attempts, exception.Message);
+                break;
+
+            case FailureReport.Silent when logger.IsEnabled(LogLevel.Debug):
+                logger.LogDebug(exception, "Could not {What} of {Device} {BaseUri}, as before", what, device, address);
+                break;
+        }
+    }
+
+    /// <summary>Records a success, and says so once if it had been failing. The parameters are those of <see cref="Log"/>.</summary>
+    public void LogRecovery(ILogger logger, string what, string device, object? address)
+    {
+        if (Recover() is { } outage && logger.IsEnabled(LogLevel.Information))
+        {
+            logger.LogInformation("Can {What} of {Device} {BaseUri} again, after {Attempts} attempts over {Duration:g}", what, device, address, outage.Attempts, outage.Duration);
+        }
+    }
 }
