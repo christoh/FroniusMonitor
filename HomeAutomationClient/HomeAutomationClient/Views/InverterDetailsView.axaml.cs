@@ -1,3 +1,5 @@
+using De.Hochstaetter.HomeAutomationClient.Extensions;
+
 namespace De.Hochstaetter.HomeAutomationClient.Views;
 
 public partial class InverterDetailsView : ContentPage
@@ -20,9 +22,7 @@ public partial class InverterDetailsView : ContentPage
     {
         InitializeComponent();
 
-        // Parameterless, so the XAML runtime loader and the previewer can create the view (AVLN3001). The container
-        // hands out the same singleton view model it would have injected; Try..., because the designer has no container.
-        DataContext = IoC.TryGetRegistered<InverterDetailsViewModel>();
+        this.UseViewModel<InverterDetailsViewModel>();
 
         Loaded += (_, _) =>
         {

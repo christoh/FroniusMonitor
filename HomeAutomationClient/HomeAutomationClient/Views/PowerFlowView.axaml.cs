@@ -71,7 +71,9 @@ public partial class PowerFlowView : ContentPage
 
         // Parameterless, so the XAML runtime loader and the previewer can create the view (AVLN3001). The container
         // hands out the view model it would have injected; Try..., because the designer has no container. After the
-        // handler is on, or the view would never hear about the view model it was just given.
+        // handler is on, or the view would never hear about the view model it was just given. Not UseViewModel, which
+        // starts Initialize once: this page starts its view model every time it is loaded and stops it when it is
+        // unloaded, see below.
         DataContext = IoC.TryGetRegistered<PowerFlowViewModel>();
 
         Stage.LayoutUpdated += (_, _) => Route();

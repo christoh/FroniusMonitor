@@ -125,10 +125,6 @@ public partial class App : Application
             // The narrow contract of the Solar Web switch, so that the house block and the power flow page take
             // the one setting they need instead of the whole main view model - and a test can fake it.
             .AddSingleton<IPowerDisplayOptions>(provider => provider.GetRequiredService<MainViewModel>())
-            .AddTransient<GaugeTestView>()
-            .AddTransient<GaugeTestViewModel>()
-            .AddTransient<LinearGaugeTestView>()
-            .AddTransient<LinearGaugeTestViewModel>()
             .AddSingleton<DashboardView>()
             .AddSingleton<DashboardViewModel>()
             // One for the app: the house block on the dashboard follows the update service for as long as the app runs.

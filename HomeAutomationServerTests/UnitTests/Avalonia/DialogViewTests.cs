@@ -15,23 +15,6 @@ namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests;
 [Collection(AvaloniaCollection.Name)]
 public sealed class DialogViewTests
 {
-    public sealed class CountingViewModel : ViewModelBase
-    {
-        public int InitializeCount { get; private set; }
-
-        /// <summary>How many <c>DataContextChanged</c> handlers had run when <c>Initialize</c> was started.</summary>
-        public int HandlersRunBeforeInitialize { get; private set; } = -1;
-
-        public int HandlersRun { get; set; }
-
-        public override Task Initialize()
-        {
-            InitializeCount++;
-            HandlersRunBeforeInitialize = HandlersRun;
-            return Task.CompletedTask;
-        }
-    }
-
     public sealed class SubscribingDialogView : DialogView
     {
         public SubscribingDialogView() => DataContextChanged += (_, _) =>
