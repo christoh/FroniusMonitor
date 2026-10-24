@@ -36,6 +36,12 @@ pages did those lines by hand before, some with `GetRegistered`, which threw in 
 is handed its view model and inherits the start from `DialogView` (see [[DialogSystem.Lifecycle]]), and
 `PowerFlowView` starts its view model on every `Loaded` and stops it on `Unloaded` rather than once.
 
+The same file has `FollowApplicationTheme(handler)`, for a view that has to react to the application switching
+between light and dark itself: it subscribes `Application.Current.ActualThemeVariantChanged` on `Loaded` and
+unsubscribes on `Unloaded`. The four detail pages, `DashboardView` and `InverterControl` each wrote that pair by hand
+until 2026-10-24. A view that only needs its own `ActualThemeVariantChanged` - the chart dialogs, `PowerFlowView` -
+subscribes that directly; it is the control's own event and holds nothing.
+
 ## Why constructor injection breaks the XAML preview
 
 Avalonia's XAML **runtime** loader - which is what the previewer/designer uses, and what any other XAML file uses

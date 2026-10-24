@@ -43,9 +43,10 @@ Fixing that means giving the update service per-inverter meters first; it cannot
 
 ## Attach, detach and theme
 
-`Loaded` subscribes and `Unloaded` unsubscribes `Application.Current.ActualThemeVariantChanged`. Mandatory pairing:
-on a page that is kept and shown again a missed unsubscribe re-adds the handler on every navigation. Subscribe in `Loaded`, never in
-the constructor.
+`this.FollowApplicationTheme(OnThemeChanged)` in the constructor subscribes `Application.Current.ActualThemeVariantChanged`
+on `Loaded` and unsubscribes it on `Unloaded` (`Extensions/ViewExtensions.cs`, since 2026-10-24; the page wrote both
+handlers itself before). Mandatory pairing: on a page that is kept and shown again a missed unsubscribe re-adds the
+handler on every navigation - which is why it is in one place now and pinned by `ViewExtensionsTests`.
 
 `OnThemeChanged` re-notifies `Gen24Status.StatusCode` on `UpdateService.MeterStatus`, because the gauge background
 comes from the `InverterBackgroundColor` converter, which resolves the theme brushes when it runs rather than

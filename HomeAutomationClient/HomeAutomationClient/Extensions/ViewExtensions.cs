@@ -37,4 +37,36 @@ public static class ViewExtensions
             return viewModel;
         }
     }
+
+    extension(Control view)
+    {
+        /// <summary>
+        /// Calls <paramref name="onThemeChanged"/> whenever the application switches between light and dark, for as long
+        /// as the view is loaded - for what the theme does not reach by itself, such as a converter that reads the
+        /// theme's brushes once when it runs.
+        /// </summary>
+        /// <remarks>
+        /// Subscribes on <c>Loaded</c> and unsubscribes on <c>Unloaded</c>, and that pairing is the point of this method:
+        /// a page is kept and shown again, so a subscription made in the constructor, or one never removed, would add the
+        /// handler once more on every navigation and run it N times per theme change for as long as the app runs.
+        /// </remarks>
+        public void FollowApplicationTheme(EventHandler onThemeChanged)
+        {
+            view.Loaded += (_, _) =>
+            {
+                if (Application.Current is { } application)
+                {
+                    application.ActualThemeVariantChanged += onThemeChanged;
+                }
+            };
+
+            view.Unloaded += (_, _) =>
+            {
+                if (Application.Current is { } application)
+                {
+                    application.ActualThemeVariantChanged -= onThemeChanged;
+                }
+            };
+        }
+    }
 }

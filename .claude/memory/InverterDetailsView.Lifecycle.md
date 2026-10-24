@@ -65,7 +65,9 @@ Contract for callers:
 
 ## Attach and detach (once per navigation)
 
-`Loaded` subscribes and `Unloaded` unsubscribes `Application.Current.ActualThemeVariantChanged`.
+`this.FollowApplicationTheme(OnThemeChanged)` in the constructor subscribes `Application.Current.ActualThemeVariantChanged`
+on `Loaded` and unsubscribes it on `Unloaded` (`Extensions/ViewExtensions.cs`, since 2026-10-24; the page wrote both
+handlers itself before).
 
 **This pairing is mandatory, not stylistic.** A page is kept and shown again, so a subscription that is not removed
 in `Unloaded` is re-added on every navigation and the handler runs N times per theme change, forever. Any future

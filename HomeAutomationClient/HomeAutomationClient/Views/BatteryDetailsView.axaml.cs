@@ -12,15 +12,7 @@ public partial class BatteryDetailsView : ContentPage
 
         this.UseViewModel<BatteryDetailsViewModel>();
 
-        Loaded += (_, _) =>
-        {
-            Application.Current!.ActualThemeVariantChanged += OnThemeChanged;
-        };
-
-        Unloaded += (_, _) =>
-        {
-            Application.Current!.ActualThemeVariantChanged -= OnThemeChanged;
-        };
+        this.FollowApplicationTheme(OnThemeChanged);
     }
 
     /// <summary>

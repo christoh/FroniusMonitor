@@ -24,15 +24,7 @@ public partial class InverterDetailsView : ContentPage
 
         this.UseViewModel<InverterDetailsViewModel>();
 
-        Loaded += (_, _) =>
-        {
-            Application.Current!.ActualThemeVariantChanged += OnThemeChanged; 
-        };
-
-        Unloaded += (_, _) =>
-        {
-            Application.Current!.ActualThemeVariantChanged -= OnThemeChanged;
-        };
+        this.FollowApplicationTheme(OnThemeChanged);
     }
 
     private void OnThemeChanged(object? sender, EventArgs e)

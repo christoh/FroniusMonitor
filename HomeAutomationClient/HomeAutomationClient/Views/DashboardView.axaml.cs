@@ -19,11 +19,12 @@ public partial class DashboardView : ContentPage
             return;
         }
 
+        this.FollowApplicationTheme(OnThemeChanged);
+
         Loaded += (_, _) =>
         {
             model.UpdateService.SitePowerFlowUpdated += OnSitePowerFlowUpdated;
             model.PropertyChanged += OnViewModelPropertyChanged;
-            Application.Current!.ActualThemeVariantChanged += OnThemeChanged;
             UpdatePowerFlowColors();
         };
 
@@ -31,7 +32,6 @@ public partial class DashboardView : ContentPage
         {
             model.UpdateService.SitePowerFlowUpdated -= OnSitePowerFlowUpdated;
             model.PropertyChanged -= OnViewModelPropertyChanged;
-            Application.Current!.ActualThemeVariantChanged -= OnThemeChanged;
         };
     }
 

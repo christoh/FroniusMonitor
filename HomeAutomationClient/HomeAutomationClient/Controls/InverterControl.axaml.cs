@@ -129,15 +129,7 @@ public partial class InverterControl : DeviceControlBase
             ? brush
             : new ImmutableSolidColorBrush(Color.FromUInt32(0xff807000));
 
-        Loaded += (_, _) =>
-        {
-            Application.Current.ActualThemeVariantChanged += OnThemeChanged;
-        };
-
-        Unloaded += (_, _) =>
-        {
-            Application.Current.ActualThemeVariantChanged -= OnThemeChanged;
-        };
+        this.FollowApplicationTheme(OnThemeChanged);
     }
 
     private void OnThemeChanged(object? sender, EventArgs e)
