@@ -28,7 +28,7 @@ public partial class FritzBoxColorControl : BindableBase
     [JsonIgnore]
     public string? CurrentModeString
     {
-        get => FritzBoxDevice.GetStringValue((double?)SupportedModes,1);
+        get => FritzBoxDevice.GetStringValue((double?)CurrentMode, 1);
         set => CurrentMode = (FritzBoxColorMode?)FritzBoxDevice.GetUintValue(value);
     }
 

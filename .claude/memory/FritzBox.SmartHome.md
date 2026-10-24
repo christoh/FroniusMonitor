@@ -6,6 +6,7 @@ paths:
   - Fronius/Models/FritzBox*.cs
   - Fronius/Contracts/IFritzBoxService.cs
   - Fronius/Services/FritzBoxService.cs
+  - HomeAutomationServerTests/UnitTests/FritzBoxColorControlTests.cs
   - HomeAutomationServerTests/UnitTests/FritzBoxHttpClientTests.cs
   - HomeAutomationServerTests/UnitTests/FritzBoxSmartHomeMappingTests.cs
   - HomeAutomationServerTests/UnitTests/FritzBoxSmartHomeServiceTests.cs
@@ -109,5 +110,3 @@ says whether AHA and REST still agree.**
   allowed value, not as 0.
 - The service accepts the box's certificate unchecked, as the old AHA service did. Phase 1.4 of the plan changes
   that.
-- `FritzBoxColorControl.CurrentModeString` returns the *supported* modes. This is an old bug in `Fronius`, and it only
-  affects writing XML, which nothing does.
