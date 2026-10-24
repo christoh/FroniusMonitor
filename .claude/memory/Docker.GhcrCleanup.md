@@ -138,9 +138,9 @@ with fabricated leftovers mixed into the real keep set; only the leftovers went.
 
 ## Building and pushing from Claude Code on the web
 
-Done for the first time on 2026-10-24, for the client image only, from `dev` and on the developer's instruction
-(the workflow only ever publishes from `master`). Docker is installed in the cloud container but not running, and
-every network access goes through the session's HTTPS proxy, which gives four traps:
+Done for the first time on 2026-10-24, the client image and then the server image, from `dev` and on the
+developer's instruction (the workflow only ever publishes from `master`). Docker is installed in the cloud container but not running, and
+every network access goes through the session's HTTPS proxy, which gives these traps:
 
 - **Start the daemon yourself**, with the proxy in its environment: `HTTPS_PROXY=$HTTPS_PROXY dockerd &`. It comes
   up with the containerd image store, so the plain `docker` driver builds all four platforms and pushes the index
@@ -151,10 +151,15 @@ every network access goes through the session's HTTPS proxy, which gives four tr
   `exec format error`.
 - **`RUN` reaches the network only through the proxy on the host's loopback**, so the build needs host networking
   and the proxy as build arguments. A bake override in a scratch file does it without touching the repository:
-  `target "client" { network = "host"  args = { HTTPS_PROXY = "http://127.0.0.1:33693", https_proxy = "..." } }`,
-  run as `docker buildx bake --allow network.host -f docker-bake.hcl -f <override> client --push`. The predefined
-  proxy arguments are not written into the image history. No proxy CA was needed inside the build: apk, NuGet and
-  the Ubuntu archive over HTTPS all went through without it.
+  `target "client" { network = "host"  args = { HTTPS_PROXY = "$HTTPS_PROXY", https_proxy = "$HTTPS_PROXY" } }`,
+  run as `docker buildx bake --allow network.host -f docker-bake.hcl -f <override> client --push`. **Write the
+  override from `$HTTPS_PROXY` every time, never a port copied from earlier**: the port is the session's and changes
+  when the session is resumed. A stale one fails the first `RUN` with `Connection refused` on the loopback, which
+  is how the first server build of 2026-10-24 died. The predefined proxy arguments are not written into the image
+  history. No proxy CA was needed inside the build: apk, NuGet and the Ubuntu archive over HTTPS all went through
+  without it.
+- **A resumed session has lost the daemon and the QEMU registration** - both live in the container, not in the
+  repository. Start `dockerd` and register QEMU again, as above, before building.
 - **The proxy refuses plain HTTP** (`405 Method Not Allowed`), and the SDK image's apt sources are
   `http://archive.ubuntu.com` - hence the HTTPS rewrite in `client-builder`. The archive is public and signed, so
   HTTP was fine on its own; the developer had left it on purpose and agreed to the change for this reason.
@@ -165,6 +170,13 @@ Two more things before the push:
   `git fetch --unshallow --tags origin` first; on 2026-10-24 that gave `1.42.9` plus the commits since.
 - **The session's `GH_TOKEN` may push both packages**: `printf '%s' "$GH_TOKEN" | docker login ghcr.io -u christoh
   --password-stdin`. It is short lived (hours), so log in right before the push.
+
+**The server image does not start in the cloud container**, so check a pushed one by its files rather than by
+running it (`docker run --rm --entrypoint sh <image> -c 'grep -l … /app/*.dll'`). The Modbus server binds `[::]:1502`
+and the container has no IPv6, not even with `--network host`, so the process dies with `SocketException (97):
+Address family not supported by protocol`. Before that it also needs a writable `/app/Settings.xml`: without one
+mounted it tries to create a default file, which the non-root `app` user may not, so a probe has to run as root.
+Neither is a fault of the image; in production `Settings.xml` is mounted and the host has IPv6.
 
 ### Where the client runs: amazon2
 
