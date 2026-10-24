@@ -130,6 +130,25 @@ says whether AHA and REST still agree.**
   `CommandSent`.
 - Only the server listens to that event.
 
+## Checked on the deployed server, 2026-10-24
+
+The server was deployed as version 1.42.47 and checked through the Home Automation connector, which goes through the
+server's web API like the apps. Christoph watched the lamps and confirmed every step.
+- The server has 17 Fritz!Box devices: 13 outlets and 4 lamps.
+  - The second, unswitchable AHA entries of the lamps are gone.
+  - Power, energy, temperature (in steps of 0.5 °C) and the locks of the outlets are there.
+- **Switching** a lamp and an outlet works.
+  - A read straight after the command still shows the old state, and the next one shows the new state.
+  - The power of an outlet follows a few seconds after its state.
+- **A command that changes nothing does not lock the device.** The lamp was set to 100 % while it was at 100 %, and
+  the next command (40 %) was taken at once.
+  - The connector does not forward a switch to the state a device already has ("war schon aus"). That case can
+    therefore not be checked with it, but switching goes through the same lock in the server.
+- **The color path was exact end to end:**
+  - Green at 50 % saturation came back as 50 %, which is 127/254.
+  - 4500 K turned the lamp from color back to white.
+  - "Lampe Dienstboteneingang" (255) shows as 100 %.
+
 ## Tests against the real box
 
 `HomeAutomationServerTests/SystemTests/FritzBoxSystemTests.cs`: eight `[SystemFact]` tests against the box in
