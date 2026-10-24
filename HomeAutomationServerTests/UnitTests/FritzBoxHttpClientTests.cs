@@ -1,9 +1,7 @@
 using System.Diagnostics;
 using System.Net;
-using System.Text;
-using System.Web;
-using System.Xml.Linq;
 using De.Hochstaetter.FritzBox.Http;
+using De.Hochstaetter.HomeAutomationServerTests.UnitTests.Fakes;
 
 namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests;
 
@@ -16,7 +14,7 @@ namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests;
 public sealed class FritzBoxHttpClientTests : IDisposable
 {
     private const string DefaultPassword = "1example!";
-    private const string LoginPath = "/login_sid.lua?version=2";
+    private const string LoginPath = FakeFritzBox.LoginPath;
     private const string OverviewPath = "/api/v0/smarthome/overview";
     private const string Overview = """{"units":[{"UID":"11630 0015376","name":"Desk lamp"}]}""";
     private const string DeviceList = """<devicelist version="1"><device identifier="11630 0015376"/></devicelist>""";
@@ -90,7 +88,7 @@ public sealed class FritzBoxHttpClientTests : IDisposable
 
         Assert.Equal(Overview, answer);
         Assert.Equal([$"GET {LoginPath}", $"POST {LoginPath}", $"GET {OverviewPath}"], box.Calls.Select(c => $"{c.Method} {c.PathAndQuery}"));
-        Assert.Equal($"AVM-SID {FakeBox.Sid(1)}", Assert.Single(box.ApiCalls).Authorization);
+        Assert.Equal($"AVM-SID {FakeBox.Sid(1)}", Assert.Single(box.Requests).Authorization);
     }
 
     [Fact]
@@ -127,7 +125,7 @@ public sealed class FritzBoxHttpClientTests : IDisposable
 
         await client.GetRestAsync("/smarthome/overview", TestContext.Current.CancellationToken);
 
-        Assert.Equal(OverviewPath, Assert.Single(box.ApiCalls).PathAndQuery);
+        Assert.Equal(OverviewPath, Assert.Single(box.Requests).PathAndQuery);
     }
 
     [Fact]
@@ -139,7 +137,7 @@ public sealed class FritzBoxHttpClientTests : IDisposable
         var answer = await client.GetAhaAsync("switchcmd=getdevicelistinfos", TestContext.Current.CancellationToken);
 
         Assert.Equal(DeviceList, answer);
-        var call = Assert.Single(box.ApiCalls);
+        var call = Assert.Single(box.Requests);
         Assert.Equal(HttpMethod.Get, call.Method);
         Assert.Equal($"/webservices/homeautoswitch.lua?switchcmd=getdevicelistinfos&sid={FakeBox.Sid(1)}", call.PathAndQuery);
         Assert.Null(call.Authorization);
@@ -154,7 +152,7 @@ public sealed class FritzBoxHttpClientTests : IDisposable
 
         await client.SendRestAsync(HttpMethod.Put, "smarthome/overview/units/11630 0015376", json, TestContext.Current.CancellationToken);
 
-        var call = Assert.Single(box.ApiCalls);
+        var call = Assert.Single(box.Requests);
         Assert.Equal(HttpMethod.Put, call.Method);
         Assert.Equal("/api/v0/smarthome/overview/units/11630%200015376", call.PathAndQuery);
         Assert.Equal("application/json", call.ContentType);
@@ -175,10 +173,10 @@ public sealed class FritzBoxHttpClientTests : IDisposable
 
         Assert.Single(box.LoginGets);
         Assert.Single(box.LoginPosts);
-        Assert.Equal(3, box.ApiCalls.Count);
-        Assert.Equal($"AVM-SID {FakeBox.Sid(1)}", box.ApiCalls[0].Authorization);
-        Assert.Contains($"sid={FakeBox.Sid(1)}", box.ApiCalls[1].PathAndQuery);
-        Assert.Equal($"AVM-SID {FakeBox.Sid(1)}", box.ApiCalls[2].Authorization);
+        Assert.Equal(3, box.Requests.Count);
+        Assert.Equal($"AVM-SID {FakeBox.Sid(1)}", box.Requests[0].Authorization);
+        Assert.Contains($"sid={FakeBox.Sid(1)}", box.Requests[1].PathAndQuery);
+        Assert.Equal($"AVM-SID {FakeBox.Sid(1)}", box.Requests[2].Authorization);
     }
 
     [Fact]
@@ -194,8 +192,8 @@ public sealed class FritzBoxHttpClientTests : IDisposable
         Assert.All(answers, answer => Assert.Equal(Overview, answer));
         Assert.Single(box.LoginGets);
         Assert.Single(box.LoginPosts);
-        Assert.Equal(8, box.ApiCalls.Count);
-        Assert.All(box.ApiCalls, call => Assert.Equal($"AVM-SID {FakeBox.Sid(1)}", call.Authorization));
+        Assert.Equal(8, box.Requests.Count);
+        Assert.All(box.Requests, call => Assert.Equal($"AVM-SID {FakeBox.Sid(1)}", call.Authorization));
     }
 
     #endregion
@@ -246,7 +244,7 @@ public sealed class FritzBoxHttpClientTests : IDisposable
         Assert.Equal(Overview, answer);
         Assert.Equal(2, box.LoginGets.Count);
         Assert.Equal(2, box.LoginPosts.Count);
-        Assert.Equal([$"AVM-SID {FakeBox.Sid(1)}", $"AVM-SID {FakeBox.Sid(2)}"], box.ApiCalls.Select(c => c.Authorization));
+        Assert.Equal([$"AVM-SID {FakeBox.Sid(1)}", $"AVM-SID {FakeBox.Sid(2)}"], box.Requests.Select(c => c.Authorization));
     }
 
     [Fact]
@@ -264,7 +262,7 @@ public sealed class FritzBoxHttpClientTests : IDisposable
                 $"/webservices/homeautoswitch.lua?switchcmd=getdevicelistinfos&sid={FakeBox.Sid(1)}",
                 $"/webservices/homeautoswitch.lua?switchcmd=getdevicelistinfos&sid={FakeBox.Sid(2)}",
             ],
-            box.ApiCalls.Select(c => c.PathAndQuery)
+            box.Requests.Select(c => c.PathAndQuery)
         );
     }
 
@@ -277,15 +275,15 @@ public sealed class FritzBoxHttpClientTests : IDisposable
 
         await client.SendRestAsync(HttpMethod.Put, "smarthome/overview/units/11630 0015376", json, TestContext.Current.CancellationToken);
 
-        Assert.Equal(2, box.ApiCalls.Count);
-        Assert.All(box.ApiCalls, call =>
+        Assert.Equal(2, box.Requests.Count);
+        Assert.All(box.Requests, call =>
         {
             Assert.Equal(HttpMethod.Put, call.Method);
             Assert.Equal(json, call.Body);
             Assert.Equal("application/json", call.ContentType);
         });
 
-        Assert.Equal($"AVM-SID {FakeBox.Sid(2)}", box.ApiCalls[1].Authorization);
+        Assert.Equal($"AVM-SID {FakeBox.Sid(2)}", box.Requests[1].Authorization);
     }
 
     [Theory]
@@ -300,7 +298,7 @@ public sealed class FritzBoxHttpClientTests : IDisposable
 
         Assert.Equal(refusal, exception.StatusCode);
         Assert.Contains("no access", exception.Message);
-        Assert.Equal(2, box.ApiCalls.Count);
+        Assert.Equal(2, box.Requests.Count);
         Assert.Equal(2, box.LoginPosts.Count);
     }
 
@@ -318,7 +316,7 @@ public sealed class FritzBoxHttpClientTests : IDisposable
         Assert.Equal(status, exception.StatusCode);
         Assert.Contains(body, exception.Message);
         Assert.Contains(OverviewPath, exception.Message);
-        Assert.Single(box.ApiCalls);
+        Assert.Single(box.Requests);
         Assert.Single(box.LoginPosts);
     }
 
@@ -348,7 +346,7 @@ public sealed class FritzBoxHttpClientTests : IDisposable
 
         Assert.Contains("christoh", exception.Message);
         Assert.Single(box.LoginPosts);
-        Assert.Empty(box.ApiCalls);
+        Assert.Empty(box.Requests);
     }
 
     [Fact]
@@ -362,7 +360,7 @@ public sealed class FritzBoxHttpClientTests : IDisposable
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.GetRestAsync("smarthome/overview", token));
 
         Assert.Equal(2, box.LoginPosts.Count);
-        Assert.Empty(box.ApiCalls);
+        Assert.Empty(box.Requests);
     }
 
     [Theory]
@@ -377,7 +375,7 @@ public sealed class FritzBoxHttpClientTests : IDisposable
 
         Assert.Single(box.LoginGets);
         Assert.Empty(box.LoginPosts);
-        Assert.Empty(box.ApiCalls);
+        Assert.Empty(box.Requests);
     }
 
     [Fact]
@@ -406,124 +404,32 @@ public sealed class FritzBoxHttpClientTests : IDisposable
 
     private FritzBoxHttpClient CreateClient(FakeBox box, FritzBoxHttpClientOptions? options = null) => new(options ?? Options(), loggers.CreateLogger<FritzBoxHttpClient>(), box);
 
-    /// <summary>One request as the fake box received it. The body is read right away, because the request is disposed afterwards.</summary>
-    private sealed record Call(HttpMethod Method, string PathAndQuery, string? Authorization, string? ContentType, string Body, long Timestamp)
-    {
-        public bool IsLogin => PathAndQuery == LoginPath;
-
-        /// <summary>A field of a form-encoded body.</summary>
-        public string? Field(string name) => HttpUtility.ParseQueryString(Body)[name];
-    }
-
     /// <summary>
-    /// <c>login_sid.lua?version=2</c> the way FRITZ!OS implements it: a GET answers with the challenge and no session,
-    /// a POST with the user and the response answers with a session if the response is right. Every other request goes
-    /// to <see cref="Respond"/>, which is told the number of the request and is not asked about the session. All
-    /// requests are recorded, in the order they arrived.
+    /// <see cref="FakeFritzBox"/> for the login tests: it checks the login against <see cref="DefaultPassword"/> and
+    /// the challenge AVM publishes, and every request that is not a login goes to <see cref="Respond"/>, which is
+    /// told the number of the request.
     /// </summary>
-    private sealed class FakeBox : HttpMessageHandler
+    private sealed class FakeBox : FakeFritzBox
     {
-        public const string NoSession = "0000000000000000";
-
-        public static readonly Uri BaseUri = new("http://192.168.44.11");
-
-        private readonly Lock gate = new();
-        private readonly List<Call> calls = [];
-        private int logins;
-
-        public string Challenge { get; init; } = "2$10000$5A1711$2000$5A1722";
-
-        public string Password { get; init; } = DefaultPassword;
-
-        public int BlockTime { get; init; }
-
-        /// <summary>The children of <c>&lt;Users&gt;</c>.</summary>
-        public string UsersXml { get; init; } = LastUserFirst;
-
-        /// <summary>How long the box takes to answer a login request.</summary>
-        public TimeSpan LoginDelay { get; init; }
+        public FakeBox()
+        {
+            Challenge = "2$10000$5A1711$2000$5A1722";
+            Password = DefaultPassword;
+            UsersXml = LastUserFirst;
+        }
 
         /// <summary>The answer to the n-th request that is not a login request (counting from 1).</summary>
         public Func<int, (HttpStatusCode Status, string Body)> Respond { get; init; } = _ => (HttpStatusCode.OK, Overview);
 
-        public IReadOnlyList<Call> Calls
+        protected override HttpResponseMessage Answer(FakeFritzBoxCall call, int number)
         {
-            get
-            {
-                lock (gate)
-                {
-                    return [.. calls];
-                }
-            }
-        }
-
-        public IReadOnlyList<Call> LoginGets => [.. Calls.Where(c => c.IsLogin && c.Method == HttpMethod.Get)];
-
-        public IReadOnlyList<Call> LoginPosts => [.. Calls.Where(c => c.IsLogin && c.Method == HttpMethod.Post)];
-
-        public IReadOnlyList<Call> ApiCalls => [.. Calls.Where(c => !c.IsLogin)];
-
-        /// <summary>The session the n-th successful login (counting from 1) gets.</summary>
-        public static string Sid(int login) => (0x0123456789abcdefUL + (ulong)(login - 1)).ToString("x16");
-
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            var call = new Call
-            (
-                request.Method,
-                request.RequestUri!.PathAndQuery,
-                request.Headers.TryGetValues("Authorization", out var authorization) ? string.Join(", ", authorization) : null,
-                request.Content?.Headers.ContentType?.MediaType,
-                request.Content == null ? string.Empty : await request.Content.ReadAsStringAsync(cancellationToken),
-                Stopwatch.GetTimestamp()
-            );
-
-            int number;
-
-            lock (gate)
-            {
-                calls.Add(call);
-                number = calls.Count(c => !c.IsLogin);
-            }
-
-            if (call.IsLogin)
-            {
-                if (LoginDelay > TimeSpan.Zero)
-                {
-                    await Task.Delay(LoginDelay, cancellationToken);
-                }
-
-                return call.Method == HttpMethod.Get ? SessionInfo(NoSession) : Login(call);
-            }
-
-            if (!call.PathAndQuery.StartsWith("/api/v0/", StringComparison.Ordinal) && !call.PathAndQuery.StartsWith("/webservices/homeautoswitch.lua?", StringComparison.Ordinal))
+            if (!call.IsApi)
             {
                 throw new InvalidOperationException(call.PathAndQuery);
             }
 
             var (status, body) = Respond(number);
-            return new HttpResponseMessage(status) { Content = new StringContent(body, Encoding.UTF8, call.PathAndQuery.StartsWith("/api/", StringComparison.Ordinal) ? "application/json" : "text/xml") };
+            return Reply(status, body, call.IsRest ? "application/json" : "text/xml");
         }
-
-        private HttpResponseMessage Login(Call call)
-        {
-            var users = XElement.Parse($"<Users>{UsersXml}</Users>").Elements("User").Select(u => u.Value);
-
-            var accepted = call.ContentType == "application/x-www-form-urlencoded" &&
-                           users.Contains(call.Field("username")) &&
-                           call.Field("response") == FritzBoxLogin.CreateResponse(Challenge, Password);
-
-            return SessionInfo(accepted ? Sid(Interlocked.Increment(ref logins)) : NoSession);
-        }
-
-        private HttpResponseMessage SessionInfo(string sid) => new(HttpStatusCode.OK)
-        {
-            Content = new StringContent
-            (
-                $"""<?xml version="1.0" encoding="utf-8"?><SessionInfo><SID>{sid}</SID><Challenge>{Challenge}</Challenge><BlockTime>{BlockTime}</BlockTime><Rights></Rights><Users>{UsersXml}</Users></SessionInfo>""",
-                Encoding.UTF8,
-                "text/xml"
-            ),
-        };
     }
 }

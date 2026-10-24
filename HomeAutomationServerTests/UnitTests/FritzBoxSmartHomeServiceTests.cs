@@ -1,6 +1,5 @@
 using System.Net;
 using System.Reflection;
-using System.Text;
 using System.Web;
 using De.Hochstaetter.FritzBox.Http;
 using De.Hochstaetter.FritzBox.SmartHome;
@@ -21,12 +20,11 @@ public sealed class FritzBoxSmartHomeServiceTests
 {
     private const string Os825 = "254.08.25";
     private const string Os757 = "154.07.57";
-    private const string BaseUrl = "http://192.168.44.11";
     private const string OverviewPath = "/api/v0/smarthome/overview";
     private const string UnitsPath = "/api/v0/smarthome/overview/units/";
-    private const string AhaPath = "/webservices/homeautoswitch.lua";
-    private const string BoxInfoPath = "/jason_boxinfo.xml";
-    private const string LoginPath = "/login_sid.lua?version=2";
+    private const string AhaPath = FakeFritzBox.AhaPath;
+    private const string BoxInfoPath = FakeFritzBox.BoxInfoPath;
+    private const string LoginPath = FakeFritzBox.LoginPath;
 
     /// <summary>A lamp: its unit has the AIN "13077 0000003-1" and the same UID.</summary>
     private const string LampAin = "13077 0000003-1";
@@ -749,7 +747,7 @@ public sealed class FritzBoxSmartHomeServiceTests
 
     #endregion
 
-    private static WebConnection CreateConnection(string baseUrl = BaseUrl, string password = "secret") => new() { BaseUrl = baseUrl, UserName = "user", Password = password };
+    private static WebConnection CreateConnection(string baseUrl = FakeFritzBox.BaseUrl, string password = "secret") => new() { BaseUrl = baseUrl, UserName = "user", Password = password };
 
     /// <summary>A service for the fake box, with a connection unless <paramref name="connection"/> says which. Every client it makes is recorded by its options.</summary>
     private static FritzBoxSmartHomeService CreateService(FakeBox box, List<FritzBoxHttpClientOptions>? created = null, WebConnection? connection = null) => new(NullLoggerFactory.Instance, options =>
@@ -818,43 +816,13 @@ public sealed class FritzBoxSmartHomeServiceTests
     private static void AssertAhaCommand(FakeBox box, string query) =>
         Assert.Equal([$"GET {BoxInfoPath}", $"GET {AhaPath}?{query}&sid={FakeBox.Sid(1)}"], box.Requests.Select(c => c.Line));
 
-    /// <summary>One request as the fake box received it, with the path and query as the box sees them.</summary>
-    private sealed record Call(HttpMethod Method, string PathAndQuery, string? Authorization, string Body)
-    {
-        public string Line => $"{Method} {PathAndQuery}";
-
-        public string Path => PathAndQuery.Split('?')[0];
-
-        public bool IsLogin => PathAndQuery == LoginPath;
-
-        public bool IsBoxInfo => Path == BoxInfoPath;
-
-        public bool IsRest => Path.StartsWith("/api/v0/", StringComparison.Ordinal);
-
-        public bool IsAha => Path == AhaPath;
-
-        /// <summary>A request of the Smart Home REST API or of AHA, as against the login and the box info.</summary>
-        public bool IsApi => IsRest || IsAha;
-
-        public string Query => PathAndQuery.Contains('?', StringComparison.Ordinal) ? PathAndQuery[(PathAndQuery.IndexOf('?', StringComparison.Ordinal) + 1)..] : string.Empty;
-    }
-
     /// <summary>
-    /// A FRITZ!Box with a smart home: <c>jason_boxinfo.xml</c>, <c>login_sid.lua?version=2</c> (which accepts any
-    /// response and gives the n-th login the session <see cref="Sid"/>), the REST overview and PUT of a unit, and the
-    /// AHA interface. Every request is recorded, in the order it arrived.
+    /// <see cref="FakeFritzBox"/> with a smart home: <c>jason_boxinfo.xml</c> (its version is what decides between the
+    /// REST API and AHA), the REST overview and PUT of a unit, and the AHA interface. Its login accepts any response.
     /// </summary>
-    private sealed class FakeBox : HttpMessageHandler
+    private sealed class FakeBox : FakeFritzBox
     {
-        private const string NoSession = "0000000000000000";
-        private const string Challenge = "2$10$5A1711$10$5A1722";
-
         private static readonly (HttpStatusCode Status, string Body) noBoxInfo = (HttpStatusCode.NotFound, "Not found");
-
-        private readonly Lock gate = new();
-        private readonly List<Call> calls = [];
-        private int logins;
-        private int disposals;
 
         /// <param name="version">The <c>j:Version</c> of <c>jason_boxinfo.xml</c>, or <see langword="null"/> for a box that answers 404.</param>
         public FakeBox(string? version = Os825) => BoxInfo = version == null ? noBoxInfo : BoxInfoOf(version);
@@ -862,120 +830,39 @@ public sealed class FritzBoxSmartHomeServiceTests
         /// <summary>The answer to <c>jason_boxinfo.xml</c>.</summary>
         public (HttpStatusCode Status, string Body) BoxInfo { get; set; }
 
-        /// <summary>The box answers a login with no session, as it does for a wrong password.</summary>
-        public bool RefuseLogin { get; init; }
+        public IReadOnlyList<FakeFritzBoxCall> BoxInfoRequests => [.. Calls.Where(c => c.IsBoxInfo)];
 
-        /// <summary>Runs when a request has been recorded and before it is answered. A test can hold a request with it.</summary>
-        public Func<Call, CancellationToken, Task>? Before { get; init; }
+        public IReadOnlyList<FakeFritzBoxCall> OverviewRequests => [.. Calls.Where(c => c.Method == HttpMethod.Get && c.PathAndQuery == OverviewPath)];
 
-        public int Disposals => Volatile.Read(ref disposals);
-
-        public IReadOnlyList<Call> Calls
-        {
-            get
-            {
-                lock (gate)
-                {
-                    return [.. calls];
-                }
-            }
-        }
-
-        /// <summary>Everything but the login: the version, the overview, the commands.</summary>
-        public IReadOnlyList<Call> Requests => [.. Calls.Where(c => !c.IsLogin)];
-
-        public IReadOnlyList<Call> LoginGets => [.. Calls.Where(c => c.IsLogin && c.Method == HttpMethod.Get)];
-
-        public IReadOnlyList<Call> LoginPosts => [.. Calls.Where(c => c.IsLogin && c.Method == HttpMethod.Post)];
-
-        public IReadOnlyList<Call> BoxInfoRequests => [.. Calls.Where(c => c.IsBoxInfo)];
-
-        public IReadOnlyList<Call> OverviewRequests => [.. Calls.Where(c => c.Method == HttpMethod.Get && c.PathAndQuery == OverviewPath)];
-
-        public IReadOnlyList<Call> Puts => [.. Calls.Where(c => c.Method == HttpMethod.Put)];
-
-        /// <summary>The session the n-th login (counting from 1) gets.</summary>
-        public static string Sid(int login) => (0x0123456789abcdefUL + (ulong)(login - 1)).ToString("x16");
+        public IReadOnlyList<FakeFritzBoxCall> Puts => [.. Calls.Where(c => c.Method == HttpMethod.Put)];
 
         public static (HttpStatusCode Status, string Body) BoxInfoOf(string version) =>
             (HttpStatusCode.OK, $"""<j:BoxInfo xmlns:j="http://jason.avm.de/updatecheck/"><j:Name>FRITZ!Box 5690 Pro</j:Name><j:HW>254</j:HW><j:Version>{version}</j:Version></j:BoxInfo>""");
 
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            var call = new Call
-            (
-                request.Method,
-                request.RequestUri!.PathAndQuery,
-                request.Headers.TryGetValues("Authorization", out var authorization) ? string.Join(", ", authorization) : null,
-                request.Content == null ? string.Empty : await request.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false)
-            );
-
-            lock (gate)
-            {
-                calls.Add(call);
-            }
-
-            if (Before != null)
-            {
-                await Before(call, cancellationToken).ConfigureAwait(false);
-            }
-
-            return Answer(call);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                Interlocked.Increment(ref disposals);
-            }
-
-            base.Dispose(disposing);
-        }
-
-        private HttpResponseMessage Answer(Call call)
+        protected override HttpResponseMessage Answer(FakeFritzBoxCall call, int number)
         {
             if (call.Method == HttpMethod.Get && call.IsBoxInfo)
             {
-                return Respond(BoxInfo.Status, BoxInfo.Body, "text/xml");
-            }
-
-            if (call.IsLogin && call.Method == HttpMethod.Get)
-            {
-                return SessionInfo(NoSession);
-            }
-
-            if (call.IsLogin && call.Method == HttpMethod.Post)
-            {
-                return SessionInfo(RefuseLogin ? NoSession : Sid(Interlocked.Increment(ref logins)));
+                return Reply(BoxInfo.Status, BoxInfo.Body, "text/xml");
             }
 
             if (call.Method == HttpMethod.Get && call.PathAndQuery == OverviewPath)
             {
-                return Respond(HttpStatusCode.OK, FritzBoxSmartHomeFixtures.Overview, "application/json");
+                return Reply(HttpStatusCode.OK, FritzBoxSmartHomeFixtures.Overview, "application/json");
             }
 
             if (call.Method == HttpMethod.Put && call.PathAndQuery.StartsWith(UnitsPath, StringComparison.Ordinal))
             {
-                return Respond(HttpStatusCode.OK, string.Empty, "application/json");
+                return Reply(HttpStatusCode.OK, string.Empty, "application/json");
             }
 
             if (call.Method == HttpMethod.Get && call.IsAha)
             {
                 var isDeviceList = HttpUtility.ParseQueryString(call.Query)["switchcmd"] == "getdevicelistinfos";
-                return Respond(HttpStatusCode.OK, isDeviceList ? FritzBoxSmartHomeFixtures.DeviceList : string.Empty, "text/xml");
+                return Reply(HttpStatusCode.OK, isDeviceList ? FritzBoxSmartHomeFixtures.DeviceList : string.Empty, "text/xml");
             }
 
             throw new InvalidOperationException($"The fake box knows nothing about {call.Line}");
         }
-
-        private static HttpResponseMessage Respond(HttpStatusCode status, string body, string contentType) => new(status) { Content = new StringContent(body, Encoding.UTF8, contentType) };
-
-        private static HttpResponseMessage SessionInfo(string sid) => Respond
-        (
-            HttpStatusCode.OK,
-            $"""<?xml version="1.0" encoding="utf-8"?><SessionInfo><SID>{sid}</SID><Challenge>{Challenge}</Challenge><BlockTime>0</BlockTime><Rights></Rights><Users><User last="1">user</User></Users></SessionInfo>""",
-            "text/xml"
-        );
     }
 }
