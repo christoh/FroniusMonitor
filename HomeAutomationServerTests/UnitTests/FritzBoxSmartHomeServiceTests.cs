@@ -110,6 +110,7 @@ public sealed class FritzBoxSmartHomeServiceTests
     [InlineData(-2, 1)]
     [InlineData(0.125, 13)]
     [InlineData(0.994, 99)]
+    [InlineData(double.NaN, 1)]
     public async Task SetLevel_puts_the_percentage_between_1_and_100(double level, int percent)
     {
         var box = new FakeBox(Os825);
@@ -333,6 +334,8 @@ public sealed class FritzBoxSmartHomeServiceTests
     [InlineData("254.08.19", false)]
     [InlineData("254.08.05", false)]
     [InlineData("154.07.57", false)]
+    [InlineData("279.08.25.12345", true)]
+    [InlineData("279.08.25-12345", false)]
     public async Task The_REST_API_is_used_from_FRITZ_OS_8_20_on_and_AHA_before(string boxVersion, bool usesRestApi)
     {
         var box = new FakeBox(boxVersion);
@@ -384,13 +387,7 @@ public sealed class FritzBoxSmartHomeServiceTests
         Assert.Contains(box.Calls, c => c.Path == AhaPath);
     }
 
-    /// <remarks>
-    /// Production bug, reported and not fixed: <c>FritzBoxHttpClient.GetFritzOsVersionAsync</c> promises
-    /// <see langword="null"/> when the box's answer "says nothing readable", but <c>XDocument.Parse</c> (line 65) throws an
-    /// <see cref="System.Xml.XmlException"/> for a body that is not well-formed XML (an empty one, an HTML page). The
-    /// exception ends GetDevices and every command, on every call, instead of falling back to AHA.
-    /// </remarks>
-    [Theory(Skip = "Bug in FritzBoxHttpClient.GetFritzOsVersionAsync (line 65): a jason_boxinfo.xml that is not well-formed XML throws an XmlException instead of giving null, which would mean AHA")]
+    [Theory]
     [InlineData("")]
     [InlineData("<html><body>Please log in<br></body></html>")]
     public async Task A_jason_boxinfo_that_is_not_XML_means_AHA(string body)
@@ -621,6 +618,22 @@ public sealed class FritzBoxSmartHomeServiceTests
         service.Connection = null;
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => Invoke(service, operation, TestContext.Current.CancellationToken));
+
+        Assert.Empty(created);
+        Assert.Empty(box.Calls);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("192.168.44.11")]
+    [InlineData("ftp://192.168.44.11")]
+    public async Task A_connection_without_an_http_address_throws_an_InvalidOperationException_and_sends_nothing(string baseUrl)
+    {
+        var box = new FakeBox(Os825);
+        var created = new List<FritzBoxHttpClientOptions>();
+        using var service = CreateService(box, created, CreateConnection(baseUrl));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => service.GetDevices(TestContext.Current.CancellationToken));
 
         Assert.Empty(created);
         Assert.Empty(box.Calls);
