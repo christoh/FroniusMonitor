@@ -30,7 +30,8 @@ again, so every rule below still holds.
 1. The container hands out the view; its parameterless constructor resolves the view model itself, as the code
    behind injection rule asks (`IoC.TryGetRegistered`, so the designer gets a view with no view model instead of
    an exception). Both are transient, so a page and its view model belong to each other.
-2. `InitializeComponent()` runs, then `DataContext` is assigned.
+2. `InitializeComponent()` runs, then `UseViewModel` assigns `DataContext` and starts the view model's
+   `Initialize`, which `InverterDetailsViewModel` does not override.
 3. `DataContext` is assigned exactly once and never changed. `ViewModel` is a cast of `DataContext` and relies on
    this; do not re-assign `DataContext` elsewhere.
 The constructor does nothing else: the gauge group switches and the `ShowAll` logic live in the view model

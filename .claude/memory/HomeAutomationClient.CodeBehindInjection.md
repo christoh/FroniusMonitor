@@ -3,6 +3,7 @@ paths:
   - HomeAutomationClient/HomeAutomationClient/App.axaml.cs
   - HomeAutomationClient/HomeAutomationClient/Controls/**
   - HomeAutomationClient/HomeAutomationClient/Views/**
+  - HomeAutomationClient/HomeAutomationClient/Extensions/ViewExtensions.cs
 ---
 
 # Dependency injection in HomeAutomationClient code behind
@@ -22,10 +23,18 @@ public partial class BatteryDetailsView : ContentPage
     public BatteryDetailsView()
     {
         InitializeComponent();
-        DataContext = IoC.TryGetRegistered<BatteryDetailsViewModel>();
+        this.UseViewModel<BatteryDetailsViewModel>();
     }
 }
 ```
+
+**A page gets its view model through `UseViewModel<T>()`** (`Extensions/ViewExtensions.cs`, since 2026-10-24): it
+resolves `T` with `TryGetRegistered`, sets it as the `DataContext` and starts its `Initialize`, and returns it - or
+`null` in the designer, which a page that keeps the view model in a field has to allow for (`DashboardView`). The
+pages did those lines by hand before, some with `GetRegistered`, which threw in the designer, and some without
+`Initialize`, which would have left one a view model got later unrun. Two kinds of view do not use it: a dialog body
+is handed its view model and inherits the start from `DialogView` (see [[DialogSystem.Lifecycle]]), and
+`PowerFlowView` starts its view model on every `Loaded` and stops it on `Unloaded` rather than once.
 
 ## Why constructor injection breaks the XAML preview
 
@@ -62,7 +71,7 @@ public SomeView(SomeViewModel viewModel)
 public SomeView()
 {
     InitializeComponent();
-    DataContext = IoC.TryGetRegistered<SomeViewModel>();
+    this.UseViewModel<SomeViewModel>();
 }
 ```
 

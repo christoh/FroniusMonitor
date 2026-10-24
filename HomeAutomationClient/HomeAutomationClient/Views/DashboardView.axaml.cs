@@ -5,27 +5,32 @@ namespace De.Hochstaetter.HomeAutomationClient.Views;
 
 public partial class DashboardView : ContentPage
 {
-    private readonly DashboardViewModel viewModel;
+    /// <summary>Null in the designer, which has no container; the view then follows nothing.</summary>
+    private readonly DashboardViewModel? viewModel;
 
     public DashboardView()
     {
         InitializeComponent();
-        DataContext = viewModel = IoC.GetRegistered<DashboardViewModel>();
-        ViewModelBase.HandleTaskExceptions(viewModel.Initialize);
+        viewModel = this.UseViewModel<DashboardViewModel>();
         ViewVisibility.Follow(this);
+
+        if (viewModel is not { } model)
+        {
+            return;
+        }
 
         Loaded += (_, _) =>
         {
-            viewModel.UpdateService.SitePowerFlowUpdated += OnSitePowerFlowUpdated;
-            viewModel.PropertyChanged += OnViewModelPropertyChanged;
+            model.UpdateService.SitePowerFlowUpdated += OnSitePowerFlowUpdated;
+            model.PropertyChanged += OnViewModelPropertyChanged;
             Application.Current!.ActualThemeVariantChanged += OnThemeChanged;
             UpdatePowerFlowColors();
         };
 
         Unloaded += (_, _) =>
         {
-            viewModel.UpdateService.SitePowerFlowUpdated -= OnSitePowerFlowUpdated;
-            viewModel.PropertyChanged -= OnViewModelPropertyChanged;
+            model.UpdateService.SitePowerFlowUpdated -= OnSitePowerFlowUpdated;
+            model.PropertyChanged -= OnViewModelPropertyChanged;
             Application.Current!.ActualThemeVariantChanged -= OnThemeChanged;
         };
     }
@@ -36,7 +41,7 @@ public partial class DashboardView : ContentPage
     /// </summary>
     private void OnSitePowerFlowUpdated(object? sender, SitePowerFlowUpdatedEventArgs e)
     {
-        if (viewModel.IsShown)
+        if (viewModel is { IsShown: true })
         {
             _ = Dispatcher.UIThread.InvokeAsync(UpdatePowerFlowColors);
         }
@@ -44,7 +49,7 @@ public partial class DashboardView : ContentPage
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(DashboardViewModel.IsShown) && viewModel.IsShown)
+        if (e.PropertyName == nameof(DashboardViewModel.IsShown) && viewModel is { IsShown: true })
         {
             UpdatePowerFlowColors();
         }
@@ -52,7 +57,7 @@ public partial class DashboardView : ContentPage
 
     private void OnThemeChanged(object? sender, EventArgs e) => UpdatePowerFlowColors();
 
-    private void UpdatePowerFlowColors() => viewModel.UpdatePowerFlowColors
+    private void UpdatePowerFlowColors() => viewModel?.UpdatePowerFlowColors
     (
         GetThemeColor("PowerFlowGrid"),
         GetThemeColor("PowerFlowSolar"),
