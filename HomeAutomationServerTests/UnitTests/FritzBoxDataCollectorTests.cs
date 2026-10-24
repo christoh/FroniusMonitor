@@ -329,10 +329,7 @@ public sealed class FritzBoxDataCollectorTests : IAsyncDisposable
         Assert.Same(officeNow, update.Device.Device);
     }
 
-    [Fact(Skip = "BUG in FritzBoxDataCollector.cs line 167: `catch (Exception ex) when (ex is not OperationCanceledException)` lets a timeout of the box escape. " +
-                 "HttpClient reports one as TaskCanceledException (an OperationCanceledException) while the stop token is not cancelled; RunAsync (line 149) only " +
-                 "handles it when token.IsCancellationRequested, so the exception ends the loop of that box for good, nothing is logged, and StopAsync later throws " +
-                 "from Task.WhenAll. Fix: `when (!token.IsCancellationRequested)`. Un-skip this test once that is done.")]
+    [Fact]
     public async Task A_timeout_of_the_box_is_a_failed_round_like_any_other_and_the_next_round_works()
     {
         var service = await StartOneBoxAsync();
