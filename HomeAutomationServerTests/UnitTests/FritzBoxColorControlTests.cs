@@ -24,5 +24,17 @@ public sealed class FritzBoxColorControlTests
         Assert.Equal(read, written);
     }
 
+    [Theory]
+    [InlineData(254d, 1d)]
+    [InlineData(127d, 0.5d)]
+    [InlineData(0d, 0d)]
+    [InlineData(255d, 1d)]
+    public void A_saturation_of_254_is_100_percent_and_255_set_another_way_is_no_more(double absolute, double percent)
+    {
+        IHsvColorControl lamp = new FritzBoxDevice { Color = new FritzBoxColorControl { SaturationAbsolute = absolute } };
+
+        Assert.Equal(percent, lamp.Saturation);
+    }
+
     private static (string?, string?) Modes(XElement color) => (color.Attribute("supported_modes")?.Value, color.Attribute("current_mode")?.Value);
 }

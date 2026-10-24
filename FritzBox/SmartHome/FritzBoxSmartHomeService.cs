@@ -87,11 +87,11 @@ public sealed class FritzBoxSmartHomeService : IFritzBoxService, IDisposable
         token
     );
 
-    /// <summary>Sets hue (degrees) and saturation (0..1).</summary>
+    /// <summary>Sets hue (degrees) and saturation (0..1, where 1 is <see cref="FritzBoxColorControl.MaxSaturation"/>).</summary>
     public ValueTask SetColor(string ain, double hueDegrees, double saturation, CancellationToken token = default)
     {
         var hue = ToRange(hueDegrees, 0, 359);
-        var saturationAbsolute = ToRange(saturation * 255, 0, 255);
+        var saturationAbsolute = ToRange(saturation * FritzBoxColorControl.MaxSaturation, 0, FritzBoxColorControl.MaxSaturation);
 
         return SendAsync
         (

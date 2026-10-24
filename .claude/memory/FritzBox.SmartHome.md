@@ -174,6 +174,14 @@ They ran green from the cloud on 2026-10-24, against `https://fritzbox.hochstaet
   - `hsColor` 120/128, which turns `currentColorMode` to `hueSaturation`
   - `colorTemperature` 3000, which turns it back to `temperature`
   As AVM says, none of them switched the lamp on.
+- **The saturation of a FRITZ!Smart Light 500 ends at 254**, although the specification says 0..255.
+  - Measured on 2026-10-24 on `13077 0050820-1`.
+  - Twelve values from 12 to 254 came back exactly as sent.
+  - 255 is stored and reported as 254, also seconds later.
+  - **254 is therefore 100 %** (`FritzBoxColorControl.MaxSaturation`): in what the service sends over REST and
+    AHA, in `IHsvColorControl.Saturation` (which both clients show), and in the Avalonia dashboard's rollback.
+  - A lamp set to 255 another way still reports 255. "Lampe Dienstboteneingang" has one, from AHA or the
+    FRITZ!App. `Saturation` caps it at 100 %.
 - `PUT …/triggers/{UID}` with only `{"enabled":true}` is accepted.
 - Applying a template (`POST …/templates/{UID}`) has not been tried, because it switches things in the house.
 - Commands work with the AIN written with or without its space. The service finds the UID in the last overview.

@@ -135,13 +135,13 @@ public sealed class FritzBoxSmartHomeServiceTests
     }
 
     [Theory]
-    [InlineData(400, 2, 359, 255)]
-    [InlineData(120, 0.5, 120, 128)]
+    [InlineData(400, 2, 359, 254)]
+    [InlineData(120, 0.5, 120, 127)]
     [InlineData(0, 0, 0, 0)]
-    [InlineData(359.4, 1, 359, 255)]
-    [InlineData(359.6, 1, 359, 255)]
+    [InlineData(359.4, 1, 359, 254)]
+    [InlineData(359.6, 1, 359, 254)]
     [InlineData(-5, -1, 0, 0)]
-    public async Task SetColor_puts_hue_up_to_359_and_saturation_up_to_255_as_the_hsColor(double hue, double saturation, int expectedHue, int expectedSaturation)
+    public async Task SetColor_puts_hue_up_to_359_and_saturation_up_to_254_as_the_hsColor(double hue, double saturation, int expectedHue, int expectedSaturation)
     {
         var box = new FakeBox(Os825);
         using var service = CreateService(box);
@@ -309,8 +309,8 @@ public sealed class FritzBoxSmartHomeServiceTests
     }
 
     [Theory]
-    [InlineData(120, 0.5, 120, 128)]
-    [InlineData(400, 2, 359, 255)]
+    [InlineData(120, 0.5, 120, 127)]
+    [InlineData(400, 2, 359, 254)]
     public async Task Over_AHA_SetColor_sends_an_unmapped_color_with_duration_0(double hue, double saturation, int expectedHue, int expectedSaturation)
     {
         var box = new FakeBox(Os757);
