@@ -21,7 +21,8 @@ box. **Step 1 is done** (phases 1.1 to 1.5, `.claude/memory/FritzBox.SmartHome.m
 - an optional certificate pin
 - system tests against the box, green from the cloud on 2026-10-24
 
-The server still has to be deployed.
+The server was deployed on 2026-10-24 as version 1.42.47. It was checked the same day through the Home Automation
+connector, and Christoph confirmed it at the lamps (`.claude/memory/FritzBox.SmartHome.md`).
 
 ## Where we are
 
@@ -150,7 +151,10 @@ The original points:
   7 passed, and the switching test was skipped (see `.claude/memory/FritzBox.SmartHome.md`).
 - `FritzBox.SmartHome.md` is the document for the REST client. `UpdateVisibility.Lifecycle.md` (1.2) and
   `Fronius.SharedLibraryBoundary.md` (1.3) are updated.
-- With **step 1 done**, what is left of it is deploying the server and running the system tests in Neufahrn.
+- **Step 1 is done and in operation:**
+  - The server is deployed and checked.
+  - The system tests ran against the box.
+  - What is not checked live is a WPF build with the new service, because it only runs on Windows.
 
 The original points:
 
