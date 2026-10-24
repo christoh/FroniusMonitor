@@ -1,18 +1,19 @@
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
-             xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
-             xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
-             mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="320"
-             x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.PriceComponentsView"
-             x:DataType="dialogs:PriceComponentsViewModel"
-             MinWidth="320" MaxWidth="900" FontSize="12">
+<v:DialogView xmlns="https://github.com/avaloniaui"
+              xmlns:v="clr-namespace:De.Hochstaetter.HomeAutomationClient.Views.Dialogs"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+              xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
+              xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+              mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="320"
+              x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.PriceComponentsView"
+              x:DataType="dialogs:PriceComponentsViewModel"
+              MinWidth="320" MaxWidth="900" FontSize="12">
 	<!-- The same density as the event log: a table of a dozen rows read, not touched. -->
-	<UserControl.Styles>
+	<v:DialogView.Styles>
 		<StyleInclude Source="avares://HomeAutomationClient/Styles/CompactForms.axaml" />
-	</UserControl.Styles>
+	</v:DialogView.Styles>
 
 	<Grid RowDefinitions="Auto,Auto,Auto" Margin="0,0,0,8">
 		<!-- Sized to its content, as the WPF window was: a fixed dozen rows need no scrolling and no virtualization.
@@ -44,4 +45,4 @@
 		<Button Grid.Row="2" MinWidth="70" Margin="12,10,12,0" HorizontalAlignment="Right" HorizontalContentAlignment="Center"
 		        Content="{x:Static p:Resources.Ok}" Command="{Binding CloseDialogCommand}" />
 	</Grid>
-</UserControl>
+</v:DialogView>

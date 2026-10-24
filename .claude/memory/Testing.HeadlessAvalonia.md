@@ -116,6 +116,7 @@ reason, which is worth knowing before trying one.
 |---|---|
 | `WindowPresenterTests` | The desktop head: a window per dialog and per device page, reuse and activation, the close box through `AbortAsync`, the modal message box, a logout |
 | `MainViewPresenterTests` | Every other head: the dialog frame, nesting, the busy text handover, one page per view type, the menu bar gate - that every gated command says false *and* raises `CanExecuteChanged` |
+| `DialogViewTests` | Every dialog body of the client derives from `DialogView`, which starts `Initialize` after `DataContextChanged` has been raised, and a body derived from it is still drawn with `UserControl`'s template |
 | `AboutViewTests` | The About box in a window: this app above the server with the same lines from one `WebApiInfo` template, and this app alone where the server did not answer |
 | `ZoomBoxTests` | Ctrl with the wheel and the keys, the limits, the steps, the scope on a view inside the window, the focused text box |
 | `ZoomPinchTests` | Pinch, with its events synthesized |

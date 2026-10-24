@@ -1,13 +1,14 @@
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
-             xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
-             xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
-             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="450"
-             x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.LoginView"
-             x:DataType="dialogs:LoginViewModel" MaxWidth="400" MinWidth="200">
+<v:DialogView xmlns="https://github.com/avaloniaui"
+              xmlns:v="clr-namespace:De.Hochstaetter.HomeAutomationClient.Views.Dialogs"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+              xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
+              xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+              mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="450"
+              x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.LoginView"
+              x:DataType="dialogs:LoginViewModel" MaxWidth="400" MinWidth="200">
     <StackPanel Margin="16" HorizontalAlignment="Stretch">
 		<StackPanel.Styles>
 			<Style Selector="StackPanel.InputBlock">
@@ -49,4 +50,4 @@
 		</Grid>
 
 	</StackPanel>
-</UserControl>
+</v:DialogView>

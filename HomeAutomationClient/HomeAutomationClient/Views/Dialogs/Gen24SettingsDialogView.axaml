@@ -1,15 +1,15 @@
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
-             xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
-             xmlns:v="clr-namespace:De.Hochstaetter.HomeAutomationClient.Views.Dialogs"
-             xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
-             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="700"
-             x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.Gen24SettingsDialogView"
-             x:DataType="dialogs:Gen24SettingsDialogViewModel"
-             MinWidth="320" MaxWidth="1024" FontSize="12">
+<v:DialogView xmlns="https://github.com/avaloniaui"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+              xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
+              xmlns:v="clr-namespace:De.Hochstaetter.HomeAutomationClient.Views.Dialogs"
+              xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="700"
+              x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.Gen24SettingsDialogView"
+              x:DataType="dialogs:Gen24SettingsDialogViewModel"
+              MinWidth="320" MaxWidth="1024" FontSize="12">
 	<!-- No MaxHeight. The dialog is as tall as what is on the tab, and the energy flow tab grows with every rule
 	     the user adds: a fixed maximum stopped it at that height and left the tab scrolling inside a dialog with
 	     room to spare. Measured, with the schedule filling up: 782 pixels at nine rules, 1046 at twenty, and from
@@ -19,9 +19,9 @@
 	     the sizes that app uses: 12 point type, and the compact controls of
 	     Styles/CompactForms.axaml instead of the finger sized ones Fluent gives everything else. FontSize is
 	     inherited, so it reaches every tab, including the ones that are not there yet. -->
-	<UserControl.Styles>
+	<v:DialogView.Styles>
 		<StyleInclude Source="avares://HomeAutomationClient/Styles/CompactForms.axaml" />
-	</UserControl.Styles>
+	</v:DialogView.Styles>
 
 	<!-- Not gated on IsLoaded: the tabs are there from the start, so the dialog does not open as a bare title bar
 	     and the busy animation of the frame has a body of a sensible size to sit over while the settings are read. -->
@@ -82,4 +82,4 @@
 			</Grid>
 		</Border>
 	</Grid>
-</UserControl>
+</v:DialogView>

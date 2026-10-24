@@ -1,22 +1,12 @@
 namespace De.Hochstaetter.HomeAutomationClient.Views.Dialogs;
 
-public partial class MessageBoxView : UserControl, IDialogControl
+public partial class MessageBoxView : DialogView
 {
     private MessageBoxViewModel? ViewModel => DataContext as MessageBoxViewModel;
 
     public MessageBoxView()
     {
         InitializeComponent();
-    }
-
-    protected override void OnDataContextChanged(EventArgs e)
-    {
-        base.OnDataContextChanged(e);
-
-        if (ViewModel is { } viewModel)
-        {
-            ViewModelBase.HandleTaskExceptions(viewModel.Initialize);
-        }
     }
 
     private void OnButtonClicked(object? sender, RoutedEventArgs e)

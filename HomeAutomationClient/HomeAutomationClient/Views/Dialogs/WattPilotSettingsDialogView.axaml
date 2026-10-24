@@ -1,19 +1,19 @@
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
-             xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
-             xmlns:v="clr-namespace:De.Hochstaetter.HomeAutomationClient.Views.Dialogs"
-             xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
-             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="640"
-             x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.WattPilotSettingsDialogView"
-             x:DataType="dialogs:WattPilotSettingsDialogViewModel"
-             MinWidth="320" MaxWidth="1024" FontSize="12">
+<v:DialogView xmlns="https://github.com/avaloniaui"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+              xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
+              xmlns:v="clr-namespace:De.Hochstaetter.HomeAutomationClient.Views.Dialogs"
+              xmlns:c="clr-namespace:De.Hochstaetter.HomeAutomationClient.Controls"
+              mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="640"
+              x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.WattPilotSettingsDialogView"
+              x:DataType="dialogs:WattPilotSettingsDialogViewModel"
+              MinWidth="320" MaxWidth="1024" FontSize="12">
 	<!-- The same density as the inverter settings dialog, for the same reason: it is a form of sixty fields. -->
-	<UserControl.Styles>
+	<v:DialogView.Styles>
 		<StyleInclude Source="avares://HomeAutomationClient/Styles/CompactForms.axaml" />
-	</UserControl.Styles>
+	</v:DialogView.Styles>
 
 	<Grid RowDefinitions="*,Auto">
 		<v:WattPilotSettingsView Grid.Row="0" x:Name="SettingsTabs" DataContext="{Binding Settings}" />
@@ -37,4 +37,4 @@
 			        Content="{x:Static p:Resources.Cancel}" Command="{Binding CloseDialogCommand}" />
 		</Grid>
 	</Grid>
-</UserControl>
+</v:DialogView>

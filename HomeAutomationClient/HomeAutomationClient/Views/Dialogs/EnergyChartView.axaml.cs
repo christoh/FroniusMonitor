@@ -5,7 +5,7 @@ namespace De.Hochstaetter.HomeAutomationClient.Views.Dialogs;
 /// leaves there: drawing the view model's <see cref="EnergyChartModel"/> with the charting library, and reading
 /// the theme's colors for it - both need the UI framework, and neither decides anything.
 /// </summary>
-public partial class EnergyChartView : UserControl, IDialogControl
+public partial class EnergyChartView : DialogView
 {
     private EnergyChartViewModel? viewModel;
 
@@ -47,9 +47,7 @@ public partial class EnergyChartView : UserControl, IDialogControl
         viewModel.PropertyChanged += OnViewModelPropertyChanged;
         Render();
 
-        // Nobody can await it here; Initialize guards itself against running twice and reports its own failures
-        // through TaskExceptionHandler, and HandleTaskExceptions catches whatever escapes that all the same.
-        ViewModelBase.HandleTaskExceptions(viewModel.Initialize);
+        // DialogView starts Initialize once this has run, so the subscription above sees everything it loads.
     }
 
     /// <summary>

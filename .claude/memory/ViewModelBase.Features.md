@@ -24,7 +24,8 @@ ViewModelBase          HomeAutomationClient/ViewModels/ViewModelBase.cs   (abstr
 - **`Task Initialize()`** - virtual, does nothing by default. Views call it after setting the `DataContext`, so
   it is the place for async start-up work - through `ViewModelBase.HandleTaskExceptions(viewModel.Initialize)`,
   never `_ = viewModel.Initialize();`: a start-up that throws would otherwise be lost or end the app. Every view
-  does so since 2026-09-17, the dialog bodies in `Views/Dialogs` included.
+  does so since 2026-09-17. The dialog bodies in `Views/Dialogs` get it from their base `DialogView` since
+  2026-10-24 and have no call of their own; see [[DialogSystem.Lifecycle]].
 - **`TaskExceptionHandler(Func<Task> task)`** - wrap the body of a `[RelayCommand]` in it: it awaits the task,
   shows any exception in a message box and always clears `BusyText` afterwards. See the commands in
   `DashboardViewModel`.

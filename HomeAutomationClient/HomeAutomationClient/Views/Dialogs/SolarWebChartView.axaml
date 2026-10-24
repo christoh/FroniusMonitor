@@ -1,20 +1,21 @@
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
-             xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
-             xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
-             xmlns:sp="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
-             xmlns:m="clr-namespace:De.Hochstaetter.HomeAutomationClient.Models"
-             mc:Ignorable="d" d:DesignWidth="1160" d:DesignHeight="520"
-             x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.SolarWebChartView"
-             x:DataType="dialogs:SolarWebChartViewModel"
-             Width="1160" Height="520" MinWidth="900" MinHeight="320" FontSize="12">
+<v:DialogView xmlns="https://github.com/avaloniaui"
+              xmlns:v="clr-namespace:De.Hochstaetter.HomeAutomationClient.Views.Dialogs"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+              xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
+              xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
+              xmlns:sp="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
+              xmlns:m="clr-namespace:De.Hochstaetter.HomeAutomationClient.Models"
+              mc:Ignorable="d" d:DesignWidth="1160" d:DesignHeight="520"
+              x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.SolarWebChartView"
+              x:DataType="dialogs:SolarWebChartViewModel"
+              Width="1160" Height="520" MinWidth="900" MinHeight="320" FontSize="12">
 	<!-- The same shape as the price chart: the plot above, one row of choices below, and the dialog resizeable from
 	     the start because a chart gets better with every pixel. The row does not wrap; the minimum width is what it
 	     needs on one line in German. -->
-	<UserControl.Styles>
+	<v:DialogView.Styles>
 		<StyleInclude Source="avares://HomeAutomationClient/Styles/CompactForms.axaml" />
 		<Style Selector="RadioButton.Wrap">
 			<Setter Property="Margin" Value="0,2,0,0" />
@@ -24,9 +25,9 @@
 			<Setter Property="FontSize" Value="16" />
 			<Setter Property="VerticalAlignment" Value="Center" />
 		</Style>
-	</UserControl.Styles>
+	</v:DialogView.Styles>
 
-	<UserControl.Resources>
+	<v:DialogView.Resources>
 		<!-- One line of the tooltip, for the series rows and the totals alike: a swatch in the series' colour - none
 		     for a total, whose colour is null and converts to transparent - the name, and the value right aligned.
 		     Tabular figures (+tnum) on the rows, so that the values line up digit under digit as the pointer moves;
@@ -38,7 +39,7 @@
 				<TextBlock Grid.Column="2" Text="{Binding Value}" FontWeight="Bold" VerticalAlignment="Center" FontFeatures="+tnum" />
 			</Grid>
 		</DataTemplate>
-	</UserControl.Resources>
+	</v:DialogView.Resources>
 
 	<Grid RowDefinitions="*,Auto">
 		<!-- The chart itself. It has no bindings: the code behind draws ChartModel into it, because drawing is the
@@ -103,4 +104,4 @@
 			           Text="{x:Static p:Resources.SolarWebPremiumHint}" IsVisible="{Binding IsPremiumFeature}" />
 		</Grid>
 	</Grid>
-</UserControl>
+</v:DialogView>

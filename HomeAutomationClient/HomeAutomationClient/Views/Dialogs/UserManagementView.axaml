@@ -1,13 +1,14 @@
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
-             xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
-             xmlns:webApi="clr-namespace:De.Hochstaetter.Fronius.Models.WebApi;assembly=Fronius"
-             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="400"
-             x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.UserManagementView"
-             x:DataType="dialogs:UserManagementViewModel" MinWidth="400">
+<v:DialogView xmlns="https://github.com/avaloniaui"
+              xmlns:v="clr-namespace:De.Hochstaetter.HomeAutomationClient.Views.Dialogs"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+              xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+              xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
+              xmlns:webApi="clr-namespace:De.Hochstaetter.Fronius.Models.WebApi;assembly=Fronius"
+              mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="400"
+              x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.UserManagementView"
+              x:DataType="dialogs:UserManagementViewModel" MinWidth="400">
 	<Grid Margin="16" RowDefinitions="*,Auto" ColumnDefinitions="*,Auto">
 		<Grid.Styles>
 			<Style Selector="StackPanel.Commands > Button">
@@ -42,4 +43,4 @@
 			<Button Content="{x:Static p:Resources.Close}" Command="{Binding CloseDialogCommand}" IsCancel="True" />
 		</StackPanel>
 	</Grid>
-</UserControl>
+</v:DialogView>

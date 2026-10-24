@@ -372,7 +372,8 @@ Three things a tab has to do:
 
 ## Initialize runs once
 
-The body's `OnDataContextChanged` starts `Initialize`, and **it fires again every time the dialog is re-attached** -
+The body's `OnDataContextChanged` - `DialogView`'s, which every dialog body inherits - starts `Initialize`, and
+**it fires again every time the dialog is re-attached** -
 which happens whenever a message box has opened and closed over it, an error from a tab for instance. A settings
 dialog stays open across that, unlike the login and message boxes that came before it, so `Initialize` guards
 itself with a flag set before its first `await`. Without the guard the inverter is read again and the busy overlay
