@@ -204,9 +204,6 @@
   <data name="Off" xml:space="preserve">
     <value>off</value>
   </data>
-  <data name="AccessDenied" xml:space="preserve">
-    <value>Accesso negato</value>
-  </data>
   <data name="Temperature" xml:space="preserve">
     <value>Temperatura</value>
   </data>
@@ -218,9 +215,6 @@
   </data>
   <data name="View" xml:space="preserve">
     <value>_Visualizza</value>
-  </data>
-  <data name="NoFritzBoxConnection" xml:space="preserve">
-    <value>Non sono stati specificati parametri di connessione completi del Fritz!Box</value>
   </data>
   <data name="Cancel" xml:space="preserve">
     <value>Annulla</value>

@@ -5,7 +5,8 @@ paths:
   - FritzBox/FritzBox.csproj
   - Fronius/Models/FritzBox*.cs
   - Fronius/Contracts/IFritzBoxService.cs
-  - Fronius/Services/FritzBoxService.cs
+  - FroniusMonitor/App.xaml.cs
+  - FroniusMonitor/Services/DataCollectionService.cs
   - HomeAutomationServerTests/UnitTests/FritzBoxColorControlTests.cs
   - HomeAutomationServerTests/UnitTests/FritzBoxHttpClientTests.cs
   - HomeAutomationServerTests/UnitTests/FritzBoxSmartHomeMappingTests.cs
@@ -26,10 +27,13 @@ Phase 1.1 of `.claude/plans/FritzBoxUsp-plan.md`. `FritzBoxSmartHomeService` (in
 It hands out the same `FritzBoxDevice`s either way, so the server, its JSON and both clients need not know which
 interface is in use.
 
-**The HA server uses it since phase 1.2** (2026-10-24): `Program.cs` registers it as `IFritzBoxService`, and
-`FritzBoxDataCollector` asks for one per configured box. The WPF app still registers the old AHA service
-`Fronius/Services/FritzBoxService.cs` until phase 1.3, and the old service is deleted then. Until that happens, its
-four AHA command strings exist twice: once there and once as the fallback here.
+**Both heads that talk to a box use it** (2026-10-24):
+- The HA server since phase 1.2. `Program.cs` registers it as `IFritzBoxService`, and `FritzBoxDataCollector` asks
+  for one per configured box.
+- The WPF app since phase 1.3. `App.xaml.cs` registers it as the singleton `IFritzBoxService`.
+
+The old AHA client `Fronius/Services/FritzBoxService.cs` is deleted, and its two strings `NoFritzBoxConnection` and
+`AccessDenied` with it. AHA lives on only as the fallback inside this service.
 
 ## The parts
 
@@ -111,6 +115,17 @@ says whether AHA and REST still agree.**
   empty, and REST fills it from the device. That lamp's id therefore changed once, with the switch to REST:
   `AVM;130770053217-1` became `AVM;FRITZ!Smart_Light_500;130770053217-1`. The AHA device entries of the lamps
   (`functionbitmask` 1, not switchable) are gone from the server.
+
+## How the WPF app polls
+
+`DataCollectionService` is unchanged by the switch:
+- It reads the box on every third tick of its one-second timer.
+- It tells devices apart by `Id`, which is why the REST mapping makes one up.
+- It takes the values into the instances the UI shows with `CopyFrom`.
+- The power button of `PowerConsumer` stops the polling, sends the command, waits a second and lets the polling go
+  on. That second is about what the box needs before its overview shows a command, so the WPF app does not use
+  `CommandSent`.
+- Only the server listens to that event.
 
 ## Measured on the box in Neufahrn (FRITZ!OS 8.25), 2026-10-24
 

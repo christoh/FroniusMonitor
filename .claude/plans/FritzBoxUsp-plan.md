@@ -1,6 +1,5 @@
 ---
 paths:
-  - Fronius/Services/FritzBoxService.cs
   - Fronius/Contracts/IFritzBoxService.cs
   - Fronius/Models/FritzBoxDevice.cs
   - HomeAutomationServer/Services/DataCollectors/FritzBoxDataCollector.cs
@@ -15,8 +14,8 @@ paths:
 Status of 2026-10-24: phase 1.0 (the USP probe) is done. Push over USP works, but only for the outlets, and the
 lamps are missing from it entirely. **Step 1 therefore goes on without USP, over the Smart Home REST API.** The USP
 setup (Mosquitto on amazon2 and the controller on the box) stays for now, in case step 2 needs it for the Swiss
-box. **Phase 1.1 (the REST client) is done and tested live in Neufahrn, and phase 1.2 puts it into the HA server**
-(`.claude/memory/FritzBox.SmartHome.md`). Phases 1.3 to 1.5 are still to do.
+box. **Phase 1.1 (the REST client) is done and tested live in Neufahrn. Phase 1.2 puts it into the HA server and
+phase 1.3 into the WPF app** (`.claude/memory/FritzBox.SmartHome.md`). Phases 1.4 and 1.5 are still to do.
 
 ## Where we are
 
@@ -25,8 +24,8 @@ box. **Phase 1.1 (the REST client) is done and tested live in Neufahrn, and phas
   - The server has used `FritzBoxSmartHomeService` since phase 1.2 (REST API, AHA before FRITZ!OS 8.20). Its
     `FritzBoxDataCollector` polls every `RefreshRate`, which `Program.cs` sets to 2 s, and pushes a device only
     when it has changed.
-  - The WPF app still polls AHA through `FritzBoxService`, on every third cycle (`FritzBoxUpdateRate = 3`), until
-    phase 1.3.
+  - The WPF app has used the same service since phase 1.3. It reads the box on every third cycle
+    (`FritzBoxUpdateRate = 3`), as before. The old `FritzBoxService` is deleted.
 - AVM has frozen the AHA interface: "will not be developed any further". Its successor is the Smart Home REST API
   (FRITZ!OS 8.20 and later, `https://<box>/api/v0`). It has no push either.
 - TR-064 has no push: every state variable is `sendEvents = no`. Its `X_AVM-DE_Homeauto` service can also do less
@@ -110,7 +109,13 @@ Built as described below. How the collector works is in `.claude/memory/FritzBox
   too (1.3), delete the old service: its AHA commands exist twice until then.
 - **Templates and routines** become available on the way, for step 3.
 
-### Phase 1.3 - WPF app
+### Phase 1.3 - WPF app (done)
+
+- `App.xaml.cs` registers `FritzBoxSmartHomeService`.
+- `Fronius/Services/FritzBoxService.cs` is deleted, together with its two strings, which nothing else used.
+- The polling of `DataCollectionService` is unchanged. Its power button already waits a second after a command,
+  which is what the REST API needs.
+- Compile-checked with `-p:VerifyOnLinux=true`. Not run, because WPF does not run off Windows.
 
 - `DataCollectionService` uses the same library and the REST API, with AHA as the fallback.
 - The WPF app only builds and runs on Windows. In the cloud it is compile-checked with `-p:VerifyOnLinux=true`.

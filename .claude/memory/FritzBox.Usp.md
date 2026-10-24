@@ -12,8 +12,8 @@ paths:
 # The FritzBox library: TR-064 and USP
 
 `FritzBox/FritzBox.csproj` talks to a FRITZ!Box through TR-064 (SOAP) and as a USP controller (TR-369) over MQTT.
-Only `Tools/FritzBoxUspProbe` and the tests use it so far. The HA server and the WPF app still go through AHA in
-`Fronius/Services/FritzBoxService.cs`.
+The USP and TR-064 parts are used only by `Tools/FritzBoxUspProbe` and the tests. The HA server and the WPF app
+use the smart-home part of the library (`FritzBox.SmartHome.md`).
 
 **USP is not the way for smart home** (`.claude/plans/FritzBoxUsp-plan.md`, D8):
 - It has no lamps.
