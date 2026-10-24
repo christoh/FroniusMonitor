@@ -36,7 +36,9 @@ Built once only because BuildKit merges identical vertices across the targets of
 is `--platform=$BUILDPLATFORM` and uses no `TARGET*` argument, so it is the same LLB for every platform and both
 images. An ARG in it that differs per platform or per target, or a differing context/build-arg between the two
 bake targets, silently brings back the double build. `.dockerignore` (`**/bin/`, `**/obj/`) replaced the
-`rm -fr bin obj` steps both Dockerfiles had. `.ashrc` and `/etc/motd` stay per image on purpose: they name the
+`rm -fr bin obj` steps both Dockerfiles had. Since 2026-10-24 `client-builder` rewrites the SDK image's apt sources
+from `http://` to `https://` before `apt-get update` - see "Building and pushing from Claude Code on the web" below
+for why. `.ashrc` and `/etc/motd` stay per image on purpose: they name the
 image, and the server's has the `doas`/`root` aliases for its non-root `app` user.
 
 ## OCI labels (added 2026-09-15)
@@ -133,6 +135,46 @@ It was noticed on 2026-09-16 because the first dry run happened to overlap a pub
 Checked against the live packages on 2026-09-16: the keep sets it computes are 7 for the server and 9 for the
 client, the same numbers both manual cleanups arrived at. The delete path was exercised against a stubbed API
 with fabricated leftovers mixed into the real keep set; only the leftovers went.
+
+## Building and pushing from Claude Code on the web
+
+Done for the first time on 2026-10-24, for the client image only, from `dev` and on the developer's instruction
+(the workflow only ever publishes from `master`). Docker is installed in the cloud container but not running, and
+every network access goes through the session's HTTPS proxy, which gives four traps:
+
+- **Start the daemon yourself**, with the proxy in its environment: `HTTPS_PROXY=$HTTPS_PROXY dockerd &`. It comes
+  up with the containerd image store, so the plain `docker` driver builds all four platforms and pushes the index
+  with the bake file's annotations; no `docker-container` builder is needed.
+- **Mount `binfmt_misc` on the host before registering QEMU**: `mount -t binfmt_misc binfmt_misc
+  /proc/sys/fs/binfmt_misc`, then `docker run --privileged --rm tonistiigi/binfmt --install arm64,arm,386`. Without
+  the mount the registration is gone as soon as that container exits, and every arm container dies with
+  `exec format error`.
+- **`RUN` reaches the network only through the proxy on the host's loopback**, so the build needs host networking
+  and the proxy as build arguments. A bake override in a scratch file does it without touching the repository:
+  `target "client" { network = "host"  args = { HTTPS_PROXY = "http://127.0.0.1:33693", https_proxy = "..." } }`,
+  run as `docker buildx bake --allow network.host -f docker-bake.hcl -f <override> client --push`. The predefined
+  proxy arguments are not written into the image history. No proxy CA was needed inside the build: apk, NuGet and
+  the Ubuntu archive over HTTPS all went through without it.
+- **The proxy refuses plain HTTP** (`405 Method Not Allowed`), and the SDK image's apt sources are
+  `http://archive.ubuntu.com` - hence the HTTPS rewrite in `client-builder`. The archive is public and signed, so
+  HTTP was fine on its own; the developer had left it on purpose and agreed to the change for this reason.
+
+Two more things before the push:
+
+- **The cloud clone is shallow and has no tags**, so GitInfo computes a version like `0.0.111`.
+  `git fetch --unshallow --tags origin` first; on 2026-10-24 that gave `1.42.9` plus the commits since.
+- **The session's `GH_TOKEN` may push both packages**: `printf '%s' "$GH_TOKEN" | docker login ghcr.io -u christoh
+  --password-stdin`. It is short lived (hours), so log in right before the push.
+
+### Where the client runs: amazon2
+
+`amazon2.hochstaetter.de` is the EC2 instance `i-0fcbdf4bd2de0dc19` ("Docker Host", t4g.nano, arm64, Alpine) in
+`eu-central-1`, reachable through SSM (`AWS-RunShellScript`). The client is the service `home-automation-client`
+of `/home/christoh/src/kartellvz/docker-compose.yml`, container `home-automation-client.kartellvz`, with
+`platform: linux/arm/v7` and `pull_policy: always` - so the push has to include arm/v7. Rolling out is
+`docker compose pull home-automation-client && docker compose up -d --no-deps home-automation-client` in that
+directory. The server does not run there. **The compose files on that host hold secrets**; read the lines you need
+rather than printing whole files.
 
 ## Why "dangling" is not "untagged"
 

@@ -86,7 +86,12 @@ EOF
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0 AS client-builder
 
 # Before COPY, so that a source change does not install the workload again.
-RUN apt-get update -y && \
+# The package sources over HTTPS rather than the image's HTTP. The archive is public and signed, so this is not for
+# secrecy: a build behind a proxy that only lets HTTPS through - Claude Code on the web is one - gets nothing over
+# plain HTTP at all (405 from the proxy). Every *.sources file, so a change of the SDK's base image (Ubuntu now,
+# Debian before) does not break the build.
+RUN find /etc/apt -name '*.sources' -exec sed -i 's|http://|https://|g' {} + && \
+    apt-get update -y && \
     apt-get upgrade -y && \
     apt-get install -y --no-install-recommends python3 && \
     dotnet workload install wasm-tools
