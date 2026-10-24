@@ -402,7 +402,6 @@ public sealed class FritzBoxSmartHomeServiceTests
     [Theory]
     [InlineData(Os825)]
     [InlineData(Os757)]
-    [InlineData(null)]
     public async Task The_version_is_read_once_per_connection_whichever_way_it_came_out(string? boxVersion)
     {
         var box = new FakeBox(boxVersion);
@@ -412,6 +411,27 @@ public sealed class FritzBoxSmartHomeServiceTests
         await service.GetDevices(TestContext.Current.CancellationToken);
 
         Assert.Single(box.BoxInfoRequests);
+    }
+
+    [Fact]
+    public async Task A_version_that_cannot_be_read_is_asked_for_again_and_AHA_is_used_meanwhile()
+    {
+        var box = new FakeBox(null);
+        using var service = CreateService(box);
+        var token = TestContext.Current.CancellationToken;
+
+        await service.GetDevices(token);
+        await service.GetDevices(token);
+
+        Assert.Equal(2, box.BoxInfoRequests.Count);
+        Assert.DoesNotContain(box.Calls, c => c.IsRest);
+
+        box.BoxInfo = FakeBox.BoxInfoOf(Os825);
+        await service.GetDevices(token);
+        await service.GetDevices(token);
+
+        Assert.Equal(3, box.BoxInfoRequests.Count);
+        Assert.Equal(2, box.Calls.Count(c => c.Method == HttpMethod.Get && c.PathAndQuery == OverviewPath));
     }
 
     [Fact]
@@ -560,7 +580,7 @@ public sealed class FritzBoxSmartHomeServiceTests
     [InlineData("http://192.168.44.11/", "http://192.168.44.11/")]
     [InlineData("http://192.168.44.11//", "http://192.168.44.11/")]
     [InlineData("https://192.168.44.11:49443", "https://192.168.44.11:49443/")]
-    public async Task The_client_is_made_for_the_address_user_and_password_of_the_connection_and_accepts_the_self_signed_certificate(string baseUrl, string expectedBaseUri)
+    public async Task The_client_is_made_for_the_address_user_and_password_of_the_connection_and_decides_on_untrusted_certificates(string baseUrl, string expectedBaseUri)
     {
         var box = new FakeBox(Os825);
         var created = new List<FritzBoxHttpClientOptions>();
@@ -572,8 +592,8 @@ public sealed class FritzBoxSmartHomeServiceTests
         Assert.Equal(new Uri(expectedBaseUri), options.BaseUri);
         Assert.Equal("user", options.UserName);
         Assert.Equal("secret", options.Password);
+        // What it decides is FritzBoxCertificateTests' business: the pinned certificate only, or any with a warning.
         Assert.NotNull(options.AcceptUntrustedCertificate);
-        Assert.True(options.AcceptUntrustedCertificate(null!), "The box's own certificate is self-signed and has always been accepted (the callback does not look at it)");
     }
 
     [Fact]

@@ -87,8 +87,16 @@ public sealed class FritzBoxHttpClient : IDisposable
     /// <summary>Logs in now, also when there is a session already. Every other call logs in by itself when it has to.</summary>
     public async Task LogInAsync(CancellationToken token = default)
     {
-        sessionId = null;
-        await GetSessionIdAsync(token).ConfigureAwait(false);
+        await loginLock.WaitAsync(token).ConfigureAwait(false);
+
+        try
+        {
+            sessionId = await LoginAsync(token).ConfigureAwait(false);
+        }
+        finally
+        {
+            loginLock.Release();
+        }
     }
 
     /// <summary>Returns the AHA answer to <c>webservices/homeautoswitch.lua?&lt;query&gt;</c>.</summary>

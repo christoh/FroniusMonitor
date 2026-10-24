@@ -7,6 +7,7 @@ paths:
   - Fronius/Contracts/IFritzBoxService.cs
   - FroniusMonitor/App.xaml.cs
   - FroniusMonitor/Services/DataCollectionService.cs
+  - HomeAutomationServerTests/UnitTests/FritzBoxCertificateTests.cs
   - HomeAutomationServerTests/UnitTests/FritzBoxColorControlTests.cs
   - HomeAutomationServerTests/UnitTests/FritzBoxHttpClientTests.cs
   - HomeAutomationServerTests/UnitTests/FritzBoxSmartHomeMappingTests.cs
@@ -15,6 +16,7 @@ paths:
   - HomeAutomationServerTests/UnitTests/Fakes/FakeFritzBox.cs
   - HomeAutomationServer/Services/DataCollectors/FritzBoxDataCollector.cs
   - HomeAutomationServerTests/UnitTests/FritzBoxDataCollectorTests.cs
+  - HomeAutomationServerTests/SystemTests/FritzBoxSystemTests.cs
 ---
 
 # The FritzBox library: smart home over the REST API, AHA as the fallback
@@ -41,6 +43,7 @@ The old AHA client `Fronius/Services/FritzBoxService.cs` is deleted, and its two
 |---|---|
 | `Http/FritzBoxLogin.cs` | The response to the `login_sid.lua?version=2` challenge: PBKDF2 (`2$…`) or MD5. The tests hold it against AVM's published test vectors. |
 | `Http/FritzBoxHttpClient.cs` | One `HttpClient` per box, with the session ID. It logs in when it first needs to. On 401 or 403 it logs in again and repeats the request once. Also: `GetFritzOsVersionAsync` from `jason_boxinfo.xml`, which needs no login. |
+| `Http/UntrustedCertificatePolicy.cs` | What happens to a certificate the operating system does not trust: the optional pin (see "Things that bite"). |
 | `SmartHome/SmartHomeOverview.cs` | The REST JSON as far as it is read or written. The same interface classes serve as the PUT body. |
 | `SmartHome/SmartHomeClient.cs` | `GET smarthome/overview`, `PUT …/units/{UID}`, `POST …/templates/{UID}` (apply), `PUT …/triggers/{UID}` (enable). |
 | `SmartHome/SmartHomeMapper.cs` | Overview → `FritzBoxDeviceList`. |
@@ -127,6 +130,26 @@ says whether AHA and REST still agree.**
   `CommandSent`.
 - Only the server listens to that event.
 
+## Tests against the real box
+
+`HomeAutomationServerTests/SystemTests/FritzBoxSystemTests.cs`: eight `[SystemFact]` tests against
+`http://192.168.44.11`. They only run on a machine in the Neufahrn LAN, with
+`dotnet test --project HomeAutomationServerTests/HomeAutomationServerTests.csproj -c Debug -- --explicit only --filter-class "*FritzBoxSystemTests"`.
+
+The credentials come from the environment only:
+- `FRITZBOX_PASSWORD` (required)
+- `FRITZBOX_USER`: empty means the user who logged in last
+- `FRITZBOX_TEST_AIN`: an outlet that one test may switch over and back. Without it, that test is skipped.
+
+The tests do this:
+- They read the version, the overview and AHA.
+- They compare REST with AHA.
+- They write a routine with the state it already has, which changes nothing.
+- One test logs in with a wrong password on purpose, which costs a few seconds of block time on the box.
+- Nothing else in the house is switched.
+
+None of them has run yet: they were written in the cloud, where the box cannot be reached.
+
 ## Measured on the box in Neufahrn (FRITZ!OS 8.25), 2026-10-24
 
 - `jason_boxinfo.xml` answers without a login: `<j:Version>279.08.25</j:Version>`, which is hardware 279 and
@@ -151,13 +174,29 @@ says whether AHA and REST still agree.**
 
 ## Things that bite
 
-- **When the version cannot be read, AHA is used.** That covers a 404, an answer that is not XML (an HTML page, an
-  empty body), and a `j:Version` that is not `<hw>.<major>.<minor>`. AHA works on every box, so this is the safe
-  side. `XDocument.Parse` throws on what is not XML; without the catch, every call of the service would fail.
+- **When the version cannot be read, AHA is used for that call, and the next call asks again.**
+  - That covers a 404, an answer that is not XML (an HTML page, an empty body), and a `j:Version` that is not
+    `<hw>.<major>.<minor>`.
+  - AHA works on every box, so this is the safe side.
+  - `XDocument.Parse` throws on what is not XML. Without the catch, every call of the service would fail.
+  - The log says it once per connection, as a warning.
+- **A version that was read is kept for the connection.** A box updated to FRITZ!OS 8.20 while the server runs goes
+  on with AHA until the server restarts or the connection changes. AHA still works there, so nothing breaks.
 - `HttpClient.BaseAddress` needs the trailing `/`, otherwise a path in the base URL is lost. The service adds it.
   A `BaseUrl` that is not an absolute http or https address is refused with `InvalidOperationException` before
   anything is sent. Without that check an empty one would become `file:///` on Linux.
 - A level, temperature or color of NaN (the web API's `double` parameters let it through) is sent as the lowest
   allowed value, not as 0.
-- The service accepts the box's certificate unchecked, as the old AHA service did. Phase 1.4 of the plan changes
-  that.
+- **Certificates** (`Http/UntrustedCertificatePolicy.cs`): the operating system decides first, so a box addressed
+  by the name its certificate is for needs nothing. A certificate it does not trust (the box's self-signed one, at
+  `https://<IP>`) is checked against `WebConnection.CertificateFingerprint` (SHA-256 in hex, colons and case do not
+  matter):
+  - A different certificate is refused with an error that names both fingerprints.
+  - Without a pin, it is accepted as before, and the log names its fingerprint once per connection, ready to be
+    pinned.
+  - Christoph chose this "optional pin" on 2026-10-24, because the boxes are reached as `http://IP`, `https://IP`
+    and `https://<name>` and none of them may break.
+  - The pin is part of what makes the service build a new client, so changing it takes effect with the next call.
+  - Neither settings dialog shows it yet. It goes into the settings file by hand, as the attribute
+    `CertificateFingerprint` of the connection: the server's `Settings.xml` (`FritzBoxConnections`), or the WPF
+    app's settings (`FritzBoxConnection`).

@@ -14,8 +14,14 @@ paths:
 Status of 2026-10-24: phase 1.0 (the USP probe) is done. Push over USP works, but only for the outlets, and the
 lamps are missing from it entirely. **Step 1 therefore goes on without USP, over the Smart Home REST API.** The USP
 setup (Mosquitto on amazon2 and the controller on the box) stays for now, in case step 2 needs it for the Swiss
-box. **Phase 1.1 (the REST client) is done and tested live in Neufahrn. Phase 1.2 puts it into the HA server and
-phase 1.3 into the WPF app** (`.claude/memory/FritzBox.SmartHome.md`). Phases 1.4 and 1.5 are still to do.
+box. **Step 1 is done** (phases 1.1 to 1.5, `.claude/memory/FritzBox.SmartHome.md`):
+- the REST client, tested live in Neufahrn
+- in the HA server, which pushes changes only
+- in the WPF app
+- an optional certificate pin
+- system tests against the box, which have not run yet
+
+The server still has to be deployed.
 
 ## Where we are
 
@@ -120,14 +126,32 @@ Built as described below. How the collector works is in `.claude/memory/FritzBox
 - `DataCollectionService` uses the same library and the REST API, with AHA as the fallback.
 - The WPF app only builds and runs on Windows. In the cloud it is compile-checked with `-p:VerifyOnLinux=true`.
 
-### Phase 1.4 - Improve the HTTP path
+### Phase 1.4 - Improve the HTTP path (done)
+
+- `FritzBoxHttpClient` keeps one `HttpClient` per box, and the service throws `InvalidOperationException` for a
+  missing or unusable connection. Both came with phase 1.1.
+- **Certificates, decided on 2026-10-24: the pin is optional.** `WebConnection.CertificateFingerprint` (SHA-256) is
+  checked when it is set. Without it, a certificate the system does not trust is still accepted, and the log names
+  its fingerprint once. Christoph chose this over refusing unpinned certificates, because the boxes are reached as
+  `http://IP`, `https://IP` and `https://<name>` today, and the update must not break any of them. A certificate the
+  system trusts, as for a name like `hgm-fs.dns.army`, needs no pin.
+
+The original points:
 
 - **HTTP client:** one `HttpClient` per box instead of a new one per request.
 - **Certificates:** `ServerCertificateCustomValidationCallback` currently accepts any certificate. Address the box by
   the name its certificate is for (`hgm-fs.dns.army` in Neufahrn), or pin the certificate.
 - **Missing connection:** throw `InvalidOperationException` instead of throwing `NullReferenceException` by hand.
 
-### Phase 1.5 - Tests and documentation
+### Phase 1.5 - Tests and documentation (done)
+
+- Unit tests for every part, and `FritzBoxSystemTests` with eight `[SystemFact]` tests against the box in Neufahrn.
+  They need `FRITZBOX_PASSWORD` and have not run yet (see `.claude/memory/FritzBox.SmartHome.md`).
+- `FritzBox.SmartHome.md` is the document for the REST client. `UpdateVisibility.Lifecycle.md` (1.2) and
+  `Fronius.SharedLibraryBoundary.md` (1.3) are updated.
+- With **step 1 done**, what is left of it is deploying the server and running the system tests in Neufahrn.
+
+The original points:
 
 - **xUnit tests in `HomeAutomationServerTests`:**
   - the REST JSON mapped onto `FritzBoxDevice`, from a sanitized overview of the box

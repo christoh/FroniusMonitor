@@ -127,6 +127,11 @@ public sealed class FritzBoxSmartHomeService : IFritzBoxService, IDisposable
         CommandSent?.Invoke(this, EventArgs.Empty);
     }
 
+    /// <summary>
+    /// Whether the box has the REST API, from its FRITZ!OS version. A version that was read is remembered for the
+    /// connection. One that could not be read (an error page, a box busy restarting) is not: that call goes over AHA,
+    /// which every box has, and the next one asks again.
+    /// </summary>
     private async ValueTask<bool> UsesRestApiAsync(Box current, CancellationToken token)
     {
         if (current.UsesRestApi is { } known)
@@ -134,12 +139,22 @@ public sealed class FritzBoxSmartHomeService : IFritzBoxService, IDisposable
             return known;
         }
 
-        var version = await current.Http.GetFritzOsVersionAsync(token).ConfigureAwait(false);
+        if (await current.Http.GetFritzOsVersionAsync(token).ConfigureAwait(false) is not { } version)
+        {
+            if (!current.ReportedUnknownVersion && logger.IsEnabled(LogLevel.Warning))
+            {
+                logger.LogWarning("FRITZ!Box at {BaseUri} does not tell its FRITZ!OS version: using the AHA interface until it does", current.BaseUri);
+            }
+
+            current.ReportedUnknownVersion = true;
+            return false;
+        }
+
         var usesRestApi = version >= restApiVersion;
 
         if (logger.IsEnabled(LogLevel.Information))
         {
-            logger.LogInformation("FRITZ!Box at {BaseUri} runs FRITZ!OS {Version}: using the {Interface}", current.BaseUri, version?.ToString() ?? "(unknown)", usesRestApi ? "Smart Home REST API" : "AHA interface");
+            logger.LogInformation("FRITZ!Box at {BaseUri} runs FRITZ!OS {Version}: using the {Interface}", current.BaseUri, version, usesRestApi ? "Smart Home REST API" : "AHA interface");
         }
 
         current.FritzOsVersion = version;
@@ -151,7 +166,7 @@ public sealed class FritzBoxSmartHomeService : IFritzBoxService, IDisposable
     private Box GetBox()
     {
         var connection = Connection ?? throw new InvalidOperationException("No FRITZ!Box connection is set");
-        var key = (connection.BaseUrl, connection.UserName, connection.Password);
+        var key = (connection.BaseUrl, connection.UserName, connection.Password, connection.CertificateFingerprint);
 
         if (!Uri.TryCreate(connection.BaseUrl.TrimEnd('/') + "/", UriKind.Absolute, out var baseUri) || baseUri.Scheme != Uri.UriSchemeHttp && baseUri.Scheme != Uri.UriSchemeHttps)
         {
@@ -172,8 +187,7 @@ public sealed class FritzBoxSmartHomeService : IFritzBoxService, IDisposable
                 BaseUri = baseUri,
                 UserName = connection.UserName,
                 Password = connection.Password,
-                // The box's own certificate is self-signed. It has always been accepted unchecked.
-                AcceptUntrustedCertificate = _ => true,
+                AcceptUntrustedCertificate = new UntrustedCertificatePolicy(baseUri, connection.CertificateFingerprint, logger).Accept,
             });
 
             return box = new Box(key, http);
@@ -184,17 +198,18 @@ public sealed class FritzBoxSmartHomeService : IFritzBoxService, IDisposable
     private static int ToRange(double value, int minimum, int maximum) => double.IsNaN(value) ? minimum : (int)Math.Clamp(Math.Round(value, MidpointRounding.AwayFromZero), minimum, maximum);
 
     /// <summary>One connection to one box, with what was learned about it.</summary>
-    private sealed class Box((string, string, string) key, FritzBoxHttpClient http) : IDisposable
+    private sealed class Box((string, string, string, string?) key, FritzBoxHttpClient http) : IDisposable
     {
         /// <summary>The unit UIDs of the REST API by their AIN without spaces, as callers may write it either way.</summary>
         private readonly ConcurrentDictionary<string, string> unitUids = new();
 
-        public (string, string, string) Key => key;
+        public (string, string, string, string?) Key => key;
         public FritzBoxHttpClient Http => http;
         public SmartHomeClient SmartHome { get; } = new(http);
         public Uri BaseUri { get; } = http.BaseUri;
         public bool? UsesRestApi { get; set; }
         public Version? FritzOsVersion { get; set; }
+        public bool ReportedUnknownVersion { get; set; }
 
         public static string Compact(string ain) => ain.Replace(" ", string.Empty, StringComparison.Ordinal);
 
