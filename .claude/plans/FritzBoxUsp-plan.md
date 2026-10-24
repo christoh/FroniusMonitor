@@ -19,7 +19,7 @@ box. **Step 1 is done** (phases 1.1 to 1.5, `.claude/memory/FritzBox.SmartHome.m
 - in the HA server, which pushes changes only
 - in the WPF app
 - an optional certificate pin
-- system tests against the box, which have not run yet
+- system tests against the box, green from the cloud on 2026-10-24
 
 The server still has to be deployed.
 
@@ -146,7 +146,8 @@ The original points:
 ### Phase 1.5 - Tests and documentation (done)
 
 - Unit tests for every part, and `FritzBoxSystemTests` with eight `[SystemFact]` tests against the box in Neufahrn.
-  They need `FRITZBOX_PASSWORD` and have not run yet (see `.claude/memory/FritzBox.SmartHome.md`).
+  They need `FRITZBOX_PASSWORD`. On 2026-10-24 they ran from the cloud against `https://fritzbox.hochstaetter.de`:
+  7 passed, and the switching test was skipped (see `.claude/memory/FritzBox.SmartHome.md`).
 - `FritzBox.SmartHome.md` is the document for the REST client. `UpdateVisibility.Lifecycle.md` (1.2) and
   `Fronius.SharedLibraryBoundary.md` (1.3) are updated.
 - With **step 1 done**, what is left of it is deploying the server and running the system tests in Neufahrn.
@@ -186,8 +187,12 @@ Verify --(IPv4 still down)--> Backoff --> DisableIpv6 (limited, see below)
     answers through the tunnel (checked on 2026-10-24).
   - Public IPv4 178.21.230.55 (fixed) and IPv6 2a01:aec0:8000:1::788d, the A and AAAA records of
     `li9ldnoisizdei41.myfritz.net`.
-  - Also reachable as `https://fritzbox.hochstaetter.de/` through nginx on AWS (A 3.77.190.163, AAAA
-    2a05:d014:9eb:d01:1b::2), over HTTPS only.
+  - Also reachable as `https://fritzbox.hochstätter.ch/` (`fritzbox.xn--hochsttter-v5a.ch`), over HTTPS with a
+    certificate the system trusts. On 2026-10-24 it answered `jason_boxinfo.xml` with 400, which step 2 has to look
+    at.
+  - **Not** `https://fritzbox.hochstaetter.de/`: that is the box in Neufahrn, through nginx on AWS (A 3.77.190.163,
+    AAAA 2a05:d014:9eb:d01:1b::2), with the same serial number as 192.168.44.11. This plan had the two mixed up until
+    Christoph set it right on 2026-10-24.
   - FRITZ! does not allow a port forwarding to the box itself.
 - **The tunnel probably goes down together with IPv4**, so it is no way in during an outage. Which address family
   the WireGuard tunnel uses is still to be found out.

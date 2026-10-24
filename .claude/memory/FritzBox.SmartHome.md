@@ -132,11 +132,17 @@ says whether AHA and REST still agree.**
 
 ## Tests against the real box
 
-`HomeAutomationServerTests/SystemTests/FritzBoxSystemTests.cs`: eight `[SystemFact]` tests against
-`http://192.168.44.11`. They only run on a machine in the Neufahrn LAN, with
+`HomeAutomationServerTests/SystemTests/FritzBoxSystemTests.cs`: eight `[SystemFact]` tests against the box in
+Neufahrn. Run them with
 `dotnet test --project HomeAutomationServerTests/HomeAutomationServerTests.csproj -c Debug -- --explicit only --filter-class "*FritzBoxSystemTests"`.
+The box is `http://192.168.44.11` in the LAN by default.
+
+**From anywhere else, the cloud included, `FRITZBOX_URL=https://fritzbox.hochstaetter.de` reaches the same box.**
+- It goes through nginx on AWS, with a certificate the system trusts.
+- Do not confuse it with `fritzbox.hochstätter.ch`, which is the Swiss box.
 
 The credentials come from the environment only:
+- `FRITZBOX_URL`: the box's web interface. Unset means `http://192.168.44.11`.
 - `FRITZBOX_PASSWORD` (required)
 - `FRITZBOX_USER`: empty means the user who logged in last
 - `FRITZBOX_TEST_AIN`: an outlet that one test may switch over and back. Without it, that test is skipped.
@@ -148,7 +154,9 @@ The tests do this:
 - One test logs in with a wrong password on purpose, which costs a few seconds of block time on the box.
 - Nothing else in the house is switched.
 
-None of them has run yet: they were written in the cloud, where the box cannot be reached.
+They ran green from the cloud on 2026-10-24, against `https://fritzbox.hochstaetter.de`:
+- 7 passed.
+- The switching test was skipped, because no `FRITZBOX_TEST_AIN` was set.
 
 ## Measured on the box in Neufahrn (FRITZ!OS 8.25), 2026-10-24
 

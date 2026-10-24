@@ -10,8 +10,9 @@ namespace De.Hochstaetter.HomeAutomationServerTests.SystemTests;
 
 /// <summary>
 /// The FritzBox library against the real FRITZ!Box in Neufahrn (FRITZ!OS 8.25, 17 smart home units: 13 outlets and 4
-/// lamps when it was measured), reached over the LAN at <c>http://192.168.44.11</c>. They run on the developer's
-/// machine only; nothing here can run in the cloud.
+/// lamps when it was measured), by default over the LAN at <c>http://192.168.44.11</c>. From elsewhere, the cloud
+/// included, <c>FRITZBOX_URL=https://fritzbox.hochstaetter.de</c> reaches the same box through nginx on AWS, with a
+/// certificate the system trusts.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -19,6 +20,7 @@ namespace De.Hochstaetter.HomeAutomationServerTests.SystemTests;
 /// to be restarted after the variable is set) holds them:
 /// </para>
 /// <list type="bullet">
+/// <item><c>FRITZBOX_URL</c>: the box's web interface. Unset means <c>http://192.168.44.11</c>.</item>
 /// <item><c>FRITZBOX_PASSWORD</c>: the password of the box user. Required by every test that logs in; the one that does
 /// not (the version) works without it.</item>
 /// <item><c>FRITZBOX_USER</c>: the box user. Empty or unset means the user the box names as the last one to log in.</item>
@@ -37,12 +39,16 @@ namespace De.Hochstaetter.HomeAutomationServerTests.SystemTests;
 /// </remarks>
 public sealed class FritzBoxSystemTests(ITestOutputHelper output) : IDisposable
 {
-    private const string BoxUrl = "http://192.168.44.11";
+    private const string UrlVariable = "FRITZBOX_URL";
+    private const string LanUrl = "http://192.168.44.11";
     private const string PasswordVariable = "FRITZBOX_PASSWORD";
     private const string UserVariable = "FRITZBOX_USER";
     private const string TestAinVariable = "FRITZBOX_TEST_AIN";
 
     private static readonly Version restApiVersion = new(8, 20);
+
+    /// <summary>The box's web interface, from <c>FRITZBOX_URL</c> or the LAN address of the box in Neufahrn.</summary>
+    private static string BoxUrl => Environment.GetEnvironmentVariable(UrlVariable) is { Length: > 0 } url ? url.TrimEnd('/') : LanUrl;
     private static readonly TimeSpan pollInterval = TimeSpan.FromMilliseconds(500);
     private static readonly TimeSpan pollTimeout = TimeSpan.FromSeconds(10);
     private static readonly XmlSerializer ahaSerializer = new(typeof(FritzBoxDeviceList));
