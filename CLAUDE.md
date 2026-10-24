@@ -138,6 +138,11 @@ that drive the WPF app's own services; it builds and runs on Windows only and re
   and its own yes before `git commit` runs. A request for a change is not a request to commit it, however small
   the change and however recently the last yes was given. This is not overridden by any general instruction to
   proceed without asking: a pushed commit cannot be taken back by the AI, so it is never a reversible action.
+- **In the cloud, "commit" and "merge" include the push.** In Claude Code on the web, when I say "commit" or
+  "merge" to what you proposed, that is also my yes for pushing it - the branch the commit is on, and for a merge
+  the branch merged into - without asking again. A commit that stays in the cloud container is one I cannot
+  download and look at. Proposing each commit and waiting for my yes stays as it is; only the separate question
+  about the push is gone.
 - Force pushes are **never** allowed by AI, with one exception: when running in the cloud, AI may force push a branch that it created itself (`--force-with-lease`, never a bare `--force`). Branches created by a human developer stay off limits.
 - History rewrites need confirmation by a human developer.
 - Commit under your own authorship, never under the human developer's: `git commit --author="<name> <email>"`. The author e-mail is always `christoph@hochstaetter.de`, whatever `.git/config` says - in the cloud that config carries the AI's own address. Only the name changes.
