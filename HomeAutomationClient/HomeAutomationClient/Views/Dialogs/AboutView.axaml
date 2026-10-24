@@ -1,0 +1,47 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:p="clr-namespace:De.Hochstaetter.Fronius.Localization;assembly=Fronius"
+             xmlns:webApi="clr-namespace:De.Hochstaetter.Fronius.Models.WebApi;assembly=Fronius"
+             xmlns:dialogs="clr-namespace:De.Hochstaetter.HomeAutomationClient.ViewModels.Dialogs"
+             xmlns:co="clr-namespace:De.Hochstaetter.HomeAutomationClient.Converters"
+             mc:Ignorable="d" d:DesignWidth="420" d:DesignHeight="320"
+             x:Class="De.Hochstaetter.HomeAutomationClient.Views.Dialogs.AboutView"
+             x:DataType="dialogs:AboutViewModel" MinWidth="300">
+    <UserControl.DataTemplates>
+        <!-- One build, the app's own or the server's: the lines of the About box of the WPF app. Version and build
+             can be selected, so that they can be copied into a bug report. -->
+        <DataTemplate DataType="webApi:WebApiInfo">
+            <StackPanel Spacing="2">
+                <TextBlock Margin="0,0,0,6" FontSize="14" FontWeight="Medium" Text="{Binding ProductName}" />
+                <SelectableTextBlock>
+                    <Run Text="{x:Static p:Resources.Version}" />
+                    <Run Text="{Binding Version, Mode=OneWay}" />
+                    <Run Text="{Binding CommitTime, Mode=OneWay, StringFormat='({0:G} UTC)'}" />
+                </SelectableTextBlock>
+                <TextBlock TextWrapping="Wrap">
+                    <Run Text="{Binding DotNetVersion, Mode=OneWay}" />
+                    <Run Text="/" />
+                    <Run Text="{Binding OsVersion, Mode=OneWay}" />
+                    <Run Text="{Binding OsArch, Mode=OneWay, StringFormat='({0})'}" />
+                </TextBlock>
+                <TextBlock Text="{Binding Manufacturer, StringFormat='© {0}'}" />
+                <SelectableTextBlock Text="{Binding BuildInfo}" />
+            </StackPanel>
+        </DataTemplate>
+    </UserControl.DataTemplates>
+
+    <StackPanel Margin="16" Spacing="12">
+        <ContentControl Content="{Binding Client}" />
+
+        <!-- Not where the server did not answer: what it did say instead was a message box of its own. -->
+        <StackPanel Spacing="12" IsVisible="{Binding Server, Converter={co:NullToBool}}">
+            <Separator />
+            <ContentControl Content="{Binding Server}" />
+        </StackPanel>
+
+        <Button MinWidth="70" HorizontalAlignment="Right" HorizontalContentAlignment="Center" IsDefault="True"
+                Content="{x:Static p:Resources.Ok}" Command="{Binding CloseDialogCommand}" />
+    </StackPanel>
+</UserControl>

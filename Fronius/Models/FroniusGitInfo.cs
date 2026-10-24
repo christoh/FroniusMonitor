@@ -11,4 +11,12 @@ public class FroniusGitInfo
     public static bool IsDirty => ThisAssembly.Git.IsDirty; // True, if it was build with uncommited changes
 
     public static string CommitId => ThisAssembly.Git.Sha;
+
+    public static string Branch => ThisAssembly.Git.Branch;
+
+#if DEBUG
+    public const string Configuration = "Debug";
+#else
+    public const string Configuration = "Release";
+#endif
 }

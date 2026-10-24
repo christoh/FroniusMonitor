@@ -1,3 +1,4 @@
+using System.Windows.Input;
 using De.Hochstaetter.Fronius;
 using De.Hochstaetter.HomeAutomationClient.Contracts;
 using De.Hochstaetter.HomeAutomationClient.Models.Dialogs;
@@ -132,18 +133,32 @@ public sealed class MainViewPresenterTests
     {
         var mainViewModel = Start();
 
+        ICommand[] gated =
+        [
+            mainViewModel.SettingsCommand, mainViewModel.ShowEnergyChartCommand, mainViewModel.ShowSolarWebChartCommand,
+            mainViewModel.ShowAboutCommand, mainViewModel.ChangePasswordCommand, mainViewModel.LogoutCommand,
+        ];
+
+        // A menu item asks a command again only when the command says it may have changed, so asking the command
+        // here is not enough: each one has to say so as well. The Solar.web chart did not until 2026-10-24, and its
+        // menu item stayed enabled over an open dialog.
+        var announced = new HashSet<ICommand>();
+
+        foreach (var command in gated)
+        {
+            command.CanExecuteChanged += (sender, _) => announced.Add((ICommand)sender!);
+        }
+
         Assert.True(mainViewModel.CanOpenDialog);
-        Assert.True(mainViewModel.SettingsCommand.CanExecute(null));
+        Assert.All(gated, command => Assert.True(command.CanExecute(null)));
 
         var dialog = new TestDialog(new DialogParameters { Title = "Settings" });
         var shown = dialog.ShowDialogAsync();
         await HeadlessAvalonia.SettleAsync();
 
         Assert.False(mainViewModel.CanOpenDialog);
-        Assert.False(mainViewModel.SettingsCommand.CanExecute(null));
-        Assert.False(mainViewModel.ShowEnergyChartCommand.CanExecute(null));
-        Assert.False(mainViewModel.ChangePasswordCommand.CanExecute(null));
-        Assert.False(mainViewModel.LogoutCommand.CanExecute(null));
+        Assert.All(gated, command => Assert.False(command.CanExecute(null)));
+        Assert.All(gated, command => Assert.Contains(command, announced));
 
         // Switching pages stays allowed while a dialog is up; that is what the menu bar is left usable for.
         Assert.True(mainViewModel.ShowDetailsCommand.CanExecute(null));
@@ -152,8 +167,7 @@ public sealed class MainViewPresenterTests
         dialog.Accept();
         await HeadlessAvalonia.SettleAsync();
 
-        Assert.True(mainViewModel.SettingsCommand.CanExecute(null));
-        Assert.True(mainViewModel.ShowEnergyChartCommand.CanExecute(null));
+        Assert.All(gated, command => Assert.True(command.CanExecute(null)));
         await shown;
     });
 

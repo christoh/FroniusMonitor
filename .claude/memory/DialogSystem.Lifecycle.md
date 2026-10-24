@@ -110,17 +110,25 @@ its previous run is still pending, and a run that awaits `ShowDialogAsync` is pe
 on screen - which used to be a modal moment and is now a window the user leaves standing. Without the flag the
 menu entry or button is **disabled** for exactly that time, so a second settings dialog could never be opened and
 clicking Electricity price while its window was up did nothing at all, not even bring it to the front. It carries
-Seven commands need the flag today: `MainViewModel.Settings`, `ChangePassword`, `ShowEnergyChart` and `ShowSolarWebChart`,
-`EnergyChartViewModel.ShowPriceComponents`, `UserManagementViewModel.Add` and `Edit`. (`ShowPowerFlow` opens a
-page, not a dialog, and needs neither the flag nor the gate.)
+Eight commands need the flag today: `MainViewModel.Settings`, `ChangePassword`, `ShowEnergyChart`, `ShowSolarWebChart`
+and `ShowAbout`, `EnergyChartViewModel.ShowPriceComponents`, `UserManagementViewModel.Add` and `Edit`. (`ShowPowerFlow`
+opens a page, not a dialog, and needs neither the flag nor the gate.)
 
 **The flag on its own is too much, though.** The menu bar is the one thing a modal dialog does not disable - the
 dimming layer sits in the content row, not over the bar - so on a head with one dialog frame the disabled command
-was the only thing keeping a second settings dialog off the first. The four commands of the menu bar are therefore
-gated on `MainViewModel.CanOpenDialog`, which asks `IDialogPresenter.ShowsDialogsInMainView`: where one frame shows
-one dialog at a time nothing may be opened over it, and where every dialog gets a window everything may. `Logout`
-is gated the same way and is deliberately **not** concurrent - it shows a modal confirmation and then tears the
-session down, and logging out with a settings dialog on the frame would leave that dialog queued under the login.
+was the only thing keeping a second settings dialog off the first. The commands of the menu bar that open a dialog
+are therefore gated on `MainViewModel.CanOpenDialog`, which asks `IDialogPresenter.ShowsDialogsInMainView`: where one
+frame shows one dialog at a time nothing may be opened over it, and where every dialog gets a window everything
+may. `Logout` is gated the same way and is deliberately **not** concurrent - it shows a modal confirmation and then
+tears the session down, and logging out with a settings dialog on the frame would leave that dialog queued under
+the login.
+
+**The gate needs its command named in `[NotifyCanExecuteChangedFor]` on `CurrentDialog` as well.** A menu item asks
+`CanExecute` again only when the command raises `CanExecuteChanged`, and `CanOpenDialog` is a calculated property
+that raises nothing of its own. `ShowSolarWebChart` had the gate but was missing from that list until 2026-10-24,
+so its entry stayed enabled over an open dialog in the frame - while asking the command directly said false, which
+is why a test that only calls `CanExecute` cannot see it. `MainViewPresenterTests.The_menu_bar_may_not_open_a_second_dialog_over_the_first`
+now listens for the event on every gated command.
 
 **Switching pages stays allowed while a dialog is up.** That is what the menu bar is left usable for, and only the
 commands that would open a second dialog are held back. The commands *inside* a dialog need no gate: `MainView`

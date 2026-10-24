@@ -101,7 +101,9 @@ public sealed partial class MainViewModel : ViewModelBase, IPowerDisplayOptions
     /// <remarks>
     /// The menu bar is the one thing a modal dialog does not disable, on purpose - switching to another device's
     /// detail page while a dialog is open is allowed and stays allowed. Only what would open a second dialog is
-    /// held back, which is why this is on the four commands that do rather than on the bar.
+    /// held back, which is why this is on the commands that do rather than on the bar. Each of them also has to be
+    /// named in the <c>NotifyCanExecuteChangedFor</c> of <see cref="CurrentDialog"/>: this property raises nothing
+    /// of its own, so a menu item would never ask again.
     /// </remarks>
     public bool CanOpenDialog => !dialogPresenter.ShowsDialogsInMainView || !IsDialogVisible;
 
@@ -190,7 +192,7 @@ public sealed partial class MainViewModel : ViewModelBase, IPowerDisplayOptions
     public bool IsModalDialogVisible => CurrentDialog is { Parameters.IsModal: true };
 
     [ObservableProperty, NotifyPropertyChangedFor(nameof(IsDialogVisible), nameof(IsDialogBusy), nameof(IsModalDialogVisible), nameof(CanOpenDialog))]
-    [NotifyCanExecuteChangedFor(nameof(SettingsCommand), nameof(ShowEnergyChartCommand), nameof(ChangePasswordCommand), nameof(LogoutCommand))]
+    [NotifyCanExecuteChangedFor(nameof(SettingsCommand), nameof(ShowEnergyChartCommand), nameof(ShowSolarWebChartCommand), nameof(ShowAboutCommand), nameof(ChangePasswordCommand), nameof(LogoutCommand))]
     public partial DialogQueueItem? CurrentDialog { get; set; }
 
     public ConcurrentStack<DialogQueueItem?> DialogQueue { get; } = new();
@@ -496,6 +498,27 @@ public sealed partial class MainViewModel : ViewModelBase, IPowerDisplayOptions
 
     /// <summary>Where <c>MapOpenApi</c> serves the document, relative to the root of the server.</summary>
     private const string OpenApiDocumentPath = "openapi/v1.json";
+
+    /// <summary>
+    /// The About box: this app and the server. What the server says about itself is asked for before the dialog goes
+    /// up, so the dialog shows what it has and loads nothing; a server that does not answer gets a message box of
+    /// its own, and the dialog then shows this app alone.
+    /// </summary>
+    // Concurrently, for the same reason as ShowEnergyChart: the command is pending for as long as the window is open.
+    [RelayCommand(AllowConcurrentExecutions = true, CanExecute = nameof(CanOpenDialog))]
+    private Task ShowAbout() => TaskExceptionHandler(async () =>
+    {
+        BusyText = string.Empty;
+        var server = await webClient.GetServerInfo().ConfigureAwait(true);
+        BusyText = null;
+
+        if (server.Status != HttpStatusCode.OK)
+        {
+            await ShowHttpError(server).ConfigureAwait(true);
+        }
+
+        await new AboutViewModel(new DialogParameters { Title = Loc.About }, server.Payload).ShowDialogAsync().ConfigureAwait(true);
+    });
 
     /// <summary>
     /// A firmware status from the server, on the hub's thread or from the catch-up. Where it names outdated firmware the
