@@ -117,7 +117,8 @@ a changed forecast is expanded (`ExpandWattPilotPrices`), stored under `Source =
 `EnergyHistoryStore` in the server, SQLite via `Microsoft.Data.Sqlite`, the contract `IEnergyHistoryStore` in
 the server too, so the collector and the tests do not know SQLite. Since 2026-09-20 the plumbing - connection
 string, the `user_version` upgrade steps, one writer at a time, `WriteAsync`, `WriteInTransactionAsync`,
-`ReadAsync` - is `SqliteStoreBase`, shared with the Solar.web chart cache ([[SolarWeb]]); the store itself is
+`ReadAsync` - is `SqliteStoreBase`, shared with the Solar.web chart cache ([[SolarWeb]]) and, since 2026-10-27, the
+IPv4 watchdog's outage log ([[FritzBox.Ipv4Watchdog]]); the store itself is
 the schema and the queries. **The file is next to the executable in `history/`**,
 which the Dockerfile creates and `chown`s to `app`; `docker-compose.yml` shows the mount. Yesterday and older is
 final: `GetDayAsync` serves it from the store and asks Awattar only for what the store lacks, once.

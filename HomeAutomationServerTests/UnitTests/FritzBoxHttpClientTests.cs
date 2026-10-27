@@ -18,8 +18,8 @@ public sealed class FritzBoxHttpClientTests : IDisposable
     private const string OverviewPath = "/api/v0/smarthome/overview";
     private const string Overview = """{"units":[{"UID":"11630 0015376","name":"Desk lamp"}]}""";
     private const string DeviceList = """<devicelist version="1"><device identifier="11630 0015376"/></devicelist>""";
-    private const string LastUserFirst = """<User last="1">christoh</User><User>other</User>""";
-    private const string LastUserSecond = """<User>other</User><User last="1">christoh</User>""";
+    private const string LastUserFirst = """<User last="1">alice</User><User>other</User>""";
+    private const string LastUserSecond = """<User>other</User><User last="1">alice</User>""";
 
     private static readonly TimeSpan defaultMaximumBlockTime = new FritzBoxHttpClientOptions { BaseUri = FakeBox.BaseUri, Password = string.Empty }.MaximumBlockTime;
 
@@ -101,7 +101,7 @@ public sealed class FritzBoxHttpClientTests : IDisposable
 
         var post = Assert.Single(box.LoginPosts);
         Assert.Equal("application/x-www-form-urlencoded", post.ContentType);
-        Assert.Equal("christoh", post.Field("username"));
+        Assert.Equal("alice", post.Field("username"));
         Assert.Equal("5A1722$1798a1672bca7c6463d6b245f82b53703b0f50813401b03e4045a5861e689adb", post.Field("response"));
     }
 
@@ -211,7 +211,7 @@ public sealed class FritzBoxHttpClientTests : IDisposable
 
         await client.GetRestAsync("smarthome/overview", TestContext.Current.CancellationToken);
 
-        Assert.Equal("christoh", Assert.Single(box.LoginPosts).Field("username"));
+        Assert.Equal("alice", Assert.Single(box.LoginPosts).Field("username"));
     }
 
     [Theory]
@@ -344,7 +344,7 @@ public sealed class FritzBoxHttpClientTests : IDisposable
 
         var exception = await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.GetRestAsync("smarthome/overview", TestContext.Current.CancellationToken));
 
-        Assert.Contains("christoh", exception.Message);
+        Assert.Contains("alice", exception.Message);
         Assert.Single(box.LoginPosts);
         Assert.Empty(box.Requests);
     }

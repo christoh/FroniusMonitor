@@ -43,7 +43,7 @@ The old AHA client `Fronius/Services/FritzBoxService.cs` is deleted, and its two
 |---|---|
 | `Http/FritzBoxLogin.cs` | The response to the `login_sid.lua?version=2` challenge: PBKDF2 (`2$…`) or MD5. The tests hold it against AVM's published test vectors. |
 | `Http/FritzBoxHttpClient.cs` | One `HttpClient` per box, with the session ID. It logs in when it first needs to. On 401 or 403 it logs in again and repeats the request once. Also: `GetFritzOsVersionAsync` from `jason_boxinfo.xml`, which needs no login. |
-| `Http/UntrustedCertificatePolicy.cs` | What happens to a certificate the operating system does not trust: the optional pin (see "Things that bite"). |
+| `Http/UntrustedCertificatePolicy.cs` | What happens to a certificate the operating system does not trust: the optional pin (see "Things that bite"). Public since 2026-10-27, because the IPv4 watchdog uses it too ([[FritzBox.Ipv4Watchdog]]). |
 | `SmartHome/SmartHomeOverview.cs` | The REST JSON as far as it is read or written. The same interface classes serve as the PUT body. |
 | `SmartHome/SmartHomeClient.cs` | `GET smarthome/overview`, `PUT …/units/{UID}`, `POST …/templates/{UID}` (apply), `PUT …/triggers/{UID}` (enable). |
 | `SmartHome/SmartHomeMapper.cs` | Overview → `FritzBoxDeviceList`. |

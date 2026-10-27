@@ -54,14 +54,16 @@ connector, and Christoph confirmed it at the lamps (`.claude/memory/FritzBox.Sma
 | # | Question | Answer |
 |---|---|---|
 | D1 | FRITZ!OS version and box model? | FRITZ!Box 5690 Pro with FRITZ!OS 8.25 (`info`, 2026-10-24). The REST API (8.20) is there. |
-| D2 | Which MQTT broker? | Mosquitto on amazon2 (AWS), with TLS on port 8883 and the Let's Encrypt certificate of `amazon2.hochstaetter.de`, set up on 2026-10-24 for the probe. Files in `Tools/FritzBoxUspProbe/amazon2`. Not used by step 1. |
+| D2 | Which MQTT broker? | Mosquitto on amazon2 (AWS), with TLS on port 8883 and the Let's Encrypt certificate of `amazon2.hochstaetter.de`, set up on 2026-10-24 for the probe. Not used by step 1. Removed on 2026-10-27 (D9); its files are in commit `2e576ad`. |
 | D3 | Where does the Fritz!Box code live? | `FritzBox/FritzBox.csproj`: TR-064, USP, and now the REST client. It is not part of `Fronius`, because the Avalonia client does not use it. The device models (`FritzBoxDevice` and its parts) stay in `Fronius`. |
 | D4 | Does the box ask for a confirmation (button or phone)? | The box in Neufahrn has it **on** (`X_AVM-DE_Auth:GetInfo`, 2026-10-24). Adding the USP controller needed one button press. Whether the Swiss box asks when IPv6 is switched in its web UI is still to be checked. |
 | D5 | How does the HA server reach the box of step 2? | It is a different box, in Switzerland. The HA server and the smart-home box (192.168.44.11) are in Neufahrn. Step 2 below is written for that. |
 | D6 | Is the probe of phase 1.0 committed? | `Tools/FritzBoxUspProbe` on `feature/fritzbox-usp`. Its findings are in `.claude/memory/FritzBox.Usp.md`. It can go once step 2 has decided about USP. |
 | D7 | TR-069 on the box? | Switched off by Christoph. Not needed. |
 | D8 | USP or REST API for step 1? | The REST API, proposed on 2026-10-24 after the probe. USP stays an option for the switch states only (see the end of step 1). |
-| D9 | What happens to the USP setup? | It stays: Mosquitto and the security group `mosquitto-mqtts` on amazon2, and the controller `fqdn:hochstaetter.de:home-automation` on the box in Neufahrn. Christoph decided this on 2026-10-24, because step 2 may need USP for the Swiss box. It is removed once step 2 has decided against it. |
+| D9 | What happens to the USP setup? | **Removed on 2026-10-27**, on Christoph's word, because step 2 does not need it (D10): the controller `fqdn:hochstaetter.de:home-automation` on the box in Neufahrn, Mosquitto with its certificate job on amazon2, and the security group `mosquitto-mqtts`. It had stayed since 2026-10-24 in case step 2 needed USP for the Swiss box. The library code and the probe stay. |
+| D10 | How does step 2 switch IPv6? | **The web UI's own request** (Christoph, 2026-10-27): `PUT /api/v0/generic/sync_groups/sg/sg1001` with `Authorization: AVM-SID <sid>`, `"ipv6_mode": "ipv6_off"` to switch off and `"ipv6_automatic"` to switch on. Captured in the browser on the Swiss box (FRITZ!OS 8.25). The web UI sends the box's whole IPv6 group, but `{"ipv6_mode": "…"}` alone does the same and leaves every other field as it was (live test, 2026-10-27). It needs no confirmation and answers 200. The UI no longer uses `data.lua` for this. USP cannot do it: `Device.IP.IPv6Enable` is read-only (see Step 2). |
+| D11 | What does the first stage of step 2 contain? | Christoph, 2026-10-27: **the watchdog and its outage log** (SQLite under `history`, and the server log). The notification in the client comes later. **At most 3 cycles per hour**, then it waits. **A test trigger** for `Operator`, which runs a cycle while IPv4 works, so that the installed watchdog can be tried without an outage. **A box user of its own** for the HA server, which Christoph creates on the Swiss box; its password goes into `Settings.xml` on the server only. |
 
 ## Step 1 - Better smart home in the HA server and the WPF app
 
@@ -186,48 +188,138 @@ Verify --(IPv4 still down)--> Backoff --> DisableIpv6 (limited, see below)
 
 ### The setting
 
-- **The HA server** is in Neufahrn (192.168.44.50). **The box with the IPv4 problem** is in Switzerland:
-  - LAN 192.168.3.1, reachable from Neufahrn through the site-to-site WireGuard tunnel of the two boxes. TR-064
-    answers through the tunnel (checked on 2026-10-24).
-  - Public IPv4 178.21.230.55 (fixed) and IPv6 2a01:aec0:8000:1::788d, the A and AAAA records of
-    `li9ldnoisizdei41.myfritz.net`.
-  - Also reachable as `https://fritzbox.hochstätter.ch/` (`fritzbox.xn--hochsttter-v5a.ch`), over HTTPS with a
-    certificate the system trusts. On 2026-10-24 it answered `jason_boxinfo.xml` with 400, which step 2 has to look
-    at.
+- **The HA server** is in Neufahrn (192.168.44.50). It has IPv6 to the internet (Christoph checked with `ping -6`
+  on 2026-10-27).
+- **The box with the IPv4 problem** is in Switzerland:
+  - **FRITZ!Box 7590, FRITZ!OS 8.25** (`154.08.25`, checked on 2026-10-27). So it has the REST API and the TR-064
+    services `WANPPPConnection`, `WANIPConnection`, `X_AVM-DE_Auth` and `X_AVM-DE_USPController`.
+  - LAN 192.168.3.1, reachable from Neufahrn and from amazon2 through WireGuard. TR-064 answers through the tunnel
+    (checked on 2026-10-24).
+  - **Its name for the watchdog is `widnau.hochstätter.ch`** (`widnau.xn--hochsttter-v5a.ch`, Christoph on
+    2026-10-27). It has A 178.21.230.55 (fixed), AAAA 2a01:aec0:8000:1::788d and a TTL of 60 s. The box answers
+    pings on both addresses from amazon2. It also has the MyFRITZ name `li9ldnoisizdei41.myfritz.net`.
+  - **The box accepts `widnau.xn--hochsttter-v5a.ch` and `fritzbox.xn--hochsttter-v5a.ch` as host names**, the
+    second since Christoph's DNS rebind exception of 2026-10-27. Through it, from the cloud: `jason_boxinfo.xml`, the
+    login and `GET sync_groups/sg/sg1001` (200, `ipv6_automatic`, 35 fields) work.
+  - **Remote HTTPS access** is closed on port 443, over IPv4 and over IPv6 (2026-10-27). Its port, and a box user
+    who may log in from the internet, are still to come from Christoph.
+  - `https://fritzbox.hochstätter.ch/` (`fritzbox.xn--hochsttter-v5a.ch`) is nginx on amazon2 (A 3.77.190.163),
+    which forwards through WireGuard to `http://192.168.3.1` with that name as the host. So it is no way in during an
+    outage either. On 2026-10-24 it answered `jason_boxinfo.xml` with 400, which turned out to be the box's DNS
+    rebind protection; since 2026-10-27 it answers 200.
   - **Not** `https://fritzbox.hochstaetter.de/`: that is the box in Neufahrn, through nginx on AWS (A 3.77.190.163,
     AAAA 2a05:d014:9eb:d01:1b::2), with the same serial number as 192.168.44.11. This plan had the two mixed up until
     Christoph set it right on 2026-10-24.
   - FRITZ! does not allow a port forwarding to the box itself.
-- **The tunnel probably goes down together with IPv4**, so it is no way in during an outage. Which address family
-  the WireGuard tunnel uses is still to be found out.
+- **The Swiss box's WireGuard tunnels run over IPv6** (checked on 2026-10-27 on amazon2 and in the box's VPN
+  page). It has two LAN-to-LAN tunnels, one to amazon2 and one straight to the box in Neufahrn, and both sides of
+  each one initiate:
 
-### Details and proposed additions (to be decided)
+  | Tunnel | The Swiss box connects to | The other side connects to | In use on 2026-10-27 |
+  |---|---|---|---|
+  | amazon2 | `amazon2.hochstaetter.de:20697` | `li9ldnoisizdei41.myfritz.net:55897`, keepalive 25 s | both AAAA |
+  | Neufahrn | the MyFRITZ name of the box in Neufahrn | (the box in Neufahrn) | both AAAA |
+
+  Every one of these names has an A and an AAAA record. What follows for the watchdog:
+  - **When IPv4 fails, the tunnels stay up**, so the HA server can switch IPv6 off through them, at 192.168.3.1.
+  - **Switching IPv6 off takes them down.** They should come back over IPv4 once IPv4 works: the box can then only
+    reach the A records, and the other side follows the address a handshake comes from (WireGuard roaming;
+    `wg-quick` on amazon2 resolves its endpoint name only when it starts). Then IPv6 can be switched on again
+    through the tunnel, without remote HTTPS. The live test of 2026-10-27 confirmed it (below).
+
+### Live test (2026-10-27)
+
+At 23:13 UTC, with Christoph's OK, while IPv4 worked. All requests went through `fritzbox.hochstätter.ch` (nginx on
+amazon2, then the tunnel). Every 3 s a request for `jason_boxinfo.xml`
+(3 s timeout) showed whether the way through the tunnel was up, so the times are good to a few seconds.
+
+1. **The group was read and saved:** 35 fields, `ipv6_automatic`.
+2. **A no-op first:** `PUT {"ipv6_mode": "ipv6_automatic"}` alone answered 200 `{}`, and all 35 fields read as
+   before.
+3. **Switching off:**
+
+   | After the PUT | What happened |
+   |---|---|
+   | 0 s | `PUT {"ipv6_mode": "ipv6_off"}` answered 200 `{}`, before the box acted on it |
+   | within 10 s | The way through the tunnel was gone |
+   | 28 s | It was back, by itself; the group read `ipv6_off`, every other field as before |
+
+4. **Switching on**, 35 s after switching off, through the tunnel:
+
+   | After the PUT | What happened |
+   | --- | --- |
+   | 0 s | `PUT {"ipv6_mode": "ipv6_automatic"}` answered 200 `{}` |
+   | within 10 s | The way through the tunnel was gone again |
+   | 27 s | It was back; the group read `ipv6_automatic`, all 35 fields as before the test |
+
+5. **What amazon2 saw.** It pinged the box's IPv6, its IPv4 and 192.168.3.1 every 2 to 5 s, and noted the address
+   WireGuard used for the box (times UTC; switched off at 23:13:12, on at 23:13:47):
+   - **Each switch takes IPv4 down as well**, because the box reconnects: off 23:13:20 to 23:13:29 after switching
+     off, and 23:13:55 to 23:14:09 after switching on. IPv6 was back at 23:14:12.
+   - **The tunnel to amazon2 moved to IPv4** at 23:13:40, 28 s after switching off: the box connected from
+     178.21.230.55, and amazon2 followed.
+   - **It stayed on IPv4** after IPv6 was back, still at 23:21:45, with a handshake every two minutes. The box's
+     direct tunnel to Neufahrn, by contrast, was back on IPv6 at 23:20:51, when the box reconnected it.
+
+**What follows for the watchdog:**
+- `{"ipv6_mode": "…"}` is the whole body (D10).
+- **Each switch interrupts the box's connection for about 20 s**, switching on as well as switching off. The answer
+  comes before that, so it is no sign of success; reading the group back once the box is reachable again is. The
+  30 s before `Verify` are about the shortest that make sense.
+- **The tunnel comes back by itself after IPv6 is switched off**, so switching on goes through the tunnel too, and
+  the box's remote HTTPS access is not needed.
+- **A tunnel does not necessarily go back to IPv6 after a cycle.** amazon2 keeps the address the last handshake
+  came from, so its tunnel stays on IPv4 until something moves it, and would go down with the next IPv4 outage. The
+  direct tunnel to Neufahrn went back to IPv6 by itself within 7 minutes (seen once).
+- **So the watchdog goes through the direct tunnel**: from the HA server to 192.168.3.1, through the box in
+  Neufahrn. That is also the way the Swiss box sends everything for 192.168.44.0/24; its tunnel to amazon2 carries
+  172.31.0.0/20 only. `fritzbox.hochstätter.ch` goes through amazon2 and is not the way for the watchdog.
+- **When IPv4 fails while the tunnel is on IPv4, the watchdog cannot reach the box** and can only say so. To be
+  decided: amazon2 could pull its tunnel back to the box's AAAA (`wg set wg0 peer … endpoint`) whenever that
+  answers, which would make it a second way in.
+- **Not tested:** a real IPv4 outage. That switching IPv6 off brings IPv4 back is the premise of Christoph's manual
+  procedure. That the tunnel stays up over IPv6 while IPv4 is gone follows from its endpoints (above), not from a
+  test.
+
+### Details and proposed additions (D11 decided the scope; the phases below)
 
 - **Detection:** five pings to the box's fixed IPv4 178.21.230.55 every 30 s. Whether the box answers pings from
   the internet is still to be checked. If it does not, connect to its HTTPS port over IPv4 instead.
-  `System.Net.NetworkInformation.Ping` works in the container, which runs as root with `network_mode: host`.
+  `System.Net.NetworkInformation.Ping` in the container: it runs as user `app` (`Dockerfile`, `docker-compose.yml`),
+  so .NET needs unprivileged ICMP sockets, which `net.ipv4.ping_group_range` of the Pi has to allow (the host's,
+  because of `network_mode: host`). To be checked on the Pi in phase 2.3.
 - **Guards before acting:**
   - **Neufahrn's own IPv4 works** (a ping to, for example, `1.1.1.1` or `9.9.9.9`). Otherwise the problem is on
     this side and toggling the Swiss box does nothing.
   - **The Swiss box answers over IPv6.** That is the failure mode described ("IPv4 gone, IPv6 still there"). If
     both are down, the line is down and toggling is pointless.
   - At most N recovery cycles per hour, then stop and report.
-- **Switching IPv6 off has to go over IPv6.** Two ways, to be chosen:
-  1. **Directly from the HA server** to `[2a01:aec0:8000:1::788d]`. This needs IPv6 internet at the HA server.
-     Christoph's laptop has it; the HA server is still to be checked (`ping -6` on the Pi).
+- **USP, checked on 2026-10-27 against the data model the box in Neufahrn showed our controller (rights Smarthome
+  and Internet):**
+  - `Device.IP.IPv6Enable` and `Device.IP.Interface.{i}.IPv6Enable` are read-only.
+  - There is no reboot and no reconnect command.
+  - Writable are smart home, DHCPv4, time, cellular and the controller administration.
+  - `Device.IP.Diagnostics.IPPing()` would let the box ping from itself.
+  - So USP is not the way to switch IPv6 (D10).
+- **Switching IPv6 off has to go over IPv6.** The tunnels do (see above), so the simplest way is **192.168.3.1
+  through the tunnel**, as for everything else. Kept in reserve, should the tunnel one day not come back:
+  1. **Directly from the HA server** to `[2a01:aec0:8000:1::788d]`. The HA server has IPv6 internet; remote HTTPS
+     on the box is closed, though.
   2. **Through nginx on AWS**, with two names that each reach the box over one address family only (`resolver …
-     ipv4=off` or `ipv6=off`, upstream by the MyFRITZ name). This works without IPv6 in Neufahrn.
-- **Switching IPv6 on again goes over IPv4:** through the tunnel (192.168.3.1) once it is up again, otherwise to the
-  public IPv4 or through nginx.
-- **Command channel:** the request the box's web UI sends (`data.lua`), which Christoph captures once in the
-  browser's developer tools while switching.
-  - It goes over the box's remote HTTPS access, and needs a box user who may connect from the internet.
-  - It is fragile across FRITZ!OS versions.
-  - TR-064 can only read the IPv6 status, not switch it.
-  - USP over the broker on amazon2 might work after all: the broker is reachable over IPv4 and IPv6, so the Swiss
-    box could keep its MQTT connection over IPv6 while IPv4 is down. That needs a controller on the Swiss box (one
-    button press there), and it is to be tested whether its MQTT client falls back to IPv6. The library and the
-    broker are ready for it (D9).
+     ipv4=off` or `ipv6=off`, upstream by the MyFRITZ name).
+- **Switching IPv6 on again goes over IPv4:** through the tunnel (192.168.3.1) once it is back over IPv4, otherwise
+  to the public IPv4 or through nginx.
+- **Command channel, decided (D10):** the web UI's `PUT /api/v0/generic/sync_groups/sg/sg1001`.
+  - It goes through `FritzBoxHttpClient` (`SendRestAsync`, PBKDF2 login, AVM-SID header), which can already do this
+    kind of request.
+  - **The body is `{"ipv6_mode": "…"}` alone.** The box leaves every other field as it was (live test), so nothing
+    can be overwritten with a stale value, and a field AVM adds is not lost. `GET` on the same path reads the group:
+    before switching, for the mode to restore, and after, to check.
+  - It goes through the tunnel to 192.168.3.1, so the box's remote HTTPS access is not needed. A box user of its own
+    for the HA server is proposed.
+  - It is internal to the web UI and may change with a FRITZ!OS update. The watchdog therefore checks the answer, and
+    reads the mode back, and stops and reports when it does not match.
+  - TR-064 can only read the IPv6 status, not switch it. USP cannot switch it either (see above).
 - **Never leave IPv6 switched off:**
   - Switch it back on in a `finally`.
   - Persist the state, so that a server restart in the middle of a cycle switches IPv6 back on at start.
@@ -244,6 +336,47 @@ Verify --(IPv4 still down)--> Backoff --> DisableIpv6 (limited, see below)
   the cycle limit.
 - **Tests:** the state machine with a fake `TimeProvider`, a fake pinger and a fake box.
 - **Order:** step 2 does not depend on step 1 and can be done first if the outages hurt more.
+
+### Phase 2.1 - Switching IPv6 in the `FritzBox` library (done)
+
+- `FritzBox/Internet/`: read `ipv6_mode` with `GET generic/sync_groups/sg/sg1001`, and set it with a `PUT` of
+  `{"ipv6_mode": "…"}`, through `FritzBoxHttpClient`.
+- xUnit tests against a fake box: the request, the body, the answer, and a mode the box does not report.
+
+### Phase 2.2 - The watchdog in the HA server (done, not deployed)
+
+Built on 2026-10-27 as below; what it became is in `.claude/memory/FritzBox.Ipv4Watchdog.md`. It switches IPv6
+back on as soon as the box answers again after the 30 s, with no upper limit: until the box answers there is no way
+to reach it anyway, and the log warns after 5 minutes.
+
+
+- **Settings:** an `Ipv4Watchdog` element in `Settings.xml`, which is the box connection (`BaseUrl`
+  `http://192.168.3.1`, user, password) with the public IPv4 to ping, the reference hosts, the interval, the ping
+  count and timeout, the delays and the cycle limit as attributes. Without the element there is no watchdog.
+- **A runner** with a `TimeProvider` and a pinger behind an interface:
+  - every 30 s five pings to the public IPv4; one answer is enough
+  - all five fail: check the guards (Neufahrn's own IPv4, the cycle limit, the box reachable through the tunnel
+    and in `ipv6_automatic`), then run a cycle
+  - **a cycle:** note the cycle in the log, switch IPv6 off, wait 30 s and until the box answers again, switch the
+    mode from before back on, wait 30 s, read the mode back and ping again
+  - the box does not answer after switching off: keep trying to switch IPv6 back on, and say so in the log
+- **Restart safety:** a cycle that switched IPv6 off and has not switched it on again is finished at start.
+- **Outage log** in `history/ipv4-watchdog.db`: each outage (last good round, detection, recovery, how) and each
+  cycle (start, the mode before, off, on, verified, result).
+- **Endpoints for `Operator`:** start a test cycle, read the recent outages and cycles.
+- **Tests:** the state machine with a fake `TimeProvider`, a fake pinger and a fake box; the store.
+- **Memory:** a document for the watchdog.
+
+### Phase 2.3 - Deployment and live check
+
+- Christoph creates the box user and adds the element to `Settings.xml` on the Pi.
+- Check that the container may ping (see Detection), then start a test cycle and compare it with the live test.
+
+### Later
+
+- TR-064 diagnostics around each cycle (see Diagnostics).
+- The notification in the client.
+- amazon2 pulling its tunnel back to IPv6, as a second way in (see the live test).
 
 ## Step 3 - Additions we cannot do today
 
@@ -267,11 +400,8 @@ configures. The WPF app only if wanted, because it is being ported away from.
 
 - **The REST API is version 0.9.5.** AVM reserves the right to change it. Mitigations: AHA stays as the fallback,
   and `[SystemFact]` tests show a change after a FRITZ!OS update.
-- **The USP setup that stays (D9):**
-  - Port 8883 on amazon2 is open to the internet, with TLS, a password per client and an ACL.
-  - Anyone with the password of `usp-probe` can control the box within the controller's rights (Smarthome,
-    Internet). The password stays on amazon2.
-  - It is removed once step 2 no longer needs it.
+- **The USP setup (D9)** is gone since 2026-10-27: port 8883 on amazon2 is closed, and no controller on the box
+  accepts commands any more.
 
 ## Sources
 

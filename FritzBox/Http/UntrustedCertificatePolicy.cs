@@ -11,7 +11,7 @@ namespace De.Hochstaetter.FritzBox.Http;
 /// says once which certificate that was, so it can be pinned. This was chosen on 2026-10-24 over refusing
 /// unpinned certificates, because boxes are addressed by IP over https today and nothing may break with the update.
 /// </remarks>
-internal sealed class UntrustedCertificatePolicy(Uri baseUri, string? pinnedFingerprint, ILogger logger)
+public sealed class UntrustedCertificatePolicy(Uri baseUri, string? pinnedFingerprint, ILogger logger)
 {
     private readonly string? pinned = Normalize(pinnedFingerprint);
     private int warned;

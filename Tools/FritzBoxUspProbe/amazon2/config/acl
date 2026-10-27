@@ -1,8 +1,0 @@
-# /opt/mosquitto/config/acl on amazon2.hochstaetter.de. Who may use which topics. While the probe finds out which
-# of its two topics the box listens on, both may use everything below usp/. Narrow this down afterwards.
-
-user fritzbox-neufahrn
-topic readwrite usp/#
-
-user usp-probe
-topic readwrite usp/#

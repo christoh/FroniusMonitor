@@ -58,4 +58,15 @@
         when a day is over. The firmware status of the system's components (GET api/SolarWeb/firmware) is checked
         every RefreshMinutes as well, and every change is pushed to the clients over the hub. -->
    <SolarWeb BaseUrl="https://www.solarweb.com" UserName="you@example.com" ClearTextPassword="your password, replaced by an encrypted Password on the first save" PvSystemId="00000000-0000-0000-0000-000000000000" RefreshMinutes="15" TimeZoneId="Europe/Berlin" />
+   <!-- Optional. The IPv4 watchdog of a FRITZ!Box whose provider sometimes drops IPv4 and keeps IPv6. Every
+        IntervalSeconds the box's PublicAddress is pinged, up to PingCount times; when none answers and one of the
+        ReferenceAddresses does (so this side's IPv4 works), the watchdog switches the box's IPv6 off, waits
+        SwitchOnDelaySeconds and until the box answers again, switches IPv6 back on and checks the result after
+        VerifyDelaySeconds. At most MaximumCyclesPerHour cycles are started in any hour.
+        BaseUrl is the box's web interface as this server reaches it while IPv4 is down: its LAN address through a
+        tunnel that runs over IPv6. UserName and password are a box user with the right "FRITZ!Box Einstellungen"; the
+        password is encrypted on the first save. Outages and cycles are logged in history/Ipv4Watchdog.db (mount that
+        folder to keep it) and shown by GET api/Ipv4Watchdog; POST api/Ipv4Watchdog/test-cycle (role Operator) runs a
+        cycle although IPv4 works. Leave the element out, or PublicAddress empty, to watch nothing. -->
+   <Ipv4Watchdog BaseUrl="http://192.168.3.1" UserName="home-automation" ClearTextPassword="the box user's password, replaced by an encrypted Password on the first save" PublicAddress="203.0.113.10" ReferenceAddresses="1.1.1.1 9.9.9.9" IntervalSeconds="30" PingCount="5" PingTimeoutMilliseconds="1000" SwitchOnDelaySeconds="30" VerifyDelaySeconds="30" MaximumCyclesPerHour="3" UnreachableWarningMinutes="5" RequestTimeoutSeconds="10" />
 </Settings>

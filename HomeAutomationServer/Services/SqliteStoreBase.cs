@@ -10,8 +10,9 @@ namespace De.Hochstaetter.HomeAutomationServer.Services;
 /// <remarks>
 ///     <para>
 ///         Times are Unix seconds UTC unless a store says otherwise, a day is <c>yyyy-MM-dd</c>, and a decimal is
-///         stored as text so that a price of 12.345 comes back as exactly that. <see cref="EnergyHistoryStore" /> and
-///         <see cref="SolarWebHistoryStore" /> are the two files; each has its own schema and its own version.
+///         stored as text so that a price of 12.345 comes back as exactly that. <see cref="EnergyHistoryStore" />,
+///         <see cref="SolarWebHistoryStore" /> and <see cref="Ipv4WatchdogStore" /> are the files; each has its own
+///         schema and its own version.
 ///     </para>
 ///     <para>
 ///         The <c>history</c> folder is what a Docker host mounts to keep the files across containers; the
