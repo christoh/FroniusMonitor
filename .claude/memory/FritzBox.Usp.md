@@ -20,8 +20,15 @@ use the smart-home part of the library (`FritzBox.SmartHome.md`).
 - It pushes power no faster than the box updates it, which is every two minutes.
 - It allows at most 32 subscriptions.
 
-Step 1 uses the REST client of this library instead (`FritzBox.SmartHome.md`). The USP part stays, together with
-the broker on amazon2 and the controller on the box, in case step 2 needs it for the Swiss box (D9).
+Step 1 uses the REST client of this library instead (`FritzBox.SmartHome.md`). Step 2 does not need USP either: it
+cannot switch IPv6 (D10).
+
+**So the setup was removed on 2026-10-27 (D9):**
+- the controller on the box in Neufahrn, which `unregister` deleted without asking for a confirmation at the box
+- Mosquitto on amazon2
+- the security group `mosquitto-mqtts`
+
+The library code, the probe and the tests stay.
 
 It is a project of its own, not part of `Fronius`, because its users will be the HA server and the WPF app and not
 the Avalonia client (see `Fronius.SharedLibraryBoundary.md`).
@@ -103,19 +110,21 @@ the Avalonia client (see `Fronius.SharedLibraryBoundary.md`).
 - G3 (push): yes.
 - G4 (switching over USP): yes.
 
-## Where the broker runs
+## Where the broker ran (removed on 2026-10-27)
+
+The broker is gone; this is what it was, should USP come back. Its files are in commit `2e576ad`.
 
 On `amazon2.hochstaetter.de` (AWS), decided on 2026-10-24: Mosquitto with TLS on port 8883 and the Let's Encrypt
 certificate of `amazon2.hochstaetter.de`, which certbot in `nginx.kartellvz` already renews. The box connects over
 the internet (IPv4 or IPv6), the probe on amazon2 locally on port 1883. A broker on the HA server would have needed
-a certificate for a name the box resolves to a private address. `Tools/FritzBoxUspProbe/README.md` lists every file
-on amazon2.
+a certificate for a name the box resolves to a private address. The README of the probe listed every file on
+amazon2 until then.
 
 From the home networks amazon2 is also reachable through WireGuard as 172.31.15.1. The HA server can use that,
 with `amazon2.hochstaetter.de` as the TLS target host. The box cannot: the certificate is for the public name, and
 its DNS rebind protection blocks a public name that resolves to a private address.
 
-The controller is registered with the names the HA server is meant to keep (`fqdn:hochstaetter.de:home-automation`,
+The controller was registered with the names the HA server is meant to keep (`fqdn:hochstaetter.de:home-automation`,
 `usp/controller/home-automation`), because every new entry on the box needs somebody to confirm it at the box.
 
 ## How the controller finds the box

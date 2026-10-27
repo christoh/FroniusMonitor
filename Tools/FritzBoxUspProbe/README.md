@@ -7,23 +7,27 @@ and `.claude/memory/FritzBox.SmartHome.md` and nothing needs it any more.
 
 The probe registers a USP controller on the box (through TR-064) and then talks to the box over an MQTT broker.
 
+**The USP setup was removed on 2026-10-27 (plan, D9):**
+- the controller `fqdn:hochstaetter.de:home-automation` on the box in Neufahrn
+- Mosquitto on amazon2 with its daily certificate job
+- the security group `mosquitto-mqtts`
+
+Their files are in commit `2e576ad`. Without a broker, the USP commands (`register`, `listen`, `explore`,
+`subscribe`, `get`, `set`, `delete`) no longer work. `info`, `unregister`, `aha`, `rest`, `smarthome` and `routine`
+still do.
+
 ## Where it runs
 
 Everything runs on `amazon2.hochstaetter.de` (AWS, Alpine, reachable by SSM). It reaches the box in Neufahrn
-(192.168.44.11) through the WireGuard tunnel. The files of `amazon2/` are what is installed there:
+(192.168.44.11) and the Swiss box (192.168.3.1) through WireGuard.
 
 | On amazon2 | From | What |
 |---|---|---|
-| `/opt/mosquitto/docker-compose.yml` | `amazon2/docker-compose.yml` | Mosquitto 2: port 8883 with TLS from the internet, port 1883 without TLS on 127.0.0.1 only |
-| `/opt/mosquitto/config/mosquitto.conf`, `acl` | `amazon2/config/` | No anonymous clients, a password per client, an ACL |
-| `/opt/mosquitto/config/passwd`, `/opt/mosquitto/secrets.env` | made on amazon2 | Random passwords of `usp-probe` and `fritzbox-neufahrn`, readable by root only |
-| `/opt/mosquitto/update-cert.sh`, `/etc/periodic/daily/mosquitto-cert` | `amazon2/update-cert.sh` | Copies the Let's Encrypt certificate of `amazon2.hochstaetter.de`, which certbot in `nginx.kartellvz` renews, and restarts Mosquitto when it changed |
 | `/opt/fritzbox-usp-probe/probe.sh` | `amazon2/probe.sh` | Runs the probe in `mcr.microsoft.com/dotnet/runtime:10.0-alpine` |
 | `/opt/fritzbox-usp-probe/app/` | `dotnet publish` | The probe |
-| `/opt/fritzbox-usp-probe/probe.json`, `secrets.env` | written on amazon2 | Settings (see `probe.sample.json`) and the password of the box user, readable by root only |
-
-The security group `mosquitto-mqtts` opens port 8883 for IPv4 and IPv6. The box's public address in Neufahrn
-changes daily, so the port cannot be limited to it.
+| `/opt/fritzbox-usp-probe/probe.json`, `secrets.env` | written on amazon2 | Settings for the box in Neufahrn (see `probe.sample.json`) and the password of the box user, readable by root only |
+| `/opt/fritzbox-usp-probe/probe-ch.json` | written on amazon2 | The Swiss box (`Box.Url`, `Box.WebUrl` 192.168.3.1), used with `--config probe-ch.json`. The same password. Output in `probe-output-ch/`. |
+| `/etc/conf.d/amazon-ssm-agent` | written on amazon2 | `supervisor=supervise-daemon`, `respawn_delay=30`, `respawn_max=0`. Restarts the SSM agent when it exits. It exited on 2026-10-26 when it could not get an IMDSv2 token, and stayed away until it was started by hand. Set on 2026-10-27. |
 
 **The box takes a controller only with TLS.** Without it, `AddUSPController` fails with UPnP error 600 "Argument
 Value Invalid", whatever else is right.

@@ -54,14 +54,14 @@ connector, and Christoph confirmed it at the lamps (`.claude/memory/FritzBox.Sma
 | # | Question | Answer |
 |---|---|---|
 | D1 | FRITZ!OS version and box model? | FRITZ!Box 5690 Pro with FRITZ!OS 8.25 (`info`, 2026-10-24). The REST API (8.20) is there. |
-| D2 | Which MQTT broker? | Mosquitto on amazon2 (AWS), with TLS on port 8883 and the Let's Encrypt certificate of `amazon2.hochstaetter.de`, set up on 2026-10-24 for the probe. Files in `Tools/FritzBoxUspProbe/amazon2`. Not used by step 1. |
+| D2 | Which MQTT broker? | Mosquitto on amazon2 (AWS), with TLS on port 8883 and the Let's Encrypt certificate of `amazon2.hochstaetter.de`, set up on 2026-10-24 for the probe. Not used by step 1. Removed on 2026-10-27 (D9); its files are in commit `2e576ad`. |
 | D3 | Where does the Fritz!Box code live? | `FritzBox/FritzBox.csproj`: TR-064, USP, and now the REST client. It is not part of `Fronius`, because the Avalonia client does not use it. The device models (`FritzBoxDevice` and its parts) stay in `Fronius`. |
 | D4 | Does the box ask for a confirmation (button or phone)? | The box in Neufahrn has it **on** (`X_AVM-DE_Auth:GetInfo`, 2026-10-24). Adding the USP controller needed one button press. Whether the Swiss box asks when IPv6 is switched in its web UI is still to be checked. |
 | D5 | How does the HA server reach the box of step 2? | It is a different box, in Switzerland. The HA server and the smart-home box (192.168.44.11) are in Neufahrn. Step 2 below is written for that. |
 | D6 | Is the probe of phase 1.0 committed? | `Tools/FritzBoxUspProbe` on `feature/fritzbox-usp`. Its findings are in `.claude/memory/FritzBox.Usp.md`. It can go once step 2 has decided about USP. |
 | D7 | TR-069 on the box? | Switched off by Christoph. Not needed. |
 | D8 | USP or REST API for step 1? | The REST API, proposed on 2026-10-24 after the probe. USP stays an option for the switch states only (see the end of step 1). |
-| D9 | What happens to the USP setup? | It stays: Mosquitto and the security group `mosquitto-mqtts` on amazon2, and the controller `fqdn:hochstaetter.de:home-automation` on the box in Neufahrn. Christoph decided this on 2026-10-24, because step 2 may need USP for the Swiss box. It is removed once step 2 has decided against it. **Step 2 no longer needs it (D10)**, so whether to remove it is Christoph's to say. |
+| D9 | What happens to the USP setup? | **Removed on 2026-10-27**, on Christoph's word, because step 2 does not need it (D10): the controller `fqdn:hochstaetter.de:home-automation` on the box in Neufahrn, Mosquitto with its certificate job on amazon2, and the security group `mosquitto-mqtts`. It had stayed since 2026-10-24 in case step 2 needed USP for the Swiss box. The library code and the probe stay. |
 | D10 | How does step 2 switch IPv6? | **The web UI's own request** (Christoph, 2026-10-27): `PUT /api/v0/generic/sync_groups/sg/sg1001` with `Authorization: AVM-SID <sid>`, the JSON of the box's whole IPv6 group as the body, `"ipv6_mode": "ipv6_off"` to switch off and `"ipv6_automatic"` to switch on. Captured in the browser on the Swiss box (FRITZ!OS 8.25). It needs no confirmation and answers 200. The UI no longer uses `data.lua` for this. USP cannot do it: `Device.IP.IPv6Enable` is read-only (see Step 2). |
 
 ## Step 1 - Better smart home in the HA server and the WPF app
@@ -197,20 +197,24 @@ Verify --(IPv4 still down)--> Backoff --> DisableIpv6 (limited, see below)
   - **Its name for the watchdog is `widnau.hochstätter.ch`** (`widnau.xn--hochsttter-v5a.ch`, Christoph on
     2026-10-27). It has A 178.21.230.55 (fixed), AAAA 2a01:aec0:8000:1::788d and a TTL of 60 s. The box answers
     pings on both addresses from amazon2. It also has the MyFRITZ name `li9ldnoisizdei41.myfritz.net`.
-  - **The box accepts `widnau.xn--hochsttter-v5a.ch` as a host name.** It does not accept `fritzbox.xn--hochsttter-v5a.ch`,
-    although Christoph added a DNS rebind exception on 2026-10-27; this is still open.
+  - **The box accepts `widnau.xn--hochsttter-v5a.ch` and `fritzbox.xn--hochsttter-v5a.ch` as host names**, the
+    second since Christoph's DNS rebind exception of 2026-10-27. Through it, from the cloud: `jason_boxinfo.xml`, the
+    login and `GET sync_groups/sg/sg1001` (200, `ipv6_automatic`, 35 fields) work.
   - **Remote HTTPS access** is closed on port 443, over IPv4 and over IPv6 (2026-10-27). Its port, and a box user
     who may log in from the internet, are still to come from Christoph.
   - `https://fritzbox.hochstätter.ch/` (`fritzbox.xn--hochsttter-v5a.ch`) is nginx on amazon2 (A 3.77.190.163),
     which forwards through WireGuard to `http://192.168.3.1` with that name as the host. So it is no way in during an
     outage either. On 2026-10-24 it answered `jason_boxinfo.xml` with 400, which turned out to be the box's DNS
-    rebind protection.
+    rebind protection; since 2026-10-27 it answers 200.
   - **Not** `https://fritzbox.hochstaetter.de/`: that is the box in Neufahrn, through nginx on AWS (A 3.77.190.163,
     AAAA 2a05:d014:9eb:d01:1b::2), with the same serial number as 192.168.44.11. This plan had the two mixed up until
     Christoph set it right on 2026-10-24.
   - FRITZ! does not allow a port forwarding to the box itself.
-- **The tunnel probably goes down together with IPv4**, so it is no way in during an outage. Which address family
-  the WireGuard tunnel uses is still to be found out.
+- **The WireGuard tunnel runs over IPv6** (`wg show` on amazon2, 2026-10-27: the Swiss peer's endpoint is the box's
+  AAAA address, port 55897). So it stays up when IPv4 fails, and the HA server can switch IPv6 off through it
+  (192.168.3.1). Switching IPv6 off takes the tunnel down. Whether it comes back over IPv4 by itself, so that IPv6
+  can be switched on again through it, depends on which side initiates and with which endpoint; still to be found
+  out.
 
 ### Details and proposed additions (to be decided)
 
@@ -287,11 +291,8 @@ configures. The WPF app only if wanted, because it is being ported away from.
 
 - **The REST API is version 0.9.5.** AVM reserves the right to change it. Mitigations: AHA stays as the fallback,
   and `[SystemFact]` tests show a change after a FRITZ!OS update.
-- **The USP setup that stays (D9):**
-  - Port 8883 on amazon2 is open to the internet, with TLS, a password per client and an ACL.
-  - Anyone with the password of `usp-probe` can control the box within the controller's rights (Smarthome,
-    Internet). The password stays on amazon2.
-  - It is removed once step 2 no longer needs it.
+- **The USP setup (D9)** is gone since 2026-10-27: port 8883 on amazon2 is closed, and no controller on the box
+  accepts commands any more.
 
 ## Sources
 
