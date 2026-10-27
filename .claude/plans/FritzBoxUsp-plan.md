@@ -210,11 +210,21 @@ Verify --(IPv4 still down)--> Backoff --> DisableIpv6 (limited, see below)
     AAAA 2a05:d014:9eb:d01:1b::2), with the same serial number as 192.168.44.11. This plan had the two mixed up until
     Christoph set it right on 2026-10-24.
   - FRITZ! does not allow a port forwarding to the box itself.
-- **The WireGuard tunnel runs over IPv6** (`wg show` on amazon2, 2026-10-27: the Swiss peer's endpoint is the box's
-  AAAA address, port 55897). So it stays up when IPv4 fails, and the HA server can switch IPv6 off through it
-  (192.168.3.1). Switching IPv6 off takes the tunnel down. Whether it comes back over IPv4 by itself, so that IPv6
-  can be switched on again through it, depends on which side initiates and with which endpoint; still to be found
-  out.
+- **The Swiss box's WireGuard tunnels run over IPv6** (checked on 2026-10-27 on amazon2 and in the box's VPN
+  page). It has two LAN-to-LAN tunnels, one to amazon2 and one straight to the box in Neufahrn, and both sides of
+  each one initiate:
+
+  | Tunnel | The Swiss box connects to | The other side connects to | In use on 2026-10-27 |
+  |---|---|---|---|
+  | amazon2 | `amazon2.hochstaetter.de:20697` | `li9ldnoisizdei41.myfritz.net:55897`, keepalive 25 s | both AAAA |
+  | Neufahrn | the MyFRITZ name of the box in Neufahrn | (the box in Neufahrn) | both AAAA |
+
+  Every one of these names has an A and an AAAA record. What follows for the watchdog:
+  - **When IPv4 fails, the tunnels stay up**, so the HA server can switch IPv6 off through them, at 192.168.3.1.
+  - **Switching IPv6 off takes them down.** They should come back over IPv4 once IPv4 works: the box can then only
+    reach the A records, and the other side follows the address a handshake comes from (WireGuard roaming;
+    `wg-quick` on amazon2 resolves its endpoint name only when it starts). Then IPv6 can be switched on again
+    through the tunnel, without remote HTTPS. The live test has to confirm this.
 
 ### Details and proposed additions (to be decided)
 
@@ -234,13 +244,14 @@ Verify --(IPv4 still down)--> Backoff --> DisableIpv6 (limited, see below)
   - Writable are smart home, DHCPv4, time, cellular and the controller administration.
   - `Device.IP.Diagnostics.IPPing()` would let the box ping from itself.
   - So USP is not the way to switch IPv6 (D10).
-- **Switching IPv6 off has to go over IPv6.** Two ways, to be chosen:
-  1. **Directly from the HA server** to `[2a01:aec0:8000:1::788d]`. This needs IPv6 internet at the HA server.
-     Christoph's laptop has it; the HA server is still to be checked (`ping -6` on the Pi).
+- **Switching IPv6 off has to go over IPv6.** The tunnels do (see above), so the simplest way is **192.168.3.1
+  through the tunnel**, as for everything else. Kept in reserve, should the live test disagree:
+  1. **Directly from the HA server** to `[2a01:aec0:8000:1::788d]`. The HA server has IPv6 internet; remote HTTPS
+     on the box is closed, though.
   2. **Through nginx on AWS**, with two names that each reach the box over one address family only (`resolver …
-     ipv4=off` or `ipv6=off`, upstream by the MyFRITZ name). This works without IPv6 in Neufahrn.
-- **Switching IPv6 on again goes over IPv4:** through the tunnel (192.168.3.1) once it is up again, otherwise to the
-  public IPv4 or through nginx.
+     ipv4=off` or `ipv6=off`, upstream by the MyFRITZ name).
+- **Switching IPv6 on again goes over IPv4:** through the tunnel (192.168.3.1) once it is back over IPv4, otherwise
+  to the public IPv4 or through nginx.
 - **Command channel, decided (D10):** the web UI's `PUT /api/v0/generic/sync_groups/sg/sg1001`.
   - It goes through `FritzBoxHttpClient` (`SendRestAsync`, PBKDF2 login, AVM-SID header), which can already do this
     kind of request.
