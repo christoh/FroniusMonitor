@@ -62,7 +62,7 @@ connector, and Christoph confirmed it at the lamps (`.claude/memory/FritzBox.Sma
 | D7 | TR-069 on the box? | Switched off by Christoph. Not needed. |
 | D8 | USP or REST API for step 1? | The REST API, proposed on 2026-10-24 after the probe. USP stays an option for the switch states only (see the end of step 1). |
 | D9 | What happens to the USP setup? | **Removed on 2026-10-27**, on Christoph's word, because step 2 does not need it (D10): the controller `fqdn:hochstaetter.de:home-automation` on the box in Neufahrn, Mosquitto with its certificate job on amazon2, and the security group `mosquitto-mqtts`. It had stayed since 2026-10-24 in case step 2 needed USP for the Swiss box. The library code and the probe stay. |
-| D10 | How does step 2 switch IPv6? | **The web UI's own request** (Christoph, 2026-10-27): `PUT /api/v0/generic/sync_groups/sg/sg1001` with `Authorization: AVM-SID <sid>`, the JSON of the box's whole IPv6 group as the body, `"ipv6_mode": "ipv6_off"` to switch off and `"ipv6_automatic"` to switch on. Captured in the browser on the Swiss box (FRITZ!OS 8.25). It needs no confirmation and answers 200. The UI no longer uses `data.lua` for this. USP cannot do it: `Device.IP.IPv6Enable` is read-only (see Step 2). |
+| D10 | How does step 2 switch IPv6? | **The web UI's own request** (Christoph, 2026-10-27): `PUT /api/v0/generic/sync_groups/sg/sg1001` with `Authorization: AVM-SID <sid>`, `"ipv6_mode": "ipv6_off"` to switch off and `"ipv6_automatic"` to switch on. Captured in the browser on the Swiss box (FRITZ!OS 8.25). The web UI sends the box's whole IPv6 group, but `{"ipv6_mode": "…"}` alone does the same and leaves every other field as it was (live test, 2026-10-27). It needs no confirmation and answers 200. The UI no longer uses `data.lua` for this. USP cannot do it: `Device.IP.IPv6Enable` is read-only (see Step 2). |
 
 ## Step 1 - Better smart home in the HA server and the WPF app
 
@@ -224,7 +224,43 @@ Verify --(IPv4 still down)--> Backoff --> DisableIpv6 (limited, see below)
   - **Switching IPv6 off takes them down.** They should come back over IPv4 once IPv4 works: the box can then only
     reach the A records, and the other side follows the address a handshake comes from (WireGuard roaming;
     `wg-quick` on amazon2 resolves its endpoint name only when it starts). Then IPv6 can be switched on again
-    through the tunnel, without remote HTTPS. The live test has to confirm this.
+    through the tunnel, without remote HTTPS. The live test of 2026-10-27 confirmed it (below).
+
+### Live test (2026-10-27)
+
+At 23:13 UTC, with Christoph's OK, while IPv4 worked. All requests went through `fritzbox.hochstätter.ch` (nginx on
+amazon2, then the tunnel). Every 3 s a request for `jason_boxinfo.xml`
+(3 s timeout) showed whether the way through the tunnel was up, so the times are good to a few seconds.
+
+1. **The group was read and saved:** 35 fields, `ipv6_automatic`.
+2. **A no-op first:** `PUT {"ipv6_mode": "ipv6_automatic"}` alone answered 200 `{}`, and all 35 fields read as
+   before.
+3. **Switching off:**
+
+   | After the PUT | What happened |
+   |---|---|
+   | 0 s | `PUT {"ipv6_mode": "ipv6_off"}` answered 200 `{}`, before the box acted on it |
+   | within 10 s | The way through the tunnel was gone |
+   | 28 s | It was back, by itself; the group read `ipv6_off`, every other field as before |
+
+4. **Switching on**, 35 s after switching off, through the tunnel:
+
+   | After the PUT | What happened |
+   | --- | --- |
+   | 0 s | `PUT {"ipv6_mode": "ipv6_automatic"}` answered 200 `{}` |
+   | within 10 s | The way through the tunnel was gone again |
+   | 27 s | It was back; the group read `ipv6_automatic`, all 35 fields as before the test |
+
+**What follows for the watchdog:**
+- `{"ipv6_mode": "…"}` is the whole body (D10).
+- **Each switch interrupts the box's connection for about 20 s**, switching on as well as switching off. The answer
+  comes before that, so it is no sign of success; reading the group back once the box is reachable again is. The
+  30 s before `Verify` are about the shortest that make sense.
+- **The tunnel comes back by itself after IPv6 is switched off**, so switching on goes through the tunnel too, and
+  the box's remote HTTPS access is not needed.
+- **Not tested:** a real IPv4 outage. That switching IPv6 off brings IPv4 back is the premise of Christoph's manual
+  procedure. That the tunnel stays up over IPv6 while IPv4 is gone follows from its endpoints (above), not from a
+  test.
 
 ### Details and proposed additions (to be decided)
 
@@ -245,7 +281,7 @@ Verify --(IPv4 still down)--> Backoff --> DisableIpv6 (limited, see below)
   - `Device.IP.Diagnostics.IPPing()` would let the box ping from itself.
   - So USP is not the way to switch IPv6 (D10).
 - **Switching IPv6 off has to go over IPv6.** The tunnels do (see above), so the simplest way is **192.168.3.1
-  through the tunnel**, as for everything else. Kept in reserve, should the live test disagree:
+  through the tunnel**, as for everything else. Kept in reserve, should the tunnel one day not come back:
   1. **Directly from the HA server** to `[2a01:aec0:8000:1::788d]`. The HA server has IPv6 internet; remote HTTPS
      on the box is closed, though.
   2. **Through nginx on AWS**, with two names that each reach the box over one address family only (`resolver …
@@ -255,11 +291,11 @@ Verify --(IPv4 still down)--> Backoff --> DisableIpv6 (limited, see below)
 - **Command channel, decided (D10):** the web UI's `PUT /api/v0/generic/sync_groups/sg/sg1001`.
   - It goes through `FritzBoxHttpClient` (`SendRestAsync`, PBKDF2 login, AVM-SID header), which can already do this
     kind of request.
-  - **Read before write:** read the group, change `ipv6_mode` only, and write it back. The mode from before is kept
-    and restored exactly. That way no setting is overwritten with a stale value, and a field AVM adds is not lost.
-    How the group is read (presumably `GET` on the same path) is still to be checked with a box user.
-  - It goes over the box's remote HTTPS access (port still to come) and needs a box user who may connect from the
-    internet. A user of its own for the HA server is proposed.
+  - **The body is `{"ipv6_mode": "…"}` alone.** The box leaves every other field as it was (live test), so nothing
+    can be overwritten with a stale value, and a field AVM adds is not lost. `GET` on the same path reads the group:
+    before switching, for the mode to restore, and after, to check.
+  - It goes through the tunnel to 192.168.3.1, so the box's remote HTTPS access is not needed. A box user of its own
+    for the HA server is proposed.
   - It is internal to the web UI and may change with a FRITZ!OS update. The watchdog therefore checks the answer, and
     reads the mode back, and stops and reports when it does not match.
   - TR-064 can only read the IPv6 status, not switch it. USP cannot switch it either (see above).
