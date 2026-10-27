@@ -107,6 +107,10 @@ that drive the WPF app's own services; it builds and runs on Windows only and re
   `--explicit on` runs them alongside everything else. They want the inverter and the smart meter on the LAN,
   Awattar, the deployed server and multicast DNS, and they fail without them - that is the environment, not the
   code, and it is normal.
+  The Fritz!Box system tests (`FritzBoxSystemTests`) also need the password of the box user in `FRITZBOX_PASSWORD`,
+  and `FRITZBOX_USER` if it is not the user who logged in last. From outside the LAN in Neufahrn, the cloud
+  included, `FRITZBOX_URL=https://fritzbox.hochstaetter.de` reaches the box. `FRITZBOX_TEST_AIN` names an outlet the
+  switching test may switch; without it, that test is skipped.
 * **An option the runner does not know is never reported as unknown.** The run ends in `Zero tests ran` with
   exit code 5, which reads exactly like a project whose tests cannot be found - and on 2026-09-16 that was
   believed, and `FroniusUnitTests` was wrongly called empty on the strength of it. When a run reports zero tests,
