@@ -83,6 +83,8 @@ internal class Program
             settings.EnergyData = new EnergyDataSettings();
             // Shows the shape of the Solar.web section; with an empty user name or PvSystemId nothing is read.
             settings.SolarWeb = new SolarWebSettings();
+            // Shows the shape of the IPv4 watchdog; with an empty PublicAddress or user name nothing is watched.
+            settings.Ipv4Watchdog = new Ipv4WatchdogSettings();
             await settings.SaveAsync().ConfigureAwait(false);
             settingsLoadException = ex;
         }
@@ -133,6 +135,12 @@ internal class Program
             .AddSingleton<ISolarWebHistoryStore, SolarWebHistoryStore>()
             .AddSingleton<SolarWebService>()
             .AddSingleton<ISolarWebService>(services => services.GetRequiredService<SolarWebService>())
+            // The IPv4 watchdog of a FRITZ!Box: its outage log is a third SQLite file, and the controller reads the
+            // watchdog under its contract - the same instance, so a test cycle it asks for is the one that runs.
+            .AddSingleton<IIpv4WatchdogStore, Ipv4WatchdogStore>()
+            .AddSingleton<IPinger, IcmpPinger>()
+            .AddSingleton<Ipv4WatchdogService>()
+            .AddSingleton<IIpv4WatchdogService>(services => services.GetRequiredService<Ipv4WatchdogService>())
             .AddTransient<ISunSpecClient, SunSpecClient>()
             .AddLogging(b => b.AddSerilog())
             .AddCors(o => o.AddDefaultPolicy(p => p.SetIsOriginAllowed(_ => true)
@@ -206,6 +214,7 @@ internal class Program
                     s.Settings = settings.SolarWeb;
                     s.RefreshRate = TimeSpan.FromMinutes(Math.Max(1, settings.SolarWeb?.RefreshMinutes ?? 15));
                 })
+                .Configure<Ipv4WatchdogParameters>(w => { w.Settings = settings.Ipv4Watchdog; })
                 .Configure<UserList>(u =>
                 {
                     u.Users = settings.Users;
@@ -341,6 +350,7 @@ internal class Program
         await IoC.Get<ToshibaHvacDataCollector>().StartAsync().ConfigureAwait(false);
         await IoC.Get<EnergyDataCollector>().StartAsync().ConfigureAwait(false);
         await IoC.Get<SolarWebService>().StartAsync().ConfigureAwait(false);
+        await IoC.Get<Ipv4WatchdogService>().StartAsync().ConfigureAwait(false);
         //await Task.Delay(TimeSpan.FromSeconds(30));
         //await IoC.Get<SunSpecDataCollector>().StopAsync().ConfigureAwait(false);
         //await IoC.Get<Gen24DataCollector>().StopAsync().ConfigureAwait(false);

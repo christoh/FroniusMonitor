@@ -42,6 +42,7 @@ global using De.Hochstaetter.HomeAutomationServer.Models.SolarWeb;
 global using De.Hochstaetter.HomeAutomationServer.Services;
 global using De.Hochstaetter.HomeAutomationServer.Services.DataCollectors;
 global using De.Hochstaetter.HomeAutomationServer.Services.EnergyData;
+global using De.Hochstaetter.HomeAutomationServer.Services.Ipv4Watchdog;
 global using De.Hochstaetter.HomeAutomationServer.Services.Modbus;
 global using De.Hochstaetter.HomeAutomationServer.Services.SolarWeb;
 global using CommunityToolkit.Mvvm.ComponentModel;

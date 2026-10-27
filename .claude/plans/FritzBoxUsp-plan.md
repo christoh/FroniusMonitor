@@ -63,6 +63,7 @@ connector, and Christoph confirmed it at the lamps (`.claude/memory/FritzBox.Sma
 | D8 | USP or REST API for step 1? | The REST API, proposed on 2026-10-24 after the probe. USP stays an option for the switch states only (see the end of step 1). |
 | D9 | What happens to the USP setup? | **Removed on 2026-10-27**, on Christoph's word, because step 2 does not need it (D10): the controller `fqdn:hochstaetter.de:home-automation` on the box in Neufahrn, Mosquitto with its certificate job on amazon2, and the security group `mosquitto-mqtts`. It had stayed since 2026-10-24 in case step 2 needed USP for the Swiss box. The library code and the probe stay. |
 | D10 | How does step 2 switch IPv6? | **The web UI's own request** (Christoph, 2026-10-27): `PUT /api/v0/generic/sync_groups/sg/sg1001` with `Authorization: AVM-SID <sid>`, `"ipv6_mode": "ipv6_off"` to switch off and `"ipv6_automatic"` to switch on. Captured in the browser on the Swiss box (FRITZ!OS 8.25). The web UI sends the box's whole IPv6 group, but `{"ipv6_mode": "…"}` alone does the same and leaves every other field as it was (live test, 2026-10-27). It needs no confirmation and answers 200. The UI no longer uses `data.lua` for this. USP cannot do it: `Device.IP.IPv6Enable` is read-only (see Step 2). |
+| D11 | What does the first stage of step 2 contain? | Christoph, 2026-10-27: **the watchdog and its outage log** (SQLite under `history`, and the server log). The notification in the client comes later. **At most 3 cycles per hour**, then it waits. **A test trigger** for `Operator`, which runs a cycle while IPv4 works, so that the installed watchdog can be tried without an outage. **A box user of its own** for the HA server, which Christoph creates on the Swiss box; its password goes into `Settings.xml` on the server only. |
 
 ## Step 1 - Better smart home in the HA server and the WPF app
 
@@ -280,11 +281,13 @@ amazon2, then the tunnel). Every 3 s a request for `jason_boxinfo.xml`
   procedure. That the tunnel stays up over IPv6 while IPv4 is gone follows from its endpoints (above), not from a
   test.
 
-### Details and proposed additions (to be decided)
+### Details and proposed additions (D11 decided the scope; the phases below)
 
 - **Detection:** five pings to the box's fixed IPv4 178.21.230.55 every 30 s. Whether the box answers pings from
   the internet is still to be checked. If it does not, connect to its HTTPS port over IPv4 instead.
-  `System.Net.NetworkInformation.Ping` works in the container, which runs as root with `network_mode: host`.
+  `System.Net.NetworkInformation.Ping` in the container: it runs as user `app` (`Dockerfile`, `docker-compose.yml`),
+  so .NET needs unprivileged ICMP sockets, which `net.ipv4.ping_group_range` of the Pi has to allow (the host's,
+  because of `network_mode: host`). To be checked on the Pi in phase 2.3.
 - **Guards before acting:**
   - **Neufahrn's own IPv4 works** (a ping to, for example, `1.1.1.1` or `9.9.9.9`). Otherwise the problem is on
     this side and toggling the Swiss box does nothing.
@@ -333,6 +336,47 @@ amazon2, then the tunnel). Every 3 s a request for `jason_boxinfo.xml`
   the cycle limit.
 - **Tests:** the state machine with a fake `TimeProvider`, a fake pinger and a fake box.
 - **Order:** step 2 does not depend on step 1 and can be done first if the outages hurt more.
+
+### Phase 2.1 - Switching IPv6 in the `FritzBox` library (done)
+
+- `FritzBox/Internet/`: read `ipv6_mode` with `GET generic/sync_groups/sg/sg1001`, and set it with a `PUT` of
+  `{"ipv6_mode": "…"}`, through `FritzBoxHttpClient`.
+- xUnit tests against a fake box: the request, the body, the answer, and a mode the box does not report.
+
+### Phase 2.2 - The watchdog in the HA server (done, not deployed)
+
+Built on 2026-10-27 as below; what it became is in `.claude/memory/FritzBox.Ipv4Watchdog.md`. It switches IPv6
+back on as soon as the box answers again after the 30 s, with no upper limit: until the box answers there is no way
+to reach it anyway, and the log warns after 5 minutes.
+
+
+- **Settings:** an `Ipv4Watchdog` element in `Settings.xml`, which is the box connection (`BaseUrl`
+  `http://192.168.3.1`, user, password) with the public IPv4 to ping, the reference hosts, the interval, the ping
+  count and timeout, the delays and the cycle limit as attributes. Without the element there is no watchdog.
+- **A runner** with a `TimeProvider` and a pinger behind an interface:
+  - every 30 s five pings to the public IPv4; one answer is enough
+  - all five fail: check the guards (Neufahrn's own IPv4, the cycle limit, the box reachable through the tunnel
+    and in `ipv6_automatic`), then run a cycle
+  - **a cycle:** note the cycle in the log, switch IPv6 off, wait 30 s and until the box answers again, switch the
+    mode from before back on, wait 30 s, read the mode back and ping again
+  - the box does not answer after switching off: keep trying to switch IPv6 back on, and say so in the log
+- **Restart safety:** a cycle that switched IPv6 off and has not switched it on again is finished at start.
+- **Outage log** in `history/ipv4-watchdog.db`: each outage (last good round, detection, recovery, how) and each
+  cycle (start, the mode before, off, on, verified, result).
+- **Endpoints for `Operator`:** start a test cycle, read the recent outages and cycles.
+- **Tests:** the state machine with a fake `TimeProvider`, a fake pinger and a fake box; the store.
+- **Memory:** a document for the watchdog.
+
+### Phase 2.3 - Deployment and live check
+
+- Christoph creates the box user and adds the element to `Settings.xml` on the Pi.
+- Check that the container may ping (see Detection), then start a test cycle and compare it with the live test.
+
+### Later
+
+- TR-064 diagnostics around each cycle (see Diagnostics).
+- The notification in the client.
+- amazon2 pulling its tunnel back to IPv6, as a second way in (see the live test).
 
 ## Step 3 - Additions we cannot do today
 

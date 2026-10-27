@@ -66,6 +66,10 @@ public class Settings
     [XmlElement, DefaultValue(null)]
     public SolarWebSettings? SolarWeb { get; set; }
 
+    /// <summary>The FRITZ!Box whose IPv4 is watched, or <see langword="null" /> when the server watches none.</summary>
+    [XmlElement, DefaultValue(null)]
+    public Ipv4WatchdogSettings? Ipv4Watchdog { get; set; }
+
     [XmlIgnore] public static string SettingsFileName { get; set; } = Path.Combine(AppContext.BaseDirectory, "Settings.xml");
 
     public static Task<Settings> LoadAsync(string? fileName = null, CancellationToken token = default) => Task.Run(() => Load(fileName), token);
@@ -88,7 +92,7 @@ public class Settings
         lock (settingLock)
         {
             fileName ??= SettingsFileName;
-            UpdateChecksum([.. FritzBoxConnections, ToshibaHvac, SolarWeb]);
+            UpdateChecksum([.. FritzBoxConnections, ToshibaHvac, SolarWeb, Ipv4Watchdog]);
             var serializer = new XmlSerializer(typeof(Settings));
             using var stream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None);
 
