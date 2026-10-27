@@ -251,6 +251,15 @@ amazon2, then the tunnel). Every 3 s a request for `jason_boxinfo.xml`
    | within 10 s | The way through the tunnel was gone again |
    | 27 s | It was back; the group read `ipv6_automatic`, all 35 fields as before the test |
 
+5. **What amazon2 saw.** It pinged the box's IPv6, its IPv4 and 192.168.3.1 every 2 to 5 s, and noted the address
+   WireGuard used for the box (times UTC; switched off at 23:13:12, on at 23:13:47):
+   - **Each switch takes IPv4 down as well**, because the box reconnects: off 23:13:20 to 23:13:29 after switching
+     off, and 23:13:55 to 23:14:09 after switching on. IPv6 was back at 23:14:12.
+   - **The tunnel to amazon2 moved to IPv4** at 23:13:40, 28 s after switching off: the box connected from
+     178.21.230.55, and amazon2 followed.
+   - **It stayed on IPv4** after IPv6 was back, still at 23:21:45, with a handshake every two minutes. The box's
+     direct tunnel to Neufahrn, by contrast, was back on IPv6 at 23:20:51, when the box reconnected it.
+
 **What follows for the watchdog:**
 - `{"ipv6_mode": "…"}` is the whole body (D10).
 - **Each switch interrupts the box's connection for about 20 s**, switching on as well as switching off. The answer
@@ -258,6 +267,15 @@ amazon2, then the tunnel). Every 3 s a request for `jason_boxinfo.xml`
   30 s before `Verify` are about the shortest that make sense.
 - **The tunnel comes back by itself after IPv6 is switched off**, so switching on goes through the tunnel too, and
   the box's remote HTTPS access is not needed.
+- **A tunnel does not necessarily go back to IPv6 after a cycle.** amazon2 keeps the address the last handshake
+  came from, so its tunnel stays on IPv4 until something moves it, and would go down with the next IPv4 outage. The
+  direct tunnel to Neufahrn went back to IPv6 by itself within 7 minutes (seen once).
+- **So the watchdog goes through the direct tunnel**: from the HA server to 192.168.3.1, through the box in
+  Neufahrn. That is also the way the Swiss box sends everything for 192.168.44.0/24; its tunnel to amazon2 carries
+  172.31.0.0/20 only. `fritzbox.hochstätter.ch` goes through amazon2 and is not the way for the watchdog.
+- **When IPv4 fails while the tunnel is on IPv4, the watchdog cannot reach the box** and can only say so. To be
+  decided: amazon2 could pull its tunnel back to the box's AAAA (`wg set wg0 peer … endpoint`) whenever that
+  answers, which would make it a second way in.
 - **Not tested:** a real IPv4 outage. That switching IPv6 off brings IPv4 back is the premise of Christoph's manual
   procedure. That the tunnel stays up over IPv6 while IPv4 is gone follows from its endpoints (above), not from a
   test.
