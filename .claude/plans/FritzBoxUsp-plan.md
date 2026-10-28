@@ -343,7 +343,7 @@ amazon2, then the tunnel). Every 3 s a request for `jason_boxinfo.xml`
   `{"ipv6_mode": "…"}`, through `FritzBoxHttpClient`.
 - xUnit tests against a fake box: the request, the body, the answer, and a mode the box does not report.
 
-### Phase 2.2 - The watchdog in the HA server (done, not deployed)
+### Phase 2.2 - The watchdog in the HA server (done)
 
 Built on 2026-10-27 as below; what it became is in `.claude/memory/FritzBox.Ipv4Watchdog.md`. It switches IPv6
 back on as soon as the box answers again after the 30 s, with no upper limit: until the box answers there is no way
@@ -367,10 +367,30 @@ to reach it anyway, and the log warns after 5 minutes.
 - **Tests:** the state machine with a fake `TimeProvider`, a fake pinger and a fake box; the store.
 - **Memory:** a document for the watchdog.
 
-### Phase 2.3 - Deployment and live check
+### Phase 2.3 - Deployment and live check (done)
 
-- Christoph creates the box user and adds the element to `Settings.xml` on the Pi.
-- Check that the container may ping (see Detection), then start a test cycle and compare it with the live test.
+- Christoph created the box user, added the element to `Settings.xml` on the Pi and deployed `dev` on 2026-10-27.
+- **The container may ping:** the watchdog's checks were answered from the start, so the Pi's
+  `net.ipv4.ping_group_range` allows unprivileged ICMP for the user `app`.
+- **The first test cycle** (`POST api/Ipv4Watchdog/test-cycle`, 23:52:41 UTC, while IPv4 worked):
+
+  | UTC | Watchdog | amazon2 saw |
+  |---|---|---|
+  | 23:52:42 | cycle 1 stored, mode before `ipv6_automatic` | |
+  | 23:52:44 | IPv6 switched off | |
+  | 23:52:52 | | IPv4, IPv6 and 192.168.3.1 gone |
+  | 23:53:01 / 23:53:08 | | IPv4 back / the LAN through the tunnel back |
+  | 23:53:17 | IPv6 switched back on, 33 s after switching off, at the first try after the delay | |
+  | 23:53:25 | | IPv4 and the LAN gone again |
+  | 23:53:34 / 23:53:37 / 23:53:39 | | IPv4 / LAN / IPv6 back |
+  | 23:53:49 | | amazon2's tunnel back on IPv6 |
+  | 23:53:52 | result `ipv4Back` | |
+
+  71 s in all, as in the live test. Afterwards the box's IPv6 group was field by field what it had been before the
+  live test.
+- **amazon2's tunnel** had stayed on IPv4 from the live test until this cycle (35 minutes), and went back to IPv6
+  10 s after IPv6 was back this time. So whether it returns to IPv6 after a cycle differs from cycle to cycle; it
+  is not the watchdog's way in either way.
 
 ### Later
 

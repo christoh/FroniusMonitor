@@ -69,7 +69,7 @@ IPv6 off and IPv4 still down, the box has no way in at all.
 **A host that cannot ping** throws `PingException` from `IcmpPinger`, which the tick logs (`RepeatedFailure`); it is
 never read as "no answer", so it cannot start a cycle. The container runs as user `app`, so .NET needs unprivileged
 ICMP sockets, which `net.ipv4.ping_group_range` of the Pi has to allow (`network_mode: host` makes it the host's).
-**Not checked on the Pi yet** (plan, phase 2.3).
+It does: the checks were answered from the first deployment on (2026-10-27).
 
 ## Which way the watchdog reaches the box
 
@@ -77,9 +77,10 @@ ICMP sockets, which `net.ipv4.ping_group_range` of the Pi has to allow (`network
 **direct WireGuard tunnel between the two boxes**, which runs over IPv6 and so stays up while IPv4 is down. The
 live test showed:
 - both tunnels of the Swiss box move to IPv4 when IPv6 is switched off, and come back within about 28 s;
-- the direct tunnel to Neufahrn went back to IPv6 by itself within 7 minutes; the tunnel to amazon2 stayed on IPv4,
-  because amazon2 keeps the address the last handshake came from. `fritzbox.hochstätter.ch` goes through amazon2
-  and is **not** the way for the watchdog.
+- the direct tunnel to Neufahrn went back to IPv6 by itself within 7 minutes; the tunnel to amazon2 stayed on IPv4
+  for 35 minutes after the live test, because amazon2 keeps the address the last handshake came from, and went back
+  to IPv6 within 10 s after the first test cycle - it varies. `fritzbox.hochstätter.ch` goes through amazon2 and is
+  **not** the way for the watchdog.
 
 When IPv4 fails while the direct tunnel happens to be on IPv4, the watchdog cannot reach the box and only logs it
 (`Hold`). Pulling amazon2's tunnel back to IPv6 as a second way in is still to be decided (plan, "Later").
@@ -109,6 +110,12 @@ is one of its own for the HA server (D11) with the right "FRITZ!Box Einstellunge
 - `POST api/Ipv4Watchdog/test-cycle`: 202, and the cycle starts at the next tick although IPv4 works (D11: to try
   the installed watchdog without an outage). 409 while a cycle runs, 404 without a watchdog. It interrupts the
   Swiss box's internet twice for about 20 s.
+
+## On the Pi
+
+Deployed on 2026-10-27 with `dev`. The first test cycle took 71 s and ended in `ipv4Back`: IPv6 off 2 s after the
+request, back on 33 s later at the first try after the delay, checked 35 s after that. The plan (phase 2.3) has the
+timeline next to what amazon2 saw.
 
 ## Tests
 
