@@ -18,6 +18,9 @@ public sealed class FritzBoxHttpClientTests : IDisposable
     private const string OverviewPath = "/api/v0/smarthome/overview";
     private const string Overview = """{"units":[{"UID":"11630 0015376","name":"Desk lamp"}]}""";
     private const string DeviceList = """<devicelist version="1"><device identifier="11630 0015376"/></devicelist>""";
+
+    /// <summary>What the REST API answered on 2026-10-28 to a session it no longer knew, with status 400.</summary>
+    private const string PermissionDenied = """{"errors":[{"message":"permission denied: \/api\/v0\/smarthome\/overview","code":3001}]}""";
     private const string LastUserFirst = """<User last="1">alice</User><User>other</User>""";
     private const string LastUserSecond = """<User>other</User><User last="1">alice</User>""";
 
@@ -232,11 +235,12 @@ public sealed class FritzBoxHttpClientTests : IDisposable
     #region FritzBoxHttpClient: expired sessions and errors
 
     [Theory]
-    [InlineData(HttpStatusCode.Forbidden)]
-    [InlineData(HttpStatusCode.Unauthorized)]
-    public async Task A_session_the_box_no_longer_accepts_is_replaced_and_the_request_is_repeated_once(HttpStatusCode refusal)
+    [InlineData(HttpStatusCode.Forbidden, "session expired")]
+    [InlineData(HttpStatusCode.Unauthorized, "session expired")]
+    [InlineData(HttpStatusCode.BadRequest, PermissionDenied)]
+    public async Task A_session_the_box_no_longer_accepts_is_replaced_and_the_request_is_repeated_once(HttpStatusCode refusal, string body)
     {
-        var box = new FakeBox { Respond = number => number == 1 ? (refusal, "session expired") : (HttpStatusCode.OK, Overview) };
+        var box = new FakeBox { Respond = number => number == 1 ? (refusal, body) : (HttpStatusCode.OK, Overview) };
         using var client = CreateClient(box);
 
         var answer = await client.GetRestAsync("smarthome/overview", TestContext.Current.CancellationToken);
@@ -287,17 +291,18 @@ public sealed class FritzBoxHttpClientTests : IDisposable
     }
 
     [Theory]
-    [InlineData(HttpStatusCode.Forbidden)]
-    [InlineData(HttpStatusCode.Unauthorized)]
-    public async Task A_box_that_keeps_refusing_the_new_session_ends_in_an_HttpRequestException_after_one_repeat(HttpStatusCode refusal)
+    [InlineData(HttpStatusCode.Forbidden, "no access")]
+    [InlineData(HttpStatusCode.Unauthorized, "no access")]
+    [InlineData(HttpStatusCode.BadRequest, PermissionDenied)]
+    public async Task A_box_that_keeps_refusing_the_new_session_ends_in_an_HttpRequestException_after_one_repeat(HttpStatusCode refusal, string body)
     {
-        var box = new FakeBox { Respond = _ => (refusal, "no access") };
+        var box = new FakeBox { Respond = _ => (refusal, body) };
         using var client = CreateClient(box);
 
         var exception = await Assert.ThrowsAsync<HttpRequestException>(() => client.GetRestAsync("smarthome/overview", TestContext.Current.CancellationToken));
 
         Assert.Equal(refusal, exception.StatusCode);
-        Assert.Contains("no access", exception.Message);
+        Assert.Contains(body, exception.Message);
         Assert.Equal(2, box.Requests.Count);
         Assert.Equal(2, box.LoginPosts.Count);
     }
@@ -306,6 +311,7 @@ public sealed class FritzBoxHttpClientTests : IDisposable
     [InlineData(HttpStatusCode.InternalServerError, "lua: stack overflow")]
     [InlineData(HttpStatusCode.NotFound, "no such unit")]
     [InlineData(HttpStatusCode.BadRequest, "invalid JSON")]
+    [InlineData(HttpStatusCode.BadRequest, """{"errors":[{"message":"invalid value","code":1001}]}""")]
     public async Task Any_other_error_status_throws_an_HttpRequestException_with_the_answer_of_the_box_and_is_not_repeated(HttpStatusCode status, string body)
     {
         var box = new FakeBox { Respond = _ => (status, body) };
