@@ -316,6 +316,30 @@ public sealed class Ipv4WatchdogServiceTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task A_session_the_box_dropped_since_the_last_cycle_is_replaced_by_a_new_login()
+    {
+        var service = await StartAsync();
+        await service.TickAsync(Token);
+        service.RequestTestCycle();
+        await service.TickAsync(Token);
+        Advance(30);
+        await service.TickAsync(Token);
+        Advance(30);
+        await service.TickAsync(Token);
+        Assert.Single(box.LoginPosts);
+
+        // The night of 2026-10-28: the first request hours after the test cycle met "permission denied".
+        box.ExpireSessions();
+        pinger.Answers[publicAddress] = false;
+        Advance(3600);
+        await service.TickAsync(Token);
+
+        Assert.Equal([Ipv6Client.Off, Ipv6Client.Automatic, Ipv6Client.Off], box.ModesPut);
+        Assert.Equal(2, box.LoginPosts.Count);
+        Assert.Equal(Ipv4WatchdogPhase.SwitchingOn, service.Status.Phase);
+    }
+
+    [Fact]
     public async Task A_box_that_refuses_to_switch_off_ends_the_cycle_as_failed_without_switching_again()
     {
         box.RefusePut = true;

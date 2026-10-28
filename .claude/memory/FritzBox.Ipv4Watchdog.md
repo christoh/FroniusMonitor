@@ -35,6 +35,11 @@ test that everything here rests on.
   the live test). So nothing stale is written back.
 - **The box answers 200 before it acts**, and then reconnects, IPv4 included, for 10 to 20 s. The answer proves
   nothing; reading the mode back once the box answers again does.
+- **The session expires between cycles.** The watchdog asks the box only during a cycle, so its session is long
+  gone by the next outage (20 minutes without a request end it), and the REST API refuses a stale session with
+  400 and error code 3001 ("permission denied"). On 2026-10-28 that stopped every cycle of the night and the
+  morning, because `FritzBoxHttpClient` logged in again on 401 and 403 only. It does on 400 with code 3001 too since
+  then ([[FritzBox.SmartHome]]).
 
 ## The watchdog: `HomeAutomationServer/Services/Ipv4Watchdog/Ipv4WatchdogService.cs`
 
@@ -116,6 +121,10 @@ is one of its own for the HA server (D11) with the right "FRITZ!Box Einstellunge
 Deployed on 2026-10-27 with `dev`. The first test cycle took 71 s and ended in `ipv4Back`: IPv6 off 2 s after the
 request, back on 33 s later at the first try after the delay, checked 35 s after that. The plan (phase 2.3) has the
 timeline next to what amazon2 saw.
+
+On 2026-10-28 the night and the morning brought seven outages (03:53 to 10:03 UTC). The first six ended by
+themselves after 5 to 20 minutes; for none of them a cycle was started, because of the stale session above, and the
+log said "the box does not answer" for a box that did answer, with an error. The message names the error now.
 
 ## Tests
 

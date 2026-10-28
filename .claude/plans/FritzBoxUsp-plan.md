@@ -391,6 +391,10 @@ to reach it anyway, and the log warns after 5 minutes.
 - **amazon2's tunnel** had stayed on IPv4 from the live test until this cycle (35 minutes), and went back to IPv6
   10 s after IPv6 was back this time. So whether it returns to IPv6 after a cycle differs from cycle to cycle; it
   is not the watchdog's way in either way.
+- **The first real outages, 2026-10-28** (seven between 03:53 and 10:03 UTC): no cycle was started, because the
+  REST API refuses a session idle for 20 minutes with 400 and error code 3001, and `FritzBoxHttpClient` logged in
+  again on 401 and 403 only. Fixed the same day; it would also have stopped the smart home after a reboot of the
+  box in Neufahrn.
 
 ### Later
 

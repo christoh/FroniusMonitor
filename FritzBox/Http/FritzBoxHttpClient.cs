@@ -33,6 +33,9 @@ public sealed class FritzBoxHttpClient : IDisposable
     private const string NoSession = "0000000000000000";
     private const string LoginPath = "login_sid.lua?version=2";
 
+    /// <summary>The REST API's error code for a request it does not allow, which it gives a session it does not know as well.</summary>
+    private const int PermissionDenied = 3001;
+
     private readonly FritzBoxHttpClientOptions options;
     private readonly ILogger logger;
     private readonly HttpClient httpClient;
@@ -140,7 +143,7 @@ public sealed class FritzBoxHttpClient : IDisposable
 
     /// <summary>
     /// Sends the request <paramref name="createRequest"/> makes for the current session. When the box refuses the
-    /// session, it logs in again and repeats the request once.
+    /// session (<see cref="IsSessionRefusedAsync"/>), it logs in again and repeats the request once.
     /// </summary>
     /// <exception cref="HttpRequestException">The box answered with an error. The message holds its answer.</exception>
     private async Task<HttpResponseMessage> SendAsync(Func<string, HttpRequestMessage> createRequest, CancellationToken token)
@@ -151,7 +154,7 @@ public sealed class FritzBoxHttpClient : IDisposable
             using var request = createRequest(session);
             var response = await httpClient.SendAsync(request, token).ConfigureAwait(false);
 
-            if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden && attempt == 1)
+            if (attempt == 1 && await IsSessionRefusedAsync(response, token).ConfigureAwait(false))
             {
                 response.Dispose();
                 Interlocked.CompareExchange(ref sessionId, null, session);
@@ -166,6 +169,43 @@ public sealed class FritzBoxHttpClient : IDisposable
             }
 
             return response;
+        }
+    }
+
+    /// <summary>
+    /// Whether the box refuses the session: AHA answers 403, the REST API 400 with error code 3001,
+    /// <c>{"errors":[{"message":"permission denied: /api/v0/…","code":3001}]}</c>. A session ends 20 minutes after
+    /// its last request, and with a reboot. The smart home is polled every two seconds and so never lost it; the IPv4
+    /// watchdog asks the box only during a cycle, and its first request after a quiet night met the 400 (2026-10-28).
+    /// </summary>
+    /// <remarks>
+    /// The REST API answers the same when the user lacks the right. A new login tells the two apart: the repeated
+    /// request fails again then, and its error is thrown.
+    /// </remarks>
+    private static async Task<bool> IsSessionRefusedAsync(HttpResponseMessage response, CancellationToken token)
+    {
+        if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
+        {
+            return true;
+        }
+
+        if (response.StatusCode != HttpStatusCode.BadRequest)
+        {
+            return false;
+        }
+
+        try
+        {
+            using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync(token).ConfigureAwait(false));
+
+            return document.RootElement.ValueKind == JsonValueKind.Object &&
+                   document.RootElement.TryGetProperty("errors", out var errors) &&
+                   errors.ValueKind == JsonValueKind.Array &&
+                   errors.EnumerateArray().Any(error => error.ValueKind == JsonValueKind.Object && error.TryGetProperty("code", out var code) && code.ValueKind == JsonValueKind.Number && code.TryGetInt32(out var value) && value == PermissionDenied);
+        }
+        catch (JsonException)
+        {
+            return false;
         }
     }
 

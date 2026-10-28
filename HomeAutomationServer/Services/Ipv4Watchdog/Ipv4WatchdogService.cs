@@ -405,7 +405,7 @@ public sealed class Ipv4WatchdogService : IHomeAutomationRunner, IIpv4WatchdogSe
         }
         catch (Exception ex) when (!token.IsCancellationRequested)
         {
-            Hold($"the box does not answer at {settings.BaseUrl} ({ex.Message})");
+            Hold($"its IPv6 mode cannot be read at {settings.BaseUrl}: {ex.Message}");
             return;
         }
 

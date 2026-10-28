@@ -7,13 +7,15 @@ namespace De.Hochstaetter.HomeAutomationServerTests.UnitTests.Fakes;
 /// <summary>
 /// A box with the IPv6 group of the Swiss box as it read on 2026-10-27: a GET of <c>sync_groups/sg/sg1001</c>
 /// answers the group, a PUT changes the fields it names and keeps the others. <see cref="IsReachable"/> takes the box
-/// off the network, the login included, as the reconnect after a switch does.
+/// off the network, the login included, as the reconnect after a switch does. <see cref="ExpireSessions"/> makes it
+/// forget every session it has handed out, as 20 minutes without a request do.
 /// </summary>
 internal sealed class FakeIpv6Box : FakeFritzBox
 {
     public const string GroupPath = "/api/v0/generic/sync_groups/sg/sg1001";
 
     private readonly Lock gate = new();
+    private readonly HashSet<string> expiredSessions = [];
 
     private readonly Dictionary<string, string> group = new()
     {
@@ -71,11 +73,31 @@ internal sealed class FakeIpv6Box : FakeFritzBox
         }
     }
 
+    /// <summary>
+    /// Forgets every session handed out so far: a request with one of them is answered with 400 and error code 3001,
+    /// as FRITZ!OS 8.25 answered the watchdog on 2026-10-28.
+    /// </summary>
+    public void ExpireSessions()
+    {
+        lock (gate)
+        {
+            expiredSessions.UnionWith(Requests.Select(r => r.Authorization).OfType<string>());
+        }
+    }
+
     /// <summary>The modes the PUTs set, in order.</summary>
     public IReadOnlyList<string> ModesPut => [.. Requests.Where(r => r.Method == HttpMethod.Put).Select(r => JsonSerializer.Deserialize<Dictionary<string, string>>(r.Body)!["ipv6_mode"])];
 
     protected override HttpResponseMessage Answer(FakeFritzBoxCall call, int number)
     {
+        lock (gate)
+        {
+            if (call.Authorization is { } session && expiredSessions.Contains(session))
+            {
+                return Reply(HttpStatusCode.BadRequest, $$"""{"errors":[{"message":"permission denied: {{call.Path.Replace("/", "\\/")}}","code":3001}]}""", "application/json");
+            }
+        }
+
         if (call.Path != GroupPath)
         {
             return Reply(HttpStatusCode.NotFound, "{}", "application/json");
