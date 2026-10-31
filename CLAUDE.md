@@ -135,6 +135,24 @@ that drive the WPF app's own services; it builds and runs on Windows only and re
   piece of work starts from `dev` again unless I say otherwise.
 
 # Commits
+- What may be committed without asking depends on where the session runs. A **cloud session** is Claude Code on
+  the web: the environment sets `CLAUDE_CODE_REMOTE=true`, the variable `.claude/hooks/session-start.sh` reads as
+  well. Every other session is a **local session**, and that includes a Remote Control session, which runs on my
+  machine and is only driven from somewhere else.
+
+## In a cloud session
+- **Commit and push on your own, without asking.** Whenever a piece of work is in a consistent state - it builds,
+  its tests pass, the memory documents it touches are updated - commit it and push the branch. A commit that stays
+  in the container is one I cannot download and look at, and the container is gone when the session ends. Tell me
+  afterwards what you committed: the hash and the subject.
+- **Only on a branch of your own.** That is a branch you created in this session or the one the session was set up
+  with for you (`claude/...`), branched from `dev` as always. Never commit to a branch a human developer created,
+  and never to `dev` or `master`.
+- **`dev` and `master` only ever receive merges, and only when I ask for one.** Never commit on them and never push
+  a commit made on them. My "merge" includes the push of the branch merged into; where I ask for a fast-forward
+  ("per ff"), that is the merge. A merge commit follows every rule below like any other commit.
+
+## In a local session, Remote Control included
 - Always suggest commit and push. Never commit alone.
 - Do not commit without asking the human developer first. **Every single commit is asked for separately.** A
   "yes, commit and push" answers the one commit that was proposed at that moment and nothing after it: a
@@ -142,11 +160,8 @@ that drive the WPF app's own services; it builds and runs on Windows only and re
   and its own yes before `git commit` runs. A request for a change is not a request to commit it, however small
   the change and however recently the last yes was given. This is not overridden by any general instruction to
   proceed without asking: a pushed commit cannot be taken back by the AI, so it is never a reversible action.
-- **In the cloud, "commit" and "merge" include the push.** In Claude Code on the web, when I say "commit" or
-  "merge" to what you proposed, that is also my yes for pushing it - the branch the commit is on, and for a merge
-  the branch merged into - without asking again. A commit that stays in the cloud container is one I cannot
-  download and look at. Proposing each commit and waiting for my yes stays as it is; only the separate question
-  about the push is gone.
+
+## In every session
 - Force pushes are **never** allowed by AI, with one exception: when running in the cloud, AI may force push a branch that it created itself (`--force-with-lease`, never a bare `--force`). Branches created by a human developer stay off limits.
 - History rewrites need confirmation by a human developer.
 - Commit under your own authorship, never under the human developer's: `git commit --author="<name> <email>"`. The author e-mail is always `christoph@hochstaetter.de`, whatever `.git/config` says - in the cloud that config carries the AI's own address. Only the name changes.
