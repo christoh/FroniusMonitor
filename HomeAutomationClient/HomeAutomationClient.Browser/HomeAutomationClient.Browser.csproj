@@ -11,6 +11,10 @@
 		     it is what the reflection in our code counts on; see PlatformHeads.Lifecycle and Dashboard.Loading. -->
 		<PublishTrimmed>true</PublishTrimmed>
 		<TrimMode>partial</TrimMode>
+		<!-- A trimmed app has System.Text.Json's reflection-based serialization switched off by default, and the app then
+		     dies on its first JSON - the cache read at start-up. The web client, the hub protocol and the caches serialize
+		     our models with it, and those types are untrimmed, so it is switched back on. -->
+		<JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
 		<Nullable>enable</Nullable>
         <WasmBuildNative>true</WasmBuildNative>
 		<!-- Compiled to WebAssembly ahead of time when published, which is what the Dockerfile does. Without this the
