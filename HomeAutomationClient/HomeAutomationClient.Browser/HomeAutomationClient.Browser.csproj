@@ -5,7 +5,12 @@
 		<Configuration>Release</Configuration>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<RootNamespace>De.Hochstaetter.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-		<PublishTrimmed>false</PublishTrimmed>
+		<!-- The WebAssembly SDK compiles ahead of time only with IL trimming on. Partial trims the assemblies that declare
+		     themselves trimmable - the framework, Avalonia, SkiaSharp, the SignalR client, the toolkit - and leaves the
+		     rest whole: Fronius, this client, ScottPlot, the DataGrid. That is the mode the mobile heads build with, and
+		     it is what the reflection in our code counts on; see PlatformHeads.Lifecycle and Dashboard.Loading. -->
+		<PublishTrimmed>true</PublishTrimmed>
+		<TrimMode>partial</TrimMode>
 		<Nullable>enable</Nullable>
         <WasmBuildNative>true</WasmBuildNative>
 		<!-- Compiled to WebAssembly ahead of time when published, which is what the Dockerfile does. Without this the

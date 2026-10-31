@@ -112,6 +112,18 @@ which is what the Dockerfile's client builder stage does; the `wasm-tools` workl
 already. The publish takes longer and the download is bigger. A plain build or `dotnet run` does not compile
 ahead of time.
 
+**AOT needs IL trimming**: the .NET 10 WebAssembly SDK stops the publish with "AOT is not supported without IL
+trimming", and the browser head had `PublishTrimmed=false` since its first commit. It trims since 2026-10-31,
+with `TrimMode=partial` like the mobile heads: only the assemblies that declare themselves trimmable are trimmed
+(the framework, Avalonia, SkiaSharp, HarfBuzzSharp, the SignalR client, CommunityToolkit.Mvvm), and Fronius, the
+client, ScottPlot and the DataGrid stay whole - which is what the reflection in our code counts on, see
+[[PlatformHeads.Lifecycle]]. **Newtonsoft is not among them: nothing but `HomeAutomationServerTests` references
+it any more** (the oracle of `JsonExtensionsTests`); the comments in `Fronius` that name it are history. With
+trimming on, System.Text.Json switches its reflection-based serialization off by default, and the web client and
+the hub protocol serialize our models with it, so `JsonSerializerIsReflectionEnabledByDefault` is set back to
+true in the browser project. The mobile heads, which trim the same way, have never run (known gap in
+[[PlatformHeads.Lifecycle]]) and will want the same switch.
+
 ### `Run.Text` binds two way by default
 
 `Run.TextProperty`'s default binding mode is **TwoWay** (`TextBlock.Text` is OneWay), so a `<Run Text="{Binding
@@ -141,4 +153,6 @@ its own.
 - The detail views build all their gauges at once - `InverterDetailsView` 138 - but open one at a time, on
   request; `LazyPanel` would serve their gauge groups too, should it be wanted.
 - `HouseControl` (296 visuals) and `SmartMeterControl` are part of the page and built with it.
-- The WebAssembly numbers are unmeasured; the AOT build's size and time are what the next image build shows.
+- The WebAssembly numbers are unmeasured, and the trimmed AOT publish has not been seen through yet: the first
+  attempt in the cloud failed on the trimming requirement above, the second on the sandbox's proxy port changing
+  under it. Size, build time and whether the published app comes up are what the next image build shows.
