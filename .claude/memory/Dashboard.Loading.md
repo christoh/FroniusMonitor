@@ -149,8 +149,8 @@ its own.
 ## The trimmed AOT publish, seen through once (2026-10-31, in the cloud)
 
 Built through the Dockerfile's client stage with `docker buildx bake … --set client.platform=linux/amd64 --load`
-and the proxy override of the session: the publish step took 12.5 minutes (100 ms of trimming, "AOT'ing 100
-assemblies" the rest), with 274 `IL2026` trim warnings - the compiled XAML's setters of the string properties of
+and the proxy override of the session: the publish step took 12.5 minutes (about 100 s to restore, build and
+trim, the AOT toolchain the rest - see below), with 274 `IL2026` trim warnings - the compiled XAML's setters of the string properties of
 the settings view models, the two JSON calls of `Browser/Platform/Cache.cs`, and `IL2104` for the DataGrid,
 ScottPlot and `Avalonia.DesignerSupport`, none of which is trimmed. `_framework` is 105 MB on disk and 14.1 MB
 as the brotli files nginx serves, of which `dotnet.native.wasm` is 52 MB raw and 10.2 MB brotli; the image's
@@ -163,6 +163,35 @@ the first publish carried `false`, because the edit that set it had died with th
 died on its first JSON before Avalonia was up. And the client image's nginx listens on `[::]:42741` as well,
 which the cloud sandbox cannot bind (no IPv6): to run the image there, mount a `default.conf` without that line
 over `/etc/nginx/http.d/default.conf`.
+
+### Where the 12.5 minutes go, and why the machine looks idle
+
+The developer saw the AOT publish run long on little CPU. The timestamps of the build log (4 cores) say why:
+
+| Phase | Time | In parallel? |
+|---|---|---|
+| restore, build, ILLink | 0-102 s | mostly |
+| `mono-aot-cross`, IL to `.bc`, 100 assemblies | 102-184 s | yes, but 99 are done after 18 s; `aot-instances.dll` then runs alone for 62 s |
+| LLVM `-O2`, `.bc` to `.o`, one per assembly | 184-419 s | yes: 634 s of CPU in 235 s, 2.7 cores on average; the last 85 s are `aot-instances` (137 s, and last in the queue) alone |
+| `wasm-ld` | 420-423 s | - |
+| `wasm-opt -O2` on the linked 52 MB module | 423-749 s | one process; Binaryen spreads only function-local passes over threads, the whole-module ones are serial |
+
+About half the time is one core, which on a machine with many cores reads as an idle build. Both serial parts
+are built in: with dedup (the default) every generic instantiation of every assembly goes once into
+`aot-instances.dll`, which can only be compiled after all the others and is the biggest; and `wasm-opt` is
+Emscripten's whole-module optimizer when linking at `-O2`. GitHub's runner does the whole workflow in about 8
+minutes.
+
+**The link stays at `-O2`** - the developer's decision of 2026-10-31. `EmccLinkOptimizationFlag=-O1` would skip
+the 5.4 minutes of `wasm-opt` (Emscripten runs the Binaryen optimizer from `-O2` on), and it was offered and
+declined; do not propose it again. Turning dedup off (`WasmDedup`) would spread `aot-instances` over the
+assemblies but duplicate the generics into each of them; not proposed either.
+
+What would save time without touching the code that comes out: the client builder stage starts with `COPY . .`,
+and `.dockerignore` keeps out only `bin` and `obj`, so any change anywhere in the repository - the server, a test,
+a memory document - runs the whole AOT publish again in a local build; and the workflow builds without a layer
+cache, so on GitHub every push to master runs it regardless. Copying only what the client needs into that stage,
+and a `gha` cache in the workflow, would let a server-only change reuse the published client. Not done.
 
 ## Not done, and known
 
