@@ -68,7 +68,7 @@ public sealed class DevicePaletteTests
         meter.MeterStatus = new Gen24Status { StatusCode = "STATE_RUNNING", Status = 1 };
         await HeadlessAvalonia.SettleAsync();
 
-        Assert.Same(running, meter.FindControl<Grid>("BackgroundProvider")!.Background);
+        Assert.Same(running, meter.FindControl<Border>("BackgroundProvider")!.Background);
         window.Close();
     });
 }

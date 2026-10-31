@@ -9,7 +9,7 @@
                      mc:Ignorable="d" d:DesignWidth="220" d:DesignHeight="272"
                      x:Class="De.Hochstaetter.HomeAutomationClient.Controls.WattPilotControl">
 	<Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:WattPilotControl}}">
-		<Border Classes="DeviceFrame" Width="110">
+		<Border x:Name="BackgroundProvider" Classes="DeviceFrame" Width="110">
 			<Border.Styles>
 				<Style Selector="c|HalfCircleGauge">
 					<Setter Property="TickFill" Value="{DynamicResource TickFill}" />
@@ -18,7 +18,7 @@
 					<Setter Property="AnimationDuration" Value="00:00:01.0" />
 				</Style>
 			</Border.Styles>
-			<Grid x:Name="BackgroundProvider" RowDefinitions="Auto,Auto,Auto">
+			<Grid RowDefinitions="Auto,Auto,Auto">
 				<Grid Grid.Row="0" RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*">
 					<Viewbox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" StretchDirection="DownOnly" Margin="2,0">
 						<TextBlock FontSize="8" TextAlignment="Center" Text="{Binding WattPilot.DeviceName, FallbackValue=---, TargetNullValue=???}" />

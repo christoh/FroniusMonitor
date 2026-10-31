@@ -54,16 +54,22 @@ speaks the language of the power flow page:
   amber, fault red, startup blue, each a light card with a lighter panel. Any other state is a light grey.
 - **The frame** of a device card and of a gauge tile is one style, `Border.DeviceFrame`, with `DeviceBorder`,
   `DeviceCornerRadius` and - in the gauge template only - `GaugeTileMargin` from the palette: rounded, with a gap,
-  so that the tiles are cards and not a table. `ClipToBounds` is what makes a card's square panels follow the
-  rounded frame. Do not set `BorderBrush` or `CornerRadius` on the Border in `DetailsGauge`: a value set in a
-  template outranks a style, and the frame would stop following the theme.
+  so that the tiles are cards and not a table. Do not set `BorderBrush` or `CornerRadius` on the Border in
+  `DetailsGauge`: a value set in a template outranks a style, and the frame would stop following the theme.
+- **The colour of a card's state goes on the frame, never on a panel inside it.** A panel is square, and its
+  corners paint over the rounded line of the frame - the developer saw the frame end at every corner on the first
+  version, which had the colour on the `Grid` inside and `ClipToBounds` on the frame. Clipping does not help: it
+  cuts at the outer edge of the frame, so the line under the panel's corner stays covered. Since then
+  `BackgroundProvider`, the element the code behind colours, **is** the `Border.DeviceFrame` in `InverterControl`,
+  `SmartMeterControl`, `WattPilotControl` and `PowerConsumer`. `ToshibaHvacControl` keeps it on its `Grid`, whose
+  margin of 2 holds the corners clear of the line - and shows the ground as a thin ring, as it always has.
 - The tabs of a card are grey, the selected one a light blue; the units are the slate of the labels, the needle
   the orange of the dark variant; the battery and the on/off switch have colours of the same family.
 
 **The dark variant did not change**, on purpose: `DeviceBorder` is `DimGray`, radius and gap are 0, and
-`BackgroundBrush` is the black Fluent painted a page with. Rendered before and after, the dark pages differed in a
-few hundred pixels of anti-aliasing at the gauge ticks, by at most 28 of 255 - `ClipToBounds` changes the path
-Skia draws them on.
+`BackgroundBrush` is the black Fluent painted a page with. Rendered before and after, the inverter page is
+identical to the pixel; the dashboard differs only along the frames of the cards, by at most 26 of 255, because
+the frame's anti-aliased edge now blends with the card's colour under it instead of the black ground.
 
 ## The kinds of power
 

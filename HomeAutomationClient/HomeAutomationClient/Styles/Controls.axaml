@@ -51,13 +51,15 @@
 
     <!-- The frame of every device card on the dashboard and of every gauge tile on the detail views, in one place
          instead of a DimGray literal in each of them. Colour, rounding and the gap between the tiles are per theme
-         in App.axaml. -->
+         in App.axaml.
+         The colour of a card's state belongs on this Border, never on a panel inside it: a panel is square, and
+         its corners paint over the rounded line of the frame. Clipping does not help - it cuts at the outer edge
+         of the frame, so the line stays covered. That is why BackgroundProvider is the Border in every card - except
+         ToshibaHvacControl, whose panel keeps a margin of 2 that holds it clear of the line. -->
     <Style Selector="Border.DeviceFrame">
         <Setter Property="BorderBrush" Value="{DynamicResource DeviceBorder}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="CornerRadius" Value="{DynamicResource DeviceCornerRadius}"/>
-        <!-- A card's panels paint square corners; clipping is what makes them follow a rounded frame. -->
-        <Setter Property="ClipToBounds" Value="True"/>
     </Style>
 
     <!-- The ground of every page, which the cards and tiles stand on. Fluent paints a page white or black by itself;
