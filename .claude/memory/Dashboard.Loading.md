@@ -146,6 +146,24 @@ when the needle animation is on, so compare renders with `AnimationDuration` set
 difference against two renders of the same code. A `git worktree` of the old commit gives the old code a probe of
 its own.
 
+## The trimmed AOT publish, seen through once (2026-10-31, in the cloud)
+
+Built through the Dockerfile's client stage with `docker buildx bake … --set client.platform=linux/amd64 --load`
+and the proxy override of the session: the publish step took 12.5 minutes (100 ms of trimming, "AOT'ing 100
+assemblies" the rest), with 274 `IL2026` trim warnings - the compiled XAML's setters of the string properties of
+the settings view models, the two JSON calls of `Browser/Platform/Cache.cs`, and `IL2104` for the DataGrid,
+ScottPlot and `Avalonia.DesignerSupport`, none of which is trimmed. `_framework` is 105 MB on disk and 14.1 MB
+as the brotli files nginx serves, of which `dotnet.native.wasm` is 52 MB raw and 10.2 MB brotli; the image's
+content is 66 MB. Loaded in headless Chromium through Playwright, the app had its canvas after 3.2 s and the
+login dialog on screen, with no page error.
+
+Two things the first attempt taught: **the switch has to be checked in the published app**, with
+`grep -o '"System.Text.Json.JsonSerializer.IsReflectionEnabledByDefault": [a-z]*' _framework/dotnet.js` -
+the first publish carried `false`, because the edit that set it had died with the shell it ran in, and the app
+died on its first JSON before Avalonia was up. And the client image's nginx listens on `[::]:42741` as well,
+which the cloud sandbox cannot bind (no IPv6): to run the image there, mount a `default.conf` without that line
+over `/etc/nginx/http.d/default.conf`.
+
 ## Not done, and known
 
 - The 4 Toshiba cards are 217 visuals each (16 buttons, 10 menu flyouts) and the dearest of the consumer cards at
@@ -153,6 +171,5 @@ its own.
 - The detail views build all their gauges at once - `InverterDetailsView` 138 - but open one at a time, on
   request; `LazyPanel` would serve their gauge groups too, should it be wanted.
 - `HouseControl` (296 visuals) and `SmartMeterControl` are part of the page and built with it.
-- The WebAssembly numbers are unmeasured, and the trimmed AOT publish has not been seen through yet: the first
-  attempt in the cloud failed on the trimming requirement above, the second on the sandbox's proxy port changing
-  under it. Size, build time and whether the published app comes up are what the next image build shows.
+- The WebAssembly numbers are unmeasured; whether the dashboard is quicker in the browser, and by how much, is
+  what the next rollout shows.
