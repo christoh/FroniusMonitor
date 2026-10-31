@@ -63,6 +63,15 @@ The WPF pair each had the formula written out until 2026-09-19, which is why `Di
 `RelativeValue`: a switch that only half the gauges obey is worse than no switch. **Do not write the clamp out
 again in a template.**
 
+## The needle moves only on screen (Avalonia, 2026-10-31)
+
+`Gauge.SetValue` animates a new value over a second - but not before the gauge is loaded and not while it is not
+effectively visible: `sKipAnimation |= !IsLoaded || !IsEffectivelyVisible;`, and the value is taken at once. Every
+binding that delivers a first value during XAML construction used to start an animation of its own - 250 of them
+when the dashboard came up, most in panels nobody saw - and a gauge in a hidden panel now shows whatever it has
+when the panel comes back rather than running an animation for nobody. `DeferredBuildingTests` holds all three
+cases. The WPF gauge was left as it is. See [[Dashboard.Loading]].
+
 ## What a gauge is told at runtime, and what only by a style
 
 `ColorAllTicks` changes while the app runs - a menu item in WPF, a switch in the main view in Avalonia - so both

@@ -180,6 +180,12 @@ public abstract class Gauge : ContentControl
     // ReSharper disable once AsyncVoidMethod
     protected virtual async void SetValue(bool sKipAnimation = false)
     {
+        // A gauge nobody can see does not move its needle, it takes the value. Before the gauge is loaded, every
+        // binding that delivers a value would start a one second animation of its own - the dashboard started two
+        // hundred and fifty of them at once, most in panels that were not shown - and a gauge in a hidden panel shows
+        // whatever value it has when the panel comes back. A value that arrives while the gauge is on screen animates.
+        sKipAnimation |= !IsLoaded || !IsEffectivelyVisible;
+
         var value = double.IsNaN(Value ?? NullValue) ? 0 : Value ?? NullValue;
         var relativeValue = (Math.Max(Math.Min(Maximum, DialShowsAbsoluteValue ? Math.Abs(value) : value), Minimum) - Minimum) / (Maximum - Minimum);
         relativeValue = double.IsFinite(relativeValue) ? relativeValue : Math.Min(Math.Max(Origin, 0), 1);

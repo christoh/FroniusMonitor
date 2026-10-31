@@ -26,7 +26,7 @@
                         <!-- The roles are the server's enum names on purpose, not translated: see MainView. -->
 						<TextBlock Text="" FontWeight="SemiBold">
                             <Run Text="{Binding UserName}"/>
-                            <Run Text="("/><Run Text="{Binding Roles}"/><Run Text=")"/>
+                            <Run Text="("/><Run Text="{Binding Roles, Mode=OneWay}"/><Run Text=")"/>
                         </TextBlock>
 					</StackPanel>
 				</DataTemplate>

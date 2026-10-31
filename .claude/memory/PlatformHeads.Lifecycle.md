@@ -438,8 +438,10 @@ to `wwwroot`; there was nothing for it to report that Avalonia does not already.
 ## Known gaps
 
 - Neither mobile head has ever run on a device or emulator. Everything about them here is compile time knowledge.
-- `dotnet run` on the browser head serves an app whose SkiaSharp fails to initialize, because neither
-  `WasmBuildNative` nor `RunAOTCompilation` is on. The page loads and the .NET side runs - useful for checking
-  interop in the console - but nothing is rendered.
+- `dotnet run` on the browser head serves an app whose SkiaSharp fails to initialize - seen while neither
+  `WasmBuildNative` nor `RunAOTCompilation` was on, and not tried again since both are: `RunAOTCompilation`
+  since 2026-10-31 (see [[Dashboard.Loading]]), and it applies to a publish only, which is what the Dockerfile
+  does; a plain build or `dotnet run` still runs the interpreter. The page loads and the .NET side runs - useful
+  for checking interop in the console - but nothing is rendered.
 - The browser head carries `FileCache` without using it. Accepted: one place for the file format is worth more
   than the few kilobytes.

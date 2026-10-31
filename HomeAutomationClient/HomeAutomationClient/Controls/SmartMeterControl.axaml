@@ -64,283 +64,339 @@
 				<Border Grid.Row="1" Width="100" Height="85" Margin="4" x:Name="InnerBackgroundProvider"
                         BorderThickness=".2" BorderBrush="Black">
 					<Grid>
-						<Grid x:Name="PowerActiveGauge" IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool PowerActiveGauge}}" RowDefinitions="Auto,Auto,Auto">
+						<c:LazyPanel IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool PowerActiveGauge}}">
+							<Template x:DataType="c:SmartMeterControl">
+								<Grid x:Name="PowerActiveGauge" RowDefinitions="Auto,Auto,Auto">
 
-							<TextBlock FontSize="10" FontWeight="Normal" Text="{x:Static p:Resources.ActivePower}" TextAlignment="Center" />
+									<TextBlock FontSize="10" FontWeight="Normal" Text="{x:Static p:Resources.ActivePower}" TextAlignment="Center" />
 
-							<TextBlock FontSize="10" FontWeight="Medium" Grid.Row="1" Margin="0,0,0,2"
-                                       Width="{Binding Bounds.Width, ElementName=PowerActiveGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
-								<Run Text="{Binding SmartMeter.ActivePowerSum, StringFormat=N1, FallbackValue=0, TargetNullValue=0}" />
-								<Run Text="W" />
-							</TextBlock>
+									<TextBlock FontSize="10" FontWeight="Medium" Grid.Row="1" Margin="0,0,0,2"
+		                                       Width="{Binding Bounds.Width, ElementName=PowerActiveGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
+										<Run Text="{Binding SmartMeter.ActivePowerSum, StringFormat=N1, FallbackValue=0, TargetNullValue=0, Mode=OneWay}" />
+										<Run Text="W" />
+									</TextBlock>
 
-							<c:HalfCircleGauge Value="{Binding SmartMeter.ActivePowerSum, FallbackValue=0, TargetNullValue=0}"
-                                               Minimum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter IsMinimum=True}, FallbackValue=-24150}"
-                                               Maximum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter IsMinimum=False}, FallbackValue=24150}"
-                                               GaugeColors="{x:Static m:GaugeColors.MidIsGood}"
-                                               Origin=".5" Width="92" Grid.Row="2" />
-						</Grid>
+									<c:HalfCircleGauge Value="{Binding SmartMeter.ActivePowerSum, FallbackValue=0, TargetNullValue=0}"
+		                                               Minimum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter IsMinimum=True}, FallbackValue=-24150}"
+		                                               Maximum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter IsMinimum=False}, FallbackValue=24150}"
+		                                               GaugeColors="{x:Static m:GaugeColors.MidIsGood}"
+		                                               Origin=".5" Width="92" Grid.Row="2" />
+								</Grid>
+							</Template>
+						</c:LazyPanel>
 
-						<Grid x:Name="PowerActive" IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool PowerActive}}" RowDefinitions="Auto,*">
-							<Grid.Resources>
-								<ControlTheme x:Key="Local" TargetType="c:LinearGauge" BasedOn="{StaticResource PowerLinearGaugeStyle}" />
-							</Grid.Resources>
+						<c:LazyPanel IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool PowerActive}}">
+							<Template x:DataType="c:SmartMeterControl">
+								<Grid x:Name="PowerActive" RowDefinitions="Auto,*">
+									<Grid.Resources>
+										<ControlTheme x:Key="Local" TargetType="c:LinearGauge" BasedOn="{StaticResource PowerLinearGaugeStyle}" />
+									</Grid.Resources>
 
-							<TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{x:Static p:Resources.ActivePower}" />
+									<TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{x:Static p:Resources.ActivePower}" />
 
-							<StackPanel Grid.Row="1" VerticalAlignment="Center">
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="L1" Value="{Binding SmartMeter.ActivePowerL1, FallbackValue=0, TargetNullValue=0}" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="L2" Value="{Binding SmartMeter.ActivePowerL2, FallbackValue=0, TargetNullValue=0}" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="L3" Value="{Binding SmartMeter.ActivePowerL3, FallbackValue=0, TargetNullValue=0}" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="{x:Static p:Resources.Sum}" Value="{Binding SmartMeter.ActivePowerSum, FallbackValue=0, TargetNullValue=0}"
-                                               Minimum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter IsMinimum=True}, FallbackValue=-24150}"
-                                               Maximum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter}, FallbackValue=-24150}" />
-							</StackPanel>
-						</Grid>
+									<StackPanel Grid.Row="1" VerticalAlignment="Center">
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="L1" Value="{Binding SmartMeter.ActivePowerL1, FallbackValue=0, TargetNullValue=0}" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="L2" Value="{Binding SmartMeter.ActivePowerL2, FallbackValue=0, TargetNullValue=0}" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="L3" Value="{Binding SmartMeter.ActivePowerL3, FallbackValue=0, TargetNullValue=0}" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="{x:Static p:Resources.Sum}" Value="{Binding SmartMeter.ActivePowerSum, FallbackValue=0, TargetNullValue=0}"
+		                                               Minimum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter IsMinimum=True}, FallbackValue=-24150}"
+		                                               Maximum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter}, FallbackValue=-24150}" />
+									</StackPanel>
+								</Grid>
+							</Template>
+						</c:LazyPanel>
 
-						<Grid x:Name="PowerApparent" IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool PowerApparent}}" RowDefinitions="Auto,*">
-							<Grid.Resources>
-								<ControlTheme x:Key="Local" TargetType="c:LinearGauge" BasedOn="{StaticResource PowerLinearGaugeStyle}">
-									<Setter Property="UnitName" Value="VA" />
-									<Setter Property="Minimum" Value="0" />
-									<Setter Property="Origin" Value="0" />
-									<Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.HighIsBad}" />
-								</ControlTheme>
-							</Grid.Resources>
+						<c:LazyPanel IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool PowerApparent}}">
+							<Template x:DataType="c:SmartMeterControl">
+								<Grid x:Name="PowerApparent" RowDefinitions="Auto,*">
+									<Grid.Resources>
+										<ControlTheme x:Key="Local" TargetType="c:LinearGauge" BasedOn="{StaticResource PowerLinearGaugeStyle}">
+											<Setter Property="UnitName" Value="VA" />
+											<Setter Property="Minimum" Value="0" />
+											<Setter Property="Origin" Value="0" />
+											<Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.HighIsBad}" />
+										</ControlTheme>
+									</Grid.Resources>
 
-							<TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{x:Static p:Resources.ApparentPower}" />
+									<TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{x:Static p:Resources.ApparentPower}" />
 
-							<StackPanel Grid.Row="1" VerticalAlignment="Center">
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="L1" Value="{Binding SmartMeter.ApparentPowerL1, FallbackValue=0, TargetNullValue=0}" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="L2" Value="{Binding SmartMeter.ApparentPowerL2, FallbackValue=0, TargetNullValue=0}" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="L3" Value="{Binding SmartMeter.ApparentPowerL3, FallbackValue=0, TargetNullValue=0}" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="{x:Static p:Resources.Sum}" Value="{Binding SmartMeter.ApparentPowerSum, FallbackValue=0, TargetNullValue=0}"
-                                               Maximum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter}, FallbackValue=-24150}" />
-							</StackPanel>
-						</Grid>
+									<StackPanel Grid.Row="1" VerticalAlignment="Center">
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="L1" Value="{Binding SmartMeter.ApparentPowerL1, FallbackValue=0, TargetNullValue=0}" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="L2" Value="{Binding SmartMeter.ApparentPowerL2, FallbackValue=0, TargetNullValue=0}" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="L3" Value="{Binding SmartMeter.ApparentPowerL3, FallbackValue=0, TargetNullValue=0}" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="{x:Static p:Resources.Sum}" Value="{Binding SmartMeter.ApparentPowerSum, FallbackValue=0, TargetNullValue=0}"
+		                                               Maximum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter}, FallbackValue=-24150}" />
+									</StackPanel>
+								</Grid>
+							</Template>
+						</c:LazyPanel>
 
-						<Grid x:Name="PowerReactive" IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool PowerReactive}}" RowDefinitions="Auto,*">
-							<Grid.Resources>
-								<ControlTheme x:Key="Local" TargetType="c:LinearGauge" BasedOn="{StaticResource PowerLinearGaugeStyle}">
-									<Setter Property="UnitName" Value="VA(r)" />
-								</ControlTheme>
-							</Grid.Resources>
+						<c:LazyPanel IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool PowerReactive}}">
+							<Template x:DataType="c:SmartMeterControl">
+								<Grid x:Name="PowerReactive" RowDefinitions="Auto,*">
+									<Grid.Resources>
+										<ControlTheme x:Key="Local" TargetType="c:LinearGauge" BasedOn="{StaticResource PowerLinearGaugeStyle}">
+											<Setter Property="UnitName" Value="VA(r)" />
+										</ControlTheme>
+									</Grid.Resources>
 
-							<TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{x:Static p:Resources.ReactivePower}" />
+									<TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{x:Static p:Resources.ReactivePower}" />
 
-							<StackPanel Grid.Row="1" VerticalAlignment="Center">
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="L1" Value="{Binding SmartMeter.ReactivePowerL1, FallbackValue=0, TargetNullValue=0}" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="L2" Value="{Binding SmartMeter.ReactivePowerL2, FallbackValue=0, TargetNullValue=0}" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="L3" Value="{Binding SmartMeter.ReactivePowerL3, FallbackValue=0, TargetNullValue=0}" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="{x:Static p:Resources.Sum}" Value="{Binding SmartMeter.ReactivePowerSum, FallbackValue=0, TargetNullValue=0}"
-                                               Minimum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter IsMinimum=True}, FallbackValue=-24150}"
-                                               Maximum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter}, FallbackValue=-24150}" />
-							</StackPanel>
-						</Grid>
+									<StackPanel Grid.Row="1" VerticalAlignment="Center">
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="L1" Value="{Binding SmartMeter.ReactivePowerL1, FallbackValue=0, TargetNullValue=0}" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="L2" Value="{Binding SmartMeter.ReactivePowerL2, FallbackValue=0, TargetNullValue=0}" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="L3" Value="{Binding SmartMeter.ReactivePowerL3, FallbackValue=0, TargetNullValue=0}" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="{x:Static p:Resources.Sum}" Value="{Binding SmartMeter.ReactivePowerSum, FallbackValue=0, TargetNullValue=0}"
+		                                               Minimum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter IsMinimum=True}, FallbackValue=-24150}"
+		                                               Maximum="{Binding Gen24Config.InverterSettings.PowerLimitSettings.ExportLimits, Converter={co:StrictestLimitConverter}, FallbackValue=-24150}" />
+									</StackPanel>
+								</Grid>
+							</Template>
+						</c:LazyPanel>
 
-						<Grid x:Name="PowerOutOfBalance" IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool PowerOutOfBalance}}" RowDefinitions="Auto,*">
-							<Grid.Resources>
-								<ControlTheme x:Key="Local" TargetType="c:LinearGauge" BasedOn="{StaticResource PowerLinearGaugeStyle}">
-									<Setter Property="Maximum" Value="4600" />
-									<Setter Property="Minimum" Value="0" />
-									<Setter Property="Origin" Value="0" />
-									<Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.HighIsBad}" />
-								</ControlTheme>
-							</Grid.Resources>
+						<c:LazyPanel IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool PowerOutOfBalance}}">
+							<Template x:DataType="c:SmartMeterControl">
+								<Grid x:Name="PowerOutOfBalance" RowDefinitions="Auto,*">
+									<Grid.Resources>
+										<ControlTheme x:Key="Local" TargetType="c:LinearGauge" BasedOn="{StaticResource PowerLinearGaugeStyle}">
+											<Setter Property="Maximum" Value="4600" />
+											<Setter Property="Minimum" Value="0" />
+											<Setter Property="Origin" Value="0" />
+											<Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.HighIsBad}" />
+										</ControlTheme>
+									</Grid.Resources>
 
-							<TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{x:Static p:Resources.OutOfBalance}" />
+									<TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{x:Static p:Resources.OutOfBalance}" />
 
-							<StackPanel Grid.Row="1" VerticalAlignment="Center">
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="L12" Value="{Binding SmartMeter.OutOfBalancePowerL12, FallbackValue=0, TargetNullValue=0}" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="L23" Value="{Binding SmartMeter.OutOfBalancePowerL23, FallbackValue=0, TargetNullValue=0}" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="L31" Value="{Binding SmartMeter.OutOfBalancePowerL31, FallbackValue=0, TargetNullValue=0}" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="Maximum" Value="{Binding SmartMeter.OutOfBalancePowerMax, FallbackValue=0, TargetNullValue=0}" />
-							</StackPanel>
-						</Grid>
+									<StackPanel Grid.Row="1" VerticalAlignment="Center">
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="L12" Value="{Binding SmartMeter.OutOfBalancePowerL12, FallbackValue=0, TargetNullValue=0}" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="L23" Value="{Binding SmartMeter.OutOfBalancePowerL23, FallbackValue=0, TargetNullValue=0}" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="L31" Value="{Binding SmartMeter.OutOfBalancePowerL31, FallbackValue=0, TargetNullValue=0}" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="Maximum" Value="{Binding SmartMeter.OutOfBalancePowerMax, FallbackValue=0, TargetNullValue=0}" />
+									</StackPanel>
+								</Grid>
+							</Template>
+						</c:LazyPanel>
 
-						<Grid x:Name="PowerFactor" IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool PowerFactor}}" RowDefinitions="Auto,*">
-							<Grid.Resources>
-								<!-- Like the cos(phi) group of the detail views: the bar reads the amount, the number
-								     beside it keeps the sign. The sign says which way the reactive power flows, the bar
-								     is about how good the power factor is, so the scale runs from 0 to 1 with 1 at the
-								     good end, and the Origin of the base theme goes with the lower half it belonged to. -->
-								<ControlTheme x:Key="Local" TargetType="c:LinearGauge" BasedOn="{StaticResource PowerLinearGaugeStyle}">
-									<Setter Property="DialShowsAbsoluteValue" Value="True" />
-									<Setter Property="Maximum" Value="1" />
-									<Setter Property="Minimum" Value="0" />
-									<Setter Property="Origin" Value="0" />
-									<Setter Property="UnitName" Value="" />
-									<Setter Property="StringFormat" Value="N3" />
-									<Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.LowIsBad}" />
-								</ControlTheme>
-							</Grid.Resources>
+						<c:LazyPanel IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool PowerFactor}}">
+							<Template x:DataType="c:SmartMeterControl">
+								<Grid x:Name="PowerFactor" RowDefinitions="Auto,*">
+									<Grid.Resources>
+										<!-- Like the cos(phi) group of the detail views: the bar reads the amount, the number
+										     beside it keeps the sign. The sign says which way the reactive power flows, the bar
+										     is about how good the power factor is, so the scale runs from 0 to 1 with 1 at the
+										     good end, and the Origin of the base theme goes with the lower half it belonged to. -->
+										<ControlTheme x:Key="Local" TargetType="c:LinearGauge" BasedOn="{StaticResource PowerLinearGaugeStyle}">
+											<Setter Property="DialShowsAbsoluteValue" Value="True" />
+											<Setter Property="Maximum" Value="1" />
+											<Setter Property="Minimum" Value="0" />
+											<Setter Property="Origin" Value="0" />
+											<Setter Property="UnitName" Value="" />
+											<Setter Property="StringFormat" Value="N3" />
+											<Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.LowIsBad}" />
+										</ControlTheme>
+									</Grid.Resources>
 
-							<TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="cos(φ)" />
+									<TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="cos(φ)" />
 
-							<StackPanel Grid.Row="1" VerticalAlignment="Center">
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="L1" Value="{Binding SmartMeter.PowerFactorL1, FallbackValue=0, TargetNullValue=0}" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="L2" Value="{Binding SmartMeter.PowerFactorL2, FallbackValue=0, TargetNullValue=0}" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="L3" Value="{Binding SmartMeter.PowerFactorL3, FallbackValue=0, TargetNullValue=0}" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="{x:Static p:Resources.Total}" Value="{Binding SmartMeter.PowerFactorTotal, FallbackValue=0, TargetNullValue=0}" />
-							</StackPanel>
-						</Grid>
+									<StackPanel Grid.Row="1" VerticalAlignment="Center">
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="L1" Value="{Binding SmartMeter.PowerFactorL1, FallbackValue=0, TargetNullValue=0}" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="L2" Value="{Binding SmartMeter.PowerFactorL2, FallbackValue=0, TargetNullValue=0}" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="L3" Value="{Binding SmartMeter.PowerFactorL3, FallbackValue=0, TargetNullValue=0}" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="{x:Static p:Resources.Total}" Value="{Binding SmartMeter.PowerFactorTotal, FallbackValue=0, TargetNullValue=0}" />
+									</StackPanel>
+								</Grid>
+							</Template>
+						</c:LazyPanel>
 
-						<Grid x:Name="PhaseVoltage" IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool PhaseVoltage}}" RowDefinitions="Auto,*">
-							<Grid.Resources>
-								<ControlTheme x:Key="Local" TargetType="c:LinearGauge" BasedOn="{StaticResource VoltageLinearGaugeStyle}" />
-							</Grid.Resources>
+						<c:LazyPanel IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool PhaseVoltage}}">
+							<Template x:DataType="c:SmartMeterControl">
+								<Grid x:Name="PhaseVoltage" RowDefinitions="Auto,*">
+									<Grid.Resources>
+										<ControlTheme x:Key="Local" TargetType="c:LinearGauge" BasedOn="{StaticResource VoltageLinearGaugeStyle}" />
+									</Grid.Resources>
 
-							<TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.PhaseVoltage}" TextAlignment="Center" />
+									<TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.PhaseVoltage}" TextAlignment="Center" />
 
-							<StackPanel Grid.Row="1" VerticalAlignment="Center">
-								<c:LinearGauge Theme="{DynamicResource Local}" Value="{Binding SmartMeter.PhaseVoltageL1, FallbackValue=0, TargetNullValue=0}" Label="L1" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Value="{Binding SmartMeter.PhaseVoltageL2, FallbackValue=0, TargetNullValue=0}" Label="L2" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Value="{Binding SmartMeter.PhaseVoltageL3, FallbackValue=0, TargetNullValue=0}" Label="L3" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Value="{Binding SmartMeter.PhaseVoltageAverage, FallbackValue=0, TargetNullValue=0}" Label="{x:Static p:Resources.AverageShort}" />
-							</StackPanel>
-						</Grid>
+									<StackPanel Grid.Row="1" VerticalAlignment="Center">
+										<c:LinearGauge Theme="{DynamicResource Local}" Value="{Binding SmartMeter.PhaseVoltageL1, FallbackValue=0, TargetNullValue=0}" Label="L1" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Value="{Binding SmartMeter.PhaseVoltageL2, FallbackValue=0, TargetNullValue=0}" Label="L2" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Value="{Binding SmartMeter.PhaseVoltageL3, FallbackValue=0, TargetNullValue=0}" Label="L3" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Value="{Binding SmartMeter.PhaseVoltageAverage, FallbackValue=0, TargetNullValue=0}" Label="{x:Static p:Resources.AverageShort}" />
+									</StackPanel>
+								</Grid>
+							</Template>
+						</c:LazyPanel>
 
-						<StackPanel x:Name="PhaseVoltageGauge" IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool PhaseVoltageGauge}}">
-							<TextBlock Text="{x:Static p:Resources.GridHealth}" HorizontalAlignment="Center" FontSize="10" Margin="0,0,0,4" />
-							<UniformGrid Rows="2" Columns="2" Margin="0,6,0,0">
-								<UniformGrid.Resources>
-									<ControlTheme x:Key="Local" TargetType="c:HalfCircleGauge">
-										<Setter Property="Minimum" Value="207" />
-										<Setter Property="Maximum" Value="253" />
-										<Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.MidIsGood}" />
-										<Setter Property="Origin" Value=".5" />
-									</ControlTheme>
-								</UniformGrid.Resources>
+						<c:LazyPanel IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool PhaseVoltageGauge}}">
+							<Template x:DataType="c:SmartMeterControl">
+								<StackPanel x:Name="PhaseVoltageGauge">
+									<TextBlock Text="{x:Static p:Resources.GridHealth}" HorizontalAlignment="Center" FontSize="10" Margin="0,0,0,4" />
+									<UniformGrid Rows="2" Columns="2" Margin="0,6,0,0">
+										<UniformGrid.Resources>
+											<ControlTheme x:Key="Local" TargetType="c:HalfCircleGauge">
+												<Setter Property="Minimum" Value="207" />
+												<Setter Property="Maximum" Value="253" />
+												<Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.MidIsGood}" />
+												<Setter Property="Origin" Value=".5" />
+											</ControlTheme>
+										</UniformGrid.Resources>
 
-								<!-- ReSharper disable Xaml.RedundantAttachedProperty -->
-								<c:HalfCircleGauge Theme="{DynamicResource Local}" Grid.Row="0" Grid.Column="0" Margin="1"
-                                                   Value="{Binding SmartMeter.PhaseVoltageL1, FallbackValue=0, TargetNullValue=0}" />
+										<!-- ReSharper disable Xaml.RedundantAttachedProperty -->
+										<c:HalfCircleGauge Theme="{DynamicResource Local}" Grid.Row="0" Grid.Column="0" Margin="1"
+		                                                   Value="{Binding SmartMeter.PhaseVoltageL1, FallbackValue=0, TargetNullValue=0}" />
 
-								<c:HalfCircleGauge Theme="{DynamicResource Local}" Grid.Row="0" Grid.Column="1" Margin="1"
-                                                   Value="{Binding SmartMeter.PhaseVoltageL2, FallbackValue=0, TargetNullValue=0}" />
+										<c:HalfCircleGauge Theme="{DynamicResource Local}" Grid.Row="0" Grid.Column="1" Margin="1"
+		                                                   Value="{Binding SmartMeter.PhaseVoltageL2, FallbackValue=0, TargetNullValue=0}" />
 
-								<c:HalfCircleGauge Theme="{DynamicResource Local}" Grid.Row="1" Grid.Column="0" Margin="1"
-                                                   Value="{Binding SmartMeter.PhaseVoltageL3, FallbackValue=0, TargetNullValue=0}" />
+										<c:HalfCircleGauge Theme="{DynamicResource Local}" Grid.Row="1" Grid.Column="0" Margin="1"
+		                                                   Value="{Binding SmartMeter.PhaseVoltageL3, FallbackValue=0, TargetNullValue=0}" />
 
-								<c:HalfCircleGauge Theme="{DynamicResource Local}" Grid.Row="1" Grid.Column="1" Margin="1" Minimum="49" Maximum="51"
-                                                   Value="{Binding SmartMeter.Frequency, FallbackValue=0, TargetNullValue=0}"
-                                                   StringFormat="N1" />
-								<!-- ReSharper restore Xaml.RedundantAttachedProperty -->
-							</UniformGrid>
-						</StackPanel>
+										<c:HalfCircleGauge Theme="{DynamicResource Local}" Grid.Row="1" Grid.Column="1" Margin="1" Minimum="49" Maximum="51"
+		                                                   Value="{Binding SmartMeter.Frequency, FallbackValue=0, TargetNullValue=0}"
+		                                                   StringFormat="N1" />
+										<!-- ReSharper restore Xaml.RedundantAttachedProperty -->
+									</UniformGrid>
+								</StackPanel>
+							</Template>
+						</c:LazyPanel>
 
-						<Grid x:Name="LineVoltage" IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool LineVoltage}}" RowDefinitions="Auto,*">
-							<Grid.Resources>
-								<ControlTheme TargetType="c:LinearGauge" x:Key="Local" BasedOn="{StaticResource VoltageLinearGaugeStyle}">
-									<Setter Property="Minimum" Value="358.5345171668" />
-									<Setter Property="Maximum" Value="438.2088543149" />
-								</ControlTheme>
-							</Grid.Resources>
+						<c:LazyPanel IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool LineVoltage}}">
+							<Template x:DataType="c:SmartMeterControl">
+								<Grid x:Name="LineVoltage" RowDefinitions="Auto,*">
+									<Grid.Resources>
+										<ControlTheme TargetType="c:LinearGauge" x:Key="Local" BasedOn="{StaticResource VoltageLinearGaugeStyle}">
+											<Setter Property="Minimum" Value="358.5345171668" />
+											<Setter Property="Maximum" Value="438.2088543149" />
+										</ControlTheme>
+									</Grid.Resources>
 
-							<TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.LineVoltage}" TextAlignment="Center" />
+									<TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.LineVoltage}" TextAlignment="Center" />
 
-							<StackPanel Grid.Row="1" VerticalAlignment="Center">
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="L12" Value="{Binding SmartMeter.LineVoltageL12, FallbackValue=0, TargetNullValue=0}" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="L23" Value="{Binding SmartMeter.LineVoltageL23, FallbackValue=0, TargetNullValue=0}" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="L31" Value="{Binding SmartMeter.LineVoltageL31, FallbackValue=0, TargetNullValue=0}" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="{x:Static p:Resources.AverageShort}" Value="{Binding SmartMeter.LineVoltageAverage, FallbackValue=0, TargetNullValue=0}" />
-							</StackPanel>
-						</Grid>
+									<StackPanel Grid.Row="1" VerticalAlignment="Center">
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="L12" Value="{Binding SmartMeter.LineVoltageL12, FallbackValue=0, TargetNullValue=0}" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="L23" Value="{Binding SmartMeter.LineVoltageL23, FallbackValue=0, TargetNullValue=0}" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="L31" Value="{Binding SmartMeter.LineVoltageL31, FallbackValue=0, TargetNullValue=0}" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="{x:Static p:Resources.AverageShort}" Value="{Binding SmartMeter.LineVoltageAverage, FallbackValue=0, TargetNullValue=0}" />
+									</StackPanel>
+								</Grid>
+							</Template>
+						</c:LazyPanel>
 
-						<Grid x:Name="Current" IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool Current}}" RowDefinitions="Auto,*">
-							<Grid.Resources>
-								<ControlTheme x:Key="Local" TargetType="c:LinearGauge" BasedOn="{StaticResource CurrentLinearGaugeStyle}" />
-							</Grid.Resources>
+						<c:LazyPanel IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool Current}}">
+							<Template x:DataType="c:SmartMeterControl">
+								<Grid x:Name="Current" RowDefinitions="Auto,*">
+									<Grid.Resources>
+										<ControlTheme x:Key="Local" TargetType="c:LinearGauge" BasedOn="{StaticResource CurrentLinearGaugeStyle}" />
+									</Grid.Resources>
 
-							<TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.Current}" TextAlignment="Center" />
+									<TextBlock Grid.Row="0" FontSize="10" Text="{x:Static p:Resources.Current}" TextAlignment="Center" />
 
-							<StackPanel Grid.Row="1" VerticalAlignment="Center">
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="L1" Value="{Binding SmartMeter.CurrentL1, FallbackValue=0, TargetNullValue=0}" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="L2" Value="{Binding SmartMeter.CurrentL2, FallbackValue=0, TargetNullValue=0}" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="L3" Value="{Binding SmartMeter.CurrentL3, FallbackValue=0, TargetNullValue=0}" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="{x:Static p:Resources.Sum}" Value="{Binding SmartMeter.TotalCurrent, FallbackValue=0, TargetNullValue=0}"
-                                                   Maximum="105" Minimum="-105" />
-							</StackPanel>
-						</Grid>
+									<StackPanel Grid.Row="1" VerticalAlignment="Center">
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="L1" Value="{Binding SmartMeter.CurrentL1, FallbackValue=0, TargetNullValue=0}" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="L2" Value="{Binding SmartMeter.CurrentL2, FallbackValue=0, TargetNullValue=0}" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="L3" Value="{Binding SmartMeter.CurrentL3, FallbackValue=0, TargetNullValue=0}" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="{x:Static p:Resources.Sum}" Value="{Binding SmartMeter.TotalCurrent, FallbackValue=0, TargetNullValue=0}"
+		                                                   Maximum="105" Minimum="-105" />
+									</StackPanel>
+								</Grid>
+							</Template>
+						</c:LazyPanel>
 
-						<Grid x:Name="CurrentOutOfBalanceGauge" IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool CurrentOutOfBalanceGauge}}" RowDefinitions="Auto,Auto,Auto">
+						<c:LazyPanel IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool CurrentOutOfBalanceGauge}}">
+							<Template x:DataType="c:SmartMeterControl">
+								<Grid x:Name="CurrentOutOfBalanceGauge" RowDefinitions="Auto,Auto,Auto">
 
-                            <TextBlock FontSize="10" FontWeight="Normal" Text="{x:Static p:Resources.OutOfBalance}" TextAlignment="Center" />
+		                            <TextBlock FontSize="10" FontWeight="Normal" Text="{x:Static p:Resources.OutOfBalance}" TextAlignment="Center" />
 
-							<TextBlock FontSize="10" FontWeight="Medium" Grid.Row="1" Margin="0,0,0,2"
-                                       Width="{Binding Bounds.Width, ElementName=CurrentOutOfBalanceGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
-								<Run Text="{Binding SmartMeter.OutOfBalanceCurrentMax, FallbackValue=0, TargetNullValue=0, StringFormat=N3}" />
-								<Run Text="A" />
-							</TextBlock>
+									<TextBlock FontSize="10" FontWeight="Medium" Grid.Row="1" Margin="0,0,0,2"
+		                                       Width="{Binding Bounds.Width, ElementName=CurrentOutOfBalanceGauge}" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextAlignment="Center">
+										<Run Text="{Binding SmartMeter.OutOfBalanceCurrentMax, FallbackValue=0, TargetNullValue=0, StringFormat=N3, Mode=OneWay}" />
+										<Run Text="A" />
+									</TextBlock>
 
-							<c:HalfCircleGauge Value="{Binding SmartMeter.OutOfBalanceCurrentMax, FallbackValue=0, TargetNullValue=0}"
-                                               Minimum="0" Grid.Row="2"
-                                               Maximum="20"
-                                               GaugeColors="{x:Static m:GaugeColors.HighIsBad}"
-                                               Width="92" />
-						</Grid>
-						<Grid x:Name="CurrentOutOfBalance" IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool CurrentOutOfBalance}}" RowDefinitions="Auto,*">
-							<Grid.Resources>
-								<ControlTheme x:Key="Local" TargetType="c:LinearGauge" BasedOn="{StaticResource CurrentLinearGaugeStyle}">
-									<Setter Property="Minimum" Value="0" />
-									<Setter Property="Origin" Value="0" />
-									<Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.HighIsBad}" />
-								</ControlTheme>
-							</Grid.Resources>
+									<c:HalfCircleGauge Value="{Binding SmartMeter.OutOfBalanceCurrentMax, FallbackValue=0, TargetNullValue=0}"
+		                                               Minimum="0" Grid.Row="2"
+		                                               Maximum="20"
+		                                               GaugeColors="{x:Static m:GaugeColors.HighIsBad}"
+		                                               Width="92" />
+								</Grid>
+							</Template>
+						</c:LazyPanel>
+						<c:LazyPanel IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool CurrentOutOfBalance}}">
+							<Template x:DataType="c:SmartMeterControl">
+								<Grid x:Name="CurrentOutOfBalance" RowDefinitions="Auto,*">
+									<Grid.Resources>
+										<ControlTheme x:Key="Local" TargetType="c:LinearGauge" BasedOn="{StaticResource CurrentLinearGaugeStyle}">
+											<Setter Property="Minimum" Value="0" />
+											<Setter Property="Origin" Value="0" />
+											<Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.HighIsBad}" />
+										</ControlTheme>
+									</Grid.Resources>
 
-                            <TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{x:Static p:Resources.OutOfBalance}" />
+		                            <TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{x:Static p:Resources.OutOfBalance}" />
 
-							<StackPanel Grid.Row="1" VerticalAlignment="Center">
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="L12" Value="{Binding SmartMeter.OutOfBalanceCurrentL12, FallbackValue=0, TargetNullValue=0}" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="L23" Value="{Binding SmartMeter.OutOfBalanceCurrentL23, FallbackValue=0, TargetNullValue=0}" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="L31" Value="{Binding SmartMeter.OutOfBalanceCurrentL31, FallbackValue=0, TargetNullValue=0}" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="Maximum" Value="{Binding SmartMeter.OutOfBalanceCurrentMax, FallbackValue=0, TargetNullValue=0}" />
-							</StackPanel>
-						</Grid>
+									<StackPanel Grid.Row="1" VerticalAlignment="Center">
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="L12" Value="{Binding SmartMeter.OutOfBalanceCurrentL12, FallbackValue=0, TargetNullValue=0}" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="L23" Value="{Binding SmartMeter.OutOfBalanceCurrentL23, FallbackValue=0, TargetNullValue=0}" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="L31" Value="{Binding SmartMeter.OutOfBalanceCurrentL31, FallbackValue=0, TargetNullValue=0}" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="Maximum" Value="{Binding SmartMeter.OutOfBalanceCurrentMax, FallbackValue=0, TargetNullValue=0}" />
+									</StackPanel>
+								</Grid>
+							</Template>
+						</c:LazyPanel>
 
-						<Grid x:Name="MoreEnergy" IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool MoreEnergy}}" RowDefinitions="Auto,*">
-							<Grid.Resources>
-								<ControlTheme TargetType="c:LinearGauge" x:Key="Local" BasedOn="{StaticResource PowerLinearGaugeStyle}">
-									<Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.AllIsGood}" />
-									<Setter Property="UnitName" Value="kWh" />
-									<Setter Property="Minimum" Value="99999999" />
-									<Setter Property="Origin" Value="0" />
-									<Setter Property="Maximum" Value="100000000" />
-								</ControlTheme>
-							</Grid.Resources>
+						<c:LazyPanel IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool MoreEnergy}}">
+							<Template x:DataType="c:SmartMeterControl">
+								<Grid x:Name="MoreEnergy" RowDefinitions="Auto,*">
+									<Grid.Resources>
+										<ControlTheme TargetType="c:LinearGauge" x:Key="Local" BasedOn="{StaticResource PowerLinearGaugeStyle}">
+											<Setter Property="GaugeColors" Value="{x:Static m:GaugeColors.AllIsGood}" />
+											<Setter Property="UnitName" Value="kWh" />
+											<Setter Property="Minimum" Value="99999999" />
+											<Setter Property="Origin" Value="0" />
+											<Setter Property="Maximum" Value="100000000" />
+										</ControlTheme>
+									</Grid.Resources>
 
-                            <TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{x:Static p:Resources.Energy}" />
+		                            <TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{x:Static p:Resources.Energy}" />
 
-							<StackPanel Grid.Row="1" VerticalAlignment="Center">
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="1.8.0" Value="{Binding SmartMeter.EnergyActiveConsumed, FallbackValue=0, TargetNullValue=0, Converter={co:Multiply Factor=.001}}" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="2.8.0" Value="{Binding SmartMeter.EnergyActiveProduced, FallbackValue=0, TargetNullValue=0, Converter={co:Multiply Factor=.001}}" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="3.8.0" Value="{Binding SmartMeter.EnergyReactiveConsumed, FallbackValue=0, TargetNullValue=0, Converter={co:Multiply Factor=.001}}" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="4.8.0" Value="{Binding SmartMeter.EnergyReactiveProduced, FallbackValue=0, TargetNullValue=0, Converter={co:Multiply Factor=.001}}" />
-							</StackPanel>
-						</Grid>
+									<StackPanel Grid.Row="1" VerticalAlignment="Center">
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="1.8.0" Value="{Binding SmartMeter.EnergyActiveConsumed, FallbackValue=0, TargetNullValue=0, Converter={co:Multiply Factor=.001}}" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="2.8.0" Value="{Binding SmartMeter.EnergyActiveProduced, FallbackValue=0, TargetNullValue=0, Converter={co:Multiply Factor=.001}}" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="3.8.0" Value="{Binding SmartMeter.EnergyReactiveConsumed, FallbackValue=0, TargetNullValue=0, Converter={co:Multiply Factor=.001}}" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="4.8.0" Value="{Binding SmartMeter.EnergyReactiveProduced, FallbackValue=0, TargetNullValue=0, Converter={co:Multiply Factor=.001}}" />
+									</StackPanel>
+								</Grid>
+							</Template>
+						</c:LazyPanel>
 
-						<Grid x:Name="More" IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool More}}" RowDefinitions="Auto,Auto,*">
-							<Grid.Resources>
-								<ControlTheme x:Key="Local" TargetType="c:Gauge" BasedOn="{StaticResource PowerLinearGaugeStyle}" />
-							</Grid.Resources>
+						<c:LazyPanel IsVisible="{Binding Mode, Converter={co:MeterDisplayMode2Bool More}}">
+							<Template x:DataType="c:SmartMeterControl">
+								<Grid x:Name="More" RowDefinitions="Auto,Auto,*">
+									<Grid.Resources>
+										<ControlTheme x:Key="Local" TargetType="c:Gauge" BasedOn="{StaticResource PowerLinearGaugeStyle}" />
+									</Grid.Resources>
 
-                            <TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{Binding SmartMeter.SerialNumber, FallbackValue='---'}" />
-							<TextBlock Grid.Row="1" FontSize="10" TextAlignment="Center"
-                                       Text="{Binding SmartMeter.DataTime, FallbackValue='', Converter={co:DateConverter}}" />
+		                            <TextBlock Grid.Row="0" FontSize="10" TextAlignment="Center" Text="{Binding SmartMeter.SerialNumber, FallbackValue='---'}" />
+									<TextBlock Grid.Row="1" FontSize="10" TextAlignment="Center"
+		                                       Text="{Binding SmartMeter.DataTime, FallbackValue='', Converter={co:DateConverter}}" />
 
-							<StackPanel Grid.Row="2" VerticalAlignment="Center">
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="{x:Static p:Resources.Frequency}"
-                                               Value="{Binding SmartMeter.Frequency, FallbackValue=0, TargetNullValue=0}"
-                                               StringFormat="N1"
-                                               Minimum="49" Maximum="51"
-                                               GaugeColors="{x:Static m:GaugeColors.MidIsGood}"
-                                               UnitName="Hz" />
-								<c:LinearGauge Theme="{DynamicResource Local}" Label="{x:Static p:Resources.Latency}" Origin="0"
-                                               Value="{Binding SmartMeter.Latency.TotalMilliseconds, FallbackValue=0, TargetNullValue=0}"
-                                               StringFormat="N0" Minimum="0" Maximum="2000" UnitName="ms"
-                                               GaugeColors="{x:Static m:GaugeColors.HighIsBad}" />
-							</StackPanel>
-						</Grid>
+									<StackPanel Grid.Row="2" VerticalAlignment="Center">
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="{x:Static p:Resources.Frequency}"
+		                                               Value="{Binding SmartMeter.Frequency, FallbackValue=0, TargetNullValue=0}"
+		                                               StringFormat="N1"
+		                                               Minimum="49" Maximum="51"
+		                                               GaugeColors="{x:Static m:GaugeColors.MidIsGood}"
+		                                               UnitName="Hz" />
+										<c:LinearGauge Theme="{DynamicResource Local}" Label="{x:Static p:Resources.Latency}" Origin="0"
+		                                               Value="{Binding SmartMeter.Latency.TotalMilliseconds, FallbackValue=0, TargetNullValue=0}"
+		                                               StringFormat="N0" Minimum="0" Maximum="2000" UnitName="ms"
+		                                               GaugeColors="{x:Static m:GaugeColors.HighIsBad}" />
+									</StackPanel>
+								</Grid>
+							</Template>
+						</c:LazyPanel>
 					</Grid>
 				</Border>
 				<Viewbox Width="108" Grid.Row="2" StretchDirection="DownOnly" HorizontalAlignment="Center">

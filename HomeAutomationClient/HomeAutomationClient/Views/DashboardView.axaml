@@ -17,35 +17,52 @@
         <Thickness x:Key="ControlMargin">4</Thickness>
 	</ContentPage.Resources>
 	<ContentPage.DataTemplates>
+		<!-- Every card below the power flow is DeferredContent: the item is placed at once, the card inside is built a
+		     frame or two later, a few per frame, so the page comes up and the busy spinner keeps turning while the
+		     cards arrive. Built in the one layout pass with the page, the 22 cards of a house held the UI thread for
+		     seconds. The Template starts a scope of its own, so x:DataType is said again inside. See Dashboard.Loading. -->
+
 		<!-- WattPilot -->
         <DataTemplate DataType="{x:Type m:KeyedWattPilot}">
-            <c:WattPilotControl ColorAllTicks="{Binding Path=((vm:DashboardViewModel)DataContext).MainViewModel.ColorAllTicks, FallbackValue={x:False}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
-                                Width="{StaticResource ControlWidth}"
-                                WattPilot="{Binding Device}"
-                                DeviceKey="{Binding Key}"
-                                Margin="{StaticResource ControlMargin}"/>
+            <c:DeferredContent>
+                <Template x:DataType="m:KeyedWattPilot">
+                    <c:WattPilotControl ColorAllTicks="{Binding Path=((vm:DashboardViewModel)DataContext).MainViewModel.ColorAllTicks, FallbackValue={x:False}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+                                        Width="{StaticResource ControlWidth}"
+                                        WattPilot="{Binding Device}"
+                                        DeviceKey="{Binding Key}"
+                                        Margin="{StaticResource ControlMargin}"/>
+                </Template>
+            </c:DeferredContent>
         </DataTemplate>
 
 		<!-- Toshiba HVAC. The control brings its own view model (one per device) and takes the device and its key;
 		     the commands go through it, not through this page's view model. -->
 		<DataTemplate DataType="{x:Type m:KeyedToshibaHvac}">
-			<c:ToshibaHvacControl Width="{StaticResource ControlWidth}"
-			                      Device="{Binding Device}"
-			                      DeviceKey="{Binding Key}"
-			                      Margin="{StaticResource ControlMargin}" />
+			<c:DeferredContent>
+				<Template x:DataType="m:KeyedToshibaHvac">
+					<c:ToshibaHvacControl Width="{StaticResource ControlWidth}"
+					                      Device="{Binding Device}"
+					                      DeviceKey="{Binding Key}"
+					                      Margin="{StaticResource ControlMargin}" />
+				</Template>
+			</c:DeferredContent>
 		</DataTemplate>
 
 		<!-- FritzBox -->
 		<DataTemplate DataType="{x:Type m:KeyedFritzBoxDevice}">
-			<c:PowerConsumer Width="{StaticResource ControlWidth}"
-							 Device="{Binding Device}"
-							 Margin="{StaticResource ControlMargin}"
-							 DeviceKey="{Binding Key}"
-							 SwitchCommand="{Binding ((vm:DashboardViewModel)DataContext).SwitchDeviceCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
-							 SetColorTemperatureCommand="{Binding ((vm:DashboardViewModel)DataContext).SetColorTemperatureCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
-							 SetHueCommand="{Binding ((vm:DashboardViewModel)DataContext).SetHueCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
-							 SetSaturationCommand="{Binding ((vm:DashboardViewModel)DataContext).SetSaturationCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
-							 SetBrightnessCommand="{Binding ((vm:DashboardViewModel)DataContext).SetBrightnessCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}" />
+			<c:DeferredContent>
+				<Template x:DataType="m:KeyedFritzBoxDevice">
+					<c:PowerConsumer Width="{StaticResource ControlWidth}"
+									 Device="{Binding Device}"
+									 Margin="{StaticResource ControlMargin}"
+									 DeviceKey="{Binding Key}"
+									 SwitchCommand="{Binding ((vm:DashboardViewModel)DataContext).SwitchDeviceCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+									 SetColorTemperatureCommand="{Binding ((vm:DashboardViewModel)DataContext).SetColorTemperatureCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+									 SetHueCommand="{Binding ((vm:DashboardViewModel)DataContext).SetHueCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+									 SetSaturationCommand="{Binding ((vm:DashboardViewModel)DataContext).SetSaturationCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+									 SetBrightnessCommand="{Binding ((vm:DashboardViewModel)DataContext).SetBrightnessCommand, FallbackValue={x:Null}, RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}" />
+				</Template>
+			</c:DeferredContent>
 		</DataTemplate>
 	</ContentPage.DataTemplates>
 	<Grid RowDefinitions="*" x:Name="RootElement" Margin="8">

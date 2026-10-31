@@ -78,7 +78,7 @@
 			<Line Classes="Cross" StartPoint="36,21" EndPoint="45,13" />
 
 			<TextBlock Classes="Energy" Canvas.Left="8" Canvas.Top="3" FontWeight="Bold">
-				<Run Text="{Binding EnergyWattHours, StringFormat=N0, TargetNullValue='---', FallbackValue='---'}" />
+				<Run Text="{Binding EnergyWattHours, StringFormat=N0, TargetNullValue='---', FallbackValue='---', Mode=OneWay}" />
 				<Run Text="Wh" />
 			</TextBlock>
 

@@ -8,6 +8,12 @@
 		<PublishTrimmed>false</PublishTrimmed>
 		<Nullable>enable</Nullable>
         <WasmBuildNative>true</WasmBuildNative>
+		<!-- Compiled to WebAssembly ahead of time when published, which is what the Dockerfile does. Without this the
+		     app runs in Mono's interpreter, which is several times slower on the work a page like the dashboard is
+		     made of - building a few thousand controls and bindings - than the JIT the desktop head has. The publish
+		     takes longer and the download is bigger; the wasm-tools workload the AOT compiler needs is already
+		     installed in the client builder stage. A plain build or dotnet run does not compile ahead of time. -->
+		<RunAOTCompilation>true</RunAOTCompilation>
 		<UserSecretsId>fd7e4816-270f-4bb3-9abf-bec39a784410</UserSecretsId>
 	</PropertyGroup>
 
