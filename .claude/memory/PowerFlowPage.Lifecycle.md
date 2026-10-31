@@ -67,11 +67,11 @@ junction dot, never nothing: **every card has a connector**, on or off. The figu
 choice): **solar yellow, battery green, grid grey, everything inside the house blue** - from the inverters to the
 house and from the house to its consumers. The grid's wire is grey whether the house imports or exports; the
 dashes say which way. The legend at the top right lists the four and idle. Brushes are `Flow*` in `App.axaml`,
-both variants; in the light one solar, battery and grid point to the `SolarColor`, `BatteryColor` and `GridColor`
-the dashboard's arrows use as well (since 2026-10-31, see [[Theme.Palette]]). **The dark variant is the design's, not the app's**: ground `#0A1018`, cards `#131C2B`, on
-purpose one step deeper than the rest of the app, and the page paints its own `FlowPageBackground` because as a
-page it would otherwise sit on the window background. The light variant is the dialog's `#E8E8E8` ground, where
-the developer approved the light look.
+both variants; solar, battery and grid point to the `SolarColor`, `BatteryColor` and `GridColor` the dashboard's
+arrows use as well (since 2026-10-31, see [[Theme.Palette]]). **The dark variant is the design's, not the app's**:
+ground `#0A1018`, cards `#131C2B`, on purpose one step deeper than the rest of the app, and the page paints its own
+`FlowPageBackground` because as a page it would otherwise sit on the window background. The light variant is the
+dialog's `#E8E8E8` ground, where the developer approved the light look.
 
 **Only name and figure on a consumer**, as the plan asks. A source has a state line under its figure - what a
 battery or the grid is doing - and a battery a bar for its state of charge: a `Border.SocTrack` with a

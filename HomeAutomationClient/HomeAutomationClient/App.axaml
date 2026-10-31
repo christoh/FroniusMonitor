@@ -49,8 +49,7 @@
                     <SolidColorBrush x:Key="AlternatingRowBackground">#14000000</SolidColorBrush>
 
                     <!-- The three kinds of power, written down once for the dashboard (PowerFlow*) and the power flow
-                         page (Flow*), which mean the same by them: solar yellow, battery green, grid grey. Only in this
-                         variant: in the dark one the two pages differ on purpose - see there. -->
+                         page (Flow*), which mean the same by them: solar yellow, battery green, grid grey. -->
                     <Color x:Key="SolarColor">#D4A106</Color>
                     <Color x:Key="BatteryColor">#1FA864</Color>
                     <Color x:Key="GridColor">#7D8A9F</Color>
@@ -172,14 +171,17 @@
                     <SolidColorBrush x:Key="DialogBackground">#002040</SolidColorBrush>
                     <SolidColorBrush x:Key="AlternatingRowBackground">#18ffffff</SolidColorBrush>
 
-                    <!-- Power Flow. Not the Flow* colours below, unlike the light variant: those are the design the
-                         power flow page was drawn from, these the dashboard's own dark look, and the developer has
-                         chosen neither over the other. -->
+                    <!-- The three kinds of power, see the light variant. The colours of the power flow page's design,
+                         which the dashboard took over when the two were made one on the developer's request. -->
+                    <Color x:Key="SolarColor">#F5C518</Color>
+                    <Color x:Key="BatteryColor">#3ECF8E</Color>
+                    <Color x:Key="GridColor">#8B98AE</Color>
 
-                    <SolidColorBrush x:Key="PowerFlowBattery">DarkGreen</SolidColorBrush>
-                    <SolidColorBrush x:Key="PowerFlowSolar">#D8AE06</SolidColorBrush>
-                    <SolidColorBrush x:Key="PowerFlowGrid">#ff404040</SolidColorBrush>
-                    <SolidColorBrush x:Key="PowerGridIcon">#808080</SolidColorBrush>
+                    <!-- Power Flow -->
+                    <SolidColorBrush x:Key="PowerFlowBattery" Color="{StaticResource BatteryColor}" />
+                    <SolidColorBrush x:Key="PowerFlowSolar" Color="{StaticResource SolarColor}" />
+                    <SolidColorBrush x:Key="PowerFlowGrid" Color="{StaticResource GridColor}" />
+                    <SolidColorBrush x:Key="PowerGridIcon" Color="{StaticResource GridColor}" />
 
                     <!-- Power flow page, see the light variant. These are the colours of the design the page was drawn
                          from - a deeper ground than the rest of the app, on purpose and by the developer's choice. -->
@@ -190,9 +192,9 @@
                     <SolidColorBrush x:Key="FlowText">#E7EDF7</SolidColorBrush>
                     <SolidColorBrush x:Key="FlowLabel">#8B98AE</SolidColorBrush>
                     <SolidColorBrush x:Key="FlowMuted">#5D6B84</SolidColorBrush>
-                    <SolidColorBrush x:Key="FlowSolar">#F5C518</SolidColorBrush>
-                    <SolidColorBrush x:Key="FlowBattery">#3ECF8E</SolidColorBrush>
-                    <SolidColorBrush x:Key="FlowGrid">#8B98AE</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowSolar" Color="{StaticResource SolarColor}" />
+                    <SolidColorBrush x:Key="FlowBattery" Color="{StaticResource BatteryColor}" />
+                    <SolidColorBrush x:Key="FlowGrid" Color="{StaticResource GridColor}" />
                     <SolidColorBrush x:Key="FlowHouse">#5B9DFF</SolidColorBrush>
                     <SolidColorBrush x:Key="FlowIdle">#2B3752</SolidColorBrush>
                     <SolidColorBrush x:Key="FlowJunction">#AEBBD0</SolidColorBrush>

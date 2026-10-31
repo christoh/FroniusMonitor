@@ -66,20 +66,26 @@ speaks the language of the power flow page:
 - The tabs of a card are grey, the selected one a light blue; the units are the slate of the labels, the needle
   the orange of the dark variant; the battery and the on/off switch have colours of the same family.
 
-**The dark variant did not change**, on purpose: `DeviceBorder` is `DimGray`, radius and gap are 0, and
-`BackgroundBrush` is the black Fluent painted a page with. Rendered before and after, the inverter page is
-identical to the pixel; the dashboard differs only along the frames of the cards, by at most 26 of 255, because
-the frame's anti-aliased edge now blends with the card's colour under it instead of the black ground.
+**The dark variant kept its look in that redo**, on purpose - only its energy colours changed afterwards, see
+below: `DeviceBorder` is `DimGray`, radius and gap are 0, and `BackgroundBrush` is the black Fluent painted a page
+with. Rendered before and after, the inverter page is identical to the pixel; the dashboard differs only along the
+frames of the cards, by at most 26 of 255, because the frame's anti-aliased edge now blends with the card's colour
+under it instead of the black ground.
 
 ## The kinds of power
 
 Solar yellow, battery green, grid grey mean the same on the dashboard (`PowerFlow*`, the arrows and the colours
-`DashboardView.UpdatePowerFlowColors` mixes) and on the power flow page (`Flow*`). **In the light variant they are
-written down once**, as `SolarColor`, `BatteryColor` and `GridColor`, and both sets point to them with
-`StaticResource` - which resolves inside a theme dictionary. They are the colours the power flow page already had,
-because it uses them for lines and figures on white, where a lighter yellow would not read; the dashboard's arrows
-became darker by it. **In the dark variant the two sets stay apart**: `Flow*` is the design the power flow page was
-drawn from, `PowerFlow*` the dashboard's own look, and the developer has chosen neither over the other.
+`DashboardView.UpdatePowerFlowColors` mixes) and on the power flow page (`Flow*`). **They are written down once
+per variant**, as `SolarColor`, `BatteryColor` and `GridColor`, and both sets - and `PowerGridIcon`, the pylon -
+point to them with `StaticResource`, which resolves inside a theme dictionary. Both variants took the power flow
+page's colours, which the developer had approved there:
+
+- **Light** (2026-10-31): the page uses them for lines and figures on white, where a lighter yellow would not read;
+  the dashboard's arrows became darker by it.
+- **Dark** (2026-10-31, on the developer's request): the dashboard gave up its own `#D8AE06`, `DarkGreen`,
+  `#404040` and `#808080`. The solar arrows became brighter, and the battery and grid arrows - which only show at
+  night or when the battery discharges - became readable: their caption had sat on `DarkGreen` and a nearly black
+  grey before.
 
 ## Looking at it
 
