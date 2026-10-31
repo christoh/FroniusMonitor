@@ -40,12 +40,30 @@
         <Setter Property="OuterFault" Value="{DynamicResource DeviceOuterBackgroundFault}"/>
         <Setter Property="OuterOther" Value="{DynamicResource DeviceOuterBackgroundOther}"/>
         <Setter Property="OuterWarning" Value="{DynamicResource DeviceOuterBackgroundWarning}"/>
-        <Setter Property="OuterStartup" Value="{DynamicResource DeviceOuterBackgroundStartUp}"/>
+        <Setter Property="OuterStartup" Value="{DynamicResource DeviceOuterBackgroundStartup}"/>
 
         <Setter Property="InnerRunning" Value="{DynamicResource DeviceInnerBackgroundRunning}"/>
         <Setter Property="InnerFault" Value="{DynamicResource DeviceInnerBackgroundFault}"/>
         <Setter Property="InnerOther" Value="{DynamicResource DeviceInnerBackgroundOther}"/>
         <Setter Property="InnerWarning" Value="{DynamicResource DeviceInnerBackgroundWarning}"/>
         <Setter Property="InnerStartup" Value="{DynamicResource DeviceInnerBackgroundStartup}"/>
+    </Style>
+
+    <!-- The frame of every device card on the dashboard and of every gauge tile on the detail views, in one place
+         instead of a DimGray literal in each of them. Colour, rounding and the gap between the tiles are per theme
+         in App.axaml. -->
+    <Style Selector="Border.DeviceFrame">
+        <Setter Property="BorderBrush" Value="{DynamicResource DeviceBorder}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="{DynamicResource DeviceCornerRadius}"/>
+        <!-- A card's panels paint square corners; clipping is what makes them follow a rounded frame. -->
+        <Setter Property="ClipToBounds" Value="True"/>
+    </Style>
+
+    <!-- The ground of every page, which the cards and tiles stand on. Fluent paints a page white or black by itself;
+         the light variant wants a grey for the white cards to stand off. A page that brings its own ground sets it
+         on itself and wins over this - PowerFlowView does. :is, because a page is a subclass of ContentPage. -->
+    <Style Selector=":is(ContentPage)">
+        <Setter Property="Background" Value="{DynamicResource BackgroundBrush}"/>
     </Style>
 </Styles>

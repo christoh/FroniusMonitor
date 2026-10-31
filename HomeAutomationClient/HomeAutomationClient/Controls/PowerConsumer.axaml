@@ -9,7 +9,7 @@
              mc:Ignorable="d" d:DesignWidth="110" d:DesignHeight="80"
              x:Class="De.Hochstaetter.HomeAutomationClient.Controls.PowerConsumer">
 	<Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:PowerConsumer}}">
-		<Border BorderBrush="DimGray" BorderThickness="1" Width="110">
+		<Border Classes="DeviceFrame" Width="110">
 			<Grid x:Name="BackgroundProvider" Background="LightGray" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
 
 				<Grid.Styles>

@@ -9,8 +9,8 @@
              mc:Ignorable="d" d:DesignWidth="220" d:DesignHeight="254"
              x:Class="De.Hochstaetter.HomeAutomationClient.Controls.SmartMeterControl">
 	<Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:SmartMeterControl}}">
-		<Border BorderBrush="DimGray" BorderThickness="1" Width="110">
-			<Grid x:Name="BackgroundProvider" Background="{Binding MeterStatus, FallbackValue=LightGray, Converter={co:Gen24Status2Brush}}" RowDefinitions="Auto,Auto,Auto">
+		<Border Classes="DeviceFrame" Width="110">
+			<Grid x:Name="BackgroundProvider" RowDefinitions="Auto,Auto,Auto">
 
 				<Grid.Resources>
 					<ControlTheme TargetType="c:LinearGauge" x:Key="PowerLinearGaugeStyle">

@@ -2,7 +2,6 @@ using System.Diagnostics.CodeAnalysis;
 using Avalonia.Data;
 using De.Hochstaetter.Fronius.Extensions;
 using De.Hochstaetter.HomeAutomationClient.Extensions;
-using De.Hochstaetter.HomeAutomationClient.Models.Gen24;
 
 namespace De.Hochstaetter.HomeAutomationClient.Converters;
 
@@ -136,17 +135,17 @@ public class InverterBackgroundColor : MultiConverterBase
 
         if (values.Count > 0 && values[0] is string statusString)
         {
-            var innerRunning = Application.Current!.GetSolidColorBrush("DeviceOuterBackgroundRunning");
-            var innerFault = Application.Current!.GetSolidColorBrush("DeviceOuterBackgroundFault");
-            var innerWarning = Application.Current!.GetSolidColorBrush("DeviceOuterBackgroundWarning");
-            var innerStartup = Application.Current!.GetSolidColorBrush("DeviceOuterBackgroundStartup");
+            var outerRunning = Application.Current!.GetSolidColorBrush("DeviceOuterBackgroundRunning");
+            var outerFault = Application.Current!.GetSolidColorBrush("DeviceOuterBackgroundFault");
+            var outerWarning = Application.Current!.GetSolidColorBrush("DeviceOuterBackgroundWarning");
+            var outerStartup = Application.Current!.GetSolidColorBrush("DeviceOuterBackgroundStartup");
             return statusString switch
             {
-                "STATE_ERROR" => innerFault,
-                "STATE_RUNNING" => innerRunning,
-                "STATE_WARNING" => innerWarning,
-                "STATE_STARTUP" => innerStartup,
-                _ when values.Count > 2 && values[2] is true && values[1] is double d /*&& double.Abs(d) > 1e-9*/ => innerRunning,
+                "STATE_ERROR" => outerFault,
+                "STATE_RUNNING" => outerRunning,
+                "STATE_WARNING" => outerWarning,
+                "STATE_STARTUP" => outerStartup,
+                _ when values.Count > 2 && values[2] is true && values[1] is double d /*&& double.Abs(d) > 1e-9*/ => outerRunning,
                 _ => innerOther,
             };
         }
@@ -212,35 +211,6 @@ public class LinuxVersion : ConverterBase
     public override object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         return value is Version version ? version.ToLinuxString() : value;
-    }
-}
-
-public class PowerStatus2Brush : MultiConverterBase
-{
-    public override object? Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
-    {
-        if (values.OfType<bool>().ToList() is not { Count: 3 } list)
-        {
-            return null;
-        }
-
-        return !list[0] ? Brushes.OrangeRed : list[2] ? Brushes.Azure : list[1] ? Brushes.AntiqueWhite : Brushes.LightGray;
-    }
-}
-
-public class Gen24Status2PanelBrush : ConverterBase
-{
-    public override object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-    {
-        return value is Gen24Status status ? status.ToPanelBrush() : Brushes.Gainsboro;
-    }
-}
-
-public class Gen24Status2Brush : ConverterBase
-{
-    public override object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-    {
-        return value is Gen24Status status ? status.ToBrush() : Brushes.Gainsboro;
     }
 }
 

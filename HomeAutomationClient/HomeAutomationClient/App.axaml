@@ -36,7 +36,10 @@
                 <ResourceDictionary x:Key='Light'>
                     <Color x:Key="AppAccentColor">#FFDA3B01</Color>
 
-                    <SolidColorBrush x:Key='BackgroundBrush'>White</SolidColorBrush>
+                    <!-- The ground of every page (Styles/Controls.axaml), and with it of the group box captions that
+                         sit on it. A cool light grey rather than white, so that the white device cards and gauge tiles
+                         stand off it - the language of the power flow page. -->
+                    <SolidColorBrush x:Key='BackgroundBrush'>#EEF1F5</SolidColorBrush>
 					<SolidColorBrush x:Key='ForegroundBrush'>Black</SolidColorBrush>
                     <SolidColorBrush x:Key='DisableBrush'>#80000000</SolidColorBrush>
                     <SolidColorBrush x:Key="DialogBackground">#e8e8e8</SolidColorBrush>
@@ -45,11 +48,18 @@
                          colouring them, which is what the AntiqueWhite of the WPF grid ended up doing. -->
                     <SolidColorBrush x:Key="AlternatingRowBackground">#14000000</SolidColorBrush>
 
+                    <!-- The three kinds of power, written down once for the dashboard (PowerFlow*) and the power flow
+                         page (Flow*), which mean the same by them: solar yellow, battery green, grid grey. Only in this
+                         variant: in the dark one the two pages differ on purpose - see there. -->
+                    <Color x:Key="SolarColor">#D4A106</Color>
+                    <Color x:Key="BatteryColor">#1FA864</Color>
+                    <Color x:Key="GridColor">#7D8A9F</Color>
+
                     <!-- Power Flow -->
-                    <SolidColorBrush x:Key="PowerFlowBattery">LightGreen</SolidColorBrush>
-                    <SolidColorBrush x:Key="PowerFlowSolar">#ffd000</SolidColorBrush>
-                    <SolidColorBrush x:Key="PowerFlowGrid">LightGray</SolidColorBrush>
-                    <SolidColorBrush x:Key="PowerGridIcon">#808080</SolidColorBrush>
+                    <SolidColorBrush x:Key="PowerFlowBattery" Color="{StaticResource BatteryColor}" />
+                    <SolidColorBrush x:Key="PowerFlowSolar" Color="{StaticResource SolarColor}" />
+                    <SolidColorBrush x:Key="PowerFlowGrid" Color="{StaticResource GridColor}" />
+                    <SolidColorBrush x:Key="PowerGridIcon" Color="{StaticResource GridColor}" />
 
                     <!-- Power flow page. Colour is the kind of power, never the device or the direction: solar
                          yellow, battery green, grid grey, everything inside the house blue. Idle is a trace of the
@@ -62,9 +72,9 @@
                     <SolidColorBrush x:Key="FlowText">Black</SolidColorBrush>
                     <SolidColorBrush x:Key="FlowLabel">#5B6B84</SolidColorBrush>
                     <SolidColorBrush x:Key="FlowMuted">#8C99AE</SolidColorBrush>
-                    <SolidColorBrush x:Key="FlowSolar">#D4A106</SolidColorBrush>
-                    <SolidColorBrush x:Key="FlowBattery">#1FA864</SolidColorBrush>
-                    <SolidColorBrush x:Key="FlowGrid">#7D8A9F</SolidColorBrush>
+                    <SolidColorBrush x:Key="FlowSolar" Color="{StaticResource SolarColor}" />
+                    <SolidColorBrush x:Key="FlowBattery" Color="{StaticResource BatteryColor}" />
+                    <SolidColorBrush x:Key="FlowGrid" Color="{StaticResource GridColor}" />
                     <SolidColorBrush x:Key="FlowHouse">#3B7FE0</SolidColorBrush>
                     <SolidColorBrush x:Key="FlowIdle">#C9D1DE</SolidColorBrush>
                     <SolidColorBrush x:Key="FlowJunction">#6B7A92</SolidColorBrush>
@@ -72,24 +82,33 @@
                     <!--Menus-->
                     <SolidColorBrush x:Key='MenuBackground'>#f0f0f0</SolidColorBrush>
                     
-                    <!-- Device Control -->
-                    <SolidColorBrush x:Key='DeviceButtonBackground'>BurlyWood</SolidColorBrush>
-                    <SolidColorBrush x:Key='DeviceButtonSelectedBackground'>LightSalmon</SolidColorBrush>
-                    <SolidColorBrush x:Key='DeviceButtonMouseOver'>Coral</SolidColorBrush>
+                    <!-- Device Control. The tabs of a device card: grey, the selected one a light blue. -->
+                    <SolidColorBrush x:Key='DeviceButtonBackground'>#E4E8EE</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceButtonSelectedBackground'>#C9DCF7</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceButtonMouseOver'>#D7E3F4</SolidColorBrush>
 
-                    <SolidColorBrush x:Key='DeviceOuterBackgroundRunning'>AntiqueWhite</SolidColorBrush>
-                    <SolidColorBrush x:Key='DeviceOuterBackgroundFault'>Red</SolidColorBrush>
-                    <SolidColorBrush x:Key='DeviceOuterBackgroundWarning'>Orange</SolidColorBrush>
-                    <SolidColorBrush x:Key='DeviceOuterBackgroundStartUp'>BurlyWood</SolidColorBrush>
-                    <SolidColorBrush x:Key='DeviceOuterBackgroundOther'>LightGray</SolidColorBrush>
-                    
-                    <SolidColorBrush x:Key='DeviceInnerBackgroundRunning'>Cornsilk</SolidColorBrush>
-                    <SolidColorBrush x:Key='DeviceInnerBackgroundFault'>OrangeRed</SolidColorBrush>
-                    <SolidColorBrush x:Key='DeviceInnerBackgroundWarning'>Goldenrod</SolidColorBrush>
-                    <SolidColorBrush x:Key='DeviceInnerBackgroundStartup'>LightSalmon</SolidColorBrush>
-                    <SolidColorBrush x:Key='DeviceInnerBackgroundOther'>Gainsboro</SolidColorBrush>
-                    <SolidColorBrush x:Key="Lcd">#B3DBC6</SolidColorBrush>
-                    <SolidColorBrush x:Key="DeviceCleaning">Azure</SolidColorBrush>
+                    <!-- The frame of a device card and of a gauge tile of the detail views (Border.DeviceFrame in
+                         Styles/Controls.axaml). Rounded and with a gap between the tiles here; the dark variant keeps
+                         the square, touching frames it has always had. -->
+                    <SolidColorBrush x:Key="DeviceBorder">#C3CCD9</SolidColorBrush>
+                    <CornerRadius x:Key="DeviceCornerRadius">6</CornerRadius>
+                    <Thickness x:Key="GaugeTileMargin">2</Thickness>
+
+                    <!-- The state of a device. Running is the normal case and therefore the neutral white card; only
+                         what needs attention is tinted. Outer is the card, Inner the panel inside it. -->
+                    <SolidColorBrush x:Key='DeviceOuterBackgroundRunning'>White</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceOuterBackgroundFault'>#F5B5B0</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceOuterBackgroundWarning'>#FBE3A6</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceOuterBackgroundStartup'>#C3D8F5</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceOuterBackgroundOther'>#E4E8EE</SolidColorBrush>
+
+                    <SolidColorBrush x:Key='DeviceInnerBackgroundRunning'>#F6F8FB</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceInnerBackgroundFault'>#FDE7E5</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceInnerBackgroundWarning'>#FFF6DB</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceInnerBackgroundStartup'>#E8F0FC</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceInnerBackgroundOther'>#F1F3F6</SolidColorBrush>
+                    <SolidColorBrush x:Key="Lcd">#E3EFE8</SolidColorBrush>
+                    <SolidColorBrush x:Key="DeviceCleaning">#E8F0FC</SolidColorBrush>
                     
                     <!-- Toshiba HVAC control: the WPF colours. The hover frame is the same in both variants; the
                          active green, the selected mode and the inactive grey are darkened for the dark one. -->
@@ -104,24 +123,25 @@
                     <!-- The Wi-Fi LED keeps this green in the dark variant too, unlike HvacActive. -->
                     <SolidColorBrush x:Key="HvacWifiLedOn">LimeGreen</SolidColorBrush>
 
-                    <!-- Gauge -->
-                    <SolidColorBrush x:Key='UnitForeground'>Blue</SolidColorBrush>
-                    <SolidColorBrush x:Key='HandFill'>DarkSlateGray</SolidColorBrush>
-                    <SolidColorBrush x:Key='TickFill'>DarkGray</SolidColorBrush>
+                    <!-- Gauge. The needle is the warm orange of the dark variant, so that it is the same accent in
+                         both; the units are the labels' slate rather than a link blue. -->
+                    <SolidColorBrush x:Key='UnitForeground'>#5B6B84</SolidColorBrush>
+                    <SolidColorBrush x:Key='HandFill'>#C54F26</SolidColorBrush>
+                    <SolidColorBrush x:Key='TickFill'>#C9D1DE</SolidColorBrush>
                     <SolidColorBrush x:Key='AnimationBackground'>#10000000</SolidColorBrush>
-                    
+
                     <!-- OnOff Button -->
-                    <SolidColorBrush x:Key='ThumbFill'>DarkCyan</SolidColorBrush>
-                    <SolidColorBrush x:Key='SliderBackground'>LightSalmon</SolidColorBrush>
-                    
+                    <SolidColorBrush x:Key='ThumbFill'>#3B7FE0</SolidColorBrush>
+                    <SolidColorBrush x:Key='SliderBackground'>#CBD3DF</SolidColorBrush>
+
                     <!-- Battery -->
-                    <Color x:Key="Soc0">DarkRed</Color>
-                    <Color x:Key="Soc1">Red</Color>
-                    <Color x:Key="Soc2">Yellow</Color>
-                    <Color x:Key="Soc3">YellowGreen</Color>
-                    <Color x:Key="Soc4">LightGreen</Color>
-                    <Color x:Key="Soc5">LawnGreen</Color>
-                    <SolidColorBrush x:Key="BatteryBorderRunning">DarkGreen</SolidColorBrush>
+                    <Color x:Key="Soc0">#B42318</Color>
+                    <Color x:Key="Soc1">#E5484D</Color>
+                    <Color x:Key="Soc2">#F2B705</Color>
+                    <Color x:Key="Soc3">#9BCB3C</Color>
+                    <Color x:Key="Soc4">#4CC27A</Color>
+                    <Color x:Key="Soc5">#1FA864</Color>
+                    <SolidColorBrush x:Key="BatteryBorderRunning" Color="{StaticResource BatteryColor}" />
                     <SolidColorBrush x:Key="BatteryBorderFault">Red</SolidColorBrush>
                     <SolidColorBrush x:Key="BatteryBorderWarning">Gold</SolidColorBrush>
                     <!-- Where the frame pulses to while the battery charges, the blue of the WPF animation -->
@@ -144,13 +164,18 @@
                 <ResourceDictionary x:Key='Dark'>
                     <Color x:Key="AppAccentColor">#C4480C</Color>
 
+                    <!-- The ground of every page, see the light variant. Black is what Fluent painted a page with
+                         before the pages took this brush, so the dark look did not change. -->
                     <SolidColorBrush x:Key='BackgroundBrush'>Black</SolidColorBrush>
 					<SolidColorBrush x:Key='ForegroundBrush'>#e8e8e8</SolidColorBrush>
 					<SolidColorBrush x:Key='DisableBrush'>#40FFFFFF</SolidColorBrush>
                     <SolidColorBrush x:Key="DialogBackground">#002040</SolidColorBrush>
                     <SolidColorBrush x:Key="AlternatingRowBackground">#18ffffff</SolidColorBrush>
 
-                    <!-- Power Flow -->
+                    <!-- Power Flow. Not the Flow* colours below, unlike the light variant: those are the design the
+                         power flow page was drawn from, these the dashboard's own dark look, and the developer has
+                         chosen neither over the other. -->
+
                     <SolidColorBrush x:Key="PowerFlowBattery">DarkGreen</SolidColorBrush>
                     <SolidColorBrush x:Key="PowerFlowSolar">#D8AE06</SolidColorBrush>
                     <SolidColorBrush x:Key="PowerFlowGrid">#ff404040</SolidColorBrush>
@@ -179,11 +204,17 @@
                     <SolidColorBrush x:Key='DeviceButtonBackground'>#005080</SolidColorBrush>
                     <SolidColorBrush x:Key='DeviceButtonSelectedBackground'>DarkCyan</SolidColorBrush>
                     <SolidColorBrush x:Key='DeviceButtonMouseOver'>CadetBlue</SolidColorBrush>
+
+                    <!-- The frame of a device card and of a gauge tile, see the light variant: square and touching,
+                         as the dark look has always been. -->
+                    <SolidColorBrush x:Key="DeviceBorder">DimGray</SolidColorBrush>
+                    <CornerRadius x:Key="DeviceCornerRadius">0</CornerRadius>
+                    <Thickness x:Key="GaugeTileMargin">0</Thickness>
                     
                     <SolidColorBrush x:Key='DeviceOuterBackgroundRunning'>#ff003050</SolidColorBrush>
                     <SolidColorBrush x:Key='DeviceOuterBackgroundFault'>DarkRed</SolidColorBrush>
                     <SolidColorBrush x:Key='DeviceOuterBackgroundWarning'>DarkGoldenrod</SolidColorBrush>
-                    <SolidColorBrush x:Key='DeviceOuterBackgroundStartUp'>SaddleBrown</SolidColorBrush>
+                    <SolidColorBrush x:Key='DeviceOuterBackgroundStartup'>SaddleBrown</SolidColorBrush>
                     <SolidColorBrush x:Key='DeviceOuterBackgroundOther'>#ff606060</SolidColorBrush>
                     
                     <SolidColorBrush x:Key='DeviceInnerBackgroundRunning'>#ff101010</SolidColorBrush>

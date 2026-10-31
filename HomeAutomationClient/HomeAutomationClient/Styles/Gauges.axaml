@@ -10,9 +10,14 @@
 
     What tells the four views apart is only the background, which says whether the device is running. Each view
     therefore binds the gauge's Background in its own style; do not paint the Border here.
+
+    The frame is Border.DeviceFrame (Styles/Controls.axaml), the one the device cards of the dashboard have, and
+    GaugeTileMargin is the gap between two tiles; both are per theme in App.axaml. Do not set BorderBrush or
+    CornerRadius on the Border here: a value set in a template outranks a style, so the frame would stop following
+    the theme.
     -->
     <ControlTemplate x:Key="DetailsGauge" TargetType="c:HalfCircleGauge">
-        <Border BorderBrush="DimGray" BorderThickness="1" UseLayoutRounding="False" Padding="4"
+        <Border Classes="DeviceFrame" Margin="{DynamicResource GaugeTileMargin}" UseLayoutRounding="False" Padding="4"
                 Background="{TemplateBinding Background}">
             <Grid RowDefinitions="Auto,Auto,Auto">
                 <TextBlock Grid.Row="0" FontSize="18" FontWeight="Normal" TextAlignment="Center"

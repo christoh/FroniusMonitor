@@ -46,6 +46,10 @@ Where they differ, it is a decision and not a gap. The delta frequency gauge hid
 has a switch per group, so the user turns those off there, while the delta frequency gauge has no switch of its
 own in either app. See [[InverterDetailsView.Lifecycle]].
 
+The tiles of the detail views look different as well: in the light variant of the Avalonia client they are
+rounded cards with a gap between them (`Border.DeviceFrame` and `GaugeTileMargin`, since 2026-10-31), the WPF
+app keeps its square frames. See [[Theme.Palette]].
+
 ## One place works out where the needle stands
 
 Both apps compute the fraction of the scale **once**, and both templates ask for it:

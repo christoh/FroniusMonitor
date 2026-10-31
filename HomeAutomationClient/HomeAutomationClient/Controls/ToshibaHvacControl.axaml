@@ -109,7 +109,7 @@
 	</c:DeviceControlBase.Styles>
 
 	<Viewbox x:Name="Root" x:DataType="vm:ToshibaHvacViewModel">
-		<Border BorderBrush="DimGray" BorderThickness="1" Width="150">
+		<Border Classes="DeviceFrame" Width="150">
 			<Grid x:Name="BackgroundProvider" Margin="2" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
 
 				<Viewbox Grid.Row="0" StretchDirection="DownOnly">

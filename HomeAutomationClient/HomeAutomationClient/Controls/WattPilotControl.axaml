@@ -9,7 +9,7 @@
                      mc:Ignorable="d" d:DesignWidth="220" d:DesignHeight="272"
                      x:Class="De.Hochstaetter.HomeAutomationClient.Controls.WattPilotControl">
 	<Viewbox DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=c:WattPilotControl}}">
-		<Border BorderBrush="DimGray" BorderThickness="1" Width="110">
+		<Border Classes="DeviceFrame" Width="110">
 			<Border.Styles>
 				<Style Selector="c|HalfCircleGauge">
 					<Setter Property="TickFill" Value="{DynamicResource TickFill}" />
