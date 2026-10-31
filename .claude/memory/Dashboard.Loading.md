@@ -171,5 +171,6 @@ over `/etc/nginx/http.d/default.conf`.
 - The detail views build all their gauges at once - `InverterDetailsView` 138 - but open one at a time, on
   request; `LazyPanel` would serve their gauge groups too, should it be wanted.
 - `HouseControl` (296 visuals) and `SmartMeterControl` are part of the page and built with it.
-- The WebAssembly numbers are unmeasured; whether the dashboard is quicker in the browser, and by how much, is
-  what the next rollout shows.
+- The WebAssembly numbers are unmeasured in the cloud. What the developer saw after the rollout of 2026-10-31
+  (the `548eb111…` image on amazon2): the `.wasm.br` download takes about a second, the dashboard is much
+  quicker, and the whole app is much more responsive - "das hat viel gebracht".
