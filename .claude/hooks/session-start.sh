@@ -11,35 +11,33 @@ export DEBIAN_FRONTEND=noninteractive
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
 export DOTNET_NOLOGO=1
 
-# 1. The .NET 10 SDK from apt. The Microsoft download host (builds.dotnet.microsoft.com, used by dotnet-install.sh)
-#    is blocked by the egress policy of the cloud environment; Ubuntu's own archive and packages.microsoft.com are not.
-if ! command -v dotnet >/dev/null 2>&1 || ! dotnet --list-sdks 2>/dev/null | grep -q '^10\.'; then
-  if [ ! -f /etc/apt/sources.list.d/microsoft-prod.list ]; then
-    tmp=$(mktemp)
-    curl -sSL -o "$tmp" https://packages.microsoft.com/config/ubuntu/24.04/packages-microsoft-prod.deb
-    dpkg -i "$tmp" >/dev/null
-    rm -f "$tmp"
+# 1. The .NET 11 SDK. Ubuntu's archive has none (only dotnet-sdk-10.0, checked 2026-11-16), so it comes from
+#    Microsoft's dotnet-install.sh, into the directory of the dotnet the image already has, so that one "dotnet" sees
+#    every SDK. builds.dotnet.microsoft.com, where the script and the SDK come from, was once blocked by the egress
+#    policy of the cloud environment, which is why this used to install .NET 10 from apt; on 2026-11-16 it was open.
+if ! dotnet --list-sdks 2>/dev/null | grep -q '^11\.'; then
+  if command -v dotnet >/dev/null 2>&1; then
+    dotnetDir=$(dirname "$(readlink -f "$(command -v dotnet)")")
+  else
+    dotnetDir=/usr/lib/dotnet
   fi
-  # A third party PPA in the image is blocked too; its failure must not stop the update.
-  apt-get update -qq || true
-  apt-get install -y -qq dotnet-sdk-10.0
+
+  script=$(mktemp)
+  curl -sSfL -o "$script" https://builds.dotnet.microsoft.com/dotnet/scripts/v1/dotnet-install.sh
+  bash "$script" --channel 11.0 --install-dir "$dotnetDir" --no-path >/dev/null
+  rm -f "$script"
+
+  if ! command -v dotnet >/dev/null 2>&1; then
+    ln -sf "$dotnetDir/dotnet" /usr/local/bin/dotnet
+  fi
 fi
 
-# 2. A newer C# compiler. The SDK's Roslyn 5.0 does not know the preview C# the solution uses (collection expression
-#    arguments, "with(...)"), the newest Microsoft.Net.Compilers.Toolset from NuGet does. A user level MSBuild import
-#    adds it to every .csproj built in this container, so the repository's own build files stay as they are.
-importDir="$HOME/.local/share/Microsoft/MSBuild/Current/Imports/Microsoft.Common.props/ImportBefore"
-mkdir -p "$importDir"
-cat > "$importDir/ClaudeRoslynPreview.props" <<'PROPS'
-<Project>
-  <!-- Installed by .claude/hooks/session-start.sh in Claude Code on the web. The Ubuntu .NET 10 SDK ships Roslyn 5.0,
-       which does not know the preview C# the solution uses (collection expression arguments, "with(...)").
-       The newest compiler toolset from NuGet replaces it for every build in this container. -->
-  <ItemGroup Condition="'$(MSBuildProjectExtension)' == '.csproj'">
-    <PackageReference Include="Microsoft.Net.Compilers.Toolset" Version="5.9.0" PrivateAssets="all" IsImplicitlyDefined="true" />
-  </ItemGroup>
-</Project>
-PROPS
+# 2. No compiler of its own any more. The .NET 10 SDK from Ubuntu shipped Roslyn 5.0, which did not know the preview C#
+#    the solution uses, so this hook used to put Microsoft.Net.Compilers.Toolset 5.9.0 into every build through a user
+#    level MSBuild import. The .NET 11 SDK brings Roslyn 5.12, and the old toolset would now be the older compiler:
+#    the analyzers of ASP.NET Core 11 refuse it (CS9057). A container cached with the import loses it here. MSBuild
+#    imports every file in that folder, whatever it is called, so it has to go, not be renamed.
+rm -f "$HOME/.local/share/Microsoft/MSBuild/Current/Imports/Microsoft.Common.props/ImportBefore/ClaudeRoslynPreview.props"
 
 # 3. Environment for the session.
 if [ -n "${CLAUDE_ENV_FILE:-}" ]; then
