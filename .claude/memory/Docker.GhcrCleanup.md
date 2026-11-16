@@ -32,6 +32,15 @@ rest of the client's publish output (`dotnet.js`, `web.config`, runtimeconfig, m
 The two lines must stay identical - a `--chmod`, a different path or a missing `--link` on one side makes two layers
 again.
 
+**The client image's nginx says how long a file may be cached** (since 2026-11-16): a name with a content hash
+(`.<10 characters>.wasm`, `.dat`, `.js` - the assemblies, the native module, the runtime, ICU) is `immutable` for a
+year, everything else - `index.html`, `main.js`, `dotnet.js`, Avalonia's `avalonia.js` and `storage.js`, a deep link
+like `/powerflow` - `no-cache`, so the browser revalidates it and gets a 304 while it has not changed. Before, nginx
+sent no `Cache-Control`, a browser kept the unhashed files by its own reckoning, and after the update to Avalonia
+12.1.6 a Chrome ran the new assemblies with the cached `avalonia.js` of 12.1.4 and stopped at "Loading..."
+(`Caniuse.isApplePlatform must be a Function but was undefined`). The server image needs nothing of the kind:
+`MapStaticAssets` sends the headers itself.
+
 Built once only because BuildKit merges identical vertices across the targets of one bake run: `client-builder`
 is `--platform=$BUILDPLATFORM` and uses no `TARGET*` argument, so it is the same LLB for every platform and both
 images. An ARG in it that differs per platform or per target, or a differing context/build-arg between the two

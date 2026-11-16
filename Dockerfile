@@ -181,11 +181,26 @@ server {
     root /app/wwwroot;
     index index.html;
 
+    # A name with a content hash in it - dotnet.native.5c3dza45gi.wasm, Fronius.resources.5o2qhqcwht.wasm - stands
+    # for that content for good: the next publish gives changed content a new name. So the browser may keep it.
+    location ~ "\.[a-z0-9]{10}\.(wasm|dat|js)$" {
+        brotli_static on;
+        gzip_static on;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+
+    # Everything else keeps its name from one version to the next: index.html, main.js, the loader dotnet.js, and
+    # Avalonia's avalonia.js and storage.js. Sent without Cache-Control, a browser keeps such a file for as long as it
+    # sees fit - a tenth of its age by Last-Modified, days for a file out of a NuGet package - and then runs the new
+    # Avalonia with the old one's JavaScript. That is how Avalonia 12.1.6 met a cached avalonia.js of 12.1.4 on
+    # 2026-11-16 and stopped at "Caniuse.isApplePlatform must be a Function but was undefined". no-cache makes the
+    # browser ask every time, which the ETag answers with a 304 while nothing has changed.
     location / {
         try_files $uri $uri/ =404;
         error_page 404 =200 /;
         brotli_static on;
         gzip_static on;
+        add_header Cache-Control "no-cache";
     }
 
     listen 42741;
