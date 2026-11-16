@@ -183,6 +183,12 @@ The AOT publish with the .NET 11 SDK in the cloud (4 cores, without Docker, the 
 headless Chromium the app had its canvas after 2.9 s and drew the login dialog - text, icons, the check box - with
 no page error. The charts and the dashboard after a login were not seen: there was no server behind the page.
 
+**Publish from a clean `obj` after a package update.** The AOT publish after the update to Avalonia 12.1.6, over
+the `obj` of builds with 12.1.4, produced an app whose Mono runtime stopped at start: `[MONO] aot-runtime.c:2147
+<disabled>`, then `mono_wasm_load_runtime () failed` and `ExitStatus`, which is how an AOT image that does not
+match its assembly shows. The same sources published after deleting the head's `obj` and `bin` ran (2026-11-16,
+canvas after 2.6 s). The Docker build always starts clean; a local publish does not.
+
 ### Where the 12.5 minutes go, and why the machine looks idle
 
 The developer saw the AOT publish run long on little CPU. The timestamps of the build log (4 cores) say why:
