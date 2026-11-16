@@ -41,6 +41,13 @@ sent no `Cache-Control`, a browser kept the unhashed files by its own reckoning,
 (`Caniuse.isApplePlatform must be a Function but was undefined`). The server image needs nothing of the kind:
 `MapStaticAssets` sends the headers itself.
 
+**A copy already cached that way stays until the browser's own estimate runs out**, because the new headers only
+reach it when the browser asks again. It is kept per host name: `home.hochstätter.de` failed while
+`home.hochstaetter.de` worked in the same Chrome, with byte-identical files on the server. Neither Ctrl+Shift+R
+(the runtime imports `avalonia.js` after the page has loaded, and that import may still come from the cache) nor
+DevTools' "Clear site data" (cookies, storage and Cache Storage, not the HTTP cache) removed it; **"Empty cache
+and hard reload"** - right-click on the reload button while DevTools are open - did.
+
 Built once only because BuildKit merges identical vertices across the targets of one bake run: `client-builder`
 is `--platform=$BUILDPLATFORM` and uses no `TARGET*` argument, so it is the same LLB for every platform and both
 images. An ARG in it that differs per platform or per target, or a differing context/build-arg between the two
