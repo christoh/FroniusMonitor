@@ -27,7 +27,7 @@
 		<PackageReference Include="Google.Protobuf" Version="3.36.2" />
 		<!-- Generates the USP types from the .proto files at build time. The Docker image builds on $BUILDPLATFORM, so
 		     protoc always runs on a platform Grpc.Tools ships it for. -->
-		<PackageReference Include="Grpc.Tools" Version="2.84.0">
+		<PackageReference Include="Grpc.Tools" Version="2.85.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>

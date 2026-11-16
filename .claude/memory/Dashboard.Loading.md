@@ -171,9 +171,12 @@ HarfBuzzSharp libraries Avalonia 12.1 asks for (3.119.4, 8.3.1.3) go up to Emscr
 of the head (`WasmBuildNative` links) failed with `undefined symbol: saveSetjmp` / `testSetjmp`. No 3.119 build
 has a 6.0.2 variant; SkiaSharp 4.156.1 and HarfBuzzSharp 14.4.0.101 do. So the browser head, and only it, references
 those four packages directly (the comment in its project file says when they can go: once Avalonia asks for
-SkiaSharp 4). Avalonia, ScottPlot and SkiaSharp.HarfBuzz are compiled against SkiaSharp 3; every one of the 791
-SkiaSharp and HarfBuzzSharp members they reference was found unchanged in the new assemblies by a metadata
-comparison, and the link succeeds.
+SkiaSharp 4). Avalonia, ScottPlot and SkiaSharp.HarfBuzz are compiled against SkiaSharp 3; every one of the
+SkiaSharp and HarfBuzzSharp members they reference - 791 with Avalonia 12.1.4, 793 with 12.1.6 - was found unchanged
+in the new assemblies, and the link succeeds. Compare again with every Avalonia update until the four references can
+go: in the browser head's build output, every `MemberReference` and `TypeReference` of an assembly that references
+SkiaSharp or HarfBuzzSharp, looked up by type, name and signature among the definitions of `SkiaSharp.dll` and
+`HarfBuzzSharp.dll` (`System.Reflection.Metadata`, a small console program).
 
 The AOT publish with the .NET 11 SDK in the cloud (4 cores, without Docker, the client stage's own command) took
 8.5 minutes. `dotnet.native.wasm` is 54.4 MB raw and 10.6 MB brotli, `_framework` 15.0 MB as brotli files. In
