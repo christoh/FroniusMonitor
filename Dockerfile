@@ -83,7 +83,7 @@ EOF
 # whatever image and platform is being built - the WebAssembly output is the same for all of them - so this stage
 # runs once per build, not once per platform, and not once per image either. Keep it that way: an ARG such as
 # TARGETPLATFORM used in here would make it differ between platforms and build it once for each.
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0 AS client-builder
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:11.0 AS client-builder
 
 # Before COPY, so that a source change does not install the workload again.
 # The package sources over HTTPS rather than the image's HTTP. The archive is public and signed, so this is not for
@@ -209,7 +209,7 @@ HEALTHCHECK CMD curl http://127.0.0.1:42741 -sD - | fgrep "<title>Home Automatio
 
 # The SDK image for the same reason as the client builder, but without the wasm-tools workload: the browser client
 # is not built here, it is taken ready-made from the client builder.
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0 AS server-builder
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:11.0 AS server-builder
 
 WORKDIR /build
 COPY . .
@@ -293,7 +293,7 @@ EOF
 # ----- Server runner -----
 
 # Last on purpose, so that a plain "docker build ." builds the server, as it did before the two Dockerfiles merged.
-FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS server
+FROM mcr.microsoft.com/dotnet/aspnet:11.0-alpine AS server
 
 # The OCI image labels GitHub reads: source attaches the package to this repository (and so inherits its
 # visibility and README), description and licenses show on the package page. In the runner stage on purpose -
@@ -308,7 +308,7 @@ LABEL org.opencontainers.image.title="Home Automation Server" \
       org.opencontainers.image.licenses="AGPL-3.0-only" \
       org.opencontainers.image.vendor="Christoph Hochstätter" \
       org.opencontainers.image.authors="Christoph Hochstätter" \
-      org.opencontainers.image.base.name="mcr.microsoft.com/dotnet/aspnet:10.0-alpine"
+      org.opencontainers.image.base.name="mcr.microsoft.com/dotnet/aspnet:11.0-alpine"
 COPY --from=shell-files / /
 COPY --from=server-builder /runner/ /
 # The browser client, as the very same layer the client image has - see the matching line there.

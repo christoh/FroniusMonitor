@@ -82,9 +82,10 @@ because setting the switch recomputes without the animation.
 
 ## The project runs everywhere, and these tests run in the cloud
 
-`HomeAutomationServerTests` targets plain `net10.0` and references no WPF, so the whole suite - these headless
-Avalonia tests included - runs on Linux and in Claude Code on the web. They do: 559 passing in about nine
-seconds there on 2026-09-16, with no display and nothing installed beyond the SDK; 607 by the end of that day.
+`HomeAutomationServerTests` targets plain `net11.0` (`net10.0` until 2026-11-16) and references no WPF, so the
+whole suite - these headless Avalonia tests included - runs on Linux and in Claude Code on the web. They do: 559
+passing in about nine seconds there on 2026-09-16, with no display and nothing installed beyond the SDK; 607 by the
+end of that day.
 
 It was not so until that day. The project targeted `net10.0-windows7.0` and referenced `FroniusMonitor`, so
 `dotnet test` in the cloud ended in `No frameworks were found` and `Zero tests ran` - and that reads exactly like

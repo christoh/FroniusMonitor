@@ -5,4 +5,4 @@
 cd /opt/fritzbox-usp-probe
 set -a; [ -f /opt/mosquitto/secrets.env ] && . /opt/mosquitto/secrets.env; . ./secrets.env; set +a
 exec docker run --rm --network host -e FRITZBOX_PASSWORD -e MQTT_PASSWORD -e MQTT_BOX_PASSWORD \
-  -v /opt/fritzbox-usp-probe:/work -w /work mcr.microsoft.com/dotnet/runtime:10.0-alpine dotnet /work/app/FritzBoxUspProbe.dll "$@"
+  -v /opt/fritzbox-usp-probe:/work -w /work mcr.microsoft.com/dotnet/runtime:11.0-alpine dotnet /work/app/FritzBoxUspProbe.dll "$@"

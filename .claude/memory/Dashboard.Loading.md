@@ -164,6 +164,22 @@ died on its first JSON before Avalonia was up. And the client image's nginx list
 which the cloud sandbox cannot bind (no IPv6): to run the image there, mount a `default.conf` without that line
 over `/etc/nginx/http.d/default.conf`.
 
+### On .NET 11, with SkiaSharp 4 (2026-11-16)
+
+.NET 11 links WebAssembly with **Emscripten 6.0.2** and native WebAssembly exceptions. The native SkiaSharp and
+HarfBuzzSharp libraries Avalonia 12.1 asks for (3.119.4, 8.3.1.3) go up to Emscripten 3.1.56, and even a plain build
+of the head (`WasmBuildNative` links) failed with `undefined symbol: saveSetjmp` / `testSetjmp`. No 3.119 build
+has a 6.0.2 variant; SkiaSharp 4.156.1 and HarfBuzzSharp 14.4.0.101 do. So the browser head, and only it, references
+those four packages directly (the comment in its project file says when they can go: once Avalonia asks for
+SkiaSharp 4). Avalonia, ScottPlot and SkiaSharp.HarfBuzz are compiled against SkiaSharp 3; every one of the 791
+SkiaSharp and HarfBuzzSharp members they reference was found unchanged in the new assemblies by a metadata
+comparison, and the link succeeds.
+
+The AOT publish with the .NET 11 SDK in the cloud (4 cores, without Docker, the client stage's own command) took
+8.5 minutes. `dotnet.native.wasm` is 54.4 MB raw and 10.6 MB brotli, `_framework` 15.0 MB as brotli files. In
+headless Chromium the app had its canvas after 2.9 s and drew the login dialog - text, icons, the check box - with
+no page error. The charts and the dashboard after a login were not seen: there was no server behind the page.
+
 ### Where the 12.5 minutes go, and why the machine looks idle
 
 The developer saw the AOT publish run long on little CPU. The timestamps of the build log (4 cores) say why:

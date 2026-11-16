@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>net10.0</TargetFramework>
+		<TargetFramework>net11.0</TargetFramework>
 		<LangVersion>preview</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<AssemblyVersion>0.9.*</AssemblyVersion>
@@ -19,15 +19,15 @@
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
 		<PackageReference Include="FluentModbus" Version="5.3.2" />
-		<PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.13" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="11.0.0" />
 		<!-- The history of prices and weather is one SQLite file in the history folder; see Services/EnergyHistoryStore. -->
-		<PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.13" />
+		<PackageReference Include="Microsoft.Data.Sqlite" Version="11.0.0" />
 		<PackageReference Include="Serilog" Version="4.4.0" />
 		<PackageReference Include="Serilog.Expressions" Version="5.0.0" />
 		<PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
 		<PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
-		<PackageReference Include="System.IO.Packaging" Version="10.0.13" />
-		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.13" />
+		<PackageReference Include="System.IO.Packaging" Version="11.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="11.0.0" />
 		<PackageReference Include="GitInfo" Version="3.6.1">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

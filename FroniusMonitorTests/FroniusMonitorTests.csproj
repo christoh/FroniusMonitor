@@ -2,8 +2,8 @@
 
 	<PropertyGroup>
 		<!-- WPF, so Windows only. Everything that does not need the WPF app lives in HomeAutomationServerTests,
-		     which is plain net10.0 and runs anywhere - see the Refuse target below. -->
-		<TargetFramework>net10.0-windows7.0</TargetFramework>
+		     which is plain net11.0 and runs anywhere - see the Refuse target below. -->
+		<TargetFramework>net11.0-windows7.0</TargetFramework>
 		<!-- Only for the compile check described at RefuseNonWindows; Windows does not need it. -->
 		<EnableWindowsTargeting Condition="'$(VerifyOnLinux)' == 'true'">true</EnableWindowsTargeting>
 		<!-- Serialize the project references: FroniusMonitor may not have its XAML compiled beside its siblings.
