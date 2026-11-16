@@ -23,7 +23,7 @@ Everything runs on `amazon2.hochstaetter.de` (AWS, Alpine, reachable by SSM). It
 
 | On amazon2 | From | What |
 |---|---|---|
-| `/opt/fritzbox-usp-probe/probe.sh` | `amazon2/probe.sh` | Runs the probe in `mcr.microsoft.com/dotnet/runtime:10.0-alpine` |
+| `/opt/fritzbox-usp-probe/probe.sh` | `amazon2/probe.sh` | Runs the probe in `mcr.microsoft.com/dotnet/runtime:11.0-alpine` |
 | `/opt/fritzbox-usp-probe/app/` | `dotnet publish` | The probe |
 | `/opt/fritzbox-usp-probe/probe.json`, `secrets.env` | written on amazon2 | Settings for the box in Neufahrn (see `probe.sample.json`) and the password of the box user, readable by root only |
 | `/opt/fritzbox-usp-probe/probe-ch.json` | written on amazon2 | The Swiss box (`Box.Url`, `Box.WebUrl` 192.168.3.1), used with `--config probe-ch.json`. The same password. Output in `probe-output-ch/`. |

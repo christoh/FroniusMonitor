@@ -164,6 +164,31 @@ died on its first JSON before Avalonia was up. And the client image's nginx list
 which the cloud sandbox cannot bind (no IPv6): to run the image there, mount a `default.conf` without that line
 over `/etc/nginx/http.d/default.conf`.
 
+### On .NET 11, with SkiaSharp 4 (2026-11-16)
+
+.NET 11 links WebAssembly with **Emscripten 6.0.2** and native WebAssembly exceptions. The native SkiaSharp and
+HarfBuzzSharp libraries Avalonia 12.1 asks for (3.119.4, 8.3.1.3) go up to Emscripten 3.1.56, and even a plain build
+of the head (`WasmBuildNative` links) failed with `undefined symbol: saveSetjmp` / `testSetjmp`. No 3.119 build
+has a 6.0.2 variant; SkiaSharp 4.156.1 and HarfBuzzSharp 14.4.0.101 do. So the browser head, and only it, references
+those four packages directly (the comment in its project file says when they can go: once Avalonia asks for
+SkiaSharp 4). Avalonia, ScottPlot and SkiaSharp.HarfBuzz are compiled against SkiaSharp 3; every one of the
+SkiaSharp and HarfBuzzSharp members they reference - 791 with Avalonia 12.1.4, 793 with 12.1.6 - was found unchanged
+in the new assemblies, and the link succeeds. Compare again with every Avalonia update until the four references can
+go: in the browser head's build output, every `MemberReference` and `TypeReference` of an assembly that references
+SkiaSharp or HarfBuzzSharp, looked up by type, name and signature among the definitions of `SkiaSharp.dll` and
+`HarfBuzzSharp.dll` (`System.Reflection.Metadata`, a small console program).
+
+The AOT publish with the .NET 11 SDK in the cloud (4 cores, without Docker, the client stage's own command) took
+8.5 minutes. `dotnet.native.wasm` is 54.4 MB raw and 10.6 MB brotli, `_framework` 15.0 MB as brotli files. In
+headless Chromium the app had its canvas after 2.9 s and drew the login dialog - text, icons, the check box - with
+no page error. The charts and the dashboard after a login were not seen: there was no server behind the page.
+
+**Publish from a clean `obj` after a package update.** The AOT publish after the update to Avalonia 12.1.6, over
+the `obj` of builds with 12.1.4, produced an app whose Mono runtime stopped at start: `[MONO] aot-runtime.c:2147
+<disabled>`, then `mono_wasm_load_runtime () failed` and `ExitStatus`, which is how an AOT image that does not
+match its assembly shows. The same sources published after deleting the head's `obj` and `bin` ran (2026-11-16,
+canvas after 2.6 s). The Docker build always starts clean; a local publish does not.
+
 ### Where the 12.5 minutes go, and why the machine looks idle
 
 The developer saw the AOT publish run long on little CPU. The timestamps of the build log (4 cores) say why:

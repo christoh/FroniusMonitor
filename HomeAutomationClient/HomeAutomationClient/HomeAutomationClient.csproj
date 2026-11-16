@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net10.0</TargetFramework>
+		<TargetFramework>net11.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<LangVersion>preview</LangVersion>
 		<Configuration>Release</Configuration>
@@ -32,10 +32,10 @@
 		<!-- The price chart. OxyPlot, which the WPF app draws it with, has no Avalonia package worth the name;
 		     ScottPlot renders through the Skia Avalonia already uses, on every head. -->
 		<PackageReference Include="ScottPlot.Avalonia" Version="5.1.59" />
-		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.13" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.13" />
+		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="11.0.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="11.0.0" />
 		<!-- The default log provider for every head that has nowhere better to write; the desktop head uses Serilog. -->
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.13" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="11.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
