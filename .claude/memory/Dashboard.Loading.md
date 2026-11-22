@@ -173,10 +173,18 @@ has a 6.0.2 variant; SkiaSharp 4.156.1 and HarfBuzzSharp 14.4.0.101 do. So the b
 those four packages directly (the comment in its project file says when they can go: once Avalonia asks for
 SkiaSharp 4). Avalonia, ScottPlot and SkiaSharp.HarfBuzz are compiled against SkiaSharp 3; every one of the
 SkiaSharp and HarfBuzzSharp members they reference - 791 with Avalonia 12.1.4, 793 with 12.1.6 - was found unchanged
-in the new assemblies, and the link succeeds. Compare again with every Avalonia update until the four references can
-go: in the browser head's build output, every `MemberReference` and `TypeReference` of an assembly that references
-SkiaSharp or HarfBuzzSharp, looked up by type, name and signature among the definitions of `SkiaSharp.dll` and
-`HarfBuzzSharp.dll` (`System.Reflection.Metadata`, a small console program).
+in the new assemblies, and the link succeeds. Compare again with every Avalonia update, and with every update of the
+four packages themselves, until the four references can go: in the browser head's build output, every
+`MemberReference` and `TypeReference` of an assembly that references SkiaSharp or HarfBuzzSharp, looked up by type,
+name and signature among the definitions of `SkiaSharp.dll` and `HarfBuzzSharp.dll` (`System.Reflection.Metadata`,
+a small console program; base types are walked for a member declared further up). A `Debug` build of the head is
+enough for both checks, because `WasmBuildNative` links there too - 41 seconds on the developer's machine.
+
+**2026-11-22, SkiaSharp 4.157.0 and HarfBuzzSharp 14.4.0.200** (the developer's package update): the link with
+Emscripten 6.0.2 succeeds, and none of the 795 references is missing - Avalonia.Skia 440, ScottPlot 228,
+SkiaSharp.HarfBuzz 76, Avalonia.HarfBuzz 44, ScottPlot.Avalonia 5, and 2 from `HomeAutomationClient` itself, which
+the earlier count of 793 did not include. The same program finds 67 missing against SkiaSharp 2.88, so a nought from
+it means something.
 
 The AOT publish with the .NET 11 SDK in the cloud (4 cores, without Docker, the client stage's own command) took
 8.5 minutes. `dotnet.native.wasm` is 54.4 MB raw and 10.6 MB brotli, `_framework` 15.0 MB as brotli files. In

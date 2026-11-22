@@ -32,9 +32,10 @@
 		     HarfBuzzSharp libraries of the versions Avalonia 12.1 asks for (3.119.4 and 8.3.1.3) are built for Emscripten
 		     3.1.56 at the newest and do not link there: "undefined symbol: saveSetjmp, testSetjmp". SkiaSharp 4.156 and
 		     HarfBuzzSharp 14.4 carry a build for 6.0.2. Avalonia and ScottPlot are compiled against SkiaSharp 3, but every
-		     SkiaSharp and HarfBuzzSharp member they reference is still there in these versions (checked 2026-11-16). Only
-		     this head needs them, because only this head links with Emscripten. Remove the four once Avalonia asks for
-		     SkiaSharp 4 itself. -->
+		     SkiaSharp and HarfBuzzSharp member they reference is still there in these versions - checked again with every
+		     update of Avalonia or of these four, last on 2026-11-22 with SkiaSharp 4.157.0, HarfBuzzSharp 14.4.0.200 and
+		     Avalonia 12.1.6; see Dashboard.Loading for how. Only this head needs them, because only this head links with
+		     Emscripten. Remove the four once Avalonia asks for SkiaSharp 4 itself. -->
 		<PackageReference Include="SkiaSharp" Version="4.157.0" />
 		<PackageReference Include="SkiaSharp.NativeAssets.WebAssembly" Version="4.157.0" />
 		<PackageReference Include="HarfBuzzSharp" Version="14.4.0.200" />
