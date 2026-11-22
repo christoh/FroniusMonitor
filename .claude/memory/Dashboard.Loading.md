@@ -178,13 +178,28 @@ four packages themselves, until the four references can go: in the browser head'
 `MemberReference` and `TypeReference` of an assembly that references SkiaSharp or HarfBuzzSharp, looked up by type,
 name and signature among the definitions of `SkiaSharp.dll` and `HarfBuzzSharp.dll` (`System.Reflection.Metadata`,
 a small console program; base types are walked for a member declared further up). A `Debug` build of the head is
-enough for both checks, because `WasmBuildNative` links there too - 41 seconds on the developer's machine.
+enough for these two, because `WasmBuildNative` links there too - 41 seconds on the developer's machine. **It is not
+enough for an update of the four packages: the third check is an AOT publish** (`dotnet publish -c Release`, what
+the Dockerfile does), because only a publish runs the AOT compiler, and that is what the next paragraph's update
+failed on.
 
-**2026-11-22, SkiaSharp 4.157.0 and HarfBuzzSharp 14.4.0.200** (the developer's package update): the link with
-Emscripten 6.0.2 succeeds, and none of the 795 references is missing - Avalonia.Skia 440, ScottPlot 228,
-SkiaSharp.HarfBuzz 76, Avalonia.HarfBuzz 44, ScottPlot.Avalonia 5, and 2 from `HomeAutomationClient` itself, which
-the earlier count of 793 did not include. The same program finds 67 missing against SkiaSharp 2.88, so a nought from
-it means something.
+**2026-11-22, SkiaSharp 4.157.0 and HarfBuzzSharp 14.4.0.200** (the developer's package update), **taken back the
+same night.** The link with Emscripten 6.0.2 succeeded, and none of the 795 references was missing - Avalonia.Skia
+440, ScottPlot 228, SkiaSharp.HarfBuzz 76, Avalonia.HarfBuzz 44, ScottPlot.Avalonia 5, and 2 from
+`HomeAutomationClient` itself, which the earlier count of 793 did not include (the program finds 67 missing against
+SkiaSharp 2.88, so a nought from it means something). But the image build on GitHub failed: the AOT compiler of
+.NET 11.0.0 (`mono-aot-cross`) died on `HarfBuzzSharp.dll` with `Assertion at sgen-alloc.c:409, condition
+'*p == NULL' not met`. On Windows the same publish crashed the same way on `HarfBuzzSharp.dll`, `SkiaSharp.dll` and
+the `aot-instances.dll` built from them; with HarfBuzzSharp alone back at 14.4.0.101, still on `SkiaSharp.dll` - so
+both new versions do it, and the build machine does not matter. The commit before the update published in full on
+the same machine, and so did the update with the four back at 4.156.1 / 14.4.0.101, which is where the project file
+pins them now, with a comment. Try a newer pair, or this one after an SDK update, with an AOT publish first.
+
+Two things about running that publish on the developer's machine: it takes 10 to 13 minutes (588 and 772 s), and
+about 2 to the crash. And keep the checkout's path short - a worktree under the session scratchpad
+(`C:\Users\...\AppData\Local\Temp\claude\<hash>\<session>\scratchpad\...`) took the files under `obj\...\aot-in`
+past Windows' 260 characters, and the AOT compiler then reported "Can not open image" for a dozen assemblies on top
+of the real failure; a worktree under `.claude\worktrees` is short enough.
 
 The AOT publish with the .NET 11 SDK in the cloud (4 cores, without Docker, the client stage's own command) took
 8.5 minutes. `dotnet.native.wasm` is 54.4 MB raw and 10.6 MB brotli, `_framework` 15.0 MB as brotli files. In

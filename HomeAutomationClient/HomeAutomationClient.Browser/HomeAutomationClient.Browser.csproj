@@ -33,13 +33,17 @@
 		     3.1.56 at the newest and do not link there: "undefined symbol: saveSetjmp, testSetjmp". SkiaSharp 4.156 and
 		     HarfBuzzSharp 14.4 carry a build for 6.0.2. Avalonia and ScottPlot are compiled against SkiaSharp 3, but every
 		     SkiaSharp and HarfBuzzSharp member they reference is still there in these versions - checked again with every
-		     update of Avalonia or of these four, last on 2026-11-22 with SkiaSharp 4.157.0, HarfBuzzSharp 14.4.0.200 and
-		     Avalonia 12.1.6; see Dashboard.Loading for how. Only this head needs them, because only this head links with
-		     Emscripten. Remove the four once Avalonia asks for SkiaSharp 4 itself. -->
-		<PackageReference Include="SkiaSharp" Version="4.157.0" />
-		<PackageReference Include="SkiaSharp.NativeAssets.WebAssembly" Version="4.157.0" />
-		<PackageReference Include="HarfBuzzSharp" Version="14.4.0.200" />
-		<PackageReference Include="HarfBuzzSharp.NativeAssets.WebAssembly" Version="14.4.0.200" />
+		     update of Avalonia or of these four, last on 2026-11-22 with Avalonia 12.1.6; see Dashboard.Loading for how.
+		     Only this head needs them, because only this head links with Emscripten. Remove the four once Avalonia asks
+		     for SkiaSharp 4 itself.
+		     Do not update them without an AOT publish (dotnet publish -c Release, what the Dockerfile does): SkiaSharp
+		     4.157.0 and HarfBuzzSharp 14.4.0.200 crash the AOT compiler of .NET 11.0.0 on their own assemblies -
+		     "Assertion at sgen-alloc.c:409, condition `*p == NULL' not met" - on Linux and on Windows alike, so the
+		     image could not be built (2026-11-22). A build and dotnet run do not compile ahead of time and pass. -->
+		<PackageReference Include="SkiaSharp" Version="4.156.1" />
+		<PackageReference Include="SkiaSharp.NativeAssets.WebAssembly" Version="4.156.1" />
+		<PackageReference Include="HarfBuzzSharp" Version="14.4.0.101" />
+		<PackageReference Include="HarfBuzzSharp.NativeAssets.WebAssembly" Version="14.4.0.101" />
 	</ItemGroup>
 
 	<ItemGroup>
