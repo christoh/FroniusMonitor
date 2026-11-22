@@ -61,7 +61,8 @@ because a plug that draws half a watt is switched on and worth seeing. **The spi
 for this rule**: the synthetic nodes the view makes for their segments carry what the cards beyond them draw and
 the consumer threshold, so a rail above two lamps at 5 W moves like the lamps do. **What a node puts on a bus
 is its `FlowPower` - nothing while it is idle** (2026-11-22): a bus that added the raw readings up crossed its
-threshold on a sum of idle ones (two plugs at 0.19 W) and ran to cards that showed idle. Made a `House` node at first, with the
+threshold on a sum of idle ones (two plugs at 0.19 W) and ran to cards that showed idle. The one exception is
+the house on the trunk, which takes the balance (see "The trunk is a bus"). Made a `House` node at first, with the
 producers' 10 W, a rail stood still above lit lamps. An idle wire is a solid trace in the idle colour with its
 junction dot, never nothing: **every card has a connector**, on or off. The figure is dimmed.
 
@@ -227,8 +228,14 @@ house, and nothing below it. The taps are signed, so **an inverter that charges 
 from the grid or from another inverter - has a negative AC power, takes from the bus, and the segments on the way
 to it run towards it; its own wire runs back into it through `IsReversed` as it always did. As one wire with the
 house's figure the trunk ran downwards from the top tap to the bottom one, past the house. `PowerFlowViewTests.The_trunk_carries_the_net_between_its_taps` holds it to this,
-through `WireStates`, which also tells whether a wire runs reversed. A tap feeds its `FlowPower` in (see
-"Idle is per kind"), so an idle tap injects nothing into the net.
+through `WireStates`, which also tells whether a wire runs reversed. A source feeds its `FlowPower` in (see
+"Idle is per kind"), so an idle source injects nothing into the net, and **the house takes off the balance of
+the sources' taps, not its own figure** (2026-11-22). Its figure still holds the idle readings the sources left
+out, so with it the taps no longer added up to nought - the same broken balance as the 41 W of "Where the figures
+come from" - and the leftover ran through every segment past the house to the bottom tap: two inverters drawing
+8 W each, the house between them, sent 16 W down into the lower one, whose own wire stood still. The house's own
+wire, `house`, still carries its figure. `PowerFlowViewTests.Idle_sources_feed_nothing_and_the_trunk_still_balances`
+holds the trunk to this, red both on the house's own figure and on raw readings at every tap.
 
 **The rails and the spine are buses too** (2026-11-22, the same lesson as the trunk). A rail is one segment per
 gap between two stubs (`rail:<row>:<segment>`), each carrying the `FlowPower` of the cards beyond it; a spine
@@ -287,7 +294,8 @@ fit scrolls, and Ctrl with the wheel scales the picture.
   card per node - trackers and battery included - and a wire with a stroke to every one of them, idle ones too;
   a reading that updates a card **without rebuilding it** (same `Border`, same item); a consumer that appears and
   gets a card and a stub; a closed page that lets go of its devices; rails and spine that stop at the last
-  drawing consumer, and a bus fed only by idle consumers standing still.
+  drawing consumer, a bus fed only by idle consumers standing still, and a trunk with idle sources that
+  still balances.
 - `WattPilotModelTests` - the charger as a consumer, and the JSON it does not leak into.
 
 **Not tested, and not testable here:** how it looks, and that the dashes run the right way. The headless platform

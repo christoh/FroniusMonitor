@@ -240,8 +240,8 @@ public partial class PowerFlowView : ContentPage
         // ----- Sources onto the trunk -----
         // A tap is where a wire meets the trunk, with what it feeds in there: the grid's import, an inverter's AC
         // output, and the house's draw as a negative. What crosses the trunk between two taps is the sum of the
-        // taps on one side. A tap feeds its FlowPower in, so an idle source feeds nothing and no segment runs
-        // on a sum of idle readings towards a device that is off.
+        // taps on one side. A source feeds its FlowPower in, so an idle source feeds nothing and no segment runs
+        // on a sum of idle readings towards a device that is off; the house takes the balance, see below.
         var trunkTaps = new List<(double Y, double Injection)>();
         var sourcesRight = double.NegativeInfinity;
 
@@ -305,8 +305,12 @@ public partial class PowerFlowView : ContentPage
         // downwards, so a negative net runs upwards. With one inverter producing, the grid above it and the house
         // below, that is a few watts up to the grid and the rest down to the house, and nothing below the house. As
         // one wire with the house's figure it ran from the top tap to the bottom one, past the house.
+        // The house takes off exactly what the sources put on, not its own figure: that figure still holds the
+        // idle readings the sources left out, and the taps would no longer add up to nought. The leftover then ran
+        // through every segment past the house to the bottom tap - two inverters at night drawing 8 W each, the
+        // house between them, sent 16 W down into the lower one, whose own wire stood still.
         var houseY = house.Rect.Center.Y;
-        trunkTaps.Add((houseY, -house.Item.Node.FlowPower));
+        trunkTaps.Add((houseY, -trunkTaps.Sum(tap => tap.Injection)));
         var taps = trunkTaps.OrderBy(tap => tap.Y).ToList();
         var crossing = 0d;
 

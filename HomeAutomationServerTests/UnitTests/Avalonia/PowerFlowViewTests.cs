@@ -236,6 +236,42 @@ public sealed class PowerFlowViewTests
         Window.Close();
     });
 
+    /// <summary>
+    /// Idle sources on the trunk, which runs top to bottom past the grid, inverter A, the house and inverter B. An
+    /// idle source feeds nothing in, and the house takes off only what the others put on, so the taps still add up
+    /// to nought and no segment runs past the last source that delivers. While the house took its own figure, which
+    /// still holds the idle readings, the leftover ran down into inverter B in the first two cases and up out of it
+    /// in the third; with the raw readings on every tap, the third ran from the idle grid past idle inverter A.
+    /// </summary>
+    [Theory]
+    // The grid imports 416 W, each inverter draws 8 W of its own, the house 400 W: down from the grid past
+    // inverter A into the house, and not on to inverter B.
+    [InlineData(416, -8, -8, 400, true, true, false)]
+    // Inverter A makes 3000 W, 9 W of it go out to the grid, inverter B draws 8 W, the house 2983 W.
+    [InlineData(-9, 3000, -8, 2983, false, true, false)]
+    // Every source below its threshold - the grid at 9.9 W, each inverter at 5 W - and the house at 19.9 W.
+    [InlineData(9.9, 5, 5, 19.9, false, false, false)]
+    public Task Idle_sources_feed_nothing_and_the_trunk_still_balances(double gridPower, double acA, double acB, double load, bool aboveA, bool aboveHouse, bool belowHouse) => HeadlessAvalonia.RunAsync(async () =>
+    {
+        await StartAsync(service =>
+        {
+            service.Inverters[0].Device.Sensors!.PowerFlow!.InverterAcPower = acA;
+            service.Inverters[1].Device.Sensors!.PowerFlow!.InverterAcPower = acB;
+            service.SitePowerFlow.GridPower = gridPower;
+            service.SitePowerFlow.InverterAcPower = acA + acB;
+            service.SitePowerFlow.LoadPower = -load;
+        });
+
+        var trunk = Wires.Where(wire => wire.Key.StartsWith("trunk:", StringComparison.Ordinal)).OrderBy(wire => wire.Key).Select(wire => wire.Value).ToList();
+        Assert.Equal(3, trunk.Count);
+        Assert.Equal([aboveA, aboveHouse, belowHouse], trunk.Select(segment => segment.Moves));
+
+        // What does flow runs down from the grid or inverter A into the house.
+        Assert.All(trunk.Where(segment => segment.Moves), segment => Assert.False(segment.Reversed, "a trunk segment runs upwards"));
+
+        Window.Close();
+    });
+
     [Fact]
     public Task A_rail_to_lamps_of_a_few_watts_carries_flow() => HeadlessAvalonia.RunAsync(async () =>
     {
