@@ -277,6 +277,25 @@ public sealed class PowerFlowSnapshotTests
         Assert.Equal(isIdle, node.IsIdle);
     }
 
+    /// <summary>
+    /// What a node puts on a shared bus. An idle node puts nothing there, however close to its threshold it
+    /// sits: a bus that summed the idle readings ran on the sum of them, to devices that were off.
+    /// </summary>
+    [Theory]
+    [InlineData(PowerFlowNodeKind.Consumer, 0.19, 0)]
+    [InlineData(PowerFlowNodeKind.Consumer, 0.5, 0.5)]
+    [InlineData(PowerFlowNodeKind.Consumer, 620d, 620)]
+    [InlineData(PowerFlowNodeKind.Battery, -9.9, 0)]
+    [InlineData(PowerFlowNodeKind.Battery, -1120d, -1120)]
+    [InlineData(PowerFlowNodeKind.Grid, 9.9, 0)]
+    [InlineData(PowerFlowNodeKind.House, null, 0)]
+    public void A_node_puts_nothing_on_a_bus_while_it_is_idle(PowerFlowNodeKind kind, double? watts, double flowPower)
+    {
+        var node = new PowerFlowNode("n", kind, string.Empty, watts);
+
+        Assert.Equal(flowPower, node.FlowPower);
+    }
+
     [Fact]
     public void A_node_that_has_not_reported_is_idle_and_says_nothing()
     {

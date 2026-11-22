@@ -75,6 +75,13 @@ public sealed record PowerFlowNode(string Key, PowerFlowNodeKind Kind, string Na
     /// <summary>Whether the wire stands still and the figure is dimmed. A node that has not reported is idle.</summary>
     public bool IsIdle => !(Math.Abs(Power ?? 0) >= IdleThreshold);
 
+    /// <summary>
+    /// The watts this node puts on a shared bus - a trunk tap, a rail, the spine. An idle node puts nothing
+    /// there: its card reads idle and its own wire stands still, so a bus that added the idle readings up could
+    /// run on a sum of them, past the last card that draws anything, to devices that are off.
+    /// </summary>
+    public double FlowPower => IsIdle ? 0 : Power ?? 0;
+
     public PowerFlowKind FlowKind => IsIdle ? PowerFlowKind.Idle : Kind switch
     {
         PowerFlowNodeKind.Solar => PowerFlowKind.Solar,

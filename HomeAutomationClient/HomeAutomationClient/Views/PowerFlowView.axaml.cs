@@ -240,13 +240,14 @@ public partial class PowerFlowView : ContentPage
         // ----- Sources onto the trunk -----
         // A tap is where a wire meets the trunk, with what it feeds in there: the grid's import, an inverter's AC
         // output, and the house's draw as a negative. What crosses the trunk between two taps is the sum of the
-        // taps on one side.
+        // taps on one side. A tap feeds its FlowPower in, so an idle source feeds nothing and no segment runs
+        // on a sum of idle readings towards a device that is off.
         var trunkTaps = new List<(double Y, double Injection)>();
         var sourcesRight = double.NegativeInfinity;
 
         if (items.Grid is { } grid && cards.TryGetValue(grid.Key, out var gridCard))
         {
-            trunkTaps.Add((gridCard.Rect.Center.Y, grid.Node.Power ?? 0));
+            trunkTaps.Add((gridCard.Rect.Center.Y, grid.Node.FlowPower));
             sourcesRight = Math.Max(sourcesRight, gridCard.Rect.Right);
         }
 
@@ -258,7 +259,7 @@ public partial class PowerFlowView : ContentPage
             }
 
             sourcesRight = Math.Max(sourcesRight, inverter.Rect.Right);
-            trunkTaps.Add((inverter.Rect.Center.Y, inverter.Item.Node.Power ?? 0));
+            trunkTaps.Add((inverter.Rect.Center.Y, inverter.Item.Node.FlowPower));
 
             // The DC cards, each into its own tap on the inverter's left edge; the taps are spread around the middle.
             var dcSources = cluster.DcSources.Select(item => cards.TryGetValue(item.Key, out var card) ? card : default).Where(card => card.Item is { }).ToList();
@@ -305,7 +306,7 @@ public partial class PowerFlowView : ContentPage
         // below, that is a few watts up to the grid and the rest down to the house, and nothing below the house. As
         // one wire with the house's figure it ran from the top tap to the bottom one, past the house.
         var houseY = house.Rect.Center.Y;
-        trunkTaps.Add((houseY, -(house.Item.Node.Power ?? 0)));
+        trunkTaps.Add((houseY, -house.Item.Node.FlowPower));
         var taps = trunkTaps.OrderBy(tap => tap.Y).ToList();
         var crossing = 0d;
 
@@ -338,46 +339,65 @@ public partial class PowerFlowView : ContentPage
         var houseY = house.Rect.Center.Y;
         var spineX = house.Rect.Right + SpineOffset;
 
-        // A row is every card whose top is the same, within the rounding a layout pass leaves. A rail carries what
-        // its row draws and is a consumer for the idle rule: two lamps at 5 W are on, and so is the rail to them.
+        // A row is every card whose top is the same, within the rounding a layout pass leaves, its cards from the
+        // spine outwards. A rail carries what its row draws and is a consumer for the idle rule: two lamps at 5 W
+        // are on, and so is the rail to them. What a card puts on its rail is its FlowPower, so an idle card puts
+        // nothing there.
         var rows = consumers
             .GroupBy(card => Math.Round(card.Rect.Top))
             .OrderBy(group => group.Key)
-            .Select((group, i) => new ConsumerRow(group.ToList(), group.Key - RailOffset, new PowerFlowNode($"rail:{i}", PowerFlowNodeKind.Consumer, string.Empty, group.Sum(card => card.Item.Node.Power ?? 0))))
+            .Select((group, i) => new ConsumerRow(group.OrderBy(card => card.Rect.Center.X).ToList(), group.Key - RailOffset, new PowerFlowNode($"rail:{i}", PowerFlowNodeKind.Consumer, string.Empty, group.Sum(card => card.Item.Node.FlowPower))))
             .ToList();
 
-        // The house feeds the spine at the junction; from there the spine runs up and down as two wires, each
-        // starting at the junction, so that the dashes run away from it on both. One path that went up and came back
+        // The house feeds the spine at the junction; from there the spine runs up and down, each run drawn away
+        // from the junction so that the dashes run away from it on both. One path that went up and came back
         // down passed the upper part twice, with the two runs of dashes crossing over each other. The spine carries
         // what the rails carry, under the consumers' idle rule like them.
         Set(needed, "spine", SpineNode("spine", rows), Path(new Point(house.Rect.Right, houseY), new Point(spineX, houseY)), dots: [new Point(spineX, houseY)]);
-        SetSpineRun(needed, "spine:up", spineX, houseY, rows.Where(row => row.RailY < houseY).ToList(), Math.Min);
-        SetSpineRun(needed, "spine:down", spineX, houseY, rows.Where(row => row.RailY > houseY).ToList(), Math.Max);
+        SetSpineRun(needed, "spine:up", spineX, houseY, rows.Where(row => row.RailY < houseY).OrderByDescending(row => row.RailY).ToList());
+        SetSpineRun(needed, "spine:down", spineX, houseY, rows.Where(row => row.RailY > houseY).OrderBy(row => row.RailY).ToList());
 
         foreach (var (row, railY, rowNode) in rows)
         {
-            Set(needed, rowNode.Key, rowNode, Path(new Point(spineX, railY), new Point(row.Max(card => card.Rect.Center.X), railY)), dots: [new Point(spineX, railY)]);
+            // The rail is a bus like the trunk, one segment per gap between two stubs, each carrying what the
+            // cards beyond it draw. As one wire with the row's figure it ran to the last card of the row, over
+            // the stubs of the ones that were off, as if power flowed to them.
+            var x = spineX;
+
+            for (var i = 0; i < row.Count; i++)
+            {
+                var stubX = row[i].Rect.Center.X;
+                var key = $"{rowNode.Key}:{i}";
+                Set(needed, key, new PowerFlowNode(key, PowerFlowNodeKind.Consumer, string.Empty, row.Skip(i).Sum(card => card.Item.Node.FlowPower)), Path(new Point(x, railY), new Point(stubX, railY)), dots: i == 0 ? [new Point(spineX, railY)] : []);
+                x = stubX;
+            }
 
             foreach (var card in row)
             {
-                var x = card.Rect.Center.X;
-                Set(needed, $"stub:{card.Item.Key}", card.Item.Node, Path(new Point(x, railY), new Point(x, card.Rect.Top)), dots: [new Point(x, railY)]);
+                var stubX = card.Rect.Center.X;
+                Set(needed, $"stub:{card.Item.Key}", card.Item.Node, Path(new Point(stubX, railY), new Point(stubX, card.Rect.Top)), dots: [new Point(stubX, railY)]);
             }
         }
     }
 
-    /// <summary>One run of the spine, from the junction with the house to the farthest rail on that side, carrying what those rails draw. No rails there, no run.</summary>
-    private void SetSpineRun(HashSet<string> needed, string key, double spineX, double houseY, IReadOnlyList<ConsumerRow> rows, Func<double, double, double> farthest)
+    /// <summary>
+    /// One run of the spine, from the junction with the house through the rails on that side, nearest first: one
+    /// segment per gap, each carrying what the rails beyond it draw, so the run stands still past the last rail
+    /// that feeds anything. No rails there, no run.
+    /// </summary>
+    private void SetSpineRun(HashSet<string> needed, string prefix, double spineX, double houseY, IReadOnlyList<ConsumerRow> rows)
     {
-        if (rows.Count == 0)
-        {
-            return;
-        }
+        var y = houseY;
 
-        Set(needed, key, SpineNode(key, rows), Path(new Point(spineX, houseY), new Point(spineX, rows.Select(row => row.RailY).Aggregate(farthest))));
+        for (var i = 0; i < rows.Count; i++)
+        {
+            var key = $"{prefix}:{i}";
+            Set(needed, key, new PowerFlowNode(key, PowerFlowNodeKind.Consumer, string.Empty, rows.Skip(i).Sum(row => row.Node.FlowPower)), Path(new Point(spineX, y), new Point(spineX, rows[i].RailY)));
+            y = rows[i].RailY;
+        }
     }
 
-    private static PowerFlowNode SpineNode(string key, IReadOnlyList<ConsumerRow> rows) => new(key, PowerFlowNodeKind.Consumer, string.Empty, rows.Sum(row => row.Node.Power ?? 0));
+    private static PowerFlowNode SpineNode(string key, IReadOnlyList<ConsumerRow> rows) => new(key, PowerFlowNodeKind.Consumer, string.Empty, rows.Sum(row => row.Node.FlowPower));
 
     /// <summary>A row of consumer cards, the rail above it and the node that rail carries.</summary>
     private sealed record ConsumerRow(List<(PowerFlowNodeItem Item, Rect Rect)> Cards, double RailY, PowerFlowNode Node);

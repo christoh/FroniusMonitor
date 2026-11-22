@@ -42,7 +42,7 @@ legend. Left to right, because it is for the desktop and the desktop is wide:
 | Sources | The grid; then one **cluster** per inverter - its DC side stacked on the left (**one card per tracker**, then the battery), the inverter to their right | Each DC card into its own tap on the inverter's left edge, the taps 14 px apart around the middle; inverter and grid right into the **trunk** |
 | Trunk | a vertical bus between the sources and the house | one tap per source and one for the house, a dot at each; **one wire per gap between two taps**, carrying the net of every tap above it, drawn downwards so that a negative net runs upwards |
 | House | one wide card: consumption, self-sufficiency, own consumption | trunk into its left edge; its right edge into the **spine** junction |
-| Consumers | every consumer that measures its power, wrapping to the width there is, and last **the rest of the house** | a spine down the left in two runs from the junction, one up and one down; one **rail** above each row, one **stub** down to each card |
+| Consumers | every consumer that measures its power, wrapping to the width there is, and last **the rest of the house** | a spine down the left in two runs from the junction, one up and one down, each **one segment per rail** it passes; one **rail** above each row, itself **one segment per stub**, and one **stub** down to each card |
 
 **Topology, not a star.** Every line goes to a bus. With twenty consumers that is twenty short stubs and no
 crossing; a star with a line from the house to every card is unreadable at eight. This is the decision the
@@ -58,8 +58,10 @@ the dashes back the other way. So a charging battery and an exporting house are 
 **Idle is per kind** (`PowerFlowNode.IdleThreshold`): a producer - grid, tracker, inverter, battery - and the
 house below **10 W**, an inverter at night still reporting a few watts of its own; a consumer below **0.2 W**,
 because a plug that draws half a watt is switched on and worth seeing. **The spine and the rails are consumers
-for this rule**: the synthetic nodes the view makes for them carry the sum of their rows and the consumer
-threshold, so a rail above two lamps at 5 W moves like the lamps do. Made a `House` node at first, with the
+for this rule**: the synthetic nodes the view makes for their segments carry what the cards beyond them draw and
+the consumer threshold, so a rail above two lamps at 5 W moves like the lamps do. **What a node puts on a bus
+is its `FlowPower` - nothing while it is idle** (2026-11-22): a bus that added the raw readings up crossed its
+threshold on a sum of idle ones (two plugs at 0.19 W) and ran to cards that showed idle. Made a `House` node at first, with the
 producers' 10 W, a rail stood still above lit lamps. An idle wire is a solid trace in the idle colour with its
 junction dot, never nothing: **every card has a connector**, on or off. The figure is dimmed.
 
@@ -225,7 +227,17 @@ house, and nothing below it. The taps are signed, so **an inverter that charges 
 from the grid or from another inverter - has a negative AC power, takes from the bus, and the segments on the way
 to it run towards it; its own wire runs back into it through `IsReversed` as it always did. As one wire with the
 house's figure the trunk ran downwards from the top tap to the bottom one, past the house. `PowerFlowViewTests.The_trunk_carries_the_net_between_its_taps` holds it to this,
-through `WireStates`, which also tells whether a wire runs reversed.
+through `WireStates`, which also tells whether a wire runs reversed. A tap feeds its `FlowPower` in (see
+"Idle is per kind"), so an idle tap injects nothing into the net.
+
+**The rails and the spine are buses too** (2026-11-22, the same lesson as the trunk). A rail is one segment per
+gap between two stubs (`rail:<row>:<segment>`), each carrying the `FlowPower` of the cards beyond it; a spine
+run is one segment per rail on its side (`spine:up:<segment>`, `spine:down:<segment>`), each carrying the rails
+beyond it. As one wire each with the whole row's or side's figure they ran to the last card of the row and the
+farthest rail, over the stubs of devices that were off, as if power flowed to them - which is what the developer
+reported. Now animated flow stops at the last drawing stub and the last drawing rail.
+`PowerFlowViewTests.The_rails_and_the_spine_stop_at_the_last_drawing_consumer` and
+`A_bus_fed_only_by_idle_consumers_stands_still` hold them to this; both were red on the single wires.
 
 **Dots lie over wires** (`ZIndex` 1 on the canvas children, paths at 0). A wire's paths
 and dots are added to the canvas as it is routed, so without this the trunk segments, routed after the taps on
@@ -240,9 +252,9 @@ wire canvas to traces, flows and dots alone. What a wire tells is direction and 
 number"); the reading is the card's job.
 
 **No wire passes a point twice.** The spine is a stub from the house to the junction (`spine`) and then a run
-from the junction up to the highest rail (`spine:up`) and one down to the lowest (`spine:down`), each drawn
-starting at the junction so that its dashes run away from the house, and each left out when there is no rail on
-that side. As one path - house, up to the first rail, back down to the last - it passed the part above the house
+of segments from the junction up to the highest rail (`spine:up:<segment>`) and one down to the lowest
+(`spine:down:<segment>`), each run drawn away from the junction, segment after segment, so that its dashes run
+away from the house, and each left out when there is no rail on that side. As one path - house, up to the first rail, back down to the last - it passed the part above the house
 twice and the two runs of dashes crossed over each other there. `PowerFlowViewTests.No_wire_passes_a_point_twice`
 holds every wire to this. `PowerFlowView.WireStates` is internal for exactly these tests: the path and whether the
 dashes move, per key.
@@ -250,7 +262,7 @@ dashes move, per key.
 **It writes to a wire only what changed** - the path string, the dot positions, the thickness
 and kind - because setting a path's geometry invalidates layout, and an unconditional write on every layout pass
 would loop for ever.
-`spine:up`, `spine:down`, `rail:<row>`, `stub:<consumer>`); after `Apply` says the structure changed, all of them are thrown away and
+`spine:up:<segment>`, `spine:down:<segment>`, `rail:<row>:<segment>`, `stub:<consumer>`); after `Apply` says the structure changed, all of them are thrown away and
 routed anew, otherwise they are updated in place. **A wire's kind starts out as null**, so that the first update
 styles it whatever it is: with `Idle` as the initial value an idle-from-birth wire was never given a stroke or a
 thickness, and the first screenshot had connectors on some idle devices and none on others.
@@ -274,7 +286,8 @@ fit scrolls, and Ctrl with the wheel scales the picture.
 - `PowerFlowViewTests` (headless, in the Avalonia collection) - the page in its window at the declared size, a
   card per node - trackers and battery included - and a wire with a stroke to every one of them, idle ones too;
   a reading that updates a card **without rebuilding it** (same `Border`, same item); a consumer that appears and
-  gets a card and a stub; a closed page that lets go of its devices.
+  gets a card and a stub; a closed page that lets go of its devices; rails and spine that stop at the last
+  drawing consumer, and a bus fed only by idle consumers standing still.
 - `WattPilotModelTests` - the charger as a consumer, and the JSON it does not leak into.
 
 **Not tested, and not testable here:** how it looks, and that the dashes run the right way. The headless platform
