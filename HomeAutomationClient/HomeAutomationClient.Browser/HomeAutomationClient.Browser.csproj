@@ -35,10 +35,10 @@
 		     SkiaSharp and HarfBuzzSharp member they reference is still there in these versions (checked 2026-11-16). Only
 		     this head needs them, because only this head links with Emscripten. Remove the four once Avalonia asks for
 		     SkiaSharp 4 itself. -->
-		<PackageReference Include="SkiaSharp" Version="4.156.1" />
-		<PackageReference Include="SkiaSharp.NativeAssets.WebAssembly" Version="4.156.1" />
-		<PackageReference Include="HarfBuzzSharp" Version="14.4.0.101" />
-		<PackageReference Include="HarfBuzzSharp.NativeAssets.WebAssembly" Version="14.4.0.101" />
+		<PackageReference Include="SkiaSharp" Version="4.157.0" />
+		<PackageReference Include="SkiaSharp.NativeAssets.WebAssembly" Version="4.157.0" />
+		<PackageReference Include="HarfBuzzSharp" Version="14.4.0.200" />
+		<PackageReference Include="HarfBuzzSharp.NativeAssets.WebAssembly" Version="14.4.0.200" />
 	</ItemGroup>
 
 	<ItemGroup>
