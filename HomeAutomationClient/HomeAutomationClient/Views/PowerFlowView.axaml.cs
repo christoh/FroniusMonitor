@@ -309,16 +309,12 @@ public partial class PowerFlowView : ContentPage
         // idle readings the sources left out, and the taps would no longer add up to nought. The leftover then ran
         // through every segment past the house to the bottom tap - two inverters at night drawing 8 W each, the
         // house between them, sent 16 W down into the lower one, whose own wire stood still.
+        // Because the taps add up to nought, the net above a segment is also what the taps below it take off, which
+        // makes the trunk a bus like the rails and the spine, from the top tap downwards.
         var houseY = house.Rect.Center.Y;
         trunkTaps.Add((houseY, -trunkTaps.Sum(tap => tap.Injection)));
         var taps = trunkTaps.OrderBy(tap => tap.Y).ToList();
-        var crossing = 0d;
-
-        for (var i = 0; i < taps.Count - 1; i++)
-        {
-            crossing += taps[i].Injection;
-            Set(needed, $"trunk:{i}", new PowerFlowNode($"trunk:{i}", PowerFlowNodeKind.House, string.Empty, crossing), Path(new Point(trunkX, taps[i].Y), new Point(trunkX, taps[i + 1].Y)));
-        }
+        SetBus(needed, "trunk", PowerFlowNodeKind.House, new Point(trunkX, taps[0].Y), taps.Skip(1).Select(tap => (new Point(trunkX, tap.Y), -tap.Injection)).ToList());
 
         // The last step into the house carries what the house draws, with its dot on the trunk like every tap.
         Set(needed, "house", house.Item.Node, Path(new Point(trunkX, houseY), new Point(house.Rect.Left, houseY)), dots: [new Point(trunkX, houseY)]);
@@ -350,31 +346,24 @@ public partial class PowerFlowView : ContentPage
         var rows = consumers
             .GroupBy(card => Math.Round(card.Rect.Top))
             .OrderBy(group => group.Key)
-            .Select((group, i) => new ConsumerRow(group.OrderBy(card => card.Rect.Center.X).ToList(), group.Key - RailOffset, new PowerFlowNode($"rail:{i}", PowerFlowNodeKind.Consumer, string.Empty, group.Sum(card => card.Item.Node.FlowPower))))
+            .Select((group, i) => new ConsumerRow(group.OrderBy(card => card.Rect.Center.X).ToList(), group.Key - RailOffset, BusNode($"rail:{i}", PowerFlowNodeKind.Consumer, group.Sum(card => card.Item.Node.FlowPower))))
             .ToList();
 
         // The house feeds the spine at the junction; from there the spine runs up and down, each run drawn away
         // from the junction so that the dashes run away from it on both. One path that went up and came back
         // down passed the upper part twice, with the two runs of dashes crossing over each other. The spine carries
-        // what the rails carry, under the consumers' idle rule like them.
-        Set(needed, "spine", SpineNode("spine", rows), Path(new Point(house.Rect.Right, houseY), new Point(spineX, houseY)), dots: [new Point(spineX, houseY)]);
-        SetSpineRun(needed, "spine:up", spineX, houseY, rows.Where(row => row.RailY < houseY).OrderByDescending(row => row.RailY).ToList());
-        SetSpineRun(needed, "spine:down", spineX, houseY, rows.Where(row => row.RailY > houseY).OrderBy(row => row.RailY).ToList());
+        // what the rails carry, under the consumers' idle rule like them: each run is a bus through the rails on its
+        // side, nearest first, and there is no run where there is no rail.
+        Set(needed, "spine", BusNode("spine", PowerFlowNodeKind.Consumer, rows.Sum(row => row.Node.FlowPower)), Path(new Point(house.Rect.Right, houseY), new Point(spineX, houseY)), dots: [new Point(spineX, houseY)]);
+        SetSpineRun("spine:up", rows.Where(row => row.RailY < houseY).OrderByDescending(row => row.RailY));
+        SetSpineRun("spine:down", rows.Where(row => row.RailY > houseY).OrderBy(row => row.RailY));
 
         foreach (var (row, railY, rowNode) in rows)
         {
-            // The rail is a bus like the trunk, one segment per gap between two stubs, each carrying what the
-            // cards beyond it draw. As one wire with the row's figure it ran to the last card of the row, over
-            // the stubs of the ones that were off, as if power flowed to them.
-            var x = spineX;
-
-            for (var i = 0; i < row.Count; i++)
-            {
-                var stubX = row[i].Rect.Center.X;
-                var key = $"{rowNode.Key}:{i}";
-                Set(needed, key, new PowerFlowNode(key, PowerFlowNodeKind.Consumer, string.Empty, row.Skip(i).Sum(card => card.Item.Node.FlowPower)), Path(new Point(x, railY), new Point(stubX, railY)), dots: i == 0 ? [new Point(spineX, railY)] : []);
-                x = stubX;
-            }
+            // The rail is a bus like the trunk, one segment per gap between two stubs. As one wire with the row's
+            // figure it ran to the last card of the row, over the stubs of the ones that were off, as if power
+            // flowed to them. Its junction with the spine has a dot.
+            SetBus(needed, rowNode.Key, PowerFlowNodeKind.Consumer, new Point(spineX, railY), row.Select(card => (new Point(card.Rect.Center.X, railY), card.Item.Node.FlowPower)).ToList(), startDot: true);
 
             foreach (var card in row)
             {
@@ -382,26 +371,34 @@ public partial class PowerFlowView : ContentPage
                 Set(needed, $"stub:{card.Item.Key}", card.Item.Node, Path(new Point(stubX, railY), new Point(stubX, card.Rect.Top)), dots: [new Point(stubX, railY)]);
             }
         }
+
+        void SetSpineRun(string prefix, IEnumerable<ConsumerRow> run) => SetBus(needed, prefix, PowerFlowNodeKind.Consumer, new Point(spineX, houseY), run.Select(row => (new Point(spineX, row.RailY), row.Node.FlowPower)).ToList());
     }
 
     /// <summary>
-    /// One run of the spine, from the junction with the house through the rails on that side, nearest first: one
-    /// segment per gap, each carrying what the rails beyond it draw, so the run stands still past the last rail
-    /// that feeds anything. No rails there, no run.
+    /// A bus - the trunk, a rail, a run of the spine - as one wire per gap: from <paramref name="start"/> to the first
+    /// point along it, from there to the next, and so on, each named <c>prefix:index</c> and carrying what is taken
+    /// off at its far end and beyond. So a bus stands still past the last point that takes anything, runs up to that
+    /// point past every one that takes nothing, and runs back towards its start where what lies beyond feeds it
+    /// instead. Nothing on an empty list.
     /// </summary>
-    private void SetSpineRun(HashSet<string> needed, string prefix, double spineX, double houseY, IReadOnlyList<ConsumerRow> rows)
+    /// <param name="kind">Whose idle rule the segments follow: the producers' on the trunk, the consumers' on the rails and the spine.</param>
+    /// <param name="points">Where each segment ends, in the order the bus runs, and what is taken off there - negative where something feeds the bus.</param>
+    /// <param name="startDot">Whether the first segment has a junction dot at its start, as a rail has where it meets the spine.</param>
+    private void SetBus(HashSet<string> needed, string prefix, PowerFlowNodeKind kind, Point start, IReadOnlyList<(Point At, double Draw)> points, bool startDot = false)
     {
-        var y = houseY;
+        var from = start;
 
-        for (var i = 0; i < rows.Count; i++)
+        for (var i = 0; i < points.Count; i++)
         {
             var key = $"{prefix}:{i}";
-            Set(needed, key, new PowerFlowNode(key, PowerFlowNodeKind.Consumer, string.Empty, rows.Skip(i).Sum(row => row.Node.FlowPower)), Path(new Point(spineX, y), new Point(spineX, rows[i].RailY)));
-            y = rows[i].RailY;
+            Set(needed, key, BusNode(key, kind, points.Skip(i).Sum(point => point.Draw)), Path(from, points[i].At), dots: startDot && i == 0 ? [start] : []);
+            from = points[i].At;
         }
     }
 
-    private static PowerFlowNode SpineNode(string key, IReadOnlyList<ConsumerRow> rows) => new(key, PowerFlowNodeKind.Consumer, string.Empty, rows.Sum(row => row.Node.FlowPower));
+    /// <summary>The node the view makes for a stretch of bus, which has no card of its own.</summary>
+    private static PowerFlowNode BusNode(string key, PowerFlowNodeKind kind, double power) => new(key, kind, string.Empty, power);
 
     /// <summary>A row of consumer cards, the rail above it and the node that rail carries.</summary>
     private sealed record ConsumerRow(List<(PowerFlowNodeItem Item, Rect Rect)> Cards, double RailY, PowerFlowNode Node);

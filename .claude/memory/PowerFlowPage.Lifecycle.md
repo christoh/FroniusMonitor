@@ -244,7 +244,19 @@ beyond it. As one wire each with the whole row's or side's figure they ran to th
 farthest rail, over the stubs of devices that were off, as if power flowed to them - which is what the developer
 reported. Now animated flow stops at the last drawing stub and the last drawing rail.
 `PowerFlowViewTests.The_rails_and_the_spine_stop_at_the_last_drawing_consumer` and
-`A_bus_fed_only_by_idle_consumers_stands_still` hold them to this; both were red on the single wires.
+`A_bus_fed_only_by_idle_consumers_stands_still` hold them to this; both were red on the single wires. The first
+and `A_rail_to_lamps_of_a_few_watts_carries_flow` go through `AssertTheBusesRunExactlyToTheDrawingConsumers`,
+which holds **both halves**: no segment moves past the last drawing device, and none stands still on the way to
+it - the first test's layout has a drawing plug behind an idle one and a drawing row behind an idle one, and
+asserts that it does, so a change of layout fails it instead of quietly testing less.
+
+**All three buses are one method, `PowerFlowView.SetBus`** (2026-11-22): a start, the points along the bus each
+with what is taken off there, and a segment per gap carrying what is taken off at its far end and beyond. The
+rails and the spine runs pass their cards' and rows' `FlowPower`; the trunk passes its taps below the top one,
+each with its injection negated - which is the net above each segment only because the taps add up to nought, so
+**the balance at the house tap is what makes the trunk a bus at all**. The view's synthetic nodes are all
+`BusNode`. The tests read a bus through `Segments(wires, "trunk")` and the like, ordered by index: ordered by key
+as a string, `spine:down:10` came before `spine:down:2`.
 
 **Dots lie over wires** (`ZIndex` 1 on the canvas children, paths at 0). A wire's paths
 and dots are added to the canvas as it is routed, so without this the trunk segments, routed after the taps on
@@ -268,7 +280,7 @@ dashes move, per key.
 
 **It writes to a wire only what changed** - the path string, the dot positions, the thickness
 and kind - because setting a path's geometry invalidates layout, and an unconditional write on every layout pass
-would loop for ever.
+would loop for ever. Wires are keyed (`dc:<node>`, `ac:<inverter>`, `grid`, `trunk:<gap>`, `house`, `spine`,
 `spine:up:<segment>`, `spine:down:<segment>`, `rail:<row>:<segment>`, `stub:<consumer>`); after `Apply` says the structure changed, all of them are thrown away and
 routed anew, otherwise they are updated in place. **A wire's kind starts out as null**, so that the first update
 styles it whatever it is: with `Idle` as the initial value an idle-from-birth wire was never given a stroke or a

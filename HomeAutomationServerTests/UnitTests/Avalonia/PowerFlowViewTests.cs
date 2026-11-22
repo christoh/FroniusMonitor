@@ -167,14 +167,13 @@ public sealed class PowerFlowViewTests
         // its dashes ran over each other on the upper part. Now it is a stub from the house and a run to each side.
         var wires = Wires;
         var junction = wires["spine"].Path.Split(' ')[^1][1..];
-        var runs = wires.Where(wire => wire.Key.StartsWith("spine:", StringComparison.Ordinal)).GroupBy(wire => string.Join(':', wire.Key.Split(':').Take(2))).ToList();
+        var runs = new[] { "spine:up", "spine:down" }.Select(run => Segments(wires, run).Select(segment => segment.Path).ToList()).Where(segments => segments.Count > 0).ToList();
         Assert.NotEmpty(runs);
 
         // A run is a bus now, one segment per rail on its side: the first starts at the junction and the rest
         // join end to end away from it, so no point of the spine is passed twice either.
-        Assert.All(runs, run =>
+        Assert.All(runs, segments =>
         {
-            var segments = run.OrderBy(segment => segment.Key).Select(segment => segment.Value.Path).ToList();
             Assert.Equal(junction, segments[0].Split(' ')[0][1..]);
 
             for (var i = 1; i < segments.Count; i++)
@@ -200,7 +199,7 @@ public sealed class PowerFlowViewTests
         // between the house and inverter B 950 W upwards. As one wire the trunk ran downwards from end to end.
         await StartAsync();
 
-        var trunk = Wires.Where(wire => wire.Key.StartsWith("trunk:", StringComparison.Ordinal)).OrderBy(wire => wire.Key).Select(wire => wire.Value).ToList();
+        var trunk = Segments(Wires, "trunk");
         Assert.Equal(3, trunk.Count);
         Assert.All(trunk, segment => Assert.True(segment.Moves, "a trunk segment stands still"));
         Assert.Equal([true, false, true], trunk.Select(segment => segment.Reversed));
@@ -226,7 +225,7 @@ public sealed class PowerFlowViewTests
         });
 
         var wires = Wires;
-        var trunk = wires.Where(wire => wire.Key.StartsWith("trunk:", StringComparison.Ordinal)).OrderBy(wire => wire.Key).Select(wire => wire.Value).ToList();
+        var trunk = Segments(wires, "trunk");
         Assert.Equal(3, trunk.Count);
         Assert.All(trunk, segment => Assert.True(segment.Moves && !segment.Reversed, "a trunk segment stands still or runs upwards"));
         Assert.True(wires["ac:inv-b"] is { Moves: true, Reversed: true }, "the charging inverter's wire does not run into it");
@@ -262,7 +261,7 @@ public sealed class PowerFlowViewTests
             service.SitePowerFlow.LoadPower = -load;
         });
 
-        var trunk = Wires.Where(wire => wire.Key.StartsWith("trunk:", StringComparison.Ordinal)).OrderBy(wire => wire.Key).Select(wire => wire.Value).ToList();
+        var trunk = Segments(Wires, "trunk");
         Assert.Equal(3, trunk.Count);
         Assert.Equal([aboveA, aboveHouse, belowHouse], trunk.Select(segment => segment.Moves));
 
@@ -292,19 +291,10 @@ public sealed class PowerFlowViewTests
         Assert.False(wires["stub:wp"].Moves);
         Assert.True(wires[$"stub:{PowerFlowSnapshot.RestOfHouseKey}"].Moves);
 
-        // Every rail segment that leads into a drawing stub, however the cards wrap: each row here draws under
-        // 10 W and over 0.2 W. (A segment that leads only to the idle car may stand still - that is the next test.)
-        var rails = wires.Where(wire => wire.Key.StartsWith("rail:", StringComparison.Ordinal)).ToList();
-        Assert.NotEmpty(rails);
-
-        foreach (var stub in new[] { "stub:hp", "stub:fridge", $"stub:{PowerFlowSnapshot.RestOfHouseKey}" })
-        {
-            var junction = Points(wires[stub].Path)[0];
-            Assert.Contains(rails, rail => rail.Value.Moves && Math.Abs(Points(rail.Value.Path)[^1].X - junction.X) < 0.6 && Math.Abs(Points(rail.Value.Path)[^1].Y - junction.Y) < 0.6);
-        }
-
+        // Every rail and spine segment on the way to them, however the cards wrap: each row here draws under 10 W
+        // and over 0.2 W. Only what lies beyond the last of them - the idle car's - stands still.
         Assert.True(wires["spine"].Moves);
-        Assert.Contains(wires.Where(wire => wire.Key.StartsWith("spine:", StringComparison.Ordinal)), run => run.Value.Moves);
+        AssertTheBusesRunExactlyToTheDrawingConsumers(wires);
 
         Window.Close();
     });
@@ -312,53 +302,47 @@ public sealed class PowerFlowViewTests
     [Fact]
     public Task The_rails_and_the_spine_stop_at_the_last_drawing_consumer() => HeadlessAvalonia.RunAsync(async () =>
     {
-        // Only the heat pump draws; every other consumer is at nought, and enough of them that the cards wrap
-        // into rows the heat pump is not in. As one wire per row and side, the rails ran to the last card of
-        // their row and the spine to the farthest rail, over the stubs of devices that were off.
+        // The heat pump, first in the top row, and plug 4, in the middle of the third, draw; everything else is at
+        // nought, and enough of it that the cards wrap into four rows of three, two above the house and two below.
+        // As one wire per row and side, the rails ran to the last card of their row and the spine to the farthest
+        // rail, over the stubs of devices that were off.
         await StartAsync(service =>
         {
             for (var i = 0; i < 8; i++)
             {
-                service.AllPowerConsumers.Add(Plug($"off{i}", $"Off {i}", 0));
+                service.AllPowerConsumers.Add(Plug($"off{i}", $"Off {i}", i == 4 ? 40 : 0));
             }
 
             ((KeyedWattPilot)service.AllPowerConsumers[2]).Device.PowerTotal = 0;
-            service.SitePowerFlow.LoadPower = -620;
+            service.SitePowerFlow.LoadPower = -660;
         });
 
         var wires = Wires;
         var stubs = wires.Where(wire => wire.Key.StartsWith("stub:", StringComparison.Ordinal)).ToList();
-        Assert.True(wires["stub:hp"].Moves);
-        Assert.All(stubs.Where(stub => stub.Key != "stub:hp"), stub => Assert.False(stub.Value.Moves, $"{stub.Key} moves at nought"));
+        string[] drawing = ["stub:hp", "stub:off4"];
+        Assert.All(stubs, stub => Assert.True(drawing.Contains(stub.Key) == stub.Value.Moves, $"{stub.Key} {(stub.Value.Moves ? "moves at nought" : "stands still")}"));
 
-        // A rail segment moves only where a drawing stub waits at or beyond its far end on the same rail, and
-        // there is rail beyond the heat pump to stand still.
-        var drawingJunctions = stubs.Where(stub => stub.Value.Moves).Select(stub => Points(stub.Value.Path)[0]).ToList();
+        // What this test is about has to be in the picture, whatever the layout does to it: rail and spine that run
+        // on past a card or a row that draws nothing, towards one that does, and rail and spine beyond the last
+        // drawing one that stand still. Asserted, so that a change of layout fails here instead of testing less.
+        var idleStubs = stubs.Where(stub => !stub.Value.Moves).Select(stub => Points(stub.Value.Path)[0]).ToList();
         var rails = wires.Where(wire => wire.Key.StartsWith("rail:", StringComparison.Ordinal)).ToList();
+        Assert.Contains(rails, rail => rail.Value.Moves && idleStubs.Contains(Points(rail.Value.Path)[^1]));
         Assert.Contains(rails, rail => !rail.Value.Moves);
-        Assert.All(rails.Where(rail => rail.Value.Moves), rail =>
-        {
-            var end = Points(rail.Value.Path)[^1];
-            Assert.Contains(drawingJunctions, junction => Math.Abs(junction.Y - end.Y) < 0.6 && junction.X >= end.X - 0.6);
-        });
 
-        // The same up the spine: a segment moves only where a drawing rail waits at or beyond its far end on
-        // its side of the house, and there is spine past a drawing rail to stand still.
-        var houseY = Points(wires["spine"].Path)[0].Y;
-        var drawingRails = rails.Where(rail => rail.Value.Moves).Select(rail => Points(rail.Value.Path)[0].Y).Distinct().ToList();
+        var drawingRows = rails.GroupBy(rail => Points(rail.Value.Path)[0].Y).ToDictionary(row => row.Key, row => row.Any(rail => rail.Value.Moves));
         var spine = wires.Where(wire => wire.Key.StartsWith("spine:", StringComparison.Ordinal)).ToList();
+        Assert.Contains(spine, segment => segment.Value.Moves && !drawingRows[Points(segment.Value.Path)[^1].Y]);
         Assert.Contains(spine, segment => !segment.Value.Moves);
-        Assert.All(spine.Where(segment => segment.Value.Moves), segment =>
-        {
-            var end = Points(segment.Value.Path)[^1].Y;
-            Assert.Contains(drawingRails, railY => Math.Sign(railY - houseY) == Math.Sign(end - houseY) && Math.Abs(railY - houseY) >= Math.Abs(end - houseY) - 0.6);
-        });
+
+        AssertTheBusesRunExactlyToTheDrawingConsumers(wires);
 
         Window.Close();
     });
 
     [Fact]
     public Task A_bus_fed_only_by_idle_consumers_stands_still() => HeadlessAvalonia.RunAsync(async () =>
+
     {
         // Two plugs just under the consumers' threshold and nothing else. Each is idle, so are its stub and
         // card; a rail or spine that summed the raw readings crossed 0.2 W on the two of them and ran to
@@ -461,6 +445,47 @@ public sealed class PowerFlowViewTests
         Assert.NotSame(before, ViewModel.Snapshot);
         Assert.Equal(800, ((PowerFlowNodeItem)CardOf("hp").DataContext!).Node.Power);
     });
+
+    /// <summary>
+    /// Holds the rails and the spine to being buses: a segment moves exactly when something that draws waits at its
+    /// far end or beyond - a moving stub further out on the same rail, a moving rail further out on the same side of
+    /// the house. Both halves count. Nothing may run on past the last device that draws, and nothing may stand still
+    /// on the way to it, or the power would come out of nowhere halfway along.
+    /// </summary>
+    private static void AssertTheBusesRunExactlyToTheDrawingConsumers(IReadOnlyDictionary<string, (string Path, bool Moves, bool Reversed)> wires)
+    {
+        var drawingStubs = wires.Where(wire => wire.Key.StartsWith("stub:", StringComparison.Ordinal) && wire.Value.Moves).Select(wire => Points(wire.Value.Path)[0]).ToList();
+        var rails = wires.Where(wire => wire.Key.StartsWith("rail:", StringComparison.Ordinal)).ToList();
+        Assert.NotEmpty(rails);
+
+        Assert.All(rails, rail =>
+        {
+            var end = Points(rail.Value.Path)[^1];
+            var leadsToADrawingStub = drawingStubs.Any(stub => Math.Abs(stub.Y - end.Y) < 0.6 && stub.X >= end.X - 0.6);
+            Assert.True(leadsToADrawingStub == rail.Value.Moves, $"{rail.Key} {(rail.Value.Moves ? "moves past the last drawing stub" : "stands still on the way to a drawing stub")}");
+        });
+
+        var junctionY = Points(wires["spine"].Path)[^1].Y;
+        var drawingRails = rails.Where(rail => rail.Value.Moves).Select(rail => Points(rail.Value.Path)[0].Y).Distinct().ToList();
+
+        Assert.All(wires.Where(wire => wire.Key.StartsWith("spine:", StringComparison.Ordinal)), segment =>
+        {
+            var end = Points(segment.Value.Path)[^1].Y;
+            var leadsToADrawingRail = drawingRails.Any(railY => Math.Sign(railY - junctionY) == Math.Sign(end - junctionY) && Math.Abs(railY - junctionY) >= Math.Abs(end - junctionY) - 0.6);
+            Assert.True(leadsToADrawingRail == segment.Value.Moves, $"{segment.Key} {(segment.Value.Moves ? "moves past the last drawing rail" : "stands still on the way to a drawing rail")}");
+        });
+    }
+
+    /// <summary>
+    /// The segments of one bus - <c>trunk</c>, <c>spine:up</c>, <c>rail:0</c> - in the order they run: by their index,
+    /// not by their key as a string, which puts <c>spine:down:10</c> before <c>spine:down:2</c>.
+    /// </summary>
+    private static List<(string Path, bool Moves, bool Reversed)> Segments(IReadOnlyDictionary<string, (string Path, bool Moves, bool Reversed)> wires, string bus) => wires
+        .Select(wire => (Index: wire.Key.StartsWith(bus + ":", StringComparison.Ordinal) && int.TryParse(wire.Key.AsSpan(bus.Length + 1), NumberStyles.None, CultureInfo.InvariantCulture, out var index) ? index : -1, wire.Value))
+        .Where(segment => segment.Index >= 0)
+        .OrderBy(segment => segment.Index)
+        .Select(segment => segment.Value)
+        .ToList();
 
     /// <summary>The points of a wire's path, as <c>PowerFlowView</c> writes them: <c>Mx,y Lx,y ...</c></summary>
     private static List<(double X, double Y)> Points(string path) => path.Split(' ')
