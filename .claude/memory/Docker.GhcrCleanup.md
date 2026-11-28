@@ -212,7 +212,10 @@ Looked at through SSM on 2026-11-28, read only:
 
 - **The client** is the service `home-automation-client` of `/home/christoh/src/kartellvz/docker-compose.yml`,
   container `home-automation-client.kartellvz`, with **`platform: linux/arm64`** - `linux/arm/v7` on the old host,
-  so the push has to include arm64 now; the bake file has both - and `pull_policy: always`. Rolling out should be,
+  so the push has to include arm64 now; the bake file has both - and `pull_policy: always`. **arm/v7 cannot run
+  there at all**: the new instance has a Neoverse V3 CPU, which has no 32-bit (AArch32) mode (the developer,
+  2026-11-28). Do not set a service on amazon2 back to `linux/arm/v7`, and do not take an arm/v7 image as a
+  fallback for it. Rolling out should be,
   as before, `docker compose pull home-automation-client && docker compose up -d --no-deps home-automation-client`
   in that directory - not yet tried on this host. The image it ran then had no `RepoDigests`, so it had not been pulled there; compare a rollout by the
   digest of the image pulled, not with what ran before.
