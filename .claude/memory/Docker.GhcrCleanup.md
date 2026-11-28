@@ -257,8 +257,8 @@ file system whose device cannot discard. `fstrim -v /` says it: "the discard ope
 taken during the move on 2026-11-25 already had 13.9 GB of its 16 GB volume in its snapshot, with about 6 GB in
 use. The developer says the AMI is stored compressed in S3; if that is what counts, blocks overwritten with zeros
 would cost next to nothing where freed blocks keep their old, compressed and so incompressible, layer data.
-Zero-filling the free space once would test it, by the next snapshot's size - not done, and it fills the disk while
-it runs.
+Zero-filling the free space would test it, by the next snapshot's size, but the developer declined it on
+2026-11-28: it is either `fstrim` or nothing, and the backup costs little. Do not propose it again.
 
 ## Why "dangling" is not "untagged"
 
