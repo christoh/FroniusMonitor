@@ -202,19 +202,30 @@ Neither is a fault of the image; in production `Settings.xml` is mounted and the
 ### Where the client runs: amazon2
 
 `amazon2.hochstaetter.de` is the EC2 instance named "Docker Host" in `eu-central-1`, reachable through SSM
-(`AWS-RunShellScript`). **The developer moved to a new AWS account on 2026-11-27, and set everything up anew
-there.** The AWS connector now signs in to the new account; the old one, and its instance `i-0fcbdf4bd2de0dc19`
-(t4g.nano, arm64, Alpine), are out of reach. The host in the new account is `i-003d020f7b6f6ea99` (t9g.small,
-arm64) - **look the ID up rather than trusting one written down**: `DescribeInstanceInformation`, whose
-`ComputerName` is `amazon2.hochstaetter.de`. On it only a plain `echo` through SSM has run so far (2026-11-28).
-**Everything below, and everything the other documents say about amazon2 - the compose directory, the container,
-its `platform`, the WireGuard tunnels and addresses, nginx and certbot - was seen on the old host** and is unchecked
-on the new one; read it as how it was, and look before relying on it. The client is the service `home-automation-client`
-of `/home/christoh/src/kartellvz/docker-compose.yml`, container `home-automation-client.kartellvz`, with
-`platform: linux/arm/v7` and `pull_policy: always` - so the push has to include arm/v7. Rolling out is
-`docker compose pull home-automation-client && docker compose up -d --no-deps home-automation-client` in that
-directory. The server does not run there. **The compose files on that host hold secrets**; read the lines you need
-rather than printing whole files.
+(`AWS-RunShellScript`). **The developer moved to a new AWS account on 2026-11-27 and set the host up anew there.**
+The AWS connector signs in to the new account; the old one, and its instance `i-0fcbdf4bd2de0dc19` (t4g.nano), are
+out of reach. **Look the instance ID up rather than trusting one written down**: `DescribeInstanceInformation`,
+whose `ComputerName` is `amazon2.hochstaetter.de` - `i-003d020f7b6f6ea99` on 2026-11-28 (t9g.small, Alpine 3.24,
+aarch64, Docker 29.9, Compose v5.7).
+
+Looked at through SSM on 2026-11-28, read only:
+
+- **The client** is the service `home-automation-client` of `/home/christoh/src/kartellvz/docker-compose.yml`,
+  container `home-automation-client.kartellvz`, with **`platform: linux/arm64`** - `linux/arm/v7` on the old host,
+  so the push has to include arm64 now; the bake file has both - and `pull_policy: always`. Rolling out should be,
+  as before, `docker compose pull home-automation-client && docker compose up -d --no-deps home-automation-client`
+  in that directory - not yet tried on this host. The image it ran then had no `RepoDigests`, so it had not been pulled there; compare a rollout by the
+  digest of the image pulled, not with what ran before.
+- The same compose file has `nginx.kartellvz` (certbot's certificates in its `letsencrypt` volume), `ntp`,
+  `onedrive-mcp.kartellvz` and `whatsapp-mcp.kartellvz`, all running, every service on `linux/arm64`. Its
+  `kartellvz.db` and `kartellvz.web` services had no containers at all.
+- Other compose projects under `/home/christoh/docker/`: `claude` (`claude-runner`), `portainer`, `vlmcsd` (the KMS
+  image from the new account's ECR), and `home-automation`, whose image is still the old account's ECR and which had
+  no container. **The HA server does not run on amazon2.**
+- The WireGuard tunnels and addresses the FRITZ!Box documents describe were seen on the old host and are unchecked.
+
+**The compose files on that host hold secrets**; read the lines you need - the service names, `image`, `platform`,
+`container_name`, `pull_policy` - rather than printing whole files.
 
 ## Why "dangling" is not "untagged"
 
