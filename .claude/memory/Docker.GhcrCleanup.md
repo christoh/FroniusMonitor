@@ -202,11 +202,14 @@ Neither is a fault of the image; in production `Settings.xml` is mounted and the
 ### Where the client runs: amazon2
 
 `amazon2.hochstaetter.de` is the EC2 instance named "Docker Host" in `eu-central-1`, reachable through SSM
-(`AWS-RunShellScript`). **Look its ID up rather than trusting one written down**: it was `i-0fcbdf4bd2de0dc19`
-(t4g.nano, arm64, Alpine) until the host was replaced on 2026-11-27, and is `i-003d020f7b6f6ea99` (t9g.small,
-arm64) since - found by `DescribeInstanceInformation`, whose `ComputerName` is `amazon2.hochstaetter.de`. On the
-new instance only a plain `echo` through SSM has been run so far (2026-11-28); that the compose directory and the
-container below are as described there is not checked yet. The client is the service `home-automation-client`
+(`AWS-RunShellScript`). **The developer moved to a new AWS account on 2026-11-27, and set everything up anew
+there.** The AWS connector now signs in to the new account; the old one, and its instance `i-0fcbdf4bd2de0dc19`
+(t4g.nano, arm64, Alpine), are out of reach. The host in the new account is `i-003d020f7b6f6ea99` (t9g.small,
+arm64) - **look the ID up rather than trusting one written down**: `DescribeInstanceInformation`, whose
+`ComputerName` is `amazon2.hochstaetter.de`. On it only a plain `echo` through SSM has run so far (2026-11-28).
+**Everything below, and everything the other documents say about amazon2 - the compose directory, the container,
+its `platform`, the WireGuard tunnels and addresses, nginx and certbot - was seen on the old host** and is unchecked
+on the new one; read it as how it was, and look before relying on it. The client is the service `home-automation-client`
 of `/home/christoh/src/kartellvz/docker-compose.yml`, container `home-automation-client.kartellvz`, with
 `platform: linux/arm/v7` and `pull_policy: always` - so the push has to include arm/v7. Rolling out is
 `docker compose pull home-automation-client && docker compose up -d --no-deps home-automation-client` in that
