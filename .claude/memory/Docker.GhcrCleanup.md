@@ -247,6 +247,13 @@ started for this - which also makes the `logrotate` in the same directory run ag
 Sunday cleanup, in GHCR; going back means building the older commit again. The developer accepted that ("we can
 build again any time"). So deleting the old image after a rollout is no longer a step of its own.
 
+**The host's backup is a monthly AMI**, by the DLM policy "Intranet Gateway" (`IMAGE_MANAGEMENT`, instances tagged
+`IntranetGateway=1`, which the new instance is; on the 1st at 03:00 UTC, one kept). Pruning does **not** make it
+smaller: an EBS snapshot holds the blocks that were ever written, not what the file system calls used, and deleting
+a file does not unwrite its blocks. Only a discard would, and the instance's disk has none
+(`/sys/block/nvme0n1/queue/discard_max_bytes` is 0), so `fstrim` cannot hand anything back. The AMI taken during
+the move on 2026-11-25 already had 13.9 GB of its 16 GB volume in its snapshot, with about 6 GB in use.
+
 ## Why "dangling" is not "untagged"
 
 A naive read of "dangling images" is "anything without a tag" - that is wrong here and deleting on that basis
