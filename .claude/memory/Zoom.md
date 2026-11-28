@@ -150,6 +150,7 @@ views, with the boxes where they sit today.
 - Real fingers reach the recognizer through the scroll viewer around the gauges, which wants them for panning:
   **they do** - the developer pinched cards and gauges in the browser head on an iPad (M5, 11") in
   2026-11, and after the rollout of 2026-11-28 the empty space between them as well ("works as expected").
+
 **Not measured:**
 
 - The trackpad. A precision touchpad pinch is usually delivered as Ctrl and the wheel, which already works, and
