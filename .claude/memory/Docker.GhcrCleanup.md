@@ -236,6 +236,17 @@ Looked at through SSM on 2026-11-28, read only:
 **The compose files on that host hold secrets**; read the lines you need - the service names, `image`, `platform`,
 `container_name`, `pull_policy` - rather than printing whole files.
 
+**Old images are pruned there every night** (since 2026-11-28, on the developer's request). The registry cleanup
+above deletes only versions in GHCR; what `docker compose pull` has brought to a host stays in that host's Docker
+store, untagged, after a newer build takes the tag - 13 such images, 1.28 GB, had gathered on amazon2 within a day
+of the move. `/etc/periodic/daily/docker-image-prune` runs `docker image prune -f` (images without a tag that no
+container uses; tagged images are left alone) and logs what it reclaimed to syslog under the tag
+`docker-image-prune`. `crond` was neither running nor in the default runlevel on the new host, so it was added and
+started for this - which also makes the `logrotate` in the same directory run again, daily at 02:00 with the rest of
+`/etc/periodic/daily`. Consequence: **there is no previous image to go back to**, neither on the host nor, after the
+Sunday cleanup, in GHCR; going back means building the older commit again. The developer accepted that ("we can
+build again any time"). So deleting the old image after a rollout is no longer a step of its own.
+
 ## Why "dangling" is not "untagged"
 
 A naive read of "dangling images" is "anything without a tag" - that is wrong here and deleting on that basis
