@@ -222,7 +222,13 @@ Looked at through SSM on 2026-11-28, read only:
 - Other compose projects under `/home/christoh/docker/`: `claude` (`claude-runner`), `portainer`, `vlmcsd` (the KMS
   image from the new account's ECR), and `home-automation`, whose image is still the old account's ECR and which had
   no container. **The HA server does not run on amazon2.**
-- The WireGuard tunnels and addresses the FRITZ!Box documents describe were seen on the old host and are unchecked.
+- **The network is as it was, except IPv6** (the developer, 2026-11-28): the VPC is set up exactly as before and
+  amazon2 has the same private address in it, WireGuard is as before (so `172.31.15.1` through the tunnel, as the
+  FRITZ!Box and reverse proxy documents say), and the IPv4 Elastic IP `3.77.190.163` was transferred to the new
+  account. The IPv6 address could not be taken along: it is `2a05:d014:1dc2:6301:1b::2` now, `…:9eb:d01:1b::2` on
+  the old host. The AAAA records of `amazon2.hochstaetter.de`, `fritzbox.hochstaetter.de` and
+  `fritzbox.hochstätter.ch` already named the new one on 2026-11-28 (checked over DNS over HTTPS, as was the
+  address on the instance's interface). An IPv6 address of amazon2 written down before that date is the old one.
 
 **The compose files on that host hold secrets**; read the lines you need - the service names, `image`, `platform`,
 `container_name`, `pull_policy` - rather than printing whole files.

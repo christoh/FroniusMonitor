@@ -208,7 +208,8 @@ Verify --(IPv4 still down)--> Backoff --> DisableIpv6 (limited, see below)
     outage either. On 2026-10-24 it answered `jason_boxinfo.xml` with 400, which turned out to be the box's DNS
     rebind protection; since 2026-10-27 it answers 200.
   - **Not** `https://fritzbox.hochstaetter.de/`: that is the box in Neufahrn, through nginx on AWS (A 3.77.190.163,
-    AAAA 2a05:d014:9eb:d01:1b::2), with the same serial number as 192.168.44.11. This plan had the two mixed up until
+    AAAA 2a05:d014:9eb:d01:1b::2 - amazon2's address until it moved to a new AWS account on 2026-11-27; it is
+    2a05:d014:1dc2:6301:1b::2 since, and the A record stayed with the Elastic IP), with the same serial number as 192.168.44.11. This plan had the two mixed up until
     Christoph set it right on 2026-10-24.
   - FRITZ! does not allow a port forwarding to the box itself.
 - **The Swiss box's WireGuard tunnels run over IPv6** (checked on 2026-10-27 on amazon2 and in the box's VPN
