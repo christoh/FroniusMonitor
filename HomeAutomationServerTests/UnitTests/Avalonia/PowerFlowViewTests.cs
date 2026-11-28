@@ -1,11 +1,14 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
+using Avalonia.Input;
 using System.Globalization;
 using Avalonia.VisualTree;
 using De.Hochstaetter.Fronius.Models;
 using De.Hochstaetter.Fronius.Models.Charging;
 using De.Hochstaetter.Fronius.Models.Gen24;
 using De.Hochstaetter.HomeAutomationClient.Contracts;
+using De.Hochstaetter.HomeAutomationClient.Controls;
 using De.Hochstaetter.HomeAutomationClient.Models;
 using De.Hochstaetter.HomeAutomationClient.Services;
 using De.Hochstaetter.HomeAutomationClient.Services.Presentation;
@@ -452,6 +455,24 @@ public sealed class PowerFlowViewTests
     /// the house. Both halves count. Nothing may run on past the last device that draws, and nothing may stand still
     /// on the way to it, or the power would come out of nowhere halfway along.
     /// </summary>
+    /// <summary>
+    /// A pinch on the power flow page between the cards: the margin of the picture on its left, halfway down the
+    /// part that can be seen, is the page's zoom box and nothing else, so the recognizer on the box gets the
+    /// fingers. Until 2026-11 nothing of the box was there, and pinching worked only on a card.
+    /// </summary>
+    [Fact]
+    public Task The_space_between_the_cards_is_the_zoom_box() => HeadlessAvalonia.RunAsync(async () =>
+    {
+        await StartAsync();
+
+        var box = Body.GetVisualDescendants().OfType<ZoomBox>().Single();
+        var scrollViewer = box.FindAncestorOfType<ScrollViewer>()!;
+        var middle = scrollViewer.TranslatePoint(new Point(0, scrollViewer.Bounds.Height / 2), Window)!.Value;
+        var left = box.TranslatePoint(new Point(8, 0), Window)!.Value;
+
+        Assert.Same(box, Window.InputHitTest(new Point(left.X, middle.Y)));
+    });
+
     private static void AssertTheBusesRunExactlyToTheDrawingConsumers(IReadOnlyDictionary<string, (string Path, bool Moves, bool Reversed)> wires)
     {
         var drawingStubs = wires.Where(wire => wire.Key.StartsWith("stub:", StringComparison.Ordinal) && wire.Value.Moves).Select(wire => Points(wire.Value.Path)[0]).ToList();

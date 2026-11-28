@@ -182,8 +182,10 @@
 						  VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"
 						  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AllowAutoHide="False" >
 				<!-- Ctrl with the wheel, or with plus, minus and zero, scales the power consumers; see ZoomBox. The
-				     gestures are taken on the main view, so they work anywhere in the window. -->
-				<c:ZoomBox HorizontalAlignment="Left">
+				     gestures are taken on the main view, so they work anywhere in the window. A pinch is taken on the
+				     box, so the box stretches over the whole area below the power flow, and the cards stay on the left
+				     because the ItemsControl in it says so. -->
+				<c:ZoomBox>
 				<ItemsControl ItemsSource="{Binding UpdateService.AllPowerConsumers}" x:Name="PowerConsumerItemsControl" HorizontalAlignment="Left">
 					<ItemsControl.ItemsPanel>
 						<ItemsPanelTemplate>

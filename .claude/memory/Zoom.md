@@ -9,6 +9,8 @@ paths:
   - HomeAutomationClient/HomeAutomationClient/Views/MainView.axaml
   - HomeAutomationClient/HomeAutomationClient/Views/ChildWindow.axaml
   - HomeAutomationClient/HomeAutomationClient/Views/PowerFlowView.axaml
+  - HomeAutomationServerTests/UnitTests/Avalonia/ZoomBoxTests.cs
+  - HomeAutomationServerTests/UnitTests/Avalonia/ZoomPinchTests.cs
 ---
 
 # Zooming a view (Avalonia)
@@ -40,7 +42,10 @@ and the scale is applied somewhere else entirely; a `ZoomBox` handles no input a
 </ContentPage>
 ```
 
-That is the whole job. Where the scopes are today:
+That is the whole job - **but let the box cover the area where a pinch should work**: a pinch is taken on the box
+(see below), so a box that shrinks to its content with `HorizontalAlignment="Left"` takes no pinch beside it. In a
+scroll viewer the default, stretch, makes the box as big as the viewport; align the content inside it instead.
+Where the scopes are today:
 
 - **`MainView`**, which covers the menu bar, the content and the switches at the bottom - the whole main window on
   every head, and on a head without windows it covers the detail pages too, because they are shown inside it.
@@ -63,7 +68,17 @@ opposite: it is done **to** something, with the fingers on it. So the `PinchGest
 sit on the `ZoomBox` itself, not on the top level, and a pinch
 
 - zooms the box the fingers are on and **no other box in the window**,
-- does nothing at all when the fingers are somewhere else, where it may well be meant as a scroll gesture.
+- does nothing at all when the fingers are outside every box.
+
+**"On the box" is its whole area, its empty space included** (since 2026-11-28). The recognizer only sees
+pointers whose hit test lands on the box or inside it, and Avalonia hits only what has been drawn: a panel without
+a background is not there for the pointer between its children. So until then a pinch worked only with the fingers
+on a card or a gauge - the developer found it on an iPad, where on the power flow page the space between the cards
+is most of the page. `ZoomBox.Render` now fills its bounds with `Brushes.Transparent`, which is drawn and so is hit;
+a missing background is neither. The content is above that fill, so a card, a button or a slider still gets its
+pointer first, and one finger on the empty space still pans the scroll viewer around the box. The dashboard's box,
+which shrank to its cards with `HorizontalAlignment="Left"`, stretches over the whole area below the power flow
+since; the `ItemsControl` in it keeps the cards on the left.
 
 A pinch reports how far apart the fingers are **relative to where they started**, not a step. The box therefore
 remembers the scale the gesture began at and multiplies that by what it is told, so bringing the fingers back to
@@ -120,7 +135,12 @@ platform - see [[Testing.HeadlessAvalonia]]:
 - A scope with no box still scrolls.
 
 The pinch tests synthesize the routed events, because the headless platform has no two-finger input: the
-baseline, the arithmetic, the limits and the restriction are measured, the recognizer below them is not.
+baseline, the arithmetic, the limits and the restriction are measured, the recognizer below them is not. What
+decides whether the recognizer gets the fingers at all is the hit test, and that is measured: the empty space of a
+box is the box (`ZoomPinchTests`), the space between the cards of the power flow page is its box
+(`PowerFlowViewTests`), and the dashboard's box covers the scroll viewer with its cards still on the left
+(`ZoomPinchTests`, on the real `DashboardView`). All three fail without the transparent fill, and the dashboard one
+also with the box left-aligned again.
 
 **Confirmed in the running desktop app** by the developer on 2026-09-15: the wheel and the keyboard zoom the real
 views, with the boxes where they sit today.
@@ -128,7 +148,9 @@ views, with the boxes where they sit today.
 **Not measured:**
 
 - Whether real fingers reach the recognizer through the scroll viewer around the gauges, which wants them for
-  panning. Only a touch screen can answer that; nothing here can.
+  panning: **they do** - the developer pinched cards and gauges in the browser head on an iPad (M5, 11") in
+  2026-11. That the empty space between them now pinches too is for that iPad to confirm once the change is rolled
+  out.
 - The trackpad. A precision touchpad pinch is usually delivered as Ctrl and the wheel, which already works, and
   Avalonia also offers `PointerTouchPadGestureMagnifyEvent` for the platforms that report it natively. Neither is
   handled explicitly.

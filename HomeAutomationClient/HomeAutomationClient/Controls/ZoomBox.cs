@@ -77,11 +77,24 @@ public class ZoomBox : LayoutTransformControl
         LayoutTransform = new ScaleTransform(Scale, Scale);
 
         // Unlike the wheel and the keyboard, this is on the box and not on the window: a pinch is done *to*
-        // something, with the fingers on it, so it zooms what is under them and nothing else. A pinch anywhere
-        // else in the window is left alone - it may well be a scroll gesture.
+        // something, with the fingers on it, so it zooms what is under them and nothing else. "On it" is the whole
+        // area of the box, its empty space included - see Render. A pinch outside every box is left alone.
         GestureRecognizers.Add(new PinchGestureRecognizer());
         AddHandler(PinchEvent, OnPinch);
         AddHandler(PinchEndedEvent, OnPinchEnded);
+    }
+
+    /// <summary>
+    /// Paints the whole box transparent, which is what puts its empty space into hit testing. Avalonia hits only
+    /// what has been drawn: a panel with no background is not there for the pointer between its children, so two
+    /// fingers on the space between the cards of the power flow page reached no element of the box, and the pinch
+    /// recognizer on it never saw them - pinching worked only with the fingers on a card or a gauge, found on an
+    /// iPad in 2026-11. Transparent is drawn and so is hit; a missing background is neither.
+    /// </summary>
+    public override void Render(DrawingContext context)
+    {
+        base.Render(context);
+        context.FillRectangle(Brushes.Transparent, new Rect(Bounds.Size));
     }
 
     /// <summary>How much bigger than its natural size the content is drawn and laid out. 1 is unzoomed.</summary>
