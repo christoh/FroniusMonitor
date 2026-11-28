@@ -251,8 +251,14 @@ build again any time"). So deleting the old image after a rollout is no longer a
 `IntranetGateway=1`, which the new instance is; on the 1st at 03:00 UTC, one kept). Pruning does **not** make it
 smaller: an EBS snapshot holds the blocks that were ever written, not what the file system calls used, and deleting
 a file does not unwrite its blocks. Only a discard would, and the instance's disk has none
-(`/sys/block/nvme0n1/queue/discard_max_bytes` is 0), so `fstrim` cannot hand anything back. The AMI taken during
-the move on 2026-11-25 already had 13.9 GB of its 16 GB volume in its snapshot, with about 6 GB in use.
+(`/sys/block/nvme0n1/queue/discard_max_bytes` is 0), so `fstrim` cannot hand anything back - tried on
+2026-11-28: **`fstrim -va` exits 0 and prints nothing, which looks like success and is not**; `-a` silently skips a
+file system whose device cannot discard. `fstrim -v /` says it: "the discard operation is not supported". The AMI
+taken during the move on 2026-11-25 already had 13.9 GB of its 16 GB volume in its snapshot, with about 6 GB in
+use. The developer says the AMI is stored compressed in S3; if that is what counts, blocks overwritten with zeros
+would cost next to nothing where freed blocks keep their old, compressed and so incompressible, layer data.
+Zero-filling the free space once would test it, by the next snapshot's size - not done, and it fills the disk while
+it runs.
 
 ## Why "dangling" is not "untagged"
 
