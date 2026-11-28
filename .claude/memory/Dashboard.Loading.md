@@ -224,7 +224,14 @@ The developer saw the AOT publish run long on little CPU. The timestamps of the 
 | `wasm-ld` | 420-423 s | - |
 | `wasm-opt -O2` on the linked 52 MB module | 423-749 s | one process; Binaryen spreads only function-local passes over threads, the whole-module ones are serial |
 
-About half the time is one core, which on a machine with many cores reads as an idle build. Both serial parts
+About half the time is one core, which on a machine with many cores reads as an idle build.
+
+The same publish on .NET 11 with Emscripten 6.0.2 (2026-11-28, again 4 cores) took 397 s instead of 750 s, and
+**every phase shrank by about the same factor**: restore, build and trim 102 to 54 s, `mono-aot-cross` 82 to 37 s,
+LLVM 634 to 270 s of CPU (`aot-instances` 137 to 74 s), link and `wasm-opt` 326 to 193 s. A new toolchain would
+show in its own phases and not in the SDK's restore and trim, so this reads more as a less loaded host under the
+cloud container than as .NET 11 - the developer's point. One run on each side cannot separate the two; compare
+phases, never totals, and only between runs on the same day. Both serial parts
 are built in: with dedup (the default) every generic instantiation of every assembly goes once into
 `aot-instances.dll`, which can only be compiled after all the others and is the biggest; and `wasm-opt` is
 Emscripten's whole-module optimizer when linking at `-O2`. GitHub's runner does the whole workflow in about 8
